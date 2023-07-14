@@ -1,7 +1,8 @@
+import type { I18nKey } from '$lib/i18n';
 import type {
   EventType,
-  WorkflowEvents,
   IterableEvent,
+  WorkflowEvents,
 } from '$lib/types/events';
 
 type Categories = typeof CATEGORIES;
@@ -74,26 +75,53 @@ export const eventTypeCategorizations: Readonly<
 };
 
 export type EventTypeOption = {
-  label: string;
+  label: I18nKey<'events'>;
   option: EventTypeCategory | undefined;
   color?: string;
 };
 
 export const allEventTypeOptions: EventTypeOption[] = [
-  { label: 'All', option: undefined },
-  { label: 'Activity', option: CATEGORIES.ACTIVITY, color: '#8B5CF6' },
+  { label: 'category-all', option: undefined },
   {
-    label: 'Child Workflow',
+    label: 'category-activity',
+    option: CATEGORIES.ACTIVITY,
+    color: '#8B5CF6',
+  },
+  {
+    label: 'category-child-workflow',
     option: CATEGORIES.CHILD_WORKFLOW,
     color: '#F59E0B',
   },
-  { label: 'Command', option: CATEGORIES.COMMAND, color: '#10B981' },
-  { label: 'Local Activity', option: CATEGORIES.LOCAL_ACTIVITY },
-  { label: 'Marker', option: CATEGORIES.MARKER, color: '#EC4899' },
-  { label: 'Signal', option: CATEGORIES.SIGNAL, color: '#DD6B20' },
-  { label: 'Timer', option: CATEGORIES.TIMER, color: '#1D4ED8' },
-  { label: 'Update', option: CATEGORIES.UPDATE },
-  { label: 'Workflow', option: CATEGORIES.WORKFLOW, color: '#10B981' },
+  {
+    label: 'category-command',
+    option: CATEGORIES.COMMAND,
+    color: '#10B981',
+  },
+  {
+    label: 'category-local-activity',
+    option: CATEGORIES.LOCAL_ACTIVITY,
+  },
+  {
+    label: 'category-marker',
+    option: CATEGORIES.MARKER,
+    color: '#EC4899',
+  },
+  {
+    label: 'category-signal',
+    option: CATEGORIES.SIGNAL,
+    color: '#DD6B20',
+  },
+  {
+    label: 'category-timer',
+    option: CATEGORIES.TIMER,
+    color: '#1D4ED8',
+  },
+  { label: 'category-update', option: CATEGORIES.UPDATE },
+  {
+    label: 'category-workflow',
+    option: CATEGORIES.WORKFLOW,
+    color: '#10B981',
+  },
 ];
 
 const compactEventTypes: (EventTypeCategory | undefined)[] = [

@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
+
 import {
-  formatAttributes,
   attributeGroups,
   formatAttemptsLeft,
+  formatAttributes,
   formatMaximumAttempts,
   formatRetryExpiration,
-  UnlimitedAttempts,
   NoExpiration,
+  UnlimitedAttempts,
 } from './format-event-attributes';
 
 const workflowEvent = {

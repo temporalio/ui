@@ -1,7 +1,7 @@
 <script lang="ts">
-  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
 
   export let hour = '';
   export let minute = '';

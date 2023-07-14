@@ -1,4 +1,4 @@
-import { derived, writable, type Readable } from 'svelte/store';
+import { derived, type Readable, writable } from 'svelte/store';
 
 import { page } from '$app/stores';
 
@@ -6,13 +6,13 @@ import type {
   FetchEventsParameters,
   FetchEventsParametersWithSettings,
 } from '$lib/services/events-service';
+import { authUser } from '$lib/stores/auth-user';
+import { refresh } from '$lib/stores/workflow-run';
 import type { WorkflowEvents } from '$lib/types/events';
+import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+import { isResetEvent } from '$lib/utilities/is-event-type';
 
 import { eventFilterSort } from './event-view';
-import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-import { refresh } from '$lib/stores/workflow-run';
-import { authUser } from '$lib/stores/auth-user';
-import { isResetEvent } from '$lib/utilities/is-event-type';
 
 const namespace = derived([page], ([$page]) => {
   if ($page.params.namespace) {

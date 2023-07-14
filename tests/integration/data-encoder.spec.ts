@@ -1,15 +1,18 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-import { mockSettingsApi, mockWorkflowsApis } from '~/test-utilities/mock-apis';
+import {
+  mockSettingsApi,
+  mockWorkflowsApis,
+  waitForWorkflowsApis,
+} from '~/test-utilities/mock-apis';
 
 const workflowsUrl = '/namespaces/default/workflows';
-const workflowsAPI = '**/api/v1/namespaces/default/workflows?query=';
 
 test.describe('Data Encoder without Configuration Settings', () => {
   test.beforeEach(async ({ page }) => {
     await mockWorkflowsApis(page);
     await page.goto(workflowsUrl);
-    await page.waitForRequest(workflowsAPI);
+    await waitForWorkflowsApis(page, false);
   });
 
   test('Navigate to Data Encoder UI and configure Local Setting', async ({
@@ -236,7 +239,7 @@ test.describe('Data Encoder with Configuration Settings', () => {
       },
     });
     await page.goto(workflowsUrl);
-    await page.waitForRequest(workflowsAPI);
+    await waitForWorkflowsApis(page, false);
   });
 
   test('Navigate to Data Encoder UI', async ({ page }) => {

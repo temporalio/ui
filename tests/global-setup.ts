@@ -1,12 +1,11 @@
-import { FullConfig, chromium } from '@playwright/test';
+import { chromium, FullConfig } from '@playwright/test';
 
-import { createTemporalServer } from '../utilities/temporal-server';
-import { createCodecServer } from '../temporal/codec-server';
-import { createUIServer } from '../utilities/ui-server';
-import { runWorker } from '../temporal/workers';
 import { startWorkflows } from '../temporal/client';
 import { connect } from '../temporal/client';
-import { setLocalStorage } from './test-utilities/mock-local-storage';
+import { createCodecServer } from '../temporal/codec-server';
+import { runWorker } from '../temporal/workers';
+import { createTemporalServer } from '../utilities/temporal-server';
+import { createUIServer } from '../utilities/ui-server';
 
 const setupDependencies = async () => {
   const codecServer = await createCodecServer({ port: 8888 });
@@ -34,7 +33,6 @@ async function globalSetup(config: FullConfig) {
   }
 
   await page.goto(baseURL);
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 
   await page
     .context()

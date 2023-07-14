@@ -3,10 +3,10 @@
 
 import { expect } from 'vitest';
 import { describe, it } from 'vitest';
-import { isLocalActivityMarkerEvent } from './is-event-type';
-import { toEvent } from '../models/event-history';
 
 import type { EventType } from './is-event-type';
+import { isLocalActivityMarkerEvent } from './is-event-type';
+import { toEvent } from '../models/event-history';
 
 const baseEvent = {
   id: '1',

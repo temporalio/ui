@@ -24,7 +24,7 @@
     searchAttributes,
     searchAttributeOptions,
   } from '$lib/stores/search-attributes';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import { workflowFilters } from '$lib/stores/filters';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -65,10 +65,7 @@
   });
 
   function onSearch() {
-    const searchQuery = toListWorkflowQueryFromFilters(
-      $workflowFilters,
-      $workflowSorts,
-    );
+    const searchQuery = toListWorkflowQueryFromFilters($workflowFilters);
 
     if (searchQuery && searchQuery === searchParamQuery) {
       $refresh = Date.now();

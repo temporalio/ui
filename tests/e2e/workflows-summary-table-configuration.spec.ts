@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 const initialHeaders = [
   'Status',
@@ -156,18 +156,16 @@ test.describe('Workflows Table Configuration', () => {
     const sourceBox = await sourceElement.boundingBox();
     const targetBox = await targetElement.boundingBox();
 
-    if (sourceBox && targetBox) {
-      await page.mouse.move(
-        sourceBox.x + sourceBox.width / 2,
-        sourceBox.y + sourceBox.height / 2,
-      );
-      await page.mouse.down();
-      await page.mouse.move(
-        targetBox.x + targetBox.width / 2,
-        targetBox.y + targetBox.height / 2,
-      );
-      await page.mouse.up();
-    }
+    await page.mouse.move(
+      sourceBox.x + sourceBox.width / 2,
+      sourceBox.y + sourceBox.height / 2,
+    );
+    await page.mouse.down();
+    await page.mouse.move(
+      targetBox.x + targetBox.width / 2,
+      targetBox.y + targetBox.height / 2,
+    );
+    await page.mouse.up();
 
     await page.getByTestId('drawer-close-button').click();
 

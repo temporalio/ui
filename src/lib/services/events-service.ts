@@ -1,23 +1,22 @@
-import { paginated } from '$lib/utilities/paginated';
-import { requestFromAPI } from '$lib/utilities/request-from-api';
-import { routeForApi } from '$lib/utilities/route-for-api';
 import { toEventHistory } from '$lib/models/event-history';
-import { isSortOrder } from '$lib/utilities/is';
-
 import type { EventSortOrder } from '$lib/stores/event-view';
+import type { WorkflowAPIRoutePath } from '$lib/types/api';
+import type {
+  CommonHistoryEvent,
+  GetWorkflowExecutionHistoryResponse,
+  HistoryEvent,
+  WorkflowEvents,
+} from '$lib/types/events';
 import type {
   NamespaceScopedRequest,
   NextPageToken,
   PaginationCallbacks,
   Settings,
 } from '$lib/types/global';
-import type {
-  CommonHistoryEvent,
-  HistoryEvent,
-  GetWorkflowExecutionHistoryResponse,
-  WorkflowEvents,
-} from '$lib/types/events';
-import type { WorkflowAPIRoutePath } from '$lib/types/api';
+import { isSortOrder } from '$lib/utilities/is';
+import { paginated } from '$lib/utilities/paginated';
+import { requestFromAPI } from '$lib/utilities/request-from-api';
+import { routeForApi } from '$lib/utilities/route-for-api';
 
 export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {

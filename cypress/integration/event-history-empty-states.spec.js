@@ -9,7 +9,6 @@ const workflowUrl = `/namespaces/default/workflows/${workflowId}/${runId}`;
 describe('Workflow Executions List', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +

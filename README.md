@@ -29,6 +29,8 @@ You can access the UI by visiting `http://localhost:8233`. OpenAPI is accessible
 
 ### Local Development
 
+#### Setup
+
 Once you have the prerequisites going, run the following:
 
 ```bash
@@ -41,17 +43,27 @@ Running `pnpm install` will attempt to download and install the most recent vers
 - If you do not have a version of Temporal CLI at `./bin/cli/temporal`, the development server will look for a version of Temporal CLI in your path.
 - For Windows users, you will need to start Temporal using one of the methods listed above until we have sufficiently tested this functionality on Windows. (We would absolutely welcome a pull request.)
 
+```bash
+git submodule update
+```
 
-#### Running the UI
+This clones the [Temporal API Protos](https://github.com/temporalio/api) into the git submodule, which is required for local development of the UI when running against a local version of the UI server.
+
+```bash
+cd server/
+make install-utils
+```
+
+This installs various Go dependencies which are required for compiling the gRPC protos for running a local version of the UI server.
+
+
+To run a local development version of the Svelte application via Vite, run `pnpm dev`. The application will run on [http://localhost:3000]() against a local ui-server running along with Temporal server from the temporal-cli.
 
 ```bash
 pnpm dev
 ```
 
-By default, the application will start up the UI with a local ui-server running along with Temporal server from the temporal-cli on port 3000.
-
-Alternatively, you can run `pnpm dev:temporal-cli` to run both ui-server and Temporal server from temporal-cli.
-
+Alternatively, you can run `pnpm dev:temporal-cli` to run against the version of ui-server and Temporal server included temporal-cli.
 ```bash
 pnpm dev:temporal-cli
 ```

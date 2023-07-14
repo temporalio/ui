@@ -18,7 +18,6 @@ const statuses = [
 describe('Workflow Executions List', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
     cy.visit('/namespaces/default/workflows');
 
     cy.wait('@workflows-api');

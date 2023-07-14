@@ -1,15 +1,4 @@
-import {
-  isChildWorkflowExecutionCanceledEvent,
-  isChildWorkflowExecutionCompletedEvent,
-  isChildWorkflowExecutionFailedEvent,
-  isChildWorkflowExecutionTerminatedEvent,
-  isChildWorkflowExecutionTimedOutEvent,
-  isWorkflowExecutionStartedEvent,
-} from './is-event-type';
-import { has } from './has';
-import { isString } from './is';
-
-import type { StartAndEndEventHistory } from '../stores/events';
+import type { DescribeNamespaceResponse } from '$lib/types';
 import type {
   ChildWorkflowExecutionCanceledEvent,
   ChildWorkflowExecutionCompletedEvent,
@@ -19,8 +8,19 @@ import type {
   WorkflowEvents,
 } from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
-import type { DescribeNamespaceResponse } from '$lib/types';
 import type { WorkflowIdentifier } from '$lib/types/workflows';
+
+import { has } from './has';
+import { isString } from './is';
+import {
+  isChildWorkflowExecutionCanceledEvent,
+  isChildWorkflowExecutionCompletedEvent,
+  isChildWorkflowExecutionFailedEvent,
+  isChildWorkflowExecutionTerminatedEvent,
+  isChildWorkflowExecutionTimedOutEvent,
+  isWorkflowExecutionStartedEvent,
+} from './is-event-type';
+import type { StartAndEndEventHistory } from '../stores/events';
 
 const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
   for (const event of events) {

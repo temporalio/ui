@@ -1,5 +1,6 @@
-import { has } from './has';
 import type { NetworkError } from '$lib/types/global';
+
+import { has } from './has';
 
 export function isNetworkError(
   error: unknown | NetworkError,

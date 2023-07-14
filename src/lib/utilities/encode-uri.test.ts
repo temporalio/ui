@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { encodeURIForSvelte, decodeURIForSvelte } from './encode-uri';
+
+import { decodeURIForSvelte, encodeURIForSvelte } from './encode-uri';
 
 describe('encodeURIForSvelte', () => {
   it('should encode reserved URI characters, \\ and %', () => {

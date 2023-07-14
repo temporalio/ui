@@ -1,10 +1,10 @@
 import type {
-  PendingChildren,
-  PendingActivityInfo,
-  PendingActivity,
   Payload,
+  PendingActivity,
+  PendingActivityInfo,
+  PendingChildren,
 } from './events';
-import type { Replace, Optional } from './global';
+import type { Optional, Replace } from './global';
 
 /**
  * Replace Longs, ITimestamps, UInt8Array's etc. with their corresponding http values

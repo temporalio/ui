@@ -59,11 +59,7 @@
     workflowsSearchParams,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import {
-    persistedTimeFilter,
-    workflowFilters,
-    workflowSorts,
-  } from '$lib/stores/filters';
+  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import Pagination from '$lib/holocene/pagination.svelte';
@@ -99,7 +95,7 @@
   $: searchParams, ($workflowsSearchParams = searchParams);
 
   $: {
-    if (!$workflowFilters.length && !$workflowSorts.length) {
+    if (!$workflowFilters.length) {
       $workflowsQuery = '';
     }
   }
@@ -107,7 +103,7 @@
   const persistTimeFilter = () => {
     if (!query && !$workflowFilters.length && $persistedTimeFilter) {
       $workflowFilters = [$persistedTimeFilter];
-      updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+      updateQueryParamsFromFilter($page.url, $workflowFilters);
     }
   };
 
@@ -136,7 +132,6 @@
 
   const resetPageToDefaultState = () => {
     $workflowFilters = [];
-    $workflowSorts = [];
     updateQueryParameters({
       url: $page.url,
       parameter: 'query',
@@ -252,7 +247,7 @@
       </p>
       {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility}
         <div class="h-1 w-1 rounded-full bg-gray-400" />
-        <p data-testid="workflow-count">
+        <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
           {#if $loading}
             <span class="text-gray-400"
               ><Translate namespace="common" key="loading" /></span

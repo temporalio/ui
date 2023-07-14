@@ -1,10 +1,9 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
   import { logEvent } from 'histoire/client';
-
+  
   import Button from './button.svelte';
   import Input from './input/input.svelte';
-
   import Modal from './modal.svelte';
 
   export let Hst: HST;

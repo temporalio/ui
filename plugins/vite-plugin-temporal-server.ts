@@ -1,10 +1,11 @@
-import { chalk } from 'zx';
 import type { Plugin } from 'vite';
-import {
-  type TemporalServer,
-  createTemporalServer,
-} from '../utilities/temporal-server';
 import type { ViteDevServer } from 'vite';
+import { chalk } from 'zx';
+
+import {
+  createTemporalServer,
+  type TemporalServer,
+} from '../utilities/temporal-server';
 
 const { cyan, magenta } = chalk;
 

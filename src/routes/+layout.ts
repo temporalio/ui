@@ -1,9 +1,9 @@
-import { get } from 'svelte/store';
-import type { LayoutData, LayoutLoad } from './$types';
 import i18next from 'i18next';
-import Backend, { type HttpBackendOptions } from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { createStore } from '$lib/i18n/store';
+import Backend, { type HttpBackendOptions } from 'i18next-http-backend';
+
+import type { LayoutData, LayoutLoad } from './$types';
+
 import { I18nNamespaces } from '$lib/i18n';
 
 export const ssr = false;
@@ -27,10 +27,4 @@ export const load: LayoutLoad = function (): LayoutData {
         loadPath: '/i18n/locales/{{lng}}/{{ns}}.json',
       },
     });
-
-  const { i18n } = createStore(i18next);
-
-  return {
-    i18n: () => get(i18n),
-  };
 };

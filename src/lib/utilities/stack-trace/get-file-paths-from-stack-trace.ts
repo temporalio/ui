@@ -1,7 +1,7 @@
+import { getFilePathsFromGoStackTrace } from './get-file-paths-from-go-stack-trace';
+import { getFilePathsFromTypeScriptStackTrace } from './get-file-paths-from-typescript-stack-trace';
 import { isFromGoSDK } from './is-from-go-sdk';
 import { isFromTypeScriptSDK } from './is-from-typescript-sdk';
-import { getFilePathsFromTypeScriptStackTrace } from './get-file-paths-from-typescript-stack-trace';
-import { getFilePathsFromGoStackTrace } from './get-file-paths-from-go-stack-trace';
 
 export const getFilePathsFromStackTrace = (
   stackTraceText: string,

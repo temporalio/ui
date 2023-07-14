@@ -1,4 +1,11 @@
 import { describe, expect, it } from 'vitest';
+
+import type {
+  ActivityTaskScheduledEvent,
+  StartChildWorkflowExecutionInitiatedEvent,
+  WorkflowEvent,
+} from '$lib/types/events';
+
 import { groupEvents } from '.';
 import {
   eventIsCanceled,
@@ -8,11 +15,6 @@ import {
   eventOrGroupIsFailureOrTimedOut,
   eventOrGroupIsTerminated,
 } from './get-event-in-group';
-import type {
-  ActivityTaskScheduledEvent,
-  StartChildWorkflowExecutionInitiatedEvent,
-  WorkflowEvent,
-} from '$lib/types/events';
 
 const startChildWorkflow = {
   id: '42',

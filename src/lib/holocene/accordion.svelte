@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { v4 } from 'uuid';
-  import { noop } from 'svelte/internal';
-  import type { IconName } from './icon/paths';
-
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import type { HTMLAttributes } from 'svelte/elements';
+  import { noop } from 'svelte/internal';
+  
+  import { v4 } from 'uuid';
+  
+  import Badge from '$lib/holocene/badge.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  
+  import type { IconName } from './icon/paths';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
     title: string;

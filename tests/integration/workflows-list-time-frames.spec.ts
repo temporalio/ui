@@ -1,16 +1,14 @@
-import { test, expect } from '@playwright/test';
-import { mockDate } from '~/test-utilities/mock-date';
+import { expect, test } from '@playwright/test';
+
 import { mockWorkflowsApis } from '~/test-utilities/mock-apis';
-import { setLocalStorage } from '~/test-utilities/mock-local-storage';
+import { mockDate } from '~/test-utilities/mock-date';
 
 const workflowsUrl = '/namespaces/default/workflows';
-const workflowsApiMatch = new RegExp('/api/v1/namespaces/default/workflows');
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(mockDate);
   await mockWorkflowsApis(page);
   await page.goto(workflowsUrl);
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 });
 
 const timeFrames = [
@@ -61,8 +59,6 @@ for (const { period, query } of timeFrames) {
     page,
   }) => {
     await page.locator('#time-range-filter').selectOption(period);
-    await page.waitForRequest(workflowsApiMatch);
-
-    expect(page.url()).toBe(query);
+    await expect(page).toHaveURL(query);
   });
 }

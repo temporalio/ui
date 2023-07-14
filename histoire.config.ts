@@ -1,6 +1,7 @@
 import path from 'path';
-import { defaultColors, defineConfig } from 'histoire';
+
 import { HstSvelte as histoire } from '@histoire/plugin-svelte';
+import { defaultColors, defineConfig } from 'histoire';
 
 export default defineConfig({
   plugins: [histoire()],

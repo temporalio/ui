@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { toTimeDifference } from './to-time-difference';
 
 describe('toTimeDifference', () => {

@@ -1,13 +1,13 @@
 /// <reference types="cypress" />
 
-import workflowsFixture from '../fixtures/workflows.json';
-import eventsCompletedFixture from '../fixtures/event-history-completed.json';
-import eventsCompletedNullFixture from '../fixtures/event-history-completed-null.json';
-import eventsRunningFixture from '../fixtures/event-history-running.json';
-import eventsFailedFixture from '../fixtures/event-history-failed.json';
 import eventsCanceledFixture from '../fixtures/event-history-canceled.json';
+import eventsCompletedNullFixture from '../fixtures/event-history-completed-null.json';
+import eventsCompletedFixture from '../fixtures/event-history-completed.json';
 import eventsContinuedAsNewFixture from '../fixtures/event-history-continued-as-new.json';
+import eventsFailedFixture from '../fixtures/event-history-failed.json';
+import eventsRunningFixture from '../fixtures/event-history-running.json';
 import eventsTimedOutFixture from '../fixtures/event-history-timed-out.json';
+import workflowsFixture from '../fixtures/workflows.json';
 
 const workflow = workflowsFixture.executions[0];
 const { workflowId, runId } = workflow.execution;
@@ -15,7 +15,6 @@ const { workflowId, runId } = workflow.execution;
 describe('Workflow Input and Results', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +

@@ -8,6 +8,7 @@
 
   export let pinned = false;
   export let columns: WorkflowHeader[];
+  export let totalColumnCount: number;
   export let empty: boolean;
 </script>
 
@@ -35,7 +36,7 @@
           />
         </td>
       </tr>
-    {:else if !pinned && columns.length === 0}
+    {:else if !pinned && totalColumnCount === 0}
       <tr>
         <td colspan={columns.length + 1}>
           <EmptyState title="No column headers are in view">

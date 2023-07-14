@@ -1,25 +1,10 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
 import { mockWorkflowsApis } from '~/test-utilities/mock-apis';
-import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 
 test.beforeEach(async ({ page, baseURL }) => {
   await page.goto(baseURL);
   await mockWorkflowsApis(page);
-});
-
-test('New Top Navigation modal overlay is present', async ({ page }) => {
-  await setLocalStorage('viewedFeatureTags', JSON.stringify([]), page);
-  await expect(page.getByTestId('overlay-modal')).toBeVisible();
-  await expect(page.getByTestId('overlay-title')).toBeVisible();
-  await expect(page.getByTestId('overlay-title')).toHaveText(
-    'Check out the new top navigation!',
-  );
-  await expect(
-    page.getByRole('button', { name: 'Got it!' }).first(),
-  ).toBeVisible();
-  await page.getByRole('button', { name: 'Got it!' }).first().click();
-
-  await expect(page.getByTestId('overlay-modal')).toBeHidden();
 });
 
 test('Top Navigation current namespace is present', async ({ page }) => {
@@ -76,7 +61,6 @@ test('Top Navigation current namespace is present and has other namespaces to se
 test('Top Navigation current namespace is not present on non-namespace specific pages', async ({
   page,
 }) => {
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
   await expect(page.getByTestId('namespace-select-button')).toBeVisible();
 
   await page.getByRole('link', { name: 'Namespaces' }).click();

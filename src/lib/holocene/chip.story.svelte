@@ -1,6 +1,7 @@
 <script lang="ts">
-  import Chip from '$lib/holocene/chip.svelte';
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
+  import Chip from '$lib/holocene/chip.svelte';
 
   export let Hst: HST;
 

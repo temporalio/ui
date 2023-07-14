@@ -11,14 +11,18 @@
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import WorkflowColumnsOrderableList from './workflows-summary-configurable-table/orderable-list.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { page } from '$app/stores';
 
   export let workflows: WorkflowExecution[];
 
   let customizationDrawerOpen: boolean = false;
 
-  $: empty = workflows.length === 0 || $workflowTableColumns.length === 0;
-  $: pinnedColumns = $workflowTableColumns.filter((column) => column.pinned);
-  $: otherColumns = $workflowTableColumns.filter((column) => !column.pinned);
+  $: ({ namespace } = $page.params);
+  $: columns = $workflowTableColumns?.[namespace] ?? [];
+  $: empty = workflows.length === 0;
+  $: pinnedColumns = columns.filter((column) => column.pinned);
+  $: otherColumns = columns.filter((column) => !column.pinned);
+  $: totalColumnCount = pinnedColumns.length + otherColumns.length;
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
@@ -31,7 +35,7 @@
 
 <div class="workflows-summary-configurable-table">
   <TableWrapper noPinnedColumns={pinnedColumns.length === 0}>
-    <Table pinned {empty} columns={pinnedColumns}>
+    <Table pinned {empty} {totalColumnCount} columns={pinnedColumns}>
       <TableHeaderRow pinned {workflows} {pinnedColumns} {empty} slot="headers">
         {#each pinnedColumns as column}
           <TableHeaderCell {column} />
@@ -45,7 +49,12 @@
         </TableRow>
       {/each}
     </Table>
-    <Table {empty} columns={otherColumns} slot="unpinned-columns">
+    <Table
+      {empty}
+      {totalColumnCount}
+      columns={otherColumns}
+      slot="unpinned-columns"
+    >
       <TableHeaderRow
         onClickConfigure={openCustomizationDrawer}
         {workflows}
@@ -83,7 +92,7 @@
     />), and remove (<Icon class="inline" name="hyphen" />), Workflow Headings
     to personalize the Workflow List Table.
   </svelte:fragment>
-  <WorkflowColumnsOrderableList />
+  <WorkflowColumnsOrderableList {namespace} />
 </Drawer>
 
 <style lang="postcss">

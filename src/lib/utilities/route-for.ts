@@ -1,9 +1,11 @@
 import { BROWSER } from 'esm-env';
-import { toURL } from '$lib/utilities/to-url';
-import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
+
 import { base } from '$app/paths';
-import type { Settings } from '$lib/types/global';
+
 import type { EventView } from '$lib/types/events';
+import type { Settings } from '$lib/types/global';
+import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
+import { toURL } from '$lib/utilities/to-url';
 
 type RouteParameters = {
   namespace: string;

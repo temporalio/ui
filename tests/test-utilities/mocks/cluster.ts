@@ -1,5 +1,8 @@
 import type { Page } from '@playwright/test';
+
 import type { GetClusterInfoResponse as Cluster } from '$src/lib/types';
+
+export const CLUSTER_API = '**/api/v1/cluster?';
 
 const MOCK_CLUSTER: Cluster = {
   supportedClients: {
@@ -31,7 +34,7 @@ export const mockClusterApi = async (
   page: Page,
   cluster?: Partial<Cluster>,
 ) => {
-  return page.route('**/api/v1/cluster?', async (route) => {
+  return page.route(CLUSTER_API, async (route) => {
     route.fulfill({ json: mergeCluster(cluster) });
   });
 };

@@ -3,12 +3,7 @@
   "origins": [
     {
       "origin": "http://localhost:3000",
-      "localStorage": [
-        {
-          "name": "viewedFeatureTags",
-          "value": "[\"topNav\"]"
-        }
-      ]
+      "localStorage": []
     }
   ]
 }

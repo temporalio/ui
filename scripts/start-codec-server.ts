@@ -1,4 +1,5 @@
 import yargs from 'yargs/yargs';
+
 import {
   type CodecServerOptions,
   createCodecServer,

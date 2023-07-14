@@ -1,5 +1,6 @@
-import { writable, get, derived, type Readable } from 'svelte/store';
-import type { WorkflowExecution, SearchAttributes } from '$lib/types/workflows';
+import { derived, get, type Readable, writable } from 'svelte/store';
+
+import type { SearchAttributes, WorkflowExecution } from '$lib/types/workflows';
 
 type SearchAttributesStore = {
   customAttributes: SearchAttributes;
