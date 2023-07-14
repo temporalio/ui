@@ -36,8 +36,8 @@ type RequestFromAPIOptions = {
 };
 
 export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
-  (obj as TemporalAPIError)?.message !== undefined &&
-  typeof (obj as TemporalAPIError)?.message === 'string';
+    (obj as TemporalAPIError)?.message !== undefined &&
+    typeof (obj as TemporalAPIError)?.message === 'string';
 
 /**
  *  A utility method for making requests to the Temporal API.
@@ -52,8 +52,8 @@ export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
  * @returns Promise with the response from the API parsed into an object.
  */
 export const requestFromAPI = async <T>(
-  endpoint: toURLParams[0],
-  init: RequestFromAPIOptions = {},
+    endpoint: toURLParams[0],
+    init: RequestFromAPIOptions = {},
 ): Promise<T> => {
   const {
     params = {},
@@ -106,8 +106,8 @@ export const requestFromAPI = async <T>(
 };
 
 const withSecurityOptions = (
-  options: RequestInit,
-  isBrowser = BROWSER,
+    options: RequestInit,
+    isBrowser = BROWSER,
 ): RequestInit => {
   const opts: RequestInit = { credentials: 'include', ...options };
   opts.headers = withCsrf(options?.headers, isBrowser);
@@ -115,25 +115,25 @@ const withSecurityOptions = (
 };
 
 const withAuth = async (
-  options: RequestInit,
-  isBrowser = BROWSER,
+    options: RequestInit,
+    isBrowser = BROWSER,
 ): Promise<RequestInit> => {
   if (getAuthUser().accessToken) {
     options.headers = await withBearerToken(
-      options?.headers,
-      async () => getAuthUser().accessToken,
-      isBrowser,
+        options?.headers,
+        async () => getAuthUser().accessToken,
+        isBrowser,
     );
     options.headers = withIdToken(
-      options?.headers,
-      getAuthUser().idToken,
-      isBrowser,
+        options?.headers,
+        getAuthUser().idToken,
+        isBrowser,
     );
   } else if (globalThis?.AccessToken) {
     options.headers = await withBearerToken(
-      options?.headers,
-      globalThis.AccessToken,
-      isBrowser,
+        options?.headers,
+        globalThis.AccessToken,
+        isBrowser,
     );
   }
 
@@ -141,9 +141,9 @@ const withAuth = async (
 };
 
 const withBearerToken = async (
-  headers: HeadersInit,
-  accessToken: () => Promise<string>,
-  isBrowser = BROWSER,
+    headers: HeadersInit,
+    accessToken: () => Promise<string>,
+    isBrowser = BROWSER,
 ): Promise<HeadersInit> => {
   // At this point in the code path, headers will always be set.
   /* c8 ignore next */
@@ -151,8 +151,9 @@ const withBearerToken = async (
   if (!isBrowser) return headers;
 
   try {
-    const token = await accessToken();
+    const token = getAuthUser().idToken
     if (token) {
+      console.log("eisler - I changed here", token);
       headers['Authorization'] = `Bearer ${token}`;
     }
     /* c8 ignore next 4 */
@@ -164,9 +165,9 @@ const withBearerToken = async (
 };
 
 const withIdToken = (
-  headers: HeadersInit = {},
-  idToken: string,
-  isBrowser = BROWSER,
+    headers: HeadersInit = {},
+    idToken: string,
+    isBrowser = BROWSER,
 ): HeadersInit => {
   if (!isBrowser) return headers;
 

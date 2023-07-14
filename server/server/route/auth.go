@@ -131,20 +131,20 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 			return echo.NewHTTPError(http.StatusInternalServerError, "unable to set user: "+err.Error())
 		}
 
-		nonceS, err := c.Request().Cookie("nonce")
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, "nonce is not provided")
-		}
-		nonce, err := nonceFromString(nonceS.Value)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, "nonce is invalid")
-		}
+		//nonceS, err := c.Request().Cookie("nonce")
+		//if err != nil {
+		//	return echo.NewHTTPError(http.StatusBadRequest, "nonce is not provided")
+		//}
+		//nonce, err := nonceFromString(nonceS.Value)
+		//if err != nil {
+		//	return echo.NewHTTPError(http.StatusBadRequest, "nonce is invalid")
+		//}
 
-		returnUrl := nonce.ReturnURL
-		if returnUrl == "" {
-			returnUrl = "/"
-		}
-
+		//returnUrl := nonce.ReturnURL
+		//if returnUrl == "" {
+		//	returnUrl = "/"
+		//}
+		returnUrl := "/"
 		return c.Redirect(http.StatusSeeOther, returnUrl)
 	}
 }

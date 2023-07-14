@@ -31,6 +31,10 @@ COPY docker/config-template.yaml ./config-template.yaml
 
 RUN chown temporal:temporal /home/ui-server -R
 
+RUN curl https://vault.prod-hashicorp-ent.bra2.tucows.systems:8200/v1/pki/ca/pem -o /usr/local/share/ca-certificates/tucows-root-ca-v2.crt -k
+
+RUN update-ca-certificates
+
 EXPOSE 8080
 ENTRYPOINT ["./start-ui-server.sh"]
 ENV TEMPORAL_CLOUD_UI=$TEMPORAL_CLOUD_UI

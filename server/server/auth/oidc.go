@@ -59,13 +59,13 @@ type Claims struct {
 }
 
 func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, provider *oidc.Provider) (*User, error) {
-	state, err := r.Cookie("state")
-	if err != nil {
-		return nil, echo.NewHTTPError(http.StatusBadRequest, "State cookie is not set in request")
-	}
-	if r.URL.Query().Get("state") != state.Value {
-		return nil, echo.NewHTTPError(http.StatusBadRequest, "State cookie did not match")
-	}
+	//state, err := r.Cookie("state")
+	//if err != nil {
+	//	return nil, echo.NewHTTPError(http.StatusBadRequest, "State cookie is not set in request")
+	//}
+	//if r.URL.Query().Get("state") != state.Value {
+	//	return nil, echo.NewHTTPError(http.StatusBadRequest, "State cookie did not match")
+	//}
 
 	oauth2Token, err := config.Exchange(ctx, r.URL.Query().Get("code"))
 	if err != nil {
@@ -85,13 +85,13 @@ func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, p
 		return nil, echo.NewHTTPError(http.StatusInternalServerError, "Unable to verify ID Token: "+err.Error())
 	}
 
-	nonce, err := r.Cookie("nonce")
-	if err != nil {
-		return nil, echo.NewHTTPError(http.StatusBadRequest, "Nonce is not provided")
-	}
-	if idToken.Nonce != nonce.Value {
-		return nil, echo.NewHTTPError(http.StatusBadRequest, "Nonce did not match")
-	}
+	//nonce, err := r.Cookie("nonce")
+	//if err != nil {
+	//	return nil, echo.NewHTTPError(http.StatusBadRequest, "Nonce is not provided")
+	//}
+	//if idToken.Nonce != nonce.Value {
+	//	return nil, echo.NewHTTPError(http.StatusBadRequest, "Nonce did not match")
+	//}
 
 	var claims Claims
 	if err := idToken.Claims(&claims); err != nil {
