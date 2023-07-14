@@ -19,11 +19,10 @@
   aria-label="primary"
   {...$$restProps}
 >
-  <div class="h-32 min-h-[84px] relative">
+  <div class="h-10 md:h-32 md:min-h-[84px] md:relative">
     <a
       href={linkList.home}
-      class="absolute block z-[51]"
-      style="top: 22px; left: 18px;"
+      class="absolute top-[8px] left-[8px] md:top-[22px] md:left-[18px] block z-[51]"
     >
       <Logo
         height="24px"
@@ -48,24 +47,31 @@
     class:close={!$navOpen}
   >
     <div class="nav-section-wrapper">
-      <ul class="nav-section">
+      <ul class="nav-section ml-8 md:ml-0">
         <slot name="top" />
       </ul>
+      <div
+        class="w-2 h-8 border-l-2 {isCloud
+          ? 'border-gray-200'
+          : 'border-gray-700'} md:hidden"
+      />
       <hr
-        class="w-full my-8 {isCloud ? 'stroke-gray-200' : 'stroke-gray-700'}"
+        class="hidden md:block md:w-full md:my-8 {isCloud
+          ? 'stroke-gray-200'
+          : 'stroke-gray-700'}"
       />
       <ul class="nav-section">
         <slot name="middle" />
       </ul>
     </div>
-    <div class="nav-section-wrapper">
+    <div class="nav-section-wrapper justify-end">
       <ul class="nav-section">
         <slot name="bottom" />
       </ul>
     </div>
   </div>
   <div
-    class="text-[10px] w-full pb-12 pt-24 text-center {isCloud
+    class="text-[10px] hidden md:block md:w-full md:pb-12 md:pt-24 text-center {isCloud
       ? 'text-gray-500'
       : 'text-gray-300'}"
   >
@@ -76,7 +82,7 @@
 
 <style lang="postcss">
   .nav-header {
-    @apply relative z-0 flex flex-col justify-between h-screen bg-primary text-white;
+    @apply relative z-0 flex flex-row md:flex-col justify-between h-10 md:h-screen bg-primary text-white;
   }
 
   .nav-header.cloud {
@@ -84,7 +90,7 @@
   }
 
   .nav-wrapper {
-    @apply z-50 flex flex-col grow items-center justify-between w-16;
+    @apply z-50 flex flex-row md:flex-col md:w-16 grow items-center justify-between;
   }
 
   .nav-wrapper.open {
@@ -92,11 +98,11 @@
   }
 
   .nav-section-wrapper {
-    @apply w-full flex flex-col;
+    @apply w-full flex flex-row md:flex-col;
   }
 
   .nav-section {
-    @apply flex flex-col gap-2 px-3;
+    @apply flex flex-row md:flex-col gap-2 px-3;
   }
 
   .cloud {
@@ -120,11 +126,11 @@
   }
 
   .nav-header:hover .nav-toggle {
-    @apply block;
+    @apply md:block;
   }
 
   .nav-header:focus .nav-toggle {
-    @apply block;
+    @apply md:block;
   }
 
   .nav-toggle.close {

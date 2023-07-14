@@ -101,7 +101,7 @@
 
 <style lang="postcss">
   .nav-icon {
-    @apply ml-2 mr-2 mt-0 h-6 cursor-pointer;
+    @apply ml-1 mr-1 md:ml-2 md:mr-2 md:mt-0 md:h-6 cursor-pointer;
   }
 
   .nav-title {

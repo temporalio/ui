@@ -91,12 +91,15 @@
 
 <div class="flex w-screen flex-row">
   <Toaster pop={toaster.pop} toasts={toaster.toasts} />
-  <div class="sticky top-0 z-20 h-screen w-auto">
+  <div class="hidden md:block sticky top-0 z-20 h-screen w-auto">
     <SideNavigation {activeNamespace} {linkList} {isCloud} />
   </div>
   <MainContentContainer>
     <DataEncoderSettings />
     <TopNavigation {logout} {namespaceList} />
+    <div class="sticky top-10 z-30 md:hidden">
+      <SideNavigation {activeNamespace} {linkList} {isCloud} />
+    </div>
     <Banners {uiVersionInfo} />
     <div class="z-10 -mt-4 flex w-full flex-col gap-4 px-10 pb-10 pt-8">
       <ErrorBoundary onError={() => {}}>
