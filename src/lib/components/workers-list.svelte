@@ -9,9 +9,9 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import {
-    getWorkerTaskReachability,
     type GetPollersResponse,
     type TaskQueueCompatibility,
+    getWorkerTaskRetirementStatus,
   } from '$lib/services/pollers-service';
   import {
     getCurrentCompatibilityDefaultVersion,
@@ -22,18 +22,12 @@
   } from '$lib/utilities/task-queue-compatibility';
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
   import { page } from '$app/stores';
-  import { onMount } from 'svelte';
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;
   export let compatibility: TaskQueueCompatibility;
 
-  // onMount(async () => {
-  //   const namespace = $page.params.namespace;
-  //   let fetchWorkerTaskReachability = await getWorkerTaskReachability({
-  //     namespace,
-  //   });
-  // });
+  let namespace = $page.params.namespace;
 
   $: defaultVersion = getCurrentCompatibilityDefaultVersion(compatibility);
 </script>
@@ -80,6 +74,7 @@
     <TableHeaderRow slot="headers">
       <th class="w-3/12">ID</th>
       <th class="w-3/12">Version</th>
+      <th class="w-2/12">Retirability</th>
       <th class="w-2/12">Last Accessed</th>
       <th class="w-2/12">
         <p class="text-center">Workflow Task Handler</p>
@@ -89,6 +84,7 @@
       </th>
     </TableHeaderRow>
     {#each workers?.pollers as poller (poller.identity)}
+      {@const buildId = getCurrentPollerBuildId(poller)}
       <TableRow data-testid="worker-row">
         <td class="text-left" data-testid="worker-identity">
           <p class="select-all">{poller.identity}</p>
@@ -96,12 +92,20 @@
         <td class="text-left" data-testid="worker-identity">
           <p class="select-all">
             <CompatibilityBadge
-              defaultVersion={getCurrentPollerBuildId(poller) ===
-                defaultVersion}
-              active={getCurrentPollerBuildId(poller) === defaultVersion}
-              buildId={getCurrentPollerBuildId(poller)}
+              defaultVersion={buildId === defaultVersion}
+              active={buildId === defaultVersion}
+              {buildId}
             />
           </p>
+        </td>
+        <td class="text-left" data-testid="worker-last-access-time">
+          {#await getWorkerTaskRetirementStatus( { namespace, taskQueues: [taskQueue], buildIds: [buildId] }, ) then result}
+            <p>
+              <span class="bg-gray-200 px-2 py-1 rounded-sm">{result}</span>
+            </p>
+          {:catch}
+            <p>Unknown</p>
+          {/await}
         </td>
         <td class="text-left" data-testid="worker-last-access-time">
           <p class="select-all">

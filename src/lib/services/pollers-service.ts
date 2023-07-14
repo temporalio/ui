@@ -1,7 +1,9 @@
 import type {
+  BuildIdReachability,
   PollerInfo,
   TaskQueueCompatibleVersionSet,
   TaskQueueStatus,
+  TaskReachability,
 } from '$lib/types';
 import type { NamespaceScopedRequest } from '$lib/types/global';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -9,7 +11,7 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 
-export type GetWorkerTasReachabilityRequest = NamespaceScopedRequest & {
+export type GetWorkerTaskReachabilityRequest = NamespaceScopedRequest & {
   buildIds?: string[];
   taskQueues?: string[];
 };
@@ -21,6 +23,10 @@ export type GetPollersResponse = {
 
 export type TaskQueueCompatibility = {
   majorVersionSets: TaskQueueCompatibleVersionSet[];
+};
+
+export type GetWorkerTaskReachabilityResponse = {
+  buildIdReachability: BuildIdReachability[];
 };
 
 type PollersData = {
@@ -118,13 +124,41 @@ export async function getTaskQueueCompatibility(
 }
 
 export async function getWorkerTaskReachability(
-  parameters: GetWorkerTasReachabilityRequest,
+  parameters: GetWorkerTaskReachabilityRequest,
   request = fetch,
-): Promise<TaskQueueCompatibility> {
-  const { namespace } = parameters;
+): Promise<GetWorkerTaskReachabilityResponse> {
+  const { namespace, taskQueues, buildIds } = parameters;
   const route = routeForApi('worker-task-reachability', { namespace });
   return requestFromAPI(route, {
     request,
-    params: { buildIds: '', taskQueues: '' },
+    params: { buildIds, taskQueues },
   });
+}
+
+function getLabelForReachability(reachability: TaskReachability[]): string {
+  if (!reachability) return 'Ready to be Retired';
+  if (reachability.length === 1 && reachability.includes('CLOSED')) {
+    return 'Ready to be Retired';
+  }
+  return 'No';
+  // if (reachability.includes(TaskReachability.TASK_REACHABILITY_NEW_WORKFLOWS)) {
+  //   return 'NEW_WORKFLOWS';
+  // }
+  // if (reachability.includes(TaskReachability.TASK_REACHABILITY_EXISTING_WORKFLOWS)) {
+  //   return 'EXISTING_WORKFLOWS';
+  // }
+  // if (reachability.includes(TaskReachability.TASK_REACHABILITY_OPEN_WORKFLOWS)) {
+  //   return 'OPEN_WORKFLOWS';
+  // }
+}
+
+export async function getWorkerTaskRetirementStatus(
+  parameters: GetWorkerTaskReachabilityRequest,
+  request = fetch,
+): Promise<string> {
+  const reachability = await getWorkerTaskReachability(parameters, request);
+  const buildIdReachability = reachability?.buildIdReachability[0];
+  const taskQueueReachability =
+    buildIdReachability?.taskQueueReachability?.[0]?.reachability;
+  return getLabelForReachability(taskQueueReachability);
 }
