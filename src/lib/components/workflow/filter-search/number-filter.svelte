@@ -7,11 +7,13 @@
 
   type T = $$Generic;
 
-  const { filter, handleSubmit } = getContext<FilterContext<T>>(FILTER_CONTEXT);
+  const { filter, focusedElementId, handleSubmit } =
+    getContext<FilterContext<T>>(FILTER_CONTEXT);
 
   const validateNumber = (value: string): boolean => /^[0-9]+$/.test(value);
 
   const handleKeydown = (e: KeyboardEvent) => {
+    $focusedElementId = '';
     if (e.key === 'Enter' && $filter.value !== '') {
       const isValid = validateNumber($filter.value);
       if (isValid) {

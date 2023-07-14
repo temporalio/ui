@@ -6,11 +6,15 @@
 
   type T = $$Generic;
 
-  const { filter, handleSubmit } = getContext<FilterContext<T>>(FILTER_CONTEXT);
+  const { filter, handleSubmit, resetFilter } =
+    getContext<FilterContext<T>>(FILTER_CONTEXT);
+
+  let value = $filter.value;
 
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter' && $filter.value !== '') {
+    if (e.key === 'Enter' && value !== '') {
       e.preventDefault();
+      $filter.value = value;
       handleSubmit();
     }
   }
@@ -23,6 +27,7 @@
   icon="search"
   class="w-full"
   unroundLeft
-  bind:value={$filter.value}
+  bind:value
   on:keydown={handleKeydown}
+  on:blur={resetFilter}
 />

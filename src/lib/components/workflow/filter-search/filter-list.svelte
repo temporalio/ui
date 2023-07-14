@@ -6,6 +6,7 @@
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { isWorkflowStatusType } from '$lib/models/workflow-status';
 
   import Chip from '$lib/holocene/chip.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -38,21 +39,27 @@
           on:remove={() => removeQuery(i)}
           on:click={() => {
             $activeQueryIndex = i;
-            $filter = workflowFilter;
+            $filter = { ...workflowFilter };
           }}
           intent="default"
           button
         >
-          {attribute}
-          {#if !customDate}
-            {conditional}
-          {/if}
-          {#if attribute === 'ExecutionStatus'}
-            <div class="-py-1">
-              <WorkflowStatus status={value} />
-            </div>
+          {#if attribute === 'ExecutionStatus' && isWorkflowStatusType(value)}
+            <span class="flex">
+              {attribute}
+              {conditional}
+              <span class="ml-1 -py-1">
+                <WorkflowStatus status={value} />
+              </span>
+            </span>
           {:else}
-            {value}
+            <span class="max-w-xs md:max-w-lg xl:max-w-2xl truncate">
+              {attribute}
+              {#if !customDate}
+                {conditional}
+              {/if}
+              {value}
+            </span>
           {/if}
         </Chip>
       </div>

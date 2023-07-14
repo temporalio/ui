@@ -8,6 +8,7 @@
     activeQueryIndex: Writable<number>;
     handleSubmit: () => void;
     focusedElementId: Writable<any>;
+    resetFilter: () => void;
   }
 </script>
 
@@ -56,6 +57,7 @@
     activeQueryIndex,
     handleSubmit,
     focusedElementId,
+    resetFilter,
   });
 
   function onSearch() {
@@ -103,6 +105,7 @@
 
   function isTextFilter(attribute: string) {
     const searchAttributeType = $searchAttributes[attribute];
+    if (isStatusFilter($filter.attribute)) return false;
     return ['Keyword', 'Text'].includes(searchAttributeType);
   }
 
@@ -141,8 +144,8 @@
     return '';
   }
 
-  function isOptionDisabled(value: string) {
-    return $workflowFilters.some(
+  function isOptionDisabled(value: string, filters: WorkflowFilter[]) {
+    return filters.some(
       (filter) => filter.conditional === '=' && filter.attribute === value,
     );
   }
@@ -152,8 +155,13 @@
     $focusedElementId = getFocusedElementId(value);
   }
 
-  $: $activeQueryIndex,
-    ($focusedElementId = getFocusedElementId($filter.attribute));
+  function updateFocusedElementId() {
+    if ($activeQueryIndex !== null) {
+      $focusedElementId = getFocusedElementId($filter.attribute);
+    }
+  }
+
+  $: $activeQueryIndex, updateFocusedElementId();
 
   let searchAttributeValue = '';
   //  TODO: Add KeywordList support
@@ -183,11 +191,15 @@
     updateFocus();
   });
 
+  function resetFilter() {
+    activeQueryIndex.set(null);
+    filter.set(emptyFilter());
+    searchAttributeValue = '';
+  }
+
   function handleKeyUp(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      activeQueryIndex.set(null);
-      filter.set(emptyFilter());
-      searchAttributeValue = '';
+    if (event.key === 'Escape' && !isTextFilter($filter.attribute)) {
+      resetFilter();
     }
   }
 </script>
@@ -218,7 +230,7 @@
         />
 
         {#each filteredOptions as { value, label }}
-          {@const disabled = isOptionDisabled(value)}
+          {@const disabled = isOptionDisabled(value, $workflowFilters)}
           <MenuItem
             on:click={() => {
               handleNewQuery(value);
