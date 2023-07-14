@@ -8,6 +8,7 @@
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { isWorkflowStatusType } from '$lib/models/workflow-status';
 
+  import Button from '$lib/holocene/button.svelte';
   import Chip from '$lib/holocene/chip.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
 
@@ -28,10 +29,21 @@
       $activeQueryIndex -= 1;
     }
   };
+
+  let totalFiltersInView = 5;
+
+  $: visibleFilters = $workflowFilters.slice(0, totalFiltersInView);
+  $: hasMoreFilters = totalFiltersInView < $workflowFilters.length;
+
+  const viewMoreFilters = () => {
+    if (hasMoreFilters) {
+      totalFiltersInView += 5;
+    }
+  };
 </script>
 
 <div class="flex flex-wrap gap-2 pt-2">
-  {#each $workflowFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
+  {#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
     {@const { attribute, value, conditional, customDate } = workflowFilter}
     {#if attribute}
       <div in:fade>
@@ -65,4 +77,9 @@
       </div>
     {/if}
   {/each}
+  {#if hasMoreFilters}
+    <Button variant="search" thin on:click={viewMoreFilters}
+      >View More...</Button
+    >
+  {/if}
 </div>

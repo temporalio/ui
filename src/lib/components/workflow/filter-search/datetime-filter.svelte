@@ -9,13 +9,11 @@
     startOfDay,
   } from 'date-fns';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { columnOrderedDurations } from '$lib/utilities/to-duration';
   import { translate } from '$lib/i18n/translate';
 
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
   import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
@@ -25,7 +23,7 @@
 
   const { filter, handleSubmit } = getContext<FilterContext<T>>(FILTER_CONTEXT);
 
-  $: value = $filter.customDate ? 'Custom' : $filter.value ?? '';
+  $: isTimeRange = $filter.conditional === 'BETWEEN';
 
   let startDate = startOfDay(new Date());
   let endDate = startOfDay(new Date());
@@ -40,19 +38,7 @@
   let endSecond = '';
   let endHalf: 'AM' | 'PM' = 'AM';
 
-  $: useBetweenDateTimeQuery =
-    $filter.customDate || !$supportsAdvancedVisibility;
-
-  const onChange = (_value: string) => {
-    value = _value;
-    if (value === 'Custom') {
-      $filter.customDate = true;
-    } else {
-      $filter.value = value;
-      $filter.customDate = false;
-      handleSubmit();
-    }
-  };
+  $: useBetweenDateTimeQuery = isTimeRange || !$supportsAdvancedVisibility;
 
   const onStartDateChange = (d: CustomEvent) => {
     startDate = startOfDay(d.detail);
@@ -104,9 +90,17 @@
       ? `BETWEEN "${formatISO(startDateWithTime)}" AND "${formatISO(
           endDateWithTime,
         )}"`
-      : `> "${formatISO(startDateWithTime)}"`;
+      : formatISO(startDateWithTime);
 
     $filter.value = value;
+
+    if (isTimeRange) {
+      $filter.customDate = true;
+      $filter.conditional = '';
+    } else {
+      $filter.customDate = false;
+    }
+
     handleSubmit();
   };
 </script>
@@ -116,7 +110,7 @@
     inputId="time-range-filter"
     options={[
       { value: '>=', label: 'BEFORE' },
-      { value: '', label: 'BETWEEN' },
+      { value: 'BETWEEN', label: 'BETWEEN' },
       { value: '<=', label: 'AFTER' },
     ]}
   />
@@ -126,14 +120,14 @@
       controls="time-range-filter-menu"
       class="flex flex-row items-center p-2 bg-white text-gray-800 hover:border-primary hover:bg-primary hover:text-white border border-gray-800 rounded-r h-10"
     >
-      {value || 'Select Time'}
+      Select Time
     </MenuButton>
     <Menu
       keepOpen
       id="time-range-filter-menu"
       class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-2"
     >
-      {#if $filter.customDate}
+      {#if isTimeRange}
         <div class="flex flex-col">
           <p class="text-sm">Start</p>
           <div class="flex flex-col gap-2">
@@ -161,34 +155,17 @@
             />
           </div>
         </div>
-        <div class="flex gap-2">
-          <Button on:click={onApply}>{translate('apply')}</Button>
-          <Button
-            variant="secondary"
-            on:click={() => {
-              $filter.customDate = false;
-              $filter.conditional = '>=';
-              $filter.value = '';
-            }}>{translate('cancel')}</Button
-          >
-        </div>
+        <Button on:click={onApply}>{translate('apply')}</Button>
       {:else}
-        <div>
-          <div class="flex w-full flex-wrap">
-            {#each columnOrderedDurations as duration}
-              <div class="flex w-1/2 flex-col justify-center">
-                <MenuItem on:click={() => onChange(duration)}
-                  >{duration}</MenuItem
-                >
-              </div>
-            {/each}
-
-            <div class="flex w-full flex-col border-t border-gray-300">
-              <MenuItem on:click={() => onChange('Custom')}
-                >{translate('custom')}</MenuItem
-              >
-            </div>
-          </div>
+        <div class="flex flex-col gap-2">
+          <DatePicker on:datechange={onStartDateChange} selected={startDate} />
+          <TimePicker
+            bind:hour={startHour}
+            bind:minute={startMinute}
+            bind:second={startSecond}
+            bind:half={startHalf}
+          />
+          <Button on:click={onApply}>{translate('apply')}</Button>
         </div>
       {/if}
     </Menu>

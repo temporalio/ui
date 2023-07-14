@@ -40,6 +40,8 @@
   import NumberFilter from './number-filter.svelte';
   import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
 
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
 
@@ -51,6 +53,8 @@
 
   $: searchParamQuery = $page.url.searchParams.get('query');
   $: showClearAllButton = $workflowFilters.length && !$filter.attribute;
+
+  let viewAdvancedSearchInput = false;
 
   setContext<FilterContext<T>>(FILTER_CONTEXT, {
     filter,
@@ -204,80 +208,116 @@
   }
 </script>
 
-<div class="flex w-full gap-4">
-  <div class="flex" class:filter={!showClearAllButton} on:keyup={handleKeyUp}>
-    <MenuContainer let:open>
-      <Button
-        variant="search"
-        unroundRight={Boolean($filter.attribute)}
-        disabled={$activeQueryIndex !== null}
-        icon={$filter.attribute ? null : 'filter'}
-        count={$filter.attribute ? 0 : $workflowFilters.length}
-        on:click={() => open.update((previous) => !previous)}
-      >
-        {$filter.attribute || 'Filter'}
-      </Button>
-      <Menu
-        class="max-h-80 overflow-y-scroll w-fit whitespace-nowrap"
-        id="search-attribute-menu"
-      >
-        <Input
-          id="filter-search"
-          noBorder
-          bind:value={searchAttributeValue}
-          icon="search"
-          placeholder="Search"
-        />
+{#if viewAdvancedSearchInput}
+  <div class="flex flex-col sm:flex-row gap-4">
+    <WorkflowAdvancedSearch />
+    <label
+      for="view-search-input"
+      class="flex items-center gap-4 font-secondary text-sm"
+      >View Search Input
+      <ToggleSwitch
+        id="view-search-input"
+        checked={viewAdvancedSearchInput}
+        on:change={() => (viewAdvancedSearchInput = !viewAdvancedSearchInput)}
+      />
+    </label>
+  </div>
+{:else}
+  <div class="flex w-full gap-4">
+    <div class="flex" class:filter={!showClearAllButton} on:keyup={handleKeyUp}>
+      <MenuContainer let:open>
+        <Button
+          variant="search"
+          unroundRight={Boolean($filter.attribute)}
+          disabled={$activeQueryIndex !== null}
+          icon={$filter.attribute ? null : 'filter'}
+          count={$filter.attribute ? 0 : $workflowFilters.length}
+          on:click={() => open.update((previous) => !previous)}
+        >
+          {$filter.attribute || 'Filter'}
+        </Button>
+        <Menu
+          class="max-h-80 overflow-y-scroll w-fit whitespace-nowrap"
+          id="search-attribute-menu"
+        >
+          <Input
+            id="filter-search"
+            noBorder
+            bind:value={searchAttributeValue}
+            icon="search"
+            placeholder="Search"
+          />
 
-        {#each filteredOptions as { value, label }}
-          {@const disabled = isOptionDisabled(value, $workflowFilters)}
-          <MenuItem
-            on:click={() => {
-              handleNewQuery(value);
-            }}
-            {disabled}
-          >
-            {label}
-          </MenuItem>
-        {:else}
-          <MenuItem on:click={noop}>No Results</MenuItem>
-        {/each}
-      </Menu>
-    </MenuContainer>
+          {#each filteredOptions as { value, label }}
+            {@const disabled = isOptionDisabled(value, $workflowFilters)}
+            <MenuItem
+              on:click={() => {
+                handleNewQuery(value);
+              }}
+              {disabled}
+            >
+              {label}
+            </MenuItem>
+          {:else}
+            <MenuItem on:click={noop}>No Results</MenuItem>
+          {/each}
+        </Menu>
+      </MenuContainer>
 
-    {#if isStatusFilter($filter.attribute)}
-      <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
-        <StatusFilter />
-      </div>
-    {:else if isTextFilter($filter.attribute)}
-      <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
-        <TextFilter />
-      </div>
-      <!-- TODO: Add KeywordList support -->
-      <!-- {:else if isListFilter($filter.attribute)}
+      {#if isStatusFilter($filter.attribute)}
+        <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <StatusFilter />
+        </div>
+      {:else if isTextFilter($filter.attribute)}
+        <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <TextFilter />
+        </div>
+        <!-- TODO: Add KeywordList support -->
+        <!-- {:else if isListFilter($filter.attribute)}
       <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
         <ListFilter />
       </div> -->
-    {:else if isNumberFilter($filter.attribute)}
-      <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
-        <NumberFilter />
-      </div>
-    {:else if isDateTimeFilter($filter.attribute)}
-      <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
-        <DateTimeFilter />
-      </div>
-    {:else if isBooleanFilter($filter.attribute)}
-      <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
-        <BooleanFilter />
-      </div>
-    {/if}
+      {:else if isNumberFilter($filter.attribute)}
+        <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <NumberFilter />
+        </div>
+      {:else if isDateTimeFilter($filter.attribute)}
+        <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <DateTimeFilter />
+        </div>
+      {:else if isBooleanFilter($filter.attribute)}
+        <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <BooleanFilter />
+        </div>
+      {/if}
+    </div>
+
+    <div
+      class="flex flex-col sm:flex-row {showClearAllButton
+        ? 'justify-between w-full'
+        : 'justify-end'}"
+    >
+      {#if showClearAllButton}
+        <Button variant="link" on:click={handleClearInput}>Clear all</Button>
+      {/if}
+      <label
+        for="view-search-input"
+        class="flex items-center gap-4 font-secondary text-sm"
+        >View Search Input
+        <ToggleSwitch
+          id="view-search-input"
+          checked={viewAdvancedSearchInput}
+          on:change={() => {
+            viewAdvancedSearchInput = !viewAdvancedSearchInput;
+            resetFilter();
+          }}
+        />
+      </label>
+    </div>
   </div>
 
-  {#if showClearAllButton}
-    <Button variant="link" on:click={handleClearInput}>Clear all</Button>
-  {/if}
-</div>
-<FilterList />
+  <FilterList />
+{/if}
 
 <style lang="postcss">
   .filter {
