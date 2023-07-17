@@ -9,9 +9,9 @@
     routeForEventHistoryImport,
     routeForLoginPage,
     routeForNamespaces,
-    routeForSchedules,
-    routeForWorkflows,
-  } from '$lib/utilities/route-for';
+    routeForSchedules, routeForSettings,
+    routeForWorkflows
+  } from "$lib/utilities/route-for";
 
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/holocene/error-boundary';
@@ -61,6 +61,7 @@
     feedback:
       $page.data?.settings?.feedbackURL ||
       'https://github.com/temporalio/ui/issues/new/choose',
+    settings: routeForSettings()
   };
 
   function getCurrentHref(namespace: string) {

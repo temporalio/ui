@@ -62,3 +62,15 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
 
   return settingsInformation;
 };
+
+export const fetchFlowSettings = async () => {
+  const url = `${import.meta.env.VITE_FLOW_API}/workflow/config`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+
+  return response;
+};

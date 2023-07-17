@@ -80,6 +80,14 @@
         <div class="nav-title">Archive</div>
       </NavRow>
     </IsCloudGuard>
+    <NavRow link={linkList.settings} {isCloud} data-testid="settings-button">
+      <NavTooltip right text="Settings">
+        <div class="nav-icon">
+          <Icon name="cog-6-tooth" />
+        </div>
+      </NavTooltip>
+      <div class="nav-title">Settings</div>
+    </NavRow>
   </svelte:fragment>
   <svelte:fragment slot="bottom">
     {#if extras}
