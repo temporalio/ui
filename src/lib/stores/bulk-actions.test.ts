@@ -1,10 +1,10 @@
-import { vi, describe, test, expect, beforeEach } from 'vitest';
 import { get, type writable as writableFunc } from 'svelte/store';
 
-import { cluster } from './cluster';
-import { settings } from './settings';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { supportsBulkActions } from './bulk-actions';
+import { cluster } from './cluster';
+import { settings } from './settings';
 
 const mockedPageStore = await vi.hoisted(async () => {
   const { writable } = await vi.importActual<{
