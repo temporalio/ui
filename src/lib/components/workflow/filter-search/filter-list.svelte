@@ -3,6 +3,7 @@
   import { getContext } from 'svelte';
   import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
   import { page } from '$app/stores';
+  import { labsMode } from '$lib/stores/labs-mode';
   import { workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
@@ -20,7 +21,14 @@
   const removeQuery = (index: number) => {
     $workflowFilters.splice(index, 1);
     $workflowFilters = $workflowFilters;
-    updateQueryParamsFromFilter($page.url, $workflowFilters);
+    updateQueryParamsFromFilter($page.url, $workflowFilters, labsMode);
+
+    if (index === $workflowFilters.length) {
+      const previousQuery = $workflowFilters[$workflowFilters.length - 1];
+      if (previousQuery) {
+        previousQuery.operator = '';
+      }
+    }
 
     if (index === $activeQueryIndex) {
       $activeQueryIndex = null;
