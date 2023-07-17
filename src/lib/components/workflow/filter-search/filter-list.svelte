@@ -4,9 +4,12 @@
   import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
   import { page } from '$app/stores';
   import { labsMode } from '$lib/stores/labs-mode';
+  import { timeFormat } from '$lib/stores/time-format';
   import { workflowFilters } from '$lib/stores/filters';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { formatDateTime } from '$lib/utilities/format-date';
+  import { isDateTimeFilter } from '$lib/utilities/query/filter-search';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { isWorkflowStatusType } from '$lib/models/workflow-status';
 
   import Button from '$lib/holocene/button.svelte';
@@ -48,6 +51,20 @@
       totalFiltersInView += 5;
     }
   };
+
+  const getDateTimeConditonal = (conditional: string) => {
+    if (['<', '<='].includes(conditional)) return 'before';
+    if (['>', '>='].includes(conditional)) return 'after';
+    return conditional;
+  };
+
+  const formatDateTimeRange = (value: string, format: string) => {
+    const [conditon, start, operator, end] = value.split(' ');
+    return `${conditon.toLowerCase()} ${formatDateTime(
+      start,
+      format,
+    )} ${operator.toLowerCase()} ${formatDateTime(end, format)}`;
+  };
 </script>
 
 <div class="flex flex-wrap gap-2 pt-2">
@@ -75,10 +92,17 @@
           {:else}
             <span class="max-w-xs md:max-w-lg xl:max-w-2xl truncate">
               {attribute}
-              {#if !customDate}
+              {#if isDateTimeFilter(attribute)}
+                {#if customDate}
+                  {formatDateTimeRange(value, $timeFormat)}
+                {:else}
+                  {getDateTimeConditonal(conditional)}
+                  {formatDateTime(value, $timeFormat)}
+                {/if}
+              {:else}
                 {conditional}
+                {value}
               {/if}
-              {value}
             </span>
           {/if}
         </Chip>

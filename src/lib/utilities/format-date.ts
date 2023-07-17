@@ -30,3 +30,24 @@ export function formatDate(
     return '';
   }
 }
+
+export function formatDateTime(
+  date: string,
+  timeFormat: TimeFormat | string = 'UTC',
+  relativeLabel = 'ago',
+): string {
+  try {
+    const parsed = parseJSON(date);
+
+    const pattern = parsed.getSeconds()
+      ? 'yyyy-MM-dd HH:mm:ss a'
+      : 'yyyy-MM-dd HH:mm a';
+    if (timeFormat === 'local') return dateTz.format(parsed, pattern);
+    if (timeFormat === 'relative')
+      return formatDistanceToNow(parsed) + ` ${relativeLabel}`;
+
+    return dateTz.formatInTimeZone(parsed, 'UTC', pattern);
+  } catch {
+    return `about ${date} ${relativeLabel}`;
+  }
+}

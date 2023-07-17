@@ -109,9 +109,9 @@
   <ConditionalMenu
     inputId="time-range-filter"
     options={[
-      { value: '>=', label: 'BEFORE' },
+      { value: '<=', label: 'BEFORE' },
       { value: 'BETWEEN', label: 'BETWEEN' },
-      { value: '<=', label: 'AFTER' },
+      { value: '>=', label: 'AFTER' },
     ]}
   />
   <MenuContainer>

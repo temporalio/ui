@@ -20,14 +20,19 @@
   import { page } from '$app/stores';
 
   import { refresh } from '$lib/stores/workflows';
-  import {
-    searchAttributes,
-    searchAttributeOptions,
-  } from '$lib/stores/search-attributes';
+  import { searchAttributeOptions } from '$lib/stores/search-attributes';
   import { workflowFilters } from '$lib/stores/filters';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import {
+    isBooleanFilter,
+    isDateTimeFilter,
+    isListFilter,
+    isNumberFilter,
+    isStatusFilter,
+    isTextFilter,
+  } from '$lib/utilities/query/filter-search';
 
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -98,36 +103,6 @@
   function handleClearInput() {
     $workflowFilters = [];
     onSearch();
-  }
-
-  function isStatusFilter(attribute: string) {
-    return attribute === 'ExecutionStatus';
-  }
-
-  function isTextFilter(attribute: string) {
-    const searchAttributeType = $searchAttributes[attribute];
-    if (isStatusFilter($filter.attribute)) return false;
-    return ['Keyword', 'Text'].includes(searchAttributeType);
-  }
-
-  function isListFilter(attribute: string) {
-    const searchAttributeType = $searchAttributes[attribute];
-    return searchAttributeType === 'KeywordList';
-  }
-
-  function isNumberFilter(attribute: string) {
-    const searchAttributeType = $searchAttributes[attribute];
-    return ['Int', 'Double'].includes(searchAttributeType);
-  }
-
-  function isDateTimeFilter(attribute: string) {
-    const searchAttributeType = $searchAttributes[attribute];
-    return searchAttributeType === 'Datetime';
-  }
-
-  function isBooleanFilter(attribute: string) {
-    const searchAttributeType = $searchAttributes[attribute];
-    return searchAttributeType === 'Bool';
   }
 
   function getFocusedElementId(attribute: string) {
