@@ -1,28 +1,26 @@
 import type { Page } from '@playwright/test';
-import { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
-import { mockClusterApi, CLUSTER_API } from './mocks/cluster';
-import { mockSettingsApi, SETTINGS_API } from './mocks/settings';
+
 import {
-  mockSearchAttributesApi,
-  SEARCH_ATTRIBUTES_API,
-} from './mocks/search-attributes';
-import { mockWorkflowsApi, WORKFLOWS_API } from './mocks/workflows';
-import { mockWorkflowApi, WORKFLOW_API } from './mocks/workflow';
+  mockCreateBatchOperationApi,
+  mockDescribeBatchOperationApi,
+} from './mocks/batch-operations';
+import { CLUSTER_API, mockClusterApi } from './mocks/cluster';
+import {
+  EVENT_HISTORY_API,
+  EVENT_HISTORY_API_REVERSE,
+  mockEventHistoryApi,
+} from './mocks/event-history';
 import { mockNamespaceApi } from './mocks/namespace';
+import { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
+import { mockSearchAttributesApi } from './mocks/search-attributes';
+import { mockSettingsApi, SETTINGS_API } from './mocks/settings';
+import { mockTaskQueuesApi, TASK_QUEUES_API } from './mocks/task-queues';
+import { mockWorkflowApi, WORKFLOW_API } from './mocks/workflow';
+import { mockWorkflowsApi, WORKFLOWS_API } from './mocks/workflows';
 import {
   mockWorkflowsCountApi,
   WORKFLOWS_COUNT_API,
 } from './mocks/workflows-count';
-import {
-  mockDescribeBatchOperationApi,
-  mockCreateBatchOperationApi,
-} from './mocks/batch-operations';
-import {
-  mockEventHistoryApi,
-  EVENT_HISTORY_API,
-  EVENT_HISTORY_API_REVERSE,
-} from './mocks/event-history';
-import { mockTaskQueuesApi, TASK_QUEUES_API } from './mocks/task-queues';
 
 export { mockClusterApi, CLUSTER_API } from './mocks/cluster';
 export { mockNamespaceApi, NAMESPACE_API } from './mocks/namespace';

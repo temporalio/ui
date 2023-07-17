@@ -1,5 +1,6 @@
-import { icons } from './paths';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+
+import { icons } from './paths';
 let target: HTMLElement;
 
 beforeEach(() => {

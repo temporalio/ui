@@ -1,5 +1,5 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import i18next, { i18n } from 'i18next';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { translate } from './translate';
 

@@ -12,7 +12,7 @@
 
   export let namespace: string;
 
-  $: columnsInUse = $workflowTableColumns[namespace];
+  $: columnsInUse = $workflowTableColumns?.[namespace] ?? [];
   $: availableSystemColumns = availableSystemSearchAttributeColumns(namespace);
   $: availableCustomColumns = availableCustomSearchAttributeColumns(namespace);
 </script>

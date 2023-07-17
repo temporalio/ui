@@ -1,10 +1,10 @@
-import { has } from '$lib/utilities/has';
-import { createEventGroup } from './create-event-group';
-import { getGroupId } from './get-group-id';
-
 import type { EventSortOrder } from '$lib/stores/event-view';
 import type { CommonHistoryEvent, WorkflowEvent } from '$lib/types/events';
+import { has } from '$lib/utilities/has';
+
+import { createEventGroup } from './create-event-group';
 import type { EventGroup, EventGroups } from './event-groups';
+import { getGroupId } from './get-group-id';
 
 export { getGroupForEvent } from './get-group-for-event';
 

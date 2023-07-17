@@ -1,9 +1,10 @@
 import { get } from 'svelte/store';
+
 import {
   codecEndpoint,
-  passAccessToken,
   includeCredentials,
   overrideRemoteCodecConfiguration,
+  passAccessToken,
 } from '$lib/stores/data-encoder-config';
 import type { Settings } from '$lib/types/global';
 

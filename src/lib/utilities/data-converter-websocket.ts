@@ -1,11 +1,13 @@
 import { get } from 'svelte/store';
+
 import WebSocketAsPromised from 'websocket-as-promised';
 import type Options from 'websocket-as-promised/types/options';
+
+import { parseWithBigInt, stringifyWithBigInt } from './parse-with-big-int';
 import {
   dataConverterPort,
   setLastDataConverterFailure,
 } from '../stores/data-converter-config';
-import { parseWithBigInt, stringifyWithBigInt } from './parse-with-big-int';
 
 export interface DataConverterWebsocketInterface {
   hasWebsocket: boolean;

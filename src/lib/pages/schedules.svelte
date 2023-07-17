@@ -24,7 +24,7 @@
 
   $: namespace = $page.params.namespace;
 
-  let hasSchedules = true;
+  let hasSchedules = false;
 
   $: fetchSchedules = fetchAllSchedules(namespace).then((res) => {
     const { schedules } = res;

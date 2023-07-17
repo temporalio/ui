@@ -1,8 +1,8 @@
 import type { I18nKey } from '$lib/i18n';
 import type {
   EventType,
-  WorkflowEvents,
   IterableEvent,
+  WorkflowEvents,
 } from '$lib/types/events';
 
 type Categories = typeof CATEGORIES;

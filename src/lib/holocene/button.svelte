@@ -1,7 +1,7 @@
 <script lang="ts">
+  import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
-  import Badge from '$lib/holocene/badge.svelte';
 
   export let disabled = false;
   export let variant:

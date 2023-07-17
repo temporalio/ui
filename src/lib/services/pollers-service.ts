@@ -1,7 +1,7 @@
-import { requestFromAPI } from '$lib/utilities/request-from-api';
-import { routeForApi } from '$lib/utilities/route-for-api';
 import type { PollerInfo, TaskQueueStatus } from '$lib/types';
 import type { NamespaceScopedRequest } from '$lib/types/global';
+import { requestFromAPI } from '$lib/utilities/request-from-api';
+import { routeForApi } from '$lib/utilities/route-for-api';
 
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 

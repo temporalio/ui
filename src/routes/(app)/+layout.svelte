@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { afterNavigate } from '$app/navigation';
   import type { PageData } from './$types';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
   import { page, updated } from '$app/stores';
@@ -18,7 +19,7 @@
   import Toaster from '$lib/holocene/toaster.svelte';
   import { toaster } from '$lib/stores/toaster';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import { workflowFilters } from '$lib/stores/filters';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import SideNavigation from '$lib/holocene/navigation/side-nav.svelte';
   import TopNavigation from '$lib/holocene/navigation/top-nav.svelte';
@@ -46,7 +47,6 @@
       onClick: (namespace: string) => {
         $lastUsedNamespace = namespace;
         $workflowFilters = [];
-        $workflowSorts = [];
         goto(getHref(namespace));
       },
     };
@@ -82,6 +82,10 @@
       // Hard refresh when version does not match
       window.location.reload();
     }
+  });
+
+  afterNavigate(() => {
+    document.getElementById('content')?.scrollTo(0, 0);
   });
 </script>
 

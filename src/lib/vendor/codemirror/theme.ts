@@ -1,7 +1,7 @@
 import { HighlightStyle } from '@codemirror/language';
 import { EditorView } from '@codemirror/view';
-import colors from 'tailwindcss/colors';
 import { tags } from '@lezer/highlight';
+import colors from 'tailwindcss/colors';
 
 export const TEMPORAL_THEME = EditorView.theme(
   {

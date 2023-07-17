@@ -1,7 +1,10 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { createEventDispatcher, type ComponentProps } from 'svelte';
+  
+  import { type ComponentProps, createEventDispatcher } from 'svelte';
+  
   import Button from '$lib/holocene/button.svelte';
+  
   import IconButton from './icon-button.svelte';
 
   interface $$Props extends HTMLAttributes<HTMLDialogElement> {

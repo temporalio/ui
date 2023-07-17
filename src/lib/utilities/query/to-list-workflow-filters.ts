@@ -1,18 +1,15 @@
-import type {
-  WorkflowFilter,
-  WorkflowSort,
-} from '$lib/models/workflow-filters';
-import { searchAttributeOptions } from '$lib/stores/search-attributes';
 import { formatDuration } from 'date-fns';
 import debounce from 'just-debounce';
+
+import type { WorkflowFilter } from '$lib/models/workflow-filters';
+import { searchAttributeOptions } from '$lib/stores/search-attributes';
+import type { FilterParameters, SearchAttributes } from '$lib/types/workflows';
 import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
 
-import { isConditional, isJoin, isParenthesis, isBetween } from '../is';
-import { durationKeys, fromDate } from '../to-duration';
 import { tokenize } from './tokenize';
+import { isBetween, isConditional, isJoin, isParenthesis } from '../is';
+import { durationKeys, fromDate } from '../to-duration';
 import { updateQueryParameters } from '../update-query-parameters';
-
-import type { FilterParameters, SearchAttributes } from '$lib/types/workflows';
 
 type Tokens = string[];
 export type ParsedParameters = FilterParameters & { timeRange?: string };
@@ -159,9 +156,9 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
 };
 
 export const updateQueryParamsFromFilter = debounce(
-  (url: URL, filters: WorkflowFilter[], sorts: WorkflowSort[]) => {
+  (url: URL, filters: WorkflowFilter[]) => {
     const allFilters = combineDropdownFilters(filters);
-    const query = toListWorkflowQueryFromFilters(allFilters, sorts);
+    const query = toListWorkflowQueryFromFilters(allFilters);
     updateQueryParameters({
       url,
       parameter: 'query',

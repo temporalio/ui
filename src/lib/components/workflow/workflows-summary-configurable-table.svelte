@@ -16,8 +16,8 @@
   let customizationDrawerOpen: boolean = false;
 
   $: ({ namespace } = $page.params);
-  $: columns = $workflowTableColumns[namespace];
-  $: empty = $workflows.length === 0 || columns.length === 0;
+  $: columns = $workflowTableColumns?.[namespace] ?? [];
+  $: empty = $workflows.length === 0;
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;

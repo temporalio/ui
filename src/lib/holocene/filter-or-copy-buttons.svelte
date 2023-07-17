@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { noop } from 'svelte/internal';
+  
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
-  import { noop } from 'svelte/internal';
 
   export let show = false;
   export let filterable = true;

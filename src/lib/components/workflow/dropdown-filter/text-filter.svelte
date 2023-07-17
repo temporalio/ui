@@ -7,7 +7,7 @@
     attributeToHumanReadable,
     attributeToId,
   } from '$lib/models/workflow-filters';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import { workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   let value = '';
@@ -17,7 +17,6 @@
     $workflowFilters.filter((f) => f.attribute !== attribute);
 
   $: idFilter = $workflowFilters.find((f) => f.attribute === attribute);
-  $: idSort = $workflowSorts.find((s) => s.attribute === attribute);
 
   const onInput = (e: Event) => {
     const { value } = e.target as HTMLInputElement;
@@ -34,7 +33,7 @@
       $workflowFilters = [...getOtherFilters()];
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    updateQueryParamsFromFilter($page.url, $workflowFilters);
   };
 
   function handleShowInput(event: CustomEvent) {
@@ -48,12 +47,12 @@
 
   function handleClearInput() {
     $workflowFilters = [...getOtherFilters()];
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    updateQueryParamsFromFilter($page.url, $workflowFilters);
   }
 </script>
 
 <DropdownMenu
-  value={idFilter ? idFilter.value : idSort ? idSort.value : ''}
+  value={idFilter ? idFilter.value : ''}
   keepOpen
   icon="filter"
   testId="{attributeToId[attribute]}-filter-button"

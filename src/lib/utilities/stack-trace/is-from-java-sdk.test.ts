@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
+
 import { isFromJavaSDK } from './is-from-java-sdk';
-import typeScriptStacktraceQueryJson from '../../../fixtures/stacktrace-query.ts-sdk.json';
 import GoStacktraceQueryJson from '../../../fixtures/stacktrace-query.go-sdk.json';
 import UnixJavaStacktraceQueryJson from '../../../fixtures/stacktrace-query.java-sdk.json';
 import WindowsJavaStacktraceQueryJson from '../../../fixtures/stacktrace-query.java-sdk.windows.json';
+import typeScriptStacktraceQueryJson from '../../../fixtures/stacktrace-query.ts-sdk.json';
 import { stringifyWithBigInt } from '../parse-with-big-int';
 
 describe('isFromJavaSDK', () => {

@@ -1,11 +1,13 @@
 import { get } from 'svelte/store';
-import { describe, test, expect } from 'vitest';
+
+import { describe, expect, test } from 'vitest';
+
 import {
-  persistedWorkflowTableColumns,
   addColumn,
-  removeColumn,
   moveColumn,
+  persistedWorkflowTableColumns,
   pinColumn,
+  removeColumn,
 } from './workflow-table-columns';
 
 describe('Workflow Table Columns store', () => {

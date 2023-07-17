@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
+
 import {
+  getCodeBlockValue,
   getSingleAttributeForEvent,
   shouldDisplayAsExecutionLink,
   shouldDisplayAttribute,
-  getCodeBlockValue,
 } from './get-single-attribute-for-event';
 
 describe('getSingleAttributeForEvent', () => {

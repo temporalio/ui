@@ -1,13 +1,14 @@
+import type { Readable } from 'svelte/store';
 import { derived, writable } from 'svelte/store';
+
 import { page } from '$app/stores';
+
 import {
-  perPageFromSearchParameter,
   defaultItemsPerPage,
   options,
+  perPageFromSearchParameter,
   perPageKey,
 } from './pagination';
-
-import type { Readable } from 'svelte/store';
 
 type PaginationMethods<T> = {
   nextPageWithItems: (t: string, items: T[]) => void;

@@ -1,17 +1,16 @@
-import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { v4 as uuidv4 } from 'uuid';
 
 import type {
-  ListScheduleResponse,
   CreateScheduleRequest,
-  UpdateScheduleRequest,
+  ListScheduleResponse,
   ScheduleListEntry,
+  UpdateScheduleRequest,
 } from '$lib/types';
+import type { DescribeFullSchedule } from '$lib/types/schedule';
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-
-import type { DescribeFullSchedule } from '$lib/types/schedule';
 
 type ScheduleParameters = {
   namespace: string;

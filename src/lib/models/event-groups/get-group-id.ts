@@ -1,3 +1,4 @@
+import type { CommonHistoryEvent } from '$lib/types/events';
 import {
   isActivityTaskCanceledEvent,
   isActivityTaskCancelRequestedEvent,
@@ -11,7 +12,6 @@ import {
   isTimerCanceledEvent,
   isTimerFiredEvent,
 } from '$lib/utilities/is-event-type';
-import type { CommonHistoryEvent } from '$lib/types/events';
 
 export const getGroupId = (event: CommonHistoryEvent): string => {
   if (isActivityTaskStartedEvent(event))

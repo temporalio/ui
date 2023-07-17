@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { getTruncatedWord } from './get-truncated-word';
 
 describe('getTruncatedWord', () => {

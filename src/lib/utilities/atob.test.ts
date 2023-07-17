@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { base64DecodeUnicode, atob } from './atob';
+
+import { atob, base64DecodeUnicode } from './atob';
 
 describe('base64DecodeUnicode', () => {
   it('should decode unicode characters', () => {

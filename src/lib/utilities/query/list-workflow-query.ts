@@ -1,15 +1,14 @@
-import type {
-  WorkflowFilter,
-  WorkflowSort,
-} from '$lib/models/workflow-filters';
-import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
-import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
 import { get } from 'svelte/store';
+
+import type { WorkflowFilter } from '$lib/models/workflow-filters';
+import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
 import type {
   ArchiveFilterParameters,
   FilterParameters,
   SearchAttributes,
 } from '$lib/types/workflows';
+
+import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 
 export type QueryKey =
   | 'WorkflowId'
@@ -175,13 +174,7 @@ const toQueryStatementsFromFilters = (
 
 export const toListWorkflowQueryFromFilters = (
   filters: WorkflowFilter[] = [],
-  sorts: WorkflowSort[] = [],
   archived = false,
 ): string => {
-  const sortStatement = sorts.length
-    ? ` order by ${sorts[0].attribute} ${sorts[0].value}`
-    : '';
-  return (
-    toQueryStatementsFromFilters(filters, archived).join('') + sortStatement
-  );
+  return toQueryStatementsFromFilters(filters, archived).join('');
 };
