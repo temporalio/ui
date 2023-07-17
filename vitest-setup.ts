@@ -1,7 +1,9 @@
 import { noop } from 'svelte/internal';
-import { vi } from 'vitest';
+
 import i18next from 'i18next';
 import Backend, { FsBackendOptions } from 'i18next-fs-backend';
+import { vi } from 'vitest';
+
 import { I18nNamespaces } from './src/lib/i18n';
 
 i18next.use(Backend).init<FsBackendOptions>({

@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
+
 import { getWorkflowStartedCompletedAndTaskFailedEvents } from './get-started-completed-and-task-failed-events';
 
+import canceledEventHistory from '$fixtures/events.canceled.json';
 import completedEventHistory from '$fixtures/events.completed.json';
 import continuedAsNewEventHistory from '$fixtures/events.continued-as-new.json';
-import canceledEventHistory from '$fixtures/events.canceled.json';
 import failedEventHistory from '$fixtures/events.failed.json';
 import runningEventHistory from '$fixtures/events.running.json';
 import terminatedEventHistory from '$fixtures/events.terminated.json';

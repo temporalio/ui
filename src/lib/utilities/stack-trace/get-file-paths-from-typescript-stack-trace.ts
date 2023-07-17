@@ -4,8 +4,8 @@
         if the stack trace originates from the TypeScript SDK
   It returns undefined otherwise
  */
-import { parseWithBigInt } from '../parse-with-big-int';
 import { isFromTypeScriptSDK } from './is-from-typescript-sdk';
+import { parseWithBigInt } from '../parse-with-big-int';
 
 export const getFilePathsFromTypeScriptStackTrace = (
   stackTraceText: string,

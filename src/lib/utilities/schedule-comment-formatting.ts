@@ -1,5 +1,6 @@
-import { genericWeekDays, monthNames, weekDays } from './calendar';
 import type { ScheduleParameters } from '$lib/types/schedule';
+
+import { genericWeekDays, monthNames, weekDays } from './calendar';
 
 // Examples of output
 // Every 3hrs:5min:20 sec 30 min offset

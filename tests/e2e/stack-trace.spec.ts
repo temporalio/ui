@@ -1,10 +1,12 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
 import mockQueryApiWithStackTraceError from '~/test-utilities/mocks/query';
 
 test.beforeEach(async ({ page, baseURL }) => {
   await page.goto(`${baseURL}/namespaces/default/workflows`);
 });
 
+// eslint-disable-next-line playwright/no-skipped-test
 test.skip('Stack Trace With Completed Workflow', () => {
   test('should show No Stack Trace for completed workflow', async ({
     page,
@@ -21,6 +23,7 @@ test.skip('Stack Trace With Completed Workflow', () => {
   });
 });
 
+// eslint-disable-next-line playwright/no-skipped-test
 test.skip('Stack Trace with Running Workflow', () => {
   test('should show stack trace for running workflow', async ({ page }) => {
     await page

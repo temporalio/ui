@@ -1,20 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { getWorkflowRelationships } from './get-workflow-relationships';
+
 import { toWorkflowExecution } from '$lib/models/workflow-execution';
 
+import { getWorkflowRelationships } from './get-workflow-relationships';
+
+import childEvents from '$fixtures/events.children.json';
 import completedEvents from '$fixtures/events.completed.json';
 import continuedAsNewEvents from '$fixtures/events.continued-as-new.json';
 import failedEvents from '$fixtures/events.failed.json';
 import timedOutEvents from '$fixtures/events.timed-out.json';
-import childEvents from '$fixtures/events.children.json';
-
+import namespaces from '$fixtures/namespaces.json';
 import completedWorkflow from '$fixtures/workflow.completed.json';
 import continuedAsNewWorkflow from '$fixtures/workflow.continued-as-new.json';
 import failedWorkflow from '$fixtures/workflow.failed.json';
 import pendingChildrenWorkflow from '$fixtures/workflow.pending-children.json';
 import runningWorkflow from '$fixtures/workflow.running.json';
 import timedOutWorkflow from '$fixtures/workflow.timed-out.json';
-import namespaces from '$fixtures/namespaces.json';
 
 describe('getWorkflowRelationships', () => {
   const completedEventHistory = {

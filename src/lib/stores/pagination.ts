@@ -1,5 +1,5 @@
-import { derived, writable, get } from 'svelte/store';
 import type { Readable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 
 export const defaultItemsPerPage = 100;
 export const options: string[] = ['100', '250', '500'];
@@ -46,8 +46,10 @@ export const getStartingIndexForPage = (
   if (isNaN(page)) return 0;
 
   if (page <= 1) return 0;
-  if (page > getTotalPages(itemsPerPage, items))
-    return items.length - itemsPerPage;
+  if (page > getTotalPages(itemsPerPage, items)) {
+    const index = items.length - itemsPerPage;
+    return index > 0 ? index : 0;
+  }
 
   return Math.floor(itemsPerPage * (page - 1));
 };

@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { isVersionNewer } from '../version-check';
+
 import { toListWorkflowQueryFromFilters } from './list-workflow-query';
 import { combineDropdownFilters } from './to-list-workflow-filters';
+import { isVersionNewer } from '../version-check';
 
 describe('toListWorkflowQueryFromFilters', () => {
   beforeEach(() => {
@@ -151,7 +152,6 @@ describe('toListWorkflowQueryFromFilters', () => {
     const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
     const query = toListWorkflowQueryFromFilters(
       combineDropdownFilters(filters),
-      [],
       supportsAdvancedVisibility,
     );
     expect(query).toBe('StartTime > "2019-12-30T00:00:00Z"');
@@ -177,7 +177,6 @@ describe('toListWorkflowQueryFromFilters', () => {
     const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
     const query = toListWorkflowQueryFromFilters(
       combineDropdownFilters(filters),
-      [],
       supportsAdvancedVisibility,
     );
     expect(query).toBe(

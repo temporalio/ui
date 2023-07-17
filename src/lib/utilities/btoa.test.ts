@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { base64EncodeUnicode, btoa } from './btoa';
 
 describe('base64DecodeUnicode', () => {

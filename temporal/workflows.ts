@@ -1,4 +1,5 @@
 import * as workflow from '@temporalio/workflow';
+
 import type * as activities from './activities';
 
 const { echo: Activity } = workflow.proxyActivities<typeof activities>({

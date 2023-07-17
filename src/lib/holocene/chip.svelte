@@ -1,7 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import IconButton from './icon-button.svelte';
+  
   import Icon from '$lib/holocene/icon/icon.svelte';
+  
+  import IconButton from './icon-button.svelte';
 
   export let intent: 'warning' | 'default' = 'default';
 

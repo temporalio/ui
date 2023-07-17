@@ -1,21 +1,22 @@
 import { describe, expect, it } from 'vitest';
+
+import type {
+  ListWorkflowExecutionsResponse,
+  WorkflowExecutionAPIResponse,
+} from '$lib/types/workflows';
+
 import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from './workflow-execution';
 
+import listWorkflowsResponse from '$fixtures/list-workflows.json';
 import canceledWorkflow from '$fixtures/workflow.canceled.json';
 import completedWorkflow from '$fixtures/workflow.completed.json';
 import failedWorkflow from '$fixtures/workflow.failed.json';
 import runningWorkflow from '$fixtures/workflow.running.json';
 import terminatedWorkflow from '$fixtures/workflow.terminated.json';
 import timedOutWorkflow from '$fixtures/workflow.timed-out.json';
-import listWorkflowsResponse from '$fixtures/list-workflows.json';
-
-import type {
-  ListWorkflowExecutionsResponse,
-  WorkflowExecutionAPIResponse,
-} from '$lib/types/workflows';
 
 const workflows = [
   canceledWorkflow,

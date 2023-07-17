@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import eventsCompleted from '$fixtures/events.completed.json';
+
+import type {
+  EventType,
+  EventTypeCategory,
+  WorkflowEvents,
+} from '$lib/types/events';
+
 import {
   allEventTypeOptions,
   compactEventTypeOptions,
@@ -9,11 +15,8 @@ import {
   isCategoryType,
   timelineEventTypeOptions,
 } from './get-event-categorization';
-import type {
-  EventType,
-  EventTypeCategory,
-  WorkflowEvents,
-} from '$lib/types/events';
+
+import eventsCompleted from '$fixtures/events.completed.json';
 
 describe('Event Category Data Structures', () => {
   it('should match the eventTypeCategorizations to the last snapshot', () => {

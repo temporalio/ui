@@ -1,9 +1,12 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
   import type { ToastVariant } from '$lib/types/holocene';
+  
+  import { toaster } from '../stores/toaster';
+  
   import Button from './button.svelte';
   import Toaster from './toaster.svelte';
-  import { toaster } from '../stores/toaster';
 
   export let Hst: HST;
 

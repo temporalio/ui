@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { isEventGroups, isEventGroup } from '.';
+
+import { isEventGroup, isEventGroups } from '.';
+import type { EventGroup, EventGroups } from './event-groups';
 
 import eventGroupsFixture from '$fixtures/event-groups.completed.json';
 import eventsFixture from '$fixtures/events.completed.json';
-import type { EventGroup, EventGroups } from './event-groups';
 
 describe('isEventGroups', () => {
   it('should return true for event groups', () => {
