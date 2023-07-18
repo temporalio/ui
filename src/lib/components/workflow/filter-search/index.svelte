@@ -16,13 +16,16 @@
   import { setContext } from 'svelte';
   import { afterUpdate, noop } from 'svelte/internal';
   import { writable } from 'svelte/store';
-  import { fly } from 'svelte/transition';
+  import { fly, fade } from 'svelte/transition';
   import { page } from '$app/stores';
 
   import { refresh } from '$lib/stores/workflows';
   import { searchAttributeOptions } from '$lib/stores/search-attributes';
   import { workflowFilters } from '$lib/stores/filters';
-  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    emptyFilter,
+    combineFilters,
+  } from '$lib/utilities/query/to-list-workflow-filters';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import {
@@ -70,7 +73,9 @@
   });
 
   function onSearch() {
-    const searchQuery = toListWorkflowQueryFromFilters($workflowFilters);
+    const searchQuery = toListWorkflowQueryFromFilters(
+      combineFilters($workflowFilters),
+    );
 
     if (searchQuery && searchQuery === searchParamQuery) {
       $refresh = Date.now();
@@ -89,10 +94,6 @@
       $workflowFilters[$activeQueryIndex] = $filter;
       $activeQueryIndex = null;
     } else {
-      const previousQuery = $workflowFilters[$workflowFilters.length - 1];
-      if (previousQuery) {
-        previousQuery.operator = 'AND';
-      }
       $workflowFilters = [...$workflowFilters, $filter];
     }
     filter.set(emptyFilter());
@@ -197,50 +198,52 @@
 {:else}
   <div class="flex w-full gap-4">
     <div class="flex" class:filter={!showClearAllButton} on:keyup={handleKeyUp}>
-      <MenuContainer let:open>
-        <Button
-          variant="search"
-          unroundRight={Boolean($filter.attribute)}
-          disabled={$activeQueryIndex !== null}
-          icon={$filter.attribute ? null : 'filter'}
-          count={$filter.attribute ? 0 : $workflowFilters.length}
-          on:click={() => open.update((previous) => !previous)}
-        >
-          {$filter.attribute || 'Filter'}
-        </Button>
-        <Menu
-          class="max-h-80 overflow-y-scroll w-fit whitespace-nowrap"
-          id="search-attribute-menu"
-        >
-          <Input
-            id="filter-search"
-            noBorder
-            bind:value={searchAttributeValue}
-            icon="search"
-            placeholder="Search"
-          />
-
-          {#each filteredOptions as { value, label }}
-            {@const disabled = isOptionDisabled(value, $workflowFilters)}
-            <MenuItem
-              on:click={() => {
-                handleNewQuery(value);
-              }}
-              {disabled}
-            >
-              {label}
-            </MenuItem>
-          {:else}
-            <MenuItem on:click={noop}>No Results</MenuItem>
-          {/each}
-        </Menu>
-      </MenuContainer>
-
       {#if isStatusFilter($filter.attribute)}
-        <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+        <div class="w-full" in:fade>
           <StatusFilter />
         </div>
-      {:else if isTextFilter($filter.attribute)}
+      {:else}
+        <MenuContainer let:open>
+          <Button
+            variant="search"
+            unroundRight={Boolean($filter.attribute)}
+            disabled={$activeQueryIndex !== null}
+            icon={$filter.attribute ? null : 'filter'}
+            count={$filter.attribute ? 0 : $workflowFilters.length}
+            on:click={() => open.update((previous) => !previous)}
+          >
+            {$filter.attribute || 'Filter'}
+          </Button>
+          <Menu
+            class="max-h-80 overflow-y-scroll w-fit whitespace-nowrap"
+            id="search-attribute-menu"
+          >
+            <Input
+              id="filter-search"
+              noBorder
+              bind:value={searchAttributeValue}
+              icon="search"
+              placeholder="Search"
+            />
+
+            {#each filteredOptions as { value, label }}
+              {@const disabled = isOptionDisabled(value, $workflowFilters)}
+              <MenuItem
+                on:click={() => {
+                  handleNewQuery(value);
+                }}
+                {disabled}
+              >
+                {label}
+              </MenuItem>
+            {:else}
+              <MenuItem on:click={noop}>No Results</MenuItem>
+            {/each}
+          </Menu>
+        </MenuContainer>
+      {/if}
+
+      {#if isTextFilter($filter.attribute)}
         <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
           <TextFilter />
         </div>

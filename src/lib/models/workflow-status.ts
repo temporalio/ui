@@ -14,15 +14,7 @@ export const workflowStatuses: WorkflowStatuses = [
 ] as const;
 
 export function isWorkflowStatusType(value: string): value is WorkflowStatus {
-  return [
-    'Running',
-    'TimedOut',
-    'Completed',
-    'Failed',
-    'ContinuedAsNew',
-    'Canceled',
-    'Terminated',
-  ].includes(value);
+  return workflowStatuses.includes(value as WorkflowStatus);
 }
 
 export const workflowStatusFilters: WorkflowFilters = [
