@@ -57,4 +57,8 @@ export const Strings = {
   'cron-view-description':
     'Write or paste in a cron string to generate a schedule.',
   'error-title': 'Error Message',
+  'name-label': 'Name*',
+  'workflow-id-label': 'Workflow Id*',
+  'workflow-type-label': 'Workflow Type*',
+  'task-queue-label': 'Task Queue*',
 } as const;

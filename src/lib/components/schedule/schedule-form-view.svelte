@@ -131,7 +131,7 @@
         <Input
           id="name"
           bind:value={name}
-          label={translate('name')}
+          label={translate('schedules', 'name-label')}
           error={errors['name']}
           maxLength={232}
           disabled={Boolean(scheduleId)}
@@ -143,7 +143,7 @@
         <Input
           id="workflowType"
           bind:value={workflowType}
-          label={translate('workflow-type')}
+          label={translate('schedules', 'workflow-type-label')}
           error={errors['workflowType']}
           on:input={onInput}
           on:blur={onBlur}
@@ -153,7 +153,7 @@
         <Input
           id="workflowId"
           bind:value={workflowId}
-          label={translate('workflow-id')}
+          label={translate('schedules', 'workflow-id-label')}
           error={errors['workflowId']}
           on:input={onInput}
           on:blur={onBlur}
@@ -163,7 +163,7 @@
         <Input
           id="taskQueue"
           bind:value={taskQueue}
-          label={translate('task-queue')}
+          label={translate('schedules', 'task-queue-label')}
           error={errors['taskQueue']}
           on:input={onInput}
           on:blur={onBlur}
