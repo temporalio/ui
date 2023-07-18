@@ -17,7 +17,7 @@
 
 <section class="flex flex-col gap-4">
   <h2 class="text-lg font-medium" data-testid="task-queue-name">
-    {translate('workflows', 'task-queue')}:
+    {translate('task-queue')}:
     <span class="select-all font-normal">{taskQueue}</span>
   </h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
