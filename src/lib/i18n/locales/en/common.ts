@@ -47,6 +47,7 @@ export const Strings = {
   'expand-all': 'Expand All',
   save: 'Save',
   'workflow-type': 'Workflow Type',
+  'task-queue': 'Task Queue',
   preview: 'Preview',
   status: 'Status',
   created: 'Created: {{created}}',
