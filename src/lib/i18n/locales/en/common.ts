@@ -1,7 +1,7 @@
 export const Namespace = 'common' as const;
 
 export const Strings = {
-  loading: 'loading',
+  loading: 'Loading...',
   filtering: 'filtering',
   'unknown-error': 'An unknown error occurred.',
   'search-placeholder': 'Enter a query',
@@ -43,4 +43,9 @@ export const Strings = {
   event: 'Event',
   'collapse-all': 'Collapse All',
   'expand-all': 'Expand All',
+  id: 'ID',
+  yes: 'yes',
+  no: 'no',
+  refresh: 'Refresh',
+  'error-occurred': 'An Error Occurred',
 } as const;

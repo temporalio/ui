@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
 
 import type { I18nKey } from '$lib/i18n';
+import { translate } from '$lib/i18n/translate';
 import { timeFormat } from '$lib/stores/time-format';
 import type {
   EventAttribute,
@@ -36,8 +37,8 @@ const keysToExpand: Readonly<Set<string>> = new Set([
 
 const keysToFormat: Readonly<Set<string>> = new Set(['maximumAttempts']);
 
-export const UnlimitedAttempts = 'Unlimited';
-export const NoExpiration = 'No Expiration';
+export const UnlimitedAttempts = translate('workflows', 'unlimited');
+export const NoExpiration = translate('workflows', 'no-expiration');
 
 export const formatRetryExpiration = (
   maxAttempts: number,
