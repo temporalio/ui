@@ -29,6 +29,7 @@
 
   let namespace = $page.params.namespace;
 
+  $: versionSets = getOrderedVersionSets(compatibility);
   $: defaultVersion = getCurrentCompatibilityDefaultVersion(compatibility);
 </script>
 
@@ -37,44 +38,49 @@
     Task Queue: <span class="select-all font-normal">{taskQueue}</span>
   </h2>
 
-  <h2 class="text-base font-medium" data-testid="version-sets">Version Sets</h2>
-  <Table class="mb-6 w-full min-w-[600px] table-fixed">
-    <TableHeaderRow slot="headers">
-      <th class="w-3/12">Default</th>
-      <th class="w-9/12">Compatible Build IDs</th>
-    </TableHeaderRow>
-    {#each getOrderedVersionSets(compatibility) as set, index (index)}
-      <TableRow data-testid="version-row">
-        <td class="text-left" data-testid="version-default">
-          <CompatibilityBadge
-            defaultVersion
-            active={index === 0}
-            buildId={getDefaultVersionForSet(set.buildIds)}
-          />
-        </td>
-        <td class="text-left" data-testid="version-compatible-builds">
-          <div class="flex gap-2 noto flex-wrap">
-            {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
-              <CompatibilityBadge active={false} {buildId} />
-            {/each}
-          </div>
-        </td>
-      </TableRow>
-    {:else}
-      <tr class="w-full">
-        <td colspan="6">
-          <EmptyState title={'No Version Sets Found'} />
-        </td>
-      </tr>
-    {/each}
-  </Table>
-
+  {#if versionSets.length}
+    <h2 class="text-base font-medium" data-testid="version-sets">
+      Version Sets
+    </h2>
+    <Table class="mb-6 w-full min-w-[600px] table-fixed">
+      <TableHeaderRow slot="headers">
+        <th class="w-3/12">Default</th>
+        <th class="w-9/12">Compatible Build IDs</th>
+      </TableHeaderRow>
+      {#each versionSets as set, index (index)}
+        <TableRow data-testid="version-row">
+          <td class="text-left" data-testid="version-default">
+            <CompatibilityBadge
+              defaultVersion
+              active={index === 0}
+              buildId={getDefaultVersionForSet(set.buildIds)}
+            />
+          </td>
+          <td class="text-left" data-testid="version-compatible-builds">
+            <div class="flex gap-2 noto flex-wrap">
+              {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
+                <CompatibilityBadge active={false} {buildId} />
+              {/each}
+            </div>
+          </td>
+        </TableRow>
+      {:else}
+        <tr class="w-full">
+          <td colspan="6">
+            <EmptyState title={'No Version Sets Found'} />
+          </td>
+        </tr>
+      {/each}
+    </Table>
+  {/if}
   <h2 class="text-base font-medium" data-testid="workers">Workers</h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <TableHeaderRow slot="headers">
-      <th class="w-3/12">ID</th>
-      <th class="w-3/12">Version</th>
-      <th class="w-2/12">Retirability</th>
+      <th class={versionSets?.length ? 'w-3/12' : 'w-6/12'}>ID</th>
+      {#if versionSets?.length}
+        <th class="w-3/12">Version</th>
+        <th class="w-2/12">Retirability</th>
+      {/if}
       <th class="w-2/12">Last Accessed</th>
       <th class="w-2/12">
         <p class="text-center">Workflow Task Handler</p>
@@ -89,24 +95,26 @@
         <td class="text-left" data-testid="worker-identity">
           <p class="select-all">{poller.identity}</p>
         </td>
-        <td class="text-left" data-testid="worker-identity">
-          <p class="select-all">
-            <CompatibilityBadge
-              defaultVersion={buildId === defaultVersion}
-              active={buildId === defaultVersion}
-              {buildId}
-            />
-          </p>
-        </td>
-        <td class="text-left" data-testid="worker-last-access-time">
-          {#await getWorkerTaskRetirementStatus( { namespace, taskQueues: [taskQueue], buildIds: [buildId] }, ) then result}
-            <p>
-              <span class="bg-gray-200 px-2 py-1 rounded-sm">{result}</span>
+        {#if versionSets?.length}
+          <td class="text-left" data-testid="worker-identity">
+            <p class="select-all">
+              <CompatibilityBadge
+                defaultVersion={buildId === defaultVersion}
+                active={buildId === defaultVersion}
+                {buildId}
+              />
             </p>
-          {:catch}
-            <p>Unknown</p>
-          {/await}
-        </td>
+          </td>
+          <td class="text-left" data-testid="worker-last-access-time">
+            {#await getWorkerTaskRetirementStatus( { namespace, taskQueues: [taskQueue], buildIds: [buildId] }, ) then result}
+              <p>
+                <span class="bg-gray-200 px-2 py-1 rounded-sm">{result}</span>
+              </p>
+            {:catch}
+              <p>Unknown</p>
+            {/await}
+          </td>
+        {/if}
         <td class="text-left" data-testid="worker-last-access-time">
           <p class="select-all">
             {formatDate(poller.lastAccessTime, $timeFormat)}
@@ -129,7 +137,7 @@
       </TableRow>
     {:else}
       <tr class="w-full">
-        <td colspan="6">
+        <td colspan={versionSets?.length ? 8 : 6}>
           <EmptyState title={'No Workers Found'} />
         </td>
       </tr>

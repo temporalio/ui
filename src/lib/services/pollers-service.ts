@@ -136,9 +136,9 @@ export async function getWorkerTaskReachability(
 }
 
 function getLabelForReachability(reachability: TaskReachability[]): string {
-  if (!reachability) return 'Ready to be Retired';
+  if (!reachability || !reachability.length) return 'Ready to be Retired';
   if (reachability.length === 1 && reachability.includes('CLOSED')) {
-    return 'Ready to be Retired';
+    return 'Maybe';
   }
   return 'No';
   // if (reachability.includes(TaskReachability.TASK_REACHABILITY_NEW_WORKFLOWS)) {
