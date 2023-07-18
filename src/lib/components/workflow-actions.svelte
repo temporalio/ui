@@ -315,7 +315,7 @@
     <Input
       id="workflow-termination-reason"
       class="mt-4"
-      placeholder={translate('workflows', 'terminate-reason-input-placeholder')}
+      placeholder={translate('reason-placeholder')}
       bind:value={reason}
     />
   </div>

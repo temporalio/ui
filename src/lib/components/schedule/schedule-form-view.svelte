@@ -21,6 +21,8 @@
     ScheduleParameters,
   } from '$lib/types/schedule';
 
+  import { translate } from '$lib/i18n/translate';
+
   export let schedule: FullSchedule | null = null;
   export let onConfirm: (
     preset: SchedulePreset,
@@ -31,13 +33,18 @@
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
 
-  let title = schedule ? 'Edit Schedule' : 'Create Schedule';
-  let loadingText = schedule ? 'Editing Schedule...' : 'Creating Schedule...';
-  let backTitle = schedule ? 'Back to Schedule' : 'Back to Schedules';
+  let title = translate('schedules', schedule ? 'edit' : 'create');
+  let loadingText = translate('schedules', schedule ? 'editing' : 'creating');
+  let backTitle = translate(
+    'schedules',
+    schedule ? 'back-to-schedule' : 'back-to-schedules',
+  );
   let backHref = schedule
     ? routeForSchedule({ namespace, scheduleId })
     : routeForSchedules({ namespace });
-  let confirmText = schedule ? 'Save' : 'Create Schedule';
+  let confirmText = schedule
+    ? translate('save')
+    : translate('schedules', 'create');
 
   let errors = {};
   let name = scheduleId ?? '';
@@ -124,7 +131,7 @@
         <Input
           id="name"
           bind:value={name}
-          label="Name*"
+          label={translate('name')}
           error={errors['name']}
           maxLength={232}
           disabled={Boolean(scheduleId)}
@@ -136,7 +143,7 @@
         <Input
           id="workflowType"
           bind:value={workflowType}
-          label="Workflow Type*"
+          label={translate('workflow-type')}
           error={errors['workflowType']}
           on:input={onInput}
           on:blur={onBlur}
@@ -146,7 +153,7 @@
         <Input
           id="workflowId"
           bind:value={workflowId}
-          label="Workflow Id*"
+          label={translate('workflow-id')}
           error={errors['workflowId']}
           on:input={onInput}
           on:blur={onBlur}
@@ -156,7 +163,7 @@
         <Input
           id="taskQueue"
           bind:value={taskQueue}
-          label="Task Queue*"
+          label={translate('task-queue')}
           error={errors['taskQueue']}
           on:input={onInput}
           on:blur={onBlur}
@@ -181,7 +188,9 @@
             on:click={() => handleConfirm(preset, schedule)}
             >{confirmText}</Button
           >
-          <a href={backHref} class="back" style="left: 0;">Cancel</a>
+          <a href={backHref} class="back" style="left: 0;"
+            >{translate('cancel')}</a
+          >
         </div>
       </SchedulesCalendarView>
     </form>

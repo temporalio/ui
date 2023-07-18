@@ -1,5 +1,6 @@
 import * as Common from './locales/en/common';
 import * as Events from './locales/en/events';
+import * as Schedules from './locales/en/schedules';
 import * as TypedErrors from './locales/en/typed-errors';
 import * as Workflows from './locales/en/workflows';
 
@@ -21,6 +22,7 @@ export const I18nMap = {
   [Workflows.Namespace]: Workflows.Strings,
   [TypedErrors.Namespace]: TypedErrors.Strings,
   [Events.Namespace]: Events.Strings,
+  [Schedules.Namespace]: Schedules.Strings,
 } as const;
 
 export const I18nNamespaces = Object.keys(I18nMap);

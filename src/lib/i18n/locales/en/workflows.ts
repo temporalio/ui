@@ -88,7 +88,6 @@ export const Strings = {
   'terminate-modal-title': 'Terminate Workflow',
   'terminate-modal-confirmation':
     'Are you sure you want to terminate this workflow? This action cannot be undone.',
-  'terminate-reason-input-placeholder': 'Enter a reason',
   'signal-modal-title': 'Send a Signal',
   'signal-name-label': 'Signal name',
   'signal-payload-input-label': 'Input',
@@ -107,9 +106,7 @@ export const Strings = {
   'workflow-error-no-workers-title': 'No Workers Running',
   'workflow-error-no-workers-description':
     'Please make sure you have at least one worker connected to the {{taskQueue}} Task Queue.',
-  'workflow-type': 'Workflow Type',
   'state-transitions': 'State Transitions',
-  'task-queue': 'Task Queue',
   'start-and-close-time': 'Start & Close Time',
   relationships: 'Relationships',
   parents_zero: '0 Parents',
