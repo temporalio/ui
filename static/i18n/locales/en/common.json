@@ -65,5 +65,9 @@
   "days": "days",
   "per-page": "Per Page",
   "today": "Today",
-  "close": "Close"
+  "close": "Close",
+  "deprecated": "Deprecated",
+  "namespaces": "Namespaces",
+  "cluster": "Cluster",
+  "codec-server": "Codec Server"
 }

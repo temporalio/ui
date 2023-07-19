@@ -1,12 +1,14 @@
 <script lang="ts">
+  import { translate } from '$lib/i18n/translate';
+
   export let port = '';
 </script>
 
 <div class="my-4">
   <h3 class="text-lg" data-testid="data-encoder-port-title">
-    tctl plugin port <span
+    {translate('data-encoder', 'port-title')}<span
       class="rounded-lg bg-orange-100 px-1 text-sm text-orange-900"
-      >Deprecated</span
+      >{translate('deprecated')}</span
     >
   </h3>
   <div class="flex gap-2">
@@ -18,7 +20,7 @@
       on:keydown|stopPropagation
     />
     <p data-testid="data-encoder-info" class="text-sm w-[220px]">
-      *If both are set, the Codec Server endpoint will be used.
+      {translate('data-encoder', 'port-info')}
     </p>
   </div>
 </div>

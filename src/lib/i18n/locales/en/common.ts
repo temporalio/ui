@@ -68,4 +68,8 @@ export const Strings = {
   'per-page': 'Per Page',
   today: 'Today',
   close: 'Close',
+  deprecated: 'Deprecated',
+  namespaces: 'Namespaces',
+  cluster: 'Cluster',
+  'codec-server': 'Codec Server',
 } as const;
