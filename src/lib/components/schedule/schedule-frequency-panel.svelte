@@ -4,13 +4,14 @@
 
   import Panel from '$lib/components/panel.svelte';
   import ScheduleFrequency from './schedule-frequency.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let calendar: StructuredCalendar | undefined = undefined;
   export let interval: IntervalSpec | undefined = undefined;
 </script>
 
 <Panel>
-  <h2 class="mb-4 text-2xl">Frequency</h2>
+  <h2 class="mb-4 text-2xl">{translate('schedules', 'frequency')}</h2>
   <div class="pr-2">
     <ScheduleFrequency {calendar} {interval} class="text-base" />
   </div>

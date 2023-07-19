@@ -10,6 +10,7 @@
   import ScheduleFrequency from './schedule-frequency.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import type { FullSchedule, SchedulePreset } from '$lib/types/schedule';
+  import { translate } from '$lib/i18n/translate';
 
   let scheduleId = $page.params.schedule;
 
@@ -42,7 +43,7 @@
 </script>
 
 <Tabs class="mt-8 w-full">
-  <h2 class="mb-4 text-2xl">Frequency</h2>
+  <h2 class="mb-4 text-2xl">{translate('schedules', 'frequency')}</h2>
   <TabList label="Schedule Tabs" class="flex flex-wrap gap-6">
     {#if schedule}
       <Tab
@@ -109,8 +110,10 @@
     </TabPanel>
     <TabPanel id="string-panel" tabId="string-tab">
       <div class="my-2 flex w-full flex-col gap-4">
-        <h3 class="text-lg font-medium">String</h3>
-        <p>Write or paste in a cron string to generate a schedule.</p>
+        <h3 class="text-lg font-medium">
+          {translate('schedules', 'cron-view-title')}
+        </h3>
+        <p>{translate('schedules', 'cron-view-description')}</p>
         <Input
           id="cronString"
           bind:value={cronString}
