@@ -13,9 +13,11 @@
 
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
   import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import ConditionalMenu from './conditional-menu.svelte';
 
@@ -37,6 +39,15 @@
   let endMinute = '';
   let endSecond = '';
   let endHalf: 'AM' | 'PM' = 'AM';
+
+  const TIME_UNIT_LABELS = {
+    minutes: 'mins',
+    hours: 'hrs',
+  };
+  const TIME_UNIT_OPTIONS = ['minutes', 'hours', 'days'];
+
+  let timeUnit = TIME_UNIT_OPTIONS[0];
+  let relativeTime = '';
 
   $: useBetweenDateTimeQuery = isTimeRange || !$supportsAdvancedVisibility;
 
@@ -103,6 +114,20 @@
 
     handleSubmit();
   };
+
+  const onApplyRelativeTime = () => {
+    if (!relativeTime) return;
+
+    $filter.value = `${relativeTime} ${timeUnit}`;
+    $filter.customDate = false;
+
+    handleSubmit();
+  };
+
+  const error = (x: string) => {
+    if (x) return isNaN(parseInt(x));
+    return false;
+  };
 </script>
 
 <div class="flex items-center">
@@ -158,6 +183,41 @@
         <Button on:click={onApply}>{translate('apply')}</Button>
       {:else}
         <div class="flex flex-col gap-2">
+          <div class="flex gap-2 pb-2 border-b border-gray-300">
+            <div class="flex w-40 gap-0">
+              <Input
+                id="relative-datetime-input"
+                bind:value={relativeTime}
+                placeholder="00"
+                error={error(relativeTime)}
+                unroundRight
+                class="h-10"
+              />
+              <MenuContainer>
+                <MenuButton
+                  hasIndicator
+                  id="relative-datetime-input"
+                  controls="relative-datetime-input-menu"
+                  class="rounded-r bg-offWhite border border-primary border-l-0 h-10 w-20 px-2"
+                >
+                  {TIME_UNIT_LABELS[timeUnit] ?? timeUnit}
+                </MenuButton>
+                <Menu id="relative-datetime-input-menu">
+                  {#each TIME_UNIT_OPTIONS as unit}
+                    <MenuItem
+                      on:click={() => {
+                        timeUnit = unit;
+                      }}>{TIME_UNIT_LABELS[unit] ?? unit}</MenuItem
+                    >
+                  {/each}
+                </Menu>
+              </MenuContainer>
+            </div>
+            <Button
+              disabled={error(relativeTime)}
+              on:click={onApplyRelativeTime}>{translate('apply')}</Button
+            >
+          </div>
           <DatePicker on:datechange={onStartDateChange} selected={startDate} />
           <TimePicker
             bind:hour={startHour}

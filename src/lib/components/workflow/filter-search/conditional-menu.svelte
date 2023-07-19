@@ -24,6 +24,8 @@
   export let disabled = false;
   export let inputId: string;
 
+  $: options, ($filter.conditional = options[0].value);
+
   $: selectedOption =
     options.find((o) => o.value === $filter.conditional) ?? options[0];
   $: selectedLabel = selectedOption?.label ?? selectedOption?.value;
