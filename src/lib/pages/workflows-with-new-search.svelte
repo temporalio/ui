@@ -260,8 +260,10 @@
         </p>
         <div class="h-1 w-1 rounded-full bg-gray-400" />
       {/if}
-      <Button variant="link" on:click={() => exportWorkflows($workflows)}
-        >Download JSON</Button
+      <Button
+        variant="link"
+        disabled={$loading || $updating || $workflows.length === 0}
+        on:click={() => exportWorkflows($workflows)}>Download JSON</Button
       >
     </div>
   </div>

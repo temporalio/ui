@@ -4,7 +4,11 @@ import { stringifyWithBigInt } from './parse-with-big-int';
 
 export const exportWorkflows = (workflows: WorkflowExecution[]) => {
   const content = stringifyWithBigInt({ workflows }, null, 2);
-  download(content, `workflows-${Date.now()}.json`, 'text/plain');
+  download(
+    content,
+    `workflows-${workflows?.length}-${Date.now()}.json`,
+    'text/plain',
+  );
 
   function download(content: string, fileName: string, contentType: string) {
     const a = document.createElement('a');
