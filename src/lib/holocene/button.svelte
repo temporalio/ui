@@ -131,7 +131,7 @@
   }
 
   .link {
-    @apply border-0 bg-none p-0 font-primary text-sm underline shadow-none;
+    @apply border-0 bg-none p-0 font-primary text-sm text-blue-700 leading-5 font-semibold hover:underline shadow-none;
   }
 
   .selected {
