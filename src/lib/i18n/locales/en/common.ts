@@ -66,4 +66,6 @@ export const Strings = {
   'seconds-abbreviated': 'sec.',
   days: 'days',
   'per-page': 'Per Page',
+  today: 'Today',
+  close: 'Close',
 } as const;
