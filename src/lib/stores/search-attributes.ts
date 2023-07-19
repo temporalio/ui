@@ -54,3 +54,29 @@ export const searchAttributeOptions = () => {
       })
     : [];
 };
+
+export const sortedSearchAttributOptions = () => {
+  const popularOptions = [
+    'ExecutionStatus',
+    'WorkflowId',
+    'WorkflowType',
+    'RunId',
+    'StartTime',
+    'CloseTime',
+  ];
+
+  return searchAttributeOptions()
+    .sort((a, b) => {
+      if (a.label < b.label) return -1;
+      if (a.label > b.label) return 1;
+      return 0;
+    })
+    .sort((a, b) => {
+      const indexA = popularOptions.indexOf(a.value);
+      const indexB = popularOptions.indexOf(b.value);
+
+      if (indexA < 0) return 1;
+      if (indexB < 0) return -1;
+      return indexA - indexB;
+    });
+};

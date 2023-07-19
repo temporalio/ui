@@ -8,7 +8,10 @@
   import { workflowFilters } from '$lib/stores/filters';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { formatDateTime } from '$lib/utilities/format-date';
-  import { isDateTimeFilter } from '$lib/utilities/query/filter-search';
+  import {
+    isDateTimeFilter,
+    isTextFilter,
+  } from '$lib/utilities/query/filter-search';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { isWorkflowStatusType } from '$lib/models/workflow-status';
 
@@ -101,7 +104,7 @@
                 {/if}
               {:else}
                 {conditional}
-                {value}
+                {isTextFilter(attribute) ? `"${value}"` : value}
               {/if}
             </span>
           {/if}

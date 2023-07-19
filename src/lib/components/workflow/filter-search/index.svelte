@@ -16,11 +16,11 @@
   import { setContext } from 'svelte';
   import { afterUpdate, noop } from 'svelte/internal';
   import { writable } from 'svelte/store';
-  import { fly, fade } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
   import { page } from '$app/stores';
 
   import { refresh } from '$lib/stores/workflows';
-  import { searchAttributeOptions } from '$lib/stores/search-attributes';
+  import { sortedSearchAttributOptions } from '$lib/stores/search-attributes';
   import { workflowFilters } from '$lib/stores/filters';
   import {
     emptyFilter,
@@ -142,7 +142,7 @@
 
   let searchAttributeValue = '';
   //  TODO: Add KeywordList support
-  let options = searchAttributeOptions().filter(
+  let options = sortedSearchAttributOptions().filter(
     (option) => !isListFilter(option.value),
   );
 
@@ -199,9 +199,7 @@
   <div class="flex w-full gap-4">
     <div class="flex" class:filter={!showClearAllButton} on:keyup={handleKeyUp}>
       {#if isStatusFilter($filter.attribute)}
-        <div class="w-full" in:fade>
-          <StatusFilter />
-        </div>
+        <StatusFilter />
       {:else}
         <MenuContainer let:open>
           <Button
