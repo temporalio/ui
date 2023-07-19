@@ -65,4 +65,11 @@ export const Strings = {
   'minutes-abbreviated': 'min.',
   'seconds-abbreviated': 'sec.',
   days: 'days',
+  workflows: 'Workflows',
+  schedules: 'Schedules',
+  archive: 'Archive',
+  namespaces: 'Namespaces',
+  import: 'Import',
+  feedback: 'Feedback',
+  'log-out': 'Log out',
 } as const;
