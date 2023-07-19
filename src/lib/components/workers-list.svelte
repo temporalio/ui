@@ -11,7 +11,8 @@
   import {
     type GetPollersResponse,
     type TaskQueueCompatibility,
-    getWorkerTaskRetirementStatus,
+    getWorkerTaskReachability,
+    getBuildIdReachability,
   } from '$lib/services/pollers-service';
   import {
     getCurrentCompatibilityDefaultVersion,
@@ -31,6 +32,22 @@
 
   $: versionSets = getOrderedVersionSets(compatibility);
   $: defaultVersion = getCurrentCompatibilityDefaultVersion(compatibility);
+
+  $: buildIds = workers?.pollers.map(getCurrentPollerBuildId);
+
+  let workerTaskReachability;
+
+  async function fetchWorkerTaskReachability(
+    namespace: string,
+    buildIds: string[],
+  ) {
+    workerTaskReachability = await getWorkerTaskReachability({
+      namespace,
+      buildIds,
+      taskQueue,
+    });
+  }
+  $: fetchWorkerTaskReachability(namespace, buildIds);
 </script>
 
 <section class="flex flex-col gap-4">
@@ -91,6 +108,11 @@
     </TableHeaderRow>
     {#each workers?.pollers as poller (poller.identity)}
       {@const buildId = getCurrentPollerBuildId(poller)}
+      {@const reachability = getBuildIdReachability(
+        workerTaskReachability,
+        taskQueue,
+        buildId,
+      )}
       <TableRow data-testid="worker-row">
         <td class="text-left" data-testid="worker-identity">
           <p class="select-all">{poller.identity}</p>
@@ -106,13 +128,11 @@
             </p>
           </td>
           <td class="text-left" data-testid="worker-last-access-time">
-            {#await getWorkerTaskRetirementStatus( { namespace, taskQueues: [taskQueue], buildIds: [buildId] }, ) then result}
-              <p>
-                <span class="bg-gray-200 px-2 py-1 rounded-sm">{result}</span>
-              </p>
-            {:catch}
-              <p>Unknown</p>
-            {/await}
+            <p>
+              <span class="bg-gray-200 px-2 py-1 rounded-sm"
+                >{reachability}</span
+              >
+            </p>
           </td>
         {/if}
         <td class="text-left" data-testid="worker-last-access-time">

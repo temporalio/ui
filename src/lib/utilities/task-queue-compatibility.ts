@@ -18,6 +18,16 @@ export const getDefaultVersionForSet = (
   return buildIds[buildIds.length - 1];
 };
 
+export const getDefaultVersionForSetFromABuildId = (
+  compatibility: TaskQueueCompatibility,
+  buildId: string,
+): string | undefined => {
+  const buildIdSet = compatibility?.majorVersionSets?.find((set) =>
+    set.buildIds?.includes(buildId),
+  );
+  return getDefaultVersionForSet(buildIdSet?.buildIds);
+};
+
 export const getNonDefaultVersionsForSet = (buildIds?: string[]): string[] => {
   if (!buildIds) return [];
   return buildIds.slice(0, buildIds.length - 1).reverse();

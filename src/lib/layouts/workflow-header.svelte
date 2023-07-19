@@ -36,6 +36,7 @@
   import {
     getCurrentCompatibilityDefaultVersion,
     getCurrentWorkflowBuildId,
+    getDefaultVersionForSetFromABuildId,
   } from '$lib/utilities/task-queue-compatibility';
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
 
@@ -92,9 +93,15 @@
     $workflowRun?.workflow?.status,
     $eventHistory,
   );
-
   $: workflowHasBeenReset = has($resetWorkflows, $workflowRun?.workflow?.runId);
-  $: defaultVersion = getCurrentCompatibilityDefaultVersion(compatibility);
+
+  $: buildId = getCurrentWorkflowBuildId(workflow);
+  $: overallDefaultVersion =
+    getCurrentCompatibilityDefaultVersion(compatibility);
+  $: defaultVersionForSet = getDefaultVersionForSetFromABuildId(
+    compatibility,
+    buildId,
+  );
 </script>
 
 <header class="mb-4 flex flex-col gap-1">
@@ -129,20 +136,19 @@
       </h1>
       <div class="flex gap-4 items-center">
         <WorkflowStatus status={workflow?.status} />
-        {#if defaultVersion}
+        {#if overallDefaultVersion}
           <p class="flex gap-1 items-center">
             <span>Last used version</span><CompatibilityBadge
-              defaultVersion={getCurrentWorkflowBuildId(workflow) ===
-                defaultVersion}
-              active={getCurrentWorkflowBuildId(workflow) === defaultVersion}
-              buildId={getCurrentWorkflowBuildId(workflow)}
+              defaultVersion={buildId === overallDefaultVersion}
+              active={buildId === overallDefaultVersion}
+              {buildId}
             />
           </p>
           <p class="flex gap-1 items-center">
             <span>Next version</span><CompatibilityBadge
-              defaultVersion={!!defaultVersion}
-              active={!!defaultVersion}
-              buildId={defaultVersion}
+              defaultVersion={!!defaultVersionForSet}
+              active={defaultVersionForSet === overallDefaultVersion}
+              buildId={defaultVersionForSet}
             />
           </p>
         {/if}

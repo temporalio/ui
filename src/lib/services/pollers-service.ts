@@ -1,3 +1,5 @@
+import { temporal } from '@temporalio/proto';
+
 import type {
   BuildIdReachability,
   PollerInfo,
@@ -9,11 +11,13 @@ import type { NamespaceScopedRequest } from '$lib/types/global';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
+const TaskReachabilityEnum = temporal.api.enums.v1.TaskReachability;
+
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 
 export type GetWorkerTaskReachabilityRequest = NamespaceScopedRequest & {
-  buildIds?: string[];
-  taskQueues?: string[];
+  taskQueue: string;
+  buildIds: string[];
 };
 
 export type GetPollersResponse = {
@@ -127,38 +131,60 @@ export async function getWorkerTaskReachability(
   parameters: GetWorkerTaskReachabilityRequest,
   request = fetch,
 ): Promise<GetWorkerTaskReachabilityResponse> {
-  const { namespace, taskQueues, buildIds } = parameters;
+  const { namespace, buildIds, taskQueue } = parameters;
   const route = routeForApi('worker-task-reachability', { namespace });
-  return requestFromAPI(route, {
-    request,
-    params: { buildIds, taskQueues },
-  });
+  const params = new URLSearchParams();
+
+  if (buildIds.length) {
+    for (const buildId of buildIds) {
+      params.append('buildIds', buildId);
+    }
+  } else {
+    params.append('buildIds', '');
+    params.append('taskQueues', taskQueue);
+  }
+
+  try {
+    return await requestFromAPI(route, {
+      request,
+      params,
+    });
+  } catch (e) {
+    console.error(e);
+    return {
+      buildIdReachability: [],
+    };
+  }
 }
 
 function getLabelForReachability(reachability: TaskReachability[]): string {
   if (!reachability || !reachability.length) return 'Ready to be Retired';
-  if (reachability.length === 1 && reachability.includes('CLOSED')) {
+  if (
+    reachability.length === 1 &&
+    reachability.includes(
+      TaskReachabilityEnum.TASK_REACHABILITY_CLOSED_WORKFLOWS,
+    )
+  ) {
     return 'Maybe';
   }
   return 'No';
-  // if (reachability.includes(TaskReachability.TASK_REACHABILITY_NEW_WORKFLOWS)) {
-  //   return 'NEW_WORKFLOWS';
-  // }
-  // if (reachability.includes(TaskReachability.TASK_REACHABILITY_EXISTING_WORKFLOWS)) {
-  //   return 'EXISTING_WORKFLOWS';
-  // }
-  // if (reachability.includes(TaskReachability.TASK_REACHABILITY_OPEN_WORKFLOWS)) {
-  //   return 'OPEN_WORKFLOWS';
-  // }
 }
 
-export async function getWorkerTaskRetirementStatus(
-  parameters: GetWorkerTaskReachabilityRequest,
-  request = fetch,
-): Promise<string> {
-  const reachability = await getWorkerTaskReachability(parameters, request);
-  const buildIdReachability = reachability?.buildIdReachability[0];
-  const taskQueueReachability =
-    buildIdReachability?.taskQueueReachability?.[0]?.reachability;
-  return getLabelForReachability(taskQueueReachability);
+export function getBuildIdReachability(
+  workerTaskReachability: GetWorkerTaskReachabilityResponse,
+  taskQueue: string,
+  buildId: string,
+): string {
+  const buildIdReachability = workerTaskReachability?.buildIdReachability?.find(
+    (bird) => bird.buildId === buildId,
+  );
+  if (!buildIdReachability) return '';
+  // const taskQueueSize = buildIdReachability?.taskQueueReachability?.length;
+  const currentTaskQueueReachability =
+    buildIdReachability?.taskQueueReachability?.find(
+      (tqr) => tqr?.taskQueue === taskQueue,
+    );
+  if (!currentTaskQueueReachability) return '';
+  const reachability = currentTaskQueueReachability?.reachability;
+  return getLabelForReachability(reachability);
 }
