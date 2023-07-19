@@ -137,5 +137,6 @@
   "last-worker-identity": "Last Worker Identity",
   "unlimited": "Unlimited",
   "no-expiration": "No Expiration",
-  "no-retry": "None"
+  "no-retry": "None",
+  "search-placeholder": "Enter a query"
 }

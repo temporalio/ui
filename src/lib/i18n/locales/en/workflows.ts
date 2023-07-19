@@ -166,4 +166,5 @@ export const Strings = {
   unlimited: 'Unlimited',
   'no-expiration': 'No Expiration',
   'no-retry': 'None',
+  'search-placeholder': 'Enter a query',
 } as const;

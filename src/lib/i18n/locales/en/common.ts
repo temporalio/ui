@@ -4,7 +4,7 @@ export const Strings = {
   loading: 'Loading...',
   filtering: 'filtering',
   'unknown-error': 'An unknown error occurred.',
-  'search-placeholder': 'Enter a query',
+  search: 'Search',
   apply: 'Apply',
   'all-time': 'All Time',
   custom: 'Custom',
