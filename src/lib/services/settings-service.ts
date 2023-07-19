@@ -72,5 +72,32 @@ export const fetchFlowSettings = async () => {
     },
   });
 
+  return response.json();
+};
+
+export const updateFlowSettings = async (data) => {
+  const url = `${import.meta.env.VITE_FLOW_API}/workflow/config`;
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  return response;
+};
+
+export const deleteSettings = async (wfName) => {
+  const url = `${
+    import.meta.env.VITE_FLOW_API
+  }/workflow/config?wfName=${wfName}`;
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+
   return response;
 };
