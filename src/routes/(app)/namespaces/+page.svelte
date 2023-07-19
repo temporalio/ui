@@ -8,12 +8,18 @@
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+  import { translate } from '$lib/i18n/translate';
 </script>
 
 <PageTitle title="Namespaces" url={$page.url.href} />
 <h1 data-testid="namespace-selector-title" class="mb-8 text-2xl">Namespaces</h1>
 {#if $namespaces?.length > 0}
-  <Pagination items={$namespaces} let:visibleItems aria-label="namespaces">
+  <Pagination
+    items={$namespaces}
+    let:visibleItems
+    aria-label="namespaces"
+    pageSizeSelectLabel={translate('per-page')}
+  >
     <Table variant="fancy" class="w-full">
       <TableHeaderRow slot="headers">
         <th>Name</th>

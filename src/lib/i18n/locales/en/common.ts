@@ -65,4 +65,5 @@ export const Strings = {
   'minutes-abbreviated': 'min.',
   'seconds-abbreviated': 'sec.',
   days: 'days',
+  'per-page': 'Per Page',
 } as const;

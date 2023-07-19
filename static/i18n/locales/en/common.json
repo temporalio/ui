@@ -62,5 +62,6 @@
   "hours-abbreviated": "hrs.",
   "minutes-abbreviated": "min.",
   "seconds-abbreviated": "sec.",
-  "days": "days"
+  "days": "days",
+  "per-page": "Per Page"
 }
