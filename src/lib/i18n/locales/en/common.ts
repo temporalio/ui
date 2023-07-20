@@ -6,6 +6,7 @@ export const Strings = {
   'unknown-error': 'An unknown error occurred.',
   search: 'Search',
   apply: 'Apply',
+  ago: 'ago',
   'all-time': 'All Time',
   custom: 'Custom',
   'start-time': 'Start Time',

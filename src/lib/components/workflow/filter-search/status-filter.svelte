@@ -94,7 +94,7 @@
   >
     {$filter.attribute}
   </Button>
-  <Menu class="max-h-80 overflow-y-scroll w-fit" id="status-menu" keepOpen>
+  <Menu class="max-h-84 overflow-y-scroll w-fit" id="status-menu" keepOpen>
     {#each workflowStatuses as status (status)}
       {@const isActive = statusFilters.find(
         (filter) => filter.value === status,
@@ -124,8 +124,8 @@
         </span>
       </MenuItem>
     {/each}
-    <div class="pt-2 border-t border-gray-300">
-      <Button thin class="!w-full " on:click={onApply}
+    <div class="p-4 border-t border-gray-300">
+      <Button variant="link" class="!w-full " on:click={onApply}
         >{translate('apply')}</Button
       >
     </div>

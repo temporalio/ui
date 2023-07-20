@@ -214,7 +214,7 @@
             {$filter.attribute || translate('workflows', 'filter')}
           </Button>
           <Menu
-            class="max-h-80 overflow-y-scroll w-fit whitespace-nowrap"
+            class="max-h-80 overflow-y-scroll w-fit min-w-[240px] whitespace-nowrap"
             id="search-attribute-menu"
           >
             <Input

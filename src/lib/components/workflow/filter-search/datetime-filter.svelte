@@ -183,7 +183,8 @@
         <Button on:click={onApply}>{translate('apply')}</Button>
       {:else}
         <div class="flex flex-col gap-2">
-          <div class="flex gap-2 pb-2 border-b border-gray-300">
+          <p class="text-sm font-semibold">Relative</p>
+          <div class="flex justify-between items-center gap-2">
             <div class="flex w-40 gap-0">
               <Input
                 id="relative-datetime-input"
@@ -198,9 +199,10 @@
                   hasIndicator
                   id="relative-datetime-input"
                   controls="relative-datetime-input-menu"
-                  class="rounded-r bg-offWhite border border-primary border-l-0 h-10 w-20 px-2"
+                  class="rounded-r bg-offWhite border border-primary border-l-0 h-10 w-28 px-2"
                 >
                   {TIME_UNIT_LABELS[timeUnit] ?? timeUnit}
+                  {translate('ago')}
                 </MenuButton>
                 <Menu id="relative-datetime-input-menu">
                   {#each TIME_UNIT_OPTIONS as unit}
@@ -213,11 +215,16 @@
                 </Menu>
               </MenuContainer>
             </div>
-            <Button
-              disabled={error(relativeTime)}
-              on:click={onApplyRelativeTime}>{translate('apply')}</Button
-            >
+            <div class="px-4">
+              <Button
+                variant="link"
+                disabled={error(relativeTime)}
+                on:click={onApplyRelativeTime}>{translate('apply')}</Button
+              >
+            </div>
           </div>
+          <hr class="border-gray-300 mt-2" />
+          <p class="text-sm font-semibold">Absolute</p>
           <DatePicker on:datechange={onStartDateChange} selected={startDate} />
           <TimePicker
             bind:hour={startHour}
@@ -225,7 +232,11 @@
             bind:second={startSecond}
             bind:half={startHalf}
           />
-          <Button on:click={onApply}>{translate('apply')}</Button>
+          <div class="flex justify-end p-4">
+            <Button variant="link" on:click={onApply}
+              >{translate('apply')}</Button
+            >
+          </div>
         </div>
       {/if}
     </Menu>
