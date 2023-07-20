@@ -72,4 +72,5 @@ export const Strings = {
   import: 'Import',
   feedback: 'Feedback',
   'log-out': 'Log out',
+  'select-all': 'Select All',
 } as const;

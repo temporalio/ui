@@ -167,4 +167,6 @@ export const Strings = {
   'no-expiration': 'No Expiration',
   'no-retry': 'None',
   'search-placeholder': 'Enter a query',
+  'select-all-workflows': 'Select all Workflows',
+  'select-workflow': 'Select Workflow {{workflow}}',
 } as const;
