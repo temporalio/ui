@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ToggleSwitch from './toggle-switch.svelte';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
 
   export let endpoint = '';
   export let passToken = false;

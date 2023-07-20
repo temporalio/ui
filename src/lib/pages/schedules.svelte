@@ -21,6 +21,7 @@
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   $: namespace = $page.params.namespace;
 
@@ -49,7 +50,7 @@
     <h1
       class="flex flex-col gap-0 text-lg md:flex-row md:items-center md:gap-2 md:text-2xl"
     >
-      Schedules<Badge type="beta">Preview</Badge>
+      {translate('schedules')}<Badge type="beta">{translate('preview')}</Badge>
     </h1>
     <p class="text-sm text-gray-600" data-testid="namespace-name">
       {namespace}
@@ -62,7 +63,7 @@
       disabled={createDisabled}
       on:click={() => goto(routeForScheduleCreate({ namespace }))}
     >
-      Create Schedule
+      {translate('schedules', 'create')}
     </Button>
   {/if}
 </header>
@@ -75,6 +76,7 @@
       items={filteredSchedules(schedules)}
       let:visibleItems
       aria-label="schedules"
+      pageSizeSelectLabel={translate('per-page')}
     >
       <svelte:fragment slot="action-top-left">
         <div class="w-full xl:w-1/2">
@@ -82,7 +84,7 @@
             icon="search"
             type="search"
             id="schedule-name-filter"
-            placeholder="Schedule Name"
+            placeholder={translate('schedules', 'name')}
             clearable
             bind:value={search}
             on:submit={noop}
@@ -96,10 +98,14 @@
           icon="clock"
         >
           <MenuItem on:click={() => ($timeFormat = 'relative')}
-            >Relative</MenuItem
+            >{translate('relative')}</MenuItem
           >
-          <MenuItem on:click={() => ($timeFormat = 'UTC')}>UTC</MenuItem>
-          <MenuItem on:click={() => ($timeFormat = 'local')}>Local</MenuItem>
+          <MenuItem on:click={() => ($timeFormat = 'UTC')}
+            >{translate('utc')}</MenuItem
+          >
+          <MenuItem on:click={() => ($timeFormat = 'local')}
+            >{translate('local')}</MenuItem
+          >
         </DropdownButton>
       </svelte:fragment>
       <SchedulesTable>
@@ -110,8 +116,8 @@
             <td class="hidden xl:table-cell" />
             <td colspan="3">
               <EmptyState
-                title="No Schedules Found"
-                content={'Try a different search'}
+                title={translate('schedules', 'empty-state-title')}
+                content={translate('schedules', 'empty-state-description')}
               />
             </td>
             <td class="hidden xl:table-cell" />
@@ -121,7 +127,7 @@
     </Pagination>
   {:else}
     <div class="my-12 flex flex-col items-center justify-start gap-2">
-      <EmptyState title={'No Schedules Found'} {error}>
+      <EmptyState title={translate('schedules', 'empty-state-title')} {error}>
         <p>
           Go to <Link
             target="_external"
@@ -138,7 +144,7 @@
             disabled={createDisabled}
             on:click={() => goto(routeForScheduleCreate({ namespace }))}
           >
-            Create Schedule
+            {translate('schedules', 'create')}
           </Button>
         {/if}
       </EmptyState>
