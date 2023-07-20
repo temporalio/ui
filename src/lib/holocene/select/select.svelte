@@ -25,7 +25,8 @@
 
   type T = $$Generic;
 
-  export let label = '';
+  export let label: string;
+  export let labelHidden = false;
   export let id: string;
   export let value: T = undefined;
   export let placeholder = '';
@@ -120,9 +121,7 @@
 
 <svelte:window on:click={handleWindowClick} />
 <div class="select {$$props.class}">
-  {#if label}
-    <label for={id}>{label}</label>
-  {/if}
+  <label class:sr-only={labelHidden} for={id}>{label}</label>
   <ul
     role="button"
     class="select-input-container"

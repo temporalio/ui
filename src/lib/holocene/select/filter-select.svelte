@@ -7,7 +7,7 @@
 
   import type { SelectOptionValue } from '$lib/types/global';
 
-  export let label: string = null;
+  export let label: string;
   export let value: SelectOptionValue;
   export let options: SelectOptionValue[] = [];
   export let parameter: string = null;

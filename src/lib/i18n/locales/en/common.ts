@@ -53,6 +53,7 @@ export const Strings = {
   save: 'Save',
   'workflow-type': 'Workflow Type',
   'workflow-id': 'Workflow ID',
+  'workflow-status': 'Workflow Status',
   'task-queue': 'Task Queue',
   preview: 'Preview',
   status: 'Status',
