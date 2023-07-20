@@ -1,11 +1,9 @@
 <script lang="ts">
-  // https://svelte.dev/repl/6116680a6c3e49d0908624105018efb7?version=3.12.1
-
   import { createEventDispatcher } from 'svelte';
-  
+
   import { clickOutside } from '$lib/holocene/outside-click';
   import { getMonthName } from '$lib/utilities/calendar';
-  
+
   import Calender from './calendar.svelte';
   import Icon from './icon/icon.svelte';
   import Input from './input/input.svelte';
@@ -14,6 +12,8 @@
 
   export let isAllowed = () => true;
   export let selected = new Date();
+  export let label: string;
+  export let labelHidden: boolean = false;
 
   let month: number | undefined;
   let year: number | undefined;
@@ -75,6 +75,8 @@
 >
   <Input
     id="datepicker"
+    {label}
+    {labelHidden}
     icon="calendar-plus"
     type="text"
     on:focus={onFocus}

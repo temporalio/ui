@@ -40,6 +40,8 @@
   <Hst.Variant title="A Text Input with an Icon">
     <Input
       id="input-2"
+      label="Search"
+      labelHidden
       bind:value
       placeholder="Search"
       icon="search"
@@ -50,6 +52,8 @@
   <Hst.Variant title="A Copyable Input">
     <Input
       id="input-3"
+      label="Copy Me!"
+      labelHidden
       value="Copy Me!"
       copyable
       theme={dark ? 'dark' : 'light'}

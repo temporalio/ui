@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { noop } from 'svelte/internal';
-  
+
   import type { IconName } from '$lib/holocene/icon/paths';
   import Input from '$lib/holocene/input/input.svelte';
-  
+
   import MenuContainer from './primitives/menu/menu-container.svelte';
   import MenuItem from './primitives/menu/menu-item.svelte';
   import Menu from './primitives/menu/menu.svelte';
@@ -12,7 +12,8 @@
   interface $$Props extends HTMLInputAttributes {
     id: string;
     value: string;
-    label?: string;
+    label: string;
+    labelHidden?: boolean;
     icon?: IconName;
     copyable?: boolean;
     clearable?: boolean;
@@ -23,7 +24,8 @@
 
   export let id: string;
   export let value: string;
-  export let label = '';
+  export let label: string;
+  export let labelHidden = false;
   export let placeholder = '';
   export let icon: IconName = null;
   export let copyable = false;
@@ -48,6 +50,7 @@
     bind:value
     {icon}
     {label}
+    {labelHidden}
     {placeholder}
     {theme}
     {copyable}

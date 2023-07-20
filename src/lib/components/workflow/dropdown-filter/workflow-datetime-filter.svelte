@@ -183,9 +183,11 @@
     >
       {#if custom}
         <div class="flex flex-col">
-          <p class="text-sm">Start</p>
+          <p class="text-sm">{translate('start')}</p>
           <div class="flex flex-col gap-2">
             <DatePicker
+              label={translate('start')}
+              labelHidden
               on:datechange={onStartDateChange}
               selected={startDate}
             />
@@ -198,9 +200,14 @@
           </div>
         </div>
         <div class="flex flex-col">
-          <p class="text-sm">End</p>
+          <p class="text-sm">{translate('end')}</p>
           <div class="flex flex-col gap-2">
-            <DatePicker on:datechange={onEndDateChange} selected={endDate} />
+            <DatePicker
+              label={translate('end')}
+              labelHidden
+              on:datechange={onEndDateChange}
+              selected={endDate}
+            />
             <TimePicker
               bind:hour={endHour}
               bind:minute={endMinute}
