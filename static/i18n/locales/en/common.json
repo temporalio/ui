@@ -2,7 +2,7 @@
   "loading": "Loading...",
   "filtering": "filtering",
   "unknown-error": "An unknown error occurred.",
-  "search-placeholder": "Enter a query",
+  "search": "Search",
   "apply": "Apply",
   "all-time": "All Time",
   "custom": "Custom",
@@ -66,7 +66,13 @@
   "days": "days",
   "number-input-placeholder": "Enter a number",
   "enter": "Enter",
-  "search": "Search",
   "no-results": "No results",
-  "type-or-paste-in": "Type or paste in"
+  "type-or-paste-in": "Type or paste in",
+  "workflows": "Workflows",
+  "schedules": "Schedules",
+  "archive": "Archive",
+  "namespaces": "Namespaces",
+  "import": "Import",
+  "feedback": "Feedback",
+  "log-out": "Log out"
 }

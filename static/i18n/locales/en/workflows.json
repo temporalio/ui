@@ -140,5 +140,6 @@
   "no-retry": "None",
   "filter": "Filter",
   "view-search-input": "View Search Input",
-  "select-time": "Select Time"
+  "select-time": "Select Time",
+  "search-placeholder": "Enter a query"
 }

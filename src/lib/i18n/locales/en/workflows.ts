@@ -169,4 +169,5 @@ export const Strings = {
   filter: 'Filter',
   'view-search-input': 'View Search Input',
   'select-time': 'Select Time',
+  'search-placeholder': 'Enter a query',
 } as const;

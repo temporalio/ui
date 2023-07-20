@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { has, hasAnyKeys } from './has';
+import { has, hasAnyProperties } from './has';
 
 describe('has', () => {
   it('returns true if an object has a key', () => {
@@ -50,30 +50,35 @@ describe('has', () => {
   });
 });
 
-describe('hasAnyKeys', () => {
-  it('returns true if an object has keys', () => {
+describe('hasAnyProperties', () => {
+  it('returns true if an object has enumerable properties', () => {
     const source = { foo: 123 };
-    expect(hasAnyKeys(source)).toBe(true);
+    expect(hasAnyProperties(source)).toBe(true);
+  });
+
+  it('returns true if an object has non-enumerable properties', () => {
+    const error = new Error();
+    expect(hasAnyProperties(error)).toBe(true);
   });
 
   it('returns false if an object has no keys', () => {
     const source = {};
-    expect(hasAnyKeys(source)).toBe(false);
+    expect(hasAnyProperties(source)).toBe(false);
   });
 
   it('should return false if given null', () => {
-    expect(hasAnyKeys(null)).toBe(false);
+    expect(hasAnyProperties(null)).toBe(false);
   });
 
   it('should return false if given undefined', () => {
-    expect(hasAnyKeys(undefined)).toBe(false);
+    expect(hasAnyProperties(undefined)).toBe(false);
   });
 
   it('should return false if given a number', () => {
-    expect(hasAnyKeys(3)).toBe(false);
+    expect(hasAnyProperties(3)).toBe(false);
   });
 
   it('should return false if given a boolean', () => {
-    expect(hasAnyKeys(true)).toBe(false);
+    expect(hasAnyProperties(true)).toBe(false);
   });
 });
