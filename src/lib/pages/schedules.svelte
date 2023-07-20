@@ -50,9 +50,7 @@
     <h1
       class="flex flex-col gap-0 text-lg md:flex-row md:items-center md:gap-2 md:text-2xl"
     >
-      {translate('schedules', 'schedules')}<Badge type="beta"
-        >{translate('preview')}</Badge
-      >
+      {translate('schedules')}<Badge type="beta">{translate('preview')}</Badge>
     </h1>
     <p class="text-sm text-gray-600" data-testid="namespace-name">
       {namespace}

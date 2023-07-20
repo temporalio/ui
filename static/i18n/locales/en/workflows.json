@@ -1,4 +1,5 @@
 {
+  "loading-workflows": "Loading workflows",
   "recent-workflows": "Recent Workflows",
   "workflows-count_one": "{{count, number}} workflow",
   "workflows-count_other": "{{count, number}} workflows",
@@ -136,5 +137,6 @@
   "last-worker-identity": "Last Worker Identity",
   "unlimited": "Unlimited",
   "no-expiration": "No Expiration",
-  "no-retry": "None"
+  "no-retry": "None",
+  "search-placeholder": "Enter a query"
 }

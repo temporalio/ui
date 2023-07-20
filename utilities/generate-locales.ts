@@ -102,7 +102,7 @@ export const generateLocales = async (
     }
 
     const subDir = source.split(src)[1];
-    const fullDir = path.join(dest, subDir.split(/\w+\.ts/)[0]);
+    const fullDir = path.join(dest, subDir.split(/[a-zA-Z0-9_-]+\.ts/)[0]);
     const fullPath = path.join(dest, subDir.replace('.ts', '.json'));
 
     try {

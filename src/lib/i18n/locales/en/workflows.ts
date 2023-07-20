@@ -1,6 +1,7 @@
 export const Namespace = 'workflows' as const;
 
 export const Strings = {
+  'loading-workflows': 'Loading workflows',
   'recent-workflows': 'Recent Workflows',
   'workflows-count_one': '{{count, number}} workflow',
   'workflows-count_other': '{{count, number}} workflows',
@@ -165,4 +166,5 @@ export const Strings = {
   unlimited: 'Unlimited',
   'no-expiration': 'No Expiration',
   'no-retry': 'None',
+  'search-placeholder': 'Enter a query',
 } as const;

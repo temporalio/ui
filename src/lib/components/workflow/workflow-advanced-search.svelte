@@ -62,7 +62,7 @@
       <Input
         id="manual-search"
         type="search"
-        placeholder={translate('search-placeholder')}
+        placeholder={translate('workflows', 'search-placeholder')}
         icon="search"
         class="w-3/4"
         clearable
@@ -77,7 +77,7 @@
         unroundLeft
         type="submit"
       >
-        Search
+        {translate('search')}
       </Button>
     </form>
   </div>
