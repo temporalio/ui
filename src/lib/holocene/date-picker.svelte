@@ -14,6 +14,8 @@
   export let selected = new Date();
   export let label: string;
   export let labelHidden: boolean = false;
+  export let todayLabel: string;
+  export let closeLabel: string;
 
   let month: number | undefined;
   let year: number | undefined;
@@ -113,13 +115,13 @@
           class="cursor-pointer text-[12px]"
           on:click={() => (selected = new Date())}
         >
-          Today
+          {todayLabel}
         </button>
         <button
           class="cursor-pointer text-[12px]"
           on:click={() => (showDatePicker = false)}
         >
-          Close
+          {closeLabel}
         </button>
       </div>
     </div>

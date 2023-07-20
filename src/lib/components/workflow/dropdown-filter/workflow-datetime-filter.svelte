@@ -190,6 +190,8 @@
               labelHidden
               on:datechange={onStartDateChange}
               selected={startDate}
+              todayLabel={translate('today')}
+              closeLabel={translate('close')}
             />
             <TimePicker
               bind:hour={startHour}
@@ -207,6 +209,8 @@
               labelHidden
               on:datechange={onEndDateChange}
               selected={endDate}
+              todayLabel={translate('today')}
+              closeLabel={translate('close')}
             />
             <TimePicker
               bind:hour={endHour}

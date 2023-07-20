@@ -23,7 +23,7 @@
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
-  import DataEncoderSettings from '$lib/holocene/data-encoder-settings.svelte';
+  import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
 
   export let data: PageData;
 

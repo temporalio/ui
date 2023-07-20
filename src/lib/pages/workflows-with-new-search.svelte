@@ -277,7 +277,12 @@
     </button>
   </div>
 </header>
-<Pagination items={$workflows} let:visibleItems aria-label="recent workflows">
+<Pagination
+  items={$workflows}
+  let:visibleItems
+  aria-label="recent workflows"
+  pageSizeSelectLabel={translate('per-page')}
+>
   <svelte:fragment slot="action-top-left">
     <WorkflowAdvancedSearch />
   </svelte:fragment>

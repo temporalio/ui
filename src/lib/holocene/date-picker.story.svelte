@@ -16,5 +16,7 @@
     labelHidden
     on:datechange={onDateChange}
     selected={currentDate}
+    todayLabel="Today"
+    closeLabel="Close"
   />
 </Hst.Story>

@@ -19,6 +19,7 @@
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import Loading from '$lib/holocene/loading.svelte';
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -60,7 +61,12 @@
   </div>
 </header>
 <WorkflowFilters bind:searchType />
-<Pagination items={$workflows} let:visibleItems aria-label="recent workflows">
+<Pagination
+  items={$workflows}
+  let:visibleItems
+  aria-label="recent workflows"
+  pageSizeSelectLabel={translate('per-page')}
+>
   <WorkflowsSummaryTable updating={$updating}>
     {#each visibleItems as event}
       <WorkflowsSummaryRow

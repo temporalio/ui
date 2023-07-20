@@ -20,6 +20,7 @@
     theme?: 'dark' | 'light';
     options: string[];
     onOptionClick: (option: string) => void;
+    emptyOptionText: string;
   }
 
   export let id: string;
@@ -33,6 +34,7 @@
   export let options: string[];
   export let onOptionClick: (option: string) => void;
   export let disabled = false;
+  export let emptyOptionText: string;
 
   let className = '';
   export { className as class };
@@ -71,7 +73,7 @@
         {option}
       </MenuItem>
     {:else}
-      <MenuItem on:click={noop}>No Results</MenuItem>
+      <MenuItem on:click={noop}>{emptyOptionText}</MenuItem>
     {/each}
   </Menu>
 </MenuContainer>
