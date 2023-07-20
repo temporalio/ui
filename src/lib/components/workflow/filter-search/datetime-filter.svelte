@@ -153,8 +153,8 @@
       class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-2"
     >
       {#if isTimeRange}
-        <div class="flex flex-col">
-          <p class="text-sm">Start</p>
+        <div class="flex flex-col gap-2">
+          <p class="text-sm font-semibold">Start</p>
           <div class="flex flex-col gap-2">
             <DatePicker
               on:datechange={onStartDateChange}
@@ -168,8 +168,8 @@
             />
           </div>
         </div>
-        <div class="flex flex-col">
-          <p class="text-sm">End</p>
+        <div class="flex flex-col gap-2">
+          <p class="text-sm font-semibold">End</p>
           <div class="flex flex-col gap-2">
             <DatePicker on:datechange={onEndDateChange} selected={endDate} />
             <TimePicker
@@ -180,7 +180,10 @@
             />
           </div>
         </div>
-        <Button on:click={onApply}>{translate('apply')}</Button>
+        <div class="flex justify-end px-4 pb-4">
+          <Button variant="link" on:click={onApply}>{translate('apply')}</Button
+          >
+        </div>
       {:else}
         <div class="flex flex-col gap-2">
           <p class="text-sm font-semibold">Relative</p>
