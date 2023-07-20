@@ -167,7 +167,7 @@
   }
 
   .paginated-table {
-    @apply table-auto;
+    @apply table-auto w-full;
   }
 
   .paginated-table-header {
