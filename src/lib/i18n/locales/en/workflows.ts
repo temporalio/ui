@@ -1,6 +1,7 @@
 export const Namespace = 'workflows' as const;
 
 export const Strings = {
+  'loading-workflows': 'Loading workflows',
   'recent-workflows': 'Recent Workflows',
   'workflows-count_one': '{{count, number}} workflow',
   'workflows-count_other': '{{count, number}} workflows',
@@ -88,7 +89,6 @@ export const Strings = {
   'terminate-modal-title': 'Terminate Workflow',
   'terminate-modal-confirmation':
     'Are you sure you want to terminate this workflow? This action cannot be undone.',
-  'terminate-reason-input-placeholder': 'Enter a reason',
   'signal-modal-title': 'Send a Signal',
   'signal-name-label': 'Signal name',
   'signal-payload-input-label': 'Input',
@@ -100,6 +100,7 @@ export const Strings = {
   'reset-success-alert-description':
     'You can find the resulting Workflow Execution <1>here</1>.',
   'history-tab': 'History',
+  'workflow-history': 'Workflow History',
   'workers-tab': 'Workers',
   'pending-activities-tab': 'Pending Activities',
   'stack-trace-tab': 'Stack Trace',
@@ -107,9 +108,7 @@ export const Strings = {
   'workflow-error-no-workers-title': 'No Workers Running',
   'workflow-error-no-workers-description':
     'Please make sure you have at least one worker connected to the {{taskQueue}} Task Queue.',
-  'workflow-type': 'Workflow Type',
   'state-transitions': 'State Transitions',
-  'task-queue': 'Task Queue',
   'start-and-close-time': 'Start & Close Time',
   relationships: 'Relationships',
   parents_zero: '0 Parents',
@@ -139,4 +138,32 @@ export const Strings = {
   expiration: 'Expiration',
   'heartbeat-details': 'Heartbeat Details',
   'last-failure': 'Last Failure',
+  'last-accessed': 'Last Accessed',
+  'workflow-task-handler': 'Workflow Task Handler',
+  'activity-handler': 'Activity Handler',
+  'workers-empty-state': 'No Workers Found',
+  'stack-trace-empty-state': 'No Stack Traces Found',
+  'no-workers-failure-message':
+    'This will fail if you have no workers running.',
+  'no-workers-running-message':
+    'Please make sure you have at least one worker running.',
+  'stack-trace-at': 'Stack Trace at',
+  'stack-trace-link-preface': 'To enable ',
+  'stack-trace-link': 'stack traces',
+  'stack-trace-link-postface':
+    ', run a Worker on the {{taskQueue}} Task Queue.',
+  'json-formatting': 'JSON Formatting',
+  'query-type': 'Query Type',
+  'pending-activities-empty-state': 'No Pending Activities',
+  'activity-id': 'Activity ID',
+  details: 'Details',
+  'maximum-attempts': 'Maximum Attempts',
+  'retry-expiration': 'Retry Expiration',
+  state: 'State',
+  'last-started-time': 'Last Started Time',
+  'scheduled-time': 'Scheduled Time',
+  'last-worker-identity': 'Last Worker Identity',
+  unlimited: 'Unlimited',
+  'no-expiration': 'No Expiration',
+  'no-retry': 'None',
 } as const;

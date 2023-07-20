@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ScheduleSpec, ScheduleState, SchedulePolicies } from '$types';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let spec: ScheduleSpec;
   export let state: ScheduleState;
@@ -10,18 +11,26 @@
 </script>
 
 <button on:click={() => (show = !show)} class="settings">
-  Advanced Settings <Icon
-    class="inline"
-    name={show ? 'chevron-up' : 'chevron-down'}
-  />
+  {translate('schedules', 'advanced-settings')}
+  <Icon class="inline" name={show ? 'chevron-up' : 'chevron-down'} />
 </button>
 {#if show}
-  <p>Schedule Start Time: {spec?.startTime ?? ''}</p>
-  <p>Schedule End Time: {spec?.endTime ?? ''}</p>
-  <p>Jitter: {spec?.jitter ?? ''}</p>
-  <p>Exclusion Calendar: {spec?.excludeCalendar?.[0] ?? ''}</p>
-  <p>Remaining Actions: {state?.remainingActions ?? ''}</p>
-  <p>Overlap Policy: {policies?.overlapPolicy ?? ''}</p>
+  <p>
+    {translate('schedules', 'start-time')}
+    {spec?.startTime ?? ''}
+  </p>
+  <p>{translate('schedules', 'end-time')}{spec?.endTime ?? ''}</p>
+  <p>{translate('schedules', 'jitter')}{spec?.jitter ?? ''}</p>
+  <p>
+    {translate('schedules', 'exclusion-calendar')}{spec?.excludeCalendar?.[0] ??
+      ''}
+  </p>
+  <p>
+    {translate('schedules', 'remaining-actions')}{state?.remainingActions ?? ''}
+  </p>
+  <p>
+    {translate('schedules', 'overlap-policy')}{policies?.overlapPolicy ?? ''}
+  </p>
 {/if}
 
 <style lang="postcss">

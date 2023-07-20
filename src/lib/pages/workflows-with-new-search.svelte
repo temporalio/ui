@@ -59,11 +59,7 @@
     workflowsSearchParams,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import {
-    persistedTimeFilter,
-    workflowFilters,
-    workflowSorts,
-  } from '$lib/stores/filters';
+  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import Pagination from '$lib/holocene/pagination.svelte';
@@ -85,6 +81,8 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import Translate from '$lib/i18n/translate.svelte';
   import { translate } from '$lib/i18n/translate';
+  import Button from '$lib/holocene/button.svelte';
+  import { exportWorkflows } from '$lib/utilities/export-workflows';
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);
@@ -94,7 +92,7 @@
   $: searchParams, ($workflowsSearchParams = searchParams);
 
   $: {
-    if (!$workflowFilters.length && !$workflowSorts.length) {
+    if (!$workflowFilters.length) {
       $workflowsQuery = '';
     }
   }
@@ -102,7 +100,7 @@
   const persistTimeFilter = () => {
     if (!query && !$workflowFilters.length && $persistedTimeFilter) {
       $workflowFilters = [$persistedTimeFilter];
-      updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+      updateQueryParamsFromFilter($page.url, $workflowFilters);
     }
   };
 
@@ -129,7 +127,6 @@
 
   const resetPageToDefaultState = () => {
     $workflowFilters = [];
-    $workflowSorts = [];
     updateQueryParameters({
       url: $page.url,
       parameter: 'query',
@@ -240,20 +237,10 @@
       <Translate namespace="workflows" key="recent-workflows" />
     </h1>
     <div class="flex items-center gap-2 text-sm">
-      <p data-testid="namespace-name">
-        {$page.params.namespace}
-      </p>
       {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility}
-        <div class="h-1 w-1 rounded-full bg-gray-400" />
         <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
-          {#if $loading}
-            <span class="text-gray-400"
-              ><Translate namespace="common" key="loading" /></span
-            >
-          {:else if $updating}
-            <span class="text-gray-400"
-              ><Translate namespace="common" key="filtering" /></span
-            >
+          {#if $loading || $updating}
+            <Translate namespace="workflows" key="loading-workflows" />
           {:else if query}
             <Translate
               namespace="workflows"
@@ -271,7 +258,13 @@
             />
           {/if}
         </p>
+        <div class="h-1 w-1 rounded-full bg-gray-400" />
       {/if}
+      <Button
+        variant="link"
+        disabled={$loading || $updating || $workflows.length === 0}
+        on:click={() => exportWorkflows($workflows)}>Download JSON</Button
+      >
     </div>
   </div>
   <div>

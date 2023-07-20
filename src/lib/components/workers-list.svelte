@@ -3,6 +3,7 @@
 
   import { timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
+  import { translate } from '$lib/i18n/translate';
 
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Table from '$lib/holocene/table/table.svelte';
@@ -52,7 +53,8 @@
 
 <section class="flex flex-col gap-4">
   <h2 class="text-lg font-medium" data-testid="task-queue-name">
-    Task Queue: <span class="select-all font-normal">{taskQueue}</span>
+    {translate('task-queue')}:
+    <span class="select-all font-normal">{taskQueue}</span>
   </h2>
 
   {#if versionSets.length}
@@ -93,17 +95,21 @@
   <h2 class="text-base font-medium" data-testid="workers">Workers</h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <TableHeaderRow slot="headers">
-      <th class={versionSets?.length ? 'w-3/12' : 'w-6/12'}>ID</th>
+      <th class={versionSets?.length ? 'w-3/12' : 'w-6/12'}
+        >{translate('id')}</th
+      >
       {#if versionSets?.length}
         <th class="w-3/12">Version</th>
         <th class="w-2/12">Retirability</th>
       {/if}
-      <th class="w-2/12">Last Accessed</th>
+      <th class="w-2/12">{translate('workflows', 'last-accessed')}</th>
       <th class="w-2/12">
-        <p class="text-center">Workflow Task Handler</p>
+        <p class="text-center">
+          {translate('workflows', 'workflow-task-handler')}
+        </p>
       </th>
       <th class="w-2/12 text-center">
-        <p class="text-center">Activity Handler</p>
+        <p class="text-center">{translate('workflows', 'activity-handler')}</p>
       </th>
     </TableHeaderRow>
     {#each workers?.pollers as poller (poller.identity)}
@@ -142,23 +148,39 @@
         </td>
         <td data-testid="workflow-poller">
           {#if poller.taskQueueTypes.includes('WORKFLOW')}
-            <Icon name="checkmark" class="m-auto text-blue-700" title="yes" />
+            <Icon
+              name="checkmark"
+              class="m-auto text-blue-700"
+              title={translate('yes')}
+            />
           {:else}
-            <Icon name="close" class="m-auto text-primary" title="no" />
+            <Icon
+              name="close"
+              class="m-auto text-primary"
+              title={translate('no')}
+            />
           {/if}
         </td>
         <td data-testid="activity-poller">
           {#if poller.taskQueueTypes.includes('ACTIVITY')}
-            <Icon name="checkmark" class="m-auto text-blue-700" title="yes" />
+            <Icon
+              name="checkmark"
+              class="m-auto text-blue-700"
+              title={translate('yes')}
+            />
           {:else}
-            <Icon name="close" class="m-auto text-primary" title="no" />
+            <Icon
+              name="close"
+              class="m-auto text-primary"
+              title={translate('no')}
+            />
           {/if}
         </td>
       </TableRow>
     {:else}
       <tr class="w-full">
         <td colspan={versionSets?.length ? 8 : 6}>
-          <EmptyState title={'No Workers Found'} />
+          <EmptyState title={translate('workflows', 'workers-empty-state')} />
         </td>
       </tr>
     {/each}

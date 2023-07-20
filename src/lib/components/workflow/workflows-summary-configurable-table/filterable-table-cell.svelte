@@ -5,7 +5,7 @@
     type TextFilterAttributes,
     searchAttributeToWorkflowKey,
   } from '$lib/models/workflow-filters';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import { workflowFilters } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForEventHistory } from '$lib/utilities/route-for';
@@ -40,7 +40,7 @@
       $workflowFilters = [...getOtherFilters()];
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    updateQueryParamsFromFilter($page.url, $workflowFilters);
   };
 </script>
 

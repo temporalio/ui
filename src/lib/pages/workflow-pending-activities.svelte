@@ -1,5 +1,6 @@
 <script lang="ts">
   import { workflowRun } from '$lib/stores/workflow-run';
+  import { translate } from '$lib/i18n/translate';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Badge from '$lib/holocene/badge.svelte';
@@ -25,8 +26,8 @@
 {#if pendingActivities.length}
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <TableHeaderRow slot="headers">
-      <th class="w-44">Activity Id</th>
-      <th>Details</th>
+      <th class="w-44">{translate('workflows', 'activity-id')}</th>
+      <th>{translate('workflows', 'details')}</th>
     </TableHeaderRow>
     {#each pendingActivities as { id, activityId, ...details } (id)}
       {@const failed = details.attempt > 1}
@@ -39,13 +40,15 @@
         <td class="py-4 px-5">
           <ul>
             <li class="event-table-row">
-              <h4 class="font-semibold">Activity Type</h4>
+              <h4 class="font-semibold">
+                {translate('workflows', 'activity-type')}
+              </h4>
               <Badge type={failed ? 'error' : 'default'}>
                 {details.activityType}
               </Badge>
             </li>
             <li class="event-table-row">
-              <h4>Attempt</h4>
+              <h4>{translate('workflows', 'attempt')}</h4>
               <Badge type={failed ? 'error' : 'default'}>
                 {#if failed}
                   <Icon class="mr-1" name="retry" />
@@ -55,31 +58,31 @@
             </li>
             {#if failed}
               <li class="event-table-row">
-                <h4>Attempts Left</h4>
+                <h4>{translate('workflows', 'attempts-left')}</h4>
                 <Badge type="error">
                   {formatAttemptsLeft(details.maximumAttempts, details.attempt)}
                 </Badge>
               </li>
               {#if details.scheduledTime}
                 <li class="event-table-row">
-                  <h4>Next Retry</h4>
+                  <h4>{translate('workflows', 'next-retry')}</h4>
                   <Badge type="error">
                     {toTimeDifference({
                       date: details.scheduledTime,
-                      negativeDefault: 'None',
+                      negativeDefault: translate('workflows', 'no-retry'),
                     })}
                   </Badge>
                 </li>
               {/if}
             {/if}
             <li class="event-table-row">
-              <h4>Maximum Attempts</h4>
+              <h4>{translate('workflows', 'maximum-attempts')}</h4>
               <Badge>{formatMaximumAttempts(details.maximumAttempts)}</Badge>
             </li>
             {#if failed}
               {#if details.heartbeatDetails}
                 <li class="event-table-row">
-                  <h4>Heartbeat Details</h4>
+                  <h4>{translate('workflows', 'heartbeat-details')}</h4>
                   <CodeBlock
                     slot="value"
                     class="pb-2"
@@ -89,7 +92,7 @@
               {/if}
               {#if details.lastFailure}
                 <li class="event-table-row">
-                  <h4>Last Failure</h4>
+                  <h4>{translate('workflows', 'last-failure')}</h4>
                   <CodeBlock
                     slot="value"
                     class="pb-2"
@@ -98,7 +101,7 @@
                 </li>
               {/if}
               <li class="event-table-row">
-                <h4>Retry Expiration</h4>
+                <h4>{translate('workflows', 'retry-expiration')}</h4>
                 <p>
                   {formatRetryExpiration(
                     details.maximumAttempts,
@@ -113,28 +116,28 @@
               </li>
             {/if}
             <li class="event-table-row">
-              <h4>Last Heartbeat</h4>
+              <h4>{translate('workflows', 'last-heartbeat')}</h4>
               <p>{formatDate(details.lastHeartbeatTime, 'relative')}</p>
             </li>
             <li class="event-table-row">
-              <h4>State</h4>
+              <h4>{translate('workflows', 'state')}</h4>
               <p>{details.state}</p>
             </li>
             {#if details.lastStartedTime}
               <li class="event-table-row">
-                <h4>Last Started Time</h4>
+                <h4>{translate('workflows', 'last-started-time')}</h4>
                 <p>{formatDate(details.lastStartedTime, $timeFormat)}</p>
               </li>
             {/if}
             {#if details.scheduledTime}
               <li class="event-table-row">
-                <h4>Scheduled Time</h4>
+                <h4>{translate('workflows', 'scheduled-time')}</h4>
                 <p>{formatDate(details.scheduledTime, $timeFormat)}</p>
               </li>
             {/if}
             {#if details.lastWorkerIdentity}
               <li class="event-table-row">
-                <h4>Last Worker Identity</h4>
+                <h4>{translate('workflows', 'last-worker-identity')}</h4>
                 <p>{details.lastWorkerIdentity}</p>
               </li>
             {/if}
@@ -144,7 +147,9 @@
     {/each}
   </Table>
 {:else}
-  <EmptyState title="No Pending Activities" />
+  <EmptyState
+    title={translate('workflows', 'pending-activities-empty-state')}
+  />
 {/if}
 
 <style lang="postcss">

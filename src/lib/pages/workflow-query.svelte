@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { getQuery, getQueryTypes } from '$lib/services/query-service';
+  import { translate } from '$lib/i18n/translate';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Select from '$lib/holocene/select/simple-select.svelte';
@@ -54,14 +55,14 @@
   {#await queryTypes}
     <div class="text-center">
       <Loading />
-      <p>(This will fail if you have no workers running.)</p>
+      <p>{translate('workflows', 'no-workers-failure-message')}</p>
     </div>
   {:then types}
     <div class="flex justify-between">
       <div class="flex items-center gap-4">
         <Select
           id="query-select"
-          label="Query Type"
+          label={translate('workflows', 'query-type')}
           bind:value={queryType}
           testId="query-select"
         >
@@ -74,14 +75,14 @@
           icon="retry"
           loading={isLoading}
         >
-          Refresh
+          {translate('refresh')}
         </Button>
       </div>
       <div class="flex justify-end">
         <label
           for="json-formatting"
           class="flex items-center gap-4 font-secondary text-sm"
-          >JSON Formatting
+          >{translate('workflows', 'json-formatting')}
           <ToggleSwitch
             id="json-formatting"
             checked={jsonFormatting}
@@ -100,8 +101,8 @@
     </div>
   {:catch _error}
     <EmptyState
-      title="An Error Occurred"
-      content="Please make sure you have at least one worker running."
+      title={translate('error-occurred')}
+      content={translate('workflows', 'no-workers-running-message')}
       error={_error?.message}
     />
   {/await}

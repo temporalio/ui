@@ -3,7 +3,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import { workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { workflowStatusFilters } from '$lib/models/workflow-status';
 
@@ -13,8 +13,6 @@
   $: statusFilters = $workflowFilters.filter(
     (f) => f.attribute === 'ExecutionStatus',
   );
-
-  $: statusSort = $workflowSorts.find((s) => s.attribute === 'ExecutionStatus');
 
   function mapStatusToFilter(value: string) {
     return {
@@ -74,14 +72,12 @@
       }
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    updateQueryParamsFromFilter($page.url, $workflowFilters);
   };
 </script>
 
 <DropdownMenu
-  value={statusFilters.length
-    ? statusFilters.map((s) => s.value).join('')
-    : statusSort?.value ?? ''}
+  value={statusFilters.length ? statusFilters.map((s) => s.value).join('') : ''}
   testId="execution-status-filter"
   keepOpen
   icon="filter"

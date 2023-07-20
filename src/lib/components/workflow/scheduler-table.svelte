@@ -15,7 +15,7 @@
 
 <Table class="w-full">
   <TableHeaderRow slot="headers">
-    <th>{translate('schedule')}</th>
+    <th>{translate('schedules', 'schedule')}</th>
   </TableHeaderRow>
   <TableRow class="hover:text-blue-700 hover:underline">
     <td>

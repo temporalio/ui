@@ -4,6 +4,7 @@
   import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   import type { ScheduleOffsetUnit } from '$lib/types/schedule';
 
@@ -41,10 +42,11 @@
 </script>
 
 <div class="my-2 flex flex-col gap-4">
-  <h3 class="text-lg font-medium">Recurring Time</h3>
+  <h3 class="text-lg font-medium">
+    {translate('schedules', 'interval-view-heading')}
+  </h3>
   <p>
-    Specify the time interval for this schedule to run (for example every 5
-    minutes).
+    {translate('schedules', 'interval-view-description')}
   </p>
   <div class="flex flex-row items-center gap-2">
     <div class="w-24">
@@ -52,7 +54,7 @@
         id="days"
         bind:value={days}
         placeholder="00"
-        suffix="days"
+        suffix={translate('days')}
         maxLength={3}
         error={error(days)}
       />
@@ -63,7 +65,7 @@
         id="hour"
         bind:value={hour}
         placeholder="00"
-        suffix="hrs"
+        suffix={translate('hours-abbreviated')}
         maxLength={2}
         error={error(hour)}
       />
@@ -74,7 +76,7 @@
         id="minute"
         bind:value={minute}
         placeholder="00"
-        suffix="min"
+        suffix={translate('minutes-abbreviated')}
         maxLength={2}
         error={error(minute)}
       />
@@ -85,16 +87,17 @@
         id="second"
         bind:value={second}
         placeholder="00"
-        suffix="sec"
+        suffix={translate('seconds-abbreviated')}
         maxLength={2}
         error={error(second)}
       />
     </div>
   </div>
-  <h3 class="mt-4 text-lg font-medium">Offset</h3>
+  <h3 class="mt-4 text-lg font-medium">
+    {translate('schedules', 'offset-heading')}
+  </h3>
   <p>
-    Specify the time to offset when this schedule will run (for example 15 min
-    past the hour).
+    {translate('schedules', 'offset-description')}
   </p>
   <div class="flex w-40 gap-0">
     <Input
@@ -115,10 +118,18 @@
         {offsetUnit}
       </MenuButton>
       <Menu id="phase-menu">
-        <MenuItem on:click={() => onPhaseClick('days')}>days</MenuItem>
-        <MenuItem on:click={() => onPhaseClick('hrs')}>hrs</MenuItem>
-        <MenuItem on:click={() => onPhaseClick('min')}>min</MenuItem>
-        <MenuItem on:click={() => onPhaseClick('sec')}>sec</MenuItem>
+        <MenuItem on:click={() => onPhaseClick('days')}
+          >{translate('days')}</MenuItem
+        >
+        <MenuItem on:click={() => onPhaseClick('hrs')}
+          >{translate('hours-abbreviated')}</MenuItem
+        >
+        <MenuItem on:click={() => onPhaseClick('min')}
+          >{translate('minutes-abbreviated')}</MenuItem
+        >
+        <MenuItem on:click={() => onPhaseClick('sec')}
+          >{translate('seconds-abbreviated')}</MenuItem
+        >
       </Menu>
     </MenuContainer>
   </div>

@@ -1,10 +1,7 @@
 import { formatDuration } from 'date-fns';
 import debounce from 'just-debounce';
 
-import type {
-  WorkflowFilter,
-  WorkflowSort,
-} from '$lib/models/workflow-filters';
+import type { WorkflowFilter } from '$lib/models/workflow-filters';
 import { searchAttributeOptions } from '$lib/stores/search-attributes';
 import type { FilterParameters, SearchAttributes } from '$lib/types/workflows';
 import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
@@ -159,9 +156,9 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
 };
 
 export const updateQueryParamsFromFilter = debounce(
-  (url: URL, filters: WorkflowFilter[], sorts: WorkflowSort[]) => {
+  (url: URL, filters: WorkflowFilter[]) => {
     const allFilters = combineDropdownFilters(filters);
-    const query = toListWorkflowQueryFromFilters(allFilters, sorts);
+    const query = toListWorkflowQueryFromFilters(allFilters);
     updateQueryParameters({
       url,
       parameter: 'query',

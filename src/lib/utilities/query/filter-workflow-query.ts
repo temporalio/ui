@@ -1,9 +1,6 @@
 import { get } from 'svelte/store';
 
-import type {
-  WorkflowFilter,
-  WorkflowSort,
-} from '$lib/models/workflow-filters';
+import type { WorkflowFilter } from '$lib/models/workflow-filters';
 import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
 import type { SearchAttributes } from '$lib/types/workflows';
 
@@ -103,13 +100,7 @@ const toQueryStatementsFromFilters = (
 
 export const toListWorkflowQueryFromFilters = (
   filters: WorkflowFilter[] = [],
-  sorts: WorkflowSort[] = [],
   archived = false,
 ): string => {
-  const sortStatement = sorts.length
-    ? ` order by ${sorts[0].attribute} ${sorts[0].value}`
-    : '';
-  return (
-    toQueryStatementsFromFilters(filters, archived).join('') + sortStatement
-  );
+  return toQueryStatementsFromFilters(filters, archived).join('');
 };

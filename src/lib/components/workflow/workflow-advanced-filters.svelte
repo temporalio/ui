@@ -8,10 +8,9 @@
 
   import AdvancedFilter from './advanced-filter/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import SortFilter from './advanced-filter/sort-filter.svelte';
   import CustomButton from '$lib/components/workflow/advanced-filter/custom-button.svelte';
   import AddFilter from './advanced-filter/add-filter.svelte';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import { workflowFilters } from '$lib/stores/filters';
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
   export let advancedSearch = false;
@@ -25,7 +24,6 @@
 
   const onRestart = () => {
     $workflowFilters = [];
-    $workflowSorts = [];
     updateQueryParameters({
       url: $page.url,
       parameter: 'query',
@@ -102,9 +100,6 @@
         {/each}
         <div class="my-1">
           <AddFilter />
-        </div>
-        <div class="my-1">
-          <SortFilter />
         </div>
       </div>
     {/if}
