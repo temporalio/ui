@@ -58,7 +58,7 @@
         variant: "success"
       });
 
-      fetchFlowSettings()
+      fetchFlowSettings().then(result => configurations = result)
     }).catch(error => {
       toaster.push({
         message: "Something went wrong",
