@@ -44,23 +44,22 @@ export function translate<Namespace extends I18nNamespace>(
   replaceOrUndef?: I18nReplace,
 ): string {
   let namespace: Namespace;
-  let key: I18nKey<Namespace>;
+  let key: string;
   let count: number;
   let replace: I18nReplace;
 
-  if (namespaceOrKey in I18nMap) {
+  if (namespaceOrKey in I18nMap && typeof replaceCountOrKey === 'string') {
     namespace = namespaceOrKey as Namespace;
+    key = replaceCountOrKey;
   } else {
     namespace = 'common' as Namespace;
-    key = namespaceOrKey as I18nKey<Namespace>;
+    key = namespaceOrKey;
   }
 
   if (isObject(replaceCountOrKey)) {
     replace = replaceCountOrKey;
   } else if (typeof replaceCountOrKey === 'number') {
     count = replaceCountOrKey;
-  } else if (key === undefined) {
-    key = replaceCountOrKey;
   }
 
   if (typeof replaceOrCount === 'number') {
@@ -78,5 +77,5 @@ export function translate<Namespace extends I18nNamespace>(
     ...(replace && { replace }),
   };
 
-  return t(`${namespace}:${String(key)}`, options);
+  return t(`${namespace}:${key}`, options);
 }
