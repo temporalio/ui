@@ -42,6 +42,7 @@
   itemsPerPage={10}
   let:visibleItems
   aria-label="child workflows"
+  pageSizeSelectLabel={translate('per-page')}
 >
   <div slot="pagination-top" />
   <Table class="w-full">

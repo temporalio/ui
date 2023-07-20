@@ -55,7 +55,7 @@ export const searchAttributeOptions = () => {
     : [];
 };
 
-export const sortedSearchAttributOptions = () => {
+export const sortedSearchAttributeOptions = () => {
   const popularOptions = [
     'ExecutionStatus',
     'WorkflowId',

@@ -21,7 +21,7 @@
   import { translate } from '$lib/i18n/translate';
 
   import { refresh } from '$lib/stores/workflows';
-  import { sortedSearchAttributOptions } from '$lib/stores/search-attributes';
+  import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
   import { workflowFilters } from '$lib/stores/filters';
   import {
     emptyFilter,
@@ -143,7 +143,7 @@
 
   let searchAttributeValue = '';
   //  TODO: Add KeywordList support
-  let options = sortedSearchAttributOptions().filter(
+  let options = sortedSearchAttributeOptions().filter(
     (option) => !isListFilter(option.value),
   );
 

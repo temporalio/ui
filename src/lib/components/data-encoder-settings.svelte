@@ -14,9 +14,8 @@
   } from '$lib/stores/data-encoder-config';
   import { refresh } from '$lib/stores/workflow-run';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
-
-  import Accordion from './accordion.svelte';
-  import Button from './button.svelte';
+  import Accordion from '$lib/holocene/accordion.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
   import DataConverterPortSettings from './data-converter-port-settings.svelte';
 

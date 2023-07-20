@@ -193,6 +193,8 @@
                 <DatePicker
                   on:datechange={onStartDateChange}
                   selected={startDate}
+                  todayLabel={translate('today')}
+                  closeLabel={translate('close')}
                 />
                 <TimePicker
                   bind:hour={startHour}
@@ -208,6 +210,8 @@
                 <DatePicker
                   on:datechange={onEndDateChange}
                   selected={endDate}
+                  todayLabel={translate('today')}
+                  closeLabel={translate('close')}
                 />
                 <TimePicker
                   bind:hour={endHour}
