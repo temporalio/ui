@@ -1,6 +1,5 @@
 <script lang="ts">
   import { translate } from '$lib/i18n/translate';
-
   export let port = '';
 </script>
 
