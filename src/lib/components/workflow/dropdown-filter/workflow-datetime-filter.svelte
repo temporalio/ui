@@ -183,11 +183,9 @@
     >
       {#if custom}
         <div class="flex flex-col">
-          <p class="text-sm">{translate('start')}</p>
           <div class="flex flex-col gap-2">
             <DatePicker
               label={translate('start')}
-              labelHidden
               on:datechange={onStartDateChange}
               selected={startDate}
               todayLabel={translate('today')}
@@ -202,11 +200,9 @@
           </div>
         </div>
         <div class="flex flex-col">
-          <p class="text-sm">{translate('end')}</p>
           <div class="flex flex-col gap-2">
             <DatePicker
               label={translate('end')}
-              labelHidden
               on:datechange={onEndDateChange}
               selected={endDate}
               todayLabel={translate('today')}
