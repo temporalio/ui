@@ -42,6 +42,8 @@
   >
   {#if adding}
     <TypeaheadInput
+      label=""
+      labelHidden
       icon="filter"
       placeholder="Filter type"
       class="w-72"
