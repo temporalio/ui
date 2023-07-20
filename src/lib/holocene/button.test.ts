@@ -62,32 +62,6 @@ describe('Button', () => {
     expect(host.innerHTML).toMatchSnapshot();
   });
 
-  test('search', async () => {
-    const instance = new Button({
-      target: host,
-      props: {
-        secondary: true,
-      },
-    });
-
-    expect(instance).toBeTruthy();
-
-    expect(host.innerHTML).toMatchSnapshot();
-  });
-
-  test('search disabled', async () => {
-    const instance = new Button({
-      target: host,
-      props: {
-        secondary: true,
-      },
-    });
-
-    expect(instance).toBeTruthy();
-
-    expect(host.innerHTML).toMatchSnapshot();
-  });
-
   test('loading', async () => {
     const instance = new Button({
       target: host,

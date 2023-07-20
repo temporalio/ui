@@ -159,6 +159,8 @@
             <DatePicker
               on:datechange={onStartDateChange}
               selected={startDate}
+              todayLabel={translate('today')}
+              closeLabel={translate('close')}
             />
             <TimePicker
               bind:hour={startHour}
@@ -171,7 +173,12 @@
         <div class="flex flex-col gap-2">
           <p class="text-sm font-semibold">End</p>
           <div class="flex flex-col gap-2">
-            <DatePicker on:datechange={onEndDateChange} selected={endDate} />
+            <DatePicker
+              on:datechange={onEndDateChange}
+              selected={endDate}
+              todayLabel={translate('today')}
+              closeLabel={translate('close')}
+            />
             <TimePicker
               bind:hour={endHour}
               bind:minute={endMinute}
@@ -227,7 +234,12 @@
           </div>
           <hr class="border-gray-300 mt-2" />
           <p class="text-sm font-semibold">Absolute</p>
-          <DatePicker on:datechange={onStartDateChange} selected={startDate} />
+          <DatePicker
+            on:datechange={onStartDateChange}
+            selected={startDate}
+            todayLabel={translate('today')}
+            closeLabel={translate('close')}
+          />
           <TimePicker
             bind:hour={startHour}
             bind:minute={startMinute}

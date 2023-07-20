@@ -10,17 +10,15 @@
 
   const { filter, focusedElementId, handleSubmit } =
     getContext<FilterContext<T>>(FILTER_CONTEXT);
-
-  const validateNumber = (value: string): boolean => /^[0-9]+$/.test(value);
+  const min = 0;
+  let value = $filter.value ? Number($filter.value) : null;
 
   const handleKeydown = (e: KeyboardEvent) => {
     $focusedElementId = '';
-    if (e.key === 'Enter' && $filter.value !== '') {
-      const isValid = validateNumber($filter.value);
-      if (isValid) {
-        e.preventDefault();
-        handleSubmit();
-      }
+    if (e.key === 'Enter' && value !== null && value >= min) {
+      $filter.value = String(value);
+      e.preventDefault();
+      handleSubmit();
     }
   };
 </script>
@@ -31,7 +29,8 @@
     id="number-filter-search"
     icon="search"
     placeholder={translate('number-input-placeholder')}
-    bind:value={$filter.value}
+    bind:value
+    {min}
     on:keydown={handleKeydown}
     unroundLeft
     search
