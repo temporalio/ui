@@ -124,8 +124,8 @@
         </span>
       </MenuItem>
     {/each}
-    <div class="p-4 border-t border-gray-300">
-      <Button variant="link" class="!w-full " on:click={onApply}
+    <div class="border-t border-gray-300">
+      <Button variant="ghost" class="!w-full " on:click={onApply}
         >{translate('apply')}</Button
       >
     </div>

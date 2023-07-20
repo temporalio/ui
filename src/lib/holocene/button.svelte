@@ -10,6 +10,7 @@
     | 'search'
     | 'destructive'
     | 'login'
+    | 'ghost'
     | 'link' = 'primary';
 
   export let thin = false;
@@ -94,11 +95,11 @@
   .secondary,
   .destructive,
   .login {
-    @apply border-2 py-2 px-4 transition-colors;
+    @apply border-2 py-2.5 px-4 transition-colors;
   }
 
   .search {
-    @apply border py-2 px-4 h-10 transition-colors;
+    @apply border py-2.5 px-4 h-10 transition-colors;
   }
 
   .button:disabled {
@@ -143,6 +144,14 @@
 
   .link {
     @apply border-0 bg-none p-0 font-primary text-sm text-blue-700 leading-5 font-semibold hover:underline shadow-none;
+  }
+
+  .ghost {
+    @apply border-0 bg-none py-2.5 px-4 font-primary border border-[transparent] text-sm text-gray-700 leading-5 font-medium hover:bg-gray-200 hover:border hover:border-indigo-700 focus:bg-gray-200 focus:border focus:border-indigo-700 hover:shadow-md;
+  }
+
+  .ghost:hover {
+    box-shadow: 0 0 0 4px #a4bcfd;
   }
 
   .selected {

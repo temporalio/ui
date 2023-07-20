@@ -180,8 +180,9 @@
             />
           </div>
         </div>
-        <div class="flex justify-end px-4 pb-4">
-          <Button variant="link" on:click={onApply}>{translate('apply')}</Button
+        <div class="flex justify-end">
+          <Button variant="ghost" on:click={onApply}
+            >{translate('apply')}</Button
           >
         </div>
       {:else}
@@ -218,13 +219,11 @@
                 </Menu>
               </MenuContainer>
             </div>
-            <div class="px-4">
-              <Button
-                variant="link"
-                disabled={error(relativeTime)}
-                on:click={onApplyRelativeTime}>{translate('apply')}</Button
-              >
-            </div>
+            <Button
+              variant="ghost"
+              disabled={error(relativeTime)}
+              on:click={onApplyRelativeTime}>{translate('apply')}</Button
+            >
           </div>
           <hr class="border-gray-300 mt-2" />
           <p class="text-sm font-semibold">Absolute</p>
@@ -235,8 +234,8 @@
             bind:second={startSecond}
             bind:half={startHalf}
           />
-          <div class="flex justify-end p-4">
-            <Button variant="link" on:click={onApply}
+          <div class="flex justify-end">
+            <Button variant="ghost" on:click={onApply}
               >{translate('apply')}</Button
             >
           </div>

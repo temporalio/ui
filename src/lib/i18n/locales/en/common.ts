@@ -16,6 +16,7 @@ export const Strings = {
   utc: 'UTC',
   local: 'Local',
   cancel: 'Cancel',
+  'clear-all': 'Clear all',
   'ante-meridiem': 'AM',
   'post-meridiem': 'PM',
   ascending: 'Ascending',

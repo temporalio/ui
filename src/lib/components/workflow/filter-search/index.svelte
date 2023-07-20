@@ -272,7 +272,9 @@
         : 'justify-end'}"
     >
       {#if showClearAllButton}
-        <Button variant="link" on:click={handleClearInput}>Clear all</Button>
+        <Button variant="ghost" on:click={handleClearInput}
+          >{translate('clear-all')}</Button
+        >
       {/if}
       <label
         for="view-search-input"
