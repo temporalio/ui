@@ -61,7 +61,11 @@
   </Hst.Variant>
 
   <Hst.Variant title="A Number Input">
-    <NumberInput id="number-input-1" bind:value={numberValue} />
+    <NumberInput
+      label="Enter a number"
+      id="number-input-1"
+      bind:value={numberValue}
+    />
   </Hst.Variant>
 
   <Hst.Variant title="A Number Input with a Label, Units, Max, and Hint Text">
