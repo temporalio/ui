@@ -18,6 +18,7 @@
   import { writable } from 'svelte/store';
   import { fly } from 'svelte/transition';
   import { page } from '$app/stores';
+  import { translate } from '$lib/i18n/translate';
 
   import { refresh } from '$lib/stores/workflows';
   import { sortedSearchAttributOptions } from '$lib/stores/search-attributes';
@@ -187,7 +188,7 @@
     <label
       for="view-search-input"
       class="flex items-center gap-4 font-secondary text-sm"
-      >View Search Input
+      >{translate('workflows', 'view-search-input')}
       <ToggleSwitch
         id="view-search-input"
         checked={viewAdvancedSearchInput}
@@ -210,7 +211,7 @@
             count={$filter.attribute ? 0 : $workflowFilters.length}
             on:click={() => open.update((previous) => !previous)}
           >
-            {$filter.attribute || 'Filter'}
+            {$filter.attribute || translate('workflows', 'filter')}
           </Button>
           <Menu
             class="max-h-80 overflow-y-scroll w-fit whitespace-nowrap"
@@ -221,7 +222,7 @@
               noBorder
               bind:value={searchAttributeValue}
               icon="search"
-              placeholder="Search"
+              placeholder={translate('search')}
             />
 
             {#each filteredOptions as { value, label }}
@@ -235,7 +236,7 @@
                 {label}
               </MenuItem>
             {:else}
-              <MenuItem on:click={noop}>No Results</MenuItem>
+              <MenuItem on:click={noop}>{translate('no-results')}</MenuItem>
             {/each}
           </Menu>
         </MenuContainer>
@@ -276,7 +277,7 @@
       <label
         for="view-search-input"
         class="flex items-center gap-4 font-secondary text-sm"
-        >View Search Input
+        >{translate('workflows', 'view-search-input')}
         <ToggleSwitch
           id="view-search-input"
           checked={viewAdvancedSearchInput}

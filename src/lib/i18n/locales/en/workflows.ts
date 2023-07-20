@@ -166,4 +166,7 @@ export const Strings = {
   unlimited: 'Unlimited',
   'no-expiration': 'No Expiration',
   'no-retry': 'None',
+  filter: 'Filter',
+  'view-search-input': 'View Search Input',
+  'select-time': 'Select Time',
 } as const;

@@ -3,6 +3,7 @@
 
   import { getContext } from 'svelte';
   import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   type T = $$Generic;
 
@@ -23,7 +24,7 @@
 <Input
   id="text-filter-search"
   type="search"
-  placeholder={`Enter ${$filter.attribute}`}
+  placeholder={`${translate('enter')} ${$filter.attribute}`}
   icon="search"
   class="w-full"
   unroundLeft

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getContext } from 'svelte';
   import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   import NumberInput from '$lib/holocene/input/number-input.svelte';
   import ConditionalMenu from './conditional-menu.svelte';
@@ -29,7 +30,7 @@
   <NumberInput
     id="number-filter-search"
     icon="search"
-    placeholder="Enter a number"
+    placeholder={translate('number-input-placeholder')}
     bind:value={$filter.value}
     on:keydown={handleKeydown}
     unroundLeft

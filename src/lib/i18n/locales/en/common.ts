@@ -25,6 +25,7 @@ export const Strings = {
   false: 'False',
   after: 'After',
   before: 'Before',
+  between: 'Between',
   'in-last': 'In Last',
   equals: 'Equals',
   'greater-than': 'Greater Than',
@@ -65,4 +66,9 @@ export const Strings = {
   'minutes-abbreviated': 'min.',
   'seconds-abbreviated': 'sec.',
   days: 'days',
+  'number-input-placeholder': 'Enter a number',
+  enter: 'Enter',
+  search: 'Search',
+  'no-results': 'No results',
+  'type-or-paste-in': 'Type or paste in',
 } as const;

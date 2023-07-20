@@ -14,6 +14,7 @@
   } from '$lib/utilities/query/filter-search';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { isWorkflowStatusType } from '$lib/models/workflow-status';
+  import { translate } from '$lib/i18n/translate';
 
   import Button from '$lib/holocene/button.svelte';
   import Chip from '$lib/holocene/chip.svelte';
@@ -56,8 +57,10 @@
   };
 
   const getDateTimeConditonal = (conditional: string) => {
-    if (['<', '<='].includes(conditional)) return 'before';
-    if (['>', '>='].includes(conditional)) return 'after';
+    if (['<', '<='].includes(conditional))
+      return translate('before').toLowerCase();
+    if (['>', '>='].includes(conditional))
+      return translate('after').toLowerCase();
     return conditional;
   };
 

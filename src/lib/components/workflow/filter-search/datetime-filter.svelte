@@ -134,9 +134,9 @@
   <ConditionalMenu
     inputId="time-range-filter"
     options={[
-      { value: '<=', label: 'BEFORE' },
-      { value: 'BETWEEN', label: 'BETWEEN' },
-      { value: '>=', label: 'AFTER' },
+      { value: '<=', label: translate('before').toUpperCase() },
+      { value: 'BETWEEN', label: translate('between').toUpperCase() },
+      { value: '>=', label: translate('after').toUpperCase() },
     ]}
   />
   <MenuContainer>
@@ -145,7 +145,7 @@
       controls="time-range-filter-menu"
       class="flex flex-row items-center p-2 bg-white text-gray-800 hover:border-primary hover:bg-primary hover:text-white border border-gray-800 rounded-r h-10"
     >
-      Select Time
+      {translate('workflows', 'select-time')}
     </MenuButton>
     <Menu
       keepOpen

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getContext } from 'svelte';
   import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
   import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
@@ -11,8 +12,8 @@
 
   const { filter, handleSubmit } = getContext<FilterContext<T>>(FILTER_CONTEXT);
   const options = [
-    { value: 'true', label: 'True' },
-    { value: 'false', label: 'False' },
+    { value: 'true', label: translate('true') },
+    { value: 'false', label: translate('false') },
   ];
 
   $: selectedOption =

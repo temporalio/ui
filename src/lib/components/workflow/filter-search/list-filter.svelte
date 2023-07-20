@@ -4,6 +4,7 @@
 
   import { getContext } from 'svelte';
   import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   type T = $$Generic;
 
@@ -24,12 +25,12 @@
     id="list-filter-search"
     bind:chips={list}
     class="w-full rounded-none"
-    placeholder={`Type or paste in ${$filter.attribute}`}
+    placeholder={`${translate('type-or-paste-in')} ${$filter.attribute}`}
   />
   <Button
     variant="search"
     unroundLeft
     disabled={!list.length}
-    on:click={onSubmit}>Submit</Button
+    on:click={onSubmit}>{translate('submit')}</Button
   >
 </div>
