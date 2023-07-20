@@ -188,6 +188,8 @@
             <DatePicker
               on:datechange={onStartDateChange}
               selected={startDate}
+              todayLabel={translate('today')}
+              closeLabel={translate('close')}
             />
             <TimePicker
               bind:hour={startHour}
@@ -200,7 +202,12 @@
         <div class="flex flex-col">
           <p class="text-sm">End</p>
           <div class="flex flex-col gap-2">
-            <DatePicker on:datechange={onEndDateChange} selected={endDate} />
+            <DatePicker
+              on:datechange={onEndDateChange}
+              selected={endDate}
+              todayLabel={translate('today')}
+              closeLabel={translate('close')}
+            />
             <TimePicker
               bind:hour={endHour}
               bind:minute={endMinute}

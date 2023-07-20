@@ -19,9 +19,7 @@
   <Hst.Variant title="An orderable list">
     <OrderableList>
       {#each items as item, index}
-        <OrderableListItem pinned={item.pinned} {index}>
-          {item.label}
-        </OrderableListItem>
+        <OrderableListItem label={item.label} pinned={item.pinned} {index} />
       {/each}
     </OrderableList>
   </Hst.Variant>
