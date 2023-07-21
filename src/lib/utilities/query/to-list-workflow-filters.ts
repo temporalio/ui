@@ -1,3 +1,5 @@
+import { get } from 'svelte/store';
+
 import { formatDuration } from 'date-fns';
 import debounce from 'just-debounce';
 
@@ -198,7 +200,7 @@ export const updateQueryParamsFromFilter = debounce(
 export const getConditionalForAttribute = (
   attribute: keyof SearchAttributes,
 ): string => {
-  const filter = searchAttributeOptions().find((t) => t.value === attribute);
+  const filter = get(searchAttributeOptions).find((t) => t.value === attribute);
   const type = filter?.type;
   if (type === 'Datetime') return 'In Last';
   return '=';
@@ -207,7 +209,7 @@ export const getConditionalForAttribute = (
 export const getDefaultValueForAttribute = (
   attribute: keyof SearchAttributes,
 ) => {
-  const filter = searchAttributeOptions().find((t) => t.value === attribute);
+  const filter = get(searchAttributeOptions).find((t) => t.value === attribute);
   const type = filter?.type;
   if (type === 'Datetime') return '24 hours';
   if (type === 'Bool') return 'true';

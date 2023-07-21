@@ -143,7 +143,7 @@
 
   let searchAttributeValue = '';
   //  TODO: Add KeywordList support
-  let options = sortedSearchAttributeOptions().filter(
+  $: options = $sortedSearchAttributeOptions.filter(
     (option) => !isListFilter(option.value),
   );
 

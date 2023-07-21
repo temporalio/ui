@@ -67,7 +67,7 @@ export type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
 
 export type WorkflowIdentifier = import('$lib/types').WorkflowExecutionInput;
 
-type SearchAttributesValue =
+export type SearchAttributesValue =
   | 'Bool'
   | 'Datetime'
   | 'Double'
