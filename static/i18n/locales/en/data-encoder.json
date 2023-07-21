@@ -6,7 +6,7 @@
   "include-cross-origin-credentials-label": "Include cross-origin credentials.",
   "include-cross-origin-credentials-warning": "Warning: Pre-flight checks will be done and could result in failure to decode if incorrectly configured.",
   "port-title": "tctl plugin port ",
-  "port-info": "*If both are set, the Codec Server endpoint will be used.",
+  "port-info": "If both are set, the Codec Server endpoint will be used.",
   "access-token-https-error": "Endpoint must be https:// if passing access token",
   "prefix-error": "Endpoint must start with http:// or https://",
   "codec-server-description-prefix": "A ",

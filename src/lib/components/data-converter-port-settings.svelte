@@ -19,7 +19,10 @@
       bind:value={port}
       on:keydown|stopPropagation
     />
-    <p data-testid="data-encoder-info" class="text-sm w-[220px]">
+    <p
+      data-testid="data-encoder-info"
+      class="text-sm w-[220px] before:content-['*']"
+    >
       {translate('data-encoder', 'port-info')}
     </p>
   </div>
