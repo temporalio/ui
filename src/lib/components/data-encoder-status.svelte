@@ -1,10 +1,10 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { dataEncoder } from '$lib/stores/data-encoder';
-  
+
   import { viewDataEncoderSettings } from './data-encoder-settings.svelte';
-  
 
   const onIconClick = () => {
     $viewDataEncoderSettings = !$viewDataEncoderSettings;
@@ -16,7 +16,10 @@
 
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
-    <Tooltip bottomRight text="Codec Server is configured">
+    <Tooltip
+      bottomRight
+      text={translate('data-encoder', 'codec-server-configured')}
+    >
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-configured"
@@ -29,7 +32,7 @@
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasError}
-    <Tooltip bottomRight text="Codec Server could not connect">
+    <Tooltip bottomRight text={translate('data-encoder', 'codec-server-error')}>
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-error"
@@ -42,7 +45,10 @@
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasSuccess}
-    <Tooltip bottomRight text="Codec Server succesfully converted content">
+    <Tooltip
+      bottomRight
+      text={translate('data-encoder', 'codec-server-success')}
+    >
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-success"
@@ -56,7 +62,10 @@
     </Tooltip>
   {/if}
 {:else}
-  <Tooltip bottomRight text={'Configure Codec Server'}>
+  <Tooltip
+    bottomRight
+    text={translate('data-encoder', 'configure-codec-server')}
+  >
     <button
       class="relative flex items-center"
       data-testid="data-encoder-status"
