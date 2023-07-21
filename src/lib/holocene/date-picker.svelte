@@ -13,7 +13,7 @@
   export let isAllowed = () => true;
   export let selected = new Date();
   export let label: string;
-  export let labelHidden: boolean = false;
+  export let labelHidden = false;
   export let todayLabel: string;
   export let closeLabel: string;
 

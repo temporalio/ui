@@ -23,7 +23,7 @@
   export let id = '';
   export let checked = false;
   export let label: string;
-  export let labelHidden: boolean = false;
+  export let labelHidden = false;
   export let onDark = false;
   export let indeterminate = false;
   export let disabled = false;
