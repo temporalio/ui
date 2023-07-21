@@ -9,7 +9,7 @@ export function isStatusFilter(attribute: string) {
 export function isTextFilter(attribute: string, attributes = searchAttributes) {
   const searchAttributeType = get(attributes)[attribute];
   if (isStatusFilter(attribute)) return false;
-  return ['Keyword', 'Text'].includes(searchAttributeType);
+  return ['Keyword', 'Text', 'String'].includes(searchAttributeType);
 }
 
 export function isListFilter(attribute: string, attributes = searchAttributes) {

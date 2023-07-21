@@ -24,6 +24,7 @@ const store = writable<SearchAttributes>({
   WorkflowType: 'Keyword',
   CustomA: 'Text',
   CustomB: 'Double',
+  CustomC: 'String',
 });
 
 describe('isStatusFilter', () => {
@@ -43,6 +44,10 @@ describe('isTextFilter', () => {
 
   it('should return true if the attribute is a Text', () => {
     expect(isTextFilter('CustomA', store)).toBe(true);
+  });
+
+  it('should return true if the attribute is a String', () => {
+    expect(isTextFilter('CustomC', store)).toBe(true);
   });
 
   it('should return false if the attribute is not a Keyword or is ExecutionStatus', () => {
