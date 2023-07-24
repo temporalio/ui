@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
   combineDropdownFilters,
+  combineFilters,
   toListWorkflowFilters,
 } from './to-list-workflow-filters';
 
@@ -476,6 +477,309 @@ describe('combineDropdownFilters', () => {
         operator: '',
         parenthesis: '',
         value: 'World',
+      },
+    ]);
+  });
+});
+
+describe('combineFilters', () => {
+  it('should not add an AND operator if there is no previous filter', () => {
+    const filters = [
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ]);
+  });
+
+  it('should not add an AND operator if there is already an operator', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '',
+        value: 'Running',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Canceled',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '(',
+        value: 'Running',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: '',
+        parenthesis: ')',
+        value: 'Canceled',
+      },
+    ]);
+  });
+
+  it('should clear the filter operator if there is no following filter', () => {
+    const filters = [
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'World',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ]);
+  });
+
+  it('should combine two filters', () => {
+    const filters = [
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Hello',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'Hello',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ]);
+  });
+
+  it('should combine three filters', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Running',
+      },
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Hello',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'Running',
+      },
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'Hello',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ]);
+  });
+
+  it('should combine filters with an OR statement', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '',
+        value: 'Running',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '',
+        value: 'Canceled',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Failed',
+      },
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Hello',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '(',
+        value: 'Running',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '',
+        value: 'Canceled',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: ')',
+        value: 'Failed',
+      },
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'Hello',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ]);
+  });
+
+  it('should clear parenthesis for filters with an OR statement', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '',
+        value: 'Running',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: ')',
+        value: 'Canceled',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Failed',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '(',
+        value: 'Running',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '',
+        value: 'Canceled',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: '',
+        parenthesis: ')',
+        value: 'Failed',
       },
     ]);
   });
