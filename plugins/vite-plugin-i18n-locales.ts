@@ -1,6 +1,6 @@
 import type { Plugin } from 'vite';
 
-import { generateLocales } from '../utilities/generate-locales';
+import { generateLocales } from '../src/lib/i18n/generate-locales';
 
 type PluginOptions = {
   src: string;
@@ -12,12 +12,12 @@ export function i18nPlugin(options: PluginOptions): Plugin {
 
   return {
     name: 'vite-plugin-i18n-generate-locales',
-    async buildStart(this) {
-      await generateLocales(src, dest, this.error);
+    async buildStart() {
+      await generateLocales(src, dest, 'ts');
     },
     async handleHotUpdate(ctx) {
       if (ctx.file.match(/src\/lib\/i18n\/locales\/\w+\/\w+\.ts/) !== null) {
-        await generateLocales(src, dest, console.error);
+        await generateLocales(src, dest, 'ts');
       }
     },
   };
