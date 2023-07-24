@@ -49,7 +49,7 @@
       class="w-72"
       id="filter-type-name"
       bind:value
-      options={searchAttributeOptions()}
+      options={$searchAttributeOptions}
       onChange={onTypeChange}
       autoFocus
     />

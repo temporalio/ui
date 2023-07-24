@@ -1,0 +1,38 @@
+<script lang="ts">
+  import { getContext } from 'svelte';
+  import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
+  import { translate } from '$lib/i18n/translate';
+
+  import NumberInput from '$lib/holocene/input/number-input.svelte';
+  import ConditionalMenu from './conditional-menu.svelte';
+
+  type T = $$Generic;
+
+  const { filter, focusedElementId, handleSubmit } =
+    getContext<FilterContext<T>>(FILTER_CONTEXT);
+  const min = 0;
+  let value = $filter.value ? Number($filter.value) : null;
+
+  const handleKeydown = (e: KeyboardEvent) => {
+    $focusedElementId = '';
+    if (e.key === 'Enter' && value !== null && value >= min) {
+      $filter.value = String(value);
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+</script>
+
+<div class="flex items-center">
+  <ConditionalMenu inputId="number-filter-search" />
+  <NumberInput
+    id="number-filter-search"
+    icon="search"
+    placeholder={translate('number-input-placeholder')}
+    bind:value
+    {min}
+    on:keydown={handleKeydown}
+    unroundLeft
+    search
+  />
+</div>

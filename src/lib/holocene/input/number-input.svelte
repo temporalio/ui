@@ -1,4 +1,8 @@
 <script lang="ts">
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { IconName } from '$lib/holocene/icon/paths';
+
+  export let icon: IconName = null;
   export let id: string;
   export let value: number;
   export let label: string;
@@ -11,6 +15,9 @@
   export let hintText = '';
   export let max: number = undefined;
   export let min: number = undefined;
+  export let unroundRight: boolean = false;
+  export let unroundLeft: boolean = false;
+  export let search = false;
 
   let valid = true;
 
@@ -30,7 +37,19 @@
 <div class={$$props.class}>
   <label class:sr-only={labelHidden} for={id}>{label}</label>
   <div class="flex items-center gap-2">
-    <div class="input-container {theme}" class:disabled class:invalid={!valid}>
+    <div
+      class="input-container {theme}"
+      class:disabled
+      class:search
+      class:unroundRight
+      class:unroundLeft
+      class:invalid={!valid}
+    >
+      {#if icon}
+        <span class="icon-container">
+          <Icon name={icon} />
+        </span>
+      {/if}
       <input
         class="m-2 block w-full bg-white text-center focus:outline-none"
         class:disabled
@@ -49,6 +68,7 @@
         on:change
         on:focus
         on:blur
+        on:keydown
       />
     </div>
     <div class="units">{units}</div>
@@ -70,6 +90,14 @@
 
   .input-container {
     @apply relative box-border flex h-10 w-16 items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+  }
+
+  .input-container.search {
+    @apply w-fit;
+
+    input {
+      @apply text-left;
+    }
   }
 
   .input-container.disabled {
@@ -131,5 +159,13 @@
   .input-container.dark.disabled .copy-icon-container,
   .input-container.dark.disabled input {
     @apply border-gray-900 bg-gray-900;
+  }
+
+  .unroundRight {
+    @apply rounded-tr-none rounded-br-none;
+  }
+
+  .unroundLeft {
+    @apply rounded-tl-none rounded-bl-none;
   }
 </style>

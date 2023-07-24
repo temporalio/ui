@@ -21,6 +21,7 @@
     spellcheck?: boolean;
     unroundRight?: boolean;
     unroundLeft?: boolean;
+    noBorder?: boolean;
     autoFocus?: boolean;
     error?: boolean;
   }
@@ -44,6 +45,7 @@
   export let spellcheck: boolean = null;
   export let unroundRight: boolean = false;
   export let unroundLeft: boolean = false;
+  export let noBorder: boolean = false;
   export let autoFocus = false;
   export let error = false;
   export let required = false;
@@ -73,6 +75,7 @@
     class:error
     class:unroundRight={unroundRight ?? suffix}
     class:unroundLeft
+    class:noBorder
     class:invalid={!valid}
   >
     {#if icon}
@@ -174,6 +177,10 @@
 
   .unroundLeft {
     @apply rounded-tl-none rounded-bl-none border-l-0;
+  }
+
+  .noBorder {
+    @apply border-none;
   }
 
   .input-container.disabled {
