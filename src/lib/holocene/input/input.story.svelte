@@ -9,7 +9,7 @@
   export let Hst: HST;
 
   let value: string = '';
-  let numberValue: number;
+  let numberValue: number = 0;
   let hintText: string | undefined;
   let valid = true;
   let maxLength: number | undefined;
@@ -57,16 +57,18 @@
   </Hst.Variant>
 
   <Hst.Variant title="A Number Input">
-    <NumberInput id="number-input-1" bind:value />
+    <NumberInput id="number-input-1" bind:value={numberValue} />
   </Hst.Variant>
 
-  <Hst.Variant title="A Number Input with a Label, Units and a Max">
+  <Hst.Variant title="A Number Input with a Label, Units, Max, and Hint Text">
     <NumberInput
       label="Retention Period*"
       id="number-input-2"
+      hintText="Please enter a number between {min} and {max}"
       units="days"
-      max={50}
-      bind:value
+      {max}
+      {min}
+      bind:value={numberValue}
     />
   </Hst.Variant>
 

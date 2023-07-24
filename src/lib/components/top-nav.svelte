@@ -6,10 +6,11 @@
   import DropdownMenu from '$lib/holocene/dropdown-menu.svelte';
   import NamespaceList from '$lib/components/namespace-list.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
+  import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import { authUser } from '$lib/stores/auth-user';
   import type { NamespaceListItem } from '$lib/types/global';
   import { dataEncoder } from '$lib/stores/data-encoder';
+  import { translate } from '$lib/i18n/translate';
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
@@ -89,7 +90,9 @@
           <MenuItem class="truncate rounded-t-xl" disabled
             >{$authUser.email}</MenuItem
           >
-          <MenuItem class="rounded-b-xl" on:click={logout}>Log out</MenuItem>
+          <MenuItem class="rounded-b-xl" on:click={logout}
+            >{translate('log-out')}</MenuItem
+          >
         </div>
       </DropdownMenu>
     {/if}

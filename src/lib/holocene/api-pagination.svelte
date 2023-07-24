@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  
+
   import { onMount } from 'svelte';
-  
+
   import Alert from '$lib/holocene/alert.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
@@ -12,7 +12,6 @@
   } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
   import { isError } from '$lib/utilities/is';
-  
 
   type T = $$Generic;
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
@@ -24,6 +23,9 @@
     pageSizeOptions?: string[] | number[];
     defaultPageSize?: string | number | undefined;
     total?: string | number;
+    pageSizeSelectLabel: string;
+    emptyStateMessage: string;
+    fallbackErrorMessage: string;
   }
 
   type PaginatedRequest<T> = (
@@ -41,6 +43,9 @@
   export let pageSizeOptions: string[] | number[] = options;
   export let defaultPageSize: string | number | undefined = undefined;
   export let total: string | number = '';
+  export let pageSizeSelectLabel: string;
+  export let emptyStateMessage: string;
+  export let fallbackErrorMessage: string;
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
@@ -155,7 +160,7 @@
     bold
     intent="error"
     class="mb-10"
-    title={error?.message ?? 'Error fetching data.'}
+    title={error?.message ?? fallbackErrorMessage}
   />
 {/if}
 
@@ -171,7 +176,7 @@
       <slot name="action-top-center" />
       {#if pageSizeOptions.length}
         <FilterSelect
-          label="Per Page"
+          label={pageSizeSelectLabel}
           parameter={$store.key}
           value={String($store.pageSize)}
           options={pageSizeOptions}
@@ -215,7 +220,7 @@
   {#if $store.loading}
     <SkeletonTable rows={15} />
   {:else if isEmpty}
-    <slot name="empty">No Items</slot>
+    <slot name="empty">{emptyStateMessage}</slot>
   {:else}
     <slot
       updating={$store.updating}
@@ -235,7 +240,7 @@
       {#if $store.visibleItems.length}
         {#if pageSizeOptions.length}
           <FilterSelect
-            label="Per Page"
+            label={pageSizeSelectLabel}
             parameter={$store.key}
             value={String($store.pageSize)}
             options={pageSizeOptions}

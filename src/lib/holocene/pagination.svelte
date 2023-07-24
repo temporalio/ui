@@ -26,6 +26,7 @@
     currentPageKey?: string;
     itemsPerPage?: number | null;
     updating?: boolean;
+    pageSizeSelectLabel: string;
   }
 
   export let items: T[];
@@ -34,6 +35,7 @@
   export let currentPageKey = 'page';
   export let itemsPerPage: number | null = null;
   export let updating = false;
+  export let pageSizeSelectLabel: string;
 
   $: perPage =
     itemsPerPage !== null
@@ -142,7 +144,7 @@
       <slot name="action-top-center" />
       {#if !itemsPerPage}
         <FilterSelect
-          label="Per Page"
+          label={pageSizeSelectLabel}
           parameter={perPageKey}
           value={perPage}
           {options}
@@ -208,7 +210,7 @@
     <div class="flex gap-4">
       {#if !itemsPerPage}
         <FilterSelect
-          label="Per Page"
+          label={pageSizeSelectLabel}
           parameter={perPageKey}
           value={perPage}
           {options}
