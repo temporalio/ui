@@ -76,7 +76,6 @@
     bulkCancelByIDs,
     bulkTerminateByIDs,
   } from '$lib/services/batch-service';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import { Action } from '$lib/models/workflow-actions';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
@@ -132,17 +131,6 @@
     $refresh = Date.now();
   };
 
-  const resetPageToDefaultState = () => {
-    $workflowFilters = [];
-    updateQueryParameters({
-      url: $page.url,
-      parameter: 'query',
-      value: '',
-      allowEmpty: true,
-    });
-    refreshWorkflows();
-  };
-
   const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
     const options = {
       namespace: $page.params.namespace,
@@ -169,7 +157,7 @@
         });
       }
       batchTerminateConfirmationModal?.close();
-      resetPageToDefaultState();
+      refreshWorkflows();
     } catch (error) {
       batchTerminateConfirmationModal?.setError(
         error?.message ?? translate('unknown-error'),
@@ -203,7 +191,7 @@
         });
       }
       batchCancelConfirmationModal?.close();
-      resetPageToDefaultState();
+      refreshWorkflows();
     } catch (error) {
       batchCancelConfirmationModal?.setError(
         error?.message ?? translate('unknown-error'),
