@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  
+
   import { onMount } from 'svelte';
-  
+
   import { page } from '$app/stores';
-  
+
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import {
@@ -17,7 +17,6 @@
   } from '$lib/stores/pagination';
   import { getFloatStyle } from '$lib/utilities/get-float-style';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  
 
   type T = $$Generic;
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
@@ -27,6 +26,7 @@
     currentPageKey?: string;
     itemsPerPage?: number | null;
     updating?: boolean;
+    pageSizeSelectLabel: string;
   }
 
   export let items: T[];
@@ -35,6 +35,7 @@
   export let currentPageKey = 'page';
   export let itemsPerPage: number | null = null;
   export let updating = false;
+  export let pageSizeSelectLabel: string;
 
   $: perPage =
     itemsPerPage !== null
@@ -129,67 +130,69 @@
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
   <div
-    class={`flex flex-col items-center gap-4 lg:flex-row ${
-      $$slots['action-top-left'] ? 'justify-between' : 'justify-end'
-    }`}
+    class="flex flex-col items-end lg:items-start gap-4 lg:flex-row justify-end"
   >
-    <slot name="action-top-left" />
+    <div class="w-full">
+      <slot name="action-top-left" />
+    </div>
     <nav
       style={floatStyle}
       bind:clientHeight={height}
-      class="flex flex-col justify-end gap-4 md:flex-row"
+      class="flex flex-col items-end gap-4 md:flex-row min-w-fit"
       aria-label={$$restProps['aria-label']}
     >
       <slot name="action-top-center" />
-      {#if !itemsPerPage}
-        <FilterSelect
-          label="Per Page"
-          parameter={perPageKey}
-          value={perPage}
-          {options}
-        />
-      {/if}
-      <slot name="pagination-top">
-        <div class="flex items-center justify-center gap-3">
-          <button
-            class="caret"
-            disabled={!$store.hasPrevious}
-            on:click={() => {
-              store.previous();
-              handlePageChange();
-            }}
-            aria-label="previous"
-          >
-            <span
-              class="arrow arrow-left"
-              class:arrow-left-disabled={!$store.hasPrevious}
-            />
-          </button>
-          <p>
-            {#if updating}
-              <Skeleton class="block h-5 w-24" />
-            {:else}
-              {$store.length
-                ? $store.startingIndex + 1
-                : 0}–{$store.endingIndex + 1} of {$store.length}
-            {/if}
-          </p>
-          <button
-            class="caret"
-            disabled={!$store.hasNext}
-            on:click={() => {
-              store.next();
-              handlePageChange();
-            }}
-            aria-label="next"
-          >
-            <span
-              class="arrow arrow-right"
-              class:arrow-right-disabled={!$store.hasNext}
-            />
-          </button>
-        </div>
-      </slot>
+      <div class="flex gap-4">
+        {#if !itemsPerPage}
+          <FilterSelect
+            label={pageSizeSelectLabel}
+            parameter={perPageKey}
+            value={perPage}
+            {options}
+          />
+        {/if}
+        <slot name="pagination-top">
+          <div class="flex items-center justify-center gap-3">
+            <button
+              class="caret"
+              disabled={!$store.hasPrevious}
+              on:click={() => {
+                store.previous();
+                handlePageChange();
+              }}
+              aria-label="previous"
+            >
+              <span
+                class="arrow arrow-left"
+                class:arrow-left-disabled={!$store.hasPrevious}
+              />
+            </button>
+            <p>
+              {#if updating}
+                <Skeleton class="block h-5 w-24" />
+              {:else}
+                {$store.length
+                  ? $store.startingIndex + 1
+                  : 0}–{$store.endingIndex + 1} of {$store.length}
+              {/if}
+            </p>
+            <button
+              class="caret"
+              disabled={!$store.hasNext}
+              on:click={() => {
+                store.next();
+                handlePageChange();
+              }}
+              aria-label="next"
+            >
+              <span
+                class="arrow arrow-right"
+                class:arrow-right-disabled={!$store.hasNext}
+              />
+            </button>
+          </div>
+        </slot>
+      </div>
       <slot name="action-top-right" />
     </nav>
   </div>
@@ -209,7 +212,7 @@
     <div class="flex gap-4">
       {#if !itemsPerPage}
         <FilterSelect
-          label="Per Page"
+          label={pageSizeSelectLabel}
           parameter={perPageKey}
           value={perPage}
           {options}

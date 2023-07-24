@@ -113,7 +113,7 @@
         hasIndicator
         id="phase"
         controls="phase-menu"
-        class="rounded-r bg-offWhite border border-primary border-l-0 h-10 w-16 px-2"
+        class="rounded-r bg-offWhite border border-primary border-l-0 h-10 w-20 px-2"
       >
         {offsetUnit}
       </MenuButton>

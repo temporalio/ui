@@ -66,6 +66,10 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
+  import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
+  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
+  import { labsMode } from '$lib/stores/labs-mode';
+
   import {
     batchCancelByQuery,
     batchTerminateByQuery,
@@ -81,6 +85,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import Translate from '$lib/i18n/translate.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { searchAttributes } from '$lib/stores/search-attributes';
   import Button from '$lib/holocene/button.svelte';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
 
@@ -110,7 +115,9 @@
     $lastUsedNamespace = $page.params.namespace;
     if (query) {
       // Set filters from inital page load query if it exists
-      $workflowFilters = toListWorkflowFilters(query);
+      $workflowFilters = $labsMode
+        ? toListWorkflowFilters(query, $searchAttributes)
+        : toListWorkflowFilters(query);
     }
   });
 
@@ -277,9 +284,19 @@
     </button>
   </div>
 </header>
-<Pagination items={$workflows} let:visibleItems aria-label="recent workflows">
+<Pagination
+  items={$workflows}
+  let:visibleItems
+  aria-label="recent workflows"
+  pageSizeSelectLabel={translate('per-page')}
+>
   <svelte:fragment slot="action-top-left">
-    <WorkflowAdvancedSearch />
+    <LabsModeGuard>
+      <svelte:fragment slot="fallback">
+        <WorkflowAdvancedSearch />
+      </svelte:fragment>
+      <WorkflowFilterSearch />
+    </LabsModeGuard>
   </svelte:fragment>
   <svelte:fragment slot="action-top-center">
     <WorkflowDateTimeFilter />

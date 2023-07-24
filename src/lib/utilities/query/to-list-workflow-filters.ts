@@ -1,3 +1,5 @@
+import { get } from 'svelte/store';
+
 import { formatDuration } from 'date-fns';
 import debounce from 'just-debounce';
 
@@ -38,7 +40,7 @@ export const getLargestDurationUnit = (duration: Duration): Duration => {
 
 const isDatetimeStatement = is('Datetime');
 
-const emptyFilter = () => ({
+export const emptyFilter = () => ({
   attribute: '',
   value: '',
   operator: '',
@@ -155,9 +157,35 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
   ];
 };
 
+export const combineFilters = (filters: WorkflowFilter[]) => {
+  filters.forEach((filter, index) => {
+    const previousFilter = filters[index - 1];
+    if (previousFilter && !previousFilter.operator) {
+      previousFilter.operator = 'AND';
+    }
+
+    const nextFilter = filters[index + 1];
+    if (!nextFilter) {
+      filter.operator = '';
+    }
+
+    if (filter.operator === 'OR' && previousFilter?.operator !== 'OR') {
+      filter.parenthesis = '(';
+    } else if (previousFilter?.operator === 'OR' && filter.operator !== 'OR') {
+      filter.parenthesis = ')';
+    } else {
+      filter.parenthesis = '';
+    }
+  });
+
+  return filters;
+};
+
 export const updateQueryParamsFromFilter = debounce(
-  (url: URL, filters: WorkflowFilter[]) => {
-    const allFilters = combineDropdownFilters(filters);
+  (url: URL, filters: WorkflowFilter[], labsMode = false) => {
+    const allFilters = labsMode
+      ? combineFilters(filters)
+      : combineDropdownFilters(filters);
     const query = toListWorkflowQueryFromFilters(allFilters);
     updateQueryParameters({
       url,
@@ -172,7 +200,7 @@ export const updateQueryParamsFromFilter = debounce(
 export const getConditionalForAttribute = (
   attribute: keyof SearchAttributes,
 ): string => {
-  const filter = searchAttributeOptions().find((t) => t.value === attribute);
+  const filter = get(searchAttributeOptions).find((t) => t.value === attribute);
   const type = filter?.type;
   if (type === 'Datetime') return 'In Last';
   return '=';
@@ -181,7 +209,7 @@ export const getConditionalForAttribute = (
 export const getDefaultValueForAttribute = (
   attribute: keyof SearchAttributes,
 ) => {
-  const filter = searchAttributeOptions().find((t) => t.value === attribute);
+  const filter = get(searchAttributeOptions).find((t) => t.value === attribute);
   const type = filter?.type;
   if (type === 'Datetime') return '24 hours';
   if (type === 'Bool') return 'true';

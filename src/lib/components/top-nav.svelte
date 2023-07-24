@@ -6,7 +6,7 @@
   import DropdownMenu from '$lib/holocene/dropdown-menu.svelte';
   import NamespaceList from '$lib/components/namespace-list.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
+  import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import { authUser } from '$lib/stores/auth-user';
   import type { NamespaceListItem } from '$lib/types/global';
   import { dataEncoder } from '$lib/stores/data-encoder';
