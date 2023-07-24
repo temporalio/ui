@@ -88,4 +88,5 @@ export const Strings = {
   feedback: 'Feedback',
   'log-out': 'Log out',
   'select-all': 'Select All',
+  absolute: 'Absolute',
 } as const;

@@ -22,6 +22,8 @@
 </script>
 
 <Input
+  label={translate('search')}
+  labelHidden
   id="text-filter-search"
   type="search"
   placeholder={`${translate('enter')} ${$filter.attribute}`}

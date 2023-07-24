@@ -85,5 +85,6 @@
   "import": "Import",
   "feedback": "Feedback",
   "log-out": "Log out",
-  "select-all": "Select All"
+  "select-all": "Select All",
+  "absolute": "Absolute"
 }
