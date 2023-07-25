@@ -100,27 +100,70 @@ export function getDuration({
   }
 }
 
-export function formatDistance({
+export function getMillisecondDuration({
   start,
   end,
 }: {
   start: ValidTime | undefined | null;
   end: ValidTime | undefined | null;
+}): number | null {
+  if (!start || !end) return null;
+
+  try {
+    if (isTimestamp(start)) {
+      start = timestampToDate(start);
+    }
+
+    if (isTimestamp(end)) {
+      end = timestampToDate(end);
+    }
+
+    const parsedStart = parseJSON(start);
+    const parsedEnd = parseJSON(end);
+    const ms = parsedEnd.getTime() - parsedStart.getTime();
+    return ms % 1000;
+  } catch {
+    return null;
+  }
+}
+
+export function formatDistance({
+  start,
+  end,
+  includeMilliseconds = false,
+}: {
+  start: ValidTime | undefined | null;
+  end: ValidTime | undefined | null;
+  includeMilliseconds?: boolean;
 }): string {
   const duration = getDuration({ start, end });
-  return formatDuration(duration);
+  const distance = formatDuration(duration);
+  if (includeMilliseconds) {
+    const msDuration = getMillisecondDuration({ start, end });
+    return `${distance} ${msDuration}ms`.trim();
+  } else {
+    return distance;
+  }
 }
 
 export function formatDistanceAbbreviated({
   start,
   end,
+  includeMilliseconds = false,
 }: {
   start: ValidTime | undefined | null;
   end: ValidTime | undefined | null;
+  includeMilliseconds?: boolean;
 }): string {
   const duration = getDuration({ start, end });
   const distance = formatDuration(duration, ' ');
-  return formatDistanceToSingleLetters(distance);
+  const formattedDistance = formatDistanceToSingleLetters(distance);
+  if (includeMilliseconds) {
+    const msDuration = getMillisecondDuration({ start, end });
+    return `${formattedDistance} ${msDuration}ms`.trim();
+  } else {
+    return formattedDistance;
+  }
 }
 
 export function getMilliseconds(date: ValidTime | undefined | null): number {
