@@ -42,7 +42,6 @@
         {compact}
         expandAll={$expandAllEvents === 'true'}
         {initialItem}
-        {visibleItems}
       />
     {:else}
       <EventEmptyRow />

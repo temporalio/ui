@@ -110,7 +110,7 @@
           <Icon name="checkmark" />
         {/if}
       </div>
-      <button on:click={onShowElapsedClick}
+      <button class="text-left" on:click={onShowElapsedClick}
         >{translate('events', 'show-elapsed-time')}</button
       >
     </div>
