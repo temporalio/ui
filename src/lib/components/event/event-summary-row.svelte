@@ -93,7 +93,9 @@
     <div class="flex flex-col gap-0">
       {#if showElapsedTimeDiff}
         <p class="break-word truncate text-sm md:whitespace-normal">
-          {descending ? '-' : '+'}{elapsedTime}
+          {#if elapsedTime}
+            {descending ? '-' : '+'}{elapsedTime}
+          {/if}
         </p>
         {#if duration && duration !== '0ms'}
           <div class="flex flex-row items-center gap-0">
