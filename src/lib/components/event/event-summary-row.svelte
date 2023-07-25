@@ -39,6 +39,13 @@
   $: expanded = expandAll || active;
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
+  $: duration = isEventGroup(event)
+    ? formatDistanceAbbreviated({
+        start: event.initialEvent.eventTime,
+        end: event.lastEvent.eventTime,
+      })
+    : '';
+
   $: descending = $eventFilterSort === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: showElapsedTimeDiff =
@@ -96,7 +103,7 @@
           start: initialItem.eventTime,
           end: currentEvent.eventTime,
         })}
-        {timeDiffChange}
+        ({duration})
       {:else}
         {formatDate(event?.eventTime, $timeFormat)}
       {/if}
