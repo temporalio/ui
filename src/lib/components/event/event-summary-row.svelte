@@ -24,7 +24,6 @@
   import type { IterableEvent } from '$lib/types/events';
 
   export let event: IterableEvent;
-  export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent | undefined;
   export let compact = false;
   export let expandAll = false;

@@ -138,8 +138,8 @@ export function formatDistance({
 }): string {
   const duration = getDuration({ start, end });
   const distance = formatDuration(duration);
-  if (includeMilliseconds) {
-    const msDuration = getMillisecondDuration({ start, end });
+  const msDuration = getMillisecondDuration({ start, end });
+  if (includeMilliseconds && msDuration) {
     return `${distance} ${msDuration}ms`.trim();
   } else {
     return distance;
@@ -158,8 +158,8 @@ export function formatDistanceAbbreviated({
   const duration = getDuration({ start, end });
   const distance = formatDuration(duration, ' ');
   const formattedDistance = formatDistanceToSingleLetters(distance);
-  if (includeMilliseconds) {
-    const msDuration = getMillisecondDuration({ start, end });
+  const msDuration = getMillisecondDuration({ start, end });
+  if (includeMilliseconds && msDuration) {
     return `${formattedDistance} ${msDuration}ms`.trim();
   } else {
     return formattedDistance;
