@@ -26,7 +26,12 @@
           scheduleId,
         })}
       >
-        <Copyable content={scheduleId} visible />
+        <Copyable
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+          content={scheduleId}
+          visible
+        />
       </Link>
     </td>
   </TableRow>

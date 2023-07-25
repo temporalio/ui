@@ -3,6 +3,60 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
 
+  type BaseProps = {
+    text?: string;
+    icon?: IconName;
+    hide?: boolean;
+    width?: number;
+  };
+
+  type BasePositionProps = {
+    top?: boolean;
+    topRight?: boolean;
+    right?: boolean;
+    bottomRight?: boolean;
+    bottom?: boolean;
+    bottomLeft?: boolean;
+    left?: boolean;
+    topLeft?: boolean;
+  };
+
+  type Only<O extends {}, K extends keyof O> = {
+    [X in keyof Pick<O, K>]-?: true;
+  } & {
+    [X in keyof Omit<O, K>]: never;
+  };
+
+  type OnlyTop = Only<BasePositionProps, 'top'>;
+  type OnlyTopRight = Only<BasePositionProps, 'topRight'>;
+  type OnlyRight = Only<BasePositionProps, 'right'>;
+  type OnlyBottomRight = Only<BasePositionProps, 'bottomRight'>;
+  type OnlyBottom = Only<BasePositionProps, 'bottom'>;
+  type OnlyBottomLeft = Only<BasePositionProps, 'bottomLeft'>;
+  type OnlyLeft = Only<BasePositionProps, 'left'>;
+  type OnlyTopLeft = Only<BasePositionProps, 'topLeft'>;
+
+  type AllUniquePositionProps =
+    | OnlyTop
+    | OnlyTopRight
+    | OnlyRight
+    | OnlyBottomRight
+    | OnlyBottom
+    | OnlyBottomLeft
+    | OnlyLeft
+    | OnlyTopLeft;
+
+  type CopyableProps = BaseProps &
+    AllUniquePositionProps & {
+      copyable: true;
+      copyIconTitle: string;
+      copySuccessIconTitle: string;
+    };
+
+  type NonCopyableProps = BaseProps & AllUniquePositionProps;
+
+  type $$Props = CopyableProps | NonCopyableProps;
+
   export let text = '';
   export let icon: IconName = null;
   /** bottom center of the tooltip aligned to the top center of the wrapper */
@@ -24,6 +78,8 @@
   export let copyable = false;
   export let hide: boolean | null = false;
   export let width: number | null = null;
+  export let copyIconTitle = '';
+  export let copySuccessIconTitle = '';
 </script>
 
 {#if hide}
@@ -45,7 +101,13 @@
     >
       <div class="inline-block rounded-lg bg-gray-800 px-2 py-2">
         {#if copyable}
-          <Copyable clickAllToCopy content={text} color="white">
+          <Copyable
+            {copySuccessIconTitle}
+            {copyIconTitle}
+            clickAllToCopy
+            content={text}
+            color="white"
+          >
             <span class="text-gray-100"
               >{#if icon}<Icon
                   name={icon}

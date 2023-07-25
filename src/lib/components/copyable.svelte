@@ -6,8 +6,10 @@
   export let visible = false;
   export let color = 'black';
   export let clickAllToCopy = false;
+  export let copyIconTitle: string;
+  export let copySuccessIconTitle: string;
 
-  const { copy, copied } = copyToClipboard(500);
+  const { copy, copied } = copyToClipboard();
 </script>
 
 {#if clickAllToCopy}
@@ -22,6 +24,7 @@
     </slot>
     <button on:click={(e) => copy(e, content)}>
       <Icon
+        title={$copied ? copySuccessIconTitle : copyIconTitle}
         name={$copied ? 'checkmark' : 'copy'}
         stroke={color}
         class={`${visible ? 'visible' : 'invisible group-hover:visible'}`}
@@ -37,6 +40,7 @@
     </slot>
     <button on:click={(e) => copy(e, content)}>
       <Icon
+        title={$copied ? copySuccessIconTitle : copyIconTitle}
         name={$copied ? 'checkmark' : 'copy'}
         stroke={color}
         class={`${visible ? 'visible' : 'invisible group-hover:visible'}`}

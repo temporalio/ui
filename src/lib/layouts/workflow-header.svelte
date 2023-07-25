@@ -116,6 +116,8 @@
         class="overflow-hidden text-2xl font-medium"
       >
         <Copyable
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
           content={workflow?.id}
           clickAllToCopy
           container-class="w-full"

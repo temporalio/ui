@@ -42,7 +42,7 @@
     };
   };
 
-  const { copy, copied } = copyToClipboard(500);
+  const { copy, copied } = copyToClipboard();
 </script>
 
 <div class="flex flex-col">

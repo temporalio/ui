@@ -6,6 +6,6 @@
   export let props = $$restProps;
 </script>
 
-<Tooltip hide={$navOpen} {...props}>
+<Tooltip right hide={$navOpen} {...props}>
   <slot />
 </Tooltip>

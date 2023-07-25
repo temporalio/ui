@@ -30,7 +30,12 @@
           run: parent.runId,
         })}
       >
-        <Copyable content={parent.workflowId} visible />
+        <Copyable
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+          content={parent.workflowId}
+          visible
+        />
       </Link>
     </td>
     <td>
@@ -42,7 +47,12 @@
           run: parent.runId,
         })}
       >
-        <Copyable content={parent.runId} visible />
+        <Copyable
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+          content={parent.runId}
+          visible
+        />
       </Link>
     </td>
   </TableRow>

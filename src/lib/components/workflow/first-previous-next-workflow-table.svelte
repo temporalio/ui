@@ -34,7 +34,12 @@
             run: first,
           })}
         >
-          <Copyable content={first} visible />
+          <Copyable
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
+            content={first}
+            visible
+          />
         </Link>
       {/if}
     </td>
@@ -48,7 +53,12 @@
             run: previous,
           })}
         >
-          <Copyable content={previous} visible />
+          <Copyable
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
+            content={previous}
+            visible
+          />
         </Link>
       {/if}
     </td>
@@ -62,7 +72,12 @@
             run: next,
           })}
         >
-          <Copyable content={next} visible />
+          <Copyable
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
+            content={next}
+            visible
+          />
         </Link>
       {/if}
     </td>

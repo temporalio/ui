@@ -10,7 +10,7 @@
   }
 </script>
 
-<Tooltip text="Select a Namespace">
+<Tooltip top text="Select a Namespace">
   <button
     class="relative"
     on:click={toggleNamespaceSelector}

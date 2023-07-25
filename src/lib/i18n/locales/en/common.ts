@@ -85,4 +85,7 @@ export const Strings = {
   import: 'Import',
   feedback: 'Feedback',
   'log-out': 'Log out',
+  'copy-icon-title': 'Click to copy content',
+  'copy-success-icon-title': 'Content copied to clipboard',
+  'filter-workflows': 'Filter workflows',
 } as const;

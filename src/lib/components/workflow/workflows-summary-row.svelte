@@ -14,6 +14,7 @@
 
   import type { TimeFormat } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { translate } from '$lib/i18n/translate';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -61,6 +62,9 @@
   >
     <span class="table-link">{workflow.id}</span>
     <FilterOrCopyButtons
+      copyIconTitle={translate('copy-icon-title')}
+      copySuccessIconTitle={translate('copy-success-icon-title')}
+      filterIconTitle={translate('filter-workflows')}
       show={showFilterCopy}
       content={workflow.id}
       filterable={false}
@@ -85,6 +89,9 @@
       {workflow.name}
     </button>
     <FilterOrCopyButtons
+      copyIconTitle={translate('copy-icon-title')}
+      copySuccessIconTitle={translate('copy-success-icon-title')}
+      filterIconTitle={translate('filter-workflows')}
       show={showFilterCopy}
       content={workflow.name}
       onFilter={() => onTypeClick(workflow.name)}
