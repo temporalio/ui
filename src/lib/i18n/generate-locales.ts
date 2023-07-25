@@ -1,7 +1,7 @@
 import { mkdir, readFile, stat, writeFile } from 'fs/promises';
 import path from 'path';
 
-import rimraf from 'rimraf';
+import { rimraf } from 'rimraf';
 import ts from 'typescript';
 import { chalk, glob } from 'zx';
 

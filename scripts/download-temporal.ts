@@ -5,7 +5,7 @@ import { finished } from 'stream/promises';
 
 import mkdirp from 'mkdirp';
 import fetch from 'node-fetch';
-import rimraf from 'rimraf';
+import { rimraf } from 'rimraf';
 import tar from 'tar-fs';
 import { chalk } from 'zx';
 
@@ -26,8 +26,8 @@ const reportError = (error: string, exitCode = 1, callback?: () => void) => {
   process.exit(exitCode);
 };
 
-const removeDirectory = () => {
-  rimraf(destination);
+const removeDirectory = async () => {
+  await rimraf(destination);
 };
 
 const destinationDirectory = './bin';
