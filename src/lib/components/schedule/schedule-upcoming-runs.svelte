@@ -12,7 +12,9 @@
   <h2 class="mb-4 text-2xl">{translate('schedules', 'upcoming-runs')}</h2>
   {#each futureRuns.slice(0, 5) as run}
     <div class="row">
-      <p>{formatDate(run, $timeFormat, translate('from-now'))}</p>
+      <p>
+        {formatDate(run, $timeFormat, { relativeLabel: translate('from-now') })}
+      </p>
     </div>
   {/each}
 </Panel>
