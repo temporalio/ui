@@ -118,10 +118,13 @@
             <li class="event-table-row">
               <h4>{translate('workflows', 'last-heartbeat')}</h4>
               <p>
-                {(formatDate(details.lastHeartbeatTime, 'relative'),
-                {
-                  relativeStrict: true,
-                })}
+                {`${formatDate(details.lastHeartbeatTime)} (${formatDate(
+                  details.lastHeartbeatTime,
+                  'relative',
+                  {
+                    relativeStrict: true,
+                  },
+                )})`}
               </p>
             </li>
             <li class="event-table-row">

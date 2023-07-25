@@ -67,9 +67,15 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows', 'last-heartbeat')}
                     </h4>
-                    {formatDate(pendingActivity.lastHeartbeatTime, 'relative', {
-                      relativeStrict: true,
-                    })}
+                    {`${formatDate(
+                      pendingActivity.lastHeartbeatTime,
+                    )} (${formatDate(
+                      pendingActivity.lastHeartbeatTime,
+                      'relative',
+                      {
+                        relativeStrict: true,
+                      },
+                    )})`}
                   </div>
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">
