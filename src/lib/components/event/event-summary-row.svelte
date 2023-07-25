@@ -24,7 +24,6 @@
   import type { IterableEvent } from '$lib/types/events';
 
   export let event: IterableEvent;
-  export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent | undefined;
   export let compact = false;
   export let expandAll = false;
@@ -38,27 +37,28 @@
 
   $: expanded = expandAll || active;
 
-  $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
   $: descending = $eventFilterSort === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: showElapsedTimeDiff =
     showElapsed && initialItem && event.id !== initialItem.id;
   $: attributes = formatAttributes(event, { compact });
 
-  $: timeDiffChange = '';
-  $: {
-    const currentIndex = visibleItems.indexOf(event);
-    const previousItem = visibleItems[currentIndex - 1];
-    if (previousItem) {
-      const timeDiff = formatDistanceAbbreviated({
-        start: isEventGroup(previousItem)
-          ? previousItem?.initialEvent?.eventTime
-          : previousItem?.eventTime,
-        end: currentEvent?.eventTime,
-      });
-      timeDiffChange = timeDiff ? `(${descending ? '-' : '+'}${timeDiff})` : '';
-    }
-  }
+  $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
+  $: elapsedTime = formatDistanceAbbreviated({
+    start: initialItem.eventTime,
+    end: isEventGroup(event)
+      ? event.initialEvent.eventTime
+      : currentEvent.eventTime,
+    includeMilliseconds: true,
+  });
+
+  $: duration = isEventGroup(event)
+    ? formatDistanceAbbreviated({
+        start: event.initialEvent.eventTime,
+        end: event.lastEvent.eventTime,
+        includeMilliseconds: true,
+      })
+    : '';
 
   const onLinkClick = () => {
     expanded = !expanded;
@@ -90,17 +90,29 @@
     >
   </td>
   <td class="text-left">
-    <p class="break-word truncate text-sm md:whitespace-normal md:text-base">
+    <div class="flex flex-col gap-0">
       {#if showElapsedTimeDiff}
-        {formatDistanceAbbreviated({
-          start: initialItem.eventTime,
-          end: currentEvent.eventTime,
-        })}
-        {timeDiffChange}
+        <p class="break-word truncate text-sm md:whitespace-normal">
+          {#if elapsedTime}
+            {descending ? '-' : '+'}{elapsedTime}
+          {/if}
+        </p>
+        {#if duration && duration !== '0ms'}
+          <div class="flex flex-row items-center gap-0">
+            <Icon class="inline" name="clock" />
+            <p class="break-word truncate text-sm md:whitespace-normal">
+              {duration}
+            </p>
+          </div>
+        {/if}
       {:else}
-        {formatDate(event?.eventTime, $timeFormat)}
+        <p
+          class="break-word truncate text-sm md:whitespace-normal md:text-base"
+        >
+          {formatDate(event?.eventTime, $timeFormat)}
+        </p>
       {/if}
-    </p>
+    </div>
   </td>
   <td class="text-right text-sm font-normal xl:text-left">
     <div class="flex">

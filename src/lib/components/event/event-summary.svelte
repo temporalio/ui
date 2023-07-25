@@ -108,7 +108,6 @@
       <EventSummaryRow
         {event}
         {compact}
-        {visibleItems}
         expandAll={$expandAllEvents === 'true'}
         {initialItem}
         active={activeRowIndex === index}

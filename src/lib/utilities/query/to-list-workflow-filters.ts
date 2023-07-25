@@ -37,7 +37,7 @@ export const getLargestDurationUnit = (duration: Duration): Duration => {
 
 const isDatetimeStatement = is('Datetime');
 
-const emptyFilter = () => ({
+export const emptyFilter = () => ({
   attribute: '',
   value: '',
   operator: '',
@@ -154,9 +154,35 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
   ];
 };
 
+export const combineFilters = (filters: WorkflowFilter[]) => {
+  filters.forEach((filter, index) => {
+    const previousFilter = filters[index - 1];
+    if (previousFilter && !previousFilter.operator) {
+      previousFilter.operator = 'AND';
+    }
+
+    const nextFilter = filters[index + 1];
+    if (!nextFilter) {
+      filter.operator = '';
+    }
+
+    if (filter.operator === 'OR' && previousFilter?.operator !== 'OR') {
+      filter.parenthesis = '(';
+    } else if (previousFilter?.operator === 'OR' && filter.operator !== 'OR') {
+      filter.parenthesis = ')';
+    } else {
+      filter.parenthesis = '';
+    }
+  });
+
+  return filters;
+};
+
 export const updateQueryParamsFromFilter = debounce(
-  (url: URL, filters: WorkflowFilter[]) => {
-    const allFilters = combineDropdownFilters(filters);
+  (url: URL, filters: WorkflowFilter[], labsMode = false) => {
+    const allFilters = labsMode
+      ? combineFilters(filters)
+      : combineDropdownFilters(filters);
     const query = toListWorkflowQueryFromFilters(allFilters);
     updateQueryParameters({
       url,

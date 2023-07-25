@@ -1,6 +1,10 @@
 import { derived, get, type Readable, writable } from 'svelte/store';
 
-import type { SearchAttributes, WorkflowExecution } from '$lib/types/workflows';
+import type {
+  SearchAttributes,
+  SearchAttributesValue,
+  WorkflowExecution,
+} from '$lib/types/workflows';
 
 type SearchAttributesStore = {
   customAttributes: SearchAttributes;
@@ -42,15 +46,48 @@ export const workflowIncludesSearchAttribute = (
   return searchAttribute in (workflow?.searchAttributes?.indexedFields ?? {});
 };
 
-export const searchAttributeOptions = () => {
-  const attributes = get(searchAttributes);
-  return attributes
-    ? Object.entries(attributes).map(([key, value]) => {
-        return {
-          label: key,
-          value: key,
-          type: value,
-        };
-      })
-    : [];
+type SearchAttributeOption = {
+  label: string;
+  value: string;
+  type: SearchAttributesValue;
 };
+
+export const searchAttributeOptions: Readable<SearchAttributeOption[]> =
+  derived([searchAttributes], ([$searchAttributes]) => {
+    return $searchAttributes
+      ? Object.entries($searchAttributes).map(([key, value]) => {
+          return {
+            label: key,
+            value: key,
+            type: value,
+          };
+        })
+      : [];
+  });
+
+export const sortedSearchAttributeOptions: Readable<SearchAttributeOption[]> =
+  derived([searchAttributeOptions], ([$searchAttributeOptions]) => {
+    const popularOptions = [
+      'ExecutionStatus',
+      'WorkflowId',
+      'WorkflowType',
+      'RunId',
+      'StartTime',
+      'CloseTime',
+    ];
+
+    return $searchAttributeOptions
+      .sort((a, b) => {
+        if (a.label < b.label) return -1;
+        if (a.label > b.label) return 1;
+        return 0;
+      })
+      .sort((a, b) => {
+        const indexA = popularOptions.indexOf(a.value);
+        const indexB = popularOptions.indexOf(b.value);
+
+        if (indexA < 0) return 1;
+        if (indexB < 0) return -1;
+        return indexA - indexB;
+      });
+  });

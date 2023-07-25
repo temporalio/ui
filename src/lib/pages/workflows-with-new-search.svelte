@@ -66,13 +66,16 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
+  import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
+  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
+  import { labsMode } from '$lib/stores/labs-mode';
+
   import {
     batchCancelByQuery,
     batchTerminateByQuery,
     bulkCancelByIDs,
     bulkTerminateByIDs,
   } from '$lib/services/batch-service';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import { Action } from '$lib/models/workflow-actions';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
@@ -81,6 +84,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import Translate from '$lib/i18n/translate.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { searchAttributes } from '$lib/stores/search-attributes';
   import Button from '$lib/holocene/button.svelte';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
 
@@ -110,7 +114,9 @@
     $lastUsedNamespace = $page.params.namespace;
     if (query) {
       // Set filters from inital page load query if it exists
-      $workflowFilters = toListWorkflowFilters(query);
+      $workflowFilters = $labsMode
+        ? toListWorkflowFilters(query, $searchAttributes)
+        : toListWorkflowFilters(query);
     }
   });
 
@@ -123,17 +129,6 @@
   const refreshWorkflows = () => {
     resetSelection();
     $refresh = Date.now();
-  };
-
-  const resetPageToDefaultState = () => {
-    $workflowFilters = [];
-    updateQueryParameters({
-      url: $page.url,
-      parameter: 'query',
-      value: '',
-      allowEmpty: true,
-    });
-    refreshWorkflows();
   };
 
   const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
@@ -162,7 +157,7 @@
         });
       }
       batchTerminateConfirmationModal?.close();
-      resetPageToDefaultState();
+      refreshWorkflows();
     } catch (error) {
       batchTerminateConfirmationModal?.setError(
         error?.message ?? translate('unknown-error'),
@@ -196,7 +191,7 @@
         });
       }
       batchCancelConfirmationModal?.close();
-      resetPageToDefaultState();
+      refreshWorkflows();
     } catch (error) {
       batchCancelConfirmationModal?.setError(
         error?.message ?? translate('unknown-error'),
@@ -284,7 +279,12 @@
   pageSizeSelectLabel={translate('per-page')}
 >
   <svelte:fragment slot="action-top-left">
-    <WorkflowAdvancedSearch />
+    <LabsModeGuard>
+      <svelte:fragment slot="fallback">
+        <WorkflowAdvancedSearch />
+      </svelte:fragment>
+      <WorkflowFilterSearch />
+    </LabsModeGuard>
   </svelte:fragment>
   <svelte:fragment slot="action-top-center">
     <WorkflowDateTimeFilter />

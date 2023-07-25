@@ -28,7 +28,7 @@ export const searchAttributeToWorkflowKey: Record<
 };
 
 export type WorkflowFilter = {
-  attribute: keyof SearchAttributes;
+  attribute: Extract<keyof SearchAttributes, string>;
   value: string;
   operator: string;
   parenthesis: string;

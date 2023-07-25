@@ -162,7 +162,7 @@
         >
         <Button
           thin
-          variant="link"
+          variant="ghost"
           testId="cancel-data-encoder-button"
           on:click={onCancel}>{translate('cancel')}</Button
         >

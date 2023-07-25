@@ -157,8 +157,9 @@
     if (history.length && timeline) {
       const reverseHistory =
         $eventFilterSort === 'descending' && $eventViewType !== 'compact';
+      const historyCopy = [...history];
       const eventGroups = groupEvents(
-        reverseHistory ? history.reverse() : history,
+        reverseHistory ? historyCopy.reverse() : history,
       );
       const { groups, items } = createGroupItems(
         eventGroups,
