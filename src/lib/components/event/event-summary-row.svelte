@@ -38,6 +38,12 @@
 
   $: expanded = expandAll || active;
 
+  $: descending = $eventFilterSort === 'descending';
+  $: showElapsed = $eventShowElapsed === 'true';
+  $: showElapsedTimeDiff =
+    showElapsed && initialItem && event.id !== initialItem.id;
+  $: attributes = formatAttributes(event, { compact });
+
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
   $: elapsedTime = formatDistanceAbbreviated({
     start: initialItem.eventTime,
@@ -54,11 +60,6 @@
         includeMilliseconds: true,
       })
     : '';
-
-  $: showElapsed = $eventShowElapsed === 'true';
-  $: showElapsedTimeDiff =
-    showElapsed && initialItem && event.id !== initialItem.id;
-  $: attributes = formatAttributes(event, { compact });
 
   const onLinkClick = () => {
     expanded = !expanded;
@@ -92,17 +93,13 @@
   <td class="text-left">
     <div class="flex flex-col gap-0">
       {#if showElapsedTimeDiff}
-        <p
-          class="break-word truncate text-sm md:whitespace-normal md:text-base"
-        >
-          +{elapsedTime}
+        <p class="break-word truncate text-sm md:whitespace-normal">
+          {descending ? '-' : '+'}{elapsedTime}
         </p>
         {#if duration && duration !== '0ms'}
-          <div class="flex flex-row items center gap-0">
-            <Icon class="mr-1.5 inline" name="clock" />
-            <p
-              class="break-word truncate text-sm md:whitespace-normal md:text-base"
-            >
+          <div class="flex flex-row items-center gap-0">
+            <Icon class="inline" name="clock" />
+            <p class="break-word truncate text-sm md:whitespace-normal">
               {duration}
             </p>
           </div>

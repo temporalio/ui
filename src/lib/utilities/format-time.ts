@@ -121,7 +121,7 @@ export function getMillisecondDuration({
     const parsedStart = parseJSON(start);
     const parsedEnd = parseJSON(end);
     const ms = parsedEnd.getTime() - parsedStart.getTime();
-    return ms % 1000;
+    return Math.abs(ms % 1000);
   } catch {
     return null;
   }
