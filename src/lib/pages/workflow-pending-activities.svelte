@@ -117,7 +117,12 @@
             {/if}
             <li class="event-table-row">
               <h4>{translate('workflows', 'last-heartbeat')}</h4>
-              <p>{formatDate(details.lastHeartbeatTime, 'relative')}</p>
+              <p>
+                {(formatDate(details.lastHeartbeatTime, 'relative'),
+                {
+                  relativeStrict: true,
+                })}
+              </p>
             </li>
             <li class="event-table-row">
               <h4>{translate('workflows', 'state')}</h4>
