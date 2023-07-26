@@ -91,4 +91,8 @@ export const Strings = {
   type: 'Type',
   disabled: 'Disabled',
   enabled: 'Enabled',
+  primary: 'Primary',
+  previous: 'Previous',
+  next: 'Next',
+  name: 'Name',
 } as const;

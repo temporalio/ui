@@ -85,7 +85,7 @@
   <section id="event-history">
     <nav
       class="flex flex-col items-center justify-between gap-4 pb-4 lg:flex-row lg:items-end"
-      aria-label="recent events view"
+      aria-label={translate('workflows', 'recent-events-view')}
     >
       <h2 class="text-lg font-medium">
         {translate('workflows', 'recent-events')}

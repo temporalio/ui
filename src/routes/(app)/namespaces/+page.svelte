@@ -12,17 +12,19 @@
 </script>
 
 <PageTitle title="Namespaces" url={$page.url.href} />
-<h1 data-testid="namespace-selector-title" class="mb-8 text-2xl">Namespaces</h1>
+<h1 data-testid="namespace-selector-title" class="mb-8 text-2xl">
+  {translate('namespaces')}
+</h1>
 {#if $namespaces?.length > 0}
   <Pagination
     items={$namespaces}
     let:visibleItems
-    aria-label="namespaces"
+    aria-label={translate('namespaces')}
     pageSizeSelectLabel={translate('per-page')}
   >
     <Table variant="fancy" class="w-full" aria-label={translate('namespaces')}>
       <TableHeaderRow slot="headers">
-        <th>Name</th>
+        <th>{translate('name')}</th>
       </TableHeaderRow>
       {#each visibleItems as namespace}
         <TableRow>
@@ -41,7 +43,7 @@
   </Pagination>
 {:else}
   <EmptyState
-    title={'No Namespaces Found'}
-    content={'You do not have access to a Namespace. Contact your Administrator for assistance.'}
+    title={translate('namespaces', 'namespaces-empty-state-title')}
+    content={translate('namespaces', 'namespaces-empty-state-content')}
   />
 {/if}

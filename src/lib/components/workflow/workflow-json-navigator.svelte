@@ -2,6 +2,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import RangeInput from '$lib/holocene/input/range-input.svelte';
   import Loading from '$lib/holocene/loading.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { WorkflowEvents } from '$lib/types/events';
 
   export let events: WorkflowEvents = [];
@@ -50,7 +51,7 @@
           on:click={() => {
             index -= 1;
           }}
-          aria-label="previous"
+          aria-label={translate('previous')}
         >
           <span
             class="arrow arrow-left"
@@ -63,7 +64,7 @@
           on:click={() => {
             index += 1;
           }}
-          aria-label="next"
+          aria-label={translate('next')}
         >
           <span
             class="arrow arrow-right"

@@ -16,7 +16,6 @@
   class="nav-header transition-width"
   class:cloud={isCloud}
   data-testid="navigation-header"
-  aria-label="primary"
   {...$$restProps}
 >
   <div class="h-32 min-h-[84px] relative">

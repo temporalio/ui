@@ -61,6 +61,7 @@ export const Strings = {
   'continued-as-new-with-input': 'Continued as New with Input',
   results: 'Results',
   'recent-events': 'Recent Events',
+  'recent-events-view': 'Recent Events View',
   history: 'History',
   compact: 'Compact',
   json: 'JSON',
@@ -172,4 +173,9 @@ export const Strings = {
   'select-time': 'Select Time',
   'search-placeholder': 'Enter a query',
   'child-workflows': 'Child Workflows',
+  'retry-workflows': 'Retry Workflows',
+  'select-workflow': 'Select Workflow',
+  'select-all-workflows': 'Select all Workflows',
+  'workflow-name': 'Workflow Name',
+  'filter-by': 'filter by {{workflowName}} type',
 } as const;

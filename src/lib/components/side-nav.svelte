@@ -15,7 +15,7 @@
   export let linkList: Partial<Record<string, string>>;
 </script>
 
-<NavContainer {isCloud} {linkList}>
+<NavContainer {isCloud} {linkList} aria-label={translate('primary')}>
   <svelte:fragment slot="top">
     <NavRow link={linkList.workflows} {isCloud} data-testid="workflows-button">
       <NavTooltip right text={translate('workflows')}>

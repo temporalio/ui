@@ -9,6 +9,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import { translate } from '$lib/i18n/translate';
 
   export let workflow: WorkflowExecution;
   export let pinned = false;
@@ -37,7 +38,7 @@
         bind:group={$selectedWorkflows}
         value={workflow}
         disabled={$allSelected}
-        aria-label="select workflow"
+        aria-label={translate('workflows', 'select-workflow')}
       />
     </td>
   {/if}

@@ -12,6 +12,7 @@
   import IconButton from '$lib/holocene/icon-button.svelte';
   import { noop } from 'svelte/internal';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import { translate } from '$lib/i18n/translate';
 
   export let pinned = false;
   export let workflows: WorkflowExecution[];
@@ -36,7 +37,7 @@
         <Checkbox
           id="select-visible-workflows"
           data-testid="batch-actions-checkbox"
-          aria-label="select all workflows"
+          aria-label={translate('workflows', 'select-all-workflows')}
           onDark
           hoverable
           bind:checked={$pageSelected}
