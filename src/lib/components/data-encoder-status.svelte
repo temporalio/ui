@@ -24,6 +24,7 @@
         class="relative flex items-center"
         data-testid="data-encoder-status-configured"
         on:click={onIconClick}
+        aria-label={translate('codec-server')}
       >
         <div class="mx-1 flex items-center">
           <Icon name="transcoder-on" />
@@ -37,6 +38,7 @@
         class="relative flex items-center"
         data-testid="data-encoder-status-error"
         on:click={onIconClick}
+        aria-label={translate('codec-server')}
       >
         <div class="mx-1 flex items-center">
           <Icon name="transcoder-error" />
@@ -53,6 +55,7 @@
         class="relative flex items-center"
         data-testid="data-encoder-status-success"
         on:click={onIconClick}
+        aria-label={translate('codec-server')}
       >
         <div class="mx-1 flex items-center">
           <Icon name="transcoder-on" />
@@ -70,6 +73,7 @@
       class="relative flex items-center"
       data-testid="data-encoder-status"
       on:click={onIconClick}
+      aria-label={translate('codec-server')}
     >
       <div class="mx-1 flex items-center">
         <Icon name="transcoder-off" />
