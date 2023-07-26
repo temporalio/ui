@@ -131,6 +131,8 @@
       id="namespace-search"
       bind:value={searchValue}
       icon="search"
+      label={translate('search')}
+      labelHidden
       placeholder={translate('search')}
     />
   </div>

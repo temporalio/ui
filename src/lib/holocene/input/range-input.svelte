@@ -5,13 +5,15 @@
   interface $$Props extends HTMLInputAttributes {
     value: number;
     id: string;
-    label?: string;
+    label: string;
+    labelHidden?: boolean;
     min?: number;
     max?: number;
     'data-testid'?: string;
   }
 
-  export let label: string = undefined;
+  export let label: string;
+  export let labelHidden = false;
   export let min: number = undefined;
   export let max: number = undefined;
   export let id: string = undefined;
@@ -106,11 +108,9 @@
         step={$$props.step}
       />
     </div>
-    {#if label}
-      <label class="flex shrink text-sm" for={id}>
-        {label}
-      </label>
-    {/if}
+    <label class:sr-only={labelHidden} class="flex shrink text-sm" for={id}>
+      {label}
+    </label>
   </div>
 </div>
 

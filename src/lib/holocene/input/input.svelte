@@ -8,7 +8,8 @@
   interface $$Props extends HTMLInputAttributes {
     id: string;
     value: string;
-    label?: string;
+    label: string;
+    labelHidden?: boolean;
     icon?: IconName;
     suffix?: string;
     copyable?: boolean;
@@ -27,7 +28,8 @@
 
   export let id: string;
   export let value: string;
-  export let label = '';
+  export let label: string;
+  export let labelHidden = false;
   export let icon: IconName = null;
   export let placeholder = '';
   export let suffix = '';
@@ -66,9 +68,7 @@
 </script>
 
 <div class={className}>
-  {#if label}
-    <label class:required for={id}>{label}</label>
-  {/if}
+  <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
   <div
     class="input-container {theme}"
     class:disabled

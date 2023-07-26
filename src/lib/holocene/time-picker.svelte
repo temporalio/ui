@@ -12,6 +12,8 @@
 <div class="flex gap-2">
   <Input
     id="hour"
+    label="hrs"
+    labelHidden
     bind:value={hour}
     placeholder="00"
     suffix="hrs"
@@ -20,6 +22,8 @@
   />
   <Input
     id="minute"
+    label="min"
+    labelHidden
     required
     bind:value={minute}
     placeholder="00"
@@ -29,6 +33,8 @@
   />
   <Input
     id="second"
+    label="sec"
+    labelHidden
     bind:value={second}
     placeholder="00"
     suffix="sec"

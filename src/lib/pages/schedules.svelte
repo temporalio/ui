@@ -83,6 +83,8 @@
           <Input
             icon="search"
             type="search"
+            label={translate('schedules', 'name')}
+            labelHidden
             id="schedule-name-filter"
             placeholder={translate('schedules', 'name')}
             clearable

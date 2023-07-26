@@ -15,12 +15,12 @@
 </script>
 
 <div class="flex gap-2">
-  <Select id="operator-filter" bind:value={conditional}>
+  <Select label="" labelHidden id="operator-filter" bind:value={conditional}>
     {#each Object.entries(operations) as [label, value] (label)}
       <Option {value}>{label}</Option>
     {/each}
   </Select>
-  <Select id="time-range" bind:value class="w-44">
+  <Select label="" labelHidden id="time-range" bind:value class="w-44">
     {#each durations as value}
       <Option {value}>{value}</Option>
     {/each}
