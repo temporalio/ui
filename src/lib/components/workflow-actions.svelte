@@ -34,10 +34,13 @@
   import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { translate } from '$lib/i18n/translate';
+  import Button from '$lib/holocene/button.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
   export let cancelInProgress: boolean;
+  export let isRunning: boolean;
 
   let reason = '';
   let signalInput = '';
@@ -50,6 +53,7 @@
   let resetId: string;
   let resetReason: string;
   let loading = false;
+  let resetTooltipText: string;
 
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
   $: signalEnabled = workflowSignalEnabled($page.data.settings);
@@ -193,28 +197,35 @@
     tooltip?: string;
   }[];
 
-  const resetTooltipText = (): string | undefined => {
-    if (!resetEnabled) return translate('workflows', 'reset-disabled');
-    if (resetEnabled && workflow?.pendingChildren?.length > 0)
-      return translate('workflows', 'reset-disabled-pending-children');
-    if (
+  $: {
+    if (!resetEnabled) {
+      resetTooltipText = translate('workflows', 'reset-disabled');
+    } else if (resetEnabled && workflow?.pendingChildren?.length > 0) {
+      resetTooltipText = translate(
+        'workflows',
+        'reset-disabled-pending-children',
+      );
+    } else if (
       resetEnabled &&
       workflow?.pendingChildren?.length === 0 &&
       $resetEvents.length === 0
-    )
-      return translate('workflows', 'reset-disabled-no-events');
-  };
+    ) {
+      resetTooltipText = translate('workflows', 'reset-disabled-no-events');
+    }
+  }
+
+  $: resetAllowed =
+    resetEnabled &&
+    workflow?.pendingChildren?.length === 0 &&
+    $resetEvents.length > 0;
 
   $: workflowActions = [
     {
       label: translate('workflows', 'reset'),
       onClick: () => resetConfirmationModal.open(),
       testId: 'reset-button',
-      allowed:
-        resetEnabled &&
-        workflow?.pendingChildren?.length === 0 &&
-        $resetEvents.length > 0,
-      tooltip: resetTooltipText(),
+      allowed: resetAllowed,
+      tooltip: resetTooltipText,
     },
     {
       label: translate('workflows', 'signal'),
@@ -242,29 +253,42 @@
     !writeActionsAreAllowed(settings);
 </script>
 
-<SplitButton
-  id="workflow-actions"
-  position="right"
-  disabled={actionsDisabled}
-  primaryActionDisabled={!cancelEnabled || cancelInProgress}
-  on:click={() => cancelConfirmationModal.open()}
-  label={translate('workflows', 'request-cancellation')}
->
-  {#each workflowActions as { onClick, destructive, label, allowed, testId, tooltip }}
-    {#if destructive}
-      <MenuDivider />
-    {/if}
-    <MenuItem
-      on:click={onClick}
-      {destructive}
-      {testId}
-      disabled={!allowed}
-      tooltipProps={{ text: tooltip, left: true, width: 200 }}
+{#if isRunning}
+  <SplitButton
+    id="workflow-actions"
+    position="right"
+    disabled={actionsDisabled}
+    primaryActionDisabled={!cancelEnabled || cancelInProgress}
+    on:click={() => cancelConfirmationModal.open()}
+    label={translate('workflows', 'request-cancellation')}
+  >
+    {#each workflowActions as { onClick, destructive, label, allowed, testId, tooltip }}
+      {#if destructive}
+        <MenuDivider />
+      {/if}
+      <MenuItem
+        on:click={onClick}
+        {destructive}
+        {testId}
+        disabled={!allowed}
+        tooltipProps={{ text: tooltip, left: true, width: 200 }}
+      >
+        {label}
+      </MenuItem>
+    {/each}
+  </SplitButton>
+{:else}
+  <Tooltip bottomLeft text={resetTooltipText} hide={resetAllowed}>
+    <Button
+      aria-label={translate('workflows', 'reset')}
+      disabled={!resetAllowed}
+      variant="primary"
+      on:click={() => resetConfirmationModal.open()}
     >
-      {label}
-    </MenuItem>
-  {/each}
-</SplitButton>
+      {translate('workflows', 'reset')}
+    </Button>
+  </Tooltip>
+{/if}
 
 <Modal
   id="reset-confirmation-modal"
