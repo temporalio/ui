@@ -218,6 +218,8 @@
             id="search-attribute-menu"
           >
             <Input
+              label={translate('search')}
+              labelHidden
               id="filter-search"
               noBorder
               bind:value={searchAttributeValue}

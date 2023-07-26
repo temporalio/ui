@@ -5,7 +5,8 @@
   export let icon: IconName = null;
   export let id: string;
   export let value: number;
-  export let label = '';
+  export let label: string;
+  export let labelHidden = false;
   export let units = '';
   export let placeholder = '';
   export let name = id;
@@ -34,9 +35,7 @@
 </script>
 
 <div class={$$props.class}>
-  {#if label}
-    <label for={id}>{label}</label>
-  {/if}
+  <label class:sr-only={labelHidden} for={id}>{label}</label>
   <div class="flex items-center gap-2">
     <div
       class="input-container {theme}"

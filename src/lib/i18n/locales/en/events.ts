@@ -7,7 +7,7 @@ export const Strings = {
   'sort-ascending': 'Sort 1-9',
   'sort-descending': 'Sort 9-1',
   'date-and-time': 'Date & Time',
-  'show-elapsed-time': 'Show Elapsed Time',
+  'show-elapsed-time': 'Show Elapsed Time & Duration',
   'event-type': 'Event Type',
   'workflow-events': 'Workflow Events',
   'category-all': 'All',

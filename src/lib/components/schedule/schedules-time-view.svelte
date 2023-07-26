@@ -41,6 +41,8 @@
     <div class="w-24">
       <Input
         id="hour"
+        label={translate('hours-abbreviated')}
+        labelHidden
         bind:value={_hour}
         placeholder="00"
         suffix={translate('hours-abbreviated')}
@@ -52,6 +54,8 @@
     <div class="w-24">
       <Input
         id="minute"
+        label={translate('minutes-abbreviated')}
+        labelHidden
         bind:value={minute}
         placeholder="00"
         suffix={translate('minutes-abbreviated')}

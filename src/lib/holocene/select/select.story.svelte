@@ -30,6 +30,7 @@
 
   <Hst.Variant title="With Option Descriptions">
     <Select
+      label="Example"
       value={null}
       id="select-2"
       placeholder="Select an option..."
@@ -63,7 +64,13 @@
   </Hst.Variant>
 
   <Hst.Variant title="With Grouped Options">
-    <Select id="select-3" placeholder="Select an Option" {value} {disabled}>
+    <Select
+      label="Example"
+      id="select-3"
+      placeholder="Select an Option"
+      {value}
+      {disabled}
+    >
       <OptionGroup label="Mammals">
         <Option value="horse">Horse</Option>
         <Option value="dog">Dog</Option>
@@ -89,7 +96,12 @@
   </Hst.Variant>
 
   <Hst.Variant title="A Select with a lot of Options">
-    <Select placeholder="Select an option" {value} id="select-5">
+    <Select
+      label="Example"
+      placeholder="Select an option"
+      {value}
+      id="select-5"
+    >
       {#each new Array(100).fill(0).map((_, idx) => idx) as idx}
         <Option value={idx}>Option {idx}</Option>
       {/each}
