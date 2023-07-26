@@ -4,7 +4,7 @@
   import { translate } from '$lib/i18n/translate';
 </script>
 
-<Table class="table-fixed">
+<Table class="table-fixed" aria-label={translate('schedules')}>
   <TableHeaderRow slot="headers">
     <th class="w-28">{translate('status')}</th>
     <th class="md:w-80 xl:w-auto">{translate('schedules', 'name')}</th>

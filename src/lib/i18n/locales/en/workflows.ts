@@ -123,6 +123,7 @@ export const Strings = {
   'no-relationships': "This workflow doesn't have any relationships",
   'parent-id': 'Parent Workflow ID',
   'parent-run-id': 'Parent Run ID',
+  'parent-workflow': 'Parent Workflow',
   'first-execution': 'First Execution',
   'previous-execution': 'Previous Execution',
   'next-execution': 'Next Execution',
@@ -170,4 +171,5 @@ export const Strings = {
   'view-search-input': 'View Search Input',
   'select-time': 'Select Time',
   'search-placeholder': 'Enter a query',
+  'child-workflows': 'Child Workflows',
 } as const;

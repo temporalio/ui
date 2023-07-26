@@ -207,7 +207,10 @@
       </p>
     {/if}
     <div class="mt-2 bg-white">
-      <Table class="dark w-full table-fixed">
+      <Table
+        class="dark w-full table-fixed"
+        aria-label={translate('events', 'error-event')}
+      >
         <TableHeaderRow slot="headers">
           <th class="w-14 xl:w-10" />
           <th class="w-16 md:w-32">

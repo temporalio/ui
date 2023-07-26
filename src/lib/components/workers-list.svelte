@@ -20,7 +20,10 @@
     {translate('task-queue')}:
     <span class="select-all font-normal">{taskQueue}</span>
   </h2>
-  <Table class="mb-6 w-full min-w-[600px] table-fixed">
+  <Table
+    class="mb-6 w-full min-w-[600px] table-fixed"
+    aria-label={translate('workflows', 'workers-tab')}
+  >
     <TableHeaderRow slot="headers">
       <th class="w-6/12">{translate('id')}</th>
       <th class="w-2/12">{translate('workflows', 'last-accessed')}</th>

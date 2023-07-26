@@ -17,7 +17,7 @@
   export let previous: string;
 </script>
 
-<Table class="w-full">
+<Table class="w-full" aria-label={translate('workflows', 'relationships')}>
   <TableHeaderRow slot="headers">
     <th>{translate('workflows', 'first-execution')}</th>
     <th>{translate('workflows', 'previous-execution')}</th>

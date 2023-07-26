@@ -28,4 +28,6 @@ export const Strings = {
   'attribute-group-summary': 'Summary',
   'attribute-group-task-queue': 'Task Queue',
   'attribute-group-workflow': 'Workflow',
+  'event-group': 'Events related to {{eventName}}',
+  'error-event': 'Error Event',
 } as const;

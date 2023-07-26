@@ -15,7 +15,7 @@
   export let namespace: string;
 </script>
 
-<Table class="w-full">
+<Table class="w-full" aria-label={translate('workflows', 'parent-workflow')}>
   <TableHeaderRow slot="headers">
     <th>{translate('workflows', 'parent-id')}</th>
     <th>{translate('workflows', 'parent-run-id')}</th>

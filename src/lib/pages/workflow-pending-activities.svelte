@@ -24,7 +24,10 @@
 </script>
 
 {#if pendingActivities.length}
-  <Table class="mb-6 w-full min-w-[600px] table-fixed">
+  <Table
+    class="mb-6 w-full min-w-[600px] table-fixed"
+    aria-label={translate('workflows', 'pending-activities-tab')}
+  >
     <TableHeaderRow slot="headers">
       <th class="w-44">{translate('workflows', 'activity-id')}</th>
       <th>{translate('workflows', 'details')}</th>

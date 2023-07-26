@@ -13,7 +13,7 @@
   export let namespace: string;
 </script>
 
-<Table class="w-full">
+<Table class="w-full" aria-label={translate('schedules', 'schedule')}>
   <TableHeaderRow slot="headers">
     <th>{translate('schedules', 'schedule')}</th>
   </TableHeaderRow>
