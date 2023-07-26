@@ -5,11 +5,13 @@ import { finished } from 'stream/promises';
 
 import mkdirp from 'mkdirp';
 import fetch from 'node-fetch';
-import { rimraf } from 'rimraf';
+import rmrf from 'rimraf';
 import tar from 'tar-fs';
 import { chalk } from 'zx';
 
 console.log(chalk.cyan('Getting ready to download Temporal CLI…'));
+
+const { rimraf } = rmrf;
 
 if (process.env.VERCEL) {
   console.log(
