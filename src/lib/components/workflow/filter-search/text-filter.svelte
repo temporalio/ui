@@ -22,7 +22,7 @@
 </script>
 
 <Input
-  label={translate('search')}
+  label={$filter.attribute}
   labelHidden
   id="text-filter-search"
   type="search"

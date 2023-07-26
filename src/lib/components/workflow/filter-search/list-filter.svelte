@@ -22,7 +22,7 @@
 
 <div class="flex">
   <ChipInput
-    label={translate('type-or-paste-in')}
+    label={$filter.attribute}
     labelHidden
     id="list-filter-search"
     bind:chips={list}
