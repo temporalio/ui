@@ -47,8 +47,8 @@
   "collapse-all": "Collapse All",
   "expand-all": "Expand All",
   "id": "ID",
-  "yes": "yes",
-  "no": "no",
+  "yes": "Yes",
+  "no": "No",
   "refresh": "Refresh",
   "error-occurred": "An Error Occurred",
   "save": "Save",
@@ -82,5 +82,11 @@
   "archive": "Archive",
   "import": "Import",
   "feedback": "Feedback",
-  "log-out": "Log out"
+  "log-out": "Log out",
+  "details": "Details",
+  "unknown": "Unknown",
+  "key": "Key",
+  "type": "Type",
+  "disabled": "Disabled",
+  "enabled": "Enabled"
 }
