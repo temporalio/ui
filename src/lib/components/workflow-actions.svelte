@@ -225,7 +225,7 @@
       onClick: () => resetConfirmationModal.open(),
       testId: 'reset-button',
       allowed: resetAllowed,
-      tooltip: resetTooltipText,
+      tooltip: resetAllowed ? '' : resetTooltipText,
     },
     {
       label: translate('workflows', 'signal'),
