@@ -7,7 +7,13 @@
 </script>
 
 <div class="flex gap-2">
-  <Select id="workflow-status" bind:value class="w-20">
+  <Select
+    label={translate('workflow-status')}
+    labelHidden
+    id="workflow-status"
+    bind:value
+    class="w-20"
+  >
     <Option value="true">{translate('true')}</Option>
     <Option value="false">{translate('false')}</Option>
   </Select>

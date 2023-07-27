@@ -191,6 +191,8 @@
               <p class="text-sm">Start</p>
               <div class="flex flex-col gap-2">
                 <DatePicker
+                  label={translate('start')}
+                  labelHidden
                   on:datechange={onStartDateChange}
                   selected={startDate}
                   todayLabel={translate('today')}
@@ -208,6 +210,8 @@
               <p class="text-sm">End</p>
               <div class="flex flex-col gap-2">
                 <DatePicker
+                  label={translate('end')}
+                  labelHidden
                   on:datechange={onEndDateChange}
                   selected={endDate}
                   todayLabel={translate('today')}

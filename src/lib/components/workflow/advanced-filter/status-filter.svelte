@@ -12,7 +12,7 @@
 
 <div class="flex gap-2">
   <KeywordConditionals bind:conditional />
-  <Select id="workflow-status" bind:value class="w-44">
+  <Select label="" labelHidden id="workflow-status" bind:value class="w-44">
     {#each workflowStatusFilters as status (status)}
       <Option value={status}>
         {#if status === 'All'}

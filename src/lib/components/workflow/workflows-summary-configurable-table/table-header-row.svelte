@@ -12,6 +12,7 @@
   import IconButton from '$lib/holocene/icon-button.svelte';
   import { noop } from 'svelte/internal';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import { translate } from '$lib/i18n/translate';
 
   export let pinned = false;
   export let workflows: WorkflowExecution[];
@@ -27,6 +28,7 @@
   $: indeterminate =
     $selectedWorkflows.length > 0 &&
     $selectedWorkflows.length < workflows.length;
+  $: label = translate('workflows', 'select-all-workflows');
 </script>
 
 <tr class="workflows-summary-configurable-table-header-row" class:pinned>
@@ -34,9 +36,11 @@
     <th class="batch-actions-checkbox-table-cell">
       {#if !empty}
         <Checkbox
+          {label}
+          labelHidden
           id="select-visible-workflows"
           data-testid="batch-actions-checkbox"
-          aria-label="select all workflows"
+          aria-label={label}
           onDark
           hoverable
           bind:checked={$pageSelected}

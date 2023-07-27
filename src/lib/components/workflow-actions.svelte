@@ -340,6 +340,8 @@
       id="workflow-termination-reason"
       class="mt-4"
       placeholder={translate('reason-placeholder')}
+      label={translate('reason-placeholder')}
+      labelHidden
       bind:value={reason}
     />
   </div>
