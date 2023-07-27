@@ -22,7 +22,9 @@
     aria-label={translate('namespaces')}
     pageSizeSelectLabel={translate('per-page')}
   >
-    <Table variant="fancy" class="w-full" aria-label={translate('namespaces')}>
+    <Table variant="fancy" class="w-full">
+      <caption class="sr-only" slot="caption">{translate('namespaces')}</caption
+      >
       <TableHeaderRow slot="headers">
         <th>{translate('name')}</th>
       </TableHeaderRow>

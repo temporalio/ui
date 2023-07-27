@@ -14,6 +14,7 @@
 <Hst.Story>
   <Hst.Variant title="A Fancy Table">
     <Table variant="fancy" class="w-full" bind:updating>
+      <caption class="sr-only" slot="caption">fancy table example</caption>
       <TableHeaderRow slot="headers">
         <th class="w-1/5">Status</th>
         <th class="w-1/5">Email</th>
@@ -45,6 +46,7 @@
 
   <Hst.Variant title="A Simple Table">
     <Table variant="simple" class="w-full">
+      <caption class="sr-only" slot="caption">simple table example</caption>
       <tr slot="headers">
         <th>Attribute</th>
         <th>Type</th>

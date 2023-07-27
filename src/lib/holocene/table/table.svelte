@@ -16,6 +16,7 @@
 </script>
 
 <table class="{variant} {className}" {...$$restProps}>
+  <slot name="caption" />
   <thead>
     <slot name="headers" />
     {#if updating}

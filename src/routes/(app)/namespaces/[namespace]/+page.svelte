@@ -67,12 +67,12 @@
 <Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
     <h3 class="text-lg font-medium">{translate('details')}</h3>
-    <Table
-      variant="simple"
-      aria-label={`${translate('namespaces', 'namespace')} ${translate(
-        'details',
-      )}`}
-    >
+    <Table variant="simple">
+      <caption class="sr-only" slot="caption"
+        >{`${translate('namespaces', 'namespace')} ${translate(
+          'details',
+        )}`}</caption
+      >
       <tr slot="headers">
         <th class="w-1/2 lg:w-3/5" /><th />
       </tr>
@@ -138,7 +138,10 @@
 
   <article class="namespace-info flex w-full flex-col">
     <h3 class="text-lg font-medium">{translate('namespaces', 'versions')}</h3>
-    <Table variant="simple" aria-label={translate('namespaces', 'versions')}>
+    <Table variant="simple">
+      <caption class="sr-only" slot="caption"
+        >{translate('namespaces', 'versions')}</caption
+      >
       <tr slot="headers">
         <th class="w-1/2 lg:w-3/4" /><th />
       </tr>
@@ -158,10 +161,11 @@
     <h3 class="text-lg font-medium">
       {translate('namespaces', 'client-actions')}
     </h3>
-    <Table
-      variant="simple"
-      aria-label={translate('namespaces', 'client-actions')}
-    >
+    <Table variant="simple">
+      <caption class="sr-only" slot="caption"
+        >{translate('namespaces', 'client-actions')}</caption
+      >
+
       <tr slot="headers">
         <th class="w-1/2 lg:w-3/5" /><th />
       </tr>
@@ -225,10 +229,10 @@
     <h3 class="my-4 text-lg font-medium">
       {translate('events', 'attribute-group-search-attributes')}
     </h3>
-    <Table
-      class="w-full"
-      aria-label={translate('events', 'attribute-group-search-attributes')}
-    >
+    <Table class="w-full">
+      <caption class="sr-only" slot="caption"
+        >{translate('events', 'attribute-group-search-attributes')}</caption
+      >
       <TableHeaderRow slot="headers">
         <th>{translate('key')}</th>
         <th>{translate('type')}</th>
