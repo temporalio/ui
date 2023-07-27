@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import { translate } from '$lib/i18n/translate';
   import {
     type TextFilterAttributes,
     attributeToHumanReadable,
@@ -65,6 +66,8 @@
     <Input
       icon="search"
       type="search"
+      label={translate('search')}
+      labelHidden
       id={attributeToId[attribute]}
       placeholder={attributeToHumanReadable[attribute]}
       class="flex items-center px-2 transition-all hover:cursor-pointer"

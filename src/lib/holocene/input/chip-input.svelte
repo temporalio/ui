@@ -5,7 +5,8 @@
 
   export let id: string;
   export let chips: string[];
-  export let label = '';
+  export let label: string;
+  export let labelHidden: boolean = false;
   export let placeholder = '';
   export let name = id;
   export let disabled = false;
@@ -86,9 +87,7 @@
 </script>
 
 <div class={$$props.class}>
-  {#if label}
-    <label class:required for={id}>{label}</label>
-  {/if}
+  <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
   <div bind:this={inputContainer} class="input-container" class:invalid>
     {#if $values.length > 0}
       {#each $values as chip, i (`${chip}-${i}`)}

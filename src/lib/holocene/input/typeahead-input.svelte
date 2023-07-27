@@ -15,6 +15,8 @@
   export let autoFocus = false;
   export let unroundRight: boolean = false;
   export let unroundLeft: boolean = false;
+  export let label: string;
+  export let labelHidden = false;
 
   export let onChange: (value: string) => void = noop;
 
@@ -47,6 +49,8 @@
     <Input
       {id}
       {icon}
+      {label}
+      {labelHidden}
       class={$$props.class}
       bind:value
       {placeholder}

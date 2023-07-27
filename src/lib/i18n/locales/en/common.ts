@@ -55,6 +55,8 @@ export const Strings = {
   'error-occurred': 'An Error Occurred',
   save: 'Save',
   'workflow-type': 'Workflow Type',
+  'workflow-id': 'Workflow ID',
+  'workflow-status': 'Workflow Status',
   'task-queue': 'Task Queue',
   preview: 'Preview',
   status: 'Status',
@@ -85,4 +87,6 @@ export const Strings = {
   import: 'Import',
   feedback: 'Feedback',
   'log-out': 'Log out',
+  'select-all': 'Select All',
+  absolute: 'Absolute',
 } as const;

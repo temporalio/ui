@@ -11,6 +11,8 @@
 <div class="flex gap-2">
   <KeywordConditionals bind:conditional />
   <Input
+    label=""
+    labelHidden
     icon="search"
     type="search"
     id="{id}-filter"

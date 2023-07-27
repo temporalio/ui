@@ -14,7 +14,7 @@
   };
 </script>
 
-<Select id="int-operation-filter" bind:value={conditional}>
+<Select label="" labelHidden id="int-operation-filter" bind:value={conditional}>
   {#each Object.entries(operations) as [value, label] (value)}
     <Option {value}>{label}</Option>
   {/each}

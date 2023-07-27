@@ -62,6 +62,8 @@
       <Input
         id="manual-search"
         type="search"
+        label={translate('workflows', 'search-placeholder')}
+        labelHidden
         placeholder={translate('workflows', 'search-placeholder')}
         icon="search"
         class="w-full lg:w-3/4"

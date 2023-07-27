@@ -154,14 +154,14 @@
         {/if}
       </div>
     </div>
-    {#if isRunning}
-      <div
-        class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
-      >
+    <div
+      class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
+    >
+      {#if isRunning}
         <AutoRefreshWorkflow onChange={onRefreshChange} />
-        <WorkflowActions {cancelInProgress} {workflow} {namespace} />
-      </div>
-    {/if}
+      {/if}
+      <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
+    </div>
   </div>
   {#if cancelInProgress}
     <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>

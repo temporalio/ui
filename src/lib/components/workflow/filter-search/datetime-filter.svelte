@@ -154,9 +154,9 @@
     >
       {#if isTimeRange}
         <div class="flex flex-col gap-2">
-          <p class="text-sm font-semibold">Start</p>
           <div class="flex flex-col gap-2">
             <DatePicker
+              label={translate('start')}
               on:datechange={onStartDateChange}
               selected={startDate}
               todayLabel={translate('today')}
@@ -171,9 +171,9 @@
           </div>
         </div>
         <div class="flex flex-col gap-2">
-          <p class="text-sm font-semibold">End</p>
           <div class="flex flex-col gap-2">
             <DatePicker
+              label={translate('end')}
               on:datechange={onEndDateChange}
               selected={endDate}
               todayLabel={translate('today')}
@@ -194,10 +194,12 @@
         </div>
       {:else}
         <div class="flex flex-col gap-2">
-          <p class="text-sm font-semibold">Relative</p>
+          <p class="text-sm font-semibold">{translate('relative')}</p>
           <div class="flex justify-between items-center gap-2">
             <div class="flex w-40 gap-0">
               <Input
+                label={translate('relative')}
+                labelHidden
                 id="relative-datetime-input"
                 bind:value={relativeTime}
                 placeholder="00"
@@ -233,8 +235,8 @@
             >
           </div>
           <hr class="border-gray-300 mt-2" />
-          <p class="text-sm font-semibold">Absolute</p>
           <DatePicker
+            label={translate('absolute')}
             on:datechange={onStartDateChange}
             selected={startDate}
             todayLabel={translate('today')}
