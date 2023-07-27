@@ -278,7 +278,7 @@
     {/each}
   </SplitButton>
 {:else}
-  <Tooltip bottomLeft text={resetTooltipText} hide={resetAllowed}>
+  <Tooltip bottomRight width={200} text={resetTooltipText} hide={resetAllowed}>
     <Button
       aria-label={translate('workflows', 'reset')}
       disabled={!resetAllowed}
