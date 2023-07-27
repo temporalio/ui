@@ -48,6 +48,7 @@
   bind:this={modal}
   data-testid="batch-{actionText}-confirmation"
   confirmType="destructive"
+  cancelText={translate('cancel')}
   {confirmText}
   on:cancelModal={handleCancelModal}
   on:confirmModal={handleConfirmModal}

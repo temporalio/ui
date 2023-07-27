@@ -16,7 +16,7 @@
     labelHidden?: boolean;
     icon?: IconName;
     copyable?: boolean;
-    clearable?: boolean;
+    copyButtonLabel?: string;
     theme?: 'dark' | 'light';
     options: string[];
     onOptionClick: (option: string) => void;
@@ -35,6 +35,7 @@
   export let onOptionClick: (option: string) => void;
   export let disabled = false;
   export let emptyOptionText: string;
+  export let copyButtonLabel = '';
 
   let className = '';
   export { className as class };
@@ -56,6 +57,7 @@
     {placeholder}
     {theme}
     {copyable}
+    {copyButtonLabel}
     {disabled}
     on:input
     on:change

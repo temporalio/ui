@@ -2,12 +2,14 @@
   import Copyable from '$lib/components/copyable.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
+  import type { Only } from '$lib/types/global';
 
   type BaseProps = {
     text?: string;
     icon?: IconName;
     hide?: boolean;
     width?: number;
+    class?: string;
   };
 
   type BasePositionProps = {
@@ -19,12 +21,6 @@
     bottomLeft?: boolean;
     left?: boolean;
     topLeft?: boolean;
-  };
-
-  type Only<O extends {}, K extends keyof O> = {
-    [X in keyof Pick<O, K>]-?: true;
-  } & {
-    [X in keyof Omit<O, K>]: never;
   };
 
   type OnlyTop = Only<BasePositionProps, 'top'>;
@@ -57,6 +53,8 @@
 
   type $$Props = CopyableProps | NonCopyableProps;
 
+  let className = '';
+  export { className as class };
   export let text = '';
   export let icon: IconName = null;
   /** bottom center of the tooltip aligned to the top center of the wrapper */
@@ -85,7 +83,7 @@
 {#if hide}
   <slot />
 {:else}
-  <div class="wrapper relative inline-block {$$props.class}">
+  <div class="wrapper relative inline-block {className}">
     <slot />
     <div
       class="tooltip"

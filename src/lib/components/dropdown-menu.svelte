@@ -12,7 +12,8 @@
   export let right = false;
   export let keepOpen = false;
   export let disabled = false;
-  export let disabledText = 'Disabled';
+  export let disabledText: string = '';
+  export let label: string;
 
   let show: boolean = false;
   let menu: any = null;
@@ -61,6 +62,7 @@
       <IconButton
         on:click={disabled ? noop : onClick}
         data-testid="{$$props.testId}-button"
+        {label}
       >
         <div class="flex items-center gap-1 truncate" class:disabled>
           <slot name="label" />

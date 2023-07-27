@@ -2,6 +2,7 @@
   import Shortcut from '$lib/holocene/keyboard-shortcut/shortcut.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let open = false;
   export let onOpen: () => void;
@@ -15,30 +16,35 @@
     ></Button
   >
 </div>
-<Drawer {open} onClick={onClose} title="Keyboard Shortcuts">
+<Drawer
+  {open}
+  onClick={onClose}
+  title={translate('keyboard-shortcuts')}
+  closeButtonLabel={translate('close-keyboard-shortcuts')}
+>
   <div
     class="grid grid-cols-1 gap-8 text-gray-500 dark:text-gray-400 md:grid-cols-2 xl:grid-cols-4"
   >
     <div class="cell">
-      Next Page
+      {translate('next-page')}
       <div class="shortcut">
         <Shortcut arrow="right" />|<Shortcut>L</Shortcut>
       </div>
     </div>
     <div class="cell">
-      Previous Page
+      {translate('previous-page')}
       <div class="shortcut">
         <Shortcut arrow="left" />|<Shortcut>H</Shortcut>
       </div>
     </div>
     <div class="cell">
-      Next Row
+      {translate('next-row')}
       <div class="shortcut">
         <Shortcut arrow="down" />|<Shortcut>J</Shortcut>
       </div>
     </div>
     <div class="cell">
-      Previous Row
+      {translate('previous-row')}
       <div class="shortcut">
         <Shortcut arrow="up" />|<Shortcut>K</Shortcut>
       </div>

@@ -9,6 +9,7 @@
 
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import Translate from '$lib/i18n/translate.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   $: statusFilters = $workflowFilters.filter(
     (f) => f.attribute === 'ExecutionStatus',
@@ -77,6 +78,7 @@
 </script>
 
 <DropdownMenu
+  label={translate('workflow-status-filter-label')}
   value={statusFilters.length ? statusFilters.map((s) => s.value).join('') : ''}
   testId="execution-status-filter"
   keepOpen

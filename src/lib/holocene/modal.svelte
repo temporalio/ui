@@ -8,9 +8,9 @@
   import IconButton from './icon-button.svelte';
 
   interface $$Props extends HTMLAttributes<HTMLDialogElement> {
-    cancelText?: string;
+    cancelText: string;
     confirmDisabled?: boolean;
-    confirmText?: string;
+    confirmText: string;
     confirmType?: ComponentProps<Button>['variant'];
     hideConfirm?: boolean;
     hightlightNav?: boolean;
@@ -21,8 +21,8 @@
   }
 
   export let hideConfirm = false;
-  export let confirmText = 'Confirm';
-  export let cancelText = 'Cancel';
+  export let confirmText: string;
+  export let cancelText: string;
   export let confirmType: ComponentProps<Button>['variant'] = 'primary';
   export let confirmDisabled = false;
   export let large = false;
@@ -119,7 +119,7 @@
 >
   {#if !loading}
     <IconButton
-      aria-label={cancelText}
+      label={cancelText}
       icon="close"
       class="float-right m-4"
       on:click={handleCancel}

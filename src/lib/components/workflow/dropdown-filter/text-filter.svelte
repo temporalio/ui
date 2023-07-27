@@ -53,6 +53,9 @@
 </script>
 
 <DropdownMenu
+  label={translate('workflow-filter-label', {
+    attribute: attributeToHumanReadable[attribute],
+  })}
   value={idFilter ? idFilter.value : ''}
   keepOpen
   icon="filter"
@@ -73,6 +76,7 @@
       class="flex items-center px-2 transition-all hover:cursor-pointer"
       autoFocus
       clearable
+      clearButtonLabel={translate('clear-input-button-label')}
       on:input={onInput}
       on:clear={handleClearInput}
       bind:value

@@ -13,6 +13,7 @@
   export let required = false;
   export let hintText = '';
   export let validator: (value: string) => boolean = () => true;
+  export let removeChipButtonLabel: (chipValue: string) => string;
   const values = writable<string[]>(chips);
   let displayValue: string = '';
   let shouldScrollToInput = false;
@@ -93,6 +94,7 @@
       {#each $values as chip, i (`${chip}-${i}`)}
         {@const valid = validator(chip)}
         <Chip
+          removeButtonLabel={removeChipButtonLabel(chip)}
           on:remove={() => removeChip(i)}
           intent={valid ? 'default' : 'warning'}>{chip}</Chip
         >

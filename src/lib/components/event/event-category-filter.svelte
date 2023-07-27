@@ -46,7 +46,12 @@
   };
 </script>
 
-<DropdownMenu value={_value} icon="filter" testId="event-category-filter">
+<DropdownMenu
+  label={translate('event-category-filter-label')}
+  value={_value}
+  icon="filter"
+  testId="event-category-filter"
+>
   <svelte:fragment slot="label">
     {label}
   </svelte:fragment>
