@@ -130,6 +130,14 @@ Cypress.Commands.add('interceptTaskQueuesApi', () => {
   ).as('activity-task-queues-api');
 });
 
+Cypress.Commands.add('interceptTaskQueueCompatibilityApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+      `/api/v1/namespaces/*/task-queues/*/compatibility`,
+    { fixture: 'query-stack-trace.json' },
+  ).as('compatibility-api');
+});
+
 Cypress.Commands.add('interceptSchedulesApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/schedules*`,
