@@ -26,6 +26,7 @@
     pageSizeSelectLabel: string;
     emptyStateMessage: string;
     fallbackErrorMessage: string;
+    itemsKeyname?: string;
   }
 
   type PaginatedRequest<T> = (
@@ -46,7 +47,7 @@
   export let pageSizeSelectLabel: string;
   export let emptyStateMessage: string;
   export let fallbackErrorMessage: string;
-  export let itemsKeyname = 'items';
+  export let itemsKeyname: string = 'items';
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
@@ -79,7 +80,7 @@
     try {
       const response = await fetchData($store.pageSize, '');
       const { nextPageToken } = response;
-      const items = response?.[itemsKeyname] ?? [];
+      const items = response[itemsKeyname];
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
       error = err;
@@ -98,7 +99,7 @@
           $store.indexData[$store.index].nextToken,
         );
         const { nextPageToken } = response;
-        const items = response?.[itemsKeyname] ?? [];
+        const items = response[itemsKeyname];
         store.nextPageWithItems(nextPageToken, items);
       } catch (error) {
         if (isError(error) && onError) {
