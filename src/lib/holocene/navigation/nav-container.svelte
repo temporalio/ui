@@ -11,6 +11,8 @@
   function toggleNav() {
     $navOpen = !$navOpen;
   }
+
+  $: version = $page.data?.settings?.version ?? '';
 </script>
 
 <nav
@@ -69,8 +71,10 @@
       ? 'text-gray-500'
       : 'text-gray-300'}"
   >
-    <span class="sr-only">{translate('version')}</span>{$page.data?.settings
-      ?.version ?? ''}
+    {#if version}
+      <span class="sr-only">{translate('version')}</span>
+    {/if}
+    {version}
   </div>
   <slot name="drawer" />
 </nav>
