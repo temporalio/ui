@@ -95,4 +95,5 @@ export const Strings = {
   previous: 'Previous',
   next: 'Next',
   name: 'Name',
+  version: 'Version',
 } as const;

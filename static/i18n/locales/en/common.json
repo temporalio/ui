@@ -92,5 +92,6 @@
   "primary": "Primary",
   "previous": "Previous",
   "next": "Next",
-  "name": "Name"
+  "name": "Name",
+  "version": "Version"
 }

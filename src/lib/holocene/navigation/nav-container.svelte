@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { navOpen } from '$lib/stores/nav-open';
 
   export let isCloud = false;
@@ -68,7 +69,8 @@
       ? 'text-gray-500'
       : 'text-gray-300'}"
   >
-    {$page.data?.settings?.version ?? ''}
+    <span class="sr-only">{translate('version')}</span>{$page.data?.settings
+      ?.version ?? ''}
   </div>
   <slot name="drawer" />
 </nav>
