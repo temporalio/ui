@@ -57,7 +57,7 @@ export const getCurrentWorkflowBuildId = (
 export const getCurrentPollerBuildId = (
   poller: PollerInfo,
 ): string | undefined => {
-  if (poller.workerVersionCapabilities?.useVersioning) {
+  if (poller?.workerVersionCapabilities?.useVersioning) {
     return poller.workerVersionCapabilities?.buildId || undefined;
   }
   return undefined;

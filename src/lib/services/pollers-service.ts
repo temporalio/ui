@@ -1,3 +1,5 @@
+import { noop } from 'svelte/internal';
+
 import { temporal } from '@temporalio/proto';
 
 import type {
@@ -124,7 +126,7 @@ export async function getTaskQueueCompatibility(
   request = fetch,
 ): Promise<TaskQueueCompatibility> {
   const route = routeForApi('task-queue.compatibility', parameters);
-  return requestFromAPI(route, { request });
+  return requestFromAPI(route, { request, onError: noop });
 }
 
 export async function getWorkerTaskReachability(
@@ -144,17 +146,15 @@ export async function getWorkerTaskReachability(
     params.append('taskQueues', taskQueue);
   }
 
-  try {
-    return await requestFromAPI(route, {
-      request,
-      params,
-    });
-  } catch (e) {
-    console.error(e);
-    return {
-      buildIdReachability: [],
-    };
-  }
+  return await requestFromAPI(route, {
+    request,
+    params,
+    onError: () => {
+      return {
+        buildIdReachability: [],
+      };
+    },
+  });
 }
 
 function getLabelForReachability(reachability: TaskReachability[]): string {
