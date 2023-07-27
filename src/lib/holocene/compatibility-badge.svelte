@@ -1,9 +1,9 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  export let defaultVersion: boolean = false;
-  export let active: boolean = false;
-  export let buildId: string = '';
+  export let defaultVersion = false;
+  export let active = false;
+  export let buildId = '';
   export let unversionedText = 'Unversioned';
 </script>
 
