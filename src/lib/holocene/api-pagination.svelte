@@ -47,7 +47,7 @@
   export let pageSizeSelectLabel: string;
   export let emptyStateMessage: string;
   export let fallbackErrorMessage: string;
-  export let itemsKeyname: string = 'items';
+  export let itemsKeyname = 'items';
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
