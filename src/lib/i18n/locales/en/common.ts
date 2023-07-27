@@ -96,4 +96,5 @@ export const Strings = {
   next: 'Next',
   name: 'Name',
   version: 'Version',
+  main: 'Main',
 } as const;

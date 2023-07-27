@@ -93,5 +93,6 @@
   "previous": "Previous",
   "next": "Next",
   "name": "Name",
-  "version": "Version"
+  "version": "Version",
+  "main": "Main"
 }
