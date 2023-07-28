@@ -39,6 +39,8 @@
   <div class="flex gap-4 max-sm:flex-col">
     <div class="flex w-full gap-4">
       <RangeInput
+        label={translate('event')}
+        labelHidden
         id="range-input-event-history"
         min={1}
         max={events.length}

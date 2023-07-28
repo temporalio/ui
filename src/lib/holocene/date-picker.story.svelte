@@ -12,6 +12,8 @@
 
 <Hst.Story>
   <DatePicker
+    label="Pick a Date"
+    labelHidden
     on:datechange={onDateChange}
     selected={currentDate}
     todayLabel="Today"

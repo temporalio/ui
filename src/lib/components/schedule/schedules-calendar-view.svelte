@@ -115,6 +115,8 @@
         </h3>
         <p>{translate('schedules', 'cron-view-description')}</p>
         <Input
+          label={translate('schedules', 'cron-view-title')}
+          labelHidden
           id="cronString"
           bind:value={cronString}
           placeholder="* * * * *"

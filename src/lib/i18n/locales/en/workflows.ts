@@ -174,8 +174,8 @@ export const Strings = {
   'search-placeholder': 'Enter a query',
   'child-workflows': 'Child Workflows',
   'retry-workflows': 'Retry Workflows',
-  'select-workflow': 'Select Workflow',
-  'select-all-workflows': 'Select all Workflows',
   'workflow-name': 'Workflow Name',
   'filter-by': 'filter by {{workflowName}} type',
+  'select-all-workflows': 'Select all Workflows',
+  'select-workflow': 'Select Workflow {{workflow}}',
 } as const;

@@ -25,6 +25,10 @@
       }),
     );
   };
+
+  $: label = translate('workflows', 'select-workflow', {
+    workflow: workflow.id,
+  });
 </script>
 
 <tr
@@ -34,11 +38,13 @@
   {#if pinned && $supportsBulkActions}
     <td>
       <Checkbox
+        {label}
+        labelHidden
         hoverable
         bind:group={$selectedWorkflows}
         value={workflow}
         disabled={$allSelected}
-        aria-label={translate('workflows', 'select-workflow')}
+        aria-label={label}
       />
     </td>
   {/if}

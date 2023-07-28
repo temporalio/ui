@@ -22,10 +22,12 @@
 
 <div class="flex">
   <ChipInput
+    label={$filter.attribute}
+    labelHidden
     id="list-filter-search"
     bind:chips={list}
     class="w-full rounded-none"
-    placeholder={`${translate('type-or-paste-in')} ${$filter.attribute}`}
+    placeholder="{translate('type-or-paste-in')} {$filter.attribute}"
   />
   <Button
     variant="search"
