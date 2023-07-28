@@ -6,6 +6,7 @@ import {
   getCurrentCompatibilityDefaultVersion,
   getCurrentWorkflowBuildId,
   getDefaultVersionForSet,
+  getDefaultVersionForSetFromABuildId,
   getNonDefaultVersionsForSet,
   getOrderedVersionSets,
 } from './task-queue-compatibility';
@@ -242,5 +243,66 @@ describe('getCurrentWorkflowBuildId', () => {
     expect(
       getCurrentWorkflowBuildId(getWorkflow(mostRecentWorkerVersionStamp)),
     ).toBe('3.5');
+  });
+});
+
+describe('getDefaultVersionForSetFromABuildId', () => {
+  it('should return default version from a non-default build id', () => {
+    const majorVersionSets = [
+      {
+        versionSetId: '1.0',
+        buildIds: ['1.0', '1.1', '1.2'],
+      },
+      {
+        versionSetId: '2.0',
+        buildIds: ['2.0', '2.1', '2.2'],
+      },
+      {
+        versionSetId: '3.0',
+        buildIds: ['3.0', '3.1', '3.2'],
+      },
+    ];
+    expect(
+      getDefaultVersionForSetFromABuildId({ majorVersionSets }, '3.0'),
+    ).toBe('3.2');
+  });
+
+  it('should return default version from a build id', () => {
+    const majorVersionSets = [
+      {
+        versionSetId: '1.0',
+        buildIds: ['1.0', '1.1', '1.2'],
+      },
+      {
+        versionSetId: '2.0',
+        buildIds: ['2.0', '2.1', '2.2', '2.3'],
+      },
+      {
+        versionSetId: '3.0',
+        buildIds: ['3.0', '3.1', '3.2'],
+      },
+    ];
+    expect(
+      getDefaultVersionForSetFromABuildId({ majorVersionSets }, '2.3'),
+    ).toBe('2.3');
+  });
+  it('should return undefined if buildId not found', () => {
+    const majorVersionSets = [
+      {
+        versionSetId: '1.0',
+        buildIds: ['1.0', '1.1', '1.2'],
+      },
+      {
+        versionSetId: '2.0',
+        buildIds: ['2.0', '2.1', '2.2', '2.3'],
+      },
+      {
+        versionSetId: '3.0',
+        buildIds: ['3.0', '3.1', '3.2'],
+      },
+    ];
+    expect(
+      getDefaultVersionForSetFromABuildId({ majorVersionSets }, '6.7'),
+    ).toBe(undefined);
   });
 });

@@ -95,6 +95,8 @@
   );
   $: workflowHasBeenReset = has($resetWorkflows, $workflowRun?.workflow?.runId);
 
+  $: workflowUsesVersioning =
+    workflow?.mostRecentWorkerVersionStamp?.useVersioning;
   $: buildId = getCurrentWorkflowBuildId(workflow);
   $: overallDefaultVersion =
     getCurrentCompatibilityDefaultVersion(compatibility);
@@ -136,16 +138,18 @@
       </h1>
       <div class="flex gap-4 items-center">
         <WorkflowStatus status={workflow?.status} />
-        {#if overallDefaultVersion}
+        {#if workflowUsesVersioning}
           <p class="flex gap-1 items-center">
-            <span>Last used version</span><CompatibilityBadge
+            <span>{translate('workers', 'last-used-version')}</span
+            ><CompatibilityBadge
               defaultVersion={buildId === overallDefaultVersion}
               active={buildId === overallDefaultVersion}
               {buildId}
             />
           </p>
           <p class="flex gap-1 items-center">
-            <span>Next version</span><CompatibilityBadge
+            <span>{translate('workers', 'next-version')}</span
+            ><CompatibilityBadge
               defaultVersion={!!defaultVersionForSet}
               active={defaultVersionForSet === overallDefaultVersion}
               buildId={defaultVersionForSet}

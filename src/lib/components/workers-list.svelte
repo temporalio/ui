@@ -27,7 +27,7 @@
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;
-  export let compatibility: TaskQueueCompatibility;
+  export let compatibility: TaskQueueCompatibility | undefined;
 
   let namespace = $page.params.namespace;
 
@@ -42,12 +42,15 @@
     namespace: string,
     buildIds: string[],
   ) {
-    workerTaskReachability = await getWorkerTaskReachability({
-      namespace,
-      buildIds,
-      taskQueue,
-    });
+    if (compatibility) {
+      workerTaskReachability = await getWorkerTaskReachability({
+        namespace,
+        buildIds,
+        taskQueue,
+      });
+    }
   }
+
   $: fetchWorkerTaskReachability(namespace, buildIds);
 </script>
 
@@ -59,12 +62,12 @@
 
   {#if versionSets.length}
     <h2 class="text-base font-medium" data-testid="version-sets">
-      Version Sets
+      {translate('workers', 'version-sets')}}
     </h2>
     <Table class="mb-6 w-full min-w-[600px] table-fixed">
       <TableHeaderRow slot="headers">
-        <th class="w-3/12">Default</th>
-        <th class="w-9/12">Compatible Build IDs</th>
+        <th class="w-3/12">{translate('workers', 'default')}</th>
+        <th class="w-9/12">{translate('workers', 'compatible-build-ids')}</th>
       </TableHeaderRow>
       {#each versionSets as set, index (index)}
         <TableRow data-testid="version-row">
@@ -86,21 +89,23 @@
       {:else}
         <tr class="w-full">
           <td colspan="6">
-            <EmptyState title={'No Version Sets Found'} />
+            <EmptyState title={translate('workers', 'no-version-sets-found')} />
           </td>
         </tr>
       {/each}
     </Table>
   {/if}
-  <h2 class="text-base font-medium" data-testid="workers">Workers</h2>
+  <h2 class="text-base font-medium" data-testid="workers">
+    {translate('workers', 'workers')}
+  </h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <TableHeaderRow slot="headers">
       <th class={versionSets?.length ? 'w-3/12' : 'w-6/12'}
         >{translate('id')}</th
       >
       {#if versionSets?.length}
-        <th class="w-3/12">Version</th>
-        <th class="w-2/12">Retirability</th>
+        <th class="w-3/12">{translate('workers', 'version')}</th>
+        <th class="w-2/12">{translate('workers', 'retirability')}</th>
       {/if}
       <th class="w-2/12">{translate('workflows', 'last-accessed')}</th>
       <th class="w-2/12">
@@ -135,9 +140,7 @@
           </td>
           <td class="text-left" data-testid="worker-last-access-time">
             <p>
-              <span class="bg-gray-200 px-2 py-1 rounded-sm"
-                >{reachability}</span
-              >
+              <span class:reachability={!!reachability}>{reachability}</span>
             </p>
           </td>
         {/if}
@@ -186,3 +189,9 @@
     {/each}
   </Table>
 </section>
+
+<style lang="postcss">
+  .reachability {
+    @apply bg-gray-200 px-2 py-1 rounded-sm;
+  }
+</style>

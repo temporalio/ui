@@ -3,7 +3,7 @@ import type { PollerInfo, TaskQueueCompatibleVersionSet } from '$lib/types';
 import type { WorkflowExecution } from '$lib/types/workflows';
 
 export const getOrderedVersionSets = (
-  compatibility: TaskQueueCompatibility,
+  compatibility: TaskQueueCompatibility | undefined,
 ): TaskQueueCompatibleVersionSet[] => {
   const sets = compatibility?.majorVersionSets
     ? [...compatibility.majorVersionSets]
@@ -19,7 +19,7 @@ export const getDefaultVersionForSet = (
 };
 
 export const getDefaultVersionForSetFromABuildId = (
-  compatibility: TaskQueueCompatibility,
+  compatibility: TaskQueueCompatibility | undefined,
   buildId: string,
 ): string | undefined => {
   const buildIdSet = compatibility?.majorVersionSets?.find((set) =>
@@ -34,7 +34,7 @@ export const getNonDefaultVersionsForSet = (buildIds?: string[]): string[] => {
 };
 
 export const getCurrentCompatibilityDefaultVersion = (
-  compatibility: TaskQueueCompatibility,
+  compatibility: TaskQueueCompatibility | undefined,
 ): string | undefined => {
   const orderedSets = getOrderedVersionSets(compatibility);
   if (!orderedSets.length) return undefined;

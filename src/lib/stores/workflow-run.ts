@@ -12,13 +12,12 @@ export const refresh = writable(0);
 export type WorkflowRunWithWorkers = {
   workflow: WorkflowExecution | null;
   workers: GetPollersResponse;
-  compatibility: TaskQueueCompatibility;
+  compatibility?: TaskQueueCompatibility;
 };
 
 export const initialWorkflowRun: WorkflowRunWithWorkers = {
   workflow: null,
   workers: { pollers: [], taskQueueStatus: null },
-  compatibility: { majorVersionSets: [] },
 };
 
 export const workflowRun = writable<WorkflowRunWithWorkers>(initialWorkflowRun);

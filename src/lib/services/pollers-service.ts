@@ -1,7 +1,6 @@
-import { noop } from 'svelte/internal';
-
 import { temporal } from '@temporalio/proto';
 
+import { translate } from '$lib/i18n/translate';
 import type {
   BuildIdReachability,
   PollerInfo,
@@ -10,7 +9,11 @@ import type {
   TaskReachability,
 } from '$lib/types';
 import type { NamespaceScopedRequest } from '$lib/types/global';
-import { requestFromAPI } from '$lib/utilities/request-from-api';
+import { capitalize } from '$lib/utilities/format-camel-case';
+import {
+  APIErrorResponse,
+  requestFromAPI,
+} from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 const TaskReachabilityEnum = temporal.api.enums.v1.TaskReachability;
@@ -126,7 +129,10 @@ export async function getTaskQueueCompatibility(
   request = fetch,
 ): Promise<TaskQueueCompatibility> {
   const route = routeForApi('task-queue.compatibility', parameters);
-  return requestFromAPI(route, { request, onError: noop });
+  return requestFromAPI(route, {
+    request,
+    onError: (e: APIErrorResponse) => console.error(e),
+  });
 }
 
 export async function getWorkerTaskReachability(
@@ -149,7 +155,8 @@ export async function getWorkerTaskReachability(
   return await requestFromAPI(route, {
     request,
     params,
-    onError: () => {
+    onError: (e: APIErrorResponse) => {
+      console.error(e);
       return {
         buildIdReachability: [],
       };
@@ -158,16 +165,17 @@ export async function getWorkerTaskReachability(
 }
 
 function getLabelForReachability(reachability: TaskReachability[]): string {
-  if (!reachability || !reachability.length) return 'Ready to be Retired';
+  if (!reachability || !reachability.length)
+    return translate('workers', 'ready-to-be-retired');
   if (
     reachability.length === 1 &&
     reachability.includes(
       TaskReachabilityEnum.TASK_REACHABILITY_CLOSED_WORKFLOWS,
     )
   ) {
-    return 'Maybe';
+    return capitalize(translate('maybe'));
   }
-  return 'No';
+  return capitalize(translate('no'));
 }
 
 export function getBuildIdReachability(
@@ -179,7 +187,6 @@ export function getBuildIdReachability(
     (bird) => bird.buildId === buildId,
   );
   if (!buildIdReachability) return '';
-  // const taskQueueSize = buildIdReachability?.taskQueueReachability?.length;
   const currentTaskQueueReachability =
     buildIdReachability?.taskQueueReachability?.find(
       (tqr) => tqr?.taskQueue === taskQueue,

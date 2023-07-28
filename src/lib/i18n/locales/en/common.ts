@@ -51,6 +51,7 @@ export const Strings = {
   id: 'ID',
   yes: 'yes',
   no: 'no',
+  maybe: 'maybe',
   refresh: 'Refresh',
   'error-occurred': 'An Error Occurred',
   save: 'Save',

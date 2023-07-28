@@ -23,8 +23,24 @@
   } from '$lib/services/pollers-service';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchStartAndEndEvents } from '$lib/services/events-service';
+  import type { WorkflowExecution } from '$lib/types/workflows';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
+
+  const getCompatibility = async (
+    workflow: WorkflowExecution,
+    taskQueue: string,
+  ) => {
+    const workflowUsesVersioning =
+      workflow?.mostRecentWorkerVersionStamp?.useVersioning;
+    if (workflowUsesVersioning) {
+      return await getTaskQueueCompatibility({
+        queue: taskQueue,
+        namespace,
+      });
+    }
+    return;
+  };
 
   const getWorkflowAndEventHistory = async (
     namespace: string,
@@ -40,10 +56,7 @@
     });
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
-    const compatibility = await getTaskQueueCompatibility({
-      queue: taskQueue,
-      namespace,
-    });
+    const compatibility = await getCompatibility(workflow, taskQueue);
     workflow.pendingActivities = await toDecodedPendingActivities(
       workflow,
       namespace,
