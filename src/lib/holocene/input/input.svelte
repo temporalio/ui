@@ -158,7 +158,7 @@
 <style lang="postcss">
   /* Base styles */
   label {
-    @apply mb-10 font-secondary text-sm font-medium;
+    @apply font-secondary text-sm font-medium;
   }
 
   label.required {
