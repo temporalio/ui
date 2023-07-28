@@ -42,16 +42,14 @@
     namespace: string,
     buildIds: string[],
   ) {
-    if (compatibility) {
-      workerTaskReachability = await getWorkerTaskReachability({
-        namespace,
-        buildIds,
-        taskQueue,
-      });
-    }
+    workerTaskReachability = await getWorkerTaskReachability({
+      namespace,
+      buildIds,
+      taskQueue,
+    });
   }
 
-  $: fetchWorkerTaskReachability(namespace, buildIds);
+  $: if (compatibility) fetchWorkerTaskReachability(namespace, buildIds);
 </script>
 
 <section class="flex flex-col gap-4">
@@ -62,7 +60,7 @@
 
   {#if versionSets.length}
     <h2 class="text-base font-medium" data-testid="version-sets">
-      {translate('workers', 'version-sets')}}
+      {translate('workers', 'version-sets')}
     </h2>
     <Table class="mb-6 w-full min-w-[600px] table-fixed">
       <TableHeaderRow slot="headers">

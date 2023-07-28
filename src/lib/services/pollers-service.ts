@@ -11,7 +11,7 @@ import type {
 import type { NamespaceScopedRequest } from '$lib/types/global';
 import { capitalize } from '$lib/utilities/format-camel-case';
 import {
-  APIErrorResponse,
+  type APIErrorResponse,
   requestFromAPI,
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
