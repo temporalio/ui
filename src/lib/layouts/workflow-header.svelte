@@ -17,7 +17,7 @@
   } from '$lib/utilities/route-for';
 
   import Badge from '$lib/holocene/badge.svelte';
-  import Copyable from '$lib/components/copyable.svelte';
+  import Copyable from '$lib/holocene/copyable.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';

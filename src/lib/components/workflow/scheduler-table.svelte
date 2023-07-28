@@ -5,7 +5,7 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
 
-  import Copyable from '../copyable.svelte';
+  import Copyable from '../../holocene/copyable.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
 
