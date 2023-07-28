@@ -186,7 +186,7 @@
     @apply bg-white;
 
     :global(tr:not(.empty)) {
-      @apply h-12 border-b border-primary cursor-pointer last-of-type:border-0 hover:bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 hover:bg-fixed;
+      @apply h-12 border-b border-primary last-of-type:border-0 hover:bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 hover:bg-fixed;
     }
 
     :global(tr > td > .table-link) {
