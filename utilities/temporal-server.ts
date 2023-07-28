@@ -78,10 +78,10 @@ export const createTemporalServer = async ({
     flags.push('--headless');
   }
 
-  // const temporal =
-  // $`${cliPath} server start-dev --dynamic-config-value frontend.workerVersioningDataAPIs=true --dynamic-config-value frontend.workerVersioningWorkflowAPIs=true --dynamic-config-value worker.buildIdScavengerEnabled=true ${flags}`.quiet();
+  const temporal =
+    $`${cliPath} server start-dev --dynamic-config-value frontend.workerVersioningDataAPIs=true --dynamic-config-value frontend.workerVersioningWorkflowAPIs=true --dynamic-config-value worker.buildIdScavengerEnabled=true ${flags}`.quiet();
 
-  const temporal = $`${cliPath} server start-dev ${flags}`.quiet();
+  // const temporal = $`${cliPath} server start-dev ${flags}`.quiet();
 
   temporal.catch(async ({ stdout, stderr, exitCode }) => {
     if (exitCode) {
