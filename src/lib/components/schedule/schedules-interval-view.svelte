@@ -52,6 +52,8 @@
     <div class="w-24">
       <Input
         id="days"
+        label={translate('days')}
+        labelHidden
         bind:value={days}
         placeholder="00"
         suffix={translate('days')}
@@ -63,6 +65,8 @@
     <div class="w-24">
       <Input
         id="hour"
+        label={translate('hours-abbreviated')}
+        labelHidden
         bind:value={hour}
         placeholder="00"
         suffix={translate('hours-abbreviated')}
@@ -74,6 +78,8 @@
     <div class="w-24">
       <Input
         id="minute"
+        label={translate('minutes-abbreviated')}
+        labelHidden
         bind:value={minute}
         placeholder="00"
         suffix={translate('minutes-abbreviated')}
@@ -85,6 +91,8 @@
     <div class="w-24">
       <Input
         id="second"
+        label={translate('seconds-abbreviated')}
+        labelHidden
         bind:value={second}
         placeholder="00"
         suffix={translate('seconds-abbreviated')}
@@ -102,6 +110,8 @@
   <div class="flex w-40 gap-0">
     <Input
       id="phase"
+      label={translate('schedules', 'offset-heading')}
+      labelHidden
       bind:value={offset}
       placeholder="00"
       error={error(phase)}
@@ -113,7 +123,7 @@
         hasIndicator
         id="phase"
         controls="phase-menu"
-        class="rounded-r bg-offWhite border border-primary border-l-0 h-10 w-16 px-2"
+        class="rounded-r bg-offWhite border border-primary border-l-0 h-10 w-20 px-2"
       >
         {offsetUnit}
       </MenuButton>

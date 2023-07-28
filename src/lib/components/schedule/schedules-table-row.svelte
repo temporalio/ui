@@ -72,7 +72,9 @@
   </td>
   <td class="cell truncate max-xl:hidden">
     {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
-      <div>{formatDate(run, $timeFormat, translate('from-now'))}</div>
+      <div>
+        {formatDate(run, $timeFormat, { relativeLabel: translate('from-now') })}
+      </div>
     {/each}
   </td>
 </TableRow>

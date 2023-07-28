@@ -12,7 +12,8 @@
   interface $$Props extends HTMLInputAttributes {
     id: string;
     value: string;
-    label?: string;
+    label: string;
+    labelHidden?: boolean;
     icon?: IconName;
     copyable?: boolean;
     clearable?: boolean;
@@ -24,7 +25,8 @@
 
   export let id: string;
   export let value: string;
-  export let label = '';
+  export let label: string;
+  export let labelHidden = false;
   export let placeholder = '';
   export let icon: IconName = null;
   export let copyable = false;
@@ -50,6 +52,7 @@
     bind:value
     {icon}
     {label}
+    {labelHidden}
     {placeholder}
     {theme}
     {copyable}

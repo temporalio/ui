@@ -9,6 +9,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import { translate } from '$lib/i18n/translate';
 
   export let workflow: WorkflowExecution | undefined = undefined;
   export let empty: boolean = false;
@@ -24,6 +25,10 @@
       }),
     );
   };
+
+  $: label = translate('workflows', 'select-workflow', {
+    workflow: workflow.id,
+  });
 </script>
 
 <tr
@@ -34,11 +39,13 @@
   {#if !empty && $supportsBulkActions}
     <td>
       <Checkbox
+        {label}
+        labelHidden
         hoverable
         bind:group={$selectedWorkflows}
         value={workflow}
         disabled={$allSelected}
-        aria-label="select workflow"
+        aria-label={label}
       />
     </td>
   {/if}

@@ -18,6 +18,7 @@
   import Button from '$lib/holocene/button.svelte';
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
   import DataConverterPortSettings from './data-converter-port-settings.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export const viewDataEncoderSettings = writable<boolean>(false);
 </script>
@@ -31,14 +32,14 @@
 
   $: error = '';
   $: namespaceOrCluster = $page.data?.settings?.runtimeEnvironment?.isCloud
-    ? 'Namespace'
-    : 'Cluster';
+    ? translate('namespaces')
+    : translate('cluster');
 
   $: {
     if (passToken && !validateHttps(endpoint)) {
-      error = 'Endpoint must be https:// if passing access token';
+      error = translate('data-encoder', 'access-token-https-error');
     } else if (endpoint && !validateHttpOrHttps(endpoint)) {
-      error = 'Endpoint must start with http:// or https://';
+      error = translate('data-encoder', 'prefix-error');
     } else {
       error = '';
     }
@@ -81,23 +82,31 @@
   >
     <div class="w-full xl:w-1/2 flex flex-col gap-4">
       <div class="flex items-center justify-between space-x-2">
-        <h3 data-testid="data-encoder-title" class="text-xl">Codec Server</h3>
+        <h3 data-testid="data-encoder-title" class="text-xl">
+          {translate('codec-server')}
+        </h3>
       </div>
       <p class="text-sm">
-        A <a
+        {translate('data-encoder', 'codec-server-description-prefix')}<a
           rel="noreferrer"
           target="_blank"
           href="https://docs.temporal.io/dataconversion#codec-server"
-          class="text-blue-700 underline decoration-blue-700">Codec Server</a
+          class="text-blue-700 underline decoration-blue-700"
+          >{translate('codec-server')}</a
         >
-        decodes your data. A Codec Server endpoint can be set at the {namespaceOrCluster}
-        level, or locally in your browser.
+        {translate('data-encoder', 'codec-server-description-suffix', {
+          level: namespaceOrCluster,
+        })}
       </p>
       <Accordion
         data-testid="override-accordion"
         title={override
-          ? `Use my browser setting and ignore ${namespaceOrCluster}-level setting.`
-          : `Use ${namespaceOrCluster}-level setting, where available.`}
+          ? translate('data-encoder', 'browser-override-description', {
+              level: namespaceOrCluster,
+            })
+          : translate('data-encoder', 'no-browser-override-description', {
+              level: namespaceOrCluster,
+            })}
       >
         <div class="flex flex-col gap-2">
           <label
@@ -113,8 +122,9 @@
               id="use-configuration-endpoint-radio"
               data-testid="use-configuration-endpoint-input"
             />
-            Use {namespaceOrCluster}-level setting, where available. Otherwise,
-            use my browser setting.
+            {translate('data-encoder', 'no-browser-override-description', {
+              level: namespaceOrCluster,
+            })}
           </label>
           <label
             class="flex flex-row items-center gap-2 cursor-pointer"
@@ -129,8 +139,9 @@
               id="use-local-endpoint-radio"
               data-testid="use-local-endpoint-input"
             />
-            Use my browser setting and ignore {namespaceOrCluster}-level
-            setting.
+            {translate('data-encoder', 'browser-override-description', {
+              level: namespaceOrCluster,
+            })}
           </label>
         </div>
       </Accordion>
@@ -147,13 +158,13 @@
           disabled={Boolean(error) || (override && !endpoint)}
           testId="confirm-data-encoder-button"
           on:click={onConfirm}
-          type="submit">Apply</Button
+          type="submit">{translate('apply')}</Button
         >
         <Button
           thin
-          variant="link"
+          variant="ghost"
           testId="cancel-data-encoder-button"
-          on:click={onCancel}>Cancel</Button
+          on:click={onCancel}>{translate('cancel')}</Button
         >
       </div>
     </div>

@@ -166,5 +166,10 @@ export const Strings = {
   unlimited: 'Unlimited',
   'no-expiration': 'No Expiration',
   'no-retry': 'None',
+  filter: 'Filter',
+  'view-search-input': 'View Search Input',
+  'select-time': 'Select Time',
   'search-placeholder': 'Enter a query',
+  'select-all-workflows': 'Select all Workflows',
+  'select-workflow': 'Select Workflow {{workflow}}',
 } as const;
