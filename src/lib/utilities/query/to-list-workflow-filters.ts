@@ -1,10 +1,7 @@
-import { get } from 'svelte/store';
-
 import { formatDuration } from 'date-fns';
 import debounce from 'just-debounce';
 
 import type { WorkflowFilter } from '$lib/models/workflow-filters';
-import { searchAttributeOptions } from '$lib/stores/search-attributes';
 import type { FilterParameters, SearchAttributes } from '$lib/types/workflows';
 import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
 
@@ -196,22 +193,3 @@ export const updateQueryParamsFromFilter = debounce(
   },
   300,
 );
-
-export const getConditionalForAttribute = (
-  attribute: keyof SearchAttributes,
-): string => {
-  const filter = get(searchAttributeOptions).find((t) => t.value === attribute);
-  const type = filter?.type;
-  if (type === 'Datetime') return 'In Last';
-  return '=';
-};
-
-export const getDefaultValueForAttribute = (
-  attribute: keyof SearchAttributes,
-) => {
-  const filter = get(searchAttributeOptions).find((t) => t.value === attribute);
-  const type = filter?.type;
-  if (type === 'Datetime') return '24 hours';
-  if (type === 'Bool') return 'true';
-  return '';
-};
