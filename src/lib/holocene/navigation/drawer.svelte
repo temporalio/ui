@@ -2,6 +2,7 @@
   export let flyin: boolean;
   export let flyout: boolean;
   export let onClose: () => void;
+  export let closeButtonLabel: string;
 
   import { clickOutside } from '$lib/holocene/outside-click';
   import IconButton from '../icon-button.svelte';
@@ -29,7 +30,12 @@
 >
   <div class="relative">
     <div class="absolute right-0 top-0">
-      <IconButton aria-expanded={flyin} on:click={onClose} icon="close" />
+      <IconButton
+        label={closeButtonLabel}
+        aria-expanded={flyin}
+        on:click={onClose}
+        icon="close"
+      />
     </div>
   </div>
   <slot />
@@ -46,8 +52,7 @@
     @keyframes flyin {
       0% {
         right: 0;
-        box-shadow:
-          0 10px 15px -3px rgb(0 0 0 / 10%),
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%),
           0 4px 6px -4px rgb(0 0 0 / 10%);
       }
 
@@ -65,8 +70,7 @@
 
       100% {
         right: 0;
-        box-shadow:
-          0 10px 15px -3px rgb(0 0 0 / 10%),
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%),
           0 4px 6px -4px rgb(0 0 0 / 10%);
       }
     }

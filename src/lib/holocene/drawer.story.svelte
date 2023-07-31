@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
-  
+
   import Button from './button.svelte';
   import Drawer from './drawer.svelte';
 
@@ -20,7 +20,13 @@
 <Hst.Story title="drawer">
   <Button on:click={handleButtonClick}>Open Drawer</Button>
   <Hst.Variant title="From Bottom">
-    <Drawer onClick={handleDrawerClick} {open} title="Drawer title" dark>
+    <Drawer
+      onClick={handleDrawerClick}
+      {open}
+      title="Drawer title"
+      closeButtonLabel="Close drawer"
+      dark
+    >
       <h3 slot="subtitle">Drawer subtitle</h3>
       <p>Some Drawer Content</p>
     </Drawer>
@@ -31,6 +37,7 @@
       {open}
       dark={false}
       title="Drawer Title"
+      closeButtonLabel="Close drawer"
       position="right"
     >
       <svelte:fragment slot="subtitle">Drawer Subtitle</svelte:fragment>

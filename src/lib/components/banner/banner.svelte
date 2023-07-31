@@ -33,7 +33,7 @@
       data-testid="close-banner"
       class="text-black-600 absolute top-0 right-0 h-10 w-10 mr-5"
       icon="close"
-      aria-label={translate('close')}
+      label={translate('close')}
     />
   </section>
 {/if}

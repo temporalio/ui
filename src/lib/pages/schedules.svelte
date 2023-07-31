@@ -88,6 +88,7 @@
             id="schedule-name-filter"
             placeholder={translate('schedules', 'name')}
             clearable
+            clearButtonLabel={translate('clear-input-button-label')}
             bind:value={search}
             on:submit={noop}
           />

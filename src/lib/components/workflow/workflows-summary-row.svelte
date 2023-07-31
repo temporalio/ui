@@ -62,6 +62,9 @@
   >
     <span class="table-link">{workflow.id}</span>
     <FilterOrCopyButtons
+      copyIconTitle={translate('copy-icon-title')}
+      copySuccessIconTitle={translate('copy-success-icon-title')}
+      filterIconTitle={translate('filter-workflows')}
       show={showFilterCopy}
       content={workflow.id}
       filterable={false}
@@ -88,6 +91,9 @@
       {workflow.name}
     </button>
     <FilterOrCopyButtons
+      copyIconTitle={translate('copy-icon-title')}
+      copySuccessIconTitle={translate('copy-success-icon-title')}
+      filterIconTitle={translate('filter-workflows')}
       show={showFilterCopy}
       content={workflow.name}
       onFilter={() => onTypeClick(workflow.name)}

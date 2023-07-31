@@ -161,6 +161,7 @@
               selected={startDate}
               todayLabel={translate('today')}
               closeLabel={translate('close')}
+              clearLabel={translate('clear-input-button-label')}
             />
             <TimePicker
               bind:hour={startHour}
@@ -178,6 +179,7 @@
               selected={endDate}
               todayLabel={translate('today')}
               closeLabel={translate('close')}
+              clearLabel={translate('clear-input-button-label')}
             />
             <TimePicker
               bind:hour={endHour}
@@ -241,6 +243,7 @@
             selected={startDate}
             todayLabel={translate('today')}
             closeLabel={translate('close')}
+            clearLabel={translate('clear-input-button-label')}
           />
           <TimePicker
             bind:hour={startHour}

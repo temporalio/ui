@@ -8,6 +8,7 @@
     type TimeFormatOptions,
   } from '$lib/stores/time-format';
   import type { TimeFormat } from '$lib/types/global';
+  import { translate } from '$lib/i18n/translate';
 
   let dateOptions: TimeFormatOptions = [
     { label: 'UTC Time', option: 'UTC' },
@@ -22,7 +23,12 @@
   $: value = $timeFormat === 'UTC' ? undefined : `${$timeFormat}`;
 </script>
 
-<DropdownMenu {value} right testId="date-time-format-filter">
+<DropdownMenu
+  label={translate('date-time-menu-label')}
+  {value}
+  right
+  testId="date-time-format-filter"
+>
   <div class="w-56">
     {#each dateOptions as { label, option } (option)}
       <div class="option" class:active={$timeFormat === option}>
