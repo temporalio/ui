@@ -58,7 +58,7 @@
     <span class="select-all font-normal">{taskQueue}</span>
   </h2>
 
-  {#if versionSets.length}
+  {#if versionSets?.length}
     <h2 class="text-base font-medium" data-testid="version-sets">
       {translate('workers', 'version-sets')}
     </h2>
@@ -74,12 +74,23 @@
               defaultVersion
               active={index === 0}
               buildId={getDefaultVersionForSet(set.buildIds)}
-            />
+            >
+              <svelte:fragment slot="overall-default-worker">
+                {#if index === 0}{translate('workers', 'overall')}{/if}
+              </svelte:fragment>
+              <svelte:fragment slot="default-worker">
+                {translate('workers', 'default')}
+              </svelte:fragment>
+            </CompatibilityBadge>
           </td>
           <td class="text-left" data-testid="version-compatible-builds">
             <div class="flex gap-2 noto flex-wrap">
               {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
-                <CompatibilityBadge active={false} {buildId} />
+                <CompatibilityBadge active={false} {buildId}>
+                  <svelte:fragment slot="default-worker">
+                    {translate('workers', 'default')}
+                  </svelte:fragment>
+                </CompatibilityBadge>
               {/each}
             </div>
           </td>
@@ -133,7 +144,17 @@
                 defaultVersion={buildId === defaultVersion}
                 active={buildId === defaultVersion}
                 {buildId}
-              />
+              >
+                <svelte:fragment slot="overall-default-worker">
+                  {#if buildId === defaultVersion}{translate(
+                      'workers',
+                      'overall',
+                    )}{/if}
+                </svelte:fragment>
+                <svelte:fragment slot="default-worker">
+                  {translate('workers', 'default')}
+                </svelte:fragment>
+              </CompatibilityBadge>
             </p>
           </td>
           <td class="text-left" data-testid="worker-last-access-time">

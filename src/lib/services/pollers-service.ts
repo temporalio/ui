@@ -9,7 +9,6 @@ import type {
   TaskReachability,
 } from '$lib/types';
 import type { NamespaceScopedRequest } from '$lib/types/global';
-import { capitalize } from '$lib/utilities/format-camel-case';
 import {
   type APIErrorResponse,
   requestFromAPI,
@@ -173,9 +172,9 @@ function getLabelForReachability(reachability: TaskReachability[]): string {
       TaskReachabilityEnum.TASK_REACHABILITY_CLOSED_WORKFLOWS,
     )
   ) {
-    return capitalize(translate('maybe'));
+    return translate('maybe');
   }
-  return capitalize(translate('no'));
+  return translate('no');
 }
 
 export function getBuildIdReachability(

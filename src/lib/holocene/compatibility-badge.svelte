@@ -1,6 +1,5 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { translate } from '$lib/i18n/translate';
 
   export let defaultVersion = false;
   export let active = false;
@@ -11,9 +10,9 @@
   {#if defaultVersion && buildId}
     <span class:active-version={active} class:version={!active}>
       <Icon name="merge" />{buildId}
-      {#if active}{translate('workers', 'overall')}{/if}
-      {translate('workers', 'default')}</span
-    >
+      <slot name="overall-default-worker" />
+      <slot name="default-worker" />
+    </span>
   {:else if buildId}
     <span class="version">
       <Icon name="merge" />{buildId}

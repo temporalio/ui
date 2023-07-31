@@ -104,6 +104,12 @@
     compatibility,
     buildId,
   );
+
+  $: {
+    console.log('BuildId: ', buildId);
+    console.log('defaultVersionForSet: ', defaultVersionForSet);
+    console.log('overallDefaultVersion: ', overallDefaultVersion);
+  }
 </script>
 
 <header class="mb-4 flex flex-col gap-1">
@@ -136,16 +142,27 @@
           class="overflow-hidden text-ellipsis"
         />
       </h1>
-      <div class="flex gap-4 items-center">
+      <div class="flex gap-4 items-center flex-wrap">
         <WorkflowStatus status={workflow?.status} />
         {#if workflowUsesVersioning}
           <p class="flex gap-1 items-center">
             <span>{translate('workers', 'last-used-version')}</span
             ><CompatibilityBadge
-              defaultVersion={buildId === overallDefaultVersion}
+              defaultVersion={buildId === defaultVersionForSet ||
+                buildId === overallDefaultVersion}
               active={buildId === overallDefaultVersion}
               {buildId}
-            />
+            >
+              <svelte:fragment slot="overall-default-worker">
+                {#if buildId === overallDefaultVersion}{translate(
+                    'workers',
+                    'overall',
+                  )}{/if}
+              </svelte:fragment>
+              <svelte:fragment slot="default-worker">
+                {translate('workers', 'default')}
+              </svelte:fragment>
+            </CompatibilityBadge>
           </p>
           <p class="flex gap-1 items-center">
             <span>{translate('workers', 'next-version')}</span
@@ -153,7 +170,17 @@
               defaultVersion={!!defaultVersionForSet}
               active={defaultVersionForSet === overallDefaultVersion}
               buildId={defaultVersionForSet}
-            />
+            >
+              <svelte:fragment slot="overall-default-worker">
+                {#if defaultVersionForSet === overallDefaultVersion}{translate(
+                    'workers',
+                    'overall',
+                  )}{/if}
+              </svelte:fragment>
+              <svelte:fragment slot="default-worker">
+                {translate('workers', 'default')}
+              </svelte:fragment>
+            </CompatibilityBadge>
           </p>
         {/if}
       </div>
