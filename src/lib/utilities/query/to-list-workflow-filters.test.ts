@@ -143,7 +143,7 @@ describe('toListWorkflowParameters', () => {
         conditional: '>',
         operator: '',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-18T17:45:18-06:00',
       },
     ];
     expect(result).toEqual(expectedFilters);
@@ -160,7 +160,7 @@ describe('toListWorkflowParameters', () => {
         conditional: '>',
         operator: '',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-18T17:45:18-06:00',
       },
     ];
     expect(result).toEqual(expectedFilters);
@@ -183,7 +183,7 @@ describe('toListWorkflowParameters', () => {
         conditional: '>',
         operator: '',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-18T17:45:18-06:00',
       },
     ];
     expect(result).toEqual(expectedFilters);
@@ -207,7 +207,7 @@ describe('toListWorkflowParameters', () => {
         conditional: '>',
         operator: 'AND',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-18T17:45:18-06:00',
       },
       {
         attribute: 'ExecutionStatus',
@@ -259,7 +259,7 @@ describe('toListWorkflowParameters', () => {
         conditional: '>',
         operator: '',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-18T17:45:18-06:00',
       },
     ];
     expect(result).toEqual(expectedFilters);
@@ -329,7 +329,7 @@ describe('combineDropdownFilters', () => {
         conditional: '>',
         operator: '',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-20T17:45:18-06:00',
       },
     ];
 
@@ -347,7 +347,7 @@ describe('combineDropdownFilters', () => {
         conditional: '>',
         operator: '',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-20T17:45:18-06:00',
       },
     ]);
   });
