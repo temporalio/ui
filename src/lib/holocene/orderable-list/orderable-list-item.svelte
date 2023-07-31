@@ -22,11 +22,11 @@
   };
 
   type ReadonlyProps = BaseProps & {
-    readonly: true;
+    readonly: boolean;
   };
 
   type StaticProps = BaseProps & {
-    static: true;
+    static: boolean;
   } & Pick<I18nProps, 'addButtonLabel'>;
 
   type I18nProps = {
