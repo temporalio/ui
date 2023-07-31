@@ -5,7 +5,7 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
 
-  import Copyable from '../copyable.svelte';
+  import Copyable from '../../holocene/copyable.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
 
@@ -34,7 +34,12 @@
             run: first,
           })}
         >
-          <Copyable content={first} visible />
+          <Copyable
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
+            content={first}
+            visible
+          />
         </Link>
       {/if}
     </td>
@@ -48,7 +53,12 @@
             run: previous,
           })}
         >
-          <Copyable content={previous} visible />
+          <Copyable
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
+            content={previous}
+            visible
+          />
         </Link>
       {/if}
     </td>
@@ -62,7 +72,12 @@
             run: next,
           })}
         >
-          <Copyable content={next} visible />
+          <Copyable
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
+            content={next}
+            visible
+          />
         </Link>
       {/if}
     </td>

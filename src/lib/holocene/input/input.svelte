@@ -5,15 +5,14 @@
   import IconButton from '../icon-button.svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
   import type { IconName } from '$lib/holocene/icon/paths';
-  interface $$Props extends HTMLInputAttributes {
+
+  type BaseProps = HTMLInputAttributes & {
     id: string;
     value: string;
     label: string;
     labelHidden?: boolean;
     icon?: IconName;
     suffix?: string;
-    copyable?: boolean;
-    clearable?: boolean;
     theme?: 'dark' | 'light';
     valid?: boolean;
     hintText?: string;
@@ -24,7 +23,19 @@
     noBorder?: boolean;
     autoFocus?: boolean;
     error?: boolean;
-  }
+  };
+
+  type CopyableProps = BaseProps & {
+    copyable: boolean;
+    copyButtonLabel: string;
+  };
+
+  type ClearableProps = BaseProps & {
+    clearable: boolean;
+    clearButtonLabel: string;
+  };
+
+  type $$Props = BaseProps | CopyableProps | ClearableProps;
 
   export let id: string;
   export let value: string;
@@ -34,7 +45,7 @@
   export let placeholder = '';
   export let suffix = '';
   export let name = id;
-  export let copyable: boolean = false;
+  export let copyable = false;
   export let disabled = false;
   export let clearable = false;
   export let theme: 'dark' | 'light' = 'light';
@@ -49,6 +60,8 @@
   export let autoFocus = false;
   export let error = false;
   export let required = false;
+  export let copyButtonLabel = '';
+  export let clearButtonLabel = '';
 
   let className = '';
   export { className as class };
@@ -113,6 +126,7 @@
     {#if copyable}
       <div class="copy-icon-container">
         <IconButton
+          label={copyButtonLabel}
           on:click={(e) => copy(e, value)}
           icon={$copied ? 'checkmark' : 'copy'}
         />
@@ -123,7 +137,7 @@
       </div>
     {:else if clearable && value}
       <div class="clear-icon-container" data-testid="clear-input">
-        <IconButton on:click={onClear} icon="close" />
+        <IconButton label={clearButtonLabel} on:click={onClear} icon="close" />
       </div>
     {/if}
     {#if maxLength && !suffix && !disabled}
@@ -144,7 +158,7 @@
 <style lang="postcss">
   /* Base styles */
   label {
-    @apply mb-10 font-secondary text-sm font-medium;
+    @apply font-secondary text-sm font-medium;
   }
 
   label.required {

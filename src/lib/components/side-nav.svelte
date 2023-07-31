@@ -18,7 +18,7 @@
 <NavContainer {isCloud} {linkList}>
   <svelte:fragment slot="top">
     <NavRow link={linkList.workflows} {isCloud} data-testid="workflows-button">
-      <NavTooltip right text={translate('workflows')}>
+      <NavTooltip text={translate('workflows')}>
         <div class="nav-icon">
           <Icon name="workflow" />
         </div>
@@ -34,7 +34,7 @@
           {isCloud}
           data-testid="schedules-button"
         >
-          <NavTooltip right text={translate('schedules')}>
+          <NavTooltip text={translate('schedules')}>
             <div class="nav-icon">
               <Icon name="schedules" />
             </div>
@@ -46,7 +46,7 @@
     <slot name="top" />
     <IsCloudGuard {isCloud}>
       <NavRow link={linkList.archive} {isCloud} data-testid="archive-button">
-        <NavTooltip right text={translate('archive')}>
+        <NavTooltip text={translate('archive')}>
           <div class="nav-icon">
             <Icon name="archives" />
           </div>
@@ -62,7 +62,7 @@
         {isCloud}
         data-testid="namespaces-button"
       >
-        <NavTooltip right text={translate('namespaces')}>
+        <NavTooltip text={translate('namespaces')}>
           <div class="nav-icon">
             <Icon name="namespace" />
           </div>
@@ -77,7 +77,7 @@
     <slot name="import">
       <IsCloudGuard {isCloud}>
         <NavRow link={linkList.import} {isCloud} data-testid="import-button">
-          <NavTooltip right text={translate('import')}>
+          <NavTooltip text={translate('import')}>
             <div class="nav-icon">
               <Icon name="import" />
             </div>
@@ -88,7 +88,7 @@
     </slot>
     <slot name="feedback">
       <NavRow link={linkList.feedback} {isCloud} externalLink>
-        <NavTooltip right text={translate('feedback')}>
+        <NavTooltip text={translate('feedback')}>
           <div class="nav-icon">
             <Icon name="feedback" />
           </div>

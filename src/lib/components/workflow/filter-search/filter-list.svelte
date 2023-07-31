@@ -79,6 +79,9 @@
     {#if attribute}
       <div in:fade>
         <Chip
+          removeButtonLabel={translate('workflows', 'remove-filter-label', {
+            attribute,
+          })}
           on:remove={() => removeQuery(i)}
           on:click={() => {
             $activeQueryIndex = i;

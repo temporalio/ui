@@ -11,6 +11,7 @@
   } from '$lib/stores/workflow-table-columns';
   import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
   import OrderableListItem from '$lib/holocene/orderable-list/orderable-list-item.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let namespace: string;
 
@@ -35,6 +36,24 @@
           moveColumn(event.detail.from, event.detail.to, namespace)}
         on:pinItem={() => pinColumn(label, namespace)}
         on:removeItem={() => removeColumn(label, namespace)}
+        addButtonLabel={translate('workflows', 'add-column-label', {
+          column: label,
+        })}
+        removeButtonLabel={translate('workflows', 'remove-column-label', {
+          column: label,
+        })}
+        moveUpButtonLabel={translate('workflows', 'move-column-up-label', {
+          column: label,
+        })}
+        moveDownButtonLabel={translate('workflows', 'move-column-down-label', {
+          column: label,
+        })}
+        pinButtonLabel={translate('workflows', 'pin-column-label', {
+          column: label,
+        })}
+        unpinButtonLabel={translate('workflows', 'unpin-column-label', {
+          column: label,
+        })}
       />
     {:else}
       <OrderableListItem readonly label="No headings in view" />
@@ -48,6 +67,9 @@
       <OrderableListItem
         static
         on:addItem={() => addColumn(label, namespace)}
+        addButtonLabel={translate('workflows', 'add-column-label', {
+          column: label,
+        })}
         {label}
       />
     {:else}
@@ -62,6 +84,9 @@
       <OrderableListItem
         static
         on:addItem={() => addColumn(label, namespace)}
+        addButtonLabel={translate('workflows', 'add-column-label', {
+          column: label,
+        })}
         {label}
       />
     {:else}

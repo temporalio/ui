@@ -16,8 +16,9 @@
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Copyable from '../copyable.svelte';
+  import Copyable from '../../holocene/copyable.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
+  import { translate } from '$lib/i18n/translate';
 
   export let key: string;
   export let value: string | Record<string, unknown>;
@@ -43,7 +44,12 @@
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
       <div class="truncate text-sm">
-        <Copyable content={value} container-class=" xl:flex-row">
+        <Copyable
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+          content={value}
+          container-class=" xl:flex-row"
+        >
           <Link
             class="truncate"
             newTab
@@ -62,7 +68,12 @@
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="truncate text-sm">{format(key)}</p>
       <div class="truncate text-sm">
-        <Copyable content={value} container-class="xl:flex-row">
+        <Copyable
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+          content={value}
+          container-class="xl:flex-row"
+        >
           <Link
             class="truncate"
             newTab
@@ -81,7 +92,12 @@
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
       <div class="truncate text-sm">
-        <Copyable content={value} container-class="">
+        <Copyable
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+          content={value}
+          container-class=""
+        >
           <Link
             class="truncate"
             newTab

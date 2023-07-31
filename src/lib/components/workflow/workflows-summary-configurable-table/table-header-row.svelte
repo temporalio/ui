@@ -62,6 +62,7 @@
       <IconButton
         data-testid="workflows-summary-table-configuration-button"
         icon="vertical-ellipsis"
+        label={translate('workflows', 'open-configure-workflows')}
         on:click={onClickConfigure}
       />
     </th>

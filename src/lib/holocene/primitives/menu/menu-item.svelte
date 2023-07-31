@@ -15,7 +15,7 @@
   export let disabled = false;
   export let href = '';
   export let testId: string = null;
-  export let tooltipProps: ComponentProps<Tooltip> = {};
+  export let tooltipProps: { text?: string; width?: number } = {};
 
   const { keepOpen, closeMenu } = getContext<MenuContext>(MENU_CONTEXT);
 
@@ -37,7 +37,7 @@
 </script>
 
 <div class="menu-item-wrapper" class:disabled>
-  <Tooltip class="w-full" hide={!text} {text} {...restTooltipProps}>
+  <Tooltip left class="w-full" hide={!text} {text} {...restTooltipProps}>
     {#if href}
       <a
         {href}

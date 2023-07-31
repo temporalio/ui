@@ -271,7 +271,7 @@
         {destructive}
         {testId}
         disabled={!allowed}
-        tooltipProps={{ text: tooltip, left: true, width: 200 }}
+        tooltipProps={{ text: tooltip, width: 200 }}
       >
         {label}
       </MenuItem>
@@ -293,6 +293,8 @@
 <Modal
   id="reset-confirmation-modal"
   data-testid="reset-confirmation-modal"
+  confirmText={translate('confirm')}
+  cancelText={translate('cancel')}
   bind:this={resetConfirmationModal}
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
@@ -310,6 +312,8 @@
 <Modal
   id="cancel-confirmation-modal"
   data-testid="cancel-confirmation-modal"
+  confirmText={translate('confirm')}
+  cancelText={translate('cancel')}
   bind:this={cancelConfirmationModal}
   {loading}
   confirmType="destructive"
@@ -327,6 +331,7 @@
   data-testid="terminate-confirmation-modal"
   bind:this={terminateConfirmationModal}
   confirmText={translate('workflows', 'terminate')}
+  cancelText={translate('cancel')}
   confirmType="destructive"
   on:cancelModal={hideTerminationModal}
   on:confirmModal={terminate}
@@ -351,6 +356,7 @@
   data-testid="signal-confirmation-modal"
   bind:this={signalConfirmationModal}
   confirmText={translate('submit')}
+  cancelText={translate('cancel')}
   confirmDisabled={!signalName}
   on:cancelModal={hideSignalModal}
   on:confirmModal={signal}

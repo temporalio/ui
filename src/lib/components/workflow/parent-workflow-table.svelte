@@ -6,7 +6,7 @@
   import Table from '$lib/holocene/table/table.svelte';
 
   import type { WorkflowIdentifier } from '$lib/types/workflows';
-  import Copyable from '../copyable.svelte';
+  import Copyable from '../../holocene/copyable.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
 
@@ -30,7 +30,12 @@
           run: parent.runId,
         })}
       >
-        <Copyable content={parent.workflowId} visible />
+        <Copyable
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+          content={parent.workflowId}
+          visible
+        />
       </Link>
     </td>
     <td>
@@ -42,7 +47,12 @@
           run: parent.runId,
         })}
       >
-        <Copyable content={parent.runId} visible />
+        <Copyable
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+          content={parent.runId}
+          visible
+        />
       </Link>
     </td>
   </TableRow>

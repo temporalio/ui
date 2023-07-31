@@ -35,6 +35,8 @@ export const Strings = {
   'batch-terminate-success': 'Successfully $t(terminated) {{count}} workflows.',
   'batch-cancel-success': 'Successfully $t(canceled) {{count}} workflows.',
   'configure-workflows': 'Configure Workflow List',
+  'open-configure-workflows': 'Open workflow list configuration',
+  'close-configure-workflows': 'Close workflow list configuration',
   'configure-workflows-description':
     'Add (<1></1>), re-arrange (<2></2>), and remove (<3></3>), Workflow Headings to personalize the Workflow List Table.',
   'all-statuses': 'All Statuses',
@@ -172,4 +174,12 @@ export const Strings = {
   'search-placeholder': 'Enter a query',
   'select-all-workflows': 'Select all Workflows',
   'select-workflow': 'Select Workflow {{workflow}}',
+  'remove-filter-label': 'Remove {{attribute}} filter',
+  'remove-keyword-label': 'Remove {{keyword}} keyword',
+  'move-column-up-label': 'Move {{column}} column up',
+  'move-column-down-label': 'Move {{column}} column down',
+  'add-column-label': 'Add {{column}} column',
+  'remove-column-label': 'Remove {{column}} column',
+  'pin-column-label': 'Pin {{column}} column',
+  'unpin-column-label': 'Unpin {{column}} column',
 } as const;

@@ -72,6 +72,10 @@
   "no-results": "No results",
   "type-or-paste-in": "Type or paste in",
   "per-page": "Per Page",
+  "next-page": "Next Page",
+  "previous-page": "Previous Page",
+  "next-row": "Next Row",
+  "previous-row": "Previous Row",
   "today": "Today",
   "close": "Close",
   "deprecated": "Deprecated",
@@ -85,5 +89,16 @@
   "feedback": "Feedback",
   "log-out": "Log out",
   "select-all": "Select All",
-  "absolute": "Absolute"
+  "absolute": "Absolute",
+  "copy-icon-title": "Click to copy content",
+  "copy-success-icon-title": "Content copied to clipboard",
+  "filter-workflows": "Filter workflows",
+  "event-category-filter-label": "Open event category filter menu",
+  "event-date-filter-label": "Open event date filter menu",
+  "date-time-menu-label": "Open time format menu",
+  "workflow-filter-label": "Open {{attribute}} filter menu",
+  "workflow-status-filter-label": "Open execution status filter menu",
+  "clear-input-button-label": "Clear input",
+  "keyboard-shortcuts": "Keyboard Shortcuts",
+  "close-keyboard-shortcuts": "Close keyboard shortcuts"
 }
