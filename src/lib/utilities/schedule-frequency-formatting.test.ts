@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import type { ScheduleRange } from '$lib/types/schedule';
 
-import { structuredCalendarToFrequency } from './schedule-frequency-formatting';
+import {
+  commentOrCalendarToFrequency,
+  structuredCalendarToFrequency,
+} from './schedule-frequency-formatting';
 
 const generateCalendar = ({
   minute = 0,
@@ -10,12 +13,14 @@ const generateCalendar = ({
   month = [],
   dayOfWeek = [],
   dayOfMonth = [],
+  comment,
 }: {
   minute?: number;
   hour?: number;
   month?: ScheduleRange[];
   dayOfWeek?: ScheduleRange[];
   dayOfMonth?: ScheduleRange[];
+  comment?: string;
 }) => {
   return {
     second: [{ start: 0, end: 0, step: 1 }],
@@ -27,6 +32,7 @@ const generateCalendar = ({
       ? dayOfMonth
       : [{ start: 1, end: 31, step: 1 }],
     dayOfWeek: dayOfWeek.length ? dayOfWeek : [{ start: 0, end: 6, step: 1 }],
+    comment: comment ?? '',
   };
 };
 
@@ -129,5 +135,27 @@ describe('structuredCalendarToFrequency', () => {
     const calendar = generateCalendar({ dayOfMonth, month });
     const expected = 'Every 1, 15, 30 of January - April at 12:00am UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
+  });
+});
+
+describe('commentOrCalendarToFrequency', () => {
+  it('should convert a calendar to a frequency', () => {
+    const calendar = generateCalendar({});
+    const expected = 'Daily at 12:00am UTC';
+    expect(structuredCalendarToFrequency(calendar)).toBe(expected);
+  });
+  it('should convert a comment to a frequency with a default of UTC if a timezone is not provided', () => {
+    const calendar = generateCalendar({ comment: '*/1 * * * *' });
+    const expected = '*/1 * * * * UTC';
+    expect(commentOrCalendarToFrequency(calendar)).toBe(expected);
+  });
+  it('should convert a comment to a frequency with the correct timezone if one is provided', () => {
+    const calendar = generateCalendar({
+      comment: 'CRON_TZ=Asia/Shanghai */1 * * * *',
+    });
+    const expected = 'CRON_TZ=Asia/Shanghai */1 * * * * Asia/Shanghai';
+    expect(commentOrCalendarToFrequency(calendar, 'Asia/Shanghai')).toBe(
+      expected,
+    );
   });
 });
