@@ -21,6 +21,8 @@
 
   export let items: Item[];
   export let updating: boolean = false;
+  export let perPageLabel: string;
+  export let pageButtonLabel: string;
 
   $: url = $page.url;
   $: perPage = url.searchParams.get(perPageKey) ?? String(defaultItemsPerPage);
@@ -81,29 +83,6 @@
     });
   };
 
-  const handleKeyDown = (event: KeyboardEvent) => {
-    switch (event.key) {
-      case 'ArrowRight':
-      case 'KeyL': {
-        if ($store.hasNext) {
-          event.preventDefault();
-          handlePageChange($store.currentPage + 1);
-        }
-        break;
-      }
-      case 'ArrowLeft':
-      case 'KeyH': {
-        if ($store.hasPrevious) {
-          event.preventDefault();
-          handlePageChange($store.currentPage - 1);
-        }
-        break;
-      }
-      default:
-        break;
-    }
-  };
-
   $: {
     if (perPage) store.jumpToPage(currentPage);
     if (currentPage) store.adjustPageSize(perPage);
@@ -122,7 +101,7 @@
       <slot visibleItems={$store.items} />
     </tbody>
   </table>
-  <nav on:keydown={handleKeyDown} class="paginated-table-controls">
+  <nav class="paginated-table-controls">
     <div class="flex flex-row items-center justify-start mx-8">
       <FilterSelect
         label="Per Page"
@@ -201,7 +180,7 @@
   }
 
   .page-btn.active {
-    @apply bg-gray-100 text-primary border-none;
+    @apply bg-gray-100 text-primary;
   }
 
   .nav-btn {
