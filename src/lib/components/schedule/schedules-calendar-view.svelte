@@ -84,6 +84,7 @@
         <ScheduleFrequency
           calendar={schedule?.spec?.structuredCalendar?.[0]}
           interval={schedule?.spec?.interval?.[0]}
+          timezone={schedule?.spec?.timezoneName}
           class="text-base"
         />
       </TabPanel>

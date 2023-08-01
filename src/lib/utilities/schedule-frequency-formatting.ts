@@ -207,7 +207,10 @@ export const structuredCalendarToFrequency = (
   return '';
 };
 
-export const commentOrCalendarToFrequency = (calendar: StructuredCalendar) => {
-  if (calendar?.comment) return `${calendar?.comment} UTC`;
+export const commentOrCalendarToFrequency = (
+  calendar: StructuredCalendar,
+  timezone: string | undefined = 'UTC',
+) => {
+  if (calendar?.comment) return `${calendar?.comment} ${timezone}`;
   return structuredCalendarToFrequency(calendar);
 };
