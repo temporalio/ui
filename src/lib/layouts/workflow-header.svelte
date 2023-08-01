@@ -104,12 +104,6 @@
     compatibility,
     buildId,
   );
-
-  $: {
-    console.log('BuildId: ', buildId);
-    console.log('defaultVersionForSet: ', defaultVersionForSet);
-    console.log('overallDefaultVersion: ', overallDefaultVersion);
-  }
 </script>
 
 <header class="mb-4 flex flex-col gap-1">
