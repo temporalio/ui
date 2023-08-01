@@ -28,7 +28,15 @@
   };
 </script>
 
-<PaginatedTable updating={$updating} items={$workflows} let:visibleItems>
+<PaginatedTable
+  perPageLabel={translate('per-page')}
+  nextPageButtonLabel={translate('next-page')}
+  previousPageButtonLabel={translate('previous-page')}
+  pageButtonLabel={(page) => translate('go-to-page', { page })}
+  updating={$updating}
+  items={$workflows}
+  let:visibleItems
+>
   <TableHeaderRow
     onClickConfigure={openCustomizationDrawer}
     workflows={visibleItems}

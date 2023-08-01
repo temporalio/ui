@@ -22,7 +22,9 @@
   export let items: Item[];
   export let updating: boolean = false;
   export let perPageLabel: string;
-  export let pageButtonLabel: string;
+  export let pageButtonLabel: (page: number) => string;
+  export let nextPageButtonLabel: string;
+  export let previousPageButtonLabel: string;
 
   $: url = $page.url;
   $: perPage = url.searchParams.get(perPageKey) ?? String(defaultItemsPerPage);
@@ -101,10 +103,10 @@
       <slot visibleItems={$store.items} />
     </tbody>
   </table>
-  <nav class="paginated-table-controls">
+  <div class="paginated-table-controls">
     <div class="flex flex-row items-center justify-start mx-8">
       <FilterSelect
-        label="Per Page"
+        label={perPageLabel}
         parameter={perPageKey}
         value={perPage}
         {options}
@@ -116,6 +118,7 @@
           <span>...</span>
         {:else}
           <button
+            aria-label={pageButtonLabel(page)}
             class="page-btn"
             class:active={page === parseInt(currentPage, 10)}
             on:click={() => handlePageChange(page)}>{page}</button
@@ -125,17 +128,19 @@
     </div>
     <div class="flex flex-row items-center justify-end mx-8 gap-2">
       <button
+        aria-label={previousPageButtonLabel}
         disabled={!$store.hasPrevious}
         on:click={() => handlePageChange($store.currentPage - 1)}
         class="nav-btn"><Icon name="arrow-left" /></button
       >
       <button
+        aria-label={nextPageButtonLabel}
         disabled={!$store.hasNext}
         on:click={() => handlePageChange($store.currentPage + 1)}
         class="nav-btn"><Icon name="arrow-right" /></button
       >
     </div>
-  </nav>
+  </div>
 </div>
 
 <style lang="postcss">
