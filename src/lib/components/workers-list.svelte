@@ -21,6 +21,9 @@
     <span class="select-all font-normal">{taskQueue}</span>
   </h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
+    <caption class="sr-only" slot="caption"
+      >{translate('workflows', 'workers-tab')}</caption
+    >
     <TableHeaderRow slot="headers">
       <th class="w-6/12">{translate('id')}</th>
       <th class="w-2/12">{translate('workflows', 'last-accessed')}</th>

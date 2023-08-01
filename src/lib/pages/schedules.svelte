@@ -75,7 +75,7 @@
     <Pagination
       items={filteredSchedules(schedules)}
       let:visibleItems
-      aria-label="schedules"
+      aria-label={translate('schedules')}
       pageSizeSelectLabel={translate('per-page')}
     >
       <svelte:fragment slot="action-top-left">

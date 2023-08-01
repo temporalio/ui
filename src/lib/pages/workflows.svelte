@@ -43,7 +43,9 @@
 
 <header class="mb-2 flex justify-between">
   <div>
-    <h1 class="text-2xl" data-testid="namespace-title">Recent Workflows</h1>
+    <h1 class="text-2xl" data-testid="namespace-title">
+      {translate('workflows', 'recent-workflows')}
+    </h1>
     <div class="flex items-center gap-2 text-sm">
       <p data-testid="namespace-name">
         {$page.params.namespace}
@@ -52,7 +54,7 @@
   </div>
   <div>
     <button
-      aria-label="retry workflows"
+      aria-label={translate('workflows', 'retry-workflows')}
       class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
       on:click={refreshWorkflows}
     >
@@ -64,7 +66,7 @@
 <Pagination
   items={$workflows}
   let:visibleItems
-  aria-label="recent workflows"
+  aria-label={translate('workflows', 'recent-workflows')}
   pageSizeSelectLabel={translate('per-page')}
 >
   <WorkflowsSummaryTable updating={$updating}>

@@ -18,6 +18,9 @@
 </script>
 
 <Table class="w-full">
+  <caption class="sr-only" slot="caption"
+    >{translate('workflows', 'relationships')}</caption
+  >
   <TableHeaderRow slot="headers">
     <th>{translate('workflows', 'first-execution')}</th>
     <th>{translate('workflows', 'previous-execution')}</th>

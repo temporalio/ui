@@ -33,7 +33,7 @@
   floatId="event-view-toggle"
   let:visibleItems
   let:initialItem
-  aria-label="recent events"
+  aria-label={translate('workflows', 'recent-events')}
   pageSizeSelectLabel={translate('per-page')}
 >
   <EventSummaryTable {compact} on:expandAll={handleExpandChange}>

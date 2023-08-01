@@ -1,6 +1,5 @@
 <script lang="ts">
   import IconButton from '$lib/holocene/icon-button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { dataEncoder } from '$lib/stores/data-encoder';

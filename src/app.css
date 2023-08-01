@@ -14,7 +14,7 @@
     font-family: 'Inter';
     src: local('Inter'), local('inter'),
       url('/src/lib/vendor/css/fonts/Inter/Inter-SemiBold.ttf');
-    font-style: medium;
+    font-style: normal;
     font-weight: 600;
     font-display: swap;
   }
@@ -41,7 +41,7 @@
     font-family: 'Poppins';
     src: local('Poppins'), local('poppins'),
       url('/src/lib/vendor/css/fonts/Poppins/Poppins-Medium.ttf');
-    font-style: medium;
+    font-style: normal;
     font-weight: 500;
     font-display: swap;
   }
@@ -50,7 +50,7 @@
     font-family: 'Poppins';
     src: local('Poppins'), local('poppins'),
       url('/src/lib/vendor/css/fonts/Poppins/Poppins-SemiBold.ttf');
-    font-style: medium;
+    font-style: normal;
     font-weight: 600;
     font-display: swap;
   }

@@ -41,11 +41,14 @@
   items={formattedAll}
   itemsPerPage={10}
   let:visibleItems
-  aria-label="child workflows"
+  aria-label={translate('workflows', 'child-workflows')}
   pageSizeSelectLabel={translate('per-page')}
 >
   <div slot="pagination-top" />
   <Table class="w-full">
+    <caption class="sr-only" slot="caption"
+      >{translate('workflows', 'child-workflows')}</caption
+    >
     <TableHeaderRow slot="headers">
       <th class="max-md:hidden">Status</th>
       <th>{translate('workflows', 'child-id')}</th>
