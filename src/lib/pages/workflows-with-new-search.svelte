@@ -225,7 +225,7 @@
   on:confirm={cancelWorkflows}
 />
 
-<header class="flex flex-initial justify-between">
+<header class="flex justify-between">
   <div>
     <h1 class="text-2xl" data-cy="workflows-title">
       <Translate namespace="workflows" key="recent-workflows" />

@@ -110,8 +110,6 @@
   }
 </script>
 
-<svelte:window on:keydown={handleKeyDown} />
-
 <div class="paginated-table-wrapper">
   <table class="paginated-table">
     <thead class="paginated-table-header">
@@ -124,7 +122,7 @@
       <slot visibleItems={$store.items} />
     </tbody>
   </table>
-  <div class="paginated-table-controls">
+  <nav on:keydown={handleKeyDown} class="paginated-table-controls">
     <div class="flex flex-row items-center justify-start mx-8">
       <FilterSelect
         label="Per Page"
@@ -158,7 +156,7 @@
         class="nav-btn"><Icon name="arrow-right" /></button
       >
     </div>
-  </div>
+  </nav>
 </div>
 
 <style lang="postcss">
@@ -199,11 +197,11 @@
   }
 
   .page-btn {
-    @apply w-10 h-10 rounded-lg bg-white text-gray-600 hover:bg-gray-50 focus:outline-none focus:border-2 focus:border-blue-500;
+    @apply w-10 h-10 rounded-lg bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:border-2 focus:border-blue-600;
   }
 
   .page-btn.active {
-    @apply bg-primary text-white border-none;
+    @apply bg-gray-100 text-primary border-none;
   }
 
   .nav-btn {

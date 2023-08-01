@@ -169,7 +169,7 @@
   };
 </script>
 
-<div class="flex items-center">
+<div class="flex items-start">
   <LabsModeGuard>
     <svelte:fragment slot="fallback">
       <MenuContainer>
