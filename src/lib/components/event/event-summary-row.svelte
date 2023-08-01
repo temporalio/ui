@@ -114,39 +114,51 @@
       {/if}
     </div>
   </td>
-  <td class="text-right text-sm font-normal xl:text-left">
+  <td
+    colspan={expanded ? 2 : 1}
+    class="text-right text-sm font-normal xl:text-left"
+  >
     <div class="flex">
-      {#if compact && failure}
-        <Icon class="mr-1.5 inline text-red-700" name="clock" />
-      {/if}
-      {#if compact && canceled}
-        <Icon class="mr-1.5 inline text-yellow-700" name="clock" />
-      {/if}
-      {#if compact && terminated}
-        <Icon class="mr-1.5 inline text-pink-700" name="clock" />
-      {/if}
-      <p class="event-name truncate text-sm font-semibold md:text-base">
-        {isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name}
-      </p>
+      <div>
+        {#if compact && failure}
+          <Icon class="mr-1.5 inline text-red-700" name="clock" />
+        {/if}
+        {#if compact && canceled}
+          <Icon class="mr-1.5 inline text-yellow-700" name="clock" />
+        {/if}
+        {#if compact && terminated}
+          <Icon class="mr-1.5 inline text-pink-700" name="clock" />
+        {/if}
+      </div>
+      <div class="flex w-full items-center justify-between truncate">
+        <p class="event-name truncate text-sm font-semibold md:text-base">
+          {isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name}
+        </p>
+        {#if expanded}
+          <div>
+            <Icon class="inline" name="chevron-up" />
+          </div>
+        {/if}
+      </div>
     </div>
   </td>
-  <td class="overflow-hidden">
-    <div class="flex w-full items-center justify-between">
-      <div class="grow truncate">
-        {#if !expanded}
+  {#if !expanded}
+    <td class="overflow-hidden">
+      <div class="flex w-full items-center justify-between">
+        <div class="grow truncate">
           <EventDetailsRow
             {...getSingleAttributeForEvent(currentEvent)}
             {attributes}
             class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
             inline
           />
-        {/if}
+        </div>
+        <div>
+          <Icon class="inline" name="chevron-down" />
+        </div>
       </div>
-      <div>
-        <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
-      </div>
-    </div>
-  </td>
+    </td>
+  {/if}
 
   <td />
 </tr>
