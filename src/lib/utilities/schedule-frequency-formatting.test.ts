@@ -144,18 +144,9 @@ describe('commentOrCalendarToFrequency', () => {
     const expected = 'Daily at 12:00am UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
   });
-  it('should convert a comment to a frequency with a default of UTC if a timezone is not provided', () => {
-    const calendar = generateCalendar({ comment: '*/1 * * * *' });
-    const expected = '*/1 * * * * UTC';
-    expect(commentOrCalendarToFrequency(calendar)).toBe(expected);
-  });
-  it('should convert a comment to a frequency with the correct timezone if one is provided', () => {
-    const calendar = generateCalendar({
-      comment: 'CRON_TZ=Asia/Shanghai */1 * * * *',
-    });
-    const expected = 'CRON_TZ=Asia/Shanghai */1 * * * * Asia/Shanghai';
-    expect(commentOrCalendarToFrequency(calendar, 'Asia/Shanghai')).toBe(
-      expected,
-    );
+  it('should return a comment as the frequency if one exists', () => {
+    const comment = 'CRON_TZ=Asia/Shanghai */1 * * * *';
+    const calendar = generateCalendar({ comment });
+    expect(commentOrCalendarToFrequency(calendar)).toBe(comment);
   });
 });

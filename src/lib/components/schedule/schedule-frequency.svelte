@@ -6,7 +6,6 @@
 
   export let calendar: StructuredCalendar | undefined = undefined;
   export let interval: IntervalSpec | undefined = undefined;
-  export let timezone: string | undefined = undefined;
 
   const intervalSecs = interval?.interval as string;
   const phaseSecs = interval?.phase as string;
@@ -15,7 +14,7 @@
 <div class="flex flex-col {$$props.class}">
   {#if calendar}
     <p data-testid="schedule-calendar-frequency">
-      {commentOrCalendarToFrequency(calendar, timezone)}
+      {commentOrCalendarToFrequency(calendar)}
     </p>
   {:else}
     <p data-testid="schedule-interval-frequency">

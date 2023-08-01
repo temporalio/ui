@@ -8,12 +8,11 @@
 
   export let calendar: StructuredCalendar | undefined = undefined;
   export let interval: IntervalSpec | undefined = undefined;
-  export let timezone: string | undefined = undefined;
 </script>
 
 <Panel>
   <h2 class="mb-4 text-2xl">{translate('schedules', 'frequency')}</h2>
   <div class="pr-2">
-    <ScheduleFrequency {calendar} {interval} {timezone} class="text-base" />
+    <ScheduleFrequency {calendar} {interval} class="text-base" />
   </div>
 </Panel>

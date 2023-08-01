@@ -51,12 +51,7 @@
   <td class="cell whitespace-pre-line break-words">
     <p class="text-base">{schedule.scheduleId}</p>
     <p>
-      <ScheduleFrequency
-        {calendar}
-        {interval}
-        timezone={spec?.timezoneName}
-        class="text-sm"
-      />
+      <ScheduleFrequency {calendar} {interval} class="text-sm" />
     </p>
   </td>
   <td class="cell whitespace-pre-line break-words max-md:hidden">
