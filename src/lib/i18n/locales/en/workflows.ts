@@ -172,4 +172,7 @@ export const Strings = {
   'search-placeholder': 'Enter a query',
   'select-all-workflows': 'Select all Workflows',
   'select-workflow': 'Select Workflow {{workflow}}',
+  'empty-state-title': 'No Workflows Found',
+  'empty-state-description':
+    'If you have filters applied, try adjusting them. Otherwise please check your syntax and try again.',
 } as const;

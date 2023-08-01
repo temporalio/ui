@@ -48,43 +48,23 @@
       <TableHeaderCell {column} />
     {/each}
   </TableHeaderRow>
-  {#if columns.length > 0}
-    {#each visibleItems as workflow}
-      <TableRow {workflow}>
-        {#each columns as column}
-          <TableBodyCell {workflow} {column} />
-        {/each}
-      </TableRow>
-    {:else}
-      <TableRow empty>
-        <td colspan={columns.length}>
-          <EmptyState
-            title="No Workflows Found"
-            content="If you have filters applied, try adjusting them. Otherwise please check your syntax and try again."
-            error={$workflowError}
-          />
-        </td>
-      </TableRow>
-    {/each}
+  {#each visibleItems as workflow}
+    <TableRow {workflow}>
+      {#each columns as column}
+        <TableBodyCell {workflow} {column} />
+      {/each}
+    </TableRow>
   {:else}
     <TableRow empty>
-      <td>
-        <EmptyState title="No column headers are in view">
-          <p class="text-center w-1/2">
-            At least one column heading is required to display workflows. Click
-            the <span class="whitespace-nowrap"
-              >(<Icon class="inline" name="vertical-ellipsis" />)</span
-            >
-            in the top right corner of the Workflow List to reveal the Configure
-            Workflow List panel. Click the
-            <span class="whitespace-nowrap"
-              >(<Icon class="inline" name="add" />)</span
-            > to add column headings.
-          </p>
-        </EmptyState>
+      <td colspan={columns.length}>
+        <EmptyState
+          title={translate('workflows', 'empty-state-title')}
+          content={translate('workflows', 'empty-state-description')}
+          error={$workflowError}
+        />
       </td>
     </TableRow>
-  {/if}
+  {/each}
 </PaginatedTable>
 
 <Drawer
