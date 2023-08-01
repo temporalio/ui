@@ -79,16 +79,13 @@
         </Button>
       </div>
       <div class="flex justify-end">
-        <label
-          for="json-formatting"
-          class="flex items-center gap-4 font-secondary text-sm"
-          >{translate('workflows', 'json-formatting')}
-          <ToggleSwitch
-            id="json-formatting"
-            checked={jsonFormatting}
-            on:change={() => (jsonFormatting = !jsonFormatting)}
-          />
-        </label>
+        <ToggleSwitch
+          label={translate('workflows', 'json-formatting')}
+          labelPosition="left"
+          id="json-formatting"
+          checked={jsonFormatting}
+          on:change={() => (jsonFormatting = !jsonFormatting)}
+        />
       </div>
     </div>
     <div class="flex items-start h-full">
