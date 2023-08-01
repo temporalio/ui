@@ -54,7 +54,7 @@
     class:focused
     class:hovered
   >
-    <span class="thumb" class:disabled class:checked />
+    <span class="thumb" class:checked />
   </span>
   {#if labelPosition === 'right'}
     <span class="label right" class:sr-only={labelHidden}>
@@ -68,7 +68,7 @@
     @apply px-2 relative flex items-center rounded max-w-fit cursor-pointer;
 
     &.disabled {
-      @apply cursor-not-allowed pointer-events-none;
+      @apply pointer-events-none;
     }
   }
 
@@ -108,7 +108,7 @@
     }
 
     &.disabled {
-      @apply bg-gray-100;
+      @apply opacity-50;
     }
 
     &.checked {
@@ -125,10 +125,6 @@
 
     &:not(.checked) {
       @apply left-0.5 bg-gray-900 text-white;
-    }
-
-    &.disabled {
-      @apply bg-gray-500;
     }
   }
 </style>
