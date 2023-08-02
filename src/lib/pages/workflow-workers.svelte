@@ -3,7 +3,7 @@
 
   import WorkersList from '$lib/components/workers-list.svelte';
 
-  $: ({ workers, workflow } = $workflowRun);
+  $: ({ workers, workflow, compatibility } = $workflowRun);
 </script>
 
-<WorkersList taskQueue={workflow?.taskQueue} {workers} />
+<WorkersList taskQueue={workflow?.taskQueue} {workers} {compatibility} />
