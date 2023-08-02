@@ -65,7 +65,7 @@
 
 <style lang="postcss">
   .switch {
-    @apply px-2 relative flex items-center rounded max-w-fit cursor-pointer;
+    @apply px-2 relative flex items-center rounded min-w-fit cursor-pointer;
 
     &.disabled {
       @apply pointer-events-none;
