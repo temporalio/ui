@@ -27,7 +27,7 @@
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;
-  export let compatibility: TaskQueueCompatibility | undefined;
+  export let compatibility: TaskQueueCompatibility | undefined = undefined;
 
   let namespace = $page.params.namespace;
 

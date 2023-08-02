@@ -16,6 +16,10 @@
   });
 </script>
 
-{#await Promise.all( [getWorkers, getCompatibility], ) then [workers, compatibility]}
-  <WorkersList taskQueue={queue} {workers} {compatibility} />
+{#await getWorkers then workers}
+  {#await getCompatibility then compatibility}
+    <WorkersList taskQueue={queue} {workers} {compatibility} />
+  {:catch}
+    <WorkersList taskQueue={queue} {workers} />
+  {/await}
 {/await}
