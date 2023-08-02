@@ -15,9 +15,7 @@ export const load: LayoutLoad = async function (): LayoutData {
   for (const key in locales) {
     const [_, lang] = key.split(/\/src\/lib\/i18n\/locales\/(\w+)\/.+\.ts/);
     if (!resources[lang]) {
-      resources[lang] = {
-        translations: {},
-      };
+      resources[lang] = {};
     }
 
     const { Strings, Namespace } = (await locales[key]()) as {
