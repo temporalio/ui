@@ -1,4 +1,4 @@
-import { English } from './locales/en';
+import Locales from './locales';
 
 /**
  * https://www.i18next.com/translation-function/plurals#singular-plural
@@ -14,7 +14,7 @@ type WithoutPluralSuffix<T> = T extends
   : T;
 
 export const I18nMap = {
-  ...English,
+  ...Locales.en,
 } as const;
 
 export const I18nNamespaces = Object.keys(I18nMap);
