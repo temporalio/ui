@@ -1,12 +1,9 @@
-import { temporal } from '@temporalio/proto';
-
 import { translate } from '$lib/i18n/translate';
 import type {
   BuildIdReachability,
   PollerInfo,
   TaskQueueCompatibleVersionSet,
   TaskQueueStatus,
-  TaskReachability,
 } from '$lib/types';
 import type { NamespaceScopedRequest } from '$lib/types/global';
 import {
@@ -14,8 +11,6 @@ import {
   requestFromAPI,
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-
-const TaskReachabilityEnum = temporal.api.enums.v1.TaskReachability;
 
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 
@@ -163,15 +158,10 @@ export async function getWorkerTaskReachability(
   });
 }
 
-function getLabelForReachability(reachability: TaskReachability[]): string {
+function getLabelForReachability(reachability: unknown[]): string {
   if (!reachability || !reachability.length)
     return translate('workers', 'ready-to-be-retired');
-  if (
-    reachability.length === 1 &&
-    reachability.includes(
-      TaskReachabilityEnum.TASK_REACHABILITY_CLOSED_WORKFLOWS,
-    )
-  ) {
+  if (reachability.length === 1 && reachability.includes('CLOSED')) {
     return translate('maybe');
   }
   return translate('no');
