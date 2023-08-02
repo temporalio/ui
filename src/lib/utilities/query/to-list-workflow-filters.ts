@@ -1,4 +1,3 @@
-import { formatDuration } from 'date-fns';
 import debounce from 'just-debounce';
 
 import type { WorkflowFilter } from '$lib/models/workflow-filters';
@@ -6,10 +5,10 @@ import type { FilterParameters, SearchAttributes } from '$lib/types/workflows';
 import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
 
 import { tokenize } from './tokenize';
+import { isValidDate } from '../format-date';
 import { isBetween, isConditional, isJoin, isParenthesis } from '../is';
-import { durationKeys, fromDate } from '../to-duration';
+import { durationKeys } from '../to-duration';
 import { updateQueryParameters } from '../update-query-parameters';
-
 type Tokens = string[];
 export type ParsedParameters = FilterParameters & { timeRange?: string };
 
@@ -72,14 +71,10 @@ export const toListWorkflowFilters = (
         filter.attribute = token;
         if (isDatetimeStatement(attributes[token])) {
           const start = getTwoAhead(tokens, index);
-
-          try {
-            const duration = fromDate(start);
-            const largestUnit = getLargestDurationUnit(duration);
-
-            filter.value = formatDuration(largestUnit);
-          } catch (error) {
-            console.error('Error parsing Datetime field from query', error);
+          if (isValidDate(start)) {
+            filter.value = start;
+          } else {
+            console.error('Error parsing Datetime field from query');
           }
         } else {
           filter.value = getTwoAhead(tokens, index);

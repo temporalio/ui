@@ -1,6 +1,7 @@
 import {
   formatDistanceToNow,
   formatDistanceToNowStrict,
+  parseISO,
   parseJSON,
 } from 'date-fns';
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
@@ -58,4 +59,9 @@ export function formatDateTime(
   } catch {
     return `about ${date} ${relativeLabel}`;
   }
+}
+
+export function isValidDate(date: string): boolean {
+  const d = parseISO(date);
+  return d instanceof Date && !isNaN(d.getTime());
 }
