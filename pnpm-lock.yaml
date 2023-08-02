@@ -125,8 +125,8 @@ devDependencies:
     specifier: ^1.7.4
     version: 1.7.4
   '@temporalio/proto':
-    specifier: ^1.7.4
-    version: 1.7.4
+    specifier: ^1.8.1
+    version: 1.8.1
   '@temporalio/testing':
     specifier: ^1.6.0
     version: 1.6.0(esbuild@0.13.15)
@@ -1895,6 +1895,13 @@ packages:
 
   /@temporalio/proto@1.7.4:
     resolution: {integrity: sha512-liIAsRiTrdOtTuqjzYXJxgOmctPnWk1YXVEqaXQgvxu5lpkeRuCdXOiCW7c/2cvl4gKCno5RDR1UI3yFXvECPg==}
+    dependencies:
+      long: 5.2.1
+      protobufjs: 7.2.2
+    dev: true
+
+  /@temporalio/proto@1.8.1:
+    resolution: {integrity: sha512-upXcA8hiDsDFjfNeYY6CQg/xEG3dtqYCrHPpTnF7K/Qyv/HRuoJUu3smFRKyeekAUE2KFuwOmAmXq5sV/HqUVw==}
     dependencies:
       long: 5.2.1
       protobufjs: 7.2.2
