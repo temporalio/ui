@@ -6,7 +6,27 @@
   @font-face {
     font-family: 'Inter';
     src: local('Inter'), local('inter'),
-      url('/src/lib/vendor/css/fonts/Inter/Inter-VariableFont_slnt\,wght.ttf');
+      url('/src/lib/vendor/css/fonts/Inter/Inter-Light.ttf');
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    src: local('Inter'), local('inter'),
+      url('/src/lib/vendor/css/fonts/Inter/Inter-Regular.ttf');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    src: local('Inter'), local('inter'),
+      url('/src/lib/vendor/css/fonts/Inter/Inter-Medium.ttf');
+    font-style: normal;
+    font-weight: 500;
     font-display: swap;
   }
 
@@ -14,7 +34,7 @@
     font-family: 'Inter';
     src: local('Inter'), local('inter'),
       url('/src/lib/vendor/css/fonts/Inter/Inter-SemiBold.ttf');
-    font-style: medium;
+    font-style: normal;
     font-weight: 600;
     font-display: swap;
   }
