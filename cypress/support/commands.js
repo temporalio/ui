@@ -134,7 +134,7 @@ Cypress.Commands.add('interceptTaskQueueCompatibilityApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
       `/api/v1/namespaces/*/task-queues/*/compatibility`,
-    { fixture: 'query-stack-trace.json' },
+    { fixture: 'compatibility.json' },
   ).as('compatibility-api');
 });
 
@@ -232,5 +232,6 @@ Cypress.Commands.add(
     cy.interceptCancelWorkflowApi();
     cy.interceptSignalWorkflowApi();
     cy.interceptResetWorkflowApi();
+    cy.interceptTaskQueueCompatibilityApi();
   },
 );
