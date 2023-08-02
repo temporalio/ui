@@ -96,15 +96,11 @@
     }
 
     &.focused:not(.checked) {
-      @apply border-indigo-600;
-
-      box-shadow: 0 0 0 4px #2463eb80; /* blue-600 at 50% opacity */
+      @apply border-indigo-600 shadow-focus shadow-blue-600/50;
     }
 
     &.focused.checked {
-      @apply border-white;
-
-      box-shadow: 0 0 0 4px #2463eb80; /* blue-600 at 50% opacity */
+      @apply border-white shadow-focus shadow-blue-600/50;
     }
 
     &.disabled {
