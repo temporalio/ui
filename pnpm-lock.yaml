@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -180,7 +180,7 @@ devDependencies:
     version: 10.4.13(postcss@8.4.21)
   babel-loader:
     specifier: ^8.3.0
-    version: 8.3.0(@babel/core@7.20.12)(webpack@5.75.0)
+    version: 8.3.0(@babel/core@7.20.12)(webpack@5.76.0)
   babel-preset-vite:
     specifier: ^1.0.4
     version: 1.0.4
@@ -354,7 +354,7 @@ devDependencies:
     version: 1.0.4
   webpack:
     specifier: ^5.73.0
-    version: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
+    version: 5.76.0(@swc/core@1.3.35)(esbuild@0.13.15)
   yargs:
     specifier: ^17.7.2
     version: 17.7.2
@@ -1945,10 +1945,10 @@ packages:
       rxjs: 7.8.0
       semver: 7.3.8
       source-map: 0.7.4
-      source-map-loader: 4.0.1(webpack@5.75.0)
-      swc-loader: 0.2.3(@swc/core@1.3.35)(webpack@5.75.0)
+      source-map-loader: 4.0.1(webpack@5.76.0)
+      swc-loader: 0.2.3(@swc/core@1.3.35)(webpack@5.76.0)
       unionfs: 4.4.0
-      webpack: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
+      webpack: 5.76.0(@swc/core@1.3.35)(esbuild@0.13.15)
     transitivePeerDependencies:
       - esbuild
       - uglify-js
@@ -1974,10 +1974,10 @@ packages:
       ms: 2.1.3
       rxjs: 7.8.0
       source-map: 0.7.4
-      source-map-loader: 4.0.1(webpack@5.75.0)
-      swc-loader: 0.2.3(@swc/core@1.3.35)(webpack@5.75.0)
+      source-map-loader: 4.0.1(webpack@5.76.0)
+      swc-loader: 0.2.3(@swc/core@1.3.35)(webpack@5.76.0)
       unionfs: 4.4.0
-      webpack: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
+      webpack: 5.76.0(@swc/core@1.3.35)(esbuild@0.13.15)
     transitivePeerDependencies:
       - esbuild
       - uglify-js
@@ -2505,7 +2505,7 @@ packages:
     dependencies:
       '@mapbox/node-pre-gyp': 1.0.10
       '@rollup/pluginutils': 4.2.1
-      acorn: 8.8.2
+      acorn: 8.9.0
       async-sema: 3.1.1
       bindings: 1.5.0
       estree-walker: 2.0.2
@@ -2713,24 +2713,24 @@ packages:
   /acorn-globals@7.0.1:
     resolution: {integrity: sha512-umOSDSDrfHbTNPuNpC2NSnnA3LUrqpevPb4T9jRx4MagXNS0rs+gwiTcAvqCRmsD6utzsrzNt+ebm00SNWiC3Q==}
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
       acorn-walk: 8.2.0
     dev: true
 
-  /acorn-import-assertions@1.8.0(acorn@8.8.2):
+  /acorn-import-assertions@1.8.0(acorn@8.9.0):
     resolution: {integrity: sha512-m7VZ3jwz4eK6A4Vtt8Ew1/mNbP24u0FhdyfA7fSvnJR6LMdfOYnmuIrrJAgrYfYJ10F/otaHTtrtrtmHdMNzEw==}
     peerDependencies:
       acorn: ^8
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
     dev: true
 
-  /acorn-jsx@5.3.2(acorn@8.8.2):
+  /acorn-jsx@5.3.2(acorn@8.9.0):
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
       acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
     dev: true
 
   /acorn-node@1.8.2:
@@ -3025,7 +3025,7 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
-  /babel-loader@8.3.0(@babel/core@7.20.12)(webpack@5.75.0):
+  /babel-loader@8.3.0(@babel/core@7.20.12)(webpack@5.76.0):
     resolution: {integrity: sha512-H8SvsMF+m9t15HNLMipppzkC+Y2Yq+v3SonZyU70RBL/h1gxPkH08Ot8pEE9Z4Kd+czyWJClmFS8qzIP9OZ04Q==}
     engines: {node: '>= 8.9'}
     peerDependencies:
@@ -3037,7 +3037,7 @@ packages:
       loader-utils: 2.0.4
       make-dir: 3.1.0
       schema-utils: 2.7.1
-      webpack: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
+      webpack: 5.76.0(@swc/core@1.3.35)(esbuild@0.13.15)
     dev: true
 
   /babel-plugin-transform-vite-meta-env@1.0.3:
@@ -4999,8 +4999,8 @@ packages:
     resolution: {integrity: sha512-XwctdmTO6SIvCzd9810yyNzIrOrqNYV9Koizx4C/mRhf9uq0o4yHoCEU/670pOxOL/MSraektvSAji79kX90Vg==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dependencies:
-      acorn: 8.8.2
-      acorn-jsx: 5.3.2(acorn@8.8.2)
+      acorn: 8.9.0
+      acorn-jsx: 5.3.2(acorn@8.9.0)
       eslint-visitor-keys: 3.3.0
     dev: true
 
@@ -6919,7 +6919,7 @@ packages:
   /mlly@0.5.17:
     resolution: {integrity: sha512-Rn+ai4G+CQXptDFSRNnChEgNr+xAEauYhwRvpPl/UHStTlgkIftplgJRsA2OXPuoUn86K4XAjB26+x5CEvVb6A==}
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
       pathe: 1.1.0
       pkg-types: 1.0.1
       ufo: 1.0.1
@@ -6928,7 +6928,7 @@ packages:
   /mlly@1.1.0:
     resolution: {integrity: sha512-cwzBrBfwGC1gYJyfcy8TcZU1f+dbH/T+TuOhtYP2wLv/Fb51/uV7HJQfBPtEupZ2ORLRU1EKFS/QfS3eo9+kBQ==}
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
       pathe: 1.1.0
       pkg-types: 1.0.1
       ufo: 1.0.1
@@ -8632,7 +8632,7 @@ packages:
     resolution: {integrity: sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==}
     engines: {node: '>=0.10.0'}
 
-  /source-map-loader@4.0.1(webpack@5.75.0):
+  /source-map-loader@4.0.1(webpack@5.76.0):
     resolution: {integrity: sha512-oqXpzDIByKONVY8g1NUPOTQhe0UTU5bWUl32GSkqK2LjJj0HmwTMVKxcUip0RgAYhY1mqgOxjbQM48a0mmeNfA==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
@@ -8641,7 +8641,7 @@ packages:
       abab: 2.0.6
       iconv-lite: 0.6.3
       source-map-js: 1.0.2
-      webpack: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
+      webpack: 5.76.0(@swc/core@1.3.35)(esbuild@0.13.15)
     dev: true
 
   /source-map-support@0.5.21:
@@ -8853,7 +8853,7 @@ packages:
   /strip-literal@1.0.1:
     resolution: {integrity: sha512-QZTsipNpa2Ppr6v1AmJHESqJ3Uz247MUS0OjrnnZjFAvEoWqxuyFuXn2xLgMtRnijJShAa1HL0gtJyUs7u7n3Q==}
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
     dev: true
 
   /style-mod@4.0.0:
@@ -9143,14 +9143,14 @@ packages:
       stable: 0.1.8
     dev: true
 
-  /swc-loader@0.2.3(@swc/core@1.3.35)(webpack@5.75.0):
+  /swc-loader@0.2.3(@swc/core@1.3.35)(webpack@5.76.0):
     resolution: {integrity: sha512-D1p6XXURfSPleZZA/Lipb3A8pZ17fP4NObZvFCDjK/OKljroqDpPmsBdTraWhVBqUNpcWBQY1imWdoPScRlQ7A==}
     peerDependencies:
       '@swc/core': ^1.2.147
       webpack: '>=2'
     dependencies:
       '@swc/core': 1.3.35
-      webpack: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
+      webpack: 5.76.0(@swc/core@1.3.35)(esbuild@0.13.15)
     dev: true
 
   /symbol-tree@3.2.4:
@@ -9239,7 +9239,7 @@ packages:
       yallist: 4.0.0
     dev: true
 
-  /terser-webpack-plugin@5.3.6(@swc/core@1.3.35)(esbuild@0.13.15)(webpack@5.75.0):
+  /terser-webpack-plugin@5.3.6(@swc/core@1.3.35)(esbuild@0.13.15)(webpack@5.76.0):
     resolution: {integrity: sha512-kfLFk+PoLUQIbLmB1+PZDMRSZS99Mp+/MHqDNmMA6tOItzRt+Npe3E+fsMs5mfcM0wCtrrdU387UnV+vnSffXQ==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
@@ -9262,7 +9262,7 @@ packages:
       schema-utils: 3.1.1
       serialize-javascript: 6.0.0
       terser: 5.16.1
-      webpack: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
+      webpack: 5.76.0(@swc/core@1.3.35)(esbuild@0.13.15)
     dev: true
 
   /terser@5.16.1:
@@ -9271,7 +9271,7 @@ packages:
     hasBin: true
     dependencies:
       '@jridgewell/source-map': 0.3.2
-      acorn: 8.8.2
+      acorn: 8.9.0
       commander: 2.20.3
       source-map-support: 0.5.21
     dev: true
@@ -10029,8 +10029,8 @@ packages:
     engines: {node: '>=10.13.0'}
     dev: true
 
-  /webpack@5.75.0(@swc/core@1.3.35)(esbuild@0.13.15):
-    resolution: {integrity: sha512-piaIaoVJlqMsPtX/+3KTTO6jfvrSYgauFVdt8cr9LTHKmcq/AMd4mhzsiP7ZF/PGRNPGA8336jldh9l2Kt2ogQ==}
+  /webpack@5.76.0(@swc/core@1.3.35)(esbuild@0.13.15):
+    resolution: {integrity: sha512-l5sOdYBDunyf72HW8dF23rFtWq/7Zgvt/9ftMof71E/yUb1YLOBmTgA2K4vQthB3kotMrSj609txVE0dnr2fjA==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     peerDependencies:
@@ -10044,8 +10044,8 @@ packages:
       '@webassemblyjs/ast': 1.11.1
       '@webassemblyjs/wasm-edit': 1.11.1
       '@webassemblyjs/wasm-parser': 1.11.1
-      acorn: 8.8.2
-      acorn-import-assertions: 1.8.0(acorn@8.8.2)
+      acorn: 8.9.0
+      acorn-import-assertions: 1.8.0(acorn@8.9.0)
       browserslist: 4.21.4
       chrome-trace-event: 1.0.3
       enhanced-resolve: 5.12.0
@@ -10060,7 +10060,7 @@ packages:
       neo-async: 2.6.2
       schema-utils: 3.1.1
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.6(@swc/core@1.3.35)(esbuild@0.13.15)(webpack@5.75.0)
+      terser-webpack-plugin: 5.3.6(@swc/core@1.3.35)(esbuild@0.13.15)(webpack@5.76.0)
       watchpack: 2.4.0
       webpack-sources: 3.2.3
     transitivePeerDependencies:
