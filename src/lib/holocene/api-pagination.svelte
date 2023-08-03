@@ -26,6 +26,8 @@
     pageSizeSelectLabel: string;
     emptyStateMessage: string;
     fallbackErrorMessage: string;
+    previousButtonLabel: string;
+    nextButtonLabel: string;
   }
 
   type PaginatedRequest<T> = (
@@ -46,6 +48,8 @@
   export let pageSizeSelectLabel: string;
   export let emptyStateMessage: string;
   export let fallbackErrorMessage: string;
+  export let previousButtonLabel: string;
+  export let nextButtonLabel: string;
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
@@ -187,6 +191,7 @@
           class="caret"
           disabled={!$store.hasPrevious}
           on:click={store.previousPage}
+          aria-label={previousButtonLabel}
         >
           <span
             class="arrow arrow-left"
@@ -207,6 +212,7 @@
           class="caret"
           disabled={!$store.hasNext}
           on:click={fetchIndexData}
+          aria-label={nextButtonLabel}
         >
           <span
             class="arrow arrow-right"
@@ -251,6 +257,7 @@
             class="caret"
             disabled={!$store.hasPrevious}
             on:click={store.previousPage}
+            aria-label={previousButtonLabel}
           >
             <span
               class="arrow arrow-left"
@@ -271,6 +278,7 @@
             class="caret"
             disabled={!$store.hasNext}
             on:click={fetchIndexData}
+            aria-label={nextButtonLabel}
           >
             <span
               class="arrow arrow-right"

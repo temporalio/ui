@@ -89,4 +89,6 @@ export const Strings = {
   'log-out': 'Log out',
   'select-all': 'Select All',
   absolute: 'Absolute',
+  previous: 'Previous',
+  next: 'Next',
 } as const;
