@@ -3,6 +3,8 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
 
+  import { translate } from '$lib/i18n/translate';
+
   const format1 = { events: 'HistoryEvent[]' };
   const format2 = 'HistoryEvent[]';
 </script>
@@ -14,7 +16,7 @@
     aria-label="import event history"
   >
     <h1 class="text-lg font-medium" data-testid="import-event-history">
-      Import Event History
+      {translate('events', 'import-event-history')}
     </h1>
     <div class="flex gap-4">
       <HistoryImport />
@@ -28,10 +30,12 @@
       <Link
         target="_blank"
         href="https://github.com/temporalio/api/blob/1cd0ac0bbd8e71c7bfc9fe1900c678b432e66e5b/temporal/api/history/v1/message.proto"
-        class="mb-8">View in Github</Link
+        class="mb-8">{translate('events', 'api-history-link')}</Link
       >
     </div>
-    <h3 class="mt-8 text-lg font-medium">Expected JSON formats</h3>
+    <h3 class="mt-8 text-lg font-medium">
+      {translate('events', 'history-expected-formats')}
+    </h3>
     <div class="h-40 text-center">
       <CodeBlock content={format1} inline />
       <CodeBlock content={format2} inline />
