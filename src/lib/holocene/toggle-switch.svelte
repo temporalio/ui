@@ -91,8 +91,12 @@
   .slider {
     @apply flex relative items-center h-5 w-9 rounded-xl border border-gray-600 bg-gray-50;
 
-    &.hovered {
+    &.hovered:not(.checked) {
       @apply bg-gray-200;
+    }
+
+    &.hovered.checked {
+      @apply bg-indigo-800;
     }
 
     &.focused:not(.checked) {
