@@ -22,6 +22,7 @@
   import { noop } from 'svelte/internal';
   import { isEventGroup } from '$lib/models/event-groups';
   import type { IterableEvent } from '$lib/types/events';
+  import { page } from '$app/stores';
 
   export let event: IterableEvent;
   export let visibleItems: IterableEvent[];
@@ -62,6 +63,7 @@
 
   const onLinkClick = () => {
     expanded = !expanded;
+    document.location = `#${event.id}`;
     onRowClick();
   };
 
@@ -81,7 +83,7 @@
   class:terminated
   class:typedError
   data-testid="event-summary-row"
-  on:click|stopPropagation={onLinkClick}
+  on:click|preventDefault|stopPropagation={onLinkClick}
 >
   <td />
   <td class="w-24 text-left">

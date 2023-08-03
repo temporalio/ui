@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { onMount } from 'svelte';
   import {
     eventFilterSort,
     type EventSortOrder,
@@ -30,11 +31,26 @@
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
 
   let loading: boolean = true;
+  let hash: string = '';
 
   const resetFullHistory = () => {
     $fullEventHistory = [];
     loading = true;
   };
+
+  onMount(() => {
+    hash = $page.url.hash;
+  });
+
+  function scrollIntoView(target) {
+    const element = document.querySelector(`[id='${Number(target)}']`);
+    console.log('target', target);
+    console.log('el', element);
+    if (!element) return;
+    element.scrollIntoView({
+      behavior: 'smooth',
+    });
+  }
 
   const fetchEvents = async (
     namespace: string,
@@ -53,6 +69,9 @@
       sort: compact ? 'ascending' : sort,
     });
     loading = false;
+    setTimeout(() => {
+      scrollIntoView(hash.slice(1));
+    }, 500);
   };
 
   $: $refresh, fetchEvents(namespace, workflowId, runId, $eventFilterSort);
@@ -109,7 +128,7 @@
         {visibleItems}
         expandAll={$expandAllEvents === 'true'}
         {initialItem}
-        active={activeRowIndex === index}
+        active={activeRowIndex === index || event.id === hash.slice(1)}
         onRowClick={() => setActiveRowIndex(index)}
       />
     {:else}
