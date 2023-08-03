@@ -37,6 +37,9 @@
   items={$workflows}
   let:visibleItems
 >
+  <caption class="sr-only" slot="caption">
+    {translate('workflows')}
+  </caption>
   <TableHeaderRow
     onClickConfigure={openCustomizationDrawer}
     workflows={visibleItems}

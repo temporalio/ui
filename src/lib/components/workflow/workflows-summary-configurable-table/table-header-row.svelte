@@ -71,6 +71,6 @@
   }
 
   .configuration-button-table-cell {
-    @apply h-10 leading-[48px] sticky right-0 block w-10 bg-primary;
+    @apply h-10 w-10 px-2;
   }
 </style>

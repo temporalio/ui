@@ -27,19 +27,20 @@
   export let previousPageButtonLabel: string;
 
   $: url = $page.url;
-  $: perPage = url.searchParams.get(perPageKey) ?? String(defaultItemsPerPage);
-  $: currentPage = url.searchParams.get(currentPageKey);
-  $: store = pagination(items, perPage, currentPage);
+  $: perPageParam =
+    url.searchParams.get(perPageKey) ?? String(defaultItemsPerPage);
+  $: currentPageParam = url.searchParams.get(currentPageKey) ?? '1';
+  $: store = pagination(items, perPageParam, currentPageParam);
 
   // keep the 'page-size' url search param within the supported options
   $: {
-    if (parseInt(perPage, 10) > parseInt(MAX_PAGE_SIZE, 10)) {
+    if (parseInt(perPageParam, 10) > parseInt(MAX_PAGE_SIZE, 10)) {
       updateQueryParameters({
         parameter: perPageKey,
         value: MAX_PAGE_SIZE,
         url,
       });
-    } else if (!options.includes(perPage)) {
+    } else if (!options.includes(perPageParam)) {
       updateQueryParameters({
         parameter: perPageKey,
         value: defaultItemsPerPage,
@@ -48,7 +49,7 @@
     } else {
       updateQueryParameters({
         parameter: perPageKey,
-        value: perPage,
+        value: perPageParam,
         url,
       });
     }
@@ -56,13 +57,19 @@
 
   // Keep the 'page' url search param within 1 and the total number of pages
   $: {
-    if ($store.totalPages && parseInt(currentPage, 10) > $store.totalPages) {
+    if (
+      $store.totalPages &&
+      parseInt(currentPageParam, 10) > $store.totalPages
+    ) {
       updateQueryParameters({
         parameter: currentPageKey,
         value: $store.totalPages,
         url,
       });
-    } else if (currentPage === null || parseInt(currentPage, 10) < 0) {
+    } else if (
+      currentPageParam === null ||
+      parseInt(currentPageParam, 10) < 0
+    ) {
       updateQueryParameters({
         parameter: currentPageKey,
         value: '1',
@@ -71,7 +78,7 @@
     } else {
       updateQueryParameters({
         parameter: currentPageKey,
-        value: currentPage,
+        value: currentPageParam,
         url,
       });
     }
@@ -86,13 +93,14 @@
   };
 
   $: {
-    if (perPage) store.jumpToPage(currentPage);
-    if (currentPage) store.adjustPageSize(perPage);
+    if (currentPageParam) store.jumpToPage(currentPageParam);
+    if (perPageParam) store.adjustPageSize(perPageParam);
   }
 </script>
 
 <div class="paginated-table-wrapper">
   <table class="paginated-table">
+    <slot name="caption" />
     <thead class="paginated-table-header">
       <slot name="headers" />
       {#if updating}
@@ -104,15 +112,15 @@
     </tbody>
   </table>
   <div class="paginated-table-controls">
-    <div class="flex flex-row items-center justify-start mx-8">
+    <div class="paginated-table-controls-start">
       <FilterSelect
         label={perPageLabel}
         parameter={perPageKey}
-        value={perPage}
+        value={perPageParam}
         {options}
       />
     </div>
-    <div class="flex flex-row items-center justify-center gap-2">
+    <div class="paginated-table-controls-center">
       {#each $store.pageShortcuts as page}
         {#if isNaN(page)}
           <span>...</span>
@@ -120,13 +128,13 @@
           <button
             aria-label={pageButtonLabel(page)}
             class="page-btn"
-            class:active={page === parseInt(currentPage, 10)}
+            class:active={page === $store.currentPage}
             on:click={() => handlePageChange(page)}>{page}</button
           >
         {/if}
       {/each}
     </div>
-    <div class="flex flex-row items-center justify-end mx-8 gap-2">
+    <div class="paginated-table-controls-end">
       <button
         aria-label={previousPageButtonLabel}
         disabled={!$store.hasPrevious}
@@ -177,7 +185,19 @@
   }
 
   .paginated-table-controls {
-    @apply sticky z-10 grid grid-cols-3 w-full rounded-b bottom-0 left-0 py-4 bg-white text-primary border-t border-gray-200;
+    @apply sticky flex gap-2 grow flex-col lg:flex-row w-full rounded-b bottom-0 left-0 p-4 bg-white text-primary border-t border-gray-200;
+  }
+
+  .paginated-table-controls-start {
+    @apply flex flex-row items-center justify-center lg:justify-start;
+  }
+
+  .paginated-table-controls-center {
+    @apply flex flex-wrap grow flex-row items-center justify-center min-w-fit gap-2;
+  }
+
+  .paginated-table-controls-end {
+    @apply flex flex-row items-center justify-between lg:justify-end gap-2;
   }
 
   .page-btn {
