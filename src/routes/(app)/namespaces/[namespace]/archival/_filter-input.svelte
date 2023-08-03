@@ -22,7 +22,7 @@
   }
 </script>
 
-<div class="input-container focus-within:border-blue-700">
+<div class="input-container focus-within:border-blue-700 bg-white">
   <label for={id} class="hidden">{name}</label>
   <span><Icon name="search" class="flex items-center text-gray-700" /></span>
   <input
