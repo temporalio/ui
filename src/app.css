@@ -6,7 +6,27 @@
   @font-face {
     font-family: 'Inter';
     src: local('Inter'), local('inter'),
-      url('/src/lib/vendor/css/fonts/Inter/Inter-VariableFont_slnt\,wght.ttf');
+      url('/src/lib/vendor/css/fonts/Inter/Inter-Light.ttf');
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    src: local('Inter'), local('inter'),
+      url('/src/lib/vendor/css/fonts/Inter/Inter-Regular.ttf');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    src: local('Inter'), local('inter'),
+      url('/src/lib/vendor/css/fonts/Inter/Inter-Medium.ttf');
+    font-style: normal;
+    font-weight: 500;
     font-display: swap;
   }
 
@@ -14,7 +34,7 @@
     font-family: 'Inter';
     src: local('Inter'), local('inter'),
       url('/src/lib/vendor/css/fonts/Inter/Inter-SemiBold.ttf');
-    font-style: medium;
+    font-style: normal;
     font-weight: 600;
     font-display: swap;
   }
@@ -54,6 +74,13 @@
     font-weight: 600;
     font-display: swap;
   }
+
+  @font-face {
+    font-family: 'Noto Sans Mono';
+    src: local('Noto Sans Mono'), local('noto sans mono'),
+      url('/src/lib/vendor/css/fonts/NotoSansMono/NotoSansMono-VariableFont_wdth\,wght.ttf');
+    font-display: swap;
+  }
 }
 
 *,
@@ -82,6 +109,10 @@ labels {
 .hljs {
   max-height: 25em;
   overflow-y: scroll;
+}
+
+.noto {
+  font-family: 'Noto Sans Mono', monospace;
 }
 
 input[type='search']::-webkit-search-cancel-button {
