@@ -148,6 +148,9 @@ const config = {
       animation: {
         'spin-slow': 'spin 3s linear infinite',
       },
+      boxShadow: {
+        focus: '0 0 0 4px',
+      },
     },
   },
   plugins: [],

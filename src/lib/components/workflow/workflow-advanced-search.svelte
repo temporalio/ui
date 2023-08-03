@@ -67,8 +67,8 @@
         placeholder={translate('workflows', 'search-placeholder')}
         icon="search"
         class="w-full lg:w-3/4"
-        copyable
-        copyButtonLabel={translate('copy-icon-title')}
+        clearable
+        clearButtonLabel={translate('clear-input-button-label')}
         unroundRight
         on:clear={handleClearInput}
         bind:value={manualSearchString}
