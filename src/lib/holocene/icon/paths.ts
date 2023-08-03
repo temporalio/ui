@@ -43,6 +43,7 @@ import invertedCheckmark from './svg/inverted-checkmark.svelte';
 import json from './svg/json.svelte';
 import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
+import merge from './svg/merge.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
 import pinFilled from './svg/pin-filled.svelte';
@@ -123,6 +124,7 @@ export const icons = {
   json,
   lock,
   logout,
+  merge,
   'namespace-switcher': namespaceSwitcher,
   namespace,
   'pin-filled': pinFilled,
