@@ -11,6 +11,7 @@
   import { fetchWorkflowForAuthorization } from '$lib/services/workflow-service';
   import { namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
+  import { translate } from '$lib/i18n/translate';
 
   $: namespaceNames = $namespaces.map(
     (namespace: Namespace) => namespace?.namespaceInfo?.name,
@@ -27,7 +28,7 @@
         } else {
           toaster.push({
             variant: 'error',
-            message: 'You do not have access to this namespace.',
+            message: translate('namespaces', 'unauthorized-namespace-error'),
           });
         }
       },
@@ -40,25 +41,32 @@
   );
 </script>
 
-<PageTitle title="Select Namespace" url={$page.url.href} />
+<PageTitle
+  title={translate('namespaces', 'namespace-select-header')}
+  url={$page.url.href}
+/>
 <div class="w-full p-8 xl:w-1/2">
-  <h1 class="my-4 text-3xl">Welcome to Temporal</h1>
-  <p class="mb-8">Select a Namespace to get started.</p>
+  <h1 class="my-4 text-3xl">
+    {translate('namespaces', 'select-namespace-welcome')}
+  </h1>
+  <p class="mb-8">{translate('namespaces', 'select-namespace')}</p>
   <form class="search" role="search">
     <div class="ml-4 mr-2">
       <Icon name="search" />
     </div>
-    <label class="sr-only" for="search-namespaces">Search Namespaces</label>
+    <label class="sr-only" for="search-namespaces"
+      >{translate('namespaces', 'search-namespaces')}</label
+    >
     <input
       class="w-full"
-      placeholder="Search"
+      placeholder={translate('search')}
       type="search"
       id="search-namespaces"
       on:keydown|stopPropagation
       bind:value={searchValue}
     />
   </form>
-  <ul class="h-screen w-full" aria-label="namespaces">
+  <ul class="h-screen w-full" aria-label={translate('namespaces')}>
     {#if namespaceList.length}
       {#if filteredList.length}
         <VirtualList items={filteredList} let:item itemHeight={50}>
@@ -74,10 +82,12 @@
           </li>
         </VirtualList>
       {:else}
-        <EmptyState title="No results." />
+        <EmptyState title={translate('no-results')} />
       {/if}
     {:else}
-      <EmptyState title="No Namespaces. Contact your admin to create one." />
+      <EmptyState
+        title={translate('namespaces', 'select-namespace-empty-state')}
+      />
     {/if}
   </ul>
 </div>
