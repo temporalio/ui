@@ -241,9 +241,6 @@ devDependencies:
   husky:
     specifier: ^8.0.3
     version: 8.0.3
-  i18next-fs-backend:
-    specifier: ^2.1.2
-    version: 2.1.2
   jest-websocket-mock:
     specifier: ^2.4.0
     version: 2.4.0
@@ -5881,10 +5878,6 @@ packages:
     dependencies:
       '@babel/runtime': 7.20.7
     dev: false
-
-  /i18next-fs-backend@2.1.2:
-    resolution: {integrity: sha512-y9vl8HC8b1ayqZELzKvaKgnphrxgbaGGSNQjPU0JoTVP1M3NI6C69SwiAAXi6xuF1FSySJG52EdQZdMUETlwRA==}
-    dev: true
 
   /i18next@22.4.15:
     resolution: {integrity: sha512-yYudtbFrrmWKLEhl6jvKUYyYunj4bTBCe2qIUYAxbXoPusY7YmdwPvOE6fx6UIfWvmlbCWDItr7wIs8KEBZ5Zg==}
