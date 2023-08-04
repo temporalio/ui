@@ -89,4 +89,8 @@ export const Strings = {
   'log-out': 'Log out',
   'select-all': 'Select All',
   absolute: 'Absolute',
+  previous: 'Previous',
+  next: 'Next',
+  'banner-temporal-version': 'Temporal v{{version}} is available',
+  'banner-ui-version': 'Temporal UI v{{version}} is available',
 } as const;

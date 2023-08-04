@@ -13,6 +13,7 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
 
   import type { HistoryEvent } from '$lib/types/events';
+  import { translate } from '$lib/i18n/translate';
 
   let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
   let fileLoaded = false;
@@ -29,7 +30,10 @@
           rawEvents = parseWithBigInt(result);
           fileLoaded = true;
         } catch (e) {
-          toaster.push({ variant: 'error', message: 'Could not parse JSON' });
+          toaster.push({
+            variant: 'error',
+            message: translate('events', 'event-history-load-error'),
+          });
           fileLoaded = false;
         }
       };
@@ -55,7 +59,7 @@
       console.error(e);
       toaster.push({
         variant: 'error',
-        message: 'Could not create event history from JSON',
+        message: translate('events', 'event-history-import-error'),
       });
     }
   };
@@ -68,5 +72,5 @@
   on:change={onFileSelect}
 />
 <Button icon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
-  >Import</Button
+  >{translate('import')}</Button
 >

@@ -19,6 +19,8 @@
     let:visibleItems
     aria-label="namespaces"
     pageSizeSelectLabel={translate('per-page')}
+    previousButtonLabel={translate('previous')}
+    nextButtonLabel={translate('next')}
   >
     <Table variant="fancy" class="w-full">
       <TableHeaderRow slot="headers">
