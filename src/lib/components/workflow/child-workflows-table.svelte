@@ -43,6 +43,8 @@
   let:visibleItems
   aria-label="child workflows"
   pageSizeSelectLabel={translate('per-page')}
+  previousButtonLabel={translate('previous')}
+  nextButtonLabel={translate('next')}
 >
   <div slot="pagination-top" />
   <Table class="w-full">

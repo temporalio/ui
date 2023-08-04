@@ -77,6 +77,8 @@
       let:visibleItems
       aria-label="schedules"
       pageSizeSelectLabel={translate('per-page')}
+      previousButtonLabel={translate('previous')}
+      nextButtonLabel={translate('next')}
     >
       <svelte:fragment slot="action-top-left">
         <div class="w-full xl:w-1/2">

@@ -34,6 +34,8 @@
   let:initialItem
   aria-label="recent events"
   pageSizeSelectLabel={translate('per-page')}
+  previousButtonLabel={translate('previous')}
+  nextButtonLabel={translate('next')}
 >
   <EventSummaryTable {compact} on:expandAll={handleExpandChange}>
     {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
