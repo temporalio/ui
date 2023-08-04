@@ -114,5 +114,7 @@
   "workflow-status-filter-label": "Open execution status filter menu",
   "clear-input-button-label": "Clear input",
   "keyboard-shortcuts": "Keyboard Shortcuts",
-  "close-keyboard-shortcuts": "Close keyboard shortcuts"
+  "close-keyboard-shortcuts": "Close keyboard shortcuts",
+  "banner-temporal-version": "Temporal v{{version}} is available",
+  "banner-ui-version": "Temporal UI v{{version}} is available"
 }

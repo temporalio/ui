@@ -277,6 +277,8 @@
   let:visibleItems
   aria-label={translate('workflows', 'recent-workflows')}
   pageSizeSelectLabel={translate('per-page')}
+  previousButtonLabel={translate('previous')}
+  nextButtonLabel={translate('next')}
 >
   <svelte:fragment slot="action-top-left">
     <LabsModeGuard>

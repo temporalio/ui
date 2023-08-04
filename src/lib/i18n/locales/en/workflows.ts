@@ -45,7 +45,7 @@ export const Strings = {
   completed: 'Completed',
   failed: 'Failed',
   'contd-as-new': "Cont'd as New",
-  'continued-as-new': 'ContinuedAsNew',
+  'continued-as-new': 'Continued as New',
   terminated: 'Terminated',
   canceled: 'Canceled',
   paused: 'Paused',
@@ -188,4 +188,20 @@ export const Strings = {
   'remove-column-label': 'Remove {{column}} column',
   'pin-column-label': 'Pin {{column}} column',
   'unpin-column-label': 'Unpin {{column}} column',
+  'archived-workflows': 'Archived Workflows',
+  archival: 'Archival',
+  'empty-state-title': 'No Workflows Found',
+  'empty-state-description':
+    'If you have filters applied, try adjusting them. Otherwise please check your syntax and try again.',
+  'visibility-disabled-archival':
+    'This namespace is currently enabled for archival but visibility is not enabled.',
+  'archival-link-preface': 'To enable ',
+  'archival-link': 'archival visibility',
+  'archival-disabled-title':
+    'This namespace is currently not enabled for archival.',
+  'archival-disabled-details':
+    'Run this command to enable archival visibility for event histories',
+  'basic-search': 'Basic Search',
+  'advanced-search': 'Advanced Search',
+  'time-range': 'Time Range',
 } as const;

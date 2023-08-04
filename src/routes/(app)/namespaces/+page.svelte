@@ -21,6 +21,8 @@
     let:visibleItems
     aria-label={translate('namespaces')}
     pageSizeSelectLabel={translate('per-page')}
+    previousButtonLabel={translate('previous')}
+    nextButtonLabel={translate('next')}
   >
     <Table variant="fancy" class="w-full">
       <caption class="sr-only" slot="caption">{translate('namespaces')}</caption

@@ -117,4 +117,6 @@ export const Strings = {
   'clear-input-button-label': 'Clear input',
   'keyboard-shortcuts': 'Keyboard Shortcuts',
   'close-keyboard-shortcuts': 'Close keyboard shortcuts',
+  'banner-temporal-version': 'Temporal v{{version}} is available',
+  'banner-ui-version': 'Temporal UI v{{version}} is available',
 } as const;

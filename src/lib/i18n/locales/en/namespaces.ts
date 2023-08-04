@@ -17,4 +17,10 @@ export const Strings = {
   clusters: 'Clusters',
   'client-actions': 'Client Actions',
   'signal-workflow': 'Signal Workflow',
+  'unauthorized-namespace-error': 'You do not have access to this namespace.',
+  'select-namespace-welcome': 'Welcome to Temporal',
+  'select-namespace': 'Select a Namespace to get started.',
+  'search-namespaces': 'Search Namespaces',
+  'select-namespace-empty-state':
+    'No Namespaces. Contact your admin to create one.',
 } as const;
