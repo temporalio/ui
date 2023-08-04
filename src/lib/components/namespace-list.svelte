@@ -8,6 +8,7 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
   import type { Writable } from 'svelte/store';
+  import { translate } from '$lib/i18n/translate';
 
   export let namespaceList: NamespaceListItem[] = [];
   export let open: Writable<boolean>;
@@ -121,7 +122,7 @@
 >
   <div class="prose my-4">
     <h2 class="text:xl md:text-2xl" data-testid="namespace-select-header">
-      Select a Namespace
+      {translate('namespaces', 'namespace-select-header')}
     </h2>
   </div>
   <div class="mb-4">
@@ -130,7 +131,9 @@
       id="namespace-search"
       bind:value={searchValue}
       icon="search"
-      placeholder="Search"
+      label={translate('search')}
+      labelHidden
+      placeholder={translate('search')}
     />
   </div>
 
@@ -152,7 +155,9 @@
         </a>
       </li>
     {:else}
-      <EmptyState title="No Namespaces" />
+      <EmptyState
+        title={translate('namespaces', 'namespace-select-empty-state')}
+      />
     {/each}
   </ul>
 </div>

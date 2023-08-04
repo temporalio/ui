@@ -133,6 +133,7 @@ export type Severity = temporal.api.enums.v1.Severity;
 export type WorkflowTaskFailedCause =
   temporal.api.enums.v1.WorkflowTaskFailedCause;
 export type ArchivalState = temporal.api.enums.v1.ArchivalState;
+export type TaskReachability = temporal.api.enums.v1.TaskReachability;
 
 // api.workflow
 
@@ -143,6 +144,8 @@ export type WorkflowExecutionConfig =
   temporal.api.workflow.v1.IWorkflowExecutionConfig;
 export type WorkflowExecutionInfo =
   temporal.api.workflow.v1.IWorkflowExecutionInfo;
+export type WorkflowVersionTimpstamp =
+  temporal.api.common.v1.IWorkerVersionStamp;
 
 // api response
 export type Payload = temporal.api.common.v1.IPayload;
@@ -155,6 +158,9 @@ export type Header = temporal.api.common.v1.IHeader;
 
 export type PollerInfo = temporal.api.taskqueue.v1.IPollerInfo;
 export type TaskQueueStatus = temporal.api.taskqueue.v1.ITaskQueueStatus;
+export type TaskQueueCompatibleVersionSet =
+  temporal.api.taskqueue.v1.ICompatibleVersionSet;
+export type BuildIdReachability = temporal.api.taskqueue.v1.BuildIdReachability;
 
 // api.schedule
 

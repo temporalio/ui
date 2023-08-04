@@ -14,6 +14,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Search from '$lib/components/search.svelte';
   import { createEventDispatcher } from 'svelte';
+  import { translate } from '$lib/i18n/translate';
   const dispatch = createEventDispatcher<{ search: undefined }>();
 
   export let searchType: 'basic' | 'advanced';
@@ -108,7 +109,9 @@
         icon="search"
         type="search"
         id="workflow-id-filter"
-        placeholder="Workflow ID"
+        placeholder={translate('workflow-id')}
+        label={translate('workflow-id')}
+        labelHidden
         bind:value={parameters.workflowId}
         on:input={handleParameterChange}
       />
@@ -116,7 +119,9 @@
         icon="search"
         type="search"
         id="workflow-type-filter"
-        placeholder="Workflow Type"
+        placeholder={translate('workflow-type')}
+        label={translate('workflow-type')}
+        labelHidden
         bind:value={parameters.workflowType}
         on:input={handleParameterChange}
       />

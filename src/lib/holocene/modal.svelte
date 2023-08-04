@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  
+
   import { type ComponentProps, createEventDispatcher } from 'svelte';
-  
+
   import Button from '$lib/holocene/button.svelte';
-  
+
   import IconButton from './icon-button.svelte';
 
   interface $$Props extends HTMLAttributes<HTMLDialogElement> {
@@ -126,15 +126,11 @@
     />
   {/if}
   <div id="modal-title-{id}" class="title">
-    <slot name="title">
-      <h3>Title</h3>
-    </slot>
+    <slot name="title" />
   </div>
   <form on:submit|preventDefault={confirmModal} method="dialog">
     <div id="modal-content-{id}" class="content">
-      <slot name="content">
-        <span>Content</span>
-      </slot>
+      <slot name="content" />
       {#if error}
         <p class="mt-2 text-sm font-normal text-danger">{error}</p>
       {/if}

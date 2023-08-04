@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { noop } from 'svelte/internal';
-  
+
   import type { IconName } from '$lib/holocene/icon/paths';
   import Input from '$lib/holocene/input/input.svelte';
-  
+
   import MenuContainer from './primitives/menu/menu-container.svelte';
   import MenuItem from './primitives/menu/menu-item.svelte';
   import Menu from './primitives/menu/menu.svelte';
@@ -12,18 +12,21 @@
   interface $$Props extends HTMLInputAttributes {
     id: string;
     value: string;
-    label?: string;
+    label: string;
+    labelHidden?: boolean;
     icon?: IconName;
     copyable?: boolean;
     clearable?: boolean;
     theme?: 'dark' | 'light';
     options: string[];
     onOptionClick: (option: string) => void;
+    emptyOptionText: string;
   }
 
   export let id: string;
   export let value: string;
-  export let label = '';
+  export let label: string;
+  export let labelHidden = false;
   export let placeholder = '';
   export let icon: IconName = null;
   export let copyable = false;
@@ -31,6 +34,7 @@
   export let options: string[];
   export let onOptionClick: (option: string) => void;
   export let disabled = false;
+  export let emptyOptionText: string;
 
   let className = '';
   export { className as class };
@@ -48,6 +52,7 @@
     bind:value
     {icon}
     {label}
+    {labelHidden}
     {placeholder}
     {theme}
     {copyable}
@@ -68,7 +73,7 @@
         {option}
       </MenuItem>
     {:else}
-      <MenuItem on:click={noop}>No Results</MenuItem>
+      <MenuItem on:click={noop}>{emptyOptionText}</MenuItem>
     {/each}
   </Menu>
 </MenuContainer>

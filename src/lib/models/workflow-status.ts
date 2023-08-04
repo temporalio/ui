@@ -13,6 +13,10 @@ export const workflowStatuses: WorkflowStatuses = [
   'Terminated',
 ] as const;
 
+export function isWorkflowStatusType(value: string): value is WorkflowStatus {
+  return workflowStatuses.includes(value as WorkflowStatus);
+}
+
 export const workflowStatusFilters: WorkflowFilters = [
   'All',
   ...workflowStatuses,

@@ -152,7 +152,6 @@ describe('toListWorkflowQueryFromFilters', () => {
     const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
     const query = toListWorkflowQueryFromFilters(
       combineDropdownFilters(filters),
-      [],
       supportsAdvancedVisibility,
     );
     expect(query).toBe('StartTime > "2019-12-30T00:00:00Z"');
@@ -178,7 +177,6 @@ describe('toListWorkflowQueryFromFilters', () => {
     const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
     const query = toListWorkflowQueryFromFilters(
       combineDropdownFilters(filters),
-      [],
       supportsAdvancedVisibility,
     );
     expect(query).toBe(

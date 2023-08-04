@@ -28,13 +28,13 @@
       class="grid-row-3 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:w-11/12"
     >
       <div class="col-span-1 md:col-span-2">
-        <h3 class="font-medium">{translate('workflows', 'workflow-type')}</h3>
+        <h3 class="font-medium">{translate('workflow-type')}</h3>
         <div class="h-0.5 rounded-full bg-gray-900" />
         <WorkflowDetail content={workflow?.name} copyable />
         <WorkflowDetail content={workflow?.runId} copyable />
       </div>
       <div class="col-span-1">
-        <h3 class="font-medium">{translate('workflows', 'task-queue')}</h3>
+        <h3 class="font-medium">{translate('task-queue')}</h3>
         <div class="h-0.5 rounded-full bg-gray-900" />
         <WorkflowDetail
           content={workflow?.taskQueue}

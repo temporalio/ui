@@ -114,7 +114,7 @@ export const fetchWorkflowCount = async (
         countPromise,
         totalCountPromise,
       ]);
-      count = parseInt(countResult?.count);
+      count = parseInt(countResult?.count ?? '0');
       totalCount = parseInt(totalCountResult?.count);
     }
   } catch (e) {

@@ -2,13 +2,30 @@
   import { page } from '$app/stores';
 
   import WorkersList from '$lib/components/workers-list.svelte';
-  import { getPollers } from '$lib/services/pollers-service';
+  import {
+    type PollerWithTaskQueueTypes,
+    getPollers,
+    getTaskQueueCompatibility,
+  } from '$lib/services/pollers-service';
 
   let { queue, namespace } = $page.params;
 
-  let workers = getPollers({ queue, namespace });
+  function pollerHasVersioning(pollers: PollerWithTaskQueueTypes[]) {
+    return pollers?.some(
+      (poller) => poller?.workerVersionCapabilities?.useVersioning,
+    );
+  }
 </script>
 
-{#await workers then workers}
-  <WorkersList taskQueue={queue} {workers} />
+{#await getPollers({ queue, namespace }) then workers}
+  {@const versioningEnabled = pollerHasVersioning(workers.pollers)}
+  {#if versioningEnabled}
+    {#await getTaskQueueCompatibility({ queue, namespace }) then compatibility}
+      <WorkersList taskQueue={queue} {workers} {compatibility} />
+    {:catch}
+      <WorkersList taskQueue={queue} {workers} />
+    {/await}
+  {:else}
+    <WorkersList taskQueue={queue} {workers} />
+  {/if}
 {/await}

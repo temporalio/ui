@@ -11,5 +11,12 @@
 </script>
 
 <Hst.Story>
-  <DatePicker on:datechange={onDateChange} selected={currentDate} />
+  <DatePicker
+    label="Pick a Date"
+    labelHidden
+    on:datechange={onDateChange}
+    selected={currentDate}
+    todayLabel="Today"
+    closeLabel="Close"
+  />
 </Hst.Story>

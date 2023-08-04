@@ -10,6 +10,7 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let data: PageData & { archivalQueryingNotSupported: boolean };
 
@@ -35,6 +36,7 @@
       items={workflows}
       let:visibleItems
       aria-label="archived workflows"
+      pageSizeSelectLabel={translate('per-page')}
     >
       <WorkflowsSummaryTable>
         {#each visibleItems as event}

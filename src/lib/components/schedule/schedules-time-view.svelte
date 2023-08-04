@@ -2,6 +2,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let hour = '';
   export let minute = '';
@@ -30,18 +31,21 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <h3 class="text-lg font-medium">Time</h3>
+  <h3 class="text-lg font-medium">
+    {translate('schedules', 'time-view-heading')}
+  </h3>
   <p>
-    Specify the time (UTC) for this schedule to run. By default, the schedule
-    will run at 12:00am UTC if left blank.
+    {translate('schedules', 'time-view-description')}
   </p>
   <div class="flex flex-row items-center gap-2">
     <div class="w-24">
       <Input
         id="hour"
+        label={translate('hours-abbreviated')}
+        labelHidden
         bind:value={_hour}
         placeholder="00"
-        suffix="hrs"
+        suffix={translate('hours-abbreviated')}
         maxLength={2}
         error={error(_hour, 12)}
       />
@@ -50,9 +54,11 @@
     <div class="w-24">
       <Input
         id="minute"
+        label={translate('minutes-abbreviated')}
+        labelHidden
         bind:value={minute}
         placeholder="00"
-        suffix="min"
+        suffix={translate('minutes-abbreviated')}
         maxLength={2}
         error={error(minute, 59)}
       />
@@ -60,10 +66,10 @@
     <div class="ml-2">
       <ToggleButtons>
         <ToggleButton active={time === 'AM'} on:click={() => (time = 'AM')}
-          >AM</ToggleButton
+          >{translate('ante-meridiem')}</ToggleButton
         >
         <ToggleButton active={time === 'PM'} on:click={() => (time = 'PM')}
-          >PM</ToggleButton
+          >{translate('post-meridiem')}</ToggleButton
         >
       </ToggleButtons>
     </div>

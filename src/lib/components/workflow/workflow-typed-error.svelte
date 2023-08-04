@@ -217,12 +217,7 @@
           <th class="w-44">{translate('event')}</th>
           <th class="w-auto xl:w-80" />
         </TableHeaderRow>
-        <EventSummaryRow
-          event={error}
-          initialItem={error}
-          visibleItems={[error]}
-          typedError
-        />
+        <EventSummaryRow event={error} initialItem={error} typedError />
       </Table>
     </div>
   </Alert>

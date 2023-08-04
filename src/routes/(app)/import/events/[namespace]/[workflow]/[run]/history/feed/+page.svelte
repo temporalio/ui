@@ -8,6 +8,7 @@
   import { eventCategoryFilter } from '$lib/stores/filters';
 
   import type { EventTypeCategory, WorkflowEvent } from '$lib/types/events';
+  import { translate } from '$lib/i18n/translate';
 
   $: category = $eventCategoryFilter as EventTypeCategory;
   $: sortedEvents =
@@ -32,6 +33,7 @@
   let:visibleItems
   let:initialItem
   aria-label="recent events"
+  pageSizeSelectLabel={translate('per-page')}
 >
   <EventSummaryTable {compact} on:expandAll={handleExpandChange}>
     {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
@@ -40,7 +42,6 @@
         {compact}
         expandAll={$expandAllEvents === 'true'}
         {initialItem}
-        {visibleItems}
       />
     {:else}
       <EventEmptyRow />

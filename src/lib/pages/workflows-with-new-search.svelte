@@ -59,24 +59,23 @@
     workflowsSearchParams,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import {
-    persistedTimeFilter,
-    workflowFilters,
-    workflowSorts,
-  } from '$lib/stores/filters';
+  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import Pagination from '$lib/holocene/pagination.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
+  import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
+  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
+  import { labsMode } from '$lib/stores/labs-mode';
+
   import {
     batchCancelByQuery,
     batchTerminateByQuery,
     bulkCancelByIDs,
     bulkTerminateByIDs,
   } from '$lib/services/batch-service';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import { Action } from '$lib/models/workflow-actions';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
@@ -85,6 +84,9 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import Translate from '$lib/i18n/translate.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { searchAttributes } from '$lib/stores/search-attributes';
+  import Button from '$lib/holocene/button.svelte';
+  import { exportWorkflows } from '$lib/utilities/export-workflows';
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);
@@ -94,7 +96,7 @@
   $: searchParams, ($workflowsSearchParams = searchParams);
 
   $: {
-    if (!$workflowFilters.length && !$workflowSorts.length) {
+    if (!$workflowFilters.length) {
       $workflowsQuery = '';
     }
   }
@@ -102,7 +104,7 @@
   const persistTimeFilter = () => {
     if (!query && !$workflowFilters.length && $persistedTimeFilter) {
       $workflowFilters = [$persistedTimeFilter];
-      updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+      updateQueryParamsFromFilter($page.url, $workflowFilters);
     }
   };
 
@@ -112,7 +114,9 @@
     $lastUsedNamespace = $page.params.namespace;
     if (query) {
       // Set filters from inital page load query if it exists
-      $workflowFilters = toListWorkflowFilters(query);
+      $workflowFilters = $labsMode
+        ? toListWorkflowFilters(query, $searchAttributes)
+        : toListWorkflowFilters(query);
     }
   });
 
@@ -125,18 +129,6 @@
   const refreshWorkflows = () => {
     resetSelection();
     $refresh = Date.now();
-  };
-
-  const resetPageToDefaultState = () => {
-    $workflowFilters = [];
-    $workflowSorts = [];
-    updateQueryParameters({
-      url: $page.url,
-      parameter: 'query',
-      value: '',
-      allowEmpty: true,
-    });
-    refreshWorkflows();
   };
 
   const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
@@ -165,7 +157,7 @@
         });
       }
       batchTerminateConfirmationModal?.close();
-      resetPageToDefaultState();
+      refreshWorkflows();
     } catch (error) {
       batchTerminateConfirmationModal?.setError(
         error?.message ?? translate('unknown-error'),
@@ -199,7 +191,7 @@
         });
       }
       batchCancelConfirmationModal?.close();
-      resetPageToDefaultState();
+      refreshWorkflows();
     } catch (error) {
       batchCancelConfirmationModal?.setError(
         error?.message ?? translate('unknown-error'),
@@ -240,20 +232,10 @@
       <Translate namespace="workflows" key="recent-workflows" />
     </h1>
     <div class="flex items-center gap-2 text-sm">
-      <p data-testid="namespace-name">
-        {$page.params.namespace}
-      </p>
       {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility}
-        <div class="h-1 w-1 rounded-full bg-gray-400" />
         <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
-          {#if $loading}
-            <span class="text-gray-400"
-              ><Translate namespace="common" key="loading" /></span
-            >
-          {:else if $updating}
-            <span class="text-gray-400"
-              ><Translate namespace="common" key="filtering" /></span
-            >
+          {#if $loading || $updating}
+            <Translate namespace="workflows" key="loading-workflows" />
           {:else if query}
             <Translate
               namespace="workflows"
@@ -271,7 +253,13 @@
             />
           {/if}
         </p>
+        <div class="h-1 w-1 rounded-full bg-gray-400" />
       {/if}
+      <Button
+        variant="link"
+        disabled={$loading || $updating || $workflows.length === 0}
+        on:click={() => exportWorkflows($workflows)}>Download JSON</Button
+      >
     </div>
   </div>
   <div>
@@ -284,9 +272,19 @@
     </button>
   </div>
 </header>
-<Pagination items={$workflows} let:visibleItems aria-label="recent workflows">
+<Pagination
+  items={$workflows}
+  let:visibleItems
+  aria-label="recent workflows"
+  pageSizeSelectLabel={translate('per-page')}
+>
   <svelte:fragment slot="action-top-left">
-    <WorkflowAdvancedSearch />
+    <LabsModeGuard>
+      <svelte:fragment slot="fallback">
+        <WorkflowAdvancedSearch />
+      </svelte:fragment>
+      <WorkflowFilterSearch />
+    </LabsModeGuard>
   </svelte:fragment>
   <svelte:fragment slot="action-top-center">
     <WorkflowDateTimeFilter />

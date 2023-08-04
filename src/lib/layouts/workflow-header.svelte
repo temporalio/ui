@@ -33,10 +33,16 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    getCurrentCompatibilityDefaultVersion,
+    getCurrentWorkflowBuildId,
+    getDefaultVersionForSetFromABuildId,
+  } from '$lib/utilities/task-queue-compatibility';
+  import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
 
   export let namespace: string;
 
-  $: ({ workflow, workers } = $workflowRun);
+  $: ({ workflow, workers, compatibility } = $workflowRun);
 
   let refreshInterval: NodeJS.Timer;
   const refreshRate = 15000;
@@ -87,8 +93,17 @@
     $workflowRun?.workflow?.status,
     $eventHistory,
   );
-
   $: workflowHasBeenReset = has($resetWorkflows, $workflowRun?.workflow?.runId);
+
+  $: workflowUsesVersioning =
+    workflow?.mostRecentWorkerVersionStamp?.useVersioning;
+  $: buildId = getCurrentWorkflowBuildId(workflow);
+  $: overallDefaultVersion =
+    getCurrentCompatibilityDefaultVersion(compatibility);
+  $: defaultVersionForSet = getDefaultVersionForSetFromABuildId(
+    compatibility,
+    buildId,
+  );
 </script>
 
 <header class="mb-4 flex flex-col gap-1">
@@ -108,9 +123,8 @@
     class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
   >
     <div
-      class="flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
+      class="flex flex-col gap-2 w-full justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
     >
-      <WorkflowStatus status={workflow?.status} />
       <h1
         data-testid="workflow-id-heading"
         class="overflow-hidden text-2xl font-medium"
@@ -122,15 +136,57 @@
           class="overflow-hidden text-ellipsis"
         />
       </h1>
-    </div>
-    {#if isRunning}
-      <div
-        class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
-      >
-        <AutoRefreshWorkflow onChange={onRefreshChange} />
-        <WorkflowActions {cancelInProgress} {workflow} {namespace} />
+      <div class="flex gap-4 items-center flex-wrap">
+        <WorkflowStatus status={workflow?.status} />
+        {#if workflowUsesVersioning}
+          <p class="flex gap-1 items-center">
+            <span>{translate('workers', 'last-used-version')}</span
+            ><CompatibilityBadge
+              defaultVersion={buildId === defaultVersionForSet ||
+                buildId === overallDefaultVersion}
+              active={buildId === overallDefaultVersion}
+              {buildId}
+            >
+              <svelte:fragment slot="overall-default-worker">
+                {#if buildId === overallDefaultVersion}{translate(
+                    'workers',
+                    'overall',
+                  )}{/if}
+              </svelte:fragment>
+              <svelte:fragment slot="default-worker">
+                {translate('workers', 'default')}
+              </svelte:fragment>
+            </CompatibilityBadge>
+          </p>
+          <p class="flex gap-1 items-center">
+            <span>{translate('workers', 'next-version')}</span
+            ><CompatibilityBadge
+              defaultVersion={!!defaultVersionForSet}
+              active={defaultVersionForSet === overallDefaultVersion}
+              buildId={defaultVersionForSet}
+            >
+              <svelte:fragment slot="overall-default-worker">
+                {#if defaultVersionForSet === overallDefaultVersion}{translate(
+                    'workers',
+                    'overall',
+                  )}{/if}
+              </svelte:fragment>
+              <svelte:fragment slot="default-worker">
+                {translate('workers', 'default')}
+              </svelte:fragment>
+            </CompatibilityBadge>
+          </p>
+        {/if}
       </div>
-    {/if}
+    </div>
+    <div
+      class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
+    >
+      {#if isRunning}
+        <AutoRefreshWorkflow onChange={onRefreshChange} />
+      {/if}
+      <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
+    </div>
   </div>
   {#if cancelInProgress}
     <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>

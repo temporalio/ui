@@ -2,12 +2,13 @@
   import { page } from '$app/stores';
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import { translate } from '$lib/i18n/translate';
   import {
     type TextFilterAttributes,
     attributeToHumanReadable,
     attributeToId,
   } from '$lib/models/workflow-filters';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import { workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   let value = '';
@@ -17,7 +18,6 @@
     $workflowFilters.filter((f) => f.attribute !== attribute);
 
   $: idFilter = $workflowFilters.find((f) => f.attribute === attribute);
-  $: idSort = $workflowSorts.find((s) => s.attribute === attribute);
 
   const onInput = (e: Event) => {
     const { value } = e.target as HTMLInputElement;
@@ -34,7 +34,7 @@
       $workflowFilters = [...getOtherFilters()];
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    updateQueryParamsFromFilter($page.url, $workflowFilters);
   };
 
   function handleShowInput(event: CustomEvent) {
@@ -48,12 +48,12 @@
 
   function handleClearInput() {
     $workflowFilters = [...getOtherFilters()];
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    updateQueryParamsFromFilter($page.url, $workflowFilters);
   }
 </script>
 
 <DropdownMenu
-  value={idFilter ? idFilter.value : idSort ? idSort.value : ''}
+  value={idFilter ? idFilter.value : ''}
   keepOpen
   icon="filter"
   testId="{attributeToId[attribute]}-filter-button"
@@ -66,6 +66,8 @@
     <Input
       icon="search"
       type="search"
+      label={translate('search')}
+      labelHidden
       id={attributeToId[attribute]}
       placeholder={attributeToHumanReadable[attribute]}
       class="flex items-center px-2 transition-all hover:cursor-pointer"

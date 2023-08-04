@@ -17,6 +17,7 @@
     SchedulePresetsParameters,
     ScheduleSpecParameters,
   } from '$lib/types/schedule';
+  import { translate } from '$lib/i18n/translate';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -74,7 +75,7 @@
 </script>
 
 {#await scheduleFetch}
-  <Loading title="Loading Schedule..." />
+  <Loading title={translate('schedules', 'loading')} />
 {:then { schedule }}
   <ScheduleFormView onConfirm={handleEdit} {schedule} />
 {/await}

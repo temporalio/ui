@@ -19,11 +19,11 @@
   import Toaster from '$lib/holocene/toaster.svelte';
   import { toaster } from '$lib/stores/toaster';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import { workflowFilters } from '$lib/stores/filters';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
-  import SideNavigation from '$lib/holocene/navigation/side-nav.svelte';
-  import TopNavigation from '$lib/holocene/navigation/top-nav.svelte';
-  import DataEncoderSettings from '$lib/holocene/data-encoder-settings.svelte';
+  import SideNavigation from '$lib/components/side-nav.svelte';
+  import TopNavigation from '$lib/components/top-nav.svelte';
+  import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
 
   export let data: PageData;
 
@@ -47,7 +47,6 @@
       onClick: (namespace: string) => {
         $lastUsedNamespace = namespace;
         $workflowFilters = [];
-        $workflowSorts = [];
         goto(getHref(namespace));
       },
     };

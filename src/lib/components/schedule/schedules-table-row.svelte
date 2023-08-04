@@ -16,6 +16,7 @@
     FullScheduleSpec,
     StructuredCalendar,
   } from '$lib/types/schedule';
+  import { translate } from '$lib/i18n/translate';
 
   let { namespace } = $page.params;
 
@@ -71,7 +72,9 @@
   </td>
   <td class="cell truncate max-xl:hidden">
     {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
-      <div>{formatDate(run, $timeFormat, 'from now')}</div>
+      <div>
+        {formatDate(run, $timeFormat, { relativeLabel: translate('from-now') })}
+      </div>
     {/each}
   </td>
 </TableRow>

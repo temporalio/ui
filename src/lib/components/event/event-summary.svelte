@@ -25,6 +25,7 @@
     EventTypeCategory,
     IterableEvent,
   } from '$lib/types/events';
+  import { translate } from '$lib/i18n/translate';
 
   export let compact = false;
 
@@ -119,13 +120,13 @@
   let:activeRowIndex
   let:setActiveRowIndex
   aria-label="recent events"
+  pageSizeSelectLabel={translate('per-page')}
 >
   <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
     {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
       <EventSummaryRow
         {event}
         {compact}
-        {visibleItems}
         expandAll={$expandAllEvents === 'true'}
         {initialItem}
         active={activeRowIndex === index || event.id === hash.slice(1)}
