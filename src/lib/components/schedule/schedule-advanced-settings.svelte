@@ -17,19 +17,19 @@
 {#if show}
   <p>
     {translate('schedules', 'start-time')}
-    {spec?.startTime ?? ''}
+    {spec?.startTime ?? 'None'}
   </p>
-  <p>{translate('schedules', 'end-time')}{spec?.endTime ?? ''}</p>
-  <p>{translate('schedules', 'jitter')}{spec?.jitter ?? ''}</p>
+  <p>{translate('schedules', 'end-time')}{spec?.endTime ?? 'None'}</p>
+  <p>{translate('schedules', 'jitter')}{spec?.jitter ?? 'None'}</p>
   <p>
     {translate('schedules', 'exclusion-calendar')}{spec?.excludeCalendar?.[0] ??
-      ''}
+      'None'}
   </p>
   <p>
-    {translate('schedules', 'remaining-actions')}{state?.remainingActions ?? ''}
+    {translate('schedules', 'remaining-actions')}{state?.remainingActions ?? 'None'}
   </p>
   <p>
-    {translate('schedules', 'overlap-policy')}{policies?.overlapPolicy ?? ''}
+    {translate('schedules', 'overlap-policy')}{policies?.overlapPolicy ?? 'None'}
   </p>
 {/if}
 
