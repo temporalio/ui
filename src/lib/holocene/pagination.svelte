@@ -70,7 +70,7 @@
 
   onMount(() => {
     updateWidth();
-    if (startingIndex > 0) {
+    if (parseInt(startingIndex) > 0) {
       handlePageChange();
     }
   });
