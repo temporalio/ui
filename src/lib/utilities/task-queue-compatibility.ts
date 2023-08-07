@@ -45,6 +45,14 @@ export const getCurrentCompatibilityDefaultVersion = (
   return getDefaultVersionForSet(orderedSets[0].buildIds);
 };
 
+export const getNumberOfVersionSets = (
+  compatibility: TaskQueueCompatibility | undefined,
+): number => {
+  const orderedSets = getOrderedVersionSets(compatibility);
+  console.log('Numbrer of Version Sets: ', orderedSets.length);
+  return orderedSets?.length || 0;
+};
+
 export const getCurrentWorkflowBuildId = (
   workflow: WorkflowExecution,
 ): string | undefined => {

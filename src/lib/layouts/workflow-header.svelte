@@ -37,6 +37,7 @@
     getCurrentCompatibilityDefaultVersion,
     getCurrentWorkflowBuildId,
     getDefaultVersionForSetFromABuildId,
+    getNumberOfVersionSets,
   } from '$lib/utilities/task-queue-compatibility';
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
 
@@ -104,6 +105,7 @@
     compatibility,
     buildId,
   );
+  $: maxVersionSets = getNumberOfVersionSets(compatibility);
 </script>
 
 <header class="mb-4 flex flex-col gap-1">
@@ -218,6 +220,19 @@
             run: $resetWorkflows[$workflowRun?.workflow?.runId],
           })}>here</Link
         >.
+      </Alert>
+    </div>
+  {/if}
+  {#if maxVersionSets}
+    <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
+      <Alert
+        bold
+        icon="warning"
+        intent="warning"
+        title={translate('workers', 'max-version-sets-title')}
+        role="status"
+      >
+        {translate('workers', 'max-version-sets-description')}
       </Alert>
     </div>
   {/if}
