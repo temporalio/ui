@@ -26,6 +26,7 @@
     pageSizeSelectLabel: string;
     emptyStateMessage: string;
     fallbackErrorMessage: string;
+    itemsKeyname?: string;
     previousButtonLabel: string;
     nextButtonLabel: string;
   }
@@ -48,6 +49,7 @@
   export let pageSizeSelectLabel: string;
   export let emptyStateMessage: string;
   export let fallbackErrorMessage: string;
+  export let itemsKeyname = 'items';
   export let previousButtonLabel: string;
   export let nextButtonLabel: string;
 
@@ -81,7 +83,8 @@
     const fetchData = await onFetch();
     try {
       const response = await fetchData($store.pageSize, '');
-      const { items, nextPageToken } = response;
+      const { nextPageToken } = response;
+      const items = response[itemsKeyname] || [];
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
       error = err;
@@ -99,7 +102,8 @@
           $store.pageSize,
           $store.indexData[$store.index].nextToken,
         );
-        const { items, nextPageToken } = response;
+        const { nextPageToken } = response;
+        const items = response[itemsKeyname] || [];
         store.nextPageWithItems(nextPageToken, items);
       } catch (error) {
         if (isError(error) && onError) {
