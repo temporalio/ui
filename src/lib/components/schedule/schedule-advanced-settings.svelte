@@ -8,7 +8,6 @@
   export let policies: SchedulePolicies;
 
   let show = false;
-  console.log('this is state', state);
 </script>
 
 <button on:click={() => (show = !show)} class="settings">
@@ -18,7 +17,7 @@
 {#if show}
   <p>
     {translate('schedules', 'start-time')}
-    {spec?.startTime ?? 'None'}
+    {spec?.startTime ?? translate('schedules', 'none')}
   </p>
   <p>{translate('schedules', 'end-time')}{spec?.endTime ?? 'None'}</p>
   <p>{translate('schedules', 'jitter')}{spec?.jitter ?? 'None'}</p>

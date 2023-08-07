@@ -91,6 +91,7 @@ export const Strings = {
   absolute: 'Absolute',
   previous: 'Previous',
   next: 'Next',
+  none: 'None',
   'banner-temporal-version': 'Temporal v{{version}} is available',
   'banner-ui-version': 'Temporal UI v{{version}} is available',
 } as const;
