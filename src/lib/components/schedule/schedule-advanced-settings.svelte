@@ -19,21 +19,21 @@
     {translate('schedules', 'start-time')}
     {spec?.startTime ?? translate('schedules', 'none')}
   </p>
-  <p>{translate('schedules', 'end-time')}{spec?.endTime ?? 'None'}</p>
-  <p>{translate('schedules', 'jitter')}{spec?.jitter ?? 'None'}</p>
+  <p>{translate('schedules', 'end-time')}{spec?.endTime ?? 'none'}</p>
+  <p>{translate('schedules', 'jitter')}{spec?.jitter ?? 'none'}</p>
   <p>
     {translate('schedules', 'exclusion-calendar')}{spec?.excludeCalendar?.[0] ??
-      'None'}
+      'none'}
   </p>
   {#if state?.limitedActions}
     <p>
       {translate('schedules', 'remaining-actions')}{state?.remainingActions ??
-        'None'}
+        'none'}
     </p>
   {/if}
   <p>
     {translate('schedules', 'overlap-policy')}{policies?.overlapPolicy ??
-      'None'}
+      'none'}
   </p>
 {/if}
 
