@@ -25,11 +25,15 @@
     {translate('schedules', 'exclusion-calendar')}{spec?.excludeCalendar?.[0] ??
       'None'}
   </p>
+  {#if state?.remainingActions}
+    <p>
+      {translate('schedules', 'remaining-actions')}{state?.remainingActions ??
+        ''}
+    </p>
+  {/if}
   <p>
-    {translate('schedules', 'remaining-actions')}{state?.remainingActions ?? 'None'}
-  </p>
-  <p>
-    {translate('schedules', 'overlap-policy')}{policies?.overlapPolicy ?? 'None'}
+    {translate('schedules', 'overlap-policy')}{policies?.overlapPolicy ??
+      'None'}
   </p>
 {/if}
 
