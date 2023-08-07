@@ -47,14 +47,14 @@
   "collapse-all": "Collapse All",
   "expand-all": "Expand All",
   "id": "ID",
-  "yes": "yes",
-  "no": "no",
+  "yes": "Yes",
+  "no": "No",
+  "maybe": "Maybe",
   "refresh": "Refresh",
   "error-occurred": "An Error Occurred",
   "save": "Save",
   "workflow-type": "Workflow Type",
   "workflow-id": "Workflow ID",
-  "workflow-status": "Workflow Status",
   "task-queue": "Task Queue",
   "preview": "Preview",
   "status": "Status",
@@ -86,5 +86,9 @@
   "feedback": "Feedback",
   "log-out": "Log out",
   "select-all": "Select All",
-  "absolute": "Absolute"
+  "absolute": "Absolute",
+  "previous": "Previous",
+  "next": "Next",
+  "banner-temporal-version": "Temporal v{{version}} is available",
+  "banner-ui-version": "Temporal UI v{{version}} is available"
 }

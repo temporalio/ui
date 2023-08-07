@@ -19,6 +19,7 @@ import type {
   SearchAttributesRoutePath,
   TaskQueueAPIRoutePath,
   TaskQueueRouteParameters,
+  WorkerAPIRoutePath,
   WorkflowActivitiesAPIRoutePath,
   WorkflowActivitiesRouteParameters,
   WorkflowAPIRoutePath,
@@ -110,7 +111,9 @@ export function pathForApi(
     'search-attributes': `/namespaces/${parameters.namespace}/search-attributes`,
     settings: '/settings',
     'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
+    'task-queue.compatibility': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/compatibility`,
     user: '/me',
+    'worker-task-reachability': `/namespaces/${parameters?.namespace}/worker-task-reachability`,
     'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/terminate`,
     'workflow.cancel': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/cancel`,
     'workflow.signal': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/signal`,
@@ -141,6 +144,11 @@ export function routeForApi(
 export function routeForApi(
   route: SchedulesAPIRoutePath,
   parameters: ScheduleListRouteParameters,
+): string;
+export function routeForApi(
+  route: WorkerAPIRoutePath,
+  parameters: NamespaceRouteParameters,
+  shouldEncode?: boolean,
 ): string;
 export function routeForApi(
   route: WorkflowAPIRoutePath,

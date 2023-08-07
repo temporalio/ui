@@ -102,6 +102,8 @@
   let:setActiveRowIndex
   aria-label="recent events"
   pageSizeSelectLabel={translate('per-page')}
+  previousButtonLabel={translate('previous')}
+  nextButtonLabel={translate('next')}
 >
   <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
     {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}

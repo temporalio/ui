@@ -66,6 +66,8 @@
   let:visibleItems
   aria-label="recent workflows"
   pageSizeSelectLabel={translate('per-page')}
+  previousButtonLabel={translate('previous')}
+  nextButtonLabel={translate('next')}
 >
   <WorkflowsSummaryTable updating={$updating}>
     {#each visibleItems as event}

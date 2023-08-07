@@ -27,6 +27,8 @@
     emptyStateMessage: string;
     fallbackErrorMessage: string;
     itemsKeyname?: string;
+    previousButtonLabel: string;
+    nextButtonLabel: string;
   }
 
   type PaginatedRequest<T> = (
@@ -48,6 +50,8 @@
   export let emptyStateMessage: string;
   export let fallbackErrorMessage: string;
   export let itemsKeyname = 'items';
+  export let previousButtonLabel: string;
+  export let nextButtonLabel: string;
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
@@ -80,7 +84,7 @@
     try {
       const response = await fetchData($store.pageSize, '');
       const { nextPageToken } = response;
-      const items = response[itemsKeyname];
+      const items = response[itemsKeyname] || [];
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
       error = err;
@@ -99,7 +103,7 @@
           $store.indexData[$store.index].nextToken,
         );
         const { nextPageToken } = response;
-        const items = response[itemsKeyname];
+        const items = response[itemsKeyname] || [];
         store.nextPageWithItems(nextPageToken, items);
       } catch (error) {
         if (isError(error) && onError) {
@@ -191,6 +195,7 @@
           class="caret"
           disabled={!$store.hasPrevious}
           on:click={store.previousPage}
+          aria-label={previousButtonLabel}
         >
           <span
             class="arrow arrow-left"
@@ -211,6 +216,7 @@
           class="caret"
           disabled={!$store.hasNext}
           on:click={fetchIndexData}
+          aria-label={nextButtonLabel}
         >
           <span
             class="arrow arrow-right"
@@ -255,6 +261,7 @@
             class="caret"
             disabled={!$store.hasPrevious}
             on:click={store.previousPage}
+            aria-label={previousButtonLabel}
           >
             <span
               class="arrow arrow-left"
@@ -275,6 +282,7 @@
             class="caret"
             disabled={!$store.hasNext}
             on:click={fetchIndexData}
+            aria-label={nextButtonLabel}
           >
             <span
               class="arrow arrow-right"

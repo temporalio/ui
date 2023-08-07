@@ -27,6 +27,8 @@
     itemsPerPage?: number | null;
     updating?: boolean;
     pageSizeSelectLabel: string;
+    previousButtonLabel: string;
+    nextButtonLabel: string;
   }
 
   export let items: T[];
@@ -36,6 +38,8 @@
   export let itemsPerPage: number | null = null;
   export let updating = false;
   export let pageSizeSelectLabel: string;
+  export let previousButtonLabel: string;
+  export let nextButtonLabel: string;
 
   $: perPage =
     itemsPerPage !== null
@@ -71,7 +75,7 @@
   onMount(() => {
     updateWidth();
 
-    if (startingIndex > 0) {
+    if (Number(startingIndex) > 0) {
       handlePageChange();
     }
   });
@@ -160,7 +164,7 @@
                 store.previous();
                 handlePageChange();
               }}
-              aria-label="previous"
+              aria-label={previousButtonLabel}
             >
               <span
                 class="arrow arrow-left"
@@ -183,7 +187,7 @@
                 store.next();
                 handlePageChange();
               }}
-              aria-label="next"
+              aria-label={nextButtonLabel}
             >
               <span
                 class="arrow arrow-right"
@@ -223,7 +227,7 @@
           class="caret"
           disabled={!$store.hasPrevious}
           on:click={() => store.previous()}
-          aria-label="previous"
+          aria-label={previousButtonLabel}
         >
           <span
             class="arrow arrow-left"
@@ -242,7 +246,7 @@
           class="caret"
           disabled={!$store.hasNext}
           on:click={() => store.next()}
-          aria-label="next"
+          aria-label={nextButtonLabel}
         >
           <span
             class="arrow arrow-right"

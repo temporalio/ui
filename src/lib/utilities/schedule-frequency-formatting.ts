@@ -208,6 +208,7 @@ export const structuredCalendarToFrequency = (
 };
 
 export const commentOrCalendarToFrequency = (calendar: StructuredCalendar) => {
-  if (calendar?.comment) return `${calendar?.comment} UTC`;
+  const comment = calendar?.comment;
+  if (comment) return comment;
   return structuredCalendarToFrequency(calendar);
 };
