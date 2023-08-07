@@ -8,6 +8,7 @@
   export let policies: SchedulePolicies;
 
   let show = false;
+  console.log('this is state', state);
 </script>
 
 <button on:click={() => (show = !show)} class="settings">
@@ -25,10 +26,10 @@
     {translate('schedules', 'exclusion-calendar')}{spec?.excludeCalendar?.[0] ??
       'None'}
   </p>
-  {#if state?.remainingActions}
+  {#if state?.limitedActions}
     <p>
       {translate('schedules', 'remaining-actions')}{state?.remainingActions ??
-        ''}
+        'None'}
     </p>
   {/if}
   <p>
