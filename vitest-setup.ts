@@ -1,12 +1,12 @@
 import { noop } from 'svelte/internal';
 
 import i18next from 'i18next';
-import Backend, { FsBackendOptions } from 'i18next-fs-backend';
 import { vi } from 'vitest';
 
 import { I18nNamespaces } from './src/lib/i18n';
+import resources from './src/lib/i18n/locales';
 
-i18next.use(Backend).init<FsBackendOptions>({
+i18next.init({
   fallbackLng: 'en',
   load: 'languageOnly',
   ns: I18nNamespaces,
@@ -17,9 +17,7 @@ i18next.use(Backend).init<FsBackendOptions>({
     lookupQuerystring: 'lng',
     lookupLocalStorage: 'locale',
   },
-  backend: {
-    loadPath: 'static/i18n/locales/{{lng}}/{{ns}}.json',
-  },
+  resources,
 });
 
 const BroadcastChannelMock = vi.fn(() => ({
