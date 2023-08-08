@@ -22,6 +22,7 @@
       enable-background="new 0 0 150 73"
       xml:space="preserve"
       aria-hidden="true"
+      focusable="false"
     >
       <polyline
         fill="none"
