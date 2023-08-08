@@ -141,7 +141,10 @@
       </div>
       <SplitButton
         position="right"
-        label={schedule?.schedule?.state?.paused ? 'Unpause' : 'Pause'}
+        label={schedule?.schedule?.state?.paused
+          ? translate('schedules', 'unpause')
+          : translate('schedules', 'pause')}
+        menuLabel={translate('schedules', 'schedule-actions')}
         id="schedule-actions"
         disabled={editDisabled}
         on:click={() => pauseConfirmationModal.open()}

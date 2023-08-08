@@ -261,6 +261,7 @@
     primaryActionDisabled={!cancelEnabled || cancelInProgress}
     on:click={() => cancelConfirmationModal.open()}
     label={translate('workflows', 'request-cancellation')}
+    menuLabel={translate('workflows', 'workflow-actions')}
   >
     {#each workflowActions as { onClick, destructive, label, allowed, testId, tooltip }}
       {#if destructive}

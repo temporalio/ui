@@ -3,12 +3,13 @@
   import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-  
+
   import type { IconName } from './icon/paths';
-  
+
   import Button from './button.svelte';
 
-  export let label = '';
+  export let label: string;
+  export let menuLabel: string;
   export let icon: IconName | undefined = undefined;
   export let id: string;
   export let variant:
@@ -44,6 +45,7 @@
     </Button>
     <MenuButton
       id="{id}-menu-button"
+      label={menuLabel}
       dark
       class="segment right"
       bind:show
