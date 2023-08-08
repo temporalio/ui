@@ -70,13 +70,13 @@
         <div slot="trigger" class="flex items-center gap-1">
           <img
             src={$authUser?.picture}
-            alt={$authUser?.profile ?? 'user profile'}
+            alt={$authUser?.profile ?? translate('user-profile')}
             class="h-[24px] w-[24px] cursor-pointer rounded-md"
             on:error={fixImage}
             class:hidden={!showProfilePic}
           />
           <div
-            class="aspect-square h-[24px] h-full w-[24px] rounded-md bg-blue-200 p-0.5"
+            class="aspect-square h-full w-[24px] rounded-md bg-blue-200 p-0.5"
             class:hidden={showProfilePic}
           >
             {#if $authUser?.name}

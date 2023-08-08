@@ -119,4 +119,5 @@ export const Strings = {
   'close-keyboard-shortcuts': 'Close keyboard shortcuts',
   'banner-temporal-version': 'Temporal v{{version}} is available',
   'banner-ui-version': 'Temporal UI v{{version}} is available',
+  'user-profile': 'User Profile',
 } as const;
