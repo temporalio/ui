@@ -6,7 +6,7 @@
   import Table from '$lib/holocene/table/table.svelte';
 
   import type { WorkflowIdentifier } from '$lib/types/workflows';
-  import Copyable from '../../holocene/copyable.svelte';
+  import Copyable from '$lib/holocene/copyable.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
 
