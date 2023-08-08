@@ -11,7 +11,8 @@
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
   class={$$props.class}
+  aria-labelledby="icon-title"
 >
-  <title>{title}</title>
+  <title id="icon-title">{title}</title>
   <slot />
 </svg>
