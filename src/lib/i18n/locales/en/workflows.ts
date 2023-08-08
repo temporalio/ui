@@ -107,7 +107,10 @@ export const Strings = {
   'queries-tab': 'Queries',
   'workflow-error-no-workers-title': 'No Workers Running',
   'workflow-error-no-workers-description':
-    'Please make sure you have at least one worker connected to the {{taskQueue}} Task Queue.',
+    'There are no Workers polling the {{taskQueue}} Task Queue.',
+  'workflow-error-no-compatible-workers-title': 'No Compatible Workers Running',
+  'workflow-error-no-compatible-workers-description':
+    'There are no compatible Workers polling the {{taskQueue}} Task Queue.',
   'state-transitions': 'State Transitions',
   'start-and-close-time': 'Start & Close Time',
   relationships: 'Relationships',

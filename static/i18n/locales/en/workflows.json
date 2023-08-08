@@ -82,7 +82,7 @@
   "stack-trace-tab": "Stack Trace",
   "queries-tab": "Queries",
   "workflow-error-no-workers-title": "No Workers Running",
-  "workflow-error-no-workers-description": "Please make sure you have at least one worker connected to the {{taskQueue}} Task Queue.",
+  "workflow-error-no-workers-description": "There are no Workers polling the {{taskQueue}} Task Queue.",
   "state-transitions": "State Transitions",
   "start-and-close-time": "Start & Close Time",
   "relationships": "Relationships",

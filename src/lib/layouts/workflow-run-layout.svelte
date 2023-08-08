@@ -18,12 +18,19 @@
   import { type EventSortOrder, eventFilterSort } from '$lib/stores/event-view';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import {
+    type GetPollersResponse,
     getPollers,
     getTaskQueueCompatibility,
+    getWorkerTaskReachability,
   } from '$lib/services/pollers-service';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchStartAndEndEvents } from '$lib/services/events-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import {
+    getCurrentPollerBuildId,
+    getUniqueBuildIdsFromPollers,
+    pollerHasVersioning,
+  } from '$lib/utilities/task-queue-compatibility';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
 
@@ -33,13 +40,30 @@
   ) => {
     const workflowUsesVersioning =
       workflow?.mostRecentWorkerVersionStamp?.useVersioning;
-    if (workflowUsesVersioning) {
-      return await getTaskQueueCompatibility({
-        queue: taskQueue,
-        namespace,
-      });
-    }
-    return;
+    if (!workflowUsesVersioning) return;
+    return await getTaskQueueCompatibility({
+      queue: taskQueue,
+      namespace,
+    });
+  };
+
+  const getReachability = async ({
+    namespace,
+    workers,
+    taskQueue,
+  }: {
+    namespace: string;
+    workers: GetPollersResponse;
+    taskQueue: string;
+  }) => {
+    const pollerUsesVersioning = pollerHasVersioning(workers.pollers);
+    if (!pollerUsesVersioning) return;
+    const buildIds = getUniqueBuildIdsFromPollers(workers.pollers);
+    return await getWorkerTaskReachability({
+      namespace,
+      buildIds,
+      taskQueue,
+    });
   };
 
   const getWorkflowAndEventHistory = async (
@@ -57,13 +81,18 @@
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
     const compatibility = await getCompatibility(workflow, taskQueue);
+    const reachability = await getReachability({
+      namespace,
+      workers,
+      taskQueue,
+    });
     workflow.pendingActivities = await toDecodedPendingActivities(
       workflow,
       namespace,
       settings,
       $authUser?.accessToken,
     );
-    $workflowRun = { workflow, workers, compatibility };
+    $workflowRun = { workflow, workers, compatibility, reachability };
     const events = await fetchStartAndEndEvents({
       namespace,
       workflowId,
