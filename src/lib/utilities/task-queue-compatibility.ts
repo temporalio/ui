@@ -89,7 +89,7 @@ export const workflowIsCompatibleWithWorkers = (
   compatibility: TaskQueueCompatibility | undefined,
 ): boolean => {
   const workflowBuildId = getCurrentWorkflowBuildId(workflow);
-  if (!workflowBuildId) return false;
+  if (!workflowBuildId) return true;
   const defaultVersionForBuildId = getDefaultVersionForSetFromABuildId(
     compatibility,
     workflowBuildId,

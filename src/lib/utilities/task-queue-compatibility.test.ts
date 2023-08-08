@@ -449,6 +449,43 @@ describe('workflowIsCompatibleWithWorkers', () => {
       buildIds: ['2.0', '2.1', '2.2'],
     },
   ];
+
+  it('should return true if workflow not using versioning', () => {
+    const pollers = [
+      {
+        lastAccessTime: '2023-08-08T17:31:47.475536Z',
+        identity: '49105@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '1.2',
+          useVersioning: true,
+        },
+      },
+      {
+        lastAccessTime: '2023-08-08T17:29:53.396211Z',
+        identity: '48804@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '2.0',
+          useVersioning: true,
+        },
+      },
+    ];
+    const mostRecentWorkerVersionStamp = {
+      buildId: 'asdfasdfasf0',
+      bundleId: '',
+      useVersioning: false,
+    };
+
+    expect(
+      workflowIsCompatibleWithWorkers(
+        getWorkflow(mostRecentWorkerVersionStamp),
+        pollers,
+        { majorVersionSets },
+      ),
+    ).toBe(true);
+  });
+
   it('should return true if pollers have default version of workflow version', () => {
     const pollers = [
       {
