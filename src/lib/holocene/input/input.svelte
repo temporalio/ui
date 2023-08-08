@@ -67,7 +67,7 @@
   export { className as class };
 
   function callFocus(input: HTMLInputElement) {
-    if (autoFocus) input.focus();
+    if (autoFocus && input) input.focus();
   }
 
   const dispatch = createEventDispatcher();
