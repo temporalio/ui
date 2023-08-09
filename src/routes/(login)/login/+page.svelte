@@ -17,9 +17,7 @@
 
 <PageTitle title="Login" url={$page.url.href} />
 <header class="flex h-16 w-full items-center justify-between bg-primary px-10">
-  <a href="/" class="inline-block">
-    <img src={Logo} alt="Temporal Logo" class="max-h-10" />
-  </a>
+  <img src={Logo} alt="" class="max-h-10" />
   <FeedbackButton />
 </header>
 <section class="my-[20vh] text-center">

@@ -119,4 +119,9 @@ export const Strings = {
   'close-keyboard-shortcuts': 'Close keyboard shortcuts',
   'banner-temporal-version': 'Temporal v{{version}} is available',
   'banner-ui-version': 'Temporal UI v{{version}} is available',
+  'user-profile': 'User Profile',
+  'arrow-key-up': 'Arrow key up',
+  'arrow-key-down': 'Arrow key down',
+  'arrow-key-left': 'Arrow key left',
+  'arrow-key-right': 'Arrow key right',
 } as const;

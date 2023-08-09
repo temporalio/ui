@@ -16,7 +16,7 @@
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Copyable from '../../holocene/copyable.svelte';
+  import Copyable from '$lib/holocene/copyable.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import { translate } from '$lib/i18n/translate';
 
