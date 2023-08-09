@@ -27,7 +27,6 @@
   import { fetchStartAndEndEvents } from '$lib/services/events-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import {
-    getCurrentPollerBuildId,
     getUniqueBuildIdsFromPollers,
     pollerHasVersioning,
   } from '$lib/utilities/task-queue-compatibility';
