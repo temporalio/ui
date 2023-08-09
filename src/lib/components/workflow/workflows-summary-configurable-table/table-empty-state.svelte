@@ -19,10 +19,10 @@
 </script>
 
 <div
-  class="flex flex-col lg:flex-row w-full h-auto rounded-bl-xl rounded-br-xl border-2 border-gray-900 overflow-hidden"
+  class="flex flex-col xl:flex-row w-full h-auto rounded-bl-xl rounded-br-xl border-2 border-gray-900 overflow-hidden"
 >
   <div
-    class="w-auto min-w-[280px] lg:min-w-[520px] p-8 flex flex-col gap-4 bg-white border-r-2 border-gray-900"
+    class="w-auto min-w-[280px] xl:min-w-[520px] p-8 flex flex-col gap-4 bg-white border-b-2 xl:border-b-0 xl:border-r-2 border-gray-900"
   >
     <h3 class="text-lg font-medium">
       {#if query}
@@ -73,11 +73,11 @@
       </ul>
     {/if}
   </div>
-  <div class="max-h-[680px]">
+  <div>
     <img
       src={query ? noResultsImages : emptyImage}
       alt="no results found"
-      class="mx-auto my-auto min-h-[420px] h-full"
+      class="aspect-auto"
     />
   </div>
 </div>
