@@ -76,7 +76,7 @@
   <div>
     <img
       src={query ? noResultsImages : emptyImage}
-      alt="no results found"
+      alt=""
       class="aspect-auto"
     />
   </div>
