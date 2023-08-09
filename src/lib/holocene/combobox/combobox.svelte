@@ -270,10 +270,6 @@
       <ComboboxOption disabled>{noResultsText}</ComboboxOption>
     {/each}
   </ul>
-
-  <div class="sr-only" role="status" aria-live="polite">
-    {options.length} results available.
-  </div>
 </div>
 
 <style lang="postcss">
