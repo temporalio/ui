@@ -1,4 +1,5 @@
 <script lang="ts" generics="T extends object">
+  import type { HTMLInputAttributes } from 'svelte/elements';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { clickOutside } from '../outside-click';
   import ComboboxOption from './combobox-option.svelte';
@@ -12,7 +13,7 @@
     target: HTMLLIElement;
   };
 
-  type BaseProps = {
+  interface BaseProps extends HTMLInputAttributes {
     id: string;
     label: string;
     value: string;
@@ -22,7 +23,8 @@
     placeholder?: string;
     readonly?: boolean;
     required?: boolean;
-  };
+    'data-testid'?: string;
+  }
 
   type DefaultOptionsProps = {
     options: string[];
@@ -239,6 +241,8 @@
       on:keydown={handleInputKeydown}
       on:click={handleInputClick}
       bind:this={inputElement}
+      data-testid={$$props['data-testid'] ?? id}
+      {...$$restProps}
     />
     <slot name="trailing-icon">
       <Icon name={open ? 'chevron-up' : 'chevron-down'} />
