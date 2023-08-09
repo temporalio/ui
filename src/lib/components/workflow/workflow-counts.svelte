@@ -77,7 +77,7 @@
   };
 </script>
 
-<div class="flex gap-4 flex-wrap">
+<div class="flex gap-2 lg:gap-4 flex-wrap">
   {#each workflowStatuses as status}
     <WorkflowCount
       {status}
