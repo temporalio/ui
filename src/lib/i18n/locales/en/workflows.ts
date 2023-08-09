@@ -180,7 +180,7 @@ export const Strings = {
   'workflow-query-empty-state-postface':
     'Try adjusting or clearing the filters to see the Workflows running on this Namespace.',
   'workflow-query-error-state': 'There is an error with filtering Workflows.',
-  'workflow-empty-state-title': 'No workflows running in this Namespace',
+  'workflow-empty-state-title': 'No Workflows running in this Namespace',
   'workflow-empty-state-description': `You can populate the WebUI with sample Workflows. You can find a complete list of executable code samples in`,
   'visibility-disabled-archival':
     'This namespace is currently enabled for archival but visibility is not enabled.',

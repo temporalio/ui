@@ -31,11 +31,7 @@
   $: label = translate('workflows', 'select-all-workflows');
 </script>
 
-<tr
-  class="workflows-summary-configurable-table-header-row"
-  class:pinned
-  class:empty
->
+<tr class="workflows-summary-configurable-table-header-row" class:pinned>
   {#if pinned && $supportsBulkActions}
     <th class="batch-actions-checkbox-table-cell">
       {#if !empty}
@@ -87,11 +83,5 @@
 
   .configuration-button-table-cell {
     @apply h-10 leading-[48px] text-right sticky right-0 block w-auto bg-primary;
-  }
-
-  .empty {
-    .batch-actions-checkbox-table-cell {
-      @apply min-w-[520px] max-w-[520px];
-    }
   }
 </style>
