@@ -82,7 +82,7 @@
     <WorkflowCount
       {status}
       {onStatusClick}
-      active={Boolean(statusFilters.find((filter) => filter.value === status))}
+      active={statusFilters.some((filter) => filter.value === status)}
     />
   {/each}
 </div>
