@@ -299,8 +299,8 @@ devDependencies:
     specifier: ^3.55.1
     version: 3.55.1
   svelte-check:
-    specifier: ^3.4.2
-    version: 3.4.2(@babel/core@7.20.12)(postcss-load-config@3.1.4)(postcss@8.4.21)(svelte@3.55.1)
+    specifier: ^3.4.3
+    version: 3.4.3(@babel/core@7.20.12)(postcss-load-config@3.1.4)(postcss@8.4.21)(svelte@3.55.1)
   svelte-highlight:
     specifier: ^3.4.0
     version: 3.4.0
@@ -8948,11 +8948,11 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /svelte-check@3.4.2(@babel/core@7.20.12)(postcss-load-config@3.1.4)(postcss@8.4.21)(svelte@3.55.1):
-    resolution: {integrity: sha512-ep9oAmPMq6jnbuTwEKVrb5FSr8VfJoGamOfid3yRJU/06/SMLRtkXUg7TrdoN6ADQCuVtj2gKjZzFssQqabeUw==}
+  /svelte-check@3.4.3(@babel/core@7.20.12)(postcss-load-config@3.1.4)(postcss@8.4.21)(svelte@3.55.1):
+    resolution: {integrity: sha512-O07soQFY3X0VDt+bcGc6D5naz0cLtjwnmNP9JsEBPVyMemFEqUhL2OdLqvkl5H/u8Jwm50EiAU4BPRn5iin/kg==}
     hasBin: true
     peerDependencies:
-      svelte: ^3.55.0 || 4.0.0-next.0 || 4.0.0-next.1 || ^4.0.0
+      svelte: ^3.55.0 || ^4.0.0-next.0 || ^4.0.0
     dependencies:
       '@jridgewell/trace-mapping': 0.3.17
       chokidar: 3.5.3
