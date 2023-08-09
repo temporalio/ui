@@ -257,21 +257,21 @@ test.describe('Workflows List with Advanced Visibility', () => {
       expect(await page.inputValue('#manual-search')).toContain('CloseTime > ');
 
       const namespaces = ['default', 'some-other-namespace'];
-      await page.getByTestId('namespace-select-button').click();
-      await expect(page.getByTestId('namespace-select-list')).toContainText(
-        namespaces[0],
-      );
-      await page.click('[data-test="namespace-list"] > :nth-child(2)');
-      await expect(page.getByTestId('namespace-select-button')).toHaveText(
+      await page.getByTestId('namespace-switcher').click();
+      await expect(
+        page.getByRole('option', { name: namespaces[0] }),
+      ).toBeVisible();
+      await page.getByRole('option', { name: namespaces[1] }).click();
+      await expect(page.getByTestId('namespace-switcher')).toHaveValue(
         namespaces[1],
       );
       await expect(page).not.toHaveURL(/ExecutionStatus%3D%22Running%22/);
       await expect(page).toHaveURL(/CloseTime\+%3E/);
       await expect(page.locator('#time-range-filter')).toHaveText('1 hour');
       expect(await page.inputValue('#manual-search')).toContain('CloseTime > ');
-      await page.getByTestId('namespace-select-button').click();
-      await page.getByTestId('namespace-list-item').first().click();
-      await expect(page.getByTestId('namespace-select-button')).toHaveText(
+      await page.getByTestId('namespace-switcher').click();
+      await page.getByRole('option', { name: namespaces[0] }).click();
+      await expect(page.getByTestId('namespace-switcher')).toHaveValue(
         namespaces[0],
       );
       await expect(page).not.toHaveURL(/ExecutionStatus%3D%22Running%22/);
