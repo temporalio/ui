@@ -174,9 +174,14 @@ export const Strings = {
   'select-workflow': 'Select Workflow {{workflow}}',
   'archived-workflows': 'Archived Workflows',
   archival: 'Archival',
-  'empty-state-title': 'No Workflows Found',
-  'empty-state-description':
-    'If you have filters applied, try adjusting them. Otherwise please check your syntax and try again.',
+  'workflow-query-empty-state-title': 'No Results',
+  'workflow-query-empty-state-preface':
+    'There are no results for the applied filters.',
+  'workflow-query-empty-state-postface':
+    'Try adjusting or clearing the filters to see the Workflows running on this Namespace.',
+  'workflow-query-error-state': 'There is an error with filtering Workflows.',
+  'workflow-empty-state-title': 'No workflows running in this Namespace',
+  'workflow-empty-state-description': `You can populate the WebUI with sample Workflows. You can find a complete list of executable code samples in`,
   'visibility-disabled-archival':
     'This namespace is currently enabled for archival but visibility is not enabled.',
   'archival-link-preface': 'To enable ',
@@ -185,6 +190,8 @@ export const Strings = {
     'This namespace is currently not enabled for archival.',
   'archival-disabled-details':
     'Run this command to enable archival visibility for event histories',
+  'archival-empty-state-description':
+    'No results found for archival visibility.',
   'basic-search': 'Basic Search',
   'advanced-search': 'Advanced Search',
   'time-range': 'Time Range',

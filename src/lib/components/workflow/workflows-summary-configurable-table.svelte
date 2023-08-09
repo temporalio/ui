@@ -34,7 +34,7 @@
 </script>
 
 <div class="workflows-summary-configurable-table">
-  <TableWrapper noPinnedColumns={pinnedColumns.length === 0}>
+  <TableWrapper noPinnedColumns={pinnedColumns.length === 0} {empty}>
     <Table pinned {empty} {totalColumnCount} columns={pinnedColumns}>
       <TableHeaderRow pinned {workflows} {pinnedColumns} {empty} slot="headers">
         {#each pinnedColumns as column}

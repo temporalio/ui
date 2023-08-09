@@ -1,15 +1,21 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
   import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
-  import { updating, loading, workflowError } from '$lib/stores/workflows';
+  import { updating, loading } from '$lib/stores/workflows';
+  import emptyImage from '$lib/vendor/empty-state-dark_2x.png';
+  import noResultsImages from '$lib/vendor/empty-state-light_2x.png';
+  import WorkflowEmptyState from './table-empty-state.svelte';
 
   export let pinned = false;
   export let columns: WorkflowHeader[];
   export let totalColumnCount: number;
   export let empty: boolean;
+
+  $: query = $page.url.searchParams.get('query');
 </script>
 
 <table class="workflows-summary-table" class:pinned>
@@ -20,7 +26,7 @@
     {/if}
   </thead>
   <tbody>
-    {#if !pinned && $loading}
+    {#if !pinned && ($loading || $updating)}
       <tr>
         <td colspan={columns.length + 1}>
           <Loading />
@@ -29,10 +35,10 @@
     {:else if !pinned && empty}
       <tr>
         <td colspan={columns.length + 1}>
-          <EmptyState
-            title="No Workflows Found"
-            content="If you have filters applied, try adjusting them. Otherwise please check your syntax and try again."
-            error={$workflowError}
+          <img
+            src={query ? noResultsImages : emptyImage}
+            alt="no results found"
+            class="mx-auto min-h-[420px]"
           />
         </td>
       </tr>
@@ -52,6 +58,12 @@
               > to add column headings.
             </p>
           </EmptyState>
+        </td>
+      </tr>
+    {:else if !($loading || $updating) && pinned && empty}
+      <tr>
+        <td colspan={columns.length + 1}>
+          <WorkflowEmptyState />
         </td>
       </tr>
     {:else}

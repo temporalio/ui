@@ -4,6 +4,7 @@
   import { pinnedColumnsWidth } from '$lib/stores/workflow-table-columns';
 
   export let noPinnedColumns: boolean = false;
+  export let empty: boolean = false;
 
   let pinnedWrapperElement: HTMLDivElement;
   let pinnedWrapperWidth = $pinnedColumnsWidth;
@@ -34,6 +35,7 @@
   class:batch-actions-enabled={$supportsBulkActions}
   class:batch-actions-visible={$batchActionsVisible}
   class:no-columns-pinned={noPinnedColumns}
+  class:empty
   bind:this={pinnedWrapperElement}
   style="width:{pinnedWrapperWidth ? pinnedWrapperWidth + 'px' : '50%'};"
 >
@@ -84,6 +86,10 @@
           @apply !w-10 z-50;
         }
       }
+    }
+
+    &.empty {
+      @apply min-w-[520px] max-w-[520px];
     }
 
     &:not(.pinned) {
