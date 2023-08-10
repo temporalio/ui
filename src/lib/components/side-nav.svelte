@@ -9,13 +9,17 @@
   import FeatureGuard from '$lib/components/feature-guard.svelte';
   import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
   import { translate } from '$lib/i18n/translate';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { labsMode } from '$lib/stores/labs-mode';
 
   export let isCloud = false;
   export let activeNamespace: Namespace;
   export let linkList: Partial<Record<string, string>>;
 
+  $: labsHoverText = `${translate('labs')} ${
+    $labsMode
+      ? `${translate('on')} - ${translate('experimental')}`
+      : translate('off')
+  }`;
   $: labsText = `${translate('labs')} ${
     $labsMode ? translate('on') : translate('off')
   }`;
@@ -102,19 +106,23 @@
         <div class="nav-title">{translate('feedback')}</div>
       </NavRow>
     </slot>
-    <NavRow {isCloud} noHover>
-      <NavTooltip right text={labsText}>
+    <NavRow {isCloud} noHover handleClick={() => ($labsMode = !$labsMode)}>
+      <NavTooltip right text={labsHoverText}>
         <button
-          aria-label="labs mode"
+          aria-label={translate('labs')}
           data-testid="labs-button"
           class="w-10 flex items-center justify-center"
-          on:click={() => ($labsMode = !$labsMode)}
         >
           <Icon name="labs" {isCloud} active={$labsMode} />
         </button>
       </NavTooltip>
-      <div class="nav-title">
-        {labsText}
+      <div class="nav-title flex flex-col leading-3">
+        <div>{labsText}</div>
+        {#if $labsMode}
+          <p class="text-[12px]">
+            {translate('experimental')}
+          </p>
+        {/if}
       </div>
     </NavRow>
   </svelte:fragment>

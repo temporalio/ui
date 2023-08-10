@@ -97,4 +97,5 @@ export const Strings = {
   on: 'On',
   off: 'Off',
   labs: 'Labs',
+  experimental: 'Experimental',
 } as const;
