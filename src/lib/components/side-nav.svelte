@@ -106,7 +106,7 @@
         <div class="nav-title">{translate('feedback')}</div>
       </NavRow>
     </slot>
-    <NavRow {isCloud} noHover handleClick={() => ($labsMode = !$labsMode)}>
+    <NavRow {isCloud} handleClick={() => ($labsMode = !$labsMode)}>
       <NavTooltip right text={labsHoverText}>
         <button
           aria-label={labsText}
