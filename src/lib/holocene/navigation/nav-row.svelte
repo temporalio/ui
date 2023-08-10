@@ -9,7 +9,7 @@
 </script>
 
 <li
-  class="{link ? '' : classes} overflow-hidden"
+  class={link ? '' : classes}
   class:noFilter
   class:wrap
   class:button={handleClick !== null}
