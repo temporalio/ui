@@ -19,7 +19,8 @@
 </script>
 
 <div
-  class="flex flex-col xl:flex-row w-full h-auto rounded-bl-xl rounded-br-xl border-2 border-gray-900 overflow-hidden"
+  class="flex flex-col xl:flex-row w-full h-auto rounded-bl-xl rounded-br-xl border-2 border-t-0 border-gray-900 overflow-hidden"
+  aria-live="polite"
 >
   <div
     class="w-auto min-w-[280px] xl:min-w-[520px] p-8 flex flex-col gap-4 bg-white border-b-2 xl:border-b-0 xl:border-r-2 border-gray-900"
@@ -73,7 +74,7 @@
       </ul>
     {/if}
   </div>
-  <div>
+  <div class="bg-[#DDD6FE]">
     <img
       src={query ? noResultsImages : emptyImage}
       alt=""
