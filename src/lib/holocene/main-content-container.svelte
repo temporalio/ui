@@ -19,7 +19,10 @@
   }
 </script>
 
-<div class="relative h-screen w-max flex-auto overflow-auto bg-gray-100">
+<div
+  id="content-wrapper"
+  class="relative h-screen w-max flex-auto overflow-auto bg-gray-100"
+>
   <slot />
   <main id="content" on:scroll={handleOnScroll}>
     <slot name="main" />
