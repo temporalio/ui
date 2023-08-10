@@ -68,6 +68,7 @@ export const Strings = {
   compact: 'Compact',
   json: 'JSON',
   download: 'Download',
+  'workflow-actions': 'Workflow Actions',
   'reset-disabled':
     'Resetting workflows is not enabled, please contact your administrator for assistance.',
   'reset-disabled-pending-children':

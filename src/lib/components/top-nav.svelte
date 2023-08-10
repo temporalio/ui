@@ -41,7 +41,8 @@
     {#if showNamespaceSpecificNav}
       {#key namespace}
         <DropdownMenu
-          id="namespace"
+          label={translate('namespaces', 'namespace-label', { namespace })}
+          id="namespace-switcher"
           position="right"
           menuClass="border-2 bg-purple-200"
           buttonClass="border border-purple-700 rounded-sm"
