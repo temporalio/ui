@@ -61,7 +61,7 @@
     @apply overflow-y-visible;
 
     &.pinned {
-      @apply shrink-0 overflow-x-hidden rounded-tl-lg max-md:max-w-[50%] max-md:overflow-x-scroll max-w-fit min-w-[40px];
+      @apply shrink-0 overflow-x-hidden rounded-tl-lg max-md:max-w-[50%] max-md:overflow-x-scroll max-w-fit min-w-[40px] bg-gray-900;
 
       &.batch-actions-visible {
         @apply !w-full;
