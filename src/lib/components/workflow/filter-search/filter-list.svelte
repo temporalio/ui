@@ -73,7 +73,7 @@
   };
 </script>
 
-<div class="flex flex-wrap gap-2 pt-2">
+<div class="flex flex-wrap gap-2" class:pt-2={visibleFilters.length}>
   {#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
     {@const { attribute, value, conditional, customDate } = workflowFilter}
     {#if attribute}

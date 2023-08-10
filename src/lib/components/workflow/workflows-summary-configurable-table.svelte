@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { loading, updating } from '$lib/stores/workflows';
   import { workflowTableColumns } from '$lib/stores/workflow-table-columns';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import Drawer from '$lib/holocene/drawer.svelte';
@@ -12,6 +13,7 @@
   import WorkflowColumnsOrderableList from './workflows-summary-configurable-table/orderable-list.svelte';
   import { translate } from '$lib/i18n/translate';
   import { page } from '$app/stores';
+  import TableEmptyState from './workflows-summary-configurable-table/table-empty-state.svelte';
 
   export let workflows: WorkflowExecution[];
 
@@ -22,7 +24,7 @@
   $: empty = workflows.length === 0;
   $: pinnedColumns = columns.filter((column) => column.pinned);
   $: otherColumns = columns.filter((column) => !column.pinned);
-  $: totalColumnCount = pinnedColumns.length + otherColumns.length;
+  $: emptyAndNotLoading = empty && !($loading || $updating);
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
@@ -33,48 +35,59 @@
   };
 </script>
 
-<div class="workflows-summary-configurable-table">
-  <TableWrapper noPinnedColumns={pinnedColumns.length === 0}>
-    <Table pinned {empty} {totalColumnCount} columns={pinnedColumns}>
-      <TableHeaderRow pinned {workflows} {pinnedColumns} {empty} slot="headers">
-        {#each pinnedColumns as column}
-          <TableHeaderCell {column} />
-        {/each}
-      </TableHeaderRow>
-      {#each workflows as workflow}
-        <TableRow pinned {workflow}>
+<div class="flex flex-col">
+  <div
+    class="workflows-summary-configurable-table"
+    class:workflows-summary-configurable-table-empty={emptyAndNotLoading}
+  >
+    <TableWrapper noPinnedColumns={pinnedColumns.length === 0}>
+      <Table pinned columns={pinnedColumns}>
+        <TableHeaderRow
+          pinned
+          {workflows}
+          {pinnedColumns}
+          {empty}
+          slot="headers"
+        >
           {#each pinnedColumns as column}
-            <TableBodyCell {column} {workflow} />
+            <TableHeaderCell {column} />
           {/each}
-        </TableRow>
-      {/each}
-    </Table>
-    <Table
-      {empty}
-      {totalColumnCount}
-      columns={otherColumns}
-      slot="unpinned-columns"
-    >
-      <TableHeaderRow
-        onClickConfigure={openCustomizationDrawer}
-        {workflows}
-        {pinnedColumns}
-        {empty}
-        slot="headers"
-      >
-        {#each otherColumns as column}
-          <TableHeaderCell {column} />
+        </TableHeaderRow>
+        {#each workflows as workflow}
+          <TableRow pinned {workflow}>
+            {#each pinnedColumns as column}
+              <TableBodyCell {column} {workflow} />
+            {/each}
+          </TableRow>
         {/each}
-      </TableHeaderRow>
-      {#each workflows as workflow}
-        <TableRow {workflow}>
+      </Table>
+      <Table columns={otherColumns} slot="unpinned-columns">
+        <TableHeaderRow
+          onClickConfigure={openCustomizationDrawer}
+          {workflows}
+          {pinnedColumns}
+          {empty}
+          slot="headers"
+        >
           {#each otherColumns as column}
-            <TableBodyCell {column} {workflow} />
+            <TableHeaderCell {column} />
           {/each}
-        </TableRow>
-      {/each}
-    </Table>
-  </TableWrapper>
+        </TableHeaderRow>
+        {#each workflows as workflow}
+          <TableRow {workflow}>
+            {#each otherColumns as column}
+              <TableBodyCell {column} {workflow} />
+            {/each}
+          </TableRow>
+        {/each}
+      </Table>
+    </TableWrapper>
+  </div>
+  {#if emptyAndNotLoading}
+    <TableEmptyState>
+      <slot slot="cloud" name="cloud" />
+    </TableEmptyState>
+  {/if}
 </div>
 
 <Drawer
@@ -98,5 +111,9 @@
 <style lang="postcss">
   .workflows-summary-configurable-table {
     @apply flex flex-row w-full rounded-xl border-primary border-2 bg-white overflow-auto;
+  }
+
+  .workflows-summary-configurable-table-empty {
+    @apply rounded-b-none;
   }
 </style>
