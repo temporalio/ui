@@ -27,28 +27,23 @@
     options = options.filter(({ option }) => option !== 'update');
   }
 
-  $: _value = $page.url?.searchParams?.get(parameter);
+  $: visibleOption = options.find(
+    ({ option }) => option === $page.url?.searchParams?.get(parameter),
+  );
+  $: $eventCategoryFilter = visibleOption?.option?.toString() ?? undefined;
 
-  $: {
+  const onOptionClick = (value: string) => {
     updateQueryParameters({
       parameter: parameter,
-      value: _value,
+      value,
       url: $page.url,
-    }).then((v) => {
-      const visibleOption = options.find(({ option }) => option === v);
-      _value = visibleOption?.option?.toString() ?? null;
-      $eventCategoryFilter = _value;
     });
-  }
-
-  const onOptionClick = (option: string) => {
-    _value = option;
   };
 </script>
 
 <DropdownMenu
   label={translate('event-category-filter-label')}
-  value={_value}
+  value={$eventCategoryFilter}
   icon="filter"
   testId="event-category-filter"
 >
@@ -57,9 +52,9 @@
   </svelte:fragment>
   <div class="w-56">
     {#each options as { label, option } (option)}
-      <div class="option" class:active={_value === option}>
+      <div class="option" class:active={$eventCategoryFilter === option}>
         <div class="check active">
-          {#if _value === option}
+          {#if $eventCategoryFilter === option}
             <Icon name="checkmark" />
           {/if}
         </div>

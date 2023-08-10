@@ -291,5 +291,7 @@
   <svelte:fragment slot="action-top-center">
     <WorkflowDateTimeFilter />
   </svelte:fragment>
-  <WorkflowsSummaryConfigurableTable workflows={visibleItems} />
+  <WorkflowsSummaryConfigurableTable workflows={visibleItems}>
+    <slot slot="cloud" name="cloud" />
+  </WorkflowsSummaryConfigurableTable>
 </Pagination>

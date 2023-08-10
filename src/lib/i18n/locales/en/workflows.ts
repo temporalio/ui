@@ -111,7 +111,10 @@ export const Strings = {
   'queries-tab': 'Queries',
   'workflow-error-no-workers-title': 'No Workers Running',
   'workflow-error-no-workers-description':
-    'Please make sure you have at least one worker connected to the {{taskQueue}} Task Queue.',
+    'There are no Workers polling the {{taskQueue}} Task Queue.',
+  'workflow-error-no-compatible-workers-title': 'No Compatible Workers Running',
+  'workflow-error-no-compatible-workers-description':
+    'There are no compatible Workers polling the {{taskQueue}} Task Queue.',
   'state-transitions': 'State Transitions',
   'start-and-close-time': 'Start & Close Time',
   relationships: 'Relationships',
@@ -191,9 +194,14 @@ export const Strings = {
   'unpin-column-label': 'Unpin {{column}} column',
   'archived-workflows': 'Archived Workflows',
   archival: 'Archival',
-  'empty-state-title': 'No Workflows Found',
-  'empty-state-description':
-    'If you have filters applied, try adjusting them. Otherwise please check your syntax and try again.',
+  'workflow-query-empty-state-title': 'No Results',
+  'workflow-query-empty-state-preface':
+    'There are no results for the applied filters.',
+  'workflow-query-empty-state-postface':
+    'Try adjusting or clearing the filters to see the Workflows running on this Namespace.',
+  'workflow-query-error-state': 'There is an error with filtering Workflows.',
+  'workflow-empty-state-title': 'No Workflows running in this Namespace',
+  'workflow-empty-state-description': `You can populate the WebUI with sample Workflows. You can find a complete list of executable code samples in`,
   'visibility-disabled-archival':
     'This namespace is currently enabled for archival but visibility is not enabled.',
   'archival-link-preface': 'To enable ',
@@ -202,6 +210,8 @@ export const Strings = {
     'This namespace is currently not enabled for archival.',
   'archival-disabled-details':
     'Run this command to enable archival visibility for event histories',
+  'archival-empty-state-description':
+    'No results found for archival visibility.',
   'basic-search': 'Basic Search',
   'advanced-search': 'Advanced Search',
   'time-range': 'Time Range',

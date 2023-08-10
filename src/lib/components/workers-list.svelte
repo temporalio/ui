@@ -12,7 +12,7 @@
   import {
     type GetPollersResponse,
     type TaskQueueCompatibility,
-    getWorkerTaskReachability,
+    type WorkerReachability,
     getBuildIdReachability,
   } from '$lib/services/pollers-service';
   import {
@@ -23,33 +23,14 @@
     getOrderedVersionSets,
   } from '$lib/utilities/task-queue-compatibility';
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
-  import { page } from '$app/stores';
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;
   export let compatibility: TaskQueueCompatibility | undefined = undefined;
-
-  let namespace = $page.params.namespace;
+  export let reachability: WorkerReachability | undefined = undefined;
 
   $: versionSets = getOrderedVersionSets(compatibility);
   $: defaultVersion = getCurrentCompatibilityDefaultVersion(compatibility);
-
-  $: buildIds = workers?.pollers.map(getCurrentPollerBuildId);
-
-  let workerTaskReachability;
-
-  async function fetchWorkerTaskReachability(
-    namespace: string,
-    buildIds: string[],
-  ) {
-    workerTaskReachability = await getWorkerTaskReachability({
-      namespace,
-      buildIds,
-      taskQueue,
-    });
-  }
-
-  $: if (compatibility) fetchWorkerTaskReachability(namespace, buildIds);
 </script>
 
 <section class="flex flex-col gap-4">
@@ -112,10 +93,11 @@
       >{translate('workflows', 'workers-tab')}</caption
     >
     <TableHeaderRow slot="headers">
-      <th class={versionSets?.length ? 'w-3/12' : 'w-6/12'}
+      <th
+        class={reachability?.buildIdReachability?.length ? 'w-3/12' : 'w-6/12'}
         >{translate('id')}</th
       >
-      {#if versionSets?.length}
+      {#if reachability?.buildIdReachability?.length}
         <th class="w-3/12">{translate('workers', 'version')}</th>
         <th class="w-2/12">{translate('workers', 'retirability')}</th>
       {/if}
@@ -131,8 +113,8 @@
     </TableHeaderRow>
     {#each workers?.pollers as poller (poller.identity)}
       {@const buildId = getCurrentPollerBuildId(poller)}
-      {@const reachability = getBuildIdReachability(
-        workerTaskReachability,
+      {@const pollerReachability = getBuildIdReachability(
+        reachability,
         taskQueue,
         buildId,
       )}
@@ -140,7 +122,7 @@
         <td class="text-left" data-testid="worker-identity">
           <p class="select-all">{poller.identity}</p>
         </td>
-        {#if versionSets?.length}
+        {#if reachability?.buildIdReachability?.length}
           <td class="text-left" data-testid="worker-identity">
             <p class="select-all">
               <CompatibilityBadge
@@ -162,7 +144,9 @@
           </td>
           <td class="text-left" data-testid="worker-last-access-time">
             <p>
-              <span class:reachability={!!reachability}>{reachability}</span>
+              <span class:reachability={!!pollerReachability}
+                >{pollerReachability}</span
+              >
             </p>
           </td>
         {/if}
@@ -204,7 +188,7 @@
       </TableRow>
     {:else}
       <tr class="w-full">
-        <td colspan={versionSets?.length ? 8 : 6}>
+        <td colspan={reachability?.buildIdReachability?.length ? 8 : 6}>
           <EmptyState title={translate('workflows', 'workers-empty-state')} />
         </td>
       </tr>

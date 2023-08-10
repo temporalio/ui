@@ -3,25 +3,24 @@
 
   import WorkersList from '$lib/components/workers-list.svelte';
   import {
-    type PollerWithTaskQueueTypes,
     getPollers,
     getTaskQueueCompatibility,
+    getWorkerTaskReachability,
   } from '$lib/services/pollers-service';
+  import {
+    getUniqueBuildIdsFromPollers,
+    pollerHasVersioning,
+  } from '$lib/utilities/task-queue-compatibility';
 
-  let { queue, namespace } = $page.params;
-
-  function pollerHasVersioning(pollers: PollerWithTaskQueueTypes[]) {
-    return pollers?.some(
-      (poller) => poller?.workerVersionCapabilities?.useVersioning,
-    );
-  }
+  let { queue, namespace, taskQueue } = $page.params;
 </script>
 
 {#await getPollers({ queue, namespace }) then workers}
   {@const versioningEnabled = pollerHasVersioning(workers.pollers)}
   {#if versioningEnabled}
-    {#await getTaskQueueCompatibility({ queue, namespace }) then compatibility}
-      <WorkersList taskQueue={queue} {workers} {compatibility} />
+    {@const buildIds = getUniqueBuildIdsFromPollers(workers.pollers)}
+    {#await Promise.all( [getTaskQueueCompatibility( { queue, namespace }, ), getWorkerTaskReachability( { namespace, buildIds, taskQueue }, )], ) then [compatibility, reachability]}
+      <WorkersList taskQueue={queue} {workers} {compatibility} {reachability} />
     {:catch}
       <WorkersList taskQueue={queue} {workers} />
     {/await}

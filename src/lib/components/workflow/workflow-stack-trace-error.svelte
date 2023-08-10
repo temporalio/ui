@@ -1,24 +1,54 @@
 <script lang="ts">
-  import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
+  import { fly } from 'svelte/transition';
   import { translate } from '$lib/i18n/translate';
 
   import { workflowRun } from '$lib/stores/workflow-run';
+  import { workflowIsCompatibleWithWorkers } from '$lib/utilities/task-queue-compatibility';
 
-  $: ({ workflow, workers } = $workflowRun);
+  $: ({ workflow, workers, compatibility } = $workflowRun);
   $: runningWithNoWorkers = workflow?.isRunning && !workers?.pollers?.length;
+  $: runningWithNoCompatibleWorkers =
+    workflow?.isRunning &&
+    !workflowIsCompatibleWithWorkers(workflow, workers.pollers, compatibility);
 </script>
 
 {#if runningWithNoWorkers}
-  <section class="stack-trace">
-    <EmptyState
+  <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
+    <Alert
+      bold
       icon="warning"
+      intent="warning"
       title={translate('workflows', 'workflow-error-no-workers-title')}
-      content={translate('workflows', 'workflow-error-no-workers-description', {
+      role="status"
+    >
+      {translate('workflows', 'workflow-error-no-workers-description', {
         taskQueue: workflow?.taskQueue,
       })}
-      class="my-0"
-    />
-  </section>
+    </Alert>
+  </div>
+{/if}
+{#if !runningWithNoWorkers && runningWithNoCompatibleWorkers}
+  <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
+    <Alert
+      bold
+      icon="warning"
+      intent="warning"
+      title={translate(
+        'workflows',
+        'workflow-error-no-compatible-workers-title',
+      )}
+      role="status"
+    >
+      {translate(
+        'workflows',
+        'workflow-error-no-compatible-workers-description',
+        {
+          taskQueue: workflow?.taskQueue,
+        },
+      )}
+    </Alert>
+  </div>
 {/if}
 
 <style lang="postcss">
