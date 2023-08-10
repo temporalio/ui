@@ -125,4 +125,8 @@ export const Strings = {
   'arrow-key-down': 'Arrow key down',
   'arrow-key-left': 'Arrow key left',
   'arrow-key-right': 'Arrow key right',
+  on: 'On',
+  off: 'Off',
+  labs: 'Labs',
+  experimental: 'Experimental',
 } as const;
