@@ -41,6 +41,7 @@ import importIcon from './svg/import.svelte';
 import info from './svg/info.svelte';
 import invertedCheckmark from './svg/inverted-checkmark.svelte';
 import json from './svg/json.svelte';
+import labs from './svg/labs.svelte';
 import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
 import merge from './svg/merge.svelte';
@@ -122,6 +123,7 @@ export const icons = {
   info,
   'inverted-checkmark': invertedCheckmark,
   json,
+  labs,
   lock,
   logout,
   merge,
