@@ -109,7 +109,7 @@
     <NavRow {isCloud} noHover handleClick={() => ($labsMode = !$labsMode)}>
       <NavTooltip right text={labsHoverText}>
         <button
-          aria-label={translate('labs')}
+          aria-label={labsText}
           data-testid="labs-button"
           class="w-10 flex items-center justify-center"
         >
