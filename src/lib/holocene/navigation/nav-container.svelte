@@ -65,7 +65,7 @@
     </div>
   </div>
   <div
-    class="text-[10px] w-full pb-12 pt-24 text-center {isCloud
+    class="text-[10px] h-4 w-full pb-12 pt-24 text-center {isCloud
       ? 'text-gray-500'
       : 'text-gray-300'}"
   >
