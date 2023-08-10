@@ -2,6 +2,7 @@
   export let link: string | null = null;
   export let isCloud: boolean;
   export let noFilter = false;
+  export let noHover = false;
   export let wrap = false;
   export let externalLink = false;
   export let handleClick: () => void = null;
@@ -12,6 +13,7 @@
   class={link ? '' : classes}
   class:noFilter
   class:wrap
+  class:noHover
   data-testid={$$props['data-testid']}
 >
   {#if handleClick !== null}
@@ -54,5 +56,13 @@
 
   .cloud:hover {
     @apply bg-gray-900 text-white;
+  }
+
+  .local.noHover:hover {
+    @apply bg-gray-900 text-white;
+  }
+
+  .cloud.noHover:hover {
+    @apply bg-white text-gray-900;
   }
 </style>

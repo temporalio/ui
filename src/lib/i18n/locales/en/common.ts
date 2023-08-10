@@ -96,5 +96,5 @@ export const Strings = {
   'banner-ui-version': 'Temporal UI v{{version}} is available',
   on: 'On',
   off: 'Off',
-  'labs-mode': 'Labs Mode',
+  labs: 'Labs',
 } as const;

@@ -39,23 +39,7 @@
   data-testid="top-nav"
   class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
 >
-  <div class="flex items-center gap-2">
-    <Tooltip
-      text="{translate('labs-mode')} {$labsMode
-        ? translate('on')
-        : translate('off')}"
-      right
-    >
-      <button
-        aria-label="labs mode"
-        class="w-8 h-8 rounded flex items-center justify-center"
-        class:bg-gray-200={$labsMode}
-        on:click={() => ($labsMode = !$labsMode)}
-      >
-        <Icon name="labs" active={$labsMode} />
-      </button>
-    </Tooltip>
-  </div>
+  <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">
     {#if showNamespaceSpecificNav}
       {#key namespace}

@@ -9,10 +9,16 @@
   import FeatureGuard from '$lib/components/feature-guard.svelte';
   import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
   import { translate } from '$lib/i18n/translate';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { labsMode } from '$lib/stores/labs-mode';
 
   export let isCloud = false;
   export let activeNamespace: Namespace;
   export let linkList: Partial<Record<string, string>>;
+
+  $: labsText = `${translate('labs')} ${
+    $labsMode ? translate('on') : translate('off')
+  }`;
 </script>
 
 <NavContainer {isCloud} {linkList}>
@@ -96,6 +102,21 @@
         <div class="nav-title">{translate('feedback')}</div>
       </NavRow>
     </slot>
+    <NavRow {isCloud} noHover>
+      <NavTooltip right text={labsText}>
+        <button
+          aria-label="labs mode"
+          data-testid="labs-button"
+          class="w-10 flex items-center justify-center"
+          on:click={() => ($labsMode = !$labsMode)}
+        >
+          <Icon name="labs" {isCloud} active={$labsMode} />
+        </button>
+      </NavTooltip>
+      <div class="nav-title">
+        {labsText}
+      </div>
+    </NavRow>
   </svelte:fragment>
 </NavContainer>
 
