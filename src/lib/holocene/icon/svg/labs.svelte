@@ -1,11 +1,9 @@
 <script lang="ts">
   import Svg from './svg.svelte';
 
-  export let isCloud = false;
   export let active = false;
 
-  $: fill = isCloud ? '#18181b' : '#ffffff';
-  $: liquidFill = active ? '#2CFA1F' : isCloud ? '#ffffff' : '#18181b';
+  $: liquidFill = active ? '#2CFA1F' : 'currentColor';
 </script>
 
 <Svg {...$$props}>

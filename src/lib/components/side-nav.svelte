@@ -113,7 +113,7 @@
           data-testid="labs-button"
           class="w-10 flex items-center justify-center"
         >
-          <Icon name="labs" {isCloud} active={$labsMode} />
+          <Icon name="labs" active={$labsMode} />
         </button>
       </NavTooltip>
       <div class="nav-title flex flex-col leading-3">
