@@ -55,8 +55,8 @@
     </Pagination>
   {:else}
     <EmptyState
-      title={translate('workflows', 'empty-state-title')}
-      content={translate('workflows', 'empty-state-description')}
+      title={translate('workflows', 'workflow-empty-state-title')}
+      content={translate('workflows', 'archival-empty-state-description')}
     />
   {/if}
 {:else if archivalEnabled}
