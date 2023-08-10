@@ -28,6 +28,7 @@
     {message}
     {link}
     bind:shownBanner
-    testId="ui-version-banner"
+    data-testid="ui-version-banner"
+    role="alertdialog"
   />
 {/if}

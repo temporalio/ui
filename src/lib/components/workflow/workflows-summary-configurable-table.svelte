@@ -97,6 +97,7 @@
   id="workflows-summary-table-configuration-drawer"
   dark={false}
   title={translate('workflows', 'configure-workflows')}
+  closeButtonLabel={translate('workflows', 'close-configure-workflows')}
 >
   <svelte:fragment slot="subtitle">
     Add (<Icon class="inline" name="add" />), re-arrange (<Icon

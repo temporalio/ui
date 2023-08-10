@@ -9,9 +9,11 @@
     classes?: string;
     'data-testid'?: string;
     hoverable?: boolean;
+    label: string;
   }
 
   export let icon: IconName = null;
+  export let label = '';
   export let classes = '';
   export let hoverable = false;
 </script>
@@ -22,6 +24,7 @@
   class:hoverable
   on:click
   data-testid={$$props['data-testid']}
+  aria-label={label}
   {...$$restProps}
 >
   {#if icon}

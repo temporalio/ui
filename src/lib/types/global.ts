@@ -13,6 +13,17 @@ export type Replace<T, U extends { [key: string]: unknown }> = Omit<
 > &
   U;
 
+export type Only<O extends object, K extends keyof O> = {
+  [X in keyof Pick<O, K>]-?: true;
+} & {
+  [X in keyof Omit<O, K>]: never;
+};
+
+export type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+export type XOR<T, U> = T | U extends object
+  ? (Without<T, U> & U) | (Without<U, T> & T)
+  : T | U;
+
 export type Eventual<T> = T | PromiseLike<T>;
 
 export type NamespaceScopedRequest = { namespace: string };

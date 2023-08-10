@@ -10,11 +10,12 @@
   $: checked = $autoRefreshWorkflow === 'on';
 </script>
 
-<label
-  for="autorefresh"
-  class="mt-2 flex items-center gap-4 font-secondary text-sm"
-  >{translate('workflows', 'auto-refresh')}
-  <Tooltip bottomLeft text={translate('workflows', 'auto-refresh-tooltip')}>
-    <ToggleSwitch id="autorefresh" {checked} on:change={onChange} />
-  </Tooltip>
-</label>
+<Tooltip bottomLeft text={translate('workflows', 'auto-refresh-tooltip')}>
+  <ToggleSwitch
+    label={translate('workflows', 'auto-refresh')}
+    labelPosition="left"
+    id="autorefresh"
+    {checked}
+    on:change={onChange}
+  />
+</Tooltip>

@@ -7,6 +7,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
+  import { translate } from '$lib/i18n/translate';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
@@ -61,6 +62,9 @@
   >
     <span class="table-link">{workflow.id}</span>
     <FilterOrCopyButtons
+      copyIconTitle={translate('copy-icon-title')}
+      copySuccessIconTitle={translate('copy-success-icon-title')}
+      filterIconTitle={translate('filter-workflows')}
       show={showFilterCopy}
       content={workflow.id}
       filterable={false}
@@ -76,15 +80,20 @@
     on:mouseleave={() => (showFilterCopy = false)}
     on:blur={() => (showFilterCopy = false)}
   >
-    <h3 class="md:hidden">Workflow Name:</h3>
+    <h3 class="md:hidden">{translate('workflows', 'workflow-name')}:</h3>
     <button
       class="table-link"
       on:click|preventDefault|stopPropagation={() => onTypeClick(workflow.name)}
-      aria-label="filter by {workflow.name} type"
+      aria-label={translate('workflows', 'filter-by', {
+        workflowName: workflow.name,
+      })}
     >
       {workflow.name}
     </button>
     <FilterOrCopyButtons
+      copyIconTitle={translate('copy-icon-title')}
+      copySuccessIconTitle={translate('copy-success-icon-title')}
+      filterIconTitle={translate('filter-workflows')}
       show={showFilterCopy}
       content={workflow.name}
       onFilter={() => onTypeClick(workflow.name)}

@@ -42,6 +42,7 @@
 </script>
 
 <DropdownMenu
+  label={translate('event-category-filter-label')}
   value={$eventCategoryFilter}
   icon="filter"
   testId="event-category-filter"

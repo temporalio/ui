@@ -89,6 +89,9 @@
     {translate('workers', 'workers')}
   </h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
+    <caption class="sr-only" slot="caption"
+      >{translate('workflows', 'workers-tab')}</caption
+    >
     <TableHeaderRow slot="headers">
       <th
         class={reachability?.buildIdReachability?.length ? 'w-3/12' : 'w-6/12'}

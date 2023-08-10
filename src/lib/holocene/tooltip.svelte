@@ -1,8 +1,60 @@
 <script lang="ts">
-  import Copyable from '$lib/components/copyable.svelte';
+  import Copyable from '$lib/holocene/copyable.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
+  import type { Only } from '$lib/types/global';
 
+  type BaseProps = {
+    text?: string;
+    icon?: IconName;
+    hide?: boolean;
+    width?: number;
+    class?: string;
+  };
+
+  type BasePositionProps = {
+    top?: boolean;
+    topRight?: boolean;
+    right?: boolean;
+    bottomRight?: boolean;
+    bottom?: boolean;
+    bottomLeft?: boolean;
+    left?: boolean;
+    topLeft?: boolean;
+  };
+
+  type OnlyTop = Only<BasePositionProps, 'top'>;
+  type OnlyTopRight = Only<BasePositionProps, 'topRight'>;
+  type OnlyRight = Only<BasePositionProps, 'right'>;
+  type OnlyBottomRight = Only<BasePositionProps, 'bottomRight'>;
+  type OnlyBottom = Only<BasePositionProps, 'bottom'>;
+  type OnlyBottomLeft = Only<BasePositionProps, 'bottomLeft'>;
+  type OnlyLeft = Only<BasePositionProps, 'left'>;
+  type OnlyTopLeft = Only<BasePositionProps, 'topLeft'>;
+
+  type AllUniquePositionProps =
+    | OnlyTop
+    | OnlyTopRight
+    | OnlyRight
+    | OnlyBottomRight
+    | OnlyBottom
+    | OnlyBottomLeft
+    | OnlyLeft
+    | OnlyTopLeft;
+
+  type CopyableProps = BaseProps &
+    AllUniquePositionProps & {
+      copyable: true;
+      copyIconTitle: string;
+      copySuccessIconTitle: string;
+    };
+
+  type NonCopyableProps = BaseProps & AllUniquePositionProps;
+
+  type $$Props = CopyableProps | NonCopyableProps;
+
+  let className = '';
+  export { className as class };
   export let text = '';
   export let icon: IconName = null;
   /** bottom center of the tooltip aligned to the top center of the wrapper */
@@ -24,12 +76,14 @@
   export let copyable = false;
   export let hide: boolean | null = false;
   export let width: number | null = null;
+  export let copyIconTitle = '';
+  export let copySuccessIconTitle = '';
 </script>
 
 {#if hide}
   <slot />
 {:else}
-  <div class="wrapper relative inline-block {$$props.class}">
+  <div class="wrapper relative inline-block {className}">
     <slot />
     <div
       class="tooltip"
@@ -45,7 +99,13 @@
     >
       <div class="inline-block rounded-lg bg-gray-800 px-2 py-2">
         {#if copyable}
-          <Copyable clickAllToCopy content={text} color="white">
+          <Copyable
+            {copySuccessIconTitle}
+            {copyIconTitle}
+            clickAllToCopy
+            content={text}
+            color="white"
+          >
             <span class="text-gray-100"
               >{#if icon}<Icon
                   name={icon}

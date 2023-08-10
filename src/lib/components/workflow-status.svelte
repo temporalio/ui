@@ -37,12 +37,12 @@
 </script>
 
 <span class="flex text-center text-sm font-medium leading-4">
-  <h6 class="{color} flex items-center rounded-sm px-1 py-0.5">
+  <span class="{color} flex items-center rounded-sm px-1 py-0.5 font-secondary">
     <span class="whitespace-nowrap">{label}</span>
     {#if isRunning}
       <HeartBeat {delay} />
     {/if}
-  </h6>
+  </span>
 </span>
 
 <style lang="postcss">

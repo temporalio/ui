@@ -7,6 +7,7 @@
 
   export let tooltipText: string = '';
   export let arrow: 'up' | 'down' | 'left' | 'right' | undefined = undefined;
+  export let title: string;
 
   const ArrowComponents = {
     up: ArrowUp,
@@ -19,7 +20,7 @@
 <Tooltip text={tooltipText} hide={!tooltipText} top>
   <kbd class="shortcut">
     {#if arrow}
-      <svelte:component this={ArrowComponents[arrow]} />
+      <svelte:component this={ArrowComponents[arrow]} {title} />
     {:else}
       <slot />
     {/if}

@@ -30,24 +30,21 @@
         >{error}</small
       >
     {/if}
-    <label
-      for="pass-access-token"
-      class="flex items-center gap-4 font-secondary text-sm"
-      ><ToggleSwitch
-        id="pass-access-token"
-        bind:checked={passToken}
-        data-testid="data-encoder-pass-access-token"
-      />{translate('data-encoder', 'pass-access-token-label')}
-    </label>
-    <label
-      for="pass-access-credentials"
-      class="flex items-center gap-4 font-secondary text-sm"
-      ><ToggleSwitch
-        id="pass-access-credentials"
-        bind:checked={includeCreds}
-        data-testid="data-encoder-include-credentials"
-      />{translate('data-encoder', 'include-cross-origin-credentials-label')}
-    </label>
+    <ToggleSwitch
+      label={translate('data-encoder', 'pass-access-token-label')}
+      id="pass-access-token"
+      bind:checked={passToken}
+      data-testid="data-encoder-pass-access-token"
+    />
+    <ToggleSwitch
+      label={translate(
+        'data-encoder',
+        'include-cross-origin-credentials-label',
+      )}
+      id="pass-access-credentials"
+      bind:checked={includeCreds}
+      data-testid="data-encoder-include-credentials"
+    />
     {#if includeCreds}
       <small data-testid="data-encoder-cross-origin-credentials"
         >{translate(

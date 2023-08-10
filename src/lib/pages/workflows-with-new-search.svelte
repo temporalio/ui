@@ -264,7 +264,7 @@
   </div>
   <div>
     <button
-      aria-label="retry workflows"
+      aria-label={translate('workflows', 'retry-workflows')}
       class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
       on:click={refreshWorkflows}
     >
@@ -275,7 +275,7 @@
 <Pagination
   items={$workflows}
   let:visibleItems
-  aria-label="recent workflows"
+  aria-label={translate('workflows', 'recent-workflows')}
   pageSizeSelectLabel={translate('per-page')}
   previousButtonLabel={translate('previous')}
   nextButtonLabel={translate('next')}

@@ -21,6 +21,7 @@ export const Strings = {
   'delete-schedule-error': 'Cannot delete schedule. {{error}}',
   pause: 'Pause',
   unpause: 'Unpause',
+  'schedule-actions': 'Schedule Actions',
   'pause-modal-title': 'Pause Schedule?',
   'pause-modal-confirmation': 'Are you sure you want to pause {{schedule}}?',
   'pause-reason': 'Enter a reason for pausing the schedule.',

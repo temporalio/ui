@@ -34,17 +34,19 @@
   }
 </script>
 
-<div
+<nav
   class="sticky top-0 z-30 flex h-10 w-full items-center justify-between border-b-2 bg-gray-100 p-1 px-4 md:px-10"
   data-testid="top-nav"
   class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
+  aria-label={translate('main')}
 >
   <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">
     {#if showNamespaceSpecificNav}
       {#key namespace}
         <DropdownMenu
-          id="namespace"
+          label={translate('namespaces', 'namespace-label', { namespace })}
+          id="namespace-switcher"
           position="right"
           menuClass="border-2 bg-purple-200"
           buttonClass="border border-purple-700 rounded-sm"
@@ -73,13 +75,13 @@
         <div slot="trigger" class="flex items-center gap-1">
           <img
             src={$authUser?.picture}
-            alt={$authUser?.profile ?? 'user profile'}
+            alt={$authUser?.profile ?? translate('user-profile')}
             class="h-[24px] w-[24px] cursor-pointer rounded-md"
             on:error={fixImage}
             class:hidden={!showProfilePic}
           />
           <div
-            class="aspect-square h-[24px] h-full w-[24px] rounded-md bg-blue-200 p-0.5"
+            class="aspect-square h-full w-[24px] rounded-md bg-blue-200 p-0.5"
             class:hidden={showProfilePic}
           >
             {#if $authUser?.name}
@@ -101,4 +103,4 @@
       </DropdownMenu>
     {/if}
   </div>
-</div>
+</nav>

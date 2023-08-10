@@ -9,9 +9,12 @@
   <img
     src={Logo}
     style="margin-top: -40px;"
-    alt="Temporal Logo"
+    alt=""
     width="200px"
     height="200px"
+    aria-labelledby="loadingTitle"
   />
-  <h2 class="text-xl font-medium" style="margin-top: -40px;">{title}</h2>
+  <h2 id="loadingTitle" class="text-xl font-medium" style="margin-top: -40px;">
+    {title}
+  </h2>
 </div>
