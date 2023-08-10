@@ -9,9 +9,10 @@
 </script>
 
 <li
-  class={link ? '' : classes}
+  class="{link ? '' : classes} overflow-hidden"
   class:noFilter
   class:wrap
+  class:button={handleClick !== null}
   data-testid={$$props['data-testid']}
 >
   {#if handleClick !== null}
@@ -34,6 +35,10 @@
 <style lang="postcss">
   .nav-row {
     @apply flex flex-row items-center whitespace-nowrap rounded-lg py-1 text-sm font-medium;
+  }
+
+  .nav-row.button {
+    @apply py-0;
   }
 
   .wrap {
