@@ -108,13 +108,9 @@
     </slot>
     <NavRow {isCloud} handleClick={() => ($labsMode = !$labsMode)}>
       <NavTooltip right text={labsHoverText}>
-        <button
-          aria-label={labsText}
-          data-testid="labs-button"
-          class="w-10 flex items-center justify-center"
-        >
+        <div class="nav-icon">
           <Icon name="labs" active={$labsMode} />
-        </button>
+        </div>
       </NavTooltip>
       <div class="nav-title flex flex-col leading-3">
         <div>{labsText}</div>
