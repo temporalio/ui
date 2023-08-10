@@ -94,4 +94,8 @@ export const Strings = {
   none: 'None',
   'banner-temporal-version': 'Temporal v{{version}} is available',
   'banner-ui-version': 'Temporal UI v{{version}} is available',
+  on: 'On',
+  off: 'Off',
+  labs: 'Labs',
+  experimental: 'Experimental',
 } as const;
