@@ -4,6 +4,7 @@
   import { type MenuContext, MENU_CONTEXT } from './menu-container.svelte';
   import type { HTMLButtonAttributes } from 'svelte/elements';
   import Badge from '../badge.svelte';
+  import { MENU_ITEM_SELECTORS } from './menu-item.svelte';
 
   interface $$Props extends HTMLButtonAttributes {
     controls: string;
@@ -27,11 +28,39 @@
   export let unroundLeft = false;
   export let variant: 'default' | 'ghost' = 'default';
 
-  const { toggleMenu, open } = getContext<MenuContext>(MENU_CONTEXT);
+  const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);
 
   const handleClick = () => {
     if (!disabled) {
-      toggleMenu();
+      $open = !$open;
+    }
+  };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case 'Escape':
+        $open = false;
+        break;
+      case 'ArrowDown':
+        event.preventDefault();
+        if ($open) {
+          focusFirstMenuItem();
+        } else {
+          $open = true;
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  const focusFirstMenuItem = () => {
+    const focusable: (HTMLInputElement | HTMLLIElement)[] = Array.from(
+      $menuElement.querySelectorAll(MENU_ITEM_SELECTORS),
+    );
+
+    if (focusable && focusable[0]) {
+      requestAnimationFrame(() => focusable[0].focus());
     }
   };
 </script>
@@ -41,6 +70,7 @@
   {disabled}
   type="button"
   on:click={handleClick}
+  on:keydown={handleKeyDown}
   aria-haspopup={!disabled}
   aria-controls={controls}
   aria-expanded={$open}

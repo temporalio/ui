@@ -16,18 +16,22 @@
   export let position: 'left' | 'right' = 'left';
   export let menuElement: HTMLUListElement = null;
 
-  const { keepOpen: keepOpenCtx, open } = getContext<MenuContext>(MENU_CONTEXT);
+  const {
+    keepOpen: keepOpenCtx,
+    menuElement: menuElementCtx,
+    open,
+  } = getContext<MenuContext>(MENU_CONTEXT);
 
   $: $keepOpenCtx = keepOpen;
+  $: $menuElementCtx = menuElement;
 </script>
 
 <ul
   in:fly={{ duration: 100 }}
   role="menu"
-  class="absolute z-50 mt-1 p-2 max-h-80 overflow-scroll w-full min-w-fit list-none rounded-lg border border-gray-900 bg-white text-primary shadow focus:outline-none focus-visible:outline focus-visible:outline-blue-700 focus-visible:-outline-offset-2 {position} {$$props.class}"
+  class="absolute z-50 mt-1 p-2 max-h-80 overflow-scroll w-full min-w-[240px] list-none rounded-lg border border-gray-900 bg-white text-primary shadow focus:outline-none focus-visible:outline focus-visible:outline-blue-700 focus-visible:-outline-offset-2 {position} {$$props.class}"
   class:hidden={!$open}
   aria-labelledby={id}
-  on:keydown
   {id}
   bind:this={menuElement}
   {...$$restProps}

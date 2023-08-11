@@ -41,7 +41,7 @@
   >
     {selectedLabel}
   </MenuButton>
-  <Menu class="max-h-80 overflow-y-scroll w-fit" id="conditional-menu">
+  <Menu id="conditional-menu">
     {#each options as { value, label }}
       <MenuItem
         on:click={() => {

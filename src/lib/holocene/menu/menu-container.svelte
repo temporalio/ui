@@ -6,22 +6,17 @@
   export const MENU_CONTEXT = 'menu-context';
 
   export type MenuContext = {
-    toggleMenu: () => void;
-    closeMenu: () => void;
     open: Writable<boolean>;
     keepOpen: Writable<boolean>;
+    menuElement: Writable<HTMLUListElement>;
   };
 </script>
 
 <script lang="ts">
   export let open: Writable<boolean> = writable(false);
-  const keepOpen = writable(false);
 
-  const handleKeydown = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      closeMenu();
-    }
-  };
+  const keepOpen = writable(false);
+  const menuElement: Writable<HTMLUListElement> = writable(null);
 
   const closeMenu = () => {
     $open = false;
@@ -33,8 +28,7 @@
   setContext<MenuContext>(MENU_CONTEXT, {
     open,
     keepOpen,
-    toggleMenu,
-    closeMenu,
+    menuElement,
   });
 </script>
 
@@ -42,7 +36,6 @@
   use:clickOutside
   on:click-outside={closeMenu}
   class="relative {$$props.class}"
-  on:keydown|stopPropagation={handleKeydown}
 >
   <slot {open} />
 </div>

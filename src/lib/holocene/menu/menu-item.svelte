@@ -1,8 +1,21 @@
+<script lang="ts" context="module">
+  export const MENU_ITEM_SELECTORS =
+    'input, li[role="option"]:not([aria-disabled="true"]), li[role="menuitem"]:not([aria-disabled="true"])';
+</script>
+
 <script lang="ts">
   import { createEventDispatcher, getContext } from 'svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
   import type { HTMLLiAttributes } from 'svelte/elements';
+
+  type ExtendedLIEvent = KeyboardEvent & {
+    currentTarget: EventTarget & HTMLLIElement;
+  };
+
+  type ExtendedAnchorEvent = KeyboardEvent & {
+    currentTarget: EventTarget & HTMLAnchorElement;
+  };
 
   interface $$Props extends HTMLLiAttributes {
     selected?: boolean;
@@ -19,19 +32,66 @@
   export let href = null;
   export let description = null;
 
-  const { keepOpen, closeMenu } = getContext<MenuContext>(MENU_CONTEXT);
+  const { keepOpen, open } = getContext<MenuContext>(MENU_CONTEXT);
 
   const dispatch = createEventDispatcher<{ click: undefined }>();
 
-  const handleKeyUp = (event: KeyboardEvent) => {
-    if (event.key === ' ' || event.key === 'Enter') {
-      if (!$keepOpen) closeMenu();
-      dispatch('click');
+  const handleKeydown = (event: ExtendedLIEvent | ExtendedAnchorEvent) => {
+    switch (event.key) {
+      case 'Escape':
+        $open = false;
+        break;
+      case 'ArrowDown':
+      case 'ArrowRight':
+        event.preventDefault();
+        focusNextMenuItem(event.currentTarget);
+        break;
+      case 'ArrowUp':
+      case 'ArrowLeft':
+        event.preventDefault();
+        focusPreviousMenuItem(event.currentTarget);
+        break;
+      case ' ':
+      case 'Enter':
+        event.preventDefault();
+        dispatch('click');
+        if (!$keepOpen) $open = false;
+        break;
+      default:
+        break;
+    }
+  };
+
+  const focusNextMenuItem = (element: HTMLLIElement | HTMLAnchorElement) => {
+    let nextElement = element.nextElementSibling;
+
+    while (nextElement) {
+      if (nextElement.matches(MENU_ITEM_SELECTORS)) break;
+      nextElement = nextElement.nextElementSibling;
+    }
+
+    if (nextElement && nextElement instanceof HTMLLIElement) {
+      nextElement.focus();
+    }
+  };
+
+  const focusPreviousMenuItem = (
+    element: HTMLLIElement | HTMLAnchorElement,
+  ) => {
+    let previousElement = element.previousElementSibling;
+
+    while (previousElement) {
+      if (previousElement.matches(MENU_ITEM_SELECTORS)) break;
+      previousElement = previousElement.previousElementSibling;
+    }
+
+    if (previousElement && previousElement instanceof HTMLLIElement) {
+      previousElement.focus();
     }
   };
 
   const handleClick = () => {
-    if (!$keepOpen) closeMenu();
+    if (!$keepOpen) $open = false;
     dispatch('click');
   };
 </script>
@@ -45,6 +105,7 @@
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
+    on:keydown={handleKeydown}
     {...$$restProps}
   >
     <slot />
@@ -59,7 +120,7 @@
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
     on:click|preventDefault|stopPropagation={handleClick}
-    on:keyup={handleKeyUp}
+    on:keydown={handleKeydown}
     {...$$restProps}
   >
     <slot name="leading" />

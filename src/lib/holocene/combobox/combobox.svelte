@@ -10,11 +10,6 @@
     currentTarget: EventTarget & HTMLInputElement;
   };
 
-  type ExtendedUListEvent = KeyboardEvent & {
-    currentTarget: EventTarget & HTMLUListElement;
-    target: HTMLLIElement;
-  };
-
   interface BaseProps extends HTMLInputAttributes {
     id: string;
     label: string;
@@ -57,7 +52,6 @@
 
   let displayValue: string;
   let menuElement: HTMLUListElement;
-  let inputElement: HTMLInputElement;
   const open = writable<boolean>(false);
   $: list = options;
 
@@ -79,21 +73,13 @@
     }
   }
 
-  export const openList = (focusList: boolean = false) => {
+  export const openList = () => {
     $open = true;
-    if (focusList) {
-      requestAnimationFrame(() => {
-        focusFirstOption();
-      });
-    }
   };
 
   export const closeList = () => {
     if (!$open) return;
     $open = false;
-    requestAnimationFrame(() => {
-      inputElement.focus();
-    });
   };
 
   const narrowOption = (option: unknown): T => option as T;
@@ -113,81 +99,26 @@
     );
 
     if (listItemElement) {
-      listItemElement.focus();
-    }
-  };
-
-  const focusNextOption = (element: HTMLLIElement) => {
-    let nextElement = element.nextElementSibling;
-
-    while (nextElement) {
-      if (nextElement.matches(`li[role="option"]:not([aria-disabled="true"])`))
-        break;
-      nextElement = nextElement.nextElementSibling;
-    }
-
-    if (nextElement && nextElement instanceof HTMLLIElement) {
-      nextElement.focus();
-    } else {
-      inputElement.focus();
-    }
-  };
-
-  const focusPreviousOption = (element: HTMLLIElement) => {
-    let previousElement = element.previousElementSibling;
-
-    while (previousElement) {
-      if (
-        previousElement.matches(`[role="option"]:not([aria-disabled="true"])`)
-      )
-        break;
-      previousElement = previousElement.previousElementSibling;
-    }
-
-    if (previousElement && previousElement instanceof HTMLLIElement) {
-      previousElement.focus();
-    } else {
-      inputElement.focus();
+      requestAnimationFrame(() => listItemElement.focus());
     }
   };
 
   const handleInputKeydown = (event: KeyboardEvent) => {
-    const focusList = true;
     switch (event.key) {
       case 'Escape':
         closeList();
         break;
       case 'ArrowDown':
-        openList(focusList);
-        event.preventDefault();
+        openList();
+        focusFirstOption();
         break;
       case 'Enter':
-        openList(focusList);
+        openList();
+        focusFirstOption();
         break;
       case 'ArrowUp':
       case 'ArrowRight':
       case 'ArrowLeft':
-        event.stopPropagation();
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleListKeydown = (event: ExtendedUListEvent) => {
-    switch (event.key) {
-      case 'Escape':
-        closeList();
-        break;
-      case 'ArrowDown':
-      case 'ArrowRight':
-        focusNextOption(event.target);
-        event.preventDefault();
-        break;
-      case 'ArrowUp':
-      case 'ArrowLeft':
-        focusPreviousOption(event.target);
-        event.preventDefault();
         break;
       default:
         break;
@@ -219,13 +150,7 @@
     {label}
   </label>
 
-  <MenuButton
-    aria-hidden="true"
-    tabindex={-1}
-    hasIndicator
-    {disabled}
-    controls="{id}-listbox"
-  >
+  <MenuButton hasIndicator {disabled} controls="{id}-listbox">
     <slot name="leading" slot="leading" />
     <input
       {id}
@@ -245,22 +170,16 @@
       aria-expanded={$open}
       aria-required={required}
       aria-autocomplete="list"
-      on:input={handleInput}
-      on:keydown={handleInputKeydown}
+      on:input|stopPropagation={handleInput}
+      on:keydown|stopPropagation={handleInputKeydown}
       on:click|stopPropagation={handleInputClick}
-      bind:this={inputElement}
       data-testid={$$props['data-testid'] ?? id}
       {...$$restProps}
     />
     <slot name="trailing" slot="trailing" />
   </MenuButton>
 
-  <Menu
-    bind:menuElement
-    on:keydown={handleListKeydown}
-    id="{id}-listbox"
-    role="listbox"
-  >
+  <Menu bind:menuElement id="{id}-listbox" role="listbox">
     {#each list as option}
       {#if typeof option === 'string'}
         <ComboboxOption
