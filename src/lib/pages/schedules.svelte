@@ -75,8 +75,10 @@
     <Pagination
       items={filteredSchedules(schedules)}
       let:visibleItems
-      aria-label="schedules"
+      aria-label={translate('schedules')}
       pageSizeSelectLabel={translate('per-page')}
+      previousButtonLabel={translate('previous')}
+      nextButtonLabel={translate('next')}
     >
       <svelte:fragment slot="action-top-left">
         <div class="w-full xl:w-1/2">
@@ -88,6 +90,7 @@
             id="schedule-name-filter"
             placeholder={translate('schedules', 'name')}
             clearable
+            clearButtonLabel={translate('clear-input-button-label')}
             bind:value={search}
             on:submit={noop}
           />

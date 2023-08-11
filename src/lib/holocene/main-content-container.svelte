@@ -19,11 +19,13 @@
   }
 </script>
 
-<main
-  id="content"
+<div
+  id="content-wrapper"
   class="relative h-screen w-max flex-auto overflow-auto bg-gray-100"
-  on:scroll={handleOnScroll}
 >
   <slot />
-  <ScrollToTop hidden={scrollToTopHidden} {onScrollToTopClick} />
-</main>
+  <main id="content" on:scroll={handleOnScroll}>
+    <slot name="main" />
+    <ScrollToTop hidden={scrollToTopHidden} {onScrollToTopClick} />
+  </main>
+</div>

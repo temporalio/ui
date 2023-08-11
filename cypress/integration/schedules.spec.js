@@ -79,7 +79,7 @@ describe('Schedules Edit', () => {
     );
 
     cy.get('#schedule-actions-menu-button').click();
-    cy.get('#schedule-actions-menu >> [data-testid="edit-schedule"]').click();
+    cy.get('#schedule-actions-menu > [data-testid="edit-schedule"]').click();
     cy.url().should('contain', `/schedules/${scheduleId}/edit`);
     cy.get('#content').contains('Edit Schedule');
   });

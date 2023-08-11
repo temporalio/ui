@@ -9,16 +9,26 @@
   import FeatureGuard from '$lib/components/feature-guard.svelte';
   import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { labsMode } from '$lib/stores/labs-mode';
 
   export let isCloud = false;
   export let activeNamespace: Namespace;
   export let linkList: Partial<Record<string, string>>;
+
+  $: labsHoverText = `${translate('labs')} ${
+    $labsMode
+      ? `${translate('on')} - ${translate('experimental')}`
+      : translate('off')
+  }`;
+  $: labsText = `${translate('labs')} ${
+    $labsMode ? translate('on') : translate('off')
+  }`;
 </script>
 
-<NavContainer {isCloud} {linkList}>
+<NavContainer {isCloud} {linkList} aria-label={translate('primary')}>
   <svelte:fragment slot="top">
     <NavRow link={linkList.workflows} {isCloud} data-testid="workflows-button">
-      <NavTooltip right text={translate('workflows')}>
+      <NavTooltip text={translate('workflows')}>
         <div class="nav-icon">
           <Icon name="workflow" />
         </div>
@@ -34,7 +44,7 @@
           {isCloud}
           data-testid="schedules-button"
         >
-          <NavTooltip right text={translate('schedules')}>
+          <NavTooltip text={translate('schedules')}>
             <div class="nav-icon">
               <Icon name="schedules" />
             </div>
@@ -46,7 +56,7 @@
     <slot name="top" />
     <IsCloudGuard {isCloud}>
       <NavRow link={linkList.archive} {isCloud} data-testid="archive-button">
-        <NavTooltip right text={translate('archive')}>
+        <NavTooltip text={translate('archive')}>
           <div class="nav-icon">
             <Icon name="archives" />
           </div>
@@ -62,7 +72,7 @@
         {isCloud}
         data-testid="namespaces-button"
       >
-        <NavTooltip right text={translate('namespaces')}>
+        <NavTooltip text={translate('namespaces')}>
           <div class="nav-icon">
             <Icon name="namespace" />
           </div>
@@ -77,7 +87,7 @@
     <slot name="import">
       <IsCloudGuard {isCloud}>
         <NavRow link={linkList.import} {isCloud} data-testid="import-button">
-          <NavTooltip right text={translate('import')}>
+          <NavTooltip text={translate('import')}>
             <div class="nav-icon">
               <Icon name="import" />
             </div>
@@ -88,7 +98,7 @@
     </slot>
     <slot name="feedback">
       <NavRow link={linkList.feedback} {isCloud} externalLink>
-        <NavTooltip right text={translate('feedback')}>
+        <NavTooltip text={translate('feedback')}>
           <div class="nav-icon">
             <Icon name="feedback" />
           </div>
@@ -96,6 +106,21 @@
         <div class="nav-title">{translate('feedback')}</div>
       </NavRow>
     </slot>
+    <NavRow {isCloud} handleClick={() => ($labsMode = !$labsMode)}>
+      <NavTooltip right text={labsHoverText}>
+        <div class="nav-icon">
+          <Icon name="labs" active={$labsMode} />
+        </div>
+      </NavTooltip>
+      <div class="nav-title flex flex-col leading-3">
+        <div>{labsText}</div>
+        {#if $labsMode}
+          <p class="text-[12px]">
+            {translate('experimental')}
+          </p>
+        {/if}
+      </div>
+    </NavRow>
   </svelte:fragment>
 </NavContainer>
 

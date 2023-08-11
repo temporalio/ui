@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
   import { logEvent } from 'histoire/client';
-  
+
   import Button from './button.svelte';
   import Input from './input/input.svelte';
   import Modal from './modal.svelte';
@@ -53,6 +53,7 @@
       id="basic-modal"
       confirmType="destructive"
       confirmText="Delete"
+      cancelText="Cancel"
       on:confirmModal={handleConfirm}
       on:cancelModal={handleCancel}
     >
@@ -69,6 +70,7 @@
       bind:this={modal}
       confirmType="destructive"
       confirmText="Delete"
+      cancelText="Cancel"
       {loading}
       on:cancelModal={handleCancel}
       on:confirmModal={makeFakeApiRequest}

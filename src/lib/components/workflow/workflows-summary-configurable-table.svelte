@@ -1,10 +1,9 @@
 <script lang="ts">
   import { workflowTableColumns } from '$lib/stores/workflow-table-columns';
-  import { workflows, updating, workflowError } from '$lib/stores/workflows';
+  import { workflows, updating, loading } from '$lib/stores/workflows';
   import Drawer from '$lib/holocene/drawer.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
   import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
   import TableRow from './workflows-summary-configurable-table/table-row.svelte';
   import TableHeaderRow from './workflows-summary-configurable-table/table-header-row.svelte';
@@ -58,7 +57,7 @@
       {/each}
     </TableRow>
   {:else}
-    <TableRow empty>
+    <!-- <TableRow empty>
       <td colspan={columns.length}>
         <EmptyState
           title={translate('workflows', 'empty-state-title')}
@@ -66,7 +65,7 @@
           error={$workflowError}
         />
       </td>
-    </TableRow>
+    </TableRow> -->
   {/each}
 </PaginatedTable>
 
@@ -77,6 +76,7 @@
   id="workflows-summary-table-configuration-drawer"
   dark={false}
   title={translate('workflows', 'configure-workflows')}
+  closeButtonLabel={translate('workflows', 'close-configure-workflows')}
 >
   <svelte:fragment slot="subtitle">
     Add (<Icon class="inline" name="add" />), re-arrange (<Icon

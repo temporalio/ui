@@ -16,6 +16,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
+  import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
 
   type Item = $$Generic;
 
@@ -111,44 +112,48 @@
       <slot visibleItems={$store.items} />
     </tbody>
   </table>
-  <div class="paginated-table-controls">
-    <div class="paginated-table-controls-start">
-      <FilterSelect
-        label={perPageLabel}
-        parameter={perPageKey}
-        value={perPageParam}
-        {options}
-      />
+  {#if $store.items.length}
+    <div class="paginated-table-controls">
+      <div class="paginated-table-controls-start">
+        <FilterSelect
+          label={perPageLabel}
+          parameter={perPageKey}
+          value={perPageParam}
+          {options}
+        />
+      </div>
+      <div class="paginated-table-controls-center">
+        {#each $store.pageShortcuts as page}
+          {#if isNaN(page)}
+            <span>...</span>
+          {:else}
+            <button
+              aria-label={pageButtonLabel(page)}
+              class="page-btn"
+              class:active={page === $store.currentPage}
+              on:click={() => handlePageChange(page)}>{page}</button
+            >
+          {/if}
+        {/each}
+      </div>
+      <div class="paginated-table-controls-end">
+        <button
+          aria-label={previousPageButtonLabel}
+          disabled={!$store.hasPrevious}
+          on:click={() => handlePageChange($store.currentPage - 1)}
+          class="nav-btn"><Icon name="arrow-left" /></button
+        >
+        <button
+          aria-label={nextPageButtonLabel}
+          disabled={!$store.hasNext}
+          on:click={() => handlePageChange($store.currentPage + 1)}
+          class="nav-btn"><Icon name="arrow-right" /></button
+        >
+      </div>
     </div>
-    <div class="paginated-table-controls-center">
-      {#each $store.pageShortcuts as page}
-        {#if isNaN(page)}
-          <span>...</span>
-        {:else}
-          <button
-            aria-label={pageButtonLabel(page)}
-            class="page-btn"
-            class:active={page === $store.currentPage}
-            on:click={() => handlePageChange(page)}>{page}</button
-          >
-        {/if}
-      {/each}
-    </div>
-    <div class="paginated-table-controls-end">
-      <button
-        aria-label={previousPageButtonLabel}
-        disabled={!$store.hasPrevious}
-        on:click={() => handlePageChange($store.currentPage - 1)}
-        class="nav-btn"><Icon name="arrow-left" /></button
-      >
-      <button
-        aria-label={nextPageButtonLabel}
-        disabled={!$store.hasNext}
-        on:click={() => handlePageChange($store.currentPage + 1)}
-        class="nav-btn"><Icon name="arrow-right" /></button
-      >
-    </div>
-  </div>
+  {:else}
+    <TableEmptyState {updating} />
+  {/if}
 </div>
 
 <style lang="postcss">

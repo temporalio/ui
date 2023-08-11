@@ -18,5 +18,6 @@
     selected={currentDate}
     todayLabel="Today"
     closeLabel="Close"
+    clearLabel="Clear input"
   />
 </Hst.Story>

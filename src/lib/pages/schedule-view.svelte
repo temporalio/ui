@@ -141,7 +141,10 @@
       </div>
       <SplitButton
         position="right"
-        label={schedule?.schedule?.state?.paused ? 'Unpause' : 'Pause'}
+        label={schedule?.schedule?.state?.paused
+          ? translate('schedules', 'unpause')
+          : translate('schedules', 'pause')}
+        menuLabel={translate('schedules', 'schedule-actions')}
         id="schedule-actions"
         disabled={editDisabled}
         on:click={() => pauseConfirmationModal.open()}
@@ -204,6 +207,7 @@
       confirmText={schedule.schedule.state.paused
         ? translate('schedules', 'unpause')
         : translate('schedules', 'pause')}
+      cancelText={translate('cancel')}
       confirmDisabled={!reason}
       on:confirmModal={() => handlePause(schedule)}
     >
@@ -240,6 +244,7 @@
       bind:this={deleteConfirmationModal}
       confirmType="destructive"
       confirmText={translate('delete')}
+      cancelText={translate('cancel')}
       on:confirmModal={handleDelete}
     >
       <h3 slot="title">{translate('schedules', 'delete-modal-title')}</h3>

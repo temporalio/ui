@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { navOpen } from '$lib/stores/nav-open';
 
   export let isCloud = false;
@@ -10,13 +11,14 @@
   function toggleNav() {
     $navOpen = !$navOpen;
   }
+
+  $: version = $page.data?.settings?.version ?? '';
 </script>
 
 <nav
   class="nav-header transition-width"
   class:cloud={isCloud}
   data-testid="navigation-header"
-  aria-label="primary"
   {...$$restProps}
 >
   <div class="h-32 min-h-[84px] relative">
@@ -65,11 +67,14 @@
     </div>
   </div>
   <div
-    class="text-[10px] w-full pb-12 pt-24 text-center {isCloud
+    class="text-[10px] h-4 w-full pb-12 pt-24 text-center {isCloud
       ? 'text-gray-500'
       : 'text-gray-300'}"
   >
-    {$page.data?.settings?.version ?? ''}
+    {#if version}
+      <span class="sr-only">{translate('version')}</span>
+    {/if}
+    {version}
   </div>
   <slot name="drawer" />
 </nav>

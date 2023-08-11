@@ -273,17 +273,15 @@
         {/if}
       </div>
     {/if}
-    <div>
-      <label
-        for="view-search-input"
-        class="flex whitespace-nowrap items-center gap-4 font-secondary text-sm"
-        >{translate('workflows', 'view-search-input')}
-        <ToggleSwitch
-          id="view-search-input"
-          bind:checked={viewAdvancedSearchInput}
-        />
-      </label>
-    </div>
+    <ToggleSwitch
+      label={translate('workflows', 'view-search-input')}
+      labelPosition="left"
+      id="view-search-input"
+      bind:checked={viewAdvancedSearchInput}
+      on:change={() => {
+        resetFilter();
+      }}
+    />
   </div>
   <FilterList />
 </div>

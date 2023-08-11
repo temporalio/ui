@@ -5,7 +5,7 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
 
-  import Copyable from '../copyable.svelte';
+  import Copyable from '$lib/holocene/copyable.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
 
@@ -14,6 +14,9 @@
 </script>
 
 <Table class="w-full">
+  <caption class="sr-only" slot="caption"
+    >{translate('schedules', 'schedule')}</caption
+  >
   <TableHeaderRow slot="headers">
     <th>{translate('schedules', 'schedule')}</th>
   </TableHeaderRow>
@@ -26,7 +29,12 @@
           scheduleId,
         })}
       >
-        <Copyable content={scheduleId} visible />
+        <Copyable
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+          content={scheduleId}
+          visible
+        />
       </Link>
     </td>
   </TableRow>

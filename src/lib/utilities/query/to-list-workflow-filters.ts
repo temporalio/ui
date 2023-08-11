@@ -36,7 +36,7 @@ export const getLargestDurationUnit = (duration: Duration): Duration => {
 
 const isDatetimeStatement = is('Datetime');
 
-export const emptyFilter = () => ({
+export const emptyFilter = (): WorkflowFilter => ({
   attribute: '',
   value: '',
   operator: '',
@@ -71,7 +71,19 @@ export const toListWorkflowFilters = (
         filter.attribute = token;
         if (isDatetimeStatement(attributes[token])) {
           const start = getTwoAhead(tokens, index);
-          if (isValidDate(start)) {
+          const hasValidStartTime = isValidDate(start);
+
+          if (isBetween(tokens[index + 1])) {
+            const end = tokens[index + 4];
+            const hasValidEndTime = isValidDate(end);
+
+            if (hasValidStartTime && hasValidEndTime) {
+              filter.value = `BETWEEN "${start}" AND "${end}"`;
+              filter.customDate = true;
+            } else {
+              console.error('Error parsing Datetime field from query');
+            }
+          } else if (hasValidStartTime) {
             filter.value = start;
           } else {
             console.error('Error parsing Datetime field from query');

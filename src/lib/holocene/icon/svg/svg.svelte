@@ -11,6 +11,7 @@
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
   class={$$props.class}
+  role="img"
 >
   <title>{title}</title>
   <slot />

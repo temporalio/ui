@@ -53,7 +53,7 @@
           on:click={() => {
             index -= 1;
           }}
-          aria-label="previous"
+          aria-label={translate('previous')}
         >
           <span
             class="arrow arrow-left"
@@ -66,7 +66,7 @@
           on:click={() => {
             index += 1;
           }}
-          aria-label="next"
+          aria-label={translate('next')}
         >
           <span
             class="arrow arrow-right"

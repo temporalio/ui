@@ -2,6 +2,7 @@
   import { isVersionNewer } from '$lib/utilities/version-check';
   import type { BannersState } from '$lib/models/banner-state';
   import Banner from './banner.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   import type { UiVersionInfo } from '$lib/types/global';
 
@@ -10,7 +11,9 @@
 
   const severity = 'low';
   const key = `ui-v${uiVersionInfo?.current}`;
-  const message = `📥 Temporal UI v${uiVersionInfo?.recommended} is available`;
+  const message = `📥 ${translate('banner-ui-version', {
+    version: uiVersionInfo?.recommended,
+  })}`;
   const show = isVersionNewer(
     uiVersionInfo?.recommended,
     uiVersionInfo?.current,
@@ -25,6 +28,7 @@
     {message}
     {link}
     bind:shownBanner
-    testId="ui-version-banner"
+    data-testid="ui-version-banner"
+    role="alertdialog"
   />
 {/if}

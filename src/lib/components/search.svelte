@@ -1,10 +1,11 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let placeholder = '';
   export let value = '';
-  export let label = 'Search';
+  export let label = translate('search');
   export let name = 'query';
   export let icon = false;
   export let id = `${label.toLocaleUpperCase()}-input`;

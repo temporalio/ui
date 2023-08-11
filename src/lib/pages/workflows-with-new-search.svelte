@@ -263,7 +263,7 @@
   </div>
   <div>
     <button
-      aria-label="retry workflows"
+      aria-label={translate('workflows', 'retry-workflows')}
       class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
       on:click={refreshWorkflows}
     >

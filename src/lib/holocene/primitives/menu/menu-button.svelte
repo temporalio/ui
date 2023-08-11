@@ -9,6 +9,7 @@
   export let hasIndicator = false;
   export let id: string = null;
   export let icon: IconName = null;
+  export let label: string = null;
 
   const { toggleMenu, open } = getContext<MenuContext>(MENU_CONTEXT);
 
@@ -32,6 +33,7 @@
   class:has-indicator={hasIndicator}
   class:has-icon={!!icon}
   {disabled}
+  aria-label={label}
   data-testid={$$props.testId}
 >
   {#if icon}<Icon name={icon} />{/if}<slot />{#if hasIndicator}

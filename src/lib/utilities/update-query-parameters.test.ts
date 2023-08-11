@@ -2,113 +2,165 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { gotoOptions, updateQueryParameters } from './update-query-parameters';
 
-const url = new URL('https://temporal.io');
-
 describe('updateQueryParameters', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should call the set method on the query when a value is provided', () => {
+  it('should call `goto` with the correct path when no value is provided', () => {
+    const url = new URL('https://temporal.io');
     const parameter = 'parameter';
-    const value = 'value';
-    const goto = () => Promise.resolve();
-
-    const spy = vi.spyOn(url.searchParams, 'set');
-
-    updateQueryParameters({ parameter, value, url, goto });
-
-    expect(spy).toHaveBeenCalled();
-    expect(spy).toHaveBeenCalledWith(parameter, value);
-  });
-
-  it('should call the delete method on the query when no value is provided', () => {
-    const parameter = 'parameter';
-    const goto = () => Promise.resolve();
-
-    const spy = vi.spyOn(url.searchParams, 'delete');
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, url, goto });
 
-    expect(spy).toHaveBeenCalled();
-    expect(spy).toHaveBeenCalledWith(parameter);
+    const [href, options] = goto.mock.calls[0];
+
+    expect(href).toBe('/');
+    expect(options).toEqual(gotoOptions);
   });
 
-  it('should call the delete method on the query when an empty string is provided', () => {
+  it('should call `goto` with the correct path when an empty string is provided', () => {
+    const url = new URL('https://temporal.io');
     const parameter = 'parameter';
     const value = '';
-    const goto = () => Promise.resolve();
-
-    const spy = vi.spyOn(url.searchParams, 'delete');
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
-    expect(spy).toHaveBeenCalled();
-    expect(spy).toHaveBeenCalledWith(parameter);
+    const [href, options] = goto.mock.calls[0];
+
+    expect(href).toBe('/');
+    expect(options).toEqual(gotoOptions);
   });
 
-  it('should call the delete method on the query when null is provided', () => {
+  it('should call `goto` with the correct path when an emmpty string is provided and there are other params', () => {
+    const url = new URL('https://temporal.io/?other=value');
     const parameter = 'parameter';
-    const value = null as unknown as string;
-    const goto = () => Promise.resolve();
+    const value = '';
 
-    const spy = vi.spyOn(url.searchParams, 'delete');
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
-    expect(spy).toHaveBeenCalled();
-    expect(spy).toHaveBeenCalledWith(parameter);
+    const [href, options] = goto.mock.calls[0];
+
+    expect(href).toBe('/?other=value');
+    expect(options).toEqual(gotoOptions);
+  });
+
+  it('should call `goto` with the correct path when null is provided', () => {
+    const url = new URL('https://temporal.io');
+    const parameter = 'parameter';
+    const value = null as unknown as string;
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
+
+    updateQueryParameters({ parameter, value, url, goto });
+
+    const [href, options] = goto.mock.calls[0];
+
+    expect(href).toBe('/');
+    expect(options).toEqual(gotoOptions);
+  });
+
+  it('should call `goto` with the correct path when null is provided and there are other params', () => {
+    const url = new URL('https://temporal.io/?other=value');
+    const parameter = 'parameter';
+    const value = null as unknown as string;
+
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
+
+    updateQueryParameters({ parameter, value, url, goto });
+
+    const [href, options] = goto.mock.calls[0];
+
+    expect(href).toBe('/?other=value');
+    expect(options).toEqual(gotoOptions);
   });
 
   it('should call `goto` with the correct path', () => {
+    const url = new URL('https://temporal.io');
     const parameter = 'parameter';
     const value = 'value';
     const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
-    const [{ href }, options] = goto.mock.calls[0];
+    const [href, options] = goto.mock.calls[0];
 
-    expect(href).toBe('https://temporal.io/?parameter=value');
+    expect(href).toBe('/?parameter=value');
+    expect(options).toEqual(gotoOptions);
+  });
+
+  it('should call `goto` with the correct path when there are other params', () => {
+    const url = new URL('https://temporal.io/?other=value');
+    const parameter = 'parameter';
+    const value = 'value';
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
+
+    updateQueryParameters({ parameter, value, url, goto });
+
+    const [href, options] = goto.mock.calls[0];
+
+    expect(href).toBe('/?other=value&parameter=value');
     expect(options).toEqual(gotoOptions);
   });
 
   it('should call `goto` with the correct path when query parameters already exist', () => {
     const parameter = 'parameter';
-    const value = 'newvalue';
+    const value = 'value';
+    const url = new URL(`https://temporal.io/?${parameter}=oldvalue`);
     const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
-    const [{ href }, options] = goto.mock.calls[0];
+    const [href, options] = goto.mock.calls[0];
 
-    expect(href).toBe('https://temporal.io/?parameter=newvalue');
+    expect(href).toBe('/?parameter=value');
+    expect(options).toEqual(gotoOptions);
+  });
+
+  it('should call `goto` with the correct path for the updated param when there are other params', () => {
+    const parameter = 'parameter';
+    const value = 'value';
+    const url = new URL(
+      `https://temporal.io/?${parameter}=oldvalue&other=value`,
+    );
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
+
+    updateQueryParameters({ parameter, value, url, goto });
+
+    const [href, options] = goto.mock.calls[0];
+
+    expect(href).toBe('/?other=value&parameter=value');
     expect(options).toEqual(gotoOptions);
   });
 
   it('should call `goto` with without the "?" if the query params are empty', () => {
+    const url = new URL('https://temporal.io');
     const parameter = 'parameter';
     const value = null as unknown as string;
     const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
-    const [{ href }, options] = goto.mock.calls[0];
+    const [href, options] = goto.mock.calls[0];
 
-    expect(href).toBe('https://temporal.io/');
+    expect(href).toBe('/');
     expect(options).toEqual(gotoOptions);
   });
 
   it('should set the parameter to an empty string if allowEmpty is set', () => {
+    const url = new URL('https://temporal.io');
     const parameter = 'parameter';
     const value = '';
     const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto, allowEmpty: true });
 
-    const [{ href }, options] = goto.mock.calls[0];
+    const [href, options] = goto.mock.calls[0];
 
-    expect(href).toBe('https://temporal.io/?parameter=');
+    expect(href).toBe('/?parameter=');
     expect(options).toEqual(gotoOptions);
   });
 });

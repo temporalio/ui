@@ -24,6 +24,7 @@
   import SideNavigation from '$lib/components/side-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let data: PageData;
 
@@ -90,7 +91,11 @@
 </script>
 
 <div class="flex w-screen flex-row">
-  <Toaster pop={toaster.pop} toasts={toaster.toasts} />
+  <Toaster
+    closeButtonLabel={translate('close')}
+    pop={toaster.pop}
+    toasts={toaster.toasts}
+  />
   <div class="sticky top-0 z-20 h-screen w-auto">
     <SideNavigation {activeNamespace} {linkList} {isCloud} />
   </div>
@@ -98,10 +103,15 @@
     <DataEncoderSettings />
     <TopNavigation {logout} {namespaceList} />
     <Banners {uiVersionInfo} />
-    <div class="flex w-full flex-col gap-4 p-8 h-[calc(100%-2.5rem)]">
+    <div
+      slot="main"
+      class="z-10 -mt-4 flex w-full flex-col gap-4 px-10 pb-10 pt-8"
+    >
       <ErrorBoundary onError={() => {}}>
         <slot />
       </ErrorBoundary>
     </div>
   </MainContentContainer>
 </div>
+
+<!-- class="flex w-full flex-col gap-4 p-8 h-[calc(100%-2.5rem)]" -->

@@ -5,6 +5,7 @@
 
   export let intent: 'warning' | 'default' = 'default';
   export let button = false;
+  export let removeButtonLabel: string;
 
   const dispatch = createEventDispatcher();
 
@@ -23,6 +24,7 @@
     <slot />
   {/if}
   <IconButton
+    label={removeButtonLabel}
     class="h-4 w-4 text-gray-700"
     icon="close"
     on:click={handleRemove}

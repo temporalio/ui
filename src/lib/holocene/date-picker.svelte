@@ -16,6 +16,7 @@
   export let labelHidden = false;
   export let todayLabel: string;
   export let closeLabel: string;
+  export let clearLabel: string;
 
   let month: number | undefined;
   let year: number | undefined;
@@ -86,6 +87,7 @@
     placeholder="MM/DD/YY"
     value={selected.toDateString()}
     clearable
+    clearButtonLabel={clearLabel}
   />
   {#if showDatePicker}
     <div
