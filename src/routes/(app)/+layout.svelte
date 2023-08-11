@@ -113,5 +113,3 @@
     </div>
   </MainContentContainer>
 </div>
-
-<!-- class="flex w-full flex-col gap-4 p-8 h-[calc(100%-2.5rem)]" -->

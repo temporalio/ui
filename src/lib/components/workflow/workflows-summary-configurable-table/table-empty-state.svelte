@@ -21,6 +21,10 @@
   ];
 </script>
 
+<svelte:head>
+  <link rel="preload" as="image" href={emptyImage} />
+  <link rel="preload" as="image" href={noResultsImages} />
+</svelte:head>
 <div
   class="flex flex-col xl:flex-row w-full h-auto rounded-bl-xl rounded-br-xl border-2 border-t-0 border-gray-900 overflow-hidden"
   aria-live="polite"
