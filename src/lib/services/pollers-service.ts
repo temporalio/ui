@@ -28,7 +28,7 @@ export type TaskQueueCompatibility = {
   majorVersionSets: TaskQueueCompatibleVersionSet[];
 };
 
-export type GetWorkerTaskReachabilityResponse = {
+export type WorkerReachability = {
   buildIdReachability: BuildIdReachability[];
 };
 
@@ -132,7 +132,7 @@ export async function getTaskQueueCompatibility(
 export async function getWorkerTaskReachability(
   parameters: GetWorkerTaskReachabilityRequest,
   request = fetch,
-): Promise<GetWorkerTaskReachabilityResponse> {
+): Promise<WorkerReachability> {
   const { namespace, buildIds, taskQueue } = parameters;
   const route = routeForApi('worker-task-reachability', { namespace });
   const params = new URLSearchParams();
@@ -168,7 +168,7 @@ function getLabelForReachability(reachability: unknown[]): string {
 }
 
 export function getBuildIdReachability(
-  workerTaskReachability: GetWorkerTaskReachabilityResponse,
+  workerTaskReachability: WorkerReachability,
   taskQueue: string,
   buildId: string,
 ): string {

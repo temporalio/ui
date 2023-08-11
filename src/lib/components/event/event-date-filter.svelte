@@ -62,7 +62,11 @@
   });
 </script>
 
-<DropdownMenu {value} testId="event-date-filter">
+<DropdownMenu
+  label={translate('event-date-filter-label')}
+  {value}
+  testId="event-date-filter"
+>
   <svelte:fragment slot="label">
     <span class="hidden md:block">{translate('date-and-time')}</span>
     <span class="block md:hidden"><Icon name="clock" /></span>

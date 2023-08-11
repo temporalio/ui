@@ -1,6 +1,9 @@
 <script lang="ts">
   import { closedBanners, close } from '$lib/stores/banner';
+  import { translate } from '$lib/i18n/translate';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import type { BannersState } from '$lib/models/banner-state';
+
   export let key: string;
   export let severity: 'high' | 'medium' | 'low';
   export let message: string;
@@ -19,18 +22,19 @@
 {#if show}
   <section
     class={`relative block text-center leading-10 ${severity}`}
-    data-testid={$$props.testId}
+    {...$$restProps}
   >
     <a href={link} target="_blank" rel="noreferrer">
       {message}
     </a>
-    <button
+
+    <IconButton
       on:click={() => close(key)}
-      class="text-black-600 absolute top-0 right-0 mr-5"
       data-testid="close-banner"
-    >
-      ✕
-    </button>
+      class="text-black-600 absolute top-0 right-0 h-10 w-10 mr-5"
+      icon="close"
+      label={translate('close')}
+    />
   </section>
 {/if}
 

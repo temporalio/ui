@@ -74,7 +74,7 @@
 </script>
 
 {#if $viewDataEncoderSettings}
-  <div
+  <aside
     use:clickOutside
     on:click-outside={() => ($viewDataEncoderSettings = false)}
     in:fly={{ y: -50, delay: 0, duration: 500 }}
@@ -168,5 +168,5 @@
         >
       </div>
     </div>
-  </div>
+  </aside>
 {/if}

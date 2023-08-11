@@ -35,6 +35,8 @@ export const Strings = {
   'batch-terminate-success': 'Successfully $t(terminated) {{count}} workflows.',
   'batch-cancel-success': 'Successfully $t(canceled) {{count}} workflows.',
   'configure-workflows': 'Configure Workflow List',
+  'open-configure-workflows': 'Open workflow list configuration',
+  'close-configure-workflows': 'Close workflow list configuration',
   'configure-workflows-description':
     'Add (<1></1>), re-arrange (<2></2>), and remove (<3></3>), Workflow Headings to personalize the Workflow List Table.',
   'all-statuses': 'All Statuses',
@@ -61,10 +63,12 @@ export const Strings = {
   'continued-as-new-with-input': 'Continued as New with Input',
   results: 'Results',
   'recent-events': 'Recent Events',
+  'recent-events-view': 'Recent Events View',
   history: 'History',
   compact: 'Compact',
   json: 'JSON',
   download: 'Download',
+  'workflow-actions': 'Workflow Actions',
   'reset-disabled':
     'Resetting workflows is not enabled, please contact your administrator for assistance.',
   'reset-disabled-pending-children':
@@ -107,7 +111,10 @@ export const Strings = {
   'queries-tab': 'Queries',
   'workflow-error-no-workers-title': 'No Workers Running',
   'workflow-error-no-workers-description':
-    'Please make sure you have at least one worker connected to the {{taskQueue}} Task Queue.',
+    'There are no Workers polling the {{taskQueue}} Task Queue.',
+  'workflow-error-no-compatible-workers-title': 'No Compatible Workers Running',
+  'workflow-error-no-compatible-workers-description':
+    'There are no compatible Workers polling the {{taskQueue}} Task Queue.',
   'state-transitions': 'State Transitions',
   'start-and-close-time': 'Start & Close Time',
   relationships: 'Relationships',
@@ -123,6 +130,7 @@ export const Strings = {
   'no-relationships': "This workflow doesn't have any relationships",
   'parent-id': 'Parent Workflow ID',
   'parent-run-id': 'Parent Run ID',
+  'parent-workflow': 'Parent Workflow',
   'first-execution': 'First Execution',
   'previous-execution': 'Previous Execution',
   'next-execution': 'Next Execution',
@@ -170,13 +178,30 @@ export const Strings = {
   'view-search-input': 'View Search Input',
   'select-time': 'Select Time',
   'search-placeholder': 'Enter a query',
+  'child-workflows': 'Child Workflows',
+  'retry-workflows': 'Retry Workflows',
+  'workflow-name': 'Workflow Name',
+  'filter-by': 'filter by {{workflowName}} type',
   'select-all-workflows': 'Select all Workflows',
   'select-workflow': 'Select Workflow {{workflow}}',
+  'remove-filter-label': 'Remove {{attribute}} filter',
+  'remove-keyword-label': 'Remove {{keyword}} keyword',
+  'move-column-up-label': 'Move {{column}} column up',
+  'move-column-down-label': 'Move {{column}} column down',
+  'add-column-label': 'Add {{column}} column',
+  'remove-column-label': 'Remove {{column}} column',
+  'pin-column-label': 'Pin {{column}} column',
+  'unpin-column-label': 'Unpin {{column}} column',
   'archived-workflows': 'Archived Workflows',
   archival: 'Archival',
-  'empty-state-title': 'No Workflows Found',
-  'empty-state-description':
-    'If you have filters applied, try adjusting them. Otherwise please check your syntax and try again.',
+  'workflow-query-empty-state-title': 'No Results',
+  'workflow-query-empty-state-preface':
+    'There are no results for the applied filters.',
+  'workflow-query-empty-state-postface':
+    'Try adjusting or clearing the filters to see the Workflows running on this Namespace.',
+  'workflow-query-error-state': 'There is an error with filtering Workflows.',
+  'workflow-empty-state-title': 'No Workflows running in this Namespace',
+  'workflow-empty-state-description': `You can populate the WebUI with sample Workflows. You can find a complete list of executable code samples in`,
   'visibility-disabled-archival':
     'This namespace is currently enabled for archival but visibility is not enabled.',
   'archival-link-preface': 'To enable ',
@@ -185,6 +210,8 @@ export const Strings = {
     'This namespace is currently not enabled for archival.',
   'archival-disabled-details':
     'Run this command to enable archival visibility for event histories',
+  'archival-empty-state-description':
+    'No results found for archival visibility.',
   'basic-search': 'Basic Search',
   'advanced-search': 'Advanced Search',
   'time-range': 'Time Range',

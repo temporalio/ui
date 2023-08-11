@@ -36,6 +36,7 @@
     {message}
     {link}
     bind:shownBanner
-    testId="temporal-version-banner"
+    data-testid="temporal-version-banner"
+    role="alertdialog"
   />
 {/if}

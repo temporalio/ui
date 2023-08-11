@@ -5,6 +5,7 @@
 </script>
 
 <Table class="table-fixed">
+  <caption class="sr-only" slot="caption">{translate('schedules')}</caption>
   <TableHeaderRow slot="headers">
     <th class="w-28">{translate('status')}</th>
     <th class="md:w-80 xl:w-auto">{translate('schedules', 'name')}</th>

@@ -182,22 +182,10 @@
   }
 </script>
 
-{#if viewAdvancedSearchInput}
-  <div class="flex flex-col sm:flex-row gap-4">
+<div class="flex flex-col sm:flex-row gap-4">
+  {#if viewAdvancedSearchInput}
     <WorkflowAdvancedSearch />
-    <label
-      for="view-search-input"
-      class="flex items-center gap-4 font-secondary text-sm"
-      >{translate('workflows', 'view-search-input')}
-      <ToggleSwitch
-        id="view-search-input"
-        checked={viewAdvancedSearchInput}
-        on:change={() => (viewAdvancedSearchInput = !viewAdvancedSearchInput)}
-      />
-    </label>
-  </div>
-{:else}
-  <div class="flex w-full gap-4">
+  {:else}
     <div class="flex" class:filter={!showClearAllButton} on:keyup={handleKeyUp}>
       {#if isStatusFilter($filter.attribute)}
         <StatusFilter />
@@ -278,24 +266,19 @@
           >{translate('clear-all')}</Button
         >
       {/if}
-      <label
-        for="view-search-input"
-        class="flex items-center gap-4 font-secondary text-sm"
-        >{translate('workflows', 'view-search-input')}
-        <ToggleSwitch
-          id="view-search-input"
-          checked={viewAdvancedSearchInput}
-          on:change={() => {
-            viewAdvancedSearchInput = !viewAdvancedSearchInput;
-            resetFilter();
-          }}
-        />
-      </label>
     </div>
-  </div>
-
-  <FilterList />
-{/if}
+  {/if}
+  <ToggleSwitch
+    label={translate('workflows', 'view-search-input')}
+    labelPosition="left"
+    id="view-search-input"
+    bind:checked={viewAdvancedSearchInput}
+    on:change={() => {
+      resetFilter();
+    }}
+  />
+</div>
+<FilterList />
 
 <style lang="postcss">
   .filter {

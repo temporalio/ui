@@ -129,7 +129,6 @@ test.describe('Data Encoder without Configuration Settings', () => {
     await page
       .locator('label')
       .filter({ hasText: 'Pass the user access token with your endpoint.' })
-      .locator('span')
       .click();
 
     expect(

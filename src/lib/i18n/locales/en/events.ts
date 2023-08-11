@@ -28,6 +28,8 @@ export const Strings = {
   'attribute-group-summary': 'Summary',
   'attribute-group-task-queue': 'Task Queue',
   'attribute-group-workflow': 'Workflow',
+  'event-group': 'Events related to {{eventName}}',
+  'error-event': 'Error Event',
   'import-event-history': 'Import Event History',
   'event-history-view': 'Event History View',
   'api-history-link': 'View in Github',

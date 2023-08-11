@@ -15,7 +15,7 @@
   export let disabled = false;
   export let href = '';
   export let testId: string = null;
-  export let tooltipProps: ComponentProps<Tooltip> = {};
+  export let tooltipProps: { text?: string; width?: number } = {};
 
   const { keepOpen, closeMenu } = getContext<MenuContext>(MENU_CONTEXT);
 
@@ -36,50 +36,44 @@
   $: ({ text, ...restTooltipProps } = tooltipProps);
 </script>
 
-<div class="menu-item-wrapper" class:disabled>
-  <Tooltip class="w-full" hide={!text} {text} {...restTooltipProps}>
-    {#if href}
-      <a
-        {href}
-        role="menuitem"
-        class:dark
-        class:destructive
-        class:selected
-        class:active
-        class:disabled
-        data-testid={testId}
-        class="menu-item inline-block {$$props.class}"
-      >
-        <slot />
-      </a>
-    {:else}
-      <li
-        on:click|preventDefault|stopPropagation={handleClick}
-        on:keyup={handleKeyUp}
-        role="menuitem"
-        tabindex="0"
-        class:dark
-        class:destructive
-        class:selected
-        class:active
-        class:disabled
-        data-testid={testId}
-        class="menu-item {$$props.class}"
-      >
-        {#if selected}
-          <Icon width={18} height={18} name="checkmark" />
-        {/if}
-        <slot />
-      </li>
-    {/if}
-  </Tooltip>
-</div>
+<Tooltip left class="w-full" hide={!text} {text} {...restTooltipProps}>
+  {#if href}
+    <a
+      {href}
+      role="menuitem"
+      class:dark
+      class:destructive
+      class:selected
+      class:active
+      class:disabled
+      data-testid={testId}
+      class="menu-item inline-block {$$props.class}"
+    >
+      <slot />
+    </a>
+  {:else}
+    <li
+      on:click|preventDefault|stopPropagation={handleClick}
+      on:keyup={handleKeyUp}
+      role="menuitem"
+      tabindex="0"
+      class:dark
+      class:destructive
+      class:selected
+      class:active
+      class:disabled
+      data-testid={testId}
+      class="menu-item {$$props.class}"
+    >
+      {#if selected}
+        <Icon width={18} height={18} name="checkmark" />
+      {/if}
+      <slot />
+    </li>
+  {/if}
+</Tooltip>
 
 <style lang="postcss">
-  .menu-item-wrapper.disabled {
-    @apply cursor-not-allowed;
-  }
-
   .menu-item {
     @apply w-full flex flex-col cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary hover:bg-gray-50 first-of-type:rounded-t last-of-type:rounded-b focus:outline-none focus-visible:outline focus-visible:bg-blue-50 focus-visible:outline-blue-700 focus-visible:-outline-offset-2;
   }
@@ -103,6 +97,6 @@
   }
 
   .menu-item.disabled {
-    @apply pointer-events-none text-gray-500;
+    @apply cursor-not-allowed pointer-events-none text-gray-500;
   }
 </style>

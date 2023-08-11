@@ -27,6 +27,8 @@
     id="list-filter-search"
     bind:chips={list}
     class="w-full rounded-none"
+    removeChipButtonLabel={(chip) =>
+      translate('workflows', 'remove-keyword-label', { keyword: chip })}
     placeholder="{translate('type-or-paste-in')} {$filter.attribute}"
   />
   <Button

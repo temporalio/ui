@@ -5,10 +5,11 @@
 
   export let id: string;
   export let position: 'right' | 'left' = 'left';
+  export let label: string = null;
 </script>
 
 <MenuContainer let:open>
-  <MenuButton controls={id} class={$$restProps.buttonClass}>
+  <MenuButton {label} controls={id} class={$$restProps.buttonClass}>
     <slot name="trigger" />
   </MenuButton>
   <Menu {position} class="min-w-fit {$$restProps.menuClass}" {id}>

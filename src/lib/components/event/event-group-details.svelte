@@ -6,6 +6,7 @@
   } from '$lib/models/event-groups/get-event-in-group';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import Table from '$lib/holocene/table/table.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
 
   export let eventGroup: EventGroup;
@@ -15,6 +16,11 @@
 
 <div class="w-full border-gray-700 lg:w-1/3 lg:border-r-2">
   <Table class="w-full table-fixed pb-2" variant="simple">
+    <caption class="sr-only" slot="caption"
+      >{translate('events', 'event-group', {
+        eventName: eventGroup.name,
+      })}</caption
+    >
     {#each [...eventGroup.events].reverse() as [id, eventInGroup] (id)}
       <tr
         class="row"
