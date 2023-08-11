@@ -26,8 +26,8 @@
   let value: string;
   let customValue = customOptions[0].value;
 
-  const handleOptionSelect = (event: CustomEvent<CustomOption>) => {
-    customValue = event.detail.value;
+  const handleSelect = (option: CustomOption) => {
+    customValue = option.value;
     customCombobox.closeList();
   };
 </script>
@@ -55,15 +55,14 @@
       optionLabelKey="label"
       optionValueKey="value"
     >
-      <Icon name="regions" slot="leading-icon" />
+      <Icon name="regions" slot="leading" />
       <svelte:fragment let:option>
         <ComboboxOption
-          on:select={handleOptionSelect}
-          value={option}
+          on:select={() => handleSelect(option)}
           selected={value === option.value}
           disabled={option.disabled}
         >
-          <span slot="leading-slot">
+          <span slot="leading">
             {option.flag}
           </span>
           <span>

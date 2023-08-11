@@ -14,8 +14,7 @@
 </script>
 
 <script lang="ts">
-  let menuContainer: HTMLDivElement;
-  const open = writable(false);
+  export let open: Writable<boolean> = writable(false);
   const keepOpen = writable(false);
 
   const handleKeydown = (event: KeyboardEvent) => {
@@ -24,8 +23,12 @@
     }
   };
 
-  const closeMenu = () => ($open = false);
-  const toggleMenu = () => ($open = !$open);
+  const closeMenu = () => {
+    $open = false;
+  };
+  const toggleMenu = () => {
+    $open = !$open;
+  };
 
   setContext<MenuContext>(MENU_CONTEXT, {
     open,
@@ -36,10 +39,9 @@
 </script>
 
 <div
-  bind:this={menuContainer}
   use:clickOutside
-  on:click-outside={() => ($open = false)}
-  class="relative inline-block {$$props.class}"
+  on:click-outside={closeMenu}
+  class="relative {$$props.class}"
   on:keydown|stopPropagation={handleKeydown}
 >
   <slot {open} />

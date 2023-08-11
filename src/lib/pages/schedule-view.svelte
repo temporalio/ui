@@ -31,7 +31,7 @@
   import Loading from '$lib/holocene/loading.svelte';
   import type { DescribeScheduleResponse } from '$types';
   import { coreUserStore } from '$lib/stores/core-user';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import { translate } from '$lib/i18n/translate';
 
   let namespace = $page.params.namespace;
@@ -150,13 +150,13 @@
         on:click={() => pauseConfirmationModal.open()}
       >
         <MenuItem
-          testId="edit-schedule"
+          data-testid="edit-schedule"
           href={routeForScheduleEdit({ namespace, scheduleId })}
         >
           {translate('edit')}
         </MenuItem>
         <MenuItem
-          testId="delete-schedule"
+          data-testid="delete-schedule"
           destructive
           on:click={() => deleteConfirmationModal.open()}
         >

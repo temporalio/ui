@@ -148,7 +148,7 @@
           variant={confirmType}
           {loading}
           disabled={confirmDisabled || loading}
-          testId="confirm-modal-button"
+          data-testid="confirm-modal-button"
           type="submit">{confirmText}</Button
         >
       {/if}

@@ -1,12 +1,8 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-
-  import type { IconName } from './icon/paths';
-
-  import Button from './button.svelte';
+  import { MenuContainer, MenuButton, Menu } from '$lib/holocene/menu';
+  import type { IconName } from '$lib/holocene/icon/paths';
+  import Button from '$lib/holocene/button.svelte';
 
   export let label: string;
   export let menuLabel: string;
@@ -23,8 +19,6 @@
   export let position: 'left' | 'right' = 'left';
   export let href = '';
   export let primaryActionDisabled = false;
-
-  let show = false;
 </script>
 
 <MenuContainer class={$$props.class}>
@@ -46,25 +40,22 @@
     <MenuButton
       id="{id}-menu-button"
       label={menuLabel}
-      dark
-      class="segment right"
-      bind:show
       controls="{id}-menu"
       {disabled}
       hasIndicator
     />
   </div>
-  <Menu class="min-w-max" id="{id}-menu" {show} {position}>
+  <Menu id="{id}-menu" {position}>
     <slot />
   </Menu>
 </MenuContainer>
 
 <style lang="postcss">
   .split-button {
-    @apply flex grow cursor-pointer flex-row gap-[1px] font-secondary;
+    @apply flex grow cursor-pointer flex-row gap-[1px];
 
     :global(.segment) {
-      @apply relative flex w-fit items-center justify-center py-2 font-secondary text-sm;
+      @apply relative flex w-fit items-center justify-center py-2;
     }
 
     :global(.segment.left) {

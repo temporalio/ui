@@ -16,12 +16,17 @@
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
   import { timeFormat } from '$lib/stores/time-format';
   import { capitalize } from '$lib/utilities/format-camel-case';
-  import DropdownButton from '$lib/holocene/dropdown-button/dropdown-button.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import {
+    MenuContainer,
+    MenuButton,
+    Menu,
+    MenuItem,
+  } from '$lib/holocene/menu';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   $: namespace = $page.params.namespace;
 
@@ -59,7 +64,7 @@
   {#if hasSchedules}
     <Button
       class="h-10"
-      testId="create-schedule"
+      data-testid="create-schedule"
       disabled={createDisabled}
       on:click={() => goto(routeForScheduleCreate({ namespace }))}
     >
@@ -97,21 +102,23 @@
         </div>
       </svelte:fragment>
       <svelte:fragment slot="action-top-right">
-        <DropdownButton
-          id="timezone"
-          label={capitalize($timeFormat)}
-          icon="clock"
-        >
-          <MenuItem on:click={() => ($timeFormat = 'relative')}
-            >{translate('relative')}</MenuItem
-          >
-          <MenuItem on:click={() => ($timeFormat = 'UTC')}
-            >{translate('utc')}</MenuItem
-          >
-          <MenuItem on:click={() => ($timeFormat = 'local')}
-            >{translate('local')}</MenuItem
-          >
-        </DropdownButton>
+        <MenuContainer>
+          <MenuButton hasIndicator controls="timezone-menu">
+            <Icon slot="leading" name="clock" />
+            {capitalize($timeFormat)}
+          </MenuButton>
+          <Menu id="timezone-menu">
+            <MenuItem on:click={() => ($timeFormat = 'relative')}
+              >{translate('relative')}</MenuItem
+            >
+            <MenuItem on:click={() => ($timeFormat = 'UTC')}
+              >{translate('utc')}</MenuItem
+            >
+            <MenuItem on:click={() => ($timeFormat = 'local')}
+              >{translate('local')}</MenuItem
+            >
+          </Menu>
+        </MenuContainer>
       </svelte:fragment>
       <SchedulesTable>
         {#each visibleItems as schedule}
@@ -145,7 +152,7 @@
         {#if !error}
           <Button
             class="mt-4"
-            testId="create-schedule"
+            data-testid="create-schedule"
             disabled={createDisabled}
             on:click={() => goto(routeForScheduleCreate({ namespace }))}
           >

@@ -13,9 +13,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import { MenuContainer, Menu, MenuItem } from '$lib/holocene/menu';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
 
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
@@ -94,7 +92,7 @@
   >
     {$filter.attribute}
   </Button>
-  <Menu class="max-h-84 overflow-y-scroll w-fit" id="status-menu" keepOpen>
+  <Menu id="status-menu" keepOpen>
     {#each workflowStatuses as status (status)}
       {@const isActive = statusFilters.find(
         (filter) => filter.value === status,

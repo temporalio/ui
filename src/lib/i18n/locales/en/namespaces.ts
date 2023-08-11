@@ -3,7 +3,7 @@ export const Namespace = 'namespaces' as const;
 export const Strings = {
   'namespace-select-header': 'Select a Namespace',
   'namespace-select-empty-state': 'No Namespaces',
-  'namespace-select-label': 'Select a Namespace',
+  'namespace-label': 'Select a Namespace',
   'namespaces-empty-state-title': 'No Namespaces Found',
   'namespaces-empty-state-content':
     'You do not have access to a Namespace. Contact your Administrator for assistance.',

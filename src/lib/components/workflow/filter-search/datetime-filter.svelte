@@ -15,10 +15,12 @@
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
+  import {
+    MenuContainer,
+    MenuButton,
+    Menu,
+    MenuItem,
+  } from '$lib/holocene/menu';
   import ConditionalMenu from './conditional-menu.svelte';
 
   type T = $$Generic;
@@ -140,18 +142,10 @@
     ]}
   />
   <MenuContainer>
-    <MenuButton
-      id="time-range-filter"
-      controls="time-range-filter-menu"
-      class="flex flex-row items-center p-2 bg-white text-gray-800 hover:border-primary hover:bg-primary hover:text-white border border-gray-800 rounded-r h-10"
-    >
+    <MenuButton id="time-range-filter" controls="time-range-filter-menu">
       {translate('workflows', 'select-time')}
     </MenuButton>
-    <Menu
-      keepOpen
-      id="time-range-filter-menu"
-      class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-2"
-    >
+    <Menu keepOpen id="time-range-filter-menu">
       {#if isTimeRange}
         <div class="flex flex-col gap-2">
           <div class="flex flex-col gap-2">
@@ -214,7 +208,6 @@
                   hasIndicator
                   id="relative-datetime-input"
                   controls="relative-datetime-input-menu"
-                  class="rounded-r bg-offWhite border border-primary border-l-0 h-10 w-28 px-2"
                 >
                   {TIME_UNIT_LABELS[timeUnit] ?? timeUnit}
                   {translate('ago')}

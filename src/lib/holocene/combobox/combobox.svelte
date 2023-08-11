@@ -1,8 +1,10 @@
 <script lang="ts" generics="T extends object">
+  import { writable } from 'svelte/store';
   import type { HTMLInputAttributes } from 'svelte/elements';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import { clickOutside } from '../outside-click';
-  import ComboboxOption from './combobox-option.svelte';
+  import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
+  import Menu from '$lib/holocene/menu/menu.svelte';
+  import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
+  import MenuButton from '../menu/menu-button.svelte';
 
   type ExtendedInputEvent = Event & {
     currentTarget: EventTarget & HTMLInputElement;
@@ -54,9 +56,10 @@
   export let optionLabelKey = null;
 
   let displayValue: string;
-  let listElement: HTMLUListElement;
+  let menuElement: HTMLUListElement;
   let inputElement: HTMLInputElement;
-  let open = false;
+  const open = writable<boolean>(false);
+  $: list = options;
 
   $: {
     const selectedOption = options.find((option) => {
@@ -77,7 +80,7 @@
   }
 
   export const openList = (focusList: boolean = false) => {
-    open = true;
+    $open = true;
     if (focusList) {
       requestAnimationFrame(() => {
         focusFirstOption();
@@ -86,8 +89,8 @@
   };
 
   export const closeList = () => {
-    if (!open) return;
-    open = false;
+    if (!$open) return;
+    $open = false;
     requestAnimationFrame(() => {
       inputElement.focus();
     });
@@ -95,19 +98,17 @@
 
   const narrowOption = (option: unknown): T => option as T;
 
-  $: list = options;
-
   const isString = (option: unknown): option is string => {
     return typeof option === 'string';
   };
 
-  const handleSelectOption = (event: CustomEvent<string>) => {
-    value = event.detail;
+  const handleSelectOption = (option: string | T) => {
+    value = isString(option) ? option : option[optionValueKey];
     closeList();
   };
 
   const focusFirstOption = () => {
-    const listItemElement: HTMLLIElement = listElement.querySelector(
+    const listItemElement: HTMLLIElement = menuElement.querySelector(
       'li[role="option"]:not([aria-disabled="true"])',
     );
 
@@ -194,7 +195,7 @@
   };
 
   const handleInput = (event: ExtendedInputEvent) => {
-    if (!open) openList();
+    if (!$open) openList();
     list = options.filter((option) => {
       if (isString(option)) {
         return option
@@ -209,17 +210,23 @@
   };
 
   const handleInputClick = () => {
-    if (!open) openList();
+    if (!$open) openList();
   };
 </script>
 
-<div class="combobox">
+<MenuContainer {open}>
   <label class="combobox-label" class:sr-only={labelHidden} for={id}>
     {label}
   </label>
 
-  <div class="combobox-input-container group">
-    <slot name="leading-icon" />
+  <MenuButton
+    aria-hidden="true"
+    tabindex={-1}
+    hasIndicator
+    {disabled}
+    controls="{id}-listbox"
+  >
+    <slot name="leading" slot="leading" />
     <input
       {id}
       {placeholder}
@@ -233,36 +240,31 @@
       autocomplete="off"
       autocapitalize="off"
       spellcheck="false"
+      data-lpignore="true"
       aria-controls="{id}-listbox"
-      aria-expanded={open}
+      aria-expanded={$open}
       aria-required={required}
       aria-autocomplete="list"
       on:input={handleInput}
       on:keydown={handleInputKeydown}
-      on:click={handleInputClick}
+      on:click|stopPropagation={handleInputClick}
       bind:this={inputElement}
       data-testid={$$props['data-testid'] ?? id}
       {...$$restProps}
     />
-    <slot name="trailing-icon">
-      <Icon name={open ? 'chevron-up' : 'chevron-down'} />
-    </slot>
-  </div>
+    <slot name="trailing" slot="trailing" />
+  </MenuButton>
 
-  <ul
-    class="combobox-list {open ? 'flex' : 'hidden'}"
+  <Menu
+    bind:menuElement
+    on:keydown={handleListKeydown}
     id="{id}-listbox"
     role="listbox"
-    bind:this={listElement}
-    on:keydown={handleListKeydown}
-    use:clickOutside
-    on:click-outside={closeList}
   >
     {#each list as option}
       {#if typeof option === 'string'}
         <ComboboxOption
-          on:select={handleSelectOption}
-          value={option}
+          on:click={() => handleSelectOption(option)}
           selected={value === option}
         >
           {option}
@@ -273,35 +275,15 @@
     {:else}
       <ComboboxOption disabled>{noResultsText}</ComboboxOption>
     {/each}
-  </ul>
-</div>
+  </Menu>
+</MenuContainer>
 
 <style lang="postcss">
-  .combobox {
-    @apply relative w-full;
-  }
-
   .combobox-label {
     @apply font-secondary text-sm font-normal;
   }
 
-  .combobox-input-container {
-    @apply flex flex-row items-center px-2 h-10 gap-2 bg-white border border-primary rounded-lg focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-blue-600/50;
-  }
-
   .combobox-input {
-    @apply w-full h-full rounded font-primary focus:outline-none;
-  }
-
-  .combobox-list {
-    @apply absolute w-full mt-1 bg-white border border-primary rounded-lg flex-col gap-2 p-2;
-
-    :global(.combobox-option) {
-      @apply cursor-pointer font-primary h-12 px-2 py-3 font-medium first:rounded-t last:rounded-b flex flex-row items-center gap-2 rounded hover:bg-indigo-50 focus:outline-none focus:border focus:bg-indigo-50 focus:border-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
-    }
-
-    :global(.combobox-option.disabled) {
-      @apply text-gray-500 pointer-events-none;
-    }
+    @apply w-full h-full flex content-center rounded font-primary focus:outline-none;
   }
 </style>

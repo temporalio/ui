@@ -74,7 +74,7 @@
         bind:value={manualSearchString}
       />
       <Button
-        testId="manual-search-button"
+        data-testid="manual-search-button"
         variant="primary"
         class="h-10"
         unroundLeft

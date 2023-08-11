@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
 
-  import MenuItem from './primitives/menu/menu-item.svelte';
-  import SplitButton from './split-button.svelte';
+  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
+  import SplitButton from '$lib/holocene/split-button.svelte';
 
   export let Hst: HST;
 </script>

@@ -2,8 +2,12 @@
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import DropdownMenu from '$lib/holocene/dropdown-menu.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import {
+    MenuContainer,
+    MenuButton,
+    Menu,
+    MenuItem,
+  } from '$lib/holocene/menu';
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import { authUser } from '$lib/stores/auth-user';
   import type { NamespaceListItem } from '$lib/types/global';
@@ -26,31 +30,27 @@
       pathNameSplit.includes('task-queues'));
 
   let showProfilePic = true;
-  let namespaceSwitcher: Combobox<NamespaceListItem>;
 
   function fixImage() {
     showProfilePic = false;
   }
 
-  const handleNamespaceSelect = (event: CustomEvent<NamespaceListItem>) => {
-    namespaceSwitcher.closeList();
-    const ns = event.detail;
+  const handleNamespaceSelect = (ns: NamespaceListItem) => {
     $lastUsedNamespace = ns.namespace;
     goto(ns.href(ns.namespace));
+    ns?.onClick(ns.namespace);
   };
 </script>
 
 <nav
-  class="sticky top-0 z-30 flex h-12 w-full items-center justify-between border-b-2 bg-gray-100 p-1 px-4 md:px-10"
+  class="sticky top-0 z-30 flex h-12 w-full items-center justify-end border-b-2 bg-gray-100 p-1 px-4 md:px-10"
   data-testid="top-nav"
   class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
   aria-label={translate('main')}
 >
-  <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">
     {#if showNamespaceSpecificNav}
       <Combobox
-        bind:this={namespaceSwitcher}
         label={translate('namespaces', 'namespace-label', { namespace })}
         noResultsText={translate('no-results')}
         labelHidden
@@ -59,12 +59,11 @@
         options={namespaceList}
         optionValueKey="namespace"
       >
-        <Icon name="namespace-switcher" slot="leading-icon" />
+        <Icon name="namespace-switcher" slot="leading" />
         <svelte:fragment let:option>
           <ComboboxOption
             selected={option.namespace === namespace}
-            value={option}
-            on:select={handleNamespaceSelect}
+            on:click={() => handleNamespaceSelect(option)}
           >
             {option.namespace}
           </ComboboxOption>
@@ -73,8 +72,8 @@
       <DataEncoderStatus />
     {/if}
     {#if $authUser.accessToken}
-      <DropdownMenu id="user" position="right">
-        <div slot="trigger" class="flex items-center gap-1">
+      <MenuContainer>
+        <MenuButton variant="ghost" hasIndicator controls="user-menu">
           <img
             src={$authUser?.picture}
             alt={$authUser?.profile ?? translate('user-profile')}
@@ -92,17 +91,12 @@
               </div>
             {/if}
           </div>
-          <Icon name="chevron-down" class="mt-1" />
-        </div>
-        <div class="h-auto w-[300px]" slot="items">
-          <MenuItem class="truncate rounded-t-xl" disabled
-            >{$authUser.email}</MenuItem
-          >
-          <MenuItem class="rounded-b-xl" on:click={logout}
-            >{translate('log-out')}</MenuItem
-          >
-        </div>
-      </DropdownMenu>
+        </MenuButton>
+        <Menu id="user-menu" position="right">
+          <MenuItem disabled>{$authUser.email}</MenuItem>
+          <MenuItem on:click={logout}>{translate('log-out')}</MenuItem>
+        </Menu>
+      </MenuContainer>
     {/if}
   </div>
 </nav>

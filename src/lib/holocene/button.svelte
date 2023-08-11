@@ -1,18 +1,49 @@
-<script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
-
-  export let disabled = false;
-  export let variant:
+<script lang="ts" context="module">
+  type ButtonVariant =
     | 'primary'
     | 'secondary'
     | 'search'
     | 'destructive'
     | 'login'
     | 'ghost'
-    | 'link' = 'primary';
+    | 'link'
+    | 'menu';
 
+  export interface ButtonProps {
+    variant?: ButtonVariant;
+    id?: string;
+    disabled?: boolean;
+    thin?: boolean;
+    loading?: boolean;
+    active?: boolean;
+    large?: boolean;
+    icon?: IconName;
+    iconClass?: string;
+    count?: number;
+    unround?: boolean;
+    unroundRight?: boolean;
+    unroundLeft?: boolean;
+    noBorderRight?: boolean;
+    noBorderLeft?: boolean;
+    as?: 'button' | 'anchor';
+    href?: string;
+    target?: '_self' | '_external';
+    'data-testid'?: string;
+  }
+</script>
+
+<script lang="ts">
+  import Badge from '$lib/holocene/badge.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { IconName } from '$lib/holocene/icon/paths';
+  import type { HTMLButtonAttributes } from 'svelte/elements';
+
+  type $$Props = ButtonProps & HTMLButtonAttributes;
+
+  let className: string = '';
+  export { className as class };
+  export let disabled = false;
+  export let variant: ButtonVariant = 'primary';
   export let thin = false;
   export let loading = false;
   export let href: string = null;
@@ -22,10 +53,7 @@
   export let as: 'button' | 'anchor' = href ? 'anchor' : 'button';
   export let icon: IconName = null;
   export let iconClass: string = null;
-  export let classes: string = $$props.class;
-  export let testId: string = $$props.testId;
   export let count = 0;
-  export let type: 'button' | 'submit' | 'reset' = 'button';
   export let unround = false;
   export let unroundRight = false;
   export let unroundLeft = false;
@@ -37,7 +65,7 @@
 {#if as === 'button'}
   <button
     on:click|stopPropagation
-    class="button {variant} {classes}"
+    class="button {variant} {className}"
     class:selected={active}
     class:large
     class:thin
@@ -46,10 +74,9 @@
     class:unroundLeft
     class:noBorderRight
     class:noBorderLeft
-    data-testid={testId}
-    {type}
     {disabled}
     {id}
+    {...$$restProps}
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>
@@ -68,14 +95,14 @@
   <a
     {href}
     on:click|stopPropagation
-    class="button {variant} {classes}"
+    class="button {variant} {className}"
     class:selected={active}
     class:large
     class:disabled
     class:thin
-    data-testid={testId}
     {target}
     {id}
+    {...$$restProps}
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>
@@ -147,7 +174,7 @@
   }
 
   .ghost {
-    @apply border-0 bg-none py-2.5 px-4 font-primary border border-[transparent] text-sm text-gray-700 leading-5 font-medium hover:bg-gray-200 hover:border hover:border-indigo-700 focus:bg-gray-200 focus:border focus:border-indigo-700 hover:shadow-md;
+    @apply bg-none py-2.5 px-4 font-primary border border-[transparent] text-sm text-gray-700 leading-5 font-medium hover:bg-gray-200 hover:border hover:border-indigo-700 focus:bg-gray-200 focus:border focus:border-indigo-700 hover:shadow-md;
   }
 
   .ghost:hover {

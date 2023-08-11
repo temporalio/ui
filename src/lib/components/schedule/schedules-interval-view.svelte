@@ -1,9 +1,11 @@
 <script lang="ts">
   import Input from '$lib/holocene/input/input.svelte';
-  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+  import {
+    MenuContainer,
+    MenuButton,
+    Menu,
+    MenuItem,
+  } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
 
   import type { ScheduleOffsetUnit } from '$lib/types/schedule';
@@ -119,12 +121,7 @@
       class="h-10"
     />
     <MenuContainer>
-      <MenuButton
-        hasIndicator
-        id="phase"
-        controls="phase-menu"
-        class="rounded-r bg-offWhite border border-primary border-l-0 h-10 w-20 px-2"
-      >
+      <MenuButton hasIndicator controls="phase-menu">
         {offsetUnit}
       </MenuButton>
       <Menu id="phase-menu">

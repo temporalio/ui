@@ -13,6 +13,8 @@
 </script>
 
 <script lang="ts">
+  import Icon from '$lib/holocene/icon/icon.svelte';
+
   import { setContext } from 'svelte';
   import { afterUpdate, noop } from 'svelte/internal';
   import { writable } from 'svelte/store';
@@ -40,9 +42,12 @@
 
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import {
+    MenuContainer,
+    MenuButton,
+    Menu,
+    MenuItem,
+  } from '$lib/holocene/menu';
   import BooleanFilter from './boolean-filter.svelte';
   import FilterList from './filter-list.svelte';
   import DateTimeFilter from './datetime-filter.svelte';
@@ -190,21 +195,21 @@
       {#if isStatusFilter($filter.attribute)}
         <StatusFilter />
       {:else}
-        <MenuContainer let:open>
-          <Button
-            variant="search"
-            unroundRight={Boolean($filter.attribute)}
-            disabled={$activeQueryIndex !== null}
-            icon={$filter.attribute ? null : 'filter'}
+        <MenuContainer>
+          <MenuButton
             count={$filter.attribute ? 0 : $workflowFilters.length}
-            on:click={() => open.update((previous) => !previous)}
+            disabled={$activeQueryIndex !== null}
+            unroundRight={Boolean($filter.attribute)}
+            controls="search-attribute-menu"
           >
+            <svelte:fragment slot="leading">
+              {#if !$filter.attribute}
+                <Icon name="filter" />
+              {/if}
+            </svelte:fragment>
             {$filter.attribute || translate('workflows', 'filter')}
-          </Button>
-          <Menu
-            class="max-h-80 overflow-y-scroll w-fit min-w-[240px] whitespace-nowrap"
-            id="search-attribute-menu"
-          >
+          </MenuButton>
+          <Menu id="search-attribute-menu">
             <Input
               label={translate('search')}
               labelHidden
@@ -213,6 +218,7 @@
               bind:value={searchAttributeValue}
               icon="search"
               placeholder={translate('search')}
+              class="mb-1"
             />
 
             {#each filteredOptions as { value, label }}
@@ -226,7 +232,7 @@
                 {label}
               </MenuItem>
             {:else}
-              <MenuItem on:click={noop}>{translate('no-results')}</MenuItem>
+              <MenuItem disabled>{translate('no-results')}</MenuItem>
             {/each}
           </Menu>
         </MenuContainer>

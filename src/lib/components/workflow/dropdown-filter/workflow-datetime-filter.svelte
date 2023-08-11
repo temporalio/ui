@@ -16,15 +16,18 @@
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { page } from '$app/stores';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+  import {
+    MenuContainer,
+    MenuButton,
+    Menu,
+    MenuItem,
+  } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
 
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import { labsMode } from '$lib/stores/labs-mode';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   let custom = false;
   let value = 'All Time';
@@ -177,17 +180,12 @@
           id="time-range-filter"
           hasIndicator
           controls="time-range-filter-menu"
-          class="flex flex-row items-center p-2 bg-white border border-r-0 border-primary rounded-l h-10 w-44"
         >
           {value}
         </MenuButton>
-        <Menu
-          keepOpen
-          id="time-range-filter-menu"
-          class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-2"
-        >
+        <Menu keepOpen id="time-range-filter-menu">
           {#if custom}
-            <div class="flex flex-col">
+            <div class="flex flex-col w-96">
               <p class="text-sm">Start</p>
               <div class="flex flex-col gap-2">
                 <DatePicker
@@ -234,7 +232,7 @@
               >
             </div>
           {:else}
-            <div>
+            <div class="w-80">
               <div class="flex w-full flex-wrap">
                 <div class="flex w-1/2 flex-col border-b border-gray-300">
                   <MenuItem on:click={() => onChange('All Time')}
@@ -280,14 +278,11 @@
   </LabsModeGuard>
   <MenuContainer>
     <MenuButton
-      class="p-2 bg-white border border-primary {$labsMode
-        ? 'rounded'
-        : 'rounded-r'} h-10 w-32"
       id="datetime-filter"
       controls="datetime-filter-menu"
       hasIndicator
-      icon="clock"
     >
+      <Icon slot="leading" name="clock" />
       {capitalize($timeFormat)}
     </MenuButton>
     <Menu id="datetime-filter-menu">
