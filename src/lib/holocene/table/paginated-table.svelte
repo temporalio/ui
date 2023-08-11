@@ -158,7 +158,7 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply border-2 border-primary rounded-lg overflow-scroll;
+    @apply border-2 border-primary rounded-lg overflow-scroll max-h-[680px];
   }
 
   .paginated-table {
@@ -190,7 +190,7 @@
   }
 
   .paginated-table-controls {
-    @apply sticky flex gap-2 grow flex-col lg:flex-row w-full rounded-b bottom-0 left-0 p-4 bg-white text-primary border-t border-gray-200;
+    @apply sticky flex gap-2 grow flex-col lg:flex-row w-full rounded-b bottom-0 left-0 py-2 px-4 bg-white text-primary border-t border-gray-200;
   }
 
   .paginated-table-controls-start {
