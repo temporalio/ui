@@ -4,7 +4,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import { eventShowElapsed, eventFilterSort } from '$lib/stores/event-view';
-  import { timeFormat } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
 
   import {
     eventOrGroupIsFailureOrTimedOut,
@@ -109,7 +109,9 @@
         <p
           class="break-word truncate text-sm md:whitespace-normal md:text-base"
         >
-          {formatDate(event?.eventTime, $timeFormat)}
+          {formatDate(event?.eventTime, $timeFormat, {
+            relative: $relativeTime,
+          })}
         </p>
       {/if}
     </div>

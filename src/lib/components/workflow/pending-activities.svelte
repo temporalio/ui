@@ -71,8 +71,9 @@
                       pendingActivity.lastHeartbeatTime,
                     )} (${formatDate(
                       pendingActivity.lastHeartbeatTime,
-                      'relative',
+                      'local',
                       {
+                        relative: true,
                         relativeStrict: true,
                       },
                     )})`}

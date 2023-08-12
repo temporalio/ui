@@ -4,7 +4,11 @@
   import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
   import { page } from '$app/stores';
   import { labsMode } from '$lib/stores/labs-mode';
-  import { timeFormat } from '$lib/stores/time-format';
+  import {
+    type TimeFormat,
+    relativeTime,
+    timeFormat,
+  } from '$lib/stores/time-format';
   import { workflowFilters } from '$lib/stores/filters';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { formatDateTime } from '$lib/utilities/format-date';
@@ -64,12 +68,13 @@
     return conditional;
   };
 
-  const formatDateTimeRange = (value: string, format: string) => {
+  const formatDateTimeRange = (value: string, format: TimeFormat) => {
     const [conditon, start, operator, end] = value.split(' ');
-    return `${conditon.toLowerCase()} ${formatDateTime(
-      start,
-      format,
-    )} ${operator.toLowerCase()} ${formatDateTime(end, format)}`;
+    return `${conditon.toLowerCase()} ${formatDateTime(start, format, {
+      relative: $relativeTime,
+    })} ${operator.toLowerCase()} ${formatDateTime(end, format, {
+      relative: $relativeTime,
+    })}`;
   };
 </script>
 
@@ -106,7 +111,9 @@
                   {formatDateTimeRange(value, $timeFormat)}
                 {:else}
                   {getDateTimeConditonal(conditional)}
-                  {formatDateTime(value, $timeFormat)}
+                  {formatDateTime(value, $timeFormat, {
+                    relative: $relativeTime,
+                  })}
                 {/if}
               {:else}
                 {conditional}

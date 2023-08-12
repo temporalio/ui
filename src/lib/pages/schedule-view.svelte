@@ -16,7 +16,7 @@
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
   import { formatDate } from '$lib/utilities/format-date';
-  import { timeFormat } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { loading } from '$lib/stores/schedules';
 
   import ScheduleMemo from '$lib/components/schedule/schedule-memo.svelte';
@@ -125,7 +125,9 @@
         <div class="flex items-center gap-2 text-sm">
           <p>
             {translate('created', {
-              created: formatDate(schedule?.info?.createTime, $timeFormat),
+              created: formatDate(schedule?.info?.createTime, $timeFormat, {
+                relative: $relativeTime,
+              }),
             })}
           </p>
         </div>
@@ -133,7 +135,9 @@
           <div class="flex items-center gap-2 text-sm">
             <p>
               {translate('last-updated', {
-                updated: formatDate(schedule?.info?.updateTime, $timeFormat),
+                updated: formatDate(schedule?.info?.updateTime, $timeFormat, {
+                  relative: $relativeTime,
+                }),
               })}
             </p>
           </div>

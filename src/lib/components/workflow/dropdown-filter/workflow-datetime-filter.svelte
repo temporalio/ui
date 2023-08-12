@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { timeFormat } from '$lib/stores/time-format';
-  import { capitalize } from '$lib/utilities/format-camel-case';
   import {
     addHours,
     addMinutes,
@@ -9,22 +7,21 @@
     startOfDay,
   } from 'date-fns';
 
-  import { columnOrderedDurations } from '$lib/utilities/to-duration';
-  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
-  import DatePicker from '$lib/holocene/date-picker.svelte';
-  import Button from '$lib/holocene/button.svelte';
-  import TimePicker from '$lib/holocene/time-picker.svelte';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { page } from '$app/stores';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+  import { columnOrderedDurations } from '$lib/utilities/to-duration';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { translate } from '$lib/i18n/translate';
 
+  import Button from '$lib/holocene/button.svelte';
+  import DatePicker from '$lib/holocene/date-picker.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
-  import { labsMode } from '$lib/stores/labs-mode';
+  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
+  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import TimePicker from '$lib/holocene/time-picker.svelte';
 
   let custom = false;
   let value = 'All Time';
@@ -177,7 +174,7 @@
           id="time-range-filter"
           hasIndicator
           controls="time-range-filter-menu"
-          class="flex flex-row items-center p-2 bg-white border border-r-0 border-primary rounded-l h-10 w-44"
+          class="flex flex-row items-center p-2 bg-white border border-primary rounded h-10 w-44"
         >
           {value}
         </MenuButton>
@@ -278,28 +275,4 @@
       </MenuContainer>
     </svelte:fragment>
   </LabsModeGuard>
-  <MenuContainer>
-    <MenuButton
-      class="p-2 bg-white border border-primary {$labsMode
-        ? 'rounded'
-        : 'rounded-r'} h-10 w-32"
-      id="datetime-filter"
-      controls="datetime-filter-menu"
-      hasIndicator
-      icon="clock"
-    >
-      {capitalize($timeFormat)}
-    </MenuButton>
-    <Menu id="datetime-filter-menu">
-      <MenuItem on:click={() => ($timeFormat = 'relative')}
-        >{translate('relative')}</MenuItem
-      >
-      <MenuItem on:click={() => ($timeFormat = 'UTC')}
-        >{translate('utc')}</MenuItem
-      >
-      <MenuItem on:click={() => ($timeFormat = 'local')}
-        >{translate('local')}</MenuItem
-      >
-    </Menu>
-  </MenuContainer>
 </div>

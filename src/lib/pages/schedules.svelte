@@ -14,11 +14,7 @@
   import type { ScheduleListEntry } from '$types';
   import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
-  import { timeFormat } from '$lib/stores/time-format';
-  import { capitalize } from '$lib/utilities/format-camel-case';
-  import DropdownButton from '$lib/holocene/dropdown-button/dropdown-button.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -95,23 +91,6 @@
             on:submit={noop}
           />
         </div>
-      </svelte:fragment>
-      <svelte:fragment slot="action-top-right">
-        <DropdownButton
-          id="timezone"
-          label={capitalize($timeFormat)}
-          icon="clock"
-        >
-          <MenuItem on:click={() => ($timeFormat = 'relative')}
-            >{translate('relative')}</MenuItem
-          >
-          <MenuItem on:click={() => ($timeFormat = 'UTC')}
-            >{translate('utc')}</MenuItem
-          >
-          <MenuItem on:click={() => ($timeFormat = 'local')}
-            >{translate('local')}</MenuItem
-          >
-        </DropdownButton>
       </svelte:fragment>
       <SchedulesTable>
         {#each visibleItems as schedule}
