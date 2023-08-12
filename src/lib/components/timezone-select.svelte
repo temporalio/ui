@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
+  import { noop, onMount } from 'svelte/internal';
 
   import {
     timeFormat,
@@ -59,6 +59,15 @@
     Timezones[$timeFormat]?.abbr ??
     Timezones[$timeFormat]?.label ??
     capitalize($timeFormat);
+
+  onMount(() => {
+    // Check for legacy timeFormat that may be set in localStorage
+    // @ts-ignore
+    if ($timeFormat === 'relative') {
+      $timeFormat = 'local';
+      $relativeTime = true;
+    }
+  });
 </script>
 
 <MenuContainer>

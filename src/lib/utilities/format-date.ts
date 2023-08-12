@@ -43,9 +43,10 @@ export function formatDate(
           : formatDistanceToNow(parsed) + ` ${relativeLabel}`;
       return dateTz.format(parsed, pattern);
     }
-    const timezone = Timezones[timeFormat]?.zones[0] ?? 'UTC';
+    const timezone = Timezones[timeFormat]?.zones[0] ?? timeFormat;
     return dateTz.formatInTimeZone(parsed, timezone, pattern);
-  } catch {
+  } catch (e) {
+    console.error('Error formatting date:', e);
     return '';
   }
 }
