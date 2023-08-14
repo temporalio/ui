@@ -162,7 +162,9 @@
       </div>
     </div>
   {:else}
-    <TableEmptyState {updating} />
+    <TableEmptyState {updating}>
+      <slot name="cloud" slot="cloud" />
+    </TableEmptyState>
   {/if}
 </div>
 

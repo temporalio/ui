@@ -56,17 +56,8 @@
         <TableBodyCell {workflow} {column} />
       {/each}
     </TableRow>
-  {:else}
-    <!-- <TableRow empty>
-      <td colspan={columns.length}>
-        <EmptyState
-          title={translate('workflows', 'empty-state-title')}
-          content={translate('workflows', 'empty-state-description')}
-          error={$workflowError}
-        />
-      </td>
-    </TableRow> -->
   {/each}
+  <slot name="cloud" slot="cloud" />
 </PaginatedTable>
 
 <Drawer

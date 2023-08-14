@@ -280,4 +280,6 @@
   </LabsModeGuard>
   <WorkflowDateTimeFilter />
 </div>
-<WorkflowsSummaryConfigurableTable />
+<WorkflowsSummaryConfigurableTable>
+  <slot name="cloud" slot="cloud" />
+</WorkflowsSummaryConfigurableTable>
