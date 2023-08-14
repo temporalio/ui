@@ -60,6 +60,12 @@
     Timezones[$timeFormat]?.label ??
     capitalize($timeFormat);
 
+  $: localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  $: localOption = TimezoneOptions.find(({ zones }) =>
+    zones?.includes(localTimezone),
+  ) ?? { label: '', abbr: '' };
+  $: localDescription = `${localOption.label} (${localOption.abbr})`;
+
   onMount(() => {
     // Check for legacy timeFormat that may be set in localStorage
     // @ts-ignore
@@ -118,6 +124,11 @@
               <Icon name="checkmark" class="text-blue-700" />
             {/if}
           </span>
+          {#if value === 'local'}
+            <p class="text-gray-500 text-xs font-normal">
+              {localDescription}
+            </p>
+          {/if}
         </MenuItem>
       {/each}
     {/if}
