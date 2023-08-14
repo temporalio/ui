@@ -11,6 +11,7 @@
     label?: string;
     labelHidden?: boolean;
     arrow?: boolean;
+    'data-testid'?: string;
   }
 
   let className: string = null;
