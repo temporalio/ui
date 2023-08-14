@@ -104,18 +104,6 @@
     <div class="border-b border-gray-200 -mx-2 mt-2" />
 
     {#if !search}
-      <div class="my-4">
-        <ToggleSwitch
-          label={translate('relative')}
-          id="relative-toggle"
-          bind:checked={$relativeTime}
-          labelPosition="left"
-          on:change={handleRelativeToggle}
-        />
-      </div>
-
-      <div class="border-b border-gray-200 -mx-2 mb-2" />
-
       {#each QuickTimezoneOptions as { value, label }}
         <MenuItem class="w-full" on:click={() => selectTimezone(value)}>
           <span class="w-full flex flex-row items-center gap-4 justify-between">
@@ -132,6 +120,16 @@
         </MenuItem>
       {/each}
     {/if}
+
+    <div class="my-4">
+      <ToggleSwitch
+        label={translate('relative')}
+        id="relative-toggle"
+        bind:checked={$relativeTime}
+        labelPosition="left"
+        on:change={handleRelativeToggle}
+      />
+    </div>
 
     <div class="border-b border-gray-200 -mx-2 mb-2" />
 
