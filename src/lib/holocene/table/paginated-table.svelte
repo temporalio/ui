@@ -224,6 +224,6 @@
   }
 
   .nav-btn {
-    @apply border border-gray-300 text-gray-700 rounded-lg w-10 h-10 flex items-center justify-center disabled:bg-gray-100 disabled:text-gray-500 disabled:pointer-events-none;
+    @apply border border-gray-300 text-gray-700 rounded-lg w-10 h-10 flex items-center justify-center disabled:bg-gray-100 disabled:text-gray-500 disabled:pointer-events-none hover:bg-gray-900 hover:text-white;
   }
 </style>
