@@ -51,6 +51,7 @@ export const Strings = {
   'interval-view-description':
     'Specify the time interval for this schedule to run (for example every 5 minutes).',
   'offset-heading': 'Offset',
+  'offset-unit': 'Offset Unit',
   'offset-description':
     'Specify the time to offset when this schedule will run (for example 15 min past the hour).',
   'cron-view-title': 'String',

@@ -1,8 +1,10 @@
 <script lang="ts" context="module">
   export const SELECT_CONTEXT = 'select-context';
+
   type ExtendedSelectOption<T> = {
     nativeElement: HTMLLIElement;
   } & SelectOption<T>;
+
   export interface SelectContext<T> {
     handleChange: (value: T) => void;
     options: Writable<ExtendedSelectOption<T>[]>;
@@ -17,16 +19,29 @@
   }
 </script>
 
-<script lang="ts">
-  import type { IconName } from '../icon/paths';
-
+<script lang="ts" generics="T">
   import { setContext } from 'svelte';
+  import type { HTMLInputAttributes } from 'svelte/elements';
+  import { noop, onMount } from 'svelte/internal';
+  import { writable, type Writable } from 'svelte/store';
+
+  import type { IconName } from '$lib/holocene/icon/paths';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { MenuContainer, MenuButton, Menu } from '$lib/holocene/menu';
-  import { writable, type Writable } from 'svelte/store';
-  import { noop, onMount } from 'svelte/internal';
 
-  type T = $$Generic;
+  type $$Props = HTMLInputAttributes & {
+    label: string;
+    id: string;
+    labelHidden?: boolean;
+    value?: T;
+    placeholder?: string;
+    disabled?: boolean;
+    leadingIcon?: IconName;
+    unroundRight?: boolean;
+    unroundLeft?: boolean;
+    onChange?: (value: T) => void;
+    'data-testid'?: string;
+  };
 
   export let label: string;
   export let labelHidden = false;
@@ -36,6 +51,7 @@
   export let disabled: boolean = false;
   export let leadingIcon: IconName = null;
   export let unroundRight: boolean = false;
+  export let unroundLeft: boolean = false;
   export let onChange: (value: T) => void = noop;
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
@@ -78,7 +94,13 @@
 
 <MenuContainer class="w-full" {open}>
   <label class:sr-only={labelHidden} for={id}>{label}</label>
-  <MenuButton hasIndicator {disabled} controls="{id}-select">
+  <MenuButton
+    hasIndicator
+    {disabled}
+    {unroundLeft}
+    {unroundRight}
+    controls="{id}-select"
+  >
     <Icon slot="leading" name={leadingIcon} />
     <input
       {id}
@@ -87,7 +109,11 @@
       class="select-input"
       disabled
       class:disabled
+      {...$$restProps}
     />
+    {#if disabled}
+      <Icon slot="trailing" name="lock" />
+    {/if}
   </MenuButton>
   <Menu role="listbox" id="{id}-select">
     <slot />

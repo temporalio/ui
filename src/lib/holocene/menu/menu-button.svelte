@@ -15,7 +15,7 @@
     label?: string;
     unroundRight?: boolean;
     unroundLeft?: boolean;
-    variant?: 'default' | 'ghost';
+    variant?: 'default' | 'primary' | 'ghost';
   }
 
   export let controls: string;
@@ -26,7 +26,7 @@
   export let label: string = null;
   export let unroundRight = false;
   export let unroundLeft = false;
-  export let variant: 'default' | 'ghost' = 'default';
+  export let variant: 'default' | 'primary' | 'ghost' = 'default';
 
   const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);
 
@@ -81,13 +81,13 @@
   {...$$restProps}
 >
   <slot name="leading" />
-  <div class="flex grow">
+  <div class="flex grow" class:hidden={!$$slots.default}>
     <slot />
   </div>
-  {#if hasIndicator && !disabled}
-    <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
-  {:else if disabled}
-    <Icon name="lock" />
+  {#if hasIndicator}
+    <div class="flex">
+      <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
+    </div>
   {/if}
   <slot name="trailing" />
   {#if count > 0}
@@ -100,15 +100,23 @@
 
 <style lang="postcss">
   .menu-button {
-    @apply relative text-primary text-sm w-full py-2.5 px-4 h-10 flex flex-row items-center gap-2 rounded-lg disabled:cursor-not-allowed focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
+    @apply relative text-sm w-full h-10 py-2.5 px-4 flex flex-row items-center gap-2 rounded-lg disabled:cursor-not-allowed focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
+  }
+
+  .primary {
+    @apply border-2 border-primary bg-primary bg-gradient-to-br text-white hover:from-blue-100 hover:to-purple-100 hover:text-primary;
+
+    &:disabled {
+      @apply text-white opacity-75 hover:from-primary hover:to-primary;
+    }
   }
 
   .ghost {
-    @apply disabled:bg-gray-100/50;
+    @apply text-primary disabled:bg-gray-100/50;
   }
 
   .default {
-    @apply bg-white border border-primary disabled:bg-gray-50;
+    @apply bg-white text-primary border border-primary disabled:bg-gray-50;
   }
 
   .unroundLeft {

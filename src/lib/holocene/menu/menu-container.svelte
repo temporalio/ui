@@ -21,9 +21,6 @@
   const closeMenu = () => {
     $open = false;
   };
-  const toggleMenu = () => {
-    $open = !$open;
-  };
 
   setContext<MenuContext>(MENU_CONTEXT, {
     open,
