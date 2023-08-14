@@ -83,6 +83,7 @@
     controls="timezones-menu"
     hasIndicator
     icon="clock"
+    testId="timezones-menu-button"
   >
     {timezone}
   </MenuButton>
@@ -105,7 +106,11 @@
 
     {#if !search}
       {#each QuickTimezoneOptions as { value, label }}
-        <MenuItem class="w-full" on:click={() => selectTimezone(value)}>
+        <MenuItem
+          class="w-full"
+          on:click={() => selectTimezone(value)}
+          testId={`timezones-${value}`}
+        >
           <span class="w-full flex flex-row items-center gap-4 justify-between">
             <p class="truncate">{label}</p>
             {#if value === $timeFormat}
@@ -128,6 +133,7 @@
         bind:checked={$relativeTime}
         labelPosition="left"
         on:change={handleRelativeToggle}
+        data-testid="timezones-relative-toggle"
       />
     </div>
 
