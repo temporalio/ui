@@ -120,9 +120,3 @@
     >
   </Menu>
 </MenuContainer>
-
-<style lang="postcss">
-  .active {
-    @apply bg-gray-900 text-white;
-  }
-</style>
