@@ -50,11 +50,6 @@
 >
   <div class="flex items-center gap-2">
     {#if showNamespaceSpecificNav}
-      <!-- <select value={namespace}>
-        {#each namespaceList as ns}
-          <option>{ns.namespace}</option>
-        {/each}
-      </select> -->
       <Combobox
         label={translate('namespaces', 'namespace-label', { namespace })}
         noResultsText={translate('no-results')}

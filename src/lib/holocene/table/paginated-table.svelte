@@ -27,7 +27,7 @@
   export let nextPageButtonLabel: string;
   export let previousPageButtonLabel: string;
 
-  let tableContainer;
+  let tableContainer: HTMLDivElement;
 
   $: url = $page.url;
   $: perPageParam =
@@ -162,7 +162,9 @@
       </div>
     </div>
   {:else}
-    <TableEmptyState {updating} />
+    <TableEmptyState {updating}>
+      <slot name="cloud" slot="cloud" />
+    </TableEmptyState>
   {/if}
 </div>
 
