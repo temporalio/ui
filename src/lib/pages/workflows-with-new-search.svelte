@@ -51,9 +51,9 @@
   import { page } from '$app/stores';
   import {
     refresh,
-    workflows,
     loading,
     updating,
+    workflows,
     workflowCount,
     workflowsQuery,
     workflowsSearchParams,
@@ -62,7 +62,6 @@
   import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
-  import Pagination from '$lib/holocene/pagination.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
@@ -226,7 +225,7 @@
   on:confirm={cancelWorkflows}
 />
 
-<header class="mb-2 flex justify-between">
+<header class="flex justify-between">
   <div>
     <h1 class="text-2xl" data-cy="workflows-title">
       <Translate namespace="workflows" key="recent-workflows" />
@@ -272,26 +271,13 @@
     </button>
   </div>
 </header>
-<Pagination
-  items={$workflows}
-  let:visibleItems
-  aria-label={translate('workflows', 'recent-workflows')}
-  pageSizeSelectLabel={translate('per-page')}
-  previousButtonLabel={translate('previous')}
-  nextButtonLabel={translate('next')}
->
-  <svelte:fragment slot="action-top-left">
-    <LabsModeGuard>
-      <svelte:fragment slot="fallback">
-        <WorkflowAdvancedSearch />
-      </svelte:fragment>
-      <WorkflowFilterSearch />
-    </LabsModeGuard>
-  </svelte:fragment>
-  <svelte:fragment slot="action-top-center">
-    <WorkflowDateTimeFilter />
-  </svelte:fragment>
-  <WorkflowsSummaryConfigurableTable workflows={visibleItems}>
-    <slot slot="cloud" name="cloud" />
-  </WorkflowsSummaryConfigurableTable>
-</Pagination>
+<div class="flex flex-col md:flex-row gap-2">
+  <LabsModeGuard>
+    <svelte:fragment slot="fallback">
+      <WorkflowAdvancedSearch />
+    </svelte:fragment>
+    <WorkflowFilterSearch />
+  </LabsModeGuard>
+  <WorkflowDateTimeFilter />
+</div>
+<WorkflowsSummaryConfigurableTable />

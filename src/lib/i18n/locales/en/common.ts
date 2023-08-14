@@ -78,6 +78,7 @@ export const Strings = {
   'per-page': 'Per Page',
   'next-page': 'Next Page',
   'previous-page': 'Previous Page',
+  'go-to-page': 'Go to page {{page}}',
   'next-row': 'Next Row',
   'previous-row': 'Previous Row',
   today: 'Today',
