@@ -16,7 +16,7 @@ type PaginationMethods<T> = {
   findPage: (fn: (item: T) => boolean) => number;
   nextRow: () => void;
   previousRow: () => void;
-  setActiveRowIndex: (activeRowIndex: number) => void;
+  setActiveRowIndex: (activeRowIndex: number | undefined) => void;
 };
 
 type PaginationStore<T> = PaginationMethods<T> &
@@ -132,6 +132,7 @@ export const pagination = <T>(
   };
 
   const next = () => {
+    setActiveRowIndex();
     index.update((index) => {
       const nextIndex = index + get(pageSize);
       if (outOfBounds(nextIndex, items)) return index;
@@ -140,6 +141,7 @@ export const pagination = <T>(
   };
 
   const previous = () => {
+    setActiveRowIndex();
     index.update((index) => {
       const nextStart = index - get(pageSize);
       return getIndex(nextStart, items);
@@ -179,7 +181,8 @@ export const pagination = <T>(
     return getPageForIndex(i, get(pageSize));
   };
 
-  const setActiveRowIndex = (nextIndex: number) => {
+  const setActiveRowIndex = (nextIndex: number | undefined = undefined) => {
+    if (nextIndex === undefined) activeRowIndex.set(nextIndex);
     const pageItemSize = items.slice(
       get(index),
       get(index) + get(pageSize),
