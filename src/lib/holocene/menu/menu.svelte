@@ -34,6 +34,7 @@
   class="menu {position} {className}"
   class:hidden={!$open}
   aria-labelledby={id}
+  tabindex={-1}
   {id}
   bind:this={menuElement}
   {...$$restProps}
@@ -43,7 +44,7 @@
 
 <style lang="postcss">
   .menu {
-    @apply absolute z-50 mt-1 p-2 overflow-scroll max-h-[480px] min-w-full list-none rounded-lg border border-gray-900 bg-white text-primary shadow focus:outline-none focus-visible:outline focus-visible:outline-blue-700 focus-visible:-outline-offset-2;
+    @apply absolute z-50 mt-1 p-2 overflow-scroll max-h-[480px] list-none rounded-lg border border-gray-900 bg-white text-primary shadow;
 
     &.left {
       @apply left-0 origin-top-left;

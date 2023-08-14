@@ -1,6 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import DropdownMenu from '$lib/components/dropdown-menu.svelte';
+  import {
+    Menu,
+    MenuButton,
+    MenuContainer,
+    MenuItem,
+  } from '$lib/holocene/menu';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -10,6 +15,7 @@
   } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   let value = '';
   export let attribute: TextFilterAttributes;
@@ -52,20 +58,12 @@
   }
 </script>
 
-<DropdownMenu
-  label={translate('workflow-filter-label', {
-    attribute: attributeToHumanReadable[attribute],
-  })}
-  value={idFilter ? idFilter.value : ''}
-  keepOpen
-  icon="filter"
-  testId="{attributeToId[attribute]}-filter-button"
-  on:showmenu={handleShowInput}
->
-  <svelte:fragment slot="label"
-    >{attributeToHumanReadable[attribute]}</svelte:fragment
-  >
-  <div class="flex w-[500px] flex-col gap-2 p-2">
+<MenuContainer>
+  <MenuButton variant="table-header" controls="{attribute}-filter-menu">
+    {attributeToHumanReadable[attribute]}
+    <Icon name="filter" slot="trailing" />
+  </MenuButton>
+  <Menu keepOpen id="{attribute}-filter-menu" class="w-[500px]">
     <Input
       icon="search"
       type="search"
@@ -81,5 +79,5 @@
       on:clear={handleClearInput}
       bind:value
     />
-  </div>
-</DropdownMenu>
+  </Menu>
+</MenuContainer>

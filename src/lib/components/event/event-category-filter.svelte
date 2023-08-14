@@ -2,8 +2,12 @@
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
-
-  import DropdownMenu from '$lib/components/dropdown-menu.svelte';
+  import {
+    Menu,
+    MenuButton,
+    MenuContainer,
+    MenuItem,
+  } from '$lib/holocene/menu';
   import {
     allEventTypeOptions,
     compactEventTypeOptions,
@@ -41,44 +45,23 @@
   };
 </script>
 
-<DropdownMenu
-  label={translate('event-category-filter-label')}
-  value={$eventCategoryFilter}
-  icon="filter"
-  testId="event-category-filter"
->
-  <svelte:fragment slot="label">
+<MenuContainer>
+  <MenuButton
+    active={!!$eventCategoryFilter}
+    variant="table-header"
+    controls="event-category-filter-menu"
+  >
     {label}
-  </svelte:fragment>
-  <div class="w-56">
-    {#each options as { label, option } (option)}
-      <div class="option" class:active={$eventCategoryFilter === option}>
-        <div class="check active">
-          {#if $eventCategoryFilter === option}
-            <Icon name="checkmark" />
-          {/if}
-        </div>
-        <button
-          data-testid="event-category-option"
-          on:click={() => onOptionClick(option)}
-        >
-          {translate('events', label)}
-        </button>
-      </div>
+    <Icon name="filter" slot="trailing" />
+  </MenuButton>
+  <Menu class="w-48" id="event-categroy-filter-menu">
+    {#each options as { label, option }}
+      <MenuItem
+        selected={$eventCategoryFilter === option}
+        on:click={() => onOptionClick(option)}
+      >
+        {translate('events', label)}
+      </MenuItem>
     {/each}
-  </div>
-</DropdownMenu>
-
-<style lang="postcss">
-  .option {
-    @apply my-2 flex font-normal;
-  }
-
-  .check {
-    @apply mx-4 w-4;
-  }
-
-  .active {
-    @apply text-blue-700;
-  }
-</style>
+  </Menu>
+</MenuContainer>

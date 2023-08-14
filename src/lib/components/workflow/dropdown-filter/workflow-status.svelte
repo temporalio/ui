@@ -1,15 +1,22 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import DropdownMenu from '$lib/components/dropdown-menu.svelte';
+  import {
+    Menu,
+    MenuButton,
+    MenuContainer,
+    MenuItem,
+  } from '$lib/holocene/menu';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { workflowStatusFilters } from '$lib/models/workflow-status';
+  import type { WorkflowStatus as TWorkflowStatus } from '$lib/types/workflows';
 
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import Translate from '$lib/i18n/translate.svelte';
   import { translate } from '$lib/i18n/translate';
+  import Checkbox from '$lib/holocene/checkbox.svelte';
 
   $: statusFilters = $workflowFilters.filter(
     (f) => f.attribute === 'ExecutionStatus',
@@ -75,51 +82,35 @@
 
     updateQueryParamsFromFilter($page.url, $workflowFilters);
   };
+
+  const isActive = (status: 'All' | TWorkflowStatus) => {
+    if (status === 'All') return statusFilters.length === 0;
+    return statusFilters.some((filter) => filter.value === status);
+  };
 </script>
 
-<DropdownMenu
-  label={translate('workflow-status-filter-label')}
-  value={statusFilters.length ? statusFilters.map((s) => s.value).join('') : ''}
-  testId="execution-status-filter"
-  keepOpen
-  icon="filter"
->
-  <svelte:fragment slot="label">Status</svelte:fragment>
-  <div class="flex w-56 flex-col gap-4 py-2">
-    {#each workflowStatusFilters as status (status)}
-      <button
-        class="flex items-center transition-all hover:cursor-pointer"
-        data-testid={status}
-        on:click={() => onStatusClick(status)}
-      >
-        <div
-          class="ml-4 mr-2 h-4 w-4 rounded-sm ring-1 ring-gray-900"
-          class:active={statusFilters.find((s) => s.value === status) ||
+<MenuContainer>
+  <MenuButton variant="table-header" controls="execution-status-filter">
+    {translate('status')}
+    <Icon name="filter" slot="trailing" />
+  </MenuButton>
+  <Menu keepOpen id="execution-status-filter">
+    {#each workflowStatusFilters as status}
+      <MenuItem on:click={() => onStatusClick(status)}>
+        <Checkbox
+          slot="leading"
+          label={status}
+          labelHidden
+          tabindex={-1}
+          checked={statusFilters.some((filter) => filter.value === status) ||
             (!statusFilters.length && status === 'All')}
-        >
-          {#if statusFilters.find((s) => s.value === status) || (!statusFilters.length && status === 'All')}
-            <Icon
-              class="pointer-events-none -mt-[1px] -ml-[2px] text-white"
-              name="checkmark"
-              width={20}
-              height={20}
-            />
-          {/if}
-        </div>
-        <div class="flex h-6 items-center text-sm hover:scale-[103%]">
-          {#if status === 'All'}
-            <Translate namespace="workflows" key="all-statuses" />
-          {:else}
-            <WorkflowStatus {status} />
-          {/if}
-        </div>
-      </button>
+        />
+        {#if status === 'All'}
+          <Translate namespace="workflows" key="all-statuses" />
+        {:else}
+          <WorkflowStatus {status} />
+        {/if}
+      </MenuItem>
     {/each}
-  </div>
-</DropdownMenu>
-
-<style lang="postcss">
-  .active {
-    @apply bg-gray-900 text-white;
-  }
-</style>
+  </Menu>
+</MenuContainer>

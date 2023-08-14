@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { writable } from 'svelte/store';
+
   import { page } from '$app/stores';
 
   import { getContext } from 'svelte';
@@ -12,7 +14,7 @@
   import { workflowStatuses } from '$lib/models/workflow-status';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Checkbox from '$lib/holocene/checkbox.svelte';
   import {
     MenuContainer,
     Menu,
@@ -21,13 +23,12 @@
     MenuDivider,
   } from '$lib/holocene/menu';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
 
   type T = $$Generic;
 
   const { filter, resetFilter } = getContext<FilterContext<T>>(FILTER_CONTEXT);
-
+  const open = writable(true);
   $: filters = [...$workflowFilters];
   $: statusFilters = filters.filter((filter) =>
     isStatusFilter(filter.attribute),
@@ -90,37 +91,27 @@
   };
 </script>
 
-<MenuContainer let:open>
+<MenuContainer {open}>
   <MenuButton controls="status-menu">
     {$filter.attribute}
   </MenuButton>
   <Menu id="status-menu" keepOpen>
     {#each workflowStatuses as status (status)}
-      {@const isActive = statusFilters.find(
-        (filter) => filter.value === status,
-      )}
+      {@const checked = statusFilters.some((filter) => filter.value === status)}
       <MenuItem
         data-testid={status}
         on:click={() => {
           onStatusClick(status);
         }}
       >
-        <span class="flex items-center">
-          <div
-            class="mr-2 h-4 w-4 rounded-sm ring-1 ring-gray-900"
-            class:active={isActive}
-          >
-            {#if isActive}
-              <Icon
-                class="pointer-events-none -mt-[1px] -ml-[2px] "
-                name="checkmark"
-                width={20}
-                height={20}
-              />
-            {/if}
-          </div>
-          <WorkflowStatus {status} />
-        </span>
+        <Checkbox
+          on:click={() => onStatusClick(status)}
+          slot="leading"
+          {checked}
+          label={status}
+          labelHidden
+        />
+        <WorkflowStatus {status} />
       </MenuItem>
     {/each}
     <MenuDivider />

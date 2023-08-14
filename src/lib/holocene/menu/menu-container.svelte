@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   import { clickOutside } from '$lib/holocene/outside-click';
   import { setContext } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
   import { type Writable, writable } from 'svelte/store';
 
   export const MENU_CONTEXT = 'menu-context';
@@ -13,6 +14,13 @@
 </script>
 
 <script lang="ts">
+  interface $$Props extends HTMLAttributes<HTMLUListElement> {
+    open?: Writable<boolean>;
+    class?: string;
+  }
+
+  let className = '';
+  export { className as class };
   export let open: Writable<boolean> = writable(false);
 
   const keepOpen = writable(false);
@@ -32,7 +40,8 @@
 <div
   use:clickOutside
   on:click-outside={closeMenu}
-  class="relative {$$props.class}"
+  class="relative {className}"
+  {...$$restProps}
 >
   <slot {open} />
 </div>

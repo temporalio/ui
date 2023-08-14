@@ -6,6 +6,8 @@
   import Badge from '../badge.svelte';
   import { MENU_ITEM_SELECTORS } from './menu-item.svelte';
 
+  type MenuButtonVariant = 'primary' | 'secondary' | 'ghost' | 'table-header';
+
   interface $$Props extends HTMLButtonAttributes {
     controls: string;
     count?: number;
@@ -15,9 +17,13 @@
     label?: string;
     unroundRight?: boolean;
     unroundLeft?: boolean;
-    variant?: 'default' | 'primary' | 'ghost';
+    variant?: MenuButtonVariant;
+    class?: string;
+    active?: boolean;
   }
 
+  let className = '';
+  export { className as class };
   export let controls: string;
   export let count = 0;
   export let disabled: boolean = false;
@@ -26,7 +32,8 @@
   export let label: string = null;
   export let unroundRight = false;
   export let unroundLeft = false;
-  export let variant: 'default' | 'primary' | 'ghost' = 'default';
+  export let variant: MenuButtonVariant = 'secondary';
+  export let active = false;
 
   const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);
 
@@ -75,13 +82,14 @@
   aria-controls={controls}
   aria-expanded={$open}
   aria-label={label}
-  class="menu-button {variant}"
+  class="menu-button {variant} {className}"
   class:unroundLeft
   class:unroundRight
+  class:active
   {...$$restProps}
 >
   <slot name="leading" />
-  <div class="flex grow" class:hidden={!$$slots.default}>
+  <div class="flex items-center grow" class:hidden={!$$slots.default}>
     <slot />
   </div>
   {#if hasIndicator}
@@ -100,11 +108,15 @@
 
 <style lang="postcss">
   .menu-button {
-    @apply relative text-sm w-full h-10 py-2.5 px-4 flex flex-row items-center gap-2 rounded-lg disabled:cursor-not-allowed focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
+    @apply relative text-sm w-full h-10 py-2.5 px-4 flex flex-row items-center gap-2 rounded-lg disabled:cursor-not-allowed;
+
+    &.active {
+      @apply after:content-[''] after:rounded-full after:h-2 after:w-2 after:bg-blue-300 after:-translate-x-full after:-translate-y-full;
+    }
   }
 
   .primary {
-    @apply border-2 border-primary bg-primary bg-gradient-to-br text-white hover:from-blue-100 hover:to-purple-100 hover:text-primary;
+    @apply border-2 border-primary bg-primary bg-gradient-to-br text-white hover:from-blue-100 hover:to-purple-100 hover:text-primary focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
 
     &:disabled {
       @apply text-white opacity-75 hover:from-primary hover:to-primary;
@@ -112,11 +124,23 @@
   }
 
   .ghost {
-    @apply text-primary disabled:bg-gray-100/50;
+    @apply text-primary;
+
+    &:disabled {
+      @apply bg-gray-100/50;
+    }
   }
 
-  .default {
-    @apply bg-white text-primary border border-primary disabled:bg-gray-50;
+  .secondary {
+    @apply bg-white text-primary border border-primary;
+
+    &:disabled {
+      @apply bg-gray-50;
+    }
+  }
+
+  .table-header {
+    @apply p-0 max-w-fit;
   }
 
   .unroundLeft {
