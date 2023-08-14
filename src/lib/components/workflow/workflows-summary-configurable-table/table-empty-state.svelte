@@ -23,7 +23,6 @@
 
 <svelte:head>
   <link rel="preload" as="image" href={emptyImage} />
-  <link rel="preload" as="image" href={noResultsImages} />
 </svelte:head>
 <div
   class="flex flex-col xl:flex-row w-full h-auto overflow-hidden"

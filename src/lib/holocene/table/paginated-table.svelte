@@ -27,6 +27,8 @@
   export let nextPageButtonLabel: string;
   export let previousPageButtonLabel: string;
 
+  let tableContainer;
+
   $: url = $page.url;
   $: perPageParam =
     url.searchParams.get(perPageKey) ?? String(defaultItemsPerPage);
@@ -97,9 +99,17 @@
     if (currentPageParam) store.jumpToPage(currentPageParam);
     if (perPageParam) store.adjustPageSize(perPageParam);
   }
+
+  $: tableOffset = tableContainer?.offsetTop
+    ? tableContainer?.offsetTop + 16
+    : 0;
 </script>
 
-<div class="paginated-table-wrapper">
+<div
+  class="paginated-table-wrapper"
+  bind:this={tableContainer}
+  style="max-height: calc(100vh - {tableOffset}px)"
+>
   <table class="paginated-table">
     <slot name="caption" />
     <thead class="paginated-table-header">
@@ -158,7 +168,7 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply border-2 border-primary rounded-lg overflow-scroll max-h-[680px];
+    @apply border-2 border-primary rounded-lg overflow-scroll;
   }
 
   .paginated-table {
