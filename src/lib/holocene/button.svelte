@@ -33,14 +33,15 @@
 </script>
 
 <script lang="ts">
+  import type { HTMLButtonAttributes } from 'svelte/elements';
+
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
-  import type { HTMLButtonAttributes } from 'svelte/elements';
 
   type $$Props = ButtonProps & HTMLButtonAttributes;
 
-  let className: string = '';
+  let className = '';
   export { className as class };
   export let disabled = false;
   export let variant: ButtonVariant = 'primary';

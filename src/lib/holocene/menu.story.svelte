@@ -2,13 +2,13 @@
   import type { Hst as HST } from '@histoire/plugin-svelte';
   import { logEvent } from 'histoire/client';
 
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import {
-    MenuContainer,
-    MenuButton,
     Menu,
+    MenuButton,
+    MenuContainer,
     MenuItem,
   } from '$lib/holocene/menu';
-  import Icon from './icon/icon.svelte';
 
   export let Hst: HST;
 </script>
