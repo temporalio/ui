@@ -1142,10 +1142,9 @@ export const Timezones = {
     zones: ['Pacific/Wallis'],
   },
 } as const;
-
 export const TimezoneOptions: TimeFormatOptions = Object.entries(Timezones)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   .map(([key, value]: [TimeFormat, any]) => ({
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     label: key,
     value: key,
     ...value,
