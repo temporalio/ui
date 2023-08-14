@@ -101,7 +101,7 @@
   }
 
   $: tableOffset = tableContainer?.offsetTop
-    ? tableContainer?.offsetTop + 16
+    ? tableContainer?.offsetTop + 32
     : 0;
 </script>
 
@@ -208,7 +208,7 @@
   }
 
   .paginated-table-controls-center {
-    @apply flex flex-wrap grow flex-row items-center justify-center min-w-fit gap-2;
+    @apply flex flex-wrap grow flex-row items-center justify-center min-w-fit gap-2 text-sm;
   }
 
   .paginated-table-controls-end {

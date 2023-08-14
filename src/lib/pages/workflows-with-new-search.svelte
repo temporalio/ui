@@ -271,7 +271,7 @@
     </button>
   </div>
 </header>
-<div class="flex flex-row gap-2">
+<div class="flex flex-col md:flex-row gap-2">
   <LabsModeGuard>
     <svelte:fragment slot="fallback">
       <WorkflowAdvancedSearch />
