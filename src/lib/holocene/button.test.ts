@@ -87,4 +87,17 @@ describe('Button', () => {
 
     expect(host.innerHTML).toMatchSnapshot();
   });
+
+  test('class', async () => {
+    const instance = new Button({
+      target: host,
+      props: {
+        class: 'custom-class',
+      },
+    });
+
+    expect(instance).toBeTruthy();
+
+    expect(host.innerHTML).toMatchSnapshot();
+  });
 });
