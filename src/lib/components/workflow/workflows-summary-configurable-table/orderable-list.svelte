@@ -6,8 +6,6 @@
     addColumn,
     removeColumn,
     moveColumn,
-    pinColumn,
-    MAX_PINNED_COLUMNS,
   } from '$lib/stores/workflow-table-columns';
   import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
   import OrderableListItem from '$lib/holocene/orderable-list/orderable-list-item.svelte';
@@ -25,16 +23,13 @@
     <svelte:fragment slot="heading">
       Workflow Headings <span class="font-normal">(in view)</span>
     </svelte:fragment>
-    {#each columnsInUse as { label, pinned }, index (label)}
+    {#each columnsInUse as { label }, index (label)}
       <OrderableListItem
         {index}
-        {pinned}
         {label}
         totalItems={columnsInUse.length}
-        maxPinnedItems={MAX_PINNED_COLUMNS}
         on:moveItem={(event) =>
           moveColumn(event.detail.from, event.detail.to, namespace)}
-        on:pinItem={() => pinColumn(label, namespace)}
         on:removeItem={() => removeColumn(label, namespace)}
         addButtonLabel={translate('workflows', 'add-column-label', {
           column: label,

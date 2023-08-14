@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { loading, updating } from '$lib/stores/workflows';
   import { workflowTableColumns } from '$lib/stores/workflow-table-columns';
-  import type { WorkflowExecution } from '$lib/types/workflows';
+  import { workflows, updating, loading } from '$lib/stores/workflows';
   import Drawer from '$lib/holocene/drawer.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import TableWrapper from './workflows-summary-configurable-table/table-wrapper.svelte';
-  import Table from './workflows-summary-configurable-table/table.svelte';
+  import PaginatedTable from '$lib/holocene/table/paginated-table.svelte';
   import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
   import TableRow from './workflows-summary-configurable-table/table-row.svelte';
   import TableHeaderRow from './workflows-summary-configurable-table/table-header-row.svelte';
@@ -13,18 +11,12 @@
   import WorkflowColumnsOrderableList from './workflows-summary-configurable-table/orderable-list.svelte';
   import { translate } from '$lib/i18n/translate';
   import { page } from '$app/stores';
-  import TableEmptyState from './workflows-summary-configurable-table/table-empty-state.svelte';
-
-  export let workflows: WorkflowExecution[];
 
   let customizationDrawerOpen: boolean = false;
 
   $: ({ namespace } = $page.params);
   $: columns = $workflowTableColumns?.[namespace] ?? [];
-  $: empty = workflows.length === 0;
-  $: pinnedColumns = columns.filter((column) => column.pinned);
-  $: otherColumns = columns.filter((column) => !column.pinned);
-  $: emptyAndNotLoading = empty && !($loading || $updating);
+  $: empty = $workflows.length === 0;
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
@@ -35,60 +27,47 @@
   };
 </script>
 
-<div class="flex flex-col">
-  <div
-    class="workflows-summary-configurable-table"
-    class:workflows-summary-configurable-table-empty={emptyAndNotLoading}
+<PaginatedTable
+  perPageLabel={translate('per-page')}
+  nextPageButtonLabel={translate('next-page')}
+  previousPageButtonLabel={translate('previous-page')}
+  pageButtonLabel={(page) => translate('go-to-page', { page })}
+  updating={$updating}
+  items={$workflows}
+  let:visibleItems
+>
+  <caption class="sr-only" slot="caption">
+    {translate('workflows')}
+  </caption>
+  <TableHeaderRow
+    onClickConfigure={openCustomizationDrawer}
+    workflows={visibleItems}
+    columnsCount={columns.length}
+    {empty}
+    slot="headers"
   >
-    <TableWrapper noPinnedColumns={pinnedColumns.length === 0}>
-      <Table pinned columns={pinnedColumns}>
-        <TableHeaderRow
-          pinned
-          {workflows}
-          {pinnedColumns}
-          {empty}
-          slot="headers"
-        >
-          {#each pinnedColumns as column}
-            <TableHeaderCell {column} />
-          {/each}
-        </TableHeaderRow>
-        {#each workflows as workflow}
-          <TableRow pinned {workflow}>
-            {#each pinnedColumns as column}
-              <TableBodyCell {column} {workflow} />
-            {/each}
-          </TableRow>
-        {/each}
-      </Table>
-      <Table columns={otherColumns} slot="unpinned-columns">
-        <TableHeaderRow
-          onClickConfigure={openCustomizationDrawer}
-          {workflows}
-          {pinnedColumns}
-          {empty}
-          slot="headers"
-        >
-          {#each otherColumns as column}
-            <TableHeaderCell {column} />
-          {/each}
-        </TableHeaderRow>
-        {#each workflows as workflow}
-          <TableRow {workflow}>
-            {#each otherColumns as column}
-              <TableBodyCell {column} {workflow} />
-            {/each}
-          </TableRow>
-        {/each}
-      </Table>
-    </TableWrapper>
-  </div>
-  {#if emptyAndNotLoading}
-    <TableEmptyState>
-      <slot slot="cloud" name="cloud" />
-    </TableEmptyState>
-  {/if}
-</div>
+    {#each columns as column}
+      <TableHeaderCell {column} />
+    {/each}
+  </TableHeaderRow>
+  {#each visibleItems as workflow}
+    <TableRow {workflow}>
+      {#each columns as column}
+        <TableBodyCell {workflow} {column} />
+      {/each}
+    </TableRow>
+  {:else}
+    <!-- <TableRow empty>
+      <td colspan={columns.length}>
+        <EmptyState
+          title={translate('workflows', 'empty-state-title')}
+          content={translate('workflows', 'empty-state-description')}
+          error={$workflowError}
+        />
+      </td>
+    </TableRow> -->
+  {/each}
+</PaginatedTable>
 
 <Drawer
   open={customizationDrawerOpen}
@@ -108,13 +87,3 @@
   </svelte:fragment>
   <WorkflowColumnsOrderableList {namespace} />
 </Drawer>
-
-<style lang="postcss">
-  .workflows-summary-configurable-table {
-    @apply flex flex-row w-full rounded-xl border-primary border-2 bg-white overflow-auto;
-  }
-
-  .workflows-summary-configurable-table-empty {
-    @apply rounded-b-none;
-  }
-</style>

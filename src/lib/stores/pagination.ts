@@ -4,6 +4,7 @@ import { derived, get, writable } from 'svelte/store';
 export const defaultItemsPerPage = 100;
 export const options: string[] = ['100', '250', '500'];
 export const perPageKey = 'per-page';
+export const currentPageKey = 'page';
 export const MAX_PAGE_SIZE = options[options.length - 1];
 
 type PaginationMethods<T> = {
@@ -16,7 +17,7 @@ type PaginationMethods<T> = {
   findPage: (fn: (item: T) => boolean) => number;
   nextRow: () => void;
   previousRow: () => void;
-  setActiveRowIndex: (activeRowIndex: number) => void;
+  setActiveRowIndex: (activeRowIndex: number | undefined) => void;
 };
 
 type PaginationStore<T> = PaginationMethods<T> &
@@ -32,10 +33,53 @@ type PaginationStore<T> = PaginationMethods<T> &
     currentPage: number;
     totalPages: number;
     activeRowIndex: number | undefined;
+    pageShortcuts: number[];
   }>;
 
 export const getPageForIndex = (i: number, pageSize: number): number => {
   return Math.floor(i / pageSize) + 1;
+};
+
+export const getPageShortcuts = (
+  currentPage: number,
+  totalPages: number,
+): number[] => {
+  if (totalPages <= 9) {
+    return new Array(totalPages).fill(0).map((_, idx) => idx + 1);
+  }
+
+  if (currentPage < 5) {
+    return [1, 2, 3, 4, 5, NaN, totalPages - 2, totalPages - 1, totalPages];
+  }
+
+  if (currentPage >= 5 && currentPage <= totalPages - 5) {
+    return [
+      1,
+      2,
+      NaN,
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+      NaN,
+      totalPages - 1,
+      totalPages,
+    ];
+  }
+
+  if (currentPage >= totalPages - 5) {
+    return [
+      1,
+      2,
+      NaN,
+      totalPages - 5,
+      totalPages - 4,
+      totalPages - 3,
+      totalPages - 2,
+      totalPages - 1,
+      totalPages,
+    ];
+  }
+  return [];
 };
 
 export const getStartingIndexForPage = (
@@ -132,6 +176,7 @@ export const pagination = <T>(
   };
 
   const next = () => {
+    setActiveRowIndex();
     index.update((index) => {
       const nextIndex = index + get(pageSize);
       if (outOfBounds(nextIndex, items)) return index;
@@ -140,6 +185,7 @@ export const pagination = <T>(
   };
 
   const previous = () => {
+    setActiveRowIndex();
     index.update((index) => {
       const nextStart = index - get(pageSize);
       return getIndex(nextStart, items);
@@ -179,7 +225,8 @@ export const pagination = <T>(
     return getPageForIndex(i, get(pageSize));
   };
 
-  const setActiveRowIndex = (nextIndex: number) => {
+  const setActiveRowIndex = (nextIndex: number | undefined = undefined) => {
+    if (nextIndex === undefined) activeRowIndex.set(nextIndex);
     const pageItemSize = items.slice(
       get(index),
       get(index) + get(pageSize),
@@ -211,6 +258,8 @@ export const pagination = <T>(
   const { subscribe } = derived(
     [index, pageSize, activeRowIndex],
     ([$index, $pageSize, $activeRowIndex]) => {
+      const totalPages = getTotalPages($pageSize, items);
+      const currentPage = getPageForIndex($index, $pageSize);
       return {
         items: items.slice($index, $index + $pageSize),
         initialItem: items[0],
@@ -220,9 +269,10 @@ export const pagination = <T>(
         endingIndex: getIndex($index + $pageSize - 1, items),
         length: items.length,
         pageSize: $pageSize,
-        currentPage: getPageForIndex($index, $pageSize),
-        totalPages: getTotalPages($pageSize, items),
+        currentPage,
+        totalPages,
         activeRowIndex: $activeRowIndex,
+        pageShortcuts: getPageShortcuts(currentPage, totalPages),
       };
     },
   );
