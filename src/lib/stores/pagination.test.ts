@@ -348,7 +348,7 @@ describe('pagination', () => {
     expect(get(store).activeRowIndex).toBe(1);
   });
 
-  it('should set active row to current row item on next ', () => {
+  it('should set active row to undefined on next page', () => {
     const store = pagination(oneHundredResolutions, 5);
 
     for (let i = 0; i < 4; i++) {
@@ -359,7 +359,7 @@ describe('pagination', () => {
 
     store.next();
 
-    expect(get(store).activeRowIndex).toBe(3);
+    expect(get(store).activeRowIndex).toBe(undefined);
   });
 
   it('should set active row to last row item on next if next page has less items', () => {
