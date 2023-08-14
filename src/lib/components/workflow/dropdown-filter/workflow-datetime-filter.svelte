@@ -183,7 +183,7 @@
         >
           {value}
         </MenuButton>
-        <Menu keepOpen id="time-range-filter-menu">
+        <Menu position="right" keepOpen id="time-range-filter-menu">
           {#if custom}
             <div class="flex flex-col w-96">
               <p class="text-sm">Start</p>

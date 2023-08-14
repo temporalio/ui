@@ -13,7 +13,13 @@
 
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { MenuContainer, Menu, MenuItem } from '$lib/holocene/menu';
+  import {
+    MenuContainer,
+    Menu,
+    MenuItem,
+    MenuButton,
+    MenuDivider,
+  } from '$lib/holocene/menu';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
 
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
@@ -85,20 +91,15 @@
 </script>
 
 <MenuContainer let:open>
-  <Button
-    id="status-filter"
-    variant="search"
-    on:click={() => open.update((previous) => !previous)}
-  >
+  <MenuButton controls="status-menu">
     {$filter.attribute}
-  </Button>
+  </MenuButton>
   <Menu id="status-menu" keepOpen>
     {#each workflowStatuses as status (status)}
       {@const isActive = statusFilters.find(
         (filter) => filter.value === status,
       )}
       <MenuItem
-        class="transition-all hover:cursor-pointer !p-2"
         data-testid={status}
         on:click={() => {
           onStatusClick(status);
@@ -122,11 +123,10 @@
         </span>
       </MenuItem>
     {/each}
-    <div class="border-t border-gray-300">
-      <Button variant="ghost" class="!w-full " on:click={onApply}
-        >{translate('apply')}</Button
-      >
-    </div>
+    <MenuDivider />
+    <Button variant="ghost" class="!w-full " on:click={onApply}
+      >{translate('apply')}</Button
+    >
   </Menu>
 </MenuContainer>
 

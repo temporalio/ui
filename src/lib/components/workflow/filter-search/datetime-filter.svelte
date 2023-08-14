@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Select from '$lib/holocene/select/select.svelte';
+
   import { getContext } from 'svelte';
   import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
   import {
@@ -15,13 +17,9 @@
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
-  import {
-    MenuContainer,
-    MenuButton,
-    Menu,
-    MenuItem,
-  } from '$lib/holocene/menu';
+  import { MenuContainer, MenuButton, Menu } from '$lib/holocene/menu';
   import ConditionalMenu from './conditional-menu.svelte';
+  import Option from '$lib/holocene/select/option.svelte';
 
   type T = $$Generic;
 
@@ -42,10 +40,6 @@
   let endSecond = '';
   let endHalf: 'AM' | 'PM' = 'AM';
 
-  const TIME_UNIT_LABELS = {
-    minutes: 'mins',
-    hours: 'hrs',
-  };
   const TIME_UNIT_OPTIONS = ['minutes', 'hours', 'days'];
 
   let timeUnit = TIME_UNIT_OPTIONS[0];
@@ -142,10 +136,14 @@
     ]}
   />
   <MenuContainer>
-    <MenuButton id="time-range-filter" controls="time-range-filter-menu">
+    <MenuButton
+      unroundLeft
+      id="time-range-filter"
+      controls="time-range-filter-menu"
+    >
       {translate('workflows', 'select-time')}
     </MenuButton>
-    <Menu keepOpen id="time-range-filter-menu">
+    <Menu keepOpen id="time-range-filter-menu" class="w-[400px]">
       {#if isTimeRange}
         <div class="flex flex-col gap-2">
           <div class="flex flex-col gap-2">
@@ -192,7 +190,7 @@
         <div class="flex flex-col gap-2">
           <p class="text-sm font-semibold">{translate('relative')}</p>
           <div class="flex justify-between items-center gap-2">
-            <div class="flex w-40 gap-0">
+            <div class="flex gap-0">
               <Input
                 label={translate('relative')}
                 labelHidden
@@ -203,25 +201,17 @@
                 unroundRight
                 class="h-10"
               />
-              <MenuContainer>
-                <MenuButton
-                  hasIndicator
-                  id="relative-datetime-input"
-                  controls="relative-datetime-input-menu"
-                >
-                  {TIME_UNIT_LABELS[timeUnit] ?? timeUnit}
-                  {translate('ago')}
-                </MenuButton>
-                <Menu id="relative-datetime-input-menu">
-                  {#each TIME_UNIT_OPTIONS as unit}
-                    <MenuItem
-                      on:click={() => {
-                        timeUnit = unit;
-                      }}>{TIME_UNIT_LABELS[unit] ?? unit}</MenuItem
-                    >
-                  {/each}
-                </Menu>
-              </MenuContainer>
+              <Select
+                unroundLeft
+                bind:value={timeUnit}
+                id="relative-datetime-unit-input"
+                label="ross"
+                labelHidden
+              >
+                {#each TIME_UNIT_OPTIONS as unit}
+                  <Option value={unit}>{unit} {translate('ago')}</Option>
+                {/each}
+              </Select>
             </div>
             <Button
               variant="ghost"

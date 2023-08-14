@@ -35,6 +35,8 @@
 
 <MenuContainer>
   <MenuButton
+    unroundLeft
+    unroundRight
     id="conditional-menu-button"
     controls="conditional-menu"
     {disabled}

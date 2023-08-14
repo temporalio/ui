@@ -11,6 +11,8 @@
     menuElement?: HTMLUListElement;
   }
 
+  let className = '';
+  export { className as class };
   export let id: string;
   export let keepOpen = false;
   export let position: 'left' | 'right' = 'left';
@@ -29,7 +31,7 @@
 <ul
   in:fly={{ duration: 100 }}
   role="menu"
-  class="absolute z-50 mt-1 p-2 max-h-80 overflow-scroll w-full min-w-[240px] list-none rounded-lg border border-gray-900 bg-white text-primary shadow focus:outline-none focus-visible:outline focus-visible:outline-blue-700 focus-visible:-outline-offset-2 {position} {$$props.class}"
+  class="menu {position} {className}"
   class:hidden={!$open}
   aria-labelledby={id}
   {id}
@@ -40,11 +42,15 @@
 </ul>
 
 <style lang="postcss">
-  .left {
-    @apply left-0 origin-top-left;
-  }
+  .menu {
+    @apply absolute z-50 mt-1 p-2 overflow-scroll max-h-[480px] min-w-full list-none rounded-lg border border-gray-900 bg-white text-primary shadow focus:outline-none focus-visible:outline focus-visible:outline-blue-700 focus-visible:-outline-offset-2;
 
-  .right {
-    @apply right-0 origin-top-right;
+    &.left {
+      @apply left-0 origin-top-left;
+    }
+
+    &.right {
+      @apply right-0 origin-top-right;
+    }
   }
 </style>

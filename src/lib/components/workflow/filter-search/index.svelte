@@ -200,17 +200,20 @@
         {#if isStatusFilter($filter.attribute)}
           <StatusFilter />
         {:else}
-          <MenuContainer let:open>
-            <Button
-              variant="search"
+          <MenuContainer>
+            <MenuButton
+              controls="search-attribute-menu"
               unroundRight={Boolean($filter.attribute)}
               disabled={$activeQueryIndex !== null}
-              icon={$filter.attribute ? null : 'filter'}
               count={$filter.attribute ? 0 : $workflowFilters.length}
-              on:click={() => open.update((previous) => !previous)}
             >
+              <svelte:fragment slot="leading">
+                {#if !$filter.attribute}
+                  <Icon name="filter" />
+                {/if}
+              </svelte:fragment>
               {$filter.attribute || translate('workflows', 'filter')}
-            </Button>
+            </MenuButton>
             <Menu id="search-attribute-menu">
               <Input
                 label={translate('search')}
@@ -220,6 +223,7 @@
                 bind:value={searchAttributeValue}
                 icon="search"
                 placeholder={translate('search')}
+                class="mb-1"
               />
 
               {#each filteredOptions as { value, label }}
