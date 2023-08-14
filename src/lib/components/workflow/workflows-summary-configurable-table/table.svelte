@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import Loading from '$lib/holocene/loading.svelte';
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
   import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
@@ -7,8 +6,6 @@
 
   export let pinned = false;
   export let columns: WorkflowHeader[];
-
-  $: query = $page.url.searchParams.get('query');
 </script>
 
 <table class="workflows-summary-table" class:pinned>

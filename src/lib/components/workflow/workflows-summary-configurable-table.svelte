@@ -1,6 +1,6 @@
 <script lang="ts">
   import { workflowTableColumns } from '$lib/stores/workflow-table-columns';
-  import { workflows, updating, loading } from '$lib/stores/workflows';
+  import { workflows, updating } from '$lib/stores/workflows';
   import Drawer from '$lib/holocene/drawer.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table.svelte';

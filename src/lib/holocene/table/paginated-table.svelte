@@ -27,7 +27,7 @@
   export let nextPageButtonLabel: string;
   export let previousPageButtonLabel: string;
 
-  let tableContainer;
+  let tableContainer: HTMLDivElement;
 
   $: url = $page.url;
   $: perPageParam =

@@ -1,9 +1,5 @@
 <script lang="ts">
-  import {
-    type ComponentProps,
-    createEventDispatcher,
-    getContext,
-  } from 'svelte';
+  import { createEventDispatcher, getContext } from 'svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';

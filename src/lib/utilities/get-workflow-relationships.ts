@@ -5,6 +5,7 @@ import type {
   ChildWorkflowExecutionFailedEvent,
   ChildWorkflowExecutionTerminatedEvent,
   ChildWorkflowExecutionTimedOutEvent,
+  WorkflowEvent,
   WorkflowEvents,
 } from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
@@ -40,7 +41,7 @@ export type ChildWorkflowClosedEvent =
   | ChildWorkflowExecutionTimedOutEvent
   | ChildWorkflowExecutionTerminatedEvent;
 
-export const isChildWorkflowClosedEvent = (event) => {
+export const isChildWorkflowClosedEvent = (event: WorkflowEvent) => {
   return (
     isChildWorkflowExecutionCompletedEvent(event) ||
     isChildWorkflowExecutionFailedEvent(event) ||

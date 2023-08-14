@@ -50,9 +50,3 @@
     </Alert>
   </div>
 {/if}
-
-<style lang="postcss">
-  .stack-trace {
-    @apply relative flex w-full flex-col rounded-xl border-2 border-yellow-700 bg-yellow-50 p-4 text-yellow-900;
-  }
-</style>

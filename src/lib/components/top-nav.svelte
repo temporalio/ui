@@ -11,10 +11,6 @@
   import type { NamespaceListItem } from '$lib/types/global';
   import { dataEncoder } from '$lib/stores/data-encoder';
   import { translate } from '$lib/i18n/translate';
-  import IconButton from '$lib/holocene/icon-button.svelte';
-  import { labsMode } from '$lib/stores/labs-mode';
-  import Button from '$lib/holocene/button.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
