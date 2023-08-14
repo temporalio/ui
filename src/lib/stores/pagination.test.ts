@@ -389,6 +389,16 @@ describe('pagination', () => {
     expect(get(store).activeRowIndex).toBe(0);
   });
 
+  it('by default should not set active row index', () => {
+    const store = pagination(oneHundredResolutions, 5);
+
+    expect(get(store).activeRowIndex).toBe(undefined);
+
+    store.setActiveRowIndex();
+
+    expect(get(store).activeRowIndex).toBe(undefined);
+  });
+
   it('should set active row index', () => {
     const store = pagination(oneHundredResolutions, 5);
 
