@@ -64,7 +64,7 @@
 
 <style lang="postcss">
   .batch-actions-checkbox-table-cell {
-    @apply w-[40px] rounded-tl-lg;
+    @apply w-10 rounded-tl-lg;
   }
 
   .batch-actions-table-cell {
