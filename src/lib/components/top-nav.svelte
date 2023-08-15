@@ -16,7 +16,6 @@
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { goto } from '$app/navigation';
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
@@ -37,7 +36,6 @@
 
   const handleNamespaceSelect = (ns: NamespaceListItem) => {
     $lastUsedNamespace = ns.namespace;
-    goto(ns.href(ns.namespace));
     ns?.onClick(ns.namespace);
   };
 </script>
@@ -51,6 +49,7 @@
   <div class="flex items-center gap-2">
     {#if showNamespaceSpecificNav}
       <Combobox
+        class="w-60"
         label={translate('namespaces', 'namespace-label', { namespace })}
         noResultsText={translate('no-results')}
         labelHidden

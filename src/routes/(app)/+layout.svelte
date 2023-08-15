@@ -25,10 +25,13 @@
   import TopNavigation from '$lib/components/top-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { NamespaceListItem } from '$lib/types/global';
 
   export let data: PageData;
 
   $: ({ uiVersionInfo } = data);
+
+  let namespaceList: NamespaceListItem[];
 
   $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
   $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
@@ -44,10 +47,8 @@
       isCloud ? routeForWorkflows({ namespace }) : getCurrentHref(namespace);
     return {
       namespace,
-      href: (namespace: string) => getHref(namespace),
       onClick: (namespace: string) => {
         $lastUsedNamespace = namespace;
-        $workflowFilters = [];
         goto(getHref(namespace));
       },
     };

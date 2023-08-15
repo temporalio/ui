@@ -31,7 +31,7 @@
 <ul
   in:fly={{ duration: 100 }}
   role="menu"
-  class="menu min-w-full {position} {className}"
+  class="menu {position} {className}"
   class:hidden={!$open}
   aria-labelledby={id}
   tabindex={-1}
@@ -44,7 +44,7 @@
 
 <style lang="postcss">
   .menu {
-    @apply absolute z-50 mt-1 p-2 overflow-scroll max-h-[480px] list-none rounded-lg border border-gray-900 bg-white text-primary shadow;
+    @apply absolute z-50 mt-1 p-2 overflow-scroll min-w-fit w-full max-h-[480px] list-none rounded-lg border border-gray-900 bg-white text-primary shadow;
 
     &.left {
       @apply left-0 origin-top-left;

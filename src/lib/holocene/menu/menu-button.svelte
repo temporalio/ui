@@ -127,7 +127,7 @@
   }
 
   .primary {
-    @apply border-2 border-primary bg-primary bg-gradient-to-br text-white hover:from-blue-100 hover:to-purple-100 hover:text-primary focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
+    @apply border-2 border-primary bg-primary bg-gradient-to-br text-white hover:from-blue-100 hover:to-purple-100 hover:text-primary;
 
     &:disabled {
       @apply text-white opacity-75 hover:from-primary hover:to-primary;
@@ -135,7 +135,7 @@
   }
 
   .ghost {
-    @apply text-primary;
+    @apply text-primary border border-primary border-opacity-0;
 
     &:disabled {
       @apply bg-gray-100/50;
@@ -148,6 +148,11 @@
     &:disabled {
       @apply bg-gray-50;
     }
+  }
+
+  .secondary,
+  .ghost {
+    @apply focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
   }
 
   .table-header {

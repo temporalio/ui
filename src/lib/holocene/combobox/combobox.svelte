@@ -37,6 +37,8 @@
     | (BaseProps & DefaultOptionsProps)
     | (BaseProps & CustomOptionsProps);
 
+  let className = '';
+  export { className as class };
   export let id: string;
   export let label: string;
   export let value: string = undefined;
@@ -160,7 +162,7 @@
       {disabled}
       value={displayValue}
       class:disabled
-      class="combobox-input"
+      class="combobox-input {className}"
       role="combobox"
       autocomplete="off"
       autocapitalize="off"
@@ -203,6 +205,6 @@
   }
 
   .combobox-input {
-    @apply w-full h-full flex content-center rounded font-primary focus:outline-none;
+    @apply w-full h-full flex content-center font-primary focus:outline-none focus:border-indigo-600;
   }
 </style>

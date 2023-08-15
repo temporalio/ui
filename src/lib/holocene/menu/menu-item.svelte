@@ -135,9 +135,11 @@
       {:else}
         <slot />
       {/if}
-      {#if selected}
-        <Icon name="checkmark" />
-      {/if}
+      <div class="flex w-6 h-6 shrink-0">
+        {#if selected}
+          <Icon name="checkmark" />
+        {/if}
+      </div>
     </div>
     <slot name="trailing" />
   </li>

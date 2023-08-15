@@ -1,6 +1,5 @@
 export type NamespaceListItem = {
   namespace: string;
-  href: (namspace: string) => string;
   onClick: (namspace: string) => void;
 };
 

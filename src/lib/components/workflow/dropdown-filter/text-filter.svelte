@@ -58,7 +58,7 @@
   }
 </script>
 
-<MenuContainer>
+<MenuContainer class="w-[500px]">
   <MenuButton
     data-testid="{attributeToId[attribute]}-filter-button"
     variant="table-header"
@@ -68,7 +68,7 @@
     {attributeToHumanReadable[attribute]}
     <Icon name="filter" slot="trailing" />
   </MenuButton>
-  <Menu keepOpen id="{attributeToId[attribute]}-filter-menu" class="w-[500px]">
+  <Menu keepOpen id="{attributeToId[attribute]}-filter-menu">
     <Input
       icon="search"
       type="search"
