@@ -49,12 +49,6 @@
         value: defaultItemsPerPage,
         url,
       });
-    } else {
-      updateQueryParameters({
-        parameter: perPageKey,
-        value: perPageParam,
-        url,
-      });
     }
   }
 
@@ -76,12 +70,6 @@
       updateQueryParameters({
         parameter: currentPageKey,
         value: '1',
-        url,
-      });
-    } else {
-      updateQueryParameters({
-        parameter: currentPageKey,
-        value: currentPageParam,
         url,
       });
     }
