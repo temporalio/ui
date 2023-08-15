@@ -89,7 +89,7 @@
   </MenuButton>
   <Menu
     id="timezones-menu"
-    class="w-fit max-h-96 overflow-y-scroll"
+    class="min-w-[10rem] sm:min-w-[20rem] md:min-w-[26rem] md:w-fit max-h-96 overflow-y-scroll"
     position="right"
   >
     <Input
@@ -102,7 +102,7 @@
       placeholder={translate('search')}
     />
 
-    <div class="border-b border-gray-200 -mx-2 mt-2" />
+    <div class="border-b border-gray-200 -mx-2 my-2" />
 
     {#if !search}
       {#each QuickTimezoneOptions as { value, label }}
@@ -112,44 +112,48 @@
           testId={`timezones-${value}`}
         >
           <span class="w-full flex flex-row items-center gap-4 justify-between">
-            <p class="truncate">{label}</p>
+            <span>
+              <p class="truncate">{label}</p>
+              {#if value === 'local'}
+                <p class="text-gray-500 text-xs font-normal">
+                  {localDescription}
+                </p>
+              {/if}
+            </span>
             {#if value === $timeFormat}
               <Icon name="checkmark" class="text-blue-700" />
             {/if}
           </span>
-          {#if value === 'local'}
-            <p class="text-gray-500 text-xs font-normal">
-              {localDescription}
-            </p>
-          {/if}
         </MenuItem>
       {/each}
+
+      <div class="my-4">
+        <ToggleSwitch
+          label={translate('relative')}
+          id="relative-toggle"
+          bind:checked={$relativeTime}
+          labelPosition="left"
+          on:change={handleRelativeToggle}
+          data-testid="timezones-relative-toggle"
+        />
+      </div>
+
+      <div class="border-b border-gray-200 -mx-2 mb-2" />
     {/if}
-
-    <div class="my-4">
-      <ToggleSwitch
-        label={translate('relative')}
-        id="relative-toggle"
-        bind:checked={$relativeTime}
-        labelPosition="left"
-        on:change={handleRelativeToggle}
-        data-testid="timezones-relative-toggle"
-      />
-    </div>
-
-    <div class="border-b border-gray-200 -mx-2 mb-2" />
 
     {#each filteredOptions as { value, label, offset, abbr }}
       <MenuItem class="w-full" on:click={() => selectTimezone(value)}>
         <span class="w-full flex flex-row items-center gap-4 justify-between">
-          <p class="truncate">{label} ({abbr})</p>
+          <span>
+            <p class="truncate">{label} ({abbr})</p>
+            <p class="text-gray-500 text-xs font-normal">
+              {formatUTCOffset(offset, translate('utc'))}
+            </p>
+          </span>
           {#if value === $timeFormat}
             <Icon name="checkmark" class="text-blue-700" />
           {/if}
         </span>
-        <p class="text-gray-500 text-xs font-normal">
-          {formatUTCOffset(offset, translate('utc'))}
-        </p>
       </MenuItem>
     {:else}
       <MenuItem class="whitespace-nowrap" on:click={noop}
