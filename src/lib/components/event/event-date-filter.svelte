@@ -73,6 +73,7 @@
     hasIndicator
     variant="table-header"
     controls="event-date-filter-menu"
+    data-testid="event-date-filter-button"
   >
     {translate('date-and-time')}
   </MenuButton>
@@ -86,6 +87,7 @@
     <MenuDivider />
     {#each dateOptions as { option, label }}
       <MenuItem
+        data-testid="event-date-filter-{option}"
         selected={$timeFormat === option}
         on:click={() => onDateOptionClick(option)}>{label}</MenuItem
       >
