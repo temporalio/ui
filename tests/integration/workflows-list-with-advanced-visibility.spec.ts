@@ -149,10 +149,7 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await page.click('body');
       await expect(page).toHaveURL(/ExecutionStatus%3D%22Running%22/);
 
-      await page
-        .getByTestId('workflows-summary-configurable-table-row')
-        .first()
-        .click();
+      await page.getByRole('link', { name: '002c98_Running' }).first().click();
 
       await expect(page).toHaveURL(/\/history/);
       await page.getByTestId('back-to-workflows').click();
