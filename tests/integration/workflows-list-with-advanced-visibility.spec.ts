@@ -33,7 +33,7 @@ test.describe('Workflows List with Advanced Visibility', () => {
         /WorkflowType%3D%22ImportantWorkflowType%22/,
       );
 
-      await page.click('[data-testid="workflow-type-filter-button"]');
+      await page.getByTestId('workflow-type-filter-button').click();
       const workflowTypeValue = await page.inputValue('#workflow-type');
       expect(workflowTypeValue).toBe('ImportantWorkflowType');
       await page.waitForSelector(
@@ -78,7 +78,7 @@ test.describe('Workflows List with Advanced Visibility', () => {
 
     test('Execution Status filter sets the correct query', async ({ page }) => {
       await page.getByTestId('execution-status-filter-button').click();
-      await page.getByTestId('Running').click();
+      await page.getByRole('menuitem').filter({ hasText: 'Running' }).click();
 
       const query = 'ExecutionStatus="Running"';
       const urlEncodedQuery = /ExecutionStatus%3D%22Running%22/;
@@ -96,9 +96,8 @@ test.describe('Workflows List with Advanced Visibility', () => {
       page,
     }) => {
       await page.getByTestId('execution-status-filter-button').click();
-      await page.getByTestId('Running').click();
-      await page.getByTestId('Failed').click();
-
+      await page.getByRole('menuitem').filter({ hasText: 'Running' }).click();
+      await page.getByRole('menuitem').filter({ hasText: 'Failed' }).click();
       const query = '(ExecutionStatus="Running" OR ExecutionStatus="Failed")';
       const urlEncodedQuery =
         /%28ExecutionStatus%3D%22Running%22\+OR\+ExecutionStatus%3D%22Failed%22%29/;
@@ -106,20 +105,20 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await expect(page).toHaveURL(urlEncodedQuery);
       expect(await page.inputValue('#manual-search')).toBe(query);
 
-      await page.getByTestId('All').click();
+      await page.getByRole('menuitem').filter({ hasText: 'All' }).click();
 
       await expect(page).not.toHaveURL(urlEncodedQuery);
       expect(await page.inputValue('#manual-search')).toBe('');
     });
 
     test('should combine all three filters', async ({ page }) => {
-      await page.click('[data-testid="execution-status-filter-button"]');
-      await page.click('[data-testid="Running"]');
+      await page.getByTestId('execution-status-filter-button').click();
+      await page.getByRole('menuitem').filter({ hasText: 'Running' }).click();
 
-      await page.click('[data-testid="workflow-id-filter-button"]');
+      await page.getByTestId('workflow-id-filter-button').click();
       await page.fill('#workflow-id', '002c98_Running');
 
-      await page.click('[data-testid="workflow-type-filter-button"]');
+      await page.getByTestId('workflow-type-filter-button').click();
       await page.fill('#workflow-type', 'ImportantWorkflowType');
 
       await expect(page).toHaveURL(
@@ -145,8 +144,8 @@ test.describe('Workflows List with Advanced Visibility', () => {
     test('keeps a single workflow filter after navigating to workflow history and back to workflow list', async ({
       page,
     }) => {
-      await page.click('[data-testid="execution-status-filter-button"]');
-      await page.click('[data-testid="Running"]');
+      await page.getByTestId('execution-status-filter-button').click();
+      await page.getByRole('menuitem').filter({ hasText: 'Running' }).click();
       await page.click('body');
       await expect(page).toHaveURL(/ExecutionStatus%3D%22Running%22/);
 
@@ -191,7 +190,7 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await page.getByText('3 hours').click();
       await page.getByText('End Time').click();
       await page.getByTestId('execution-status-filter-button').click();
-      await page.getByTestId('Running').click();
+      await page.getByRole('menuitem').filter({ hasText: 'Running' }).click();
       await expect(page).toHaveURL(/ExecutionStatus%3D%22Running%22/);
       await expect(page).toHaveURL(/CloseTime\+%3E/);
       await page.getByTestId('namespaces-button').click();
@@ -250,7 +249,7 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await page.getByText('1 hour').click();
       await page.getByText('End Time').click();
       await page.getByTestId('execution-status-filter-button').click();
-      await page.getByTestId('Running').click();
+      await page.getByRole('menuitem').filter({ hasText: 'Running' }).click();
       await expect(page).toHaveURL(/ExecutionStatus%3D%22Running%22/);
       await expect(page).toHaveURL(/CloseTime\+%3E/);
       await expect(page.locator('#time-range-filter')).toHaveText('1 hour');

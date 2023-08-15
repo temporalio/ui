@@ -43,11 +43,11 @@
     updateQueryParamsFromFilter($page.url, $workflowFilters);
   };
 
-  function handleShowInput(event: CustomEvent) {
-    const show = event.detail.show;
-    if (show && idFilter?.value) {
+  function handleShowInput(event: CustomEvent<{ open: boolean }>) {
+    const { open } = event.detail;
+    if (open && idFilter?.value) {
       value = idFilter.value;
-    } else if (show && !idFilter && value) {
+    } else if (open && !idFilter && value) {
       value = '';
     }
   }
@@ -59,11 +59,16 @@
 </script>
 
 <MenuContainer>
-  <MenuButton variant="table-header" controls="{attribute}-filter-menu">
+  <MenuButton
+    data-testid="{attributeToId[attribute]}-filter-button"
+    variant="table-header"
+    controls="{attributeToId[attribute]}-filter-menu"
+    on:click={handleShowInput}
+  >
     {attributeToHumanReadable[attribute]}
     <Icon name="filter" slot="trailing" />
   </MenuButton>
-  <Menu keepOpen id="{attribute}-filter-menu" class="w-[500px]">
+  <Menu keepOpen id="{attributeToId[attribute]}-filter-menu" class="w-[500px]">
     <Input
       icon="search"
       type="search"

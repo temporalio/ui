@@ -1,10 +1,13 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import { getContext } from 'svelte';
-  import { type MenuContext, MENU_CONTEXT } from './menu-container.svelte';
+  import { createEventDispatcher, getContext } from 'svelte';
   import type { HTMLButtonAttributes } from 'svelte/elements';
-  import Badge from '../badge.svelte';
-  import { MENU_ITEM_SELECTORS } from './menu-item.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import {
+    type MenuContext,
+    MENU_CONTEXT,
+  } from '$lib/holocene/menu/menu-container.svelte';
+  import { MENU_ITEM_SELECTORS } from '$lib/holocene/menu/menu-item.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
 
   type MenuButtonVariant = 'primary' | 'secondary' | 'ghost' | 'table-header';
 
@@ -36,12 +39,19 @@
   export let variant: MenuButtonVariant = 'secondary';
   export let active = false;
 
+  const dispatch = createEventDispatcher<{ click: { open: boolean } }>();
   const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);
 
   const handleClick = () => {
-    if (!disabled) {
-      $open = !$open;
-    }
+    open.update((previousState) => {
+      let newState = previousState;
+      if (!disabled) {
+        newState = !previousState;
+      }
+
+      dispatch('click', { open: newState });
+      return newState;
+    });
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {

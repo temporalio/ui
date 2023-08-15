@@ -90,7 +90,11 @@
 </script>
 
 <MenuContainer>
-  <MenuButton variant="table-header" controls="execution-status-filter">
+  <MenuButton
+    data-testid="execution-status-filter-button"
+    variant="table-header"
+    controls="execution-status-filter"
+  >
     {translate('status')}
     <Icon name="filter" slot="trailing" />
   </MenuButton>
