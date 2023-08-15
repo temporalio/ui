@@ -19,6 +19,7 @@ export function formatDate(
     relative?: boolean;
     relativeLabel?: string;
     relativeStrict?: boolean;
+    abbrFormat?: boolean;
   } = {},
 ): string {
   if (!date) return '';
@@ -27,6 +28,7 @@ export function formatDate(
     relative = false,
     relativeLabel = 'ago',
     relativeStrict = false,
+    abbrFormat = false,
   } = options;
 
   try {
@@ -36,46 +38,24 @@ export function formatDate(
 
     const parsed = parseJSON(date);
 
+    const format = abbrFormat
+      ? parsed.getSeconds()
+        ? 'yyyy-MM-dd HH:mm:ss a'
+        : 'yyyy-MM-dd HH:mm a'
+      : pattern;
+
     if (timeFormat === 'local') {
       if (relative)
         return relativeStrict
           ? formatDistanceToNowStrict(parsed) + ` ${relativeLabel}`
           : formatDistanceToNow(parsed) + ` ${relativeLabel}`;
-      return dateTz.format(parsed, pattern);
+      return dateTz.format(parsed, format);
     }
     const timezone = Timezones[timeFormat]?.zones[0] ?? timeFormat;
-    return dateTz.formatInTimeZone(parsed, timezone, pattern);
+    return dateTz.formatInTimeZone(parsed, timezone, format);
   } catch (e) {
     console.error('Error formatting date:', e);
     return '';
-  }
-}
-
-export function formatDateTime(
-  date: string,
-  timeFormat: TimeFormat = 'UTC',
-  options: {
-    relative?: boolean;
-    relativeLabel?: string;
-  } = {},
-): string {
-  const { relative = false, relativeLabel = 'ago' } = options;
-  try {
-    const parsed = parseJSON(date);
-
-    const pattern = parsed.getSeconds()
-      ? 'yyyy-MM-dd HH:mm:ss a'
-      : 'yyyy-MM-dd HH:mm a';
-
-    if (timeFormat === 'local') {
-      if (relative) return formatDistanceToNow(parsed) + ` ${relativeLabel}`;
-
-      return dateTz.format(parsed, pattern);
-    }
-
-    return dateTz.formatInTimeZone(parsed, 'UTC', pattern);
-  } catch {
-    return `about ${date} ${relativeLabel}`;
   }
 }
 

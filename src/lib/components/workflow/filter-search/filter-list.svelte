@@ -11,7 +11,7 @@
   } from '$lib/stores/time-format';
   import { workflowFilters } from '$lib/stores/filters';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import { formatDateTime } from '$lib/utilities/format-date';
+  import { formatDate } from '$lib/utilities/format-date';
   import {
     isDateTimeFilter,
     isTextFilter,
@@ -70,10 +70,12 @@
 
   const formatDateTimeRange = (value: string, format: TimeFormat) => {
     const [conditon, start, operator, end] = value.split(' ');
-    return `${conditon.toLowerCase()} ${formatDateTime(start, format, {
+    return `${conditon.toLowerCase()} ${formatDate(start, format, {
       relative: $relativeTime,
-    })} ${operator.toLowerCase()} ${formatDateTime(end, format, {
+      abbrFormat: true,
+    })} ${operator.toLowerCase()} ${formatDate(end, format, {
       relative: $relativeTime,
+      abbrFormat: true,
     })}`;
   };
 </script>
@@ -111,8 +113,9 @@
                   {formatDateTimeRange(value, $timeFormat)}
                 {:else}
                   {getDateTimeConditonal(conditional)}
-                  {formatDateTime(value, $timeFormat, {
+                  {formatDate(value, $timeFormat, {
                     relative: $relativeTime,
+                    abbrFormat: true,
                   })}
                 {/if}
               {:else}
