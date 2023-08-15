@@ -49,6 +49,7 @@
   <MenuButton
     active={!!$eventCategoryFilter}
     variant="table-header"
+    data-testid="event-category-filter"
     controls="event-category-filter-menu"
   >
     {label}
@@ -57,6 +58,7 @@
   <Menu class="w-48" id="event-categroy-filter-menu">
     {#each options as { label, option }}
       <MenuItem
+        data-testid="event-category-option"
         selected={$eventCategoryFilter === option}
         on:click={() => onOptionClick(option)}
       >

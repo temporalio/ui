@@ -20,6 +20,7 @@
     variant?: MenuButtonVariant;
     class?: string;
     active?: boolean;
+    'data-testid'?: string;
   }
 
   let className = '';
