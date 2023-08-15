@@ -14,7 +14,6 @@
   import { dataEncoder } from '$lib/stores/data-encoder';
   import { translate } from '$lib/i18n/translate';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
-  import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
 
   export let logout: () => void;
@@ -34,9 +33,10 @@
     showProfilePic = false;
   }
 
-  const handleNamespaceSelect = (ns: NamespaceListItem) => {
-    $lastUsedNamespace = ns.namespace;
-    ns?.onClick(ns.namespace);
+  const handleNamespaceSelect = (event: CustomEvent<NamespaceListItem>) => {
+    const namespaceListItem = event.detail;
+    $lastUsedNamespace = namespaceListItem.namespace;
+    namespaceListItem?.onClick(namespaceListItem.namespace);
   };
 </script>
 
@@ -57,16 +57,9 @@
         id="namespace-switcher"
         options={namespaceList}
         optionValueKey="namespace"
+        on:change={handleNamespaceSelect}
       >
         <Icon name="namespace-switcher" slot="leading" />
-        <svelte:fragment let:option>
-          <ComboboxOption
-            selected={option.namespace === namespace}
-            on:click={() => handleNamespaceSelect(option)}
-          >
-            {option.namespace}
-          </ComboboxOption>
-        </svelte:fragment>
       </Combobox>
       <DataEncoderStatus />
     {/if}

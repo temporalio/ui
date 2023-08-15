@@ -1,8 +1,8 @@
 <script lang="ts" context="module">
-  import { clickOutside } from '$lib/holocene/outside-click';
-  import { setContext } from 'svelte';
+  import { setContext, createEventDispatcher } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import { type Writable, writable } from 'svelte/store';
+  import { clickOutside } from '$lib/holocene/outside-click';
 
   export const MENU_CONTEXT = 'menu-context';
 
@@ -25,8 +25,10 @@
 
   const keepOpen = writable(false);
   const menuElement: Writable<HTMLUListElement> = writable(null);
+  const dispatch = createEventDispatcher<{ close: undefined }>();
 
   const closeMenu = () => {
+    dispatch('close');
     $open = false;
   };
 

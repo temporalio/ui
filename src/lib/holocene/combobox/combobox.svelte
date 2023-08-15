@@ -1,10 +1,13 @@
 <script lang="ts" generics="T extends object">
+  import { onMount, createEventDispatcher } from 'svelte';
   import { writable } from 'svelte/store';
   import type { HTMLInputAttributes } from 'svelte/elements';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   import MenuButton from '../menu/menu-button.svelte';
+
+  const dispatch = createEventDispatcher<{ change: T | string }>();
 
   type ExtendedInputEvent = Event & {
     currentTarget: EventTarget & HTMLInputElement;
@@ -50,15 +53,16 @@
   export let readonly: boolean = false;
   export let required: boolean = false;
   export let optionValueKey = null;
-  export let optionLabelKey = null;
+  export let optionLabelKey = optionValueKey;
 
   let displayValue: string;
+  let selectedOption: string | T;
   let menuElement: HTMLUListElement;
   const open = writable<boolean>(false);
   $: list = options;
 
-  $: {
-    const selectedOption = options.find((option) => {
+  onMount(() => {
+    selectedOption = options.find((option) => {
       if (isString(option)) {
         return option === value;
       } else {
@@ -66,32 +70,58 @@
       }
     });
 
-    if (selectedOption === undefined) {
-      displayValue = '';
-    } else if (isString(selectedOption)) {
-      displayValue = selectedOption;
-    } else {
-      displayValue = selectedOption[optionLabelKey ?? optionValueKey];
-    }
-  }
+    displayValue = getDisplayValue(selectedOption);
+  });
 
-  export const openList = () => {
+  const openList = () => {
     $open = true;
   };
 
-  export const closeList = () => {
+  const closeList = () => {
     if (!$open) return;
     $open = false;
+    resetValueAndOptions();
+  };
+
+  const resetValueAndOptions = () => {
+    displayValue = getDisplayValue(selectedOption);
+    list = options;
   };
 
   const narrowOption = (option: unknown): T => option as T;
 
-  const isString = (option: unknown): option is string => {
+  const isString = (option: string | T): option is string => {
     return typeof option === 'string';
   };
 
+  const isObject = (option: string | T): option is T => {
+    return typeof option === 'object' && optionValueKey in option;
+  };
+
+  const getDisplayValue = (option: string | T): string => {
+    if (isString(option)) {
+      return option;
+    } else if (isObject(option)) {
+      return option[optionLabelKey];
+    }
+
+    return '';
+  };
+
+  const getValue = (option: string | T): string => {
+    if (isString(option)) {
+      return option;
+    } else if (isObject(option)) {
+      return option[optionValueKey];
+    }
+
+    return '';
+  };
+
   const handleSelectOption = (option: string | T) => {
-    value = isString(option) ? option : option[optionValueKey];
+    dispatch('change', option);
+    value = getValue(option);
+    displayValue = getDisplayValue(option);
     closeList();
   };
 
@@ -135,7 +165,7 @@
           .toLowerCase()
           .includes(event.currentTarget.value.toLowerCase());
       } else {
-        return option[optionLabelKey ?? optionValueKey]
+        return option[optionLabelKey]
           .toLowerCase()
           .includes(event.currentTarget.value.toLowerCase());
       }
@@ -147,7 +177,7 @@
   };
 </script>
 
-<MenuContainer {open}>
+<MenuContainer {open} on:close={resetValueAndOptions}>
   <label class="combobox-label" class:sr-only={labelHidden} for={id}>
     {label}
   </label>
@@ -160,7 +190,7 @@
       {required}
       {readonly}
       {disabled}
-      value={displayValue}
+      bind:value={displayValue}
       class:disabled
       class="combobox-input {className}"
       role="combobox"
@@ -183,7 +213,14 @@
 
   <Menu bind:menuElement id="{id}-listbox" role="listbox">
     {#each list as option}
-      {#if typeof option === 'string'}
+      {#if isObject(option)}
+        <ComboboxOption
+          on:click={() => handleSelectOption(option)}
+          selected={value === option[optionValueKey]}
+        >
+          {option[optionLabelKey]}
+        </ComboboxOption>
+      {:else if isString(option)}
         <ComboboxOption
           on:click={() => handleSelectOption(option)}
           selected={value === option}
