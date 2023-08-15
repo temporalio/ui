@@ -1,19 +1,19 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  
+
   import Icon from '$lib/holocene/icon/icon.svelte';
-  
+
   import type { IconName } from './icon/paths';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
-    intent: 'warning' | 'error' | 'success' | 'info';
+    intent: 'warning' | 'caution' | 'error' | 'success' | 'info';
     title?: string;
     icon?: IconName;
     bold?: boolean;
     'data-testid'?: string;
   }
 
-  export let intent: 'warning' | 'error' | 'success' | 'info';
+  export let intent: 'warning' | 'caution' | 'error' | 'success' | 'info';
   export let title = '';
   export let icon: IconName = null;
   export let bold = false;
@@ -47,7 +47,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply flex rounded-md border p-5 font-secondary text-sm;
+    @apply flex rounded-md border p-5 font-primary text-sm;
   }
 
   .alert.bold {
@@ -64,6 +64,10 @@
 
   .alert.error {
     @apply border-red-700 bg-red-100 text-red-700;
+  }
+
+  .alert.caution {
+    @apply border-orange-700 bg-orange-50 text-orange-700;
   }
 
   .alert.warning {
