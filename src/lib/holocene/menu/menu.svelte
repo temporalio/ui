@@ -31,7 +31,7 @@
 <ul
   in:fly={{ duration: 100 }}
   role="menu"
-  class="menu {position} {className}"
+  class="menu min-w-full {position} {className}"
   class:hidden={!$open}
   aria-labelledby={id}
   tabindex={-1}
