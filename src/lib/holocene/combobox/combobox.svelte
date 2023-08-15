@@ -1,5 +1,9 @@
 <script lang="ts" generics="T extends object">
-  import { onMount, createEventDispatcher } from 'svelte';
+  import Icon from '../icon/icon.svelte';
+
+  import type { IconName } from '../icon/paths';
+
+  import { createEventDispatcher } from 'svelte';
   import { writable } from 'svelte/store';
   import type { HTMLInputAttributes } from 'svelte/elements';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
@@ -23,22 +27,36 @@
     placeholder?: string;
     readonly?: boolean;
     required?: boolean;
+    leadingIcon?: IconName;
     'data-testid'?: string;
   }
 
-  type DefaultOptionsProps = {
+  type UncontrolledStringOptionProps = {
     options: string[];
+    optionValueKey?: never;
+    optionLabelKey?: never;
+    renderDisplayValue?: never;
   };
 
-  type CustomOptionsProps = {
+  type UncontrolledCustomOptionProps = {
     options: T[];
     optionValueKey: keyof T;
     optionLabelKey?: keyof T;
   };
 
+  type ControlledCustomOptionProps = {
+    options: T[];
+    renderDisplayValue: (option: T) => string;
+    filter: (option: T, value: string) => boolean;
+    match: (option: T, value: string) => boolean;
+    optionValueKey?: never;
+    optionLabelKey?: never;
+  };
+
   type $$Props =
-    | (BaseProps & DefaultOptionsProps)
-    | (BaseProps & CustomOptionsProps);
+    | (BaseProps & UncontrolledStringOptionProps)
+    | (BaseProps & UncontrolledCustomOptionProps)
+    | (BaseProps & ControlledCustomOptionProps);
 
   let className = '';
   export { className as class };
@@ -52,8 +70,12 @@
   export let placeholder: string = null;
   export let readonly: boolean = false;
   export let required: boolean = false;
-  export let optionValueKey = null;
-  export let optionLabelKey = optionValueKey;
+  export let leadingIcon: IconName = null;
+  export let optionValueKey: keyof T = null;
+  export let optionLabelKey: keyof T = optionValueKey;
+  export let renderDisplayValue: (option: T) => string = () => '';
+  export let filter: (option: T, value: string) => boolean = () => false;
+  export let match: (option: T, value: string) => boolean = () => false;
 
   let displayValue: string;
   let selectedOption: string | T;
@@ -61,17 +83,23 @@
   const open = writable<boolean>(false);
   $: list = options;
 
-  onMount(() => {
+  $: {
     selectedOption = options.find((option) => {
-      if (isString(option)) {
+      if (isStringOption(option)) {
         return option === value;
-      } else {
-        return option[optionValueKey] === value;
+      }
+
+      if (isObjectOption(option)) {
+        if (canRenderCustomOption(option)) {
+          return option[optionValueKey] === value;
+        }
+
+        return match(option, value);
       }
     });
 
     displayValue = getDisplayValue(selectedOption);
-  });
+  }
 
   const openList = () => {
     $open = true;
@@ -90,39 +118,50 @@
 
   const narrowOption = (option: unknown): T => option as T;
 
-  const isString = (option: string | T): option is string => {
+  const isStringOption = (option: string | T): option is string => {
     return typeof option === 'string';
   };
 
-  const isObject = (option: string | T): option is T => {
-    return typeof option === 'object' && optionValueKey in option;
+  const isObjectOption = (option: string | T): option is T => {
+    return typeof option === 'object';
+  };
+
+  const canRenderCustomOption = (option: T) => {
+    return (
+      optionValueKey !== null &&
+      optionLabelKey !== null &&
+      optionValueKey in option &&
+      optionValueKey in option
+    );
   };
 
   const getDisplayValue = (option: string | T): string => {
-    if (isString(option)) {
+    if (isStringOption(option)) {
       return option;
-    } else if (isObject(option)) {
-      return option[optionLabelKey];
     }
 
-    return '';
+    if (isObjectOption(option)) {
+      if (canRenderCustomOption(option)) {
+        return option[optionLabelKey];
+      } else {
+        return renderDisplayValue(option);
+      }
+    }
   };
 
-  const getValue = (option: string | T): string => {
-    if (isString(option)) {
-      return option;
-    } else if (isObject(option)) {
-      return option[optionValueKey];
+  const setValue = (option: string | T): void => {
+    if (isStringOption(option)) {
+      value = option;
     }
 
-    return '';
+    if (isObjectOption(option) && canRenderCustomOption(option)) {
+      value = option[optionValueKey];
+    }
   };
 
   const handleSelectOption = (option: string | T) => {
     dispatch('change', option);
-    value = getValue(option);
-    displayValue = getDisplayValue(option);
-    closeList();
+    setValue(option);
   };
 
   const focusFirstOption = () => {
@@ -158,16 +197,24 @@
   };
 
   const handleInput = (event: ExtendedInputEvent) => {
+    displayValue = event.currentTarget.value;
     if (!$open) openList();
+
     list = options.filter((option) => {
-      if (isString(option)) {
+      if (isStringOption(option)) {
         return option
           .toLowerCase()
           .includes(event.currentTarget.value.toLowerCase());
-      } else {
-        return option[optionLabelKey]
-          .toLowerCase()
-          .includes(event.currentTarget.value.toLowerCase());
+      }
+
+      if (isObjectOption(option)) {
+        if (canRenderCustomOption(option)) {
+          return String(option[optionLabelKey])
+            .toLowerCase()
+            .includes(event.currentTarget.value.toLowerCase());
+        }
+
+        return filter(option, event.currentTarget.value);
       }
     });
   };
@@ -183,14 +230,18 @@
   </label>
 
   <MenuButton hasIndicator {disabled} controls="{id}-listbox">
-    <slot name="leading" slot="leading" />
+    <svelte:fragment slot="leading">
+      {#if leadingIcon}
+        <Icon name={leadingIcon} />
+      {/if}
+    </svelte:fragment>
     <input
       {id}
       {placeholder}
       {required}
       {readonly}
       {disabled}
-      bind:value={displayValue}
+      value={displayValue}
       class:disabled
       class="combobox-input {className}"
       role="combobox"
@@ -208,27 +259,28 @@
       data-testid={$$props['data-testid'] ?? id}
       {...$$restProps}
     />
-    <slot name="trailing" slot="trailing" />
   </MenuButton>
 
   <Menu bind:menuElement id="{id}-listbox" role="listbox">
     {#each list as option}
-      {#if isObject(option)}
-        <ComboboxOption
-          on:click={() => handleSelectOption(option)}
-          selected={value === option[optionValueKey]}
-        >
-          {option[optionLabelKey]}
-        </ComboboxOption>
-      {:else if isString(option)}
+      {#if isStringOption(option)}
         <ComboboxOption
           on:click={() => handleSelectOption(option)}
           selected={value === option}
         >
           {option}
         </ComboboxOption>
-      {:else}
-        <slot option={narrowOption(option)} />
+      {:else if isObjectOption(option)}
+        {#if canRenderCustomOption(option)}
+          <ComboboxOption
+            on:click={() => handleSelectOption(option)}
+            selected={value === option[optionValueKey]}
+          >
+            {option[optionLabelKey]}
+          </ComboboxOption>
+        {:else}
+          <slot option={narrowOption(option)} />
+        {/if}
       {/if}
     {:else}
       <ComboboxOption disabled>{noResultsText}</ComboboxOption>

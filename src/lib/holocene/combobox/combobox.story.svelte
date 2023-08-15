@@ -5,7 +5,13 @@
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   export let Hst: HST;
 
-  let options = ['English', 'English (UK)', 'German', 'French', 'Japanese'];
+  let stringOptions = [
+    'English',
+    'English (UK)',
+    'German',
+    'French',
+    'Japanese',
+  ];
 
   type CustomOption = {
     label: string;
@@ -22,31 +28,43 @@
     { label: 'Japanese', value: 'jp', flag: '🇯🇵' },
   ];
 
-  let customCombobox: Combobox<CustomOption>;
-  let value: string;
-  let customValue = customOptions[0].value;
+  let value = stringOptions[0];
+  let customValue = customOptions[1].value;
 
   const handleSelect = (option: CustomOption) => {
     customValue = option.value;
-    customCombobox.closeList();
+  };
+
+  const match = (option: CustomOption, value: string) => {
+    return option.value === value;
+  };
+
+  const filter = (option: CustomOption, value: string) => {
+    return (
+      option.label.toLowerCase().includes(value.toLowerCase()) ||
+      option.value.toLowerCase().includes(value.toLowerCase())
+    );
+  };
+
+  const renderDisplayValue = (option: CustomOption) => {
+    return option.label;
   };
 </script>
 
 <Hst.Story title="combobox">
-  <Hst.Variant title="a combobox with default options">
+  <Hst.Variant title="a combobox with string options (uncontrolled)">
     <Combobox
       bind:value
       label="Select a Language"
       placeholder="Type a Language..."
       noResultsText="No Results"
       id="combobox-1"
-      {options}
+      options={stringOptions}
     />
   </Hst.Variant>
 
-  <Hst.Variant title="a combobox with custom options">
+  <Hst.Variant title="a combobox with custom options (uncontrolled)">
     <Combobox
-      bind:this={customCombobox}
       bind:value={customValue}
       label="Select a Language"
       noResultsText="No Results"
@@ -54,12 +72,25 @@
       options={customOptions}
       optionLabelKey="label"
       optionValueKey="value"
+    />
+  </Hst.Variant>
+
+  <Hst.Variant title="a combobox with custom options (controlled)">
+    <Combobox
+      value={customValue}
+      label="Select a Language"
+      noResultsText="No Results"
+      id="combobox-3"
+      leadingIcon="regions"
+      options={customOptions}
+      {renderDisplayValue}
+      {filter}
+      {match}
     >
-      <Icon name="regions" slot="leading" />
       <svelte:fragment let:option>
         <ComboboxOption
-          on:select={() => handleSelect(option)}
-          selected={value === option.value}
+          on:click={() => handleSelect(option)}
+          selected={customValue === option.value}
           disabled={option.disabled}
         >
           <span slot="leading">

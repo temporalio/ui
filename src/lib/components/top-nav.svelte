@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     MenuContainer,
     MenuButton,
@@ -55,12 +54,11 @@
         labelHidden
         value={namespace}
         id="namespace-switcher"
+        leadingIcon="namespace-switcher"
         options={namespaceList}
         optionValueKey="namespace"
         on:change={handleNamespaceSelect}
-      >
-        <Icon name="namespace-switcher" slot="leading" />
-      </Combobox>
+      />
       <DataEncoderStatus />
     {/if}
     {#if $authUser.accessToken}
