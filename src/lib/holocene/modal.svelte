@@ -56,6 +56,8 @@
 
   const handleCancel = () => {
     dispatch('cancelModal');
+    open = false;
+    error = '';
   };
 
   const confirmModal = () => {

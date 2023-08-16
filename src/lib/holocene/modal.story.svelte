@@ -20,15 +20,11 @@
   const handleConfirm = () => {
     logEvent('Confirm', {});
     basicModalOpen = false;
-    formModalOpen = false;
     deleteConfirm = '';
   };
 
   const handleCancel = () => {
     logEvent('Cancel', {});
-    basicModalOpen = false;
-    formModalOpen = false;
-    formModalError = '';
     deleteConfirm = '';
   };
 
@@ -44,6 +40,7 @@
         }
       });
       formModalOpen = false;
+      deleteConfirm = '';
     } catch {
       formModalError = errorText;
     } finally {
@@ -66,7 +63,7 @@
       cancelText="Cancel"
       on:confirmModal={handleConfirm}
       on:cancelModal={handleCancel}
-      open={basicModalOpen}
+      bind:open={basicModalOpen}
     >
       <h3 slot="title">Delete User</h3>
       <p slot="content">
@@ -88,8 +85,8 @@
       {loading}
       on:cancelModal={handleCancel}
       on:confirmModal={makeFakeApiRequest}
-      open={formModalOpen}
-      error={formModalError}
+      bind:open={formModalOpen}
+      bind:error={formModalError}
     >
       <h3 slot="title">Delete Namespace</h3>
       <div slot="content" class="flex flex-col gap-2">

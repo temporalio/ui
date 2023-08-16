@@ -42,22 +42,16 @@
       reason: formatReason({ action, reason, email: $authUser.email }),
     });
   };
-
-  const handleCancelModal = () => {
-    error = '';
-    isOpen = false;
-  };
 </script>
 
 <Modal
   id="batch-operation-confirmation-modal"
-  open={isOpen}
-  {error}
+  bind:open={isOpen}
+  bind:error
   data-testid="batch-{actionText}-confirmation"
   confirmType="destructive"
   cancelText={translate('cancel')}
   {confirmText}
-  on:cancelModal={handleCancelModal}
   on:confirmModal={handleConfirmModal}
 >
   <h3 slot="title">

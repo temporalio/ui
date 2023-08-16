@@ -63,23 +63,17 @@
 
   const hideTerminationModal = () => {
     reason = '';
-    error = '';
-    terminateConfirmationModalOpen = false;
   };
 
   const hideSignalModal = () => {
     signalInput = '';
     signalName = '';
-    error = '';
-    signalConfirmationModalOpen = false;
   };
 
   const hideResetModal = () => {
     resetReapplyType = ResetReapplyType.Unspecified;
     resetId = undefined;
     resetReason = undefined;
-    error = '';
-    resetConfirmationModalOpen = false;
   };
 
   const handleSuccessfulTermination = async () => {
@@ -299,8 +293,8 @@
   data-testid="reset-confirmation-modal"
   confirmText={translate('confirm')}
   cancelText={translate('cancel')}
-  {error}
-  open={resetConfirmationModalOpen}
+  bind:error
+  bind:open={resetConfirmationModalOpen}
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
   confirmDisabled={!resetId}
@@ -319,15 +313,11 @@
   data-testid="cancel-confirmation-modal"
   confirmText={translate('confirm')}
   cancelText={translate('cancel')}
-  {error}
-  open={cancelConfirmationModalOpen}
+  bind:error
+  bind:open={cancelConfirmationModalOpen}
   {loading}
   confirmType="destructive"
   on:confirmModal={cancel}
-  on:cancelModal={() => {
-    cancelConfirmationModalOpen = false;
-    error = '';
-  }}
 >
   <h3 slot="title">{translate('workflows', 'cancel-modal-title')}</h3>
   <svelte:fragment slot="content">
@@ -339,8 +329,8 @@
 <Modal
   id="terminate-confirmation-modal"
   data-testid="terminate-confirmation-modal"
-  {error}
-  open={terminateConfirmationModalOpen}
+  bind:error
+  bind:open={terminateConfirmationModalOpen}
   confirmText={translate('workflows', 'terminate')}
   cancelText={translate('cancel')}
   confirmType="destructive"
@@ -365,8 +355,8 @@
 <Modal
   id="signal-confirmation-modal"
   data-testid="signal-confirmation-modal"
-  {error}
-  open={signalConfirmationModalOpen}
+  bind:error
+  bind:open={signalConfirmationModalOpen}
   confirmText={translate('submit')}
   cancelText={translate('cancel')}
   confirmDisabled={!signalName}

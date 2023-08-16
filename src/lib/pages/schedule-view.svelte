@@ -87,6 +87,10 @@
     reason = '';
     pauseConfirmationModalOpen = false;
   };
+
+  const resetReason = () => {
+    reason = '';
+  };
 </script>
 
 {#await scheduleFetch}
@@ -206,7 +210,7 @@
     </div>
     <Modal
       id="pause-schedule-modal"
-      open={pauseConfirmationModalOpen}
+      bind:open={pauseConfirmationModalOpen}
       confirmType="primary"
       confirmText={schedule.schedule.state.paused
         ? translate('schedules', 'unpause')
@@ -214,10 +218,7 @@
       cancelText={translate('cancel')}
       confirmDisabled={!reason}
       on:confirmModal={() => handlePause(schedule)}
-      on:cancelModal={() => {
-        reason = '';
-        pauseConfirmationModalOpen = false;
-      }}
+      on:cancelModal={resetReason}
     >
       <h3 slot="title">
         {schedule.schedule.state.paused
@@ -249,17 +250,13 @@
     </Modal>
     <Modal
       id="delete-schedule-modal"
-      open={deleteConfirmationModalOpen}
-      {error}
+      bind:open={deleteConfirmationModalOpen}
+      bind:error
       confirmType="destructive"
       confirmText={translate('delete')}
       cancelText={translate('cancel')}
       on:confirmModal={handleDelete}
-      on:cancelModal={() => {
-        error = '';
-        reason = '';
-        deleteConfirmationModalOpen = false;
-      }}
+      on:cancelModal={resetReason}
     >
       <h3 slot="title">{translate('schedules', 'delete-modal-title')}</h3>
       <div slot="content">
