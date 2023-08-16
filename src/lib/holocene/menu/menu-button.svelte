@@ -167,7 +167,7 @@
   }
 
   .table-header {
-    @apply p-0 max-w-fit;
+    @apply p-0 max-w-fit text-sm;
   }
 
   .unroundLeft {

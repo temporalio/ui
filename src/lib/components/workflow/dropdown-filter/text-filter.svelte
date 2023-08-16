@@ -76,7 +76,7 @@
       labelHidden
       id={attributeToId[attribute]}
       placeholder={attributeToHumanReadable[attribute]}
-      class="flex items-center px-2 transition-all hover:cursor-pointer"
+      class="flex items-center p-2 transition-all hover:cursor-pointer"
       autoFocus
       clearable
       clearButtonLabel={translate('clear-input-button-label')}
