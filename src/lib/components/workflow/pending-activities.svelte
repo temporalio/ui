@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import { timeFormat, relativeTime } from '$lib/stores/time-format';
 
   import { formatDate } from '$lib/utilities/format-date';
   import { getDuration, formatDuration } from '$lib/utilities/format-time';
@@ -67,16 +68,13 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows', 'last-heartbeat')}
                     </h4>
-                    {`${formatDate(
+                    {formatDate(
                       pendingActivity.lastHeartbeatTime,
-                    )} (${formatDate(
-                      pendingActivity.lastHeartbeatTime,
-                      'local',
+                      $timeFormat,
                       {
-                        relative: true,
-                        relativeStrict: true,
+                        relative: $relativeTime,
                       },
-                    )})`}
+                    )}
                   </div>
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">
