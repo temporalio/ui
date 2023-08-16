@@ -130,4 +130,5 @@ export const Strings = {
   off: 'Off',
   labs: 'Labs',
   experimental: 'Experimental',
+  timezone: 'Timezone {{ timezone }}',
 } as const;

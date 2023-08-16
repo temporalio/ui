@@ -31,7 +31,7 @@
   export let destructive = false;
   export let disabled = false;
   export let href = null;
-  export let description = null;
+  export let description: string = null;
   export let centered = false;
 
   const { keepOpen, open } = getContext<MenuContext>(MENU_CONTEXT);
@@ -128,7 +128,7 @@
     <slot name="leading" />
     <div class:selected class:centered class="menu-item-wrapper">
       {#if description}
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col">
           <slot />
           <span class="menu-item-description">
             {description}
@@ -149,7 +149,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer font-primary text-sm font-medium min-h-[40px] max-w-[400px] px-2 m-1 flex flex-row items-center gap-2 rounded hover:bg-indigo-50 focus:bg-indigo-50 focus:outline focus:outline-1 focus:outline-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
+    @apply cursor-pointer font-primary text-sm font-medium  px-3 py-2 m-1 flex flex-row items-center gap-2 rounded hover:bg-indigo-50 focus:bg-indigo-50 focus:outline focus:outline-1 focus:outline-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
   }
 
   .menu-item-wrapper {
@@ -165,7 +165,7 @@
   }
 
   .menu-item-description {
-    @apply text-gray-500 font-normal;
+    @apply text-gray-500 font-normal text-xs;
   }
 
   .destructive {

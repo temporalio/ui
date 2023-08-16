@@ -50,7 +50,6 @@
     <TimezoneSelect />
     {#if showNamespaceSpecificNav}
       <Combobox
-        class="w-60"
         label={translate('namespaces', 'namespace-label', { namespace })}
         noResultsText={translate('no-results')}
         labelHidden

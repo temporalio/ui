@@ -44,7 +44,7 @@
 
 <style lang="postcss">
   .menu {
-    @apply absolute z-50 mt-1 overflow-scroll min-w-full w-max max-h-[480px] list-none rounded-lg border border-gray-900 bg-white text-primary shadow;
+    @apply absolute z-50 mt-1 overflow-scroll max-h-[480px] list-none rounded-lg border border-gray-900 bg-white text-primary shadow;
 
     &.left {
       @apply left-0 origin-top-left;
