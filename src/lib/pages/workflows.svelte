@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
   import { page } from '$app/stores';
-  import { timeFormat } from '$lib/stores/time-format';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import {
     refresh,
@@ -76,7 +75,6 @@
       <WorkflowsSummaryRow
         workflow={event}
         namespace={$page.params.namespace}
-        timeFormat={$timeFormat}
       />
     {:else}
       <tr>

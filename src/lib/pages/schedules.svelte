@@ -14,19 +14,11 @@
   import type { ScheduleListEntry } from '$types';
   import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
-  import { timeFormat } from '$lib/stores/time-format';
-  import { capitalize } from '$lib/utilities/format-camel-case';
+
   import { coreUserStore } from '$lib/stores/core-user';
-  import {
-    MenuContainer,
-    MenuButton,
-    Menu,
-    MenuItem,
-  } from '$lib/holocene/menu';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import Icon from '$lib/holocene/icon/icon.svelte';
 
   $: namespace = $page.params.namespace;
 
@@ -100,25 +92,6 @@
             on:submit={noop}
           />
         </div>
-      </svelte:fragment>
-      <svelte:fragment slot="action-top-right">
-        <MenuContainer>
-          <MenuButton hasIndicator controls="timezone-menu">
-            <Icon slot="leading" name="clock" />
-            {capitalize($timeFormat)}
-          </MenuButton>
-          <Menu id="timezone-menu">
-            <MenuItem on:click={() => ($timeFormat = 'relative')}
-              >{translate('relative')}</MenuItem
-            >
-            <MenuItem on:click={() => ($timeFormat = 'UTC')}
-              >{translate('utc')}</MenuItem
-            >
-            <MenuItem on:click={() => ($timeFormat = 'local')}
-              >{translate('local')}</MenuItem
-            >
-          </Menu>
-        </MenuContainer>
       </svelte:fragment>
       <SchedulesTable>
         {#each visibleItems as schedule}

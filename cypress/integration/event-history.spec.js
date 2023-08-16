@@ -157,18 +157,17 @@ describe('Workflow Events', () => {
 
     const dt = new Date(eventsFixtureDescending.history.events[0].eventTime);
 
-    cy.get('[data-testid=event-date-filter-button]').click();
-    cy.get('[data-testid=event-date-filter-relative]').click();
+    cy.get('[data-testid=timezones-menu-button]').click();
+    cy.get('[data-testid=timezones-relative-toggle]').click({ force: true });
     const relative = formatDistanceToNow(dt);
     cy.get('table').contains(relative);
 
-    cy.get('[data-testid=event-date-filter-button]').click();
-    cy.get('[data-testid=event-date-filter-UTC]').click();
+    cy.get('[data-testid=timezones-UTC]').click();
     const utc = dateTz.formatInTimeZone(dt, 'UTC', 'yyyy-MM-dd z HH:mm:ss.SS');
     cy.get('table').contains(utc);
 
-    cy.get('[data-testid=event-date-filter-button]').click();
-    cy.get('[data-testid=event-date-filter-local]').click();
+    cy.get('[data-testid=timezones-menu-button]').click();
+    cy.get('[data-testid=timezones-local]').click();
     const local = dateTz.format(dt, 'yyyy-MM-dd z HH:mm:ss.SS');
     cy.get('table').contains(local);
   });

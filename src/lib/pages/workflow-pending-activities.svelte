@@ -17,7 +17,7 @@
     formatMaximumAttempts,
     formatRetryExpiration,
   } from '$lib/utilities/format-event-attributes';
-  import { timeFormat } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   $: pendingActivities = $workflowRun.workflow?.pendingActivities;
@@ -121,13 +121,10 @@
             <li class="event-table-row">
               <h4>{translate('workflows', 'last-heartbeat')}</h4>
               <p>
-                {`${formatDate(details.lastHeartbeatTime)} (${formatDate(
-                  details.lastHeartbeatTime,
-                  'relative',
-                  {
-                    relativeStrict: true,
-                  },
-                )})`}
+                {formatDate(details.lastHeartbeatTime, $timeFormat, {
+                  relative: $relativeTime,
+                  relativeStrict: true,
+                })}
               </p>
             </li>
             <li class="event-table-row">
@@ -137,13 +134,21 @@
             {#if details.lastStartedTime}
               <li class="event-table-row">
                 <h4>{translate('workflows', 'last-started-time')}</h4>
-                <p>{formatDate(details.lastStartedTime, $timeFormat)}</p>
+                <p>
+                  {formatDate(details.lastStartedTime, $timeFormat, {
+                    relative: $relativeTime,
+                  })}
+                </p>
               </li>
             {/if}
             {#if details.scheduledTime}
               <li class="event-table-row">
                 <h4>{translate('workflows', 'scheduled-time')}</h4>
-                <p>{formatDate(details.scheduledTime, $timeFormat)}</p>
+                <p>
+                  {formatDate(details.scheduledTime, $timeFormat, {
+                    relative: $relativeTime,
+                  })}
+                </p>
               </li>
             {/if}
             {#if details.lastWorkerIdentity}

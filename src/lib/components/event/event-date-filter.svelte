@@ -3,7 +3,6 @@
 </script>
 
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     Menu,
     MenuButton,
@@ -12,8 +11,6 @@
     MenuDivider,
   } from '$lib/holocene/menu';
   import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
-  import { timeFormat, setTimeFormat } from '$lib/stores/time-format';
-  import type { TimeFormatOptions } from '$lib/stores/time-format';
   import type {
     EventSortOrder,
     EventSortOrderOptions,
@@ -22,7 +19,6 @@
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { getDateFilterValue } from '$lib/utilities/event-formatting';
-  import type { TimeFormat } from '$lib/types/global';
   import { translate } from '$lib/i18n/translate';
 
   export let compact: boolean;
@@ -32,12 +28,6 @@
     { label: translate('events', 'sort-descending'), option: 'descending' },
   ];
 
-  let dateOptions: TimeFormatOptions = [
-    { label: translate('relative'), option: 'relative' },
-    { label: translate('utc'), option: 'UTC' },
-    { label: translate('local'), option: 'local' },
-  ];
-
   const onSortOptionClick = (option: EventSortOrder) => {
     $eventFilterSort = option;
     updateQueryParameters({
@@ -45,10 +35,6 @@
       value: option,
       url: $page.url,
     });
-  };
-
-  const onDateOptionClick = (option: TimeFormat) => {
-    setTimeFormat(option);
   };
 
   const onShowElapsedClick = () => {
@@ -61,7 +47,6 @@
 
   $: value = getDateFilterValue({
     compact,
-    timeFormat: $timeFormat,
     sortOrder: $eventFilterSort,
     showElapsed: $eventShowElapsed,
   });
@@ -82,14 +67,6 @@
       <MenuItem
         selected={$eventFilterSort === option}
         on:click={() => onSortOptionClick(option)}>{label}</MenuItem
-      >
-    {/each}
-    <MenuDivider />
-    {#each dateOptions as { option, label }}
-      <MenuItem
-        data-testid="event-date-filter-{option}"
-        selected={$timeFormat === option}
-        on:click={() => onDateOptionClick(option)}>{label}</MenuItem
       >
     {/each}
     <MenuDivider />

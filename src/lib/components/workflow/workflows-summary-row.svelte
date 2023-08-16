@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
   import { getMilliseconds } from '$lib/utilities/format-time';
   import { routeForEventHistory } from '$lib/utilities/route-for';
@@ -13,12 +14,10 @@
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
 
-  import type { TimeFormat } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
-  export let timeFormat: TimeFormat | string;
 
   $: href = routeForEventHistory({
     namespace,
@@ -70,7 +69,7 @@
       filterable={false}
     />
     <p class="inline-time-cell">
-      {formatDate(workflow.startTime, timeFormat)}
+      {formatDate(workflow.startTime, $timeFormat, { relative: $relativeTime })}
     </p>
   </td>
   <td
@@ -100,17 +99,17 @@
       filtered={$page.url?.searchParams?.get('query')?.includes(workflow.name)}
     />
     <p class="inline-time-cell">
-      {formatDate(workflow.endTime, timeFormat)}
+      {formatDate(workflow.endTime, $timeFormat, { relative: $relativeTime })}
     </p>
   </td>
   <td class="time-cell">
     <p>
-      {formatDate(workflow.startTime, timeFormat)}
+      {formatDate(workflow.startTime, $timeFormat, { relative: $relativeTime })}
     </p>
   </td>
   <td class="time-cell">
     <p>
-      {formatDate(workflow.endTime, timeFormat)}
+      {formatDate(workflow.endTime, $timeFormat, { relative: $relativeTime })}
     </p>
   </td>
 </TableRow>

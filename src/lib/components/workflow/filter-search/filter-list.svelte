@@ -4,10 +4,14 @@
   import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
   import { page } from '$app/stores';
   import { labsMode } from '$lib/stores/labs-mode';
-  import { timeFormat } from '$lib/stores/time-format';
+  import {
+    type TimeFormat,
+    relativeTime,
+    timeFormat,
+  } from '$lib/stores/time-format';
   import { workflowFilters } from '$lib/stores/filters';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import { formatDateTime } from '$lib/utilities/format-date';
+  import { formatDate } from '$lib/utilities/format-date';
   import {
     isDateTimeFilter,
     isTextFilter,
@@ -64,12 +68,15 @@
     return conditional;
   };
 
-  const formatDateTimeRange = (value: string, format: string) => {
+  const formatDateTimeRange = (value: string, format: TimeFormat) => {
     const [conditon, start, operator, end] = value.split(' ');
-    return `${conditon.toLowerCase()} ${formatDateTime(
-      start,
-      format,
-    )} ${operator.toLowerCase()} ${formatDateTime(end, format)}`;
+    return `${conditon.toLowerCase()} ${formatDate(start, format, {
+      relative: $relativeTime,
+      abbrFormat: true,
+    })} ${operator.toLowerCase()} ${formatDate(end, format, {
+      relative: $relativeTime,
+      abbrFormat: true,
+    })}`;
   };
 </script>
 
@@ -106,7 +113,10 @@
                   {formatDateTimeRange(value, $timeFormat)}
                 {:else}
                   {getDateTimeConditonal(conditional)}
-                  {formatDateTime(value, $timeFormat)}
+                  {formatDate(value, $timeFormat, {
+                    relative: $relativeTime,
+                    abbrFormat: true,
+                  })}
                 {/if}
               {:else}
                 {conditional}

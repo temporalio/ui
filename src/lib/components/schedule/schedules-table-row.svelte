@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { ScheduleActionResult, ScheduleListEntry } from '$types';
   import { page } from '$app/stores';
-  import { timeFormat } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
   import {
     routeForEventHistory,
@@ -65,7 +65,10 @@
             namespace,
             workflow: run?.startWorkflowResult?.workflowId,
             run: run?.startWorkflowResult?.runId,
-          })}>{formatDate(run?.actualTime, $timeFormat)}</Link
+          })}
+          >{formatDate(run?.actualTime, $timeFormat, {
+            relative: $relativeTime,
+          })}</Link
         >
       </p>
     {/each}
@@ -73,7 +76,10 @@
   <td class="cell truncate max-xl:hidden">
     {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
       <div>
-        {formatDate(run, $timeFormat, { relativeLabel: translate('from-now') })}
+        {formatDate(run, $timeFormat, {
+          relative: $relativeTime,
+          relativeLabel: translate('from-now'),
+        })}
       </div>
     {/each}
   </td>

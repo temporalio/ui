@@ -107,8 +107,6 @@ export type User = {
 };
 export type ClusterInformation = import('$lib/types').GetClusterInfoResponse;
 
-export type TimeFormat = 'UTC' | 'relative' | 'local';
-
 export type SelectOptionValue = number | string | boolean;
 
 export type BooleanString = 'true' | 'false';

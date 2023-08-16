@@ -8,6 +8,7 @@
     MenuItem,
   } from '$lib/holocene/menu';
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
+  import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import { authUser } from '$lib/stores/auth-user';
   import type { NamespaceListItem } from '$lib/types/global';
   import { dataEncoder } from '$lib/stores/data-encoder';
@@ -46,6 +47,7 @@
   aria-label={translate('main')}
 >
   <div class="flex items-center gap-2">
+    <TimezoneSelect />
     {#if showNamespaceSpecificNav}
       <Combobox
         class="w-60"

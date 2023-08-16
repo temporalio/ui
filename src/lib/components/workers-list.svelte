@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import { timeFormat } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
   import { translate } from '$lib/i18n/translate';
 
@@ -152,7 +152,9 @@
         {/if}
         <td class="text-left" data-testid="worker-last-access-time">
           <p class="select-all">
-            {formatDate(poller.lastAccessTime, $timeFormat)}
+            {formatDate(poller.lastAccessTime, $timeFormat, {
+              relative: $relativeTime,
+            })}
           </p>
         </td>
         <td data-testid="workflow-poller">
