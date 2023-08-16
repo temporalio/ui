@@ -23,6 +23,7 @@
     variant?: MenuButtonVariant;
     class?: string;
     active?: boolean;
+    round?: boolean;
     'data-testid'?: string;
   }
 
@@ -38,6 +39,7 @@
   export let unroundLeft = false;
   export let variant: MenuButtonVariant = 'secondary';
   export let active = false;
+  export let round = false;
 
   const dispatch = createEventDispatcher<{ click: { open: boolean } }>();
   const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);
@@ -87,7 +89,7 @@
   {id}
   {disabled}
   type="button"
-  on:click={handleClick}
+  on:click|stopPropagation={handleClick}
   on:keydown={handleKeyDown}
   aria-haspopup={!disabled}
   aria-controls={controls}
@@ -97,10 +99,15 @@
   class:unroundLeft
   class:unroundRight
   class:active
+  class:round
   {...$$restProps}
 >
   <slot name="leading" />
-  <div class="flex items-center grow" class:hidden={!$$slots.default}>
+  <div
+    class="flex items-center grow"
+    class:justify-center={round}
+    class:hidden={!$$slots.default}
+  >
     <slot />
   </div>
   {#if hasIndicator}
@@ -135,7 +142,7 @@
   }
 
   .ghost {
-    @apply text-primary border border-primary border-opacity-0;
+    @apply text-primary border border-primary border-[transparent] hover:bg-gray-200 hover:border-indigo-600 hover:shadow-focus hover:shadow-blue-600/50 focus:bg-gray-200 focus:border focus:outline-none focus:border-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
 
     &:disabled {
       @apply bg-gray-100/50;
@@ -148,6 +155,10 @@
     &:disabled {
       @apply bg-gray-50;
     }
+  }
+
+  .round {
+    @apply w-10 p-0 rounded-full;
   }
 
   .secondary,

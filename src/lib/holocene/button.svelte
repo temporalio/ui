@@ -9,7 +9,7 @@
     | 'link'
     | 'menu';
 
-  export interface ButtonProps {
+  export interface ButtonProps extends HTMLButtonAttributes {
     variant?: ButtonVariant;
     id?: string;
     disabled?: boolean;
@@ -175,7 +175,7 @@
   }
 
   .ghost {
-    @apply bg-none py-2.5 px-4 font-primary border border-[transparent] text-sm text-gray-700 leading-5 font-medium hover:bg-gray-200 hover:border hover:border-indigo-700 focus:bg-gray-200 focus:border focus:border-indigo-700 hover:shadow-md;
+    @apply bg-none py-2.5 px-4 font-primary border border-[transparent] text-sm text-gray-700 leading-5 font-medium hover:bg-gray-200 hover:border hover:border-indigo-600 focus:bg-gray-200 focus:border focus:border-indigo-600 hover:shadow-focus hover:shadow-blue-600/50;
   }
 
   .ghost:hover {

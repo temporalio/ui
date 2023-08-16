@@ -135,7 +135,9 @@
     );
   };
 
-  const getDisplayValue = (option: string | T): string => {
+  const getDisplayValue = (option: string | T | undefined): string => {
+    if (!option) return '';
+
     if (isStringOption(option)) {
       return option;
     }

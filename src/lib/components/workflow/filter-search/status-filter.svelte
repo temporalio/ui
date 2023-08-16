@@ -115,8 +115,8 @@
       </MenuItem>
     {/each}
     <MenuDivider />
-    <Button variant="ghost" class="!w-full " on:click={onApply}
-      >{translate('apply')}</Button
+    <MenuItem centered disabled={statusFilters.length === 0} on:click={onApply}
+      >{translate('apply')}</MenuItem
     >
   </Menu>
 </MenuContainer>

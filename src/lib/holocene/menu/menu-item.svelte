@@ -23,6 +23,7 @@
     disabled?: boolean;
     href?: string;
     description?: string;
+    centered?: boolean;
     'data-testid'?: string;
   }
 
@@ -31,6 +32,7 @@
   export let disabled = false;
   export let href = null;
   export let description = null;
+  export let centered = false;
 
   const { keepOpen, open } = getContext<MenuContext>(MENU_CONTEXT);
 
@@ -124,7 +126,7 @@
     {...$$restProps}
   >
     <slot name="leading" />
-    <div class:selected class="menu-item-wrapper">
+    <div class:selected class:centered class="menu-item-wrapper">
       {#if description}
         <div class="flex flex-col gap-1">
           <slot />
@@ -135,11 +137,11 @@
       {:else}
         <slot />
       {/if}
-      <div class="flex w-6 h-6 shrink-0">
-        {#if selected}
+      {#if selected}
+        <div class="flex w-6 h-6 shrink-0">
           <Icon name="checkmark" />
-        {/if}
-      </div>
+        </div>
+      {/if}
     </div>
     <slot name="trailing" />
   </li>
@@ -147,19 +149,23 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer font-primary text-sm font-medium min-h-[40px] p-2 flex flex-row items-center gap-2 rounded hover:bg-indigo-50 focus:bg-indigo-50 focus:outline focus:outline-1 focus:outline-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
+    @apply cursor-pointer font-primary text-sm font-medium min-h-[40px] px-2 m-1 flex flex-row items-center gap-2 rounded hover:bg-indigo-50 focus:bg-indigo-50 focus:outline focus:outline-1 focus:outline-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
   }
 
   .menu-item-wrapper {
     @apply flex grow items-center justify-between;
+
+    &.centered {
+      @apply justify-center;
+    }
+
+    &.selected {
+      @apply text-indigo-600;
+    }
   }
 
   .menu-item-description {
     @apply text-gray-500 font-normal;
-  }
-
-  .selected {
-    @apply text-indigo-600;
   }
 
   .destructive {
