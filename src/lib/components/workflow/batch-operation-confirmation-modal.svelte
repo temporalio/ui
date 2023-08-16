@@ -13,10 +13,16 @@
   export let actionableWorkflowsLength: number;
   export let query: string;
 
-  let modal: Modal;
-  export const open = () => modal.open();
-  export const close = () => modal.close();
-  export const setError = (error: string) => modal.setError(error);
+  let reason: string = '';
+  let isOpen = false;
+  let error = '';
+
+  export const open = () => {
+    reason = '';
+    isOpen = true;
+  };
+  export const close = () => (isOpen = false);
+  export const setError = (err: string) => (error = err);
 
   const dispatch = createEventDispatcher<{
     confirm: { reason: string };
@@ -30,22 +36,23 @@
 
   $: placeholder = getPlacholder(action, $authUser.email);
 
-  let reason: string = '';
-
   const handleConfirmModal = () => {
+    error = '';
     dispatch('confirm', {
       reason: formatReason({ action, reason, email: $authUser.email }),
     });
   };
 
   const handleCancelModal = () => {
-    reason = '';
+    error = '';
+    isOpen = false;
   };
 </script>
 
 <Modal
   id="batch-operation-confirmation-modal"
-  bind:this={modal}
+  open={isOpen}
+  {error}
   data-testid="batch-{actionText}-confirmation"
   confirmType="destructive"
   cancelText={translate('cancel')}
