@@ -7,6 +7,7 @@
   import NamespaceList from '$lib/components/namespace-list.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
+  import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import { authUser } from '$lib/stores/auth-user';
   import type { NamespaceListItem } from '$lib/types/global';
   import { dataEncoder } from '$lib/stores/data-encoder';
@@ -38,6 +39,7 @@
 >
   <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">
+    <TimezoneSelect />
     {#if showNamespaceSpecificNav}
       {#key namespace}
         <DropdownMenu

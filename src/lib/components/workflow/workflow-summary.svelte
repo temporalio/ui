@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { timeFormat } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import {
     workflowRun,
     workflowSummaryViewOpen,
@@ -57,11 +57,15 @@
         <div class="h-0.5 rounded-full bg-gray-900" />
         <WorkflowDetail
           title={translate('start-time')}
-          content={formatDate(workflow?.startTime, $timeFormat)}
+          content={formatDate(workflow?.startTime, $timeFormat, {
+            relative: $relativeTime,
+          })}
         />
         <WorkflowDetail
           title={translate('close-time')}
-          content={formatDate(workflow?.endTime, $timeFormat)}
+          content={formatDate(workflow?.endTime, $timeFormat, {
+            relative: $relativeTime,
+          })}
         />
       </div>
     </div>

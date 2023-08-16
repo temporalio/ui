@@ -3,7 +3,7 @@
   import Panel from '$lib/components/panel.svelte';
   import WorkflowStatus from '../workflow-status.svelte';
   import { formatDate } from '$lib/utilities/format-date';
-  import { timeFormat } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { fetchWorkflowForSchedule } from '$lib/services/workflow-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -48,7 +48,11 @@
           </Link>
         </div>
         <div class="ml-auto">
-          <p>{formatDate(run.actualTime, $timeFormat)}</p>
+          <p>
+            {formatDate(run.actualTime, $timeFormat, {
+              relative: $relativeTime,
+            })}
+          </p>
         </div>
       </div>
     {:catch}
@@ -58,7 +62,11 @@
           {run.startWorkflowResult.workflowId}
         </div>
         <div class="ml-auto">
-          <p>{formatDate(run.actualTime, $timeFormat)}</p>
+          <p>
+            {formatDate(run.actualTime, $timeFormat, {
+              relative: $relativeTime,
+            })}
+          </p>
         </div>
       </div>
     {/await}

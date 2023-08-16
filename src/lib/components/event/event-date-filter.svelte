@@ -7,8 +7,6 @@
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
-  import { timeFormat, setTimeFormat } from '$lib/stores/time-format';
-  import type { TimeFormatOptions } from '$lib/stores/time-format';
   import type {
     EventSortOrder,
     EventSortOrderOptions,
@@ -17,7 +15,6 @@
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { getDateFilterValue } from '$lib/utilities/event-formatting';
-  import type { TimeFormat } from '$lib/types/global';
   import { translate } from '$lib/i18n/translate';
 
   export let compact: boolean;
@@ -27,12 +24,6 @@
     { label: translate('events', 'sort-descending'), option: 'descending' },
   ];
 
-  let dateOptions: TimeFormatOptions = [
-    { label: translate('relative'), option: 'relative' },
-    { label: translate('utc'), option: 'UTC' },
-    { label: translate('local'), option: 'local' },
-  ];
-
   const onSortOptionClick = (option: EventSortOrder) => {
     $eventFilterSort = option;
     updateQueryParameters({
@@ -40,10 +31,6 @@
       value: option,
       url: $page.url,
     });
-  };
-
-  const onDateOptionClick = (option: TimeFormat) => {
-    setTimeFormat(option);
   };
 
   const onShowElapsedClick = () => {
@@ -56,7 +43,6 @@
 
   $: value = getDateFilterValue({
     compact,
-    timeFormat: $timeFormat,
     sortOrder: $eventFilterSort,
     showElapsed: $eventShowElapsed,
   });
@@ -85,25 +71,6 @@
       </div>
     {/each}
 
-    <div class="option pr-4">
-      <div class="check" />
-      <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
-    </div>
-    {#each dateOptions as { label, option } (option)}
-      <div class="option" class:active={$timeFormat === option}>
-        <div class="check active">
-          {#if $timeFormat === option}
-            <Icon name="checkmark" />
-          {/if}
-        </div>
-        <button
-          data-testid="event-date-filter-{option}"
-          on:click={() => onDateOptionClick(option)}
-        >
-          {label}
-        </button>
-      </div>
-    {/each}
     <div class="option pr-4">
       <div class="check" />
       <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />

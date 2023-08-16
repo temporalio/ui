@@ -71,7 +71,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply w-full flex flex-col cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary hover:bg-gray-50 first-of-type:rounded-t last-of-type:rounded-b focus:outline-none focus-visible:outline focus-visible:bg-blue-50 focus-visible:outline-blue-700 focus-visible:-outline-offset-2;
+    @apply w-full flex flex-col cursor-pointer list-none bg-white p-2 my-2 first-of-type:mt-0 last-of-type:mb-0 font-primary text-sm font-medium text-primary hover:bg-gray-50 rounded focus:outline-none focus-visible:outline focus-visible:bg-blue-50 focus-visible:outline-blue-700 focus-visible:-outline-offset-2;
   }
 
   .dark {

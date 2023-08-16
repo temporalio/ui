@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { PageData } from './$types';
-  import { timeFormat } from '$lib/stores/time-format';
   import { page } from '$app/stores';
 
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
@@ -45,11 +44,7 @@
     >
       <WorkflowsSummaryTable>
         {#each visibleItems as event}
-          <WorkflowsSummaryRow
-            workflow={event}
-            namespace={namespaceName}
-            timeFormat={$timeFormat}
-          />
+          <WorkflowsSummaryRow workflow={event} namespace={namespaceName} />
         {/each}
       </WorkflowsSummaryTable>
     </Pagination>
