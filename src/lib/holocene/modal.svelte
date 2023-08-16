@@ -18,6 +18,8 @@
     large?: boolean;
     loading?: boolean;
     'data-testid'?: string;
+    open: boolean;
+    error?: string;
   }
 
   export let hideConfirm = false;
@@ -29,24 +31,23 @@
   export let loading = false;
   export let hightlightNav = false;
   export let id: string;
-
-  let error: string;
-
-  export const open = () => modalElement.showModal();
-
-  export const close = () => {
-    error = '';
-    modalElement.close();
-  };
-
-  export const setError = (err: string) => {
-    error = err;
-  };
+  export let open: boolean;
+  export let error = '';
 
   let className = '';
   export { className as class };
 
   let modalElement: HTMLDialogElement;
+
+  $: open, toggleModal();
+
+  export const toggleModal = () => {
+    if (open) {
+      modalElement?.showModal();
+    } else {
+      modalElement?.close();
+    }
+  };
 
   const dispatch = createEventDispatcher<{
     cancelModal: undefined;
@@ -54,12 +55,10 @@
   }>();
 
   const handleCancel = () => {
-    close();
     dispatch('cancelModal');
   };
 
   const confirmModal = () => {
-    error = '';
     dispatch('confirmModal');
   };
 
