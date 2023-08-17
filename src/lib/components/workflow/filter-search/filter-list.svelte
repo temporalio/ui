@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { parseJSON } from 'date-fns';
   import { fade } from 'svelte/transition';
   import { getContext } from 'svelte';
   import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
