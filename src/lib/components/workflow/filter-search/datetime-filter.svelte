@@ -9,6 +9,7 @@
     startOfDay,
   } from 'date-fns';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { toDate } from '$lib/utilities/to-duration';
   import { translate } from '$lib/i18n/translate';
 
   import Button from '$lib/holocene/button.svelte';
@@ -117,8 +118,7 @@
 
   const onApplyRelativeTime = () => {
     if (!relativeTime) return;
-
-    $filter.value = `${relativeTime} ${timeUnit}`;
+    $filter.value = toDate(`${relativeTime} ${timeUnit}`);
     $filter.customDate = false;
 
     handleSubmit();
