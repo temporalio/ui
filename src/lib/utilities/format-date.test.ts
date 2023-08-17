@@ -14,6 +14,9 @@ describe('formatDate', () => {
     const spy = vi.spyOn(console, 'error');
     formatDate('2022-04-13T16');
     expect(spy).toHaveBeenCalled();
+
+    formatDate('5 minutes');
+    expect(spy).toHaveBeenCalled();
   });
 
   it('should error if there is an invalid timezone', () => {
