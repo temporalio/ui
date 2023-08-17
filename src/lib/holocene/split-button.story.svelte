@@ -5,7 +5,7 @@
   import SplitButton from '$lib/holocene/split-button.svelte';
 
   export let Hst: HST;
-  let disabled: boolean = false;
+  let disabled = false;
   let position: 'left' | 'right' = 'left';
 </script>
 
