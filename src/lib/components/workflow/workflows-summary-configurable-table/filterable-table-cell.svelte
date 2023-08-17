@@ -22,6 +22,7 @@
     workflow: workflow.id,
     run: workflow.runId,
   });
+  $: displayValue = truncateValue(value);
 
   const onRowFilterClick = () => {
     const filter = $workflowFilters.find((f) => f.attribute === attribute);
@@ -43,9 +44,22 @@
 
     updateQueryParamsFromFilter($page.url, $workflowFilters);
   };
+
+  const truncateValue = (val: string) => {
+    return val?.length > 100
+      ? val.slice(0, 53) + '....' + val.slice(val.length - 54, val.length - 1)
+      : val;
+  };
 </script>
 
-<a {href} class="table-link">{value}</a>
+<a
+  {href}
+  class="table-link"
+  on:blur={() => (displayValue = truncateValue(value))}
+  on:mouseout={() => (displayValue = truncateValue(value))}
+  on:focus={() => (displayValue = value)}
+  on:mouseover={() => (displayValue = value)}>{displayValue}</a
+>
 <FilterOrCopyButtons
   copyIconTitle={translate('copy-icon-title')}
   copySuccessIconTitle={translate('copy-success-icon-title')}
