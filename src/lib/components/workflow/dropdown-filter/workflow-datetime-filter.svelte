@@ -182,6 +182,7 @@
           keepOpen
           id="time-range-filter-menu"
           class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-2"
+          position="right"
         >
           {#if custom}
             <div class="flex flex-col">
