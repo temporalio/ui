@@ -7,12 +7,18 @@
   } from '$lib/stores/workflow-run';
   import { routeForWorkers } from '$lib/utilities/route-for';
   import { formatDate } from '$lib/utilities/format-date';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import Accordion from '$lib/holocene/accordion.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import { translate } from '$lib/i18n/translate';
 
   $: ({ workflow } = $workflowRun);
+  $: elapsedTime = formatDistanceAbbreviated({
+    start: workflow?.startTime,
+    end: workflow?.endTime,
+  });
 </script>
 
 <section>
@@ -67,6 +73,14 @@
             relative: $relativeTime,
           })}
         />
+        {#if elapsedTime}
+          <span class="flex flex-row items-center pt-2">
+            <Icon class="min-w-fit" name="clock" />
+            <p class="truncate text-sm">
+              {elapsedTime}
+            </p>
+          </span>
+        {/if}
       </div>
     </div>
   </Accordion>
