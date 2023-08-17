@@ -97,7 +97,7 @@
       {/if}
     </div>
     <Input
-      id={`bulk-action-reason-${action}`}
+      id="bulk-action-reason-{action}"
       bind:value={reason}
       label={translate('reason')}
       hintText={translate(
