@@ -21,22 +21,22 @@
   export let primaryActionDisabled = false;
 </script>
 
-<div class="split-button">
-  <Button
-    {href}
-    {variant}
-    {thin}
-    unroundRight
-    disabled={disabled || primaryActionDisabled}
-    id="{id}-primary-button"
-    on:click
-  >
-    {#if icon}
-      <Icon name={icon} />
-    {/if}
-    {label}
-  </Button>
-  <MenuContainer class={$$props.class}>
+<MenuContainer class={$$props.class}>
+  <div class="split-button">
+    <Button
+      {href}
+      {variant}
+      {thin}
+      unroundRight
+      disabled={disabled || primaryActionDisabled}
+      id="{id}-primary-button"
+      on:click
+    >
+      {#if icon}
+        <Icon name={icon} />
+      {/if}
+      {label}
+    </Button>
     <MenuButton
       id="{id}-menu-button"
       label={menuLabel}
@@ -46,11 +46,12 @@
       {disabled}
       hasIndicator
     />
-    <Menu id="{id}-menu" {position}>
-      <slot />
-    </Menu>
-  </MenuContainer>
-</div>
+  </div>
+
+  <Menu id="{id}-menu" {position} class="w-full">
+    <slot />
+  </Menu>
+</MenuContainer>
 
 <style lang="postcss">
   .split-button {

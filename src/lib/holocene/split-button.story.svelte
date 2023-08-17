@@ -10,18 +10,20 @@
 </script>
 
 <Hst.Story>
-  <Hst.Variant title="A Split Button">
-    <SplitButton
-      {position}
-      {disabled}
-      id="button-1"
-      label="Edit"
-      menuLabel="Actions"
-    >
-      <MenuItem>Edit</MenuItem>
-      <MenuItem destructive>Delete</MenuItem>
-    </SplitButton>
-  </Hst.Variant>
+  <div class="flex">
+    <Hst.Variant title="A Split Button">
+      <SplitButton
+        {position}
+        {disabled}
+        id="button-1"
+        label="Edit"
+        menuLabel="Actions"
+      >
+        <MenuItem>Edit</MenuItem>
+        <MenuItem destructive>Delete</MenuItem>
+      </SplitButton>
+    </Hst.Variant>
+  </div>
 
   <svelte:fragment slot="controls">
     <Hst.Checkbox bind:value={disabled} title="Disabled" />
