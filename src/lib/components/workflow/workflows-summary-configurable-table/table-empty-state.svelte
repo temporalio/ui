@@ -65,7 +65,7 @@
             rel="noreferrer"
             target="_blank"
             class="underline hover:text-blue-700 hover:decoration-blue-700"
-            >Temporal's GitHub repository</a
+            >github.com/temporalio</a
           >.
         </p>
         <ul class="flex flex-col gap-2">
