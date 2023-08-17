@@ -69,7 +69,7 @@
   <div
     class="text-[10px] h-4 w-full pb-12 pt-24 text-center {isCloud
       ? 'text-gray-500'
-      : 'text-gray-300'}"
+      : 'text-white'}"
   >
     {#if version}
       <span class="sr-only">{translate('version')}</span>
