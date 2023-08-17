@@ -143,7 +143,7 @@
     >
       {translate('workflows', 'select-time')}
     </MenuButton>
-    <Menu keepOpen id="time-range-filter-menu" class="w-[400px]">
+    <Menu keepOpen id="time-range-filter-menu" class="w-[400px] p-2">
       {#if isTimeRange}
         <div class="flex flex-col gap-2">
           <div class="flex flex-col gap-2">
