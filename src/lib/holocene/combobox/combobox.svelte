@@ -234,7 +234,7 @@
   <MenuButton hasIndicator {disabled} controls="{id}-listbox">
     <svelte:fragment slot="leading">
       {#if leadingIcon}
-        <Icon name={leadingIcon} />
+        <Icon class="shrink-0" name={leadingIcon} />
       {/if}
     </svelte:fragment>
     <input
