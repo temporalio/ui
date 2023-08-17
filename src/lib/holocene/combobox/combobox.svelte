@@ -263,7 +263,7 @@
     />
   </MenuButton>
 
-  <Menu bind:menuElement id="{id}-listbox" role="listbox">
+  <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
     {#each list as option}
       {#if isStringOption(option)}
         <ComboboxOption
