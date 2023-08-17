@@ -28,6 +28,8 @@
     readonly?: boolean;
     required?: boolean;
     leadingIcon?: IconName;
+    maxWidth?: number;
+    minWidth?: number;
     'data-testid'?: string;
   }
 
@@ -73,6 +75,8 @@
   export let leadingIcon: IconName = null;
   export let optionValueKey: keyof T = null;
   export let optionLabelKey: keyof T = optionValueKey;
+  export let maxWidth = 100;
+  export let minWidth = 40;
   export let renderDisplayValue: (option: T) => string = () => '';
   export let filter: (option: T, value: string) => boolean = () => false;
   export let match: (option: T, value: string) => boolean = () => false;
@@ -80,8 +84,21 @@
   let displayValue: string;
   let selectedOption: string | T;
   let menuElement: HTMLUListElement;
+  let inputElement: HTMLInputElement;
   const open = writable<boolean>(false);
   $: list = options;
+
+  $: {
+    if (inputElement && value) {
+      if (value.length > minWidth && value.length < maxWidth) {
+        inputElement.size = value.length;
+      } else if (value.length <= minWidth) {
+        inputElement.size = minWidth;
+      } else if (value.length >= maxWidth) {
+        inputElement.size = maxWidth;
+      }
+    }
+  }
 
   $: {
     selectedOption = options.find((option) => {
@@ -243,6 +260,7 @@
       {required}
       {readonly}
       {disabled}
+      type="text"
       value={displayValue}
       class:disabled
       class="combobox-input {className}"
@@ -258,6 +276,7 @@
       on:input|stopPropagation={handleInput}
       on:keydown|stopPropagation={handleInputKeydown}
       on:click|stopPropagation={handleInputClick}
+      bind:this={inputElement}
       data-testid={$$props['data-testid'] ?? id}
       {...$$restProps}
     />
@@ -296,6 +315,6 @@
   }
 
   .combobox-input {
-    @apply w-full h-full flex content-center font-primary focus:outline-none focus:border-indigo-600;
+    @apply truncate h-full w-full font-primary focus:outline-none focus:border-indigo-600;
   }
 </style>

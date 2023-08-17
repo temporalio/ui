@@ -150,7 +150,7 @@
   }
 
   .menu-item-wrapper {
-    @apply flex grow items-center justify-between;
+    @apply flex grow items-center justify-between break-all;
 
     &.centered {
       @apply justify-center;
