@@ -45,17 +45,14 @@
         break;
       case 'ArrowDown':
       case 'ArrowRight':
-        event.preventDefault();
         focusNextMenuItem(event.currentTarget);
         break;
       case 'ArrowUp':
       case 'ArrowLeft':
-        event.preventDefault();
         focusPreviousMenuItem(event.currentTarget);
         break;
       case ' ':
       case 'Enter':
-        event.preventDefault();
         dispatch('click');
         if (!$keepOpen) $open = false;
         break;
@@ -122,7 +119,7 @@
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
     on:click|preventDefault|stopPropagation={handleClick}
-    on:keydown={handleKeydown}
+    on:keydown|preventDefault|stopPropagation={handleKeydown}
     {...$$restProps}
   >
     <slot name="leading" />
