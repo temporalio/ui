@@ -44,26 +44,29 @@
 
   let scheduleFetch = fetchSchedule(parameters);
 
-  let pauseConfirmationModal: Modal;
-  let deleteConfirmationModal: Modal;
+  let pauseConfirmationModalOpen = false;
+  let deleteConfirmationModalOpen = false;
   let reason = '';
+  let error = '';
 
   let coreUser = coreUserStore();
   let editDisabled = $coreUser.namespaceWriteDisabled(namespace);
 
   const handleDelete = async () => {
+    error = '';
     try {
       $loading = true;
       await deleteSchedule({ namespace, scheduleId });
-      deleteConfirmationModal?.close();
+      deleteConfirmationModalOpen = false;
       setTimeout(() => {
         $loading = false;
         goto(routeForSchedules({ namespace }));
       }, 2000);
+      reason = '';
     } catch (e) {
-      deleteConfirmationModal?.setError(
-        translate('schedules', 'delete-schedule-error', { error: e?.message }),
-      );
+      error = translate('schedules', 'delete-schedule-error', {
+        error: e?.message,
+      });
       $loading = false;
     }
   };
@@ -81,6 +84,11 @@
           reason,
         });
     scheduleFetch = fetchSchedule(parameters, fetch);
+    reason = '';
+    pauseConfirmationModalOpen = false;
+  };
+
+  const resetReason = () => {
     reason = '';
   };
 </script>
@@ -151,7 +159,7 @@
         menuLabel={translate('schedules', 'schedule-actions')}
         id="schedule-actions"
         disabled={editDisabled}
-        on:click={() => pauseConfirmationModal.open()}
+        on:click={() => (pauseConfirmationModalOpen = true)}
       >
         <MenuItem
           testId="edit-schedule"
@@ -162,7 +170,7 @@
         <MenuItem
           testId="delete-schedule"
           destructive
-          on:click={() => deleteConfirmationModal.open()}
+          on:click={() => (deleteConfirmationModalOpen = true)}
         >
           {translate('schedules', 'delete')}
         </MenuItem>
@@ -206,7 +214,7 @@
     </div>
     <Modal
       id="pause-schedule-modal"
-      bind:this={pauseConfirmationModal}
+      bind:open={pauseConfirmationModalOpen}
       confirmType="primary"
       confirmText={schedule.schedule.state.paused
         ? translate('schedules', 'unpause')
@@ -214,6 +222,7 @@
       cancelText={translate('cancel')}
       confirmDisabled={!reason}
       on:confirmModal={() => handlePause(schedule)}
+      on:cancelModal={resetReason}
     >
       <h3 slot="title">
         {schedule.schedule.state.paused
@@ -245,11 +254,13 @@
     </Modal>
     <Modal
       id="delete-schedule-modal"
-      bind:this={deleteConfirmationModal}
+      bind:open={deleteConfirmationModalOpen}
+      bind:error
       confirmType="destructive"
       confirmText={translate('delete')}
       cancelText={translate('cancel')}
       on:confirmModal={handleDelete}
+      on:cancelModal={resetReason}
     >
       <h3 slot="title">{translate('schedules', 'delete-modal-title')}</h3>
       <div slot="content">

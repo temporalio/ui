@@ -45,10 +45,11 @@
   let reason = '';
   let signalInput = '';
   let signalName = '';
-  let cancelConfirmationModal: Modal;
-  let terminateConfirmationModal: Modal;
-  let resetConfirmationModal: Modal;
-  let signalConfirmationModal: Modal;
+  let cancelConfirmationModalOpen = false;
+  let terminateConfirmationModalOpen = false;
+  let resetConfirmationModalOpen = false;
+  let signalConfirmationModalOpen = false;
+  let error = '';
   let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
   let resetId: string;
   let resetReason: string;
@@ -76,7 +77,7 @@
   };
 
   const handleSuccessfulTermination = async () => {
-    terminateConfirmationModal?.close();
+    terminateConfirmationModalOpen = false;
     $refresh = Date.now();
     toaster.push({
       id: 'workflow-termination-success-toast',
@@ -84,14 +85,13 @@
     });
   };
 
-  const handleTerminationError = (error: NetworkError) => {
+  const handleTerminationError = (err: NetworkError) => {
     reason = '';
-    terminateConfirmationModal?.setError(
-      error?.message ?? translate('unknown-error'),
-    );
+    error = err?.message ?? translate('unknown-error');
   };
 
   const terminate = () => {
+    error = '';
     if (!workflow.canBeTerminated) return;
     terminateWorkflow({
       workflow,
@@ -109,23 +109,22 @@
 
   const cancel = async () => {
     loading = true;
+    error = '';
     try {
       await cancelWorkflow({
         namespace,
         workflowId: workflow.id,
         runId: workflow.runId,
       });
-      cancelConfirmationModal?.close();
+      cancelConfirmationModalOpen = false;
       loading = false;
       $refresh = Date.now();
       toaster.push({
         id: 'workflow-cancelation-success-toast',
         message: translate('workflows', 'cancel-success'),
       });
-    } catch (error) {
-      cancelConfirmationModal?.setError(
-        error?.message ?? translate('unknown-error'),
-      );
+    } catch (err) {
+      error = err?.message ?? translate('unknown-error');
     }
   };
 
@@ -134,6 +133,7 @@
   };
 
   const signal = async () => {
+    error = '';
     try {
       await signalWorkflow({
         namespace,
@@ -142,22 +142,21 @@
         signalInput,
         signalName,
       });
-      signalConfirmationModal?.close();
+      signalConfirmationModalOpen = false;
       $refresh = Date.now();
       toaster.push({
         message: translate('workflows', 'signal-success'),
         id: 'workflow-signal-success-toast',
       });
-    } catch (error) {
-      signalConfirmationModal?.setError(
-        error?.message ?? translate('unknown-error'),
-      );
+    } catch (err) {
+      error = err?.message ?? translate('unknown-error');
     }
 
     hideSignalModal();
   };
 
   const reset = async () => {
+    error = '';
     try {
       const response = await resetWorkflow({
         namespace,
@@ -178,12 +177,10 @@
           [workflow.runId]: response.runId,
         }));
       }
-      resetConfirmationModal?.close();
+      resetConfirmationModalOpen = false;
       $refresh = Date.now();
-    } catch (error) {
-      resetConfirmationModal?.setError(
-        error?.message ?? translate('unknown-error'),
-      );
+    } catch (err) {
+      error = err?.message ?? translate('unknown-error');
     }
     hideResetModal();
   };
@@ -222,21 +219,21 @@
   $: workflowActions = [
     {
       label: translate('workflows', 'reset'),
-      onClick: () => resetConfirmationModal.open(),
+      onClick: () => (resetConfirmationModalOpen = true),
       testId: 'reset-button',
       allowed: resetAllowed,
       tooltip: resetAllowed ? '' : resetTooltipText,
     },
     {
       label: translate('workflows', 'signal'),
-      onClick: () => signalConfirmationModal.open(),
+      onClick: () => (signalConfirmationModalOpen = true),
       testId: 'signal-button',
       allowed: signalEnabled,
       tooltip: signalEnabled ? '' : translate('workflows', 'signal-disabled'),
     },
     {
       label: translate('workflows', 'terminate'),
-      onClick: () => terminateConfirmationModal.open(),
+      onClick: () => (terminateConfirmationModalOpen = true),
       testId: 'terminate-button',
       allowed: terminateEnabled,
       destructive: true,
@@ -259,7 +256,7 @@
     position="right"
     disabled={actionsDisabled}
     primaryActionDisabled={!cancelEnabled || cancelInProgress}
-    on:click={() => cancelConfirmationModal.open()}
+    on:click={() => (cancelConfirmationModalOpen = true)}
     label={translate('workflows', 'request-cancellation')}
     menuLabel={translate('workflows', 'workflow-actions')}
   >
@@ -284,7 +281,7 @@
       aria-label={translate('workflows', 'reset')}
       disabled={!resetAllowed}
       variant="primary"
-      on:click={() => resetConfirmationModal.open()}
+      on:click={() => (resetConfirmationModalOpen = true)}
     >
       {translate('workflows', 'reset')}
     </Button>
@@ -296,7 +293,8 @@
   data-testid="reset-confirmation-modal"
   confirmText={translate('confirm')}
   cancelText={translate('cancel')}
-  bind:this={resetConfirmationModal}
+  bind:error
+  bind:open={resetConfirmationModalOpen}
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
   confirmDisabled={!resetId}
@@ -315,7 +313,8 @@
   data-testid="cancel-confirmation-modal"
   confirmText={translate('confirm')}
   cancelText={translate('cancel')}
-  bind:this={cancelConfirmationModal}
+  bind:error
+  bind:open={cancelConfirmationModalOpen}
   {loading}
   confirmType="destructive"
   on:confirmModal={cancel}
@@ -330,7 +329,8 @@
 <Modal
   id="terminate-confirmation-modal"
   data-testid="terminate-confirmation-modal"
-  bind:this={terminateConfirmationModal}
+  bind:error
+  bind:open={terminateConfirmationModalOpen}
   confirmText={translate('workflows', 'terminate')}
   cancelText={translate('cancel')}
   confirmType="destructive"
@@ -355,7 +355,8 @@
 <Modal
   id="signal-confirmation-modal"
   data-testid="signal-confirmation-modal"
-  bind:this={signalConfirmationModal}
+  bind:error
+  bind:open={signalConfirmationModalOpen}
   confirmText={translate('submit')}
   cancelText={translate('cancel')}
   confirmDisabled={!signalName}

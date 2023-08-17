@@ -19,11 +19,11 @@
   );
 
   export const openBatchCancelConfirmationModal = () => {
-    batchCancelConfirmationModal.open();
+    batchCancelConfirmationModal?.open();
   };
 
   export const openBatchTerminateConfirmationModal = () => {
-    batchTerminateConfirmationModal.open();
+    batchTerminateConfirmationModal?.open();
   };
 
   export const handleSelectAll = (workflows: WorkflowExecution[]) => {
