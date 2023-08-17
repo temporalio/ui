@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { parseJSON } from 'date-fns';
   import { fade } from 'svelte/transition';
   import { getContext } from 'svelte';
   import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
@@ -11,7 +12,7 @@
   } from '$lib/stores/time-format';
   import { workflowFilters } from '$lib/stores/filters';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import { formatDate } from '$lib/utilities/format-date';
+  import { formatDate, isValidDate } from '$lib/utilities/format-date';
   import {
     isDateTimeFilter,
     isTextFilter,
@@ -68,13 +69,17 @@
     return conditional;
   };
 
-  const formatDateTimeRange = (value: string, format: TimeFormat) => {
+  const formatDateTimeRange = (
+    value: string,
+    format: TimeFormat,
+    relative: boolean,
+  ) => {
     const [conditon, start, operator, end] = value.split(' ');
     return `${conditon.toLowerCase()} ${formatDate(start, format, {
-      relative: $relativeTime,
+      relative,
       abbrFormat: true,
     })} ${operator.toLowerCase()} ${formatDate(end, format, {
-      relative: $relativeTime,
+      relative,
       abbrFormat: true,
     })}`;
   };
@@ -110,7 +115,7 @@
               {attribute}
               {#if isDateTimeFilter(attribute)}
                 {#if customDate}
-                  {formatDateTimeRange(value, $timeFormat)}
+                  {formatDateTimeRange(value, $timeFormat, $relativeTime)}
                 {:else}
                   {getDateTimeConditonal(conditional)}
                   {formatDate(value, $timeFormat, {
