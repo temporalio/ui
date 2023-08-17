@@ -131,4 +131,5 @@ export const Strings = {
   labs: 'Labs',
   experimental: 'Experimental',
   timezone: 'Timezone {{ timezone }}',
+  'time-unit': 'Time Unit',
 } as const;

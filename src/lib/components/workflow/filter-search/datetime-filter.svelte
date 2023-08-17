@@ -205,7 +205,7 @@
                 unroundLeft
                 bind:value={timeUnit}
                 id="relative-datetime-unit-input"
-                label="ross"
+                label={translate('time-unit')}
                 labelHidden
               >
                 {#each TIME_UNIT_OPTIONS as unit}
