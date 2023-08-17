@@ -131,7 +131,7 @@
       optionValueKey !== null &&
       optionLabelKey !== null &&
       optionValueKey in option &&
-      optionValueKey in option
+      optionLabelKey in option
     );
   };
 
