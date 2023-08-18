@@ -16,11 +16,6 @@
 
 <div class="w-full border-gray-700 lg:w-1/3 lg:border-r-2">
   <Table class="w-full table-fixed pb-2" variant="simple">
-    <caption class="sr-only" slot="caption"
-      >{translate('events', 'event-group', {
-        eventName: eventGroup.name,
-      })}</caption
-    >
     {#each [...eventGroup.events].reverse() as [id, eventInGroup] (id)}
       <tr
         class="row"

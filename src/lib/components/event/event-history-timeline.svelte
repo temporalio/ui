@@ -37,11 +37,11 @@
     });
     return `<div class="flex gap-1 items-center justify-between"><div class="bar-content"><p>${name}</p></div><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div></div>`;
   }
-  const createGroupItems = (eventGroups, isRunning) => {
+  const createGroupItems = (eventGroups, isRunning, sortedHistory) => {
     const items = new DataSet([]);
     const groups = new DataSet([]);
-    const firstEvent = history[0];
-    const finalEvent = history[history.length - 1];
+    const firstEvent = sortedHistory[0];
+    const finalEvent = sortedHistory[sortedHistory.length - 1];
     if ($workflowRun?.workflow?.status) {
       groups.add({
         id: 'workflow',
@@ -157,13 +157,14 @@
     if (history.length && timeline) {
       const reverseHistory =
         $eventFilterSort === 'descending' && $eventViewType !== 'compact';
-      const historyCopy = [...history];
-      const eventGroups = groupEvents(
-        reverseHistory ? historyCopy.reverse() : history,
-      );
+      const sortedHistory = reverseHistory
+        ? [...history].reverse()
+        : [...history];
+      const eventGroups = groupEvents(sortedHistory);
       const { groups, items } = createGroupItems(
         eventGroups,
         $workflowRun?.workflow?.isRunning,
+        sortedHistory,
       );
       setVizItems(items, groups);
     }
