@@ -129,7 +129,7 @@
 
 <style lang="postcss">
   .menu-button {
-    @apply relative text-sm w-full h-10 py-2.5 px-4 flex flex-row items-center gap-2 rounded-lg disabled:cursor-not-allowed;
+    @apply relative text-sm w-full h-10 py-2.5 px-4 flex flex-row items-center gap-2 rounded-lg disabled:cursor-not-allowed focus:z-50;
 
     &.active {
       @apply after:content-[''] after:rounded-full after:h-2 after:w-2 after:bg-blue-300 after:-translate-x-full after:-translate-y-full;
@@ -178,10 +178,10 @@
   }
 
   .unroundLeft {
-    @apply rounded-l-none border-l-0;
+    @apply rounded-l-none;
   }
 
   .unroundRight {
-    @apply rounded-r-none border-r-0;
+    @apply rounded-r-none;
   }
 </style>
