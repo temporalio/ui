@@ -150,45 +150,39 @@
     >
       {#if isTimeRange}
         <div class="flex flex-col gap-2">
-          <div class="flex flex-col gap-2">
-            <DatePicker
-              label={translate('start')}
-              on:datechange={onStartDateChange}
-              selected={startDate}
-              todayLabel={translate('today')}
-              closeLabel={translate('close')}
-              clearLabel={translate('clear-input-button-label')}
-            />
-            <TimePicker
-              bind:hour={startHour}
-              bind:minute={startMinute}
-              bind:second={startSecond}
-              bind:half={startHalf}
-            />
+          <DatePicker
+            label={translate('start')}
+            on:datechange={onStartDateChange}
+            selected={startDate}
+            todayLabel={translate('today')}
+            closeLabel={translate('close')}
+            clearLabel={translate('clear-input-button-label')}
+          />
+          <TimePicker
+            bind:hour={startHour}
+            bind:minute={startMinute}
+            bind:second={startSecond}
+            bind:half={startHalf}
+          />
+          <DatePicker
+            label={translate('end')}
+            on:datechange={onEndDateChange}
+            selected={endDate}
+            todayLabel={translate('today')}
+            closeLabel={translate('close')}
+            clearLabel={translate('clear-input-button-label')}
+          />
+          <TimePicker
+            bind:hour={endHour}
+            bind:minute={endMinute}
+            bind:second={endSecond}
+            bind:half={endHalf}
+          />
+          <div class="flex justify-end">
+            <Button variant="ghost" on:click={onApply}
+              >{translate('apply')}</Button
+            >
           </div>
-        </div>
-        <div class="flex flex-col gap-2">
-          <div class="flex flex-col gap-2">
-            <DatePicker
-              label={translate('end')}
-              on:datechange={onEndDateChange}
-              selected={endDate}
-              todayLabel={translate('today')}
-              closeLabel={translate('close')}
-              clearLabel={translate('clear-input-button-label')}
-            />
-            <TimePicker
-              bind:hour={endHour}
-              bind:minute={endMinute}
-              bind:second={endSecond}
-              bind:half={endHalf}
-            />
-          </div>
-        </div>
-        <div class="flex justify-end">
-          <Button variant="ghost" on:click={onApply}
-            >{translate('apply')}</Button
-          >
         </div>
       {:else}
         <div class="flex flex-col gap-2">
