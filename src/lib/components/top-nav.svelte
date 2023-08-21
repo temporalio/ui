@@ -60,6 +60,7 @@
         optionValueKey="namespace"
         on:change={handleNamespaceSelect}
         position="right"
+        size={32}
       />
       <DataEncoderStatus />
     {/if}
