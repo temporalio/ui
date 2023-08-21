@@ -20,6 +20,7 @@
 <MenuItem
   on:click
   role="option"
+  class="break-all"
   aria-selected={selected}
   aria-disabled={disabled}
   {disabled}

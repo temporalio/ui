@@ -24,9 +24,12 @@
     href?: string;
     description?: string;
     centered?: boolean;
+    class?: string;
     'data-testid'?: string;
   }
 
+  let className = '';
+  export { className as class };
   export let selected = false;
   export let destructive = false;
   export let disabled = false;
@@ -99,7 +102,7 @@
   <a
     {href}
     role="menuitem"
-    class="menu-item"
+    class="menu-item {className}"
     class:disabled
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
@@ -112,7 +115,7 @@
 {:else}
   <li
     role="menuitem"
-    class="menu-item"
+    class="menu-item {className}"
     class:destructive
     class:disabled
     aria-hidden={disabled ? 'true' : 'false'}
@@ -146,7 +149,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer break-all font-primary text-sm font-medium px-3 py-2 m-1 flex flex-row items-center gap-2 rounded hover:bg-indigo-50 focus:bg-indigo-50 focus:outline focus:outline-1 focus:outline-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
+    @apply cursor-pointer font-primary text-sm font-medium px-3 py-2 m-1 flex flex-row items-center gap-2 rounded hover:bg-indigo-50 focus:bg-indigo-50 focus:outline focus:outline-1 focus:outline-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
   }
 
   .menu-item-wrapper {
