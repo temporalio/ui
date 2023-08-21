@@ -179,7 +179,7 @@
         >
           {value}
         </MenuButton>
-        <Menu position="right" keepOpen id="time-range-filter-menu">
+        <Menu class="p-2" position="right" keepOpen id="time-range-filter-menu">
           {#if custom}
             <div class="flex flex-col w-96">
               <p class="text-sm">Start</p>
@@ -221,7 +221,7 @@
                 />
               </div>
             </div>
-            <div class="flex gap-2">
+            <div class="flex mt-2 gap-2">
               <Button on:click={onApply}>{translate('apply')}</Button>
               <Button variant="secondary" on:click={() => (custom = false)}
                 >{translate('cancel')}</Button

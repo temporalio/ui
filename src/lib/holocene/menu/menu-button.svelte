@@ -18,6 +18,7 @@
     hasIndicator?: boolean;
     id?: string;
     label?: string;
+    unround?: boolean;
     unroundRight?: boolean;
     unroundLeft?: boolean;
     variant?: MenuButtonVariant;
@@ -35,6 +36,7 @@
   export let hasIndicator: boolean = false;
   export let id: string = null;
   export let label: string = null;
+  export let unround = false;
   export let unroundRight = false;
   export let unroundLeft = false;
   export let variant: MenuButtonVariant = 'secondary';
@@ -99,6 +101,7 @@
   class:unroundLeft
   class:unroundRight
   class:active
+  class:unround
   class:round
   {...$$restProps}
 >
@@ -142,7 +145,7 @@
   }
 
   .ghost {
-    @apply text-primary border border-primary border-[transparent] hover:bg-gray-200 hover:border-indigo-600 hover:shadow-focus hover:shadow-blue-600/50 focus:bg-gray-200 focus:border focus:outline-none focus:border-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
+    @apply text-primary border border-[transparent] hover:bg-gray-200 hover:border-indigo-600 hover:shadow-focus hover:shadow-blue-600/50 focus:bg-gray-200 focus:outline-1 focus:outline-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
 
     &:disabled {
       @apply bg-gray-100/50;
@@ -170,11 +173,15 @@
     @apply p-0 max-w-fit text-sm;
   }
 
+  .unround {
+    @apply rounded-none;
+  }
+
   .unroundLeft {
-    @apply rounded-l-none;
+    @apply rounded-l-none border-l-0;
   }
 
   .unroundRight {
-    @apply rounded-r-none;
+    @apply rounded-r-none border-r-0;
   }
 </style>

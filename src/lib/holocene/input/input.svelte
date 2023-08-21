@@ -190,7 +190,7 @@
   }
 
   .unroundLeft {
-    @apply rounded-tl-none rounded-bl-none border-l-0;
+    @apply rounded-tl-none rounded-bl-none;
   }
 
   .noBorder {

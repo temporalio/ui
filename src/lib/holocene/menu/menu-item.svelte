@@ -104,7 +104,7 @@
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
-    on:keydown={handleKeydown}
+    on:keydown|stopPropagation={handleKeydown}
     {...$$restProps}
   >
     <slot />
@@ -119,7 +119,7 @@
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
     on:click|preventDefault|stopPropagation={handleClick}
-    on:keydown|preventDefault|stopPropagation={handleKeydown}
+    on:keydown|stopPropagation={handleKeydown}
     {...$$restProps}
   >
     <slot name="leading" />
@@ -146,11 +146,11 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer font-primary text-sm font-medium  px-3 py-2 m-1 flex flex-row items-center gap-2 rounded hover:bg-indigo-50 focus:bg-indigo-50 focus:outline focus:outline-1 focus:outline-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
+    @apply cursor-pointer font-primary text-sm font-medium px-3 py-2 m-1 flex flex-row items-center rounded hover:bg-indigo-50 focus:bg-indigo-50 focus:outline focus:outline-1 focus:outline-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
   }
 
   .menu-item-wrapper {
-    @apply flex grow items-center justify-between break-all;
+    @apply flex grow items-center justify-between;
 
     &.centered {
       @apply justify-center;

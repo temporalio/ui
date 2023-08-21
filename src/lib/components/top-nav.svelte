@@ -58,8 +58,8 @@
         leadingIcon="namespace-switcher"
         options={namespaceList}
         optionValueKey="namespace"
-        minWidth={34}
         on:change={handleNamespaceSelect}
+        position="right"
       />
       <DataEncoderStatus />
     {/if}

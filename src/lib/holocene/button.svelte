@@ -116,7 +116,7 @@
 
 <style lang="postcss">
   .button {
-    @apply relative flex w-fit items-center justify-center gap-2 rounded font-secondary text-sm;
+    @apply relative flex w-fit items-center justify-center gap-2 rounded-lg font-secondary text-sm;
   }
 
   .primary,

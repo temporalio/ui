@@ -20,6 +20,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { getDateFilterValue } from '$lib/utilities/event-formatting';
   import { translate } from '$lib/i18n/translate';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   export let compact: boolean;
 
@@ -60,7 +61,8 @@
     controls="event-date-filter-menu"
     data-testid="event-date-filter-button"
   >
-    {translate('date-and-time')}
+    <Icon class="md:hidden" name="clock" />
+    <span class="max-md:hidden">{translate('date-and-time')}</span>
   </MenuButton>
   <Menu class="w-80" id="event-date-filter-menu">
     {#each sortOptions as { option, label }}

@@ -90,10 +90,7 @@
     <Icon slot="leading" name="clock" />
     {timezone}
   </MenuButton>
-  <Menu
-    id="timezones-menu"
-    class="min-w-[10rem] sm:min-w-[20rem] md:min-w-[26rem]"
-  >
+  <Menu id="timezones-menu" class="w-[10rem] sm:w-[20rem] md:w-[26rem]">
     <Input
       label={translate('search')}
       labelHidden

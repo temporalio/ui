@@ -28,8 +28,7 @@
     readonly?: boolean;
     required?: boolean;
     leadingIcon?: IconName;
-    maxWidth?: number;
-    minWidth?: number;
+    position?: 'right' | 'left';
     'data-testid'?: string;
   }
 
@@ -75,8 +74,7 @@
   export let leadingIcon: IconName = null;
   export let optionValueKey: keyof T = null;
   export let optionLabelKey: keyof T = optionValueKey;
-  export let maxWidth = 100;
-  export let minWidth = 40;
+  export let position: 'right' | 'left' = 'left';
   export let renderDisplayValue: (option: T) => string = () => '';
   export let filter: (option: T, value: string) => boolean = () => false;
   export let match: (option: T, value: string) => boolean = () => false;
@@ -84,21 +82,9 @@
   let displayValue: string;
   let selectedOption: string | T;
   let menuElement: HTMLUListElement;
-  let inputElement: HTMLInputElement;
+  // let inputElement: HTMLInputElement;
   const open = writable<boolean>(false);
   $: list = options;
-
-  $: {
-    if (inputElement && value) {
-      if (value.length > minWidth && value.length < maxWidth) {
-        inputElement.size = value.length;
-      } else if (value.length <= minWidth) {
-        inputElement.size = minWidth;
-      } else if (value.length >= maxWidth) {
-        inputElement.size = maxWidth;
-      }
-    }
-  }
 
   $: {
     selectedOption = options.find((option) => {
@@ -181,6 +167,7 @@
   const handleSelectOption = (option: string | T) => {
     dispatch('change', option);
     setValue(option);
+    resetValueAndOptions();
   };
 
   const focusFirstOption = () => {
@@ -276,13 +263,18 @@
       on:input|stopPropagation={handleInput}
       on:keydown|stopPropagation={handleInputKeydown}
       on:click|stopPropagation={handleInputClick}
-      bind:this={inputElement}
       data-testid={$$props['data-testid'] ?? id}
       {...$$restProps}
     />
   </MenuButton>
 
-  <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
+  <Menu
+    bind:menuElement
+    id="{id}-listbox"
+    role="listbox"
+    class="w-full"
+    {position}
+  >
     {#each list as option}
       {#if isStringOption(option)}
         <ComboboxOption
