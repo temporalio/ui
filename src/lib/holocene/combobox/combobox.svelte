@@ -82,7 +82,6 @@
   let displayValue: string;
   let selectedOption: string | T;
   let menuElement: HTMLUListElement;
-  // let inputElement: HTMLInputElement;
   const open = writable<boolean>(false);
   $: list = options;
 
@@ -307,6 +306,6 @@
   }
 
   .combobox-input {
-    @apply truncate h-full w-full font-primary focus:outline-none focus:border-indigo-600;
+    @apply h-full w-full font-primary focus:outline-none focus:border-indigo-600;
   }
 </style>
