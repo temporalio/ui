@@ -11,7 +11,10 @@
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   import MenuButton from '../menu/menu-button.svelte';
 
-  const dispatch = createEventDispatcher<{ change: T | string }>();
+  const dispatch = createEventDispatcher<{
+    change: T | string;
+    filter: string;
+  }>();
 
   type ExtendedInputEvent = Event & {
     currentTarget: EventTarget & HTMLInputElement;
@@ -36,7 +39,7 @@
     options: string[];
     optionValueKey?: never;
     optionLabelKey?: never;
-    renderDisplayValue?: never;
+    displayValue?: never;
   };
 
   type UncontrolledCustomOptionProps = {
@@ -45,19 +48,9 @@
     optionLabelKey?: keyof T;
   };
 
-  type ControlledCustomOptionProps = {
-    options: T[];
-    renderDisplayValue: (option: T) => string;
-    filter: (option: T, value: string) => boolean;
-    match: (option: T, value: string) => boolean;
-    optionValueKey?: never;
-    optionLabelKey?: never;
-  };
-
   type $$Props =
     | (BaseProps & UncontrolledStringOptionProps)
-    | (BaseProps & UncontrolledCustomOptionProps)
-    | (BaseProps & ControlledCustomOptionProps);
+    | (BaseProps & UncontrolledCustomOptionProps);
 
   let className = '';
   export { className as class };
@@ -75,9 +68,6 @@
   export let optionValueKey: keyof T = null;
   export let optionLabelKey: keyof T = optionValueKey;
   export let position: 'right' | 'left' = 'left';
-  export let renderDisplayValue: (option: T) => string = () => '';
-  export let filter: (option: T, value: string) => boolean = () => false;
-  export let match: (option: T, value: string) => boolean = () => false;
 
   let displayValue: string;
   let selectedOption: string | T;
@@ -91,12 +81,8 @@
         return option === value;
       }
 
-      if (isObjectOption(option)) {
-        if (canRenderCustomOption(option)) {
-          return option[optionValueKey] === value;
-        }
-
-        return match(option, value);
+      if (isObjectOption(option) && canRenderCustomOption(option)) {
+        return option[optionValueKey] === value;
       }
     });
 
@@ -144,12 +130,8 @@
       return option;
     }
 
-    if (isObjectOption(option)) {
-      if (canRenderCustomOption(option)) {
-        return option[optionLabelKey];
-      } else {
-        return renderDisplayValue(option);
-      }
+    if (isObjectOption(option) && canRenderCustomOption(option)) {
+      return option[optionLabelKey];
     }
   };
 
@@ -203,6 +185,7 @@
 
   const handleInput = (event: ExtendedInputEvent) => {
     displayValue = event.currentTarget.value;
+    dispatch('filter', displayValue);
     if (!$open) openList();
 
     list = options.filter((option) => {
@@ -212,14 +195,10 @@
           .includes(event.currentTarget.value.toLowerCase());
       }
 
-      if (isObjectOption(option)) {
-        if (canRenderCustomOption(option)) {
-          return String(option[optionLabelKey])
-            .toLowerCase()
-            .includes(event.currentTarget.value.toLowerCase());
-        }
-
-        return filter(option, event.currentTarget.value);
+      if (isObjectOption(option) && canRenderCustomOption(option)) {
+        return String(option[optionLabelKey])
+          .toLowerCase()
+          .includes(event.currentTarget.value.toLowerCase());
       }
     });
   };

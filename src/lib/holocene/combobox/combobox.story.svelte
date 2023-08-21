@@ -1,8 +1,6 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   export let Hst: HST;
 
   let stringOptions = [
@@ -13,42 +11,16 @@
     'Japanese',
   ];
 
-  type CustomOption = {
-    label: string;
-    value: string;
-    flag: string;
-    disabled?: boolean;
-  };
-
-  let customOptions: CustomOption[] = [
-    { label: 'English', value: 'en-us', flag: '🇺🇸' },
-    { label: 'English (UK)', value: 'en-uk', flag: '🇬🇧' },
-    { label: 'German', value: 'de', flag: '🇩🇪', disabled: true },
-    { label: 'French', value: 'fr', flag: '🇫🇷' },
-    { label: 'Japanese', value: 'jp', flag: '🇯🇵' },
+  let customOptions = [
+    { label: 'English', value: 'en-us' },
+    { label: 'English (UK)', value: 'en-uk' },
+    { label: 'German', value: 'de' },
+    { label: 'French', value: 'fr' },
+    { label: 'Japanese', value: 'jp' },
   ];
 
   let value = stringOptions[0];
-  let customValue = customOptions[1].value;
-
-  const handleSelect = (option: CustomOption) => {
-    customValue = option.value;
-  };
-
-  const match = (option: CustomOption, value: string) => {
-    return option.value === value;
-  };
-
-  const filter = (option: CustomOption, value: string) => {
-    return (
-      option.label.toLowerCase().includes(value.toLowerCase()) ||
-      option.value.toLowerCase().includes(value.toLowerCase())
-    );
-  };
-
-  const renderDisplayValue = (option: CustomOption) => {
-    return option.label;
-  };
+  let customValue = customOptions[0].value;
 </script>
 
 <Hst.Story title="combobox">
@@ -73,34 +45,5 @@
       optionLabelKey="label"
       optionValueKey="value"
     />
-  </Hst.Variant>
-
-  <Hst.Variant title="a combobox with custom options (controlled)">
-    <Combobox
-      value={customValue}
-      label="Select a Language"
-      noResultsText="No Results"
-      id="combobox-3"
-      leadingIcon="regions"
-      options={customOptions}
-      {renderDisplayValue}
-      {filter}
-      {match}
-    >
-      <svelte:fragment let:option>
-        <ComboboxOption
-          on:click={() => handleSelect(option)}
-          selected={customValue === option.value}
-          disabled={option.disabled}
-        >
-          <span slot="leading">
-            {option.flag}
-          </span>
-          <span>
-            {option.label}
-          </span>
-        </ComboboxOption>
-      </svelte:fragment>
-    </Combobox>
   </Hst.Variant>
 </Hst.Story>
