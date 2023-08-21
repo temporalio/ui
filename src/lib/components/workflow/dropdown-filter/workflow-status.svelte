@@ -103,7 +103,6 @@
       <MenuItem on:click={() => onStatusClick(status)}>
         <Checkbox
           slot="leading"
-          class="mr-2"
           label={status}
           labelHidden
           tabindex={-1}

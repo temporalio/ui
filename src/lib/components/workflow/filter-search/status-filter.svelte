@@ -106,7 +106,6 @@
       >
         <Checkbox
           on:click={() => onStatusClick(status)}
-          class="mr-2"
           slot="leading"
           {checked}
           label={status}

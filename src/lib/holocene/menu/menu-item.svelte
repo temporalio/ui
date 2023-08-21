@@ -146,7 +146,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer min-w-max font-primary text-sm font-medium px-3 py-2 m-1 flex flex-row items-center rounded hover:bg-indigo-50 focus:bg-indigo-50 focus:outline focus:outline-1 focus:outline-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
+    @apply cursor-pointer min-w-max font-primary text-sm font-medium px-3 py-2 m-1 flex flex-row items-center gap-2 rounded hover:bg-indigo-50 focus:bg-indigo-50 focus:outline focus:outline-1 focus:outline-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
   }
 
   .menu-item-wrapper {
