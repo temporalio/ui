@@ -156,10 +156,10 @@
     <Menu
       keepOpen
       id="time-range-filter-menu"
-      class="w-[400px] p-2 !overflow-visible"
+      class="w-[25rem] !overflow-visible"
     >
       {#if isTimeRange}
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 p-2">
           <DatePicker
             label={translate('start')}
             on:datechange={onStartDateChange}
@@ -196,68 +196,68 @@
         </div>
       {:else}
         <div class="flex flex-col gap-2">
-          <p class="text-sm font-semibold">{translate('relative')}</p>
-          <div class="flex justify-between items-center gap-2">
-            <div class="flex gap-0">
-              <Input
-                label={translate('relative')}
-                labelHidden
-                id="relative-datetime-input"
-                bind:value={relativeTime}
-                placeholder="00"
-                error={error(relativeTime)}
-                unroundRight
-                class="h-10"
-              />
-              <Select
-                unroundLeft
-                bind:value={timeUnit}
-                id="relative-datetime-unit-input"
-                label={translate('time-unit')}
-                labelHidden
+          <div class="p-2">
+            <p class="text-sm font-semibold">{translate('relative')}</p>
+            <div class="flex justify-between items-center gap-2">
+              <div class="flex gap-0">
+                <Input
+                  label={translate('relative')}
+                  labelHidden
+                  id="relative-datetime-input"
+                  bind:value={relativeTime}
+                  placeholder="00"
+                  error={error(relativeTime)}
+                  unroundRight
+                  class="h-10"
+                />
+                <Select
+                  unroundLeft
+                  bind:value={timeUnit}
+                  id="relative-datetime-unit-input"
+                  label={translate('time-unit')}
+                  labelHidden
+                >
+                  {#each TIME_UNIT_OPTIONS as unit}
+                    <Option value={unit}>{unit} {translate('ago')}</Option>
+                  {/each}
+                </Select>
+              </div>
+              <Button
+                variant="ghost"
+                disabled={error(relativeTime)}
+                on:click={onApplyRelativeTime}>{translate('apply')}</Button
               >
-                {#each TIME_UNIT_OPTIONS as unit}
-                  <Option value={unit}>{unit} {translate('ago')}</Option>
-                {/each}
-              </Select>
             </div>
-            <Button
-              variant="ghost"
-              disabled={error(relativeTime)}
-              on:click={onApplyRelativeTime}>{translate('apply')}</Button
-            >
           </div>
-          <hr class="border-gray-300 mt-2" />
-          <DatePicker
-            label={translate('absolute')}
-            on:datechange={onStartDateChange}
-            selected={startDate}
-            todayLabel={translate('today')}
-            closeLabel={translate('close')}
-            clearLabel={translate('clear-input-button-label')}
-          />
-          <TimePicker
-            bind:hour={startHour}
-            bind:minute={startMinute}
-            bind:second={startSecond}
-            bind:half={startHalf}
-          />
-          <div class="flex justify-end">
-            <Button variant="ghost" on:click={onApply}
-              >{translate('apply')}</Button
-            >
+          <MenuDivider />
+          <div class="p-2 flex flex-col gap-2">
+            <DatePicker
+              label={translate('absolute')}
+              on:datechange={onStartDateChange}
+              selected={startDate}
+              todayLabel={translate('today')}
+              closeLabel={translate('close')}
+              clearLabel={translate('clear-input-button-label')}
+            />
+            <TimePicker
+              bind:hour={startHour}
+              bind:minute={startMinute}
+              bind:second={startSecond}
+              bind:half={startHalf}
+            />
+            <div class="flex justify-end">
+              <Button variant="ghost" on:click={onApply}
+                >{translate('apply')}</Button
+              >
+            </div>
           </div>
         </div>
       {/if}
       <MenuDivider />
-      <MenuItem disabled class="!pb-0 !m-0">
-        <div class="flex w-full flex-row items-center gap-2">
-          <Icon name="clock" aria-hidden="true" />
-          <span class="font-normal text-xs">
-            {translate('based-on-time-preface')}
-            {localTime}
-          </span>
-        </div>
+      <MenuItem centered disabled>
+        <Icon name="clock" aria-hidden="true" />
+        {translate('based-on-time-preface')}
+        {localTime}
       </MenuItem>
     </Menu>
   </MenuContainer>

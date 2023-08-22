@@ -185,13 +185,13 @@
           {value}
         </MenuButton>
         <Menu
-          class="p-2 !overflow-visible"
+          class="w-[25rem] !overflow-visible"
           position="right"
           keepOpen
           id="time-range-filter-menu"
         >
           {#if custom}
-            <div class="flex flex-col gap-2 w-96">
+            <div class="flex flex-col gap-2 p-2">
               <DatePicker
                 label={translate('start')}
                 on:datechange={onStartDateChange}
@@ -220,63 +220,57 @@
                 bind:second={endSecond}
                 bind:half={endHalf}
               />
-            </div>
-            <div class="flex mt-2 gap-2 pb-2">
-              <Button on:click={onApply}>{translate('apply')}</Button>
-              <Button variant="secondary" on:click={() => (custom = false)}
-                >{translate('cancel')}</Button
-              >
+              <div class="flex gap-2">
+                <Button on:click={onApply}>{translate('apply')}</Button>
+                <Button variant="secondary" on:click={() => (custom = false)}
+                  >{translate('cancel')}</Button
+                >
+              </div>
             </div>
           {:else}
-            <div class="w-80">
+            <div class="flex w-full flex-wrap">
+              <div class="flex w-1/2 flex-col border-b border-gray-300">
+                <MenuItem on:click={() => onChange('All Time')}
+                  >{translate('all-time')}</MenuItem
+                >
+              </div>
+              <div class="flex w-1/2 flex-col border-b border-gray-300">
+                <MenuItem on:click={() => onChange('Custom')}
+                  >{translate('custom')}</MenuItem
+                >
+              </div>
+              {#each columnOrderedDurations as duration}
+                <div class="flex w-1/2 flex-col justify-center">
+                  <MenuItem on:click={() => onChange(duration)}
+                    >{duration}</MenuItem
+                  >
+                </div>
+              {/each}
               <div class="flex w-full flex-wrap">
-                <div class="flex w-1/2 flex-col border-b border-gray-300">
-                  <MenuItem on:click={() => onChange('All Time')}
-                    >{translate('all-time')}</MenuItem
+                <div class="flex w-1/2 flex-col border-t border-gray-300">
+                  <MenuItem
+                    selected={timeField === 'StartTime'}
+                    on:click={() => onTimeFieldChange('StartTime')}
                   >
+                    {translate('start-time')}
+                  </MenuItem>
                 </div>
-                <div class="flex w-1/2 flex-col border-b border-gray-300">
-                  <MenuItem on:click={() => onChange('Custom')}
-                    >{translate('custom')}</MenuItem
+                <div class="flex w-1/2 flex-col border-t border-gray-300">
+                  <MenuItem
+                    selected={timeField === 'CloseTime'}
+                    on:click={() => onTimeFieldChange('CloseTime')}
                   >
-                </div>
-                {#each columnOrderedDurations as duration}
-                  <div class="flex w-1/2 flex-col justify-center">
-                    <MenuItem on:click={() => onChange(duration)}
-                      >{duration}</MenuItem
-                    >
-                  </div>
-                {/each}
-                <div class="flex w-full flex-wrap">
-                  <div class="flex w-1/2 flex-col border-t border-gray-300">
-                    <MenuItem
-                      selected={timeField === 'StartTime'}
-                      on:click={() => onTimeFieldChange('StartTime')}
-                    >
-                      {translate('start-time')}
-                    </MenuItem>
-                  </div>
-                  <div class="flex w-1/2 flex-col border-t border-gray-300">
-                    <MenuItem
-                      selected={timeField === 'CloseTime'}
-                      on:click={() => onTimeFieldChange('CloseTime')}
-                    >
-                      {translate('end-time')}
-                    </MenuItem>
-                  </div>
+                    {translate('end-time')}
+                  </MenuItem>
                 </div>
               </div>
             </div>
           {/if}
           <MenuDivider />
-          <MenuItem disabled class="!pb-0 !m-0">
-            <div class="flex w-full flex-row items-center gap-2">
-              <Icon name="clock" aria-hidden="true" />
-              <span class="font-normal text-xs">
-                {translate('based-on-time-preface')}
-                {localTime}
-              </span>
-            </div>
+          <MenuItem centered disabled>
+            <Icon name="clock" aria-hidden="true" />
+            {translate('based-on-time-preface')}
+            {localTime}
           </MenuItem>
         </Menu>
       </MenuContainer>
