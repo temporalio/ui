@@ -269,12 +269,15 @@
             </div>
           {/if}
           <MenuDivider />
-          <div class="flex w-full flex-row items-center gap-2 px-3 pt-2 m-1">
-            <Icon name="clock" aria-hidden="true" />
-            <span class="text-gray-500 font-normal text-xs"
-              >{translate('based-on-time-preface')} {localTime}
-            </span>
-          </div>
+          <MenuItem disabled class="!pb-0 !m-0">
+            <div class="flex w-full flex-row items-center gap-2">
+              <Icon name="clock" aria-hidden="true" />
+              <span class="font-normal text-xs">
+                {translate('based-on-time-preface')}
+                {localTime}
+              </span>
+            </div>
+          </MenuItem>
         </Menu>
       </MenuContainer>
     </svelte:fragment>
