@@ -67,7 +67,8 @@
     "story:build": "histoire build",
     "story:preview": "histoire preview",
     "generate:locales": "esno scripts/generate-locales.ts",
-    "workflows": "esno scripts/workflows.ts"
+    "workflows": "esno scripts/workflows.ts",
+    "audit:tailwind": "esno scripts/audit-tailwind-colors"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.4.0",
