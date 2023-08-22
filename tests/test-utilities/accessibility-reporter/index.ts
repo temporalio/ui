@@ -30,7 +30,7 @@ class AccessibilityReporter implements Reporter {
     );
   }
 
-  onTestEnd(test: TestCase, result: TestResult) {
+  onTestEnd(_: TestCase, result: TestResult) {
     if (result.status === 'passed') return;
     if (!result.attachments) return;
 
@@ -59,7 +59,7 @@ class AccessibilityReporter implements Reporter {
 
     const markdown = await toMarkdown(violations);
     const markdownFile = join(
-      dirname(this.options.outputFile) + '/accessibility-violations.html',
+      dirname(this.options.outputFile) + '/accessibility-violations.md',
     );
 
     await writeFile(markdownFile, markdown).catch((error) =>
