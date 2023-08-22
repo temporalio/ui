@@ -170,8 +170,6 @@
     "stylelint": "^15.1.0",
     "stylelint-config-recommended": "^10.0.1",
     "stylelint-config-standard": "^30.0.1",
-    "svast": "^0.2.0",
-    "svast-stringify": "^0.1.0",
     "svelte": "^3.55.1",
     "svelte-check": "^3.4.3",
     "svelte-highlight": "^3.4.0",

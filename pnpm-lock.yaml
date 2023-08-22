@@ -298,12 +298,6 @@ devDependencies:
   stylelint-config-standard:
     specifier: ^30.0.1
     version: 30.0.1(stylelint@15.1.0)
-  svast:
-    specifier: ^0.2.0
-    version: 0.2.0
-  svast-stringify:
-    specifier: ^0.1.0
-    version: 0.1.0
   svelte:
     specifier: ^3.55.1
     version: 3.55.1
@@ -2275,10 +2269,6 @@ packages:
     resolution: {integrity: sha512-1AX+Yt3icFuU6kxwmPakaiGrJUwG44MpuiqPg4dSolRFk6jmvs4b3IbUol9wKDLIgU76gevn3EwE8y/DkSJCZQ==}
     dependencies:
       '@types/node': 16.18.11
-    dev: true
-
-  /@types/unist@2.0.7:
-    resolution: {integrity: sha512-cputDpIbFgLUaGQn6Vqg3/YsJwxUwHLO13v3i5ouxT4lat0khip9AEWxtERujXV9wxIB1EyF97BSJFt6vpdI8g==}
     dev: true
 
   /@types/uuid@9.0.0:
@@ -8932,18 +8922,6 @@ packages:
   /supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
-    dev: true
-
-  /svast-stringify@0.1.0:
-    resolution: {integrity: sha512-3s9zuwNo5g07rFjyQy0K1S4efJdPClRX5Dxbn5VhzHGrpoUj/P4aNp4nG4x9LqZ6aTPc+4cInoaELFGsxIcAJg==}
-    dependencies:
-      svast: 0.2.0
-    dev: true
-
-  /svast@0.2.0:
-    resolution: {integrity: sha512-1Ik0uj5+c0gIGLZn3XQ1Cyy03co+24GgY+p701DAWOZX+fD4L4ZEUyWu2BR2F99tbIMJj4RoyRp8+0AcBZXx/g==}
-    dependencies:
-      '@types/unist': 2.0.7
     dev: true
 
   /svelte-check@3.4.3(@babel/core@7.20.12)(postcss-load-config@3.1.4)(postcss@8.4.21)(svelte@3.55.1):
