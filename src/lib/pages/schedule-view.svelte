@@ -216,7 +216,7 @@
       id="pause-schedule-modal"
       bind:open={pauseConfirmationModalOpen}
       confirmType="primary"
-      confirmText={schedule.schedule.state.paused
+      confirmText={schedule?.schedule.state.paused
         ? translate('schedules', 'unpause')
         : translate('schedules', 'pause')}
       cancelText={translate('cancel')}
@@ -225,13 +225,13 @@
       on:cancelModal={resetReason}
     >
       <h3 slot="title">
-        {schedule.schedule.state.paused
+        {schedule?.schedule.state.paused
           ? translate('schedules', 'unpause-modal-title')
           : translate('schedules', 'pause-modal-title')}
       </h3>
       <div slot="content">
         <p>
-          {schedule.schedule.state.paused
+          {schedule?.schedule.state.paused
             ? translate('schedules', 'unpause-modal-confirmation', {
                 schedule: scheduleId,
               })
@@ -240,7 +240,7 @@
               })}
         </p>
         <p class="my-4">
-          {schedule.schedule.state.paused
+          {schedule?.schedule.state.paused
             ? translate('schedules', 'unpause-reason')
             : translate('schedules', 'pause-reason')}
         </p>
@@ -272,6 +272,8 @@
       </div>
     </Modal>
   {/if}
+{:catch error}
+  <ScheduleError error={error?.message} />
 {/await}
 
 <style lang="postcss">
