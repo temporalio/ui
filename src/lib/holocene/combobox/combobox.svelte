@@ -67,13 +67,28 @@
   export let leadingIcon: IconName = null;
   export let optionValueKey: keyof T = null;
   export let optionLabelKey: keyof T = optionValueKey;
+  export let minSize: number = 32;
+  export let maxSize: number = 120;
   export let position: 'right' | 'left' = 'left';
 
   let displayValue: string;
   let selectedOption: string | T;
   let menuElement: HTMLUListElement;
+  let inputElement: HTMLInputElement;
   const open = writable<boolean>(false);
   $: list = options;
+
+  $: {
+    if (inputElement && displayValue) {
+      if (displayValue.length < minSize) {
+        inputElement.size = minSize;
+      } else if (displayValue.length > maxSize) {
+        inputElement.size = maxSize;
+      } else {
+        inputElement.size = displayValue.length;
+      }
+    }
+  }
 
   $: {
     selectedOption = options.find((option) => {
@@ -242,6 +257,7 @@
       on:keydown|stopPropagation={handleInputKeydown}
       on:click|stopPropagation={handleInputClick}
       data-testid={$$props['data-testid'] ?? id}
+      bind:this={inputElement}
       {...$$restProps}
     />
   </MenuButton>
