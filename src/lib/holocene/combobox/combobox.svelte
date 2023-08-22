@@ -124,7 +124,7 @@
   };
 
   const getDisplayValue = (option: string | T | undefined): string => {
-    if (!option) return '';
+    if (!option) return value;
 
     if (isStringOption(option)) {
       return option;

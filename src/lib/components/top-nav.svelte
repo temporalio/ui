@@ -47,7 +47,7 @@
   aria-label={translate('main')}
 >
   <div class="flex items-center gap-2">
-    <TimezoneSelect />
+    <TimezoneSelect position={showNamespaceSpecificNav ? 'left' : 'right'} />
     {#if showNamespaceSpecificNav}
       <Combobox
         label={translate('namespaces', 'namespace-label', { namespace })}
