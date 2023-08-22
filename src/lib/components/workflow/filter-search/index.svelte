@@ -59,8 +59,6 @@
 
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
 
-  type T = $$Generic;
-
   const filter = writable<WorkflowFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
