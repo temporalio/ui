@@ -114,12 +114,15 @@
     <div class="my-12 flex flex-col items-center justify-start gap-2">
       <EmptyState title={translate('schedules', 'empty-state-title')} {error}>
         <p>
-          Go to <Link
+          {translate('schedules', 'getting-started-docs-link-preface')}
+          <Link
             target="_external"
-            href="https://docs.temporal.io/workflows/#schedule">docs</Link
-          > or get started with <Link
-            target="_external"
-            href="https://docs.temporal.io/cli/schedule">Temporal CLI</Link
+            href="https://docs.temporal.io/workflows/#schedule"
+            >{translate('schedules', 'getting-started-docs-link')}</Link
+          >
+          {translate('schedules', 'getting-started-cli-link-preface')}
+          <Link target="_external" href="https://docs.temporal.io/cli/schedule"
+            >Temporal CLI</Link
           >.
         </p>
         {#if !error}

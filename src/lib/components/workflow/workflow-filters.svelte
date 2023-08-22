@@ -79,7 +79,7 @@
         class="text-blue-700"
         on:click|preventDefault={updateSearchType('basic')}
       >
-        Basic Search
+        {translate('workflows', 'basic-search')}
       </a>
     {:else}
       <a
@@ -87,7 +87,7 @@
         class="text-blue-700"
         on:click|preventDefault={updateSearchType('advanced')}
       >
-        Advanced Search
+        {translate('workflows', 'advanced-search')}
       </a>
     {/if}
   </p>
