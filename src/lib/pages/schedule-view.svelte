@@ -33,7 +33,6 @@
   import { coreUserStore } from '$lib/stores/core-user';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import { translate } from '$lib/i18n/translate';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
