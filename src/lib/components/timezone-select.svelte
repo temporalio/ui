@@ -24,8 +24,6 @@
   } from '$lib/holocene/menu';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
 
-  export let position: 'left' | 'right';
-
   const QuickTimezoneOptions: TimeFormatOptions = [
     {
       label: translate('utc'),
@@ -94,7 +92,7 @@
   </MenuButton>
   <Menu
     id="timezones-menu"
-    {position}
+    position="right"
     class="w-[10rem] sm:w-[20rem] md:w-[26rem]"
   >
     <Input
