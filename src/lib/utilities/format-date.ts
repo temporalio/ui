@@ -6,7 +6,11 @@ import {
 } from 'date-fns';
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
-import { type TimeFormat, Timezones } from '$lib/stores/time-format';
+import {
+  type TimeFormat,
+  TimezoneOptions,
+  Timezones,
+} from '$lib/stores/time-format';
 
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
 
@@ -75,4 +79,14 @@ export function formatUTCOffset(
     absoluteValue > 9 ? `${absoluteValue}:00` : `0${absoluteValue}:00`;
   if (offset > 0) return `${utc}+${formattedOffset}`;
   if (offset < 0) return `${utc}-${formattedOffset}`;
+}
+
+export function getLocalTime(): string {
+  const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const localOption = TimezoneOptions.find(({ zones }) =>
+    zones?.includes(localTimezone),
+  );
+  return localOption
+    ? `${localOption.label} (${localOption.abbr})`
+    : localTimezone;
 }
