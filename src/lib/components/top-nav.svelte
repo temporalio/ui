@@ -58,7 +58,7 @@
         options={namespaceList}
         optionValueKey="namespace"
         on:change={handleNamespaceSelect}
-        position="right"
+        minSize={32}
       />
     {/if}
   </div>

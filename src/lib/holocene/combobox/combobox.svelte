@@ -31,7 +31,8 @@
     readonly?: boolean;
     required?: boolean;
     leadingIcon?: IconName;
-    position?: 'right' | 'left';
+    minSize?: number;
+    maxSize?: number;
     'data-testid'?: string;
   }
 
@@ -67,9 +68,8 @@
   export let leadingIcon: IconName = null;
   export let optionValueKey: keyof T = null;
   export let optionLabelKey: keyof T = optionValueKey;
-  export let minSize: number = 32;
+  export let minSize: number = 0;
   export let maxSize: number = 120;
-  export let position: 'right' | 'left' = 'left';
 
   let displayValue: string;
   let selectedOption: string | T;
@@ -262,13 +262,7 @@
     />
   </MenuButton>
 
-  <Menu
-    bind:menuElement
-    id="{id}-listbox"
-    role="listbox"
-    class="w-full"
-    {position}
-  >
+  <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
     {#each list as option}
       {#if isStringOption(option)}
         <ComboboxOption
