@@ -31,7 +31,8 @@
     readonly?: boolean;
     required?: boolean;
     leadingIcon?: IconName;
-    position?: 'right' | 'left';
+    minSize?: number;
+    maxSize?: number;
     'data-testid'?: string;
   }
 
@@ -67,13 +68,27 @@
   export let leadingIcon: IconName = null;
   export let optionValueKey: keyof T = null;
   export let optionLabelKey: keyof T = optionValueKey;
-  export let position: 'right' | 'left' = 'left';
+  export let minSize: number = 0;
+  export let maxSize: number = 120;
 
   let displayValue: string;
   let selectedOption: string | T;
   let menuElement: HTMLUListElement;
+  let inputElement: HTMLInputElement;
   const open = writable<boolean>(false);
   $: list = options;
+
+  $: {
+    if (inputElement && displayValue) {
+      if (displayValue.length < minSize) {
+        inputElement.size = minSize;
+      } else if (displayValue.length > maxSize) {
+        inputElement.size = maxSize;
+      } else {
+        inputElement.size = displayValue.length;
+      }
+    }
+  }
 
   $: {
     selectedOption = options.find((option) => {
@@ -124,7 +139,7 @@
   };
 
   const getDisplayValue = (option: string | T | undefined): string => {
-    if (!option) return '';
+    if (!option) return value ?? '';
 
     if (isStringOption(option)) {
       return option;
@@ -242,17 +257,12 @@
       on:keydown|stopPropagation={handleInputKeydown}
       on:click|stopPropagation={handleInputClick}
       data-testid={$$props['data-testid'] ?? id}
+      bind:this={inputElement}
       {...$$restProps}
     />
   </MenuButton>
 
-  <Menu
-    bind:menuElement
-    id="{id}-listbox"
-    role="listbox"
-    class="w-full"
-    {position}
-  >
+  <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
     {#each list as option}
       {#if isStringOption(option)}
         <ComboboxOption

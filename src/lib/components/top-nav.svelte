@@ -41,13 +41,12 @@
 </script>
 
 <nav
-  class="sticky top-0 z-30 flex h-12 w-full items-center justify-end border-b-2 bg-gray-100 p-1 px-4 md:px-10"
+  class="sticky top-0 z-30 flex flex-col md:flex-row w-full items-center justify-end border-b-2 bg-gray-100 p-1 px-4 md:px-8"
   data-testid="top-nav"
   class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
   aria-label={translate('main')}
 >
-  <div class="flex items-center gap-2">
-    <TimezoneSelect />
+  <div class="flex grow items-center">
     {#if showNamespaceSpecificNav}
       <Combobox
         label={translate('namespaces', 'namespace-label', { namespace })}
@@ -59,9 +58,13 @@
         options={namespaceList}
         optionValueKey="namespace"
         on:change={handleNamespaceSelect}
-        position="right"
-        size={32}
+        minSize={32}
       />
+    {/if}
+  </div>
+  <div class="flex items-center gap-2">
+    <TimezoneSelect />
+    {#if showNamespaceSpecificNav}
       <DataEncoderStatus />
     {/if}
     {#if $authUser.accessToken}
