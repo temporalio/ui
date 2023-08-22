@@ -31,7 +31,7 @@
         height="24px"
         width="24px"
         {isCloud}
-        title="View Recent Workflows"
+        title={translate('workflows', 'recent-workflows-link')}
       />
     </a>
     <button

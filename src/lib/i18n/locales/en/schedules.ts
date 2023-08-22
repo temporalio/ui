@@ -62,4 +62,7 @@ export const Strings = {
   'workflow-id-label': 'Workflow Id*',
   'workflow-type-label': 'Workflow Type*',
   'task-queue-label': 'Task Queue*',
+  'getting-started-docs-link-preface': 'Go to',
+  'getting-started-docs-link': 'docs',
+  'getting-started-cli-link-preface': 'or get started with',
 } as const;
