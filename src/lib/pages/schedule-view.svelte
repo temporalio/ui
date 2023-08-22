@@ -33,6 +33,7 @@
   import { coreUserStore } from '$lib/stores/core-user';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import { translate } from '$lib/i18n/translate';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -216,7 +217,7 @@
       id="pause-schedule-modal"
       bind:open={pauseConfirmationModalOpen}
       confirmType="primary"
-      confirmText={schedule.schedule.state.paused
+      confirmText={schedule?.schedule.state.paused
         ? translate('schedules', 'unpause')
         : translate('schedules', 'pause')}
       cancelText={translate('cancel')}
@@ -225,13 +226,13 @@
       on:cancelModal={resetReason}
     >
       <h3 slot="title">
-        {schedule.schedule.state.paused
+        {schedule?.schedule.state.paused
           ? translate('schedules', 'unpause-modal-title')
           : translate('schedules', 'pause-modal-title')}
       </h3>
       <div slot="content">
         <p>
-          {schedule.schedule.state.paused
+          {schedule?.schedule.state.paused
             ? translate('schedules', 'unpause-modal-confirmation', {
                 schedule: scheduleId,
               })
@@ -240,7 +241,7 @@
               })}
         </p>
         <p class="my-4">
-          {schedule.schedule.state.paused
+          {schedule?.schedule.state.paused
             ? translate('schedules', 'unpause-reason')
             : translate('schedules', 'pause-reason')}
         </p>
@@ -272,6 +273,8 @@
       </div>
     </Modal>
   {/if}
+{:catch error}
+  <ScheduleError error={error?.message} />
 {/await}
 
 <style lang="postcss">
