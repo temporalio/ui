@@ -8,63 +8,67 @@ test.beforeEach(async ({ page, baseURL }) => {
 });
 
 test('Top Navigation current namespace is present', async ({ page }) => {
-  await expect(page.getByTestId('namespace-select-button')).toBeVisible();
-  await page.getByTestId('namespace-select-button').click();
-  await expect(page.locator('#namespace-search')).toBeFocused();
-  await expect(page.getByRole('link', { name: 'default' })).toBeVisible();
+  const switcher = page.getByTestId('namespace-switcher');
+  await expect(switcher).toBeVisible();
+  await switcher.click();
+  await expect(switcher).toBeFocused();
+  await expect(page.getByRole('option', { name: 'default' })).toBeVisible();
 });
 
 test('Top Navigation current namespace is present and has other namespaces to search and navigate to', async ({
   page,
 }) => {
-  await expect(page.getByTestId('namespace-select-button')).toBeVisible();
-  await page.getByTestId('namespace-select-button').click();
-  await expect(page.locator('#namespace-search')).toBeFocused();
-  await expect(page.getByRole('link', { name: 'default' })).toBeVisible();
+  const switcher = page.getByTestId('namespace-switcher');
+  await expect(switcher).toBeVisible();
+  await switcher.click();
+  await expect(switcher).toBeFocused();
+  await expect(page.getByRole('option', { name: 'default' })).toBeVisible();
   await expect(
-    page.getByRole('link', { name: 'some-other-namespace' }),
+    page.getByRole('option', { name: 'some-other-namespace' }),
   ).toBeVisible();
   await expect(
-    page.getByRole('link', { name: 'temporal-system' }),
+    page.getByRole('option', { name: 'temporal-system' }),
   ).toBeHidden();
 
-  await page.locator('#namespace-search').type('some');
-  await expect(page.getByRole('link', { name: 'default' })).toBeHidden();
+  await switcher.clear();
+  await switcher.type('some');
+  await expect(page.getByRole('option', { name: 'default' })).toBeHidden();
 
-  await page.getByRole('link', { name: 'some-other-namespace' }).click();
-  await expect(page.getByTestId('namespace-name')).toHaveText(
-    'some-other-namespace',
-  );
+  await page.getByRole('option', { name: 'some-other-namespace' }).click();
+  await expect(switcher).toHaveValue('some-other-namespace');
 });
 
 test('Top Navigation current namespace is present and has other namespaces to search and stays open with space press', async ({
   page,
 }) => {
-  await expect(page.getByTestId('namespace-select-button')).toBeVisible();
-  await page.getByTestId('namespace-select-button').click();
-  await expect(page.locator('#namespace-search')).toBeFocused();
-  await expect(page.getByRole('link', { name: 'default' })).toBeVisible();
+  const switcher = page.getByTestId('namespace-switcher');
+  await expect(switcher).toBeVisible();
+  await switcher.click();
+  await expect(switcher).toBeFocused();
+  await expect(page.getByRole('option', { name: 'default' })).toBeVisible();
   await expect(
-    page.getByRole('link', { name: 'some-other-namespace' }),
+    page.getByRole('option', { name: 'some-other-namespace' }),
   ).toBeVisible();
   await expect(
-    page.getByRole('link', { name: 'temporal-system' }),
+    page.getByRole('option', { name: 'temporal-system' }),
   ).toBeHidden();
 
-  await page.locator('#namespace-search').type('some other namespace');
-  await expect(page.getByRole('link', { name: 'default' })).toBeHidden();
+  await switcher.clear();
+  await switcher.type('some other namespace');
+  await expect(page.getByRole('option', { name: 'default' })).toBeHidden();
   await expect(
-    page.getByRole('link', { name: 'some-other-namespace' }),
+    page.getByRole('option', { name: 'some-other-namespace' }),
   ).toBeHidden();
 });
 
 test('Top Navigation current namespace is not present on non-namespace specific pages', async ({
   page,
 }) => {
-  await expect(page.getByTestId('namespace-select-button')).toBeVisible();
+  const switcher = page.getByTestId('namespace-switcher');
 
+  await expect(switcher).toBeVisible();
   await page.getByRole('link', { name: 'Namespaces' }).click();
-  await expect(page.getByTestId('namespace-select-button')).toBeHidden();
+  await expect(switcher).toBeHidden();
   await page.getByRole('link', { name: 'Workflows' }).first().click();
-  await expect(page.getByTestId('namespace-select-button')).toBeVisible();
+  await expect(switcher).toBeVisible();
 });

@@ -66,6 +66,7 @@ import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
 import support from './svg/support.svelte';
+import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
 import timeline from './svg/timeline.svelte';
 import transcoderError from './svg/transcoder-error.svelte';
@@ -150,6 +151,7 @@ export const icons = {
   summary,
   support,
   'spinner-solid': spinnerSolid,
+  'temporal-logo': temporalLogo,
   terminal,
   timeline,
   'transcoder-error': transcoderError,
@@ -162,4 +164,4 @@ export const icons = {
   'vertical-ellipsis': verticalEllipsis,
   warning,
   workflow,
-};
+} as const;

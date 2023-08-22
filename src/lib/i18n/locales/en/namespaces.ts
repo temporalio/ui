@@ -3,6 +3,7 @@ export const Namespace = 'namespaces' as const;
 export const Strings = {
   'namespace-select-header': 'Select a Namespace',
   'namespace-select-empty-state': 'No Namespaces',
+  'namespace-label': 'Select a Namespace',
   'namespaces-empty-state-title': 'No Namespaces Found',
   'namespaces-empty-state-content':
     'You do not have access to a Namespace. Contact your Administrator for assistance.',
@@ -17,7 +18,6 @@ export const Strings = {
   clusters: 'Clusters',
   'client-actions': 'Client Actions',
   'signal-workflow': 'Signal Workflow',
-  'namespace-label': 'Namespace {{namespace}}',
   'unauthorized-namespace-error': 'You do not have access to this namespace.',
   'select-namespace-welcome': 'Welcome to Temporal',
   'select-namespace': 'Select a Namespace to get started.',

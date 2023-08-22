@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { writable } from 'svelte/store';
+
   import { page } from '$app/stores';
 
   import { getContext } from 'svelte';
@@ -12,18 +14,21 @@
   import { workflowStatuses } from '$lib/models/workflow-status';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import Checkbox from '$lib/holocene/checkbox.svelte';
+  import {
+    MenuContainer,
+    Menu,
+    MenuItem,
+    MenuButton,
+    MenuDivider,
+  } from '$lib/holocene/menu';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
 
   type T = $$Generic;
 
   const { filter, resetFilter } = getContext<FilterContext<T>>(FILTER_CONTEXT);
-
+  const open = writable(true);
   $: filters = [...$workflowFilters];
   $: statusFilters = filters.filter((filter) =>
     isStatusFilter(filter.attribute),
@@ -86,54 +91,32 @@
   };
 </script>
 
-<MenuContainer let:open>
-  <Button
-    id="status-filter"
-    variant="search"
-    on:click={() => open.update((previous) => !previous)}
-  >
+<MenuContainer {open}>
+  <MenuButton controls="status-menu">
     {$filter.attribute}
-  </Button>
-  <Menu class="max-h-84 overflow-y-scroll w-fit" id="status-menu" keepOpen>
+  </MenuButton>
+  <Menu id="status-menu" keepOpen>
     {#each workflowStatuses as status (status)}
-      {@const isActive = statusFilters.find(
-        (filter) => filter.value === status,
-      )}
+      {@const checked = statusFilters.some((filter) => filter.value === status)}
       <MenuItem
-        class="transition-all hover:cursor-pointer !p-2"
         data-testid={status}
         on:click={() => {
           onStatusClick(status);
         }}
       >
-        <span class="flex items-center">
-          <div
-            class="mr-2 h-4 w-4 rounded-sm ring-1 ring-gray-900"
-            class:active={isActive}
-          >
-            {#if isActive}
-              <Icon
-                class="pointer-events-none -mt-[1px] -ml-[2px] "
-                name="checkmark"
-                width={20}
-                height={20}
-              />
-            {/if}
-          </div>
-          <WorkflowStatus {status} />
-        </span>
+        <Checkbox
+          on:click={() => onStatusClick(status)}
+          slot="leading"
+          {checked}
+          label={status}
+          labelHidden
+        />
+        <WorkflowStatus {status} />
       </MenuItem>
     {/each}
-    <div class="border-t border-gray-300">
-      <Button variant="ghost" class="!w-full " on:click={onApply}
-        >{translate('apply')}</Button
-      >
-    </div>
+    <MenuDivider />
+    <MenuItem centered disabled={statusFilters.length === 0} on:click={onApply}
+      >{translate('apply')}</MenuItem
+    >
   </Menu>
 </MenuContainer>
-
-<style lang="postcss">
-  .active {
-    @apply bg-gray-900 text-white;
-  }
-</style>

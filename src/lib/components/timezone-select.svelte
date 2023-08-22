@@ -15,10 +15,13 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import {
+    Menu,
+    MenuButton,
+    MenuContainer,
+    MenuItem,
+    MenuDivider,
+  } from '$lib/holocene/menu';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
 
   const QuickTimezoneOptions: TimeFormatOptions = [
@@ -78,20 +81,16 @@
 
 <MenuContainer>
   <MenuButton
-    class="p-1 leading-4"
-    id="timezones"
+    label={translate('timezone', { timezone })}
     controls="timezones-menu"
     hasIndicator
-    icon="clock"
-    testId="timezones-menu-button"
+    variant="ghost"
+    data-testid="timezones-menu-button"
   >
+    <Icon slot="leading" name="clock" />
     {timezone}
   </MenuButton>
-  <Menu
-    id="timezones-menu"
-    class="min-w-[10rem] sm:min-w-[20rem] md:min-w-[26rem] md:w-fit max-h-96 overflow-y-scroll"
-    position="right"
-  >
+  <Menu id="timezones-menu" class="w-[10rem] sm:w-[20rem] md:w-[26rem]">
     <Input
       label={translate('search')}
       labelHidden
@@ -102,32 +101,21 @@
       placeholder={translate('search')}
     />
 
-    <div class="border-b border-gray-200 -mx-2 my-2" />
+    <MenuDivider />
 
     {#if !search}
       {#each QuickTimezoneOptions as { value, label }}
         <MenuItem
-          class="w-full"
           on:click={() => selectTimezone(value)}
-          testId={`timezones-${value}`}
+          data-testid={`timezones-${value}`}
+          selected={value === $timeFormat}
+          description={value === 'local' && localDescription}
         >
-          <span class="w-full flex flex-row items-center gap-4 justify-between">
-            <span>
-              <p class="truncate">{label}</p>
-              {#if value === 'local'}
-                <p class="text-gray-500 text-xs font-normal">
-                  {localDescription}
-                </p>
-              {/if}
-            </span>
-            {#if value === $timeFormat}
-              <Icon name="checkmark" class="text-blue-700" />
-            {/if}
-          </span>
+          {label}
         </MenuItem>
       {/each}
 
-      <div class="my-4">
+      <div class="mx-1 my-4">
         <ToggleSwitch
           label={translate('relative')}
           id="relative-toggle"
@@ -138,27 +126,19 @@
         />
       </div>
 
-      <div class="border-b border-gray-200 -mx-2 mb-2" />
+      <MenuDivider />
     {/if}
 
     {#each filteredOptions as { value, label, offset, abbr }}
-      <MenuItem class="w-full" on:click={() => selectTimezone(value)}>
-        <span class="w-full flex flex-row items-center gap-4 justify-between">
-          <span>
-            <p class="truncate">{label} ({abbr})</p>
-            <p class="text-gray-500 text-xs font-normal">
-              {formatUTCOffset(offset, translate('utc'))}
-            </p>
-          </span>
-          {#if value === $timeFormat}
-            <Icon name="checkmark" class="text-blue-700" />
-          {/if}
-        </span>
+      <MenuItem
+        selected={value === $timeFormat}
+        on:click={() => selectTimezone(value)}
+        description={formatUTCOffset(offset, translate('utc'))}
+      >
+        {label} ({abbr})
       </MenuItem>
     {:else}
-      <MenuItem class="whitespace-nowrap" on:click={noop}
-        >{translate('no-results')}</MenuItem
-      >
+      <MenuItem disabled>{translate('no-results')}</MenuItem>
     {/each}
   </Menu>
 </MenuContainer>

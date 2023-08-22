@@ -27,7 +27,7 @@
   <p class="my-7" data-testid="login-info">Let's get you signed in.</p>
   <div class="mx-auto">
     <Button
-      testId="login-button"
+      data-testid="login-button"
       variant="login"
       icon="lock"
       on:click={() => {

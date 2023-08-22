@@ -156,14 +156,14 @@
         <Button
           thin
           disabled={Boolean(error) || (override && !endpoint)}
-          testId="confirm-data-encoder-button"
+          data-testid="confirm-data-encoder-button"
           on:click={onConfirm}
           type="submit">{translate('apply')}</Button
         >
         <Button
           thin
           variant="ghost"
-          testId="cancel-data-encoder-button"
+          data-testid="cancel-data-encoder-button"
           on:click={onCancel}>{translate('cancel')}</Button
         >
       </div>

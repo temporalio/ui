@@ -1,28 +1,41 @@
 <script lang="ts">
   import Option from './simple-option.svelte';
   import type { SelectOptionValue } from '$lib/types/global';
+  import type { HTMLSelectAttributes } from 'svelte/elements';
 
+  interface $$Props extends HTMLSelectAttributes {
+    id: string;
+    value: SelectOptionValue;
+    name?: string;
+    options?: SelectOptionValue[];
+    label?: string;
+    labelHidden?: boolean;
+    arrow?: boolean;
+    'data-testid'?: string;
+  }
+
+  let className: string = null;
+  export { className as class };
   export let id: string;
   export let value: SelectOptionValue;
   export let label: string = null;
   export let dark: boolean = false;
   export let arrow: boolean = false;
   export let name = id;
-
   export let options: SelectOptionValue[] = [];
 </script>
 
 <div>
   <label class="sr-only" for={id}>{label}</label>
   <select
-    class="inline h-10 w-full rounded-lg border-2 px-2 text-base {$$props.class}"
+    class="inline h-10 w-full rounded-lg border-2 px-2 text-base {className}"
     class:dark
     class:remove={arrow}
     {name}
     {id}
     bind:value
     on:change
-    data-testid={$$props.testId}
+    {...$$restProps}
   >
     <slot>
       {#each options as option}

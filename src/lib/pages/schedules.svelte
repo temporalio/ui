@@ -14,6 +14,7 @@
   import type { ScheduleListEntry } from '$types';
   import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
+
   import { coreUserStore } from '$lib/stores/core-user';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -55,7 +56,7 @@
   {#if hasSchedules}
     <Button
       class="h-10"
-      testId="create-schedule"
+      data-testid="create-schedule"
       disabled={createDisabled}
       on:click={() => goto(routeForScheduleCreate({ namespace }))}
     >
@@ -124,7 +125,7 @@
         {#if !error}
           <Button
             class="mt-4"
-            testId="create-schedule"
+            data-testid="create-schedule"
             disabled={createDisabled}
             on:click={() => goto(routeForScheduleCreate({ namespace }))}
           >
