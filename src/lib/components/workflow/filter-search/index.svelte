@@ -53,8 +53,6 @@
   import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
 
-  type T = $$Generic;
-
   const filter = writable<WorkflowFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
