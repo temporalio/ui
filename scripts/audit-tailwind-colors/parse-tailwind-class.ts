@@ -1,9 +1,4 @@
-export type TailwindClass = {
-  variant: string | null;
-  utility: string | null;
-  color: string | null;
-  shade: string | null;
-};
+import type { TailwindClass } from './types';
 
 export const parseTailwindClass = (tailwindClass: string): TailwindClass => {
   const result: TailwindClass = {
@@ -32,7 +27,7 @@ export const parseTailwindClass = (tailwindClass: string): TailwindClass => {
   }
 
   // Match the color
-  const colorMatch = tailwindClass.match(/^(\w+)-\d{3}\b/);
+  const colorMatch = tailwindClass.match(/^(\w+)-/);
   if (colorMatch) {
     result.color = colorMatch[1];
     tailwindClass = tailwindClass.replace(colorMatch[0], '');
