@@ -157,7 +157,7 @@
       {/each}
     </div>
     <div class="text-right">
-      <Link {href}>{translate('show-all')}</Link>
+      <Link {href}>{translate('workflows', 'pending-activities-link')}</Link>
     </div>
   </section>
 {/if}
