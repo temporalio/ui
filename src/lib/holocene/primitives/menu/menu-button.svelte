@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
+  
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
-  import { getContext } from 'svelte';
-  import { type MenuContext, MENU_CONTEXT } from './menu-container.svelte';
+  
+  import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
   export let controls: string;
   export let dark = false;
   export let disabled = false;

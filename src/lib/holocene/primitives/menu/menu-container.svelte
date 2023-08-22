@@ -1,7 +1,10 @@
 <script lang="ts" context="module">
-  import { clickOutside } from '$lib/holocene/outside-click';
-  import { setContext } from 'svelte';
   import { type Writable, writable } from 'svelte/store';
+  
+  import { setContext } from 'svelte';
+  
+  import { clickOutside } from '$lib/holocene/outside-click';
+  
 
   export const MENU_CONTEXT = 'menu-context';
 

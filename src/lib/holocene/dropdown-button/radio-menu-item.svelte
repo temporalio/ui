@@ -1,10 +1,11 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
 
   type T = $$Generic;
 
-  export let checked: boolean = false;
+  export let checked = false;
   export let value: T;
 
   const dispatch = createEventDispatcher<{ select: { value: T } }>();

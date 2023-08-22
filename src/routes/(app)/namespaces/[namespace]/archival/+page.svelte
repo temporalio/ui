@@ -1,15 +1,17 @@
 <script lang="ts">
-  import type { PageData } from './$types';
   import { page } from '$app/stores';
+  
+  import type { PageData } from './$types';
 
-  import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
-  import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
-  import WorkflowFilters from './_workflow-filters.svelte';
-  import Pagination from '$lib/holocene/pagination.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
+  import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
+  import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Pagination from '$lib/holocene/pagination.svelte';
   import { translate } from '$lib/i18n/translate';
+  
+  import WorkflowFilters from './_workflow-filters.svelte';
 
   export let data: PageData & { archivalQueryingNotSupported: boolean };
 

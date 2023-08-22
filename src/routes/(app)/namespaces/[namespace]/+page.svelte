@@ -1,22 +1,23 @@
 <script lang="ts">
-  import type { PageData } from './$types';
   import { onMount } from 'svelte';
+  
   import { page } from '$app/stores';
+  
+  import type { PageData } from './$types';
 
-  import { temporalVersion, uiVersion } from '$lib/stores/versions';
+  import PageTitle from '$lib/components/page-title.svelte';
+  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
+  import Card from '$lib/holocene/card.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { settings } from '$lib/stores/settings';
-  import { translate } from '$lib/i18n/translate';
-
+  import { temporalVersion, uiVersion } from '$lib/stores/versions';
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-time';
-
-  import Card from '$lib/holocene/card.svelte';
-  import PageTitle from '$lib/components/page-title.svelte';
-  import Table from '$lib/holocene/table/table.svelte';
-  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
-  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
+  
 
   export let data: PageData;
 
@@ -32,7 +33,7 @@
 
   const badgeTypeForBoolean = (
     bool: boolean,
-    invertLogic: boolean = true,
+    invertLogic = true,
   ): BadgeType => {
     if (invertLogic) {
       return bool ? 'default' : 'green';

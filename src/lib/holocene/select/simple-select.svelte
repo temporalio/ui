@@ -1,12 +1,13 @@
 <script lang="ts">
-  import Option from './simple-option.svelte';
   import type { SelectOptionValue } from '$lib/types/global';
+  
+  import Option from './simple-option.svelte';
 
   export let id: string;
   export let value: SelectOptionValue;
   export let label: string = null;
-  export let dark: boolean = false;
-  export let arrow: boolean = false;
+  export let dark = false;
+  export let arrow = false;
   export let name = id;
 
   export let options: SelectOptionValue[] = [];

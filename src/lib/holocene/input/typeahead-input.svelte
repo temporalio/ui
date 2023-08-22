@@ -1,11 +1,12 @@
 <script lang="ts">
-  import type { IconName } from '$lib/holocene/icon/paths';
-  import { clickOutside } from '$lib/holocene/outside-click';
-
-  import Input from '$lib/holocene/input/input.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import { noop } from 'svelte/internal';
+  
+  import type { IconName } from '$lib/holocene/icon/paths';
+  import Input from '$lib/holocene/input/input.svelte';
+  import { clickOutside } from '$lib/holocene/outside-click';
+  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
+  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+  
   import Option from '../select/option.svelte';
 
   export let id: string;
@@ -13,8 +14,8 @@
   export let placeholder = '';
   export let icon: IconName = null;
   export let autoFocus = false;
-  export let unroundRight: boolean = false;
-  export let unroundLeft: boolean = false;
+  export let unroundRight = false;
+  export let unroundLeft = false;
   export let label: string;
   export let labelHidden = false;
 

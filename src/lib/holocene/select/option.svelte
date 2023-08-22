@@ -13,26 +13,28 @@
 
 <script lang="ts">
   import {
+    createEventDispatcher,
     getContext,
     onDestroy,
     onMount,
-    createEventDispatcher,
   } from 'svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import { type SelectContext, SELECT_CONTEXT } from './select.svelte';
 
-  type T = $$Generic;
+  import Icon from '$lib/holocene/icon/icon.svelte';
+
+  import { SELECT_CONTEXT, type SelectContext } from './select.svelte';
+
+  type T = $$Generic | string;
 
   const { selectValue, handleChange, options, open } =
     getContext<SelectContext<T>>(SELECT_CONTEXT);
 
   const dispatch = createEventDispatcher<{ click: { value: T } }>();
 
-  export let value: T;
-  export let description: string = '';
+  export let value: string;
+  export let description = '';
 
-  let selected: boolean = false;
-  let _value: any;
+  let selected = false;
+  let _value: string;
   let slotWrapper: HTMLSpanElement;
   let optionElement: HTMLLIElement;
   let label: string;

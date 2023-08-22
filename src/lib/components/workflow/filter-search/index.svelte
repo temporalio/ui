@@ -1,34 +1,36 @@
 <script lang="ts" context="module">
-  import type { Writable } from 'svelte/store';
+  import { afterUpdate, noop } from 'svelte/internal';
+  import { writable, type Writable } from 'svelte/store';
+  import { fly } from 'svelte/transition';
+
+  import { setContext } from 'svelte';
+
+  import { page } from '$app/stores';
 
   export const FILTER_CONTEXT = 'filter-context';
 
-  export interface FilterContext<T> {
+  export interface FilterContext {
     filter: Writable<WorkflowFilter>;
     activeQueryIndex: Writable<number>;
     handleSubmit: () => void;
-    focusedElementId: Writable<any>;
+    focusedElementId: Writable<string>;
     resetFilter: () => void;
   }
 </script>
 
 <script lang="ts">
-  import { setContext } from 'svelte';
-  import { afterUpdate, noop } from 'svelte/internal';
-  import { writable } from 'svelte/store';
-  import { fly } from 'svelte/transition';
-  import { page } from '$app/stores';
+  import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
-
-  import { refresh } from '$lib/stores/workflows';
-  import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
+  import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
-  import {
-    emptyFilter,
-    combineFilters,
-  } from '$lib/utilities/query/to-list-workflow-filters';
-  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
+  import { refresh } from '$lib/stores/workflows';
   import {
     isBooleanFilter,
     isDateTimeFilter,
@@ -37,22 +39,19 @@
     isStatusFilter,
     isTextFilter,
   } from '$lib/utilities/query/filter-search';
+  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
+  import {
+    combineFilters,
+    emptyFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  import Button from '$lib/holocene/button.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import BooleanFilter from './boolean-filter.svelte';
-  import FilterList from './filter-list.svelte';
   import DateTimeFilter from './datetime-filter.svelte';
+  import FilterList from './filter-list.svelte';
   import NumberFilter from './number-filter.svelte';
   import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
-  import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
-
-  import type { WorkflowFilter } from '$lib/models/workflow-filters';
 
   type T = $$Generic;
 
@@ -65,7 +64,7 @@
 
   let viewAdvancedSearchInput = false;
 
-  setContext<FilterContext<T>>(FILTER_CONTEXT, {
+  setContext<FilterContext>(FILTER_CONTEXT, {
     filter,
     activeQueryIndex,
     handleSubmit,

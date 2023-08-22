@@ -1,14 +1,15 @@
 <script lang="ts">
+  import type { Writable } from 'svelte/store';
+  
   import { page } from '$app/stores';
-
-  import Icon from '$lib/holocene/icon/icon.svelte';
-
+  
   import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
-  import type { Writable } from 'svelte/store';
-  import { translate } from '$lib/i18n/translate';
+  
 
   export let namespaceList: NamespaceListItem[] = [];
   export let open: Writable<boolean>;

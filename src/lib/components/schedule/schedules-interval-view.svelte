@@ -5,8 +5,7 @@
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
-
-  import type { ScheduleOffsetUnit } from '$lib/types/schedule';
+import type { ScheduleOffsetUnit } from '$lib/types/schedule';
 
   export let days = '';
   export let hour = '';

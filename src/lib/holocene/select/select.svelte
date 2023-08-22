@@ -18,10 +18,12 @@
 </script>
 
 <script lang="ts">
-  import { setContext } from 'svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import { writable, type Writable } from 'svelte/store';
   import { noop, onMount } from 'svelte/internal';
+  import { writable, type Writable } from 'svelte/store';
+  
+  import { setContext } from 'svelte';
+  
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   type T = $$Generic;
 
@@ -30,8 +32,8 @@
   export let id: string;
   export let value: T = undefined;
   export let placeholder = '';
-  export let disabled: boolean = false;
-  export let unroundRight: boolean = false;
+  export let disabled = false;
+  export let unroundRight = false;
   export let onChange: (value: T) => void = noop;
 
   let select: HTMLUListElement;

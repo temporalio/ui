@@ -1,13 +1,15 @@
 <script lang="ts">
+  import type { Hst as HST } from '@histoire/plugin-svelte';
   import { logEvent } from 'histoire/client';
-  import DropdownButton from './dropdown-button.svelte';
+  
   import RadioMenuItem from '../dropdown-button/radio-menu-item.svelte';
   import MenuItem from '../primitives/menu/menu-item.svelte';
-  import type { Hst as HST } from '@histoire/plugin-svelte';
+  
+  import DropdownButton from './dropdown-button.svelte';
 
   export let Hst: HST;
 
-  let value: number = 0;
+  let value = 0;
 </script>
 
 <Hst.Story>

@@ -1,8 +1,8 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
+  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
 
   export let label: string;

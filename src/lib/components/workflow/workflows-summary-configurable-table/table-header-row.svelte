@@ -1,17 +1,19 @@
 <script lang="ts">
-  import Checkbox from '$lib/holocene/checkbox.svelte';
-  import BatchActions from './batch-actions.svelte';
-  import {
-    pageSelected,
-    handleSelectPage,
-    selectedWorkflows,
-    batchActionsVisible,
-  } from '$lib/pages/workflows-with-new-search.svelte';
-  import type { WorkflowExecution } from '$lib/types/workflows';
-  import IconButton from '$lib/holocene/icon-button.svelte';
   import { noop } from 'svelte/internal';
-  import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  
+  import Checkbox from '$lib/holocene/checkbox.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    batchActionsVisible,
+    handleSelectPage,
+    pageSelected,
+    selectedWorkflows,
+  } from '$lib/pages/workflows-with-new-search.svelte';
+  import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import type { WorkflowExecution } from '$lib/types/workflows';
+  
+  import BatchActions from './batch-actions.svelte';
 
   export let workflows: WorkflowExecution[];
   export let empty: boolean;

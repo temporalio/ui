@@ -1,10 +1,13 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
-  import { translate } from '$lib/i18n/translate';
-
+  
+  
+  
   import NumberInput from '$lib/holocene/input/number-input.svelte';
+  import { translate } from '$lib/i18n/translate';
+  
   import ConditionalMenu from './conditional-menu.svelte';
+  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
   type T = $$Generic;
 

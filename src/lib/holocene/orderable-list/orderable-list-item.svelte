@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  
   import IconButton from '../icon-button.svelte';
 
   const dispatch = createEventDispatcher<{
@@ -40,14 +41,14 @@
 
   type $$Props = (BaseProps & I18nProps) | ReadonlyProps | StaticProps;
 
-  let isStatic: boolean = false;
+  let isStatic = false;
   export { isStatic as static };
   export let label: string;
   export let maxPinnedItems: number = undefined;
-  export let pinned: boolean = false;
-  export let readonly: boolean = false;
-  export let index: number = 0;
-  export let totalItems: number = 0;
+  export let pinned = false;
+  export let readonly = false;
+  export let index = 0;
+  export let totalItems = 0;
   export let moveUpButtonLabel = '';
   export let moveDownButtonLabel = '';
   export let pinButtonLabel = '';

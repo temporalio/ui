@@ -1,17 +1,17 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import Badge from '$lib/holocene/badge.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import DropdownMenu from '$lib/holocene/dropdown-menu.svelte';
-  import NamespaceList from '$lib/components/namespace-list.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
+  import NamespaceList from '$lib/components/namespace-list.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
-  import { authUser } from '$lib/stores/auth-user';
-  import type { NamespaceListItem } from '$lib/types/global';
-  import { dataEncoder } from '$lib/stores/data-encoder';
+  import Badge from '$lib/holocene/badge.svelte';
+  import DropdownMenu from '$lib/holocene/dropdown-menu.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { authUser } from '$lib/stores/auth-user';
+  import { dataEncoder } from '$lib/stores/data-encoder';
+  import type { NamespaceListItem } from '$lib/types/global';
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];

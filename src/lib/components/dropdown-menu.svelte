@@ -1,10 +1,12 @@
 <script lang="ts">
-  import { createEventDispatcher, onMount } from 'svelte';
-  import { scale } from 'svelte/transition';
-  import IconButton from '$lib/holocene/icon-button.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { noop } from 'svelte/internal';
+  import { scale } from 'svelte/transition';
+
+  import { createEventDispatcher, onMount } from 'svelte';
+
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { IconName } from '$lib/holocene/icon/paths';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
   export let value: string | undefined;
@@ -12,11 +14,11 @@
   export let right = false;
   export let keepOpen = false;
   export let disabled = false;
-  export let disabledText: string = '';
+  export let disabledText = '';
   export let label: string;
 
-  let show: boolean = false;
-  let menu: any = null;
+  let show = false;
+  let menu: HTMLElement = null;
 
   $: {
     // Close the menu any time the value changes
@@ -27,6 +29,7 @@
 
   onMount(() => {
     const handleOutsideClick = (event: Event) => {
+      if (!(event.target instanceof HTMLElement)) return;
       if (show && !menu.contains(event.target)) {
         show = false;
       }

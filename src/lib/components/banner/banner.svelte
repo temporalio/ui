@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { closedBanners, close } from '$lib/stores/banner';
-  import { translate } from '$lib/i18n/translate';
   import IconButton from '$lib/holocene/icon-button.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { BannersState } from '$lib/models/banner-state';
+  import { close, closedBanners } from '$lib/stores/banner';
 
   export let key: string;
   export let severity: 'high' | 'medium' | 'low';

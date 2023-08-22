@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
-  import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
   import {
     addHours,
     addMinutes,
@@ -8,19 +6,23 @@
     formatISO,
     startOfDay,
   } from 'date-fns';
-  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { toDate } from '$lib/utilities/to-duration';
-  import { translate } from '$lib/i18n/translate';
-
+  import { getContext } from 'svelte';
+  
+  
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import TimePicker from '$lib/holocene/time-picker.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
   import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+  import TimePicker from '$lib/holocene/time-picker.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { toDate } from '$lib/utilities/to-duration';
+  
   import ConditionalMenu from './conditional-menu.svelte';
+  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
   type T = $$Generic;
 

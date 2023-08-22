@@ -1,18 +1,22 @@
 <script lang="ts">
-  import { workflowTableColumns } from '$lib/stores/workflow-table-columns';
-  import { workflows, updating } from '$lib/stores/workflows';
+  import { page } from '$app/stores';
+  
   import Drawer from '$lib/holocene/drawer.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table.svelte';
-  import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
-  import TableRow from './workflows-summary-configurable-table/table-row.svelte';
-  import TableHeaderRow from './workflows-summary-configurable-table/table-header-row.svelte';
-  import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
-  import WorkflowColumnsOrderableList from './workflows-summary-configurable-table/orderable-list.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { page } from '$app/stores';
+  import { workflowTableColumns } from '$lib/stores/workflow-table-columns';
+  import { updating, workflows } from '$lib/stores/workflows';
+  
+  import WorkflowColumnsOrderableList from './workflows-summary-configurable-table/orderable-list.svelte';
+  import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
+  import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
+  import TableHeaderRow from './workflows-summary-configurable-table/table-header-row.svelte';
+  import TableRow from './workflows-summary-configurable-table/table-row.svelte';
+  
+  
 
-  let customizationDrawerOpen: boolean = false;
+  let customizationDrawerOpen = false;
 
   $: ({ namespace } = $page.params);
   $: columns = $workflowTableColumns?.[namespace] ?? [];

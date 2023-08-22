@@ -1,13 +1,14 @@
 <script lang="ts">
-  import HeartBeat from './heart-beat-indicator.svelte';
-  import type { WorkflowStatus } from '$lib/types/workflows';
   import { translate } from '$lib/i18n/translate';
   import type { EventClassification } from '$lib/types/events';
+  import type { WorkflowStatus } from '$lib/types/workflows';
+  
+  import HeartBeat from './heart-beat-indicator.svelte';
 
   type Status = WorkflowStatus | EventClassification | 'Paused';
 
   export let status: Status = 'Running';
-  export let delay: number = 0;
+  export let delay = 0;
 
   const humanFriendlyNames: Partial<Record<Status, string>> = {
     Running: translate('workflows', 'running'),

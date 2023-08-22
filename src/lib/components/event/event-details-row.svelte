@@ -1,24 +1,24 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  
+  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Copyable from '$lib/holocene/copyable.svelte';
+  import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { format } from '$lib/utilities/format-camel-case';
+  import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
+  import {
+    getCodeBlockValue,
+    shouldDisplayAsExecutionLink,
+    shouldDisplayAsPlainText,
+    shouldDisplayAsTaskQueueLink,
+    shouldDisplayChildWorkflowLink,
+  } from '$lib/utilities/get-single-attribute-for-event';
   import {
     routeForEventHistory,
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
-  import {
-    shouldDisplayAsExecutionLink,
-    shouldDisplayAsTaskQueueLink,
-    shouldDisplayAsPlainText,
-    getCodeBlockValue,
-    shouldDisplayChildWorkflowLink,
-  } from '$lib/utilities/get-single-attribute-for-event';
-
-  import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Link from '$lib/holocene/link.svelte';
-  import Copyable from '$lib/holocene/copyable.svelte';
-  import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
-  import { translate } from '$lib/i18n/translate';
 
   export let key: string;
   export let value: string | Record<string, unknown>;

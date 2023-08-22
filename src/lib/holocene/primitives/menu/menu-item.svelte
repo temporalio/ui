@@ -1,7 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher, getContext } from 'svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
+  
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
+  
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
   export let dark = false;

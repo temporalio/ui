@@ -1,20 +1,19 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
-
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import {
     allEventTypeOptions,
     compactEventTypeOptions,
   } from '$lib/models/event-history/get-event-categorization';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { isVersionNewer } from '$lib/utilities/version-check';
   import { eventCategoryFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
-  import { translate } from '$lib/i18n/translate';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { isVersionNewer } from '$lib/utilities/version-check';
 
-  export let compact: boolean = false;
+  export let compact = false;
 
   $: label = compact
     ? translate('events', 'event-type')

@@ -3,19 +3,18 @@
 </script>
 
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
-
+  import { page } from '$app/stores';
+  
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
-  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type {
     EventSortOrder,
     EventSortOrderOptions,
   } from '$lib/stores/event-view';
-
-  import { page } from '$app/stores';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
   import { getDateFilterValue } from '$lib/utilities/event-formatting';
-  import { translate } from '$lib/i18n/translate';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   export let compact: boolean;
 

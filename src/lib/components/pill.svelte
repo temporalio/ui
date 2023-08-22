@@ -1,12 +1,11 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
-
-  import type { IconName } from '$lib/holocene/icon/paths';
+import type { IconName } from '$lib/holocene/icon/paths';
   import type { Color } from '$lib/types/global';
 
-  export let disabled: boolean = false;
-  export let loading: boolean = false;
-  export let active: boolean = false;
+  export let disabled = false;
+  export let loading = false;
+  export let active = false;
   export let icon: IconName = null;
   export let classes: string = $$props.class;
   export let color: Color = 'gray';

@@ -1,25 +1,24 @@
 <script lang="ts">
   import { noop, onMount } from 'svelte/internal';
 
-  import {
-    timeFormat,
-    Timezones,
-    TimezoneOptions,
-    relativeTime,
-    type TimeFormat,
-    type TimeFormatOptions,
-  } from '$lib/stores/time-format';
-  import { formatUTCOffset } from '$lib/utilities/format-date';
-  import { capitalize } from '$lib/utilities/format-camel-case';
-  import { translate } from '$lib/i18n/translate';
-
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
   import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import {
+    relativeTime,
+    type TimeFormat,
+    timeFormat,
+    type TimeFormatOptions,
+    TimezoneOptions,
+    Timezones,
+  } from '$lib/stores/time-format';
+  import { capitalize } from '$lib/utilities/format-camel-case';
+  import { formatUTCOffset } from '$lib/utilities/format-date';
 
   const QuickTimezoneOptions: TimeFormatOptions = [
     {
@@ -68,8 +67,7 @@
 
   onMount(() => {
     // Check for legacy timeFormat that may be set in localStorage
-    // @ts-ignore
-    if ($timeFormat === 'relative') {
+    if (($timeFormat as string) === 'relative') {
       $timeFormat = 'local';
       $relativeTime = true;
     }

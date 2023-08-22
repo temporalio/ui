@@ -1,23 +1,20 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import { submitEditSchedule } from '$lib/stores/schedules';
-
-  import Loading from '$lib/holocene/loading.svelte';
-  import { fetchSchedule } from '$lib/services/schedule-service';
-
   import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
-  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-
+  import Loading from '$lib/holocene/loading.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { fetchSchedule } from '$lib/services/schedule-service';
+  import { submitEditSchedule } from '$lib/stores/schedules';
   import type {
     FullSchedule,
-    SchedulePreset,
-    ScheduleParameters,
     ScheduleActionParameters,
+    ScheduleParameters,
+    SchedulePreset,
     SchedulePresetsParameters,
     ScheduleSpecParameters,
   } from '$lib/types/schedule';
-  import { translate } from '$lib/i18n/translate';
+  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
