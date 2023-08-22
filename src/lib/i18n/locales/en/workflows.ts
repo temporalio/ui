@@ -218,4 +218,5 @@ export const Strings = {
   'basic-search': 'Basic Search',
   'advanced-search': 'Advanced Search',
   'time-range': 'Time Range',
+  'pending-activities-link': 'Show all Pending Activities',
 } as const;
