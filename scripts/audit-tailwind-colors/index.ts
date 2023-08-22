@@ -19,8 +19,6 @@ const findTailwindColors = async (directory = src) => {
 
     let index = 1;
 
-    await parseSvelteComponent(file);
-
     for (const line of lines) {
       let match: RegExpExecArray | null;
 
