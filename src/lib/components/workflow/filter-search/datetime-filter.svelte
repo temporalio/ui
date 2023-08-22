@@ -11,20 +11,29 @@
     startOfDay,
   } from 'date-fns';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { getLocalTime } from '$lib/utilities/format-date';
   import { toDate } from '$lib/utilities/to-duration';
   import { translate } from '$lib/i18n/translate';
 
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
-  import { MenuContainer, MenuButton, Menu } from '$lib/holocene/menu';
+  import {
+    MenuContainer,
+    MenuDivider,
+    MenuButton,
+    Menu,
+  } from '$lib/holocene/menu';
   import ConditionalMenu from './conditional-menu.svelte';
   import Option from '$lib/holocene/select/option.svelte';
 
   type T = $$Generic;
 
   const { filter, handleSubmit } = getContext<FilterContext<T>>(FILTER_CONTEXT);
+
+  const localTime = getLocalTime() || translate('local');
 
   $: isTimeRange = $filter.conditional === 'BETWEEN';
 
@@ -239,6 +248,14 @@
           </div>
         </div>
       {/if}
+      <MenuDivider />
+      <div class="flex w-full flex-row items-center gap-2 px-3 pt-2 m-1">
+        <Icon name="clock" aria-hidden="true" />
+        <span class="text-gray-500 font-normal text-xs">
+          {translate('based-on-time-preface')}
+          {localTime}
+        </span>
+      </div>
     </Menu>
   </MenuContainer>
 </div>

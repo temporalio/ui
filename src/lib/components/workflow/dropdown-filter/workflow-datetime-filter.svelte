@@ -11,6 +11,7 @@
   import {
     MenuContainer,
     MenuButton,
+    MenuDivider,
     Menu,
     MenuItem,
   } from '$lib/holocene/menu';
@@ -19,11 +20,15 @@
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { translate } from '$lib/i18n/translate';
+  import { getLocalTime } from '$lib/utilities/format-date';
 
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
+
+  const localTime = getLocalTime() || translate('local');
 
   let custom = false;
   let value = 'All Time';
@@ -216,7 +221,7 @@
                 bind:half={endHalf}
               />
             </div>
-            <div class="flex mt-2 gap-2">
+            <div class="flex mt-2 gap-2 pb-2">
               <Button on:click={onApply}>{translate('apply')}</Button>
               <Button variant="secondary" on:click={() => (custom = false)}
                 >{translate('cancel')}</Button
@@ -263,6 +268,13 @@
               </div>
             </div>
           {/if}
+          <MenuDivider />
+          <div class="flex w-full flex-row items-center gap-2 px-3 pt-2 m-1">
+            <Icon name="clock" aria-hidden="true" />
+            <span class="text-gray-500 font-normal text-xs"
+              >{translate('based-on-time-preface')} {localTime}
+            </span>
+          </div>
         </Menu>
       </MenuContainer>
     </svelte:fragment>
