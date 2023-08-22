@@ -1,5 +1,5 @@
 <script lang="ts">
-  import MenuItem from '../primitives/menu/menu-item.svelte';
+  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
 
   export let label: string;
 </script>

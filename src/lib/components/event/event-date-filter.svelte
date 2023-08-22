@@ -3,9 +3,13 @@
 </script>
 
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
-
-  import DropdownMenu from '$lib/components/dropdown-menu.svelte';
+  import {
+    Menu,
+    MenuButton,
+    MenuContainer,
+    MenuItem,
+    MenuDivider,
+  } from '$lib/holocene/menu';
   import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
   import type {
     EventSortOrder,
@@ -16,6 +20,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { getDateFilterValue } from '$lib/utilities/event-formatting';
   import { translate } from '$lib/i18n/translate';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   export let compact: boolean;
 
@@ -48,56 +53,29 @@
   });
 </script>
 
-<DropdownMenu
-  label={translate('event-date-filter-label')}
-  {value}
-  testId="event-date-filter"
->
-  <svelte:fragment slot="label">
-    <span class="hidden md:block">{translate('date-and-time')}</span>
-    <span class="block md:hidden"><Icon name="clock" /></span>
-  </svelte:fragment>
-  <div class="w-56">
-    {#each sortOptions as { option, label } (option)}
-      <div class="option" class:active={$eventFilterSort === option}>
-        <div class="check active">
-          {#if $eventFilterSort === option}
-            <Icon name="checkmark" />
-          {/if}
-        </div>
-        <button on:click={() => onSortOptionClick(option)}>
-          {label}
-        </button>
-      </div>
-    {/each}
-
-    <div class="option pr-4">
-      <div class="check" />
-      <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
-    </div>
-    <div class="option" class:active={$eventShowElapsed === 'true'}>
-      <div class="check active">
-        {#if $eventShowElapsed === 'true'}
-          <Icon name="checkmark" />
-        {/if}
-      </div>
-      <button class="text-left" on:click={onShowElapsedClick}
-        >{translate('events', 'show-elapsed-time')}</button
+<MenuContainer>
+  <MenuButton
+    active={!!value}
+    hasIndicator
+    variant="table-header"
+    controls="event-date-filter-menu"
+    data-testid="event-date-filter-button"
+  >
+    <Icon class="md:hidden" name="clock" />
+    <span class="max-md:hidden">{translate('date-and-time')}</span>
+  </MenuButton>
+  <Menu class="w-80" id="event-date-filter-menu">
+    {#each sortOptions as { option, label }}
+      <MenuItem
+        selected={$eventFilterSort === option}
+        on:click={() => onSortOptionClick(option)}>{label}</MenuItem
       >
-    </div>
-  </div>
-</DropdownMenu>
-
-<style lang="postcss">
-  .option {
-    @apply my-2 flex font-normal;
-  }
-
-  .check {
-    @apply mx-4 w-4;
-  }
-
-  .active {
-    @apply text-blue-700;
-  }
-</style>
+    {/each}
+    <MenuDivider />
+    <MenuItem
+      selected={$eventShowElapsed === 'true'}
+      on:click={onShowElapsedClick}
+      >{translate('events', 'show-elapsed-time')}</MenuItem
+    >
+  </Menu>
+</MenuContainer>

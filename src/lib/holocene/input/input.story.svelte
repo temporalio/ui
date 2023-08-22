@@ -97,6 +97,7 @@
       label="Email Address(es)"
       placeholder="Type or paste in email addresses"
       hintText="Please enter a properly formatted email address."
+      removeChipButtonLabel={(chip) => `Remove ${chip}`}
       validator={isEmail}
     />
   </Hst.Variant>

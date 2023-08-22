@@ -59,7 +59,7 @@
     label={translate('workflows', 'reset-reapply-type-label')}
     id="reset-reapply-type-select"
     bind:value={resetReapplyType}
-    testId="workflow-reset-reapply-type-select"
+    data-testid="workflow-reset-reapply-type-select"
   >
     {#each resetReapplyTypes as { value, label }}
       <Option {value}>

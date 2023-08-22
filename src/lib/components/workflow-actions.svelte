@@ -19,10 +19,9 @@
   import { toaster } from '$lib/stores/toaster';
 
   import SplitButton from '$lib/holocene/split-button.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import MenuDivider from '$lib/holocene/primitives/menu/menu-divider.svelte';
+  import { MenuItem, MenuDivider } from '$lib/holocene/menu';
   import JSONEditor from '$lib/holocene/json-editor.svelte';
   import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
@@ -264,15 +263,16 @@
       {#if destructive}
         <MenuDivider />
       {/if}
-      <MenuItem
-        on:click={onClick}
-        {destructive}
-        {testId}
-        disabled={!allowed}
-        tooltipProps={{ text: tooltip, width: 200 }}
-      >
-        {label}
-      </MenuItem>
+      <Tooltip text={tooltip} hide={!tooltip} width={200} left>
+        <MenuItem
+          on:click={onClick}
+          {destructive}
+          disabled={!allowed}
+          data-testid={testId}
+        >
+          {label}
+        </MenuItem>
+      </Tooltip>
     {/each}
   </SplitButton>
 {:else}

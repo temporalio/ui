@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Select from '$lib/holocene/select/select.svelte';
+
   import { getContext } from 'svelte';
   import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
   import {
@@ -16,11 +18,9 @@
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
+  import { MenuContainer, MenuButton, Menu } from '$lib/holocene/menu';
   import ConditionalMenu from './conditional-menu.svelte';
+  import Option from '$lib/holocene/select/option.svelte';
 
   type T = $$Generic;
 
@@ -41,10 +41,6 @@
   let endSecond = '';
   let endHalf: 'AM' | 'PM' = 'AM';
 
-  const TIME_UNIT_LABELS = {
-    minutes: 'mins',
-    hours: 'hrs',
-  };
   const TIME_UNIT_OPTIONS = ['minutes', 'hours', 'days'];
 
   let timeUnit = TIME_UNIT_OPTIONS[0];
@@ -141,64 +137,58 @@
   />
   <MenuContainer>
     <MenuButton
+      unroundLeft
       id="time-range-filter"
       controls="time-range-filter-menu"
-      class="flex flex-row items-center p-2 bg-white text-gray-800 hover:border-primary hover:bg-primary hover:text-white border border-gray-800 rounded-r h-10"
     >
       {translate('workflows', 'select-time')}
     </MenuButton>
     <Menu
       keepOpen
       id="time-range-filter-menu"
-      class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-2"
+      class="w-[400px] p-2 !overflow-visible"
     >
       {#if isTimeRange}
         <div class="flex flex-col gap-2">
-          <div class="flex flex-col gap-2">
-            <DatePicker
-              label={translate('start')}
-              on:datechange={onStartDateChange}
-              selected={startDate}
-              todayLabel={translate('today')}
-              closeLabel={translate('close')}
-              clearLabel={translate('clear-input-button-label')}
-            />
-            <TimePicker
-              bind:hour={startHour}
-              bind:minute={startMinute}
-              bind:second={startSecond}
-              bind:half={startHalf}
-            />
+          <DatePicker
+            label={translate('start')}
+            on:datechange={onStartDateChange}
+            selected={startDate}
+            todayLabel={translate('today')}
+            closeLabel={translate('close')}
+            clearLabel={translate('clear-input-button-label')}
+          />
+          <TimePicker
+            bind:hour={startHour}
+            bind:minute={startMinute}
+            bind:second={startSecond}
+            bind:half={startHalf}
+          />
+          <DatePicker
+            label={translate('end')}
+            on:datechange={onEndDateChange}
+            selected={endDate}
+            todayLabel={translate('today')}
+            closeLabel={translate('close')}
+            clearLabel={translate('clear-input-button-label')}
+          />
+          <TimePicker
+            bind:hour={endHour}
+            bind:minute={endMinute}
+            bind:second={endSecond}
+            bind:half={endHalf}
+          />
+          <div class="flex justify-end">
+            <Button variant="ghost" on:click={onApply}
+              >{translate('apply')}</Button
+            >
           </div>
-        </div>
-        <div class="flex flex-col gap-2">
-          <div class="flex flex-col gap-2">
-            <DatePicker
-              label={translate('end')}
-              on:datechange={onEndDateChange}
-              selected={endDate}
-              todayLabel={translate('today')}
-              closeLabel={translate('close')}
-              clearLabel={translate('clear-input-button-label')}
-            />
-            <TimePicker
-              bind:hour={endHour}
-              bind:minute={endMinute}
-              bind:second={endSecond}
-              bind:half={endHalf}
-            />
-          </div>
-        </div>
-        <div class="flex justify-end">
-          <Button variant="ghost" on:click={onApply}
-            >{translate('apply')}</Button
-          >
         </div>
       {:else}
         <div class="flex flex-col gap-2">
           <p class="text-sm font-semibold">{translate('relative')}</p>
           <div class="flex justify-between items-center gap-2">
-            <div class="flex w-40 gap-0">
+            <div class="flex gap-0">
               <Input
                 label={translate('relative')}
                 labelHidden
@@ -209,26 +199,17 @@
                 unroundRight
                 class="h-10"
               />
-              <MenuContainer>
-                <MenuButton
-                  hasIndicator
-                  id="relative-datetime-input"
-                  controls="relative-datetime-input-menu"
-                  class="rounded-r bg-offWhite border border-primary border-l-0 h-10 w-28 px-2"
-                >
-                  {TIME_UNIT_LABELS[timeUnit] ?? timeUnit}
-                  {translate('ago')}
-                </MenuButton>
-                <Menu id="relative-datetime-input-menu">
-                  {#each TIME_UNIT_OPTIONS as unit}
-                    <MenuItem
-                      on:click={() => {
-                        timeUnit = unit;
-                      }}>{TIME_UNIT_LABELS[unit] ?? unit}</MenuItem
-                    >
-                  {/each}
-                </Menu>
-              </MenuContainer>
+              <Select
+                unroundLeft
+                bind:value={timeUnit}
+                id="relative-datetime-unit-input"
+                label={translate('time-unit')}
+                labelHidden
+              >
+                {#each TIME_UNIT_OPTIONS as unit}
+                  <Option value={unit}>{unit} {translate('ago')}</Option>
+                {/each}
+              </Select>
             </div>
             <Button
               variant="ghost"

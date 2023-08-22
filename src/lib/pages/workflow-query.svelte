@@ -64,7 +64,7 @@
           id="query-select"
           label={translate('workflows', 'query-type')}
           bind:value={queryType}
-          testId="query-select"
+          data-testid="query-select"
         >
           {#each types as value}
             <Option {value}>{value}</Option>

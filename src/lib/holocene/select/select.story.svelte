@@ -19,6 +19,7 @@
       id="select-1"
       label="Favorite Food"
       placeholder="Select an Option"
+      leadingIcon="temporal-logo"
       bind:value
       bind:disabled
     >
