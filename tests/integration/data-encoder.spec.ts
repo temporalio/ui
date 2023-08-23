@@ -251,7 +251,7 @@ test.describe('Data Encoder with Configuration Settings', () => {
     expect(dataEncoderTitle).toBe('Codec Server');
 
     await expect(page.getByTestId('override-accordion')).toHaveText(
-      'Use Cluster-level setting, where available.',
+      /Use Cluster-level setting, where available/,
     );
 
     const dataEncoderConfirmButton = page.getByTestId(
@@ -277,7 +277,7 @@ test.describe('Data Encoder with Configuration Settings', () => {
       .click();
 
     await expect(page.getByTestId('override-accordion')).toHaveText(
-      'Use my browser setting and ignore Cluster-level setting.',
+      /Use my browser setting and ignore Cluster-level setting/,
     );
 
     await dataEncoderConfirmButton.click();
@@ -287,7 +287,7 @@ test.describe('Data Encoder with Configuration Settings', () => {
     await dataEncoderStatusConfiguredButton.click();
 
     await expect(page.getByTestId('override-accordion')).toHaveText(
-      'Use my browser setting and ignore Cluster-level setting.',
+      /Use my browser setting and ignore Cluster-level setting/,
     );
   });
 });

@@ -67,12 +67,12 @@ test.describe('Workflows List with Advanced Visibility', () => {
         const encodedQuery = encodeURIComponent(query);
 
         await expect(page).toHaveURL(new RegExp(encodedQuery));
-        await expect(page).toHaveValue('#manual-search', query);
+        await expect(page.locator('#manual-search')).toHaveValue(query);
 
         await page.getByRole('search').getByTestId('clear-input').click();
 
         await expect(page).not.toHaveURL(new RegExp(encodedQuery));
-        await expect(page).toHaveValue('#manual-search', '');
+        await expect(page.locator('#manual-search')).toHaveValue('');
       });
     }
 
@@ -84,12 +84,12 @@ test.describe('Workflows List with Advanced Visibility', () => {
       const urlEncodedQuery = /ExecutionStatus%3D%22Running%22/;
 
       await expect(page).toHaveURL(urlEncodedQuery);
-      await expect(page).toHaveValue('#manual-search', query);
+      await expect(page.locator('#manual-search')).toHaveValue(query);
 
       await page.getByRole('search').getByTestId('clear-input').click();
 
       await expect(page).not.toHaveURL(urlEncodedQuery);
-      await expect(page).toHaveValue('#manual-search', '');
+      await expect(page.locator('#manual-search')).toHaveValue('');
     });
 
     test('Execution Status filter sets the correct query for multiple values', async ({
@@ -103,12 +103,12 @@ test.describe('Workflows List with Advanced Visibility', () => {
         /%28ExecutionStatus%3D%22Running%22\+OR\+ExecutionStatus%3D%22Failed%22%29/;
 
       await expect(page).toHaveURL(urlEncodedQuery);
-      await expect(page).toHaveValue('#manual-search', query);
+      await expect(page.locator('#manual-search')).toHaveValue(query);
 
       await page.getByRole('menuitem').filter({ hasText: 'All' }).click();
 
       await expect(page).not.toHaveURL(urlEncodedQuery);
-      await expect(page).toHaveValue('#manual-search', '');
+      await expect(page.locator('#manual-search')).toHaveValue('');
     });
 
     test('should combine all three filters', async ({ page }) => {
@@ -221,8 +221,7 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await expect(page.locator('#time-range-filter')).toHaveText(
         ' All Time chevron-down  ',
       );
-      await expect(page).toHaveValue(
-        '#manual-search',
+      await expect(page.locator('#manual-search')).toHaveValue(
         'ExecutionStatus="Running"',
       );
     });
@@ -247,8 +246,7 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await expect(page.locator('#time-range-filter')).toHaveText(
         ' All Time chevron-down  ',
       );
-      await expect(page).toHaveValue(
-        '#manual-search',
+      await expect(page.locator('#manual-search')).toHaveValue(
         'ExecutionStatus="Running"',
       );
     });
