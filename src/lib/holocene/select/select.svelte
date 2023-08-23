@@ -19,16 +19,18 @@
   }
 </script>
 
-<script lang="ts" generics="T">
+<script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { noop, onMount } from 'svelte/internal';
   import { writable, type Writable } from 'svelte/store';
-  
+
   import { setContext } from 'svelte';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
+
+  type T = $$Generic;
 
   type $$Props = HTMLInputAttributes & {
     label: string;

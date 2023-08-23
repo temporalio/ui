@@ -1,16 +1,18 @@
-<script lang="ts" generics="T extends object">
+<script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { writable } from 'svelte/store';
-  
+
   import { createEventDispatcher } from 'svelte';
-  
+
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
-  
+
   import Icon from '../icon/icon.svelte';
   import type { IconName } from '../icon/paths';
   import MenuButton from '../menu/menu-button.svelte';
+
+  type T = $$Generic;
 
   const dispatch = createEventDispatcher<{
     change: T | string;
@@ -131,6 +133,9 @@
   };
 
   const canRenderCustomOption = (option: T) => {
+    if (option === null) return false;
+    if (typeof option !== 'object') return false;
+
     return (
       optionValueKey !== null &&
       optionLabelKey !== null &&
@@ -146,8 +151,12 @@
       return option;
     }
 
-    if (isObjectOption(option) && canRenderCustomOption(option)) {
-      return option[optionLabelKey];
+    if (
+      typeof option === 'object' &&
+      isObjectOption(option) &&
+      canRenderCustomOption(option)
+    ) {
+      return String(option[optionLabelKey]);
     }
   };
 
@@ -157,7 +166,7 @@
     }
 
     if (isObjectOption(option) && canRenderCustomOption(option)) {
-      value = option[optionValueKey];
+      value = String(option[optionValueKey]);
     }
   };
 
