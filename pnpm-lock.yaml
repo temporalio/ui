@@ -299,8 +299,8 @@ devDependencies:
     specifier: ^3.55.1
     version: 3.55.1
   svelte-check:
-    specifier: ^3.4.3
-    version: 3.4.3(@babel/core@7.20.12)(postcss-load-config@3.1.4)(postcss@8.4.21)(svelte@3.55.1)
+    specifier: ^3.5.0
+    version: 3.5.0(@babel/core@7.20.12)(postcss-load-config@3.1.4)(postcss@8.4.21)(svelte@3.55.1)
   svelte-highlight:
     specifier: ^3.4.0
     version: 3.4.0
@@ -5763,7 +5763,7 @@ packages:
     dependencies:
       array-union: 3.0.1
       dir-glob: 3.0.1
-      fast-glob: 3.2.12
+      fast-glob: 3.3.1
       ignore: 5.2.4
       merge2: 1.4.1
       slash: 4.0.0
@@ -5774,7 +5774,7 @@ packages:
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dependencies:
       dir-glob: 3.0.1
-      fast-glob: 3.2.12
+      fast-glob: 3.3.1
       ignore: 5.2.4
       merge2: 1.4.1
       slash: 4.0.0
@@ -9214,15 +9214,15 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /svelte-check@3.4.3(@babel/core@7.20.12)(postcss-load-config@3.1.4)(postcss@8.4.21)(svelte@3.55.1):
-    resolution: {integrity: sha512-O07soQFY3X0VDt+bcGc6D5naz0cLtjwnmNP9JsEBPVyMemFEqUhL2OdLqvkl5H/u8Jwm50EiAU4BPRn5iin/kg==}
+  /svelte-check@3.5.0(@babel/core@7.20.12)(postcss-load-config@3.1.4)(postcss@8.4.21)(svelte@3.55.1):
+    resolution: {integrity: sha512-KHujbn4k17xKYLmtCwv0sKKM7uiHTYcQvXnvrCcNU6a7hcszh99zFTIoiu/Sp/ewAw5aJmillJ1Cs8gKLmcX4A==}
     hasBin: true
     peerDependencies:
       svelte: ^3.55.0 || ^4.0.0-next.0 || ^4.0.0
     dependencies:
       '@jridgewell/trace-mapping': 0.3.17
       chokidar: 3.5.3
-      fast-glob: 3.2.12
+      fast-glob: 3.3.1
       import-fresh: 3.3.0
       picocolors: 1.0.0
       sade: 1.8.1
