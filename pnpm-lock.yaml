@@ -175,12 +175,6 @@ devDependencies:
   autoprefixer:
     specifier: ^10.4.13
     version: 10.4.13(postcss@8.4.21)
-  babel-loader:
-    specifier: ^8.3.0
-    version: 8.3.0(@babel/core@7.20.12)(webpack@5.75.0)
-  babel-preset-vite:
-    specifier: ^1.0.4
-    version: 1.0.4
   c8:
     specifier: ^7.12.0
     version: 7.12.0
@@ -348,7 +342,7 @@ devDependencies:
     version: 1.0.4
   webpack:
     specifier: ^5.73.0
-    version: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
+    version: 5.76.0(@swc/core@1.3.35)(esbuild@0.13.15)
   yargs:
     specifier: ^17.7.2
     version: 17.7.2
@@ -647,6 +641,7 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.13.11
+    dev: false
 
   /@babel/template@7.20.7:
     resolution: {integrity: sha512-8SegXApWe6VoNw0r9JHpSteLKTpTiLZ4rMlGIm9JQ18KiCtyQiAMEazujAHrUS5flrcqYZa75ukev3P6QmUwUw==}
@@ -1939,10 +1934,10 @@ packages:
       rxjs: 7.8.0
       semver: 7.3.8
       source-map: 0.7.4
-      source-map-loader: 4.0.1(webpack@5.75.0)
-      swc-loader: 0.2.3(@swc/core@1.3.35)(webpack@5.75.0)
+      source-map-loader: 4.0.1(webpack@5.76.0)
+      swc-loader: 0.2.3(@swc/core@1.3.35)(webpack@5.76.0)
       unionfs: 4.4.0
-      webpack: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
+      webpack: 5.76.0(@swc/core@1.3.35)(esbuild@0.13.15)
     transitivePeerDependencies:
       - esbuild
       - uglify-js
@@ -1968,10 +1963,10 @@ packages:
       ms: 2.1.3
       rxjs: 7.8.0
       source-map: 0.7.4
-      source-map-loader: 4.0.1(webpack@5.75.0)
-      swc-loader: 0.2.3(@swc/core@1.3.35)(webpack@5.75.0)
+      source-map-loader: 4.0.1(webpack@5.76.0)
+      swc-loader: 0.2.3(@swc/core@1.3.35)(webpack@5.76.0)
       unionfs: 4.4.0
-      webpack: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
+      webpack: 5.76.0(@swc/core@1.3.35)(esbuild@0.13.15)
     transitivePeerDependencies:
       - esbuild
       - uglify-js
@@ -2016,35 +2011,6 @@ packages:
 
   /@tsconfig/node16@1.0.3:
     resolution: {integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==}
-    dev: true
-
-  /@types/babel__core@7.1.20:
-    resolution: {integrity: sha512-PVb6Bg2QuscZ30FvOU7z4guG6c926D9YRvOxEaelzndpMsvP+YM74Q/dAFASpg2l6+XLalxSGxcq/lrgYWZtyQ==}
-    dependencies:
-      '@babel/parser': 7.20.7
-      '@babel/types': 7.20.7
-      '@types/babel__generator': 7.6.4
-      '@types/babel__template': 7.4.1
-      '@types/babel__traverse': 7.18.3
-    dev: true
-
-  /@types/babel__generator@7.6.4:
-    resolution: {integrity: sha512-tFkciB9j2K755yrTALxD44McOrk+gfpIpvC3sxHjRawj6PfnQxrse4Clq5y/Rq+G3mrBurMax/lG8Qn2t9mSsg==}
-    dependencies:
-      '@babel/types': 7.20.7
-    dev: true
-
-  /@types/babel__template@7.4.1:
-    resolution: {integrity: sha512-azBFKemX6kMg5Io+/rdGT0dkGreboUVR0Cdm3fz9QJWpaQGJRQXl7C+6hOTCZcMll7KFyEQpgbYI2lHdsS4U7g==}
-    dependencies:
-      '@babel/parser': 7.20.7
-      '@babel/types': 7.20.7
-    dev: true
-
-  /@types/babel__traverse@7.18.3:
-    resolution: {integrity: sha512-1kbcJ40lLB7MHsj39U4Sh1uTd2E7rLEa79kmDpI6cy+XiXsteB3POdQomoq4FxszMrO3ZYchkhYJw7A2862b3w==}
-    dependencies:
-      '@babel/types': 7.20.7
     dev: true
 
   /@types/base-64@1.0.0:
@@ -2499,7 +2465,7 @@ packages:
     dependencies:
       '@mapbox/node-pre-gyp': 1.0.10
       '@rollup/pluginutils': 4.2.1
-      acorn: 8.8.2
+      acorn: 8.9.0
       async-sema: 3.1.1
       bindings: 1.5.0
       estree-walker: 2.0.2
@@ -2707,24 +2673,24 @@ packages:
   /acorn-globals@7.0.1:
     resolution: {integrity: sha512-umOSDSDrfHbTNPuNpC2NSnnA3LUrqpevPb4T9jRx4MagXNS0rs+gwiTcAvqCRmsD6utzsrzNt+ebm00SNWiC3Q==}
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
       acorn-walk: 8.2.0
     dev: true
 
-  /acorn-import-assertions@1.8.0(acorn@8.8.2):
+  /acorn-import-assertions@1.8.0(acorn@8.9.0):
     resolution: {integrity: sha512-m7VZ3jwz4eK6A4Vtt8Ew1/mNbP24u0FhdyfA7fSvnJR6LMdfOYnmuIrrJAgrYfYJ10F/otaHTtrtrtmHdMNzEw==}
     peerDependencies:
       acorn: ^8
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
     dev: true
 
-  /acorn-jsx@5.3.2(acorn@8.8.2):
+  /acorn-jsx@5.3.2(acorn@8.9.0):
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
       acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
     dev: true
 
   /acorn-node@1.8.2:
@@ -3017,45 +2983,6 @@ packages:
   /axe-core@4.7.2:
     resolution: {integrity: sha512-zIURGIS1E1Q4pcrMjp+nnEh+16G56eG/MUllJH8yEvw7asDo7Ac9uhC9KIH5jzpITueEZolfYglnCGIuSBz39g==}
     engines: {node: '>=4'}
-    dev: true
-
-  /babel-loader@8.3.0(@babel/core@7.20.12)(webpack@5.75.0):
-    resolution: {integrity: sha512-H8SvsMF+m9t15HNLMipppzkC+Y2Yq+v3SonZyU70RBL/h1gxPkH08Ot8pEE9Z4Kd+czyWJClmFS8qzIP9OZ04Q==}
-    engines: {node: '>= 8.9'}
-    peerDependencies:
-      '@babel/core': ^7.0.0
-      webpack: '>=2'
-    dependencies:
-      '@babel/core': 7.20.12
-      find-cache-dir: 3.3.2
-      loader-utils: 2.0.4
-      make-dir: 3.1.0
-      schema-utils: 2.7.1
-      webpack: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
-    dev: true
-
-  /babel-plugin-transform-vite-meta-env@1.0.3:
-    resolution: {integrity: sha512-eyfuDEXrMu667TQpmctHeTlJrZA6jXYHyEJFjcM0yEa60LS/LXlOg2PBbMb8DVS+V9CnTj/j9itdlDVMcY2zEg==}
-    dependencies:
-      '@babel/runtime': 7.20.7
-      '@types/babel__core': 7.1.20
-    dev: true
-
-  /babel-plugin-transform-vite-meta-glob@1.0.3:
-    resolution: {integrity: sha512-JW3VnwUjJqpj0FM0vJFxrGdxSBcHOa0j5YMvvtXYPmFshroq53nbK9dqRETgjXlMrfIz0oU/6ki+u1GdVWdNHA==}
-    dependencies:
-      '@babel/runtime': 7.20.7
-      '@types/babel__core': 7.1.20
-      glob: 7.2.3
-    dev: true
-
-  /babel-preset-vite@1.0.4:
-    resolution: {integrity: sha512-RZS/wNfEUD8aMliObxqlPw4ZR7R5OsT1G2IHd5nuUmiYKS6zemur8aZ5WPbfQwPpTPe9VEjcrxQA/6PKBWRTkg==}
-    dependencies:
-      '@babel/runtime': 7.20.7
-      '@types/babel__core': 7.1.20
-      babel-plugin-transform-vite-meta-env: 1.0.3
-      babel-plugin-transform-vite-meta-glob: 1.0.3
     dev: true
 
   /balanced-match@1.0.2:
@@ -3514,10 +3441,6 @@ packages:
   /common-tags@1.8.2:
     resolution: {integrity: sha512-gk/Z852D2Wtb//0I+kRFNKKE9dIIVirjoqPoA1wJU+XePVXZfGeBpk45+A1rKO4Q43prqWBNY/MiIeRLbPWUaA==}
     engines: {node: '>=4.0.0'}
-    dev: true
-
-  /commondir@1.0.1:
-    resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==}
     dev: true
 
   /component-emitter@1.3.0:
@@ -4985,8 +4908,8 @@ packages:
     resolution: {integrity: sha512-XwctdmTO6SIvCzd9810yyNzIrOrqNYV9Koizx4C/mRhf9uq0o4yHoCEU/670pOxOL/MSraektvSAji79kX90Vg==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dependencies:
-      acorn: 8.8.2
-      acorn-jsx: 5.3.2(acorn@8.8.2)
+      acorn: 8.9.0
+      acorn-jsx: 5.3.2(acorn@8.9.0)
       eslint-visitor-keys: 3.3.0
     dev: true
 
@@ -5274,15 +5197,6 @@ packages:
       unpipe: 1.0.0
     transitivePeerDependencies:
       - supports-color
-    dev: true
-
-  /find-cache-dir@3.3.2:
-    resolution: {integrity: sha512-wXZV5emFEjrridIgED11OoUKLxiYjAcqot/NJdAkOhlJ+vGzwhOAfcG5OX1jP+S0PcjEn8bdMJv+g2jwQ3Onig==}
-    engines: {node: '>=8'}
-    dependencies:
-      commondir: 1.0.1
-      make-dir: 3.1.0
-      pkg-dir: 4.2.0
     dev: true
 
   /find-up@4.1.0:
@@ -6893,7 +6807,7 @@ packages:
   /mlly@0.5.17:
     resolution: {integrity: sha512-Rn+ai4G+CQXptDFSRNnChEgNr+xAEauYhwRvpPl/UHStTlgkIftplgJRsA2OXPuoUn86K4XAjB26+x5CEvVb6A==}
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
       pathe: 1.1.0
       pkg-types: 1.0.1
       ufo: 1.0.1
@@ -6902,7 +6816,7 @@ packages:
   /mlly@1.1.0:
     resolution: {integrity: sha512-cwzBrBfwGC1gYJyfcy8TcZU1f+dbH/T+TuOhtYP2wLv/Fb51/uV7HJQfBPtEupZ2ORLRU1EKFS/QfS3eo9+kBQ==}
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
       pathe: 1.1.0
       pkg-types: 1.0.1
       ufo: 1.0.1
@@ -7432,13 +7346,6 @@ packages:
   /pify@3.0.0:
     resolution: {integrity: sha512-C3FsVNH1udSEX48gGX1xfvwTWfsYWj5U+8/uK15BGzIGrKoUpghX8hWZwa/OFnakBiiVNmBvemTJR5mcy7iPcg==}
     engines: {node: '>=4'}
-    dev: true
-
-  /pkg-dir@4.2.0:
-    resolution: {integrity: sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==}
-    engines: {node: '>=8'}
-    dependencies:
-      find-up: 4.1.0
     dev: true
 
   /pkg-types@1.0.1:
@@ -8201,6 +8108,7 @@ packages:
 
   /regenerator-runtime@0.13.11:
     resolution: {integrity: sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==}
+    dev: false
 
   /regexp.prototype.flags@1.4.3:
     resolution: {integrity: sha512-fjggEOO3slI6Wvgjwflkc4NFRCTZAu5CnNfBd5qOMYhWdn67nJBBu34/TkD++eeFmd8C9r9jfXJ27+nSiRkSUA==}
@@ -8367,15 +8275,6 @@ packages:
     engines: {node: '>=v12.22.7'}
     dependencies:
       xmlchars: 2.2.0
-    dev: true
-
-  /schema-utils@2.7.1:
-    resolution: {integrity: sha512-SHiNtMOUGWBQJwzISiVYKu82GiV4QYGePp3odlY1tuKO7gPtphAT5R/py0fA6xtbgLL/RvtJZnU9b8s0F1q0Xg==}
-    engines: {node: '>= 8.9.0'}
-    dependencies:
-      '@types/json-schema': 7.0.11
-      ajv: 6.12.6
-      ajv-keywords: 3.5.2(ajv@6.12.6)
     dev: true
 
   /schema-utils@3.1.1:
@@ -8604,7 +8503,7 @@ packages:
     resolution: {integrity: sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==}
     engines: {node: '>=0.10.0'}
 
-  /source-map-loader@4.0.1(webpack@5.75.0):
+  /source-map-loader@4.0.1(webpack@5.76.0):
     resolution: {integrity: sha512-oqXpzDIByKONVY8g1NUPOTQhe0UTU5bWUl32GSkqK2LjJj0HmwTMVKxcUip0RgAYhY1mqgOxjbQM48a0mmeNfA==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
@@ -8613,7 +8512,7 @@ packages:
       abab: 2.0.6
       iconv-lite: 0.6.3
       source-map-js: 1.0.2
-      webpack: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
+      webpack: 5.76.0(@swc/core@1.3.35)(esbuild@0.13.15)
     dev: true
 
   /source-map-support@0.5.21:
@@ -8825,7 +8724,7 @@ packages:
   /strip-literal@1.0.1:
     resolution: {integrity: sha512-QZTsipNpa2Ppr6v1AmJHESqJ3Uz247MUS0OjrnnZjFAvEoWqxuyFuXn2xLgMtRnijJShAa1HL0gtJyUs7u7n3Q==}
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
     dev: true
 
   /style-mod@4.0.0:
@@ -9164,14 +9063,14 @@ packages:
       stable: 0.1.8
     dev: true
 
-  /swc-loader@0.2.3(@swc/core@1.3.35)(webpack@5.75.0):
+  /swc-loader@0.2.3(@swc/core@1.3.35)(webpack@5.76.0):
     resolution: {integrity: sha512-D1p6XXURfSPleZZA/Lipb3A8pZ17fP4NObZvFCDjK/OKljroqDpPmsBdTraWhVBqUNpcWBQY1imWdoPScRlQ7A==}
     peerDependencies:
       '@swc/core': ^1.2.147
       webpack: '>=2'
     dependencies:
       '@swc/core': 1.3.35
-      webpack: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
+      webpack: 5.76.0(@swc/core@1.3.35)(esbuild@0.13.15)
     dev: true
 
   /symbol-tree@3.2.4:
@@ -9260,7 +9159,7 @@ packages:
       yallist: 4.0.0
     dev: true
 
-  /terser-webpack-plugin@5.3.6(@swc/core@1.3.35)(esbuild@0.13.15)(webpack@5.75.0):
+  /terser-webpack-plugin@5.3.6(@swc/core@1.3.35)(esbuild@0.13.15)(webpack@5.76.0):
     resolution: {integrity: sha512-kfLFk+PoLUQIbLmB1+PZDMRSZS99Mp+/MHqDNmMA6tOItzRt+Npe3E+fsMs5mfcM0wCtrrdU387UnV+vnSffXQ==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
@@ -9283,7 +9182,7 @@ packages:
       schema-utils: 3.1.1
       serialize-javascript: 6.0.0
       terser: 5.16.1
-      webpack: 5.75.0(@swc/core@1.3.35)(esbuild@0.13.15)
+      webpack: 5.76.0(@swc/core@1.3.35)(esbuild@0.13.15)
     dev: true
 
   /terser@5.16.1:
@@ -9292,7 +9191,7 @@ packages:
     hasBin: true
     dependencies:
       '@jridgewell/source-map': 0.3.2
-      acorn: 8.8.2
+      acorn: 8.9.0
       commander: 2.20.3
       source-map-support: 0.5.21
     dev: true
@@ -10058,8 +9957,8 @@ packages:
     engines: {node: '>=10.13.0'}
     dev: true
 
-  /webpack@5.75.0(@swc/core@1.3.35)(esbuild@0.13.15):
-    resolution: {integrity: sha512-piaIaoVJlqMsPtX/+3KTTO6jfvrSYgauFVdt8cr9LTHKmcq/AMd4mhzsiP7ZF/PGRNPGA8336jldh9l2Kt2ogQ==}
+  /webpack@5.76.0(@swc/core@1.3.35)(esbuild@0.13.15):
+    resolution: {integrity: sha512-l5sOdYBDunyf72HW8dF23rFtWq/7Zgvt/9ftMof71E/yUb1YLOBmTgA2K4vQthB3kotMrSj609txVE0dnr2fjA==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     peerDependencies:
@@ -10073,8 +9972,8 @@ packages:
       '@webassemblyjs/ast': 1.11.1
       '@webassemblyjs/wasm-edit': 1.11.1
       '@webassemblyjs/wasm-parser': 1.11.1
-      acorn: 8.8.2
-      acorn-import-assertions: 1.8.0(acorn@8.8.2)
+      acorn: 8.9.0
+      acorn-import-assertions: 1.8.0(acorn@8.9.0)
       browserslist: 4.21.4
       chrome-trace-event: 1.0.3
       enhanced-resolve: 5.12.0
@@ -10089,7 +9988,7 @@ packages:
       neo-async: 2.6.2
       schema-utils: 3.1.1
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.6(@swc/core@1.3.35)(esbuild@0.13.15)(webpack@5.75.0)
+      terser-webpack-plugin: 5.3.6(@swc/core@1.3.35)(esbuild@0.13.15)(webpack@5.76.0)
       watchpack: 2.4.0
       webpack-sources: 3.2.3
     transitivePeerDependencies:
