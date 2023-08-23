@@ -1,10 +1,9 @@
 <script lang="ts">
   import Input from '$lib/holocene/input/input.svelte';
-  import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
+  import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
-
-  import type { ScheduleOffsetUnit } from '$lib/types/schedule';
+import type { ScheduleOffsetUnit } from '$lib/types/schedule';
 
   export let days = '';
   export let hour = '';

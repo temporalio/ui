@@ -2,7 +2,7 @@
   import Panel from '$lib/components/panel.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let error: string = '';
+  export let error = '';
 </script>
 
 <Panel error>

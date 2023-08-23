@@ -1,13 +1,15 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
-
+  
   import {
-    MenuContainer,
-    MenuButton,
     Menu,
+    MenuButton,
+    MenuContainer,
     MenuItem,
   } from '$lib/holocene/menu';
+  
+  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
+  
 
   type T = $$Generic;
 

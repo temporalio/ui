@@ -1,18 +1,19 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  
+  import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
+  import Accordion from '$lib/holocene/accordion.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import {
     workflowRun,
     workflowSummaryViewOpen,
   } from '$lib/stores/workflow-run';
-  import { routeForWorkers } from '$lib/utilities/route-for';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-
-  import Accordion from '$lib/holocene/accordion.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
-  import { translate } from '$lib/i18n/translate';
+  import { routeForWorkers } from '$lib/utilities/route-for';
+  
 
   $: ({ workflow } = $workflowRun);
   $: elapsedTime = formatDistanceAbbreviated({

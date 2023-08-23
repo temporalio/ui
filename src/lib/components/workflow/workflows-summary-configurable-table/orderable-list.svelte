@@ -1,15 +1,15 @@
 <script lang="ts">
-  import {
-    workflowTableColumns,
-    availableSystemSearchAttributeColumns,
-    availableCustomSearchAttributeColumns,
-    addColumn,
-    removeColumn,
-    moveColumn,
-  } from '$lib/stores/workflow-table-columns';
-  import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
   import OrderableListItem from '$lib/holocene/orderable-list/orderable-list-item.svelte';
+  import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    addColumn,
+    availableCustomSearchAttributeColumns,
+    availableSystemSearchAttributeColumns,
+    moveColumn,
+    removeColumn,
+    workflowTableColumns,
+  } from '$lib/stores/workflow-table-columns';
 
   export let namespace: string;
 

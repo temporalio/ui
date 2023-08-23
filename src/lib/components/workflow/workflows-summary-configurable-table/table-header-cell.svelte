@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
-
-  import ExecutionStatusDropdownFilter from '$lib/components/workflow/dropdown-filter/workflow-status.svelte';
+  
   import TextFilter from '$lib/components/workflow/dropdown-filter/text-filter.svelte';
+  import ExecutionStatusDropdownFilter from '$lib/components/workflow/dropdown-filter/workflow-status.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
+  import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
 
   export let column: WorkflowHeader;
 

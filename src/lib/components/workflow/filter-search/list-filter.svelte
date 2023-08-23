@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
+  
   import Button from '$lib/holocene/button.svelte';
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
-
-  import { getContext } from 'svelte';
-  import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
   import { translate } from '$lib/i18n/translate';
+  
+  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
+  
 
   type T = $$Generic;
 

@@ -5,6 +5,7 @@
   export let closeButtonLabel: string;
 
   import { clickOutside } from '$lib/holocene/outside-click';
+  
   import IconButton from '../icon-button.svelte';
 </script>
 

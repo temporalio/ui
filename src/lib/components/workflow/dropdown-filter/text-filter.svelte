@@ -1,21 +1,22 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
     MenuButton,
     MenuContainer,
     MenuItem,
   } from '$lib/holocene/menu';
-  import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
-    type TextFilterAttributes,
     attributeToHumanReadable,
     attributeToId,
+    type TextFilterAttributes,
   } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import Icon from '$lib/holocene/icon/icon.svelte';
 
   let value = '';
   export let attribute: TextFilterAttributes;

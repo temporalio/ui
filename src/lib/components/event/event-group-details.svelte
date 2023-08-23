@@ -1,13 +1,13 @@
 <script lang="ts">
-  import {
-    eventOrGroupIsFailureOrTimedOut,
-    eventOrGroupIsCanceled,
-    eventOrGroupIsTerminated,
-  } from '$lib/models/event-groups/get-event-in-group';
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import {
+    eventOrGroupIsCanceled,
+    eventOrGroupIsFailureOrTimedOut,
+    eventOrGroupIsTerminated,
+  } from '$lib/models/event-groups/get-event-in-group';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
   export let eventGroup: EventGroup;
   export let selectedId: string;

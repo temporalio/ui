@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { I18nNamespace, I18nKey, I18nReplace } from '.';
+  import type { I18nKey, I18nNamespace, I18nReplace } from '.';
   import { translate } from './translate';
 
   /**

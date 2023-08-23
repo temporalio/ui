@@ -1,13 +1,12 @@
 <script lang="ts">
-  import { routeForSchedule } from '$lib/utilities/route-for';
-
+  
+  import Copyable from '$lib/holocene/copyable.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
-
-  import Copyable from '$lib/holocene/copyable.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { routeForSchedule } from '$lib/utilities/route-for';
 
   export let scheduleId: string;
   export let namespace: string;

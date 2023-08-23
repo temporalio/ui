@@ -1,18 +1,19 @@
 <script lang="ts">
-  import { groupEvents } from '$lib/models/event-groups';
-  import type { CommonHistoryEvent } from '$lib/types/events';
+  import { onMount } from 'svelte';
   import {
-    Timeline,
     DataSet,
+    Timeline,
     type TimelineOptionsGroupHeightModeType,
     type TimelineOptionsZoomKey,
   } from 'vis-timeline/standalone';
+  
   import Button from '$lib/holocene/button.svelte';
-  import { onMount } from 'svelte';
-  import { workflowRun } from '$lib/stores/workflow-run';
-  import { capitalize } from '$lib/utilities/format-camel-case';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { groupEvents } from '$lib/models/event-groups';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import type { CommonHistoryEvent } from '$lib/types/events';
+  import { capitalize } from '$lib/utilities/format-camel-case';
 
   export let history: CommonHistoryEvent[] = [];
 

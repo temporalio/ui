@@ -1,30 +1,30 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { eventViewType } from '$lib/stores/event-view';
-  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
-  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
-  import { exportHistory } from '$lib/utilities/export-history';
+  
+  import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
+  import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
+  import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
+  import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
-
-  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
   import WorkflowStackTraceError from '$lib/components/workflow/workflow-stack-trace-error.svelte';
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
-  import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
-  import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
-  import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
-
   import type { EventView } from '$lib/types/events';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { authUser } from '$lib/stores/auth-user';
   import { translate } from '$lib/i18n/translate';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import { eventViewType } from '$lib/stores/event-view';
+  import { exportHistory } from '$lib/utilities/export-history';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
   let showShortcuts = false;
 

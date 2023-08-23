@@ -1,9 +1,11 @@
 <script lang="ts">
-  import Input from '$lib/holocene/input/input.svelte';
-
   import { getContext } from 'svelte';
-  import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
+  
+  import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
+  
+  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
+  
 
   type T = $$Generic;
 
