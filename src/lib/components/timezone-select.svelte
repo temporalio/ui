@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { noop, onMount } from 'svelte/internal';
+  import { onMount } from 'svelte/internal';
 
   import {
     timeFormat,
@@ -9,7 +9,7 @@
     type TimeFormat,
     type TimeFormatOptions,
   } from '$lib/stores/time-format';
-  import { formatUTCOffset } from '$lib/utilities/format-date';
+  import { formatUTCOffset, getLocalTime } from '$lib/utilities/format-date';
   import { capitalize } from '$lib/utilities/format-camel-case';
   import { translate } from '$lib/i18n/translate';
 
@@ -24,6 +24,7 @@
   } from '$lib/holocene/menu';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
 
+  const localTime = getLocalTime();
   const QuickTimezoneOptions: TimeFormatOptions = [
     {
       label: translate('utc'),
@@ -62,12 +63,6 @@
     Timezones[$timeFormat]?.abbr ??
     Timezones[$timeFormat]?.label ??
     capitalize($timeFormat);
-
-  $: localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  $: localOption = TimezoneOptions.find(({ zones }) =>
-    zones?.includes(localTimezone),
-  ) ?? { label: '', abbr: '' };
-  $: localDescription = `${localOption.label} (${localOption.abbr})`;
 
   onMount(() => {
     // Check for legacy timeFormat that may be set in localStorage
@@ -113,7 +108,7 @@
           on:click={() => selectTimezone(value)}
           data-testid={`timezones-${value}`}
           selected={value === $timeFormat}
-          description={value === 'local' && localDescription}
+          description={value === 'local' && localTime}
         >
           {label}
         </MenuItem>
