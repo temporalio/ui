@@ -44,7 +44,7 @@
 
   $: ({ workflow, workers, compatibility } = $workflowRun);
 
-  let refreshInterval: number;
+  let refreshInterval: ReturnType<typeof setInterval>;
   const refreshRate = 15000;
 
   $: routeParameters = {

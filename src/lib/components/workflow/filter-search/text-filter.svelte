@@ -1,16 +1,15 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  
+
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
-  
+
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
-  
 
   type T = $$Generic;
 
   const { filter, handleSubmit, resetFilter } =
-    getContext<FilterContext<T>>(FILTER_CONTEXT);
+    getContext<FilterContext>(FILTER_CONTEXT);
 
   let value = $filter.value;
 

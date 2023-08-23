@@ -1,18 +1,16 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  
-  
-  
+
   import NumberInput from '$lib/holocene/input/number-input.svelte';
   import { translate } from '$lib/i18n/translate';
-  
+
   import ConditionalMenu from './conditional-menu.svelte';
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
   type T = $$Generic;
 
   const { filter, focusedElementId, handleSubmit } =
-    getContext<FilterContext<T>>(FILTER_CONTEXT);
+    getContext<FilterContext>(FILTER_CONTEXT);
   const min = 0;
   let value = $filter.value ? Number($filter.value) : null;
 

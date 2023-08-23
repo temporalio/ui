@@ -30,7 +30,7 @@
   type T = $$Generic;
 
   const { filter, activeQueryIndex } =
-    getContext<FilterContext<T>>(FILTER_CONTEXT);
+    getContext<FilterContext>(FILTER_CONTEXT);
 
   const removeQuery = (index: number) => {
     $workflowFilters.splice(index, 1);

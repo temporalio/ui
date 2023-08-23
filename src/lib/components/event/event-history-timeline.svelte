@@ -46,7 +46,7 @@
     if ($workflowRun?.workflow?.status) {
       groups.add({
         id: 'workflow',
-        content: renderExecutionName($workflowRun.workflow.status),
+        content: renderExecutionName(),
         order: -1,
       });
     }
@@ -106,7 +106,7 @@
       }
       groups.add({
         id: group.id,
-        content: renderGroupName(group, lastEvent.classification),
+        content: renderGroupName(group),
         order: i,
       });
     });

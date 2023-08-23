@@ -63,8 +63,8 @@
   });
 
   const handleOptionClick = () => {
-    handleChange(_value);
-    dispatch('click', { value: _value });
+    handleChange(_value as T);
+    dispatch('click', { value: _value as T });
   };
 </script>
 

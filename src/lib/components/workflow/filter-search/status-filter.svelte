@@ -26,7 +26,7 @@
 
   type T = $$Generic;
 
-  const { filter, resetFilter } = getContext<FilterContext<T>>(FILTER_CONTEXT);
+  const { filter, resetFilter } = getContext<FilterContext>(FILTER_CONTEXT);
   const open = writable(true);
   $: filters = [...$workflowFilters];
   $: statusFilters = filters.filter((filter) =>

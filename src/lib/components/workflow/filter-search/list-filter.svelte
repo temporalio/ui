@@ -1,16 +1,15 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  
+
   import Button from '$lib/holocene/button.svelte';
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import { translate } from '$lib/i18n/translate';
-  
+
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
-  
 
   type T = $$Generic;
 
-  const { filter, handleSubmit } = getContext<FilterContext<T>>(FILTER_CONTEXT);
+  const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
   let list: string[] = [];
 
