@@ -75,14 +75,14 @@
         <VirtualList items={filteredList} let:item itemHeight={50}>
           {@const first = item === filteredList[0]}
           {@const last = item === filteredList[filteredList.length - 1]}
-          <li class="link-item" class:first class:last>
+          <div class="link-item" class:first class:last>
             <button
               class="w-full p-3 text-left"
               on:click={() => item?.onClick(item.namespace)}
             >
               {item.namespace}
             </button>
-          </li>
+          </div>
         </VirtualList>
       {:else}
         <EmptyState title={translate('no-results')} />
