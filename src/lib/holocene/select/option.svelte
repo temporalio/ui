@@ -18,14 +18,14 @@
     onDestroy,
     onMount,
   } from 'svelte';
-  
+
   import { MenuItem } from '$lib/holocene/menu';
-  
+
   import { SELECT_CONTEXT, type SelectContext } from './select.svelte';
 
   type T = $$Generic;
 
-  const { selectValue, handleChange, options, open } =
+  const { selectValue, handleChange, options } =
     getContext<SelectContext<T>>(SELECT_CONTEXT);
 
   const dispatch = createEventDispatcher<{ click: { value: T } }>();
@@ -34,7 +34,7 @@
   export let description = '';
 
   let selected = false;
-  let _value: any;
+  let _value: T | string;
   let slotWrapper: HTMLSpanElement;
   let optionElement: HTMLLIElement;
   let label: string;
