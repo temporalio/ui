@@ -3,7 +3,7 @@
 
   export const FILTER_CONTEXT = 'filter-context';
 
-  export interface FilterContext<T> {
+  export interface FilterContext {
     filter: Writable<WorkflowFilter>;
     activeQueryIndex: Writable<number>;
     handleSubmit: () => void;
@@ -15,18 +15,17 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
   import { fly } from 'svelte/transition';
-  
+
   import { setContext } from 'svelte';
-  
+
   import { page } from '$app/stores';
-  
+
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  
+
   import { afterUpdate, noop } from 'svelte/internal';
-  
-  
+
   import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
@@ -54,15 +53,13 @@
     emptyFilter,
   } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  
-  
+
   import BooleanFilter from './boolean-filter.svelte';
   import DateTimeFilter from './datetime-filter.svelte';
   import FilterList from './filter-list.svelte';
   import NumberFilter from './number-filter.svelte';
   import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
-  
 
   const filter = writable<WorkflowFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
@@ -73,7 +70,7 @@
 
   let viewAdvancedSearchInput = false;
 
-  setContext<FilterContext<T>>(FILTER_CONTEXT, {
+  setContext<FilterContext>(FILTER_CONTEXT, {
     filter,
     activeQueryIndex,
     handleSubmit,
