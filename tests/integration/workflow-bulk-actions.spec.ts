@@ -60,7 +60,7 @@ test.describe('Batch and Bulk Workflow Actions', () => {
         'ExecutionStatus="Running"',
       );
       await page.fill(
-        '[data-testid="batch-Terminate-confirmation"] #bulk-action-reason',
+        '[data-testid="batch-Terminate-confirmation"] #bulk-action-reason-2',
         'Sarah Connor',
       );
       await page.click(
@@ -93,7 +93,7 @@ test.describe('Batch and Bulk Workflow Actions', () => {
         'ExecutionStatus="Running"',
       );
       await page.fill(
-        '[data-testid="batch-Cancel-confirmation"] #bulk-action-reason',
+        '[data-testid="batch-Cancel-confirmation"] #bulk-action-reason-0',
         'Sarah Connor',
       );
       await page.click(
