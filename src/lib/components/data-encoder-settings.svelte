@@ -4,7 +4,10 @@
 
   import { page } from '$app/stores';
 
+  import Accordion from '$lib/holocene/accordion.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { clickOutside } from '$lib/holocene/outside-click';
+  import { translate } from '$lib/i18n/translate';
   import { dataConverterPort } from '$lib/stores/data-converter-config';
   import {
     codecEndpoint,
@@ -14,11 +17,10 @@
   } from '$lib/stores/data-encoder-config';
   import { refresh } from '$lib/stores/workflow-run';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
-  import Accordion from '$lib/holocene/accordion.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
   import DataConverterPortSettings from './data-converter-port-settings.svelte';
-  import { translate } from '$lib/i18n/translate';
+  
 
   export const viewDataEncoderSettings = writable<boolean>(false);
 </script>
@@ -156,14 +158,14 @@
         <Button
           thin
           disabled={Boolean(error) || (override && !endpoint)}
-          testId="confirm-data-encoder-button"
+          data-testid="confirm-data-encoder-button"
           on:click={onConfirm}
           type="submit">{translate('apply')}</Button
         >
         <Button
           thin
           variant="ghost"
-          testId="cancel-data-encoder-button"
+          data-testid="cancel-data-encoder-button"
           on:click={onCancel}>{translate('cancel')}</Button
         >
       </div>

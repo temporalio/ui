@@ -1,15 +1,17 @@
 <script lang="ts">
-  import type { ScheduleActionResult } from '$types';
   import Panel from '$lib/components/panel.svelte';
-  import WorkflowStatus from '../workflow-status.svelte';
-  import { formatDate } from '$lib/utilities/format-date';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import { fetchWorkflowForSchedule } from '$lib/services/workflow-service';
-  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fetchWorkflowForSchedule } from '$lib/services/workflow-service';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+  import { formatDate } from '$lib/utilities/format-date';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
+  
+  import WorkflowStatus from '../workflow-status.svelte';
+  
+  import type { ScheduleActionResult } from '$types';
 
   export let recentRuns: ScheduleActionResult[] = [];
   export let namespace: string;

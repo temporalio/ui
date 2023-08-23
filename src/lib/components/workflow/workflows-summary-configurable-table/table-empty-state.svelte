@@ -1,5 +1,6 @@
 <script>
   import { page } from '$app/stores';
+  
   import Alert from '$lib/holocene/alert.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -47,7 +48,7 @@
           intent="caution"
           icon="warning"
           title={translate('workflows', 'workflow-query-error-state')}
-          >{$workflowError}</Alert
+          style="overflow-wrap: anywhere">{$workflowError}</Alert
         >
       {:else if query}
         <p>

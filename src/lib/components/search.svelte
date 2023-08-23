@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
 
   export let placeholder = '';

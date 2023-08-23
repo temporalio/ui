@@ -1,18 +1,19 @@
 <script lang="ts">
-  import { groupEvents } from '$lib/models/event-groups';
-  import type { CommonHistoryEvent } from '$lib/types/events';
+  import { onMount } from 'svelte';
   import {
-    Timeline,
     DataSet,
+    Timeline,
     type TimelineOptionsGroupHeightModeType,
     type TimelineOptionsZoomKey,
   } from 'vis-timeline/standalone';
+
   import Button from '$lib/holocene/button.svelte';
-  import { onMount } from 'svelte';
-  import { workflowRun } from '$lib/stores/workflow-run';
-  import { capitalize } from '$lib/utilities/format-camel-case';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { groupEvents } from '$lib/models/event-groups';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import type { CommonHistoryEvent } from '$lib/types/events';
+  import { capitalize } from '$lib/utilities/format-camel-case';
 
   export let history: CommonHistoryEvent[] = [];
 
@@ -24,11 +25,11 @@
     new Component({ target: container, props });
     return container.innerHTML;
   }
-  function renderGroupName(group, classification) {
+  function renderGroupName(group) {
     const groupName = capitalize(group.category);
     return `<div class="flex gap-2 items-center">${groupName}</div>`;
   }
-  function renderExecutionName(status) {
+  function renderExecutionName() {
     return `<div class="flex gap-1 items-center">Workflow Execution</div>`;
   }
   function renderPendingAttempts(name, attempt) {
@@ -37,15 +38,15 @@
     });
     return `<div class="flex gap-1 items-center justify-between"><div class="bar-content"><p>${name}</p></div><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div></div>`;
   }
-  const createGroupItems = (eventGroups, isRunning) => {
+  const createGroupItems = (eventGroups, isRunning, sortedHistory) => {
     const items = new DataSet([]);
     const groups = new DataSet([]);
-    const firstEvent = history[0];
-    const finalEvent = history[history.length - 1];
+    const firstEvent = sortedHistory[0];
+    const finalEvent = sortedHistory[sortedHistory.length - 1];
     if ($workflowRun?.workflow?.status) {
       groups.add({
         id: 'workflow',
-        content: renderExecutionName($workflowRun.workflow.status),
+        content: renderExecutionName(),
         order: -1,
       });
     }
@@ -105,7 +106,7 @@
       }
       groups.add({
         id: group.id,
-        content: renderGroupName(group, lastEvent.classification),
+        content: renderGroupName(group),
         order: i,
       });
     });
@@ -157,13 +158,14 @@
     if (history.length && timeline) {
       const reverseHistory =
         $eventFilterSort === 'descending' && $eventViewType !== 'compact';
-      const historyCopy = [...history];
-      const eventGroups = groupEvents(
-        reverseHistory ? historyCopy.reverse() : history,
-      );
+      const sortedHistory = reverseHistory
+        ? [...history].reverse()
+        : [...history];
+      const eventGroups = groupEvents(sortedHistory);
       const { groups, items } = createGroupItems(
         eventGroups,
         $workflowRun?.workflow?.isRunning,
+        sortedHistory,
       );
       setVizItems(items, groups);
     }

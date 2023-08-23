@@ -1,29 +1,31 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { writable } from 'svelte/store';
 
   import { getContext } from 'svelte';
-  import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
 
-  import { translate } from '$lib/i18n/translate';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import { isStatusFilter } from '$lib/utilities/query/filter-search';
-  import { labsMode } from '$lib/stores/labs-mode';
-  import { workflowFilters } from '$lib/stores/filters';
-  import { workflowStatuses } from '$lib/models/workflow-status';
+  import { page } from '$app/stores';
 
-  import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-
+  import Checkbox from '$lib/holocene/checkbox.svelte';
+  import {
+    Menu,
+    MenuButton,
+    MenuContainer,
+    MenuDivider,
+    MenuItem,
+  } from '$lib/holocene/menu';
+  import { translate } from '$lib/i18n/translate';
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
+  import { workflowStatuses } from '$lib/models/workflow-status';
+  import { workflowFilters } from '$lib/stores/filters';
+  import { labsMode } from '$lib/stores/labs-mode';
+  import { isStatusFilter } from '$lib/utilities/query/filter-search';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
-  type T = $$Generic;
+  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
-  const { filter, resetFilter } = getContext<FilterContext<T>>(FILTER_CONTEXT);
-
+  const { filter, resetFilter } = getContext<FilterContext>(FILTER_CONTEXT);
+  const open = writable(true);
   $: filters = [...$workflowFilters];
   $: statusFilters = filters.filter((filter) =>
     isStatusFilter(filter.attribute),
@@ -86,54 +88,32 @@
   };
 </script>
 
-<MenuContainer let:open>
-  <Button
-    id="status-filter"
-    variant="search"
-    on:click={() => open.update((previous) => !previous)}
-  >
+<MenuContainer {open}>
+  <MenuButton controls="status-menu">
     {$filter.attribute}
-  </Button>
-  <Menu class="max-h-84 overflow-y-scroll w-fit" id="status-menu" keepOpen>
+  </MenuButton>
+  <Menu id="status-menu" keepOpen>
     {#each workflowStatuses as status (status)}
-      {@const isActive = statusFilters.find(
-        (filter) => filter.value === status,
-      )}
+      {@const checked = statusFilters.some((filter) => filter.value === status)}
       <MenuItem
-        class="transition-all hover:cursor-pointer !p-2"
         data-testid={status}
         on:click={() => {
           onStatusClick(status);
         }}
       >
-        <span class="flex items-center">
-          <div
-            class="mr-2 h-4 w-4 rounded-sm ring-1 ring-gray-900"
-            class:active={isActive}
-          >
-            {#if isActive}
-              <Icon
-                class="pointer-events-none -mt-[1px] -ml-[2px] "
-                name="checkmark"
-                width={20}
-                height={20}
-              />
-            {/if}
-          </div>
-          <WorkflowStatus {status} />
-        </span>
+        <Checkbox
+          on:click={() => onStatusClick(status)}
+          slot="leading"
+          {checked}
+          label={status}
+          labelHidden
+        />
+        <WorkflowStatus {status} />
       </MenuItem>
     {/each}
-    <div class="border-t border-gray-300">
-      <Button variant="ghost" class="!w-full " on:click={onApply}
-        >{translate('apply')}</Button
-      >
-    </div>
+    <MenuDivider />
+    <MenuItem centered disabled={statusFilters.length === 0} on:click={onApply}
+      >{translate('apply')}</MenuItem
+    >
   </Menu>
 </MenuContainer>
-
-<style lang="postcss">
-  .active {
-    @apply bg-gray-900 text-white;
-  }
-</style>

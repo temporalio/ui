@@ -1,14 +1,15 @@
 <script lang="ts">
-  import { routeForNamespace } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
-  import { namespaces } from '$lib/stores/namespaces';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
+  
   import PageTitle from '$lib/components/page-title.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
-  import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { namespaces } from '$lib/stores/namespaces';
+  import { routeForNamespace } from '$lib/utilities/route-for';
 </script>
 
 <PageTitle title="Namespaces" url={$page.url.href} />

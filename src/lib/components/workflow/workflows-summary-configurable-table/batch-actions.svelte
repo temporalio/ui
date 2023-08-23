@@ -1,21 +1,22 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  
   import BulkActionButton from '$lib/holocene/table/bulk-action-button.svelte';
-  import { coreUserStore } from '$lib/stores/core-user';
-  import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
-  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
-  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
+  import { translate } from '$lib/i18n/translate';
+  import Translate from '$lib/i18n/translate.svelte';
   import {
     allSelected,
-    selectedWorkflows,
     cancelableWorkflows,
     handleSelectAll,
     openBatchCancelConfirmationModal,
     openBatchTerminateConfirmationModal,
+    selectedWorkflows,
   } from '$lib/pages/workflows-with-new-search.svelte';
+  import { coreUserStore } from '$lib/stores/core-user';
+  import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { translate } from '$lib/i18n/translate';
-  import Translate from '$lib/i18n/translate.svelte';
+  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
+  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
 
   export let workflows: WorkflowExecution[];
 

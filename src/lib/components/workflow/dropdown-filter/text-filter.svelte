@@ -1,12 +1,14 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import DropdownMenu from '$lib/components/dropdown-menu.svelte';
+
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import {
-    type TextFilterAttributes,
     attributeToHumanReadable,
     attributeToId,
+    type TextFilterAttributes,
   } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
@@ -37,11 +39,11 @@
     updateQueryParamsFromFilter($page.url, $workflowFilters);
   };
 
-  function handleShowInput(event: CustomEvent) {
-    const show = event.detail.show;
-    if (show && idFilter?.value) {
+  function handleShowInput(event: CustomEvent<{ open: boolean }>) {
+    const { open } = event.detail;
+    if (open && idFilter?.value) {
       value = idFilter.value;
-    } else if (show && !idFilter && value) {
+    } else if (open && !idFilter && value) {
       value = '';
     }
   }
@@ -52,20 +54,17 @@
   }
 </script>
 
-<DropdownMenu
-  label={translate('workflow-filter-label', {
-    attribute: attributeToHumanReadable[attribute],
-  })}
-  value={idFilter ? idFilter.value : ''}
-  keepOpen
-  icon="filter"
-  testId="{attributeToId[attribute]}-filter-button"
-  on:showmenu={handleShowInput}
->
-  <svelte:fragment slot="label"
-    >{attributeToHumanReadable[attribute]}</svelte:fragment
+<MenuContainer>
+  <MenuButton
+    data-testid="{attributeToId[attribute]}-filter-button"
+    variant="table-header"
+    controls="{attributeToId[attribute]}-filter-menu"
+    on:click={handleShowInput}
   >
-  <div class="flex w-[500px] flex-col gap-2 p-2">
+    {attributeToHumanReadable[attribute]}
+    <Icon name="filter" slot="trailing" />
+  </MenuButton>
+  <Menu keepOpen id="{attributeToId[attribute]}-filter-menu" class="w-[500px]">
     <Input
       icon="search"
       type="search"
@@ -73,7 +72,7 @@
       labelHidden
       id={attributeToId[attribute]}
       placeholder={attributeToHumanReadable[attribute]}
-      class="flex items-center px-2 transition-all hover:cursor-pointer"
+      class="flex items-center p-2 transition-all hover:cursor-pointer"
       autoFocus
       clearable
       clearButtonLabel={translate('clear-input-button-label')}
@@ -81,5 +80,5 @@
       on:clear={handleClearInput}
       bind:value
     />
-  </div>
-</DropdownMenu>
+  </Menu>
+</MenuContainer>

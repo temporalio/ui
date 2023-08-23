@@ -130,4 +130,7 @@ export const Strings = {
   off: 'Off',
   labs: 'Labs',
   experimental: 'Experimental',
+  timezone: 'Timezone {{ timezone }}',
+  'time-unit': 'Time Unit',
+  'based-on-time-preface': 'Based on',
 } as const;

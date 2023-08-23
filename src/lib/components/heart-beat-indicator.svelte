@@ -3,7 +3,7 @@
   // https://codepen.io/jupa8712/pen/XmbyXE?js-preprocessor=none
 
   let text = '';
-  export let delay: number = 0;
+  export let delay = 0;
 
   $: cssVarStyles = `--animation-delay:${delay}ms;`;
 </script>

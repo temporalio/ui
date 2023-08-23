@@ -3,6 +3,7 @@ export const Namespace = 'workflows' as const;
 export const Strings = {
   'loading-workflows': 'Loading workflows',
   'recent-workflows': 'Recent Workflows',
+  'recent-workflows-link': 'View Recent Workflows',
   'workflows-count_one': '{{count, number}} workflow',
   'workflows-count_other': '{{count, number}} workflows',
   'workflows-error-querying':
@@ -218,4 +219,5 @@ export const Strings = {
   'basic-search': 'Basic Search',
   'advanced-search': 'Advanced Search',
   'time-range': 'Time Range',
+  'pending-activities-link': 'Show all Pending Activities',
 } as const;
