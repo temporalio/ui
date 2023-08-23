@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Shortcut from '$lib/holocene/keyboard-shortcut/shortcut.svelte';
-  import Drawer from '$lib/holocene/drawer.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Drawer from '$lib/holocene/drawer.svelte';
+  import Shortcut from '$lib/holocene/keyboard-shortcut/shortcut.svelte';
   import { translate } from '$lib/i18n/translate';
 
   export let open = false;

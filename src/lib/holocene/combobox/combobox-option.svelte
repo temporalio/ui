@@ -13,8 +13,8 @@
 
   type $$Props = Props | DisabledProps;
 
-  export let selected: boolean = false;
-  export let disabled: boolean = false;
+  export let selected = false;
+  export let disabled = false;
 </script>
 
 <MenuItem

@@ -1,20 +1,18 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import { formatDate } from '$lib/utilities/format-date';
-  import { getMilliseconds } from '$lib/utilities/format-time';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
-  import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
-  import { translate } from '$lib/i18n/translate';
-
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
-
+  import { translate } from '$lib/i18n/translate';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { formatDate } from '$lib/utilities/format-date';
+  import { getMilliseconds } from '$lib/utilities/format-time';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+  import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;

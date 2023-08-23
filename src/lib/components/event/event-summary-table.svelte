@@ -3,11 +3,11 @@
 
   import EventCategoryFilter from '$lib/components/event/event-category-filter.svelte';
   import EventDateFilter from '$lib/components/event/event-date-filter.svelte';
-  import { expandAllEvents } from '$lib/stores/event-view';
-  import Table from '$lib/holocene/table/table.svelte';
-  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { expandAllEvents } from '$lib/stores/event-view';
 
   export let compact = false;
   export let updating = false;

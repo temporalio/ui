@@ -1,11 +1,12 @@
 <script lang="ts">
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import ArrowUp from './arrow-up.svelte';
+  
   import ArrowDown from './arrow-down.svelte';
-  import ArrowRight from './arrow-right.svelte';
   import ArrowLeft from './arrow-left.svelte';
+  import ArrowRight from './arrow-right.svelte';
+  import ArrowUp from './arrow-up.svelte';
 
-  export let tooltipText: string = '';
+  export let tooltipText = '';
   export let arrow: 'up' | 'down' | 'left' | 'right' | undefined = undefined;
   export let title: string;
 

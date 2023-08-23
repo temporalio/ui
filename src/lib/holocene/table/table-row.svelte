@@ -3,10 +3,10 @@
 
   interface $$Props extends HTMLAttributes<HTMLTableRowElement> {
     href?: string;
-    'data-testid'?: String;
+    'data-testid'?: string;
   }
 
-  export let href: string = '';
+  export let href = '';
 
   let className = '';
   export { className as class };

@@ -1,15 +1,18 @@
-<script lang="ts" generics="T extends object">
-  import Icon from '../icon/icon.svelte';
-
-  import type { IconName } from '../icon/paths';
+<script lang="ts">
+  import type { HTMLInputAttributes } from 'svelte/elements';
+  import { writable } from 'svelte/store';
 
   import { createEventDispatcher } from 'svelte';
-  import { writable } from 'svelte/store';
-  import type { HTMLInputAttributes } from 'svelte/elements';
+
+  import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
-  import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
+
+  import Icon from '../icon/icon.svelte';
+  import type { IconName } from '../icon/paths';
   import MenuButton from '../menu/menu-button.svelte';
+
+  type T = $$Generic;
 
   const dispatch = createEventDispatcher<{
     change: T | string;
@@ -59,17 +62,17 @@
   export let label: string;
   export let value: string = undefined;
   export let noResultsText: string;
-  export let disabled: boolean = false;
-  export let labelHidden: boolean = false;
+  export let disabled = false;
+  export let labelHidden = false;
   export let options: (T | string)[];
   export let placeholder: string = null;
-  export let readonly: boolean = false;
-  export let required: boolean = false;
+  export let readonly = false;
+  export let required = false;
   export let leadingIcon: IconName = null;
   export let optionValueKey: keyof T = null;
   export let optionLabelKey: keyof T = optionValueKey;
-  export let minSize: number = 0;
-  export let maxSize: number = 120;
+  export let minSize = 0;
+  export let maxSize = 120;
 
   let displayValue: string;
   let selectedOption: string | T;
@@ -125,11 +128,14 @@
     return typeof option === 'string';
   };
 
-  const isObjectOption = (option: string | T): option is T => {
+  const isObjectOption = (option: string | T): option is T & object => {
     return typeof option === 'object';
   };
 
   const canRenderCustomOption = (option: T) => {
+    if (option === null) return false;
+    if (typeof option !== 'object') return false;
+
     return (
       optionValueKey !== null &&
       optionLabelKey !== null &&
@@ -146,7 +152,7 @@
     }
 
     if (isObjectOption(option) && canRenderCustomOption(option)) {
-      return option[optionLabelKey];
+      return String(option[optionLabelKey]);
     }
   };
 
@@ -156,7 +162,7 @@
     }
 
     if (isObjectOption(option) && canRenderCustomOption(option)) {
-      value = option[optionValueKey];
+      value = String(option[optionValueKey]);
     }
   };
 

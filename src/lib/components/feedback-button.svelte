@@ -1,6 +1,7 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { page } from '$app/stores';
+  
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   const href =
     $page.data?.settings?.feedbackURL ||
