@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
   import OptionGroup from './option-group.svelte';
-
-  import Option from './option.svelte';
+import Option from './option.svelte';
   import Select from './select.svelte';
   import SimpleOption from './simple-option.svelte';
   import SimpleSelect from './simple-select.svelte';

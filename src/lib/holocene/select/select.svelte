@@ -19,15 +19,18 @@
   }
 </script>
 
-<script lang="ts" generics="T">
-  import { setContext } from 'svelte';
+<script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { noop, onMount } from 'svelte/internal';
   import { writable, type Writable } from 'svelte/store';
 
-  import type { IconName } from '$lib/holocene/icon/paths';
+  import { setContext } from 'svelte';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { MenuContainer, MenuButton, Menu } from '$lib/holocene/menu';
+  import type { IconName } from '$lib/holocene/icon/paths';
+  import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
+
+  type T = $$Generic;
 
   type $$Props = HTMLInputAttributes & {
     label: string;
@@ -48,10 +51,10 @@
   export let id: string;
   export let value: T = undefined;
   export let placeholder = '';
-  export let disabled: boolean = false;
+  export let disabled = false;
   export let leadingIcon: IconName = null;
-  export let unroundRight: boolean = false;
-  export let unroundLeft: boolean = false;
+  export let unroundRight = false;
+  export let unroundLeft = false;
   export let onChange: (value: T) => void = noop;
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
@@ -95,7 +98,7 @@
 <MenuContainer class="w-full" {open}>
   <label class:sr-only={labelHidden} for={id}>{label}</label>
   <MenuButton
-    hasIndicator
+    hasIndicator={!disabled}
     {disabled}
     {unroundLeft}
     {unroundRight}

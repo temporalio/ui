@@ -1,8 +1,8 @@
 <script lang="ts">
-  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
 
   export let hour = '';

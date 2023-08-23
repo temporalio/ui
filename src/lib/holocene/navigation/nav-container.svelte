@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';

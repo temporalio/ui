@@ -1,8 +1,6 @@
 <script lang="ts">
-  import Select from '$lib/holocene/select/select.svelte';
-
-  import { getContext } from 'svelte';
-  import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
+  
+  
   import {
     addHours,
     addMinutes,
@@ -10,29 +8,27 @@
     formatISO,
     startOfDay,
   } from 'date-fns';
-  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { getLocalTime } from '$lib/utilities/format-date';
-  import { toDate } from '$lib/utilities/to-duration';
-  import { translate } from '$lib/i18n/translate';
-
+  import { getContext } from 'svelte';
+  
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import TimePicker from '$lib/holocene/time-picker.svelte';
-  import {
-    MenuContainer,
-    MenuDivider,
-    MenuItem,
-    MenuButton,
-    Menu,
-  } from '$lib/holocene/menu';
-  import ConditionalMenu from './conditional-menu.svelte';
+  import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
+  import MenuDivider from '$lib/holocene/menu/menu-divider.svelte';
+  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Option from '$lib/holocene/select/option.svelte';
+  import Select from '$lib/holocene/select/select.svelte';
+  import TimePicker from '$lib/holocene/time-picker.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { getLocalTime } from '$lib/utilities/format-date';
+  import { toDate } from '$lib/utilities/to-duration';
 
-  type T = $$Generic;
+  import ConditionalMenu from './conditional-menu.svelte';
+  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
-  const { filter, handleSubmit } = getContext<FilterContext<T>>(FILTER_CONTEXT);
+  const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
   const localTime = getLocalTime() || translate('local');
 

@@ -1,11 +1,14 @@
 <script lang="ts">
-  import type { PageData } from './$types';
   import { onMount } from 'svelte';
+  
   import { goto } from '$app/navigation';
+  
+  import type { PageData } from './$types';
+  
 
+  import Loading from '$lib/holocene/loading.svelte';
   import { fetchWorkflowForAuthorization } from '$lib/services/workflow-service';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import Loading from '$lib/holocene/loading.svelte';
   import {
     routeForNamespaceSelector,
     routeForWorkflows,

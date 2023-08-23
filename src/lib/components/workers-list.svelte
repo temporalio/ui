@@ -1,20 +1,19 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
-
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import { formatDate } from '$lib/utilities/format-date';
-  import { translate } from '$lib/i18n/translate';
-
+  import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Table from '$lib/holocene/table/table.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
+  import { translate } from '$lib/i18n/translate';
   import {
+    getBuildIdReachability,
     type GetPollersResponse,
     type TaskQueueCompatibility,
     type WorkerReachability,
-    getBuildIdReachability,
   } from '$lib/services/pollers-service';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { formatDate } from '$lib/utilities/format-date';
   import {
     getCurrentCompatibilityDefaultVersion,
     getCurrentPollerBuildId,
@@ -22,7 +21,6 @@
     getNonDefaultVersionsForSet,
     getOrderedVersionSets,
   } from '$lib/utilities/task-queue-compatibility';
-  import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;

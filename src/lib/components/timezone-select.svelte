@@ -1,28 +1,27 @@
 <script lang="ts">
   import { onMount } from 'svelte/internal';
 
-  import {
-    timeFormat,
-    Timezones,
-    TimezoneOptions,
-    relativeTime,
-    type TimeFormat,
-    type TimeFormatOptions,
-  } from '$lib/stores/time-format';
-  import { formatUTCOffset, getLocalTime } from '$lib/utilities/format-date';
-  import { capitalize } from '$lib/utilities/format-camel-case';
-  import { translate } from '$lib/i18n/translate';
-
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
     MenuButton,
     MenuContainer,
-    MenuItem,
     MenuDivider,
+    MenuItem,
   } from '$lib/holocene/menu';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import {
+    relativeTime,
+    type TimeFormat,
+    timeFormat,
+    type TimeFormatOptions,
+    TimezoneOptions,
+    Timezones,
+  } from '$lib/stores/time-format';
+  import { capitalize } from '$lib/utilities/format-camel-case';
+  import { formatUTCOffset, getLocalTime } from '$lib/utilities/format-date';
 
   const localTime = getLocalTime();
   const QuickTimezoneOptions: TimeFormatOptions = [
@@ -65,9 +64,7 @@
     capitalize($timeFormat);
 
   onMount(() => {
-    // Check for legacy timeFormat that may be set in localStorage
-    // @ts-ignore
-    if ($timeFormat === 'relative') {
+    if (String($timeFormat) === 'relative') {
       $timeFormat = 'local';
       $relativeTime = true;
     }

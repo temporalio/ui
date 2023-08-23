@@ -1,13 +1,15 @@
 <script lang="ts">
-  import { createEventDispatcher, getContext } from 'svelte';
   import type { HTMLButtonAttributes } from 'svelte/elements';
+  
+  import { createEventDispatcher, getContext } from 'svelte';
+  
+  import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import {
-    type MenuContext,
     MENU_CONTEXT,
+    type MenuContext,
   } from '$lib/holocene/menu/menu-container.svelte';
   import { MENU_ITEM_SELECTORS } from '$lib/holocene/menu/menu-item.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
 
   type MenuButtonVariant = 'primary' | 'secondary' | 'ghost' | 'table-header';
 
@@ -32,8 +34,8 @@
   export { className as class };
   export let controls: string;
   export let count = 0;
-  export let disabled: boolean = false;
-  export let hasIndicator: boolean = false;
+  export let disabled = false;
+  export let hasIndicator = false;
   export let id: string = null;
   export let label: string = null;
   export let unround = false;

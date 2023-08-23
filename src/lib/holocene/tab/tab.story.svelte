@@ -1,9 +1,10 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
-  import Tabs from './tabs.svelte';
-  import Tab from './tab.svelte';
-  import TabPanel from './tab-panel.svelte';
+  
   import TabList from './tab-list.svelte';
+  import TabPanel from './tab-panel.svelte';
+  import Tab from './tab.svelte';
+  import Tabs from './tabs.svelte';
 
   export let Hst: HST;
 </script>

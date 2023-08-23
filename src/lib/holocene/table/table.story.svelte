@@ -1,14 +1,15 @@
 <script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
-  import Table from '$lib/holocene/table/table.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
-  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
+  import Badge from '$lib/holocene/badge.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
 
   export let Hst: HST;
 
   let bulkActionsAvailable = true;
-  let updating: boolean = false;
+  let updating = false;
 </script>
 
 <Hst.Story>

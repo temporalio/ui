@@ -1,9 +1,10 @@
 <script lang="ts">
-  import type { Timestamp } from '$types';
   import Panel from '$lib/components/panel.svelte';
-  import { formatDate } from '$lib/utilities/format-date';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { translate } from '$lib/i18n/translate';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { formatDate } from '$lib/utilities/format-date';
+  
+  import type { Timestamp } from '$types';
 
   export let futureRuns: Timestamp[] = [];
 </script>
