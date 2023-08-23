@@ -13,6 +13,8 @@ export const workflowStatuses: WorkflowStatuses = [
   'Terminated',
 ] as const;
 
+export const scheduleStatuses = ['Paused', 'Running'] as const;
+
 export function isWorkflowStatusType(value: string): value is WorkflowStatus {
   return workflowStatuses.includes(value as WorkflowStatus);
 }
