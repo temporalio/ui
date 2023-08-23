@@ -128,7 +128,7 @@
     return typeof option === 'string';
   };
 
-  const isObjectOption = (option: string | T): option is T => {
+  const isObjectOption = (option: string | T): option is T & object => {
     return typeof option === 'object';
   };
 
@@ -151,11 +151,7 @@
       return option;
     }
 
-    if (
-      typeof option === 'object' &&
-      isObjectOption(option) &&
-      canRenderCustomOption(option)
-    ) {
+    if (isObjectOption(option) && canRenderCustomOption(option)) {
       return String(option[optionLabelKey]);
     }
   };
