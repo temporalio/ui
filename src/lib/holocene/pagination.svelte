@@ -153,6 +153,7 @@
             parameter={perPageKey}
             value={perPage}
             {options}
+            position="top"
           />
         {/if}
         <slot name="pagination-top">
@@ -220,6 +221,7 @@
           parameter={perPageKey}
           value={perPage}
           {options}
+          position="bottom"
         />
       {/if}
       <div class="flex items-center justify-center gap-3">

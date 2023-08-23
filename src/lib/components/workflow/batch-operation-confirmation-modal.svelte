@@ -46,7 +46,7 @@
 </script>
 
 <Modal
-  id="batch-operation-confirmation-modal"
+  id={`batch-operation-confirmation-modal-${action}`}
   bind:open={isOpen}
   bind:error
   data-testid="batch-{actionText}-confirmation"
@@ -99,7 +99,7 @@
       {/if}
     </div>
     <Input
-      id="bulk-action-reason"
+      id={`bulk-action-reason-${action}`}
       bind:value={reason}
       label={translate('reason')}
       hintText={translate(

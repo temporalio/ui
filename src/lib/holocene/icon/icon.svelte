@@ -15,6 +15,7 @@
     {width}
     {height}
     {title}
+    {name}
     class={$$props.class}
     {...$$restProps}
   />

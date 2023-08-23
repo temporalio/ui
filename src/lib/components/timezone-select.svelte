@@ -21,8 +21,9 @@
     Timezones,
   } from '$lib/stores/time-format';
   import { capitalize } from '$lib/utilities/format-camel-case';
-  import { formatUTCOffset } from '$lib/utilities/format-date';
+  import { formatUTCOffset, getLocalTime } from '$lib/utilities/format-date';
 
+  const localTime = getLocalTime();
   const QuickTimezoneOptions: TimeFormatOptions = [
     {
       label: translate('utc'),
@@ -62,14 +63,8 @@
     Timezones[$timeFormat]?.label ??
     capitalize($timeFormat);
 
-  $: localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  $: localOption = TimezoneOptions.find(({ zones }) =>
-    zones?.includes(localTimezone),
-  ) ?? { label: '', abbr: '' };
-  $: localDescription = `${localOption.label} (${localOption.abbr})`;
-
   onMount(() => {
-    if ($timeFormat === 'relative') {
+    if (String($timeFormat) === 'relative') {
       $timeFormat = 'local';
       $relativeTime = true;
     }
@@ -110,7 +105,7 @@
           on:click={() => selectTimezone(value)}
           data-testid={`timezones-${value}`}
           selected={value === $timeFormat}
-          description={value === 'local' && localDescription}
+          description={value === 'local' && localTime}
         >
           {label}
         </MenuItem>

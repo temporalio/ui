@@ -12,8 +12,11 @@
   export let value: SelectOptionValue;
   export let options: SelectOptionValue[] = [];
   export let parameter: string = null;
+  export let position: string | undefined = undefined;
 
-  const id = `${parameter || label}-filter`;
+  const id = `${parameter || label}-${
+    position ? `${position}-filter` : 'filter'
+  }`;
   const parameterValue = parameter && $page.url.searchParams.get(parameter);
 
   let _value = parameterValue || (value && value.toString());
