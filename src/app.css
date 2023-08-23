@@ -81,40 +81,74 @@
       url('/src/lib/vendor/css/fonts/NotoSansMono/NotoSansMono-VariableFont_wdth\,wght.ttf');
     font-display: swap;
   }
+
+  *,
+  html,
+  body {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Inter, sans-serif;
+    position: relative;
+    overscroll-behavior: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  titles,
+  labels {
+    font-family: Poppins, sans-serif;
+  }
+
+  input[type='search']::-webkit-search-cancel-button {
+    display: none;
+  }
 }
 
-*,
-html,
-body {
-  box-sizing: border-box;
-}
+@layer components {
+  .hljs {
+    max-height: 25em;
+    overflow-y: scroll;
+  }
 
-body {
-  font-family: Inter, sans-serif;
-  position: relative;
-  overscroll-behavior: none;
-}
+  .noto {
+    font-family: 'Noto Sans Mono', monospace;
+  }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-titles,
-labels {
-  font-family: Poppins, sans-serif;
-}
+  .status-completed {
+    @apply bg-green-100 text-green-700;
+  }
 
-.hljs {
-  max-height: 25em;
-  overflow-y: scroll;
-}
+  .status-canceled {
+    @apply bg-yellow-100 text-yellow-900;
+  }
 
-.noto {
-  font-family: 'Noto Sans Mono', monospace;
-}
+  .status-paused {
+    @apply bg-yellow-100 text-yellow-900;
+  }
 
-input[type='search']::-webkit-search-cancel-button {
-  display: none;
+  .status-running {
+    @apply bg-blue-100 text-blue-700;
+  }
+
+  .status-failed {
+    @apply bg-red-100 text-red-700;
+  }
+
+  .status-continued-as-new {
+    @apply bg-purple-100 text-purple-900;
+  }
+
+  .status-terminated {
+    @apply bg-gray-200 text-gray-900;
+  }
+
+  .status-timed-out {
+    @apply bg-orange-100 text-orange-900;
+  }
 }
