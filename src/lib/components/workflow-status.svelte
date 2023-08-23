@@ -1,11 +1,10 @@
 <script lang="ts">
   import { translate } from '$lib/i18n/translate';
-  import type { EventClassification } from '$lib/types/events';
   import type { WorkflowStatus } from '$lib/types/workflows';
-  
+
   import HeartBeat from './heart-beat-indicator.svelte';
 
-  type Status = WorkflowStatus | EventClassification | 'Paused';
+  type Status = WorkflowStatus | 'Paused';
 
   export let status: Status = 'Running';
   export let delay = 0;
@@ -20,58 +19,23 @@
     Terminated: translate('workflows', 'terminated'),
     Paused: translate('workflows', 'paused'),
   };
-
-  const colors = {
-    Running: 'blue',
-    TimedOut: 'orange',
-    Completed: 'green',
-    Failed: 'red',
-    ContinuedAsNew: 'purple',
-    Canceled: 'yellow',
-    Terminated: 'gray',
-    Paused: 'yellow',
-  };
-
-  $: color = colors[status];
-  $: label = humanFriendlyNames[status];
-  $: isRunning = label === humanFriendlyNames.Running;
 </script>
 
 <span class="flex text-center text-sm font-medium leading-4">
-  <span class="{color} flex items-center rounded-sm px-1 py-0.5 font-secondary">
-    <span class="whitespace-nowrap">{label}</span>
-    {#if isRunning}
+  <span
+    class="flex items-center rounded-sm px-1 py-0.5 font-secondary"
+    class:status-running={status === 'Running'}
+    class:status-timed-out={status === 'TimedOut'}
+    class:status-completed={status === 'Completed'}
+    class:status-continued-as-new={status === 'ContinuedAsNew'}
+    class:status-canceled={status === 'Canceled'}
+    class:status-terminated={status === 'Terminated'}
+    class:status-paused={status === 'Paused'}
+    class:status-failed={status === 'Failed'}
+  >
+    <span class="whitespace-nowrap">{humanFriendlyNames[status]}</span>
+    {#if status === 'Running'}
       <HeartBeat {delay} />
     {/if}
   </span>
 </span>
-
-<style lang="postcss">
-  .green {
-    @apply bg-green-100 text-green-700;
-  }
-
-  .yellow {
-    @apply bg-yellow-100 text-yellow-900;
-  }
-
-  .blue {
-    @apply bg-blue-100 text-blue-700;
-  }
-
-  .red {
-    @apply bg-red-100 text-red-700;
-  }
-
-  .purple {
-    @apply bg-purple-100 text-purple-900;
-  }
-
-  .gray {
-    @apply bg-gray-200 text-gray-900;
-  }
-
-  .orange {
-    @apply bg-orange-100 text-orange-900;
-  }
-</style>
