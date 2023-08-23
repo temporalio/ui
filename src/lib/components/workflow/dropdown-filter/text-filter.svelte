@@ -1,14 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import {
-    Menu,
-    MenuButton,
-    MenuContainer,
-    MenuItem,
-  } from '$lib/holocene/menu';
+  import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import {
     attributeToHumanReadable,

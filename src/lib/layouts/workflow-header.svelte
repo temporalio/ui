@@ -1,10 +1,10 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
-  
+
   import { onDestroy, onMount } from 'svelte';
 
   import { page } from '$app/stores';
-  
+
   import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -44,7 +44,7 @@
 
   $: ({ workflow, workers, compatibility } = $workflowRun);
 
-  let refreshInterval: NodeJS.Timer;
+  let refreshInterval: number;
   const refreshRate = 15000;
 
   $: routeParameters = {

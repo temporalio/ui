@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { noop, onMount } from 'svelte/internal';
+  import { onMount } from 'svelte/internal';
 
-  
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
@@ -70,8 +69,6 @@
   $: localDescription = `${localOption.label} (${localOption.abbr})`;
 
   onMount(() => {
-    // Check for legacy timeFormat that may be set in localStorage
-    // @ts-ignore
     if ($timeFormat === 'relative') {
       $timeFormat = 'local';
       $relativeTime = true;

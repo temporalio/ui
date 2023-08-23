@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -15,9 +15,7 @@
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { workflowStatusFilters } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
-  import type { WorkflowStatus as TWorkflowStatus } from '$lib/types/workflows';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  
 
   $: statusFilters = $workflowFilters.filter(
     (f) => f.attribute === 'ExecutionStatus',
@@ -82,11 +80,6 @@
     }
 
     updateQueryParamsFromFilter($page.url, $workflowFilters);
-  };
-
-  const isActive = (status: 'All' | TWorkflowStatus) => {
-    if (status === 'All') return statusFilters.length === 0;
-    return statusFilters.some((filter) => filter.value === status);
   };
 </script>
 

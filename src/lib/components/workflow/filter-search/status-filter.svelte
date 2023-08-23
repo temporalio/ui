@@ -1,14 +1,11 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  
   import { getContext } from 'svelte';
-  
+
   import { page } from '$app/stores';
-  
-  
+
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import {
     Menu,
@@ -24,7 +21,7 @@
   import { labsMode } from '$lib/stores/labs-mode';
   import { isStatusFilter } from '$lib/utilities/query/filter-search';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  
+
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
   type T = $$Generic;

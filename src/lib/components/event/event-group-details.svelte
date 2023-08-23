@@ -1,6 +1,5 @@
 <script lang="ts">
   import Table from '$lib/holocene/table/table.svelte';
-  import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
     eventOrGroupIsCanceled,

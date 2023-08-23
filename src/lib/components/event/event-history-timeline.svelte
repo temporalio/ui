@@ -6,7 +6,7 @@
     type TimelineOptionsGroupHeightModeType,
     type TimelineOptionsZoomKey,
   } from 'vis-timeline/standalone';
-  
+
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { groupEvents } from '$lib/models/event-groups';
@@ -25,11 +25,11 @@
     new Component({ target: container, props });
     return container.innerHTML;
   }
-  function renderGroupName(group, classification) {
+  function renderGroupName(group) {
     const groupName = capitalize(group.category);
     return `<div class="flex gap-2 items-center">${groupName}</div>`;
   }
-  function renderExecutionName(status) {
+  function renderExecutionName() {
     return `<div class="flex gap-1 items-center">Workflow Execution</div>`;
   }
   function renderPendingAttempts(name, attempt) {

@@ -1,10 +1,9 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
   import { fly } from 'svelte/transition';
-  
+
   import { page } from '$app/stores';
 
-  
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -32,7 +31,9 @@
     } else {
       try {
         $workflowFilters = toListWorkflowFilters(manualSearchString);
-      } catch (e) {}
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     if (manualSearchString && manualSearchString === query) {
