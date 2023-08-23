@@ -1,7 +1,8 @@
-import express from 'express';
-import type { Application } from 'express';
-import cors from 'cors';
 import type { Server } from 'http';
+
+import cors from 'cors';
+import type { Application } from 'express';
+import express from 'express';
 
 export type CodecServer = {
   start: () => Promise<Server>;

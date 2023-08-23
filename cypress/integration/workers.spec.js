@@ -2,9 +2,9 @@
 
 import * as dateTz from 'date-fns-tz';
 
-import workflowCompletedFixture from '../fixtures/workflow-completed.json';
-import wtq from '../fixtures/worker-task-queues.json';
 import atq from '../fixtures/activity-task-queues.json';
+import wtq from '../fixtures/worker-task-queues.json';
+import workflowCompletedFixture from '../fixtures/workflow-completed.json';
 
 const { workflowId, runId } =
   workflowCompletedFixture.workflowExecutionInfo.execution;

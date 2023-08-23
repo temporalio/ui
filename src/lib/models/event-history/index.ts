@@ -1,35 +1,35 @@
 import {
   codecEndpoint,
-  passAccessToken,
   includeCredentials,
+  passAccessToken,
 } from '$lib/stores/data-encoder-config';
+import type {
+  EventAttributeKey,
+  EventAttributesWithType,
+  EventsWithMetadata,
+  EventType,
+  EventWithMetadata,
+  WorkflowEvent,
+  WorkflowEvents,
+} from '$lib/types/events';
 import {
   convertPayloadToJsonWithCodec,
   convertPayloadToJsonWithWebsocket,
-  decodePayloadAttributes,
   type DecodeFunctions,
+  decodePayloadAttributes,
 } from '$lib/utilities/decode-payload';
 import { formatDate } from '$lib/utilities/format-date';
-import { has } from '$lib/utilities/has';
-import { findAttributesAndKey } from '$lib/utilities/is-event-type';
 import {
   getCodecEndpoint,
-  getCodecPassAccessToken,
   getCodecIncludeCredentials,
+  getCodecPassAccessToken,
 } from '$lib/utilities/get-codec';
+import { has } from '$lib/utilities/has';
+import { findAttributesAndKey } from '$lib/utilities/is-event-type';
 
 import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
-import type {
-  EventWithMetadata,
-  EventsWithMetadata,
-  EventAttributeKey,
-  EventAttributesWithType,
-  EventType,
-  WorkflowEvents,
-  WorkflowEvent,
-} from '$lib/types/events';
 
 export async function getEventAttributes(
   { historyEvent, namespace, settings, accessToken }: EventWithMetadata,

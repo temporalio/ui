@@ -1,9 +1,87 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+@layer base {
+  @font-face {
+    font-family: 'Inter';
+    src: local('Inter'), local('inter'),
+      url('/src/lib/vendor/css/fonts/Inter/Inter-Light.ttf');
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    src: local('Inter'), local('inter'),
+      url('/src/lib/vendor/css/fonts/Inter/Inter-Regular.ttf');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    src: local('Inter'), local('inter'),
+      url('/src/lib/vendor/css/fonts/Inter/Inter-Medium.ttf');
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    src: local('Inter'), local('inter'),
+      url('/src/lib/vendor/css/fonts/Inter/Inter-SemiBold.ttf');
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Poppins';
+    src: local('Poppins'), local('poppins'),
+      url('/src/lib/vendor/css/fonts/Poppins/Poppins-Light.ttf');
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Poppins';
+    src: local('Poppins'), local('poppins'),
+      url('/src/lib/vendor/css/fonts/Poppins/Poppins-Regular.ttf');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Poppins';
+    src: local('Poppins'), local('poppins'),
+      url('/src/lib/vendor/css/fonts/Poppins/Poppins-Medium.ttf');
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Poppins';
+    src: local('Poppins'), local('poppins'),
+      url('/src/lib/vendor/css/fonts/Poppins/Poppins-SemiBold.ttf');
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Noto Sans Mono';
+    src: local('Noto Sans Mono'), local('noto sans mono'),
+      url('/src/lib/vendor/css/fonts/NotoSansMono/NotoSansMono-VariableFont_wdth\,wght.ttf');
+    font-display: swap;
+  }
+}
 
 *,
 html,
@@ -14,6 +92,7 @@ body {
 body {
   font-family: Inter, sans-serif;
   position: relative;
+  overscroll-behavior: none;
 }
 
 h1,
@@ -30,6 +109,10 @@ labels {
 .hljs {
   max-height: 25em;
   overflow-y: scroll;
+}
+
+.noto {
+  font-family: 'Noto Sans Mono', monospace;
 }
 
 input[type='search']::-webkit-search-cancel-button {

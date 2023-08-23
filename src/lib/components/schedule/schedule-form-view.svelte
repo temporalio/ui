@@ -1,25 +1,28 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { loading, error } from '$lib/stores/schedules';
-
-  import Alert from '$lib/holocene/alert.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import Button from '$lib/holocene/button.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
-  import type { Schedule } from '$types';
+  
   import { page } from '$app/stores';
+  
+  import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { error, loading } from '$lib/stores/schedules';
+  import type {
+    FullSchedule,
+    ScheduleParameters,
+    SchedulePreset,
+  } from '$lib/types/schedule';
   import {
     routeForSchedule,
     routeForSchedules,
   } from '$lib/utilities/route-for';
-
-  import type {
-    FullSchedule,
-    SchedulePreset,
-    ScheduleParameters,
-  } from '$lib/types/schedule';
+  
+  import type { Schedule } from '$types';
+  
 
   export let schedule: FullSchedule | null = null;
   export let onConfirm: (
@@ -31,13 +34,18 @@
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
 
-  let title = schedule ? 'Edit Schedule' : 'Create Schedule';
-  let loadingText = schedule ? 'Editing Schedule...' : 'Creating Schedule...';
-  let backTitle = schedule ? 'Back to Schedule' : 'Back to Schedules';
+  let title = translate('schedules', schedule ? 'edit' : 'create');
+  let loadingText = translate('schedules', schedule ? 'editing' : 'creating');
+  let backTitle = translate(
+    'schedules',
+    schedule ? 'back-to-schedule' : 'back-to-schedules',
+  );
   let backHref = schedule
     ? routeForSchedule({ namespace, scheduleId })
     : routeForSchedules({ namespace });
-  let confirmText = schedule ? 'Save' : 'Create Schedule';
+  let confirmText = schedule
+    ? translate('save')
+    : translate('schedules', 'create');
 
   let errors = {};
   let name = scheduleId ?? '';
@@ -124,7 +132,7 @@
         <Input
           id="name"
           bind:value={name}
-          label="Name*"
+          label={translate('schedules', 'name-label')}
           error={errors['name']}
           maxLength={232}
           disabled={Boolean(scheduleId)}
@@ -136,7 +144,7 @@
         <Input
           id="workflowType"
           bind:value={workflowType}
-          label="Workflow Type*"
+          label={translate('schedules', 'workflow-type-label')}
           error={errors['workflowType']}
           on:input={onInput}
           on:blur={onBlur}
@@ -146,7 +154,7 @@
         <Input
           id="workflowId"
           bind:value={workflowId}
-          label="Workflow Id*"
+          label={translate('schedules', 'workflow-id-label')}
           error={errors['workflowId']}
           on:input={onInput}
           on:blur={onBlur}
@@ -156,7 +164,7 @@
         <Input
           id="taskQueue"
           bind:value={taskQueue}
-          label="Task Queue*"
+          label={translate('schedules', 'task-queue-label')}
           error={errors['taskQueue']}
           on:input={onInput}
           on:blur={onBlur}
@@ -181,7 +189,9 @@
             on:click={() => handleConfirm(preset, schedule)}
             >{confirmText}</Button
           >
-          <a href={backHref} class="back" style="left: 0;">Cancel</a>
+          <a href={backHref} class="back" style="left: 0;"
+            >{translate('cancel')}</a
+          >
         </div>
       </SchedulesCalendarView>
     </form>

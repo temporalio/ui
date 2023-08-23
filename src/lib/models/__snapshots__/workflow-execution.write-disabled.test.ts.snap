@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`toWorkflowExecution > should match the snapshot for Canceled workflows 1`] = `
 {
@@ -10,6 +10,7 @@ exports[`toWorkflowExecution > should match the snapshot for Canceled workflows 
   "historySizeBytes": undefined,
   "id": "temporal.fixture.cancelled.workflow.id",
   "isRunning": false,
+  "mostRecentWorkerVersionStamp": undefined,
   "name": "workflow.cancellation",
   "parent": {
     "runId": "b142fc85-8e13-42e5-a824-0f2fafdeabaf",
@@ -48,6 +49,7 @@ exports[`toWorkflowExecution > should match the snapshot for Completed workflows
   "historySizeBytes": undefined,
   "id": "temporal.fixture.completed.workflow.id",
   "isRunning": false,
+  "mostRecentWorkerVersionStamp": undefined,
   "name": "workflow.completion",
   "parent": {
     "runId": "971e2165-c4f8-4f78-87ca-b652a06eb234",
@@ -86,6 +88,7 @@ exports[`toWorkflowExecution > should match the snapshot for Failed workflows 1`
   "historySizeBytes": undefined,
   "id": "temporal.fixture.failed.workflow.id",
   "isRunning": false,
+  "mostRecentWorkerVersionStamp": undefined,
   "name": "workflow.retry-workflow.ext",
   "parent": null,
   "parentNamespaceId": "",
@@ -117,6 +120,7 @@ exports[`toWorkflowExecution > should match the snapshot for Running workflows 1
   "historySizeBytes": undefined,
   "id": "temporal.fixture.running.workflow.id",
   "isRunning": true,
+  "mostRecentWorkerVersionStamp": undefined,
   "name": "workflow.advanced-visibility",
   "parent": {
     "runId": "8f00d989-6bc2-4826-b9f9-7c18ed90c9cc",
@@ -181,6 +185,7 @@ exports[`toWorkflowExecution > should match the snapshot for Terminated workflow
   "historySizeBytes": undefined,
   "id": "temporal.fixture.completed.workflow.id",
   "isRunning": false,
+  "mostRecentWorkerVersionStamp": undefined,
   "name": "workflow.reset.base",
   "parent": {
     "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd",
@@ -250,6 +255,7 @@ exports[`toWorkflowExecution > should match the snapshot for TimedOut workflows 
   "historySizeBytes": undefined,
   "id": "temporal.fixture.timed-out.workflow.id/workflow.advanced-visibility",
   "isRunning": false,
+  "mostRecentWorkerVersionStamp": undefined,
   "name": "workflow.advanced-visibility",
   "parent": {
     "runId": "78cba607-189e-41fe-a31b-a2b6061babaa",
@@ -289,6 +295,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historySizeBytes": undefined,
     "id": "temporal.fixture.cancelled.workflow.id",
     "isRunning": false,
+    "mostRecentWorkerVersionStamp": undefined,
     "name": "workflow.cancellation",
     "parent": null,
     "parentNamespaceId": "",
@@ -321,6 +328,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historySizeBytes": undefined,
     "id": "temporal.fixture.completed.workflow.id",
     "isRunning": false,
+    "mostRecentWorkerVersionStamp": undefined,
     "name": "workflow.completion",
     "parent": null,
     "parentNamespaceId": "",
@@ -353,6 +361,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historySizeBytes": undefined,
     "id": "temporal.fixture.failed.workflow.id",
     "isRunning": false,
+    "mostRecentWorkerVersionStamp": undefined,
     "name": "workflow.retry-workflow.ext",
     "parent": null,
     "parentNamespaceId": "",
@@ -381,6 +390,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historySizeBytes": undefined,
     "id": "temporal.fixture.running.workflow.id",
     "isRunning": true,
+    "mostRecentWorkerVersionStamp": undefined,
     "name": "workflow.advanced-visibility",
     "parent": null,
     "parentNamespaceId": "",
@@ -413,6 +423,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historySizeBytes": undefined,
     "id": "temporal.fixture.completed.workflow.id",
     "isRunning": false,
+    "mostRecentWorkerVersionStamp": undefined,
     "name": "workflow.reset.base",
     "parent": null,
     "parentNamespaceId": "",
@@ -445,6 +456,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historySizeBytes": undefined,
     "id": "temporal.fixture.terminated.workflow.id",
     "isRunning": false,
+    "mostRecentWorkerVersionStamp": undefined,
     "name": "workflow.reset.base",
     "parent": null,
     "parentNamespaceId": "",
@@ -477,6 +489,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historySizeBytes": undefined,
     "id": "temporal.fixture.timed-out.workflow.id",
     "isRunning": false,
+    "mostRecentWorkerVersionStamp": undefined,
     "name": "workflow.advanced-visibility",
     "parent": null,
     "parentNamespaceId": "",

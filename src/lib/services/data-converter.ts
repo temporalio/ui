@@ -1,15 +1,14 @@
+import type WebSocketAsPromised from 'websocket-as-promised';
+
 import {
   setLastDataConverterFailure,
   setLastDataConverterSuccess,
 } from '$lib/stores/data-converter-config';
-
+import type { Payload } from '$lib/types/events';
 import {
   parseWithBigInt,
   stringifyWithBigInt,
 } from '$lib/utilities/parse-with-big-int';
-
-import type WebSocketAsPromised from 'websocket-as-promised';
-import type { Payload } from '$lib/types/events';
 
 interface WebSocketResponse {
   content: string;

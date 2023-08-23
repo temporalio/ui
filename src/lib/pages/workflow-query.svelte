@@ -1,15 +1,17 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { getQuery, getQueryTypes } from '$lib/services/query-service';
-
-  import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Select from '$lib/holocene/select/simple-select.svelte';
-  import Option from '$lib/holocene/select/simple-option.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
+  
+  
   import Button from '$lib/holocene/button.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
   import Loading from '$lib/holocene/loading.svelte';
-  import { authUser } from '$lib/stores/auth-user';
+  import Option from '$lib/holocene/select/simple-option.svelte';
+  import Select from '$lib/holocene/select/simple-select.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { getQuery, getQueryTypes } from '$lib/services/query-service';
+  import { authUser } from '$lib/stores/auth-user';
 
   const { namespace, workflow: workflowId, run: runId } = $page.params;
 
@@ -54,16 +56,16 @@
   {#await queryTypes}
     <div class="text-center">
       <Loading />
-      <p>(This will fail if you have no workers running.)</p>
+      <p>{translate('workflows', 'no-workers-failure-message')}</p>
     </div>
   {:then types}
     <div class="flex justify-between">
       <div class="flex items-center gap-4">
         <Select
           id="query-select"
-          label="Query Type"
+          label={translate('workflows', 'query-type')}
           bind:value={queryType}
-          testId="query-select"
+          data-testid="query-select"
         >
           {#each types as value}
             <Option {value}>{value}</Option>
@@ -74,20 +76,17 @@
           icon="retry"
           loading={isLoading}
         >
-          Refresh
+          {translate('refresh')}
         </Button>
       </div>
       <div class="flex justify-end">
-        <label
-          for="json-formatting"
-          class="flex items-center gap-4 font-secondary text-sm"
-          >JSON Formatting
-          <ToggleSwitch
-            id="json-formatting"
-            checked={jsonFormatting}
-            on:change={() => (jsonFormatting = !jsonFormatting)}
-          />
-        </label>
+        <ToggleSwitch
+          label={translate('workflows', 'json-formatting')}
+          labelPosition="left"
+          id="json-formatting"
+          checked={jsonFormatting}
+          on:change={() => (jsonFormatting = !jsonFormatting)}
+        />
       </div>
     </div>
     <div class="flex items-start h-full">
@@ -100,8 +99,8 @@
     </div>
   {:catch _error}
     <EmptyState
-      title="An Error Occurred"
-      content="Please make sure you have at least one worker running."
+      title={translate('error-occurred')}
+      content={translate('workflows', 'no-workers-running-message')}
       error={_error?.message}
     />
   {/await}

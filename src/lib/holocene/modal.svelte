@@ -1,13 +1,16 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { createEventDispatcher, type ComponentProps } from 'svelte';
+
+  import { type ComponentProps, createEventDispatcher } from 'svelte';
+
   import Button from '$lib/holocene/button.svelte';
+
   import IconButton from './icon-button.svelte';
 
   interface $$Props extends HTMLAttributes<HTMLDialogElement> {
-    cancelText?: string;
+    cancelText: string;
     confirmDisabled?: boolean;
-    confirmText?: string;
+    confirmText: string;
     confirmType?: ComponentProps<Button>['variant'];
     hideConfirm?: boolean;
     hightlightNav?: boolean;
@@ -15,35 +18,36 @@
     large?: boolean;
     loading?: boolean;
     'data-testid'?: string;
+    open: boolean;
+    error?: string;
   }
 
   export let hideConfirm = false;
-  export let confirmText = 'Confirm';
-  export let cancelText = 'Cancel';
+  export let confirmText: string;
+  export let cancelText: string;
   export let confirmType: ComponentProps<Button>['variant'] = 'primary';
   export let confirmDisabled = false;
   export let large = false;
   export let loading = false;
   export let hightlightNav = false;
   export let id: string;
-
-  let error: string;
-
-  export const open = () => modalElement.showModal();
-
-  export const close = () => {
-    error = '';
-    modalElement.close();
-  };
-
-  export const setError = (err: string) => {
-    error = err;
-  };
+  export let open: boolean;
+  export let error = '';
 
   let className = '';
   export { className as class };
 
   let modalElement: HTMLDialogElement;
+
+  $: open, toggleModal();
+
+  export const toggleModal = () => {
+    if (open) {
+      modalElement?.showModal();
+    } else {
+      modalElement?.close();
+    }
+  };
 
   const dispatch = createEventDispatcher<{
     cancelModal: undefined;
@@ -51,12 +55,12 @@
   }>();
 
   const handleCancel = () => {
-    close();
     dispatch('cancelModal');
+    open = false;
+    error = '';
   };
 
   const confirmModal = () => {
-    error = '';
     dispatch('confirmModal');
   };
 
@@ -116,22 +120,18 @@
 >
   {#if !loading}
     <IconButton
-      aria-label={cancelText}
+      label={cancelText}
       icon="close"
       class="float-right m-4"
       on:click={handleCancel}
     />
   {/if}
   <div id="modal-title-{id}" class="title">
-    <slot name="title">
-      <h3>Title</h3>
-    </slot>
+    <slot name="title" />
   </div>
   <form on:submit|preventDefault={confirmModal} method="dialog">
     <div id="modal-content-{id}" class="content">
-      <slot name="content">
-        <span>Content</span>
-      </slot>
+      <slot name="content" />
       {#if error}
         <p class="mt-2 text-sm font-normal text-danger">{error}</p>
       {/if}
@@ -149,7 +149,7 @@
           variant={confirmType}
           {loading}
           disabled={confirmDisabled || loading}
-          testId="confirm-modal-button"
+          data-testid="confirm-modal-button"
           type="submit">{confirmText}</Button
         >
       {/if}

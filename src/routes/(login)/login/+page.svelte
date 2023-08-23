@@ -1,13 +1,16 @@
 <script lang="ts">
-  import type { PageData } from './$types';
-  import { page } from '$app/stores';
   import { BROWSER } from 'esm-env';
+  
+  import { page } from '$app/stores';
+  
+  import type { PageData } from './$types';
+  
 
+  import FeedbackButton from '$lib/components/feedback-button.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { routeForAuthentication } from '$lib/utilities/route-for';
   import Logo from '$lib/vendor/logo.svg';
-  import FeedbackButton from '$lib/components/feedback-button.svelte';
 
   export let data: PageData;
 
@@ -17,9 +20,7 @@
 
 <PageTitle title="Login" url={$page.url.href} />
 <header class="flex h-16 w-full items-center justify-between bg-primary px-10">
-  <a href="/" class="inline-block">
-    <img src={Logo} alt="Temporal Logo" class="max-h-10" />
-  </a>
+  <img src={Logo} alt="" class="max-h-10" />
   <FeedbackButton />
 </header>
 <section class="my-[20vh] text-center">
@@ -29,7 +30,7 @@
   <p class="my-7" data-testid="login-info">Let's get you signed in.</p>
   <div class="mx-auto">
     <Button
-      testId="login-button"
+      data-testid="login-button"
       variant="login"
       icon="lock"
       on:click={() => {

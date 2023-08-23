@@ -1,17 +1,17 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
+  import { onMount } from 'svelte';
+
   import Alert from '$lib/holocene/alert.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
-
   import {
     createPaginationStore,
     type PaginationStore,
   } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
   import { isError } from '$lib/utilities/is';
-  import { onMount } from 'svelte';
-
-  import type { HTMLAttributes } from 'svelte/elements';
 
   type T = $$Generic;
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
@@ -23,6 +23,12 @@
     pageSizeOptions?: string[] | number[];
     defaultPageSize?: string | number | undefined;
     total?: string | number;
+    pageSizeSelectLabel: string;
+    emptyStateMessage: string;
+    fallbackErrorMessage: string;
+    itemsKeyname?: string;
+    previousButtonLabel: string;
+    nextButtonLabel: string;
   }
 
   type PaginatedRequest<T> = (
@@ -40,6 +46,12 @@
   export let pageSizeOptions: string[] | number[] = options;
   export let defaultPageSize: string | number | undefined = undefined;
   export let total: string | number = '';
+  export let pageSizeSelectLabel: string;
+  export let emptyStateMessage: string;
+  export let fallbackErrorMessage: string;
+  export let itemsKeyname = 'items';
+  export let previousButtonLabel: string;
+  export let nextButtonLabel: string;
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
@@ -71,7 +83,8 @@
     const fetchData = await onFetch();
     try {
       const response = await fetchData($store.pageSize, '');
-      const { items, nextPageToken } = response;
+      const { nextPageToken } = response;
+      const items = response[itemsKeyname] || [];
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
       error = err;
@@ -89,7 +102,8 @@
           $store.pageSize,
           $store.indexData[$store.index].nextToken,
         );
-        const { items, nextPageToken } = response;
+        const { nextPageToken } = response;
+        const items = response[itemsKeyname] || [];
         store.nextPageWithItems(nextPageToken, items);
       } catch (error) {
         if (isError(error) && onError) {
@@ -154,7 +168,7 @@
     bold
     intent="error"
     class="mb-10"
-    title={error?.message ?? 'Error fetching data.'}
+    title={error?.message ?? fallbackErrorMessage}
   />
 {/if}
 
@@ -170,7 +184,7 @@
       <slot name="action-top-center" />
       {#if pageSizeOptions.length}
         <FilterSelect
-          label="Per Page"
+          label={pageSizeSelectLabel}
           parameter={$store.key}
           value={String($store.pageSize)}
           options={pageSizeOptions}
@@ -181,6 +195,7 @@
           class="caret"
           disabled={!$store.hasPrevious}
           on:click={store.previousPage}
+          aria-label={previousButtonLabel}
         >
           <span
             class="arrow arrow-left"
@@ -201,6 +216,7 @@
           class="caret"
           disabled={!$store.hasNext}
           on:click={fetchIndexData}
+          aria-label={nextButtonLabel}
         >
           <span
             class="arrow arrow-right"
@@ -214,7 +230,7 @@
   {#if $store.loading}
     <SkeletonTable rows={15} />
   {:else if isEmpty}
-    <slot name="empty">No Items</slot>
+    <slot name="empty">{emptyStateMessage}</slot>
   {:else}
     <slot
       updating={$store.updating}
@@ -234,7 +250,7 @@
       {#if $store.visibleItems.length}
         {#if pageSizeOptions.length}
           <FilterSelect
-            label="Per Page"
+            label={pageSizeSelectLabel}
             parameter={$store.key}
             value={String($store.pageSize)}
             options={pageSizeOptions}
@@ -245,6 +261,7 @@
             class="caret"
             disabled={!$store.hasPrevious}
             on:click={store.previousPage}
+            aria-label={previousButtonLabel}
           >
             <span
               class="arrow arrow-left"
@@ -265,6 +282,7 @@
             class="caret"
             disabled={!$store.hasNext}
             on:click={fetchIndexData}
+            aria-label={nextButtonLabel}
           >
             <span
               class="arrow arrow-right"

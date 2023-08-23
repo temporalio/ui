@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
-
+  
   import WorkflowJsonNavigator from '$lib/components/workflow/workflow-json-navigator.svelte';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { fetchAllEvents, fetchRawEvents } from '$lib/services/events-service';
   import { authUser } from '$lib/stores/auth-user';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
@@ -33,14 +33,11 @@
 </script>
 
 <WorkflowJsonNavigator {events}>
-  <label
+  <ToggleSwitch
     slot="decode"
-    for="decode-event-history"
-    class="flex items-center gap-4 font-secondary text-sm w-96 min-w-fit sm:justify-end"
-    ><ToggleSwitch
-      id="decode-event-history"
-      bind:checked={decodeEventHistory}
-      data-testid="decode-event-history-toggle"
-    />View decoded event history
-  </label>
+    label="View decoded event history"
+    id="decode-event-history"
+    bind:checked={decodeEventHistory}
+    data-testid="decode-event-history-toggle"
+  />
 </WorkflowJsonNavigator>

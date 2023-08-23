@@ -1,6 +1,7 @@
-import { vi, afterEach, describe, test, expect } from 'vitest';
-import { requestFromAPI } from '../utilities/request-from-api';
+import { afterEach, describe, expect, test, vi } from 'vitest';
+
 import { fetchAllWorkflows, fetchWorkflowForRunId } from './workflow-service';
+import { requestFromAPI } from '../utilities/request-from-api';
 
 vi.mock('../utilities/request-from-api', () => ({
   requestFromAPI: vi.fn().mockImplementation(

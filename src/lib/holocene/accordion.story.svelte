@@ -1,11 +1,13 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
+
+  import CodeBlock from '$lib/holocene/code-block.svelte';
+
   import Accordion from './accordion.svelte';
+  import IconButton from './icon-button.svelte';
   import TableHeaderRow from './table/table-header-row.svelte';
   import TableRow from './table/table-row.svelte';
   import Table from './table/table.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
-  import IconButton from './icon-button.svelte';
 
   export let Hst: HST;
 </script>
@@ -76,7 +78,12 @@
 
   <Hst.Variant title="An Accordion with an action">
     <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
-      <IconButton class="!p-0" icon="info" slot="action" />
+      <IconButton
+        label="A descriptive label"
+        class="!p-0"
+        icon="info"
+        slot="action"
+      />
       <p>Accordion content here.</p>
     </Accordion>
   </Hst.Variant>
@@ -88,7 +95,12 @@
       }}
     >
       <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
-        <IconButton class="!p-0" icon="info" slot="action" />
+        <IconButton
+          label="A descriptive label"
+          class="!p-0"
+          icon="info"
+          slot="action"
+        />
         <p>Accordion content here.</p>
       </Accordion>
     </form>

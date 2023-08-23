@@ -1,6 +1,5 @@
 export type NamespaceListItem = {
   namespace: string;
-  href: (namspace: string) => string;
   onClick: (namspace: string) => void;
 };
 
@@ -12,6 +11,17 @@ export type Replace<T, U extends { [key: string]: unknown }> = Omit<
   keyof U
 > &
   U;
+
+export type Only<O extends object, K extends keyof O> = {
+  [X in keyof Pick<O, K>]-?: true;
+} & {
+  [X in keyof Omit<O, K>]: never;
+};
+
+export type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+export type XOR<T, U> = T | U extends object
+  ? (Without<T, U> & U) | (Without<U, T> & T)
+  : T | U;
 
 export type Eventual<T> = T | PromiseLike<T>;
 
@@ -96,8 +106,6 @@ export type User = {
   [key: string]: any;
 };
 export type ClusterInformation = import('$lib/types').GetClusterInfoResponse;
-
-export type TimeFormat = 'UTC' | 'relative' | 'local';
 
 export type SelectOptionValue = number | string | boolean;
 

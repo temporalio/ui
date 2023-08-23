@@ -1,37 +1,39 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  
+  
+  
+  import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
+  import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
+  import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
+  import ScheduleMemo from '$lib/components/schedule/schedule-memo.svelte';
+  import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
+  import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
+  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
+  import SplitButton from '$lib/holocene/split-button.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import {
+    deleteSchedule,
+    fetchSchedule,
+    pauseSchedule,
+    unpauseSchedule,
+  } from '$lib/services/schedule-service';
+  import { coreUserStore } from '$lib/stores/core-user';
+  import { loading } from '$lib/stores/schedules';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+  import { formatDate } from '$lib/utilities/format-date';
   import {
     routeForScheduleEdit,
     routeForSchedules,
   } from '$lib/utilities/route-for';
-  import { goto } from '$app/navigation';
-
-  import {
-    fetchSchedule,
-    deleteSchedule,
-    pauseSchedule,
-    unpauseSchedule,
-  } from '$lib/services/schedule-service';
-  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-
-  import { formatDate } from '$lib/utilities/format-date';
-  import { timeFormat } from '$lib/stores/time-format';
-  import { loading } from '$lib/stores/schedules';
-
-  import ScheduleMemo from '$lib/components/schedule/schedule-memo.svelte';
-  import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
-  import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
-  import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
-  import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
-  import SplitButton from '$lib/holocene/split-button.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
+  
   import type { DescribeScheduleResponse } from '$types';
-  import { coreUserStore } from '$lib/stores/core-user';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -43,26 +45,29 @@
 
   let scheduleFetch = fetchSchedule(parameters);
 
-  let pauseConfirmationModal: Modal;
-  let deleteConfirmationModal: Modal;
+  let pauseConfirmationModalOpen = false;
+  let deleteConfirmationModalOpen = false;
   let reason = '';
+  let error = '';
 
   let coreUser = coreUserStore();
   let editDisabled = $coreUser.namespaceWriteDisabled(namespace);
 
   const handleDelete = async () => {
+    error = '';
     try {
       $loading = true;
       await deleteSchedule({ namespace, scheduleId });
-      deleteConfirmationModal?.close();
+      deleteConfirmationModalOpen = false;
       setTimeout(() => {
         $loading = false;
         goto(routeForSchedules({ namespace }));
       }, 2000);
+      reason = '';
     } catch (e) {
-      deleteConfirmationModal?.setError(
-        `Cannot delete schedule. ${e?.message}`,
-      );
+      error = translate('schedules', 'delete-schedule-error', {
+        error: e?.message,
+      });
       $loading = false;
     }
   };
@@ -81,6 +86,11 @@
         });
     scheduleFetch = fetchSchedule(parameters, fetch);
     reason = '';
+    pauseConfirmationModalOpen = false;
+  };
+
+  const resetReason = () => {
+    reason = '';
   };
 </script>
 
@@ -88,7 +98,7 @@
   <Loading />
 {:then schedule}
   {#if $loading}
-    <Loading title="Deleting Schedule..." class="my-2" />
+    <Loading title={translate('schedules', 'deleting')} class="my-2" />
   {:else}
     <header class="flex flex-row justify-between gap-4 mb-8">
       <div class="flex flex-col gap-1 relative">
@@ -97,7 +107,10 @@
           class="absolute top-0 back-to-schedules"
           style="left: -0.5rem;"
         >
-          <Icon name="chevron-left" class="inline" />Back to Schedules
+          <Icon name="chevron-left" class="inline" />{translate(
+            'schedules',
+            'back-to-schedules',
+          )}
         </a>
         <div class="flex justify-between items-center mt-8">
           <h1 class="text-2xl flex relative items-center gap-4">
@@ -120,39 +133,47 @@
         </div>
         <div class="flex items-center gap-2 text-sm">
           <p>
-            Created: {formatDate(schedule?.info?.createTime, $timeFormat)}
+            {translate('created', {
+              created: formatDate(schedule?.info?.createTime, $timeFormat, {
+                relative: $relativeTime,
+              }),
+            })}
           </p>
         </div>
         {#if schedule?.info?.updateTime}
           <div class="flex items-center gap-2 text-sm">
             <p>
-              Last updated: {formatDate(
-                schedule?.info?.updateTime,
-                $timeFormat,
-              )}
+              {translate('last-updated', {
+                updated: formatDate(schedule?.info?.updateTime, $timeFormat, {
+                  relative: $relativeTime,
+                }),
+              })}
             </p>
           </div>
         {/if}
       </div>
       <SplitButton
         position="right"
-        label={schedule?.schedule?.state?.paused ? 'Unpause' : 'Pause'}
+        label={schedule?.schedule?.state?.paused
+          ? translate('schedules', 'unpause')
+          : translate('schedules', 'pause')}
+        menuLabel={translate('schedules', 'schedule-actions')}
         id="schedule-actions"
         disabled={editDisabled}
-        on:click={() => pauseConfirmationModal.open()}
+        on:click={() => (pauseConfirmationModalOpen = true)}
       >
         <MenuItem
-          testId="edit-schedule"
+          data-testid="edit-schedule"
           href={routeForScheduleEdit({ namespace, scheduleId })}
         >
-          Edit
+          {translate('edit')}
         </MenuItem>
         <MenuItem
-          testId="delete-schedule"
+          data-testid="delete-schedule"
           destructive
-          on:click={() => deleteConfirmationModal.open()}
+          on:click={() => (deleteConfirmationModalOpen = true)}
         >
-          Delete Schedule
+          {translate('schedules', 'delete')}
         </MenuItem>
       </SplitButton>
     </header>
@@ -194,30 +215,39 @@
     </div>
     <Modal
       id="pause-schedule-modal"
-      bind:this={pauseConfirmationModal}
+      bind:open={pauseConfirmationModalOpen}
       confirmType="primary"
-      confirmText={schedule.schedule.state.paused ? 'Unpause' : 'Pause'}
+      confirmText={schedule?.schedule.state.paused
+        ? translate('schedules', 'unpause')
+        : translate('schedules', 'pause')}
+      cancelText={translate('cancel')}
       confirmDisabled={!reason}
       on:confirmModal={() => handlePause(schedule)}
+      on:cancelModal={resetReason}
     >
       <h3 slot="title">
-        {schedule.schedule.state.paused ? 'Unpause' : 'Pause'} Schedule?
+        {schedule?.schedule.state.paused
+          ? translate('schedules', 'unpause-modal-title')
+          : translate('schedules', 'pause-modal-title')}
       </h3>
       <div slot="content">
         <p>
-          Are you sure you want to {schedule.schedule.state.paused
-            ? 'unpause'
-            : 'pause'}
-          <strong>{scheduleId}</strong>?
+          {schedule?.schedule.state.paused
+            ? translate('schedules', 'unpause-modal-confirmation', {
+                schedule: scheduleId,
+              })
+            : translate('schedules', 'pause-modal-confirmation', {
+                schedule: scheduleId,
+              })}
         </p>
         <p class="my-4">
-          Enter a reason for {schedule.schedule.state.paused
-            ? 'unpausing'
-            : 'pausing'} the schedule.
+          {schedule?.schedule.state.paused
+            ? translate('schedules', 'unpause-reason')
+            : translate('schedules', 'pause-reason')}
         </p>
         <input
           class="block w-full border border-gray-200 rounded-md p-2 mt-4"
-          placeholder="Enter a reason"
+          placeholder={translate('reason')}
           bind:value={reason}
           on:keydown|stopPropagation
         />
@@ -225,20 +255,26 @@
     </Modal>
     <Modal
       id="delete-schedule-modal"
-      bind:this={deleteConfirmationModal}
+      bind:open={deleteConfirmationModalOpen}
+      bind:error
       confirmType="destructive"
-      confirmText={'Delete'}
+      confirmText={translate('delete')}
+      cancelText={translate('cancel')}
       on:confirmModal={handleDelete}
+      on:cancelModal={resetReason}
     >
-      <h3 slot="title">Delete Schedule?</h3>
+      <h3 slot="title">{translate('schedules', 'delete-modal-title')}</h3>
       <div slot="content">
         <p>
-          Are you sure you want to delete
-          <strong>{scheduleId}</strong>?
+          {translate('schedules', 'delete-modal-confirmation', {
+            schedule: scheduleId,
+          })}
         </p>
       </div>
     </Modal>
   {/if}
+{:catch error}
+  <ScheduleError error={error?.message} />
 {/await}
 
 <style lang="postcss">

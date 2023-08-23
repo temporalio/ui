@@ -1,19 +1,20 @@
 <script lang="ts">
   import debounce from 'just-debounce';
-  import { page } from '$app/stores';
-
-  import { timeFormat } from '$lib/stores/time-format';
-
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { durations } from '$lib/utilities/to-duration';
-  import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
-
-  import Select from '$lib/holocene/select/simple-select.svelte';
-  import Option from '$lib/holocene/select/simple-option.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import Search from '$lib/components/search.svelte';
   import { createEventDispatcher } from 'svelte';
+  
+  import { page } from '$app/stores';
+  
+  import Search from '$lib/components/search.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+  import Option from '$lib/holocene/select/simple-option.svelte';
+  import Select from '$lib/holocene/select/simple-select.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { timeFormat } from '$lib/stores/time-format';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+  import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
+  import { durations } from '$lib/utilities/to-duration';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  
   const dispatch = createEventDispatcher<{ search: undefined }>();
 
   export let searchType: 'basic' | 'advanced';
@@ -78,7 +79,7 @@
         class="text-blue-700"
         on:click|preventDefault={updateSearchType('basic')}
       >
-        Basic Search
+        {translate('workflows', 'basic-search')}
       </a>
     {:else}
       <a
@@ -86,7 +87,7 @@
         class="text-blue-700"
         on:click|preventDefault={updateSearchType('advanced')}
       >
-        Advanced Search
+        {translate('workflows', 'advanced-search')}
       </a>
     {/if}
   </p>
@@ -108,7 +109,9 @@
         icon="search"
         type="search"
         id="workflow-id-filter"
-        placeholder="Workflow ID"
+        placeholder={translate('workflow-id')}
+        label={translate('workflow-id')}
+        labelHidden
         bind:value={parameters.workflowId}
         on:input={handleParameterChange}
       />
@@ -116,7 +119,9 @@
         icon="search"
         type="search"
         id="workflow-type-filter"
-        placeholder="Workflow Type"
+        placeholder={translate('workflow-type')}
+        label={translate('workflow-type')}
+        labelHidden
         bind:value={parameters.workflowType}
         on:input={handleParameterChange}
       />

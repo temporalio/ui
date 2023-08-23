@@ -1,15 +1,18 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
+  import { isEmail } from '../../utilities/is-email';
+  
+  import ChipInput from './chip-input.svelte';
   import Input from './input.svelte';
   import NumberInput from './number-input.svelte';
   import RangeInput from './range-input.svelte';
-  import ChipInput from './chip-input.svelte';
-  import { isEmail } from '../../utilities/is-email';
+  
 
   export let Hst: HST;
 
-  let value: string = '';
-  let numberValue: number;
+  let value = '';
+  let numberValue = 0;
   let hintText: string | undefined;
   let valid = true;
   let maxLength: number | undefined;
@@ -40,6 +43,8 @@
   <Hst.Variant title="A Text Input with an Icon">
     <Input
       id="input-2"
+      label="Search"
+      labelHidden
       bind:value
       placeholder="Search"
       icon="search"
@@ -50,6 +55,8 @@
   <Hst.Variant title="A Copyable Input">
     <Input
       id="input-3"
+      label="Copy Me!"
+      labelHidden
       value="Copy Me!"
       copyable
       theme={dark ? 'dark' : 'light'}
@@ -57,16 +64,22 @@
   </Hst.Variant>
 
   <Hst.Variant title="A Number Input">
-    <NumberInput id="number-input-1" bind:value />
+    <NumberInput
+      label="Enter a number"
+      id="number-input-1"
+      bind:value={numberValue}
+    />
   </Hst.Variant>
 
-  <Hst.Variant title="A Number Input with a Label, Units and a Max">
+  <Hst.Variant title="A Number Input with a Label, Units, Max, and Hint Text">
     <NumberInput
       label="Retention Period*"
       id="number-input-2"
+      hintText="Please enter a number between {min} and {max}"
       units="days"
-      max={50}
-      bind:value
+      {max}
+      {min}
+      bind:value={numberValue}
     />
   </Hst.Variant>
 
@@ -87,6 +100,7 @@
       label="Email Address(es)"
       placeholder="Type or paste in email addresses"
       hintText="Please enter a properly formatted email address."
+      removeChipButtonLabel={(chip) => `Remove ${chip}`}
       validator={isEmail}
     />
   </Hst.Variant>

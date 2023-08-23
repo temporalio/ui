@@ -1,9 +1,10 @@
 import type { PageLoad } from './$types';
-import {
-  fetchAllArchivedWorkflows,
-  type CombinedWorkflowExecutionsResponse,
-} from '$lib/services/workflow-service';
+
 import { fetchNamespace } from '$lib/services/namespaces-service';
+import {
+  type CombinedWorkflowExecutionsResponse,
+  fetchAllArchivedWorkflows,
+} from '$lib/services/workflow-service';
 import type { DescribeNamespaceResponse } from '$lib/types';
 import type {
   ArchiveFilterParameters,

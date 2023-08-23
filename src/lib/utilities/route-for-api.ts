@@ -1,30 +1,34 @@
-import { page } from '$app/stores';
 import { get } from 'svelte/store';
-import { getApiOrigin } from './get-api-origin';
+
 import { base as basePath } from '$app/paths';
+import { page } from '$app/stores';
+
 import type {
-  APIRoutePath,
   APIRouteParameters,
-  WorkflowListRouteParameters,
-  NamespaceAPIRoutePath,
-  NamespaceRouteParameters,
-  TaskQueueAPIRoutePath,
-  ScheduleRouteParameters,
-  ParameterlessAPIRoutePath,
-  SearchAttributesRoutePath,
-  TaskQueueRouteParameters,
+  APIRoutePath,
   BatchAPIRoutePath,
   BatchRouteParameters,
+  NamespaceAPIRoutePath,
+  NamespaceRouteParameters,
+  ParameterlessAPIRoutePath,
   ScheduleAPIRoutePath,
-  SchedulesAPIRoutePath,
   ScheduleListRouteParameters,
-  WorkflowsAPIRoutePath,
-  WorkflowActivitiesAPIRoutePath,
-  WorkflowAPIRoutePath,
-  WorkflowRouteParameters,
-  WorkflowActivitiesRouteParameters,
+  ScheduleRouteParameters,
+  SchedulesAPIRoutePath,
   SearchAttributesRouteParameters,
+  SearchAttributesRoutePath,
+  TaskQueueAPIRoutePath,
+  TaskQueueRouteParameters,
+  WorkerAPIRoutePath,
+  WorkflowActivitiesAPIRoutePath,
+  WorkflowActivitiesRouteParameters,
+  WorkflowAPIRoutePath,
+  WorkflowListRouteParameters,
+  WorkflowRouteParameters,
+  WorkflowsAPIRoutePath,
 } from '$lib/types/api';
+
+import { getApiOrigin } from './get-api-origin';
 
 const replaceNamespaceInApiUrl = (
   apiUrl: string,
@@ -107,7 +111,9 @@ export function pathForApi(
     'search-attributes': `/namespaces/${parameters.namespace}/search-attributes`,
     settings: '/settings',
     'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
+    'task-queue.compatibility': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/compatibility`,
     user: '/me',
+    'worker-task-reachability': `/namespaces/${parameters?.namespace}/worker-task-reachability`,
     'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/terminate`,
     'workflow.cancel': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/cancel`,
     'workflow.signal': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/signal`,
@@ -138,6 +144,11 @@ export function routeForApi(
 export function routeForApi(
   route: SchedulesAPIRoutePath,
   parameters: ScheduleListRouteParameters,
+): string;
+export function routeForApi(
+  route: WorkerAPIRoutePath,
+  parameters: NamespaceRouteParameters,
+  shouldEncode?: boolean,
 ): string;
 export function routeForApi(
   route: WorkflowAPIRoutePath,

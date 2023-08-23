@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, Page, test } from '@playwright/test';
 
 const initialHeaders = [
   'Status',
@@ -25,66 +25,76 @@ test.beforeEach(async ({ page, baseURL }) => {
   await page.goto(baseURL);
 });
 
+const delayClick = (testId: string, page: Page, delayMs = 100) =>
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      return page.getByTestId(testId).click().then(resolve).catch(reject);
+    }, delayMs);
+  });
+
 test.describe('Workflows Table Configuration', () => {
   test('allows adding columns to the table', async ({ page }) => {
-    for (const header of initialHeaders) {
-      await expect(
-        page.getByTestId(`workflows-summary-table-header-cell-${header}`),
-      ).toBeVisible();
-    }
+    await Promise.all(
+      initialHeaders.map((header) =>
+        expect(
+          page.getByTestId(`workflows-summary-table-header-cell-${header}`),
+        ).toBeAttached(),
+      ),
+    );
 
-    for (const header of headersToAdd) {
-      await expect(
-        page.getByTestId(`workflows-summary-table-header-cell-${header}`),
-      ).toBeHidden();
-    }
+    await Promise.all(
+      headersToAdd.map((header) =>
+        expect(
+          page.getByTestId(`workflows-summary-table-header-cell-${header}`),
+        ).not.toBeAttached(),
+      ),
+    );
 
     await page
       .getByTestId('workflows-summary-table-configuration-button')
       .click();
 
     for (const header of headersToAdd) {
-      await page
-        .getByTestId(`orderable-list-item-${header}-add-button`)
-        .click();
+      await delayClick(`orderable-list-item-${header}-add-button`, page);
     }
 
     await page.getByTestId('drawer-close-button').click();
-    await page
-      .getByTestId('unpinned-table-columns-wrapper')
-      .scrollIntoViewIfNeeded();
 
-    for (const header of headersToAdd) {
-      await expect(
-        page.getByTestId(`workflows-summary-table-header-cell-${header}`),
-      ).toBeVisible();
-    }
+    await Promise.all(
+      headersToAdd.map((header) =>
+        expect(
+          page.getByTestId(`workflows-summary-table-header-cell-${header}`),
+        ).toBeAttached(),
+      ),
+    );
   });
 
   test('allows removing columns from the table', async ({ page }) => {
-    for (const header of initialHeaders) {
-      await expect(
-        page.getByTestId(`workflows-summary-table-header-cell-${header}`),
-      ).toBeVisible();
-    }
+    await Promise.all(
+      initialHeaders.map((header) =>
+        expect(
+          page.getByTestId(`workflows-summary-table-header-cell-${header}`),
+        ).toBeAttached(),
+      ),
+    );
 
     await page
       .getByTestId('workflows-summary-table-configuration-button')
       .click();
 
     for (const header of headersToRemove) {
-      await page
-        .getByTestId(`orderable-list-item-${header}-remove-button`)
-        .click();
+      await delayClick(`orderable-list-item-${header}-remove-button`, page);
     }
 
     await page.getByTestId('drawer-close-button').click();
 
-    for (const header of headersToRemove) {
-      await expect(
-        page.getByTestId(`workflows-summary-table-header-cell-${header}`),
-      ).toBeHidden();
-    }
+    await Promise.all(
+      headersToRemove.map((header) =>
+        expect(
+          page.getByTestId(`workflows-summary-table-header-cell-${header}`),
+        ).not.toBeAttached(),
+      ),
+    );
   });
 
   test('allows reordering columns in the table via buttons', async ({
@@ -94,12 +104,14 @@ test.describe('Workflows Table Configuration', () => {
       .locator('.workflows-summary-table-header-cell')
       .all();
 
-    initialThs.forEach(async (th, idx) => {
-      await expect(th).toHaveAttribute(
-        'data-testid',
-        `workflows-summary-table-header-cell-${initialHeaders[idx]}`,
-      );
-    });
+    await Promise.all(
+      initialThs.map(async (th, idx) =>
+        expect(th).toHaveAttribute(
+          'data-testid',
+          `workflows-summary-table-header-cell-${initialHeaders[idx]}`,
+        ),
+      ),
+    );
 
     await page
       .getByTestId('workflows-summary-table-configuration-button')
@@ -110,16 +122,14 @@ test.describe('Workflows Table Configuration', () => {
     ).toBeVisible();
 
     for (let i = 0; i < 3; i++) {
-      await page
-        .getByTestId('orderable-list-item-Run ID-move-down-button')
-        .click();
+      await delayClick('orderable-list-item-Run ID-move-down-button', page);
     }
 
     const reorderedThs = await page
       .locator('.workflows-summary-table-header-cell')
       .all();
 
-    await Promise.allSettled(
+    await Promise.all(
       reorderedThs.map((th, idx) => {
         return expect(th).toHaveAttribute(
           'data-testid',
@@ -136,12 +146,14 @@ test.describe('Workflows Table Configuration', () => {
       .locator('.workflows-summary-table-header-cell')
       .all();
 
-    initialThs.forEach(async (th, idx) => {
-      await expect(th).toHaveAttribute(
-        'data-testid',
-        `workflows-summary-table-header-cell-${initialHeaders[idx]}`,
-      );
-    });
+    await Promise.all(
+      initialThs.map(async (th, idx) =>
+        expect(th).toHaveAttribute(
+          'data-testid',
+          `workflows-summary-table-header-cell-${initialHeaders[idx]}`,
+        ),
+      ),
+    );
 
     await page
       .getByTestId('workflows-summary-table-configuration-button')
@@ -156,18 +168,16 @@ test.describe('Workflows Table Configuration', () => {
     const sourceBox = await sourceElement.boundingBox();
     const targetBox = await targetElement.boundingBox();
 
-    if (sourceBox && targetBox) {
-      await page.mouse.move(
-        sourceBox.x + sourceBox.width / 2,
-        sourceBox.y + sourceBox.height / 2,
-      );
-      await page.mouse.down();
-      await page.mouse.move(
-        targetBox.x + targetBox.width / 2,
-        targetBox.y + targetBox.height / 2,
-      );
-      await page.mouse.up();
-    }
+    await page.mouse.move(
+      sourceBox.x + sourceBox.width / 2,
+      sourceBox.y + sourceBox.height / 2,
+    );
+    await page.mouse.down();
+    await page.mouse.move(
+      targetBox.x + targetBox.width / 2,
+      targetBox.y + targetBox.height / 2,
+    );
+    await page.mouse.up();
 
     await page.getByTestId('drawer-close-button').click();
 
@@ -175,7 +185,7 @@ test.describe('Workflows Table Configuration', () => {
       .locator('.workflows-summary-table-header-cell')
       .all();
 
-    await Promise.allSettled(
+    await Promise.all(
       reorderedThs.map((th, idx) => {
         return expect(th).toHaveAttribute(
           'data-testid',

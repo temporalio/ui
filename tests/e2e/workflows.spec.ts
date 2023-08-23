@@ -1,4 +1,4 @@
-import { test, expect, Locator } from '@playwright/test';
+import { expect, Locator, test } from '@playwright/test';
 
 test.beforeEach(async ({ page, baseURL }) => {
   await page.goto(baseURL);
@@ -7,7 +7,9 @@ test.beforeEach(async ({ page, baseURL }) => {
 test.describe('Workflows list', () => {
   test('should render decoded Payloads', async ({ page }) => {
     test.slow();
-    await page.getByText('e2e-workflow-1').click({ position: { x: 0, y: 0 } });
+    await page
+      .getByRole('link', { name: 'e2e-workflow-1' })
+      .click({ position: { x: 0, y: 0 } });
 
     let region: Locator;
     let toggle: Locator;
@@ -49,7 +51,9 @@ test.describe('Workflows list', () => {
   });
 
   test('should render decoded stack trace', async ({ page }) => {
-    await page.getByText('e2e-workflow-2').click({ position: { x: 0, y: 0 } });
+    await page
+      .getByRole('link', { name: 'e2e-workflow-2' })
+      .click({ position: { x: 0, y: 0 } });
 
     await page.getByText('Stack Trace').click();
 
@@ -59,7 +63,9 @@ test.describe('Workflows list', () => {
   });
 
   test('should render decoded query results', async ({ page }) => {
-    await page.getByText('e2e-workflow-2').click({ position: { x: 0, y: 0 } });
+    await page
+      .getByRole('link', { name: 'e2e-workflow-2' })
+      .click({ position: { x: 0, y: 0 } });
 
     await page.getByText('Queries').click();
     await page.getByLabel('Query Type').selectOption('is-blocked');

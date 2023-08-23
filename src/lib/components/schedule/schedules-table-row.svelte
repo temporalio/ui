@@ -1,21 +1,25 @@
 <script lang="ts">
-  import type { ScheduleActionResult, ScheduleListEntry } from '$types';
   import { page } from '$app/stores';
-  import { timeFormat } from '$lib/stores/time-format';
+  
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Link from '$lib/holocene/link.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import type {
+    FullScheduleSpec,
+    StructuredCalendar,
+  } from '$lib/types/schedule';
   import { formatDate } from '$lib/utilities/format-date';
   import {
     routeForEventHistory,
     routeForSchedule,
   } from '$lib/utilities/route-for';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Link from '$lib/holocene/link.svelte';
+  
   import ScheduleFrequency from './schedule-frequency.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
-
-  import type {
-    FullScheduleSpec,
-    StructuredCalendar,
-  } from '$lib/types/schedule';
+  
+  
+  import type { ScheduleActionResult, ScheduleListEntry } from '$types';
 
   let { namespace } = $page.params;
 
@@ -64,14 +68,22 @@
             namespace,
             workflow: run?.startWorkflowResult?.workflowId,
             run: run?.startWorkflowResult?.runId,
-          })}>{formatDate(run?.actualTime, $timeFormat)}</Link
+          })}
+          >{formatDate(run?.actualTime, $timeFormat, {
+            relative: $relativeTime,
+          })}</Link
         >
       </p>
     {/each}
   </td>
   <td class="cell truncate max-xl:hidden">
     {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
-      <div>{formatDate(run, $timeFormat, 'from now')}</div>
+      <div>
+        {formatDate(run, $timeFormat, {
+          relative: $relativeTime,
+          relativeLabel: translate('from-now'),
+        })}
+      </div>
     {/each}
   </td>
 </TableRow>

@@ -4,8 +4,8 @@
       if the stack trace originates from the Go SDK
   It returns undefined otherwise
  */
-import { parseWithBigInt } from '../parse-with-big-int';
 import { isFromGoSDK } from './is-from-go-sdk';
+import { parseWithBigInt } from '../parse-with-big-int';
 
 export const getFilePathsFromGoStackTrace = (
   stackTraceText: string,

@@ -1,12 +1,11 @@
-<script lang="ts" context="module">
-  import type { Toaster } from '../stores/toaster';
-</script>
-
 <script lang="ts">
+  import type { Toaster } from '../stores/toaster';
+
   import ToastComponent from './toast.svelte';
 
   export let pop: Toaster['pop'];
   export let toasts: Toaster['toasts'];
+  export let closeButtonLabel: string;
 
   const dismissToast = (event: CustomEvent<{ id: string }>) => {
     pop(event.detail.id);
@@ -18,7 +17,7 @@
   role="log"
 >
   {#each $toasts as { message, variant, id } (id)}
-    <ToastComponent {variant} {id} on:dismiss={dismissToast}>
+    <ToastComponent {closeButtonLabel} {variant} {id} on:dismiss={dismissToast}>
       {message}
     </ToastComponent>
   {/each}

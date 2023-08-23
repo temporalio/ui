@@ -1,9 +1,11 @@
 import { BROWSER } from 'esm-env';
+
 import { getAuthUser } from '$lib/stores/auth-user';
+import type { NetworkError } from '$lib/types/global';
+
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
-import type { NetworkError } from '$lib/types/global';
 
 export type TemporalAPIError = {
   code: number;
@@ -66,11 +68,17 @@ export const requestFromAPI = async <T>(
   } = init;
   let { options } = init;
 
-  const nextPageToken = token ? { next_page_token: token } : {};
-  const query = new URLSearchParams({
-    ...params,
-    ...nextPageToken,
-  });
+  let query = new URLSearchParams();
+  if (params?.entries) {
+    query = params as URLSearchParams;
+    if (token) query.set('nextPageToken', token);
+  } else {
+    const nextPageToken = token ? { next_page_token: token } : {};
+    query = new URLSearchParams({
+      ...params,
+      ...nextPageToken,
+    });
+  }
   const url = toURL(endpoint, query);
 
   try {

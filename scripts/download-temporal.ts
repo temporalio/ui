@@ -1,15 +1,17 @@
-import { join } from 'path';
 import { chmod } from 'fs/promises';
-import { finished } from 'stream/promises';
 import zlib from 'node:zlib';
+import { join } from 'path';
+import { finished } from 'stream/promises';
 
-import fetch from 'node-fetch';
-import { chalk } from 'zx';
 import mkdirp from 'mkdirp';
-import rimraf from 'rimraf';
+import fetch from 'node-fetch';
+import rmrf from 'rimraf';
 import tar from 'tar-fs';
+import { chalk } from 'zx';
 
 console.log(chalk.cyan('Getting ready to download Temporal CLI…'));
+
+const { rimraf } = rmrf;
 
 if (process.env.VERCEL) {
   console.log(
@@ -26,8 +28,8 @@ const reportError = (error: string, exitCode = 1, callback?: () => void) => {
   process.exit(exitCode);
 };
 
-const removeDirectory = () => {
-  rimraf(destination);
+const removeDirectory = async () => {
+  await rimraf(destination);
 };
 
 const destinationDirectory = './bin';

@@ -32,23 +32,7 @@ For all env options see [Config template file](./config-template.yaml) or [Confi
 
 ## Serve UI under a sub-path
 
-To change the public path under which the UI is served you will want to build your own docker image
-
-Clone the repo
-
-``` bash
-git clone https://github.com/temporalio/ui-server.git
-cd ui-server
-```
-
-Build the image
-
-``` bash
-make install-submodules
-docker build -t temporal-ui .
-```
-
-Run the image
+To change the public path under which the UI is served you can use the TEMPORAL_UI_PUBLIC_PATH environment variable.
 
 ```
 docker run -d --network host -e TEMPORAL_UI_PUBLIC_PATH=/custom-path -t temporal-ui

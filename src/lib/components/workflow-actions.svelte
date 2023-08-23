@@ -1,55 +1,57 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  
+  import WorkflowResetForm from '$lib/components/workflow/workflow-reset-form.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+  import JSONEditor from '$lib/holocene/json-editor.svelte';
+  import { MenuDivider, MenuItem } from '$lib/holocene/menu';
+  import Modal from '$lib/holocene/modal.svelte';
+  import SplitButton from '$lib/holocene/split-button.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { Action } from '$lib/models/workflow-actions';
+  import { ResetReapplyType } from '$lib/models/workflow-actions';
   import {
     resetWorkflow,
     signalWorkflow,
     terminateWorkflow,
   } from '$lib/services/workflow-service';
-  import { authUser } from '$lib/stores/auth-user';
-
-  import { formatReason } from '$lib/utilities/workflow-actions';
-  import { Action } from '$lib/models/workflow-actions';
-  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
-  import { ResetReapplyType } from '$lib/models/workflow-actions';
-
-  import { refresh } from '$lib/stores/workflow-run';
-  import { settings } from '$lib/stores/settings';
-  import { coreUserStore } from '$lib/stores/core-user';
   import { cancelWorkflow } from '$lib/services/workflow-service';
-  import { toaster } from '$lib/stores/toaster';
-
-  import SplitButton from '$lib/holocene/split-button.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import MenuDivider from '$lib/holocene/primitives/menu/menu-divider.svelte';
-  import JSONEditor from '$lib/holocene/json-editor.svelte';
+  import { authUser } from '$lib/stores/auth-user';
+  import { coreUserStore } from '$lib/stores/core-user';
   import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
-  import WorkflowResetForm from '$lib/components/workflow/workflow-reset-form.svelte';
-  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
-  import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
-  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
-  import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
+  import { settings } from '$lib/stores/settings';
+  import { toaster } from '$lib/stores/toaster';
+  import { refresh } from '$lib/stores/workflow-run';
   import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { translate } from '$lib/i18n/translate';
+  import { formatReason } from '$lib/utilities/workflow-actions';
+  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
+  import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
+  import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
+  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
+  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
   export let cancelInProgress: boolean;
+  export let isRunning: boolean;
 
   let reason = '';
   let signalInput = '';
   let signalName = '';
-  let cancelConfirmationModal: Modal;
-  let terminateConfirmationModal: Modal;
-  let resetConfirmationModal: Modal;
-  let signalConfirmationModal: Modal;
+  let cancelConfirmationModalOpen = false;
+  let terminateConfirmationModalOpen = false;
+  let resetConfirmationModalOpen = false;
+  let signalConfirmationModalOpen = false;
+  let error = '';
   let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
   let resetId: string;
   let resetReason: string;
   let loading = false;
+  let resetTooltipText: string;
 
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
   $: signalEnabled = workflowSignalEnabled($page.data.settings);
@@ -72,7 +74,7 @@
   };
 
   const handleSuccessfulTermination = async () => {
-    terminateConfirmationModal?.close();
+    terminateConfirmationModalOpen = false;
     $refresh = Date.now();
     toaster.push({
       id: 'workflow-termination-success-toast',
@@ -80,14 +82,13 @@
     });
   };
 
-  const handleTerminationError = (error: NetworkError) => {
+  const handleTerminationError = (err: NetworkError) => {
     reason = '';
-    terminateConfirmationModal?.setError(
-      error?.message ?? translate('unknown-error'),
-    );
+    error = err?.message ?? translate('unknown-error');
   };
 
   const terminate = () => {
+    error = '';
     if (!workflow.canBeTerminated) return;
     terminateWorkflow({
       workflow,
@@ -105,23 +106,22 @@
 
   const cancel = async () => {
     loading = true;
+    error = '';
     try {
       await cancelWorkflow({
         namespace,
         workflowId: workflow.id,
         runId: workflow.runId,
       });
-      cancelConfirmationModal?.close();
+      cancelConfirmationModalOpen = false;
       loading = false;
       $refresh = Date.now();
       toaster.push({
         id: 'workflow-cancelation-success-toast',
         message: translate('workflows', 'cancel-success'),
       });
-    } catch (error) {
-      cancelConfirmationModal?.setError(
-        error?.message ?? translate('unknown-error'),
-      );
+    } catch (err) {
+      error = err?.message ?? translate('unknown-error');
     }
   };
 
@@ -130,6 +130,7 @@
   };
 
   const signal = async () => {
+    error = '';
     try {
       await signalWorkflow({
         namespace,
@@ -138,22 +139,21 @@
         signalInput,
         signalName,
       });
-      signalConfirmationModal?.close();
+      signalConfirmationModalOpen = false;
       $refresh = Date.now();
       toaster.push({
         message: translate('workflows', 'signal-success'),
         id: 'workflow-signal-success-toast',
       });
-    } catch (error) {
-      signalConfirmationModal?.setError(
-        error?.message ?? translate('unknown-error'),
-      );
+    } catch (err) {
+      error = err?.message ?? translate('unknown-error');
     }
 
     hideSignalModal();
   };
 
   const reset = async () => {
+    error = '';
     try {
       const response = await resetWorkflow({
         namespace,
@@ -174,12 +174,10 @@
           [workflow.runId]: response.runId,
         }));
       }
-      resetConfirmationModal?.close();
+      resetConfirmationModalOpen = false;
       $refresh = Date.now();
-    } catch (error) {
-      resetConfirmationModal?.setError(
-        error?.message ?? translate('unknown-error'),
-      );
+    } catch (err) {
+      error = err?.message ?? translate('unknown-error');
     }
     hideResetModal();
   };
@@ -193,39 +191,46 @@
     tooltip?: string;
   }[];
 
-  const resetTooltipText = (): string | undefined => {
-    if (!resetEnabled) return translate('workflows', 'reset-disabled');
-    if (resetEnabled && workflow?.pendingChildren?.length > 0)
-      return translate('workflows', 'reset-disabled-pending-children');
-    if (
+  $: {
+    if (!resetEnabled) {
+      resetTooltipText = translate('workflows', 'reset-disabled');
+    } else if (resetEnabled && workflow?.pendingChildren?.length > 0) {
+      resetTooltipText = translate(
+        'workflows',
+        'reset-disabled-pending-children',
+      );
+    } else if (
       resetEnabled &&
       workflow?.pendingChildren?.length === 0 &&
       $resetEvents.length === 0
-    )
-      return translate('workflows', 'reset-disabled-no-events');
-  };
+    ) {
+      resetTooltipText = translate('workflows', 'reset-disabled-no-events');
+    }
+  }
+
+  $: resetAllowed =
+    resetEnabled &&
+    workflow?.pendingChildren?.length === 0 &&
+    $resetEvents.length > 0;
 
   $: workflowActions = [
     {
       label: translate('workflows', 'reset'),
-      onClick: () => resetConfirmationModal.open(),
+      onClick: () => (resetConfirmationModalOpen = true),
       testId: 'reset-button',
-      allowed:
-        resetEnabled &&
-        workflow?.pendingChildren?.length === 0 &&
-        $resetEvents.length > 0,
-      tooltip: resetTooltipText(),
+      allowed: resetAllowed,
+      tooltip: resetAllowed ? '' : resetTooltipText,
     },
     {
       label: translate('workflows', 'signal'),
-      onClick: () => signalConfirmationModal.open(),
+      onClick: () => (signalConfirmationModalOpen = true),
       testId: 'signal-button',
       allowed: signalEnabled,
       tooltip: signalEnabled ? '' : translate('workflows', 'signal-disabled'),
     },
     {
       label: translate('workflows', 'terminate'),
-      onClick: () => terminateConfirmationModal.open(),
+      onClick: () => (terminateConfirmationModalOpen = true),
       testId: 'terminate-button',
       allowed: terminateEnabled,
       destructive: true,
@@ -242,34 +247,52 @@
     !writeActionsAreAllowed(settings);
 </script>
 
-<SplitButton
-  id="workflow-actions"
-  position="right"
-  disabled={actionsDisabled}
-  primaryActionDisabled={!cancelEnabled || cancelInProgress}
-  on:click={() => cancelConfirmationModal.open()}
-  label={translate('workflows', 'request-cancellation')}
->
-  {#each workflowActions as { onClick, destructive, label, allowed, testId, tooltip }}
-    {#if destructive}
-      <MenuDivider />
-    {/if}
-    <MenuItem
-      on:click={onClick}
-      {destructive}
-      {testId}
-      disabled={!allowed}
-      tooltipProps={{ text: tooltip, left: true, width: 200 }}
+{#if isRunning}
+  <SplitButton
+    id="workflow-actions"
+    position="right"
+    disabled={actionsDisabled}
+    primaryActionDisabled={!cancelEnabled || cancelInProgress}
+    on:click={() => (cancelConfirmationModalOpen = true)}
+    label={translate('workflows', 'request-cancellation')}
+    menuLabel={translate('workflows', 'workflow-actions')}
+  >
+    {#each workflowActions as { onClick, destructive, label, allowed, testId, tooltip }}
+      {#if destructive}
+        <MenuDivider />
+      {/if}
+      <Tooltip text={tooltip} hide={!tooltip} width={200} left>
+        <MenuItem
+          on:click={onClick}
+          {destructive}
+          disabled={!allowed}
+          data-testid={testId}
+        >
+          {label}
+        </MenuItem>
+      </Tooltip>
+    {/each}
+  </SplitButton>
+{:else}
+  <Tooltip bottomRight width={200} text={resetTooltipText} hide={resetAllowed}>
+    <Button
+      aria-label={translate('workflows', 'reset')}
+      disabled={!resetAllowed}
+      variant="primary"
+      on:click={() => (resetConfirmationModalOpen = true)}
     >
-      {label}
-    </MenuItem>
-  {/each}
-</SplitButton>
+      {translate('workflows', 'reset')}
+    </Button>
+  </Tooltip>
+{/if}
 
 <Modal
   id="reset-confirmation-modal"
   data-testid="reset-confirmation-modal"
-  bind:this={resetConfirmationModal}
+  confirmText={translate('confirm')}
+  cancelText={translate('cancel')}
+  bind:error
+  bind:open={resetConfirmationModalOpen}
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
   confirmDisabled={!resetId}
@@ -286,7 +309,10 @@
 <Modal
   id="cancel-confirmation-modal"
   data-testid="cancel-confirmation-modal"
-  bind:this={cancelConfirmationModal}
+  confirmText={translate('confirm')}
+  cancelText={translate('cancel')}
+  bind:error
+  bind:open={cancelConfirmationModalOpen}
   {loading}
   confirmType="destructive"
   on:confirmModal={cancel}
@@ -301,8 +327,10 @@
 <Modal
   id="terminate-confirmation-modal"
   data-testid="terminate-confirmation-modal"
-  bind:this={terminateConfirmationModal}
+  bind:error
+  bind:open={terminateConfirmationModalOpen}
   confirmText={translate('workflows', 'terminate')}
+  cancelText={translate('cancel')}
   confirmType="destructive"
   on:cancelModal={hideTerminationModal}
   on:confirmModal={terminate}
@@ -315,7 +343,9 @@
     <Input
       id="workflow-termination-reason"
       class="mt-4"
-      placeholder={translate('workflows', 'terminate-reason-input-placeholder')}
+      placeholder={translate('reason-placeholder')}
+      label={translate('reason-placeholder')}
+      labelHidden
       bind:value={reason}
     />
   </div>
@@ -323,8 +353,10 @@
 <Modal
   id="signal-confirmation-modal"
   data-testid="signal-confirmation-modal"
-  bind:this={signalConfirmationModal}
+  bind:error
+  bind:open={signalConfirmationModalOpen}
   confirmText={translate('submit')}
+  cancelText={translate('cancel')}
   confirmDisabled={!signalName}
   on:cancelModal={hideSignalModal}
   on:confirmModal={signal}

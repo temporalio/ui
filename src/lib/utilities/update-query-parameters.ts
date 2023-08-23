@@ -1,7 +1,6 @@
-import { get } from 'svelte/store';
 import { BROWSER } from 'esm-env';
-import { goto as navigateTo, invalidate } from '$app/navigation';
-import { page } from '$app/stores';
+
+import { goto as navigateTo } from '$app/navigation';
 
 type UpdateQueryParams = {
   parameter: string;
@@ -9,7 +8,6 @@ type UpdateQueryParams = {
   url: URL;
   goto?: typeof navigateTo;
   allowEmpty?: boolean;
-  invalidate?: typeof invalidate;
 };
 
 export const gotoOptions = {
@@ -25,24 +23,25 @@ export const updateQueryParameters = async ({
   allowEmpty = false,
 }: UpdateQueryParams): Promise<typeof value> => {
   const next = String(value);
+  const params = {};
+  url.searchParams.forEach((value, key) => {
+    if (key !== parameter) {
+      params[key] = value;
+    }
+  });
+  const newQuery = new URLSearchParams(params);
 
   if (value) {
-    url.searchParams.set(parameter, next);
+    newQuery.set(parameter, next);
   } else if (allowEmpty) {
-    url.searchParams.set(parameter, '');
-  } else {
-    url.searchParams.delete(parameter);
+    newQuery.set(parameter, '');
   }
 
-  if (BROWSER && url.href !== window.location.href) {
-    const namespace = get(page)?.params?.namespace;
-    const workflowsPath = `/namespaces/${namespace}/workflows`;
+  if (BROWSER) {
+    const query = newQuery?.toString();
+    const newUrl = query ? `${url.pathname}?${query}` : url.pathname;
 
-    if (url.pathname === workflowsPath) {
-      await invalidate((url) => url.pathname === workflowsPath);
-    }
-
-    goto(url, gotoOptions);
+    goto(newUrl, gotoOptions);
   }
 
   return value;

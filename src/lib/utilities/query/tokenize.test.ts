@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { tokenize } from './tokenize';
 
 const executionStatusQuery = 'ExecutionStatus="Completed"';

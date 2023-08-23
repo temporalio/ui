@@ -1,11 +1,12 @@
-import { Connection, Client, WorkflowHandle } from '@temporalio/client';
+import { Client, Connection, WorkflowHandle } from '@temporalio/client';
+
+import { getDataConverter } from './data-converter';
 import {
-  Workflow,
   BlockingWorkflow,
   CompletedWorkflow,
   RunningWorkflow,
+  Workflow,
 } from './workflows';
-import { getDataConverter } from './data-converter';
 
 let connection: Connection;
 

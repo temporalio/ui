@@ -1,7 +1,4 @@
-import * as Common from './locales/en/common';
-import * as Workflows from './locales/en/workflows';
-import * as TypedErrors from './locales/en/typed-errors';
-import * as Events from './locales/en/events';
+import Locales from './locales';
 
 /**
  * https://www.i18next.com/translation-function/plurals#singular-plural
@@ -17,10 +14,7 @@ type WithoutPluralSuffix<T> = T extends
   : T;
 
 export const I18nMap = {
-  [Common.Namespace]: Common.Strings,
-  [Workflows.Namespace]: Workflows.Strings,
-  [TypedErrors.Namespace]: TypedErrors.Strings,
-  [Events.Namespace]: Events.Strings,
+  ...Locales.en,
 } as const;
 
 export const I18nNamespaces = Object.keys(I18nMap);

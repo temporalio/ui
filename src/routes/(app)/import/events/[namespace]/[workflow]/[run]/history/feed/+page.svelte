@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { importEvents } from '$lib/stores/import-events';
+  import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
-  import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
-
+  import { importEvents } from '$lib/stores/import-events';
   import type { EventTypeCategory, WorkflowEvent } from '$lib/types/events';
 
   $: category = $eventCategoryFilter as EventTypeCategory;
@@ -31,7 +31,10 @@
   floatId="event-view-toggle"
   let:visibleItems
   let:initialItem
-  aria-label="recent events"
+  aria-label={translate('workflows', 'recent-events')}
+  pageSizeSelectLabel={translate('per-page')}
+  previousButtonLabel={translate('previous')}
+  nextButtonLabel={translate('next')}
 >
   <EventSummaryTable {compact} on:expandAll={handleExpandChange}>
     {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
@@ -40,7 +43,6 @@
         {compact}
         expandAll={$expandAllEvents === 'true'}
         {initialItem}
-        {visibleItems}
       />
     {:else}
       <EventEmptyRow />

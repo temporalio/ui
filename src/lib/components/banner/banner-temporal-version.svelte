@@ -1,8 +1,12 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { isVersionNewer } from '$lib/utilities/version-check';
+  
+  import { translate } from '$lib/i18n/translate';
   import type { BannersState } from '$lib/models/banner-state';
+  import { isVersionNewer } from '$lib/utilities/version-check';
+  
   import Banner from './banner.svelte';
+  
 
   export let shownBanner: BannersState;
 
@@ -22,7 +26,9 @@
   const show = isVersionNewer(recommended?.version, current?.version);
   const message =
     severity === severities.Low
-      ? `📥 Temporal v${recommended?.version} is available`
+      ? `📥 ${translate('banner-temporal-version', {
+          version: recommended?.version,
+        })}`
       : `📥 ${alert?.message}`;
 </script>
 
@@ -33,6 +39,7 @@
     {message}
     {link}
     bind:shownBanner
-    testId="temporal-version-banner"
+    data-testid="temporal-version-banner"
+    role="alertdialog"
   />
 {/if}

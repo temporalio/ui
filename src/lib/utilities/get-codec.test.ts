@@ -1,16 +1,18 @@
-import { describe, expect, it, beforeEach } from 'vitest';
-import {
-  getCodecEndpoint,
-  getCodecPassAccessToken,
-  getCodecIncludeCredentials,
-} from './get-codec';
-import type { Settings } from '$lib/types/global';
+import { beforeEach, describe, expect, it } from 'vitest';
+
 import {
   codecEndpoint,
-  passAccessToken,
   includeCredentials,
   overrideRemoteCodecConfiguration,
+  passAccessToken,
 } from '$lib/stores/data-encoder-config';
+import type { Settings } from '$lib/types/global';
+
+import {
+  getCodecEndpoint,
+  getCodecIncludeCredentials,
+  getCodecPassAccessToken,
+} from './get-codec';
 
 const defaultSettings = {
   auth: {

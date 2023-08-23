@@ -1,8 +1,9 @@
-import { afterEach, beforeEach, describe, test, expect } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
-import TableBodyCell from '../table-body-cell.svelte';
 import { WorkflowHeaderLabels } from '$lib/stores/workflow-table-columns';
 import type { WorkflowExecution } from '$lib/types/workflows';
+
+import TableBodyCell from '../table-body-cell.svelte';
 
 const workflow: WorkflowExecution = {
   name: 'mock-workflow',

@@ -1,14 +1,15 @@
 <script lang="ts">
-  import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
-
-  import {
-    formatAttributes,
-    attributeGroups,
-  } from '$lib/utilities/format-event-attributes';
-  import EventDetailPills from './event-detail-pills.svelte';
-  import EventGroupDetails from './event-group-details.svelte';
   import { isEventGroup } from '$lib/models/event-groups';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
+  import {
+    attributeGroups,
+    formatAttributes,
+  } from '$lib/utilities/format-event-attributes';
+  
+  import EventDetailPills from './event-detail-pills.svelte';
+  import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
+  import EventGroupDetails from './event-group-details.svelte';
+  
 
   export let event: IterableEvent;
   export let currentEvent: WorkflowEvent;

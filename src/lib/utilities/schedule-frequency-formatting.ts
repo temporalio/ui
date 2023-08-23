@@ -1,5 +1,6 @@
-import { monthNames, weekDays } from './calendar';
 import type { ScheduleRange, StructuredCalendar } from '$lib/types/schedule';
+
+import { monthNames, weekDays } from './calendar';
 
 // Examples of output
 // Wednesday at 06:30pm UTC
@@ -207,6 +208,7 @@ export const structuredCalendarToFrequency = (
 };
 
 export const commentOrCalendarToFrequency = (calendar: StructuredCalendar) => {
-  if (calendar?.comment) return `${calendar?.comment} UTC`;
+  const comment = calendar?.comment;
+  if (comment) return comment;
   return structuredCalendarToFrequency(calendar);
 };

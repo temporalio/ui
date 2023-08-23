@@ -1,18 +1,19 @@
 import { get } from 'svelte/store';
-import { timeFormat } from '$lib/stores/time-format';
+
+import type { I18nKey } from '$lib/i18n';
+import { translate } from '$lib/i18n/translate';
+import { relativeTime, timeFormat } from '$lib/stores/time-format';
 import type {
   EventAttribute,
   EventAttributeKey,
   IterableEvent,
 } from '$lib/types/events';
-
+import { capitalize } from '$lib/utilities/format-camel-case';
+import { formatDate } from '$lib/utilities/format-date';
 import {
   shouldDisplayAttribute,
   shouldDisplayNestedAttribute,
 } from '$lib/utilities/get-single-attribute-for-event';
-import { capitalize } from '$lib/utilities/format-camel-case';
-import { formatDate } from '$lib/utilities/format-date';
-import type { I18nKey } from '$lib/i18n';
 
 export type CombinedAttributes = EventAttribute & {
   eventTime?: string;
@@ -36,8 +37,8 @@ const keysToExpand: Readonly<Set<string>> = new Set([
 
 const keysToFormat: Readonly<Set<string>> = new Set(['maximumAttempts']);
 
-export const UnlimitedAttempts = 'Unlimited';
-export const NoExpiration = 'No Expiration';
+export const UnlimitedAttempts = translate('workflows', 'unlimited');
+export const NoExpiration = translate('workflows', 'no-expiration');
 
 export const formatRetryExpiration = (
   maxAttempts: number,
@@ -104,7 +105,9 @@ export const formatAttributes = (
   const attributes: CombinedAttributes = {};
 
   if (compact)
-    attributes.eventTime = formatDate(event.eventTime, get(timeFormat));
+    attributes.eventTime = formatDate(event.eventTime, get(timeFormat), {
+      relative: get(relativeTime),
+    });
 
   for (const [key, value] of Object.entries(event.attributes)) {
     const shouldDisplay = shouldDisplayAttribute(key, value);

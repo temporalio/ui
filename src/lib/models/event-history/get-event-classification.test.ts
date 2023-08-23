@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
+
+import type { EventType } from '$lib/types/events';
+
 import {
   eventClassifications,
   getEventClassification,
 } from './get-event-classification';
-import type { EventType } from '$lib/types/events';
 
 describe('eventClassifications', () => {
   it('should match the last snapshot of the classifications', () => {

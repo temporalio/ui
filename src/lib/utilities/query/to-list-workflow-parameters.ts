@@ -1,9 +1,10 @@
 import { formatDuration } from 'date-fns';
-import { isExecutionStatus } from '../is';
-import { durationKeys, fromDate } from '../to-duration';
-import { tokenize } from './tokenize';
 
 import type { FilterParameters } from '$lib/types/workflows';
+
+import { tokenize } from './tokenize';
+import { isExecutionStatus } from '../is';
+import { durationKeys, fromDate } from '../to-duration';
 
 type Tokens = string[];
 export type ParsedParameters = FilterParameters & { timeRange?: string };

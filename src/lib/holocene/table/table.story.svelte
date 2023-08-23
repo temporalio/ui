@@ -1,19 +1,21 @@
 <script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
-  import Table from '$lib/holocene/table/table.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
-  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
+  import Badge from '$lib/holocene/badge.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
 
   export let Hst: HST;
 
   let bulkActionsAvailable = true;
-  let updating: boolean = false;
+  let updating = false;
 </script>
 
 <Hst.Story>
   <Hst.Variant title="A Fancy Table">
     <Table variant="fancy" class="w-full" bind:updating>
+      <caption class="sr-only" slot="caption">fancy table example</caption>
       <TableHeaderRow slot="headers">
         <th class="w-1/5">Status</th>
         <th class="w-1/5">Email</th>
@@ -45,6 +47,7 @@
 
   <Hst.Variant title="A Simple Table">
     <Table variant="simple" class="w-full">
+      <caption class="sr-only" slot="caption">simple table example</caption>
       <tr slot="headers">
         <th>Attribute</th>
         <th>Type</th>

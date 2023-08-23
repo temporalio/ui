@@ -1,5 +1,8 @@
 import { derived } from 'svelte/store';
+
 import { page } from '$app/stores';
+
+import { authUser } from './auth-user';
 import {
   dataConverterPort,
   lastDataConverterStatus,
@@ -9,7 +12,6 @@ import {
   lastDataEncoderStatus,
   overrideRemoteCodecConfiguration,
 } from './data-encoder-config';
-import { authUser } from './auth-user';
 
 type DataEncoder = {
   namespace: string;

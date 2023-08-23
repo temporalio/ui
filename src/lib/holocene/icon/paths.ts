@@ -1,7 +1,8 @@
 import add from './svg/add.svelte';
 import archives from './svg/archives.svelte';
-import arrowUp from './svg/arrow-up.svelte';
+import arrowLeft from './svg/arrow-left.svelte';
 import arrowRight from './svg/arrow-right.svelte';
+import arrowUp from './svg/arrow-up.svelte';
 import ascending from './svg/ascending.svelte';
 import book from './svg/book.svelte';
 import bookmark from './svg/bookmark.svelte';
@@ -12,8 +13,8 @@ import checkmark from './svg/checkmark.svelte';
 import chevronDown from './svg/chevron-down.svelte';
 import chevronLeft from './svg/chevron-left.svelte';
 import chevronRight from './svg/chevron-right.svelte';
-import chevronUp from './svg/chevron-up.svelte';
 import chevronSelectorVertical from './svg/chevron-selector-vertical.svelte';
+import chevronUp from './svg/chevron-up.svelte';
 import clock from './svg/clock.svelte';
 import close from './svg/close.svelte';
 import cometSolid from './svg/comet-solid.svelte';
@@ -33,16 +34,19 @@ import feedbackCircle from './svg/feedback-circle.svelte';
 import feedback from './svg/feedback.svelte';
 import fileImport from './svg/file-import.svelte';
 import fileUpload from './svg/file-upload.svelte';
-import filter from './svg/filter.svelte';
 import filterSolid from './svg/filter-solid.svelte';
+import filter from './svg/filter.svelte';
+import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
 import hyphen from './svg/hyphen.svelte';
 import importIcon from './svg/import.svelte';
 import info from './svg/info.svelte';
 import invertedCheckmark from './svg/inverted-checkmark.svelte';
 import json from './svg/json.svelte';
+import labs from './svg/labs.svelte';
 import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
+import merge from './svg/merge.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
 import pinFilled from './svg/pin-filled.svelte';
@@ -56,17 +60,18 @@ import schedules from './svg/schedules.svelte';
 import search from './svg/search.svelte';
 import settings from './svg/settings.svelte';
 import sliders from './svg/sliders.svelte';
-import spinner from './svg/spinner.svelte';
 import spinnerSolid from './svg/spinner-solid.svelte';
+import spinner from './svg/spinner.svelte';
 import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
 import support from './svg/support.svelte';
+import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
 import timeline from './svg/timeline.svelte';
 import transcoderError from './svg/transcoder-error.svelte';
-import transcoderOn from './svg/transcoder-on.svelte';
 import transcoderOff from './svg/transcoder-off.svelte';
+import transcoderOn from './svg/transcoder-on.svelte';
 import trash from './svg/trash.svelte';
 import tutorial from './svg/tutorial.svelte';
 import upload from './svg/upload.svelte';
@@ -80,6 +85,7 @@ export type IconName = keyof typeof icons;
 export const icons = {
   add,
   archives,
+  'arrow-left': arrowLeft,
   'arrow-up': arrowUp,
   'arrow-right': arrowRight,
   ascending,
@@ -115,14 +121,17 @@ export const icons = {
   'file-upload': fileUpload,
   filter,
   'filter-solid': filterSolid,
+  github,
   graph,
   hyphen,
   import: importIcon,
   info,
   'inverted-checkmark': invertedCheckmark,
   json,
+  labs,
   lock,
   logout,
+  merge,
   'namespace-switcher': namespaceSwitcher,
   namespace,
   'pin-filled': pinFilled,
@@ -142,6 +151,7 @@ export const icons = {
   summary,
   support,
   'spinner-solid': spinnerSolid,
+  'temporal-logo': temporalLogo,
   terminal,
   timeline,
   'transcoder-error': transcoderError,
@@ -154,4 +164,4 @@ export const icons = {
   'vertical-ellipsis': verticalEllipsis,
   warning,
   workflow,
-};
+} as const;

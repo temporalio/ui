@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
+
 import {
-  getDuration,
   formatDistance,
   formatDistanceAbbreviated,
-  fromSecondsToMinutesAndSeconds,
   fromSecondsToDaysOrHours,
+  fromSecondsToMinutesAndSeconds,
+  getDuration,
   getTimestampDifference,
 } from './format-time';
 
@@ -130,6 +131,48 @@ describe('getDuration', () => {
       '2 years, 9 months, 11 days, 4 hours, 44 minutes, 18 seconds',
     );
     expect(abbvDistancer).toBe('2years 9months 11d 4h 44m 18s');
+  });
+  it('should get minutes/seconds duration with milliseconds of a start and end date', () => {
+    const start = '2022-04-13T16:29:35.630571Z';
+    const end = '2022-04-13T16:35:21.300609Z';
+    const duration = getDuration({ start, end });
+    const distance = formatDistance({ start, end, includeMilliseconds: true });
+    const abbvDistancer = formatDistanceAbbreviated({
+      start,
+      end,
+      includeMilliseconds: true,
+    });
+    expect(duration).toStrictEqual({
+      days: 0,
+      hours: 0,
+      minutes: 5,
+      months: 0,
+      seconds: 45,
+      years: 0,
+    });
+    expect(distance).toBe('5 minutes, 45 seconds 670ms');
+    expect(abbvDistancer).toBe('5m 45s 670ms');
+  });
+  it('should get only milliseconds of a start and end date less than a second apart', () => {
+    const start = '2022-04-13T16:29:35.630571Z';
+    const end = '2022-04-13T16:29:35.893821Z';
+    const duration = getDuration({ start, end });
+    const distance = formatDistance({ start, end, includeMilliseconds: true });
+    const abbvDistancer = formatDistanceAbbreviated({
+      start,
+      end,
+      includeMilliseconds: true,
+    });
+    expect(duration).toStrictEqual({
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      months: 0,
+      seconds: 0,
+      years: 0,
+    });
+    expect(distance).toBe('263ms');
+    expect(abbvDistancer).toBe('263ms');
   });
 });
 

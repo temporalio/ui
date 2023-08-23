@@ -1,19 +1,14 @@
-import type {
-  WorkflowFilter,
-  WorkflowSort,
-} from '$lib/models/workflow-filters';
-import { searchAttributeOptions } from '$lib/stores/search-attributes';
-import { formatDuration } from 'date-fns';
 import debounce from 'just-debounce';
+
+import type { WorkflowFilter } from '$lib/models/workflow-filters';
+import type { FilterParameters, SearchAttributes } from '$lib/types/workflows';
 import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
 
-import { isConditional, isJoin, isParenthesis, isBetween } from '../is';
-import { durationKeys, fromDate } from '../to-duration';
 import { tokenize } from './tokenize';
+import { isValidDate } from '../format-date';
+import { isBetween, isConditional, isJoin, isParenthesis } from '../is';
+import { durationKeys } from '../to-duration';
 import { updateQueryParameters } from '../update-query-parameters';
-
-import type { FilterParameters, SearchAttributes } from '$lib/types/workflows';
-
 type Tokens = string[];
 export type ParsedParameters = FilterParameters & { timeRange?: string };
 
@@ -41,7 +36,7 @@ export const getLargestDurationUnit = (duration: Duration): Duration => {
 
 const isDatetimeStatement = is('Datetime');
 
-const emptyFilter = () => ({
+export const emptyFilter = (): WorkflowFilter => ({
   attribute: '',
   value: '',
   operator: '',
@@ -76,14 +71,22 @@ export const toListWorkflowFilters = (
         filter.attribute = token;
         if (isDatetimeStatement(attributes[token])) {
           const start = getTwoAhead(tokens, index);
+          const hasValidStartTime = isValidDate(start);
 
-          try {
-            const duration = fromDate(start);
-            const largestUnit = getLargestDurationUnit(duration);
+          if (isBetween(tokens[index + 1])) {
+            const end = tokens[index + 4];
+            const hasValidEndTime = isValidDate(end);
 
-            filter.value = formatDuration(largestUnit);
-          } catch (error) {
-            console.error('Error parsing Datetime field from query', error);
+            if (hasValidStartTime && hasValidEndTime) {
+              filter.value = `BETWEEN "${start}" AND "${end}"`;
+              filter.customDate = true;
+            } else {
+              console.error('Error parsing Datetime field from query');
+            }
+          } else if (hasValidStartTime) {
+            filter.value = start;
+          } else {
+            console.error('Error parsing Datetime field from query');
           }
         } else {
           filter.value = getTwoAhead(tokens, index);
@@ -158,10 +161,36 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
   ];
 };
 
+export const combineFilters = (filters: WorkflowFilter[]) => {
+  filters.forEach((filter, index) => {
+    const previousFilter = filters[index - 1];
+    if (previousFilter && !previousFilter.operator) {
+      previousFilter.operator = 'AND';
+    }
+
+    const nextFilter = filters[index + 1];
+    if (!nextFilter) {
+      filter.operator = '';
+    }
+
+    if (filter.operator === 'OR' && previousFilter?.operator !== 'OR') {
+      filter.parenthesis = '(';
+    } else if (previousFilter?.operator === 'OR' && filter.operator !== 'OR') {
+      filter.parenthesis = ')';
+    } else {
+      filter.parenthesis = '';
+    }
+  });
+
+  return filters;
+};
+
 export const updateQueryParamsFromFilter = debounce(
-  (url: URL, filters: WorkflowFilter[], sorts: WorkflowSort[]) => {
-    const allFilters = combineDropdownFilters(filters);
-    const query = toListWorkflowQueryFromFilters(allFilters, sorts);
+  (url: URL, filters: WorkflowFilter[], labsMode = false) => {
+    const allFilters = labsMode
+      ? combineFilters(filters)
+      : combineDropdownFilters(filters);
+    const query = toListWorkflowQueryFromFilters(allFilters);
     updateQueryParameters({
       url,
       parameter: 'query',
@@ -171,22 +200,3 @@ export const updateQueryParamsFromFilter = debounce(
   },
   300,
 );
-
-export const getConditionalForAttribute = (
-  attribute: keyof SearchAttributes,
-): string => {
-  const filter = searchAttributeOptions().find((t) => t.value === attribute);
-  const type = filter?.type;
-  if (type === 'Datetime') return 'In Last';
-  return '=';
-};
-
-export const getDefaultValueForAttribute = (
-  attribute: keyof SearchAttributes,
-) => {
-  const filter = searchAttributeOptions().find((t) => t.value === attribute);
-  const type = filter?.type;
-  if (type === 'Datetime') return '24 hours';
-  if (type === 'Bool') return 'true';
-  return '';
-};

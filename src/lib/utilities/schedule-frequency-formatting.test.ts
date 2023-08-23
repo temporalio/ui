@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { structuredCalendarToFrequency } from './schedule-frequency-formatting';
+
 import type { ScheduleRange } from '$lib/types/schedule';
+
+import {
+  commentOrCalendarToFrequency,
+  structuredCalendarToFrequency,
+} from './schedule-frequency-formatting';
 
 const generateCalendar = ({
   minute = 0,
@@ -8,12 +13,14 @@ const generateCalendar = ({
   month = [],
   dayOfWeek = [],
   dayOfMonth = [],
+  comment,
 }: {
   minute?: number;
   hour?: number;
   month?: ScheduleRange[];
   dayOfWeek?: ScheduleRange[];
   dayOfMonth?: ScheduleRange[];
+  comment?: string;
 }) => {
   return {
     second: [{ start: 0, end: 0, step: 1 }],
@@ -25,6 +32,7 @@ const generateCalendar = ({
       ? dayOfMonth
       : [{ start: 1, end: 31, step: 1 }],
     dayOfWeek: dayOfWeek.length ? dayOfWeek : [{ start: 0, end: 6, step: 1 }],
+    comment: comment ?? '',
   };
 };
 
@@ -127,5 +135,18 @@ describe('structuredCalendarToFrequency', () => {
     const calendar = generateCalendar({ dayOfMonth, month });
     const expected = 'Every 1, 15, 30 of January - April at 12:00am UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
+  });
+});
+
+describe('commentOrCalendarToFrequency', () => {
+  it('should convert a calendar to a frequency', () => {
+    const calendar = generateCalendar({});
+    const expected = 'Daily at 12:00am UTC';
+    expect(structuredCalendarToFrequency(calendar)).toBe(expected);
+  });
+  it('should return a comment as the frequency if one exists', () => {
+    const comment = 'CRON_TZ=Asia/Shanghai */1 * * * *';
+    const calendar = generateCalendar({ comment });
+    expect(commentOrCalendarToFrequency(calendar)).toBe(comment);
   });
 });

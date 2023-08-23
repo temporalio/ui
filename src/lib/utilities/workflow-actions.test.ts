@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { formatReason, getPlacholder } from './workflow-actions';
 import { Action } from '../models/workflow-actions';
-import { getPlacholder, formatReason } from './workflow-actions';
 
 describe('getPlacholder', () => {
   describe('without an authorized user', () => {

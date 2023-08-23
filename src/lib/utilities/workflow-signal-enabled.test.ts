@@ -1,4 +1,5 @@
-import { describe, test, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
+
 import { workflowSignalEnabled } from './workflow-signal-enabled';
 
 describe('workflowSignalEnabled', () => {

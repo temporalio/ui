@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { timeFormat } from '$lib/stores/time-format';
-  import { capitalize } from '$lib/utilities/format-camel-case';
   import {
     addHours,
     addMinutes,
@@ -9,23 +7,28 @@
     startOfDay,
   } from 'date-fns';
 
-  import { columnOrderedDurations } from '$lib/utilities/to-duration';
-  import {
-    persistedTimeFilter,
-    workflowFilters,
-    workflowSorts,
-  } from '$lib/stores/filters';
-  import DatePicker from '$lib/holocene/date-picker.svelte';
-  import Button from '$lib/holocene/button.svelte';
-  import TimePicker from '$lib/holocene/time-picker.svelte';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { page } from '$app/stores';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+
+  import Button from '$lib/holocene/button.svelte';
+  import DatePicker from '$lib/holocene/date-picker.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
+  import {
+    Menu,
+    MenuButton,
+    MenuContainer,
+    MenuItem,
+  } from '$lib/holocene/menu';
+  import MenuDivider from '$lib/holocene/menu/menu-divider.svelte';
+  import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
+  import { getLocalTime } from '$lib/utilities/format-date';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { columnOrderedDurations } from '$lib/utilities/to-duration';
+
+  const localTime = getLocalTime() || translate('local');
 
   let custom = false;
   let value = 'All Time';
@@ -94,7 +97,7 @@
       custom = false;
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    updateQueryParamsFromFilter($page.url, $workflowFilters);
   };
 
   const onTimeFieldChange = (field: 'StartTime' | 'CloseTime') => {
@@ -166,122 +169,111 @@
     };
     $workflowFilters = [...getOtherFilters(), filter];
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    updateQueryParamsFromFilter($page.url, $workflowFilters);
   };
 </script>
 
-<div class="flex items-center">
-  <MenuContainer>
-    <MenuButton
-      id="time-range-filter"
-      hasIndicator
-      controls="time-range-filter-menu"
-      class="flex flex-row items-center p-2 bg-white border border-r-0 border-primary rounded-l h-10 w-44"
-    >
-      {value}
-    </MenuButton>
-    <Menu
-      keepOpen
-      id="time-range-filter-menu"
-      class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-2"
-    >
-      {#if custom}
-        <div class="flex flex-col">
-          <p class="text-sm">Start</p>
-          <div class="flex flex-col gap-2">
-            <DatePicker
-              on:datechange={onStartDateChange}
-              selected={startDate}
-            />
-            <TimePicker
-              bind:hour={startHour}
-              bind:minute={startMinute}
-              bind:second={startSecond}
-              bind:half={startHalf}
-            />
-          </div>
-        </div>
-        <div class="flex flex-col">
-          <p class="text-sm">End</p>
-          <div class="flex flex-col gap-2">
-            <DatePicker on:datechange={onEndDateChange} selected={endDate} />
-            <TimePicker
-              bind:hour={endHour}
-              bind:minute={endMinute}
-              bind:second={endSecond}
-              bind:half={endHalf}
-            />
-          </div>
-        </div>
-        <div class="flex gap-2">
-          <Button on:click={onApply}>{translate('apply')}</Button>
-          <Button variant="secondary" on:click={() => (custom = false)}
-            >{translate('cancel')}</Button
-          >
-        </div>
-      {:else}
-        <div>
-          <div class="flex w-full flex-wrap">
-            <div class="flex w-1/2 flex-col border-b border-gray-300">
-              <MenuItem on:click={() => onChange('All Time')}
-                >{translate('all-time')}</MenuItem
-              >
-            </div>
-            <div class="flex w-1/2 flex-col border-b border-gray-300">
-              <MenuItem on:click={() => onChange('Custom')}
-                >{translate('custom')}</MenuItem
-              >
-            </div>
-            {#each columnOrderedDurations as duration}
-              <div class="flex w-1/2 flex-col justify-center">
-                <MenuItem on:click={() => onChange(duration)}
-                  >{duration}</MenuItem
+<div class="flex items-start">
+  <LabsModeGuard>
+    <svelte:fragment slot="fallback">
+      <MenuContainer>
+        <MenuButton
+          id="time-range-filter"
+          hasIndicator
+          controls="time-range-filter-menu"
+        >
+          {value}
+        </MenuButton>
+        <Menu
+          class="w-[25rem] !overflow-visible"
+          position="right"
+          keepOpen
+          id="time-range-filter-menu"
+        >
+          {#if custom}
+            <div class="flex flex-col gap-2 p-2">
+              <DatePicker
+                label={translate('start')}
+                on:datechange={onStartDateChange}
+                selected={startDate}
+                todayLabel={translate('today')}
+                closeLabel={translate('close')}
+                clearLabel={translate('clear-input-button-label')}
+              />
+              <TimePicker
+                bind:hour={startHour}
+                bind:minute={startMinute}
+                bind:second={startSecond}
+                bind:half={startHalf}
+              />
+              <DatePicker
+                label={translate('end')}
+                on:datechange={onEndDateChange}
+                selected={endDate}
+                todayLabel={translate('today')}
+                closeLabel={translate('close')}
+                clearLabel={translate('clear-input-button-label')}
+              />
+              <TimePicker
+                bind:hour={endHour}
+                bind:minute={endMinute}
+                bind:second={endSecond}
+                bind:half={endHalf}
+              />
+              <div class="flex gap-2">
+                <Button on:click={onApply}>{translate('apply')}</Button>
+                <Button variant="secondary" on:click={() => (custom = false)}
+                  >{translate('cancel')}</Button
                 >
               </div>
-            {/each}
+            </div>
+          {:else}
             <div class="flex w-full flex-wrap">
-              <div class="flex w-1/2 flex-col border-t border-gray-300">
-                <MenuItem
-                  selected={timeField === 'StartTime'}
-                  on:click={() => onTimeFieldChange('StartTime')}
+              <div class="flex w-1/2 flex-col border-b border-gray-300">
+                <MenuItem on:click={() => onChange('All Time')}
+                  >{translate('all-time')}</MenuItem
                 >
-                  {translate('start-time')}
-                </MenuItem>
               </div>
-              <div class="flex w-1/2 flex-col border-t border-gray-300">
-                <MenuItem
-                  selected={timeField === 'CloseTime'}
-                  on:click={() => onTimeFieldChange('CloseTime')}
+              <div class="flex w-1/2 flex-col border-b border-gray-300">
+                <MenuItem on:click={() => onChange('Custom')}
+                  >{translate('custom')}</MenuItem
                 >
-                  {translate('end-time')}
-                </MenuItem>
+              </div>
+              {#each columnOrderedDurations as duration}
+                <div class="flex w-1/2 flex-col justify-center">
+                  <MenuItem on:click={() => onChange(duration)}
+                    >{duration}</MenuItem
+                  >
+                </div>
+              {/each}
+              <div class="flex w-full flex-wrap">
+                <div class="flex w-1/2 flex-col border-t border-gray-300">
+                  <MenuItem
+                    selected={timeField === 'StartTime'}
+                    on:click={() => onTimeFieldChange('StartTime')}
+                  >
+                    {translate('start-time')}
+                  </MenuItem>
+                </div>
+                <div class="flex w-1/2 flex-col border-t border-gray-300">
+                  <MenuItem
+                    selected={timeField === 'CloseTime'}
+                    on:click={() => onTimeFieldChange('CloseTime')}
+                  >
+                    {translate('end-time')}
+                  </MenuItem>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      {/if}
-    </Menu>
-  </MenuContainer>
-  <MenuContainer>
-    <MenuButton
-      class="p-2 bg-white border border-primary rounded-r h-10 w-32"
-      id="datetime-filter"
-      controls="datetime-filter-menu"
-      hasIndicator
-      icon="clock"
-    >
-      {capitalize($timeFormat)}
-    </MenuButton>
-    <Menu id="datetime-filter-menu">
-      <MenuItem on:click={() => ($timeFormat = 'relative')}
-        >{translate('relative')}</MenuItem
-      >
-      <MenuItem on:click={() => ($timeFormat = 'UTC')}
-        >{translate('utc')}</MenuItem
-      >
-      <MenuItem on:click={() => ($timeFormat = 'local')}
-        >{translate('local')}</MenuItem
-      >
-    </Menu>
-  </MenuContainer>
+          {/if}
+          <MenuDivider />
+          <MenuItem centered disabled>
+            <Icon name="clock" aria-hidden="true" />
+            {translate('based-on-time-preface')}
+            {localTime}
+          </MenuItem>
+        </Menu>
+      </MenuContainer>
+    </svelte:fragment>
+  </LabsModeGuard>
 </div>

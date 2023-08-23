@@ -1,25 +1,23 @@
-import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
-import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
-
 import { convertPayloadWithWebsocket } from '$lib/services/data-converter';
 import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
-
 import type {
   codecEndpoint,
-  passAccessToken,
   includeCredentials,
+  passAccessToken,
 } from '$lib/stores/data-encoder-config';
-import type { Optional, Replace, Settings } from '$lib/types/global';
 import type {
   EventAttribute,
   EventRequestMetadata,
   Payload,
 } from '$lib/types/events';
+import type { Optional, Replace, Settings } from '$lib/types/global';
+import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
+import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
 
 import { atob } from './atob';
-import { parseWithBigInt } from './parse-with-big-int';
-import { isObject } from './is';
 import { has } from './has';
+import { isObject } from './is';
+import { parseWithBigInt } from './parse-with-big-int';
 
 type PotentiallyDecodable =
   | Record<string | number | symbol, unknown>

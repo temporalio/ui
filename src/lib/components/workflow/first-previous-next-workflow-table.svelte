@@ -1,13 +1,12 @@
 <script lang="ts">
-  import { routeForEventHistory } from '$lib/utilities/route-for';
-
+  
+  import Copyable from '$lib/holocene/copyable.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
-
-  import Copyable from '../copyable.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   export let workflow: string;
   export let namespace: string;
@@ -18,6 +17,9 @@
 </script>
 
 <Table class="w-full">
+  <caption class="sr-only" slot="caption"
+    >{translate('workflows', 'relationships')}</caption
+  >
   <TableHeaderRow slot="headers">
     <th>{translate('workflows', 'first-execution')}</th>
     <th>{translate('workflows', 'previous-execution')}</th>
@@ -34,7 +36,12 @@
             run: first,
           })}
         >
-          <Copyable content={first} visible />
+          <Copyable
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
+            content={first}
+            visible
+          />
         </Link>
       {/if}
     </td>
@@ -48,7 +55,12 @@
             run: previous,
           })}
         >
-          <Copyable content={previous} visible />
+          <Copyable
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
+            content={previous}
+            visible
+          />
         </Link>
       {/if}
     </td>
@@ -62,7 +74,12 @@
             run: next,
           })}
         >
-          <Copyable content={next} visible />
+          <Copyable
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
+            content={next}
+            visible
+          />
         </Link>
       {/if}
     </td>

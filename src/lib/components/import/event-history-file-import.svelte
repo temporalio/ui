@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { routeForEventHistoryImport } from '$lib/utilities/route-for';
   import { goto } from '$app/navigation';
-
-  import Button from '$lib/holocene/button.svelte';
-  import { toEventHistory } from '$lib/models/event-history';
-  import { toaster } from '$lib/stores/toaster';
-  import { importEvents, importEventGroups } from '$lib/stores/import-events';
-  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
-  import { groupEvents } from '$lib/models/event-groups';
   import { page } from '$app/stores';
+  
+  import Button from '$lib/holocene/button.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { groupEvents } from '$lib/models/event-groups';
+  import { toEventHistory } from '$lib/models/event-history';
   import { authUser } from '$lib/stores/auth-user';
+  import { importEventGroups, importEvents } from '$lib/stores/import-events';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-
+  import { toaster } from '$lib/stores/toaster';
   import type { HistoryEvent } from '$lib/types/events';
+  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import { routeForEventHistoryImport } from '$lib/utilities/route-for';
 
   let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
   let fileLoaded = false;
@@ -29,7 +29,10 @@
           rawEvents = parseWithBigInt(result);
           fileLoaded = true;
         } catch (e) {
-          toaster.push({ variant: 'error', message: 'Could not parse JSON' });
+          toaster.push({
+            variant: 'error',
+            message: translate('events', 'event-history-load-error'),
+          });
           fileLoaded = false;
         }
       };
@@ -55,7 +58,7 @@
       console.error(e);
       toaster.push({
         variant: 'error',
-        message: 'Could not create event history from JSON',
+        message: translate('events', 'event-history-import-error'),
       });
     }
   };
@@ -68,5 +71,5 @@
   on:change={onFileSelect}
 />
 <Button icon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
-  >Import</Button
+  >{translate('import')}</Button
 >

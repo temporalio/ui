@@ -1,12 +1,13 @@
+import type {
+  NextPageToken,
+  PaginationCallbacks,
+  WithNextPageToken,
+  WithoutNextPageToken,
+} from '$lib/types/global';
+
 import { handleError } from './handle-error';
 import { isFunction } from './is-function';
 import { merge } from './merge';
-import type {
-  NextPageToken,
-  WithNextPageToken,
-  WithoutNextPageToken,
-  PaginationCallbacks,
-} from '$lib/types/global';
 
 type PaginatedOptions<T> = PaginationCallbacks<T> & {
   token?: NextPageToken;
