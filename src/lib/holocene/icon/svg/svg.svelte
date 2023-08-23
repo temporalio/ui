@@ -2,6 +2,7 @@
   export let width = 24;
   export let height = 24;
   export let title = '';
+  export let name = '';
 </script>
 
 <svg
@@ -13,6 +14,6 @@
   class={$$props.class}
   role="img"
 >
-  <title>{title}</title>
+  <title>{title || name}</title>
   <slot />
 </svg>
