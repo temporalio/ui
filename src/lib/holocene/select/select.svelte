@@ -95,7 +95,7 @@
 <MenuContainer class="w-full" {open}>
   <label class:sr-only={labelHidden} for={id}>{label}</label>
   <MenuButton
-    hasIndicator
+    hasIndicator={!disabled}
     {disabled}
     {unroundLeft}
     {unroundRight}
