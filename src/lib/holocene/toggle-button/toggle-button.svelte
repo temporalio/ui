@@ -1,16 +1,15 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { page } from '$app/stores';
-
-  import type { IconName } from '$lib/holocene/icon/paths';
-
-  import { getAppContext } from '$lib/utilities/get-context';
+  
+  import Icon from '$lib/holocene/icon/icon.svelte';
+import type { IconName } from '$lib/holocene/icon/paths';
+import { getAppContext } from '$lib/utilities/get-context';
 
   export let icon: IconName = null;
   export let group = getAppContext('group');
   export let href = '';
   export let base = href;
-  export let active: boolean = false;
+  export let active = false;
 </script>
 
 {#if href}

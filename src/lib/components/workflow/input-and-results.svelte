@@ -1,6 +1,6 @@
 <script lang="ts">
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Badge from '$lib/holocene/badge.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
 
   export let content: string;
   export let title: string;

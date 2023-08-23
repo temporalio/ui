@@ -1,19 +1,18 @@
 <script lang="ts">
-  import { routeForEventHistoryImport } from '$lib/utilities/route-for';
   import { goto } from '$app/navigation';
-
-  import Button from '$lib/holocene/button.svelte';
-  import { toEventHistory } from '$lib/models/event-history';
-  import { toaster } from '$lib/stores/toaster';
-  import { importEvents, importEventGroups } from '$lib/stores/import-events';
-  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
-  import { groupEvents } from '$lib/models/event-groups';
   import { page } from '$app/stores';
-  import { authUser } from '$lib/stores/auth-user';
-  import { lastUsedNamespace } from '$lib/stores/namespaces';
-
-  import type { HistoryEvent } from '$lib/types/events';
+  
+  import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { groupEvents } from '$lib/models/event-groups';
+  import { toEventHistory } from '$lib/models/event-history';
+  import { authUser } from '$lib/stores/auth-user';
+  import { importEventGroups, importEvents } from '$lib/stores/import-events';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
+  import { toaster } from '$lib/stores/toaster';
+  import type { HistoryEvent } from '$lib/types/events';
+  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import { routeForEventHistoryImport } from '$lib/utilities/route-for';
 
   let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
   let fileLoaded = false;

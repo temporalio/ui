@@ -1,9 +1,12 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { isVersionNewer } from '$lib/utilities/version-check';
-  import type { BannersState } from '$lib/models/banner-state';
-  import Banner from './banner.svelte';
+  
   import { translate } from '$lib/i18n/translate';
+  import type { BannersState } from '$lib/models/banner-state';
+  import { isVersionNewer } from '$lib/utilities/version-check';
+  
+  import Banner from './banner.svelte';
+  
 
   export let shownBanner: BannersState;
 

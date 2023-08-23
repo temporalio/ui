@@ -8,11 +8,12 @@
   } from '$lib/stores/search-attributes';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
-  import { formatDate } from '$lib/utilities/format-date';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import FilterableTableCell from './filterable-table-cell.svelte';
   import { formatBytes } from '$lib/utilities/format-bytes';
+  import { formatDate } from '$lib/utilities/format-date';
   import { formatDistance } from '$lib/utilities/format-time';
+  
+  import FilterableTableCell from './filterable-table-cell.svelte';
 
   export let column: WorkflowHeader;
   export let workflow: WorkflowExecution;

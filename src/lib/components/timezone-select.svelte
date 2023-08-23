@@ -1,17 +1,5 @@
 <script lang="ts">
-  import { noop, onMount } from 'svelte/internal';
-
-  import {
-    timeFormat,
-    Timezones,
-    TimezoneOptions,
-    relativeTime,
-    type TimeFormat,
-    type TimeFormatOptions,
-  } from '$lib/stores/time-format';
-  import { formatUTCOffset } from '$lib/utilities/format-date';
-  import { capitalize } from '$lib/utilities/format-camel-case';
-  import { translate } from '$lib/i18n/translate';
+  import { onMount } from 'svelte/internal';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -19,11 +7,23 @@
     Menu,
     MenuButton,
     MenuContainer,
-    MenuItem,
     MenuDivider,
+    MenuItem,
   } from '$lib/holocene/menu';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import {
+    relativeTime,
+    type TimeFormat,
+    timeFormat,
+    type TimeFormatOptions,
+    TimezoneOptions,
+    Timezones,
+  } from '$lib/stores/time-format';
+  import { capitalize } from '$lib/utilities/format-camel-case';
+  import { formatUTCOffset, getLocalTime } from '$lib/utilities/format-date';
 
+  const localTime = getLocalTime();
   const QuickTimezoneOptions: TimeFormatOptions = [
     {
       label: translate('utc'),
@@ -63,16 +63,8 @@
     Timezones[$timeFormat]?.label ??
     capitalize($timeFormat);
 
-  $: localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  $: localOption = TimezoneOptions.find(({ zones }) =>
-    zones?.includes(localTimezone),
-  ) ?? { label: '', abbr: '' };
-  $: localDescription = `${localOption.label} (${localOption.abbr})`;
-
   onMount(() => {
-    // Check for legacy timeFormat that may be set in localStorage
-    // @ts-ignore
-    if ($timeFormat === 'relative') {
+    if (String($timeFormat) === 'relative') {
       $timeFormat = 'local';
       $relativeTime = true;
     }
@@ -113,7 +105,7 @@
           on:click={() => selectTimezone(value)}
           data-testid={`timezones-${value}`}
           selected={value === $timeFormat}
-          description={value === 'local' && localDescription}
+          description={value === 'local' && localTime}
         >
           {label}
         </MenuItem>

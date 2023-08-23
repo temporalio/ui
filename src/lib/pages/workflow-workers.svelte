@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { workflowRun } from '$lib/stores/workflow-run';
-
   import WorkersList from '$lib/components/workers-list.svelte';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  
   $: ({ workers, workflow, compatibility, reachability } = $workflowRun);
 </script>
 

@@ -67,12 +67,12 @@ test.describe('Workflows List with Advanced Visibility', () => {
         const encodedQuery = encodeURIComponent(query);
 
         await expect(page).toHaveURL(new RegExp(encodedQuery));
-        expect(await page.inputValue('#manual-search')).toBe(query);
+        await expect(page.locator('#manual-search')).toHaveValue(query);
 
         await page.getByRole('search').getByTestId('clear-input').click();
 
         await expect(page).not.toHaveURL(new RegExp(encodedQuery));
-        expect(await page.inputValue('#manual-search')).toBe('');
+        await expect(page.locator('#manual-search')).toHaveValue('');
       });
     }
 
@@ -84,12 +84,12 @@ test.describe('Workflows List with Advanced Visibility', () => {
       const urlEncodedQuery = /ExecutionStatus%3D%22Running%22/;
 
       await expect(page).toHaveURL(urlEncodedQuery);
-      expect(await page.inputValue('#manual-search')).toBe(query);
+      await expect(page.locator('#manual-search')).toHaveValue(query);
 
       await page.getByRole('search').getByTestId('clear-input').click();
 
       await expect(page).not.toHaveURL(urlEncodedQuery);
-      expect(await page.inputValue('#manual-search')).toBe('');
+      await expect(page.locator('#manual-search')).toHaveValue('');
     });
 
     test('Execution Status filter sets the correct query for multiple values', async ({
@@ -103,12 +103,12 @@ test.describe('Workflows List with Advanced Visibility', () => {
         /%28ExecutionStatus%3D%22Running%22\+OR\+ExecutionStatus%3D%22Failed%22%29/;
 
       await expect(page).toHaveURL(urlEncodedQuery);
-      expect(await page.inputValue('#manual-search')).toBe(query);
+      await expect(page.locator('#manual-search')).toHaveValue(query);
 
       await page.getByRole('menuitem').filter({ hasText: 'All' }).click();
 
       await expect(page).not.toHaveURL(urlEncodedQuery);
-      expect(await page.inputValue('#manual-search')).toBe('');
+      await expect(page.locator('#manual-search')).toHaveValue('');
     });
 
     test('should combine all three filters', async ({ page }) => {
@@ -171,12 +171,16 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await page.getByText('3 hours').click();
       await page.getByText('End Time').click();
       await expect(page).toHaveURL(/CloseTime\+%3E/);
-      await expect(page.locator('#time-range-filter')).toHaveText('3 hours');
+      await expect(page.locator('#time-range-filter')).toHaveText(
+        ' 3 hours chevron-up  ',
+      );
       expect(await page.inputValue('#manual-search')).toContain('CloseTime > ');
       await page.getByTestId('namespaces-button').click();
       await page.getByTestId('workflows-button').click();
       await expect(page).toHaveURL(/CloseTime\+%3E/);
-      await expect(page.locator('#time-range-filter')).toHaveText('3 hours');
+      await expect(page.locator('#time-range-filter')).toHaveText(
+        ' 3 hours chevron-down  ',
+      );
       expect(await page.inputValue('#manual-search')).toContain('CloseTime > ');
     });
 
@@ -203,7 +207,9 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await page.getByText('3 hours').click();
       await page.getByText('End Time').click();
       await expect(page).toHaveURL(/CloseTime\+%3E/);
-      await expect(page.locator('#time-range-filter')).toHaveText('3 hours');
+      await expect(page.locator('#time-range-filter')).toHaveText(
+        ' 3 hours chevron-up  ',
+      );
       expect(await page.inputValue('#manual-search')).toContain('CloseTime > ');
 
       page.goto(
@@ -212,8 +218,10 @@ test.describe('Workflows List with Advanced Visibility', () => {
 
       await expect(page).toHaveURL(/ExecutionStatus%3D%22Running%22/);
       await expect(page).not.toHaveURL(/CloseTime\+%3E/);
-      await expect(page.locator('#time-range-filter')).toHaveText('All Time');
-      expect(await page.inputValue('#manual-search')).toBe(
+      await expect(page.locator('#time-range-filter')).toHaveText(
+        ' All Time chevron-down  ',
+      );
+      await expect(page.locator('#manual-search')).toHaveValue(
         'ExecutionStatus="Running"',
       );
     });
@@ -225,7 +233,9 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await page.getByText('3 hours').click();
       await page.getByText('End Time').click();
       await expect(page).toHaveURL(/CloseTime\+%3E/);
-      await expect(page.locator('#time-range-filter')).toHaveText('3 hours');
+      await expect(page.locator('#time-range-filter')).toHaveText(
+        ' 3 hours chevron-up  ',
+      );
       expect(await page.inputValue('#manual-search')).toContain('CloseTime > ');
 
       await page.getByRole('search').getByTestId('clear-input').click();
@@ -233,8 +243,10 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await page.getByTestId('manual-search-button').click();
       await expect(page).toHaveURL(/ExecutionStatus%3D%22Running%22/);
       await expect(page).not.toHaveURL(/CloseTime\+%3E/);
-      await expect(page.locator('#time-range-filter')).toHaveText('All Time');
-      expect(await page.inputValue('#manual-search')).toBe(
+      await expect(page.locator('#time-range-filter')).toHaveText(
+        ' All Time chevron-down  ',
+      );
+      await expect(page.locator('#manual-search')).toHaveValue(
         'ExecutionStatus="Running"',
       );
     });
@@ -249,7 +261,9 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await page.getByRole('menuitem').filter({ hasText: 'Running' }).click();
       await expect(page).toHaveURL(/ExecutionStatus%3D%22Running%22/);
       await expect(page).toHaveURL(/CloseTime\+%3E/);
-      await expect(page.locator('#time-range-filter')).toHaveText('1 hour');
+      await expect(page.locator('#time-range-filter')).toHaveText(
+        ' 1 hour chevron-down  ',
+      );
       expect(await page.inputValue('#manual-search')).toContain('CloseTime > ');
 
       const namespaces = ['default', 'some-other-namespace'];
@@ -263,7 +277,9 @@ test.describe('Workflows List with Advanced Visibility', () => {
       );
       await expect(page).not.toHaveURL(/ExecutionStatus%3D%22Running%22/);
       await expect(page).toHaveURL(/CloseTime\+%3E/);
-      await expect(page.locator('#time-range-filter')).toHaveText('1 hour');
+      await expect(page.locator('#time-range-filter')).toHaveText(
+        ' 1 hour chevron-down  ',
+      );
       expect(await page.inputValue('#manual-search')).toContain('CloseTime > ');
       await page.getByTestId('namespace-switcher').click();
       await page.getByRole('option', { name: namespaces[0] }).click();
@@ -272,7 +288,9 @@ test.describe('Workflows List with Advanced Visibility', () => {
       );
       await expect(page).not.toHaveURL(/ExecutionStatus%3D%22Running%22/);
       await expect(page).toHaveURL(/CloseTime\+%3E/);
-      await expect(page.locator('#time-range-filter')).toHaveText('1 hour');
+      await expect(page.locator('#time-range-filter')).toHaveText(
+        ' 1 hour chevron-down  ',
+      );
       expect(await page.inputValue('#manual-search')).toContain('CloseTime > ');
     });
   });

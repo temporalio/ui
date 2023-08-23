@@ -1,30 +1,32 @@
 <script lang="ts">
+  
+  import { onDestroy, onMount } from 'svelte';
+  
   import { page } from '$app/stores';
+  
+  import Loading from '$lib/holocene/loading.svelte';
+  import Header from '$lib/layouts/workflow-header.svelte';
+  import { toDecodedPendingActivities } from '$lib/models/pending-activities';
+  import { fetchStartAndEndEvents } from '$lib/services/events-service';
+  import {
+    getPollers,
+    type GetPollersResponse,
+    getTaskQueueCompatibility,
+    getWorkerTaskReachability,
+  } from '$lib/services/pollers-service';
+  import { fetchWorkflow } from '$lib/services/workflow-service';
+  import { authUser } from '$lib/stores/auth-user';
+  import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
+  import {
+    eventHistory,
+    initialEventHistory,
+    timelineEvents,
+  } from '$lib/stores/events';
   import {
     initialWorkflowRun,
     refresh,
     workflowRun,
   } from '$lib/stores/workflow-run';
-  import {
-    timelineEvents,
-    eventHistory,
-    initialEventHistory,
-  } from '$lib/stores/events';
-  import { authUser } from '$lib/stores/auth-user';
-
-  import Header from '$lib/layouts/workflow-header.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
-  import { onDestroy, onMount } from 'svelte';
-  import { type EventSortOrder, eventFilterSort } from '$lib/stores/event-view';
-  import { fetchWorkflow } from '$lib/services/workflow-service';
-  import {
-    type GetPollersResponse,
-    getPollers,
-    getTaskQueueCompatibility,
-    getWorkerTaskReachability,
-  } from '$lib/services/pollers-service';
-  import { toDecodedPendingActivities } from '$lib/models/pending-activities';
-  import { fetchStartAndEndEvents } from '$lib/services/events-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import {
     getUniqueBuildIdsFromPollers,

@@ -1,40 +1,38 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  
+  import WorkflowResetForm from '$lib/components/workflow/workflow-reset-form.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+  import JSONEditor from '$lib/holocene/json-editor.svelte';
+  import { MenuDivider, MenuItem } from '$lib/holocene/menu';
+  import Modal from '$lib/holocene/modal.svelte';
+  import SplitButton from '$lib/holocene/split-button.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { Action } from '$lib/models/workflow-actions';
+  import { ResetReapplyType } from '$lib/models/workflow-actions';
   import {
     resetWorkflow,
     signalWorkflow,
     terminateWorkflow,
   } from '$lib/services/workflow-service';
-  import { authUser } from '$lib/stores/auth-user';
-
-  import { formatReason } from '$lib/utilities/workflow-actions';
-  import { Action } from '$lib/models/workflow-actions';
-  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
-  import { ResetReapplyType } from '$lib/models/workflow-actions';
-
-  import { refresh } from '$lib/stores/workflow-run';
-  import { settings } from '$lib/stores/settings';
-  import { coreUserStore } from '$lib/stores/core-user';
   import { cancelWorkflow } from '$lib/services/workflow-service';
-  import { toaster } from '$lib/stores/toaster';
-
-  import SplitButton from '$lib/holocene/split-button.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import { MenuItem, MenuDivider } from '$lib/holocene/menu';
-  import JSONEditor from '$lib/holocene/json-editor.svelte';
+  import { authUser } from '$lib/stores/auth-user';
+  import { coreUserStore } from '$lib/stores/core-user';
   import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
-  import WorkflowResetForm from '$lib/components/workflow/workflow-reset-form.svelte';
-  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
-  import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
-  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
-  import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
+  import { settings } from '$lib/stores/settings';
+  import { toaster } from '$lib/stores/toaster';
+  import { refresh } from '$lib/stores/workflow-run';
   import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { translate } from '$lib/i18n/translate';
-  import Button from '$lib/holocene/button.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { formatReason } from '$lib/utilities/workflow-actions';
+  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
+  import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
+  import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
+  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
+  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;

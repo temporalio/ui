@@ -2,8 +2,7 @@
   import HistoryImport from '$lib/components/import/event-history-file-import.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
-
-  import { translate } from '$lib/i18n/translate';
+import { translate } from '$lib/i18n/translate';
 
   const format1 = { events: 'HistoryEvent[]' };
   const format2 = 'HistoryEvent[]';
