@@ -1,13 +1,14 @@
 <script lang="ts">
-  import HeartBeat from './heart-beat-indicator.svelte';
-  import type { WorkflowStatus } from '$lib/types/workflows';
   import { translate } from '$lib/i18n/translate';
   import type { EventClassification } from '$lib/types/events';
+  import type { WorkflowStatus } from '$lib/types/workflows';
+  
+  import HeartBeat from './heart-beat-indicator.svelte';
 
   type Status = WorkflowStatus | EventClassification | 'Paused';
 
   export let status: Status = 'Running';
-  export let delay: number = 0;
+  export let delay = 0;
 
   const humanFriendlyNames: Partial<Record<Status, string>> = {
     Running: translate('workflows', 'running'),
@@ -37,12 +38,12 @@
 </script>
 
 <span class="flex text-center text-sm font-medium leading-4">
-  <h6 class="{color} flex rounded-sm px-1 py-1">
+  <span class="{color} flex items-center rounded-sm px-1 py-0.5 font-secondary">
     <span class="whitespace-nowrap">{label}</span>
     {#if isRunning}
       <HeartBeat {delay} />
     {/if}
-  </h6>
+  </span>
 </span>
 
 <style lang="postcss">

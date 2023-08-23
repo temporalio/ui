@@ -1,23 +1,21 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import { formatDate } from '$lib/utilities/format-date';
-  import { getMilliseconds } from '$lib/utilities/format-time';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
-  import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
-
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
-
-  import type { TimeFormat } from '$lib/types/global';
+  import { translate } from '$lib/i18n/translate';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { formatDate } from '$lib/utilities/format-date';
+  import { getMilliseconds } from '$lib/utilities/format-time';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+  import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
-  export let timeFormat: TimeFormat | string;
 
   $: href = routeForEventHistory({
     namespace,
@@ -61,12 +59,15 @@
   >
     <span class="table-link">{workflow.id}</span>
     <FilterOrCopyButtons
+      copyIconTitle={translate('copy-icon-title')}
+      copySuccessIconTitle={translate('copy-success-icon-title')}
+      filterIconTitle={translate('filter-workflows')}
       show={showFilterCopy}
       content={workflow.id}
       filterable={false}
     />
     <p class="inline-time-cell">
-      {formatDate(workflow.startTime, timeFormat)}
+      {formatDate(workflow.startTime, $timeFormat, { relative: $relativeTime })}
     </p>
   </td>
   <td
@@ -76,32 +77,37 @@
     on:mouseleave={() => (showFilterCopy = false)}
     on:blur={() => (showFilterCopy = false)}
   >
-    <h3 class="md:hidden">Workflow Name:</h3>
+    <h3 class="md:hidden">{translate('workflows', 'workflow-name')}:</h3>
     <button
       class="table-link"
       on:click|preventDefault|stopPropagation={() => onTypeClick(workflow.name)}
-      aria-label="filter by {workflow.name} type"
+      aria-label={translate('workflows', 'filter-by', {
+        workflowName: workflow.name,
+      })}
     >
       {workflow.name}
     </button>
     <FilterOrCopyButtons
+      copyIconTitle={translate('copy-icon-title')}
+      copySuccessIconTitle={translate('copy-success-icon-title')}
+      filterIconTitle={translate('filter-workflows')}
       show={showFilterCopy}
       content={workflow.name}
       onFilter={() => onTypeClick(workflow.name)}
       filtered={$page.url?.searchParams?.get('query')?.includes(workflow.name)}
     />
     <p class="inline-time-cell">
-      {formatDate(workflow.endTime, timeFormat)}
+      {formatDate(workflow.endTime, $timeFormat, { relative: $relativeTime })}
     </p>
   </td>
   <td class="time-cell">
     <p>
-      {formatDate(workflow.startTime, timeFormat)}
+      {formatDate(workflow.startTime, $timeFormat, { relative: $relativeTime })}
     </p>
   </td>
   <td class="time-cell">
     <p>
-      {formatDate(workflow.endTime, timeFormat)}
+      {formatDate(workflow.endTime, $timeFormat, { relative: $relativeTime })}
     </p>
   </td>
 </TableRow>

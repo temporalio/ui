@@ -1,7 +1,9 @@
 import { URLSearchParams } from 'url';
+
 import { describe, expect, it, vi } from 'vitest';
-import { isTemporalAPIError, requestFromAPI } from './request-from-api';
+
 import { handleError } from './handle-error';
+import { isTemporalAPIError, requestFromAPI } from './request-from-api';
 
 import listWorkflowResponse from '$fixtures/list-workflows.json';
 

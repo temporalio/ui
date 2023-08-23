@@ -13,7 +13,6 @@ const {
 describe('Schedules List', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default/schedules');
 
@@ -30,7 +29,6 @@ describe('Schedules List', () => {
 describe('Schedules View', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default/schedules');
 
@@ -58,7 +56,6 @@ describe('Schedules View', () => {
 describe('Schedules Edit', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default/schedules');
 
@@ -82,7 +79,7 @@ describe('Schedules Edit', () => {
     );
 
     cy.get('#schedule-actions-menu-button').click();
-    cy.get('#schedule-actions-menu >> [data-testid="edit-schedule"]').click();
+    cy.get('#schedule-actions-menu > [data-testid="edit-schedule"]').click();
     cy.url().should('contain', `/schedules/${scheduleId}/edit`);
     cy.get('#content').contains('Edit Schedule');
   });
@@ -91,7 +88,6 @@ describe('Schedules Edit', () => {
 describe('Schedules Create', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default/schedules');
 

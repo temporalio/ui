@@ -40,9 +40,12 @@ Cypress.Commands.add('interceptNamespaceApi', ({ archived }) => {
 });
 
 Cypress.Commands.add('interceptSearchAttributesApi', () => {
-  cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/search-attributes*', {
-    fixture: 'search-attributes.json',
-  }).as('search-attributes-api');
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') + '/api/v1/namespaces/*/search-attributes*',
+    {
+      fixture: 'search-attributes.json',
+    },
+  ).as('search-attributes-api');
 });
 
 Cypress.Commands.add('interceptWorkflowsApi', () => {
@@ -125,6 +128,14 @@ Cypress.Commands.add('interceptTaskQueuesApi', () => {
       fixture: 'activity-task-queues.json',
     },
   ).as('activity-task-queues-api');
+});
+
+Cypress.Commands.add('interceptTaskQueueCompatibilityApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+      `/api/v1/namespaces/*/task-queues/*/compatibility`,
+    { fixture: 'compatibility.json' },
+  ).as('compatibility-api');
 });
 
 Cypress.Commands.add('interceptSchedulesApi', () => {
@@ -221,14 +232,6 @@ Cypress.Commands.add(
     cy.interceptCancelWorkflowApi();
     cy.interceptSignalWorkflowApi();
     cy.interceptResetWorkflowApi();
+    cy.interceptTaskQueueCompatibilityApi();
   },
 );
-
-Cypress.Commands.add('setTopNavFeatureTag', () => {
-  cy.window().then((window) => {
-    window.localStorage.setItem(
-      'viewedFeatureTags',
-      JSON.stringify(['topNav']),
-    );
-  });
-});

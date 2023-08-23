@@ -1,10 +1,11 @@
-import { chalk } from 'zx';
 import type { Plugin } from 'vite';
+import type { ViteDevServer } from 'vite';
+import { chalk } from 'zx';
+
 import {
-  type TemporalServer,
   createTemporalServer,
-} from '../scripts/start-temporal-server';
-import { ViteDevServer } from 'vite';
+  type TemporalServer,
+} from '../utilities/temporal-server';
 
 const { cyan, magenta } = chalk;
 
@@ -16,7 +17,8 @@ const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.VITEST) return true;
   if (temporal) return true;
   if (process.platform === 'win32') return true;
-  if (server.config.mode === 'ui-server') return true;
+  if (server.config.mode === 'docker' || server.config.mode.includes('test'))
+    return true;
 
   return false;
 };

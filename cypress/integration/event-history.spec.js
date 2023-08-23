@@ -3,9 +3,9 @@
 import { formatDistanceToNow } from 'date-fns';
 import * as dateTz from 'date-fns-tz';
 
-import workflowCompletedFixture from '../fixtures/workflow-completed.json';
 import eventsFixtureDescending from '../fixtures/event-history-completed-reverse.json';
 import eventsFixtureAscending from '../fixtures/event-history-completed.json';
+import workflowCompletedFixture from '../fixtures/workflow-completed.json';
 
 const [firstEventInDescendingOrder] = eventsFixtureDescending.history.events;
 
@@ -15,7 +15,6 @@ const { workflowId, runId } =
 describe('Workflow Events', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -50,7 +49,6 @@ describe('Workflow Events', () => {
 
   it('default to the summary page when visiting a workflow', () => {
     cy.clearLocalStorage();
-    cy.setTopNavFeatureTag();
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
@@ -159,18 +157,17 @@ describe('Workflow Events', () => {
 
     const dt = new Date(eventsFixtureDescending.history.events[0].eventTime);
 
-    cy.get('[data-testid=event-date-filter-button]').click();
-    cy.get('[data-testid=event-date-filter-relative]').click();
+    cy.get('[data-testid=timezones-menu-button]').click();
+    cy.get('[data-testid=timezones-relative-toggle]').click({ force: true });
     const relative = formatDistanceToNow(dt);
     cy.get('table').contains(relative);
 
-    cy.get('[data-testid=event-date-filter-button]').click();
-    cy.get('[data-testid=event-date-filter-UTC]').click();
+    cy.get('[data-testid=timezones-UTC]').click();
     const utc = dateTz.formatInTimeZone(dt, 'UTC', 'yyyy-MM-dd z HH:mm:ss.SS');
     cy.get('table').contains(utc);
 
-    cy.get('[data-testid=event-date-filter-button]').click();
-    cy.get('[data-testid=event-date-filter-local]').click();
+    cy.get('[data-testid=timezones-menu-button]').click();
+    cy.get('[data-testid=timezones-local]').click();
     const local = dateTz.format(dt, 'yyyy-MM-dd z HH:mm:ss.SS');
     cy.get('table').contains(local);
   });

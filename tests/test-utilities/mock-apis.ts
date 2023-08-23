@@ -1,71 +1,123 @@
-import { Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
-export const apiUrl = 'http://localhost:8233/api/v1';
-export const workflowsApi = apiUrl + '/namespaces/default/workflows?query=';
-export const settingsApi = apiUrl + '/settings**';
+import {
+  mockCreateBatchOperationApi,
+  mockDescribeBatchOperationApi,
+} from './mocks/batch-operations';
+import { CLUSTER_API, mockClusterApi } from './mocks/cluster';
+import {
+  EVENT_HISTORY_API,
+  EVENT_HISTORY_API_REVERSE,
+  mockEventHistoryApi,
+} from './mocks/event-history';
+import { mockNamespaceApi } from './mocks/namespace';
+import { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
+import { mockSearchAttributesApi } from './mocks/search-attributes';
+import { mockSettingsApi, SETTINGS_API } from './mocks/settings';
+import { mockTaskQueuesApi, TASK_QUEUES_API } from './mocks/task-queues';
+import { mockWorkflowApi, WORKFLOW_API } from './mocks/workflow';
+import { mockWorkflowsApi, WORKFLOWS_API } from './mocks/workflows';
+import {
+  mockWorkflowsCountApi,
+  WORKFLOWS_COUNT_API,
+} from './mocks/workflows-count';
 
-const clusterApi = apiUrl + '/cluster**';
-const namespaceApi = apiUrl + '/namespaces/**';
+export { mockClusterApi, CLUSTER_API } from './mocks/cluster';
+export { mockNamespaceApi, NAMESPACE_API } from './mocks/namespace';
+export { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
+export { mockSettingsApi, SETTINGS_API } from './mocks/settings';
+export {
+  mockSearchAttributesApi,
+  SEARCH_ATTRIBUTES_API,
+} from './mocks/search-attributes';
+export { mockWorkflowsApi, WORKFLOWS_API } from './mocks/workflows';
+export { mockWorkflowApi, WORKFLOW_API } from './mocks/workflow';
+export {
+  mockWorkflowsCountApi,
+  WORKFLOWS_COUNT_API,
+} from './mocks/workflows-count';
+export {
+  mockCreateBatchOperationApi,
+  mockDescribeBatchOperationApi,
+  CREATE_BATCH_OPERATION_API,
+  DESCRIBE_BATCH_OPERATION_API,
+} from './mocks/batch-operations';
+export { EVENT_HISTORY_API, mockEventHistoryApi } from './mocks/event-history';
+export { mockTaskQueuesApi, TASK_QUEUES_API } from './mocks/task-queues';
 
-const clusterInfo = {
-  supportedClients: {
-    'temporal-cli': '\u003c2.0.0',
-    'temporal-go': '\u003c2.0.0',
-    'temporal-java': '\u003c2.0.0',
-    'temporal-php': '\u003c2.0.0',
-    'temporal-server': '\u003c2.0.0',
-    'temporal-typescript': '\u003c2.0.0',
-    'temporal-ui': '\u003c3.0.0',
-  },
-  serverVersion: '1.19.3',
-  clusterId: 'f2f23e30-2294-4bf8-a5ec-b505259f30c9',
-  versionInfo: null,
-  clusterName: 'active',
-  historyShardCount: 1,
-  persistenceStore: 'sqlite',
-  visibilityStore: 'sqlite',
+export const mockGlobalApis = (page: Page) => {
+  return Promise.all([
+    mockClusterApi(page),
+    mockNamespacesApi(page),
+    mockSettingsApi(page),
+  ]);
 };
 
-export const mockClusterApi = async (page: Page) => {
-  await page.route(clusterApi, async (route) => {
-    route.fulfill({ json: clusterInfo });
-  });
+export const mockWorkflowsApis = (page: Page) => {
+  return Promise.all([
+    mockGlobalApis(page),
+    mockWorkflowsApi(page),
+    mockSearchAttributesApi(page),
+    mockWorkflowsCountApi(page),
+  ]);
 };
 
-const archivalNamespace = {
-  namespaceInfo: {
-    name: 'some-archived-namespace',
-    state: 'Registered',
-    description: '',
-    ownerEmail: '',
-    data: {},
-    id: '5411056f-9bd0-4b4e-90fa-e88e3031a0d0',
-  },
-  config: {
-    workflowExecutionRetentionTtl: '259200s',
-    badBinaries: {
-      binaries: {},
-    },
-    historyArchivalState: 'Enabled',
-    historyArchivalUri: '',
-    visibilityArchivalState: 'Enabled',
-    visibilityArchivalUri: '',
-  },
-  replicationConfig: {
-    activeClusterName: 'active',
-    clusters: [
-      {
-        clusterName: 'active',
-      },
-    ],
-    state: 'Unspecified',
-  },
-  failoverVersion: '0',
-  isGlobalNamespace: false,
+export const mockNamespaceApis = (page: Page) => {
+  return Promise.all([
+    mockGlobalApis(page),
+    mockNamespaceApi(page),
+    mockSearchAttributesApi(page),
+  ]);
 };
 
-export const mockNamespaceApi = async (page: Page) => {
-  await page.route(namespaceApi, async (route) => {
-    route.fulfill({ json: archivalNamespace });
-  });
+export const mockBatchOperationApis = (page: Page) => {
+  return Promise.all([
+    mockCreateBatchOperationApi(page),
+    mockDescribeBatchOperationApi(page),
+  ]);
+};
+
+export const mockWorkflowApis = (page: Page) => {
+  return Promise.all([
+    mockNamespaceApis(page),
+    mockWorkflowApi(page),
+    mockEventHistoryApi(page),
+    mockTaskQueuesApi(page),
+  ]);
+};
+
+/**
+ * Waits for requests that occur on initial load of every page, i.e. cluster, settings, etc.
+ * @param page a playwright Page object
+ * @returns Promise<Request[]>
+ */
+export const waitForGlobalApis = (page: Page) => {
+  return Promise.all([
+    page.waitForResponse(CLUSTER_API),
+    page.waitForResponse(NAMESPACES_API),
+    page.waitForResponse(SETTINGS_API),
+  ]);
+};
+
+/**
+ * Waits for requests that occur on navigation to the Workflows page, excluding global APIs
+ * @param page a playwright Page object
+ * @param waitForCount boolean - whether to wait for the Workflows Count Api - which only gets requested when advanced visibility in enabled
+ * @returns Promise<Request[]>
+ */
+export const waitForWorkflowsApis = (page: Page, waitForCount = true) => {
+  const requests = [page.waitForResponse(WORKFLOWS_API)];
+
+  if (waitForCount) requests.push(page.waitForResponse(WORKFLOWS_COUNT_API));
+
+  return Promise.all(requests);
+};
+
+export const waitForWorkflowApis = (page: Page) => {
+  return Promise.all([
+    page.waitForResponse(WORKFLOW_API),
+    page.waitForResponse(EVENT_HISTORY_API),
+    page.waitForResponse(EVENT_HISTORY_API_REVERSE),
+    page.waitForResponse(TASK_QUEUES_API),
+  ]);
 };

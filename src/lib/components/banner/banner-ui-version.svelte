@@ -1,30 +1,35 @@
 <script lang="ts">
-  import { isVersionNewer } from '$lib/utilities/version-check';
-  import {
-    BannersState,
-    getLinkForUIVersion,
-  } from '$lib/components/banner/banner-state';
-  import Banner from './banner.svelte';
-
+  import { translate } from '$lib/i18n/translate';
+  import type { BannersState } from '$lib/models/banner-state';
   import type { UiVersionInfo } from '$lib/types/global';
+  import { isVersionNewer } from '$lib/utilities/version-check';
+  
+  import Banner from './banner.svelte';
+  
 
   export let shownBanner: BannersState;
   export let uiVersionInfo: UiVersionInfo;
 
-  const severity = 'Low';
-  const { current, recommended } = uiVersionInfo;
+  const severity = 'low';
   const key = `ui-v${uiVersionInfo?.current}`;
-  const message = `📥 Temporal UI v${uiVersionInfo?.recommended} is available`;
-  const link = getLinkForUIVersion(uiVersionInfo);
+  const message = `📥 ${translate('banner-ui-version', {
+    version: uiVersionInfo?.recommended,
+  })}`;
+  const show = isVersionNewer(
+    uiVersionInfo?.recommended,
+    uiVersionInfo?.current,
+  );
+  const link = `https://github.com/temporalio/ui-server/releases/tag/v${uiVersionInfo?.recommended}`;
 </script>
 
-{#if isVersionNewer(recommended, current)}
+{#if show}
   <Banner
     {key}
     {severity}
     {message}
     {link}
     bind:shownBanner
-    testId="ui-version-banner"
+    data-testid="ui-version-banner"
+    role="alertdialog"
   />
 {/if}

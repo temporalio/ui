@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  
   import IconButton from '../icon-button.svelte';
 
   const dispatch = createEventDispatcher<{
@@ -13,24 +14,47 @@
     currentTarget: EventTarget & HTMLLIElement;
   };
 
-  interface $$Props {
+  type BaseProps = {
     label: string;
     index?: number;
     totalItems?: number;
     pinned?: boolean;
     maxPinnedItems?: number;
-    static?: boolean;
-    readonly?: boolean;
-  }
+  };
 
-  let isStatic: boolean = false;
+  type ReadonlyProps = BaseProps & {
+    readonly: boolean;
+  };
+
+  type StaticProps = BaseProps & {
+    static: boolean;
+  } & Pick<I18nProps, 'addButtonLabel'>;
+
+  type I18nProps = {
+    moveUpButtonLabel: string;
+    moveDownButtonLabel: string;
+    pinButtonLabel: string;
+    unpinButtonLabel: string;
+    addButtonLabel: string;
+    removeButtonLabel: string;
+  };
+
+  type $$Props = (BaseProps & I18nProps) | ReadonlyProps | StaticProps;
+
+  let isStatic = false;
   export { isStatic as static };
   export let label: string;
   export let maxPinnedItems: number = undefined;
-  export let pinned: boolean = false;
-  export let readonly: boolean = false;
-  export let index: number = 0;
-  export let totalItems: number = 0;
+  export let pinned = false;
+  export let readonly = false;
+  export let index = 0;
+  export let totalItems = 0;
+  export let moveUpButtonLabel = '';
+  export let moveDownButtonLabel = '';
+  export let pinButtonLabel = '';
+  export let unpinButtonLabel = '';
+  export let addButtonLabel = '';
+  export let removeButtonLabel = '';
 
   const handleDragStart = (event: ExtendedDragEvent, index: number) => {
     if (isStatic || readonly) return;
@@ -69,6 +93,7 @@
           hoverable
           icon="chevron-up"
           data-testid="orderable-list-item-{label}-move-up-button"
+          label={moveUpButtonLabel}
           on:click={() => dispatch('moveItem', { from: index, to: index - 1 })}
         />
         <IconButton
@@ -76,6 +101,7 @@
           hoverable
           icon="chevron-down"
           data-testid="orderable-list-item-{label}-move-down-button"
+          label={moveDownButtonLabel}
           on:click={() => dispatch('moveItem', { from: index, to: index + 1 })}
         />
       </div>
@@ -87,6 +113,7 @@
           hoverable
           icon="pin-filled"
           data-testid="orderable-list-item-{label}-unpin-button"
+          label={unpinButtonLabel}
           on:click={() => dispatch('pinItem')}
         />
       {:else}
@@ -94,6 +121,7 @@
           hoverable
           icon="pin"
           data-testid="orderable-list-item-{label}-pin-button"
+          label={pinButtonLabel}
           on:click={() => dispatch('pinItem')}
         />
       {/if}
@@ -105,6 +133,7 @@
         hoverable
         icon="add"
         data-testid="orderable-list-item-{label}-add-button"
+        label={addButtonLabel}
         on:click={() => dispatch('addItem')}
       />
     {:else}
@@ -112,6 +141,7 @@
         hoverable
         icon="hyphen"
         data-testid="orderable-list-item-{label}-remove-button"
+        label={removeButtonLabel}
         on:click={() => dispatch('removeItem')}
       />
     {/if}

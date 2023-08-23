@@ -23,12 +23,13 @@ export type BatchAPIRoutePath = 'batch-operations' | 'batch-operation.describe';
 
 export type NamespaceAPIRoutePath = 'namespace';
 
-export type TaskQueueAPIRoutePath = 'task-queue';
+export type TaskQueueAPIRoutePath = 'task-queue' | 'task-queue.compatibility';
 export type ParameterlessAPIRoutePath =
   | 'cluster'
   | 'settings'
   | 'user'
   | 'namespaces';
+export type WorkerAPIRoutePath = 'worker-task-reachability';
 export type SchedulesAPIRoutePath = 'schedules';
 export type ScheduleAPIRoutePath = 'schedule' | 'schedule.delete';
 export type SearchAttributesRoutePath = 'search-attributes';
@@ -39,6 +40,7 @@ export type APIRoutePath =
   | SchedulesAPIRoutePath
   | SearchAttributesRoutePath
   | TaskQueueAPIRoutePath
+  | WorkerAPIRoutePath
   | WorkflowAPIRoutePath
   | WorkflowActivitiesAPIRoutePath
   | WorkflowsAPIRoutePath
@@ -57,6 +59,10 @@ export type APIRouteParameters = {
 export type WorkflowListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 export type NamespaceRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 export type ScheduleListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
+export type SearchAttributesRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace'
+>;
 
 export type WorkflowRouteParameters = Pick<
   APIRouteParameters,

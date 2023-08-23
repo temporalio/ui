@@ -1,5 +1,6 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
+
   import { clickOutside } from '$lib/holocene/outside-click';
 
   import IconButton from './icon-button.svelte';
@@ -9,6 +10,8 @@
   export let position: 'bottom' | 'right' = 'bottom';
   export let dark = true;
   export let onClick: () => void;
+  export let id = 'navigation-drawer';
+  export let closeButtonLabel: string;
 
   const flyParams = {
     duration: 500,
@@ -23,13 +26,14 @@
     class:max-w-[400px]={position === 'right'}
     transition:fly={flyParams}
     use:clickOutside
-    id="navigation-drawer"
+    {id}
     role="region"
     on:click-outside={onClick}
   >
     <div class="close-button-wrapper {position}">
       <IconButton
         data-testid="drawer-close-button"
+        label={closeButtonLabel}
         icon="close"
         aria-expanded={open}
         aria-controls="navigation-drawer"

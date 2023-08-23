@@ -2,25 +2,26 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { ResetReapplyType } from '$lib/models/workflow-actions';
   import { resetEvents } from '$lib/stores/events';
 
   export let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
-  export let reason: string = '';
+  export let reason = '';
   export let eventId: string;
 
   const resetReapplyTypes = [
     {
       value: ResetReapplyType.Unspecified,
-      label: 'All Events',
+      label: translate('workflows', 'reset-reapply-all'),
     },
     {
       value: ResetReapplyType.Signal,
-      label: 'Signals Only',
+      label: translate('workflows', 'reset-reapply-signals-only'),
     },
     {
       value: ResetReapplyType.None,
-      label: 'None',
+      label: translate('workflows', 'reset-reapply-none'),
     },
   ];
 </script>
@@ -55,10 +56,10 @@
     {/each}
   </ul>
   <Select
-    label="Reapply Type"
+    label={translate('workflows', 'reset-reapply-type-label')}
     id="reset-reapply-type-select"
     bind:value={resetReapplyType}
-    testId="workflow-reset-reapply-type-select"
+    data-testid="workflow-reset-reapply-type-select"
   >
     {#each resetReapplyTypes as { value, label }}
       <Option {value}>
@@ -66,5 +67,5 @@
       </Option>
     {/each}
   </Select>
-  <Input id="reset-reason" bind:value={reason} label="Reason" />
+  <Input id="reset-reason" bind:value={reason} label={translate('reason')} />
 </div>

@@ -1,18 +1,22 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-
-  import Select from './simple-select.svelte';
-  import Option from './simple-option.svelte';
-
+  
   import type { SelectOptionValue } from '$lib/types/global';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  
+  import Option from './simple-option.svelte';
+  import Select from './simple-select.svelte';
+  
 
-  export let label: string = null;
+  export let label: string;
   export let value: SelectOptionValue;
   export let options: SelectOptionValue[] = [];
   export let parameter: string = null;
+  export let position: string | undefined = undefined;
 
-  const id = `${parameter || label}-filter`;
+  const id = `${parameter || label}-${
+    position ? `${position}-filter` : 'filter'
+  }`;
   const parameterValue = parameter && $page.url.searchParams.get(parameter);
 
   let _value = parameterValue || (value && value.toString());
@@ -31,7 +35,7 @@
   {id}
   bind:value={_value}
   {...$$props}
-  class="border-[1px] border-gray-900 outline-none"
+  class="border-[1px] border-gray-900 outline-none focus-visible:outline focus-visible:outline-blue-700"
 >
   <slot>
     {#each options.map((o) => o.toString()) as option}

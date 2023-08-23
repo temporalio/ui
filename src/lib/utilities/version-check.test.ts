@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { isVersionNewer } from './version-check';
 
 const undefinedValue = undefined as unknown as string;

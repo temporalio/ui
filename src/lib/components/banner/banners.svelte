@@ -1,13 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  
+  import { BannersState } from '$lib/models/banner-state';
+  import type { UiVersionInfo } from '$lib/types/global';
+  
   import BannerTemporalVersion from './banner-temporal-version.svelte';
   import BannerUIVersion from './banner-ui-version.svelte';
-  import {
-    BannersState,
-    isTemporalVersionBanner,
-    isUIVersionBanner,
-  } from './banner-state';
-  import type { UiVersionInfo } from '$lib/types/global';
 
   export let uiVersionInfo: UiVersionInfo;
 
@@ -16,9 +14,9 @@
 </script>
 
 {#if notifyOnNewVersion}
-  {#if isTemporalVersionBanner(shownBanner)}
+  {#if shownBanner === BannersState.TemporalVersion}
     <BannerTemporalVersion bind:shownBanner />
-  {:else if isUIVersionBanner(shownBanner)}
+  {:else if shownBanner === BannersState.UIVersion}
     <BannerUIVersion {uiVersionInfo} bind:shownBanner />
   {/if}
 {/if}

@@ -1,13 +1,17 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
+
+  import { createEventDispatcher } from 'svelte';
+
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { omit } from '$lib/utilities/omit';
 
   type T = $$Generic;
 
   interface $$Props extends HTMLInputAttributes {
     checked?: boolean;
-    label?: string;
+    label: string;
+    labelHidden?: boolean;
     onDark?: boolean;
     indeterminate?: boolean;
     hoverable?: boolean;
@@ -18,7 +22,8 @@
 
   export let id = '';
   export let checked = false;
-  export let label = '';
+  export let label: string;
+  export let labelHidden = false;
   export let onDark = false;
   export let indeterminate = false;
   export let disabled = false;
@@ -53,6 +58,7 @@
 </script>
 
 <div
+  data-testid={$$restProps['data-testid'] ?? null}
   on:click|stopPropagation
   on:keypress|stopPropagation
   class="relative {$$props.class}"
@@ -65,11 +71,9 @@
     class:disabled
     class:on-dark={onDark}
   >
-    {#if label}
-      <span class="label" class:hoverable>
-        {label}
-      </span>
-    {/if}
+    <span class="label" class:hoverable class:sr-only={labelHidden}>
+      {label}
+    </span>
     <input
       on:click|stopPropagation
       on:change={handleChange}
@@ -80,7 +84,7 @@
       {indeterminate}
       {disabled}
       class:indeterminate
-      {...$$restProps}
+      {...omit($$restProps, 'data-testid')}
     />
     <span class="checkmark" class:hoverable class:on-dark={onDark}>
       {#if indeterminate}

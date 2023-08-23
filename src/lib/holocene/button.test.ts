@@ -1,5 +1,6 @@
-import Button from '$lib/holocene/button.svelte';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+
+import Button from '$lib/holocene/button.svelte';
 
 let host: HTMLElement;
 
@@ -39,7 +40,7 @@ describe('Button', () => {
     const instance = new Button({
       target: host,
       props: {
-        secondary: true,
+        variant: 'secondary',
       },
     });
 
@@ -52,7 +53,7 @@ describe('Button', () => {
     const instance = new Button({
       target: host,
       props: {
-        secondary: true,
+        variant: 'secondary',
       },
     });
 
@@ -79,6 +80,19 @@ describe('Button', () => {
       target: host,
       props: {
         icon: 'download',
+      },
+    });
+
+    expect(instance).toBeTruthy();
+
+    expect(host.innerHTML).toMatchSnapshot();
+  });
+
+  test('class', async () => {
+    const instance = new Button({
+      target: host,
+      props: {
+        class: 'custom-class',
       },
     });
 

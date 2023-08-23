@@ -1,14 +1,13 @@
 <script lang="ts">
-  import { routeForEventHistory } from '$lib/utilities/route-for';
-
+  
+  import Copyable from '$lib/holocene/copyable.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
-
+  import { translate } from '$lib/i18n/translate';
   import type { WorkflowIdentifier } from '$lib/types/workflows';
-  import Copyable from '../copyable.svelte';
-  import { goto } from '$app/navigation';
-  import Link from '$lib/holocene/link.svelte';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   export let parent: WorkflowIdentifier;
   export let parentNamespaceName: string | undefined;
@@ -16,9 +15,12 @@
 </script>
 
 <Table class="w-full">
+  <caption class="sr-only" slot="caption"
+    >{translate('workflows', 'parent-workflow')}</caption
+  >
   <TableHeaderRow slot="headers">
-    <th>Parent Workflow ID</th>
-    <th>Parent Run ID</th>
+    <th>{translate('workflows', 'parent-id')}</th>
+    <th>{translate('workflows', 'parent-run-id')}</th>
   </TableHeaderRow>
   <TableRow class="hover:text-blue-700 hover:underline">
     <td>
@@ -30,7 +32,12 @@
           run: parent.runId,
         })}
       >
-        <Copyable content={parent.workflowId} visible />
+        <Copyable
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+          content={parent.workflowId}
+          visible
+        />
       </Link>
     </td>
     <td>
@@ -42,7 +49,12 @@
           run: parent.runId,
         })}
       >
-        <Copyable content={parent.runId} visible />
+        <Copyable
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+          content={parent.runId}
+          visible
+        />
       </Link>
     </td>
   </TableRow>

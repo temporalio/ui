@@ -1,19 +1,24 @@
 <script lang="ts">
-  import { onDestroy, afterUpdate } from 'svelte';
   import { writable } from 'svelte/store';
+  
+  import { afterUpdate, onDestroy } from 'svelte';
+  
+  
   import Chip from '$lib/holocene/chip.svelte';
 
   export let id: string;
   export let chips: string[];
-  export let label = '';
+  export let label: string;
+  export let labelHidden = false;
   export let placeholder = '';
   export let name = id;
   export let disabled = false;
   export let required = false;
   export let hintText = '';
   export let validator: (value: string) => boolean = () => true;
+  export let removeChipButtonLabel: string | ((chipValue: string) => string);
   const values = writable<string[]>(chips);
-  let displayValue: string = '';
+  let displayValue = '';
   let shouldScrollToInput = false;
   let inputContainer: HTMLDivElement;
   let input: HTMLInputElement;
@@ -86,14 +91,15 @@
 </script>
 
 <div class={$$props.class}>
-  {#if label}
-    <label class:required for={id}>{label}</label>
-  {/if}
+  <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
   <div bind:this={inputContainer} class="input-container" class:invalid>
     {#if $values.length > 0}
       {#each $values as chip, i (`${chip}-${i}`)}
         {@const valid = validator(chip)}
         <Chip
+          removeButtonLabel={typeof removeChipButtonLabel === 'string'
+            ? removeChipButtonLabel
+            : removeChipButtonLabel(chip)}
           on:remove={() => removeChip(i)}
           intent={valid ? 'default' : 'warning'}>{chip}</Chip
         >

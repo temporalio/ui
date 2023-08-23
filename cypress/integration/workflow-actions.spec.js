@@ -8,7 +8,6 @@ const { workflowId, runId } =
 describe('Workflow Actions', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -46,9 +45,7 @@ describe('Workflow Actions', () => {
       const confirmBtn =
         '[data-testid="terminate-confirmation-modal"] [data-testid="confirm-modal-button"]';
       cy.get('#workflow-actions-menu-button').click();
-      cy.get(
-        '#workflow-actions-menu >> [data-testid="terminate-button"]',
-      ).click();
+      cy.get('[data-testid="terminate-button"]').click();
       cy.get('#workflow-termination-reason').type('test');
       cy.get(confirmBtn).click();
 
@@ -79,7 +76,7 @@ describe('Workflow Actions', () => {
       const confirmBtn =
         '[data-testid="signal-confirmation-modal"] [data-testid="confirm-modal-button"]';
       cy.get('#workflow-actions-menu-button').click();
-      cy.get('#workflow-actions-menu >> [data-testid="signal-button"]').click();
+      cy.get('[data-testid="signal-button"]').click();
       cy.get('#signal-name').type('sos');
       cy.get('div.cm-content').type('{{}{enter}"sos":true');
       cy.get(confirmBtn).click();
@@ -98,7 +95,7 @@ describe('Workflow Actions', () => {
 
     it('to an arbitrary workflow task if the workflow is running, and the action is enabled', () => {
       cy.get('#workflow-actions-menu-button').click();
-      cy.get('#workflow-actions-menu >> [data-testid="reset-button"]').click();
+      cy.get('[data-testid="reset-button"]').click();
       cy.get('input[name="reset-event-id"').first().click();
       cy.get('#reset-reason').type('test');
       cy.get(confirmBtn).click();
@@ -115,7 +112,6 @@ describe('Workflow Actions', () => {
 describe('Write Actions Disabled', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
     cy.intercept(Cypress.env('VITE_API_HOST') + `/api/v1/settings?`, {
       fixture: 'settings.write-actions-disabled.json',
     }).as('settings-api');

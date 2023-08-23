@@ -1,51 +1,52 @@
 import type {
+  ActivityTaskCanceledEvent,
+  ActivityTaskCancelRequestedEvent,
+  ActivityTaskCompletedEvent,
+  ActivityTaskFailedEvent,
+  ActivityTaskScheduledEvent,
+  ActivityTaskStartedEvent,
+  ActivityTaskTimedOutEvent,
   ChildWorkflowExecutionCanceledEvent,
   ChildWorkflowExecutionCompletedEvent,
   ChildWorkflowExecutionFailedEvent,
   ChildWorkflowExecutionStartedEvent,
   ChildWorkflowExecutionTerminatedEvent,
   ChildWorkflowExecutionTimedOutEvent,
-  SignalExternalWorkflowExecutionInitiatedEvent,
-  SignalExternalWorkflowExecutionFailedEvent,
-  ExternalWorkflowExecutionSignaledEvent,
-  StartChildWorkflowExecutionFailedEvent,
-  ExternalWorkflowExecutionCancelRequestedEvent,
-  UpsertWorkflowSearchAttributesEvent,
-  RequestCancelExternalWorkflowExecutionInitiatedEvent,
-  RequestCancelExternalWorkflowExecutionFailedEvent,
-  TimerStartedEvent,
-  TimerFiredEvent,
-  TimerCanceledEvent,
-  MarkerRecordedEvent,
-  ActivityTaskCancelRequestedEvent,
-  ActivityTaskCanceledEvent,
-  ActivityTaskCompletedEvent,
-  ActivityTaskFailedEvent,
-  ActivityTaskScheduledEvent,
-  ActivityTaskStartedEvent,
-  ActivityTaskTimedOutEvent,
-  IterableEvent,
-  HistoryEvent,
+  CommonHistoryEvent,
+  EventAttribute,
   EventAttributeKey,
   EventWithAttributes,
-  EventAttribute,
-  CommonHistoryEvent,
+  ExternalWorkflowExecutionCancelRequestedEvent,
+  ExternalWorkflowExecutionSignaledEvent,
+  HistoryEvent,
+  IterableEvent,
+  MarkerRecordedEvent,
+  RequestCancelExternalWorkflowExecutionFailedEvent,
+  RequestCancelExternalWorkflowExecutionInitiatedEvent,
+  SignalExternalWorkflowExecutionFailedEvent,
+  SignalExternalWorkflowExecutionInitiatedEvent,
+  StartChildWorkflowExecutionFailedEvent,
+  StartChildWorkflowExecutionInitiatedEvent,
+  TimerCanceledEvent,
+  TimerFiredEvent,
+  TimerStartedEvent,
+  UpsertWorkflowSearchAttributesEvent,
   WorkflowEvent,
-  WorkflowExecutionStartedEvent,
-  WorkflowExecutionCompletedEvent,
   WorkflowExecutionCanceledEvent,
+  WorkflowExecutionCancelRequestedEvent,
+  WorkflowExecutionCompletedEvent,
+  WorkflowExecutionContinuedAsNewEvent,
   WorkflowExecutionFailedEvent,
   WorkflowExecutionSignaledEvent,
-  WorkflowExecutionContinuedAsNewEvent,
+  WorkflowExecutionStartedEvent,
   WorkflowExecutionTerminatedEvent,
   WorkflowExecutionTimedOutEvent,
+  WorkflowExecutionUpdateCompletedEvent,
   WorkflowTaskCompletedEvent,
   WorkflowTaskFailedEvent,
   WorkflowTaskScheduledEvent,
   WorkflowTaskStartedEvent,
   WorkflowTaskTimedOutEvent,
-  WorkflowExecutionCancelRequestedEvent,
-  StartChildWorkflowExecutionInitiatedEvent,
 } from '$lib/types/events';
 
 export type ActivityType = (typeof activityEvents)[number];
@@ -112,8 +113,8 @@ export const eventTypes = [
   'RequestCancelExternalWorkflowExecutionFailed',
   'RequestCancelExternalWorkflowExecutionInitiated',
   'UpsertWorkflowSearchAttributes',
-  'WorkflowUpdateAccepted',
-  'WorkflowUpdateCompleted',
+  'WorkflowExecutionUpdateAccepted',
+  'WorkflowExecutionUpdateCompleted',
 ] as const;
 
 export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
@@ -139,6 +140,8 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'markerRecordedEventAttributes',
   'workflowExecutionSignaledEventAttributes',
   'workflowExecutionTerminatedEventAttributes',
+  'workflowExecutionUpdateAcceptedEventAttributes',
+  'workflowExecutionUpdateCompletedEventAttributes',
   'workflowExecutionCancelRequestedEventAttributes',
   'workflowExecutionCanceledEventAttributes',
   'requestCancelExternalWorkflowExecutionInitiatedEventAttributes',
@@ -157,8 +160,6 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'signalExternalWorkflowExecutionFailedEventAttributes',
   'externalWorkflowExecutionSignaledEventAttributes',
   'upsertWorkflowSearchAttributesEventAttributes',
-  'workflowUpdateAcceptedEventAttributes',
-  'workflowUpdateCompletedEventAttributes',
 ] as const;
 
 export type ResetEventType = (typeof validResetEventTypes)[number];
@@ -408,3 +409,16 @@ export const isLocalActivityMarkerEvent = (
 
   return true;
 };
+
+const isWorkflowExecutionUpdateCompletedEvent =
+  hasAttributes<WorkflowExecutionUpdateCompletedEvent>(
+    'workflowExecutionUpdateCompletedEventAttributes',
+  );
+
+export const isFailedWorkflowExecutionUpdateCompletedEvent = (
+  event: WorkflowEvent,
+): boolean =>
+  isWorkflowExecutionUpdateCompletedEvent(event) &&
+  Boolean(
+    event.workflowExecutionUpdateCompletedEventAttributes.outcome?.failure,
+  );

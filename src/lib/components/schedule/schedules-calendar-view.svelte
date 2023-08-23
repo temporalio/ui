@@ -1,15 +1,18 @@
 <script lang="ts">
-  import Tab from '$lib/holocene/tab/tab.svelte';
+  import { page } from '$app/stores';
+  
+  import Input from '$lib/holocene/input/input.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import TabPanel from '$lib/holocene/tab/tab-panel.svelte';
-  import SchedulesIntervalView from './schedules-interval-view.svelte';
-  import ScheduleDayOfWeekView from './schedule-day-of-week-view.svelte';
-  import ScheduleDayOfMonthView from './schedule-day-of-month-view.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import { page } from '$app/stores';
-  import ScheduleFrequency from './schedule-frequency.svelte';
+  import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { FullSchedule, SchedulePreset } from '$lib/types/schedule';
+  
+  import ScheduleDayOfMonthView from './schedule-day-of-month-view.svelte';
+  import ScheduleDayOfWeekView from './schedule-day-of-week-view.svelte';
+  import ScheduleFrequency from './schedule-frequency.svelte';
+  import SchedulesIntervalView from './schedules-interval-view.svelte';
 
   let scheduleId = $page.params.schedule;
 
@@ -42,7 +45,7 @@
 </script>
 
 <Tabs class="mt-8 w-full">
-  <h2 class="mb-4 text-2xl">Frequency</h2>
+  <h2 class="mb-4 text-2xl">{translate('schedules', 'frequency')}</h2>
   <TabList label="Schedule Tabs" class="flex flex-wrap gap-6">
     {#if schedule}
       <Tab
@@ -109,9 +112,13 @@
     </TabPanel>
     <TabPanel id="string-panel" tabId="string-tab">
       <div class="my-2 flex w-full flex-col gap-4">
-        <h3 class="text-lg font-medium">String</h3>
-        <p>Write or paste in a cron string to generate a schedule.</p>
+        <h3 class="text-lg font-medium">
+          {translate('schedules', 'cron-view-title')}
+        </h3>
+        <p>{translate('schedules', 'cron-view-description')}</p>
         <Input
+          label={translate('schedules', 'cron-view-title')}
+          labelHidden
           id="cronString"
           bind:value={cronString}
           placeholder="* * * * *"

@@ -1,36 +1,45 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  
+  import { translate } from '$lib/i18n/translate';
+  import type { BannersState } from '$lib/models/banner-state';
   import { isVersionNewer } from '$lib/utilities/version-check';
-  import {
-    BannersState,
-    getLinkForTemporalVersion,
-  } from '$lib/components/banner/banner-state';
-  import type { ClusterInformation } from '$lib/types/global';
-
+  
   import Banner from './banner.svelte';
+  
 
   export let shownBanner: BannersState;
 
-  const cluster: ClusterInformation = $page.data.cluster;
+  const { cluster } = $page.data;
 
-  const { recommended, current, alerts } = cluster?.versionInfo;
-  const alert = alerts?.[0];
-  const severity = alert?.severity;
+  const severities = {
+    High: 'high',
+    Medium: 'medium',
+    Low: 'low',
+  } as const;
+
+  const { recommended, current } = cluster?.versionInfo ?? {};
+  const alert = cluster?.versionInfo?.alerts?.[0];
+  const severity = alert ? severities[alert.severity] : severities.Low;
   const key = `server-v${current?.version}`;
-  const link = getLinkForTemporalVersion(cluster);
+  const link = `https://github.com/temporalio/temporal/releases/tag/v${cluster?.versionInfo?.recommended?.version}`;
+  const show = isVersionNewer(recommended?.version, current?.version);
   const message =
-    alert?.severity === 'Low'
-      ? `📥 Temporal v${recommended?.version} is available`
+    severity === severities.Low
+      ? `📥 ${translate('banner-temporal-version', {
+          version: recommended?.version,
+        })}`
       : `📥 ${alert?.message}`;
 </script>
 
-{#if isVersionNewer(recommended?.version, current?.version)}
+{#if show}
   <Banner
     {key}
     {severity}
     {message}
     {link}
     bind:shownBanner
-    testId="temporal-version-banner"
+    data-testid="temporal-version-banner"
+    role="alertdialog"
   />
 {/if}

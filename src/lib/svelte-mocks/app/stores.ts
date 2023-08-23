@@ -1,6 +1,6 @@
 import { readable } from 'svelte/store';
+
 import type { Settings } from '$lib/types/global';
-import i18next from 'i18next';
 
 interface Page<Params extends Record<string, string> = Record<string, string>> {
   url: URL;
@@ -30,6 +30,7 @@ const settings: Settings = {
   workflowCancelDisabled: false,
   workflowSignalDisabled: false,
   workflowTerminateDisabled: false,
+  hideWorkflowQueryErrors: false,
   notifyOnNewVersion: true,
   feedbackURL: '',
   runtimeEnvironment: {
@@ -42,7 +43,6 @@ const settings: Settings = {
 
 const data: App.PageData = {
   settings,
-  i18n: () => i18next,
 };
 
 export const page = readable<Page>({

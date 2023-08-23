@@ -1,19 +1,21 @@
-import { chalk } from 'zx';
 import type { Plugin } from 'vite';
-import { createUIServer, UIServer } from '../scripts/start-ui-server';
-import { ViteDevServer } from 'vite';
+import type { ViteDevServer } from 'vite';
 
-const { cyan } = chalk;
+import { createUIServer, UIServer } from '../utilities/ui-server';
 
 let uiServer: UIServer;
-const PORT = 8081;
 
 const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.VERCEL) return true;
   if (process.env.HISTOIRE) return true;
   if (process.env.VITEST) return true;
   if (process.env.CI) return true;
-  if (server.config.mode !== 'ui-server') return true;
+  if (
+    server.config.mode === 'docker' ||
+    server.config.mode === 'temporal-server' ||
+    server.config.mode.includes('test')
+  )
+    return true;
 
   return false;
 };
@@ -25,13 +27,8 @@ export function uiServerPlugin(): Plugin {
     apply: 'serve',
     async configureServer(server) {
       if (shouldSkip(server)) return;
-
-      if (server.config.mode === 'ui-server') {
-        console.log(cyan(`Starting local UI Server on Port ${PORT}...`));
-        uiServer = await createUIServer(PORT);
-        await uiServer.ready();
-        console.log(cyan(`UI Server is running on Port ${PORT}`));
-      }
+      uiServer = await createUIServer();
+      await uiServer.ready();
     },
     async closeBundle() {
       await uiServer?.shutdown();

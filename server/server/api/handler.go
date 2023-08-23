@@ -32,6 +32,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"github.com/temporalio/ui-server/v2/api/operatorservice/v1"
 	"github.com/temporalio/ui-server/v2/api/workflowservice/v1"
 	"github.com/temporalio/ui-server/v2/server/auth"
 	"github.com/temporalio/ui-server/v2/server/config"
@@ -65,6 +66,7 @@ type SettingsResponse struct {
 	WorkflowSignalDisabled      bool
 	WorkflowResetDisabled       bool
 	BatchActionsDisabled        bool
+	HideWorkflowQueryErrors     bool
 }
 
 func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware) echo.HandlerFunc {
@@ -96,9 +98,9 @@ func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddle
 	}
 }
 
-func GetSettings(cfgProvier *config.ConfigProviderWithRefresh) func(echo.Context) error {
+func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Context) error {
 	return func(c echo.Context) error {
-		cfg, err := cfgProvier.GetConfig()
+		cfg, err := cfgProvider.GetConfig()
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
@@ -133,6 +135,7 @@ func GetSettings(cfgProvier *config.ConfigProviderWithRefresh) func(echo.Context
 			WorkflowSignalDisabled:    cfg.WorkflowSignalDisabled,
 			WorkflowResetDisabled:     cfg.WorkflowResetDisabled,
 			BatchActionsDisabled:      cfg.BatchActionsDisabled,
+			HideWorkflowQueryErrors:   cfg.HideWorkflowQueryErrors,
 		}
 
 		return c.JSON(http.StatusOK, settings)
@@ -155,8 +158,12 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 		)...,
 	)
 
-	if err := workflowservice.RegisterWorkflowServiceHandler(context.Background(), tMux, temporalConn); err != nil {
-		return nil, err
+	if wfErr := workflowservice.RegisterWorkflowServiceHandler(context.Background(), tMux, temporalConn); wfErr != nil {
+		return nil, wfErr
+	}
+
+	if opErr := operatorservice.RegisterOperatorServiceHandler(context.Background(), tMux, temporalConn); opErr != nil {
+		return nil, opErr
 	}
 	return tMux, nil
 }

@@ -1,17 +1,18 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
-
-  import { getWorkflowStackTrace } from '$lib/services/query-service';
-  import type { ParsedQuery } from '$lib/services/query-service';
-  import type { Eventual } from '$lib/types/global';
-
-  import CodeBlock from '$lib/holocene/code-block.svelte';
+  
+  
   import Button from '$lib/holocene/button.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import type { ParsedQuery } from '$lib/services/query-service';
+  import { getWorkflowStackTrace } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import type { Eventual } from '$lib/types/global';
 
   const { namespace } = $page.params;
   $: ({ workflow, workers } = $workflowRun);
@@ -55,14 +56,17 @@
     {#await stackTrace}
       <div class="text-center">
         <Loading />
-        <p>(This will fail if you have no workers running.)</p>
+        <p>{translate('workflows', 'no-workers-failure-message')}</p>
       </div>
     {:then result}
       <div class="flex items-center gap-4">
         <Button on:click={refreshStackTrace} icon="retry" loading={isLoading}>
-          Refresh
+          {translate('refresh')}
         </Button>
-        <p>Stack Trace at {currentdate.toLocaleTimeString()}</p>
+        <p>
+          {translate('workflows', 'stack-trace-at')}
+          {currentdate.toLocaleTimeString()}
+        </p>
       </div>
       <div class="flex items-start h-full">
         <CodeBlock
@@ -73,18 +77,24 @@
       </div>
     {:catch _error}
       <EmptyState
-        title="An Error Occured"
-        content="Please make sure you have at least one worker running."
+        title={translate('error-occurred')}
+        content={translate('workflows', 'no-workers-running-message')}
       />
     {/await}
   {:else}
-    <EmptyState title="No Stack Traces Found" testId="query-stack-trace-empty">
+    <EmptyState
+      title={translate('workflows', 'stack-trace-empty-state')}
+      testId="query-stack-trace-empty"
+    >
       {#if workflow?.isRunning && workers?.pollers?.length === 0}
         <p>
-          To enable <Link
+          {translate('workflows', 'stack-trace-link-preface')}<Link
             href="https://docs.temporal.io/workflows#stack-trace-query"
-            >stack traces</Link
-          >, run a Worker on the {workflow?.taskQueue} Task Queue.
+          >
+            {translate('workflows', 'stack-trace-link')}</Link
+          >{translate('workflows', 'stack-trace-link-postface', {
+            taskQueue: workflow?.taskQueue,
+          })}
         </p>
       {/if}
     </EmptyState>

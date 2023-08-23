@@ -1,5 +1,5 @@
 {
-  "keys": {
+  "systemAttributes": {
     "BatcherNamespace": "Keyword",
     "BatcherUser": "Keyword",
     "BinaryChecksums": "Keyword",
@@ -22,5 +22,7 @@
     "TemporalChangeVersion": "Keyword",
     "WorkflowId": "Keyword",
     "WorkflowType": "Keyword"
-  }
+  },
+  "customAttributes": {},
+  "storageSchema": {}
 }

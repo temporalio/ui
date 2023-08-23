@@ -1,30 +1,28 @@
 <script lang="ts">
+  import { noop } from 'svelte/internal';
   import { fade } from 'svelte/transition';
-
+  
   import Icon from '$lib/holocene/icon/icon.svelte';
-
-  import { eventShowElapsed, eventFilterSort } from '$lib/stores/event-view';
-  import { timeFormat } from '$lib/stores/time-format';
-
+  import { isEventGroup } from '$lib/models/event-groups';
   import {
-    eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsCanceled,
+    eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
+  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import type { IterableEvent } from '$lib/types/events';
   import { formatDate } from '$lib/utilities/format-date';
+  import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
-
-  import EventDetailsRow from './event-details-row.svelte';
-  import EventDetailsFull from './event-details-full.svelte';
-  import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
-  import { noop } from 'svelte/internal';
-  import { isEventGroup } from '$lib/models/event-groups';
-  import type { IterableEvent } from '$lib/types/events';
+  
+  import EventDetailsFull from './event-details-full.svelte';
+  import EventDetailsRow from './event-details-row.svelte';
+  
 
   export let event: IterableEvent;
-  export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent | undefined;
   export let compact = false;
   export let expandAll = false;
@@ -38,27 +36,28 @@
 
   $: expanded = expandAll || active;
 
-  $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
   $: descending = $eventFilterSort === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: showElapsedTimeDiff =
     showElapsed && initialItem && event.id !== initialItem.id;
   $: attributes = formatAttributes(event, { compact });
 
-  $: timeDiffChange = '';
-  $: {
-    const currentIndex = visibleItems.indexOf(event);
-    const previousItem = visibleItems[currentIndex - 1];
-    if (previousItem) {
-      const timeDiff = formatDistanceAbbreviated({
-        start: isEventGroup(previousItem)
-          ? previousItem?.initialEvent?.eventTime
-          : previousItem?.eventTime,
-        end: currentEvent?.eventTime,
-      });
-      timeDiffChange = timeDiff ? `(${descending ? '-' : '+'}${timeDiff})` : '';
-    }
-  }
+  $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
+  $: elapsedTime = formatDistanceAbbreviated({
+    start: initialItem.eventTime,
+    end: isEventGroup(event)
+      ? event.initialEvent.eventTime
+      : currentEvent.eventTime,
+    includeMilliseconds: true,
+  });
+
+  $: duration = isEventGroup(event)
+    ? formatDistanceAbbreviated({
+        start: event.initialEvent.eventTime,
+        end: event.lastEvent.eventTime,
+        includeMilliseconds: true,
+      })
+    : '';
 
   const onLinkClick = () => {
     expanded = !expanded;
@@ -90,51 +89,77 @@
     >
   </td>
   <td class="text-left">
-    <p class="break-word truncate text-sm md:whitespace-normal md:text-base">
+    <div class="flex flex-col gap-0">
       {#if showElapsedTimeDiff}
-        {formatDistanceAbbreviated({
-          start: initialItem.eventTime,
-          end: currentEvent.eventTime,
-        })}
-        {timeDiffChange}
+        <p class="break-word truncate text-sm md:whitespace-normal">
+          {#if elapsedTime}
+            {descending ? '-' : '+'}{elapsedTime}
+          {/if}
+        </p>
+        {#if duration && duration !== '0ms'}
+          <div class="flex flex-row items-center gap-0">
+            <Icon class="inline" name="clock" />
+            <p class="break-word truncate text-sm md:whitespace-normal">
+              {duration}
+            </p>
+          </div>
+        {/if}
       {:else}
-        {formatDate(event?.eventTime, $timeFormat)}
+        <p
+          class="break-word truncate text-sm md:whitespace-normal md:text-base"
+        >
+          {formatDate(event?.eventTime, $timeFormat, {
+            relative: $relativeTime,
+          })}
+        </p>
       {/if}
-    </p>
-  </td>
-  <td class="text-right text-sm font-normal xl:text-left">
-    <div class="flex">
-      {#if compact && failure}
-        <Icon class="mr-1.5 inline text-red-700" name="clock" />
-      {/if}
-      {#if compact && canceled}
-        <Icon class="mr-1.5 inline text-yellow-700" name="clock" />
-      {/if}
-      {#if compact && terminated}
-        <Icon class="mr-1.5 inline text-pink-700" name="clock" />
-      {/if}
-      <p class="event-name truncate text-sm font-semibold md:text-base">
-        {isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name}
-      </p>
     </div>
   </td>
-  <td class="overflow-hidden">
-    <div class="flex w-full items-center justify-between">
-      <div class="grow truncate">
-        {#if !expanded}
+  <td
+    colspan={expanded ? 2 : 1}
+    class="text-right text-sm font-normal xl:text-left"
+  >
+    <div class="flex">
+      <div>
+        {#if compact && failure}
+          <Icon class="mr-1.5 inline text-red-700" name="clock" />
+        {/if}
+        {#if compact && canceled}
+          <Icon class="mr-1.5 inline text-yellow-700" name="clock" />
+        {/if}
+        {#if compact && terminated}
+          <Icon class="mr-1.5 inline text-pink-700" name="clock" />
+        {/if}
+      </div>
+      <div class="flex w-full items-center justify-between truncate">
+        <p class="event-name truncate text-sm font-semibold md:text-base">
+          {isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name}
+        </p>
+        {#if expanded}
+          <div>
+            <Icon class="inline" name="chevron-up" />
+          </div>
+        {/if}
+      </div>
+    </div>
+  </td>
+  {#if !expanded}
+    <td class="overflow-hidden">
+      <div class="flex w-full items-center justify-between">
+        <div class="grow truncate">
           <EventDetailsRow
             {...getSingleAttributeForEvent(currentEvent)}
             {attributes}
             class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
             inline
           />
-        {/if}
+        </div>
+        <div>
+          <Icon class="inline" name="chevron-down" />
+        </div>
       </div>
-      <div>
-        <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
-      </div>
-    </div>
-  </td>
+    </td>
+  {/if}
 
   <td />
 </tr>

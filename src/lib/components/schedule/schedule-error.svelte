@@ -1,11 +1,12 @@
 <script lang="ts">
   import Panel from '$lib/components/panel.svelte';
+  import { translate } from '$lib/i18n/translate';
 
-  export let error: string = '';
+  export let error = '';
 </script>
 
 <Panel error>
-  <p class="error-text">Error Message</p>
+  <p class="error-text">{translate('schedules', 'error-title')}</p>
   <p class="error-text">
     {error}
   </p>

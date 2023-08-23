@@ -1,8 +1,10 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { attributeGroupingProperties } from '$lib/utilities/format-event-attributes';
-  import type { AttributeGrouping } from '$lib/utilities/format-event-attributes';
+  
   import Pill from '$lib/components/pill.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import type { AttributeGrouping } from '$lib/utilities/format-event-attributes';
+  import { attributeGroupingProperties } from '$lib/utilities/format-event-attributes';
 
   export let attributeGrouping: AttributeGrouping;
   export let activePill: string;
@@ -27,7 +29,7 @@
             {active}
             on:click={() => dispatch('pillChange', { key })}
             color={active ? 'lightBlue' : 'gray'}
-            >{attributeGroupingProperties[key].label}</Pill
+            >{translate('events', attributeGroupingProperties[key].label)}</Pill
           >
         {/if}
       {/each}

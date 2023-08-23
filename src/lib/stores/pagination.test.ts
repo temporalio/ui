@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, expect, it } from 'vitest';
 import { get } from 'svelte/store';
+
+import { describe, expect, it } from 'vitest';
+
 import {
   getIndex,
   getPageForIndex,
@@ -346,7 +348,7 @@ describe('pagination', () => {
     expect(get(store).activeRowIndex).toBe(1);
   });
 
-  it('should set active row to current row item on next ', () => {
+  it('should set active row to undefined on next page', () => {
     const store = pagination(oneHundredResolutions, 5);
 
     for (let i = 0; i < 4; i++) {
@@ -357,7 +359,7 @@ describe('pagination', () => {
 
     store.next();
 
-    expect(get(store).activeRowIndex).toBe(3);
+    expect(get(store).activeRowIndex).toBe(undefined);
   });
 
   it('should set active row to last row item on next if next page has less items', () => {
@@ -385,6 +387,16 @@ describe('pagination', () => {
     }
 
     expect(get(store).activeRowIndex).toBe(0);
+  });
+
+  it('by default should not set active row index', () => {
+    const store = pagination(oneHundredResolutions, 5);
+
+    expect(get(store).activeRowIndex).toBe(undefined);
+
+    store.setActiveRowIndex();
+
+    expect(get(store).activeRowIndex).toBe(undefined);
   });
 
   it('should set active row index', () => {
@@ -481,6 +493,10 @@ describe('getStartingIndexForPage', () => {
 
   it('should return the first index of the last page for the something out of bounds', () => {
     expect(getStartingIndexForPage(100, 20, oneHundredResolutions)).toBe(80);
+  });
+
+  it('should return 0 for the something out of bounds if the total number of items is less than itemsPerPage', () => {
+    expect(getStartingIndexForPage(3, 101, oneHundredResolutions)).toBe(0);
   });
 
   it('should return 0 if given a negative number for the page', () => {

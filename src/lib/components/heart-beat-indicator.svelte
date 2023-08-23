@@ -3,7 +3,7 @@
   // https://codepen.io/jupa8712/pen/XmbyXE?js-preprocessor=none
 
   let text = '';
-  export let delay: number = 0;
+  export let delay = 0;
 
   $: cssVarStyles = `--animation-delay:${delay}ms;`;
 </script>
@@ -21,6 +21,8 @@
       viewBox="0 0 150 73"
       enable-background="new 0 0 150 73"
       xml:space="preserve"
+      aria-hidden="true"
+      focusable="false"
     >
       <polyline
         fill="none"
@@ -64,41 +66,36 @@
     animation: heartRateOut 2s linear infinite;
     animation-delay: var(--animation-delay, 0);
     background: rgb(219 234 254);
-    background:
-      linear-gradient(
-        to left,
-        rgb(219 234 254) 0%,
-        rgb(219 234 254) 50%,
-        rgb(255 255 255 / 0%) 100%
-      );
-    background:
-      linear-gradient(
-        to left,
-        rgb(219 234 254) 0%,
-        rgb(219 234 254) 50%,
-        rgb(255 255 255 / 0%) 100%
-      );
-    background:
-      linear-gradient(
-        to left,
-        rgb(219 234 254) 0%,
-        rgb(219 234 254) 50%,
-        rgb(255 255 255 / 0%) 100%
-      );
-    background:
-      linear-gradient(
-        to left,
-        rgb(219 234 254) 0%,
-        rgb(219 234 254) 50%,
-        rgb(255 255 255 / 0%) 100%
-      );
-    background:
-      linear-gradient(
-        to right,
-        rgb(219 234 254) 0%,
-        rgb(219 234 254) 80%,
-        rgb(255 255 255 / 0%) 100%
-      );
+    background: linear-gradient(
+      to left,
+      rgb(219 234 254) 0%,
+      rgb(219 234 254) 50%,
+      rgb(255 255 255 / 0%) 100%
+    );
+    background: linear-gradient(
+      to left,
+      rgb(219 234 254) 0%,
+      rgb(219 234 254) 50%,
+      rgb(255 255 255 / 0%) 100%
+    );
+    background: linear-gradient(
+      to left,
+      rgb(219 234 254) 0%,
+      rgb(219 234 254) 50%,
+      rgb(255 255 255 / 0%) 100%
+    );
+    background: linear-gradient(
+      to left,
+      rgb(219 234 254) 0%,
+      rgb(219 234 254) 50%,
+      rgb(255 255 255 / 0%) 100%
+    );
+    background: linear-gradient(
+      to right,
+      rgb(219 234 254) 0%,
+      rgb(219 234 254) 80%,
+      rgb(255 255 255 / 0%) 100%
+    );
   }
 
   @keyframes heartRateIn {

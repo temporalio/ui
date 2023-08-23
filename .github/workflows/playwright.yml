@@ -1,4 +1,4 @@
-name: Playwright Tests
+name: Playwright
 run-name: ${{github.event.pull_request.title}} (${{ github.event.pull_request.number }}) by @${{ github.triggering_actor }} (Attempt ${{ github.run_attempt }})
 
 on:
@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  playwright:
+  integration-tests:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -25,11 +25,46 @@ jobs:
         uses: ./.github/actions/checkout-and-setup
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
-      - name: Run Playwright tests
-        run: pnpm run test:integration
+      - name: Run Integration tests
+        run: pnpm test:integration:run
       - uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: playwright-report
+          name: playwright-report-integration
+          path: playwright-report/
+          retention-days: 30
+  e2e-tests:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/checkout-and-setup
+      - name: Build UI
+        run: pnpm build:server
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+          cache: true
+          check-latest: true
+      - name: Set up Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: '3.x'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build UI Server
+        working-directory: server
+        run: make install-utils build
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
+      - name: Run E2E tests
+        run: pnpm test:e2e
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report-e2e
           path: playwright-report/
           retention-days: 30

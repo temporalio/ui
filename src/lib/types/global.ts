@@ -2,7 +2,6 @@ import type { GetClusterInfoResponse } from '$lib/types';
 
 export type NamespaceListItem = {
   namespace: string;
-  href: (namspace: string) => string;
   onClick: (namspace: string) => void;
 };
 
@@ -14,6 +13,17 @@ export type Replace<T, U extends { [key: string]: unknown }> = Omit<
   keyof U
 > &
   U;
+
+export type Only<O extends object, K extends keyof O> = {
+  [X in keyof Pick<O, K>]-?: true;
+} & {
+  [X in keyof Omit<O, K>]: never;
+};
+
+export type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+export type XOR<T, U> = T | U extends object
+  ? (Without<T, U> & U) | (Without<U, T> & T)
+  : T | U;
 
 export type Eventual<T> = T | PromiseLike<T>;
 
@@ -58,6 +68,7 @@ export type Settings = {
   workflowCancelDisabled: boolean;
   workflowSignalDisabled: boolean;
   workflowResetDisabled: boolean;
+  hideWorkflowQueryErrors: boolean;
   batchActionsDisabled: boolean;
   showTemporalSystemNamespace: boolean;
   notifyOnNewVersion: boolean;
@@ -120,8 +131,6 @@ type VersionInfo = {
 export type ClusterInformation = Omit<GetClusterInfoResponse, 'versionInfo'> & {
   versionInfo: VersionInfo;
 };
-
-export type TimeFormat = 'UTC' | 'relative' | 'local';
 
 export type SelectOptionValue = number | string | boolean;
 

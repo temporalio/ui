@@ -6,7 +6,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier',
   ],
-  plugins: ['svelte3', '@typescript-eslint', 'vitest'],
+  plugins: ['svelte3', '@typescript-eslint', 'vitest', 'import'],
   ignorePatterns: ['*.cjs', 'prism.cjs', '/server'],
   overrides: [
     {
@@ -17,7 +17,7 @@ module.exports = {
        * So, we're selectively adding to this list until we get all
        * components to pass linting.
        */
-      files: ['src/lib/holocene/*.svelte'],
+      files: ['src/**/*.svelte'],
       processor: 'svelte3/svelte3',
       /**
        * Temporary fix, see the following:
@@ -54,7 +54,7 @@ module.exports = {
   },
   rules: {
     '@typescript-eslint/no-unused-vars': [
-      1,
+      'error',
       {
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
@@ -68,6 +68,7 @@ module.exports = {
       'error',
       { assertionStyle: 'as' },
     ],
+    '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/no-restricted-imports': [
       'error',
       {
@@ -77,6 +78,44 @@ module.exports = {
             message: 'Please use esm-env instead.',
           },
         ],
+      },
+    ],
+    'sort-imports': [
+      'error',
+      { ignoreCase: true, ignoreDeclarationSort: true },
+    ],
+    'import/order': [
+      'error',
+      {
+        groups: [
+          'builtin',
+          'external',
+          'internal',
+          ['parent', 'sibling', 'index'],
+        ],
+        pathGroups: [
+          {
+            pattern: 'svelte/**',
+            group: 'external',
+            position: 'before',
+          },
+          { pattern: '$app/**', group: 'external', position: 'after' },
+          { pattern: './$types', group: 'external', position: 'after' },
+          { pattern: '$lib/**', group: 'internal' },
+          {
+            pattern: '$components/**/*.svelte',
+            group: 'internal',
+            position: 'after',
+          },
+          { pattern: './**/*.svelte', group: 'index', position: 'after' },
+        ],
+        pathGroupsExcludedImportTypes: ['svelte'],
+        'newlines-between': 'always',
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: false,
+          orderImportKind: 'asc',
+        },
       },
     ],
   },

@@ -1,10 +1,12 @@
+import type { WorkflowVersionTimpstamp } from '$lib/types';
+
 import type {
-  PendingChildren,
-  PendingActivityInfo,
-  PendingActivity,
   Payload,
+  PendingActivity,
+  PendingActivityInfo,
+  PendingChildren,
 } from './events';
-import type { Replace, Optional } from './global';
+import type { Optional, Replace } from './global';
 
 /**
  * Replace Longs, ITimestamps, UInt8Array's etc. with their corresponding http values
@@ -67,20 +69,23 @@ export type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
 
 export type WorkflowIdentifier = import('$lib/types').WorkflowExecutionInput;
 
-type SearchAttributesValue =
+export type SearchAttributesValue =
   | 'Bool'
   | 'Datetime'
   | 'Double'
   | 'Int'
   | 'Keyword'
-  | 'Text';
+  | 'Text'
+  | 'KeywordList';
 
 export type SearchAttributes = {
   [k: string]: SearchAttributesValue;
 };
 
 export type SearchAttributesResponse = {
-  keys: SearchAttributes;
+  customAttributes: Record<string, SearchAttributesValue>;
+  systemAttributes: Record<string, SearchAttributesValue>;
+  storageSchema: import('$lib/types').ListSearchAttributesResponse['storageSchema'];
 };
 
 export type WorkflowSearchAttributes = {
@@ -90,6 +95,11 @@ export type WorkflowSearchAttributes = {
 export type DecodedWorkflowSearchAttributes = {
   indexedFields?: Record<string, string | Payload>;
 };
+
+export interface MostRecentWOrkflowVersionStamp
+  extends WorkflowVersionTimpstamp {
+  useVersioning?: boolean;
+}
 
 export type WorkflowExecution = {
   name: string;
@@ -102,6 +112,7 @@ export type WorkflowExecution = {
   taskQueue?: string;
   historyEvents: string;
   historySizeBytes: string;
+  mostRecentWorkerVersionStamp?: MostRecentWOrkflowVersionStamp;
   searchAttributes?: DecodedWorkflowSearchAttributes;
   pendingChildren: PendingChildren[];
   pendingActivities: PendingActivity[];

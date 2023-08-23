@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
+
+import type { EventAttributesWithType } from '$lib/types/events';
+
 import {
   canBeSimplified,
   getValueForFirstKey,
   simplifyAttributes,
 } from './simplify-attributes';
-import type { EventAttributesWithType } from '$lib/types/events';
 
 const attributes = {
   workflowType: {

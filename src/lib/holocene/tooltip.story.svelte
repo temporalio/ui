@@ -1,7 +1,8 @@
 <script lang="ts">
+  import type { Hst as HST } from '@histoire/plugin-svelte';
+
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import type { Hst as HST } from '@histoire/plugin-svelte';
 
   export let Hst: HST;
 </script>
@@ -9,7 +10,13 @@
 <Hst.Story>
   <Hst.Variant title="A copyable tooltip">
     <div class="center">
-      <Tooltip copyable top text={'Tooltip text goes here.'}>
+      <Tooltip
+        copyable
+        copyIconTitle="Click to copy content"
+        copySuccessIconTitle="Content copied to clipboard"
+        top
+        text={'Tooltip text goes here.'}
+      >
         <Button as="anchor" href={'#'}>Hover Here</Button>
       </Tooltip>
     </div>

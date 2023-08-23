@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
   import OrderableListItem from './orderable-list-item.svelte';
   import OrderableList from './orderable-list.svelte';
 
@@ -19,9 +20,7 @@
   <Hst.Variant title="An orderable list">
     <OrderableList>
       {#each items as item, index}
-        <OrderableListItem pinned={item.pinned} {index}>
-          {item.label}
-        </OrderableListItem>
+        <OrderableListItem label={item.label} pinned={item.pinned} {index} />
       {/each}
     </OrderableList>
   </Hst.Variant>

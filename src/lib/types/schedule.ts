@@ -1,10 +1,11 @@
 import type {
+  CalendarSpec,
   DescribeScheduleResponse,
+  IntervalSpec,
+  RangeSpec,
   Schedule,
   ScheduleSpec,
-  CalendarSpec,
   StructuredCalendarSpec,
-  IntervalSpec,
 } from '$lib/types';
 
 export type DescribeFullSchedule = DescribeScheduleResponse & {
@@ -18,6 +19,7 @@ export type FullCalendarSpec = CalendarSpec;
 export type StructuredCalendars = StructuredCalendarSpec[];
 export type StructuredCalendar = StructuredCalendarSpec;
 export type ScheduleInterval = IntervalSpec;
+export type ScheduleRange = RangeSpec;
 
 export type SchedulePreset =
   | 'existing'

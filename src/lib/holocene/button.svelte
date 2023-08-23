@@ -1,16 +1,50 @@
-<script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
-  import Badge from '$lib/holocene/badge.svelte';
-
-  export let disabled = false;
-  export let variant:
+<script lang="ts" context="module">
+  type ButtonVariant =
     | 'primary'
     | 'secondary'
+    | 'search'
     | 'destructive'
     | 'login'
-    | 'link' = 'primary';
+    | 'ghost'
+    | 'link'
+    | 'menu';
 
+  export interface ButtonProps extends HTMLButtonAttributes {
+    variant?: ButtonVariant;
+    id?: string;
+    disabled?: boolean;
+    thin?: boolean;
+    loading?: boolean;
+    active?: boolean;
+    large?: boolean;
+    icon?: IconName;
+    iconClass?: string;
+    count?: number;
+    unround?: boolean;
+    unroundRight?: boolean;
+    unroundLeft?: boolean;
+    noBorderRight?: boolean;
+    noBorderLeft?: boolean;
+    as?: 'button' | 'anchor';
+    href?: string;
+    target?: '_self' | '_external';
+    'data-testid'?: string;
+  }
+</script>
+
+<script lang="ts">
+  import type { HTMLButtonAttributes } from 'svelte/elements';
+
+  import Badge from '$lib/holocene/badge.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { IconName } from '$lib/holocene/icon/paths';
+
+  type $$Props = ButtonProps & HTMLButtonAttributes;
+
+  let className = '';
+  export { className as class };
+  export let disabled = false;
+  export let variant: ButtonVariant = 'primary';
   export let thin = false;
   export let loading = false;
   export let href: string = null;
@@ -20,30 +54,30 @@
   export let as: 'button' | 'anchor' = href ? 'anchor' : 'button';
   export let icon: IconName = null;
   export let iconClass: string = null;
-  export let classes: string = $$props.class;
-  export let testId: string = $$props.testId;
   export let count = 0;
-  export let type = 'button';
   export let unround = false;
   export let unroundRight = false;
   export let unroundLeft = false;
+  export let noBorderRight = false;
+  export let noBorderLeft = false;
   export let id: string = null;
 </script>
 
 {#if as === 'button'}
   <button
     on:click|stopPropagation
-    class="button {variant} {classes}"
+    class="button {variant} {className}"
     class:selected={active}
     class:large
     class:thin
     class:unround
     class:unroundRight
     class:unroundLeft
-    data-testid={testId}
-    {type}
+    class:noBorderRight
+    class:noBorderLeft
     {disabled}
     {id}
+    {...$$restProps}
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>
@@ -62,14 +96,19 @@
   <a
     {href}
     on:click|stopPropagation
-    class="button {variant} {classes}"
+    class="button whitespace-nowrap {variant} {className}"
     class:selected={active}
     class:large
     class:disabled
     class:thin
-    data-testid={testId}
+    class:unround
+    class:unroundRight
+    class:unroundLeft
+    class:noBorderRight
+    class:noBorderLeft
     {target}
     {id}
+    {...$$restProps}
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>
@@ -82,14 +121,18 @@
 
 <style lang="postcss">
   .button {
-    @apply relative flex w-fit items-center justify-center gap-2 rounded font-secondary text-sm;
+    @apply relative flex w-fit items-center justify-center gap-2 rounded-lg font-secondary text-sm;
   }
 
   .primary,
   .secondary,
   .destructive,
   .login {
-    @apply border-2 py-2 px-4 transition-colors;
+    @apply border-2 py-2.5 px-4 transition-colors;
+  }
+
+  .search {
+    @apply border py-2.5 px-4 h-10 transition-colors;
   }
 
   .button:disabled {
@@ -114,11 +157,13 @@
     @apply text-white opacity-75 hover:from-primary hover:to-primary;
   }
 
-  .secondary {
+  .secondary,
+  .search {
     @apply border-gray-800 bg-white text-gray-800 hover:border-primary hover:bg-primary hover:text-white;
   }
 
-  .secondary:disabled {
+  .secondary:disabled,
+  .search:disabled {
     @apply opacity-75 hover:border-gray-800 hover:bg-white hover:text-gray-800;
   }
 
@@ -131,7 +176,15 @@
   }
 
   .link {
-    @apply border-0 bg-none p-0 font-primary text-sm underline shadow-none;
+    @apply border-0 bg-none p-0 font-primary text-sm text-blue-700 leading-5 font-semibold hover:underline shadow-none;
+  }
+
+  .ghost {
+    @apply bg-none py-2.5 px-4 font-primary border border-[transparent] text-sm text-gray-700 leading-5 font-medium hover:bg-gray-200 hover:border hover:border-indigo-600 focus:bg-gray-200 focus:border focus:border-indigo-600 hover:shadow-focus hover:shadow-blue-600/50;
+  }
+
+  .ghost:hover {
+    box-shadow: 0 0 0 4px #a4bcfd;
   }
 
   .selected {
@@ -156,5 +209,13 @@
 
   .unroundRight {
     @apply rounded-tr-none rounded-br-none;
+  }
+
+  .noBorderLeft {
+    @apply border-l-0;
+  }
+
+  .noBorderRight {
+    @apply border-r-0;
   }
 </style>

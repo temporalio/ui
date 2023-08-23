@@ -2,9 +2,9 @@
 
 import * as dateTz from 'date-fns-tz';
 
-import workflowCompletedFixture from '../fixtures/workflow-completed.json';
-import wtq from '../fixtures/worker-task-queues.json';
 import atq from '../fixtures/activity-task-queues.json';
+import wtq from '../fixtures/worker-task-queues.json';
+import workflowCompletedFixture from '../fixtures/workflow-completed.json';
 
 const { workflowId, runId } =
   workflowCompletedFixture.workflowExecutionInfo.execution;
@@ -13,7 +13,6 @@ const { name } = workflowCompletedFixture.executionConfig.taskQueue;
 describe('Workflow Workers', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -48,7 +47,6 @@ describe('Workflow Workers', () => {
 describe.skip('Navigate to Workflow Workers', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -112,7 +110,6 @@ describe.skip('Navigate to Workflow Workers', () => {
 describe('Workflow Workers - Workflow Worker Only', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -157,7 +154,6 @@ describe('Workflow Workers - Workflow Worker Only', () => {
 describe('Workflow Workers - Activity Worker Only', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +

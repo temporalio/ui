@@ -1,9 +1,11 @@
 import { parseISO } from 'date-fns';
 import { afterEach } from 'vitest';
 import { describe, expect, it, vi } from 'vitest';
+
 import {
-  toListWorkflowFilters,
   combineDropdownFilters,
+  combineFilters,
+  toListWorkflowFilters,
 } from './to-list-workflow-filters';
 
 const executionStatusQuery = 'ExecutionStatus="Completed"';
@@ -15,6 +17,8 @@ const workflowTypeQuery = 'WorkflowType="World"';
 const workflowQuery1 = 'WorkflowId="Hello" AND WorkflowType="World"';
 const startTimeQuery = 'StartTime > "2022-04-18T17:45:18-06:00"';
 const closeTimeQuery = 'CloseTime > "2022-04-18T17:45:18-06:00"';
+const betweenTimeQuery =
+  'StartTime BETWEEN "2023-07-28T00:00:00-00:00" AND "2023-07-28T06:00:00-00:00"';
 const workflowQuery2 =
   'WorkflowType="World" AND StartTime > "2022-04-18T17:45:18-06:00"';
 const workflowQuery3 =
@@ -141,7 +145,7 @@ describe('toListWorkflowParameters', () => {
         conditional: '>',
         operator: '',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-18T17:45:18-06:00',
       },
     ];
     expect(result).toEqual(expectedFilters);
@@ -158,11 +162,31 @@ describe('toListWorkflowParameters', () => {
         conditional: '>',
         operator: '',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-18T17:45:18-06:00',
       },
     ];
     expect(result).toEqual(expectedFilters);
   });
+
+  it('should parse a query BETWEEN two times', () => {
+    vi.useFakeTimers().setSystemTime(
+      parseISO('2022-04-20T17:45:18-06:00').getTime(),
+    );
+    const result = toListWorkflowFilters(betweenTimeQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'StartTime',
+        conditional: '',
+        operator: '',
+        parenthesis: '',
+        value:
+          'BETWEEN "2023-07-28T00:00:00-00:00" AND "2023-07-28T06:00:00-00:00"',
+        customDate: true,
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
   it('should parse a query with a workflowType and startTime', () => {
     vi.useFakeTimers().setSystemTime(
       parseISO('2022-04-20T17:45:18-06:00').getTime(),
@@ -181,7 +205,36 @@ describe('toListWorkflowParameters', () => {
         conditional: '>',
         operator: '',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-18T17:45:18-06:00',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
+  it('should parse a query with a workflowId and BETWEEN two times', () => {
+    vi.useFakeTimers().setSystemTime(
+      parseISO('2022-04-20T17:45:18-06:00').getTime(),
+    );
+    const result = toListWorkflowFilters(
+      `${workflowIdQuery} AND ${betweenTimeQuery}`,
+      attributes,
+    );
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'Hello',
+      },
+      {
+        attribute: 'StartTime',
+        conditional: '',
+        operator: '',
+        parenthesis: '',
+        value:
+          'BETWEEN "2023-07-28T00:00:00-00:00" AND "2023-07-28T06:00:00-00:00"',
+        customDate: true,
       },
     ];
     expect(result).toEqual(expectedFilters);
@@ -205,7 +258,7 @@ describe('toListWorkflowParameters', () => {
         conditional: '>',
         operator: 'AND',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-18T17:45:18-06:00',
       },
       {
         attribute: 'ExecutionStatus',
@@ -257,7 +310,7 @@ describe('toListWorkflowParameters', () => {
         conditional: '>',
         operator: '',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-18T17:45:18-06:00',
       },
     ];
     expect(result).toEqual(expectedFilters);
@@ -272,6 +325,40 @@ describe('toListWorkflowParameters', () => {
   it('should console error if given an invalid start time', () => {
     const spy = vi.spyOn(console, 'error');
     toListWorkflowFilters('StartTime = "bogus"', attributes);
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('should not throw if given an invalid time in a BETWEEN query', () => {
+    expect(() => {
+      toListWorkflowFilters(
+        'StartTime BETWEEN "bogus" AND "2023-07-28T06:00:00-00:00"',
+        attributes,
+      );
+    }).not.toThrow();
+
+    expect(() => {
+      toListWorkflowFilters(
+        'StartTime BETWEEN "2023-07-28T00:00:00-00:00" AND "bogus"',
+        attributes,
+      );
+    }).not.toThrow();
+  });
+
+  it('should console error if given an invalid start time in a BETWEEN query', () => {
+    const spy = vi.spyOn(console, 'error');
+    toListWorkflowFilters(
+      'StartTime BETWEEN "bogus" AND "2023-07-28T06:00:00-00:00"',
+      attributes,
+    );
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('should console error if given an invalid end time in a BETWEEN query', () => {
+    const spy = vi.spyOn(console, 'error');
+    toListWorkflowFilters(
+      'StartTime BETWEEN "2023-07-28T00:00:00-00:00" AND "bogus"',
+      attributes,
+    );
     expect(spy).toHaveBeenCalled();
   });
 });
@@ -327,7 +414,7 @@ describe('combineDropdownFilters', () => {
         conditional: '>',
         operator: '',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-20T17:45:18-06:00',
       },
     ];
 
@@ -345,7 +432,7 @@ describe('combineDropdownFilters', () => {
         conditional: '>',
         operator: '',
         parenthesis: '',
-        value: '2 days',
+        value: '2022-04-20T17:45:18-06:00',
       },
     ]);
   });
@@ -475,6 +562,309 @@ describe('combineDropdownFilters', () => {
         operator: '',
         parenthesis: '',
         value: 'World',
+      },
+    ]);
+  });
+});
+
+describe('combineFilters', () => {
+  it('should not add an AND operator if there is no previous filter', () => {
+    const filters = [
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ]);
+  });
+
+  it('should not add an AND operator if there is already an operator', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '',
+        value: 'Running',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Canceled',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '(',
+        value: 'Running',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: '',
+        parenthesis: ')',
+        value: 'Canceled',
+      },
+    ]);
+  });
+
+  it('should clear the filter operator if there is no following filter', () => {
+    const filters = [
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'World',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ]);
+  });
+
+  it('should combine two filters', () => {
+    const filters = [
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Hello',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'Hello',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ]);
+  });
+
+  it('should combine three filters', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Running',
+      },
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Hello',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'Running',
+      },
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'Hello',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ]);
+  });
+
+  it('should combine filters with an OR statement', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '',
+        value: 'Running',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '',
+        value: 'Canceled',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Failed',
+      },
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Hello',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '(',
+        value: 'Running',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '',
+        value: 'Canceled',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: ')',
+        value: 'Failed',
+      },
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'Hello',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ]);
+  });
+
+  it('should clear parenthesis for filters with an OR statement', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '',
+        value: 'Running',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: ')',
+        value: 'Canceled',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Failed',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '(',
+        value: 'Running',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '',
+        value: 'Canceled',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: '',
+        parenthesis: ')',
+        value: 'Failed',
       },
     ]);
   });

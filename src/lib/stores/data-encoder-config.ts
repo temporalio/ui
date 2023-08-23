@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+
 import { persistStore } from '$lib/stores/persist-store';
 import type { DataEncoderStatus } from '$lib/types/global';
 
@@ -12,6 +13,12 @@ export const passAccessToken = persistStore<boolean>(
 
 export const includeCredentials = persistStore<boolean>(
   'includeCredentials',
+  false,
+  true,
+);
+
+export const overrideRemoteCodecConfiguration = persistStore<boolean>(
+  'overrideRemoteCodecConfiguration',
   false,
   true,
 );

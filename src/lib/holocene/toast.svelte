@@ -1,13 +1,17 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
-  import type { ToastVariant } from '$lib/types/holocene';
+
   import { createEventDispatcher } from 'svelte';
+
+  import type { ToastVariant } from '$lib/types/holocene';
+
   import IconButton from './icon-button.svelte';
 
   const dispatch = createEventDispatcher<{ dismiss: { id: string } }>();
 
   export let id: string;
   export let variant: ToastVariant;
+  export let closeButtonLabel: string;
 
   const handleDismiss = () => {
     dispatch('dismiss', { id });
@@ -22,7 +26,7 @@
   <p class="font-secondary text-sm">
     <slot />
   </p>
-  <IconButton icon="close" on:click={handleDismiss} />
+  <IconButton label={closeButtonLabel} icon="close" on:click={handleDismiss} />
 </div>
 
 <style lang="postcss">

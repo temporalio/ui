@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+
 import type { Settings } from '$lib/types/global';
 
 export const settings = writable<Settings>({
@@ -19,6 +20,7 @@ export const settings = writable<Settings>({
   workflowCancelDisabled: false,
   workflowSignalDisabled: false,
   workflowResetDisabled: false,
+  hideWorkflowQueryErrors: false,
   showTemporalSystemNamespace: false,
   notifyOnNewVersion: false,
   feedbackURL: '',

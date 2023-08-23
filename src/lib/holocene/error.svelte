@@ -1,19 +1,20 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  import { beforeNavigate } from '$app/navigation';
   import { BROWSER } from 'esm-env';
+  import { createEventDispatcher } from 'svelte';
+  
+  import { afterNavigate } from '$app/navigation';
   import { page } from '$app/stores';
-
-  import { isNetworkError } from '$lib/utilities/is-network-error';
-  import type { NetworkError } from '$lib/types/global';
-
+  
   import Link from '$lib/holocene/link.svelte';
+  import type { NetworkError } from '$lib/types/global';
+  import { has } from '$lib/utilities/has';
+  
 
   export let error: App.Error | NetworkError = null;
   export let status = 500;
   let message = error?.message || '';
 
-  if (isNetworkError(error)) {
+  if (has(error, 'statusCode')) {
     status = error.statusCode;
   }
 
@@ -21,7 +22,7 @@
 
   $: currentLocation = $page.url.toString();
 
-  beforeNavigate(() => {
+  afterNavigate(() => {
     dispatch('clearError', {});
   });
 </script>

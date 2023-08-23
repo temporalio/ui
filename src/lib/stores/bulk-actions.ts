@@ -1,11 +1,11 @@
 import { derived } from 'svelte/store';
 
+import { bulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
 import { isVersionNewer } from '$lib/utilities/version-check';
 
-import { supportsAdvancedVisibility, isCloud } from './advanced-visibility';
-import { temporalVersion } from './versions';
+import { isCloud, supportsAdvancedVisibility } from './advanced-visibility';
 import { settings } from './settings';
-import { bulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
+import { temporalVersion } from './versions';
 
 export const supportsBulkActions = derived(
   [temporalVersion, supportsAdvancedVisibility, settings, isCloud],

@@ -1,11 +1,9 @@
 <script lang="ts">
   import Input from '$lib/holocene/input/input.svelte';
-  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-
-  import type { ScheduleOffsetUnit } from '$lib/types/schedule';
+  import Option from '$lib/holocene/select/option.svelte';
+  import Select from '$lib/holocene/select/select.svelte';
+  import { translate } from '$lib/i18n/translate';
+import type { ScheduleOffsetUnit } from '$lib/types/schedule';
 
   export let days = '';
   export let hour = '';
@@ -34,25 +32,24 @@
       }
     }
   }
-
-  const onPhaseClick = (unit: ScheduleOffsetUnit) => {
-    offsetUnit = unit;
-  };
 </script>
 
 <div class="my-2 flex flex-col gap-4">
-  <h3 class="text-lg font-medium">Recurring Time</h3>
+  <h3 class="text-lg font-medium">
+    {translate('schedules', 'interval-view-heading')}
+  </h3>
   <p>
-    Specify the time interval for this schedule to run (for example every 5
-    minutes).
+    {translate('schedules', 'interval-view-description')}
   </p>
   <div class="flex flex-row items-center gap-2">
     <div class="w-24">
       <Input
         id="days"
+        label={translate('days')}
+        labelHidden
         bind:value={days}
         placeholder="00"
-        suffix="days"
+        suffix={translate('days')}
         maxLength={3}
         error={error(days)}
       />
@@ -61,9 +58,11 @@
     <div class="w-24">
       <Input
         id="hour"
+        label={translate('hours-abbreviated')}
+        labelHidden
         bind:value={hour}
         placeholder="00"
-        suffix="hrs"
+        suffix={translate('hours-abbreviated')}
         maxLength={2}
         error={error(hour)}
       />
@@ -72,9 +71,11 @@
     <div class="w-24">
       <Input
         id="minute"
+        label={translate('minutes-abbreviated')}
+        labelHidden
         bind:value={minute}
         placeholder="00"
-        suffix="min"
+        suffix={translate('minutes-abbreviated')}
         maxLength={2}
         error={error(minute)}
       />
@@ -83,43 +84,43 @@
     <div class="w-24">
       <Input
         id="second"
+        label={translate('seconds-abbreviated')}
+        labelHidden
         bind:value={second}
         placeholder="00"
-        suffix="sec"
+        suffix={translate('seconds-abbreviated')}
         maxLength={2}
         error={error(second)}
       />
     </div>
   </div>
-  <h3 class="mt-4 text-lg font-medium">Offset</h3>
+  <h3 class="mt-4 text-lg font-medium">
+    {translate('schedules', 'offset-heading')}
+  </h3>
   <p>
-    Specify the time to offset when this schedule will run (for example 15 min
-    past the hour).
+    {translate('schedules', 'offset-description')}
   </p>
-  <div class="flex w-40 gap-0">
+  <div class="flex w-48 gap-0">
     <Input
       id="phase"
+      label={translate('schedules', 'offset-heading')}
+      labelHidden
       bind:value={offset}
       placeholder="00"
       error={error(phase)}
       unroundRight
-      class="h-10"
     />
-    <MenuContainer>
-      <MenuButton
-        hasIndicator
-        id="phase"
-        controls="phase-menu"
-        class="rounded-r bg-offWhite border border-primary border-l-0 h-10 w-16 px-2"
-      >
-        {offsetUnit}
-      </MenuButton>
-      <Menu id="phase-menu">
-        <MenuItem on:click={() => onPhaseClick('days')}>days</MenuItem>
-        <MenuItem on:click={() => onPhaseClick('hrs')}>hrs</MenuItem>
-        <MenuItem on:click={() => onPhaseClick('min')}>min</MenuItem>
-        <MenuItem on:click={() => onPhaseClick('sec')}>sec</MenuItem>
-      </Menu>
-    </MenuContainer>
+    <Select
+      label={translate('schedules', 'offset-unit')}
+      labelHidden
+      unroundLeft
+      id="phase-unit"
+      bind:value={offsetUnit}
+    >
+      <Option value="days">{translate('days')}</Option>
+      <Option value="hrs">{translate('hours-abbreviated')}</Option>
+      <Option value="min">{translate('minutes-abbreviated')}</Option>
+      <Option value="sec">{translate('seconds-abbreviated')}</Option>
+    </Select>
   </div>
 </div>

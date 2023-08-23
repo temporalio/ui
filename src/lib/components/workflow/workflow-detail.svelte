@@ -1,6 +1,7 @@
 <script lang="ts">
-  import Copyable from '$lib/components/copyable.svelte';
+  import Copyable from '$lib/holocene/copyable.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let title = '';
   export let content: string;
@@ -11,7 +12,13 @@
 
 <p class="flex items-center gap-2 text-{textSize} whitespace-nowrap pt-2">
   {#if copyable}
-    <Copyable {content} visible container-class="gap-1 w-full">
+    <Copyable
+      copyIconTitle={translate('copy-icon-title')}
+      copySuccessIconTitle={translate('copy-success-icon-title')}
+      {content}
+      visible
+      container-class="gap-1 w-full"
+    >
       {#if title}
         {title}:
       {/if}

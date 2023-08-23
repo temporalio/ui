@@ -1,8 +1,8 @@
-import type { TOptions } from 'i18next';
-import { page } from '$app/stores';
-import { get } from 'svelte/store';
-import { type I18nKey, type I18nNamespace, type I18nReplace, I18nMap } from '.';
+import { t, type TOptions } from 'i18next';
+
 import { isObject } from '$lib/utilities/is';
+
+import { type I18nKey, I18nMap, type I18nNamespace, type I18nReplace } from '.';
 
 // no namespace
 export function translate(key: I18nKey<'common'>): string;
@@ -43,26 +43,23 @@ export function translate<Namespace extends I18nNamespace>(
   replaceOrCount?: I18nReplace | number,
   replaceOrUndef?: I18nReplace,
 ): string {
-  const { t } = get(page).data.i18n();
-
   let namespace: Namespace;
-  let key: I18nKey<Namespace>;
+  let key: string;
   let count: number;
   let replace: I18nReplace;
 
-  if (namespaceOrKey in I18nMap) {
+  if (namespaceOrKey in I18nMap && typeof replaceCountOrKey === 'string') {
     namespace = namespaceOrKey as Namespace;
+    key = replaceCountOrKey;
   } else {
     namespace = 'common' as Namespace;
-    key = namespaceOrKey as I18nKey<Namespace>;
+    key = namespaceOrKey;
   }
 
   if (isObject(replaceCountOrKey)) {
     replace = replaceCountOrKey;
   } else if (typeof replaceCountOrKey === 'number') {
     count = replaceCountOrKey;
-  } else if (key === undefined) {
-    key = replaceCountOrKey;
   }
 
   if (typeof replaceOrCount === 'number') {
@@ -80,5 +77,5 @@ export function translate<Namespace extends I18nNamespace>(
     ...(replace && { replace }),
   };
 
-  return t(`${namespace}:${String(key)}`, options);
+  return t(`${namespace}:${key}`, options);
 }

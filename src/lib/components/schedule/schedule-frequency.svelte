@@ -1,7 +1,9 @@
 <script lang="ts">
-  import { intervalToComment } from '$lib/utilities/schedule-comment-formatting';
-  import type { IntervalSpec } from '$types';
   import type { StructuredCalendar } from '$lib/types/schedule';
+  import { intervalToComment } from '$lib/utilities/schedule-comment-formatting';
+  import { commentOrCalendarToFrequency } from '$lib/utilities/schedule-frequency-formatting';
+  
+  import type { IntervalSpec } from '$types';
 
   export let calendar: StructuredCalendar | undefined = undefined;
   export let interval: IntervalSpec | undefined = undefined;
@@ -13,7 +15,7 @@
 <div class="flex flex-col {$$props.class}">
   {#if calendar}
     <p data-testid="schedule-calendar-frequency">
-      {calendar?.comment ?? ''} UTC
+      {commentOrCalendarToFrequency(calendar)}
     </p>
   {:else}
     <p data-testid="schedule-interval-frequency">

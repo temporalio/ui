@@ -1,4 +1,5 @@
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
+
 import type { Replace, Settings } from './global';
 
 export type EventHistory = Replace<
@@ -219,6 +220,8 @@ export type ExternalWorkflowExecutionSignaledEvent =
   EventWithAttributes<'externalWorkflowExecutionSignaledEventAttributes'>;
 export type UpsertWorkflowSearchAttributesEvent =
   EventWithAttributes<'upsertWorkflowSearchAttributesEventAttributes'>;
+export type WorkflowExecutionUpdateCompletedEvent =
+  EventWithAttributes<'workflowExecutionUpdateCompletedEventAttributes'>;
 
 export type FailActivityTaskRequest =
   import('$lib/types').ActivityTaskFailedByIdRequest;

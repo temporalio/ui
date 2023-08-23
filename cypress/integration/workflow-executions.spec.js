@@ -18,7 +18,6 @@ const statuses = [
 describe('Workflow Executions List', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
     cy.visit('/namespaces/default/workflows');
 
     cy.wait('@workflows-api');
@@ -59,7 +58,8 @@ describe('Workflow Executions List', () => {
     for (const status of statuses) {
       it(`should redirect to the correct query params for ${status} workflows`, () => {
         cy.visit(`/namespaces/default/workflows`);
-        cy.get('#execution-status-filter').select(status).trigger('input');
+        cy.get('#execution-status-filter').select(status);
+        cy.get('#execution-status-filter').trigger('input');
         cy.url().should(
           'contain',
           encodeURIComponent(`ExecutionStatus="${status}"`),
@@ -99,7 +99,8 @@ describe('Workflow Executions List', () => {
           .find('option:selected')
           .should('have.value', 'null');
 
-        cy.get('#execution-status-filter').select('Running').trigger('input');
+        cy.get('#execution-status-filter').select('Running');
+        cy.get('#execution-status-filter').trigger('input');
         cy.url().should(
           'contain',
           encodeURIComponent(`ExecutionStatus="Running"`),

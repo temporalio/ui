@@ -1,6 +1,8 @@
+import { get, Writable, writable } from 'svelte/store';
+
 import { BROWSER } from 'esm-env';
+
 import { page } from '$app/stores';
-import { writable, get, Writable } from 'svelte/store';
 
 type SearchParameterValue = string | number | boolean | null;
 

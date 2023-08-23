@@ -1,23 +1,30 @@
-import { searchAttributes } from '$lib/stores/search-attributes';
+import type { SearchAttributesResponse } from '$lib/types/workflows';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-import type { Settings } from '$lib/types/global';
-import type { SearchAttributesResponse } from '$lib/types/workflows';
 
-export const fetchSearchAttributes = async (
-  settings: Settings,
+export const fetchSearchAttributesForNamespace = async (
+  namespace: string,
   request = fetch,
-): Promise<SearchAttributesResponse> => {
-  if (settings.runtimeEnvironment.isCloud) return;
-
-  const route = routeForApi('search-attributes');
-  return await requestFromAPI<SearchAttributesResponse>(route, {
-    request,
-  }).then((searchAttributesResponse) => {
-    if (searchAttributesResponse?.keys) {
-      searchAttributes.set(searchAttributesResponse.keys);
-    }
-
-    return searchAttributesResponse;
-  });
+): Promise<Omit<SearchAttributesResponse, 'storageSchema'>> => {
+  try {
+    const route = routeForApi('search-attributes', { namespace });
+    const searchAttributesResponse =
+      await requestFromAPI<SearchAttributesResponse>(route, {
+        request,
+      });
+    return {
+      customAttributes: searchAttributesResponse.customAttributes,
+      systemAttributes: searchAttributesResponse.systemAttributes,
+    };
+  } catch (e) {
+    console.error(
+      'Error fetching search attributes for namespace',
+      namespace,
+      e,
+    );
+    return {
+      customAttributes: {},
+      systemAttributes: {},
+    };
+  }
 };

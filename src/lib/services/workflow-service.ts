@@ -1,35 +1,36 @@
+import { noop } from 'svelte/internal';
+
 import { v4 } from 'uuid';
 
+import type { ResetReapplyType } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
-
-import { requestFromAPI } from '$lib/utilities/request-from-api';
-import { routeForApi } from '$lib/utilities/route-for-api';
-import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+import type { ResetWorkflowRequest } from '$lib/types';
+import type {
+  ValidWorkflowEndpoints,
+  ValidWorkflowParameters,
+} from '$lib/types/api';
+import type { NamespaceScopedRequest, Replace } from '$lib/types/global';
+import type {
+  ArchiveFilterParameters,
+  ListWorkflowExecutionsResponse,
+  WorkflowExecution,
+} from '$lib/types/workflows';
+import { btoa } from '$lib/utilities/btoa';
 import {
   handleUnauthorizedOrForbiddenError,
   isForbidden,
   isUnauthorized,
 } from '$lib/utilities/handle-error';
-import { noop } from 'svelte/internal';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-import { btoa } from '$lib/utilities/btoa';
-
-import type { ErrorCallback } from '$lib/utilities/request-from-api';
-import type { ResetReapplyType } from '$lib/models/workflow-actions';
-import type { ResetWorkflowRequest } from '$lib/types';
-import type { NamespaceScopedRequest, Replace } from '$lib/types/global';
-import type {
-  WorkflowExecution,
-  ListWorkflowExecutionsResponse,
-  ArchiveFilterParameters,
-} from '$lib/types/workflows';
-import type {
-  ValidWorkflowEndpoints,
-  ValidWorkflowParameters,
-} from '$lib/types/api';
+import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+import {
+  type ErrorCallback,
+  requestFromAPI,
+} from '$lib/utilities/request-from-api';
+import { base, pathForApi, routeForApi } from '$lib/utilities/route-for-api';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -113,7 +114,7 @@ export const fetchWorkflowCount = async (
         countPromise,
         totalCountPromise,
       ]);
-      count = parseInt(countResult?.count);
+      count = parseInt(countResult?.count ?? '0');
       totalCount = parseInt(totalCountResult?.count);
     }
   } catch (e) {
@@ -171,14 +172,20 @@ export const fetchAllWorkflows = async (
   };
 };
 
+type WorkflowForRunIdParams = {
+  namespace: string;
+  workflowId: string;
+  url?: string;
+};
+
 export const fetchWorkflowForRunId = async (
-  parameters: { namespace: string; workflowId: string },
+  { namespace, workflowId, url }: WorkflowForRunIdParams,
   request = fetch,
 ): Promise<{ runId: string }> => {
-  const { namespace, workflowId } = parameters;
   const endpoint: ValidWorkflowEndpoints = 'workflows';
-
-  const route = routeForApi(endpoint, { namespace });
+  const baseUrl = url ?? base(namespace);
+  const path = pathForApi(endpoint, { namespace });
+  const route = baseUrl + path;
   const { executions } = (await requestFromAPI<ListWorkflowExecutionsResponse>(
     route,
     {

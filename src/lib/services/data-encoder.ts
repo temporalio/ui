@@ -2,9 +2,9 @@ import {
   setLastDataEncoderFailure,
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
+import type { Settings } from '$lib/types/global';
 import { validateHttps } from '$lib/utilities/is-http';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-import type { Settings } from '$lib/types/global';
 
 type PotentialPayloads = { payloads: unknown[] };
 
@@ -21,6 +21,7 @@ export async function convertPayloadsWithCodec({
 }): Promise<PotentialPayloads> {
   const endpoint = settings?.codec?.endpoint;
   const passAccessToken = settings?.codec?.passAccessToken;
+  const includeCredentials = settings?.codec?.includeCredentials;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -36,7 +37,7 @@ export async function convertPayloadsWithCodec({
     }
   }
 
-  const requestOptions = settings?.codec?.includeCredentials
+  const requestOptions = includeCredentials
     ? {
         headers,
         credentials: 'include' as RequestCredentials,

@@ -1,22 +1,25 @@
 <script lang="ts">
-  import { omit } from '$lib/utilities/omit';
   import type { HTMLInputAttributes } from 'svelte/elements';
+  
+  import { omit } from '$lib/utilities/omit';
 
   interface $$Props extends HTMLInputAttributes {
     value: number;
     id: string;
-    label?: string;
+    label: string;
+    labelHidden?: boolean;
     min?: number;
     max?: number;
     'data-testid'?: string;
   }
 
-  export let label: string = undefined;
+  export let label: string;
+  export let labelHidden = false;
   export let min: number = undefined;
   export let max: number = undefined;
   export let id: string = undefined;
   export let value: number = Math.round((min + max) / 2);
-  let valid: boolean = true;
+  let valid = true;
   let outputElement: HTMLOutputElement;
 
   $: outputXPos = getOutputXPos({ value, min, max });
@@ -106,11 +109,9 @@
         step={$$props.step}
       />
     </div>
-    {#if label}
-      <label class="flex shrink text-sm" for={id}>
-        {label}
-      </label>
-    {/if}
+    <label class:sr-only={labelHidden} class="flex shrink text-sm" for={id}>
+      {label}
+    </label>
   </div>
 </div>
 

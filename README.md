@@ -6,8 +6,6 @@ Temporal must be running in development.
 
 Temporal UI requires [Temporal v1.16.0](https://github.com/temporalio/temporal/releases/tag/v1.16.0) or later.
 
-## Trying it out
-
 ### Using Temporal CLI
 
 You can install [Temporal CLI][] using [Homebrew][]:
@@ -27,19 +25,16 @@ You can access the UI by visiting `http://localhost:8233`. OpenAPI is accessible
 [temporal cli]: https://github.com/temporalio/cli
 [homebrew]: https://brew.sh
 
-### Using Docker
+## Development
 
-After pulling down the lastest version of Temporal's [`docker-compose`](https://github.com/temporalio/docker-compose), you can access the UI by visiting `http://localhost:8080`.
+### Local Development
 
-## Trying it out: Bleeding edge
-
-If you want to use the most recent commit to `main`, you can spin up a bleeding-edge build as described below.
+#### Setup
 
 Once you have the prerequisites going, run the following:
 
 ```bash
 pnpm install
-pnpm start
 ```
 
 Running `pnpm install` will attempt to download and install the most recent version of [Temporal CLI][] into `./bin/cli/temporal`. The development server will attempt to use use this version of this Temporal when starting up.
@@ -48,52 +43,78 @@ Running `pnpm install` will attempt to download and install the most recent vers
 - If you do not have a version of Temporal CLI at `./bin/cli/temporal`, the development server will look for a version of Temporal CLI in your path.
 - For Windows users, you will need to start Temporal using one of the methods listed above until we have sufficiently tested this functionality on Windows. (We would absolutely welcome a pull request.)
 
+```bash
+git submodule update
+```
+
+This clones the [Temporal API Protos](https://github.com/temporalio/api) into the git submodule, which is required for local development of the UI when running against a local version of the UI server.
+
+```bash
+cd server/
+make install-utils
+```
+
+This installs various Go dependencies which are required for compiling the gRPC protos for running a local version of the UI server.
+
+
+To run a local development version of the Svelte application via Vite, run `pnpm dev`. The application will run on [http://localhost:3000]() against a local ui-server running along with Temporal server from the temporal-cli.
+
+```bash
+pnpm dev
+```
+
+Alternatively, you can run `pnpm dev:temporal-cli` to run against the version of ui-server and Temporal server included temporal-cli.
+```bash
+pnpm dev:temporal-cli
+```
+
+### Building the UI
+
+The Temporal UI can be built for local preview. You must set the `VITE_TEMPORAL_UI_BUILD_TARGET` environment variable in order to build the assets. This will be set for you if you use either of the following `pnpm` scripts. The resulting assets will be placed in `./dist`.
+
+> You can preview the built app with `pnpm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+
+
+```bash
+pnpm build:local
+```
+
+
+The Temporal UI can build assets for ui-server. The resulting assets will be placed in `./server/ui/assets`.
+
+```bash
+pnpm build:server
+```
+
 ### Using Docker
 
-If you're running the development version of the UI and you want to point it at the `docker-compose` version of Temporal, you can run this command:
+After pulling down the lastest version of Temporal's [`docker-compose`](https://github.com/temporalio/docker-compose), you can access the UI by visiting `http://localhost:8080`.
 
+If you want to point the development environment at the `docker-compose` version of Temporal, you can use the following command:
+
+```bash
+pnpm dev:docker
 ```
+
+```bash
 pnpn run build:docker
 pnpn run preview:docker
 ```
 
-## Developing
+## Testing
+We use [Playwright](https://playwright.dev) to interactively test the Temporal UI.
 
-Developing the UI has the same prequisites as trying it out. Once you've created a project and installed dependencies with `pnpm install`, start the development server:
+### Running the E2E tests
+The e2e tests run against the UI with workflows via the [TypeScript SDK](https://github.com/temporalio/sdk-typescript), a locally built version of the UI Server, a NodeJS/Express Codec Server, and a Temporal dev server via [Temporal CLI](https://github.com/temporalio/cli)
 
-```bash
-pnpm start
-```
+`pnpm test:e2e`
 
-and open [`localhost:3000`](http://localhost:3000).
+### Running the Integration tests
+The integration tests run against the UI using Mocks
 
-By default, the application will start up with a version of the UI for the local version of Temporal. You can start the UI for Temporal Cloud by setting the `VITE_TEMPORAL_UI_BUILD_TARGET` target to `cloud`. Alternatively, you can use either of the following scripts:
+`pnpm test:integration`
 
-```bash
-pnpm run dev:local
-pnpm run dev:cloud
-```
-
-### Using Docker
-
-If you want to point the development environment at the `docker-compose` version of Temporal, you can use the following command:
-
-```
-pnpm run dev:docker
-```
-
-## Building
-
-The Temporal UI _must_ be built for either the local version or Temporal Cloud. You must set the `VITE_TEMPORAL_UI_BUILD_TARGET` environment variable in order to build the assets. This will be set for you if you use either of the following `pnpm` scripts.
-
-```bash
-pnpm run build:local
-pnpm run build:cloud
-```
-
-The resulting assets will be placed in `./build`.
-
-> You can preview the built app with `pnpm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+Both `pnpm test:e2e` and `pnpm test:integration` use the `playwright.config.ts` at the root of the repo. This file will [run the UI via the vite development server](https://playwright.dev/docs/api/class-testconfig#test-config-web-server) with the correct configuration by running either `pnpm serve:playwright:e2e` or `pnpm serve:playwright:integration`. It will also invoke the default function in `tests/globalSetup.ts`, which instantiates all of the necessary dependencies (UI Server, Codec Server, Temporal Server, Temporl Workers, etc.) when running in e2e mode.
 
 ## Configuration
 

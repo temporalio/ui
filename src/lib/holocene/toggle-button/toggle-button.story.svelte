@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
   import ToggleButton from './toggle-button.svelte';
   import ToggleButtons from './toggle-buttons.svelte';
   let tab = {
     a: 'auto',
-    b: 'auto',
+    b: 'feed',
   };
   export let Hst: HST;
 </script>
@@ -28,14 +29,28 @@
   <Hst.Variant title="A Toggle Button with Icons">
     <ToggleButtons>
       <ToggleButton
-        icon="workflow"
-        active={tab.b === 'auto'}
-        on:click={() => (tab.b = 'auto')}>Auto</ToggleButton
+        icon="feed"
+        active={tab.b === 'feed'}
+        data-testid="feed"
+        on:click={() => (tab.b = 'feed')}>History</ToggleButton
       >
       <ToggleButton
-        icon="calendar-plus"
-        active={tab.b === 'manual'}
-        on:click={() => (tab.b = 'manual')}>Manual</ToggleButton
+        icon="compact"
+        active={tab.b === 'compact'}
+        data-testid="compact"
+        on:click={() => (tab.b = 'compact')}>Compact</ToggleButton
+      >
+      <ToggleButton
+        icon="json"
+        active={tab.b === 'json'}
+        data-testid="json"
+        on:click={() => (tab.b = 'json')}>JSON</ToggleButton
+      >
+      <ToggleButton
+        icon="download"
+        data-testid="download"
+        active={tab.b === 'download'}
+        on:click={() => (tab.b = 'download')}>Download</ToggleButton
       >
     </ToggleButtons>
   </Hst.Variant>

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import eventsCompleted from '$fixtures/events.completed.json';
+
+import type {
+  EventType,
+  EventTypeCategory,
+  WorkflowEvents,
+} from '$lib/types/events';
+
 import {
   allEventTypeOptions,
   compactEventTypeOptions,
@@ -9,11 +15,8 @@ import {
   isCategoryType,
   timelineEventTypeOptions,
 } from './get-event-categorization';
-import type {
-  EventType,
-  EventTypeCategory,
-  WorkflowEvents,
-} from '$lib/types/events';
+
+import eventsCompleted from '$fixtures/events.completed.json';
 
 describe('Event Category Data Structures', () => {
   it('should match the eventTypeCategorizations to the last snapshot', () => {
@@ -54,13 +57,13 @@ describe('Event Category Data Structures', () => {
         "WorkflowExecutionStarted": "workflow",
         "WorkflowExecutionTerminated": "workflow",
         "WorkflowExecutionTimedOut": "workflow",
+        "WorkflowExecutionUpdateAccepted": "update",
+        "WorkflowExecutionUpdateCompleted": "update",
         "WorkflowTaskCompleted": "workflow",
         "WorkflowTaskFailed": "workflow",
         "WorkflowTaskScheduled": "workflow",
         "WorkflowTaskStarted": "workflow",
         "WorkflowTaskTimedOut": "workflow",
-        "WorkflowUpdateAccepted": "update",
-        "WorkflowUpdateCompleted": "update",
       }
     `);
   });
@@ -69,50 +72,50 @@ describe('Event Category Data Structures', () => {
     expect(allEventTypeOptions).toMatchInlineSnapshot(`
       [
         {
-          "label": "All",
+          "label": "category-all",
           "option": undefined,
         },
         {
           "color": "#8B5CF6",
-          "label": "Activity",
+          "label": "category-activity",
           "option": "activity",
         },
         {
           "color": "#F59E0B",
-          "label": "Child Workflow",
+          "label": "category-child-workflow",
           "option": "child-workflow",
         },
         {
           "color": "#10B981",
-          "label": "Command",
+          "label": "category-command",
           "option": "command",
         },
         {
-          "label": "Local Activity",
+          "label": "category-local-activity",
           "option": "local-activity",
         },
         {
           "color": "#EC4899",
-          "label": "Marker",
+          "label": "category-marker",
           "option": "marker",
         },
         {
           "color": "#DD6B20",
-          "label": "Signal",
+          "label": "category-signal",
           "option": "signal",
         },
         {
           "color": "#1D4ED8",
-          "label": "Timer",
+          "label": "category-timer",
           "option": "timer",
         },
         {
-          "label": "Update",
+          "label": "category-update",
           "option": "update",
         },
         {
           "color": "#10B981",
-          "label": "Workflow",
+          "label": "category-workflow",
           "option": "workflow",
         },
       ]
@@ -123,26 +126,26 @@ describe('Event Category Data Structures', () => {
     expect(compactEventTypeOptions).toMatchInlineSnapshot(`
       [
         {
-          "label": "All",
+          "label": "category-all",
           "option": undefined,
         },
         {
           "color": "#8B5CF6",
-          "label": "Activity",
+          "label": "category-activity",
           "option": "activity",
         },
         {
-          "label": "Local Activity",
+          "label": "category-local-activity",
           "option": "local-activity",
         },
         {
           "color": "#DD6B20",
-          "label": "Signal",
+          "label": "category-signal",
           "option": "signal",
         },
         {
           "color": "#1D4ED8",
-          "label": "Timer",
+          "label": "category-timer",
           "option": "timer",
         },
       ]
@@ -207,7 +210,10 @@ const categories: Record<
 
   command: ['UpsertWorkflowSearchAttributes'],
 
-  update: ['WorkflowUpdateAccepted', 'WorkflowUpdateCompleted'],
+  update: [
+    'WorkflowExecutionUpdateAccepted',
+    'WorkflowExecutionUpdateCompleted',
+  ],
 };
 
 describe('getEventCategory', () => {
@@ -293,40 +299,40 @@ describe('timelineEventTypeOptions', () => {
     expect(timelineEventTypeOptions).toEqual([
       {
         color: '#8B5CF6',
-        label: 'Activity',
+        label: 'category-activity',
         option: 'activity',
       },
       {
         color: '#F59E0B',
-        label: 'Child Workflow',
+        label: 'category-child-workflow',
         option: 'child-workflow',
       },
       {
         color: '#10B981',
-        label: 'Command',
+        label: 'category-command',
         option: 'command',
       },
       {
-        label: 'Local Activity',
+        label: 'category-local-activity',
         option: 'local-activity',
       },
       {
         color: '#EC4899',
-        label: 'Marker',
+        label: 'category-marker',
         option: 'marker',
       },
       {
         color: '#DD6B20',
-        label: 'Signal',
+        label: 'category-signal',
         option: 'signal',
       },
       {
         color: '#1D4ED8',
-        label: 'Timer',
+        label: 'category-timer',
         option: 'timer',
       },
       {
-        label: 'Update',
+        label: 'category-update',
         option: 'update',
       },
     ]);
