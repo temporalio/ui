@@ -27,15 +27,11 @@ test('it has the correct defaults for basic query filters', async ({
 }) => {
   await page.goto(workflowsUrl);
 
-  expect(await page.locator('#workflow-id-filter').inputValue()).toBe('');
-  expect(await page.locator('#workflow-type-filter').inputValue()).toBe('');
-  expect(await page.locator('#execution-status-filter').inputValue()).toBe(
-    'null',
-  );
-  expect(await page.locator('#time-range-filter').inputValue()).toBe('null');
-  expect(await page.locator('#filter-by-relative-time').inputValue()).toBe(
-    'UTC',
-  );
+  await expect(page.locator('#workflow-id-filter')).toHaveValue('');
+  await expect(page.locator('#workflow-type-filter')).toHaveValue('');
+  await expect(page.locator('#execution-status-filter')).toHaveValue('null');
+  await expect(page.locator('#time-range-filter')).toHaveValue('null');
+  await expect(page.locator('#filter-by-relative-time')).toHaveValue('UTC');
 });
 
 for (const [selector, parameter] of [

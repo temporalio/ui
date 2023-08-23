@@ -46,7 +46,7 @@
   :root {
     --animationRight: -500px;
 
-    @media (max-width: 768px) {
+    @media (width <= 768px) {
       --animationRight: -300px;
     }
 
