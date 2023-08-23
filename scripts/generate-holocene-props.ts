@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+
 import { svelte2tsx } from 'svelte2tsx';
 
 const holocenePath = new URL('../src/lib/holocene', import.meta.url).pathname;
