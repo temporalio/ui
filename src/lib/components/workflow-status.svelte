@@ -13,7 +13,7 @@
   export let delay = 0;
   export let status: Status = 'Running';
 
-  const humanFriendlyNames: Record<Status, string> = {
+  const label: Record<Status, string> = {
     Running: translate('workflows', 'running'),
     TimedOut: translate('workflows', 'timed-out'),
     Completed: translate('workflows', 'completed'),
@@ -47,7 +47,7 @@
 
 <div class="flex text-center text-sm font-medium leading-4">
   <span class={workflowStatus({ status })}>
-    {humanFriendlyNames[status]}
+    {label[status]}
     {#if status === 'Running'}
       <HeartBeat {delay} />
     {/if}
