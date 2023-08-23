@@ -12,9 +12,20 @@
   import Badge from '$lib/holocene/badge.svelte';
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
   import Copyable from '$lib/holocene/copyable.svelte';
-  import { refresh, workflowRun } from '$lib/stores/workflow-run';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
+  import TabList from '$lib/holocene/tab/tab-list.svelte';
+  import Tab from '$lib/holocene/tab/tab.svelte';
+  import Tabs from '$lib/holocene/tab/tabs.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { autoRefreshWorkflow } from '$lib/stores/event-view';
   import { eventHistory } from '$lib/stores/events';
-  
+  import { resetWorkflows } from '$lib/stores/reset-workflows';
+  import { refresh, workflowRun } from '$lib/stores/workflow-run';
+  import { workflowsSearchParams } from '$lib/stores/workflows';
+  import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
+  import { has } from '$lib/utilities/has';
+  import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForEventHistory,
     routeForPendingActivities,
@@ -23,19 +34,6 @@
     routeForWorkflowQuery,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
-  
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import Tab from '$lib/holocene/tab/tab.svelte';
-  import { pathMatches } from '$lib/utilities/path-matches';
-  import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
-  import { resetWorkflows } from '$lib/stores/reset-workflows';
-  import { has } from '$lib/utilities/has';
-  import Link from '$lib/holocene/link.svelte';
-  import Tabs from '$lib/holocene/tab/tabs.svelte';
-  import TabList from '$lib/holocene/tab/tab-list.svelte';
-  import { translate } from '$lib/i18n/translate';
-  import { autoRefreshWorkflow } from '$lib/stores/event-view';
-  import { workflowsSearchParams } from '$lib/stores/workflows';
   import {
     getCurrentCompatibilityDefaultVersion,
     getCurrentWorkflowBuildId,

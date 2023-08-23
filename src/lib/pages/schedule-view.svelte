@@ -5,12 +5,12 @@
   
   
   import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
   import ScheduleMemo from '$lib/components/schedule/schedule-memo.svelte';
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';

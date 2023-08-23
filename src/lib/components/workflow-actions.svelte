@@ -11,31 +11,28 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Action } from '$lib/models/workflow-actions';
+  import { ResetReapplyType } from '$lib/models/workflow-actions';
   import {
     resetWorkflow,
     signalWorkflow,
     terminateWorkflow,
   } from '$lib/services/workflow-service';
-  import { authUser } from '$lib/stores/auth-user';
-  
-  import { formatReason } from '$lib/utilities/workflow-actions';
-  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
-  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
-  import { ResetReapplyType } from '$lib/models/workflow-actions';
-  
-  import { refresh } from '$lib/stores/workflow-run';
-  import { settings } from '$lib/stores/settings';
-  import { coreUserStore } from '$lib/stores/core-user';
   import { cancelWorkflow } from '$lib/services/workflow-service';
-  import { toaster } from '$lib/stores/toaster';
-  
+  import { authUser } from '$lib/stores/auth-user';
+  import { coreUserStore } from '$lib/stores/core-user';
   import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
-  import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
-  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
-  import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
+  import { settings } from '$lib/stores/settings';
+  import { toaster } from '$lib/stores/toaster';
+  import { refresh } from '$lib/stores/workflow-run';
   import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { formatReason } from '$lib/utilities/workflow-actions';
+  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
+  import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
+  import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
+  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
+  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
