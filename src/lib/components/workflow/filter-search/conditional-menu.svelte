@@ -10,8 +10,6 @@
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
-  type T = $$Generic;
-
   const { filter, focusedElementId } =
     getContext<FilterContext>(FILTER_CONTEXT);
   const defaultConditionOptions = [

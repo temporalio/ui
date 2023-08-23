@@ -5,7 +5,7 @@
   export let closeButtonLabel: string;
 
   import { clickOutside } from '$lib/holocene/outside-click';
-  
+
   import IconButton from '../icon-button.svelte';
 </script>
 
@@ -45,35 +45,37 @@
 <style lang="postcss">
   :root {
     --animationRight: -500px;
+  }
 
-    @media (width <= 768px) {
+  @media (width <= 768px) {
+    :root {
       --animationRight: -300px;
     }
+  }
 
-    @keyframes flyin {
-      0% {
-        right: 0;
-        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%),
-          0 4px 6px -4px rgb(0 0 0 / 10%);
-      }
-
-      100% {
-        right: var(--animationRight);
-        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%);
-      }
+  @keyframes flyin {
+    0% {
+      right: 0;
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%),
+        0 4px 6px -4px rgb(0 0 0 / 10%);
     }
 
-    @keyframes flyout {
-      0% {
-        right: var(--animationRight);
-        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%);
-      }
+    100% {
+      right: var(--animationRight);
+      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%);
+    }
+  }
 
-      100% {
-        right: 0;
-        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%),
-          0 4px 6px -4px rgb(0 0 0 / 10%);
-      }
+  @keyframes flyout {
+    0% {
+      right: var(--animationRight);
+      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%);
+    }
+
+    100% {
+      right: 0;
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%),
+        0 4px 6px -4px rgb(0 0 0 / 10%);
     }
   }
 

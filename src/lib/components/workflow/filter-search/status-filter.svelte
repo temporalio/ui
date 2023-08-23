@@ -24,8 +24,6 @@
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
-  type T = $$Generic;
-
   const { filter, resetFilter } = getContext<FilterContext>(FILTER_CONTEXT);
   const open = writable(true);
   $: filters = [...$workflowFilters];

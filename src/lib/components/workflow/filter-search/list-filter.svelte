@@ -7,8 +7,6 @@
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
-  type T = $$Generic;
-
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
   let list: string[] = [];
