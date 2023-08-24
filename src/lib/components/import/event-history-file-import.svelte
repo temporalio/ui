@@ -64,11 +64,11 @@
   };
 </script>
 
-<label class="sr-only" for="file-import"
-  >{translate('events', 'event-history-file')}</label
->
+<label class="sr-only" for="import-event-history-file-upload">
+  {translate('events', 'import-event-history-file-upload')}
+</label>
 <input
-  id="file-import"
+  id="import-event-history-file-upload"
   class="import-input block rounded-md border border-gray-200 p-2"
   type="file"
   accept=".json"
