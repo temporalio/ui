@@ -70,14 +70,14 @@
   <p class="pb-2 text-right text-xs">
     {#if searchType === 'advanced'}
       <Link
-        href="{$page.url.pathname}?searchType=basic"
+        href="{$page.url.pathname}?search=basic"
         on:click={updateSearchType('basic')}
       >
         {translate('workflows', 'basic-search')}
       </Link>
     {:else}
       <Link
-        href="{$page.url.pathname}?searchType=advanced"
+        href="{$page.url.pathname}?search=advanced"
         on:click={updateSearchType('advanced')}
       >
         {translate('workflows', 'advanced-search')}
