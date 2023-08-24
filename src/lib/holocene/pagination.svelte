@@ -143,7 +143,7 @@
       style={floatStyle}
       bind:clientHeight={height}
       class="flex flex-col items-end gap-4 md:flex-row min-w-fit"
-      aria-label={$$restProps['aria-label']}
+      aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
       <div class="flex gap-4">
@@ -211,7 +211,7 @@
     class={`flex ${
       $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
     }`}
-    aria-label={$$restProps['aria-label']}
+    aria-label="{$$restProps['aria-label']} 2"
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">

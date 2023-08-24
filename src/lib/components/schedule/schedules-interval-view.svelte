@@ -3,7 +3,7 @@
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
-import type { ScheduleOffsetUnit } from '$lib/types/schedule';
+  import type { ScheduleOffsetUnit } from '$lib/types/schedule';
 
   export let days = '';
   export let hour = '';
@@ -57,7 +57,7 @@ import type { ScheduleOffsetUnit } from '$lib/types/schedule';
     <div>:</div>
     <div class="w-24">
       <Input
-        id="hour"
+        id="hour-interval"
         label={translate('hours-abbreviated')}
         labelHidden
         bind:value={hour}
@@ -70,7 +70,7 @@ import type { ScheduleOffsetUnit } from '$lib/types/schedule';
     <div>:</div>
     <div class="w-24">
       <Input
-        id="minute"
+        id="minute-interval"
         label={translate('minutes-abbreviated')}
         labelHidden
         bind:value={minute}
