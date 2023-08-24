@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -43,6 +42,8 @@
           content={codeBlockValue}
           class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
           {inline}
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
         />
       </div>
       {#if stackTrace && !inline}
@@ -52,6 +53,8 @@
             content={stackTrace}
             class="mb-2 h-full lg:pr-2"
             language="text"
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
           />
         </div>
       {/if}

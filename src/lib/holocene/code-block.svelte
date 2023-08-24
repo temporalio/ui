@@ -5,11 +5,30 @@
     parseWithBigInt,
     stringifyWithBigInt,
   } from '$lib/utilities/parse-with-big-int';
+  import type { HTMLAttributes } from 'svelte/elements';
+
+  type BaseProps = HTMLAttributes<HTMLDivElement> & {
+    content: Parameters<typeof JSON.stringify>[0];
+    inline?: boolean;
+    language?: string;
+    async?: boolean;
+    testId?: string;
+  };
+
+  type CopyableProps = BaseProps & {
+    copyable: boolean;
+    copyIconTitle: string;
+    copySuccessIconTitle: string;
+  };
+
+  type $$Props = BaseProps | CopyableProps;
 
   export let content: Parameters<typeof JSON.stringify>[0];
   export let inline = false;
   export let language = 'json';
   export let copyable = true;
+  export let copyIconTitle = '';
+  export let copySuccessIconTitle = '';
   export let async = true;
 
   let root: HTMLElement;
@@ -72,6 +91,7 @@
           class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
         >
           <Icon
+            title={$copied ? copySuccessIconTitle : copyIconTitle}
             name={$copied ? 'checkmark' : 'copy'}
             class="text-white hover:text-gray-900"
           />
