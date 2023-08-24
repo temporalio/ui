@@ -28,6 +28,7 @@
     as?: 'button' | 'anchor';
     href?: string;
     target?: '_self' | '_external';
+    type?: 'button' | 'submit' | 'reset';
     'data-testid'?: string;
   }
 </script>
@@ -61,6 +62,7 @@
   export let noBorderRight = false;
   export let noBorderLeft = false;
   export let id: string = null;
+  export let type: 'button' | 'submit' | 'reset' = 'button';
 </script>
 
 {#if as === 'button'}
@@ -77,6 +79,7 @@
     class:noBorderLeft
     {disabled}
     {id}
+    {type}
     {...$$restProps}
   >
     {#if icon || loading}
