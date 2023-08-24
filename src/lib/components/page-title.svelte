@@ -1,8 +1,8 @@
 <script>
-  import banner from '$lib/vendor/banner.png';
-  import manifest from '$lib/vendor/site.webmanifest';
-  import favicon from '$lib/vendor/favicon.ico';
   import apple from '$lib/vendor/apple-touch-icon.png';
+  import banner from '$lib/vendor/banner.png';
+  import favicon from '$lib/vendor/favicon.ico';
+  import manifest from '$lib/vendor/site.webmanifest';
 
   export let title = 'Temporal';
   export let url = 'https://temporal.io';

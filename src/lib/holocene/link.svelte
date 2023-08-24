@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLAnchorAttributes } from 'svelte/elements';
+
   import type { IconName } from '$lib/holocene/icon/paths';
+
   import Icon from './icon/icon.svelte';
 
   type $$Props = HTMLAnchorAttributes & {

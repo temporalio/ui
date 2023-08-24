@@ -2,7 +2,7 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   interface $$Props extends HTMLAttributes<HTMLTableRowElement> {
-    'data-testid'?: String;
+    'data-testid'?: string;
   }
 
   let className = '';

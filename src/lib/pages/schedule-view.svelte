@@ -1,39 +1,37 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+
+  import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
+  import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
+  import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
+  import ScheduleMemo from '$lib/components/schedule/schedule-memo.svelte';
+  import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
+  import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Link from '$lib/holocene/link.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
+  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
+  import SplitButton from '$lib/holocene/split-button.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import {
+    deleteSchedule,
+    fetchSchedule,
+    pauseSchedule,
+    unpauseSchedule,
+  } from '$lib/services/schedule-service';
+  import { coreUserStore } from '$lib/stores/core-user';
+  import { loading } from '$lib/stores/schedules';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+  import { formatDate } from '$lib/utilities/format-date';
   import {
     routeForScheduleEdit,
     routeForSchedules,
   } from '$lib/utilities/route-for';
-  import { goto } from '$app/navigation';
 
-  import {
-    fetchSchedule,
-    deleteSchedule,
-    pauseSchedule,
-    unpauseSchedule,
-  } from '$lib/services/schedule-service';
-  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-
-  import { formatDate } from '$lib/utilities/format-date';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import { loading } from '$lib/stores/schedules';
-
-  import ScheduleMemo from '$lib/components/schedule/schedule-memo.svelte';
-  import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
-  import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
-  import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
-  import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
-  import SplitButton from '$lib/holocene/split-button.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
   import type { DescribeScheduleResponse } from '$types';
-  import { coreUserStore } from '$lib/stores/core-user';
-  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
-  import { translate } from '$lib/i18n/translate';
-  import Link from '$lib/holocene/link.svelte';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;

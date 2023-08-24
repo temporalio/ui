@@ -1,17 +1,20 @@
 <script lang="ts">
   import VirtualList from '@sveltejs/svelte-virtual-list';
+  
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import type { DescribeNamespaceResponse as Namespace } from '$types';
-  import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { routeForWorkflows } from '$lib/utilities/route-for';
+  
+  import PageTitle from '$lib/components/page-title.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import PageTitle from '$lib/components/page-title.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { fetchWorkflowForAuthorization } from '$lib/services/workflow-service';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
-  import { translate } from '$lib/i18n/translate';
+  import { routeForWorkflows } from '$lib/utilities/route-for';
+  
+  import type { DescribeNamespaceResponse as Namespace } from '$types';
 
   $: namespaceNames = $namespaces.map(
     (namespace: Namespace) => namespace?.namespaceInfo?.name,
@@ -72,14 +75,14 @@
         <VirtualList items={filteredList} let:item itemHeight={50}>
           {@const first = item === filteredList[0]}
           {@const last = item === filteredList[filteredList.length - 1]}
-          <li class="link-item" class:first class:last>
+          <div class="link-item" class:first class:last>
             <button
               class="w-full p-3 text-left"
               on:click={() => item?.onClick(item.namespace)}
             >
               {item.namespace}
             </button>
-          </li>
+          </div>
         </VirtualList>
       {:else}
         <EmptyState title={translate('no-results')} />

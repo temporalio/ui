@@ -1,10 +1,12 @@
 <script lang="ts">
-  import type { IntervalSpec } from '$types';
-  import type { StructuredCalendar } from '$lib/types/schedule';
-
   import Panel from '$lib/components/panel.svelte';
-  import ScheduleFrequency from './schedule-frequency.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { StructuredCalendar } from '$lib/types/schedule';
+  
+  import ScheduleFrequency from './schedule-frequency.svelte';
+  
+  
+  import type { IntervalSpec } from '$types';
 
   export let calendar: StructuredCalendar | undefined = undefined;
   export let interval: IntervalSpec | undefined = undefined;

@@ -1,9 +1,10 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { attributeGroupingProperties } from '$lib/utilities/format-event-attributes';
-  import type { AttributeGrouping } from '$lib/utilities/format-event-attributes';
+  
   import Pill from '$lib/components/pill.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { AttributeGrouping } from '$lib/utilities/format-event-attributes';
+  import { attributeGroupingProperties } from '$lib/utilities/format-event-attributes';
 
   export let attributeGrouping: AttributeGrouping;
   export let activePill: string;

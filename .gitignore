@@ -22,3 +22,4 @@ server/ui/assets
 /playwright-report/
 /playwright/.cache/
 /dist
+/audits

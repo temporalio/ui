@@ -1,15 +1,15 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import {
-    selectedWorkflows,
-    allSelected,
-  } from '$lib/pages/workflows-with-new-search.svelte';
-  import type { WorkflowExecution } from '$lib/types/workflows';
-  import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import { translate } from '$lib/i18n/translate';
+  import {
+    allSelected,
+    selectedWorkflows,
+  } from '$lib/pages/workflows-with-new-search.svelte';
+  import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import type { WorkflowExecution } from '$lib/types/workflows';
 
   export let workflow: WorkflowExecution | undefined = undefined;
-  export let empty: boolean = false;
+  export let empty = false;
 
   $: label = translate('workflows', 'select-workflow', {
     workflow: workflow?.id,

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { routeForEventHistoryImport } from '$lib/utilities/route-for';
-  import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { translate } from '$lib/i18n/translate';
-
+  import HistoryImport from '$lib/components/import/event-history-file-import.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import HistoryImport from '$lib/components/import/event-history-file-import.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
+  import { routeForEventHistoryImport } from '$lib/utilities/route-for';
+  
 </script>
 
 <section id="event-history">

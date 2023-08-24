@@ -1,18 +1,17 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
 
   import {
-    MenuContainer,
-    MenuButton,
     Menu,
+    MenuButton,
+    MenuContainer,
     MenuItem,
   } from '$lib/holocene/menu';
 
-  type T = $$Generic;
+  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
   const { filter, focusedElementId } =
-    getContext<FilterContext<T>>(FILTER_CONTEXT);
+    getContext<FilterContext>(FILTER_CONTEXT);
   const defaultConditionOptions = [
     { value: '>' },
     { value: '>=' },

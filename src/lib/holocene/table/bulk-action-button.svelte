@@ -1,6 +1,6 @@
 <script lang="ts">
   export let testId: string = null;
-  export let disabled: boolean = false;
+  export let disabled = false;
   export let variant: 'primary' | 'destructive' = 'primary';
 </script>
 

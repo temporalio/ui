@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { isVersionNewer } from '$lib/utilities/version-check';
-  import type { BannersState } from '$lib/models/banner-state';
-  import Banner from './banner.svelte';
   import { translate } from '$lib/i18n/translate';
-
+  import type { BannersState } from '$lib/models/banner-state';
   import type { UiVersionInfo } from '$lib/types/global';
+  import { isVersionNewer } from '$lib/utilities/version-check';
+  
+  import Banner from './banner.svelte';
+  
 
   export let shownBanner: BannersState;
   export let uiVersionInfo: UiVersionInfo;

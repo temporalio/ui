@@ -1,22 +1,25 @@
 <script lang="ts">
-  import type { ScheduleActionResult, ScheduleListEntry } from '$types';
   import { page } from '$app/stores';
+  
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Link from '$lib/holocene/link.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import type {
+    FullScheduleSpec,
+    StructuredCalendar,
+  } from '$lib/types/schedule';
   import { formatDate } from '$lib/utilities/format-date';
   import {
     routeForEventHistory,
     routeForSchedule,
   } from '$lib/utilities/route-for';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Link from '$lib/holocene/link.svelte';
+  
   import ScheduleFrequency from './schedule-frequency.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
-
-  import type {
-    FullScheduleSpec,
-    StructuredCalendar,
-  } from '$lib/types/schedule';
-  import { translate } from '$lib/i18n/translate';
+  
+  
+  import type { ScheduleActionResult, ScheduleListEntry } from '$types';
 
   let { namespace } = $page.params;
 

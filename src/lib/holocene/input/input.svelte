@@ -1,10 +1,14 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import IconButton from '../icon-button.svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
+  
+  import { createEventDispatcher } from 'svelte';
+  
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  
+  import IconButton from '../icon-button.svelte';
+  
 
   type BaseProps = HTMLInputAttributes & {
     id: string;
@@ -54,9 +58,9 @@
   export let hintText = '';
   export let maxLength = 0;
   export let spellcheck: boolean = null;
-  export let unroundRight: boolean = false;
-  export let unroundLeft: boolean = false;
-  export let noBorder: boolean = false;
+  export let unroundRight = false;
+  export let unroundLeft = false;
+  export let noBorder = false;
   export let autoFocus = false;
   export let error = false;
   export let required = false;

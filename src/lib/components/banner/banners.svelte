@@ -1,9 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  
   import { BannersState } from '$lib/models/banner-state';
+  import type { UiVersionInfo } from '$lib/types/global';
+  
   import BannerTemporalVersion from './banner-temporal-version.svelte';
   import BannerUIVersion from './banner-ui-version.svelte';
-  import type { UiVersionInfo } from '$lib/types/global';
 
   export let uiVersionInfo: UiVersionInfo;
 

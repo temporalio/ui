@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import SchedulesCreate from '$lib/pages/schedules-create.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
+  import SchedulesCreate from '$lib/pages/schedules-create.svelte';
 
   const namespace = $page.params.namespace;
 </script>

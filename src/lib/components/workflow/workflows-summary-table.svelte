@@ -2,7 +2,7 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
 
-  export let updating: boolean = false;
+  export let updating = false;
 </script>
 
 <Table class="w-full md:table-fixed" {updating} data-testid="workflows-table">

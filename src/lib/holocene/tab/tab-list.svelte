@@ -7,7 +7,7 @@
   }
 
   export let label: string;
-  let className: string = '';
+  let className = '';
   export { className as class };
 </script>
 

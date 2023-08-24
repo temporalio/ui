@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { icons, type IconName } from './paths';
+  import { type IconName, icons } from './paths';
 
   export let name: IconName;
   export let width = 24;
