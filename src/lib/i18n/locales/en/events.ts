@@ -34,6 +34,7 @@ export const Strings = {
   'event-history-view': 'Event History View',
   'api-history-link': 'View in Github',
   'history-expected-formats': 'Expected JSON formats',
+  'event-history-file': 'Event History File',
   'event-history-import-error': 'Could not create event history from JSON',
   'event-history-load-error': 'Could not parse JSON',
 } as const;
