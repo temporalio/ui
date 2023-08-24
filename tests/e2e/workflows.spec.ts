@@ -26,27 +26,37 @@ test.describe('Workflows list', () => {
 
     toggle = page.getByRole('cell', { name: 'WorkflowExecutionStarted' });
     await toggle.click();
-    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
+    await expect(
+      region.getByText('"Mock decoded payload"').first(),
+    ).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'MarkerRecorded' }).first();
     await toggle.click();
-    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
+    await expect(
+      region.getByText('"Mock decoded payload"').first(),
+    ).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'ActivityTaskScheduled' }).first();
     await toggle.click();
-    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
+    await expect(
+      region.getByText('"Mock decoded payload"').first(),
+    ).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'ActivityTaskCompleted' }).first();
     await toggle.click();
-    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
+    await expect(
+      region.getByText('"Mock decoded payload"').first(),
+    ).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'WorkflowExecutionCompleted' });
     await toggle.click();
-    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
+    await expect(
+      region.getByText('"Mock decoded payload"').first(),
+    ).toBeVisible();
     await toggle.click();
   });
 
