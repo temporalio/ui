@@ -3,6 +3,7 @@
   import { translate } from '$lib/i18n/translate';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import type { BannersState } from '$lib/models/banner-state';
+  import Link from '$lib/holocene/link.svelte';
 
   export let key: string;
   export let severity: 'high' | 'medium' | 'low';
@@ -24,9 +25,9 @@
     class={`relative block text-center leading-10 ${severity}`}
     {...$$restProps}
   >
-    <a href={link} target="_blank" rel="noreferrer">
+    <Link href={link} newTab>
       {message}
-    </a>
+    </Link>
 
     <IconButton
       on:click={() => close(key)}

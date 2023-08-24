@@ -15,6 +15,7 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
 
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import Link from '$lib/holocene/link.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -45,7 +46,7 @@
   };
 </script>
 
-<TableRow {href} class="workflow-summary-row">
+<TableRow class="workflow-summary-row">
   <td>
     <WorkflowStatus
       status={workflow.status}
@@ -59,7 +60,9 @@
     on:mouseleave={() => (showFilterCopy = false)}
     on:blur={() => (showFilterCopy = false)}
   >
-    <span class="table-link">{workflow.id}</span>
+    <Link {href}>
+      {workflow.id}
+    </Link>
     <FilterOrCopyButtons
       copyIconTitle={translate('copy-icon-title')}
       copySuccessIconTitle={translate('copy-success-icon-title')}

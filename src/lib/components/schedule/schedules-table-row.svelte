@@ -44,12 +44,14 @@
   });
 </script>
 
-<TableRow href={route} class="schedule-row">
+<TableRow class="schedule-row">
   <td class="cell">
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </td>
   <td class="cell whitespace-pre-line break-words">
-    <p class="text-base">{schedule.scheduleId}</p>
+    <Link class="text-base" href={route}>
+      {schedule.scheduleId}
+    </Link>
     <p>
       <ScheduleFrequency {calendar} {interval} class="text-sm" />
     </p>

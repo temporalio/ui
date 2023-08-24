@@ -17,7 +17,7 @@
         top
         text={'Tooltip text goes here.'}
       >
-        <Button as="anchor" href={'#'}>Hover Here</Button>
+        <Button>Hover Here</Button>
       </Tooltip>
     </div>
   </Hst.Variant>
@@ -29,7 +29,7 @@
         width={100}
         text={'Really really really really really long tooltip text goes here.'}
       >
-        <Button as="anchor" href={'#'}>Hover Here</Button>
+        <Button>Hover Here</Button>
       </Tooltip>
     </div>
   </Hst.Variant>
@@ -37,7 +37,7 @@
   <Hst.Variant title="A tooltip with attribute top">
     <div class="center">
       <Tooltip top text={'Tooltip text goes here.'}>
-        <Button as="anchor" href={'#'}>Hover Here</Button>
+        <Button>Hover Here</Button>
       </Tooltip>
     </div>
   </Hst.Variant>
@@ -45,7 +45,7 @@
   <Hst.Variant title="A tooltip with attribute topRight">
     <div class="center">
       <Tooltip topRight text={'Tooltip text goes here.'}>
-        <Button as="anchor" href={'#'}>Hover Here</Button>
+        <Button>Hover Here</Button>
       </Tooltip>
     </div>
   </Hst.Variant>
@@ -53,7 +53,7 @@
   <Hst.Variant title="A tooltip with attribute topLeft">
     <div class="center">
       <Tooltip topLeft text={'Tooltip text goes here.'}>
-        <Button as="anchor" href={'#'}>Hover Here</Button>
+        <Button>Hover Here</Button>
       </Tooltip>
     </div>
   </Hst.Variant>
@@ -61,7 +61,7 @@
   <Hst.Variant title="A tooltip with attribute right">
     <div class="center">
       <Tooltip right text={'Tooltip text goes here.'}>
-        <Button as="anchor" href={'#'}>Hover Here</Button>
+        <Button>Hover Here</Button>
       </Tooltip>
     </div>
   </Hst.Variant>
@@ -69,7 +69,7 @@
   <Hst.Variant title="A tooltip with attribute bottom">
     <div class="center">
       <Tooltip bottom text={'Tooltip text goes here.'}>
-        <Button as="anchor" href={'#'}>Hover Here</Button>
+        <Button>Hover Here</Button>
       </Tooltip>
     </div>
   </Hst.Variant>
@@ -77,7 +77,7 @@
   <Hst.Variant title="A tooltip with attribute bottomLeft">
     <div class="center">
       <Tooltip bottomLeft text={'Tooltip text goes here.'}>
-        <Button as="anchor" href={'#'}>Hover Here</Button>
+        <Button>Hover Here</Button>
       </Tooltip>
     </div>
   </Hst.Variant>
@@ -85,7 +85,7 @@
   <Hst.Variant title="A tooltip with attribute bottomRight">
     <div class="center">
       <Tooltip bottomRight text={'Tooltip text goes here.'}>
-        <Button as="anchor" href={'#'}>Hover Here</Button>
+        <Button>Hover Here</Button>
       </Tooltip>
     </div>
   </Hst.Variant>
@@ -93,7 +93,7 @@
   <Hst.Variant title="A tooltip with attribute left">
     <div class="center">
       <Tooltip left text={'Tooltip text goes here.'}>
-        <Button as="anchor" href={'#'}>Hover Here</Button>
+        <Button>Hover Here</Button>
       </Tooltip>
     </div>
   </Hst.Variant>

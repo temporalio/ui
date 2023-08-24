@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     type TextFilterAttributes,
@@ -45,7 +46,7 @@
   };
 </script>
 
-<a {href} class="table-link">{value}</a>
+<Link {href}>{value}</Link>
 <FilterOrCopyButtons
   copyIconTitle={translate('copy-icon-title')}
   copySuccessIconTitle={translate('copy-success-icon-title')}

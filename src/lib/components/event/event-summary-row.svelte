@@ -22,6 +22,7 @@
   import { noop } from 'svelte/internal';
   import { isEventGroup } from '$lib/models/event-groups';
   import type { IterableEvent } from '$lib/types/events';
+  import Link from '$lib/holocene/link.svelte';
 
   export let event: IterableEvent;
   export let initialItem: IterableEvent | undefined;
@@ -85,9 +86,7 @@
 >
   <td />
   <td class="w-24 text-left">
-    <a class="text-sm text-gray-500 md:text-base" href="#{event.id}"
-      ><p class="truncate">{event.id}</p></a
-    >
+    <Link class="truncate" href="#{event.id}">{event.id}</Link>
   </td>
   <td class="text-left">
     <div class="flex flex-col gap-0">

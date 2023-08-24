@@ -133,4 +133,5 @@ export const Strings = {
   timezone: 'Timezone {{ timezone }}',
   'time-unit': 'Time Unit',
   'based-on-time-preface': 'Based on',
+  'download-json': 'Download JSON',
 } as const;

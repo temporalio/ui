@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
   import { logEvent } from 'histoire/client';
-  
+
   import Button from './button.svelte';
 
   let disabled = false;
@@ -47,12 +47,6 @@
       bind:disabled
       variant="login">Login</Button
     >
-  </Hst.Variant>
-  <Hst.Variant title="Link">
-    <Button variant="link">A Link</Button>
-  </Hst.Variant>
-  <Hst.Variant title="Anchor">
-    <Button href="https://temporal.io">An Anchor</Button>
   </Hst.Variant>
   <Hst.Variant title="Icon">
     <Button icon="retry">Retry</Button>

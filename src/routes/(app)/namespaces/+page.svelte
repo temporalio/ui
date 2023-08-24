@@ -9,6 +9,7 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import { translate } from '$lib/i18n/translate';
+  import Link from '$lib/holocene/link.svelte';
 </script>
 
 <PageTitle title="Namespaces" url={$page.url.href} />
@@ -33,12 +34,10 @@
       {#each visibleItems as namespace}
         <TableRow>
           <td>
-            <a
+            <Link
               href={routeForNamespace({
                 namespace: namespace.namespaceInfo.name,
-              })}
-              class="hover:text-blue-700 hover:underline hover:decoration-blue-700"
-              >{namespace.namespaceInfo.name}</a
+              })}>{namespace.namespaceInfo.name}</Link
             >
           </td>
         </TableRow>

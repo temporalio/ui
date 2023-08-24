@@ -86,6 +86,8 @@
   import { searchAttributes } from '$lib/stores/search-attributes';
   import Button from '$lib/holocene/button.svelte';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
+  import Link from '$lib/holocene/link.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);
@@ -252,13 +254,13 @@
             />
           {/if}
         </p>
-        <div class="h-1 w-1 rounded-full bg-gray-400" />
       {/if}
-      <Button
-        variant="link"
-        disabled={$loading || $updating || $workflows.length === 0}
-        on:click={() => exportWorkflows($workflows)}>Download JSON</Button
-      >
+      {#if !$loading && !$updating && $workflows.length > 0}
+        <div class="h-1 w-1 rounded-full bg-gray-400" />
+        <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
+          >{translate('download-json')}</Link
+        >
+      {/if}
     </div>
   </div>
   <div>

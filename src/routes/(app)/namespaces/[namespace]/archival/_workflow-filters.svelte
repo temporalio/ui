@@ -11,6 +11,7 @@
 
   import { timeFormat } from '$lib/stores/time-format';
   import { translate } from '$lib/i18n/translate';
+  import Link from '$lib/holocene/icon/svg/link.svelte';
 
   const statuses = {
     All: { value: null, label: translate('workflows', 'all-statuses') },
@@ -65,21 +66,13 @@
 <section class="flex flex-col gap-2">
   <p class="text-right text-xs">
     {#if isAdvancedQuery}
-      <a
-        href={$page.url.pathname}
-        class="text-blue-700"
-        on:click|preventDefault={handleToggle('basic')}
-      >
+      <Link href={$page.url.pathname} on:click={handleToggle('basic')}>
         {translate('workflows', 'basic-search')}
-      </a>
+      </Link>
     {:else}
-      <a
-        href="{$page.url.pathname}?query"
-        class="text-blue-700"
-        on:click|preventDefault={handleToggle('advanced')}
-      >
+      <Link class="text-blue-700" on:click={handleToggle('advanced')}>
         {translate('workflows', 'advanced-search')}
-      </a>
+      </Link>
     {/if}
   </p>
 

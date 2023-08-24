@@ -5,9 +5,7 @@
     | 'search'
     | 'destructive'
     | 'login'
-    | 'ghost'
-    | 'link'
-    | 'menu';
+    | 'ghost';
 
   export interface ButtonProps extends HTMLButtonAttributes {
     variant?: ButtonVariant;
@@ -25,9 +23,6 @@
     unroundLeft?: boolean;
     noBorderRight?: boolean;
     noBorderLeft?: boolean;
-    as?: 'button' | 'anchor';
-    href?: string;
-    target?: '_self' | '_external';
     'data-testid'?: string;
   }
 </script>
@@ -47,11 +42,8 @@
   export let variant: ButtonVariant = 'primary';
   export let thin = false;
   export let loading = false;
-  export let href: string = null;
-  export let target: '_self' | '_external' = '_self';
   export let active = false;
   export let large = false;
-  export let as: 'button' | 'anchor' = href ? 'anchor' : 'button';
   export let icon: IconName = null;
   export let iconClass: string = null;
   export let count = 0;
@@ -63,56 +55,34 @@
   export let id: string = null;
 </script>
 
-{#if as === 'button'}
-  <button
-    on:click|stopPropagation
-    class="button {variant} {className}"
-    class:selected={active}
-    class:large
-    class:thin
-    class:unround
-    class:unroundRight
-    class:unroundLeft
-    class:noBorderRight
-    class:noBorderLeft
-    {disabled}
-    {id}
-    {...$$restProps}
-  >
-    {#if icon || loading}
-      <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : icon} class={iconClass} />
-      </span>
-    {/if}
-    <slot />
-    {#if count > 0}
-      <Badge
-        class="badge absolute top-0 right-0 origin-bottom-left translate-y-[-10px] translate-x-[10px]"
-        type="count">{count}</Badge
-      >
-    {/if}
-  </button>
-{:else}
-  <a
-    {href}
-    on:click|stopPropagation
-    class="button {variant} {className}"
-    class:selected={active}
-    class:large
-    class:disabled
-    class:thin
-    {target}
-    {id}
-    {...$$restProps}
-  >
-    {#if icon || loading}
-      <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : icon} />
-      </span>
-    {/if}
-    <slot />
-  </a>
-{/if}
+<button
+  on:click|stopPropagation
+  class="button {variant} {className}"
+  class:selected={active}
+  class:large
+  class:thin
+  class:unround
+  class:unroundRight
+  class:unroundLeft
+  class:noBorderRight
+  class:noBorderLeft
+  {disabled}
+  {id}
+  {...$$restProps}
+>
+  {#if icon || loading}
+    <span class:animate-spin={loading}>
+      <Icon name={loading ? 'spinner' : icon} class={iconClass} />
+    </span>
+  {/if}
+  <slot />
+  {#if count > 0}
+    <Badge
+      class="badge absolute top-0 right-0 origin-bottom-left translate-y-[-10px] translate-x-[10px]"
+      type="count">{count}</Badge
+    >
+  {/if}
+</button>
 
 <style lang="postcss">
   .button {
@@ -132,10 +102,6 @@
 
   .button:disabled {
     @apply cursor-not-allowed;
-  }
-
-  a.disabled {
-    @apply pointer-events-none opacity-75 hover:border-gray-800 hover:bg-white hover:text-gray-800;
   }
 
   .large {
@@ -168,10 +134,6 @@
 
   .destructive:disabled {
     @apply opacity-50 hover:border-danger hover:bg-danger;
-  }
-
-  .link {
-    @apply border-0 bg-none p-0 font-primary text-sm text-blue-700 leading-5 font-semibold hover:underline shadow-none;
   }
 
   .ghost {

@@ -33,6 +33,7 @@
   import { coreUserStore } from '$lib/stores/core-user';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import { translate } from '$lib/i18n/translate';
+  import Link from '$lib/holocene/link.svelte';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -101,16 +102,9 @@
   {:else}
     <header class="flex flex-row justify-between gap-4 mb-8">
       <div class="flex flex-col gap-1 relative">
-        <a
-          href={routeForSchedules({ namespace })}
-          class="absolute top-0 back-to-schedules"
-          style="left: -0.5rem;"
-        >
-          <Icon name="chevron-left" class="inline" />{translate(
-            'schedules',
-            'back-to-schedules',
-          )}
-        </a>
+        <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+          {translate('schedules', 'back-to-schedules')}
+        </Link>
         <div class="flex justify-between items-center mt-8">
           <h1 class="text-2xl flex relative items-center gap-4">
             <WorkflowStatus
@@ -275,13 +269,3 @@
 {:catch error}
   <ScheduleError error={error?.message} />
 {/await}
-
-<style lang="postcss">
-  .back-to-schedules {
-    @apply text-sm;
-  }
-
-  .back-to-schedules:hover {
-    @apply text-blue-700 underline;
-  }
-</style>

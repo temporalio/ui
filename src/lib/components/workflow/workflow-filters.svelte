@@ -15,6 +15,7 @@
   import Search from '$lib/components/search.svelte';
   import { createEventDispatcher } from 'svelte';
   import { translate } from '$lib/i18n/translate';
+  import Link from '$lib/holocene/link.svelte';
   const dispatch = createEventDispatcher<{ search: undefined }>();
 
   export let searchType: 'basic' | 'advanced';
@@ -37,12 +38,6 @@
   const updateSearchType =
     (newSearchType: 'basic' | 'advanced') => (): void => {
       searchType = newSearchType;
-
-      updateQueryParameters({
-        parameter: 'search',
-        value: searchType,
-        url: $page.url,
-      });
     };
 
   const updateQuery = (event: SubmitEvent): void => {
@@ -74,21 +69,19 @@
 <div class="flex flex-col">
   <p class="pb-2 text-right text-xs">
     {#if searchType === 'advanced'}
-      <a
+      <Link
         href="{$page.url.pathname}?searchType=basic"
-        class="text-blue-700"
-        on:click|preventDefault={updateSearchType('basic')}
+        on:click={updateSearchType('basic')}
       >
         {translate('workflows', 'basic-search')}
-      </a>
+      </Link>
     {:else}
-      <a
+      <Link
         href="{$page.url.pathname}?searchType=advanced"
-        class="text-blue-700"
-        on:click|preventDefault={updateSearchType('advanced')}
+        on:click={updateSearchType('advanced')}
       >
         {translate('workflows', 'advanced-search')}
-      </a>
+      </Link>
     {/if}
   </p>
 

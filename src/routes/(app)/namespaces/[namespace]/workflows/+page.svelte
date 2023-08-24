@@ -13,7 +13,8 @@
   url={$page.url.href}
 />
 
-<AdvancedVisibilityGuard>
+<!-- <AdvancedVisibilityGuard>
   <WorkflowsWithNewSearch />
   <Workflows slot="fallback" />
-</AdvancedVisibilityGuard>
+</AdvancedVisibilityGuard> -->
+<Workflows />

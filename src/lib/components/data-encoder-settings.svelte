@@ -16,6 +16,7 @@
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
   import Accordion from '$lib/holocene/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
   import DataConverterPortSettings from './data-converter-port-settings.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -87,12 +88,9 @@
         </h3>
       </div>
       <p class="text-sm">
-        {translate('data-encoder', 'codec-server-description-prefix')}<a
-          rel="noreferrer"
-          target="_blank"
+        {translate('data-encoder', 'codec-server-description-prefix')}<Link
           href="https://docs.temporal.io/dataconversion#codec-server"
-          class="text-blue-700 underline decoration-blue-700"
-          >{translate('codec-server')}</a
+          newTab>{translate('codec-server')}</Link
         >
         {translate('data-encoder', 'codec-server-description-suffix', {
           level: namespaceOrCluster,
