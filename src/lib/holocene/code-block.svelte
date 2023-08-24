@@ -1,11 +1,12 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import {
     parseWithBigInt,
     stringifyWithBigInt,
   } from '$lib/utilities/parse-with-big-int';
-  import type { HTMLAttributes } from 'svelte/elements';
 
   type BaseProps = HTMLAttributes<HTMLDivElement> & {
     content: Parameters<typeof JSON.stringify>[0];
