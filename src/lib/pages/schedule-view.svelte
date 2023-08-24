@@ -1,9 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  
-  
-  
+
   import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
@@ -32,7 +30,7 @@
     routeForScheduleEdit,
     routeForSchedules,
   } from '$lib/utilities/route-for';
-  
+
   import type { DescribeScheduleResponse } from '$types';
 
   let namespace = $page.params.namespace;
@@ -95,6 +93,29 @@
 </script>
 
 {#await scheduleFetch}
+  <header class="mb-8">
+    <div class="flex flex-col gap-1 relative">
+      <a
+        href={routeForSchedules({ namespace })}
+        class="absolute top-0 back-to-schedules"
+        style="left: -0.5rem;"
+      >
+        <Icon name="chevron-left" class="inline" />{translate(
+          'schedules',
+          'back-to-schedules',
+        )}
+      </a>
+      <h1
+        class="text-2xl mt-8 font-medium select-all"
+        data-testid="schedule-name"
+      >
+        {scheduleId}
+      </h1>
+      <p class="text-sm">
+        {namespace}
+      </p>
+    </div>
+  </header>
   <Loading />
 {:then schedule}
   {#if $loading}
@@ -112,16 +133,14 @@
             'back-to-schedules',
           )}
         </a>
-        <div class="flex justify-between items-center mt-8">
-          <h1 class="text-2xl flex relative items-center gap-4">
-            <WorkflowStatus
-              status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
-            />
-            <p class="font-medium select-all" data-testid="schedule-name">
-              {scheduleId}
-            </p>
-          </h1>
-        </div>
+        <h1 class="text-2xl flex relative items-center gap-4 mt-8">
+          <WorkflowStatus
+            status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
+          />
+          <span class="font-medium select-all" data-testid="schedule-name">
+            {scheduleId}
+          </span>
+        </h1>
         <div class="flex items-center gap-2 text-sm">
           <p>
             {namespace}
@@ -274,6 +293,29 @@
     </Modal>
   {/if}
 {:catch error}
+  <header class="mb-8">
+    <div class="flex flex-col gap-1 relative">
+      <a
+        href={routeForSchedules({ namespace })}
+        class="absolute top-0 back-to-schedules"
+        style="left: -0.5rem;"
+      >
+        <Icon name="chevron-left" class="inline" />{translate(
+          'schedules',
+          'back-to-schedules',
+        )}
+      </a>
+      <h1
+        class="text-2xl mt-8 font-medium select-all"
+        data-testid="schedule-name"
+      >
+        {scheduleId}
+      </h1>
+      <p class="text-sm">
+        {namespace}
+      </p>
+    </div>
+  </header>
   <ScheduleError error={error?.message} />
 {/await}
 
