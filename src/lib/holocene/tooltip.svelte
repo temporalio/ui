@@ -104,6 +104,8 @@
             {copyIconTitle}
             clickAllToCopy
             content={text}
+            container-class="text-white"
+            visible
           >
             <span class="text-gray-100"
               >{#if icon}<Icon
