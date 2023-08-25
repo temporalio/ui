@@ -57,6 +57,7 @@
 
 <button
   on:click|stopPropagation
+  type="button"
   class="button {variant} {className}"
   class:selected={active}
   class:large
