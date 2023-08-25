@@ -182,13 +182,13 @@
         bind:phase
         bind:cronString
       >
-        <div class="mt-8 flex items-center gap-8">
+        <div class="mt-8 flex items-center gap-2">
           <Button
             disabled={isDisabled(preset)}
             on:click={() => handleConfirm(preset, schedule)}
             >{confirmText}</Button
           >
-          <Link href={backHref}>{translate('cancel')}</Link>
+          <Button variant="ghost" href={backHref}>{translate('cancel')}</Button>
         </div>
       </SchedulesCalendarView>
     </form>

@@ -153,14 +153,12 @@
       <DataConverterPortSettings bind:port />
       <div class="flex items-center gap-4">
         <Button
-          thin
           disabled={Boolean(error) || (override && !endpoint)}
           data-testid="confirm-data-encoder-button"
           on:click={onConfirm}
           type="submit">{translate('apply')}</Button
         >
         <Button
-          thin
           variant="ghost"
           data-testid="cancel-data-encoder-button"
           on:click={onCancel}>{translate('cancel')}</Button

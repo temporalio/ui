@@ -9,8 +9,7 @@
   <slot />
   <div class="back-to-top" class:hidden>
     <Button
-      class="!py-1.5 !px-1"
-      icon="arrow-up"
+      leadingIcon="arrow-up"
       variant="secondary"
       on:click={onScrollToTopClick}
     />

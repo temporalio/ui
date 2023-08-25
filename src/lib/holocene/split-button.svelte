@@ -8,9 +8,8 @@
   export let menuLabel: string;
   export let icon: IconName | undefined = undefined;
   export let id: string;
-  export let variant: 'primary' | 'secondary' | 'destructive' | 'login' =
+  export let variant: 'primary' | 'secondary' | 'destructive' | 'ghost' =
     'primary';
-  export let thin = false;
   export let disabled = false;
   export let position: 'left' | 'right' = 'left';
   export let primaryActionDisabled = false;
@@ -20,8 +19,7 @@
   <div class="split-button">
     <Button
       {variant}
-      {thin}
-      unroundRight
+      borderRadiusModifier="square-right"
       disabled={disabled || primaryActionDisabled}
       id="{id}-primary-button"
       on:click

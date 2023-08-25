@@ -33,7 +33,7 @@
 
 <style lang="postcss">
   .chip {
-    @apply flex w-fit min-w-fit h-fit flex-row items-center justify-between break-all whitespace-nowrap rounded-md border border-gray-300 bg-gray-50 p-1 text-sm gap-1 text-gray-700;
+    @apply flex w-fit min-w-fit h-8 flex-row items-center justify-between break-all whitespace-nowrap rounded-md border border-gray-300 bg-gray-50 p-1 text-sm gap-1 text-gray-700;
 
     :global(.icon-button) {
       @apply ml-1 h-auto w-fit;

@@ -78,8 +78,7 @@
       <Button
         data-testid="manual-search-button"
         variant="primary"
-        class="h-10"
-        unroundLeft
+        borderRadiusModifier="square-left"
         type="submit"
       >
         {translate('search')}
