@@ -1,7 +1,6 @@
 <script lang="ts">
   import { noop } from 'svelte/internal';
 
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';

@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
+  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
-  import Button from './button.svelte';
 
   interface $$Props extends HTMLButtonAttributes {
     icon: IconName;

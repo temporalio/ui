@@ -1,14 +1,14 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
 
-  import Button from './button.svelte';
-  import { type IconName, icons } from './icon/paths';
+  import Button from '$lib/holocene/button.svelte';
+  import { type IconName, icons } from '$lib/holocene/icon/paths';
 
   let disabled = false;
-  let variant = 'primary' as any;
-  let size = 'md' as any;
-  let borderModifier = '' as any;
-  let borderRadiusModifier = '' as any;
+  let variant: 'primary' | 'secondary' | 'destructive' | 'ghost' = 'primary';
+  let size: 'xs' | 'sm' | 'md' | 'lg' = 'md';
+  let borderModifier: 'borderless' | 'borderless-left' | 'borderless-right';
+  let borderRadiusModifier: 'square' | 'square-left' | 'square-right';
   let loading = false;
   let href: string;
   let leadingIcon: IconName;

@@ -1,9 +1,10 @@
 <script lang="ts">
-  import IconButton from '../icon-button.svelte';
-
   import { page } from '$app/stores';
 
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
+  import ProgressBar from '$lib/holocene/progress-bar.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import {
     currentPageKey,
@@ -14,9 +15,6 @@
     perPageKey,
   } from '$lib/stores/pagination';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-
-  import ProgressBar from '../progress-bar.svelte';
-  import Button from '../button.svelte';
 
   type Item = $$Generic;
 

@@ -1,13 +1,14 @@
 <script lang="ts">
+  import type {
+    HTMLAnchorAttributes,
+    HTMLButtonAttributes,
+  } from 'svelte/elements';
+
   import { cva, type VariantProps } from 'class-variance-authority';
 
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
-  import type {
-    HTMLAnchorAttributes,
-    HTMLButtonAttributes,
-  } from 'svelte/elements';
 
   const buttonStyles = cva(
     [
