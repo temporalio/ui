@@ -14,12 +14,18 @@
     language?: string;
     async?: boolean;
     testId?: string;
-  };
-
-  type CopyableProps = BaseProps & {
-    copyable: boolean;
+    copyable?: boolean;
     copyIconTitle: string;
     copySuccessIconTitle: string;
+  };
+
+  type CopyableProps = Omit<
+    BaseProps,
+    'copyable' | 'copyIconTitle' | 'copySuccessIconTitle'
+  > & {
+    copyable: false;
+    copyIconTitle?: never;
+    copySuccessIconTitle?: never;
   };
 
   type $$Props = BaseProps | CopyableProps;
