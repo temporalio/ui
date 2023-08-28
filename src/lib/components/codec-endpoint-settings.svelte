@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Textarea from '$lib/holocene/textarea.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
 
@@ -16,20 +17,14 @@
     <p class="text-sm">
       {translate('data-encoder', 'endpoint-description')}
     </p>
-    <textarea
-      class="block w-full rounded-xl border-2 border-gray-900 p-2"
-      class:error
+    <Textarea
+      id="data-encoder-endpoint-input"
       rows={3}
       placeholder={translate('data-encoder', 'endpoint-placeholder')}
-      data-testid="data-encoder-endpoint-input"
       bind:value={endpoint}
-      on:keydown|stopPropagation
+      {error}
+      isValid={!error}
     />
-    {#if error}
-      <small data-testid="data-encoder-endpoint-error" class="text-red-700"
-        >{error}</small
-      >
-    {/if}
     <ToggleSwitch
       label={translate('data-encoder', 'pass-access-token-label')}
       id="pass-access-token"

@@ -1,22 +1,28 @@
 <script lang="ts">
+  import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
   export let port = '';
 </script>
 
 <div class="my-4">
-  <h3 class="text-lg" data-testid="data-encoder-port-title">
+  <label
+    class="text-lg"
+    data-testid="data-encoder-port-title"
+    for="data-encoder-port-input"
+  >
     {translate('data-encoder', 'port-title')}<span
       class="rounded-lg bg-orange-100 px-1 text-sm text-orange-900"
       >{translate('deprecated')}</span
     >
-  </h3>
+  </label>
   <div class="flex gap-2">
-    <input
-      class="block w-24 rounded-xl border-2 border-gray-900 p-2"
+    <Input
+      class="w-24"
       placeholder="Port"
-      data-testid="data-encoder-port-input"
+      id="data-encoder-port-input"
       bind:value={port}
-      on:keydown|stopPropagation
+      label={''}
+      labelHidden
     />
     <p
       data-testid="data-encoder-info"
