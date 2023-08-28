@@ -281,16 +281,9 @@
 {:catch error}
   <header class="mb-8">
     <div class="flex flex-col gap-1 relative">
-      <a
-        href={routeForSchedules({ namespace })}
-        class="absolute top-0 back-to-schedules"
-        style="left: -0.5rem;"
-      >
-        <Icon name="chevron-left" class="inline" />{translate(
-          'schedules',
-          'back-to-schedules',
-        )}
-      </a>
+      <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+        {translate('schedules', 'back-to-schedules')}
+      </Link>
       <h1
         class="text-2xl mt-8 font-medium select-all"
         data-testid="schedule-name"
