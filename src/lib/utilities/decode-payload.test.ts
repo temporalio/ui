@@ -161,7 +161,7 @@ describe('convertPayloadToJsonWithWebsocket', () => {
     resetLastDataConverterSuccess();
   });
   it('Should convert a payload through data-converter and set the success status when the websocket is set and the websocket connects', async () => {
-    const ws = new WS('ws://localhost:1337');
+    const ws = new WS('wss://localhost:1337');
 
     // We need to respond to the websocket messages with the requestID so the
     // websocket as promised library can resolve the promises correctly without
