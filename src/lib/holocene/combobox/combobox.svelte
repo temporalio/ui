@@ -244,7 +244,7 @@
   </label>
 
   <div
-    class="text-sm w-full h-10 flex flex-row items-center rounded-lg bg-white border border-primary gap-2"
+    class="combobox-wrapper"
   >
     {#if leadingIcon}
       <Icon
@@ -322,6 +322,10 @@
 <style lang="postcss">
   .combobox-label {
     @apply font-secondary text-sm font-normal;
+  }
+
+  .combobox-wrapper {
+    @apply text-sm w-full h-10 flex flex-row items-center rounded-lg bg-white border border-primary gap-2 focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
   }
 
   .combobox-input {
