@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Accordion from '$lib/holocene/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
   
   import type { SchedulePolicies, ScheduleSpec, ScheduleState } from '$types';
@@ -7,15 +7,10 @@
   export let spec: ScheduleSpec;
   export let state: ScheduleState;
   export let policies: SchedulePolicies;
-
-  let show = false;
 </script>
 
-<button on:click={() => (show = !show)} class="settings">
-  {translate('schedules', 'advanced-settings')}
-  <Icon class="inline" name={show ? 'chevron-up' : 'chevron-down'} />
-</button>
-{#if show}
+
+<Accordion title={translate('schedules', 'advanced-settings')}>
   <p>
     {translate('schedules', 'start-time')}
     {spec?.startTime ?? translate('none')}
@@ -38,10 +33,5 @@
     {translate('schedules', 'overlap-policy')}{policies?.overlapPolicy ??
       translate('none')}
   </p>
-{/if}
+</Accordion>
 
-<style lang="postcss">
-  .settings {
-    @apply mb-4 underline decoration-gray-900;
-  }
-</style>

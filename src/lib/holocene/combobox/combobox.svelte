@@ -10,7 +10,6 @@
 
   import Icon from '../icon/icon.svelte';
   import type { IconName } from '../icon/paths';
-  import IconButton from '../icon-button.svelte';
 
   type T = $$Generic;
 
@@ -245,13 +244,13 @@
   </label>
 
   <div
-    class="text-sm w-full h-10 flex flex-row items-center rounded-lg bg-white border border-primary"
+    class="text-sm w-full h-10 flex flex-row items-center rounded-lg bg-white border border-primary gap-2"
   >
     {#if leadingIcon}
       <Icon
         width={20}
         height={20}
-        class="mx-3 shrink-0 text-gray-500"
+        class="mx-2 shrink-0 text-gray-500"
         name={leadingIcon}
       />
     {/if}
@@ -281,15 +280,16 @@
       bind:this={inputElement}
       {...$$restProps}
     />
-    <IconButton
-      label={toggleLabel}
-      class="h-full w-10 shrink-0"
+    <button
+      aria-label={toggleLabel}
+      class="h-8 w-8 rounded-full shrink-0 bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 flex justify-center items-center mx-2"
       tabindex={-1}
-      icon={$open ? 'chevron-up' : 'chevron-down'}
       aria-controls="{id}-listbox"
       aria-expanded={$open}
       on:click={toggleList}
-    />
+    >
+      <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
+  </button>
   </div>
 
   <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">

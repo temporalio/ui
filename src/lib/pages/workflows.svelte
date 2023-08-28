@@ -7,7 +7,7 @@
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -42,7 +42,7 @@
   });
 </script>
 
-<header class="mb-2 flex justify-between">
+<header class="mb-2 flex justify-between items-center">
   <div>
     <h1 class="text-2xl" data-testid="namespace-title">
       {translate('workflows', 'recent-workflows')}
@@ -54,13 +54,11 @@
     </div>
   </div>
   <div>
-    <button
-      aria-label={translate('workflows', 'retry-workflows')}
-      class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
+    <IconButton
+      label={translate('workflows', 'retry-workflows')}
+      icon="retry"
       on:click={refreshWorkflows}
-    >
-      <Icon name="retry" class="h-8 w-8" />
-    </button>
+    />
   </div>
 </header>
 <WorkflowFilters bind:searchType />
