@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
-  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
 
@@ -15,6 +14,13 @@
   export let label = '';
 </script>
 
-<Button variant="secondary" on:click aria-label={label} {...$$restProps}>
+<button type="button" class="icon-button" on:click aria-label={label} {...$$restProps}>
   <Icon name={icon} class="h-auto" />
-</Button>
+</button>
+
+
+<style lang="postcss">
+  .icon-button {
+    @apply inline-block w-auto rounded-full border-2 border-[transparent] text-sm hover:bg-gray-900 hover:text-white hover:border-indigo-600 hover:shadow-focus hover:shadow-blue-600/50 focus-visible:outline-none focus-visible:bg-gray-900 focus-visible:text-white focus-visible:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50;
+  }
+</style>

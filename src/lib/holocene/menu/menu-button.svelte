@@ -139,7 +139,7 @@
   }
 
   .primary {
-    @apply border-2 border-primary bg-primary bg-gradient-to-br text-white hover:from-blue-100 hover:to-purple-100 hover:text-primary;
+    @apply border-2 border-primary bg-primary bg-gradient-to-br text-white hover:from-blue-100 hover:to-purple-100 hover:text-primary hover:border-indigo-600 hover:shadow-focus hover:shadow-blue-600/50 focus-visible:outline-none focus-visible:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-primary;
 
     &:disabled {
       @apply text-white opacity-75 hover:from-primary hover:to-primary;
@@ -168,7 +168,7 @@
 
   .secondary,
   .ghost {
-    @apply focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
+    @apply focus-visible:border-indigo-600 focus-visible:outline-none focus-visible:shadow-focus focus-visible:shadow-blue-600/50;
   }
 
   .table-header {

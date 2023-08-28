@@ -25,19 +25,19 @@
       'border-box',
       'transition-colors',
       'transition-shadow',
-      'focus:outline-none',
+      'focus-visible:outline-none',
     ],
     {
       variants: {
         variant: {
           primary:
-            'border-gray-900 bg-gray-900 bg-gradient-to-br text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:from-blue-100 [&:not(:disabled):hover]:to-purple-100 [&:not(:disabled):hover]:text-gray-900 [&:not(:disabled):hover]:border-indigo-600 focus:shadow-focus focus:shadow-blue-600/50 focus:from-blue-100 focus:to-purple-100 focus:text-gray-900 focus:border-indigo-600',
+            'border-gray-900 bg-gray-900 bg-gradient-to-br text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:from-blue-100 [&:not(:disabled):hover]:to-purple-100 [&:not(:disabled):hover]:text-gray-900 [&:not(:disabled):hover]:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-gray-900 focus-visible:border-indigo-600',
           secondary:
-            'border-gray-900 bg-white text-gray-900 [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-gray-900 [&:not(:disabled):hover]:text-white [&:not(:disabled):hover]:border-white focus:shadow-focus focus:shadow-blue-600/50 focus:bg-gray-900 focus:text-white focus:border-white disabled:hover',
+            'border-gray-900 bg-white text-gray-900 [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-gray-900 [&:not(:disabled):hover]:text-white [&:not(:disabled):hover]:border-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:bg-gray-900 focus-visible:text-white focus-visible:border-white',
           destructive:
-            'border-red-700 bg-red-700 text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-red-200/50 [&:not(:disabled):hover]:border-white focus:border-white focus:shadow-focus focus:shadow-red-200/50',
+            'border-red-700 bg-red-700 text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-red-200/50 [&:not(:disabled):hover]:border-white focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-red-200/50',
           ghost:
-            'border-[transparent] bg-[transparent] text-gray-600 [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-indigo-100 [&:not(:disabled):hover]:border-indigo-600 focus:shadow-focus focus:shadow-blue-600/50 focus:bg-indigo-100 focus:border-indigo-600',
+            'border-[transparent] bg-[transparent] text-gray-600 [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-indigo-100 [&:not(:disabled):hover]:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:bg-indigo-100 focus-visible:border-indigo-600',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',
