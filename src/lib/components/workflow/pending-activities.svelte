@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -136,6 +136,10 @@
                     <CodeBlock
                       class="max-h-32"
                       content={pendingActivity.heartbeatDetails}
+                      copyIconTitle={translate('copy-icon-title')}
+                      copySuccessIconTitle={translate(
+                        'copy-success-icon-title',
+                      )}
                     />
                   </div>
                 {/if}
@@ -147,6 +151,10 @@
                     <CodeBlock
                       class="max-h-32"
                       content={pendingActivity.lastFailure}
+                      copyIconTitle={translate('copy-icon-title')}
+                      copySuccessIconTitle={translate(
+                        'copy-success-icon-title',
+                      )}
                     />
                   </div>
                 {/if}

@@ -1,10 +1,9 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
   export let content: string;
   export let visible = false;
-  export let color = 'black';
   export let clickAllToCopy = false;
   export let copyIconTitle: string;
   export let copySuccessIconTitle: string;
@@ -22,14 +21,12 @@
         >{content}</span
       >
     </slot>
-    <button on:click={(e) => copy(e, content)}>
-      <Icon
-        title={$copied ? copySuccessIconTitle : copyIconTitle}
-        name={$copied ? 'checkmark' : 'copy'}
-        stroke={color}
-        class={`${visible ? 'visible' : 'invisible group-hover:visible'}`}
-      />
-    </button>
+    <IconButton
+      on:click={(e) => copy(e, content)}
+      class={`${visible ? 'visible' : 'invisible group-hover:visible'}`}
+      icon={$copied ? 'checkmark' : 'copy'}
+      label={$copied ? copySuccessIconTitle : copyIconTitle}
+    />
   </button>
 {:else}
   <div class="group flex items-center gap-2 {$$props['container-class']}">
@@ -38,13 +35,12 @@
         >{content}</span
       >
     </slot>
-    <button on:click={(e) => copy(e, content)}>
-      <Icon
-        title={$copied ? copySuccessIconTitle : copyIconTitle}
-        name={$copied ? 'checkmark' : 'copy'}
-        stroke={color}
-        class={`${visible ? 'visible' : 'invisible group-hover:visible'}`}
-      />
-    </button>
+
+    <IconButton
+      on:click={(e) => copy(e, content)}
+      class={`${visible ? 'visible' : 'invisible group-hover:visible'}`}
+      icon={$copied ? 'checkmark' : 'copy'}
+      label={$copied ? copySuccessIconTitle : copyIconTitle}
+    />
   </div>
 {/if}

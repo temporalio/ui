@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
-  
+
   import CodeBlock from '$lib/holocene/code-block.svelte';
 
   export let Hst: HST;
@@ -8,7 +8,11 @@
 
 <Hst.Story>
   <Hst.Variant title="A json code block">
-    <CodeBlock content={{ foo: 'bar', baz: false, blue: 42 }} />
+    <CodeBlock
+      content={{ foo: 'bar', baz: false, blue: 42 }}
+      copyIconTitle="Click to copy content"
+      copySuccessIconTitle="Content copied to clipboard"
+    />
   </Hst.Variant>
 
   <Hst.Variant title="An inline json code block">
@@ -26,6 +30,8 @@
         '56781234',
       ]}
       inline
+      copyIconTitle="Click to copy content"
+      copySuccessIconTitle="Content copied to clipboard"
     />
   </Hst.Variant>
 
@@ -34,6 +40,8 @@
       content={'temporal operator namespace list'}
       language="text"
       inline
+      copyIconTitle="Click to copy content"
+      copySuccessIconTitle="Content copied to clipboard"
     />
   </Hst.Variant>
 </Hst.Story>
