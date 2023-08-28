@@ -179,7 +179,7 @@
     </div>
     <nav
       class="flex flex-col justify-end gap-4 md:flex-row"
-      aria-label={$$restProps['aria-label']}
+      aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
       {#if pageSizeOptions.length}
@@ -243,7 +243,7 @@
     class={`flex ${
       $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
     }`}
-    aria-label={$$restProps['aria-label']}
+    aria-label="{$$restProps['aria-label']} 2"
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">

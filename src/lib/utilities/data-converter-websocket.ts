@@ -31,7 +31,7 @@ export const createWebsocket = (
   }
 
   try {
-    sock = new WebSocketAsPromised(`ws://localhost:${port}/`, {
+    sock = new WebSocketAsPromised(`wss://localhost:${port}/`, {
       packMessage: (data) => stringifyWithBigInt(data),
       unpackMessage: (data) => parseWithBigInt(data as string),
       attachRequestId: (data, requestId) =>

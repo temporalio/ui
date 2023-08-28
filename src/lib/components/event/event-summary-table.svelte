@@ -29,7 +29,7 @@
     >{translate('workflows', 'recent-events')}</caption
   >
   <TableHeaderRow slot="headers">
-    <th class="w-14 xl:w-10" />
+    <td class="w-14 xl:w-10" />
     <th class="w-16 md:w-32">
       <EventDateFilter {compact} />
     </th>

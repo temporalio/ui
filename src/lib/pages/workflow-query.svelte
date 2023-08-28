@@ -93,6 +93,8 @@
         <CodeBlock
           content={result}
           language={jsonFormatting ? 'json' : 'text'}
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
         />
       {/await}
     </div>

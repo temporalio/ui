@@ -76,6 +76,8 @@
           content={result}
           language="text"
           testId="query-stack-trace"
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
         />
       </div>
     {:catch _error}
