@@ -23,7 +23,7 @@
 </script>
 
 <div
-  class="alert {intent} {className}"
+  class="flex alert {intent} {className}"
   class:bold
   role="alert"
   {...$$restProps}
@@ -47,7 +47,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply flex rounded-md border p-5 font-primary text-sm;
+    @apply rounded-md border p-5 font-primary text-sm;
   }
 
   .alert.bold {

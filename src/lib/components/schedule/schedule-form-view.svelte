@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  
+
   import { page } from '$app/stores';
-  
+
   import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -20,9 +20,8 @@
     routeForSchedule,
     routeForSchedules,
   } from '$lib/utilities/route-for';
-  
+
   import type { Schedule } from '$types';
-  
 
   export let schedule: FullSchedule | null = null;
   export let onConfirm: (
@@ -123,11 +122,9 @@
       <h1 class="font-base mt-8 ml-0 text-2xl">{title}</h1>
     </header>
     <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
-      {#if $error}
-        <Alert intent="error" title="" bold>
-          {$error}
-        </Alert>
-      {/if}
+      <Alert intent="error" title="" class={$error ? '' : 'hidden'} bold>
+        {$error}
+      </Alert>
       <div class="w-full">
         <Input
           id="name"
