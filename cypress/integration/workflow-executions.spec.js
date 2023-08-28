@@ -106,7 +106,7 @@ describe('Workflow Executions List', () => {
           encodeURIComponent(`ExecutionStatus="Running"`),
         );
 
-        cy.get('.workflow-summary-row >> a').first().click();
+        cy.get('.workflow-summary-row a').first().click();
 
         cy.wait('@workflow-api');
         cy.wait('@event-history-api');
