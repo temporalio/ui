@@ -6,8 +6,8 @@ const config = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
     colors: temporalColors,
-    textColor: temporalColors,
-    backgroundColor: temporalColors,
+    textColor: ({ theme }) => theme('colors'),
+    backgroundColor: ({ theme }) => theme('colors'),
     fontFamily: {
       primary: ['Inter Variable', ...defaultTheme.fontFamily.sans],
       secondary: ['Poppins', ...defaultTheme.fontFamily.sans],
