@@ -34,10 +34,3 @@
     display: none;
   }
 }
-
-@layer components {
-  .hljs {
-    max-height: 25em;
-    overflow-y: scroll;
-  }
-}
