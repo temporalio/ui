@@ -11,6 +11,7 @@
   let value = '';
   let label = 'Label';
   let required = true;
+  let description = 'Description goes here.';
 </script>
 
 <Hst.Story title="textarea">
@@ -21,6 +22,7 @@
     {error}
     {label}
     {required}
+    {description}
     bind:value
   />
 

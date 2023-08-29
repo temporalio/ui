@@ -11,18 +11,6 @@
 
 <div class="flex flex-col gap-4">
   <div class="flex flex-col gap-2">
-    <div>
-      <label
-        for="data-encoder-endpoint-input"
-        class="text-sm font-medium"
-        data-testid="data-encoder-endpoint-title"
-      >
-        {translate('data-encoder', 'endpoint-title')}
-      </label>
-      <p class="text-sm">
-        {translate('data-encoder', 'endpoint-description')}
-      </p>
-    </div>
     <Textarea
       id="data-encoder-endpoint-input"
       rows={3}
@@ -30,6 +18,8 @@
       bind:value={endpoint}
       {error}
       isValid={!error}
+      label={translate('data-encoder', 'endpoint-title')}
+      description={translate('data-encoder', 'endpoint-description')}
     />
     <ToggleSwitch
       label={translate('data-encoder', 'pass-access-token-label')}
