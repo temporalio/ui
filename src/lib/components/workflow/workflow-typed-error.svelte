@@ -192,7 +192,6 @@
     icon="warning"
     intent="warning"
     title={translate('typed-errors', title)}
-    role="status"
   >
     <p>
       {translate('typed-errors', description)}

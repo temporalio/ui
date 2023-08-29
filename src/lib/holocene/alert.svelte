@@ -25,7 +25,7 @@
 <div
   class="flex alert {intent} {className}"
   class:bold
-  role="alert"
+  role="status"
   {...$$restProps}
 >
   {#if icon}
