@@ -126,6 +126,7 @@
             <Button
               variant="ghost"
               size="sm"
+              active={page === $store.currentPage}
               aria-label={pageButtonLabel(page)}
               on:click={() => handlePageChange(page)}>{page}</Button
             >

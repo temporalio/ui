@@ -70,6 +70,7 @@
     trailingIcon?: IconName;
     count?: number;
     id?: string;
+    active?: boolean;
     'data-testid'?: string;
   };
 
@@ -96,6 +97,7 @@
   export let id: string = null;
   export let href: string = null;
   export let target: string = null;
+  export let active = false;
 </script>
 
 <svelte:element
@@ -106,6 +108,7 @@
   {id}
   role="button"
   type="button"
+  class:active
   on:click|stopPropagation
   class={buttonStyles({ variant, size, borderModifier, borderRadiusModifier })}
   {...$$restProps}
@@ -128,3 +131,9 @@
     >
   {/if}
 </svelte:element>
+
+<style lang="postcss">
+  .active {
+    @apply bg-indigo-100;
+  }
+</style>
