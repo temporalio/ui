@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
-  import IconButton from './icon-button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   export let intent: 'warning' | 'default' = 'default';
   export let button = false;
@@ -23,12 +23,12 @@
   {:else}
     <slot />
   {/if}
-  <IconButton
-    label={removeButtonLabel}
-    class="h-4 w-4 text-gray-700"
-    icon="close"
+  <button
+    aria-label={removeButtonLabel}
     on:click={handleRemove}
-  />
+  >
+  <Icon name="close" />
+</button>
 </span>
 
 <style lang="postcss">
