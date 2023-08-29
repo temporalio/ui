@@ -14,6 +14,21 @@
 </script>
 
 <div class="flex flex-col {$$props.class}">
+  {#if calendar}
+    <p data-testid="schedule-calendar-frequency">
+      {commentOrCalendarToFrequency(calendar)}
+    </p>
+  {:else}
+    <p data-testid="schedule-interval-frequency">
+      {intervalToComment(intervalSecs)}
+    </p>
+    <p data-testid="schedule-phase-frequency">
+      {intervalToComment(phaseSecs, true)}
+    </p>
+  {/if}
+</div>
+
+<div class="flex flex-col {$$props.class}">
   <!-- {#if calendar} -->
   <CodeBlock
     copyable

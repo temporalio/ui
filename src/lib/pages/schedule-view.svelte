@@ -202,17 +202,16 @@
           <ScheduleError error={schedule?.info?.invalidScheduleError} />
         </div>
       {/if}
-      <div class="w-full xl:w-1/2">
-        <ScheduleFrequencyPanel
-          calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
-          interval={schedule?.schedule?.spec?.interval?.[0]}
-        />
-      </div>
+      <div class="w-full xl:w-1/2" />
       <div class="flex flex-col xl:flex-row gap-4">
         <div class="w-full xl:w-3/4">
           <ScheduleRecentRuns
             {namespace}
             recentRuns={schedule?.info?.recentActions}
+          />
+          <ScheduleFrequencyPanel
+            calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
+            interval={schedule?.schedule?.spec?.interval?.[0]}
           />
         </div>
         <div class="w-full xl:w-1/4 xl:min-w-[320px]">
