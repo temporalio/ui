@@ -1,9 +1,9 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import ScheduleNotes from './schedule-notes.svelte';
 
   import type { SchedulePolicies, ScheduleSpec, ScheduleState } from '$types';
-  import ScheduleNotes from './schedule-notes.svelte';
 
   export let spec: ScheduleSpec;
   export let state: ScheduleState;
