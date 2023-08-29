@@ -9,7 +9,7 @@ const config = {
     textColor: temporalColors,
     backgroundColor: temporalColors,
     fontFamily: {
-      primary: ['Inter', ...defaultTheme.fontFamily.sans],
+      primary: ['Inter Variable', ...defaultTheme.fontFamily.sans],
       secondary: ['Poppins', ...defaultTheme.fontFamily.sans],
     },
     extend: {
