@@ -243,14 +243,12 @@
     {label}
   </label>
 
-  <div
-    class="combobox-wrapper"
-  >
+  <div class="combobox-wrapper">
     {#if leadingIcon}
       <Icon
         width={20}
         height={20}
-        class="mx-2 shrink-0 text-gray-500"
+        class="shrink-0 text-gray-500"
         name={leadingIcon}
       />
     {/if}
@@ -282,7 +280,7 @@
     />
     <button
       aria-label={toggleLabel}
-      class="h-8 w-8 rounded-full shrink-0 bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 flex justify-center items-center mx-2"
+      class="rounded-full shrink-0 bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 flex justify-center items-center mx-2"
       tabindex={-1}
       aria-controls="{id}-listbox"
       aria-expanded={$open}
@@ -325,7 +323,7 @@
   }
 
   .combobox-wrapper {
-    @apply text-sm w-full h-10 flex flex-row items-center rounded-lg bg-white border border-primary gap-2 focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
+    @apply text-sm w-full h-10 flex flex-row items-center rounded-lg bg-white border border-primary px-2 gap-2 focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
   }
 
   .combobox-input {
