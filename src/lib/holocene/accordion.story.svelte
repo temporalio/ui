@@ -41,7 +41,11 @@
 
   <Hst.Variant title="With a Code Block">
     <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
-      <CodeBlock content={{ some: 'thing', blue: 42 }} />
+      <CodeBlock
+        content={{ some: 'thing', blue: 42 }}
+        copyIconTitle="Click to copy content"
+        copySuccessIconTitle="Content copied to clipboard"
+      />
     </Accordion>
   </Hst.Variant>
 

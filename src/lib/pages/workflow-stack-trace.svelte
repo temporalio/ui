@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
-  
+
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -73,6 +72,8 @@
           content={result}
           language="text"
           testId="query-stack-trace"
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
         />
       </div>
     {:catch _error}

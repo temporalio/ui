@@ -1,7 +1,7 @@
 <script lang="ts">
   import { noop } from 'svelte/internal';
   import { fade } from 'svelte/transition';
-  
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { isEventGroup } from '$lib/models/event-groups';
   import {
@@ -17,10 +17,9 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
-  
+
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
-  
 
   export let event: IterableEvent;
   export let initialItem: IterableEvent | undefined;
@@ -73,7 +72,6 @@
   class="row"
   id={event.id}
   class:expanded={expanded && !expandAll}
-  aria-expanded={expanded || expandAll}
   class:active
   class:failure
   class:canceled

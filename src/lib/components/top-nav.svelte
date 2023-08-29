@@ -50,6 +50,7 @@
     {#if showNamespaceSpecificNav}
       <Combobox
         label={translate('namespaces', 'namespace-label', { namespace })}
+        toggleLabel={translate('namespaces')}
         noResultsText={translate('no-results')}
         labelHidden
         value={namespace}

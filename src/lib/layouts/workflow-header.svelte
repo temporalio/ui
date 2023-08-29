@@ -123,7 +123,7 @@
     class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
   >
     <div
-      class="flex flex-col gap-2 w-full justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
+      class="flex flex-col w-full justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
     >
       <h1
         data-testid="workflow-id-heading"

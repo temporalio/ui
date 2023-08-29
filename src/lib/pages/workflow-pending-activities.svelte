@@ -1,5 +1,4 @@
 <script lang="ts">
-  
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -90,6 +89,8 @@
                     slot="value"
                     class="pb-2"
                     content={details.heartbeatDetails}
+                    copyIconTitle={translate('copy-icon-title')}
+                    copySuccessIconTitle={translate('copy-success-icon-title')}
                   />
                 </li>
               {/if}
@@ -100,6 +101,8 @@
                     slot="value"
                     class="pb-2"
                     content={details.lastFailure}
+                    copyIconTitle={translate('copy-icon-title')}
+                    copySuccessIconTitle={translate('copy-success-icon-title')}
                   />
                 </li>
               {/if}

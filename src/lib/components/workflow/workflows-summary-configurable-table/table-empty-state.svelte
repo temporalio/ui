@@ -1,6 +1,6 @@
 <script>
   import { page } from '$app/stores';
-  
+
   import Alert from '$lib/holocene/alert.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -36,13 +36,13 @@
     {#if updating}
       <Loading />
     {:else}
-      <h3 class="text-lg font-medium">
+      <h2 class="text-lg font-medium">
         {#if query}
           {translate('workflows', 'workflow-query-empty-state-title')}
         {:else}
           {translate('workflows', 'workflow-empty-state-title')}
         {/if}
-      </h3>
+      </h2>
       {#if $workflowError}
         <Alert
           intent="caution"

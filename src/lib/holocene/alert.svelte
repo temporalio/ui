@@ -34,9 +34,9 @@
     </div>
   {/if}
   <div class="ml-1">
-    <h5 class="font-semibold leading-6" class:hidden={!title}>
+    <p class="font-semibold leading-6" class:hidden={!title}>
       {title}
-    </h5>
+    </p>
     {#if $$slots.default}
       <div class="content">
         <slot />
