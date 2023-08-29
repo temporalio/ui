@@ -1,6 +1,7 @@
 const defaultTheme = require('tailwindcss/defaultTheme');
 const temporalColors = require('./colors.cjs');
 
+/** @type {import('tailwindcss').Config} */
 const config = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
