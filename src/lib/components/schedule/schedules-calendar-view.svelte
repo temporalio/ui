@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import Input from '$lib/holocene/input/input.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import TabPanel from '$lib/holocene/tab/tab-panel.svelte';
@@ -8,7 +8,7 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { FullSchedule, SchedulePreset } from '$lib/types/schedule';
-  
+
   import ScheduleDayOfMonthView from './schedule-day-of-month-view.svelte';
   import ScheduleDayOfWeekView from './schedule-day-of-week-view.svelte';
   import ScheduleFrequency from './schedule-frequency.svelte';
@@ -82,11 +82,10 @@
   </TabList>
   <div class="mt-4 flex w-full flex-wrap gap-6">
     {#if schedule}
-      <TabPanel id="existing-panel" tabId="existing-tab">
+      <TabPanel id="existing-panel" tabId="existing-tab" class="w-full">
         <ScheduleFrequency
           calendar={schedule?.spec?.structuredCalendar?.[0]}
           interval={schedule?.spec?.interval?.[0]}
-          class="text-base"
         />
       </TabPanel>
     {/if}
