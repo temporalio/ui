@@ -122,13 +122,7 @@
       <h1 class="font-base mt-8 ml-0 text-2xl">{title}</h1>
     </header>
     <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
-      <Alert
-        intent="error"
-        title=""
-        class={$error ? '' : 'hidden'}
-        bold
-        role="alert"
-      >
+      <Alert intent="error" title="" hidden={!$error} bold role="alert">
         {$error}
       </Alert>
       <div class="w-full">

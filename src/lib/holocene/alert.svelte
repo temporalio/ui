@@ -11,12 +11,14 @@
     icon?: IconName;
     bold?: boolean;
     'data-testid'?: string;
+    hidden?: boolean;
   }
 
   export let intent: 'warning' | 'caution' | 'error' | 'success' | 'info';
   export let title = '';
   export let icon: IconName = null;
   export let bold = false;
+  export let hidden = false;
 
   let className = '';
   export { className as class };
@@ -25,6 +27,7 @@
 <div
   class="flex alert {intent} {className}"
   class:bold
+  class:hidden
   role="status"
   {...$$restProps}
 >
