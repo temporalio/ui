@@ -11,6 +11,7 @@ const config = {
     fontFamily: {
       primary: ['Inter Variable', ...defaultTheme.fontFamily.sans],
       secondary: ['Poppins', ...defaultTheme.fontFamily.sans],
+      mono: ['Noto Sans Mono', ...defaultTheme.fontFamily.mono],
     },
     extend: {
       animation: {

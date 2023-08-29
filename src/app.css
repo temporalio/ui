@@ -1,43 +1,43 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource/poppins';
+@import '@fontsource/noto-sans-mono';
+
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-@import '@fontsource/inter';
-@import '@fontsource/poppins';
-@import '@fontsource/noto-sans-mono';
+@layer base {
+  *,
+  html,
+  body {
+    box-sizing: border-box;
+  }
 
-*,
-html,
-body {
-  box-sizing: border-box;
+  body {
+    font-family: theme('fontFamily.primary');
+    position: relative;
+    overscroll-behavior: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  titles,
+  labels {
+    font-family: theme('fontFamily.secondary');
+  }
+
+  input[type='search']::-webkit-search-cancel-button {
+    display: none;
+  }
 }
 
-body {
-  font-family: Inter, sans-serif;
-  position: relative;
-  overscroll-behavior: none;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-titles,
-labels {
-  font-family: Poppins, sans-serif;
-}
-
-.hljs {
-  max-height: 25em;
-  overflow-y: scroll;
-}
-
-.noto {
-  font-family: 'Noto Sans Mono', monospace;
-}
-
-input[type='search']::-webkit-search-cancel-button {
-  display: none;
+@layer components {
+  .hljs {
+    max-height: 25em;
+    overflow-y: scroll;
+  }
 }
