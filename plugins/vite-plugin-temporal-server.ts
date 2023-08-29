@@ -12,6 +12,7 @@ const { cyan, magenta } = chalk;
 let temporal: TemporalServer;
 
 const shouldSkip = (server: ViteDevServer): boolean => {
+  if (process.env.VITE_STORYBOOK) return true;
   if (process.env.VERCEL) return true;
   if (process.env.HISTOIRE) return true;
   if (process.env.VITEST) return true;
