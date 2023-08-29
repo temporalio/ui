@@ -80,9 +80,9 @@
       {/if}
     </div>
     <p class="flex items-center font-secondary">
-      <Badge class="mr-2 {error ? '' : 'hidden'}" type="error" role="alert">
-        {error}
-      </Badge>
+      {#if error}
+        <Badge class="mr-2" type="error">{error}</Badge>
+      {/if}
       {subtitle}
     </p>
   </button>
