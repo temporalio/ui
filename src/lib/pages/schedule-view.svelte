@@ -5,7 +5,6 @@
   import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
-  import ScheduleMemo from '$lib/components/schedule/schedule-memo.svelte';
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -202,33 +201,28 @@
           <ScheduleError error={schedule?.info?.invalidScheduleError} />
         </div>
       {/if}
-      <div class="w-full xl:w-1/2" />
       <div class="flex flex-col xl:flex-row gap-4">
-        <div class="w-full xl:w-3/4">
+        <div class="w-full flex flex-col items-start gap-4 xl:w-2/3">
           <ScheduleRecentRuns
             {namespace}
             recentRuns={schedule?.info?.recentActions}
           />
+          <ScheduleUpcomingRuns
+            futureRuns={schedule?.info?.futureActionTimes}
+          />
+          <ScheduleAdvancedSettings
+            spec={schedule?.schedule?.spec}
+            state={schedule?.schedule?.state}
+            policies={schedule?.schedule?.policies}
+            notes={schedule?.schedule?.state?.notes}
+          />
+        </div>
+        <div class="w-full xl:w-1/3">
           <ScheduleFrequencyPanel
             calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
             interval={schedule?.schedule?.spec?.interval?.[0]}
           />
         </div>
-        <div class="w-full xl:w-1/4 xl:min-w-[320px]">
-          <ScheduleUpcomingRuns
-            futureRuns={schedule?.info?.futureActionTimes}
-          />
-        </div>
-      </div>
-      <div class="w-full xl:w-1/2">
-        <ScheduleAdvancedSettings
-          spec={schedule?.schedule?.spec}
-          state={schedule?.schedule?.state}
-          policies={schedule?.schedule?.policies}
-        />
-      </div>
-      <div class="w-full xl:w-1/2">
-        <ScheduleMemo notes={schedule?.schedule?.state?.notes} />
       </div>
     </div>
     <Modal

@@ -52,9 +52,6 @@
   </td>
   <td class="cell whitespace-pre-line break-words max-w-[600px] w-auto">
     <p class="text-base">{schedule.scheduleId}</p>
-    <p>
-      <ScheduleFrequency {calendar} {interval} class="text-sm" />
-    </p>
   </td>
   <td class="cell whitespace-pre-line break-words max-md:hidden">
     {schedule?.info?.workflowType?.name ?? ''}
@@ -84,6 +81,17 @@
         })}
       </div>
     {/each}
+  </td>
+</TableRow>
+<TableRow>
+  <td colspan="5" class="hidden xl:table-cell !p-0">
+    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  </td>
+  <td colspan="3" class="hidden md:table-cell xl:hidden">
+    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  </td>
+  <td colspan="2" class="md:hidden">
+    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
   </td>
 </TableRow>
 
