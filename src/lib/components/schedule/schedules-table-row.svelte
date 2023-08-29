@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
@@ -15,10 +15,9 @@
     routeForEventHistory,
     routeForSchedule,
   } from '$lib/utilities/route-for';
-  
+
   import ScheduleFrequency from './schedule-frequency.svelte';
-  
-  
+
   import type { ScheduleActionResult, ScheduleListEntry } from '$types';
 
   let { namespace } = $page.params;
@@ -51,7 +50,7 @@
   <td class="cell">
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </td>
-  <td class="cell whitespace-pre-line break-words">
+  <td class="cell whitespace-pre-line break-words max-w-[600px] w-auto">
     <p class="text-base">{schedule.scheduleId}</p>
     <p>
       <ScheduleFrequency {calendar} {interval} class="text-sm" />
