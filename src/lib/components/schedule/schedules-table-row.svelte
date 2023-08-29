@@ -50,7 +50,7 @@
   <td class="cell">
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </td>
-  <td class="cell whitespace-pre-line break-words max-w-[600px] w-auto">
+  <td class="cell whitespace-pre-line break-words">
     <p class="text-base">{schedule.scheduleId}</p>
   </td>
   <td class="cell whitespace-pre-line break-words max-md:hidden">
@@ -87,10 +87,10 @@
   <td colspan="5" class="hidden xl:table-cell !p-0">
     <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
   </td>
-  <td colspan="3" class="hidden md:table-cell xl:hidden">
+  <td colspan="3" class="hidden md:table-cell xl:hidden !p-0">
     <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
   </td>
-  <td colspan="2" class="md:hidden">
+  <td colspan="2" class="md:hidden !p-0">
     <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
   </td>
 </TableRow>
