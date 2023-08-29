@@ -169,7 +169,6 @@
     intent="error"
     class="mb-10"
     title={error?.message ?? fallbackErrorMessage}
-    role="alert"
   />
 {/if}
 

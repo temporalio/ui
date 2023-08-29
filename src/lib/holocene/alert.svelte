@@ -22,13 +22,27 @@
 
   let className = '';
   export { className as class };
+
+  const role = getRole();
+
+  function getRole(): HTMLAttributes<HTMLDivElement>['role'] {
+    if (intent === 'error') {
+      return 'alert';
+    }
+
+    if (intent === 'success' || intent === 'warning' || intent === 'caution') {
+      return 'status';
+    }
+
+    return null;
+  }
 </script>
 
 <div
   class="flex alert {intent} {className}"
   class:bold
   class:hidden
-  role="status"
+  {role}
   {...$$restProps}
 >
   {#if icon}

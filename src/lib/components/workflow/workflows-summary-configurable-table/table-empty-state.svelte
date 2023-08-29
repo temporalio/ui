@@ -49,8 +49,9 @@
           icon="warning"
           title={translate('workflows', 'workflow-query-error-state')}
           style="overflow-wrap: anywhere"
-          role="alert">{$workflowError}</Alert
         >
+          {$workflowError}
+        </Alert>
       {:else if query}
         <p>
           {translate('workflows', 'workflow-query-empty-state-preface')}
