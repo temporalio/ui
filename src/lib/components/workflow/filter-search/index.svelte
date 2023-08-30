@@ -1,10 +1,8 @@
 <script lang="ts" context="module">
-  import { afterUpdate } from 'svelte';
   import { writable, type Writable } from 'svelte/store';
   import { fly } from 'svelte/transition';
-  import { setContext } from 'svelte';
 
-  import { noop } from '$lib/utilities/noop';
+  import { afterUpdate, setContext } from 'svelte';
 
   export const FILTER_CONTEXT = 'filter-context';
 
@@ -36,6 +34,7 @@
   import { workflowFilters } from '$lib/stores/filters';
   import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
   import { refresh } from '$lib/stores/workflows';
+  import { noop } from '$lib/utilities/noop';
   import {
     isBooleanFilter,
     isDateTimeFilter,

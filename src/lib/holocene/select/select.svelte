@@ -21,15 +21,14 @@
 
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
-  import { onMount } from 'svelte';
   import { writable, type Writable } from 'svelte/store';
 
-  import { setContext } from 'svelte';
-  import { noop } from '$lib/utilities/noop';
+  import { onMount, setContext } from 'svelte';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
+  import { noop } from '$lib/utilities/noop';
 
   type T = $$Generic;
 

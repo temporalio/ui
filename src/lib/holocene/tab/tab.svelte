@@ -4,9 +4,9 @@
   import { getContext } from 'svelte';
 
   import { isNull } from '$lib/utilities/is';
+  import { noop } from '$lib/utilities/noop';
 
   import { type TabContext, TABS } from './tabs.svelte';
-  import { noop } from '$lib/utilities/noop';
 
   type OwnProps = {
     label: string;

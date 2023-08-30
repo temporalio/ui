@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { noop } from '$lib/utilities/noop';
 
   import { v4 } from 'uuid';
 
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { noop } from '$lib/utilities/noop';
 
   import type { IconName } from './icon/paths';
 
