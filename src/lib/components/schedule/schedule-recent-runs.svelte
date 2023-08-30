@@ -8,9 +8,9 @@
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForEventHistory } from '$lib/utilities/route-for';
-  
+
   import WorkflowStatus from '../workflow-status.svelte';
-  
+
   import type { ScheduleActionResult } from '$types';
 
   export let recentRuns: ScheduleActionResult[] = [];
@@ -29,7 +29,7 @@
   };
 </script>
 
-<Panel>
+<Panel class="w-full">
   <h2 class="mb-4 text-2xl">{translate('schedules', 'recent-runs')}</h2>
   {#each sortRecentRuns(recentRuns) as run (run?.startWorkflowResult?.workflowId)}
     {#await fetchWorkflowForSchedule({ namespace, workflowId: decodeURIForSvelte(run.startWorkflowResult.workflowId), runId: run.startWorkflowResult.runId }, fetch) then workflow}

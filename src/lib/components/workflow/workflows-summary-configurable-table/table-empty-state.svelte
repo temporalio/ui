@@ -48,8 +48,10 @@
           intent="caution"
           icon="warning"
           title={translate('workflows', 'workflow-query-error-state')}
-          style="overflow-wrap: anywhere">{$workflowError}</Alert
+          style="overflow-wrap: anywhere"
         >
+          {$workflowError}
+        </Alert>
       {:else if query}
         <p>
           {translate('workflows', 'workflow-query-empty-state-preface')}

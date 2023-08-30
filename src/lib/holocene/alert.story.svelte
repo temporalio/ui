@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
-  
+
   import Alert from './alert.svelte';
 
   export let Hst: HST;
@@ -8,7 +8,7 @@
 
 <Hst.Story>
   <Hst.Variant title="An Information Alert">
-    <Alert intent="info" title="Alert Title" icon="info" role="status">
+    <Alert intent="info" title="Alert Title" icon="info">
       <p>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate
         exercitationem quia quibusdam excepturi rem saepe dolore quas, odit vero

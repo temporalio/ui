@@ -1,15 +1,17 @@
 const defaultTheme = require('tailwindcss/defaultTheme');
 const temporalColors = require('./colors.cjs');
 
+/** @type {import('tailwindcss').Config} */
 const config = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
     colors: temporalColors,
-    textColor: temporalColors,
-    backgroundColor: temporalColors,
+    textColor: ({ theme }) => theme('colors'),
+    backgroundColor: ({ theme }) => theme('colors'),
     fontFamily: {
-      primary: ['Inter', ...defaultTheme.fontFamily.sans],
+      primary: ['Inter Variable', ...defaultTheme.fontFamily.sans],
       secondary: ['Poppins', ...defaultTheme.fontFamily.sans],
+      mono: ['Noto Sans Mono', ...defaultTheme.fontFamily.mono],
     },
     extend: {
       animation: {
