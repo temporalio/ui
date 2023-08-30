@@ -6,7 +6,7 @@
   import type { IconName } from './icon/paths';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
-    intent: 'warning' | 'caution' | 'error' | 'success' | 'info';
+    intent: typeof intent;
     title?: string;
     icon?: IconName;
     bold?: boolean;
@@ -26,7 +26,7 @@
   $: role = getRole(intent);
 
   function getRole(
-    alertIntent: 'warning' | 'caution' | 'error' | 'success' | 'info',
+    alertIntent: typeof intent,
   ): HTMLAttributes<HTMLDivElement>['role'] {
     if (alertIntent === 'error') {
       return 'alert';
