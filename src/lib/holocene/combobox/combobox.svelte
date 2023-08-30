@@ -113,6 +113,7 @@
       closeList();
     } else {
       openList();
+      inputElement.focus();
     }
   };
 
@@ -280,7 +281,7 @@
     />
     <button
       aria-label={toggleLabel}
-      class="rounded-full shrink-0 bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 flex justify-center items-center mx-2"
+      class="combobox-button"
       tabindex={-1}
       aria-controls="{id}-listbox"
       aria-expanded={$open}
@@ -327,6 +328,10 @@
   }
 
   .combobox-input {
-    @apply h-full w-full font-primary focus:outline-none focus:border-indigo-600;
+    @apply h-full w-full font-primary focus:outline-none;
+  }
+
+  .combobox-button {
+    @apply rounded-full shrink-0 bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 flex justify-center items-center mx-2;
   }
 </style>
