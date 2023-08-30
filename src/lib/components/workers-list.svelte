@@ -21,6 +21,7 @@
     getNonDefaultVersionsForSet,
     getOrderedVersionSets,
   } from '$lib/utilities/task-queue-compatibility';
+  import Badge from '$lib/holocene/badge.svelte';
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;
