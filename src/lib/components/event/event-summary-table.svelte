@@ -38,6 +38,7 @@
       <div class="flex w-full justify-end">
         <Button
           size="sm"
+          variant="table-header"
           trailingIcon={expandAll ? 'chevron-up' : 'chevron-down'}
           on:click={handleChange}
         >
