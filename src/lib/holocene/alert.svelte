@@ -23,14 +23,20 @@
   let className = '';
   export { className as class };
 
-  const role = getRole();
+  $: role = getRole(intent);
 
-  function getRole(): HTMLAttributes<HTMLDivElement>['role'] {
-    if (intent === 'error') {
+  function getRole(
+    alertIntent: 'warning' | 'caution' | 'error' | 'success' | 'info',
+  ): HTMLAttributes<HTMLDivElement>['role'] {
+    if (alertIntent === 'error') {
       return 'alert';
     }
 
-    if (intent === 'success' || intent === 'warning' || intent === 'caution') {
+    if (
+      alertIntent === 'success' ||
+      alertIntent === 'warning' ||
+      alertIntent === 'caution'
+    ) {
       return 'status';
     }
 
