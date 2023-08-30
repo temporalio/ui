@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-  
+  import { noop } from '$lib/utilities/noop';
+
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -12,7 +12,7 @@
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  
+
   import BatchActions from './batch-actions.svelte';
 
   export let workflows: WorkflowExecution[];

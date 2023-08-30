@@ -1,9 +1,10 @@
 <script lang="ts" context="module">
-  import { afterUpdate, noop } from 'svelte/internal';
+  import { afterUpdate } from 'svelte';
   import { writable, type Writable } from 'svelte/store';
   import { fly } from 'svelte/transition';
-
   import { setContext } from 'svelte';
+
+  import { noop } from '$lib/utilities/noop';
 
   export const FILTER_CONTEXT = 'filter-context';
 
@@ -22,7 +23,7 @@
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-import Input from '$lib/holocene/input/input.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
     MenuButton,

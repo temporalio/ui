@@ -1,5 +1,3 @@
-import { noop } from 'svelte/internal';
-
 import { v4 } from 'uuid';
 
 import type { ResetReapplyType } from '$lib/models/workflow-actions';
@@ -24,6 +22,7 @@ import {
   isForbidden,
   isUnauthorized,
 } from '$lib/utilities/handle-error';
+import { noop } from '$lib/utilities/noop';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 import {

@@ -21,10 +21,11 @@
 
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
-  import { noop, onMount } from 'svelte/internal';
+  import { onMount } from 'svelte';
   import { writable, type Writable } from 'svelte/store';
 
   import { setContext } from 'svelte';
+  import { noop } from '$lib/utilities/noop';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';

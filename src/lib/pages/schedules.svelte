@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
@@ -17,6 +15,7 @@
   import { translate } from '$lib/i18n/translate';
   import { fetchAllSchedules } from '$lib/services/schedule-service';
   import { coreUserStore } from '$lib/stores/core-user';
+  import { noop } from '$lib/utilities/noop';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
 
   import type { ScheduleListEntry } from '$types';

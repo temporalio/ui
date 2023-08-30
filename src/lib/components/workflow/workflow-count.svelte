@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { WorkflowStatus as Status } from '$lib/types/workflows';
-  
+
   import WorkflowStatus from '../workflow-status.svelte';
 
   export let status: Status;
@@ -10,7 +10,7 @@
   export let onStatusClick: (status: Status) => void = () => {};
 </script>
 
-<div
+<button
   class="count-card flex flex-row lg:flex-col items-center lg:items-end gap-2 lg:gap-0 cursor-pointer py-1 px-2 lg:py-4 lg:px-5 border-2 border-gray-900 rounded-lg bg-white"
   class:active
   on:click={() => onStatusClick(status)}
@@ -18,7 +18,7 @@
 >
   <p class="noto text-sm lg:text-lg">{count.toLocaleString()}</p>
   <WorkflowStatus {status} />
-</div>
+</button>
 
 <style lang="postcss">
   .active {

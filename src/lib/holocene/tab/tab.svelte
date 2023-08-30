@@ -1,13 +1,12 @@
 <script lang="ts">
   import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements';
-  import { noop } from 'svelte/internal';
-  
+
   import { getContext } from 'svelte';
-  
+
   import { isNull } from '$lib/utilities/is';
-  
+
   import { type TabContext, TABS } from './tabs.svelte';
-  
+  import { noop } from '$lib/utilities/noop';
 
   type OwnProps = {
     label: string;

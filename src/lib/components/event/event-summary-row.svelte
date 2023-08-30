@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
   import { fade } from 'svelte/transition';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -17,6 +16,7 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { noop } from '$lib/utilities/noop';
 
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
@@ -162,7 +162,7 @@
   <td />
 </tr>
 {#if expanded}
-  <tr in:fade|local class:typedError>
+  <tr in:fade class:typedError>
     <td class="expanded-cell" colspan="6">
       <EventDetailsFull {event} {currentEvent} {compact} bind:selectedId />
     </td>

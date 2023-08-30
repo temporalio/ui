@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { noop } from 'svelte/internal';
+  import { noop } from '$lib/utilities/noop';
 
   import { v4 } from 'uuid';
 

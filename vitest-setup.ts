@@ -1,10 +1,10 @@
-import { noop } from 'svelte/internal';
-
 import i18next from 'i18next';
 import { vi } from 'vitest';
 
 import { I18nNamespaces } from './src/lib/i18n';
 import resources from './src/lib/i18n/locales';
+
+import { noop } from '.src/lib/utilities/noop';
 
 i18next.init({
   fallbackLng: 'en',
