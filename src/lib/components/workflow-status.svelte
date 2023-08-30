@@ -6,8 +6,9 @@
   import type { WorkflowStatus } from '$lib/types/workflows';
 
   import HeartBeat from './heart-beat-indicator.svelte';
+  import type { EventClassification } from '$lib/models/event-history/get-event-classification';
 
-  type Status = WorkflowStatus | ScheduleStatus;
+  type Status = WorkflowStatus | ScheduleStatus | EventClassification;
 
   export let delay = 0;
   export let status: Status = 'Running';
@@ -21,6 +22,18 @@
     Canceled: translate('workflows', 'canceled'),
     Terminated: translate('workflows', 'terminated'),
     Paused: translate('workflows', 'paused'),
+    Scheduled: translate('events', 'event-classification-scheduled'),
+    Started: translate('events', 'event-classification-started'),
+    Unspecified: translate('events', 'event-classification-unspecified'),
+    Open: translate('events', 'event-classification-open'),
+    New: translate('events', 'event-classification-new'),
+    Initiated: translate('events', 'event-classification-initiated'),
+    Fired: translate('events', 'event-classification-fired'),
+    CancelRequested: translate(
+      'events',
+      'event-classification-cancelrequested',
+    ),
+    Signaled: translate('events', 'event-classification-signaled'),
   };
 
   const workflowStatus = cva(
@@ -38,6 +51,15 @@
           Canceled: 'bg-yellow-100 text-yellow-900',
           Terminated: 'bg-red-100 text-red-700',
           Paused: 'bg-yellow-100 text-yellow-700',
+          Unspecified: 'bg-gray-200 text-gray-900',
+          Scheduled: 'bg-blue-100 text-blue-700',
+          Started: 'bg-blue-100 text-blue-700',
+          Open: 'bg-green-100 text-green-700',
+          New: 'bg-indigo-100 text-indigo-700',
+          Initiated: 'bg-blue-100 text-blue-700',
+          Fired: 'bg-blue-100 text-blue-700',
+          CancelRequested: 'bg-yellow-100 text-yellow-900',
+          Signaled: 'bg-purple-100 text-purple-700',
         },
       },
     },
