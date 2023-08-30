@@ -1,14 +1,17 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { workflowStatuses } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
   import { isStatusFilter } from '$lib/utilities/query/filter-search';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { requestFromAPI } from '$lib/utilities/request-from-api';
+  import { routeForApi } from '$lib/utilities/route-for-api';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  
+  import { noop } from 'svelte/internal';
+
   import WorkflowCount from './workflow-count.svelte';
 
   $: statusFilters = $workflowFilters.filter((filter) =>
@@ -40,30 +43,34 @@
   }
 
   const onStatusClick = (status: string) => {
-    if (statusFilters.find((s) => s.value === status)) {
-      const nonStatusFilters = $workflowFilters.filter(
-        (f) => !isStatusFilter(f.attribute),
-      );
-      $workflowFilters = [
-        ...nonStatusFilters,
-        ...mapStatusesToFilters(
-          statusFilters.filter((s) => s.value !== status),
-        ),
-      ];
+    if (status === 'all') {
+      $workflowFilters = [];
     } else {
-      if (!statusFilters.length) {
-        $workflowFilters = [...$workflowFilters, mapStatusToFilter(status)];
-      } else {
+      if (statusFilters.find((s) => s.value === status)) {
         const nonStatusFilters = $workflowFilters.filter(
           (f) => !isStatusFilter(f.attribute),
         );
         $workflowFilters = [
           ...nonStatusFilters,
-          ...mapStatusesToFilters([
-            ...statusFilters,
-            mapStatusToFilter(status),
-          ]),
+          ...mapStatusesToFilters(
+            statusFilters.filter((s) => s.value !== status),
+          ),
         ];
+      } else {
+        if (!statusFilters.length) {
+          $workflowFilters = [...$workflowFilters, mapStatusToFilter(status)];
+        } else {
+          const nonStatusFilters = $workflowFilters.filter(
+            (f) => !isStatusFilter(f.attribute),
+          );
+          $workflowFilters = [
+            ...nonStatusFilters,
+            ...mapStatusesToFilters([
+              ...statusFilters,
+              mapStatusToFilter(status),
+            ]),
+          ];
+        }
       }
     }
 
@@ -77,14 +84,34 @@
       allowEmpty: true,
     });
   };
+
+  const countRoute = routeForApi('workflows.count', {
+    namespace: $page.params.namespace,
+  });
+  const countPromise = requestFromAPI<{ count: string }>(countRoute, {
+    params: { query: 'GROUP BY ExecutionStatus' },
+    onError: noop,
+    handleError: noop,
+  });
 </script>
 
-<div class="flex gap-2 lg:gap-4 flex-wrap">
-  {#each workflowStatuses as status}
+{#await countPromise then counts}
+  {(console.log('COUNTS: ', counts), '')}
+  <div class="flex gap-2 lg:gap-4 flex-wrap">
     <WorkflowCount
-      {status}
+      status="all"
+      count={parseInt(counts?.count || '0')}
       {onStatusClick}
-      active={statusFilters.some((filter) => filter.value === status)}
+      active={!$workflowFilters.length}
     />
-  {/each}
-</div>
+    {#each workflowStatuses as status}
+      <WorkflowCount
+        {status}
+        {onStatusClick}
+        active={statusFilters.some((filter) => filter.value === status)}
+      />
+    {/each}
+  </div>
+{:catch error}
+  <div>{error}</div>
+{/await}

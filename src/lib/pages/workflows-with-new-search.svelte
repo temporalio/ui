@@ -47,12 +47,11 @@
 
 <script lang="ts">
   import { derived, writable } from 'svelte/store';
-  
+
   import { onMount } from 'svelte';
-  
+
   import { page } from '$app/stores';
-  
-  
+
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
@@ -89,6 +88,7 @@
   import { exportWorkflows } from '$lib/utilities/export-workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);
@@ -274,6 +274,7 @@
     </button>
   </div>
 </header>
+<WorkflowCounts />
 <div class="flex flex-col md:flex-row gap-2">
   <LabsModeGuard>
     <svelte:fragment slot="fallback">
