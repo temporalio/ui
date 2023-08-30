@@ -36,7 +36,6 @@
     {translate('task-queue')}:
     <span class="select-all font-normal">{taskQueue}</span>
   </h2>
-
   {#if versionSets?.length}
     <h2 class="text-base font-medium" data-testid="version-sets">
       {translate('workers', 'version-sets')}
@@ -85,6 +84,7 @@
   {/if}
   <h2 class="text-base font-medium" data-testid="workers">
     {translate('workers', 'workers')}
+    {#if workers?.pollers?.length}({workers.pollers.length} total){/if}
   </h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <caption class="sr-only" slot="caption"
