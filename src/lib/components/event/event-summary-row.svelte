@@ -143,7 +143,7 @@
   {#if !expanded}
     <td class="overflow-hidden">
       <div class="flex w-full items-center justify-between">
-        <div class="grow truncate">
+        <div class="grow">
           <EventDetailsRow
             {...getSingleAttributeForEvent(currentEvent)}
             {attributes}

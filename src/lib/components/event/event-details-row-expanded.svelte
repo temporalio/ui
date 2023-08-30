@@ -152,7 +152,7 @@
   }
 
   .detail-row {
-    @apply block w-full items-start gap-4 py-2 text-left xl:flex;
+    @apply flex w-full items-center gap-4 py-2 text-left xl:flex;
   }
 
   .row:last-of-type .content {
