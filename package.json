@@ -126,7 +126,7 @@
     "@types/uuid": "^9.0.0",
     "@types/yargs": "^17.0.24",
     "@typescript-eslint/eslint-plugin": "^5.52.0",
-    "@typescript-eslint/parser": "^5.52.0",
+    "@typescript-eslint/parser": "^6.5.0",
     "@vitest/ui": "^0.32.2",
     "autoprefixer": "^10.4.13",
     "c8": "^7.12.0",
