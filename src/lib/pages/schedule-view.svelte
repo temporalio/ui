@@ -191,7 +191,7 @@
           destructive
           on:click={() => (deleteConfirmationModalOpen = true)}
         >
-          {translate('schedules', 'delete')}
+          {translate('delete')}
         </MenuItem>
       </SplitButton>
     </header>

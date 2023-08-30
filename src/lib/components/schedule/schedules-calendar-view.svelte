@@ -45,7 +45,7 @@
 </script>
 
 <Tabs class="mt-8 w-full">
-  <h2 class="mb-4 text-2xl">{translate('schedules', 'frequency')}</h2>
+  <h2 class="mb-4 text-2xl">{translate('schedules', 'schedule-spec')}</h2>
   <TabList label="Schedule Tabs" class="flex flex-wrap gap-6">
     {#if schedule}
       <Tab
