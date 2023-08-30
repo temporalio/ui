@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Badge from '$lib/holocene/badge.svelte';
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -21,7 +22,6 @@
     getNonDefaultVersionsForSet,
     getOrderedVersionSets,
   } from '$lib/utilities/task-queue-compatibility';
-  import Badge from '$lib/holocene/badge.svelte';
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;
