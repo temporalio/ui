@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { HTMLTableAttributes } from 'svelte/elements';
-  
+
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
   interface $$Props extends HTMLTableAttributes {
@@ -49,6 +49,10 @@
       @apply bg-gray-900 text-gray-100;
 
       :global(th) {
+        @apply border-t border-gray-900 px-1 py-2;
+      }
+
+      :global(td) {
         @apply border-t border-gray-900 px-1 py-2;
 
         &:first-child {

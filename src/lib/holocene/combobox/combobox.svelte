@@ -10,7 +10,7 @@
 
   import Icon from '../icon/icon.svelte';
   import type { IconName } from '../icon/paths';
-  import MenuButton from '../menu/menu-button.svelte';
+  import IconButton from '../icon-button.svelte';
 
   type T = $$Generic;
 
@@ -26,6 +26,7 @@
   interface BaseProps extends HTMLInputAttributes {
     id: string;
     label: string;
+    toggleLabel: string;
     value: string;
     noResultsText: string;
     disabled?: boolean;
@@ -61,6 +62,7 @@
   export let id: string;
   export let label: string;
   export let value: string = undefined;
+  export let toggleLabel: string;
   export let noResultsText: string;
   export let disabled = false;
   export let labelHidden = false;
@@ -106,6 +108,14 @@
 
     displayValue = getDisplayValue(selectedOption);
   }
+
+  const toggleList = () => {
+    if ($open) {
+      closeList();
+    } else {
+      openList();
+    }
+  };
 
   const openList = () => {
     $open = true;
@@ -234,12 +244,17 @@
     {label}
   </label>
 
-  <MenuButton hasIndicator {disabled} controls="{id}-listbox">
-    <svelte:fragment slot="leading">
-      {#if leadingIcon}
-        <Icon class="shrink-0" name={leadingIcon} />
-      {/if}
-    </svelte:fragment>
+  <div
+    class="text-sm w-full h-10 flex flex-row items-center rounded-lg bg-white border border-primary"
+  >
+    {#if leadingIcon}
+      <Icon
+        width={20}
+        height={20}
+        class="mx-3 shrink-0 text-gray-500"
+        name={leadingIcon}
+      />
+    {/if}
     <input
       {id}
       {placeholder}
@@ -266,7 +281,16 @@
       bind:this={inputElement}
       {...$$restProps}
     />
-  </MenuButton>
+    <IconButton
+      label={toggleLabel}
+      class="h-full w-10 shrink-0"
+      tabindex={-1}
+      icon={$open ? 'chevron-up' : 'chevron-down'}
+      aria-controls="{id}-listbox"
+      aria-expanded={$open}
+      on:click={toggleList}
+    />
+  </div>
 
   <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
     {#each list as option}

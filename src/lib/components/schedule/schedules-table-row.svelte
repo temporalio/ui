@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
@@ -15,10 +15,9 @@
     routeForEventHistory,
     routeForSchedule,
   } from '$lib/utilities/route-for';
-  
+
   import ScheduleFrequency from './schedule-frequency.svelte';
-  
-  
+
   import type { ScheduleActionResult, ScheduleListEntry } from '$types';
 
   let { namespace } = $page.params;
@@ -53,9 +52,6 @@
   </td>
   <td class="cell whitespace-pre-line break-words">
     <p class="text-base">{schedule.scheduleId}</p>
-    <p>
-      <ScheduleFrequency {calendar} {interval} class="text-sm" />
-    </p>
   </td>
   <td class="cell whitespace-pre-line break-words max-md:hidden">
     {schedule?.info?.workflowType?.name ?? ''}
@@ -87,9 +83,24 @@
     {/each}
   </td>
 </TableRow>
+<TableRow class="row">
+  <td colspan="5" class="hidden xl:table-cell !p-0">
+    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  </td>
+  <td colspan="3" class="hidden md:table-cell xl:hidden !p-0">
+    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  </td>
+  <td colspan="2" class="md:hidden !p-0">
+    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  </td>
+</TableRow>
 
 <style lang="postcss">
   .cell {
     @apply p-2 text-left;
+  }
+
+  :global(.row td) {
+    @apply !border-t-0;
   }
 </style>

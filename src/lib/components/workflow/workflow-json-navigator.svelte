@@ -77,7 +77,12 @@
     </div>
     <slot name="decode" />
   </div>
-  <CodeBlock content={events[index - 1]} data-testid="event-history-json" />
+  <CodeBlock
+    content={events[index - 1]}
+    testId="event-history-json"
+    copyIconTitle={translate('copy-icon-title')}
+    copySuccessIconTitle={translate('copy-success-icon-title')}
+  />
 {/if}
 
 <style lang="postcss">

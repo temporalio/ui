@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import {
@@ -6,10 +8,34 @@
     stringifyWithBigInt,
   } from '$lib/utilities/parse-with-big-int';
 
+  type BaseProps = HTMLAttributes<HTMLDivElement> & {
+    content: Parameters<typeof JSON.stringify>[0];
+    inline?: boolean;
+    language?: string;
+    async?: boolean;
+    testId?: string;
+    copyable?: boolean;
+    copyIconTitle?: string;
+    copySuccessIconTitle?: string;
+  };
+
+  type CopyableProps = Omit<
+    BaseProps,
+    'copyable' | 'copyIconTitle' | 'copySuccessIconTitle'
+  > & {
+    copyable: false;
+    copyIconTitle?: never;
+    copySuccessIconTitle?: never;
+  };
+
+  type $$Props = BaseProps | CopyableProps;
+
   export let content: Parameters<typeof JSON.stringify>[0];
   export let inline = false;
   export let language = 'json';
   export let copyable = true;
+  export let copyIconTitle = '';
+  export let copySuccessIconTitle = '';
   export let async = true;
 
   let root: HTMLElement;
@@ -72,6 +98,7 @@
           class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
         >
           <Icon
+            title={$copied ? copySuccessIconTitle : copyIconTitle}
             name={$copied ? 'checkmark' : 'copy'}
             class="text-white hover:text-gray-900"
           />

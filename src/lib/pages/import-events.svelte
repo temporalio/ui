@@ -2,7 +2,7 @@
   import HistoryImport from '$lib/components/import/event-history-file-import.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
-import { translate } from '$lib/i18n/translate';
+  import { translate } from '$lib/i18n/translate';
 
   const format1 = { events: 'HistoryEvent[]' };
   const format2 = 'HistoryEvent[]';
@@ -12,7 +12,7 @@ import { translate } from '$lib/i18n/translate';
   <nav
     id="event-history"
     class="block items-center justify-between gap-4 pb-4 lg:flex"
-    aria-label="import event history"
+    aria-label={translate('events', 'import-event-history')}
   >
     <h1 class="text-lg font-medium" data-testid="import-event-history">
       {translate('events', 'import-event-history')}
@@ -32,12 +32,22 @@ import { translate } from '$lib/i18n/translate';
         class="mb-8">{translate('events', 'api-history-link')}</Link
       >
     </div>
-    <h3 class="mt-8 text-lg font-medium">
+    <h2 class="mt-8 text-lg font-medium">
       {translate('events', 'history-expected-formats')}
-    </h3>
+    </h2>
     <div class="h-40 text-center">
-      <CodeBlock content={format1} inline />
-      <CodeBlock content={format2} inline />
+      <CodeBlock
+        content={format1}
+        inline
+        copyIconTitle={translate('copy-icon-title')}
+        copySuccessIconTitle={translate('copy-success-icon-title')}
+      />
+      <CodeBlock
+        content={format2}
+        inline
+        copyIconTitle={translate('copy-icon-title')}
+        copySuccessIconTitle={translate('copy-success-icon-title')}
+      />
     </div>
   </div>
 </section>

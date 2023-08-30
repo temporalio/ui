@@ -1,9 +1,9 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
-  
+
   import Alert from '$lib/holocene/alert.svelte';
   import { translate } from '$lib/i18n/translate';
-import { workflowRun } from '$lib/stores/workflow-run';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowIsCompatibleWithWorkers } from '$lib/utilities/task-queue-compatibility';
 
   $: ({ workflow, workers, compatibility } = $workflowRun);
@@ -20,7 +20,6 @@ import { workflowRun } from '$lib/stores/workflow-run';
       icon="warning"
       intent="warning"
       title={translate('workflows', 'workflow-error-no-workers-title')}
-      role="status"
     >
       {translate('workflows', 'workflow-error-no-workers-description', {
         taskQueue: workflow?.taskQueue,
@@ -38,7 +37,6 @@ import { workflowRun } from '$lib/stores/workflow-run';
         'workflows',
         'workflow-error-no-compatible-workers-title',
       )}
-      role="status"
     >
       {translate(
         'workflows',
