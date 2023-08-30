@@ -1,5 +1,7 @@
-<script lang="ts" generics="E extends keyof SvelteHTMLElements">
+<script lang="ts">
   import type { SvelteHTMLElements } from 'svelte/elements';
+
+  type E = $$Generic<keyof SvelteHTMLElements>;
 
   type $$Props = SvelteHTMLElements[E] & {
     as?: E;

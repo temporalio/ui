@@ -1,6 +1,8 @@
-<script lang="ts" generics="Namespace extends I18nNamespace">
+<script lang="ts">
   import type { I18nKey, I18nNamespace, I18nReplace } from '$lib/i18n';
   import { translate } from '$lib/i18n/translate';
+
+  type Namespace = $$Generic<I18nNamespace>;
 
   type $$Props = {
     namespace: Namespace;
