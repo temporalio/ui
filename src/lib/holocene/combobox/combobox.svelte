@@ -249,7 +249,7 @@
       <Icon
         width={20}
         height={20}
-        class="shrink-0 text-gray-500"
+        class="shrink-0 text-gray-500 ml-2"
         name={leadingIcon}
       />
     {/if}
@@ -324,11 +324,11 @@
   }
 
   .combobox-wrapper {
-    @apply text-sm w-full h-10 flex flex-row items-center rounded-lg bg-white border border-primary px-2 gap-2 focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
+    @apply text-sm w-full h-10 flex flex-row items-center rounded-lg bg-white border border-primary focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
   }
 
   .combobox-input {
-    @apply h-full w-full font-primary focus:outline-none;
+    @apply grow h-full w-full font-primary focus:outline-none ml-2;
   }
 
   .combobox-button {

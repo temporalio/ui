@@ -26,7 +26,7 @@
     @apply p-1 inline-block rounded-full border-2 border-[transparent];
 
     &:not(:disabled) {
-      @apply hover:bg-gray-900 hover:text-white hover:border-indigo-600 hover:shadow-focus hover:shadow-blue-600/50 focus-visible:outline-none focus-visible:bg-gray-900 focus-visible:text-white focus-visible:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50
+      @apply hover:border-indigo-600 hover:shadow-focus hover:shadow-blue-600/50 focus-visible:outline-none focus-visible:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50
     }
 
     &:disabled {
