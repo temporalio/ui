@@ -66,6 +66,7 @@
 {#if as === 'button'}
   <button
     on:click|stopPropagation
+    type="button"
     class="button {variant} {className}"
     class:selected={active}
     class:large
@@ -96,11 +97,16 @@
   <a
     {href}
     on:click|stopPropagation
-    class="button {variant} {className}"
+    class="button whitespace-nowrap {variant} {className}"
     class:selected={active}
     class:large
     class:disabled
     class:thin
+    class:unround
+    class:unroundRight
+    class:unroundLeft
+    class:noBorderRight
+    class:noBorderLeft
     {target}
     {id}
     {...$$restProps}

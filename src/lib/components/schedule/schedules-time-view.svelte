@@ -1,8 +1,8 @@
 <script lang="ts">
-  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
 
   export let hour = '';
@@ -41,7 +41,7 @@
   <div class="flex flex-row items-center gap-2">
     <div class="w-24">
       <Input
-        id="hour"
+        id="hour-time"
         label={translate('hours-abbreviated')}
         labelHidden
         bind:value={_hour}
@@ -54,7 +54,7 @@
     <div>:</div>
     <div class="w-24">
       <Input
-        id="minute"
+        id="minute-time"
         label={translate('minutes-abbreviated')}
         labelHidden
         bind:value={minute}

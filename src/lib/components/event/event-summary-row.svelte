@@ -1,27 +1,25 @@
 <script lang="ts">
+  import { noop } from 'svelte/internal';
   import { fade } from 'svelte/transition';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
-
-  import { eventShowElapsed, eventFilterSort } from '$lib/stores/event-view';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
-
+  import { isEventGroup } from '$lib/models/event-groups';
   import {
-    eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsCanceled,
+    eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
+  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import type { IterableEvent } from '$lib/types/events';
   import { formatDate } from '$lib/utilities/format-date';
+  import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
-
-  import EventDetailsRow from './event-details-row.svelte';
-  import EventDetailsFull from './event-details-full.svelte';
-  import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
-  import { noop } from 'svelte/internal';
-  import { isEventGroup } from '$lib/models/event-groups';
-  import type { IterableEvent } from '$lib/types/events';
+
+  import EventDetailsFull from './event-details-full.svelte';
+  import EventDetailsRow from './event-details-row.svelte';
 
   export let event: IterableEvent;
   export let initialItem: IterableEvent | undefined;
@@ -74,7 +72,6 @@
   class="row"
   id={event.id}
   class:expanded={expanded && !expandAll}
-  aria-expanded={expanded || expandAll}
   class:active
   class:failure
   class:canceled

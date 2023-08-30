@@ -13,26 +13,28 @@
 
 <script lang="ts">
   import {
+    createEventDispatcher,
     getContext,
     onDestroy,
     onMount,
-    createEventDispatcher,
   } from 'svelte';
+
   import { MenuItem } from '$lib/holocene/menu';
-  import { type SelectContext, SELECT_CONTEXT } from './select.svelte';
+
+  import { SELECT_CONTEXT, type SelectContext } from './select.svelte';
 
   type T = $$Generic;
 
-  const { selectValue, handleChange, options, open } =
+  const { selectValue, handleChange, options } =
     getContext<SelectContext<T>>(SELECT_CONTEXT);
 
   const dispatch = createEventDispatcher<{ click: { value: T } }>();
 
   export let value: T;
-  export let description: string = '';
+  export let description = '';
 
-  let selected: boolean = false;
-  let _value: any;
+  let selected = false;
+  let _value: T | string;
   let slotWrapper: HTMLSpanElement;
   let optionElement: HTMLLIElement;
   let label: string;
@@ -61,8 +63,8 @@
   });
 
   const handleOptionClick = () => {
-    handleChange(_value);
-    dispatch('click', { value: _value });
+    handleChange(_value as T);
+    dispatch('click', { value: _value as T });
   };
 </script>
 

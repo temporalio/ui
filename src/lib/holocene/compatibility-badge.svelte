@@ -6,7 +6,7 @@
   export let buildId = '';
 </script>
 
-<p class="select-all flex gap-2 noto">
+<p class="select-all flex gap-2 font-mono">
   {#if defaultVersion && buildId}
     <span class:active-version={active} class:version={!active}>
       <Icon name="merge" />{buildId}

@@ -1,15 +1,17 @@
 <script lang="ts">
-  import type { PageData } from './$types';
   import { page } from '$app/stores';
 
-  import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
-  import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
-  import WorkflowFilters from './_workflow-filters.svelte';
-  import Pagination from '$lib/holocene/pagination.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import type { PageData } from './$types';
+
   import PageTitle from '$lib/components/page-title.svelte';
+  import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
+  import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Pagination from '$lib/holocene/pagination.svelte';
   import { translate } from '$lib/i18n/translate';
+
+  import WorkflowFilters from './_workflow-filters.svelte';
 
   export let data: PageData & { archivalQueryingNotSupported: boolean };
 
@@ -70,6 +72,8 @@
     content={`temporal operator namespace update --visibility-archival-state enabled ${namespaceName}`}
     language="text"
     inline
+    copyIconTitle={translate('copy-icon-title')}
+    copySuccessIconTitle={translate('copy-success-icon-title')}
   />
 {:else}
   <h1 class="text-2xl" data-testid="archived-disabled-title">
@@ -80,6 +84,8 @@
     content={`temporal operator namespace update --history-archival-state enabled ${namespaceName}`}
     language="text"
     inline
+    copyIconTitle={translate('copy-icon-title')}
+    copySuccessIconTitle={translate('copy-success-icon-title')}
   />
   {#if !visibilityArchivalEnabled}
     <p>
@@ -94,6 +100,8 @@
       content={`temporal operator namespace update --visibility-archival-state enabled ${namespaceName}`}
       language="text"
       inline
+      copyIconTitle={translate('copy-icon-title')}
+      copySuccessIconTitle={translate('copy-success-icon-title')}
     />
   {/if}
 {/if}

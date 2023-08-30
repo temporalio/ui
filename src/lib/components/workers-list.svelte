@@ -1,20 +1,20 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
-
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import { formatDate } from '$lib/utilities/format-date';
-  import { translate } from '$lib/i18n/translate';
-
+  import Badge from '$lib/holocene/badge.svelte';
+  import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Table from '$lib/holocene/table/table.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
+  import { translate } from '$lib/i18n/translate';
   import {
+    getBuildIdReachability,
     type GetPollersResponse,
     type TaskQueueCompatibility,
     type WorkerReachability,
-    getBuildIdReachability,
   } from '$lib/services/pollers-service';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { formatDate } from '$lib/utilities/format-date';
   import {
     getCurrentCompatibilityDefaultVersion,
     getCurrentPollerBuildId,
@@ -22,7 +22,6 @@
     getNonDefaultVersionsForSet,
     getOrderedVersionSets,
   } from '$lib/utilities/task-queue-compatibility';
-  import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;
@@ -38,7 +37,6 @@
     {translate('task-queue')}:
     <span class="select-all font-normal">{taskQueue}</span>
   </h2>
-
   {#if versionSets?.length}
     <h2 class="text-base font-medium" data-testid="version-sets">
       {translate('workers', 'version-sets')}
@@ -65,7 +63,7 @@
             </CompatibilityBadge>
           </td>
           <td class="text-left" data-testid="version-compatible-builds">
-            <div class="flex gap-2 noto flex-wrap">
+            <div class="flex gap-2 font-mono flex-wrap">
               {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
                 <CompatibilityBadge active={false} {buildId}>
                   <svelte:fragment slot="default-worker">
@@ -85,8 +83,14 @@
       {/each}
     </Table>
   {/if}
-  <h2 class="text-base font-medium" data-testid="workers">
+  <h2
+    class="text-base font-medium flex items-center gap-2"
+    data-testid="workers"
+  >
     {translate('workers', 'workers')}
+    <Badge type="count" class="rounded-sm"
+      >{workers?.pollers?.length || 0}</Badge
+    >
   </h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <caption class="sr-only" slot="caption"

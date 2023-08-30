@@ -1,27 +1,25 @@
 <script lang="ts">
-  import ProgressBar from '../progress-bar.svelte';
-
   import { page } from '$app/stores';
 
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-
-  import {
-    MAX_PAGE_SIZE,
-    defaultItemsPerPage,
-    pagination,
-    perPageKey,
-    currentPageKey,
-    options,
-  } from '$lib/stores/pagination';
-
+  import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
-  import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
+  import {
+    currentPageKey,
+    defaultItemsPerPage,
+    MAX_PAGE_SIZE,
+    options,
+    pagination,
+    perPageKey,
+  } from '$lib/stores/pagination';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+
+  import ProgressBar from '../progress-bar.svelte';
 
   type Item = $$Generic;
 
   export let items: Item[];
-  export let updating: boolean = false;
+  export let updating = false;
   export let perPageLabel: string;
   export let pageButtonLabel: (page: number) => string;
   export let nextPageButtonLabel: string;

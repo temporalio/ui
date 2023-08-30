@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
-  import { fly } from 'svelte/transition';
-  import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
   import type { HTMLAttributes } from 'svelte/elements';
+  import { fly } from 'svelte/transition';
+
+  import { getContext } from 'svelte';
+
+  import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
   interface $$Props extends HTMLAttributes<HTMLUListElement> {
     id: string;

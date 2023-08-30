@@ -1,10 +1,13 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import IconButton from '../icon-button.svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
+
+  import { createEventDispatcher } from 'svelte';
+
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+
+  import IconButton from '../icon-button.svelte';
 
   type BaseProps = HTMLInputAttributes & {
     id: string;
@@ -54,9 +57,9 @@
   export let hintText = '';
   export let maxLength = 0;
   export let spellcheck: boolean = null;
-  export let unroundRight: boolean = false;
-  export let unroundLeft: boolean = false;
-  export let noBorder: boolean = false;
+  export let unroundRight = false;
+  export let unroundLeft = false;
+  export let noBorder = false;
   export let autoFocus = false;
   export let error = false;
   export let required = false;
@@ -150,9 +153,15 @@
       </span>
     {/if}
   </div>
-  {#if hintText}
-    <span class="hint-text" class:invalid={!valid} class:error>{hintText}</span>
-  {/if}
+  <span
+    class="inline-block hint-text"
+    class:invalid={!valid}
+    class:error
+    class:hidden={!hintText}
+    role={error ? 'alert' : null}
+  >
+    {hintText}
+  </span>
 </div>
 
 <style lang="postcss">
@@ -234,7 +243,7 @@
   }
 
   .hint-text {
-    @apply mt-2 inline-block text-xs;
+    @apply mt-2 text-xs;
   }
 
   .hint-text.error,

@@ -15,8 +15,8 @@
   export let hintText = '';
   export let max: number = undefined;
   export let min: number = undefined;
-  export let unroundRight: boolean = false;
-  export let unroundLeft: boolean = false;
+  export let unroundRight = false;
+  export let unroundLeft = false;
   export let search = false;
 
   let valid = true;

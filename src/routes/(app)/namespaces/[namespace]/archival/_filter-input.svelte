@@ -1,8 +1,11 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import debounce from 'just-debounce';
+  
+  import { page } from '$app/stores';
+  
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  
 
   export let parameter: string;
   export let name: string;

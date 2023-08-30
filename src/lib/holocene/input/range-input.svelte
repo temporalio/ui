@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { omit } from '$lib/utilities/omit';
   import type { HTMLInputAttributes } from 'svelte/elements';
+  
+  import { omit } from '$lib/utilities/omit';
 
   interface $$Props extends HTMLInputAttributes {
     value: number;
@@ -18,7 +19,7 @@
   export let max: number = undefined;
   export let id: string = undefined;
   export let value: number = Math.round((min + max) / 2);
-  let valid: boolean = true;
+  let valid = true;
   let outputElement: HTMLOutputElement;
 
   $: outputXPos = getOutputXPos({ value, min, max });

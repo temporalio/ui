@@ -1,16 +1,18 @@
 <script lang="ts">
-  import Tab from '$lib/holocene/tab/tab.svelte';
+  import { page } from '$app/stores';
+
+  import Input from '$lib/holocene/input/input.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import TabPanel from '$lib/holocene/tab/tab-panel.svelte';
-  import SchedulesIntervalView from './schedules-interval-view.svelte';
-  import ScheduleDayOfWeekView from './schedule-day-of-week-view.svelte';
-  import ScheduleDayOfMonthView from './schedule-day-of-month-view.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import { page } from '$app/stores';
-  import ScheduleFrequency from './schedule-frequency.svelte';
+  import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
-  import type { FullSchedule, SchedulePreset } from '$lib/types/schedule';
   import { translate } from '$lib/i18n/translate';
+  import type { FullSchedule, SchedulePreset } from '$lib/types/schedule';
+
+  import ScheduleDayOfMonthView from './schedule-day-of-month-view.svelte';
+  import ScheduleDayOfWeekView from './schedule-day-of-week-view.svelte';
+  import ScheduleFrequency from './schedule-frequency.svelte';
+  import SchedulesIntervalView from './schedules-interval-view.svelte';
 
   let scheduleId = $page.params.schedule;
 
@@ -43,7 +45,7 @@
 </script>
 
 <Tabs class="mt-8 w-full">
-  <h2 class="mb-4 text-2xl">{translate('schedules', 'frequency')}</h2>
+  <h2 class="mb-4 text-2xl">{translate('schedules', 'schedule-spec')}</h2>
   <TabList label="Schedule Tabs" class="flex flex-wrap gap-6">
     {#if schedule}
       <Tab
@@ -80,11 +82,10 @@
   </TabList>
   <div class="mt-4 flex w-full flex-wrap gap-6">
     {#if schedule}
-      <TabPanel id="existing-panel" tabId="existing-tab">
+      <TabPanel id="existing-panel" tabId="existing-tab" class="w-full">
         <ScheduleFrequency
           calendar={schedule?.spec?.structuredCalendar?.[0]}
           interval={schedule?.spec?.interval?.[0]}
-          class="text-base"
         />
       </TabPanel>
     {/if}

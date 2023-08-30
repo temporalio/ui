@@ -1,15 +1,16 @@
 <script lang="ts">
+  
+  import FeatureGuard from '$lib/components/feature-guard.svelte';
+  import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
+  import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { DescribeNamespaceResponse as Namespace } from '$types';
-
   import NavContainer from '$lib/holocene/navigation/nav-container.svelte';
   import NavRow from '$lib/holocene/navigation/nav-row.svelte';
   import NavTooltip from '$lib/holocene/navigation/nav-tooltip.svelte';
-  import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
-  import FeatureGuard from '$lib/components/feature-guard.svelte';
-  import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
   import { translate } from '$lib/i18n/translate';
   import { labsMode } from '$lib/stores/labs-mode';
+  
+  import type { DescribeNamespaceResponse as Namespace } from '$types';
 
   export let isCloud = false;
   export let activeNamespace: Namespace;

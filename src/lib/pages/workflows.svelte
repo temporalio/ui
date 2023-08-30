@@ -1,24 +1,26 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
+  
   import { page } from '$app/stores';
+  
+  import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
+  import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
+  import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
+  import Pagination from '$lib/holocene/pagination.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import {
-    refresh,
-    workflows,
     loading,
+    refresh,
     updating,
     workflowError,
+    workflows,
   } from '$lib/stores/workflows';
-  import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Pagination from '$lib/holocene/pagination.svelte';
-  import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
   import { getSearchType } from '$lib/utilities/search-type-parameter';
-  import Loading from '$lib/holocene/loading.svelte';
-  import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
-  import { translate } from '$lib/i18n/translate';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 

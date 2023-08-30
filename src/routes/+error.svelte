@@ -11,7 +11,7 @@
 
   $: error = $page.error;
   $: status = $page.status;
-  let requestFromAPIError: Record<string, any>;
+  let requestFromAPIError: Record<string, unknown>;
 
   try {
     requestFromAPIError = parseWithBigInt(error.message);
@@ -19,7 +19,9 @@
     if (isNetworkError(requestFromAPIError)) {
       status = requestFromAPIError.statusCode;
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+  }
 </script>
 
 <Error {error} {status} />

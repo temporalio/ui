@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { routeForEventHistory } from '$lib/utilities/route-for';
-
+  import Link from '$lib/holocene/link.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
-
+  import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
+  
   import WorkflowStatus from '../workflow-status.svelte';
-  import Link from '$lib/holocene/link.svelte';
-  import { translate } from '$lib/i18n/translate';
+  
 
   export let children: ChildWorkflowClosedEvent[] = [];
   export let pendingChildren: WorkflowExecution['pendingChildren'] = [];

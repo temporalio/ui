@@ -1,24 +1,25 @@
 <script lang="ts">
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Pagination from '$lib/holocene/pagination.svelte';
-  import Button from '$lib/holocene/button.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
-
   import { noop } from 'svelte/internal';
-  import Input from '$lib/holocene/input/input.svelte';
-  import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
-  import { routeForScheduleCreate } from '$lib/utilities/route-for';
-  import { fetchAllSchedules } from '$lib/services/schedule-service';
-  import type { ScheduleListEntry } from '$types';
-  import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
-  import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
 
-  import { coreUserStore } from '$lib/stores/core-user';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+
+  import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
+  import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
+  import Pagination from '$lib/holocene/pagination.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fetchAllSchedules } from '$lib/services/schedule-service';
+  import { coreUserStore } from '$lib/stores/core-user';
+  import { routeForScheduleCreate } from '$lib/utilities/route-for';
+
+  import type { ScheduleListEntry } from '$types';
 
   $: namespace = $page.params.namespace;
 

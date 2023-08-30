@@ -1,6 +1,7 @@
 <script lang="ts">
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Badge from '$lib/holocene/badge.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let content: string;
   export let title: string;
@@ -30,11 +31,21 @@
     {#if showParsedContent}
       <div class="flex flex-col h-full lg:max-h-[24rem] overflow-scroll">
         {#each parsedContent as content}
-          <CodeBlock content={JSON.stringify(content)} class="mb-2" />
+          <CodeBlock
+            content={JSON.stringify(content)}
+            class="mb-2"
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
+          />
         {/each}
       </div>
     {:else}
-      <CodeBlock {content} class="mb-2 lg:max-h-[23.5rem]" />
+      <CodeBlock
+        {content}
+        class="mb-2 lg:max-h-[23.5rem]"
+        copyIconTitle={translate('copy-icon-title')}
+        copySuccessIconTitle={translate('copy-success-icon-title')}
+      />
     {/if}
   {:else}
     <CodeBlock

@@ -1,12 +1,31 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
   import { fly } from 'svelte/transition';
 
-  import { autoRefreshWorkflow } from '$lib/stores/event-view';
-  import { workflowsSearchParams } from '$lib/stores/workflows';
-  import { refresh, workflowRun } from '$lib/stores/workflow-run';
-  import { eventHistory } from '$lib/stores/events';
+  import { onDestroy, onMount } from 'svelte';
 
+  import { page } from '$app/stores';
+
+  import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
+  import WorkflowActions from '$lib/components/workflow-actions.svelte';
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
+  import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
+  import Copyable from '$lib/holocene/copyable.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
+  import TabList from '$lib/holocene/tab/tab-list.svelte';
+  import Tab from '$lib/holocene/tab/tab.svelte';
+  import Tabs from '$lib/holocene/tab/tabs.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { autoRefreshWorkflow } from '$lib/stores/event-view';
+  import { eventHistory } from '$lib/stores/events';
+  import { resetWorkflows } from '$lib/stores/reset-workflows';
+  import { refresh, workflowRun } from '$lib/stores/workflow-run';
+  import { workflowsSearchParams } from '$lib/stores/workflows';
+  import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
+  import { has } from '$lib/utilities/has';
+  import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForEventHistory,
     routeForPendingActivities,
@@ -15,36 +34,17 @@
     routeForWorkflowQuery,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
-
-  import Badge from '$lib/holocene/badge.svelte';
-  import Copyable from '$lib/holocene/copyable.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import WorkflowActions from '$lib/components/workflow-actions.svelte';
-  import Tab from '$lib/holocene/tab/tab.svelte';
-  import { page } from '$app/stores';
-  import { pathMatches } from '$lib/utilities/path-matches';
-  import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
-  import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
-  import { resetWorkflows } from '$lib/stores/reset-workflows';
-  import { has } from '$lib/utilities/has';
-  import Link from '$lib/holocene/link.svelte';
-  import Tabs from '$lib/holocene/tab/tabs.svelte';
-  import TabList from '$lib/holocene/tab/tab-list.svelte';
-  import { translate } from '$lib/i18n/translate';
   import {
     getCurrentCompatibilityDefaultVersion,
     getCurrentWorkflowBuildId,
     getDefaultVersionForSetFromABuildId,
   } from '$lib/utilities/task-queue-compatibility';
-  import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
 
   export let namespace: string;
 
   $: ({ workflow, workers, compatibility } = $workflowRun);
 
-  let refreshInterval: NodeJS.Timer;
+  let refreshInterval: ReturnType<typeof setInterval>;
   const refreshRate = 15000;
 
   $: routeParameters = {
@@ -123,7 +123,7 @@
     class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
   >
     <div
-      class="flex flex-col gap-2 w-full justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
+      class="flex flex-col w-full justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
     >
       <h1
         data-testid="workflow-id-heading"
@@ -197,7 +197,6 @@
         icon="info"
         intent="info"
         title={translate('workflows', 'cancel-request-sent')}
-        role="status"
       >
         {translate('workflows', 'cancel-request-sent-description')}
       </Alert>
@@ -211,7 +210,6 @@
         intent="info"
         data-testid="workflow-reset-alert"
         title={translate('workflows', 'reset-success-alert-title')}
-        role="status"
       >
         You can find the resulting Workflow Execution <Link
           href={routeForEventHistory({

@@ -1,38 +1,36 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+
+  import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
+  import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
+  import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
+  import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
+  import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
+  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
+  import SplitButton from '$lib/holocene/split-button.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import {
+    deleteSchedule,
+    fetchSchedule,
+    pauseSchedule,
+    unpauseSchedule,
+  } from '$lib/services/schedule-service';
+  import { coreUserStore } from '$lib/stores/core-user';
+  import { loading } from '$lib/stores/schedules';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+  import { formatDate } from '$lib/utilities/format-date';
   import {
     routeForScheduleEdit,
     routeForSchedules,
   } from '$lib/utilities/route-for';
-  import { goto } from '$app/navigation';
 
-  import {
-    fetchSchedule,
-    deleteSchedule,
-    pauseSchedule,
-    unpauseSchedule,
-  } from '$lib/services/schedule-service';
-  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-
-  import { formatDate } from '$lib/utilities/format-date';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import { loading } from '$lib/stores/schedules';
-
-  import ScheduleMemo from '$lib/components/schedule/schedule-memo.svelte';
-  import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
-  import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
-  import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
-  import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
-  import SplitButton from '$lib/holocene/split-button.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
   import type { DescribeScheduleResponse } from '$types';
-  import { coreUserStore } from '$lib/stores/core-user';
-  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
-  import { translate } from '$lib/i18n/translate';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -94,6 +92,29 @@
 </script>
 
 {#await scheduleFetch}
+  <header class="mb-8">
+    <div class="flex flex-col gap-1 relative">
+      <a
+        href={routeForSchedules({ namespace })}
+        class="absolute top-0 back-to-schedules"
+        style="left: -0.5rem;"
+      >
+        <Icon name="chevron-left" class="inline" />{translate(
+          'schedules',
+          'back-to-schedules',
+        )}
+      </a>
+      <h1
+        class="text-2xl mt-8 font-medium select-all"
+        data-testid="schedule-name"
+      >
+        {scheduleId}
+      </h1>
+      <p class="text-sm">
+        {namespace}
+      </p>
+    </div>
+  </header>
   <Loading />
 {:then schedule}
   {#if $loading}
@@ -111,16 +132,14 @@
             'back-to-schedules',
           )}
         </a>
-        <div class="flex justify-between items-center mt-8">
-          <h1 class="text-2xl flex relative items-center gap-4">
-            <WorkflowStatus
-              status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
-            />
-            <p class="font-medium select-all" data-testid="schedule-name">
-              {scheduleId}
-            </p>
-          </h1>
-        </div>
+        <h1 class="text-2xl flex relative items-center gap-4 mt-8">
+          <WorkflowStatus
+            status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
+          />
+          <span class="font-medium select-all" data-testid="schedule-name">
+            {scheduleId}
+          </span>
+        </h1>
         <div class="flex items-center gap-2 text-sm">
           <p>
             {namespace}
@@ -172,7 +191,7 @@
           destructive
           on:click={() => (deleteConfirmationModalOpen = true)}
         >
-          {translate('schedules', 'delete')}
+          {translate('delete')}
         </MenuItem>
       </SplitButton>
     </header>
@@ -182,34 +201,28 @@
           <ScheduleError error={schedule?.info?.invalidScheduleError} />
         </div>
       {/if}
-      <div class="w-full xl:w-1/2">
-        <ScheduleFrequencyPanel
-          calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
-          interval={schedule?.schedule?.spec?.interval?.[0]}
-        />
-      </div>
       <div class="flex flex-col xl:flex-row gap-4">
-        <div class="w-full xl:w-3/4">
+        <div class="w-full flex flex-col items-start gap-4 xl:w-2/3">
           <ScheduleRecentRuns
             {namespace}
             recentRuns={schedule?.info?.recentActions}
           />
-        </div>
-        <div class="w-full xl:w-1/4 xl:min-w-[320px]">
           <ScheduleUpcomingRuns
             futureRuns={schedule?.info?.futureActionTimes}
           />
+          <ScheduleAdvancedSettings
+            spec={schedule?.schedule?.spec}
+            state={schedule?.schedule?.state}
+            policies={schedule?.schedule?.policies}
+            notes={schedule?.schedule?.state?.notes}
+          />
         </div>
-      </div>
-      <div class="w-full xl:w-1/2">
-        <ScheduleAdvancedSettings
-          spec={schedule?.schedule?.spec}
-          state={schedule?.schedule?.state}
-          policies={schedule?.schedule?.policies}
-        />
-      </div>
-      <div class="w-full xl:w-1/2">
-        <ScheduleMemo notes={schedule?.schedule?.state?.notes} />
+        <div class="w-full xl:w-1/3">
+          <ScheduleFrequencyPanel
+            calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
+            interval={schedule?.schedule?.spec?.interval?.[0]}
+          />
+        </div>
       </div>
     </div>
     <Modal
@@ -273,6 +286,29 @@
     </Modal>
   {/if}
 {:catch error}
+  <header class="mb-8">
+    <div class="flex flex-col gap-1 relative">
+      <a
+        href={routeForSchedules({ namespace })}
+        class="absolute top-0 back-to-schedules"
+        style="left: -0.5rem;"
+      >
+        <Icon name="chevron-left" class="inline" />{translate(
+          'schedules',
+          'back-to-schedules',
+        )}
+      </a>
+      <h1
+        class="text-2xl mt-8 font-medium select-all"
+        data-testid="schedule-name"
+      >
+        {scheduleId}
+      </h1>
+      <p class="text-sm">
+        {namespace}
+      </p>
+    </div>
+  </header>
   <ScheduleError error={error?.message} />
 {/await}
 

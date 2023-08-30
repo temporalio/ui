@@ -17,7 +17,7 @@ module.exports = {
        * So, we're selectively adding to this list until we get all
        * components to pass linting.
        */
-      files: ['src/lib/holocene/*.svelte'],
+      files: ['src/**/*.svelte'],
       processor: 'svelte3/svelte3',
       /**
        * Temporary fix, see the following:
@@ -68,6 +68,7 @@ module.exports = {
       'error',
       { assertionStyle: 'as' },
     ],
+    '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/no-restricted-imports': [
       'error',
       {

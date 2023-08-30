@@ -1,23 +1,22 @@
 <script lang="ts">
-  import { workflowRun } from '$lib/stores/workflow-run';
-  import { translate } from '$lib/i18n/translate';
-
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Badge from '$lib/holocene/badge.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Table from '$lib/holocene/table/table.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import { formatDate } from '$lib/utilities/format-date';
-  import { getDuration, formatDuration } from '$lib/utilities/format-time';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
     formatRetryExpiration,
   } from '$lib/utilities/format-event-attributes';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { formatDuration, getDuration } from '$lib/utilities/format-time';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   $: pendingActivities = $workflowRun.workflow?.pendingActivities;
@@ -90,6 +89,8 @@
                     slot="value"
                     class="pb-2"
                     content={details.heartbeatDetails}
+                    copyIconTitle={translate('copy-icon-title')}
+                    copySuccessIconTitle={translate('copy-success-icon-title')}
                   />
                 </li>
               {/if}
@@ -100,6 +101,8 @@
                     slot="value"
                     class="pb-2"
                     content={details.lastFailure}
+                    copyIconTitle={translate('copy-icon-title')}
+                    copySuccessIconTitle={translate('copy-success-icon-title')}
                   />
                 </li>
               {/if}

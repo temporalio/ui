@@ -1,20 +1,20 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import {
-    MenuContainer,
-    MenuButton,
-    Menu,
-    MenuItem,
-  } from '$lib/holocene/menu';
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
-  import { authUser } from '$lib/stores/auth-user';
-  import type { NamespaceListItem } from '$lib/types/global';
-  import { dataEncoder } from '$lib/stores/data-encoder';
-  import { translate } from '$lib/i18n/translate';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
+  import {
+    Menu,
+    MenuButton,
+    MenuContainer,
+    MenuItem,
+  } from '$lib/holocene/menu';
+  import { translate } from '$lib/i18n/translate';
+  import { authUser } from '$lib/stores/auth-user';
+  import { dataEncoder } from '$lib/stores/data-encoder';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
+  import type { NamespaceListItem } from '$lib/types/global';
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
@@ -50,6 +50,7 @@
     {#if showNamespaceSpecificNav}
       <Combobox
         label={translate('namespaces', 'namespace-label', { namespace })}
+        toggleLabel={translate('namespaces')}
         noResultsText={translate('no-results')}
         labelHidden
         value={namespace}

@@ -8,25 +8,25 @@
   } from 'date-fns';
 
   import { page } from '$app/stores';
-  import {
-    MenuContainer,
-    MenuButton,
-    MenuDivider,
-    Menu,
-    MenuItem,
-  } from '$lib/holocene/menu';
-  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
-  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { columnOrderedDurations } from '$lib/utilities/to-duration';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import { translate } from '$lib/i18n/translate';
-  import { getLocalTime } from '$lib/utilities/format-date';
 
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
+  import {
+    Menu,
+    MenuButton,
+    MenuContainer,
+    MenuItem,
+  } from '$lib/holocene/menu';
+  import MenuDivider from '$lib/holocene/menu/menu-divider.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
+  import { getLocalTime } from '$lib/utilities/format-date';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { columnOrderedDurations } from '$lib/utilities/to-duration';
 
   const localTime = getLocalTime() || translate('local');
 

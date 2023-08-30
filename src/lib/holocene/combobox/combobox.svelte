@@ -1,15 +1,18 @@
-<script lang="ts" generics="T extends object">
-  import Icon from '../icon/icon.svelte';
-
-  import type { IconName } from '../icon/paths';
+<script lang="ts">
+  import type { HTMLInputAttributes } from 'svelte/elements';
+  import { writable } from 'svelte/store';
 
   import { createEventDispatcher } from 'svelte';
-  import { writable } from 'svelte/store';
-  import type { HTMLInputAttributes } from 'svelte/elements';
+
+  import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
-  import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
-  import MenuButton from '../menu/menu-button.svelte';
+
+  import Icon from '../icon/icon.svelte';
+  import type { IconName } from '../icon/paths';
+  import IconButton from '../icon-button.svelte';
+
+  type T = $$Generic;
 
   const dispatch = createEventDispatcher<{
     change: T | string;
@@ -23,6 +26,7 @@
   interface BaseProps extends HTMLInputAttributes {
     id: string;
     label: string;
+    toggleLabel: string;
     value: string;
     noResultsText: string;
     disabled?: boolean;
@@ -58,18 +62,19 @@
   export let id: string;
   export let label: string;
   export let value: string = undefined;
+  export let toggleLabel: string;
   export let noResultsText: string;
-  export let disabled: boolean = false;
-  export let labelHidden: boolean = false;
+  export let disabled = false;
+  export let labelHidden = false;
   export let options: (T | string)[];
   export let placeholder: string = null;
-  export let readonly: boolean = false;
-  export let required: boolean = false;
+  export let readonly = false;
+  export let required = false;
   export let leadingIcon: IconName = null;
   export let optionValueKey: keyof T = null;
   export let optionLabelKey: keyof T = optionValueKey;
-  export let minSize: number = 0;
-  export let maxSize: number = 120;
+  export let minSize = 0;
+  export let maxSize = 120;
 
   let displayValue: string;
   let selectedOption: string | T;
@@ -104,6 +109,14 @@
     displayValue = getDisplayValue(selectedOption);
   }
 
+  const toggleList = () => {
+    if ($open) {
+      closeList();
+    } else {
+      openList();
+    }
+  };
+
   const openList = () => {
     $open = true;
   };
@@ -125,11 +138,14 @@
     return typeof option === 'string';
   };
 
-  const isObjectOption = (option: string | T): option is T => {
+  const isObjectOption = (option: string | T): option is T & object => {
     return typeof option === 'object';
   };
 
   const canRenderCustomOption = (option: T) => {
+    if (option === null) return false;
+    if (typeof option !== 'object') return false;
+
     return (
       optionValueKey !== null &&
       optionLabelKey !== null &&
@@ -146,7 +162,7 @@
     }
 
     if (isObjectOption(option) && canRenderCustomOption(option)) {
-      return option[optionLabelKey];
+      return String(option[optionLabelKey]);
     }
   };
 
@@ -156,7 +172,7 @@
     }
 
     if (isObjectOption(option) && canRenderCustomOption(option)) {
-      value = option[optionValueKey];
+      value = String(option[optionValueKey]);
     }
   };
 
@@ -228,12 +244,17 @@
     {label}
   </label>
 
-  <MenuButton hasIndicator {disabled} controls="{id}-listbox">
-    <svelte:fragment slot="leading">
-      {#if leadingIcon}
-        <Icon class="shrink-0" name={leadingIcon} />
-      {/if}
-    </svelte:fragment>
+  <div
+    class="text-sm w-full h-10 flex flex-row items-center rounded-lg bg-white border border-primary"
+  >
+    {#if leadingIcon}
+      <Icon
+        width={20}
+        height={20}
+        class="mx-3 shrink-0 text-gray-500"
+        name={leadingIcon}
+      />
+    {/if}
     <input
       {id}
       {placeholder}
@@ -260,7 +281,16 @@
       bind:this={inputElement}
       {...$$restProps}
     />
-  </MenuButton>
+    <IconButton
+      label={toggleLabel}
+      class="h-full w-10 shrink-0"
+      tabindex={-1}
+      icon={$open ? 'chevron-up' : 'chevron-down'}
+      aria-controls="{id}-listbox"
+      aria-expanded={$open}
+      on:click={toggleList}
+    />
+  </div>
 
   <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
     {#each list as option}

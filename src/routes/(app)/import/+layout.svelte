@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  
   import PageTitle from '$lib/components/page-title.svelte';
 </script>
 

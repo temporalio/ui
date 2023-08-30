@@ -1,8 +1,9 @@
 <script lang="ts">
-  import SchedulesTimeView from './schedules-time-view.svelte';
   import DayOfMonthPicker from '$lib/holocene/day-of-month-picker.svelte';
   import MonthPicker from '$lib/holocene/month-picker.svelte';
   import { translate } from '$lib/i18n/translate';
+  
+  import SchedulesTimeView from './schedules-time-view.svelte';
 
   export let daysOfMonth: number[];
   export let months: string[];

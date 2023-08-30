@@ -1,14 +1,14 @@
 <script lang="ts">
-  import Alert from '$lib/holocene/alert.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Table from '$lib/holocene/table/table.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
-  import type { WorkflowTaskFailedEvent } from '$lib/types/events';
+  import Table from '$lib/holocene/table/table.svelte';
+  import type { I18nKey } from '$lib/i18n';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowTaskFailedCause } from '$lib/types';
-  import type { I18nKey } from '$lib/i18n';
+  import type { WorkflowTaskFailedEvent } from '$lib/types/events';
 
   type CopyKeys = {
     title: I18nKey<'typed-errors'>;
@@ -192,7 +192,6 @@
     icon="warning"
     intent="warning"
     title={translate('typed-errors', title)}
-    role="status"
   >
     <p>
       {translate('typed-errors', description)}
@@ -212,7 +211,7 @@
           >{translate('events', 'error-event')}</caption
         >
         <TableHeaderRow slot="headers">
-          <th class="w-14 xl:w-10" />
+          <td class="w-14 xl:w-10" />
           <th class="w-16 md:w-32">
             <span class="max-md:hidden">{translate('date-and-time')}</span>
             <span class="md:hidden"><Icon name="clock" /></span>

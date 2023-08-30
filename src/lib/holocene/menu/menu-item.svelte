@@ -4,10 +4,13 @@
 </script>
 
 <script lang="ts">
-  import { createEventDispatcher, getContext } from 'svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
   import type { HTMLLiAttributes } from 'svelte/elements';
+  
+  import { createEventDispatcher, getContext } from 'svelte';
+  
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  
+  import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
   type ExtendedLIEvent = KeyboardEvent & {
     currentTarget: EventTarget & HTMLLIElement;

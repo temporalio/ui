@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
   import Skeleton from './index.svelte';
   import SkeletonTable from './table.svelte';
 
-  let rows: number = 10;
-  let columns: number = 4;
+  let rows = 10;
+  let columns = 4;
   let columnWidths: number[] = [25, 25, 25, 25];
 
   $: {

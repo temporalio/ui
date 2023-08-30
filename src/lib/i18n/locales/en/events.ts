@@ -31,6 +31,8 @@ export const Strings = {
   'event-group': 'Events related to {{eventName}}',
   'error-event': 'Error Event',
   'import-event-history': 'Import Event History',
+  'import-event-history-file-upload':
+    'Select an event history JSON file to upload',
   'event-history-view': 'Event History View',
   'api-history-link': 'View in Github',
   'history-expected-formats': 'Expected JSON formats',
