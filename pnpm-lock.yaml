@@ -26,6 +26,15 @@ dependencies:
   '@crownframework/svelte-error-boundary':
     specifier: ^1.0.3
     version: 1.0.3
+  '@fontsource-variable/inter':
+    specifier: ^5.0.8
+    version: 5.0.8
+  '@fontsource/noto-sans-mono':
+    specifier: ^5.0.9
+    version: 5.0.9
+  '@fontsource/poppins':
+    specifier: ^5.0.8
+    version: 5.0.8
   '@lezer/highlight':
     specifier: ^1.1.3
     version: 1.1.3
@@ -1322,6 +1331,18 @@ packages:
     resolution: {integrity: sha512-P6omY1zv5MItm93kLM8s2vr1HICJH8v0dvddDhysbIuZ+vcjOHg5Zbkf1mTkcmi2JA9oBG2anOkRnW8WJTS8Og==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
+
+  /@fontsource-variable/inter@5.0.8:
+    resolution: {integrity: sha512-WkYfFNccmEIeL2fNg0mYeLWqOoB7xD8MFxFRc4IwbSP2o8ZaBt36v5aW4by4MyrgGRMNk7uNi5LbvYKq6clPjw==}
+    dev: false
+
+  /@fontsource/noto-sans-mono@5.0.9:
+    resolution: {integrity: sha512-kEnRN/Vs7TgWkY+Y5U36b2NZOYITWEY1T6LYkjFopCA2eaUWY4DDO7UOov55VE/PHDZH8KZZIOoEmBiM4Nv7Kw==}
+    dev: false
+
+  /@fontsource/poppins@5.0.8:
+    resolution: {integrity: sha512-P8owfYWluoUY5Nyzk4gT/L6LmLmseP6ezFWhj6VBUa5pRIdnCvNJpoQ6i/vhekjtJOfqX6nKlB+LCttoUl2GQQ==}
+    dev: false
 
   /@grpc/grpc-js@1.7.3:
     resolution: {integrity: sha512-H9l79u4kJ2PVSxUNA08HMYAnUBLj9v6KjYQ7SQ71hOZcEXhShE/y5iQCesP8+6/Ik/7i2O0a10bPquIcYfufog==}
