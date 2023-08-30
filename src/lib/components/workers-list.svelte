@@ -83,8 +83,8 @@
     </Table>
   {/if}
   <h2 class="text-base font-medium" data-testid="workers">
+    {workers?.pollers?.length || 0}
     {translate('workers', 'workers')}
-    {#if workers?.pollers?.length}({workers.pollers.length} total){/if}
   </h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <caption class="sr-only" slot="caption"
