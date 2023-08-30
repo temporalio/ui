@@ -6,7 +6,7 @@
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import { clickOutside } from '$lib/holocene/outside-click';
+  import { clickoutside } from '$lib/holocene/outside-click';
   import { translate } from '$lib/i18n/translate';
   import { dataConverterPort } from '$lib/stores/data-converter-config';
   import {
@@ -17,10 +17,9 @@
   } from '$lib/stores/data-encoder-config';
   import { refresh } from '$lib/stores/workflow-run';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
-  
+
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
   import DataConverterPortSettings from './data-converter-port-settings.svelte';
-  
 
   export const viewDataEncoderSettings = writable<boolean>(false);
 </script>
@@ -77,8 +76,7 @@
 
 {#if $viewDataEncoderSettings}
   <aside
-    use:clickOutside
-    on:click-outside={() => ($viewDataEncoderSettings = false)}
+    use:clickoutside={() => ($viewDataEncoderSettings = false)}
     in:fly={{ y: -50, delay: 0, duration: 500 }}
     class="relative w-full h-auto p-12 bg-blue-50 border-b border-blue-100 flex flex-col gap-6"
   >
