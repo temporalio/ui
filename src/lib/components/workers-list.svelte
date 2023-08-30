@@ -82,9 +82,14 @@
       {/each}
     </Table>
   {/if}
-  <h2 class="text-base font-medium" data-testid="workers">
-    {workers?.pollers?.length || 0}
+  <h2
+    class="text-base font-medium flex items-center gap-2"
+    data-testid="workers"
+  >
     {translate('workers', 'workers')}
+    <Badge type="count" class="rounded-sm"
+      >{workers?.pollers?.length || 0}</Badge
+    >
   </h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <caption class="sr-only" slot="caption"
