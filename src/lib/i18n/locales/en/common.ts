@@ -65,6 +65,7 @@ export const Strings = {
   edit: 'Edit',
   delete: 'Delete',
   memo: 'Memo',
+  notes: 'Notes',
   add: 'Add',
   'from-now': 'from now',
   'hours-abbreviated': 'hrs.',

@@ -31,8 +31,5 @@ export default {
     prerender: {
       entries: [],
     },
-    version: {
-      pollInterval: 10000,
-    },
   },
 };

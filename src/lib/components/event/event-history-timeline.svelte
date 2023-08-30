@@ -233,7 +233,7 @@
     background-color: white;
   }
 
-  :global(.vis-item) {
+  :global(.vis-timeline .vis-item) {
     background-color: #fff;
     border-color: transparent;
     color: #3f3f46;

@@ -196,7 +196,6 @@
         icon="info"
         intent="info"
         title={translate('workflows', 'cancel-request-sent')}
-        role="status"
       >
         {translate('workflows', 'cancel-request-sent-description')}
       </Alert>
@@ -210,7 +209,6 @@
         intent="info"
         data-testid="workflow-reset-alert"
         title={translate('workflows', 'reset-success-alert-title')}
-        role="status"
       >
         You can find the resulting Workflow Execution <Link
           href={routeForEventHistory({
