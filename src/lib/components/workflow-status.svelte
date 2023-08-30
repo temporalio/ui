@@ -2,8 +2,8 @@
   import { cva } from 'class-variance-authority';
 
   import { translate } from '$lib/i18n/translate';
-  import type { WorkflowStatus } from '$lib/types/workflows';
   import type { ScheduleStatus } from '$lib/types/schedule';
+  import type { WorkflowStatus } from '$lib/types/workflows';
 
   import HeartBeat from './heart-beat-indicator.svelte';
 
