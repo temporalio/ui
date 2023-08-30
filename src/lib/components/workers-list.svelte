@@ -63,7 +63,7 @@
             </CompatibilityBadge>
           </td>
           <td class="text-left" data-testid="version-compatible-builds">
-            <div class="flex gap-2 noto flex-wrap">
+            <div class="flex gap-2 font-mono flex-wrap">
               {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
                 <CompatibilityBadge active={false} {buildId}>
                   <svelte:fragment slot="default-worker">
