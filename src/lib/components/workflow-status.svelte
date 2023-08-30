@@ -1,7 +1,6 @@
 <script lang="ts">
   import { cva } from 'class-variance-authority';
 
-  import Badge from '$lib/holocene/badge.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowStatus } from '$lib/types/workflows';
   import type { ScheduleStatus } from '$lib/types/schedule';
