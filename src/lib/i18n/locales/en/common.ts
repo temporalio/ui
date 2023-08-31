@@ -135,4 +135,5 @@ export const Strings = {
   'time-unit': 'Time Unit',
   'based-on-time-preface': 'Based on',
   'download-json': 'Download JSON',
+  'skip-nav': 'Skip to main content',
 } as const;
