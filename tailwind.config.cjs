@@ -20,6 +20,9 @@ const config = {
       boxShadow: {
         focus: '0 0 0 4px',
       },
+      zIndex: {
+        100: '100',
+      },
     },
   },
   plugins: [],
