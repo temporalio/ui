@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import type { PageData } from './$types';
 
   import PageTitle from '$lib/components/page-title.svelte';
@@ -10,7 +10,7 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import { translate } from '$lib/i18n/translate';
-  
+
   import WorkflowFilters from './_workflow-filters.svelte';
 
   export let data: PageData & { archivalQueryingNotSupported: boolean };
@@ -72,6 +72,8 @@
     content={`temporal operator namespace update --visibility-archival-state enabled ${namespaceName}`}
     language="text"
     inline
+    copyIconTitle={translate('copy-icon-title')}
+    copySuccessIconTitle={translate('copy-success-icon-title')}
   />
 {:else}
   <h1 class="text-2xl" data-testid="archived-disabled-title">
@@ -82,6 +84,8 @@
     content={`temporal operator namespace update --history-archival-state enabled ${namespaceName}`}
     language="text"
     inline
+    copyIconTitle={translate('copy-icon-title')}
+    copySuccessIconTitle={translate('copy-success-icon-title')}
   />
   {#if !visibilityArchivalEnabled}
     <p>
@@ -96,6 +100,8 @@
       content={`temporal operator namespace update --visibility-archival-state enabled ${namespaceName}`}
       language="text"
       inline
+      copyIconTitle={translate('copy-icon-title')}
+      copySuccessIconTitle={translate('copy-success-icon-title')}
     />
   {/if}
 {/if}

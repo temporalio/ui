@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -38,7 +37,12 @@
       <p class="min-w-fit text-sm">
         {format(key)}
       </p>
-      <CodeBlock content={getCodeBlockValue(value)} {inline} />
+      <CodeBlock
+        content={getCodeBlockValue(value)}
+        {inline}
+        copyIconTitle={translate('copy-icon-title')}
+        copySuccessIconTitle={translate('copy-success-icon-title')}
+      />
     </div>
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">

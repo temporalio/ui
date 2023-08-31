@@ -41,7 +41,7 @@
   <div class="flex flex-row items-center gap-2">
     <div class="w-24">
       <Input
-        id="hour"
+        id="hour-time"
         label={translate('hours-abbreviated')}
         labelHidden
         bind:value={_hour}
@@ -54,7 +54,7 @@
     <div>:</div>
     <div class="w-24">
       <Input
-        id="minute"
+        id="minute-time"
         label={translate('minutes-abbreviated')}
         labelHidden
         bind:value={minute}

@@ -123,7 +123,7 @@
     class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
   >
     <div
-      class="flex flex-col gap-2 w-full justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
+      class="flex flex-col w-full justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
     >
       <h1
         data-testid="workflow-id-heading"
@@ -197,7 +197,6 @@
         icon="info"
         intent="info"
         title={translate('workflows', 'cancel-request-sent')}
-        role="status"
       >
         {translate('workflows', 'cancel-request-sent-description')}
       </Alert>
@@ -211,7 +210,6 @@
         intent="info"
         data-testid="workflow-reset-alert"
         title={translate('workflows', 'reset-success-alert-title')}
-        role="status"
       >
         You can find the resulting Workflow Execution <Link
           href={routeForEventHistory({
