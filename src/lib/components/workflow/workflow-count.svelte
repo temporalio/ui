@@ -5,8 +5,8 @@
 
   export let status: Status | 'all' = 'all';
   // TODO: Make this a real count once API is implemented
-  // export let count: number = Math.round(Math.random() * 10000);
-  export let count = 0;
+  export let count: number = Math.round(Math.random() * 10000);
+  // export let count = 0;
   export let active = false;
   export let onStatusClick: (status: Status | 'all') => void = () => {};
 </script>

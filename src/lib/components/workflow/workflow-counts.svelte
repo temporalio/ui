@@ -85,22 +85,23 @@
     });
   };
 
+  const groupByClause = 'GROUP BY ExecutionStatus';
+
   const countRoute = routeForApi('workflows.count', {
     namespace: $page.params.namespace,
   });
   const countPromise = requestFromAPI<{ count: string }>(countRoute, {
-    params: { query: 'GROUP BY ExecutionStatus' },
-    onError: noop,
-    handleError: noop,
+    params: { query: '' },
+    notifyOnError: false,
   });
 </script>
 
-{#await countPromise then counts}
-  {(console.log('COUNTS: ', counts), '')}
+{#await countPromise then { count, groups }}
+  {(console.log('Count and groups: ', count, groups), '')}
   <div class="flex gap-2 lg:gap-4 flex-wrap">
     <WorkflowCount
       status="all"
-      count={parseInt(counts?.count || '0')}
+      count={parseInt(count || '0')}
       {onStatusClick}
       active={!$workflowFilters.length}
     />
@@ -112,6 +113,4 @@
       />
     {/each}
   </div>
-{:catch error}
-  <div>{error}</div>
 {/await}
