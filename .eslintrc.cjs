@@ -1,7 +1,12 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier', 'plugin:storybook/recommended'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+    'plugin:storybook/recommended',
+  ],
   plugins: ['svelte3', '@typescript-eslint', 'vitest', 'import'],
   ignorePatterns: ['*.cjs', 'prism.cjs', '/server'],
   overrides: [

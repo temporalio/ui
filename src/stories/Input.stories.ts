@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/svelte';
 
-import InputWrapper from './InputWrapper.svelte';
+import Input from '$lib/holocene/input/input.svelte';
 
 // More on how to set up stories at: https://storybook.js.org/docs/svelte/writing-stories/introduction
 const meta = {
   title: 'Example/Input',
-  component: InputWrapper,
+  component: Input,
   tags: ['autodocs'],
   argTypes: {
     labelHidden: {
@@ -25,7 +25,7 @@ const meta = {
       options: ['dark', 'light'],
     },
   },
-} satisfies Meta<InputWrapper>;
+} satisfies Meta<Input>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
