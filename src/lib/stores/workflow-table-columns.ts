@@ -20,7 +20,6 @@ export const WorkflowHeaderLabels = [
   'Execution Duration',
   'State Transitions',
   'Parent Namespace',
-  'Parent Workflow ID',
   'Task Queue',
 ] as const;
 
@@ -74,7 +73,6 @@ const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
   { label: 'Execution Duration', pinned: false },
   { label: 'State Transitions', pinned: false },
   { label: 'Parent Namespace', pinned: false },
-  { label: 'Parent Workflow ID', pinned: false },
   { label: 'Task Queue', pinned: false },
 ];
 

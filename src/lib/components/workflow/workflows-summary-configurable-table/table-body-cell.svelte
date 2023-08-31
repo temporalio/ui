@@ -12,7 +12,7 @@
   import { formatBytes } from '$lib/utilities/format-bytes';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistance } from '$lib/utilities/format-time';
-  
+
   import FilterableTableCell from './filterable-table-cell.svelte';
 
   export let column: WorkflowHeader;
@@ -73,8 +73,6 @@
       {workflow.taskQueue}
     {:else if label === 'Parent Namespace'}
       {workflow.parentNamespaceId}
-    {:else if label === 'Parent Workflow ID'}
-      {workflow.parent ? workflow.parent.workflowId : ''}
     {:else if label === 'History Size'}
       {formatBytes(parseInt(workflow.historySizeBytes, 10))}
     {:else if label === 'State Transitions'}
