@@ -87,7 +87,10 @@ export const getDefaultColumns = (): WorkflowHeader[] => {
     const parsedOldColumns = JSON.parse(stringifiedOldColumns);
 
     if (stringifiedOldColumns && parsedOldColumns?.length) {
-      columns = parsedOldColumns;
+      const filteredOldColumns = parsedOldColumns.filter(
+        (column: WorkflowHeader) => column.label !== 'Parent Workflow ID',
+      );
+      columns = filteredOldColumns;
     } else {
       columns = DEFAULT_COLUMNS;
     }
