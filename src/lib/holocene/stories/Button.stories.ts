@@ -15,7 +15,6 @@ const iconControls = {
 const meta = {
   title: 'Example/Button',
   component: ButtonWrapper,
-  tags: ['autodocs'],
   argTypes: {
     leadingIcon: { ...iconControls },
     trailingIcon: { ...iconControls },
@@ -23,16 +22,7 @@ const meta = {
       control: {
         type: 'select',
       },
-      options: [
-        'primary',
-        'secondary',
-        'search',
-        'destructive',
-        'login',
-        'ghost',
-        'link',
-        'menu',
-      ],
+      options: ['primary', 'secondary', 'destructive', 'ghost'],
     },
   },
 

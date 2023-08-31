@@ -1,31 +1,25 @@
 import type { Meta, StoryObj } from '@storybook/svelte';
 
-import Input from '$lib/holocene/input/input.svelte';
+import Icon from '$lib/holocene/icon/icon.svelte';
+import { icons } from '$lib/holocene/icon/paths';
 
 // More on how to set up stories at: https://storybook.js.org/docs/svelte/writing-stories/introduction
 const meta = {
-  title: 'Example/Input',
-  component: Input,
-  tags: ['autodocs'],
+  title: 'Icon',
+  component: Icon,
   argTypes: {
-    labelHidden: {
-      control: {
-        type: 'boolean',
-      },
-    },
-    valid: {
-      control: {
-        type: 'boolean',
-      },
-    },
-    theme: {
+    name: {
       control: {
         type: 'select',
       },
-      options: ['dark', 'light'],
+      options: Object.keys(icons),
     },
   },
-} satisfies Meta<Input>;
+  args: {
+    width: 60,
+    height: 60,
+  },
+} satisfies Meta<Icon>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -33,8 +27,6 @@ type Story = StoryObj<typeof meta>;
 // More on writing stories with args: https://storybook.js.org/docs/svelte/writing-stories/args
 export const Regular: Story = {
   args: {
-    value: 'Oh hai mark',
-    label: 'Such a label',
-    id: 'sounique',
+    name: 'comet-solid',
   },
 };
