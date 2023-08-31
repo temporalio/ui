@@ -17,12 +17,12 @@ const meta = {
         type: 'boolean',
       },
     },
-    theme: {
-      control: {
-        type: 'select',
-      },
-      options: ['dark', 'light'],
-    },
+    // theme: {
+    //   control: {
+    //     type: 'select',
+    //   },
+    //   options: ['dark', 'light'],
+    // },
   },
 } satisfies Meta<Input>;
 
