@@ -5,7 +5,6 @@
 
   import type { PageData } from './$types';
 
-  import Banners from '$lib/components/banner/banners.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
@@ -29,8 +28,6 @@
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
   export let data: PageData;
-
-  $: ({ uiVersionInfo } = data);
 
   let namespaceList: NamespaceListItem[];
 
@@ -104,7 +101,6 @@
   <MainContentContainer>
     <DataEncoderSettings />
     <TopNavigation {logout} {namespaceList} />
-    <Banners {uiVersionInfo} />
     <div
       slot="main"
       class="flex w-full flex-col gap-4 p-8 h-[calc(100%-2.5rem)]"
