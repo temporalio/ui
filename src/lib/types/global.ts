@@ -113,7 +113,7 @@ export type BooleanString = 'true' | 'false';
 
 export type UiVersionInfo = {
   current: string;
-  recommended: string;
+  recommended: Promise<string>;
 };
 
 export type DataEncoderStatus = 'notRequested' | 'success' | 'error';

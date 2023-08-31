@@ -44,7 +44,7 @@ export const load: LayoutLoad = async function ({
   const uiVersionInfo: UiVersionInfo = {
     current: settings.version,
     recommended: settings.notifyOnNewVersion
-      ? await fetchLatestUiVersion(fetch)
+      ? fetchLatestUiVersion(fetch)
       : undefined,
   };
 
