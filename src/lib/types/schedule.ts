@@ -61,3 +61,5 @@ export type SchedulePresetsParameters = {
 export type ScheduleParameters = ScheduleActionParameters &
   ScheduleSpecParameters &
   SchedulePresetsParameters;
+
+export type ScheduleStatus = 'Paused' | 'Running';
