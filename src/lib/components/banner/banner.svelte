@@ -1,5 +1,6 @@
 <script lang="ts">
   import IconButton from '$lib/holocene/icon-button.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { BannersState } from '$lib/models/banner-state';
   import { close, closedBanners } from '$lib/stores/banner';
@@ -24,9 +25,9 @@
     class={`relative block text-center leading-10 ${severity}`}
     {...$$restProps}
   >
-    <a href={link} target="_blank" rel="noreferrer">
+    <Link href={link} newTab>
       {message}
-    </a>
+    </Link>
 
     <IconButton
       on:click={() => close(key)}

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
-  import IconButton from './icon-button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   export let intent: 'warning' | 'default' = 'default';
   export let button = false;
@@ -23,17 +23,17 @@
   {:else}
     <slot />
   {/if}
-  <IconButton
-    label={removeButtonLabel}
-    class="h-4 w-4 text-gray-700"
-    icon="close"
+  <button
+    aria-label={removeButtonLabel}
     on:click={handleRemove}
-  />
+  >
+  <Icon name="close" />
+</button>
 </span>
 
 <style lang="postcss">
   .chip {
-    @apply flex w-fit min-w-fit h-fit flex-row items-center justify-between break-all whitespace-nowrap rounded-md border border-gray-300 bg-gray-50 p-1 text-sm gap-1 text-gray-700;
+    @apply flex w-fit min-w-fit h-8 flex-row items-center justify-between break-all whitespace-nowrap rounded-md border border-gray-300 bg-gray-50 p-1 text-sm gap-1 text-gray-700;
 
     :global(.icon-button) {
       @apply ml-1 h-auto w-fit;

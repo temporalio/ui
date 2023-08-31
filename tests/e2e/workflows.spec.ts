@@ -9,7 +9,7 @@ test.describe('Workflows list', () => {
     test.slow();
     await page
       .getByRole('link', { name: 'e2e-workflow-1' })
-      .click({ position: { x: 0, y: 0 } });
+      .click({ force: true });
 
     let region: Locator;
     let toggle: Locator;
@@ -63,7 +63,7 @@ test.describe('Workflows list', () => {
   test('should render decoded stack trace', async ({ page }) => {
     await page
       .getByRole('link', { name: 'e2e-workflow-2' })
-      .click({ position: { x: 0, y: 0 } });
+      .click({ force: true });
 
     await page.getByText('Stack Trace').click();
 
@@ -75,7 +75,7 @@ test.describe('Workflows list', () => {
   test('should render decoded query results', async ({ page }) => {
     await page
       .getByRole('link', { name: 'e2e-workflow-2' })
-      .click({ position: { x: 0, y: 0 } });
+      .click({ force: true });
 
     await page.getByText('Queries').click();
     await page.getByLabel('Query Type').selectOption('is-blocked');

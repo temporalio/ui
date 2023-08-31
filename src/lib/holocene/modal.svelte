@@ -141,15 +141,11 @@
       </p>
     </div>
     <div class="flex items-center justify-end space-x-2 p-6">
-      <Button
-        thin
-        variant="secondary"
-        disabled={loading}
-        on:click={handleCancel}>{cancelText}</Button
+      <Button variant="secondary" disabled={loading} on:click={handleCancel}
+        >{cancelText}</Button
       >
       {#if !hideConfirm}
         <Button
-          thin
           variant={confirmType}
           {loading}
           disabled={confirmDisabled || loading}

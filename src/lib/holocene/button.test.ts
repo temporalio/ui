@@ -4,6 +4,14 @@ import Button from '$lib/holocene/button.svelte';
 
 let host: HTMLElement;
 
+const variants: ('primary' | 'secondary' | 'destructive' | 'ghost')[] = [
+  'primary',
+  'secondary',
+  'destructive',
+  'ghost',
+];
+const sizes: ('xs' | 'sm' | 'md' | 'lg')[] = ['xs', 'sm', 'md', 'lg'];
+
 beforeEach(() => {
   host = document.createElement('div');
   host.setAttribute('id', 'host');
@@ -15,89 +23,71 @@ afterEach(() => {
 });
 
 describe('Button', () => {
-  test('default', async () => {
-    const instance = new Button({ target: host, props: {} });
+  describe.each(variants)('Variant %s renders', (variant) => {
+    test.each(sizes)('%s', (size) => {
+      const instance = new Button({
+        target: host,
+        props: { variant, size },
+      });
 
-    expect(instance).toBeTruthy();
+      expect(instance).toBeTruthy();
 
-    expect(host.innerHTML).toMatchSnapshot();
-  });
-
-  test('disabled', async () => {
-    const instance = new Button({
-      target: host,
-      props: {
-        disabled: true,
-      },
+      expect(host.innerHTML).toMatchSnapshot();
     });
 
-    expect(instance).toBeTruthy();
+    test('disabled', () => {
+      const instance = new Button({
+        target: host,
+        props: { variant, disabled: true },
+      });
 
-    expect(host.innerHTML).toMatchSnapshot();
-  });
+      expect(instance).toBeTruthy();
 
-  test('secondary', async () => {
-    const instance = new Button({
-      target: host,
-      props: {
-        variant: 'secondary',
-      },
+      expect(host.innerHTML).toMatchSnapshot();
     });
 
-    expect(instance).toBeTruthy();
+    test('count', () => {
+      const instance = new Button({
+        target: host,
+        props: { variant, count: 10 },
+      });
 
-    expect(host.innerHTML).toMatchSnapshot();
-  });
+      expect(instance).toBeTruthy();
 
-  test('secondary disabled', async () => {
-    const instance = new Button({
-      target: host,
-      props: {
-        variant: 'secondary',
-      },
+      expect(host.innerHTML).toMatchSnapshot();
     });
 
-    expect(instance).toBeTruthy();
+    test('loading', () => {
+      const instance = new Button({
+        target: host,
+        props: { variant, loading: true },
+      });
 
-    expect(host.innerHTML).toMatchSnapshot();
-  });
+      expect(instance).toBeTruthy();
 
-  test('loading', async () => {
-    const instance = new Button({
-      target: host,
-      props: {
-        loading: true,
-      },
+      expect(host.innerHTML).toMatchSnapshot();
     });
 
-    expect(instance).toBeTruthy();
+    test('leading icon', () => {
+      const instance = new Button({
+        target: host,
+        props: { variant, leadingIcon: 'search' },
+      });
 
-    expect(host.innerHTML).toMatchSnapshot();
-  });
+      expect(instance).toBeTruthy();
 
-  test('icon', async () => {
-    const instance = new Button({
-      target: host,
-      props: {
-        icon: 'download',
-      },
+      expect(host.innerHTML).toMatchSnapshot();
     });
 
-    expect(instance).toBeTruthy();
+    test('trailing icon', () => {
+      const instance = new Button({
+        target: host,
+        props: { variant, trailingIcon: 'search' },
+      });
 
-    expect(host.innerHTML).toMatchSnapshot();
-  });
+      expect(instance).toBeTruthy();
 
-  test('class', async () => {
-    const instance = new Button({
-      target: host,
-      props: {
-        class: 'custom-class',
-      },
+      expect(host.innerHTML).toMatchSnapshot();
     });
-
-    expect(instance).toBeTruthy();
-
-    expect(host.innerHTML).toMatchSnapshot();
   });
 });

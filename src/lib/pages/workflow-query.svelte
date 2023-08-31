@@ -72,7 +72,7 @@
         </Select>
         <Button
           on:click={() => query(queryType)}
-          icon="retry"
+          leadingIcon="retry"
           loading={isLoading}
         >
           {translate('refresh')}

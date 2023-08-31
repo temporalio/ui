@@ -1,7 +1,6 @@
 <script lang="ts">
   import { noop } from 'svelte/internal';
 
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
@@ -56,10 +55,9 @@
   </div>
   {#if hasSchedules}
     <Button
-      class="h-10"
       data-testid="create-schedule"
       disabled={createDisabled}
-      on:click={() => goto(routeForScheduleCreate({ namespace }))}
+      href={routeForScheduleCreate({ namespace })}
     >
       {translate('schedules', 'create')}
     </Button>
@@ -128,10 +126,9 @@
         </p>
         {#if !error}
           <Button
-            class="mt-4"
             data-testid="create-schedule"
             disabled={createDisabled}
-            on:click={() => goto(routeForScheduleCreate({ namespace }))}
+            href={routeForScheduleCreate({ namespace })}
           >
             {translate('schedules', 'create')}
           </Button>

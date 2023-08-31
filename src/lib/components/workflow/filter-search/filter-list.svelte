@@ -134,7 +134,7 @@
     {/if}
   {/each}
   {#if hasMoreFilters}
-    <Button variant="search" thin on:click={viewMoreFilters}
+    <Button variant="secondary" size="xs" on:click={viewMoreFilters}
       >View More...</Button
     >
   {/if}

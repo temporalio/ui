@@ -10,7 +10,6 @@
 
   import Icon from '../icon/icon.svelte';
   import type { IconName } from '../icon/paths';
-  import IconButton from '../icon-button.svelte';
 
   type T = $$Generic;
 
@@ -114,6 +113,7 @@
       closeList();
     } else {
       openList();
+      inputElement.focus();
     }
   };
 
@@ -244,14 +244,12 @@
     {label}
   </label>
 
-  <div
-    class="text-sm w-full h-10 flex flex-row items-center rounded-lg bg-white border border-primary"
-  >
+  <div class="combobox-wrapper">
     {#if leadingIcon}
       <Icon
         width={20}
         height={20}
-        class="mx-3 shrink-0 text-gray-500"
+        class="shrink-0 text-gray-500 ml-2"
         name={leadingIcon}
       />
     {/if}
@@ -281,15 +279,16 @@
       bind:this={inputElement}
       {...$$restProps}
     />
-    <IconButton
-      label={toggleLabel}
-      class="h-full w-10 shrink-0"
+    <button
+      aria-label={toggleLabel}
+      class="combobox-button"
       tabindex={-1}
-      icon={$open ? 'chevron-up' : 'chevron-down'}
       aria-controls="{id}-listbox"
       aria-expanded={$open}
       on:click={toggleList}
-    />
+    >
+      <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
+  </button>
   </div>
 
   <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
@@ -324,7 +323,15 @@
     @apply font-secondary text-sm font-normal;
   }
 
+  .combobox-wrapper {
+    @apply text-sm w-full h-10 flex flex-row items-center rounded-lg bg-white border border-primary focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
+  }
+
   .combobox-input {
-    @apply h-full w-full font-primary focus:outline-none focus:border-indigo-600;
+    @apply grow h-full w-full font-primary focus:outline-none ml-2;
+  }
+
+  .combobox-button {
+    @apply rounded-full shrink-0 bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 flex justify-center items-center mx-2;
   }
 </style>
