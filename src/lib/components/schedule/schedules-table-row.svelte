@@ -83,7 +83,7 @@
     {/each}
   </td>
 </TableRow>
-<TableRow class="row">
+<TableRow class="schedule-spec-row">
   <td colspan="5" class="hidden xl:table-cell !p-0">
     <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
   </td>
@@ -100,7 +100,7 @@
     @apply p-2 text-left;
   }
 
-  :global(.row td) {
+  :global(.schedule-spec-row td) {
     @apply !border-t-0;
   }
 </style>
