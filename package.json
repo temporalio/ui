@@ -68,7 +68,8 @@
     "story:preview": "histoire preview",
     "generate:locales": "esno scripts/generate-locales.ts",
     "workflows": "esno scripts/workflows.ts",
-    "audit:tailwind": "esno scripts/audit-tailwind-colors"
+    "audit:tailwind": "esno scripts/audit-tailwind-colors",
+    "audit:holocene-props": "esno scripts/generate-holocene-props.ts"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.4.0",
