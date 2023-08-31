@@ -41,10 +41,13 @@ test.describe('Batch and Bulk Workflow Actions', () => {
     }) => {
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="bulk-terminate-button"]');
-      await page.click(
-        '[data-testid="batch-Terminate-confirmation"] button.destructive',
-      );
-      await page.waitForSelector('#batch-terminate-success-toast');
+      await page
+        .getByTestId('batch-Terminate-confirmation')
+        .getByTestId('confirm-modal-button')
+        .click();
+      await expect(
+        page.locator('#batch-terminate-success-toast'),
+      ).toBeVisible();
     });
 
     test('allows running workflows to be terminated by a query', async ({
@@ -63,10 +66,13 @@ test.describe('Batch and Bulk Workflow Actions', () => {
         '[data-testid="batch-Terminate-confirmation"] #bulk-action-reason-2',
         'Sarah Connor',
       );
-      await page.click(
-        '[data-testid="batch-Terminate-confirmation"] button.destructive',
-      );
-      await page.waitForSelector('#batch-terminate-success-toast');
+      await page
+        .getByTestId('batch-Terminate-confirmation')
+        .getByTestId('confirm-modal-button')
+        .click();
+      await expect(
+        page.locator('#batch-terminate-success-toast'),
+      ).toBeVisible();
     });
 
     test('allows running workflows to be cancelled by ID without a reason', async ({
@@ -74,10 +80,11 @@ test.describe('Batch and Bulk Workflow Actions', () => {
     }) => {
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="bulk-cancel-button"]');
-      await page.click(
-        '[data-testid="batch-Cancel-confirmation"] button.destructive',
-      );
-      await page.waitForSelector('#batch-cancel-success-toast');
+      await page
+        .getByTestId('batch-Cancel-confirmation')
+        .getByTestId('confirm-modal-button')
+        .click();
+      await expect(page.locator('#batch-cancel-success-toast')).toBeVisible();
     });
 
     test('allows running workflows to be cancelled by a query', async ({
@@ -96,10 +103,11 @@ test.describe('Batch and Bulk Workflow Actions', () => {
         '[data-testid="batch-Cancel-confirmation"] #bulk-action-reason-0',
         'Sarah Connor',
       );
-      await page.click(
-        '[data-testid="batch-Cancel-confirmation"] button.destructive',
-      );
-      await page.waitForSelector('#batch-cancel-success-toast');
+      await page
+        .getByTestId('batch-Cancel-confirmation')
+        .getByTestId('confirm-modal-button')
+        .click();
+      await expect(page.locator('#batch-cancel-success-toast')).toBeVisible();
     });
   });
 });

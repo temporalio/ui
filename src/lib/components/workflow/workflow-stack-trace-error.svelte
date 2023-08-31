@@ -20,7 +20,6 @@
       icon="warning"
       intent="warning"
       title={translate('workflows', 'workflow-error-no-workers-title')}
-      role="status"
     >
       {translate('workflows', 'workflow-error-no-workers-description', {
         taskQueue: workflow?.taskQueue,
@@ -38,7 +37,6 @@
         'workflows',
         'workflow-error-no-compatible-workers-title',
       )}
-      role="status"
     >
       {translate(
         'workflows',

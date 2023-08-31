@@ -6,17 +6,20 @@
   export let rows = 5;
   export let spellcheck: boolean = null;
   export let value: string;
-  export let label = '';
+  export let label: string;
+  export let labelHidden = false;
   export let id: string;
   export let required = false;
+  export let description = '';
 
   let className = '';
   export { className as class };
 </script>
 
 <div class={className}>
-  {#if label}
-    <label class:required for={id}>{label}</label>
+  <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
+  {#if description}
+    <p class="text-sm">{description}</p>
   {/if}
   <textarea
     class="font-mono min-h-fit w-full rounded border border-gray-900 py-2 px-3 text-sm"

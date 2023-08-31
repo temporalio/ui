@@ -5,11 +5,10 @@
   import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
-  import ScheduleMemo from '$lib/components/schedule/schedule-memo.svelte';
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Modal from '$lib/holocene/modal.svelte';
@@ -95,16 +94,9 @@
 {#await scheduleFetch}
   <header class="mb-8">
     <div class="flex flex-col gap-1 relative">
-      <a
-        href={routeForSchedules({ namespace })}
-        class="absolute top-0 back-to-schedules"
-        style="left: -0.5rem;"
-      >
-        <Icon name="chevron-left" class="inline" />{translate(
-          'schedules',
-          'back-to-schedules',
-        )}
-      </a>
+      <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+        {translate('schedules', 'back-to-schedules')}
+      </Link>
       <h1
         class="text-2xl mt-8 font-medium select-all"
         data-testid="schedule-name"
@@ -123,16 +115,9 @@
   {:else}
     <header class="flex flex-row justify-between gap-4 mb-8">
       <div class="flex flex-col gap-1 relative">
-        <a
-          href={routeForSchedules({ namespace })}
-          class="absolute top-0 back-to-schedules"
-          style="left: -0.5rem;"
-        >
-          <Icon name="chevron-left" class="inline" />{translate(
-            'schedules',
-            'back-to-schedules',
-          )}
-        </a>
+        <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+          {translate('schedules', 'back-to-schedules')}
+        </Link>
         <h1 class="text-2xl flex relative items-center gap-4 mt-8">
           <WorkflowStatus
             status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
@@ -192,7 +177,7 @@
           destructive
           on:click={() => (deleteConfirmationModalOpen = true)}
         >
-          {translate('schedules', 'delete')}
+          {translate('delete')}
         </MenuItem>
       </SplitButton>
     </header>
@@ -202,34 +187,28 @@
           <ScheduleError error={schedule?.info?.invalidScheduleError} />
         </div>
       {/if}
-      <div class="w-full xl:w-1/2">
-        <ScheduleFrequencyPanel
-          calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
-          interval={schedule?.schedule?.spec?.interval?.[0]}
-        />
-      </div>
       <div class="flex flex-col xl:flex-row gap-4">
-        <div class="w-full xl:w-3/4">
+        <div class="w-full flex flex-col items-start gap-4 xl:w-2/3">
           <ScheduleRecentRuns
             {namespace}
             recentRuns={schedule?.info?.recentActions}
           />
-        </div>
-        <div class="w-full xl:w-1/4 xl:min-w-[320px]">
           <ScheduleUpcomingRuns
             futureRuns={schedule?.info?.futureActionTimes}
           />
+          <ScheduleAdvancedSettings
+            spec={schedule?.schedule?.spec}
+            state={schedule?.schedule?.state}
+            policies={schedule?.schedule?.policies}
+            notes={schedule?.schedule?.state?.notes}
+          />
         </div>
-      </div>
-      <div class="w-full xl:w-1/2">
-        <ScheduleAdvancedSettings
-          spec={schedule?.schedule?.spec}
-          state={schedule?.schedule?.state}
-          policies={schedule?.schedule?.policies}
-        />
-      </div>
-      <div class="w-full xl:w-1/2">
-        <ScheduleMemo notes={schedule?.schedule?.state?.notes} />
+        <div class="w-full xl:w-1/3">
+          <ScheduleFrequencyPanel
+            calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
+            interval={schedule?.schedule?.spec?.interval?.[0]}
+          />
+        </div>
       </div>
     </div>
     <Modal
@@ -295,16 +274,9 @@
 {:catch error}
   <header class="mb-8">
     <div class="flex flex-col gap-1 relative">
-      <a
-        href={routeForSchedules({ namespace })}
-        class="absolute top-0 back-to-schedules"
-        style="left: -0.5rem;"
-      >
-        <Icon name="chevron-left" class="inline" />{translate(
-          'schedules',
-          'back-to-schedules',
-        )}
-      </a>
+      <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+        {translate('schedules', 'back-to-schedules')}
+      </Link>
       <h1
         class="text-2xl mt-8 font-medium select-all"
         data-testid="schedule-name"
@@ -318,13 +290,3 @@
   </header>
   <ScheduleError error={error?.message} />
 {/await}
-
-<style lang="postcss">
-  .back-to-schedules {
-    @apply text-sm;
-  }
-
-  .back-to-schedules:hover {
-    @apply text-blue-700 underline;
-  }
-</style>

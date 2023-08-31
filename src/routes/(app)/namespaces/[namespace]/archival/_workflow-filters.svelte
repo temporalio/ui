@@ -1,18 +1,17 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  
+
   import Search from '$lib/components/search.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import Option from '$lib/holocene/select/simple-option.svelte';
   import Select from '$lib/holocene/select/simple-select.svelte';
   import { translate } from '$lib/i18n/translate';
   import { timeFormat } from '$lib/stores/time-format';
   import { durations } from '$lib/utilities/to-duration';
-  
-  
+
   import FilterInput from './_filter-input.svelte';
-  
 
   const statuses = {
     All: { value: null, label: translate('workflows', 'all-statuses') },
@@ -67,21 +66,13 @@
 <section class="flex flex-col gap-2">
   <p class="text-right text-xs">
     {#if isAdvancedQuery}
-      <a
-        href={$page.url.pathname}
-        class="text-blue-700"
-        on:click|preventDefault={handleToggle('basic')}
-      >
+      <Link href={$page.url.pathname} on:click={handleToggle('basic')}>
         {translate('workflows', 'basic-search')}
-      </a>
+      </Link>
     {:else}
-      <a
-        href="{$page.url.pathname}?query"
-        class="text-blue-700"
-        on:click|preventDefault={handleToggle('advanced')}
-      >
+      <Link class="text-blue-700" on:click={handleToggle('advanced')}>
         {translate('workflows', 'advanced-search')}
-      </a>
+      </Link>
     {/if}
   </p>
 

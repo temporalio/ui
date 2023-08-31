@@ -7,10 +7,8 @@
   "editor.formatOnSave": true,
   "css.customData": [".vscode/css-custom-data.json"],
   "typescript.tsdk": "node_modules/typescript/lib",
-  "i18n-ally.localesPaths": [
-    "static/i18n",
-    "src/lib/i18n",
-    "static/i18n/locales",
-    "src/lib/i18n/locales"
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
   ]
 }

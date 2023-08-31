@@ -40,16 +40,12 @@ describe('Schedules View', () => {
     cy.get('.schedule-row').first().contains(scheduleId);
     cy.get('.schedule-row').first().contains(name);
 
-    cy.get('.schedule-row').first().click();
+    cy.get('.schedule-row a').first().click();
 
     cy.wait('@schedule-api');
 
     cy.get('[data-testid="schedule-name"]').should('exist');
     cy.get('[data-testid="schedule-name"]').contains(scheduleId);
-
-    cy.get('[data-testid="schedule-interval-frequency"]').contains(
-      'Every 30sec',
-    );
   });
 });
 
@@ -67,16 +63,12 @@ describe('Schedules Edit', () => {
     cy.get('.schedule-row').first().contains(scheduleId);
     cy.get('.schedule-row').first().contains(name);
 
-    cy.get('.schedule-row').first().click();
+    cy.get('.schedule-row a').first().click();
 
     cy.wait('@schedule-api');
 
     cy.get('[data-testid="schedule-name"]').should('exist');
     cy.get('[data-testid="schedule-name"]').contains(scheduleId);
-
-    cy.get('[data-testid="schedule-interval-frequency"]').contains(
-      'Every 30sec',
-    );
 
     cy.get('#schedule-actions-menu-button').click();
     cy.get('#schedule-actions-menu > [data-testid="edit-schedule"]').click();

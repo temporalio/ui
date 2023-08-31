@@ -15,8 +15,8 @@
     async?: boolean;
     testId?: string;
     copyable?: boolean;
-    copyIconTitle: string;
-    copySuccessIconTitle: string;
+    copyIconTitle?: string;
+    copySuccessIconTitle?: string;
   };
 
   type CopyableProps = Omit<
