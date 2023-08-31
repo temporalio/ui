@@ -17,6 +17,10 @@ export default defineConfig({
     ['html'],
     ['json', { outputFile: 'playwright-report/test-results.json' }],
     [process.env.CI ? 'list' : 'github'],
+    [
+      './tests/test-utilities/accessibility-reporter',
+      { outputFile: 'playwright-report/accessibility-violations.json' },
+    ],
   ],
   use: {
     actionTimeout: 0,

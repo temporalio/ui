@@ -16,7 +16,7 @@
   on:click={() => onStatusClick(status)}
   on:keypress={() => onStatusClick(status)}
 >
-  <p class="noto text-sm lg:text-lg">{count.toLocaleString()}</p>
+  <p class="font-mono text-sm lg:text-lg">{count.toLocaleString()}</p>
   <WorkflowStatus {status} />
 </button>
 
