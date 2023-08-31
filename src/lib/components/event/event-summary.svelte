@@ -1,8 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-<<<<<<< HEAD
   import { onMount } from 'svelte';
-=======
   
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
@@ -12,7 +10,6 @@
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { authUser } from '$lib/stores/auth-user';
->>>>>>> main
   import {
     eventFilterSort,
     type EventSortOrder,
@@ -35,12 +32,8 @@
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
 
-<<<<<<< HEAD
-  let loading: boolean = true;
-  let hash: string = '';
-=======
   let loading = true;
->>>>>>> main
+  let hash: string = '';
 
   const resetFullHistory = () => {
     $fullEventHistory = [];
@@ -50,6 +43,13 @@
   onMount(() => {
     hash = $page.url.hash;
   });
+
+  $:{
+    if(!loading) {
+      find offsetheight 
+      scrollTo element based on anchor id
+    }
+  }
 
   function scrollIntoView(target) {
     const element = document.querySelector(`[id='${Number(target)}']`);

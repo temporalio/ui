@@ -17,16 +17,9 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
-<<<<<<< HEAD
-  import { noop } from 'svelte/internal';
-  import { isEventGroup } from '$lib/models/event-groups';
-  import type { IterableEvent } from '$lib/types/events';
-  import { page } from '$app/stores';
-=======
 
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
->>>>>>> main
 
   export let event: IterableEvent;
   export let initialItem: IterableEvent | undefined;
