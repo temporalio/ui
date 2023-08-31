@@ -47,12 +47,12 @@
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <div class="text-sm">
+      <div class="text-sm truncate">
         <Copyable
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class=" xl:flex-row"
+          container-class="xl:flex-row h-12 pr-1"
         >
           <Link
             class="truncate"
@@ -71,12 +71,12 @@
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="truncate text-sm">{format(key)}</p>
-      <div class="text-sm">
+      <div class="text-sm truncate">
         <Copyable
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class="xl:flex-row"
+          container-class="xl:flex-row h-12 pr-1"
         >
           <Link
             class="truncate"
@@ -95,12 +95,12 @@
   {:else if shouldDisplayAsTaskQueueLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <div class="text-sm">
+      <div class="text-sm truncate">
         <Copyable
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class=""
+          container-class="h-12 pr-1"
         >
           <Link
             class="truncate"
