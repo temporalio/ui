@@ -2,11 +2,11 @@
   import { cva } from 'class-variance-authority';
 
   import { translate } from '$lib/i18n/translate';
+  import type { EventClassification } from '$lib/models/event-history/get-event-classification';
   import type { ScheduleStatus } from '$lib/types/schedule';
   import type { WorkflowStatus } from '$lib/types/workflows';
 
   import HeartBeat from './heart-beat-indicator.svelte';
-  import type { EventClassification } from '$lib/models/event-history/get-event-classification';
 
   type Status = WorkflowStatus | ScheduleStatus | EventClassification;
 
