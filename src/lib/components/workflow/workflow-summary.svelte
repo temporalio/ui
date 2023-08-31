@@ -1,18 +1,25 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { timeFormat } from '$lib/stores/time-format';
+  
+  import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
+  import Accordion from '$lib/holocene/accordion.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import {
     workflowRun,
     workflowSummaryViewOpen,
   } from '$lib/stores/workflow-run';
-  import { routeForWorkers } from '$lib/utilities/route-for';
   import { formatDate } from '$lib/utilities/format-date';
-
-  import Accordion from '$lib/holocene/accordion.svelte';
-  import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
-  import { translate } from '$lib/i18n/translate';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import { routeForWorkers } from '$lib/utilities/route-for';
+  
 
   $: ({ workflow } = $workflowRun);
+  $: elapsedTime = formatDistanceAbbreviated({
+    start: workflow?.startTime,
+    end: workflow?.endTime,
+  });
 </script>
 
 <section>
@@ -57,12 +64,24 @@
         <div class="h-0.5 rounded-full bg-gray-900" />
         <WorkflowDetail
           title={translate('start-time')}
-          content={formatDate(workflow?.startTime, $timeFormat)}
+          content={formatDate(workflow?.startTime, $timeFormat, {
+            relative: $relativeTime,
+          })}
         />
         <WorkflowDetail
           title={translate('close-time')}
-          content={formatDate(workflow?.endTime, $timeFormat)}
+          content={formatDate(workflow?.endTime, $timeFormat, {
+            relative: $relativeTime,
+          })}
         />
+        {#if elapsedTime}
+          <span class="flex flex-row items-center pt-2">
+            <Icon class="min-w-fit" name="clock" />
+            <p class="truncate text-sm">
+              {elapsedTime}
+            </p>
+          </span>
+        {/if}
       </div>
     </div>
   </Accordion>

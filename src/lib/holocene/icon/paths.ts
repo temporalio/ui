@@ -1,5 +1,6 @@
 import add from './svg/add.svelte';
 import archives from './svg/archives.svelte';
+import arrowLeft from './svg/arrow-left.svelte';
 import arrowRight from './svg/arrow-right.svelte';
 import arrowUp from './svg/arrow-up.svelte';
 import ascending from './svg/ascending.svelte';
@@ -35,12 +36,14 @@ import fileImport from './svg/file-import.svelte';
 import fileUpload from './svg/file-upload.svelte';
 import filterSolid from './svg/filter-solid.svelte';
 import filter from './svg/filter.svelte';
+import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
 import hyphen from './svg/hyphen.svelte';
 import importIcon from './svg/import.svelte';
 import info from './svg/info.svelte';
 import invertedCheckmark from './svg/inverted-checkmark.svelte';
 import json from './svg/json.svelte';
+import labs from './svg/labs.svelte';
 import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
 import merge from './svg/merge.svelte';
@@ -63,6 +66,7 @@ import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
 import support from './svg/support.svelte';
+import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
 import timeline from './svg/timeline.svelte';
 import transcoderError from './svg/transcoder-error.svelte';
@@ -81,6 +85,7 @@ export type IconName = keyof typeof icons;
 export const icons = {
   add,
   archives,
+  'arrow-left': arrowLeft,
   'arrow-up': arrowUp,
   'arrow-right': arrowRight,
   ascending,
@@ -116,12 +121,14 @@ export const icons = {
   'file-upload': fileUpload,
   filter,
   'filter-solid': filterSolid,
+  github,
   graph,
   hyphen,
   import: importIcon,
   info,
   'inverted-checkmark': invertedCheckmark,
   json,
+  labs,
   lock,
   logout,
   merge,
@@ -144,6 +151,7 @@ export const icons = {
   summary,
   support,
   'spinner-solid': spinnerSolid,
+  'temporal-logo': temporalLogo,
   terminal,
   timeline,
   'transcoder-error': transcoderError,
@@ -156,4 +164,4 @@ export const icons = {
   'vertical-ellipsis': verticalEllipsis,
   warning,
   workflow,
-};
+} as const;

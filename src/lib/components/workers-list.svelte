@@ -1,20 +1,20 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
-
-  import { timeFormat } from '$lib/stores/time-format';
-  import { formatDate } from '$lib/utilities/format-date';
-  import { translate } from '$lib/i18n/translate';
-
+  import Badge from '$lib/holocene/badge.svelte';
+  import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Table from '$lib/holocene/table/table.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
+  import { translate } from '$lib/i18n/translate';
   import {
+    getBuildIdReachability,
     type GetPollersResponse,
     type TaskQueueCompatibility,
-    getWorkerTaskReachability,
-    getBuildIdReachability,
+    type WorkerReachability,
   } from '$lib/services/pollers-service';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { formatDate } from '$lib/utilities/format-date';
   import {
     getCurrentCompatibilityDefaultVersion,
     getCurrentPollerBuildId,
@@ -22,34 +22,14 @@
     getNonDefaultVersionsForSet,
     getOrderedVersionSets,
   } from '$lib/utilities/task-queue-compatibility';
-  import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
-  import { page } from '$app/stores';
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;
   export let compatibility: TaskQueueCompatibility | undefined = undefined;
-
-  let namespace = $page.params.namespace;
+  export let reachability: WorkerReachability | undefined = undefined;
 
   $: versionSets = getOrderedVersionSets(compatibility);
   $: defaultVersion = getCurrentCompatibilityDefaultVersion(compatibility);
-
-  $: buildIds = workers?.pollers.map(getCurrentPollerBuildId);
-
-  let workerTaskReachability;
-
-  async function fetchWorkerTaskReachability(
-    namespace: string,
-    buildIds: string[],
-  ) {
-    workerTaskReachability = await getWorkerTaskReachability({
-      namespace,
-      buildIds,
-      taskQueue,
-    });
-  }
-
-  $: if (compatibility) fetchWorkerTaskReachability(namespace, buildIds);
 </script>
 
 <section class="flex flex-col gap-4">
@@ -57,7 +37,6 @@
     {translate('task-queue')}:
     <span class="select-all font-normal">{taskQueue}</span>
   </h2>
-
   {#if versionSets?.length}
     <h2 class="text-base font-medium" data-testid="version-sets">
       {translate('workers', 'version-sets')}
@@ -84,7 +63,7 @@
             </CompatibilityBadge>
           </td>
           <td class="text-left" data-testid="version-compatible-builds">
-            <div class="flex gap-2 noto flex-wrap">
+            <div class="flex gap-2 font-mono flex-wrap">
               {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
                 <CompatibilityBadge active={false} {buildId}>
                   <svelte:fragment slot="default-worker">
@@ -104,15 +83,25 @@
       {/each}
     </Table>
   {/if}
-  <h2 class="text-base font-medium" data-testid="workers">
+  <h2
+    class="text-base font-medium flex items-center gap-2"
+    data-testid="workers"
+  >
     {translate('workers', 'workers')}
+    <Badge type="count" class="rounded-sm"
+      >{workers?.pollers?.length || 0}</Badge
+    >
   </h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
+    <caption class="sr-only" slot="caption"
+      >{translate('workflows', 'workers-tab')}</caption
+    >
     <TableHeaderRow slot="headers">
-      <th class={versionSets?.length ? 'w-3/12' : 'w-6/12'}
+      <th
+        class={reachability?.buildIdReachability?.length ? 'w-3/12' : 'w-6/12'}
         >{translate('id')}</th
       >
-      {#if versionSets?.length}
+      {#if reachability?.buildIdReachability?.length}
         <th class="w-3/12">{translate('workers', 'version')}</th>
         <th class="w-2/12">{translate('workers', 'retirability')}</th>
       {/if}
@@ -128,8 +117,8 @@
     </TableHeaderRow>
     {#each workers?.pollers as poller (poller.identity)}
       {@const buildId = getCurrentPollerBuildId(poller)}
-      {@const reachability = getBuildIdReachability(
-        workerTaskReachability,
+      {@const pollerReachability = getBuildIdReachability(
+        reachability,
         taskQueue,
         buildId,
       )}
@@ -137,7 +126,7 @@
         <td class="text-left" data-testid="worker-identity">
           <p class="select-all">{poller.identity}</p>
         </td>
-        {#if versionSets?.length}
+        {#if reachability?.buildIdReachability?.length}
           <td class="text-left" data-testid="worker-identity">
             <p class="select-all">
               <CompatibilityBadge
@@ -159,13 +148,17 @@
           </td>
           <td class="text-left" data-testid="worker-last-access-time">
             <p>
-              <span class:reachability={!!reachability}>{reachability}</span>
+              <span class:reachability={!!pollerReachability}
+                >{pollerReachability}</span
+              >
             </p>
           </td>
         {/if}
         <td class="text-left" data-testid="worker-last-access-time">
           <p class="select-all">
-            {formatDate(poller.lastAccessTime, $timeFormat)}
+            {formatDate(poller.lastAccessTime, $timeFormat, {
+              relative: $relativeTime,
+            })}
           </p>
         </td>
         <td data-testid="workflow-poller">
@@ -201,7 +194,7 @@
       </TableRow>
     {:else}
       <tr class="w-full">
-        <td colspan={versionSets?.length ? 8 : 6}>
+        <td colspan={reachability?.buildIdReachability?.length ? 8 : 6}>
           <EmptyState title={translate('workflows', 'workers-empty-state')} />
         </td>
       </tr>

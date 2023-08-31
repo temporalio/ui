@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
-  
+
   import Textarea from './textarea.svelte';
 
   export let Hst: HST;
@@ -11,19 +11,10 @@
   let value = '';
   let label = 'Label';
   let required = true;
+  let description = 'Description goes here.';
 </script>
 
-<Hst.Story>
-  <Textarea id="textarea" {disabled} {isValid} {error} bind:value />
-
-  <svelte:fragment slot="controls">
-    <Hst.Checkbox title="Disabled: " bind:value={disabled} />
-    <Hst.Checkbox title="Valid: " bind:value={isValid} />
-    <Hst.Text title="Error: " bind:value={error} />
-  </svelte:fragment>
-</Hst.Story>
-
-<Hst.Story>
+<Hst.Story title="textarea">
   <Textarea
     id="textarea-with-label"
     {disabled}
@@ -31,10 +22,14 @@
     {error}
     {label}
     {required}
+    {description}
     bind:value
   />
 
   <svelte:fragment slot="controls">
+    <Hst.Checkbox title="Disabled: " bind:value={disabled} />
+    <Hst.Checkbox title="Valid: " bind:value={isValid} />
+    <Hst.Text title="Error: " bind:value={error} />
     <Hst.Text title="Label: " bind:value={label} />
     <Hst.Checkbox title="Required: " bind:value={required} />
   </svelte:fragment>

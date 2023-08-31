@@ -10,6 +10,7 @@ export const Strings = {
   name: 'Schedule Name',
   schedule: 'Schedule',
   frequency: 'Frequency',
+  'schedule-spec': 'Schedule Spec',
   'empty-state-title': 'No Schedules Found',
   'empty-state-description': 'Try a different search',
   'recent-runs': 'Recent Runs',
@@ -17,10 +18,10 @@ export const Strings = {
   'upcoming-runs': 'Upcoming Runs',
   loading: 'Loading Schedule...',
   deleting: 'Deleting Schedule...',
-  delete: 'Delete Schedule',
   'delete-schedule-error': 'Cannot delete schedule. {{error}}',
   pause: 'Pause',
   unpause: 'Unpause',
+  'schedule-actions': 'Schedule Actions',
   'pause-modal-title': 'Pause Schedule?',
   'pause-modal-confirmation': 'Are you sure you want to pause {{schedule}}?',
   'pause-reason': 'Enter a reason for pausing the schedule.',
@@ -50,6 +51,7 @@ export const Strings = {
   'interval-view-description':
     'Specify the time interval for this schedule to run (for example every 5 minutes).',
   'offset-heading': 'Offset',
+  'offset-unit': 'Offset Unit',
   'offset-description':
     'Specify the time to offset when this schedule will run (for example 15 min past the hour).',
   'cron-view-title': 'String',
@@ -60,4 +62,7 @@ export const Strings = {
   'workflow-id-label': 'Workflow Id*',
   'workflow-type-label': 'Workflow Type*',
   'task-queue-label': 'Task Queue*',
+  'getting-started-docs-link-preface': 'Go to',
+  'getting-started-docs-link': 'docs',
+  'getting-started-cli-link-preface': 'or get started with',
 } as const;

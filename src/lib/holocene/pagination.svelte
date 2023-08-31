@@ -27,6 +27,8 @@
     itemsPerPage?: number | null;
     updating?: boolean;
     pageSizeSelectLabel: string;
+    previousButtonLabel: string;
+    nextButtonLabel: string;
   }
 
   export let items: T[];
@@ -36,6 +38,8 @@
   export let itemsPerPage: number | null = null;
   export let updating = false;
   export let pageSizeSelectLabel: string;
+  export let previousButtonLabel: string;
+  export let nextButtonLabel: string;
 
   $: perPage =
     itemsPerPage !== null
@@ -70,7 +74,8 @@
 
   onMount(() => {
     updateWidth();
-    if (parseInt(startingIndex) > 0) {
+
+    if (Number(startingIndex) > 0) {
       handlePageChange();
     }
   });
@@ -138,7 +143,7 @@
       style={floatStyle}
       bind:clientHeight={height}
       class="flex flex-col items-end gap-4 md:flex-row min-w-fit"
-      aria-label={$$restProps['aria-label']}
+      aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
       <div class="flex gap-4">
@@ -148,6 +153,7 @@
             parameter={perPageKey}
             value={perPage}
             {options}
+            position="top"
           />
         {/if}
         <slot name="pagination-top">
@@ -159,7 +165,7 @@
                 store.previous();
                 handlePageChange();
               }}
-              aria-label="previous"
+              aria-label={previousButtonLabel}
             >
               <span
                 class="arrow arrow-left"
@@ -182,7 +188,7 @@
                 store.next();
                 handlePageChange();
               }}
-              aria-label="next"
+              aria-label={nextButtonLabel}
             >
               <span
                 class="arrow arrow-right"
@@ -205,7 +211,7 @@
     class={`flex ${
       $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
     }`}
-    aria-label={$$restProps['aria-label']}
+    aria-label="{$$restProps['aria-label']} 2"
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">
@@ -215,6 +221,7 @@
           parameter={perPageKey}
           value={perPage}
           {options}
+          position="bottom"
         />
       {/if}
       <div class="flex items-center justify-center gap-3">
@@ -222,7 +229,7 @@
           class="caret"
           disabled={!$store.hasPrevious}
           on:click={() => store.previous()}
-          aria-label="previous"
+          aria-label={previousButtonLabel}
         >
           <span
             class="arrow arrow-left"
@@ -241,7 +248,7 @@
           class="caret"
           disabled={!$store.hasNext}
           on:click={() => store.next()}
-          aria-label="next"
+          aria-label={nextButtonLabel}
         >
           <span
             class="arrow arrow-right"

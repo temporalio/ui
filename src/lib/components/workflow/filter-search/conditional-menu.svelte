@@ -1,16 +1,17 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
 
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
+  import {
+    Menu,
+    MenuButton,
+    MenuContainer,
+    MenuItem,
+  } from '$lib/holocene/menu';
 
-  type T = $$Generic;
+  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
   const { filter, focusedElementId } =
-    getContext<FilterContext<T>>(FILTER_CONTEXT);
+    getContext<FilterContext>(FILTER_CONTEXT);
   const defaultConditionOptions = [
     { value: '>' },
     { value: '>=' },
@@ -33,14 +34,15 @@
 
 <MenuContainer>
   <MenuButton
+    unround
+    class="!border-l-0 !border-r-0"
     id="conditional-menu-button"
     controls="conditional-menu"
-    class="border-l-0 border-r-0 border border-gray-800 bg-white text-gray-800 hover:border-primary hover:bg-primary hover:text-white h-10 p-2"
     {disabled}
   >
     {selectedLabel}
   </MenuButton>
-  <Menu class="max-h-80 overflow-y-scroll w-fit" id="conditional-menu">
+  <Menu id="conditional-menu">
     {#each options as { value, label }}
       <MenuItem
         on:click={() => {

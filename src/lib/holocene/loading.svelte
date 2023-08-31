@@ -9,9 +9,11 @@
   <img
     src={Logo}
     style="margin-top: -40px;"
-    alt="Temporal Logo"
+    alt=""
     width="200px"
     height="200px"
   />
-  <h2 class="text-xl font-medium" style="margin-top: -40px;">{title}</h2>
+  <h2 class="text-xl font-medium" style="margin-top: -40px;">
+    {title}
+  </h2>
 </div>

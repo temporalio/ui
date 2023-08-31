@@ -1,15 +1,18 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
+  import { isEmail } from '../../utilities/is-email';
+  
+  import ChipInput from './chip-input.svelte';
   import Input from './input.svelte';
   import NumberInput from './number-input.svelte';
   import RangeInput from './range-input.svelte';
-  import ChipInput from './chip-input.svelte';
-  import { isEmail } from '../../utilities/is-email';
+  
 
   export let Hst: HST;
 
-  let value: string = '';
-  let numberValue: number = 0;
+  let value = '';
+  let numberValue = 0;
   let hintText: string | undefined;
   let valid = true;
   let maxLength: number | undefined;
@@ -97,6 +100,7 @@
       label="Email Address(es)"
       placeholder="Type or paste in email addresses"
       hintText="Please enter a properly formatted email address."
+      removeChipButtonLabel={(chip) => `Remove ${chip}`}
       validator={isEmail}
     />
   </Hst.Variant>

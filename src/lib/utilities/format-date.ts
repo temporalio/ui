@@ -6,7 +6,11 @@ import {
 } from 'date-fns';
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
-import type { TimeFormat } from '$lib/types/global';
+import {
+  type TimeFormat,
+  TimezoneOptions,
+  Timezones,
+} from '$lib/stores/time-format';
 
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
 
@@ -14,12 +18,22 @@ const pattern = 'yyyy-MM-dd z HH:mm:ss.SS';
 
 export function formatDate(
   date: ValidTime | undefined | null,
-  timeFormat: TimeFormat | string = 'UTC',
-  options: { relativeLabel?: string; relativeStrict?: boolean } = {},
+  timeFormat: TimeFormat = 'UTC',
+  options: {
+    relative?: boolean;
+    relativeLabel?: string;
+    relativeStrict?: boolean;
+    abbrFormat?: boolean;
+  } = {},
 ): string {
   if (!date) return '';
 
-  const { relativeLabel = 'ago', relativeStrict = false } = options;
+  const {
+    relative = false,
+    relativeLabel = 'ago',
+    relativeStrict = false,
+    abbrFormat = false,
+  } = options;
 
   try {
     if (isTimestamp(date)) {
@@ -28,40 +42,51 @@ export function formatDate(
 
     const parsed = parseJSON(date);
 
-    if (timeFormat === 'local') return dateTz.format(parsed, pattern);
-    if (timeFormat === 'relative')
-      return relativeStrict
-        ? formatDistanceToNowStrict(parsed) + ` ${relativeLabel}`
-        : formatDistanceToNow(parsed) + ` ${relativeLabel}`;
+    const format = abbrFormat
+      ? parsed.getSeconds()
+        ? 'yyyy-MM-dd HH:mm:ss a'
+        : 'yyyy-MM-dd HH:mm a'
+      : pattern;
 
-    return dateTz.formatInTimeZone(parsed, 'UTC', pattern);
-  } catch {
+    if (timeFormat === 'local') {
+      if (relative)
+        return relativeStrict
+          ? formatDistanceToNowStrict(parsed) + ` ${relativeLabel}`
+          : formatDistanceToNow(parsed) + ` ${relativeLabel}`;
+      return dateTz.format(parsed, format);
+    }
+    const timezone = Timezones[timeFormat]?.zones[0] ?? timeFormat;
+    return dateTz.formatInTimeZone(parsed, timezone, format);
+  } catch (e) {
+    console.error('Error formatting date:', e);
     return '';
-  }
-}
-
-export function formatDateTime(
-  date: string,
-  timeFormat: TimeFormat | string = 'UTC',
-  relativeLabel = 'ago',
-): string {
-  try {
-    const parsed = parseJSON(date);
-
-    const pattern = parsed.getSeconds()
-      ? 'yyyy-MM-dd HH:mm:ss a'
-      : 'yyyy-MM-dd HH:mm a';
-    if (timeFormat === 'local') return dateTz.format(parsed, pattern);
-    if (timeFormat === 'relative')
-      return formatDistanceToNow(parsed) + ` ${relativeLabel}`;
-
-    return dateTz.formatInTimeZone(parsed, 'UTC', pattern);
-  } catch {
-    return `about ${date} ${relativeLabel}`;
   }
 }
 
 export function isValidDate(date: string): boolean {
   const d = parseISO(date);
   return d instanceof Date && !isNaN(d.getTime());
+}
+
+export function formatUTCOffset(
+  offset: number | undefined,
+  utc: string,
+): string {
+  if (offset === undefined) return '';
+  if (offset === 0) return `${utc}±00:00`;
+  const absoluteValue = Math.abs(offset);
+  const formattedOffset =
+    absoluteValue > 9 ? `${absoluteValue}:00` : `0${absoluteValue}:00`;
+  if (offset > 0) return `${utc}+${formattedOffset}`;
+  if (offset < 0) return `${utc}-${formattedOffset}`;
+}
+
+export function getLocalTime(): string {
+  const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const localOption = TimezoneOptions.find(({ zones }) =>
+    zones?.includes(localTimezone),
+  );
+  return localOption
+    ? `${localOption.label} (${localOption.abbr})`
+    : localTimezone;
 }

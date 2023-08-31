@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
-  
+
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  
+
   import Accordion from './accordion.svelte';
   import IconButton from './icon-button.svelte';
   import TableHeaderRow from './table/table-header-row.svelte';
@@ -41,7 +41,11 @@
 
   <Hst.Variant title="With a Code Block">
     <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
-      <CodeBlock content={{ some: 'thing', blue: 42 }} />
+      <CodeBlock
+        content={{ some: 'thing', blue: 42 }}
+        copyIconTitle="Click to copy content"
+        copySuccessIconTitle="Content copied to clipboard"
+      />
     </Accordion>
   </Hst.Variant>
 
@@ -78,7 +82,12 @@
 
   <Hst.Variant title="An Accordion with an action">
     <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
-      <IconButton class="!p-0" icon="info" slot="action" />
+      <IconButton
+        label="A descriptive label"
+        class="!p-0"
+        icon="info"
+        slot="action"
+      />
       <p>Accordion content here.</p>
     </Accordion>
   </Hst.Variant>
@@ -90,7 +99,12 @@
       }}
     >
       <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
-        <IconButton class="!p-0" icon="info" slot="action" />
+        <IconButton
+          label="A descriptive label"
+          class="!p-0"
+          icon="info"
+          slot="action"
+        />
         <p>Accordion content here.</p>
       </Accordion>
     </form>

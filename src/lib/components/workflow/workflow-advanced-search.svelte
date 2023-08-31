@@ -1,16 +1,16 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
   import { fly } from 'svelte/transition';
+
   import { page } from '$app/stores';
 
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-
-  import Input from '$lib/holocene/input/input.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import { workflowFilters } from '$lib/stores/filters';
-  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
-  import { refresh, workflowsQuery } from '$lib/stores/workflows';
+  import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { workflowFilters } from '$lib/stores/filters';
+  import { refresh, workflowsQuery } from '$lib/stores/workflows';
+  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   let manualSearchString = '';
 
@@ -31,7 +31,9 @@
     } else {
       try {
         $workflowFilters = toListWorkflowFilters(manualSearchString);
-      } catch (e) {}
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     if (manualSearchString && manualSearchString === query) {
@@ -68,12 +70,13 @@
         icon="search"
         class="w-full lg:w-3/4"
         clearable
+        clearButtonLabel={translate('clear-input-button-label')}
         unroundRight
         on:clear={handleClearInput}
         bind:value={manualSearchString}
       />
       <Button
-        testId="manual-search-button"
+        data-testid="manual-search-button"
         variant="primary"
         class="h-10"
         unroundLeft

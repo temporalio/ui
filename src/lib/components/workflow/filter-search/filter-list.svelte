@@ -1,29 +1,34 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
+
   import { getContext } from 'svelte';
-  import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
+
   import { page } from '$app/stores';
-  import { labsMode } from '$lib/stores/labs-mode';
-  import { timeFormat } from '$lib/stores/time-format';
+
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Chip from '$lib/holocene/chip.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { isWorkflowStatusType } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
-  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import { formatDateTime } from '$lib/utilities/format-date';
+  import { labsMode } from '$lib/stores/labs-mode';
+  import {
+    relativeTime,
+    timeFormat,
+    type TimeFormat,
+  } from '$lib/stores/time-format';
+  import { formatDate } from '$lib/utilities/format-date';
   import {
     isDateTimeFilter,
     isTextFilter,
   } from '$lib/utilities/query/filter-search';
+  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import { isWorkflowStatusType } from '$lib/models/workflow-status';
-  import { translate } from '$lib/i18n/translate';
 
-  import Button from '$lib/holocene/button.svelte';
-  import Chip from '$lib/holocene/chip.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
-
-  type T = $$Generic;
+  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
   const { filter, activeQueryIndex } =
-    getContext<FilterContext<T>>(FILTER_CONTEXT);
+    getContext<FilterContext>(FILTER_CONTEXT);
 
   const removeQuery = (index: number) => {
     $workflowFilters.splice(index, 1);
@@ -64,21 +69,31 @@
     return conditional;
   };
 
-  const formatDateTimeRange = (value: string, format: string) => {
+  const formatDateTimeRange = (
+    value: string,
+    format: TimeFormat,
+    relative: boolean,
+  ) => {
     const [conditon, start, operator, end] = value.split(' ');
-    return `${conditon.toLowerCase()} ${formatDateTime(
-      start,
-      format,
-    )} ${operator.toLowerCase()} ${formatDateTime(end, format)}`;
+    return `${conditon.toLowerCase()} ${formatDate(start, format, {
+      relative,
+      abbrFormat: true,
+    })} ${operator.toLowerCase()} ${formatDate(end, format, {
+      relative,
+      abbrFormat: true,
+    })}`;
   };
 </script>
 
-<div class="flex flex-wrap gap-2 pt-2">
+<div class="flex flex-wrap gap-2" class:pt-2={visibleFilters.length}>
   {#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
     {@const { attribute, value, conditional, customDate } = workflowFilter}
     {#if attribute}
       <div in:fade>
         <Chip
+          removeButtonLabel={translate('workflows', 'remove-filter-label', {
+            attribute,
+          })}
           on:remove={() => removeQuery(i)}
           on:click={() => {
             $activeQueryIndex = i;
@@ -100,10 +115,13 @@
               {attribute}
               {#if isDateTimeFilter(attribute)}
                 {#if customDate}
-                  {formatDateTimeRange(value, $timeFormat)}
+                  {formatDateTimeRange(value, $timeFormat, $relativeTime)}
                 {:else}
                   {getDateTimeConditonal(conditional)}
-                  {formatDateTime(value, $timeFormat)}
+                  {formatDate(value, $timeFormat, {
+                    relative: $relativeTime,
+                    abbrFormat: true,
+                  })}
                 {/if}
               {:else}
                 {conditional}

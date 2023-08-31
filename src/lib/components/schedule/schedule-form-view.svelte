@@ -1,27 +1,27 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { loading, error } from '$lib/stores/schedules';
 
-  import Alert from '$lib/holocene/alert.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import Button from '$lib/holocene/button.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
-  import type { Schedule } from '$types';
   import { page } from '$app/stores';
+
+  import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { error, loading } from '$lib/stores/schedules';
+  import type {
+    FullSchedule,
+    ScheduleParameters,
+    SchedulePreset,
+  } from '$lib/types/schedule';
   import {
     routeForSchedule,
     routeForSchedules,
   } from '$lib/utilities/route-for';
 
-  import type {
-    FullSchedule,
-    SchedulePreset,
-    ScheduleParameters,
-  } from '$lib/types/schedule';
-
-  import { translate } from '$lib/i18n/translate';
+  import type { Schedule } from '$types';
 
   export let schedule: FullSchedule | null = null;
   export let onConfirm: (
@@ -122,11 +122,9 @@
       <h1 class="font-base mt-8 ml-0 text-2xl">{title}</h1>
     </header>
     <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
-      {#if $error}
-        <Alert intent="error" title="" bold>
-          {$error}
-        </Alert>
-      {/if}
+      <Alert intent="error" title="" hidden={!$error} bold>
+        {$error}
+      </Alert>
       <div class="w-full">
         <Input
           id="name"

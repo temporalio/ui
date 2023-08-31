@@ -26,6 +26,9 @@
     pageSizeSelectLabel: string;
     emptyStateMessage: string;
     fallbackErrorMessage: string;
+    itemsKeyname?: string;
+    previousButtonLabel: string;
+    nextButtonLabel: string;
   }
 
   type PaginatedRequest<T> = (
@@ -46,6 +49,9 @@
   export let pageSizeSelectLabel: string;
   export let emptyStateMessage: string;
   export let fallbackErrorMessage: string;
+  export let itemsKeyname = 'items';
+  export let previousButtonLabel: string;
+  export let nextButtonLabel: string;
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
@@ -77,7 +83,8 @@
     const fetchData = await onFetch();
     try {
       const response = await fetchData($store.pageSize, '');
-      const { items, nextPageToken } = response;
+      const { nextPageToken } = response;
+      const items = response[itemsKeyname] || [];
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
       error = err;
@@ -95,7 +102,8 @@
           $store.pageSize,
           $store.indexData[$store.index].nextToken,
         );
-        const { items, nextPageToken } = response;
+        const { nextPageToken } = response;
+        const items = response[itemsKeyname] || [];
         store.nextPageWithItems(nextPageToken, items);
       } catch (error) {
         if (isError(error) && onError) {
@@ -171,7 +179,7 @@
     </div>
     <nav
       class="flex flex-col justify-end gap-4 md:flex-row"
-      aria-label={$$restProps['aria-label']}
+      aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
       {#if pageSizeOptions.length}
@@ -187,6 +195,7 @@
           class="caret"
           disabled={!$store.hasPrevious}
           on:click={store.previousPage}
+          aria-label={previousButtonLabel}
         >
           <span
             class="arrow arrow-left"
@@ -207,6 +216,7 @@
           class="caret"
           disabled={!$store.hasNext}
           on:click={fetchIndexData}
+          aria-label={nextButtonLabel}
         >
           <span
             class="arrow arrow-right"
@@ -233,7 +243,7 @@
     class={`flex ${
       $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
     }`}
-    aria-label={$$restProps['aria-label']}
+    aria-label="{$$restProps['aria-label']} 2"
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">
@@ -251,6 +261,7 @@
             class="caret"
             disabled={!$store.hasPrevious}
             on:click={store.previousPage}
+            aria-label={previousButtonLabel}
           >
             <span
               class="arrow arrow-left"
@@ -271,6 +282,7 @@
             class="caret"
             disabled={!$store.hasNext}
             on:click={fetchIndexData}
+            aria-label={nextButtonLabel}
           >
             <span
               class="arrow arrow-right"

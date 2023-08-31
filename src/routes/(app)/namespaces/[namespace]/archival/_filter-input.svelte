@@ -1,8 +1,11 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import debounce from 'just-debounce';
+  
+  import { page } from '$app/stores';
+  
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  
 
   export let parameter: string;
   export let name: string;
@@ -22,7 +25,7 @@
   }
 </script>
 
-<div class="input-container focus-within:border-blue-700">
+<div class="input-container focus-within:border-blue-700 bg-white">
   <label for={id} class="hidden">{name}</label>
   <span><Icon name="search" class="flex items-center text-gray-700" /></span>
   <input

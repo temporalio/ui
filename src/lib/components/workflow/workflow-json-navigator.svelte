@@ -53,7 +53,7 @@
           on:click={() => {
             index -= 1;
           }}
-          aria-label="previous"
+          aria-label={translate('previous')}
         >
           <span
             class="arrow arrow-left"
@@ -66,7 +66,7 @@
           on:click={() => {
             index += 1;
           }}
-          aria-label="next"
+          aria-label={translate('next')}
         >
           <span
             class="arrow arrow-right"
@@ -77,7 +77,12 @@
     </div>
     <slot name="decode" />
   </div>
-  <CodeBlock content={events[index - 1]} data-testid="event-history-json" />
+  <CodeBlock
+    content={events[index - 1]}
+    testId="event-history-json"
+    copyIconTitle={translate('copy-icon-title')}
+    copySuccessIconTitle={translate('copy-success-icon-title')}
+  />
 {/if}
 
 <style lang="postcss">

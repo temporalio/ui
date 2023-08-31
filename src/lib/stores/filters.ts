@@ -47,7 +47,7 @@ const updateEventCategoryFilter: StartStopNotifier<string | null> = (set) => {
   });
 };
 
-export const eventCategoryFilter = writable<string | null>(
-  null,
+export const eventCategoryFilter = writable<string | undefined>(
+  undefined,
   updateEventCategoryFilter,
 );

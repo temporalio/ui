@@ -1,25 +1,26 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
+  
   import { page } from '$app/stores';
-  import { timeFormat } from '$lib/stores/time-format';
+  
+  import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
+  import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
+  import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
+  import Pagination from '$lib/holocene/pagination.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import {
-    refresh,
-    workflows,
     loading,
+    refresh,
     updating,
     workflowError,
+    workflows,
   } from '$lib/stores/workflows';
-  import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Pagination from '$lib/holocene/pagination.svelte';
-  import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
   import { getSearchType } from '$lib/utilities/search-type-parameter';
-  import Loading from '$lib/holocene/loading.svelte';
-  import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
-  import { translate } from '$lib/i18n/translate';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -43,7 +44,9 @@
 
 <header class="mb-2 flex justify-between">
   <div>
-    <h1 class="text-2xl" data-testid="namespace-title">Recent Workflows</h1>
+    <h1 class="text-2xl" data-testid="namespace-title">
+      {translate('workflows', 'recent-workflows')}
+    </h1>
     <div class="flex items-center gap-2 text-sm">
       <p data-testid="namespace-name">
         {$page.params.namespace}
@@ -52,7 +55,7 @@
   </div>
   <div>
     <button
-      aria-label="retry workflows"
+      aria-label={translate('workflows', 'retry-workflows')}
       class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
       on:click={refreshWorkflows}
     >
@@ -64,15 +67,16 @@
 <Pagination
   items={$workflows}
   let:visibleItems
-  aria-label="recent workflows"
+  aria-label={translate('workflows', 'recent-workflows')}
   pageSizeSelectLabel={translate('per-page')}
+  previousButtonLabel={translate('previous')}
+  nextButtonLabel={translate('next')}
 >
   <WorkflowsSummaryTable updating={$updating}>
     {#each visibleItems as event}
       <WorkflowsSummaryRow
         workflow={event}
         namespace={$page.params.namespace}
-        timeFormat={$timeFormat}
       />
     {:else}
       <tr>

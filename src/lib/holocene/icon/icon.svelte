@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { icons, type IconName } from './paths';
+  import { type IconName, icons } from './paths';
 
   export let name: IconName;
   export let width = 24;
@@ -15,6 +15,7 @@
     {width}
     {height}
     {title}
+    {name}
     class={$$props.class}
     {...$$restProps}
   />

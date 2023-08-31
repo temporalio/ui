@@ -1,6 +1,7 @@
 <script lang="ts">
-  import ProgressBar from '$lib/holocene/progress-bar.svelte';
   import type { HTMLTableAttributes } from 'svelte/elements';
+
+  import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
   interface $$Props extends HTMLTableAttributes {
     variant?: 'simple' | 'fancy';
@@ -9,13 +10,14 @@
     'data-testid'?: string;
   }
 
-  let className: string = '';
+  let className = '';
   export { className as class };
   export let variant: 'simple' | 'fancy' = 'fancy';
   export let updating = false;
 </script>
 
 <table class="{variant} {className}" {...$$restProps}>
+  <slot name="caption" />
   <thead>
     <slot name="headers" />
     {#if updating}
@@ -47,6 +49,10 @@
       @apply bg-gray-900 text-gray-100;
 
       :global(th) {
+        @apply border-t border-gray-900 px-1 py-2;
+      }
+
+      :global(td) {
         @apply border-t border-gray-900 px-1 py-2;
 
         &:first-child {

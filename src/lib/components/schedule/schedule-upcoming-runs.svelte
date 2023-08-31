@@ -1,9 +1,10 @@
 <script lang="ts">
-  import type { Timestamp } from '$types';
   import Panel from '$lib/components/panel.svelte';
-  import { formatDate } from '$lib/utilities/format-date';
-  import { timeFormat } from '$lib/stores/time-format';
   import { translate } from '$lib/i18n/translate';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { formatDate } from '$lib/utilities/format-date';
+  
+  import type { Timestamp } from '$types';
 
   export let futureRuns: Timestamp[] = [];
 </script>
@@ -13,7 +14,10 @@
   {#each futureRuns.slice(0, 5) as run}
     <div class="row">
       <p>
-        {formatDate(run, $timeFormat, { relativeLabel: translate('from-now') })}
+        {formatDate(run, $timeFormat, {
+          relative: $relativeTime,
+          relativeLabel: translate('from-now'),
+        })}
       </p>
     </div>
   {/each}

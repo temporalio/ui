@@ -1,14 +1,12 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import { submitCreateSchedule } from '$lib/stores/schedules';
-
   import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
-
+  import { submitCreateSchedule } from '$lib/stores/schedules';
   import type {
-    SchedulePreset,
-    ScheduleParameters,
     ScheduleActionParameters,
+    ScheduleParameters,
+    SchedulePreset,
     SchedulePresetsParameters,
     ScheduleSpecParameters,
   } from '$lib/types/schedule';

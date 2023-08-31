@@ -1,10 +1,22 @@
 <script lang="ts">
   import { afterNavigate } from '$app/navigation';
-  import type { PageData } from './$types';
-  import type { DescribeNamespaceResponse as Namespace } from '$types';
-  import { page, updated } from '$app/stores';
-  import { clearAuthUser } from '$lib/stores/auth-user';
   import { goto } from '$app/navigation';
+  import { page, updated } from '$app/stores';
+
+  import type { PageData } from './$types';
+
+  import Banners from '$lib/components/banner/banners.svelte';
+  import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
+  import SideNavigation from '$lib/components/side-nav.svelte';
+  import TopNavigation from '$lib/components/top-nav.svelte';
+  import { ErrorBoundary } from '$lib/holocene/error-boundary';
+  import MainContentContainer from '$lib/holocene/main-content-container.svelte';
+  import Toaster from '$lib/holocene/toaster.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { clearAuthUser } from '$lib/stores/auth-user';
+  import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
+  import { toaster } from '$lib/stores/toaster';
+  import type { NamespaceListItem } from '$lib/types/global';
   import {
     routeForArchivalWorkfows,
     routeForEventHistoryImport,
@@ -14,20 +26,13 @@
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
-  import Banners from '$lib/components/banner/banners.svelte';
-  import { ErrorBoundary } from '$lib/holocene/error-boundary';
-  import Toaster from '$lib/holocene/toaster.svelte';
-  import { toaster } from '$lib/stores/toaster';
-  import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
-  import { workflowFilters } from '$lib/stores/filters';
-  import MainContentContainer from '$lib/holocene/main-content-container.svelte';
-  import SideNavigation from '$lib/components/side-nav.svelte';
-  import TopNavigation from '$lib/components/top-nav.svelte';
-  import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
+  import type { DescribeNamespaceResponse as Namespace } from '$types';
 
   export let data: PageData;
 
   $: ({ uiVersionInfo } = data);
+
+  let namespaceList: NamespaceListItem[];
 
   $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
   $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
@@ -43,10 +48,8 @@
       isCloud ? routeForWorkflows({ namespace }) : getCurrentHref(namespace);
     return {
       namespace,
-      href: (namespace: string) => getHref(namespace),
       onClick: (namespace: string) => {
         $lastUsedNamespace = namespace;
-        $workflowFilters = [];
         goto(getHref(namespace));
       },
     };
@@ -90,7 +93,11 @@
 </script>
 
 <div class="flex w-screen flex-row">
-  <Toaster pop={toaster.pop} toasts={toaster.toasts} />
+  <Toaster
+    closeButtonLabel={translate('close')}
+    pop={toaster.pop}
+    toasts={toaster.toasts}
+  />
   <div class="sticky top-0 z-20 h-screen w-auto">
     <SideNavigation {activeNamespace} {linkList} {isCloud} />
   </div>
@@ -98,7 +105,10 @@
     <DataEncoderSettings />
     <TopNavigation {logout} {namespaceList} />
     <Banners {uiVersionInfo} />
-    <div class="z-10 -mt-4 flex w-full flex-col gap-4 px-10 pb-10 pt-8">
+    <div
+      slot="main"
+      class="flex w-full flex-col gap-4 p-8 h-[calc(100%-2.5rem)]"
+    >
       <ErrorBoundary onError={() => {}}>
         <slot />
       </ErrorBoundary>

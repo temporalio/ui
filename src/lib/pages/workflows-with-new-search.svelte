@@ -19,11 +19,11 @@
   );
 
   export const openBatchCancelConfirmationModal = () => {
-    batchCancelConfirmationModal.open();
+    batchCancelConfirmationModal?.open();
   };
 
   export const openBatchTerminateConfirmationModal = () => {
-    batchTerminateConfirmationModal.open();
+    batchTerminateConfirmationModal?.open();
   };
 
   export const handleSelectAll = (workflows: WorkflowExecution[]) => {
@@ -46,47 +46,49 @@
 </script>
 
 <script lang="ts">
+  import { derived, writable } from 'svelte/store';
+  
   import { onMount } from 'svelte';
-  import { writable, derived } from 'svelte/store';
+  
   import { page } from '$app/stores';
-  import {
-    refresh,
-    workflows,
-    loading,
-    updating,
-    workflowCount,
-    workflowsQuery,
-    workflowsSearchParams,
-  } from '$lib/stores/workflows';
-  import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
-  import Pagination from '$lib/holocene/pagination.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
+  
+  
+  import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
+  import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
+  import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
-  import { labsMode } from '$lib/stores/labs-mode';
-
+  import { translate } from '$lib/i18n/translate';
+  import Translate from '$lib/i18n/translate.svelte';
+  import { Action } from '$lib/models/workflow-actions';
   import {
     batchCancelByQuery,
     batchTerminateByQuery,
     bulkCancelByIDs,
     bulkTerminateByIDs,
   } from '$lib/services/batch-service';
-  import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
-  import { Action } from '$lib/models/workflow-actions';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { toaster } from '$lib/stores/toaster';
-  import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
-  import type { WorkflowExecution } from '$lib/types/workflows';
-  import Translate from '$lib/i18n/translate.svelte';
-  import { translate } from '$lib/i18n/translate';
+  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
+  import { labsMode } from '$lib/stores/labs-mode';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
-  import Button from '$lib/holocene/button.svelte';
+  import { toaster } from '$lib/stores/toaster';
+  import {
+    loading,
+    refresh,
+    updating,
+    workflowCount,
+    workflows,
+    workflowsQuery,
+    workflowsSearchParams,
+  } from '$lib/stores/workflows';
+  import type { WorkflowExecution } from '$lib/types/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
+  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);
@@ -226,7 +228,7 @@
   on:confirm={cancelWorkflows}
 />
 
-<header class="mb-2 flex justify-between">
+<header class="flex justify-between">
   <div>
     <h1 class="text-2xl" data-cy="workflows-title">
       <Translate namespace="workflows" key="recent-workflows" />
@@ -264,7 +266,7 @@
   </div>
   <div>
     <button
-      aria-label="retry workflows"
+      aria-label={translate('workflows', 'retry-workflows')}
       class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
       on:click={refreshWorkflows}
     >
@@ -272,22 +274,15 @@
     </button>
   </div>
 </header>
-<Pagination
-  items={$workflows}
-  let:visibleItems
-  aria-label="recent workflows"
-  pageSizeSelectLabel={translate('per-page')}
->
-  <svelte:fragment slot="action-top-left">
-    <LabsModeGuard>
-      <svelte:fragment slot="fallback">
-        <WorkflowAdvancedSearch />
-      </svelte:fragment>
-      <WorkflowFilterSearch />
-    </LabsModeGuard>
-  </svelte:fragment>
-  <svelte:fragment slot="action-top-center">
-    <WorkflowDateTimeFilter />
-  </svelte:fragment>
-  <WorkflowsSummaryConfigurableTable workflows={visibleItems} />
-</Pagination>
+<div class="flex flex-col md:flex-row gap-2">
+  <LabsModeGuard>
+    <svelte:fragment slot="fallback">
+      <WorkflowAdvancedSearch />
+    </svelte:fragment>
+    <WorkflowFilterSearch />
+  </LabsModeGuard>
+  <WorkflowDateTimeFilter />
+</div>
+<WorkflowsSummaryConfigurableTable>
+  <slot name="cloud" slot="cloud" />
+</WorkflowsSummaryConfigurableTable>

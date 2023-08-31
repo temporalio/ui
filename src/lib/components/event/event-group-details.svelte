@@ -1,12 +1,12 @@
 <script lang="ts">
+  import Table from '$lib/holocene/table/table.svelte';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
-    eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsCanceled,
+    eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
-  import Table from '$lib/holocene/table/table.svelte';
-  import type { EventGroup } from '$lib/models/event-groups/event-groups';
 
   export let eventGroup: EventGroup;
   export let selectedId: string;

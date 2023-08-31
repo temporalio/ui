@@ -1,17 +1,17 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
-  import { translate } from '$lib/i18n/translate';
-  import { getWorkflowStackTrace } from '$lib/services/query-service';
-  import type { ParsedQuery } from '$lib/services/query-service';
-  import type { Eventual } from '$lib/types/global';
 
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import type { ParsedQuery } from '$lib/services/query-service';
+  import { getWorkflowStackTrace } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import type { Eventual } from '$lib/types/global';
 
   const { namespace } = $page.params;
   $: ({ workflow, workers } = $workflowRun);
@@ -72,6 +72,8 @@
           content={result}
           language="text"
           testId="query-stack-trace"
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
         />
       </div>
     {:catch _error}

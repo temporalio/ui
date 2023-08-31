@@ -3,6 +3,7 @@ import { writable } from 'svelte/store';
 import type {
   GetPollersResponse,
   TaskQueueCompatibility,
+  WorkerReachability,
 } from '$lib/services/pollers-service';
 import { persistStore } from '$lib/stores/persist-store';
 import type { WorkflowExecution } from '$lib/types/workflows';
@@ -13,6 +14,7 @@ export type WorkflowRunWithWorkers = {
   workflow: WorkflowExecution | null;
   workers: GetPollersResponse;
   compatibility?: TaskQueueCompatibility;
+  reachability?: WorkerReachability;
 };
 
 export const initialWorkflowRun: WorkflowRunWithWorkers = {

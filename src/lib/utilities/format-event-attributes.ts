@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 
 import type { I18nKey } from '$lib/i18n';
 import { translate } from '$lib/i18n/translate';
-import { timeFormat } from '$lib/stores/time-format';
+import { relativeTime, timeFormat } from '$lib/stores/time-format';
 import type {
   EventAttribute,
   EventAttributeKey,
@@ -105,7 +105,9 @@ export const formatAttributes = (
   const attributes: CombinedAttributes = {};
 
   if (compact)
-    attributes.eventTime = formatDate(event.eventTime, get(timeFormat));
+    attributes.eventTime = formatDate(event.eventTime, get(timeFormat), {
+      relative: get(relativeTime),
+    });
 
   for (const [key, value] of Object.entries(event.attributes)) {
     const shouldDisplay = shouldDisplayAttribute(key, value);

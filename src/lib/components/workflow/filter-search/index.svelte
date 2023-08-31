@@ -1,34 +1,40 @@
 <script lang="ts" context="module">
-  import type { Writable } from 'svelte/store';
+  import { afterUpdate, noop } from 'svelte/internal';
+  import { writable, type Writable } from 'svelte/store';
+  import { fly } from 'svelte/transition';
+
+  import { setContext } from 'svelte';
 
   export const FILTER_CONTEXT = 'filter-context';
 
-  export interface FilterContext<T> {
+  export interface FilterContext {
     filter: Writable<WorkflowFilter>;
     activeQueryIndex: Writable<number>;
     handleSubmit: () => void;
-    focusedElementId: Writable<any>;
+    focusedElementId: Writable<string>;
     resetFilter: () => void;
   }
 </script>
 
 <script lang="ts">
-  import { setContext } from 'svelte';
-  import { afterUpdate, noop } from 'svelte/internal';
-  import { writable } from 'svelte/store';
-  import { fly } from 'svelte/transition';
   import { page } from '$app/stores';
-  import { translate } from '$lib/i18n/translate';
 
-  import { refresh } from '$lib/stores/workflows';
-  import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
-  import { workflowFilters } from '$lib/stores/filters';
+  import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+import Input from '$lib/holocene/input/input.svelte';
   import {
-    emptyFilter,
-    combineFilters,
-  } from '$lib/utilities/query/to-list-workflow-filters';
-  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+    Menu,
+    MenuButton,
+    MenuContainer,
+    MenuItem,
+  } from '$lib/holocene/menu';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import type { WorkflowFilter } from '$lib/models/workflow-filters';
+  import { workflowFilters } from '$lib/stores/filters';
+  import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
+  import { refresh } from '$lib/stores/workflows';
   import {
     isBooleanFilter,
     isDateTimeFilter,
@@ -37,24 +43,19 @@
     isStatusFilter,
     isTextFilter,
   } from '$lib/utilities/query/filter-search';
+  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
+  import {
+    combineFilters,
+    emptyFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  import Button from '$lib/holocene/button.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import BooleanFilter from './boolean-filter.svelte';
-  import FilterList from './filter-list.svelte';
   import DateTimeFilter from './datetime-filter.svelte';
+  import FilterList from './filter-list.svelte';
   import NumberFilter from './number-filter.svelte';
   import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
-  import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
-
-  import type { WorkflowFilter } from '$lib/models/workflow-filters';
-
-  type T = $$Generic;
 
   const filter = writable<WorkflowFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
@@ -65,7 +66,7 @@
 
   let viewAdvancedSearchInput = false;
 
-  setContext<FilterContext<T>>(FILTER_CONTEXT, {
+  setContext<FilterContext>(FILTER_CONTEXT, {
     filter,
     activeQueryIndex,
     handleSubmit,
@@ -182,120 +183,110 @@
   }
 </script>
 
-{#if viewAdvancedSearchInput}
-  <div class="flex flex-col sm:flex-row gap-4">
-    <WorkflowAdvancedSearch />
-    <label
-      for="view-search-input"
-      class="flex items-center gap-4 font-secondary text-sm"
-      >{translate('workflows', 'view-search-input')}
-      <ToggleSwitch
-        id="view-search-input"
-        checked={viewAdvancedSearchInput}
-        on:change={() => (viewAdvancedSearchInput = !viewAdvancedSearchInput)}
-      />
-    </label>
-  </div>
-{:else}
-  <div class="flex w-full gap-4">
-    <div class="flex" class:filter={!showClearAllButton} on:keyup={handleKeyUp}>
-      {#if isStatusFilter($filter.attribute)}
-        <StatusFilter />
-      {:else}
-        <MenuContainer let:open>
-          <Button
-            variant="search"
-            unroundRight={Boolean($filter.attribute)}
-            disabled={$activeQueryIndex !== null}
-            icon={$filter.attribute ? null : 'filter'}
-            count={$filter.attribute ? 0 : $workflowFilters.length}
-            on:click={() => open.update((previous) => !previous)}
+<div class="flex flex-col grow">
+  <div class="flex flex-col grow sm:items-center sm:flex-row gap-4">
+    {#if viewAdvancedSearchInput}
+      <WorkflowAdvancedSearch />
+    {:else}
+      <div
+        class="flex"
+        class:filter={!showClearAllButton}
+        on:keyup={handleKeyUp}
+      >
+        {#if isStatusFilter($filter.attribute)}
+          <StatusFilter />
+        {:else}
+          <MenuContainer>
+            <MenuButton
+              controls="search-attribute-menu"
+              unroundRight={Boolean($filter.attribute)}
+              disabled={$activeQueryIndex !== null}
+              count={$filter.attribute ? 0 : $workflowFilters.length}
+            >
+              <svelte:fragment slot="leading">
+                {#if !$filter.attribute}
+                  <Icon name="filter" />
+                {/if}
+              </svelte:fragment>
+              {$filter.attribute || translate('workflows', 'filter')}
+            </MenuButton>
+            <Menu id="search-attribute-menu">
+              <Input
+                label={translate('search')}
+                labelHidden
+                id="filter-search"
+                noBorder
+                bind:value={searchAttributeValue}
+                icon="search"
+                placeholder={translate('search')}
+                class="mb-1"
+              />
+
+              {#each filteredOptions as { value, label }}
+                {@const disabled = isOptionDisabled(value, $workflowFilters)}
+                <MenuItem
+                  on:click={() => {
+                    handleNewQuery(value);
+                  }}
+                  {disabled}
+                >
+                  {label}
+                </MenuItem>
+              {:else}
+                <MenuItem on:click={noop}>{translate('no-results')}</MenuItem>
+              {/each}
+            </Menu>
+          </MenuContainer>
+        {/if}
+
+        {#if isTextFilter($filter.attribute)}
+          <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+            <TextFilter />
+          </div>
+          <!-- TODO: Add KeywordList support -->
+          <!-- {:else if isListFilter($filter.attribute)}
+        <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <ListFilter />
+        </div> -->
+        {:else if isNumberFilter($filter.attribute)}
+          <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+            <NumberFilter />
+          </div>
+        {:else if isDateTimeFilter($filter.attribute)}
+          <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+            <DateTimeFilter />
+          </div>
+        {:else if isBooleanFilter($filter.attribute)}
+          <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+            <BooleanFilter />
+          </div>
+        {/if}
+      </div>
+
+      <div
+        class="flex flex-col sm:flex-row {showClearAllButton
+          ? 'justify-between w-full'
+          : 'justify-end'}"
+      >
+        {#if showClearAllButton}
+          <Button variant="ghost" on:click={handleClearInput}
+            >{translate('clear-all')}</Button
           >
-            {$filter.attribute || translate('workflows', 'filter')}
-          </Button>
-          <Menu
-            class="max-h-80 overflow-y-scroll w-fit min-w-[240px] whitespace-nowrap"
-            id="search-attribute-menu"
-          >
-            <Input
-              label={translate('search')}
-              labelHidden
-              id="filter-search"
-              noBorder
-              bind:value={searchAttributeValue}
-              icon="search"
-              placeholder={translate('search')}
-            />
-
-            {#each filteredOptions as { value, label }}
-              {@const disabled = isOptionDisabled(value, $workflowFilters)}
-              <MenuItem
-                on:click={() => {
-                  handleNewQuery(value);
-                }}
-                {disabled}
-              >
-                {label}
-              </MenuItem>
-            {:else}
-              <MenuItem on:click={noop}>{translate('no-results')}</MenuItem>
-            {/each}
-          </Menu>
-        </MenuContainer>
-      {/if}
-
-      {#if isTextFilter($filter.attribute)}
-        <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
-          <TextFilter />
-        </div>
-        <!-- TODO: Add KeywordList support -->
-        <!-- {:else if isListFilter($filter.attribute)}
-      <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
-        <ListFilter />
-      </div> -->
-      {:else if isNumberFilter($filter.attribute)}
-        <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
-          <NumberFilter />
-        </div>
-      {:else if isDateTimeFilter($filter.attribute)}
-        <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
-          <DateTimeFilter />
-        </div>
-      {:else if isBooleanFilter($filter.attribute)}
-        <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
-          <BooleanFilter />
-        </div>
-      {/if}
-    </div>
-
-    <div
-      class="flex flex-col sm:flex-row {showClearAllButton
-        ? 'justify-between w-full'
-        : 'justify-end'}"
-    >
-      {#if showClearAllButton}
-        <Button variant="ghost" on:click={handleClearInput}
-          >{translate('clear-all')}</Button
-        >
-      {/if}
-      <label
-        for="view-search-input"
-        class="flex items-center gap-4 font-secondary text-sm"
-        >{translate('workflows', 'view-search-input')}
-        <ToggleSwitch
-          id="view-search-input"
-          checked={viewAdvancedSearchInput}
-          on:change={() => {
-            viewAdvancedSearchInput = !viewAdvancedSearchInput;
-            resetFilter();
-          }}
-        />
-      </label>
-    </div>
+        {/if}
+      </div>
+    {/if}
+    <ToggleSwitch
+      label={translate('workflows', 'view-search-input')}
+      labelPosition="left"
+      id="view-search-input"
+      bind:checked={viewAdvancedSearchInput}
+      on:change={() => {
+        resetFilter();
+      }}
+    />
   </div>
-
   <FilterList />
-{/if}
+</div>
 
 <style lang="postcss">
   .filter {

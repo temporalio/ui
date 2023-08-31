@@ -1,19 +1,21 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import IconButton from '../icon-button.svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
+
+  import { createEventDispatcher } from 'svelte';
+
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
-  interface $$Props extends HTMLInputAttributes {
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+
+  import IconButton from '../icon-button.svelte';
+
+  type BaseProps = HTMLInputAttributes & {
     id: string;
     value: string;
     label: string;
     labelHidden?: boolean;
     icon?: IconName;
     suffix?: string;
-    copyable?: boolean;
-    clearable?: boolean;
     theme?: 'dark' | 'light';
     valid?: boolean;
     hintText?: string;
@@ -24,7 +26,19 @@
     noBorder?: boolean;
     autoFocus?: boolean;
     error?: boolean;
-  }
+  };
+
+  type CopyableProps = BaseProps & {
+    copyable: boolean;
+    copyButtonLabel: string;
+  };
+
+  type ClearableProps = BaseProps & {
+    clearable: boolean;
+    clearButtonLabel: string;
+  };
+
+  type $$Props = BaseProps | CopyableProps | ClearableProps;
 
   export let id: string;
   export let value: string;
@@ -34,7 +48,7 @@
   export let placeholder = '';
   export let suffix = '';
   export let name = id;
-  export let copyable: boolean = false;
+  export let copyable = false;
   export let disabled = false;
   export let clearable = false;
   export let theme: 'dark' | 'light' = 'light';
@@ -43,18 +57,20 @@
   export let hintText = '';
   export let maxLength = 0;
   export let spellcheck: boolean = null;
-  export let unroundRight: boolean = false;
-  export let unroundLeft: boolean = false;
-  export let noBorder: boolean = false;
+  export let unroundRight = false;
+  export let unroundLeft = false;
+  export let noBorder = false;
   export let autoFocus = false;
   export let error = false;
   export let required = false;
+  export let copyButtonLabel = '';
+  export let clearButtonLabel = '';
 
   let className = '';
   export { className as class };
 
   function callFocus(input: HTMLInputElement) {
-    if (autoFocus) input.focus();
+    if (autoFocus && input) input.focus();
   }
 
   const dispatch = createEventDispatcher();
@@ -113,6 +129,7 @@
     {#if copyable}
       <div class="copy-icon-container">
         <IconButton
+          label={copyButtonLabel}
           on:click={(e) => copy(e, value)}
           icon={$copied ? 'checkmark' : 'copy'}
         />
@@ -123,7 +140,7 @@
       </div>
     {:else if clearable && value}
       <div class="clear-icon-container" data-testid="clear-input">
-        <IconButton on:click={onClear} icon="close" />
+        <IconButton label={clearButtonLabel} on:click={onClear} icon="close" />
       </div>
     {/if}
     {#if maxLength && !suffix && !disabled}
@@ -136,15 +153,21 @@
       </span>
     {/if}
   </div>
-  {#if hintText}
-    <span class="hint-text" class:invalid={!valid} class:error>{hintText}</span>
-  {/if}
+  <span
+    class="inline-block hint-text"
+    class:invalid={!valid}
+    class:error
+    class:hidden={!hintText}
+    role={error ? 'alert' : null}
+  >
+    {hintText}
+  </span>
 </div>
 
 <style lang="postcss">
   /* Base styles */
   label {
-    @apply mb-10 font-secondary text-sm font-medium;
+    @apply font-secondary text-sm font-medium;
   }
 
   label.required {
@@ -220,7 +243,7 @@
   }
 
   .hint-text {
-    @apply mt-2 inline-block text-xs;
+    @apply mt-2 text-xs;
   }
 
   .hint-text.error,

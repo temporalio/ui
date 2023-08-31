@@ -2,23 +2,13 @@ import { get } from 'svelte/store';
 
 import { describe, expect, test } from 'vitest';
 
-import { setTimeFormat, timeFormat } from './time-format';
+import { relativeTime, timeFormat } from './time-format';
 
 describe('time format store', () => {
-  test('should return UTC as the default', () => {
+  test('should return UTC as the default timeFormat', () => {
     expect(get(timeFormat)).toBe('UTC');
   });
-
-  describe('setTimeFormat', () => {
-    test('sets the time format', () => {
-      setTimeFormat('local');
-      expect(get(timeFormat)).toBe('local');
-
-      setTimeFormat('relative');
-      expect(get(timeFormat)).toBe('relative');
-
-      setTimeFormat('UTC');
-      expect(get(timeFormat)).toBe('UTC');
-    });
+  test('should return false as the default for relativeTime', () => {
+    expect(get(relativeTime)).toBe(false);
   });
 });

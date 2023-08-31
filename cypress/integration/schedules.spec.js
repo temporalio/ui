@@ -46,10 +46,6 @@ describe('Schedules View', () => {
 
     cy.get('[data-testid="schedule-name"]').should('exist');
     cy.get('[data-testid="schedule-name"]').contains(scheduleId);
-
-    cy.get('[data-testid="schedule-interval-frequency"]').contains(
-      'Every 30sec',
-    );
   });
 });
 
@@ -74,12 +70,8 @@ describe('Schedules Edit', () => {
     cy.get('[data-testid="schedule-name"]').should('exist');
     cy.get('[data-testid="schedule-name"]').contains(scheduleId);
 
-    cy.get('[data-testid="schedule-interval-frequency"]').contains(
-      'Every 30sec',
-    );
-
     cy.get('#schedule-actions-menu-button').click();
-    cy.get('#schedule-actions-menu >> [data-testid="edit-schedule"]').click();
+    cy.get('#schedule-actions-menu > [data-testid="edit-schedule"]').click();
     cy.url().should('contain', `/schedules/${scheduleId}/edit`);
     cy.get('#content').contains('Edit Schedule');
   });

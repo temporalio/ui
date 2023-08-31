@@ -1,9 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
+  import { translate } from '$lib/i18n/translate';
   import {
-    type TextFilterAttributes,
     searchAttributeToWorkflowKey,
+    type TextFilterAttributes,
   } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -12,7 +14,7 @@
 
   export let attribute: TextFilterAttributes;
   export let workflow: WorkflowExecution;
-  export let filterOrCopyButtonsVisible: boolean = false;
+  export let filterOrCopyButtonsVisible = false;
 
   $: value = workflow[searchAttributeToWorkflowKey[attribute]];
   $: namespace = $page.params.namespace;
@@ -46,6 +48,9 @@
 
 <a {href} class="table-link">{value}</a>
 <FilterOrCopyButtons
+  copyIconTitle={translate('copy-icon-title')}
+  copySuccessIconTitle={translate('copy-success-icon-title')}
+  filterIconTitle={translate('filter-workflows')}
   show={filterOrCopyButtonsVisible}
   content={value}
   onFilter={onRowFilterClick}

@@ -9,6 +9,9 @@ import {
   getDefaultVersionForSetFromABuildId,
   getNonDefaultVersionsForSet,
   getOrderedVersionSets,
+  getUniqueBuildIdsFromPollers,
+  pollerHasVersioning,
+  workflowIsCompatibleWithWorkers,
 } from './task-queue-compatibility';
 
 describe('getOrderedVersionSets', () => {
@@ -304,5 +307,254 @@ describe('getDefaultVersionForSetFromABuildId', () => {
     expect(
       getDefaultVersionForSetFromABuildId({ majorVersionSets }, '6.7'),
     ).toBe(undefined);
+  });
+});
+
+describe('getUniqueBuildIdsFromPollers', () => {
+  it('should return single buildId from pollers with one not using versioning', () => {
+    const pollers = [
+      {
+        lastAccessTime: '2023-08-08T17:31:47.475536Z',
+        identity: '49105@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '1.1',
+          useVersioning: true,
+        },
+      },
+      {
+        lastAccessTime: '2023-08-08T17:29:53.396211Z',
+        identity: '48804@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '382de1cb0b7d4cc19436ef156c3aa973',
+          useVersioning: false,
+        },
+      },
+    ];
+
+    expect(getUniqueBuildIdsFromPollers(pollers)).toStrictEqual(['1.1']);
+  });
+
+  it('should return list of buildIds from pollers with all using versioning', () => {
+    const pollers = [
+      {
+        lastAccessTime: '2023-08-08T17:31:47.475536Z',
+        identity: '49105@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '1.1',
+          useVersioning: true,
+        },
+      },
+      {
+        lastAccessTime: '2023-08-08T17:29:53.396211Z',
+        identity: '48804@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '3.0',
+          useVersioning: true,
+        },
+      },
+    ];
+
+    expect(getUniqueBuildIdsFromPollers(pollers)).toStrictEqual(['1.1', '3.0']);
+  });
+
+  it('should return unique list of buildIds from pollers with duplicate versioning', () => {
+    const pollers = [
+      {
+        lastAccessTime: '2023-08-08T17:31:47.475536Z',
+        identity: '49105@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '1.1',
+          useVersioning: true,
+        },
+      },
+      {
+        lastAccessTime: '2023-08-08T17:29:53.396211Z',
+        identity: '48804@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '1.1',
+          useVersioning: true,
+        },
+      },
+    ];
+
+    expect(getUniqueBuildIdsFromPollers(pollers)).toStrictEqual(['1.1']);
+  });
+});
+
+describe('pollerHasVersioning', () => {
+  it('should return false from pollers not using versioning', () => {
+    const pollers = [
+      {
+        lastAccessTime: '2023-08-08T17:31:47.475536Z',
+        identity: '49105@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '',
+          useVersioning: false,
+        },
+      },
+      {
+        lastAccessTime: '2023-08-08T17:29:53.396211Z',
+        identity: '48804@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '',
+          useVersioning: false,
+        },
+      },
+    ];
+
+    expect(pollerHasVersioning(pollers)).toBe(false);
+  });
+  it('should return true from pollers with one using versioning', () => {
+    const pollers = [
+      {
+        lastAccessTime: '2023-08-08T17:31:47.475536Z',
+        identity: '49105@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '1.1',
+          useVersioning: true,
+        },
+      },
+      {
+        lastAccessTime: '2023-08-08T17:29:53.396211Z',
+        identity: '48804@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '382de1cb0b7d4cc19436ef156c3aa973',
+          useVersioning: false,
+        },
+      },
+    ];
+
+    expect(pollerHasVersioning(pollers)).toBe(true);
+  });
+});
+
+describe('workflowIsCompatibleWithWorkers', () => {
+  const majorVersionSets = [
+    {
+      versionSetId: '1.0',
+      buildIds: ['1.0', '1.1', '1.2'],
+    },
+    {
+      versionSetId: '2.0',
+      buildIds: ['2.0', '2.1', '2.2'],
+    },
+  ];
+
+  it('should return true if workflow not using versioning', () => {
+    const pollers = [
+      {
+        lastAccessTime: '2023-08-08T17:31:47.475536Z',
+        identity: '49105@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '1.2',
+          useVersioning: true,
+        },
+      },
+      {
+        lastAccessTime: '2023-08-08T17:29:53.396211Z',
+        identity: '48804@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '2.0',
+          useVersioning: true,
+        },
+      },
+    ];
+    const mostRecentWorkerVersionStamp = {
+      buildId: 'asdfasdfasf0',
+      bundleId: '',
+      useVersioning: false,
+    };
+
+    expect(
+      workflowIsCompatibleWithWorkers(
+        getWorkflow(mostRecentWorkerVersionStamp),
+        pollers,
+        { majorVersionSets },
+      ),
+    ).toBe(true);
+  });
+
+  it('should return true if pollers have default version of workflow version', () => {
+    const pollers = [
+      {
+        lastAccessTime: '2023-08-08T17:31:47.475536Z',
+        identity: '49105@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '1.2',
+          useVersioning: true,
+        },
+      },
+      {
+        lastAccessTime: '2023-08-08T17:29:53.396211Z',
+        identity: '48804@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '2.0',
+          useVersioning: true,
+        },
+      },
+    ];
+    const mostRecentWorkerVersionStamp = {
+      buildId: '1.0',
+      bundleId: '',
+      useVersioning: true,
+    };
+
+    expect(
+      workflowIsCompatibleWithWorkers(
+        getWorkflow(mostRecentWorkerVersionStamp),
+        pollers,
+        { majorVersionSets },
+      ),
+    ).toBe(true);
+  });
+
+  it('should return false if pollers dont have default version of workflow version', () => {
+    const pollers = [
+      {
+        lastAccessTime: '2023-08-08T17:31:47.475536Z',
+        identity: '49105@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '1.1',
+          useVersioning: true,
+        },
+      },
+      {
+        lastAccessTime: '2023-08-08T17:29:53.396211Z',
+        identity: '48804@Test.local@',
+        ratePerSecond: 100000,
+        workerVersionCapabilities: {
+          buildId: '2.2',
+          useVersioning: true,
+        },
+      },
+    ];
+    const mostRecentWorkerVersionStamp = {
+      buildId: '1.0',
+      bundleId: '',
+      useVersioning: true,
+    };
+
+    expect(
+      workflowIsCompatibleWithWorkers(
+        getWorkflow(mostRecentWorkerVersionStamp),
+        pollers,
+        { majorVersionSets },
+      ),
+    ).toBe(false);
   });
 });

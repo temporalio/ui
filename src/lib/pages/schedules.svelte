@@ -1,27 +1,25 @@
 <script lang="ts">
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Pagination from '$lib/holocene/pagination.svelte';
-  import Button from '$lib/holocene/button.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
-
   import { noop } from 'svelte/internal';
-  import Input from '$lib/holocene/input/input.svelte';
-  import { page } from '$app/stores';
+
   import { goto } from '$app/navigation';
-  import { routeForScheduleCreate } from '$lib/utilities/route-for';
-  import { fetchAllSchedules } from '$lib/services/schedule-service';
-  import type { ScheduleListEntry } from '$types';
-  import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
+  import { page } from '$app/stores';
+
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
-  import { timeFormat } from '$lib/stores/time-format';
-  import { capitalize } from '$lib/utilities/format-camel-case';
-  import DropdownButton from '$lib/holocene/dropdown-button/dropdown-button.svelte';
-  import { coreUserStore } from '$lib/stores/core-user';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
+  import Pagination from '$lib/holocene/pagination.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fetchAllSchedules } from '$lib/services/schedule-service';
+  import { coreUserStore } from '$lib/stores/core-user';
+  import { routeForScheduleCreate } from '$lib/utilities/route-for';
+
+  import type { ScheduleListEntry } from '$types';
 
   $: namespace = $page.params.namespace;
 
@@ -59,7 +57,7 @@
   {#if hasSchedules}
     <Button
       class="h-10"
-      testId="create-schedule"
+      data-testid="create-schedule"
       disabled={createDisabled}
       on:click={() => goto(routeForScheduleCreate({ namespace }))}
     >
@@ -75,8 +73,10 @@
     <Pagination
       items={filteredSchedules(schedules)}
       let:visibleItems
-      aria-label="schedules"
+      aria-label={translate('schedules')}
       pageSizeSelectLabel={translate('per-page')}
+      previousButtonLabel={translate('previous')}
+      nextButtonLabel={translate('next')}
     >
       <svelte:fragment slot="action-top-left">
         <div class="w-full xl:w-1/2">
@@ -88,27 +88,11 @@
             id="schedule-name-filter"
             placeholder={translate('schedules', 'name')}
             clearable
+            clearButtonLabel={translate('clear-input-button-label')}
             bind:value={search}
             on:submit={noop}
           />
         </div>
-      </svelte:fragment>
-      <svelte:fragment slot="action-top-right">
-        <DropdownButton
-          id="timezone"
-          label={capitalize($timeFormat)}
-          icon="clock"
-        >
-          <MenuItem on:click={() => ($timeFormat = 'relative')}
-            >{translate('relative')}</MenuItem
-          >
-          <MenuItem on:click={() => ($timeFormat = 'UTC')}
-            >{translate('utc')}</MenuItem
-          >
-          <MenuItem on:click={() => ($timeFormat = 'local')}
-            >{translate('local')}</MenuItem
-          >
-        </DropdownButton>
       </svelte:fragment>
       <SchedulesTable>
         {#each visibleItems as schedule}
@@ -131,18 +115,21 @@
     <div class="my-12 flex flex-col items-center justify-start gap-2">
       <EmptyState title={translate('schedules', 'empty-state-title')} {error}>
         <p>
-          Go to <Link
+          {translate('schedules', 'getting-started-docs-link-preface')}
+          <Link
             target="_external"
-            href="https://docs.temporal.io/workflows/#schedule">docs</Link
-          > or get started with <Link
-            target="_external"
-            href="https://docs.temporal.io/cli/schedule">Temporal CLI</Link
+            href="https://docs.temporal.io/workflows/#schedule"
+            >{translate('schedules', 'getting-started-docs-link')}</Link
+          >
+          {translate('schedules', 'getting-started-cli-link-preface')}
+          <Link target="_external" href="https://docs.temporal.io/cli/schedule"
+            >Temporal CLI</Link
           >.
         </p>
         {#if !error}
           <Button
             class="mt-4"
-            testId="create-schedule"
+            data-testid="create-schedule"
             disabled={createDisabled}
             on:click={() => goto(routeForScheduleCreate({ namespace }))}
           >

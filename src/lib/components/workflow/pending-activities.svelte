@@ -1,21 +1,22 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
 
-  import { formatDate } from '$lib/utilities/format-date';
-  import { getDuration, formatDuration } from '$lib/utilities/format-time';
-  import { routeForPendingActivities } from '$lib/utilities/route-for';
-  import Link from '$lib/holocene/link.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import { formatDate } from '$lib/utilities/format-date';
   import {
     formatAttemptsLeft,
     formatRetryExpiration,
   } from '$lib/utilities/format-event-attributes';
+  import { formatDuration, getDuration } from '$lib/utilities/format-time';
+  import { routeForPendingActivities } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
-  import { translate } from '$lib/i18n/translate';
 
   $: ({ workflow } = $workflowRun);
   $: pendingActivities = workflow?.pendingActivities;
@@ -67,15 +68,13 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows', 'last-heartbeat')}
                     </h4>
-                    {`${formatDate(
+                    {formatDate(
                       pendingActivity.lastHeartbeatTime,
-                    )} (${formatDate(
-                      pendingActivity.lastHeartbeatTime,
-                      'relative',
+                      $timeFormat,
                       {
-                        relativeStrict: true,
+                        relative: $relativeTime,
                       },
-                    )})`}
+                    )}
                   </div>
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">
@@ -137,6 +136,10 @@
                     <CodeBlock
                       class="max-h-32"
                       content={pendingActivity.heartbeatDetails}
+                      copyIconTitle={translate('copy-icon-title')}
+                      copySuccessIconTitle={translate(
+                        'copy-success-icon-title',
+                      )}
                     />
                   </div>
                 {/if}
@@ -148,6 +151,10 @@
                     <CodeBlock
                       class="max-h-32"
                       content={pendingActivity.lastFailure}
+                      copyIconTitle={translate('copy-icon-title')}
+                      copySuccessIconTitle={translate(
+                        'copy-success-icon-title',
+                      )}
                     />
                   </div>
                 {/if}
@@ -158,7 +165,7 @@
       {/each}
     </div>
     <div class="text-right">
-      <Link {href}>{translate('show-all')}</Link>
+      <Link {href}>{translate('workflows', 'pending-activities-link')}</Link>
     </div>
   </section>
 {/if}

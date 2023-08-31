@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let error: boolean = false;
+  export let error = false;
 </script>
 
 <div class="panel bg-white {$$props.class}" class:error>

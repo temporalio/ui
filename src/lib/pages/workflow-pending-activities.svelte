@@ -1,23 +1,22 @@
 <script lang="ts">
-  import { workflowRun } from '$lib/stores/workflow-run';
-  import { translate } from '$lib/i18n/translate';
-
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Badge from '$lib/holocene/badge.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Table from '$lib/holocene/table/table.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import { formatDate } from '$lib/utilities/format-date';
-  import { getDuration, formatDuration } from '$lib/utilities/format-time';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
     formatRetryExpiration,
   } from '$lib/utilities/format-event-attributes';
-  import { timeFormat } from '$lib/stores/time-format';
+  import { formatDuration, getDuration } from '$lib/utilities/format-time';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   $: pendingActivities = $workflowRun.workflow?.pendingActivities;
@@ -25,6 +24,9 @@
 
 {#if pendingActivities.length}
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
+    <caption class="sr-only" slot="caption"
+      >{translate('workflows', 'pending-activities-tab')}</caption
+    >
     <TableHeaderRow slot="headers">
       <th class="w-44">{translate('workflows', 'activity-id')}</th>
       <th>{translate('workflows', 'details')}</th>
@@ -87,6 +89,8 @@
                     slot="value"
                     class="pb-2"
                     content={details.heartbeatDetails}
+                    copyIconTitle={translate('copy-icon-title')}
+                    copySuccessIconTitle={translate('copy-success-icon-title')}
                   />
                 </li>
               {/if}
@@ -97,6 +101,8 @@
                     slot="value"
                     class="pb-2"
                     content={details.lastFailure}
+                    copyIconTitle={translate('copy-icon-title')}
+                    copySuccessIconTitle={translate('copy-success-icon-title')}
                   />
                 </li>
               {/if}
@@ -118,13 +124,10 @@
             <li class="event-table-row">
               <h4>{translate('workflows', 'last-heartbeat')}</h4>
               <p>
-                {`${formatDate(details.lastHeartbeatTime)} (${formatDate(
-                  details.lastHeartbeatTime,
-                  'relative',
-                  {
-                    relativeStrict: true,
-                  },
-                )})`}
+                {formatDate(details.lastHeartbeatTime, $timeFormat, {
+                  relative: $relativeTime,
+                  relativeStrict: true,
+                })}
               </p>
             </li>
             <li class="event-table-row">
@@ -134,13 +137,21 @@
             {#if details.lastStartedTime}
               <li class="event-table-row">
                 <h4>{translate('workflows', 'last-started-time')}</h4>
-                <p>{formatDate(details.lastStartedTime, $timeFormat)}</p>
+                <p>
+                  {formatDate(details.lastStartedTime, $timeFormat, {
+                    relative: $relativeTime,
+                  })}
+                </p>
               </li>
             {/if}
             {#if details.scheduledTime}
               <li class="event-table-row">
                 <h4>{translate('workflows', 'scheduled-time')}</h4>
-                <p>{formatDate(details.scheduledTime, $timeFormat)}</p>
+                <p>
+                  {formatDate(details.scheduledTime, $timeFormat, {
+                    relative: $relativeTime,
+                  })}
+                </p>
               </li>
             {/if}
             {#if details.lastWorkerIdentity}

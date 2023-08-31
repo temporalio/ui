@@ -1,32 +1,35 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
   import { logEvent } from 'histoire/client';
-  
+
   import Button from './button.svelte';
   import Input from './input/input.svelte';
   import Modal from './modal.svelte';
 
   export let Hst: HST;
   let deleteConfirm: string;
-  let modal: Modal;
   let loading = false;
+  let basicModalOpen = false;
+  let formModalOpen = false;
+  let formModalError = '';
 
   let shouldError = false;
   let errorText =
     'Quo sint nisi nostrum quis nesciunt est. Delectus adipisci reiciendis nihil fuga libero exercitationem. Distinctio nihil sit et consequatur sit quia. Quia aut et temporibus doloremque veritatis corporis.';
-  const openModal = () => {
-    modal.open();
-  };
 
   const handleConfirm = () => {
     logEvent('Confirm', {});
+    basicModalOpen = false;
+    deleteConfirm = '';
   };
 
   const handleCancel = () => {
     logEvent('Cancel', {});
+    deleteConfirm = '';
   };
 
   const makeFakeApiRequest = async () => {
+    formModalError = '';
     try {
       loading = true;
       await new Promise<void>((resolve, reject) => {
@@ -36,9 +39,10 @@
           setTimeout(resolve, 250);
         }
       });
-      modal?.close();
+      formModalOpen = false;
+      deleteConfirm = '';
     } catch {
-      modal?.setError(errorText);
+      formModalError = errorText;
     } finally {
       loading = false;
     }
@@ -47,14 +51,19 @@
 
 <Hst.Story>
   <Hst.Variant title="A Basic Confirmation Modal">
-    <Button on:click={openModal}>Open Modal</Button>
+    <Button
+      on:click={() => {
+        basicModalOpen = true;
+      }}>Open Modal</Button
+    >
     <Modal
-      bind:this={modal}
       id="basic-modal"
       confirmType="destructive"
       confirmText="Delete"
+      cancelText="Cancel"
       on:confirmModal={handleConfirm}
       on:cancelModal={handleCancel}
+      bind:open={basicModalOpen}
     >
       <h3 slot="title">Delete User</h3>
       <p slot="content">
@@ -63,15 +72,21 @@
     </Modal>
   </Hst.Variant>
   <Hst.Variant title="A Modal with a Form">
-    <Button on:click={openModal}>Open Modal</Button>
+    <Button
+      on:click={() => {
+        formModalOpen = true;
+      }}>Open Modal</Button
+    >
     <Modal
       id="form-modal"
-      bind:this={modal}
       confirmType="destructive"
       confirmText="Delete"
+      cancelText="Cancel"
       {loading}
       on:cancelModal={handleCancel}
       on:confirmModal={makeFakeApiRequest}
+      bind:open={formModalOpen}
+      bind:error={formModalError}
     >
       <h3 slot="title">Delete Namespace</h3>
       <div slot="content" class="flex flex-col gap-2">

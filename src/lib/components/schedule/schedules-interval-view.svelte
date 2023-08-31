@@ -1,11 +1,8 @@
 <script lang="ts">
   import Input from '$lib/holocene/input/input.svelte';
-  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+  import Option from '$lib/holocene/select/option.svelte';
+  import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
-
   import type { ScheduleOffsetUnit } from '$lib/types/schedule';
 
   export let days = '';
@@ -35,10 +32,6 @@
       }
     }
   }
-
-  const onPhaseClick = (unit: ScheduleOffsetUnit) => {
-    offsetUnit = unit;
-  };
 </script>
 
 <div class="my-2 flex flex-col gap-4">
@@ -64,7 +57,7 @@
     <div>:</div>
     <div class="w-24">
       <Input
-        id="hour"
+        id="hour-interval"
         label={translate('hours-abbreviated')}
         labelHidden
         bind:value={hour}
@@ -77,7 +70,7 @@
     <div>:</div>
     <div class="w-24">
       <Input
-        id="minute"
+        id="minute-interval"
         label={translate('minutes-abbreviated')}
         labelHidden
         bind:value={minute}
@@ -107,7 +100,7 @@
   <p>
     {translate('schedules', 'offset-description')}
   </p>
-  <div class="flex w-40 gap-0">
+  <div class="flex w-48 gap-0">
     <Input
       id="phase"
       label={translate('schedules', 'offset-heading')}
@@ -116,31 +109,18 @@
       placeholder="00"
       error={error(phase)}
       unroundRight
-      class="h-10"
     />
-    <MenuContainer>
-      <MenuButton
-        hasIndicator
-        id="phase"
-        controls="phase-menu"
-        class="rounded-r bg-offWhite border border-primary border-l-0 h-10 w-20 px-2"
-      >
-        {offsetUnit}
-      </MenuButton>
-      <Menu id="phase-menu">
-        <MenuItem on:click={() => onPhaseClick('days')}
-          >{translate('days')}</MenuItem
-        >
-        <MenuItem on:click={() => onPhaseClick('hrs')}
-          >{translate('hours-abbreviated')}</MenuItem
-        >
-        <MenuItem on:click={() => onPhaseClick('min')}
-          >{translate('minutes-abbreviated')}</MenuItem
-        >
-        <MenuItem on:click={() => onPhaseClick('sec')}
-          >{translate('seconds-abbreviated')}</MenuItem
-        >
-      </Menu>
-    </MenuContainer>
+    <Select
+      label={translate('schedules', 'offset-unit')}
+      labelHidden
+      unroundLeft
+      id="phase-unit"
+      bind:value={offsetUnit}
+    >
+      <Option value="days">{translate('days')}</Option>
+      <Option value="hrs">{translate('hours-abbreviated')}</Option>
+      <Option value="min">{translate('minutes-abbreviated')}</Option>
+      <Option value="sec">{translate('seconds-abbreviated')}</Option>
+    </Select>
   </div>
 </div>
