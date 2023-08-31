@@ -3,6 +3,7 @@
 
   import PageTitle from '$lib/components/page-title.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
@@ -34,12 +35,10 @@
       {#each visibleItems as namespace}
         <TableRow>
           <td>
-            <a
+            <Link
               href={routeForNamespace({
                 namespace: namespace.namespaceInfo.name,
-              })}
-              class="hover:text-blue-700 hover:underline hover:decoration-blue-700"
-              >{namespace.namespaceInfo.name}</a
+              })}>{namespace.namespaceInfo.name}</Link
             >
           </td>
         </TableRow>

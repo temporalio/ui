@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
 
   import Alert from '$lib/holocene/alert.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowError } from '$lib/stores/workflows';
@@ -63,22 +63,17 @@
         <slot name="cloud" />
         <p>
           {translate('workflows', 'workflow-empty-state-description')}
-          <a
-            href="https://github.com/temporalio"
-            rel="noreferrer"
-            target="_blank"
-            class="underline hover:text-blue-700 hover:decoration-blue-700"
-            >Temporal's GitHub repository</a
+          <Link newTab href="https://github.com/temporalio"
+            >Temporal's GitHub repository</Link
           >.
         </p>
         <ul class="flex flex-col gap-2">
           {#each samples as sample}
             <li>
-              <a
-                class="flex gap-2 items-center hover:text-blue-700 hover:underline hover:decoration-blue-700"
-                href="https://github.com/temporalio/{sample}"
-                rel="noreferrer"
-                target="_blank"><Icon name="github" />{sample}</a
+              <Link
+                icon="github"
+                newTab
+                href="https://github.com/temporalio/{sample}">{sample}</Link
               >
             </li>
           {/each}

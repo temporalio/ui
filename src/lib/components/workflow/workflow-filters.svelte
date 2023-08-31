@@ -1,11 +1,12 @@
 <script lang="ts">
   import debounce from 'just-debounce';
   import { createEventDispatcher } from 'svelte';
-  
+
   import { page } from '$app/stores';
-  
+
   import Search from '$lib/components/search.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Option from '$lib/holocene/select/simple-option.svelte';
   import Select from '$lib/holocene/select/simple-select.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -14,7 +15,7 @@
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
   import { durations } from '$lib/utilities/to-duration';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  
+
   const dispatch = createEventDispatcher<{ search: undefined }>();
 
   export let searchType: 'basic' | 'advanced';
@@ -37,12 +38,6 @@
   const updateSearchType =
     (newSearchType: 'basic' | 'advanced') => (): void => {
       searchType = newSearchType;
-
-      updateQueryParameters({
-        parameter: 'search',
-        value: searchType,
-        url: $page.url,
-      });
     };
 
   const updateQuery = (event: SubmitEvent): void => {
@@ -74,21 +69,19 @@
 <div class="flex flex-col">
   <p class="pb-2 text-right text-xs">
     {#if searchType === 'advanced'}
-      <a
-        href="{$page.url.pathname}?searchType=basic"
-        class="text-blue-700"
-        on:click|preventDefault={updateSearchType('basic')}
+      <Link
+        href="{$page.url.pathname}?search=basic"
+        on:click={updateSearchType('basic')}
       >
         {translate('workflows', 'basic-search')}
-      </a>
+      </Link>
     {:else}
-      <a
-        href="{$page.url.pathname}?searchType=advanced"
-        class="text-blue-700"
-        on:click|preventDefault={updateSearchType('advanced')}
+      <Link
+        href="{$page.url.pathname}?search=advanced"
+        on:click={updateSearchType('advanced')}
       >
         {translate('workflows', 'advanced-search')}
-      </a>
+      </Link>
     {/if}
   </p>
 

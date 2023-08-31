@@ -59,7 +59,11 @@
       </div>
     {:then result}
       <div class="flex items-center gap-4">
-        <Button on:click={refreshStackTrace} icon="retry" loading={isLoading}>
+        <Button
+          on:click={refreshStackTrace}
+          leadingIcon="retry"
+          loading={isLoading}
+        >
           {translate('refresh')}
         </Button>
         <p>

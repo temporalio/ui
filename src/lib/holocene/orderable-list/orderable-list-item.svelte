@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  
+
   import IconButton from '../icon-button.svelte';
 
   const dispatch = createEventDispatcher<{
@@ -90,7 +90,6 @@
       <div class="flex items-center">
         <IconButton
           disabled={index === 0}
-          hoverable
           icon="chevron-up"
           data-testid="orderable-list-item-{label}-move-up-button"
           label={moveUpButtonLabel}
@@ -98,7 +97,6 @@
         />
         <IconButton
           disabled={index === totalItems - 1}
-          hoverable
           icon="chevron-down"
           data-testid="orderable-list-item-{label}-move-down-button"
           label={moveDownButtonLabel}
@@ -110,7 +108,6 @@
     {#if !isStatic && !readonly && index <= maxPinnedItems - 1}
       {#if pinned}
         <IconButton
-          hoverable
           icon="pin-filled"
           data-testid="orderable-list-item-{label}-unpin-button"
           label={unpinButtonLabel}
@@ -118,7 +115,6 @@
         />
       {:else}
         <IconButton
-          hoverable
           icon="pin"
           data-testid="orderable-list-item-{label}-pin-button"
           label={pinButtonLabel}
@@ -130,7 +126,6 @@
   {#if !readonly}
     {#if isStatic}
       <IconButton
-        hoverable
         icon="add"
         data-testid="orderable-list-item-{label}-add-button"
         label={addButtonLabel}
@@ -138,7 +133,6 @@
       />
     {:else}
       <IconButton
-        hoverable
         icon="hyphen"
         data-testid="orderable-list-item-{label}-remove-button"
         label={removeButtonLabel}

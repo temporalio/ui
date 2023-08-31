@@ -8,7 +8,7 @@
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Modal from '$lib/holocene/modal.svelte';
@@ -94,16 +94,9 @@
 {#await scheduleFetch}
   <header class="mb-8">
     <div class="flex flex-col gap-1 relative">
-      <a
-        href={routeForSchedules({ namespace })}
-        class="absolute top-0 back-to-schedules"
-        style="left: -0.5rem;"
-      >
-        <Icon name="chevron-left" class="inline" />{translate(
-          'schedules',
-          'back-to-schedules',
-        )}
-      </a>
+      <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+        {translate('schedules', 'back-to-schedules')}
+      </Link>
       <h1
         class="text-2xl mt-8 font-medium select-all"
         data-testid="schedule-name"
@@ -122,16 +115,9 @@
   {:else}
     <header class="flex flex-row justify-between gap-4 mb-8">
       <div class="flex flex-col gap-1 relative">
-        <a
-          href={routeForSchedules({ namespace })}
-          class="absolute top-0 back-to-schedules"
-          style="left: -0.5rem;"
-        >
-          <Icon name="chevron-left" class="inline" />{translate(
-            'schedules',
-            'back-to-schedules',
-          )}
-        </a>
+        <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+          {translate('schedules', 'back-to-schedules')}
+        </Link>
         <h1 class="text-2xl flex relative items-center gap-4 mt-8">
           <WorkflowStatus
             status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
@@ -288,16 +274,9 @@
 {:catch error}
   <header class="mb-8">
     <div class="flex flex-col gap-1 relative">
-      <a
-        href={routeForSchedules({ namespace })}
-        class="absolute top-0 back-to-schedules"
-        style="left: -0.5rem;"
-      >
-        <Icon name="chevron-left" class="inline" />{translate(
-          'schedules',
-          'back-to-schedules',
-        )}
-      </a>
+      <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+        {translate('schedules', 'back-to-schedules')}
+      </Link>
       <h1
         class="text-2xl mt-8 font-medium select-all"
         data-testid="schedule-name"
@@ -311,13 +290,3 @@
   </header>
   <ScheduleError error={error?.message} />
 {/await}
-
-<style lang="postcss">
-  .back-to-schedules {
-    @apply text-sm;
-  }
-
-  .back-to-schedules:hover {
-    @apply text-blue-700 underline;
-  }
-</style>
