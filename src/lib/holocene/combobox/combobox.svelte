@@ -113,12 +113,13 @@
       closeList();
     } else {
       openList();
-      inputElement.focus();
     }
   };
 
   const openList = () => {
     $open = true;
+    inputElement.focus();
+    inputElement.select();
   };
 
   const closeList = () => {
@@ -288,7 +289,7 @@
       on:click={toggleList}
     >
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
-  </button>
+    </button>
   </div>
 
   <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
