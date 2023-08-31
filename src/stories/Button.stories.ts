@@ -4,18 +4,21 @@ import { icons } from '$lib/holocene/icon/paths';
 
 import ButtonWrapper from './ButtonWrapper.svelte';
 
+const iconControls = {
+  control: {
+    type: 'select',
+  },
+  options: Object.keys(icons),
+};
+
 // More on how to set up stories at: https://storybook.js.org/docs/svelte/writing-stories/introduction
 const meta = {
   title: 'Example/Button',
   component: ButtonWrapper,
   tags: ['autodocs'],
   argTypes: {
-    icon: {
-      control: {
-        type: 'select',
-      },
-      options: Object.keys(icons),
-    },
+    leadingIcon: { ...iconControls },
+    trailingIcon: { ...iconControls },
     variant: {
       control: {
         type: 'select',

@@ -1,6 +1,8 @@
 <script lang="ts">
+  import type { ComponentProps } from 'svelte';
+
   import Button from '$lib/holocene/button.svelte';
-  import type { ComponentProps, SvelteComponent } from 'svelte';
+
   export let defaultSlot;
 
   type $$Props = ComponentProps<Button> & { defaultSlot: string };
