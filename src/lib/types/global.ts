@@ -106,6 +106,7 @@ export type User = {
   [key: string]: any;
 };
 export type ClusterInformation = import('$lib/types').GetClusterInfoResponse;
+export type SystemInformation = import('$lib/types').GetSystemInfoResponse;
 
 export type SelectOptionValue = number | string | boolean;
 

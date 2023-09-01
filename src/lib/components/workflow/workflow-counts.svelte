@@ -91,7 +91,7 @@
     namespace: $page.params.namespace,
   });
   const countPromise = requestFromAPI<{ count: string }>(countRoute, {
-    params: { query: '' },
+    params: { query: 'GROUP BY ExecutionStatus' },
     notifyOnError: false,
   });
 </script>
