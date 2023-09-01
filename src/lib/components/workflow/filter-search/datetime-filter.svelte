@@ -38,12 +38,10 @@
   let startHour = '';
   let startMinute = '';
   let startSecond = '';
-  let startHalf: 'AM' | 'PM' = 'AM';
 
   let endHour = '';
   let endMinute = '';
   let endSecond = '';
-  let endHalf: 'AM' | 'PM' = 'AM';
 
   const TIME_UNIT_OPTIONS = ['minutes', 'hours', 'days'];
 
@@ -74,20 +72,6 @@
     return _date;
   };
 
-  const setHours = (hour: string, half: 'AM' | 'PM') => {
-    if (hour) {
-      if (hour === '12') {
-        return half === 'AM' ? '00' : '12';
-      } else if (half === 'PM') {
-        return (parseInt(hour) + 12).toString();
-      } else {
-        return hour;
-      }
-    } else {
-      hour = '';
-    }
-  };
-
   const onApply = () => {
     if (type === 'relative') {
       if (!relativeTime) return;
@@ -95,12 +79,12 @@
       $filter.customDate = false;
     } else {
       let startDateWithTime = applyTimeChanges(startDate, {
-        hour: setHours(startHour, startHalf),
+        hour: startHour,
         minute: startMinute,
         second: startSecond,
       });
       let endDateWithTime = applyTimeChanges(endDate, {
-        hour: setHours(endHour, endHalf),
+        hour: endHour,
         minute: endMinute,
         second: endSecond,
       });
@@ -168,7 +152,7 @@
               bind:hour={startHour}
               bind:minute={startMinute}
               bind:second={startSecond}
-              bind:half={startHalf}
+              twelveHourClock={false}
             />
           </div>
         </MenuItem>
@@ -187,7 +171,7 @@
               bind:hour={endHour}
               bind:minute={endMinute}
               bind:second={endSecond}
-              bind:half={endHalf}
+              twelveHourClock={false}
             />
           </div>
         </MenuItem>
@@ -252,21 +236,23 @@
               />
               {translate('absolute')}
             </label>
-            <DatePicker
-              label={''}
-              labelHidden
-              on:datechange={onStartDateChange}
-              selected={startDate}
-              todayLabel={translate('today')}
-              closeLabel={translate('close')}
-              clearLabel={translate('clear-input-button-label')}
-            />
-            <TimePicker
-              bind:hour={startHour}
-              bind:minute={startMinute}
-              bind:second={startSecond}
-              bind:half={startHalf}
-            />
+            <div class="flex flex-col ml-6 gap-2">
+              <DatePicker
+                label={''}
+                labelHidden
+                on:datechange={onStartDateChange}
+                selected={startDate}
+                todayLabel={translate('today')}
+                closeLabel={translate('close')}
+                clearLabel={translate('clear-input-button-label')}
+              />
+              <TimePicker
+                bind:hour={startHour}
+                bind:minute={startMinute}
+                bind:second={startSecond}
+                twelveHourClock={false}
+              />
+            </div>
           </div>
         </MenuItem>
       {/if}

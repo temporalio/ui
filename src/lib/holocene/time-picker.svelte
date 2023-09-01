@@ -7,6 +7,7 @@
   export let minute = '';
   export let second = '';
   export let half: 'AM' | 'PM' = 'AM';
+  export let twelveHourClock = true;
 </script>
 
 <div class="flex gap-2">
@@ -18,7 +19,7 @@
     placeholder="00"
     suffix="hrs"
     maxLength={2}
-    error={Boolean(parseInt(hour) > 12)}
+    error={twelveHourClock ? parseInt(hour) > 12 : parseInt(hour) > 23}
   />
   <Input
     id="minute"
@@ -41,12 +42,14 @@
     maxLength={2}
     error={Boolean(parseInt(hour) > 59)}
   />
-  <ToggleButtons>
-    <ToggleButton active={half === 'AM'} on:click={() => (half = 'AM')}
-      >AM</ToggleButton
-    >
-    <ToggleButton active={half === 'PM'} on:click={() => (half = 'PM')}
-      >PM</ToggleButton
-    >
-  </ToggleButtons>
+  {#if twelveHourClock}
+    <ToggleButtons>
+      <ToggleButton active={half === 'AM'} on:click={() => (half = 'AM')}
+        >AM</ToggleButton
+      >
+      <ToggleButton active={half === 'PM'} on:click={() => (half = 'PM')}
+        >PM</ToggleButton
+      >
+    </ToggleButtons>
+  {/if}
 </div>
