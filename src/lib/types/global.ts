@@ -112,11 +112,6 @@ export type SelectOptionValue = number | string | boolean;
 
 export type BooleanString = 'true' | 'false';
 
-export type UiVersionInfo = {
-  current: string;
-  recommended: string;
-};
-
 export type DataEncoderStatus = 'notRequested' | 'success' | 'error';
 
 export type Color =

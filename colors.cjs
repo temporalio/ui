@@ -1,15 +1,12 @@
 const colors = {
   primary: { DEFAULT: '#18181b' }, // gray-900
   secondary: '#64748b', // blue-gray-500
-  primaryText: '#141414',
-  spaceGray: { DEFAULT: '#141414' },
   white: '#ffffff',
   offWhite: '#F8F8F7',
   danger: '#b91c1c', // red-700
   success: '#bbf7d0', // green-200
   black: '#000000',
   lightBlue: '#DFFBFF',
-  lightPurple: '#DDD6FE',
   blue: {
     50: '#eff6ff',
     100: '#dbeafe',
@@ -24,7 +21,7 @@ const colors = {
   },
   indigo: {
     50: '#eef2ff',
-    100: '#e0e7ff',
+    100: '#E0EAFF',
     200: '#c7d2fe',
     300: '#a5b4fc',
     400: '#818cf8',
@@ -41,7 +38,7 @@ const colors = {
     300: '#d4d4d8',
     400: '#a1a1aa',
     500: '#71717a',
-    600: '#52525b',
+    600: '#4B5563',
     700: '#3f3f46',
     800: '#27272a',
     900: '#18181b',
@@ -97,7 +94,7 @@ const colors = {
   red: {
     50: '#fef2f2',
     100: '#fee2e2',
-    200: '#fecaca',
+    200: '#FFCFCF',
     300: '#fca5a5',
     400: '#f87171',
     500: '#ef4444',

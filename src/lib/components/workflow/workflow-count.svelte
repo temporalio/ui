@@ -17,9 +17,9 @@
   on:click={() => onStatusClick(status)}
   on:keypress={() => onStatusClick(status)}
 >
-  <p class="noto text-sm lg:text-lg">{count.toLocaleString()}</p>
+  <p class="font-mono text-sm lg:text-lg">{count.toLocaleString()}</p>
   {#if status === 'all'}
-    <p class="noto text-sm lg:text-lg">All</p>
+    <p class="font-mono text-sm lg:text-lg">All</p>
   {:else}
     <WorkflowStatus {status} />
   {/if}

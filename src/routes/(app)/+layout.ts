@@ -3,12 +3,11 @@ import { redirect } from '@sveltejs/kit';
 import type { LayoutData, LayoutLoad } from './$types';
 
 import { fetchCluster, fetchSystemInfo } from '$lib/services/cluster-service';
-import { fetchLatestUiVersion } from '$lib/services/github-service';
 import { fetchNamespaces } from '$lib/services/namespaces-service';
 import { fetchSettings } from '$lib/services/settings-service';
 import { getAuthUser, setAuthUser } from '$lib/stores/auth-user';
 import type { GetClusterInfoResponse, GetSystemInfoResponse } from '$lib/types';
-import type { Settings, UiVersionInfo } from '$lib/types/global';
+import type { Settings } from '$lib/types/global';
 import {
   cleanAuthUserCookie,
   getAuthUserCookie,
@@ -45,17 +44,8 @@ export const load: LayoutLoad = async function ({
     fetch,
   );
 
-  console.log('SYSTEM INFO', systemInfo);
-  const uiVersionInfo: UiVersionInfo = {
-    current: settings.version,
-    recommended: settings.notifyOnNewVersion
-      ? await fetchLatestUiVersion(fetch)
-      : undefined,
-  };
-
   return {
     user,
-    uiVersionInfo,
     settings,
     cluster,
     systemInfo,

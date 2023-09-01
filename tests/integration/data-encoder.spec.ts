@@ -32,20 +32,16 @@ test.describe('Data Encoder without Configuration Settings', () => {
     );
     await expect(dataEncoderConfirmButton).toBeEnabled();
 
-    await expect(page.getByTestId('data-encoder-endpoint-input')).toHaveValue(
-      '',
-    );
+    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
 
-    await page
-      .getByTestId('data-encoder-endpoint-input')
-      .fill('localhost:8080');
-    await expect(page.getByTestId('data-encoder-endpoint-error')).toHaveText(
+    await page.locator('#data-encoder-endpoint-input').fill('localhost:8080');
+    await expect(page.locator('.error-msg')).toHaveText(
       'Endpoint must start with http:// or https://',
     );
     await expect(dataEncoderConfirmButton).toBeDisabled();
 
     await page
-      .getByTestId('data-encoder-endpoint-input')
+      .locator('#data-encoder-endpoint-input')
       .fill('http://localhost:8080');
     await dataEncoderConfirmButton.click();
 
@@ -54,7 +50,7 @@ test.describe('Data Encoder without Configuration Settings', () => {
     );
     await expect(dataEncoderStatusConfiguredButton).toBeVisible();
     await dataEncoderStatusConfiguredButton.click();
-    await expect(page.getByTestId('data-encoder-endpoint-input')).toHaveValue(
+    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue(
       'http://localhost:8080',
     );
   });
@@ -77,7 +73,7 @@ test.describe('Data Encoder without Configuration Settings', () => {
     await expect(dataEncoderConfirmButton).toBeEnabled();
 
     await page
-      .getByTestId('data-encoder-endpoint-input')
+      .locator('#data-encoder-endpoint-input')
       .fill('https://localhost:8080');
 
     await dataEncoderConfirmButton.click();
@@ -87,11 +83,11 @@ test.describe('Data Encoder without Configuration Settings', () => {
     );
     await expect(dataEncoderStatusConfiguredButton).toBeVisible();
     await dataEncoderStatusConfiguredButton.click();
-    await expect(page.getByTestId('data-encoder-endpoint-input')).toHaveValue(
+    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue(
       'https://localhost:8080',
     );
     await page
-      .getByTestId('data-encoder-endpoint-input')
+      .locator('#data-encoder-endpoint-input')
       .fill('http://localhost:9999');
 
     const dataEncoderCancelButton = page.getByTestId(
@@ -101,7 +97,7 @@ test.describe('Data Encoder without Configuration Settings', () => {
     await expect(dataEncoderStatusConfiguredButton).toBeVisible();
     await dataEncoderStatusConfiguredButton.click();
 
-    await expect(page.getByTestId('data-encoder-endpoint-input')).toHaveValue(
+    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue(
       'https://localhost:8080',
     );
   });
@@ -118,12 +114,10 @@ test.describe('Data Encoder without Configuration Settings', () => {
     );
     await expect(dataEncoderConfirmButton).toBeEnabled();
 
-    await expect(page.getByTestId('data-encoder-endpoint-input')).toHaveValue(
-      '',
-    );
+    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
 
     await page
-      .getByTestId('data-encoder-endpoint-input')
+      .locator('#data-encoder-endpoint-input')
       .fill('http://localhost:8080');
 
     await page
@@ -131,13 +125,13 @@ test.describe('Data Encoder without Configuration Settings', () => {
       .filter({ hasText: 'Pass the user access token with your endpoint.' })
       .click();
 
-    await expect(page.getByTestId('data-encoder-endpoint-error')).toHaveText(
+    await expect(page.locator('.error-msg')).toHaveText(
       'Endpoint must be https:// if passing access token',
     );
     await expect(dataEncoderConfirmButton).toBeDisabled();
 
     await page
-      .getByTestId('data-encoder-endpoint-input')
+      .locator('#data-encoder-endpoint-input')
       .fill('https://localhost:8080');
 
     await expect(dataEncoderConfirmButton).toBeEnabled();
@@ -148,7 +142,7 @@ test.describe('Data Encoder without Configuration Settings', () => {
     );
     await expect(dataEncoderStatusConfiguredButton).toBeVisible();
     await dataEncoderStatusConfiguredButton.click();
-    await expect(page.getByTestId('data-encoder-endpoint-input')).toHaveValue(
+    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue(
       'https://localhost:8080',
     );
   });
@@ -165,12 +159,10 @@ test.describe('Data Encoder without Configuration Settings', () => {
     );
     await expect(dataEncoderConfirmButton).toBeEnabled();
 
-    await expect(page.getByTestId('data-encoder-endpoint-input')).toHaveValue(
-      '',
-    );
+    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
 
     await page
-      .getByTestId('data-encoder-endpoint-input')
+      .locator('#data-encoder-endpoint-input')
       .fill('http://localhost:8080');
 
     await page
@@ -185,7 +177,7 @@ test.describe('Data Encoder without Configuration Settings', () => {
     );
     await expect(dataEncoderStatusConfiguredButton).toBeVisible();
     await dataEncoderStatusConfiguredButton.click();
-    await expect(page.getByTestId('data-encoder-endpoint-input')).toHaveValue(
+    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue(
       'http://localhost:8080',
     );
   });
@@ -205,9 +197,9 @@ test.describe('Data Encoder without Configuration Settings', () => {
     );
     await expect(dataEncoderConfirmButton).toBeEnabled();
 
-    await expect(page.getByTestId('data-encoder-port-input')).toHaveValue('');
+    await expect(page.locator('#data-encoder-port-input')).toHaveValue('');
 
-    await page.getByTestId('data-encoder-port-input').fill('3456');
+    await page.locator('#data-encoder-port-input').fill('3456');
 
     await dataEncoderConfirmButton.click();
 
@@ -216,12 +208,8 @@ test.describe('Data Encoder without Configuration Settings', () => {
     );
     await expect(dataEncoderStatusConfiguredButton).toBeVisible();
     await dataEncoderStatusConfiguredButton.click();
-    await expect(page.getByTestId('data-encoder-endpoint-input')).toHaveValue(
-      '',
-    );
-    await expect(page.getByTestId('data-encoder-port-input')).toHaveValue(
-      '3456',
-    );
+    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
+    await expect(page.locator('#data-encoder-port-input')).toHaveValue('3456');
   });
 });
 
@@ -259,12 +247,10 @@ test.describe('Data Encoder with Configuration Settings', () => {
     );
     await expect(dataEncoderConfirmButton).toBeEnabled();
 
-    await expect(page.getByTestId('data-encoder-endpoint-input')).toHaveValue(
-      '',
-    );
+    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
 
     await page
-      .getByTestId('data-encoder-endpoint-input')
+      .locator('#data-encoder-endpoint-input')
       .fill('http://localhost:8080');
 
     await page.getByTestId('override-accordion').click();

@@ -10,11 +10,7 @@
 </script>
 
 <div class="shortcut-key-button">
-  <Button class="!py-1.5 !px-1" variant="secondary" on:click={onOpen}
-    ><span class="flex h-[24px] w-[24px] items-center justify-center text-xl"
-      >?</span
-    ></Button
-  >
+  <Button variant="secondary" on:click={onOpen}>?</Button>
 </div>
 <Drawer
   {open}

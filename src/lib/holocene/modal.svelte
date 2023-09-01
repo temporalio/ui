@@ -132,20 +132,20 @@
   <form on:submit|preventDefault={confirmModal} method="dialog">
     <div id="modal-content-{id}" class="content">
       <slot name="content" />
-      {#if error}
-        <p class="mt-2 text-sm font-normal text-danger">{error}</p>
-      {/if}
+      <p
+        class="mt-2 text-sm font-normal text-danger"
+        class:hidden={!error}
+        role="alert"
+      >
+        {error}
+      </p>
     </div>
     <div class="flex items-center justify-end space-x-2 p-6">
-      <Button
-        thin
-        variant="secondary"
-        disabled={loading}
-        on:click={handleCancel}>{cancelText}</Button
+      <Button variant="secondary" disabled={loading} on:click={handleCancel}
+        >{cancelText}</Button
       >
       {#if !hideConfirm}
         <Button
-          thin
           variant={confirmType}
           {loading}
           disabled={confirmDisabled || loading}

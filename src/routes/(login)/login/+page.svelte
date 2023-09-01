@@ -1,10 +1,9 @@
 <script lang="ts">
   import { BROWSER } from 'esm-env';
-  
+
   import { page } from '$app/stores';
-  
+
   import type { PageData } from './$types';
-  
 
   import FeedbackButton from '$lib/components/feedback-button.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
@@ -31,8 +30,7 @@
   <div class="mx-auto">
     <Button
       data-testid="login-button"
-      variant="login"
-      icon="lock"
+      leadingIcon="lock"
       on:click={() => {
         if (BROWSER) {
           window.location.assign(
