@@ -6,8 +6,7 @@
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
-  const { filter, handleSubmit, resetFilter } =
-    getContext<FilterContext>(FILTER_CONTEXT);
+  const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
   let value = $filter.value;
 
@@ -31,5 +30,4 @@
   unroundLeft
   bind:value
   on:keydown={handleKeydown}
-  on:blur={resetFilter}
 />
