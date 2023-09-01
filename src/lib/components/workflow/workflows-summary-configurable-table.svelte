@@ -1,20 +1,18 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import Drawer from '$lib/holocene/drawer.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowTableColumns } from '$lib/stores/workflow-table-columns';
   import { updating, workflows } from '$lib/stores/workflows';
-  
+
   import WorkflowColumnsOrderableList from './workflows-summary-configurable-table/orderable-list.svelte';
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
   import TableHeaderRow from './workflows-summary-configurable-table/table-header-row.svelte';
   import TableRow from './workflows-summary-configurable-table/table-row.svelte';
-  
-  
 
   let customizationDrawerOpen = false;
 
@@ -38,29 +36,31 @@
   pageButtonLabel={(page) => translate('go-to-page', { page })}
   updating={$updating}
   items={$workflows}
-  let:visibleItems
 >
   <caption class="sr-only" slot="caption">
     {translate('workflows')}
   </caption>
   <TableHeaderRow
+    slot="headers"
+    let:visibleItems
     onClickConfigure={openCustomizationDrawer}
     workflows={visibleItems}
     columnsCount={columns.length}
     {empty}
-    slot="headers"
   >
     {#each columns as column}
       <TableHeaderCell {column} />
     {/each}
   </TableHeaderRow>
-  {#each visibleItems as workflow}
-    <TableRow {workflow}>
-      {#each columns as column}
-        <TableBodyCell {workflow} {column} />
-      {/each}
-    </TableRow>
-  {/each}
+  <svelte:fragment let:visibleItems>
+    {#each visibleItems as workflow}
+      <TableRow {workflow}>
+        {#each columns as column}
+          <TableBodyCell {workflow} {column} />
+        {/each}
+      </TableRow>
+    {/each}
+  </svelte:fragment>
   <slot name="cloud" slot="cloud" />
 </PaginatedTable>
 
