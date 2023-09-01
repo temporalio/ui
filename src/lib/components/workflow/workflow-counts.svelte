@@ -5,6 +5,7 @@
   import { workflowStatuses } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
   import { workflowsQuery } from '$lib/stores/workflows';
+  import { workflows } from '$lib/stores/workflows';
   import { decodePayload } from '$lib/utilities/decode-payload';
   import { isStatusFilter } from '$lib/utilities/query/filter-search';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
@@ -14,6 +15,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   import WorkflowCount from './workflow-count.svelte';
+  import WorkflowTypeCount from './workflow-type-count.svelte';
 
   let totalCount = 0;
   let statusGroups = [];
@@ -48,6 +50,28 @@
       });
     }
   }
+
+  const onTypeClick = (type: string) => {
+    $workflowFilters = [
+      ...$workflowFilters.filter((f) => !isStatusFilter(f.attribute)),
+      {
+        attribute: 'WorkflowType',
+        value: type,
+        operator: 'AND',
+        parenthesis: '',
+        conditional: '=',
+      },
+    ];
+    const searchQuery = toListWorkflowQueryFromFilters(
+      combineFilters($workflowFilters),
+    );
+    updateQueryParameters({
+      url: $page.url,
+      parameter: 'query',
+      value: searchQuery,
+      allowEmpty: true,
+    });
+  };
 
   const onStatusClick = (status: string) => {
     if (status === 'all') {
@@ -125,6 +149,20 @@
   };
 
   $: $workflowsQuery, fetchCounts();
+  $: $workflows, getTopTypes();
+
+  let topTypes = [];
+
+  const getTopTypes = () => {
+    const typeCounts: Record<string, number> = {};
+    const types = $workflows.map((w) => w.name);
+    types.forEach((t) => {
+      typeCounts[t] = (typeCounts[t] || 0) + 1;
+    });
+    topTypes = Object.entries(typeCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+  };
 </script>
 
 {#if groupByEnabled}
@@ -141,6 +179,15 @@
         {onStatusClick}
         count={statusGroups.find((group) => group.value === status)?.count ?? 0}
         active={statusFilters.some((filter) => filter.value === status)}
+      />
+    {/each}
+  </div>
+  <div class="flex gap-2 lg:gap-4 flex-wrap">
+    {#each topTypes as [attribute, _count] (`${attribute}`)}
+      <WorkflowTypeCount
+        value={attribute}
+        attribute="WorkflowType"
+        {onTypeClick}
       />
     {/each}
   </div>

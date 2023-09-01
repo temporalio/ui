@@ -18,7 +18,7 @@
 </script>
 
 <button
-  class="count-card flex flex-row lg:flex-col items-center lg:items-end gap-2 lg:gap-0 cursor-pointer py-1 px-2 lg:py-2 lg:px-4 border-2 border-gray-900 rounded-lg bg-white"
+  class="count-card w-32 min-w-fit flex flex-row lg:flex-col items-center lg:items-end gap-2 lg:gap-0 cursor-pointer py-1 px-2 lg:py-2 lg:px-4 border-2 border-gray-900 rounded-lg bg-white"
   class:active
   on:click={() => onStatusClick(status)}
   on:keypress={() => onStatusClick(status)}
@@ -31,9 +31,11 @@
     {/if}
   </div>
   {#if status === 'all'}
-    <p class="font-primary text-sm lg:text-lg">
-      {hasNonStatusQuery ? 'Query' : 'All'}
-    </p>
+    {#if hasNonStatusQuery}
+      <div class="flex gap-1">Filtered</div>
+    {:else}
+      <p class="font-primary text-sm lg:text-lg">All</p>
+    {/if}
   {:else}
     <WorkflowStatus {status} />
   {/if}

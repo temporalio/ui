@@ -255,14 +255,13 @@
             />
           {/if}
         </p>
-        <div class="h-1 w-1 rounded-full bg-gray-400" />
       {/if}
-      <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
-        >{translate('download-json')}</Link
-      >
     </div>
   </div>
-  <div>
+  <div class="flex gap-2 text-sm">
+    <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
+      >{translate('download-json')}</Link
+    >
     <IconButton
       icon="retry"
       label={translate('workflows', 'retry-workflows')}
