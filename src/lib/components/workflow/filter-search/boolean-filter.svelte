@@ -23,7 +23,13 @@
 </script>
 
 <MenuContainer>
-  <MenuButton unroundLeft class="!border-l-0" id="boolean-filter" controls="boolean-filter-menu">
+  <MenuButton
+    unroundLeft
+    unroundRight
+    class="!border-l-0"
+    id="boolean-filter"
+    controls="boolean-filter-menu"
+  >
     {selectedLabel}
   </MenuButton>
   <Menu id="boolean-filter-menu">

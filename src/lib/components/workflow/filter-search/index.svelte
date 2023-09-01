@@ -22,7 +22,7 @@
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-import Input from '$lib/holocene/input/input.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
     MenuButton,
@@ -51,6 +51,7 @@ import Input from '$lib/holocene/input/input.svelte';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   import BooleanFilter from './boolean-filter.svelte';
+  import CloseFilter from './close-filter-button.svelte';
   import DateTimeFilter from './datetime-filter.svelte';
   import FilterList from './filter-list.svelte';
   import NumberFilter from './number-filter.svelte';
@@ -240,8 +241,9 @@ import Input from '$lib/holocene/input/input.svelte';
         {/if}
 
         {#if isTextFilter($filter.attribute)}
-          <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <div class="flex w-full" in:fly={{ x: -100, duration: 150 }}>
             <TextFilter />
+            <CloseFilter />
           </div>
           <!-- TODO: Add KeywordList support -->
           <!-- {:else if isListFilter($filter.attribute)}
@@ -249,16 +251,19 @@ import Input from '$lib/holocene/input/input.svelte';
           <ListFilter />
         </div> -->
         {:else if isNumberFilter($filter.attribute)}
-          <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <div class="flex w-full" in:fly={{ x: -100, duration: 150 }}>
             <NumberFilter />
+            <CloseFilter />
           </div>
         {:else if isDateTimeFilter($filter.attribute)}
-          <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <div class="flex w-full" in:fly={{ x: -100, duration: 150 }}>
             <DateTimeFilter />
+            <CloseFilter />
           </div>
         {:else if isBooleanFilter($filter.attribute)}
-          <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <div class="flex w-full" in:fly={{ x: -100, duration: 150 }}>
             <BooleanFilter />
+            <CloseFilter />
           </div>
         {/if}
       </div>

@@ -28,6 +28,7 @@
   icon="search"
   class="w-full"
   unroundLeft
+  unroundRight
   bind:value
   on:keydown={handleKeydown}
 />

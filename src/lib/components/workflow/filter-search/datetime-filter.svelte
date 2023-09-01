@@ -1,6 +1,4 @@
 <script lang="ts">
-  
-  
   import {
     addHours,
     addMinutes,
@@ -9,7 +7,7 @@
     startOfDay,
   } from 'date-fns';
   import { getContext } from 'svelte';
-  
+
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -144,6 +142,7 @@
   <MenuContainer>
     <MenuButton
       unroundLeft
+      unroundRight
       id="time-range-filter"
       controls="time-range-filter-menu"
     >

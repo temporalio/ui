@@ -34,6 +34,8 @@
     {min}
     on:keydown={handleKeydown}
     unroundLeft
+    unroundRight
     search
+    class="-mr-2"
   />
 </div>
