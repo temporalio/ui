@@ -74,6 +74,6 @@
   }
 
   .configuration-button-table-cell {
-    @apply h-10 w-10 px-2;
+    @apply h-10 w-10 px-2 py-1;
   }
 </style>

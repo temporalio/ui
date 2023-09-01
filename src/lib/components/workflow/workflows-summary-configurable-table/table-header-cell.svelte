@@ -34,6 +34,6 @@
 
 <style lang="postcss">
   .workflows-summary-table-header-cell {
-    @apply whitespace-nowrap px-2 text-left font-secondary text-sm font-medium h-10;
+    @apply whitespace-nowrap px-2 text-left font-secondary text-sm font-medium;
   }
 </style>

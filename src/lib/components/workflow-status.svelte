@@ -1,16 +1,19 @@
 <script lang="ts">
+  import { cva } from 'class-variance-authority';
+
   import { translate } from '$lib/i18n/translate';
-  import type { EventClassification } from '$lib/types/events';
+  import type { EventClassification } from '$lib/models/event-history/get-event-classification';
+  import type { ScheduleStatus } from '$lib/types/schedule';
   import type { WorkflowStatus } from '$lib/types/workflows';
-  
+
   import HeartBeat from './heart-beat-indicator.svelte';
 
-  type Status = WorkflowStatus | EventClassification | 'Paused';
+  type Status = WorkflowStatus | ScheduleStatus | EventClassification;
 
-  export let status: Status = 'Running';
   export let delay = 0;
+  export let status: Status = 'Running';
 
-  const humanFriendlyNames: Partial<Record<Status, string>> = {
+  const label: Record<Status, string> = {
     Running: translate('workflows', 'running'),
     TimedOut: translate('workflows', 'timed-out'),
     Completed: translate('workflows', 'completed'),
@@ -19,59 +22,55 @@
     Canceled: translate('workflows', 'canceled'),
     Terminated: translate('workflows', 'terminated'),
     Paused: translate('workflows', 'paused'),
+    Scheduled: translate('events', 'event-classification-scheduled'),
+    Started: translate('events', 'event-classification-started'),
+    Unspecified: translate('events', 'event-classification-unspecified'),
+    Open: translate('events', 'event-classification-open'),
+    New: translate('events', 'event-classification-new'),
+    Initiated: translate('events', 'event-classification-initiated'),
+    Fired: translate('events', 'event-classification-fired'),
+    CancelRequested: translate(
+      'events',
+      'event-classification-cancelrequested',
+    ),
+    Signaled: translate('events', 'event-classification-signaled'),
   };
 
-  const colors = {
-    Running: 'blue',
-    TimedOut: 'orange',
-    Completed: 'green',
-    Failed: 'red',
-    ContinuedAsNew: 'purple',
-    Canceled: 'yellow',
-    Terminated: 'gray',
-    Paused: 'yellow',
-  };
-
-  $: color = colors[status];
-  $: label = humanFriendlyNames[status];
-  $: isRunning = label === humanFriendlyNames.Running;
+  const workflowStatus = cva(
+    [
+      'flex items-center rounded-sm px-1 py-0.5 font-secondary whitespace-nowrap',
+    ],
+    {
+      variants: {
+        status: {
+          Running: 'bg-blue-100 text-blue-700',
+          TimedOut: 'bg-orange-100 text-orange-700',
+          Completed: 'bg-green-100 text-green-700',
+          Failed: 'bg-red-100 text-red-700',
+          ContinuedAsNew: 'bg-gray-200 text-gray-900',
+          Canceled: 'bg-yellow-100 text-yellow-900',
+          Terminated: 'bg-red-100 text-red-700',
+          Paused: 'bg-yellow-100 text-yellow-700',
+          Unspecified: 'bg-gray-200 text-gray-900',
+          Scheduled: 'bg-blue-100 text-blue-700',
+          Started: 'bg-blue-100 text-blue-700',
+          Open: 'bg-green-100 text-green-700',
+          New: 'bg-indigo-100 text-indigo-700',
+          Initiated: 'bg-blue-100 text-blue-700',
+          Fired: 'bg-blue-100 text-blue-700',
+          CancelRequested: 'bg-yellow-100 text-yellow-900',
+          Signaled: 'bg-purple-100 text-purple-700',
+        },
+      },
+    },
+  );
 </script>
 
-<span class="flex text-center text-sm font-medium leading-4">
-  <span class="{color} flex items-center rounded-sm px-1 py-0.5 font-secondary">
-    <span class="whitespace-nowrap">{label}</span>
-    {#if isRunning}
+<div class="flex text-center text-sm font-medium leading-4">
+  <span class={workflowStatus({ status })}>
+    {label[status]}
+    {#if status === 'Running'}
       <HeartBeat {delay} />
     {/if}
   </span>
-</span>
-
-<style lang="postcss">
-  .green {
-    @apply bg-green-100 text-green-700;
-  }
-
-  .yellow {
-    @apply bg-yellow-100 text-yellow-900;
-  }
-
-  .blue {
-    @apply bg-blue-100 text-blue-700;
-  }
-
-  .red {
-    @apply bg-red-100 text-red-700;
-  }
-
-  .purple {
-    @apply bg-purple-100 text-purple-900;
-  }
-
-  .gray {
-    @apply bg-gray-200 text-gray-900;
-  }
-
-  .orange {
-    @apply bg-orange-100 text-orange-900;
-  }
-</style>
+</div>

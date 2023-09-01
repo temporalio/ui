@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
 
   export let placeholder = '';
@@ -11,27 +11,20 @@
   export let id = `${label.toLocaleUpperCase()}-input`;
 </script>
 
-<form
-  on:submit|preventDefault
-  class="relative flex items-center rounded-lg border-2 bg-white transition-colors focus-within:border-blue-700"
-  role="search"
->
-  {#if icon}
-    <Icon name="search" class="ml-4 flex items-center text-gray-700" />
-  {/if}
-  <label for={id} class="hidden">{label}</label>
-  <input
+<form on:submit|preventDefault role="search" class="flex items-center">
+  <Input
+    class="w-full"
+    unroundRight
+    {label}
     {id}
+    labelHidden
+    icon={icon ? 'search' : null}
     type="search"
-    class="w-full rounded-l-lg px-4 focus:outline-none"
     {name}
     {value}
     {placeholder}
     autocomplete="off"
     on:input
-    on:keydown|stopPropagation
   />
-  <div>
-    <Button class="m-2" type="submit">{label}</Button>
-  </div>
+  <Button borderRadiusModifier="square-left" type="submit">{label}</Button>
 </form>

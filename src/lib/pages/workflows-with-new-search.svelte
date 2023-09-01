@@ -47,20 +47,19 @@
 
 <script lang="ts">
   import { derived, writable } from 'svelte/store';
-  
+
   import { onMount } from 'svelte';
-  
+
   import { page } from '$app/stores';
-  
-  
+
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
-  import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { Action } from '$lib/models/workflow-actions';
@@ -228,7 +227,7 @@
   on:confirm={cancelWorkflows}
 />
 
-<header class="flex justify-between">
+<header class="flex justify-between items-center">
   <div>
     <h1 class="text-2xl" data-cy="workflows-title">
       <Translate namespace="workflows" key="recent-workflows" />
@@ -255,23 +254,21 @@
             />
           {/if}
         </p>
-        <div class="h-1 w-1 rounded-full bg-gray-400" />
       {/if}
-      <Button
-        variant="link"
-        disabled={$loading || $updating || $workflows.length === 0}
-        on:click={() => exportWorkflows($workflows)}>Download JSON</Button
-      >
+      {#if !$loading && !$updating && $workflows.length > 0}
+        <div class="h-1 w-1 rounded-full bg-gray-400" />
+        <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
+          >{translate('download-json')}</Link
+        >
+      {/if}
     </div>
   </div>
   <div>
-    <button
-      aria-label={translate('workflows', 'retry-workflows')}
-      class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
+    <IconButton
+      icon="retry"
+      label={translate('workflows', 'retry-workflows')}
       on:click={refreshWorkflows}
-    >
-      <Icon name="retry" class="h-8 w-8" />
-    </button>
+    />
   </div>
 </header>
 <div class="flex flex-col md:flex-row gap-2">

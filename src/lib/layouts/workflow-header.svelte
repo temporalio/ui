@@ -108,16 +108,15 @@
 
 <header class="mb-4 flex flex-col gap-1">
   <div class="mb-4 block">
-    <a
+    <Link
       href={`${routeForWorkflows({
         namespace,
       })}?${$workflowsSearchParams}`}
       data-testid="back-to-workflows"
-      class="back-to-workflows"
+      icon="chevron-left"
     >
-      <Icon name="chevron-left" class="inline" />
       {translate('workflows', 'back-to-workflows')}
-    </a>
+    </Link>
   </div>
   <div
     class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
@@ -289,17 +288,3 @@
     </TabList>
   </Tabs>
 </header>
-
-<style lang="postcss">
-  .back-to-workflows {
-    @apply text-sm;
-  }
-
-  .back-to-workflows:hover {
-    @apply text-blue-700 underline;
-  }
-
-  .back-to-workflows:hover :global(svg path) {
-    stroke: #1d4ed8;
-  }
-</style>

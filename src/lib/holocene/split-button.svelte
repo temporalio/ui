@@ -8,26 +8,18 @@
   export let menuLabel: string;
   export let icon: IconName | undefined = undefined;
   export let id: string;
-  export let variant:
-    | 'primary'
-    | 'secondary'
-    | 'destructive'
-    | 'login'
-    | 'link' = 'primary';
-  export let thin = false;
+  export let variant: 'primary' | 'secondary' | 'destructive' | 'ghost' =
+    'primary';
   export let disabled = false;
   export let position: 'left' | 'right' = 'left';
-  export let href = '';
   export let primaryActionDisabled = false;
 </script>
 
 <MenuContainer class={$$props.class}>
   <div class="split-button">
     <Button
-      {href}
       {variant}
-      {thin}
-      unroundRight
+      borderRadiusModifier="square-right"
       disabled={disabled || primaryActionDisabled}
       id="{id}-primary-button"
       on:click

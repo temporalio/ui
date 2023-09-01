@@ -40,7 +40,7 @@ describe('Schedules View', () => {
     cy.get('.schedule-row').first().contains(scheduleId);
     cy.get('.schedule-row').first().contains(name);
 
-    cy.get('.schedule-row').first().click();
+    cy.get('.schedule-row a').first().click();
 
     cy.wait('@schedule-api');
 
@@ -63,7 +63,7 @@ describe('Schedules Edit', () => {
     cy.get('.schedule-row').first().contains(scheduleId);
     cy.get('.schedule-row').first().contains(name);
 
-    cy.get('.schedule-row').first().click();
+    cy.get('.schedule-row a').first().click();
 
     cy.wait('@schedule-api');
 
