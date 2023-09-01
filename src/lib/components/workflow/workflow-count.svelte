@@ -1,5 +1,9 @@
 <script lang="ts">
+  import Spinner from '$lib/holocene/icon/svg/spinner.svelte';
+  import { workflowFilters } from '$lib/stores/filters';
+  import { loading, updating } from '$lib/stores/workflows';
   import type { WorkflowStatus as Status } from '$lib/types/workflows';
+  import { isStatusFilter } from '$lib/utilities/query/filter-search';
 
   import WorkflowStatus from '../workflow-status.svelte';
 
@@ -7,6 +11,10 @@
   export let count = 0;
   export let active = false;
   export let onStatusClick: (status: Status | 'all') => void = () => {};
+
+  $: hasNonStatusQuery = $workflowFilters.some(
+    (filter) => !isStatusFilter(filter.attribute),
+  );
 </script>
 
 <button
@@ -15,9 +23,17 @@
   on:click={() => onStatusClick(status)}
   on:keypress={() => onStatusClick(status)}
 >
-  <p class="font-mono text-sm lg:text-lg">{count.toLocaleString()}</p>
+  <div class="h-8 flex flex-col items-center">
+    {#if $loading || $updating}
+      <Spinner class="w-6 h-6 animate-spin" />
+    {:else}
+      <p class="font-mono text-sm lg:text-lg">{count.toLocaleString()}</p>
+    {/if}
+  </div>
   {#if status === 'all'}
-    <p class="font-primary text-sm lg:text-lg">All</p>
+    <p class="font-primary text-sm lg:text-lg">
+      {hasNonStatusQuery ? 'Query' : 'All'}
+    </p>
   {:else}
     <WorkflowStatus {status} />
   {/if}

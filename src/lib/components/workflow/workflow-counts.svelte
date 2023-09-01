@@ -51,7 +51,9 @@
 
   const onStatusClick = (status: string) => {
     if (status === 'all') {
-      $workflowFilters = [];
+      $workflowFilters = $workflowFilters.filter(
+        (f) => !isStatusFilter(f.attribute),
+      );
     } else {
       if (statusFilters.find((s) => s.value === status)) {
         const nonStatusFilters = $workflowFilters.filter(
@@ -98,11 +100,17 @@
       const countRoute = routeForApi('workflows.count', {
         namespace: $page.params.namespace,
       });
+
+      const query = toListWorkflowQueryFromFilters(
+        combineFilters(
+          $workflowFilters.filter((f) => !isStatusFilter(f.attribute)),
+        ),
+      );
       const { count, groups } = await requestFromAPI<{
         count: string;
         groups: unknown[];
       }>(countRoute, {
-        params: { query: `${groupByClause}` },
+        params: { query: `${query} ${groupByClause}` },
         notifyOnError: false,
       });
       totalCount = parseInt(count);

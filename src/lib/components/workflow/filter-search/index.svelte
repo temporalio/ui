@@ -22,7 +22,7 @@
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-import Input from '$lib/holocene/input/input.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
     MenuButton,
@@ -54,7 +54,6 @@ import Input from '$lib/holocene/input/input.svelte';
   import DateTimeFilter from './datetime-filter.svelte';
   import FilterList from './filter-list.svelte';
   import NumberFilter from './number-filter.svelte';
-  import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
 
   const filter = writable<WorkflowFilter>(emptyFilter());
@@ -143,9 +142,10 @@ import Input from '$lib/holocene/input/input.svelte';
   $: $activeQueryIndex, updateFocusedElementId();
 
   let searchAttributeValue = '';
+
   //  TODO: Add KeywordList support
   $: options = $sortedSearchAttributeOptions.filter(
-    (option) => !isListFilter(option.value),
+    (option) => !isListFilter(option.value) && !isStatusFilter(option.value),
   );
 
   $: filteredOptions = !searchAttributeValue
@@ -193,51 +193,47 @@ import Input from '$lib/holocene/input/input.svelte';
         class:filter={!showClearAllButton}
         on:keyup={handleKeyUp}
       >
-        {#if isStatusFilter($filter.attribute)}
-          <StatusFilter />
-        {:else}
-          <MenuContainer>
-            <MenuButton
-              controls="search-attribute-menu"
-              unroundRight={Boolean($filter.attribute)}
-              disabled={$activeQueryIndex !== null}
-              count={$filter.attribute ? 0 : $workflowFilters.length}
-            >
-              <svelte:fragment slot="leading">
-                {#if !$filter.attribute}
-                  <Icon name="filter" />
-                {/if}
-              </svelte:fragment>
-              {$filter.attribute || translate('workflows', 'filter')}
-            </MenuButton>
-            <Menu id="search-attribute-menu">
-              <Input
-                label={translate('search')}
-                labelHidden
-                id="filter-search"
-                noBorder
-                bind:value={searchAttributeValue}
-                icon="search"
-                placeholder={translate('search')}
-                class="mb-1"
-              />
+        <MenuContainer>
+          <MenuButton
+            controls="search-attribute-menu"
+            unroundRight={Boolean($filter.attribute)}
+            disabled={$activeQueryIndex !== null}
+            count={$filter.attribute ? 0 : $workflowFilters.length}
+          >
+            <svelte:fragment slot="leading">
+              {#if !$filter.attribute}
+                <Icon name="filter" />
+              {/if}
+            </svelte:fragment>
+            {$filter.attribute || translate('workflows', 'filter')}
+          </MenuButton>
+          <Menu id="search-attribute-menu">
+            <Input
+              label={translate('search')}
+              labelHidden
+              id="filter-search"
+              noBorder
+              bind:value={searchAttributeValue}
+              icon="search"
+              placeholder={translate('search')}
+              class="mb-1"
+            />
 
-              {#each filteredOptions as { value, label }}
-                {@const disabled = isOptionDisabled(value, $workflowFilters)}
-                <MenuItem
-                  on:click={() => {
-                    handleNewQuery(value);
-                  }}
-                  {disabled}
-                >
-                  {label}
-                </MenuItem>
-              {:else}
-                <MenuItem on:click={noop}>{translate('no-results')}</MenuItem>
-              {/each}
-            </Menu>
-          </MenuContainer>
-        {/if}
+            {#each filteredOptions as { value, label }}
+              {@const disabled = isOptionDisabled(value, $workflowFilters)}
+              <MenuItem
+                on:click={() => {
+                  handleNewQuery(value);
+                }}
+                {disabled}
+              >
+                {label}
+              </MenuItem>
+            {:else}
+              <MenuItem on:click={noop}>{translate('no-results')}</MenuItem>
+            {/each}
+          </Menu>
+        </MenuContainer>
 
         {#if isTextFilter($filter.attribute)}
           <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
