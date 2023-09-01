@@ -234,7 +234,7 @@
       <Translate namespace="workflows" key="recent-workflows" />
     </h1>
     <div class="flex items-center gap-2 text-sm">
-      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility}
+      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !$page.data?.systemInfo?.capabilities?.countGroupByExecutionStatus}
         <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
           {#if $loading || $updating}
             <Translate namespace="workflows" key="loading-workflows" />
@@ -255,13 +255,11 @@
             />
           {/if}
         </p>
-      {/if}
-      {#if !$loading && !$updating && $workflows.length > 0}
         <div class="h-1 w-1 rounded-full bg-gray-400" />
-        <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
-          >{translate('download-json')}</Link
-        >
       {/if}
+      <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
+        >{translate('download-json')}</Link
+      >
     </div>
   </div>
   <div>

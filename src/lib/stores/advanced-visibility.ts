@@ -7,14 +7,13 @@ import {
   advancedVisibilityEnabledWithOrderBy,
 } from '$lib/utilities/advanced-visibility-enabled';
 
+import { cluster } from './cluster';
 import { temporalVersion } from './versions';
 
 export const isCloud = derived(
   [page],
   ([$page]) => $page.data?.settings?.runtimeEnvironment?.isCloud,
 );
-
-export const cluster = derived([page], ([$page]) => $page.data?.cluster);
 
 export const supportsAdvancedVisibility = derived(
   [cluster, temporalVersion, isCloud],

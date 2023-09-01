@@ -4,26 +4,24 @@
   import WorkflowStatus from '../workflow-status.svelte';
 
   export let status: Status | 'all' = 'all';
-  // TODO: Make this a real count once API is implemented
-  export let count: number = Math.round(Math.random() * 10000);
-  // export let count = 0;
+  export let count = 0;
   export let active = false;
   export let onStatusClick: (status: Status | 'all') => void = () => {};
 </script>
 
-<div
-  class="count-card flex flex-row lg:flex-col items-center lg:items-end gap-2 lg:gap-0 cursor-pointer py-1 px-2 lg:py-4 lg:px-5 border-2 border-gray-900 rounded-lg bg-white"
+<button
+  class="count-card flex flex-row lg:flex-col items-center lg:items-end gap-2 lg:gap-0 cursor-pointer py-1 px-2 lg:py-2 lg:px-4 border-2 border-gray-900 rounded-lg bg-white"
   class:active
   on:click={() => onStatusClick(status)}
   on:keypress={() => onStatusClick(status)}
 >
   <p class="font-mono text-sm lg:text-lg">{count.toLocaleString()}</p>
   {#if status === 'all'}
-    <p class="font-mono text-sm lg:text-lg">All</p>
+    <p class="font-primary text-sm lg:text-lg">All</p>
   {:else}
     <WorkflowStatus {status} />
   {/if}
-</div>
+</button>
 
 <style lang="postcss">
   .active {
@@ -32,6 +30,6 @@
 
   .count-card:hover {
     background: linear-gradient(157deg, #e6fffa 0%, #e0eaff 100%);
-    box-shadow: 8px 8px 0 0 #000;
+    box-shadow: 4px 4px 0 0 #000;
   }
 </style>

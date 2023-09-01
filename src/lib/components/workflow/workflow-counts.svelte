@@ -4,15 +4,22 @@
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { workflowStatuses } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
+  import { workflowsQuery } from '$lib/stores/workflows';
+  import { decodePayload } from '$lib/utilities/decode-payload';
   import { isStatusFilter } from '$lib/utilities/query/filter-search';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { requestFromAPI } from '$lib/utilities/request-from-api';
   import { routeForApi } from '$lib/utilities/route-for-api';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { noop } from 'svelte/internal';
 
   import WorkflowCount from './workflow-count.svelte';
+
+  let totalCount = 0;
+  let statusGroups = [];
+
+  $: groupByEnabled =
+    $page.data?.systemInfo?.capabilities?.countGroupByExecutionStatus;
 
   $: statusFilters = $workflowFilters.filter((filter) =>
     isStatusFilter(filter.attribute),
@@ -85,23 +92,38 @@
     });
   };
 
-  const groupByClause = 'GROUP BY ExecutionStatus';
+  const fetchCounts = async () => {
+    if (groupByEnabled) {
+      const groupByClause = 'GROUP BY ExecutionStatus';
+      const countRoute = routeForApi('workflows.count', {
+        namespace: $page.params.namespace,
+      });
+      const { count, groups } = await requestFromAPI<{
+        count: string;
+        groups: unknown[];
+      }>(countRoute, {
+        params: { query: `${groupByClause}` },
+        notifyOnError: false,
+      });
+      totalCount = parseInt(count);
+      statusGroups = groups.map((group) => {
+        const value = decodePayload(group?.groupValues[0]);
+        return {
+          value,
+          count: parseInt(group.count),
+        };
+      });
+    }
+  };
 
-  const countRoute = routeForApi('workflows.count', {
-    namespace: $page.params.namespace,
-  });
-  const countPromise = requestFromAPI<{ count: string }>(countRoute, {
-    params: { query: 'GROUP BY ExecutionStatus' },
-    notifyOnError: false,
-  });
+  $: $workflowsQuery, fetchCounts();
 </script>
 
-{#await countPromise then { count, groups }}
-  {(console.log('Count and groups: ', count, groups), '')}
+{#if groupByEnabled}
   <div class="flex gap-2 lg:gap-4 flex-wrap">
     <WorkflowCount
       status="all"
-      count={parseInt(count || '0')}
+      count={totalCount}
       {onStatusClick}
       active={!$workflowFilters.length}
     />
@@ -109,8 +131,9 @@
       <WorkflowCount
         {status}
         {onStatusClick}
+        count={statusGroups.find((group) => group.value === status)?.count ?? 0}
         active={statusFilters.some((filter) => filter.value === status)}
       />
     {/each}
   </div>
-{/await}
+{/if}
