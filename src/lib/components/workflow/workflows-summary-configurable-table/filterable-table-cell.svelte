@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -9,6 +9,7 @@
     type TextFilterAttributes,
   } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
+  import { labsMode } from '$lib/stores/labs-mode';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForEventHistory } from '$lib/utilities/route-for';
@@ -43,7 +44,7 @@
       $workflowFilters = [...getOtherFilters()];
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters);
+    updateQueryParamsFromFilter($page.url, $workflowFilters, $labsMode);
   };
 </script>
 

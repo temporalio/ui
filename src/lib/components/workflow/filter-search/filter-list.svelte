@@ -33,7 +33,7 @@
   const removeQuery = (index: number) => {
     $workflowFilters.splice(index, 1);
     $workflowFilters = $workflowFilters;
-    updateQueryParamsFromFilter($page.url, $workflowFilters, labsMode);
+    updateQueryParamsFromFilter($page.url, $workflowFilters, $labsMode);
 
     if (index === $workflowFilters.length) {
       const previousQuery = $workflowFilters[$workflowFilters.length - 1];
