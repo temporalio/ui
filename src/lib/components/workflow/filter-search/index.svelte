@@ -162,6 +162,7 @@
       >
         {#if isStatusFilter($filter.attribute)}
           <StatusFilter />
+          <CloseFilter />
         {:else}
           <SearchAttributeMenu />
         {/if}

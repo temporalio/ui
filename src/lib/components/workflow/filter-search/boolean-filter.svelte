@@ -25,7 +25,6 @@
 <MenuContainer>
   <MenuButton
     unroundLeft
-    unroundRight
     class="!border-l-0"
     id="boolean-filter"
     controls="boolean-filter-menu"

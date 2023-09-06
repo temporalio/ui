@@ -130,7 +130,6 @@
   <MenuContainer>
     <MenuButton
       unroundLeft
-      unroundRight
       id="time-range-filter"
       controls="time-range-filter-menu"
     >
