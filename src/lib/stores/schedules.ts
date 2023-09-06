@@ -12,7 +12,6 @@ import type {
   ScheduleSpecParameters,
 } from '$lib/types/schedule';
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
-import { calendarToComment } from '$lib/utilities/schedule-comment-formatting';
 import {
   convertDaysAndMonths,
   timeToInterval,
@@ -58,15 +57,6 @@ const setBodySpec = (
       daysOfMonth,
       daysOfWeek,
     });
-    const comment = calendarToComment({
-      preset,
-      month,
-      dayOfMonth,
-      dayOfWeek,
-      hour,
-      minute,
-      second,
-    });
     body.schedule.spec.calendar = [
       {
         year: '*',
@@ -76,7 +66,6 @@ const setBodySpec = (
         hour,
         minute,
         second,
-        comment,
       },
     ];
     body.schedule.spec.interval = [];
