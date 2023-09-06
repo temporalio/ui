@@ -76,6 +76,9 @@ const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
   { label: 'Task Queue', pinned: false },
 ];
 
+const isNotParentWorkflowIdColumn = (column: WorkflowHeader) =>
+  column.label !== 'Parent Workflow ID';
+
 export const getDefaultColumns = (): WorkflowHeader[] => {
   let columns: WorkflowHeader[];
   try {
@@ -88,7 +91,7 @@ export const getDefaultColumns = (): WorkflowHeader[] => {
 
     if (stringifiedOldColumns && parsedOldColumns?.length) {
       const filteredOldColumns = parsedOldColumns.filter(
-        (column: WorkflowHeader) => column.label !== 'Parent Workflow ID',
+        isNotParentWorkflowIdColumn,
       );
       columns = filteredOldColumns;
     } else {
@@ -119,6 +122,15 @@ export const workflowTableColumns: Readable<State> = derived(
         columns[namespace] = [...getDefaultColumns()];
         return columns[namespace];
       }
+      const filteredColumns = columns[namespace].filter(
+        isNotParentWorkflowIdColumn,
+      );
+
+      if (filteredColumns.length !== columns[namespace].length) {
+        columns[namespace] = filteredColumns;
+        persistedWorkflowTableColumns.set(columns);
+      }
+
       return columns[namespace];
     };
 
