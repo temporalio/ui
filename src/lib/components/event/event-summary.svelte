@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  
+
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
@@ -23,9 +24,8 @@
     IterableEvent,
   } from '$lib/types/events';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
-  
+
   import EventEmptyRow from './event-empty-row.svelte';
-  
 
   export let compact = false;
 
@@ -81,6 +81,23 @@
     return compact ? groupEvents(items, $eventFilterSort) : items;
   };
 
+  const handleRowClick = (event: IterableEvent) => {
+    const currentUrl = $page.url.toString();
+    const currentEventHash = $page.url.hash;
+    if (currentEventHash) {
+      goto(currentUrl.replace(currentEventHash, `#${event.id}`));
+    } else {
+      goto(`${currentUrl}#${event.id}`);
+    }
+  };
+
+  const getActiveEvent = () => {
+    const [_, eventIdHash = ''] = $page.url.hash.split('#');
+    return eventIdHash;
+  };
+
+  let activeEventId = '';
+  $: $page.url.hash, (activeEventId = getActiveEvent());
   $: category = $eventCategoryFilter as EventTypeCategory;
   $: intialEvents =
     $eventFilterSort === 'descending' && !compact
@@ -99,22 +116,20 @@
   {items}
   {updating}
   let:visibleItems
-  let:activeRowIndex
-  let:setActiveRowIndex
   aria-label={translate('workflows', 'recent-events')}
   pageSizeSelectLabel={translate('per-page')}
   previousButtonLabel={translate('previous')}
   nextButtonLabel={translate('next')}
 >
   <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
-    {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
+    {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
       <EventSummaryRow
         {event}
         {compact}
         expandAll={$expandAllEvents === 'true'}
         {initialItem}
-        active={activeRowIndex === index}
-        onRowClick={() => setActiveRowIndex(index)}
+        active={event.id === activeEventId}
+        onRowClick={() => handleRowClick(event)}
       />
     {:else}
       <EventEmptyRow {loading} />
