@@ -12,7 +12,7 @@
   import { requestFromAPI } from '$lib/utilities/request-from-api';
   import { routeForApi } from '$lib/utilities/route-for-api';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  
+
   import WorkflowCountAll from './workflow-count-all.svelte';
   import WorkflowCountStatus from './workflow-count-status.svelte';
 
@@ -20,6 +20,8 @@
   let statusGroups = [];
 
   $: groupByEnabled =
+    ($page.data?.settings?.runtimeEnvironment?.isCloud &&
+      !$page.data?.systemInfo) ||
     $page.data?.systemInfo?.capabilities?.countGroupByExecutionStatus;
 
   $: statusFilters = $workflowFilters.filter((filter) =>
