@@ -4,7 +4,8 @@
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { workflowStatuses } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
-  import { workflowsQuery } from '$lib/stores/workflows';
+  import { groupByCountEnabled } from '$lib/stores/group-by-enabled';
+  import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
   import { decodePayload } from '$lib/utilities/decode-payload';
   import { isStatusFilter } from '$lib/utilities/query/filter-search';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
@@ -16,13 +17,10 @@
   import WorkflowCountAll from './workflow-count-all.svelte';
   import WorkflowCountStatus from './workflow-count-status.svelte';
 
+  $: namespace = $page.params.namespace;
+
   let totalCount = 0;
   let statusGroups = [];
-
-  $: groupByEnabled =
-    ($page.data?.settings?.runtimeEnvironment?.isCloud &&
-      !$page.data?.systemInfo) ||
-    $page.data?.systemInfo?.capabilities?.countGroupByExecutionStatus;
 
   $: statusFilters = $workflowFilters.filter((filter) =>
     isStatusFilter(filter.attribute),
@@ -98,10 +96,10 @@
   };
 
   const fetchCounts = async () => {
-    if (groupByEnabled) {
+    if (groupByCountEnabled) {
       const groupByClause = 'GROUP BY ExecutionStatus';
       const countRoute = routeForApi('workflows.count', {
-        namespace: $page.params.namespace,
+        namespace,
       });
 
       const query = toListWorkflowQueryFromFilters(
@@ -117,20 +115,23 @@
         notifyOnError: false,
       });
       totalCount = parseInt(count);
+      $workflowCount.totalCount = totalCount;
       statusGroups = groups.map((group) => {
         const value = decodePayload(group?.groupValues[0]);
+        const count = parseInt(group.count);
+        // if ()
         return {
           value,
-          count: parseInt(group.count),
+          count,
         };
       });
     }
   };
 
-  $: $workflowsQuery, fetchCounts();
+  $: $workflowsQuery, namespace, fetchCounts();
 </script>
 
-{#if groupByEnabled}
+{#if groupByCountEnabled}
   <div class="flex gap-2 lg:gap-4 flex-wrap">
     <WorkflowCountAll
       count={totalCount}

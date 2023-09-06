@@ -72,6 +72,7 @@
   } from '$lib/services/batch-service';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
+  import { groupByCountEnabled } from '$lib/stores/group-by-enabled';
   import { labsMode } from '$lib/stores/labs-mode';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
@@ -234,7 +235,7 @@
       <Translate namespace="workflows" key="recent-workflows" />
     </h1>
     <div class="flex items-center gap-2 text-sm">
-      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !$page.data?.systemInfo?.capabilities?.countGroupByExecutionStatus}
+      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !groupByCountEnabled}
         <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
           {#if $loading || $updating}
             <Translate namespace="workflows" key="loading-workflows" />

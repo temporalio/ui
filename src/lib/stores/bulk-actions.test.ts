@@ -1,6 +1,6 @@
 import { get, type writable as writableFunc } from 'svelte/store';
 
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import { supportsBulkActions } from './bulk-actions';
 
@@ -22,12 +22,6 @@ vi.mock('$app/stores', () => ({
 
 describe('supportsBulkActions store', () => {
   describe('for Cloud', () => {
-    beforeEach(() => {
-      mockedPageStore.mockSetSubscribeValue({
-        data: { settings: { runtimeEnvironment: { isCloud: true } } },
-      });
-    });
-
     test('returns true when batch actions are enabled, and visibility store is elasticsearch regardless of server version', () => {
       mockedPageStore.mockSetSubscribeValue({
         data: {
@@ -44,14 +38,13 @@ describe('supportsBulkActions store', () => {
   });
 
   describe('for Local', () => {
-    beforeEach(() => {
-      mockedPageStore.mockSetSubscribeValue({
-        data: { settings: { runtimeEnvironment: { isCloud: false } } },
-      });
-    });
     test('returns true when version is newer than 1.18.0, advanced visibility is supported, and batch actions are enabled', () => {
       mockedPageStore.mockSetSubscribeValue({
         data: {
+          settings: {
+            runtimeEnvironment: { isCloud: false },
+            batchActionsDisabled: false,
+          },
           cluster: {
             serverVersion: '1.19.0',
             visibilityStore: 'elasticsearch',
