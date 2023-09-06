@@ -51,6 +51,10 @@
   let type: 'relative' | 'absolute' = 'relative';
 
   $: useBetweenDateTimeQuery = isTimeRange || !$supportsAdvancedVisibility;
+  $: disabled =
+    type === 'relative' &&
+    !useBetweenDateTimeQuery &&
+    (!relativeTime || error(relativeTime));
 
   const onStartDateChange = (d: CustomEvent) => {
     startDate = startOfDay(d.detail);
@@ -73,7 +77,7 @@
   };
 
   const onApply = () => {
-    if (type === 'relative') {
+    if (type === 'relative' && !useBetweenDateTimeQuery) {
       if (!relativeTime) return;
       $filter.value = toDate(`${relativeTime} ${timeUnit}`);
       $filter.customDate = false;
@@ -109,7 +113,7 @@
   };
 
   const error = (x: string) => {
-    if (x) return isNaN(parseInt(x));
+    if (x) return isNaN(Number(x)) || isNaN(parseFloat(x));
     return false;
   };
 </script>
@@ -258,7 +262,7 @@
       {/if}
       <MenuDivider />
       <div class="p-2 flex items-center">
-        <Button size="xs" style="width: 100%" on:click={onApply}
+        <Button size="xs" style="width: 100%" on:click={onApply} {disabled}
           >{translate('apply')}</Button
         >
       </div>
