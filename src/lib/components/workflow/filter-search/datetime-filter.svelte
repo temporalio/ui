@@ -207,6 +207,7 @@
                 error={error(relativeTime)}
                 unroundRight
                 class="h-10"
+                disabled={type !== 'relative'}
               />
               <Select
                 unroundLeft
@@ -214,6 +215,7 @@
                 id="relative-datetime-unit-input"
                 label={translate('time-unit')}
                 labelHidden
+                disabled={type !== 'relative'}
               >
                 {#each TIME_UNIT_OPTIONS as unit}
                   <Option value={unit}>{unit} {translate('ago')}</Option>
@@ -248,12 +250,14 @@
                 todayLabel={translate('today')}
                 closeLabel={translate('close')}
                 clearLabel={translate('clear-input-button-label')}
+                disabled={type !== 'absolute'}
               />
               <TimePicker
                 bind:hour={startHour}
                 bind:minute={startMinute}
                 bind:second={startSecond}
                 twelveHourClock={false}
+                disabled={type !== 'absolute'}
               />
             </div>
           </div>

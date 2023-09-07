@@ -8,6 +8,7 @@
   export let second = '';
   export let half: 'AM' | 'PM' = 'AM';
   export let twelveHourClock = true;
+  export let disabled = false;
 </script>
 
 <div class="flex gap-2">
@@ -20,6 +21,7 @@
     suffix="hrs"
     maxLength={2}
     error={twelveHourClock ? parseInt(hour) > 12 : parseInt(hour) > 23}
+    {disabled}
   />
   <Input
     id="minute"
@@ -31,6 +33,7 @@
     suffix="min"
     maxLength={2}
     error={Boolean(parseInt(hour) > 59)}
+    {disabled}
   />
   <Input
     id="second"
@@ -41,6 +44,7 @@
     suffix="sec"
     maxLength={2}
     error={Boolean(parseInt(hour) > 59)}
+    {disabled}
   />
   {#if twelveHourClock}
     <ToggleButtons>
