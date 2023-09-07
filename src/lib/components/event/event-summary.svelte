@@ -85,9 +85,11 @@
     const currentUrl = $page.url.toString();
     const currentEventHash = $page.url.hash;
     if (currentEventHash) {
-      goto(currentUrl.replace(currentEventHash, `#${event.id}`));
+      goto(currentUrl.replace(currentEventHash, `#${event.id}`), {
+        noScroll: true,
+      });
     } else {
-      goto(`${currentUrl}#${event.id}`);
+      goto(`${currentUrl}#${event.id}`, { noScroll: true });
     }
   };
 
