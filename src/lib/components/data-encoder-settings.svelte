@@ -80,9 +80,9 @@
     use:clickOutside
     on:click-outside={() => ($viewDataEncoderSettings = false)}
     in:fly={{ y: -50, delay: 0, duration: 500 }}
-    class="relative w-full h-auto p-12 bg-blue-50 border-b border-blue-100 flex flex-col gap-6"
+    class="relative flex h-auto w-full flex-col gap-6 border-b border-blue-100 bg-blue-50 p-12"
   >
-    <div class="w-full xl:w-1/2 flex flex-col gap-4">
+    <div class="flex w-full flex-col gap-4 xl:w-1/2">
       <div class="flex items-center justify-between space-x-2">
         <h3 data-testid="data-encoder-title" class="text-xl">
           {translate('codec-server')}
@@ -109,12 +109,12 @@
       >
         <div class="flex flex-col gap-2">
           <label
-            class="flex flex-row items-center gap-2 cursor-pointer"
+            class="flex cursor-pointer flex-row items-center gap-2"
             for="use-configuration-endpoint-radio"
           >
             <input
               on:click={() => (override = false)}
-              class="w-4 h-4 accent-gray-900"
+              class="h-4 w-4 accent-gray-900"
               type="radio"
               checked={!override}
               name="use-configuration-endpoint"
@@ -126,12 +126,12 @@
             })}
           </label>
           <label
-            class="flex flex-row items-center gap-2 cursor-pointer"
+            class="flex cursor-pointer flex-row items-center gap-2"
             for="use-local-endpoint-radio"
           >
             <input
               on:click={() => (override = true)}
-              class="w-4 h-4 accent-gray-900"
+              class="h-4 w-4 accent-gray-900"
               type="radio"
               checked={override}
               name="use-local-endpoint"

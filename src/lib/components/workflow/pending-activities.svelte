@@ -158,7 +158,7 @@
         </div>
       {/each}
     </div>
-    <div class="text-right mt-2">
+    <div class="mt-2 text-right">
       <Link {href}>{translate('workflows', 'pending-activities-link')}</Link>
     </div>
   </section>

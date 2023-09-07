@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
-  
+
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import { type IconName, icons } from '$lib/holocene/icon/paths';
   export let Hst: HST;
@@ -55,6 +55,10 @@
   </Hst.Variant>
 
   <svelte:fragment slot="controls">
-    <Hst.Select bind:value={leadingIcon} title="Leading Icon" options={[{ label: 'None', value: '' }, ...Object.keys(icons)]} />
+    <Hst.Select
+      bind:value={leadingIcon}
+      title="Leading Icon"
+      options={[{ label: 'None', value: '' }, ...Object.keys(icons)]}
+    />
   </svelte:fragment>
 </Hst.Story>

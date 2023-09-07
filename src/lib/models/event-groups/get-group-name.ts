@@ -18,9 +18,8 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   }
 
   if (isTimerStartedEvent(event)) {
-    return `Timer ${
-      event.timerStartedEventAttributes?.timerId
-    } (${formatDurationAbbreviated(
+    return `Timer ${event.timerStartedEventAttributes
+      ?.timerId} (${formatDurationAbbreviated(
       event.timerStartedEventAttributes
         ?.startToFireTimeout as unknown as Duration,
     )})`;

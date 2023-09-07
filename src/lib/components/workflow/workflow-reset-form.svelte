@@ -27,13 +27,13 @@
 </script>
 
 <div class="flex w-full flex-col gap-4">
-  <ul class="w-full rounded border border-primary max-h-40 overflow-y-scroll">
+  <ul class="max-h-40 w-full overflow-y-scroll rounded border border-primary">
     {#each $resetEvents as event}
       <li
-        class="w-full h-10 border-b border-primary last-of-type:border-none hover:bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed first-of-type:rounded-t last-of-type:rounded-b"
+        class="h-10 w-full border-b border-primary from-blue-100 to-purple-100 bg-fixed first-of-type:rounded-t last-of-type:rounded-b last-of-type:border-none hover:bg-gradient-to-br"
       >
         <label
-          class="flex flex-row items-center gap-2 cursor-pointer px-4 py-2 h-full w-full"
+          class="flex h-full w-full cursor-pointer flex-row items-center gap-2 px-4 py-2"
           for="reset-event-{event.id}"
         >
           <input
@@ -44,7 +44,7 @@
             id="reset-event-{event.id}"
           />
           <p class="grid grid-cols-8">
-            <span class="text-gray-500 font-medium col-span-1">
+            <span class="col-span-1 font-medium text-gray-500">
               {event.eventId}
             </span>
             <span class="font-semibold">

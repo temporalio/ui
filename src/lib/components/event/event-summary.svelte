@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
@@ -23,9 +23,8 @@
     IterableEvent,
   } from '$lib/types/events';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
-  
+
   import EventEmptyRow from './event-empty-row.svelte';
-  
 
   export let compact = false;
 

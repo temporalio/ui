@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import Icon from '$lib/holocene/icon/icon.svelte';
-import type { IconName } from '$lib/holocene/icon/paths';
-import { getAppContext } from '$lib/utilities/get-context';
+  import type { IconName } from '$lib/holocene/icon/paths';
+  import { getAppContext } from '$lib/utilities/get-context';
 
   export let icon: IconName = null;
   export let group = getAppContext('group');

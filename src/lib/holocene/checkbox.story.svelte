@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
   import { logEvent } from 'histoire/client';
-  
+
   import Checkbox from '$lib/holocene/checkbox.svelte';
 
   export let Hst: HST;

@@ -86,14 +86,14 @@
   </td>
 </TableRow>
 <TableRow class="schedule-spec-row">
-  <td colspan="5" class="hidden xl:table-cell !p-0">
-    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  <td colspan="5" class="hidden !p-0 xl:table-cell">
+    <ScheduleFrequency {calendar} {interval} inline class="w-auto text-sm" />
   </td>
-  <td colspan="3" class="hidden md:table-cell xl:hidden !p-0">
-    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  <td colspan="3" class="hidden !p-0 md:table-cell xl:hidden">
+    <ScheduleFrequency {calendar} {interval} inline class="w-auto text-sm" />
   </td>
-  <td colspan="2" class="md:hidden !p-0">
-    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  <td colspan="2" class="!p-0 md:hidden">
+    <ScheduleFrequency {calendar} {interval} inline class="w-auto text-sm" />
   </td>
 </TableRow>
 

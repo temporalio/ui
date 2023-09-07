@@ -8,9 +8,8 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
   import { routeForEventHistory } from '$lib/utilities/route-for';
-  
+
   import WorkflowStatus from '../workflow-status.svelte';
-  
 
   export let children: ChildWorkflowClosedEvent[] = [];
   export let pendingChildren: WorkflowExecution['pendingChildren'] = [];

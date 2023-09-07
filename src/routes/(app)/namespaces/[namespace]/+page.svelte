@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  
+
   import { page } from '$app/stores';
-  
+
   import type { PageData } from './$types';
 
   import PageTitle from '$lib/components/page-title.svelte';
@@ -17,7 +17,6 @@
   import { settings } from '$lib/stores/settings';
   import { temporalVersion, uiVersion } from '$lib/stores/versions';
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-time';
-  
 
   export let data: PageData;
 
