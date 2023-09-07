@@ -53,6 +53,7 @@
     "test:integration:run": "PW_MODE=integration playwright test tests/integration",
     "test:integration": "PW_MODE=integration playwright test --ui tests/integration",
     "lint": "pnpm prettier; pnpm eslint; pnpm stylelint",
+    "lint:ci": "pnpm prettier && pnpm eslint && pnpm stylelint",
     "format": "pnpm prettier:fix; pnpm eslint:fix; pnpm stylelint:fix",
     "check": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json --watch",
