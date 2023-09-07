@@ -1,6 +1,4 @@
 <script lang="ts">
-  
-  
   import {
     addHours,
     addMinutes,
@@ -9,7 +7,7 @@
     startOfDay,
   } from 'date-fns';
   import { getContext } from 'svelte';
-  
+
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -40,19 +38,23 @@
   let startHour = '';
   let startMinute = '';
   let startSecond = '';
-  let startHalf: 'AM' | 'PM' = 'AM';
 
   let endHour = '';
   let endMinute = '';
   let endSecond = '';
-  let endHalf: 'AM' | 'PM' = 'AM';
 
   const TIME_UNIT_OPTIONS = ['minutes', 'hours', 'days'];
 
   let timeUnit = TIME_UNIT_OPTIONS[0];
   let relativeTime = '';
 
+  let type: 'relative' | 'absolute' = 'relative';
+
   $: useBetweenDateTimeQuery = isTimeRange || !$supportsAdvancedVisibility;
+  $: disabled =
+    type === 'relative' &&
+    !useBetweenDateTimeQuery &&
+    (!relativeTime || error(relativeTime));
 
   const onStartDateChange = (d: CustomEvent) => {
     startDate = startOfDay(d.detail);
@@ -74,60 +76,44 @@
     return _date;
   };
 
-  const setHours = (hour: string, half: 'AM' | 'PM') => {
-    if (hour) {
-      if (hour === '12') {
-        return half === 'AM' ? '00' : '12';
-      } else if (half === 'PM') {
-        return (parseInt(hour) + 12).toString();
-      } else {
-        return hour;
-      }
-    } else {
-      hour = '';
-    }
-  };
-
   const onApply = () => {
-    let startDateWithTime = applyTimeChanges(startDate, {
-      hour: setHours(startHour, startHalf),
-      minute: startMinute,
-      second: startSecond,
-    });
-    let endDateWithTime = applyTimeChanges(endDate, {
-      hour: setHours(endHour, endHalf),
-      minute: endMinute,
-      second: endSecond,
-    });
-
-    const value = useBetweenDateTimeQuery
-      ? `BETWEEN "${formatISO(startDateWithTime)}" AND "${formatISO(
-          endDateWithTime,
-        )}"`
-      : formatISO(startDateWithTime);
-
-    $filter.value = value;
-
-    if (isTimeRange) {
-      $filter.customDate = true;
-      $filter.conditional = '';
-    } else {
+    if (type === 'relative' && !useBetweenDateTimeQuery) {
+      if (!relativeTime) return;
+      $filter.value = toDate(`${relativeTime} ${timeUnit}`);
       $filter.customDate = false;
+    } else {
+      let startDateWithTime = applyTimeChanges(startDate, {
+        hour: startHour,
+        minute: startMinute,
+        second: startSecond,
+      });
+      let endDateWithTime = applyTimeChanges(endDate, {
+        hour: endHour,
+        minute: endMinute,
+        second: endSecond,
+      });
+
+      const value = useBetweenDateTimeQuery
+        ? `BETWEEN "${formatISO(startDateWithTime)}" AND "${formatISO(
+            endDateWithTime,
+          )}"`
+        : formatISO(startDateWithTime);
+
+      $filter.value = value;
+
+      if (isTimeRange) {
+        $filter.customDate = true;
+        $filter.conditional = '';
+      } else {
+        $filter.customDate = false;
+      }
     }
-
-    handleSubmit();
-  };
-
-  const onApplyRelativeTime = () => {
-    if (!relativeTime) return;
-    $filter.value = toDate(`${relativeTime} ${timeUnit}`);
-    $filter.customDate = false;
 
     handleSubmit();
   };
 
   const error = (x: string) => {
-    if (x) return isNaN(parseInt(x));
+    if (x) return isNaN(Number(x)) || isNaN(parseFloat(x));
     return false;
   };
 </script>
@@ -136,9 +122,9 @@
   <ConditionalMenu
     inputId="time-range-filter"
     options={[
-      { value: '<=', label: translate('before').toUpperCase() },
-      { value: 'BETWEEN', label: translate('between').toUpperCase() },
-      { value: '>=', label: translate('after').toUpperCase() },
+      { value: '<=', label: translate('before') },
+      { value: 'BETWEEN', label: translate('between') },
+      { value: '>=', label: translate('after') },
     ]}
   />
   <MenuContainer>
@@ -155,80 +141,10 @@
       class="w-[25rem] !overflow-visible"
     >
       {#if isTimeRange}
-        <div class="flex flex-col gap-2 p-2">
-          <DatePicker
-            label={translate('start')}
-            on:datechange={onStartDateChange}
-            selected={startDate}
-            todayLabel={translate('today')}
-            closeLabel={translate('close')}
-            clearLabel={translate('clear-input-button-label')}
-          />
-          <TimePicker
-            bind:hour={startHour}
-            bind:minute={startMinute}
-            bind:second={startSecond}
-            bind:half={startHalf}
-          />
-          <DatePicker
-            label={translate('end')}
-            on:datechange={onEndDateChange}
-            selected={endDate}
-            todayLabel={translate('today')}
-            closeLabel={translate('close')}
-            clearLabel={translate('clear-input-button-label')}
-          />
-          <TimePicker
-            bind:hour={endHour}
-            bind:minute={endMinute}
-            bind:second={endSecond}
-            bind:half={endHalf}
-          />
-          <div class="flex justify-end">
-            <Button variant="ghost" on:click={onApply}
-              >{translate('apply')}</Button
-            >
-          </div>
-        </div>
-      {:else}
-        <div class="flex flex-col gap-2">
-          <div class="p-2">
-            <p class="text-sm font-semibold">{translate('relative')}</p>
-            <div class="flex justify-between items-center gap-2">
-              <div class="flex gap-0">
-                <Input
-                  label={translate('relative')}
-                  labelHidden
-                  id="relative-datetime-input"
-                  bind:value={relativeTime}
-                  placeholder="00"
-                  error={error(relativeTime)}
-                  unroundRight
-                  class="h-10"
-                />
-                <Select
-                  unroundLeft
-                  bind:value={timeUnit}
-                  id="relative-datetime-unit-input"
-                  label={translate('time-unit')}
-                  labelHidden
-                >
-                  {#each TIME_UNIT_OPTIONS as unit}
-                    <Option value={unit}>{unit} {translate('ago')}</Option>
-                  {/each}
-                </Select>
-              </div>
-              <Button
-                variant="ghost"
-                disabled={error(relativeTime)}
-                on:click={onApplyRelativeTime}>{translate('apply')}</Button
-              >
-            </div>
-          </div>
-          <MenuDivider />
-          <div class="p-2 flex flex-col gap-2">
+        <MenuItem>
+          <div class="flex flex-col gap-2">
             <DatePicker
-              label={translate('absolute')}
+              label={translate('start')}
               on:datechange={onStartDateChange}
               selected={startDate}
               todayLabel={translate('today')}
@@ -239,18 +155,121 @@
               bind:hour={startHour}
               bind:minute={startMinute}
               bind:second={startSecond}
-              bind:half={startHalf}
+              twelveHourClock={false}
             />
-            <div class="flex justify-end">
-              <Button variant="ghost" on:click={onApply}
-                >{translate('apply')}</Button
+          </div>
+        </MenuItem>
+        <MenuDivider />
+        <MenuItem>
+          <div class="flex flex-col gap-2">
+            <DatePicker
+              label={translate('end')}
+              on:datechange={onEndDateChange}
+              selected={endDate}
+              todayLabel={translate('today')}
+              closeLabel={translate('close')}
+              clearLabel={translate('clear-input-button-label')}
+            />
+            <TimePicker
+              bind:hour={endHour}
+              bind:minute={endMinute}
+              bind:second={endSecond}
+              twelveHourClock={false}
+            />
+          </div>
+        </MenuItem>
+      {:else}
+        <MenuItem on:click={() => (type = 'relative')}>
+          <div class="flex flex-col">
+            <label
+              class="flex flex-row items-center gap-2 cursor-pointer"
+              for="relative-time"
+            >
+              <input
+                on:click|stopPropagation={() => {
+                  type = 'relative';
+                }}
+                class="w-4 h-4 accent-gray-900"
+                type="radio"
+                checked={type === 'relative'}
+                id="relative-time"
+                tabindex="-1"
+              />
+              {translate('relative')}
+            </label>
+            <div class="ml-6 pt-2 flex gap-0">
+              <Input
+                label={translate('relative')}
+                labelHidden
+                id="relative-datetime-input"
+                bind:value={relativeTime}
+                placeholder="00"
+                error={error(relativeTime)}
+                unroundRight
+                class="h-10"
+                disabled={type !== 'relative'}
+              />
+              <Select
+                unroundLeft
+                bind:value={timeUnit}
+                id="relative-datetime-unit-input"
+                label={translate('time-unit')}
+                labelHidden
+                disabled={type !== 'relative'}
               >
+                {#each TIME_UNIT_OPTIONS as unit}
+                  <Option value={unit}>{unit} {translate('ago')}</Option>
+                {/each}
+              </Select>
             </div>
           </div>
-        </div>
+        </MenuItem>
+        <MenuDivider />
+        <MenuItem on:click={() => (type = 'absolute')}>
+          <div class="flex flex-col gap-2">
+            <label
+              class="flex flex-row items-center gap-2 cursor-pointer"
+              for="absolute-time"
+            >
+              <input
+                on:click|stopPropagation={() => (type = 'absolute')}
+                class="w-4 h-4 accent-gray-900"
+                type="radio"
+                checked={type === 'absolute'}
+                id="absolute-time"
+                tabindex="-1"
+              />
+              {translate('absolute')}
+            </label>
+            <div class="flex flex-col ml-6 gap-2">
+              <DatePicker
+                label={''}
+                labelHidden
+                on:datechange={onStartDateChange}
+                selected={startDate}
+                todayLabel={translate('today')}
+                closeLabel={translate('close')}
+                clearLabel={translate('clear-input-button-label')}
+                disabled={type !== 'absolute'}
+              />
+              <TimePicker
+                bind:hour={startHour}
+                bind:minute={startMinute}
+                bind:second={startSecond}
+                twelveHourClock={false}
+                disabled={type !== 'absolute'}
+              />
+            </div>
+          </div>
+        </MenuItem>
       {/if}
       <MenuDivider />
-      <MenuItem centered disabled>
+      <div class="p-2 flex items-center">
+        <Button size="xs" style="width: 100%" on:click={onApply} {disabled}
+          >{translate('apply')}</Button
+        >
+      </div>
+      <MenuItem centered disabled class="!pt-0">
         <Icon name="clock" aria-hidden="true" />
         {translate('based-on-time-preface')}
         {localTime}
