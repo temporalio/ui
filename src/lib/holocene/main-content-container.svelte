@@ -5,7 +5,7 @@
   let showScrollToTopOn = 150; // pixels
 
   function getScrollContainer(): HTMLElement | null {
-    return document.getElementById('content');
+    return document.getElementById('content-wrapper');
   }
 
   function onScrollToTopClick() {
@@ -22,10 +22,11 @@
 <div
   id="content-wrapper"
   class="relative h-screen w-max flex-auto overflow-auto bg-gray-100"
+  on:scroll={handleOnScroll}
 >
   <slot />
-  <main id="content" on:scroll={handleOnScroll}>
+  <main id="content">
     <slot name="main" />
-    <ScrollToTop hidden={scrollToTopHidden} {onScrollToTopClick} />
   </main>
+  <ScrollToTop hidden={scrollToTopHidden} {onScrollToTopClick} />
 </div>

@@ -157,7 +157,7 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply border-2 border-primary rounded-lg overflow-scroll;
+    @apply border-2 border-primary rounded-lg overflow-auto;
   }
 
   .paginated-table {

@@ -12,8 +12,6 @@ exports[`Table_body_cell$ > History Size renders 1`] = `"<td class=\\"workflows-
 
 exports[`Table_body_cell$ > Parent Namespace renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">parent-namespace-id</td>"`;
 
-exports[`Table_body_cell$ > Parent Workflow ID renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">parent-workflow-id</td>"`;
-
 exports[`Table_body_cell$ > Run ID renders 1`] = `"<td class=\\"workflows-summary-table-body-cell filterable svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\"><a href=\\"/namespaces/default/workflows/abc-123/def-456/history\\" class=\\"link svelte-1v8baj6\\"> def-456</a> </td>"`;
 
 exports[`Table_body_cell$ > Start renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">2023-04-27 UTC 00:00:00.00</td>"`;

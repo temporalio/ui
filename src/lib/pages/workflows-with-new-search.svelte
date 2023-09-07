@@ -107,7 +107,7 @@
   const persistTimeFilter = () => {
     if (!query && !$workflowFilters.length && $persistedTimeFilter) {
       $workflowFilters = [$persistedTimeFilter];
-      updateQueryParamsFromFilter($page.url, $workflowFilters);
+      updateQueryParamsFromFilter($page.url, $workflowFilters, $labsMode);
     }
   };
 

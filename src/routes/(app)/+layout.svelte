@@ -5,6 +5,7 @@
 
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
+  import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
   import { ErrorBoundary } from '$lib/holocene/error-boundary';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
@@ -85,6 +86,7 @@
   });
 </script>
 
+<SkipNavigation />
 <div class="flex w-screen flex-row">
   <Toaster
     closeButtonLabel={translate('close')}
