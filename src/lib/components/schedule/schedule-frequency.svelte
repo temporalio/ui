@@ -9,12 +9,14 @@
   export let inline = false;
 </script>
 
-<div class="flex flex-col {$$props.class}">
-  <CodeBlock
-    copyable
-    {inline}
-    testId="schedule-calendar"
-    language="json"
-    content={JSON.stringify(calendar || interval, null, 2)}
-  />
-</div>
+{#key [calendar, interval]}
+  <div class="flex flex-col {$$props.class}">
+    <CodeBlock
+      copyable
+      {inline}
+      testId="schedule-calendar"
+      language="json"
+      content={JSON.stringify(calendar || interval, null, 2)}
+    />
+  </div>
+{/key}

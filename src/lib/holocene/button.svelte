@@ -138,4 +138,8 @@
   .active {
     @apply bg-indigo-100;
   }
+
+  a[type='button'] {
+    appearance: none;
+  }
 </style>

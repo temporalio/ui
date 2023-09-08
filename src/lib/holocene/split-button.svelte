@@ -30,6 +30,7 @@
       {label}
     </Button>
     <MenuButton
+      class="max-w-fit grow-0"
       id="{id}-menu-button"
       label={menuLabel}
       controls="{id}-menu"
