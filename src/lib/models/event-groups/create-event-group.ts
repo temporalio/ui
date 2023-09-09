@@ -6,6 +6,7 @@ import type {
   StartChildWorkflowExecutionInitiatedEvent,
   TimerStartedEvent,
   WorkflowExecutionSignaledEvent,
+  WorkflowExecutionUpdateAcceptedEvent,
 } from '$lib/types/events';
 import {
   isActivityTaskScheduledEvent,
@@ -15,6 +16,7 @@ import {
   isStartChildWorkflowExecutionInitiatedEvent,
   isTimerStartedEvent,
   isWorkflowExecutionSignaledEvent,
+  isWorkflowExecutionUpdateAcceptedEvent,
 } from '$lib/utilities/is-event-type';
 
 import type { EventGroup } from './event-groups';
@@ -35,6 +37,7 @@ type StartingEvents = {
   SignalReceived: WorkflowExecutionSignaledEvent;
   LocalActivity: MarkerRecordedEvent;
   Marker: MarkerRecordedEvent;
+  Update: WorkflowExecutionUpdateAcceptedEvent;
 };
 
 const createGroupFor = <K extends keyof StartingEvents>(
@@ -106,4 +109,7 @@ export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
     }
     return createGroupFor<'Marker'>(event);
   }
+
+  if (isWorkflowExecutionUpdateAcceptedEvent(event))
+    return createGroupFor<'Update'>(event);
 };

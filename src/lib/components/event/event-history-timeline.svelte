@@ -395,6 +395,14 @@
     color: #652b19;
   }
 
+  :global(.vis-item.vis-range.update) {
+    background-color: #f3e8ff;
+    border-color: #581c87;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #581c87;
+  }
+
   :global(.bar-content) {
     display: flex;
     gap: 2px;
