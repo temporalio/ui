@@ -91,10 +91,6 @@
   $: initialItem = currentEvents?.[0];
   $: items = getEventsOrGroups(currentEvents, category);
   $: updating = currentEvents.length && !$fullEventHistory.length;
-
-  $: {
-    console.log('GROUPS: ', items);
-  }
 </script>
 
 <Pagination
