@@ -8,6 +8,7 @@ import {
   isStartChildWorkflowExecutionInitiatedEvent,
   isTimerStartedEvent,
   isWorkflowExecutionSignaledEvent,
+  isWorkflowExecutionUpdateAcceptedEvent,
 } from '$lib/utilities/is-event-type';
 
 export const getEventGroupName = (event: CommonHistoryEvent): string => {
@@ -43,5 +44,9 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
 
   if (isStartChildWorkflowExecutionInitiatedEvent(event)) {
     return `Child Workflow: ${event.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType?.name}`;
+  }
+
+  if (isWorkflowExecutionUpdateAcceptedEvent(event)) {
+    return `${event.workflowExecutionUpdateAcceptedEventAttributes?.acceptedRequest?.input?.name}`;
   }
 };
