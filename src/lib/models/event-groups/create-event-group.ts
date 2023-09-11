@@ -67,7 +67,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
   const groupEvents: EventGroup['events'] = new Map();
   const groupEventIds: EventGroup['eventIds'] = new Set();
 
-  if (isWorkflowExecutionUpdateAcceptedEvent(event)) {
+  if (initialEvent && isWorkflowExecutionUpdateAcceptedEvent(event)) {
     groupEvents.set(initialEvent.id, initialEvent);
     groupEvents.set(event.id, event);
     groupEventIds.add(initialEvent.id);
