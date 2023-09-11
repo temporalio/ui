@@ -3,6 +3,7 @@
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable.svelte';
+  import JsonEditor from '$lib/holocene/json-editor.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { format } from '$lib/utilities/format-camel-case';
@@ -38,13 +39,14 @@
     >
       <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
         <p class="text-sm">{format(key)}</p>
-        <CodeBlock
+        <JsonEditor value={JSON.stringify(codeBlockValue, undefined, 2)} />
+        <!-- <CodeBlock
           content={codeBlockValue}
           class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
           {inline}
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
-        />
+        /> -->
       </div>
       {#if stackTrace && !inline}
         <div class="flex flex-col lg:w-1/2">

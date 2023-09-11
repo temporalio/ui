@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  
+
   import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
   import { historyKeymap, standardKeymap } from '@codemirror/commands';
   import { json } from '@codemirror/lang-json';
@@ -14,7 +14,7 @@
   import { EditorView } from '@codemirror/view';
   import { keymap } from '@codemirror/view';
   import { createEventDispatcher, onMount } from 'svelte';
-  
+
   import {
     TEMPORAL_SYNTAX,
     TEMPORAL_THEME,
@@ -60,6 +60,7 @@
         indentOnInput(),
         bracketMatching(),
         json(),
+        EditorState.readOnly.of(true),
       ],
     });
   };
