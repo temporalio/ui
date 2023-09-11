@@ -38,7 +38,7 @@
       <p class="min-w-fit text-sm">
         {format(key)}
       </p>
-      <JsonEditor value={JSON.stringify(getCodeBlockValue(value))} />
+      <JsonEditor value={getCodeBlockValue(value)} inline readOnly />
       <CodeBlock
         content={getCodeBlockValue(value)}
         {inline}

@@ -23,6 +23,8 @@
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
     value: string;
     class?: string;
+    readOnly?: boolean;
+    inline?: boolean;
   }
 
   const dispatch = createEventDispatcher<{ change: string }>();
@@ -30,6 +32,8 @@
   export let value: string;
   let className: string = null;
   export { className as class };
+  export let readOnly = false;
+  export let inline = false;
 
   let editor: HTMLElement;
   let view: EditorView;
@@ -37,7 +41,9 @@
   const createEditorView = (): EditorView => {
     return new EditorView({
       parent: editor,
-      state: createEditorState(value),
+      state: createEditorState(
+        inline ? JSON.stringify(value) : JSON.stringify(value, undefined, 2),
+      ),
       dispatch(transaction) {
         view.update([transaction]);
         if (transaction.docChanged) {
@@ -60,7 +66,7 @@
         indentOnInput(),
         bracketMatching(),
         json(),
-        EditorState.readOnly.of(true),
+        EditorState.readOnly.of(readOnly),
       ],
     });
   };

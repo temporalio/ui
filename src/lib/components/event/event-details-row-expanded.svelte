@@ -39,7 +39,7 @@
     >
       <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
         <p class="text-sm">{format(key)}</p>
-        <JsonEditor value={JSON.stringify(codeBlockValue, undefined, 2)} />
+        <JsonEditor value={codeBlockValue} readOnly />
         <!-- <CodeBlock
           content={codeBlockValue}
           class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
