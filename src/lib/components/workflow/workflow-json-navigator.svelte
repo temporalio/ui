@@ -1,6 +1,6 @@
 <script lang="ts">
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import RangeInput from '$lib/holocene/input/range-input.svelte';
+  import JsonEditor from '$lib/holocene/json-editor.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowEvents } from '$lib/types/events';
@@ -77,8 +77,8 @@
     </div>
     <slot name="decode" />
   </div>
-  <CodeBlock
-    content={events[index - 1]}
+  <JsonEditor
+    value={events[index - 1]}
     testId="event-history-json"
     copyIconTitle={translate('copy-icon-title')}
     copySuccessIconTitle={translate('copy-success-icon-title')}

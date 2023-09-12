@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable.svelte';
   import JsonEditor from '$lib/holocene/json-editor.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -33,14 +32,13 @@
 >
   {#if typeof value === 'object'}
     <div
-      class="flex w-full flex-wrap items-center pr-1 xl:flex-nowrap xl:gap-4"
+      class="flex w-full flex-wrap items-center justify-between pr-1 xl:flex-nowrap xl:gap-4"
     >
       <p class="min-w-fit text-sm">
         {format(key)}
       </p>
-      <JsonEditor value={getCodeBlockValue(value)} inline readOnly />
-      <CodeBlock
-        content={getCodeBlockValue(value)}
+      <JsonEditor
+        value={getCodeBlockValue(value)}
         {inline}
         copyIconTitle={translate('copy-icon-title')}
         copySuccessIconTitle={translate('copy-success-icon-title')}

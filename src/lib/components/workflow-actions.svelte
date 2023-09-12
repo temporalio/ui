@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import WorkflowResetForm from '$lib/components/workflow/workflow-reset-form.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -380,6 +380,8 @@
         class="max-h-80 overflow-y-scroll overscroll-contain"
         value={signalInput}
         on:change={handleSignalInputChange}
+        readOnly={false}
+        copyable={false}
       />
     </div>
   </div>

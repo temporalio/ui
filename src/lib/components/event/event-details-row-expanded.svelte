@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable.svelte';
   import JsonEditor from '$lib/holocene/json-editor.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -39,22 +38,18 @@
     >
       <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
         <p class="text-sm">{format(key)}</p>
-        <JsonEditor value={codeBlockValue} readOnly />
-        <!-- <CodeBlock
-          content={codeBlockValue}
-          class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
-          {inline}
+        <JsonEditor
+          value={codeBlockValue}
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
-        /> -->
+        />
       </div>
       {#if stackTrace && !inline}
         <div class="flex flex-col lg:w-1/2">
           <p class="text-sm">Stack trace</p>
-          <CodeBlock
-            content={stackTrace}
+          <JsonEditor
+            value={stackTrace}
             class="mb-2 h-full lg:pr-2"
-            language="text"
             copyIconTitle={translate('copy-icon-title')}
             copySuccessIconTitle={translate('copy-success-icon-title')}
           />

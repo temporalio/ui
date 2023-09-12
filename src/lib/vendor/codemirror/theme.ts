@@ -9,6 +9,7 @@ export const TEMPORAL_THEME = EditorView.theme(
       color: 'white',
       backgroundColor: colors.gray['900'],
       borderRadius: '0.25rem',
+      padding: '0.5rem',
     },
     '.cm-matchingBracket': {
       backgroundColor: colors.gray['800'],
@@ -18,6 +19,7 @@ export const TEMPORAL_THEME = EditorView.theme(
     },
     '.cm-content': {
       caretColor: colors.white,
+      fontSize: '0.875em',
     },
     '.cm-editor&.cm-focused': {
       outline: `1px solid ${colors.blue['700']}`,

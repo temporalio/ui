@@ -15,25 +15,39 @@
   import { keymap } from '@codemirror/view';
   import { createEventDispatcher, onMount } from 'svelte';
 
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import {
     TEMPORAL_SYNTAX,
     TEMPORAL_THEME,
   } from '$lib/vendor/codemirror/theme';
+  
+  import Icon from './icon/icon.svelte';
+  
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
-    value: string;
+    value: unknown;
     class?: string;
     readOnly?: boolean;
+    testId?: string;
     inline?: boolean;
+    copyable?: boolean;
+    copyIconTitle?: string;
+    copySuccessIconTitle?: string;
   }
 
   const dispatch = createEventDispatcher<{ change: string }>();
 
-  export let value: string;
+  export let value: unknown;
   let className: string = null;
   export { className as class };
-  export let readOnly = false;
+  export let readOnly = true;
   export let inline = false;
+  export let copyable = true;
+  export let copyIconTitle = '';
+  export let copySuccessIconTitle = '';
+
+  const { copy, copied } = copyToClipboard();
 
   let editor: HTMLElement;
   let view: EditorView;
@@ -42,7 +56,9 @@
     return new EditorView({
       parent: editor,
       state: createEditorState(
-        inline ? JSON.stringify(value) : JSON.stringify(value, undefined, 2),
+        inline
+          ? stringifyWithBigInt(value)
+          : stringifyWithBigInt(value, undefined, 2),
       ),
       dispatch(transaction) {
         view.update([transaction]);
@@ -74,9 +90,24 @@
   onMount(() => (view = createEditorView()));
 </script>
 
-<div
-  on:keydown|stopPropagation
-  bind:this={editor}
-  class={className}
-  {...$$restProps}
-/>
+<div class="relative min-w-[80px]">
+  <div
+    on:keydown|stopPropagation
+    bind:this={editor}
+    class={className}
+    data-testid={$$props['data-testid']}
+    {...$$restProps}
+  />
+  {#if copyable}
+    <button
+      on:click={(e) => copy(e, JSON.stringify(value, undefined, 2))}
+      class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
+    >
+      <Icon
+        title={$copied ? copySuccessIconTitle : copyIconTitle}
+        name={$copied ? 'checkmark' : 'copy'}
+        class="text-white hover:text-gray-900"
+      />
+    </button>
+  {/if}
+</div>
