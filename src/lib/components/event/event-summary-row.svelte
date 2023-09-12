@@ -2,6 +2,9 @@
   import { noop } from 'svelte/internal';
   import { fade } from 'svelte/transition';
 
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { isEventGroup } from '$lib/models/event-groups';
@@ -18,9 +21,11 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
-
+  import { routeForEventHistory } from '$lib/utilities/route-for';
+  
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
+  
 
   export let event: IterableEvent;
   export let initialItem: IterableEvent | undefined;
@@ -61,7 +66,14 @@
 
   const onLinkClick = () => {
     expanded = !expanded;
-    document.location = `#${event.id}`;
+    // Dont delete query params like ?per-page
+    const queryParams = $page.url.searchParams;
+    const urlParams = $page.params;
+    const route = routeForEventHistory({
+      queryParams,
+      ...urlParams,
+    });
+    goto(`${route}#${event.id}`, { noScroll: true });
     onRowClick();
   };
 

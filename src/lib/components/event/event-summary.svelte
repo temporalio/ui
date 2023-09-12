@@ -1,6 +1,8 @@
 <script lang="ts">
+  import _ from 'json-bigint';
   import { onMount } from 'svelte';
   
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
@@ -45,43 +47,14 @@
     hash = $page.url.hash;
   });
 
-  $: if (!loading && hash) {
-    scrollIntoView(hash.slice(1));
-  }
-
   function scrollIntoView(target) {
-  const element = document.querySelector(`[id='${Number(target)}']`);
-  if (!element) return;
+    const element = document.getElementById(target);
+    if (!element) return;
 
-  const elementTop = (element as HTMLElement).offsetTop;
-
-  const windowHeight = window.innerHeight;
-  const offset = (windowHeight - element.clientHeight)/2; 
-  console.log(offset)
-
-  const targetPosition = elementTop - offset;
-  window.scrollTo({
-    top: targetPosition,
-    behavior: 'smooth',
-  });
-}
-
-  // $:{
-  //   if(!loading) {
-  //     find offsetheight 
-  //     scrollTo element based on anchor id
-  //   }
-  // }
-
-  // function scrollIntoView(target) {
-  //   const element = document.querySelector(`[id='${Number(target)}']`);
-  //   console.log('target', target);
-  //   console.log('el', element);
-  //   if (!element) return;
-  //   element.scrollIntoView({
-  //     behavior: 'smooth',
-  //   });
-  // }
+    goto(`${$page.url}`, { noScroll: true }).then(() => {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
 
   const fetchEvents = async (
     namespace: string,
@@ -102,7 +75,7 @@
     loading = false;
     setTimeout(() => {
       scrollIntoView(hash.slice(1));
-    }, 500);
+    }, 250);
   };
 
   $: $refresh, fetchEvents(namespace, workflowId, runId, $eventFilterSort);
