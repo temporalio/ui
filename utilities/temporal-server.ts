@@ -79,7 +79,7 @@ export const createTemporalServer = async ({
   }
 
   const temporal =
-    $`${cliPath} server start-dev --dynamic-config-value frontend.workerVersioningDataAPIs=true --dynamic-config-value frontend.workerVersioningWorkflowAPIs=true --dynamic-config-value worker.buildIdScavengerEnabled=true ${flags}`.quiet();
+    $`${cliPath} server start-dev --dynamic-config-value frontend.enableUpdateWorkflowExecution=true --dynamic-config-value frontend.workerVersioningDataAPIs=true --dynamic-config-value frontend.workerVersioningWorkflowAPIs=true ${flags}`.quiet();
 
   temporal.catch(async ({ stdout, stderr, exitCode }) => {
     if (exitCode) {
