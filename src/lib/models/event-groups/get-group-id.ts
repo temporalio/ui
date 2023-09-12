@@ -11,6 +11,7 @@ import {
   isChildWorkflowExecutionTerminatedEvent,
   isTimerCanceledEvent,
   isTimerFiredEvent,
+  isWorkflowExecutionUpdateCompletedEvent,
 } from '$lib/utilities/is-event-type';
 
 export const getGroupId = (event: CommonHistoryEvent): string => {
@@ -63,6 +64,12 @@ export const getGroupId = (event: CommonHistoryEvent): string => {
 
   if (isTimerCanceledEvent(event)) {
     return String(event.timerCanceledEventAttributes.startedEventId);
+  }
+
+  if (isWorkflowExecutionUpdateCompletedEvent(event)) {
+    return String(
+      event.workflowExecutionUpdateCompletedEventAttributes.acceptedEventId,
+    );
   }
 
   return event.id;
