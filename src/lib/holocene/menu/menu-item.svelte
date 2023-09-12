@@ -5,11 +5,11 @@
 
 <script lang="ts">
   import type { HTMLLiAttributes } from 'svelte/elements';
-  
+
   import { createEventDispatcher, getContext } from 'svelte';
-  
+
   import Icon from '$lib/holocene/icon/icon.svelte';
-  
+
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
   type ExtendedLIEvent = KeyboardEvent & {
@@ -33,7 +33,7 @@
 
   let className = '';
   export { className as class };
-  export let selected = false;
+  export let selected = undefined;
   export let destructive = false;
   export let disabled = false;
   export let href = null;
@@ -140,11 +140,13 @@
       {:else}
         <slot />
       {/if}
-      <div class="flex w-6 h-6 shrink-0">
-        {#if selected}
-          <Icon name="checkmark" />
-        {/if}
-      </div>
+      {#if selected !== undefined}
+        <div class="flex w-6 h-6 shrink-0">
+          {#if selected}
+            <Icon name="checkmark" />
+          {/if}
+        </div>
+      {/if}
     </div>
     <slot name="trailing" />
   </li>

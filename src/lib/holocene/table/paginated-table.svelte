@@ -2,7 +2,9 @@
   import { page } from '$app/stores';
 
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
+  import ProgressBar from '$lib/holocene/progress-bar.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import {
     currentPageKey,
@@ -13,8 +15,6 @@
     perPageKey,
   } from '$lib/stores/pagination';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-
-  import ProgressBar from '../progress-bar.svelte';
 
   type Item = $$Generic;
 
@@ -123,28 +123,29 @@
           {#if isNaN(page)}
             <span>...</span>
           {:else}
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
+              active={page === $store.currentPage}
               aria-label={pageButtonLabel(page)}
-              class="page-btn"
-              class:active={page === $store.currentPage}
-              on:click={() => handlePageChange(page)}>{page}</button
+              on:click={() => handlePageChange(page)}>{page}</Button
             >
           {/if}
         {/each}
       </div>
       <div class="paginated-table-controls-end">
-        <button
-          aria-label={previousPageButtonLabel}
+        <IconButton
+          label={previousPageButtonLabel}
           disabled={!$store.hasPrevious}
+          icon="arrow-left"
           on:click={() => handlePageChange($store.currentPage - 1)}
-          class="nav-btn"><Icon name="arrow-left" /></button
-        >
-        <button
-          aria-label={nextPageButtonLabel}
+        />
+        <IconButton
+          label={nextPageButtonLabel}
           disabled={!$store.hasNext}
           on:click={() => handlePageChange($store.currentPage + 1)}
-          class="nav-btn"><Icon name="arrow-right" /></button
-        >
+          icon="arrow-right"
+        />
       </div>
     </div>
   {:else}
@@ -156,7 +157,7 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply border-2 border-primary rounded-lg overflow-scroll;
+    @apply border-2 border-primary rounded-lg overflow-auto;
   }
 
   .paginated-table {
@@ -196,22 +197,10 @@
   }
 
   .paginated-table-controls-center {
-    @apply flex flex-wrap grow flex-row items-center justify-center min-w-fit gap-2 text-sm;
+    @apply flex flex-wrap grow flex-row items-center justify-center min-w-fit gap-4 text-sm;
   }
 
   .paginated-table-controls-end {
-    @apply flex flex-row items-center justify-between lg:justify-end gap-2;
-  }
-
-  .page-btn {
-    @apply w-10 h-10 rounded-lg bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:border-2 focus:border-blue-600;
-  }
-
-  .page-btn.active {
-    @apply bg-gray-100 text-primary;
-  }
-
-  .nav-btn {
-    @apply border border-gray-300 text-gray-700 rounded-lg w-10 h-10 flex items-center justify-center disabled:bg-gray-100 disabled:text-gray-500 disabled:pointer-events-none hover:bg-gray-900 hover:text-white;
+    @apply flex flex-row items-center justify-between lg:justify-end gap-4;
   }
 </style>

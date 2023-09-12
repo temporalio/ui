@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import { onMount } from 'svelte';
+  
+  import { page } from '$app/stores';
   
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
@@ -33,7 +34,7 @@
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
 
   let loading = true;
-  let hash: string = '';
+  let hash = '';
 
   const resetFullHistory = () => {
     $fullEventHistory = [];
@@ -44,22 +45,43 @@
     hash = $page.url.hash;
   });
 
-  $:{
-    if(!loading) {
-      find offsetheight 
-      scrollTo element based on anchor id
-    }
+  $: if (!loading && hash) {
+    scrollIntoView(hash.slice(1));
   }
 
   function scrollIntoView(target) {
-    const element = document.querySelector(`[id='${Number(target)}']`);
-    console.log('target', target);
-    console.log('el', element);
-    if (!element) return;
-    element.scrollIntoView({
-      behavior: 'smooth',
-    });
-  }
+  const element = document.querySelector(`[id='${Number(target)}']`);
+  if (!element) return;
+
+  const elementTop = (element as HTMLElement).offsetTop;
+
+  const windowHeight = window.innerHeight;
+  const offset = (windowHeight - element.clientHeight)/2; 
+  console.log(offset)
+
+  const targetPosition = elementTop - offset;
+  window.scrollTo({
+    top: targetPosition,
+    behavior: 'smooth',
+  });
+}
+
+  // $:{
+  //   if(!loading) {
+  //     find offsetheight 
+  //     scrollTo element based on anchor id
+  //   }
+  // }
+
+  // function scrollIntoView(target) {
+  //   const element = document.querySelector(`[id='${Number(target)}']`);
+  //   console.log('target', target);
+  //   console.log('el', element);
+  //   if (!element) return;
+  //   element.scrollIntoView({
+  //     behavior: 'smooth',
+  //   });
+  // }
 
   const fetchEvents = async (
     namespace: string,

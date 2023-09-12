@@ -80,7 +80,7 @@ export const Strings = {
     'Signaling workflows is not enabled, please contact your administrator for assistance.',
   'terminate-disabled':
     'Terminating workflows is not enabled, please contact your adminstrator for assistance.',
-  'terminate-success': 'Worklfow terminated.',
+  'terminate-success': 'Workflow terminated.',
   'cancel-success': 'Workflow canceled.',
   'signal-success': 'Workflow signaled.',
   'reset-modal-title': 'Reset Workflow',

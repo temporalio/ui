@@ -10,11 +10,12 @@
 </script>
 
 <div class="shortcut-key-button">
-  <Button class="!py-1.5 !px-1" variant="secondary" on:click={onOpen}
-    ><span class="flex h-[24px] w-[24px] items-center justify-center text-xl"
-      >?</span
-    ></Button
-  >
+  <Button
+    size="sm"
+    variant="secondary"
+    leadingIcon="keyboard"
+    on:click={onOpen}
+  />
 </div>
 <Drawer
   {open}
@@ -63,7 +64,7 @@
 
 <style lang="postcss">
   .shortcut-key-button {
-    @apply fixed right-16 bottom-5 z-50;
+    @apply fixed right-24 px-2 bottom-5 z-50;
   }
 
   .cell {

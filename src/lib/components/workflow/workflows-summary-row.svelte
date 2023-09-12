@@ -1,11 +1,14 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { workflowsSearchParams } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
   import { getMilliseconds } from '$lib/utilities/format-time';
@@ -43,7 +46,7 @@
   };
 </script>
 
-<TableRow {href} class="workflow-summary-row">
+<TableRow class="workflow-summary-row">
   <td>
     <WorkflowStatus
       status={workflow.status}
@@ -57,7 +60,12 @@
     on:mouseleave={() => (showFilterCopy = false)}
     on:blur={() => (showFilterCopy = false)}
   >
-    <span class="table-link">{workflow.id}</span>
+    <Link on:click={() => {
+      $workflowsSearchParams = $page.url.searchParams.toString();
+      goto(href)
+    }}>
+      {workflow.id}
+    </Link>
     <FilterOrCopyButtons
       copyIconTitle={translate('copy-icon-title')}
       copySuccessIconTitle={translate('copy-success-icon-title')}

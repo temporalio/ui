@@ -3,6 +3,7 @@
   import { fade } from 'svelte/transition';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { isEventGroup } from '$lib/models/event-groups';
   import {
     eventOrGroupIsCanceled,
@@ -83,9 +84,7 @@
 >
   <td />
   <td class="w-24 text-left">
-    <a class="text-sm text-gray-500 md:text-base" href="#{event.id}"
-      ><p class="truncate">{event.id}</p></a
-    >
+    <Link class="truncate" href="#{event.id}">{event.id}</Link>
   </td>
   <td class="text-left">
     <div class="flex flex-col gap-0">
