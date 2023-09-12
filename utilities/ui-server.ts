@@ -26,7 +26,7 @@ export const createUIServer = async (
 ) => {
   $.cwd = join(process.cwd(), 'server');
 
-  await $`make build`;
+  await $`make build-server`;
 
   const uiServerProcess = $`./ui-server --env ${env} start`.quiet();
   console.log(`✨ ui-server running in ${env} mode on port ${portForEnv(env)}`);
