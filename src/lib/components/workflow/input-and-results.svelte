@@ -3,16 +3,15 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let content: string;
-  export let title: string;
+  export let content: unknown;
+  export let title: unknown;
 
   $: parsedContent = parseContent(content);
   $: showParsedContent = parsedContent.length > 0;
   $: showParsedContentCount = parsedContent.length > 1;
 
-  const parseContent = (c: string): string[] => {
+  const parseContent = (result: unknown): unknown[] => {
     try {
-      const result = JSON.parse(c);
       return Array.isArray(result) ? result : [];
     } catch {
       return [];
@@ -27,12 +26,12 @@
       <Badge type="count" class="rounded-sm">{parsedContent.length}</Badge>
     {/if}
   </h3>
-  {#if content}
+  {#if content || content === null}
     {#if showParsedContent}
       <div class="flex flex-col h-full lg:max-h-[24rem] overflow-scroll">
         {#each parsedContent as content}
           <CodeBlock
-            content={JSON.stringify(content)}
+            {content}
             class="mb-2"
             copyIconTitle={translate('copy-icon-title')}
             copySuccessIconTitle={translate('copy-success-icon-title')}

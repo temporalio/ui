@@ -3,8 +3,8 @@
 
   import WorkflowResetForm from '$lib/components/workflow/workflow-reset-form.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import JSONEditor from '$lib/holocene/json-editor.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
   import Modal from '$lib/holocene/modal.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
@@ -376,11 +376,11 @@
       <span class="font-secondary text-xs font-light italic">
         {translate('workflows', 'signal-payload-input-label-hint')}
       </span>
-      <JSONEditor
+      <CodeBlock
         class="max-h-80 overflow-y-scroll overscroll-contain"
-        value={signalInput}
+        content={signalInput}
         on:change={handleSignalInputChange}
-        readOnly={false}
+        editable
         copyable={false}
       />
     </div>

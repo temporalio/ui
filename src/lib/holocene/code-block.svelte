@@ -1,18 +1,35 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
+  import { historyKeymap, standardKeymap } from '@codemirror/commands';
+  import { json } from '@codemirror/lang-json';
+import {
+    bracketMatching,
+    indentOnInput,
+    indentUnit,
+    syntaxHighlighting,
+  } from '@codemirror/language';
+  import { EditorState } from '@codemirror/state';
+  import { EditorView } from '@codemirror/view';
+  import { keymap } from '@codemirror/view';
+  import _ from 'json-bigint';
+  import { createEventDispatcher, onMount } from 'svelte';
+  
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import {
-    parseWithBigInt,
-    stringifyWithBigInt,
-  } from '$lib/utilities/parse-with-big-int';
+    TEMPORAL_SYNTAX,
+    TEMPORAL_THEME,
+  } from '$lib/vendor/codemirror/theme';
+  
+  import Icon from './icon/icon.svelte';
 
   type BaseProps = HTMLAttributes<HTMLDivElement> & {
     content: Parameters<typeof JSON.stringify>[0];
+    editable?: boolean;
     inline?: boolean;
     language?: string;
-    async?: boolean;
     testId?: string;
     copyable?: boolean;
     copyIconTitle?: string;
@@ -30,86 +47,85 @@
 
   type $$Props = BaseProps | CopyableProps;
 
+  const dispatch = createEventDispatcher<{ change: string }>();
+
   export let content: Parameters<typeof JSON.stringify>[0];
+  let className: string = null;
+  export { className as class };
+  export let editable = false;
   export let inline = false;
   export let language = 'json';
   export let copyable = true;
   export let copyIconTitle = '';
   export let copySuccessIconTitle = '';
-  export let async = true;
 
-  let root: HTMLElement;
-  $: isJSON = language === 'json';
-
-  const formatJSON = (jsonData: string): string => {
-    if (!jsonData) return;
-
-    let parsedData: string;
-    try {
-      parsedData = parseWithBigInt(jsonData);
-    } catch (error) {
-      parsedData = jsonData;
-    }
-
-    return stringifyWithBigInt(parsedData, undefined, inline ? 0 : 2);
-  };
-
-  $: parsedContent = isJSON ? formatJSON(content) : content;
   const { copy, copied } = copyToClipboard();
 
-  function highlight(root: HTMLElement, language: string, source: string) {
-    root.textContent = source;
-    root.classList.forEach((item) => root.classList.remove(item));
-    if (language) {
-      root.classList.add(`language-${language}`);
+  let editor: HTMLElement;
+  let view: EditorView;
+
+  const createEditorView = (): EditorView => {
+    return new EditorView({
+      parent: editor,
+      state: createEditorState(
+        inline
+          ? stringifyWithBigInt(content, undefined, 0)
+          : stringifyWithBigInt(content, undefined, 2),
+      ),
+      dispatch(transaction) {
+        view.update([transaction]);
+        if (transaction.docChanged) {
+          dispatch('change', view.state.doc.toString());
+        }
+      },
+    });
+  };
+
+  const createEditorState = (value: string | null | undefined): EditorState => {
+    const extensions = [
+      keymap.of([...standardKeymap, ...historyKeymap]),
+      TEMPORAL_THEME,
+      syntaxHighlighting(TEMPORAL_SYNTAX, { fallback: true }),
+      indentUnit.of('  '),
+      closeBrackets(),
+      autocompletion(),
+      indentOnInput(),
+      bracketMatching(),
+      EditorView.lineWrapping,
+      EditorState.readOnly.of(!editable),
+    ];
+
+    if (language === 'json') {
+      extensions.push(json());
     }
 
-    window.Prism.highlightElement(root, async);
-  }
+    return EditorState.create({
+      doc: value,
+      extensions,
+    });
+  };
 
-  $: {
-    if (root && window.Prism) {
-      highlight(root, language, parsedContent);
-    }
-  }
+  onMount(() => (view = createEditorView()));
 </script>
 
-{#if parsedContent || parsedContent === null}
+<div class="relative grow min-w-[80px]">
   <div
-    class="w-full rounded-lg {inline
-      ? 'h-auto overflow-auto'
-      : 'h-full'} {$$props.class}"
-    data-testid={$$props.testId}
-  >
-    <div class="relative h-full">
-      <!-- The spacing for this if statement is like this because PRE's honor all whitespace and
-      line breaks so we have this peculiar formatting to preserve this components output -->
-      <pre
-        class="w-full overflow-x-scroll rounded-lg p-4"
-        class:h-full={!inline}><code
-          bind:this={root}
-          class="language-{language}"
-          data-testid={$$props['data-testid']}
-        /></pre>
-
-      {#if copyable}
-        <button
-          on:click={(e) => copy(e, parsedContent)}
-          class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
-        >
-          <Icon
-            title={$copied ? copySuccessIconTitle : copyIconTitle}
-            name={$copied ? 'checkmark' : 'copy'}
-            class="text-white hover:text-gray-900"
-          />
-        </button>
-      {/if}
-    </div>
-  </div>
-{/if}
-
-<style lang="postcss">
-  .inline {
-    @apply top-5 right-2;
-  }
-</style>
+    on:keydown|stopPropagation
+    bind:this={editor}
+    class={className}
+    data-testid={$$props['data-testid']}
+    {...$$restProps}
+  />
+  {#if copyable}
+    <button
+      on:click={(e) => copy(e, JSON.stringify(content, undefined, 2))}
+      class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
+    >
+      <Icon
+        title={$copied ? copySuccessIconTitle : copyIconTitle}
+        name={$copied ? 'checkmark' : 'copy'}
+        class="text-white hover:text-gray-900"
+      />
+    </button>
+  {/if}
+</div>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';

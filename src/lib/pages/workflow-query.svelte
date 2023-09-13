@@ -88,7 +88,7 @@
         />
       </div>
     </div>
-    <div class="flex items-start h-full">
+    <div class="flex items-start h-full my-2">
       {#await queryResult then result}
         <CodeBlock
           content={result}

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable.svelte';
-  import JsonEditor from '$lib/holocene/json-editor.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { format } from '$lib/utilities/format-camel-case';
@@ -37,8 +37,8 @@
       <p class="min-w-fit text-sm">
         {format(key)}
       </p>
-      <JsonEditor
-        value={getCodeBlockValue(value)}
+      <CodeBlock
+        content={getCodeBlockValue(value)}
         {inline}
         copyIconTitle={translate('copy-icon-title')}
         copySuccessIconTitle={translate('copy-success-icon-title')}

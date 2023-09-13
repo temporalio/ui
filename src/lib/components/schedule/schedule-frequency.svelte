@@ -16,7 +16,7 @@
       {inline}
       testId="schedule-calendar"
       language="json"
-      content={JSON.stringify(calendar || interval, null, 2)}
+      content={calendar || interval}
     />
   </div>
 {/key}

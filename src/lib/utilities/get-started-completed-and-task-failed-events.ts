@@ -16,11 +16,10 @@ import {
   isWorkflowExecutionCompletedEvent,
   isWorkflowExecutionContinuedAsNewEvent,
 } from './is-event-type';
-import { stringifyWithBigInt } from './parse-with-big-int';
 
 type WorkflowInputAndResults = {
-  input: string;
-  results: string;
+  input: unknown;
+  results: unknown;
   error: WorkflowTaskFailedEvent;
   contAsNew: boolean;
 };
@@ -83,8 +82,8 @@ const getEventResult = (event: CompletionEvent) => {
 export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   eventHistory: StartAndEndEventHistory,
 ): WorkflowInputAndResults => {
-  let input: string;
-  let results: string;
+  let input: unknown;
+  let results: unknown;
   let error: WorkflowTaskFailedEvent;
   let contAsNew = false;
 
@@ -130,15 +129,14 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   }
 
   if (workflowStartedEvent) {
-    input = stringifyWithBigInt(
+    input =
       workflowStartedEvent?.workflowExecutionStartedEventAttributes?.input
-        ?.payloads ?? null,
-    );
+        ?.payloads ?? null;
   }
 
   if (workflowCompletedEvent) {
     contAsNew = isWorkflowExecutionContinuedAsNewEvent(workflowCompletedEvent);
-    results = stringifyWithBigInt(getEventResult(workflowCompletedEvent));
+    results = getEventResult(workflowCompletedEvent);
   }
 
   if (workflowTaskFailedEvent) {

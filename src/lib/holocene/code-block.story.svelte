@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
 
-  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import CodeBlock from '$lib/holocene/code-block-prism.svelte';
 
   export let Hst: HST;
 </script>
