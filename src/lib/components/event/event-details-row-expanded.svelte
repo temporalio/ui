@@ -40,6 +40,8 @@
         <p class="text-sm">{format(key)}</p>
         <CodeBlock
           content={codeBlockValue}
+          class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
+          {inline}
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
         />
@@ -49,6 +51,7 @@
           <p class="text-sm">Stack trace</p>
           <CodeBlock
             content={stackTrace}
+            language="text"
             class="mb-2 h-full lg:pr-2"
             copyIconTitle={translate('copy-icon-title')}
             copySuccessIconTitle={translate('copy-success-icon-title')}
