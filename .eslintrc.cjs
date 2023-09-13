@@ -37,6 +37,7 @@ module.exports = {
     node: true,
   },
   globals: {
+    // These are needed until https://github.com/sveltejs/eslint-plugin-svelte/issues/348 is resolved
     App: 'readonly',
     $$Generic: 'readonly',
   },
