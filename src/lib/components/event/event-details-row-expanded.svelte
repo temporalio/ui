@@ -51,8 +51,8 @@
           <p class="text-sm">Stack trace</p>
           <CodeBlock
             content={stackTrace}
-            class="mb-2 h-full lg:pr-2"
             language="text"
+            class="mb-2 h-full lg:pr-2"
             copyIconTitle={translate('copy-icon-title')}
             copySuccessIconTitle={translate('copy-success-icon-title')}
           />

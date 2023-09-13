@@ -92,13 +92,13 @@
   </td>
 </TableRow>
 <TableRow class="schedule-spec-row">
-  <td colspan="5" class="hidden !p-0 xl:table-cell">
+  <td colspan="5" class="hidden xl:table-cell">
     <ScheduleFrequency {calendar} {interval} inline class="w-auto text-sm" />
   </td>
-  <td colspan="3" class="hidden !p-0 md:table-cell xl:hidden">
+  <td colspan="3" class="hidden md:table-cell xl:hidden">
     <ScheduleFrequency {calendar} {interval} inline class="w-auto text-sm" />
   </td>
-  <td colspan="2" class="!p-0 md:hidden">
+  <td colspan="2" class="md:hidden">
     <ScheduleFrequency {calendar} {interval} inline class="w-auto text-sm" />
   </td>
 </TableRow>

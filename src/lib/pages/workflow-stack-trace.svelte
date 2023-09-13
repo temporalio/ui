@@ -71,7 +71,7 @@
           {currentdate.toLocaleTimeString()}
         </p>
       </div>
-      <div class="flex h-full items-start">
+      <div class="my-2 flex h-full items-start">
         <CodeBlock
           content={result}
           language="text"

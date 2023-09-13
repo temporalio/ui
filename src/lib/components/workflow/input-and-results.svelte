@@ -32,7 +32,7 @@
       <div class="flex h-full flex-col overflow-scroll lg:max-h-[24rem]">
         {#each parsedContent as content}
           <CodeBlock
-            content={JSON.stringify(content)}
+            {content}
             class="mb-2"
             copyIconTitle={translate('copy-icon-title')}
             copySuccessIconTitle={translate('copy-success-icon-title')}

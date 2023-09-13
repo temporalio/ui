@@ -3,6 +3,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   const format1 = { events: 'HistoryEvent[]' };
   const format2 = 'HistoryEvent[]';
@@ -37,13 +38,13 @@
     </h2>
     <div class="h-40 text-center">
       <CodeBlock
-        content={format1}
+        content={stringifyWithBigInt(format1)}
         inline
         copyIconTitle={translate('copy-icon-title')}
         copySuccessIconTitle={translate('copy-success-icon-title')}
       />
       <CodeBlock
-        content={format2}
+        content={stringifyWithBigInt(format2)}
         inline
         copyIconTitle={translate('copy-icon-title')}
         copySuccessIconTitle={translate('copy-success-icon-title')}
