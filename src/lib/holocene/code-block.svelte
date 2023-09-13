@@ -12,8 +12,7 @@
     syntaxHighlighting,
   } from '@codemirror/language';
   import { EditorState } from '@codemirror/state';
-  import { EditorView } from '@codemirror/view';
-  import { keymap } from '@codemirror/view';
+  import { EditorView, keymap } from '@codemirror/view';
   import { createEventDispatcher, onMount } from 'svelte';
 
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
@@ -137,7 +136,7 @@
     on:keydown|stopPropagation
     bind:this={editor}
     class={className}
-    data-testid={$$props['data-testid']}
+    data-testid={$$props.testId}
     {...$$restProps}
   />
   {#if copyable}
