@@ -137,6 +137,7 @@
     bind:this={editor}
     class={className}
     data-testid={$$props.testId}
+    class:editable
     {...$$restProps}
   />
   {#if copyable}
