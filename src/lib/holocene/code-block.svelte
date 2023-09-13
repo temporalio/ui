@@ -99,7 +99,6 @@
       autocompletion(),
       indentOnInput(),
       bracketMatching(),
-      EditorView.lineWrapping,
       EditorState.readOnly.of(!editable),
     ];
 
@@ -107,8 +106,11 @@
       extensions.push(json());
     }
 
-    if (!editable) {
-      extensions.push(foldGutter());
+    if (!inline) {
+      extensions.push(EditorView.lineWrapping);
+      if (!editable) {
+        extensions.push(foldGutter());
+      }
     }
 
     return EditorState.create({
@@ -138,6 +140,7 @@
     class={className}
     data-testid={$$props.testId}
     class:editable
+    class:readOnly={!editable}
     {...$$restProps}
   />
   {#if copyable}
