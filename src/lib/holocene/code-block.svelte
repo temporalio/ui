@@ -108,9 +108,10 @@
 
     if (!inline) {
       extensions.push(EditorView.lineWrapping);
-      if (!editable) {
-        extensions.push(foldGutter());
-      }
+    }
+
+    if (!inline && !editable) {
+      extensions.push(foldGutter());
     }
 
     return EditorState.create({
