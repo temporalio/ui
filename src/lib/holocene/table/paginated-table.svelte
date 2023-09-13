@@ -157,18 +157,18 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply border-2 border-primary rounded-lg overflow-auto;
+    @apply overflow-auto rounded-lg border-2 border-primary;
   }
 
   .paginated-table {
-    @apply table-auto w-full;
+    @apply w-full table-auto;
   }
 
   .paginated-table-header {
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply bg-primary text-white h-10;
+      @apply h-10 bg-primary text-white;
     }
 
     :global(tr > th) {
@@ -189,7 +189,7 @@
   }
 
   .paginated-table-controls {
-    @apply sticky flex gap-2 grow flex-col lg:flex-row w-full rounded-b bottom-0 left-0 py-2 px-4 bg-white text-primary border-t border-gray-200;
+    @apply sticky bottom-0 left-0 flex w-full grow flex-col gap-2 rounded-b border-t border-gray-200 bg-white py-2 px-4 text-primary lg:flex-row;
   }
 
   .paginated-table-controls-start {
@@ -197,10 +197,10 @@
   }
 
   .paginated-table-controls-center {
-    @apply flex flex-wrap grow flex-row items-center justify-center min-w-fit gap-4 text-sm;
+    @apply flex min-w-fit grow flex-row flex-wrap items-center justify-center gap-4 text-sm;
   }
 
   .paginated-table-controls-end {
-    @apply flex flex-row items-center justify-between lg:justify-end gap-4;
+    @apply flex flex-row items-center justify-between gap-4 lg:justify-end;
   }
 </style>

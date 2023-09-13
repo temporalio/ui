@@ -21,7 +21,7 @@
 </script>
 
 <article class="flex w-full flex-col lg:w-1/2" {...$$restProps}>
-  <h3 class="text-lg flex items-center gap-2 mb-2">
+  <h3 class="mb-2 flex items-center gap-2 text-lg">
     {title}
     {#if showParsedContentCount}
       <Badge type="count" class="rounded-sm">{parsedContent.length}</Badge>
@@ -29,7 +29,7 @@
   </h3>
   {#if content}
     {#if showParsedContent}
-      <div class="flex flex-col h-full lg:max-h-[24rem] overflow-scroll">
+      <div class="flex h-full flex-col overflow-scroll lg:max-h-[24rem]">
         {#each parsedContent as content}
           <CodeBlock
             {content}

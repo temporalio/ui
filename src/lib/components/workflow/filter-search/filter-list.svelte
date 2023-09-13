@@ -106,12 +106,12 @@
             <span class="flex">
               {attribute}
               {conditional}
-              <span class="ml-1 -py-1">
+              <span class="-py-1 ml-1">
                 <WorkflowStatus status={value} />
               </span>
             </span>
           {:else}
-            <span class="max-w-xs md:max-w-lg xl:max-w-2xl truncate">
+            <span class="max-w-xs truncate md:max-w-lg xl:max-w-2xl">
               {attribute}
               {#if isDateTimeFilter(attribute)}
                 {#if customDate}

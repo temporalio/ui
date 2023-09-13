@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
-  
+
   import { omit } from '$lib/utilities/omit';
 
   interface $$Props extends HTMLInputAttributes {

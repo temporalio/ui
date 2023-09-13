@@ -65,7 +65,7 @@
 
 <style lang="postcss">
   .switch {
-    @apply px-2 relative flex items-center rounded min-w-fit cursor-pointer;
+    @apply relative flex min-w-fit cursor-pointer items-center rounded px-2;
 
     &.disabled {
       @apply pointer-events-none;
@@ -89,7 +89,7 @@
   }
 
   .slider {
-    @apply flex relative items-center h-5 w-9 rounded-xl border border-gray-600 bg-gray-50;
+    @apply relative flex h-5 w-9 items-center rounded-xl border border-gray-600 bg-gray-50;
 
     &.hovered:not(.checked) {
       @apply bg-gray-200;
@@ -112,7 +112,7 @@
     }
 
     &.checked {
-      @apply bg-indigo-600 border-indigo-900;
+      @apply border-indigo-900 bg-indigo-600;
     }
   }
 

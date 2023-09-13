@@ -1,9 +1,8 @@
 <script lang="ts">
-  
   import { onDestroy, onMount } from 'svelte';
-  
+
   import { page } from '$app/stores';
-  
+
   import Loading from '$lib/holocene/loading.svelte';
   import Header from '$lib/layouts/workflow-header.svelte';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';

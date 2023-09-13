@@ -5,30 +5,16 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'prettier',
+    'plugin:svelte/prettier',
   ],
-  plugins: ['svelte3', '@typescript-eslint', 'vitest', 'import'],
-  ignorePatterns: ['*.cjs', '/server'],
+  plugins: ['svelte', '@typescript-eslint', 'vitest', 'import'],
+  ignorePatterns: ['**/*.cjs', '/server'],
   overrides: [
     {
-      /**
-       * Right now, we only lint Holocene components due to a previous
-       * configuration issue where we *weren't* linting Svelte components.
-       * Currently, if you try to lint all components, the build *will* fail.
-       * So, we're selectively adding to this list until we get all
-       * components to pass linting.
-       */
       files: ['src/**/*.svelte'],
-      processor: 'svelte3/svelte3',
-      /**
-       * Temporary fix, see the following:
-       *
-       * - https://github.com/sveltejs/kit/issues/5125
-       * - https://stackoverflow.com/questions/75578842/eslint-complains-that-sveltekits-app-namespace-is-not-defined
-       */
-      globals: {
-        App: 'readable',
-        NetworkError: 'readable',
-        NextPageToken: 'readable',
+      parser: 'svelte-eslint-parser',
+      parserOptions: {
+        parser: '@typescript-eslint/parser',
       },
     },
     {
@@ -40,10 +26,8 @@ module.exports = {
       extends: ['plugin:playwright/playwright-test'],
     },
   ],
-  settings: {
-    'svelte3/typescript': () => require('typescript'),
-  },
   parserOptions: {
+    extraFileExtensions: ['.svelte'],
     sourceType: 'module',
     ecmaVersion: 2019,
   },
@@ -52,12 +36,17 @@ module.exports = {
     es2017: true,
     node: true,
   },
+  globals: {
+    // These are needed until https://github.com/sveltejs/eslint-plugin-svelte/issues/348 is resolved
+    App: 'readonly',
+    $$Generic: 'readonly',
+  },
   rules: {
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
         argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
+        varsIgnorePattern: '^_|^\\$\\$(Props|Events|Slots)$',
       },
     ],
     '@typescript-eslint/no-explicit-any': 'error',

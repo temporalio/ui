@@ -2,8 +2,8 @@
   import type { Hst as HST } from '@histoire/plugin-svelte';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
-import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-  
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+
   import Accordion from './accordion.svelte';
   import IconButton from './icon-button.svelte';
   import TableHeaderRow from './table/table-header-row.svelte';

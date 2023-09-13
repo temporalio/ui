@@ -132,7 +132,7 @@
   $: content, language, setView();
 </script>
 
-<div class="relative grow min-w-[80px]">
+<div class="relative min-w-[80px] grow">
   <div
     on:keydown|stopPropagation
     bind:this={editor}

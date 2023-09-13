@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  
+
   import { getContext } from 'svelte';
-  
+
   import { type TabContext, TABS } from './tabs.svelte';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {

@@ -5,11 +5,10 @@
     attributeGroups,
     formatAttributes,
   } from '$lib/utilities/format-event-attributes';
-  
+
   import EventDetailPills from './event-detail-pills.svelte';
   import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
   import EventGroupDetails from './event-group-details.svelte';
-  
 
   export let event: IterableEvent;
   export let currentEvent: WorkflowEvent;

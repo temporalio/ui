@@ -1,13 +1,12 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
-  
+
   import { isEmail } from '../../utilities/is-email';
-  
+
   import ChipInput from './chip-input.svelte';
   import Input from './input.svelte';
   import NumberInput from './number-input.svelte';
   import RangeInput from './range-input.svelte';
-  
 
   export let Hst: HST;
 

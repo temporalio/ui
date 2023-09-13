@@ -47,7 +47,7 @@
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <div class="text-sm truncate">
+      <div class="truncate text-sm">
         <Copyable
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
@@ -71,7 +71,7 @@
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="truncate text-sm">{format(key)}</p>
-      <div class="text-sm truncate">
+      <div class="truncate text-sm">
         <Copyable
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
@@ -95,7 +95,7 @@
   {:else if shouldDisplayAsTaskQueueLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <div class="text-sm truncate">
+      <div class="truncate text-sm">
         <Copyable
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}

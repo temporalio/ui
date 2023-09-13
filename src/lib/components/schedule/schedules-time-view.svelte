@@ -77,7 +77,7 @@
   </div>
   <div class="flex w-full flex-row items-center gap-2">
     <Icon name="clock" aria-hidden="true" />
-    <span class="text-gray-500 font-normal text-xs"
+    <span class="text-xs font-normal text-gray-500"
       >{translate('based-on-time-preface')} Universal Standard Time (UTC)
     </span>
   </div>
