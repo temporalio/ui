@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  
+
   import { routeForLoginPage } from '$lib/utilities/route-for';
 </script>
 
