@@ -2,25 +2,29 @@
 
 ## Prerequisites
 
+### Install the Go compiler
+
+You'll need to have a recent version of the Go language compiler installed locally: https://go.dev/
+
+### Install Protobuf and gRPC
+
+```sh
+brew install grpc protobuf
+```
+
+### Temporal CLI
+
 Temporal must be running in development.
 
 Temporal UI requires [Temporal v1.16.0](https://github.com/temporalio/temporal/releases/tag/v1.16.0) or later.
 
-### Using Temporal CLI
+#### Using Temporal CLI
 
 You can install [Temporal CLI][] using [Homebrew][]:
 
 ```sh
 brew install temporal
 ```
-
-You can start a Temporal server in development using the following command:
-
-```sh
-temporal server start-dev
-```
-
-You can access the UI by visiting `http://localhost:8233`. OpenAPI is accessible at `http://localhost:8233/openapi/`.
 
 [temporal cli]: https://github.com/temporalio/cli
 [homebrew]: https://brew.sh
@@ -39,6 +43,14 @@ pnpm install
 
 Running `pnpm install` will attempt to download and install the most recent version of [Temporal CLI][] into `./bin/cli/temporal`. The development server will attempt to use use this version of this Temporal when starting up.
 
+Optional: you can manually start a Temporal server in development using the following command:
+
+```sh
+temporal server start-dev
+```
+
+You can access the UI by visiting `http://localhost:8233`. OpenAPI is accessible at `http://localhost:8233/openapi/`.
+
 - If that port is already in use, the UI will fallback to trying to talk to whatever process is running on that port.
 - If you do not have a version of Temporal CLI at `./bin/cli/temporal`, the development server will look for a version of Temporal CLI in your path.
 - For Windows users, you will need to start Temporal using one of the methods listed above until we have sufficiently tested this functionality on Windows. (We would absolutely welcome a pull request.)
@@ -56,12 +68,13 @@ make install-utils
 
 This installs various Go dependencies which are required for compiling the gRPC protos for running a local version of the UI server.
 
-
 To run a local development version of the Svelte application via Vite, run `pnpm dev`. The application will run on [http://localhost:3000]() against a local ui-server running along with Temporal server from the temporal-cli.
 
 ```bash
 pnpm dev
 ```
+
+
 
 Alternatively, you can run `pnpm dev:temporal-cli` to run against the version of ui-server and Temporal server included temporal-cli.
 ```bash
