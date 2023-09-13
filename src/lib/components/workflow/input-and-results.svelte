@@ -2,16 +2,18 @@
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  export let content: unknown;
-  export let title: unknown;
+  export let content: string;
+  export let title: string;
 
   $: parsedContent = parseContent(content);
   $: showParsedContent = parsedContent.length > 0;
   $: showParsedContentCount = parsedContent.length > 1;
 
-  const parseContent = (result: unknown): unknown[] => {
+  const parseContent = (c: string): string[] => {
     try {
+      const result = JSON.parse(c);
       return Array.isArray(result) ? result : [];
     } catch {
       return [];
@@ -31,7 +33,7 @@
       <div class="flex flex-col h-full lg:max-h-[24rem] overflow-scroll">
         {#each parsedContent as content}
           <CodeBlock
-            {content}
+            content={stringifyWithBigInt(content)}
             class="mb-2"
             copyIconTitle={translate('copy-icon-title')}
             copySuccessIconTitle={translate('copy-success-icon-title')}
@@ -40,7 +42,7 @@
       </div>
     {:else}
       <CodeBlock
-        {content}
+        content={stringifyWithBigInt(content)}
         class="mb-2 lg:max-h-[23.5rem]"
         copyIconTitle={translate('copy-icon-title')}
         copySuccessIconTitle={translate('copy-success-icon-title')}

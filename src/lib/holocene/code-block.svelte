@@ -4,8 +4,9 @@
   import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
   import { historyKeymap, standardKeymap } from '@codemirror/commands';
   import { json } from '@codemirror/lang-json';
-import {
+  import {
     bracketMatching,
+    foldGutter,
     indentOnInput,
     indentUnit,
     syntaxHighlighting,
@@ -13,43 +14,40 @@ import {
   import { EditorState } from '@codemirror/state';
   import { EditorView } from '@codemirror/view';
   import { keymap } from '@codemirror/view';
-  import _ from 'json-bigint';
   import { createEventDispatcher, onMount } from 'svelte';
-  
+
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
-  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import {
+    parseWithBigInt,
+    stringifyWithBigInt,
+  } from '$lib/utilities/parse-with-big-int';
   import {
     TEMPORAL_SYNTAX,
     TEMPORAL_THEME,
   } from '$lib/vendor/codemirror/theme';
-  
+
   import Icon from './icon/icon.svelte';
 
   type BaseProps = HTMLAttributes<HTMLDivElement> & {
-    content: Parameters<typeof JSON.stringify>[0];
+    content: string;
+    language?: 'json' | 'text';
     editable?: boolean;
     inline?: boolean;
-    language?: string;
     testId?: string;
     copyable?: boolean;
-    copyIconTitle?: string;
-    copySuccessIconTitle?: string;
   };
 
-  type CopyableProps = Omit<
-    BaseProps,
-    'copyable' | 'copyIconTitle' | 'copySuccessIconTitle'
-  > & {
-    copyable: false;
-    copyIconTitle?: never;
-    copySuccessIconTitle?: never;
+  type CopyableProps = BaseProps & {
+    copyable: true;
+    copyIconTitle: string;
+    copySuccessIconTitle: string;
   };
 
   type $$Props = BaseProps | CopyableProps;
 
   const dispatch = createEventDispatcher<{ change: string }>();
 
-  export let content: Parameters<typeof JSON.stringify>[0];
+  export let content: string;
   let className: string = null;
   export { className as class };
   export let editable = false;
@@ -64,14 +62,25 @@ import {
   let editor: HTMLElement;
   let view: EditorView;
 
+  const formatJSON = (jsonData: string): string => {
+    if (!jsonData) return;
+
+    let parsedData: string;
+    try {
+      parsedData = parseWithBigInt(jsonData);
+    } catch (error) {
+      parsedData = jsonData;
+    }
+
+    return stringifyWithBigInt(parsedData, undefined, inline ? 0 : 2);
+  };
+
+  $: value = language === 'json' ? formatJSON(content) : content;
+
   const createEditorView = (): EditorView => {
     return new EditorView({
       parent: editor,
-      state: createEditorState(
-        inline
-          ? stringifyWithBigInt(content, undefined, 0)
-          : stringifyWithBigInt(content, undefined, 2),
-      ),
+      state: createEditorState(value),
       dispatch(transaction) {
         view.update([transaction]);
         if (transaction.docChanged) {
@@ -99,13 +108,28 @@ import {
       extensions.push(json());
     }
 
+    if (!editable) {
+      extensions.push(foldGutter());
+    }
+
     return EditorState.create({
       doc: value,
       extensions,
     });
   };
 
-  onMount(() => (view = createEditorView()));
+  onMount(() => {
+    view = createEditorView();
+  });
+
+  const setView = () => {
+    if (view && !editable) {
+      const newState = createEditorState(value);
+      view.setState(newState);
+    }
+  };
+
+  $: content, language, setView();
 </script>
 
 <div class="relative grow min-w-[80px]">
@@ -118,7 +142,7 @@ import {
   />
   {#if copyable}
     <button
-      on:click={(e) => copy(e, JSON.stringify(content, undefined, 2))}
+      on:click={(e) => copy(e, stringifyWithBigInt(content, undefined, 2))}
       class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
     >
       <Icon

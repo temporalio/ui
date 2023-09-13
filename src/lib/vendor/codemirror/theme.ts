@@ -34,6 +34,14 @@ export const TEMPORAL_THEME = EditorView.theme(
     '&.cm-focused .cm-selectionBackground, ::selection': {
       backgroundColor: colors.gray['700'],
     },
+    '.cm-gutters': {
+      backgroundColor: 'transparent',
+      color: colors.white,
+      borderRight: 'none',
+    },
+    '.cm-line': {
+      color: '#ccc',
+    },
   },
   { dark: false },
 );

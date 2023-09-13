@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
 
-  import CodeBlock from '$lib/holocene/code-block-prism.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   export let Hst: HST;
 </script>
@@ -9,7 +10,7 @@
 <Hst.Story>
   <Hst.Variant title="A json code block">
     <CodeBlock
-      content={{ foo: 'bar', baz: false, blue: 42 }}
+      content={stringifyWithBigInt({ foo: 'bar', baz: false, blue: 42 })}
       copyIconTitle="Click to copy content"
       copySuccessIconTitle="Content copied to clipboard"
     />
@@ -17,7 +18,7 @@
 
   <Hst.Variant title="An inline json code block">
     <CodeBlock
-      content={[
+      content={stringifyWithBigInt([
         '12345678',
         '56781234',
         '12345678',
@@ -28,7 +29,7 @@
         '56781234',
         '12345678',
         '56781234',
-      ]}
+      ])}
       inline
       copyIconTitle="Click to copy content"
       copySuccessIconTitle="Content copied to clipboard"
