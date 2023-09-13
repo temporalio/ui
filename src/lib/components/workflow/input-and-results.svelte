@@ -27,7 +27,7 @@
       <Badge type="count" class="rounded-sm">{parsedContent.length}</Badge>
     {/if}
   </h3>
-  {#if content || content === null}
+  {#if content}
     {#if showParsedContent}
       <div class="flex flex-col h-full lg:max-h-[24rem] overflow-scroll">
         {#each parsedContent as content}
