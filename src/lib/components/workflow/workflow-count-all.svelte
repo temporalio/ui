@@ -13,25 +13,17 @@
   );
 </script>
 
-<button
-  class="count-card w-32 min-w-fit flex flex-row lg:flex-col items-center lg:items-end gap-2 lg:gap-0 cursor-pointer py-1 px-2 lg:py-2 lg:px-4 border-2 border-gray-900 rounded-lg bg-white"
-  class:active
-  on:click={() => onStatusClick('all')}
-  on:keypress={() => onStatusClick('all')}
->
-  <div class="h-8 flex flex-col items-center">
+<div class="flex h-6 text-center text-sm font-medium leading-4">
+  <span
+    class="flex items-center whitespace-nowrap rounded-sm px-1 py-0.5 font-secondary"
+  >
     {#if $loading || $updating}
-      <Spinner class="w-6 h-6 animate-spin" />
+      <Spinner class="h-6 w-6 animate-spin" />
     {:else}
-      <p class="font-mono text-sm lg:text-lg">{count.toLocaleString()}</p>
+      {count.toLocaleString()} Total
     {/if}
-  </div>
-  {#if hasNonStatusQuery}
-    <div class="flex gap-1">Filtered</div>
-  {:else}
-    <p class="font-primary text-sm lg:text-lg">All</p>
-  {/if}
-</button>
+  </span>
+</div>
 
 <style lang="postcss">
   .active {

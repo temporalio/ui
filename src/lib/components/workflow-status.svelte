@@ -12,6 +12,7 @@
 
   export let delay = 0;
   export let status: Status = 'Running';
+  export let count: number | undefined = undefined;
 
   const label: Record<Status, string> = {
     Running: translate('workflows', 'running'),
@@ -68,6 +69,9 @@
 
 <div class="flex text-center text-sm font-medium leading-4">
   <span class={workflowStatus({ status })}>
+    {#if count || count === 0}
+      {count}
+    {/if}
     {label[status]}
     {#if status === 'Running'}
       <HeartBeat {delay} />

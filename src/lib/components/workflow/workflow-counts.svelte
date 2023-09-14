@@ -132,7 +132,7 @@
 </script>
 
 {#if groupByCountEnabled}
-  <div class="flex gap-2 lg:gap-4 flex-wrap">
+  <div class="flex flex flex-wrap gap-1">
     <WorkflowCountAll
       count={totalCount}
       {onStatusClick}

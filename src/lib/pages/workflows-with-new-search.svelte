@@ -229,49 +229,51 @@
   on:confirm={cancelWorkflows}
 />
 
-<header class="flex justify-between items-center">
-  <div>
-    <h1 class="text-2xl" data-cy="workflows-title">
-      <Translate namespace="workflows" key="recent-workflows" />
-    </h1>
-    <div class="flex items-center gap-2 text-sm">
-      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !groupByCountEnabled}
-        <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
-          {#if $loading || $updating}
-            <Translate namespace="workflows" key="loading-workflows" />
-          {:else if query}
-            <Translate
-              namespace="workflows"
-              key="filtered-workflows-count"
-              replace={{
-                filtered: $workflowCount.count,
-                total: $workflowCount.totalCount,
-              }}
-            />
-          {:else}
-            <Translate
-              namespace="workflows"
-              key="workflows-count"
-              count={$workflowCount.totalCount}
-            />
-          {/if}
-        </p>
-      {/if}
+<div class="flex flex-col gap-0">
+  <header class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl" data-cy="workflows-title">
+        <Translate namespace="workflows" key="recent-workflows" />
+      </h1>
+      <div class="flex items-center gap-2 text-sm">
+        {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !groupByCountEnabled}
+          <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
+            {#if $loading || $updating}
+              <Translate namespace="workflows" key="loading-workflows" />
+            {:else if query}
+              <Translate
+                namespace="workflows"
+                key="filtered-workflows-count"
+                replace={{
+                  filtered: $workflowCount.count,
+                  total: $workflowCount.totalCount,
+                }}
+              />
+            {:else}
+              <Translate
+                namespace="workflows"
+                key="workflows-count"
+                count={$workflowCount.totalCount}
+              />
+            {/if}
+          </p>
+        {/if}
+      </div>
     </div>
-  </div>
-  <div class="flex gap-2 text-sm">
-    <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
-      >{translate('download-json')}</Link
-    >
-    <IconButton
-      icon="retry"
-      label={translate('workflows', 'retry-workflows')}
-      on:click={refreshWorkflows}
-    />
-  </div>
-</header>
-<WorkflowCounts />
-<div class="flex flex-col md:flex-row gap-2">
+    <div class="flex gap-2 text-sm">
+      <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
+        >{translate('download-json')}</Link
+      >
+      <IconButton
+        icon="retry"
+        label={translate('workflows', 'retry-workflows')}
+        on:click={refreshWorkflows}
+      />
+    </div>
+  </header>
+  <WorkflowCounts />
+</div>
+<div class="flex flex-col gap-2 md:flex-row">
   <LabsModeGuard>
     <svelte:fragment slot="fallback">
       <WorkflowAdvancedSearch />
