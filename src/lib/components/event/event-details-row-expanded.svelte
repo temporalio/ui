@@ -20,6 +20,8 @@
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
 
+  import PayloadDecoder from './payload-decoder.svelte';
+
   export let key: string;
   export let value: string | Record<string, unknown>;
   export let attributes: CombinedAttributes;
@@ -38,13 +40,25 @@
     >
       <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
         <p class="text-sm">{format(key)}</p>
-        <CodeBlock
-          content={codeBlockValue}
-          class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
-          {inline}
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
-        />
+        <!-- {#if value?.payloads} -->
+        <PayloadDecoder {value} let:decodedValue>
+          <CodeBlock
+            content={decodedValue}
+            class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
+            {inline}
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
+          />
+        </PayloadDecoder>
+        <!-- {:else}
+          <CodeBlock
+            content={codeBlockValue}
+            class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
+            {inline}
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
+          />
+        {/if} -->
       </div>
       {#if stackTrace && !inline}
         <div class="flex flex-col lg:w-1/2">

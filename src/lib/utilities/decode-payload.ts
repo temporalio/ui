@@ -19,7 +19,7 @@ import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
 
-type PotentiallyDecodable =
+export type PotentiallyDecodable =
   | Record<string | number | symbol, unknown>
   | EventAttribute;
 

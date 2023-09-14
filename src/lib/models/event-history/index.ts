@@ -9,6 +9,7 @@ import type {
   EventsWithMetadata,
   EventType,
   EventWithMetadata,
+  HistoryEvent,
   WorkflowEvent,
   WorkflowEvents,
 } from '$lib/types/events';
@@ -80,23 +81,22 @@ export async function getEventAttributes(
   };
 }
 
-export const toEvent = async ({
-  historyEvent,
-  namespace,
-  settings,
-  accessToken,
-}: EventWithMetadata): Promise<WorkflowEvent> => {
+export const toEvent = async (
+  historyEvent: HistoryEvent,
+): Promise<WorkflowEvent> => {
   const id = String(historyEvent.eventId);
   const eventType = historyEvent.eventType as unknown as EventType;
   const timestamp = formatDate(String(historyEvent.eventTime));
   const classification = getEventClassification(eventType);
   const category = getEventCategory(eventType);
-  const attributes = await getEventAttributes({
-    historyEvent,
-    namespace,
-    settings,
-    accessToken,
-  }).then((attributes) => simplifyAttributes(attributes));
+  const { key, attributes } = findAttributesAndKey(historyEvent);
+
+  // const attributes = await getEventAttributes({
+  //   historyEvent,
+  //   namespace,
+  //   settings,
+  //   accessToken,
+  // }).then((attributes) => simplifyAttributes(attributes));
 
   return {
     ...historyEvent,
@@ -106,7 +106,7 @@ export const toEvent = async ({
     timestamp,
     classification,
     category,
-    attributes,
+    attributes: simplifyAttributes({ type: key, ...attributes }),
   };
 };
 
@@ -116,11 +116,8 @@ export const toEventHistory = async ({
   settings,
   accessToken,
 }: EventsWithMetadata): Promise<WorkflowEvents> => {
-  return await Promise.all(
-    response.map((historyEvent) =>
-      toEvent({ historyEvent, namespace, settings, accessToken }),
-    ),
-  );
+  console.log(namespace, settings, accessToken);
+  return await Promise.all(response.map(toEvent));
 };
 
 export const isEvent = (event: unknown): event is WorkflowEvent => {

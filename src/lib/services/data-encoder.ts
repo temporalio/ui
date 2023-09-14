@@ -6,7 +6,7 @@ import type { Settings } from '$lib/types/global';
 import { validateHttps } from '$lib/utilities/is-http';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-type PotentialPayloads = { payloads: unknown[] };
+export type PotentialPayloads = { payloads: unknown[] };
 
 export async function convertPayloadsWithCodec({
   payloads,
