@@ -6,6 +6,7 @@ import type {
   StartChildWorkflowExecutionInitiatedEvent,
   TimerStartedEvent,
   WorkflowExecutionSignaledEvent,
+  WorkflowExecutionUpdateAcceptedEvent,
 } from '$lib/types/events';
 import {
   isActivityTaskScheduledEvent,
@@ -15,6 +16,7 @@ import {
   isStartChildWorkflowExecutionInitiatedEvent,
   isTimerStartedEvent,
   isWorkflowExecutionSignaledEvent,
+  isWorkflowExecutionUpdateAcceptedEvent,
 } from '$lib/utilities/is-event-type';
 
 import type { EventGroup } from './event-groups';
@@ -35,28 +37,51 @@ type StartingEvents = {
   SignalReceived: WorkflowExecutionSignaledEvent;
   LocalActivity: MarkerRecordedEvent;
   Marker: MarkerRecordedEvent;
+  Update: WorkflowExecutionUpdateAcceptedEvent;
+};
+
+const getInitialEvent = (
+  event: CommonHistoryEvent,
+  events?: CommonHistoryEvent[],
+) => {
+  if (events?.length && isWorkflowExecutionUpdateAcceptedEvent(event)) {
+    return events.find(
+      (e) =>
+        e.id ===
+        event.workflowExecutionUpdateAcceptedEventAttributes?.acceptedRequestSequencingEventId.toString(),
+    );
+  }
+  return event;
 };
 
 const createGroupFor = <K extends keyof StartingEvents>(
   event: StartingEvents[K],
+  events?: CommonHistoryEvent[],
 ): EventGroup => {
   const id = getGroupId(event);
   const name = getEventGroupName(event);
   const { timestamp, category, classification } = event;
 
-  const initialEvent = event;
+  const initialEvent = getInitialEvent(event, events);
 
-  const events: EventGroup['events'] = new Map();
-  const eventIds: EventGroup['eventIds'] = new Set();
+  const groupEvents: EventGroup['events'] = new Map();
+  const groupEventIds: EventGroup['eventIds'] = new Set();
 
-  events.set(event.id, event);
-  eventIds.add(event.id);
+  if (initialEvent && isWorkflowExecutionUpdateAcceptedEvent(event)) {
+    groupEvents.set(initialEvent.id, initialEvent);
+    groupEvents.set(event.id, event);
+    groupEventIds.add(initialEvent.id);
+    groupEventIds.add(event.id);
+  } else {
+    groupEvents.set(event.id, event);
+    groupEventIds.add(event.id);
+  }
 
   return {
     id,
     name,
-    events,
-    eventIds,
+    events: groupEvents,
+    eventIds: groupEventIds,
     initialEvent,
     timestamp,
     category,
@@ -85,7 +110,10 @@ const createGroupFor = <K extends keyof StartingEvents>(
   };
 };
 
-export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
+export const createEventGroup = (
+  event: CommonHistoryEvent,
+  events?: CommonHistoryEvent[],
+): EventGroup => {
   if (isActivityTaskScheduledEvent(event))
     return createGroupFor<'Activity'>(event);
 
@@ -106,4 +134,7 @@ export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
     }
     return createGroupFor<'Marker'>(event);
   }
+
+  if (isWorkflowExecutionUpdateAcceptedEvent(event))
+    return createGroupFor<'Update'>(event, events);
 };
