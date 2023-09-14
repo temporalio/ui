@@ -88,8 +88,10 @@
   } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
-  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    toListWorkflowFilters,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);

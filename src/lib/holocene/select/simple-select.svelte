@@ -1,10 +1,9 @@
 <script lang="ts">
   import type { HTMLSelectAttributes } from 'svelte/elements';
-  
+
   import type { SelectOptionValue } from '$lib/types/global';
-  
+
   import Option from './simple-option.svelte';
-  
 
   interface $$Props extends HTMLSelectAttributes {
     id: string;

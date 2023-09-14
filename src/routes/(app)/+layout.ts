@@ -16,8 +16,6 @@ import {
 } from '$lib/utilities/auth-user-cookie';
 import { isAuthorized } from '$lib/utilities/is-authorized';
 import { routeForLoginPage } from '$lib/utilities/route-for';
-import '$lib/vendor/prism/prism.css';
-import '$lib/vendor/prism/prism.cjs';
 
 import '../../app.css';
 

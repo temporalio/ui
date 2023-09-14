@@ -1,10 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  
+
   import { goto } from '$app/navigation';
-  
+
   import type { PageData } from './$types';
-  
 
   import Loading from '$lib/holocene/loading.svelte';
   import { fetchWorkflowForAuthorization } from '$lib/services/workflow-service';
@@ -25,9 +24,8 @@
 
   onMount(async () => {
     try {
-      const { authorized } = await fetchWorkflowForAuthorization(
-        namespaceToRedirect,
-      );
+      const { authorized } =
+        await fetchWorkflowForAuthorization(namespaceToRedirect);
       if (authorized) {
         goto(routeForWorkflows({ namespace: namespaceToRedirect }));
       } else {

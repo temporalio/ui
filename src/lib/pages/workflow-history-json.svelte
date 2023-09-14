@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import WorkflowJsonNavigator from '$lib/components/workflow/workflow-json-navigator.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { fetchAllEvents, fetchRawEvents } from '$lib/services/events-service';

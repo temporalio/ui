@@ -125,7 +125,7 @@
 
 <style lang="postcss">
   .select-input {
-    @apply w-full bg-white pointer-events-none;
+    @apply pointer-events-none w-full bg-white;
   }
 
   .select-input.disabled {

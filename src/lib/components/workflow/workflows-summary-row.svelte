@@ -60,10 +60,12 @@
     on:mouseleave={() => (showFilterCopy = false)}
     on:blur={() => (showFilterCopy = false)}
   >
-    <Link on:click={() => {
-      $workflowsSearchParams = $page.url.searchParams.toString();
-      goto(href)
-    }}>
+    <Link
+      on:click={() => {
+        $workflowsSearchParams = $page.url.searchParams.toString();
+        goto(href);
+      }}
+    >
       {workflow.id}
     </Link>
     <FilterOrCopyButtons

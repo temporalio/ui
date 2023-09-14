@@ -17,6 +17,7 @@
     formatRetryExpiration,
   } from '$lib/utilities/format-event-attributes';
   import { formatDuration, getDuration } from '$lib/utilities/format-time';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   $: pendingActivities = $workflowRun.workflow?.pendingActivities;
@@ -88,7 +89,7 @@
                   <CodeBlock
                     slot="value"
                     class="pb-2"
-                    content={details.heartbeatDetails}
+                    content={stringifyWithBigInt(details.heartbeatDetails)}
                     copyIconTitle={translate('copy-icon-title')}
                     copySuccessIconTitle={translate('copy-success-icon-title')}
                   />
@@ -100,7 +101,7 @@
                   <CodeBlock
                     slot="value"
                     class="pb-2"
-                    content={details.lastFailure}
+                    content={stringifyWithBigInt(details.lastFailure)}
                     copyIconTitle={translate('copy-icon-title')}
                     copySuccessIconTitle={translate('copy-success-icon-title')}
                   />
