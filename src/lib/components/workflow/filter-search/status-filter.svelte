@@ -14,8 +14,9 @@
     MenuDivider,
     MenuItem,
   } from '$lib/holocene/menu';
+  import Translate from '$lib/i18n/translate.svelte';
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
-  import { workflowStatuses } from '$lib/models/workflow-status';
+  import { workflowStatusFilters } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
   import { labsMode } from '$lib/stores/labs-mode';
   import { isStatusFilter } from '$lib/utilities/query/filter-search';
@@ -57,7 +58,11 @@
   }
 
   const onStatusClick = (status: string) => {
-    if (statusFilters.find((s) => s.value === status)) {
+    if (status === 'All') {
+      filters = $workflowFilters.filter(
+        (f) => f.attribute !== 'ExecutionStatus',
+      );
+    } else if (statusFilters.find((s) => s.value === status)) {
       const nonStatusFilters = $workflowFilters.filter(
         (f) => !isStatusFilter(f.attribute),
       );
@@ -97,8 +102,10 @@
     {$filter.attribute}
   </MenuButton>
   <Menu id="status-menu" keepOpen>
-    {#each workflowStatuses as status (status)}
-      {@const checked = statusFilters.some((filter) => filter.value === status)}
+    {#each workflowStatusFilters as status (status)}
+      {@const checked =
+        statusFilters.some((filter) => filter.value === status) ||
+        (!statusFilters.length && status === 'All')}
       <MenuItem
         data-testid={status}
         on:click={() => {
@@ -112,7 +119,11 @@
           label={status}
           labelHidden
         />
-        <WorkflowStatus {status} />
+        {#if status === 'All'}
+          <Translate namespace="workflows" key="all-statuses" />
+        {:else}
+          <WorkflowStatus {status} />
+        {/if}
       </MenuItem>
     {/each}
     <MenuDivider />
