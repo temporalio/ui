@@ -14,7 +14,6 @@
     MenuDivider,
     MenuItem,
   } from '$lib/holocene/menu';
-  import { translate } from '$lib/i18n/translate';
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { workflowStatuses } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
@@ -31,10 +30,9 @@
     isStatusFilter(filter.attribute),
   );
 
-  function onApply() {
+  function apply() {
     $workflowFilters = filters;
     updateQueryParamsFromFilter($page.url, $workflowFilters, $labsMode);
-    resetFilter();
   }
 
   function mapStatusToFilter(value: string) {
@@ -85,11 +83,17 @@
         ];
       }
     }
+    apply();
   };
 </script>
 
-<MenuContainer {open}>
-  <MenuButton controls="status-menu">
+<MenuContainer {open} on:close={resetFilter}>
+  <MenuButton
+    controls="status-menu"
+    on:click={() => {
+      if ($open) resetFilter();
+    }}
+  >
     {$filter.attribute}
   </MenuButton>
   <Menu id="status-menu" keepOpen>
@@ -112,8 +116,5 @@
       </MenuItem>
     {/each}
     <MenuDivider />
-    <MenuItem centered disabled={statusFilters.length === 0} on:click={onApply}
-      >{translate('apply')}</MenuItem
-    >
   </Menu>
 </MenuContainer>
