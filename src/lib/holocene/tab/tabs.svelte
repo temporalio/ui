@@ -13,11 +13,10 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
   import { type Writable, writable } from 'svelte/store';
-  
-  import { onDestroy, setContext } from 'svelte';
-  
 
-  type $$Props = HTMLAttributes<HTMLDivElement>
+  import { onDestroy, setContext } from 'svelte';
+
+  type $$Props = HTMLAttributes<HTMLDivElement>;
 
   const tabs: string[] = [];
   const panels: string[] = [];

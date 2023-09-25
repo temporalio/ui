@@ -39,7 +39,7 @@
 
 <style lang="postcss">
   .link {
-    @apply cursor-pointer underline inline-flex gap-2 items-center max-w-fit rounded underline-offset-2 hover:text-indigo-600 focus-visible:bg-blue-100 focus-visible:outline-none focus-visible:shadow-focus focus-visible:shadow-blue-600/50;
+    @apply inline-flex max-w-fit cursor-pointer items-center gap-2 rounded underline underline-offset-2 hover:text-indigo-600 focus-visible:bg-blue-100 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
 
     &.active {
       @apply text-blue-900;

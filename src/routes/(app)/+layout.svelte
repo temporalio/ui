@@ -105,7 +105,7 @@
     <TopNavigation {logout} {namespaceList} />
     <div
       slot="main"
-      class="flex w-full flex-col gap-4 p-8 h-[calc(100%-2.5rem)]"
+      class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-8"
     >
       <ErrorBoundary onError={() => {}}>
         <slot />

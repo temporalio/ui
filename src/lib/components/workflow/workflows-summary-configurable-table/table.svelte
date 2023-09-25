@@ -30,10 +30,10 @@
 
 <style lang="postcss">
   .workflows-summary-table {
-    @apply table-fixed w-auto;
+    @apply w-auto table-fixed;
 
     &:not(.pinned) {
-      @apply table-auto w-full;
+      @apply w-full table-auto;
     }
   }
 </style>

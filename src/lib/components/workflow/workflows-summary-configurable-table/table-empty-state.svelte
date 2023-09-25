@@ -27,11 +27,11 @@
   <link rel="preload" as="image" href={emptyImage} />
 </svelte:head>
 <div
-  class="flex flex-col xl:flex-row w-full h-auto overflow-hidden"
+  class="flex h-auto w-full flex-col overflow-hidden xl:flex-row"
   aria-live="polite"
 >
   <div
-    class="w-auto min-w-[280px] xl:min-w-[520px] p-8 flex flex-col gap-4 bg-white border-b-2 xl:border-b-0 xl:border-r-2 border-gray-900"
+    class="flex w-auto min-w-[280px] flex-col gap-4 border-b-2 border-gray-900 bg-white p-8 xl:min-w-[520px] xl:border-b-0 xl:border-r-2"
   >
     {#if updating}
       <Loading />

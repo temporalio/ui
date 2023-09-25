@@ -15,6 +15,7 @@
     formatRetryExpiration,
   } from '$lib/utilities/format-event-attributes';
   import { formatDuration, getDuration } from '$lib/utilities/format-time';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { routeForPendingActivities } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
@@ -129,7 +130,9 @@
                     </h4>
                     <CodeBlock
                       class="max-h-32"
-                      content={pendingActivity.heartbeatDetails}
+                      content={stringifyWithBigInt(
+                        pendingActivity.heartbeatDetails,
+                      )}
                       copyIconTitle={translate('copy-icon-title')}
                       copySuccessIconTitle={translate(
                         'copy-success-icon-title',
@@ -144,7 +147,7 @@
                     </h4>
                     <CodeBlock
                       class="max-h-32"
-                      content={pendingActivity.lastFailure}
+                      content={stringifyWithBigInt(pendingActivity.lastFailure)}
                       copyIconTitle={translate('copy-icon-title')}
                       copySuccessIconTitle={translate(
                         'copy-success-icon-title',
@@ -158,7 +161,7 @@
         </div>
       {/each}
     </div>
-    <div class="text-right mt-2">
+    <div class="mt-2 text-right">
       <Link {href}>{translate('workflows', 'pending-activities-link')}</Link>
     </div>
   </section>
