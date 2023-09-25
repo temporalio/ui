@@ -149,7 +149,7 @@
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "cssnano": "^5.1.14",
-    "cypress": "^9.7.0",
+    "cypress": "^13.2.0",
     "esbuild": "^0.13.15",
     "eslint": "^8.47.0",
     "eslint-config-prettier": "^9.0.0",
