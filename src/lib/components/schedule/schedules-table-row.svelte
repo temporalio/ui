@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -17,7 +18,6 @@
   } from '$lib/utilities/route-for';
   
   import ScheduleFrequency from './schedule-frequency.svelte';
-  
   
   import type { ScheduleActionResult, ScheduleListEntry } from '$types';
 
@@ -47,15 +47,19 @@
   });
 </script>
 
-<TableRow href={route} class="schedule-row">
+<TableRow class="schedule-row">
   <td class="cell">
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </td>
   <td class="cell whitespace-pre-line break-words">
-    <p class="text-base">{schedule.scheduleId}</p>
-    <p>
-      <ScheduleFrequency {calendar} {interval} class="text-sm" />
-    </p>
+    <Link
+      class="text-base"
+      on:click={() => {
+        goto(route);
+      }}
+    >
+      {schedule.scheduleId}
+    </Link>
   </td>
   <td class="cell whitespace-pre-line break-words max-md:hidden">
     {schedule?.info?.workflowType?.name ?? ''}
@@ -87,9 +91,24 @@
     {/each}
   </td>
 </TableRow>
+<TableRow class="schedule-spec-row">
+  <td colspan="5" class="hidden xl:table-cell !p-0">
+    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  </td>
+  <td colspan="3" class="hidden md:table-cell xl:hidden !p-0">
+    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  </td>
+  <td colspan="2" class="md:hidden !p-0">
+    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  </td>
+</TableRow>
 
 <style lang="postcss">
   .cell {
     @apply p-2 text-left;
+  }
+
+  :global(.schedule-spec-row td) {
+    @apply !border-t-0;
   }
 </style>

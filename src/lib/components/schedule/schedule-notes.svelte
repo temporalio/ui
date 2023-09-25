@@ -4,5 +4,7 @@
   export let notes = '';
 </script>
 
-<h2 class="mb-4 text-2xl">{translate('memo')}</h2>
-<p>{notes}</p>
+<div>
+  <h2 class="mb-4 text-2xl">{translate('notes')}</h2>
+  <p>{notes}</p>
+</div>

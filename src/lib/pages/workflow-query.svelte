@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
-  
+
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -73,7 +72,7 @@
         </Select>
         <Button
           on:click={() => query(queryType)}
-          icon="retry"
+          leadingIcon="retry"
           loading={isLoading}
         >
           {translate('refresh')}
@@ -94,6 +93,8 @@
         <CodeBlock
           content={result}
           language={jsonFormatting ? 'json' : 'text'}
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
         />
       {/await}
     </div>

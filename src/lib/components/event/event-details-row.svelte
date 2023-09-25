@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -38,17 +37,22 @@
       <p class="min-w-fit text-sm">
         {format(key)}
       </p>
-      <CodeBlock content={getCodeBlockValue(value)} {inline} />
+      <CodeBlock
+        content={getCodeBlockValue(value)}
+        {inline}
+        copyIconTitle={translate('copy-icon-title')}
+        copySuccessIconTitle={translate('copy-success-icon-title')}
+      />
     </div>
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <div class="truncate text-sm">
+      <div class="text-sm truncate">
         <Copyable
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class=" xl:flex-row"
+          container-class="xl:flex-row h-12 pr-1"
         >
           <Link
             class="truncate"
@@ -67,12 +71,12 @@
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="truncate text-sm">{format(key)}</p>
-      <div class="truncate text-sm">
+      <div class="text-sm truncate">
         <Copyable
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class="xl:flex-row"
+          container-class="xl:flex-row h-12 pr-1"
         >
           <Link
             class="truncate"
@@ -91,12 +95,12 @@
   {:else if shouldDisplayAsTaskQueueLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <div class="truncate text-sm">
+      <div class="text-sm truncate">
         <Copyable
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class=""
+          container-class="h-12 pr-1"
         >
           <Link
             class="truncate"

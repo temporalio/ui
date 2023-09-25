@@ -9,7 +9,7 @@ test.describe('Workflows list', () => {
     test.slow();
     await page
       .getByRole('link', { name: 'e2e-workflow-1' })
-      .click({ position: { x: 0, y: 0 } });
+      .click({ force: true });
 
     let region: Locator;
     let toggle: Locator;
@@ -26,34 +26,44 @@ test.describe('Workflows list', () => {
 
     toggle = page.getByRole('cell', { name: 'WorkflowExecutionStarted' });
     await toggle.click();
-    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
+    await expect(
+      region.getByText('"Mock decoded payload"').first(),
+    ).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'MarkerRecorded' }).first();
     await toggle.click();
-    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
+    await expect(
+      region.getByText('"Mock decoded payload"').first(),
+    ).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'ActivityTaskScheduled' }).first();
     await toggle.click();
-    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
+    await expect(
+      region.getByText('"Mock decoded payload"').first(),
+    ).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'ActivityTaskCompleted' }).first();
     await toggle.click();
-    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
+    await expect(
+      region.getByText('"Mock decoded payload"').first(),
+    ).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'WorkflowExecutionCompleted' });
     await toggle.click();
-    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
+    await expect(
+      region.getByText('"Mock decoded payload"').first(),
+    ).toBeVisible();
     await toggle.click();
   });
 
   test('should render decoded stack trace', async ({ page }) => {
     await page
       .getByRole('link', { name: 'e2e-workflow-2' })
-      .click({ position: { x: 0, y: 0 } });
+      .click({ force: true });
 
     await page.getByText('Stack Trace').click();
 
@@ -65,7 +75,7 @@ test.describe('Workflows list', () => {
   test('should render decoded query results', async ({ page }) => {
     await page
       .getByRole('link', { name: 'e2e-workflow-2' })
-      .click({ position: { x: 0, y: 0 } });
+      .click({ force: true });
 
     await page.getByText('Queries').click();
     await page.getByLabel('Query Type').selectOption('is-blocked');

@@ -9,17 +9,17 @@
   <slot />
   <div class="back-to-top" class:hidden>
     <Button
-      class="!py-1.5 !px-1"
-      icon="arrow-up"
+      size="sm"
       variant="secondary"
       on:click={onScrollToTopClick}
+      leadingIcon="arrow-up"
     />
   </div>
 </div>
 
 <style lang="postcss">
   .back-to-top {
-    @apply fixed right-5 bottom-5 z-50;
+    @apply fixed right-8 bottom-5 z-50;
   }
 
   .back-to-top.hidden {

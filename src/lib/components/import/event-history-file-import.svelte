@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  
+
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
@@ -64,12 +64,16 @@
   };
 </script>
 
+<label class="sr-only" for="import-event-history-file-upload">
+  {translate('events', 'import-event-history-file-upload')}
+</label>
 <input
+  id="import-event-history-file-upload"
   class="import-input block rounded-md border border-gray-200 p-2"
   type="file"
   accept=".json"
   on:change={onFileSelect}
 />
-<Button icon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
+<Button leadingIcon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
   >{translate('import')}</Button
 >

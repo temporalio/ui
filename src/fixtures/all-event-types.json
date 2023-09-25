@@ -100,13 +100,19 @@
     "version": "0",
     "taskId": "29866296",
     "workflowTaskScheduledEventAttributes": {
-      "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
       "startToCloseTimeout": "20s",
       "attempt": 1
     },
     "attributes": {
       "type": "workflowTaskScheduledEventAttributes",
-      "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
       "startToCloseTimeout": "20 seconds",
       "attempt": 1
     },
@@ -179,14 +185,18 @@
     "upsertWorkflowSearchAttributesEventAttributes": {
       "workflowTaskCompletedEventId": "4",
       "searchAttributes": {
-        "indexedFields": { "TemporalChangeVersion": ["initial version-3"] }
+        "indexedFields": {
+          "TemporalChangeVersion": ["initial version-3"]
+        }
       }
     },
     "attributes": {
       "type": "upsertWorkflowSearchAttributesEventAttributes",
       "workflowTaskCompletedEventId": "4",
       "searchAttributes": {
-        "indexedFields": { "TemporalChangeVersion": ["initial version-3"] }
+        "indexedFields": {
+          "TemporalChangeVersion": ["initial version-3"]
+        }
       }
     },
     "category": "command",
@@ -206,14 +216,21 @@
         "change-id": {
           "payloads": [
             {
-              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
               "data": "ImluaXRpYWwgdmVyc2lvbiI="
             }
           ]
         },
         "version": {
           "payloads": [
-            { "metadata": { "encoding": "anNvbi9wbGFpbg==" }, "data": "Mw==" }
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "Mw=="
+            }
           ]
         }
       },
@@ -228,14 +245,21 @@
         "change-id": {
           "payloads": [
             {
-              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
               "data": "ImluaXRpYWwgdmVyc2lvbiI="
             }
           ]
         },
         "version": {
           "payloads": [
-            { "metadata": { "encoding": "anNvbi9wbGFpbg==" }, "data": "Mw==" }
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "Mw=="
+            }
           ]
         }
       },
@@ -255,15 +279,22 @@
     "version": "0",
     "taskId": "29866290",
     "workflowExecutionStartedEventAttributes": {
-      "workflowType": { "name": "workflow.advanced-visibility" },
+      "workflowType": {
+        "name": "workflow.advanced-visibility"
+      },
       "parentWorkflowNamespace": "canary",
       "parentWorkflowExecution": {
         "workflowId": "temporal.fixture.timed-out.workflow.id",
         "runId": "78cba607-189e-41fe-a31b-a2b6061babaa"
       },
       "parentInitiatedEventId": "11",
-      "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
-      "input": { "payloads": ["1656683778738403300", "canary"] },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": ["1656683778738403300", "canary"]
+      },
       "workflowExecutionTimeout": "0s",
       "workflowRunTimeout": "1200s",
       "workflowTaskTimeout": "20s",
@@ -281,10 +312,14 @@
       "firstWorkflowTaskBackoff": "0s",
       "memo": null,
       "searchAttributes": {
-        "indexedFields": { "CustomKeywordField": "childWorkflowValue" }
+        "indexedFields": {
+          "CustomKeywordField": "childWorkflowValue"
+        }
       },
       "prevAutoResetPoints": null,
-      "header": { "fields": {} },
+      "header": {
+        "fields": {}
+      },
       "parentInitiatedEventVersion": "0"
     },
     "attributes": {
@@ -296,8 +331,13 @@
         "runId": "78cba607-189e-41fe-a31b-a2b6061babaa"
       },
       "parentInitiatedEventId": "11",
-      "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
-      "input": { "payloads": ["1656683778738403300", "canary"] },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": ["1656683778738403300", "canary"]
+      },
       "workflowExecutionTimeout": "",
       "workflowRunTimeout": "20 minutes",
       "workflowTaskTimeout": "20 seconds",
@@ -315,10 +355,14 @@
       "firstWorkflowTaskBackoff": "",
       "memo": null,
       "searchAttributes": {
-        "indexedFields": { "CustomKeywordField": "childWorkflowValue" }
+        "indexedFields": {
+          "CustomKeywordField": "childWorkflowValue"
+        }
       },
       "prevAutoResetPoints": null,
-      "header": { "fields": {} },
+      "header": {
+        "fields": {}
+      },
       "parentInitiatedEventVersion": "0"
     },
     "classification": "Started",
@@ -410,9 +454,16 @@
     "taskId": "29867308",
     "activityTaskScheduledEventAttributes": {
       "activityId": "13",
-      "activityType": { "name": "activity.advanced-visibility" },
-      "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
-      "header": { "fields": {} },
+      "activityType": {
+        "name": "activity.advanced-visibility"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "header": {
+        "fields": {}
+      },
       "input": {
         "payloads": [
           "1656683782883152600",
@@ -439,8 +490,13 @@
       "type": "activityTaskScheduledEventAttributes",
       "activityId": "13",
       "activityType": "activity.advanced-visibility",
-      "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
-      "header": { "fields": {} },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "header": {
+        "fields": {}
+      },
       "input": {
         "payloads": [
           "1656683782883152600",
@@ -475,7 +531,10 @@
     "eventType": "TimerFired",
     "version": "0",
     "taskId": "29867299",
-    "timerFiredEventAttributes": { "timerId": "8", "startedEventId": "8" },
+    "timerFiredEventAttributes": {
+      "timerId": "8",
+      "startedEventId": "8"
+    },
     "attributes": {
       "type": "timerFiredEventAttributes",
       "timerId": "8",
@@ -600,10 +659,14 @@
         "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
       },
       "signalName": "signalToTrigger",
-      "input": { "payloads": ["signalValue"] },
+      "input": {
+        "payloads": ["signalValue"]
+      },
       "control": "25",
       "childWorkflowOnly": false,
-      "header": { "fields": {} }
+      "header": {
+        "fields": {}
+      }
     },
     "attributes": {
       "type": "signalExternalWorkflowExecutionInitiatedEventAttributes",
@@ -614,10 +677,14 @@
         "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
       },
       "signalName": "signalToTrigger",
-      "input": { "payloads": ["signalValue"] },
+      "input": {
+        "payloads": ["signalValue"]
+      },
       "control": "25",
       "childWorkflowOnly": false,
-      "header": { "fields": {} }
+      "header": {
+        "fields": {}
+      }
     },
     "classification": "Initiated",
     "category": "signal",
@@ -633,16 +700,24 @@
     "taskId": "32096693",
     "workflowExecutionSignaledEventAttributes": {
       "signalName": "signalBeforeReset",
-      "input": { "payloads": ["signalValue"] },
+      "input": {
+        "payloads": ["signalValue"]
+      },
       "identity": "history-service",
-      "header": { "fields": {} }
+      "header": {
+        "fields": {}
+      }
     },
     "attributes": {
       "type": "workflowExecutionSignaledEventAttributes",
       "signalName": "signalBeforeReset",
-      "input": { "payloads": ["signalValue"] },
+      "input": {
+        "payloads": ["signalValue"]
+      },
       "identity": "history-service",
-      "header": { "fields": {} }
+      "header": {
+        "fields": {}
+      }
     },
     "classification": "Signaled",
     "category": "signal",
@@ -756,5 +831,96 @@
     "id": "14",
     "name": "ActivityTaskTimedOut",
     "timestamp": "2022-07-01 UTC 14:00:29.94"
+  },
+  "WorkflowExecutionUpdateAccepted": {
+    "eventId": "13",
+    "eventTime": "2023-09-11T13:29:00.588588Z",
+    "eventType": "WorkflowExecutionUpdateAccepted",
+    "version": "0",
+    "taskId": "1048706",
+    "workerMayIgnore": false,
+    "workflowExecutionUpdateAcceptedEventAttributes": {
+      "protocolInstanceId": "31440fef-27ba-4393-bb59-debabc23b77d",
+      "acceptedRequestMessageId": "31440fef-27ba-4393-bb59-debabc23b77d/request",
+      "acceptedRequestSequencingEventId": "10",
+      "acceptedRequest": {
+        "meta": {
+          "updateId": "31440fef-27ba-4393-bb59-debabc23b77d",
+          "identity": "29187@Alexs-MacBook-Pro.local@"
+        },
+        "input": {
+          "header": {
+            "fields": {}
+          },
+          "name": "set-to-account",
+          "args": {
+            "payloads": ["Piggy Bank"]
+          }
+        }
+      }
+    },
+    "name": "WorkflowExecutionUpdateAccepted",
+    "id": "13",
+    "timestamp": "2023-09-11 UTC 13:29:00.58",
+    "category": "update",
+    "attributes": {
+      "type": "workflowExecutionUpdateAcceptedEventAttributes",
+      "protocolInstanceId": "31440fef-27ba-4393-bb59-debabc23b77d",
+      "acceptedRequestMessageId": "31440fef-27ba-4393-bb59-debabc23b77d/request",
+      "acceptedRequestSequencingEventId": "10",
+      "acceptedRequest": {
+        "meta": {
+          "updateId": "31440fef-27ba-4393-bb59-debabc23b77d",
+          "identity": "29187@MacBook-Pro.local@"
+        },
+        "input": {
+          "header": {
+            "fields": {}
+          },
+          "name": "set-to-account",
+          "args": {
+            "payloads": ["Piggy Bank"]
+          }
+        }
+      }
+    }
+  },
+  "WorkflowExecutionUpdateCompleted": {
+    "eventId": "14",
+    "eventTime": "2023-09-11T13:29:00.588642Z",
+    "eventType": "WorkflowExecutionUpdateCompleted",
+    "version": "0",
+    "taskId": "1048707",
+    "workerMayIgnore": false,
+    "workflowExecutionUpdateCompletedEventAttributes": {
+      "meta": {
+        "updateId": "31440fef-27ba-4393-bb59-debabc23b77d",
+        "identity": ""
+      },
+      "acceptedEventId": "13",
+      "outcome": {
+        "success": {
+          "payloads": [null]
+        }
+      }
+    },
+    "name": "WorkflowExecutionUpdateCompleted",
+    "id": "14",
+    "timestamp": "2023-09-11 UTC 13:29:00.58",
+    "classification": "Completed",
+    "category": "update",
+    "attributes": {
+      "type": "workflowExecutionUpdateCompletedEventAttributes",
+      "meta": {
+        "updateId": "31440fef-27ba-4393-bb59-debabc23b77d",
+        "identity": ""
+      },
+      "acceptedEventId": "13",
+      "outcome": {
+        "success": {
+          "payloads": [null]
+        }
+      }
+    }
   }
 }

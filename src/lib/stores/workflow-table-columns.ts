@@ -20,7 +20,6 @@ export const WorkflowHeaderLabels = [
   'Execution Duration',
   'State Transitions',
   'Parent Namespace',
-  'Parent Workflow ID',
   'Task Queue',
 ] as const;
 
@@ -74,9 +73,11 @@ const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
   { label: 'Execution Duration', pinned: false },
   { label: 'State Transitions', pinned: false },
   { label: 'Parent Namespace', pinned: false },
-  { label: 'Parent Workflow ID', pinned: false },
   { label: 'Task Queue', pinned: false },
 ];
+
+const isNotParentWorkflowIdColumn = (column: WorkflowHeader) =>
+  column.label !== 'Parent Workflow ID';
 
 export const getDefaultColumns = (): WorkflowHeader[] => {
   let columns: WorkflowHeader[];
@@ -89,7 +90,10 @@ export const getDefaultColumns = (): WorkflowHeader[] => {
     const parsedOldColumns = JSON.parse(stringifiedOldColumns);
 
     if (stringifiedOldColumns && parsedOldColumns?.length) {
-      columns = parsedOldColumns;
+      const filteredOldColumns = parsedOldColumns.filter(
+        isNotParentWorkflowIdColumn,
+      );
+      columns = filteredOldColumns;
     } else {
       columns = DEFAULT_COLUMNS;
     }
@@ -118,6 +122,15 @@ export const workflowTableColumns: Readable<State> = derived(
         columns[namespace] = [...getDefaultColumns()];
         return columns[namespace];
       }
+      const filteredColumns = columns[namespace].filter(
+        isNotParentWorkflowIdColumn,
+      );
+
+      if (filteredColumns.length !== columns[namespace].length) {
+        columns[namespace] = filteredColumns;
+        persistedWorkflowTableColumns.set(columns);
+      }
+
       return columns[namespace];
     };
 

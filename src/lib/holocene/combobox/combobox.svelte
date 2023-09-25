@@ -10,7 +10,6 @@
 
   import Icon from '../icon/icon.svelte';
   import type { IconName } from '../icon/paths';
-  import MenuButton from '../menu/menu-button.svelte';
 
   type T = $$Generic;
 
@@ -26,6 +25,7 @@
   interface BaseProps extends HTMLInputAttributes {
     id: string;
     label: string;
+    toggleLabel: string;
     value: string;
     noResultsText: string;
     disabled?: boolean;
@@ -61,6 +61,7 @@
   export let id: string;
   export let label: string;
   export let value: string = undefined;
+  export let toggleLabel: string;
   export let noResultsText: string;
   export let disabled = false;
   export let labelHidden = false;
@@ -107,8 +108,18 @@
     displayValue = getDisplayValue(selectedOption);
   }
 
+  const toggleList = () => {
+    if ($open) {
+      closeList();
+    } else {
+      openList();
+    }
+  };
+
   const openList = () => {
     $open = true;
+    inputElement.focus();
+    inputElement.select();
   };
 
   const closeList = () => {
@@ -234,12 +245,15 @@
     {label}
   </label>
 
-  <MenuButton hasIndicator {disabled} controls="{id}-listbox">
-    <svelte:fragment slot="leading">
-      {#if leadingIcon}
-        <Icon class="shrink-0" name={leadingIcon} />
-      {/if}
-    </svelte:fragment>
+  <div class="combobox-wrapper">
+    {#if leadingIcon}
+      <Icon
+        width={20}
+        height={20}
+        class="shrink-0 text-gray-500 ml-2"
+        name={leadingIcon}
+      />
+    {/if}
     <input
       {id}
       {placeholder}
@@ -266,7 +280,17 @@
       bind:this={inputElement}
       {...$$restProps}
     />
-  </MenuButton>
+    <button
+      aria-label={toggleLabel}
+      class="combobox-button"
+      tabindex={-1}
+      aria-controls="{id}-listbox"
+      aria-expanded={$open}
+      on:click={toggleList}
+    >
+      <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
+    </button>
+  </div>
 
   <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
     {#each list as option}
@@ -300,7 +324,15 @@
     @apply font-secondary text-sm font-normal;
   }
 
+  .combobox-wrapper {
+    @apply text-sm w-full h-10 flex flex-row items-center rounded-lg bg-white border border-primary focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
+  }
+
   .combobox-input {
-    @apply h-full w-full font-primary focus:outline-none focus:border-indigo-600;
+    @apply grow h-full w-full font-primary focus:outline-none ml-2;
+  }
+
+  .combobox-button {
+    @apply rounded-full shrink-0 bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 flex justify-center items-center mx-2;
   }
 </style>

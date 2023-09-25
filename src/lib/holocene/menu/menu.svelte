@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
   import { fly } from 'svelte/transition';
-  
+
   import { getContext } from 'svelte';
-  
+
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
   interface $$Props extends HTMLAttributes<HTMLUListElement> {
@@ -46,7 +46,7 @@
 
 <style lang="postcss">
   .menu {
-    @apply absolute z-50 mt-1 min-w-full overflow-scroll max-h-[480px] list-none rounded-lg border border-gray-900 bg-white text-primary shadow;
+    @apply absolute z-50 mt-1 min-w-full overflow-auto max-h-[480px] list-none rounded-lg border border-gray-900 bg-white text-primary shadow;
 
     &.left {
       @apply left-0 origin-top-left;

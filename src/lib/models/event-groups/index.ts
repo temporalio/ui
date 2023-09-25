@@ -25,7 +25,7 @@ export const groupEvents = (
 
   for (const event of events) {
     const id = getGroupId(event);
-    const group = createEventGroup(event);
+    const group = createEventGroup(event, events);
 
     if (group) {
       groups[group.id] = group;

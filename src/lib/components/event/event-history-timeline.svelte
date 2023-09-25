@@ -233,7 +233,7 @@
     background-color: white;
   }
 
-  :global(.vis-item) {
+  :global(.vis-timeline .vis-item) {
     background-color: #fff;
     border-color: transparent;
     color: #3f3f46;
@@ -393,6 +393,14 @@
 
   :global(.vis-item.vis-point.signal) {
     color: #652b19;
+  }
+
+  :global(.vis-item.vis-range.update) {
+    background-color: #f3e8ff;
+    border-color: #581c87;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #581c87;
   }
 
   :global(.bar-content) {
