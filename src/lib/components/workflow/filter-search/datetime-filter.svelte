@@ -182,14 +182,14 @@
         <MenuItem on:click={() => (type = 'relative')}>
           <div class="flex flex-col">
             <label
-              class="flex flex-row items-center gap-2 cursor-pointer"
+              class="flex cursor-pointer flex-row items-center gap-2"
               for="relative-time"
             >
               <input
                 on:click|stopPropagation={() => {
                   type = 'relative';
                 }}
-                class="w-4 h-4 accent-gray-900"
+                class="h-4 w-4 accent-gray-900"
                 type="radio"
                 checked={type === 'relative'}
                 id="relative-time"
@@ -197,7 +197,7 @@
               />
               {translate('relative')}
             </label>
-            <div class="ml-6 pt-2 flex gap-0">
+            <div class="ml-6 flex gap-0 pt-2">
               <Input
                 label={translate('relative')}
                 labelHidden
@@ -228,12 +228,12 @@
         <MenuItem on:click={() => (type = 'absolute')}>
           <div class="flex flex-col gap-2">
             <label
-              class="flex flex-row items-center gap-2 cursor-pointer"
+              class="flex cursor-pointer flex-row items-center gap-2"
               for="absolute-time"
             >
               <input
                 on:click|stopPropagation={() => (type = 'absolute')}
-                class="w-4 h-4 accent-gray-900"
+                class="h-4 w-4 accent-gray-900"
                 type="radio"
                 checked={type === 'absolute'}
                 id="absolute-time"
@@ -241,7 +241,7 @@
               />
               {translate('absolute')}
             </label>
-            <div class="flex flex-col ml-6 gap-2">
+            <div class="ml-6 flex flex-col gap-2">
               <DatePicker
                 label={''}
                 labelHidden
@@ -264,7 +264,7 @@
         </MenuItem>
       {/if}
       <MenuDivider />
-      <div class="p-2 flex items-center">
+      <div class="flex items-center p-2">
         <Button size="xs" style="width: 100%" on:click={onApply} {disabled}
           >{translate('apply')}</Button
         >

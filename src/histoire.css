@@ -1,5 +1,4 @@
 @import url('/src/lib/vendor/css/normalize.css');
-@import url('/src/lib/vendor/prism/prism.css');
 
 @tailwind base;
 @tailwind components;

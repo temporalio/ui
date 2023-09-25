@@ -5,7 +5,6 @@
   import { translate } from '$lib/i18n/translate';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { routeForEventHistoryImport } from '$lib/utilities/route-for';
-  
 </script>
 
 <section id="event-history">

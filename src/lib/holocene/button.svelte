@@ -81,6 +81,7 @@
     HTMLAnchorAttributes & {
       href: string;
       target?: HTMLAnchorAttributes['target'];
+      disabled: never;
     };
 
   type ButtonStyles = VariantProps<typeof buttonStyles>;
@@ -106,7 +107,7 @@
   this={href ? 'a' : 'button'}
   {target}
   {href}
-  {disabled}
+  disabled={href ? null : disabled}
   {id}
   role="button"
   type="button"

@@ -154,7 +154,7 @@
     {/if}
   </div>
   <span
-    class="inline-block hint-text"
+    class="hint-text inline-block"
     class:invalid={!valid}
     class:error
     class:hidden={!hintText}

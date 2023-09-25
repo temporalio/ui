@@ -6,7 +6,7 @@
   export let buildId = '';
 </script>
 
-<p class="select-all flex gap-2 font-mono">
+<p class="flex select-all gap-2 font-mono">
   {#if defaultVersion && buildId}
     <span class:active-version={active} class:version={!active}>
       <Icon name="merge" />{buildId}
@@ -22,10 +22,10 @@
 
 <style lang="postcss">
   .version {
-    @apply px-1 flex gap-1 items-center border border-gray-900 rounded text-sm;
+    @apply flex items-center gap-1 rounded border border-gray-900 px-1 text-sm;
   }
 
   .active-version {
-    @apply px-1 flex gap-1 items-center bg-green-100 rounded text-green-700 text-sm;
+    @apply flex items-center gap-1 rounded bg-green-100 px-1 text-sm text-green-700;
   }
 </style>

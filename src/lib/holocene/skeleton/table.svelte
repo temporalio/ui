@@ -1,9 +1,9 @@
 <script lang="ts">
   import Table from '$lib/holocene/table/table.svelte';
-  
+
   import TableHeaderRow from '../table/table-header-row.svelte';
   import TableRow from '../table/table-row.svelte';
-  
+
   import Skeleton from './index.svelte';
 
   export let rows = 10;

@@ -83,8 +83,8 @@ export function formatUTCOffset(
 
 export function getLocalTime(): string {
   const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const localOption = TimezoneOptions.find(({ zones }) =>
-    zones?.includes(localTimezone),
+  const localOption = TimezoneOptions.find(
+    ({ zones }) => zones?.includes(localTimezone),
   );
   return localOption
     ? `${localOption.label} (${localOption.abbr})`

@@ -45,7 +45,7 @@
 </script>
 
 <div
-  class="flex alert {intent} {className}"
+  class="alert flex {intent} {className}"
   class:bold
   class:hidden
   {role}
