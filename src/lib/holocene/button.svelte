@@ -81,7 +81,7 @@
     HTMLAnchorAttributes & {
       href: string;
       target?: HTMLAnchorAttributes['target'];
-      disabled: never;
+      disabled?: never;
     };
 
   type ButtonStyles = VariantProps<typeof buttonStyles>;
