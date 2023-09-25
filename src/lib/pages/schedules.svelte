@@ -53,10 +53,9 @@
       {namespace}
     </p>
   </div>
-  {#if hasSchedules}
+  {#if hasSchedules && !createDisabled}
     <Button
       data-testid="create-schedule"
-      disabled={createDisabled}
       href={routeForScheduleCreate({ namespace })}
     >
       {translate('schedules', 'create')}
@@ -124,10 +123,9 @@
             >Temporal CLI</Link
           >.
         </p>
-        {#if !error}
+        {#if !error && !createDisabled}
           <Button
             data-testid="create-schedule"
-            disabled={createDisabled}
             href={routeForScheduleCreate({ namespace })}
           >
             {translate('schedules', 'create')}

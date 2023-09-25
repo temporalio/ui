@@ -18,21 +18,41 @@
   export let Hst: HST;
 </script>
 
-<Hst.Story>
-  <div class="flex items-center justify-center p-4">
-    <Button
-      {variant}
-      {size}
-      {borderModifier}
-      {borderRadiusModifier}
-      {disabled}
-      {loading}
-      {href}
-      {leadingIcon}
-      {trailingIcon}
-      {count}>Click Me</Button
-    >
-  </div>
+<Hst.Story title="button">
+  <Hst.Variant title="A Regular Button">
+    <div class="flex items-center justify-center p-4">
+      <Button
+        {variant}
+        {size}
+        {borderModifier}
+        {borderRadiusModifier}
+        {disabled}
+        {loading}
+        {leadingIcon}
+        {trailingIcon}
+        {count}>Click Me</Button
+      >
+    </div>
+  </Hst.Variant>
+
+  <Hst.Variant title="A Button with an href">
+    <div class="flex items-center justify-center p-4">
+      <Button
+        href="https://temporal.io"
+        target="_blank"
+        {variant}
+        {size}
+        {borderModifier}
+        {borderRadiusModifier}
+        {loading}
+        {leadingIcon}
+        {trailingIcon}
+        {count}
+      >
+        A Link
+      </Button>
+    </div>
+  </Hst.Variant>
 
   <svelte:fragment slot="controls">
     <Hst.Select
