@@ -2,6 +2,9 @@
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
+
+  import PayloadDecoder from '../event/payload-decoder.svelte';
 
   export let content: string;
   export let title: string;
@@ -10,7 +13,7 @@
   $: showParsedContent = parsedContent.length > 0;
   $: showParsedContentCount = parsedContent.length > 1;
 
-  const parseContent = (c: string): string[] => {
+  const parseContent = (c: string): unknown[] => {
     try {
       const result = JSON.parse(c);
       return Array.isArray(result) ? result : [];
@@ -31,21 +34,25 @@
     {#if showParsedContent}
       <div class="flex h-full flex-col overflow-scroll lg:max-h-[24rem]">
         {#each parsedContent as content}
-          <CodeBlock
-            {content}
-            class="mb-2"
-            copyIconTitle={translate('copy-icon-title')}
-            copySuccessIconTitle={translate('copy-success-icon-title')}
-          />
+          <PayloadDecoder value={content} let:decodedValue>
+            <CodeBlock
+              content={decodedValue}
+              class="mb-2"
+              copyIconTitle={translate('copy-icon-title')}
+              copySuccessIconTitle={translate('copy-success-icon-title')}
+            />
+          </PayloadDecoder>
         {/each}
       </div>
     {:else}
-      <CodeBlock
-        {content}
-        class="mb-2 lg:max-h-[23.5rem]"
-        copyIconTitle={translate('copy-icon-title')}
-        copySuccessIconTitle={translate('copy-success-icon-title')}
-      />
+      <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
+        <CodeBlock
+          content={decodedValue}
+          class="mb-2 lg:max-h-[23.5rem]"
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+        />
+      </PayloadDecoder>
     {/if}
   {:else}
     <CodeBlock

@@ -69,12 +69,12 @@ const isCompletedTaskEvent = (
 
 const getEventResult = (event: CompletionEvent) => {
   if (isWorkflowExecutionContinuedAsNewEvent(event)) {
-    return event.attributes.input?.payloads;
+    return event.attributes.input;
   }
 
   if (isWorkflowExecutionCompletedEvent(event)) {
     if (event.attributes.result === null) return null;
-    return event.attributes.result.payloads;
+    return event.attributes.result;
   }
 
   return event.attributes;
@@ -131,8 +131,8 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
 
   if (workflowStartedEvent) {
     input = stringifyWithBigInt(
-      workflowStartedEvent?.workflowExecutionStartedEventAttributes?.input
-        ?.payloads ?? null,
+      workflowStartedEvent?.workflowExecutionStartedEventAttributes?.input ??
+        null,
     );
   }
 

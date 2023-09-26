@@ -48,7 +48,7 @@
     decodePayloads();
   });
 
-  let decodedValue = 'Decoding payloads...';
+  let decodedValue = 'Decoding...';
 </script>
 
 <slot {decodedValue} />
