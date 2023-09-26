@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import { page } from '$app/stores';
 
   import { authUser } from '$lib/stores/auth-user';
@@ -41,12 +39,12 @@
     const decodedAttributes = decodePayloadAttributes(
       convertedAttributes,
     ) as object;
-    decodedValue = stringifyWithBigInt(decodedAttributes);
+    decodedValue = stringifyWithBigInt(
+      decodedAttributes?.payloads || decodedAttributes,
+    );
   };
 
-  onMount(() => {
-    decodePayloads();
-  });
+  $: value, decodePayloads();
 
   let decodedValue = 'Decoding...';
 </script>

@@ -54,10 +54,6 @@ export type EventWithMetadata = {
   historyEvent: HistoryEvent;
 } & EventRequestMetadata;
 
-export type EventsWithMetadata = {
-  response: HistoryEvent[];
-} & EventRequestMetadata;
-
 export type EventType = import('$lib/utilities/is-event-type').EventType;
 export type ResetEventType =
   import('$lib/utilities/is-event-type').ResetEventType;

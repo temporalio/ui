@@ -139,6 +139,9 @@ export const shouldDisplayChildWorkflowLink = (
 const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
   if (typeof value === 'object') {
     const [firstKey] = Object.keys(value);
+    if (firstKey === 'payloads') {
+      return { key, value };
+    }
     return { key: key + capitalize(firstKey), value: value[firstKey] };
   } else {
     return { key, value: value.toString() };

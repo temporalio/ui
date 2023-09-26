@@ -69,12 +69,10 @@ export const fetchAllEvents = async ({
   workflowId,
   runId,
   sort,
-  settings,
-  accessToken,
   onStart,
   onUpdate,
   onComplete,
-}: FetchEventsParametersWithSettings): Promise<CommonHistoryEvent[]> => {
+}: FetchEventsParameters): Promise<CommonHistoryEvent[]> => {
   const endpoint = getEndpointForSortOrder(sort);
   const route = routeForApi(endpoint, { namespace, workflowId, runId });
   const response = await paginated(
@@ -87,13 +85,7 @@ export const fetchAllEvents = async ({
     { onStart, onUpdate, onComplete },
   );
 
-  const allEvents = await toEventHistory({
-    response: response.history.events,
-    namespace,
-    settings,
-    accessToken,
-  });
-
+  const allEvents = await toEventHistory(response.history.events);
   return allEvents;
 };
 
@@ -125,9 +117,8 @@ export const fetchPartialRawEvents = async ({
 };
 
 export const fetchStartAndEndEvents = async (
-  parameters: FetchEventsParametersWithSettings,
+  parameters: FetchEventsParameters,
 ): Promise<{ start: WorkflowEvents; end: WorkflowEvents }> => {
-  const { settings, namespace, accessToken } = parameters;
   const startEventsRaw = await fetchPartialRawEvents({
     ...parameters,
     sort: 'ascending',
@@ -137,18 +128,8 @@ export const fetchStartAndEndEvents = async (
     sort: 'descending',
   });
   const [start, end] = await Promise.all([
-    toEventHistory({
-      response: startEventsRaw,
-      namespace,
-      settings,
-      accessToken,
-    }),
-    toEventHistory({
-      response: endEventsRaw,
-      namespace,
-      settings,
-      accessToken,
-    }),
+    toEventHistory(startEventsRaw),
+    toEventHistory(endEventsRaw),
   ]);
   return { start, end };
 };
@@ -160,8 +141,6 @@ type PaginatedEventParams = {
   sort?: EventSortOrder;
   category?: string;
   compact: boolean;
-  settings: Settings;
-  accessToken: string;
 };
 
 export async function getPaginatedEvents({
@@ -171,8 +150,6 @@ export async function getPaginatedEvents({
   sort,
   category,
   compact,
-  settings,
-  accessToken,
 }: PaginatedEventParams): Promise<
   () => Promise<{ items: WorkflowEvents; nextPageToken: NextPageToken }>
 > {
@@ -193,12 +170,7 @@ export async function getPaginatedEvents({
         },
       });
 
-    const events = await toEventHistory({
-      response: history.events,
-      namespace,
-      settings,
-      accessToken,
-    });
+    const events = await toEventHistory(history.events);
 
     if (category) {
       return {

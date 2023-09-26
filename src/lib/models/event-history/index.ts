@@ -6,7 +6,6 @@ import {
 import type {
   EventAttributeKey,
   EventAttributesWithType,
-  EventsWithMetadata,
   EventType,
   EventWithMetadata,
   HistoryEvent,
@@ -91,13 +90,6 @@ export const toEvent = async (
   const category = getEventCategory(eventType);
   const { key, attributes } = findAttributesAndKey(historyEvent);
 
-  // const attributes = await getEventAttributes({
-  //   historyEvent,
-  //   namespace,
-  //   settings,
-  //   accessToken,
-  // }).then((attributes) => simplifyAttributes(attributes));
-
   return {
     ...historyEvent,
     name: eventType,
@@ -110,14 +102,10 @@ export const toEvent = async (
   };
 };
 
-export const toEventHistory = async ({
-  response,
-  namespace,
-  settings,
-  accessToken,
-}: EventsWithMetadata): Promise<WorkflowEvents> => {
-  console.log(namespace, settings, accessToken);
-  return await Promise.all(response.map(toEvent));
+export const toEventHistory = async (
+  events: HistoryEvent[],
+): Promise<WorkflowEvents> => {
+  return await Promise.all(events.map(toEvent));
 };
 
 export const isEvent = (event: unknown): event is WorkflowEvent => {

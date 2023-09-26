@@ -8,7 +8,6 @@
   import { format } from '$lib/utilities/format-camel-case';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
-    getCodeBlockValue,
     shouldDisplayAsExecutionLink,
     shouldDisplayAsPlainText,
     shouldDisplayAsTaskQueueLink,
@@ -18,6 +17,8 @@
     routeForEventHistory,
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
+
+  import PayloadDecoder from './payload-decoder.svelte';
 
   export let key: string;
   export let value: string | Record<string, unknown>;
@@ -37,12 +38,14 @@
       <p class="min-w-fit text-sm">
         {format(key)}
       </p>
-      <CodeBlock
-        content={getCodeBlockValue(value)}
-        {inline}
-        copyIconTitle={translate('copy-icon-title')}
-        copySuccessIconTitle={translate('copy-success-icon-title')}
-      />
+      <PayloadDecoder {value} let:decodedValue>
+        <CodeBlock
+          content={decodedValue}
+          {inline}
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+        />
+      </PayloadDecoder>
     </div>
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
