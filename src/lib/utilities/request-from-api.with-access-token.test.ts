@@ -13,7 +13,9 @@ type MockResponse<T = unknown> = {
 
 const options = {
   credentials: 'include',
-  headers: {},
+  headers: {
+    'Caller-Type': 'operator',
+  },
 };
 
 const endpoint = '/api/endpoint';

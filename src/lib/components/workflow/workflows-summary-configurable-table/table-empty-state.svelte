@@ -64,7 +64,7 @@
         <p>
           {translate('workflows', 'workflow-empty-state-description')}
           <Link newTab href="https://github.com/temporalio"
-            >Temporal's GitHub repository</Link
+            >github.com/temporalio</Link
           >.
         </p>
         <ul class="flex flex-col gap-2">

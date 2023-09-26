@@ -61,7 +61,9 @@ describe('requestFromAPI', () => {
 
   const options = {
     credentials: 'include',
-    headers: {},
+    headers: {
+      'Caller-Type': 'operator',
+    },
   };
 
   const fetchMock = <T = unknown>(
@@ -102,6 +104,7 @@ describe('requestFromAPI', () => {
       ...options,
       headers: {
         'X-CSRF-TOKEN': token,
+        'Caller-Type': 'operator',
       },
     });
   });
