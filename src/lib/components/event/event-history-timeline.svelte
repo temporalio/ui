@@ -143,7 +143,7 @@
     tooltip: {
       delay: 0,
       overflowMethod: 'flip' as TimelineOptionsTooltipOverflow,
-      followMouse: true,
+      followMouse: false,
       template: tooltipTemplate,
     },
     format: {
