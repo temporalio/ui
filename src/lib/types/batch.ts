@@ -8,7 +8,7 @@ export type BatchOperationType =
 
 export type BatchOperationState =
   | 'Running'
-  | 'Complete'
+  | 'Completed'
   | 'Failed'
   | 'Unspecified';
 

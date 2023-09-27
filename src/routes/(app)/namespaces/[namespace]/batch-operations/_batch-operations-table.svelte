@@ -1,21 +1,26 @@
 <script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
+  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { timeFormat } from '$lib/stores/time-format';
-  import type { BatchOperationInfo } from '$lib/types';
+  import type {
+    BatchOperationInfo,
+    BatchOperationState,
+  } from '$lib/types/batch';
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForBatchOperation } from '$lib/utilities/route-for';
 
   export let operations: BatchOperationInfo[];
   export let namespace: string;
 
-  const jobStateToBadgeType = {
+  const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
     Completed: 'green',
     Running: 'blue',
     Failed: 'red',
+    Unspecified: 'gray',
   };
 </script>
 
@@ -39,6 +44,12 @@
       >
       <td>{formatDate(startTime, $timeFormat)}</td>
       <td>{formatDate(closeTime, $timeFormat)}</td>
+    </TableRow>
+  {:else}
+    <TableRow>
+      <td colspan="4">
+        <EmptyState title="No Batch Operations for {namespace}"></EmptyState>
+      </td>
     </TableRow>
   {/each}
 </Table>

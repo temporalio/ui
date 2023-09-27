@@ -2,9 +2,10 @@
   import { page } from '$app/stores';
 
   import PageTitle from '$lib/components/page-title.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
   import { timeFormat } from '$lib/stores/time-format';
+  import type { BatchOperationState } from '$lib/types/batch';
   import { formatDate } from '$lib/utilities/format-date';
 
   $: operation = $page.data.batchOperation;
@@ -26,10 +27,11 @@
     }
   }
 
-  const jobStateToBadgeType = {
+  const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
     Completed: 'green',
     Running: 'blue',
     Failed: 'red',
+    Unspecified: 'gray',
   };
 </script>
 
@@ -81,7 +83,7 @@
     </p>
 
     <div
-      class="relative h-10 w-full overflow-hidden rounded"
+      class="relative h-4 w-full overflow-hidden rounded"
       bind:clientWidth={operationGraphContainerWidth}
     >
       <div
