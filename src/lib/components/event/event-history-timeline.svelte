@@ -10,15 +10,25 @@
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { groupEvents } from '$lib/models/event-groups';
+  import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
+  import { eventCategoryFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type { CommonHistoryEvent } from '$lib/types/events';
+  import type {
+    CommonHistoryEvent,
+    EventTypeCategory,
+  } from '$lib/types/events';
   import { capitalize } from '$lib/utilities/format-camel-case';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+
+  import EventCategoryFilter from './event-category-filter.svelte';
 
   export let history: CommonHistoryEvent[] = [];
 
   let visualizationRef;
   let timeline;
+
+  $: category = $eventCategoryFilter as EventTypeCategory;
 
   function renderComponentToHTML(Component, props) {
     const container = document.createElement('div');
@@ -112,10 +122,12 @@
     });
     return { items, groups };
   };
-  const options = {
+  const getOptions = () => ({
     stack: false,
     stackSubgroups: true,
     maxHeight: 600,
+    min: history[0].eventTime,
+    max: history[history.length - 1].eventTime,
     horizontalScroll: true,
     verticalScroll: true,
     groupHeightMode: 'fixed' as TimelineOptionsGroupHeightModeType,
@@ -138,30 +150,44 @@
         },
       },
     },
-  };
-  onMount(() => {
-    timeline = new Timeline(
-      visualizationRef,
-      new DataSet([]),
-      new DataSet([]),
-      options,
-    );
-    return () => timeline.destroy();
   });
+
+  onMount(() => {
+    return () => timeline?.destroy();
+  });
+
   const setVizItems = (items, groups) => {
     timeline.setGroups(groups);
     timeline.setItems(items);
     timeline.fit();
   };
 
-  $: {
-    if (history.length && timeline) {
+  const filterHistory = (history, category) => {
+    if (!category) return history;
+    return history.filter((i) => {
+      if (category === CATEGORIES.LOCAL_ACTIVITY) {
+        return isLocalActivityMarkerEvent(i);
+      }
+      return i.category === category;
+    });
+  };
+
+  const buildTimeline = () => {
+    if (history.length) {
+      timeline?.destroy();
+      timeline = new Timeline(
+        visualizationRef,
+        new DataSet([]),
+        new DataSet([]),
+        getOptions(),
+      );
       const reverseHistory =
         $eventFilterSort === 'descending' && $eventViewType !== 'compact';
       const sortedHistory = reverseHistory
         ? [...history].reverse()
         : [...history];
-      const eventGroups = groupEvents(sortedHistory);
+      const filteredHistory = filterHistory(sortedHistory, category);
+      const eventGroups = groupEvents(filteredHistory);
       const { groups, items } = createGroupItems(
         eventGroups,
         $workflowRun?.workflow?.isRunning,
@@ -169,7 +195,10 @@
       );
       setVizItems(items, groups);
     }
-  }
+  };
+
+  $: category, history, buildTimeline();
+
   const resetTimelineView = () => {
     timeline.focus('workflow');
   };
@@ -180,16 +209,14 @@
 >
   <div class="flex items-center justify-between gap-2">
     <h3 class="text-xl">Timeline</h3>
+    <div class="flex gap-2"></div>
     <div class="flex gap-2">
-      <Button variant="secondary" on:click={() => timeline.zoomIn(1)}
-        >Zoom In</Button
+      <EventCategoryFilter compact variant="secondary" />
+
+      <Button variant="secondary" on:click={() => timeline.zoomIn(1)}>+</Button>
+      <Button variant="secondary" on:click={() => timeline.zoomOut(1)}>-</Button
       >
-      <Button variant="secondary" on:click={() => timeline.zoomOut(1)}
-        >Zoom Out</Button
-      >
-      <Button variant="secondary" on:click={resetTimelineView}
-        >Zoom to Fit</Button
-      >
+      <Button variant="secondary" on:click={resetTimelineView}>Fit</Button>
     </div>
   </div>
   <div bind:this={visualizationRef} />
