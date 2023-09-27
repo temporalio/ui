@@ -14,12 +14,8 @@
   import { workflowFilters } from '$lib/stores/filters';
   import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
   import {
-    isBooleanFilter,
-    isDateTimeFilter,
+    getFocusedElementId,
     isListFilter,
-    isNumberFilter,
-    isStatusFilter,
-    isTextFilter,
   } from '$lib/utilities/query/filter-search';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
@@ -27,21 +23,6 @@
 
   const { filter, activeQueryIndex, focusedElementId } =
     getContext<FilterContext>(FILTER_CONTEXT);
-
-  function getFocusedElementId(attribute: string) {
-    if (isStatusFilter(attribute)) return 'status-filter';
-
-    if (isTextFilter(attribute)) return 'text-filter-search';
-
-    if (isListFilter(attribute)) return 'list-filter-search';
-
-    if (isNumberFilter(attribute) || isDateTimeFilter(attribute))
-      return 'conditional-menu-button';
-
-    if (isBooleanFilter(attribute)) return 'boolean-filter';
-
-    return '';
-  }
 
   function isOptionDisabled(value: string, filters: WorkflowFilter[]) {
     return filters.some(

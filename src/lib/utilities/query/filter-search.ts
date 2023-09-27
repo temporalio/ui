@@ -40,3 +40,20 @@ export function isBooleanFilter(
   const searchAttributeType = get(attributes)[attribute];
   return searchAttributeType === 'Bool';
 }
+
+export function getFocusedElementId(attribute: string) {
+  if (isStatusFilter(attribute)) return 'status-filter';
+
+  if (
+    isTextFilter(attribute) ||
+    isNumberFilter(attribute) ||
+    isDateTimeFilter(attribute)
+  )
+    return 'conditional-menu-button';
+
+  if (isListFilter(attribute)) return 'list-filter-search';
+
+  if (isBooleanFilter(attribute)) return 'boolean-filter';
+
+  return '';
+}

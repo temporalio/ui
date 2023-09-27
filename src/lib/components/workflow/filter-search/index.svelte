@@ -27,9 +27,9 @@
   import { workflowFilters } from '$lib/stores/filters';
   import { refresh } from '$lib/stores/workflows';
   import {
+    getFocusedElementId,
     isBooleanFilter,
     isDateTimeFilter,
-    isListFilter,
     isNumberFilter,
     isStatusFilter,
     isTextFilter,
@@ -97,21 +97,6 @@
   function handleClearInput() {
     $workflowFilters = [];
     onSearch();
-  }
-
-  function getFocusedElementId(attribute: string) {
-    if (isStatusFilter(attribute)) return 'status-filter';
-
-    if (isTextFilter(attribute)) return 'text-filter-search';
-
-    if (isListFilter(attribute)) return 'list-filter-search';
-
-    if (isNumberFilter(attribute) || isDateTimeFilter(attribute))
-      return 'conditional-menu-button';
-
-    if (isBooleanFilter(attribute)) return 'boolean-filter';
-
-    return '';
   }
 
   function updateFocusedElementId() {
