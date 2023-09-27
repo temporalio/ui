@@ -4,18 +4,24 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { getAuthUser } from '$lib/stores/auth-user';
 import { temporalVersion } from '$lib/stores/versions';
-import type {
-  StartBatchOperationRequest,
-  WorkflowExecutionInput,
-} from '$lib/types';
-import type {
-  BatchOperationInfo,
-  WorkflowExecution,
-} from '$lib/types/workflows';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { isVersionNewer } from '$lib/utilities/version-check';
+
+import type {
+  StartBatchOperationRequest,
+  WorkflowExecutionInput,
+} from '$types';
+import type {
+  APIBatchOperationInfo,
+  BatchOperation,
+  BatchOperationInfo,
+  BatchOperations,
+  DescribeBatchOperationResponse,
+  ListBatchOperationsResponse,
+} from '$types/batch';
+import type { WorkflowExecution } from '$types/workflows';
 
 type CreateBatchOperationOptions = {
   namespace: string;
@@ -186,7 +192,7 @@ export async function pollBatchOperation({
         if (state === 'Failed') {
           reject();
         } else if (state !== 'Running') {
-          resolve(parseInt(completeOperationCount, 10));
+          resolve(completeOperationCount);
         } else {
           setTimeout(() => {
             try {
@@ -201,15 +207,69 @@ export async function pollBatchOperation({
   });
 }
 
-async function describeBatchOperation({
-  jobId,
-  namespace,
-}: DescribeBatchOperationOptions): Promise<BatchOperationInfo> {
+export async function describeBatchOperation(
+  { jobId, namespace }: DescribeBatchOperationOptions,
+  request = fetch,
+): Promise<BatchOperation> {
   const route = routeForApi('batch-operation.describe', {
     namespace,
   });
 
-  return requestFromAPI<BatchOperationInfo>(route, {
+  const response = await requestFromAPI<DescribeBatchOperationResponse>(route, {
     params: { jobId },
+    request,
   });
+
+  return toBatchOperationDetails(response);
 }
+
+const toBatchOperationDetails = (
+  apiBatchOperationDetails: DescribeBatchOperationResponse,
+): BatchOperation => {
+  return {
+    ...apiBatchOperationDetails,
+    startTime: new Date(apiBatchOperationDetails.startTime),
+    closeTime: new Date(apiBatchOperationDetails.closeTime),
+    totalOperationCount: parseInt(
+      apiBatchOperationDetails.completeOperationCount,
+      10,
+    ),
+    completeOperationCount: parseInt(
+      apiBatchOperationDetails.completeOperationCount,
+      10,
+    ),
+    failureOperationCount: parseInt(
+      apiBatchOperationDetails.failureOperationCount,
+      10,
+    ),
+  };
+};
+
+export async function listBatchOperations(
+  namespace: string,
+  request = fetch,
+): Promise<BatchOperations> {
+  const route = routeForApi('batch-operations', {
+    namespace,
+  });
+
+  const response = await requestFromAPI<ListBatchOperationsResponse>(route, {
+    request,
+  });
+
+  return {
+    nextPageToken: response.nextPageToken,
+    operations: response.operationInfo.map(toBatchOperationInfo),
+  };
+}
+
+const toBatchOperationInfo = (
+  apiBatchOperationInfo: APIBatchOperationInfo,
+): BatchOperationInfo => {
+  return {
+    startTime: new Date(apiBatchOperationInfo.startTime),
+    closeTime: new Date(apiBatchOperationInfo.closeTime),
+    jobId: apiBatchOperationInfo.jobId,
+    state: apiBatchOperationInfo.state,
+  };
+};

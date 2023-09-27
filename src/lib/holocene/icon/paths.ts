@@ -45,6 +45,7 @@ import invertedCheckmark from './svg/inverted-checkmark.svelte';
 import json from './svg/json.svelte';
 import keyboard from './svg/keyboard.svelte';
 import labs from './svg/labs.svelte';
+import layers3 from './svg/layers-3.svelte';
 import lightningBolt from './svg/lightning-bolt.svelte';
 import link from './svg/link.svelte';
 import lock from './svg/lock.svelte';
@@ -133,6 +134,7 @@ export const icons = {
   json,
   keyboard,
   labs,
+  'layers-3': layers3,
   'lightning-bolt': lightningBolt,
   link,
   lock,

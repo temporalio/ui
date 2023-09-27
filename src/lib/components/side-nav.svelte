@@ -64,6 +64,14 @@
         <div class="nav-title">{translate('archive')}</div>
       </NavRow>
     </IsCloudGuard>
+    <NavRow link={linkList.batchOperations} {isCloud}>
+      <NavTooltip text="Batch Operations">
+        <div class="nav-icon">
+          <Icon name="layers-3" />
+        </div>
+      </NavTooltip>
+      <div class="nav-title">Batch</div>
+    </NavRow>
   </svelte:fragment>
   <svelte:fragment slot="middle">
     <IsLegacyCloudGuard {isCloud}>
