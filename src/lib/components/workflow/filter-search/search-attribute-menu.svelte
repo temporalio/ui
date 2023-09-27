@@ -45,7 +45,9 @@
 
   function isOptionDisabled(value: string, filters: WorkflowFilter[]) {
     return filters.some(
-      (filter) => filter.conditional === '=' && filter.attribute === value,
+      (filter) =>
+        (filter.conditional === '=' || filter.conditional === '!=') &&
+        filter.attribute === value,
     );
   }
 
