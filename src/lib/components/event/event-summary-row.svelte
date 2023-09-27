@@ -13,6 +13,7 @@
   import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { IterableEvent } from '$lib/types/events';
+  import { capitalize } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
@@ -112,6 +113,15 @@
       {/if}
     </div>
   </td>
+  <td class="text-left">
+    <div class="flex w-full items-center justify-between truncate">
+      <p class="event-name truncate text-sm font-semibold md:text-base">
+        {isLocalActivityMarkerEvent(event)
+          ? 'LocalActivity'
+          : capitalize(event.category)}
+      </p>
+    </div>
+  </td>
   <td
     colspan={expanded ? 2 : 1}
     class="text-right text-sm font-normal xl:text-left"
@@ -130,7 +140,7 @@
       </div>
       <div class="flex w-full items-center justify-between truncate">
         <p class="event-name truncate text-sm font-semibold md:text-base">
-          {isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name}
+          {event.name}
         </p>
         {#if expanded}
           <div>

@@ -33,7 +33,8 @@
     <th class="w-16 md:w-32">
       <EventDateFilter {compact} />
     </th>
-    <th class="w-44"><EventCategoryFilter {compact} /></th>
+    <th class="w-24"><EventCategoryFilter {compact} /></th>
+    <th class="w-44">Name</th>
     <th class="w-auto xl:w-80">
       <div class="flex w-full justify-end">
         <Button
