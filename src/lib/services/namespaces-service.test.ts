@@ -45,7 +45,9 @@ describe('fetchNamespaces', () => {
       'http://localhost:8233/api/v1/namespaces?',
       {
         credentials: 'include',
-        headers: {},
+        headers: {
+          'Caller-Type': 'operator',
+        },
       },
     );
   });

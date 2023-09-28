@@ -227,7 +227,7 @@
   on:confirm={cancelWorkflows}
 />
 
-<header class="flex justify-between items-center">
+<header class="flex items-center justify-between">
   <div>
     <h1 class="text-2xl" data-cy="workflows-title">
       <Translate namespace="workflows" key="recent-workflows" />
@@ -271,7 +271,7 @@
     />
   </div>
 </header>
-<div class="flex flex-col md:flex-row gap-2">
+<div class="flex flex-col gap-2 md:flex-row">
   <LabsModeGuard>
     <svelte:fragment slot="fallback">
       <WorkflowAdvancedSearch />

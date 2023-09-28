@@ -84,6 +84,7 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 		AllowHeaders: []string{
 			echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept,
 			echo.HeaderXCSRFToken, echo.HeaderAuthorization, auth.AuthorizationExtrasHeader,
+			"Caller-Type",
 		},
 		AllowCredentials: true,
 	}))

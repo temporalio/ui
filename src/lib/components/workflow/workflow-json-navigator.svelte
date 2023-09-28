@@ -4,6 +4,7 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowEvents } from '$lib/types/events';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   export let events: WorkflowEvents = [];
   let index = 1;
@@ -78,7 +79,7 @@
     <slot name="decode" />
   </div>
   <CodeBlock
-    content={events[index - 1]}
+    content={stringifyWithBigInt(events[index - 1])}
     testId="event-history-json"
     copyIconTitle={translate('copy-icon-title')}
     copySuccessIconTitle={translate('copy-success-icon-title')}

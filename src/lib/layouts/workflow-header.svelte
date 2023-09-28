@@ -122,7 +122,7 @@
     class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
   >
     <div
-      class="flex flex-col w-full justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
+      class="flex w-full flex-col justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
     >
       <h1
         data-testid="workflow-id-heading"
@@ -137,10 +137,10 @@
           class="overflow-hidden text-ellipsis"
         />
       </h1>
-      <div class="flex gap-4 items-center flex-wrap">
+      <div class="flex flex-wrap items-center gap-4">
         <WorkflowStatus status={workflow?.status} />
         {#if workflowUsesVersioning}
-          <p class="flex gap-1 items-center">
+          <p class="flex items-center gap-1">
             <span>{translate('workers', 'last-used-version')}</span
             ><CompatibilityBadge
               defaultVersion={buildId === defaultVersionForSet ||
@@ -159,7 +159,7 @@
               </svelte:fragment>
             </CompatibilityBadge>
           </p>
-          <p class="flex gap-1 items-center">
+          <p class="flex items-center gap-1">
             <span>{translate('workers', 'next-version')}</span
             ><CompatibilityBadge
               defaultVersion={!!defaultVersionForSet}

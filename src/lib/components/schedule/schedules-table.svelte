@@ -4,7 +4,7 @@
   import { translate } from '$lib/i18n/translate';
 </script>
 
-<Table class="table-fixed w-full">
+<Table class="w-full table-fixed">
   <caption class="sr-only" slot="caption">{translate('schedules')}</caption>
   <TableHeaderRow slot="headers">
     <th class="w-28">{translate('status')}</th>

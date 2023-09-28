@@ -150,8 +150,8 @@
   }
 </script>
 
-<div class="flex flex-col grow">
-  <div class="flex flex-col grow sm:items-center sm:flex-row gap-4">
+<div class="flex grow flex-col">
+  <div class="flex grow flex-col gap-4 sm:flex-row sm:items-center">
     {#if viewAdvancedSearchInput}
       <WorkflowAdvancedSearch />
     {:else}
@@ -162,13 +162,15 @@
       >
         {#if isStatusFilter($filter.attribute)}
           <StatusFilter />
-          <CloseFilter />
         {:else}
           <SearchAttributeMenu />
         {/if}
 
         {#if isTextFilter($filter.attribute)}
-          <div class="flex w-full items-center" in:fly={{ x: -100, duration: 150 }}>
+          <div
+            class="flex w-full items-center"
+            in:fly={{ x: -100, duration: 150 }}
+          >
             <TextFilter />
             <CloseFilter />
           </div>
@@ -178,17 +180,26 @@
           <ListFilter />
         </div> -->
         {:else if isNumberFilter($filter.attribute)}
-          <div class="flex w-full items-center" in:fly={{ x: -100, duration: 150 }}>
+          <div
+            class="flex w-full items-center"
+            in:fly={{ x: -100, duration: 150 }}
+          >
             <NumberFilter />
             <CloseFilter />
           </div>
         {:else if isDateTimeFilter($filter.attribute)}
-          <div class="flex w-full items-center" in:fly={{ x: -100, duration: 150 }}>
+          <div
+            class="flex w-full items-center"
+            in:fly={{ x: -100, duration: 150 }}
+          >
             <DateTimeFilter />
             <CloseFilter />
           </div>
         {:else if isBooleanFilter($filter.attribute)}
-          <div class="flex w-full items-center" in:fly={{ x: -100, duration: 150 }}>
+          <div
+            class="flex w-full items-center"
+            in:fly={{ x: -100, duration: 150 }}
+          >
             <BooleanFilter />
             <CloseFilter />
           </div>
@@ -197,7 +208,7 @@
 
       <div
         class="flex flex-col sm:flex-row {showClearAllButton
-          ? 'justify-between w-full'
+          ? 'w-full justify-between'
           : 'justify-end'}"
       >
         {#if showClearAllButton}

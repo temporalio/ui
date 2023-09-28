@@ -1,6 +1,6 @@
 <script lang="ts">
   import { noop } from 'svelte/internal';
-  
+
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -12,7 +12,7 @@
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  
+
   import BatchActions from './batch-actions.svelte';
 
   export let workflows: WorkflowExecution[];
@@ -70,7 +70,7 @@
   }
 
   .batch-actions-table-cell {
-    @apply text-left text-sm font-medium overflow-visible whitespace-nowrap font-secondary px-2;
+    @apply overflow-visible whitespace-nowrap px-2 text-left font-secondary text-sm font-medium;
   }
 
   .configuration-button-table-cell {

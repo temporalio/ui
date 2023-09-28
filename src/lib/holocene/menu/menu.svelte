@@ -46,7 +46,7 @@
 
 <style lang="postcss">
   .menu {
-    @apply absolute z-50 mt-1 min-w-full overflow-auto max-h-[480px] list-none rounded-lg border border-gray-900 bg-white text-primary shadow;
+    @apply absolute z-50 mt-1 max-h-[480px] min-w-full list-none overflow-auto rounded-lg border border-gray-900 bg-white text-primary shadow;
 
     &.left {
       @apply left-0 origin-top-left;

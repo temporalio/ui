@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   const href =

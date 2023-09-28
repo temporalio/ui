@@ -1,13 +1,12 @@
 <script lang="ts">
   import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements';
   import { noop } from 'svelte/internal';
-  
+
   import { getContext } from 'svelte';
-  
+
   import { isNull } from '$lib/utilities/is';
-  
+
   import { type TabContext, TABS } from './tabs.svelte';
-  
 
   type OwnProps = {
     label: string;
@@ -65,7 +64,7 @@
 
 <style lang="postcss">
   .tab {
-    @apply cursor-pointer flex items-center gap-1 whitespace-nowrap border-b-2 text-sm hover:border-b-2 hover:border-blue-700 md:text-base;
+    @apply flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 text-sm hover:border-b-2 hover:border-blue-700 md:text-base;
 
     border-color: transparent;
   }
