@@ -77,6 +77,8 @@
     onRowClick();
   };
 
+  console.log("selected",active, selectedId, expanded)
+
   const failure = eventOrGroupIsFailureOrTimedOut(event);
   const canceled = eventOrGroupIsCanceled(event);
   const terminated = eventOrGroupIsTerminated(event);
