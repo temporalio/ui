@@ -119,7 +119,7 @@
     "@playwright/test": "^1.37.1",
     "@sveltejs/adapter-static": "^1.0.5",
     "@sveltejs/adapter-vercel": "^1.0.5",
-    "@sveltejs/kit": "1.15.4",
+    "@sveltejs/kit": "1.20.0",
     "@sveltejs/vite-plugin-svelte": "^2.0.2",
     "@temporalio/activity": "^1.8.4",
     "@temporalio/client": "^1.8.4",
