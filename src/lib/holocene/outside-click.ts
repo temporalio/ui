@@ -1,11 +1,16 @@
-export function clickOutside(node: Element): { destroy: () => void } {
-  const handleClick = (event: Event) => {
+import type { Action } from 'svelte/action';
+
+export const clickoutside: Action<Element, (event: MouseEvent) => void> = (
+  node: Element,
+  handler: (event: MouseEvent) => void,
+): { destroy: () => void } => {
+  const handleClick = (event: MouseEvent) => {
     if (
       node &&
       !node.contains(event.target as HTMLElement) &&
       !event.defaultPrevented
     ) {
-      node.dispatchEvent(new CustomEvent('click-outside'));
+      handler(event);
     }
   };
 
@@ -16,4 +21,4 @@ export function clickOutside(node: Element): { destroy: () => void } {
       document.removeEventListener('click', handleClick, true);
     },
   };
-}
+};

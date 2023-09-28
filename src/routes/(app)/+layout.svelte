@@ -1,9 +1,6 @@
 <script lang="ts">
-  import { afterNavigate } from '$app/navigation';
-  import { goto } from '$app/navigation';
+  import { afterNavigate, goto } from '$app/navigation';
   import { page, updated } from '$app/stores';
-
-  import type { PageData } from './$types';
 
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
@@ -27,8 +24,6 @@
   } from '$lib/utilities/route-for';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
-
-  export let data: PageData;
 
   let namespaceList: NamespaceListItem[];
 
