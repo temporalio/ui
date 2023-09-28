@@ -63,7 +63,7 @@
             </CompatibilityBadge>
           </td>
           <td class="text-left" data-testid="version-compatible-builds">
-            <div class="flex gap-2 font-mono flex-wrap">
+            <div class="flex flex-wrap gap-2 font-mono">
               {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
                 <CompatibilityBadge active={false} {buildId}>
                   <svelte:fragment slot="default-worker">
@@ -84,7 +84,7 @@
     </Table>
   {/if}
   <h2
-    class="text-base font-medium flex items-center gap-2"
+    class="flex items-center gap-2 text-base font-medium"
     data-testid="workers"
   >
     {translate('workers', 'workers')}
@@ -204,6 +204,6 @@
 
 <style lang="postcss">
   .reachability {
-    @apply bg-gray-200 px-2 py-1 rounded-sm;
+    @apply rounded-sm bg-gray-200 px-2 py-1;
   }
 </style>

@@ -80,7 +80,7 @@ export const Strings = {
     'Signaling workflows is not enabled, please contact your administrator for assistance.',
   'terminate-disabled':
     'Terminating workflows is not enabled, please contact your adminstrator for assistance.',
-  'terminate-success': 'Worklfow terminated.',
+  'terminate-success': 'Workflow terminated.',
   'cancel-success': 'Workflow canceled.',
   'signal-success': 'Workflow signaled.',
   'reset-modal-title': 'Reset Workflow',
@@ -205,7 +205,7 @@ export const Strings = {
     'Try adjusting or clearing the filters to see the Workflows running on this Namespace.',
   'workflow-query-error-state': 'There is an error with filtering Workflows.',
   'workflow-empty-state-title': 'No Workflows running in this Namespace',
-  'workflow-empty-state-description': `You can populate the WebUI with sample Workflows. You can find a complete list of executable code samples in`,
+  'workflow-empty-state-description': `You can populate the Web UI with sample Workflows. You can find a complete list of executable code samples at`,
   'visibility-disabled-archival':
     'This namespace is currently enabled for archival but visibility is not enabled.',
   'archival-link-preface': 'To enable ',

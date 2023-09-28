@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -22,10 +22,10 @@
   data-testid="navigation-header"
   {...$$restProps}
 >
-  <div class="h-32 min-h-[84px] relative">
+  <div class="relative h-32 min-h-[84px]">
     <a
       href={linkList.home}
-      class="absolute block z-[51]"
+      class="absolute z-[51] block"
       style="top: 22px; left: 18px;"
     >
       <Logo
@@ -55,7 +55,7 @@
         <slot name="top" />
       </ul>
       <hr
-        class="w-full my-8 {isCloud ? 'stroke-gray-200' : 'stroke-gray-700'}"
+        class="my-8 w-full {isCloud ? 'stroke-gray-200' : 'stroke-gray-700'}"
       />
       <ul class="nav-section">
         <slot name="middle" />
@@ -68,7 +68,7 @@
     </div>
   </div>
   <div
-    class="text-[10px] h-4 w-full pb-12 pt-24 text-center {isCloud
+    class="h-4 w-full pb-12 pt-24 text-center text-[10px] {isCloud
       ? 'text-gray-500'
       : 'text-gray-300'}"
   >
@@ -82,7 +82,7 @@
 
 <style lang="postcss">
   .nav-header {
-    @apply relative z-0 flex flex-col justify-between h-screen bg-primary text-white;
+    @apply relative z-0 flex h-screen flex-col justify-between bg-primary text-white;
   }
 
   .nav-header.cloud {
@@ -90,7 +90,7 @@
   }
 
   .nav-wrapper {
-    @apply z-50 flex flex-col grow items-center justify-between w-16;
+    @apply z-50 flex w-16 grow flex-col items-center justify-between;
   }
 
   .nav-wrapper.open {
@@ -98,7 +98,7 @@
   }
 
   .nav-section-wrapper {
-    @apply w-full flex flex-col;
+    @apply flex w-full flex-col;
   }
 
   .nav-section {
@@ -122,7 +122,7 @@
   }
 
   .nav-toggle {
-    @apply z-[51] top-[52px] left-[18px] hidden absolute transition-left;
+    @apply transition-left absolute top-[52px] left-[18px] z-[51] hidden;
   }
 
   .nav-header:hover .nav-toggle {
@@ -142,10 +142,14 @@
   }
 
   .transition-left {
-    transition: left 0.15s linear, width 0.15s linear;
+    transition:
+      left 0.15s linear,
+      width 0.15s linear;
   }
 
   .transition-width {
-    transition: width 0.15s ease-in-out, width 0.15s ease-in-out;
+    transition:
+      width 0.15s ease-in-out,
+      width 0.15s ease-in-out;
   }
 </style>

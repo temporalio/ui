@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
-  
+
   import { createEventDispatcher, getContext } from 'svelte';
-  
+
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import {
@@ -109,7 +109,7 @@
 >
   <slot name="leading" />
   <div
-    class="flex items-center grow"
+    class="flex grow items-center"
     class:justify-center={round}
     class:hidden={!$$slots.default}
   >
@@ -131,15 +131,15 @@
 
 <style lang="postcss">
   .menu-button {
-    @apply relative text-sm w-full h-10 py-2.5 px-4 flex flex-row items-center gap-2 rounded-lg disabled:cursor-not-allowed focus:z-50;
+    @apply relative flex h-10 w-full flex-row items-center gap-2 rounded-lg py-2.5 px-4 text-sm focus:z-50 disabled:cursor-not-allowed;
 
     &.active {
-      @apply after:content-[''] after:rounded-full after:h-2 after:w-2 after:bg-blue-300 after:-translate-x-full after:-translate-y-full;
+      @apply after:h-2 after:w-2 after:-translate-x-full after:-translate-y-full after:rounded-full after:bg-blue-300 after:content-[''];
     }
   }
 
   .primary {
-    @apply border-2 border-primary bg-primary bg-gradient-to-br text-white hover:from-blue-100 hover:to-purple-100 hover:text-primary;
+    @apply border-2 border-primary bg-primary bg-gradient-to-br text-white hover:border-indigo-600 hover:from-blue-100 hover:to-purple-100 hover:text-primary hover:shadow-focus hover:shadow-blue-600/50 focus-visible:border-indigo-600 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-primary focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
 
     &:disabled {
       @apply text-white opacity-75 hover:from-primary hover:to-primary;
@@ -147,7 +147,7 @@
   }
 
   .ghost {
-    @apply text-primary border border-[transparent] hover:bg-gray-200 hover:border-indigo-600 hover:shadow-focus hover:shadow-blue-600/50 focus:bg-gray-200 focus:outline-1 focus:outline-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
+    @apply border border-[transparent] text-primary hover:border-indigo-600 hover:bg-gray-200 hover:shadow-focus hover:shadow-blue-600/50 focus:bg-gray-200 focus:shadow-focus focus:shadow-blue-600/50 focus:outline-1 focus:outline-indigo-600;
 
     &:disabled {
       @apply bg-gray-100/50;
@@ -155,7 +155,7 @@
   }
 
   .secondary {
-    @apply bg-white text-primary border border-primary;
+    @apply border border-primary bg-white text-primary;
 
     &:disabled {
       @apply bg-gray-50;
@@ -163,16 +163,16 @@
   }
 
   .round {
-    @apply w-10 p-0 rounded-full;
+    @apply w-10 rounded-full p-0;
   }
 
   .secondary,
   .ghost {
-    @apply focus-within:border-indigo-600 focus-within:outline-none focus-within:shadow-focus focus-within:shadow-blue-600/50;
+    @apply focus-visible:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
   }
 
   .table-header {
-    @apply p-0 max-w-fit text-sm;
+    @apply h-auto max-w-fit border-2 border-[transparent] bg-primary p-0 text-sm text-white focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
   }
 
   .unround {

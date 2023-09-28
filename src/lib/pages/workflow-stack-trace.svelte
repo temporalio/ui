@@ -59,7 +59,11 @@
       </div>
     {:then result}
       <div class="flex items-center gap-4">
-        <Button on:click={refreshStackTrace} icon="retry" loading={isLoading}>
+        <Button
+          on:click={refreshStackTrace}
+          leadingIcon="retry"
+          loading={isLoading}
+        >
           {translate('refresh')}
         </Button>
         <p>
@@ -67,7 +71,7 @@
           {currentdate.toLocaleTimeString()}
         </p>
       </div>
-      <div class="flex items-start h-full">
+      <div class="my-2 flex h-full items-start">
         <CodeBlock
           content={result}
           language="text"

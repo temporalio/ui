@@ -6,8 +6,8 @@
   import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import { error, loading } from '$lib/stores/schedules';
@@ -115,11 +115,11 @@
   {#if $loading}
     <Loading title={loadingText} />
   {:else}
-    <header class="relative mb-12 flex gap-1">
-      <a href={backHref} class="back absolute top-0" style="left: 0;">
-        <Icon name="chevron-left" class="inline" />{backTitle}
-      </a>
-      <h1 class="font-base mt-8 ml-0 text-2xl">{title}</h1>
+    <header class="mb-12 flex flex-col gap-1">
+      <Link href={backHref} icon="chevron-left">
+        {backTitle}
+      </Link>
+      <h1 class="font-base text-2xl">{title}</h1>
     </header>
     <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
       <Alert intent="error" title="" hidden={!$error} bold>
@@ -180,27 +180,15 @@
         bind:phase
         bind:cronString
       >
-        <div class="mt-8 flex items-center gap-8">
+        <div class="mt-8 flex items-center gap-2">
           <Button
             disabled={isDisabled(preset)}
             on:click={() => handleConfirm(preset, schedule)}
             >{confirmText}</Button
           >
-          <a href={backHref} class="back" style="left: 0;"
-            >{translate('cancel')}</a
-          >
+          <Button variant="ghost" href={backHref}>{translate('cancel')}</Button>
         </div>
       </SchedulesCalendarView>
     </form>
   {/if}
 </div>
-
-<style lang="postcss">
-  .back {
-    @apply text-sm;
-  }
-
-  .back:hover {
-    @apply text-blue-700 underline;
-  }
-</style>

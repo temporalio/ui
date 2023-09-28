@@ -1,6 +1,7 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import type { StructuredCalendar } from '$lib/types/schedule';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   import type { IntervalSpec } from '$types';
 
@@ -9,12 +10,14 @@
   export let inline = false;
 </script>
 
-<div class="flex flex-col {$$props.class}">
-  <CodeBlock
-    copyable
-    {inline}
-    testId="schedule-calendar"
-    language="json"
-    content={JSON.stringify(calendar || interval, null, 2)}
-  />
-</div>
+{#key [calendar, interval]}
+  <div class="flex flex-col {$$props.class}">
+    <CodeBlock
+      copyable
+      {inline}
+      testId="schedule-calendar"
+      language="json"
+      content={stringifyWithBigInt(calendar || interval)}
+    />
+  </div>
+{/key}

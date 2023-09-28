@@ -51,8 +51,8 @@
           <p class="text-sm">Stack trace</p>
           <CodeBlock
             content={stackTrace}
-            class="mb-2 h-full lg:pr-2"
             language="text"
+            class="mb-2 h-full lg:pr-2"
             copyIconTitle={translate('copy-icon-title')}
             copySuccessIconTitle={translate('copy-success-icon-title')}
           />
@@ -152,7 +152,7 @@
   }
 
   .detail-row {
-    @apply block w-full items-start gap-4 py-2 text-left xl:flex;
+    @apply flex w-full items-center gap-4 py-2 text-left xl:flex;
   }
 
   .row:last-of-type .content {

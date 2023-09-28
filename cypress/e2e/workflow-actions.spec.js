@@ -78,7 +78,7 @@ describe('Workflow Actions', () => {
       cy.get('#workflow-actions-menu-button').click();
       cy.get('[data-testid="signal-button"]').click();
       cy.get('#signal-name').type('sos');
-      cy.get('div.cm-content').type('{{}{enter}"sos":true');
+      cy.get('.editable .cm-content').type('{{}{enter}"sos":true');
       cy.get(confirmBtn).click();
 
       cy.wait('@signal-workflow-api');

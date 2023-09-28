@@ -22,7 +22,7 @@
     <p class="text-sm">{description}</p>
   {/if}
   <textarea
-    class="font-mono min-h-fit w-full rounded border border-gray-900 py-2 px-3 text-sm"
+    class="min-h-fit w-full rounded border border-gray-900 py-2 px-3 font-mono text-sm"
     class:error={!isValid}
     {id}
     bind:value

@@ -20,21 +20,11 @@
 
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import {
-    Menu,
-    MenuButton,
-    MenuContainer,
-    MenuItem,
-  } from '$lib/holocene/menu';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
-  import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
   import { refresh } from '$lib/stores/workflows';
-  import { noop } from '$lib/utilities/noop';
   import {
     isBooleanFilter,
     isDateTimeFilter,
@@ -51,12 +41,13 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   import BooleanFilter from './boolean-filter.svelte';
+  import CloseFilter from './close-filter-button.svelte';
   import DateTimeFilter from './datetime-filter.svelte';
   import FilterList from './filter-list.svelte';
   import NumberFilter from './number-filter.svelte';
+  import SearchAttributeMenu from './search-attribute-menu.svelte';
   import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
-
   const filter = writable<WorkflowFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
@@ -99,7 +90,6 @@
       $workflowFilters = [...$workflowFilters, $filter];
     }
     filter.set(emptyFilter());
-    searchAttributeValue = '';
     onSearch();
   }
 
@@ -123,17 +113,6 @@
     return '';
   }
 
-  function isOptionDisabled(value: string, filters: WorkflowFilter[]) {
-    return filters.some(
-      (filter) => filter.conditional === '=' && filter.attribute === value,
-    );
-  }
-
-  function handleNewQuery(value: string) {
-    filter.set({ ...emptyFilter(), attribute: value, conditional: '=' });
-    $focusedElementId = getFocusedElementId(value);
-  }
-
   function updateFocusedElementId() {
     if ($activeQueryIndex !== null) {
       $focusedElementId = getFocusedElementId($filter.attribute);
@@ -141,18 +120,6 @@
   }
 
   $: $activeQueryIndex, updateFocusedElementId();
-
-  let searchAttributeValue = '';
-  //  TODO: Add KeywordList support
-  $: options = $sortedSearchAttributeOptions.filter(
-    (option) => !isListFilter(option.value),
-  );
-
-  $: filteredOptions = !searchAttributeValue
-    ? options
-    : options.filter((option) =>
-        option.value.toLowerCase().includes(searchAttributeValue.toLowerCase()),
-      );
 
   function updateFocus() {
     if ($focusedElementId) {
@@ -173,7 +140,6 @@
   function resetFilter() {
     activeQueryIndex.set(null);
     filter.set(emptyFilter());
-    searchAttributeValue = '';
   }
 
   function handleKeyUp(event: KeyboardEvent) {
@@ -183,65 +149,29 @@
   }
 </script>
 
-<div class="flex flex-col grow">
-  <div class="flex flex-col grow sm:items-center sm:flex-row gap-4">
+<div class="flex grow flex-col">
+  <div class="flex grow flex-col gap-4 sm:flex-row sm:items-center">
     {#if viewAdvancedSearchInput}
       <WorkflowAdvancedSearch />
     {:else}
       <div
-        class="flex"
+        class="flex items-center"
         class:filter={!showClearAllButton}
         on:keyup={handleKeyUp}
       >
         {#if isStatusFilter($filter.attribute)}
           <StatusFilter />
         {:else}
-          <MenuContainer>
-            <MenuButton
-              controls="search-attribute-menu"
-              unroundRight={Boolean($filter.attribute)}
-              disabled={$activeQueryIndex !== null}
-              count={$filter.attribute ? 0 : $workflowFilters.length}
-            >
-              <svelte:fragment slot="leading">
-                {#if !$filter.attribute}
-                  <Icon name="filter" />
-                {/if}
-              </svelte:fragment>
-              {$filter.attribute || translate('workflows', 'filter')}
-            </MenuButton>
-            <Menu id="search-attribute-menu">
-              <Input
-                label={translate('search')}
-                labelHidden
-                id="filter-search"
-                noBorder
-                bind:value={searchAttributeValue}
-                icon="search"
-                placeholder={translate('search')}
-                class="mb-1"
-              />
-
-              {#each filteredOptions as { value, label }}
-                {@const disabled = isOptionDisabled(value, $workflowFilters)}
-                <MenuItem
-                  on:click={() => {
-                    handleNewQuery(value);
-                  }}
-                  {disabled}
-                >
-                  {label}
-                </MenuItem>
-              {:else}
-                <MenuItem on:click={noop}>{translate('no-results')}</MenuItem>
-              {/each}
-            </Menu>
-          </MenuContainer>
+          <SearchAttributeMenu />
         {/if}
 
         {#if isTextFilter($filter.attribute)}
-          <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <div
+            class="flex w-full items-center"
+            in:fly={{ x: -100, duration: 150 }}
+          >
             <TextFilter />
+            <CloseFilter />
           </div>
           <!-- TODO: Add KeywordList support -->
           <!-- {:else if isListFilter($filter.attribute)}
@@ -249,23 +179,35 @@
           <ListFilter />
         </div> -->
         {:else if isNumberFilter($filter.attribute)}
-          <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <div
+            class="flex w-full items-center"
+            in:fly={{ x: -100, duration: 150 }}
+          >
             <NumberFilter />
+            <CloseFilter />
           </div>
         {:else if isDateTimeFilter($filter.attribute)}
-          <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <div
+            class="flex w-full items-center"
+            in:fly={{ x: -100, duration: 150 }}
+          >
             <DateTimeFilter />
+            <CloseFilter />
           </div>
         {:else if isBooleanFilter($filter.attribute)}
-          <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+          <div
+            class="flex w-full items-center"
+            in:fly={{ x: -100, duration: 150 }}
+          >
             <BooleanFilter />
+            <CloseFilter />
           </div>
         {/if}
       </div>
 
       <div
         class="flex flex-col sm:flex-row {showClearAllButton
-          ? 'justify-between w-full'
+          ? 'w-full justify-between'
           : 'justify-end'}"
       >
         {#if showClearAllButton}

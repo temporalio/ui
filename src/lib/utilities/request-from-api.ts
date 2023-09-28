@@ -187,6 +187,7 @@ const withIdToken = (
 
 const withCsrf = (headers: HeadersInit, isBrowser = BROWSER): HeadersInit => {
   if (!headers) headers = {};
+  headers['Caller-Type'] = 'operator';
   if (!isBrowser) return headers;
 
   const csrfCookie = '_csrf=';

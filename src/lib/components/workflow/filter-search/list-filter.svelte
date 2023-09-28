@@ -31,8 +31,8 @@
     placeholder="{translate('type-or-paste-in')} {$filter.attribute}"
   />
   <Button
-    variant="search"
-    unroundLeft
+    variant="secondary"
+    borderRadiusModifier="square-left"
     disabled={!list.length}
     on:click={onSubmit}>{translate('submit')}</Button
   >

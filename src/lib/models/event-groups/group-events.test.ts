@@ -234,4 +234,20 @@ describe('getEventGroupName', () => {
       'Child Workflow: Workflow Name',
     );
   });
+
+  it('should get the name of a WorkflowExecutionUpdateAcceptedEvent', () => {
+    const workflowUpdateAcceptedEvent = {
+      workflowExecutionUpdateAcceptedEventAttributes: {
+        acceptedRequest: {
+          input: {
+            name: 'Start the update',
+          },
+        },
+      },
+    } as unknown as CommonHistoryEvent;
+
+    expect(getEventGroupName(workflowUpdateAcceptedEvent)).toBe(
+      'Start the update',
+    );
+  });
 });

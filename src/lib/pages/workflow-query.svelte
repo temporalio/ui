@@ -72,7 +72,7 @@
         </Select>
         <Button
           on:click={() => query(queryType)}
-          icon="retry"
+          leadingIcon="retry"
           loading={isLoading}
         >
           {translate('refresh')}
@@ -88,7 +88,7 @@
         />
       </div>
     </div>
-    <div class="flex items-start h-full">
+    <div class="my-2 flex h-full items-start">
       {#await queryResult then result}
         <CodeBlock
           content={result}

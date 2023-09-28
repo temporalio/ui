@@ -5,11 +5,11 @@
 
 <script lang="ts">
   import type { HTMLLiAttributes } from 'svelte/elements';
-  
+
   import { createEventDispatcher, getContext } from 'svelte';
-  
+
   import Icon from '$lib/holocene/icon/icon.svelte';
-  
+
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
   type ExtendedLIEvent = KeyboardEvent & {
@@ -33,7 +33,7 @@
 
   let className = '';
   export { className as class };
-  export let selected = false;
+  export let selected = undefined;
   export let destructive = false;
   export let disabled = false;
   export let href = null;
@@ -140,11 +140,13 @@
       {:else}
         <slot />
       {/if}
-      <div class="flex w-6 h-6 shrink-0">
-        {#if selected}
-          <Icon name="checkmark" />
-        {/if}
-      </div>
+      {#if selected !== undefined}
+        <div class="flex h-6 w-6 shrink-0">
+          {#if selected}
+            <Icon name="checkmark" />
+          {/if}
+        </div>
+      {/if}
     </div>
     <slot name="trailing" />
   </li>
@@ -152,11 +154,11 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer font-primary text-sm font-medium px-3 py-2 m-1 flex flex-row items-center gap-2 rounded hover:bg-indigo-50 focus:bg-indigo-50 focus:outline focus:outline-1 focus:outline-indigo-600 focus:shadow-focus focus:shadow-blue-600/50;
+    @apply m-1 flex cursor-pointer flex-row items-center gap-2 rounded px-3 py-2 font-primary text-sm font-medium hover:bg-indigo-50 focus:bg-indigo-50 focus:shadow-focus focus:shadow-blue-600/50 focus:outline focus:outline-1 focus:outline-indigo-600;
   }
 
   .menu-item-wrapper {
-    @apply flex grow gap-2 items-center justify-between;
+    @apply flex grow items-center justify-between gap-2;
 
     &.centered {
       @apply justify-center;
@@ -168,7 +170,7 @@
   }
 
   .menu-item-description {
-    @apply text-gray-500 font-normal text-xs;
+    @apply text-xs font-normal text-gray-500;
   }
 
   .destructive {
@@ -176,6 +178,6 @@
   }
 
   .menu-item.disabled {
-    @apply cursor-not-allowed pointer-events-none text-gray-500;
+    @apply pointer-events-none cursor-not-allowed text-gray-500;
   }
 </style>

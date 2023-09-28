@@ -1,5 +1,4 @@
 <script lang="ts">
-  
   import TextFilter from '$lib/components/workflow/dropdown-filter/text-filter.svelte';
   import ExecutionStatusDropdownFilter from '$lib/components/workflow/dropdown-filter/workflow-status.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
@@ -34,6 +33,6 @@
 
 <style lang="postcss">
   .workflows-summary-table-header-cell {
-    @apply whitespace-nowrap px-2 text-left font-secondary text-sm font-medium h-10;
+    @apply whitespace-nowrap px-2 text-left font-secondary text-sm font-medium;
   }
 </style>

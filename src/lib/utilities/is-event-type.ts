@@ -41,6 +41,7 @@ import type {
   WorkflowExecutionStartedEvent,
   WorkflowExecutionTerminatedEvent,
   WorkflowExecutionTimedOutEvent,
+  WorkflowExecutionUpdateAcceptedEvent,
   WorkflowExecutionUpdateCompletedEvent,
   WorkflowTaskCompletedEvent,
   WorkflowTaskFailedEvent,
@@ -410,7 +411,12 @@ export const isLocalActivityMarkerEvent = (
   return true;
 };
 
-const isWorkflowExecutionUpdateCompletedEvent =
+export const isWorkflowExecutionUpdateAcceptedEvent =
+  hasAttributes<WorkflowExecutionUpdateAcceptedEvent>(
+    'workflowExecutionUpdateAcceptedEventAttributes',
+  );
+
+export const isWorkflowExecutionUpdateCompletedEvent =
   hasAttributes<WorkflowExecutionUpdateCompletedEvent>(
     'workflowExecutionUpdateCompletedEventAttributes',
   );

@@ -37,7 +37,7 @@ func SetUIRoutes(e *echo.Echo, publicPath string, assets fs.FS) error {
 	assetsHandler := buildUIAssetsHandler(assets)
 	e.GET("/_app/*", assetsHandler)
 	e.GET("/css/*", assetsHandler)
-	e.GET("/prism/*", assetsHandler)
+	e.GET("/codemirror/*", assetsHandler)
 	e.GET("/android*", assetsHandler)
 	e.GET("/apple*", assetsHandler)
 	e.GET("/banner*", assetsHandler)

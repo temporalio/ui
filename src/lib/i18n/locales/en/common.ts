@@ -120,8 +120,6 @@ export const Strings = {
   'keyboard-shortcuts': 'Keyboard Shortcuts',
   'close-keyboard-shortcuts': 'Close keyboard shortcuts',
   none: 'None',
-  'banner-temporal-version': 'Temporal v{{version}} is available',
-  'banner-ui-version': 'Temporal UI v{{version}} is available',
   'user-profile': 'User Profile',
   'arrow-key-up': 'Arrow key up',
   'arrow-key-down': 'Arrow key down',
@@ -134,4 +132,6 @@ export const Strings = {
   timezone: 'Timezone {{ timezone }}',
   'time-unit': 'Time Unit',
   'based-on-time-preface': 'Based on',
+  'download-json': 'Download JSON',
+  'skip-nav': 'Skip to Main Content',
 } as const;

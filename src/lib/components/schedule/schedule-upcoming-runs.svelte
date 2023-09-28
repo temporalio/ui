@@ -3,7 +3,7 @@
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
-  
+
   import type { Timestamp } from '$types';
 
   export let futureRuns: Timestamp[] = [];

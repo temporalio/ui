@@ -69,10 +69,10 @@
   }
 
   .batch-actions-table-cell {
-    @apply text-left text-sm font-medium overflow-visible whitespace-nowrap font-secondary px-2;
+    @apply overflow-visible whitespace-nowrap px-2 text-left font-secondary text-sm font-medium;
   }
 
   .configuration-button-table-cell {
-    @apply h-10 w-10 px-2;
+    @apply h-10 w-10 px-2 py-1;
   }
 </style>

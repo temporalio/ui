@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
@@ -8,11 +8,10 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowIdentifier } from '$lib/types/workflows';
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
-  
+
   import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
   import ParentWorkflowTable from './parent-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
-  
 
   export let hasChildren: boolean;
   export let hasRelationships: boolean;

@@ -37,7 +37,7 @@
         <div class="w-28">
           <WorkflowStatus status={workflow.status} />
         </div>
-        <div class="w-auto break-words mx-2">
+        <div class="mx-2 w-auto break-words">
           <Link
             newTab
             href={routeForEventHistory({

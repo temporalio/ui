@@ -5,7 +5,7 @@
       bg-gradient-to-r
       from-gray-100
       via-gray-200
-      to-gray-300 
+      to-gray-300
       {$$props.class}"
 />
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
@@ -53,12 +52,10 @@
       {namespace}
     </p>
   </div>
-  {#if hasSchedules}
+  {#if hasSchedules && !createDisabled}
     <Button
-      class="h-10"
       data-testid="create-schedule"
-      disabled={createDisabled}
-      on:click={() => goto(routeForScheduleCreate({ namespace }))}
+      href={routeForScheduleCreate({ namespace })}
     >
       {translate('schedules', 'create')}
     </Button>
@@ -125,12 +122,10 @@
             >Temporal CLI</Link
           >.
         </p>
-        {#if !error}
+        {#if !error && !createDisabled}
           <Button
-            class="mt-4"
             data-testid="create-schedule"
-            disabled={createDisabled}
-            on:click={() => goto(routeForScheduleCreate({ namespace }))}
+            href={routeForScheduleCreate({ namespace })}
           >
             {translate('schedules', 'create')}
           </Button>

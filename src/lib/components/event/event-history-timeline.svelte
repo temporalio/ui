@@ -176,9 +176,9 @@
 </script>
 
 <div
-  class="flex flex-col gap-4 bg-white border-2 border-gray-900 rounded-xl p-4 w-full"
+  class="flex w-full flex-col gap-4 rounded-xl border-2 border-gray-900 bg-white p-4"
 >
-  <div class="flex justify-between items-center gap-2">
+  <div class="flex items-center justify-between gap-2">
     <h3 class="text-xl">Timeline</h3>
     <div class="flex gap-2">
       <Button variant="secondary" on:click={() => timeline.zoomIn(1)}
@@ -393,6 +393,14 @@
 
   :global(.vis-item.vis-point.signal) {
     color: #652b19;
+  }
+
+  :global(.vis-item.vis-range.update) {
+    background-color: #f3e8ff;
+    border-color: #581c87;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #581c87;
   }
 
   :global(.bar-content) {

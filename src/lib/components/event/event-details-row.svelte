@@ -32,7 +32,7 @@
 >
   {#if typeof value === 'object'}
     <div
-      class="flex w-full flex-wrap items-center pr-1 xl:flex-nowrap xl:gap-4"
+      class="flex w-full flex-wrap items-center justify-between pr-1 xl:flex-nowrap xl:gap-4"
     >
       <p class="min-w-fit text-sm">
         {format(key)}
@@ -52,7 +52,7 @@
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class=" xl:flex-row"
+          container-class="xl:flex-row h-12 pr-1"
         >
           <Link
             class="truncate"
@@ -76,7 +76,7 @@
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class="xl:flex-row"
+          container-class="xl:flex-row h-12 pr-1"
         >
           <Link
             class="truncate"
@@ -100,7 +100,7 @@
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class=""
+          container-class="h-12 pr-1"
         >
           <Link
             class="truncate"

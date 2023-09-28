@@ -134,7 +134,7 @@
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
   <div
-    class="flex flex-col items-end lg:items-start gap-4 lg:flex-row justify-end"
+    class="flex flex-col items-end justify-end gap-4 lg:flex-row lg:items-start"
   >
     <div class="w-full">
       <slot name="action-top-left" />
@@ -142,7 +142,7 @@
     <nav
       style={floatStyle}
       bind:clientHeight={height}
-      class="flex flex-col items-end gap-4 md:flex-row min-w-fit"
+      class="flex min-w-fit flex-col items-end gap-4 md:flex-row"
       aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />

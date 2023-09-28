@@ -6,6 +6,7 @@
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { clickoutside } from '$lib/holocene/outside-click';
   import { translate } from '$lib/i18n/translate';
   import { dataConverterPort } from '$lib/stores/data-converter-config';
@@ -78,21 +79,18 @@
   <aside
     use:clickoutside={() => ($viewDataEncoderSettings = false)}
     in:fly={{ y: -50, delay: 0, duration: 500 }}
-    class="relative w-full h-auto p-12 bg-blue-50 border-b border-blue-100 flex flex-col gap-6"
+    class="relative flex h-auto w-full flex-col gap-6 border-b border-blue-100 bg-blue-50 p-12"
   >
-    <div class="w-full xl:w-1/2 flex flex-col gap-4">
+    <div class="flex w-full flex-col gap-4 xl:w-1/2">
       <div class="flex items-center justify-between space-x-2">
         <h3 data-testid="data-encoder-title" class="text-xl">
           {translate('codec-server')}
         </h3>
       </div>
       <p class="text-sm">
-        {translate('data-encoder', 'codec-server-description-prefix')}<a
-          rel="noreferrer"
-          target="_blank"
+        {translate('data-encoder', 'codec-server-description-prefix')}<Link
           href="https://docs.temporal.io/dataconversion#codec-server"
-          class="text-blue-700 underline decoration-blue-700"
-          >{translate('codec-server')}</a
+          newTab>{translate('codec-server')}</Link
         >
         {translate('data-encoder', 'codec-server-description-suffix', {
           level: namespaceOrCluster,
@@ -110,12 +108,12 @@
       >
         <div class="flex flex-col gap-2">
           <label
-            class="flex flex-row items-center gap-2 cursor-pointer"
+            class="flex cursor-pointer flex-row items-center gap-2"
             for="use-configuration-endpoint-radio"
           >
             <input
               on:click={() => (override = false)}
-              class="w-4 h-4 accent-gray-900"
+              class="h-4 w-4 accent-gray-900"
               type="radio"
               checked={!override}
               name="use-configuration-endpoint"
@@ -127,12 +125,12 @@
             })}
           </label>
           <label
-            class="flex flex-row items-center gap-2 cursor-pointer"
+            class="flex cursor-pointer flex-row items-center gap-2"
             for="use-local-endpoint-radio"
           >
             <input
               on:click={() => (override = true)}
-              class="w-4 h-4 accent-gray-900"
+              class="h-4 w-4 accent-gray-900"
               type="radio"
               checked={override}
               name="use-local-endpoint"
@@ -154,14 +152,12 @@
       <DataConverterPortSettings bind:port />
       <div class="flex items-center gap-4">
         <Button
-          thin
           disabled={Boolean(error) || (override && !endpoint)}
           data-testid="confirm-data-encoder-button"
           on:click={onConfirm}
           type="submit">{translate('apply')}</Button
         >
         <Button
-          thin
           variant="ghost"
           data-testid="cancel-data-encoder-button"
           on:click={onCancel}>{translate('cancel')}</Button

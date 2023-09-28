@@ -33,7 +33,7 @@
   const removeQuery = (index: number) => {
     $workflowFilters.splice(index, 1);
     $workflowFilters = $workflowFilters;
-    updateQueryParamsFromFilter($page.url, $workflowFilters, labsMode);
+    updateQueryParamsFromFilter($page.url, $workflowFilters, $labsMode);
 
     if (index === $workflowFilters.length) {
       const previousQuery = $workflowFilters[$workflowFilters.length - 1];
@@ -106,12 +106,12 @@
             <span class="flex">
               {attribute}
               {conditional}
-              <span class="ml-1 -py-1">
+              <span class="-py-1 ml-1">
                 <WorkflowStatus status={value} />
               </span>
             </span>
           {:else}
-            <span class="max-w-xs md:max-w-lg xl:max-w-2xl truncate">
+            <span class="max-w-xs truncate md:max-w-lg xl:max-w-2xl">
               {attribute}
               {#if isDateTimeFilter(attribute)}
                 {#if customDate}
@@ -134,7 +134,7 @@
     {/if}
   {/each}
   {#if hasMoreFilters}
-    <Button variant="search" thin on:click={viewMoreFilters}
+    <Button variant="secondary" size="xs" on:click={viewMoreFilters}
       >View More...</Button
     >
   {/if}
