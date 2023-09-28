@@ -4,6 +4,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
 
+  import ConditionalMenu from './conditional-menu.svelte';
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
@@ -19,6 +20,14 @@
   }
 </script>
 
+<ConditionalMenu
+  options={[
+    { value: '=', label: translate('equal-to') },
+    { value: '!=', label: translate('not-equal-to') },
+  ]}
+  inputId="text-filter-search"
+  noBorderLeft
+/>
 <Input
   label={$filter.attribute}
   labelHidden
