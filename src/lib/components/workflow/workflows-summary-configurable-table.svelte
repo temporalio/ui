@@ -36,29 +36,31 @@
   pageButtonLabel={(page) => translate('go-to-page', { page })}
   updating={$updating}
   items={$workflows}
-  let:visibleItems
 >
   <caption class="sr-only" slot="caption">
     {translate('workflows')}
   </caption>
   <TableHeaderRow
     onClickConfigure={openCustomizationDrawer}
-    workflows={visibleItems}
     columnsCount={columns.length}
     {empty}
+    let:visibleItems
+    workflows={visibleItems}
     slot="headers"
   >
     {#each columns as column}
       <TableHeaderCell {column} />
     {/each}
   </TableHeaderRow>
-  {#each visibleItems as workflow}
-    <TableRow {workflow}>
-      {#each columns as column}
-        <TableBodyCell {workflow} {column} />
-      {/each}
-    </TableRow>
-  {/each}
+  <svelte:fragment let:visibleItems>
+    {#each visibleItems as workflow}
+      <TableRow {workflow}>
+        {#each columns as column}
+          <TableBodyCell {workflow} {column} />
+        {/each}
+      </TableRow>
+    {/each}
+  </svelte:fragment>
   <slot name="cloud" slot="cloud" />
 </PaginatedTable>
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { clickoutside } from '$lib/holocene/outside-click';
+  import { clickOutside } from '$lib/holocene/outside-click';
 
   import IconButton from './icon-button.svelte';
 
@@ -25,7 +25,8 @@
     class:dark
     class:max-w-[400px]={position === 'right'}
     transition:fly={flyParams}
-    use:clickoutside={onClick}
+    use:clickOutside
+    on:click-outside={onClick}
     {id}
     role="region"
   >

@@ -99,7 +99,7 @@
   <table class="paginated-table">
     <slot name="caption" />
     <thead class="paginated-table-header">
-      <slot name="headers" />
+      <slot name="headers" visibleItems={$store.items} />
       {#if updating}
         <ProgressBar />
       {/if}

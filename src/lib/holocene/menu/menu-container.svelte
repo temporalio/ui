@@ -4,7 +4,7 @@
 
   import { createEventDispatcher, setContext } from 'svelte';
 
-  import { clickoutside } from '$lib/holocene/outside-click';
+  import { clickOutside } from '$lib/holocene/outside-click';
 
   export const MENU_CONTEXT = 'menu-context';
 
@@ -41,6 +41,11 @@
   });
 </script>
 
-<div use:clickoutside={closeMenu} class="relative {className}" {...$$restProps}>
+<div
+  use:clickOutside
+  on:click-outside={closeMenu}
+  class="relative {className}"
+  {...$$restProps}
+>
   <slot {open} />
 </div>
