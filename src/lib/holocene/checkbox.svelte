@@ -31,6 +31,8 @@
   export let value: T = undefined;
   export let group: T[] = undefined;
 
+  let inputRef;
+
   const dispatch = createEventDispatcher<{
     change: { checked: boolean; value?: T };
   }>();
@@ -55,6 +57,16 @@
   };
 
   $: checked = group !== undefined ? group.includes(value) : checked;
+
+  $: {
+    if (inputRef) {
+      if (indeterminate) {
+        inputRef.indeterminate = true;
+      } else {
+        inputRef.indeterminate = false;
+      }
+    }
+  }
 </script>
 
 <div
@@ -75,13 +87,13 @@
       {label}
     </span>
     <input
+      bind:this={inputRef}
       on:click|stopPropagation
       on:change={handleChange}
       {id}
       {value}
       type="checkbox"
       bind:checked
-      {indeterminate}
       {disabled}
       class:indeterminate
       {...omit($$restProps, 'data-testid')}
