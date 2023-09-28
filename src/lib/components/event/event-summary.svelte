@@ -1,7 +1,6 @@
 <script lang="ts">
-  import _ from 'json-bigint';
   import { onMount } from 'svelte';
-  
+
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
@@ -47,6 +46,7 @@
   });
 
   function scrollIntoView(target) {
+    // does the id exist in history if not return/remove from url
     const element = document.getElementById(target);
     if (!element) return;
 
@@ -121,12 +121,18 @@
   let:visibleItems
   let:activeRowIndex
   let:setActiveRowIndex
+  let:store
   aria-label={translate('workflows', 'recent-events')}
   pageSizeSelectLabel={translate('per-page')}
   previousButtonLabel={translate('previous')}
   nextButtonLabel={translate('next')}
 >
-  <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
+  <EventSummaryTable
+    {updating}
+    {compact}
+    {store}
+    on:expandAll={handleExpandChange}
+  >
     {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
       <EventSummaryRow
         {event}
