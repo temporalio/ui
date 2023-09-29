@@ -52,7 +52,7 @@
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class="xl:flex-row h-12 pr-1"
+          container-class="xl:flex-row"
         >
           <Link
             class="truncate"
@@ -76,7 +76,7 @@
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class="xl:flex-row h-12 pr-1"
+          container-class="xl:flex-row"
         >
           <Link
             class="truncate"
@@ -100,7 +100,6 @@
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class="h-12 pr-1"
         >
           <Link
             class="truncate"

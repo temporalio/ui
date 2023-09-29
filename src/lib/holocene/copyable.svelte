@@ -1,5 +1,5 @@
 <script lang="ts">
-  import IconButton from '$lib/holocene/icon-button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
   export let content: string;
@@ -13,7 +13,7 @@
 
 {#if clickAllToCopy}
   <button
-    class="group flex items-center gap-2 {$$props['container-class']}"
+    class="group flex items-center gap-1 {$$props['container-class']}"
     on:click={(e) => copy(e, content)}
   >
     <slot>
@@ -21,26 +21,43 @@
         >{content}</span
       >
     </slot>
-    <IconButton
+    <button
       on:click={(e) => copy(e, content)}
-      class={`${visible ? 'visible' : 'invisible group-hover:visible'}`}
-      icon={$copied ? 'checkmark' : 'copy'}
-      label={$copied ? copySuccessIconTitle : copyIconTitle}
-    />
+      aria-label={$copied ? copySuccessIconTitle : copyIconTitle}
+      class={`${
+        visible ? 'visible' : 'invisible group-hover:visible'
+      } copy-button`}
+    >
+      <Icon
+        title={$copied ? copySuccessIconTitle : copyIconTitle}
+        name={$copied ? 'checkmark' : 'copy'}
+      />
+    </button>
   </button>
 {:else}
-  <div class="group flex items-center gap-2 {$$props['container-class']}">
+  <div class="group flex items-center gap-1 {$$props['container-class']}">
     <slot>
       <span class={$$props.class} class:select-all={!$$slots.default}
         >{content}</span
       >
     </slot>
-
-    <IconButton
+    <button
       on:click={(e) => copy(e, content)}
-      class={`${visible ? 'visible' : 'invisible group-hover:visible'}`}
-      icon={$copied ? 'checkmark' : 'copy'}
-      label={$copied ? copySuccessIconTitle : copyIconTitle}
-    />
+      aria-label={$copied ? copySuccessIconTitle : copyIconTitle}
+      class={`${
+        visible ? 'visible' : 'invisible group-hover:visible'
+      } copy-button`}
+    >
+      <Icon
+        title={$copied ? copySuccessIconTitle : copyIconTitle}
+        name={$copied ? 'checkmark' : 'copy'}
+      />
+    </button>
   </div>
 {/if}
+
+<style lang="postcss">
+  .copy-button {
+    @apply m-1 rounded-md border-2 border-[transparent] hover:border-indigo-600 hover:bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 hover:shadow-focus hover:shadow-blue-600/50 focus-visible:border-indigo-600 focus-visible:bg-gradient-to-br focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
+  }
+</style>
