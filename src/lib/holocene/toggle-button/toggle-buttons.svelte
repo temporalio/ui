@@ -3,6 +3,6 @@
   setContext<boolean>('group', true);
 </script>
 
-<div class="flex">
+<div class="flex {$$restProps.class}">
   <slot />
 </div>

@@ -66,6 +66,7 @@ export const Strings = {
   'recent-events': 'Recent Events',
   'recent-events-view': 'Recent Events View',
   history: 'History',
+  'event-history': 'Event History',
   compact: 'Compact',
   json: 'JSON',
   download: 'Download',

@@ -25,6 +25,7 @@
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
   import EventEmptyRow from './event-empty-row.svelte';
+  import EventHistoryTimeline from './event-history-timeline.svelte';
 
   export let compact = false;
 
@@ -105,7 +106,13 @@
   previousButtonLabel={translate('previous')}
   nextButtonLabel={translate('next')}
 >
+  <span slot="pagination-top" />
   <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
+    <tr>
+      <td colspan="6" class="border-4 border-gray-900">
+        <EventHistoryTimeline history={$fullEventHistory} />
+      </td>
+    </tr>
     {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
       <EventSummaryRow
         {event}

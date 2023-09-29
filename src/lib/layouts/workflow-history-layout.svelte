@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
@@ -10,7 +9,6 @@
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
-  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -78,16 +76,13 @@
       </div>
     </Accordion>
   </section>
-  <LabsModeGuard>
-    <EventHistoryTimeline history={$fullEventHistory} />
-  </LabsModeGuard>
   <section id="event-history">
     <nav
-      class="flex flex-col items-center justify-between gap-4 pb-4 lg:flex-row lg:items-end"
+      class="flex flex-col items-center justify-between gap-4 lg:flex-row lg:items-end"
       aria-label={translate('workflows', 'recent-events-view')}
     >
-      <h2 class="text-lg font-medium">
-        {translate('workflows', 'recent-events')}
+      <h2 class="text-xl font-medium">
+        {translate('workflows', 'event-history')}
       </h2>
       <div id="event-view-toggle" class="flex gap-4 bg-white">
         <ToggleButtons>

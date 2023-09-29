@@ -8,7 +8,6 @@
     MenuContainer,
     MenuItem,
   } from '$lib/holocene/menu';
-  import type { MenuButtonVariant } from '$lib/holocene/menu/menu-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     allEventTypeOptions,
@@ -20,7 +19,6 @@
   import { isVersionNewer } from '$lib/utilities/version-check';
 
   export let compact = false;
-  export let variant: MenuButtonVariant = 'table-header';
 
   $: label = compact
     ? translate('events', 'event-type')
@@ -52,7 +50,7 @@
 <MenuContainer>
   <MenuButton
     active={!!$eventCategoryFilter}
-    {variant}
+    variant="secondary"
     data-testid="event-category-filter"
     controls="event-category-filter-menu"
   >

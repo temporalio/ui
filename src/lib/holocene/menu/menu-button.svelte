@@ -161,7 +161,7 @@
   }
 
   .secondary {
-    @apply border border-primary bg-white text-primary;
+    @apply border-2 border-primary bg-white text-primary;
 
     &:disabled {
       @apply bg-gray-50;

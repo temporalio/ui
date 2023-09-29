@@ -113,20 +113,11 @@
       {/if}
     </div>
   </td>
-  <td class="text-left">
-    <div class="flex w-full items-center justify-between truncate">
-      <p class="event-name truncate text-sm font-semibold md:text-base">
-        {isLocalActivityMarkerEvent(event)
-          ? 'LocalActivity'
-          : capitalize(event.category)}
-      </p>
-    </div>
-  </td>
   <td
     colspan={expanded ? 2 : 1}
     class="text-right text-sm font-normal xl:text-left"
   >
-    <div class="flex">
+    <div class="flex flex-col gap-1 md:flex-row">
       <div>
         {#if compact && failure}
           <Icon class="mr-1.5 inline text-red-700" name="clock" />
@@ -140,6 +131,11 @@
       </div>
       <div class="flex w-full items-center justify-between truncate">
         <p class="event-name truncate text-sm font-semibold md:text-base">
+          {#if compact}
+            {isLocalActivityMarkerEvent(event)
+              ? 'LocalActivity'
+              : capitalize(event.category)}:
+          {/if}
           {event.name}
         </p>
         {#if expanded}

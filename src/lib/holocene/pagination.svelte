@@ -147,16 +147,16 @@
     >
       <slot name="action-top-center" />
       <div class="flex gap-4">
-        {#if !itemsPerPage}
-          <FilterSelect
-            label={pageSizeSelectLabel}
-            parameter={perPageKey}
-            value={perPage}
-            {options}
-            position="top"
-          />
-        {/if}
         <slot name="pagination-top">
+          {#if !itemsPerPage}
+            <FilterSelect
+              label={pageSizeSelectLabel}
+              parameter={perPageKey}
+              value={perPage}
+              {options}
+              position="top"
+            />
+          {/if}
           <div class="flex items-center justify-center gap-3">
             <button
               class="caret"

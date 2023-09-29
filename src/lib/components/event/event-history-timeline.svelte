@@ -6,12 +6,13 @@
     type TimelineOptionsZoomKey,
   } from 'vis-timeline/standalone';
 
-  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
+  import { timeline } from '$lib/stores/timeline';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
     CommonHistoryEvent,
@@ -23,12 +24,9 @@
 
   import { tooltipTemplate } from './event-history-timeline-helpers';
 
-  import EventCategoryFilter from './event-category-filter.svelte';
-
   export let history: CommonHistoryEvent[] = [];
 
   let visualizationRef;
-  let timeline;
 
   $: category = $eventCategoryFilter as EventTypeCategory;
 
@@ -55,31 +53,42 @@
     const groups = new DataSet([]);
     const firstEvent = sortedHistory[0];
     const finalEvent = sortedHistory[sortedHistory.length - 1];
-    groups.add({
-      id: 'workflow',
-      content: renderExecutionName(),
-      order: -1,
-    });
-    items.add({
-      id: 'workflow',
-      group: 'workflow',
-      start: firstEvent.eventTime,
-      end: isRunning ? Date.now() : finalEvent.eventTime,
-      type: 'range',
-      title: stringifyWithBigInt(
-        {
-          startTime: $workflowRun.workflow.startTime,
-          endTime: $workflowRun.workflow?.endTime || Date.now(),
-        },
-        undefined,
-        2,
-      ),
-      content: $workflowRun.workflow.runId,
-      className: isRunning
-        ? `${finalEvent.category} Running`
-        : `${finalEvent.category} ${finalEvent.classification}`,
-      editable: false,
-    });
+
+    if (!category) {
+      groups.add({
+        id: 'workflow',
+        content: renderExecutionName(),
+        order: -1,
+      });
+      items.add({
+        id: 'workflow',
+        group: 'workflow',
+        start: firstEvent.eventTime,
+        end: isRunning ? Date.now() : finalEvent.eventTime,
+        type: 'range',
+        title: stringifyWithBigInt(
+          {
+            startTime: $workflowRun.workflow.startTime,
+            endTime: $workflowRun.workflow?.endTime || Date.now(),
+          },
+          undefined,
+          2,
+        ),
+        content: $workflowRun.workflow.runId,
+        className: isRunning
+          ? `${finalEvent.category} Running`
+          : `${finalEvent.category} ${finalEvent.classification}`,
+        editable: false,
+      });
+    }
+
+    if (category && !eventGroups.length) {
+      groups.add({
+        id: 'no-results',
+        content: translate('events', 'empty-state-title'),
+        order: -1,
+      });
+    }
 
     eventGroups.forEach((group, i) => {
       const initialEvent = group.initialEvent;
@@ -130,14 +139,14 @@
 
   const getOptions = () => ({
     stackSubgroups: true,
-    maxHeight: 520,
+    maxHeight: 360,
     min: $workflowRun.workflow.startTime,
     max: $workflowRun.workflow?.endTime || Date.now(),
     horizontalScroll: true,
     verticalScroll: true,
     zoomKey: 'ctrlKey' as TimelineOptionsZoomKey,
     orientation: {
-      axis: 'both',
+      axis: 'top',
       item: 'center',
     },
     tooltip: {
@@ -146,19 +155,20 @@
       followMouse: false,
       template: tooltipTemplate,
     },
-    format: {
-      majorLabels: {
-        millisecond: 'D MMMM HH:mm:ss',
-        second: 'D MMMM HH:mm',
-        minute: 'ddd D MMMM',
-        hour: 'ddd D MMMM',
-        weekday: 'MMMM YYYY',
-        day: 'MMMM YYYY',
-        week: 'MMMM YYYY',
-        month: 'YYYY',
-        year: '',
-      },
-    },
+    // showMinorLabels: false,
+    // format: {
+    //   majorLabels: {
+    //     millisecond: 'D MMMM HH:mm:ss',
+    //     second: 'D MMMM HH:mm',
+    //     minute: 'ddd D MMMM',
+    //     hour: 'ddd D MMMM',
+    //     weekday: 'MMMM YYYY',
+    //     day: 'MMMM YYYY',
+    //     week: 'MMMM YYYY',
+    //     month: 'YYYY',
+    //     year: '',
+    //   },
+    // },
     xss: {
       disabled: true,
       filterOptions: {
@@ -170,9 +180,9 @@
   });
 
   const setVizItems = (items, groups) => {
-    timeline.setGroups(groups);
-    timeline.setItems(items);
-    timeline.fit();
+    $timeline.setGroups(groups);
+    $timeline.setItems(items);
+    $timeline.fit();
   };
 
   const filterHistory = (history, category) => {
@@ -186,8 +196,7 @@
   };
 
   const buildTimeline = (category: EventTypeCategory) => {
-    console.log('Building timeline');
-    timeline = new Timeline(
+    $timeline = new Timeline(
       visualizationRef,
       new DataSet([]),
       new DataSet([]),
@@ -209,43 +218,22 @@
   };
 
   onMount(() => {
-    return () => timeline?.destroy();
+    return () => {
+      if ($timeline?.body) $timeline.destroy();
+    };
   });
 
   $: {
     if ($workflowRun.workflow && history.length && visualizationRef) {
-      if (timeline) {
-        timeline.destroy();
+      if ($timeline?.body) {
+        $timeline.destroy();
       }
       buildTimeline(category);
     }
   }
-
-  const resetTimelineView = () => {
-    timeline.focus('workflow');
-  };
 </script>
 
-<div
-  class="flex w-full flex-col gap-4 rounded-xl border-2 border-gray-900 bg-white p-4"
->
-  <div class="flex items-center justify-between gap-2">
-    <h3 class="text-xl">Timeline</h3>
-    <div class="flex flex-col gap-2 md:flex-row">
-      <EventCategoryFilter compact variant="secondary" />
-      <div class="flex gap-2">
-        <Button variant="secondary" on:click={() => timeline.zoomIn(1)}
-          >+</Button
-        >
-        <Button variant="secondary" on:click={() => timeline.zoomOut(1)}
-          >-</Button
-        >
-        <Button variant="secondary" on:click={resetTimelineView}>Fit</Button>
-      </div>
-    </div>
-  </div>
-  <div class="timeline" bind:this={visualizationRef} />
-</div>
+<div class="timeline" bind:this={visualizationRef} />
 
 <style lang="postcss">
   :global(.vis-item-content) {
@@ -276,9 +264,6 @@
   :global(.vis-background, .vis-timeline) {
     background-color: #18181b;
     color: white;
-    border-radius: 0.75rem;
-    border-width: 2px;
-    border: 2px solid #18181b;
   }
 
   :global(.vis-content, .vis-group) {
@@ -307,7 +292,7 @@
     border-width: 2px !important;
     border: 2px solid #18181b !important;
     height: auto !important;
-    font-size: 0.5em !important;
+    font-size: 0.75em !important;
   }
 
   :global(.vis-item.Card) {
