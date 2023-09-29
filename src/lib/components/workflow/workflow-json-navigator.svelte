@@ -37,53 +37,55 @@
 {#if !events.length}
   <Loading />
 {:else}
-  <div class="flex gap-4 max-sm:flex-col">
-    <div class="flex w-full gap-4">
-      <RangeInput
-        label={translate('event')}
-        labelHidden
-        id="range-input-event-history"
-        min={1}
-        max={events.length}
-        bind:value={index}
-      />
-      <div class="flex items-center justify-center gap-3">
-        <button
-          class="caret"
-          disabled={index === 1}
-          on:click={() => {
-            index -= 1;
-          }}
-          aria-label={translate('previous')}
-        >
-          <span
-            class="arrow arrow-left"
-            class:arrow-left-disabled={index === 1}
-          />
-        </button>
-        <button
-          class="caret"
-          disabled={index === events.length}
-          on:click={() => {
-            index += 1;
-          }}
-          aria-label={translate('next')}
-        >
-          <span
-            class="arrow arrow-right"
-            class:arrow-right-disabled={index === events.length}
-          />
-        </button>
+  <div class="border-2 border-gray-900 p-8">
+    <div class="flex gap-4 max-sm:flex-col">
+      <div class="flex w-full gap-4">
+        <RangeInput
+          label={translate('event')}
+          labelHidden
+          id="range-input-event-history"
+          min={1}
+          max={events.length}
+          bind:value={index}
+        />
+        <div class="flex items-center justify-center gap-3">
+          <button
+            class="caret"
+            disabled={index === 1}
+            on:click={() => {
+              index -= 1;
+            }}
+            aria-label={translate('previous')}
+          >
+            <span
+              class="arrow arrow-left"
+              class:arrow-left-disabled={index === 1}
+            />
+          </button>
+          <button
+            class="caret"
+            disabled={index === events.length}
+            on:click={() => {
+              index += 1;
+            }}
+            aria-label={translate('next')}
+          >
+            <span
+              class="arrow arrow-right"
+              class:arrow-right-disabled={index === events.length}
+            />
+          </button>
+        </div>
       </div>
+      <slot name="decode" />
     </div>
-    <slot name="decode" />
+    <CodeBlock
+      content={stringifyWithBigInt(events[index - 1])}
+      testId="event-history-json"
+      copyIconTitle={translate('copy-icon-title')}
+      copySuccessIconTitle={translate('copy-success-icon-title')}
+    />
   </div>
-  <CodeBlock
-    content={stringifyWithBigInt(events[index - 1])}
-    testId="event-history-json"
-    copyIconTitle={translate('copy-icon-title')}
-    copySuccessIconTitle={translate('copy-success-icon-title')}
-  />
 {/if}
 
 <style lang="postcss">

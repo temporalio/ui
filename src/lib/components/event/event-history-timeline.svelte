@@ -155,7 +155,7 @@
       followMouse: false,
       template: tooltipTemplate,
     },
-    // showMinorLabels: false,
+    showMinorLabels: false,
     // format: {
     //   majorLabels: {
     //     millisecond: 'D MMMM HH:mm:ss',
@@ -258,12 +258,11 @@
 
   :global(.vis-time-axis .vis-text) {
     font-size: 10px;
-    color: white !important;
+    color: #666c7b !important;
   }
 
   :global(.vis-background, .vis-timeline) {
-    background-color: #18181b;
-    color: white;
+    background-color: #e2e8f0;
   }
 
   :global(.vis-content, .vis-group) {

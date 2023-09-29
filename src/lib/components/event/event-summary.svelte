@@ -59,10 +59,6 @@
 
   $: $refresh, fetchEvents(namespace, workflowId, runId, $eventFilterSort);
 
-  function handleExpandChange(event: CustomEvent) {
-    $expandAllEvents = event.detail.expanded;
-  }
-
   const getEventsOrGroups = (
     items: CommonHistoryEvent[],
     category: string,
@@ -107,7 +103,7 @@
   nextButtonLabel={translate('next')}
 >
   <span slot="pagination-top" />
-  <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
+  <EventSummaryTable {updating}>
     <tr>
       <td colspan="6" class="border-4 border-gray-900">
         <EventHistoryTimeline history={$fullEventHistory} />
