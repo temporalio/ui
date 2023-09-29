@@ -9,9 +9,9 @@
   $: checked = $autoRefreshWorkflow === 'on';
 </script>
 
-<Tooltip bottomLeft text={translate('workflows', 'auto-refresh-tooltip')}>
+<Tooltip bottomLeft text={translate('auto-refresh-tooltip')}>
   <ToggleSwitch
-    label={translate('workflows', 'auto-refresh')}
+    label={translate('auto-refresh')}
     labelPosition="left"
     id="autorefresh"
     {checked}

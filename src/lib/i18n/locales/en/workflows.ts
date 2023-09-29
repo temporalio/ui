@@ -30,11 +30,9 @@ export const Strings = {
   'batch-operation-confirmation-input-hint':
     'If you supply a custom reason, "{{placeholder}}" will be appended to it.',
   'batch-terminate-all-success':
-    'The batch $t(terminate) request is processing in the background.',
+    'The batch terminate request is processing in the background.',
   'batch-cancel-all-success':
-    'The batch $t(cancel) request is processing in the background.',
-  'batch-terminate-success': 'Successfully $t(terminated) {{count}} workflows.',
-  'batch-cancel-success': 'Successfully $t(canceled) {{count}} workflows.',
+    'The batch cancel request is processing in the background.',
   'configure-workflows': 'Configure Workflow List',
   'open-configure-workflows': 'Open workflow list configuration',
   'close-configure-workflows': 'Close workflow list configuration',
@@ -57,8 +55,6 @@ export const Strings = {
   'select-all': 'select all {{count, number}}',
   'request-cancellation': 'Request Cancellation',
   'back-to-workflows': 'Back to Workflows',
-  'auto-refresh': 'Auto refresh',
-  'auto-refresh-tooltip': '15 second page refresh',
   input: 'Input',
   'input-and-results': 'Input and Results',
   'continued-as-new-with-input': 'Continued as New with Input',

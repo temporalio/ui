@@ -13,7 +13,5 @@ declare namespace App {
     settings?: import('$types').Settings;
     workers?: import('$types').GetPollersResponse;
     cluster?: import('$types').ClusterInformation;
-    batchOperations?: import('$types/batch').BatchOperations;
-    batchOperation?: import('$types/batch').BatchOperation;
   }
 }

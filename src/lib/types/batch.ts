@@ -43,8 +43,8 @@ export type APIBatchOperationInfo = {
 };
 
 export type BatchOperationInfo = {
-  startTime: Date;
-  closeTime: Date;
+  startTime: string;
+  closeTime: string;
   state: BatchOperationState;
   jobId: string;
 };
@@ -53,8 +53,8 @@ export type BatchOperation = {
   operationType: BatchOperationType;
   jobId: string;
   state: BatchOperationState;
-  startTime: Date;
-  closeTime: Date;
+  startTime: string;
+  closeTime: string;
   totalOperationCount: number;
   completeOperationCount: number;
   failureOperationCount: number;

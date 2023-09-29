@@ -5,15 +5,13 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { batchOperations } from '$lib/stores/batch-operations';
   import { timeFormat } from '$lib/stores/time-format';
-  import type {
-    BatchOperationInfo,
-    BatchOperationState,
-  } from '$lib/types/batch';
+  import type { BatchOperationState } from '$lib/types/batch';
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForBatchOperation } from '$lib/utilities/route-for';
 
-  export let operations: BatchOperationInfo[];
   export let namespace: string;
 
   const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
@@ -26,12 +24,12 @@
 
 <Table>
   <TableHeaderRow slot="headers">
-    <th>Status</th>
-    <th>Job ID</th>
-    <th>Start Time</th>
-    <th>Close Time</th>
+    <th>{translate('status')}</th>
+    <th>{translate('job-id')}</th>
+    <th>{translate('start-time')}</th>
+    <th>{translate('close-time')}</th>
   </TableHeaderRow>
-  {#each operations as { state, jobId, startTime, closeTime }}
+  {#each $batchOperations as { state, jobId, startTime, closeTime }}
     <TableRow>
       <td>
         <Badge type={jobStateToBadgeType[state]}>
@@ -48,7 +46,8 @@
   {:else}
     <TableRow>
       <td colspan="4">
-        <EmptyState title="No Batch Operations for {namespace}"></EmptyState>
+        <EmptyState title={translate('batch', 'empty-state-title')}
+        ></EmptyState>
       </td>
     </TableRow>
   {/each}

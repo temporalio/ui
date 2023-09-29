@@ -136,4 +136,7 @@ export const Strings = {
   'skip-nav': 'Skip to Main Content',
   'equal-to': 'Equal to',
   'not-equal-to': 'Not equal to',
+  'job-id': 'Job ID',
+  'auto-refresh': 'Auto refresh',
+  'auto-refresh-tooltip': '15 second page refresh',
 } as const;

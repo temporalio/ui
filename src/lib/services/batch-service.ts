@@ -2,7 +2,9 @@ import { get } from 'svelte/store';
 
 import { v4 as uuidv4 } from 'uuid';
 
+import { Action } from '$lib/models/workflow-actions';
 import { getAuthUser } from '$lib/stores/auth-user';
+import { inProgressBatchOperation } from '$lib/stores/batch-operations';
 import { temporalVersion } from '$lib/stores/versions';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -27,15 +29,7 @@ type CreateBatchOperationOptions = {
   namespace: string;
   reason: string;
   query?: string;
-  executions?: WorkflowExecutionInput[];
-};
-
-type CreateBatchOperationWithQueryOptions = CreateBatchOperationOptions & {
-  query: string;
-};
-
-type CreateBatchOperationWithIDsOptions = CreateBatchOperationOptions & {
-  workflows: WorkflowExecution[];
+  workflows?: WorkflowExecution[];
 };
 
 type DescribeBatchOperationOptions = {
@@ -57,89 +51,75 @@ const queryFromWorkflows = (
   }, '');
 };
 
+const batchActionToOperation = (
+  action: Action,
+): Pick<
+  StartBatchOperationRequest,
+  'cancellationOperation' | 'terminationOperation'
+> => {
+  const identity = getAuthUser().email;
+
+  switch (action) {
+    case Action.Cancel:
+      return {
+        cancellationOperation: { identity },
+      };
+    case Action.Terminate:
+      return {
+        terminationOperation: { identity },
+      };
+    default:
+      return {};
+  }
+};
+
 const toWorkflowExecutionInput = ({
   id,
   runId,
 }: WorkflowExecution): WorkflowExecutionInput => ({ workflowId: id, runId });
 
-const createBatchOperationOptions = ({
-  namespace,
-  reason,
-  workflows,
-}: CreateBatchOperationWithIDsOptions): CreateBatchOperationOptions => {
-  const options: CreateBatchOperationOptions = {
-    namespace,
-    reason,
+const createBatchOperationRequest = (
+  action: Action,
+  options: CreateBatchOperationOptions,
+): StartBatchOperationRequest => {
+  const body: StartBatchOperationRequest = {
+    namespace: options.namespace,
+    reason: options.reason,
+    jobId: uuidv4(),
+    ...batchActionToOperation(action),
   };
 
-  if (isVersionNewer(get(temporalVersion), '1.19')) {
+  if (options.workflows) {
+    if (isVersionNewer(get(temporalVersion), '1.19')) {
+      return {
+        ...body,
+        executions: options.workflows.map(toWorkflowExecutionInput),
+      };
+    } else {
+      return {
+        ...body,
+        visibilityQuery: queryFromWorkflows(options.workflows),
+      };
+    }
+  } else if (options.query) {
     return {
-      ...options,
-      executions: workflows.map(toWorkflowExecutionInput),
-    };
-  } else {
-    return {
-      ...options,
-      query: queryFromWorkflows(workflows),
+      ...body,
+      visibilityQuery: options.query,
     };
   }
 };
 
-export async function bulkTerminateByIDs(
-  options: CreateBatchOperationWithIDsOptions,
-): Promise<number> {
-  const fullOptions = createBatchOperationOptions(options);
-  const jobId = await terminateWorkflows(fullOptions);
-  return pollBatchOperation({
-    namespace: fullOptions.namespace,
-    jobId,
+export async function batchCancelWorkflows(
+  options: CreateBatchOperationOptions,
+): Promise<void> {
+  const route = routeForApi('batch-operations', {
+    namespace: options.namespace,
   });
-}
 
-export function batchTerminateByQuery({
-  namespace,
-  query,
-  reason,
-}: CreateBatchOperationWithQueryOptions): Promise<string> {
-  return terminateWorkflows({ namespace, query, reason });
-}
-
-export async function bulkCancelByIDs(
-  options: CreateBatchOperationWithIDsOptions,
-): Promise<number> {
-  const fullOptions = createBatchOperationOptions(options);
-  const jobId = await cancelWorkflows(fullOptions);
-  return pollBatchOperation({
-    namespace: fullOptions.namespace,
-    jobId,
-  });
-}
-
-export function batchCancelByQuery({
-  namespace,
-  query,
-  reason,
-}: CreateBatchOperationWithQueryOptions): Promise<string> {
-  return cancelWorkflows({ namespace, query, reason });
-}
-
-async function cancelWorkflows({
-  namespace,
-  query,
-  executions,
-  reason,
-}: CreateBatchOperationOptions): Promise<string> {
-  const route = routeForApi('batch-operations', { namespace });
-  const jobId = uuidv4();
-
-  const body: StartBatchOperationRequest = {
-    jobId,
-    namespace,
-    reason,
-    cancellationOperation: {},
-    ...(query && { visibilityQuery: query }),
-    ...(executions && { executions }),
-  };
+  const body: StartBatchOperationRequest = createBatchOperationRequest(
+    Action.Cancel,
+    options,
+  );
 
   await requestFromAPI<null>(route, {
     options: {
@@ -149,27 +129,20 @@ async function cancelWorkflows({
     notifyOnError: false,
   });
 
-  return jobId;
+  inProgressBatchOperation.set({
+    jobId: body.jobId,
+    namespace: body.namespace,
+  });
 }
 
-async function terminateWorkflows({
-  namespace,
-  query,
-  executions,
-  reason,
-}: CreateBatchOperationOptions): Promise<string> {
-  const route = routeForApi('batch-operations', { namespace });
-  const jobId = uuidv4();
-  const identity = getAuthUser().email;
+export async function batchTerminateWorkflows(
+  options: CreateBatchOperationOptions,
+): Promise<void> {
+  const route = routeForApi('batch-operations', {
+    namespace: options.namespace,
+  });
 
-  const body: StartBatchOperationRequest = {
-    jobId,
-    namespace,
-    reason,
-    terminationOperation: { ...(identity && { identity }) },
-    ...(query && { visibilityQuery: query }),
-    ...(executions && { executions }),
-  };
+  const body = createBatchOperationRequest(Action.Terminate, options);
 
   await requestFromAPI<null>(route, {
     options: {
@@ -179,7 +152,10 @@ async function terminateWorkflows({
     notifyOnError: false,
   });
 
-  return jobId;
+  inProgressBatchOperation.set({
+    jobId: body.jobId,
+    namespace: body.namespace,
+  });
 }
 
 export async function pollBatchOperation({
@@ -200,7 +176,7 @@ export async function pollBatchOperation({
             } catch {
               reject();
             }
-          }, 1000);
+          }, 5000);
         }
       },
     );
@@ -228,10 +204,10 @@ const toBatchOperationDetails = (
 ): BatchOperation => {
   return {
     ...apiBatchOperationDetails,
-    startTime: new Date(apiBatchOperationDetails.startTime),
-    closeTime: new Date(apiBatchOperationDetails.closeTime),
+    startTime: apiBatchOperationDetails.startTime,
+    closeTime: apiBatchOperationDetails.closeTime,
     totalOperationCount: parseInt(
-      apiBatchOperationDetails.completeOperationCount,
+      apiBatchOperationDetails.totalOperationCount,
       10,
     ),
     completeOperationCount: parseInt(
@@ -259,7 +235,9 @@ export async function listBatchOperations(
 
   return {
     nextPageToken: response.nextPageToken,
-    operations: response.operationInfo.map(toBatchOperationInfo),
+    operations: response.operationInfo
+      ? response.operationInfo.map(toBatchOperationInfo)
+      : [],
   };
 }
 
@@ -267,8 +245,8 @@ const toBatchOperationInfo = (
   apiBatchOperationInfo: APIBatchOperationInfo,
 ): BatchOperationInfo => {
   return {
-    startTime: new Date(apiBatchOperationInfo.startTime),
-    closeTime: new Date(apiBatchOperationInfo.closeTime),
+    startTime: apiBatchOperationInfo.startTime,
+    closeTime: apiBatchOperationInfo.closeTime,
     jobId: apiBatchOperationInfo.jobId,
     state: apiBatchOperationInfo.state,
   };
