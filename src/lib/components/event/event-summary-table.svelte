@@ -26,15 +26,14 @@
 
 <Table {updating} class="dark w-full table-fixed">
   <caption class="sr-only" slot="caption"
-    >{translate('workflows', 'recent-events')}</caption
+    >{translate('workflows', 'event-history')}</caption
   >
   <TableHeaderRow slot="headers">
     <td class="w-14 xl:w-10" />
     <th class="w-16 md:w-32">
       <EventDateFilter {compact} />
     </th>
-    <th class="w-24"><EventCategoryFilter {compact} /></th>
-    <th class="w-44">Name</th>
+    <th class="w-44"><EventCategoryFilter {compact} /></th>
     <th class="w-auto xl:w-80">
       <div class="flex w-full justify-end">
         <Button

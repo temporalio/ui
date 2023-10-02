@@ -26,7 +26,7 @@ import {
   eventIsTerminated,
 } from './get-event-in-group';
 import { getGroupId } from './get-group-id';
-import { getEventGroupName } from './get-group-name';
+import { getEventGroupDisplayName, getEventGroupName } from './get-group-name';
 import { getLastEvent } from './get-last-event';
 
 type StartingEvents = {
@@ -60,6 +60,8 @@ const createGroupFor = <K extends keyof StartingEvents>(
 ): EventGroup => {
   const id = getGroupId(event);
   const name = getEventGroupName(event);
+  const displayName = getEventGroupDisplayName(event);
+
   const { timestamp, category, classification } = event;
 
   const initialEvent = getInitialEvent(event, events);
@@ -80,6 +82,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
   return {
     id,
     name,
+    displayName,
     events: groupEvents,
     eventIds: groupEventIds,
     initialEvent,

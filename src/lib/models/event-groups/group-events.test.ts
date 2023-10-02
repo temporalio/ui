@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { CommonHistoryEvent, WorkflowEvents } from '$lib/types/events';
 
 import { groupEvents } from './';
-import { getEventGroupName } from './get-group-name';
+import { getEventGroupDisplayName } from './get-group-name';
 
 const scheduledEvent = {
   id: '5',
@@ -155,14 +155,16 @@ describe('groupEvents', () => {
   });
 });
 
-describe('getEventGroupName', () => {
+describe('getEventGroupDisplayName', () => {
   it('should get the name of the eventGroup', () => {
     const [group] = groupEvents(eventHistory);
     expect(group.name).toBe('CompletedActivity');
   });
 
   it('should guard against empty arguments', () => {
-    expect(getEventGroupName(undefined as CommonHistoryEvent)).toBeUndefined();
+    expect(
+      getEventGroupDisplayName(undefined as CommonHistoryEvent),
+    ).toBeUndefined();
   });
 
   it('should get the name of a TimerStartedEvent', () => {
@@ -177,7 +179,7 @@ describe('getEventGroupName', () => {
       name: 'TimerStarted',
     } as unknown as CommonHistoryEvent;
 
-    expect(getEventGroupName(timerStartedEvent)).toBe('Timer 8 (4s)');
+    expect(getEventGroupDisplayName(timerStartedEvent)).toBe('Timer: 8 (4s)');
   });
 
   it('should get the name of a SignalExternalWorkflowExecutionInitiatedEvent', () => {
@@ -188,7 +190,9 @@ describe('getEventGroupName', () => {
       },
       name: 'WorkflowExecutionSignaled',
     } as unknown as CommonHistoryEvent;
-    expect(getEventGroupName(signalEvent)).toBe('Signal: WorkflowSignal');
+    expect(getEventGroupDisplayName(signalEvent)).toBe(
+      'Signal: WorkflowSignal',
+    );
   });
 
   it('should get the name of a WorkflowExecutionSignaledEvent', () => {
@@ -200,7 +204,7 @@ describe('getEventGroupName', () => {
       name: 'WorkflowExecutionSignaled',
     } as unknown as CommonHistoryEvent;
 
-    expect(getEventGroupName(workflowExectutionSignaledEvent)).toBe(
+    expect(getEventGroupDisplayName(workflowExectutionSignaledEvent)).toBe(
       'Signal received: signalBeforeReset',
     );
   });
@@ -218,7 +222,9 @@ describe('getEventGroupName', () => {
       timestamp: '2022-07-01 UTC 20:23:49.13',
     } as unknown as CommonHistoryEvent;
 
-    expect(getEventGroupName(markerRecordedEvent)).toBe('Marker: Version');
+    expect(getEventGroupDisplayName(markerRecordedEvent)).toBe(
+      'Marker: Version',
+    );
   });
 
   it('should get the name of a StartChildWorkflowExecutionInitiatedEvent', () => {
@@ -230,7 +236,7 @@ describe('getEventGroupName', () => {
       },
     } as unknown as CommonHistoryEvent;
 
-    expect(getEventGroupName(startChildWorkflowEvent)).toBe(
+    expect(getEventGroupDisplayName(startChildWorkflowEvent)).toBe(
       'Child Workflow: Workflow Name',
     );
   });
@@ -246,7 +252,7 @@ describe('getEventGroupName', () => {
       },
     } as unknown as CommonHistoryEvent;
 
-    expect(getEventGroupName(workflowUpdateAcceptedEvent)).toBe(
+    expect(getEventGroupDisplayName(workflowUpdateAcceptedEvent)).toBe(
       'Start the update',
     );
   });

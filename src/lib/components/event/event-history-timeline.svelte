@@ -6,13 +6,19 @@
     type TimelineOptionsZoomKey,
   } from 'vis-timeline/standalone';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Accordion from '$lib/holocene/accordion.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import {
+    workflowRun,
+    workflowTimelineViewOpen,
+  } from '$lib/stores/workflow-run';
   import type {
     CommonHistoryEvent,
     EventTypeCategory,
@@ -55,31 +61,34 @@
     const groups = new DataSet([]);
     const firstEvent = sortedHistory[0];
     const finalEvent = sortedHistory[sortedHistory.length - 1];
-    groups.add({
-      id: 'workflow',
-      content: renderExecutionName(),
-      order: -1,
-    });
-    items.add({
-      id: 'workflow',
-      group: 'workflow',
-      start: firstEvent.eventTime,
-      end: isRunning ? Date.now() : finalEvent.eventTime,
-      type: 'range',
-      title: stringifyWithBigInt(
-        {
-          startTime: $workflowRun.workflow.startTime,
-          endTime: $workflowRun.workflow?.endTime || Date.now(),
-        },
-        undefined,
-        2,
-      ),
-      content: $workflowRun.workflow.runId,
-      className: isRunning
-        ? `${finalEvent.category} Running`
-        : `${finalEvent.category} ${finalEvent.classification}`,
-      editable: false,
-    });
+
+    if (!category) {
+      groups.add({
+        id: 'workflow',
+        content: renderExecutionName(),
+        order: -1,
+      });
+      items.add({
+        id: 'workflow',
+        group: 'workflow',
+        start: firstEvent.eventTime,
+        end: isRunning ? Date.now() : finalEvent.eventTime,
+        type: 'range',
+        title: stringifyWithBigInt(
+          {
+            startTime: $workflowRun.workflow.startTime,
+            endTime: $workflowRun.workflow?.endTime || Date.now(),
+          },
+          undefined,
+          2,
+        ),
+        content: $workflowRun.workflow.runId,
+        className: isRunning
+          ? `${finalEvent.category} Running`
+          : `${finalEvent.category} ${finalEvent.classification}`,
+        editable: false,
+      });
+    }
 
     eventGroups.forEach((group, i) => {
       const initialEvent = group.initialEvent;
@@ -186,7 +195,6 @@
   };
 
   const buildTimeline = (category: EventTypeCategory) => {
-    console.log('Building timeline');
     timeline = new Timeline(
       visualizationRef,
       new DataSet([]),
@@ -212,40 +220,54 @@
     return () => timeline?.destroy();
   });
 
+  $: readyToDraw =
+    $workflowTimelineViewOpen &&
+    $workflowRun.workflow &&
+    history.length &&
+    visualizationRef;
   $: {
-    if ($workflowRun.workflow && history.length && visualizationRef) {
+    if (readyToDraw) {
       if (timeline) {
         timeline.destroy();
       }
       buildTimeline(category);
     }
   }
-
-  const resetTimelineView = () => {
-    timeline.focus('workflow');
-  };
 </script>
 
-<div
-  class="flex w-full flex-col gap-4 rounded-xl border-2 border-gray-900 bg-white p-4"
+<Accordion
+  title={translate('timeline')}
+  icon="timeline"
+  open={$workflowTimelineViewOpen}
+  onToggle={() => {
+    $workflowTimelineViewOpen = !$workflowTimelineViewOpen;
+  }}
 >
-  <div class="flex items-center justify-between gap-2">
-    <h3 class="text-xl">Timeline</h3>
-    <div class="flex flex-col gap-2 md:flex-row">
-      <EventCategoryFilter compact variant="secondary" />
-      <div class="flex gap-2">
-        <Button variant="secondary" on:click={() => timeline.zoomIn(1)}
-          >+</Button
-        >
-        <Button variant="secondary" on:click={() => timeline.zoomOut(1)}
-          >-</Button
-        >
-        <Button variant="secondary" on:click={resetTimelineView}>Fit</Button>
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center justify-end gap-2">
+      <div class="flex flex-col gap-2 md:flex-row">
+        <EventCategoryFilter compact variant="secondary" />
+        <div class="flex gap-2">
+          <ToggleButtons>
+            <ToggleButton
+              data-testid="zoom-in"
+              on:click={() => timeline.zoomIn(1)}>+</ToggleButton
+            >
+            <ToggleButton
+              data-testid="zoom-in"
+              on:click={() => timeline.zoomOut(1)}>-</ToggleButton
+            >
+            <ToggleButton
+              data-testid="zoom-in"
+              on:click={() => timeline.focus('workflow')}>Fit</ToggleButton
+            >
+          </ToggleButtons>
+        </div>
       </div>
     </div>
+    <div class="timeline" bind:this={visualizationRef} />
   </div>
-  <div class="timeline" bind:this={visualizationRef} />
-</div>
+</Accordion>
 
 <style lang="postcss">
   :global(.vis-item-content) {

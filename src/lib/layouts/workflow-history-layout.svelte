@@ -84,10 +84,10 @@
   <section id="event-history">
     <nav
       class="flex flex-col items-center justify-between gap-4 pb-4 lg:flex-row lg:items-end"
-      aria-label={translate('workflows', 'recent-events-view')}
+      aria-label={translate('workflows', 'event-history-view')}
     >
-      <h2 class="text-lg font-medium">
-        {translate('workflows', 'recent-events')}
+      <h2 class="text-2xl font-medium">
+        {translate('workflows', 'event-history')}
       </h2>
       <div id="event-view-toggle" class="flex gap-4 bg-white">
         <ToggleButtons>

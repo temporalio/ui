@@ -6,8 +6,13 @@ import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 export const tooltipTemplate = (item, _parsedItems): string => {
-  if (!item?.data?.eventList) {
-    return `<div class="flex flex-col gap-1">
+  if (!item.eventList) return workflowExeuctionTooltipTemplate(item);
+  if (item.eventList === 1) return singleEventTooltipTemplate(item);
+  return groupEventTooltipTemplate(item);
+};
+
+const workflowExeuctionTooltipTemplate = (item): string => {
+  return `<div class="flex flex-col gap-1">
     <div class="flex gap-2"><div class="font-bold w-12">Start</div>
       <div>${formatDate(item.start, get(timeFormat))}
       </div>
@@ -25,8 +30,10 @@ export const tooltipTemplate = (item, _parsedItems): string => {
   )}</div>
   </div>
   </div>`;
-  } else if (item?.data?.eventList.length === 1) {
-    return `<div class="flex flex-col gap-1">
+};
+
+const singleEventTooltipTemplate = (item): string => {
+  return `<div class="flex flex-col gap-1">
     <div class="flex gap-2"><div class="font-bold w-12">Start</div>
       <div>${formatDate(item.start, get(timeFormat))}
       </div>
@@ -40,7 +47,9 @@ export const tooltipTemplate = (item, _parsedItems): string => {
   )}</div>
   </div>
   </div>`;
-  }
+};
+
+const groupEventTooltipTemplate = (item): string => {
   return `<div class="flex flex-col gap-1">
     <div class="flex gap-2"><div class="font-bold w-12">Start</div>
       <div>${formatDate(item.start, get(timeFormat))}
