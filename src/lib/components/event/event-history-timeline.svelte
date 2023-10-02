@@ -249,7 +249,11 @@
   <div class="flex flex-col gap-2">
     <div class="flex items-center justify-end gap-2">
       <div class="flex flex-col gap-2 md:flex-row">
-        <EventCategoryFilter compact variant="secondary" />
+        <EventCategoryFilter
+          compact
+          variant="secondary"
+          data-testid="timeline-event-category-filter"
+        />
         <div class="flex gap-2">
           <ToggleButtons>
             <ToggleButton
