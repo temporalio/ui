@@ -30,8 +30,6 @@
 
   import { tooltipTemplate } from './event-history-timeline-helpers';
 
-  import EventCategoryFilter from './event-category-filter.svelte';
-
   export let history: CommonHistoryEvent[] = [];
 
   let visualizationRef;
@@ -248,28 +246,21 @@
 >
   <div class="flex flex-col gap-2">
     <div class="flex items-center justify-end gap-2">
-      <div class="flex flex-col gap-2 md:flex-row">
-        <EventCategoryFilter
-          compact
-          variant="secondary"
-          data-testid="timeline-event-category-filter"
-        />
-        <div class="flex gap-2">
-          <ToggleButtons>
-            <ToggleButton
-              data-testid="zoom-in"
-              on:click={() => timeline.zoomIn(1)}>+</ToggleButton
-            >
-            <ToggleButton
-              data-testid="zoom-in"
-              on:click={() => timeline.zoomOut(1)}>-</ToggleButton
-            >
-            <ToggleButton
-              data-testid="zoom-in"
-              on:click={() => timeline.focus('workflow')}>Fit</ToggleButton
-            >
-          </ToggleButtons>
-        </div>
+      <div class="flex gap-2">
+        <ToggleButtons>
+          <ToggleButton
+            data-testid="zoom-in"
+            on:click={() => timeline.zoomIn(1)}>+</ToggleButton
+          >
+          <ToggleButton
+            data-testid="zoom-in"
+            on:click={() => timeline.zoomOut(1)}>-</ToggleButton
+          >
+          <ToggleButton
+            data-testid="zoom-in"
+            on:click={() => timeline.focus('workflow')}>Fit</ToggleButton
+          >
+        </ToggleButtons>
       </div>
     </div>
     <div class="timeline" bind:this={visualizationRef} />

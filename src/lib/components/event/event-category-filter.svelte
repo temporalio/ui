@@ -53,7 +53,7 @@
   <MenuButton
     active={!!$eventCategoryFilter}
     {variant}
-    data-testid={$$restProps['data-testid'] || 'event-category-filter'}
+    data-testid="event-category-filter"
     controls="event-category-filter-menu"
   >
     {label}
