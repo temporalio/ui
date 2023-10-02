@@ -22,7 +22,7 @@ class AccessibilityReporter implements Reporter {
   ) {
     this.options = options;
 
-    console.log(`🦾 Collecting accessibility violations…`);
+    console.log('🦾 Collecting accessibility violations…');
     console.log(
       `📝 Violations will be written to: ${chalk.cyan(
         this.options.outputFile,

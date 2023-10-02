@@ -57,7 +57,7 @@ describe('Workflow Executions List', () => {
 
     for (const status of statuses) {
       it(`should redirect to the correct query params for ${status} workflows`, () => {
-        cy.visit(`/namespaces/default/workflows`);
+        cy.visit('/namespaces/default/workflows');
         cy.get('#execution-status-filter').select(status);
         cy.get('#execution-status-filter').trigger('input');
         cy.url().should(
@@ -83,7 +83,7 @@ describe('Workflow Executions List', () => {
 
         cy.intercept(
           Cypress.env('VITE_API_HOST') +
-            `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
+            '/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*',
           { fixture: 'event-history-completed.json' },
         ).as('event-history-api');
 
@@ -103,7 +103,7 @@ describe('Workflow Executions List', () => {
         cy.get('#execution-status-filter').trigger('input');
         cy.url().should(
           'contain',
-          encodeURIComponent(`ExecutionStatus="Running"`),
+          encodeURIComponent('ExecutionStatus="Running"'),
         );
 
         cy.get('.workflow-summary-row a').first().click();
@@ -116,7 +116,7 @@ describe('Workflow Executions List', () => {
 
         cy.url().should(
           'contain',
-          encodeURIComponent(`ExecutionStatus="Running"`),
+          encodeURIComponent('ExecutionStatus="Running"'),
         );
         cy.get('#execution-status-filter')
           .find('option:selected')
