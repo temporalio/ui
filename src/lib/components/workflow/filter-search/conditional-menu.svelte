@@ -24,25 +24,36 @@
     defaultConditionOptions;
   export let disabled = false;
   export let inputId: string;
+  export let noBorderLeft = false;
+  export let noBorderRight = false;
 
-  $: options, ($filter.conditional = options[0].value);
-
-  $: selectedOption =
-    options.find((o) => o.value === $filter.conditional) ?? options[0];
+  $: filterConditionalOption = options.find(
+    (o) => o.value === $filter.conditional,
+  );
+  $: options, updateFilterConditional();
+  $: selectedOption = filterConditionalOption ?? options[0];
   $: selectedLabel = selectedOption?.label ?? selectedOption?.value;
+
+  function updateFilterConditional() {
+    if (!filterConditionalOption) {
+      $filter.conditional = options[0].value;
+    }
+  }
 </script>
 
 <MenuContainer>
   <MenuButton
     unround
-    class="!border-l-0 !border-r-0"
+    class="{noBorderRight ? '!border-r-0' : ''} {noBorderLeft
+      ? '!border-l-0'
+      : ''} whitespace-nowrap"
     id="conditional-menu-button"
     controls="conditional-menu"
     {disabled}
   >
     {selectedLabel}
   </MenuButton>
-  <Menu id="conditional-menu">
+  <Menu id="conditional-menu" class="whitespace-nowrap">
     {#each options as { value, label }}
       <MenuItem
         on:click={() => {

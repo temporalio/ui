@@ -23,7 +23,7 @@
 </script>
 
 <div class="flex items-center">
-  <ConditionalMenu inputId="number-filter-search" />
+  <ConditionalMenu inputId="number-filter-search" noBorderLeft noBorderRight />
   <NumberInput
     label={translate('number-input-placeholder')}
     labelHidden
