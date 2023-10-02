@@ -31,7 +31,7 @@
     </h2>
   </div>
   {#if operation.state === 'Running'}
-    <Tooltip top text={translate('auto-refresh-tooltip')}>
+    <Tooltip top text={translate('auto-refresh-tooltip', { interval: '5' })}>
       <ToggleSwitch
         id="batch-operation-auto-refresh"
         label={translate('auto-refresh')}

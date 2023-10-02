@@ -1,6 +1,6 @@
 <script lang="ts">
   import { translate } from '$lib/i18n/translate';
-  import { timeFormat } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { BatchOperation } from '$lib/types/batch';
   import { formatDate } from '$lib/utilities/format-date';
 
@@ -8,7 +8,7 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <p>Details</p>
+  <p>{translate('batch', 'details')}</p>
   <div class="batch-operation-detail">
     <p class="batch-operation-key">
       {translate('batch', 'operation-type')}
@@ -28,13 +28,17 @@
   <div class="batch-operation-detail">
     <p class="batch-operation-key">{translate('start-time')}</p>
     <p class="batch-operation-value">
-      {formatDate(operation.startTime, $timeFormat)}
+      {formatDate(operation.startTime, $timeFormat, {
+        relative: $relativeTime,
+      })}
     </p>
   </div>
   <div class="batch-operation-detail">
     <p class="batch-operation-key">{translate('close-time')}</p>
     <p class="batch-operation-value">
-      {formatDate(operation.closeTime, $timeFormat)}
+      {formatDate(operation.closeTime, $timeFormat, {
+        relative: $relativeTime,
+      })}
     </p>
   </div>
   <div class="batch-operation-detail">

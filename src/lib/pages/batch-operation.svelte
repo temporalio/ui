@@ -13,18 +13,26 @@
 
   export let namespace: string;
 
+  let interval: number;
+
   $: {
-    let interval: number;
-    if ($autoRefresh === 'on' && $batchOperation.state === 'Running') {
+    if (
+      $autoRefresh === 'on' &&
+      $batchOperation.state === 'Running' &&
+      interval === undefined
+    ) {
       interval = window.setInterval(async () => {
         $batchOperation = await describeBatchOperation({
           namespace: $page.params.namespace,
           jobId: $batchOperation.jobId,
         });
-      }, 15000);
-    } else if (interval) {
-      console.log('clearing');
+      }, 5000);
+    } else if (
+      ($autoRefresh === 'off' || $batchOperation.state !== 'Running') &&
+      interval !== undefined
+    ) {
       clearInterval(interval);
+      interval = undefined;
     }
   }
 </script>

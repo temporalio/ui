@@ -7,12 +7,14 @@ export const Strings = {
   'empty-state-title': 'No Batch Operations',
   'back-link': 'Back to Batch Operations',
   'operation-type': 'Operation Type',
+  details: 'Operation Details',
   identity: 'Identity',
   'total-operations': 'Total Operations',
   'operations-failed': '{{ count, number }} failed',
   'operations-succeeded': '{{ count, number }} succeeded',
   'operations-progress': '{{ percent }}% complete',
-  results: 'Results',
-  progress: 'Progress',
-  'success-failure': 'Success/Failure',
+  results: 'Operation Results',
+  'max-concurrent-alert-title': 'Maximum concurrent Batch Operations met',
+  'max-concurrent-alert-description':
+    'Only 1 in progress Batch Operation is permitted. If you are attempting to create a new Batch Operation while there is one currently running, it will fail.',
 } as const;

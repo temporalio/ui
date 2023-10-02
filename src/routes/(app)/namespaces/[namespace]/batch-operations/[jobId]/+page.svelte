@@ -6,7 +6,8 @@
   import BatchOperation from '$lib/pages/batch-operation.svelte';
 
   $: namespace = $page.params.namespace;
+  $: jobId = $page.params.jobId;
 </script>
 
-<PageTitle title={translate('batch', 'describe-page-title')} />
+<PageTitle title="{translate('batch', 'describe-page-title')} | {jobId}" />
 <BatchOperation {namespace} />

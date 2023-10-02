@@ -1,5 +1,6 @@
 <script lang="ts">
   import Alert from '$lib/holocene/alert.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
 </script>
 
@@ -7,10 +8,8 @@
   <Alert
     icon="info"
     intent="info"
-    title="Maximum concurrent Batch Operations met"
+    title={translate('batch', 'max-concurrent-alert-title')}
   >
-    Only 1 in progress Batch Operation is permitted. If you are attempting to
-    create a new Batch Operation while there is one currently running, it will
-    fail.
+    {translate('batch', 'max-concurrent-alert-description')}
   </Alert>
 {/if}
