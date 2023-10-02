@@ -50,7 +50,7 @@ Cypress.Commands.add('interceptSearchAttributesApi', () => {
 
 Cypress.Commands.add('interceptWorkflowsApi', () => {
   cy.intercept(
-    Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/workflows?query=*`,
+    Cypress.env('VITE_API_HOST') + '/api/v1/namespaces/*/workflows?query=*',
     { fixture: 'workflows.json' },
   ).as('workflows-api');
 });
@@ -58,7 +58,7 @@ Cypress.Commands.add('interceptWorkflowsApi', () => {
 Cypress.Commands.add('interceptWorkflowsCountApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/workflows/count?query=*`,
+      '/api/v1/namespaces/*/workflows/count?query=*',
     { fixture: 'workflows-count.json' },
   ).as('workflows-count-api');
 });
@@ -86,7 +86,7 @@ Cypress.Commands.add('interceptClusterApi', (fixture = 'cluster.json') => {
 Cypress.Commands.add('interceptArchivedWorkflowsApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/workflows/archived?query=*`,
+      '/api/v1/namespaces/*/workflows/archived?query=*',
     { fixture: 'workflows.json' },
   ).as('workflows-archived-api');
 });
@@ -107,7 +107,7 @@ Cypress.Commands.add('interceptGithubReleasesApi', () => {
 Cypress.Commands.add('interceptQueryApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/workflows/*/runs/*/query*`,
+      '/api/v1/namespaces/*/workflows/*/runs/*/query*',
     { fixture: 'query-stack-trace.json' },
   ).as('query-api');
 });
@@ -115,7 +115,7 @@ Cypress.Commands.add('interceptQueryApi', () => {
 Cypress.Commands.add('interceptTaskQueuesApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/task-queues/*?taskQueueType=1`,
+      '/api/v1/namespaces/*/task-queues/*?taskQueueType=1',
     {
       fixture: 'worker-task-queues.json',
     },
@@ -123,7 +123,7 @@ Cypress.Commands.add('interceptTaskQueuesApi', () => {
 
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/task-queues/*?taskQueueType=2`,
+      '/api/v1/namespaces/*/task-queues/*?taskQueueType=2',
     {
       fixture: 'activity-task-queues.json',
     },
@@ -133,28 +133,28 @@ Cypress.Commands.add('interceptTaskQueuesApi', () => {
 Cypress.Commands.add('interceptTaskQueueCompatibilityApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/task-queues/*/compatibility`,
+      '/api/v1/namespaces/*/task-queues/*/compatibility',
     { fixture: 'compatibility.json' },
   ).as('compatibility-api');
 });
 
 Cypress.Commands.add('interceptSchedulesApi', () => {
   cy.intercept(
-    Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/schedules*`,
+    Cypress.env('VITE_API_HOST') + '/api/v1/namespaces/*/schedules*',
     { fixture: 'schedules.json' },
   ).as('schedules-api');
 });
 
 Cypress.Commands.add('interceptScheduleApi', () => {
   cy.intercept(
-    Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/schedules/*`,
+    Cypress.env('VITE_API_HOST') + '/api/v1/namespaces/*/schedules/*',
     { fixture: 'schedule.json' },
   ).as('schedule-api');
 });
 
 Cypress.Commands.add('interceptCreateBatchOperationApi', () => {
   cy.intercept(
-    Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/batch-operations?`,
+    Cypress.env('VITE_API_HOST') + '/api/v1/namespaces/*/batch-operations?',
     { statusCode: 200, body: {} },
   ).as('create-batch-operation-api');
 });
@@ -162,7 +162,7 @@ Cypress.Commands.add('interceptCreateBatchOperationApi', () => {
 Cypress.Commands.add('interceptDescribeBatchOperationApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/batch-operations/describe?jobId=*`,
+      '/api/v1/namespaces/*/batch-operations/describe?jobId=*',
     { fixture: 'batch-operation-status.json' },
   ).as('describe-batch-operation-api');
 });
@@ -170,7 +170,7 @@ Cypress.Commands.add('interceptDescribeBatchOperationApi', () => {
 Cypress.Commands.add('interceptTerminateWorkflowApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/workflows/*/runs/*/terminate?`,
+      '/api/v1/namespaces/*/workflows/*/runs/*/terminate?',
     { statusCode: 200, body: {} },
   ).as('terminate-workflow-api');
 });
@@ -178,7 +178,7 @@ Cypress.Commands.add('interceptTerminateWorkflowApi', () => {
 Cypress.Commands.add('interceptCancelWorkflowApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/workflows/*/runs/*/cancel?`,
+      '/api/v1/namespaces/*/workflows/*/runs/*/cancel?',
     { statusCode: 200, body: {} },
   ).as('cancel-workflow-api');
 });
@@ -186,7 +186,7 @@ Cypress.Commands.add('interceptCancelWorkflowApi', () => {
 Cypress.Commands.add('interceptSignalWorkflowApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/workflows/*/runs/*/signal?`,
+      '/api/v1/namespaces/*/workflows/*/runs/*/signal?',
     { statusCode: 200, body: {} },
   ).as('signal-workflow-api');
 });
@@ -194,7 +194,7 @@ Cypress.Commands.add('interceptSignalWorkflowApi', () => {
 Cypress.Commands.add('interceptResetWorkflowApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/workflows/*/runs/*/reset?`,
+      '/api/v1/namespaces/*/workflows/*/runs/*/reset?',
     { statusCode: 200, body: { runId: 'abc-123' } },
   ).as('reset-workflow-api');
 });

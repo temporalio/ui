@@ -41,8 +41,8 @@ describe('Workflow Executions List', () => {
     ).as('event-history-ascending');
   });
 
-  it(`should show an empty state in the feed view`, () => {
-    cy.visit(workflowUrl + `/history`);
+  it('should show an empty state in the feed view', () => {
+    cy.visit(workflowUrl + '/history');
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-start');
@@ -52,8 +52,8 @@ describe('Workflow Executions List', () => {
     cy.contains('No Events Match');
   });
 
-  it(`should show an empty state in the compact view`, () => {
-    cy.visit(workflowUrl + `/history`);
+  it('should show an empty state in the compact view', () => {
+    cy.visit(workflowUrl + '/history');
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-start');
@@ -80,7 +80,7 @@ describe('Workflow Executions List', () => {
       { fixture: 'event-history-with-no-activities.json' },
     ).as('event-history-ascending');
 
-    cy.visit(workflowUrl + `/history`);
+    cy.visit(workflowUrl + '/history');
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-start');

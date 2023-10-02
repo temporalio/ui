@@ -30,7 +30,7 @@
     return `<div class="flex gap-2 items-center">${groupName}</div>`;
   }
   function renderExecutionName() {
-    return `<div class="flex gap-1 items-center">Workflow Execution</div>`;
+    return '<div class="flex gap-1 items-center">Workflow Execution</div>';
   }
   function renderPendingAttempts(name, attempt) {
     const retryIcon = renderComponentToHTML(Icon, {

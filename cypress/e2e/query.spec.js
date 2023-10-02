@@ -11,7 +11,7 @@ describe('Query', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
+        '/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*',
       { fixture: 'event-history-completed.json' },
     ).as('event-history-api');
 
@@ -31,7 +31,7 @@ describe('Query', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/query*`,
+        '/api/v1/namespaces/default/workflows/*/runs/*/query*',
       { fixture: 'query-java-error-unknown-type.json', statusCode: 400 },
     ).as('query-unknown-type-api');
 
