@@ -24,7 +24,6 @@
   export let pageButtonLabel: (page: number) => string;
   export let nextPageButtonLabel: string;
   export let previousPageButtonLabel: string;
-  export let fitToPage: boolean = true;
 
   let tableContainer: HTMLDivElement;
 
@@ -87,8 +86,9 @@
     if (perPageParam) store.adjustPageSize(perPageParam);
   }
 
-  $: tableOffset =
-    fitToPage && tableContainer?.offsetTop ? tableContainer?.offsetTop + 32 : 0;
+  $: tableOffset = tableContainer?.offsetTop
+    ? tableContainer?.offsetTop + 32
+    : 0;
 </script>
 
 <div
