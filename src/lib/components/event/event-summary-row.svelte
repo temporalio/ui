@@ -4,7 +4,7 @@
 
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { isEventGroup } from '$lib/models/event-groups';
@@ -22,10 +22,9 @@
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { routeForEventHistory } from '$lib/utilities/route-for';
-  
+
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
-  
 
   export let event: IterableEvent;
   export let initialItem: IterableEvent | undefined;
@@ -77,7 +76,7 @@
     onRowClick();
   };
 
-  console.log("selected",active, selectedId, expanded)
+  console.log('selected', active, selectedId, expanded);
 
   const failure = eventOrGroupIsFailureOrTimedOut(event);
   const canceled = eventOrGroupIsCanceled(event);
