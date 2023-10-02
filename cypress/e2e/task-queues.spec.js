@@ -9,7 +9,7 @@ describe('Task Queues Page', () => {
   beforeEach(() => {
     cy.interceptApi();
 
-    cy.visit(`/namespaces/default/task-queues/a-task-queue`);
+    cy.visit('/namespaces/default/task-queues/a-task-queue');
 
     cy.wait('@namespaces-api');
   });

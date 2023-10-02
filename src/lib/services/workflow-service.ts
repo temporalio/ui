@@ -152,7 +152,7 @@ export const fetchAllWorkflows = async (
         err?.body?.message ??
         `Error fetching workflows: ${err.status}: ${err.statusText}`;
     } else {
-      error = `Error fetching workflows: Server failed to respond`;
+      error = 'Error fetching workflows: Server failed to respond';
     }
   };
 

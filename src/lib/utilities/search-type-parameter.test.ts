@@ -18,7 +18,7 @@ describe('isValidSearchType', () => {
     });
   }
 
-  it(`should return false if given a string that is not "basic" or "advanced"`, () => {
+  it('should return false if given a string that is not "basic" or "advanced"', () => {
     expect(isValidSearchType('bogus')).toBe(false);
   });
 });

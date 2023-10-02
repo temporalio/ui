@@ -42,6 +42,7 @@ module.exports = {
     $$Generic: 'readonly',
   },
   rules: {
+    quotes: ['error', 'single', { avoidEscape: true }],
     '@typescript-eslint/no-unused-vars': [
       'error',
       {

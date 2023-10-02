@@ -17,10 +17,10 @@ describe('Login page', () => {
 
     cy.wait('@settings-api');
 
-    cy.url().should('include', `/login`);
+    cy.url().should('include', '/login');
 
     cy.get('[data-testid="login-title"]').contains('Welcome back.');
-    cy.get('[data-testid="login-info"]').contains(`Let's get you signed in.`);
+    cy.get('[data-testid="login-info"]').contains("Let's get you signed in.");
     cy.get('[data-testid="login-button"]').contains('Continue to SSO');
   });
 
@@ -31,6 +31,6 @@ describe('Login page', () => {
     cy.wait('@namespaces-api');
     cy.wait('@workflows-api');
 
-    cy.url().should('include', `/namespaces/default/workflows`);
+    cy.url().should('include', '/namespaces/default/workflows');
   });
 });
