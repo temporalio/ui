@@ -51,6 +51,7 @@
     if (!element) return;
 
     goto(`${$page.url}`, { noScroll: true }).then(() => {
+      console.log(element);
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }
@@ -121,18 +122,12 @@
   let:visibleItems
   let:activeRowIndex
   let:setActiveRowIndex
-  let:store
   aria-label={translate('workflows', 'recent-events')}
   pageSizeSelectLabel={translate('per-page')}
   previousButtonLabel={translate('previous')}
   nextButtonLabel={translate('next')}
 >
-  <EventSummaryTable
-    {updating}
-    {compact}
-    {store}
-    on:expandAll={handleExpandChange}
-  >
+  <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
     {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
       <EventSummaryRow
         {event}
