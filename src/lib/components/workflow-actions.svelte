@@ -10,14 +10,13 @@
   import SplitButton from '$lib/holocene/split-button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { Action } from '$lib/models/workflow-actions';
-  import { ResetReapplyType } from '$lib/models/workflow-actions';
+  import { Action, ResetReapplyType } from '$lib/models/workflow-actions';
   import {
+    cancelWorkflow,
     resetWorkflow,
     signalWorkflow,
     terminateWorkflow,
   } from '$lib/services/workflow-service';
-  import { cancelWorkflow } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
   import { coreUserStore } from '$lib/stores/core-user';
   import { resetEvents } from '$lib/stores/events';
