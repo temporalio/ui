@@ -49,7 +49,7 @@
   };
 </script>
 
-<MenuContainer keepOpen>
+<MenuContainer>
   <MenuButton
     active={!!$eventCategoryFilter}
     {variant}

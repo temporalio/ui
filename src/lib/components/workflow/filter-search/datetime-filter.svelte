@@ -126,6 +126,8 @@
       { value: 'BETWEEN', label: translate('between') },
       { value: '>=', label: translate('after') },
     ]}
+    noBorderLeft
+    noBorderRight
   />
   <MenuContainer>
     <MenuButton
