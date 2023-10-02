@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { endOfMinute, startOfMinute } from 'date-fns';
   import { onMount } from 'svelte';
   import {
     DataSet,
@@ -44,7 +45,7 @@
     return container.innerHTML;
   }
   function renderGroupName(group) {
-    const groupName = capitalize(group.category);
+    const groupName = capitalize(group.label || group.category);
     return `<div class="flex gap-2 items-center">${groupName}</div>`;
   }
   function renderExecutionName() {
@@ -140,8 +141,10 @@
   const getOptions = () => ({
     stackSubgroups: true,
     maxHeight: 520,
-    min: $workflowRun.workflow.startTime,
-    max: $workflowRun.workflow?.endTime || Date.now(),
+    min: startOfMinute(new Date($workflowRun.workflow.startTime)),
+    max: $workflowRun.workflow?.endTime
+      ? endOfMinute(new Date($workflowRun.workflow?.endTime))
+      : Date.now(),
     horizontalScroll: true,
     verticalScroll: true,
     zoomKey: 'ctrlKey' as TimelineOptionsZoomKey,

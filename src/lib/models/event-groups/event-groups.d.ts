@@ -10,6 +10,7 @@ interface EventGroup
   > {
   id: EventId;
   name: string;
+  label: string;
   displayName: string;
   events: Map<EventId, WorkflowEvent>;
   eventIds: Set<EventId>;

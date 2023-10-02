@@ -146,7 +146,7 @@
       aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
-      <div class="flex gap-4">
+      <div class="flex items-center gap-4">
         {#if !itemsPerPage}
           <FilterSelect
             label={pageSizeSelectLabel}
