@@ -15,6 +15,7 @@
   import { EditorView, keymap } from '@codemirror/view';
   import { createEventDispatcher, onMount } from 'svelte';
 
+  import CopyButton from '$lib/holocene/copyable/button.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import {
     parseWithBigInt,
@@ -24,8 +25,6 @@
     TEMPORAL_SYNTAX,
     TEMPORAL_THEME,
   } from '$lib/vendor/codemirror/theme';
-
-  import Icon from './icon/icon.svelte';
 
   type BaseProps = HTMLAttributes<HTMLDivElement> & {
     content: string;
@@ -57,6 +56,10 @@
   export let copySuccessIconTitle = '';
 
   const { copy, copied } = copyToClipboard();
+
+  const handleCopy = (e: Event) => {
+    copy(e, stringifyWithBigInt(content, undefined, 2));
+  };
 
   let editor: HTMLElement;
   let view: EditorView;
@@ -145,15 +148,12 @@
     {...$$restProps}
   />
   {#if copyable}
-    <button
-      on:click={(e) => copy(e, stringifyWithBigInt(content, undefined, 2))}
-      class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
-    >
-      <Icon
-        title={$copied ? copySuccessIconTitle : copyIconTitle}
-        name={$copied ? 'checkmark' : 'copy'}
-        class="text-white hover:text-gray-900"
-      />
-    </button>
+    <CopyButton
+      {copyIconTitle}
+      {copySuccessIconTitle}
+      class="absolute top-1 right-1 text-white hover:text-gray-900 focus-visible:text-gray-900"
+      on:click={handleCopy}
+      copied={$copied}
+    />
   {/if}
 </div>
