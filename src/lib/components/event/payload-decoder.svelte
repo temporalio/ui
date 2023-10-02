@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import { page } from '$app/stores';
 
   import { authUser } from '$lib/stores/auth-user';
@@ -44,7 +46,9 @@
     );
   };
 
-  $: value, decodePayloads();
+  onMount(() => {
+    decodePayloads();
+  });
 
   let decodedValue = 'Decoding...';
 </script>
