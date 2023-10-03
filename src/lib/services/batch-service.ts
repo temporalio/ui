@@ -83,9 +83,9 @@ const createBatchOperationRequest = (
   options: CreateBatchOperationOptions,
 ): StartBatchOperationRequest => {
   const body: StartBatchOperationRequest = {
+    jobId: uuidv4(),
     namespace: options.namespace,
     reason: options.reason,
-    jobId: uuidv4(),
     ...batchActionToOperation(action),
   };
 
