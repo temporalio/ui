@@ -1,3 +1,11 @@
+<script lang="ts" context="module">
+  export type MenuButtonVariant =
+    | 'primary'
+    | 'secondary'
+    | 'ghost'
+    | 'table-header';
+</script>
+
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
@@ -10,8 +18,6 @@
     type MenuContext,
   } from '$lib/holocene/menu/menu-container.svelte';
   import { MENU_ITEM_SELECTORS } from '$lib/holocene/menu/menu-item.svelte';
-
-  type MenuButtonVariant = 'primary' | 'secondary' | 'ghost' | 'table-header';
 
   interface $$Props extends HTMLButtonAttributes {
     controls: string;

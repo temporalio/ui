@@ -142,7 +142,11 @@
       </div>
       <div class="flex w-full items-center justify-between truncate">
         <p class="event-name truncate text-sm font-semibold md:text-base">
-          {isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name}
+          {isEventGroup(event)
+            ? event.displayName
+            : isLocalActivityMarkerEvent(event)
+            ? 'LocalActivity'
+            : event.name}
         </p>
         {#if expanded}
           <div>

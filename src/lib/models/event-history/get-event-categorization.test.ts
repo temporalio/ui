@@ -135,8 +135,18 @@ describe('Event Category Data Structures', () => {
           "option": "activity",
         },
         {
+          "color": "#F59E0B",
+          "label": "category-child-workflow",
+          "option": "child-workflow",
+        },
+        {
           "label": "category-local-activity",
           "option": "local-activity",
+        },
+        {
+          "color": "#EC4899",
+          "label": "category-marker",
+          "option": "marker",
         },
         {
           "color": "#DD6B20",
@@ -147,6 +157,10 @@ describe('Event Category Data Structures', () => {
           "color": "#1D4ED8",
           "label": "category-timer",
           "option": "timer",
+        },
+        {
+          "label": "category-update",
+          "option": "update",
         },
       ]
     `);
