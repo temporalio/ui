@@ -12,8 +12,8 @@
 
   let className = '';
   export { className as class };
-  export let icon: IconName = null;
-  export let label = '';
+  export let icon: IconName;
+  export let label;
 </script>
 
 <button
