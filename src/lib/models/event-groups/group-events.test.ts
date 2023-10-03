@@ -162,9 +162,7 @@ describe('getEventGroupDisplayName', () => {
   });
 
   it('should guard against empty arguments', () => {
-    expect(
-      getEventGroupDisplayName(undefined as CommonHistoryEvent),
-    ).toBeUndefined();
+    expect(getEventGroupDisplayName(undefined as CommonHistoryEvent)).toBe('');
   });
 
   it('should get the name of a TimerStartedEvent', () => {

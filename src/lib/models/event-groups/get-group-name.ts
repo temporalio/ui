@@ -57,34 +57,34 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
   if (!event) return '';
 
   if (isActivityTaskScheduledEvent(event)) {
-    return ``;
+    return '';
   }
 
   if (isTimerStartedEvent(event)) {
-    return `Timer`;
+    return 'Timer';
   }
 
   if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) {
-    return `Signal`;
+    return 'Signal';
   }
 
   if (isWorkflowExecutionSignaledEvent(event)) {
-    return `Signal received`;
+    return 'Signal received';
   }
 
   if (isMarkerRecordedEvent(event)) {
     if (isLocalActivityMarkerEvent(event)) {
       return 'Local Activity';
     }
-    return `Marker`;
+    return 'Marker';
   }
 
   if (isStartChildWorkflowExecutionInitiatedEvent(event)) {
-    return `Child Workflow`;
+    return 'Child Workflow';
   }
 
   if (isWorkflowExecutionUpdateAcceptedEvent(event)) {
-    return ``;
+    return '';
   }
 };
 
