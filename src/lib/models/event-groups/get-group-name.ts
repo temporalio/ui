@@ -12,7 +12,7 @@ import {
 } from '$lib/utilities/is-event-type';
 
 export const getEventGroupName = (event: CommonHistoryEvent): string => {
-  if (!event) return;
+  if (!event) return '';
 
   if (isActivityTaskScheduledEvent(event)) {
     return event.activityTaskScheduledEventAttributes?.activityType?.name;
@@ -54,7 +54,7 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
 };
 
 export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
-  if (!event) return;
+  if (!event) return '';
 
   if (isActivityTaskScheduledEvent(event)) {
     return ``;
@@ -88,8 +88,8 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
   }
 };
 
-export const getEventGroupDisplayName = (event: CommonHistoryEvent) => {
-  if (!event) return;
+export const getEventGroupDisplayName = (event: CommonHistoryEvent): string => {
+  if (!event) return '';
 
   if (getEventGroupLabel(event)) {
     return `${getEventGroupLabel(event)}: ${getEventGroupName(event)}`;

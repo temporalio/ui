@@ -1,11 +1,6 @@
 <script lang="ts">
-  import { endOfMinute, startOfMinute } from 'date-fns';
   import { onMount } from 'svelte';
-  import {
-    DataSet,
-    Timeline,
-    type TimelineOptionsZoomKey,
-  } from 'vis-timeline/standalone';
+  import { DataSet, Timeline } from 'vis-timeline/standalone';
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -13,6 +8,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
+  import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
@@ -28,7 +24,7 @@
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  import { tooltipTemplate } from './event-history-timeline-helpers';
+  import { getTimelineOptions } from './event-history-timeline-helpers';
 
   export let history: CommonHistoryEvent[] = [];
 
@@ -42,20 +38,33 @@
     new Component({ target: container, props });
     return container.innerHTML;
   }
+
   function renderGroupName(group) {
     const groupName = capitalize(group.label || group.category);
     return `<div class="flex gap-2 items-center">${groupName}</div>`;
   }
+
   function renderExecutionName() {
     return `<div class="flex gap-1 items-center">Workflow Execution</div>`;
   }
+
   function renderPendingAttempts(name, attempt) {
     const retryIcon = renderComponentToHTML(Icon, {
       name: 'retry',
     });
     return `<div class="flex gap-1 items-center"><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div><div class="bar-content"><p>${name}</p></div></div>`;
   }
-  const createGroupItems = (eventGroups, isRunning, sortedHistory) => {
+
+  type GroupItems = {
+    items: DataSet<unknown, 'id'>;
+    groups: DataSet<unknown, 'id'>;
+  };
+
+  const createGroupItems = (
+    eventGroups: EventGroups,
+    isRunning: boolean,
+    sortedHistory: CommonHistoryEvent[],
+  ): GroupItems => {
     const items = new DataSet([]);
     const groups = new DataSet([]);
     const firstEvent = sortedHistory[0];
@@ -134,58 +143,19 @@
     return { items, groups };
   };
 
-  type TimelineOptionsTooltipOverflow = 'flip' | 'none' | 'cap';
-
-  const getOptions = () => ({
-    stackSubgroups: true,
-    maxHeight: 520,
-    min: startOfMinute(new Date($workflowRun.workflow.startTime)),
-    max: $workflowRun.workflow?.endTime
-      ? endOfMinute(new Date($workflowRun.workflow?.endTime))
-      : Date.now(),
-    horizontalScroll: true,
-    verticalScroll: true,
-    zoomKey: 'ctrlKey' as TimelineOptionsZoomKey,
-    orientation: {
-      axis: 'both',
-      item: 'center',
-    },
-    tooltip: {
-      delay: 0,
-      overflowMethod: 'flip' as TimelineOptionsTooltipOverflow,
-      followMouse: false,
-      template: tooltipTemplate,
-    },
-    format: {
-      majorLabels: {
-        millisecond: 'D MMMM HH:mm:ss',
-        second: 'D MMMM HH:mm',
-        minute: 'ddd D MMMM',
-        hour: 'ddd D MMMM',
-        weekday: 'MMMM YYYY',
-        day: 'MMMM YYYY',
-        week: 'MMMM YYYY',
-        month: 'YYYY',
-        year: '',
-      },
-    },
-    xss: {
-      disabled: true,
-      filterOptions: {
-        whiteList: {
-          div: ['class'],
-        },
-      },
-    },
-  });
-
-  const setVizItems = (items, groups) => {
+  const setVizItems = (
+    items: DataSet<unknown, 'id'>,
+    groups: DataSet<unknown, 'id'>,
+  ): void => {
     timeline.setGroups(groups);
     timeline.setItems(items);
     timeline.fit();
   };
 
-  const filterHistory = (history, category) => {
+  const filterHistory = (
+    history: CommonHistoryEvent[],
+    category: EventTypeCategory,
+  ): CommonHistoryEvent[] => {
     if (!category) return history;
     return history.filter((i) => {
       if (category === CATEGORIES.LOCAL_ACTIVITY) {
@@ -195,12 +165,12 @@
     });
   };
 
-  const buildTimeline = (category: EventTypeCategory) => {
+  const buildTimeline = (category: EventTypeCategory): void => {
     timeline = new Timeline(
       visualizationRef,
       new DataSet([]),
       new DataSet([]),
-      getOptions(),
+      getTimelineOptions($workflowRun.workflow),
     );
     const reverseHistory =
       $eventFilterSort === 'descending' && $eventViewType !== 'compact';
