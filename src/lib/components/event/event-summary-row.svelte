@@ -65,8 +65,8 @@
 
   const onLinkClick = () => {
     expanded = !expanded;
-    // Dont delete query params like ?per-page
     const queryParams = $page.url.searchParams;
+    console.log('queryParams', queryParams);
     const urlParams = $page.params;
     const route = routeForEventHistory({
       queryParams,
@@ -75,8 +75,6 @@
     goto(`${route}#${event.id}`, { noScroll: true });
     onRowClick();
   };
-
-  console.log('selected', active, selectedId, expanded);
 
   const failure = eventOrGroupIsFailureOrTimedOut(event);
   const canceled = eventOrGroupIsCanceled(event);

@@ -45,13 +45,14 @@
     hash = $page.url.hash;
   });
 
-  function scrollIntoView(target) {
-    // does the id exist in history if not return/remove from url
+  function scrollIntoView(target, eventHistory) {
+    if (parseInt(target) > eventHistory.length) {
+      window.location.hash = '';
+      return;
+    }
     const element = document.getElementById(target);
     if (!element) return;
-
     goto(`${$page.url}`, { noScroll: true }).then(() => {
-      console.log(element);
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }
@@ -74,7 +75,7 @@
     });
     loading = false;
     setTimeout(() => {
-      scrollIntoView(hash.slice(1));
+      scrollIntoView(hash.slice(1), $fullEventHistory);
     }, 250);
   };
 
