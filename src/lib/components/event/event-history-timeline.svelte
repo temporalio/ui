@@ -1,76 +1,103 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import {
-    DataSet,
-    Timeline,
-    type TimelineOptionsGroupHeightModeType,
-    type TimelineOptionsZoomKey,
-  } from 'vis-timeline/standalone';
+  import { DataSet, Timeline } from 'vis-timeline/standalone';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Accordion from '$lib/holocene/accordion.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
+  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
-  import { workflowRun } from '$lib/stores/workflow-run';
-  import type { CommonHistoryEvent } from '$lib/types/events';
+  import { eventCategoryFilter } from '$lib/stores/filters';
+  import {
+    workflowRun,
+    workflowTimelineViewOpen,
+  } from '$lib/stores/workflow-run';
+  import type {
+    CommonHistoryEvent,
+    EventTypeCategory,
+  } from '$lib/types/events';
   import { capitalize } from '$lib/utilities/format-camel-case';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+
+  import { getTimelineOptions } from './event-history-timeline-helpers';
 
   export let history: CommonHistoryEvent[] = [];
 
   let visualizationRef;
   let timeline;
 
+  $: category = $eventCategoryFilter as EventTypeCategory;
+
   function renderComponentToHTML(Component, props) {
     const container = document.createElement('div');
     new Component({ target: container, props });
     return container.innerHTML;
   }
+
   function renderGroupName(group) {
-    const groupName = capitalize(group.category);
+    const groupName = capitalize(group.label || group.category);
     return `<div class="flex gap-2 items-center">${groupName}</div>`;
   }
+
   function renderExecutionName() {
     return '<div class="flex gap-1 items-center">Workflow Execution</div>';
   }
+
   function renderPendingAttempts(name, attempt) {
     const retryIcon = renderComponentToHTML(Icon, {
       name: 'retry',
     });
-    return `<div class="flex gap-1 items-center justify-between"><div class="bar-content"><p>${name}</p></div><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div></div>`;
+    return `<div class="flex gap-1 items-center"><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div><div class="bar-content"><p>${name}</p></div></div>`;
   }
-  const createGroupItems = (eventGroups, isRunning, sortedHistory) => {
+
+  type GroupItems = {
+    items: DataSet<unknown, 'id'>;
+    groups: DataSet<unknown, 'id'>;
+  };
+
+  const createGroupItems = (
+    eventGroups: EventGroups,
+    isRunning: boolean,
+    sortedHistory: CommonHistoryEvent[],
+  ): GroupItems => {
     const items = new DataSet([]);
     const groups = new DataSet([]);
     const firstEvent = sortedHistory[0];
     const finalEvent = sortedHistory[sortedHistory.length - 1];
-    if ($workflowRun?.workflow?.status) {
+
+    if (!category) {
       groups.add({
         id: 'workflow',
         content: renderExecutionName(),
         order: -1,
       });
-    }
-    if (isRunning) {
       items.add({
         id: 'workflow',
         group: 'workflow',
         start: firstEvent.eventTime,
-        end: Date.now(),
+        end: isRunning ? Date.now() : finalEvent.eventTime,
         type: 'range',
+        title: stringifyWithBigInt(
+          {
+            startTime: $workflowRun.workflow.startTime,
+            endTime: $workflowRun.workflow?.endTime || Date.now(),
+          },
+          undefined,
+          2,
+        ),
         content: $workflowRun.workflow.runId,
-        className: `${finalEvent.category} Running`,
-      });
-    } else {
-      items.add({
-        id: 'workflow',
-        group: 'workflow',
-        start: firstEvent.eventTime,
-        end: finalEvent.eventTime,
-        type: 'range',
-        content: $workflowRun.workflow.runId,
-        className: `${finalEvent.category} ${finalEvent.classification}`,
+        className: isRunning
+          ? `${finalEvent.category} Running`
+          : `${finalEvent.category} ${finalEvent.classification}`,
+        editable: false,
       });
     }
+
     eventGroups.forEach((group, i) => {
       const initialEvent = group.initialEvent;
       const lastEvent = group?.lastEvent;
@@ -89,12 +116,14 @@
             groupPendingActivity.attempt,
           ),
           className: `${lastEvent.category} ${lastEvent.classification}`,
+          editable: false,
         });
       } else {
         items.add({
           id: `event-range-${initialEvent.id}`,
           group: group.id,
           start: initialEvent.eventTime,
+          data: group,
           content:
             group.eventList.length === 1
               ? group.name
@@ -102,6 +131,7 @@
           end: lastEvent.eventTime,
           type: group.eventList.length === 1 ? 'point' : 'range',
           className: `${lastEvent.category} ${lastEvent.classification}`,
+          editable: false,
         });
       }
       groups.add({
@@ -112,88 +142,100 @@
     });
     return { items, groups };
   };
-  const options = {
-    stack: false,
-    stackSubgroups: true,
-    maxHeight: 600,
-    horizontalScroll: true,
-    verticalScroll: true,
-    groupHeightMode: 'fixed' as TimelineOptionsGroupHeightModeType,
-    zoomKey: 'ctrlKey' as TimelineOptionsZoomKey,
-    orientation: {
-      axis: 'both',
-      item: 'center',
-    },
-    xss: {
-      disabled: true,
-      filterOptions: {
-        whiteList: {
-          p: ['class'],
-          div: ['class'],
-          h1: ['class'],
-          input: ['class', 'id', 'check'],
-          label: ['class', 'id', 'for'],
-          li: ['class'],
-          ul: ['class'],
-        },
-      },
-    },
-  };
-  onMount(() => {
-    timeline = new Timeline(
-      visualizationRef,
-      new DataSet([]),
-      new DataSet([]),
-      options,
-    );
-    return () => timeline.destroy();
-  });
-  const setVizItems = (items, groups) => {
+
+  const setVizItems = (
+    items: DataSet<unknown, 'id'>,
+    groups: DataSet<unknown, 'id'>,
+  ): void => {
     timeline.setGroups(groups);
     timeline.setItems(items);
     timeline.fit();
   };
 
+  const filterHistory = (
+    history: CommonHistoryEvent[],
+    category: EventTypeCategory,
+  ): CommonHistoryEvent[] => {
+    if (!category) return history;
+    return history.filter((i) => {
+      if (category === CATEGORIES.LOCAL_ACTIVITY) {
+        return isLocalActivityMarkerEvent(i);
+      }
+      return i.category === category;
+    });
+  };
+
+  const buildTimeline = (category: EventTypeCategory): void => {
+    timeline = new Timeline(
+      visualizationRef,
+      new DataSet([]),
+      new DataSet([]),
+      getTimelineOptions($workflowRun.workflow),
+    );
+    const reverseHistory =
+      $eventFilterSort === 'descending' && $eventViewType !== 'compact';
+    const sortedHistory = reverseHistory
+      ? [...history].reverse()
+      : [...history];
+    const filteredHistory = filterHistory(sortedHistory, category);
+    const eventGroups = groupEvents(filteredHistory);
+    const { groups, items } = createGroupItems(
+      eventGroups,
+      $workflowRun?.workflow?.isRunning,
+      sortedHistory,
+    );
+    setVizItems(items, groups);
+  };
+
+  onMount(() => {
+    return () => timeline?.destroy();
+  });
+
+  $: readyToDraw =
+    $workflowTimelineViewOpen &&
+    $workflowRun.workflow &&
+    history.length &&
+    visualizationRef;
   $: {
-    if (history.length && timeline) {
-      const reverseHistory =
-        $eventFilterSort === 'descending' && $eventViewType !== 'compact';
-      const sortedHistory = reverseHistory
-        ? [...history].reverse()
-        : [...history];
-      const eventGroups = groupEvents(sortedHistory);
-      const { groups, items } = createGroupItems(
-        eventGroups,
-        $workflowRun?.workflow?.isRunning,
-        sortedHistory,
-      );
-      setVizItems(items, groups);
+    if (readyToDraw) {
+      if (timeline) {
+        timeline.destroy();
+      }
+      buildTimeline(category);
     }
   }
-  const resetTimelineView = () => {
-    timeline.focus('workflow');
-  };
 </script>
 
-<div
-  class="flex w-full flex-col gap-4 rounded-xl border-2 border-gray-900 bg-white p-4"
+<Accordion
+  title={translate('timeline')}
+  icon="timeline"
+  open={$workflowTimelineViewOpen}
+  onToggle={() => {
+    $workflowTimelineViewOpen = !$workflowTimelineViewOpen;
+  }}
 >
-  <div class="flex items-center justify-between gap-2">
-    <h3 class="text-xl">Timeline</h3>
-    <div class="flex gap-2">
-      <Button variant="secondary" on:click={() => timeline.zoomIn(1)}
-        >Zoom In</Button
-      >
-      <Button variant="secondary" on:click={() => timeline.zoomOut(1)}
-        >Zoom Out</Button
-      >
-      <Button variant="secondary" on:click={resetTimelineView}
-        >Zoom to Fit</Button
-      >
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center justify-end gap-2">
+      <div class="flex gap-2">
+        <ToggleButtons>
+          <ToggleButton
+            data-testid="zoom-in"
+            on:click={() => timeline.zoomIn(1)}>+</ToggleButton
+          >
+          <ToggleButton
+            data-testid="zoom-in"
+            on:click={() => timeline.zoomOut(1)}>-</ToggleButton
+          >
+          <ToggleButton
+            data-testid="zoom-in"
+            on:click={() => timeline.focus('workflow')}>Fit</ToggleButton
+          >
+        </ToggleButtons>
+      </div>
     </div>
+    <div class="timeline" bind:this={visualizationRef} />
   </div>
-  <div bind:this={visualizationRef} />
-</div>
+</Accordion>
 
 <style lang="postcss">
   :global(.vis-item-content) {
@@ -246,6 +288,16 @@
 
   :global(.vis-item-overflow) {
     overflow: visible !important;
+  }
+
+  :global(.vis-tooltip) {
+    background-color: #18181b !important;
+    color: white !important;
+    border-radius: 0.75rem !important;
+    border-width: 2px !important;
+    border: 2px solid #18181b !important;
+    height: auto !important;
+    font-size: 0.5em !important;
   }
 
   :global(.vis-item.Card) {
