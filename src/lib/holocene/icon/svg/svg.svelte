@@ -2,7 +2,6 @@
   export let width = 24;
   export let height = 24;
   export let title = '';
-  export let name = '';
 </script>
 
 <svg
@@ -13,7 +12,8 @@
   xmlns="http://www.w3.org/2000/svg"
   class={$$props.class}
   role="img"
+  aria-hidden={!title}
 >
-  <title>{title || name}</title>
+  <title>{title}</title>
   <slot />
 </svg>
