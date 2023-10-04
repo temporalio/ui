@@ -16,7 +16,7 @@ inProgressBatchOperation.subscribe(async (operation) => {
   }
 });
 
-export const autoRefresh = persistStore<'on' | 'off'>(
+export const autoRefresh = persistStore<boolean>(
   'auto-refresh-batch-operation',
-  'off',
+  false,
 );

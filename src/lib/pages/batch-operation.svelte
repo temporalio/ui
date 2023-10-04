@@ -19,7 +19,7 @@
 
   $: {
     if (
-      $autoRefresh === 'on' &&
+      $autoRefresh &&
       operation.state === 'Running' &&
       interval === undefined
     ) {
@@ -30,7 +30,7 @@
         });
       }, 5000);
     } else if (
-      ($autoRefresh === 'off' || operation.state !== 'Running') &&
+      (!$autoRefresh || operation.state !== 'Running') &&
       interval !== undefined
     ) {
       clearInterval(interval);

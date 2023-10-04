@@ -36,10 +36,7 @@
         id="batch-operation-auto-refresh"
         label={translate('auto-refresh')}
         labelPosition="left"
-        checked={$autoRefresh === 'on'}
-        on:change={() => {
-          $autoRefresh = $autoRefresh === 'on' ? 'off' : 'on';
-        }}
+        bind:checked={$autoRefresh}
       />
     </Tooltip>
   {/if}
