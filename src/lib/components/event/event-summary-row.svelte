@@ -65,12 +65,17 @@
 
   const onLinkClick = () => {
     expanded = !expanded;
-    const queryParams = $page.url.searchParams;
-    console.log('queryParams', queryParams);
-    const urlParams = $page.params;
+    // Dont delete query params like ?per-page
+    const { namespace, workflow, run } = $page.params;
+    const queryParams: Record<string, string> = {};
+    $page.url.searchParams.forEach((value, key) => {
+      queryParams[key] = value;
+    });
     const route = routeForEventHistory({
       queryParams,
-      ...urlParams,
+      namespace,
+      workflow,
+      run,
     });
     goto(`${route}#${event.id}`, { noScroll: true });
     onRowClick();
