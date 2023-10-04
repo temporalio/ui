@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import { DataSet, Timeline } from 'vis-timeline/standalone';
 
+  import { page } from '$app/stores';
+
   import Accordion from '$lib/holocene/accordion.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
@@ -149,7 +151,14 @@
   ): void => {
     timeline.setGroups(groups);
     timeline.setItems(items);
-    timeline.fit();
+
+    if ($page.url.hash) {
+      setTimeout(() => {
+        timeline.fit();
+      }, 500);
+    } else {
+      timeline.fit();
+    }
   };
 
   const filterHistory = (

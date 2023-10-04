@@ -76,7 +76,7 @@
     loading = false;
     setTimeout(() => {
       scrollIntoView(hash.slice(1), $fullEventHistory);
-    }, 250);
+    }, 50);
   };
 
   $: $refresh, fetchEvents(namespace, workflowId, runId, $eventFilterSort);
