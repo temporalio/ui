@@ -26,7 +26,7 @@
 
 <Table {updating} class="dark w-full table-fixed">
   <caption class="sr-only" slot="caption"
-    >{translate('workflows', 'recent-events')}</caption
+    >{translate('workflows', 'event-history')}</caption
   >
   <TableHeaderRow slot="headers">
     <td class="w-14 xl:w-10" />

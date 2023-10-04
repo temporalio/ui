@@ -134,6 +134,7 @@ export const Strings = {
   'based-on-time-preface': 'Based on',
   'download-json': 'Download JSON',
   'skip-nav': 'Skip to Main Content',
+  timeline: 'Timeline',
   'equal-to': 'Equal to',
   'not-equal-to': 'Not equal to',
 } as const;

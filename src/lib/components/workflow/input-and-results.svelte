@@ -31,8 +31,8 @@
     {/if}
   </h3>
   {#if content}
-    {#if showParsedContent}
-      <div class="flex h-full flex-col overflow-scroll lg:max-h-[24rem]">
+    <div class="flex h-full flex-col overflow-scroll lg:max-h-[24rem]">
+      {#if showParsedContent}
         {#each parsedContent as content}
           <PayloadDecoder value={content} let:decodedValue>
             <CodeBlock
@@ -43,17 +43,17 @@
             />
           </PayloadDecoder>
         {/each}
-      </div>
-    {:else}
-      <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
-        <CodeBlock
-          content={decodedValue}
-          class="mb-2 lg:max-h-[23.5rem]"
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
-        />
-      </PayloadDecoder>
-    {/if}
+      {:else}
+        <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
+          <CodeBlock
+            content={decodedValue}
+            class="mb-2 lg:max-h-[23.5rem]"
+            copyIconTitle={translate('copy-icon-title')}
+            copySuccessIconTitle={translate('copy-success-icon-title')}
+          />
+        </PayloadDecoder>
+      {/if}
+    </div>
   {:else}
     <CodeBlock
       content="Results will appear upon completion."

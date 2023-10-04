@@ -15,15 +15,15 @@ import {
 } from './task-queue-compatibility';
 
 describe('getOrderedVersionSets', () => {
-  it(`should return empty array if undefined majorVersionSets`, () => {
+  it('should return empty array if undefined majorVersionSets', () => {
     expect(getOrderedVersionSets(undefined)).toStrictEqual([]);
   });
 
-  it(`should return empty array if empty array of majorVersionSets`, () => {
+  it('should return empty array if empty array of majorVersionSets', () => {
     expect(getOrderedVersionSets([])).toStrictEqual([]);
   });
 
-  it(`should return reversed array of majorVersionSets`, () => {
+  it('should return reversed array of majorVersionSets', () => {
     const majorVersionSets = [
       {
         versionSetId: '1.0',

@@ -26,7 +26,7 @@
   {href}
   target={newTab ? '_blank' : null}
   rel={newTab ? 'noreferrer' : null}
-  class="link {className}"
+  class="link {icon ? 'inline-flex' : 'inline'} {className}"
   class:active
   on:click
   {...$$restProps}
@@ -39,7 +39,7 @@
 
 <style lang="postcss">
   .link {
-    @apply inline-flex max-w-fit cursor-pointer items-center gap-2 rounded underline underline-offset-2 hover:text-indigo-600 focus-visible:bg-blue-100 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
+    @apply max-w-fit cursor-pointer items-center gap-2 rounded underline underline-offset-2 hover:text-indigo-600 focus-visible:bg-blue-100 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
 
     &.active {
       @apply text-blue-900;

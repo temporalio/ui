@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Copyable from '$lib/holocene/copyable.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
 

@@ -8,6 +8,7 @@
     MenuContainer,
     MenuItem,
   } from '$lib/holocene/menu';
+  import type { MenuButtonVariant } from '$lib/holocene/menu/menu-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     allEventTypeOptions,
@@ -19,6 +20,7 @@
   import { isVersionNewer } from '$lib/utilities/version-check';
 
   export let compact = false;
+  export let variant: MenuButtonVariant = 'table-header';
 
   $: label = compact
     ? translate('events', 'event-type')
@@ -27,8 +29,10 @@
   let parameter = 'category';
   let options = compact ? compactEventTypeOptions : allEventTypeOptions;
 
-  if (isVersionNewer('1.21', $temporalVersion)) {
-    options = options.filter(({ option }) => option !== 'update');
+  $: {
+    if (isVersionNewer('1.21', $temporalVersion)) {
+      options = options.filter(({ option }) => option !== 'update');
+    }
   }
 
   $: visibleOption = options.find(
@@ -48,7 +52,7 @@
 <MenuContainer>
   <MenuButton
     active={!!$eventCategoryFilter}
-    variant="table-header"
+    {variant}
     data-testid="event-category-filter"
     controls="event-category-filter-menu"
   >

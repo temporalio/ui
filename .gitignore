@@ -2,8 +2,6 @@
 node_modules
 /.svelte-kit
 /package
-/cypress/screenshots
-/cypress/videos
 /coverage
 *.log
 *.swp

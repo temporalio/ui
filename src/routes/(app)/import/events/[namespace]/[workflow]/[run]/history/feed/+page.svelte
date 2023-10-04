@@ -31,7 +31,7 @@
   floatId="event-view-toggle"
   let:visibleItems
   let:initialItem
-  aria-label={translate('workflows', 'recent-events')}
+  aria-label={translate('workflows', 'event-history')}
   pageSizeSelectLabel={translate('per-page')}
   previousButtonLabel={translate('previous')}
   nextButtonLabel={translate('next')}
