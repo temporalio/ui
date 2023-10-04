@@ -6,13 +6,16 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { batchOperations } from '$lib/stores/batch-operations';
   import { timeFormat } from '$lib/stores/time-format';
-  import type { BatchOperationState } from '$lib/types/batch';
+  import type {
+    BatchOperationInfo,
+    BatchOperationState,
+  } from '$lib/types/batch';
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForBatchOperation } from '$lib/utilities/route-for';
 
   export let namespace: string;
+  export let operations: BatchOperationInfo[];
 
   const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
     Completed: 'green',
@@ -29,7 +32,7 @@
     <th>{translate('start-time')}</th>
     <th>{translate('close-time')}</th>
   </TableHeaderRow>
-  {#each $batchOperations as { state, jobId, startTime, closeTime }}
+  {#each operations as { state, jobId, startTime, closeTime }}
     <TableRow>
       <td>
         <Badge type={jobStateToBadgeType[state]}>

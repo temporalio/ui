@@ -1,10 +1,15 @@
 import { listBatchOperations } from '$lib/services/batch-service';
-import { batchOperations } from '$lib/stores/batch-operations';
+import type { BatchOperationInfo } from '$lib/types/batch';
 
 import type { LayoutLoad } from '../$types';
 
-export const load: LayoutLoad = async ({ params, fetch }): Promise<void> => {
+export const load: LayoutLoad = async ({
+  params,
+  fetch,
+}): Promise<{ operations: BatchOperationInfo[] }> => {
   const { operations } = await listBatchOperations(params.namespace, fetch);
 
-  batchOperations.set(operations);
+  return {
+    operations,
+  };
 };
