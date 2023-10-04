@@ -206,7 +206,6 @@
     initialItem={$store.initialItem}
     activeRowIndex={$store.activeRowIndex}
     setActiveRowIndex={store.setActiveRowIndex}
-    store={$store}
   />
   <nav
     class={`flex ${
