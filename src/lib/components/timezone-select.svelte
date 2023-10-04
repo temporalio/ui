@@ -23,6 +23,8 @@
   import { capitalize } from '$lib/utilities/format-camel-case';
   import { formatUTCOffset, getLocalTime } from '$lib/utilities/format-date';
 
+  export let position: 'left' | 'right' = 'right';
+
   const localTime = getLocalTime();
   const QuickTimezoneOptions: TimeFormatOptions = [
     {
@@ -84,7 +86,7 @@
   </MenuButton>
   <Menu
     id="timezones-menu"
-    position="right"
+    {position}
     class="w-[10rem] sm:w-[20rem] md:w-[26rem]"
   >
     <Input

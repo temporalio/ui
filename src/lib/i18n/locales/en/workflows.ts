@@ -59,8 +59,8 @@ export const Strings = {
   'input-and-results': 'Input and Results',
   'continued-as-new-with-input': 'Continued as New with Input',
   results: 'Results',
-  'recent-events': 'Recent Events',
-  'recent-events-view': 'Recent Events View',
+  'event-history-view': 'Event History View',
+  'event-history': 'Event History',
   history: 'History',
   compact: 'Compact',
   json: 'JSON',
@@ -201,7 +201,8 @@ export const Strings = {
     'Try adjusting or clearing the filters to see the Workflows running on this Namespace.',
   'workflow-query-error-state': 'There is an error with filtering Workflows.',
   'workflow-empty-state-title': 'No Workflows running in this Namespace',
-  'workflow-empty-state-description': `You can populate the Web UI with sample Workflows. You can find a complete list of executable code samples at`,
+  'workflow-empty-state-description':
+    'You can populate the Web UI with sample Workflows. You can find a complete list of executable code samples at',
   'visibility-disabled-archival':
     'This namespace is currently enabled for archival but visibility is not enabled.',
   'archival-link-preface': 'To enable ',

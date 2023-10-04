@@ -28,3 +28,8 @@ export const workflowSummaryViewOpen = persistStore<boolean>(
   true,
   true,
 );
+export const workflowTimelineViewOpen = persistStore<boolean>(
+  'workflowTimelineView',
+  true,
+  true,
+);

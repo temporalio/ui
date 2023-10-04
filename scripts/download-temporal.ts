@@ -55,7 +55,7 @@ try {
 
   if (!response.ok) {
     console.warn(
-      chalk.magenta.bold(`There was an error fetching Temporal CLI`),
+      chalk.magenta.bold('There was an error fetching Temporal CLI'),
       chalk.bgRed.white.bold(` ${response.status} (${response.statusText}) `),
       chalk.cyan('Skipping…'),
     );

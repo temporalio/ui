@@ -266,7 +266,7 @@ describe('routeFor SSO authentication ', () => {
 
     const ssoUrl = new URL(sso);
     expect(ssoUrl.searchParams.get('returnUrl')).toBe(
-      `https://localhost/some/path`,
+      'https://localhost/some/path',
     );
   });
 
