@@ -18,10 +18,6 @@ module.exports = {
       },
     },
     {
-      files: ['cypress/**/*.js'],
-      extends: ['plugin:cypress/recommended'],
-    },
-    {
       files: ['tests/**/*.spec.ts'],
       extends: ['plugin:playwright/playwright-test'],
     },
