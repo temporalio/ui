@@ -158,11 +158,10 @@
         message: translate('workflows', 'signal-success'),
         id: 'workflow-signal-success-toast',
       });
+      hideSignalModal();
     } catch (err) {
       error = err?.message ?? translate('unknown-error');
     }
-
-    hideSignalModal();
   };
 
   const reset = async () => {

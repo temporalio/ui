@@ -128,7 +128,7 @@
   });
 
   const setView = () => {
-    if (view && !editable) {
+    if (view && (!editable || (editable && !value))) {
       const newState = createEditorState(value);
       view.setState(newState);
     }
