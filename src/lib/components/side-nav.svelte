@@ -92,16 +92,14 @@
         <div class="nav-title">{translate('archive')}</div>
       </NavRow>
     </IsCloudGuard>
-    <IsCloudGuard {isCloud}>
-      <NavRow link={linkList.batchOperations} {isCloud}>
-        <NavTooltip text={translate('batch', 'list-page-title')}>
-          <div class="nav-icon">
-            <Icon name={batchOperationIcon} />
-          </div>
-        </NavTooltip>
-        <div class="nav-title">{translate('batch', 'nav-title')}</div>
-      </NavRow>
-    </IsCloudGuard>
+    <NavRow link={linkList.batchOperations} {isCloud}>
+      <NavTooltip text={translate('batch', 'list-page-title')}>
+        <div class="nav-icon">
+          <Icon name={batchOperationIcon} />
+        </div>
+      </NavTooltip>
+      <div class="nav-title">{translate('batch', 'nav-title')}</div>
+    </NavRow>
   </svelte:fragment>
   <svelte:fragment slot="middle">
     <IsLegacyCloudGuard {isCloud}>
