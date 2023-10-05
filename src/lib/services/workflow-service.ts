@@ -1,13 +1,19 @@
 import { noop } from 'svelte/internal';
+import { get } from 'svelte/store';
 
 import { v4 } from 'uuid';
 
+import { translate } from '$lib/i18n/translate';
 import type { ResetReapplyType } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
 import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
+import {
+  lastDataEncoderError,
+  lastDataEncoderStatus,
+} from '$lib/stores/data-encoder-config';
 import type { ResetWorkflowRequest } from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
@@ -31,10 +37,8 @@ import {
 } from '$lib/utilities/handle-error';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
-import {
-  type ErrorCallback,
-  requestFromAPI,
-} from '$lib/utilities/request-from-api';
+import type { ErrorCallback } from '$lib/utilities/request-from-api';
+import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { base, pathForApi, routeForApi } from '$lib/utilities/route-for-api';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
@@ -320,6 +324,11 @@ export async function signalWorkflow({
         accessToken,
         encode: true,
       });
+      if (get(lastDataEncoderStatus) === 'error') {
+        throw new Error(
+          get(lastDataEncoderError) || translate('encode-failed'),
+        );
+      }
       payloads = awaitData?.payloads ?? null;
     } else {
       payloads = [

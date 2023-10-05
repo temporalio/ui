@@ -1,8 +1,9 @@
+import { translate } from '$lib/i18n/translate';
 import {
   setLastDataEncoderFailure,
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
-import type { Settings } from '$lib/types/global';
+import type { NetworkError, Settings } from '$lib/types/global';
 import { validateHttps } from '$lib/utilities/is-http';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
@@ -56,14 +57,27 @@ export async function convertPayloadsWithCodec({
     endpoint + (encode ? '/encode' : '/decode'),
     requestOptions,
   )
-    .then((r) => r.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw {
+          statusCode: response.status,
+          statusText: response.statusText,
+          response,
+          message: encode
+            ? translate('encode-failed')
+            : translate('decode-failed'),
+        } as NetworkError;
+      } else {
+        return response.json();
+      }
+    })
     .then((response) => {
       setLastDataEncoderSuccess();
 
       return response;
     })
-    .catch(() => {
-      setLastDataEncoderFailure();
+    .catch((err: unknown) => {
+      setLastDataEncoderFailure(err);
 
       return payloads;
     });

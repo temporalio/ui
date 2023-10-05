@@ -137,4 +137,6 @@ export const Strings = {
   timeline: 'Timeline',
   'equal-to': 'Equal to',
   'not-equal-to': 'Not equal to',
+  'encode-failed': 'Data encoding failed',
+  'decode-failed': 'Data decoding failed',
 } as const;
