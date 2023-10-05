@@ -13,11 +13,13 @@ export async function convertPayloadsWithCodec({
   namespace,
   settings,
   accessToken,
+  encode = false,
 }: {
   payloads: PotentialPayloads;
   namespace: string;
   settings: Settings;
   accessToken: string;
+  encode?: boolean;
 }): Promise<PotentialPayloads> {
   const endpoint = settings?.codec?.endpoint;
   const passAccessToken = settings?.codec?.passAccessToken;
@@ -51,7 +53,7 @@ export async function convertPayloadsWithCodec({
       };
 
   const encoderResponse: Promise<PotentialPayloads> = fetch(
-    endpoint + '/decode',
+    endpoint + (encode ? '/encode' : '/decode'),
     requestOptions,
   )
     .then((r) => r.json())

@@ -19,6 +19,11 @@
   } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
   import { coreUserStore } from '$lib/stores/core-user';
+  import {
+    codecEndpoint,
+    includeCredentials,
+    passAccessToken,
+  } from '$lib/stores/data-encoder-config';
   import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { settings } from '$lib/stores/settings';
@@ -137,6 +142,15 @@
         runId: workflow.runId,
         signalInput,
         signalName,
+        settings: {
+          ...$page.data.settings,
+          codec: {
+            endpoint: $codecEndpoint,
+            includeCredentials: $includeCredentials,
+            passAccessToken: $passAccessToken,
+          },
+        },
+        accessToken: $authUser.accessToken,
       });
       signalConfirmationModalOpen = false;
       $refresh = Date.now();

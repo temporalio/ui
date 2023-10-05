@@ -7,12 +7,17 @@ import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
+import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
 import type { ResetWorkflowRequest } from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
   ValidWorkflowParameters,
 } from '$lib/types/api';
-import type { NamespaceScopedRequest, Replace } from '$lib/types/global';
+import type {
+  NamespaceScopedRequest,
+  Replace,
+  Settings,
+} from '$lib/types/global';
 import type {
   ArchiveFilterParameters,
   ListWorkflowExecutionsResponse,
@@ -55,6 +60,8 @@ type SignalWorkflowOptions = {
   runId: string;
   signalName: string;
   signalInput: string;
+  settings: Settings;
+  accessToken: string;
 };
 
 type TerminateWorkflowOptions = {
@@ -293,12 +300,38 @@ export async function signalWorkflow({
   runId,
   signalName,
   signalInput,
+  settings,
+  accessToken,
 }: SignalWorkflowOptions) {
   const route = routeForApi('workflow.signal', {
     namespace,
     workflowId,
     runId,
   });
+
+  let payloads = null;
+
+  if (signalInput) {
+    if (settings?.codec?.endpoint) {
+      const awaitData = await convertPayloadsWithCodec({
+        payloads: { payloads: [JSON.parse(signalInput)] },
+        namespace,
+        settings,
+        accessToken,
+        encode: true,
+      });
+      payloads = awaitData?.payloads ?? null;
+    } else {
+      payloads = [
+        {
+          metadata: {
+            encoding: btoa('json/plain'),
+          },
+          data: btoa(signalInput),
+        },
+      ];
+    }
+  }
 
   return requestFromAPI(route, {
     notifyOnError: false,
@@ -307,16 +340,7 @@ export async function signalWorkflow({
       body: stringifyWithBigInt({
         signalName,
         input: {
-          payloads: signalInput
-            ? [
-                {
-                  metadata: {
-                    encoding: btoa('json/plain'),
-                  },
-                  data: btoa(signalInput),
-                },
-              ]
-            : null,
+          payloads,
         },
       }),
     },
