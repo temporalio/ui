@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { writable, type Writable } from 'svelte/store';
+
   import {
     addHours,
     addMinutes,
@@ -15,6 +17,7 @@
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import MenuDivider from '$lib/holocene/menu/menu-divider.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
+  import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
@@ -48,11 +51,11 @@
   let timeUnit = TIME_UNIT_OPTIONS[0];
   let relativeTime = '';
 
-  let type: 'relative' | 'absolute' = 'relative';
+  const type: Writable<'relative' | 'absolute'> = writable('relative');
 
   $: useBetweenDateTimeQuery = isTimeRange || !$supportsAdvancedVisibility;
   $: disabled =
-    type === 'relative' &&
+    $type === 'relative' &&
     !useBetweenDateTimeQuery &&
     (!relativeTime || error(relativeTime));
 
@@ -77,7 +80,7 @@
   };
 
   const onApply = () => {
-    if (type === 'relative' && !useBetweenDateTimeQuery) {
+    if ($type === 'relative' && !useBetweenDateTimeQuery) {
       if (!relativeTime) return;
       $filter.value = toDate(`${relativeTime} ${timeUnit}`);
       $filter.customDate = false;
@@ -181,24 +184,15 @@
           </div>
         </MenuItem>
       {:else}
-        <MenuItem on:click={() => (type = 'relative')}>
+        <MenuItem>
           <div class="flex flex-col">
-            <label
-              class="flex cursor-pointer flex-row items-center gap-2"
-              for="relative-time"
-            >
-              <input
-                on:click|stopPropagation={() => {
-                  type = 'relative';
-                }}
-                class="h-4 w-4 accent-gray-900"
-                type="radio"
-                checked={type === 'relative'}
-                id="relative-time"
-                tabindex="-1"
-              />
-              {translate('relative')}
-            </label>
+            <RadioInput
+              label={translate('relative')}
+              id="relative-time"
+              value="relative"
+              name="time-filter-type"
+              group={type}
+            />
             <div class="ml-6 flex gap-0 pt-2">
               <Input
                 label={translate('relative')}
@@ -209,7 +203,7 @@
                 error={error(relativeTime)}
                 unroundRight
                 class="h-10"
-                disabled={type !== 'relative'}
+                disabled={$type !== 'relative'}
               />
               <Select
                 unroundLeft
@@ -217,7 +211,7 @@
                 id="relative-datetime-unit-input"
                 label={translate('time-unit')}
                 labelHidden
-                disabled={type !== 'relative'}
+                disabled={$type !== 'relative'}
               >
                 {#each TIME_UNIT_OPTIONS as unit}
                   <Option value={unit}>{unit} {translate('ago')}</Option>
@@ -227,22 +221,15 @@
           </div>
         </MenuItem>
         <MenuDivider />
-        <MenuItem on:click={() => (type = 'absolute')}>
+        <MenuItem>
           <div class="flex flex-col gap-2">
-            <label
-              class="flex cursor-pointer flex-row items-center gap-2"
-              for="absolute-time"
-            >
-              <input
-                on:click|stopPropagation={() => (type = 'absolute')}
-                class="h-4 w-4 accent-gray-900"
-                type="radio"
-                checked={type === 'absolute'}
-                id="absolute-time"
-                tabindex="-1"
-              />
-              {translate('absolute')}
-            </label>
+            <RadioInput
+              label={translate('absolute')}
+              id="absolute-time"
+              value="absolute"
+              name="time-filter-type"
+              group={type}
+            />
             <div class="ml-6 flex flex-col gap-2">
               <DatePicker
                 label={''}
@@ -252,14 +239,14 @@
                 todayLabel={translate('today')}
                 closeLabel={translate('close')}
                 clearLabel={translate('clear-input-button-label')}
-                disabled={type !== 'absolute'}
+                disabled={$type !== 'absolute'}
               />
               <TimePicker
                 bind:hour={startHour}
                 bind:minute={startMinute}
                 bind:second={startSecond}
                 twelveHourClock={false}
-                disabled={type !== 'absolute'}
+                disabled={$type !== 'absolute'}
               />
             </div>
           </div>

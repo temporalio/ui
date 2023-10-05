@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { writable } from 'svelte/store';
+
   import { page } from '$app/stores';
 
   import WorkflowResetForm from '$lib/components/workflow/workflow-reset-form.svelte';
@@ -47,7 +49,7 @@
   let signalConfirmationModalOpen = false;
   let error = '';
   let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
-  let resetId: string;
+  let resetId = writable<string>();
   let resetReason: string;
   let loading = false;
   let resetTooltipText: string;
@@ -68,7 +70,7 @@
 
   const hideResetModal = () => {
     resetReapplyType = ResetReapplyType.Unspecified;
-    resetId = undefined;
+    $resetId = undefined;
     resetReason = undefined;
   };
 
@@ -158,7 +160,7 @@
         namespace,
         workflowId: workflow.id,
         runId: workflow.runId,
-        eventId: resetId,
+        eventId: $resetId,
         reason: formatReason({
           action: Action.Reset,
           reason: resetReason,
@@ -294,7 +296,7 @@
   bind:open={resetConfirmationModalOpen}
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
-  confirmDisabled={!resetId}
+  confirmDisabled={!$resetId}
 >
   <h3 slot="title">{translate('workflows', 'reset-modal-title')}</h3>
   <svelte:fragment slot="content">
