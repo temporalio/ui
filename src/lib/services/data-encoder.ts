@@ -4,6 +4,7 @@ import {
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
 import type { NetworkError, Settings } from '$lib/types/global';
+import { has } from '$lib/utilities/has';
 import { validateHttps } from '$lib/utilities/is-http';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
@@ -58,7 +59,7 @@ export async function convertPayloadsWithCodec({
     requestOptions,
   )
     .then((response) => {
-      if (!response.ok) {
+      if (has(response, 'ok') && !response.ok) {
         throw {
           statusCode: response.status,
           statusText: response.statusText,
