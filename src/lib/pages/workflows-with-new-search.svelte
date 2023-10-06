@@ -143,7 +143,6 @@
       };
       await batchTerminateWorkflows(options);
       batchTerminateConfirmationModal?.close();
-      refreshWorkflows();
       toaster.push({
         message: translate('workflows', 'batch-terminate-all-success'),
         id: 'batch-terminate-success-toast',
@@ -166,7 +165,6 @@
     try {
       await batchCancelWorkflows(options);
       batchCancelConfirmationModal?.close();
-      refreshWorkflows();
       toaster.push({
         message: translate('workflows', 'batch-cancel-all-success'),
         id: 'batch-cancel-success-toast',

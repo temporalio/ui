@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
+
   import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -7,6 +9,18 @@
   import type { BatchOperation, BatchOperationState } from '$lib/types/batch';
 
   export let operation: BatchOperation;
+
+  const dispatch = createEventDispatcher<{
+    toggleAutoRefresh: { checked: boolean };
+  }>();
+
+  const handleToggleAutoRefresh = (
+    event: Event & { target: EventTarget & HTMLInputElement },
+  ) => {
+    const { checked } = event.target;
+    dispatch('toggleAutoRefresh', { checked });
+    $autoRefresh = checked;
+  };
 
   const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
     Completed: 'green',
@@ -36,7 +50,8 @@
         id="batch-operation-auto-refresh"
         label={translate('auto-refresh')}
         labelPosition="left"
-        bind:checked={$autoRefresh}
+        checked={$autoRefresh}
+        on:change={handleToggleAutoRefresh}
       />
     </Tooltip>
   {/if}

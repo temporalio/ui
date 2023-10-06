@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import BatchOperationDetails from '$lib/components/batch-operations/details.svelte';
   import BatchOperationHeader from '$lib/components/batch-operations/header.svelte';
   import BatchOperationResults from '$lib/components/batch-operations/results.svelte';
@@ -9,34 +7,34 @@
   import { translate } from '$lib/i18n/translate';
   import { describeBatchOperation } from '$lib/services/batch-service';
   import { autoRefresh } from '$lib/stores/batch-operations';
-  import type { BatchOperation } from '$lib/types/batch';
   import { routeForBatchOperations } from '$lib/utilities/route-for';
 
   export let namespace: string;
-  export let operation: BatchOperation;
+  export let jobId: string;
 
-  let interval: number;
+  let fetchKey: number = 0;
+  let timeout: number;
 
-  $: {
-    if (
-      $autoRefresh &&
-      operation.state === 'Running' &&
-      interval === undefined
-    ) {
-      interval = window.setInterval(async () => {
-        operation = await describeBatchOperation({
-          namespace: $page.params.namespace,
-          jobId: operation.jobId,
-        });
-      }, 5000);
-    } else if (
-      (!$autoRefresh || operation.state !== 'Running') &&
-      interval !== undefined
-    ) {
-      clearInterval(interval);
-      interval = undefined;
+  const handleToggleAutoRefresh = (
+    event: CustomEvent<{ checked: boolean }>,
+  ) => {
+    if (event.detail.checked) {
+      fetchKey += 1;
+    } else if (timeout) {
+      window.clearTimeout(timeout);
     }
-  }
+  };
+
+  const fetchBatchOperation = () =>
+    describeBatchOperation({ jobId, namespace }).then((operation) => {
+      if ($autoRefresh && operation.state === 'Running') {
+        timeout = window.setTimeout(() => {
+          fetchKey += 1;
+        }, 5000);
+      }
+
+      return operation;
+    });
 </script>
 
 <div class="flex flex-col gap-4">
@@ -45,11 +43,18 @@
       {translate('batch', 'back-link')}
     </Link>
   </div>
-  <BatchOperationHeader {operation} />
-  <Card>
-    <BatchOperationDetails {operation} />
-  </Card>
-  <Card>
-    <BatchOperationResults {operation} />
-  </Card>
+  {#key fetchKey}
+    {#await fetchBatchOperation() then operation}
+      <BatchOperationHeader
+        on:toggleAutoRefresh={handleToggleAutoRefresh}
+        {operation}
+      />
+      <Card>
+        <BatchOperationDetails {operation} />
+      </Card>
+      <Card>
+        <BatchOperationResults {operation} />
+      </Card>
+    {/await}
+  {/key}
 </div>
