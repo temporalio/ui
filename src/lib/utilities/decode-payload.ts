@@ -5,11 +5,7 @@ import type {
   includeCredentials,
   passAccessToken,
 } from '$lib/stores/data-encoder-config';
-import type {
-  EventAttribute,
-  EventRequestMetadata,
-  Payload,
-} from '$lib/types/events';
+import type { EventRequestMetadata, Payload } from '$lib/types/events';
 import type { Optional, Replace, Settings } from '$lib/types/global';
 import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
 import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
@@ -19,9 +15,7 @@ import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
 
-export type PotentiallyDecodable =
-  | Record<string | number | symbol, unknown>
-  | EventAttribute;
+export type PotentiallyDecodable = Record<string | number | symbol, unknown>;
 
 export type Decode = {
   convertPayloadToJsonWithCodec: typeof convertPayloadToJsonWithCodec;

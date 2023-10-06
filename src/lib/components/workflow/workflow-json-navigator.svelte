@@ -4,10 +4,13 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowEvents } from '$lib/types/events';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   import PayloadDecoder from '../event/payload-decoder.svelte';
 
   export let events: WorkflowEvents = [];
+  export let decodeEventHistory: boolean;
+
   let index = 1;
 
   function handleKeydown(event: KeyboardEvent) {
@@ -79,14 +82,23 @@
     </div>
     <slot name="decode" />
   </div>
-  <PayloadDecoder value={events[index - 1]} let:decodedValue>
+  {#if decodeEventHistory}
+    <PayloadDecoder value={events[index - 1]} let:decodedValue>
+      <CodeBlock
+        content={decodedValue}
+        testId="event-history-json"
+        copyIconTitle={translate('copy-icon-title')}
+        copySuccessIconTitle={translate('copy-success-icon-title')}
+      />
+    </PayloadDecoder>
+  {:else}
     <CodeBlock
-      content={decodedValue}
+      content={stringifyWithBigInt(events[index - 1], undefined, 2)}
       testId="event-history-json"
       copyIconTitle={translate('copy-icon-title')}
       copySuccessIconTitle={translate('copy-success-icon-title')}
     />
-  </PayloadDecoder>
+  {/if}
 {/if}
 
 <style lang="postcss">
