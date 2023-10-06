@@ -27,6 +27,7 @@
     namespace &&
     (pathNameSplit.includes('workflows') ||
       pathNameSplit.includes('schedules') ||
+      pathNameSplit.includes('batch-operations') ||
       pathNameSplit.includes('task-queues'));
 
   let showProfilePic = true;
