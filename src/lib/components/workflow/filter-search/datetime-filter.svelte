@@ -184,7 +184,7 @@
           </div>
         </MenuItem>
       {:else}
-        <MenuItem>
+        <MenuItem on:click={() => ($type = 'relative')}>
           <div class="flex flex-col">
             <RadioInput
               label={translate('relative')}
@@ -221,7 +221,7 @@
           </div>
         </MenuItem>
         <MenuDivider />
-        <MenuItem>
+        <MenuItem on:click={() => ($type = 'absolute')}>
           <div class="flex flex-col gap-2">
             <RadioInput
               label={translate('absolute')}
