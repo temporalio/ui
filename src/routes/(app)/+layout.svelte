@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { afterNavigate } from '$app/navigation';
-  import { goto } from '$app/navigation';
+  import { afterNavigate, goto } from '$app/navigation';
   import { page, updated } from '$app/stores';
 
   import type { PageData } from './$types';
@@ -19,6 +18,7 @@
   import type { NamespaceListItem } from '$lib/types/global';
   import {
     routeForArchivalWorkfows,
+    routeForBatchOperations,
     routeForEventHistoryImport,
     routeForLoginPage,
     routeForNamespaces,
@@ -59,6 +59,9 @@
     namespaces: routeForNamespaces(),
     schedules: routeForSchedules({ namespace: activeNamespaceName }),
     workflows: routeForWorkflows({ namespace: activeNamespaceName }),
+    batchOperations: routeForBatchOperations({
+      namespace: activeNamespaceName,
+    }),
     import: routeForEventHistoryImport(),
     feedback:
       $page.data?.settings?.feedbackURL ||

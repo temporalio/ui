@@ -64,10 +64,8 @@
   import Translate from '$lib/i18n/translate.svelte';
   import { Action } from '$lib/models/workflow-actions';
   import {
-    batchCancelByQuery,
-    batchTerminateByQuery,
-    bulkCancelByIDs,
-    bulkTerminateByIDs,
+    batchCancelWorkflows,
+    batchTerminateWorkflows,
   } from '$lib/services/batch-service';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
@@ -86,8 +84,10 @@
   } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
-  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    toListWorkflowFilters,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);
@@ -133,32 +133,20 @@
   };
 
   const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
-    const options = {
-      namespace: $page.params.namespace,
-      reason: event.detail.reason,
-    };
     try {
-      if ($allSelected) {
-        await batchTerminateByQuery({
-          ...options,
-          query: batchOperationQuery,
-        });
-        toaster.push({
-          message: translate('workflows', 'batch-terminate-all-success'),
-          id: 'batch-terminate-success-toast',
-        });
-      } else {
-        const count = await bulkTerminateByIDs({
-          ...options,
-          workflows: $terminableWorkflows,
-        });
-        toaster.push({
-          message: translate('workflows', 'batch-terminate-success', { count }),
-          id: 'batch-terminate-success-toast',
-        });
-      }
+      const options = {
+        namespace: $page.params.namespace,
+        reason: event.detail.reason,
+        ...($allSelected
+          ? { query: batchOperationQuery }
+          : { workflows: $terminableWorkflows }),
+      };
+      await batchTerminateWorkflows(options);
       batchTerminateConfirmationModal?.close();
-      refreshWorkflows();
+      toaster.push({
+        message: translate('workflows', 'batch-terminate-all-success'),
+        id: 'batch-terminate-success-toast',
+      });
     } catch (error) {
       batchTerminateConfirmationModal?.setError(
         error?.message ?? translate('unknown-error'),
@@ -170,29 +158,17 @@
     const options = {
       namespace: $page.params.namespace,
       reason: event.detail.reason,
+      ...($allSelected
+        ? { query: batchOperationQuery }
+        : { workflows: $terminableWorkflows }),
     };
     try {
-      if ($allSelected) {
-        await batchCancelByQuery({
-          ...options,
-          query: batchOperationQuery,
-        });
-        toaster.push({
-          message: translate('workflows', 'batch-cancel-all-success'),
-          id: 'batch-cancel-success-toast',
-        });
-      } else {
-        const count = await bulkCancelByIDs({
-          ...options,
-          workflows: $cancelableWorkflows,
-        });
-        toaster.push({
-          message: translate('workflows', 'batch-cancel-success', { count }),
-          id: 'batch-cancel-success-toast',
-        });
-      }
+      await batchCancelWorkflows(options);
       batchCancelConfirmationModal?.close();
-      refreshWorkflows();
+      toaster.push({
+        message: translate('workflows', 'batch-cancel-all-success'),
+        id: 'batch-cancel-success-toast',
+      });
     } catch (error) {
       batchCancelConfirmationModal?.setError(
         error?.message ?? translate('unknown-error'),

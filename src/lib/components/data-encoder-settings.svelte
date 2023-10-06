@@ -140,7 +140,7 @@
       <DataConverterPortSettings bind:port />
       <div class="flex items-center gap-4">
         <Button
-          disabled={Boolean(error) || ($override && !endpoint)}
+          disabled={Boolean(error)}
           data-testid="confirm-data-encoder-button"
           on:click={onConfirm}
           type="submit">{translate('apply')}</Button

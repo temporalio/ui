@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
+
   import FeatureGuard from '$lib/components/feature-guard.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
   import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
@@ -7,6 +9,7 @@
   import NavRow from '$lib/holocene/navigation/nav-row.svelte';
   import NavTooltip from '$lib/holocene/navigation/nav-tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { labsMode } from '$lib/stores/labs-mode';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
@@ -23,6 +26,31 @@
   $: labsText = `${translate('labs')} ${
     $labsMode ? translate('on') : translate('off')
   }`;
+
+  let batchOperationIcon: 'layers-1' | 'layers-2' | 'layers-3' = 'layers-3';
+
+  const interval = setInterval(() => {
+    if (!$inProgressBatchOperation) {
+      batchOperationIcon = 'layers-3';
+      return;
+    }
+
+    setTimeout(() => {
+      batchOperationIcon = 'layers-1';
+    });
+
+    setTimeout(() => {
+      batchOperationIcon = 'layers-2';
+    }, 330);
+
+    setTimeout(() => {
+      batchOperationIcon = 'layers-3';
+    }, 660);
+  }, 2000);
+
+  onDestroy(() => {
+    clearInterval(interval);
+  });
 </script>
 
 <NavContainer {isCloud} {linkList} aria-label={translate('primary')}>
@@ -64,6 +92,14 @@
         <div class="nav-title">{translate('archive')}</div>
       </NavRow>
     </IsCloudGuard>
+    <NavRow link={linkList.batchOperations} {isCloud}>
+      <NavTooltip text={translate('batch', 'list-page-title')}>
+        <div class="nav-icon">
+          <Icon name={batchOperationIcon} />
+        </div>
+      </NavTooltip>
+      <div class="nav-title">{translate('batch', 'nav-title')}</div>
+    </NavRow>
   </svelte:fragment>
   <svelte:fragment slot="middle">
     <IsLegacyCloudGuard {isCloud}>

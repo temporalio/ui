@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { bulkCancelByIDs, bulkTerminateByIDs } from './batch-service';
+import { batchCancelWorkflows, batchTerminateWorkflows } from './batch-service';
 import { temporalVersion } from '../stores/versions';
 import { requestFromAPI } from '../utilities/request-from-api';
 
@@ -46,8 +46,8 @@ describe('Batch Service', () => {
       );
     });
 
-    test('bulkTerminateByIDs calls the create batch operation endpoint with the correct options', async () => {
-      await bulkTerminateByIDs({
+    test('batchTerminateWorkflows calls the create batch operation endpoint with the correct options', async () => {
+      await batchTerminateWorkflows({
         namespace: 'default',
         reason: 'test',
         workflows: mockWorkflows,
@@ -66,8 +66,8 @@ describe('Batch Service', () => {
       );
     });
 
-    test('bulkCancelByIDs calls the create batch operation endpoint with the correct options', async () => {
-      await bulkCancelByIDs({
+    test('batchCancelWorkflows calls the create batch operation endpoint with the correct options', async () => {
+      await batchCancelWorkflows({
         namespace: 'default',
         reason: 'test',
         workflows: mockWorkflows,
@@ -94,8 +94,8 @@ describe('Batch Service', () => {
       );
     });
 
-    test('bulkTerminateByIDs calls the create batch operation endpoint with the correct options', async () => {
-      await bulkTerminateByIDs({
+    test('batchTerminateWorkflows calls the create batch operation endpoint with the correct options', async () => {
+      await batchTerminateWorkflows({
         namespace: 'default',
         reason: 'test',
         workflows: mockWorkflows,
@@ -114,8 +114,8 @@ describe('Batch Service', () => {
       );
     });
 
-    test('bulkCancelByIDs calls the create batch operation endpoint with the correct options', async () => {
-      await bulkCancelByIDs({
+    test('batchCancelWorkflows calls the create batch operation endpoint with the correct options', async () => {
+      await batchCancelWorkflows({
         namespace: 'default',
         reason: 'test',
         workflows: mockWorkflows,
