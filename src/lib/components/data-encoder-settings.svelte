@@ -33,6 +33,11 @@
   let port = $dataConverterPort ?? '';
   let passToken = $passAccessToken ?? false;
   let includeCreds = $includeCredentials ?? false;
+  let override = writable($overrideRemoteCodecConfiguration);
+
+  $: {
+    console.log($override);
+  }
 
   $: error = '';
   $: namespaceOrCluster = $page.data?.settings?.runtimeEnvironment?.isCloud
@@ -58,6 +63,7 @@
     port = $dataConverterPort;
     passToken = $passAccessToken;
     includeCreds = $includeCredentials;
+    $override = $overrideRemoteCodecConfiguration;
     $viewDataEncoderSettings = false;
   };
 
@@ -68,6 +74,7 @@
     $includeCredentials = includeCreds;
     $dataConverterPort = port;
     $viewDataEncoderSettings = false;
+    $overrideRemoteCodecConfiguration = $override;
 
     if ($page.url.pathname.endsWith('history')) {
       $refresh = Date.now();
@@ -99,7 +106,7 @@
       </p>
       <Accordion
         data-testid="override-accordion"
-        title={$overrideRemoteCodecConfiguration
+        title={$override
           ? translate('data-encoder', 'browser-override-description', {
               level: namespaceOrCluster,
             })
@@ -107,7 +114,7 @@
               level: namespaceOrCluster,
             })}
       >
-        <RadioGroup name="override" group={overrideRemoteCodecConfiguration}>
+        <RadioGroup name="override" group={override}>
           <RadioInput
             id="use-configuration-endpoint-radio"
             value={false}
@@ -137,8 +144,7 @@
       <DataConverterPortSettings bind:port />
       <div class="flex items-center gap-4">
         <Button
-          disabled={Boolean(error) ||
-            ($overrideRemoteCodecConfiguration && !endpoint)}
+          disabled={Boolean(error) || ($override && !endpoint)}
           data-testid="confirm-data-encoder-button"
           on:click={onConfirm}
           type="submit">{translate('apply')}</Button
