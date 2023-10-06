@@ -35,10 +35,6 @@
   let includeCreds = $includeCredentials ?? false;
   let override = writable($overrideRemoteCodecConfiguration);
 
-  $: {
-    console.log($override);
-  }
-
   $: error = '';
   $: namespaceOrCluster = $page.data?.settings?.runtimeEnvironment?.isCloud
     ? translate('namespaces')
