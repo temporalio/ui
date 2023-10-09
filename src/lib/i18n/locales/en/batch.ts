@@ -17,4 +17,6 @@ export const Strings = {
   'max-concurrent-alert-title': 'Maximum concurrent Batch Operations met',
   'max-concurrent-alert-description':
     'Only 1 in progress Batch Operation is permitted. If you are attempting to create a new Batch Operation while there is one currently running, it will fail.',
+  'job-id-input-hint':
+    'Job ID must be unique. If left blank, a randomly generated UUID will be used.',
 } as const;

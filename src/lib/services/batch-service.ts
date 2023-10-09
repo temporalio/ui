@@ -1,7 +1,5 @@
 import { get } from 'svelte/store';
 
-import { v4 as uuidv4 } from 'uuid';
-
 import { Action } from '$lib/models/workflow-actions';
 import { getAuthUser } from '$lib/stores/auth-user';
 import { inProgressBatchOperation } from '$lib/stores/batch-operations';
@@ -28,6 +26,7 @@ import type { WorkflowExecution } from '$types/workflows';
 type CreateBatchOperationOptions = {
   namespace: string;
   reason: string;
+  jobId: string;
   query?: string;
   workflows?: WorkflowExecution[];
 };
@@ -83,7 +82,7 @@ const createBatchOperationRequest = (
   options: CreateBatchOperationOptions,
 ): StartBatchOperationRequest => {
   const body: StartBatchOperationRequest = {
-    jobId: uuidv4(),
+    jobId: options.jobId,
     namespace: options.namespace,
     reason: options.reason,
     ...batchActionToOperation(action),

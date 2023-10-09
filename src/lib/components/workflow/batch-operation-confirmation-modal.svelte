@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import { v4 } from 'uuid';
 
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
@@ -17,6 +18,8 @@
   let reason = '';
   let isOpen = false;
   let error = '';
+  let jobId = '';
+  let jobIdPlaceholder = v4();
 
   export const open = () => {
     reason = '';
@@ -26,7 +29,7 @@
   export const setError = (err: string) => (error = err);
 
   const dispatch = createEventDispatcher<{
-    confirm: { reason: string };
+    confirm: { reason: string; jobId: string };
   }>();
 
   $: actionText =
@@ -41,6 +44,7 @@
     error = '';
     dispatch('confirm', {
       reason: formatReason({ action, reason, email: $authUser.email }),
+      jobId: jobId || jobIdPlaceholder,
     });
   };
 </script>
@@ -63,7 +67,7 @@
     />
   </h3>
   <svelte:fragment slot="content">
-    <div class="mb-4 flex flex-col">
+    <div class="mb-4 flex flex-col gap-2">
       {#if $allSelected}
         <p class="mb-2">
           <Translate
@@ -97,17 +101,24 @@
           />
         </p>
       {/if}
+      <Input
+        id={`bulk-action-reason-${action}`}
+        bind:value={reason}
+        label={translate('reason')}
+        hintText={translate(
+          'workflows',
+          'batch-operation-confirmation-input-hint',
+          { placeholder },
+        )}
+        {placeholder}
+      />
+      <Input
+        id="batch-operation-job-id"
+        label={translate('job-id')}
+        hintText={translate('batch', 'job-id-input-hint')}
+        bind:value={jobId}
+        placeholder={jobIdPlaceholder}
+      />
     </div>
-    <Input
-      id={`bulk-action-reason-${action}`}
-      bind:value={reason}
-      label={translate('reason')}
-      hintText={translate(
-        'workflows',
-        'batch-operation-confirmation-input-hint',
-        { placeholder },
-      )}
-      {placeholder}
-    />
   </svelte:fragment>
 </Modal>
