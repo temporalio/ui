@@ -1,5 +1,4 @@
 <script lang="ts">
-  import blake from 'blakejs';
   import { onMount } from 'svelte';
 
   import { page } from '$app/stores';
@@ -43,20 +42,13 @@
       convertedAttributes,
     ) as object;
     decodedValue = stringifyWithBigInt(decodedAttributes);
-    const hashedDecodedValue = blake.blake2sHex(decodedValue);
-    if (hashedDecodedValue !== hashedValue) {
-      localStorage.setItem(hashedValue, decodedValue);
-    }
   };
 
   onMount(() => {
-    if (!decodedValue) {
-      decodePayloads();
-    }
+    decodePayloads();
   });
 
-  const hashedValue = blake.blake2sHex(stringifyWithBigInt(value));
-  let decodedValue = localStorage.getItem(hashedValue) || '';
+  let decodedValue = '';
 </script>
 
 <slot {decodedValue} />

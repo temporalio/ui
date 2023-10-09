@@ -26,6 +26,7 @@ export async function convertPayloadsWithCodec({
   const headers = {
     'Content-Type': 'application/json',
     'X-Namespace': namespace,
+    'Cache-Control': 'max-age=3600',
   };
 
   if (passAccessToken) {

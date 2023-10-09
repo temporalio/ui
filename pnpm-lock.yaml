@@ -44,9 +44,6 @@ dependencies:
   '@sveltejs/svelte-virtual-list':
     specifier: ^3.0.1
     version: 3.0.1
-  blakejs:
-    specifier: ^1.2.1
-    version: 1.2.1
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.0
@@ -2994,10 +2991,6 @@ packages:
       inherits: 2.0.4
       readable-stream: 3.6.0
     dev: true
-
-  /blakejs@1.2.1:
-    resolution: {integrity: sha512-QXUSXI3QVc/gJME0dBpXrag1kbzOqCjCX8/b54ntNyW6sjtoqxqRk3LTmXzaJoh71zMsDCjM+47jS7XiwN/+fQ==}
-    dev: false
 
   /blueimp-md5@2.19.0:
     resolution: {integrity: sha512-DRQrD6gJyy8FbiE4s+bDoXS9hiW3Vbx5uCdwvcCf3zLHL+Iv7LtGHLpr+GZV8rHG8tK766FGYBwRbu8pELTt+w==}
