@@ -128,7 +128,10 @@
   });
 
   const setView = () => {
-    if (view && (!editable || (editable && !value))) {
+    const isEditableWithNoValue = editable && !value;
+    const shouldCreateNewState = view && (!editable || isEditableWithNoValue);
+
+    if (shouldCreateNewState) {
       const newState = createEditorState(value);
       view.setState(newState);
     }

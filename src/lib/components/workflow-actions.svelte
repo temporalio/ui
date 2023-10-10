@@ -43,8 +43,11 @@
   export let cancelInProgress: boolean;
   export let isRunning: boolean;
 
+  const getDefaultSignalInput = () =>
+    $codecEndpoint ? '{"metadata": {"encoding": "..."}, "data": "..."}' : '';
+
   let reason = '';
-  let signalInput = '';
+  let signalInput = getDefaultSignalInput();
   let signalName = '';
   let cancelConfirmationModalOpen = false;
   let terminateConfirmationModalOpen = false;
@@ -67,7 +70,7 @@
   };
 
   const hideSignalModal = () => {
-    signalInput = '';
+    signalInput = getDefaultSignalInput();
     signalName = '';
   };
 
