@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { bulkCancelByIDs, bulkTerminateByIDs } from './batch-service';
+import { batchCancelWorkflows, batchTerminateWorkflows } from './batch-service';
 import { temporalVersion } from '../stores/versions';
 import { requestFromAPI } from '../utilities/request-from-api';
 
@@ -24,10 +24,6 @@ vi.mock('../utilities/request-from-api', () => ({
   }),
 }));
 
-vi.mock('uuid', () => ({
-  v4: () => 'xxx',
-}));
-
 vi.mock('../stores/versions', () => {
   return {
     temporalVersion: writable(),
@@ -46,11 +42,12 @@ describe('Batch Service', () => {
       );
     });
 
-    test('bulkTerminateByIDs calls the create batch operation endpoint with the correct options', async () => {
-      await bulkTerminateByIDs({
+    test('batchTerminateWorkflows calls the create batch operation endpoint with the correct options', async () => {
+      await batchTerminateWorkflows({
         namespace: 'default',
         reason: 'test',
         workflows: mockWorkflows,
+        jobId: 'xxx',
       });
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
@@ -66,11 +63,12 @@ describe('Batch Service', () => {
       );
     });
 
-    test('bulkCancelByIDs calls the create batch operation endpoint with the correct options', async () => {
-      await bulkCancelByIDs({
+    test('batchCancelWorkflows calls the create batch operation endpoint with the correct options', async () => {
+      await batchCancelWorkflows({
         namespace: 'default',
         reason: 'test',
         workflows: mockWorkflows,
+        jobId: 'xxx',
       });
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
@@ -94,11 +92,12 @@ describe('Batch Service', () => {
       );
     });
 
-    test('bulkTerminateByIDs calls the create batch operation endpoint with the correct options', async () => {
-      await bulkTerminateByIDs({
+    test('batchTerminateWorkflows calls the create batch operation endpoint with the correct options', async () => {
+      await batchTerminateWorkflows({
         namespace: 'default',
         reason: 'test',
         workflows: mockWorkflows,
+        jobId: 'xxx',
       });
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
@@ -114,11 +113,12 @@ describe('Batch Service', () => {
       );
     });
 
-    test('bulkCancelByIDs calls the create batch operation endpoint with the correct options', async () => {
-      await bulkCancelByIDs({
+    test('batchCancelWorkflows calls the create batch operation endpoint with the correct options', async () => {
+      await batchCancelWorkflows({
         namespace: 'default',
         reason: 'test',
         workflows: mockWorkflows,
+        jobId: 'xxx',
       });
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);

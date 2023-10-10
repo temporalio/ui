@@ -124,23 +124,3 @@ export type WorkflowExecution = {
   defaultWorkflowTaskTimeout: Duration;
   canBeTerminated: boolean;
 };
-
-export type BatchOperationType = 'Terminate' | 'Cancel' | 'Signal';
-export type BatchOperationStatus =
-  | 'Running'
-  | 'Complete'
-  | 'Failed'
-  | 'Unspecified';
-
-export type BatchOperationInfo = {
-  operationType: BatchOperationType;
-  jobId: string;
-  state: BatchOperationStatus;
-  startTime: string;
-  closeTime: string;
-  totalOperationCount: string;
-  completeOperationCount: string;
-  failureOperationCount: string;
-  identity: string;
-  reason: string;
-};
