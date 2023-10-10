@@ -24,10 +24,6 @@ vi.mock('../utilities/request-from-api', () => ({
   }),
 }));
 
-vi.mock('uuid', () => ({
-  v4: () => 'xxx',
-}));
-
 vi.mock('../stores/versions', () => {
   return {
     temporalVersion: writable(),
@@ -51,6 +47,7 @@ describe('Batch Service', () => {
         namespace: 'default',
         reason: 'test',
         workflows: mockWorkflows,
+        jobId: 'xxx',
       });
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
@@ -71,6 +68,7 @@ describe('Batch Service', () => {
         namespace: 'default',
         reason: 'test',
         workflows: mockWorkflows,
+        jobId: 'xxx',
       });
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
@@ -99,6 +97,7 @@ describe('Batch Service', () => {
         namespace: 'default',
         reason: 'test',
         workflows: mockWorkflows,
+        jobId: 'xxx',
       });
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
@@ -119,6 +118,7 @@ describe('Batch Service', () => {
         namespace: 'default',
         reason: 'test',
         workflows: mockWorkflows,
+        jobId: 'xxx',
       });
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
