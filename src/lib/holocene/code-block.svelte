@@ -77,7 +77,10 @@
     return stringifyWithBigInt(parsedData, undefined, inline ? 0 : 2);
   };
 
-  $: value = language === 'json' ? formatJSON(content) : content;
+  const formatValue = ({ value, language }) =>
+    language === 'json' ? formatJSON(value) : value;
+
+  $: value = formatValue({ value: content, language });
 
   const createEditorView = (): EditorView => {
     return new EditorView({
@@ -127,13 +130,15 @@
     view = createEditorView();
   });
 
-  const setView = () => {
-    const isEditableWithNoValue = editable && !value;
-    const shouldCreateNewState = view && (!editable || isEditableWithNoValue);
+  export const resetView = (value = '', format = true) => {
+    const formattedValue = format ? formatValue({ value, language }) : value;
+    const newState = createEditorState(formattedValue);
+    view.setState(newState);
+  };
 
-    if (shouldCreateNewState) {
-      const newState = createEditorState(value);
-      view.setState(newState);
+  const setView = () => {
+    if (view && !editable) {
+      resetView(value, false);
     }
   };
 

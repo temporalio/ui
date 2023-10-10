@@ -59,6 +59,7 @@
   let resetReason: string;
   let loading = false;
   let resetTooltipText: string;
+  let signalInputCodeBlock: CodeBlock;
 
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
   $: signalEnabled = workflowSignalEnabled($page.data.settings);
@@ -72,6 +73,7 @@
   const hideSignalModal = () => {
     signalInput = getDefaultSignalInput();
     signalName = '';
+    signalInputCodeBlock?.resetView(signalInput);
   };
 
   const hideResetModal = () => {
@@ -397,6 +399,7 @@
         on:change={handleSignalInputChange}
         editable
         copyable={false}
+        bind:this={signalInputCodeBlock}
       />
     </div>
   </div>
