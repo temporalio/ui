@@ -80,10 +80,9 @@ export const Strings = {
   'cancel-success': 'Workflow canceled.',
   'signal-success': 'Workflow signaled.',
   'reset-modal-title': 'Reset Workflow',
-  'reset-reapply-type-label': 'Reapply Type',
-  'reset-reapply-all': 'All Events',
-  'reset-reapply-signals-only': 'Signals Only',
-  'reset-reapply-none': 'None',
+  'reset-event-radio-group-description': 'Choose an Event to reset to',
+  'reset-reapply-type-label':
+    'Reapply Signals that happened after the Reset point',
   'cancel-modal-title': 'Cancel Workflow',
   'cancel-modal-confirmation':
     'Are you sure you want to cancel this workflow? This action cannot be undone.',
