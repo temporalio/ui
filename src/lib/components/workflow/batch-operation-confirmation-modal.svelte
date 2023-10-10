@@ -20,6 +20,7 @@
   let error = '';
   let jobId = '';
   let jobIdPlaceholder = v4();
+  let jobIdValid = true;
 
   export const open = () => {
     reason = '';
@@ -47,6 +48,14 @@
       jobId: jobId || jobIdPlaceholder,
     });
   };
+
+  const handleJobIdChange = (event: Event & { target: HTMLInputElement }) => {
+    if (/^[\w.~-]*$/.test(event.target.value)) {
+      jobIdValid = true;
+    } else {
+      jobIdValid = false;
+    }
+  };
 </script>
 
 <Modal
@@ -56,6 +65,7 @@
   data-testid="batch-{actionText}-confirmation"
   confirmType="destructive"
   cancelText={translate('cancel')}
+  confirmDisabled={!jobIdValid}
   {confirmText}
   on:confirmModal={handleConfirmModal}
 >
@@ -115,9 +125,13 @@
       <Input
         id="batch-operation-job-id"
         label={translate('job-id')}
-        hintText={translate('batch', 'job-id-input-hint')}
+        hintText={jobIdValid
+          ? translate('batch', 'job-id-input-hint')
+          : translate('batch', 'job-id-input-error')}
         bind:value={jobId}
         placeholder={jobIdPlaceholder}
+        on:input={handleJobIdChange}
+        valid={jobIdValid}
       />
     </div>
   </svelte:fragment>
