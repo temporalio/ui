@@ -38,7 +38,6 @@
     {id}
     {...$$restProps}
   />
-  <span class="checkmark" />
   <span class="label" class:hidden={labelHidden}>
     {label}
   </span>
@@ -46,26 +45,22 @@
 
 <style lang="postcss">
   label {
-    @apply relative flex grow cursor-pointer flex-row items-center gap-1 text-sm focus:outline-none;
+    @apply flex grow cursor-pointer flex-row items-center gap-1 text-sm focus:outline-none;
   }
 
   input[type='radio'] {
-    @apply sr-only;
+    @apply relative box-content h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 bg-white;
+
+    &::after {
+      @apply absolute top-1 left-1 h-0 w-0 scale-0 rounded-full bg-white transition-transform content-[''];
+    }
   }
 
-  input[type='radio']:checked + .checkmark {
-    @apply border-indigo-600 bg-indigo-600 after:block;
-  }
+  input[type='radio']:checked {
+    @apply border-indigo-600 bg-indigo-600;
 
-  .label {
-    @apply ml-6;
-  }
-
-  .checkmark {
-    @apply absolute left-0 box-content h-4 w-4 rounded-full border border-gray-300 bg-white;
-  }
-
-  .checkmark::after {
-    @apply absolute top-1 left-1 hidden h-2 w-2 rounded-full bg-white content-[''];
+    &::after {
+      @apply h-2 w-2 scale-100;
+    }
   }
 </style>
