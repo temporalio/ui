@@ -132,11 +132,14 @@
     $refresh = Date.now();
   };
 
-  const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
+  const terminateWorkflows = async (
+    event: CustomEvent<{ reason: string; jobId: string }>,
+  ) => {
     try {
       const options = {
         namespace: $page.params.namespace,
         reason: event.detail.reason,
+        jobId: event.detail.jobId,
         ...($allSelected
           ? { query: batchOperationQuery }
           : { workflows: $terminableWorkflows }),
@@ -154,10 +157,13 @@
     }
   };
 
-  const cancelWorkflows = async (event: CustomEvent<{ reason: string }>) => {
+  const cancelWorkflows = async (
+    event: CustomEvent<{ reason: string; jobId: string }>,
+  ) => {
     const options = {
       namespace: $page.params.namespace,
       reason: event.detail.reason,
+      jobId: event.detail.jobId,
       ...($allSelected
         ? { query: batchOperationQuery }
         : { workflows: $terminableWorkflows }),
