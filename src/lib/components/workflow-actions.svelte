@@ -44,7 +44,7 @@
   export let isRunning: boolean;
 
   const getDefaultSignalInput = () =>
-    $codecEndpoint ? '{"metadata": {"encoding": "..."}, "data": "..."}' : '';
+    $codecEndpoint ? '{"metadata": {"encoding": ""}, "data": ""}' : '';
 
   let reason = '';
   let signalInput = getDefaultSignalInput();
