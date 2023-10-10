@@ -8,6 +8,7 @@ export interface RadioInputProps<T> extends HTMLInputAttributes {
   labelHidden?: boolean;
   group?: Writable<T>;
   name?: string;
+  'data-testid'?: string;
 }
 
 export interface RadioGroupProps<T> extends HTMLAttributes<HTMLDivElement> {

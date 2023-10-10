@@ -113,6 +113,7 @@
         <RadioGroup name="override" group={override}>
           <RadioInput
             id="use-configuration-endpoint-radio"
+            data-testid="use-configuration-endpoint-input"
             value={false}
             label={translate(
               'data-encoder',
@@ -124,6 +125,7 @@
           />
           <RadioInput
             id="use-local-endpoint-radio"
+            data-testid="use-local-endpoint-input"
             value={true}
             label={translate('data-encoder', 'browser-override-description', {
               level: namespaceOrCluster,
