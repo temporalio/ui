@@ -124,7 +124,7 @@
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
-    on:click|preventDefault|stopPropagation={handleClick}
+    on:click={handleClick}
     on:keydown|stopPropagation={handleKeydown}
     {...$$restProps}
   >
@@ -154,7 +154,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply m-1 flex cursor-pointer flex-row items-center gap-2 rounded px-3 py-2 font-primary text-sm font-medium hover:bg-indigo-50 focus:bg-indigo-50 focus:shadow-focus focus:shadow-blue-600/50 focus:outline focus:outline-1 focus:outline-indigo-600;
+    @apply m-1 flex cursor-pointer flex-row items-center gap-2 rounded px-3 py-2 font-primary text-sm font-medium hover:bg-indigo-50 focus:outline-none focus-visible:bg-indigo-50 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline focus-visible:outline-1 focus-visible:outline-indigo-600;
   }
 
   .menu-item-wrapper {
