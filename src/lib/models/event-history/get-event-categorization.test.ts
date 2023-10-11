@@ -72,50 +72,50 @@ describe('Event Category Data Structures', () => {
     expect(allEventTypeOptions).toMatchInlineSnapshot(`
       [
         {
-          "label": "category-all",
+          "label": "category.all",
           "option": undefined,
         },
         {
           "color": "#8B5CF6",
-          "label": "category-activity",
+          "label": "category.activity",
           "option": "activity",
         },
         {
           "color": "#F59E0B",
-          "label": "category-child-workflow",
+          "label": "category.child-workflow",
           "option": "child-workflow",
         },
         {
           "color": "#10B981",
-          "label": "category-command",
+          "label": "category.command",
           "option": "command",
         },
         {
-          "label": "category-local-activity",
+          "label": "category.local-activity",
           "option": "local-activity",
         },
         {
           "color": "#EC4899",
-          "label": "category-marker",
+          "label": "category.marker",
           "option": "marker",
         },
         {
           "color": "#DD6B20",
-          "label": "category-signal",
+          "label": "category.signal",
           "option": "signal",
         },
         {
           "color": "#1D4ED8",
-          "label": "category-timer",
+          "label": "category.timer",
           "option": "timer",
         },
         {
-          "label": "category-update",
+          "label": "category.update",
           "option": "update",
         },
         {
           "color": "#10B981",
-          "label": "category-workflow",
+          "label": "category.workflow",
           "option": "workflow",
         },
       ]
