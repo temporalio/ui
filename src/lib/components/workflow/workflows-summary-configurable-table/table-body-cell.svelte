@@ -23,6 +23,15 @@
   let filterOrCopyButtonsVisible = false;
   const showFilterOrCopy = () => (filterOrCopyButtonsVisible = true);
   const hideFilterOrCopy = () => (filterOrCopyButtonsVisible = false);
+  const handleFocusOut = (e: FocusEvent) => {
+    const nextTarget = e.relatedTarget as HTMLElement;
+    if (
+      nextTarget &&
+      !['filter-button', 'copy-button'].includes(nextTarget.id)
+    ) {
+      hideFilterOrCopy();
+    }
+  };
 </script>
 
 {#if label === 'Run ID' || label === 'Workflow ID' || label === 'Type'}
@@ -31,6 +40,8 @@
     data-testid="workflows-summary-table-body-cell"
     on:mouseover={showFilterOrCopy}
     on:focus={showFilterOrCopy}
+    on:focusin={showFilterOrCopy}
+    on:focusout={handleFocusOut}
     on:mouseleave={hideFilterOrCopy}
     on:blur={hideFilterOrCopy}
   >
