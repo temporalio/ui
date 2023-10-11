@@ -21,6 +21,11 @@
   } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
   import { coreUserStore } from '$lib/stores/core-user';
+  import {
+    codecEndpoint,
+    includeCredentials,
+    passAccessToken,
+  } from '$lib/stores/data-encoder-config';
   import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { settings } from '$lib/stores/settings';
@@ -40,8 +45,11 @@
   export let cancelInProgress: boolean;
   export let isRunning: boolean;
 
+  const getDefaultSignalInput = () =>
+    $codecEndpoint ? '{"metadata": {"encoding": ""}, "data": ""}' : '';
+
   let reason = '';
-  let signalInput = '';
+  let signalInput = getDefaultSignalInput();
   let signalName = '';
   let cancelConfirmationModalOpen = false;
   let terminateConfirmationModalOpen = false;
@@ -53,6 +61,7 @@
   let resetReason: string;
   let loading = false;
   let resetTooltipText: string;
+  let signalInputCodeBlock: CodeBlock;
 
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
   $: signalEnabled = workflowSignalEnabled($page.data.settings);
@@ -64,8 +73,9 @@
   };
 
   const hideSignalModal = () => {
-    signalInput = '';
+    signalInput = getDefaultSignalInput();
     signalName = '';
+    signalInputCodeBlock?.resetView(signalInput);
   };
 
   const hideResetModal = () => {
@@ -139,6 +149,15 @@
         runId: workflow.runId,
         signalInput,
         signalName,
+        settings: {
+          ...$page.data.settings,
+          codec: {
+            endpoint: $codecEndpoint,
+            includeCredentials: $includeCredentials,
+            passAccessToken: $passAccessToken,
+          },
+        },
+        accessToken: $authUser.accessToken,
       });
       signalConfirmationModalOpen = false;
       $refresh = Date.now();
@@ -146,11 +165,10 @@
         message: translate('workflows', 'signal-success'),
         id: 'workflow-signal-success-toast',
       });
+      hideSignalModal();
     } catch (err) {
       error = err?.message ?? translate('unknown-error');
     }
-
-    hideSignalModal();
   };
 
   const reset = async () => {
@@ -383,6 +401,7 @@
         on:change={handleSignalInputChange}
         editable
         copyable={false}
+        bind:this={signalInputCodeBlock}
       />
     </div>
   </div>

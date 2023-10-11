@@ -1,18 +1,29 @@
 import { noop } from 'svelte/internal';
+import { get } from 'svelte/store';
 
 import { v4 } from 'uuid';
 
+import { translate } from '$lib/i18n/translate';
 import type { ResetReapplyType } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
+import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
+import {
+  lastDataEncoderError,
+  lastDataEncoderStatus,
+} from '$lib/stores/data-encoder-config';
 import type { ResetWorkflowRequest } from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
   ValidWorkflowParameters,
 } from '$lib/types/api';
-import type { NamespaceScopedRequest, Replace } from '$lib/types/global';
+import type {
+  NamespaceScopedRequest,
+  Replace,
+  Settings,
+} from '$lib/types/global';
 import type {
   ArchiveFilterParameters,
   ListWorkflowExecutionsResponse,
@@ -26,10 +37,8 @@ import {
 } from '$lib/utilities/handle-error';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
-import {
-  type ErrorCallback,
-  requestFromAPI,
-} from '$lib/utilities/request-from-api';
+import type { ErrorCallback } from '$lib/utilities/request-from-api';
+import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { base, pathForApi, routeForApi } from '$lib/utilities/route-for-api';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
@@ -55,6 +64,8 @@ type SignalWorkflowOptions = {
   runId: string;
   signalName: string;
   signalInput: string;
+  settings: Settings;
+  accessToken: string;
 };
 
 type TerminateWorkflowOptions = {
@@ -293,12 +304,43 @@ export async function signalWorkflow({
   runId,
   signalName,
   signalInput,
+  settings,
+  accessToken,
 }: SignalWorkflowOptions) {
   const route = routeForApi('workflow.signal', {
     namespace,
     workflowId,
     runId,
   });
+
+  let payloads = null;
+
+  if (signalInput) {
+    if (settings?.codec?.endpoint) {
+      const awaitData = await convertPayloadsWithCodec({
+        payloads: { payloads: [JSON.parse(signalInput)] },
+        namespace,
+        settings,
+        accessToken,
+        encode: true,
+      });
+      if (get(lastDataEncoderStatus) === 'error') {
+        throw new Error(
+          get(lastDataEncoderError) || translate('encode-failed'),
+        );
+      }
+      payloads = awaitData?.payloads ?? null;
+    } else {
+      payloads = [
+        {
+          metadata: {
+            encoding: btoa('json/plain'),
+          },
+          data: btoa(signalInput),
+        },
+      ];
+    }
+  }
 
   return requestFromAPI(route, {
     notifyOnError: false,
@@ -307,16 +349,7 @@ export async function signalWorkflow({
       body: stringifyWithBigInt({
         signalName,
         input: {
-          payloads: signalInput
-            ? [
-                {
-                  metadata: {
-                    encoding: btoa('json/plain'),
-                  },
-                  data: btoa(signalInput),
-                },
-              ]
-            : null,
+          payloads,
         },
       }),
     },
