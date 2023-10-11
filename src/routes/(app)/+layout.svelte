@@ -69,11 +69,24 @@
   };
 
   function getCurrentHref(namespace: string) {
-    const onSchedulesPage = $page.url.pathname.endsWith('schedules');
-    const href = onSchedulesPage
-      ? routeForSchedules({ namespace })
-      : routeForWorkflows({ namespace });
-    return href;
+    const namespacePages = [
+      {
+        subPath: 'schedules',
+        fullRoute: routeForSchedules({ namespace }),
+      },
+      {
+        subPath: 'batch-operations',
+        fullRoute: routeForBatchOperations({ namespace }),
+      },
+    ];
+
+    for (const { subPath, fullRoute } of namespacePages) {
+      if ($page.url.pathname.endsWith(subPath)) {
+        return fullRoute;
+      }
+    }
+
+    return routeForWorkflows({ namespace });
   }
 
   const logout = () => {
