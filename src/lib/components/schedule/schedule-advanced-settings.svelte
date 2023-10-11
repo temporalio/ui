@@ -9,6 +9,9 @@
   export let spec: ScheduleSpec;
   export let state: ScheduleState;
   export let policies: SchedulePolicies;
+  $: {
+    console.log('Policies: ', policies?.overlapPolicy);
+  }
   export let notes = '';
 </script>
 
@@ -28,26 +31,12 @@
   </p>
   {#if state?.limitedActions}
     <p>
-      {translate('schedules', 'start-time')}
-      {spec?.startTime ?? translate('none')}
-    </p>
-    <p>
-      {translate('schedules', 'end-time')}{spec?.endTime ?? translate('none')}
-    </p>
-    <p>{translate('schedules', 'jitter')}{spec?.jitter ?? translate('none')}</p>
-    <p>
-      {translate('schedules', 'exclusion-calendar')}{spec
-        ?.excludeCalendar?.[0] ?? translate('none')}
-    </p>
-    {#if state?.limitedActions}
-      <p>
-        {translate('schedules', 'remaining-actions')}{state?.remainingActions ??
-          translate('none')}
-      </p>
-    {/if}
-    <p>
-      {translate('schedules', 'overlap-policy')}{policies?.overlapPolicy ??
+      {translate('schedules', 'remaining-actions')}{state?.remainingActions ??
         translate('none')}
     </p>
   {/if}
+  <p>
+    {translate('schedules', 'overlap-policy')}{policies?.overlapPolicy ??
+      translate('none')}
+  </p>
 </Accordion>

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { writable } from 'svelte/store';
+
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
@@ -12,17 +14,21 @@
   import Loading from '$lib/holocene/loading.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Modal from '$lib/holocene/modal.svelte';
+  import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
+  import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     deleteSchedule,
     fetchSchedule,
     pauseSchedule,
+    triggerImmediately,
     unpauseSchedule,
   } from '$lib/services/schedule-service';
   import { coreUserStore } from '$lib/stores/core-user';
   import { loading } from '$lib/stores/schedules';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import type { OverlapPolicy } from '$lib/types/schedule';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { formatDate } from '$lib/utilities/format-date';
   import {
@@ -43,9 +49,49 @@
   let scheduleFetch = fetchSchedule(parameters);
 
   let pauseConfirmationModalOpen = false;
+  let triggerConfirmationModalOpen = false;
   let deleteConfirmationModalOpen = false;
   let reason = '';
   let error = '';
+  let overlapPolicy = writable<OverlapPolicy>('Unspecified');
+  let policies: { label: string; description: string; value: OverlapPolicy }[] =
+    [
+      {
+        label: translate('schedules', 'trigger-unspecified-description'),
+        description: translate('schedules', 'trigger-unspecified-title'),
+        value: 'Unspecified',
+      },
+      {
+        label: translate('schedules', 'trigger-allow-all-description'),
+        description: translate('schedules', 'trigger-allow-all-title'),
+        value: 'AllowAll',
+      },
+      {
+        label: translate('schedules', 'trigger-skip-description'),
+        description: translate('schedules', 'trigger-skip-title'),
+        value: 'Skip',
+      },
+      {
+        label: translate('schedules', 'trigger-buffer-one-description'),
+        description: translate('schedules', 'trigger-buffer-one-title'),
+        value: 'BufferOne',
+      },
+      {
+        label: translate('schedules', 'trigger-buffer-all-description'),
+        description: translate('schedules', 'trigger-buffer-all-title'),
+        value: 'BufferAll',
+      },
+      {
+        label: translate('schedules', 'trigger-cancel-other-description'),
+        description: translate('schedules', 'trigger-cancel-other-title'),
+        value: 'CancelOther',
+      },
+      {
+        label: translate('schedules', 'trigger-terminate-other-description'),
+        description: translate('schedules', 'trigger-terminate-other-title'),
+        value: 'TerminateOther',
+      },
+    ];
 
   let coreUser = coreUserStore();
   let editDisabled = $coreUser.namespaceWriteDisabled(namespace);
@@ -84,6 +130,17 @@
     scheduleFetch = fetchSchedule(parameters, fetch);
     reason = '';
     pauseConfirmationModalOpen = false;
+  };
+
+  const handleTriggerImmediately = async () => {
+    await triggerImmediately({
+      namespace,
+      scheduleId,
+      overlapPolicy: $overlapPolicy,
+    });
+    scheduleFetch = fetchSchedule(parameters, fetch);
+    reason = '';
+    triggerConfirmationModalOpen = false;
   };
 
   const resetReason = () => {
@@ -177,6 +234,12 @@
         on:click={() => (pauseConfirmationModalOpen = true)}
       >
         <MenuItem
+          data-testid="trigger-schedule"
+          on:click={() => (triggerConfirmationModalOpen = true)}
+        >
+          {translate('schedules', 'trigger')}
+        </MenuItem>
+        <MenuItem
           data-testid="edit-schedule"
           href={routeForScheduleEdit({ namespace, scheduleId })}
         >
@@ -259,6 +322,36 @@
           bind:value={reason}
           on:keydown|stopPropagation
         />
+      </div>
+    </Modal>
+    <Modal
+      id="trigger-schedule-modal"
+      large
+      bind:open={triggerConfirmationModalOpen}
+      confirmType="primary"
+      confirmText={translate('schedules', 'trigger')}
+      cancelText={translate('cancel')}
+      on:confirmModal={() => handleTriggerImmediately()}
+      on:cancelModal={() => (triggerConfirmationModalOpen = false)}
+    >
+      <h3 slot="title">
+        {translate('schedules', 'trigger-modal-title')}
+      </h3>
+      <div slot="content">
+        <RadioGroup
+          group={overlapPolicy}
+          name="trigger-event-id"
+          class="h-auto overflow-auto"
+        >
+          {#each policies as policy}
+            <RadioInput
+              id={policy.value}
+              value={policy.value}
+              label={policy.label}
+              description={policy.description}
+            />
+          {/each}
+        </RadioGroup>
       </div>
     </Modal>
     <Modal
