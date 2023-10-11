@@ -1,12 +1,10 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import { page } from '$app/stores';
 
   import { authUser } from '$lib/stores/auth-user';
   import type { Payloads } from '$lib/types';
   import {
-    decodeAllPotentialPayloadsWithCodec,
+    cloneAllPotentialPayloadsWithCodec,
     decodePayloadAttributes,
   } from '$lib/utilities/decode-payload';
   import {
@@ -32,7 +30,7 @@
   };
 
   const decodePayloads = async () => {
-    const convertedAttributes = await decodeAllPotentialPayloadsWithCodec(
+    const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
       value,
       $page.params.namespace,
       settings,
@@ -44,9 +42,7 @@
     decodedValue = stringifyWithBigInt(decodedAttributes);
   };
 
-  onMount(() => {
-    decodePayloads();
-  });
+  $: value, decodePayloads();
 
   let decodedValue = '';
 </script>

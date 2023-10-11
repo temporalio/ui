@@ -175,6 +175,37 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   return anyAttributes;
 };
 
+export const cloneAllPotentialPayloadsWithCodec = async (
+  anyAttributes: PotentiallyDecodable,
+  namespace: string,
+  settings: Settings,
+  accessToken: string,
+): Promise<PotentiallyDecodable> => {
+  const decode = decodePayloadWithCodec(namespace, settings, accessToken);
+  const clone = { ...anyAttributes };
+  if (anyAttributes) {
+    for (const key of Object.keys(clone)) {
+      if (keyIs(key, 'payloads', 'encodedAttributes') && clone[key]) {
+        const data = toArray(clone[key]);
+        const decoded = await decode(data);
+        clone[key] = keyIs(key, 'encodedAttributes') ? decoded[0] : decoded;
+      } else {
+        const next = clone[key];
+        if (isObject(next)) {
+          clone[key] = await decodeAllPotentialPayloadsWithCodec(
+            next,
+            namespace,
+            settings,
+            accessToken,
+          );
+        }
+      }
+    }
+  }
+
+  return clone;
+};
+
 export const decodeAllPotentialPayloadsWithWebsockets = async (
   anyAttributes: PotentiallyDecodable,
   ws: DataConverterWebsocketInterface,
