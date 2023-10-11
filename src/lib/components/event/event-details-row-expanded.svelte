@@ -41,7 +41,8 @@
       <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
         <p class="text-sm">{format(key)}</p>
         {#if value?.payloads}
-          <PayloadDecoder {value} let:decodedValue>
+          {(console.log({ attributes }), '')}
+          <PayloadDecoder {value} key="payloads" let:decodedValue>
             <CodeBlock
               content={decodedValue}
               class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
@@ -51,13 +52,15 @@
             />
           </PayloadDecoder>
         {:else}
-          <CodeBlock
-            content={codeBlockValue}
-            class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
-            {inline}
-            copyIconTitle={translate('copy-icon-title')}
-            copySuccessIconTitle={translate('copy-success-icon-title')}
-          />
+          <PayloadDecoder value={codeBlockValue} let:decodedValue>
+            <CodeBlock
+              content={decodedValue}
+              class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
+              {inline}
+              copyIconTitle={translate('copy-icon-title')}
+              copySuccessIconTitle={translate('copy-success-icon-title')}
+            />
+          </PayloadDecoder>
         {/if}
       </div>
       {#if stackTrace && !inline}

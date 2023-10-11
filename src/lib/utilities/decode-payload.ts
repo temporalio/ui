@@ -176,11 +176,13 @@ export const decodeAllPotentialPayloadsWithCodec = async (
 };
 
 export const cloneAllPotentialPayloadsWithCodec = async (
-  anyAttributes: PotentiallyDecodable,
+  anyAttributes: PotentiallyDecodable | null,
   namespace: string,
   settings: Settings,
   accessToken: string,
 ): Promise<PotentiallyDecodable> => {
+  if (!anyAttributes) return anyAttributes;
+
   const decode = decodePayloadWithCodec(namespace, settings, accessToken);
   const clone = { ...anyAttributes };
   if (anyAttributes) {
@@ -192,7 +194,7 @@ export const cloneAllPotentialPayloadsWithCodec = async (
       } else {
         const next = clone[key];
         if (isObject(next)) {
-          clone[key] = await decodeAllPotentialPayloadsWithCodec(
+          clone[key] = await cloneAllPotentialPayloadsWithCodec(
             next,
             namespace,
             settings,

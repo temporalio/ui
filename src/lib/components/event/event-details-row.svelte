@@ -13,7 +13,6 @@
     shouldDisplayAsTaskQueueLink,
     shouldDisplayChildWorkflowLink,
   } from '$lib/utilities/get-single-attribute-for-event';
-  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import {
     routeForEventHistory,
     routeForTaskQueue,
@@ -39,23 +38,18 @@
       <p class="min-w-fit text-sm">
         {format(key)}
       </p>
-      {#if value?.payloads}
-        <PayloadDecoder {value} let:decodedValue>
-          <CodeBlock
-            content={decodedValue}
-            {inline}
-            copyIconTitle={translate('copy-icon-title')}
-            copySuccessIconTitle={translate('copy-success-icon-title')}
-          />
-        </PayloadDecoder>
-      {:else}
+      <PayloadDecoder
+        {value}
+        key={value?.payloads ? 'payloads' : ''}
+        let:decodedValue
+      >
         <CodeBlock
-          content={stringifyWithBigInt(value)}
+          content={decodedValue}
           {inline}
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
         />
-      {/if}
+      </PayloadDecoder>
     </div>
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">

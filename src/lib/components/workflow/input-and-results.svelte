@@ -34,7 +34,7 @@
     <div class="flex h-full flex-col overflow-scroll lg:max-h-[24rem]">
       {#if showParsedContent}
         {#each parsedContent as content}
-          <PayloadDecoder value={content} let:decodedValue>
+          <PayloadDecoder value={content} key="payloads" let:decodedValue>
             <CodeBlock
               content={decodedValue}
               class="mb-2"
@@ -44,7 +44,11 @@
           </PayloadDecoder>
         {/each}
       {:else}
-        <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
+        <PayloadDecoder
+          value={parseWithBigInt(content)}
+          key="payloads"
+          let:decodedValue
+        >
           <CodeBlock
             content={decodedValue}
             class="mb-2 lg:max-h-[23.5rem]"

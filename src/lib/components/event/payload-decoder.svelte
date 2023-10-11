@@ -1,11 +1,13 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import { page } from '$app/stores';
 
   import { authUser } from '$lib/stores/auth-user';
-  import type { Payloads } from '$lib/types';
   import {
     cloneAllPotentialPayloadsWithCodec,
     decodePayloadAttributes,
+    type PotentiallyDecodable,
   } from '$lib/utilities/decode-payload';
   import {
     getCodecEndpoint,
@@ -14,7 +16,8 @@
   } from '$lib/utilities/get-codec';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  export let value: Payloads;
+  export let value: PotentiallyDecodable;
+  export let key = '';
 
   $: endpoint = getCodecEndpoint($page.data.settings);
   $: passAccessToken = getCodecPassAccessToken($page.data.settings);
@@ -30,19 +33,30 @@
   };
 
   const decodePayloads = async () => {
-    const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
-      value,
-      $page.params.namespace,
-      settings,
-      $authUser.accessToken,
-    );
-    const decodedAttributes = decodePayloadAttributes(
-      convertedAttributes,
-    ) as object;
-    decodedValue = stringifyWithBigInt(decodedAttributes);
+    try {
+      const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
+        value,
+        $page.params.namespace,
+        settings,
+        $authUser.accessToken,
+      );
+      const decodedAttributes = decodePayloadAttributes(
+        convertedAttributes,
+      ) as object;
+      const keyExists = key && decodedAttributes?.[key];
+      if (keyExists) {
+        decodedValue = stringifyWithBigInt(keyExists);
+      } else {
+        decodedValue = stringifyWithBigInt(decodedAttributes);
+      }
+    } catch (e) {
+      return stringifyWithBigInt(value);
+    }
   };
 
-  $: value, decodePayloads();
+  onMount(() => {
+    decodePayloads();
+  });
 
   let decodedValue = '';
 </script>
