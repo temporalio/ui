@@ -22,18 +22,18 @@
     Canceled: translate('workflows', 'canceled'),
     Terminated: translate('workflows', 'terminated'),
     Paused: translate('workflows', 'paused'),
-    Scheduled: translate('events', 'event-classification-scheduled'),
-    Started: translate('events', 'event-classification-started'),
-    Unspecified: translate('events', 'event-classification-unspecified'),
-    Open: translate('events', 'event-classification-open'),
-    New: translate('events', 'event-classification-new'),
-    Initiated: translate('events', 'event-classification-initiated'),
-    Fired: translate('events', 'event-classification-fired'),
+    Scheduled: translate('events', 'event-classification.started'),
+    Started: translate('events', 'event-classification.started'),
+    Unspecified: translate('events', 'event-classification.unspecified'),
+    Open: translate('events', 'event-classification.open'),
+    New: translate('events', 'event-classification.new'),
+    Initiated: translate('events', 'event-classification.initiated'),
+    Fired: translate('events', 'event-classification.fired'),
     CancelRequested: translate(
       'events',
-      'event-classification-cancelrequested',
+      'event-classification.cancelrequested',
     ),
-    Signaled: translate('events', 'event-classification-signaled'),
+    Signaled: translate('events', 'event-classification.signaled'),
   };
 
   const workflowStatus = cva(

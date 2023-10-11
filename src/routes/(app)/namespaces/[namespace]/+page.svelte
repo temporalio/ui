@@ -227,11 +227,11 @@
 {#if $searchAttributes}
   <section>
     <h3 class="my-4 text-lg font-medium">
-      {translate('events', 'attribute-group-search-attributes')}
+      {translate('events', 'attribute-group.search-attributes')}
     </h3>
     <Table class="w-full">
       <caption class="sr-only" slot="caption"
-        >{translate('events', 'attribute-group-search-attributes')}</caption
+        >{translate('events', 'attribute-group.search-attributes')}</caption
       >
       <TableHeaderRow slot="headers">
         <th>{translate('key')}</th>

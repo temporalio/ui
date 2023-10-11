@@ -124,3 +124,38 @@ export type WorkflowExecution = {
   defaultWorkflowTaskTimeout: Duration;
   canBeTerminated: boolean;
 };
+
+export type WorkflowTaskFailedCause =
+  | 'Unspecified'
+  | 'UnhandledCommand'
+  | 'BadScheduleActivityAttributes'
+  | 'BadRequestCancelActivityAttributes'
+  | 'BadStartTimerAttributes'
+  | 'BadCancelTimerAttributes'
+  | 'BadRecordMarkerAttributes'
+  | 'BadCompleteWorkflowExecutionAttributes'
+  | 'BadFailWorkflowExecutionAttributes'
+  | 'BadCancelWorkflowExecutionAttributes' // correct ?
+  | 'BadRequestCancelExternalAttributes'
+  | 'BadContinueAsNewAttributes'
+  | 'StartTimerDuplicateId'
+  | 'ResetStickyTaskQueue'
+  | 'WorkflowWorkerUnhandledFailure'
+  | 'WorkflowTaskHeartbeatError'
+  | 'BadSignalWorkflowExecutionAttributes'
+  | 'BadStartChildExecutionAttributes'
+  | 'ForceCloseCommand'
+  | 'FailoverCloseCommand'
+  | 'BadSignalInputSize'
+  | 'ResetWorkflow'
+  | 'BadBinary'
+  | 'ScheduleActivityDuplicateId'
+  | 'BadSearchAttributes'
+  | 'NonDeterministicError'
+  | 'BadModifyWorkflowPropertiesAttributes'
+  | 'PendingChildWorkflowsLimitExceeded'
+  | 'PendingActivitiesLimitExceeded'
+  | 'PendingSignalsLimitExceeded'
+  | 'PendingRequestCancelLimitExceeded'
+  | 'BadUpdateWorkflowExecutionMessage'
+  | 'UnhandledUpdate';

@@ -53,7 +53,9 @@ export type WorkflowTaskCompletedEventAttributes =
 export type WorkflowTaskTimedOutEventAttributes =
   temporal.api.history.v1.IWorkflowTaskTimedOutEventAttributes;
 export type WorkflowTaskFailedEventAttributes =
-  temporal.api.history.v1.IWorkflowTaskFailedEventAttributes;
+  temporal.api.history.v1.IWorkflowTaskFailedEventAttributes & {
+    cause?: import('$types/workflows').WorkflowTaskFailedCause;
+  };
 export type ActivityTaskScheduledEventAttributes =
   temporal.api.history.v1.IActivityTaskScheduledEventAttributes;
 export type ActivityTaskStartedEventAttributes =
@@ -130,8 +132,6 @@ export type ActivityTaskCompletedByIdResponse =
 export type WorkflowExecutionStatus =
   temporal.api.enums.v1.WorkflowExecutionStatus;
 export type Severity = temporal.api.enums.v1.Severity;
-export type WorkflowTaskFailedCause =
-  temporal.api.enums.v1.WorkflowTaskFailedCause;
 export type ArchivalState = temporal.api.enums.v1.ArchivalState;
 export type TaskReachability = temporal.api.enums.v1.TaskReachability;
 

@@ -81,44 +81,44 @@ export type EventTypeOption = {
 };
 
 export const allEventTypeOptions: EventTypeOption[] = [
-  { label: 'category-all', option: undefined },
+  { label: 'category.all', option: undefined },
   {
-    label: 'category-activity',
+    label: 'category.activity',
     option: CATEGORIES.ACTIVITY,
     color: '#8B5CF6',
   },
   {
-    label: 'category-child-workflow',
+    label: 'category.child-workflow',
     option: CATEGORIES.CHILD_WORKFLOW,
     color: '#F59E0B',
   },
   {
-    label: 'category-command',
+    label: 'category.command',
     option: CATEGORIES.COMMAND,
     color: '#10B981',
   },
   {
-    label: 'category-local-activity',
+    label: 'category.local-activity',
     option: CATEGORIES.LOCAL_ACTIVITY,
   },
   {
-    label: 'category-marker',
+    label: 'category.marker',
     option: CATEGORIES.MARKER,
     color: '#EC4899',
   },
   {
-    label: 'category-signal',
+    label: 'category.signal',
     option: CATEGORIES.SIGNAL,
     color: '#DD6B20',
   },
   {
-    label: 'category-timer',
+    label: 'category.timer',
     option: CATEGORIES.TIMER,
     color: '#1D4ED8',
   },
-  { label: 'category-update', option: CATEGORIES.UPDATE },
+  { label: 'category.update', option: CATEGORIES.UPDATE },
   {
-    label: 'category-workflow',
+    label: 'category.workflow',
     option: CATEGORIES.WORKFLOW,
     color: '#10B981',
   },

@@ -1,3 +1,5 @@
+import type { Leaves } from '$lib/types/global';
+
 import Locales from './locales';
 
 /**
@@ -22,8 +24,10 @@ export const I18nNamespaces = Object.keys(I18nMap);
 export type I18nNamespace = keyof typeof I18nMap;
 
 export type I18nKeys = {
-  [K in keyof typeof I18nMap]: {
-    [T in keyof (typeof I18nMap)[K] as WithoutPluralSuffix<T>]: (typeof I18nMap)[K][T];
+  [Namespace in keyof typeof I18nMap]: {
+    [Key in keyof (typeof I18nMap)[Namespace] as WithoutPluralSuffix<
+      Leaves<(typeof I18nMap)[Namespace]>
+    >]: (typeof I18nMap)[Namespace][Key];
   };
 };
 
