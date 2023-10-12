@@ -21,9 +21,14 @@ export const focusTrap = (node: HTMLElement, enabled: boolean) => {
 
     const focusable = Array.from(
       node.querySelectorAll<
-        HTMLButtonElement | HTMLInputElement | HTMLDivElement
+        | HTMLLinkElement
+        | HTMLButtonElement
+        | HTMLTextAreaElement
+        | HTMLInputElement
+        | HTMLDivElement
+        | HTMLSelectElement
       >(
-        'a[href], button, textarea, input, div[contenteditable="true"], select',
+        '[href], button, textarea, input, div[contenteditable="true"], select, [tabindex]:not([tabindex="-1"])',
       ),
     ).filter((element) => {
       if (element instanceof HTMLDivElement) return element.isContentEditable;
