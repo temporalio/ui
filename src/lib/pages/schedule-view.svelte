@@ -69,7 +69,7 @@
       {
         label: translate('schedules', 'trigger-skip-description'),
         description: translate('schedules', 'trigger-skip-title'),
-        value: 'Skip',
+        value: 'Skipzz',
       },
       {
         label: translate('schedules', 'trigger-buffer-one-description'),
@@ -139,7 +139,6 @@
       overlapPolicy: $overlapPolicy,
     });
     scheduleFetch = fetchSchedule(parameters, fetch);
-    reason = '';
     triggerConfirmationModalOpen = false;
   };
 

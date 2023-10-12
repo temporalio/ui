@@ -31,11 +31,10 @@
 </script>
 
 {#if description}
-  <div>
-    <strong>{description}</strong>
-  </div>
+  <p class="description" aria-describedby="{id}-label">
+    {description}
+  </p>
 {/if}
-
 <label>
   <input
     bind:group={$group}
@@ -45,14 +44,18 @@
     {id}
     {...$$restProps}
   />
-  <span class="label" class:hidden={labelHidden}>
+  <span id="{id}-label" class="label" class:hidden={labelHidden}>
     {label}
   </span>
 </label>
 
 <style lang="postcss">
+  .description {
+    @apply text-sm font-medium;
+  }
+
   label {
-    @apply flex grow cursor-pointer flex-row items-start gap-1 text-sm focus:outline-none;
+    @apply flex grow cursor-pointer flex-row items-start gap-2 text-sm focus:outline-none;
   }
 
   input[type='radio'] {
