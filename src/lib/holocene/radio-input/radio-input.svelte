@@ -30,32 +30,35 @@
   const { name, group } = ctx;
 </script>
 
-{#if description}
-  <p class="description" aria-describedby="{id}-label">
-    {description}
-  </p>
-{/if}
-<label>
-  <input
-    bind:group={$group}
-    type="radio"
-    {name}
-    {value}
-    {id}
-    {...$$restProps}
-  />
-  <span id="{id}-label" class="label" class:hidden={labelHidden}>
-    {label}
-  </span>
-</label>
+<div class="flex flex-col gap-1">
+  <label>
+    <input
+      bind:group={$group}
+      type="radio"
+      aria-describedby="{id}-description"
+      {name}
+      {value}
+      {id}
+      {...$$restProps}
+    />
+    <span class="label" class:hidden={labelHidden}>
+      {label}
+    </span>
+  </label>
+  {#if description}
+    <p class="description" id="{id}-description">
+      {description}
+    </p>
+  {/if}
+</div>
 
 <style lang="postcss">
   .description {
-    @apply text-sm font-medium;
+    @apply ml-[26px] text-xs font-light;
   }
 
   label {
-    @apply flex grow cursor-pointer flex-row items-start gap-2 text-sm focus:outline-none;
+    @apply flex grow cursor-pointer flex-row items-center gap-2 text-sm font-normal focus:outline-none;
   }
 
   input[type='radio'] {

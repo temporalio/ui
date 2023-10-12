@@ -58,38 +58,41 @@
   let policies: { label: string; description: string; value: OverlapPolicy }[] =
     [
       {
-        label: translate('schedules', 'trigger-unspecified-description'),
-        description: translate('schedules', 'trigger-unspecified-title'),
+        description: translate('schedules', 'trigger-unspecified-description'),
+        label: translate('schedules', 'trigger-unspecified-title'),
         value: 'Unspecified',
       },
       {
-        label: translate('schedules', 'trigger-allow-all-description'),
-        description: translate('schedules', 'trigger-allow-all-title'),
+        description: translate('schedules', 'trigger-allow-all-description'),
+        label: translate('schedules', 'trigger-allow-all-title'),
         value: 'AllowAll',
       },
       {
-        label: translate('schedules', 'trigger-skip-description'),
-        description: translate('schedules', 'trigger-skip-title'),
+        description: translate('schedules', 'trigger-skip-description'),
+        label: translate('schedules', 'trigger-skip-title'),
         value: 'Skip',
       },
       {
-        label: translate('schedules', 'trigger-buffer-one-description'),
-        description: translate('schedules', 'trigger-buffer-one-title'),
+        description: translate('schedules', 'trigger-buffer-one-description'),
+        label: translate('schedules', 'trigger-buffer-one-title'),
         value: 'BufferOne',
       },
       {
-        label: translate('schedules', 'trigger-buffer-all-description'),
-        description: translate('schedules', 'trigger-buffer-all-title'),
+        description: translate('schedules', 'trigger-buffer-all-description'),
+        label: translate('schedules', 'trigger-buffer-all-title'),
         value: 'BufferAll',
       },
       {
-        label: translate('schedules', 'trigger-cancel-other-description'),
-        description: translate('schedules', 'trigger-cancel-other-title'),
+        description: translate('schedules', 'trigger-cancel-other-description'),
+        label: translate('schedules', 'trigger-cancel-other-title'),
         value: 'CancelOther',
       },
       {
-        label: translate('schedules', 'trigger-terminate-other-description'),
-        description: translate('schedules', 'trigger-terminate-other-title'),
+        description: translate(
+          'schedules',
+          'trigger-terminate-other-description',
+        ),
+        label: translate('schedules', 'trigger-terminate-other-title'),
         value: 'TerminateOther',
       },
     ];
