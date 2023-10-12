@@ -1,3 +1,19 @@
+export const getFocusableElements = (node: HTMLElement) =>
+  Array.from(
+    node.querySelectorAll<
+      | HTMLLinkElement
+      | HTMLButtonElement
+      | HTMLTextAreaElement
+      | HTMLInputElement
+      | HTMLDivElement
+      | HTMLSelectElement
+    >('[href], button, textarea, input, div[contentEditable="true"], select'),
+  ).filter(
+    (element) =>
+      !element.hasAttribute('disabled') &&
+      !(element.getAttribute('tabindex') === '-1'),
+  );
+
 export const focusTrap = (node: HTMLElement, enabled: boolean) => {
   let firstFocusable: HTMLElement;
   let lastFocusable: HTMLElement;
@@ -19,21 +35,7 @@ export const focusTrap = (node: HTMLElement, enabled: boolean) => {
   const setFocus = (fromObserver: boolean = false) => {
     if (enabled === false) return;
 
-    const focusable = Array.from(
-      node.querySelectorAll<
-        | HTMLLinkElement
-        | HTMLButtonElement
-        | HTMLTextAreaElement
-        | HTMLInputElement
-        | HTMLDivElement
-        | HTMLSelectElement
-      >(
-        '[href], button, textarea, input, div[contenteditable="true"], select, [tabindex]:not([tabindex="-1"])',
-      ),
-    ).filter((element) => {
-      if (element instanceof HTMLDivElement) return element.isContentEditable;
-      return !element.disabled;
-    });
+    const focusable = getFocusableElements(node);
     firstFocusable = focusable[0];
     lastFocusable = focusable[focusable.length - 1];
 
