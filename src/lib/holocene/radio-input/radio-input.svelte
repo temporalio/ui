@@ -30,6 +30,12 @@
   const { name, group } = ctx;
 </script>
 
+{#if description}
+  <div>
+    <strong>{description}</strong>
+  </div>
+{/if}
+
 <label>
   <input
     bind:group={$group}
@@ -40,7 +46,7 @@
     {...$$restProps}
   />
   <span class="label" class:hidden={labelHidden}>
-    {#if description}<strong>{description}</strong>{/if}{label}
+    {label}
   </span>
 </label>
 
