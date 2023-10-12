@@ -38,7 +38,7 @@
     ? Array.from(event.events.keys()).pop()
     : event.id;
 
-  $: expanded = expandAll || active;
+  $: expanded = expandAll;
 
   $: descending = $eventFilterSort === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';

@@ -100,7 +100,7 @@
       });
     }
 
-    eventGroups.forEach((group, i) => {
+    eventGroups.forEach((group, index) => {
       const initialEvent = group.initialEvent;
       const lastEvent = group?.lastEvent;
       const groupPendingActivity =
@@ -110,7 +110,7 @@
       if (groupPendingActivity && isRunning) {
         items.add({
           id: `pending-${groupPendingActivity.activityId}`,
-          group: group.id,
+          group: `group-${index}`,
           start: initialEvent.eventTime,
           end: Date.now(),
           content: renderPendingAttempts(
@@ -122,8 +122,8 @@
         });
       } else {
         items.add({
-          id: `event-range-${initialEvent.id}`,
-          group: group.id,
+          id: `group-${index}-items`,
+          group: `group-${index}`,
           start: initialEvent.eventTime,
           data: group,
           content:
@@ -136,10 +136,11 @@
           editable: false,
         });
       }
+
       groups.add({
-        id: group.id,
+        id: `group-${index}`,
         content: renderGroupName(group),
-        order: i,
+        order: index,
       });
     });
     return { items, groups };

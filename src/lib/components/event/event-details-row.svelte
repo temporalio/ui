@@ -32,7 +32,7 @@
 >
   {#if typeof value === 'object'}
     <div
-      class="flex w-full flex-wrap items-center justify-between pr-1 xl:flex-nowrap xl:gap-4"
+      class="flex w-full flex-wrap items-center justify-between gap-1 pr-1 xl:flex-nowrap xl:gap-4"
     >
       <p class="min-w-fit text-sm">
         {format(key)}

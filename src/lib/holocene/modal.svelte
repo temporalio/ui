@@ -109,6 +109,7 @@
 />
 <dialog
   {id}
+  on:close={handleCancel}
   bind:this={modalElement}
   class="body {className}"
   class:large
