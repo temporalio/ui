@@ -12,7 +12,7 @@
   import Accordion from '$lib/holocene/accordion.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import { translate } from '$lib/i18n/translate';
+  import { createTranslate } from '$lib/i18n/translate';
   import { authUser } from '$lib/stores/auth-user';
   import { eventViewType } from '$lib/stores/event-view';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
@@ -25,6 +25,7 @@
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
   let showShortcuts = false;
+  const t = createTranslate('workflows');
 
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
@@ -54,9 +55,7 @@
   <PendingActivities />
   <section>
     <Accordion
-      title={workflowEvents.contAsNew
-        ? translate('workflows', 'input')
-        : translate('workflows', 'input-and-results')}
+      title={workflowEvents.contAsNew ? t('input') : t('input-and-results')}
       icon="json"
       class="border-gray-900"
       data-testid="input-and-results"
@@ -70,8 +69,8 @@
         <InputAndResults
           content={workflowEvents.results}
           title={workflowEvents.contAsNew
-            ? translate('workflows', 'continued-as-new-with-input')
-            : translate('workflows', 'results')}
+            ? t('continued-as-new-with-input')
+            : t('results')}
           data-testid="workflow-results"
         />
       </div>
@@ -81,10 +80,10 @@
   <section id="event-history">
     <nav
       class="flex flex-col items-center justify-between gap-4 lg:flex-row lg:items-end"
-      aria-label={translate('workflows', 'event-history-view')}
+      aria-label={t('event-history-view')}
     >
       <h2 class="text-2xl font-medium">
-        {translate('workflows', 'event-history')}
+        {t('event-history')}
       </h2>
       <div id="event-view-toggle" class="mt-4 flex gap-4 bg-white">
         <ToggleButtons>
@@ -92,22 +91,19 @@
             icon="feed"
             active={$eventViewType === 'feed'}
             data-testid="feed"
-            on:click={() => onViewClick('feed')}
-            >{translate('workflows', 'history')}</ToggleButton
+            on:click={() => onViewClick('feed')}>{t('history')}</ToggleButton
           >
           <ToggleButton
             icon="compact"
             active={$eventViewType === 'compact'}
             data-testid="compact"
-            on:click={() => onViewClick('compact')}
-            >{translate('workflows', 'compact')}</ToggleButton
+            on:click={() => onViewClick('compact')}>{t('compact')}</ToggleButton
           >
           <ToggleButton
             icon="json"
             active={$eventViewType === 'json'}
             data-testid="json"
-            on:click={() => onViewClick('json')}
-            >{translate('workflows', 'json')}</ToggleButton
+            on:click={() => onViewClick('json')}>{t('json')}</ToggleButton
           >
           <ToggleButton
             icon="download"
@@ -119,7 +115,7 @@
                 runId: decodeURIForSvelte($workflowRun.workflow?.runId),
                 settings: $page.data.settings,
                 accessToken: $authUser?.accessToken,
-              })}>{translate('workflows', 'download')}</ToggleButton
+              })}>{t('download')}</ToggleButton
           >
         </ToggleButtons>
       </div>

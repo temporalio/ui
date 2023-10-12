@@ -79,3 +79,31 @@ export function translate<Namespace extends I18nNamespace>(
 
   return t(`${namespace}:${key}`, options);
 }
+
+class Translate<T extends I18nNamespace> {
+  private namespace: T;
+  constructor(namespace: T) {
+    this.namespace = namespace;
+  }
+
+  public get translate() {
+    return (
+      key: I18nKey<T>,
+      replaceOrCount?: I18nReplace | number,
+      replaceOrUndef?: I18nReplace,
+    ) =>
+      translate.call(
+        undefined,
+        this.namespace,
+        key,
+        replaceOrCount,
+        replaceOrUndef,
+      );
+  }
+}
+
+export const createTranslate = <T extends I18nNamespace>(namespace: T) => {
+  const { translate } = new Translate<T>(namespace);
+
+  return translate;
+};

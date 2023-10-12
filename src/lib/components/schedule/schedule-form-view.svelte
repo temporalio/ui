@@ -9,7 +9,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
-  import { translate } from '$lib/i18n/translate';
+  import { createTranslate, translate } from '$lib/i18n/translate';
   import { error, loading } from '$lib/stores/schedules';
   import type {
     FullSchedule,
@@ -30,21 +30,16 @@
     schedule?: Schedule,
   ) => void;
 
+  const t = createTranslate('schedules');
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
-
-  let title = translate('schedules', schedule ? 'edit' : 'create');
-  let loadingText = translate('schedules', schedule ? 'editing' : 'creating');
-  let backTitle = translate(
-    'schedules',
-    schedule ? 'back-to-schedule' : 'back-to-schedules',
-  );
+  let title = t(schedule ? 'edit' : 'create');
+  let loadingText = t(schedule ? 'editing' : 'creating');
+  let backTitle = t(schedule ? 'back-to-schedule' : 'back-to-schedules');
   let backHref = schedule
     ? routeForSchedule({ namespace, scheduleId })
     : routeForSchedules({ namespace });
-  let confirmText = schedule
-    ? translate('save')
-    : translate('schedules', 'create');
+  let confirmText = schedule ? translate('save') : t('create');
 
   let errors = {};
   let name = scheduleId ?? '';
@@ -129,7 +124,7 @@
         <Input
           id="name"
           bind:value={name}
-          label={translate('schedules', 'name-label')}
+          label={t('name-label')}
           error={errors['name']}
           maxLength={232}
           disabled={Boolean(scheduleId)}
@@ -141,7 +136,7 @@
         <Input
           id="workflowType"
           bind:value={workflowType}
-          label={translate('schedules', 'workflow-type-label')}
+          label={t('workflow-type-label')}
           error={errors['workflowType']}
           on:input={onInput}
           on:blur={onBlur}
@@ -151,7 +146,7 @@
         <Input
           id="workflowId"
           bind:value={workflowId}
-          label={translate('schedules', 'workflow-id-label')}
+          label={t('workflow-id-label')}
           error={errors['workflowId']}
           on:input={onInput}
           on:blur={onBlur}
@@ -161,7 +156,7 @@
         <Input
           id="taskQueue"
           bind:value={taskQueue}
-          label={translate('schedules', 'task-queue-label')}
+          label={t('task-queue-label')}
           error={errors['taskQueue']}
           on:input={onInput}
           on:blur={onBlur}

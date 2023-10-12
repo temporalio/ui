@@ -7,34 +7,36 @@
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import Option from '$lib/holocene/select/simple-option.svelte';
   import Select from '$lib/holocene/select/simple-select.svelte';
-  import { translate } from '$lib/i18n/translate';
+  import { createTranslate, translate } from '$lib/i18n/translate';
   import { timeFormat } from '$lib/stores/time-format';
   import { durations } from '$lib/utilities/to-duration';
 
   import FilterInput from './_filter-input.svelte';
 
+  const t = createTranslate('workflows');
+
   const statuses = {
-    All: { value: null, label: translate('workflows', 'all-statuses') },
+    All: { value: null, label: t('all-statuses') },
     'Timed Out': {
       value: 'TimedOut',
-      label: translate('workflows', 'timed-out'),
+      label: t('timed-out'),
     },
     Completed: {
       value: 'Completed',
-      label: translate('workflows', 'completed'),
+      label: t('completed'),
     },
-    Failed: { value: 'Failed', label: translate('workflows', 'failed') },
+    Failed: { value: 'Failed', label: t('failed') },
     'Continued as New': {
       value: 'ContinuedAsNew',
-      label: translate('workflows', 'continued-as-new'),
+      label: t('continued-as-new'),
     },
     Canceled: {
       value: 'Canceled',
-      label: translate('workflows', 'canceled'),
+      label: t('canceled'),
     },
     Terminated: {
       value: 'Terminated',
-      label: translate('workflows', 'terminated'),
+      label: t('terminated'),
     },
   };
 
@@ -67,11 +69,11 @@
   <p class="text-right text-xs">
     {#if isAdvancedQuery}
       <Link href={$page.url.pathname} on:click={handleToggle('basic')}>
-        {translate('workflows', 'basic-search')}
+        {t('basic-search')}
       </Link>
     {:else}
       <Link class="text-blue-700" on:click={handleToggle('advanced')}>
-        {translate('workflows', 'advanced-search')}
+        {t('advanced-search')}
       </Link>
     {/if}
   </p>
@@ -99,7 +101,7 @@
         value={workflowTypeFilter}
       />
       <FilterSelect
-        label={translate('workflows', 'time-range')}
+        label={t('time-range')}
         parameter="time-range"
         value="24 hours"
       >

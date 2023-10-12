@@ -1,7 +1,7 @@
 <script lang="ts">
   import OrderableListItem from '$lib/holocene/orderable-list/orderable-list-item.svelte';
   import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
-  import { translate } from '$lib/i18n/translate';
+  import { createTranslate } from '$lib/i18n/translate';
   import {
     addColumn,
     availableCustomSearchAttributeColumns,
@@ -12,7 +12,7 @@
   } from '$lib/stores/workflow-table-columns';
 
   export let namespace: string;
-
+  const t = createTranslate('workflows');
   $: columnsInUse = $workflowTableColumns?.[namespace] ?? [];
   $: availableSystemColumns = availableSystemSearchAttributeColumns(namespace);
   $: availableCustomColumns = availableCustomSearchAttributeColumns(namespace);
@@ -31,24 +31,12 @@
         on:moveItem={(event) =>
           moveColumn(event.detail.from, event.detail.to, namespace)}
         on:removeItem={() => removeColumn(label, namespace)}
-        addButtonLabel={translate('workflows', 'add-column-label', {
-          column: label,
-        })}
-        removeButtonLabel={translate('workflows', 'remove-column-label', {
-          column: label,
-        })}
-        moveUpButtonLabel={translate('workflows', 'move-column-up-label', {
-          column: label,
-        })}
-        moveDownButtonLabel={translate('workflows', 'move-column-down-label', {
-          column: label,
-        })}
-        pinButtonLabel={translate('workflows', 'pin-column-label', {
-          column: label,
-        })}
-        unpinButtonLabel={translate('workflows', 'unpin-column-label', {
-          column: label,
-        })}
+        addButtonLabel={t('add-column-label', { column: label })}
+        removeButtonLabel={t('remove-column-label', { column: label })}
+        moveUpButtonLabel={t('move-column-up-label', { column: label })}
+        moveDownButtonLabel={t('move-column-down-label', { column: label })}
+        pinButtonLabel={t('pin-column-label', { column: label })}
+        unpinButtonLabel={t('unpin-column-label', { column: label })}
       />
     {:else}
       <OrderableListItem readonly label="No headings in view" />
@@ -62,9 +50,7 @@
       <OrderableListItem
         static
         on:addItem={() => addColumn(label, namespace)}
-        addButtonLabel={translate('workflows', 'add-column-label', {
-          column: label,
-        })}
+        addButtonLabel={t('add-column-label', { column: label })}
         {label}
       />
     {:else}
@@ -79,9 +65,7 @@
       <OrderableListItem
         static
         on:addItem={() => addColumn(label, namespace)}
-        addButtonLabel={translate('workflows', 'add-column-label', {
-          column: label,
-        })}
+        addButtonLabel={t('add-column-label', { column: label })}
         {label}
       />
     {:else}

@@ -17,7 +17,7 @@
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
-  import { translate } from '$lib/i18n/translate';
+  import { createTranslate, translate } from '$lib/i18n/translate';
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
   import { eventHistory } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
@@ -41,6 +41,7 @@
   } from '$lib/utilities/task-queue-compatibility';
 
   export let namespace: string;
+  const t = createTranslate('workflows');
 
   $: ({ workflow, workers, compatibility } = $workflowRun);
 
@@ -115,7 +116,7 @@
       data-testid="back-to-workflows"
       icon="chevron-left"
     >
-      {translate('workflows', 'back-to-workflows')}
+      {t('back-to-workflows')}
     </Link>
   </div>
   <div
@@ -191,13 +192,8 @@
   </div>
   {#if cancelInProgress}
     <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
-      <Alert
-        bold
-        icon="info"
-        intent="info"
-        title={translate('workflows', 'cancel-request-sent')}
-      >
-        {translate('workflows', 'cancel-request-sent-description')}
+      <Alert bold icon="info" intent="info" title={t('cancel-request-sent')}>
+        {t('cancel-request-sent-description')}
       </Alert>
     </div>
   {/if}
@@ -208,7 +204,7 @@
         icon="info"
         intent="info"
         data-testid="workflow-reset-alert"
-        title={translate('workflows', 'reset-success-alert-title')}
+        title={t('reset-success-alert-title')}
       >
         You can find the resulting Workflow Execution <Link
           href={routeForEventHistory({
@@ -223,7 +219,7 @@
   <Tabs>
     <TabList class="flex flex-wrap gap-6" label="workflow detail">
       <Tab
-        label={translate('workflows', 'history-tab')}
+        label={t('history-tab')}
         id="history-tab"
         href={routeForEventHistory({
           ...routeParameters,
@@ -238,7 +234,7 @@
         <Badge type="blue" class="px-2 py-0">{workflow?.historyEvents}</Badge>
       </Tab>
       <Tab
-        label={translate('workflows', 'workers-tab')}
+        label={t('workers-tab')}
         id="workers-tab"
         href={routeForWorkers(routeParameters)}
         active={pathMatches(
@@ -249,7 +245,7 @@
         <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
       </Tab>
       <Tab
-        label={translate('workflows', 'pending-activities-tab')}
+        label={t('pending-activities-tab')}
         id="pending-activities-tab"
         href={routeForPendingActivities(routeParameters)}
         active={pathMatches(
@@ -268,7 +264,7 @@
         </Badge>
       </Tab>
       <Tab
-        label={translate('workflows', 'stack-trace-tab')}
+        label={t('stack-trace-tab')}
         id="stack-trace-tab"
         href={routeForStackTrace(routeParameters)}
         active={pathMatches(
@@ -277,7 +273,7 @@
         )}
       />
       <Tab
-        label={translate('workflows', 'queries-tab')}
+        label={t('queries-tab')}
         id="queries-tab"
         href={routeForWorkflowQuery(routeParameters)}
         active={pathMatches(

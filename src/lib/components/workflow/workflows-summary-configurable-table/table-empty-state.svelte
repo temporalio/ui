@@ -4,13 +4,13 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
-  import { translate } from '$lib/i18n/translate';
+  import { createTranslate } from '$lib/i18n/translate';
   import { workflowError } from '$lib/stores/workflows';
   import emptyImage from '$lib/vendor/empty-state-dark_2x.png';
   import noResultsImages from '$lib/vendor/empty-state-light_2x.png';
 
   export let updating = false;
-
+  const t = createTranslate('workflows');
   $: query = $page.url.searchParams.get('query');
 
   const samples = [
@@ -38,31 +38,31 @@
     {:else}
       <h2 class="text-lg font-medium">
         {#if query}
-          {translate('workflows', 'workflow-query-empty-state-title')}
+          {t('workflow-query-empty-state-title')}
         {:else}
-          {translate('workflows', 'workflow-empty-state-title')}
+          {t('workflow-empty-state-title')}
         {/if}
       </h2>
       {#if $workflowError}
         <Alert
           intent="caution"
           icon="warning"
-          title={translate('workflows', 'workflow-query-error-state')}
+          title={t('workflow-query-error-state')}
           style="overflow-wrap: anywhere"
         >
           {$workflowError}
         </Alert>
       {:else if query}
         <p>
-          {translate('workflows', 'workflow-query-empty-state-preface')}
+          {t('workflow-query-empty-state-preface')}
         </p>
         <p>
-          {translate('workflows', 'workflow-query-empty-state-postface')}
+          {t('workflow-query-empty-state-postface')}
         </p>
       {:else}
         <slot name="cloud" />
         <p>
-          {translate('workflows', 'workflow-empty-state-description')}
+          {t('workflow-empty-state-description')}
           <Link newTab href="https://github.com/temporalio"
             >github.com/temporalio</Link
           >.

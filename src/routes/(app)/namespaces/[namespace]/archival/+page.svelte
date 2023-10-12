@@ -9,12 +9,12 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
-  import { translate } from '$lib/i18n/translate';
+  import { createTranslate, translate } from '$lib/i18n/translate';
 
   import WorkflowFilters from './_workflow-filters.svelte';
 
   export let data: PageData & { archivalQueryingNotSupported: boolean };
-
+  const t = createTranslate('workflows');
   $: ({
     namespace: {
       namespaceInfo: { name: namespaceName },
@@ -26,20 +26,17 @@
   } = data);
 </script>
 
-<PageTitle
-  title={`${translate('workflows', 'archival')} | ${namespaceName}`}
-  url={$page.url.href}
-/>
+<PageTitle title={`${t('archival')} | ${namespaceName}`} url={$page.url.href} />
 {#if archivalEnabled && visibilityArchivalEnabled}
   <h1 class="text-2xl" data-testid="archived-enabled-title">
-    {translate('workflows', 'archived-workflows')}
+    {t('archived-workflows')}
   </h1>
   {#if !archivalQueryingNotSupported}<WorkflowFilters />{/if}
   {#if workflows?.length}
     <Pagination
       items={workflows}
       let:visibleItems
-      aria-label={translate('workflows', 'archived-workflows')}
+      aria-label={t('archived-workflows')}
       pageSizeSelectLabel={translate('per-page')}
       previousButtonLabel={translate('previous')}
       nextButtonLabel={translate('next')}
@@ -52,20 +49,20 @@
     </Pagination>
   {:else}
     <EmptyState
-      title={translate('workflows', 'workflow-empty-state-title')}
-      content={translate('workflows', 'archival-empty-state-description')}
+      title={t('workflow-empty-state-title')}
+      content={t('archival-empty-state-description')}
     />
   {/if}
 {:else if archivalEnabled}
   <h1 class="text-2xl" data-testid="visibility-disabled-title">
-    {translate('workflows', 'visibility-disabled-archival')}
+    {t('visibility-disabled-archival')}
   </h1>
   <p>
-    {translate('workflows', 'archival-link-preface')}<a
+    {t('archival-link-preface')}<a
       class="text-blue-700 underline"
       href="https://docs.temporal.io/clusters#archival"
       target="_blank"
-      rel="noreferrer">{translate('workflows', 'archival-link')}</a
+      rel="noreferrer">{t('archival-link')}</a
     >:
   </p>
   <CodeBlock
@@ -77,9 +74,9 @@
   />
 {:else}
   <h1 class="text-2xl" data-testid="archived-disabled-title">
-    {translate('workflows', 'archival-disabled-title')}
+    {t('archival-disabled-title')}
   </h1>
-  <p>{translate('workflows', 'archival-disabled-details')}:</p>
+  <p>{t('archival-disabled-details')}:</p>
   <CodeBlock
     content={`temporal operator namespace update --history-archival-state enabled ${namespaceName}`}
     language="text"
@@ -89,11 +86,11 @@
   />
   {#if !visibilityArchivalEnabled}
     <p>
-      {translate('workflows', 'archival-link-preface')}<a
+      {t('archival-link-preface')}<a
         class="text-blue-700 underline"
         href="https://docs.temporal.io/clusters#archival"
         target="_blank"
-        rel="noreferrer">{translate('workflows', 'archival-link')}</a
+        rel="noreferrer">{t('archival-link')}</a
       >:
     </p>
     <CodeBlock

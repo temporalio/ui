@@ -6,7 +6,7 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
-  import { translate } from '$lib/i18n/translate';
+  import { createTranslate, translate } from '$lib/i18n/translate';
   import type { ParsedQuery } from '$lib/services/query-service';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
@@ -15,7 +15,7 @@
 
   const { namespace } = $page.params;
   $: ({ workflow, workers } = $workflowRun);
-
+  const t = createTranslate('workflows');
   let currentdate = new Date();
   let isLoading = false;
 
@@ -55,7 +55,7 @@
     {#await stackTrace}
       <div class="text-center">
         <Loading />
-        <p>{translate('workflows', 'no-workers-failure-message')}</p>
+        <p>{t('no-workers-failure-message')}</p>
       </div>
     {:then result}
       <div class="flex items-center gap-4">
@@ -67,7 +67,7 @@
           {translate('refresh')}
         </Button>
         <p>
-          {translate('workflows', 'stack-trace-at')}
+          {t('stack-trace-at')}
           {currentdate.toLocaleTimeString()}
         </p>
       </div>
@@ -83,21 +83,21 @@
     {:catch _error}
       <EmptyState
         title={translate('error-occurred')}
-        content={translate('workflows', 'no-workers-running-message')}
+        content={t('no-workers-running-message')}
       />
     {/await}
   {:else}
     <EmptyState
-      title={translate('workflows', 'stack-trace-empty-state')}
+      title={t('stack-trace-empty-state')}
       testId="query-stack-trace-empty"
     >
       {#if workflow?.isRunning && workers?.pollers?.length === 0}
         <p>
-          {translate('workflows', 'stack-trace-link-preface')}<Link
+          {t('stack-trace-link-preface')}<Link
             href="https://docs.temporal.io/workflows#stack-trace-query"
           >
-            {translate('workflows', 'stack-trace-link')}</Link
-          >{translate('workflows', 'stack-trace-link-postface', {
+            {t('stack-trace-link')}</Link
+          >{t('stack-trace-link-postface', {
             taskQueue: workflow?.taskQueue,
           })}
         </p>

@@ -2,7 +2,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
-  import { translate } from '$lib/i18n/translate';
+  import { createTranslate, translate } from '$lib/i18n/translate';
   import type { ScheduleOffsetUnit } from '$lib/types/schedule';
 
   export let days = '';
@@ -13,7 +13,7 @@
 
   let offset = '';
   let offsetUnit: ScheduleOffsetUnit = 'min';
-
+  const t = createTranslate('schedules');
   const error = (x: string) => {
     if (x) return isNaN(parseInt(x));
     return false;
@@ -36,10 +36,10 @@
 
 <div class="my-2 flex flex-col gap-4">
   <h3 class="text-lg font-medium">
-    {translate('schedules', 'interval-view-heading')}
+    {t('interval-view-heading')}
   </h3>
   <p>
-    {translate('schedules', 'interval-view-description')}
+    {t('interval-view-description')}
   </p>
   <div class="flex flex-row items-center gap-2">
     <div class="w-24">
@@ -95,15 +95,15 @@
     </div>
   </div>
   <h3 class="mt-4 text-lg font-medium">
-    {translate('schedules', 'offset-heading')}
+    {t('offset-heading')}
   </h3>
   <p>
-    {translate('schedules', 'offset-description')}
+    {t('offset-description')}
   </p>
   <div class="flex w-48 gap-0">
     <Input
       id="phase"
-      label={translate('schedules', 'offset-heading')}
+      label={t('offset-heading')}
       labelHidden
       bind:value={offset}
       placeholder="00"
@@ -111,7 +111,7 @@
       unroundRight
     />
     <Select
-      label={translate('schedules', 'offset-unit')}
+      label={t('offset-unit')}
       labelHidden
       unroundLeft
       id="phase-unit"

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { translate } from '$lib/i18n/translate';
+  import { createTranslate } from '$lib/i18n/translate';
   import type { BatchOperation } from '$lib/types/batch';
 
   export let operation: BatchOperation;
-
+  const t = createTranslate('batch');
   let completePercent: number;
   let failurePercent: number;
   let progressPercent: number;
@@ -31,11 +31,11 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <p>{translate('batch', 'results')}</p>
+  <p>{t('results')}</p>
   <div>
     <div class="flex justify-between">
       <span class="text-xs font-semibold">
-        {translate('batch', 'operations-progress', {
+        {t('operations-progress', {
           percent: progressPercent,
         })}
       </span>
@@ -56,14 +56,14 @@
   <div>
     <div class="flex justify-between">
       <span class=" text-xs font-semibold text-green-700"
-        >{translate('batch', 'operations-succeeded', {
+        >{t('operations-succeeded', {
           count: operation.completeOperationCount,
         })}</span
       >
       <span
         class=" text-xs font-semibold"
         class:text-red-700={failurePercent > 0}
-        >{translate('batch', 'operations-failed', {
+        >{t('operations-failed', {
           count: operation.failureOperationCount,
         })}</span
       >

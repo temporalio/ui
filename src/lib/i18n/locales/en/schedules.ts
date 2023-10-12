@@ -23,14 +23,15 @@ export const Strings = {
   unpause: 'Unpause',
   'schedule-actions': 'Schedule Actions',
   'pause-modal-title': 'Pause Schedule?',
-  'pause-modal-confirmation': 'Are you sure you want to pause {{schedule}}?',
+  'pause-modal-confirmation': 'Are you sure you want to pause {{- schedule}}?',
   'pause-reason': 'Enter a reason for pausing the schedule.',
   'unpause-modal-title': 'Unpause Schedule?',
   'unpause-modal-confirmation':
-    'Are you sure you want to unpause {{schedule}}?',
+    'Are you sure you want to unpause {{- schedule}}?',
   'unpause-reason': 'Enter a reason for unpausing the schedule.',
   'delete-modal-title': 'Delete Schedule?',
-  'delete-modal-confirmation': 'Are you sure you want to delete {{schedule}}?',
+  'delete-modal-confirmation':
+    'Are you sure you want to delete {{- schedule}}?',
   'advanced-settings': 'Advanced Settings ',
   'start-time': 'Schedule Start Time: ',
   'end-time': 'Schedule End Time: ',
