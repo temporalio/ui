@@ -59,6 +59,7 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 			[]string{
 				// NOTE: Authorization header is forwarded by grpc-gateway
 				auth.AuthorizationExtrasHeader,
+				"Caller-Type",
 			}),
 	}))
 
