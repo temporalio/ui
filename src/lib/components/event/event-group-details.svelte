@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+
   import Table from '$lib/holocene/table/table.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
@@ -7,10 +10,25 @@
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   export let eventGroup: EventGroup;
   export let selectedId: string;
-  export let onGroupClick: (id: string) => void;
+
+  const onGroupClick = (id: string) => {
+    const { namespace, workflow, run } = $page.params;
+    const queryParams: Record<string, string> = {};
+    $page.url.searchParams.forEach((value, key) => {
+      queryParams[key] = value;
+    });
+    const route = routeForEventHistory({
+      queryParams,
+      namespace,
+      workflow,
+      run,
+    });
+    goto(`${route}#${id}`, { noScroll: true });
+  };
 </script>
 
 <div class="w-full border-gray-700 lg:w-1/3 lg:border-r-2">
@@ -26,7 +44,9 @@
       >
         <td class="w-1/12" />
         <td class="w-24">
-          <p class="truncate text-sm text-gray-500 md:text-base">{id}</p>
+          <p class="truncate text-sm text-gray-500 md:text-base">
+            {id}
+          </p>
         </td>
         <td>
           <p class="event-type truncate text-sm md:text-base">

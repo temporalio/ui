@@ -2,6 +2,9 @@
   import { noop } from 'svelte/internal';
   import { fade } from 'svelte/transition';
 
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { isEventGroup } from '$lib/models/event-groups';
@@ -18,6 +21,7 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
@@ -34,7 +38,7 @@
     ? Array.from(event.events.keys()).pop()
     : event.id;
 
-  $: expanded = expandAll || active;
+  $: expanded = expandAll;
 
   $: descending = $eventFilterSort === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
@@ -61,6 +65,19 @@
 
   const onLinkClick = () => {
     expanded = !expanded;
+    // Dont delete query params like ?per-page
+    const { namespace, workflow, run } = $page.params;
+    const queryParams: Record<string, string> = {};
+    $page.url.searchParams.forEach((value, key) => {
+      queryParams[key] = value;
+    });
+    const route = routeForEventHistory({
+      queryParams,
+      namespace,
+      workflow,
+      run,
+    });
+    goto(`${route}#${event.id}`, { noScroll: true });
     onRowClick();
   };
 
