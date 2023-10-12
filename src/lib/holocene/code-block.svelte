@@ -15,6 +15,7 @@
   import { EditorView, keymap } from '@codemirror/view';
   import { createEventDispatcher, onMount } from 'svelte';
 
+  import CopyButton from '$lib/holocene/copyable/button.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import {
     parseWithBigInt,
@@ -24,8 +25,6 @@
     TEMPORAL_SYNTAX,
     TEMPORAL_THEME,
   } from '$lib/vendor/codemirror/theme';
-
-  import Icon from './icon/icon.svelte';
 
   type BaseProps = HTMLAttributes<HTMLDivElement> & {
     content: string;
@@ -58,6 +57,10 @@
 
   const { copy, copied } = copyToClipboard();
 
+  const handleCopy = (e: Event) => {
+    copy(e, stringifyWithBigInt(content, undefined, 2));
+  };
+
   let editor: HTMLElement;
   let view: EditorView;
 
@@ -74,7 +77,10 @@
     return stringifyWithBigInt(parsedData, undefined, inline ? 0 : 2);
   };
 
-  $: value = language === 'json' ? formatJSON(content) : content;
+  const formatValue = ({ value, language }) =>
+    language === 'json' ? formatJSON(value) : value;
+
+  $: value = formatValue({ value: content, language });
 
   const createEditorView = (): EditorView => {
     return new EditorView({
@@ -124,10 +130,15 @@
     view = createEditorView();
   });
 
+  export const resetView = (value = '', format = true) => {
+    const formattedValue = format ? formatValue({ value, language }) : value;
+    const newState = createEditorState(formattedValue);
+    view.setState(newState);
+  };
+
   const setView = () => {
     if (view && !editable) {
-      const newState = createEditorState(value);
-      view.setState(newState);
+      resetView(value, false);
     }
   };
 
@@ -145,15 +156,12 @@
     {...$$restProps}
   />
   {#if copyable}
-    <button
-      on:click={(e) => copy(e, stringifyWithBigInt(content, undefined, 2))}
-      class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
-    >
-      <Icon
-        title={$copied ? copySuccessIconTitle : copyIconTitle}
-        name={$copied ? 'checkmark' : 'copy'}
-        class="text-white hover:text-gray-900"
-      />
-    </button>
+    <CopyButton
+      {copyIconTitle}
+      {copySuccessIconTitle}
+      class="absolute top-1 right-1 text-white hover:text-gray-900 focus-visible:text-gray-900"
+      on:click={handleCopy}
+      copied={$copied}
+    />
   {/if}
 </div>

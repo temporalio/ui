@@ -14,4 +14,3 @@ playwright-report
 dist/**/*
 tests/**/storageState.json
 *.har
-/cypress/downloads

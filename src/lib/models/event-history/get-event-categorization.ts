@@ -128,9 +128,13 @@ const compactEventTypes: (EventTypeCategory | undefined)[] = [
   undefined,
   CATEGORIES.ACTIVITY,
   CATEGORIES.LOCAL_ACTIVITY,
+  CATEGORIES.CHILD_WORKFLOW,
   CATEGORIES.SIGNAL,
   CATEGORIES.TIMER,
+  CATEGORIES.MARKER,
+  CATEGORIES.UPDATE,
 ];
+
 export const compactEventTypeOptions: EventTypeOption[] =
   allEventTypeOptions.filter(({ option }) =>
     compactEventTypes.includes(option),

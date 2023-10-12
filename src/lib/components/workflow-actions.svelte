@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { writable } from 'svelte/store';
+
   import { page } from '$app/stores';
 
   import WorkflowResetForm from '$lib/components/workflow/workflow-reset-form.svelte';
@@ -10,16 +12,20 @@
   import SplitButton from '$lib/holocene/split-button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { Action } from '$lib/models/workflow-actions';
-  import { ResetReapplyType } from '$lib/models/workflow-actions';
+  import { Action, ResetReapplyType } from '$lib/models/workflow-actions';
   import {
+    cancelWorkflow,
     resetWorkflow,
     signalWorkflow,
     terminateWorkflow,
   } from '$lib/services/workflow-service';
-  import { cancelWorkflow } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
   import { coreUserStore } from '$lib/stores/core-user';
+  import {
+    codecEndpoint,
+    includeCredentials,
+    passAccessToken,
+  } from '$lib/stores/data-encoder-config';
   import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { settings } from '$lib/stores/settings';
@@ -39,8 +45,11 @@
   export let cancelInProgress: boolean;
   export let isRunning: boolean;
 
+  const getDefaultSignalInput = () =>
+    $codecEndpoint ? '{"metadata": {"encoding": ""}, "data": ""}' : '';
+
   let reason = '';
-  let signalInput = '';
+  let signalInput = getDefaultSignalInput();
   let signalName = '';
   let cancelConfirmationModalOpen = false;
   let terminateConfirmationModalOpen = false;
@@ -48,10 +57,11 @@
   let signalConfirmationModalOpen = false;
   let error = '';
   let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
-  let resetId: string;
+  let resetId = writable<string>();
   let resetReason: string;
   let loading = false;
   let resetTooltipText: string;
+  let signalInputCodeBlock: CodeBlock;
 
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
   $: signalEnabled = workflowSignalEnabled($page.data.settings);
@@ -63,13 +73,14 @@
   };
 
   const hideSignalModal = () => {
-    signalInput = '';
+    signalInput = getDefaultSignalInput();
     signalName = '';
+    signalInputCodeBlock?.resetView(signalInput);
   };
 
   const hideResetModal = () => {
     resetReapplyType = ResetReapplyType.Unspecified;
-    resetId = undefined;
+    $resetId = undefined;
     resetReason = undefined;
   };
 
@@ -138,6 +149,15 @@
         runId: workflow.runId,
         signalInput,
         signalName,
+        settings: {
+          ...$page.data.settings,
+          codec: {
+            endpoint: $codecEndpoint,
+            includeCredentials: $includeCredentials,
+            passAccessToken: $passAccessToken,
+          },
+        },
+        accessToken: $authUser.accessToken,
       });
       signalConfirmationModalOpen = false;
       $refresh = Date.now();
@@ -145,11 +165,10 @@
         message: translate('workflows', 'signal-success'),
         id: 'workflow-signal-success-toast',
       });
+      hideSignalModal();
     } catch (err) {
       error = err?.message ?? translate('unknown-error');
     }
-
-    hideSignalModal();
   };
 
   const reset = async () => {
@@ -159,7 +178,7 @@
         namespace,
         workflowId: workflow.id,
         runId: workflow.runId,
-        eventId: resetId,
+        eventId: $resetId,
         reason: formatReason({
           action: Action.Reset,
           reason: resetReason,
@@ -295,7 +314,7 @@
   bind:open={resetConfirmationModalOpen}
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
-  confirmDisabled={!resetId}
+  confirmDisabled={!$resetId}
 >
   <h3 slot="title">{translate('workflows', 'reset-modal-title')}</h3>
   <svelte:fragment slot="content">
@@ -382,6 +401,7 @@
         on:change={handleSignalInputChange}
         editable
         copyable={false}
+        bind:this={signalInputCodeBlock}
       />
     </div>
   </div>

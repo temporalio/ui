@@ -213,6 +213,24 @@ export const routeForEventHistoryImport = (
   return `${base}/import/events`;
 };
 
+export const routeForBatchOperations = ({
+  namespace,
+}: {
+  namespace: string;
+}) => {
+  return `${base}/namespaces/${namespace}/batch-operations`;
+};
+
+export const routeForBatchOperation = ({
+  namespace,
+  jobId,
+}: {
+  namespace: string;
+  jobId: string;
+}) => {
+  return `${base}/namespaces/${namespace}/batch-operations/${jobId}`;
+};
+
 export const hasParameters =
   <T extends Record<string, string | Record<string, string>>>(
     ...required: string[]

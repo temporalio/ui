@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { type Writable, writable } from 'svelte/store';
+  import { writable, type Writable } from 'svelte/store';
 
   import { createEventDispatcher, setContext } from 'svelte';
 

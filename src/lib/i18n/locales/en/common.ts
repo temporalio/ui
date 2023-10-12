@@ -134,4 +134,12 @@ export const Strings = {
   'based-on-time-preface': 'Based on',
   'download-json': 'Download JSON',
   'skip-nav': 'Skip to Main Content',
+  timeline: 'Timeline',
+  'equal-to': 'Equal to',
+  'not-equal-to': 'Not equal to',
+  'encode-failed': 'Data encoding failed',
+  'decode-failed': 'Data decoding failed',
+  'job-id': 'Job ID',
+  'auto-refresh': 'Auto refresh',
+  'auto-refresh-tooltip': '{{ interval }} second page refresh',
 } as const;
