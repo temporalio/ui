@@ -53,6 +53,7 @@
   let deleteConfirmationModalOpen = false;
   let reason = '';
   let error = '';
+  let triggerLoading = false;
   let overlapPolicy = writable<OverlapPolicy>('Unspecified');
   let policies: { label: string; description: string; value: OverlapPolicy }[] =
     [
@@ -69,7 +70,7 @@
       {
         label: translate('schedules', 'trigger-skip-description'),
         description: translate('schedules', 'trigger-skip-title'),
-        value: 'Skipzz',
+        value: 'Skip',
       },
       {
         label: translate('schedules', 'trigger-buffer-one-description'),
@@ -133,13 +134,17 @@
   };
 
   const handleTriggerImmediately = async () => {
+    triggerLoading = true;
     await triggerImmediately({
       namespace,
       scheduleId,
       overlapPolicy: $overlapPolicy,
     });
-    scheduleFetch = fetchSchedule(parameters, fetch);
-    triggerConfirmationModalOpen = false;
+    setTimeout(() => {
+      scheduleFetch = fetchSchedule(parameters, fetch);
+      triggerConfirmationModalOpen = false;
+      triggerLoading = false;
+    }, 1000);
   };
 
   const resetReason = () => {
@@ -192,11 +197,7 @@
             {scheduleId}
           </span>
         </h1>
-        <div class="flex items-center gap-2 text-sm">
-          <p>
-            {namespace}
-          </p>
-          <div class="h-1 w-1 rounded-full bg-gray-900" />
+        <div class="flex items-center text-lg">
           <p>
             {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
           </p>
@@ -330,6 +331,7 @@
       confirmType="primary"
       confirmText={translate('schedules', 'trigger')}
       cancelText={translate('cancel')}
+      loading={triggerLoading}
       on:confirmModal={() => handleTriggerImmediately()}
       on:cancelModal={() => (triggerConfirmationModalOpen = false)}
     >

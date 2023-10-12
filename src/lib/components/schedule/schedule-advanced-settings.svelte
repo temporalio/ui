@@ -9,9 +9,6 @@
   export let spec: ScheduleSpec;
   export let state: ScheduleState;
   export let policies: SchedulePolicies;
-  $: {
-    console.log('Policies: ', policies?.overlapPolicy);
-  }
   export let notes = '';
 </script>
 
