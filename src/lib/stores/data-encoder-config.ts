@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 
 import { persistStore } from '$lib/stores/persist-store';
 import type { DataEncoderStatus } from '$lib/types/global';
+import { has } from '$lib/utilities/has';
 
 export const codecEndpoint = persistStore('endpoint', null, true);
 
@@ -26,8 +27,16 @@ export const overrideRemoteCodecConfiguration = persistStore<boolean>(
 export const lastDataEncoderStatus =
   writable<DataEncoderStatus>('notRequested');
 
-export function setLastDataEncoderFailure(): void {
+export const lastDataEncoderError = writable<string>('');
+
+export function setLastDataEncoderFailure(error?: unknown): void {
   lastDataEncoderStatus.set('error');
+
+  if (error && has(error, 'message') && typeof error.message === 'string') {
+    lastDataEncoderError.set(error.message);
+  } else {
+    lastDataEncoderError.set('');
+  }
 }
 
 export function setLastDataEncoderSuccess(): void {
