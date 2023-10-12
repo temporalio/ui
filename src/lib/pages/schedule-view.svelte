@@ -180,7 +180,7 @@
     <Loading title={translate('schedules', 'deleting')} class="my-2" />
   {:else}
     <header class="mb-8 flex flex-row justify-between gap-4">
-      <div class="relative flex flex-col gap-1">
+      <div class="relative flex flex-col gap-4">
         <Link
           on:click={() => {
             goto(routeForSchedules({ namespace }));
@@ -189,15 +189,15 @@
         >
           {translate('schedules', 'back-to-schedules')}
         </Link>
-        <h1 class="relative mt-8 flex items-center gap-4 text-2xl">
-          <WorkflowStatus
-            status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
-          />
+        <h1 class="relative mt-4 flex items-center text-2xl">
           <span class="select-all font-medium" data-testid="schedule-name">
             {scheduleId}
           </span>
         </h1>
-        <div class="flex items-center text-lg">
+        <div class="flex items-center gap-2 text-lg">
+          <WorkflowStatus
+            status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
+          />
           <p>
             {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
           </p>
