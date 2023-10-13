@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -51,7 +52,12 @@
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </td>
   <td class="cell whitespace-pre-line break-words">
-    <Link class="text-base" href={route}>
+    <Link
+      class="text-base"
+      on:click={() => {
+        goto(route);
+      }}
+    >
       {schedule.scheduleId}
     </Link>
   </td>
