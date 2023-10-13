@@ -11,6 +11,7 @@
 
   export let compact = false;
   export let updating = false;
+  export let store;
 
   let expandAll = $expandAllEvents === 'true';
 
