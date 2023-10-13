@@ -156,7 +156,7 @@
     if ($page.url.hash) {
       setTimeout(() => {
         timeline.fit();
-      }, 500);
+      }, 2000);
     } else {
       timeline.fit();
     }
