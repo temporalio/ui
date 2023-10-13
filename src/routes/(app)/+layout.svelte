@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { afterNavigate } from '$app/navigation';
-  import { goto } from '$app/navigation';
+  import { afterNavigate, goto } from '$app/navigation';
   import { page, updated } from '$app/stores';
 
   import type { PageData } from './$types';
@@ -19,6 +18,7 @@
   import type { NamespaceListItem } from '$lib/types/global';
   import {
     routeForArchivalWorkfows,
+    routeForBatchOperations,
     routeForEventHistoryImport,
     routeForLoginPage,
     routeForNamespaces,
@@ -59,6 +59,9 @@
     namespaces: routeForNamespaces(),
     schedules: routeForSchedules({ namespace: activeNamespaceName }),
     workflows: routeForWorkflows({ namespace: activeNamespaceName }),
+    batchOperations: routeForBatchOperations({
+      namespace: activeNamespaceName,
+    }),
     import: routeForEventHistoryImport(),
     feedback:
       $page.data?.settings?.feedbackURL ||
@@ -66,11 +69,24 @@
   };
 
   function getCurrentHref(namespace: string) {
-    const onSchedulesPage = $page.url.pathname.endsWith('schedules');
-    const href = onSchedulesPage
-      ? routeForSchedules({ namespace })
-      : routeForWorkflows({ namespace });
-    return href;
+    const namespacePages = [
+      {
+        subPath: 'schedules',
+        fullRoute: routeForSchedules({ namespace }),
+      },
+      {
+        subPath: 'batch-operations',
+        fullRoute: routeForBatchOperations({ namespace }),
+      },
+    ];
+
+    for (const { subPath, fullRoute } of namespacePages) {
+      if ($page.url.pathname.endsWith(subPath)) {
+        return fullRoute;
+      }
+    }
+
+    return routeForWorkflows({ namespace });
   }
 
   const logout = () => {

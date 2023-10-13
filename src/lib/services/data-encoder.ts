@@ -1,8 +1,10 @@
+import { translate } from '$lib/i18n/translate';
 import {
   setLastDataEncoderFailure,
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
-import type { Settings } from '$lib/types/global';
+import type { NetworkError, Settings } from '$lib/types/global';
+import { has } from '$lib/utilities/has';
 import { validateHttps } from '$lib/utilities/is-http';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
@@ -13,11 +15,13 @@ export async function convertPayloadsWithCodec({
   namespace,
   settings,
   accessToken,
+  encode = false,
 }: {
   payloads: PotentialPayloads;
   namespace: string;
   settings: Settings;
   accessToken: string;
+  encode?: boolean;
 }): Promise<PotentialPayloads> {
   const endpoint = settings?.codec?.endpoint;
   const passAccessToken = settings?.codec?.passAccessToken;
@@ -51,17 +55,30 @@ export async function convertPayloadsWithCodec({
       };
 
   const encoderResponse: Promise<PotentialPayloads> = fetch(
-    endpoint + '/decode',
+    endpoint + (encode ? '/encode' : '/decode'),
     requestOptions,
   )
-    .then((r) => r.json())
+    .then((response) => {
+      if (has(response, 'ok') && !response.ok) {
+        throw {
+          statusCode: response.status,
+          statusText: response.statusText,
+          response,
+          message: encode
+            ? translate('encode-failed')
+            : translate('decode-failed'),
+        } as NetworkError;
+      } else {
+        return response.json();
+      }
+    })
     .then((response) => {
       setLastDataEncoderSuccess();
 
       return response;
     })
-    .catch(() => {
-      setLastDataEncoderFailure();
+    .catch((err: unknown) => {
+      setLastDataEncoderFailure(err);
 
       return payloads;
     });
