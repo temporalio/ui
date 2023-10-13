@@ -4,6 +4,8 @@
 
   import { getContext } from 'svelte';
 
+  import { getFocusableElements } from '$lib/utilities/focus-trap';
+
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
   interface $$Props extends HTMLAttributes<HTMLUListElement> {
@@ -28,6 +30,13 @@
 
   $: $keepOpenCtx = keepOpen;
   $: $menuElementCtx = menuElement;
+
+  $: menuItems = menuElement ? getFocusableElements(menuElement) : [];
+  $: lastMenuItem = menuItems[menuItems.length - 1];
+
+  const handleFocusOut = (e: FocusEvent) => {
+    if (!$keepOpenCtx && e.target === lastMenuItem) $open = false;
+  };
 </script>
 
 <ul
@@ -39,6 +48,7 @@
   tabindex={-1}
   {id}
   bind:this={menuElement}
+  on:focusout={handleFocusOut}
   {...$$restProps}
 >
   <slot />

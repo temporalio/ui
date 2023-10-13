@@ -1,13 +1,8 @@
 export const getFocusableElements = (node: HTMLElement) =>
   Array.from(
-    node.querySelectorAll<
-      | HTMLLinkElement
-      | HTMLButtonElement
-      | HTMLTextAreaElement
-      | HTMLInputElement
-      | HTMLDivElement
-      | HTMLSelectElement
-    >('[href], button, textarea, input, div[contentEditable="true"], select'),
+    node.querySelectorAll<HTMLElement>(
+      '[href], button, textarea, input, div[contentEditable="true"], select, [tabindex][tabindex="0"]',
+    ),
   ).filter(
     (element) =>
       !element.hasAttribute('disabled') &&

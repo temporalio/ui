@@ -5,7 +5,6 @@
   import { createEventDispatcher, setContext } from 'svelte';
 
   import { clickOutside } from '$lib/holocene/outside-click';
-  import { getFocusableElements } from '$lib/utilities/focus-trap';
 
   export const MENU_CONTEXT = 'menu-context';
 
@@ -21,7 +20,7 @@
     open?: Writable<boolean>;
     class?: string;
   }
-  let menuContainer: HTMLDivElement;
+
   let className = '';
   export { className as class };
   export let open: Writable<boolean> = writable(false);
@@ -40,20 +39,11 @@
     keepOpen,
     menuElement,
   });
-
-  $: menuItems = menuContainer ? getFocusableElements(menuContainer) : [];
-  $: lastMenuItem = menuItems[menuItems.length - 1];
-
-  const handleFocusOut = (e: FocusEvent) => {
-    if (e.target === lastMenuItem) closeMenu();
-  };
 </script>
 
 <div
   use:clickOutside
   on:click-outside={closeMenu}
-  on:focusout={handleFocusOut}
-  bind:this={menuContainer}
   class="relative {className}"
   {...$$restProps}
 >

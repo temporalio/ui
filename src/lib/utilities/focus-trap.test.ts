@@ -53,13 +53,25 @@ describe('getFocusableElements', () => {
     expect(focusable.length).toBe(1);
   });
 
-  it('should not return elements with tabindex -1', () => {
+  it('should not return elements with a tabindex of -1', () => {
     const node = document.createElement('div');
 
     const button = document.createElement('button');
     button.setAttribute('tabindex', '-1');
     node.appendChild(button);
     node.appendChild(document.createElement('button'));
+
+    const focusable = getFocusableElements(node);
+
+    expect(focusable.length).toBe(1);
+  });
+
+  it('should return elements with a tabindex of 0', () => {
+    const node = document.createElement('ul');
+    const listItem = document.createElement('li');
+    listItem.setAttribute('tabindex', '0');
+    node.appendChild(listItem);
+    node.appendChild(document.createElement('li'));
 
     const focusable = getFocusableElements(node);
 
