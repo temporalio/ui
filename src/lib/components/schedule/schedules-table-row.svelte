@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -51,7 +52,12 @@
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </td>
   <td class="cell whitespace-pre-line break-words">
-    <Link class="text-base" href={route}>
+    <Link
+      class="text-base"
+      on:click={() => {
+        goto(route);
+      }}
+    >
       {schedule.scheduleId}
     </Link>
   </td>
@@ -86,14 +92,14 @@
   </td>
 </TableRow>
 <TableRow class="schedule-spec-row">
-  <td colspan="5" class="hidden xl:table-cell !p-0">
-    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  <td colspan="5" class="hidden xl:table-cell">
+    <ScheduleFrequency {calendar} {interval} inline class="w-auto text-sm" />
   </td>
-  <td colspan="3" class="hidden md:table-cell xl:hidden !p-0">
-    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  <td colspan="3" class="hidden md:table-cell xl:hidden">
+    <ScheduleFrequency {calendar} {interval} inline class="w-auto text-sm" />
   </td>
-  <td colspan="2" class="md:hidden !p-0">
-    <ScheduleFrequency {calendar} {interval} inline class="text-sm w-auto" />
+  <td colspan="2" class="md:hidden">
+    <ScheduleFrequency {calendar} {interval} inline class="w-auto text-sm" />
   </td>
 </TableRow>
 

@@ -318,15 +318,15 @@ describe('isSpace', () => {
 
 describe('isQuote', () => {
   it('should return true for a single quote', () => {
-    expect(isQuote(`'`)).toBe(true);
+    expect(isQuote("'")).toBe(true);
   });
 
   it('should return true for a single quote', () => {
-    expect(isQuote(`"`)).toBe(true);
+    expect(isQuote('"')).toBe(true);
   });
 
   it('should return false for a letter', () => {
-    expect(isQuote(`a`)).toBe(false);
+    expect(isQuote('a')).toBe(false);
   });
 
   it('should return false for null', () => {

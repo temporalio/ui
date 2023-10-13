@@ -23,17 +23,14 @@
   {:else}
     <slot />
   {/if}
-  <button
-    aria-label={removeButtonLabel}
-    on:click={handleRemove}
-  >
-  <Icon name="close" />
-</button>
+  <button aria-label={removeButtonLabel} on:click={handleRemove}>
+    <Icon name="close" />
+  </button>
 </span>
 
 <style lang="postcss">
   .chip {
-    @apply flex w-fit min-w-fit h-8 flex-row items-center justify-between break-all whitespace-nowrap rounded-md border border-gray-300 bg-gray-50 p-1 text-sm gap-1 text-gray-700;
+    @apply flex h-8 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-md border border-gray-300 bg-gray-50 p-1 text-sm text-gray-700;
 
     :global(.icon-button) {
       @apply ml-1 h-auto w-fit;

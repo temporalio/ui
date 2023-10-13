@@ -2,16 +2,19 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-import { autoRefreshWorkflow } from '$lib/stores/event-view';
+  import { autoRefreshWorkflow } from '$lib/stores/event-view';
 
   export let onChange: () => void;
 
   $: checked = $autoRefreshWorkflow === 'on';
 </script>
 
-<Tooltip bottomLeft text={translate('workflows', 'auto-refresh-tooltip')}>
+<Tooltip
+  bottomLeft
+  text={translate('auto-refresh-tooltip', { interval: '15' })}
+>
   <ToggleSwitch
-    label={translate('workflows', 'auto-refresh')}
+    label={translate('auto-refresh')}
     labelPosition="left"
     id="autorefresh"
     {checked}

@@ -8,7 +8,8 @@ export const TEMPORAL_THEME = EditorView.theme(
     '&': {
       color: 'white',
       backgroundColor: colors.gray['900'],
-      borderRadius: '0.25rem',
+      borderRadius: '0.5rem',
+      padding: '0.5rem',
     },
     '.cm-matchingBracket': {
       backgroundColor: colors.gray['800'],
@@ -18,6 +19,7 @@ export const TEMPORAL_THEME = EditorView.theme(
     },
     '.cm-content': {
       caretColor: colors.white,
+      fontSize: '0.875em',
     },
     '.cm-editor&.cm-focused': {
       outline: `1px solid ${colors.blue['700']}`,
@@ -30,6 +32,14 @@ export const TEMPORAL_THEME = EditorView.theme(
     },
     '&.cm-focused .cm-selectionBackground, ::selection': {
       backgroundColor: colors.gray['700'],
+    },
+    '.cm-gutters': {
+      backgroundColor: 'transparent',
+      color: colors.white,
+      borderRight: 'none',
+    },
+    '.cm-line': {
+      color: '#ccc',
     },
   },
   { dark: false },

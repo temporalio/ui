@@ -1,71 +1,48 @@
 <script lang="ts">
+  import type { Writable } from 'svelte/store';
+
+  import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Option from '$lib/holocene/select/option.svelte';
-  import Select from '$lib/holocene/select/select.svelte';
+  import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
+  import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import { translate } from '$lib/i18n/translate';
   import { ResetReapplyType } from '$lib/models/workflow-actions';
   import { resetEvents } from '$lib/stores/events';
 
-  export let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
+  export let resetReapplyType: ResetReapplyType = ResetReapplyType.Signal;
   export let reason = '';
-  export let eventId: string;
+  export let eventId: Writable<string>;
 
-  const resetReapplyTypes = [
-    {
-      value: ResetReapplyType.Unspecified,
-      label: translate('workflows', 'reset-reapply-all'),
-    },
-    {
-      value: ResetReapplyType.Signal,
-      label: translate('workflows', 'reset-reapply-signals-only'),
-    },
-    {
-      value: ResetReapplyType.None,
-      label: translate('workflows', 'reset-reapply-none'),
-    },
-  ];
+  const handleResetReapplyTypeChange = (
+    event: CustomEvent<{ checked: boolean }>,
+  ) => {
+    resetReapplyType = event.detail.checked
+      ? ResetReapplyType.Signal
+      : ResetReapplyType.None;
+  };
 </script>
 
 <div class="flex w-full flex-col gap-4">
-  <ul class="w-full rounded border border-primary max-h-40 overflow-y-scroll">
-    {#each $resetEvents as event}
-      <li
-        class="w-full h-10 border-b border-primary last-of-type:border-none hover:bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed first-of-type:rounded-t last-of-type:rounded-b"
-      >
-        <label
-          class="flex flex-row items-center gap-2 cursor-pointer px-4 py-2 h-full w-full"
-          for="reset-event-{event.id}"
-        >
-          <input
-            on:click={() => (eventId = event.id)}
-            type="radio"
-            checked={event.id === eventId}
-            name="reset-event-id"
-            id="reset-event-{event.id}"
-          />
-          <p class="grid grid-cols-8">
-            <span class="text-gray-500 font-medium col-span-1">
-              {event.eventId}
-            </span>
-            <span class="font-semibold">
-              {event.eventType}
-            </span>
-          </p>
-        </label>
-      </li>
-    {/each}
-  </ul>
-  <Select
-    label={translate('workflows', 'reset-reapply-type-label')}
-    id="reset-reapply-type-select"
-    bind:value={resetReapplyType}
-    data-testid="workflow-reset-reapply-type-select"
+  <RadioGroup
+    name="reset-event-id"
+    group={eventId}
+    class="max-h-40 overflow-auto"
+    description={translate('workflows', 'reset-event-radio-group-description')}
   >
-    {#each resetReapplyTypes as { value, label }}
-      <Option {value}>
-        {label}
-      </Option>
+    {#each $resetEvents as event}
+      <RadioInput
+        id="reset-event-{event.id}"
+        value={event.id}
+        label="{event.id} - {event.eventType}"
+      />
     {/each}
-  </Select>
+  </RadioGroup>
+  <Checkbox
+    id="reset-reapply-type-checkbox"
+    checked={resetReapplyType === ResetReapplyType.Signal}
+    on:change={handleResetReapplyTypeChange}
+    label={translate('workflows', 'reset-reapply-type-label')}
+  />
+
   <Input id="reset-reason" bind:value={reason} label={translate('reason')} />
 </div>

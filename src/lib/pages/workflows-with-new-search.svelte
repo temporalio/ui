@@ -65,10 +65,8 @@
   import Translate from '$lib/i18n/translate.svelte';
   import { Action } from '$lib/models/workflow-actions';
   import {
-    batchCancelByQuery,
-    batchTerminateByQuery,
-    bulkCancelByIDs,
-    bulkTerminateByIDs,
+    batchCancelWorkflows,
+    batchTerminateWorkflows,
   } from '$lib/services/batch-service';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
@@ -88,8 +86,10 @@
   } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
-  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    toListWorkflowFilters,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);
@@ -134,33 +134,24 @@
     $refresh = Date.now();
   };
 
-  const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
-    const options = {
-      namespace: $page.params.namespace,
-      reason: event.detail.reason,
-    };
+  const terminateWorkflows = async (
+    event: CustomEvent<{ reason: string; jobId: string }>,
+  ) => {
     try {
-      if ($allSelected) {
-        await batchTerminateByQuery({
-          ...options,
-          query: batchOperationQuery,
-        });
-        toaster.push({
-          message: translate('workflows', 'batch-terminate-all-success'),
-          id: 'batch-terminate-success-toast',
-        });
-      } else {
-        const count = await bulkTerminateByIDs({
-          ...options,
-          workflows: $terminableWorkflows,
-        });
-        toaster.push({
-          message: translate('workflows', 'batch-terminate-success', { count }),
-          id: 'batch-terminate-success-toast',
-        });
-      }
+      const options = {
+        namespace: $page.params.namespace,
+        reason: event.detail.reason,
+        jobId: event.detail.jobId,
+        ...($allSelected
+          ? { query: batchOperationQuery }
+          : { workflows: $terminableWorkflows }),
+      };
+      await batchTerminateWorkflows(options);
       batchTerminateConfirmationModal?.close();
-      refreshWorkflows();
+      toaster.push({
+        message: translate('workflows', 'batch-terminate-all-success'),
+        id: 'batch-terminate-success-toast',
+      });
     } catch (error) {
       batchTerminateConfirmationModal?.setError(
         error?.message ?? translate('unknown-error'),
@@ -168,33 +159,24 @@
     }
   };
 
-  const cancelWorkflows = async (event: CustomEvent<{ reason: string }>) => {
+  const cancelWorkflows = async (
+    event: CustomEvent<{ reason: string; jobId: string }>,
+  ) => {
     const options = {
       namespace: $page.params.namespace,
       reason: event.detail.reason,
+      jobId: event.detail.jobId,
+      ...($allSelected
+        ? { query: batchOperationQuery }
+        : { workflows: $terminableWorkflows }),
     };
     try {
-      if ($allSelected) {
-        await batchCancelByQuery({
-          ...options,
-          query: batchOperationQuery,
-        });
-        toaster.push({
-          message: translate('workflows', 'batch-cancel-all-success'),
-          id: 'batch-cancel-success-toast',
-        });
-      } else {
-        const count = await bulkCancelByIDs({
-          ...options,
-          workflows: $cancelableWorkflows,
-        });
-        toaster.push({
-          message: translate('workflows', 'batch-cancel-success', { count }),
-          id: 'batch-cancel-success-toast',
-        });
-      }
+      await batchCancelWorkflows(options);
       batchCancelConfirmationModal?.close();
-      refreshWorkflows();
+      toaster.push({
+        message: translate('workflows', 'batch-cancel-all-success'),
+        id: 'batch-cancel-success-toast',
+      });
     } catch (error) {
       batchCancelConfirmationModal?.setError(
         error?.message ?? translate('unknown-error'),
@@ -229,49 +211,54 @@
   on:confirm={cancelWorkflows}
 />
 
-<header class="flex justify-between items-center">
-  <div>
-    <h1 class="text-2xl" data-cy="workflows-title">
-      <Translate namespace="workflows" key="recent-workflows" />
-    </h1>
+<header class="flex flex-col">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl" data-cy="workflows-title">
+        <Translate namespace="workflows" key="recent-workflows" />
+      </h1>
+      <div class="flex items-center gap-2 text-sm">
+        {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !groupByCountEnabled}
+          <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
+            {#if $loading || $updating}
+              <Translate namespace="workflows" key="loading-workflows" />
+            {:else if query}
+              <Translate
+                namespace="workflows"
+                key="filtered-workflows-count"
+                replace={{
+                  filtered: $workflowCount.count,
+                  total: $workflowCount.totalCount,
+                }}
+              />
+            {:else}
+              <Translate
+                namespace="workflows"
+                key="workflows-count"
+                count={$workflowCount.totalCount}
+              />
+            {/if}
+          </p>
+        {/if}
+      </div>
+    </div>
     <div class="flex items-center gap-2 text-sm">
-      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !groupByCountEnabled}
-        <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
-          {#if $loading || $updating}
-            <Translate namespace="workflows" key="loading-workflows" />
-          {:else if query}
-            <Translate
-              namespace="workflows"
-              key="filtered-workflows-count"
-              replace={{
-                filtered: $workflowCount.count,
-                total: $workflowCount.totalCount,
-              }}
-            />
-          {:else}
-            <Translate
-              namespace="workflows"
-              key="workflows-count"
-              count={$workflowCount.totalCount}
-            />
-          {/if}
-        </p>
-      {/if}
+      <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
+        >{translate('download-json')}</Link
+      >
+      <IconButton
+        icon="retry"
+        label={translate('workflows', 'retry-workflows')}
+        on:click={refreshWorkflows}
+      />
     </div>
   </div>
-  <div class="flex gap-2 text-sm">
-    <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
-      >{translate('download-json')}</Link
-    >
-    <IconButton
-      icon="retry"
-      label={translate('workflows', 'retry-workflows')}
-      on:click={refreshWorkflows}
-    />
-  </div>
+  {#if groupByCountEnabled}
+    <WorkflowCounts />
+  {/if}
 </header>
-<WorkflowCounts />
-<div class="flex flex-col md:flex-row gap-2">
+
+<div class="flex flex-col gap-2 md:flex-row">
   <LabsModeGuard>
     <svelte:fragment slot="fallback">
       <WorkflowAdvancedSearch />

@@ -26,11 +26,14 @@
 </script>
 
 <script lang="ts">
+  import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
+  import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
+
   let endpoint = $codecEndpoint ?? '';
   let port = $dataConverterPort ?? '';
   let passToken = $passAccessToken ?? false;
   let includeCreds = $includeCredentials ?? false;
-  let override = $overrideRemoteCodecConfiguration ?? false;
+  let override = writable($overrideRemoteCodecConfiguration);
 
   $: error = '';
   $: namespaceOrCluster = $page.data?.settings?.runtimeEnvironment?.isCloud
@@ -56,7 +59,7 @@
     port = $dataConverterPort;
     passToken = $passAccessToken;
     includeCreds = $includeCredentials;
-    override = $overrideRemoteCodecConfiguration;
+    $override = $overrideRemoteCodecConfiguration;
     $viewDataEncoderSettings = false;
   };
 
@@ -66,8 +69,8 @@
     $passAccessToken = passToken;
     $includeCredentials = includeCreds;
     $dataConverterPort = port;
-    $overrideRemoteCodecConfiguration = override;
     $viewDataEncoderSettings = false;
+    $overrideRemoteCodecConfiguration = $override;
 
     if ($page.url.pathname.endsWith('history')) {
       $refresh = Date.now();
@@ -80,9 +83,9 @@
     use:clickOutside
     on:click-outside={() => ($viewDataEncoderSettings = false)}
     in:fly={{ y: -50, delay: 0, duration: 500 }}
-    class="relative w-full h-auto p-12 bg-blue-50 border-b border-blue-100 flex flex-col gap-6"
+    class="relative flex h-auto w-full flex-col gap-6 border-b border-blue-100 bg-blue-50 p-12"
   >
-    <div class="w-full xl:w-1/2 flex flex-col gap-4">
+    <div class="flex w-full flex-col gap-4 xl:w-1/2">
       <div class="flex items-center justify-between space-x-2">
         <h3 data-testid="data-encoder-title" class="text-xl">
           {translate('codec-server')}
@@ -99,7 +102,7 @@
       </p>
       <Accordion
         data-testid="override-accordion"
-        title={override
+        title={$override
           ? translate('data-encoder', 'browser-override-description', {
               level: namespaceOrCluster,
             })
@@ -107,42 +110,28 @@
               level: namespaceOrCluster,
             })}
       >
-        <div class="flex flex-col gap-2">
-          <label
-            class="flex flex-row items-center gap-2 cursor-pointer"
-            for="use-configuration-endpoint-radio"
-          >
-            <input
-              on:click={() => (override = false)}
-              class="w-4 h-4 accent-gray-900"
-              type="radio"
-              checked={!override}
-              name="use-configuration-endpoint"
-              id="use-configuration-endpoint-radio"
-              data-testid="use-configuration-endpoint-input"
-            />
-            {translate('data-encoder', 'no-browser-override-description', {
+        <RadioGroup name="override" group={override}>
+          <RadioInput
+            id="use-configuration-endpoint-radio"
+            data-testid="use-configuration-endpoint-input"
+            value={false}
+            label={translate(
+              'data-encoder',
+              'no-browser-override-description',
+              {
+                level: namespaceOrCluster,
+              },
+            )}
+          />
+          <RadioInput
+            id="use-local-endpoint-radio"
+            data-testid="use-local-endpoint-input"
+            value={true}
+            label={translate('data-encoder', 'browser-override-description', {
               level: namespaceOrCluster,
             })}
-          </label>
-          <label
-            class="flex flex-row items-center gap-2 cursor-pointer"
-            for="use-local-endpoint-radio"
-          >
-            <input
-              on:click={() => (override = true)}
-              class="w-4 h-4 accent-gray-900"
-              type="radio"
-              checked={override}
-              name="use-local-endpoint"
-              id="use-local-endpoint-radio"
-              data-testid="use-local-endpoint-input"
-            />
-            {translate('data-encoder', 'browser-override-description', {
-              level: namespaceOrCluster,
-            })}
-          </label>
-        </div>
+          />
+        </RadioGroup>
       </Accordion>
       <CodecEndpointSettings
         bind:endpoint
@@ -153,7 +142,7 @@
       <DataConverterPortSettings bind:port />
       <div class="flex items-center gap-4">
         <Button
-          disabled={Boolean(error) || (override && !endpoint)}
+          disabled={Boolean(error)}
           data-testid="confirm-data-encoder-button"
           on:click={onConfirm}
           type="submit">{translate('apply')}</Button

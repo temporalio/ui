@@ -1,6 +1,6 @@
 <script lang="ts">
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  
+
   import ArrowDown from './arrow-down.svelte';
   import ArrowLeft from './arrow-left.svelte';
   import ArrowRight from './arrow-right.svelte';

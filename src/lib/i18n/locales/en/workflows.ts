@@ -30,11 +30,9 @@ export const Strings = {
   'batch-operation-confirmation-input-hint':
     'If you supply a custom reason, "{{placeholder}}" will be appended to it.',
   'batch-terminate-all-success':
-    'The batch $t(terminate) request is processing in the background.',
+    'The batch terminate request is processing in the background.',
   'batch-cancel-all-success':
-    'The batch $t(cancel) request is processing in the background.',
-  'batch-terminate-success': 'Successfully $t(terminated) {{count}} workflows.',
-  'batch-cancel-success': 'Successfully $t(canceled) {{count}} workflows.',
+    'The batch cancel request is processing in the background.',
   'configure-workflows': 'Configure Workflow List',
   'open-configure-workflows': 'Open workflow list configuration',
   'close-configure-workflows': 'Close workflow list configuration',
@@ -57,14 +55,12 @@ export const Strings = {
   'select-all': 'select all {{count, number}}',
   'request-cancellation': 'Request Cancellation',
   'back-to-workflows': 'Back to Workflows',
-  'auto-refresh': 'Auto refresh',
-  'auto-refresh-tooltip': '15 second page refresh',
   input: 'Input',
   'input-and-results': 'Input and Results',
   'continued-as-new-with-input': 'Continued as New with Input',
   results: 'Results',
-  'recent-events': 'Recent Events',
-  'recent-events-view': 'Recent Events View',
+  'event-history-view': 'Event History View',
+  'event-history': 'Event History',
   history: 'History',
   compact: 'Compact',
   json: 'JSON',
@@ -80,14 +76,13 @@ export const Strings = {
     'Signaling workflows is not enabled, please contact your administrator for assistance.',
   'terminate-disabled':
     'Terminating workflows is not enabled, please contact your adminstrator for assistance.',
-  'terminate-success': 'Worklfow terminated.',
+  'terminate-success': 'Workflow terminated.',
   'cancel-success': 'Workflow canceled.',
   'signal-success': 'Workflow signaled.',
   'reset-modal-title': 'Reset Workflow',
-  'reset-reapply-type-label': 'Reapply Type',
-  'reset-reapply-all': 'All Events',
-  'reset-reapply-signals-only': 'Signals Only',
-  'reset-reapply-none': 'None',
+  'reset-event-radio-group-description': 'Choose an Event to reset to',
+  'reset-reapply-type-label':
+    'Reapply Signals that happened after the Reset point',
   'cancel-modal-title': 'Cancel Workflow',
   'cancel-modal-confirmation':
     'Are you sure you want to cancel this workflow? This action cannot be undone.',
@@ -205,7 +200,8 @@ export const Strings = {
     'Try adjusting or clearing the filters to see the Workflows running on this Namespace.',
   'workflow-query-error-state': 'There is an error with filtering Workflows.',
   'workflow-empty-state-title': 'No Workflows running in this Namespace',
-  'workflow-empty-state-description': `You can populate the WebUI with sample Workflows. You can find a complete list of executable code samples in`,
+  'workflow-empty-state-description':
+    'You can populate the Web UI with sample Workflows. You can find a complete list of executable code samples at',
   'visibility-disabled-archival':
     'This namespace is currently enabled for archival but visibility is not enabled.',
   'archival-link-preface': 'To enable ',

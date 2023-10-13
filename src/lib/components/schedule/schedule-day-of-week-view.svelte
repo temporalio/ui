@@ -1,7 +1,7 @@
 <script lang="ts">
   import DayOfWeekPicker from '$lib/holocene/day-of-week-picker.svelte';
   import { translate } from '$lib/i18n/translate';
-  
+
   import SchedulesTimeView from './schedules-time-view.svelte';
 
   export let daysOfWeek: string[];

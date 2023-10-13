@@ -19,12 +19,15 @@
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
 
+  let screenWidth: number;
+
   $: namespace = $page.params.namespace;
   $: pathNameSplit = $page.url.pathname.split('/');
   $: showNamespaceSpecificNav =
     namespace &&
     (pathNameSplit.includes('workflows') ||
       pathNameSplit.includes('schedules') ||
+      pathNameSplit.includes('batch-operations') ||
       pathNameSplit.includes('task-queues'));
 
   let showProfilePic = true;
@@ -40,8 +43,10 @@
   };
 </script>
 
+<svelte:window bind:innerWidth={screenWidth} />
+
 <nav
-  class="sticky top-0 z-30 flex flex-col md:flex-row w-full items-center justify-end border-b-2 bg-gray-100 p-1 px-4 md:px-8"
+  class="sticky top-0 z-30 flex w-full flex-col items-center justify-end border-b-2 bg-gray-100 p-1 px-4 md:flex-row md:px-8"
   data-testid="top-nav"
   class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
   aria-label={translate('main')}
@@ -64,7 +69,7 @@
     {/if}
   </div>
   <div class="flex items-center gap-2">
-    <TimezoneSelect />
+    <TimezoneSelect position={screenWidth < 768 ? 'left' : 'right'} />
     {#if showNamespaceSpecificNav}
       <DataEncoderStatus />
     {/if}

@@ -38,7 +38,8 @@
             'border-red-700 bg-red-700 text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-red-200/50 [&:not(:disabled):hover]:border-white focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-red-200/50',
           ghost:
             'border-[transparent] bg-[transparent] text-gray-600 [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-indigo-100 [&:not(:disabled):hover]:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:bg-indigo-100 focus-visible:border-indigo-600',
-          'table-header': 'border-gray-900 bg-gray-900 text-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:border-white',
+          'table-header':
+            'border-gray-900 bg-gray-900 text-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:border-white',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',
@@ -80,6 +81,7 @@
     HTMLAnchorAttributes & {
       href: string;
       target?: HTMLAnchorAttributes['target'];
+      disabled?: never;
     };
 
   type ButtonStyles = VariantProps<typeof buttonStyles>;
@@ -105,7 +107,7 @@
   this={href ? 'a' : 'button'}
   {target}
   {href}
-  {disabled}
+  disabled={href ? null : disabled}
   {id}
   role="button"
   type="button"
@@ -136,5 +138,9 @@
 <style lang="postcss">
   .active {
     @apply bg-indigo-100;
+  }
+
+  a[type='button'] {
+    appearance: none;
   }
 </style>

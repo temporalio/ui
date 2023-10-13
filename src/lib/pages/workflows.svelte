@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  
+
   import { page } from '$app/stores';
-  
+
   import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
@@ -42,7 +42,7 @@
   });
 </script>
 
-<header class="mb-2 flex justify-between items-center">
+<header class="mb-2 flex items-center justify-between">
   <div>
     <h1 class="text-2xl" data-testid="namespace-title">
       {translate('workflows', 'recent-workflows')}

@@ -1,6 +1,5 @@
 <script lang="ts">
-  
-  import Copyable from '$lib/holocene/copyable.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';

@@ -72,7 +72,7 @@
           {@const last = item === filteredList[filteredList.length - 1]}
           <div class="link-item" class:first class:last>
             <button
-              class="w-full p-3 text-left truncate"
+              class="w-full truncate p-3 text-left"
               on:click={() => item?.onClick(item.namespace)}
             >
               {item.namespace}

@@ -27,7 +27,7 @@
     Welcome back.
   </h1>
   <p class="my-7" data-testid="login-info">Let's get you signed in.</p>
-  <div class="mx-auto">
+  <div class="flex items-center justify-center">
     <Button
       data-testid="login-button"
       leadingIcon="lock"

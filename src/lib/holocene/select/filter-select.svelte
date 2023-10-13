@@ -1,12 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   import type { SelectOptionValue } from '$lib/types/global';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  
+
   import Option from './simple-option.svelte';
   import Select from './simple-select.svelte';
-  
 
   export let label: string;
   export let value: SelectOptionValue;

@@ -17,12 +17,11 @@
   .meter > span {
     @apply relative block h-full overflow-hidden bg-blue-500;
 
-    background-image:
-      linear-gradient(
-        center bottom,
-        rgb(96 165 250) 32%,
-        rgb(59 130 246) 77%
-      );
+    background-image: linear-gradient(
+      center bottom,
+      rgb(96 165 250) 32%,
+      rgb(59 130 246) 77%
+    );
     box-shadow:
       inset 0 2px 9px rgb(255 255 255 / 25%),
       inset 0 -2px 6px rgb(0 0 0 / 40%);
@@ -31,18 +30,17 @@
   .meter > span::after {
     @apply absolute top-0 left-0 bottom-0 right-0 overflow-hidden;
 
-    content: "";
-    background-image:
-      linear-gradient(
-        -45deg,
-        rgb(255 255 255 / 20%) 25%,
-        transparent 25%,
-        transparent 50%,
-        rgb(255 255 255 / 20%) 50%,
-        rgb(255 255 255 / 20%) 75%,
-        transparent 75%,
-        transparent
-      );
+    content: '';
+    background-image: linear-gradient(
+      -45deg,
+      rgb(255 255 255 / 20%) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgb(255 255 255 / 20%) 50%,
+      rgb(255 255 255 / 20%) 75%,
+      transparent 75%,
+      transparent
+    );
     z-index: 1;
     background-size: 25px 25px;
     animation: move 1.5s linear infinite;

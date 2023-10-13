@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Copyable from '$lib/holocene/copyable.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { format } from '$lib/utilities/format-camel-case';
@@ -32,7 +32,7 @@
 >
   {#if typeof value === 'object'}
     <div
-      class="flex w-full flex-wrap items-center pr-1 xl:flex-nowrap xl:gap-4"
+      class="flex w-full flex-wrap items-center justify-between gap-1 pr-1 xl:flex-nowrap xl:gap-4"
     >
       <p class="min-w-fit text-sm">
         {format(key)}
@@ -47,12 +47,12 @@
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <div class="text-sm truncate">
+      <div class="truncate text-sm">
         <Copyable
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class="xl:flex-row h-12 pr-1"
+          container-class="xl:flex-row"
         >
           <Link
             class="truncate"
@@ -71,12 +71,12 @@
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="truncate text-sm">{format(key)}</p>
-      <div class="text-sm truncate">
+      <div class="truncate text-sm">
         <Copyable
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class="xl:flex-row h-12 pr-1"
+          container-class="xl:flex-row"
         >
           <Link
             class="truncate"
@@ -95,12 +95,11 @@
   {:else if shouldDisplayAsTaskQueueLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <div class="text-sm truncate">
+      <div class="truncate text-sm">
         <Copyable
           copyIconTitle={translate('copy-icon-title')}
           copySuccessIconTitle={translate('copy-success-icon-title')}
           content={value}
-          container-class="h-12 pr-1"
         >
           <Link
             class="truncate"

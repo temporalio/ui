@@ -25,7 +25,7 @@ describe('getDateFilterValue', () => {
     const showElapsed = 'false';
     const options = { compact, sortOrder, showElapsed };
 
-    const value = `ascending:false`;
+    const value = 'ascending:false';
     expect(getDateFilterValue(options)).toBe(value);
   });
 
@@ -35,7 +35,7 @@ describe('getDateFilterValue', () => {
     const showElapsed = 'true';
     const options = { compact, sortOrder, showElapsed };
 
-    const value = `descending:true`;
+    const value = 'descending:true';
     expect(getDateFilterValue(options)).toBe(value);
   });
 
@@ -46,7 +46,7 @@ describe('getDateFilterValue', () => {
     const showElapsed = 'true';
     const options = { compact, sortOrder, showElapsed };
 
-    const value = `ascending:true`;
+    const value = 'ascending:true';
     expect(getDateFilterValue(options)).toBe(value);
   });
 
@@ -56,7 +56,7 @@ describe('getDateFilterValue', () => {
     const showElapsed = 'false';
     const options = { compact, sortOrder, showElapsed };
 
-    const value = `ascending:false`;
+    const value = 'ascending:false';
     expect(getDateFilterValue(options)).toBe(value);
   });
 
@@ -67,7 +67,7 @@ describe('getDateFilterValue', () => {
     const showElapsed = 'true';
     const options = { compact, sortOrder, showElapsed };
 
-    const value = `ascending:true`;
+    const value = 'ascending:true';
     expect(getDateFilterValue(options)).toBe(value);
   });
 });

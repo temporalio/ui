@@ -13,7 +13,7 @@ const settings = settingsFixture as unknown as Settings;
 const accessToken = 'access-token';
 
 describe('toDecodedPendingActivities', () => {
-  it(`should decode heartbeatDetails`, async () => {
+  it('should decode heartbeatDetails', async () => {
     const workflow = pendingActivityWorkflow as unknown as WorkflowExecution;
     const decodedHeartbeatDetails = await toDecodedPendingActivities(
       workflow,

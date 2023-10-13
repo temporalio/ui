@@ -1,3 +1,4 @@
+import * as Batch from './batch';
 import * as Common from './common';
 import * as DataEncoder from './data-encoder';
 import * as Events from './events';
@@ -10,6 +11,7 @@ import * as Workflows from './workflows';
 export const EN = 'en' as const;
 
 export const English = {
+  [Batch.Namespace]: Batch.Strings,
   [Common.Namespace]: Common.Strings,
   [Workflows.Namespace]: Workflows.Strings,
   [TypedErrors.Namespace]: TypedErrors.Strings,

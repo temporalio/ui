@@ -5,7 +5,6 @@
   import { translate } from '$lib/i18n/translate';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { routeForEventHistoryImport } from '$lib/utilities/route-for';
-  
 </script>
 
 <section id="event-history">
@@ -21,7 +20,7 @@
     </div>
   </nav>
   <nav
-    class="my-4 flex items-end justify-end gap-4"
+    class="flex items-end justify-end gap-4"
     aria-label={translate('events', 'event-history-view')}
   >
     <div id="event-view-toggle" class="flex gap-4 bg-white">

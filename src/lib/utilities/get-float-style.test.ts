@@ -6,7 +6,7 @@ describe('getFloatStyle', () => {
   it('should return a style string for a width/height and screenWidth over default breakpoint', () => {
     const dimensions = {
       width: 390,
-      height: 82,
+      height: 96,
       screenWidth: 1400,
     };
     const style = 'position: absolute; right: 410px; top: -96px';
@@ -15,7 +15,7 @@ describe('getFloatStyle', () => {
   it('should return a style string for a width/height and screenWidth over custom breakpoint', () => {
     const dimensions = {
       width: 390,
-      height: 82,
+      height: 96,
       screenWidth: 1400,
       breakpoint: 900,
     };

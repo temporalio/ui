@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { writable } from 'svelte/store';
+
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
@@ -12,17 +14,21 @@
   import Loading from '$lib/holocene/loading.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Modal from '$lib/holocene/modal.svelte';
+  import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
+  import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     deleteSchedule,
     fetchSchedule,
     pauseSchedule,
+    triggerImmediately,
     unpauseSchedule,
   } from '$lib/services/schedule-service';
   import { coreUserStore } from '$lib/stores/core-user';
   import { loading } from '$lib/stores/schedules';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import type { OverlapPolicy } from '$lib/types/schedule';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { formatDate } from '$lib/utilities/format-date';
   import {
@@ -43,9 +49,53 @@
   let scheduleFetch = fetchSchedule(parameters);
 
   let pauseConfirmationModalOpen = false;
+  let triggerConfirmationModalOpen = false;
   let deleteConfirmationModalOpen = false;
   let reason = '';
   let error = '';
+  let triggerLoading = false;
+  let overlapPolicy = writable<OverlapPolicy>('Unspecified');
+  let policies: { label: string; description: string; value: OverlapPolicy }[] =
+    [
+      {
+        description: translate('schedules', 'trigger-unspecified-description'),
+        label: translate('schedules', 'trigger-unspecified-title'),
+        value: 'Unspecified',
+      },
+      {
+        description: translate('schedules', 'trigger-allow-all-description'),
+        label: translate('schedules', 'trigger-allow-all-title'),
+        value: 'AllowAll',
+      },
+      {
+        description: translate('schedules', 'trigger-skip-description'),
+        label: translate('schedules', 'trigger-skip-title'),
+        value: 'Skip',
+      },
+      {
+        description: translate('schedules', 'trigger-buffer-one-description'),
+        label: translate('schedules', 'trigger-buffer-one-title'),
+        value: 'BufferOne',
+      },
+      {
+        description: translate('schedules', 'trigger-buffer-all-description'),
+        label: translate('schedules', 'trigger-buffer-all-title'),
+        value: 'BufferAll',
+      },
+      {
+        description: translate('schedules', 'trigger-cancel-other-description'),
+        label: translate('schedules', 'trigger-cancel-other-title'),
+        value: 'CancelOther',
+      },
+      {
+        description: translate(
+          'schedules',
+          'trigger-terminate-other-description',
+        ),
+        label: translate('schedules', 'trigger-terminate-other-title'),
+        value: 'TerminateOther',
+      },
+    ];
 
   let coreUser = coreUserStore();
   let editDisabled = $coreUser.namespaceWriteDisabled(namespace);
@@ -86,6 +136,20 @@
     pauseConfirmationModalOpen = false;
   };
 
+  const handleTriggerImmediately = async () => {
+    triggerLoading = true;
+    await triggerImmediately({
+      namespace,
+      scheduleId,
+      overlapPolicy: $overlapPolicy,
+    });
+    setTimeout(() => {
+      scheduleFetch = fetchSchedule(parameters, fetch);
+      triggerConfirmationModalOpen = false;
+      triggerLoading = false;
+    }, 1000);
+  };
+
   const resetReason = () => {
     reason = '';
   };
@@ -93,12 +157,17 @@
 
 {#await scheduleFetch}
   <header class="mb-8">
-    <div class="flex flex-col gap-1 relative">
-      <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+    <div class="relative flex flex-col gap-1">
+      <Link
+        on:click={() => {
+          goto(routeForSchedules({ namespace }));
+        }}
+        icon="chevron-left"
+      >
         {translate('schedules', 'back-to-schedules')}
       </Link>
       <h1
-        class="text-2xl mt-8 font-medium select-all"
+        class="mt-8 select-all text-2xl font-medium"
         data-testid="schedule-name"
       >
         {scheduleId}
@@ -113,24 +182,25 @@
   {#if $loading}
     <Loading title={translate('schedules', 'deleting')} class="my-2" />
   {:else}
-    <header class="flex flex-row justify-between gap-4 mb-8">
-      <div class="flex flex-col gap-1 relative">
-        <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+    <header class="mb-8 flex flex-row justify-between gap-4">
+      <div class="relative flex flex-col gap-4">
+        <Link
+          on:click={() => {
+            goto(routeForSchedules({ namespace }));
+          }}
+          icon="chevron-left"
+        >
           {translate('schedules', 'back-to-schedules')}
         </Link>
-        <h1 class="text-2xl flex relative items-center gap-4 mt-8">
-          <WorkflowStatus
-            status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
-          />
-          <span class="font-medium select-all" data-testid="schedule-name">
+        <h1 class="relative mt-4 flex items-center text-2xl">
+          <span class="select-all font-medium" data-testid="schedule-name">
             {scheduleId}
           </span>
         </h1>
-        <div class="flex items-center gap-2 text-sm">
-          <p>
-            {namespace}
-          </p>
-          <div class="w-1 h-1 rounded-full bg-gray-900" />
+        <div class="flex items-center gap-2 text-lg">
+          <WorkflowStatus
+            status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
+          />
           <p>
             {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
           </p>
@@ -167,6 +237,12 @@
         on:click={() => (pauseConfirmationModalOpen = true)}
       >
         <MenuItem
+          data-testid="trigger-schedule"
+          on:click={() => (triggerConfirmationModalOpen = true)}
+        >
+          {translate('schedules', 'trigger')}
+        </MenuItem>
+        <MenuItem
           data-testid="edit-schedule"
           href={routeForScheduleEdit({ namespace, scheduleId })}
         >
@@ -187,8 +263,8 @@
           <ScheduleError error={schedule?.info?.invalidScheduleError} />
         </div>
       {/if}
-      <div class="flex flex-col xl:flex-row gap-4">
-        <div class="w-full flex flex-col items-start gap-4 xl:w-2/3">
+      <div class="flex flex-col gap-4 xl:flex-row">
+        <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
           <ScheduleRecentRuns
             {namespace}
             recentRuns={schedule?.info?.recentActions}
@@ -244,11 +320,42 @@
             : translate('schedules', 'pause-reason')}
         </p>
         <input
-          class="block w-full border border-gray-200 rounded-md p-2 mt-4"
+          class="mt-4 block w-full rounded-md border border-gray-200 p-2"
           placeholder={translate('reason')}
           bind:value={reason}
           on:keydown|stopPropagation
         />
+      </div>
+    </Modal>
+    <Modal
+      id="trigger-schedule-modal"
+      large
+      bind:open={triggerConfirmationModalOpen}
+      confirmType="primary"
+      confirmText={translate('schedules', 'trigger')}
+      cancelText={translate('cancel')}
+      loading={triggerLoading}
+      on:confirmModal={() => handleTriggerImmediately()}
+      on:cancelModal={() => (triggerConfirmationModalOpen = false)}
+    >
+      <h3 slot="title">
+        {translate('schedules', 'trigger-modal-title')}
+      </h3>
+      <div slot="content">
+        <RadioGroup
+          group={overlapPolicy}
+          name="trigger-event-id"
+          class="h-auto overflow-auto"
+        >
+          {#each policies as policy}
+            <RadioInput
+              id={policy.value}
+              value={policy.value}
+              label={policy.label}
+              description={policy.description}
+            />
+          {/each}
+        </RadioGroup>
       </div>
     </Modal>
     <Modal
@@ -273,12 +380,17 @@
   {/if}
 {:catch error}
   <header class="mb-8">
-    <div class="flex flex-col gap-1 relative">
-      <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+    <div class="relative flex flex-col gap-1">
+      <Link
+        on:click={() => {
+          goto(routeForSchedules({ namespace }));
+        }}
+        icon="chevron-left"
+      >
         {translate('schedules', 'back-to-schedules')}
       </Link>
       <h1
-        class="text-2xl mt-8 font-medium select-all"
+        class="mt-8 select-all text-2xl font-medium"
         data-testid="schedule-name"
       >
         {scheduleId}

@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Copyable from '$lib/holocene/copyable.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { format } from '$lib/utilities/format-camel-case';
@@ -51,8 +51,8 @@
           <p class="text-sm">Stack trace</p>
           <CodeBlock
             content={stackTrace}
-            class="mb-2 h-full lg:pr-2"
             language="text"
+            class="mb-2 h-full lg:pr-2"
             copyIconTitle={translate('copy-icon-title')}
             copySuccessIconTitle={translate('copy-success-icon-title')}
           />

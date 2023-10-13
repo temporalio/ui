@@ -1,9 +1,8 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
-  
+
   import { afterUpdate, onDestroy } from 'svelte';
-  
-  
+
   import Chip from '$lib/holocene/chip.svelte';
 
   export let id: string;
