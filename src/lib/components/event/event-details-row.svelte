@@ -39,11 +39,7 @@
       <p class="min-w-fit text-sm">
         {format(key)}
       </p>
-      <PayloadDecoder
-        {value}
-        key={value?.payloads ? 'payloads' : ''}
-        let:decodedValue
-      >
+      <PayloadDecoder {value} key="payloads" let:decodedValue>
         <CodeBlock
           content={decodedValue}
           {inline}
