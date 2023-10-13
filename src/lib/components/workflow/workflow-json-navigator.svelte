@@ -83,21 +83,25 @@
     <slot name="decode" />
   </div>
   {#if decodeEventHistory}
-    <PayloadDecoder value={events[index - 1]} let:decodedValue>
+    {#key index}
+      <PayloadDecoder value={events[index - 1]} let:decodedValue>
+        <CodeBlock
+          content={decodedValue}
+          testId="event-history-json"
+          copyIconTitle={translate('copy-icon-title')}
+          copySuccessIconTitle={translate('copy-success-icon-title')}
+        />
+      </PayloadDecoder>
+    {/key}
+  {:else}
+    {#key index}
       <CodeBlock
-        content={decodedValue}
+        content={stringifyWithBigInt(events[index - 1], undefined, 2)}
         testId="event-history-json"
         copyIconTitle={translate('copy-icon-title')}
         copySuccessIconTitle={translate('copy-success-icon-title')}
       />
-    </PayloadDecoder>
-  {:else}
-    <CodeBlock
-      content={stringifyWithBigInt(events[index - 1], undefined, 2)}
-      testId="event-history-json"
-      copyIconTitle={translate('copy-icon-title')}
-      copySuccessIconTitle={translate('copy-success-icon-title')}
-    />
+    {/key}
   {/if}
 {/if}
 

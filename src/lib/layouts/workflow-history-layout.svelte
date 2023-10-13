@@ -35,10 +35,6 @@
     $namespaces,
   );
 
-  $: {
-    console.log('Results: ', workflowEvents.results);
-  }
-
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {
       $page.url.searchParams.delete('page');
