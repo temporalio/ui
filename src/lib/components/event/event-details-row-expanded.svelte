@@ -41,7 +41,6 @@
       <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
         <p class="text-sm">{format(key)}</p>
         {#if value?.payloads}
-          {(console.log({ attributes }), '')}
           <PayloadDecoder {value} key="payloads" let:decodedValue>
             <CodeBlock
               content={decodedValue}
