@@ -122,6 +122,7 @@
         break;
       default:
         break;
+      case 'Enter':
     }
   }
 </script>

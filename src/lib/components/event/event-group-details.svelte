@@ -14,8 +14,9 @@
 
   export let eventGroup: EventGroup;
   export let selectedId: string;
+  export let onGroupClick: (id: string) => void;
 
-  const onGroupClick = (id: string) => {
+  const handleGroupClick = (id: string) => {
     const { namespace, workflow, run } = $page.params;
     const queryParams: Record<string, string> = {};
     $page.url.searchParams.forEach((value, key) => {
@@ -28,6 +29,7 @@
       run,
     });
     goto(`${route}#${id}`, { noScroll: true });
+    onGroupClick(id);
   };
 </script>
 
@@ -40,7 +42,7 @@
         class:failure={eventOrGroupIsFailureOrTimedOut(eventInGroup)}
         class:canceled={eventOrGroupIsCanceled(eventInGroup)}
         class:terminated={eventOrGroupIsTerminated(eventInGroup)}
-        on:click|preventDefault|stopPropagation={() => onGroupClick(id)}
+        on:click|preventDefault|stopPropagation={() => handleGroupClick(id)}
       >
         <td class="w-1/12" />
         <td class="w-24">
