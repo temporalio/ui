@@ -13,7 +13,6 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { authUser } from '$lib/stores/auth-user';
   import { eventViewType } from '$lib/stores/event-view';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
@@ -122,7 +121,6 @@
                 workflowId: decodeURIForSvelte($workflowRun.workflow?.id),
                 runId: decodeURIForSvelte($workflowRun.workflow?.runId),
                 settings: $page.data.settings,
-                accessToken: $authUser?.accessToken,
               })}>{translate('workflows', 'download')}</ToggleButton
           >
         </ToggleButtons>

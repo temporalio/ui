@@ -4,6 +4,7 @@
   import { page } from '$app/stores';
 
   import { authUser } from '$lib/stores/auth-user';
+  import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
   import {
     cloneAllPotentialPayloadsWithCodec,
     decodePayloadAttributes,
@@ -16,7 +17,7 @@
   } from '$lib/utilities/get-codec';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  export let value: PotentiallyDecodable;
+  export let value: PotentiallyDecodable | EventAttribute | WorkflowEvent;
   export let key = '';
 
   $: endpoint = getCodecEndpoint($page.data.settings);

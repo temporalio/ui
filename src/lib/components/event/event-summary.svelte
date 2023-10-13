@@ -8,7 +8,6 @@
   import { groupEvents } from '$lib/models/event-groups';
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { fetchAllEvents } from '$lib/services/events-service';
-  import { authUser } from '$lib/stores/auth-user';
   import {
     eventFilterSort,
     type EventSortOrder,
@@ -43,14 +42,11 @@
     runId: string,
     sort: EventSortOrder,
   ) => {
-    const { settings } = $page.data;
     resetFullHistory();
     $fullEventHistory = await fetchAllEvents({
       namespace,
       workflowId,
       runId,
-      settings,
-      accessToken: $authUser?.accessToken,
       sort: compact ? 'ascending' : sort,
     });
     loading = false;

@@ -22,8 +22,6 @@ describe('dataEncoder', () => {
     expect(get(dataEncoder)).toEqual({
       accessToken: undefined,
       endpoint: '',
-      hasEndpointAndPortConfigured: false,
-      hasEndpointOrPortConfigured: false,
       hasError: false,
       hasNotRequested: true,
       hasSuccess: false,
@@ -39,8 +37,6 @@ describe('dataEncoder', () => {
     expect(get(dataEncoder)).toEqual({
       accessToken: 'abc',
       endpoint: '',
-      hasEndpointAndPortConfigured: false,
-      hasEndpointOrPortConfigured: false,
       hasError: false,
       hasNotRequested: true,
       hasSuccess: false,
@@ -56,8 +52,6 @@ describe('dataEncoder', () => {
     expect(get(dataEncoder)).toEqual({
       accessToken: 'abc',
       endpoint: '',
-      hasEndpointAndPortConfigured: false,
-      hasEndpointOrPortConfigured: false,
       hasError: false,
       hasNotRequested: true,
       hasSuccess: false,
@@ -73,8 +67,6 @@ describe('dataEncoder', () => {
     expect(get(dataEncoder)).toEqual({
       accessToken: 'abc',
       endpoint: 'https://localhost:8383',
-      hasEndpointAndPortConfigured: false,
-      hasEndpointOrPortConfigured: true,
       hasError: false,
       hasNotRequested: true,
       hasSuccess: false,

@@ -3,10 +3,7 @@ import { derived } from 'svelte/store';
 import { page } from '$app/stores';
 
 import { authUser } from './auth-user';
-import {
-  dataConverterPort,
-  lastDataConverterStatus,
-} from './data-converter-config';
+import { lastDataConverterStatus } from './data-converter-config';
 import {
   codecEndpoint,
   lastDataEncoderStatus,
@@ -23,8 +20,6 @@ type DataEncoder = {
   hasNotRequested: boolean;
   hasError: boolean;
   hasSuccess: boolean;
-  hasEndpointAndPortConfigured: boolean;
-  hasEndpointOrPortConfigured: boolean;
 };
 
 export const dataEncoder = derived(
@@ -33,7 +28,6 @@ export const dataEncoder = derived(
     codecEndpoint,
     overrideRemoteCodecConfiguration,
     lastDataEncoderStatus,
-    dataConverterPort,
     lastDataConverterStatus,
     authUser,
   ],
@@ -42,7 +36,6 @@ export const dataEncoder = derived(
     $codecEndpoint,
     $overrideRemoteCodecConfiguration,
     $lastDataEncoderStatus,
-    $dataConverterPort,
     $lastDataConverterStatus,
     $authUser,
   ]): DataEncoder => {
@@ -67,10 +60,6 @@ export const dataEncoder = derived(
     const hasSuccess = endpoint
       ? $lastDataEncoderStatus === 'success'
       : $lastDataConverterStatus === 'success';
-    const hasEndpointAndPortConfigured = Boolean(
-      endpoint && $dataConverterPort,
-    );
-    const hasEndpointOrPortConfigured = Boolean(endpoint || $dataConverterPort);
 
     return {
       namespace,
@@ -82,8 +71,6 @@ export const dataEncoder = derived(
       hasNotRequested,
       hasError,
       hasSuccess,
-      hasEndpointAndPortConfigured,
-      hasEndpointOrPortConfigured,
     };
   },
 );

@@ -5,6 +5,7 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { Payloads } from '$lib/types';
   import { format } from '$lib/utilities/format-camel-case';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
@@ -21,7 +22,7 @@
   import PayloadDecoder from './payload-decoder.svelte';
 
   export let key: string;
-  export let value: string | Record<string, unknown>;
+  export let value: string | Record<string, unknown> | Payloads;
   export let attributes: CombinedAttributes;
   export let inline = false;
 

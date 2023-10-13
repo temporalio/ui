@@ -14,7 +14,6 @@ import type {
 } from '$lib/types/events';
 import {
   convertPayloadToJsonWithCodec,
-  convertPayloadToJsonWithWebsocket,
   type DecodeFunctions,
   decodePayloadAttributes,
 } from '$lib/utilities/decode-payload';
@@ -35,7 +34,6 @@ export async function getEventAttributes(
   { historyEvent, namespace, settings, accessToken }: EventWithMetadata,
   {
     convertWithCodec = convertPayloadToJsonWithCodec,
-    convertWithWebsocket = convertPayloadToJsonWithWebsocket,
     decodeAttributes = decodePayloadAttributes,
     encoderEndpoint = codecEndpoint,
     codecPassAccessToken = passAccessToken,
@@ -63,14 +61,12 @@ export async function getEventAttributes(
     },
   };
 
-  const convertedAttributes = endpoint
-    ? await convertWithCodec({
-        attributes,
-        namespace,
-        settings: _settings,
-        accessToken,
-      })
-    : await convertWithWebsocket(attributes);
+  const convertedAttributes = await convertWithCodec({
+    attributes,
+    namespace,
+    settings: _settings,
+    accessToken,
+  });
 
   const decodedAttributes = decodeAttributes(convertedAttributes) as object;
 

@@ -2,7 +2,12 @@
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import type { Payload } from '$lib/types/events';
+  import type { PotentiallyDecodable } from '$lib/utilities/decode-payload';
+  import {
+    parseWithBigInt,
+    stringifyWithBigInt,
+  } from '$lib/utilities/parse-with-big-int';
 
   import PayloadDecoder from '../event/payload-decoder.svelte';
 
@@ -10,13 +15,30 @@
   export let title: string;
 
   $: parsedContent = parseContent(content);
-  $: showParsedContent = parsedContent.length > 0;
-  $: showParsedContentCount = parsedContent.length > 1;
+  $: payloads = getPayloads(parsedContent);
+  $: showParsedContent = payloads.length > 0;
+  $: showParsedContentCount = payloads.length > 1;
 
-  const parseContent = (c: string): unknown[] => {
+  const parseContent = (c: string): PotentiallyDecodable | undefined => {
     try {
-      const result = JSON.parse(c);
-      return Array.isArray(result) ? result : [];
+      return parseWithBigInt(c);
+    } catch {
+      return undefined;
+    }
+  };
+
+  const parsePayloads = (c: string): unknown[] => {
+    try {
+      return parseWithBigInt(c);
+    } catch {
+      return [];
+    }
+  };
+
+  const getPayloads = (value: PotentiallyDecodable | undefined): Payload[] => {
+    try {
+      const payloads = value?.payloads;
+      return Array.isArray(payloads) ? payloads : [];
     } catch {
       return [];
     }
@@ -27,28 +49,24 @@
   <h3 class="mb-2 flex items-center gap-2 text-lg">
     {title}
     {#if showParsedContentCount}
-      <Badge type="count" class="rounded-sm">{parsedContent.length}</Badge>
+      <Badge type="count" class="rounded-sm">{payloads.length}</Badge>
     {/if}
   </h3>
   {#if content}
     <div class="flex h-full flex-col overflow-scroll lg:max-h-[24rem]">
       {#if showParsedContent}
-        {#each parsedContent as content}
-          <PayloadDecoder value={content} key="payloads" let:decodedValue>
+        <PayloadDecoder value={parsedContent} key="payloads" let:decodedValue>
+          {#each parsePayloads(decodedValue) as decodedContent}
             <CodeBlock
-              content={decodedValue}
+              content={stringifyWithBigInt(decodedContent)}
               class="mb-2"
               copyIconTitle={translate('copy-icon-title')}
               copySuccessIconTitle={translate('copy-success-icon-title')}
             />
-          </PayloadDecoder>
-        {/each}
+          {/each}
+        </PayloadDecoder>
       {:else}
-        <PayloadDecoder
-          value={parseWithBigInt(content)}
-          key="payloads"
-          let:decodedValue
-        >
+        <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
           <CodeBlock
             content={decodedValue}
             class="mb-2 lg:max-h-[23.5rem]"
