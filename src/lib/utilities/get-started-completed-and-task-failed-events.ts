@@ -123,7 +123,11 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
     } else if (isCompletedTaskEvent(event)) {
       hasCompletedTaskEvent = true;
       continue;
-    } else if (!hasCompletedTaskEvent && isFailedTaskEvent(event)) {
+    } else if (
+      !workflowTaskFailedEvent &&
+      !hasCompletedTaskEvent &&
+      isFailedTaskEvent(event)
+    ) {
       workflowTaskFailedEvent = event;
       continue;
     }
