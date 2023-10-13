@@ -20,7 +20,6 @@
   import { formatDate } from '$lib/utilities/format-date';
   import {
     isDateTimeFilter,
-    isStatusFilter,
     isTextFilter,
   } from '$lib/utilities/query/filter-search';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
@@ -53,9 +52,7 @@
 
   let totalFiltersInView = 5;
 
-  $: visibleFilters = $workflowFilters
-    .filter((f) => !isStatusFilter(f.attribute))
-    .slice(0, totalFiltersInView);
+  $: visibleFilters = $workflowFilters.slice(0, totalFiltersInView);
   $: hasMoreFilters = totalFiltersInView < $workflowFilters.length;
 
   const viewMoreFilters = () => {

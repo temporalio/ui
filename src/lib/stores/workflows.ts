@@ -1,5 +1,5 @@
 import type { StartStopNotifier } from 'svelte/store';
-import { derived, readable, writable } from 'svelte/store';
+import { derived, get, readable, writable } from 'svelte/store';
 
 import { page } from '$app/stores';
 
@@ -65,7 +65,7 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
         });
         set(workflows);
 
-        if (supportsAdvancedVisibility && !groupByCountEnabled) {
+        if (supportsAdvancedVisibility && !get(groupByCountEnabled)) {
           const workflowCount = await fetchWorkflowCount(namespace, query);
           setCounts(workflowCount);
         }

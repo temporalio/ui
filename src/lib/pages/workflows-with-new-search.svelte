@@ -218,7 +218,7 @@
         <Translate namespace="workflows" key="recent-workflows" />
       </h1>
       <div class="flex items-center gap-2 text-sm">
-        {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !groupByCountEnabled}
+        {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !$groupByCountEnabled}
           <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
             {#if $loading || $updating}
               <Translate namespace="workflows" key="loading-workflows" />
@@ -253,7 +253,7 @@
       />
     </div>
   </div>
-  {#if groupByCountEnabled}
+  {#if $groupByCountEnabled}
     <WorkflowCounts />
   {/if}
 </header>

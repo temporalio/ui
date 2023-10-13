@@ -2,7 +2,6 @@
   import { page } from '$app/stores';
 
   import { workflowFilters } from '$lib/stores/filters';
-  import { groupByCountEnabled } from '$lib/stores/group-by-enabled';
   import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
   import type { Payloads } from '$lib/types';
   import type { WorkflowStatus } from '$lib/types/workflows';
@@ -20,37 +19,35 @@
   let statusGroups: { status: WorkflowStatus; count: number }[] = [];
 
   const fetchCounts = async () => {
-    if (groupByCountEnabled) {
-      const groupByClause = 'GROUP BY ExecutionStatus';
-      const countRoute = routeForApi('workflows.count', {
-        namespace,
-      });
+    const groupByClause = 'GROUP BY ExecutionStatus';
+    const countRoute = routeForApi('workflows.count', {
+      namespace,
+    });
 
-      const query = toListWorkflowQueryFromFilters(
-        combineFilters($workflowFilters),
-      );
-      const { count, groups } = await requestFromAPI<{
-        count: string;
-        groups: { groupValues: Payloads; count: string }[];
-      }>(countRoute, {
-        params: { query: `${query} ${groupByClause}` },
-        notifyOnError: false,
-      });
-      totalCount = parseInt(count);
-      $workflowCount.totalCount = totalCount;
-      statusGroups = groups
-        .map((group) => {
-          const status = decodePayload(
-            group?.groupValues[0],
-          ) as unknown as WorkflowStatus;
-          const count = parseInt(group.count);
-          return {
-            status,
-            count,
-          };
-        })
-        .filter((s) => s.count > 0);
-    }
+    const query = toListWorkflowQueryFromFilters(
+      combineFilters($workflowFilters),
+    );
+    const { count, groups } = await requestFromAPI<{
+      count: string;
+      groups: { groupValues: Payloads; count: string }[];
+    }>(countRoute, {
+      params: { query: `${query} ${groupByClause}` },
+      notifyOnError: false,
+    });
+    totalCount = parseInt(count);
+    $workflowCount.totalCount = totalCount;
+    statusGroups = groups
+      .map((group) => {
+        const status = decodePayload(
+          group?.groupValues[0],
+        ) as unknown as WorkflowStatus;
+        const count = parseInt(group.count);
+        return {
+          status,
+          count,
+        };
+      })
+      .filter((s) => s.count > 0);
   };
 
   $: $workflowsQuery, namespace, fetchCounts();
