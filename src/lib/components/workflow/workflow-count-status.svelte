@@ -8,4 +8,9 @@
   export let count = 0;
 </script>
 
-<WorkflowStatus loading={$loading || $updating} {count} {status} />
+<WorkflowStatus
+  loading={$loading || $updating}
+  {count}
+  {status}
+  test-id="workflow-status-{status}"
+/>

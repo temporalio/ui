@@ -1,4 +1,3 @@
-import { noop } from 'svelte/internal';
 import { get } from 'svelte/store';
 
 import { v4 } from 'uuid';
@@ -87,53 +86,6 @@ export type ResetWorkflowOptions = {
 export type FetchWorkflow =
   | typeof fetchAllWorkflows
   | typeof fetchAllArchivedWorkflows;
-
-export const fetchWorkflowCount = async (
-  namespace: string,
-  query: string,
-  request = fetch,
-): Promise<{ totalCount: number; count: number }> => {
-  let totalCount = 0;
-  let count = 0;
-  try {
-    const countRoute = routeForApi('workflows.count', { namespace });
-    if (!query) {
-      const totalCountResult = await requestFromAPI<{ count: string }>(
-        countRoute,
-        {
-          params: {},
-          onError: noop,
-          handleError: noop,
-          request,
-        },
-      );
-      totalCount = parseInt(totalCountResult?.count);
-    } else {
-      const countPromise = requestFromAPI<{ count: string }>(countRoute, {
-        params: { query },
-        onError: noop,
-        handleError: noop,
-        request,
-      });
-      const totalCountPromise = requestFromAPI<{ count: string }>(countRoute, {
-        params: { query: '' },
-        onError: noop,
-        handleError: noop,
-        request,
-      });
-      const [countResult, totalCountResult] = await Promise.all([
-        countPromise,
-        totalCountPromise,
-      ]);
-      count = parseInt(countResult?.count ?? '0');
-      totalCount = parseInt(totalCountResult?.count);
-    }
-  } catch (e) {
-    // Don't fail the workflows call due to count
-  }
-
-  return { count, totalCount };
-};
 
 export const fetchAllWorkflows = async (
   namespace: string,

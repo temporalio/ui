@@ -27,6 +27,7 @@ export { mockClusterApi, CLUSTER_API } from './mocks/cluster';
 export { mockNamespaceApi, NAMESPACE_API } from './mocks/namespace';
 export { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
 export { mockSettingsApi, SETTINGS_API } from './mocks/settings';
+export { mockSystemInfoApi } from './mocks/system-info';
 
 export {
   mockSearchAttributesApi,

@@ -69,7 +69,10 @@
   );
 </script>
 
-<div class="flex text-center text-sm font-medium leading-4">
+<div
+  class="flex text-center text-sm font-medium leading-4"
+  data-testid={$$props['test-id']}
+>
   <span class={workflowStatus({ status })} class:count>
     {#if loading}
       <Spinner class="h-4 w-4 animate-spin" />

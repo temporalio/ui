@@ -4,10 +4,8 @@ import { derived, get, readable, writable } from 'svelte/store';
 import { page } from '$app/stores';
 
 import { translate } from '$lib/i18n/translate';
-import {
-  fetchAllWorkflows,
-  fetchWorkflowCount,
-} from '$lib/services/workflow-service';
+import { fetchWorkflowCount } from '$lib/services/workflow-counts';
+import { fetchAllWorkflows } from '$lib/services/workflow-service';
 import type { FilterParameters, WorkflowExecution } from '$lib/types/workflows';
 import { withLoading } from '$lib/utilities/stores/with-loading';
 
