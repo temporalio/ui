@@ -398,7 +398,7 @@ service WorkflowService {
     // GetSystemInfo returns information about the system.
     rpc GetSystemInfo(GetSystemInfoRequest) returns (GetSystemInfoResponse) {
         option (google.api.http) = {
-            get: "/api/v1/systemInfo"
+            get: "/api/v1/system-info"
         };
     }
 

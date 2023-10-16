@@ -1,5 +1,7 @@
-import { writable } from 'svelte/store';
+import { derived } from 'svelte/store';
 
-import type { GetClusterInfoResponse } from '$lib/types';
+import { page } from '$app/stores';
 
-export const cluster = writable<GetClusterInfoResponse>({});
+export const cluster = derived([page], ([$page]) => {
+  return $page.data?.cluster;
+});

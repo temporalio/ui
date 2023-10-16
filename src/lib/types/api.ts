@@ -25,6 +25,7 @@ export type NamespaceAPIRoutePath = 'namespace';
 
 export type TaskQueueAPIRoutePath = 'task-queue' | 'task-queue.compatibility';
 export type ParameterlessAPIRoutePath =
+  | 'systemInfo'
   | 'cluster'
   | 'settings'
   | 'user'

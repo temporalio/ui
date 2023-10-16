@@ -1,6 +1,7 @@
 <script lang="ts">
   import { cva } from 'class-variance-authority';
 
+  import Spinner from '$lib/holocene/icon/svg/spinner.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventClassification } from '$lib/models/event-history/get-event-classification';
   import type { ScheduleStatus } from '$lib/types/schedule';
@@ -12,6 +13,8 @@
 
   export let delay = 0;
   export let status: Status = 'Running';
+  export let count: number | undefined = undefined;
+  export let loading = false;
 
   const label: Record<Status, string> = {
     Running: translate('workflows', 'running'),
@@ -66,11 +69,25 @@
   );
 </script>
 
-<div class="flex text-center text-sm font-medium leading-4">
-  <span class={workflowStatus({ status })}>
+<div
+  class="flex text-center text-sm font-medium leading-4"
+  data-testid={$$props['test-id']}
+>
+  <span class={workflowStatus({ status })} class:count>
+    {#if loading}
+      <Spinner class="h-4 w-4 animate-spin" />
+    {:else if count}
+      {count.toLocaleString()}
+    {/if}
     {label[status]}
     {#if status === 'Running'}
       <HeartBeat {delay} />
     {/if}
   </span>
 </div>
+
+<style lang="postcss">
+  .count {
+    @apply px-1;
+  }
+</style>
