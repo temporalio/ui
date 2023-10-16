@@ -40,8 +40,9 @@ export type EventHistoryParameters = Pick<
   RouteParameters,
   'namespace' | 'workflow' | 'run' | 'view' | 'queryParams'
 >;
-export type EventParameters = Required<
-  Pick<RouteParameters, 'namespace' | 'workflow' | 'run' | 'view' | 'eventId'>
+export type EventParameters = Pick<
+  RouteParameters,
+  'namespace' | 'workflow' | 'run' | 'view' | 'eventId'
 >;
 
 export type AuthenticationParameters = {
