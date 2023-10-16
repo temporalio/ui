@@ -17,6 +17,7 @@
   export { className as class };
   export let name: string;
   export let group: Writable<T>;
+  export let description = '';
 
   setContext<RadioGroupContext<T>>(RADIO_GROUP_CONTEXT, {
     name,
@@ -25,5 +26,8 @@
 </script>
 
 <div class="flex flex-col gap-2 {className}" {...$$restProps}>
+  {#if description}
+    <p class="font-secondary text-sm font-medium">{description}</p>
+  {/if}
   <slot />
 </div>

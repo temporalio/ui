@@ -56,7 +56,7 @@
   let resetConfirmationModalOpen = false;
   let signalConfirmationModalOpen = false;
   let error = '';
-  let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
+  let resetReapplyType: ResetReapplyType = ResetReapplyType.Signal;
   let resetId = writable<string>();
   let resetReason: string;
   let loading = false;
@@ -79,7 +79,7 @@
   };
 
   const hideResetModal = () => {
-    resetReapplyType = ResetReapplyType.Unspecified;
+    resetReapplyType = ResetReapplyType.Signal;
     $resetId = undefined;
     resetReason = undefined;
   };

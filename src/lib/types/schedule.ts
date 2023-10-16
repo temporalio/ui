@@ -63,3 +63,12 @@ export type ScheduleParameters = ScheduleActionParameters &
   SchedulePresetsParameters;
 
 export type ScheduleStatus = 'Paused' | 'Running';
+
+export type OverlapPolicy =
+  | 'Unspecified'
+  | 'Skip'
+  | 'BufferOne'
+  | 'BufferAll'
+  | 'CancelOther'
+  | 'TerminateOther'
+  | 'AllowAll';

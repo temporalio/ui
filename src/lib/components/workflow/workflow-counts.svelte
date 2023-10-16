@@ -1,90 +1,44 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import type { WorkflowFilter } from '$lib/models/workflow-filters';
-  import { workflowStatuses } from '$lib/models/workflow-status';
+  import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
   import { workflowFilters } from '$lib/stores/filters';
-  import { isStatusFilter } from '$lib/utilities/query/filter-search';
-  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
-  import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
+  import type { WorkflowStatus } from '$lib/types/workflows';
+  import { decodePayload } from '$lib/utilities/decode-payload';
 
-  import WorkflowCount from './workflow-count.svelte';
+  import WorkflowCountAll from './workflow-count-all.svelte';
+  import WorkflowCountStatus from './workflow-count-status.svelte';
 
-  $: statusFilters = $workflowFilters.filter((filter) =>
-    isStatusFilter(filter.attribute),
-  );
+  $: namespace = $page.params.namespace;
+  let statusGroups: { status: WorkflowStatus; count: number }[] = [];
 
-  function mapStatusToFilter(value: string) {
-    return {
-      attribute: 'ExecutionStatus',
-      value,
-      operator: '',
-      parenthesis: '',
-      conditional: '=',
-    };
-  }
-
-  function mapStatusesToFilters(filters: WorkflowFilter[]) {
-    if (filters.length === 1) {
-      return [mapStatusToFilter(filters[0].value)];
-    } else {
-      return filters.map((filter, i) => {
-        const operator = i === filters.length - 1 ? '' : 'OR';
-        return {
-          ...filter,
-          operator,
-        };
-      });
-    }
-  }
-
-  const onStatusClick = (status: string) => {
-    if (statusFilters.find((s) => s.value === status)) {
-      const nonStatusFilters = $workflowFilters.filter(
-        (f) => !isStatusFilter(f.attribute),
-      );
-      $workflowFilters = [
-        ...nonStatusFilters,
-        ...mapStatusesToFilters(
-          statusFilters.filter((s) => s.value !== status),
-        ),
-      ];
-    } else {
-      if (!statusFilters.length) {
-        $workflowFilters = [...$workflowFilters, mapStatusToFilter(status)];
-      } else {
-        const nonStatusFilters = $workflowFilters.filter(
-          (f) => !isStatusFilter(f.attribute),
-        );
-        $workflowFilters = [
-          ...nonStatusFilters,
-          ...mapStatusesToFilters([
-            ...statusFilters,
-            mapStatusToFilter(status),
-          ]),
-        ];
-      }
-    }
-
-    const searchQuery = toListWorkflowQueryFromFilters(
-      combineFilters($workflowFilters),
-    );
-    updateQueryParameters({
-      url: $page.url,
-      parameter: 'query',
-      value: searchQuery,
-      allowEmpty: true,
+  const fetchCounts = async () => {
+    const { count, groups } = await fetchWorkflowCountByExecutionStatus({
+      namespace,
+      filters: $workflowFilters,
     });
+    $workflowCount.totalCount = parseInt(count);
+    statusGroups = groups
+      .map((group) => {
+        const status = decodePayload(
+          group?.groupValues[0],
+        ) as unknown as WorkflowStatus;
+        const count = parseInt(group.count);
+        return {
+          status,
+          count,
+        };
+      })
+      .filter((s) => s.count > 0);
   };
+
+  $: $workflowsQuery, namespace, fetchCounts();
 </script>
 
-<div class="flex flex-wrap gap-2 lg:gap-4">
-  {#each workflowStatuses as status}
-    <WorkflowCount
-      {status}
-      {onStatusClick}
-      active={statusFilters.some((filter) => filter.value === status)}
-    />
+<div class="flex flex-wrap items-center gap-2">
+  <WorkflowCountAll count={$workflowCount.totalCount} />
+  {#each statusGroups as { count, status } (status)}
+    <WorkflowCountStatus {status} {count} />
   {/each}
 </div>
