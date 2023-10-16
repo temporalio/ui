@@ -8,7 +8,6 @@ import type {
   WorkflowExecutionStartedEvent,
   WorkflowExecutionTerminatedEvent,
   WorkflowExecutionTimedOutEvent,
-  WorkflowTaskCompletedEvent,
   WorkflowTaskFailedEvent,
 } from '$lib/types/events';
 
@@ -61,12 +60,6 @@ const isFailedTaskEvent = (
   return event.eventType === 'WorkflowTaskFailed';
 };
 
-const isCompletedTaskEvent = (
-  event: WorkflowEvent,
-): event is WorkflowTaskCompletedEvent => {
-  return event.eventType === 'WorkflowTaskCompleted';
-};
-
 const getEventResult = (event: CompletionEvent) => {
   if (isWorkflowExecutionContinuedAsNewEvent(event)) {
     return event.attributes.input?.payloads;
@@ -91,7 +84,6 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   let workflowStartedEvent: WorkflowExecutionStartedEvent;
   let workflowCompletedEvent: CompletionEvent;
   let workflowTaskFailedEvent: WorkflowTaskFailedEvent;
-  let hasCompletedTaskEvent = false;
 
   for (const event of eventHistory.start) {
     if (isStartedEvent(event)) {
@@ -99,16 +91,6 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
       continue;
     } else if (isCompletionEvent(event)) {
       workflowCompletedEvent = event;
-      continue;
-    } else if (isCompletedTaskEvent(event)) {
-      // If there is a completed workflow task after a failed task
-      if (workflowTaskFailedEvent) {
-        // or we need to reset the failed event
-        workflowTaskFailedEvent = undefined;
-      }
-      continue;
-    } else if (!hasCompletedTaskEvent && isFailedTaskEvent(event)) {
-      workflowTaskFailedEvent = event;
       continue;
     }
   }
@@ -120,14 +102,7 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
     } else if (isCompletionEvent(event)) {
       workflowCompletedEvent = event;
       continue;
-    } else if (isCompletedTaskEvent(event)) {
-      hasCompletedTaskEvent = true;
-      continue;
-    } else if (
-      !workflowTaskFailedEvent &&
-      !hasCompletedTaskEvent &&
-      isFailedTaskEvent(event)
-    ) {
+    } else if (!workflowTaskFailedEvent && isFailedTaskEvent(event)) {
       workflowTaskFailedEvent = event;
       continue;
     }

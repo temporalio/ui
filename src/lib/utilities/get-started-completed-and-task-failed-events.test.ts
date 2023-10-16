@@ -122,7 +122,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct input for a completed event history', () => {
     const { input } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: completedEventHistory,
+      start: [...completedEventHistory].reverse(),
       end: completedEventHistory,
     });
     expect(input).toMatchInlineSnapshot(
@@ -132,7 +132,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct result for a completed event history', () => {
     const { results } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: completedEventHistory,
+      start: [...completedEventHistory].reverse(),
       end: completedEventHistory,
     });
     expect(results).toMatchInlineSnapshot('"null"');
@@ -140,7 +140,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct input for a cancelled event history', () => {
     const { input } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: canceledEventHistory,
+      start: [...canceledEventHistory].reverse(),
       end: canceledEventHistory,
     });
     expect(input).toMatchInlineSnapshot('"[1656706850149404400,480000000000]"');
@@ -148,7 +148,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct result for a cancelled event history', () => {
     const { results } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: canceledEventHistory,
+      start: [...canceledEventHistory].reverse(),
       end: canceledEventHistory,
     });
     expect(results).toMatchInlineSnapshot(
@@ -158,7 +158,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct input for a failed event history', () => {
     const { input } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: failedEventHistory,
+      start: [...failedEventHistory].reverse(),
       end: failedEventHistory,
     });
     expect(input).toMatchInlineSnapshot('"[1656706968987842000]"');
@@ -166,7 +166,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct result for a failed event history', () => {
     const { results } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: failedEventHistory,
+      start: [...failedEventHistory].reverse(),
       end: failedEventHistory,
     });
     expect(results).toMatchInlineSnapshot(
@@ -176,7 +176,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct input for a running event history', () => {
     const { input } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: runningEventHistory,
+      start: [...runningEventHistory].reverse(),
       end: runningEventHistory,
     });
     expect(input).toMatchInlineSnapshot('"[1656707029044596700,\\"canary\\"]"');
@@ -184,7 +184,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct result for a running event history', () => {
     const { results } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: runningEventHistory,
+      start: [...runningEventHistory].reverse(),
       end: runningEventHistory,
     });
     expect(results).toMatchInlineSnapshot('undefined');
@@ -192,7 +192,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct input for a terminated event history', () => {
     const { input } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: terminatedEventHistory,
+      start: [...terminatedEventHistory].reverse(),
       end: terminatedEventHistory,
     });
     expect(input).toMatchInlineSnapshot(
@@ -202,7 +202,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct result for a terminated event history', () => {
     const { results } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: terminatedEventHistory,
+      start: [...terminatedEventHistory].reverse(),
       end: terminatedEventHistory,
     });
     expect(results).toMatchInlineSnapshot(
@@ -212,7 +212,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct input for a timedOut event history', () => {
     const { input } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: timedOutEventHistory,
+      start: [...timedOutEventHistory].reverse(),
       end: timedOutEventHistory,
     });
     expect(input).toMatchInlineSnapshot('"[1656683778738403300,\\"canary\\"]"');
@@ -220,7 +220,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct result for a timedOut event history', () => {
     const { results } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: timedOutEventHistory,
+      start: [...timedOutEventHistory].reverse(),
       end: timedOutEventHistory,
     });
     expect(results).toMatchInlineSnapshot(
@@ -230,7 +230,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should set contAsNew to false for a non continuedAsNew event history', () => {
     const { contAsNew } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: timedOutEventHistory,
+      start: [...timedOutEventHistory].reverse(),
       end: timedOutEventHistory,
     });
     expect(contAsNew).toBe(false);
@@ -238,7 +238,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct input for a continuedAsNew event history', () => {
     const { input } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: continuedAsNewEventHistory,
+      start: [...continuedAsNewEventHistory].reverse(),
       end: continuedAsNewEventHistory,
     });
     expect(input).toMatchInlineSnapshot('"[3,2]"');
@@ -246,7 +246,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct result for a continuedAsNew event history', () => {
     const { results } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: continuedAsNewEventHistory,
+      start: [...continuedAsNewEventHistory].reverse(),
       end: continuedAsNewEventHistory,
     });
     expect(results).toMatchInlineSnapshot('"[4,1]"');
@@ -254,7 +254,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should set contAsNew to true for a continuedAsNew event history', () => {
     const { contAsNew } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: continuedAsNewEventHistory,
+      start: [...continuedAsNewEventHistory].reverse(),
       end: continuedAsNewEventHistory,
     });
     expect(contAsNew).toBe(true);
@@ -318,7 +318,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
   it('should get the correct error for a completed event history without any failed tasks', () => {
     const { error } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: completedEventHistory,
+      start: [...completedEventHistory].reverse(),
       end: completedEventHistory,
     });
     expect(error).toMatchInlineSnapshot('undefined');
@@ -353,13 +353,13 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
     const history = [failedEvent, ...runningEventHistory];
 
     const { error } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: history,
+      start: [...history].reverse(),
       end: history,
     });
     expect(error).toBe(failedEvent);
   });
 
-  it('should get the correct error for a workflow that has a completed task after a failed task in descending order', () => {
+  it('should get the last error for a workflow that has multiple WorkflowTaskFailed events', () => {
     const history = [
       {
         eventId: '12',
@@ -411,45 +411,8 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
         name: 'WorkflowTaskFailed',
         timestamp: '2022-10-31 UTC 22:41:28.91',
       },
-    ];
-
-    const { error } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: history,
-      end: history,
-    });
-    expect(error).toMatchInlineSnapshot(`
       {
-        "attributes": {
-          "cause": "NonDeterministicError",
-          "failure": {
-            "cause": null,
-          },
-          "type": "workflowTaskFailedEventAttributes",
-        },
-        "category": "workflow",
-        "classification": "Failed",
-        "eventId": "11",
-        "eventTime": "2022-10-31T22:41:28.917920758Z",
-        "eventType": "WorkflowTaskFailed",
-        "id": "11",
-        "name": "WorkflowTaskFailed",
-        "taskId": "56713476",
-        "timestamp": "2022-10-31 UTC 22:41:28.91",
-        "version": "0",
-        "workflowTaskFailedEventAttributes": {
-          "cause": "NonDeterministicError",
-          "failure": {
-            "cause": null,
-          },
-        },
-      }
-    `);
-  });
-
-  it('should get the correct error for a workflow that has a completed task after a failed task is ascending order', () => {
-    const history = [
-      {
-        eventId: '11',
+        eventId: '10',
         eventTime: '2022-10-31T22:41:28.917920758Z',
         eventType: 'WorkflowTaskFailed',
         version: '0',
@@ -469,39 +432,14 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
         },
         classification: 'Failed',
         category: 'workflow',
-        id: '11',
+        id: '10',
         name: 'WorkflowTaskFailed',
         timestamp: '2022-10-31 UTC 22:41:28.91',
-      },
-      {
-        eventId: '12',
-        eventTime: '2022-07-01T20:28:52.916365546Z',
-        eventType: 'WorkflowTaskCompleted',
-        version: '0',
-        taskId: '29887669',
-        workflowTaskCompletedEventAttributes: {
-          scheduledEventId: '15',
-          startedEventId: '16',
-          identity: '83579@MacBook-Pro-2.local@',
-          binaryChecksum: 'e56c0141e58df0bd405138565d0526f9',
-        },
-        attributes: {
-          type: 'workflowTaskCompletedEventAttributes',
-          scheduledEventId: '15',
-          startedEventId: '16',
-          identity: '83579@MacBook-Pro-2.local@',
-          binaryChecksum: 'e56c0141e58df0bd405138565d0526f9',
-        },
-        classification: 'Completed',
-        category: 'workflow',
-        id: '12',
-        name: 'WorkflowTaskCompleted',
-        timestamp: '2022-07-01 UTC 20:28:52.91',
       },
     ];
 
     const { error } = getWorkflowStartedCompletedAndTaskFailedEvents({
-      start: history,
+      start: [...history].reverse(),
       end: history,
     });
     expect(error).toMatchInlineSnapshot(`
