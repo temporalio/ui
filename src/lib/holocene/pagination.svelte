@@ -97,6 +97,7 @@
   $: floatStyle = getFloatStyle({ width, height, screenWidth });
 
   async function handleKeydown(event: KeyboardEvent) {
+    console.log(event);
     switch (event.code) {
       case 'ArrowRight':
       case 'KeyL':

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
+  import { noop, onMount } from 'svelte/internal';
   import { fade } from 'svelte/transition';
 
   import { goto } from '$app/navigation';
@@ -33,6 +33,11 @@
   export let typedError = false;
   export let active = false;
   export let onRowClick: () => void = noop;
+
+  onMount(() => {
+    const hash = $page.url.hash;
+    if (`#${event.id}` === hash && !expanded) expanded = true;
+  });
 
   let selectedId = isEventGroup(event)
     ? Array.from(event.events.keys()).pop()
