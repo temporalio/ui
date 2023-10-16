@@ -14,6 +14,7 @@ import { mockNamespaceApi } from './mocks/namespace';
 import { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
 import { mockSearchAttributesApi } from './mocks/search-attributes';
 import { mockSettingsApi, SETTINGS_API } from './mocks/settings';
+import { mockSystemInfoApi } from './mocks/system-info';
 import { mockTaskQueuesApi, TASK_QUEUES_API } from './mocks/task-queues';
 import { mockWorkflowApi, WORKFLOW_API } from './mocks/workflow';
 import { mockWorkflowsApi, WORKFLOWS_API } from './mocks/workflows';
@@ -26,6 +27,7 @@ export { mockClusterApi, CLUSTER_API } from './mocks/cluster';
 export { mockNamespaceApi, NAMESPACE_API } from './mocks/namespace';
 export { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
 export { mockSettingsApi, SETTINGS_API } from './mocks/settings';
+
 export {
   mockSearchAttributesApi,
   SEARCH_ATTRIBUTES_API,
@@ -50,6 +52,7 @@ export const mockGlobalApis = (page: Page) => {
     mockClusterApi(page),
     mockNamespacesApi(page),
     mockSettingsApi(page),
+    mockSystemInfoApi(page),
   ]);
 };
 

@@ -7,11 +7,11 @@
 </script>
 
 <div class="font-base flex text-center text-sm leading-4">
-  <span class="mx-1">
+  <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
     {#if $loading || $updating}
       <Spinner class="h-4 w-4 animate-spin" />
     {:else if count >= 0}
       {count.toLocaleString()} {translate('workflows').toLocaleLowerCase()}
     {/if}
-  </span>
+  </p>
 </div>
