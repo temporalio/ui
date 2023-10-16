@@ -83,7 +83,7 @@
     <slot name="decode" />
   </div>
   {#if decodeEventHistory}
-    {#key index}
+    {#key [index, decodeEventHistory]}
       <PayloadDecoder value={events[index - 1]} let:decodedValue>
         <CodeBlock
           content={decodedValue}

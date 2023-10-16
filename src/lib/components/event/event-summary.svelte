@@ -1,21 +1,13 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
-  import { fetchAllEvents } from '$lib/services/events-service';
-  import {
-    eventFilterSort,
-    type EventSortOrder,
-    expandAllEvents,
-  } from '$lib/stores/event-view';
+  import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
   import { eventCategoryFilter } from '$lib/stores/filters';
-  import { refresh } from '$lib/stores/workflow-run';
   import type {
     CommonHistoryEvent,
     EventTypeCategory,
@@ -26,33 +18,6 @@
   import EventEmptyRow from './event-empty-row.svelte';
 
   export let compact = false;
-
-  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
-
-  let loading = true;
-
-  const resetFullHistory = () => {
-    $fullEventHistory = [];
-    loading = true;
-  };
-
-  const fetchEvents = async (
-    namespace: string,
-    workflowId: string,
-    runId: string,
-    sort: EventSortOrder,
-  ) => {
-    resetFullHistory();
-    $fullEventHistory = await fetchAllEvents({
-      namespace,
-      workflowId,
-      runId,
-      sort: compact ? 'ascending' : sort,
-    });
-    loading = false;
-  };
-
-  $: $refresh, fetchEvents(namespace, workflowId, runId, $eventFilterSort);
 
   function handleExpandChange(event: CustomEvent) {
     $expandAllEvents = event.detail.expanded;
@@ -112,7 +77,7 @@
         onRowClick={() => setActiveRowIndex(index)}
       />
     {:else}
-      <EventEmptyRow {loading} />
+      <EventEmptyRow />
     {/each}
   </EventSummaryTable>
 </Pagination>
