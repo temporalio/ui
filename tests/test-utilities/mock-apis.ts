@@ -37,6 +37,7 @@ export { mockWorkflowsApi, WORKFLOWS_API } from './mocks/workflows';
 export { mockWorkflowApi, WORKFLOW_API } from './mocks/workflow';
 export {
   mockWorkflowsCountApi,
+  mockWorkflowsGroupByCountApi,
   WORKFLOWS_COUNT_API,
 } from './mocks/workflows-count';
 export {
