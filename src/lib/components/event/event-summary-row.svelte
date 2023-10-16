@@ -2,8 +2,10 @@
   import { noop } from 'svelte/internal';
   import { fade } from 'svelte/transition';
 
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import { isEventGroup } from '$lib/models/event-groups';
   import {
     eventOrGroupIsCanceled,
@@ -18,6 +20,7 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
 
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
@@ -34,8 +37,8 @@
     ? Array.from(event.events.keys()).pop()
     : event.id;
 
-  $: expanded = expandAll || active;
-
+  $: expanded = expandAll;
+  $: ({ workflow, run, namespace } = $page.params);
   $: descending = $eventFilterSort === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: showElapsedTimeDiff =
@@ -83,7 +86,20 @@
 >
   <td />
   <td class="w-24 text-left">
-    <Link class="truncate" href="#{event.id}">{event.id}</Link>
+    <p
+      class="truncate hover:text-blue-700 hover:underline"
+      on:click|stopPropagation={() =>
+        goto(
+          routeForEventHistoryEvent({
+            eventId: event.id,
+            namespace,
+            workflow,
+            run,
+          }),
+        )}
+    >
+      {event.id}
+    </p>
   </td>
   <td class="text-left">
     <div class="flex flex-col gap-0">
