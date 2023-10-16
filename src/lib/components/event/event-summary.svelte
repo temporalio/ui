@@ -77,7 +77,7 @@
         onRowClick={() => setActiveRowIndex(index)}
       />
     {:else}
-      <EventEmptyRow />
+      <EventEmptyRow loading={!intialEvents.length} />
     {/each}
   </EventSummaryTable>
 </Pagination>
