@@ -1,24 +1,23 @@
 <script lang="ts">
-  import { createTranslate, translate } from '$lib/i18n/translate';
+  import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { BatchOperation } from '$lib/types/batch';
   import { formatDate } from '$lib/utilities/format-date';
 
   export let operation: BatchOperation;
-  const t = createTranslate('batch');
 </script>
 
 <div class="flex flex-col gap-2">
-  <p>{t('details')}</p>
+  <p>{translate('batch', 'details')}</p>
   <div class="batch-operation-detail">
     <p class="batch-operation-key">
-      {t('operation-type')}
+      {translate('batch', 'operation-type')}
     </p>
     <p class="batch-operation-value">{operation.operationType}</p>
   </div>
   <div class="batch-operation-detail">
     <p class="batch-operation-key">
-      {t('identity')}
+      {translate('batch', 'identity')}
     </p>
     <p class="batch-operation-value">{operation.identity}</p>
   </div>
@@ -44,7 +43,7 @@
   </div>
   <div class="batch-operation-detail">
     <p class="batch-operation-key">
-      {t('total-operations')}
+      {translate('batch', 'total-operations')}
     </p>
     <p class="batch-operation-value">
       {Intl.NumberFormat('en-US').format(operation.totalOperationCount)}

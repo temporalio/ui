@@ -13,7 +13,7 @@
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
-  import { createTranslate, translate } from '$lib/i18n/translate';
+  import { translate } from '$lib/i18n/translate';
   import {
     deleteSchedule,
     fetchSchedule,
@@ -32,9 +32,9 @@
 
   import type { DescribeScheduleResponse } from '$types';
 
-  const t = createTranslate('schedules');
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
+
   const parameters = {
     namespace,
     scheduleId: decodeURIForSvelte(scheduleId),
@@ -62,7 +62,7 @@
       }, 2000);
       reason = '';
     } catch (e) {
-      error = t('delete-schedule-error', {
+      error = translate('schedules', 'delete-schedule-error', {
         error: e?.message,
       });
       $loading = false;
@@ -100,7 +100,7 @@
         }}
         icon="chevron-left"
       >
-        {t('back-to-schedules')}
+        {translate('schedules', 'back-to-schedules')}
       </Link>
       <h1
         class="mt-8 select-all text-2xl font-medium"
@@ -116,7 +116,7 @@
   <Loading />
 {:then schedule}
   {#if $loading}
-    <Loading title={t('deleting')} class="my-2" />
+    <Loading title={translate('schedules', 'deleting')} class="my-2" />
   {:else}
     <header class="mb-8 flex flex-row justify-between gap-4">
       <div class="relative flex flex-col gap-1">
@@ -126,7 +126,7 @@
           }}
           icon="chevron-left"
         >
-          {t('back-to-schedules')}
+          {translate('schedules', 'back-to-schedules')}
         </Link>
         <h1 class="relative mt-8 flex items-center gap-4 text-2xl">
           <WorkflowStatus
@@ -168,8 +168,10 @@
       </div>
       <SplitButton
         position="right"
-        label={schedule?.schedule?.state?.paused ? t('unpause') : t('pause')}
-        menuLabel={t('schedule-actions')}
+        label={schedule?.schedule?.state?.paused
+          ? translate('schedules', 'unpause')
+          : translate('schedules', 'pause')}
+        menuLabel={translate('schedules', 'schedule-actions')}
         id="schedule-actions"
         disabled={editDisabled}
         on:click={() => (pauseConfirmationModalOpen = true)}
@@ -223,7 +225,9 @@
       id="pause-schedule-modal"
       bind:open={pauseConfirmationModalOpen}
       confirmType="primary"
-      confirmText={schedule?.schedule.state.paused ? t('unpause') : t('pause')}
+      confirmText={schedule?.schedule.state.paused
+        ? translate('schedules', 'unpause')
+        : translate('schedules', 'pause')}
       cancelText={translate('cancel')}
       confirmDisabled={!reason}
       on:confirmModal={() => handlePause(schedule)}
@@ -231,23 +235,23 @@
     >
       <h3 slot="title">
         {schedule?.schedule.state.paused
-          ? t('unpause-modal-title')
-          : t('pause-modal-title')}
+          ? translate('schedules', 'unpause-modal-title')
+          : translate('schedules', 'pause-modal-title')}
       </h3>
       <div slot="content">
         <p>
           {schedule?.schedule.state.paused
-            ? t('unpause-modal-confirmation', {
+            ? translate('schedules', 'unpause-modal-confirmation', {
                 schedule: scheduleId,
               })
-            : t('pause-modal-confirmation', {
+            : translate('schedules', 'pause-modal-confirmation', {
                 schedule: scheduleId,
               })}
         </p>
         <p class="my-4">
           {schedule?.schedule.state.paused
-            ? t('unpause-reason')
-            : t('pause-reason')}
+            ? translate('schedules', 'unpause-reason')
+            : translate('schedules', 'pause-reason')}
         </p>
         <input
           class="mt-4 block w-full rounded-md border border-gray-200 p-2"
@@ -267,10 +271,10 @@
       on:confirmModal={handleDelete}
       on:cancelModal={resetReason}
     >
-      <h3 slot="title">{t('delete-modal-title')}</h3>
+      <h3 slot="title">{translate('schedules', 'delete-modal-title')}</h3>
       <div slot="content">
         <p>
-          {t('delete-modal-confirmation', {
+          {translate('schedules', 'delete-modal-confirmation', {
             schedule: scheduleId,
           })}
         </p>
@@ -286,7 +290,7 @@
         }}
         icon="chevron-left"
       >
-        {t('back-to-schedules')}
+        {translate('schedules', 'back-to-schedules')}
       </Link>
       <h1
         class="mt-8 select-all text-2xl font-medium"

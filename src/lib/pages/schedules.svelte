@@ -13,7 +13,7 @@
   import Loading from '$lib/holocene/loading.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
-  import { createTranslate, translate } from '$lib/i18n/translate';
+  import { translate } from '$lib/i18n/translate';
   import { fetchAllSchedules } from '$lib/services/schedule-service';
   import { coreUserStore } from '$lib/stores/core-user';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
@@ -21,8 +21,9 @@
   import type { ScheduleListEntry } from '$types';
 
   $: namespace = $page.params.namespace;
+
   let hasSchedules = false;
-  const t = createTranslate('schedules');
+
   $: fetchSchedules = fetchAllSchedules(namespace).then((res) => {
     const { schedules } = res;
     hasSchedules = Boolean(schedules?.length);
@@ -57,7 +58,7 @@
       data-testid="create-schedule"
       href={routeForScheduleCreate({ namespace })}
     >
-      {t('create')}
+      {translate('schedules', 'create')}
     </Button>
   {/if}
 </header>
@@ -79,10 +80,10 @@
           <Input
             icon="search"
             type="search"
-            label={t('name')}
+            label={translate('schedules', 'name')}
             labelHidden
             id="schedule-name-filter"
-            placeholder={t('name')}
+            placeholder={translate('schedules', 'name')}
             clearable
             clearButtonLabel={translate('clear-input-button-label')}
             bind:value={search}
@@ -98,8 +99,8 @@
             <td class="hidden xl:table-cell" />
             <td colspan="3">
               <EmptyState
-                title={t('empty-state-title')}
-                content={t('empty-state-description')}
+                title={translate('schedules', 'empty-state-title')}
+                content={translate('schedules', 'empty-state-description')}
               />
             </td>
             <td class="hidden xl:table-cell" />
@@ -109,15 +110,15 @@
     </Pagination>
   {:else}
     <div class="my-12 flex flex-col items-center justify-start gap-2">
-      <EmptyState title={t('empty-state-title')} {error}>
+      <EmptyState title={translate('schedules', 'empty-state-title')} {error}>
         <p>
-          {t('getting-started-docs-link-preface')}
+          {translate('schedules', 'getting-started-docs-link-preface')}
           <Link
             target="_external"
             href="https://docs.temporal.io/workflows/#schedule"
-            >{t('getting-started-docs-link')}</Link
+            >{translate('schedules', 'getting-started-docs-link')}</Link
           >
-          {t('getting-started-cli-link-preface')}
+          {translate('schedules', 'getting-started-cli-link-preface')}
           <Link target="_external" href="https://docs.temporal.io/cli/schedule"
             >Temporal CLI</Link
           >.
@@ -127,7 +128,7 @@
             data-testid="create-schedule"
             href={routeForScheduleCreate({ namespace })}
           >
-            {t('create')}
+            {translate('schedules', 'create')}
           </Button>
         {/if}
       </EmptyState>

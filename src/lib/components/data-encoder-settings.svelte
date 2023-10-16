@@ -8,7 +8,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { clickOutside } from '$lib/holocene/outside-click';
-  import { createTranslate, translate } from '$lib/i18n/translate';
+  import { translate } from '$lib/i18n/translate';
   import { dataConverterPort } from '$lib/stores/data-converter-config';
   import {
     codecEndpoint,
@@ -29,7 +29,6 @@
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
 
-  const t = createTranslate('data-encoder');
   let endpoint = $codecEndpoint ?? '';
   let port = $dataConverterPort ?? '';
   let passToken = $passAccessToken ?? false;
@@ -43,9 +42,9 @@
 
   $: {
     if (passToken && !validateHttps(endpoint)) {
-      error = t('access-token-https-error');
+      error = translate('data-encoder', 'access-token-https-error');
     } else if (endpoint && !validateHttpOrHttps(endpoint)) {
-      error = t('prefix-error');
+      error = translate('data-encoder', 'prefix-error');
     } else {
       error = '';
     }
@@ -93,21 +92,21 @@
         </h3>
       </div>
       <p class="text-sm">
-        {t('codec-server-description-prefix')}<Link
+        {translate('data-encoder', 'codec-server-description-prefix')}<Link
           href="https://docs.temporal.io/dataconversion#codec-server"
           newTab>{translate('codec-server')}</Link
         >
-        {t('codec-server-description-suffix', {
+        {translate('data-encoder', 'codec-server-description-suffix', {
           level: namespaceOrCluster,
         })}
       </p>
       <Accordion
         data-testid="override-accordion"
         title={$override
-          ? t('browser-override-description', {
+          ? translate('data-encoder', 'browser-override-description', {
               level: namespaceOrCluster,
             })
-          : t('no-browser-override-description', {
+          : translate('data-encoder', 'no-browser-override-description', {
               level: namespaceOrCluster,
             })}
       >
@@ -116,15 +115,19 @@
             id="use-configuration-endpoint-radio"
             data-testid="use-configuration-endpoint-input"
             value={false}
-            label={t('no-browser-override-description', {
-              level: namespaceOrCluster,
-            })}
+            label={translate(
+              'data-encoder',
+              'no-browser-override-description',
+              {
+                level: namespaceOrCluster,
+              },
+            )}
           />
           <RadioInput
             id="use-local-endpoint-radio"
             data-testid="use-local-endpoint-input"
             value={true}
-            label={t('browser-override-description', {
+            label={translate('data-encoder', 'browser-override-description', {
               level: namespaceOrCluster,
             })}
           />

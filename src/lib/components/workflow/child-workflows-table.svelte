@@ -4,7 +4,7 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
-  import { createTranslate, translate } from '$lib/i18n/translate';
+  import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
   import { routeForEventHistory } from '$lib/utilities/route-for';
@@ -14,7 +14,6 @@
   export let children: ChildWorkflowClosedEvent[] = [];
   export let pendingChildren: WorkflowExecution['pendingChildren'] = [];
   export let namespace: string;
-  const t = createTranslate('workflows');
 
   $: formattedPending = pendingChildren.map((c) => {
     return {
@@ -41,18 +40,20 @@
   items={formattedAll}
   itemsPerPage={10}
   let:visibleItems
-  aria-label={t('child-workflows')}
+  aria-label={translate('workflows', 'child-workflows')}
   pageSizeSelectLabel={translate('per-page')}
   previousButtonLabel={translate('previous')}
   nextButtonLabel={translate('next')}
 >
   <div slot="pagination-top" />
   <Table class="w-full">
-    <caption class="sr-only" slot="caption">{t('child-workflows')}</caption>
+    <caption class="sr-only" slot="caption"
+      >{translate('workflows', 'child-workflows')}</caption
+    >
     <TableHeaderRow slot="headers">
       <th class="max-md:hidden">Status</th>
-      <th>{t('child-id')}</th>
-      <th>{t('child-run-id')}</th>
+      <th>{translate('workflows', 'child-id')}</th>
+      <th>{translate('workflows', 'child-run-id')}</th>
     </TableHeaderRow>
     {#each visibleItems as child (child.runId)}
       <TableRow>

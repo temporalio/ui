@@ -11,7 +11,7 @@
   import Modal from '$lib/holocene/modal.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import { createTranslate, translate } from '$lib/i18n/translate';
+  import { translate } from '$lib/i18n/translate';
   import { Action, ResetReapplyType } from '$lib/models/workflow-actions';
   import {
     cancelWorkflow,
@@ -44,7 +44,6 @@
   export let namespace: string;
   export let cancelInProgress: boolean;
   export let isRunning: boolean;
-  const t = createTranslate('workflows');
 
   const getDefaultSignalInput = () =>
     $codecEndpoint ? '{"metadata": {"encoding": ""}, "data": ""}' : '';
@@ -90,7 +89,7 @@
     $refresh = Date.now();
     toaster.push({
       id: 'workflow-termination-success-toast',
-      message: t('terminate-success'),
+      message: translate('workflows', 'terminate-success'),
     });
   };
 
@@ -130,7 +129,7 @@
       $refresh = Date.now();
       toaster.push({
         id: 'workflow-cancelation-success-toast',
-        message: t('cancel-success'),
+        message: translate('workflows', 'cancel-success'),
       });
     } catch (err) {
       error = err?.message ?? translate('unknown-error');
@@ -163,7 +162,7 @@
       signalConfirmationModalOpen = false;
       $refresh = Date.now();
       toaster.push({
-        message: t('signal-success'),
+        message: translate('workflows', 'signal-success'),
         id: 'workflow-signal-success-toast',
       });
       hideSignalModal();
@@ -213,15 +212,18 @@
 
   $: {
     if (!resetEnabled) {
-      resetTooltipText = t('reset-disabled');
+      resetTooltipText = translate('workflows', 'reset-disabled');
     } else if (resetEnabled && workflow?.pendingChildren?.length > 0) {
-      resetTooltipText = t('reset-disabled-pending-children');
+      resetTooltipText = translate(
+        'workflows',
+        'reset-disabled-pending-children',
+      );
     } else if (
       resetEnabled &&
       workflow?.pendingChildren?.length === 0 &&
       $resetEvents.length === 0
     ) {
-      resetTooltipText = t('reset-disabled-no-events');
+      resetTooltipText = translate('workflows', 'reset-disabled-no-events');
     }
   }
 
@@ -232,26 +234,28 @@
 
   $: workflowActions = [
     {
-      label: t('reset'),
+      label: translate('workflows', 'reset'),
       onClick: () => (resetConfirmationModalOpen = true),
       testId: 'reset-button',
       allowed: resetAllowed,
       tooltip: resetAllowed ? '' : resetTooltipText,
     },
     {
-      label: t('signal'),
+      label: translate('workflows', 'signal'),
       onClick: () => (signalConfirmationModalOpen = true),
       testId: 'signal-button',
       allowed: signalEnabled,
-      tooltip: signalEnabled ? '' : t('signal-disabled'),
+      tooltip: signalEnabled ? '' : translate('workflows', 'signal-disabled'),
     },
     {
-      label: t('terminate'),
+      label: translate('workflows', 'terminate'),
       onClick: () => (terminateConfirmationModalOpen = true),
       testId: 'terminate-button',
       allowed: terminateEnabled,
       destructive: true,
-      tooltip: terminateEnabled ? '' : t('terminate-disabled'),
+      tooltip: terminateEnabled
+        ? ''
+        : translate('workflows', 'terminate-disabled'),
     },
   ];
 
@@ -269,8 +273,8 @@
     disabled={actionsDisabled}
     primaryActionDisabled={!cancelEnabled || cancelInProgress}
     on:click={() => (cancelConfirmationModalOpen = true)}
-    label={t('request-cancellation')}
-    menuLabel={t('workflow-actions')}
+    label={translate('workflows', 'request-cancellation')}
+    menuLabel={translate('workflows', 'workflow-actions')}
   >
     {#each workflowActions as { onClick, destructive, label, allowed, testId, tooltip }}
       {#if destructive}
@@ -291,12 +295,12 @@
 {:else}
   <Tooltip bottomRight width={200} text={resetTooltipText} hide={resetAllowed}>
     <Button
-      aria-label={t('reset')}
+      aria-label={translate('workflows', 'reset')}
       disabled={!resetAllowed}
       variant="primary"
       on:click={() => (resetConfirmationModalOpen = true)}
     >
-      {t('reset')}
+      {translate('workflows', 'reset')}
     </Button>
   </Tooltip>
 {/if}
@@ -312,7 +316,7 @@
   on:cancelModal={hideResetModal}
   confirmDisabled={!$resetId}
 >
-  <h3 slot="title">{t('reset-modal-title')}</h3>
+  <h3 slot="title">{translate('workflows', 'reset-modal-title')}</h3>
   <svelte:fragment slot="content">
     <WorkflowResetForm
       bind:eventId={resetId}
@@ -332,10 +336,10 @@
   confirmType="destructive"
   on:confirmModal={cancel}
 >
-  <h3 slot="title">{t('cancel-modal-title')}</h3>
+  <h3 slot="title">{translate('workflows', 'cancel-modal-title')}</h3>
   <svelte:fragment slot="content">
     <p>
-      {t('cancel-modal-confirmation')}
+      {translate('workflows', 'cancel-modal-confirmation')}
     </p>
   </svelte:fragment>
 </Modal>
@@ -344,16 +348,16 @@
   data-testid="terminate-confirmation-modal"
   bind:error
   bind:open={terminateConfirmationModalOpen}
-  confirmText={t('terminate')}
+  confirmText={translate('workflows', 'terminate')}
   cancelText={translate('cancel')}
   confirmType="destructive"
   on:cancelModal={hideTerminationModal}
   on:confirmModal={terminate}
 >
-  <h3 slot="title">{t('terminate-modal-title')}</h3>
+  <h3 slot="title">{translate('workflows', 'terminate-modal-title')}</h3>
   <div slot="content">
     <p>
-      {t('terminate-modal-confirmation')}
+      {translate('workflows', 'terminate-modal-confirmation')}
     </p>
     <Input
       id="workflow-termination-reason"
@@ -376,20 +380,20 @@
   on:cancelModal={hideSignalModal}
   on:confirmModal={signal}
 >
-  <h3 slot="title">{t('signal-modal-title')}</h3>
+  <h3 slot="title">{translate('workflows', 'signal-modal-title')}</h3>
   <div slot="content" class="flex flex-col gap-4">
     <Input
       id="signal-name"
-      label={t('signal-name-label')}
+      label={translate('workflows', 'signal-name-label')}
       required
       bind:value={signalName}
     />
     <div>
       <span class="font-secondary text-sm font-medium"
-        >{t('signal-payload-input-label')}</span
+        >{translate('workflows', 'signal-payload-input-label')}</span
       >
       <span class="font-secondary text-xs font-light italic">
-        {t('signal-payload-input-label-hint')}
+        {translate('workflows', 'signal-payload-input-label-hint')}
       </span>
       <CodeBlock
         class="max-h-80 overflow-y-scroll overscroll-contain"

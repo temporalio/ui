@@ -5,12 +5,10 @@
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
-  import { createTranslate, translate } from '$lib/i18n/translate';
+  import { translate } from '$lib/i18n/translate';
   import type { WorkflowTaskFailedEventAttributes } from '$lib/types';
   import type { WorkflowTaskFailedEvent } from '$lib/types/events';
   import type { WorkflowTaskFailedCause } from '$lib/types/workflows';
-
-  const t = createTranslate('typed-errors');
 
   function getErrorCause(
     error: WorkflowTaskFailedEvent,
@@ -39,14 +37,21 @@
 </script>
 
 {#if cause}
-  <Alert bold icon="warning" intent="warning" title={t(`${cause}.title`)}>
+  <Alert
+    bold
+    icon="warning"
+    intent="warning"
+    title={translate('typed-errors', `${cause}.title`)}
+  >
     <p>
-      {t(`${cause}.description`)}
+      {translate('typed-errors', `${cause}.description`)}
     </p>
     {#if cause === 'WorkflowWorkerUnhandledFailure' || cause === 'BadSearchAttributes'}
       <p>
-        {t('link-preface')}<Link newTab href={t(`${cause}.link`)}
-          >{t(`${cause}.action`)}</Link
+        {translate('typed-errors', 'link-preface')}<Link
+          newTab
+          href={translate('typed-errors', `${cause}.link`)}
+          >{translate('typed-errors', `${cause}.action`)}</Link
         >.
       </p>
     {/if}
