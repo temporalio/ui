@@ -8,7 +8,6 @@ import type {
   WorkflowExecutionStartedEvent,
   WorkflowExecutionTerminatedEvent,
   WorkflowExecutionTimedOutEvent,
-  WorkflowTaskFailedEvent,
 } from '$lib/types/events';
 
 import {
@@ -20,7 +19,6 @@ import { stringifyWithBigInt } from './parse-with-big-int';
 type WorkflowInputAndResults = {
   input: string;
   results: string;
-  error: WorkflowTaskFailedEvent;
   contAsNew: boolean;
 };
 
@@ -54,12 +52,6 @@ const isCompletionEvent = (event: WorkflowEvent): event is CompletionEvent => {
   return false;
 };
 
-const isFailedTaskEvent = (
-  event: WorkflowEvent,
-): event is WorkflowTaskFailedEvent => {
-  return event.eventType === 'WorkflowTaskFailed';
-};
-
 const getEventResult = (event: CompletionEvent) => {
   if (isWorkflowExecutionContinuedAsNewEvent(event)) {
     return event.attributes.input?.payloads;
@@ -78,12 +70,10 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
 ): WorkflowInputAndResults => {
   let input: string;
   let results: string;
-  let error: WorkflowTaskFailedEvent;
   let contAsNew = false;
 
   let workflowStartedEvent: WorkflowExecutionStartedEvent;
   let workflowCompletedEvent: CompletionEvent;
-  let workflowTaskFailedEvent: WorkflowTaskFailedEvent;
 
   for (const event of eventHistory.start) {
     if (isStartedEvent(event)) {
@@ -102,9 +92,6 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
     } else if (isCompletionEvent(event)) {
       workflowCompletedEvent = event;
       continue;
-    } else if (!workflowTaskFailedEvent && isFailedTaskEvent(event)) {
-      workflowTaskFailedEvent = event;
-      continue;
     }
   }
 
@@ -120,14 +107,9 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
     results = stringifyWithBigInt(getEventResult(workflowCompletedEvent));
   }
 
-  if (workflowTaskFailedEvent) {
-    error = workflowTaskFailedEvent;
-  }
-
   return {
     input,
     results,
-    error,
     contAsNew,
   };
 };

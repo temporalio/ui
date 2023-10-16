@@ -14,7 +14,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import { authUser } from '$lib/stores/auth-user';
-  import { eventViewType } from '$lib/stores/event-view';
+  import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -23,7 +23,7 @@
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
-
+  import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
   let showShortcuts = false;
 
   $: workflowEvents =
@@ -34,6 +34,10 @@
     $eventHistory,
     $fullEventHistory,
     $namespaces,
+  );
+  $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
+    $fullEventHistory,
+    $eventFilterSort,
   );
 
   const onViewClick = (view: EventView) => {
@@ -46,8 +50,8 @@
 
 <div class="flex flex-col gap-2">
   <WorkflowStackTraceError />
-  {#if workflowEvents.error}
-    <WorkflowTypedError error={workflowEvents.error} />
+  {#if workflowTaskFailedError}
+    <WorkflowTypedError error={workflowTaskFailedError} />
   {/if}
   <WorkflowSummary />
   <WorkflowRelationships {...workflowRelationships} />
