@@ -95,6 +95,7 @@
   <td class="w-24 text-left">
     <Link
       class="truncate"
+      data-testid="link"
       on:click={(e) => {
         e.stopPropagation();
         goto(href);

@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 
 export const WORKFLOW_API = '**/api/v1/namespaces/*/workflows/*/runs/*?';
 
-const mockWorkflow = {
+export const mockWorkflow = {
   executionConfig: {
     taskQueue: {
       name: 'rainbow-statuses',
