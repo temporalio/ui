@@ -5,7 +5,6 @@
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import { fetchAllEvents } from '$lib/services/events-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
 
@@ -27,14 +26,11 @@
   ) => {
     if (!$fullEventHistory.length) {
       loading = true;
-      const { settings } = $page.data;
       resetFullHistory();
       $fullEventHistory = await fetchAllEvents({
         namespace,
         workflowId,
         runId,
-        settings,
-        accessToken: $authUser?.accessToken,
       });
       loading = false;
     }
