@@ -12,7 +12,6 @@ export const load: LayoutLoad = async function (): LayoutData {
   i18next.use(LanguageDetector).init({
     fallbackLng: 'en',
     load: 'languageOnly',
-    debug: true,
     ns: i18nNamespaces,
     defaultNS: 'common',
     detection: {
