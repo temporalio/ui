@@ -37,8 +37,8 @@ const keysToExpand: Readonly<Set<string>> = new Set([
 
 const keysToFormat: Readonly<Set<string>> = new Set(['maximumAttempts']);
 
-export const UnlimitedAttempts = translate('workflows', 'unlimited');
-export const NoExpiration = translate('workflows', 'no-expiration');
+export const UnlimitedAttempts = translate('workflows.unlimited');
+export const NoExpiration = translate('workflows.no-expiration');
 
 export const formatRetryExpiration = (
   maxAttempts: number,
@@ -140,22 +140,22 @@ const attributeGroupings: Readonly<AttributeGroup[]> = [
 ];
 
 type GroupingOption = {
-  label: I18nKey<'events'>;
+  label: I18nKey;
 };
 
 export const attributeGroupingProperties: Readonly<
   Record<AttributeGroup, GroupingOption>
 > = {
-  activity: { label: 'attribute-group.activity' },
-  parent: { label: 'attribute-group.parent' },
-  retryPolicy: { label: 'attribute-group.retry-policy' },
-  schedule: { label: 'attribute-group.schedule' },
+  activity: { label: 'events.attribute-group.activity' },
+  parent: { label: 'events.attribute-group.parent' },
+  retryPolicy: { label: 'events.attribute-group.retry-policy' },
+  schedule: { label: 'events.attribute-group.schedule' },
   searchAttributes: {
-    label: 'attribute-group.search-attributes',
+    label: 'events.attribute-group.search-attributes',
   },
-  summary: { label: 'attribute-group.summary' },
-  taskQueue: { label: 'attribute-group.task-queue' },
-  workflow: { label: 'attribute-group.workflow' },
+  summary: { label: 'events.attribute-group.summary' },
+  taskQueue: { label: 'events.attribute-group.task-queue' },
+  workflow: { label: 'events.attribute-group.workflow' },
 };
 
 export type AttributeGrouping = Partial<

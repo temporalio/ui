@@ -8,5 +8,5 @@
   $: namespace = $page.params.namespace;
 </script>
 
-<PageTitle title={translate('batch', 'list-page-title')} />
+<PageTitle title={translate('batch.list-page-title')} />
 <BatchOperations {namespace} />

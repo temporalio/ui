@@ -42,8 +42,8 @@
           content={codeBlockValue}
           class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
           {inline}
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
         />
       </div>
       {#if stackTrace && !inline}
@@ -53,8 +53,8 @@
             content={stackTrace}
             language="text"
             class="mb-2 h-full lg:pr-2"
-            copyIconTitle={translate('copy-icon-title')}
-            copySuccessIconTitle={translate('copy-success-icon-title')}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
         </div>
       {/if}
@@ -64,8 +64,8 @@
       <p class="text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
           content={value}
           container-class="flex-row-reverse xl:flex-row"
         >
@@ -87,8 +87,8 @@
       <p class="text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
           content={value}
           container-class="xl:flex-row"
         >
@@ -110,8 +110,8 @@
       <p class="text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
           content={value}
           container-class="xl:flex-row"
         >

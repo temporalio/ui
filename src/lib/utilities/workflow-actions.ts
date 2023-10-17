@@ -1,37 +1,32 @@
 import { translate } from '$lib/i18n/translate';
 import { Action } from '$lib/models/workflow-actions';
 
-type PastActionText = 'terminated' | 'reset' | 'canceled';
-
 function unhandledAction(action: never) {
   console.error('Unhandled action:', action);
 }
 
-const getPastTenseActionText = (action: Action): PastActionText => {
+export const getPlacholder = (action: Action, email?: string): string => {
+  let translatedAction: string;
   switch (action) {
     case Action.Cancel:
-      return 'canceled';
+      translatedAction = translate('workflows.canceled');
+      break;
     case Action.Reset:
-      return 'reset';
+      translatedAction = translate('workflows.reset');
+      break;
     case Action.Terminate:
-      return 'terminated';
+      translatedAction = translate('workflows.terminate');
+      break;
     default:
       unhandledAction(action);
   }
-};
-
-export const getPlacholder = (action: Action, email?: string): string => {
-  const translatedAction = translate(
-    'workflows',
-    getPastTenseActionText(action),
-  );
 
   return email
-    ? translate('workflows', 'workflow-action-reason-placeholder-with-email', {
+    ? translate('workflows.workflow-action-reason-placeholder-with-email', {
         action: translatedAction,
         email,
       })
-    : translate('workflows', 'workflow-action-reason-placeholder', {
+    : translate('workflows.workflow-action-reason-placeholder', {
         action: translatedAction,
       });
 };

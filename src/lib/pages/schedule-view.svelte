@@ -62,7 +62,7 @@
       }, 2000);
       reason = '';
     } catch (e) {
-      error = translate('schedules', 'delete-schedule-error', {
+      error = translate('schedules.delete-schedule-error', {
         error: e?.message,
       });
       $loading = false;
@@ -100,7 +100,7 @@
         }}
         icon="chevron-left"
       >
-        {translate('schedules', 'back-to-schedules')}
+        {translate('schedules.back-to-schedules')}
       </Link>
       <h1
         class="mt-8 select-all text-2xl font-medium"
@@ -116,7 +116,7 @@
   <Loading />
 {:then schedule}
   {#if $loading}
-    <Loading title={translate('schedules', 'deleting')} class="my-2" />
+    <Loading title={translate('schedules.deleting')} class="my-2" />
   {:else}
     <header class="mb-8 flex flex-row justify-between gap-4">
       <div class="relative flex flex-col gap-1">
@@ -126,7 +126,7 @@
           }}
           icon="chevron-left"
         >
-          {translate('schedules', 'back-to-schedules')}
+          {translate('schedules.back-to-schedules')}
         </Link>
         <h1 class="relative mt-8 flex items-center gap-4 text-2xl">
           <WorkflowStatus
@@ -147,7 +147,7 @@
         </div>
         <div class="flex items-center gap-2 text-sm">
           <p>
-            {translate('created', {
+            {translate('common.created', {
               created: formatDate(schedule?.info?.createTime, $timeFormat, {
                 relative: $relativeTime,
               }),
@@ -157,7 +157,7 @@
         {#if schedule?.info?.updateTime}
           <div class="flex items-center gap-2 text-sm">
             <p>
-              {translate('last-updated', {
+              {translate('common.last-updated', {
                 updated: formatDate(schedule?.info?.updateTime, $timeFormat, {
                   relative: $relativeTime,
                 }),
@@ -169,9 +169,9 @@
       <SplitButton
         position="right"
         label={schedule?.schedule?.state?.paused
-          ? translate('schedules', 'unpause')
-          : translate('schedules', 'pause')}
-        menuLabel={translate('schedules', 'schedule-actions')}
+          ? translate('schedules.unpause')
+          : translate('schedules.pause')}
+        menuLabel={translate('schedules.schedule-actions')}
         id="schedule-actions"
         disabled={editDisabled}
         on:click={() => (pauseConfirmationModalOpen = true)}
@@ -180,14 +180,14 @@
           data-testid="edit-schedule"
           href={routeForScheduleEdit({ namespace, scheduleId })}
         >
-          {translate('edit')}
+          {translate('common.edit')}
         </MenuItem>
         <MenuItem
           data-testid="delete-schedule"
           destructive
           on:click={() => (deleteConfirmationModalOpen = true)}
         >
-          {translate('delete')}
+          {translate('common.delete')}
         </MenuItem>
       </SplitButton>
     </header>
@@ -226,36 +226,36 @@
       bind:open={pauseConfirmationModalOpen}
       confirmType="primary"
       confirmText={schedule?.schedule.state.paused
-        ? translate('schedules', 'unpause')
-        : translate('schedules', 'pause')}
-      cancelText={translate('cancel')}
+        ? translate('schedules.unpause')
+        : translate('schedules.pause')}
+      cancelText={translate('common.cancel')}
       confirmDisabled={!reason}
       on:confirmModal={() => handlePause(schedule)}
       on:cancelModal={resetReason}
     >
       <h3 slot="title">
         {schedule?.schedule.state.paused
-          ? translate('schedules', 'unpause-modal-title')
-          : translate('schedules', 'pause-modal-title')}
+          ? translate('schedules.unpause-modal-title')
+          : translate('schedules.pause-modal-title')}
       </h3>
       <div slot="content">
         <p>
           {schedule?.schedule.state.paused
-            ? translate('schedules', 'unpause-modal-confirmation', {
+            ? translate('schedules.unpause-modal-confirmation', {
                 schedule: scheduleId,
               })
-            : translate('schedules', 'pause-modal-confirmation', {
+            : translate('schedules.pause-modal-confirmation', {
                 schedule: scheduleId,
               })}
         </p>
         <p class="my-4">
           {schedule?.schedule.state.paused
-            ? translate('schedules', 'unpause-reason')
-            : translate('schedules', 'pause-reason')}
+            ? translate('schedules.unpause-reason')
+            : translate('schedules.pause-reason')}
         </p>
         <input
           class="mt-4 block w-full rounded-md border border-gray-200 p-2"
-          placeholder={translate('reason')}
+          placeholder={translate('common.reason')}
           bind:value={reason}
           on:keydown|stopPropagation
         />
@@ -266,15 +266,15 @@
       bind:open={deleteConfirmationModalOpen}
       bind:error
       confirmType="destructive"
-      confirmText={translate('delete')}
-      cancelText={translate('cancel')}
+      confirmText={translate('common.delete')}
+      cancelText={translate('common.cancel')}
       on:confirmModal={handleDelete}
       on:cancelModal={resetReason}
     >
-      <h3 slot="title">{translate('schedules', 'delete-modal-title')}</h3>
+      <h3 slot="title">{translate('schedules.delete-modal-title')}</h3>
       <div slot="content">
         <p>
-          {translate('schedules', 'delete-modal-confirmation', {
+          {translate('schedules.delete-modal-confirmation', {
             schedule: scheduleId,
           })}
         </p>
@@ -290,7 +290,7 @@
         }}
         icon="chevron-left"
       >
-        {translate('schedules', 'back-to-schedules')}
+        {translate('schedules.back-to-schedules')}
       </Link>
       <h1
         class="mt-8 select-all text-2xl font-medium"

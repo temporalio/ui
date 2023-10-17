@@ -75,50 +75,50 @@ export const eventTypeCategorizations: Readonly<
 };
 
 export type EventTypeOption = {
-  label: I18nKey<'events'>;
+  label: I18nKey;
   option: EventTypeCategory | undefined;
   color?: string;
 };
 
 export const allEventTypeOptions: EventTypeOption[] = [
-  { label: 'category.all', option: undefined },
+  { label: 'events.category.all', option: undefined },
   {
-    label: 'category.activity',
+    label: 'events.category.activity',
     option: CATEGORIES.ACTIVITY,
     color: '#8B5CF6',
   },
   {
-    label: 'category.child-workflow',
+    label: 'events.category.child-workflow',
     option: CATEGORIES.CHILD_WORKFLOW,
     color: '#F59E0B',
   },
   {
-    label: 'category.command',
+    label: 'events.category.command',
     option: CATEGORIES.COMMAND,
     color: '#10B981',
   },
   {
-    label: 'category.local-activity',
+    label: 'events.category.local-activity',
     option: CATEGORIES.LOCAL_ACTIVITY,
   },
   {
-    label: 'category.marker',
+    label: 'events.category.marker',
     option: CATEGORIES.MARKER,
     color: '#EC4899',
   },
   {
-    label: 'category.signal',
+    label: 'events.category.signal',
     option: CATEGORIES.SIGNAL,
     color: '#DD6B20',
   },
   {
-    label: 'category.timer',
+    label: 'events.category.timer',
     option: CATEGORIES.TIMER,
     color: '#1D4ED8',
   },
-  { label: 'category.update', option: CATEGORIES.UPDATE },
+  { label: 'events.category.update', option: CATEGORIES.UPDATE },
   {
-    label: 'category.workflow',
+    label: 'events.category.workflow',
     option: CATEGORIES.WORKFLOW,
     color: '#10B981',
   },

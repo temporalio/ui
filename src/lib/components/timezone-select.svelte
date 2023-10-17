@@ -28,10 +28,10 @@
   const localTime = getLocalTime();
   const QuickTimezoneOptions: TimeFormatOptions = [
     {
-      label: translate('utc'),
+      label: translate('common.utc'),
       value: 'UTC',
     },
-    { label: translate('local'), value: 'local' },
+    { label: translate('common.local'), value: 'local' },
   ];
 
   let search = '';
@@ -75,7 +75,7 @@
 
 <MenuContainer>
   <MenuButton
-    label={translate('timezone', { timezone })}
+    label={translate('common.timezone', { timezone })}
     controls="timezones-menu"
     hasIndicator
     variant="ghost"
@@ -90,13 +90,13 @@
     class="w-[10rem] sm:w-[20rem] md:w-[26rem]"
   >
     <Input
-      label={translate('search')}
+      label={translate('common.search')}
       labelHidden
       id="timezone-search"
       noBorder
       bind:value={search}
       icon="search"
-      placeholder={translate('search')}
+      placeholder={translate('common.search')}
     />
 
     <MenuDivider />
@@ -115,7 +115,7 @@
 
       <div class="mx-1 my-4">
         <ToggleSwitch
-          label={translate('relative')}
+          label={translate('common.relative')}
           id="relative-toggle"
           bind:checked={$relativeTime}
           labelPosition="left"
@@ -131,12 +131,12 @@
       <MenuItem
         selected={value === $timeFormat}
         on:click={() => selectTimezone(value)}
-        description={formatUTCOffset(offset, translate('utc'))}
+        description={formatUTCOffset(offset, translate('common.utc'))}
       >
         {label} ({abbr})
       </MenuItem>
     {:else}
-      <MenuItem disabled>{translate('no-results')}</MenuItem>
+      <MenuItem disabled>{translate('common.no-results')}</MenuItem>
     {/each}
   </Menu>
 </MenuContainer>

@@ -34,16 +34,16 @@
           <CodeBlock
             {content}
             class="mb-2"
-            copyIconTitle={translate('copy-icon-title')}
-            copySuccessIconTitle={translate('copy-success-icon-title')}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
         {/each}
       {:else}
         <CodeBlock
           {content}
           class="mb-2 lg:max-h-[23.5rem]"
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
         />
       {/if}
     </div>

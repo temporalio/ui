@@ -115,7 +115,7 @@
       data-testid="back-to-workflows"
       icon="chevron-left"
     >
-      {translate('workflows', 'back-to-workflows')}
+      {translate('workflows.back-to-workflows')}
     </Link>
   </div>
   <div
@@ -129,8 +129,8 @@
         class="overflow-hidden text-2xl font-medium"
       >
         <Copyable
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
           content={workflow?.id}
           clickAllToCopy
           container-class="w-full"
@@ -141,7 +141,7 @@
         <WorkflowStatus status={workflow?.status} />
         {#if workflowUsesVersioning}
           <p class="flex items-center gap-1">
-            <span>{translate('workers', 'last-used-version')}</span
+            <span>{translate('workers.last-used-version')}</span
             ><CompatibilityBadge
               defaultVersion={buildId === defaultVersionForSet ||
                 buildId === overallDefaultVersion}
@@ -150,30 +150,27 @@
             >
               <svelte:fragment slot="overall-default-worker">
                 {#if buildId === overallDefaultVersion}{translate(
-                    'workers',
-                    'overall',
+                    'workers.overall',
                   )}{/if}
               </svelte:fragment>
               <svelte:fragment slot="default-worker">
-                {translate('workers', 'default')}
+                {translate('workers.default')}
               </svelte:fragment>
             </CompatibilityBadge>
           </p>
           <p class="flex items-center gap-1">
-            <span>{translate('workers', 'next-version')}</span
-            ><CompatibilityBadge
+            <span>{translate('workers.next-version')}</span><CompatibilityBadge
               defaultVersion={!!defaultVersionForSet}
               active={defaultVersionForSet === overallDefaultVersion}
               buildId={defaultVersionForSet}
             >
               <svelte:fragment slot="overall-default-worker">
                 {#if defaultVersionForSet === overallDefaultVersion}{translate(
-                    'workers',
-                    'overall',
+                    'workers.overall',
                   )}{/if}
               </svelte:fragment>
               <svelte:fragment slot="default-worker">
-                {translate('workers', 'default')}
+                {translate('workers.default')}
               </svelte:fragment>
             </CompatibilityBadge>
           </p>
@@ -195,9 +192,9 @@
         bold
         icon="info"
         intent="info"
-        title={translate('workflows', 'cancel-request-sent')}
+        title={translate('workflows.cancel-request-sent')}
       >
-        {translate('workflows', 'cancel-request-sent-description')}
+        {translate('workflows.cancel-request-sent-description')}
       </Alert>
     </div>
   {/if}
@@ -208,7 +205,7 @@
         icon="info"
         intent="info"
         data-testid="workflow-reset-alert"
-        title={translate('workflows', 'reset-success-alert-title')}
+        title={translate('workflows.reset-success-alert-title')}
       >
         You can find the resulting Workflow Execution <Link
           href={routeForEventHistory({
@@ -223,7 +220,7 @@
   <Tabs>
     <TabList class="flex flex-wrap gap-6" label="workflow detail">
       <Tab
-        label={translate('workflows', 'history-tab')}
+        label={translate('workflows.history-tab')}
         id="history-tab"
         href={routeForEventHistory({
           ...routeParameters,
@@ -238,7 +235,7 @@
         <Badge type="blue" class="px-2 py-0">{workflow?.historyEvents}</Badge>
       </Tab>
       <Tab
-        label={translate('workflows', 'workers-tab')}
+        label={translate('workflows.workers-tab')}
         id="workers-tab"
         href={routeForWorkers(routeParameters)}
         active={pathMatches(
@@ -249,7 +246,7 @@
         <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
       </Tab>
       <Tab
-        label={translate('workflows', 'pending-activities-tab')}
+        label={translate('workflows.pending-activities-tab')}
         id="pending-activities-tab"
         href={routeForPendingActivities(routeParameters)}
         active={pathMatches(
@@ -268,7 +265,7 @@
         </Badge>
       </Tab>
       <Tab
-        label={translate('workflows', 'stack-trace-tab')}
+        label={translate('workflows.stack-trace-tab')}
         id="stack-trace-tab"
         href={routeForStackTrace(routeParameters)}
         active={pathMatches(
@@ -277,7 +274,7 @@
         )}
       />
       <Tab
-        label={translate('workflows', 'queries-tab')}
+        label={translate('workflows.queries-tab')}
         id="queries-tab"
         href={routeForWorkflowQuery(routeParameters)}
         active={pathMatches(

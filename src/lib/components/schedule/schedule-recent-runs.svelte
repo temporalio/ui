@@ -30,7 +30,7 @@
 </script>
 
 <Panel class="w-full">
-  <h2 class="mb-4 text-2xl">{translate('schedules', 'recent-runs')}</h2>
+  <h2 class="mb-4 text-2xl">{translate('schedules.recent-runs')}</h2>
   {#each sortRecentRuns(recentRuns) as run (run?.startWorkflowResult?.workflowId)}
     {#await fetchWorkflowForSchedule({ namespace, workflowId: decodeURIForSvelte(run.startWorkflowResult.workflowId), runId: run.startWorkflowResult.runId }, fetch) then workflow}
       <div class="row">
@@ -74,9 +74,7 @@
     {/await}
   {/each}
   {#if !recentRuns.length}
-    <EmptyState
-      title={translate('schedules', 'recent-runs-empty-state-title')}
-    />
+    <EmptyState title={translate('schedules.recent-runs-empty-state-title')} />
   {/if}
 </Panel>
 

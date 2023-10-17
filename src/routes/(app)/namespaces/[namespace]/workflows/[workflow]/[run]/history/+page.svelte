@@ -19,7 +19,7 @@
 </script>
 
 <PageTitle
-  title={`${translate('workflows', 'workflow-history')} | ${workflow}`}
+  title={`${translate('workflows.workflow-history')} | ${workflow}`}
   url={$page.url.href}
 />
 <WorkflowHistoryLayout>

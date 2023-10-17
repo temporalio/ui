@@ -27,13 +27,13 @@
     bind:chips={list}
     class="w-full rounded-none"
     removeChipButtonLabel={(chip) =>
-      translate('workflows', 'remove-keyword-label', { keyword: chip })}
-    placeholder="{translate('type-or-paste-in')} {$filter.attribute}"
+      translate('workflows.remove-keyword-label', { keyword: chip })}
+    placeholder="{translate('common.type-or-paste-in')} {$filter.attribute}"
   />
   <Button
     variant="secondary"
     borderRadiusModifier="square-left"
     disabled={!list.length}
-    on:click={onSubmit}>{translate('submit')}</Button
+    on:click={onSubmit}>{translate('common.submit')}</Button
   >
 </div>

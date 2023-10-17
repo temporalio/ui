@@ -89,13 +89,13 @@
     $refresh = Date.now();
     toaster.push({
       id: 'workflow-termination-success-toast',
-      message: translate('workflows', 'terminate-success'),
+      message: translate('workflows.terminate-success'),
     });
   };
 
   const handleTerminationError = (err: NetworkError) => {
     reason = '';
-    error = err?.message ?? translate('unknown-error');
+    error = err?.message ?? translate('common.unknown-error');
   };
 
   const terminate = () => {
@@ -129,10 +129,10 @@
       $refresh = Date.now();
       toaster.push({
         id: 'workflow-cancelation-success-toast',
-        message: translate('workflows', 'cancel-success'),
+        message: translate('workflows.cancel-success'),
       });
     } catch (err) {
-      error = err?.message ?? translate('unknown-error');
+      error = err?.message ?? translate('common.unknown-error');
     }
   };
 
@@ -162,12 +162,12 @@
       signalConfirmationModalOpen = false;
       $refresh = Date.now();
       toaster.push({
-        message: translate('workflows', 'signal-success'),
+        message: translate('workflows.signal-success'),
         id: 'workflow-signal-success-toast',
       });
       hideSignalModal();
     } catch (err) {
-      error = err?.message ?? translate('unknown-error');
+      error = err?.message ?? translate('common.unknown-error');
     }
   };
 
@@ -196,7 +196,7 @@
       resetConfirmationModalOpen = false;
       $refresh = Date.now();
     } catch (err) {
-      error = err?.message ?? translate('unknown-error');
+      error = err?.message ?? translate('common.unknown-error');
     }
     hideResetModal();
   };
@@ -212,18 +212,15 @@
 
   $: {
     if (!resetEnabled) {
-      resetTooltipText = translate('workflows', 'reset-disabled');
+      resetTooltipText = translate('workflows.reset-disabled');
     } else if (resetEnabled && workflow?.pendingChildren?.length > 0) {
-      resetTooltipText = translate(
-        'workflows',
-        'reset-disabled-pending-children',
-      );
+      resetTooltipText = translate('workflows.reset-disabled-pending-children');
     } else if (
       resetEnabled &&
       workflow?.pendingChildren?.length === 0 &&
       $resetEvents.length === 0
     ) {
-      resetTooltipText = translate('workflows', 'reset-disabled-no-events');
+      resetTooltipText = translate('workflows.reset-disabled-no-events');
     }
   }
 
@@ -234,28 +231,28 @@
 
   $: workflowActions = [
     {
-      label: translate('workflows', 'reset'),
+      label: translate('workflows.reset'),
       onClick: () => (resetConfirmationModalOpen = true),
       testId: 'reset-button',
       allowed: resetAllowed,
       tooltip: resetAllowed ? '' : resetTooltipText,
     },
     {
-      label: translate('workflows', 'signal'),
+      label: translate('workflows.signal'),
       onClick: () => (signalConfirmationModalOpen = true),
       testId: 'signal-button',
       allowed: signalEnabled,
-      tooltip: signalEnabled ? '' : translate('workflows', 'signal-disabled'),
+      tooltip: signalEnabled ? '' : translate('workflows.signal-disabled'),
     },
     {
-      label: translate('workflows', 'terminate'),
+      label: translate('workflows.terminate'),
       onClick: () => (terminateConfirmationModalOpen = true),
       testId: 'terminate-button',
       allowed: terminateEnabled,
       destructive: true,
       tooltip: terminateEnabled
         ? ''
-        : translate('workflows', 'terminate-disabled'),
+        : translate('workflows.terminate-disabled'),
     },
   ];
 
@@ -273,8 +270,8 @@
     disabled={actionsDisabled}
     primaryActionDisabled={!cancelEnabled || cancelInProgress}
     on:click={() => (cancelConfirmationModalOpen = true)}
-    label={translate('workflows', 'request-cancellation')}
-    menuLabel={translate('workflows', 'workflow-actions')}
+    label={translate('workflows.request-cancellation')}
+    menuLabel={translate('workflows.workflow-actions')}
   >
     {#each workflowActions as { onClick, destructive, label, allowed, testId, tooltip }}
       {#if destructive}
@@ -295,12 +292,12 @@
 {:else}
   <Tooltip bottomRight width={200} text={resetTooltipText} hide={resetAllowed}>
     <Button
-      aria-label={translate('workflows', 'reset')}
+      aria-label={translate('workflows.reset')}
       disabled={!resetAllowed}
       variant="primary"
       on:click={() => (resetConfirmationModalOpen = true)}
     >
-      {translate('workflows', 'reset')}
+      {translate('workflows.reset')}
     </Button>
   </Tooltip>
 {/if}
@@ -308,15 +305,15 @@
 <Modal
   id="reset-confirmation-modal"
   data-testid="reset-confirmation-modal"
-  confirmText={translate('confirm')}
-  cancelText={translate('cancel')}
+  confirmText={translate('common.confirm')}
+  cancelText={translate('common.cancel')}
   bind:error
   bind:open={resetConfirmationModalOpen}
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
   confirmDisabled={!$resetId}
 >
-  <h3 slot="title">{translate('workflows', 'reset-modal-title')}</h3>
+  <h3 slot="title">{translate('workflows.reset-modal-title')}</h3>
   <svelte:fragment slot="content">
     <WorkflowResetForm
       bind:eventId={resetId}
@@ -328,18 +325,18 @@
 <Modal
   id="cancel-confirmation-modal"
   data-testid="cancel-confirmation-modal"
-  confirmText={translate('confirm')}
-  cancelText={translate('cancel')}
+  confirmText={translate('common.confirm')}
+  cancelText={translate('common.cancel')}
   bind:error
   bind:open={cancelConfirmationModalOpen}
   {loading}
   confirmType="destructive"
   on:confirmModal={cancel}
 >
-  <h3 slot="title">{translate('workflows', 'cancel-modal-title')}</h3>
+  <h3 slot="title">{translate('workflows.cancel-modal-title')}</h3>
   <svelte:fragment slot="content">
     <p>
-      {translate('workflows', 'cancel-modal-confirmation')}
+      {translate('workflows.cancel-modal-confirmation')}
     </p>
   </svelte:fragment>
 </Modal>
@@ -348,22 +345,22 @@
   data-testid="terminate-confirmation-modal"
   bind:error
   bind:open={terminateConfirmationModalOpen}
-  confirmText={translate('workflows', 'terminate')}
-  cancelText={translate('cancel')}
+  confirmText={translate('workflows.terminate')}
+  cancelText={translate('common.cancel')}
   confirmType="destructive"
   on:cancelModal={hideTerminationModal}
   on:confirmModal={terminate}
 >
-  <h3 slot="title">{translate('workflows', 'terminate-modal-title')}</h3>
+  <h3 slot="title">{translate('workflows.terminate-modal-title')}</h3>
   <div slot="content">
     <p>
-      {translate('workflows', 'terminate-modal-confirmation')}
+      {translate('workflows.terminate-modal-confirmation')}
     </p>
     <Input
       id="workflow-termination-reason"
       class="mt-4"
-      placeholder={translate('reason-placeholder')}
-      label={translate('reason-placeholder')}
+      placeholder={translate('common.reason-placeholder')}
+      label={translate('common.reason-placeholder')}
       labelHidden
       bind:value={reason}
     />
@@ -374,26 +371,26 @@
   data-testid="signal-confirmation-modal"
   bind:error
   bind:open={signalConfirmationModalOpen}
-  confirmText={translate('submit')}
-  cancelText={translate('cancel')}
+  confirmText={translate('common.submit')}
+  cancelText={translate('common.cancel')}
   confirmDisabled={!signalName}
   on:cancelModal={hideSignalModal}
   on:confirmModal={signal}
 >
-  <h3 slot="title">{translate('workflows', 'signal-modal-title')}</h3>
+  <h3 slot="title">{translate('workflows.signal-modal-title')}</h3>
   <div slot="content" class="flex flex-col gap-4">
     <Input
       id="signal-name"
-      label={translate('workflows', 'signal-name-label')}
+      label={translate('workflows.signal-name-label')}
       required
       bind:value={signalName}
     />
     <div>
       <span class="font-secondary text-sm font-medium"
-        >{translate('workflows', 'signal-payload-input-label')}</span
+        >{translate('workflows.signal-payload-input-label')}</span
       >
       <span class="font-secondary text-xs font-light italic">
-        {translate('workflows', 'signal-payload-input-label-hint')}
+        {translate('workflows.signal-payload-input-label-hint')}
       </span>
       <CodeBlock
         class="max-h-80 overflow-y-scroll overscroll-contain"

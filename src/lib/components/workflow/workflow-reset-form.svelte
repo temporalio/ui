@@ -27,7 +27,7 @@
     name="reset-event-id"
     group={eventId}
     class="max-h-40 overflow-auto"
-    description={translate('workflows', 'reset-event-radio-group-description')}
+    description={translate('workflows.reset-event-radio-group-description')}
   >
     {#each $resetEvents as event}
       <RadioInput
@@ -41,8 +41,12 @@
     id="reset-reapply-type-checkbox"
     checked={resetReapplyType === ResetReapplyType.Signal}
     on:change={handleResetReapplyTypeChange}
-    label={translate('workflows', 'reset-reapply-type-label')}
+    label={translate('workflows.reset-reapply-type-label')}
   />
 
-  <Input id="reset-reason" bind:value={reason} label={translate('reason')} />
+  <Input
+    id="reset-reason"
+    bind:value={reason}
+    label={translate('common.reason')}
+  />
 </div>

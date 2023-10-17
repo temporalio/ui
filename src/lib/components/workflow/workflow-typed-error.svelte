@@ -41,32 +41,34 @@
     bold
     icon="warning"
     intent="warning"
-    title={translate('typed-errors', `${cause}.title`)}
+    title={translate(`typed-errors.${cause}.title`)}
   >
     <p>
-      {translate('typed-errors', `${cause}.description`)}
+      {translate(`typed-errors.${cause}.description`)}
     </p>
     {#if cause === 'WorkflowWorkerUnhandledFailure' || cause === 'BadSearchAttributes'}
       <p>
-        {translate('typed-errors', 'link-preface')}<Link
+        {translate('typed-errors.link-preface')}<Link
           newTab
-          href={translate('typed-errors', `${cause}.link`)}
-          >{translate('typed-errors', `${cause}.action`)}</Link
+          href={translate(`typed-errors.${cause}.link`)}
+          >{translate(`typed-errors.${cause}.action`)}</Link
         >.
       </p>
     {/if}
     <div class="mt-2 bg-white">
       <Table class="dark w-full table-fixed">
         <caption class="sr-only" slot="caption"
-          >{translate('events', 'error-event')}</caption
+          >{translate('events.error-event')}</caption
         >
         <TableHeaderRow slot="headers">
           <td class="w-14 xl:w-10" />
           <th class="w-16 md:w-32">
-            <span class="max-md:hidden">{translate('date-and-time')}</span>
+            <span class="max-md:hidden"
+              >{translate('common.date-and-time')}</span
+            >
             <span class="md:hidden"><Icon name="clock" /></span>
           </th>
-          <th class="w-44">{translate('event')}</th>
+          <th class="w-44">{translate('common.event')}</th>
           <th class="w-auto xl:w-80" />
         </TableHeaderRow>
         <EventSummaryRow event={error} initialItem={error} typedError />

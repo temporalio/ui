@@ -109,7 +109,7 @@
 <SkipNavigation />
 <div class="flex w-screen flex-row">
   <Toaster
-    closeButtonLabel={translate('close')}
+    closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
     toasts={toaster.toasts}
   />

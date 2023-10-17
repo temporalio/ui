@@ -85,7 +85,7 @@
       <div>
         {formatDate(run, $timeFormat, {
           relative: $relativeTime,
-          relativeLabel: translate('from-now'),
+          relativeLabel: translate('common.from-now'),
         })}
       </div>
     {/each}

@@ -208,7 +208,7 @@
 </script>
 
 <Accordion
-  title={translate('timeline')}
+  title={translate('common.timeline')}
   icon="timeline"
   open={$workflowTimelineViewOpen}
   onToggle={() => {

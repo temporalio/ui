@@ -28,7 +28,7 @@
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
 
-  const localTime = getLocalTime() || translate('local');
+  const localTime = getLocalTime() || translate('common.local');
 
   let custom = false;
   let value = 'All Time';
@@ -193,12 +193,12 @@
           {#if custom}
             <div class="flex flex-col gap-2 p-2">
               <DatePicker
-                label={translate('start')}
+                label={translate('common.start')}
                 on:datechange={onStartDateChange}
                 selected={startDate}
-                todayLabel={translate('today')}
-                closeLabel={translate('close')}
-                clearLabel={translate('clear-input-button-label')}
+                todayLabel={translate('common.today')}
+                closeLabel={translate('common.close')}
+                clearLabel={translate('common.clear-input-button-label')}
               />
               <TimePicker
                 bind:hour={startHour}
@@ -207,12 +207,12 @@
                 bind:half={startHalf}
               />
               <DatePicker
-                label={translate('end')}
+                label={translate('common.end')}
                 on:datechange={onEndDateChange}
                 selected={endDate}
-                todayLabel={translate('today')}
-                closeLabel={translate('close')}
-                clearLabel={translate('clear-input-button-label')}
+                todayLabel={translate('common.today')}
+                closeLabel={translate('common.close')}
+                clearLabel={translate('common.clear-input-button-label')}
               />
               <TimePicker
                 bind:hour={endHour}
@@ -221,9 +221,9 @@
                 bind:half={endHalf}
               />
               <div class="flex gap-2">
-                <Button on:click={onApply}>{translate('apply')}</Button>
+                <Button on:click={onApply}>{translate('common.apply')}</Button>
                 <Button variant="secondary" on:click={() => (custom = false)}
-                  >{translate('cancel')}</Button
+                  >{translate('common.cancel')}</Button
                 >
               </div>
             </div>
@@ -231,12 +231,12 @@
             <div class="flex w-full flex-wrap">
               <div class="flex w-1/2 flex-col border-b border-gray-300">
                 <MenuItem on:click={() => onChange('All Time')}
-                  >{translate('all-time')}</MenuItem
+                  >{translate('common.all-time')}</MenuItem
                 >
               </div>
               <div class="flex w-1/2 flex-col border-b border-gray-300">
                 <MenuItem on:click={() => onChange('Custom')}
-                  >{translate('custom')}</MenuItem
+                  >{translate('common.custom')}</MenuItem
                 >
               </div>
               {#each columnOrderedDurations as duration}
@@ -252,7 +252,7 @@
                     selected={timeField === 'StartTime'}
                     on:click={() => onTimeFieldChange('StartTime')}
                   >
-                    {translate('start-time')}
+                    {translate('common.start-time')}
                   </MenuItem>
                 </div>
                 <div class="flex w-1/2 flex-col border-t border-gray-300">
@@ -260,7 +260,7 @@
                     selected={timeField === 'CloseTime'}
                     on:click={() => onTimeFieldChange('CloseTime')}
                   >
-                    {translate('end-time')}
+                    {translate('common.end-time')}
                   </MenuItem>
                 </div>
               </div>
@@ -269,7 +269,7 @@
           <MenuDivider />
           <MenuItem centered disabled>
             <Icon name="clock" aria-hidden="true" />
-            {translate('based-on-time-preface')}
+            {translate('common.based-on-time-preface')}
             {localTime}
           </MenuItem>
         </Menu>

@@ -37,14 +37,14 @@
 
   $: error = '';
   $: namespaceOrCluster = $page.data?.settings?.runtimeEnvironment?.isCloud
-    ? translate('namespaces')
-    : translate('cluster');
+    ? translate('common.namespaces')
+    : translate('common.cluster');
 
   $: {
     if (passToken && !validateHttps(endpoint)) {
-      error = translate('data-encoder', 'access-token-https-error');
+      error = translate('data-encoder.access-token-https-error');
     } else if (endpoint && !validateHttpOrHttps(endpoint)) {
-      error = translate('data-encoder', 'prefix-error');
+      error = translate('data-encoder.prefix-error');
     } else {
       error = '';
     }
@@ -88,25 +88,25 @@
     <div class="flex w-full flex-col gap-4 xl:w-1/2">
       <div class="flex items-center justify-between space-x-2">
         <h3 data-testid="data-encoder-title" class="text-xl">
-          {translate('codec-server')}
+          {translate('common.codec-server')}
         </h3>
       </div>
       <p class="text-sm">
-        {translate('data-encoder', 'codec-server-description-prefix')}<Link
+        {translate('data-encoder.codec-server-description-prefix')}<Link
           href="https://docs.temporal.io/dataconversion#codec-server"
-          newTab>{translate('codec-server')}</Link
+          newTab>{translate('common.codec-server')}</Link
         >
-        {translate('data-encoder', 'codec-server-description-suffix', {
+        {translate('data-encoder.codec-server-description-suffix', {
           level: namespaceOrCluster,
         })}
       </p>
       <Accordion
         data-testid="override-accordion"
         title={$override
-          ? translate('data-encoder', 'browser-override-description', {
+          ? translate('data-encoder.browser-override-description', {
               level: namespaceOrCluster,
             })
-          : translate('data-encoder', 'no-browser-override-description', {
+          : translate('data-encoder.no-browser-override-description', {
               level: namespaceOrCluster,
             })}
       >
@@ -115,19 +115,15 @@
             id="use-configuration-endpoint-radio"
             data-testid="use-configuration-endpoint-input"
             value={false}
-            label={translate(
-              'data-encoder',
-              'no-browser-override-description',
-              {
-                level: namespaceOrCluster,
-              },
-            )}
+            label={translate('data-encoder.no-browser-override-description', {
+              level: namespaceOrCluster,
+            })}
           />
           <RadioInput
             id="use-local-endpoint-radio"
             data-testid="use-local-endpoint-input"
             value={true}
-            label={translate('data-encoder', 'browser-override-description', {
+            label={translate('data-encoder.browser-override-description', {
               level: namespaceOrCluster,
             })}
           />
@@ -145,12 +141,12 @@
           disabled={Boolean(error)}
           data-testid="confirm-data-encoder-button"
           on:click={onConfirm}
-          type="submit">{translate('apply')}</Button
+          type="submit">{translate('common.apply')}</Button
         >
         <Button
           variant="ghost"
           data-testid="cancel-data-encoder-button"
-          on:click={onCancel}>{translate('cancel')}</Button
+          on:click={onCancel}>{translate('common.cancel')}</Button
         >
       </div>
     </div>

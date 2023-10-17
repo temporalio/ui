@@ -33,20 +33,20 @@
 
 <div class="flex flex-col gap-4">
   <h3 class="text-lg font-medium">
-    {translate('schedules', 'time-view-heading')}
+    {translate('schedules.time-view-heading')}
   </h3>
   <p>
-    {translate('schedules', 'time-view-description')}
+    {translate('schedules.time-view-description')}
   </p>
   <div class="flex flex-row items-center gap-2">
     <div class="w-24">
       <Input
         id="hour-time"
-        label={translate('hours-abbreviated')}
+        label={translate('common.hours-abbreviated')}
         labelHidden
         bind:value={_hour}
         placeholder="00"
-        suffix={translate('hours-abbreviated')}
+        suffix={translate('common.hours-abbreviated')}
         maxLength={2}
         error={error(_hour, 12)}
       />
@@ -55,11 +55,11 @@
     <div class="w-24">
       <Input
         id="minute-time"
-        label={translate('minutes-abbreviated')}
+        label={translate('common.minutes-abbreviated')}
         labelHidden
         bind:value={minute}
         placeholder="00"
-        suffix={translate('minutes-abbreviated')}
+        suffix={translate('common.minutes-abbreviated')}
         maxLength={2}
         error={error(minute, 59)}
       />
@@ -67,10 +67,10 @@
     <div class="ml-2">
       <ToggleButtons>
         <ToggleButton active={time === 'AM'} on:click={() => (time = 'AM')}
-          >{translate('ante-meridiem')}</ToggleButton
+          >{translate('common.ante-meridiem')}</ToggleButton
         >
         <ToggleButton active={time === 'PM'} on:click={() => (time = 'PM')}
-          >{translate('post-meridiem')}</ToggleButton
+          >{translate('common.post-meridiem')}</ToggleButton
         >
       </ToggleButtons>
     </div>
@@ -78,7 +78,7 @@
   <div class="flex w-full flex-row items-center gap-2">
     <Icon name="clock" aria-hidden="true" />
     <span class="text-xs font-normal text-gray-500"
-      >{translate('based-on-time-preface')} Universal Standard Time (UTC)
+      >{translate('common.based-on-time-preface')} Universal Standard Time (UTC)
     </span>
   </div>
 </div>

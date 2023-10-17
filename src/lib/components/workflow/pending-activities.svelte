@@ -36,11 +36,11 @@
 {#if pendingActivities.length}
   <section class="rounded-xl border-2 border-gray-900 bg-white p-4">
     <h3 class="mb-2 flex gap-2 text-lg font-medium">
-      {translate('workflows', 'pending-activities')}
+      {translate('workflows.pending-activities')}
       {#if canceled}
         <Tooltip
           bottom
-          text={translate('workflows', 'pending-activities-canceled')}
+          text={translate('workflows.pending-activities-canceled')}
         >
           <Badge type="warning" class="py-0"><Icon name="canceled" /></Badge>
         </Tooltip>
@@ -58,7 +58,7 @@
               <div class="pending-activity-inner-row">
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">
-                    {translate('workflows', 'activity-type')}
+                    {translate('workflows.activity-type')}
                   </h4>
                   <Badge type={failed ? 'error' : 'default'}>
                     {pendingActivity.activityType}
@@ -66,7 +66,7 @@
                 </div>
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">
-                    {translate('workflows', 'last-heartbeat')}
+                    {translate('workflows.last-heartbeat')}
                   </h4>
                   {formatDate(pendingActivity.lastHeartbeatTime, $timeFormat, {
                     relative: $relativeTime,
@@ -74,7 +74,7 @@
                 </div>
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">
-                    {translate('workflows', 'attempt')}
+                    {translate('workflows.attempt')}
                   </h4>
                   <Badge type={failed ? 'error' : 'default'}>
                     {#if failed}
@@ -85,7 +85,7 @@
                 </div>
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">
-                    {translate('workflows', 'attempts-left')}
+                    {translate('workflows.attempts-left')}
                   </h4>
                   <Badge type={failed ? 'error' : 'default'}>
                     {formatAttemptsLeft(
@@ -97,7 +97,7 @@
                 {#if failed && pendingActivity.scheduledTime}
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">
-                      {translate('workflows', 'next-retry')}
+                      {translate('workflows.next-retry')}
                     </h4>
                     <Badge type={failed ? 'error' : 'default'}>
                       {toTimeDifference({
@@ -109,7 +109,7 @@
                 {/if}
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">
-                    {translate('workflows', 'expiration')}
+                    {translate('workflows.expiration')}
                   </h4>
                   {formatRetryExpiration(
                     pendingActivity.maximumAttempts,
@@ -126,16 +126,16 @@
                 {#if pendingActivity?.heartbeatDetails}
                   <div class="w-1/2 grow">
                     <h4 class="pending-activity-detail-header">
-                      {translate('workflows', 'heartbeat-details')}
+                      {translate('workflows.heartbeat-details')}
                     </h4>
                     <CodeBlock
                       class="max-h-32"
                       content={stringifyWithBigInt(
                         pendingActivity.heartbeatDetails,
                       )}
-                      copyIconTitle={translate('copy-icon-title')}
+                      copyIconTitle={translate('common.copy-icon-title')}
                       copySuccessIconTitle={translate(
-                        'copy-success-icon-title',
+                        'common.copy-success-icon-title',
                       )}
                     />
                   </div>
@@ -143,14 +143,14 @@
                 {#if pendingActivity?.lastFailure}
                   <div class="w-1/2 grow">
                     <h4 class="pending-activity-detail-header">
-                      {translate('workflows', 'last-failure')}
+                      {translate('workflows.last-failure')}
                     </h4>
                     <CodeBlock
                       class="max-h-32"
                       content={stringifyWithBigInt(pendingActivity.lastFailure)}
-                      copyIconTitle={translate('copy-icon-title')}
+                      copyIconTitle={translate('common.copy-icon-title')}
                       copySuccessIconTitle={translate(
-                        'copy-success-icon-title',
+                        'common.copy-success-icon-title',
                       )}
                     />
                   </div>
@@ -162,7 +162,7 @@
       {/each}
     </div>
     <div class="mt-2 text-right">
-      <Link {href}>{translate('workflows', 'pending-activities-link')}</Link>
+      <Link {href}>{translate('workflows.pending-activities-link')}</Link>
     </div>
   </section>
 {/if}

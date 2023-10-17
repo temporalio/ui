@@ -13,41 +13,46 @@
 </script>
 
 <ScheduleNotes {notes} />
-<Accordion title={translate('schedules', 'advanced-settings')}>
+<Accordion title={translate('schedules.advanced-settings')}>
   <p>
-    {translate('schedules', 'start-time')}
-    {spec?.startTime ?? translate('none')}
+    {translate('schedules.start-time')}
+    {spec?.startTime ?? translate('common.none')}
   </p>
   <p>
-    {translate('schedules', 'end-time')}{spec?.endTime ?? translate('none')}
+    {translate('schedules.end-time')}{spec?.endTime ?? translate('common.none')}
   </p>
-  <p>{translate('schedules', 'jitter')}{spec?.jitter ?? translate('none')}</p>
   <p>
-    {translate('schedules', 'exclusion-calendar')}{spec?.excludeCalendar?.[0] ??
-      translate('none')}
+    {translate('schedules.jitter')}{spec?.jitter ?? translate('common.none')}
+  </p>
+  <p>
+    {translate('schedules.exclusion-calendar')}{spec?.excludeCalendar?.[0] ??
+      translate('common.none')}
   </p>
   {#if state?.limitedActions}
     <p>
-      {translate('schedules', 'start-time')}
-      {spec?.startTime ?? translate('none')}
+      {translate('schedules.start-time')}
+      {spec?.startTime ?? translate('common.none')}
     </p>
     <p>
-      {translate('schedules', 'end-time')}{spec?.endTime ?? translate('none')}
+      {translate('schedules.end-time')}{spec?.endTime ??
+        translate('common.none')}
     </p>
-    <p>{translate('schedules', 'jitter')}{spec?.jitter ?? translate('none')}</p>
     <p>
-      {translate('schedules', 'exclusion-calendar')}{spec
-        ?.excludeCalendar?.[0] ?? translate('none')}
+      {translate('schedules.jitter')}{spec?.jitter ?? translate('common.none')}
+    </p>
+    <p>
+      {translate('schedules.exclusion-calendar')}{spec?.excludeCalendar?.[0] ??
+        translate('common.none')}
     </p>
     {#if state?.limitedActions}
       <p>
-        {translate('schedules', 'remaining-actions')}{state?.remainingActions ??
-          translate('none')}
+        {translate('schedules.remaining-actions')}{state?.remainingActions ??
+          translate('common.none')}
       </p>
     {/if}
     <p>
-      {translate('schedules', 'overlap-policy')}{policies?.overlapPolicy ??
-        translate('none')}
+      {translate('schedules.overlap-policy')}{policies?.overlapPolicy ??
+        translate('common.none')}
     </p>
   {/if}
 </Accordion>

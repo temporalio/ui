@@ -13,8 +13,8 @@
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
   const options = [
-    { value: 'true', label: translate('true') },
-    { value: 'false', label: translate('false') },
+    { value: 'true', label: translate('common.true') },
+    { value: 'false', label: translate('common.false') },
   ];
 
   $: selectedOption =

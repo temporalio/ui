@@ -27,10 +27,10 @@
 
 <Table>
   <TableHeaderRow slot="headers">
-    <th>{translate('status')}</th>
-    <th>{translate('job-id')}</th>
-    <th>{translate('start-time')}</th>
-    <th>{translate('close-time')}</th>
+    <th>{translate('common.status')}</th>
+    <th>{translate('common.job-id')}</th>
+    <th>{translate('common.start-time')}</th>
+    <th>{translate('common.close-time')}</th>
   </TableHeaderRow>
   {#each operations as { state, jobId, startTime, closeTime }}
     <TableRow>
@@ -49,8 +49,7 @@
   {:else}
     <TableRow>
       <td colspan="4">
-        <EmptyState title={translate('batch', 'empty-state-title')}
-        ></EmptyState>
+        <EmptyState title={translate('batch.empty-state-title')}></EmptyState>
       </td>
     </TableRow>
   {/each}

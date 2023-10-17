@@ -20,43 +20,46 @@
 <Drawer
   {open}
   onClick={onClose}
-  title={translate('keyboard-shortcuts')}
-  closeButtonLabel={translate('close-keyboard-shortcuts')}
+  title={translate('common.keyboard-shortcuts')}
+  closeButtonLabel={translate('common.close-keyboard-shortcuts')}
 >
   <div
     class="grid grid-cols-1 gap-8 text-gray-500 dark:text-gray-400 md:grid-cols-2 xl:grid-cols-4"
   >
     <div class="cell">
-      {translate('next-page')}
+      {translate('common.next-page')}
       <div class="shortcut">
         <Shortcut
           arrow="right"
-          title={translate('arrow-key-right')}
+          title={translate('common.arrow-key-right')}
         />|<Shortcut title="">L</Shortcut>
       </div>
     </div>
     <div class="cell">
-      {translate('previous-page')}
+      {translate('common.previous-page')}
       <div class="shortcut">
-        <Shortcut arrow="left" title={translate('arrow-key-left')} />|<Shortcut
-          title="">H</Shortcut
-        >
+        <Shortcut
+          arrow="left"
+          title={translate('common.arrow-key-left')}
+        />|<Shortcut title="">H</Shortcut>
       </div>
     </div>
     <div class="cell">
-      {translate('next-row')}
+      {translate('common.next-row')}
       <div class="shortcut">
-        <Shortcut arrow="down" title={translate('arrow-key-down')} />|<Shortcut
-          title="">J</Shortcut
-        >
+        <Shortcut
+          arrow="down"
+          title={translate('common.arrow-key-down')}
+        />|<Shortcut title="">J</Shortcut>
       </div>
     </div>
     <div class="cell">
-      {translate('previous-row')}
+      {translate('common.previous-row')}
       <div class="shortcut">
-        <Shortcut arrow="up" title={translate('arrow-key-up')} />|<Shortcut
-          title="">K</Shortcut
-        >
+        <Shortcut
+          arrow="up"
+          title={translate('common.arrow-key-up')}
+        />|<Shortcut title="">K</Shortcut>
       </div>
     </div>
   </div>

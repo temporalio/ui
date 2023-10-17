@@ -47,7 +47,9 @@
     <h1
       class="flex flex-col gap-0 text-lg md:flex-row md:items-center md:gap-2 md:text-2xl"
     >
-      {translate('schedules')}<Badge type="beta">{translate('preview')}</Badge>
+      {translate('common.schedules')}<Badge type="beta"
+        >{translate('common.preview')}</Badge
+      >
     </h1>
     <p class="text-sm text-gray-600" data-testid="namespace-name">
       {namespace}
@@ -58,7 +60,7 @@
       data-testid="create-schedule"
       href={routeForScheduleCreate({ namespace })}
     >
-      {translate('schedules', 'create')}
+      {translate('schedules.create')}
     </Button>
   {/if}
 </header>
@@ -70,22 +72,22 @@
     <Pagination
       items={filteredSchedules(schedules)}
       let:visibleItems
-      aria-label={translate('schedules')}
-      pageSizeSelectLabel={translate('per-page')}
-      previousButtonLabel={translate('previous')}
-      nextButtonLabel={translate('next')}
+      aria-label={translate('common.schedules')}
+      pageSizeSelectLabel={translate('common.per-page')}
+      previousButtonLabel={translate('common.previous')}
+      nextButtonLabel={translate('common.next')}
     >
       <svelte:fragment slot="action-top-left">
         <div class="w-full xl:w-1/2">
           <Input
             icon="search"
             type="search"
-            label={translate('schedules', 'name')}
+            label={translate('schedules.name')}
             labelHidden
             id="schedule-name-filter"
-            placeholder={translate('schedules', 'name')}
+            placeholder={translate('schedules.name')}
             clearable
-            clearButtonLabel={translate('clear-input-button-label')}
+            clearButtonLabel={translate('common.clear-input-button-label')}
             bind:value={search}
             on:submit={noop}
           />
@@ -99,8 +101,8 @@
             <td class="hidden xl:table-cell" />
             <td colspan="3">
               <EmptyState
-                title={translate('schedules', 'empty-state-title')}
-                content={translate('schedules', 'empty-state-description')}
+                title={translate('schedules.empty-state-title')}
+                content={translate('schedules.empty-state-description')}
               />
             </td>
             <td class="hidden xl:table-cell" />
@@ -110,15 +112,15 @@
     </Pagination>
   {:else}
     <div class="my-12 flex flex-col items-center justify-start gap-2">
-      <EmptyState title={translate('schedules', 'empty-state-title')} {error}>
+      <EmptyState title={translate('schedules.empty-state-title')} {error}>
         <p>
-          {translate('schedules', 'getting-started-docs-link-preface')}
+          {translate('schedules.getting-started-docs-link-preface')}
           <Link
             target="_external"
             href="https://docs.temporal.io/workflows/#schedule"
-            >{translate('schedules', 'getting-started-docs-link')}</Link
+            >{translate('schedules.getting-started-docs-link')}</Link
           >
-          {translate('schedules', 'getting-started-cli-link-preface')}
+          {translate('schedules.getting-started-cli-link-preface')}
           <Link target="_external" href="https://docs.temporal.io/cli/schedule"
             >Temporal CLI</Link
           >.
@@ -128,7 +130,7 @@
             data-testid="create-schedule"
             href={routeForScheduleCreate({ namespace })}
           >
-            {translate('schedules', 'create')}
+            {translate('schedules.create')}
           </Button>
         {/if}
       </EmptyState>

@@ -32,7 +32,7 @@
         height="24px"
         width="24px"
         {isCloud}
-        title={translate('workflows', 'recent-workflows-link')}
+        title={translate('workflows.recent-workflows-link')}
       />
     </a>
     <button
@@ -73,7 +73,7 @@
       : 'text-gray-300'}"
   >
     {#if version}
-      <span class="sr-only">{translate('version')}</span>
+      <span class="sr-only">{translate('common.version')}</span>
     {/if}
     {version}
   </div>

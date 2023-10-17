@@ -49,14 +49,14 @@
   class="sticky top-0 z-30 flex w-full flex-col items-center justify-end border-b-2 bg-gray-100 p-1 px-4 md:flex-row md:px-8"
   data-testid="top-nav"
   class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
-  aria-label={translate('main')}
+  aria-label={translate('common.main')}
 >
   <div class="flex grow items-center">
     {#if showNamespaceSpecificNav}
       <Combobox
-        label={translate('namespaces', 'namespace-label', { namespace })}
-        toggleLabel={translate('namespaces')}
-        noResultsText={translate('no-results')}
+        label={translate('namespaces.namespace-label', { namespace })}
+        toggleLabel={translate('common.namespaces')}
+        noResultsText={translate('common.no-results')}
         labelHidden
         value={namespace}
         id="namespace-switcher"
@@ -78,7 +78,7 @@
         <MenuButton variant="ghost" hasIndicator controls="user-menu">
           <img
             src={$authUser?.picture}
-            alt={$authUser?.profile ?? translate('user-profile')}
+            alt={$authUser?.profile ?? translate('common.user-profile')}
             class="h-[24px] w-[24px] cursor-pointer rounded-md"
             on:error={fixImage}
             class:hidden={!showProfilePic}
@@ -96,7 +96,7 @@
         </MenuButton>
         <Menu id="user-menu" position="right">
           <MenuItem disabled>{$authUser.email}</MenuItem>
-          <MenuItem on:click={logout}>{translate('log-out')}</MenuItem>
+          <MenuItem on:click={logout}>{translate('common.log-out')}</MenuItem>
         </Menu>
       </MenuContainer>
     {/if}

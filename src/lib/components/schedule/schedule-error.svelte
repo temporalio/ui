@@ -6,7 +6,7 @@
 </script>
 
 <Panel error>
-  <p class="error-text">{translate('schedules', 'error-title')}</p>
+  <p class="error-text">{translate('schedules.error-title')}</p>
   <p class="error-text">
     {error}
   </p>

@@ -15,11 +15,11 @@
 
 <Table class="w-full">
   <caption class="sr-only" slot="caption"
-    >{translate('workflows', 'parent-workflow')}</caption
+    >{translate('workflows.parent-workflow')}</caption
   >
   <TableHeaderRow slot="headers">
-    <th>{translate('workflows', 'parent-id')}</th>
-    <th>{translate('workflows', 'parent-run-id')}</th>
+    <th>{translate('workflows.parent-id')}</th>
+    <th>{translate('workflows.parent-run-id')}</th>
   </TableHeaderRow>
   <TableRow class="hover:text-blue-700 hover:underline">
     <td>
@@ -32,8 +32,8 @@
         })}
       >
         <Copyable
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
           content={parent.workflowId}
           visible
         />
@@ -49,8 +49,8 @@
         })}
       >
         <Copyable
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
           content={parent.runId}
           visible
         />

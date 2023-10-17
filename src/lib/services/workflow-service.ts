@@ -326,7 +326,7 @@ export async function signalWorkflow({
       });
       if (get(lastDataEncoderStatus) === 'error') {
         throw new Error(
-          get(lastDataEncoderError) || translate('encode-failed'),
+          get(lastDataEncoderError) || translate('common.encode-failed'),
         );
       }
       payloads = awaitData?.payloads ?? null;

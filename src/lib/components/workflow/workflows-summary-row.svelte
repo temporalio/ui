@@ -69,9 +69,9 @@
       {workflow.id}
     </Link>
     <FilterOrCopyButtons
-      copyIconTitle={translate('copy-icon-title')}
-      copySuccessIconTitle={translate('copy-success-icon-title')}
-      filterIconTitle={translate('filter-workflows')}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      filterIconTitle={translate('common.filter-workflows')}
       show={showFilterCopy}
       content={workflow.id}
       filterable={false}
@@ -87,20 +87,20 @@
     on:mouseleave={() => (showFilterCopy = false)}
     on:blur={() => (showFilterCopy = false)}
   >
-    <h3 class="md:hidden">{translate('workflows', 'workflow-name')}:</h3>
+    <h3 class="md:hidden">{translate('workflows.workflow-name')}:</h3>
     <button
       class="table-link"
       on:click|preventDefault|stopPropagation={() => onTypeClick(workflow.name)}
-      aria-label={translate('workflows', 'filter-by', {
+      aria-label={translate('workflows.filter-by', {
         workflowName: workflow.name,
       })}
     >
       {workflow.name}
     </button>
     <FilterOrCopyButtons
-      copyIconTitle={translate('copy-icon-title')}
-      copySuccessIconTitle={translate('copy-success-icon-title')}
-      filterIconTitle={translate('filter-workflows')}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      filterIconTitle={translate('common.filter-workflows')}
       show={showFilterCopy}
       content={workflow.name}
       onFilter={() => onTypeClick(workflow.name)}

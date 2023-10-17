@@ -31,11 +31,11 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <p>{translate('batch', 'results')}</p>
+  <p>{translate('batch.results')}</p>
   <div>
     <div class="flex justify-between">
       <span class="text-xs font-semibold">
-        {translate('batch', 'operations-progress', {
+        {translate('batch.operations-progress', {
           percent: progressPercent,
         })}
       </span>
@@ -56,14 +56,14 @@
   <div>
     <div class="flex justify-between">
       <span class=" text-xs font-semibold text-green-700"
-        >{translate('batch', 'operations-succeeded', {
+        >{translate('batch.operations-succeeded', {
           count: operation.completeOperationCount,
         })}</span
       >
       <span
         class=" text-xs font-semibold"
         class:text-red-700={failurePercent > 0}
-        >{translate('batch', 'operations-failed', {
+        >{translate('batch.operations-failed', {
           count: operation.failureOperationCount,
         })}</span
       >

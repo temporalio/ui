@@ -55,7 +55,7 @@
     {#await stackTrace}
       <div class="text-center">
         <Loading />
-        <p>{translate('workflows', 'no-workers-failure-message')}</p>
+        <p>{translate('workflows.no-workers-failure-message')}</p>
       </div>
     {:then result}
       <div class="flex items-center gap-4">
@@ -64,10 +64,10 @@
           leadingIcon="retry"
           loading={isLoading}
         >
-          {translate('refresh')}
+          {translate('common.refresh')}
         </Button>
         <p>
-          {translate('workflows', 'stack-trace-at')}
+          {translate('workflows.stack-trace-at')}
           {currentdate.toLocaleTimeString()}
         </p>
       </div>
@@ -76,28 +76,28 @@
           content={result}
           language="text"
           testId="query-stack-trace"
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
         />
       </div>
     {:catch _error}
       <EmptyState
-        title={translate('error-occurred')}
-        content={translate('workflows', 'no-workers-running-message')}
+        title={translate('common.error-occurred')}
+        content={translate('workflows.no-workers-running-message')}
       />
     {/await}
   {:else}
     <EmptyState
-      title={translate('workflows', 'stack-trace-empty-state')}
+      title={translate('workflows.stack-trace-empty-state')}
       testId="query-stack-trace-empty"
     >
       {#if workflow?.isRunning && workers?.pollers?.length === 0}
         <p>
-          {translate('workflows', 'stack-trace-link-preface')}<Link
+          {translate('workflows.stack-trace-link-preface')}<Link
             href="https://docs.temporal.io/workflows#stack-trace-query"
           >
-            {translate('workflows', 'stack-trace-link')}</Link
-          >{translate('workflows', 'stack-trace-link-postface', {
+            {translate('workflows.stack-trace-link')}</Link
+          >{translate('workflows.stack-trace-link-postface', {
             taskQueue: workflow?.taskQueue,
           })}
         </p>

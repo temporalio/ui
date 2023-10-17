@@ -9,6 +9,8 @@
   placeholder="Port"
   id="data-encoder-port-input"
   bind:value={port}
-  label="{translate('data-encoder', 'port-title')} ({translate('deprecated')})"
-  hintText="*{translate('data-encoder', 'port-info')}"
+  label="{translate('data-encoder.port-title')} ({translate(
+    'common.deprecated',
+  )})"
+  hintText="*{translate('data-encoder.port-info')}"
 />

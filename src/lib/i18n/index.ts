@@ -15,23 +15,21 @@ type WithoutPluralSuffix<T> = T extends
   ? P
   : T;
 
-export const I18nMap = {
+export const i18nResources = {
   ...Locales.en,
-} as const;
-
-export const I18nNamespaces = Object.keys(I18nMap);
-
-export type I18nNamespace = keyof typeof I18nMap;
-
-export type I18nKeys = {
-  [Namespace in keyof typeof I18nMap]: {
-    [Key in keyof (typeof I18nMap)[Namespace] as WithoutPluralSuffix<
-      Leaves<(typeof I18nMap)[Namespace]>
-    >]: (typeof I18nMap)[Namespace][Key];
-  };
 };
 
-export type I18nKey<T extends I18nNamespace> = keyof I18nKeys[T];
+export const I18nNamespaces = Object.keys(i18nResources);
+
+export type I18nMap = typeof i18nResources;
+
+export type I18nNamespace = keyof I18nMap;
+
+export type I18nKey = WithoutPluralSuffix<
+  Leaves<{
+    [Key in keyof I18nMap]: I18nMap[Key];
+  }>
+>;
 
 // TODO: can we make this dynamic based on the namespace and key?
 export type I18nReplace = {

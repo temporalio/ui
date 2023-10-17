@@ -9,5 +9,5 @@
   $: jobId = $page.params.jobId;
 </script>
 
-<PageTitle title="{translate('batch', 'describe-page-title')} | {jobId}" />
+<PageTitle title="{translate('batch.describe-page-title')} | {jobId}" />
 <BatchOperation {jobId} {namespace} />
