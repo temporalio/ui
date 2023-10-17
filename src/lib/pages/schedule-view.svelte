@@ -58,41 +58,38 @@
   let policies: { label: string; description: string; value: OverlapPolicy }[] =
     [
       {
-        description: translate('schedules', 'trigger-unspecified-description'),
-        label: translate('schedules', 'trigger-unspecified-title'),
+        description: translate('schedules.trigger-unspecified-description'),
+        label: translate('schedules.trigger-unspecified-title'),
         value: 'Unspecified',
       },
       {
-        description: translate('schedules', 'trigger-allow-all-description'),
-        label: translate('schedules', 'trigger-allow-all-title'),
+        description: translate('schedules.trigger-allow-all-description'),
+        label: translate('schedules.trigger-allow-all-title'),
         value: 'AllowAll',
       },
       {
-        description: translate('schedules', 'trigger-skip-description'),
-        label: translate('schedules', 'trigger-skip-title'),
+        description: translate('schedules.trigger-skip-description'),
+        label: translate('schedules.trigger-skip-title'),
         value: 'Skip',
       },
       {
-        description: translate('schedules', 'trigger-buffer-one-description'),
-        label: translate('schedules', 'trigger-buffer-one-title'),
+        description: translate('schedules.trigger-buffer-one-description'),
+        label: translate('schedules.trigger-buffer-one-title'),
         value: 'BufferOne',
       },
       {
-        description: translate('schedules', 'trigger-buffer-all-description'),
-        label: translate('schedules', 'trigger-buffer-all-title'),
+        description: translate('schedules.trigger-buffer-all-description'),
+        label: translate('schedules.trigger-buffer-all-title'),
         value: 'BufferAll',
       },
       {
-        description: translate('schedules', 'trigger-cancel-other-description'),
-        label: translate('schedules', 'trigger-cancel-other-title'),
+        description: translate('schedules.trigger-cancel-other-description'),
+        label: translate('schedules.trigger-cancel-other-title'),
         value: 'CancelOther',
       },
       {
-        description: translate(
-          'schedules',
-          'trigger-terminate-other-description',
-        ),
-        label: translate('schedules', 'trigger-terminate-other-title'),
+        description: translate('schedules.trigger-terminate-other-description'),
+        label: translate('schedules.trigger-terminate-other-title'),
         value: 'TerminateOther',
       },
     ];
@@ -240,7 +237,7 @@
           data-testid="trigger-schedule"
           on:click={() => (triggerConfirmationModalOpen = true)}
         >
-          {translate('schedules', 'trigger')}
+          {translate('schedules.trigger')}
         </MenuItem>
         <MenuItem
           data-testid="edit-schedule"
@@ -332,14 +329,14 @@
       large
       bind:open={triggerConfirmationModalOpen}
       confirmType="primary"
-      confirmText={translate('schedules', 'trigger')}
-      cancelText={translate('cancel')}
+      confirmText={translate('schedules.trigger')}
+      cancelText={translate('common.cancel')}
       loading={triggerLoading}
       on:confirmModal={() => handleTriggerImmediately()}
       on:cancelModal={() => (triggerConfirmationModalOpen = false)}
     >
       <h3 slot="title">
-        {translate('schedules', 'trigger-modal-title')}
+        {translate('schedules.trigger-modal-title')}
       </h3>
       <div slot="content">
         <RadioGroup

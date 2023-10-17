@@ -11,7 +11,8 @@
     {#if $loading || $updating}
       <Spinner class="h-4 w-4 animate-spin" />
     {:else if count >= 0}
-      {count.toLocaleString()} {translate('workflows').toLocaleLowerCase()}
+      {count.toLocaleString()}
+      {translate('common.workflows').toLocaleLowerCase()}
     {/if}
   </p>
 </div>

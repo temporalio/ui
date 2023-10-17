@@ -120,7 +120,7 @@
           labelHidden
         />
         {#if status === 'All'}
-          <Translate namespace="workflows" key="all-statuses" />
+          <Translate key="workflows.all-statuses" />
         {:else}
           <WorkflowStatus {status} />
         {/if}

@@ -15,7 +15,7 @@ export const getPlacholder = (action: Action, email?: string): string => {
       translatedAction = translate('workflows.reset');
       break;
     case Action.Terminate:
-      translatedAction = translate('workflows.terminate');
+      translatedAction = translate('workflows.terminated');
       break;
     default:
       unhandledAction(action);
