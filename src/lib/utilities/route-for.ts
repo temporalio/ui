@@ -40,8 +40,9 @@ export type EventHistoryParameters = Pick<
   RouteParameters,
   'namespace' | 'workflow' | 'run' | 'view' | 'queryParams'
 >;
-export type EventParameters = Required<
-  Pick<RouteParameters, 'namespace' | 'workflow' | 'run' | 'view' | 'eventId'>
+export type EventParameters = Pick<
+  RouteParameters,
+  'namespace' | 'workflow' | 'run' | 'view' | 'eventId'
 >;
 
 export type AuthenticationParameters = {
@@ -135,6 +136,15 @@ export const routeForEventHistory = ({
 }: EventHistoryParameters): string => {
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
   return toURL(`${eventHistoryPath}`, queryParams);
+};
+export const routeForEventHistoryEvent = ({
+  eventId,
+  ...parameters
+}: EventParameters): string => {
+  const eventHistoryPath = `${routeForWorkflow(
+    parameters,
+  )}/history/events/${eventId}`;
+  return toURL(`${eventHistoryPath}`);
 };
 
 export const routeForWorkers = (parameters: WorkflowParameters): string => {
@@ -265,6 +275,5 @@ export const isEventParameters = hasParameters<EventParameters>(
   'namespace',
   'workflow',
   'run',
-  'view',
   'eventId',
 );

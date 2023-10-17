@@ -215,6 +215,7 @@
 
 <Accordion
   title={translate('timeline')}
+  data-testid="timeline-accordion"
   icon="timeline"
   open={$workflowTimelineViewOpen}
   onToggle={() => {

@@ -2,6 +2,9 @@
   import { noop } from 'svelte/internal';
   import { fade } from 'svelte/transition';
 
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { isEventGroup } from '$lib/models/event-groups';
@@ -18,6 +21,7 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
 
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
@@ -34,8 +38,14 @@
     ? Array.from(event.events.keys()).pop()
     : event.id;
 
-  $: expanded = expandAll || active;
-
+  $: ({ workflow, run, namespace } = $page.params);
+  $: href = routeForEventHistoryEvent({
+    eventId: event.id,
+    namespace,
+    workflow,
+    run,
+  });
+  $: expanded = expandAll;
   $: descending = $eventFilterSort === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: showElapsedTimeDiff =
@@ -83,7 +93,16 @@
 >
   <td />
   <td class="w-24 text-left">
-    <Link class="truncate" href="#{event.id}">{event.id}</Link>
+    <Link
+      class="truncate"
+      data-testid="link"
+      on:click={(e) => {
+        e.stopPropagation();
+        goto(href);
+      }}
+    >
+      {event.id}
+    </Link>
   </td>
   <td class="text-left">
     <div class="flex flex-col gap-0">

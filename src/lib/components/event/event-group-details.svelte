@@ -1,4 +1,8 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+
+  import Link from '$lib/holocene/link.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
@@ -7,10 +11,13 @@
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
 
   export let eventGroup: EventGroup;
   export let selectedId: string;
   export let onGroupClick: (id: string) => void;
+
+  $: ({ workflow, run, namespace } = $page.params);
 </script>
 
 <div class="w-full border-gray-700 lg:w-1/3 lg:border-r-2">
@@ -26,7 +33,24 @@
       >
         <td class="w-1/12" />
         <td class="w-24">
-          <p class="truncate text-sm text-gray-500 md:text-base">{id}</p>
+          <p class="truncate text-sm text-gray-500 md:text-base">
+            <Link
+              class="truncate"
+              on:click={(e) => {
+                e.stopPropagation();
+                goto(
+                  routeForEventHistoryEvent({
+                    eventId: id,
+                    namespace,
+                    workflow,
+                    run,
+                  }),
+                );
+              }}
+            >
+              {id}
+            </Link>
+          </p>
         </td>
         <td>
           <p class="event-type truncate text-sm md:text-base">

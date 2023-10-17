@@ -34,7 +34,10 @@
 </script>
 
 {#if pendingActivities.length}
-  <section class="rounded-xl border-2 border-gray-900 bg-white p-4">
+  <section
+    class="rounded-xl border-2 border-gray-900 bg-white p-4"
+    data-testid="pending-activities"
+  >
     <h3 class="mb-2 flex gap-2 text-lg font-medium">
       {translate('workflows', 'pending-activities')}
       {#if canceled}
