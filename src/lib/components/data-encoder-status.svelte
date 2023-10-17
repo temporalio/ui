@@ -15,7 +15,7 @@
 </script>
 
 <div class="mx-1 flex items-center">
-  {#if $dataEncoder?.hasEndpointOrPortConfigured}
+  {#if $dataEncoder?.endpoint}
     {#if $dataEncoder?.hasNotRequested}
       <Tooltip
         bottomRight

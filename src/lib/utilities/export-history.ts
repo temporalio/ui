@@ -8,13 +8,11 @@ export const exportHistory = async ({
   workflowId,
   runId,
   settings,
-  accessToken,
 }: {
   namespace: string;
   workflowId: string;
   runId: string;
   settings?: Settings;
-  accessToken?: string;
 }) => {
   const decodeEventHistory = settings?.codec?.decodeEventHistoryDownload;
   const events = decodeEventHistory
@@ -22,8 +20,6 @@ export const exportHistory = async ({
         namespace,
         workflowId,
         runId,
-        settings,
-        accessToken,
         sort: 'ascending',
       })
     : await fetchRawEvents({
