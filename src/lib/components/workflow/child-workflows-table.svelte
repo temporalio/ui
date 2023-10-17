@@ -20,6 +20,7 @@
       runId: c.runId,
       workflowId: c.workflowId,
       status: 'Running' as const,
+      type: c.workflowTypeName,
       namespace,
     };
   });
@@ -28,6 +29,7 @@
     return {
       runId: c.attributes.workflowExecution.runId,
       workflowId: c.attributes.workflowExecution.workflowId,
+      type: c.attributes.workflowType,
       status: c.classification,
       namespace: c.attributes?.namespace || namespace,
     };
@@ -51,7 +53,8 @@
       >{translate('workflows', 'child-workflows')}</caption
     >
     <TableHeaderRow slot="headers">
-      <th class="max-md:hidden">Status</th>
+      <th class="max-md:hidden">{translate('status')}</th>
+      <th class="max-lg:hidden">{translate('type')}</th>
       <th>{translate('workflows', 'child-id')}</th>
       <th>{translate('workflows', 'child-run-id')}</th>
     </TableHeaderRow>
@@ -59,6 +62,9 @@
       <TableRow>
         <td class="max-md:hidden">
           <WorkflowStatus status={child.status} />
+        </td>
+        <td class="max-lg:hidden">
+          {child.type}
         </td>
         <td class="hover:text-blue-700 hover:underline">
           <Link

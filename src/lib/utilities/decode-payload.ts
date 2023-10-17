@@ -1,37 +1,34 @@
-import { convertPayloadWithWebsocket } from '$lib/services/data-converter';
 import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
 import type {
   codecEndpoint,
   includeCredentials,
   passAccessToken,
 } from '$lib/stores/data-encoder-config';
+import type { Payloads } from '$lib/types';
 import type {
   EventAttribute,
   EventRequestMetadata,
   Payload,
+  WorkflowEvent,
 } from '$lib/types/events';
 import type { Optional, Replace, Settings } from '$lib/types/global';
-import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
-import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
 
 import { atob } from './atob';
 import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
 
-type PotentiallyDecodable =
-  | Record<string | number | symbol, unknown>
-  | EventAttribute;
+export type PotentiallyDecodable =
+  | Payloads
+  | Record<string | number | symbol, unknown>;
 
 export type Decode = {
   convertPayloadToJsonWithCodec: typeof convertPayloadToJsonWithCodec;
-  convertPayloadToJsonWithWebsocket: typeof convertPayloadToJsonWithWebsocket;
   decodePayloadAttributes: typeof decodePayloadAttributes;
 };
 
 export type DecodeFunctions = {
   convertWithCodec?: Decode['convertPayloadToJsonWithCodec'];
-  convertWithWebsocket?: Decode['convertPayloadToJsonWithWebsocket'];
   decodeAttributes?: Decode['decodePayloadAttributes'];
   encoderEndpoint?: typeof codecEndpoint;
   codecPassAccessToken?: typeof passAccessToken;
@@ -78,10 +75,13 @@ export function decodePayload(
 }
 
 export const decodePayloadAttributes = <
-  T extends Optional<PotentiallyDecodable>,
+  T extends Optional<PotentiallyDecodable | EventAttribute | WorkflowEvent>,
 >(
   eventAttribute: T,
-): Replace<T, Optional<PotentiallyDecodable>> => {
+): Replace<
+  T,
+  Optional<PotentiallyDecodable | EventAttribute | WorkflowEvent>
+> => {
   // Decode Search Attributes
   if (
     has(eventAttribute, 'searchAttributes') &&
@@ -150,11 +150,11 @@ const keyIs = (key: string, ...validKeys: string[]) => {
 };
 
 export const decodeAllPotentialPayloadsWithCodec = async (
-  anyAttributes: PotentiallyDecodable,
+  anyAttributes: EventAttribute | PotentiallyDecodable,
   namespace: string,
   settings: Settings,
   accessToken: string,
-): Promise<PotentiallyDecodable> => {
+): Promise<EventAttribute | PotentiallyDecodable> => {
   const decode = decodePayloadWithCodec(namespace, settings, accessToken);
   if (anyAttributes) {
     for (const key of Object.keys(anyAttributes)) {
@@ -181,58 +181,37 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   return anyAttributes;
 };
 
-export const decodeAllPotentialPayloadsWithWebsockets = async (
-  anyAttributes: PotentiallyDecodable,
-  ws: DataConverterWebsocketInterface,
-): Promise<PotentiallyDecodable> => {
+export const cloneAllPotentialPayloadsWithCodec = async (
+  anyAttributes: PotentiallyDecodable | EventAttribute | WorkflowEvent | null,
+  namespace: string,
+  settings: Settings,
+  accessToken: string,
+): Promise<PotentiallyDecodable | EventAttribute | WorkflowEvent | null> => {
+  if (!anyAttributes) return anyAttributes;
+
+  const decode = decodePayloadWithCodec(namespace, settings, accessToken);
+  const clone = { ...anyAttributes };
   if (anyAttributes) {
-    for (const key of Object.keys(anyAttributes)) {
-      if (key === 'payloads') {
-        let JSONPayload: Payload[];
-        const payloads = toArray(anyAttributes[key]);
-
-        if (ws?.hasWebsocket) {
-          // Convert Payload data
-          const awaitData = await Promise.all(
-            (payloads ?? []).map(
-              async (payload) =>
-                await convertPayloadWithWebsocket(payload, ws.websocket),
-            ),
-          );
-          JSONPayload = awaitData;
-        } else {
-          JSONPayload = payloads.map(decodePayload);
-        }
-        anyAttributes[key] = JSONPayload;
-      } else if (key === 'encodedAttributes' && anyAttributes[key]) {
-        // Can expand if more fields have single payload
-
-        let JSONPayload: PotentiallyDecodable;
-        const payload = anyAttributes[key];
-        if (ws?.hasWebsocket) {
-          // Convert Payload data
-          const awaitData = await convertPayloadWithWebsocket(
-            payload,
-            ws.websocket,
-          );
-          JSONPayload = awaitData;
-        } else {
-          JSONPayload = decodePayload(payload);
-        }
-        anyAttributes[key] = JSONPayload;
+    for (const key of Object.keys(clone)) {
+      if (keyIs(key, 'payloads', 'encodedAttributes') && clone[key]) {
+        const data = toArray(clone[key]);
+        const decoded = await decode(data);
+        clone[key] = keyIs(key, 'encodedAttributes') ? decoded[0] : decoded;
       } else {
-        const next = anyAttributes[key];
+        const next = clone[key];
         if (isObject(next)) {
-          anyAttributes[key] = await decodeAllPotentialPayloadsWithWebsockets(
+          clone[key] = await cloneAllPotentialPayloadsWithCodec(
             next,
-            ws,
+            namespace,
+            settings,
+            accessToken,
           );
         }
       }
     }
   }
 
-  return anyAttributes;
+  return clone;
 };
 
 export const convertPayloadToJsonWithCodec = async ({
@@ -241,25 +220,13 @@ export const convertPayloadToJsonWithCodec = async ({
   settings,
   accessToken,
 }: {
-  attributes: PotentiallyDecodable;
-} & EventRequestMetadata): Promise<PotentiallyDecodable> => {
+  attributes: EventAttribute | PotentiallyDecodable;
+} & EventRequestMetadata): Promise<EventAttribute | PotentiallyDecodable> => {
   const decodedAttributes = await decodeAllPotentialPayloadsWithCodec(
     attributes,
     namespace,
     settings,
     accessToken,
-  );
-  return decodedAttributes;
-};
-
-export const convertPayloadToJsonWithWebsocket = async (
-  attributes: PotentiallyDecodable,
-  websocket?: DataConverterWebsocketInterface,
-): Promise<PotentiallyDecodable> => {
-  const ws = websocket ?? dataConverterWebsocket;
-  const decodedAttributes = await decodeAllPotentialPayloadsWithWebsockets(
-    attributes,
-    ws,
   );
   return decodedAttributes;
 };

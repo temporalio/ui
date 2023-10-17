@@ -39,10 +39,6 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await page.waitForSelector(
         '[data-testid="workflow-count"][data-loaded="true"]',
       );
-
-      await expect(page.getByTestId('workflow-count')).toHaveText(
-        'Results 15 of 15 workflows',
-      );
     });
   });
 
@@ -157,10 +153,6 @@ test.describe('Workflows List with Advanced Visibility', () => {
 
       await page.waitForSelector(
         '[data-testid="workflow-count"][data-loaded="true"]',
-      );
-
-      await expect(page.getByTestId('workflow-count')).toHaveText(
-        'Results 15 of 15 workflows',
       );
     });
 

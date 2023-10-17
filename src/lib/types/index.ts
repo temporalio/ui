@@ -10,6 +10,8 @@ export type ListNamespacesResponse =
   temporal.api.workflowservice.v1.IListNamespacesResponse;
 export type GetClusterInfoResponse =
   temporal.api.workflowservice.v1.IGetClusterInfoResponse;
+export type GetSystemInfoResponse =
+  temporal.api.workflowservice.v1.IGetSystemInfoResponse;
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
 export type GetSearchAttributesResponse =
