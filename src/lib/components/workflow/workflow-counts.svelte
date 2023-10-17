@@ -3,7 +3,11 @@
 
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
   import { workflowFilters } from '$lib/stores/filters';
-  import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
+  import {
+    refresh,
+    workflowCount,
+    workflowsQuery,
+  } from '$lib/stores/workflows';
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { decodePayload } from '$lib/utilities/decode-payload';
 
@@ -33,7 +37,7 @@
       .filter((s) => s.count > 0);
   };
 
-  $: $workflowsQuery, namespace, fetchCounts();
+  $: $workflowsQuery, namespace, $refresh, fetchCounts();
 </script>
 
 <div class="flex flex-wrap items-center gap-2">

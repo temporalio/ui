@@ -11,8 +11,13 @@ import { withLoading } from '$lib/utilities/stores/with-loading';
 
 import { supportsAdvancedVisibility } from './advanced-visibility';
 import { groupByCountEnabled } from './group-by-enabled';
+import { persistStore } from './persist-store';
 
 export const refresh = writable(0);
+export const refreshEnabled = persistStore<boolean>(
+  'workflow-list-refresh-enabled',
+  false,
+);
 export const hideWorkflowQueryErrors = derived(
   [page],
   ([$page]) => $page.data?.settings?.hideWorkflowQueryErrors,
