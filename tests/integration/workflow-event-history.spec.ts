@@ -6,8 +6,8 @@ import { mockWorkflow } from '~/test-utilities/mocks/workflow';
 const workflowUrl = `/namespaces/default/workflows/${mockWorkflow.workflowExecutionInfo.execution.workflowId}/${mockWorkflow.workflowExecutionInfo.execution.runId}/history`;
 
 test.beforeEach(async ({ page }) => {
-  await page.goto(workflowUrl);
   await mockWorkflowApis(page);
+  await page.goto(workflowUrl);
 });
 
 test.describe('Workflow History', () => {
