@@ -2,8 +2,6 @@
   import { afterNavigate, goto } from '$app/navigation';
   import { page, updated } from '$app/stores';
 
-  import type { PageData } from './$types';
-
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
@@ -27,8 +25,6 @@
   } from '$lib/utilities/route-for';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
-
-  export let data: PageData;
 
   let namespaceList: NamespaceListItem[];
 

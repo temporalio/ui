@@ -97,8 +97,6 @@
       namespace,
       workflowId,
       runId,
-      settings,
-      accessToken: $authUser?.accessToken,
     });
     $eventHistory = events;
   };

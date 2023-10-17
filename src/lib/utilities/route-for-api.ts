@@ -100,6 +100,7 @@ export function pathForApi(
 
   const routes: { [K in APIRoutePath]: string } = {
     cluster: '/cluster',
+    systemInfo: '/system-info',
     'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events`,
     'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events/reverse`,
     namespaces: '/namespaces',

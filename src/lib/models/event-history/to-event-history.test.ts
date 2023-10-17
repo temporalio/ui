@@ -91,12 +91,10 @@ describe('getEventAttributes', () => {
       const fn = async <T>(x: T): Promise<T> => x;
 
       const convertPayloadToJsonWithCodec = vi.fn(fn);
-      const convertPayloadToJsonWithWebsocket = vi.fn(fn);
       const decodePayloadAttributes = vi.fn(fn);
 
       return {
         convertPayloadToJsonWithCodec,
-        convertPayloadToJsonWithWebsocket,
         decodePayloadAttributes,
       };
     });
@@ -117,9 +115,8 @@ describe('getEventAttributes', () => {
     expect(event.type).toBe(eventType);
   });
 
-  it('should call convertWithWebSocket if not provided an endpoint', async () => {
+  it('should call convertWithCodec if not provided an endpoint in settings', async () => {
     const convertWithCodec = vi.fn(async <T>(x: T): Promise<T> => x);
-    const convertWithWebsocket = vi.fn(async <T>(x: T): Promise<T> => x);
 
     await getEventAttributes(
       {
@@ -129,18 +126,15 @@ describe('getEventAttributes', () => {
         accessToken,
       },
       {
-        convertWithWebsocket,
         convertWithCodec,
       },
     );
 
-    expect(convertWithWebsocket).toBeCalled();
-    expect(convertWithCodec).not.toBeCalled();
+    expect(convertWithCodec).toBeCalled();
   });
 
   it('should call convertWithCodec if provided an endpoint in settings', async () => {
     const convertWithCodec = vi.fn(async <T>(x: T): Promise<T> => x);
-    const convertWithWebsocket = vi.fn(async <T>(x: T): Promise<T> => x);
 
     await getEventAttributes(
       {
@@ -150,18 +144,15 @@ describe('getEventAttributes', () => {
         accessToken,
       },
       {
-        convertWithWebsocket,
         convertWithCodec,
       },
     );
 
     expect(convertWithCodec).toBeCalled();
-    expect(convertWithWebsocket).not.toBeCalled();
   });
 
   it('should call convertWithCodec if provided an endpoint in settings', async () => {
     const convertWithCodec = vi.fn(async <T>(x: T): Promise<T> => x);
-    const convertWithWebsocket = vi.fn(async <T>(x: T): Promise<T> => x);
 
     await getEventAttributes(
       {
@@ -171,14 +162,12 @@ describe('getEventAttributes', () => {
         accessToken,
       },
       {
-        convertWithWebsocket,
         convertWithCodec,
         encoderEndpoint: writable('https://localhost'),
       },
     );
 
     expect(convertWithCodec).toBeCalled();
-    expect(convertWithWebsocket).not.toBeCalled();
   });
 });
 
@@ -195,12 +184,9 @@ describe('toEventHistory', () => {
 
   for (const property of additionalProperties) {
     it(`should add a[n] ${property} property`, async () => {
-      const events = await toEventHistory({
-        response: eventsFixture.history.events as unknown as HistoryEvent[],
-        namespace,
-        settings,
-        accessToken,
-      });
+      const events = await toEventHistory(
+        eventsFixture.history.events as unknown as HistoryEvent[],
+      );
 
       const [event] = events;
 

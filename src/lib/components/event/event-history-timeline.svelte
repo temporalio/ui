@@ -4,6 +4,7 @@
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -197,18 +198,24 @@
     $workflowRun.workflow &&
     history.length &&
     visualizationRef;
+
+  const drawTimeline = () => {
+    if (timeline) {
+      timeline.destroy();
+    }
+    buildTimeline(category);
+  };
+
   $: {
     if (readyToDraw) {
-      if (timeline) {
-        timeline.destroy();
-      }
-      buildTimeline(category);
+      drawTimeline();
     }
   }
 </script>
 
 <Accordion
   title={translate('common.timeline')}
+  data-testid="timeline-accordion"
   icon="timeline"
   open={$workflowTimelineViewOpen}
   onToggle={() => {
@@ -221,20 +228,24 @@
         <ToggleButtons>
           <ToggleButton
             data-testid="zoom-in"
-            on:click={() => timeline.zoomIn(1)}>+</ToggleButton
+            on:click={() => timeline?.zoomIn(1)}>+</ToggleButton
           >
           <ToggleButton
             data-testid="zoom-in"
-            on:click={() => timeline.zoomOut(1)}>-</ToggleButton
+            on:click={() => timeline?.zoomOut(1)}>-</ToggleButton
           >
           <ToggleButton
             data-testid="zoom-in"
-            on:click={() => timeline.focus('workflow')}>Fit</ToggleButton
+            on:click={() => timeline?.focus('workflow')}>Fit</ToggleButton
           >
         </ToggleButtons>
       </div>
     </div>
-    <div class="timeline" bind:this={visualizationRef} />
+    <div class="timeline" bind:this={visualizationRef}>
+      {#if !timeline}
+        <Loading title="Building Timeline..." />
+      {/if}
+    </div>
   </div>
 </Accordion>
 

@@ -6,7 +6,7 @@ import type {
   ScheduleListEntry,
   UpdateScheduleRequest,
 } from '$lib/types';
-import type { DescribeFullSchedule } from '$lib/types/schedule';
+import type { DescribeFullSchedule, OverlapPolicy } from '$lib/types/schedule';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -187,6 +187,40 @@ export async function unpauseSchedule({
   const options = {
     patch: {
       unpause: reason,
+    },
+  };
+
+  const route = routeForApi('schedule', {
+    namespace,
+    scheduleId: scheduleId,
+  });
+  return await requestFromAPI<null>(route, {
+    options: {
+      method: 'PATCH',
+      body: stringifyWithBigInt({
+        ...options,
+        request_id: uuidv4(),
+      }),
+    },
+  });
+}
+
+type TriggerImmediatelyOptions = {
+  namespace: string;
+  scheduleId: string;
+  overlapPolicy: OverlapPolicy;
+};
+
+export async function triggerImmediately({
+  namespace,
+  scheduleId,
+  overlapPolicy,
+}: TriggerImmediatelyOptions): Promise<null> {
+  const options = {
+    patch: {
+      triggerImmediately: {
+        overlapPolicy,
+      },
     },
   };
 

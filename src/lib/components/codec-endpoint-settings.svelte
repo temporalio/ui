@@ -42,9 +42,3 @@
     {/if}
   </div>
 </div>
-
-<style lang="postcss">
-  .error {
-    @apply outline-red-700;
-  }
-</style>

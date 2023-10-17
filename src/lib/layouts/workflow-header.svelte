@@ -43,6 +43,7 @@
   export let namespace: string;
 
   $: ({ workflow, workers, compatibility } = $workflowRun);
+  $: id = $page.params.id;
 
   let refreshInterval: ReturnType<typeof setInterval>;
   const refreshRate = 15000;
@@ -115,8 +116,21 @@
       data-testid="back-to-workflows"
       icon="chevron-left"
     >
-      {translate('workflows.back-to-workflows')}
+      {id
+        ? translate('common.workflows')
+        : translate('workflows.back-to-workflows')}
     </Link>
+    {#if id}
+      <Link
+        href={routeForEventHistory({
+          ...routeParameters,
+        })}
+        data-testid="back-to-workflow-execution"
+        icon="chevron-left"
+      >
+        {workflow?.runId}
+      </Link>
+    {/if}
   </div>
   <div
     class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"

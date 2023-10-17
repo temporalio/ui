@@ -10,7 +10,6 @@ import type { Settings } from '$lib/types/global';
 import type { WorkflowExecution } from '$lib/types/workflows';
 import {
   convertPayloadToJsonWithCodec,
-  convertPayloadToJsonWithWebsocket,
   type DecodeFunctions,
   decodePayloadAttributes,
 } from '$lib/utilities/decode-payload';
@@ -23,7 +22,6 @@ export async function getActivityAttributes(
   { activity, namespace, settings, accessToken }: PendingActivityWithMetadata,
   {
     convertWithCodec = convertPayloadToJsonWithCodec,
-    convertWithWebsocket = convertPayloadToJsonWithWebsocket,
     decodeAttributes = decodePayloadAttributes,
     encoderEndpoint = codecEndpoint,
   }: DecodeFunctions = {},
@@ -39,14 +37,12 @@ export async function getActivityAttributes(
     codec: { ...settings?.codec, endpoint, passAccessToken },
   };
 
-  const convertedAttributes = endpoint
-    ? await convertWithCodec({
-        attributes: activity,
-        namespace,
-        settings: _settings,
-        accessToken,
-      })
-    : await convertWithWebsocket(activity);
+  const convertedAttributes = await convertWithCodec({
+    attributes: activity,
+    namespace,
+    settings: _settings,
+    accessToken,
+  });
 
   const decodedAttributes = decodeAttributes(
     convertedAttributes,

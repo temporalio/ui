@@ -6,6 +6,7 @@ export interface RadioInputProps<T> extends HTMLInputAttributes {
   id: string;
   label: string;
   labelHidden?: boolean;
+  description?: string;
   group?: Writable<T>;
   name?: string;
   'data-testid'?: string;

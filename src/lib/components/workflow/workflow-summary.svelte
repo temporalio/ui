@@ -25,6 +25,7 @@
   <Accordion
     title={translate('common.summary')}
     icon="summary"
+    data-testid="summary-accordion"
     open={$workflowSummaryViewOpen}
     onToggle={() => {
       $workflowSummaryViewOpen = !$workflowSummaryViewOpen;

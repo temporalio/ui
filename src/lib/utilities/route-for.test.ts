@@ -370,7 +370,6 @@ describe('routeFor SSO authentication ', () => {
           namespace: 'default',
           workflow: 'workflow',
           run: 'run',
-          view: 'feed',
           eventId: '1234',
         }),
       ).toBe(true);
@@ -401,7 +400,6 @@ describe('routeFor SSO authentication ', () => {
             namespace: 'default',
             workflow: 'workflow',
             run: 'run',
-            view: 'feed',
           }),
         ).toBe(false);
       });

@@ -6,15 +6,14 @@ import {
 import type {
   EventAttributeKey,
   EventAttributesWithType,
-  EventsWithMetadata,
   EventType,
   EventWithMetadata,
+  HistoryEvent,
   WorkflowEvent,
   WorkflowEvents,
 } from '$lib/types/events';
 import {
   convertPayloadToJsonWithCodec,
-  convertPayloadToJsonWithWebsocket,
   type DecodeFunctions,
   decodePayloadAttributes,
 } from '$lib/utilities/decode-payload';
@@ -35,7 +34,6 @@ export async function getEventAttributes(
   { historyEvent, namespace, settings, accessToken }: EventWithMetadata,
   {
     convertWithCodec = convertPayloadToJsonWithCodec,
-    convertWithWebsocket = convertPayloadToJsonWithWebsocket,
     decodeAttributes = decodePayloadAttributes,
     encoderEndpoint = codecEndpoint,
     codecPassAccessToken = passAccessToken,
@@ -63,14 +61,12 @@ export async function getEventAttributes(
     },
   };
 
-  const convertedAttributes = endpoint
-    ? await convertWithCodec({
-        attributes,
-        namespace,
-        settings: _settings,
-        accessToken,
-      })
-    : await convertWithWebsocket(attributes);
+  const convertedAttributes = await convertWithCodec({
+    attributes,
+    namespace,
+    settings: _settings,
+    accessToken,
+  });
 
   const decodedAttributes = decodeAttributes(convertedAttributes) as object;
 
@@ -80,23 +76,15 @@ export async function getEventAttributes(
   };
 }
 
-export const toEvent = async ({
-  historyEvent,
-  namespace,
-  settings,
-  accessToken,
-}: EventWithMetadata): Promise<WorkflowEvent> => {
+export const toEvent = async (
+  historyEvent: HistoryEvent,
+): Promise<WorkflowEvent> => {
   const id = String(historyEvent.eventId);
   const eventType = historyEvent.eventType as unknown as EventType;
   const timestamp = formatDate(String(historyEvent.eventTime));
   const classification = getEventClassification(eventType);
   const category = getEventCategory(eventType);
-  const attributes = await getEventAttributes({
-    historyEvent,
-    namespace,
-    settings,
-    accessToken,
-  }).then((attributes) => simplifyAttributes(attributes));
+  const { key, attributes } = findAttributesAndKey(historyEvent);
 
   return {
     ...historyEvent,
@@ -106,21 +94,14 @@ export const toEvent = async ({
     timestamp,
     classification,
     category,
-    attributes,
+    attributes: simplifyAttributes({ type: key, ...attributes }),
   };
 };
 
-export const toEventHistory = async ({
-  response,
-  namespace,
-  settings,
-  accessToken,
-}: EventsWithMetadata): Promise<WorkflowEvents> => {
-  return await Promise.all(
-    response.map((historyEvent) =>
-      toEvent({ historyEvent, namespace, settings, accessToken }),
-    ),
-  );
+export const toEventHistory = async (
+  events: HistoryEvent[],
+): Promise<WorkflowEvents> => {
+  return await Promise.all(events.map(toEvent));
 };
 
 export const isEvent = (event: unknown): event is WorkflowEvent => {

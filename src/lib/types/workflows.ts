@@ -1,4 +1,4 @@
-import type { WorkflowVersionTimpstamp } from '$lib/types';
+import type { Payloads, WorkflowVersionTimpstamp } from '$lib/types';
 
 import type {
   Payload,
@@ -29,6 +29,11 @@ export type ListWorkflowExecutionsResponse = Replace<
   import('$lib/types').ListWorkflowExecutionsResponse,
   Optional<{ executions: WorkflowExecutionInfo[] }>
 >;
+
+export type CountWorkflowExecutionsResponse = {
+  count: string;
+  groups: { count: string; groupValues: Payloads }[];
+};
 
 export type WorkflowExecutionConfig = Replace<
   import('$lib/types').WorkflowExecutionConfig,

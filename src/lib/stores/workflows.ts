@@ -1,17 +1,16 @@
 import type { StartStopNotifier } from 'svelte/store';
-import { derived, readable, writable } from 'svelte/store';
+import { derived, get, readable, writable } from 'svelte/store';
 
 import { page } from '$app/stores';
 
 import { translate } from '$lib/i18n/translate';
-import {
-  fetchAllWorkflows,
-  fetchWorkflowCount,
-} from '$lib/services/workflow-service';
+import { fetchWorkflowCount } from '$lib/services/workflow-counts';
+import { fetchAllWorkflows } from '$lib/services/workflow-service';
 import type { FilterParameters, WorkflowExecution } from '$lib/types/workflows';
 import { withLoading } from '$lib/utilities/stores/with-loading';
 
 import { supportsAdvancedVisibility } from './advanced-visibility';
+import { groupByCountEnabled } from './group-by-enabled';
 
 export const refresh = writable(0);
 export const hideWorkflowQueryErrors = derived(
@@ -64,7 +63,7 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
         });
         set(workflows);
 
-        if (supportsAdvancedVisibility) {
+        if (supportsAdvancedVisibility && !get(groupByCountEnabled)) {
           const workflowCount = await fetchWorkflowCount(namespace, query);
           setCounts(workflowCount);
         }

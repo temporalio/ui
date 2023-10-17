@@ -9,7 +9,6 @@
   import Link from '$lib/holocene/link.svelte';
   import { clickOutside } from '$lib/holocene/outside-click';
   import { translate } from '$lib/i18n/translate';
-  import { dataConverterPort } from '$lib/stores/data-converter-config';
   import {
     codecEndpoint,
     includeCredentials,
@@ -20,7 +19,6 @@
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
 
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
-  import DataConverterPortSettings from './data-converter-port-settings.svelte';
 
   export const viewDataEncoderSettings = writable<boolean>(false);
 </script>
@@ -30,7 +28,6 @@
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
 
   let endpoint = $codecEndpoint ?? '';
-  let port = $dataConverterPort ?? '';
   let passToken = $passAccessToken ?? false;
   let includeCreds = $includeCredentials ?? false;
   let override = writable($overrideRemoteCodecConfiguration);
@@ -56,7 +53,6 @@
 
   const onCancel = () => {
     endpoint = $codecEndpoint;
-    port = $dataConverterPort;
     passToken = $passAccessToken;
     includeCreds = $includeCredentials;
     $override = $overrideRemoteCodecConfiguration;
@@ -68,7 +64,6 @@
     $codecEndpoint = endpoint;
     $passAccessToken = passToken;
     $includeCredentials = includeCreds;
-    $dataConverterPort = port;
     $viewDataEncoderSettings = false;
     $overrideRemoteCodecConfiguration = $override;
 
@@ -135,7 +130,6 @@
         bind:includeCreds
         {error}
       />
-      <DataConverterPortSettings bind:port />
       <div class="flex items-center gap-4">
         <Button
           disabled={Boolean(error)}

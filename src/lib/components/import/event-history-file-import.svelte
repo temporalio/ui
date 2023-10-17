@@ -1,12 +1,10 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
 
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import { toEventHistory } from '$lib/models/event-history';
-  import { authUser } from '$lib/stores/auth-user';
   import { importEventGroups, importEvents } from '$lib/stores/import-events';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
@@ -40,14 +38,10 @@
   };
 
   const onConfirm = async () => {
-    const { settings } = $page.data;
     try {
-      const events = await toEventHistory({
-        response: Array.isArray(rawEvents) ? rawEvents : rawEvents?.events,
-        namespace: $lastUsedNamespace,
-        settings,
-        accessToken: $authUser.accessToken,
-      });
+      const events = await toEventHistory(
+        Array.isArray(rawEvents) ? rawEvents : rawEvents?.events,
+      );
       const eventGroups = groupEvents(events);
       importEvents.set(events);
       importEventGroups.set(eventGroups);
