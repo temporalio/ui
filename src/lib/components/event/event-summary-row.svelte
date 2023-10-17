@@ -6,6 +6,7 @@
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { isEventGroup } from '$lib/models/event-groups';
   import {
     eventOrGroupIsCanceled,
@@ -37,8 +38,14 @@
     ? Array.from(event.events.keys()).pop()
     : event.id;
 
-  $: expanded = expandAll;
   $: ({ workflow, run, namespace } = $page.params);
+  $: href = routeForEventHistoryEvent({
+    eventId: event.id,
+    namespace,
+    workflow,
+    run,
+  });
+  $: expanded = expandAll;
   $: descending = $eventFilterSort === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: showElapsedTimeDiff =
@@ -86,20 +93,15 @@
 >
   <td />
   <td class="w-24 text-left">
-    <p
-      class="truncate hover:text-blue-700 hover:underline"
-      on:click|stopPropagation={() =>
-        goto(
-          routeForEventHistoryEvent({
-            eventId: event.id,
-            namespace,
-            workflow,
-            run,
-          }),
-        )}
+    <Link
+      class="truncate"
+      on:click={(e) => {
+        e.stopPropagation();
+        goto(href);
+      }}
     >
       {event.id}
-    </p>
+    </Link>
   </td>
   <td class="text-left">
     <div class="flex flex-col gap-0">

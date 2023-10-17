@@ -1,6 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
+  import { page } from '$app/stores';
+
   import EventCategoryFilter from '$lib/components/event/event-category-filter.svelte';
   import EventDateFilter from '$lib/components/event/event-date-filter.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -13,6 +15,8 @@
   export let updating = false;
 
   let expandAll = $expandAllEvents === 'true';
+
+  $: id = $page.params.id;
 
   const dispatch = createEventDispatcher();
 
@@ -40,6 +44,7 @@
           size="sm"
           variant="table-header"
           trailingIcon={expandAll ? 'chevron-up' : 'chevron-down'}
+          disabled={!!id}
           on:click={handleChange}
         >
           <span class="hidden sm:block">
