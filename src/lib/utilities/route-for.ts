@@ -275,6 +275,5 @@ export const isEventParameters = hasParameters<EventParameters>(
   'namespace',
   'workflow',
   'run',
-  'view',
   'eventId',
 );
