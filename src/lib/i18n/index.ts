@@ -15,11 +15,9 @@ type WithoutPluralSuffix<T> = T extends
   ? P
   : T;
 
-export const I18nNamespaces = Object.keys(Locales.en);
+export const i18nNamespaces = Object.keys(Locales.en);
 
 export type I18nResources = typeof Locales.en;
-
-export type I18nNamespace = keyof I18nResources;
 
 export type I18nKey<Resources = I18nResources> = WithoutPluralSuffix<
   Leaves<{
