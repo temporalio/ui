@@ -15,19 +15,15 @@ type WithoutPluralSuffix<T> = T extends
   ? P
   : T;
 
-export const i18nResources = {
-  ...Locales.en,
-};
+export const I18nNamespaces = Object.keys(Locales.en);
 
-export const I18nNamespaces = Object.keys(i18nResources);
+export type I18nResources = typeof Locales.en;
 
-export type I18nMap = typeof i18nResources;
+export type I18nNamespace = keyof I18nResources;
 
-export type I18nNamespace = keyof I18nMap;
-
-export type I18nKey = WithoutPluralSuffix<
+export type I18nKey<Resources = I18nResources> = WithoutPluralSuffix<
   Leaves<{
-    [Key in keyof I18nMap]: I18nMap[Key];
+    [Key in keyof Resources]: Resources[Key];
   }>
 >;
 

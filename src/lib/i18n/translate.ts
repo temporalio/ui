@@ -4,9 +4,12 @@ import { t, type TOptions } from 'i18next';
 
 import { omit } from '$lib/utilities/omit';
 
-import { type I18nKey, type I18nReplace, i18nResources } from '.';
+import type { I18nKey, I18nReplace, I18nResources } from '.';
 
-export function translate(key: I18nKey, replace: I18nReplace = {}): string {
+const translateGeneric = <R>(
+  key: I18nKey<R>,
+  replace: I18nReplace = {},
+): string => {
   const [namespace, ...keys] = key.split('.');
   const options: TOptions = {};
 
@@ -18,8 +21,14 @@ export function translate(key: I18nKey, replace: I18nReplace = {}): string {
     options.replace = omit(replace, 'count');
   }
 
-  if (namespace && namespace in i18nResources && keys.length > 0) {
+  if (namespace && keys.length > 0) {
     const k = keys.join('.');
     return t(`${namespace}:${k}`, options);
   }
-}
+};
+
+export const createTranslate = <R>() => {
+  return translateGeneric<R>;
+};
+
+export const translate = createTranslate<I18nResources>();
