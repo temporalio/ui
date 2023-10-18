@@ -142,4 +142,5 @@ export const Strings = {
   'job-id': 'Job ID',
   'auto-refresh': 'Auto refresh',
   'auto-refresh-tooltip': '{{ interval }} second page refresh',
+  new: 'New',
 } as const;

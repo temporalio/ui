@@ -15,6 +15,7 @@
   export let status: Status = 'Running';
   export let count: number | undefined = undefined;
   export let loading = false;
+  export let newCount: number | undefined = undefined;
 
   const label: Record<Status, string> = {
     Running: translate('workflows', 'running'),
@@ -70,13 +71,13 @@
 </script>
 
 <div
-  class="flex text-center text-sm font-medium leading-4"
+  class="relative flex text-center text-sm font-medium leading-4"
   data-testid={$$props['test-id']}
 >
   <span class={workflowStatus({ status })} class:count>
     {#if loading}
       <Spinner class="h-4 w-4 animate-spin" />
-    {:else if count}
+    {:else if count >= 0}
       {count.toLocaleString()}
     {/if}
     {label[status]}
@@ -84,6 +85,12 @@
       <HeartBeat {delay} />
     {/if}
   </span>
+  {#if newCount}
+    <span
+      class="absolute -right-2 -top-[10px] flex h-4 flex-col items-center justify-center rounded-full border border-gray-900 bg-white px-0.5 text-[10px] text-gray-900"
+      >{newCount > 0 ? '+' : ''}{newCount}</span
+    >
+  {/if}
 </div>
 
 <style lang="postcss">

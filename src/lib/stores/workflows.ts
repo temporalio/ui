@@ -94,7 +94,11 @@ export const workflowsSearchParams = writable<string>('');
 
 export const updating = writable(true);
 export const loading = writable(true);
-export const workflowCount = writable({ count: 0, totalCount: 0 });
+export const workflowCount = writable({
+  count: 0,
+  totalCount: 0,
+  newTotalCount: 0,
+});
 export const workflowError = writable('');
 export const workflows = readable<WorkflowExecution[]>([], updateWorkflows);
 export const workflowsQuery = writable<string>('');

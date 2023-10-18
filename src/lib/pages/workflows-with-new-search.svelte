@@ -60,8 +60,6 @@
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { Action } from '$lib/models/workflow-actions';
@@ -78,8 +76,6 @@
   import { toaster } from '$lib/stores/toaster';
   import {
     loading,
-    refresh,
-    refreshEnabled,
     updating,
     workflowCount,
     workflows,
@@ -189,24 +185,6 @@
       resetSelection();
     }
   }
-
-  let refreshInterval: ReturnType<typeof setInterval>;
-  const refreshRate = 10000;
-  const onRefreshChange = () => {
-    if ($refreshEnabled) {
-      $refreshEnabled = false;
-      clearInterval(refreshInterval);
-    } else {
-      $refresh = Date.now();
-      $refreshEnabled = true;
-      clearInterval(refreshInterval);
-      refreshInterval = setInterval(() => {
-        if (!$selectedWorkflows.length) {
-          $refresh = Date.now();
-        }
-      }, refreshRate);
-    }
-  };
 </script>
 
 <BatchOperationConfirmationModal
@@ -257,18 +235,6 @@
       </div>
     </div>
     <div class="flex items-center gap-2 text-sm">
-      <Tooltip
-        bottomLeft
-        text={translate('auto-refresh-tooltip', { interval: '10' })}
-      >
-        <ToggleSwitch
-          label={translate('auto-refresh')}
-          labelPosition="left"
-          id="autorefresh"
-          checked={$refreshEnabled}
-          on:change={onRefreshChange}
-        />
-      </Tooltip>
       <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
         >{translate('download-json')}</Link
       >
