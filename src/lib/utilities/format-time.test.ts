@@ -174,6 +174,56 @@ describe('getDuration', () => {
     expect(distance).toBe('263ms');
     expect(abbvDistancer).toBe('263ms');
   });
+  it('should get only milliseconds of a start and end date less than a second apart with includeMillisecondsForUnderSecond', () => {
+    const start = '2022-04-13T16:29:35.630571Z';
+    const end = '2022-04-13T16:29:35.893821Z';
+    const duration = getDuration({ start, end });
+    const distance = formatDistance({
+      start,
+      end,
+      includeMillisecondsForUnderSecond: true,
+    });
+    const abbvDistancer = formatDistanceAbbreviated({
+      start,
+      end,
+      includeMillisecondsForUnderSecond: true,
+    });
+    expect(duration).toStrictEqual({
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      months: 0,
+      seconds: 0,
+      years: 0,
+    });
+    expect(distance).toBe('263ms');
+    expect(abbvDistancer).toBe('263ms');
+  });
+  it('should not get milliseconds of a start and end date more than a second apart with includeMillisecondsForUnderSecond', () => {
+    const start = '2022-04-13T16:29:33.630571Z';
+    const end = '2022-04-13T16:29:35.893821Z';
+    const duration = getDuration({ start, end });
+    const distance = formatDistance({
+      start,
+      end,
+      includeMillisecondsForUnderSecond: true,
+    });
+    const abbvDistancer = formatDistanceAbbreviated({
+      start,
+      end,
+      includeMillisecondsForUnderSecond: true,
+    });
+    expect(duration).toStrictEqual({
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      months: 0,
+      seconds: 2,
+      years: 0,
+    });
+    expect(distance).toBe('2 seconds');
+    expect(abbvDistancer).toBe('2s');
+  });
 });
 
 describe('fromSecondsToMinutesAndSeconds', () => {
