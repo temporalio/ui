@@ -28,7 +28,7 @@
   $: indeterminate =
     $selectedWorkflows.length > 0 &&
     $selectedWorkflows.length < workflows.length;
-  $: label = translate('workflows', 'select-all-workflows');
+  $: label = translate('workflows.select-all-workflows');
 </script>
 
 <tr>
@@ -58,7 +58,7 @@
     <IconButton
       data-testid="workflows-summary-table-configuration-button"
       icon="vertical-ellipsis"
-      label={translate('workflows', 'open-configure-workflows')}
+      label={translate('workflows.open-configure-workflows')}
       on:click={onClickConfigure}
     />
   </th>

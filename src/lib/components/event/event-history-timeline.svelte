@@ -214,7 +214,7 @@
 </script>
 
 <Accordion
-  title={translate('timeline')}
+  title={translate('common.timeline')}
   data-testid="timeline-accordion"
   icon="timeline"
   open={$workflowTimelineViewOpen}

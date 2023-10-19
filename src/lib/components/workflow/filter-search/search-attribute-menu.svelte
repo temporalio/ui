@@ -64,17 +64,17 @@
         <Icon name="filter" />
       {/if}
     </svelte:fragment>
-    {$filter.attribute || translate('workflows', 'filter')}
+    {$filter.attribute || translate('workflows.filter')}
   </MenuButton>
   <Menu id="search-attribute-menu">
     <Input
-      label={translate('search')}
+      label={translate('common.search')}
       labelHidden
       id="filter-search"
       noBorder
       bind:value={searchAttributeValue}
       icon="search"
-      placeholder={translate('search')}
+      placeholder={translate('common.search')}
       class="mb-1"
     />
 
@@ -90,7 +90,7 @@
       </MenuItem>
     {:else}
       <MenuItem class="whitespace-nowrap" disabled
-        >{translate('no-results')}</MenuItem
+        >{translate('common.no-results')}</MenuItem
       >
     {/each}
   </Menu>

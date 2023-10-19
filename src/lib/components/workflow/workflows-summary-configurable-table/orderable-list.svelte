@@ -31,27 +31,30 @@
         on:moveItem={(event) =>
           moveColumn(event.detail.from, event.detail.to, namespace)}
         on:removeItem={() => removeColumn(label, namespace)}
-        addButtonLabel={translate('workflows', 'add-column-label', {
+        addButtonLabel={translate('workflows.add-column-label', {
           column: label,
         })}
-        removeButtonLabel={translate('workflows', 'remove-column-label', {
+        removeButtonLabel={translate('workflows.remove-column-label', {
           column: label,
         })}
-        moveUpButtonLabel={translate('workflows', 'move-column-up-label', {
+        moveUpButtonLabel={translate('workflows.move-column-up-label', {
           column: label,
         })}
-        moveDownButtonLabel={translate('workflows', 'move-column-down-label', {
+        moveDownButtonLabel={translate('workflows.move-column-down-label', {
           column: label,
         })}
-        pinButtonLabel={translate('workflows', 'pin-column-label', {
+        pinButtonLabel={translate('workflows.pin-column-label', {
           column: label,
         })}
-        unpinButtonLabel={translate('workflows', 'unpin-column-label', {
+        unpinButtonLabel={translate('workflows.unpin-column-label', {
           column: label,
         })}
       />
     {:else}
-      <OrderableListItem readonly label="No headings in view" />
+      <OrderableListItem
+        readonly
+        label={translate('workflows.no-headings-in-view')}
+      />
     {/each}
   </OrderableList>
   <OrderableList>
@@ -62,13 +65,16 @@
       <OrderableListItem
         static
         on:addItem={() => addColumn(label, namespace)}
-        addButtonLabel={translate('workflows', 'add-column-label', {
+        addButtonLabel={translate('workflows.add-column-label', {
           column: label,
         })}
         {label}
       />
     {:else}
-      <OrderableListItem readonly label="All available headings are in view" />
+      <OrderableListItem
+        readonly
+        label={translate('workflows.all-headings-in-view')}
+      />
     {/each}
   </OrderableList>
   <OrderableList>
@@ -79,7 +85,7 @@
       <OrderableListItem
         static
         on:addItem={() => addColumn(label, namespace)}
-        addButtonLabel={translate('workflows', 'add-column-label', {
+        addButtonLabel={translate('workflows.add-column-label', {
           column: label,
         })}
         {label}

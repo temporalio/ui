@@ -31,7 +31,7 @@
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
-  const localTime = getLocalTime() || translate('local');
+  const localTime = getLocalTime() || translate('common.local');
 
   $: isTimeRange = $filter.conditional === 'BETWEEN';
 
@@ -125,9 +125,9 @@
   <ConditionalMenu
     inputId="time-range-filter"
     options={[
-      { value: '<=', label: translate('before') },
-      { value: 'BETWEEN', label: translate('between') },
-      { value: '>=', label: translate('after') },
+      { value: '<=', label: translate('common.before') },
+      { value: 'BETWEEN', label: translate('common.between') },
+      { value: '>=', label: translate('common.after') },
     ]}
     noBorderLeft
     noBorderRight
@@ -138,7 +138,7 @@
       id="time-range-filter"
       controls="time-range-filter-menu"
     >
-      {translate('workflows', 'select-time')}
+      {translate('workflows.select-time')}
     </MenuButton>
     <Menu
       keepOpen
@@ -149,12 +149,12 @@
         <MenuItem>
           <div class="flex flex-col gap-2">
             <DatePicker
-              label={translate('start')}
+              label={translate('common.start')}
               on:datechange={onStartDateChange}
               selected={startDate}
-              todayLabel={translate('today')}
-              closeLabel={translate('close')}
-              clearLabel={translate('clear-input-button-label')}
+              todayLabel={translate('common.today')}
+              closeLabel={translate('common.close')}
+              clearLabel={translate('common.clear-input-button-label')}
             />
             <TimePicker
               bind:hour={startHour}
@@ -168,12 +168,12 @@
         <MenuItem>
           <div class="flex flex-col gap-2">
             <DatePicker
-              label={translate('end')}
+              label={translate('common.end')}
               on:datechange={onEndDateChange}
               selected={endDate}
-              todayLabel={translate('today')}
-              closeLabel={translate('close')}
-              clearLabel={translate('clear-input-button-label')}
+              todayLabel={translate('common.today')}
+              closeLabel={translate('common.close')}
+              clearLabel={translate('common.clear-input-button-label')}
             />
             <TimePicker
               bind:hour={endHour}
@@ -187,7 +187,7 @@
         <MenuItem on:click={() => ($type = 'relative')}>
           <div class="flex flex-col">
             <RadioInput
-              label={translate('relative')}
+              label={translate('common.relative')}
               id="relative-time"
               value="relative"
               name="time-filter-type"
@@ -195,7 +195,7 @@
             />
             <div class="ml-6 flex gap-0 pt-2">
               <Input
-                label={translate('relative')}
+                label={translate('common.relative')}
                 labelHidden
                 id="relative-datetime-input"
                 bind:value={relativeTime}
@@ -209,12 +209,12 @@
                 unroundLeft
                 bind:value={timeUnit}
                 id="relative-datetime-unit-input"
-                label={translate('time-unit')}
+                label={translate('common.time-unit')}
                 labelHidden
                 disabled={$type !== 'relative'}
               >
                 {#each TIME_UNIT_OPTIONS as unit}
-                  <Option value={unit}>{unit} {translate('ago')}</Option>
+                  <Option value={unit}>{unit} {translate('common.ago')}</Option>
                 {/each}
               </Select>
             </div>
@@ -224,7 +224,7 @@
         <MenuItem on:click={() => ($type = 'absolute')}>
           <div class="flex flex-col gap-2">
             <RadioInput
-              label={translate('absolute')}
+              label={translate('common.absolute')}
               id="absolute-time"
               value="absolute"
               name="time-filter-type"
@@ -236,9 +236,9 @@
                 labelHidden
                 on:datechange={onStartDateChange}
                 selected={startDate}
-                todayLabel={translate('today')}
-                closeLabel={translate('close')}
-                clearLabel={translate('clear-input-button-label')}
+                todayLabel={translate('common.today')}
+                closeLabel={translate('common.close')}
+                clearLabel={translate('common.clear-input-button-label')}
                 disabled={$type !== 'absolute'}
               />
               <TimePicker
@@ -255,12 +255,12 @@
       <MenuDivider />
       <div class="flex items-center p-2">
         <Button size="xs" style="width: 100%" on:click={onApply} {disabled}
-          >{translate('apply')}</Button
+          >{translate('common.apply')}</Button
         >
       </div>
       <MenuItem centered disabled class="!pt-0">
         <Icon name="clock" aria-hidden="true" />
-        {translate('based-on-time-preface')}
+        {translate('common.based-on-time-preface')}
         {localTime}
       </MenuItem>
     </Menu>

@@ -30,16 +30,16 @@
 </script>
 
 <PaginatedTable
-  perPageLabel={translate('per-page')}
-  nextPageButtonLabel={translate('next-page')}
-  previousPageButtonLabel={translate('previous-page')}
-  pageButtonLabel={(page) => translate('go-to-page', { page })}
+  perPageLabel={translate('common.per-page')}
+  nextPageButtonLabel={translate('common.next-page')}
+  previousPageButtonLabel={translate('common.previous-page')}
+  pageButtonLabel={(page) => translate('common.go-to-page', { page })}
   updating={$updating}
   items={$workflows}
   let:visibleItems
 >
   <caption class="sr-only" slot="caption">
-    {translate('workflows')}
+    {translate('common.workflows')}
   </caption>
   <TableHeaderRow
     onClickConfigure={openCustomizationDrawer}
@@ -68,8 +68,8 @@
   position="right"
   id="workflows-summary-table-configuration-drawer"
   dark={false}
-  title={translate('workflows', 'configure-workflows')}
-  closeButtonLabel={translate('workflows', 'close-configure-workflows')}
+  title={translate('workflows.configure-workflows')}
+  closeButtonLabel={translate('workflows.close-configure-workflows')}
 >
   <svelte:fragment slot="subtitle">
     Add (<Icon class="inline" name="add" />), re-arrange (<Icon

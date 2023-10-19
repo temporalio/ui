@@ -32,10 +32,10 @@
   floatId="event-view-toggle"
   let:visibleItems
   let:initialItem
-  aria-label={translate('workflows', 'event-history')}
-  pageSizeSelectLabel={translate('per-page')}
-  previousButtonLabel={translate('previous')}
-  nextButtonLabel={translate('next')}
+  aria-label={translate('workflows.event-history')}
+  pageSizeSelectLabel={translate('common.per-page')}
+  previousButtonLabel={translate('common.previous')}
+  nextButtonLabel={translate('common.next')}
 >
   <EventSummaryTable {compact} on:expandAll={handleExpandChange}>
     {#each visibleItems as event (`${event.id}-${event.timestamp}`)}

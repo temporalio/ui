@@ -31,6 +31,7 @@
         on:click|preventDefault|stopPropagation={onFilter}
         class="copy-or-filter-button"
         class:filtered
+        id="filter-button"
       >
         {#key filtered}
           <Icon title={filterIconTitle} name="filter" />
@@ -41,6 +42,7 @@
       <button
         class="copy-or-filter-button"
         on:click|preventDefault|stopPropagation={(e) => copy(e, content)}
+        id="copy-button"
       >
         <Icon
           title={$copied ? copySuccessIconTitle : copyIconTitle}

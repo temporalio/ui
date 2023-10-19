@@ -22,8 +22,8 @@
 
 <ConditionalMenu
   options={[
-    { value: '=', label: translate('equal-to') },
-    { value: '!=', label: translate('not-equal-to') },
+    { value: '=', label: translate('common.equal-to') },
+    { value: '!=', label: translate('common.not-equal-to') },
   ]}
   inputId="text-filter-search"
   noBorderLeft
@@ -33,7 +33,7 @@
   labelHidden
   id="text-filter-search"
   type="search"
-  placeholder={`${translate('enter')} ${$filter.attribute}`}
+  placeholder={`${translate('common.enter')} ${$filter.attribute}`}
   icon="search"
   class="w-full"
   unroundLeft

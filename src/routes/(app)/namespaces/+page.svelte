@@ -15,22 +15,23 @@
 
 <PageTitle title="Namespaces" url={$page.url.href} />
 <h1 data-testid="namespace-selector-title" class="mb-8 text-2xl">
-  {translate('namespaces')}
+  {translate('common.namespaces')}
 </h1>
 {#if $namespaces?.length > 0}
   <Pagination
     items={$namespaces}
     let:visibleItems
-    aria-label={translate('namespaces')}
-    pageSizeSelectLabel={translate('per-page')}
-    previousButtonLabel={translate('previous')}
-    nextButtonLabel={translate('next')}
+    aria-label={translate('common.namespaces')}
+    pageSizeSelectLabel={translate('common.per-page')}
+    previousButtonLabel={translate('common.previous')}
+    nextButtonLabel={translate('common.next')}
   >
     <Table variant="fancy" class="w-full">
-      <caption class="sr-only" slot="caption">{translate('namespaces')}</caption
+      <caption class="sr-only" slot="caption"
+        >{translate('common.namespaces')}</caption
       >
       <TableHeaderRow slot="headers">
-        <th>{translate('name')}</th>
+        <th>{translate('common.name')}</th>
       </TableHeaderRow>
       {#each visibleItems as namespace}
         <TableRow>
@@ -47,7 +48,7 @@
   </Pagination>
 {:else}
   <EmptyState
-    title={translate('namespaces', 'namespaces-empty-state-title')}
-    content={translate('namespaces', 'namespaces-empty-state-content')}
+    title={translate('namespaces.namespaces-empty-state-title')}
+    content={translate('namespaces.namespaces-empty-state-content')}
   />
 {/if}

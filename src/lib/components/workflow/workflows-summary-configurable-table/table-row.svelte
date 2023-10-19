@@ -11,7 +11,7 @@
   export let workflow: WorkflowExecution | undefined = undefined;
   export let empty = false;
 
-  $: label = translate('workflows', 'select-workflow', {
+  $: label = translate('workflows.select-workflow', {
     workflow: workflow?.id,
   });
 </script>

@@ -20,26 +20,23 @@
   export let newCount: number | undefined = undefined;
 
   const label: Record<Status, string> = {
-    Running: translate('workflows', 'running'),
-    TimedOut: translate('workflows', 'timed-out'),
-    Completed: translate('workflows', 'completed'),
-    Failed: translate('workflows', 'failed'),
-    ContinuedAsNew: translate('workflows', 'continued-as-new'),
-    Canceled: translate('workflows', 'canceled'),
-    Terminated: translate('workflows', 'terminated'),
-    Paused: translate('workflows', 'paused'),
-    Scheduled: translate('events', 'event-classification-scheduled'),
-    Started: translate('events', 'event-classification-started'),
-    Unspecified: translate('events', 'event-classification-unspecified'),
-    Open: translate('events', 'event-classification-open'),
-    New: translate('events', 'event-classification-new'),
-    Initiated: translate('events', 'event-classification-initiated'),
-    Fired: translate('events', 'event-classification-fired'),
-    CancelRequested: translate(
-      'events',
-      'event-classification-cancelrequested',
-    ),
-    Signaled: translate('events', 'event-classification-signaled'),
+    Running: translate('workflows.running'),
+    TimedOut: translate('workflows.timed-out'),
+    Completed: translate('workflows.completed'),
+    Failed: translate('workflows.failed'),
+    ContinuedAsNew: translate('workflows.continued-as-new'),
+    Canceled: translate('workflows.canceled'),
+    Terminated: translate('workflows.terminated'),
+    Paused: translate('workflows.paused'),
+    Scheduled: translate('events.event-classification.started'),
+    Started: translate('events.event-classification.started'),
+    Unspecified: translate('events.event-classification.unspecified'),
+    Open: translate('events.event-classification.open'),
+    New: translate('events.event-classification.new'),
+    Initiated: translate('events.event-classification.initiated'),
+    Fired: translate('events.event-classification.fired'),
+    CancelRequested: translate('events.event-classification.cancelrequested'),
+    Signaled: translate('events.event-classification.signaled'),
   };
 
   const workflowStatus = cva(

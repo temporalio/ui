@@ -14,27 +14,27 @@
   import FilterInput from './_filter-input.svelte';
 
   const statuses = {
-    All: { value: null, label: translate('workflows', 'all-statuses') },
+    All: { value: null, label: translate('workflows.all-statuses') },
     'Timed Out': {
       value: 'TimedOut',
-      label: translate('workflows', 'timed-out'),
+      label: translate('workflows.timed-out'),
     },
     Completed: {
       value: 'Completed',
-      label: translate('workflows', 'completed'),
+      label: translate('workflows.completed'),
     },
-    Failed: { value: 'Failed', label: translate('workflows', 'failed') },
+    Failed: { value: 'Failed', label: translate('workflows.failed') },
     'Continued as New': {
       value: 'ContinuedAsNew',
-      label: translate('workflows', 'continued-as-new'),
+      label: translate('workflows.continued-as-new'),
     },
     Canceled: {
       value: 'Canceled',
-      label: translate('workflows', 'canceled'),
+      label: translate('workflows.canceled'),
     },
     Terminated: {
       value: 'Terminated',
-      label: translate('workflows', 'terminated'),
+      label: translate('workflows.terminated'),
     },
   };
 
@@ -67,11 +67,11 @@
   <p class="text-right text-xs">
     {#if isAdvancedQuery}
       <Link href={$page.url.pathname} on:click={handleToggle('basic')}>
-        {translate('workflows', 'basic-search')}
+        {translate('workflows.basic-search')}
       </Link>
     {:else}
       <Link class="text-blue-700" on:click={handleToggle('advanced')}>
-        {translate('workflows', 'advanced-search')}
+        {translate('workflows.advanced-search')}
       </Link>
     {/if}
   </p>
@@ -79,7 +79,7 @@
   {#if !isAdvancedQuery}
     <Search
       icon
-      placeholder={translate('search')}
+      placeholder={translate('common.search')}
       value={$page.url.searchParams.get('query')}
       on:submit={submitAdvancedQuery}
     />
@@ -90,16 +90,16 @@
     >
       <FilterInput
         parameter="workflow-id"
-        name={translate('workflow-id')}
+        name={translate('common.workflow-id')}
         value={workflowIdFilter}
       />
       <FilterInput
         parameter="workflow-type"
-        name={translate('workflow-type')}
+        name={translate('common.workflow-type')}
         value={workflowTypeFilter}
       />
       <FilterSelect
-        label={translate('workflows', 'time-range')}
+        label={translate('workflows.time-range')}
         parameter="time-range"
         value="24 hours"
       >
@@ -107,15 +107,19 @@
           <Option {value}>{value}</Option>
         {/each}
       </FilterSelect>
-      <FilterSelect label={translate('status')} parameter="status" value={null}>
+      <FilterSelect
+        label={translate('common.status')}
+        parameter="status"
+        value={null}
+      >
         {#each Object.values(statuses) as { value, label } (label)}
           <Option {value}>{label}</Option>
         {/each}
       </FilterSelect>
       <Select id="filter-by-relative-time" bind:value={$timeFormat}>
-        <Option value={'relative'}>{translate('relative')}</Option>
-        <Option value={'UTC'}>{translate('utc')}</Option>
-        <Option value={'local'}>{translate('local')}</Option>
+        <Option value={'relative'}>{translate('common.relative')}</Option>
+        <Option value={'UTC'}>{translate('common.utc')}</Option>
+        <Option value={'local'}>{translate('common.local')}</Option>
       </Select>
     </div>
   {/if}

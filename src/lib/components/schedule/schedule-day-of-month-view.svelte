@@ -13,9 +13,9 @@
 
 <div class="my-2 flex flex-col gap-4">
   <h3 class="text-lg font-medium">
-    {translate('schedules', 'recurring-dates-heading')}
+    {translate('schedules.recurring-dates-heading')}
   </h3>
-  <p>{translate('schedules', 'recurring-dates-description')}</p>
+  <p>{translate('schedules.recurring-dates-description')}</p>
   <div class="flex w-full flex-col gap-4">
     <DayOfMonthPicker bind:daysOfMonth />
     <MonthPicker bind:months />

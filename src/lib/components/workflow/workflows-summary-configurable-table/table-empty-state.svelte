@@ -38,31 +38,31 @@
     {:else}
       <h2 class="text-lg font-medium">
         {#if query}
-          {translate('workflows', 'workflow-query-empty-state-title')}
+          {translate('workflows.workflow-query-empty-state-title')}
         {:else}
-          {translate('workflows', 'workflow-empty-state-title')}
+          {translate('workflows.workflow-empty-state-title')}
         {/if}
       </h2>
       {#if $workflowError}
         <Alert
           intent="caution"
           icon="warning"
-          title={translate('workflows', 'workflow-query-error-state')}
+          title={translate('workflows.workflow-query-error-state')}
           style="overflow-wrap: anywhere"
         >
           {$workflowError}
         </Alert>
       {:else if query}
         <p>
-          {translate('workflows', 'workflow-query-empty-state-preface')}
+          {translate('workflows.workflow-query-empty-state-preface')}
         </p>
         <p>
-          {translate('workflows', 'workflow-query-empty-state-postface')}
+          {translate('workflows.workflow-query-empty-state-postface')}
         </p>
       {:else}
         <slot name="cloud" />
         <p>
-          {translate('workflows', 'workflow-empty-state-description')}
+          {translate('workflows.workflow-empty-state-description')}
           <Link newTab href="https://github.com/temporalio"
             >github.com/temporalio</Link
           >.

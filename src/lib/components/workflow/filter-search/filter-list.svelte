@@ -63,9 +63,9 @@
 
   const getDateTimeConditonal = (conditional: string) => {
     if (['<', '<='].includes(conditional))
-      return translate('before').toLowerCase();
+      return translate('common.before').toLowerCase();
     if (['>', '>='].includes(conditional))
-      return translate('after').toLowerCase();
+      return translate('common.after').toLowerCase();
     return conditional;
   };
 
@@ -91,7 +91,7 @@
     {#if attribute}
       <div in:fade>
         <Chip
-          removeButtonLabel={translate('workflows', 'remove-filter-label', {
+          removeButtonLabel={translate('workflows.remove-filter-label', {
             attribute,
           })}
           on:remove={() => removeQuery(i)}
@@ -135,7 +135,7 @@
   {/each}
   {#if hasMoreFilters}
     <Button variant="secondary" size="xs" on:click={viewMoreFilters}
-      >View More...</Button
+      >{translate('common.view-more')}</Button
     >
   {/if}
 </div>

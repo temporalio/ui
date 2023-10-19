@@ -9,7 +9,7 @@
 </script>
 
 <PageTitle
-  title={`${translate('workflows', 'queries-tab')} | ${workflow}`}
+  title={`${translate('workflows.queries-tab')} | ${workflow}`}
   url={$page.url.href}
 />
 <WorkflowQuery />

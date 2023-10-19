@@ -31,7 +31,7 @@
         } else {
           toaster.push({
             variant: 'error',
-            message: translate('namespaces', 'unauthorized-namespace-error'),
+            message: translate('namespaces.unauthorized-namespace-error'),
           });
         }
       },
@@ -45,26 +45,26 @@
 </script>
 
 <PageTitle
-  title={translate('namespaces', 'namespace-select-header')}
+  title={translate('namespaces.namespace-select-header')}
   url={$page.url.href}
 />
 <div class="w-full p-8 xl:w-1/2">
   <h1 class="my-4 text-3xl">
-    {translate('namespaces', 'select-namespace-welcome')}
+    {translate('namespaces.select-namespace-welcome')}
   </h1>
-  <p class="mb-8">{translate('namespaces', 'select-namespace')}</p>
+  <p class="mb-8">{translate('namespaces.select-namespace')}</p>
   <form class="mb-5" role="search">
     <Input
       id="search-namespaces"
       type="search"
-      label={translate('search')}
+      label={translate('common.search')}
       labelHidden
-      placeholder={translate('search')}
+      placeholder={translate('common.search')}
       icon="search"
       bind:value={searchValue}
     />
   </form>
-  <div class="h-screen w-full" aria-label={translate('namespaces')}>
+  <div class="h-screen w-full" aria-label={translate('common.namespaces')}>
     {#if namespaceList.length}
       {#if filteredList.length}
         <VirtualList items={filteredList} let:item itemHeight={50}>
@@ -80,11 +80,11 @@
           </div>
         </VirtualList>
       {:else}
-        <EmptyState title={translate('no-results')} />
+        <EmptyState title={translate('common.no-results')} />
       {/if}
     {:else}
       <EmptyState
-        title={translate('namespaces', 'select-namespace-empty-state')}
+        title={translate('namespaces.select-namespace-empty-state')}
       />
     {/if}
   </div>

@@ -160,11 +160,11 @@ export async function getWorkerTaskReachability(
 
 function getLabelForReachability(reachability: unknown[]): string {
   if (!reachability || !reachability.length)
-    return translate('workers', 'ready-to-be-retired');
+    return translate('workers.ready-to-be-retired');
   if (reachability.length === 1 && reachability.includes('CLOSED')) {
-    return translate('maybe');
+    return translate('common.maybe');
   }
-  return translate('no');
+  return translate('common.no');
 }
 
 export function getBuildIdReachability(

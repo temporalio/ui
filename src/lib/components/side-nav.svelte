@@ -18,13 +18,13 @@
   export let activeNamespace: Namespace;
   export let linkList: Partial<Record<string, string>>;
 
-  $: labsHoverText = `${translate('labs')} ${
+  $: labsHoverText = `${translate('common.labs')} ${
     $labsMode
-      ? `${translate('on')} - ${translate('experimental')}`
-      : translate('off')
+      ? `${translate('common.on')} - ${translate('common.experimental')}`
+      : translate('common.off')
   }`;
-  $: labsText = `${translate('labs')} ${
-    $labsMode ? translate('on') : translate('off')
+  $: labsText = `${translate('common.labs')} ${
+    $labsMode ? translate('common.on') : translate('common.off')
   }`;
 
   let batchOperationIcon: 'layers-1' | 'layers-2' | 'layers-3' = 'layers-3';
@@ -53,15 +53,15 @@
   });
 </script>
 
-<NavContainer {isCloud} {linkList} aria-label={translate('primary')}>
+<NavContainer {isCloud} {linkList} aria-label={translate('common.primary')}>
   <svelte:fragment slot="top">
     <NavRow link={linkList.workflows} {isCloud} data-testid="workflows-button">
-      <NavTooltip text={translate('workflows')}>
+      <NavTooltip text={translate('common.workflows')}>
         <div class="nav-icon">
           <Icon name="workflow" />
         </div>
       </NavTooltip>
-      <div class="nav-title">{translate('workflows')}</div>
+      <div class="nav-title">{translate('common.workflows')}</div>
     </NavRow>
     <IsCloudGuard {isCloud}>
       <FeatureGuard
@@ -72,33 +72,33 @@
           {isCloud}
           data-testid="schedules-button"
         >
-          <NavTooltip text={translate('schedules')}>
+          <NavTooltip text={translate('common.schedules')}>
             <div class="nav-icon">
               <Icon name="schedules" />
             </div>
           </NavTooltip>
-          <div class="nav-title">{translate('schedules')}</div>
+          <div class="nav-title">{translate('common.schedules')}</div>
         </NavRow>
       </FeatureGuard>
     </IsCloudGuard>
     <slot name="top" />
     <IsCloudGuard {isCloud}>
       <NavRow link={linkList.archive} {isCloud} data-testid="archive-button">
-        <NavTooltip text={translate('archive')}>
+        <NavTooltip text={translate('common.archive')}>
           <div class="nav-icon">
             <Icon name="archives" />
           </div>
         </NavTooltip>
-        <div class="nav-title">{translate('archive')}</div>
+        <div class="nav-title">{translate('common.archive')}</div>
       </NavRow>
     </IsCloudGuard>
     <NavRow link={linkList.batchOperations} {isCloud}>
-      <NavTooltip text={translate('batch', 'list-page-title')}>
+      <NavTooltip text={translate('batch.list-page-title')}>
         <div class="nav-icon">
           <Icon name={batchOperationIcon} />
         </div>
       </NavTooltip>
-      <div class="nav-title">{translate('batch', 'nav-title')}</div>
+      <div class="nav-title">{translate('batch.nav-title')}</div>
     </NavRow>
   </svelte:fragment>
   <svelte:fragment slot="middle">
@@ -108,12 +108,12 @@
         {isCloud}
         data-testid="namespaces-button"
       >
-        <NavTooltip text={translate('namespaces')}>
+        <NavTooltip text={translate('common.namespaces')}>
           <div class="nav-icon">
             <Icon name="namespace" />
           </div>
         </NavTooltip>
-        <div class="nav-title">{translate('namespaces')}</div>
+        <div class="nav-title">{translate('common.namespaces')}</div>
       </NavRow>
     </IsLegacyCloudGuard>
     <slot name="middle" />
@@ -123,23 +123,23 @@
     <slot name="import">
       <IsCloudGuard {isCloud}>
         <NavRow link={linkList.import} {isCloud} data-testid="import-button">
-          <NavTooltip text={translate('import')}>
+          <NavTooltip text={translate('common.import')}>
             <div class="nav-icon">
               <Icon name="import" />
             </div>
           </NavTooltip>
-          <div class="nav-title">{translate('import')}</div>
+          <div class="nav-title">{translate('common.import')}</div>
         </NavRow>
       </IsCloudGuard>
     </slot>
     <slot name="feedback">
       <NavRow link={linkList.feedback} {isCloud} externalLink>
-        <NavTooltip text={translate('feedback')}>
+        <NavTooltip text={translate('common.feedback')}>
           <div class="nav-icon">
             <Icon name="feedback" />
           </div>
         </NavTooltip>
-        <div class="nav-title">{translate('feedback')}</div>
+        <div class="nav-title">{translate('common.feedback')}</div>
       </NavRow>
     </slot>
     <NavRow {isCloud} handleClick={() => ($labsMode = !$labsMode)}>
@@ -152,7 +152,7 @@
         <div>{labsText}</div>
         {#if $labsMode}
           <p class="text-[12px]">
-            {translate('experimental')}
+            {translate('common.experimental')}
           </p>
         {/if}
       </div>

@@ -44,7 +44,7 @@
   <div class="flex gap-4 max-sm:flex-col">
     <div class="flex w-full gap-4">
       <RangeInput
-        label={translate('event')}
+        label={translate('common.event')}
         labelHidden
         id="range-input-event-history"
         min={1}
@@ -58,7 +58,7 @@
           on:click={() => {
             index -= 1;
           }}
-          aria-label={translate('previous')}
+          aria-label={translate('common.previous')}
         >
           <span
             class="arrow arrow-left"
@@ -71,7 +71,7 @@
           on:click={() => {
             index += 1;
           }}
-          aria-label={translate('next')}
+          aria-label={translate('common.next')}
         >
           <span
             class="arrow arrow-right"
@@ -88,8 +88,8 @@
         <CodeBlock
           content={decodedValue}
           testId="event-history-json"
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
         />
       </PayloadDecoder>
     {/key}
@@ -98,8 +98,8 @@
       <CodeBlock
         content={stringifyWithBigInt(events[index - 1], undefined, 2)}
         testId="event-history-json"
-        copyIconTitle={translate('copy-icon-title')}
-        copySuccessIconTitle={translate('copy-success-icon-title')}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
     {/key}
   {/if}

@@ -25,14 +25,14 @@
   <div class="relative h-32 min-h-[84px]">
     <a
       href={linkList.home}
-      class="absolute z-[51] block"
+      class="absolute block"
       style="top: 22px; left: 18px;"
     >
       <Logo
         height="24px"
         width="24px"
         {isCloud}
-        title={translate('workflows', 'recent-workflows-link')}
+        title={translate('workflows.recent-workflows-link')}
       />
     </a>
     <button
@@ -73,7 +73,7 @@
       : 'text-gray-300'}"
   >
     {#if version}
-      <span class="sr-only">{translate('version')}</span>
+      <span class="sr-only">{translate('common.version')}</span>
     {/if}
     {version}
   </div>
@@ -82,7 +82,7 @@
 
 <style lang="postcss">
   .nav-header {
-    @apply relative z-0 flex h-screen flex-col justify-between bg-primary text-white;
+    @apply relative flex h-screen flex-col justify-between bg-primary text-white;
   }
 
   .nav-header.cloud {
@@ -90,7 +90,7 @@
   }
 
   .nav-wrapper {
-    @apply z-50 flex w-16 grow flex-col items-center justify-between;
+    @apply flex w-16 grow flex-col items-center justify-between;
   }
 
   .nav-wrapper.open {
@@ -122,7 +122,7 @@
   }
 
   .nav-toggle {
-    @apply transition-left absolute top-[52px] left-[18px] z-[51] hidden;
+    @apply transition-left absolute top-[52px] left-[18px] hidden;
   }
 
   .nav-header:hover .nav-toggle {

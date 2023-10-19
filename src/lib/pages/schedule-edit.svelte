@@ -72,7 +72,7 @@
 </script>
 
 {#await scheduleFetch}
-  <Loading title={translate('schedules', 'loading')} />
+  <Loading title={translate('schedules.loading')} />
 {:then { schedule }}
   <ScheduleFormView onConfirm={handleEdit} {schedule} />
 {/await}

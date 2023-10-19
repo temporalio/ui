@@ -50,9 +50,9 @@
 
 <Link {href}>{value}</Link>
 <FilterOrCopyButtons
-  copyIconTitle={translate('copy-icon-title')}
-  copySuccessIconTitle={translate('copy-success-icon-title')}
-  filterIconTitle={translate('filter-workflows')}
+  copyIconTitle={translate('common.copy-icon-title')}
+  copySuccessIconTitle={translate('common.copy-success-icon-title')}
+  filterIconTitle={translate('common.filter-workflows')}
   show={filterOrCopyButtonsVisible}
   content={value}
   onFilter={onRowFilterClick}

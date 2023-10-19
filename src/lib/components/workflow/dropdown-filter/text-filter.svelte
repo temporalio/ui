@@ -68,14 +68,14 @@
     <Input
       icon="search"
       type="search"
-      label={translate('search')}
+      label={translate('common.search')}
       labelHidden
       id={attributeToId[attribute]}
       placeholder={attributeToHumanReadable[attribute]}
       class="flex items-center p-2 transition-all hover:cursor-pointer"
       autoFocus
       clearable
-      clearButtonLabel={translate('clear-input-button-label')}
+      clearButtonLabel={translate('common.clear-input-button-label')}
       on:input={onInput}
       on:clear={handleClearInput}
       bind:value

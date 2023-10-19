@@ -10,13 +10,13 @@
 </script>
 
 <Panel>
-  <h2 class="mb-4 text-2xl">{translate('schedules', 'upcoming-runs')}</h2>
+  <h2 class="mb-4 text-2xl">{translate('schedules.upcoming-runs')}</h2>
   {#each futureRuns.slice(0, 5) as run}
     <div class="row">
       <p>
         {formatDate(run, $timeFormat, {
           relative: $relativeTime,
-          relativeLabel: translate('from-now'),
+          relativeLabel: translate('common.from-now'),
         })}
       </p>
     </div>

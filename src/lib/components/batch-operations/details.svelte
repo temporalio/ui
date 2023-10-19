@@ -8,25 +8,25 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <p>{translate('batch', 'details')}</p>
+  <p>{translate('batch.details')}</p>
   <div class="batch-operation-detail">
     <p class="batch-operation-key">
-      {translate('batch', 'operation-type')}
+      {translate('batch.operation-type')}
     </p>
     <p class="batch-operation-value">{operation.operationType}</p>
   </div>
   <div class="batch-operation-detail">
     <p class="batch-operation-key">
-      {translate('batch', 'identity')}
+      {translate('batch.identity')}
     </p>
     <p class="batch-operation-value">{operation.identity}</p>
   </div>
   <div class="batch-operation-detail">
-    <p class="batch-operation-key">{translate('reason')}</p>
+    <p class="batch-operation-key">{translate('common.reason')}</p>
     <p class="batch-operation-value">{operation.reason}</p>
   </div>
   <div class="batch-operation-detail">
-    <p class="batch-operation-key">{translate('start-time')}</p>
+    <p class="batch-operation-key">{translate('common.start-time')}</p>
     <p class="batch-operation-value">
       {formatDate(operation.startTime, $timeFormat, {
         relative: $relativeTime,
@@ -34,7 +34,7 @@
     </p>
   </div>
   <div class="batch-operation-detail">
-    <p class="batch-operation-key">{translate('close-time')}</p>
+    <p class="batch-operation-key">{translate('common.close-time')}</p>
     <p class="batch-operation-value">
       {formatDate(operation.closeTime, $timeFormat, {
         relative: $relativeTime,
@@ -43,7 +43,7 @@
   </div>
   <div class="batch-operation-detail">
     <p class="batch-operation-key">
-      {translate('batch', 'total-operations')}
+      {translate('batch.total-operations')}
     </p>
     <p class="batch-operation-value">
       {Intl.NumberFormat('en-US').format(operation.totalOperationCount)}

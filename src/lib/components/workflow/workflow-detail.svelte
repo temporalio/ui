@@ -13,8 +13,8 @@
 <p class="flex items-center gap-2 text-{textSize} whitespace-nowrap pt-2">
   {#if copyable}
     <Copyable
-      copyIconTitle={translate('copy-icon-title')}
-      copySuccessIconTitle={translate('copy-success-icon-title')}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
       {content}
       visible
       container-class="gap-1 w-full"

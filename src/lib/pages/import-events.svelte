@@ -13,10 +13,10 @@
   <nav
     id="event-history"
     class="block items-center justify-between gap-4 pb-4 lg:flex"
-    aria-label={translate('events', 'import-event-history')}
+    aria-label={translate('events.import-event-history')}
   >
     <h1 class="text-lg font-medium" data-testid="import-event-history">
-      {translate('events', 'import-event-history')}
+      {translate('events.import-event-history')}
     </h1>
     <div class="flex gap-4">
       <HistoryImport />
@@ -30,24 +30,24 @@
       <Link
         target="_blank"
         href="https://github.com/temporalio/api/blob/1cd0ac0bbd8e71c7bfc9fe1900c678b432e66e5b/temporal/api/history/v1/message.proto"
-        class="mb-8">{translate('events', 'api-history-link')}</Link
+        class="mb-8">{translate('events.api-history-link')}</Link
       >
     </div>
     <h2 class="mt-8 text-lg font-medium">
-      {translate('events', 'history-expected-formats')}
+      {translate('events.history-expected-formats')}
     </h2>
     <div class="h-40 text-center">
       <CodeBlock
         content={stringifyWithBigInt(format1)}
         inline
-        copyIconTitle={translate('copy-icon-title')}
-        copySuccessIconTitle={translate('copy-success-icon-title')}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
       <CodeBlock
         content={stringifyWithBigInt(format2)}
         inline
-        copyIconTitle={translate('copy-icon-title')}
-        copySuccessIconTitle={translate('copy-success-icon-title')}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
     </div>
   </div>

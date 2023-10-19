@@ -29,7 +29,7 @@
             {active}
             on:click={() => dispatch('pillChange', { key })}
             color={active ? 'lightBlue' : 'gray'}
-            >{translate('events', attributeGroupingProperties[key].label)}</Pill
+            >{translate(attributeGroupingProperties[key].label)}</Pill
           >
         {/if}
       {/each}

@@ -19,9 +19,9 @@
       bold
       icon="warning"
       intent="warning"
-      title={translate('workflows', 'workflow-error-no-workers-title')}
+      title={translate('workflows.workflow-error-no-workers-title')}
     >
-      {translate('workflows', 'workflow-error-no-workers-description', {
+      {translate('workflows.workflow-error-no-workers-description', {
         taskQueue: workflow?.taskQueue,
       })}
     </Alert>
@@ -33,18 +33,11 @@
       bold
       icon="warning"
       intent="warning"
-      title={translate(
-        'workflows',
-        'workflow-error-no-compatible-workers-title',
-      )}
+      title={translate('workflows.workflow-error-no-compatible-workers-title')}
     >
-      {translate(
-        'workflows',
-        'workflow-error-no-compatible-workers-description',
-        {
-          taskQueue: workflow?.taskQueue,
-        },
-      )}
+      {translate('workflows.workflow-error-no-compatible-workers-description', {
+        taskQueue: workflow?.taskQueue,
+      })}
     </Alert>
   </div>
 {/if}

@@ -13,10 +13,10 @@
 
 <Table class="w-full">
   <caption class="sr-only" slot="caption"
-    >{translate('schedules', 'schedule')}</caption
+    >{translate('schedules.schedule')}</caption
   >
   <TableHeaderRow slot="headers">
-    <th>{translate('schedules', 'schedule')}</th>
+    <th>{translate('schedules.schedule')}</th>
   </TableHeaderRow>
   <TableRow class="hover:text-blue-700 hover:underline">
     <td>
@@ -28,8 +28,8 @@
         })}
       >
         <Copyable
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
           content={scheduleId}
           visible
         />

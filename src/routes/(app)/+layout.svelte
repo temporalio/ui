@@ -105,11 +105,11 @@
 <SkipNavigation />
 <div class="flex w-screen flex-row">
   <Toaster
-    closeButtonLabel={translate('close')}
+    closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
     toasts={toaster.toasts}
   />
-  <div class="sticky top-0 z-20 h-screen w-auto">
+  <div class="sticky top-0 z-30 h-screen w-auto">
     <SideNavigation {activeNamespace} {linkList} {isCloud} />
   </div>
   <MainContentContainer>

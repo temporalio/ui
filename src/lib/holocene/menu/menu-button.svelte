@@ -137,7 +137,7 @@
 
 <style lang="postcss">
   .menu-button {
-    @apply relative flex h-10 w-full flex-row items-center gap-2 rounded-lg py-2.5 px-4 text-sm focus:z-50 disabled:cursor-not-allowed;
+    @apply relative flex h-10 w-full flex-row items-center gap-2 rounded-lg py-2.5 px-4 text-sm disabled:cursor-not-allowed;
 
     &.active {
       @apply after:h-2 after:w-2 after:-translate-x-full after:-translate-y-full after:rounded-full after:bg-blue-300 after:content-[''];

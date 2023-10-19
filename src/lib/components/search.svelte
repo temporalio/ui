@@ -5,7 +5,7 @@
 
   export let placeholder = '';
   export let value = '';
-  export let label = translate('search');
+  export let label = translate('common.search');
   export let name = 'query';
   export let icon = false;
   export let id = `${label.toLocaleUpperCase()}-input`;

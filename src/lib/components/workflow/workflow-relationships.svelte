@@ -28,36 +28,34 @@
 
 <section>
   <Accordion
-    title={translate('workflows', 'relationships')}
+    title={translate('workflows.relationships')}
     data-testid="relationships-accordion"
     icon="relationship"
   >
     <div slot="summary" class="hidden flex-row gap-2 lg:flex">
       {#if scheduleId}
-        <Badge type="purple">{translate('scheduled')}</Badge>
+        <Badge type="purple">{translate('common.scheduled')}</Badge>
       {/if}
       <Badge type={parent ? 'purple' : 'gray'}
-        >{translate('workflows', 'parents', parent ? 1 : 0)}</Badge
+        >{translate('workflows.parents', { count: parent ? 1 : 0 })}</Badge
       >
       <Badge
         type={$workflowRun.workflow.pendingChildren.length ? 'purple' : 'gray'}
-        >{translate(
-          'workflows',
-          'pending-children',
-          $workflowRun.workflow.pendingChildren.length,
-        )}
+        >{translate('workflows.pending-children', {
+          count: $workflowRun.workflow.pendingChildren.length,
+        })}
       </Badge>
       <Badge type={children.length ? 'purple' : 'gray'}
-        >{translate('workflows', 'children', children.length)}</Badge
+        >{translate('workflows.children', { count: children.length })}</Badge
       >
       <Badge type={first ? 'purple' : 'gray'}
-        >{translate('workflows', 'first', first ? 1 : 0)}</Badge
+        >{translate('workflows.first', { count: first ? 1 : 0 })}</Badge
       >
       <Badge type={previous ? 'purple' : 'gray'}>
-        {translate('workflows', 'previous', previous ? 1 : 0)}
+        {translate('workflows.previous', { count: previous ? 1 : 0 })}
       </Badge>
       <Badge type={next ? 'purple' : 'gray'}>
-        {translate('workflows', 'next', next ? 1 : 0)}
+        {translate('workflows.next', { count: next ? 1 : 0 })}
       </Badge>
     </div>
     {#if hasRelationships}
@@ -86,7 +84,7 @@
         />
       {/if}
     {:else}
-      <p>{translate('workflows', 'no-relationships')}</p>
+      <p>{translate('workflows.no-relationships')}</p>
     {/if}
   </Accordion>
 </section>

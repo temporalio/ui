@@ -25,8 +25,8 @@
   export let compact: boolean;
 
   let sortOptions: EventSortOrderOptions = [
-    { label: translate('events', 'sort-ascending'), option: 'ascending' },
-    { label: translate('events', 'sort-descending'), option: 'descending' },
+    { label: translate('events.sort-ascending'), option: 'ascending' },
+    { label: translate('events.sort-descending'), option: 'descending' },
   ];
 
   const onSortOptionClick = (option: EventSortOrder) => {
@@ -62,7 +62,7 @@
     data-testid="event-date-filter-button"
   >
     <Icon class="md:hidden" name="clock" />
-    <span class="max-md:hidden">{translate('date-and-time')}</span>
+    <span class="max-md:hidden">{translate('common.date-and-time')}</span>
   </MenuButton>
   <Menu class="w-80" id="event-date-filter-menu">
     {#each sortOptions as { option, label }}
@@ -75,7 +75,7 @@
     <MenuItem
       selected={$eventShowElapsed === 'true'}
       on:click={onShowElapsedClick}
-      >{translate('events', 'show-elapsed-time')}</MenuItem
+      >{translate('events.show-elapsed-time')}</MenuItem
     >
   </Menu>
 </MenuContainer>

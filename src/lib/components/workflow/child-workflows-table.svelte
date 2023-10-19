@@ -42,21 +42,21 @@
   items={formattedAll}
   itemsPerPage={10}
   let:visibleItems
-  aria-label={translate('workflows', 'child-workflows')}
-  pageSizeSelectLabel={translate('per-page')}
-  previousButtonLabel={translate('previous')}
-  nextButtonLabel={translate('next')}
+  aria-label={translate('workflows.child-workflows')}
+  pageSizeSelectLabel={translate('common.per-page')}
+  previousButtonLabel={translate('common.previous')}
+  nextButtonLabel={translate('common.next')}
 >
   <div slot="pagination-top" />
   <Table class="w-full">
     <caption class="sr-only" slot="caption"
-      >{translate('workflows', 'child-workflows')}</caption
+      >{translate('workflows.child-workflows')}</caption
     >
     <TableHeaderRow slot="headers">
-      <th class="max-md:hidden">{translate('status')}</th>
-      <th class="max-lg:hidden">{translate('type')}</th>
-      <th>{translate('workflows', 'child-id')}</th>
-      <th>{translate('workflows', 'child-run-id')}</th>
+      <th class="max-md:hidden">{translate('common.status')}</th>
+      <th class="max-lg:hidden">{translate('common.type')}</th>
+      <th>{translate('workflows.child-id')}</th>
+      <th>{translate('workflows.child-run-id')}</th>
     </TableHeaderRow>
     {#each visibleItems as child (child.runId)}
       <TableRow>

@@ -73,14 +73,14 @@
         href="{$page.url.pathname}?search=basic"
         on:click={updateSearchType('basic')}
       >
-        {translate('workflows', 'basic-search')}
+        {translate('workflows.basic-search')}
       </Link>
     {:else}
       <Link
         href="{$page.url.pathname}?search=advanced"
         on:click={updateSearchType('advanced')}
       >
-        {translate('workflows', 'advanced-search')}
+        {translate('workflows.advanced-search')}
       </Link>
     {/if}
   </p>
@@ -89,7 +89,7 @@
     <Search
       icon
       id="advanced-search"
-      placeholder="Query…"
+      placeholder={translate('common.query')}
       value={query}
       on:submit={updateQuery}
     />
@@ -102,8 +102,8 @@
         icon="search"
         type="search"
         id="workflow-id-filter"
-        placeholder={translate('workflow-id')}
-        label={translate('workflow-id')}
+        placeholder={translate('common.workflow-id')}
+        label={translate('common.workflow-id')}
         labelHidden
         bind:value={parameters.workflowId}
         on:input={handleParameterChange}
@@ -112,15 +112,15 @@
         icon="search"
         type="search"
         id="workflow-type-filter"
-        placeholder={translate('workflow-type')}
-        label={translate('workflow-type')}
+        placeholder={translate('common.workflow-type')}
+        label={translate('common.workflow-type')}
         labelHidden
         bind:value={parameters.workflowType}
         on:input={handleParameterChange}
       />
       <Select
         id="time-range-filter"
-        label="Time Range"
+        label={translate('common.time-range')}
         bind:value={parameters.timeRange}
         on:change={handleParameterChange}
       >
@@ -134,7 +134,7 @@
       </Select>
       <Select
         id="execution-status-filter"
-        label="Workflow Status"
+        label={translate('common.status')}
         bind:value={parameters.executionStatus}
         on:change={handleParameterChange}
       >
@@ -145,11 +145,11 @@
       <Select
         id="filter-by-relative-time"
         bind:value={$timeFormat}
-        label="Time Format"
+        label={translate('common.time-format')}
       >
-        <Option value={'relative'}>Relative</Option>
-        <Option value={'UTC'}>UTC</Option>
-        <Option value={'local'}>Local</Option>
+        <Option value={'relative'}>{translate('common.relative')}</Option>
+        <Option value={'UTC'}>{translate('common.utc')}</Option>
+        <Option value={'local'}>{translate('common.local')}</Option>
       </Select>
     </div>
   {/if}

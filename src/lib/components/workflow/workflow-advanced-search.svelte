@@ -64,13 +64,13 @@
       <Input
         id="manual-search"
         type="search"
-        label={translate('workflows', 'search-placeholder')}
+        label={translate('workflows.search-placeholder')}
         labelHidden
-        placeholder={translate('workflows', 'search-placeholder')}
+        placeholder={translate('workflows.search-placeholder')}
         icon="search"
         class="w-full lg:w-3/4"
         clearable
-        clearButtonLabel={translate('clear-input-button-label')}
+        clearButtonLabel={translate('common.clear-input-button-label')}
         unroundRight
         on:clear={handleClearInput}
         bind:value={manualSearchString}
@@ -81,7 +81,7 @@
         borderRadiusModifier="square-left"
         type="submit"
       >
-        {translate('search')}
+        {translate('common.search')}
       </Button>
     </form>
   </div>
