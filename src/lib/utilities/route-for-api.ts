@@ -24,6 +24,8 @@ import type {
   WorkflowActivitiesRouteParameters,
   WorkflowAPIRoutePath,
   WorkflowListRouteParameters,
+  WorkflowQueryAPIRoutePath,
+  WorkflowQueryRouteParameters,
   WorkflowRouteParameters,
   WorkflowsAPIRoutePath,
 } from '$lib/types/api';
@@ -156,6 +158,11 @@ export function routeForApi(
 export function routeForApi(
   route: WorkflowAPIRoutePath,
   parameters: WorkflowRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: WorkflowQueryAPIRoutePath,
+  parameters: WorkflowQueryRouteParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(

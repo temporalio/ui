@@ -12,8 +12,9 @@ export type WorkflowAPIRoutePath =
   | 'workflow.signal'
   | 'workflow.reset'
   | 'events.ascending'
-  | 'events.descending'
-  | 'query';
+  | 'events.descending';
+
+export type WorkflowQueryAPIRoutePath = 'query';
 
 export type WorkflowActivitiesAPIRoutePath =
   | 'activity.complete'
@@ -43,6 +44,7 @@ export type APIRoutePath =
   | TaskQueueAPIRoutePath
   | WorkerAPIRoutePath
   | WorkflowAPIRoutePath
+  | WorkflowQueryAPIRoutePath
   | WorkflowActivitiesAPIRoutePath
   | WorkflowsAPIRoutePath
   | NamespaceAPIRoutePath
@@ -70,6 +72,11 @@ export type SearchAttributesRouteParameters = Pick<
 export type WorkflowRouteParameters = Pick<
   APIRouteParameters,
   'namespace' | 'workflowId'
+>;
+
+export type WorkflowQueryRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'workflowId' | 'queryType'
 >;
 
 export type WorkflowActivitiesRouteParameters = Pick<
