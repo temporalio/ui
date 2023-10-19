@@ -32,12 +32,12 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"github.com/temporalio/ui-server/v2/api/operatorservice/v1"
-	"github.com/temporalio/ui-server/v2/api/workflowservice/v1"
 	"github.com/temporalio/ui-server/v2/server/auth"
 	"github.com/temporalio/ui-server/v2/server/config"
 	"github.com/temporalio/ui-server/v2/server/rpc"
 	"github.com/temporalio/ui-server/v2/server/version"
+	"go.temporal.io/api/operatorservice/v1"
+	"go.temporal.io/api/workflowservice/v1"
 )
 
 type Auth struct {
