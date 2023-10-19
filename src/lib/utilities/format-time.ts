@@ -131,15 +131,20 @@ export function formatDistance({
   start,
   end,
   includeMilliseconds = false,
+  includeMillisecondsForUnderSecond = false,
 }: {
   start: ValidTime | undefined | null;
   end: ValidTime | undefined | null;
   includeMilliseconds?: boolean;
+  includeMillisecondsForUnderSecond?: boolean;
 }): string {
   const duration = getDuration({ start, end });
   const distance = formatDuration(duration);
   const msDuration = getMillisecondDuration({ start, end });
-  if (includeMilliseconds && msDuration) {
+
+  if (!distance && msDuration && includeMillisecondsForUnderSecond) {
+    return `${msDuration}ms`.trim();
+  } else if (includeMilliseconds && msDuration) {
     return `${distance} ${msDuration}ms`.trim();
   } else {
     return distance;
@@ -150,16 +155,21 @@ export function formatDistanceAbbreviated({
   start,
   end,
   includeMilliseconds = false,
+  includeMillisecondsForUnderSecond = false,
 }: {
   start: ValidTime | undefined | null;
   end: ValidTime | undefined | null;
   includeMilliseconds?: boolean;
+  includeMillisecondsForUnderSecond?: boolean;
 }): string {
   const duration = getDuration({ start, end });
   const distance = formatDuration(duration, ' ');
   const formattedDistance = formatDistanceToSingleLetters(distance);
   const msDuration = getMillisecondDuration({ start, end });
-  if (includeMilliseconds && msDuration) {
+
+  if (!distance && msDuration && includeMillisecondsForUnderSecond) {
+    return `${msDuration}ms`.trim();
+  } else if (includeMilliseconds && msDuration) {
     return `${formattedDistance} ${msDuration}ms`.trim();
   } else {
     return formattedDistance;

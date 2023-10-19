@@ -1,9 +1,6 @@
 import { noop } from 'svelte/internal';
 
-import type { WorkflowFilter } from '$lib/models/workflow-filters';
 import type { CountWorkflowExecutionsResponse } from '$lib/types/workflows';
-import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
-import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
@@ -56,22 +53,23 @@ export const fetchWorkflowCount = async (
 
 type WorkflowCountByExecutionStatusOptions = {
   namespace: string;
-  filters: WorkflowFilter[];
+  query: string;
 };
 
 export const fetchWorkflowCountByExecutionStatus = async ({
   namespace,
-  filters,
+  query,
 }: WorkflowCountByExecutionStatusOptions): Promise<CountWorkflowExecutionsResponse> => {
   try {
     const groupByClause = 'GROUP BY ExecutionStatus';
     const countRoute = routeForApi('workflows.count', {
       namespace,
     });
-    const query = toListWorkflowQueryFromFilters(combineFilters(filters));
     const { count, groups } =
       await requestFromAPI<CountWorkflowExecutionsResponse>(countRoute, {
-        params: { query: `${query} ${groupByClause}` },
+        params: {
+          query: query ? `${query} ${groupByClause}` : `${groupByClause}`,
+        },
         notifyOnError: false,
       });
     return { count, groups };

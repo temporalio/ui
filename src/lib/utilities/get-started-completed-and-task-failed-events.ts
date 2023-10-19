@@ -8,8 +8,6 @@ import type {
   WorkflowExecutionStartedEvent,
   WorkflowExecutionTerminatedEvent,
   WorkflowExecutionTimedOutEvent,
-  WorkflowTaskCompletedEvent,
-  WorkflowTaskFailedEvent,
 } from '$lib/types/events';
 
 import {
@@ -21,7 +19,6 @@ import { stringifyWithBigInt } from './parse-with-big-int';
 type WorkflowInputAndResults = {
   input: string;
   results: string;
-  error: WorkflowTaskFailedEvent;
   contAsNew: boolean;
 };
 
@@ -55,18 +52,6 @@ const isCompletionEvent = (event: WorkflowEvent): event is CompletionEvent => {
   return false;
 };
 
-const isFailedTaskEvent = (
-  event: WorkflowEvent,
-): event is WorkflowTaskFailedEvent => {
-  return event.eventType === 'WorkflowTaskFailed';
-};
-
-const isCompletedTaskEvent = (
-  event: WorkflowEvent,
-): event is WorkflowTaskCompletedEvent => {
-  return event.eventType === 'WorkflowTaskCompleted';
-};
-
 const getEventResult = (event: CompletionEvent) => {
   if (isWorkflowExecutionContinuedAsNewEvent(event)) {
     return event.attributes.input;
@@ -85,13 +70,10 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
 ): WorkflowInputAndResults => {
   let input: string;
   let results: string;
-  let error: WorkflowTaskFailedEvent;
   let contAsNew = false;
 
   let workflowStartedEvent: WorkflowExecutionStartedEvent;
   let workflowCompletedEvent: CompletionEvent;
-  let workflowTaskFailedEvent: WorkflowTaskFailedEvent;
-  let hasCompletedTaskEvent = false;
 
   for (const event of eventHistory.start) {
     if (isStartedEvent(event)) {
@@ -99,16 +81,6 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
       continue;
     } else if (isCompletionEvent(event)) {
       workflowCompletedEvent = event;
-      continue;
-    } else if (isCompletedTaskEvent(event)) {
-      // If there is a completed workflow task after a failed task
-      if (workflowTaskFailedEvent) {
-        // or we need to reset the failed event
-        workflowTaskFailedEvent = undefined;
-      }
-      continue;
-    } else if (!hasCompletedTaskEvent && isFailedTaskEvent(event)) {
-      workflowTaskFailedEvent = event;
       continue;
     }
   }
@@ -119,12 +91,6 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
       continue;
     } else if (isCompletionEvent(event)) {
       workflowCompletedEvent = event;
-      continue;
-    } else if (isCompletedTaskEvent(event)) {
-      hasCompletedTaskEvent = true;
-      continue;
-    } else if (!hasCompletedTaskEvent && isFailedTaskEvent(event)) {
-      workflowTaskFailedEvent = event;
       continue;
     }
   }
@@ -141,14 +107,9 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
     results = stringifyWithBigInt(getEventResult(workflowCompletedEvent));
   }
 
-  if (workflowTaskFailedEvent) {
-    error = workflowTaskFailedEvent;
-  }
-
   return {
     input,
     results,
-    error,
     contAsNew,
   };
 };

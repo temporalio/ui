@@ -84,7 +84,11 @@
         relative: $relativeTime,
       })}
     {:else if label === 'Execution Duration'}
-      {formatDistance({ start: workflow.startTime, end: workflow.endTime })}
+      {formatDistance({
+        start: workflow.startTime,
+        end: workflow.endTime,
+        includeMillisecondsForUnderSecond: true,
+      })}
     {:else if label === 'History Length'}
       {parseInt(workflow.historyEvents, 10) > 0 ? workflow.historyEvents : ''}
     {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
