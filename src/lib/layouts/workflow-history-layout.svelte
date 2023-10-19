@@ -27,6 +27,7 @@
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
+  import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   let showShortcuts = false;
@@ -39,6 +40,10 @@
     $eventHistory,
     $fullEventHistory,
     $namespaces,
+  );
+  $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
+    $fullEventHistory,
+    $eventFilterSort,
   );
 
   const resetFullHistory = () => {
@@ -74,8 +79,8 @@
 
 <div class="flex flex-col gap-2">
   <WorkflowStackTraceError />
-  {#if workflowEvents.error}
-    <WorkflowTypedError error={workflowEvents.error} />
+  {#if workflowTaskFailedError}
+    <WorkflowTypedError error={workflowTaskFailedError} />
   {/if}
   <WorkflowSummary />
   <WorkflowRelationships {...workflowRelationships} />
