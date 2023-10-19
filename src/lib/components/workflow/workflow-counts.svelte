@@ -40,11 +40,12 @@
   $: query, namespace, $refresh, fetchCounts();
 </script>
 
-<div class="flex h-6 flex-wrap items-center gap-2">
-  {#if !$loading && !$updating}
-    <WorkflowCountAll count={$workflowCount.totalCount} />
-    {#each statusGroups as { count, status } (status)}
-      <WorkflowCountStatus {status} {count} />
-    {/each}
-  {/if}
+<div
+  class="flex flex-wrap items-center gap-2"
+  class:invisible={$loading || $updating}
+>
+  <WorkflowCountAll count={$workflowCount.totalCount} />
+  {#each statusGroups as { count, status } (status)}
+    <WorkflowCountStatus {status} {count} />
+  {/each}
 </div>
