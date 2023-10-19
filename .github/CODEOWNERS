@@ -12,7 +12,6 @@
 /src/lib/utilities                      @stevekinney @Alex-Tideman
 /src/lib/stores                         @stevekinney @Alex-Tideman
 /src/routes/(import)                    @Alex-Tideman
-/src/lib/services/data-converter.ts     @Alex-Tideman @GiantRobots
 /src/lib/services/data-encoder.ts       @Alex-Tideman @GiantRobots
 /.husky/                                @stevekinney
 /.github/                               @stevekinney
