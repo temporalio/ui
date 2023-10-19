@@ -79,13 +79,11 @@
     })}"
     class:rounded-r-none={newCount}
   >
-    <span class="">
-      {#if loading}
-        <Spinner class="h-4 w-4 animate-spin" />
-      {:else if count >= 0}
-        {count.toLocaleString()}
-      {/if}
-    </span>
+    {#if loading}
+      <Spinner class="h-4 w-4 animate-spin" />
+    {:else if count >= 0}
+      {count.toLocaleString()}
+    {/if}
 
     {label[status]}
     {#if status === 'Running'}
