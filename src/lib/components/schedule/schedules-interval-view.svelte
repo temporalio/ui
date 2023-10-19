@@ -36,20 +36,20 @@
 
 <div class="my-2 flex flex-col gap-4">
   <h3 class="text-lg font-medium">
-    {translate('schedules', 'interval-view-heading')}
+    {translate('schedules.interval-view-heading')}
   </h3>
   <p>
-    {translate('schedules', 'interval-view-description')}
+    {translate('schedules.interval-view-description')}
   </p>
   <div class="flex flex-row items-center gap-2">
     <div class="w-24">
       <Input
         id="days"
-        label={translate('days')}
+        label={translate('common.days')}
         labelHidden
         bind:value={days}
         placeholder="00"
-        suffix={translate('days')}
+        suffix={translate('common.days')}
         maxLength={3}
         error={error(days)}
       />
@@ -58,11 +58,11 @@
     <div class="w-24">
       <Input
         id="hour-interval"
-        label={translate('hours-abbreviated')}
+        label={translate('common.hours-abbreviated')}
         labelHidden
         bind:value={hour}
         placeholder="00"
-        suffix={translate('hours-abbreviated')}
+        suffix={translate('common.hours-abbreviated')}
         maxLength={2}
         error={error(hour)}
       />
@@ -71,11 +71,11 @@
     <div class="w-24">
       <Input
         id="minute-interval"
-        label={translate('minutes-abbreviated')}
+        label={translate('common.minutes-abbreviated')}
         labelHidden
         bind:value={minute}
         placeholder="00"
-        suffix={translate('minutes-abbreviated')}
+        suffix={translate('common.minutes-abbreviated')}
         maxLength={2}
         error={error(minute)}
       />
@@ -84,26 +84,26 @@
     <div class="w-24">
       <Input
         id="second"
-        label={translate('seconds-abbreviated')}
+        label={translate('common.seconds-abbreviated')}
         labelHidden
         bind:value={second}
         placeholder="00"
-        suffix={translate('seconds-abbreviated')}
+        suffix={translate('common.seconds-abbreviated')}
         maxLength={2}
         error={error(second)}
       />
     </div>
   </div>
   <h3 class="mt-4 text-lg font-medium">
-    {translate('schedules', 'offset-heading')}
+    {translate('schedules.offset-heading')}
   </h3>
   <p>
-    {translate('schedules', 'offset-description')}
+    {translate('schedules.offset-description')}
   </p>
   <div class="flex w-48 gap-0">
     <Input
       id="phase"
-      label={translate('schedules', 'offset-heading')}
+      label={translate('schedules.offset-heading')}
       labelHidden
       bind:value={offset}
       placeholder="00"
@@ -111,16 +111,16 @@
       unroundRight
     />
     <Select
-      label={translate('schedules', 'offset-unit')}
+      label={translate('schedules.offset-unit')}
       labelHidden
       unroundLeft
       id="phase-unit"
       bind:value={offsetUnit}
     >
-      <Option value="days">{translate('days')}</Option>
-      <Option value="hrs">{translate('hours-abbreviated')}</Option>
-      <Option value="min">{translate('minutes-abbreviated')}</Option>
-      <Option value="sec">{translate('seconds-abbreviated')}</Option>
+      <Option value="days">{translate('common.days')}</Option>
+      <Option value="hrs">{translate('common.hours-abbreviated')}</Option>
+      <Option value="min">{translate('common.minutes-abbreviated')}</Option>
+      <Option value="sec">{translate('common.seconds-abbreviated')}</Option>
     </Select>
   </div>
 </div>

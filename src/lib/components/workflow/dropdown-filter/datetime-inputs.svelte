@@ -13,38 +13,38 @@
 <div class="flex gap-2">
   <Input
     id="hour"
-    label={translate('hours-abbreviated')}
+    label={translate('common.hours-abbreviated')}
     labelHidden
     bind:value={hour}
     placeholder="00"
-    suffix={translate('hours-abbreviated')}
+    suffix={translate('common.hours-abbreviated')}
     maxLength={2}
   />
   <Input
     id="minute"
-    label={translate('minutes-abbreviated')}
+    label={translate('common.minutes-abbreviated')}
     labelHidden
     required
     bind:value={minute}
     placeholder="00"
-    suffix={translate('minutes-abbreviated')}
+    suffix={translate('common.minutes-abbreviated')}
     maxLength={2}
   />
   <Input
     id="second"
-    label={translate('seconds-abbreviated')}
+    label={translate('common.seconds-abbreviated')}
     labelHidden
     bind:value={second}
     placeholder="00"
-    suffix={translate('hours-abbreviated')}
+    suffix={translate('common.hours-abbreviated')}
     maxLength={2}
   />
   <ToggleButtons>
     <ToggleButton active={time === 'AM'} on:click={() => (time = 'AM')}
-      >{translate('ante-meridiem')}</ToggleButton
+      >{translate('common.ante-meridiem')}</ToggleButton
     >
     <ToggleButton active={time === 'PM'} on:click={() => (time = 'PM')}
-      >{translate('post-meridiem')}</ToggleButton
+      >{translate('common.post-meridiem')}</ToggleButton
     >
   </ToggleButtons>
 </div>

@@ -43,8 +43,8 @@
         <CodeBlock
           content={decodedValue}
           {inline}
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
         />
       </PayloadDecoder>
     </div>
@@ -53,8 +53,8 @@
       <p class="mr-3 truncate text-sm">{format(key)}</p>
       <div class="truncate text-sm">
         <Copyable
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
           content={value}
           container-class="xl:flex-row"
         >
@@ -77,8 +77,8 @@
       <p class="truncate text-sm">{format(key)}</p>
       <div class="truncate text-sm">
         <Copyable
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
           content={value}
           container-class="xl:flex-row"
         >
@@ -101,8 +101,8 @@
       <p class="mr-3 truncate text-sm">{format(key)}</p>
       <div class="truncate text-sm">
         <Copyable
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
           content={value}
         >
           <Link

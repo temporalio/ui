@@ -11,10 +11,10 @@
 
 <Tooltip
   bottomLeft
-  text={translate('auto-refresh-tooltip', { interval: '15' })}
+  text={translate('common.auto-refresh-tooltip', { interval: '15' })}
 >
   <ToggleSwitch
-    label={translate('auto-refresh')}
+    label={translate('common.auto-refresh')}
     labelPosition="left"
     id="autorefresh"
     {checked}

@@ -23,7 +23,7 @@
 
 <section>
   <Accordion
-    title={translate('summary')}
+    title={translate('common.summary')}
     icon="summary"
     data-testid="summary-accordion"
     open={$workflowSummaryViewOpen}
@@ -35,13 +35,13 @@
       class="grid-row-3 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:w-11/12"
     >
       <div class="col-span-1 md:col-span-2">
-        <h3 class="font-medium">{translate('workflow-type')}</h3>
+        <h3 class="font-medium">{translate('common.workflow-type')}</h3>
         <div class="h-0.5 rounded-full bg-gray-900" />
         <WorkflowDetail content={workflow?.name} copyable />
         <WorkflowDetail content={workflow?.runId} copyable />
       </div>
       <div class="col-span-1">
-        <h3 class="font-medium">{translate('task-queue')}</h3>
+        <h3 class="font-medium">{translate('common.task-queue')}</h3>
         <div class="h-0.5 rounded-full bg-gray-900" />
         <WorkflowDetail
           content={workflow?.taskQueue}
@@ -53,23 +53,23 @@
           copyable
         />
         <WorkflowDetail
-          title={translate('workflows', 'state-transitions')}
+          title={translate('workflows.state-transitions')}
           content={workflow?.stateTransitionCount}
         />
       </div>
       <div class="col-span-1">
         <h3 class="font-medium">
-          {translate('workflows', 'start-and-close-time')}
+          {translate('workflows.start-and-close-time')}
         </h3>
         <div class="h-0.5 rounded-full bg-gray-900" />
         <WorkflowDetail
-          title={translate('start-time')}
+          title={translate('common.start-time')}
           content={formatDate(workflow?.startTime, $timeFormat, {
             relative: $relativeTime,
           })}
         />
         <WorkflowDetail
-          title={translate('close-time')}
+          title={translate('common.close-time')}
           content={formatDate(workflow?.endTime, $timeFormat, {
             relative: $relativeTime,
           })}

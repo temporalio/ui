@@ -12,8 +12,8 @@
       <Loading />
     {:else}
       <EmptyState
-        title={translate('events', 'empty-state-title')}
-        content={translate('events', 'empty-state-description')}
+        title={translate('events.empty-state-title')}
+        content={translate('events.empty-state-description')}
       />
     {/if}
   </td>

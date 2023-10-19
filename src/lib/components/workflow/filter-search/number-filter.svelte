@@ -25,11 +25,11 @@
 <div class="flex items-center">
   <ConditionalMenu inputId="number-filter-search" noBorderLeft noBorderRight />
   <NumberInput
-    label={translate('number-input-placeholder')}
+    label={translate('common.number-input-placeholder')}
     labelHidden
     id="number-filter-search"
     icon="search"
-    placeholder={translate('number-input-placeholder')}
+    placeholder={translate('common.number-input-placeholder')}
     bind:value
     {min}
     on:keydown={handleKeydown}

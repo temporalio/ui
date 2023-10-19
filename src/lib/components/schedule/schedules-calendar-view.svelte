@@ -45,7 +45,7 @@
 </script>
 
 <Tabs class="mt-8 w-full">
-  <h2 class="mb-4 text-2xl">{translate('schedules', 'schedule-spec')}</h2>
+  <h2 class="mb-4 text-2xl">{translate('schedules.schedule-spec')}</h2>
   <TabList label="Schedule Tabs" class="flex flex-wrap gap-6">
     {#if schedule}
       <Tab
@@ -112,11 +112,11 @@
     <TabPanel id="string-panel" tabId="string-tab">
       <div class="my-2 flex w-full flex-col gap-4">
         <h3 class="text-lg font-medium">
-          {translate('schedules', 'cron-view-title')}
+          {translate('schedules.cron-view-title')}
         </h3>
-        <p>{translate('schedules', 'cron-view-description')}</p>
+        <p>{translate('schedules.cron-view-description')}</p>
         <Input
-          label={translate('schedules', 'cron-view-title')}
+          label={translate('schedules.cron-view-title')}
           labelHidden
           id="cronString"
           bind:value={cronString}

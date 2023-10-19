@@ -9,7 +9,7 @@
   export let namespace: string;
 </script>
 
-<h1 class="text-2xl">{translate('batch', 'list-page-title')}</h1>
+<h1 class="text-2xl">{translate('batch.list-page-title')}</h1>
 {#await listBatchOperations(namespace)}
   <Loading />
 {:then { operations }}
@@ -17,9 +17,9 @@
     <Alert
       icon="info"
       intent="info"
-      title={translate('batch', 'max-concurrent-alert-title')}
+      title={translate('batch.max-concurrent-alert-title')}
     >
-      {translate('batch', 'max-concurrent-alert-description')}
+      {translate('batch.max-concurrent-alert-description')}
     </Alert>
   {/if}
   <BatchOperationsTable {operations} {namespace} />

@@ -55,14 +55,14 @@
   {#await queryTypes}
     <div class="text-center">
       <Loading />
-      <p>{translate('workflows', 'no-workers-failure-message')}</p>
+      <p>{translate('workflows.no-workers-failure-message')}</p>
     </div>
   {:then types}
     <div class="flex justify-between">
       <div class="flex items-center gap-4">
         <Select
           id="query-select"
-          label={translate('workflows', 'query-type')}
+          label={translate('workflows.query-type')}
           bind:value={queryType}
           data-testid="query-select"
         >
@@ -75,12 +75,12 @@
           leadingIcon="retry"
           loading={isLoading}
         >
-          {translate('refresh')}
+          {translate('common.refresh')}
         </Button>
       </div>
       <div class="flex justify-end">
         <ToggleSwitch
-          label={translate('workflows', 'json-formatting')}
+          label={translate('workflows.json-formatting')}
           labelPosition="left"
           id="json-formatting"
           checked={jsonFormatting}
@@ -93,15 +93,15 @@
         <CodeBlock
           content={result}
           language={jsonFormatting ? 'json' : 'text'}
-          copyIconTitle={translate('copy-icon-title')}
-          copySuccessIconTitle={translate('copy-success-icon-title')}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
         />
       {/await}
     </div>
   {:catch _error}
     <EmptyState
-      title={translate('error-occurred')}
-      content={translate('workflows', 'no-workers-running-message')}
+      title={translate('common.error-occurred')}
+      content={translate('workflows.no-workers-running-message')}
       error={_error?.message}
     />
   {/await}

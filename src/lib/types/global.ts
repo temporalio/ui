@@ -23,6 +23,27 @@ export type XOR<T, U> = T | U extends object
   ? (Without<T, U> & U) | (Without<U, T> & T)
   : T | U;
 
+/**
+ * Given an object with nested properties
+ * returns a Union of the valid nested paths concatenated with a `.`
+ * @example
+ * ```
+ * const myNestedObject = {
+ *   a: { b: 'c' },
+ *   b: 'c',
+ * }
+ *
+ * type MyNestedObject = Leaves<typeof myNestedObject>; // 'b' | 'a.b';
+ * ```
+ */
+export type Leaves<T> = T extends object
+  ? {
+      [K in keyof T]: `${Exclude<K, symbol>}${Leaves<T[K]> extends never
+        ? ''
+        : `.${Leaves<T[K]>}`}`;
+    }[keyof T]
+  : never;
+
 export type Eventual<T> = T | PromiseLike<T>;
 
 export type NamespaceScopedRequest = { namespace: string };

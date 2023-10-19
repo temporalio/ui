@@ -17,12 +17,12 @@
 
 <Table class="w-full">
   <caption class="sr-only" slot="caption"
-    >{translate('workflows', 'relationships')}</caption
+    >{translate('workflows.relationships')}</caption
   >
   <TableHeaderRow slot="headers">
-    <th>{translate('workflows', 'first-execution')}</th>
-    <th>{translate('workflows', 'previous-execution')}</th>
-    <th>{translate('workflows', 'next-execution')}</th>
+    <th>{translate('workflows.first-execution')}</th>
+    <th>{translate('workflows.previous-execution')}</th>
+    <th>{translate('workflows.next-execution')}</th>
   </TableHeaderRow>
   <TableRow>
     <td class="w-1/3 hover:text-blue-700 hover:underline">
@@ -36,8 +36,8 @@
           })}
         >
           <Copyable
-            copyIconTitle={translate('copy-icon-title')}
-            copySuccessIconTitle={translate('copy-success-icon-title')}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
             content={first}
             visible
           />
@@ -55,8 +55,8 @@
           })}
         >
           <Copyable
-            copyIconTitle={translate('copy-icon-title')}
-            copySuccessIconTitle={translate('copy-success-icon-title')}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
             content={previous}
             visible
           />
@@ -74,8 +74,8 @@
           })}
         >
           <Copyable
-            copyIconTitle={translate('copy-icon-title')}
-            copySuccessIconTitle={translate('copy-success-icon-title')}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
             content={next}
             visible
           />

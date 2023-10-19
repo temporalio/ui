@@ -35,9 +35,10 @@
 
   $: actionText =
     action === Action.Cancel
-      ? translate('cancel')
-      : translate('workflows', 'terminate');
-  $: confirmText = action === Action.Cancel ? translate('confirm') : actionText;
+      ? translate('common.cancel')
+      : translate('workflows.terminate');
+  $: confirmText =
+    action === Action.Cancel ? translate('common.confirm') : actionText;
 
   $: placeholder = getPlacholder(action, $authUser.email);
 
@@ -64,15 +65,14 @@
   bind:error
   data-testid="batch-{actionText}-confirmation"
   confirmType="destructive"
-  cancelText={translate('cancel')}
+  cancelText={translate('common.cancel')}
   confirmDisabled={!jobIdValid}
   {confirmText}
   on:confirmModal={handleConfirmModal}
 >
   <h3 slot="title">
     <Translate
-      namespace="workflows"
-      key="batch-operation-modal-title"
+      key="workflows.batch-operation-modal-title"
       replace={{ action: actionText }}
     />
   </h3>
@@ -81,8 +81,7 @@
       {#if $allSelected}
         <p class="mb-2">
           <Translate
-            namespace="workflows"
-            key="batch-operation-confirmation-all"
+            key="workflows.batch-operation-confirmation-all"
             replace={{ action: actionText }}
           />
         </p>
@@ -95,18 +94,16 @@
         </div>
         <span class="text-xs">
           <Translate
-            namespace="workflows"
-            key="batch-operation-count-disclaimer"
+            key="workflows.batch-operation-count-disclaimer"
             replace={{ action: actionText }}
           />
         </span>
       {:else}
         <p>
           <Translate
-            namespace="workflows"
             key={action === Action.Cancel
-              ? 'batch-cancel-confirmation'
-              : 'batch-terminate-confirmation'}
+              ? 'workflows.batch-cancel-confirmation'
+              : 'workflows.batch-terminate-confirmation'}
             count={actionableWorkflowsLength}
           />
         </p>
@@ -114,20 +111,19 @@
       <Input
         id={`bulk-action-reason-${action}`}
         bind:value={reason}
-        label={translate('reason')}
+        label={translate('common.reason')}
         hintText={translate(
-          'workflows',
-          'batch-operation-confirmation-input-hint',
+          'workflows.batch-operation-confirmation-input-hint',
           { placeholder },
         )}
         {placeholder}
       />
       <Input
         id="batch-operation-job-id"
-        label={translate('job-id')}
+        label={translate('common.job-id')}
         hintText={jobIdValid
-          ? translate('batch', 'job-id-input-hint')
-          : translate('batch', 'job-id-input-error')}
+          ? translate('batch.job-id-input-hint')
+          : translate('batch.job-id-input-error')}
         bind:value={jobId}
         placeholder={jobIdPlaceholder}
         on:input={handleJobIdChange}

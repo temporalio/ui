@@ -3,7 +3,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import type { LayoutData, LayoutLoad } from './$types';
 
-import { I18nNamespaces } from '$lib/i18n';
+import { i18nNamespaces } from '$lib/i18n';
 import resources from '$lib/i18n/locales';
 
 export const ssr = false;
@@ -12,7 +12,7 @@ export const load: LayoutLoad = async function (): LayoutData {
   i18next.use(LanguageDetector).init({
     fallbackLng: 'en',
     load: 'languageOnly',
-    ns: I18nNamespaces,
+    ns: i18nNamespaces,
     defaultNS: 'common',
     detection: {
       order: ['querystring', 'localStorage', 'navigator'],

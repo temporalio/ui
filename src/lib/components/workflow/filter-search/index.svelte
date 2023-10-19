@@ -198,13 +198,13 @@
       >
         {#if showClearAllButton}
           <Button variant="ghost" on:click={handleClearInput}
-            >{translate('clear-all')}</Button
+            >{translate('common.clear-all')}</Button
           >
         {/if}
       </div>
     {/if}
     <ToggleSwitch
-      label={translate('workflows', 'view-search-input')}
+      label={translate('workflows.view-search-input')}
       labelPosition="left"
       id="view-search-input"
       bind:checked={viewAdvancedSearchInput}

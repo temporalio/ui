@@ -45,7 +45,7 @@
 <header class="mb-2 flex items-center justify-between">
   <div>
     <h1 class="text-2xl" data-testid="namespace-title">
-      {translate('workflows', 'recent-workflows')}
+      {translate('workflows.recent-workflows')}
     </h1>
     <div class="flex items-center gap-2 text-sm">
       <p data-testid="namespace-name">
@@ -55,7 +55,7 @@
   </div>
   <div>
     <IconButton
-      label={translate('workflows', 'retry-workflows')}
+      label={translate('workflows.retry-workflows')}
       icon="retry"
       on:click={refreshWorkflows}
     />
@@ -65,10 +65,10 @@
 <Pagination
   items={$workflows}
   let:visibleItems
-  aria-label={translate('workflows', 'recent-workflows')}
-  pageSizeSelectLabel={translate('per-page')}
-  previousButtonLabel={translate('previous')}
-  nextButtonLabel={translate('next')}
+  aria-label={translate('workflows.recent-workflows')}
+  pageSizeSelectLabel={translate('common.per-page')}
+  previousButtonLabel={translate('common.previous')}
+  nextButtonLabel={translate('common.next')}
 >
   <WorkflowsSummaryTable updating={$updating}>
     {#each visibleItems as event}

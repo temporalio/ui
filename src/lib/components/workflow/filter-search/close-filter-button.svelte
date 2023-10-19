@@ -10,7 +10,7 @@
 </script>
 
 <IconButton
-  label={translate('close')}
+  label={translate('common.close')}
   icon="close"
   on:click={resetFilter}
   class="ml-1"

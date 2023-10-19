@@ -6,6 +6,7 @@ export const Strings = {
   'unknown-error': 'An unknown error occurred.',
   search: 'Search',
   apply: 'Apply',
+  query: 'Query',
   ago: 'ago',
   'all-time': 'All Time',
   custom: 'Custom',
@@ -131,6 +132,8 @@ export const Strings = {
   experimental: 'Experimental',
   timezone: 'Timezone {{ timezone }}',
   'time-unit': 'Time Unit',
+  'time-format': 'Time Format',
+  'time-range': 'Time Range',
   'based-on-time-preface': 'Based on',
   'download-json': 'Download JSON',
   'skip-nav': 'Skip to Main Content',
@@ -142,4 +145,5 @@ export const Strings = {
   'job-id': 'Job ID',
   'auto-refresh': 'Auto refresh',
   'auto-refresh-tooltip': '{{ interval }} second page refresh',
+  'view-more': 'View More...',
 } as const;

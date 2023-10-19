@@ -40,7 +40,7 @@
 <div class="flex flex-col gap-4">
   <div class="flex flex-row">
     <Link href={routeForBatchOperations({ namespace })} icon="chevron-left">
-      {translate('batch', 'back-link')}
+      {translate('batch.back-link')}
     </Link>
   </div>
   {#key fetchKey}

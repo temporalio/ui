@@ -61,10 +61,10 @@
   let:visibleItems
   let:activeRowIndex
   let:setActiveRowIndex
-  aria-label={translate('workflows', 'event-history')}
-  pageSizeSelectLabel={translate('per-page')}
-  previousButtonLabel={translate('previous')}
-  nextButtonLabel={translate('next')}
+  aria-label={translate('workflows.event-history')}
+  pageSizeSelectLabel={translate('common.per-page')}
+  previousButtonLabel={translate('common.previous')}
+  nextButtonLabel={translate('common.next')}
 >
   <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
     {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}

@@ -12,6 +12,6 @@
     data-loaded={!$loading && !$updating}
   >
     {count.toLocaleString()}
-    {translate('workflows').toLocaleLowerCase()}
+    {translate('common.workflows').toLocaleLowerCase()}
   </p>
 </div>

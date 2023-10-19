@@ -150,12 +150,12 @@
       await batchTerminateWorkflows(options);
       batchTerminateConfirmationModal?.close();
       toaster.push({
-        message: translate('workflows', 'batch-terminate-all-success'),
+        message: translate('workflows.batch-terminate-all-success'),
         id: 'batch-terminate-success-toast',
       });
     } catch (error) {
       batchTerminateConfirmationModal?.setError(
-        error?.message ?? translate('unknown-error'),
+        error?.message ?? translate('common.unknown-error'),
       );
     }
   };
@@ -175,12 +175,12 @@
       await batchCancelWorkflows(options);
       batchCancelConfirmationModal?.close();
       toaster.push({
-        message: translate('workflows', 'batch-cancel-all-success'),
+        message: translate('workflows.batch-cancel-all-success'),
         id: 'batch-cancel-success-toast',
       });
     } catch (error) {
       batchCancelConfirmationModal?.setError(
-        error?.message ?? translate('unknown-error'),
+        error?.message ?? translate('common.unknown-error'),
       );
     }
   };
@@ -216,7 +216,7 @@
   <div class="flex items-center justify-between">
     <div>
       <h1 class="flex items-center text-2xl" data-cy="workflows-title">
-        <Translate namespace="workflows" key="recent-workflows" />
+        <Translate key="workflows.recent-workflows" />
         {#if $loading || $updating}
           <Spinner class="h-8 w-8 animate-spin" />
         {/if}
@@ -225,11 +225,10 @@
         {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !$groupByCountEnabled}
           <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
             {#if $loading || $updating}
-              <Translate namespace="workflows" key="loading-workflows" />
+              <Translate key="workflows.loading-workflows" />
             {:else if query}
               <Translate
-                namespace="workflows"
-                key="filtered-workflows-count"
+                key="workflows.filtered-workflows-count"
                 replace={{
                   filtered: $workflowCount.count,
                   total: $workflowCount.totalCount,
@@ -237,8 +236,7 @@
               />
             {:else}
               <Translate
-                namespace="workflows"
-                key="workflows-count"
+                key="workflows.workflows-count"
                 count={$workflowCount.totalCount}
               />
             {/if}
@@ -248,11 +246,11 @@
     </div>
     <div class="flex items-center gap-2 text-sm">
       <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
-        >{translate('download-json')}</Link
+        >{translate('common.download-json')}</Link
       >
       <IconButton
         icon="retry"
-        label={translate('workflows', 'retry-workflows')}
+        label={translate('workflows.retry-workflows')}
         on:click={refreshWorkflows}
       />
     </div>

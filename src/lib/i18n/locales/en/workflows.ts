@@ -191,6 +191,8 @@ export const Strings = {
   'remove-column-label': 'Remove {{column}} column',
   'pin-column-label': 'Pin {{column}} column',
   'unpin-column-label': 'Unpin {{column}} column',
+  'all-headings-in-view': 'All available headings are in view',
+  'no-headings-in-view': 'No headings in view',
   'archived-workflows': 'Archived Workflows',
   archival: 'Archival',
   'workflow-query-empty-state-title': 'No Results',

@@ -88,8 +88,8 @@
   <section>
     <Accordion
       title={workflowEvents.contAsNew
-        ? translate('workflows', 'input')
-        : translate('workflows', 'input-and-results')}
+        ? translate('workflows.input')
+        : translate('workflows.input-and-results')}
       icon="json"
       class="border-gray-900"
       data-testid="input-and-results"
@@ -103,8 +103,8 @@
         <InputAndResults
           content={workflowEvents.results}
           title={workflowEvents.contAsNew
-            ? translate('workflows', 'continued-as-new-with-input')
-            : translate('workflows', 'results')}
+            ? translate('workflows.continued-as-new-with-input')
+            : translate('workflows.results')}
           data-testid="workflow-results"
         />
       </div>
@@ -114,10 +114,10 @@
   <section id="event-history">
     <nav
       class="flex flex-col items-center justify-between gap-4 lg:flex-row lg:items-end"
-      aria-label={translate('workflows', 'event-history-view')}
+      aria-label={translate('workflows.event-history-view')}
     >
       <h2 class="text-2xl font-medium">
-        {translate('workflows', 'event-history')}
+        {translate('workflows.event-history')}
       </h2>
       <div id="event-view-toggle" class="mt-4 flex gap-4 bg-white">
         <ToggleButtons>
@@ -126,21 +126,21 @@
             active={$eventViewType === 'feed'}
             data-testid="feed"
             on:click={() => onViewClick('feed')}
-            >{translate('workflows', 'history')}</ToggleButton
+            >{translate('workflows.history')}</ToggleButton
           >
           <ToggleButton
             icon="compact"
             active={$eventViewType === 'compact'}
             data-testid="compact"
             on:click={() => onViewClick('compact')}
-            >{translate('workflows', 'compact')}</ToggleButton
+            >{translate('workflows.compact')}</ToggleButton
           >
           <ToggleButton
             icon="json"
             active={$eventViewType === 'json'}
             data-testid="json"
             on:click={() => onViewClick('json')}
-            >{translate('workflows', 'json')}</ToggleButton
+            >{translate('workflows.json')}</ToggleButton
           >
           <ToggleButton
             icon="download"
@@ -151,7 +151,7 @@
                 workflowId: decodeURIForSvelte($workflowRun.workflow?.id),
                 runId: decodeURIForSvelte($workflowRun.workflow?.runId),
                 settings: $page.data.settings,
-              })}>{translate('workflows', 'download')}</ToggleButton
+              })}>{translate('workflows.download')}</ToggleButton
           >
         </ToggleButtons>
       </div>

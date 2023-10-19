@@ -42,7 +42,7 @@
   };
 
   const badgeTextForBoolean = (bool: boolean) => {
-    return bool ? translate('disabled') : translate('enabled');
+    return bool ? translate('common.disabled') : translate('common.enabled');
   };
 
   $: ({ namespace, clusters } = data);
@@ -53,46 +53,51 @@
 </script>
 
 <PageTitle
-  title={`${translate('namespaces', 'namespace')} | ${
+  title={`${translate('namespaces.namespace')} | ${
     namespace?.namespaceInfo?.name
   }`}
   url={$page.url.href}
 />
 <h1 class="text-2xl" data-testid="namespace-title">
-  {translate('namespaces', 'namespace')}: {namespace?.namespaceInfo?.name}
+  {translate('namespaces.namespace')}: {namespace?.namespaceInfo?.name}
 </h1>
 <h2 data-testid="namespace-description">
   {namespace?.namespaceInfo?.description}
 </h2>
 <Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
-    <h3 class="text-lg font-medium">{translate('details')}</h3>
+    <h3 class="text-lg font-medium">{translate('common.details')}</h3>
     <Table variant="simple">
       <caption class="sr-only" slot="caption"
-        >{`${translate('namespaces', 'namespace')} ${translate(
-          'details',
+        >{`${translate('namespaces.namespace')} ${translate(
+          'common.details',
         )}`}</caption
       >
       <tr slot="headers">
         <th class="w-1/2 lg:w-3/5" /><th />
       </tr>
       <tr data-testid="namespace-owner">
-        <td>{translate('namespaces', 'owner')}</td>
-        <td>{namespace?.namespaceInfo?.ownerEmail || translate('unknown')}</td>
+        <td>{translate('namespaces.owner')}</td>
+        <td
+          >{namespace?.namespaceInfo?.ownerEmail ||
+            translate('common.unknown')}</td
+        >
       </tr>
       <tr data-testid="namespace-global">
-        <td>{translate('namespaces', 'global')}</td>
+        <td>{translate('namespaces.global')}</td>
         <td>
           <Badge
             class="px-1 py-0"
             type={badgeTypeForBoolean(namespace?.isGlobalNamespace, false)}
           >
-            {namespace?.isGlobalNamespace ? translate('yes') : translate('no')}
+            {namespace?.isGlobalNamespace
+              ? translate('common.yes')
+              : translate('common.no')}
           </Badge>
         </td>
       </tr>
       <tr data-testid="namespace-retention">
-        <td>{translate('namespaces', 'retention-period')}</td>
+        <td>{translate('namespaces.retention-period')}</td>
         <td
           >{fromSecondsToDaysOrHours(
             namespace?.config?.workflowExecutionRetentionTtl.toString(),
@@ -100,7 +105,7 @@
         >
       </tr>
       <tr data-testid="namespace-history">
-        <td>{translate('namespaces', 'history-archival')}</td>
+        <td>{translate('namespaces.history-archival')}</td>
         <td
           ><Badge
             class="px-1 py-0"
@@ -113,7 +118,7 @@
         >
       </tr>
       <tr data-testid="namespace-visibility">
-        <td>{translate('namespaces', 'visibility-archival')}</td>
+        <td>{translate('namespaces.visibility-archival')}</td>
         <td
           ><Badge
             class="px-1 py-0"
@@ -126,21 +131,21 @@
         >
       </tr>
       <tr data-testid="namespace-failover">
-        <td>{translate('namespaces', 'failover-version')}</td>
+        <td>{translate('namespaces.failover-version')}</td>
         <td>{namespace?.failoverVersion}</td>
       </tr>
       <tr data-testid="namespace-clusters">
-        <td>{translate('namespaces', 'clusters')}</td>
+        <td>{translate('namespaces.clusters')}</td>
         <td>{clusters}</td>
       </tr>
     </Table>
   </article>
 
   <article class="namespace-info flex w-full flex-col">
-    <h3 class="text-lg font-medium">{translate('namespaces', 'versions')}</h3>
+    <h3 class="text-lg font-medium">{translate('namespaces.versions')}</h3>
     <Table variant="simple">
       <caption class="sr-only" slot="caption"
-        >{translate('namespaces', 'versions')}</caption
+        >{translate('namespaces.versions')}</caption
       >
       <tr slot="headers">
         <th class="w-1/2 lg:w-3/4" /><th />
@@ -159,11 +164,11 @@
 
   <article class="namespace-info flex w-full flex-col">
     <h3 class="text-lg font-medium">
-      {translate('namespaces', 'client-actions')}
+      {translate('namespaces.client-actions')}
     </h3>
     <Table variant="simple">
       <caption class="sr-only" slot="caption"
-        >{translate('namespaces', 'client-actions')}</caption
+        >{translate('namespaces.client-actions')}</caption
       >
 
       <tr slot="headers">
@@ -171,7 +176,7 @@
       </tr>
 
       <tr>
-        <td>{translate('namespaces', 'client-actions')}</td>
+        <td>{translate('namespaces.client-actions')}</td>
         <td
           ><Badge
             class="px-1 py-0"
@@ -181,7 +186,7 @@
         >
       </tr>
       <tr>
-        <td>{translate('workflows', 'terminate-modal-title')}</td>
+        <td>{translate('workflows.terminate-modal-title')}</td>
         <td
           ><Badge
             class="px-1 py-0"
@@ -191,7 +196,7 @@
         >
       </tr>
       <tr>
-        <td>{translate('workflows', 'cancel-modal-title')}</td>
+        <td>{translate('workflows.cancel-modal-title')}</td>
         <td
           ><Badge
             class="px-1 py-0"
@@ -201,7 +206,7 @@
         >
       </tr>
       <tr>
-        <td>{translate('namespaces', 'signal-workflow')}</td>
+        <td>{translate('namespaces.signal-workflow')}</td>
         <td
           ><Badge
             class="px-1 py-0"
@@ -211,7 +216,7 @@
         >
       </tr>
       <tr>
-        <td>{translate('workflows', 'reset-modal-title')}</td>
+        <td>{translate('workflows.reset-modal-title')}</td>
         <td
           ><Badge
             class="px-1 py-0"
@@ -227,15 +232,15 @@
 {#if $searchAttributes}
   <section>
     <h3 class="my-4 text-lg font-medium">
-      {translate('events', 'attribute-group-search-attributes')}
+      {translate('events.attribute-group.search-attributes')}
     </h3>
     <Table class="w-full">
       <caption class="sr-only" slot="caption"
-        >{translate('events', 'attribute-group-search-attributes')}</caption
+        >{translate('events.attribute-group.search-attributes')}</caption
       >
       <TableHeaderRow slot="headers">
-        <th>{translate('key')}</th>
-        <th>{translate('type')}</th>
+        <th>{translate('common.key')}</th>
+        <th>{translate('common.type')}</th>
       </TableHeaderRow>
       {#each Object.entries($searchAttributes) as [key, type]}
         <TableRow>

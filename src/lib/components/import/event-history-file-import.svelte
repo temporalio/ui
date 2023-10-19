@@ -29,7 +29,7 @@
         } catch (e) {
           toaster.push({
             variant: 'error',
-            message: translate('events', 'event-history-load-error'),
+            message: translate('events.event-history-load-error'),
           });
           fileLoaded = false;
         }
@@ -52,14 +52,14 @@
       console.error(e);
       toaster.push({
         variant: 'error',
-        message: translate('events', 'event-history-import-error'),
+        message: translate('events.event-history-import-error'),
       });
     }
   };
 </script>
 
 <label class="sr-only" for="import-event-history-file-upload">
-  {translate('events', 'import-event-history-file-upload')}
+  {translate('events.import-event-history-file-upload')}
 </label>
 <input
   id="import-event-history-file-upload"
@@ -69,5 +69,5 @@
   on:change={onFileSelect}
 />
 <Button leadingIcon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
-  >{translate('import')}</Button
+  >{translate('common.import')}</Button
 >

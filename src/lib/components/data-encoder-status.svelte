@@ -19,10 +19,10 @@
     {#if $dataEncoder?.hasNotRequested}
       <Tooltip
         bottomRight
-        text={translate('data-encoder', 'codec-server-configured')}
+        text={translate('data-encoder.codec-server-configured')}
       >
         <IconButton
-          label={translate('data-encoder', 'codec-server-configured')}
+          label={translate('data-encoder.codec-server-configured')}
           class="relative flex items-center"
           data-testid="data-encoder-status-configured"
           icon="transcoder-on"
@@ -30,12 +30,9 @@
         />
       </Tooltip>
     {:else if $dataEncoder.hasError}
-      <Tooltip
-        bottomRight
-        text={translate('data-encoder', 'codec-server-error')}
-      >
+      <Tooltip bottomRight text={translate('data-encoder.codec-server-error')}>
         <IconButton
-          label={translate('data-encoder', 'codec-server-error')}
+          label={translate('data-encoder.codec-server-error')}
           class="relative flex items-center"
           data-testid="data-encoder-status-error"
           icon="transcoder-error"
@@ -45,10 +42,10 @@
     {:else if $dataEncoder.hasSuccess}
       <Tooltip
         bottomRight
-        text={translate('data-encoder', 'codec-server-success')}
+        text={translate('data-encoder.codec-server-success')}
       >
         <IconButton
-          label={translate('data-encoder', 'codec-server-success')}
+          label={translate('data-encoder.codec-server-success')}
           class="relative flex items-center"
           data-testid="data-encoder-status-success"
           icon="transcoder-on"
@@ -59,10 +56,10 @@
   {:else}
     <Tooltip
       bottomRight
-      text={translate('data-encoder', 'configure-codec-server')}
+      text={translate('data-encoder.configure-codec-server')}
     >
       <IconButton
-        label={translate('data-encoder', 'configure-codec-server')}
+        label={translate('data-encoder.configure-codec-server')}
         class="relative flex items-center"
         data-testid="data-encoder-status"
         icon="transcoder-off"

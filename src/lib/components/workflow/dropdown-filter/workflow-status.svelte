@@ -89,7 +89,7 @@
     variant="table-header"
     controls="execution-status-filter"
   >
-    {translate('status')}
+    {translate('common.status')}
     <Icon name="filter" slot="trailing" />
   </MenuButton>
   <Menu keepOpen id="execution-status-filter">
@@ -105,7 +105,7 @@
             (!statusFilters.length && status === 'All')}
         />
         {#if status === 'All'}
-          <Translate namespace="workflows" key="all-statuses" />
+          <Translate key="workflows.all-statuses" />
         {:else}
           <WorkflowStatus {status} />
         {/if}

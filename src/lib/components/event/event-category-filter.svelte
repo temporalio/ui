@@ -24,8 +24,8 @@
 
   $: id = $page.params.id;
   $: label = compact
-    ? translate('events', 'event-type')
-    : translate('events', 'workflow-events');
+    ? translate('events.event-type')
+    : translate('events.workflow-events');
 
   let parameter = 'category';
   let options = compact ? compactEventTypeOptions : allEventTypeOptions;
@@ -68,7 +68,7 @@
         selected={$eventCategoryFilter === option}
         on:click={() => onOptionClick(option)}
       >
-        {translate('events', label)}
+        {translate(label)}
       </MenuItem>
     {/each}
   </Menu>

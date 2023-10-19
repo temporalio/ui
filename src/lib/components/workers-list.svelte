@@ -34,17 +34,17 @@
 
 <section class="flex flex-col gap-4">
   <h2 class="text-lg font-medium" data-testid="task-queue-name">
-    {translate('task-queue')}:
+    {translate('common.task-queue')}:
     <span class="select-all font-normal">{taskQueue}</span>
   </h2>
   {#if versionSets?.length}
     <h2 class="text-base font-medium" data-testid="version-sets">
-      {translate('workers', 'version-sets')}
+      {translate('workers.version-sets')}
     </h2>
     <Table class="mb-6 w-full min-w-[600px] table-fixed">
       <TableHeaderRow slot="headers">
-        <th class="w-3/12">{translate('workers', 'default')}</th>
-        <th class="w-9/12">{translate('workers', 'compatible-build-ids')}</th>
+        <th class="w-3/12">{translate('workers.default')}</th>
+        <th class="w-9/12">{translate('workers.compatible-build-ids')}</th>
       </TableHeaderRow>
       {#each versionSets as set, index (index)}
         <TableRow data-testid="version-row">
@@ -55,10 +55,10 @@
               buildId={getDefaultVersionForSet(set.buildIds)}
             >
               <svelte:fragment slot="overall-default-worker">
-                {#if index === 0}{translate('workers', 'overall')}{/if}
+                {#if index === 0}{translate('workers.overall')}{/if}
               </svelte:fragment>
               <svelte:fragment slot="default-worker">
-                {translate('workers', 'default')}
+                {translate('workers.default')}
               </svelte:fragment>
             </CompatibilityBadge>
           </td>
@@ -67,7 +67,7 @@
               {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
                 <CompatibilityBadge active={false} {buildId}>
                   <svelte:fragment slot="default-worker">
-                    {translate('workers', 'default')}
+                    {translate('workers.default')}
                   </svelte:fragment>
                 </CompatibilityBadge>
               {/each}
@@ -77,7 +77,7 @@
       {:else}
         <tr class="w-full">
           <td colspan="6">
-            <EmptyState title={translate('workers', 'no-version-sets-found')} />
+            <EmptyState title={translate('workers.no-version-sets-found')} />
           </td>
         </tr>
       {/each}
@@ -87,32 +87,32 @@
     class="flex items-center gap-2 text-base font-medium"
     data-testid="workers"
   >
-    {translate('workers', 'workers')}
+    {translate('workers.workers')}
     <Badge type="count" class="rounded-sm"
       >{workers?.pollers?.length || 0}</Badge
     >
   </h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <caption class="sr-only" slot="caption"
-      >{translate('workflows', 'workers-tab')}</caption
+      >{translate('workflows.workers-tab')}</caption
     >
     <TableHeaderRow slot="headers">
       <th
         class={reachability?.buildIdReachability?.length ? 'w-3/12' : 'w-6/12'}
-        >{translate('id')}</th
+        >{translate('common.id')}</th
       >
       {#if reachability?.buildIdReachability?.length}
-        <th class="w-3/12">{translate('workers', 'version')}</th>
-        <th class="w-2/12">{translate('workers', 'retirability')}</th>
+        <th class="w-3/12">{translate('workers.version')}</th>
+        <th class="w-2/12">{translate('workers.retirability')}</th>
       {/if}
-      <th class="w-2/12">{translate('workflows', 'last-accessed')}</th>
+      <th class="w-2/12">{translate('workflows.last-accessed')}</th>
       <th class="w-2/12">
         <p class="text-center">
-          {translate('workflows', 'workflow-task-handler')}
+          {translate('workflows.workflow-task-handler')}
         </p>
       </th>
       <th class="w-2/12 text-center">
-        <p class="text-center">{translate('workflows', 'activity-handler')}</p>
+        <p class="text-center">{translate('workflows.activity-handler')}</p>
       </th>
     </TableHeaderRow>
     {#each workers?.pollers as poller (poller.identity)}
@@ -136,12 +136,11 @@
               >
                 <svelte:fragment slot="overall-default-worker">
                   {#if buildId === defaultVersion}{translate(
-                      'workers',
-                      'overall',
+                      'workers.overall',
                     )}{/if}
                 </svelte:fragment>
                 <svelte:fragment slot="default-worker">
-                  {translate('workers', 'default')}
+                  {translate('workers.default')}
                 </svelte:fragment>
               </CompatibilityBadge>
             </p>
@@ -166,13 +165,13 @@
             <Icon
               name="checkmark"
               class="m-auto text-blue-700"
-              title={translate('yes')}
+              title={translate('common.yes')}
             />
           {:else}
             <Icon
               name="close"
               class="m-auto text-primary"
-              title={translate('no')}
+              title={translate('common.no')}
             />
           {/if}
         </td>
@@ -181,13 +180,13 @@
             <Icon
               name="checkmark"
               class="m-auto text-blue-700"
-              title={translate('yes')}
+              title={translate('common.yes')}
             />
           {:else}
             <Icon
               name="close"
               class="m-auto text-primary"
-              title={translate('no')}
+              title={translate('common.no')}
             />
           {/if}
         </td>
@@ -195,7 +194,7 @@
     {:else}
       <tr class="w-full">
         <td colspan={reachability?.buildIdReachability?.length ? 8 : 6}>
-          <EmptyState title={translate('workflows', 'workers-empty-state')} />
+          <EmptyState title={translate('workflows.workers-empty-state')} />
         </td>
       </tr>
     {/each}

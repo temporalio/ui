@@ -70,9 +70,7 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
 
         if (error) {
           if (hideWorkflowQueryErrors) {
-            workflowError.set(
-              translate('workflows', 'workflows-error-querying'),
-            );
+            workflowError.set(translate('workflows.workflows-error-querying'));
           } else {
             workflowError.set(error);
           }

@@ -1,3 +1,5 @@
+import type { Leaves } from '$lib/types/global';
+
 import Locales from './locales';
 
 /**
@@ -13,21 +15,15 @@ type WithoutPluralSuffix<T> = T extends
   ? P
   : T;
 
-export const I18nMap = {
-  ...Locales.en,
-} as const;
+export const i18nNamespaces = Object.keys(Locales.en);
 
-export const I18nNamespaces = Object.keys(I18nMap);
+export type I18nResources = typeof Locales.en;
 
-export type I18nNamespace = keyof typeof I18nMap;
-
-export type I18nKeys = {
-  [K in keyof typeof I18nMap]: {
-    [T in keyof (typeof I18nMap)[K] as WithoutPluralSuffix<T>]: (typeof I18nMap)[K][T];
-  };
-};
-
-export type I18nKey<T extends I18nNamespace> = keyof I18nKeys[T];
+export type I18nKey<Resources = I18nResources> = WithoutPluralSuffix<
+  Leaves<{
+    [Key in keyof Resources]: Resources[Key];
+  }>
+>;
 
 // TODO: can we make this dynamic based on the namespace and key?
 export type I18nReplace = {

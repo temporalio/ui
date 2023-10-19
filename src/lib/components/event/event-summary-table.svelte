@@ -34,7 +34,7 @@
   data-testid="event-summary-table"
 >
   <caption class="sr-only" slot="caption"
-    >{translate('workflows', 'event-history')}</caption
+    >{translate('workflows.event-history')}</caption
   >
   <TableHeaderRow slot="headers">
     <td class="w-14 xl:w-10" />
@@ -52,7 +52,9 @@
           on:click={handleChange}
         >
           <span class="hidden sm:block">
-            {expandAll ? translate('collapse-all') : translate('expand-all')}
+            {expandAll
+              ? translate('common.collapse-all')
+              : translate('common.expand-all')}
           </span>
         </Button>
       </div>

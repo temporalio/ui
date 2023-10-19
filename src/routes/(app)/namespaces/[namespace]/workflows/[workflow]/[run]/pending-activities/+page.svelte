@@ -9,7 +9,7 @@
 </script>
 
 <PageTitle
-  title={`${translate('workflows', 'pending-activities-tab')} | ${workflow}`}
+  title={`${translate('workflows.pending-activities-tab')} | ${workflow}`}
   url={$page.url.href}
 />
 <WorkflowPendingActivities />

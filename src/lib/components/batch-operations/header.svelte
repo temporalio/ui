@@ -34,7 +34,7 @@
   <div class="flex flex-col gap-2">
     <div class="flex flex-row gap-2">
       <h1 class="text-2xl">
-        {translate('batch', 'describe-page-title')}
+        {translate('batch.describe-page-title')}
       </h1>
       <Badge type={jobStateToBadgeType[operation.state]}>
         {operation.state}
@@ -45,10 +45,13 @@
     </h2>
   </div>
   {#if operation.state === 'Running'}
-    <Tooltip top text={translate('auto-refresh-tooltip', { interval: '5' })}>
+    <Tooltip
+      top
+      text={translate('common.auto-refresh-tooltip', { interval: '5' })}
+    >
       <ToggleSwitch
         id="batch-operation-auto-refresh"
-        label={translate('auto-refresh')}
+        label={translate('common.auto-refresh')}
         labelPosition="left"
         checked={$autoRefresh}
         on:change={handleToggleAutoRefresh}

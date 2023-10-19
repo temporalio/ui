@@ -43,17 +43,12 @@
 
 {#if $allSelected}
   <span class="font-semibold">
-    <Translate
-      namespace="workflows"
-      key="all-selected"
-      count={workflowsCount}
-    />
+    <Translate key="workflows.all-selected" count={workflowsCount} />
   </span>
 {:else}
   <span class="font-semibold"
     ><Translate
-      namespace="workflows"
-      key="n-selected"
+      key="workflows.n-selected"
       count={selectedWorkflowsCount}
     /></span
   >
@@ -62,11 +57,7 @@
       data-testid="select-all-workflows"
       on:click={() => handleSelectAll(workflows)}
       class="cursor-pointer underline"
-      ><Translate
-        namespace="workflows"
-        key="select-all"
-        count={workflowsCount}
-      /></button
+      ><Translate key="workflows.select-all" count={workflowsCount} /></button
     >)
   </span>
 {/if}
@@ -76,7 +67,7 @@
       testId="bulk-cancel-button"
       disabled={namespaceWriteDisabled || !$cancelableWorkflows.length}
       on:click={openBatchCancelConfirmationModal}
-      >{translate('workflows', 'request-cancellation')}</BulkActionButton
+      >{translate('workflows.request-cancellation')}</BulkActionButton
     >
   {/if}
   {#if terminateEnabled}
@@ -85,7 +76,7 @@
       testId="bulk-terminate-button"
       disabled={namespaceWriteDisabled}
       on:click={openBatchTerminateConfirmationModal}
-      >{translate('workflows', 'terminate')}</BulkActionButton
+      >{translate('workflows.terminate')}</BulkActionButton
     >
   {/if}
 </div>

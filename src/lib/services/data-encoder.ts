@@ -65,8 +65,8 @@ export async function convertPayloadsWithCodec({
           statusText: response.statusText,
           response,
           message: encode
-            ? translate('encode-failed')
-            : translate('decode-failed'),
+            ? translate('common.encode-failed')
+            : translate('common.decode-failed'),
         } as NetworkError;
       } else {
         return response.json();
