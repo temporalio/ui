@@ -13,17 +13,23 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { authUser } from '$lib/stores/auth-user';
-  import { eventViewType } from '$lib/stores/event-view';
+  import { fetchAllEvents } from '$lib/services/events-service';
+  import {
+    eventFilterSort,
+    type EventSortOrder,
+    eventViewType,
+  } from '$lib/stores/event-view';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import type { EventView } from '$lib/types/events';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
+  import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
+  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   let showShortcuts = false;
 
   $: workflowEvents =
@@ -35,6 +41,33 @@
     $fullEventHistory,
     $namespaces,
   );
+  $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
+    $fullEventHistory,
+    $eventFilterSort,
+  );
+
+  const resetFullHistory = () => {
+    $fullEventHistory = [];
+  };
+
+  const fetchEvents = async (
+    namespace: string,
+    workflowId: string,
+    runId: string,
+    view: EventView,
+    sort: EventSortOrder,
+  ) => {
+    resetFullHistory();
+    $fullEventHistory = await fetchAllEvents({
+      namespace,
+      workflowId,
+      runId,
+      sort: view === 'compact' ? 'ascending' : sort,
+    });
+  };
+
+  $: $refresh,
+    fetchEvents(namespace, workflowId, runId, $eventViewType, $eventFilterSort);
 
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {
@@ -46,8 +79,8 @@
 
 <div class="flex flex-col gap-2">
   <WorkflowStackTraceError />
-  {#if workflowEvents.error}
-    <WorkflowTypedError error={workflowEvents.error} />
+  {#if workflowTaskFailedError}
+    <WorkflowTypedError error={workflowTaskFailedError} />
   {/if}
   <WorkflowSummary />
   <WorkflowRelationships {...workflowRelationships} />
@@ -118,7 +151,6 @@
                 workflowId: decodeURIForSvelte($workflowRun.workflow?.id),
                 runId: decodeURIForSvelte($workflowRun.workflow?.runId),
                 settings: $page.data.settings,
-                accessToken: $authUser?.accessToken,
               })}>{translate('workflows', 'download')}</ToggleButton
           >
         </ToggleButtons>

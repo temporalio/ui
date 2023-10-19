@@ -29,6 +29,7 @@
 <section>
   <Accordion
     title={translate('workflows', 'relationships')}
+    data-testid="relationships-accordion"
     icon="relationship"
   >
     <div slot="summary" class="hidden flex-row gap-2 lg:flex">

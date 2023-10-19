@@ -22,6 +22,7 @@
   export let compact = false;
   export let variant: MenuButtonVariant = 'table-header';
 
+  $: id = $page.params.id;
   $: label = compact
     ? translate('events', 'event-type')
     : translate('events', 'workflow-events');
@@ -55,6 +56,7 @@
     {variant}
     data-testid="event-category-filter"
     controls="event-category-filter-menu"
+    disabled={!!id}
   >
     {label}
     <Icon name="filter" slot="trailing" />

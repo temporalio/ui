@@ -1,6 +1,6 @@
 import { isEventGroup } from '$lib/models/event-groups';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
-import type { Payload } from '$lib/types';
+import type { Payload, Payloads } from '$lib/types';
 import type { MarkerRecordedEvent, WorkflowEvent } from '$lib/types/events';
 import { capitalize } from '$lib/utilities/format-camel-case';
 
@@ -11,7 +11,7 @@ import { isLocalActivityMarkerEvent } from './is-event-type';
 
 type SummaryAttribute = {
   key: string;
-  value: string | Record<string, unknown>;
+  value: string | Record<string, unknown> | Payloads;
 };
 
 const emptyAttribute: SummaryAttribute = { key: '', value: '' };
@@ -139,6 +139,9 @@ export const shouldDisplayChildWorkflowLink = (
 const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
   if (typeof value === 'object') {
     const [firstKey] = Object.keys(value);
+    if (firstKey === 'payloads') {
+      return { key, value };
+    }
     return { key: key + capitalize(firstKey), value: value[firstKey] };
   } else {
     return { key, value: value.toString() };

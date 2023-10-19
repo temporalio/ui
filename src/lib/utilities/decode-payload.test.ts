@@ -1,20 +1,15 @@
 import { get } from 'svelte/store';
 
-import WS from 'jest-websocket-mock';
 import { afterEach, describe, expect, it } from 'vitest';
 import { vi } from 'vitest';
 
-import { createWebsocket } from './data-converter-websocket';
 import {
   convertPayloadToJsonWithCodec,
-  convertPayloadToJsonWithWebsocket,
   decodeAllPotentialPayloadsWithCodec,
-  decodeAllPotentialPayloadsWithWebsockets,
   decodePayload,
   decodePayloadAttributes,
 } from './decode-payload';
 import {
-  dataConvertedFailureWorkflowStartedEvent,
   dataConvertedWorkflowStartedEvent,
   getTestPayloadEvent,
   getTestPayloadEventWithNullEncodedAttributes,
@@ -24,11 +19,7 @@ import {
 } from './decode-payload-test-fixtures';
 import { parseWithBigInt, stringifyWithBigInt } from './parse-with-big-int';
 import { getEventAttributes } from '../../lib/models/event-history';
-import {
-  dataConverterPort,
-  lastDataConverterStatus,
-  resetLastDataConverterSuccess,
-} from '../stores/data-converter-config';
+import { resetLastDataConverterSuccess } from '../stores/data-converter-config';
 import {
   codecEndpoint,
   lastDataEncoderStatus,
@@ -143,93 +134,6 @@ describe('decode all potential payloads', () => {
     expect(event.input).toEqual({ payloads: ['test@test.com'] });
     expect(event.encodedAttributes).toEqual(null);
     expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
-  });
-
-  it('Should decode a payload with websockets with encoding json/plain`', async () => {
-    const event = await decodeAllPotentialPayloadsWithWebsockets(
-      getTestPayloadEvent(),
-      {},
-    );
-    expect(event.input).toEqual({ payloads: ['test@test.com'] });
-    expect(event.encodedAttributes).toEqual('a test attribute');
-    expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
-  });
-});
-
-describe('convertPayloadToJsonWithWebsocket', () => {
-  afterEach(() => {
-    resetLastDataConverterSuccess();
-  });
-  it('Should convert a payload through data-converter and set the success status when the websocket is set and the websocket connects', async () => {
-    const ws = new WS('wss://localhost:1337');
-
-    // We need to respond to the websocket messages with the requestID so the
-    // websocket as promised library can resolve the promises correctly without
-    // the requestId it won't properly resolve
-    ws.nextMessage.then((data) => {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const dataz = parseWithBigInt(data as any);
-
-        ws.send(
-          stringifyWithBigInt({
-            requestId: dataz.requestId,
-            content: 'test@test.com',
-          }),
-        );
-      } catch (e) {
-        // ignore errors, test should fail if we don't respond
-      }
-    });
-
-    const websocket = createWebsocket('1337');
-    await ws.connected;
-
-    const convertedPayload = await convertPayloadToJsonWithWebsocket(
-      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      websocket,
-    );
-    const decodedPayload = decodePayloadAttributes(convertedPayload);
-    convertPayloadToJsonWithWebsocket(
-      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      {},
-    );
-    expect(decodedPayload).toEqual(dataConvertedWorkflowStartedEvent);
-
-    const dataConverterStatus = get(lastDataConverterStatus);
-    expect(dataConverterStatus).toEqual('success');
-
-    ws.close();
-    WS.clean();
-  });
-
-  it('Should fail converting a payload through data-converter and set the status to error when the websocket is set and the websocket fails connection', async () => {
-    const websocket = createWebsocket('break', {
-      timeout: 1,
-    });
-
-    const convertedPayload = await convertPayloadToJsonWithWebsocket(
-      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      websocket,
-    );
-    const decodedPayload = decodePayloadAttributes(convertedPayload);
-
-    expect(decodedPayload).toEqual(dataConvertedFailureWorkflowStartedEvent);
-
-    const dataConverterStatus = get(lastDataConverterStatus);
-    expect(dataConverterStatus).toEqual('error');
-  });
-
-  it('Should skip converting a payload and set the status to notRequested when the websocket and port is not set', async () => {
-    const convertedPayload = await convertPayloadToJsonWithWebsocket(
-      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-    );
-    const decodedPayload = decodePayloadAttributes(convertedPayload);
-
-    expect(decodedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
-
-    const dataConverterStatus = get(lastDataConverterStatus);
-    expect(dataConverterStatus).toEqual('notRequested');
   });
 });
 
@@ -369,34 +273,6 @@ describe('getEventAttributes', () => {
 
     const endpoint = 'http://localhost:1337';
     codecEndpoint.set(endpoint);
-
-    const decodedPayload = await getEventAttributes({
-      historyEvent: parseWithBigInt(
-        stringifyWithBigInt(workflowStartedHistoryEvent),
-      ),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint: '',
-        },
-      },
-    });
-
-    expect(decodedPayload).toEqual(dataConvertedWorkflowStartedEvent);
-    const dataConverterStatus = get(lastDataEncoderStatus);
-    expect(dataConverterStatus).toEqual('success');
-  });
-  it('Should convert a payload through data-converter and set the success status when both the endpoint and websocket is set and the endpoint connects', async () => {
-    // tslint:disable-next-line
-    vi.stubGlobal('fetch', async () => {
-      return {
-        json: () => Promise.resolve({ payloads: [JsonPlainEncoded] }),
-      };
-    });
-
-    const endpoint = 'http://localhost:1337';
-    codecEndpoint.set(endpoint);
-    dataConverterPort.set('3889');
 
     const decodedPayload = await getEventAttributes({
       historyEvent: parseWithBigInt(

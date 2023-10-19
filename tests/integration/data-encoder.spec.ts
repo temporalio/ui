@@ -181,36 +181,6 @@ test.describe('Data Encoder without Configuration Settings', () => {
       'http://localhost:8080',
     );
   });
-
-  test('Navigate to Data Encoder UI and configure Port', async ({ page }) => {
-    const dataEncoderStatusButton = page.getByTestId('data-encoder-status');
-    await expect(dataEncoderStatusButton).toBeEnabled();
-    await dataEncoderStatusButton.click();
-
-    const dataEncoderTitle = await page
-      .getByTestId('data-encoder-title')
-      .innerText();
-    expect(dataEncoderTitle).toBe('Codec Server');
-
-    const dataEncoderConfirmButton = page.getByTestId(
-      'confirm-data-encoder-button',
-    );
-    await expect(dataEncoderConfirmButton).toBeEnabled();
-
-    await expect(page.locator('#data-encoder-port-input')).toHaveValue('');
-
-    await page.locator('#data-encoder-port-input').fill('3456');
-
-    await dataEncoderConfirmButton.click();
-
-    const dataEncoderStatusConfiguredButton = page.getByTestId(
-      'data-encoder-status-configured',
-    );
-    await expect(dataEncoderStatusConfiguredButton).toBeVisible();
-    await dataEncoderStatusConfiguredButton.click();
-    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
-    await expect(page.locator('#data-encoder-port-input')).toHaveValue('3456');
-  });
 });
 
 test.describe('Data Encoder with Configuration Settings', () => {
