@@ -5,15 +5,15 @@ import { mockWorkflow } from '~/test-utilities/mocks/workflow';
 
 const workflowUrl = `/namespaces/default/workflows/${mockWorkflow.workflowExecutionInfo.execution.workflowId}/${mockWorkflow.workflowExecutionInfo.execution.runId}/history`;
 
-test.beforeEach(async ({ page }) => {
-  await mockWorkflowApis(page);
-  await page.goto(workflowUrl);
-});
-
 test.describe('Workflow History', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(workflowUrl);
+  });
+
   test('Workflow Execution shows WorkflowId and all sections and event history', async ({
     page,
   }) => {
+    await mockWorkflowApis(page);
     await expect(page.getByTestId('workflow-id-heading')).toHaveText(
       '09db15_Running Click to copy content',
     );
@@ -39,12 +39,14 @@ test.describe('Workflow History', () => {
     await firstRowId.click();
 
     await page.goto(`${workflowUrl}/events/1`);
+    await mockWorkflowApis(page);
     await expect(page.getByTestId('workflow-id-heading')).toHaveText(
       '09db15_Running Click to copy content',
     );
   });
 
   test('Workflow Execution links to specific event', async ({ page }) => {
+    await mockWorkflowApis(page);
     await expect(page.getByTestId('workflow-id-heading')).toHaveText(
       '09db15_Running Click to copy content',
     );
@@ -53,9 +55,10 @@ test.describe('Workflow History', () => {
     await firstRow.click();
 
     const firstRowId = firstRow.getByTestId('link');
-    await firstRowId.click({ force: true });
+    await firstRowId.click();
 
     await page.goto(`${workflowUrl}/events/1`);
+    await mockWorkflowApis(page);
     await expect(page.getByTestId('workflow-id-heading')).toHaveText(
       '09db15_Running Click to copy content',
     );
