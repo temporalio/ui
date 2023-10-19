@@ -1,3 +1,4 @@
 [submodule "server/proto/dependencies/api"]
 	path = server/proto/dependencies/api
-	url = https://github.com/temporalio/api
+	url = https://github.com/tdeebswihart/temporal-api
+	branch = merge-ui-protos

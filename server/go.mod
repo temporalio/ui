@@ -2,6 +2,10 @@ module github.com/temporalio/ui-server/v2
 
 go 1.18
 
+replace (
+	go.temporal.io/api => github.com/tdeebswihart/temporal-api merge-ui-protos
+)
+
 require (
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/gogo/gateway v1.1.0
