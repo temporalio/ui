@@ -2,7 +2,12 @@
   import { page } from '$app/stores';
 
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
-  import { loading, updating, workflowCount } from '$lib/stores/workflows';
+  import {
+    loading,
+    refresh,
+    updating,
+    workflowCount,
+  } from '$lib/stores/workflows';
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { decodePayload } from '$lib/utilities/decode-payload';
 
@@ -32,7 +37,7 @@
     });
   };
 
-  $: query, namespace, fetchCounts();
+  $: query, namespace, $refresh, fetchCounts();
 </script>
 
 <div class="flex h-6 flex-wrap items-center gap-2">
