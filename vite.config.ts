@@ -9,7 +9,7 @@ import { uiServerPlugin } from './plugins/vite-plugin-ui-server';
 export default defineConfig({
   plugins: [sveltekit(), temporalServer(), uiServerPlugin()],
   optimizeDeps: {
-    include: ['date-fns', 'date-fns-tz', 'websocket-as-promised'],
+    include: ['date-fns', 'date-fns-tz'],
   },
   resolve: {
     alias: {
