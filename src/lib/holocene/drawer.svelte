@@ -2,6 +2,7 @@
   import { fly } from 'svelte/transition';
 
   import { clickOutside } from '$lib/holocene/outside-click';
+  import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
 
@@ -29,6 +30,7 @@
     {id}
     role="region"
     on:click-outside={onClick}
+    use:focusTrap={true}
   >
     <div class="close-button-wrapper {position}">
       <IconButton

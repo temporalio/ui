@@ -29,6 +29,7 @@
   class="link {icon ? 'inline-flex' : 'inline'} {className}"
   class:active
   on:click
+  tabindex={href ? null : 0}
   {...$$restProps}
 >
   {#if icon}

@@ -93,7 +93,7 @@
   />
   {#if showDatePicker}
     <div
-      class="absolute z-50 inline-block rounded border border-gray-900 bg-white shadow"
+      class="absolute z-30 inline-block rounded border border-gray-900 bg-white shadow"
     >
       <div class="mx-3 my-2 flex items-center justify-around">
         <div class="flex items-center justify-center">

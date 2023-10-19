@@ -4,6 +4,7 @@
   import { type ComponentProps, createEventDispatcher } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
+  import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
 
@@ -64,34 +65,6 @@
     dispatch('confirmModal');
   };
 
-  const handleKeyboardNavigation = (event: KeyboardEvent) => {
-    if (!open) {
-      return;
-    }
-
-    const focusable = Array.from(
-      modalElement.querySelectorAll<
-        HTMLButtonElement | HTMLInputElement | HTMLDivElement
-      >('button, input, div[contenteditable="true"]'),
-    ).filter((element) => {
-      if (element instanceof HTMLDivElement) return element.isContentEditable;
-      return !element.disabled;
-    });
-    const firstFocusable = focusable[0];
-    const lastFocusable = focusable[focusable.length - 1];
-    if (event.key === 'Tab') {
-      if (event.shiftKey) {
-        if (document.activeElement === firstFocusable) {
-          lastFocusable.focus();
-          event.preventDefault();
-        }
-      } else if (document.activeElement === lastFocusable) {
-        firstFocusable.focus();
-        event.preventDefault();
-      }
-    }
-  };
-
   const handleClick = (event: MouseEvent) => {
     if (event.target === modalElement) handleCancel();
   };
@@ -103,10 +76,7 @@
   }
 </script>
 
-<svelte:window
-  on:click={handleClick}
-  on:keydown|stopPropagation={handleKeyboardNavigation}
-/>
+<svelte:window on:click={handleClick} />
 <dialog
   {id}
   on:close={handleCancel}
@@ -118,6 +88,7 @@
   aria-labelledby="modal-title"
   data-testid={$$props['data-testid']}
   {...$$restProps}
+  use:focusTrap={true}
 >
   {#if !loading}
     <IconButton
