@@ -3,4 +3,4 @@
   import { importEvents } from '$lib/stores/import-events';
 </script>
 
-<WorkflowJsonNavigator events={$importEvents} />
+<WorkflowJsonNavigator events={$importEvents} decodeEventHistory={false} />

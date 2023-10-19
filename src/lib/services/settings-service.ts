@@ -1,6 +1,5 @@
 import { BROWSER } from 'esm-env';
 
-import { settings } from '$lib/stores/settings';
 import type { SettingsResponse } from '$lib/types';
 import type { Settings } from '$lib/types/global';
 import { getApiOrigin } from '$lib/utilities/get-api-origin';
@@ -61,8 +60,6 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     },
     version: settingsResponse?.Version,
   };
-
-  settings.set(settingsInformation);
 
   return settingsInformation;
 };

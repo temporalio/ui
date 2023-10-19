@@ -56,6 +56,7 @@
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
+  import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
@@ -69,6 +70,7 @@
   } from '$lib/services/batch-service';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
+  import { groupByCountEnabled } from '$lib/stores/group-by-enabled';
   import { labsMode } from '$lib/stores/labs-mode';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
@@ -209,50 +211,53 @@
   on:confirm={cancelWorkflows}
 />
 
-<header class="flex items-center justify-between">
-  <div>
-    <h1 class="text-2xl" data-cy="workflows-title">
-      <Translate namespace="workflows" key="recent-workflows" />
-    </h1>
+<header class="flex flex-col">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl" data-cy="workflows-title">
+        <Translate namespace="workflows" key="recent-workflows" />
+      </h1>
+      <div class="flex items-center gap-2 text-sm">
+        {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !$groupByCountEnabled}
+          <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
+            {#if $loading || $updating}
+              <Translate namespace="workflows" key="loading-workflows" />
+            {:else if query}
+              <Translate
+                namespace="workflows"
+                key="filtered-workflows-count"
+                replace={{
+                  filtered: $workflowCount.count,
+                  total: $workflowCount.totalCount,
+                }}
+              />
+            {:else}
+              <Translate
+                namespace="workflows"
+                key="workflows-count"
+                count={$workflowCount.totalCount}
+              />
+            {/if}
+          </p>
+        {/if}
+      </div>
+    </div>
     <div class="flex items-center gap-2 text-sm">
-      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility}
-        <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
-          {#if $loading || $updating}
-            <Translate namespace="workflows" key="loading-workflows" />
-          {:else if query}
-            <Translate
-              namespace="workflows"
-              key="filtered-workflows-count"
-              replace={{
-                filtered: $workflowCount.count,
-                total: $workflowCount.totalCount,
-              }}
-            />
-          {:else}
-            <Translate
-              namespace="workflows"
-              key="workflows-count"
-              count={$workflowCount.totalCount}
-            />
-          {/if}
-        </p>
-      {/if}
-      {#if !$loading && !$updating && $workflows.length > 0}
-        <div class="h-1 w-1 rounded-full bg-gray-400" />
-        <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
-          >{translate('download-json')}</Link
-        >
-      {/if}
+      <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
+        >{translate('download-json')}</Link
+      >
+      <IconButton
+        icon="retry"
+        label={translate('workflows', 'retry-workflows')}
+        on:click={refreshWorkflows}
+      />
     </div>
   </div>
-  <div>
-    <IconButton
-      icon="retry"
-      label={translate('workflows', 'retry-workflows')}
-      on:click={refreshWorkflows}
-    />
-  </div>
+  {#if $groupByCountEnabled}
+    <WorkflowCounts />
+  {/if}
 </header>
+
 <div class="flex flex-col gap-2 md:flex-row">
   <LabsModeGuard>
     <svelte:fragment slot="fallback">
