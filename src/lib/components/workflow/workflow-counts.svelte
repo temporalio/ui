@@ -3,6 +3,7 @@
 
   import { page } from '$app/stores';
 
+  import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
   import {
     loading,
@@ -13,7 +14,6 @@
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { decodePayload } from '$lib/utilities/decode-payload';
 
-  import WorkflowCountAll from './workflow-count-all.svelte';
   import WorkflowCountStatus from './workflow-count-status.svelte';
 
   $: namespace = $page.params.namespace;
@@ -22,7 +22,7 @@
   let statusGroups: { status: WorkflowStatus; count: number }[] = [];
   let newStatusGroups: { status: WorkflowStatus; count: number }[] = [];
   let refreshInterval: ReturnType<typeof setInterval>;
-  const refreshRate = 5000;
+  const refreshRate = 7500;
 
   onDestroy(() => {
     clearNewCounts();
@@ -79,10 +79,9 @@
   $: query, namespace, $refresh, fetchCounts();
 </script>
 
-<div class="flex h-6 flex-wrap items-center gap-2">
-  {#if !$loading && !$updating}
-    <WorkflowCountAll count={$workflowCount.totalCount} />
-    {#each statusGroups as { count, status } (status)}
+<div class="flex min-h-[24px] flex-wrap items-center gap-2">
+  {#each statusGroups as { count, status } (status)}
+    {#if !$loading && !$updating}
       <WorkflowCountStatus
         {status}
         {count}
@@ -90,6 +89,8 @@
           ? newStatusGroups.find((g) => g.status === status).count - count
           : 0}
       />
-    {/each}
-  {/if}
+    {:else}
+      <Skeleton class="h-6 w-24 rounded" />
+    {/if}
+  {/each}
 </div>

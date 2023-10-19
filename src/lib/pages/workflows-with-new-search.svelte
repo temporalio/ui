@@ -56,7 +56,7 @@
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
-  import WorkflowCountNew from '$lib/components/workflow/workflow-count-new.svelte';
+  import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
@@ -204,12 +204,13 @@
   on:confirm={cancelWorkflows}
 />
 
-<header class="flex flex-col">
+<header class="flex flex-col gap-2">
   <div class="flex items-center justify-between">
     <div>
       <h1 class="flex items-center gap-2 text-2xl" data-cy="workflows-title">
-        <WorkflowCountNew count={$workflowCount.newTotalCount} />
-        <Translate namespace="workflows" key="recent-workflows" />
+        {$workflowCount.totalCount.toLocaleString()}
+        <Translate namespace="common" key="workflows" />
+        <WorkflowCountRefresh count={$workflowCount.newTotalCount} />
       </h1>
       <div class="flex items-center gap-2 text-sm">
         {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !$groupByCountEnabled}

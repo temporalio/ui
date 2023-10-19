@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fade } from 'svelte/transition';
+
   import { cva } from 'class-variance-authority';
 
   import Spinner from '$lib/holocene/icon/svg/spinner.svelte';
@@ -41,9 +43,7 @@
   };
 
   const workflowStatus = cva(
-    [
-      'flex items-center rounded-sm px-1 py-0.5 font-secondary whitespace-nowrap',
-    ],
+    ['flex items-center rounded-sm p-1 font-secondary whitespace-nowrap'],
     {
       variants: {
         status: {
@@ -71,15 +71,23 @@
 </script>
 
 <div
-  class="relative flex text-center text-sm font-medium leading-4"
+  class="relative flex items-center gap-0 text-center text-sm leading-4"
   data-testid={$$props['test-id']}
 >
-  <span class={workflowStatus({ status })} class:count>
-    {#if loading}
-      <Spinner class="h-4 w-4 animate-spin" />
-    {:else if count >= 0}
-      {count.toLocaleString()}
-    {/if}
+  <span
+    class="flex items-center gap-1 font-mono font-medium {workflowStatus({
+      status,
+    })}"
+    class:rounded-r-none={newCount}
+  >
+    <span class="">
+      {#if loading}
+        <Spinner class="h-4 w-4 animate-spin" />
+      {:else if count >= 0}
+        {count.toLocaleString()}
+      {/if}
+    </span>
+
     {label[status]}
     {#if status === 'Running'}
       <HeartBeat {delay} />
@@ -87,14 +95,10 @@
   </span>
   {#if newCount}
     <span
-      class="absolute -right-2 -top-[10px] flex h-4 flex-col items-center justify-center rounded-full border border-gray-900 bg-white px-0.5 text-[10px] text-gray-900"
-      >{newCount > 0 ? '+' : ''}{newCount}</span
+      class="font-base rounded-r bg-white p-1 text-xs text-gray-900"
+      in:fade
     >
+      {#if newCount > 0}+{/if}{newCount}
+    </span>
   {/if}
 </div>
-
-<style lang="postcss">
-  .count {
-    @apply px-1;
-  }
-</style>

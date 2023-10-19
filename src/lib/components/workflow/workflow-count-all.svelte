@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { translate } from '$lib/i18n/translate';
   import { loading, updating } from '$lib/stores/workflows';
 
   export let count = 0;
@@ -12,6 +11,5 @@
     data-loaded={!$loading && !$updating}
   >
     {count.toLocaleString()}
-    {translate('workflows').toLocaleLowerCase()}
   </p>
 </div>
