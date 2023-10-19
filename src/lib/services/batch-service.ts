@@ -113,6 +113,7 @@ export async function batchCancelWorkflows(
 ): Promise<void> {
   const route = routeForApi('batch-operations', {
     namespace: options.namespace,
+    batchJobId: options.jobId,
   });
 
   const body: StartBatchOperationRequest = createBatchOperationRequest(
@@ -139,6 +140,7 @@ export async function batchTerminateWorkflows(
 ): Promise<void> {
   const route = routeForApi('batch-operations', {
     namespace: options.namespace,
+    batchJobId: options.jobId,
   });
 
   const body = createBatchOperationRequest(Action.Terminate, options);
@@ -188,10 +190,10 @@ export async function describeBatchOperation(
 ): Promise<BatchOperation> {
   const route = routeForApi('batch-operation.describe', {
     namespace,
+    batchJobId: jobId,
   });
 
   const response = await requestFromAPI<DescribeBatchOperationResponse>(route, {
-    params: { jobId },
     request,
   });
 
@@ -226,6 +228,7 @@ export async function listBatchOperations(
 ): Promise<BatchOperations> {
   const route = routeForApi('batch-operations', {
     namespace,
+    batchJobId: '',
   });
 
   const response = await requestFromAPI<ListBatchOperationsResponse>(route, {

@@ -52,7 +52,7 @@ describe('Batch Service', () => {
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
       expect(requestFromAPI).toHaveBeenCalledWith(
-        'http://localhost:8233/api/v1/namespaces/default/batch-operations',
+        'http://localhost:8233/api/v1/namespaces/default/batch-operations/xxx',
         {
           notifyOnError: false,
           options: {
@@ -73,7 +73,7 @@ describe('Batch Service', () => {
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
       expect(requestFromAPI).toHaveBeenCalledWith(
-        'http://localhost:8233/api/v1/namespaces/default/batch-operations',
+        'http://localhost:8233/api/v1/namespaces/default/batch-operations/xxx',
         {
           notifyOnError: false,
           options: {
@@ -102,7 +102,7 @@ describe('Batch Service', () => {
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
       expect(requestFromAPI).toHaveBeenCalledWith(
-        'http://localhost:8233/api/v1/namespaces/default/batch-operations',
+        'http://localhost:8233/api/v1/namespaces/default/batch-operations/xxx',
         {
           notifyOnError: false,
           options: {
@@ -123,7 +123,7 @@ describe('Batch Service', () => {
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
       expect(requestFromAPI).toHaveBeenCalledWith(
-        'http://localhost:8233/api/v1/namespaces/default/batch-operations',
+        'http://localhost:8233/api/v1/namespaces/default/batch-operations/xxx',
         {
           notifyOnError: false,
           options: {

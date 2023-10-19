@@ -207,8 +207,14 @@ export async function fetchWorkflow(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<WorkflowExecution> {
-  const route = routeForApi('workflow', parameters);
-  return requestFromAPI(route, { request }).then(toWorkflowExecution);
+  const route = routeForApi('workflow', {
+    namespace: parameters.namespace,
+    workflowId: parameters.workflowId,
+  });
+  return requestFromAPI(route, {
+    request,
+    params: { runId: parameters.runId },
+  }).then(toWorkflowExecution);
 }
 
 export async function terminateWorkflow({
@@ -220,7 +226,6 @@ export async function terminateWorkflow({
   const route = routeForApi('workflow.terminate', {
     namespace,
     workflowId: workflow.id,
-    runId: workflow.runId,
   });
   return await requestFromAPI<null>(route, {
     options: {
@@ -228,6 +233,9 @@ export async function terminateWorkflow({
       body: stringifyWithBigInt({ reason, ...(identity && { identity }) }),
     },
     notifyOnError: false,
+    params: {
+      runId: workflow.runId,
+    },
   });
 }
 
@@ -238,7 +246,6 @@ export async function cancelWorkflow(
   const route = routeForApi('workflow.cancel', {
     namespace,
     workflowId,
-    runId,
   });
 
   return requestFromAPI(route, {
@@ -246,6 +253,9 @@ export async function cancelWorkflow(
     notifyOnError: false,
     options: {
       method: 'POST',
+    },
+    params: {
+      runId,
     },
   });
 }
@@ -262,7 +272,6 @@ export async function signalWorkflow({
   const route = routeForApi('workflow.signal', {
     namespace,
     workflowId,
-    runId,
   });
 
   let payloads = null;
@@ -303,6 +312,9 @@ export async function signalWorkflow({
         input: {
           payloads,
         },
+        params: {
+          runId,
+        },
       }),
     },
   });
@@ -319,7 +331,6 @@ export async function resetWorkflow({
   const route = routeForApi('workflow.reset', {
     namespace,
     workflowId,
-    runId,
   });
 
   const body: Replace<
@@ -341,6 +352,9 @@ export async function resetWorkflow({
     options: {
       method: 'POST',
       body: stringifyWithBigInt(body),
+    },
+    params: {
+      runId,
     },
   });
 }
