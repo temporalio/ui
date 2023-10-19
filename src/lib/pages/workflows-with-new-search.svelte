@@ -56,8 +56,10 @@
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
+  import WorkflowCountNew from '$lib/components/workflow/workflow-count-new.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
+  import Spinner from '$lib/holocene/icon/svg/spinner.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -206,8 +208,13 @@
 <header class="flex flex-col">
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-2xl" data-cy="workflows-title">
+      <h1 class="flex items-center gap-2 text-2xl" data-cy="workflows-title">
         <Translate namespace="workflows" key="recent-workflows" />
+        {#if $loading || $updating}
+          <Spinner class="h-8 w-8 animate-spin" />
+        {:else}
+          <WorkflowCountNew count={$workflowCount.newTotalCount} />
+        {/if}
       </h1>
       <div class="flex items-center gap-2 text-sm">
         {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !$groupByCountEnabled}

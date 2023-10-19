@@ -1,30 +1,37 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
+
   import { page } from '$app/stores';
 
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
-  import { workflowFilters } from '$lib/stores/filters';
   import {
+    loading,
     refresh,
+    updating,
     workflowCount,
-    workflowsQuery,
   } from '$lib/stores/workflows';
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { decodePayload } from '$lib/utilities/decode-payload';
 
   import WorkflowCountAll from './workflow-count-all.svelte';
-  import WorkflowCountNew from './workflow-count-new.svelte';
   import WorkflowCountStatus from './workflow-count-status.svelte';
 
   $: namespace = $page.params.namespace;
+  $: query = $page.url.searchParams.get('query');
+
   let statusGroups: { status: WorkflowStatus; count: number }[] = [];
   let newStatusGroups: { status: WorkflowStatus; count: number }[] = [];
   let refreshInterval: ReturnType<typeof setInterval>;
   const refreshRate = 5000;
 
+  onDestroy(() => {
+    clearNewCounts();
+  });
+
   const clearNewCounts = () => {
+    clearInterval(refreshInterval);
     newStatusGroups = [];
     $workflowCount.newTotalCount = 0;
-    refreshInterval = setInterval(() => fetchNewCounts(), refreshRate);
   };
 
   const getStatusAndCountOfGroup = (groups = []) => {
@@ -43,36 +50,46 @@
   const fetchNewCounts = async () => {
     const { count, groups } = await fetchWorkflowCountByExecutionStatus({
       namespace,
-      filters: $workflowFilters,
+      query,
     });
     $workflowCount.newTotalCount = parseInt(count) - $workflowCount.totalCount;
     newStatusGroups = getStatusAndCountOfGroup(groups);
   };
 
   const fetchCounts = async () => {
-    clearInterval(refreshInterval);
     clearNewCounts();
+    refreshInterval = setInterval(() => fetchNewCounts(), refreshRate);
     const { count, groups } = await fetchWorkflowCountByExecutionStatus({
       namespace,
-      filters: $workflowFilters,
+      query,
     });
     $workflowCount.totalCount = parseInt(count);
-    statusGroups = getStatusAndCountOfGroup(groups);
+    statusGroups = groups.map((group) => {
+      const status = decodePayload(
+        group?.groupValues[0],
+      ) as unknown as WorkflowStatus;
+      const count = parseInt(group.count);
+      return {
+        status,
+        count,
+      };
+    });
   };
 
-  $: $workflowsQuery, namespace, $refresh, fetchCounts();
+  $: query, namespace, $refresh, fetchCounts();
 </script>
 
-<div class="flex flex-wrap items-center gap-2">
-  <WorkflowCountAll count={$workflowCount.totalCount} />
-  <WorkflowCountNew count={$workflowCount.newTotalCount} />
-  {#each statusGroups as { count, status } (status)}
-    <WorkflowCountStatus
-      {status}
-      {count}
-      newCount={newStatusGroups.find((g) => g?.status === status)?.count
-        ? newStatusGroups.find((g) => g?.status === status)?.count - count
-        : undefined}
-    />
-  {/each}
+<div class="flex h-6 flex-wrap items-center gap-2">
+  {#if !$loading && !$updating}
+    <WorkflowCountAll count={$workflowCount.totalCount} />
+    {#each statusGroups as { count, status } (status)}
+      <WorkflowCountStatus
+        {status}
+        {count}
+        newCount={newStatusGroups.find((g) => g.status === status)
+          ? newStatusGroups.find((g) => g.status === status).count - count
+          : 0}
+      />
+    {/each}
+  {/if}
 </div>

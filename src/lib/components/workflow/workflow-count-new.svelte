@@ -1,6 +1,5 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Spinner from '$lib/holocene/icon/svg/spinner.svelte';
   import { translate } from '$lib/i18n/translate';
   import { loading, refresh, updating } from '$lib/stores/workflows';
 
@@ -16,9 +15,7 @@
     data-testid="workflow-count"
     data-loaded={!$loading && !$updating}
   >
-    {#if $loading || $updating}
-      <Spinner class="h-4 w-4 animate-spin" />
-    {:else if count > 0}
+    {#if count > 0}
       {count.toLocaleString()} {translate('new')}
     {/if}
     <Icon name="retry" clas="h-2 w-2" />
