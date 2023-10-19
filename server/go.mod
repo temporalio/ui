@@ -1,6 +1,6 @@
 module github.com/temporalio/ui-server/v2
 
-go 1.18
+go 1.20
 
 replace go.temporal.io/api => github.com/tdeebswihart/temporal-api-go v0.0.0-20231019182247-c5ba53ce90c3
 
