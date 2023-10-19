@@ -154,7 +154,7 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 			version.WithVersionHeader(c),
 			// This is necessary to get error details properly
 			// marshalled in unary requests.
-			runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
+			runtime.WithProtoErrorHandler(protoErrorHandler),
 		)...,
 	)
 
@@ -176,4 +176,23 @@ func withMarshaler() runtime.ServeMuxOption {
 	}
 
 	return runtime.WithMarshalerOption(runtime.MIMEWildcard, jsonpb)
+}
+
+type remappingResponseWriter struct {
+	http.ResponseWriter
+}
+
+func (r *remappingResponseWriter) WriteHeader(statusCode int) {
+	if statusCode == http.StatusNotImplemented {
+		statusCode = http.StatusNotFound
+	}
+
+	r.ResponseWriter.WriteHeader(statusCode)
+}
+
+func protoErrorHandler(ctx context.Context, mux *runtime.ServeMux, m runtime.Marshaler, w http.ResponseWriter, req *http.Request, err error) {
+	rw := &remappingResponseWriter{
+		ResponseWriter: w,
+	}
+	runtime.DefaultHTTPProtoErrorHandler(ctx, mux, m, rw, req, err)
 }
