@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getExponentialBackoffSeconds } from './refresh-rate';
 
-describe('pick', () => {
+describe('getExponentialBackoffSeconds', () => {
   it('should get initial backoff interval of 5 seconds', () => {
     expect(getExponentialBackoffSeconds(5, 1, 100)).toEqual(5);
   });
