@@ -5,7 +5,7 @@ import { mockWorkflowsApis } from '~/test-utilities/mock-apis';
 const workflowsUrl = '/namespaces/default/workflows';
 
 test.beforeEach(async ({ page }) => {
-  await mockWorkflowsApis(page, false);
+  await mockWorkflowsApis(page);
 });
 
 test('it displays the namespace', async ({ page }) => {
