@@ -35,7 +35,7 @@
   const setBackoffInterval = () => {
     attempt += 1;
     clearInterval(refreshInterval);
-    if (attempt <= 100) {
+    if (attempt <= maxAttempts) {
       const interval =
         getExponentialBackoffSeconds(
           initialIntervalSeconds,
