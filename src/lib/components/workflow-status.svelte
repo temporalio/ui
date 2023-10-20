@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fade } from 'svelte/transition';
+
   import { cva } from 'class-variance-authority';
 
   import Spinner from '$lib/holocene/icon/svg/spinner.svelte';
@@ -15,6 +17,7 @@
   export let status: Status = 'Running';
   export let count: number | undefined = undefined;
   export let loading = false;
+  export let newCount: number | undefined = undefined;
 
   const label: Record<Status, string> = {
     Running: translate('workflows.running'),
@@ -67,24 +70,32 @@
 </script>
 
 <div
-  class="flex text-center text-sm font-medium leading-4"
+  class="relative flex items-center gap-0 text-center text-sm leading-4"
   data-testid={$$props['test-id']}
 >
-  <span class={workflowStatus({ status })} class:count>
+  <span
+    class="flex items-center gap-1 font-mono font-medium {workflowStatus({
+      status,
+    })}"
+    class:rounded-r-none={newCount}
+  >
     {#if loading}
       <Spinner class="h-4 w-4 animate-spin" />
-    {:else if count}
+    {:else if count >= 0}
       {count.toLocaleString()}
     {/if}
+
     {label[status]}
     {#if status === 'Running'}
       <HeartBeat {delay} />
     {/if}
   </span>
+  {#if newCount}
+    <span
+      class="font-base rounded-r bg-white px-1 py-0.5 text-xs text-gray-900"
+      in:fade
+    >
+      {#if newCount > 0}+{/if}{newCount}
+    </span>
+  {/if}
 </div>
-
-<style lang="postcss">
-  .count {
-    @apply px-1;
-  }
-</style>

@@ -6,11 +6,13 @@
 
   export let status: Status;
   export let count = 0;
+  export let newCount = 0;
 </script>
 
 <WorkflowStatus
   loading={$loading || $updating}
   {count}
+  {newCount}
   {status}
   test-id="workflow-status-{status}"
 />

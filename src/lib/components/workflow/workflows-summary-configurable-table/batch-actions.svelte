@@ -13,7 +13,7 @@
     selectedWorkflows,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
-  import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
+  import { workflowCount } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
@@ -21,14 +21,7 @@
   export let workflows: WorkflowExecution[];
 
   let coreUser = coreUserStore();
-  let workflowsCount: number;
   let selectedWorkflowsCount: number;
-
-  $: {
-    workflowsCount = $workflowsQuery
-      ? $workflowCount.count
-      : $workflowCount.totalCount;
-  }
 
   $: {
     selectedWorkflowsCount = $selectedWorkflows?.length ?? 0;
@@ -43,7 +36,7 @@
 
 {#if $allSelected}
   <span class="font-semibold">
-    <Translate key="workflows.all-selected" count={workflowsCount} />
+    <Translate key="workflows.all-selected" count={$workflowCount.count} />
   </span>
 {:else}
   <span class="font-semibold"
@@ -57,7 +50,10 @@
       data-testid="select-all-workflows"
       on:click={() => handleSelectAll(workflows)}
       class="cursor-pointer underline"
-      ><Translate key="workflows.select-all" count={workflowsCount} /></button
+      ><Translate
+        key="workflows.select-all"
+        count={$workflowCount.count}
+      /></button
     >)
   </span>
 {/if}

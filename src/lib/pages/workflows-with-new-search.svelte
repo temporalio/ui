@@ -56,10 +56,9 @@
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
+  import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
-  import Spinner from '$lib/holocene/icon/svg/spinner.svelte';
-  import IconButton from '$lib/holocene/icon-button.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -77,8 +76,6 @@
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
   import {
-    loading,
-    refresh,
     updating,
     workflowCount,
     workflows,
@@ -104,7 +101,6 @@
       $workflowsQuery = '';
     }
   }
-
   const persistTimeFilter = () => {
     if (!query && !$workflowFilters.length && $persistedTimeFilter) {
       $workflowFilters = [$persistedTimeFilter];
@@ -128,11 +124,6 @@
     $allSelected = false;
     $pageSelected = false;
     $selectedWorkflows = [];
-  };
-
-  const refreshWorkflows = () => {
-    resetSelection();
-    $refresh = Date.now();
   };
 
   const terminateWorkflows = async (
@@ -212,47 +203,25 @@
   on:confirm={cancelWorkflows}
 />
 
-<header class="flex flex-col">
+<header class="flex flex-col gap-2">
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="flex items-center text-2xl" data-cy="workflows-title">
-        <Translate key="workflows.recent-workflows" />
-        {#if $loading || $updating}
-          <Spinner class="h-8 w-8 animate-spin" />
+      <h1 class="flex items-center gap-2 text-2xl" data-cy="workflows-title">
+        {#if $supportsAdvancedVisibility}
+          <span data-testid="workflow-count"
+            >{$workflowCount.count.toLocaleString()}</span
+          >
+          <Translate key="common.workflows" />
+        {:else}
+          <Translate key="workflows.recent-workflows" />
         {/if}
+        <WorkflowCountRefresh count={$workflowCount.newCount} />
       </h1>
-      <div class="flex items-center gap-2 text-sm">
-        {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !$groupByCountEnabled}
-          <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
-            {#if $loading || $updating}
-              <Translate key="workflows.loading-workflows" />
-            {:else if query}
-              <Translate
-                key="workflows.filtered-workflows-count"
-                replace={{
-                  filtered: $workflowCount.count,
-                  total: $workflowCount.totalCount,
-                }}
-              />
-            {:else}
-              <Translate
-                key="workflows.workflows-count"
-                count={$workflowCount.totalCount}
-              />
-            {/if}
-          </p>
-        {/if}
-      </div>
     </div>
     <div class="flex items-center gap-2 text-sm">
       <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
         >{translate('common.download-json')}</Link
       >
-      <IconButton
-        icon="retry"
-        label={translate('workflows.retry-workflows')}
-        on:click={refreshWorkflows}
-      />
     </div>
   </div>
   {#if $groupByCountEnabled}
