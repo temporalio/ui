@@ -13,6 +13,7 @@
   } from '$lib/stores/workflows';
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { decodePayload } from '$lib/utilities/decode-payload';
+  import { getExpotentialBackoffSeconds } from '$lib/utilities/refresh-rate';
 
   import WorkflowCountStatus from './workflow-count-status.svelte';
 
@@ -22,16 +23,27 @@
   let statusGroups: { status: WorkflowStatus; count: number }[] = [];
   let newStatusGroups: { status: WorkflowStatus; count: number }[] = [];
   let refreshInterval: ReturnType<typeof setInterval>;
-  const refreshRate = 7500;
+
+  let attempt = 1;
+  const initialIntervalSeconds = 5;
 
   onDestroy(() => {
     clearNewCounts();
   });
 
+  const setBackoffInterval = () => {
+    clearInterval(refreshInterval);
+    const interval =
+      getExpotentialBackoffSeconds(initialIntervalSeconds, attempt) * 1000;
+    refreshInterval = setInterval(() => fetchNewCounts(), interval);
+    attempt += 1;
+  };
+
   const clearNewCounts = () => {
     clearInterval(refreshInterval);
     newStatusGroups = [];
     $workflowCount.newTotalCount = 0;
+    attempt = 1;
   };
 
   const getStatusAndCountOfGroup = (groups = []) => {
@@ -54,11 +66,15 @@
     });
     $workflowCount.newTotalCount = parseInt(count) - $workflowCount.totalCount;
     newStatusGroups = getStatusAndCountOfGroup(groups);
+    setBackoffInterval();
   };
 
   const fetchCounts = async () => {
     clearNewCounts();
-    refreshInterval = setInterval(() => fetchNewCounts(), refreshRate);
+    refreshInterval = setInterval(
+      () => fetchNewCounts(),
+      initialIntervalSeconds * 1000,
+    );
     const { count, groups } = await fetchWorkflowCountByExecutionStatus({
       namespace,
       query,
