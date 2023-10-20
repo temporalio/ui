@@ -1,4 +1,4 @@
-export const getExpotentialBackoffSeconds = (
+export const getExponentialBackoffSeconds = (
   initialIntervalSeconds: number,
   attempt: number,
 ): number => {
@@ -8,11 +8,11 @@ export const getExpotentialBackoffSeconds = (
     maxIntervalSeconds / initialIntervalSeconds,
     1 / maxAttempts,
   );
-  const expotentialBackoff =
+  const exponentialBackoff =
     initialIntervalSeconds * Math.pow(growthFactor, attempt);
   const intervalSeconds = Math.min(
     maxIntervalSeconds,
-    Math.round(expotentialBackoff),
+    Math.round(exponentialBackoff),
   );
   return intervalSeconds;
 };

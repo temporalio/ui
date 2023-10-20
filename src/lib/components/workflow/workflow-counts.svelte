@@ -13,7 +13,7 @@
   } from '$lib/stores/workflows';
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { decodePayload } from '$lib/utilities/decode-payload';
-  import { getExpotentialBackoffSeconds } from '$lib/utilities/refresh-rate';
+  import { getExponentialBackoffSeconds } from '$lib/utilities/refresh-rate';
 
   import WorkflowCountStatus from './workflow-count-status.svelte';
 
@@ -34,7 +34,7 @@
   const setBackoffInterval = () => {
     clearInterval(refreshInterval);
     const interval =
-      getExpotentialBackoffSeconds(initialIntervalSeconds, attempt) * 1000;
+      getExponentialBackoffSeconds(initialIntervalSeconds, attempt) * 1000;
     refreshInterval = setInterval(() => fetchNewCounts(), interval);
     attempt += 1;
   };
