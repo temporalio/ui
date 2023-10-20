@@ -95,16 +95,7 @@
         query,
       });
       $workflowCount.count = parseInt(count);
-      statusGroups = groups.map((group) => {
-        const status = decodePayload(
-          group?.groupValues[0],
-        ) as unknown as WorkflowStatus;
-        const count = parseInt(group.count);
-        return {
-          status,
-          count,
-        };
-      });
+      statusGroups = getStatusAndCountOfGroup(groups);
     } catch (e) {
       console.error('Fetching workflow counts failed: ', e?.message);
     }
