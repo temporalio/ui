@@ -4,34 +4,34 @@ import { getExponentialBackoffSeconds } from './refresh-rate';
 
 describe('pick', () => {
   it('should get initial backoff interval of 5 seconds', () => {
-    expect(getExponentialBackoffSeconds(5, 1)).toEqual(5);
+    expect(getExponentialBackoffSeconds(5, 1, 100)).toEqual(5);
   });
 
   it('should get backoff interval of 6 seconds on attempt 2', () => {
-    expect(getExponentialBackoffSeconds(5, 2)).toEqual(6);
+    expect(getExponentialBackoffSeconds(5, 2, 100)).toEqual(6);
   });
 
   it('should get backoff interval of 6 seconds on attempt 3', () => {
-    expect(getExponentialBackoffSeconds(5, 3)).toEqual(6);
+    expect(getExponentialBackoffSeconds(5, 3, 100)).toEqual(6);
   });
 
   it('should get backoff interval of 10 seconds on attempt 10', () => {
-    expect(getExponentialBackoffSeconds(5, 10)).toEqual(10);
+    expect(getExponentialBackoffSeconds(5, 10, 100)).toEqual(10);
   });
 
   it('should get backoff interval of 19 seconds on attempt 20', () => {
-    expect(getExponentialBackoffSeconds(5, 20)).toEqual(19);
+    expect(getExponentialBackoffSeconds(5, 20, 100)).toEqual(19);
   });
 
   it('should get backoff interval of 134 seconds on attempt 50', () => {
-    expect(getExponentialBackoffSeconds(5, 50)).toEqual(134);
+    expect(getExponentialBackoffSeconds(5, 50, 100)).toEqual(134);
   });
 
   it('should get max backoff interval of one hour on attempt 100', () => {
-    expect(getExponentialBackoffSeconds(5, 100)).toEqual(3600);
+    expect(getExponentialBackoffSeconds(5, 100, 100)).toEqual(3600);
   });
 
   it('should still get max backoff interval of one hour on attempt 1000', () => {
-    expect(getExponentialBackoffSeconds(5, 1000)).toEqual(3600);
+    expect(getExponentialBackoffSeconds(5, 1000, 100)).toEqual(3600);
   });
 });

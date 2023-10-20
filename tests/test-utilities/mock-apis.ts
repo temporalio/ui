@@ -59,12 +59,16 @@ export const mockGlobalApis = (page: Page) => {
 };
 
 export const mockWorkflowsApis = (page: Page) => {
-  return Promise.all([
+  const apis = [
     mockGlobalApis(page),
     mockWorkflowsApi(page),
     mockSearchAttributesApi(page),
     mockWorkflowsCountApi(page),
-  ]);
+  ];
+  // if (includeCount) {
+  //   apis.push(mockWorkflowsCountApi(page));
+  // }
+  return Promise.all(apis);
 };
 
 export const mockNamespaceApis = (page: Page) => {

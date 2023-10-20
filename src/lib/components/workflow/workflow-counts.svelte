@@ -26,23 +26,30 @@
 
   let attempt = 1;
   const initialIntervalSeconds = 5;
+  const maxAttempts = 100;
 
   onDestroy(() => {
     clearNewCounts();
   });
 
   const setBackoffInterval = () => {
-    clearInterval(refreshInterval);
-    const interval =
-      getExponentialBackoffSeconds(initialIntervalSeconds, attempt) * 1000;
-    refreshInterval = setInterval(() => fetchNewCounts(), interval);
     attempt += 1;
+    clearInterval(refreshInterval);
+    if (attempt <= 100) {
+      const interval =
+        getExponentialBackoffSeconds(
+          initialIntervalSeconds,
+          attempt,
+          maxAttempts,
+        ) * 1000;
+      refreshInterval = setInterval(() => fetchNewCounts(), interval);
+    }
   };
 
   const clearNewCounts = () => {
     clearInterval(refreshInterval);
     newStatusGroups = [];
-    $workflowCount.newTotalCount = 0;
+    $workflowCount.newCount = 0;
     attempt = 1;
   };
 
@@ -60,36 +67,47 @@
   };
 
   const fetchNewCounts = async () => {
-    const { count, groups } = await fetchWorkflowCountByExecutionStatus({
-      namespace,
-      query,
-    });
-    $workflowCount.newTotalCount = parseInt(count) - $workflowCount.totalCount;
-    newStatusGroups = getStatusAndCountOfGroup(groups);
     setBackoffInterval();
+    try {
+      const { count, groups } = await fetchWorkflowCountByExecutionStatus({
+        namespace,
+        query,
+      });
+      $workflowCount.newCount = parseInt(count) - $workflowCount.count;
+      newStatusGroups = getStatusAndCountOfGroup(groups);
+    } catch (e) {
+      console.error('Fetching workflow counts failed: ', e?.message);
+    }
   };
 
   const fetchCounts = async () => {
     clearNewCounts();
-    refreshInterval = setInterval(
-      () => fetchNewCounts(),
-      initialIntervalSeconds * 1000,
-    );
-    const { count, groups } = await fetchWorkflowCountByExecutionStatus({
-      namespace,
-      query,
-    });
-    $workflowCount.totalCount = parseInt(count);
-    statusGroups = groups.map((group) => {
-      const status = decodePayload(
-        group?.groupValues[0],
-      ) as unknown as WorkflowStatus;
-      const count = parseInt(group.count);
-      return {
-        status,
-        count,
-      };
-    });
+    const interval =
+      getExponentialBackoffSeconds(
+        initialIntervalSeconds,
+        attempt,
+        maxAttempts,
+      ) * 1000;
+    refreshInterval = setInterval(() => fetchNewCounts(), interval);
+    try {
+      const { count, groups } = await fetchWorkflowCountByExecutionStatus({
+        namespace,
+        query,
+      });
+      $workflowCount.count = parseInt(count);
+      statusGroups = groups.map((group) => {
+        const status = decodePayload(
+          group?.groupValues[0],
+        ) as unknown as WorkflowStatus;
+        const count = parseInt(group.count);
+        return {
+          status,
+          count,
+        };
+      });
+    } catch (e) {
+      console.error('Fetching workflow counts failed: ', e?.message);
+    }
   };
 
   $: query, namespace, $refresh, fetchCounts();

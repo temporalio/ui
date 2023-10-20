@@ -32,13 +32,9 @@ test.describe('Workflows List with Counts when countGroupByExecutionStatus is di
 
   test.describe('Shows total count and result count', () => {
     test('Results of workflows ', async ({ page }) => {
-      await page.waitForSelector(
-        '[data-testid="workflow-count"][data-loaded="true"]',
-      );
+      await page.waitForSelector('[data-testid="workflow-count"]');
 
-      await expect(page.getByTestId('workflow-count')).toHaveText(
-        '15 workflows',
-      );
+      await expect(page.getByTestId('workflow-count')).toHaveText('15');
 
       await page.fill('#manual-search', 'WorkflowType="ImportantWorkflowType"');
       await page.click('[data-testid="manual-search-button"]');
@@ -50,13 +46,9 @@ test.describe('Workflows List with Counts when countGroupByExecutionStatus is di
       await page.getByTestId('workflow-type-filter-button').click();
       const workflowTypeValue = await page.inputValue('#workflow-type');
       expect(workflowTypeValue).toBe('ImportantWorkflowType');
-      await page.waitForSelector(
-        '[data-testid="workflow-count"][data-loaded="true"]',
-      );
+      await page.waitForSelector('[data-testid="workflow-count"]');
 
-      await expect(page.getByTestId('workflow-count')).toHaveText(
-        'Results 15 of 15 workflows',
-      );
+      await expect(page.getByTestId('workflow-count')).toHaveText('15');
     });
   });
 });
@@ -64,27 +56,21 @@ test.describe('Workflows List with Counts when countGroupByExecutionStatus is di
 test.describe('Workflows List with Counts when countGroupByExecutionStatus is enabled', () => {
   test.beforeEach(async ({ page }) => {
     await mockWorkflowsApis(page);
-    await mockWorkflowApis(page);
-
     await mockClusterApi(page, {
       visibilityStore: 'elasticsearch',
       persistenceStore: 'postgres,elasticsearch',
     });
+    await mockWorkflowsGroupByCountApi(page);
 
     page.goto('/namespaces/default/workflows');
 
-    await mockWorkflowsGroupByCountApi(page);
     await waitForWorkflowsApis(page);
   });
 
   test.describe('Shows only result count', () => {
     test('Counts of workflows ', async ({ page }) => {
-      await page.waitForSelector(
-        '[data-testid="workflow-count"][data-loaded="true"]',
-      );
-      await expect(page.getByTestId('workflow-count')).toHaveText(
-        '31,230 workflows',
-      );
+      await page.waitForSelector('[data-testid="workflow-count"]');
+      await expect(page.getByTestId('workflow-count')).toHaveText('31,230');
       await expect(page.getByTestId('workflow-status-Running')).toHaveText(
         '6 Running',
       );

@@ -76,7 +76,6 @@
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
   import {
-    loading,
     updating,
     workflowCount,
     workflows,
@@ -208,32 +207,16 @@
   <div class="flex items-center justify-between">
     <div>
       <h1 class="flex items-center gap-2 text-2xl" data-cy="workflows-title">
-        {$workflowCount.totalCount.toLocaleString()}
-        <Translate key="common.workflows" />
-        <WorkflowCountRefresh count={$workflowCount.newTotalCount} />
-      </h1>
-      <div class="flex items-center gap-2 text-sm">
-        {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility && !$groupByCountEnabled}
-          <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
-            {#if $loading || $updating}
-              <Translate key="workflows.loading-workflows" />
-            {:else if query}
-              <Translate
-                key="workflows.filtered-workflows-count"
-                replace={{
-                  filtered: $workflowCount.count,
-                  total: $workflowCount.totalCount,
-                }}
-              />
-            {:else}
-              <Translate
-                key="workflows.workflows-count"
-                count={$workflowCount.totalCount}
-              />
-            {/if}
-          </p>
+        {#if $supportsAdvancedVisibility}
+          <span data-testid="workflow-count"
+            >{$workflowCount.count.toLocaleString()}</span
+          >
+          <Translate key="common.workflows" />
+        {:else}
+          <Translate key="workflows.recent-workflows" />
         {/if}
-      </div>
+        <WorkflowCountRefresh count={$workflowCount.newCount} />
+      </h1>
     </div>
     <div class="flex items-center gap-2 text-sm">
       <Link tabindex={0} on:click={() => exportWorkflows($workflows)}

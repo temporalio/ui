@@ -36,9 +36,7 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await page.getByTestId('workflow-type-filter-button').click();
       const workflowTypeValue = await page.inputValue('#workflow-type');
       expect(workflowTypeValue).toBe('ImportantWorkflowType');
-      await page.waitForSelector(
-        '[data-testid="workflow-count"][data-loaded="true"]',
-      );
+      await page.waitForSelector('[data-testid="workflow-count"]');
     });
   });
 
@@ -151,9 +149,7 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await page.getByTestId('back-to-workflows').click();
       await expect(page).toHaveURL(/ExecutionStatus%3D%22Running%22/);
 
-      await page.waitForSelector(
-        '[data-testid="workflow-count"][data-loaded="true"]',
-      );
+      await page.waitForSelector('[data-testid="workflow-count"]');
     });
 
     test('keeps workflow datetime filter after navigating away and back to workflow list', async ({

@@ -45,8 +45,8 @@ const parameters = derived(
   },
 );
 
-const setCounts = (_workflowCount: { totalCount: number; count: number }) => {
-  workflowCount.set({ ..._workflowCount, newTotalCount: 0 });
+const setCounts = (_workflowCount: { count: number }) => {
+  workflowCount.set({ ..._workflowCount, newCount: 0 });
 };
 
 const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
@@ -89,8 +89,7 @@ export const updating = writable(true);
 export const loading = writable(true);
 export const workflowCount = writable({
   count: 0,
-  totalCount: 0,
-  newTotalCount: 0,
+  newCount: 0,
 });
 export const workflowError = writable('');
 export const workflows = readable<WorkflowExecution[]>([], updateWorkflows);
