@@ -2,8 +2,6 @@ module github.com/temporalio/ui-server/v2
 
 go 1.20
 
-replace go.temporal.io/api => github.com/tdeebswihart/temporal-api-go v0.0.0-20231019182247-c5ba53ce90c3
-
 require (
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/gogo/gateway v1.1.0
@@ -12,7 +10,7 @@ require (
 	github.com/labstack/echo/v4 v4.9.1
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli/v2 v2.3.0
-	go.temporal.io/api v1.24.0
+	go.temporal.io/api v1.24.1-0.20231020155655-224b196919ea
 	golang.org/x/net v0.17.0
 	golang.org/x/oauth2 v0.11.0
 	google.golang.org/grpc v1.59.0

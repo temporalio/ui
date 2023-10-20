@@ -67,8 +67,6 @@ github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
-github.com/tdeebswihart/temporal-api-go v0.0.0-20231019182247-c5ba53ce90c3 h1:yEODnLlsvQwOdDwiFZHim86ktBVJPJ7YG2BCdEUpWAo=
-github.com/tdeebswihart/temporal-api-go v0.0.0-20231019182247-c5ba53ce90c3/go.mod h1:LTJM9iMOIuiE5hRtym4Ne6I4rKlDGioUiscdD9D6N2Y=
 github.com/temporalio/grpc-gateway v1.17.0 h1:OTX4OP39TfV4/FSo9OkeF7g8KkirDlhu8dmELzRdRvk=
 github.com/temporalio/grpc-gateway v1.17.0/go.mod h1:ahEN4bs7da8rI4DJqn1xL0d83Djiau/rnZUztjeGdOI=
 github.com/urfave/cli/v2 v2.3.0 h1:qph92Y649prgesehzOrQjdWyxFOp/QVM+6imKHad91M=
@@ -79,6 +77,8 @@ github.com/valyala/fasttemplate v1.2.1 h1:TVEnxayobAdVkhQfrfes2IzOB6o+z4roRkPF52
 github.com/valyala/fasttemplate v1.2.1/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
+go.temporal.io/api v1.24.1-0.20231020155655-224b196919ea h1:cTq1Fqv4SKCvYuvkF3ZdkLxYgECwGEeCzRqcr4qjRd4=
+go.temporal.io/api v1.24.1-0.20231020155655-224b196919ea/go.mod h1:LTJM9iMOIuiE5hRtym4Ne6I4rKlDGioUiscdD9D6N2Y=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
