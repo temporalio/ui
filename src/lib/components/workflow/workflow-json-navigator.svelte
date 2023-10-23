@@ -3,6 +3,7 @@
   import RangeInput from '$lib/holocene/input/range-input.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fromEventToRawEvent } from '$lib/models/event-history';
   import type { WorkflowEvents } from '$lib/types/events';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
@@ -84,7 +85,10 @@
   </div>
   {#if decodeEventHistory}
     {#key [index, decodeEventHistory]}
-      <PayloadDecoder value={events[index - 1]} let:decodedValue>
+      <PayloadDecoder
+        value={fromEventToRawEvent(events[index - 1])}
+        let:decodedValue
+      >
         <CodeBlock
           content={decodedValue}
           testId="event-history-json"
@@ -96,7 +100,11 @@
   {:else}
     {#key index}
       <CodeBlock
-        content={stringifyWithBigInt(events[index - 1], undefined, 2)}
+        content={stringifyWithBigInt(
+          fromEventToRawEvent(events[index - 1]),
+          undefined,
+          2,
+        )}
         testId="event-history-json"
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
