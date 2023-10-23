@@ -146,4 +146,5 @@ export const Strings = {
   'auto-refresh': 'Auto refresh',
   'auto-refresh-tooltip': '{{ interval }} second page refresh',
   'view-more': 'View More...',
+  download: 'Download',
 } as const;

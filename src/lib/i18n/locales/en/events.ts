@@ -59,4 +59,5 @@ export const Strings = {
     failed: 'Failed',
     terminated: 'Terminated',
   },
+  'decode-event-history-download': 'Decode Event History Payloads',
 } as const;

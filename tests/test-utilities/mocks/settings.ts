@@ -17,7 +17,6 @@ const defaultSettings = {
     Endpoint: '',
     PassAccessToken: false,
     IncludeCredentials: false,
-    DecodeEventHistoryDownload: false,
   },
   Version: '2.15.0',
   DisableWriteActions: false,

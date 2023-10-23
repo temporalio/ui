@@ -63,13 +63,14 @@ export const exportHistory = async ({
   workflowId,
   runId,
   settings,
+  decodeEventHistory,
 }: {
   namespace: string;
   workflowId: string;
   runId: string;
-  settings?: Settings;
+  settings: Settings;
+  decodeEventHistory: boolean;
 }) => {
-  const decodeEventHistory = settings?.codec?.decodeEventHistoryDownload;
   try {
     const rawEvents = await fetchRawEvents({
       namespace,
