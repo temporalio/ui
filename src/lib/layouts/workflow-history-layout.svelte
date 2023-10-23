@@ -190,7 +190,7 @@
   </h3>
   <div slot="content" class="flex flex-col gap-4">
     <ToggleSwitch
-      label={translate('events.decode-event-history-download')}
+      label={translate('events.decode-event-history')}
       id="decode-event-history"
       bind:checked={decodeEventHistory}
       data-testid="decode-event-history-toggle"
