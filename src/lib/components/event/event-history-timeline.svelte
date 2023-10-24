@@ -175,7 +175,7 @@
       getTimelineOptions($workflowRun.workflow),
     );
     const reverseHistory =
-      $eventFilterSort === 'descending' && $eventViewType !== 'compact';
+      $eventFilterSort === 'descending' && $eventViewType === 'feed';
     const sortedHistory = reverseHistory
       ? [...history].reverse()
       : [...history];

@@ -4,13 +4,13 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fromEventToRawEvent } from '$lib/models/event-history';
+  import { decodeEventHistory } from '$lib/stores/events';
   import type { WorkflowEvents } from '$lib/types/events';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   import PayloadDecoder from '../event/payload-decoder.svelte';
 
   export let events: WorkflowEvents = [];
-  export let decodeEventHistory: boolean;
 
   let index = 1;
 
@@ -83,8 +83,8 @@
     </div>
     <slot name="decode" />
   </div>
-  {#if decodeEventHistory}
-    {#key [index, decodeEventHistory]}
+  {#if $decodeEventHistory}
+    {#key [index, $decodeEventHistory]}
       <PayloadDecoder
         value={fromEventToRawEvent(events[index - 1])}
         let:decodedValue

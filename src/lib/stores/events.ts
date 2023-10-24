@@ -13,6 +13,7 @@ import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { isResetEvent } from '$lib/utilities/is-event-type';
 
 import { eventFilterSort } from './event-view';
+import { persistStore } from './persist-store';
 
 const namespace = derived([page], ([$page]) => {
   if ($page.params.namespace) {
@@ -86,4 +87,10 @@ export const fullEventHistory = writable<WorkflowEvents>([]);
 
 export const resetEvents = derived(fullEventHistory, (events) =>
   events.filter(isResetEvent),
+);
+
+export const decodeEventHistory = persistStore<boolean>(
+  'decodeEventHistory',
+  true,
+  true,
 );

@@ -20,8 +20,9 @@
   export let value: PotentiallyDecodable | EventAttribute | WorkflowEvent;
   export let key = '';
 
-  $: keyedValue = key && value?.[key] ? value[key] : value;
-  $: decodedValue = stringifyWithBigInt(keyedValue);
+  let keyedValue = key && value?.[key] ? value[key] : value;
+  let decodedValue = stringifyWithBigInt(keyedValue);
+
   $: endpoint = getCodecEndpoint($page.data.settings);
   $: passAccessToken = getCodecPassAccessToken($page.data.settings);
   $: includeCredentials = getCodecIncludeCredentials($page.data.settings);

@@ -21,7 +21,11 @@
     type EventSortOrder,
     eventViewType,
   } from '$lib/stores/event-view';
-  import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import {
+    decodeEventHistory,
+    eventHistory,
+    fullEventHistory,
+  } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import type { EventView } from '$lib/types/events';
@@ -34,7 +38,6 @@
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   let showShortcuts = false;
   let showDownloadPrompt = false;
-  let decodeEventHistory = true;
 
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
@@ -87,7 +90,7 @@
       workflowId: decodeURIForSvelte($workflowRun.workflow?.id),
       runId: decodeURIForSvelte($workflowRun.workflow?.runId),
       settings: $page.data.settings,
-      decodeEventHistory,
+      decodeEventHistory: $decodeEventHistory,
     });
   };
 </script>
@@ -192,7 +195,7 @@
     <ToggleSwitch
       label={translate('events.decode-event-history')}
       id="decode-event-history"
-      bind:checked={decodeEventHistory}
+      bind:checked={$decodeEventHistory}
       data-testid="decode-event-history-toggle"
     />
   </div>

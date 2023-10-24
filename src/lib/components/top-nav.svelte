@@ -28,7 +28,8 @@
     (pathNameSplit.includes('workflows') ||
       pathNameSplit.includes('schedules') ||
       pathNameSplit.includes('batch-operations') ||
-      pathNameSplit.includes('task-queues'));
+      pathNameSplit.includes('task-queues') ||
+      pathNameSplit.includes('import'));
 
   let showProfilePic = true;
 
