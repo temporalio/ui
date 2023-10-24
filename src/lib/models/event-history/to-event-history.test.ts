@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { HistoryEvent } from '$lib/types/events';
 import type { Settings } from '$lib/types/global';
 
-import { getEventAttributes, toEventHistory } from '.';
+import { fromEventToRawEvent, getEventAttributes, toEventHistory } from '.';
 
 import eventsFixture from '$fixtures/raw-events.descending.completed.json';
 import settingsFixture from '$fixtures/settings.json';
@@ -191,6 +191,30 @@ describe('toEventHistory', () => {
       const [event] = events;
 
       expect(event[property]).toBeDefined();
+    });
+  }
+});
+
+describe('fromEventToRawEvent', () => {
+  const additionalProperties = [
+    'attributes',
+    'classification',
+    'category',
+    'id',
+    'name',
+    'timestamp',
+  ];
+
+  for (const property of additionalProperties) {
+    it(`should remove a[n] ${property} property`, async () => {
+      const events = await toEventHistory(
+        eventsFixture.history.events as unknown as HistoryEvent[],
+      );
+
+      const [event] = events;
+      const rawEvent = fromEventToRawEvent(event);
+
+      expect(rawEvent[property]).toBeUndefined();
     });
   }
 });

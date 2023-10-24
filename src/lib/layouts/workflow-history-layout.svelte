@@ -10,8 +10,10 @@
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchAllEvents } from '$lib/services/events-service';
   import {
@@ -19,7 +21,11 @@
     type EventSortOrder,
     eventViewType,
   } from '$lib/stores/event-view';
-  import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import {
+    decodeEventHistory,
+    eventHistory,
+    fullEventHistory,
+  } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import type { EventView } from '$lib/types/events';
@@ -31,6 +37,7 @@
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   let showShortcuts = false;
+  let showDownloadPrompt = false;
 
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
@@ -62,7 +69,7 @@
       namespace,
       workflowId,
       runId,
-      sort: view === 'compact' ? 'ascending' : sort,
+      sort: view === 'feed' ? sort : 'ascending',
     });
   };
 
@@ -74,6 +81,17 @@
       $page.url.searchParams.delete('page');
     }
     $eventViewType = view;
+  };
+
+  const onDownloadClick = () => {
+    showDownloadPrompt = false;
+    exportHistory({
+      namespace: decodeURIForSvelte($page.params.namespace),
+      workflowId: decodeURIForSvelte($workflowRun.workflow?.id),
+      runId: decodeURIForSvelte($workflowRun.workflow?.runId),
+      settings: $page.data.settings,
+      decodeEventHistory: $decodeEventHistory,
+    });
   };
 </script>
 
@@ -145,13 +163,8 @@
           <ToggleButton
             icon="download"
             data-testid="download"
-            on:click={() =>
-              exportHistory({
-                namespace: decodeURIForSvelte($page.params.namespace),
-                workflowId: decodeURIForSvelte($workflowRun.workflow?.id),
-                runId: decodeURIForSvelte($workflowRun.workflow?.runId),
-                settings: $page.data.settings,
-              })}>{translate('workflows.download')}</ToggleButton
+            on:click={() => (showDownloadPrompt = true)}
+            >{translate('workflows.download')}</ToggleButton
           >
         </ToggleButtons>
       </div>
@@ -164,3 +177,26 @@
     onClose={() => (showShortcuts = false)}
   />
 </div>
+
+<Modal
+  id="download-history"
+  large
+  bind:open={showDownloadPrompt}
+  confirmType="primary"
+  confirmText={translate('common.download')}
+  cancelText={translate('common.cancel')}
+  on:confirmModal={() => onDownloadClick()}
+  on:cancelModal={() => (showDownloadPrompt = false)}
+>
+  <h3 slot="title">
+    {translate('common.download-json')}
+  </h3>
+  <div slot="content" class="flex flex-col gap-4">
+    <ToggleSwitch
+      label={translate('events.decode-event-history')}
+      id="decode-event-history"
+      bind:checked={$decodeEventHistory}
+      data-testid="decode-event-history-toggle"
+    />
+  </div>
+</Modal>

@@ -111,3 +111,14 @@ export const isEvent = (event: unknown): event is WorkflowEvent => {
   if (has(event, 'eventType')) return true;
   return false;
 };
+
+export const fromEventToRawEvent = (event: WorkflowEvent): HistoryEvent => {
+  const workflowEvent = { ...event };
+  delete workflowEvent.name;
+  delete workflowEvent.id;
+  delete workflowEvent.timestamp;
+  delete workflowEvent.classification;
+  delete workflowEvent.category;
+  delete workflowEvent.attributes;
+  return workflowEvent;
+};

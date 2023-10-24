@@ -20,6 +20,9 @@
   export let value: PotentiallyDecodable | EventAttribute | WorkflowEvent;
   export let key = '';
 
+  let keyedValue = key && value?.[key] ? value[key] : value;
+  let decodedValue = stringifyWithBigInt(keyedValue);
+
   $: endpoint = getCodecEndpoint($page.data.settings);
   $: passAccessToken = getCodecPassAccessToken($page.data.settings);
   $: includeCredentials = getCodecIncludeCredentials($page.data.settings);
@@ -51,15 +54,13 @@
         decodedValue = stringifyWithBigInt(decodedAttributes);
       }
     } catch (e) {
-      return stringifyWithBigInt(value);
+      console.error('Could not decode payloads');
     }
   };
 
   onMount(() => {
     decodePayloads();
   });
-
-  let decodedValue = '';
 </script>
 
 <slot {decodedValue} />

@@ -111,10 +111,9 @@ type (
 	}
 
 	Codec struct {
-		Endpoint                   string `yaml:"endpoint"`
-		PassAccessToken            bool   `yaml:"passAccessToken"`
-		IncludeCredentials         bool   `yaml:"includeCredentials"`
-		DecodeEventHistoryDownload bool   `yaml:"decodeEventHistoryDownload"`
+		Endpoint           string `yaml:"endpoint"`
+		PassAccessToken    bool   `yaml:"passAccessToken"`
+		IncludeCredentials bool   `yaml:"includeCredentials"`
 	}
 
 	Filesystem struct {
