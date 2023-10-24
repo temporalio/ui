@@ -9,6 +9,8 @@
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
+  import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
+  import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -18,6 +20,7 @@
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import Translate from '$lib/i18n/translate.svelte';
   import {
     deleteSchedule,
     fetchSchedule,
@@ -28,6 +31,7 @@
   import { coreUserStore } from '$lib/stores/core-user';
   import { loading } from '$lib/stores/schedules';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { workflowCount } from '$lib/stores/workflows';
   import type { OverlapPolicy } from '$lib/types/schedule';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { formatDate } from '$lib/utilities/format-date';
@@ -40,6 +44,7 @@
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
+  let workflowQuery = `TemporalScheduledById="${scheduleId}"`;
 
   const parameters = {
     namespace,
@@ -260,11 +265,26 @@
           <ScheduleError error={schedule?.info?.invalidScheduleError} />
         </div>
       {/if}
+      <div class="flex w-full flex-col gap-2 text-lg">
+        <div class="flex items-center gap-2">
+          <span data-testid="workflow-count"
+            >{$workflowCount.count.toLocaleString()}
+            <Translate key="common.workflows" />
+          </span>
+          <WorkflowCountRefresh
+            showLoading={false}
+            count={$workflowCount.newCount}
+          />
+        </div>
+        <WorkflowCounts manualQuery={workflowQuery} />
+      </div>
+
       <div class="flex flex-col gap-4 xl:flex-row">
         <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
           <ScheduleRecentRuns
             {namespace}
             recentRuns={schedule?.info?.recentActions}
+            {workflowQuery}
           />
           <ScheduleUpcomingRuns
             futureRuns={schedule?.info?.futureActionTimes}

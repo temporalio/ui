@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { loading, updating } from '$lib/stores/workflows';
   import type { WorkflowStatus as Status } from '$lib/types/workflows';
 
   import WorkflowStatus from '../workflow-status.svelte';
@@ -10,7 +9,6 @@
 </script>
 
 <WorkflowStatus
-  loading={$loading || $updating}
   {count}
   {newCount}
   {status}
