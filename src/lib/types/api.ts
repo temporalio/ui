@@ -20,7 +20,7 @@ export type WorkflowActivitiesAPIRoutePath =
   | 'activity.complete'
   | 'activity.fail';
 
-export type BatchAPIRoutePath = 'batch-operations' | 'batch-operation.describe';
+export type BatchAPIRoutePath = 'batch-operations';
 
 export type NamespaceAPIRoutePath = 'namespace';
 

@@ -188,7 +188,7 @@ export async function describeBatchOperation(
   { jobId, namespace }: DescribeBatchOperationOptions,
   request = fetch,
 ): Promise<BatchOperation> {
-  const route = routeForApi('batch-operation.describe', {
+  const route = routeForApi('batch-operations', {
     namespace,
     batchJobId: jobId,
   });

@@ -130,7 +130,6 @@ export function pathForApi(
     'activity.complete': `/namespaces/${parameters.namespace}/activities/complete-by-id`,
     'activity.fail': `/namespaces/${parameters.namespace}/activities/fail-by-id`,
     'batch-operations': `/namespaces/${parameters.namespace}/batch-operations/${parameters?.batchJobId}`,
-    'batch-operation.describe': `/namespaces/${parameters.namespace}/batch-operations/${parameters?.batchJobId}`,
   };
 
   return getPath(routes[route]);
