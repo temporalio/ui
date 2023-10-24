@@ -29,7 +29,8 @@
 
   const parsePayloads = (c: string): unknown[] => {
     try {
-      return parseWithBigInt(c);
+      const data = parseWithBigInt(c);
+      return Array.isArray(data) ? parseWithBigInt(c) : [];
     } catch {
       return [];
     }
