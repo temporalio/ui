@@ -9,8 +9,13 @@
   import Select from '$lib/holocene/select/simple-select.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { getQuery, getQueryTypes } from '$lib/services/query-service';
+  import {
+    getQuery,
+    getQueryTypes,
+    type ParsedQuery,
+  } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   const { namespace, workflow: workflowId, run: runId } = $page.params;
 
@@ -30,7 +35,7 @@
     return queryTypes;
   });
 
-  let queryResult: Promise<string>;
+  let queryResult: Promise<ParsedQuery>;
 
   const query = (queryType: string) => {
     queryResult = getQuery(
@@ -90,8 +95,10 @@
     </div>
     <div class="my-2 flex h-full items-start">
       {#await queryResult then result}
+        {@const content =
+          typeof result !== 'string' ? stringifyWithBigInt(result) : result}
         <CodeBlock
-          content={result}
+          {content}
           language={jsonFormatting ? 'json' : 'text'}
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
