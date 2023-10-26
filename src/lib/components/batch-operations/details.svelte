@@ -53,11 +53,11 @@
 
 <style lang="postcss">
   .batch-operation-detail {
-    @apply grid grid-cols-10 border-b text-sm last-of-type:border-b-0;
+    @apply border-b text-sm last-of-type:border-b-0 max-sm:flex max-sm:flex-col sm:grid sm:grid-cols-10;
   }
 
   .batch-operation-key {
-    @apply col-span-2 text-sm font-semibold;
+    @apply col-span-2 mr-2 text-sm font-semibold;
   }
 
   .batch-operation-value {
