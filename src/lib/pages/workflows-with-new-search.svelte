@@ -212,9 +212,8 @@
             >{$workflowCount.count.toLocaleString()}</span
           >
           <Translate
-            key={$workflowCount.count === 1
-              ? 'common.workflow'
-              : 'common.workflows'}
+            key="common.workflows-plural"
+            count={$workflowCount.count}
           />
         {:else}
           <Translate key="workflows.recent-workflows" />

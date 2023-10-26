@@ -48,7 +48,7 @@
         );
       }}
     >
-      View All Runs
+      {translate('common.view-all-runs')}
     </Link>
   </div>
   {#each sortRecentRuns(recentRuns) as run (run?.startWorkflowResult?.workflowId)}

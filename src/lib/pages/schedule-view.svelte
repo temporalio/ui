@@ -269,9 +269,8 @@
             <span data-testid="workflow-count"
               >{$workflowCount.count.toLocaleString()}
               <Translate
-                key={$workflowCount.count === 1
-                  ? 'common.workflow'
-                  : 'common.workflows'}
+                key="common.workflows-plural"
+                count={$workflowCount.count}
               />
             </span>
             <Button

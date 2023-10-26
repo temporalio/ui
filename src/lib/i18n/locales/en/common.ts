@@ -89,8 +89,9 @@ export const Strings = {
   namespaces: 'Namespaces',
   cluster: 'Cluster',
   'codec-server': 'Codec Server',
-  workflow: 'Workflow',
   workflows: 'Workflows',
+  'workflows-plural_one': 'Workflow',
+  'workflows-plural_other': 'Workflows',
   schedules: 'Schedules',
   archive: 'Archive',
   import: 'Import',
@@ -147,5 +148,6 @@ export const Strings = {
   'auto-refresh': 'Auto refresh',
   'auto-refresh-tooltip': '{{ interval }} second page refresh',
   'view-more': 'View More...',
+  'view-all-runs': 'View All Runs',
   download: 'Download',
 } as const;
