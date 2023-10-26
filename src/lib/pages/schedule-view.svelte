@@ -9,7 +9,9 @@
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
+  import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
@@ -18,6 +20,7 @@
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import Translate from '$lib/i18n/translate.svelte';
   import {
     deleteSchedule,
     fetchSchedule,
@@ -26,8 +29,10 @@
     unpauseSchedule,
   } from '$lib/services/schedule-service';
   import { coreUserStore } from '$lib/stores/core-user';
+  import { groupByCountEnabled } from '$lib/stores/group-by-enabled';
   import { loading } from '$lib/stores/schedules';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { OverlapPolicy } from '$lib/types/schedule';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { formatDate } from '$lib/utilities/format-date';
@@ -40,6 +45,7 @@
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
+  let workflowQuery = `TemporalScheduledById="${scheduleId}"`;
 
   const parameters = {
     namespace,
@@ -128,7 +134,7 @@
           scheduleId,
           reason,
         });
-    scheduleFetch = fetchSchedule(parameters, fetch);
+    scheduleFetch = fetchSchedule(parameters);
     reason = '';
     pauseConfirmationModalOpen = false;
   };
@@ -141,7 +147,7 @@
       overlapPolicy: $overlapPolicy,
     });
     setTimeout(() => {
-      scheduleFetch = fetchSchedule(parameters, fetch);
+      scheduleFetch = fetchSchedule(parameters);
       triggerConfirmationModalOpen = false;
       triggerLoading = false;
     }, 1000);
@@ -154,7 +160,7 @@
 
 {#await scheduleFetch}
   <header class="mb-8">
-    <div class="relative flex flex-col gap-1">
+    <div class="relative flex flex-col gap-4">
       <Link
         on:click={() => {
           goto(routeForSchedules({ namespace }));
@@ -163,10 +169,7 @@
       >
         {translate('schedules.back-to-schedules')}
       </Link>
-      <h1
-        class="mt-8 select-all text-2xl font-medium"
-        data-testid="schedule-name"
-      >
+      <h1 class="select-all text-2xl font-medium" data-testid="schedule-name">
         {scheduleId}
       </h1>
       <p class="text-sm">
@@ -189,7 +192,7 @@
         >
           {translate('schedules.back-to-schedules')}
         </Link>
-        <h1 class="relative mt-4 flex items-center text-2xl">
+        <h1 class="relative flex items-center text-2xl">
           <span class="select-all font-medium" data-testid="schedule-name">
             {scheduleId}
           </span>
@@ -260,11 +263,39 @@
           <ScheduleError error={schedule?.info?.invalidScheduleError} />
         </div>
       {/if}
+      {#if $groupByCountEnabled}
+        <div class="flex w-full flex-col gap-2 text-lg">
+          <div class="flex items-center gap-2">
+            <span data-testid="workflow-count"
+              >{$workflowCount.count.toLocaleString()}
+              <Translate
+                key="common.workflows-plural"
+                count={$workflowCount.count}
+              />
+            </span>
+            <Button
+              size="xs"
+              variant="ghost"
+              leadingIcon="retry"
+              on:click={() => {
+                scheduleFetch = fetchSchedule(parameters);
+                $refresh = Date.now();
+              }}
+            >
+              {#if $workflowCount.newCount > 0}
+                +{$workflowCount.newCount.toLocaleString()}
+              {/if}
+            </Button>
+          </div>
+          <WorkflowCounts staticQuery={workflowQuery} />
+        </div>
+      {/if}
       <div class="flex flex-col gap-4 xl:flex-row">
         <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
           <ScheduleRecentRuns
             {namespace}
             recentRuns={schedule?.info?.recentActions}
+            {workflowQuery}
           />
           <ScheduleUpcomingRuns
             futureRuns={schedule?.info?.futureActionTimes}

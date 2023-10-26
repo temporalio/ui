@@ -211,7 +211,10 @@
           <span data-testid="workflow-count"
             >{$workflowCount.count.toLocaleString()}</span
           >
-          <Translate key="common.workflows" />
+          <Translate
+            key="common.workflows-plural"
+            count={$workflowCount.count}
+          />
         {:else}
           <Translate key="workflows.recent-workflows" />
         {/if}

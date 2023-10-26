@@ -5,26 +5,23 @@
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
-  import {
-    loading,
-    refresh,
-    updating,
-    workflowCount,
-  } from '$lib/stores/workflows';
+  import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { decodePayload } from '$lib/utilities/decode-payload';
   import { getExponentialBackoffSeconds } from '$lib/utilities/refresh-rate';
 
   import WorkflowCountStatus from './workflow-count-status.svelte';
 
+  export let staticQuery = '';
   $: namespace = $page.params.namespace;
-  $: query = $page.url.searchParams.get('query');
+  $: query = staticQuery || $page.url.searchParams.get('query');
 
   let statusGroups: { status: WorkflowStatus; count: number }[] = [];
   let newStatusGroups: { status: WorkflowStatus; count: number }[] = [];
   let refreshInterval: ReturnType<typeof setInterval>;
 
   let attempt = 1;
+  let loading = false;
   const initialIntervalSeconds = 5;
   const maxAttempts = 100;
 
@@ -51,6 +48,7 @@
     newStatusGroups = [];
     $workflowCount.newCount = 0;
     attempt = 1;
+    loading = true;
   };
 
   const getStatusAndCountOfGroup = (groups = []) => {
@@ -77,6 +75,8 @@
       newStatusGroups = getStatusAndCountOfGroup(groups);
     } catch (e) {
       console.error('Fetching workflow counts failed: ', e?.message);
+    } finally {
+      loading = false;
     }
   };
 
@@ -98,6 +98,8 @@
       statusGroups = getStatusAndCountOfGroup(groups);
     } catch (e) {
       console.error('Fetching workflow counts failed: ', e?.message);
+    } finally {
+      loading = false;
     }
   };
 
@@ -106,7 +108,7 @@
 
 <div class="flex min-h-[24px] flex-wrap items-center gap-2">
   {#each statusGroups as { count, status } (status)}
-    {#if !$loading && !$updating}
+    {#if !loading}
       <WorkflowCountStatus
         {status}
         {count}

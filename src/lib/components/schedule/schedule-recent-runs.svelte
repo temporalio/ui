@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
+
   import Panel from '$lib/components/panel.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -7,7 +9,10 @@
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { formatDate } from '$lib/utilities/format-date';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import {
+    routeForEventHistory,
+    routeForWorkflowsWithQuery,
+  } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '../workflow-status.svelte';
 
@@ -15,6 +20,7 @@
 
   export let recentRuns: ScheduleActionResult[] = [];
   export let namespace: string;
+  export let workflowQuery: string;
 
   const sortRecentRuns = (recentRuns: ScheduleActionResult[]) => {
     return (
@@ -30,7 +36,21 @@
 </script>
 
 <Panel class="w-full">
-  <h2 class="mb-4 text-2xl">{translate('schedules.recent-runs')}</h2>
+  <div class="flex justify-between">
+    <h2 class="mb-4 text-2xl">{translate('schedules.recent-runs')}</h2>
+    <Link
+      on:click={() => {
+        goto(
+          routeForWorkflowsWithQuery({
+            namespace,
+            query: workflowQuery,
+          }),
+        );
+      }}
+    >
+      {translate('common.view-all-runs')}
+    </Link>
+  </div>
   {#each sortRecentRuns(recentRuns) as run (run?.startWorkflowResult?.workflowId)}
     {#await fetchWorkflowForSchedule({ namespace, workflowId: decodeURIForSvelte(run.startWorkflowResult.workflowId), runId: run.startWorkflowResult.runId }, fetch) then workflow}
       <div class="row">
