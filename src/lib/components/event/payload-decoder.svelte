@@ -43,7 +43,6 @@
         $page.params.namespace,
         settings,
         $authUser.accessToken,
-        true,
       );
       const decodedAttributes = decodePayloadAttributes(
         convertedAttributes,

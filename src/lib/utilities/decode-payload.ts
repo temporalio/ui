@@ -194,7 +194,7 @@ export const cloneAllPotentialPayloadsWithCodec = async (
   namespace: string,
   settings: Settings,
   accessToken: string,
-  returnDataOnly: boolean,
+  returnDataOnly: boolean = true,
 ): Promise<PotentiallyDecodable | EventAttribute | WorkflowEvent | null> => {
   if (!anyAttributes) return anyAttributes;
 
