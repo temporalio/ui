@@ -89,6 +89,7 @@ export const Strings = {
   namespaces: 'Namespaces',
   cluster: 'Cluster',
   'codec-server': 'Codec Server',
+  workflow: 'Workflow',
   workflows: 'Workflows',
   schedules: 'Schedules',
   archive: 'Archive',

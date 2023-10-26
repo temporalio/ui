@@ -160,7 +160,7 @@
 
 {#await scheduleFetch}
   <header class="mb-8">
-    <div class="relative flex flex-col gap-1">
+    <div class="relative flex flex-col gap-4">
       <Link
         on:click={() => {
           goto(routeForSchedules({ namespace }));
@@ -169,10 +169,7 @@
       >
         {translate('schedules.back-to-schedules')}
       </Link>
-      <h1
-        class="mt-8 select-all text-2xl font-medium"
-        data-testid="schedule-name"
-      >
+      <h1 class="select-all text-2xl font-medium" data-testid="schedule-name">
         {scheduleId}
       </h1>
       <p class="text-sm">
@@ -195,7 +192,7 @@
         >
           {translate('schedules.back-to-schedules')}
         </Link>
-        <h1 class="relative mt-4 flex items-center text-2xl">
+        <h1 class="relative flex items-center text-2xl">
           <span class="select-all font-medium" data-testid="schedule-name">
             {scheduleId}
           </span>
@@ -271,7 +268,11 @@
           <div class="flex items-center gap-2">
             <span data-testid="workflow-count"
               >{$workflowCount.count.toLocaleString()}
-              <Translate key="common.workflows" />
+              <Translate
+                key={$workflowCount.count === 1
+                  ? 'common.workflow'
+                  : 'common.workflows'}
+              />
             </span>
             <Button
               size="xs"
