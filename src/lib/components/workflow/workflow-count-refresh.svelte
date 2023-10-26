@@ -14,5 +14,7 @@
 >
   {#if count > 0}
     +{count.toLocaleString()}
+  {:else if count < 0}
+    {count.toLocaleString()}
   {/if}
 </Button>
