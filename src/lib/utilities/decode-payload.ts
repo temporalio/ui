@@ -45,6 +45,7 @@ const toArray = (payloads: Payload | Payload[]): Payload[] => {
 
 export function decodePayload(
   payload: Payload,
+  returnDataOnly: boolean = true,
   // This could decode to any object. So we either use the payload object passed in or decode it
 ): unknown | Payload | null {
   if (payload === null) {
@@ -60,7 +61,8 @@ export function decodePayload(
 
   if (encoding?.startsWith('json/')) {
     try {
-      return parseWithBigInt(atob(String(payload?.data ?? '')));
+      const data = parseWithBigInt(atob(String(payload?.data ?? '')));
+      return returnDataOnly ? data : { ...payload, data };
     } catch (_e) {
       console.warn('Could not parse payload: ', _e);
       // Couldn't correctly decode this just let the user deal with the data as is
@@ -68,7 +70,7 @@ export function decodePayload(
   }
 
   if (encoding === 'binary/null') {
-    return null;
+    return returnDataOnly ? null : { ...payload, data: null };
   }
 
   return payload;
@@ -78,6 +80,7 @@ export const decodePayloadAttributes = <
   T extends Optional<PotentiallyDecodable | EventAttribute | WorkflowEvent>,
 >(
   eventAttribute: T,
+  returnDataOnly: boolean = true,
 ): Replace<
   T,
   Optional<PotentiallyDecodable | EventAttribute | WorkflowEvent>
@@ -90,7 +93,7 @@ export const decodePayloadAttributes = <
     const searchAttributes = eventAttribute.searchAttributes.indexedFields;
 
     Object.entries(searchAttributes).forEach(([key, value]) => {
-      searchAttributes[key] = decodePayload(value);
+      searchAttributes[key] = decodePayload(value, returnDataOnly);
     });
   }
 
@@ -99,7 +102,7 @@ export const decodePayloadAttributes = <
     const memo = eventAttribute.memo.fields;
 
     Object.entries(memo).forEach(([key, value]) => {
-      memo[key] = decodePayload(value);
+      memo[key] = decodePayload(value, returnDataOnly);
     });
   }
 
@@ -108,7 +111,7 @@ export const decodePayloadAttributes = <
     const header = eventAttribute.header.fields;
 
     Object.entries(header).forEach(([key, value]) => {
-      header[key] = decodePayload(value);
+      header[key] = decodePayload(value, returnDataOnly);
     });
   }
 
@@ -118,7 +121,7 @@ export const decodePayloadAttributes = <
     const queryResult = eventAttribute?.queryResult;
 
     Object.entries(queryResult).forEach(([key, value]) => {
-      queryResult[key] = decodePayload(value);
+      queryResult[key] = decodePayload(value, returnDataOnly);
     });
   }
 
@@ -127,7 +130,10 @@ export const decodePayloadAttributes = <
 
 const decodePayloadWithCodec =
   (namespace: string, settings: Settings, accessToken: string) =>
-  async (payloads: unknown[]): Promise<unknown[]> => {
+  async (
+    payloads: unknown[],
+    returnDataOnly: boolean = true,
+  ): Promise<unknown[]> => {
     if (settings?.codec?.endpoint) {
       // Convert Payload data
       const awaitData = await convertPayloadsWithCodec({
@@ -136,9 +142,11 @@ const decodePayloadWithCodec =
         settings,
         accessToken,
       });
-      return (awaitData?.payloads ?? []).map(decodePayload);
+      return (awaitData?.payloads ?? []).map((p) =>
+        decodePayload(p, returnDataOnly),
+      );
     } else {
-      return payloads.map(decodePayload);
+      return payloads.map((p) => decodePayload(p, returnDataOnly));
     }
   };
 
@@ -186,6 +194,7 @@ export const cloneAllPotentialPayloadsWithCodec = async (
   namespace: string,
   settings: Settings,
   accessToken: string,
+  returnDataOnly: boolean,
 ): Promise<PotentiallyDecodable | EventAttribute | WorkflowEvent | null> => {
   if (!anyAttributes) return anyAttributes;
 
@@ -195,7 +204,7 @@ export const cloneAllPotentialPayloadsWithCodec = async (
     for (const key of Object.keys(clone)) {
       if (keyIs(key, 'payloads', 'encodedAttributes') && clone[key]) {
         const data = toArray(clone[key]);
-        const decoded = await decode(data);
+        const decoded = await decode(data, returnDataOnly);
         clone[key] = keyIs(key, 'encodedAttributes') ? decoded[0] : decoded;
       } else {
         const next = clone[key];
@@ -205,6 +214,7 @@ export const cloneAllPotentialPayloadsWithCodec = async (
             namespace,
             settings,
             accessToken,
+            returnDataOnly,
           );
         }
       }
