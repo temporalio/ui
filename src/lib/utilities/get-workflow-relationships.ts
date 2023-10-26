@@ -94,8 +94,13 @@ export const getWorkflowRelationships = (
   const previous =
     workflowExecutionStartedEvent?.attributes?.continuedExecutionRunId;
 
-  const scheduleId = workflowExecutionStartedEvent?.attributes?.searchAttributes
-    ?.indexedFields?.TemporalScheduledById as string;
+  let scheduleId = '';
+  const temporalScheduledById =
+    workflow?.searchAttributes?.indexedFields?.TemporalScheduledById;
+
+  if (typeof temporalScheduledById === 'string') {
+    scheduleId = temporalScheduledById;
+  }
 
   const hasRelationships = !!(
     parent ||

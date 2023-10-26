@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { toWorkflowExecution } from '$lib/models/workflow-execution';
 
+import { decodePayload } from './decode-payload';
 import { getWorkflowRelationships } from './get-workflow-relationships';
 
 import childEvents from '$fixtures/events.children.json';
@@ -15,6 +16,7 @@ import continuedAsNewWorkflow from '$fixtures/workflow.continued-as-new.json';
 import failedWorkflow from '$fixtures/workflow.failed.json';
 import pendingChildrenWorkflow from '$fixtures/workflow.pending-children.json';
 import runningWorkflow from '$fixtures/workflow.running.json';
+import scheduledWorkflow from '$fixtures/workflow.scheduled.json';
 import timedOutWorkflow from '$fixtures/workflow.timed-out.json';
 
 describe('getWorkflowRelationships', () => {
@@ -245,5 +247,31 @@ describe('getWorkflowRelationships', () => {
         namespaces.namespaces,
       ).next,
     ).toBe(newExecutionRunId);
+  });
+
+  it('should return the decoded scheduleID for a scheduled workflows', () => {
+    const workflowScheduledId = decodePayload(
+      scheduledWorkflow?.workflowExecutionInfo?.searchAttributes?.indexedFields
+        ?.TemporalScheduledById,
+    );
+    expect(
+      getWorkflowRelationships(
+        toWorkflowExecution(scheduledWorkflow),
+        completedEventHistory,
+        completedEvents,
+        namespaces.namespaces,
+      ).scheduleId,
+    ).toBe(workflowScheduledId);
+  });
+
+  it('should return empty string for a non-scheduled workflows', () => {
+    expect(
+      getWorkflowRelationships(
+        toWorkflowExecution(completedWorkflow),
+        completedEventHistory,
+        completedEvents,
+        namespaces.namespaces,
+      ).scheduleId,
+    ).toBe('');
   });
 });
