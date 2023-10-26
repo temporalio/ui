@@ -32,14 +32,17 @@ const decodePayloads = async (event: HistoryEvent, settings: Settings) => {
     },
   };
 
+  // Keep download in payload structure
+  const returnDataOnly = false;
   try {
     const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
       event,
       get(page).params.namespace,
       settingsWithLocalConfig,
       get(authUser).accessToken,
+      returnDataOnly,
     );
-    return decodePayloadAttributes(convertedAttributes);
+    return decodePayloadAttributes(convertedAttributes, returnDataOnly);
   } catch (e) {
     return event;
   }
