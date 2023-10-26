@@ -74,7 +74,7 @@
   data-testid={$$props['test-id']}
 >
   <span
-    class="flex items-center gap-1 font-mono font-medium {workflowStatus({
+    class="flex items-center gap-1 font-medium {workflowStatus({
       status,
     })}"
     class:rounded-r-none={newCount}
