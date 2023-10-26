@@ -11,7 +11,6 @@ import type {
 import type { WorkflowExecution } from '$lib/types/workflows';
 import type { WorkflowIdentifier } from '$lib/types/workflows';
 
-import { decodePayload } from './decode-payload';
 import { has } from './has';
 import { isString } from './is';
 import {
@@ -22,7 +21,6 @@ import {
   isChildWorkflowExecutionTimedOutEvent,
   isWorkflowExecutionStartedEvent,
 } from './is-event-type';
-import { stringifyWithBigInt } from './parse-with-big-int';
 import type { StartAndEndEventHistory } from '../stores/events';
 
 const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
@@ -96,12 +94,13 @@ export const getWorkflowRelationships = (
   const previous =
     workflowExecutionStartedEvent?.attributes?.continuedExecutionRunId;
 
-  const scheduleId = stringifyWithBigInt(
-    decodePayload(
-      workflowExecutionStartedEvent?.attributes?.searchAttributes?.indexedFields
-        ?.TemporalScheduledById,
-    ),
-  );
+  let scheduleId = '';
+  const temporalScheduledById =
+    workflow?.searchAttributes?.indexedFields?.TemporalScheduledById;
+
+  if (typeof temporalScheduledById === 'string') {
+    scheduleId = temporalScheduledById;
+  }
 
   const hasRelationships = !!(
     parent ||

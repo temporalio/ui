@@ -9,9 +9,9 @@
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
-  import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
@@ -29,9 +29,10 @@
     unpauseSchedule,
   } from '$lib/services/schedule-service';
   import { coreUserStore } from '$lib/stores/core-user';
+  import { groupByCountEnabled } from '$lib/stores/group-by-enabled';
   import { loading } from '$lib/stores/schedules';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import { workflowCount } from '$lib/stores/workflows';
+  import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { OverlapPolicy } from '$lib/types/schedule';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { formatDate } from '$lib/utilities/format-date';
@@ -133,7 +134,7 @@
           scheduleId,
           reason,
         });
-    scheduleFetch = fetchSchedule(parameters, fetch);
+    scheduleFetch = fetchSchedule(parameters);
     reason = '';
     pauseConfirmationModalOpen = false;
   };
@@ -146,7 +147,7 @@
       overlapPolicy: $overlapPolicy,
     });
     setTimeout(() => {
-      scheduleFetch = fetchSchedule(parameters, fetch);
+      scheduleFetch = fetchSchedule(parameters);
       triggerConfirmationModalOpen = false;
       triggerLoading = false;
     }, 1000);
@@ -265,20 +266,30 @@
           <ScheduleError error={schedule?.info?.invalidScheduleError} />
         </div>
       {/if}
-      <div class="flex w-full flex-col gap-2 text-lg">
-        <div class="flex items-center gap-2">
-          <span data-testid="workflow-count"
-            >{$workflowCount.count.toLocaleString()}
-            <Translate key="common.workflows" />
-          </span>
-          <WorkflowCountRefresh
-            showLoading={false}
-            count={$workflowCount.newCount}
-          />
+      {#if $groupByCountEnabled}
+        <div class="flex w-full flex-col gap-2 text-lg">
+          <div class="flex items-center gap-2">
+            <span data-testid="workflow-count"
+              >{$workflowCount.count.toLocaleString()}
+              <Translate key="common.workflows" />
+            </span>
+            <Button
+              size="xs"
+              variant="ghost"
+              leadingIcon="retry"
+              on:click={() => {
+                scheduleFetch = fetchSchedule(parameters);
+                $refresh = Date.now();
+              }}
+            >
+              {#if $workflowCount.newCount > 0}
+                +{$workflowCount.newCount.toLocaleString()}
+              {/if}
+            </Button>
+          </div>
+          <WorkflowCounts staticQuery={workflowQuery} />
         </div>
-        <WorkflowCounts manualQuery={workflowQuery} />
-      </div>
-
+      {/if}
       <div class="flex flex-col gap-4 xl:flex-row">
         <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
           <ScheduleRecentRuns

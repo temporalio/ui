@@ -12,9 +12,9 @@
 
   import WorkflowCountStatus from './workflow-count-status.svelte';
 
-  export let manualQuery = '';
+  export let staticQuery = '';
   $: namespace = $page.params.namespace;
-  $: query = manualQuery || $page.url.searchParams.get('query');
+  $: query = staticQuery || $page.url.searchParams.get('query');
 
   let statusGroups: { status: WorkflowStatus; count: number }[] = [];
   let newStatusGroups: { status: WorkflowStatus; count: number }[] = [];

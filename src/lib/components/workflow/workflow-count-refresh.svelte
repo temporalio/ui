@@ -3,14 +3,13 @@
   import { loading, refresh, updating } from '$lib/stores/workflows';
 
   export let count = 0;
-  export let showLoading = true;
 </script>
 
 <Button
   size="xs"
   variant="ghost"
   leadingIcon="retry"
-  loading={showLoading && ($loading || $updating)}
+  loading={$loading || $updating}
   on:click={() => ($refresh = Date.now())}
 >
   {#if count > 0}
