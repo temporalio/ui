@@ -47,6 +47,7 @@
     $eventHistory,
     $fullEventHistory,
     $namespaces,
+    $eventFilterSort,
   );
   $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
     $fullEventHistory,

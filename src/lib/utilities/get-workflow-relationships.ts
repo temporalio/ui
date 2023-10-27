@@ -1,3 +1,4 @@
+import type { EventSortOrder } from '$lib/stores/event-view';
 import type { DescribeNamespaceResponse } from '$lib/types';
 import type {
   ChildWorkflowExecutionCanceledEvent,
@@ -54,12 +55,15 @@ export const isChildWorkflowClosedEvent = (event: WorkflowEvent) => {
   );
 };
 
-const isCorrespondingEvent = (a: ChildWorkflowEvent, b: ChildWorkflowEvent) =>
+const areCorrespondingEvents = (a: ChildWorkflowEvent, b: ChildWorkflowEvent) =>
   a.attributes.workflowExecution.workflowId ===
     b.attributes.workflowExecution.workflowId &&
   a.attributes.workflowExecution.runId === b.attributes.workflowExecution.runId;
 
-export const getChildren = (events: WorkflowEvents): ChildWorkflowEvent[] => {
+export const getChildren = (
+  events: WorkflowEvents,
+  sort: EventSortOrder,
+): ChildWorkflowEvent[] => {
   const children = [];
   const startedChildren = [];
 
@@ -67,20 +71,17 @@ export const getChildren = (events: WorkflowEvents): ChildWorkflowEvent[] => {
     if (isChildWorkflowExecutionStartedEvent(event)) {
       startedChildren.push(event);
     } else if (isChildWorkflowClosedEvent(event)) {
-      const startedEventIndex = startedChildren.findIndex((child) =>
-        isCorrespondingEvent(child, event as ChildWorkflowEvent),
-      );
-
-      if (startedEventIndex !== -1) {
-        // remove the started event if there is a corresponding closed event
-        startedChildren.splice(startedEventIndex, 1);
-      }
-
       children.push(event);
     }
   }
 
-  return [...startedChildren, ...children];
+  const orphanedChildStartEvents = startedChildren.filter(
+    (child) => !children.some((c) => areCorrespondingEvents(child, c)),
+  );
+
+  return sort === 'ascending'
+    ? [...orphanedChildStartEvents, ...children]
+    : [...children, ...orphanedChildStartEvents];
 };
 
 type WorkflowRelationships = {
@@ -100,8 +101,9 @@ export const getWorkflowRelationships = (
   eventHistory: StartAndEndEventHistory,
   fullEventHistory: WorkflowEvents,
   namespaces: DescribeNamespaceResponse[],
+  sort: EventSortOrder = 'ascending',
 ): WorkflowRelationships => {
-  const children = getChildren(fullEventHistory) as ChildWorkflowEvent[];
+  const children = getChildren(fullEventHistory, sort) as ChildWorkflowEvent[];
   const hasChildren = !!workflow?.pendingChildren.length || !!children.length;
   const parent = workflow?.parent;
 

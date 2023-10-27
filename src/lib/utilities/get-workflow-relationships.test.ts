@@ -24,20 +24,36 @@ import scheduledWorkflow from '$fixtures/workflow.scheduled.json';
 import timedOutWorkflow from '$fixtures/workflow.timed-out.json';
 
 describe('getChildren', () => {
-  it('is should get closed child workflow events', () => {
-    const children = getChildren(moreChildEvents);
+  it('is should get closed child workflow events when events are in ascending order', () => {
+    const children = getChildren(moreChildEvents, 'ascending');
     expect(children.length).toEqual(3);
     expect(children.map((event) => event.eventId)).toEqual(['14', '16', '17']);
   });
 
-  it("it should get started child workflow events that don't have a corresponding closed event", () => {
+  it('is should get closed child workflow events are in descending order', () => {
+    const children = getChildren([...moreChildEvents].reverse(), 'descending');
+    expect(children.length).toEqual(3);
+    expect(children.map((event) => event.eventId)).toEqual(['17', '16', '14']);
+  });
+
+  it("it should get started child workflow events that don't have a corresponding closed event in ascending order", () => {
     const eventHistory = [...moreChildEvents];
     // remove a completed child workflow event
     eventHistory.splice(16, 1);
-    const children = getChildren(eventHistory);
+    const children = getChildren(eventHistory, 'ascending');
 
     expect(children.length).toEqual(3);
     expect(children.map((event) => event.eventId)).toEqual(['10', '14', '16']);
+  });
+
+  it("it should get started child workflow events that don't have a corresponding closed event in ascending order", () => {
+    const eventHistory = [...moreChildEvents];
+    // remove a completed child workflow event
+    eventHistory.splice(16, 1);
+    const children = getChildren(eventHistory.reverse(), 'descending');
+
+    expect(children.length).toEqual(3);
+    expect(children.map((event) => event.eventId)).toEqual(['16', '14', '10']);
   });
 });
 
