@@ -3,12 +3,16 @@ import { describe, expect, it } from 'vitest';
 import { toWorkflowExecution } from '$lib/models/workflow-execution';
 
 import { decodePayload } from './decode-payload';
-import { getWorkflowRelationships } from './get-workflow-relationships';
+import {
+  getChildren,
+  getWorkflowRelationships,
+} from './get-workflow-relationships';
 
 import childEvents from '$fixtures/events.children.json';
 import completedEvents from '$fixtures/events.completed.json';
 import continuedAsNewEvents from '$fixtures/events.continued-as-new.json';
 import failedEvents from '$fixtures/events.failed.json';
+import moreChildEvents from '$fixtures/events.more-children.json';
 import timedOutEvents from '$fixtures/events.timed-out.json';
 import namespaces from '$fixtures/namespaces.json';
 import completedWorkflow from '$fixtures/workflow.completed.json';
@@ -18,6 +22,24 @@ import pendingChildrenWorkflow from '$fixtures/workflow.pending-children.json';
 import runningWorkflow from '$fixtures/workflow.running.json';
 import scheduledWorkflow from '$fixtures/workflow.scheduled.json';
 import timedOutWorkflow from '$fixtures/workflow.timed-out.json';
+
+describe('getChildren', () => {
+  it('is should get closed child workflow events', () => {
+    const children = getChildren(moreChildEvents);
+    expect(children.length).toEqual(3);
+    expect(children.map((event) => event.eventId)).toEqual(['14', '16', '17']);
+  });
+
+  it("it should get started child workflow events that don't have a corresponding closed event", () => {
+    const eventHistory = [...moreChildEvents];
+    // remove a completed child workflow event
+    eventHistory.splice(16, 1);
+    const children = getChildren(eventHistory);
+
+    expect(children.length).toEqual(3);
+    expect(children.map((event) => event.eventId)).toEqual(['10', '14', '16']);
+  });
+});
 
 describe('getWorkflowRelationships', () => {
   const completedEventHistory = {

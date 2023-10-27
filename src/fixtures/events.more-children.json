@@ -1,0 +1,1176 @@
+[
+  {
+    "eventId": "1",
+    "eventTime": "2023-10-27T00:47:08.471246Z",
+    "eventType": "WorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "1048592",
+    "workerMayIgnore": false,
+    "workflowExecutionStartedEventAttributes": {
+      "workflowType": {
+        "name": "parentWorkflow"
+      },
+      "parentWorkflowNamespace": "",
+      "parentWorkflowNamespaceId": "",
+      "parentWorkflowExecution": null,
+      "parentInitiatedEventId": "0",
+      "taskQueue": {
+        "name": "child-workflows",
+        "kind": "Normal",
+        "normalName": ""
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": "IkFsaWNlIg=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": "IkJvYiI="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": "IkNoYXJsaWUi"
+          }
+        ]
+      },
+      "workflowExecutionTimeout": null,
+      "workflowRunTimeout": null,
+      "workflowTaskTimeout": "10s",
+      "continuedExecutionRunId": "",
+      "initiator": "Unspecified",
+      "continuedFailure": null,
+      "lastCompletionResult": null,
+      "originalExecutionRunId": "a3fc0878-5f41-4a38-9b9a-e02f60438495",
+      "identity": "81614@Laura-Whitakers-MacBook-Pro.local",
+      "firstExecutionRunId": "a3fc0878-5f41-4a38-9b9a-e02f60438495",
+      "retryPolicy": null,
+      "attempt": 1,
+      "workflowExecutionExpirationTime": null,
+      "cronSchedule": "",
+      "firstWorkflowTaskBackoff": "0s",
+      "memo": null,
+      "searchAttributes": null,
+      "prevAutoResetPoints": null,
+      "header": {
+        "fields": {}
+      },
+      "parentInitiatedEventVersion": "0",
+      "workflowId": "parent-sample-0",
+      "sourceVersionStamp": null
+    },
+    "name": "WorkflowExecutionStarted",
+    "id": "1",
+    "timestamp": "2023-10-27 UTC 00:47:08.47",
+    "classification": "Started",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowExecutionStartedEventAttributes",
+      "workflowType": "parentWorkflow",
+      "parentWorkflowNamespace": "",
+      "parentWorkflowNamespaceId": "",
+      "parentWorkflowExecution": null,
+      "parentInitiatedEventId": "0",
+      "taskQueue": {
+        "name": "child-workflows",
+        "kind": "Normal",
+        "normalName": ""
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": "IkFsaWNlIg=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": "IkJvYiI="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": "IkNoYXJsaWUi"
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "",
+      "workflowRunTimeout": "",
+      "workflowTaskTimeout": "10 seconds",
+      "continuedExecutionRunId": "",
+      "initiator": "Unspecified",
+      "continuedFailure": null,
+      "lastCompletionResult": null,
+      "originalExecutionRunId": "a3fc0878-5f41-4a38-9b9a-e02f60438495",
+      "identity": "81614@Laura-Whitakers-MacBook-Pro.local",
+      "firstExecutionRunId": "a3fc0878-5f41-4a38-9b9a-e02f60438495",
+      "retryPolicy": null,
+      "attempt": 1,
+      "workflowExecutionExpirationTime": "",
+      "cronSchedule": "",
+      "firstWorkflowTaskBackoff": "",
+      "memo": null,
+      "searchAttributes": null,
+      "prevAutoResetPoints": null,
+      "header": {
+        "fields": {}
+      },
+      "parentInitiatedEventVersion": "0",
+      "workflowId": "parent-sample-0",
+      "sourceVersionStamp": null
+    }
+  },
+  {
+    "eventId": "2",
+    "eventTime": "2023-10-27T00:47:08.471272Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "1048593",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "child-workflows",
+        "kind": "Normal",
+        "normalName": ""
+      },
+      "startToCloseTimeout": "10s",
+      "attempt": 1
+    },
+    "name": "WorkflowTaskScheduled",
+    "id": "2",
+    "timestamp": "2023-10-27 UTC 00:47:08.47",
+    "classification": "Scheduled",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskScheduledEventAttributes",
+      "taskQueue": {
+        "name": "child-workflows",
+        "kind": "Normal",
+        "normalName": ""
+      },
+      "startToCloseTimeout": "10 seconds",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "3",
+    "eventTime": "2023-10-27T00:47:08.474680Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "1048598",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "2",
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "requestId": "19c71e30-7ab9-40f9-871f-b43ae724e872",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "376"
+    },
+    "name": "WorkflowTaskStarted",
+    "id": "3",
+    "timestamp": "2023-10-27 UTC 00:47:08.47",
+    "classification": "Started",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskStartedEventAttributes",
+      "scheduledEventId": "2",
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "requestId": "19c71e30-7ab9-40f9-871f-b43ae724e872",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "376"
+    }
+  },
+  {
+    "eventId": "4",
+    "eventTime": "2023-10-27T00:47:08.508452Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "1048602",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "2",
+      "startedEventId": "3",
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "binaryChecksum": "@temporalio/worker@1.7.0+912386531f1e24cc50100009a39d2b1aa1c38eaf95e6a3124caff81986927bf2",
+      "workerVersion": {
+        "buildId": "",
+        "bundleId": "",
+        "useVersioning": false
+      },
+      "sdkMetadata": {
+        "coreUsedFlags": [],
+        "langUsedFlags": [],
+        "sdkName": "",
+        "sdkVersion": ""
+      },
+      "meteringMetadata": {
+        "nonfirstLocalActivityExecutionAttempts": 0
+      }
+    },
+    "name": "WorkflowTaskCompleted",
+    "id": "4",
+    "timestamp": "2023-10-27 UTC 00:47:08.50",
+    "classification": "Completed",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskCompletedEventAttributes",
+      "scheduledEventId": "2",
+      "startedEventId": "3",
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "binaryChecksum": "@temporalio/worker@1.7.0+912386531f1e24cc50100009a39d2b1aa1c38eaf95e6a3124caff81986927bf2",
+      "workerVersion": {
+        "buildId": "",
+        "bundleId": "",
+        "useVersioning": false
+      },
+      "sdkMetadata": {
+        "coreUsedFlags": [],
+        "langUsedFlags": [],
+        "sdkName": "",
+        "sdkVersion": ""
+      },
+      "meteringMetadata": {
+        "nonfirstLocalActivityExecutionAttempts": 0
+      }
+    }
+  },
+  {
+    "eventId": "5",
+    "eventTime": "2023-10-27T00:47:08.508871Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "1048603",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "workflowId": "57a240b5-87cf-4ac9-895c-d43ce17f581b",
+      "workflowType": {
+        "name": "childWorkflow"
+      },
+      "taskQueue": {
+        "name": "child-workflows",
+        "kind": "Normal",
+        "normalName": ""
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "e30="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": null,
+      "workflowRunTimeout": "0s",
+      "workflowTaskTimeout": "10s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {}
+      },
+      "useCompatibleVersion": false
+    },
+    "name": "StartChildWorkflowExecutionInitiated",
+    "id": "5",
+    "timestamp": "2023-10-27 UTC 00:47:08.50",
+    "classification": "Initiated",
+    "category": "child-workflow",
+    "attributes": {
+      "type": "startChildWorkflowExecutionInitiatedEventAttributes",
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "workflowId": "57a240b5-87cf-4ac9-895c-d43ce17f581b",
+      "workflowType": "childWorkflow",
+      "taskQueue": {
+        "name": "child-workflows",
+        "kind": "Normal",
+        "normalName": ""
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "e30="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "",
+      "workflowRunTimeout": "",
+      "workflowTaskTimeout": "10 seconds",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {}
+      },
+      "useCompatibleVersion": false
+    }
+  },
+  {
+    "eventId": "6",
+    "eventTime": "2023-10-27T00:47:08.508991Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "1048604",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "workflowId": "acca8a57-a77a-4e5c-a408-c7fb353ef163",
+      "workflowType": {
+        "name": "childWorkflow"
+      },
+      "taskQueue": {
+        "name": "child-workflows",
+        "kind": "Normal",
+        "normalName": ""
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "e30="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": null,
+      "workflowRunTimeout": "0s",
+      "workflowTaskTimeout": "10s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {}
+      },
+      "useCompatibleVersion": false
+    },
+    "name": "StartChildWorkflowExecutionInitiated",
+    "id": "6",
+    "timestamp": "2023-10-27 UTC 00:47:08.50",
+    "classification": "Initiated",
+    "category": "child-workflow",
+    "attributes": {
+      "type": "startChildWorkflowExecutionInitiatedEventAttributes",
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "workflowId": "acca8a57-a77a-4e5c-a408-c7fb353ef163",
+      "workflowType": "childWorkflow",
+      "taskQueue": {
+        "name": "child-workflows",
+        "kind": "Normal",
+        "normalName": ""
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "e30="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "",
+      "workflowRunTimeout": "",
+      "workflowTaskTimeout": "10 seconds",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {}
+      },
+      "useCompatibleVersion": false
+    }
+  },
+  {
+    "eventId": "7",
+    "eventTime": "2023-10-27T00:47:08.509072Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "1048605",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "workflowId": "2002ef8c-3e5a-44e4-8400-20ef924df577",
+      "workflowType": {
+        "name": "childWorkflow"
+      },
+      "taskQueue": {
+        "name": "child-workflows",
+        "kind": "Normal",
+        "normalName": ""
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "e30="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": null,
+      "workflowRunTimeout": "0s",
+      "workflowTaskTimeout": "10s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {}
+      },
+      "useCompatibleVersion": false
+    },
+    "name": "StartChildWorkflowExecutionInitiated",
+    "id": "7",
+    "timestamp": "2023-10-27 UTC 00:47:08.50",
+    "classification": "Initiated",
+    "category": "child-workflow",
+    "attributes": {
+      "type": "startChildWorkflowExecutionInitiatedEventAttributes",
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "workflowId": "2002ef8c-3e5a-44e4-8400-20ef924df577",
+      "workflowType": "childWorkflow",
+      "taskQueue": {
+        "name": "child-workflows",
+        "kind": "Normal",
+        "normalName": ""
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "e30="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "",
+      "workflowRunTimeout": "",
+      "workflowTaskTimeout": "10 seconds",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {}
+      },
+      "useCompatibleVersion": false
+    }
+  },
+  {
+    "eventId": "8",
+    "eventTime": "2023-10-27T00:47:08.510744Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "1048615",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "initiatedEventId": "7",
+      "workflowExecution": {
+        "workflowId": "2002ef8c-3e5a-44e4-8400-20ef924df577",
+        "runId": "60889454-3f66-43de-8db1-eecc74955838"
+      },
+      "workflowType": {
+        "name": "childWorkflow"
+      },
+      "header": {
+        "fields": {}
+      }
+    },
+    "name": "ChildWorkflowExecutionStarted",
+    "id": "8",
+    "timestamp": "2023-10-27 UTC 00:47:08.51",
+    "classification": "Started",
+    "category": "child-workflow",
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "initiatedEventId": "7",
+      "workflowExecution": {
+        "workflowId": "2002ef8c-3e5a-44e4-8400-20ef924df577",
+        "runId": "60889454-3f66-43de-8db1-eecc74955838"
+      },
+      "workflowType": "childWorkflow",
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "9",
+    "eventTime": "2023-10-27T00:47:08.510747Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "1048616",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "81593@Laura-Whitakers-MacBook-Pro.local-child-workflows-929cb68099914853a733c11f5d695173",
+        "kind": "Sticky",
+        "normalName": "child-workflows"
+      },
+      "startToCloseTimeout": "10s",
+      "attempt": 1
+    },
+    "name": "WorkflowTaskScheduled",
+    "id": "9",
+    "timestamp": "2023-10-27 UTC 00:47:08.51",
+    "classification": "Scheduled",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskScheduledEventAttributes",
+      "taskQueue": {
+        "name": "81593@Laura-Whitakers-MacBook-Pro.local-child-workflows-929cb68099914853a733c11f5d695173",
+        "kind": "Sticky",
+        "normalName": "child-workflows"
+      },
+      "startToCloseTimeout": "10 seconds",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "10",
+    "eventTime": "2023-10-27T00:47:08.512159Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "1048628",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "initiatedEventId": "5",
+      "workflowExecution": {
+        "workflowId": "57a240b5-87cf-4ac9-895c-d43ce17f581b",
+        "runId": "b1851bf4-091d-44d9-9245-a80786aa8abf"
+      },
+      "workflowType": {
+        "name": "childWorkflow"
+      },
+      "header": {
+        "fields": {}
+      }
+    },
+    "name": "ChildWorkflowExecutionStarted",
+    "id": "10",
+    "timestamp": "2023-10-27 UTC 00:47:08.51",
+    "classification": "Started",
+    "category": "child-workflow",
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "initiatedEventId": "5",
+      "workflowExecution": {
+        "workflowId": "57a240b5-87cf-4ac9-895c-d43ce17f581b",
+        "runId": "b1851bf4-091d-44d9-9245-a80786aa8abf"
+      },
+      "workflowType": "childWorkflow",
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "11",
+    "eventTime": "2023-10-27T00:47:08.513574Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "1048642",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "initiatedEventId": "6",
+      "workflowExecution": {
+        "workflowId": "acca8a57-a77a-4e5c-a408-c7fb353ef163",
+        "runId": "f0e41c6f-a515-4a55-bfba-ed5ef891784c"
+      },
+      "workflowType": {
+        "name": "childWorkflow"
+      },
+      "header": {
+        "fields": {}
+      }
+    },
+    "name": "ChildWorkflowExecutionStarted",
+    "id": "11",
+    "timestamp": "2023-10-27 UTC 00:47:08.51",
+    "classification": "Started",
+    "category": "child-workflow",
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "initiatedEventId": "6",
+      "workflowExecution": {
+        "workflowId": "acca8a57-a77a-4e5c-a408-c7fb353ef163",
+        "runId": "f0e41c6f-a515-4a55-bfba-ed5ef891784c"
+      },
+      "workflowType": "childWorkflow",
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "12",
+    "eventTime": "2023-10-27T00:47:08.514832Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "1048648",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "9",
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "requestId": "24481b15-eba2-4682-8bd5-0d2cd7a28ba4",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "1940"
+    },
+    "name": "WorkflowTaskStarted",
+    "id": "12",
+    "timestamp": "2023-10-27 UTC 00:47:08.51",
+    "classification": "Started",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskStartedEventAttributes",
+      "scheduledEventId": "9",
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "requestId": "24481b15-eba2-4682-8bd5-0d2cd7a28ba4",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "1940"
+    }
+  },
+  {
+    "eventId": "13",
+    "eventTime": "2023-10-27T00:47:08.519109Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "1048660",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "9",
+      "startedEventId": "12",
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "binaryChecksum": "@temporalio/worker@1.7.0+912386531f1e24cc50100009a39d2b1aa1c38eaf95e6a3124caff81986927bf2",
+      "workerVersion": {
+        "buildId": "",
+        "bundleId": "",
+        "useVersioning": false
+      },
+      "sdkMetadata": {
+        "coreUsedFlags": [1],
+        "langUsedFlags": [],
+        "sdkName": "",
+        "sdkVersion": ""
+      },
+      "meteringMetadata": {
+        "nonfirstLocalActivityExecutionAttempts": 0
+      }
+    },
+    "name": "WorkflowTaskCompleted",
+    "id": "13",
+    "timestamp": "2023-10-27 UTC 00:47:08.51",
+    "classification": "Completed",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskCompletedEventAttributes",
+      "scheduledEventId": "9",
+      "startedEventId": "12",
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "binaryChecksum": "@temporalio/worker@1.7.0+912386531f1e24cc50100009a39d2b1aa1c38eaf95e6a3124caff81986927bf2",
+      "workerVersion": {
+        "buildId": "",
+        "bundleId": "",
+        "useVersioning": false
+      },
+      "sdkMetadata": {
+        "coreUsedFlags": [1],
+        "langUsedFlags": [],
+        "sdkName": "",
+        "sdkVersion": ""
+      },
+      "meteringMetadata": {
+        "nonfirstLocalActivityExecutionAttempts": 0
+      }
+    }
+  },
+  {
+    "eventId": "14",
+    "eventTime": "2023-10-27T00:47:08.541640Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "1048686",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "IkkgYW0gYSBjaGlsZCBuYW1lZCBbb2JqZWN0IE9iamVjdF0i"
+          }
+        ]
+      },
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "workflowExecution": {
+        "workflowId": "acca8a57-a77a-4e5c-a408-c7fb353ef163",
+        "runId": "f0e41c6f-a515-4a55-bfba-ed5ef891784c"
+      },
+      "workflowType": {
+        "name": "childWorkflow"
+      },
+      "initiatedEventId": "6",
+      "startedEventId": "11"
+    },
+    "name": "ChildWorkflowExecutionCompleted",
+    "id": "14",
+    "timestamp": "2023-10-27 UTC 00:47:08.54",
+    "classification": "Completed",
+    "category": "child-workflow",
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "IkkgYW0gYSBjaGlsZCBuYW1lZCBbb2JqZWN0IE9iamVjdF0i"
+          }
+        ]
+      },
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "workflowExecution": {
+        "workflowId": "acca8a57-a77a-4e5c-a408-c7fb353ef163",
+        "runId": "f0e41c6f-a515-4a55-bfba-ed5ef891784c"
+      },
+      "workflowType": "childWorkflow",
+      "initiatedEventId": "6",
+      "startedEventId": "11"
+    }
+  },
+  {
+    "eventId": "15",
+    "eventTime": "2023-10-27T00:47:08.541643Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "1048687",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "81593@Laura-Whitakers-MacBook-Pro.local-child-workflows-929cb68099914853a733c11f5d695173",
+        "kind": "Sticky",
+        "normalName": "child-workflows"
+      },
+      "startToCloseTimeout": "10s",
+      "attempt": 1
+    },
+    "name": "WorkflowTaskScheduled",
+    "id": "15",
+    "timestamp": "2023-10-27 UTC 00:47:08.54",
+    "classification": "Scheduled",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskScheduledEventAttributes",
+      "taskQueue": {
+        "name": "81593@Laura-Whitakers-MacBook-Pro.local-child-workflows-929cb68099914853a733c11f5d695173",
+        "kind": "Sticky",
+        "normalName": "child-workflows"
+      },
+      "startToCloseTimeout": "10 seconds",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "16",
+    "eventTime": "2023-10-27T00:47:08.542754Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "1048691",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "IkkgYW0gYSBjaGlsZCBuYW1lZCBbb2JqZWN0IE9iamVjdF0i"
+          }
+        ]
+      },
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "workflowExecution": {
+        "workflowId": "2002ef8c-3e5a-44e4-8400-20ef924df577",
+        "runId": "60889454-3f66-43de-8db1-eecc74955838"
+      },
+      "workflowType": {
+        "name": "childWorkflow"
+      },
+      "initiatedEventId": "7",
+      "startedEventId": "8"
+    },
+    "name": "ChildWorkflowExecutionCompleted",
+    "id": "16",
+    "timestamp": "2023-10-27 UTC 00:47:08.54",
+    "classification": "Completed",
+    "category": "child-workflow",
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "IkkgYW0gYSBjaGlsZCBuYW1lZCBbb2JqZWN0IE9iamVjdF0i"
+          }
+        ]
+      },
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "workflowExecution": {
+        "workflowId": "2002ef8c-3e5a-44e4-8400-20ef924df577",
+        "runId": "60889454-3f66-43de-8db1-eecc74955838"
+      },
+      "workflowType": "childWorkflow",
+      "initiatedEventId": "7",
+      "startedEventId": "8"
+    }
+  },
+  {
+    "eventId": "17",
+    "eventTime": "2023-10-27T00:47:08.543621Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "1048693",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "IkkgYW0gYSBjaGlsZCBuYW1lZCBbb2JqZWN0IE9iamVjdF0i"
+          }
+        ]
+      },
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "workflowExecution": {
+        "workflowId": "57a240b5-87cf-4ac9-895c-d43ce17f581b",
+        "runId": "b1851bf4-091d-44d9-9245-a80786aa8abf"
+      },
+      "workflowType": {
+        "name": "childWorkflow"
+      },
+      "initiatedEventId": "5",
+      "startedEventId": "10"
+    },
+    "name": "ChildWorkflowExecutionCompleted",
+    "id": "17",
+    "timestamp": "2023-10-27 UTC 00:47:08.54",
+    "classification": "Completed",
+    "category": "child-workflow",
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "IkkgYW0gYSBjaGlsZCBuYW1lZCBbb2JqZWN0IE9iamVjdF0i"
+          }
+        ]
+      },
+      "namespace": "default",
+      "namespaceId": "c28ec648-cc4c-4b90-ae84-e92b60bab1d3",
+      "workflowExecution": {
+        "workflowId": "57a240b5-87cf-4ac9-895c-d43ce17f581b",
+        "runId": "b1851bf4-091d-44d9-9245-a80786aa8abf"
+      },
+      "workflowType": "childWorkflow",
+      "initiatedEventId": "5",
+      "startedEventId": "10"
+    }
+  },
+  {
+    "eventId": "18",
+    "eventTime": "2023-10-27T00:47:08.544670Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "1048695",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "15",
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "requestId": "e6b38695-01ef-4f7c-bd2d-08e223e76a69",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "3090"
+    },
+    "name": "WorkflowTaskStarted",
+    "id": "18",
+    "timestamp": "2023-10-27 UTC 00:47:08.54",
+    "classification": "Started",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskStartedEventAttributes",
+      "scheduledEventId": "15",
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "requestId": "e6b38695-01ef-4f7c-bd2d-08e223e76a69",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "3090"
+    }
+  },
+  {
+    "eventId": "19",
+    "eventTime": "2023-10-27T00:47:08.550909Z",
+    "eventType": "WorkflowTaskFailed",
+    "version": "0",
+    "taskId": "1048699",
+    "workerMayIgnore": false,
+    "workflowTaskFailedEventAttributes": {
+      "scheduledEventId": "15",
+      "startedEventId": "18",
+      "cause": "Unspecified",
+      "failure": {
+        "message": "Workflow continued as new",
+        "source": "TypeScriptSDK",
+        "stackTrace": "ContinueAsNew: Workflow continued as new\n    at /Users/laurawhitaker/samples-typescript/child-workflows/node_modules/@temporalio/workflow/src/workflow.ts:928:12\n    at /Users/laurawhitaker/samples-typescript/child-workflows/node_modules/@temporalio/workflow/src/workflow.ts:941:11\n    at continueAsNew (/Users/laurawhitaker/samples-typescript/child-workflows/node_modules/@temporalio/workflow/src/workflow.ts:967:33)\n    at workflow (/Users/laurawhitaker/samples-typescript/child-workflows/src/workflows.ts:24:2)",
+        "encodedAttributes": null,
+        "cause": null
+      },
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "baseRunId": "",
+      "newRunId": "",
+      "forkEventVersion": "0",
+      "binaryChecksum": "@temporalio/worker@1.7.0+912386531f1e24cc50100009a39d2b1aa1c38eaf95e6a3124caff81986927bf2",
+      "workerVersion": null
+    },
+    "name": "WorkflowTaskFailed",
+    "id": "19",
+    "timestamp": "2023-10-27 UTC 00:47:08.55",
+    "classification": "Failed",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskFailedEventAttributes",
+      "scheduledEventId": "15",
+      "startedEventId": "18",
+      "cause": "Unspecified",
+      "failure": {
+        "message": "Workflow continued as new",
+        "source": "TypeScriptSDK",
+        "stackTrace": "ContinueAsNew: Workflow continued as new\n    at /Users/laurawhitaker/samples-typescript/child-workflows/node_modules/@temporalio/workflow/src/workflow.ts:928:12\n    at /Users/laurawhitaker/samples-typescript/child-workflows/node_modules/@temporalio/workflow/src/workflow.ts:941:11\n    at continueAsNew (/Users/laurawhitaker/samples-typescript/child-workflows/node_modules/@temporalio/workflow/src/workflow.ts:967:33)\n    at workflow (/Users/laurawhitaker/samples-typescript/child-workflows/src/workflows.ts:24:2)",
+        "encodedAttributes": null,
+        "cause": null
+      },
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "baseRunId": "",
+      "newRunId": "",
+      "forkEventVersion": "0",
+      "binaryChecksum": "@temporalio/worker@1.7.0+912386531f1e24cc50100009a39d2b1aa1c38eaf95e6a3124caff81986927bf2",
+      "workerVersion": null
+    }
+  },
+  {
+    "eventId": "20",
+    "eventTime": "2023-10-27T00:47:08.550912Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "1048700",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "child-workflows",
+        "kind": "Normal",
+        "normalName": ""
+      },
+      "startToCloseTimeout": "10s",
+      "attempt": 1
+    },
+    "name": "WorkflowTaskScheduled",
+    "id": "20",
+    "timestamp": "2023-10-27 UTC 00:47:08.55",
+    "classification": "Scheduled",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskScheduledEventAttributes",
+      "taskQueue": {
+        "name": "child-workflows",
+        "kind": "Normal",
+        "normalName": ""
+      },
+      "startToCloseTimeout": "10 seconds",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "21",
+    "eventTime": "2023-10-27T00:47:08.551648Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "1048703",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "20",
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "requestId": "c560bc16-4286-46f7-92e8-1ab5359565fa",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "3977"
+    },
+    "name": "WorkflowTaskStarted",
+    "id": "21",
+    "timestamp": "2023-10-27 UTC 00:47:08.55",
+    "classification": "Started",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskStartedEventAttributes",
+      "scheduledEventId": "20",
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "requestId": "c560bc16-4286-46f7-92e8-1ab5359565fa",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "3977"
+    }
+  },
+  {
+    "eventId": "22",
+    "eventTime": "2023-10-27T00:47:08.580688Z",
+    "eventType": "WorkflowTaskFailed",
+    "version": "0",
+    "taskId": "1048707",
+    "workerMayIgnore": false,
+    "workflowTaskFailedEventAttributes": {
+      "scheduledEventId": "20",
+      "startedEventId": "21",
+      "cause": "Unspecified",
+      "failure": {
+        "message": "Workflow continued as new",
+        "source": "TypeScriptSDK",
+        "stackTrace": "ContinueAsNew: Workflow continued as new\n    at /Users/laurawhitaker/samples-typescript/child-workflows/node_modules/@temporalio/workflow/src/workflow.ts:928:12\n    at /Users/laurawhitaker/samples-typescript/child-workflows/node_modules/@temporalio/workflow/src/workflow.ts:941:11\n    at continueAsNew (/Users/laurawhitaker/samples-typescript/child-workflows/node_modules/@temporalio/workflow/src/workflow.ts:967:33)\n    at workflow (/Users/laurawhitaker/samples-typescript/child-workflows/src/workflows.ts:24:2)",
+        "encodedAttributes": null,
+        "cause": null
+      },
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "baseRunId": "",
+      "newRunId": "",
+      "forkEventVersion": "0",
+      "binaryChecksum": "@temporalio/worker@1.7.0+912386531f1e24cc50100009a39d2b1aa1c38eaf95e6a3124caff81986927bf2",
+      "workerVersion": null
+    },
+    "name": "WorkflowTaskFailed",
+    "id": "22",
+    "timestamp": "2023-10-27 UTC 00:47:08.58",
+    "classification": "Failed",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskFailedEventAttributes",
+      "scheduledEventId": "20",
+      "startedEventId": "21",
+      "cause": "Unspecified",
+      "failure": {
+        "message": "Workflow continued as new",
+        "source": "TypeScriptSDK",
+        "stackTrace": "ContinueAsNew: Workflow continued as new\n    at /Users/laurawhitaker/samples-typescript/child-workflows/node_modules/@temporalio/workflow/src/workflow.ts:928:12\n    at /Users/laurawhitaker/samples-typescript/child-workflows/node_modules/@temporalio/workflow/src/workflow.ts:941:11\n    at continueAsNew (/Users/laurawhitaker/samples-typescript/child-workflows/node_modules/@temporalio/workflow/src/workflow.ts:967:33)\n    at workflow (/Users/laurawhitaker/samples-typescript/child-workflows/src/workflows.ts:24:2)",
+        "encodedAttributes": null,
+        "cause": null
+      },
+      "identity": "81593@Laura-Whitakers-MacBook-Pro.local",
+      "baseRunId": "",
+      "newRunId": "",
+      "forkEventVersion": "0",
+      "binaryChecksum": "@temporalio/worker@1.7.0+912386531f1e24cc50100009a39d2b1aa1c38eaf95e6a3124caff81986927bf2",
+      "workerVersion": null
+    }
+  }
+]

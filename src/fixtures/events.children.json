@@ -1121,6 +1121,20 @@
       "header": {
         "fields": {}
       }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "22",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.schedule",
+        "runId": "3f169b97-7f96-4ba9-9262-ac14170334db"
+      },
+      "workflowType": "workflow.schedule",
+      "header": {
+        "fields": {}
+      }
     }
   },
   {
@@ -1160,6 +1174,20 @@
       "header": {
         "fields": {}
       }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "14",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.query",
+        "runId": "5ec35484-2698-4e06-a998-e8b808633eb4"
+      },
+      "workflowType": "workflow.query",
+      "header": {
+        "fields": {}
+      }
     }
   },
   {
@@ -1180,6 +1208,20 @@
       "workflowType": {
         "name": "workflow.echo"
       },
+      "header": {
+        "fields": {}
+      }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "8",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.echo",
+        "runId": "00b515ce-a010-4864-bb33-d04deb228ace"
+      },
+      "workflowType": "workflow.echo",
       "header": {
         "fields": {}
       }
@@ -1206,6 +1248,20 @@
       "header": {
         "fields": {}
       }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "9",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.signal",
+        "runId": "23a01faf-8a86-4acb-940a-a503eb9e14c3"
+      },
+      "workflowType": "workflow.signal",
+      "header": {
+        "fields": {}
+      }
     }
   },
   {
@@ -1226,6 +1282,20 @@
       "workflowType": {
         "name": "workflow.retry-activity"
       },
+      "header": {
+        "fields": {}
+      }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "18",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.retry-activity",
+        "runId": "6398e686-2e21-4758-9c5c-09600ced52b1"
+      },
+      "workflowType": "workflow.retry-activity",
       "header": {
         "fields": {}
       }
@@ -1252,6 +1322,20 @@
       "header": {
         "fields": {}
       }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "10",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.standard-visibility",
+        "runId": "16c2932f-60fb-48c2-908a-123de68dc3b3"
+      },
+      "workflowType": "workflow.standard-visibility",
+      "header": {
+        "fields": {}
+      }
     }
   },
   {
@@ -1272,6 +1356,20 @@
       "workflowType": {
         "name": "workflow.timeout"
       },
+      "header": {
+        "fields": {}
+      }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "15",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.timeout",
+        "runId": "b9c4a071-40ef-4e92-9dd2-69c331a90de4"
+      },
+      "workflowType": "workflow.timeout",
       "header": {
         "fields": {}
       }
@@ -1298,6 +1396,20 @@
       "header": {
         "fields": {}
       }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "11",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.advanced-visibility",
+        "runId": "d13c6438-be5d-4511-ad5d-cea4585bbab8"
+      },
+      "workflowType": "workflow.advanced-visibility",
+      "header": {
+        "fields": {}
+      }
     }
   },
   {
@@ -1318,6 +1430,20 @@
       "workflowType": {
         "name": "workflow.localactivity"
       },
+      "header": {
+        "fields": {}
+      }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "16",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.localactivity",
+        "runId": "ec8921e6-192b-4e3e-b843-f04109fbc4dd"
+      },
+      "workflowType": "workflow.localactivity",
       "header": {
         "fields": {}
       }
@@ -1344,6 +1470,20 @@
       "header": {
         "fields": {}
       }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "12",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.advanced-visibility.scan",
+        "runId": "12dd04c9-ae7f-4749-ae11-d410311062e0"
+      },
+      "workflowType": "workflow.advanced-visibility.scan",
+      "header": {
+        "fields": {}
+      }
     }
   },
   {
@@ -1364,6 +1504,20 @@
       "workflowType": {
         "name": "workflow.cancellation"
       },
+      "header": {
+        "fields": {}
+      }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "17",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.cancellation",
+        "runId": "875e87a0-677e-47d9-9854-17d6d67c5247"
+      },
+      "workflowType": "workflow.cancellation",
       "header": {
         "fields": {}
       }
@@ -1390,6 +1544,20 @@
       "header": {
         "fields": {}
       }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "13",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.concurrent-execution",
+        "runId": "ba57ac41-ac33-473a-a01f-6ce7bd533da2"
+      },
+      "workflowType": "workflow.concurrent-execution",
+      "header": {
+        "fields": {}
+      }
     }
   },
   {
@@ -1410,6 +1578,20 @@
       "workflowType": {
         "name": "workflow.retry-workflow"
       },
+      "header": {
+        "fields": {}
+      }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "19",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.retry-workflow",
+        "runId": "0b12815b-0dce-477a-96eb-dfdddac1476c"
+      },
+      "workflowType": "workflow.retry-workflow",
       "header": {
         "fields": {}
       }
@@ -1436,6 +1618,20 @@
       "header": {
         "fields": {}
       }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "20",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.reset",
+        "runId": "7b03c173-51b5-4317-84cf-2101b9c89547"
+      },
+      "workflowType": "workflow.reset",
+      "header": {
+        "fields": {}
+      }
     }
   },
   {
@@ -1456,6 +1652,20 @@
       "workflowType": {
         "name": "workflow.connectivity"
       },
+      "header": {
+        "fields": {}
+      }
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionStartedEventAttributes",
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "21",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.connectivity",
+        "runId": "6184621f-3f9f-4bbc-82b3-d6583d9921a3"
+      },
+      "workflowType": "workflow.connectivity",
       "header": {
         "fields": {}
       }
@@ -1511,6 +1721,19 @@
       "workflowType": {
         "name": "workflow.echo"
       },
+      "initiatedEventId": "8",
+      "startedEventId": "26"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.echo",
+        "runId": "00b515ce-a010-4864-bb33-d04deb228ace"
+      },
+      "workflowType": "workflow.echo",
       "initiatedEventId": "8",
       "startedEventId": "26"
     }
@@ -1581,6 +1804,19 @@
       "workflowType": {
         "name": "workflow.query"
       },
+      "initiatedEventId": "14",
+      "startedEventId": "25"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.query",
+        "runId": "5ec35484-2698-4e06-a998-e8b808633eb4"
+      },
+      "workflowType": "workflow.query",
       "initiatedEventId": "14",
       "startedEventId": "25"
     }
@@ -1662,6 +1898,28 @@
       },
       "initiatedEventId": "16",
       "startedEventId": "32"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImRhdGElMiA9PSAwIg=="
+          }
+        ]
+      },
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.localactivity",
+        "runId": "ec8921e6-192b-4e3e-b843-f04109fbc4dd"
+      },
+      "workflowType": "workflow.localactivity",
+      "initiatedEventId": "16",
+      "startedEventId": "32"
     }
   },
   {
@@ -1730,6 +1988,19 @@
       "workflowType": {
         "name": "workflow.connectivity"
       },
+      "initiatedEventId": "21",
+      "startedEventId": "38"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.connectivity",
+        "runId": "6184621f-3f9f-4bbc-82b3-d6583d9921a3"
+      },
+      "workflowType": "workflow.connectivity",
       "initiatedEventId": "21",
       "startedEventId": "38"
     }
@@ -1802,6 +2073,19 @@
       },
       "initiatedEventId": "13",
       "startedEventId": "35"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.concurrent-execution",
+        "runId": "ba57ac41-ac33-473a-a01f-6ce7bd533da2"
+      },
+      "workflowType": "workflow.concurrent-execution",
+      "initiatedEventId": "13",
+      "startedEventId": "35"
     }
   },
   {
@@ -1870,6 +2154,19 @@
       "workflowType": {
         "name": "workflow.signal"
       },
+      "initiatedEventId": "9",
+      "startedEventId": "27"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.signal",
+        "runId": "23a01faf-8a86-4acb-940a-a503eb9e14c3"
+      },
+      "workflowType": "workflow.signal",
       "initiatedEventId": "9",
       "startedEventId": "27"
     }
@@ -1942,6 +2239,19 @@
       },
       "initiatedEventId": "15",
       "startedEventId": "30"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.timeout",
+        "runId": "b9c4a071-40ef-4e92-9dd2-69c331a90de4"
+      },
+      "workflowType": "workflow.timeout",
+      "initiatedEventId": "15",
+      "startedEventId": "30"
     }
   },
   {
@@ -2010,6 +2320,19 @@
       "workflowType": {
         "name": "workflow.retry-workflow"
       },
+      "initiatedEventId": "19",
+      "startedEventId": "36"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.retry-workflow",
+        "runId": "0b12815b-0dce-477a-96eb-dfdddac1476c"
+      },
+      "workflowType": "workflow.retry-workflow",
       "initiatedEventId": "19",
       "startedEventId": "36"
     }
@@ -2082,6 +2405,19 @@
       },
       "initiatedEventId": "20",
       "startedEventId": "37"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.reset",
+        "runId": "7b03c173-51b5-4317-84cf-2101b9c89547"
+      },
+      "workflowType": "workflow.reset",
+      "initiatedEventId": "20",
+      "startedEventId": "37"
     }
   },
   {
@@ -2118,6 +2454,19 @@
       "workflowType": {
         "name": "workflow.cancellation"
       },
+      "initiatedEventId": "17",
+      "startedEventId": "34"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.cancellation",
+        "runId": "875e87a0-677e-47d9-9854-17d6d67c5247"
+      },
+      "workflowType": "workflow.cancellation",
       "initiatedEventId": "17",
       "startedEventId": "34"
     }
@@ -2172,6 +2521,19 @@
       "workflowType": {
         "name": "workflow.standard-visibility"
       },
+      "initiatedEventId": "10",
+      "startedEventId": "29"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.standard-visibility",
+        "runId": "16c2932f-60fb-48c2-908a-123de68dc3b3"
+      },
+      "workflowType": "workflow.standard-visibility",
       "initiatedEventId": "10",
       "startedEventId": "29"
     }
@@ -2244,6 +2606,19 @@
       },
       "initiatedEventId": "11",
       "startedEventId": "31"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.advanced-visibility",
+        "runId": "d13c6438-be5d-4511-ad5d-cea4585bbab8"
+      },
+      "workflowType": "workflow.advanced-visibility",
+      "initiatedEventId": "11",
+      "startedEventId": "31"
     }
   },
   {
@@ -2312,6 +2687,19 @@
       "workflowType": {
         "name": "workflow.schedule"
       },
+      "initiatedEventId": "22",
+      "startedEventId": "23"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.schedule",
+        "runId": "3f169b97-7f96-4ba9-9262-ac14170334db"
+      },
+      "workflowType": "workflow.schedule",
       "initiatedEventId": "22",
       "startedEventId": "23"
     }
@@ -2384,6 +2772,19 @@
       },
       "initiatedEventId": "12",
       "startedEventId": "33"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.advanced-visibility.scan",
+        "runId": "12dd04c9-ae7f-4749-ae11-d410311062e0"
+      },
+      "workflowType": "workflow.advanced-visibility.scan",
+      "initiatedEventId": "12",
+      "startedEventId": "33"
     }
   },
   {
@@ -2452,6 +2853,19 @@
       "workflowType": {
         "name": "workflow.retry-activity"
       },
+      "initiatedEventId": "18",
+      "startedEventId": "28"
+    },
+    "attributes": {
+      "type": "childWorkflowExecutionCompletedEventAttributes",
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.retry-activity",
+        "runId": "6398e686-2e21-4758-9c5c-09600ced52b1"
+      },
+      "workflowType": "workflow.retry-activity",
       "initiatedEventId": "18",
       "startedEventId": "28"
     }
