@@ -6,12 +6,12 @@
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
+  import type { ChildWorkflowEvent } from '$lib/utilities/get-workflow-relationships';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '../workflow-status.svelte';
 
-  export let children: ChildWorkflowClosedEvent[] = [];
+  export let children: ChildWorkflowEvent[] = [];
   export let pendingChildren: WorkflowExecution['pendingChildren'] = [];
   export let namespace: string;
 

@@ -7,7 +7,7 @@
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowIdentifier } from '$lib/types/workflows';
-  import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
+  import type { ChildWorkflowEvent } from '$lib/utilities/get-workflow-relationships';
 
   import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
   import ParentWorkflowTable from './parent-workflow-table.svelte';
@@ -18,7 +18,7 @@
   export let first: string | undefined;
   export let parent: WorkflowIdentifier | undefined;
   export let parentNamespaceName: string | undefined;
-  export let children: ChildWorkflowClosedEvent[];
+  export let children: ChildWorkflowEvent[];
   export let next: string | undefined;
   export let previous: string | undefined;
   export let scheduleId: string | undefined;

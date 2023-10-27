@@ -3,6 +3,7 @@ import type {
   ChildWorkflowExecutionCanceledEvent,
   ChildWorkflowExecutionCompletedEvent,
   ChildWorkflowExecutionFailedEvent,
+  ChildWorkflowExecutionStartedEvent,
   ChildWorkflowExecutionTerminatedEvent,
   ChildWorkflowExecutionTimedOutEvent,
   WorkflowEvent,
@@ -17,6 +18,7 @@ import {
   isChildWorkflowExecutionCanceledEvent,
   isChildWorkflowExecutionCompletedEvent,
   isChildWorkflowExecutionFailedEvent,
+  isChildWorkflowExecutionStartedEvent,
   isChildWorkflowExecutionTerminatedEvent,
   isChildWorkflowExecutionTimedOutEvent,
   isWorkflowExecutionStartedEvent,
@@ -34,12 +36,13 @@ const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
   }
 };
 
-export type ChildWorkflowClosedEvent =
+export type ChildWorkflowEvent =
   | ChildWorkflowExecutionCompletedEvent
   | ChildWorkflowExecutionFailedEvent
   | ChildWorkflowExecutionCanceledEvent
   | ChildWorkflowExecutionTimedOutEvent
-  | ChildWorkflowExecutionTerminatedEvent;
+  | ChildWorkflowExecutionTerminatedEvent
+  | ChildWorkflowExecutionStartedEvent;
 
 export const isChildWorkflowClosedEvent = (event: WorkflowEvent) => {
   return (
@@ -51,10 +54,39 @@ export const isChildWorkflowClosedEvent = (event: WorkflowEvent) => {
   );
 };
 
+const isCorrespondingEvent = (a: ChildWorkflowEvent, b: ChildWorkflowEvent) =>
+  a.attributes.workflowExecution.workflowId ===
+    b.attributes.workflowExecution.workflowId &&
+  a.attributes.workflowExecution.runId === b.attributes.workflowExecution.runId;
+
+export const getChildren = (events: WorkflowEvents): ChildWorkflowEvent[] => {
+  const children = [];
+  const startedChildren = [];
+
+  for (const event of events) {
+    if (isChildWorkflowExecutionStartedEvent(event)) {
+      startedChildren.push(event);
+    } else if (isChildWorkflowClosedEvent(event)) {
+      const startedEventIndex = startedChildren.findIndex((child) =>
+        isCorrespondingEvent(child, event as ChildWorkflowEvent),
+      );
+
+      if (startedEventIndex !== -1) {
+        // remove the started event if there is a corresponding closed event
+        startedChildren.splice(startedEventIndex, 1);
+      }
+
+      children.push(event);
+    }
+  }
+
+  return [...startedChildren, ...children];
+};
+
 type WorkflowRelationships = {
   hasRelationships: boolean;
   hasChildren: boolean;
-  children: ChildWorkflowClosedEvent[];
+  children: ChildWorkflowEvent[];
   first: string | undefined;
   previous: string | undefined;
   parent: WorkflowIdentifier | undefined;
@@ -69,9 +101,7 @@ export const getWorkflowRelationships = (
   fullEventHistory: WorkflowEvents,
   namespaces: DescribeNamespaceResponse[],
 ): WorkflowRelationships => {
-  const children = fullEventHistory.filter((event) =>
-    isChildWorkflowClosedEvent(event),
-  ) as ChildWorkflowClosedEvent[];
+  const children = getChildren(fullEventHistory) as ChildWorkflowEvent[];
   const hasChildren = !!workflow?.pendingChildren.length || !!children.length;
   const parent = workflow?.parent;
 
