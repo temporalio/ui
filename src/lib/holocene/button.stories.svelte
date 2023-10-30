@@ -25,6 +25,16 @@
       control: 'select',
       options: ['square', 'square-left', 'square-right'],
     },
+    target: {
+      control: 'select',
+      options: ['_blank', '_self', '_parent', '_top'],
+    },
+    href: {
+      control: 'text',
+    },
+    id: {
+      control: 'text',
+    },
   }}
 />
 
