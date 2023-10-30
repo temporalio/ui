@@ -204,6 +204,7 @@
       </div>
     {/if}
     <ToggleSwitch
+      data-testid="manual-search-toggle"
       label={translate('workflows.view-search-input')}
       labelPosition="left"
       id="view-search-input"

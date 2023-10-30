@@ -53,13 +53,10 @@
   import { page } from '$app/stores';
 
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
-  import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
-  import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
-  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
@@ -233,13 +230,7 @@
 </header>
 
 <div class="flex flex-col gap-2 md:flex-row">
-  <LabsModeGuard>
-    <svelte:fragment slot="fallback">
-      <WorkflowAdvancedSearch />
-    </svelte:fragment>
-    <WorkflowFilterSearch />
-  </LabsModeGuard>
-  <WorkflowDateTimeFilter />
+  <WorkflowFilterSearch />
 </div>
 <WorkflowsSummaryConfigurableTable>
   <slot name="cloud" slot="cloud" />

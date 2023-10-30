@@ -36,17 +36,13 @@ test.describe('Workflows List with Counts when countGroupByExecutionStatus is di
 
       await expect(page.getByTestId('workflow-count')).toHaveText('15');
 
+      await page.getByTestId('manual-search-toggle').click();
       await page.fill('#manual-search', 'WorkflowType="ImportantWorkflowType"');
-      await page.click('[data-testid="manual-search-button"]');
+      await page.getByTestId('manual-search-button').click();
 
       await expect(page).toHaveURL(
         /WorkflowType%3D%22ImportantWorkflowType%22/,
       );
-
-      await page.getByTestId('workflow-type-filter-button').click();
-      const workflowTypeValue = await page.inputValue('#workflow-type');
-      expect(workflowTypeValue).toBe('ImportantWorkflowType');
-      await page.waitForSelector('[data-testid="workflow-count"]');
 
       await expect(page.getByTestId('workflow-count')).toHaveText('15');
     });

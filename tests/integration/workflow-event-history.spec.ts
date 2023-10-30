@@ -38,8 +38,8 @@ test.describe('Workflow History', () => {
     const firstRowId = firstRow.getByTestId('link');
     await firstRowId.click();
 
-    await page.goto(`${workflowUrl}/events/1`);
     await mockWorkflowApis(page);
+
     await expect(page.getByTestId('workflow-id-heading')).toHaveText(
       '09db15_Running Click to copy content',
     );
@@ -57,8 +57,8 @@ test.describe('Workflow History', () => {
     const firstRowId = firstRow.getByTestId('link');
     await firstRowId.click();
 
-    await page.goto(`${workflowUrl}/events/1`);
     await mockWorkflowApis(page);
+
     await expect(page.getByTestId('workflow-id-heading')).toHaveText(
       '09db15_Running Click to copy content',
     );
