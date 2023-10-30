@@ -177,3 +177,5 @@ export const icons = {
   warning,
   workflow,
 } as const;
+
+export const iconNames = Object.keys(icons);

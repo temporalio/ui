@@ -8,7 +8,6 @@ server/**
 .vercel/**
 /package
 pnpm-lock.yaml
-.histoire/**
 README.md
 playwright-report
 dist/**/*

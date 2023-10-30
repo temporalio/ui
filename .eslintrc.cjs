@@ -6,6 +6,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier',
     'plugin:svelte/prettier',
+    'plugin:storybook/recommended',
   ],
   plugins: ['svelte', '@typescript-eslint', 'vitest', 'import'],
   ignorePatterns: ['**/*.cjs', '/server'],

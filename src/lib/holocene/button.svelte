@@ -97,9 +97,9 @@
   export let leadingIcon: IconName = null;
   export let trailingIcon: IconName = null;
   export let count = 0;
-  export let id: string = null;
-  export let href: string = null;
-  export let target: string = null;
+  export let id: string = '';
+  export let href: string = '';
+  export let target: string = '';
   export let active = false;
 </script>
 
