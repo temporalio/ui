@@ -40,7 +40,8 @@
       title={translate('workflows.pending-activities')}
       data-testid="pending-activities"
     >
-      <div slot="summary" class="flex items-center">
+      <div slot="summary" class="flex items-center gap-2">
+        <Badge type="count">{pendingActivities.length}</Badge>
         {#if canceled}
           <Tooltip
             bottom
@@ -137,7 +138,7 @@
                         {translate('workflows.heartbeat-details')}
                       </h4>
                       <CodeBlock
-                        class="max-h-32"
+                        class="max-h-32 overflow-y-scroll"
                         content={stringifyWithBigInt(
                           pendingActivity.heartbeatDetails,
                         )}
@@ -154,7 +155,7 @@
                         {translate('workflows.last-failure')}
                       </h4>
                       <CodeBlock
-                        class="max-h-32"
+                        class="max-h-32 overflow-y-scroll"
                         content={stringifyWithBigInt(
                           pendingActivity.lastFailure,
                         )}
