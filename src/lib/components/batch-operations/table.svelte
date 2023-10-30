@@ -6,7 +6,7 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timeFormat } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type {
     BatchOperationInfo,
     BatchOperationState,
@@ -25,12 +25,15 @@
   };
 </script>
 
-<Table>
+<Table class="w-full table-fixed">
+  <caption class="sr-only" slot="caption">
+    {translate('batch.list-page-title')}
+  </caption>
   <TableHeaderRow slot="headers">
-    <th>{translate('common.status')}</th>
-    <th>{translate('common.job-id')}</th>
-    <th>{translate('common.start-time')}</th>
-    <th>{translate('common.close-time')}</th>
+    <th class="w-28">{translate('common.status')}</th>
+    <th class="w-auto">{translate('common.job-id')}</th>
+    <th class="max-sm:hidden lg:w-56">{translate('common.start-time')}</th>
+    <th class="max-sm:hidden lg:w-56">{translate('common.close-time')}</th>
   </TableHeaderRow>
   {#each operations as { state, jobId, startTime, closeTime }}
     <TableRow>
@@ -43,12 +46,23 @@
         ><Link href={routeForBatchOperation({ namespace, jobId })}>{jobId}</Link
         ></td
       >
-      <td>{formatDate(startTime, $timeFormat)}</td>
-      <td>{formatDate(closeTime, $timeFormat)}</td>
+      <td class="max-sm:hidden"
+        >{formatDate(startTime, $timeFormat, {
+          relative: $relativeTime,
+        })}</td
+      >
+      <td class="max-sm:hidden"
+        >{formatDate(closeTime, $timeFormat, {
+          relative: $relativeTime,
+        })}</td
+      >
     </TableRow>
   {:else}
     <TableRow>
-      <td colspan="4">
+      <td class="max-sm:hidden" colspan="4">
+        <EmptyState title={translate('batch.empty-state-title')}></EmptyState>
+      </td>
+      <td class="sm:hidden" colspan="2">
         <EmptyState title={translate('batch.empty-state-title')}></EmptyState>
       </td>
     </TableRow>

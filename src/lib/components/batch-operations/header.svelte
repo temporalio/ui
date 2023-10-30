@@ -32,7 +32,7 @@
 
 <div class="flex items-center justify-between">
   <div class="flex flex-col gap-2">
-    <div class="flex flex-row gap-2">
+    <div class="flex flex-row gap-2 max-sm:flex-col">
       <h1 class="text-2xl">
         {translate('batch.describe-page-title')}
       </h1>

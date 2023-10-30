@@ -86,7 +86,7 @@ const JsonObjectEncodedWithConstructor = {
 const JsonObjectDecoded = { Transformer: 'OptimusPrime' };
 const JsonObjectDecodedWithConstructor = { ConstructorOutput: 'OptimusPrime' };
 
-describe('decodePayload', () => {
+describe('decodePayload with default returnDataOnly', () => {
   it('Should not decode a payload with encoding binary/encrypted', () => {
     expect(decodePayload(WebDecodePayload)).toEqual(WebDecodePayload);
   });
@@ -108,6 +108,46 @@ describe('decodePayload', () => {
   it('Should decode a json payload with constructor keyword with encoding json/plain', () => {
     expect(decodePayload(JsonObjectEncodedWithConstructor)).toEqual(
       JsonObjectDecodedWithConstructor,
+    );
+  });
+});
+
+describe('decodePayload with returnDataOnly = false', () => {
+  it('Should not decode a payload with encoding binary/encrypted', () => {
+    expect(decodePayload(WebDecodePayload, false)).toEqual(WebDecodePayload);
+  });
+  it('Should not decode a payload with encoding binary/null', () => {
+    const fullDecodedPayload = { ...BinaryNullEncodedNoData, data: null };
+    expect(decodePayload(BinaryNullEncodedNoData, false)).toEqual(
+      fullDecodedPayload,
+    );
+  });
+  it('Should decode a payload with encoding json/plain', () => {
+    const fullDecodedPayload = { ...JsonPlainEncoded, data: Base64Decoded };
+    expect(decodePayload(JsonPlainEncoded, false)).toEqual(fullDecodedPayload);
+  });
+  it('Should decode a payload with encoding json/foo', () => {
+    const fullDecodedPayload = { ...JsonFooEncoded, data: Base64Decoded };
+    expect(decodePayload(JsonFooEncoded, false)).toEqual(fullDecodedPayload);
+  });
+  it('Should decode a payload with encoding json/protobuf', () => {
+    const fullDecodedPayload = { ...ProtobufEncoded, data: Base64Decoded };
+    expect(decodePayload(ProtobufEncoded, false)).toEqual(fullDecodedPayload);
+  });
+  it('Should decode a json payload with encoding json/plain', () => {
+    const fullDecodedPayload = {
+      ...JsonObjectEncoded,
+      data: JsonObjectDecoded,
+    };
+    expect(decodePayload(JsonObjectEncoded, false)).toEqual(fullDecodedPayload);
+  });
+  it('Should decode a json payload with constructor keyword with encoding json/plain', () => {
+    const fullDecodedPayload = {
+      ...JsonObjectEncoded,
+      data: JsonObjectDecodedWithConstructor,
+    };
+    expect(decodePayload(JsonObjectEncodedWithConstructor, false)).toEqual(
+      fullDecodedPayload,
     );
   });
 });

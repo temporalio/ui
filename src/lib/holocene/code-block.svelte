@@ -58,7 +58,7 @@
   const { copy, copied } = copyToClipboard();
 
   const handleCopy = (e: Event) => {
-    copy(e, stringifyWithBigInt(content, undefined, 2));
+    copy(e, content);
   };
 
   let editor: HTMLElement;

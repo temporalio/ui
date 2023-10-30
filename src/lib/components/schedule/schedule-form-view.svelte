@@ -116,7 +116,7 @@
   {#if $loading}
     <Loading title={loadingText} />
   {:else}
-    <header class="mb-12 flex flex-col gap-1">
+    <header class="mb-12 flex flex-col gap-4">
       <Link href={backHref} icon="chevron-left">
         {backTitle}
       </Link>

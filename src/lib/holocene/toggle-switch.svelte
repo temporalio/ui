@@ -27,7 +27,7 @@
   };
 </script>
 
-<label class="switch" class:disabled>
+<label class="switch" class:disabled data-testid={$$props['data-testid']}>
   {#if labelPosition === 'left'}
     <span class="label left" class:sr-only={labelHidden}>
       {label}
@@ -43,7 +43,6 @@
     role="switch"
     on:focus={handleFocus}
     on:blur={handleBlur}
-    data-testid={$$props['data-testid']}
   />
   <span
     on:mouseenter={handleMouseEnter}
