@@ -4,6 +4,7 @@
   import { page } from '$app/stores';
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
+  import { workflowStatuses } from '$lib/models/workflow-status';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { WorkflowStatus } from '$lib/types/workflows';
@@ -52,16 +53,23 @@
   };
 
   const getStatusAndCountOfGroup = (groups = []) => {
-    return groups.map((group) => {
-      const status = decodePayload(
-        group?.groupValues[0],
-      ) as unknown as WorkflowStatus;
-      const count = parseInt(group.count);
-      return {
-        status,
-        count,
-      };
-    });
+    return groups
+      .map((group) => {
+        const status = decodePayload(
+          group?.groupValues[0],
+        ) as unknown as WorkflowStatus;
+        const count = parseInt(group.count);
+        return {
+          status,
+          count,
+        };
+      })
+      .sort((a, b) => {
+        return (
+          workflowStatuses.indexOf(a.status) -
+          workflowStatuses.indexOf(b.status)
+        );
+      });
   };
 
   const fetchNewCounts = async () => {
