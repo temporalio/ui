@@ -13,11 +13,10 @@ let temporal: TemporalServer;
 
 const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.VERCEL) return true;
-  if (process.env.HISTOIRE) return true;
   if (process.env.VITEST) return true;
   if (temporal) return true;
   if (process.platform === 'win32') return true;
-  if (server.config.mode === 'docker' || server.config.mode.includes('test'))
+  if (!['temporal-server', 'ui-server'].includes(server.config.mode))
     return true;
 
   return false;

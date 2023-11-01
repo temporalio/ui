@@ -7,15 +7,9 @@ let uiServer: UIServer;
 
 const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.VERCEL) return true;
-  if (process.env.HISTOIRE) return true;
   if (process.env.VITEST) return true;
   if (process.env.CI) return true;
-  if (
-    server.config.mode === 'docker' ||
-    server.config.mode === 'temporal-server' ||
-    server.config.mode.includes('test')
-  )
-    return true;
+  if (server.config.mode !== 'ui-server') return true;
 
   return false;
 };

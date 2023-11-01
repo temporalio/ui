@@ -2,4 +2,4 @@
 
 Temporal's UI Component Library
 
-Run `pnpm story:dev` to open Histoire
+Run `pnpm stories:dev` to open Storybook

@@ -1,0 +1,33 @@
+<script lang="ts">
+  import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
+
+  import { iconNames } from '$lib/holocene/icon/paths';
+  import NumberInput from '$lib/holocene/input/number-input.svelte';
+</script>
+
+<Meta
+  title="Number Input"
+  component={NumberInput}
+  args={{
+    label: 'Number Input',
+    placeholder: 'Enter a number',
+    units: 'days',
+    min: 0,
+    max: 100,
+  }}
+  argTypes={{
+    label: { control: 'text' },
+    id: { control: 'text' },
+    value: { control: 'number' },
+    icon: { control: 'select', options: iconNames },
+    name: { control: 'text' },
+    max: { control: 'number' },
+    min: { control: 'number' },
+  }}
+/>
+
+<Template let:args>
+  <NumberInput {...args} />
+</Template>
+
+<Story name="number input" args={{ id: 'number-input-1' }} />

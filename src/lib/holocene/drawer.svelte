@@ -14,7 +14,7 @@
   export let id = 'navigation-drawer';
   export let closeButtonLabel: string;
 
-  const flyParams = {
+  $: flyParams = {
     duration: 500,
     ...(position === 'bottom' ? { y: 200 } : { x: 200 }),
   };
