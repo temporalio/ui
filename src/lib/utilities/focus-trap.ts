@@ -34,10 +34,10 @@ export const focusTrap = (node: HTMLElement, enabled: boolean) => {
     firstFocusable = focusable[0];
     lastFocusable = focusable[focusable.length - 1];
 
-    if (!fromObserver) firstFocusable.focus();
+    if (!fromObserver) firstFocusable?.focus();
 
-    firstFocusable.addEventListener('keydown', onKeydown);
-    lastFocusable.addEventListener('keydown', onKeydown);
+    firstFocusable?.addEventListener('keydown', onKeydown);
+    lastFocusable?.addEventListener('keydown', onKeydown);
   };
 
   const cleanUp = () => {
