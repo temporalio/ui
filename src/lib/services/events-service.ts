@@ -50,12 +50,13 @@ export const fetchRawEvents = async ({
   onComplete,
 }: FetchEventsParameters): Promise<HistoryEvent[]> => {
   const endpoint = getEndpointForSortOrder(sort);
-  const route = routeForApi(endpoint, { namespace, workflowId, runId });
+  const route = routeForApi(endpoint, { namespace, workflowId });
   const response = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
         token,
         request: fetch,
+        params: { runId: runId },
       });
     },
     { onStart, onUpdate, onComplete },
@@ -74,12 +75,13 @@ export const fetchAllEvents = async ({
   onComplete,
 }: FetchEventsParameters): Promise<CommonHistoryEvent[]> => {
   const endpoint = getEndpointForSortOrder(sort);
-  const route = routeForApi(endpoint, { namespace, workflowId, runId });
+  const route = routeForApi(endpoint, { namespace, workflowId });
   const response = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
         token,
         request: fetch,
+        params: { runId: runId },
       });
     },
     { onStart, onUpdate, onComplete },
@@ -98,7 +100,6 @@ export const fetchPartialRawEvents = async ({
   const route = routeForApi(`events.${sort}`, {
     namespace,
     workflowId,
-    runId,
   });
 
   try {
@@ -106,7 +107,7 @@ export const fetchPartialRawEvents = async ({
       route,
       {
         request: fetch,
-        params: { maximumPageSize: '20' },
+        params: { maximumPageSize: '20', runId: runId },
       },
     );
 
@@ -159,7 +160,6 @@ export async function getPaginatedEvents({
       {
         namespace,
         workflowId,
-        runId,
       },
     );
     const { history, nextPageToken } =
@@ -167,6 +167,7 @@ export async function getPaginatedEvents({
         request: fetch,
         params: {
           nextPageToken: token,
+          runId: runId,
         },
       });
 

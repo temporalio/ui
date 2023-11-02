@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-export const WORKFLOWS_COUNT_API = '**/api/v1/namespaces/*/workflows/count?*';
+export const WORKFLOWS_COUNT_API = '**/api/v1/namespaces/*/workflow-count?*';
 
 export const mockWorkflowsCountApi = (page: Page) => {
   return page.route(WORKFLOWS_COUNT_API, (route) => {

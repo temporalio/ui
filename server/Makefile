@@ -45,8 +45,6 @@ build-grpc:
 			--openapiv2_out=$(OPENAPI_OUT) \
 		$(PROTO_DIR)*.proto \
 	;)
-	@printf $(COLOR) "Fixing gRPC output paths"
-	mv -f $(PROTO_OUT)/temporal/api/* $(PROTO_OUT) && rm -rf $(PROTO_OUT)/temporal
 
 ##### Install dependencies #####
 
