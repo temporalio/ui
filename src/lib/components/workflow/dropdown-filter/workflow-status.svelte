@@ -79,7 +79,7 @@
       }
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters);
+    updateQueryParamsFromFilter($page.url, $workflowFilters, true);
   };
 </script>
 

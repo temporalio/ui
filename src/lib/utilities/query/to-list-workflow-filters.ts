@@ -186,8 +186,10 @@ export const combineFilters = (filters: WorkflowFilter[]) => {
 };
 
 export const updateQueryParamsFromFilter = debounce(
-  (url: URL, filters: WorkflowFilter[]) => {
-    const allFilters = combineFilters(filters);
+  (url: URL, filters: WorkflowFilter[], isDropdownFilter = false) => {
+    const allFilters = isDropdownFilter
+      ? combineDropdownFilters(filters)
+      : combineFilters(filters);
     const query = toListWorkflowQueryFromFilters(allFilters);
     updateQueryParameters({
       url,
