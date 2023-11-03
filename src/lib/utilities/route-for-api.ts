@@ -24,8 +24,6 @@ import type {
   WorkflowActivitiesRouteParameters,
   WorkflowAPIRoutePath,
   WorkflowListRouteParameters,
-  WorkflowQueryAPIRoutePath,
-  WorkflowQueryRouteParameters,
   WorkflowRouteParameters,
   WorkflowsAPIRoutePath,
 } from '$lib/types/api';
@@ -86,10 +84,8 @@ const encode = (
       namespace: '',
       workflowId: '',
       scheduleId: '',
+      runId: '',
       queue: '',
-      queryType: '',
-      signalName: '',
-      batchJobId: '',
       activityId: '',
     },
   );
@@ -103,33 +99,34 @@ export function pathForApi(
   if (shouldEncode) parameters = encode(parameters);
 
   const routes: { [K in APIRoutePath]: string } = {
-    cluster: '/cluster-info',
+    cluster: '/cluster',
     systemInfo: '/system-info',
-    'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history`,
-    'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history-reverse`,
+    'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events`,
+    'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events/reverse`,
     namespaces: '/namespaces',
     namespace: `/namespaces/${parameters?.namespace}`,
-    query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/query/${parameters.queryType}`,
+    query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
     'schedule.delete': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
     schedule: `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
     schedules: `/namespaces/${parameters?.namespace}/schedules`,
     'search-attributes': `/namespaces/${parameters.namespace}/search-attributes`,
     settings: '/settings',
     'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
-    'task-queue.compatibility': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/worker-build-id-compatibility`,
+    'task-queue.compatibility': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/compatibility`,
     user: '/me',
     'worker-task-reachability': `/namespaces/${parameters?.namespace}/worker-task-reachability`,
-    'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/terminate`,
-    'workflow.cancel': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/cancel`,
-    'workflow.signal': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/signal/${parameters.signalName}`,
-    'workflow.reset': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/reset`,
-    workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}`,
-    'workflows.archived': `/namespaces/${parameters?.namespace}/archived-workflows`,
+    'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/terminate`,
+    'workflow.cancel': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/cancel`,
+    'workflow.signal': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/signal`,
+    'workflow.reset': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/reset`,
+    workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}`,
+    'workflows.archived': `/namespaces/${parameters?.namespace}/workflows/archived`,
     workflows: `/namespaces/${parameters?.namespace}/workflows`,
-    'workflows.count': `/namespaces/${parameters?.namespace}/workflow-count`,
-    'activity.complete': `/namespaces/${parameters.namespace}/activities/complete-by-id`,
-    'activity.fail': `/namespaces/${parameters.namespace}/activities/fail-by-id`,
-    'batch-operations': `/namespaces/${parameters.namespace}/batch-operations/${parameters?.batchJobId}`,
+    'workflows.count': `/namespaces/${parameters?.namespace}/workflows/count`,
+    'activity.complete': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/activities/${parameters.activityId}/complete`,
+    'activity.fail': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/activities/${parameters.activityId}/fail`,
+    'batch-operations': `/namespaces/${parameters.namespace}/batch-operations`,
+    'batch-operation.describe': `/namespaces/${parameters.namespace}/batch-operations/describe`,
   };
 
   return getPath(routes[route]);
@@ -157,11 +154,6 @@ export function routeForApi(
 export function routeForApi(
   route: WorkflowAPIRoutePath,
   parameters: WorkflowRouteParameters,
-  shouldEncode?: boolean,
-): string;
-export function routeForApi(
-  route: WorkflowQueryAPIRoutePath,
-  parameters: WorkflowQueryRouteParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(

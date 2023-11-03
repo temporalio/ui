@@ -1,5 +1,5 @@
 import { passAccessToken as codecPassAccessToken } from '$lib/stores/data-encoder-config';
-import type { WorkflowQueryRouteParameters } from '$lib/types/api';
+import type { WorkflowRouteParameters } from '$lib/types/api';
 import type { Eventual, Settings } from '$lib/types/global';
 import { convertPayloadToJsonWithCodec } from '$lib/utilities/decode-payload';
 import {
@@ -47,13 +47,12 @@ export type ParsedQuery = ReturnType<typeof JSON.parse>[0];
 const formatParameters = async (
   namespace: string,
   workflow: Eventual<{ id: string; runId: string }>,
-  queryType: string,
-): Promise<WorkflowQueryRouteParameters> => {
+): Promise<WorkflowRouteParameters> => {
   workflow = await workflow;
   return {
     namespace,
     workflowId: workflow.id,
-    queryType,
+    runId: workflow.runId,
   };
 };
 
@@ -67,7 +66,7 @@ async function fetchQuery(
   }) => void,
 ): Promise<QueryResponse> {
   workflow = await workflow;
-  const parameters = await formatParameters(namespace, workflow, queryType);
+  const parameters = await formatParameters(namespace, workflow);
   const route = routeForApi('query', parameters);
 
   return await requestFromAPI<QueryResponse>(route, {
@@ -80,7 +79,6 @@ async function fetchQuery(
         },
         query: {
           queryType,
-          runId: workflow.runId,
         },
       }),
     },

@@ -26,16 +26,14 @@ export const failActivityTask = async ({
   WorkflowInformation): Promise<FailActivityTaskResponse> => {
   const route = routeForApi('activity.fail', {
     namespace,
+    workflowId,
+    runId,
+    activityId,
   });
   return requestFromAPI<FailActivityTaskResponse>(route, {
     notifyOnError: false,
     options: {
       body: stringifyWithBigInt({ failure, identity, lastHeartbeatDetails }),
-    },
-    params: {
-      workflowId,
-      runId,
-      activityId,
     },
   });
 };
@@ -51,15 +49,13 @@ export const completeActivityTask = async ({
   WorkflowInformation): Promise<CompleteActivityTaskResponse> => {
   const route = routeForApi('activity.complete', {
     namespace,
+    workflowId,
+    runId,
+    activityId,
   });
 
   return requestFromAPI(route, {
     notifyOnError: false,
     options: { body: stringifyWithBigInt({ identity, result }) },
-    params: {
-      workflowId,
-      runId,
-      activityId,
-    },
   });
 };

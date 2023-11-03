@@ -12,15 +12,14 @@ export type WorkflowAPIRoutePath =
   | 'workflow.signal'
   | 'workflow.reset'
   | 'events.ascending'
-  | 'events.descending';
-
-export type WorkflowQueryAPIRoutePath = 'query';
+  | 'events.descending'
+  | 'query';
 
 export type WorkflowActivitiesAPIRoutePath =
   | 'activity.complete'
   | 'activity.fail';
 
-export type BatchAPIRoutePath = 'batch-operations';
+export type BatchAPIRoutePath = 'batch-operations' | 'batch-operation.describe';
 
 export type NamespaceAPIRoutePath = 'namespace';
 
@@ -44,7 +43,6 @@ export type APIRoutePath =
   | TaskQueueAPIRoutePath
   | WorkerAPIRoutePath
   | WorkflowAPIRoutePath
-  | WorkflowQueryAPIRoutePath
   | WorkflowActivitiesAPIRoutePath
   | WorkflowsAPIRoutePath
   | NamespaceAPIRoutePath
@@ -54,10 +52,8 @@ export type APIRouteParameters = {
   namespace: string;
   workflowId: string;
   scheduleId: string;
-  batchJobId: string;
+  runId: string;
   queue: string;
-  queryType: string;
-  signalName: string;
   activityId: string;
 };
 
@@ -71,23 +67,13 @@ export type SearchAttributesRouteParameters = Pick<
 
 export type WorkflowRouteParameters = Pick<
   APIRouteParameters,
-  'namespace' | 'workflowId'
+  'namespace' | 'workflowId' | 'runId'
 >;
 
-export type WorkflowQueryRouteParameters = Pick<
-  APIRouteParameters,
-  'namespace' | 'workflowId' | 'queryType'
->;
+export type WorkflowActivitiesRouteParameters = WorkflowRouteParameters &
+  Pick<APIRouteParameters, 'activityId'>;
 
-export type WorkflowActivitiesRouteParameters = Pick<
-  APIRouteParameters,
-  'namespace'
->;
-
-export type BatchRouteParameters = Pick<
-  APIRouteParameters,
-  'namespace' | 'batchJobId'
->;
+export type BatchRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 
 export type TaskQueueRouteParameters = Pick<
   APIRouteParameters,

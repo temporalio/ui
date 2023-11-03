@@ -13,21 +13,21 @@ describe('routeForApi', () => {
   it('should return a route for workflow', () => {
     const route = routeForApi('workflow', parameters);
     expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow',
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow/runs/run',
     );
   });
 
   it('should return a route for events', () => {
     const route = routeForApi('events.ascending', parameters);
     expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow/history',
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow/runs/run/events',
     );
   });
 
   it('should return a route for events', () => {
     const route = routeForApi('events.descending', parameters);
     expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow/history-reverse',
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow/runs/run/events/reverse',
     );
   });
 
@@ -40,7 +40,7 @@ describe('routeForApi', () => {
 
   it('should return a route for cluster', () => {
     const route = routeForApi('cluster');
-    expect(route).toBe('http://localhost:8233/api/v1/cluster-info');
+    expect(route).toBe('http://localhost:8233/api/v1/cluster');
   });
 
   it('should return a route for settings', () => {
@@ -56,7 +56,7 @@ describe('routeForApi', () => {
   it('should return a route for workflow.terminate', () => {
     const route = routeForApi('workflow.terminate', parameters);
     expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow/terminate',
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow/runs/run/terminate',
     );
   });
 });
@@ -68,7 +68,7 @@ describe('API Request Encoding', () => {
       workflowId: 'workflow#with#hashes',
     });
     expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow%2523with%2523hashes',
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow%2523with%2523hashes/runs/run',
     );
   });
 
@@ -81,7 +81,7 @@ describe('API Request Encoding', () => {
         'temporal.canary.cron-workflow.sanity-2022-05-02T16:03:11-06:00/workflow.advanced-visibility.scan',
     });
     expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/canary/workflows/temporal.canary.cron-workflow.sanity-2022-05-02T16%253A03%253A11-06%253A00%252Fworkflow.advanced-visibility.scan',
+      'http://localhost:8233/api/v1/namespaces/canary/workflows/temporal.canary.cron-workflow.sanity-2022-05-02T16%253A03%253A11-06%253A00%252Fworkflow.advanced-visibility.scan/runs/47e33895-aff5-475a-9b53-73abdee8bebe',
     );
   });
 });

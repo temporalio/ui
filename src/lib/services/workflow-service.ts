@@ -207,14 +207,8 @@ export async function fetchWorkflow(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<WorkflowExecution> {
-  const route = routeForApi('workflow', {
-    namespace: parameters.namespace,
-    workflowId: parameters.workflowId,
-  });
-  return requestFromAPI(route, {
-    request,
-    params: { runId: parameters.runId },
-  }).then(toWorkflowExecution);
+  const route = routeForApi('workflow', parameters);
+  return requestFromAPI(route, { request }).then(toWorkflowExecution);
 }
 
 export async function terminateWorkflow({
@@ -226,6 +220,7 @@ export async function terminateWorkflow({
   const route = routeForApi('workflow.terminate', {
     namespace,
     workflowId: workflow.id,
+    runId: workflow.runId,
   });
   return await requestFromAPI<null>(route, {
     options: {
@@ -233,9 +228,6 @@ export async function terminateWorkflow({
       body: stringifyWithBigInt({ reason, ...(identity && { identity }) }),
     },
     notifyOnError: false,
-    params: {
-      runId: workflow.runId,
-    },
   });
 }
 
