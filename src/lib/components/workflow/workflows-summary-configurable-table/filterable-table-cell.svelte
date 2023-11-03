@@ -9,7 +9,6 @@
     type TextFilterAttributes,
   } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
-  import { labsMode } from '$lib/stores/labs-mode';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForEventHistory } from '$lib/utilities/route-for';
@@ -44,7 +43,7 @@
       $workflowFilters = [...getOtherFilters()];
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $labsMode);
+    updateQueryParamsFromFilter($page.url, $workflowFilters);
   };
 </script>
 

@@ -68,7 +68,6 @@
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
   import { groupByCountEnabled } from '$lib/stores/group-by-enabled';
-  import { labsMode } from '$lib/stores/labs-mode';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
@@ -101,7 +100,7 @@
   const persistTimeFilter = () => {
     if (!query && !$workflowFilters.length && $persistedTimeFilter) {
       $workflowFilters = [$persistedTimeFilter];
-      updateQueryParamsFromFilter($page.url, $workflowFilters, $labsMode);
+      updateQueryParamsFromFilter($page.url, $workflowFilters);
     }
   };
 
@@ -111,9 +110,7 @@
     $lastUsedNamespace = $page.params.namespace;
     if (query) {
       // Set filters from inital page load query if it exists
-      $workflowFilters = $labsMode
-        ? toListWorkflowFilters(query, $searchAttributes)
-        : toListWorkflowFilters(query);
+      $workflowFilters = toListWorkflowFilters(query, $searchAttributes);
     }
   });
 
