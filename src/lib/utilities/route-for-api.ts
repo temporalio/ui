@@ -129,6 +129,7 @@ export function pathForApi(
     'workflows.count': `/namespaces/${parameters?.namespace}/workflow-count`,
     'activity.complete': `/namespaces/${parameters.namespace}/activities/complete-by-id`,
     'activity.fail': `/namespaces/${parameters.namespace}/activities/fail-by-id`,
+    'batch-operations.list': `/namespaces/${parameters.namespace}/batch-operations`,
     'batch-operations': `/namespaces/${parameters.namespace}/batch-operations/${parameters?.batchJobId}`,
   };
 
