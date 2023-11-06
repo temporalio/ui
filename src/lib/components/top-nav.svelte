@@ -4,7 +4,6 @@
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import {
     Menu,
     MenuButton,
@@ -98,12 +97,8 @@
           </div>
         </MenuButton>
         <Menu id="user-menu" position="right">
-          <MenuItem disabled={userEmaiLink === ''}>
-            {#if userEmaiLink ? true : false}
-              <Link href={userEmaiLink}>{$authUser.email}</Link>
-            {:else}
-              {$authUser.email}
-            {/if}
+          <MenuItem href={userEmaiLink}>
+            {$authUser.email}
           </MenuItem>
           <MenuItem on:click={logout}>{translate('common.log-out')}</MenuItem>
         </Menu>
