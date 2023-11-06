@@ -105,7 +105,7 @@
               {$authUser.email}
             {/if}
           </MenuItem>
-          <MenuItem on:click={logout}>{translate('log-out')}</MenuItem>
+          <MenuItem on:click={logout}>{translate('common.log-out')}</MenuItem>
         </Menu>
       </MenuContainer>
     {/if}
