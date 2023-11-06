@@ -18,6 +18,7 @@
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
+  export let userEmaiLink = '';
 
   let screenWidth: number;
 
@@ -96,7 +97,9 @@
           </div>
         </MenuButton>
         <Menu id="user-menu" position="right">
-          <MenuItem disabled>{$authUser.email}</MenuItem>
+          <MenuItem href={userEmaiLink} disabled={!userEmaiLink}>
+            {$authUser.email}
+          </MenuItem>
           <MenuItem on:click={logout}>{translate('common.log-out')}</MenuItem>
         </Menu>
       </MenuContainer>
