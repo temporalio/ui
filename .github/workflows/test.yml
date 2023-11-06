@@ -32,7 +32,7 @@ jobs:
 
       - name: build
         working-directory: server
-        run: make install-utils build
+        run: make build
 
       - name: test
         working-directory: server
