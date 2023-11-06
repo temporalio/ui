@@ -228,6 +228,7 @@ export async function listBatchOperations(
 ): Promise<BatchOperations> {
   const route = routeForApi('batch-operations.list', {
     namespace,
+    batchJobId: '',
   });
 
   const response = await requestFromAPI<ListBatchOperationsResponse>(route, {
