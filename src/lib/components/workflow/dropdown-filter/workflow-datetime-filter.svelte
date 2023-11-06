@@ -96,7 +96,7 @@
       custom = false;
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters);
+    updateQueryParamsFromFilter($page.url, $workflowFilters, true);
   };
 
   const onTimeFieldChange = (field: 'StartTime' | 'CloseTime') => {
@@ -168,7 +168,7 @@
     };
     $workflowFilters = [...getOtherFilters(), filter];
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters);
+    updateQueryParamsFromFilter($page.url, $workflowFilters, true);
   };
 </script>
 
