@@ -20,8 +20,6 @@ You can start a Temporal server in development using the following command:
 temporal server start-dev
 ```
 
-You can access the UI by visiting `http://localhost:8233`. OpenAPI is accessible at `http://localhost:8233/openapi/`.
-
 [temporal cli]: https://github.com/temporalio/cli
 [homebrew]: https://brew.sh
 
@@ -48,13 +46,6 @@ git submodule update
 ```
 
 This clones the [Temporal API Protos](https://github.com/temporalio/api) into the git submodule, which is required for local development of the UI when running against a local version of the UI server.
-
-```bash
-cd server/
-make install-utils
-```
-
-This installs various Go dependencies which are required for compiling the gRPC protos for running a local version of the UI server.
 
 
 To run a local development version of the Svelte application via Vite, run `pnpm dev`. The application will run on [http://localhost:3000]() against a local ui-server running along with Temporal server from the temporal-cli.

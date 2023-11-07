@@ -3,7 +3,6 @@ port: {{ default .Env.TEMPORAL_UI_PORT "8080" }}
 publicPath: {{ default .Env.TEMPORAL_UI_PUBLIC_PATH "" }}
 enableUi: {{ default .Env.TEMPORAL_UI_ENABLED "true" }}
 cloudUi: {{ default .Env.TEMPORAL_CLOUD_UI "false" }}
-enableOpenApi: {{ default .Env.TEMPORAL_OPENAPI_ENABLED "true" }}
 defaultNamespace: {{ default .Env.TEMPORAL_DEFAULT_NAMESPACE "default" }}
 feedbackUrl: {{ default .Env.TEMPORAL_FEEDBACK_URL "" }}
 notifyOnNewVersion: {{ default .Env.TEMPORAL_NOTIFY_ON_NEW_VERSION "true" }}

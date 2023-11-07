@@ -57,7 +57,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build UI Server
         working-directory: server
-        run: make install-utils build
+        run: make build
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
       - name: Run E2E tests
