@@ -13,8 +13,9 @@
   let isValid = true;
 
   const handleKeydown = (e: KeyboardEvent) => {
-    if (isValid && e.key === 'Enter' && value !== '') {
-      $filter.value = value.trim();
+    const newValue = value.trim();
+    if (isValid && e.key === 'Enter' && newValue !== '') {
+      $filter.value = newValue;
       e.preventDefault();
       handleSubmit();
     }
