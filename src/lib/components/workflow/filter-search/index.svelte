@@ -30,6 +30,7 @@
     getFocusedElementId,
     isBooleanFilter,
     isDateTimeFilter,
+    isDurationFilter,
     isNumberFilter,
     isStatusFilter,
     isTextFilter,
@@ -44,6 +45,7 @@
   import BooleanFilter from './boolean-filter.svelte';
   import CloseFilter from './close-filter-button.svelte';
   import DateTimeFilter from './datetime-filter.svelte';
+  import DurationFilter from './duration-filter.svelte';
   import FilterList from './filter-list.svelte';
   import NumberFilter from './number-filter.svelte';
   import SearchAttributeMenu from './search-attribute-menu.svelte';
@@ -164,6 +166,14 @@
         <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
           <ListFilter />
         </div> -->
+        {:else if isDurationFilter($filter.attribute)}
+          <div
+            class="flex w-full items-center"
+            in:fly={{ x: -100, duration: 150 }}
+          >
+            <DurationFilter />
+            <CloseFilter />
+          </div>
         {:else if isNumberFilter($filter.attribute)}
           <div
             class="flex w-full items-center"
