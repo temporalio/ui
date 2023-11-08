@@ -102,14 +102,14 @@ describe('toDate', () => {
   });
 
   it('should produce a date based on a duration', () => {
-    const ninetyDaysEarlier = '2019-10-03T00:00:00Z';
+    const ninetyDaysEarlier = '2019-10-03T00:00:00.000Z';
 
     const result = toDate({ days: 90 });
     expect(result).toBe(ninetyDaysEarlier);
   });
 
   it('should produce a date based on a duration string', () => {
-    const ninetyDaysEarlier = '2019-10-03T00:00:00Z';
+    const ninetyDaysEarlier = '2019-10-03T00:00:00.000Z';
 
     const result = toDate('90 days');
     expect(result).toBe(ninetyDaysEarlier);
@@ -127,11 +127,11 @@ describe('tomorrow', () => {
   });
 
   it('should create a date 24 hours in the future', () => {
-    expect(tomorrow()).toBe('2020-01-02T00:00:00Z');
+    expect(tomorrow()).toBe('2020-01-02T00:00:00.000Z');
   });
 
   it('should create a date 24 hours in the future from an argument', () => {
-    expect(tomorrow(new Date('2022-07-01'))).toBe('2022-07-02T00:00:00Z');
+    expect(tomorrow(new Date('2022-07-01'))).toBe('2022-07-02T00:00:00.000Z');
   });
 });
 

@@ -1,13 +1,7 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
 
-  import {
-    addHours,
-    addMinutes,
-    addSeconds,
-    formatISO,
-    startOfDay,
-  } from 'date-fns';
+  import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
   import { getContext } from 'svelte';
 
@@ -96,12 +90,15 @@
       });
 
       const timezone = getTimezone($timeFormat);
-      const formattedStartTime = formatISO(
-        zonedTimeToUtc(startDateWithTime, timezone),
-      );
-      const formattedEndTime = formatISO(
-        zonedTimeToUtc(endDateWithTime, timezone),
-      );
+      const formattedStartTime = zonedTimeToUtc(
+        startDateWithTime,
+        timezone,
+      ).toISOString();
+
+      const formattedEndTime = zonedTimeToUtc(
+        endDateWithTime,
+        timezone,
+      ).toISOString();
 
       const value = useBetweenDateTimeQuery
         ? `BETWEEN "${formattedStartTime}" AND "${formattedEndTime}"`

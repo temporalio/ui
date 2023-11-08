@@ -15,42 +15,42 @@ const timeFrames = [
   {
     period: '15 minutes',
     query:
-      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-09-19T11%3A45%3A00-06%3A00%22+AND+%222012-09-20T12%3A00%3A00-06%3A00%22',
+      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-09-19T17%3A45%3A00.000Z%22+AND+%222012-09-20T18%3A00%3A00.000Z%22',
   },
   {
     period: '1 hour',
     query:
-      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-09-19T11%3A00%3A00-06%3A00%22+AND+%222012-09-20T12%3A00%3A00-06%3A00%22',
+      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-09-19T17%3A00%3A00.000Z%22+AND+%222012-09-20T18%3A00%3A00.000Z%22',
   },
   {
     period: '3 hours',
     query:
-      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-09-19T09%3A00%3A00-06%3A00%22+AND+%222012-09-20T12%3A00%3A00-06%3A00%22',
+      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-09-19T15%3A00%3A00.000Z%22+AND+%222012-09-20T18%3A00%3A00.000Z%22',
   },
   {
     period: '24 hours',
     query:
-      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-09-18T12%3A00%3A00-06%3A00%22+AND+%222012-09-20T12%3A00%3A00-06%3A00%22',
+      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-09-18T18%3A00%3A00.000Z%22+AND+%222012-09-20T18%3A00%3A00.000Z%22',
   },
   {
     period: '3 days',
     query:
-      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-09-16T12%3A00%3A00-06%3A00%22+AND+%222012-09-20T12%3A00%3A00-06%3A00%22',
+      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-09-16T18%3A00%3A00.000Z%22+AND+%222012-09-20T18%3A00%3A00.000Z%22',
   },
   {
     period: '7 days',
     query:
-      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-09-12T12%3A00%3A00-06%3A00%22+AND+%222012-09-20T12%3A00%3A00-06%3A00%22',
+      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-09-12T18%3A00%3A00.000Z%22+AND+%222012-09-20T18%3A00%3A00.000Z%22',
   },
   {
     period: '30 days',
     query:
-      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-08-20T12%3A00%3A00-06%3A00%22+AND+%222012-09-20T12%3A00%3A00-06%3A00%22',
+      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-08-20T18%3A00%3A00.000Z%22+AND+%222012-09-20T18%3A00%3A00.000Z%22',
   },
   {
     period: '90 days',
     query:
-      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-06-21T12%3A00%3A00-06%3A00%22+AND+%222012-09-20T12%3A00%3A00-06%3A00%22',
+      'http://localhost:3333/namespaces/default/workflows?search=basic&query=StartTime+BETWEEN+%222012-06-21T18%3A00%3A00.000Z%22+AND+%222012-09-20T18%3A00%3A00.000Z%22',
   },
 ];
 
