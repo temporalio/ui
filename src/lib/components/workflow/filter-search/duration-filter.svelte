@@ -36,7 +36,9 @@
   labelHidden
   id="duration-filter-search"
   type="search"
-  placeholder={`${translate('common.enter')} ${$filter.attribute}`}
+  placeholder={`${translate('common.enter')} ${$filter.attribute} (${translate(
+    'workflows.duration-filter-placeholder',
+  )})`}
   icon="search"
   class="w-full"
   unroundLeft
