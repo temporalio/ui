@@ -7,9 +7,9 @@ import {
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
 import {
+  getTimezone,
   type TimeFormat,
   TimezoneOptions,
-  Timezones,
 } from '$lib/stores/time-format';
 
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
@@ -55,7 +55,7 @@ export function formatDate(
           : formatDistanceToNow(parsed) + ` ${relativeLabel}`;
       return dateTz.format(parsed, format);
     }
-    const timezone = Timezones[timeFormat]?.zones[0] ?? timeFormat;
+    const timezone = getTimezone(timeFormat);
     return dateTz.formatInTimeZone(parsed, timezone, format);
   } catch (e) {
     console.error('Error formatting date:', e);

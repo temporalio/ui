@@ -1155,3 +1155,7 @@ export const TimezoneOptions: TimeFormatOptions = Object.entries(Timezones)
     if (b.label > a.label) return -1;
     return 0;
   });
+
+export const getTimezone = (timeFormat: TimeFormat): string => {
+  return Timezones[timeFormat]?.zones[0] ?? timeFormat;
+};
