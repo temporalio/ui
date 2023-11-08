@@ -218,4 +218,6 @@ export const Strings = {
   'advanced-search': 'Advanced Search',
   'time-range': 'Time Range',
   'pending-activities-link': 'Show all Pending Activities',
+  'duration-filter-placeholder':
+    'e.g. "2h45m", "hh:mm:ss", or "1000" nanoseconds',
 } as const;

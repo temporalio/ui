@@ -25,6 +25,10 @@ export function isNumberFilter(
   return ['Int', 'Double'].includes(searchAttributeType);
 }
 
+export function isDurationFilter(attribute: string) {
+  return ['ExecutionDuration'].includes(attribute);
+}
+
 export function isDateTimeFilter(
   attribute: string,
   attributes = searchAttributes,
