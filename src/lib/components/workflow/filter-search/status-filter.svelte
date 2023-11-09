@@ -18,7 +18,6 @@
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { workflowStatusFilters } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
-  import { labsMode } from '$lib/stores/labs-mode';
   import { isStatusFilter } from '$lib/utilities/query/filter-search';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
@@ -33,7 +32,7 @@
 
   function apply() {
     $workflowFilters = filters;
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $labsMode);
+    updateQueryParamsFromFilter($page.url, $workflowFilters);
   }
 
   function mapStatusToFilter(value: string) {

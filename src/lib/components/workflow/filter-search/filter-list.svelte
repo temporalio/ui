@@ -11,7 +11,6 @@
   import { translate } from '$lib/i18n/translate';
   import { isWorkflowStatusType } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
-  import { labsMode } from '$lib/stores/labs-mode';
   import {
     relativeTime,
     timeFormat,
@@ -33,7 +32,7 @@
   const removeQuery = (index: number) => {
     $workflowFilters.splice(index, 1);
     $workflowFilters = $workflowFilters;
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $labsMode);
+    updateQueryParamsFromFilter($page.url, $workflowFilters);
 
     if (index === $workflowFilters.length) {
       const previousQuery = $workflowFilters[$workflowFilters.length - 1];

@@ -213,7 +213,9 @@ export async function fetchWorkflow(
   });
   return requestFromAPI(route, {
     request,
-    params: { runId: parameters.runId },
+    params: {
+      'execution.runId': parameters.runId,
+    },
   }).then(toWorkflowExecution);
 }
 
@@ -234,7 +236,7 @@ export async function terminateWorkflow({
     },
     notifyOnError: false,
     params: {
-      runId: workflow.runId,
+      'execution.runId': workflow.runId,
     },
   });
 }
@@ -255,7 +257,7 @@ export async function cancelWorkflow(
       method: 'POST',
     },
     params: {
-      runId,
+      'execution.runId': runId,
     },
   });
 }
@@ -272,6 +274,7 @@ export async function signalWorkflow({
   const route = routeForApi('workflow.signal', {
     namespace,
     workflowId,
+    signalName,
   });
 
   let payloads = null;
@@ -313,7 +316,7 @@ export async function signalWorkflow({
           payloads,
         },
         params: {
-          runId,
+          'execution.runId': runId,
         },
       }),
     },
@@ -354,7 +357,7 @@ export async function resetWorkflow({
       body: stringifyWithBigInt(body),
     },
     params: {
-      runId,
+      'execution.runId': runId,
     },
   });
 }

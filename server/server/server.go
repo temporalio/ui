@@ -39,7 +39,6 @@ import (
 	"github.com/temporalio/ui-server/v2/server/route"
 	"github.com/temporalio/ui-server/v2/server/server_options"
 
-	"github.com/temporalio/ui-server/v2/openapi"
 	"github.com/temporalio/ui-server/v2/ui"
 )
 
@@ -102,13 +101,6 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 	route.SetHealthRoute(e)
 	route.SetAPIRoutes(e, cfgProvider, serverOpts.APIMiddleware)
 	route.SetAuthRoutes(e, cfgProvider)
-	if cfg.EnableOpenAPI {
-		assets, err := openapi.Assets()
-		if err != nil {
-			panic(err)
-		}
-		route.SetOpenAPIUIRoutes(e, assets)
-	}
 	if cfg.EnableUI {
 		var assets fs.FS
 		if cfg.UIAssetPath != "" {

@@ -7,6 +7,7 @@ import {
   isDuration,
   isDurationKey,
   isDurationString,
+  isValidDurationQuery,
   toDate,
   toDuration,
   tomorrow,
@@ -380,5 +381,65 @@ describe('durations', () => {
         "90 days",
       ]
     `);
+  });
+});
+
+describe('isValidDurationQuery', () => {
+  it('should return true if the value is a valid number (for nanoseconds)', () => {
+    expect(isValidDurationQuery('01')).toBe(true);
+    expect(isValidDurationQuery('-01')).toBe(true);
+    expect(isValidDurationQuery('1')).toBe(true);
+    expect(isValidDurationQuery('-1')).toBe(true);
+    expect(isValidDurationQuery('10')).toBe(true);
+    expect(isValidDurationQuery('-10')).toBe(true);
+  });
+
+  it('should return false if the value is not a valid number (for nanoseconds)', () => {
+    expect(isValidDurationQuery('test')).toBe(false);
+    expect(isValidDurationQuery('1e6t')).toBe(false);
+  });
+
+  it('should return true if the value is in a valid HH:MM:SS format', () => {
+    expect(isValidDurationQuery('00')).toBe(true);
+    expect(isValidDurationQuery('00:00:00')).toBe(true);
+    expect(isValidDurationQuery('0:00:00')).toBe(true);
+    expect(isValidDurationQuery('01:00:00')).toBe(true);
+    expect(isValidDurationQuery('90:00:00')).toBe(true);
+    expect(isValidDurationQuery('10000:00:00')).toBe(true);
+    expect(isValidDurationQuery('00:01:00')).toBe(true);
+    expect(isValidDurationQuery('00:59:00')).toBe(true);
+    expect(isValidDurationQuery('00:00:01')).toBe(true);
+    expect(isValidDurationQuery('00:00:59')).toBe(true);
+  });
+
+  it('should return false if the value is not in a valid HH:MM:SS format', () => {
+    expect(isValidDurationQuery('00:00')).toBe(false);
+    expect(isValidDurationQuery('00:60:00')).toBe(false);
+    expect(isValidDurationQuery('00:00:60')).toBe(false);
+  });
+
+  it('should return true if the value is in valid Golang duration format', () => {
+    expect(isValidDurationQuery('1000ns')).toBe(true);
+    expect(isValidDurationQuery('-1000ns')).toBe(true);
+    expect(isValidDurationQuery('2us')).toBe(true);
+    expect(isValidDurationQuery('-2us')).toBe(true);
+    expect(isValidDurationQuery('3µs')).toBe(true);
+    expect(isValidDurationQuery('-3µs')).toBe(true);
+    expect(isValidDurationQuery('4ms')).toBe(true);
+    expect(isValidDurationQuery('-4ms')).toBe(true);
+    expect(isValidDurationQuery('5s')).toBe(true);
+    expect(isValidDurationQuery('-5s')).toBe(true);
+    expect(isValidDurationQuery('60m')).toBe(true);
+    expect(isValidDurationQuery('-60m')).toBe(true);
+    expect(isValidDurationQuery('700h')).toBe(true);
+    expect(isValidDurationQuery('-700h')).toBe(true);
+    expect(isValidDurationQuery('2h30m')).toBe(true);
+  });
+
+  it('should return false if the value is not in a valid Golang duration format', () => {
+    expect(isValidDurationQuery('1 hour')).toBe(false);
+    expect(isValidDurationQuery('60min')).toBe(false);
+    expect(isValidDurationQuery('10 s')).toBe(false);
+    expect(isValidDurationQuery(' 100 ms')).toBe(false);
   });
 });

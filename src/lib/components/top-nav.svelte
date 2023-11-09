@@ -97,7 +97,7 @@
           </div>
         </MenuButton>
         <Menu id="user-menu" position="right">
-          <MenuItem href={userEmaiLink}>
+          <MenuItem href={userEmaiLink} disabled={!userEmaiLink}>
             {$authUser.email}
           </MenuItem>
           <MenuItem on:click={logout}>{translate('common.log-out')}</MenuItem>

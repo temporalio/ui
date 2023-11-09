@@ -7,6 +7,7 @@ import type { SearchAttributes } from '$lib/types/workflows';
 import {
   isBooleanFilter,
   isDateTimeFilter,
+  isDurationFilter,
   isListFilter,
   isNumberFilter,
   isStatusFilter,
@@ -78,6 +79,16 @@ describe('isNumberFilter', () => {
   it('should return false if the attribute is not an Int', () => {
     expect(isNumberFilter('WorkflowType', store)).toBe(false);
     expect(isNumberFilter('isStartTime', store)).toBe(false);
+  });
+});
+
+describe('isDurationFilter', () => {
+  it('should return true if the attribute is ExecutionDuration', () => {
+    expect(isDurationFilter('ExecutionDuration')).toBe(true);
+  });
+
+  it('should return false if the attribute is not ExecutionDuration', () => {
+    expect(isDurationFilter('CustomB')).toBe(false);
   });
 });
 

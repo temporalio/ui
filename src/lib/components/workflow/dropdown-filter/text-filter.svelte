@@ -36,7 +36,7 @@
       $workflowFilters = [...getOtherFilters()];
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters);
+    updateQueryParamsFromFilter($page.url, $workflowFilters, true);
   };
 
   function handleShowInput(event: CustomEvent<{ open: boolean }>) {
@@ -50,7 +50,7 @@
 
   function handleClearInput() {
     $workflowFilters = [...getOtherFilters()];
-    updateQueryParamsFromFilter($page.url, $workflowFilters);
+    updateQueryParamsFromFilter($page.url, $workflowFilters, true);
   }
 </script>
 

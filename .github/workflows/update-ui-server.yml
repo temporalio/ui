@@ -26,8 +26,6 @@ jobs:
         with:
           version: '3.x'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build GRPC
-        run: cd server && make install-utils build-grpc
 
       - name: Checkout UI Server
         uses: actions/checkout@v3
