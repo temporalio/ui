@@ -25,6 +25,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
+  import { searchInputViewOpen } from '$lib/stores/filters';
   import { refresh } from '$lib/stores/workflows';
   import {
     getFocusedElementId,
@@ -57,8 +58,6 @@
 
   $: searchParamQuery = $page.url.searchParams.get('query');
   $: showClearAllButton = $workflowFilters.length && !$filter.attribute;
-
-  let viewAdvancedSearchInput = false;
 
   setContext<FilterContext>(FILTER_CONTEXT, {
     filter,
@@ -139,7 +138,7 @@
 
 <div class="flex grow flex-col">
   <div class="flex grow flex-col gap-4 sm:flex-row sm:items-center">
-    {#if viewAdvancedSearchInput}
+    {#if $searchInputViewOpen}
       <WorkflowAdvancedSearch />
     {:else}
       <div
@@ -218,7 +217,7 @@
       label={translate('workflows.view-search-input')}
       labelPosition="left"
       id="view-search-input"
-      bind:checked={viewAdvancedSearchInput}
+      bind:checked={$searchInputViewOpen}
       on:change={() => {
         resetFilter();
       }}
