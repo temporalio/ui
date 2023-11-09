@@ -56,7 +56,7 @@ export const fetchRawEvents = async ({
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
         token,
         request: fetch,
-        params: { runId: runId },
+        params: { 'execution.runId': runId },
       });
     },
     { onStart, onUpdate, onComplete },
@@ -81,7 +81,7 @@ export const fetchAllEvents = async ({
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
         token,
         request: fetch,
-        params: { runId: runId },
+        params: { 'execution.runId': runId },
       });
     },
     { onStart, onUpdate, onComplete },
@@ -107,7 +107,7 @@ export const fetchPartialRawEvents = async ({
       route,
       {
         request: fetch,
-        params: { maximumPageSize: '20', runId: runId },
+        params: { maximumPageSize: '20', 'execution.runId': runId },
       },
     );
 
@@ -167,7 +167,7 @@ export async function getPaginatedEvents({
         request: fetch,
         params: {
           nextPageToken: token,
-          runId: runId,
+          'execution.runId': runId,
         },
       });
 
