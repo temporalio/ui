@@ -125,6 +125,53 @@ describe('routeForApi', () => {
       'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow/signal/signalName',
     );
   });
+
+  it('should return a route for list of schedules', () => {
+    const parameters = {
+      namespace: 'namespace',
+    };
+
+    const route = routeForApi('schedules', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/schedules',
+    );
+  });
+
+  it('should return a route for a schedule', () => {
+    const parameters = {
+      namespace: 'namespace',
+      scheduleId: 'scheduleName',
+    };
+
+    const route = routeForApi('schedule', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/schedules/scheduleName',
+    );
+  });
+
+  it('should return a route for editing schedule', () => {
+    const parameters = {
+      namespace: 'namespace',
+      scheduleId: 'scheduleName',
+    };
+
+    const route = routeForApi('schedule.edit', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/schedules/scheduleName/update',
+    );
+  });
+
+  it('should return a route for patching schedule', () => {
+    const parameters = {
+      namespace: 'namespace',
+      scheduleId: 'scheduleName',
+    };
+
+    const route = routeForApi('schedule.patch', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/schedules/scheduleName/patch',
+    );
+  });
 });
 
 describe('API Request Encoding', () => {

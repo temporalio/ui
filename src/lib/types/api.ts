@@ -34,7 +34,10 @@ export type ParameterlessAPIRoutePath =
   | 'namespaces';
 export type WorkerAPIRoutePath = 'worker-task-reachability';
 export type SchedulesAPIRoutePath = 'schedules';
-export type ScheduleAPIRoutePath = 'schedule' | 'schedule.delete';
+export type ScheduleAPIRoutePath =
+  | 'schedule'
+  | 'schedule.patch'
+  | 'schedule.edit';
 export type SearchAttributesRoutePath = 'search-attributes';
 
 export type APIRoutePath =
