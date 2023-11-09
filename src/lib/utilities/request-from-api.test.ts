@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { handleError } from './handle-error';
 import { isTemporalAPIError, requestFromAPI } from './request-from-api';
+import { routeForApi } from './route-for-api';
 
 import listWorkflowResponse from '$fixtures/list-workflows.json';
 
@@ -156,6 +157,29 @@ describe('requestFromAPI', () => {
     const params = { query: 'WorkflowId="Test"' };
     const encodedParams = new URLSearchParams(params).toString();
     const request = fetchMock();
+
+    await requestFromAPI(endpoint, {
+      request,
+      params,
+    });
+
+    expect(request).toHaveBeenCalledWith(
+      endpoint + '?' + encodedParams,
+      options,
+    );
+  });
+
+  it('should pass through runId query params for workflow route', async () => {
+    const params = { 'execution.runId': 'run123' };
+    const encodedParams = new URLSearchParams(params).toString();
+    const request = fetchMock();
+
+    const parameters = {
+      namespace: 'namespace',
+      workflowId: 'workflow',
+    };
+
+    const endpoint = routeForApi('workflow', parameters);
 
     await requestFromAPI(endpoint, {
       request,

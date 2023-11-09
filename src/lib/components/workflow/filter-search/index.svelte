@@ -25,11 +25,13 @@
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
+  import { searchInputViewOpen } from '$lib/stores/filters';
   import { refresh } from '$lib/stores/workflows';
   import {
     getFocusedElementId,
     isBooleanFilter,
     isDateTimeFilter,
+    isDurationFilter,
     isNumberFilter,
     isStatusFilter,
     isTextFilter,
@@ -44,6 +46,7 @@
   import BooleanFilter from './boolean-filter.svelte';
   import CloseFilter from './close-filter-button.svelte';
   import DateTimeFilter from './datetime-filter.svelte';
+  import DurationFilter from './duration-filter.svelte';
   import FilterList from './filter-list.svelte';
   import NumberFilter from './number-filter.svelte';
   import SearchAttributeMenu from './search-attribute-menu.svelte';
@@ -55,8 +58,6 @@
 
   $: searchParamQuery = $page.url.searchParams.get('query');
   $: showClearAllButton = $workflowFilters.length && !$filter.attribute;
-
-  let viewAdvancedSearchInput = false;
 
   setContext<FilterContext>(FILTER_CONTEXT, {
     filter,
@@ -137,7 +138,7 @@
 
 <div class="flex grow flex-col">
   <div class="flex grow flex-col gap-4 sm:flex-row sm:items-center">
-    {#if viewAdvancedSearchInput}
+    {#if $searchInputViewOpen}
       <WorkflowAdvancedSearch />
     {:else}
       <div
@@ -164,6 +165,14 @@
         <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
           <ListFilter />
         </div> -->
+        {:else if isDurationFilter($filter.attribute)}
+          <div
+            class="flex w-full items-center"
+            in:fly={{ x: -100, duration: 150 }}
+          >
+            <DurationFilter />
+            <CloseFilter />
+          </div>
         {:else if isNumberFilter($filter.attribute)}
           <div
             class="flex w-full items-center"
@@ -208,7 +217,7 @@
       label={translate('workflows.view-search-input')}
       labelPosition="left"
       id="view-search-input"
-      bind:checked={viewAdvancedSearchInput}
+      bind:checked={$searchInputViewOpen}
       on:change={() => {
         resetFilter();
       }}

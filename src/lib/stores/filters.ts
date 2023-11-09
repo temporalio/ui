@@ -33,6 +33,12 @@ export const persistedTimeFilter = persistStore<WorkflowFilter>(
   true,
 );
 
+export const searchInputViewOpen = persistStore<boolean>(
+  'searchInputView',
+  false,
+  true,
+);
+
 export const workflowFilters = writable<WorkflowFilter[]>(
   [],
   updateWorkflowFilters,

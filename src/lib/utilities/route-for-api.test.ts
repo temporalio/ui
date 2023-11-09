@@ -53,10 +53,123 @@ describe('routeForApi', () => {
     expect(route).toBe('http://localhost:8233/api/v1/me');
   });
 
+  it('should return a route for workflow', () => {
+    const parameters = {
+      namespace: 'namespace',
+      workflowId: 'workflow',
+    };
+
+    const route = routeForApi('workflow', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow',
+    );
+  });
+
+  it('should return a route for workflow without a runId even if passed as a parameter', () => {
+    const parameters = {
+      namespace: 'namespace',
+      workflowId: 'workflow',
+      runId: 'run',
+    };
+
+    const route = routeForApi('workflow', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow',
+    );
+  });
+
+  it('should return a route for workflow without a runId even if passed as a parameter', () => {
+    const parameters = {
+      namespace: 'namespace',
+      workflowId: 'workflow',
+      runId: 'run',
+    };
+
+    const route = routeForApi('workflow', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow',
+    );
+  });
+
   it('should return a route for workflow.terminate', () => {
     const route = routeForApi('workflow.terminate', parameters);
     expect(route).toBe(
       'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow/terminate',
+    );
+  });
+
+  it('should return a route for workflow.cancel', () => {
+    const route = routeForApi('workflow.cancel', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow/cancel',
+    );
+  });
+
+  it('should return a route for workflow.reset', () => {
+    const route = routeForApi('workflow.reset', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow/reset',
+    );
+  });
+
+  it('should return a route for workflow.signal', () => {
+    const parameters = {
+      namespace: 'namespace',
+      workflowId: 'workflow',
+      runId: 'run',
+      signalName: 'signalName',
+    };
+
+    const route = routeForApi('workflow.signal', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow/signal/signalName',
+    );
+  });
+
+  it('should return a route for list of schedules', () => {
+    const parameters = {
+      namespace: 'namespace',
+    };
+
+    const route = routeForApi('schedules', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/schedules',
+    );
+  });
+
+  it('should return a route for a schedule', () => {
+    const parameters = {
+      namespace: 'namespace',
+      scheduleId: 'scheduleName',
+    };
+
+    const route = routeForApi('schedule', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/schedules/scheduleName',
+    );
+  });
+
+  it('should return a route for editing schedule', () => {
+    const parameters = {
+      namespace: 'namespace',
+      scheduleId: 'scheduleName',
+    };
+
+    const route = routeForApi('schedule.edit', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/schedules/scheduleName/update',
+    );
+  });
+
+  it('should return a route for patching schedule', () => {
+    const parameters = {
+      namespace: 'namespace',
+      scheduleId: 'scheduleName',
+    };
+
+    const route = routeForApi('schedule.patch', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/schedules/scheduleName/patch',
     );
   });
 });

@@ -62,7 +62,7 @@ export async function deleteSchedule(
   parameters: ScheduleParameters,
   request = fetch,
 ): Promise<void> {
-  const route = routeForApi('schedule.delete', parameters);
+  const route = routeForApi('schedule', parameters);
   return requestFromAPI(route, {
     request,
     options: { method: 'DELETE' },
@@ -71,11 +71,13 @@ export async function deleteSchedule(
 
 type CreateScheduleOptions = {
   namespace: string;
+  scheduleId: string;
   body: CreateScheduleRequest;
 };
 
 export async function createSchedule({
   namespace,
+  scheduleId,
   body,
 }: CreateScheduleOptions): Promise<{ error: string; conflictToken: string }> {
   let error = '';
@@ -84,8 +86,9 @@ export async function createSchedule({
       err?.body?.message ??
       `Error creating schedule: ${err.status}: ${err.statusText}`);
 
-  const route = routeForApi('schedules', {
+  const route = routeForApi('schedule', {
     namespace,
+    scheduleId,
   });
   const { conflictToken } = await requestFromAPI<{ conflictToken: string }>(
     route,
@@ -122,7 +125,7 @@ export async function editSchedule({
       err?.body?.message ??
       `Error editing schedule: ${err.status}: ${err.statusText}`);
 
-  const route = routeForApi('schedule', {
+  const route = routeForApi('schedule.edit', {
     namespace,
     scheduleId,
   });
@@ -157,13 +160,13 @@ export async function pauseSchedule({
     },
   };
 
-  const route = routeForApi('schedule', {
+  const route = routeForApi('schedule.patch', {
     namespace,
     scheduleId: scheduleId,
   });
   return await requestFromAPI<null>(route, {
     options: {
-      method: 'PATCH',
+      method: 'POST',
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
@@ -190,13 +193,13 @@ export async function unpauseSchedule({
     },
   };
 
-  const route = routeForApi('schedule', {
+  const route = routeForApi('schedule.patch', {
     namespace,
     scheduleId: scheduleId,
   });
   return await requestFromAPI<null>(route, {
     options: {
-      method: 'PATCH',
+      method: 'POST',
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
@@ -224,13 +227,13 @@ export async function triggerImmediately({
     },
   };
 
-  const route = routeForApi('schedule', {
+  const route = routeForApi('schedule.patch', {
     namespace,
     scheduleId: scheduleId,
   });
   return await requestFromAPI<null>(route, {
     options: {
-      method: 'PATCH',
+      method: 'POST',
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),

@@ -28,6 +28,8 @@ import type {
   WorkflowQueryRouteParameters,
   WorkflowRouteParameters,
   WorkflowsAPIRoutePath,
+  WorkflowSignalAPIRoutePath,
+  WorkflowSignalRouteParameters,
 } from '$lib/types/api';
 
 import { getApiOrigin } from './get-api-origin';
@@ -110,8 +112,9 @@ export function pathForApi(
     namespaces: '/namespaces',
     namespace: `/namespaces/${parameters?.namespace}`,
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/query/${parameters.queryType}`,
-    'schedule.delete': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
     schedule: `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
+    'schedule.patch': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}/patch`,
+    'schedule.edit': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}/update`,
     schedules: `/namespaces/${parameters?.namespace}/schedules`,
     'search-attributes': `/namespaces/${parameters.namespace}/search-attributes`,
     settings: '/settings',
@@ -158,6 +161,11 @@ export function routeForApi(
 export function routeForApi(
   route: WorkflowAPIRoutePath,
   parameters: WorkflowRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: WorkflowSignalAPIRoutePath,
+  parameters: WorkflowSignalRouteParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(

@@ -9,10 +9,11 @@ export type WorkflowAPIRoutePath =
   | 'workflow'
   | 'workflow.terminate'
   | 'workflow.cancel'
-  | 'workflow.signal'
   | 'workflow.reset'
   | 'events.ascending'
   | 'events.descending';
+
+export type WorkflowSignalAPIRoutePath = 'workflow.signal';
 
 export type WorkflowQueryAPIRoutePath = 'query';
 
@@ -33,7 +34,10 @@ export type ParameterlessAPIRoutePath =
   | 'namespaces';
 export type WorkerAPIRoutePath = 'worker-task-reachability';
 export type SchedulesAPIRoutePath = 'schedules';
-export type ScheduleAPIRoutePath = 'schedule' | 'schedule.delete';
+export type ScheduleAPIRoutePath =
+  | 'schedule'
+  | 'schedule.patch'
+  | 'schedule.edit';
 export type SearchAttributesRoutePath = 'search-attributes';
 
 export type APIRoutePath =
@@ -44,6 +48,7 @@ export type APIRoutePath =
   | TaskQueueAPIRoutePath
   | WorkerAPIRoutePath
   | WorkflowAPIRoutePath
+  | WorkflowSignalAPIRoutePath
   | WorkflowQueryAPIRoutePath
   | WorkflowActivitiesAPIRoutePath
   | WorkflowsAPIRoutePath
@@ -67,6 +72,11 @@ export type ScheduleListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 export type SearchAttributesRouteParameters = Pick<
   APIRouteParameters,
   'namespace'
+>;
+
+export type WorkflowSignalRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'workflowId' | 'signalName'
 >;
 
 export type WorkflowRouteParameters = Pick<
