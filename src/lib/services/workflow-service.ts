@@ -274,6 +274,7 @@ export async function signalWorkflow({
   const route = routeForApi('workflow.signal', {
     namespace,
     workflowId,
+    signalName,
   });
 
   let payloads = null;

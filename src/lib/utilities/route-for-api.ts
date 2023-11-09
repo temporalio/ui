@@ -28,6 +28,8 @@ import type {
   WorkflowQueryRouteParameters,
   WorkflowRouteParameters,
   WorkflowsAPIRoutePath,
+  WorkflowSignalAPIRoutePath,
+  WorkflowSignalRouteParameters,
 } from '$lib/types/api';
 
 import { getApiOrigin } from './get-api-origin';
@@ -158,6 +160,11 @@ export function routeForApi(
 export function routeForApi(
   route: WorkflowAPIRoutePath,
   parameters: WorkflowRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: WorkflowSignalAPIRoutePath,
+  parameters: WorkflowSignalRouteParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(
