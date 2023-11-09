@@ -102,6 +102,7 @@ export const submitCreateSchedule = async ({
   // Wait 2 seconds for create to get it on fetchAllSchedules
   loading.set(true);
   const { error: err } = await createSchedule({
+    scheduleId: name,
     namespace,
     body,
   });
