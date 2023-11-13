@@ -1,4 +1,4 @@
-import { add, formatISO, intervalToDuration, parseISO, sub } from 'date-fns';
+import { add, intervalToDuration, parseISO, sub } from 'date-fns';
 
 import { isObject, isString } from './is';
 
@@ -68,7 +68,7 @@ export const isDurationString = (value: unknown): value is string => {
 };
 
 export const tomorrow = (date = new Date()): string => {
-  return formatISO(add(date, { hours: 24 }));
+  return add(date, { hours: 24 }).toISOString();
 };
 
 export const toDuration = (value: string): Duration => {
@@ -107,7 +107,7 @@ export const toDate = (timeRange: Duration | string): string => {
   const duration =
     typeof timeRange === 'string' ? toDuration(timeRange) : timeRange;
 
-  return formatISO(sub(new Date(), duration));
+  return sub(new Date(), duration).toISOString();
 };
 
 export const fromDate = (

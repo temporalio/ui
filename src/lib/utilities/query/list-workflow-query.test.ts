@@ -40,7 +40,7 @@ describe('toListWorkflowQuery', () => {
   });
 
   it('should convert an timeRange with a Duration as a value', () => {
-    const twentyFourHoursEarlier = '2019-12-31T00:00:00Z';
+    const twentyFourHoursEarlier = '2019-12-31T00:00:00.000Z';
 
     const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
     const query = toListWorkflowQuery(
@@ -51,7 +51,7 @@ describe('toListWorkflowQuery', () => {
   });
 
   it('should convert an timeRange with a Duration as a value when archived', () => {
-    const twentyFourHoursEarlier = '2019-12-31T00:00:00Z';
+    const twentyFourHoursEarlier = '2019-12-31T00:00:00.000Z';
 
     const query = toListWorkflowQuery({ timeRange: { days: 1 } }, true);
 

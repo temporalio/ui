@@ -1,13 +1,8 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
 
-  import {
-    addHours,
-    addMinutes,
-    addSeconds,
-    formatISO,
-    startOfDay,
-  } from 'date-fns';
+  import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
+  import { zonedTimeToUtc } from 'date-fns-tz';
   import { getContext } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
@@ -23,15 +18,13 @@
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { getLocalTime } from '$lib/utilities/format-date';
+  import { getTimezone, timeFormat } from '$lib/stores/time-format';
   import { toDate } from '$lib/utilities/to-duration';
 
   import ConditionalMenu from './conditional-menu.svelte';
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
-
-  const localTime = getLocalTime() || translate('common.local');
 
   $: isTimeRange = $filter.conditional === 'BETWEEN';
 
@@ -96,11 +89,20 @@
         second: endSecond,
       });
 
+      const timezone = getTimezone($timeFormat);
+      const formattedStartTime = zonedTimeToUtc(
+        startDateWithTime,
+        timezone,
+      ).toISOString();
+
+      const formattedEndTime = zonedTimeToUtc(
+        endDateWithTime,
+        timezone,
+      ).toISOString();
+
       const value = useBetweenDateTimeQuery
-        ? `BETWEEN "${formatISO(startDateWithTime)}" AND "${formatISO(
-            endDateWithTime,
-          )}"`
-        : formatISO(startDateWithTime);
+        ? `BETWEEN "${formattedStartTime}" AND "${formattedEndTime}"`
+        : formattedStartTime;
 
       $filter.value = value;
 
@@ -261,7 +263,7 @@
       <MenuItem centered disabled class="!pt-0">
         <Icon name="clock" aria-hidden="true" />
         {translate('common.based-on-time-preface')}
-        {localTime}
+        {$timeFormat}
       </MenuItem>
     </Menu>
   </MenuContainer>
