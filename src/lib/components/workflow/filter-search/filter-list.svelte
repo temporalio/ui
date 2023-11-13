@@ -88,7 +88,7 @@
   {#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
     {@const { attribute, value, conditional, customDate } = workflowFilter}
     {#if attribute}
-      <div in:fade>
+      <div in:fade data-testid="{workflowFilter.attribute}-{i}">
         <Chip
           removeButtonLabel={translate('workflows.remove-filter-label', {
             attribute,
