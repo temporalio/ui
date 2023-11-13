@@ -39,6 +39,7 @@
   <div class="row">
     {#each cells as { allowed, value }, index (index)}
       <button
+        type="button"
         on:click={allowed && value ? () => onChange(value) : noop}
         class="cell"
         class:highlight={allowed && value}

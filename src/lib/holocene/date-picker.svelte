@@ -10,7 +10,7 @@
 
   const dispatch = createEventDispatcher();
 
-  export let isAllowed = () => true;
+  export let isAllowed: (d: Date) => boolean = () => true;
   export let selected = new Date();
   export let label: string;
   export let labelHidden = false;
@@ -97,14 +97,18 @@
     >
       <div class="mx-3 my-2 flex items-center justify-around">
         <div class="flex items-center justify-center">
-          <button on:click={prev}><Icon name="chevron-left" /></button>
+          <button type="button" on:click={prev}
+            ><Icon name="chevron-left" /></button
+          >
         </div>
         <div class="flex items-center justify-center">
           {getMonthName(month)?.label ?? ''}
           {year}
         </div>
         <div class="flex items-center justify-center">
-          <button on:click={next}><Icon name="chevron-right" /></button>
+          <button type="button" on:click={next}
+            ><Icon name="chevron-right" /></button
+          >
         </div>
       </div>
       <Calender
@@ -116,12 +120,14 @@
       />
       <div class="my-1 flex justify-between px-2">
         <button
+          type="button"
           class="cursor-pointer text-[12px]"
           on:click={() => (selected = new Date())}
         >
           {todayLabel}
         </button>
         <button
+          type="button"
           class="cursor-pointer text-[12px]"
           on:click={() => (showDatePicker = false)}
         >
