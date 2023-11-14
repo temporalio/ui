@@ -150,4 +150,5 @@ export const Strings = {
   'view-more': 'View More...',
   'view-all-runs': 'View All Runs',
   download: 'Download',
+  'search-attributes': 'Search Attributes',
 } as const;

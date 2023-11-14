@@ -125,8 +125,7 @@ export type AttributeGroup =
   | 'taskQueue'
   | 'schedule'
   | 'retryPolicy'
-  | 'workflow'
-  | 'searchAttributes';
+  | 'workflow';
 
 const attributeGroupings: Readonly<AttributeGroup[]> = [
   'summary',
@@ -136,7 +135,6 @@ const attributeGroupings: Readonly<AttributeGroup[]> = [
   'schedule',
   'retryPolicy',
   'workflow',
-  'searchAttributes',
 ];
 
 type GroupingOption = {
@@ -150,9 +148,6 @@ export const attributeGroupingProperties: Readonly<
   parent: { label: 'events.attribute-group.parent' },
   retryPolicy: { label: 'events.attribute-group.retry-policy' },
   schedule: { label: 'events.attribute-group.schedule' },
-  searchAttributes: {
-    label: 'events.attribute-group.search-attributes',
-  },
   summary: { label: 'events.attribute-group.summary' },
   taskQueue: { label: 'events.attribute-group.task-queue' },
   workflow: { label: 'events.attribute-group.workflow' },
@@ -186,10 +181,7 @@ const consolidateActivityGroups = (
 };
 
 const consolidateSingleItemGroups = (groupedAttributes: AttributeGrouping) => {
-  const keysToIgnore: Readonly<Set<string>> = new Set([
-    'summary',
-    'searchAttributes',
-  ]);
+  const keysToIgnore: Readonly<Set<string>> = new Set(['summary']);
   for (const [key, value] of Object.entries(groupedAttributes)) {
     if (value.length === 1 && !keysToIgnore.has(key)) {
       groupedAttributes.summary = [...groupedAttributes.summary, ...value];
@@ -205,7 +197,9 @@ export const attributeGroups = (
   const groupedAttributes: AttributeGrouping = {};
   attributeGroupings.forEach((group) => {
     if (group === 'summary') {
-      groupedAttributes[group] = Object.keys(attributes) as EventAttributeKey[];
+      groupedAttributes[group] = Object.keys(attributes).filter(
+        (key) => key !== 'searchAttributes',
+      ) as EventAttributeKey[];
     } else {
       groupedAttributes[group] = [];
     }
