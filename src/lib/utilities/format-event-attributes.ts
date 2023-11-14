@@ -197,7 +197,9 @@ export const attributeGroups = (
   const groupedAttributes: AttributeGrouping = {};
   attributeGroupings.forEach((group) => {
     if (group === 'summary') {
-      groupedAttributes[group] = Object.keys(attributes) as EventAttributeKey[];
+      groupedAttributes[group] = Object.keys(attributes).filter(
+        (key) => key !== 'searchAttributes',
+      ) as EventAttributeKey[];
     } else {
       groupedAttributes[group] = [];
     }
