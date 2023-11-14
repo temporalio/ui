@@ -17,7 +17,7 @@
     routeForSchedule,
   } from '$lib/utilities/route-for';
 
-  import ScheduleFrequency from './schedule-frequency.svelte';
+  import ScheduleBasicFrequency from './schedule-basic-frequency.svelte';
 
   import type { ScheduleActionResult, ScheduleListEntry } from '$types';
 
@@ -93,13 +93,13 @@
 </TableRow>
 <TableRow class="schedule-spec-row">
   <td colspan="5" class="hidden xl:table-cell">
-    <ScheduleFrequency {calendar} {interval} inline class="w-auto text-sm" />
+    <ScheduleBasicFrequency {calendar} {interval} />
   </td>
   <td colspan="3" class="hidden md:table-cell xl:hidden">
-    <ScheduleFrequency {calendar} {interval} inline class="w-auto text-sm" />
+    <ScheduleBasicFrequency {calendar} {interval} />
   </td>
   <td colspan="2" class="md:hidden">
-    <ScheduleFrequency {calendar} {interval} inline class="w-auto text-sm" />
+    <ScheduleBasicFrequency {calendar} {interval} />
   </td>
 </TableRow>
 
