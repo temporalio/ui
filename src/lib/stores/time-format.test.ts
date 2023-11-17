@@ -19,6 +19,10 @@ describe('getTimezone', () => {
     expect(getTimezone('Greenwich Mean Time')).toBe('Africa/Abidjan');
   });
 
+  test('should return the local timezone if the time format is local', () => {
+    expect(getTimezone('local')).toBe('UTC');
+  });
+
   test('should return the time format if the time format does not exist in the Timezones object', () => {
     expect(getTimezone('UTC')).toBe('UTC');
   });

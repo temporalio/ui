@@ -81,8 +81,12 @@ export function formatUTCOffset(
   if (offset < 0) return `${utc}-${formattedOffset}`;
 }
 
+export function getLocalTimezone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
 export function getLocalTime(): string {
-  const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const localTimezone = getLocalTimezone();
   const localOption = TimezoneOptions.find(
     ({ zones }) => zones?.includes(localTimezone),
   );

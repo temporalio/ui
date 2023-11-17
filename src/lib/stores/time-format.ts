@@ -1,4 +1,5 @@
 import { persistStore } from '$lib/stores/persist-store';
+import { getLocalTimezone } from '$lib/utilities/format-date';
 
 export const timeFormat = persistStore('timeFormat', 'UTC' as TimeFormat);
 export const relativeTime = persistStore('relativeTime', false);
@@ -1157,5 +1158,6 @@ export const TimezoneOptions: TimeFormatOptions = Object.entries(Timezones)
   });
 
 export const getTimezone = (timeFormat: TimeFormat): string => {
+  if (timeFormat === 'local') return getLocalTimezone();
   return Timezones[timeFormat]?.zones[0] ?? timeFormat;
 };
