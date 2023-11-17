@@ -868,4 +868,41 @@ describe('combineFilters', () => {
       },
     ]);
   });
+
+  it('should clear parenthesis and OR statement if next filter is not the same attribute', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '(',
+        value: 'Running',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ];
+
+    const result = combineFilters(filters);
+    expect(result).toEqual([
+      {
+        attribute: 'ExecutionStatus',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'Running',
+      },
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+      },
+    ]);
+  });
 });
