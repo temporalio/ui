@@ -173,7 +173,13 @@ export const combineFilters = (filters: WorkflowFilter[]) => {
       filter.operator = '';
     }
 
-    if (filter.operator === 'OR' && previousFilter?.operator !== 'OR') {
+    if (
+      filter.operator === 'OR' &&
+      nextFilter?.attribute !== filter.attribute
+    ) {
+      filter.parenthesis = '';
+      filter.operator = '';
+    } else if (filter.operator === 'OR' && previousFilter?.operator !== 'OR') {
       filter.parenthesis = '(';
     } else if (previousFilter?.operator === 'OR' && filter.operator !== 'OR') {
       filter.parenthesis = ')';
@@ -181,7 +187,6 @@ export const combineFilters = (filters: WorkflowFilter[]) => {
       filter.parenthesis = '';
     }
   });
-
   return filters;
 };
 
