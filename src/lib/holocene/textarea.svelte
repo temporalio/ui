@@ -95,7 +95,7 @@
   }
 
   .error-msg {
-    @apply break-words border-danger font-primary text-sm font-normal text-danger;
+    @apply min-h-[1.25rem] break-words border-danger font-primary text-sm font-normal text-danger;
   }
 
   .error-msg.min-width {
