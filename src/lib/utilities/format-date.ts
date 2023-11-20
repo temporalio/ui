@@ -10,6 +10,7 @@ import {
   getTimezone,
   type TimeFormat,
   TimezoneOptions,
+  Timezones,
 } from '$lib/stores/time-format';
 
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
@@ -93,4 +94,13 @@ export function getLocalTime(): string {
   return localOption
     ? `${localOption.label} (${localOption.abbr})`
     : localTimezone;
+}
+
+export function getSelectedTimezone(timeFormat: TimeFormat): string {
+  if (timeFormat === 'local') return getLocalTime();
+
+  const selectedTimezone = Timezones[timeFormat];
+  if (selectedTimezone) return `${timeFormat} (${selectedTimezone.abbr})`;
+
+  return timeFormat;
 }
