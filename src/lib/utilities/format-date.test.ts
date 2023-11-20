@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { formatDate, formatUTCOffset, isValidDate } from './format-date';
+import {
+  formatDate,
+  formatUTCOffset,
+  getLocalTime,
+  getSelectedTimezone,
+  isValidDate,
+} from './format-date';
 
 describe('formatDate', () => {
   const date = '2022-04-13T16:29:35.630571Z';
@@ -115,5 +121,27 @@ describe('formatUTCOffset', () => {
 
   it('should return an empty string if the offset is negative and double digits', () => {
     expect(formatUTCOffset(-10, 'UTC')).toBe('UTC-10:00');
+  });
+});
+
+describe('getLocalTime', () => {
+  it('should get the local timezone', () => {
+    expect(getLocalTime()).toBe('UTC');
+  });
+});
+
+describe('getSelectedTimezone', () => {
+  it('should get the abbreviation for the timezone', () => {
+    expect(getSelectedTimezone('Mountain Standard Time')).toBe(
+      'Mountain Standard Time (MST)',
+    );
+  });
+
+  it('should get the local timezone', () => {
+    expect(getSelectedTimezone('local')).toBe('UTC');
+  });
+
+  it('should return the time format if there is no matching timezone found', () => {
+    expect(getSelectedTimezone('UTC')).toBe('UTC');
   });
 });

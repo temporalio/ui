@@ -19,6 +19,7 @@
   import { translate } from '$lib/i18n/translate';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { getTimezone, timeFormat } from '$lib/stores/time-format';
+  import { getSelectedTimezone } from '$lib/utilities/format-date';
   import { toDate } from '$lib/utilities/to-duration';
 
   import ConditionalMenu from './conditional-menu.svelte';
@@ -27,6 +28,7 @@
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
   $: isTimeRange = $filter.conditional === 'BETWEEN';
+  $: selectedTime = getSelectedTimezone($timeFormat);
 
   let startDate = startOfDay(new Date());
   let endDate = startOfDay(new Date());
@@ -263,7 +265,7 @@
       <MenuItem centered disabled class="!pt-0">
         <Icon name="clock" aria-hidden="true" />
         {translate('common.based-on-time-preface')}
-        {$timeFormat}
+        {selectedTime}
       </MenuItem>
     </Menu>
   </MenuContainer>
