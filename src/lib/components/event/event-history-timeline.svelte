@@ -22,7 +22,10 @@
     EventTypeCategory,
   } from '$lib/types/events';
   import { capitalize } from '$lib/utilities/format-camel-case';
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import {
+    isActivityTaskScheduledEvent,
+    isLocalActivityMarkerEvent,
+  } from '$lib/utilities/is-event-type';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   import { getTimelineOptions } from './event-history-timeline-helpers';
@@ -104,7 +107,11 @@
       const lastEvent = group?.lastEvent;
       const groupPendingActivity =
         $workflowRun?.workflow?.pendingActivities.find((activity) =>
-          group.eventList.find((e) => e.id === activity.activityId),
+          group.eventList.find(
+            (e) =>
+              isActivityTaskScheduledEvent(e) &&
+              e.attributes.activityId === activity.activityId,
+          ),
         );
       if (groupPendingActivity && isRunning) {
         items.add({
