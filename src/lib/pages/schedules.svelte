@@ -48,9 +48,6 @@
     >
       {translate('common.schedules')}
     </h1>
-    <p class="text-sm text-gray-600" data-testid="namespace-name">
-      {namespace}
-    </p>
   </div>
   {#if hasSchedules && !createDisabled}
     <Button
