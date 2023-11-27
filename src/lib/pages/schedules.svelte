@@ -5,7 +5,6 @@
 
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
   import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -47,9 +46,7 @@
     <h1
       class="flex flex-col gap-0 text-lg md:flex-row md:items-center md:gap-2 md:text-2xl"
     >
-      {translate('common.schedules')}<Badge type="beta"
-        >{translate('common.preview')}</Badge
-      >
+      {translate('common.schedules')}
     </h1>
     <p class="text-sm text-gray-600" data-testid="namespace-name">
       {namespace}
