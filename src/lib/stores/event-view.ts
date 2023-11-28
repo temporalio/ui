@@ -13,7 +13,7 @@ export const autoRefreshWorkflow = persistStore<'on' | 'off'>(
   'off',
 );
 
-export const eventViewType = persistStore<EventView>('eventView', 'feed');
+export const eventViewType = persistStore<EventView>('eventView', 'feed', true);
 
 export const expandAllEvents = persistStore('expandAllEvents', 'false');
 
