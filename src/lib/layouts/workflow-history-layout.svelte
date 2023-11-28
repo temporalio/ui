@@ -104,32 +104,34 @@
   <WorkflowSummary />
   <WorkflowRelationships {...workflowRelationships} />
   <LabsModeGuard>
-    <section slot="fallback">
+    <svelte:fragment slot="fallback">
       <PendingActivities />
-      <Accordion
-        title={workflowEvents.contAsNew
-          ? translate('workflows.input')
-          : translate('workflows.input-and-results')}
-        icon="json"
-        class="border-gray-900"
-        data-testid="input-and-results"
-      >
-        <div class="flex w-full flex-col gap-2 lg:flex-row">
-          <InputAndResults
-            title="Input"
-            content={workflowEvents.input}
-            data-testid="workflow-input"
-          />
-          <InputAndResults
-            content={workflowEvents.results}
-            title={workflowEvents.contAsNew
-              ? translate('workflows.continued-as-new-with-input')
-              : translate('workflows.results')}
-            data-testid="workflow-results"
-          />
-        </div>
-      </Accordion>
-    </section>
+      <section>
+        <Accordion
+          title={workflowEvents.contAsNew
+            ? translate('workflows.input')
+            : translate('workflows.input-and-results')}
+          icon="json"
+          class="border-gray-900"
+          data-testid="input-and-results"
+        >
+          <div class="flex w-full flex-col gap-2 lg:flex-row">
+            <InputAndResults
+              title="Input"
+              content={workflowEvents.input}
+              data-testid="workflow-input"
+            />
+            <InputAndResults
+              content={workflowEvents.results}
+              title={workflowEvents.contAsNew
+                ? translate('workflows.continued-as-new-with-input')
+                : translate('workflows.results')}
+              data-testid="workflow-results"
+            />
+          </div>
+        </Accordion>
+      </section>
+    </svelte:fragment>
   </LabsModeGuard>
   <EventHistoryTimeline history={$fullEventHistory} />
   <section id="event-history">

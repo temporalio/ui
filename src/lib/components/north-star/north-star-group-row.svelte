@@ -28,7 +28,7 @@
 
 <button on:click={() => (open = !open)}>
   <div
-    class="flex w-full items-center justify-between border-b-2 border-l-2 border-r-2 border-gray-900 bg-white px-3 py-2 pl-8"
+    class="flex w-full items-center justify-between border-b-2 border-l-2 border-r-2 border-gray-900 bg-blueGray-100 px-3 py-2 pl-8"
     class:rounded-t-xl={first}
     class:rounded-b-xl={last && !open}
     class:border-t-2={first}
@@ -41,8 +41,8 @@
       <p class="category {category}">
         {capitalize(group.name)}
       </p>
-      <p class="classification">
-        {group?.classification || ''}
+      <p class="badge badge-{group?.status}">
+        {group?.classification ? group?.status : ''}
       </p>
     </div>
     <div class="flex gap-2">
@@ -98,5 +98,21 @@
 
   .signal-count {
     @apply bg-pink-300;
+  }
+
+  .badge {
+    @apply rounded px-1;
+  }
+
+  .badge-Completed {
+    @apply bg-green-200 text-green-900;
+  }
+
+  .badge-Scheduled {
+    @apply border border-gray-600 text-gray-600;
+  }
+
+  .badge-Started {
+    @apply border border-blue-600 text-blue-600;
   }
 </style>

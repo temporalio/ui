@@ -56,7 +56,7 @@
           {group}
           first={j === 0 && i === 0}
           last={j === Object.values(categorizedGroups).length - 1 &&
-            i === group.length - 1}
+            i === categoryGroup.length - 1}
         />
       {/each}
     {/each}

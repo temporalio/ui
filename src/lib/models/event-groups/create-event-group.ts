@@ -22,8 +22,11 @@ import {
 import type { EventGroup } from './event-groups';
 import {
   eventIsCanceled,
+  eventIsCompleted,
+  eventIsFailure,
   eventIsFailureOrTimedOut,
   eventIsTerminated,
+  eventIsTimedOut,
 } from './get-event-in-group';
 import { getGroupId } from './get-group-id';
 import {
@@ -110,11 +113,28 @@ const createGroupFor = <K extends keyof StartingEvents>(
     get isFailureOrTimedOut() {
       return Boolean(this.eventList.find(eventIsFailureOrTimedOut));
     },
+    get isFailure() {
+      return Boolean(this.eventList.find(eventIsFailure));
+    },
+    get isTimedOut() {
+      return Boolean(this.eventList.find(eventIsTimedOut));
+    },
     get isCanceled() {
       return Boolean(this.eventList.find(eventIsCanceled));
     },
     get isTerminated() {
       return Boolean(this.eventList.find(eventIsTerminated));
+    },
+    get isCompleted() {
+      return Boolean(this.eventList.find(eventIsCompleted));
+    },
+    get status() {
+      if (this.isFailure) return 'Failed';
+      if (this.isTimedOut) return 'TimedOut';
+      if (this.isCanceled) return 'Canceled';
+      if (this.isTerminated) return 'Terminated';
+      if (this.isCompleted) return 'Completed';
+      return classification;
     },
   };
 };

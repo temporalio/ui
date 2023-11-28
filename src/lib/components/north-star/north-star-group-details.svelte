@@ -8,6 +8,7 @@
   import PayloadDecoder from '../event/payload-decoder.svelte';
 
   export let group: EventGroup;
+  console.log('Group: ', group);
 
   let tab = 'input';
   $: value =
