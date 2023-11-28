@@ -10,6 +10,7 @@
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
+  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -102,32 +103,34 @@
   {/if}
   <WorkflowSummary />
   <WorkflowRelationships {...workflowRelationships} />
-  <PendingActivities />
-  <section>
-    <Accordion
-      title={workflowEvents.contAsNew
-        ? translate('workflows.input')
-        : translate('workflows.input-and-results')}
-      icon="json"
-      class="border-gray-900"
-      data-testid="input-and-results"
-    >
-      <div class="flex w-full flex-col gap-2 lg:flex-row">
-        <InputAndResults
-          title="Input"
-          content={workflowEvents.input}
-          data-testid="workflow-input"
-        />
-        <InputAndResults
-          content={workflowEvents.results}
-          title={workflowEvents.contAsNew
-            ? translate('workflows.continued-as-new-with-input')
-            : translate('workflows.results')}
-          data-testid="workflow-results"
-        />
-      </div>
-    </Accordion>
-  </section>
+  <LabsModeGuard>
+    <section slot="fallback">
+      <PendingActivities />
+      <Accordion
+        title={workflowEvents.contAsNew
+          ? translate('workflows.input')
+          : translate('workflows.input-and-results')}
+        icon="json"
+        class="border-gray-900"
+        data-testid="input-and-results"
+      >
+        <div class="flex w-full flex-col gap-2 lg:flex-row">
+          <InputAndResults
+            title="Input"
+            content={workflowEvents.input}
+            data-testid="workflow-input"
+          />
+          <InputAndResults
+            content={workflowEvents.results}
+            title={workflowEvents.contAsNew
+              ? translate('workflows.continued-as-new-with-input')
+              : translate('workflows.results')}
+            data-testid="workflow-results"
+          />
+        </div>
+      </Accordion>
+    </section>
+  </LabsModeGuard>
   <EventHistoryTimeline history={$fullEventHistory} />
   <section id="event-history">
     <nav

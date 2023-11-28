@@ -47,6 +47,9 @@ dependencies:
   '@sveltejs/svelte-virtual-list':
     specifier: ^3.0.1
     version: 3.0.1
+  '@types/lodash':
+    specifier: ^4.14.202
+    version: 4.14.202
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.0
@@ -74,6 +77,9 @@ dependencies:
   just-debounce:
     specifier: ^1.1.0
     version: 1.1.0
+  lodash:
+    specifier: ^4.17.21
+    version: 4.17.21
   remark-stringify:
     specifier: ^10.0.3
     version: 10.0.3
@@ -4278,7 +4284,7 @@ packages:
       '@storybook/preview-api': 7.5.1
       '@storybook/theming': 7.5.1(react-dom@18.2.0)(react@18.2.0)
       '@storybook/types': 7.5.1
-      '@types/lodash': 4.14.200
+      '@types/lodash': 4.14.202
       color-convert: 2.0.1
       dequal: 2.0.3
       lodash: 4.17.21
@@ -5409,9 +5415,8 @@ packages:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
     dev: true
 
-  /@types/lodash@4.14.200:
-    resolution: {integrity: sha512-YI/M/4HRImtNf3pJgbF+W6FrXovqj+T+/HpENLTooK9PnkacBsDpeP3IpHab40CClUfhNmdM2WTNP2sa2dni5Q==}
-    dev: true
+  /@types/lodash@4.14.202:
+    resolution: {integrity: sha512-OvlIYQK9tNneDlS0VN54LLd5uiPCBOp7gS5Z0f1mjoJYBrtStzgmJBxONW3U6OZqdtNzZPmn9BS/7WI7BFFcFQ==}
 
   /@types/long@4.0.2:
     resolution: {integrity: sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
@@ -14,6 +15,8 @@
     IterableEvent,
   } from '$lib/types/events';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+
+  import NorthStarLayout from '../north-star/north-star-layout.svelte';
 
   import EventEmptyRow from './event-empty-row.svelte';
 
@@ -54,30 +57,35 @@
   $: updating = currentEvents.length && !$fullEventHistory.length;
 </script>
 
-<Pagination
-  floatId="event-view-toggle"
-  {items}
-  {updating}
-  let:visibleItems
-  let:activeRowIndex
-  let:setActiveRowIndex
-  aria-label={translate('workflows.event-history')}
-  pageSizeSelectLabel={translate('common.per-page')}
-  previousButtonLabel={translate('common.previous')}
-  nextButtonLabel={translate('common.next')}
->
-  <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
-    {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
-      <EventSummaryRow
-        {event}
-        {compact}
-        expandAll={$expandAllEvents === 'true'}
-        {initialItem}
-        active={activeRowIndex === index}
-        onRowClick={() => setActiveRowIndex(index)}
-      />
-    {:else}
-      <EventEmptyRow loading={!intialEvents.length} />
-    {/each}
-  </EventSummaryTable>
-</Pagination>
+<LabsModeGuard>
+  <NorthStarLayout {items} />
+  <svelte:fragment slot="fallback">
+    <Pagination
+      floatId="event-view-toggle"
+      {items}
+      {updating}
+      let:visibleItems
+      let:activeRowIndex
+      let:setActiveRowIndex
+      aria-label={translate('workflows.event-history')}
+      pageSizeSelectLabel={translate('common.per-page')}
+      previousButtonLabel={translate('common.previous')}
+      nextButtonLabel={translate('common.next')}
+    >
+      <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
+        {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
+          <EventSummaryRow
+            {event}
+            {compact}
+            expandAll={$expandAllEvents === 'true'}
+            {initialItem}
+            active={activeRowIndex === index}
+            onRowClick={() => setActiveRowIndex(index)}
+          />
+        {:else}
+          <EventEmptyRow loading={!intialEvents.length} />
+        {/each}
+      </EventSummaryTable>
+    </Pagination>
+  </svelte:fragment>
+</LabsModeGuard>

@@ -10,7 +10,7 @@
   import NavTooltip from '$lib/holocene/navigation/nav-tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
-  // import { labsMode } from '$lib/stores/labs-mode';
+  import { labsMode } from '$lib/stores/labs-mode';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
@@ -18,14 +18,14 @@
   export let activeNamespace: Namespace;
   export let linkList: Partial<Record<string, string>>;
 
-  // $: labsHoverText = `${translate('common.labs')} ${
-  //   $labsMode
-  //     ? `${translate('common.on')} - ${translate('common.experimental')}`
-  //     : translate('common.off')
-  // }`;
-  // $: labsText = `${translate('common.labs')} ${
-  //   $labsMode ? translate('common.on') : translate('common.off')
-  // }`;
+  $: labsHoverText = `${translate('common.labs')} ${
+    $labsMode
+      ? `${translate('common.on')} - ${translate('common.experimental')}`
+      : translate('common.off')
+  }`;
+  $: labsText = `${translate('common.labs')} ${
+    $labsMode ? translate('common.on') : translate('common.off')
+  }`;
 
   let batchOperationIcon: 'layers-1' | 'layers-2' | 'layers-3' = 'layers-3';
 
@@ -142,7 +142,7 @@
         <div class="nav-title">{translate('common.feedback')}</div>
       </NavRow>
     </slot>
-    <!-- <NavRow {isCloud} handleClick={() => ($labsMode = !$labsMode)}>
+    <NavRow {isCloud} handleClick={() => ($labsMode = !$labsMode)}>
       <NavTooltip right text={labsHoverText}>
         <div class="nav-icon">
           <Icon name="labs" active={$labsMode} />
@@ -156,7 +156,7 @@
           </p>
         {/if}
       </div>
-    </NavRow> -->
+    </NavRow>
   </svelte:fragment>
 </NavContainer>
 
