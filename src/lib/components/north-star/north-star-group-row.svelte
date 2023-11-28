@@ -5,6 +5,7 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { EventTypeCategory } from '$lib/types/events';
   import { capitalize } from '$lib/utilities/format-camel-case';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import NorthStarGroupDetails from './north-star-group-details.svelte';
 
@@ -24,6 +25,12 @@
     }
     return capitalize(category);
   };
+
+  $: duration = formatDistanceAbbreviated({
+    start: group.initialEvent.eventTime,
+    end: group.lastEvent.eventTime,
+    includeMilliseconds: true,
+  });
 </script>
 
 <button on:click={() => (open = !open)}>
@@ -46,6 +53,14 @@
       </p>
     </div>
     <div class="flex gap-2">
+      {#if duration && duration !== '0ms'}
+        <div class="flex flex-row items-center gap-0">
+          <Icon class="inline" name="clock" />
+          <p class="break-word truncate text-sm md:whitespace-normal">
+            {duration}
+          </p>
+        </div>
+      {/if}
       <Icon name="json" />
       <Icon name="chevron-{open ? 'up' : 'down'}" />
     </div>
