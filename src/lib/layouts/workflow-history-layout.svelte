@@ -11,11 +11,8 @@
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
-  import IconButton from '$lib/holocene/icon-button.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Modal from '$lib/holocene/modal.svelte';
-  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
-  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchAllEvents } from '$lib/services/events-service';
@@ -37,6 +34,8 @@
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
+
+  import WorkflowViewToggle from './workflow-view-toggle.svelte';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   let showShortcuts = false;
@@ -78,13 +77,6 @@
 
   $: $refresh,
     fetchEvents(namespace, workflowId, runId, $eventViewType, $eventFilterSort);
-
-  const onViewClick = (view: EventView) => {
-    if ($page.url.searchParams.get('page')) {
-      $page.url.searchParams.delete('page');
-    }
-    $eventViewType = view;
-  };
 
   const onDownloadClick = () => {
     showDownloadPrompt = false;
@@ -142,44 +134,13 @@
       aria-label={translate('workflows.event-history-view')}
     >
       <LabsModeGuard>
-        <h2 class="text-2xl font-medium" slot="fallback">
-          {translate('workflows.event-history')}
-        </h2>
-      </LabsModeGuard>
-      <div id="event-view-toggle" class="mt-4 flex items-center gap-2">
-        <div class="flex items-center bg-white">
-          <ToggleButtons>
-            <ToggleButton
-              icon="feed"
-              active={$eventViewType === 'feed'}
-              data-testid="feed"
-              on:click={() => onViewClick('feed')}
-              >{translate('workflows.history')}</ToggleButton
-            >
-            <ToggleButton
-              icon="compact"
-              active={$eventViewType === 'compact'}
-              data-testid="compact"
-              on:click={() => onViewClick('compact')}
-              >{translate('workflows.compact')}</ToggleButton
-            >
-            <ToggleButton
-              icon="json"
-              active={$eventViewType === 'json'}
-              data-testid="json"
-              on:click={() => onViewClick('json')}
-              >{translate('workflows.json')}</ToggleButton
-            >
-          </ToggleButtons>
-        </div>
-        <IconButton
-          icon="upload"
-          class="rotate-180"
-          data-testid="download"
-          on:click={() => (showDownloadPrompt = true)}
-        />
-      </div>
-      <LabsModeGuard>
+        <svelte:fragment slot="fallback">
+          <h2 class="text-2xl font-medium">
+            {translate('workflows.event-history')}
+          </h2>
+          <WorkflowViewToggle float bind:showDownloadPrompt />
+        </svelte:fragment>
+        <WorkflowViewToggle bind:showDownloadPrompt />
         <NorthStarFilters />
       </LabsModeGuard>
     </nav>

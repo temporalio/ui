@@ -3,6 +3,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Spinner from '$lib/holocene/icon/svg/spinner.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
@@ -77,12 +78,17 @@
         <Icon name={inputInline ? 'chevron-down' : 'chevron-up'} />
       </button>
     </div>
-    <div class="flex flex-col gap-2 px-6 py-2">
-      {#each Object.entries(parallelItems) as [date, timeGroup]}
-        <NorthStarTimeRow
-          {date}
-          categorizedGroups={_.groupBy(timeGroup, (group) => group.category)}
-        />
+    <div
+      class="flex h-auto max-h-[600px] flex-col gap-2 overflow-auto px-6 py-2"
+    >
+      {#each Object.entries(parallelItems) as [date, group]}
+        <NorthStarTimeRow {date} {group} />
+      {:else}
+        <div
+          class="flex w-full items-center gap-4 rounded-lg border-2 border-gray-900 bg-white px-3 py-2 pl-8"
+        >
+          <p>{translate('events.empty-state-title')}</p>
+        </div>
       {/each}
     </div>
     <div class="flex items-center items-stretch gap-0">

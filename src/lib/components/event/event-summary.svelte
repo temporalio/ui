@@ -7,7 +7,7 @@
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
-  import { eventCategoryFilter } from '$lib/stores/filters';
+  import { eventCategoryFilter, eventStatusFilter } from '$lib/stores/filters';
   import type {
     CommonHistoryEvent,
     EventTypeCategory,
@@ -26,22 +26,34 @@
   const getEventsOrGroups = (
     items: CommonHistoryEvent[],
     category: string,
+    status: string,
   ): IterableEvent[] => {
+    let filteredItems = [...items];
     if (category) {
-      const filteredItems = items.filter((i) => {
+      filteredItems = filteredItems.filter((i) => {
         if (category === CATEGORIES.LOCAL_ACTIVITY) {
           return isLocalActivityMarkerEvent(i);
         }
         return i.category === category;
       });
-      return compact
-        ? groupEvents(filteredItems, $eventFilterSort)
-        : filteredItems;
     }
-    return compact ? groupEvents(items, $eventFilterSort) : items;
+
+    if (!compact) {
+      if (status) {
+        return filteredItems.filter((i) => i.classification === status);
+      }
+      return filteredItems;
+    }
+
+    const groups = groupEvents(filteredItems, $eventFilterSort);
+    if (status) {
+      return groups.filter((g) => g.status === status);
+    }
+    return groups;
   };
 
   $: category = $eventCategoryFilter as EventTypeCategory;
+  $: status = $eventStatusFilter;
   $: intialEvents =
     $eventFilterSort === 'descending' && !compact
       ? $eventHistory?.end
@@ -50,7 +62,7 @@
     ? $fullEventHistory
     : intialEvents;
   $: initialItem = currentEvents?.[0];
-  $: items = getEventsOrGroups(currentEvents, category);
+  $: items = getEventsOrGroups(currentEvents, category, status);
   $: updating = currentEvents.length && !$fullEventHistory.length;
 </script>
 

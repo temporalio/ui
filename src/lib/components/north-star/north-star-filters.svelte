@@ -75,7 +75,7 @@
   };
 </script>
 
-<div class="flex items-center gap-4">
+<div class="flex items-center gap-4" id="event-view-toggle">
   <MenuContainer>
     <MenuButton
       controls="event-date-filter-menu"

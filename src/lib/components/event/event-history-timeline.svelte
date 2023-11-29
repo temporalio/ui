@@ -7,10 +7,13 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { groupEvents } from '$lib/models/event-groups';
-  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import type {
+    EventGroup,
+    EventGroups,
+  } from '$lib/models/event-groups/event-groups';
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
-  import { eventCategoryFilter } from '$lib/stores/filters';
+  import { eventCategoryFilter, eventStatusFilter } from '$lib/stores/filters';
   import {
     workflowRun,
     workflowTimelineViewOpen,
@@ -172,6 +175,13 @@
     });
   };
 
+  const filterGroups = (groups: EventGroup[], status: string): EventGroup[] => {
+    if (!status) return groups;
+    return groups.filter((g) => {
+      return g.status === status;
+    });
+  };
+
   const buildTimeline = (category: EventTypeCategory): void => {
     timeline = new Timeline(
       visualizationRef,
@@ -185,7 +195,10 @@
       ? [...history].reverse()
       : [...history];
     const filteredHistory = filterHistory(sortedHistory, category);
-    const eventGroups = groupEvents(filteredHistory);
+    const eventGroups = filterGroups(
+      groupEvents(filteredHistory),
+      $eventStatusFilter,
+    );
     const { groups, items } = createGroupItems(
       eventGroups,
       $workflowRun?.workflow?.isRunning,

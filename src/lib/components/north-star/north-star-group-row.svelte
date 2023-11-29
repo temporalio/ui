@@ -4,7 +4,6 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type { EventTypeCategory } from '$lib/types/events';
   import { capitalize } from '$lib/utilities/format-camel-case';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { isActivityTaskScheduledEvent } from '$lib/utilities/is-event-type';
@@ -12,13 +11,13 @@
   import NorthStarGroupDetails from './north-star-group-details.svelte';
 
   export let group: EventGroup;
-  export let category: EventTypeCategory;
-  export let first: boolean;
+  export let category: string;
   export let last: boolean;
+  export let index: number;
 
   let open = false;
 
-  const getCategoryName = (category: EventTypeCategory) => {
+  const getCategoryName = (category: string) => {
     if (category.includes('-')) {
       return category
         .split('-')
@@ -46,10 +45,9 @@
 
 <button on:click={() => (open = !open)}>
   <div
-    class="flex w-full items-center justify-between border-b-2 border-l-2 border-r-2 border-gray-900 bg-blueGray-100 px-3 py-2 pl-8"
-    class:rounded-t-xl={first}
-    class:rounded-b-xl={last && !open}
-    class:border-t-2={first}
+    class="flex w-full items-center justify-between border-b-2 border-gray-900 px-3 py-2 pl-8"
+    class:bg-blueGray-100={index % 2 === 0}
+    class:border-b-2={!last}
   >
     <div class="flex flex-col items-center gap-1 md:flex-row md:gap-4">
       <span class="font-mono">{group.id}</span>
@@ -83,7 +81,7 @@
           </p>
         </div>
       {/if}
-      <Icon name="json" />
+      <Icon name="json" class="rounded bg-gray-900 px-1 text-white" />
       <Icon name="chevron-{open ? 'up' : 'down'}" />
     </div>
   </div>

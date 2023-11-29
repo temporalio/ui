@@ -12,11 +12,16 @@
   import NorthStarGroupRow from './north-star-group-row.svelte';
 
   export let date: string;
-  export let categorizedGroups: Record<EventTypeCategory, EventGroup[]>;
+  export let group: EventGroup[];
+
+  $: categorizedGroups = _.groupBy(group, (group) => group.category) as Record<
+    EventTypeCategory,
+    EventGroup[]
+  >;
 
   let open = false;
 
-  const getCategoryName = (category: EventTypeCategory) => {
+  const getCategoryName = (category: string) => {
     if (category.includes('-')) {
       return category
         .split('-')
@@ -30,11 +35,11 @@
 <div class="flex items-start gap-2">
   <Icon class="mt-4" name="clock" />
 
-  <div class="flex w-full flex-col gap-1">
+  <div
+    class="flex w-full flex-col gap-1 rounded-lg border-2 border-gray-900 bg-white px-3 py-2 pl-8"
+  >
     <button on:click={() => (open = !open)}>
-      <div
-        class="flex w-full items-center gap-4 rounded-lg border-2 border-gray-900 bg-white px-3 py-2 pl-8"
-      >
+      <div class="flex w-full items-center gap-4">
         {formatDate(new Date(date), $timeFormat, {
           relative: $relativeTime,
         })}
@@ -52,13 +57,13 @@
       </div>
     </button>
     {#if open}
-      <div class="flex flex-col">
+      <div class="mt-2 flex flex-col">
         {#each Object.entries(categorizedGroups) as [category, categoryGroup], j}
           {#each categoryGroup as group, i}
             <NorthStarGroupRow
               {category}
               {group}
-              first={j === 0 && i === 0}
+              index={i}
               last={j === Object.values(categorizedGroups).length - 1 &&
                 i === categoryGroup.length - 1}
             />
