@@ -4,6 +4,7 @@
   import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
   import NorthStarFilters from '$lib/components/north-star/north-star-filters.svelte';
+  import NorthStarSummary from '$lib/components/north-star/north-star-summary.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
@@ -90,14 +91,18 @@
   };
 </script>
 
-<div class="flex flex-col gap-2">
+<div class="flex flex-col gap-4">
   <WorkflowStackTraceError />
   {#if workflowTaskFailedError}
     <WorkflowTypedError error={workflowTaskFailedError} />
   {/if}
-  <WorkflowSummary />
   <LabsModeGuard>
+    <div class="flex flex-col gap-4 lg:flex-row">
+      <NorthStarSummary />
+      <EventHistoryTimeline history={$fullEventHistory} />
+    </div>
     <svelte:fragment slot="fallback">
+      <WorkflowSummary />
       <WorkflowRelationships {...workflowRelationships} />
       <PendingActivities />
       <section>
@@ -125,9 +130,9 @@
           </div>
         </Accordion>
       </section>
+      <EventHistoryTimeline history={$fullEventHistory} />
     </svelte:fragment>
   </LabsModeGuard>
-  <EventHistoryTimeline history={$fullEventHistory} />
   <section id="event-history">
     <nav
       class="flex flex-col items-center justify-between gap-4 lg:flex-row lg:items-end"

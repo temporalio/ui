@@ -231,8 +231,8 @@
   }
 </script>
 
-<div class="flex flex-col gap-2">
-  <div class="flex items-center justify-between gap-2">
+<div class="flex w-full flex-col gap-2">
+  <div class="flex items-start justify-between">
     <h1 class="text-xl">Timeline</h1>
     <div class="flex gap-2 bg-white">
       <ToggleButtons>
@@ -283,7 +283,7 @@
     color: white !important;
   }
 
-  :global(.vis-background, .vis-timeline) {
+  :global(.timeline .vis-background, .vis-timeline) {
     background-color: #18181b;
     color: white;
     border-radius: 0.75rem;

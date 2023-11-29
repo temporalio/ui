@@ -63,7 +63,7 @@
             <NorthStarGroupRow
               {category}
               {group}
-              index={i}
+              index={i + j}
               last={j === Object.values(categorizedGroups).length - 1 &&
                 i === categoryGroup.length - 1}
             />

@@ -9,7 +9,7 @@
   export let inline: boolean;
 </script>
 
-<article class="flex w-full flex-col lg:w-1/2" {...$$restProps}>
+<article class="flex w-full flex-col" {...$$restProps}>
   {#if content}
     <div class="flex overflow-scroll bg-gray-900">
       <PayloadDecoder

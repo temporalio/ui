@@ -117,36 +117,38 @@
   );
 </script>
 
-<header class="mb-4 flex flex-col gap-1">
-  <div class="mb-4 block">
-    <Link
-      href={`${routeForWorkflows({
-        namespace,
-      })}?${$workflowsSearchParams}`}
-      data-testid="back-to-workflows"
-      icon="chevron-left"
-    >
-      {id
-        ? translate('common.workflows')
-        : translate('workflows.back-to-workflows')}
-    </Link>
-    {#if id}
+<header class="flex flex-col gap-1">
+  <div class="flex justify-between">
+    <div class="">
       <Link
-        href={routeForEventHistory({
-          ...routeParameters,
-        })}
-        data-testid="back-to-workflow-execution"
+        href={`${routeForWorkflows({
+          namespace,
+        })}?${$workflowsSearchParams}`}
+        data-testid="back-to-workflows"
         icon="chevron-left"
       >
-        {workflow?.runId}
+        {id
+          ? translate('common.workflows')
+          : translate('workflows.back-to-workflows')}
       </Link>
-    {/if}
+      {#if id}
+        <Link
+          href={routeForEventHistory({
+            ...routeParameters,
+          })}
+          data-testid="back-to-workflow-execution"
+          icon="chevron-left"
+        >
+          {workflow?.runId}
+        </Link>
+      {/if}
+    </div>
   </div>
   <div
-    class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
+    class="mb-4 flex w-full flex-col items-center justify-between lg:flex-row"
   >
     <div
-      class="flex w-full flex-col justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
+      class="flex w-full flex-col justify-start overflow-hidden whitespace-nowrap lg:w-auto"
     >
       <h1
         data-testid="workflow-id-heading"
@@ -163,6 +165,12 @@
       </h1>
       <div class="flex flex-wrap items-center gap-4">
         <WorkflowStatus status={workflow?.status} />
+        <Copyable
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          content={workflow.name}
+          visible
+        />
         {#if workflowUsesVersioning}
           <p class="flex items-center gap-1">
             <span>{translate('workers.last-used-version')}</span

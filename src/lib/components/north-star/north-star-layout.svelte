@@ -1,8 +1,6 @@
 <script lang="ts">
   import * as _ from 'lodash';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import Spinner from '$lib/holocene/icon/svg/spinner.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
@@ -14,10 +12,8 @@
     CommonHistoryEvent,
     EventTypeCategory,
   } from '$lib/types/events';
-  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
-  import NorthStarInputAndResult from './north-star-input-and-result.svelte';
   import NorthStarTimeRow from './north-star-time-row.svelte';
 
   const getEventGroups = (
@@ -51,69 +47,16 @@
     : $eventHistory?.start;
   $: items = getEventGroups(currentEvents, category, status);
   $: parallelItems = _.groupBy(items, (x) => x.initialEvent.timestamp);
-  $: workflowEvents =
-    getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
-
-  let inputInline = true;
-  let resultInline = true;
 </script>
 
-<div class="border-l-8 border-gray-900">
-  <div class="my-4 flex flex-col gap-2">
-    <div class="flex items-center items-stretch gap-0">
-      <p
-        class="py-auto flex w-20 flex-col justify-center bg-gray-900 font-mono text-white"
-      >
-        Input
-      </p>
-      <NorthStarInputAndResult
-        inline={inputInline}
-        content={workflowEvents.input}
-        data-testid="workflow-input"
-      />
-      <button
-        on:click={() => (inputInline = !inputInline)}
-        class="py-auto flex flex-col justify-center rounded-r-lg bg-gray-900 px-2.5 font-mono text-white"
-      >
-        <Icon name={inputInline ? 'chevron-down' : 'chevron-up'} />
-      </button>
-    </div>
+<div class="flex h-auto max-h-[600px] flex-col gap-2 overflow-auto py-2">
+  {#each Object.entries(parallelItems) as [date, group]}
+    <NorthStarTimeRow {date} {group} />
+  {:else}
     <div
-      class="flex h-auto max-h-[600px] flex-col gap-2 overflow-auto px-6 py-2"
+      class="flex w-full items-center gap-4 rounded-lg border-2 border-gray-900 bg-white px-3 py-2 pl-8"
     >
-      {#each Object.entries(parallelItems) as [date, group]}
-        <NorthStarTimeRow {date} {group} />
-      {:else}
-        <div
-          class="flex w-full items-center gap-4 rounded-lg border-2 border-gray-900 bg-white px-3 py-2 pl-8"
-        >
-          <p>{translate('events.empty-state-title')}</p>
-        </div>
-      {/each}
+      <p>{translate('events.empty-state-title')}</p>
     </div>
-    <div class="flex items-center items-stretch gap-0">
-      <p
-        class="py-auto flex {workflowEvents.results
-          ? 'w-20'
-          : 'w-auto'} flex-col justify-center bg-gray-900 text-center font-mono text-white"
-      >
-        {#if workflowEvents.results}
-          Results
-        {:else}
-          <Spinner class="h-6 w-6 animate-spin" />
-        {/if}
-      </p>
-      <NorthStarInputAndResult
-        inline={resultInline}
-        content={workflowEvents.results}
-        data-testid="workflow-results"
-      />
-      <button
-        on:click={() => (resultInline = !resultInline)}
-        class="py-auto flex flex-col justify-center rounded-r-lg bg-gray-900 px-2.5 font-mono text-white"
-      >
-        <Icon name={resultInline ? 'chevron-down' : 'chevron-up'} />
-      </button>
-    </div>
-  </div>
+  {/each}
 </div>

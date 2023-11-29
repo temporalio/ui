@@ -12,7 +12,7 @@ type TimelineOptionsTooltipOverflow = 'flip' | 'none' | 'cap';
 
 export const getTimelineOptions = (workflow: WorkflowExecution) => ({
   stackSubgroups: true,
-  maxHeight: 300,
+  maxHeight: 500,
   min: startOfMinute(new Date(workflow.startTime)),
   max: workflow?.endTime
     ? endOfMinute(new Date(workflow?.endTime))
