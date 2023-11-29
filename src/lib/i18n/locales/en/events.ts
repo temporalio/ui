@@ -9,6 +9,7 @@ export const Strings = {
   'date-and-time': 'Date & Time',
   'show-elapsed-time': 'Show Elapsed Time & Duration',
   'event-type': 'Event Type',
+  'event-status': 'Event Status',
   'workflow-events': 'Workflow Events',
   category: {
     all: 'All',

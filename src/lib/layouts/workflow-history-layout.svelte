@@ -3,6 +3,7 @@
 
   import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
+  import NorthStarFilters from '$lib/components/north-star/north-star-filters.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
@@ -10,6 +11,7 @@
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
@@ -102,9 +104,9 @@
     <WorkflowTypedError error={workflowTaskFailedError} />
   {/if}
   <WorkflowSummary />
-  <WorkflowRelationships {...workflowRelationships} />
   <LabsModeGuard>
     <svelte:fragment slot="fallback">
+      <WorkflowRelationships {...workflowRelationships} />
       <PendingActivities />
       <section>
         <Accordion
@@ -139,40 +141,47 @@
       class="flex flex-col items-center justify-between gap-4 lg:flex-row lg:items-end"
       aria-label={translate('workflows.event-history-view')}
     >
-      <h2 class="text-2xl font-medium">
-        {translate('workflows.event-history')}
-      </h2>
-      <div id="event-view-toggle" class="mt-4 flex gap-4 bg-white">
-        <ToggleButtons>
-          <ToggleButton
-            icon="feed"
-            active={$eventViewType === 'feed'}
-            data-testid="feed"
-            on:click={() => onViewClick('feed')}
-            >{translate('workflows.history')}</ToggleButton
-          >
-          <ToggleButton
-            icon="compact"
-            active={$eventViewType === 'compact'}
-            data-testid="compact"
-            on:click={() => onViewClick('compact')}
-            >{translate('workflows.compact')}</ToggleButton
-          >
-          <ToggleButton
-            icon="json"
-            active={$eventViewType === 'json'}
-            data-testid="json"
-            on:click={() => onViewClick('json')}
-            >{translate('workflows.json')}</ToggleButton
-          >
-          <ToggleButton
-            icon="download"
-            data-testid="download"
-            on:click={() => (showDownloadPrompt = true)}
-            >{translate('workflows.download')}</ToggleButton
-          >
-        </ToggleButtons>
+      <LabsModeGuard>
+        <h2 class="text-2xl font-medium" slot="fallback">
+          {translate('workflows.event-history')}
+        </h2>
+      </LabsModeGuard>
+      <div id="event-view-toggle" class="mt-4 flex items-center gap-2">
+        <div class="flex items-center bg-white">
+          <ToggleButtons>
+            <ToggleButton
+              icon="feed"
+              active={$eventViewType === 'feed'}
+              data-testid="feed"
+              on:click={() => onViewClick('feed')}
+              >{translate('workflows.history')}</ToggleButton
+            >
+            <ToggleButton
+              icon="compact"
+              active={$eventViewType === 'compact'}
+              data-testid="compact"
+              on:click={() => onViewClick('compact')}
+              >{translate('workflows.compact')}</ToggleButton
+            >
+            <ToggleButton
+              icon="json"
+              active={$eventViewType === 'json'}
+              data-testid="json"
+              on:click={() => onViewClick('json')}
+              >{translate('workflows.json')}</ToggleButton
+            >
+          </ToggleButtons>
+        </div>
+        <IconButton
+          icon="upload"
+          class="rotate-180"
+          data-testid="download"
+          on:click={() => (showDownloadPrompt = true)}
+        />
       </div>
+      <LabsModeGuard>
+        <NorthStarFilters />
+      </LabsModeGuard>
     </nav>
     <slot />
   </section>

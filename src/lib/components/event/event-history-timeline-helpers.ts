@@ -12,7 +12,7 @@ type TimelineOptionsTooltipOverflow = 'flip' | 'none' | 'cap';
 
 export const getTimelineOptions = (workflow: WorkflowExecution) => ({
   stackSubgroups: true,
-  maxHeight: 520,
+  maxHeight: 300,
   min: startOfMinute(new Date(workflow.startTime)),
   max: workflow?.endTime
     ? endOfMinute(new Date(workflow?.endTime))
@@ -21,7 +21,7 @@ export const getTimelineOptions = (workflow: WorkflowExecution) => ({
   verticalScroll: true,
   zoomKey: 'ctrlKey' as TimelineOptionsZoomKey,
   orientation: {
-    axis: 'both',
+    // axis: 'both',
     item: 'center',
   },
   tooltip: {

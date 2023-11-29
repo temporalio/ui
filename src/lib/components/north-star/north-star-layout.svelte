@@ -8,7 +8,7 @@
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
-  import { eventCategoryFilter } from '$lib/stores/filters';
+  import { eventCategoryFilter, eventStatusFilter } from '$lib/stores/filters';
   import type {
     CommonHistoryEvent,
     EventTypeCategory,
@@ -22,24 +22,33 @@
   const getEventGroups = (
     items: CommonHistoryEvent[],
     category: string,
+    status: string,
   ): EventGroup[] => {
+    let filteredItems = [...items];
     if (category) {
-      const filteredItems = items.filter((i) => {
+      filteredItems = filteredItems.filter((i) => {
         if (category === CATEGORIES.LOCAL_ACTIVITY) {
           return isLocalActivityMarkerEvent(i);
         }
         return i.category === category;
       });
-      return groupEvents(filteredItems, $eventFilterSort);
     }
-    return groupEvents(items, $eventFilterSort);
+
+    const groups = groupEvents(filteredItems, $eventFilterSort);
+    if (status) {
+      return groups.filter((group) => {
+        return group.status === status;
+      });
+    }
+    return groups;
   };
 
   $: category = $eventCategoryFilter as EventTypeCategory;
+  $: status = $eventStatusFilter;
   $: currentEvents = $fullEventHistory.length
     ? $fullEventHistory
     : $eventHistory?.start;
-  $: items = getEventGroups(currentEvents, category);
+  $: items = getEventGroups(currentEvents, category, status);
   $: parallelItems = _.groupBy(items, (x) => x.initialEvent.timestamp);
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
@@ -52,7 +61,7 @@
   <div class="my-4 flex flex-col gap-2">
     <div class="flex items-center items-stretch gap-0">
       <p
-        class="py-auto flex flex-col justify-center bg-gray-900 px-2.5 font-mono text-white"
+        class="py-auto flex w-20 flex-col justify-center bg-gray-900 font-mono text-white"
       >
         Input
       </p>
@@ -78,7 +87,9 @@
     </div>
     <div class="flex items-center items-stretch gap-0">
       <p
-        class="py-auto flex flex-col justify-center bg-gray-900 px-2.5 font-mono text-white"
+        class="py-auto flex {workflowEvents.results
+          ? 'w-20'
+          : 'w-auto'} flex-col justify-center bg-gray-900 text-center font-mono text-white"
       >
         {#if workflowEvents.results}
           Results

@@ -163,6 +163,12 @@ export const routeForStackTrace = (parameters: WorkflowParameters): string => {
   return `${routeForWorkflow(parameters)}/stack-trace`;
 };
 
+export const routeForRelationships = (
+  parameters: WorkflowParameters,
+): string => {
+  return `${routeForWorkflow(parameters)}/relationships`;
+};
+
 export const routeForWorkflowQuery = (
   parameters: WorkflowParameters,
 ): string => {

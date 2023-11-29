@@ -12,7 +12,11 @@
 <article class="flex w-full flex-col lg:w-1/2" {...$$restProps}>
   {#if content}
     <div class="flex overflow-scroll bg-gray-900">
-      <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
+      <PayloadDecoder
+        value={parseWithBigInt(content)}
+        key="payloads"
+        let:decodedValue
+      >
         {#key inline}
           <CodeBlock
             {inline}

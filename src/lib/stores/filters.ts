@@ -10,13 +10,20 @@ const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
 const category = derived([page], ([$page]) =>
   $page.url.searchParams.get('category'),
 );
+const status = derived([page], ([$page]) =>
+  $page.url.searchParams.get('status'),
+);
 
-const parameters = derived([query, category], ([$query, $category]) => {
-  return {
-    query: $query,
-    category: $category,
-  };
-});
+const parameters = derived(
+  [query, category, status],
+  ([$query, $category, $status]) => {
+    return {
+      query: $query,
+      category: $category,
+      status: $status,
+    };
+  },
+);
 
 const updateWorkflowFilters: StartStopNotifier<WorkflowFilter[]> = (set) => {
   return parameters.subscribe(({ query }) => {
@@ -53,7 +60,21 @@ const updateEventCategoryFilter: StartStopNotifier<string | null> = (set) => {
   });
 };
 
+const updateEventStatusFilter: StartStopNotifier<string | null> = (set) => {
+  return parameters.subscribe(({ category }) => {
+    if (!category && get(eventStatusFilter)) {
+      // Clear filter if there is no category
+      set(null);
+    }
+  });
+};
+
 export const eventCategoryFilter = writable<string | undefined>(
   undefined,
   updateEventCategoryFilter,
+);
+
+export const eventStatusFilter = writable<string | undefined>(
+  undefined,
+  updateEventStatusFilter,
 );

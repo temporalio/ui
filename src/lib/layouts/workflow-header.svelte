@@ -13,22 +13,26 @@
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
-  import { eventHistory } from '$lib/stores/events';
+  import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import { namespaces } from '$lib/stores/namespaces';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
+  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import { has } from '$lib/utilities/has';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForEventHistory,
     routeForPendingActivities,
+    routeForRelationships,
     routeForStackTrace,
     routeForWorkers,
     routeForWorkflowQuery,
@@ -104,6 +108,12 @@
   $: defaultVersionForSet = getDefaultVersionForSetFromABuildId(
     compatibility,
     buildId,
+  );
+  $: workflowRelationships = getWorkflowRelationships(
+    workflow,
+    $eventHistory,
+    $fullEventHistory,
+    $namespaces,
   );
 </script>
 
@@ -232,7 +242,7 @@
     </div>
   {/if}
   <Tabs>
-    <TabList class="flex flex-wrap gap-6" label="workflow detail">
+    <TabList class="flex flex-wrap gap-6 border-b" label="workflow detail">
       <Tab
         label={translate('workflows.history-tab')}
         id="history-tab"
@@ -246,8 +256,23 @@
           }),
         )}
       >
-        <Badge type="blue" class="px-2 py-0">{workflow?.historyEvents}</Badge>
+        <Badge type="indigo" class="px-2 py-0">{workflow?.historyEvents}</Badge>
       </Tab>
+      <LabsModeGuard>
+        <Tab
+          label={translate('workflows.relationships')}
+          id="relationships-tab"
+          href={routeForRelationships(routeParameters)}
+          active={pathMatches(
+            $page.url.pathname,
+            routeForRelationships(routeParameters),
+          )}
+        >
+          <Badge type="indigo" class="px-2 py-0"
+            >{workflowRelationships.totalRelationships}</Badge
+          >
+        </Tab>
+      </LabsModeGuard>
       <Tab
         label={translate('workflows.workers-tab')}
         id="workers-tab"
@@ -257,7 +282,8 @@
           routeForWorkers(routeParameters),
         )}
       >
-        <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
+        <Badge type="indigo" class="px-2 py-0">{workers?.pollers?.length}</Badge
+        >
       </Tab>
       <Tab
         label={translate('workflows.pending-activities-tab')}
@@ -268,7 +294,10 @@
           routeForPendingActivities(routeParameters),
         )}
       >
-        <Badge type={activitiesCanceled ? 'warning' : 'blue'} class="px-2 py-0">
+        <Badge
+          type={activitiesCanceled ? 'warning' : 'indigo'}
+          class="px-2 py-0"
+        >
           {#if activitiesCanceled}<Icon
               name="canceled"
               width={20}

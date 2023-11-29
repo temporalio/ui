@@ -3,25 +3,81 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import type { PendingActivity } from '$lib/types/events';
   import { capitalize } from '$lib/utilities/format-camel-case';
 
   import PayloadDecoder from '../event/payload-decoder.svelte';
 
   export let group: EventGroup;
-  console.log('Group: ', group);
+  export let pendingActivity: PendingActivity;
+  //     {
+  //     "activityId": "7",
+  //     "activityType": "activity.retry-on-timeout",
+  //     "state": "Started",
+  //     "heartbeatDetails": {
+  //         "payloads": [
+  //             4
+  //         ]
+  //     },
+  //     "lastHeartbeatTime": "2023-11-29T15:40:31.264997Z",
+  //     "lastStartedTime": "2023-11-29T15:40:31.257167Z",
+  //     "attempt": 4,
+  //     "maximumAttempts": 10,
+  //     "scheduledTime": null,
+  //     "expirationTime": "2023-11-29T15:59:58.812474Z",
+  //     "lastFailure": {
+  //         "message": "activity Heartbeat timeout",
+  //         "source": "Server",
+  //         "stackTrace": "",
+  //         "encodedAttributes": null,
+  //         "cause": null,
+  //         "timeoutFailureInfo": {
+  //             "timeoutType": "Heartbeat",
+  //             "lastHeartbeatDetails": null
+  //         }
+  //     },
+  //     "lastWorkerIdentity": "31048@Alexs-MacBook-Pro.local@",
+  //     "id": "7"
+  // }
+
+  console.log('Pending Activity: ', pendingActivity);
 
   let tab = 'input';
   $: value =
-    tab === 'input'
+    tab === 'heartbeat' && pendingActivity
+      ? pendingActivity?.heartbeatDetails
+      : tab === 'input'
       ? group.initialEvent.attributes?.input
       : tab === 'result'
       ? group.lastEvent.attributes?.result
       : group;
+
+  $: {
+    if (tab === 'heartbeat' && !pendingActivity) {
+      tab = 'result';
+    }
+  }
 </script>
 
-<div class="flex w-full overflow-auto text-white">
-  <div class="flex w-1/2 flex-col gap-4 bg-blueGray-800 px-8 py-6">
-    {#each group.eventList as event}
+<div class="flex w-full flex-col overflow-auto text-white md:flex-row">
+  <div class="flex w-full flex-col gap-4 bg-blueGray-800 px-8 py-6 md:w-1/2">
+    {#if pendingActivity}
+      <div class="flex gap-4">
+        <p>{pendingActivity.id}</p>
+        <div class="flex w-full flex-col gap-2">
+          <p class="font-bold">Pending Activity</p>
+          {#each Object.entries(pendingActivity) as [key, value]}
+            {#if typeof value !== 'object'}
+              <div class="flex gap-4 border-b border-white p-1">
+                <p class="w-1/2">{capitalize(key)}</p>
+                <p class="w-1/2">{value}</p>
+              </div>
+            {/if}
+          {/each}
+        </div>
+      </div>
+    {/if}
+    {#each group.eventList.reverse() as event}
       <div class="flex gap-4">
         <p>{event.id}</p>
         <div class="flex w-full flex-col gap-2">
@@ -38,7 +94,7 @@
       </div>
     {/each}
   </div>
-  <div class="flex w-1/2 flex-col gap-4 bg-blueGray-900 px-8 py-6">
+  <div class="flex w-full flex-col gap-4 bg-blueGray-900 px-8 py-6 md:w-1/2">
     <div class="flex gap-4">
       <Icon name="json" />
       <button
@@ -51,6 +107,13 @@
         on:click={() => (tab = 'result')}
         class:active={tab === 'result'}>Result</button
       >
+      {#if pendingActivity}
+        <button
+          class="border-b-2 border-blueGray-900"
+          on:click={() => (tab = 'heartbeat')}
+          class:active={tab === 'heartbeat'}>Heartbeat</button
+        >
+      {/if}
       <button
         class="border-b-2 border-blueGray-900"
         on:click={() => (tab = 'json')}

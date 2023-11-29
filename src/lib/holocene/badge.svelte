@@ -14,6 +14,7 @@
     | 'green'
     | 'blue'
     | 'purple'
+    | 'indigo'
     | 'gray';
 </script>
 
@@ -32,6 +33,10 @@
   .running,
   .blue {
     @apply border-blue-700 bg-blue-100 text-blue-700;
+  }
+
+  .indigo {
+    @apply border-indigo-700 bg-indigo-100 text-indigo-700;
   }
 
   .alpha,

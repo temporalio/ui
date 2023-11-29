@@ -61,6 +61,7 @@ type WorkflowRelationships = {
   parentNamespaceName: string | undefined;
   next: string | undefined;
   scheduleId: string | undefined;
+  totalRelationships: number;
 };
 
 export const getWorkflowRelationships = (
@@ -111,6 +112,18 @@ export const getWorkflowRelationships = (
     scheduleId
   );
 
+  const totalRelationships: () => number = () => {
+    let count = 0;
+    const childrenLength =
+      (workflow?.pendingChildren?.length || 0) + (children?.length || 0);
+    count += childrenLength;
+    if (parent) count++;
+    if (first) count++;
+    if (previous) count++;
+    if (scheduleId) count++;
+    return count;
+  };
+
   return {
     hasRelationships,
     hasChildren,
@@ -121,5 +134,6 @@ export const getWorkflowRelationships = (
     parentNamespaceName,
     next: newExecutionRunId,
     scheduleId,
+    totalRelationships: totalRelationships(),
   };
 };

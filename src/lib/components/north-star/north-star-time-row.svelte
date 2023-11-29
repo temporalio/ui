@@ -27,41 +27,47 @@
   };
 </script>
 
-<button on:click={() => (open = !open)}>
-  <div
-    class="flex w-full items-center gap-4 rounded-lg border-2 border-gray-900 bg-white px-3 py-2 pl-8"
-  >
-    {formatDate(new Date(date), $timeFormat, {
-      relative: $relativeTime,
-    })}
-    <div class="flex gap-2">
-      {#each Object.entries(categorizedGroups) as [category, categoryGroup]}
-        <div class="category {category}">
-          <span class="rounded px-1 font-mono {category}-count"
-            >{categoryGroup.length}</span
-          >
-          {pluralize(getCategoryName(category), categoryGroup.length)}
+<div class="flex items-start gap-2">
+  <Icon class="mt-4" name="clock" />
+
+  <div class="flex w-full flex-col gap-1">
+    <button on:click={() => (open = !open)}>
+      <div
+        class="flex w-full items-center gap-4 rounded-lg border-2 border-gray-900 bg-white px-3 py-2 pl-8"
+      >
+        {formatDate(new Date(date), $timeFormat, {
+          relative: $relativeTime,
+        })}
+        <div class="flex gap-2">
+          {#each Object.entries(categorizedGroups) as [category, categoryGroup]}
+            <div class="category {category}">
+              <span class="rounded px-1 font-mono {category}-count"
+                >{categoryGroup.length}</span
+              >
+              {pluralize(getCategoryName(category), categoryGroup.length)}
+            </div>
+          {/each}
         </div>
-      {/each}
-    </div>
-    <Icon name="chevron-{open ? 'up' : 'down'}" />
+        <Icon name="chevron-{open ? 'up' : 'down'}" />
+      </div>
+    </button>
+    {#if open}
+      <div class="flex flex-col">
+        {#each Object.entries(categorizedGroups) as [category, categoryGroup], j}
+          {#each categoryGroup as group, i}
+            <NorthStarGroupRow
+              {category}
+              {group}
+              first={j === 0 && i === 0}
+              last={j === Object.values(categorizedGroups).length - 1 &&
+                i === categoryGroup.length - 1}
+            />
+          {/each}
+        {/each}
+      </div>
+    {/if}
   </div>
-</button>
-{#if open}
-  <div class="flex flex-col">
-    {#each Object.entries(categorizedGroups) as [category, categoryGroup], j}
-      {#each categoryGroup as group, i}
-        <NorthStarGroupRow
-          {category}
-          {group}
-          first={j === 0 && i === 0}
-          last={j === Object.values(categorizedGroups).length - 1 &&
-            i === categoryGroup.length - 1}
-        />
-      {/each}
-    {/each}
-  </div>
-{/if}
+</div>
 
 <style lang="postcss">
   .category {

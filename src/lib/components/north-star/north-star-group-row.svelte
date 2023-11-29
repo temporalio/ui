@@ -3,9 +3,11 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { EventTypeCategory } from '$lib/types/events';
   import { capitalize } from '$lib/utilities/format-camel-case';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import { isActivityTaskScheduledEvent } from '$lib/utilities/is-event-type';
 
   import NorthStarGroupDetails from './north-star-group-details.svelte';
 
@@ -26,6 +28,15 @@
     return capitalize(category);
   };
 
+  $: pendingActivity = $workflowRun?.workflow?.pendingActivities.find(
+    (activity) =>
+      group.eventList.find(
+        (e) =>
+          isActivityTaskScheduledEvent(e) &&
+          e.attributes.activityId === activity.activityId,
+      ),
+  );
+
   $: duration = formatDistanceAbbreviated({
     start: group.initialEvent.eventTime,
     end: group.lastEvent.eventTime,
@@ -40,7 +51,7 @@
     class:rounded-b-xl={last && !open}
     class:border-t-2={first}
   >
-    <div class="flex items-center gap-4">
+    <div class="flex flex-col items-center gap-1 md:flex-row md:gap-4">
       <span class="font-mono">{group.id}</span>
       <p>
         {getCategoryName(category)}
@@ -48,9 +59,20 @@
       <p class="category {category}">
         {capitalize(group.name)}
       </p>
-      <p class="badge badge-{group?.status}">
-        {group?.classification ? group?.status : ''}
-      </p>
+      {#if pendingActivity}
+        <div class="flex gap-2">
+          <p class="badge badge-{group?.status}">
+            {pendingActivity.state}
+          </p>
+          <p class="flex gap-1 rounded bg-red-200 px-1 text-red-700">
+            <Icon name="retry" />Retry
+          </p>
+        </div>
+      {:else}
+        <p class="badge badge-{group?.status}">
+          {group?.lastEvent?.classification || group?.status || ''}
+        </p>
+      {/if}
     </div>
     <div class="flex gap-2">
       {#if duration && duration !== '0ms'}
@@ -67,7 +89,7 @@
   </div>
 </button>
 {#if open}
-  <NorthStarGroupDetails {group} />
+  <NorthStarGroupDetails {group} {pendingActivity} />
 {/if}
 
 <style lang="postcss">
@@ -123,11 +145,20 @@
     @apply bg-green-200 text-green-900;
   }
 
-  .badge-Scheduled {
+  .badge-Scheduled,
+  .badge-Initiated {
     @apply border border-gray-600 text-gray-600;
   }
 
   .badge-Started {
     @apply border border-blue-600 text-blue-600;
+  }
+
+  .badge-Failed {
+    @apply bg-red-200 text-red-900;
+  }
+
+  .badge-Canceled {
+    @apply bg-yellow-200 text-yellow-900;
   }
 </style>

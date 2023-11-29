@@ -129,12 +129,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
       return Boolean(this.eventList.find(eventIsCompleted));
     },
     get status() {
-      if (this.isFailure) return 'Failed';
-      if (this.isTimedOut) return 'TimedOut';
-      if (this.isCanceled) return 'Canceled';
-      if (this.isTerminated) return 'Terminated';
-      if (this.isCompleted) return 'Completed';
-      return classification;
+      return this.lastEvent.classification;
     },
   };
 };
