@@ -97,7 +97,7 @@
     <WorkflowTypedError error={workflowTaskFailedError} />
   {/if}
   <LabsModeGuard>
-    <div class="flex flex-col gap-4 lg:flex-row">
+    <div class="flex flex-col gap-4">
       <NorthStarSummary />
       <EventHistoryTimeline history={$fullEventHistory} />
     </div>

@@ -81,7 +81,7 @@
   };
 </script>
 
-<div class="flex w-full flex-col gap-2 lg:w-[800px]">
+<div class="flex w-full flex-col gap-2">
   <h1 class="text-xl">Summary</h1>
   <div class="border-l-8 border-gray-900">
     <div class="flex flex-col gap-2">
@@ -105,7 +105,7 @@
       </div>
 
       <div class="flex flex-col gap-2 px-4 py-2">
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-row gap-2">
           <div
             class="flex flex-col items-start gap-2 rounded border-2 border-gray-900 bg-white px-4 py-2"
           >
@@ -123,7 +123,7 @@
             </p>
           </div>
           <div
-            class="flex w-full flex-col items-start gap-2 rounded border-2 border-gray-900 bg-white px-4 py-2"
+            class="flex flex-col items-start gap-2 rounded border-2 border-gray-900 bg-white px-4 py-2"
           >
             <p class="flex gap-2">
               <strong>START</strong>
@@ -150,12 +150,10 @@
               </div>
             {/if}
           </div>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          {#each Object.entries(categoryItems) as [category, group]}
-            <div
-              class="flex items-center gap-2 rounded border-2 border-gray-900 bg-white px-4 py-2"
-            >
+          <div
+            class="flex items-center gap-2 rounded border-2 border-gray-900 bg-white px-4 py-2"
+          >
+            {#each Object.entries(categoryItems) as [category, group]}
               <div class="category {category}">
                 <span class="rounded px-1 font-mono {category}-count"
                   >{group.length}</span
@@ -170,8 +168,8 @@
                   </div>
                 {/if}
               {/each}
-            </div>
-          {/each}
+            {/each}
+          </div>
         </div>
       </div>
       <div class="flex items-center items-stretch gap-0">
