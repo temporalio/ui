@@ -22,7 +22,7 @@
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
+  import { workflowFilters } from '$lib/stores/filters';
   import { getLocalTime } from '$lib/utilities/format-date';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
@@ -62,12 +62,6 @@
           : timeFilter.value;
       timeField = timeFilter.attribute as string;
     }
-
-    const shouldUpdateTimeFilter =
-      !timeFilter ||
-      columnOrderedDurations.includes(timeFilter?.value) ||
-      timeFilter?.customDate;
-    if (shouldUpdateTimeFilter) $persistedTimeFilter = timeFilter;
   };
 
   $: timeFilter, setTimeValues();
