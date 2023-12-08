@@ -36,13 +36,13 @@
   function handleNewQuery(value: string, type: SearchAttributesValue) {
     searchAttributeValue = '';
     filter.set({ ...emptyFilter(), attribute: value, conditional: '=', type });
-    $focusedElementId = getFocusedElementId(value);
+    $focusedElementId = getFocusedElementId({ attribute: value, type });
   }
 
   let searchAttributeValue = '';
   //  TODO: Add KeywordList support
   $: options = $sortedSearchAttributeOptions.filter(
-    (option) => !isListFilter(option.value),
+    ({ value, type }) => !isListFilter({ attribute: value, type }),
   );
 
   $: filteredOptions = !searchAttributeValue

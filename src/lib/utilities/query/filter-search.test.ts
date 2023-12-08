@@ -39,46 +39,66 @@ describe('isStatusFilter', () => {
 });
 
 describe('isTextFilter', () => {
+  it('should return true if the type is a Keyword', () => {
+    expect(isTextFilter({ attribute: 'WorkflowType', type: 'Keyword' })).toBe(
+      true,
+    );
+  });
+
   it('should return true if the attribute is a Keyword', () => {
-    expect(isTextFilter('WorkflowType', store)).toBe(true);
+    expect(isTextFilter({ attribute: 'WorkflowType' }, store)).toBe(true);
   });
 
   it('should return true if the attribute is a Text', () => {
-    expect(isTextFilter('CustomA', store)).toBe(true);
+    expect(isTextFilter({ attribute: 'CustomA' }, store)).toBe(true);
   });
 
   it('should return true if the attribute is a String', () => {
-    expect(isTextFilter('CustomC', store)).toBe(true);
+    expect(isTextFilter({ attribute: 'CustomC' }, store)).toBe(true);
   });
 
   it('should return false if the attribute is not a Keyword or is ExecutionStatus', () => {
-    expect(isTextFilter('ExecutionStatus', store)).toBe(false);
-    expect(isTextFilter('BuildIds', store)).toBe(false);
+    expect(
+      isTextFilter({ attribute: 'ExecutionStatus', type: 'Keyword' }),
+    ).toBe(false);
+    expect(isTextFilter({ attribute: 'BuildIds' }, store)).toBe(false);
   });
 });
 
 describe('isListFilter', () => {
+  it('should return true if the type is a KeywordList', () => {
+    expect(isListFilter({ attribute: 'BuildIds', type: 'KeywordList' })).toBe(
+      true,
+    );
+  });
+
   it('should return true if the attribute is a KeywordList', () => {
-    expect(isListFilter('BuildIds', store)).toBe(true);
+    expect(isListFilter({ attribute: 'BuildIds' }, store)).toBe(true);
   });
 
   it('should return false if the attribute is not a KeywordList', () => {
-    expect(isListFilter('WorkflowType', store)).toBe(false);
+    expect(isListFilter({ attribute: 'WorkflowType' }, store)).toBe(false);
   });
 });
 
 describe('isNumberFilter', () => {
+  it('should return true if the type is an Int', () => {
+    expect(isNumberFilter({ attribute: 'HistoryLength', type: 'Int' })).toBe(
+      true,
+    );
+  });
+
   it('should return true if the attribute is an Int', () => {
-    expect(isNumberFilter('HistoryLength', store)).toBe(true);
+    expect(isNumberFilter({ attribute: 'HistoryLength' }, store)).toBe(true);
   });
 
   it('should return true if the attribute is a Double', () => {
-    expect(isNumberFilter('CustomB', store)).toBe(true);
+    expect(isNumberFilter({ attribute: 'CustomB' }, store)).toBe(true);
   });
 
   it('should return false if the attribute is not an Int', () => {
-    expect(isNumberFilter('WorkflowType', store)).toBe(false);
-    expect(isNumberFilter('isStartTime', store)).toBe(false);
+    expect(isNumberFilter({ attribute: 'WorkflowType' }, store)).toBe(false);
+    expect(isNumberFilter({ attribute: 'isStartTime' }, store)).toBe(false);
   });
 });
 
@@ -93,24 +113,40 @@ describe('isDurationFilter', () => {
 });
 
 describe('isBooleanFilter', () => {
+  it('should return true if the type is a Bool', () => {
+    expect(
+      isBooleanFilter({ attribute: 'TemporalSchedulePaused', type: 'Bool' }),
+    ).toBe(true);
+  });
+
   it('should return true if the attribute is a Bool', () => {
-    expect(isBooleanFilter('TemporalSchedulePaused', store)).toBe(true);
+    expect(
+      isBooleanFilter({ attribute: 'TemporalSchedulePaused' }, store),
+    ).toBe(true);
   });
 
   it('should return false if the attribute is not a Bool', () => {
-    expect(isBooleanFilter('WorkflowType', store)).toBe(false);
-    expect(isBooleanFilter('HistoryLength', store)).toBe(false);
+    expect(isBooleanFilter({ attribute: 'WorkflowType' }, store)).toBe(false);
+    expect(isBooleanFilter({ attribute: 'HistoryLength' }, store)).toBe(false);
   });
 });
 
 describe('isDateTimeFilter', () => {
   it('should return true if the attribute is a Datetime', () => {
-    expect(isDateTimeFilter('CloseTime', store)).toBe(true);
+    expect(isDateTimeFilter({ attribute: 'CloseTime' }, store)).toBe(true);
+  });
+
+  it('should return true if the type is a Datetime', () => {
+    expect(isDateTimeFilter({ attribute: 'CloseTime', type: 'Datetime' })).toBe(
+      true,
+    );
   });
 
   it('should return false if the attribute is not a Datetime', () => {
-    expect(isDateTimeFilter('WorkflowType', store)).toBe(false);
-    expect(isDateTimeFilter('HistoryLength', store)).toBe(false);
-    expect(isDateTimeFilter('TemporalSchedulePaused', store)).toBe(false);
+    expect(isDateTimeFilter({ attribute: 'WorkflowType' }, store)).toBe(false);
+    expect(isDateTimeFilter({ attribute: 'HistoryLength' }, store)).toBe(false);
+    expect(
+      isDateTimeFilter({ attribute: 'TemporalSchedulePaused' }, store),
+    ).toBe(false);
   });
 });

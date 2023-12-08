@@ -102,7 +102,8 @@
 
   function updateFocusedElementId() {
     if ($activeQueryIndex !== null) {
-      $focusedElementId = getFocusedElementId($filter.attribute);
+      const { attribute, type } = $filter;
+      $focusedElementId = getFocusedElementId({ attribute, type });
     }
   }
 
@@ -130,10 +131,13 @@
   }
 
   function handleKeyUp(event: KeyboardEvent) {
-    if (event.key === 'Escape' && !isTextFilter($filter.attribute)) {
+    const { attribute, type } = $filter;
+    if (event.key === 'Escape' && !isTextFilter({ attribute, type })) {
       resetFilter();
     }
   }
+
+  $: ({ attribute, type } = $filter);
 </script>
 
 <div class="flex grow flex-col">
@@ -152,7 +156,7 @@
           <SearchAttributeMenu />
         {/if}
 
-        {#if isTextFilter($filter.attribute)}
+        {#if isTextFilter({ attribute, type })}
           <div
             class="flex w-full items-center"
             in:fly={{ x: -100, duration: 150 }}
@@ -173,7 +177,7 @@
             <DurationFilter />
             <CloseFilter />
           </div>
-        {:else if isNumberFilter($filter.attribute)}
+        {:else if isNumberFilter({ attribute, type })}
           <div
             class="flex w-full items-center"
             in:fly={{ x: -100, duration: 150 }}
@@ -181,7 +185,7 @@
             <NumberFilter />
             <CloseFilter />
           </div>
-        {:else if isDateTimeFilter($filter.attribute)}
+        {:else if isDateTimeFilter({ attribute, type })}
           <div
             class="flex w-full items-center"
             in:fly={{ x: -100, duration: 150 }}
@@ -189,7 +193,7 @@
             <DateTimeFilter />
             <CloseFilter />
           </div>
-        {:else if isBooleanFilter($filter.attribute)}
+        {:else if isBooleanFilter({ attribute, type })}
           <div
             class="flex w-full items-center"
             in:fly={{ x: -100, duration: 150 }}
