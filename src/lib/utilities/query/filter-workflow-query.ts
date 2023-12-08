@@ -2,7 +2,10 @@ import { get } from 'svelte/store';
 
 import type { WorkflowFilter } from '$lib/models/workflow-filters';
 import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-import type { SearchAttributes } from '$lib/types/workflows';
+import type {
+  SearchAttributes,
+  SearchAttributesValue,
+} from '$lib/types/workflows';
 
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 
@@ -35,8 +38,19 @@ const isValid = (value: unknown): boolean => {
   return true;
 };
 
+const formatValue = (
+  value: string,
+  type: SearchAttributesValue,
+): string | boolean => {
+  if (type === 'Bool') {
+    return value.toLowerCase() === 'true' ? true : false;
+  }
+  return `"${value}"`;
+};
+
 const toFilterQueryStatement = (
   attribute: keyof SearchAttributes,
+  type: SearchAttributesValue,
   value: FilterValue,
   conditional = '=',
   archived: boolean,
@@ -58,7 +72,7 @@ const toFilterQueryStatement = (
     return `${queryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;
   }
 
-  return `${queryKey}${conditional}"${value}"`;
+  return `${queryKey}${conditional}${formatValue(value, type)}`;
 };
 
 const toQueryStatementsFromFilters = (
@@ -69,6 +83,7 @@ const toQueryStatementsFromFilters = (
     .map(
       ({
         attribute,
+        type,
         value,
         conditional,
         operator,
@@ -78,6 +93,7 @@ const toQueryStatementsFromFilters = (
         if (isValid(value)) {
           let statement = toFilterQueryStatement(
             attribute,
+            type,
             value,
             conditional,
             archived,

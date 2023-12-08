@@ -23,6 +23,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -39,6 +40,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -55,6 +57,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '(',
@@ -62,6 +65,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '',
@@ -69,6 +73,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: ')',
@@ -87,6 +92,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -94,6 +100,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -110,6 +117,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -117,6 +125,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -124,6 +133,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -142,6 +152,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'StartTime',
+        type: 'Datetime',
         conditional: '>',
         operator: '',
         parenthesis: '',
@@ -161,6 +172,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -168,6 +180,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'StartTime',
+        type: 'Datetime',
         conditional: '>',
         operator: '',
         parenthesis: '',

@@ -1,4 +1,8 @@
-import type { SearchAttributes, WorkflowExecution } from '$lib/types/workflows';
+import type {
+  SearchAttributes,
+  SearchAttributesValue,
+  WorkflowExecution,
+} from '$lib/types/workflows';
 
 export type TextFilterAttributes = 'WorkflowId' | 'WorkflowType' | 'RunId';
 export type TextFilterKeys = Extract<
@@ -29,6 +33,7 @@ export const searchAttributeToWorkflowKey: Record<
 
 export type WorkflowFilter = {
   attribute: Extract<keyof SearchAttributes, string>;
+  type: SearchAttributesValue;
   value: string;
   operator: string;
   parenthesis: string;
