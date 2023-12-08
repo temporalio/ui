@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { toListWorkflowQueryFromFilters } from './list-workflow-query';
-import { combineDropdownFilters } from './to-list-workflow-filters';
+import { toListWorkflowQueryFromFilters } from './filter-workflow-query';
+import { combineFilters } from './to-list-workflow-filters';
 import { isVersionNewer } from '../version-check';
 
 describe('toListWorkflowQueryFromFilters', () => {
@@ -30,9 +30,7 @@ describe('toListWorkflowQueryFromFilters', () => {
         value: '',
       },
     ];
-    const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
-    );
+    const query = toListWorkflowQueryFromFilters(filters);
     expect(query).toBe('');
   });
 
@@ -47,9 +45,7 @@ describe('toListWorkflowQueryFromFilters', () => {
         value: 'Running',
       },
     ];
-    const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
-    );
+    const query = toListWorkflowQueryFromFilters(filters);
     expect(query).toBe('ExecutionStatus="Running"');
   });
 
@@ -80,12 +76,25 @@ describe('toListWorkflowQueryFromFilters', () => {
         value: 'Failed',
       },
     ];
-    const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
-    );
+    const query = toListWorkflowQueryFromFilters(combineFilters(filters));
     expect(query).toBe(
       '(ExecutionStatus="Running" OR ExecutionStatus="Canceled" OR ExecutionStatus="Failed")',
     );
+  });
+
+  it('should convert a boolean filter', () => {
+    const filters = [
+      {
+        attribute: 'CustomBoolField',
+        type: 'Bool',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'false',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('CustomBoolField=false');
   });
 
   it('should convert two different filters', () => {
@@ -107,9 +116,7 @@ describe('toListWorkflowQueryFromFilters', () => {
         value: 'abcd',
       },
     ];
-    const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
-    );
+    const query = toListWorkflowQueryFromFilters(combineFilters(filters));
     expect(query).toBe('ExecutionStatus="Running" AND WorkflowId="abcd"');
   });
 
@@ -140,9 +147,7 @@ describe('toListWorkflowQueryFromFilters', () => {
         value: 'cronWorkflow',
       },
     ];
-    const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
-    );
+    const query = toListWorkflowQueryFromFilters(combineFilters(filters));
     expect(query).toBe(
       'ExecutionStatus="Running" AND WorkflowId="abcd" AND WorkflowType="cronWorkflow"',
     );
@@ -162,7 +167,7 @@ describe('toListWorkflowQueryFromFilters', () => {
 
     const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
     const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
+      filters,
       supportsAdvancedVisibility,
     );
     expect(query).toBe('StartTime > "2019-12-30T00:00:00.000Z"');
@@ -189,7 +194,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     ];
     const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
     const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
+      combineFilters(filters),
       supportsAdvancedVisibility,
     );
     expect(query).toBe(

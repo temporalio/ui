@@ -17,6 +17,7 @@ const workflowTypeQuery = 'WorkflowType="World"';
 const workflowQuery1 = 'WorkflowId="Hello" AND WorkflowType="World"';
 const startTimeQuery = 'StartTime > "2022-04-18T17:45:18-06:00"';
 const closeTimeQuery = 'CloseTime > "2022-04-18T17:45:18-06:00"';
+const booleanQuery = 'CustomBoolField=true';
 const betweenTimeQuery =
   'StartTime BETWEEN "2023-07-28T00:00:00-00:00" AND "2023-07-28T06:00:00-00:00"';
 const workflowQuery2 =
@@ -32,6 +33,7 @@ const attributes = {
   StartTime: 'Datetime',
   WorkflowId: 'Keyword',
   WorkflowType: 'Keyword',
+  CustomBoolField: 'Bool',
 };
 
 describe('toListWorkflowFilters', () => {
@@ -173,6 +175,21 @@ describe('toListWorkflowFilters', () => {
         operator: '',
         parenthesis: '',
         value: '2022-04-18T17:45:18-06:00',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
+  it('should parse a query with a Bool type', () => {
+    const result = toListWorkflowFilters(booleanQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'CustomBoolField',
+        type: 'Bool',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'true',
       },
     ];
     expect(result).toEqual(expectedFilters);
