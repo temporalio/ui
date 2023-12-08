@@ -7,6 +7,7 @@
   import {
     searchAttributeToWorkflowKey,
     type TextFilterAttributes,
+    type WorkflowFilter,
   } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -31,8 +32,9 @@
       $workflowFilters.filter((f) => f.attribute !== attribute);
 
     if (!filter) {
-      const newFilter = {
+      const newFilter: WorkflowFilter = {
         attribute,
+        type: 'Keyword',
         value,
         conditional: '=',
         operator: '',

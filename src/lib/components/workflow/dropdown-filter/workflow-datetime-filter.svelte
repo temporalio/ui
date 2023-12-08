@@ -21,6 +21,7 @@
   import MenuDivider from '$lib/holocene/menu/menu-divider.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { workflowFilters } from '$lib/stores/filters';
   import { getLocalTime } from '$lib/utilities/format-date';
@@ -79,8 +80,9 @@
     } else if (value === 'Custom') {
       custom = true;
     } else {
-      const filter = {
+      const filter: WorkflowFilter = {
         attribute: timeField,
+        type: 'Datetime',
         value,
         conditional: '>',
         operator: '',
@@ -152,8 +154,9 @@
         )}"`
       : `> "${formatISO(startDateWithTime)}"`;
 
-    const filter = {
+    const filter: WorkflowFilter = {
       attribute: timeField,
+      type: 'Datetime',
       value: query,
       conditional: '=',
       operator: '',
