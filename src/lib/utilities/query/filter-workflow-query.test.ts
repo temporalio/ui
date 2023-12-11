@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { toListWorkflowQueryFromFilters } from './list-workflow-query';
-import { combineDropdownFilters } from './to-list-workflow-filters';
+import { toListWorkflowQueryFromFilters } from './filter-workflow-query';
+import { combineFilters } from './to-list-workflow-filters';
 import { isVersionNewer } from '../version-check';
 
 describe('toListWorkflowQueryFromFilters', () => {
@@ -23,15 +23,14 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
         value: '',
       },
     ];
-    const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
-    );
+    const query = toListWorkflowQueryFromFilters(filters);
     expect(query).toBe('');
   });
 
@@ -39,15 +38,14 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
         value: 'Running',
       },
     ];
-    const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
-    );
+    const query = toListWorkflowQueryFromFilters(filters);
     expect(query).toBe('ExecutionStatus="Running"');
   });
 
@@ -55,6 +53,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '(',
@@ -62,6 +61,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '',
@@ -69,24 +69,39 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: ')',
         value: 'Failed',
       },
     ];
-    const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
-    );
+    const query = toListWorkflowQueryFromFilters(combineFilters(filters));
     expect(query).toBe(
       '(ExecutionStatus="Running" OR ExecutionStatus="Canceled" OR ExecutionStatus="Failed")',
     );
+  });
+
+  it('should convert a boolean filter', () => {
+    const filters = [
+      {
+        attribute: 'CustomBoolField',
+        type: 'Bool',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'false',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('CustomBoolField=false');
   });
 
   it('should convert two different filters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -94,15 +109,14 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
         value: 'abcd',
       },
     ];
-    const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
-    );
+    const query = toListWorkflowQueryFromFilters(combineFilters(filters));
     expect(query).toBe('ExecutionStatus="Running" AND WorkflowId="abcd"');
   });
 
@@ -110,6 +124,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -117,6 +132,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -124,15 +140,14 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
         value: 'cronWorkflow',
       },
     ];
-    const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
-    );
+    const query = toListWorkflowQueryFromFilters(combineFilters(filters));
     expect(query).toBe(
       'ExecutionStatus="Running" AND WorkflowId="abcd" AND WorkflowType="cronWorkflow"',
     );
@@ -142,6 +157,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'StartTime',
+        type: 'Datetime',
         conditional: '>',
         operator: '',
         parenthesis: '',
@@ -151,7 +167,7 @@ describe('toListWorkflowQueryFromFilters', () => {
 
     const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
     const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
+      filters,
       supportsAdvancedVisibility,
     );
     expect(query).toBe('StartTime > "2019-12-30T00:00:00.000Z"');
@@ -161,6 +177,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -168,6 +185,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'StartTime',
+        type: 'Datetime',
         conditional: '>',
         operator: '',
         parenthesis: '',
@@ -176,7 +194,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     ];
     const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
     const query = toListWorkflowQueryFromFilters(
-      combineDropdownFilters(filters),
+      combineFilters(filters),
       supportsAdvancedVisibility,
     );
     expect(query).toBe(

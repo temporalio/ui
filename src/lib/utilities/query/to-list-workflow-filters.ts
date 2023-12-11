@@ -35,9 +35,11 @@ export const getLargestDurationUnit = (duration: Duration): Duration => {
 };
 
 const isDatetimeStatement = is('Datetime');
+const isBoolStatement = is('Bool');
 
 export const emptyFilter = (): WorkflowFilter => ({
   attribute: '',
+  type: 'Keyword',
   value: '',
   operator: '',
   parenthesis: '',
@@ -69,6 +71,7 @@ export const toListWorkflowFilters = (
     tokens.forEach((token, index) => {
       if (attributes[token]) {
         filter.attribute = token;
+        filter.type = attributes[token];
         if (isDatetimeStatement(attributes[token])) {
           const start = getTwoAhead(tokens, index);
           const hasValidStartTime = isValidDate(start);
@@ -88,6 +91,9 @@ export const toListWorkflowFilters = (
           } else {
             console.error('Error parsing Datetime field from query');
           }
+        } else if (isBoolStatement(filter.type)) {
+          filter.value = tokens[index + 1].replace('=', '');
+          filter.conditional = '=';
         } else {
           filter.value = getTwoAhead(tokens, index);
         }

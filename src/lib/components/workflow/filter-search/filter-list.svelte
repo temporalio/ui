@@ -86,7 +86,8 @@
 
 <div class="flex flex-wrap gap-2" class:pt-2={visibleFilters.length}>
   {#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
-    {@const { attribute, value, conditional, customDate } = workflowFilter}
+    {@const { attribute, type, value, conditional, customDate } =
+      workflowFilter}
     {#if attribute}
       <div in:fade data-testid="{workflowFilter.attribute}-{i}">
         <Chip
@@ -112,7 +113,7 @@
           {:else}
             <span class="max-w-xs truncate md:max-w-lg xl:max-w-2xl">
               {attribute}
-              {#if isDateTimeFilter(attribute)}
+              {#if isDateTimeFilter({ attribute, type })}
                 {#if customDate}
                   {formatDateTimeRange(value, $timeFormat, $relativeTime)}
                 {:else}
@@ -124,7 +125,7 @@
                 {/if}
               {:else}
                 {conditional}
-                {isTextFilter(attribute) ? `"${value}"` : value}
+                {isTextFilter({ attribute, type }) ? `"${value}"` : value}
               {/if}
             </span>
           {/if}

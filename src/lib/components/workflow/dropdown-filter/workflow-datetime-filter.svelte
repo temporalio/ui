@@ -21,8 +21,9 @@
   import MenuDivider from '$lib/holocene/menu/menu-divider.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
+  import { workflowFilters } from '$lib/stores/filters';
   import { getLocalTime } from '$lib/utilities/format-date';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
@@ -62,12 +63,6 @@
           : timeFilter.value;
       timeField = timeFilter.attribute as string;
     }
-
-    const shouldUpdateTimeFilter =
-      !timeFilter ||
-      columnOrderedDurations.includes(timeFilter?.value) ||
-      timeFilter?.customDate;
-    if (shouldUpdateTimeFilter) $persistedTimeFilter = timeFilter;
   };
 
   $: timeFilter, setTimeValues();
@@ -85,8 +80,9 @@
     } else if (value === 'Custom') {
       custom = true;
     } else {
-      const filter = {
+      const filter: WorkflowFilter = {
         attribute: timeField,
+        type: 'Datetime',
         value,
         conditional: '>',
         operator: '',
@@ -158,8 +154,9 @@
         )}"`
       : `> "${formatISO(startDateWithTime)}"`;
 
-    const filter = {
+    const filter: WorkflowFilter = {
       attribute: timeField,
+      type: 'Datetime',
       value: query,
       conditional: '=',
       operator: '',

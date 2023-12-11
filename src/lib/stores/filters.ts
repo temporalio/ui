@@ -27,12 +27,6 @@ const updateWorkflowFilters: StartStopNotifier<WorkflowFilter[]> = (set) => {
   });
 };
 
-export const persistedTimeFilter = persistStore<WorkflowFilter>(
-  'workflowDateTimeFilter',
-  undefined,
-  true,
-);
-
 export const searchInputViewOpen = persistStore<boolean>(
   'searchInputView',
   false,

@@ -9,6 +9,7 @@
     attributeToHumanReadable,
     attributeToId,
     type TextFilterAttributes,
+    type WorkflowFilter,
   } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
@@ -24,8 +25,9 @@
   const onInput = (e: Event) => {
     const { value } = e.target as HTMLInputElement;
     if (value) {
-      const filter = {
+      const filter: WorkflowFilter = {
         attribute,
+        type: 'Keyword',
         value,
         conditional: '=',
         operator: '',

@@ -56,8 +56,9 @@
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
 
+  $: ({ attribute, type } = $filter);
   $: searchParamQuery = $page.url.searchParams.get('query');
-  $: showClearAllButton = $workflowFilters.length && !$filter.attribute;
+  $: showClearAllButton = $workflowFilters.length && !attribute;
 
   setContext<FilterContext>(FILTER_CONTEXT, {
     filter,
@@ -102,7 +103,7 @@
 
   function updateFocusedElementId() {
     if ($activeQueryIndex !== null) {
-      $focusedElementId = getFocusedElementId($filter.attribute);
+      $focusedElementId = getFocusedElementId({ attribute, type });
     }
   }
 
@@ -130,7 +131,7 @@
   }
 
   function handleKeyUp(event: KeyboardEvent) {
-    if (event.key === 'Escape' && !isTextFilter($filter.attribute)) {
+    if (event.key === 'Escape' && !isTextFilter({ attribute, type })) {
       resetFilter();
     }
   }
@@ -146,57 +147,59 @@
         class:filter={!showClearAllButton}
         on:keyup={handleKeyUp}
       >
-        {#if isStatusFilter($filter.attribute)}
+        {#if isStatusFilter(attribute)}
           <StatusFilter />
         {:else}
           <SearchAttributeMenu />
         {/if}
 
-        {#if isTextFilter($filter.attribute)}
-          <div
-            class="flex w-full items-center"
-            in:fly={{ x: -100, duration: 150 }}
-          >
-            <TextFilter />
-            <CloseFilter />
-          </div>
-          <!-- TODO: Add KeywordList support -->
-          <!-- {:else if isListFilter($filter.attribute)}
+        {#if attribute}
+          {#if isTextFilter({ attribute, type })}
+            <div
+              class="flex w-full items-center"
+              in:fly={{ x: -100, duration: 150 }}
+            >
+              <TextFilter />
+              <CloseFilter />
+            </div>
+            <!-- TODO: Add KeywordList support -->
+            <!-- {:else if isListFilter(attribute)}
         <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
           <ListFilter />
         </div> -->
-        {:else if isDurationFilter($filter.attribute)}
-          <div
-            class="flex w-full items-center"
-            in:fly={{ x: -100, duration: 150 }}
-          >
-            <DurationFilter />
-            <CloseFilter />
-          </div>
-        {:else if isNumberFilter($filter.attribute)}
-          <div
-            class="flex w-full items-center"
-            in:fly={{ x: -100, duration: 150 }}
-          >
-            <NumberFilter />
-            <CloseFilter />
-          </div>
-        {:else if isDateTimeFilter($filter.attribute)}
-          <div
-            class="flex w-full items-center"
-            in:fly={{ x: -100, duration: 150 }}
-          >
-            <DateTimeFilter />
-            <CloseFilter />
-          </div>
-        {:else if isBooleanFilter($filter.attribute)}
-          <div
-            class="flex w-full items-center"
-            in:fly={{ x: -100, duration: 150 }}
-          >
-            <BooleanFilter />
-            <CloseFilter />
-          </div>
+          {:else if isDurationFilter(attribute)}
+            <div
+              class="flex w-full items-center"
+              in:fly={{ x: -100, duration: 150 }}
+            >
+              <DurationFilter />
+              <CloseFilter />
+            </div>
+          {:else if isNumberFilter({ attribute, type })}
+            <div
+              class="flex w-full items-center"
+              in:fly={{ x: -100, duration: 150 }}
+            >
+              <NumberFilter />
+              <CloseFilter />
+            </div>
+          {:else if isDateTimeFilter({ attribute, type })}
+            <div
+              class="flex w-full items-center"
+              in:fly={{ x: -100, duration: 150 }}
+            >
+              <DateTimeFilter />
+              <CloseFilter />
+            </div>
+          {:else if isBooleanFilter({ attribute, type })}
+            <div
+              class="flex w-full items-center"
+              in:fly={{ x: -100, duration: 150 }}
+            >
+              <BooleanFilter />
+              <CloseFilter />
+            </div>
+          {/if}
         {/if}
       </div>
 

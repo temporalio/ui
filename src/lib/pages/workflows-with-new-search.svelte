@@ -66,7 +66,7 @@
     batchTerminateWorkflows,
   } from '$lib/services/batch-service';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
+  import { workflowFilters } from '$lib/stores/filters';
   import { groupByCountEnabled } from '$lib/stores/group-by-enabled';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
@@ -80,10 +80,7 @@
   } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
-  import {
-    toListWorkflowFilters,
-    updateQueryParamsFromFilter,
-  } from '$lib/utilities/query/to-list-workflow-filters';
+  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);
@@ -97,14 +94,6 @@
       $workflowsQuery = '';
     }
   }
-  const persistTimeFilter = () => {
-    if (!query && !$workflowFilters.length && $persistedTimeFilter) {
-      $workflowFilters = [$persistedTimeFilter];
-      updateQueryParamsFromFilter($page.url, $workflowFilters);
-    }
-  };
-
-  $: $page.params.namespace, persistTimeFilter();
 
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;

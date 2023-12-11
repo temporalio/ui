@@ -13,6 +13,7 @@
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
+  import type { SearchAttributesValue } from '$lib/types/workflows';
   import {
     getFocusedElementId,
     isListFilter,
@@ -32,16 +33,16 @@
     );
   }
 
-  function handleNewQuery(value: string) {
+  function handleNewQuery(value: string, type: SearchAttributesValue) {
     searchAttributeValue = '';
-    filter.set({ ...emptyFilter(), attribute: value, conditional: '=' });
-    $focusedElementId = getFocusedElementId(value);
+    filter.set({ ...emptyFilter(), attribute: value, conditional: '=', type });
+    $focusedElementId = getFocusedElementId({ attribute: value, type });
   }
 
   let searchAttributeValue = '';
   //  TODO: Add KeywordList support
   $: options = $sortedSearchAttributeOptions.filter(
-    (option) => !isListFilter(option.value),
+    ({ value, type }) => !isListFilter({ attribute: value, type }),
   );
 
   $: filteredOptions = !searchAttributeValue
@@ -78,11 +79,11 @@
       class="mb-1"
     />
 
-    {#each filteredOptions as { value, label }}
+    {#each filteredOptions as { value, label, type }}
       {@const disabled = isOptionDisabled(value, $workflowFilters)}
       <MenuItem
         on:click={() => {
-          handleNewQuery(value);
+          handleNewQuery(value, type);
         }}
         {disabled}
       >

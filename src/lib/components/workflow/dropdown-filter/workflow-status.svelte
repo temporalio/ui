@@ -21,9 +21,10 @@
     (f) => f.attribute === 'ExecutionStatus',
   );
 
-  function mapStatusToFilter(value: string) {
+  function mapStatusToFilter(value: string): WorkflowFilter {
     return {
       attribute: 'ExecutionStatus',
+      type: 'Keyword',
       value,
       conditional: '=',
       operator: '',

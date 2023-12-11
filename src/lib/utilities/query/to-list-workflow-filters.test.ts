@@ -17,6 +17,7 @@ const workflowTypeQuery = 'WorkflowType="World"';
 const workflowQuery1 = 'WorkflowId="Hello" AND WorkflowType="World"';
 const startTimeQuery = 'StartTime > "2022-04-18T17:45:18-06:00"';
 const closeTimeQuery = 'CloseTime > "2022-04-18T17:45:18-06:00"';
+const booleanQuery = 'CustomBoolField=true';
 const betweenTimeQuery =
   'StartTime BETWEEN "2023-07-28T00:00:00-00:00" AND "2023-07-28T06:00:00-00:00"';
 const workflowQuery2 =
@@ -32,9 +33,10 @@ const attributes = {
   StartTime: 'Datetime',
   WorkflowId: 'Keyword',
   WorkflowType: 'Keyword',
+  CustomBoolField: 'Bool',
 };
 
-describe('toListWorkflowParameters', () => {
+describe('toListWorkflowFilters', () => {
   afterEach(() => {
     vi.clearAllMocks();
     vi.useRealTimers();
@@ -45,6 +47,7 @@ describe('toListWorkflowParameters', () => {
     const expectedFilters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -62,6 +65,7 @@ describe('toListWorkflowParameters', () => {
     const expectedFilters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '(',
@@ -69,6 +73,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '',
@@ -76,6 +81,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: ')',
@@ -85,11 +91,12 @@ describe('toListWorkflowParameters', () => {
     expect(result).toEqual(expectedFilters);
   });
 
-  it('should parse a query with an workflowId', () => {
+  it('should parse a query with a workflowId', () => {
     const result = toListWorkflowFilters(workflowIdQuery, attributes);
     const expectedFilters = [
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -99,11 +106,12 @@ describe('toListWorkflowParameters', () => {
     expect(result).toEqual(expectedFilters);
   });
 
-  it('should parse a query with an workflowType', () => {
+  it('should parse a query with a workflowType', () => {
     const result = toListWorkflowFilters(workflowTypeQuery, attributes);
     const expectedFilters = [
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -113,11 +121,12 @@ describe('toListWorkflowParameters', () => {
     expect(result).toEqual(expectedFilters);
   });
 
-  it('should parse a query with an workflowId and workflowType', () => {
+  it('should parse a query with a workflowId and workflowType', () => {
     const result = toListWorkflowFilters(workflowQuery1, attributes);
     const expectedFilters = [
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -125,6 +134,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -134,7 +144,7 @@ describe('toListWorkflowParameters', () => {
     expect(result).toEqual(expectedFilters);
   });
 
-  it('should parse a query with an startTime', () => {
+  it('should parse a query with a startTime', () => {
     vi.useFakeTimers().setSystemTime(
       parseISO('2022-04-20T17:45:18-06:00').getTime(),
     );
@@ -142,6 +152,7 @@ describe('toListWorkflowParameters', () => {
     const expectedFilters = [
       {
         attribute: 'StartTime',
+        type: 'Datetime',
         conditional: '>',
         operator: '',
         parenthesis: '',
@@ -151,7 +162,7 @@ describe('toListWorkflowParameters', () => {
     expect(result).toEqual(expectedFilters);
   });
 
-  it('should parse a query with an closeTime', () => {
+  it('should parse a query with a closeTime', () => {
     vi.useFakeTimers().setSystemTime(
       parseISO('2022-04-20T17:45:18-06:00').getTime(),
     );
@@ -159,10 +170,26 @@ describe('toListWorkflowParameters', () => {
     const expectedFilters = [
       {
         attribute: 'CloseTime',
+        type: 'Datetime',
         conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2022-04-18T17:45:18-06:00',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
+  it('should parse a query with a Bool type', () => {
+    const result = toListWorkflowFilters(booleanQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'CustomBoolField',
+        type: 'Bool',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'true',
       },
     ];
     expect(result).toEqual(expectedFilters);
@@ -176,6 +203,7 @@ describe('toListWorkflowParameters', () => {
     const expectedFilters = [
       {
         attribute: 'StartTime',
+        type: 'Datetime',
         conditional: '',
         operator: '',
         parenthesis: '',
@@ -195,6 +223,7 @@ describe('toListWorkflowParameters', () => {
     const expectedFilters = [
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -202,6 +231,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'StartTime',
+        type: 'Datetime',
         conditional: '>',
         operator: '',
         parenthesis: '',
@@ -222,6 +252,7 @@ describe('toListWorkflowParameters', () => {
     const expectedFilters = [
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -229,6 +260,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'StartTime',
+        type: 'Datetime',
         conditional: '',
         operator: '',
         parenthesis: '',
@@ -248,6 +280,7 @@ describe('toListWorkflowParameters', () => {
     const expectedFilters = [
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -255,6 +288,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'StartTime',
+        type: 'Datetime',
         conditional: '>',
         operator: 'AND',
         parenthesis: '',
@@ -262,6 +296,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -270,6 +305,7 @@ describe('toListWorkflowParameters', () => {
     ];
     expect(result).toEqual(expectedFilters);
   });
+
   it('should parse a query with multiple executionStatuses and workflowType and startTime', () => {
     vi.useFakeTimers().setSystemTime(
       parseISO('2022-04-20T17:45:18-06:00').getTime(),
@@ -279,6 +315,7 @@ describe('toListWorkflowParameters', () => {
     const expectedFilters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '(',
@@ -286,6 +323,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '',
@@ -293,6 +331,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: ')',
@@ -300,6 +339,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -307,6 +347,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'StartTime',
+        type: 'Datetime',
         conditional: '>',
         operator: '',
         parenthesis: '',
@@ -368,6 +409,7 @@ describe('combineDropdownFilters', () => {
     const filters = [
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -375,6 +417,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -386,6 +429,7 @@ describe('combineDropdownFilters', () => {
     expect(result).toEqual([
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -393,6 +437,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -400,10 +445,12 @@ describe('combineDropdownFilters', () => {
       },
     ]);
   });
+
   it('should combine two filters with a datetime', () => {
     const filters = [
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -411,6 +458,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'StartTime',
+        type: 'Datetime',
         conditional: '>',
         operator: '',
         parenthesis: '',
@@ -422,6 +470,7 @@ describe('combineDropdownFilters', () => {
     expect(result).toEqual([
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -429,6 +478,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'StartTime',
+        type: 'Datetime',
         conditional: '>',
         operator: '',
         parenthesis: '',
@@ -441,6 +491,7 @@ describe('combineDropdownFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -448,6 +499,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -455,6 +507,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -466,6 +519,7 @@ describe('combineDropdownFilters', () => {
     expect(result).toEqual([
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -473,6 +527,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -480,6 +535,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -487,10 +543,12 @@ describe('combineDropdownFilters', () => {
       },
     ]);
   });
+
   it('should combine filters with an OR statement', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '(',
@@ -498,6 +556,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '',
@@ -505,6 +564,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: ')',
@@ -512,6 +572,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -519,6 +580,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -530,6 +592,7 @@ describe('combineDropdownFilters', () => {
     expect(result).toEqual([
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '(',
@@ -537,6 +600,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '',
@@ -544,6 +608,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: ')',
@@ -551,6 +616,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -558,6 +624,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -572,6 +639,7 @@ describe('combineFilters', () => {
     const filters = [
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -583,6 +651,7 @@ describe('combineFilters', () => {
     expect(result).toEqual([
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -595,6 +664,7 @@ describe('combineFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '',
@@ -602,6 +672,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -613,6 +684,7 @@ describe('combineFilters', () => {
     expect(result).toEqual([
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '(',
@@ -620,6 +692,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: ')',
@@ -632,6 +705,7 @@ describe('combineFilters', () => {
     const filters = [
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -643,6 +717,7 @@ describe('combineFilters', () => {
     expect(result).toEqual([
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -655,6 +730,7 @@ describe('combineFilters', () => {
     const filters = [
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -662,6 +738,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -673,6 +750,7 @@ describe('combineFilters', () => {
     expect(result).toEqual([
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -680,6 +758,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -692,6 +771,7 @@ describe('combineFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -699,6 +779,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -706,6 +787,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -717,6 +799,7 @@ describe('combineFilters', () => {
     expect(result).toEqual([
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -724,6 +807,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -731,6 +815,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -743,6 +828,7 @@ describe('combineFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '',
@@ -750,6 +836,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '',
@@ -757,6 +844,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -764,6 +852,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -771,6 +860,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -782,6 +872,7 @@ describe('combineFilters', () => {
     expect(result).toEqual([
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '(',
@@ -789,6 +880,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '',
@@ -796,6 +888,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: ')',
@@ -803,6 +896,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'WorkflowId',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -810,6 +904,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -822,6 +917,7 @@ describe('combineFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '',
@@ -829,6 +925,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: ')',
@@ -836,6 +933,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -847,6 +945,7 @@ describe('combineFilters', () => {
     expect(result).toEqual([
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '(',
@@ -854,6 +953,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '',
@@ -861,6 +961,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: ')',
@@ -873,6 +974,7 @@ describe('combineFilters', () => {
     const filters = [
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'OR',
         parenthesis: '(',
@@ -880,6 +982,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
@@ -891,6 +994,7 @@ describe('combineFilters', () => {
     expect(result).toEqual([
       {
         attribute: 'ExecutionStatus',
+        type: 'Keyword',
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
@@ -898,6 +1002,7 @@ describe('combineFilters', () => {
       },
       {
         attribute: 'WorkflowType',
+        type: 'Keyword',
         conditional: '=',
         operator: '',
         parenthesis: '',
