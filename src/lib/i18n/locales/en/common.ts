@@ -152,4 +152,6 @@ export const Strings = {
   'view-all-runs': 'View All Runs',
   download: 'Download',
   'search-attributes': 'Search Attributes',
+  'history-size-bytes': 'History Size (Bytes)',
+  'execution-details': 'Execution Details',
 } as const;

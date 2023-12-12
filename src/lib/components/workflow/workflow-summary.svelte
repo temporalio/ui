@@ -4,7 +4,6 @@
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import {
@@ -36,13 +35,25 @@
   >
     <div class="flex flex-col gap-2 xl:flex-row">
       <div class="grow overflow-hidden">
-        <h3 class="font-medium">{translate('common.workflow-type')}</h3>
+        <h3 class="font-medium">{translate('common.execution-details')}</h3>
         <div class="h-0.5 rounded-full bg-gray-900" />
-        <WorkflowDetail content={workflow?.name} copyable />
+        <WorkflowDetail
+          title={translate('common.workflow-type')}
+          content={workflow?.name}
+          copyable
+          textSize="sm"
+        />
         <WorkflowDetail
           title={translate('common.run-id')}
           content={workflow?.runId}
           copyable
+          textSize="sm"
+        />
+        <WorkflowDetail
+          title={translate('common.history-size-bytes')}
+          content={workflow?.historySizeBytes}
+          copyable
+          textSize="sm"
         />
       </div>
       <div class="grow overflow-hidden">
@@ -56,10 +67,12 @@
             run: workflow?.runId,
           })}
           copyable
+          textSize="sm"
         />
         <WorkflowDetail
           title={translate('workflows.state-transitions')}
           content={workflow?.stateTransitionCount}
+          textSize="sm"
         />
       </div>
       <div class="grow-0">
@@ -72,25 +85,22 @@
           content={formatDate(workflow?.startTime, $timeFormat, {
             relative: $relativeTime,
           })}
+          textSize="sm"
         />
         <WorkflowDetail
           title={translate('common.close-time')}
           content={formatDate(workflow?.endTime, $timeFormat, {
             relative: $relativeTime,
           })}
+          textSize="sm"
         />
         {#if elapsedTime}
-          <span class="flex flex-row items-center pt-2">
-            <Icon class="min-w-fit" name="clock" />
-            <p class="truncate text-sm">
-              {elapsedTime}
-            </p>
-          </span>
+          <WorkflowDetail icon="clock" content={elapsedTime} textSize="sm" />
         {/if}
       </div>
     </div>
     {#if workflow?.searchAttributes}
-      <div class="flex flex-col gap-2">
+      <div class="mt-4 flex flex-col gap-2">
         <h3 class="font-medium">{translate('common.search-attributes')}</h3>
         <div class="h-0.5 rounded-full bg-gray-900" />
         <PayloadDecoder
