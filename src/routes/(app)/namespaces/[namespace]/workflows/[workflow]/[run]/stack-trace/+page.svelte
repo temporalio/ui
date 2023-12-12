@@ -9,7 +9,7 @@
 </script>
 
 <PageTitle
-  title={`${translate('workflows.stack-trace-tab')} | ${workflow}`}
+  title={`${translate('workflows.call-stack-tab')} | ${workflow}`}
   url={$page.url.href}
 />
 <WorkflowStackTrace />

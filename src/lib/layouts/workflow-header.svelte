@@ -279,8 +279,8 @@
         </Badge>
       </Tab>
       <Tab
-        label={translate('workflows.stack-trace-tab')}
-        id="stack-trace-tab"
+        label={translate('workflows.call-stack-tab')}
+        id="call-stack-tab"
         href={routeForStackTrace(routeParameters)}
         active={pathMatches(
           $page.url.pathname,

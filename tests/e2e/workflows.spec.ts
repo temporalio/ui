@@ -60,14 +60,14 @@ test.describe('Workflows list', () => {
     await toggle.click();
   });
 
-  test('should render decoded stack trace', async ({ page }) => {
+  test('should render decoded call stack', async ({ page }) => {
     await page
       .getByRole('link', { name: 'e2e-workflow-2' })
       .click({ force: true });
 
-    await page.getByText('Stack Trace').click();
+    await page.getByText('Call Stack').click();
 
-    const tab = page.getByTestId('stack-trace-tab');
+    const tab = page.getByTestId('call-stack-tab');
     await tab.click();
 
     const codeBlock = page.locator('.readOnly .cm-editor');

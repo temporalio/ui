@@ -67,7 +67,7 @@
           {translate('common.refresh')}
         </Button>
         <p>
-          {translate('workflows.stack-trace-at')}
+          {translate('workflows.call-stack-at')}
           {currentdate.toLocaleTimeString()}
         </p>
       </div>
@@ -75,7 +75,7 @@
         <CodeBlock
           content={result}
           language="text"
-          testId="query-stack-trace"
+          testId="query-call-stack"
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
         />
@@ -88,16 +88,16 @@
     {/await}
   {:else}
     <EmptyState
-      title={translate('workflows.stack-trace-empty-state')}
-      testId="query-stack-trace-empty"
+      title={translate('workflows.call-stack-empty-state')}
+      testId="query-call-stack-empty"
     >
       {#if workflow?.isRunning && workers?.pollers?.length === 0}
         <p>
-          {translate('workflows.stack-trace-link-preface')}<Link
+          {translate('workflows.call-stack-link-preface')}<Link
             href="https://docs.temporal.io/workflows#stack-trace-query"
           >
-            {translate('workflows.stack-trace-link')}</Link
-          >{translate('workflows.stack-trace-link-postface', {
+            {translate('workflows.call-stack-link')}</Link
+          >{translate('workflows.call-stack-link-postface', {
             taskQueue: workflow?.taskQueue,
           })}
         </p>

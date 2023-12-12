@@ -103,7 +103,7 @@ export const Strings = {
   'workflow-history': 'Workflow History',
   'workers-tab': 'Workers',
   'pending-activities-tab': 'Pending Activities',
-  'stack-trace-tab': 'Stack Trace',
+  'call-stack-tab': 'Call Stack',
   'queries-tab': 'Queries',
   'workflow-error-no-workers-title': 'No Workers Running',
   'workflow-error-no-workers-description':
@@ -146,16 +146,15 @@ export const Strings = {
   'workflow-task-handler': 'Workflow Task Handler',
   'activity-handler': 'Activity Handler',
   'workers-empty-state': 'No Workers Found',
-  'stack-trace-empty-state': 'No Stack Traces Found',
+  'call-stack-empty-state': 'No Call Stacks Found',
   'no-workers-failure-message':
     'This will fail if you have no workers running.',
   'no-workers-running-message':
     'Please make sure you have at least one worker running.',
-  'stack-trace-at': 'Stack Trace at',
-  'stack-trace-link-preface': 'To enable ',
-  'stack-trace-link': 'stack traces',
-  'stack-trace-link-postface':
-    ', run a Worker on the {{taskQueue}} Task Queue.',
+  'call-stack-at': 'Call Stack at',
+  'call-stack-link-preface': 'To enable ',
+  'call-stack-link': 'call stacks',
+  'call-stack-link-postface': ', run a Worker on the {{taskQueue}} Task Queue.',
   'json-formatting': 'JSON Formatting',
   'query-type': 'Query Type',
   'pending-activities-empty-state': 'No Pending Activities',

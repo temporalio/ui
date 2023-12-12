@@ -7,45 +7,43 @@ test.beforeEach(async ({ page, baseURL }) => {
 });
 
 // eslint-disable-next-line playwright/no-skipped-test
-test.skip('Stack Trace With Completed Workflow', () => {
-  test('should show No Stack Trace for completed workflow', async ({
-    page,
-  }) => {
+test.skip('Call Stack With Completed Workflow', () => {
+  test('should show No Call Stack for completed workflow', async ({ page }) => {
     await page
       .getByText('completed-workflow')
       .click({ position: { x: 0, y: 0 } });
 
-    await page.getByTestId('stack-trace-tab').click();
+    await page.getByTestId('call-stack-tab').click();
 
-    await expect(page.getByTestId('query-stack-trace-empty')).toHaveText(
-      'No Stack Traces Found',
+    await expect(page.getByTestId('query-call-stack-empty')).toHaveText(
+      'No Call Stack Found',
     );
   });
 });
 
 // eslint-disable-next-line playwright/no-skipped-test
-test.skip('Stack Trace with Running Workflow', () => {
-  test('should show stack trace for running workflow', async ({ page }) => {
+test.skip('Call Stack with Running Workflow', () => {
+  test('should show call stack for running workflow', async ({ page }) => {
     await page
       .getByText('running-workflow')
       .click({ position: { x: 0, y: 0 } });
 
-    await page.getByTestId('stack-trace-tab').click();
+    await page.getByTestId('call-stack-tab').click();
 
-    await expect(page.getByTestId('query-stack-trace')).toBeVisible();
+    await expect(page.getByTestId('query-call-stack')).toBeVisible();
   });
 
-  test('should handle errors when the stack trace is not formatted as we expect', async ({
+  test('should handle errors when the call stack is not formatted as we expect', async ({
     page,
   }) => {
     await page
       .getByText('running-workflow')
       .click({ position: { x: 0, y: 0 } });
 
-    await page.getByTestId('stack-trace-tab').click();
+    await page.getByTestId('call-stack-tab').click();
 
     await mockQueryApiWithStackTraceError(page);
 
-    await expect(page.getByTestId('query-stack-trace')).toBeVisible();
+    await expect(page.getByTestId('query-call-stack')).toBeVisible();
   });
 });
