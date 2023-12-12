@@ -8,6 +8,7 @@ import {
   isWorkflowParameters,
   routeForArchivalWorkfows,
   routeForAuthentication,
+  routeForCallStack,
   routeForEventHistory,
   routeForEventHistoryImport,
   routeForLoginPage,
@@ -17,7 +18,6 @@ import {
   routeForSchedule,
   routeForScheduleCreate,
   routeForSchedules,
-  routeForStackTrace,
   routeForTaskQueue,
   routeForWorkers,
   routeForWorkflow,
@@ -89,13 +89,13 @@ describe('routeFor', () => {
     );
   });
 
-  it('should route to "workflow".stack-trace', () => {
-    const path = routeForStackTrace({
+  it('should route to "workflow".call-stack', () => {
+    const path = routeForCallStack({
       namespace: 'default',
       workflow: 'abc',
       run: 'def',
     });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/stack-trace');
+    expect(path).toBe('/namespaces/default/workflows/abc/def/call-stack');
   });
 
   it('should route to "workflow".query', () => {
