@@ -81,7 +81,7 @@
     HTMLAnchorAttributes & {
       href: string;
       target?: HTMLAnchorAttributes['target'];
-      disabled?: never;
+      disabled?: boolean;
     };
 
   type ButtonStyles = VariantProps<typeof buttonStyles>;
@@ -104,10 +104,10 @@
 </script>
 
 <svelte:element
-  this={href ? 'a' : 'button'}
+  this={href && !disabled ? 'a' : 'button'}
   {target}
-  {href}
-  disabled={href ? null : disabled}
+  href={disabled ? null : href}
+  {disabled}
   {id}
   role="button"
   type="button"
