@@ -151,6 +151,8 @@ export const Strings = {
     'This will fail if you have no workers running.',
   'no-workers-running-message':
     'Please make sure you have at least one worker running.',
+  'call-stack-alert':
+    'This is a call stack showing each location where Workflow code is waiting.',
   'call-stack-at': 'Call Stack at',
   'call-stack-link-preface': 'To enable ',
   'call-stack-link': 'call stacks',

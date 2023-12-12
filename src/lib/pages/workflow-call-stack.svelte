@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -58,6 +59,12 @@
         <p>{translate('workflows.no-workers-failure-message')}</p>
       </div>
     {:then result}
+      <Alert
+        intent="info"
+        icon="info"
+        title={translate('workflows.call-stack-alert')}
+        class="mb-4 w-fit"
+      />
       <div class="flex items-center gap-4">
         <Button
           on:click={refreshStackTrace}
