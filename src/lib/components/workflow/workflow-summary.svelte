@@ -39,7 +39,11 @@
         <h3 class="font-medium">{translate('common.workflow-type')}</h3>
         <div class="h-0.5 rounded-full bg-gray-900" />
         <WorkflowDetail content={workflow?.name} copyable />
-        <WorkflowDetail content={workflow?.runId} copyable />
+        <WorkflowDetail
+          title={translate('common.run-id')}
+          content={workflow?.runId}
+          copyable
+        />
       </div>
       <div class="grow overflow-hidden">
         <h3 class="font-medium">{translate('common.task-queue')}</h3>
