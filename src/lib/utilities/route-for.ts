@@ -159,8 +159,8 @@ export const routeForTaskQueue = (parameters: TaskQueueParameters): string => {
   })}/task-queues/${queue}`;
 };
 
-export const routeForStackTrace = (parameters: WorkflowParameters): string => {
-  return `${routeForWorkflow(parameters)}/stack-trace`;
+export const routeForCallStack = (parameters: WorkflowParameters): string => {
+  return `${routeForWorkflow(parameters)}/call-stack`;
 };
 
 export const routeForWorkflowQuery = (

@@ -27,9 +27,9 @@
   import { has } from '$lib/utilities/has';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
+    routeForCallStack,
     routeForEventHistory,
     routeForPendingActivities,
-    routeForStackTrace,
     routeForWorkers,
     routeForWorkflowQuery,
     routeForWorkflows,
@@ -279,12 +279,12 @@
         </Badge>
       </Tab>
       <Tab
-        label={translate('workflows.stack-trace-tab')}
-        id="stack-trace-tab"
-        href={routeForStackTrace(routeParameters)}
+        label={translate('workflows.call-stack-tab')}
+        id="call-stack-tab"
+        href={routeForCallStack(routeParameters)}
         active={pathMatches(
           $page.url.pathname,
-          routeForStackTrace(routeParameters),
+          routeForCallStack(routeParameters),
         )}
       />
       <Tab

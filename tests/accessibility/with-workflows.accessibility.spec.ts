@@ -30,8 +30,8 @@ const pages = [
     url: workflowId + '/pending-activities',
   },
   {
-    title: 'Stack Trace',
-    url: workflowId + '/stack-trace',
+    title: 'Call Stack',
+    url: workflowId + '/call-stack',
   },
   {
     title: 'Query',

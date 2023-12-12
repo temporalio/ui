@@ -58,6 +58,7 @@ export const Strings = {
   save: 'Save',
   'workflow-type': 'Workflow Type',
   'workflow-id': 'Workflow ID',
+  'run-id': 'Run ID',
   'task-queue': 'Task Queue',
   preview: 'Preview',
   status: 'Status',
@@ -151,4 +152,6 @@ export const Strings = {
   'view-all-runs': 'View All Runs',
   download: 'Download',
   'search-attributes': 'Search Attributes',
+  'history-size-bytes': 'History Size (Bytes)',
+  'execution-details': 'Execution Details',
 } as const;

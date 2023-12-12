@@ -5,8 +5,8 @@
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
+  import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
-  import WorkflowStackTraceError from '$lib/components/workflow/workflow-stack-trace-error.svelte';
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
@@ -96,7 +96,7 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <WorkflowStackTraceError />
+  <WorkflowCallStackError />
   {#if workflowTaskFailedError}
     <WorkflowTypedError error={workflowTaskFailedError} />
   {/if}

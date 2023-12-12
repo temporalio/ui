@@ -20,7 +20,7 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('history-tab')).toBeVisible();
     await expect(page.getByTestId('workers-tab')).toBeVisible();
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
-    await expect(page.getByTestId('stack-trace-tab')).toBeVisible();
+    await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
     await expect(page.getByTestId('summary-accordion')).toBeVisible();
     await expect(page.getByTestId('relationships-accordion')).toBeVisible();
@@ -66,7 +66,7 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('history-tab')).toBeVisible();
     await expect(page.getByTestId('workers-tab')).toBeVisible();
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
-    await expect(page.getByTestId('stack-trace-tab')).toBeVisible();
+    await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
     await expect(page.getByTestId('summary-accordion')).toBeHidden();
     await expect(page.getByTestId('relationships-accordion')).toBeHidden();
@@ -83,7 +83,7 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('history-tab')).toBeVisible();
     await expect(page.getByTestId('workers-tab')).toBeVisible();
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
-    await expect(page.getByTestId('stack-trace-tab')).toBeVisible();
+    await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
     await expect(page.getByTestId('summary-accordion')).toBeVisible();
     await expect(page.getByTestId('relationships-accordion')).toBeVisible();

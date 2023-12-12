@@ -3,13 +3,13 @@
 
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
-  import WorkflowStackTrace from '$lib/pages/workflow-stack-trace.svelte';
+  import WorkflowCallStack from '$lib/pages/workflow-call-stack.svelte';
 
   const workflow = $page.params.workflow;
 </script>
 
 <PageTitle
-  title={`${translate('workflows.stack-trace-tab')} | ${workflow}`}
+  title={`${translate('workflows.call-stack-tab')} | ${workflow}`}
   url={$page.url.href}
 />
-<WorkflowStackTrace />
+<WorkflowCallStack />

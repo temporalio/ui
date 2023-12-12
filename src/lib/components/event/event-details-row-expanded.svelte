@@ -64,7 +64,7 @@
       </div>
       {#if stackTrace && !inline}
         <div class="flex flex-col lg:w-1/2">
-          <p class="text-sm">Stack trace</p>
+          <p class="text-sm">{translate('workflows.call-stack-tab')}</p>
           <CodeBlock
             content={stackTrace}
             language="text"
