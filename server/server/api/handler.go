@@ -26,8 +26,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gogo/gateway"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -37,6 +36,7 @@ import (
 	"github.com/temporalio/ui-server/v2/server/rpc"
 	"github.com/temporalio/ui-server/v2/server/version"
 	"go.temporal.io/api/operatorservice/v1"
+	"go.temporal.io/api/temporalproto"
 	"go.temporal.io/api/workflowservice/v1"
 )
 
@@ -152,7 +152,7 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 			version.WithVersionHeader(c),
 			// This is necessary to get error details properly
 			// marshalled in unary requests.
-			runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
+			runtime.WithErrorHandler(runtime.DefaultHTTPErrorHandler),
 		)...,
 	)
 
@@ -167,11 +167,10 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 }
 
 func withMarshaler() runtime.ServeMuxOption {
-	jsonpb := &gateway.JSONPb{
-		EmitDefaults: true,
-		Indent:       "  ",
-		OrigName:     false,
-	}
-
-	return runtime.WithMarshalerOption(runtime.MIMEWildcard, jsonpb)
+	return runtime.WithMarshalerOption(runtime.MIMEWildcard, temporalProtoMarshaler{
+		contentType: runtime.MIMEWildcard,
+		mOpts: temporalproto.CustomJSONMarshalOptions{
+			Indent: "  ",
+		},
+	})
 }
