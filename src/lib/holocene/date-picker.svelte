@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
-  import { clickOutside } from '$lib/holocene/outside-click';
+  import { clickoutside } from '$lib/holocene/outside-click';
   import { getMonthName } from '$lib/utilities/calendar';
 
   import Calender from './calendar.svelte';
@@ -72,11 +72,7 @@
   };
 </script>
 
-<div
-  class="relative"
-  use:clickOutside
-  on:click-outside={() => (showDatePicker = false)}
->
+<div class="relative" use:clickoutside={() => (showDatePicker = false)}>
   <Input
     id="datepicker"
     {label}

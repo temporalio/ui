@@ -1,7 +1,7 @@
 import type { Plugin } from 'vite';
 import type { ViteDevServer } from 'vite';
 
-import { createUIServer, UIServer } from '../utilities/ui-server';
+import { createUIServer, type UIServer } from '../utilities/ui-server';
 
 let uiServer: UIServer;
 

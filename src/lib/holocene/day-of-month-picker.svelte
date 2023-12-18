@@ -18,7 +18,7 @@
 
 <div class="text-center">
   <div
-    class="grid gap-y-4 gap-x-4 rounded border border-gray-900 bg-white px-0 py-4 text-center md:gap-x-8 md:px-2 xl:gap-x-16 xl:px-4"
+    class="grid gap-x-4 gap-y-4 rounded border border-gray-900 bg-white px-0 py-4 text-center md:gap-x-8 md:px-2 xl:gap-x-16 xl:px-4"
   >
     {#each daysInMonth as day}
       <button

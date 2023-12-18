@@ -10,15 +10,12 @@
 
   import WorkflowColumnsOrderableList from './workflows-summary-configurable-table/orderable-list.svelte';
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
-  import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
-  import TableHeaderRow from './workflows-summary-configurable-table/table-header-row.svelte';
   import TableRow from './workflows-summary-configurable-table/table-row.svelte';
 
   let customizationDrawerOpen = false;
 
   $: ({ namespace } = $page.params);
   $: columns = $workflowTableColumns?.[namespace] ?? [];
-  $: empty = $workflows.length === 0;
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
@@ -34,24 +31,15 @@
   nextPageButtonLabel={translate('common.next-page')}
   previousPageButtonLabel={translate('common.previous-page')}
   pageButtonLabel={(page) => translate('common.go-to-page', { page })}
+  openDrawer={openCustomizationDrawer}
   updating={$updating}
   items={$workflows}
+  {columns}
   let:visibleItems
 >
   <caption class="sr-only" slot="caption">
     {translate('common.workflows')}
   </caption>
-  <TableHeaderRow
-    onClickConfigure={openCustomizationDrawer}
-    workflows={visibleItems}
-    columnsCount={columns.length}
-    {empty}
-    slot="headers"
-  >
-    {#each columns as column}
-      <TableHeaderCell {column} />
-    {/each}
-  </TableHeaderRow>
   {#each visibleItems as workflow}
     <TableRow {workflow}>
       {#each columns as column}

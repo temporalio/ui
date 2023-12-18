@@ -67,7 +67,7 @@
 
 <style lang="postcss">
   .shortcut-key-button {
-    @apply fixed right-24 bottom-5 z-50 px-2;
+    @apply fixed bottom-5 right-24 z-50 px-2;
   }
 
   .cell {

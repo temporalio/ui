@@ -3,6 +3,7 @@ const temporalColors = require('./colors.cjs');
 
 /** @type {import('tailwindcss').Config} */
 const config = {
+  mode: 'jit',
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
     colors: temporalColors,

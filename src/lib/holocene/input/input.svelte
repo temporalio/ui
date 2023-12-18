@@ -183,7 +183,7 @@
   }
 
   .suffix {
-    @apply block h-full w-full rounded-tr rounded-br border-l border-gray-900 bg-offWhite p-2;
+    @apply block h-full w-full rounded-br rounded-tr border-l border-gray-900 bg-offWhite p-2;
   }
 
   .input-container:active .suffix {
@@ -195,11 +195,11 @@
   }
 
   .unroundRight {
-    @apply rounded-tr-none rounded-br-none;
+    @apply rounded-br-none rounded-tr-none;
   }
 
   .unroundLeft {
-    @apply rounded-tl-none rounded-bl-none border-l-0;
+    @apply rounded-bl-none rounded-tl-none border-l-0;
   }
 
   .noBorder {

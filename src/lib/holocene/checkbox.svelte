@@ -88,10 +88,10 @@
     />
     <span class="checkmark" class:hoverable class:on-dark={onDark}>
       {#if indeterminate}
-        <Icon class="absolute top-0 left-0 h-4 w-4" name="hyphen" />
+        <Icon class="absolute left-0 top-0 h-4 w-4" name="hyphen" />
       {:else if checked}
         <Icon
-          class="absolute top-0 left-0 h-4 w-4"
+          class="absolute left-0 top-0 h-4 w-4"
           name="checkmark"
           strokeWidth={3}
         />
@@ -122,11 +122,11 @@
   }
 
   input {
-    @apply absolute top-0 left-0 h-0 w-0 opacity-0;
+    @apply absolute left-0 top-0 h-0 w-0 opacity-0;
   }
 
   .checkmark {
-    @apply absolute top-0 left-0 box-content h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
+    @apply absolute left-0 top-0 box-content h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
   }
 
   .checkmark.hoverable {

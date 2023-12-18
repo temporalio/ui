@@ -298,7 +298,7 @@
 
 <style lang="postcss">
   .arrow {
-    @apply absolute top-0 left-0 h-0 w-0;
+    @apply absolute left-0 top-0 h-0 w-0;
 
     border-style: solid;
     border-width: 6px 12px 6px 0;

@@ -139,7 +139,7 @@
   }
 
   .body.hightlightNav::backdrop {
-    @apply top-[40px] left-[60px];
+    @apply left-[60px] top-[40px];
   }
 
   .large {
@@ -147,7 +147,7 @@
   }
 
   .title {
-    @apply bg-white px-8 pt-8 pb-0 text-2xl;
+    @apply bg-white px-8 pb-0 pt-8 text-2xl;
   }
 
   .content {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { clickOutside } from '$lib/holocene/outside-click';
+  import { clickoutside } from '$lib/holocene/outside-click';
   import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
@@ -26,10 +26,9 @@
     class:dark
     class:max-w-[400px]={position === 'right'}
     transition:fly={flyParams}
-    use:clickOutside
+    use:clickoutside={onClick}
     {id}
     role="region"
-    on:click-outside={onClick}
     use:focusTrap={true}
   >
     <div class="close-button-wrapper {position}">
@@ -66,7 +65,7 @@
     }
 
     &.right {
-      @apply right-0 top-0 bottom-0 h-full;
+      @apply bottom-0 right-0 top-0 h-full;
     }
 
     &.dark {
@@ -83,7 +82,7 @@
   }
 
   .title-wrapper {
-    @apply flex flex-col justify-center gap-2 py-4 px-8;
+    @apply flex flex-col justify-center gap-2 px-8 py-4;
 
     &.bottom {
       @apply items-center p-0;

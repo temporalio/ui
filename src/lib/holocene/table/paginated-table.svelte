@@ -2,6 +2,8 @@
   import { page } from '$app/stores';
 
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
+  import TableHeaderCell from '$lib/components/workflow/workflows-summary-configurable-table/table-header-cell.svelte';
+  import TableHeaderRow from '$lib/components/workflow/workflows-summary-configurable-table/table-header-row.svelte';
   import Button from '$lib/holocene/button.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
@@ -14,6 +16,7 @@
     pagination,
     perPageKey,
   } from '$lib/stores/pagination';
+  import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   type Item = $$Generic;
@@ -24,6 +27,8 @@
   export let pageButtonLabel: (page: number) => string;
   export let nextPageButtonLabel: string;
   export let previousPageButtonLabel: string;
+  export let columns: WorkflowHeader[];
+  export let openDrawer: () => void;
 
   let tableContainer: HTMLDivElement;
 
@@ -89,6 +94,8 @@
   $: tableOffset = tableContainer?.offsetTop
     ? tableContainer?.offsetTop + 32
     : 0;
+
+  $: empty = $store.items.length === 0;
 </script>
 
 <div
@@ -99,7 +106,16 @@
   <table class="paginated-table">
     <slot name="caption" />
     <thead class="paginated-table-header">
-      <slot name="headers" />
+      <TableHeaderRow
+        onClickConfigure={openDrawer}
+        workflows={$store.items}
+        columnsCount={columns.length}
+        {empty}
+      >
+        {#each columns as column}
+          <TableHeaderCell {column} />
+        {/each}
+      </TableHeaderRow>
       {#if updating}
         <ProgressBar />
       {/if}
@@ -189,7 +205,7 @@
   }
 
   .paginated-table-controls {
-    @apply sticky bottom-0 left-0 flex w-full grow flex-col gap-2 rounded-b border-t border-gray-200 bg-white py-2 px-4 text-primary lg:flex-row;
+    @apply sticky bottom-0 left-0 flex w-full grow flex-col gap-2 rounded-b border-t border-gray-200 bg-white px-4 py-2 text-primary lg:flex-row;
   }
 
   .paginated-table-controls-start {
