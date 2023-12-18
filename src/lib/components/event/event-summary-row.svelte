@@ -184,7 +184,7 @@
   <td />
 </tr>
 {#if expanded}
-  <tr in:fade|local class:typedError>
+  <tr in:fade class:typedError>
     <td class="expanded-cell" colspan="6">
       <EventDetailsFull {event} {currentEvent} {compact} bind:selectedId />
     </td>
