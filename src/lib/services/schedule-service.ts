@@ -25,6 +25,26 @@ export type ScheduleResponse = {
 
 export type FetchSchedule = typeof fetchAllSchedules;
 
+type PaginatedSchedulesPromise = (
+  pageSize: number,
+  token: string,
+) => Promise<{ items: ScheduleListEntry[]; nextPageToken: string }>;
+
+export const fetchPaginatedSchedules = async (
+  namespace: string,
+  request = fetch,
+): Promise<PaginatedSchedulesPromise> => {
+  return (pageSize = 100, token = '') => {
+    const route = routeForApi('schedules', { namespace });
+    return requestFromAPI<ListScheduleResponse>(route, {
+      params: { pageSize: String(pageSize), nextPageToken: token },
+      request,
+    }).then(({ schedules, nextPageToken }) => {
+      return { items: schedules, nextPageToken: String(nextPageToken) };
+    });
+  };
+};
+
 export const fetchAllSchedules = async (
   namespace: string,
   request = fetch,

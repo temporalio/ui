@@ -1,44 +1,30 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
   import { page } from '$app/stores';
 
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
   import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
+  import ApiPagination from '$lib/holocene/api-pagination.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import Link from '$lib/holocene/link.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
-  import Pagination from '$lib/holocene/pagination.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fetchAllSchedules } from '$lib/services/schedule-service';
+  import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
   import { coreUserStore } from '$lib/stores/core-user';
+  import type { ErrorCallback } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
-
-  import type { ScheduleListEntry } from '$types';
 
   $: namespace = $page.params.namespace;
 
   let hasSchedules = false;
+  let error = '';
 
-  $: fetchSchedules = fetchAllSchedules(namespace).then((res) => {
-    const { schedules } = res;
-    hasSchedules = Boolean(schedules?.length);
-    return res;
-  });
+  const onError: ErrorCallback = (err) =>
+    (error =
+      err?.body?.message ??
+      `Error fetching schedules: ${err.status}: ${err.statusText}`);
 
   let coreUser = coreUserStore();
   $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
-
-  let search = '';
-  $: filteredSchedules = (schedules: ScheduleListEntry[]) =>
-    search
-      ? schedules.filter((schedule) =>
-          schedule.scheduleId.toLowerCase().includes(search.toLowerCase()),
-        )
-      : schedules;
 </script>
 
 <header class="flex flex-row justify-between gap-2">
@@ -58,76 +44,58 @@
     </Button>
   {/if}
 </header>
-
-{#await fetchSchedules}
-  <Loading />
-{:then { schedules, error }}
-  {#if schedules?.length}
-    <Pagination
-      items={filteredSchedules(schedules)}
-      let:visibleItems
-      aria-label={translate('common.schedules')}
-      pageSizeSelectLabel={translate('common.per-page')}
-      previousButtonLabel={translate('common.previous')}
-      nextButtonLabel={translate('common.next')}
-    >
-      <svelte:fragment slot="action-top-left">
-        <div class="w-full xl:w-1/2">
-          <Input
-            icon="search"
-            type="search"
-            label={translate('schedules.name')}
-            labelHidden
-            id="schedule-name-filter"
-            placeholder={translate('schedules.name')}
-            clearable
-            clearButtonLabel={translate('common.clear-input-button-label')}
-            bind:value={search}
-            on:submit={noop}
+{#if error}
+  {error}
+{/if}
+<ApiPagination
+  let:visibleItems
+  onFetch={() => fetchPaginatedSchedules(namespace)}
+  {onError}
+  aria-label="schedules"
+  pageSizeSelectLabel={translate('common.per-page')}
+  nextButtonLabel={translate('common.next')}
+  previousButtonLabel={translate('common.previous')}
+  emptyStateMessage={translate('schedules.empty-state-title')}
+  fallbackErrorMessage={'Error fetching schedules'}
+>
+  <SchedulesTable>
+    {#each visibleItems as schedule}
+      <SchedulesTableRow {schedule} />
+    {:else}
+      <TableRow>
+        <td class="hidden xl:table-cell" />
+        <td colspan="3">
+          <EmptyState
+            title={translate('schedules.empty-state-title')}
+            content={translate('schedules.empty-state-description')}
           />
-        </div>
-      </svelte:fragment>
-      <SchedulesTable>
-        {#each visibleItems as schedule}
-          <SchedulesTableRow {schedule} />
-        {:else}
-          <TableRow>
-            <td class="hidden xl:table-cell" />
-            <td colspan="3">
-              <EmptyState
-                title={translate('schedules.empty-state-title')}
-                content={translate('schedules.empty-state-description')}
-              />
-            </td>
-            <td class="hidden xl:table-cell" />
-          </TableRow>
-        {/each}
-      </SchedulesTable>
-    </Pagination>
-  {:else}
-    <div class="my-12 flex flex-col items-center justify-start gap-2">
-      <EmptyState title={translate('schedules.empty-state-title')} {error}>
-        <p>
-          {translate('schedules.getting-started-docs-link-preface')}
-          <Link
-            target="_external"
-            href="https://docs.temporal.io/workflows/#schedule"
-            >{translate('schedules.getting-started-docs-link')}</Link
-          >
-          {translate('schedules.getting-started-cli-link-preface')}
-          <Link target="_external" href="https://docs.temporal.io/cli/schedule"
-            >Temporal CLI</Link
-          >.
-        </p>
-        {#if !error && !createDisabled}
-          <Button
-            data-testid="create-schedule"
-            href={routeForScheduleCreate({ namespace })}
-          >
-            {translate('schedules.create')}
-          </Button>
-        {/if}
-      </EmptyState>
-    </div>
-  {/if}
-{/await}
+        </td>
+        <td class="hidden xl:table-cell" />
+      </TableRow>
+    {/each}
+  </SchedulesTable>
+</ApiPagination>
+<!-- <div class="my-12 flex flex-col items-center justify-start gap-2">
+  <EmptyState title={translate('schedules.empty-state-title')} {error}>
+    <p>
+      {translate('schedules.getting-started-docs-link-preface')}
+      <Link
+        target="_external"
+        href="https://docs.temporal.io/workflows/#schedule"
+        >{translate('schedules.getting-started-docs-link')}</Link
+      >
+      {translate('schedules.getting-started-cli-link-preface')}
+      <Link target="_external" href="https://docs.temporal.io/cli/schedule"
+        >Temporal CLI</Link
+      >.
+    </p>
+    {#if !error && !createDisabled}
+      <Button
+        data-testid="create-schedule"
+        href={routeForScheduleCreate({ namespace })}
+      >
+        {translate('schedules.create')}
+      </Button>
+    {/if}
+  </EmptyState>
+</div> -->
