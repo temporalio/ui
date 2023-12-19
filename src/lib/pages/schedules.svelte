@@ -6,6 +6,7 @@
   import ApiPagination from '$lib/holocene/api-pagination.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
@@ -15,9 +16,7 @@
 
   $: namespace = $page.params.namespace;
 
-  let hasSchedules = false;
   let error = '';
-
   const onError: ErrorCallback = (err) =>
     (error =
       err?.body?.message ??
@@ -25,6 +24,8 @@
 
   let coreUser = coreUserStore();
   $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
+
+  $: onFetch = () => fetchPaginatedSchedules(namespace);
 </script>
 
 <header class="flex flex-row justify-between gap-2">
@@ -35,7 +36,7 @@
       {translate('common.schedules')}
     </h1>
   </div>
-  {#if hasSchedules && !createDisabled}
+  {#if !createDisabled}
     <Button
       data-testid="create-schedule"
       href={routeForScheduleCreate({ namespace })}
@@ -44,58 +45,60 @@
     </Button>
   {/if}
 </header>
-{#if error}
-  {error}
-{/if}
-<ApiPagination
-  let:visibleItems
-  onFetch={() => fetchPaginatedSchedules(namespace)}
-  {onError}
-  aria-label="schedules"
-  pageSizeSelectLabel={translate('common.per-page')}
-  nextButtonLabel={translate('common.next')}
-  previousButtonLabel={translate('common.previous')}
-  emptyStateMessage={translate('schedules.empty-state-title')}
-  fallbackErrorMessage={'Error fetching schedules'}
->
-  <SchedulesTable>
-    {#each visibleItems as schedule}
-      <SchedulesTableRow {schedule} />
-    {:else}
-      <TableRow>
-        <td class="hidden xl:table-cell" />
-        <td colspan="3">
-          <EmptyState
-            title={translate('schedules.empty-state-title')}
-            content={translate('schedules.empty-state-description')}
-          />
-        </td>
-        <td class="hidden xl:table-cell" />
-      </TableRow>
-    {/each}
-  </SchedulesTable>
-</ApiPagination>
-<!-- <div class="my-12 flex flex-col items-center justify-start gap-2">
-  <EmptyState title={translate('schedules.empty-state-title')} {error}>
-    <p>
-      {translate('schedules.getting-started-docs-link-preface')}
-      <Link
-        target="_external"
-        href="https://docs.temporal.io/workflows/#schedule"
-        >{translate('schedules.getting-started-docs-link')}</Link
-      >
-      {translate('schedules.getting-started-cli-link-preface')}
-      <Link target="_external" href="https://docs.temporal.io/cli/schedule"
-        >Temporal CLI</Link
-      >.
-    </p>
-    {#if !error && !createDisabled}
-      <Button
-        data-testid="create-schedule"
-        href={routeForScheduleCreate({ namespace })}
-      >
-        {translate('schedules.create')}
-      </Button>
-    {/if}
-  </EmptyState>
-</div> -->
+{#key namespace}
+  <ApiPagination
+    let:visibleItems
+    {onFetch}
+    {onError}
+    aria-label="schedules"
+    pageSizeSelectLabel={translate('common.per-page')}
+    nextButtonLabel={translate('common.next')}
+    previousButtonLabel={translate('common.previous')}
+    emptyStateMessage={translate('schedules.empty-state-title')}
+    fallbackErrorMessage={'Error fetching schedules'}
+  >
+    <SchedulesTable>
+      {#each visibleItems as schedule}
+        <SchedulesTableRow {schedule} />
+      {:else}
+        <TableRow>
+          <td class="hidden xl:table-cell" />
+          <td colspan="3">
+            <EmptyState
+              title={translate('schedules.empty-state-title')}
+              content={translate('schedules.empty-state-description')}
+            />
+          </td>
+          <td class="hidden xl:table-cell" />
+        </TableRow>
+      {/each}
+    </SchedulesTable>
+    <div
+      class="my-12 flex flex-col items-center justify-start gap-2"
+      slot="empty"
+    >
+      <EmptyState title={translate('schedules.empty-state-title')} {error}>
+        <p>
+          {translate('schedules.getting-started-docs-link-preface')}
+          <Link
+            target="_external"
+            href="https://docs.temporal.io/workflows/#schedule"
+            >{translate('schedules.getting-started-docs-link')}</Link
+          >
+          {translate('schedules.getting-started-cli-link-preface')}
+          <Link target="_external" href="https://docs.temporal.io/cli/schedule"
+            >Temporal CLI</Link
+          >.
+        </p>
+        {#if !error && !createDisabled}
+          <Button
+            data-testid="create-schedule"
+            href={routeForScheduleCreate({ namespace })}
+          >
+            {translate('schedules.create')}
+          </Button>
+        {/if}
+      </EmptyState>
+    </div>
+  </ApiPagination>
+{/key}

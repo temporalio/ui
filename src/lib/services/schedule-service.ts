@@ -37,10 +37,13 @@ export const fetchPaginatedSchedules = async (
   return (pageSize = 100, token = '') => {
     const route = routeForApi('schedules', { namespace });
     return requestFromAPI<ListScheduleResponse>(route, {
-      params: { pageSize: String(pageSize), nextPageToken: token },
+      params: { maximumPageSize: String(pageSize), nextPageToken: token },
       request,
     }).then(({ schedules, nextPageToken }) => {
-      return { items: schedules, nextPageToken: String(nextPageToken) };
+      return {
+        items: schedules,
+        nextPageToken: nextPageToken ? String(nextPageToken) : '',
+      };
     });
   };
 };
