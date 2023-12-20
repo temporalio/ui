@@ -1,124 +1,94 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import groupBy from 'lodash.groupby';
 
-  import EventDetailsRow from '$lib/components/event/event-details-row.svelte';
-  import EventSummary from '$lib/components/event/event-summary.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import EventRow from '$lib/components/lines-and-dots/event-row.svelte';
+  import GroupRow from '$lib/components/lines-and-dots/group-row.svelte';
+  import InputAndResultRow from '$lib/components/lines-and-dots/input-and-result-row.svelte';
+  import WorkflowJsonNavigator from '$lib/components/workflow/workflow-json-navigator.svelte';
   import { groupEvents } from '$lib/models/event-groups';
-  import { fetchAllEvents } from '$lib/services/events-service';
-  import {
-    eventFilterSort,
-    type EventSortOrder,
-    eventViewType,
-  } from '$lib/stores/event-view';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fullEventHistory } from '$lib/stores/events';
-  import { refresh } from '$lib/stores/workflow-run';
-  import type { EventView, WorkflowEvent } from '$lib/types/events';
-  import { formatAttributes } from '$lib/utilities/format-event-attributes';
-  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
+  import type { WorkflowEvent } from '$lib/types/events';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
+  $: groups = groupEvents($fullEventHistory);
+  $: workflowEvents =
+    getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
+  $: timeBasedGroups = groupBy(groups, (g) => g.timestamp);
 
-  const resetFullHistory = () => {
-    $fullEventHistory = [];
-  };
-
-  const fetchEvents = async (
-    namespace: string,
-    workflowId: string,
-    runId: string,
-    view: EventView,
-    sort: EventSortOrder,
-  ) => {
-    resetFullHistory();
-    $fullEventHistory = await fetchAllEvents({
-      namespace,
-      workflowId,
-      runId,
-      sort: view === 'feed' ? sort : 'ascending',
-    });
-  };
-
-  $: $refresh,
-    fetchEvents(namespace, workflowId, runId, $eventViewType, $eventFilterSort);
-  $: groups = groupEvents($fullEventHistory, $eventFilterSort);
-
-  let activeGroup;
-  let compact = false;
-
-  const getIcon = (event: WorkflowEvent) => {
-    console.log('Category: ', event.category);
-    switch (event.category) {
-      case 'workflow':
-        return 'workflow';
-      case 'activity':
-        return 'temporal';
-      case 'signal':
-        return 'lightning-bolt';
-      case 'marker':
-        return 'bookmark';
-      case 'timer':
-        return 'clock';
-      case 'command':
-        return 'rocket-ship';
-      case 'child-workflow':
-        return 'relationship';
-      default:
-        return 'temporal';
-    }
-  };
+  let activeGroup: undefined | EventGroup;
+  let zoom = 2;
 
   const onHover = (event: WorkflowEvent) => {
     activeGroup = groups.find((g) => g.eventIds.has(event.id));
   };
+
+  const onHoverLeave = () => {
+    activeGroup = undefined;
+  };
+
+  $: initialEvent = $fullEventHistory.find((e) => e.id === '1');
 </script>
 
 <div class="flex flex-col gap-2">
-  <div class="flex flex-col gap-2 rounded-lg bg-gray-900 md:h-auto md:flex-row">
-    <div
-      class="flex grow flex-col gap-1 rounded-lg bg-gray-900 py-2 text-white"
-    >
-      {#each compact ? groups : $fullEventHistory as event}
-        <div
-          class="flex items-center gap-6 px-4 py-1"
-          on:mouseover={() => onHover(event)}
-          on:focus={() => onHover(event)}
-          on:mouseleave={() => (activeGroup = undefined)}
-          class:active={activeGroup?.eventIds?.has(event.id)}
-        >
-          <div
-            class="vertical-center flex h-6 w-6 items-center rounded-full border-2 border-green-400 bg-green-400"
-          >
-            <Icon name={getIcon(event)} class="scale-85 text-gray-900" />
-          </div>
-          <div class="flex grow items-center justify-between">
-            {event.name}
-            <EventDetailsRow
-              {...getSingleAttributeForEvent(event)}
-              attributes={formatAttributes(event)}
-              inline
-            />
-          </div>
-        </div>
-      {/each}
-    </div>
-    <div class="rounded-lg bg-gray-400 px-4 py-2">
-      <ToggleSwitch
-        label={'Compact'}
-        labelPosition="left"
-        id="autorefresh"
-        checked={compact}
-        on:change={() => (compact = !compact)}
+  <div class="flex justify-end">
+    <div class="flex items-center gap-1 text-xl">
+      <span>-</span>
+      <input
+        name="range"
+        type="range"
+        class="h-0 w-24 w-full cursor-pointer appearance-none rounded border-y-2 border-blurple"
+        bind:value={zoom}
+        min={1}
+        max={4}
+        step={1}
       />
+      <span>+</span>
     </div>
   </div>
-  <EventSummary />
-  <!-- <EventHistoryTimeline history={$fullEventHistory} /> -->
+  {#if $fullEventHistory.length}
+    <div
+      class="flex w-full flex-col gap-0 rounded-lg bg-blueGray-900 md:h-auto md:flex-row"
+    >
+      <div
+        class="flex w-full flex-col gap-1 rounded-lg bg-blueGray-900 {zoom !==
+          4 && 'py-2'}"
+      >
+        {#if zoom === 1}
+          <div>Mini map here</div>
+        {:else if zoom == 2}
+          <InputAndResultRow
+            title="Input"
+            value={parseWithBigInt(workflowEvents?.input)}
+          />
+          {#each groups as group}
+            <GroupRow
+              {group}
+              {initialEvent}
+              level={Object.keys(timeBasedGroups).indexOf(group.timestamp)}
+            />
+          {/each}
+          <InputAndResultRow
+            title="Result"
+            value={parseWithBigInt(workflowEvents?.results)}
+          />
+        {:else if zoom == 3}
+          <InputAndResultRow
+            title="Input"
+            value={parseWithBigInt(workflowEvents?.input)}
+          />
+          {#each $fullEventHistory as event}
+            <EventRow {event} {onHover} {onHoverLeave} {activeGroup} />
+          {/each}
+          <InputAndResultRow
+            title="Result"
+            value={parseWithBigInt(workflowEvents?.results)}
+          />
+        {:else}
+          <WorkflowJsonNavigator events={$fullEventHistory} />
+        {/if}
+      </div>
+    </div>
+  {/if}
 </div>
-
-<style lang="postcss">
-  .active {
-    @apply bg-blurple;
-  }
-</style>

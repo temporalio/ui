@@ -6,7 +6,7 @@
   import Loading from '$lib/holocene/loading.svelte';
   import Header from '$lib/layouts/workflow-header.svelte';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
-  import { fetchStartAndEndEvents } from '$lib/services/events-service';
+  import { fetchAllEvents } from '$lib/services/events-service';
   import {
     getPollers,
     type GetPollersResponse,
@@ -16,11 +16,7 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
-  import {
-    eventHistory,
-    initialEventHistory,
-    timelineEvents,
-  } from '$lib/stores/events';
+  import { fullEventHistory, timelineEvents } from '$lib/stores/events';
   import {
     initialWorkflowRun,
     refresh,
@@ -93,12 +89,12 @@
       $authUser?.accessToken,
     );
     $workflowRun = { workflow, workers, compatibility, reachability };
-    const events = await fetchStartAndEndEvents({
+    $fullEventHistory = await fetchAllEvents({
       namespace,
       workflowId,
       runId,
+      sort: 'ascending',
     });
-    $eventHistory = events;
   };
 
   $: $refresh, getWorkflowAndEventHistory(namespace, workflowId, runId);
@@ -111,7 +107,7 @@
   onDestroy(() => {
     $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
-    $eventHistory = initialEventHistory;
+    $fullEventHistory = [];
   });
 </script>
 

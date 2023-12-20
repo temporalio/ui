@@ -9,7 +9,7 @@ export const TEMPORAL_THEME = EditorView.theme(
       color: 'white',
       backgroundColor: colors.gray['900'],
       borderRadius: '0.5rem',
-      padding: '0.5rem',
+      padding: '0.25rem',
     },
     '.cm-matchingBracket': {
       backgroundColor: colors.gray['800'],

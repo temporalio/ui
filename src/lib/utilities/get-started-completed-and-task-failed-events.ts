@@ -1,4 +1,3 @@
-import type { StartAndEndEventHistory } from '$lib/stores/events';
 import type {
   WorkflowEvent,
   WorkflowExecutionCanceledEvent,
@@ -16,7 +15,7 @@ import {
 } from './is-event-type';
 import { stringifyWithBigInt } from './parse-with-big-int';
 
-type WorkflowInputAndResults = {
+export type WorkflowInputAndResults = {
   input: string;
   results: string;
   contAsNew: boolean;
@@ -66,7 +65,7 @@ const getEventResult = (event: CompletionEvent) => {
 };
 
 export const getWorkflowStartedCompletedAndTaskFailedEvents = (
-  eventHistory: StartAndEndEventHistory,
+  eventHistory: WorkflowEvent[],
 ): WorkflowInputAndResults => {
   let input: string;
   let results: string;
@@ -75,17 +74,7 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   let workflowStartedEvent: WorkflowExecutionStartedEvent;
   let workflowCompletedEvent: CompletionEvent;
 
-  for (const event of eventHistory.start) {
-    if (isStartedEvent(event)) {
-      workflowStartedEvent = event;
-      continue;
-    } else if (isCompletionEvent(event)) {
-      workflowCompletedEvent = event;
-      continue;
-    }
-  }
-
-  for (const event of eventHistory.end) {
+  for (const event of eventHistory) {
     if (isStartedEvent(event)) {
       workflowStartedEvent = event;
       continue;

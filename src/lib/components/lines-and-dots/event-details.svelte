@@ -6,7 +6,7 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { Payloads } from '$lib/types';
-  import { format } from '$lib/utilities/format-camel-case';
+  // import { format } from '$lib/utilities/format-camel-case';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
     shouldDisplayAsExecutionLink,
@@ -19,7 +19,7 @@
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
 
-  import PayloadDecoder from './payload-decoder.svelte';
+  import PayloadDecoder from '../event/payload-decoder.svelte';
 
   export let key: string;
   export let value: string | Record<string, unknown> | Payloads;
@@ -36,9 +36,9 @@
     <div
       class="flex w-full flex-wrap items-center justify-between gap-1 pr-1 xl:flex-nowrap xl:gap-4"
     >
-      <p class="min-w-fit text-sm">
+      <!-- <p class="min-w-fit text-sm">
         {format(key)}
-      </p>
+      </p> -->
       <PayloadDecoder {value} key="payloads" let:decodedValue>
         <CodeBlock
           content={decodedValue}
@@ -50,7 +50,7 @@
     </div>
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
-      <p class="mr-3 truncate text-sm">{format(key)}</p>
+      <!-- <p class="mr-3 truncate text-sm">{format(key)}</p> -->
       <div class="truncate text-sm">
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
@@ -74,7 +74,7 @@
     </div>
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
-      <p class="truncate text-sm">{format(key)}</p>
+      <!-- <p class="truncate text-sm">{format(key)}</p> -->
       <div class="truncate text-sm">
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
@@ -98,7 +98,7 @@
     </div>
   {:else if shouldDisplayAsTaskQueueLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
-      <p class="mr-3 truncate text-sm">{format(key)}</p>
+      <!-- <p class="mr-3 truncate text-sm">{format(key)}</p> -->
       <div class="truncate text-sm">
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
@@ -117,10 +117,10 @@
     </div>
   {:else}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
-      <p class="mr-3 truncate text-sm">{format(key)}</p>
+      <!-- <p class="mr-3 truncate text-sm">{format(key)}</p> -->
       <p class="truncate text-right text-sm xl:text-left">
         <span
-          class="w-full select-all text-gray-700"
+          class="w-full select-all text-gray-50"
           class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
         >
       </p>
@@ -130,6 +130,6 @@
 
 <style lang="postcss">
   .badge {
-    @apply rounded-sm bg-gray-100 p-1 text-gray-900;
+    @apply rounded-lg bg-blueGray-800 py-1 px-2 text-gray-50;
   }
 </style>
