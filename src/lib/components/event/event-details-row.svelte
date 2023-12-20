@@ -120,7 +120,7 @@
       <p class="mr-3 truncate text-sm">{format(key)}</p>
       <p class="truncate text-right text-sm xl:text-left">
         <span
-          class="w-full select-all text-gray-700"
+          class="w-full select-all text-gray-100"
           class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
         >
       </p>

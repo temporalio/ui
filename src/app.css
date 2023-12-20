@@ -7,6 +7,7 @@
 @import 'tailwindcss/utilities';
 
 @layer base {
+
   *,
   html,
   body {
@@ -28,6 +29,21 @@
   titles,
   labels {
     font-family: theme('fontFamily.secondary');
+    color: #fff !important;
+  }
+
+  p,
+  label,
+  a {
+    color: #fff !important;
+  }
+
+  table td a {
+    color: #18181b !important;
+  }
+
+  table td p {
+    color: #18181b !important;
   }
 
   input[type='search']::-webkit-search-cancel-button {

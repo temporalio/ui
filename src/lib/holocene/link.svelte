@@ -40,10 +40,10 @@
 
 <style lang="postcss">
   .link {
-    @apply max-w-fit cursor-pointer items-center gap-2 rounded underline underline-offset-2 hover:text-indigo-600 focus-visible:bg-blue-100 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
+    @apply max-w-fit cursor-pointer items-center gap-2 rounded underline underline-offset-2 hover:text-blurple focus-visible:bg-blue-100 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
 
     &.active {
-      @apply text-blue-900;
+      @apply text-blurple;
     }
   }
 </style>

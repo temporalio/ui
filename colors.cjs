@@ -7,6 +7,7 @@ const colors = {
   success: '#bbf7d0', // green-200
   black: '#000000',
   lightBlue: '#DFFBFF',
+  blurple: '#444CE7',
   blue: {
     50: '#eff6ff',
     100: '#dbeafe',

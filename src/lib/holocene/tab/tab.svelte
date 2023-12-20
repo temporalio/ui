@@ -70,7 +70,7 @@
   }
 
   .tab.active {
-    @apply border-b-2 border-blue-700 font-medium text-blue-700;
+    @apply border-b-2 border-blue-700 font-medium text-blurple;
   }
 
   .tab.disabled {
