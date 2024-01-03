@@ -30,8 +30,6 @@
   const { workflow, namespace } = $page.params;
   $: codeBlockValue = getCodeBlockValue(value);
   $: stackTrace = getStackTrace(codeBlockValue);
-
-  console.log('Key: ', key);
 </script>
 
 <div class="row {$$props.class}">
