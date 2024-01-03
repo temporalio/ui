@@ -30,6 +30,8 @@
   const { workflow, namespace } = $page.params;
   $: codeBlockValue = getCodeBlockValue(value);
   $: stackTrace = getStackTrace(codeBlockValue);
+
+  console.log('Key: ', key);
 </script>
 
 <div class="row {$$props.class}">
@@ -42,6 +44,20 @@
         <p class="text-sm">{format(key)}</p>
         {#if value?.payloads}
           <PayloadDecoder {value} key="payloads" let:decodedValue>
+            <CodeBlock
+              content={decodedValue}
+              class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
+              {inline}
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            />
+          </PayloadDecoder>
+        {:else if key === 'searchAttributes'}
+          <PayloadDecoder
+            key="searchAttributes"
+            value={{ searchAttributes: codeBlockValue }}
+            let:decodedValue
+          >
             <CodeBlock
               content={decodedValue}
               class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"

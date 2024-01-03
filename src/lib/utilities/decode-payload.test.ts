@@ -152,6 +152,52 @@ describe('decodePayload with returnDataOnly = false', () => {
   });
 });
 
+describe.only('decodePayloadAttributes', () => {
+  it('Should decodePayloadAttributes searchAttributes with indexedFields', () => {
+    const payload = {
+      searchAttributes: {
+        indexedFields: {
+          CandidateEmail: {
+            metadata: {
+              encoding: 'anNvbi9wbGFpbg==',
+              type: 'S2V5d29yZA==',
+            },
+            data: 'IndoYWR1cEBsb2xjYXRzLmNvbSI=',
+          },
+        },
+      },
+    };
+    const result = {
+      searchAttributes: {
+        indexedFields: { CandidateEmail: 'whadup@lolcats.com' },
+      },
+    };
+
+    const decodedPayload = decodePayloadAttributes(payload);
+    expect(decodedPayload).toEqual(result);
+  });
+
+  it('Should decodePayloadAttributes searchAttributes without indexedFields', () => {
+    const payload = {
+      searchAttributes: {
+        CustomKeywordField: {
+          metadata: {
+            encoding: 'anNvbi9wbGFpbg==',
+            type: 'S2V5d29yZA==',
+          },
+          data: 'InRlc3RAdGVzdC5jb20i',
+        },
+      },
+    };
+    const result = {
+      searchAttributes: { CustomKeywordField: 'test@test.com' },
+    };
+
+    const decodedPayload = decodePayloadAttributes(payload);
+    expect(decodedPayload).toEqual(result);
+  });
+});
+
 describe('decode all potential payloads', () => {
   it('Should decode a payload with codec endpoint with encoding json/plain`', async () => {
     const event = await decodeAllPotentialPayloadsWithCodec(
