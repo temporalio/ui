@@ -183,5 +183,6 @@ describe('attributeGroups', () => {
     expect(groups.schedule).toEqual([]);
     expect(groups.retryPolicy).toEqual([]);
     expect(groups.workflow).toEqual(['workflowTaskTimeout', 'workflowType']);
+    expect(groups.searchAttributes).toEqual(['searchAttributes']);
   });
 });

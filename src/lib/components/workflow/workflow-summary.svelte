@@ -20,6 +20,7 @@
   $: elapsedTime = formatDistanceAbbreviated({
     start: workflow?.startTime,
     end: workflow?.endTime,
+    includeMilliseconds: true,
   });
 </script>
 
