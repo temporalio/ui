@@ -80,7 +80,7 @@ export const submitCreateSchedule = async ({
 }: ScheduleParameterArgs): Promise<void> => {
   const { namespace, name, workflowId, workflowType, taskQueue } = action;
   const body: DescribeFullSchedule = {
-    schedule_id: name,
+    schedule_id: name.trim(),
     schedule: {
       spec: {
         calendar: [],
