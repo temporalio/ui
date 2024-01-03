@@ -152,7 +152,7 @@ describe('decodePayload with returnDataOnly = false', () => {
   });
 });
 
-describe.only('decodePayloadAttributes', () => {
+describe('decodePayloadAttributes', () => {
   it('Should decodePayloadAttributes searchAttributes with indexedFields', () => {
     const payload = {
       searchAttributes: {
