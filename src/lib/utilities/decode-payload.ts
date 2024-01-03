@@ -95,6 +95,13 @@ export const decodePayloadAttributes = <
     Object.entries(searchAttributes).forEach(([key, value]) => {
       searchAttributes[key] = decodePayload(value, returnDataOnly);
     });
+  } else if (has(eventAttribute, 'searchAttributes')) {
+    // Decode Search Attributes on UpsertWorkflowSearchAttributes
+    const searchAttributes = eventAttribute.searchAttributes;
+
+    Object.entries(searchAttributes).forEach(([key, value]) => {
+      searchAttributes[key] = decodePayload(value, returnDataOnly);
+    });
   }
 
   // Decode Memo
