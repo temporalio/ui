@@ -39,7 +39,8 @@ import (
 	"go.temporal.io/api/temporalproto"
 	"go.temporal.io/api/workflowservice/v1"
 
-	_ "go.temporal.io/api/serviceerror"
+	// DO NOT REMOVE
+	_ "go.temporal.io/api/temporalproto"
 )
 
 type Auth struct {
@@ -152,6 +153,7 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 		append(muxOpts,
 			withMarshaler(),
 			version.WithVersionHeader(c),
+			runtime.WithUnescapingMode(runtime.UnescapingModeAllExceptReserved),
 			// This is necessary to get error details properly
 			// marshalled in unary requests.
 			runtime.WithErrorHandler(runtime.DefaultHTTPErrorHandler),
