@@ -52,7 +52,6 @@ export type WorkflowStatus =
   | 'TimedOut'
   | 'Completed'
   | 'Failed'
-  | 'Completed'
   | 'ContinuedAsNew'
   | 'Canceled'
   | 'Terminated'
