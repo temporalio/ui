@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 
+import { translate } from '$lib/i18n/translate';
 import type {
   CreateScheduleRequest,
   ListScheduleResponse,
@@ -56,7 +57,9 @@ export const fetchAllSchedules = async (
   const onError: ErrorCallback = (err) =>
     (error =
       err?.body?.message ??
-      `Error fetching schedules: ${err.status}: ${err.statusText}`);
+      `${translate('schedules.error-message-fetching')}: ${err.status}: ${
+        err.statusText
+      }`);
 
   const route = routeForApi('schedules', { namespace });
   const { schedules, nextPageToken } =

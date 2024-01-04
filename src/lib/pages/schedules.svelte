@@ -25,7 +25,9 @@
   const onError: ErrorCallback = (err) =>
     (error =
       err?.body?.message ??
-      `Error fetching schedules: ${err.status}: ${err.statusText}`);
+      `${translate('schedules.error-message-fetching')}: ${err.status}: ${
+        err.statusText
+      }`);
 
   let coreUser = coreUserStore();
   $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
@@ -46,12 +48,12 @@
     let:visibleItems
     {onFetch}
     {onError}
-    aria-label="schedules"
+    aria-label={translate('common.schedules')}
     pageSizeSelectLabel={translate('common.per-page')}
     nextButtonLabel={translate('common.next')}
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('schedules.empty-state-title')}
-    fallbackErrorMessage={'Error fetching schedules'}
+    fallbackErrorMessage={translate('schedules.error-message-fetching')}
   >
     <header class="flex flex-row justify-between gap-2" slot="header">
       <div>
