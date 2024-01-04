@@ -38,6 +38,8 @@ import (
 	"go.temporal.io/api/operatorservice/v1"
 	"go.temporal.io/api/temporalproto"
 	"go.temporal.io/api/workflowservice/v1"
+
+	_ "go.temporal.io/api/serviceerror"
 )
 
 type Auth struct {
