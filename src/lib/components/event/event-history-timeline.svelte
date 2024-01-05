@@ -2,8 +2,11 @@
   import { onMount } from 'svelte';
   import { DataSet, Timeline } from 'vis-timeline/standalone';
 
+  import { page } from '$app/stores';
+
   import Accordion from '$lib/holocene/accordion.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -27,6 +30,7 @@
     isLocalActivityMarkerEvent,
   } from '$lib/utilities/is-event-type';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import { routeForEventGroup } from '$lib/utilities/route-for';
 
   import { getTimelineOptions } from './event-history-timeline-helpers';
 
@@ -44,8 +48,22 @@
   }
 
   function renderGroupName(group) {
-    const groupName = capitalize(group.label || group.category);
-    return `<div class="flex gap-2 items-center">${groupName}</div>`;
+    const { label, category, id } = group;
+    const { workflow, run, namespace } = $page.params;
+    const groupName = capitalize(label || category);
+    const href = routeForEventGroup({
+      eventId: id,
+      namespace,
+      workflow,
+      run,
+    });
+
+    const link = renderComponentToHTML(Link, {
+      href,
+      text: groupName,
+      class: 'flex gap-2 items-center',
+    });
+    return link;
   }
 
   function renderExecutionName() {

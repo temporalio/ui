@@ -11,6 +11,7 @@
     newTab?: boolean;
     class?: string;
     icon?: IconName;
+    text?: string;
     'data-testid'?: string;
   };
 
@@ -20,6 +21,7 @@
   export let active = false;
   export let newTab = false;
   export let icon: IconName = null;
+  export let text: string = '';
 </script>
 
 <a
@@ -34,6 +36,9 @@
 >
   {#if icon}
     <Icon width={20} height={20} class="mt-0.5" name={icon} />
+  {/if}
+  {#if text}
+    {text}
   {/if}
   <slot />
 </a>
