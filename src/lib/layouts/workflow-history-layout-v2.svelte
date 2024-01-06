@@ -1,6 +1,7 @@
 <script lang="ts">
   import groupBy from 'lodash.groupby';
 
+  import EventGraph from '$lib/components/lines-and-dots/event-graph.svelte';
   import EventRow from '$lib/components/lines-and-dots/event-row.svelte';
   import GroupRow from '$lib/components/lines-and-dots/group-row.svelte';
   import InputAndResultRow from '$lib/components/lines-and-dots/input-and-result-row.svelte';
@@ -18,7 +19,7 @@
   $: timeBasedGroups = groupBy(groups, (g) => g.timestamp);
 
   let activeGroup: undefined | EventGroup;
-  let zoom = 2;
+  let zoom = 1;
 
   const onHover = (event: WorkflowEvent) => {
     activeGroup = groups.find((g) => g.eventIds.has(event.id));
@@ -56,7 +57,7 @@
           4 && 'py-2'}"
       >
         {#if zoom === 1}
-          <div>Mini map here</div>
+          <EventGraph history={$fullEventHistory} />
         {:else if zoom == 2}
           <InputAndResultRow
             title="Input"
