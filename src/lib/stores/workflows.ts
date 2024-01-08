@@ -4,8 +4,10 @@ import { derived, get, readable, writable } from 'svelte/store';
 import { page } from '$app/stores';
 
 import { translate } from '$lib/i18n/translate';
+import { fetchSearchAttributesForNamespace } from '$lib/services/search-attributes-service';
 import { fetchWorkflowCount } from '$lib/services/workflow-counts';
 import { fetchAllWorkflows } from '$lib/services/workflow-service';
+import { allSearchAttributes } from '$lib/stores/search-attributes';
 import type { FilterParameters, WorkflowExecution } from '$lib/types/workflows';
 import { withLoading } from '$lib/utilities/stores/with-loading';
 
@@ -62,6 +64,12 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
           query,
         });
         set(workflows);
+
+        const attributes = await fetchSearchAttributesForNamespace(
+          namespace,
+          fetch,
+        );
+        allSearchAttributes.set(attributes);
 
         if (supportsAdvancedVisibility && !get(groupByCountEnabled)) {
           const workflowCount = await fetchWorkflowCount(namespace, query);
