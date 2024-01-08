@@ -18,7 +18,7 @@ export const fetchWorkflowCount = async (
       handleError: noop,
       request,
     });
-    count = parseInt(result?.count);
+    count = parseInt(result?.count || '0');
   } catch (e) {
     // Don't fail the workflows call due to count
   }
@@ -46,5 +46,5 @@ export const fetchWorkflowCountByExecutionStatus = async ({
       },
       notifyOnError: false,
     });
-  return { count, groups };
+  return { count: count ?? '0', groups };
 };

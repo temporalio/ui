@@ -1,27 +1,72 @@
-import type { WorkflowExecutionStatus } from '$lib/types';
-import type { WorkflowStatus } from '$lib/types/workflows';
+import type {
+  ArchivalState,
+  NamespaceState,
+  WorkflowExecutionStatus,
+} from '$lib/types';
+import type { BatchOperationState, BatchOperationType } from '$lib/types/batch';
+import type {
+  SearchAttributesValue,
+  WorkflowStatus,
+} from '$lib/types/workflows';
+
+import type { EventType } from './is-event-type';
+
+const fromScreamingEnum = <T>(potentialScreamingEnum: T, prefix: string): T => {
+  const stringEnum = potentialScreamingEnum as string;
+  const split = stringEnum.split('_');
+  if (split?.length === 1) return potentialScreamingEnum;
+  const formatted = split
+    .map((word) => {
+      return word.charAt(0) + word.substring(1).toLowerCase();
+    })
+    .join('');
+  return formatted.replace(prefix, '') as T;
+};
+
+export const toSearchAttributeTypeReadable = (
+  status: SearchAttributesValue,
+): SearchAttributesValue => {
+  return fromScreamingEnum(status, 'IndexedValueType');
+};
 
 export const toWorkflowStatusReadable = (
   status: WorkflowExecutionStatus | WorkflowStatus,
 ): WorkflowStatus => {
-  const statusMap = {
-    WORKFLOW_EXECUTION_STATUS_UNSPECIFIED: '',
-    WORKFLOW_EXECUTION_STATUS_RUNNING: 'Running',
-    WORKFLOW_EXECUTION_STATUS_COMPLETED: 'Completed',
-    WORKFLOW_EXECUTION_STATUS_FAILED: 'Failed',
-    WORKFLOW_EXECUTION_STATUS_CANCELED: 'Canceled',
-    WORKFLOW_EXECUTION_STATUS_TERMINATED: 'Terminated',
-    WORKFLOW_EXECUTION_STATUS_CONTINUED_AS_NEW: 'ContinuedAsNew',
-    WORKFLOW_EXECUTION_STATUS_TIMED_OUT: 'TimedOut',
-  };
-  return statusMap?.[status] ?? status;
+  return fromScreamingEnum(status, 'WorkflowExecutionStatus');
+};
+
+export const toNamespaceArchivalStateReadable = (
+  status: ArchivalState,
+): ArchivalState => {
+  return fromScreamingEnum(status, 'ArchivalState');
+};
+
+export const toNamespaceStateReadable = (
+  status: NamespaceState,
+): NamespaceState => {
+  return fromScreamingEnum(status, 'NamespaceState');
 };
 
 export const toNamespaceStatusReadable = (status: string): string => {
-  const statusMap = {
-    ARCHIVAL_STATE_UNSPECIFIED: '',
-    ARCHIVAL_STATE_DISABLED: 'Disabled',
-    ARCHIVAL_STATE_ENABLED: 'Enabled',
-  };
-  return statusMap[status];
+  return fromScreamingEnum(status, 'ArchivalState');
+};
+
+export const toEventNameReadable = (status: EventType): EventType => {
+  return fromScreamingEnum(status, 'EventType');
+};
+
+export const toBatchOperationStateReadable = (
+  status: BatchOperationState,
+): BatchOperationState => {
+  return fromScreamingEnum(status, 'BatchOperationState');
+};
+
+export const toBatchOperationTypeReadable = (
+  status: BatchOperationType,
+): BatchOperationType => {
+  return fromScreamingEnum(status, 'BatchOperationType');
+};
+
+export const toTaskQueueKindReadable = (status) => {
+  return fromScreamingEnum(status, 'TaskQueueKind');
 };

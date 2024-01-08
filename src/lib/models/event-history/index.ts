@@ -6,7 +6,6 @@ import {
 import type {
   EventAttributeKey,
   EventAttributesWithType,
-  EventType,
   EventWithMetadata,
   HistoryEvent,
   WorkflowEvent,
@@ -25,6 +24,7 @@ import {
 } from '$lib/utilities/get-codec';
 import { has } from '$lib/utilities/has';
 import { findAttributesAndKey } from '$lib/utilities/is-event-type';
+import { toEventNameReadable } from '$lib/utilities/screaming-enums';
 
 import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
@@ -80,7 +80,7 @@ export const toEvent = async (
   historyEvent: HistoryEvent,
 ): Promise<WorkflowEvent> => {
   const id = String(historyEvent.eventId);
-  const eventType = historyEvent.eventType as unknown as EventType;
+  const eventType = toEventNameReadable(historyEvent.eventType);
   const timestamp = formatDate(String(historyEvent.eventTime));
   const classification = getEventClassification(eventType);
   const category = getEventCategory(eventType);

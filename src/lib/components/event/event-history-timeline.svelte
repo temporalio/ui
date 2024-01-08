@@ -44,7 +44,7 @@
   }
 
   function renderGroupName(group) {
-    const groupName = capitalize(group.label || group.category);
+    const groupName = capitalize(group.label || group.category || 'Activity');
     return `<div class="flex gap-2 items-center">${groupName}</div>`;
   }
 
