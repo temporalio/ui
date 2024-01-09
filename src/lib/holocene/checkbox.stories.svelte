@@ -57,9 +57,10 @@
       on:keypress={action('keypress')}
     />
     <Checkbox
-      label={loremIpsum}
-      hoverable
       {...args}
+      class="whitespace-nowrap"
+      label="This one can intentionally break out of the mold to demonstrate we still have nowrap as an option"
+      hoverable
       on:change={action('change')}
       on:click={action('click')}
       on:keypress={action('keypress')}
