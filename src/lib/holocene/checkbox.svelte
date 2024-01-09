@@ -104,7 +104,7 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply flex cursor-pointer select-none items-center gap-3 text-sm leading-[18px] text-primary;
+    @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px] text-primary;
   }
 
   .checkbox.hoverable:hover .checkmark::before {
