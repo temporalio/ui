@@ -61,7 +61,7 @@
   data-testid={$$restProps['data-testid'] ?? null}
   on:click|stopPropagation
   on:keypress|stopPropagation
-  class="relative {$$props.class}"
+  class={$$props.class}
 >
   <label
     on:click
@@ -71,9 +71,22 @@
     class:disabled
     class:on-dark={onDark}
   >
+    <span class="checkmark" class:hoverable class:on-dark={onDark}>
+      {#if indeterminate}
+        <Icon class="absolute top-0 left-0 h-4 w-4" name="hyphen" />
+      {:else if checked}
+        <Icon
+          class="absolute top-0 left-0 h-4 w-4"
+          name="checkmark"
+          strokeWidth={3}
+        />
+      {/if}
+    </span>
+
     <span class="label" class:hoverable class:sr-only={labelHidden}>
       {label}
     </span>
+
     <input
       on:click|stopPropagation
       on:change={handleChange}
@@ -86,27 +99,18 @@
       class:indeterminate
       {...omit($$restProps, 'data-testid')}
     />
-    <span class="checkmark" class:hoverable class:on-dark={onDark}>
-      {#if indeterminate}
-        <Icon class="absolute top-0 left-0 h-4 w-4" name="hyphen" />
-      {:else if checked}
-        <Icon
-          class="absolute top-0 left-0 h-4 w-4"
-          name="checkmark"
-          strokeWidth={3}
-        />
-      {/if}
-    </span>
   </label>
 </div>
 
 <style lang="postcss">
   .checkbox {
-    @apply block h-[18px] w-[18px] cursor-pointer select-none text-sm leading-[18px] text-primary;
+    @apply flex cursor-pointer select-none items-center gap-3 text-sm leading-[18px] text-primary;
   }
 
-  .checkbox.hoverable {
-    @apply h-9 w-9 rounded-full hover:bg-purple-200;
+  .checkbox.hoverable:hover .checkmark::before {
+    @apply absolute -left-[.65rem] -z-10 h-9 w-9 self-center rounded-full bg-purple-200;
+
+    content: ' ';
   }
 
   .checkbox.on-dark {
@@ -114,23 +118,15 @@
   }
 
   .label {
-    @apply ml-6 flex h-full items-center whitespace-nowrap;
-  }
-
-  .label.hoverable {
-    @apply ml-10;
+    @apply flex;
   }
 
   input {
-    @apply absolute top-0 left-0 h-0 w-0 opacity-0;
+    @apply sr-only;
   }
 
   .checkmark {
-    @apply absolute top-0 left-0 box-content h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
-  }
-
-  .checkmark.hoverable {
-    @apply translate-x-1/2 translate-y-1/2;
+    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border border-gray-500 bg-white;
   }
 
   .checkmark.on-dark {
