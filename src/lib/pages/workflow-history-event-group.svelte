@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
 
   import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
+  import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -53,8 +54,15 @@
   $: visibleItems = groupEvents($fullEventHistory).filter(
     (e) => e.id === groupId,
   );
+  $: event = visibleItems[0];
 </script>
 
+{#if event}
+  <h2 class="flex w-full items-center text-lg font-medium">
+    {event.displayName}
+  </h2>
+{/if}
+<EventHistoryTimeline history={$fullEventHistory} maxHeight={240} />
 <EventSummaryTable {updating} {compact}>
   {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
     <EventSummaryRow

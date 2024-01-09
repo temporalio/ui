@@ -27,7 +27,11 @@
     fullEventHistory,
   } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
-  import { refresh, workflowRun } from '$lib/stores/workflow-run';
+  import {
+    refresh,
+    workflowRun,
+    workflowTimelineViewOpen,
+  } from '$lib/stores/workflow-run';
   import type { EventView } from '$lib/types/events';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { exportHistory } from '$lib/utilities/export-history';
@@ -128,7 +132,17 @@
       </div>
     </Accordion>
   </section>
-  <EventHistoryTimeline history={$fullEventHistory} />
+  <Accordion
+    title={translate('common.timeline')}
+    data-testid="timeline-accordion"
+    icon="timeline"
+    open={$workflowTimelineViewOpen}
+    onToggle={() => {
+      $workflowTimelineViewOpen = !$workflowTimelineViewOpen;
+    }}
+  >
+    <EventHistoryTimeline history={$fullEventHistory} />
+  </Accordion>
   <section id="event-history">
     <nav
       class="flex flex-col items-center justify-between gap-4 lg:flex-row lg:items-end"

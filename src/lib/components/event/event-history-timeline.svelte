@@ -4,13 +4,11 @@
 
   import { page } from '$app/stores';
 
-  import Accordion from '$lib/holocene/accordion.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
@@ -35,6 +33,7 @@
   import { getTimelineOptions } from './event-history-timeline-helpers';
 
   export let history: CommonHistoryEvent[] = [];
+  export let maxHeight = 520;
 
   let visualizationRef;
   let timeline;
@@ -197,7 +196,7 @@
       visualizationRef,
       new DataSet([]),
       new DataSet([]),
-      getTimelineOptions($workflowRun.workflow),
+      getTimelineOptions($workflowRun.workflow, { maxHeight }),
     );
     const reverseHistory =
       $eventFilterSort === 'descending' && $eventViewType === 'feed';
@@ -238,41 +237,30 @@
   }
 </script>
 
-<Accordion
-  title={translate('common.timeline')}
-  data-testid="timeline-accordion"
-  icon="timeline"
-  open={$workflowTimelineViewOpen}
-  onToggle={() => {
-    $workflowTimelineViewOpen = !$workflowTimelineViewOpen;
-  }}
->
-  <div class="flex flex-col gap-2">
-    <div class="flex items-center justify-end gap-2">
-      <div class="flex gap-2">
-        <ToggleButtons>
-          <ToggleButton
-            data-testid="zoom-in"
-            on:click={() => timeline?.zoomIn(1)}>+</ToggleButton
-          >
-          <ToggleButton
-            data-testid="zoom-in"
-            on:click={() => timeline?.zoomOut(1)}>-</ToggleButton
-          >
-          <ToggleButton
-            data-testid="zoom-in"
-            on:click={() => timeline?.focus('workflow')}>Fit</ToggleButton
-          >
-        </ToggleButtons>
-      </div>
-    </div>
-    <div class="timeline" bind:this={visualizationRef}>
-      {#if !timeline}
-        <Loading title="Building Timeline..." />
-      {/if}
+<div class="flex flex-col gap-2">
+  <div class="flex items-center justify-end gap-2">
+    <div class="flex gap-2 bg-white">
+      <ToggleButtons>
+        <ToggleButton data-testid="zoom-in" on:click={() => timeline?.zoomIn(1)}
+          >+</ToggleButton
+        >
+        <ToggleButton
+          data-testid="zoom-in"
+          on:click={() => timeline?.zoomOut(1)}>-</ToggleButton
+        >
+        <ToggleButton
+          data-testid="zoom-in"
+          on:click={() => timeline?.focus('workflow')}>Fit</ToggleButton
+        >
+      </ToggleButtons>
     </div>
   </div>
-</Accordion>
+  <div class="timeline" bind:this={visualizationRef}>
+    {#if !timeline}
+      <Loading title="Building Timeline..." />
+    {/if}
+  </div>
+</div>
 
 <style lang="postcss">
   :global(.vis-item-content) {
