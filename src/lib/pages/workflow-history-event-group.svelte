@@ -51,20 +51,18 @@
     : $eventHistory?.start;
   $: initialItem = currentEvents?.[0];
   $: updating = currentEvents.length && !$fullEventHistory.length;
-  $: visibleItems = groupEvents($fullEventHistory).filter(
-    (e) => e.id === groupId,
-  );
-  $: event = visibleItems[0];
+  $: groupEvent = groupEvents($fullEventHistory).find((e) => e.id === groupId);
+  $: events = groupEvent ? [groupEvent] : [];
 </script>
 
-{#if event}
+{#if groupEvent}
   <h2 class="flex w-full items-center text-lg font-medium">
-    {event.displayName}
+    {groupEvent.displayName}
   </h2>
 {/if}
 <EventHistoryTimeline history={$fullEventHistory} maxHeight={240} />
 <EventSummaryTable {updating} {compact}>
-  {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
+  {#each events as event (`${event.id}-${event.timestamp}`)}
     <EventSummaryRow
       {event}
       {compact}
