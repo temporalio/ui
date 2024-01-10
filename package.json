@@ -102,7 +102,7 @@
     "tailwind-merge": "^1.14.0",
     "url-pattern": "^1.0.3",
     "uuid": "^9.0.0",
-    "vis-timeline": "^7.7.2"
+    "vis-timeline": "^7.7.3"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.7.3",
