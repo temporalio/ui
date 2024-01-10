@@ -138,7 +138,7 @@
     @apply bg-primary text-white;
   }
 
-  input:focus-visible ~ .checkmark {
+  input:focus-visible ~ .checkbox-hover-wrapper .checkmark {
     @apply outline outline-blue-700;
   }
 
