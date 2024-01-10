@@ -236,12 +236,6 @@
   };
 
   const buildTimeline = (category: EventTypeCategory): void => {
-    timeline = new Timeline(
-      visualizationRef,
-      new DataSet([]),
-      new DataSet([]),
-      getTimelineOptions($workflowRun.workflow, { maxHeight }),
-    );
     const reverseHistory =
       $eventFilterSort === 'descending' && $eventViewType === 'feed';
     const sortedHistory = reverseHistory
@@ -268,9 +262,15 @@
     visualizationRef;
 
   const drawTimeline = () => {
-    if (timeline) {
-      timeline.destroy();
+    if (!timeline) {
+      timeline = new Timeline(
+        visualizationRef,
+        new DataSet([]),
+        new DataSet([]),
+        getTimelineOptions($workflowRun.workflow, { maxHeight }),
+      );
     }
+
     buildTimeline(category);
   };
 
