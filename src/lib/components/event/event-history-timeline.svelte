@@ -388,7 +388,7 @@
   }
 
   /* CSS for each classifciation */
-  :global(.vis-item.vis-range.Failed) {
+  :global(.vis-item.vis-range.Failed, .vis-item.vis-range.Terminated) {
     background-color: #fee2e2;
     border-color: #b91c1c;
     border-radius: 9999px;
@@ -396,89 +396,49 @@
     color: #b91c1c;
   }
 
-  :global(.vis-item.vis-point.Failed) {
-    background-color: #b91c1c;
+  :global(.vis-item.vis-point.Failed, .vis-item.vis-range.Terminated) {
     color: #b91c1c;
   }
 
   :global(.vis-item.vis-range.TimedOut) {
     background-color: #ffedd5;
-    border-color: #7c2d12;
+    border-color: #c2410c;
     border-radius: 9999px;
     border-width: 2px;
-    color: #7c2d12;
+    color: #c2410c;
   }
 
   :global(.vis-item.vis-point.TimedOut) {
-    background-color: #7c2d12;
-    color: #7c2d12;
+    color: #c2410c;
   }
 
-  :global(.vis-item.vis-range.Canceled, .vis-item.vis-range.Paused) {
+  :global(
+      .vis-item.vis-range.Canceled,
+      .vis-item.vis-range.CanceledRequested,
+      .vis-item.vis-range.Paused
+    ) {
     background-color: #fef9c3;
-    border-color: #713f12;
+    border-color: #a16207;
     border-radius: 9999px;
     border-width: 2px;
-    color: #713f12;
+    color: #a16207;
   }
 
-  :global(.vis-item.vis-point.Canceled, .vis-item.vis-point.Paused) {
-    background-color: #713f12;
-    color: #713f12;
+  :global(
+      .vis-item.vis-point.Canceled,
+      .vis-item.vis-point.CanceledRequested,
+      .vis-item.vis-point.Paused
+    ) {
+    color: #a16207;
   }
 
-  :global(.vis-item.vis-range.Terminated, .vis-item.vis-range.Fired) {
-    background-color: #e4e4e7;
-    border-color: #18181b;
-    border-radius: 9999px;
-    border-width: 2px;
-    color: #18181b;
-  }
-
-  :global(.vis-item.vis-point.Terminated, .vis-item.vis-point.Fired) {
-    background-color: #18181b;
-    color: #18181b;
-  }
-
-  :global(.vis-item.vis-range.Scheduled) {
-    background-color: #e0e7ff;
-    border-color: #4338ca;
-    border-radius: 9999px;
-    border-width: 2px;
-    color: #4338ca;
-  }
-
-  :global(.vis-item.vis-point.Scheduled) {
-    color: #4338ca;
-  }
-
-  :global(.vis-item.vis-range.ContinuedAsNew) {
-    background-color: #f3e8ff;
-    border-color: #581c87;
-    border-radius: 9999px;
-    border-width: 2px;
-    color: #581c87;
-  }
-
-  :global(.vis-item.vis-point.ContinuedAsNew) {
-    background-color: #581c87;
-    color: #581c87;
-  }
-
-  :global(.vis-item.vis-range.Completed) {
-    background-color: #dcfce7;
-    border-color: #15803d;
-    border-radius: 9999px;
-    border-width: 2px;
-    color: #15803d;
-  }
-
-  :global(.vis-item.vis-point.Completed) {
-    background-color: #15803d;
-    color: #15803d;
-  }
-
-  :global(.vis-item.vis-range.Running) {
+  :global(
+      .vis-item.vis-range.Running,
+      .vis-item.vis-range.Fired,
+      .vis-item.vis-range.Scheduled,
+      .vis-item.vis-range.Started,
+      .vis-item.vis-range.Initiated
+    ) {
     background-color: #dbeafe;
     border-color: #1d4ed8;
     border-radius: 9999px;
@@ -486,21 +446,68 @@
     color: #1d4ed8;
   }
 
-  :global(.vis-item.vis-point.Running) {
-    background-color: #1d4ed8;
+  :global(
+      .vis-item.vis-point.Running,
+      .vis-item.vis-point.Fired,
+      .vis-item.vis-point.Scheduled,
+      .vis-item.vis-point.Started,
+      .vis-item.vis-point.Initiated
+    ) {
     color: #1d4ed8;
   }
 
-  :global(.vis-item.vis-range.Started) {
+  :global(.vis-item.vis-range.workflow.Running) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+  }
+
+  :global(.vis-item.vis-range.ContinuedAsNew) {
     background-color: #e4e4e7;
     border-color: #18181b;
     border-radius: 9999px;
     border-width: 2px;
+    color: #17172c;
+  }
+
+  :global(.vis-item.vis-point.ContinuedAsNew) {
     color: #18181b;
   }
 
-  :global(.vis-item.vis-point.Started) {
-    color: #18181b;
+  :global(.vis-item.vis-range.Completed, .vis-item.vis-range.Open) {
+    background-color: #dcfce7;
+    border-color: #15803d;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #15803d;
+  }
+
+  :global(.vis-item.vis-point.Completed, .vis-item.vis-point.Open) {
+    color: #15803d;
+  }
+
+  :global(.vis-item.vis-range.New) {
+    background-color: #e0eaff;
+    border-color: #4338ca;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #4338ca;
+  }
+
+  :global(.vis-item.vis-point.New) {
+    color: #4338ca;
+  }
+
+  :global(.vis-item.vis-range.Signaled) {
+    background-color: #f3e8ff;
+    border-color: #7e22ce;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #7e22ce;
+  }
+
+  :global(.vis-item.vis-point.Signaled) {
+    color: #7e22ce;
   }
 
   /* CSS for each activity type */
