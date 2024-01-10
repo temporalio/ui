@@ -4,7 +4,9 @@
 
   import { page } from '$app/stores';
 
+  import HeartBeat from '$lib/components/heart-beat-indicator.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { IconName } from '$lib/holocene/icon/paths';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
@@ -20,6 +22,7 @@
   } from '$lib/stores/workflow-run';
   import type {
     CommonHistoryEvent,
+    EventClassification,
     EventTypeCategory,
   } from '$lib/types/events';
   import { capitalize } from '$lib/utilities/format-camel-case';
@@ -76,6 +79,43 @@
     return `<div class="flex gap-1 items-center"><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div><div class="bar-content"><p>${name}</p></div></div>`;
   }
 
+  function getIconName(classification: EventClassification): IconName | null {
+    switch (classification) {
+      case 'Completed':
+        return 'checkmark';
+      case 'Canceled':
+      case 'Terminated':
+        return 'canceled';
+      case 'Failed':
+        return 'error';
+      case 'TimedOut':
+        return 'clock';
+      // TODO: Add icons for these
+      // case 'Fired':
+      // case 'CancelRequested':
+      // case 'Signaled':
+      // case 'Scheduled':
+      // case 'Open':
+      // case 'New':
+      // case 'Started':
+      // case 'Initiated':
+      default:
+        return null;
+    }
+  }
+
+  function getIcon(classification: EventClassification): string {
+    if (classification === 'Running') {
+      return renderComponentToHTML(HeartBeat, {});
+    }
+    const name = getIconName(classification);
+    return name
+      ? renderComponentToHTML(Icon, {
+          name,
+        })
+      : '';
+  }
+
   type GroupItems = {
     items: DataSet<unknown, 'id'>;
     groups: DataSet<unknown, 'id'>;
@@ -111,7 +151,9 @@
           undefined,
           2,
         ),
-        content: $workflowRun.workflow.runId,
+        content: `<div class="bar-content">${
+          $workflowRun.workflow.runId
+        }${getIcon(isRunning ? 'Running' : finalEvent.classification)}</div>`,
         className: isRunning
           ? `${finalEvent.category} Running`
           : `${finalEvent.category} ${finalEvent.classification}`,
@@ -152,7 +194,9 @@
           content:
             group.eventList.length === 1
               ? group.name
-              : `<div class="bar-content">${group.name}</div>`,
+              : `<div class="bar-content">${group.name}${getIcon(
+                  lastEvent.classification,
+                )}</div>`,
           end: lastEvent.eventTime,
           type: group.eventList.length === 1 ? 'point' : 'range',
           className: `${lastEvent.category} ${lastEvent.classification}`,
@@ -481,8 +525,8 @@
   }
 
   :global(.bar-content) {
-    display: flex;
-    gap: 2px;
+    display: inline-flex;
+    gap: 4px;
     align-items: center;
   }
 
