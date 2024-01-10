@@ -18,7 +18,7 @@ import type { Optional, Replace } from './global';
 export type WorkflowExecutionInfo = Replace<
   import('$lib/types').WorkflowExecutionInfo,
   {
-    status: WorkflowExecutionStatus;
+    status: WorkflowExecutionStatus | WorkflowStatus;
     stateTransitionCount: string;
     startTime: string;
     closeTime: string;
@@ -76,8 +76,15 @@ export type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
 };
 
 export type WorkflowIdentifier = import('$lib/types').WorkflowExecutionInput;
+
 export type SearchAttributesValue =
-  import('$lib/types').SearchAttributesEnumValue;
+  | 'Bool'
+  | 'Datetime'
+  | 'Double'
+  | 'Int'
+  | 'Keyword'
+  | 'Text'
+  | 'KeywordList';
 
 export type SearchAttributes = {
   [k: string]: SearchAttributesValue;

@@ -187,7 +187,6 @@ export type QueryResult = temporal.api.query.v1.IWorkflowQueryResult;
 // api.operatorservice
 export type ListSearchAttributesResponse =
   temporal.api.operatorservice.v1.IListSearchAttributesResponse;
-export type SearchAttributesEnumValue = temporal.api.enums.v1.IndexedValueType;
 
 // api.batch
 export type BatchCancelOperation =

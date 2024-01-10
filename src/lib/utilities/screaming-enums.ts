@@ -32,7 +32,7 @@ export const toSearchAttributeTypeReadable = (
 export const toWorkflowStatusReadable = (
   status: WorkflowExecutionStatus | WorkflowStatus,
 ): WorkflowStatus => {
-  return fromScreamingEnum(status, 'WorkflowExecutionStatus');
+  return fromScreamingEnum(status, 'WorkflowExecutionStatus') as WorkflowStatus;
 };
 
 export const toNamespaceArchivalStateReadable = (
