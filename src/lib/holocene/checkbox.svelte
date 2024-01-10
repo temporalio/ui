@@ -71,6 +71,19 @@
     class:disabled
     class:on-dark={onDark}
   >
+    <input
+      on:click|stopPropagation
+      on:change={handleChange}
+      {id}
+      {value}
+      type="checkbox"
+      bind:checked
+      {indeterminate}
+      {disabled}
+      class:indeterminate
+      {...omit($$restProps, 'data-testid')}
+    />
+
     <div class="checkbox-hover-wrapper">
       <span class="checkmark" class:hoverable class:on-dark={onDark}>
         {#if indeterminate}
@@ -84,19 +97,6 @@
     <span class="label" class:hoverable class:sr-only={labelHidden}>
       {label}
     </span>
-
-    <input
-      on:click|stopPropagation
-      on:change={handleChange}
-      {id}
-      {value}
-      type="checkbox"
-      bind:checked
-      {indeterminate}
-      {disabled}
-      class:indeterminate
-      {...omit($$restProps, 'data-testid')}
-    />
   </label>
 </div>
 
@@ -133,12 +133,12 @@
     @apply border-white bg-primary;
   }
 
-  input:checked + .checkmark,
-  input.indeterminate + .checkmark {
+  input:checked ~ .checkbox-hover-wrapper .checkmark,
+  input.indeterminate ~ .checkbox-hover-wrapper .checkmark {
     @apply bg-primary text-white;
   }
 
-  input:focus-visible + .checkmark {
+  input:focus-visible ~ .checkmark {
     @apply outline outline-blue-700;
   }
 
