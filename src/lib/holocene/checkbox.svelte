@@ -84,15 +84,17 @@
       {...omit($$restProps, 'data-testid')}
     />
 
-    <div class="checkbox-hover-wrapper">
-      <span class="checkmark" class:hoverable class:on-dark={onDark}>
-        {#if indeterminate}
-          <Icon class="h-full w-full" name="hyphen" />
-        {:else if checked}
-          <Icon class="h-full w-full" name="checkmark" strokeWidth={1} />
-        {/if}
-      </span>
-    </div>
+    <span class="checkmark" class:hoverable class:on-dark={onDark}>
+      {#if indeterminate}
+        <Icon class="absolute top-0 left-0 h-4 w-4" name="hyphen" />
+      {:else if checked}
+        <Icon
+          class="absolute top-0 left-0 h-4 w-4"
+          name="checkmark"
+          strokeWidth={3}
+        />
+      {/if}
+    </span>
 
     <span class="label" class:hoverable class:sr-only={labelHidden}>
       {label}
@@ -102,15 +104,13 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply flex cursor-pointer select-none items-start gap-1 text-sm leading-[18px] text-primary;
+    @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px] text-primary;
   }
 
-  .checkbox .checkbox-hover-wrapper {
-    @apply -mt-2 flex h-9 w-9 flex-none items-center rounded-full;
-  }
+  .checkbox.hoverable:hover .checkmark::before {
+    @apply absolute -left-2.5 -z-10 h-9 w-9 self-center rounded-full bg-purple-200;
 
-  .checkbox.hoverable:hover .checkbox-hover-wrapper {
-    @apply bg-purple-200;
+    content: ' ';
   }
 
   .checkbox.on-dark {
@@ -126,19 +126,19 @@
   }
 
   .checkmark {
-    @apply mx-auto box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border border-gray-500 bg-white;
+    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border border-gray-500 bg-white;
   }
 
   .checkmark.on-dark {
     @apply border-white bg-primary;
   }
 
-  input:checked ~ .checkbox-hover-wrapper .checkmark,
-  input.indeterminate ~ .checkbox-hover-wrapper .checkmark {
+  input:checked ~ .checkmark,
+  input.indeterminate ~ .checkmark {
     @apply bg-primary text-white;
   }
 
-  input:focus-visible ~ .checkbox-hover-wrapper .checkmark {
+  input:focus-visible ~ .checkmark {
     @apply outline outline-blue-700;
   }
 
