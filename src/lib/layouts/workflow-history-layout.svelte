@@ -53,6 +53,10 @@
     $eventFilterSort,
   );
 
+  $: {
+    console.log('Workflow events: ', workflowEvents);
+  }
+
   const resetFullHistory = () => {
     $fullEventHistory = [];
   };
