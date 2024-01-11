@@ -10,7 +10,6 @@
   import NavTooltip from '$lib/holocene/navigation/nav-tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
-  import { changeTheme, theme } from '$lib/stores/theme';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
   // import { labsMode } from '$lib/stores/labs-mode';
@@ -143,17 +142,6 @@
         <div class="nav-title">{translate('common.feedback')}</div>
       </NavRow>
     </slot>
-    <NavRow
-      {isCloud}
-      handleClick={() => changeTheme($theme === 'light' ? 'dark' : 'light')}
-    >
-      <NavTooltip right text="Theme">
-        <div class="nav-icon">
-          <Icon name={$theme === 'light' ? 'sun' : 'moon'} />
-        </div>
-        <div class="nav-title">{$theme}</div>
-      </NavTooltip>
-    </NavRow>
     <!-- <NavRow {isCloud} handleClick={() => ($labsMode = !$labsMode)}>
       <NavTooltip right text={labsHoverText}>
         <div class="nav-icon">

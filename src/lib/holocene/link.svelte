@@ -2,7 +2,6 @@
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
   import type { IconName } from '$lib/holocene/icon/paths';
-  import { theme } from '$lib/stores/theme';
 
   import Icon from './icon/icon.svelte';
 
@@ -29,7 +28,6 @@
   rel={newTab ? 'noreferrer' : null}
   class="link {icon ? 'inline-flex' : 'inline'} {className}"
   class:active
-  class:opposite={$theme === 'dark'}
   on:click
   tabindex={href ? null : 0}
   {...$$restProps}

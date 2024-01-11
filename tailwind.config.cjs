@@ -1,4 +1,5 @@
 const defaultTheme = require('tailwindcss/defaultTheme');
+const plugin = require('tailwindcss/plugin');
 const temporalColors = require('./colors.cjs');
 
 /** @type {import('tailwindcss').Config} */
@@ -25,7 +26,16 @@ const config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function ({ addBase, theme }) {
+      addBase({
+        '.bg-solid': {
+          background: theme('colors.gray.100'),
+          'dark:background': theme('colors.primary'),
+        },
+      });
+    }),
+  ],
 };
 
 module.exports = config;

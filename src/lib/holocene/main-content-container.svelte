@@ -19,14 +19,16 @@
   }
 </script>
 
-<div
-  id="content-wrapper"
-  class="relative h-screen w-max flex-auto overflow-auto bg-gray-100 dark:bg-gray-700 dark:text-white"
-  on:scroll={handleOnScroll}
->
+<div id="content-wrapper" class="main-content" on:scroll={handleOnScroll}>
   <slot />
   <main id="content">
     <slot name="main" />
   </main>
   <ScrollToTop hidden={scrollToTopHidden} {onScrollToTopClick} />
 </div>
+
+<style lang="postcss">
+  .main-content {
+    @apply relative h-screen w-max flex-auto overflow-auto bg-gray-100 dark:bg-primary dark:text-white;
+  }
+</style>

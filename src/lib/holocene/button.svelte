@@ -9,7 +9,6 @@
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
-  import { theme } from '$lib/stores/theme';
 
   const buttonStyles = cva(
     [
@@ -114,7 +113,6 @@
   type="button"
   class:active
   on:click|stopPropagation
-  class:opposite={$theme === 'dark'}
   class={buttonStyles({ variant, size, borderModifier, borderRadiusModifier })}
   {...$$restProps}
 >

@@ -41,8 +41,4 @@
   label.required {
     @apply after:content-["*"];
   }
-
-  .bg-solid {
-    @apply bg-white dark:bg-gray-800;
-  }
 }

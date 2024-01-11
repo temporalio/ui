@@ -6,7 +6,6 @@
 
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { theme } from '$lib/stores/theme';
 
   import type { IconName } from './icon/paths';
 
@@ -45,11 +44,7 @@
   };
 </script>
 
-<div
-  class="accordion {className}"
-  class:opposite={$theme === 'dark'}
-  {...$$restProps}
->
+<div class="accordion {className}" {...$$restProps}>
   <button
     id="{id}-trigger"
     aria-expanded={open}
@@ -101,9 +96,5 @@
 <style lang="postcss">
   .accordion {
     @apply bg-solid flex w-full cursor-default flex-col rounded-xl border-2 border-primary p-4 text-primary;
-
-    &.opposite {
-      @apply border-gray-300 bg-primary text-white;
-    }
   }
 </style>

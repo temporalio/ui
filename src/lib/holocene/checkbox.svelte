@@ -4,7 +4,6 @@
   import { createEventDispatcher } from 'svelte';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { theme } from '$lib/stores/theme';
   import { omit } from '$lib/utilities/omit';
 
   type T = $$Generic;
@@ -62,7 +61,6 @@
   data-testid={$$restProps['data-testid'] ?? null}
   on:click|stopPropagation
   on:keypress|stopPropagation
-  class:opposite={$theme === 'dark' || onDark}
   class={$$props.class}
 >
   <label

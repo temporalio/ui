@@ -14,7 +14,6 @@
     pagination,
     perPageKey,
   } from '$lib/stores/pagination';
-  import { theme } from '$lib/stores/theme';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   type Item = $$Generic;
@@ -93,7 +92,6 @@
 </script>
 
 <div
-  class:opposite={$theme === 'dark'}
   class="paginated-table-wrapper"
   bind:this={tableContainer}
   style="max-height: calc(100vh - {tableOffset}px)"
