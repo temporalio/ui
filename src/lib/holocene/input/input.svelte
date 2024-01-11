@@ -100,7 +100,7 @@
       </span>
     {/if}
     <input
-      class="m-2 block w-full bg-white focus:outline-none"
+      class="bg-solid m-2 block w-full focus:outline-none"
       class:disabled
       {disabled}
       data-lpignore="true"
@@ -165,17 +165,8 @@
 </div>
 
 <style lang="postcss">
-  /* Base styles */
-  label {
-    @apply font-secondary text-sm font-medium;
-  }
-
-  label.required {
-    @apply after:content-["*"];
-  }
-
   .input-container {
-    @apply relative box-border inline-flex h-10 w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+    @apply relative box-border inline-flex h-10 w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700 dark:border-gray-100;
   }
 
   .input-container.error {
@@ -183,7 +174,7 @@
   }
 
   .suffix {
-    @apply block h-full w-full rounded-tr rounded-br border-l border-gray-900 bg-offWhite p-2;
+    @apply block h-full w-full rounded-tr rounded-br border-l border-gray-900 bg-offWhite p-2 dark:border-gray-100;
   }
 
   .input-container:active .suffix {
@@ -275,24 +266,20 @@
   }
 
   /* Dark theme styles */
-  .input-container.dark,
-  .input-container.dark .icon-container,
-  .input-container.dark input,
-  .input-container.dark .copy-icon-container {
+  .input-container.opposite,
+  .input-container.opposite .icon-container,
+  .input-container.opposite input,
+  .input-container.opposite .copy-icon-container {
     @apply bg-gray-900 text-white;
   }
 
-  .input-container.dark input {
+  .input-container.opposite input {
     @apply placeholder:text-gray-200;
   }
 
-  .input-container.dark.disabled,
-  .input-container.dark.disabled .copy-icon-container,
-  .input-container.dark.disabled input {
-    @apply border-gray-900 bg-gray-900;
-  }
-
-  input[type='search']::-webkit-search-cancel-button {
-    @apply hidden;
+  .input-container.opposite.disabled,
+  .input-container.opposite.disabled .copy-icon-container,
+  .input-container.opposite.disabled input {
+    @apply border-gray-900 bg-gray-900 dark:border-gray-100;
   }
 </style>

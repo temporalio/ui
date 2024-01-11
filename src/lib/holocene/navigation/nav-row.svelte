@@ -54,7 +54,7 @@
   }
 
   .local:hover {
-    @apply bg-white text-gray-900;
+    @apply bg-solid text-gray-900;
   }
 
   .cloud:hover {

@@ -242,7 +242,7 @@
 </script>
 
 <MenuContainer {open} on:close={resetValueAndOptions}>
-  <div class:dark={$theme === 'dark'}>
+  <div class:opposite={$theme === 'dark'}>
     <label class="combobox-label" class:sr-only={labelHidden} for={id}>
       {label}
     </label>
@@ -328,7 +328,7 @@
   }
 
   .combobox-wrapper {
-    @apply flex h-10 w-full flex-row items-center rounded-lg border border-primary bg-white text-sm focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-blue-600/50 focus-within:outline-none dark:border-gray-300;
+    @apply bg-solid flex h-10 w-full flex-row items-center rounded-lg border border-primary text-sm focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-blue-600/50 focus-within:outline-none dark:border-gray-300;
   }
 
   .combobox-input {

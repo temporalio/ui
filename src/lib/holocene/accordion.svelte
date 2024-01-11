@@ -47,7 +47,7 @@
 
 <div
   class="accordion {className}"
-  class:dark={$theme === 'dark'}
+  class:opposite={$theme === 'dark'}
   {...$$restProps}
 >
   <button
@@ -100,9 +100,9 @@
 
 <style lang="postcss">
   .accordion {
-    @apply flex w-full cursor-default flex-col rounded-xl border-2 border-primary bg-white p-4 text-primary;
+    @apply bg-solid flex w-full cursor-default flex-col rounded-xl border-2 border-primary p-4 text-primary;
 
-    &.dark {
+    &.opposite {
       @apply border-gray-300 bg-primary text-white;
     }
   }

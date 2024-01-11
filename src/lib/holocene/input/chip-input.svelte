@@ -137,7 +137,7 @@
   }
 
   .input-container {
-    @apply flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-gray-900 bg-white p-2 text-sm text-gray-900 focus-within:border-blue-700;
+    @apply bg-solid flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-gray-900 p-2 text-sm text-gray-900 focus-within:border-blue-700 dark:border-gray-100;
 
     .invalid {
       @apply border-red-700;
@@ -145,7 +145,7 @@
   }
 
   input {
-    @apply inline-block w-full rounded bg-white focus:outline-none;
+    @apply bg-solid inline-block w-full rounded focus:outline-none;
   }
 
   .hint {

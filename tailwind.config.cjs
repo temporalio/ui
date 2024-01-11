@@ -3,7 +3,6 @@ const temporalColors = require('./colors.cjs');
 
 /** @type {import('tailwindcss').Config} */
 const config = {
-  darkMode: 'class',
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
     colors: temporalColors,

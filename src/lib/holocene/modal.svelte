@@ -131,7 +131,7 @@
 
 <style lang="postcss">
   .body {
-    @apply z-50  w-full max-w-lg overflow-y-auto rounded-lg bg-white p-0 text-gray-900 shadow-xl md:h-max;
+    @apply bg-solid  z-50 w-full max-w-lg overflow-y-auto rounded-lg p-0 text-gray-900 shadow-xl md:h-max;
   }
 
   .body::backdrop {
@@ -147,7 +147,7 @@
   }
 
   .title {
-    @apply bg-white px-8 pt-8 pb-0 text-2xl;
+    @apply bg-solid px-8 pt-8 pb-0 text-2xl;
   }
 
   .content {

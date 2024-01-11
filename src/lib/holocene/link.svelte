@@ -29,7 +29,7 @@
   rel={newTab ? 'noreferrer' : null}
   class="link {icon ? 'inline-flex' : 'inline'} {className}"
   class:active
-  class:dark={$theme === 'dark'}
+  class:opposite={$theme === 'dark'}
   on:click
   tabindex={href ? null : 0}
   {...$$restProps}

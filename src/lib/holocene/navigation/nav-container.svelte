@@ -86,7 +86,7 @@
   }
 
   .nav-header.cloud {
-    @apply bg-white text-primary;
+    @apply bg-solid text-primary;
   }
 
   .nav-wrapper {
@@ -106,7 +106,7 @@
   }
 
   .cloud {
-    @apply bg-white text-gray-900;
+    @apply bg-solid text-gray-900;
   }
 
   .close :global(.nav-title) {

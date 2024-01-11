@@ -193,7 +193,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex-wrap items-center border-gray-900 text-sm no-underline xl:py-3 xl:text-base;
+    @apply flex-wrap items-center border-gray-900 text-sm no-underline dark:border-gray-100 xl:py-3 xl:text-base;
   }
 
   .row:hover {

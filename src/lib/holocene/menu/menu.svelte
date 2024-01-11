@@ -40,7 +40,7 @@
   };
 </script>
 
-<div class:dark={$theme === 'dark'}>
+<div class:opposite={$theme === 'dark'}>
   <ul
     in:fly={{ duration: 100 }}
     role="menu"
@@ -59,7 +59,7 @@
 
 <style lang="postcss">
   .menu {
-    @apply absolute z-20 mt-1 max-h-[480px] min-w-full list-none overflow-auto rounded-lg border border-primary bg-white text-primary shadow dark:border-gray-300 dark:bg-primary dark:text-white;
+    @apply bg-solid absolute z-20 mt-1 max-h-[480px] min-w-full list-none overflow-auto rounded-lg border border-primary text-primary shadow dark:border-gray-300 dark:bg-primary dark:text-white;
 
     &.left {
       @apply left-0 origin-top-left;

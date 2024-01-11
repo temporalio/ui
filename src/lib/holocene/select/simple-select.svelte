@@ -21,7 +21,7 @@
   export let id: string;
   export let value: SelectOptionValue;
   export let label: string = null;
-  export let dark = false;
+  export let opposite = false;
   export let arrow = false;
   export let name = id;
   export let options: SelectOptionValue[] = [];
@@ -31,7 +31,7 @@
   <label class="sr-only" for={id}>{label}</label>
   <select
     class="inline h-10 w-full rounded-lg border-2 px-2 text-base {className}"
-    class:dark
+    class:opposite
     class:remove={arrow}
     {name}
     {id}
@@ -56,7 +56,7 @@
     @apply h-8 appearance-none rounded-xl py-1 pl-3 text-sm;
   }
 
-  .dark {
+  .opposite {
     @apply bg-gray-900 text-white;
   }
 </style>

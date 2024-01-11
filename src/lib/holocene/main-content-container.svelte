@@ -1,6 +1,5 @@
 <script lang="ts">
   import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
-  import { theme } from '$lib/stores/theme';
 
   let scrollToTopHidden = true;
   let showScrollToTopOn = 150; // pixels
@@ -22,8 +21,7 @@
 
 <div
   id="content-wrapper"
-  class="main-content"
-  class:dark={$theme === 'dark'}
+  class="relative h-screen w-max flex-auto overflow-auto bg-gray-100 dark:bg-gray-700 dark:text-white"
   on:scroll={handleOnScroll}
 >
   <slot />
@@ -32,13 +30,3 @@
   </main>
   <ScrollToTop hidden={scrollToTopHidden} {onScrollToTopClick} />
 </div>
-
-<style lang="postcss">
-  .main-content {
-    @apply relative h-screen w-max flex-auto overflow-auto bg-gray-100;
-
-    &.dark {
-      @apply bg-primary text-white;
-    }
-  }
-</style>
