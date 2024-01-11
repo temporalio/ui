@@ -70,7 +70,7 @@ export const getUniqueBuildIdsFromPollers = (
   pollers: PollerWithTaskQueueTypes[],
 ): string[] => {
   const buildIds = [
-    ...new Set(pollers.map(getCurrentPollerBuildId).filter(Boolean)),
+    ...new Set(pollers?.map(getCurrentPollerBuildId).filter(Boolean)),
   ];
   return buildIds;
 };
@@ -78,7 +78,7 @@ export const getUniqueBuildIdsFromPollers = (
 export const pollerHasVersioning = (
   pollers: PollerWithTaskQueueTypes[],
 ): boolean => {
-  return pollers.some(
+  return pollers?.some(
     (poller) => poller?.workerVersionCapabilities?.useVersioning,
   );
 };

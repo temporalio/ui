@@ -20,15 +20,20 @@ const emptyNamespace = {
 const toNamespaceDetails = (
   namespace: DescribeNamespaceResponse,
 ): DescribeNamespaceResponse => {
-  namespace.config.historyArchivalState = toNamespaceArchivalStateReadable(
-    namespace.config.historyArchivalState,
-  );
-  namespace.config.visibilityArchivalState = toNamespaceArchivalStateReadable(
-    namespace.config.visibilityArchivalState,
-  );
-  namespace.namespaceInfo.state = toNamespaceStateReadable(
-    namespace.namespaceInfo.state,
-  );
+  if (namespace.config) {
+    namespace.config.historyArchivalState = toNamespaceArchivalStateReadable(
+      namespace.config?.historyArchivalState,
+    );
+    namespace.config.visibilityArchivalState = toNamespaceArchivalStateReadable(
+      namespace.config?.visibilityArchivalState,
+    );
+  }
+
+  if (namespace.namespaceInfo) {
+    namespace.namespaceInfo.state = toNamespaceStateReadable(
+      namespace.namespaceInfo?.state,
+    );
+  }
   return namespace;
 };
 

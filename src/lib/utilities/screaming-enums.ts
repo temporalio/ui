@@ -12,6 +12,7 @@ import type {
 import type { EventType } from './is-event-type';
 
 const fromScreamingEnum = <T>(potentialScreamingEnum: T, prefix: string): T => {
+  if (!potentialScreamingEnum) return;
   const stringEnum = potentialScreamingEnum as string;
   const split = stringEnum.split('_');
   if (split?.length === 1) return potentialScreamingEnum;
