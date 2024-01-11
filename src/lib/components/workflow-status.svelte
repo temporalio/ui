@@ -92,7 +92,7 @@
   </span>
   {#if newCount}
     <span
-      class="font-base bg-solid rounded-r px-1 py-0.5 text-xs text-gray-900"
+      class="font-base bg-solid rounded-r px-1 py-0.5 text-xs text-gray-900 dark:text-gray-100"
       in:fade
     >
       {#if newCount > 0}+{/if}{newCount}
