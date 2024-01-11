@@ -51,7 +51,7 @@
 <nav
   class="top-nav"
   class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
-  class:dark={$theme === 'dark'}
+  class:opposite={$theme === 'dark'}
   data-testid="top-nav"
   aria-label={translate('common.main')}
 >
@@ -113,7 +113,7 @@
   .top-nav {
     @apply sticky top-0 z-40 flex w-full flex-col items-center justify-end border-b-2 bg-gray-100 p-1 px-4 md:flex-row md:px-8;
 
-    &.dark {
+    &.opposite {
       @apply bg-primary text-white;
     }
   }

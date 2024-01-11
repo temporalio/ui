@@ -51,7 +51,7 @@
 
   .default,
   .gray {
-    @apply border-gray-900 bg-gray-100 text-gray-900;
+    @apply border-gray-900 bg-gray-100 text-gray-900 dark:border-gray-100;
   }
 
   .active,

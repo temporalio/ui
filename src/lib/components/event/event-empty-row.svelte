@@ -21,6 +21,6 @@
 
 <style lang="postcss">
   .row {
-    @apply border-2 border-gray-900 p-2 text-center text-sm;
+    @apply border-2 border-gray-900 p-2 text-center text-sm dark:border-gray-100;
   }
 </style>

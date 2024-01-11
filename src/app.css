@@ -31,6 +31,18 @@
   }
 
   input[type='search']::-webkit-search-cancel-button {
-    display: none;
+    @apply hidden;
+  }
+
+  label {
+    @apply font-secondary text-sm font-medium;
+  }
+
+  label.required {
+    @apply after:content-["*"];
+  }
+
+  .bg-solid {
+    @apply bg-white dark:bg-gray-800;
   }
 }

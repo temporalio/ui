@@ -93,7 +93,7 @@
 </script>
 
 <div
-  class:dark={$theme === 'dark'}
+  class:opposite={$theme === 'dark'}
   class="paginated-table-wrapper"
   bind:this={tableContainer}
   style="max-height: calc(100vh - {tableOffset}px)"
@@ -179,7 +179,7 @@
   }
 
   .paginated-table-body {
-    @apply bg-white dark:bg-gray-700;
+    @apply bg-solid dark:bg-gray-700;
 
     :global(tr:not(.empty)) {
       @apply h-12 border-b border-primary last-of-type:border-0 hover:bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 hover:bg-fixed dark:hover:from-gray-700 dark:hover:to-gray-300;
@@ -187,7 +187,7 @@
   }
 
   .paginated-table-controls {
-    @apply sticky bottom-0 left-0 flex w-full grow flex-col gap-2 rounded-b border-t border-gray-200 bg-white py-2 px-4 text-primary dark:bg-gray-800 dark:text-white lg:flex-row;
+    @apply bg-solid sticky bottom-0 left-0 flex w-full grow flex-col gap-2 rounded-b border-t border-gray-200 py-2 px-4 text-primary dark:bg-gray-800 dark:text-white lg:flex-row;
   }
 
   .paginated-table-controls-start {

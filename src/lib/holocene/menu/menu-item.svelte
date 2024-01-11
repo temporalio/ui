@@ -107,7 +107,7 @@
     {href}
     role="menuitem"
     class="menu-item {className}"
-    class:dark={$theme === 'dark'}
+    class:opposite={$theme === 'dark'}
     class:disabled
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
@@ -121,7 +121,7 @@
   <li
     role="menuitem"
     class="menu-item {className}"
-    class:dark={$theme === 'dark'}
+    class:opposite={$theme === 'dark'}
     class:destructive
     class:disabled
     aria-hidden={disabled ? 'true' : 'false'}
@@ -159,7 +159,7 @@
   .menu-item {
     @apply m-1 flex cursor-pointer flex-row items-center gap-2 rounded px-3 py-2 font-primary text-sm font-medium hover:bg-indigo-50 focus:outline-none focus-visible:bg-indigo-50 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline focus-visible:outline-1 focus-visible:outline-indigo-600;
 
-    &.dark {
+    &.opposite {
       @apply hover:bg-gray-700;
     }
   }

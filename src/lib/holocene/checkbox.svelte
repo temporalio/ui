@@ -62,7 +62,7 @@
   data-testid={$$restProps['data-testid'] ?? null}
   on:click|stopPropagation
   on:keypress|stopPropagation
-  class:dark={$theme === 'dark' || onDark}
+  class:opposite={$theme === 'dark' || onDark}
   class={$$props.class}
 >
   <label
@@ -122,7 +122,7 @@
   }
 
   .checkmark {
-    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border border-gray-500 bg-white dark:border-white dark:bg-primary;
+    @apply bg-solid relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border border-gray-500 dark:border-white dark:bg-primary;
   }
 
   input:checked ~ .checkmark,

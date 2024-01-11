@@ -30,7 +30,7 @@
   }
 
   .gray.active {
-    @apply border-2 border-gray-900 bg-white text-gray-900;
+    @apply bg-solid border-2 border-gray-900 text-gray-900 dark:border-gray-100;
   }
 
   .blueGray {
@@ -50,7 +50,7 @@
   }
 
   .lightBlue.active {
-    @apply border-2 border-gray-900 bg-blue-50 text-gray-900;
+    @apply border-2 border-gray-900 bg-blue-50 text-gray-900 dark:border-gray-100;
   }
 
   .green {

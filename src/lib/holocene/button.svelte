@@ -32,9 +32,9 @@
       variants: {
         variant: {
           primary:
-            'border-primary bg-primary [&.dark]:bg-gray-700 bg-gradient-to-br text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:from-blue-100 [&:not(:disabled):hover]:to-purple-100 [&:not(:disabled):hover]:text-primary [&:not(:disabled):hover]:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-primary focus-visible:border-indigo-600',
+            'border-primary bg-primary [&.opposite]:bg-gray-700 bg-gradient-to-br text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:from-blue-100 [&:not(:disabled):hover]:to-purple-100 [&:not(:disabled):hover]:text-primary [&:not(:disabled):hover]:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-primary focus-visible:border-indigo-600',
           secondary:
-            'border-primary bg-white text-primary [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-primary [&:not(:disabled):hover]:text-white [&:not(:disabled):hover]:border-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:bg-primary focus-visible:text-white focus-visible:border-white',
+            'border-primary bg-solid text-primary [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-primary [&:not(:disabled):hover]:text-white [&:not(:disabled):hover]:border-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:bg-primary focus-visible:text-white focus-visible:border-white',
           destructive:
             'border-red-700 bg-red-700 text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-red-200/50 [&:not(:disabled):hover]:border-white focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-red-200/50',
           ghost:
@@ -114,7 +114,7 @@
   type="button"
   class:active
   on:click|stopPropagation
-  class:dark={$theme === 'dark'}
+  class:opposite={$theme === 'dark'}
   class={buttonStyles({ variant, size, borderModifier, borderRadiusModifier })}
   {...$$restProps}
 >

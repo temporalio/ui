@@ -9,7 +9,7 @@
   export let open = false;
   export let title: string;
   export let position: 'bottom' | 'right' = 'bottom';
-  export let dark = true;
+  export let opposite = true;
   export let onClick: () => void;
   export let id = 'navigation-drawer';
   export let closeButtonLabel: string;
@@ -23,7 +23,7 @@
 {#if open}
   <aside
     class="drawer {position}"
-    class:dark
+    class:opposite
     class:max-w-[400px]={position === 'right'}
     transition:fly={flyParams}
     use:clickOutside
@@ -59,7 +59,7 @@
 
 <style lang="postcss">
   .drawer {
-    @apply fixed z-[55] h-auto overflow-y-auto rounded-t-lg bg-white text-primary shadow-xl;
+    @apply bg-solid fixed z-[55] h-auto overflow-y-auto rounded-t-lg text-primary shadow-xl;
 
     &.bottom {
       @apply bottom-0 left-0 right-0;
@@ -69,7 +69,7 @@
       @apply right-0 top-0 bottom-0 h-full;
     }
 
-    &.dark {
+    &.opposite {
       @apply bg-gray-900 text-gray-100;
     }
   }

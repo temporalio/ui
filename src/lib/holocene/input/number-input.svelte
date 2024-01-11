@@ -51,7 +51,7 @@
         </span>
       {/if}
       <input
-        class="m-2 block w-full bg-white text-center focus:outline-none"
+        class="bg-solid m-2 block w-full text-center focus:outline-none"
         class:disabled
         type="number"
         {max}
@@ -89,7 +89,7 @@
   }
 
   .input-container {
-    @apply relative box-border flex h-10 w-16 items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+    @apply relative box-border flex h-10 w-16 items-center rounded border border-gray-900 text-sm focus-within:border-blue-700 dark:border-gray-100;
   }
 
   .input-container.search {
@@ -144,21 +144,21 @@
   }
 
   /* Dark theme styles */
-  .input-container.dark,
-  .input-container.dark .icon-container,
-  .input-container.dark input,
-  .input-container.dark .copy-icon-container {
+  .input-container.opposite,
+  .input-container.opposite .icon-container,
+  .input-container.opposite input,
+  .input-container.opposite .copy-icon-container {
     @apply bg-gray-900 text-white;
   }
 
-  .input-container.dark input {
+  .input-container.opposite input {
     @apply placeholder:text-gray-200;
   }
 
-  .input-container.dark.disabled,
-  .input-container.dark.disabled .copy-icon-container,
-  .input-container.dark.disabled input {
-    @apply border-gray-900 bg-gray-900;
+  .input-container.opposite.disabled,
+  .input-container.opposite.disabled .copy-icon-container,
+  .input-container.opposite.disabled input {
+    @apply border-gray-900 bg-gray-900 dark:border-gray-100;
   }
 
   .unroundRight {
