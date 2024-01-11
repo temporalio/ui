@@ -43,34 +43,34 @@
   }
 
   table.fancy {
-    @apply border-separate border-spacing-0 rounded-xl border-[3px] border-gray-900 bg-white;
+    @apply border-separate border-spacing-0 rounded-xl border-[3px] border-primary dark:border-gray-100;
 
     thead {
-      @apply bg-gray-900 text-gray-100;
+      @apply bg-primary text-gray-100;
 
       :global(th) {
-        @apply border-t border-gray-900 px-1 py-2;
+        @apply border-t border-primary px-1 py-2 dark:border-gray-100;
       }
 
       :global(td) {
-        @apply border-t border-gray-900 px-1 py-2;
+        @apply border-t border-primary px-1 py-2 dark:border-gray-100;
 
         &:first-child {
-          @apply w-[1px] rounded-tl-lg border-l border-gray-900;
+          @apply w-[1px] rounded-tl-lg border-l border-primary dark:border-gray-100;
         }
 
         &:last-child {
-          @apply w-[1px] rounded-tr-lg border-r border-gray-900;
+          @apply w-[1px] rounded-tr-lg border-r border-primary dark:border-gray-100;
         }
       }
     }
 
     tbody :global {
       td {
-        @apply border-t border-gray-900 px-1 py-2 text-sm;
+        @apply border-t border-primary px-1 py-2 text-sm dark:border-gray-100;
 
         &:first-child {
-          @apply border-l border-gray-900 px-1;
+          @apply border-l border-primary px-1 dark:border-gray-100;
         }
 
         &:first-child:is(.expanded-cell) {
@@ -78,13 +78,13 @@
         }
 
         &:last-child {
-          @apply w-0 border-r border-gray-900 p-0;
+          @apply w-0 border-r border-primary p-0 dark:border-gray-100;
         }
       }
 
       &:last-child {
         td {
-          @apply border-b border-gray-900;
+          @apply border-b border-primary dark:border-gray-100;
 
           &:first-child {
             @apply rounded-bl-lg;
@@ -116,11 +116,11 @@
 
   table.simple {
     thead :global(th) {
-      @apply border-b border-primary py-2;
+      @apply border-b border-primary py-2 dark:border-gray-100;
     }
 
     tbody :global(td) {
-      @apply border-b border-gray-900 py-2;
+      @apply border-b border-primary py-2 dark:border-gray-100;
     }
 
     &:last-child {

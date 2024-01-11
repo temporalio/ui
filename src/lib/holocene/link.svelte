@@ -2,6 +2,7 @@
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
   import type { IconName } from '$lib/holocene/icon/paths';
+  import { theme } from '$lib/stores/theme';
 
   import Icon from './icon/icon.svelte';
 
@@ -28,6 +29,7 @@
   rel={newTab ? 'noreferrer' : null}
   class="link {icon ? 'inline-flex' : 'inline'} {className}"
   class:active
+  class:dark={$theme === 'dark'}
   on:click
   tabindex={href ? null : 0}
   {...$$restProps}
@@ -40,7 +42,7 @@
 
 <style lang="postcss">
   .link {
-    @apply max-w-fit cursor-pointer items-center gap-2 rounded underline underline-offset-2 hover:text-indigo-600 focus-visible:bg-blue-100 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
+    @apply max-w-fit cursor-pointer items-center gap-2 rounded underline underline-offset-2 hover:text-indigo-600 focus-visible:bg-blue-100 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none dark:hover:text-offWhite;
 
     &.active {
       @apply text-blue-900;

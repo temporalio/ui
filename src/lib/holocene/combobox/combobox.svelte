@@ -7,6 +7,7 @@
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
+  import { theme } from '$lib/stores/theme';
 
   import Icon from '../icon/icon.svelte';
   import type { IconName } from '../icon/paths';
@@ -241,55 +242,57 @@
 </script>
 
 <MenuContainer {open} on:close={resetValueAndOptions}>
-  <label class="combobox-label" class:sr-only={labelHidden} for={id}>
-    {label}
-  </label>
+  <div class:dark={$theme === 'dark'}>
+    <label class="combobox-label" class:sr-only={labelHidden} for={id}>
+      {label}
+    </label>
 
-  <div class="combobox-wrapper">
-    {#if leadingIcon}
-      <Icon
-        width={20}
-        height={20}
-        class="ml-2 shrink-0 text-gray-500"
-        name={leadingIcon}
+    <div class="combobox-wrapper">
+      {#if leadingIcon}
+        <Icon
+          width={20}
+          height={20}
+          class="ml-2 shrink-0 text-gray-500"
+          name={leadingIcon}
+        />
+      {/if}
+      <input
+        {id}
+        {placeholder}
+        {required}
+        {readonly}
+        {disabled}
+        type="text"
+        value={displayValue}
+        class:disabled
+        class="combobox-input {className}"
+        role="combobox"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        data-lpignore="true"
+        aria-controls="{id}-listbox"
+        aria-expanded={$open}
+        aria-required={required}
+        aria-autocomplete="list"
+        on:input|stopPropagation={handleInput}
+        on:keydown|stopPropagation={handleInputKeydown}
+        on:click|stopPropagation={handleInputClick}
+        data-testid={$$props['data-testid'] ?? id}
+        bind:this={inputElement}
+        {...$$restProps}
       />
-    {/if}
-    <input
-      {id}
-      {placeholder}
-      {required}
-      {readonly}
-      {disabled}
-      type="text"
-      value={displayValue}
-      class:disabled
-      class="combobox-input {className}"
-      role="combobox"
-      autocomplete="off"
-      autocapitalize="off"
-      spellcheck="false"
-      data-lpignore="true"
-      aria-controls="{id}-listbox"
-      aria-expanded={$open}
-      aria-required={required}
-      aria-autocomplete="list"
-      on:input|stopPropagation={handleInput}
-      on:keydown|stopPropagation={handleInputKeydown}
-      on:click|stopPropagation={handleInputClick}
-      data-testid={$$props['data-testid'] ?? id}
-      bind:this={inputElement}
-      {...$$restProps}
-    />
-    <button
-      aria-label={toggleLabel}
-      class="combobox-button"
-      tabindex={-1}
-      aria-controls="{id}-listbox"
-      aria-expanded={$open}
-      on:click={toggleList}
-    >
-      <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
-    </button>
+      <button
+        aria-label={toggleLabel}
+        class="combobox-button"
+        tabindex={-1}
+        aria-controls="{id}-listbox"
+        aria-expanded={$open}
+        on:click={toggleList}
+      >
+        <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
+      </button>
+    </div>
   </div>
 
   <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
@@ -325,7 +328,7 @@
   }
 
   .combobox-wrapper {
-    @apply flex h-10 w-full flex-row items-center rounded-lg border border-primary bg-white text-sm focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-blue-600/50 focus-within:outline-none;
+    @apply flex h-10 w-full flex-row items-center rounded-lg border border-primary bg-white text-sm focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-blue-600/50 focus-within:outline-none dark:border-gray-300;
   }
 
   .combobox-input {

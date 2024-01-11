@@ -4,6 +4,7 @@
   import { createEventDispatcher } from 'svelte';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { theme } from '$lib/stores/theme';
   import { omit } from '$lib/utilities/omit';
 
   type T = $$Generic;
@@ -62,6 +63,7 @@
   on:click|stopPropagation
   on:keypress|stopPropagation
   class="relative {$$props.class}"
+  class:dark={$theme === 'dark' || onDark}
 >
   <label
     on:click
@@ -102,15 +104,11 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply block h-[18px] w-[18px] cursor-pointer select-none text-sm leading-[18px] text-primary;
+    @apply block h-[18px] w-[18px] cursor-pointer select-none text-sm leading-[18px] text-primary dark:text-white;
   }
 
   .checkbox.hoverable {
-    @apply h-9 w-9 rounded-full hover:bg-purple-200;
-  }
-
-  .checkbox.on-dark {
-    @apply text-white;
+    @apply h-9 w-9 rounded-full hover:bg-purple-200 dark:hover:bg-gray-800;
   }
 
   .label {
@@ -126,15 +124,11 @@
   }
 
   .checkmark {
-    @apply absolute top-0 left-0 box-content h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
+    @apply absolute top-0 left-0 box-content h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white dark:border-white dark:bg-primary;
   }
 
   .checkmark.hoverable {
     @apply translate-x-1/2 translate-y-1/2;
-  }
-
-  .checkmark.on-dark {
-    @apply border-white bg-primary;
   }
 
   input:checked + .checkmark,

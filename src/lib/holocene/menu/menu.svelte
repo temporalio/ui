@@ -4,6 +4,7 @@
 
   import { getContext } from 'svelte';
 
+  import { theme } from '$lib/stores/theme';
   import { getFocusableElements } from '$lib/utilities/focus-trap';
 
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
@@ -39,24 +40,26 @@
   };
 </script>
 
-<ul
-  in:fly={{ duration: 100 }}
-  role="menu"
-  class="menu {position} {className}"
-  class:hidden={!$open}
-  aria-labelledby={id}
-  tabindex={-1}
-  {id}
-  bind:this={menuElement}
-  on:focusout={handleFocusOut}
-  {...$$restProps}
->
-  <slot />
-</ul>
+<div class:dark={$theme === 'dark'}>
+  <ul
+    in:fly={{ duration: 100 }}
+    role="menu"
+    class="menu {position} {className}"
+    class:hidden={!$open}
+    aria-labelledby={id}
+    tabindex={-1}
+    {id}
+    bind:this={menuElement}
+    on:focusout={handleFocusOut}
+    {...$$restProps}
+  >
+    <slot />
+  </ul>
+</div>
 
 <style lang="postcss">
   .menu {
-    @apply absolute z-20 mt-1 max-h-[480px] min-w-full list-none overflow-auto rounded-lg border border-gray-900 bg-white text-primary shadow;
+    @apply absolute z-20 mt-1 max-h-[480px] min-w-full list-none overflow-auto rounded-lg border border-primary bg-white text-primary shadow dark:border-gray-300 dark:bg-primary dark:text-white;
 
     &.left {
       @apply left-0 origin-top-left;

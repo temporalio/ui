@@ -14,6 +14,7 @@
     pagination,
     perPageKey,
   } from '$lib/stores/pagination';
+  import { theme } from '$lib/stores/theme';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   type Item = $$Generic;
@@ -92,6 +93,7 @@
 </script>
 
 <div
+  class:dark={$theme === 'dark'}
   class="paginated-table-wrapper"
   bind:this={tableContainer}
   style="max-height: calc(100vh - {tableOffset}px)"
@@ -168,7 +170,7 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply h-10 bg-primary text-white;
+      @apply h-10 bg-primary text-white dark:bg-gray-800;
     }
 
     :global(tr > th) {
@@ -177,19 +179,15 @@
   }
 
   .paginated-table-body {
-    @apply bg-white;
+    @apply bg-white dark:bg-gray-700;
 
     :global(tr:not(.empty)) {
-      @apply h-12 border-b border-primary last-of-type:border-0 hover:bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 hover:bg-fixed;
-    }
-
-    :global(tr > td > .table-link) {
-      @apply hover:text-blue-700 hover:underline hover:decoration-blue-700;
+      @apply h-12 border-b border-primary last-of-type:border-0 hover:bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 hover:bg-fixed dark:hover:from-gray-700 dark:hover:to-gray-300;
     }
   }
 
   .paginated-table-controls {
-    @apply sticky bottom-0 left-0 flex w-full grow flex-col gap-2 rounded-b border-t border-gray-200 bg-white py-2 px-4 text-primary lg:flex-row;
+    @apply sticky bottom-0 left-0 flex w-full grow flex-col gap-2 rounded-b border-t border-gray-200 bg-white py-2 px-4 text-primary dark:bg-gray-800 dark:text-white lg:flex-row;
   }
 
   .paginated-table-controls-start {

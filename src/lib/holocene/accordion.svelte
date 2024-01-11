@@ -6,6 +6,7 @@
 
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { theme } from '$lib/stores/theme';
 
   import type { IconName } from './icon/paths';
 
@@ -45,7 +46,8 @@
 </script>
 
 <div
-  class="flex w-full cursor-default flex-col rounded-xl border-2 border-gray-900 bg-white p-4 text-primary {className}"
+  class="accordion {className}"
+  class:dark={$theme === 'dark'}
   {...$$restProps}
 >
   <button
@@ -95,3 +97,13 @@
     <slot />
   </div>
 </div>
+
+<style lang="postcss">
+  .accordion {
+    @apply flex w-full cursor-default flex-col rounded-xl border-2 border-primary bg-white p-4 text-primary;
+
+    &.dark {
+      @apply border-gray-300 bg-primary text-white;
+    }
+  }
+</style>

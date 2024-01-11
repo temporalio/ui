@@ -14,6 +14,7 @@
   import { authUser } from '$lib/stores/auth-user';
   import { dataEncoder } from '$lib/stores/data-encoder';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
+  import { theme } from '$lib/stores/theme';
   import type { NamespaceListItem } from '$lib/types/global';
 
   export let logout: () => void;
@@ -48,9 +49,10 @@
 <svelte:window bind:innerWidth={screenWidth} />
 
 <nav
-  class="sticky top-0 z-40 flex w-full flex-col items-center justify-end border-b-2 bg-gray-100 p-1 px-4 md:flex-row md:px-8"
-  data-testid="top-nav"
+  class="top-nav"
   class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
+  class:dark={$theme === 'dark'}
+  data-testid="top-nav"
   aria-label={translate('common.main')}
 >
   <div class="flex grow items-center">
@@ -106,3 +108,13 @@
     {/if}
   </div>
 </nav>
+
+<style lang="postcss">
+  .top-nav {
+    @apply sticky top-0 z-40 flex w-full flex-col items-center justify-end border-b-2 bg-gray-100 p-1 px-4 md:flex-row md:px-8;
+
+    &.dark {
+      @apply bg-primary text-white;
+    }
+  }
+</style>

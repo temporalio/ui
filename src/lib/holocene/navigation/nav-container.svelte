@@ -82,7 +82,7 @@
 
 <style lang="postcss">
   .nav-header {
-    @apply relative flex h-screen flex-col justify-between bg-primary text-white;
+    @apply relative flex h-screen flex-col justify-between border-r border-white bg-primary text-white;
   }
 
   .nav-header.cloud {
