@@ -83,8 +83,10 @@
   $: disabled = disabled || copyable;
 </script>
 
-<div class={className}>
-  <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
+<div class="flex flex-col gap-1 {className}">
+  <label class={theme} class:required class:sr-only={labelHidden} for={id}
+    >{label}</label
+  >
   <div
     class="input-container {theme}"
     class:disabled
@@ -100,7 +102,7 @@
       </span>
     {/if}
     <input
-      class="m-2 block w-full bg-white focus:outline-none"
+      class="input"
       class:disabled
       {disabled}
       data-lpignore="true"
@@ -121,11 +123,6 @@
       use:callFocus
       {...$$restProps}
     />
-    {#if suffix}
-      <div class="suffix">
-        {suffix}
-      </div>
-    {/if}
     {#if copyable}
       <div class="copy-icon-container">
         <IconButton
@@ -143,18 +140,23 @@
         <IconButton label={clearButtonLabel} on:click={onClear} icon="close" />
       </div>
     {/if}
-    {#if maxLength && !suffix && !disabled}
+    {#if maxLength && !disabled}
       <span class="count">
         <span
-          class="text-blue-700"
+          class:ok={maxLength - value.length > 5}
           class:warn={maxLength - value.length <= 5}
           class:error={maxLength === value.length}>{value.length}</span
-        >&nbsp;/&nbsp;{maxLength}
+        >/{maxLength}
       </span>
+    {/if}
+    {#if suffix}
+      <div class="suffix">
+        {suffix}
+      </div>
     {/if}
   </div>
   <span
-    class="hint-text inline-block"
+    class="hint-text inline-block {theme}"
     class:invalid={!valid}
     class:error
     class:hidden={!hintText}
@@ -175,23 +177,19 @@
   }
 
   .input-container {
-    @apply relative box-border inline-flex h-10 w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+    @apply relative box-border inline-flex h-10 w-full items-center rounded border text-sm;
+
+    &.error {
+      @apply border-2;
+    }
   }
 
-  .input-container.error {
-    @apply border-2 border-red-700;
+  .input {
+    @apply m-2 w-full bg-transparent focus:outline-none;
   }
 
   .suffix {
-    @apply block h-full w-full rounded-tr rounded-br border-l border-gray-900 bg-offWhite p-2;
-  }
-
-  .input-container:active .suffix {
-    @apply border-blue-700;
-  }
-
-  .input-container.error .suffix {
-    @apply border-red-700 bg-red-100;
+    @apply block h-full w-fit rounded-tr rounded-br border-l px-4 py-2;
   }
 
   .unroundRight {
@@ -219,77 +217,126 @@
   }
 
   .clear-icon-container {
-    @apply mr-2 flex w-6 cursor-pointer items-center justify-center rounded-full text-primary hover:bg-gray-200;
-  }
-
-  .input-container.invalid {
-    @apply border-red-700 text-red-700;
+    @apply mr-2 flex w-6 cursor-pointer items-center justify-center rounded-full;
   }
 
   .count {
-    @apply invisible mr-2 font-secondary text-sm font-medium text-primary;
+    @apply mx-2 hidden font-secondary text-sm font-medium tracking-widest;
   }
 
-  .count > .warn {
-    @apply text-orange-600;
-  }
-
-  .count > .error {
-    @apply text-red-700;
-  }
-
-  input:focus + .count {
-    @apply visible;
+  .input:focus ~ .count {
+    @apply block;
   }
 
   .hint-text {
-    @apply mt-2 text-xs;
-  }
-
-  .hint-text.error,
-  .hint-text.invalid {
-    @apply text-red-700;
+    @apply text-xs;
   }
 
   /* Light theme styles */
-  .input-container.light,
-  .input-container.light .icon-container,
-  .input-container.light input {
-    @apply bg-white;
-  }
+  .input-container.light {
+    @apply border-primary bg-white text-primary focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50 focus-within:outline-none;
 
-  .input-container.light .icon-container {
-    @apply text-gray-400;
-  }
+    > .input {
+      @apply caret-indigo-600;
+    }
 
-  .input-container.light.disabled {
-    @apply border-gray-600 bg-gray-50  text-gray-600;
-  }
+    &.disabled {
+      @apply border-gray-600 bg-gray-50  text-gray-600;
 
-  .input-container.light.disabled input {
-    @apply bg-gray-50;
-  }
+      > .input {
+        @apply bg-gray-50;
+      }
 
-  .input-container.light.disabled .copy-icon-container {
-    @apply border-gray-600 bg-gray-200;
+      > .copy-icon-container {
+        @apply border-gray-600 bg-gray-200;
+      }
+    }
+
+    &.error,
+    &.invalid {
+      @apply border-danger text-danger focus-within:shadow-red-500/50;
+
+      > .input {
+        @apply caret-danger;
+      }
+    }
+
+    > .count > .ok {
+      @apply text-blue-700;
+    }
+
+    > .count > .warn {
+      @apply text-orange-600;
+    }
+
+    > .count > .error {
+      @apply text-danger;
+    }
+
+    > .icon-container {
+      @apply text-gray-400;
+    }
+
+    + .hint-text.error,
+    + .hint-text.invalid {
+      @apply text-danger;
+    }
   }
 
   /* Dark theme styles */
-  .input-container.dark,
-  .input-container.dark .icon-container,
-  .input-container.dark input,
-  .input-container.dark .copy-icon-container {
-    @apply bg-gray-900 text-white;
+  label.dark,
+  .hint-text.dark {
+    @apply text-white;
   }
 
-  .input-container.dark input {
-    @apply placeholder:text-gray-200;
-  }
+  .input-container.dark {
+    @apply border-gray-400 bg-transparent text-white focus-within:border-indigo-600 focus-within:bg-primary focus-within:shadow-focus focus-within:shadow-indigo-500/50 focus-within:outline-none;
 
-  .input-container.dark.disabled,
-  .input-container.dark.disabled .copy-icon-container,
-  .input-container.dark.disabled input {
-    @apply border-gray-900 bg-gray-900;
+    > .input {
+      @apply caret-indigo-600;
+    }
+
+    &.disabled {
+      @apply border-gray-600 bg-gray-50 text-gray-600;
+
+      > .input {
+        @apply bg-gray-50;
+      }
+
+      > .copy-icon-container {
+        @apply border-gray-600 bg-gray-200;
+      }
+    }
+
+    &.error,
+    &.invalid {
+      @apply border-red-600 text-red-600 focus-within:shadow-red-600/50;
+
+      > .input {
+        @apply caret-red-600;
+      }
+    }
+
+    > .count > .ok {
+      @apply text-blue-300;
+    }
+
+    > .count > .warn {
+      @apply text-orange-300;
+    }
+
+    > .count > .error {
+      @apply text-red-300;
+    }
+
+    > .icon-container {
+      @apply text-gray-200;
+    }
+
+    + .hint-text.error,
+    + .hint-text.invalid {
+      @apply text-red-600;
+    }
   }
 
   input[type='search']::-webkit-search-cancel-button {
