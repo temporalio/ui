@@ -1,6 +1,5 @@
 import Slot from './slot.svelte';
 import type { Preview } from '@storybook/svelte';
-import { theme } from '../src/lib/stores/theme';
 import '../src/app.css';
 
 const preview: Preview = {
