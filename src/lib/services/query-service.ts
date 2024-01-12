@@ -1,11 +1,6 @@
-import { passAccessToken as codecPassAccessToken } from '$lib/stores/data-encoder-config';
 import type { WorkflowQueryRouteParameters } from '$lib/types/api';
 import type { Eventual, Settings } from '$lib/types/global';
 import { convertPayloadToJsonWithCodec } from '$lib/utilities/decode-payload';
-import {
-  getCodecEndpoint,
-  getCodecPassAccessToken,
-} from '$lib/utilities/get-codec';
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
 import { has } from '$lib/utilities/has';
 import {
@@ -124,19 +119,10 @@ export async function getQuery(
     let data: ParsedQuery = queryResult.payloads;
     try {
       if (data[0]) {
-        const endpoint = getCodecEndpoint(settings);
-        const passAccessToken = getCodecPassAccessToken(
-          settings,
-          codecPassAccessToken,
-        );
-        const _settings = {
-          ...settings,
-          codec: { ...settings?.codec, endpoint, passAccessToken },
-        };
         const convertedAttributes = await convertPayloadToJsonWithCodec({
           attributes: queryResult,
           namespace: options.namespace,
-          settings: _settings,
+          settings,
           accessToken,
         });
 
