@@ -4,6 +4,10 @@ import type { Payload, Payloads } from '$lib/types';
 import type { MarkerRecordedEvent, WorkflowEvent } from '$lib/types/events';
 import { capitalize } from '$lib/utilities/format-camel-case';
 
+import {
+  decodeAllPotentialPayloadsWithCodec,
+  type PotentiallyDecodable,
+} from './decode-payload';
 import type { CombinedAttributes } from './format-event-attributes';
 import { has } from './has';
 import { isObject } from './is';
@@ -184,15 +188,18 @@ const getActivityType = (payload: Payload) => {
  * preferred keys. If a preferred key is found, it will be returned.
  * Otherwise, it will return the first eligible event attribute.
  */
-const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
+const getSummaryAttribute = async (
+  event: WorkflowEvent,
+): Promise<SummaryAttribute> => {
   const first = getFirstDisplayAttribute(event);
 
   if (isLocalActivityMarkerEvent(event as MarkerRecordedEvent)) {
-    const payload =
-      event.markerRecordedEventAttributes?.details?.data?.payloads?.[0];
-
+    const payloads = event.markerRecordedEventAttributes?.details?.data;
+    const decodedPayloads = (await decodeAllPotentialPayloadsWithCodec(
+      payloads,
+    )) as PotentiallyDecodable;
+    const payload = decodedPayloads?.payloads?.[0];
     const activityType = getActivityType(payload);
-
     if (activityType) {
       return formatSummaryValue('ActivityType', activityType);
     }
@@ -208,20 +215,20 @@ const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
   return first;
 };
 
-export const getSummaryForEventGroup = ({
+export const getSummaryForEventGroup = async ({
   lastEvent,
-}: EventGroup): SummaryAttribute => {
-  return getSummaryAttribute(lastEvent);
+}: EventGroup): Promise<SummaryAttribute> => {
+  return await getSummaryAttribute(lastEvent);
 };
 
-export const getSingleAttributeForEvent = (
+export const getSingleAttributeForEvent = async (
   event: WorkflowEvent | EventGroup,
-): SummaryAttribute => {
+): Promise<SummaryAttribute> => {
   if (!event) return emptyAttribute;
 
   if (isEventGroup(event)) {
     return getSummaryForEventGroup(event);
   }
 
-  return getSummaryAttribute(event);
+  return await getSummaryAttribute(event);
 };

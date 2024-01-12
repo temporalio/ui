@@ -167,12 +167,14 @@
     <td class="overflow-hidden">
       <div class="flex w-full items-center justify-between">
         <div class="grow truncate">
-          <EventDetailsRow
-            {...getSingleAttributeForEvent(currentEvent)}
-            {attributes}
-            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-            inline
-          />
+          {#await getSingleAttributeForEvent(currentEvent) then attribute}
+            <EventDetailsRow
+              {...attribute}
+              {attributes}
+              class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
+              inline
+            />
+          {/await}
         </div>
         <div>
           <Icon class="inline" name="chevron-down" />

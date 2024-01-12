@@ -1,4 +1,9 @@
+import { get } from 'svelte/store';
+
+import { page } from '$app/stores';
+
 import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
+import { authUser } from '$lib/stores/auth-user';
 import type {
   codecEndpoint,
   includeCredentials,
@@ -166,9 +171,9 @@ const keyIs = (key: string, ...validKeys: string[]) => {
 
 export const decodeAllPotentialPayloadsWithCodec = async (
   anyAttributes: EventAttribute | PotentiallyDecodable,
-  namespace: string,
-  settings: Settings,
-  accessToken: string,
+  namespace: string = get(page).params.namespace,
+  settings: Settings = get(page).data.settings,
+  accessToken: string = get(authUser).accessToken,
 ): Promise<EventAttribute | PotentiallyDecodable> => {
   const decode = decodePayloadWithCodec(namespace, settings, accessToken);
   if (anyAttributes) {

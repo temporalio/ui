@@ -113,23 +113,23 @@ describe('getSingleAttributeForEvent', () => {
     },
   };
 
-  it('should return "workflowType.name" if the workflow type exists', () => {
-    expect(getSingleAttributeForEvent(workflowEvent)).toStrictEqual({
+  it('should return "workflowType.name" if the workflow type exists', async () => {
+    expect(await getSingleAttributeForEvent(workflowEvent)).toStrictEqual({
       key: 'workflowTypeName',
       value: 'RainbowStatusesWorkflow',
     });
   });
 
-  it('should return "taskqueue.name" if the workflow type does not exists', () => {
+  it('should return "taskqueue.name" if the workflow type does not exists', async () => {
     const event = { ...workflowEvent };
     event.attributes.workflowType = null;
-    expect(getSingleAttributeForEvent(event)).toStrictEqual({
+    expect(await getSingleAttributeForEvent(event)).toStrictEqual({
       key: 'taskQueueName',
       value: 'rainbow-statuses',
     });
   });
 
-  it('should return "parentInitiatedEventId" if the workflow type and task queue does not exist', () => {
+  it('should return "parentInitiatedEventId" if the workflow type and task queue does not exist', async () => {
     const event = { ...workflowEvent };
     event.attributes.workflowType = null as unknown as {
       name: string;
@@ -140,14 +140,14 @@ describe('getSingleAttributeForEvent', () => {
       kind: string;
     };
 
-    expect(getSingleAttributeForEvent(event)).toStrictEqual({
+    expect(await getSingleAttributeForEvent(event)).toStrictEqual({
       key: 'parentInitiatedEventId',
       value: '0',
     });
   });
 
-  it('should return empty key value object if none of the attributes display', () => {
-    expect(getSingleAttributeForEvent(null)).toStrictEqual({
+  it('should return empty key value object if none of the attributes display', async () => {
+    expect(await getSingleAttributeForEvent(null)).toStrictEqual({
       key: '',
       value: '',
     });
