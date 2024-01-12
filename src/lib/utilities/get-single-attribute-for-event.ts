@@ -218,7 +218,7 @@ const getSummaryAttribute = async (
 export const getSummaryForEventGroup = async ({
   lastEvent,
 }: EventGroup): Promise<SummaryAttribute> => {
-  return await getSummaryAttribute(lastEvent);
+  return getSummaryAttribute(lastEvent);
 };
 
 export const getSingleAttributeForEvent = async (
@@ -230,5 +230,5 @@ export const getSingleAttributeForEvent = async (
     return getSummaryForEventGroup(event);
   }
 
-  return await getSummaryAttribute(event);
+  return getSummaryAttribute(event);
 };
