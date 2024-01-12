@@ -15,13 +15,6 @@ const preview: Preview = {
       },
     },
   },
-  decorators: [
-    (_, context) => {
-      const selectedTheme = context.globals.theme || 'light';
-      theme.set(selectedTheme);
-      return Slot;
-    },
-  ],
   parameters: {
     actions: { argTypesRegex: '^on[A-Z].*' },
     backgrounds: {
