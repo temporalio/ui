@@ -7,14 +7,18 @@ import type { BatchOperationState, BatchOperationType } from '$lib/types/batch';
 import type {
   SearchAttributesValue,
   WorkflowStatus,
+  WorkflowTaskFailedCause,
 } from '$lib/types/workflows';
 
 import type { EventType } from './is-event-type';
 
-const fromScreamingEnum = <T>(potentialScreamingEnum: T, prefix: string): T => {
-  if (!potentialScreamingEnum) return;
+export const fromScreamingEnum = <T>(
+  potentialScreamingEnum: T,
+  prefix: string,
+): T => {
+  if (!potentialScreamingEnum) return potentialScreamingEnum;
   const stringEnum = potentialScreamingEnum as string;
-  const split = stringEnum.split('_');
+  const split = stringEnum?.split('_');
   if (split?.length === 1) return potentialScreamingEnum;
   const formatted = split
     .map((word) => {
@@ -48,10 +52,6 @@ export const toNamespaceStateReadable = (
   return fromScreamingEnum(status, 'NamespaceState');
 };
 
-export const toNamespaceStatusReadable = (status: string): string => {
-  return fromScreamingEnum(status, 'ArchivalState');
-};
-
 export const toEventNameReadable = (status: EventType): EventType => {
   return fromScreamingEnum(status, 'EventType');
 };
@@ -68,6 +68,8 @@ export const toBatchOperationTypeReadable = (
   return fromScreamingEnum(status, 'BatchOperationType');
 };
 
-export const toTaskQueueKindReadable = (status) => {
-  return fromScreamingEnum(status, 'TaskQueueKind');
+export const toWorkflowTaskFailureReadable = (
+  cause: WorkflowTaskFailedCause,
+): WorkflowTaskFailedCause => {
+  return fromScreamingEnum(cause, 'WorkflowTaskFailedCause');
 };
