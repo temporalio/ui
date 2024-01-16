@@ -18,6 +18,7 @@
   import type { ScheduleListEntry } from '$lib/types';
   import type { ErrorCallback } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
+  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   $: namespace = $page.params.namespace;
 
@@ -67,6 +68,7 @@
         <Button
           data-testid="create-schedule"
           on:click={() => goto(routeForScheduleCreate({ namespace }))}
+          disabled={!writeActionsAreAllowed()}
         >
           {translate('schedules.create')}
         </Button>
@@ -127,6 +129,7 @@
           <Button
             data-testid="create-schedule"
             on:click={() => goto(routeForScheduleCreate({ namespace }))}
+            disabled={!writeActionsAreAllowed()}
           >
             {translate('schedules.create')}
           </Button>
