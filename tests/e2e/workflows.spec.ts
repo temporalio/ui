@@ -19,7 +19,7 @@ test.describe('Workflows list', () => {
     toggle = codeBlock.getByRole('heading', { name: 'Input and Results' });
     await toggle.click();
     const input = page.getByTestId('workflow-input');
-    await expect(input).toContainText('"Mock decoded payload"');
+    await expect(input).toContainText('Mock decoded payload');
     await toggle.click();
 
     codeBlock = page.locator('.expanded-cell >> .cm-editor');
@@ -27,35 +27,35 @@ test.describe('Workflows list', () => {
     toggle = page.getByRole('cell', { name: 'WorkflowExecutionStarted' });
     await toggle.click();
     await expect(
-      codeBlock.getByText('"Mock decoded payload"').first(),
+      codeBlock.getByText('Mock decoded payload').first(),
     ).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'MarkerRecorded' }).first();
     await toggle.click();
     await expect(
-      codeBlock.getByText('"Mock decoded payload"').first(),
+      codeBlock.getByText('Mock decoded payload').first(),
     ).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'ActivityTaskScheduled' }).first();
     await toggle.click();
     await expect(
-      codeBlock.getByText('"Mock decoded payload"').first(),
+      codeBlock.getByText('Mock decoded payload').first(),
     ).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'ActivityTaskCompleted' }).first();
     await toggle.click();
     await expect(
-      codeBlock.getByText('"Mock decoded payload"').first(),
+      codeBlock.getByText('Mock decoded payload').first(),
     ).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'WorkflowExecutionCompleted' });
     await toggle.click();
     await expect(
-      codeBlock.getByText('"Mock decoded payload"').first(),
+      codeBlock.getByText('Mock decoded payload').first(),
     ).toBeVisible();
     await toggle.click();
   });
@@ -71,7 +71,7 @@ test.describe('Workflows list', () => {
     await tab.click();
 
     const codeBlock = page.locator('.readOnly .cm-editor');
-    await expect(codeBlock).toContainText('"Mock decoded payload"');
+    await expect(codeBlock).toContainText('Mock decoded payload');
   });
 
   test('should render decoded query results', async ({ page }) => {
@@ -85,6 +85,6 @@ test.describe('Workflows list', () => {
     await page.getByLabel('Query Type').selectOption('is-blocked');
 
     const codeBlock = page.locator('.readOnly .cm-editor');
-    await expect(codeBlock).toContainText('"Mock decoded payload"');
+    await expect(codeBlock).toContainText('Mock decoded payload');
   });
 });
