@@ -29,6 +29,16 @@
   />
 </Template>
 
+<Template id="shell" let:args>
+  <CodeBlock
+    language="shell"
+    copyIconTitle="Click to copy content"
+    copySuccessIconTitle="Content copied to clipboard"
+    {...args}
+    on:change={handleChange}
+  />
+</Template>
+
 <Template id="text" let:args>
   <CodeBlock
     language="text"
@@ -44,6 +54,19 @@
   name="json code block"
   args={{
     content: stringifyWithBigInt({ foo: 'bar', baz: false, blue: 42 }),
+    editable: false,
+  }}
+/>
+
+<Story
+  template="shell"
+  name="shell code block"
+  args={{
+    content: `# clone the repository 
+    git clone https://github.com/temporalio/ui
+# setup locally
+    cd ui
+    npm install`,
     editable: false,
   }}
 />

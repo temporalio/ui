@@ -9,8 +9,10 @@
     foldGutter,
     indentOnInput,
     indentUnit,
+    StreamLanguage,
     syntaxHighlighting,
   } from '@codemirror/language';
+  import { shell } from '@codemirror/legacy-modes/mode/shell';
   import { EditorState } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
   import { createEventDispatcher, onMount } from 'svelte';
@@ -28,7 +30,7 @@
 
   type BaseProps = HTMLAttributes<HTMLDivElement> & {
     content: string;
-    language?: 'json' | 'text';
+    language?: 'json' | 'text' | 'shell';
     editable?: boolean;
     inline?: boolean;
     testId?: string;
@@ -110,6 +112,10 @@
 
     if (language === 'json') {
       extensions.push(json());
+    }
+
+    if (language === 'shell') {
+      extensions.push(StreamLanguage.define(shell));
     }
 
     if (!inline) {

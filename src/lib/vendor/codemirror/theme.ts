@@ -52,4 +52,6 @@ export const TEMPORAL_SYNTAX = HighlightStyle.define([
   { tag: tags.bool, color: colors.indigo['200'] },
   { tag: tags.number, color: colors.indigo['200'] },
   { tag: tags.operator, color: colors.purple['400'] },
+  { tag: tags.comment, color: colors.gray['400'] },
+  { tag: tags.variableName, color: colors.green['200'] },
 ]);
