@@ -5,10 +5,14 @@
   import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import { isChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   const compact = true;
 
@@ -51,13 +55,32 @@
     : $eventHistory?.start;
   $: initialItem = currentEvents?.[0];
   $: updating = currentEvents.length && !$fullEventHistory.length;
-  $: groupEvent = groupEvents($fullEventHistory).find((e) => e.id === groupId);
-  $: events = groupEvent ? [groupEvent] : [];
+  $: eventGroup = groupEvents($fullEventHistory).find((e) => e.id === groupId);
+  $: events = eventGroup ? [eventGroup] : [];
+
+  function getLink(group: EventGroup) {
+    const childEvent = group?.eventList.find(isChildWorkflowClosedEvent);
+    return childEvent
+      ? routeForEventHistory({
+          namespace,
+          workflow: childEvent.attributes.workflowExecution.workflowId,
+          run: childEvent.attributes.workflowExecution.runId,
+        })
+      : '';
+  }
+
+  $: workflowLink = getLink(eventGroup);
 </script>
 
-{#if groupEvent}
+{#if eventGroup}
   <h2 class="flex w-full items-center text-lg font-medium">
-    {groupEvent.displayName}
+    {#if workflowLink}
+      <Link href={workflowLink} newTab>
+        {eventGroup.displayName}
+      </Link>
+    {:else}
+      {eventGroup.displayName}
+    {/if}
   </h2>
 {/if}
 <EventHistoryTimeline history={$fullEventHistory} maxHeight={240} />
