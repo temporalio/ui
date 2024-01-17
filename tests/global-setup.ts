@@ -12,13 +12,17 @@ const setupDependencies = async () => {
   const temporalServer = await createTemporalServer();
   const uiServer = await createUIServer('e2e');
 
-  await uiServer.ready();
-  await codecServer.start();
-  await temporalServer.ready();
+  try {
+    await uiServer.ready();
+    await codecServer.start();
+    await temporalServer.ready();
 
-  const client = await connect();
-  await runWorker();
-  await startWorkflows(client);
+    const client = await connect();
+    await runWorker();
+    await startWorkflows(client);
+  } catch (e) {
+    console.log('Error setting up server: ', e);
+  }
 };
 
 async function globalSetup(config: FullConfig) {

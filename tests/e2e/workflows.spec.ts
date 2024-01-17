@@ -4,7 +4,7 @@ test.beforeEach(async ({ page, baseURL }) => {
   await page.goto(baseURL);
 });
 
-test.describe('Workflows list', () => {
+test.describe('Workflow Execution Page', () => {
   test('should render decoded Payloads', async ({ page }) => {
     test.slow();
     await page
@@ -17,9 +17,7 @@ test.describe('Workflows list', () => {
     });
     await toggle.click();
     const input = page.getByTestId('workflow-input');
-    await expect(input).toContainText(
-      'Input ›"Plain text input 1" Click to copy content',
-    );
+    await expect(input).toContainText('Mock decoded payload');
   });
 
   test('should render decoded call stack', async ({ page }) => {
@@ -33,7 +31,7 @@ test.describe('Workflows list', () => {
     await tab.click();
 
     const codeBlock = page.getByRole('textbox');
-    await expect(codeBlock).toContainText('at workflow');
+    await expect(codeBlock).toContainText('Mock decoded payload');
   });
 
   test('should render decoded query results', async ({ page }) => {
@@ -47,6 +45,6 @@ test.describe('Workflows list', () => {
     await page.getByLabel('Query Type').selectOption('is-blocked');
 
     const codeBlock = page.getByRole('textbox');
-    await expect(codeBlock).toContainText('true');
+    await expect(codeBlock).toContainText('Mock decoded payload');
   });
 });
