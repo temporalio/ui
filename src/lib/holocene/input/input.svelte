@@ -204,10 +204,6 @@
     @apply border-none;
   }
 
-  .input-container.disabled {
-    @apply border;
-  }
-
   .icon-container {
     @apply ml-2 flex items-center justify-center;
   }
@@ -241,7 +237,7 @@
     }
 
     &.disabled {
-      @apply border-gray-600 bg-gray-50  text-gray-600;
+      @apply border-gray-600 bg-gray-50 text-gray-600;
 
       > .input {
         @apply bg-gray-50;
@@ -297,14 +293,14 @@
     }
 
     &.disabled {
-      @apply border-gray-600 bg-gray-50 text-gray-600;
+      @apply border-gray-500 bg-gray-700 text-gray-200;
 
       > .input {
-        @apply bg-gray-50;
+        @apply bg-gray-700 placeholder:text-gray-400;
       }
 
       > .copy-icon-container {
-        @apply border-gray-600 bg-gray-200;
+        @apply border-gray-500 bg-gray-700;
       }
     }
 
