@@ -1,4 +1,3 @@
 temporalGrpcAddress: 127.0.0.1:7233
 port: 8080
-codec:
-  endpoint: http://localhost:8888
+codec: http://localhost:8888
