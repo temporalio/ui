@@ -26,12 +26,14 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
       - name: Run Integration tests
-        run: pnpm test:integration:run
+        run: pnpm test:integration
       - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: playwright-report-integration
-          path: playwright-report/
+          path: |
+            ./playwright-report/
+            ./test-results/
           retention-days: 30
   e2e-tests:
     timeout-minutes: 60
@@ -66,5 +68,7 @@ jobs:
         if: always()
         with:
           name: playwright-report-e2e
-          path: playwright-report/
+          path: |
+            ./playwright-report/
+            ./test-results/
           retention-days: 30
