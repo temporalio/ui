@@ -82,6 +82,9 @@ export const createTemporalServer = async ({
     $`${cliPath} server start-dev --dynamic-config-value frontend.enableUpdateWorkflowExecution=true --dynamic-config-value frontend.workerVersioningDataAPIs=true --dynamic-config-value frontend.workerVersioningWorkflowAPIs=true --dynamic-config-value worker.buildIdScavengerEnabled=true ${flags}`.quiet();
 
   temporal.catch(async ({ stdout, stderr, exitCode }) => {
+    console.log('STDOUT', stdout);
+    console.log('STDERR', stderr);
+    console.log('EXIT CODE', exitCode);
     if (exitCode) {
       try {
         const { error }: { error: string } = JSON.parse(stdout);
@@ -102,7 +105,7 @@ export const createTemporalServer = async ({
   const shutdown = async () => {
     await temporal.kill();
     console.log(
-      `🔪 killed temporal server, exited with code: ${temporal.exitCode}`,
+      `🔪 killed temporal server, exited with code: ${await temporal.exitCode}`,
     );
     return await temporal.exitCode;
   };
