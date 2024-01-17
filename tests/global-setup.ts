@@ -9,7 +9,9 @@ import { createUIServer } from '../utilities/ui-server';
 
 const setupDependencies = async () => {
   const codecServer = await createCodecServer({ port: 8888 });
-  const temporalServer = await createTemporalServer();
+  const temporalServer = await createTemporalServer({
+    codecEndpoint: 'http://127.0.0.1:8888',
+  });
   const uiServer = await createUIServer('e2e');
 
   try {
