@@ -92,10 +92,8 @@ export const createTemporalServer = async ({
             `Port ${port} is already in use. Falling back to whatever is running on that port.`,
           );
         }
-
-        throw new Error(stderr ?? stdout);
-      } catch (error) {
-        throw new Error(stderr ?? stdout);
+      } catch {
+        console.error(stderr);
       }
     }
   });
