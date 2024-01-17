@@ -40,6 +40,7 @@
     routeForScheduleEdit,
     routeForSchedules,
   } from '$lib/utilities/route-for';
+  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import type { DescribeScheduleResponse } from '$types';
 
@@ -101,7 +102,8 @@
     ];
 
   let coreUser = coreUserStore();
-  let editDisabled = $coreUser.namespaceWriteDisabled(namespace);
+  let editDisabled =
+    $coreUser.namespaceWriteDisabled(namespace) || !writeActionsAreAllowed();
 
   const handleDelete = async () => {
     error = '';
