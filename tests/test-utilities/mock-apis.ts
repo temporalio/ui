@@ -12,6 +12,7 @@ import {
 } from './mocks/event-history';
 import { mockNamespaceApi } from './mocks/namespace';
 import { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
+import { mockSchedulesApi } from './mocks/schedules';
 import { mockSearchAttributesApi } from './mocks/search-attributes';
 import { mockSettingsApi, SETTINGS_API } from './mocks/settings';
 import { mockSystemInfoApi } from './mocks/system-info';
@@ -64,6 +65,14 @@ export const mockWorkflowsApis = (page: Page) => {
     mockWorkflowsApi(page),
     mockSearchAttributesApi(page),
     mockWorkflowsCountApi(page),
+  ]);
+};
+
+export const mockSchedulesApis = (page: Page, empty = false) => {
+  return Promise.all([
+    mockGlobalApis(page),
+    mockSearchAttributesApi(page),
+    mockSchedulesApi(page, empty),
   ]);
 };
 

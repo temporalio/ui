@@ -3,7 +3,12 @@
   "origins": [
     {
       "origin": "http://localhost:3000",
-      "localStorage": []
+      "localStorage": [
+        {
+          "name": "locale",
+          "value": "en-US"
+        }
+      ]
     }
   ]
 }

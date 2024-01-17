@@ -20,6 +20,7 @@
     routeForSchedule,
     routeForSchedules,
   } from '$lib/utilities/route-for';
+  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import type { Schedule } from '$types';
 
@@ -183,7 +184,7 @@
       >
         <div class="mt-8 flex items-center gap-2">
           <Button
-            disabled={isDisabled(preset)}
+            disabled={isDisabled(preset) || !writeActionsAreAllowed()}
             on:click={() => handleConfirm(preset, schedule)}
             >{confirmText}</Button
           >
