@@ -26,7 +26,7 @@ const PORT = 8888;
 
 const MOCK_DECODED_PAYLOAD = {
   metadata: {
-    encoding: Buffer.from('binary/plain').toString('base64'),
+    encoding: Buffer.from('json/plain').toString('base64'),
   },
   data: 'Mock decoded payload',
 };
