@@ -1,6 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { DataSet, Timeline } from 'vis-timeline/standalone';
+  import {
+    type DataGroup,
+    type DataItem,
+    DataSet,
+    Timeline,
+  } from 'vis-timeline/standalone';
 
   import { page } from '$app/stores';
 
@@ -117,8 +122,8 @@
   }
 
   type GroupItems = {
-    items: DataSet<unknown, 'id'>;
-    groups: DataSet<unknown, 'id'>;
+    items: DataSet<DataItem>;
+    groups: DataSet<DataGroup>;
   };
 
   const createGroupItems = (
@@ -213,15 +218,6 @@
     return { items, groups };
   };
 
-  const setVizItems = (
-    items: DataSet<unknown, 'id'>,
-    groups: DataSet<unknown, 'id'>,
-  ): void => {
-    timeline.setGroups(groups);
-    timeline.setItems(items);
-    timeline.fit();
-  };
-
   const filterHistory = (
     history: CommonHistoryEvent[],
     category: EventTypeCategory,
@@ -248,7 +244,14 @@
       $workflowRun?.workflow?.isRunning,
       sortedHistory,
     );
-    setVizItems(items, groups);
+
+    timeline = new Timeline(
+      visualizationRef,
+      items,
+      groups,
+      getTimelineOptions($workflowRun.workflow, { maxHeight }),
+    );
+    timeline.fit();
   };
 
   onMount(() => {
@@ -262,13 +265,8 @@
     visualizationRef;
 
   const drawTimeline = () => {
-    if (!timeline) {
-      timeline = new Timeline(
-        visualizationRef,
-        new DataSet([]),
-        new DataSet([]),
-        getTimelineOptions($workflowRun.workflow, { maxHeight }),
-      );
+    if (timeline) {
+      timeline.destroy();
     }
 
     buildTimeline(category);
