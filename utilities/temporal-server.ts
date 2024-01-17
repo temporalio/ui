@@ -101,7 +101,9 @@ export const createTemporalServer = async ({
 
   const shutdown = async () => {
     await temporal.kill();
-    console.log('🔪 killed temporal server');
+    console.log(
+      `🔪 killed temporal server, exited with code: ${temporal.exitCode}`,
+    );
     return await temporal.exitCode;
   };
 
