@@ -128,19 +128,6 @@ const compactEventTypes: EventTypeCategory[] = [
 export const compactEventTypeOptions: EventTypeOption[] =
   allEventTypeOptions.filter(({ value }) => compactEventTypes.includes(value));
 
-const timelineEventTypes: EventTypeCategory[] = [
-  CATEGORIES.ACTIVITY,
-  CATEGORIES.LOCAL_ACTIVITY,
-  CATEGORIES.CHILD_WORKFLOW,
-  CATEGORIES.COMMAND,
-  CATEGORIES.MARKER,
-  CATEGORIES.SIGNAL,
-  CATEGORIES.TIMER,
-  CATEGORIES.UPDATE,
-];
-export const timelineEventTypeOptions: EventTypeOption[] =
-  allEventTypeOptions.filter(({ value }) => timelineEventTypes.includes(value));
-
 export const getEventCategory = (eventType: EventType): EventTypeCategory => {
   return eventTypeCategorizations[eventType];
 };
