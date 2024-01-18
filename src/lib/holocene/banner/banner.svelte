@@ -1,9 +1,13 @@
+<script lang="ts" context="module">
+  import { persistStore } from '$lib/stores/persist-store';
+  export const bannerClosed = persistStore<boolean>('bannerClosed', false);
+</script>
+
 <script lang="ts">
   import IconButton from '$lib/holocene/icon-button.svelte';
-  import { translate } from '$lib/i18n/translate';
-  import { bannerClosed } from '$lib/stores/banner';
 
   export let message: string;
+  export let closeLabel: string;
 
   $: show = message && !$bannerClosed;
 </script>
@@ -16,7 +20,7 @@
       data-testid="close-banner"
       class="text-black-600 absolute top-0 right-0 mr-5 h-10 w-10"
       icon="close"
-      label={translate('common.close')}
+      label={closeLabel}
     />
   </section>
 {/if}

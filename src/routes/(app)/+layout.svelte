@@ -116,7 +116,10 @@
   <MainContentContainer>
     <DataEncoderSettings />
     <TopNavigation {logout} {namespaceList} />
-    <Banner message={$page.data.settings?.bannerText} />
+    <Banner
+      message={$page.data.settings?.bannerText}
+      closeLabel={translate('common.close')}
+    />
     <div
       slot="main"
       class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-8"

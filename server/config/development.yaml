@@ -1,7 +1,7 @@
 publicPath:
 port: 8081
 enableUi: true
-bannerText:
+bannerText: This is a thing to do
 cors:
   cookieInsecure: false
   allowOrigins:
