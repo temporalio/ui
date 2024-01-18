@@ -166,7 +166,7 @@
     if (!category) return history;
     return history.filter((i) => {
       if (category.includes(CATEGORIES.LOCAL_ACTIVITY)) {
-        return isLocalActivityMarkerEvent(i);
+        return category.includes(i.category) || isLocalActivityMarkerEvent(i);
       }
       return category.includes(i.category);
     });

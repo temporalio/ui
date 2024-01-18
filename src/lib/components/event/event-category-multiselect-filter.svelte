@@ -7,6 +7,7 @@
     allEventTypeOptions,
     compactEventTypeOptions,
   } from '$lib/models/event-history/get-event-categorization';
+  import { eventCategoryFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { isVersionNewer } from '$lib/utilities/version-check';
@@ -25,6 +26,9 @@
       options = options.filter(({ value }) => value !== 'update');
     }
   }
+  $: initialSelected = $eventCategoryFilter
+    ? options.filter((o) => $eventCategoryFilter.includes(o.value))
+    : [];
 
   const onOptionClick = (_options) => {
     const value = _options.map((o) => o.value).join(',');
@@ -39,7 +43,10 @@
 <MultiSelect
   id="event-category-filter-menu"
   {options}
+  {initialSelected}
   {label}
+  selectAllLabel={translate('common.select-all')}
+  clearAllLabel={translate('common.clear-all-capitalized')}
   onChange={onOptionClick}
   variant="table-header"
   icon="filter"

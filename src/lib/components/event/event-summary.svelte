@@ -32,7 +32,7 @@
     if (category) {
       const filteredItems = items.filter((i) => {
         if (category.includes(CATEGORIES.LOCAL_ACTIVITY)) {
-          return isLocalActivityMarkerEvent(i);
+          return category.includes(i.category) || isLocalActivityMarkerEvent(i);
         }
         return category.includes(i.category);
       });

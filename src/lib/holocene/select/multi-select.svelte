@@ -18,13 +18,16 @@
   type MultiSelectOptions = Option[];
 
   export let options: MultiSelectOptions = [];
+  export let initialSelected: MultiSelectOptions = [];
   export let onChange: (options: MultiSelectOptions) => void;
   export let label: string;
   export let id: string;
   export let variant: MenuButtonVariant = 'secondary';
   export let icon: IconName | undefined = undefined;
+  export let selectAllLabel: string;
+  export let clearAllLabel: string;
 
-  let selectedOptions = options;
+  let selectedOptions = initialSelected.length ? initialSelected : options;
 
   const open = writable(false);
 
@@ -88,13 +91,13 @@
       data-testid="multiselect-select-all"
       on:click={onSelectAllOptionClick}
     >
-      Select All
+      {selectAllLabel}
     </MenuItem>
     <MenuItem
       data-testid="multiselect-remove-all"
       on:click={onRemoveAllOptionClick}
     >
-      Remove All
+      {clearAllLabel}
     </MenuItem>
   </Menu>
 </MenuContainer>
