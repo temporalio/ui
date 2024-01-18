@@ -41,6 +41,7 @@ type (
 		EnableUI            bool   `yaml:"enableUi"`
 		CloudUI             bool   `yaml:"cloudUi"`
 		UIAssetPath         string `yaml:"uiAssetPath"`
+		BannerText          string `yaml:"bannerText"`
 		CORS                CORS   `yaml:"cors"`
 		DefaultNamespace    string `yaml:"defaultNamespace"`
 		FeedbackURL         string `yaml:"feedbackUrl"`
