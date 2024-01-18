@@ -35,8 +35,6 @@
   let visualizationRef;
   let timeline;
 
-  $: category = $eventCategoryFilter as EventTypeCategory;
-
   function renderComponentToHTML(Component, props) {
     const container = document.createElement('div');
     new Component({ target: container, props });
@@ -74,7 +72,7 @@
     const firstEvent = sortedHistory[0];
     const finalEvent = sortedHistory[sortedHistory.length - 1];
 
-    if (!category) {
+    if (!$eventCategoryFilter) {
       groups.add({
         id: 'workflow',
         content: renderExecutionName(),
@@ -163,18 +161,18 @@
 
   const filterHistory = (
     history: CommonHistoryEvent[],
-    category: EventTypeCategory,
+    category: EventTypeCategory[],
   ): CommonHistoryEvent[] => {
     if (!category) return history;
     return history.filter((i) => {
-      if (category === CATEGORIES.LOCAL_ACTIVITY) {
+      if (category.includes(CATEGORIES.LOCAL_ACTIVITY)) {
         return isLocalActivityMarkerEvent(i);
       }
-      return i.category === category;
+      return category.includes(i.category);
     });
   };
 
-  const buildTimeline = (category: EventTypeCategory): void => {
+  const buildTimeline = (category: EventTypeCategory[]): void => {
     timeline = new Timeline(
       visualizationRef,
       new DataSet([]),
@@ -210,7 +208,7 @@
     if (timeline) {
       timeline.destroy();
     }
-    buildTimeline(category);
+    buildTimeline($eventCategoryFilter);
   };
 
   $: {

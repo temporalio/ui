@@ -1,4 +1,4 @@
-import type { I18nKey } from '$lib/i18n';
+import { translate } from '$lib/i18n/translate';
 import type {
   EventType,
   IterableEvent,
@@ -75,57 +75,47 @@ export const eventTypeCategorizations: Readonly<
 };
 
 export type EventTypeOption = {
-  label: I18nKey;
-  option: EventTypeCategory | undefined;
-  color?: string;
+  label: string;
+  value: EventTypeCategory;
 };
 
 export const allEventTypeOptions: EventTypeOption[] = [
-  { label: 'events.category.all', option: undefined },
   {
-    label: 'events.category.activity',
-    option: CATEGORIES.ACTIVITY,
-    color: '#8B5CF6',
+    label: translate('events.category.activity'),
+    value: CATEGORIES.ACTIVITY,
   },
   {
-    label: 'events.category.child-workflow',
-    option: CATEGORIES.CHILD_WORKFLOW,
-    color: '#F59E0B',
+    label: translate('events.category.child-workflow'),
+    value: CATEGORIES.CHILD_WORKFLOW,
   },
   {
-    label: 'events.category.command',
-    option: CATEGORIES.COMMAND,
-    color: '#10B981',
+    label: translate('events.category.command'),
+    value: CATEGORIES.COMMAND,
   },
   {
-    label: 'events.category.local-activity',
-    option: CATEGORIES.LOCAL_ACTIVITY,
+    label: translate('events.category.local-activity'),
+    value: CATEGORIES.LOCAL_ACTIVITY,
   },
   {
-    label: 'events.category.marker',
-    option: CATEGORIES.MARKER,
-    color: '#EC4899',
+    label: translate('events.category.marker'),
+    value: CATEGORIES.MARKER,
   },
   {
-    label: 'events.category.signal',
-    option: CATEGORIES.SIGNAL,
-    color: '#DD6B20',
+    label: translate('events.category.signal'),
+    value: CATEGORIES.SIGNAL,
   },
   {
-    label: 'events.category.timer',
-    option: CATEGORIES.TIMER,
-    color: '#1D4ED8',
+    label: translate('events.category.timer'),
+    value: CATEGORIES.TIMER,
   },
-  { label: 'events.category.update', option: CATEGORIES.UPDATE },
+  { label: translate('events.category.update'), value: CATEGORIES.UPDATE },
   {
-    label: 'events.category.workflow',
-    option: CATEGORIES.WORKFLOW,
-    color: '#10B981',
+    label: translate('events.category.workflow'),
+    value: CATEGORIES.WORKFLOW,
   },
 ];
 
-const compactEventTypes: (EventTypeCategory | undefined)[] = [
-  undefined,
+const compactEventTypes: EventTypeCategory[] = [
   CATEGORIES.ACTIVITY,
   CATEGORIES.LOCAL_ACTIVITY,
   CATEGORIES.CHILD_WORKFLOW,
@@ -136,9 +126,7 @@ const compactEventTypes: (EventTypeCategory | undefined)[] = [
 ];
 
 export const compactEventTypeOptions: EventTypeOption[] =
-  allEventTypeOptions.filter(({ option }) =>
-    compactEventTypes.includes(option),
-  );
+  allEventTypeOptions.filter(({ value }) => compactEventTypes.includes(value));
 
 const timelineEventTypes: EventTypeCategory[] = [
   CATEGORIES.ACTIVITY,
@@ -151,9 +139,7 @@ const timelineEventTypes: EventTypeCategory[] = [
   CATEGORIES.UPDATE,
 ];
 export const timelineEventTypeOptions: EventTypeOption[] =
-  allEventTypeOptions.filter(({ option }) =>
-    timelineEventTypes.includes(option),
-  );
+  allEventTypeOptions.filter(({ value }) => timelineEventTypes.includes(value));
 
 export const getEventCategory = (eventType: EventType): EventTypeCategory => {
   return eventTypeCategorizations[eventType];
