@@ -14,6 +14,10 @@ exports[`Table_header_cell$ > Parent Namespace renders 1`] = `"<th class=\\"work
 
 exports[`Table_header_cell$ > Run ID renders 1`] = `"<th class=\\"workflows-summary-table-header-cell svelte-x2wk3\\" data-testid=\\"workflows-summary-table-header-cell-Run ID\\">Run ID</th>"`;
 
+exports[`Table_header_cell$ > Scheduled By ID renders 1`] = `"<th class=\\"workflows-summary-table-header-cell svelte-x2wk3\\" data-testid=\\"workflows-summary-table-header-cell-Scheduled By ID\\">Scheduled By ID</th>"`;
+
+exports[`Table_header_cell$ > Scheduled Start Time renders 1`] = `"<th class=\\"workflows-summary-table-header-cell svelte-x2wk3\\" data-testid=\\"workflows-summary-table-header-cell-Scheduled Start Time\\">Scheduled Start Time</th>"`;
+
 exports[`Table_header_cell$ > Start renders 1`] = `"<th class=\\"workflows-summary-table-header-cell svelte-x2wk3\\" data-testid=\\"workflows-summary-table-header-cell-Start\\">Start</th>"`;
 
 exports[`Table_header_cell$ > State Transitions renders 1`] = `"<th class=\\"workflows-summary-table-header-cell svelte-x2wk3\\" data-testid=\\"workflows-summary-table-header-cell-State Transitions\\">State Transitions</th>"`;

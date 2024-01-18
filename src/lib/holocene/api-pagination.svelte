@@ -172,6 +172,7 @@
   />
 {/if}
 
+<slot name="header" />
 <div class="relative mb-8 flex flex-col gap-4">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
     <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
@@ -182,48 +183,50 @@
       aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
-      {#if pageSizeOptions.length}
-        <FilterSelect
-          label={pageSizeSelectLabel}
-          parameter={$store.key}
-          value={String($store.pageSize)}
-          options={pageSizeOptions}
-        />
-      {/if}
-      <div class="flex items-center justify-center gap-3">
-        <button
-          class="caret"
-          disabled={!$store.hasPrevious}
-          on:click={store.previousPage}
-          aria-label={previousButtonLabel}
-        >
-          <span
-            class="arrow arrow-left"
-            class:arrow-left-disabled={!$store.hasPrevious}
+      {#if $store.visibleItems.length}
+        {#if pageSizeOptions.length}
+          <FilterSelect
+            label={pageSizeSelectLabel}
+            parameter={$store.key}
+            value={String($store.pageSize)}
+            options={pageSizeOptions}
           />
-        </button>
-        <div class="flex gap-1">
-          <p>
-            {$store.indexStart}–{$store.indexEnd}
-          </p>
-          {#if total}
+        {/if}
+        <div class="flex items-center justify-center gap-3">
+          <button
+            class="caret"
+            disabled={!$store.hasPrevious}
+            on:click={store.previousPage}
+            aria-label={previousButtonLabel}
+          >
+            <span
+              class="arrow arrow-left"
+              class:arrow-left-disabled={!$store.hasPrevious}
+            />
+          </button>
+          <div class="flex gap-1">
             <p>
-              of {total}
+              {$store.indexStart}–{$store.indexEnd}
             </p>
-          {/if}
+            {#if total}
+              <p>
+                of {total}
+              </p>
+            {/if}
+          </div>
+          <button
+            class="caret"
+            disabled={!$store.hasNext}
+            on:click={fetchIndexData}
+            aria-label={nextButtonLabel}
+          >
+            <span
+              class="arrow arrow-right"
+              class:arrow-right-disabled={!$store.hasNext}
+            />
+          </button>
         </div>
-        <button
-          class="caret"
-          disabled={!$store.hasNext}
-          on:click={fetchIndexData}
-          aria-label={nextButtonLabel}
-        >
-          <span
-            class="arrow arrow-right"
-            class:arrow-right-disabled={!$store.hasNext}
-          />
-        </button>
-      </div>
+      {/if}
       <slot name="action-top-right" />
     </nav>
   </div>

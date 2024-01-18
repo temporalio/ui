@@ -46,6 +46,8 @@
     label: { control: 'text' },
     optionValueKey: { control: 'text' },
     optionLabelKey: { control: 'text' },
+    theme: { control: 'select', options: ['light', 'dark'] },
+    filterable: { control: 'boolean' },
   }}
 />
 

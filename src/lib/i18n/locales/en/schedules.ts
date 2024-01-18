@@ -13,6 +13,7 @@ export const Strings = {
   'schedule-spec': 'Schedule Spec',
   'empty-state-title': 'No Schedules Found',
   'empty-state-description': 'Try a different search',
+  'error-message-fetching': 'Error fetching schedules',
   'recent-runs': 'Recent Runs',
   'recent-runs-empty-state-title': 'No Recent Runs',
   'upcoming-runs': 'Upcoming Runs',

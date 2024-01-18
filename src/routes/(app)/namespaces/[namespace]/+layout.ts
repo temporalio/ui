@@ -5,8 +5,10 @@ import { allSearchAttributes } from '$lib/stores/search-attributes';
 
 export const load: LayoutLoad = async ({
   params,
+  parent,
   fetch,
 }): Promise<LayoutData> => {
+  await parent();
   const attributes = await fetchSearchAttributesForNamespace(
     params.namespace,
     fetch,

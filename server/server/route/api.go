@@ -23,16 +23,38 @@
 package route
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 
 	"github.com/temporalio/ui-server/v2/server/api"
 	"github.com/temporalio/ui-server/v2/server/config"
 )
 
+func DisableWriteMiddleware(cfgProvider *config.ConfigProviderWithRefresh) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			cfg, err := cfgProvider.GetConfig()
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, err)
+			}
+
+			if cfg.DisableWriteActions && c.Request().Method != http.MethodGet {
+				return echo.ErrMethodNotAllowed
+			}
+
+			return next(c)
+		}
+	}
+}
+
 // SetAPIRoutes sets api routes
 func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []api.Middleware) error {
 	route := e.Group("/api")
 	route.GET("/v1/settings", api.GetSettings(cfgProvider))
-	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware))
+
+	writeControlMiddleware := DisableWriteMiddleware(cfgProvider)
+
+	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware), writeControlMiddleware)
 	return nil
 }

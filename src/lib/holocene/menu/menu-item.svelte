@@ -28,6 +28,7 @@
     description?: string;
     centered?: boolean;
     class?: string;
+    theme?: 'light' | 'dark';
     'data-testid'?: string;
   }
 
@@ -39,6 +40,7 @@
   export let href = null;
   export let description: string = null;
   export let centered = false;
+  export let theme: 'light' | 'dark' = 'light';
 
   const { keepOpen, open } = getContext<MenuContext>(MENU_CONTEXT);
 
@@ -105,7 +107,7 @@
   <a
     {href}
     role="menuitem"
-    class="menu-item {className}"
+    class="menu-item {theme} {className}"
     class:disabled
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
@@ -118,7 +120,7 @@
 {:else}
   <li
     role="menuitem"
-    class="menu-item {className}"
+    class="menu-item {theme} {className}"
     class:destructive
     class:disabled
     aria-hidden={disabled ? 'true' : 'false'}
@@ -129,7 +131,7 @@
     {...$$restProps}
   >
     <slot name="leading" />
-    <div class:selected class:centered class="menu-item-wrapper">
+    <div class:selected class:centered class="menu-item-wrapper {theme}">
       {#if description}
         <div class="flex flex-col">
           <slot />
@@ -154,7 +156,15 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply m-1 flex cursor-pointer flex-row items-center gap-2 rounded px-3 py-2 font-primary text-sm font-medium hover:bg-indigo-50 focus:outline-none focus-visible:bg-indigo-50 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline focus-visible:outline-1 focus-visible:outline-indigo-600;
+    @apply m-1 flex cursor-pointer flex-row items-center gap-2 rounded border border-transparent px-3 py-2 font-primary text-sm font-medium focus-visible:border focus-visible:shadow-focus focus-visible:outline-none;
+
+    &.light {
+      @apply hover:bg-indigo-50 focus-visible:border-indigo-600 focus-visible:bg-indigo-50 focus-visible:shadow-indigo-500/50;
+    }
+
+    &.dark {
+      @apply hover:bg-gray-700 focus-visible:border-indigo-600 focus-visible:bg-gray-800 focus-visible:shadow-indigo-500/50;
+    }
   }
 
   .menu-item-wrapper {
@@ -165,7 +175,13 @@
     }
 
     &.selected {
-      @apply text-indigo-600;
+      &.light {
+        @apply text-indigo-600;
+      }
+
+      &.dark {
+        @apply text-indigo-500;
+      }
     }
   }
 

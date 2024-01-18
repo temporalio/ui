@@ -37,6 +37,8 @@
     minSize?: number;
     maxSize?: number;
     'data-testid'?: string;
+    theme?: 'light' | 'dark';
+    filterable?: boolean;
   }
 
   type UncontrolledStringOptionProps = {
@@ -74,6 +76,8 @@
   export let optionLabelKey: keyof T = optionValueKey;
   export let minSize = 0;
   export let maxSize = 120;
+  export let theme: 'light' | 'dark' = 'light';
+  export let filterable = true;
 
   let displayValue: string;
   let selectedOption: string | T;
@@ -241,18 +245,13 @@
 </script>
 
 <MenuContainer {open} on:close={resetValueAndOptions}>
-  <label class="combobox-label" class:sr-only={labelHidden} for={id}>
+  <label class="combobox-label {theme}" class:sr-only={labelHidden} for={id}>
     {label}
   </label>
 
-  <div class="combobox-wrapper">
+  <div class="combobox-wrapper {theme}">
     {#if leadingIcon}
-      <Icon
-        width={20}
-        height={20}
-        class="ml-2 shrink-0 text-gray-500"
-        name={leadingIcon}
-      />
+      <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
     <input
       {id}
@@ -292,10 +291,17 @@
     </button>
   </div>
 
-  <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
+  <Menu
+    bind:menuElement
+    id="{id}-listbox"
+    role="listbox"
+    class="w-full"
+    {theme}
+  >
     {#each list as option}
       {#if isStringOption(option)}
         <ComboboxOption
+          {theme}
           on:click={() => handleSelectOption(option)}
           selected={value === option}
         >
@@ -304,6 +310,7 @@
       {:else if isObjectOption(option)}
         {#if canRenderCustomOption(option)}
           <ComboboxOption
+            {theme}
             on:click={() => handleSelectOption(option)}
             selected={value === option[optionValueKey]}
           >
@@ -322,10 +329,18 @@
 <style lang="postcss">
   .combobox-label {
     @apply font-secondary text-sm font-normal;
+
+    &.light {
+      @apply text-primary;
+    }
+
+    &.dark {
+      @apply text-white;
+    }
   }
 
   .combobox-wrapper {
-    @apply flex h-10 w-full flex-row items-center rounded-lg border border-primary bg-white text-sm focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-blue-600/50 focus-within:outline-none;
+    @apply flex h-10 w-full flex-row items-center rounded-lg border border-transparent text-sm focus-within:outline-none;
   }
 
   .combobox-input {
@@ -333,6 +348,30 @@
   }
 
   .combobox-button {
-    @apply mx-2 flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br hover:from-blue-100 hover:to-purple-100;
+    @apply mx-2 flex shrink-0 items-center justify-center rounded-full;
+  }
+
+  .combobox-wrapper.light {
+    @apply border-primary bg-white text-primary  focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50;
+
+    > .combobox-input {
+      @apply bg-white text-primary placeholder:text-gray-400;
+    }
+
+    > .combobox-button {
+      @apply bg-gradient-to-br hover:from-blue-100 hover:to-purple-100;
+    }
+  }
+
+  .combobox-wrapper.dark {
+    @apply border-gray-400 bg-primary text-white  focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50;
+
+    > .combobox-input {
+      @apply bg-primary text-white placeholder:text-gray-400;
+    }
+
+    > .combobox-button {
+      @apply hover:bg-gray-700;
+    }
   }
 </style>

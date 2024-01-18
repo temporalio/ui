@@ -6,6 +6,7 @@ const colors = {
   danger: '#b91c1c', // red-700
   success: '#bbf7d0', // green-200
   black: '#000000',
+  transparent: 'transparent',
   lightBlue: '#DFFBFF',
   blurple: '#444CE7',
   blue: {
