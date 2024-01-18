@@ -5,10 +5,10 @@
 
   export let message: string;
 
-  $: show = !$bannerClosed;
+  $: show = message && !$bannerClosed;
 </script>
 
-{#if message && show}
+{#if show}
   <section class="banner" {...$$restProps}>
     {message}
     <IconButton
