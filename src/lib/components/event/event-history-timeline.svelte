@@ -172,13 +172,17 @@
     });
   };
 
-  const buildTimeline = (category: EventTypeCategory[]): void => {
+  const buildTimeline = (): void => {
     timeline = new Timeline(
       visualizationRef,
       new DataSet([]),
       new DataSet([]),
       getTimelineOptions($workflowRun.workflow),
     );
+    filterAndSetItems($eventCategoryFilter);
+  };
+
+  const filterAndSetItems = (category: EventTypeCategory[]) => {
     const reverseHistory =
       $eventFilterSort === 'descending' && $eventViewType === 'feed';
     const sortedHistory = reverseHistory
@@ -208,12 +212,18 @@
     if (timeline) {
       timeline.destroy();
     }
-    buildTimeline($eventCategoryFilter);
+    buildTimeline();
   };
 
   $: {
     if (readyToDraw) {
       drawTimeline();
+    }
+  }
+
+  $: {
+    if (timeline) {
+      filterAndSetItems($eventCategoryFilter);
     }
   }
 </script>

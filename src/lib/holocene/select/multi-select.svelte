@@ -26,15 +26,14 @@
   export let icon: IconName | undefined = undefined;
   export let selectAllLabel: string;
   export let clearAllLabel: string;
+  export let active = false;
 
   let selectedOptions = initialSelected.length ? initialSelected : options;
 
   const open = writable(false);
 
-  const resetFilter = () => {};
-
   const onOptionClick = (option: Option) => {
-    if (selectedOptions.find((s) => s.value === option.value)) {
+    if (selectedOptions.some((s) => s.value === option.value)) {
       selectedOptions = selectedOptions.filter((s) => s.value !== option.value);
     } else {
       selectedOptions = [...selectedOptions, option];
@@ -53,15 +52,8 @@
   };
 </script>
 
-<MenuContainer {open} on:close={resetFilter}>
-  <MenuButton
-    hasIndicator
-    controls={id}
-    {variant}
-    on:click={() => {
-      if ($open) resetFilter();
-    }}
-  >
+<MenuContainer {open}>
+  <MenuButton hasIndicator controls={id} {variant} {active}>
     {#if icon}<Icon class="md:hidden" name={icon} />{/if}
     <span class="max-md:hidden">{label}</span>
   </MenuButton>

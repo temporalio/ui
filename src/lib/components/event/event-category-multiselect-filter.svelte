@@ -45,6 +45,7 @@
   {options}
   {initialSelected}
   {label}
+  active={!!$eventCategoryFilter}
   selectAllLabel={translate('common.select-all')}
   clearAllLabel={translate('common.clear-all-capitalized')}
   onChange={onOptionClick}
