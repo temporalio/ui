@@ -18,6 +18,7 @@ export const Strings = {
   local: 'Local',
   cancel: 'Cancel',
   'clear-all': 'Clear all',
+  'clear-all-capitalized': 'Clear All',
   'ante-meridiem': 'AM',
   'post-meridiem': 'PM',
   ascending: 'Ascending',

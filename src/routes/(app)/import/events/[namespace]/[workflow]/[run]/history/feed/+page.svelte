@@ -7,15 +7,15 @@
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
   import { importEvents } from '$lib/stores/import-events';
-  import type { EventTypeCategory, WorkflowEvent } from '$lib/types/events';
+  import type { WorkflowEvent } from '$lib/types/events';
 
-  $: category = $eventCategoryFilter as EventTypeCategory;
   $: sortedEvents =
     $eventFilterSort === 'descending'
       ? [...$importEvents].reverse()
       : $importEvents;
   $: filteredEvents = sortedEvents.filter((event: WorkflowEvent) => {
-    if (category) return event.category === category;
+    if ($eventCategoryFilter)
+      return $eventCategoryFilter.includes(event.category);
     return event;
   });
 
