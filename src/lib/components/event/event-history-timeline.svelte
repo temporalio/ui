@@ -46,8 +46,6 @@
   let visualizationRef;
   let timeline;
 
-  $: category = $eventCategoryFilter as EventTypeCategory;
-
   function renderComponentToHTML(Component, props) {
     const container = document.createElement('div');
     new Component({ target: container, props });
@@ -136,7 +134,7 @@
     const firstEvent = sortedHistory[0];
     const finalEvent = sortedHistory[sortedHistory.length - 1];
 
-    if (!category) {
+    if (!$eventCategoryFilter) {
       groups.add({
         id: 'workflow',
         content: renderExecutionName(),
@@ -218,20 +216,39 @@
     return { items, groups };
   };
 
+  const setVizItems = (
+    items: DataSet<unknown, 'id'>,
+    groups: DataSet<unknown, 'id'>,
+  ): void => {
+    timeline.setGroups(groups);
+    timeline.setItems(items);
+    timeline.fit();
+  };
+
   const filterHistory = (
     history: CommonHistoryEvent[],
-    category: EventTypeCategory,
+    category: EventTypeCategory[],
   ): CommonHistoryEvent[] => {
     if (!category) return history;
     return history.filter((i) => {
-      if (category === CATEGORIES.LOCAL_ACTIVITY) {
-        return isLocalActivityMarkerEvent(i);
+      if (category.includes(CATEGORIES.LOCAL_ACTIVITY)) {
+        return category.includes(i.category) || isLocalActivityMarkerEvent(i);
       }
-      return i.category === category;
+      return category.includes(i.category);
     });
   };
 
-  const buildTimeline = (category: EventTypeCategory): void => {
+  const buildTimeline = (): void => {
+    timeline = new Timeline(
+      visualizationRef,
+      new DataSet([]),
+      new DataSet([]),
+      getTimelineOptions($workflowRun.workflow, { maxHeight }),
+    );
+    filterAndSetItems($eventCategoryFilter);
+  };
+
+  const filterAndSetItems = (category: EventTypeCategory[]) => {
     const reverseHistory =
       $eventFilterSort === 'descending' && $eventViewType === 'feed';
     const sortedHistory = reverseHistory
@@ -244,14 +261,7 @@
       $workflowRun?.workflow?.isRunning,
       sortedHistory,
     );
-
-    timeline = new Timeline(
-      visualizationRef,
-      items,
-      groups,
-      getTimelineOptions($workflowRun.workflow, { maxHeight }),
-    );
-    timeline.fit();
+    setVizItems(items, groups);
   };
 
   onMount(() => {
@@ -268,13 +278,18 @@
     if (timeline) {
       timeline.destroy();
     }
-
-    buildTimeline(category);
+    buildTimeline();
   };
 
   $: {
     if (readyToDraw) {
       drawTimeline();
+    }
+  }
+
+  $: {
+    if (timeline) {
+      filterAndSetItems($eventCategoryFilter);
     }
   }
 </script>
