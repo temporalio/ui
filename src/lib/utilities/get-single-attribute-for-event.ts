@@ -188,9 +188,7 @@ const getActivityType = (payload: Payload) => {
  * preferred keys. If a preferred key is found, it will be returned.
  * Otherwise, it will return the first eligible event attribute.
  */
-const getSummaryAttribute = async (
-  event: WorkflowEvent,
-): Promise<SummaryAttribute> => {
+const getSummaryAttribute = async (event: WorkflowEvent): SummaryAttribute => {
   const first = getFirstDisplayAttribute(event);
 
   if (isLocalActivityMarkerEvent(event as MarkerRecordedEvent)) {
@@ -217,13 +215,13 @@ const getSummaryAttribute = async (
 
 export const getSummaryForEventGroup = async ({
   lastEvent,
-}: EventGroup): Promise<SummaryAttribute> => {
+}: EventGroup): SummaryAttribute => {
   return getSummaryAttribute(lastEvent);
 };
 
 export const getSingleAttributeForEvent = async (
   event: WorkflowEvent | EventGroup,
-): Promise<SummaryAttribute> => {
+): SummaryAttribute => {
   if (!event) return emptyAttribute;
 
   if (isEventGroup(event)) {
