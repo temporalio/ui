@@ -38,7 +38,12 @@
     } else {
       selectedOptions = [...selectedOptions, option];
     }
-    onChange(selectedOptions);
+
+    if (selectedOptions.length === options.length) {
+      onChange([]);
+    } else {
+      onChange(selectedOptions);
+    }
   };
 
   const onSelectAllOptionClick = () => {

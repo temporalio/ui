@@ -1,0 +1,92 @@
+{
+  "eventId": "5",
+  "eventTime": "2024-01-16T09:40:05.230271305Z",
+  "eventType": "MarkerRecorded",
+  "version": "0",
+  "taskId": "1048605",
+  "workerMayIgnore": false,
+  "markerRecordedEventAttributes": {
+    "markerName": "LocalActivity",
+    "details": {
+      "activityId": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": "9376db60-4eb5-3525-8f39-e61024fab1d1"
+          }
+        ]
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": "Hello"
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": "World"
+          }
+        ]
+      },
+      "meta": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": {
+              "firstSkd": 1705398005183,
+              "atpt": 1,
+              "backoff": null
+            }
+          }
+        ]
+      },
+      "result": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": "Hello World!"
+          }
+        ]
+      },
+      "time": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": 1705398005129
+          }
+        ]
+      },
+      "type": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImdyZWV0Ig=="
+          }
+        ]
+      }
+    },
+    "workflowTaskCompletedEventId": "4",
+    "header": null,
+    "failure": null
+  }
+}

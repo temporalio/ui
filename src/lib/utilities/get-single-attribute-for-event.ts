@@ -1,13 +1,11 @@
 import { isEventGroup } from '$lib/models/event-groups';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
-import type { Payload, Payloads } from '$lib/types';
-import type { MarkerRecordedEvent, WorkflowEvent } from '$lib/types/events';
+import type { Payloads } from '$lib/types';
+import type { WorkflowEvent } from '$lib/types/events';
+import type { Payload } from '$lib/types/events';
 import { capitalize } from '$lib/utilities/format-camel-case';
 
-import {
-  decodeAllPotentialPayloadsWithCodec,
-  type PotentiallyDecodable,
-} from './decode-payload';
+import { decodePayload } from './decode-payload';
 import type { CombinedAttributes } from './format-event-attributes';
 import { has } from './has';
 import { isObject } from './is';
@@ -183,20 +181,28 @@ const getActivityType = (payload: Payload) => {
   if (has(payload, 'activity_type')) return payload.activity_type;
 };
 
+const isJavaSDK = (event: WorkflowEvent): boolean => {
+  return !!event.markerRecordedEventAttributes?.details?.type?.payloads;
+};
+
 /**
  * Iterates through the keys of an event and compares it with the list of
  * preferred keys. If a preferred key is found, it will be returned.
  * Otherwise, it will return the first eligible event attribute.
  */
-const getSummaryAttribute = async (event: WorkflowEvent): SummaryAttribute => {
+export const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
   const first = getFirstDisplayAttribute(event);
 
-  if (isLocalActivityMarkerEvent(event as MarkerRecordedEvent)) {
-    const payloads = event.markerRecordedEventAttributes?.details?.data;
-    const decodedPayloads = (await decodeAllPotentialPayloadsWithCodec(
-      payloads,
-    )) as PotentiallyDecodable;
-    const payload = decodedPayloads?.payloads?.[0];
+  if (isLocalActivityMarkerEvent(event)) {
+    const payloads = (event.markerRecordedEventAttributes?.details?.data
+      ?.payloads ||
+      event.markerRecordedEventAttributes?.details?.type?.payloads ||
+      []) as unknown as Payload[];
+    const decodedPayloads = payloads.map((p) => decodePayload(p));
+    const payload = decodedPayloads?.[0];
+    if (isJavaSDK(event) && payload) {
+      return formatSummaryValue('ActivityType', payload);
+    }
     const activityType = getActivityType(payload);
     if (activityType) {
       return formatSummaryValue('ActivityType', activityType);
@@ -213,13 +219,13 @@ const getSummaryAttribute = async (event: WorkflowEvent): SummaryAttribute => {
   return first;
 };
 
-export const getSummaryForEventGroup = async ({
+export const getSummaryForEventGroup = ({
   lastEvent,
 }: EventGroup): SummaryAttribute => {
   return getSummaryAttribute(lastEvent);
 };
 
-export const getSingleAttributeForEvent = async (
+export const getSingleAttributeForEvent = (
   event: WorkflowEvent | EventGroup,
 ): SummaryAttribute => {
   if (!event) return emptyAttribute;

@@ -3,9 +3,17 @@ import { describe, expect, it } from 'vitest';
 import {
   getCodeBlockValue,
   getSingleAttributeForEvent,
+  getSummaryAttribute,
   shouldDisplayAsExecutionLink,
   shouldDisplayAttribute,
 } from './get-single-attribute-for-event';
+import { toEvent } from '../models/event-history';
+
+import dotnetLocalActivity from '$fixtures/local-activities/dotnet_local_activity.json';
+import goLocalActivity from '$fixtures/local-activities/go_local_activity.json';
+import javaLocalActivity from '$fixtures/local-activities/java_local_activity.json';
+import pythonLocalActivity from '$fixtures/local-activities/python_local_activity.json';
+import tsLocalActivity from '$fixtures/local-activities/ts_local_activity.json';
 
 describe('getSingleAttributeForEvent', () => {
   const workflowEvent = {
@@ -218,5 +226,43 @@ describe('getCodeBlockValue', () => {
     expect(getCodeBlockValue(1)).toBe(1);
     expect(getCodeBlockValue(null)).toBe(null);
     expect(getCodeBlockValue([1, 2, 3])).toEqual([1, 2, 3]);
+  });
+});
+
+describe.only('getSummaryEvent', () => {
+  it('should return expected payload for Go', async () => {
+    const localActivity = await toEvent(goLocalActivity);
+    expect(getSummaryAttribute(localActivity)).toStrictEqual({
+      key: 'ActivityType',
+      value: 'Activity',
+    });
+  });
+  it('should return expected payload for TS', async () => {
+    const localActivity = await toEvent(tsLocalActivity);
+    expect(getSummaryAttribute(localActivity)).toStrictEqual({
+      key: 'ActivityType',
+      value: 'greet',
+    });
+  });
+  it('should return expected payload for Java', async () => {
+    const localActivity = await toEvent(javaLocalActivity);
+    expect(getSummaryAttribute(localActivity)).toStrictEqual({
+      key: 'ActivityType',
+      value: 'greet',
+    });
+  });
+  it('should return expected payload for Python', async () => {
+    const localActivity = await toEvent(pythonLocalActivity);
+    expect(getSummaryAttribute(localActivity)).toStrictEqual({
+      key: 'ActivityType',
+      value: 'compose_greeting',
+    });
+  });
+  it('should return expected payload for .Net', async () => {
+    const localActivity = await toEvent(dotnetLocalActivity);
+    expect(getSummaryAttribute(localActivity)).toStrictEqual({
+      key: 'ActivityType',
+      value: 'DoStaticThing',
+    });
   });
 });
