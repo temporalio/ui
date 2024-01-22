@@ -229,7 +229,7 @@ describe('getCodeBlockValue', () => {
   });
 });
 
-describe.only('getSummaryEvent', () => {
+describe('getSummaryEvent', () => {
   it('should return expected payload for Go', async () => {
     const localActivity = await toEvent(goLocalActivity);
     expect(getSummaryAttribute(localActivity)).toStrictEqual({
