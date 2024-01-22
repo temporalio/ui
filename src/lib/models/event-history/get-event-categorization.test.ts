@@ -71,39 +71,39 @@ describe('Event Category Data Structures', () => {
     expect(allEventTypeOptions).toMatchInlineSnapshot(`
       [
         {
-          "label": "Activity",
+          "label": "events.category.activity",
           "value": "activity",
         },
         {
-          "label": "Child Workflow",
+          "label": "events.category.child-workflow",
           "value": "child-workflow",
         },
         {
-          "label": "Command",
+          "label": "events.category.command",
           "value": "command",
         },
         {
-          "label": "Local Activity",
+          "label": "events.category.local-activity",
           "value": "local-activity",
         },
         {
-          "label": "Marker",
+          "label": "events.category.marker",
           "value": "marker",
         },
         {
-          "label": "Signal",
+          "label": "events.category.signal",
           "value": "signal",
         },
         {
-          "label": "Timer",
+          "label": "events.category.timer",
           "value": "timer",
         },
         {
-          "label": "Update",
+          "label": "events.category.update",
           "value": "update",
         },
         {
-          "label": "Workflow",
+          "label": "events.category.workflow",
           "value": "workflow",
         },
       ]
@@ -114,31 +114,31 @@ describe('Event Category Data Structures', () => {
     expect(compactEventTypeOptions).toMatchInlineSnapshot(`
       [
         {
-          "label": "Activity",
+          "label": "events.category.activity",
           "value": "activity",
         },
         {
-          "label": "Child Workflow",
+          "label": "events.category.child-workflow",
           "value": "child-workflow",
         },
         {
-          "label": "Local Activity",
+          "label": "events.category.local-activity",
           "value": "local-activity",
         },
         {
-          "label": "Marker",
+          "label": "events.category.marker",
           "value": "marker",
         },
         {
-          "label": "Signal",
+          "label": "events.category.signal",
           "value": "signal",
         },
         {
-          "label": "Timer",
+          "label": "events.category.timer",
           "value": "timer",
         },
         {
-          "label": "Update",
+          "label": "events.category.update",
           "value": "update",
         },
       ]
