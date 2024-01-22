@@ -71,6 +71,7 @@ export const Strings = {
   notes: 'Notes',
   add: 'Add',
   'from-now': 'from now',
+  'hour-abbreviated': 'hr.',
   'hours-abbreviated': 'hrs.',
   'minutes-abbreviated': 'min.',
   'seconds-abbreviated': 'sec.',
