@@ -20,7 +20,12 @@ const workflow: WorkflowExecution = {
     workflowId: 'parent-workflow-id',
   },
   parentNamespaceId: 'parent-namespace-id',
-  searchAttributes: {},
+  searchAttributes: {
+    indexedFields: {
+      TemporalScheduledById: 'schedule_abc-123',
+      TemporalScheduledStartTime: '2024-01-05T00:00:00.000000000Z',
+    },
+  },
   pendingChildren: [],
   pendingActivities: [],
   stateTransitionCount: '12',

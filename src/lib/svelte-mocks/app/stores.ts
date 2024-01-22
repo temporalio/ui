@@ -17,6 +17,7 @@ const settings: Settings = {
     options: null,
   },
   baseUrl: 'http://localhost:3000',
+  bannerText: '',
   codec: {
     endpoint: '',
     passAccessToken: false,

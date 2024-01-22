@@ -35,6 +35,13 @@ describe('atob', () => {
     expect(res).toEqual('"rainbow statuses df2f81 Terminated"');
   });
 
+  it('should decode unicode within uft-8 characters using the fallback', () => {
+    const res = atob(
+      'eyJJbnB1dCI6eyAiUmVzdWx0IjoiXG5cdTAwMWRcblx0MzkwOTQ1MTEzXHUwMDEyXHQzOTA5MzYzMjFcdTAwMWFcdTAwMDVcdTAwMDgkXHUwMDEwXHUwMDA3In0sIk91dHB1dCI6eyJSZXN1bHQiOiJ0cnVlIn19',
+    );
+    expect(res).toContain('Result');
+  });
+
   it('should become a no-op if browser is set to false', () => {
     const res = atob('InJhaW5ib3cgc3RhdHVzZXMgZGYyZjgxIFRlcm1pbmF0ZWQi', false);
     expect(res).toEqual('InJhaW5ib3cgc3RhdHVzZXMgZGYyZjgxIFRlcm1pbmF0ZWQi');

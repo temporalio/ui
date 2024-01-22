@@ -38,32 +38,28 @@
   <p>
     {translate('schedules.time-view-description')}
   </p>
-  <div class="flex flex-row items-center gap-2">
-    <div class="w-24">
-      <Input
-        id="hour-time"
-        label={translate('common.hours-abbreviated')}
-        labelHidden
-        bind:value={_hour}
-        placeholder="00"
-        suffix={translate('common.hours-abbreviated')}
-        maxLength={2}
-        error={error(_hour, 12)}
-      />
-    </div>
-    <div>:</div>
-    <div class="w-24">
-      <Input
-        id="minute-time"
-        label={translate('common.minutes-abbreviated')}
-        labelHidden
-        bind:value={minute}
-        placeholder="00"
-        suffix={translate('common.minutes-abbreviated')}
-        maxLength={2}
-        error={error(minute, 59)}
-      />
-    </div>
+  <div class="flex flex-col items-center gap-2 lg:flex-row">
+    <Input
+      id="hour-time"
+      label={translate('common.hour-abbreviated')}
+      labelHidden
+      bind:value={_hour}
+      placeholder="00"
+      suffix={translate('common.hour-abbreviated')}
+      maxLength={2}
+      error={error(_hour, 12)}
+    />
+    <div class="hidden lg:block">:</div>
+    <Input
+      id="minute-time"
+      label={translate('common.minutes-abbreviated')}
+      labelHidden
+      bind:value={minute}
+      placeholder="00"
+      suffix={translate('common.minutes-abbreviated')}
+      maxLength={2}
+      error={error(minute, 59)}
+    />
     <div class="ml-2">
       <ToggleButtons>
         <ToggleButton active={time === 'AM'} on:click={() => (time = 'AM')}

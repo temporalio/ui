@@ -76,56 +76,46 @@ export const eventTypeCategorizations: Readonly<
 
 export type EventTypeOption = {
   label: I18nKey;
-  option: EventTypeCategory | undefined;
-  color?: string;
+  value: EventTypeCategory;
 };
 
 export const allEventTypeOptions: EventTypeOption[] = [
-  { label: 'events.category.all', option: undefined },
   {
     label: 'events.category.activity',
-    option: CATEGORIES.ACTIVITY,
-    color: '#8B5CF6',
+    value: CATEGORIES.ACTIVITY,
   },
   {
     label: 'events.category.child-workflow',
-    option: CATEGORIES.CHILD_WORKFLOW,
-    color: '#F59E0B',
+    value: CATEGORIES.CHILD_WORKFLOW,
   },
   {
     label: 'events.category.command',
-    option: CATEGORIES.COMMAND,
-    color: '#10B981',
+    value: CATEGORIES.COMMAND,
   },
   {
     label: 'events.category.local-activity',
-    option: CATEGORIES.LOCAL_ACTIVITY,
+    value: CATEGORIES.LOCAL_ACTIVITY,
   },
   {
     label: 'events.category.marker',
-    option: CATEGORIES.MARKER,
-    color: '#EC4899',
+    value: CATEGORIES.MARKER,
   },
   {
     label: 'events.category.signal',
-    option: CATEGORIES.SIGNAL,
-    color: '#DD6B20',
+    value: CATEGORIES.SIGNAL,
   },
   {
     label: 'events.category.timer',
-    option: CATEGORIES.TIMER,
-    color: '#1D4ED8',
+    value: CATEGORIES.TIMER,
   },
-  { label: 'events.category.update', option: CATEGORIES.UPDATE },
+  { label: 'events.category.update', value: CATEGORIES.UPDATE },
   {
     label: 'events.category.workflow',
-    option: CATEGORIES.WORKFLOW,
-    color: '#10B981',
+    value: CATEGORIES.WORKFLOW,
   },
 ];
 
-const compactEventTypes: (EventTypeCategory | undefined)[] = [
-  undefined,
+const compactEventTypes: EventTypeCategory[] = [
   CATEGORIES.ACTIVITY,
   CATEGORIES.LOCAL_ACTIVITY,
   CATEGORIES.CHILD_WORKFLOW,
@@ -136,24 +126,7 @@ const compactEventTypes: (EventTypeCategory | undefined)[] = [
 ];
 
 export const compactEventTypeOptions: EventTypeOption[] =
-  allEventTypeOptions.filter(({ option }) =>
-    compactEventTypes.includes(option),
-  );
-
-const timelineEventTypes: EventTypeCategory[] = [
-  CATEGORIES.ACTIVITY,
-  CATEGORIES.LOCAL_ACTIVITY,
-  CATEGORIES.CHILD_WORKFLOW,
-  CATEGORIES.COMMAND,
-  CATEGORIES.MARKER,
-  CATEGORIES.SIGNAL,
-  CATEGORIES.TIMER,
-  CATEGORIES.UPDATE,
-];
-export const timelineEventTypeOptions: EventTypeOption[] =
-  allEventTypeOptions.filter(({ option }) =>
-    timelineEventTypes.includes(option),
-  );
+  allEventTypeOptions.filter(({ value }) => compactEventTypes.includes(value));
 
 export const getEventCategory = (eventType: EventType): EventTypeCategory => {
   return eventTypeCategorizations[eventType];

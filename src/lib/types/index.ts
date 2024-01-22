@@ -201,6 +201,7 @@ export type Timestamp = google.protobuf.ITimestamp;
 // extra APIs
 export type SettingsResponse = {
   Auth: { Enabled: boolean; Options: string[] };
+  BannerText: string;
   Codec: {
     Endpoint: string;
     PassAccessToken?: boolean;

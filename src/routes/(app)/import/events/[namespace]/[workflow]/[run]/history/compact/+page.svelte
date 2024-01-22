@@ -8,15 +8,14 @@
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
   import { importEventGroups } from '$lib/stores/import-events';
-  import type { EventTypeCategory } from '$lib/types/events';
 
-  $: category = $eventCategoryFilter as EventTypeCategory;
   $: sortedEvents =
     $eventFilterSort === 'descending'
       ? [...$importEventGroups].reverse()
       : $importEventGroups;
   $: filteredEventGroups = sortedEvents.filter((event: EventGroup) => {
-    if (category) return event.category === category;
+    if ($eventCategoryFilter)
+      return $eventCategoryFilter.includes(event.category);
     return event;
   });
 

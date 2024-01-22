@@ -21,6 +21,8 @@ export const WorkflowHeaderLabels = [
   'State Transitions',
   'Parent Namespace',
   'Task Queue',
+  'Scheduled By ID',
+  'Scheduled Start Time',
 ] as const;
 
 export type WorkflowHeaderLabel = (typeof WorkflowHeaderLabels)[number];
@@ -74,6 +76,8 @@ const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
   { label: 'State Transitions', pinned: false },
   { label: 'Parent Namespace', pinned: false },
   { label: 'Task Queue', pinned: false },
+  { label: 'Scheduled By ID', pinned: false },
+  { label: 'Scheduled Start Time', pinned: false },
 ];
 
 const isNotParentWorkflowIdColumn = (column: WorkflowHeader) =>
