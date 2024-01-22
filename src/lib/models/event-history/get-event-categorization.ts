@@ -1,4 +1,4 @@
-import { translate } from '$lib/i18n/translate';
+import type { I18nKey } from '$lib/i18n';
 import type {
   EventType,
   IterableEvent,
@@ -75,42 +75,42 @@ export const eventTypeCategorizations: Readonly<
 };
 
 export type EventTypeOption = {
-  label: string;
+  label: I18nKey;
   value: EventTypeCategory;
 };
 
 export const allEventTypeOptions: EventTypeOption[] = [
   {
-    label: translate('events.category.activity'),
+    label: 'events.category.activity',
     value: CATEGORIES.ACTIVITY,
   },
   {
-    label: translate('events.category.child-workflow'),
+    label: 'events.category.child-workflow',
     value: CATEGORIES.CHILD_WORKFLOW,
   },
   {
-    label: translate('events.category.command'),
+    label: 'events.category.command',
     value: CATEGORIES.COMMAND,
   },
   {
-    label: translate('events.category.local-activity'),
+    label: 'events.category.local-activity',
     value: CATEGORIES.LOCAL_ACTIVITY,
   },
   {
-    label: translate('events.category.marker'),
+    label: 'events.category.marker',
     value: CATEGORIES.MARKER,
   },
   {
-    label: translate('events.category.signal'),
+    label: 'events.category.signal',
     value: CATEGORIES.SIGNAL,
   },
   {
-    label: translate('events.category.timer'),
+    label: 'events.category.timer',
     value: CATEGORIES.TIMER,
   },
-  { label: translate('events.category.update'), value: CATEGORIES.UPDATE },
+  { label: 'events.category.update', value: CATEGORIES.UPDATE },
   {
-    label: translate('events.category.workflow'),
+    label: 'events.category.workflow',
     value: CATEGORIES.WORKFLOW,
   },
 ];
