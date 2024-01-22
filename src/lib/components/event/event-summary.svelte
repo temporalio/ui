@@ -31,11 +31,8 @@
   ): IterableEvent[] => {
     if (category) {
       const filteredItems = items.filter((i) => {
-        if (
-          isLocalActivityMarkerEvent(i) &&
-          !category.includes(CATEGORIES.LOCAL_ACTIVITY)
-        ) {
-          return false;
+        if (isLocalActivityMarkerEvent(i)) {
+          return category.includes(CATEGORIES.LOCAL_ACTIVITY);
         }
         return category.includes(i.category);
       });
