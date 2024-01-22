@@ -220,12 +220,6 @@
       drawTimeline();
     }
   }
-
-  $: {
-    if (timeline) {
-      filterAndSetItems($eventCategoryFilter);
-    }
-  }
 </script>
 
 <Accordion
