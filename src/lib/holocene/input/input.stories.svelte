@@ -4,6 +4,7 @@
   import { iconNames } from '$lib/holocene/icon/paths';
 
   import Input from './input.svelte';
+  let value: string = '';
 </script>
 
 <Meta
@@ -31,13 +32,13 @@
     value: { control: 'text' },
     name: { control: 'text' },
     icon: { control: 'select', options: iconNames },
-    theme: { control: 'radio', options: ['dark', 'light'] },
+    theme: { control: 'select', options: ['dark', 'light'] },
     spellcheck: { control: 'boolean' },
   }}
 />
 
 <Template let:args>
-  <Input {...args} />
+  <Input bind:value {...args} />
 </Template>
 
 <Story args={{ id: 'text-input-1' }} name="input" />

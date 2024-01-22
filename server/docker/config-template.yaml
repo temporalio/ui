@@ -2,6 +2,7 @@ temporalGrpcAddress: {{ default .Env.TEMPORAL_ADDRESS "127.0.0.1:7233" }}
 port: {{ default .Env.TEMPORAL_UI_PORT "8080" }}
 publicPath: {{ default .Env.TEMPORAL_UI_PUBLIC_PATH "" }}
 enableUi: {{ default .Env.TEMPORAL_UI_ENABLED "true" }}
+bannerText: {{ default .Env.TEMPORAL_BANNER_TEXT "" }}
 cloudUi: {{ default .Env.TEMPORAL_CLOUD_UI "false" }}
 defaultNamespace: {{ default .Env.TEMPORAL_DEFAULT_NAMESPACE "default" }}
 feedbackUrl: {{ default .Env.TEMPORAL_FEEDBACK_URL "" }}

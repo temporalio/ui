@@ -4,6 +4,7 @@
   interface Props {
     selected?: boolean;
     disabled?: boolean;
+    theme?: 'dark' | 'light';
   }
 
   interface DisabledProps {
@@ -15,6 +16,7 @@
 
   export let selected = false;
   export let disabled = false;
+  export let theme: 'light' | 'dark' = 'light';
 </script>
 
 <MenuItem
@@ -25,6 +27,7 @@
   aria-disabled={disabled}
   {disabled}
   {selected}
+  {theme}
 >
   <slot slot="leading" name="leading" />
   <slot />

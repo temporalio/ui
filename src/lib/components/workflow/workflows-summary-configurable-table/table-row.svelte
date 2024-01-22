@@ -18,7 +18,7 @@
 
 <tr data-testid="workflows-summary-configurable-table-row" class:empty>
   {#if !empty && $supportsBulkActions}
-    <td class="px-2">
+    <td class="relative px-2">
       <Checkbox
         {label}
         labelHidden
