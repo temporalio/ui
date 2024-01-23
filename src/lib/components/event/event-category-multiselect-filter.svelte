@@ -36,6 +36,10 @@
     : [];
 
   const onOptionClick = (_options) => {
+    if (_options.length === options.length) {
+      _options = [];
+    }
+
     const value = _options.map((o) => o.value).join(',');
     updateQueryParameters({
       parameter: parameter,

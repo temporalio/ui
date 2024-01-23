@@ -10,6 +10,8 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
 
+  import Link from './link.svelte';
+
   const buttonStyles = cva(
     [
       'relative',
@@ -103,44 +105,70 @@
   export let active = false;
 </script>
 
-<svelte:element
-  this={href && !disabled ? 'a' : 'button'}
-  {target}
-  href={disabled ? null : href}
-  {disabled}
-  {id}
-  role="button"
-  type="button"
-  class:active
-  on:click|stopPropagation
-  class={buttonStyles({ variant, size, borderModifier, borderRadiusModifier })}
-  {...$$restProps}
->
-  {#if leadingIcon || loading}
-    <span class:animate-spin={loading}>
-      <Icon name={loading ? 'spinner' : leadingIcon} />
-    </span>
-  {/if}
-  <slot />
-  {#if trailingIcon}
-    <span>
-      <Icon name={trailingIcon} />
-    </span>
-  {/if}
-  {#if count > 0}
-    <Badge
-      class="badge absolute top-0 right-0 origin-bottom-left translate-y-[-10px] translate-x-[10px]"
-      type="count">{count}</Badge
-    >
-  {/if}
-</svelte:element>
-
-<style lang="postcss">
-  .active {
-    @apply bg-indigo-100;
-  }
-
-  a[type='button'] {
-    appearance: none;
-  }
-</style>
+{#if href && !disabled}
+  <Link
+    {target}
+    {href}
+    {id}
+    role="button"
+    type="button"
+    class={buttonStyles({
+      variant,
+      size,
+      borderModifier,
+      borderRadiusModifier,
+    })}
+    {...$$restProps}
+  >
+    {#if leadingIcon || loading}
+      <span class:animate-spin={loading}>
+        <Icon name={loading ? 'spinner' : leadingIcon} />
+      </span>
+    {/if}
+    <slot />
+    {#if trailingIcon}
+      <span>
+        <Icon name={trailingIcon} />
+      </span>
+    {/if}
+    {#if count > 0}
+      <Badge
+        class="badge absolute top-0 right-0 origin-bottom-left translate-y-[-10px] translate-x-[10px]"
+        type="count">{count}</Badge
+      >
+    {/if}
+  </Link>
+{:else}
+  <button
+    {disabled}
+    {id}
+    type="button"
+    class:active
+    on:click|stopPropagation
+    class={buttonStyles({
+      variant,
+      size,
+      borderModifier,
+      borderRadiusModifier,
+    })}
+    {...$$restProps}
+  >
+    {#if leadingIcon || loading}
+      <span class:animate-spin={loading}>
+        <Icon name={loading ? 'spinner' : leadingIcon} />
+      </span>
+    {/if}
+    <slot />
+    {#if trailingIcon}
+      <span>
+        <Icon name={trailingIcon} />
+      </span>
+    {/if}
+    {#if count > 0}
+      <Badge
+        class="badge absolute top-0 right-0 origin-bottom-left translate-y-[-10px] translate-x-[10px]"
+        type="count">{count}</Badge
+      >
+    {/if}
+  </button>
+{/if}

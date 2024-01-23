@@ -31,8 +31,8 @@
   ): IterableEvent[] => {
     if (category) {
       const filteredItems = items.filter((i) => {
-        if (category.includes(CATEGORIES.LOCAL_ACTIVITY)) {
-          return category.includes(i.category) || isLocalActivityMarkerEvent(i);
+        if (isLocalActivityMarkerEvent(i)) {
+          return category.includes(CATEGORIES.LOCAL_ACTIVITY);
         }
         return category.includes(i.category);
       });

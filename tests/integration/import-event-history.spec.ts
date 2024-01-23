@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test';
 
-import { mockWorkflowsApis, SETTINGS_API } from '~/test-utilities/mock-apis';
+import {
+  mockWorkflowsApis,
+  mockWorkflowsGroupByCountApi,
+  SETTINGS_API,
+  waitForWorkflowsApis,
+} from '~/test-utilities/mock-apis';
 
 const importUrl = '/import/events';
 const importEventHistoryUrl =
@@ -12,10 +17,12 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('Navigate to import page from nav', async ({ page }) => {
+  await mockWorkflowsGroupByCountApi(page);
   await page.goto(workflowsUrl);
+  await waitForWorkflowsApis(page);
 
-  const namespace = await page.getByTestId('namespace-name').innerText();
-  expect(namespace).toBe('default');
+  const count = await page.getByTestId('workflow-count').innerText();
+  expect(count).toBe('31,230');
 
   await page.goto(importUrl);
   page.waitForRequest(SETTINGS_API);

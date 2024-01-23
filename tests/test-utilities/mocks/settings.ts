@@ -19,7 +19,7 @@ const defaultSettings = {
     PassAccessToken: false,
     IncludeCredentials: false,
   },
-  Version: '2.15.0',
+  Version: '2.22.0',
   DisableWriteActions: false,
   WorkflowTerminateDisabled: false,
   WorkflowCancelDisabled: false,

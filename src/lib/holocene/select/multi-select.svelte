@@ -38,17 +38,18 @@
     } else {
       selectedOptions = [...selectedOptions, option];
     }
+
     onChange(selectedOptions);
   };
 
   const onSelectAllOptionClick = () => {
     selectedOptions = options;
-    onChange([]);
+    onChange(selectedOptions);
   };
 
   const onRemoveAllOptionClick = () => {
     selectedOptions = [];
-    onChange([]);
+    onChange(selectedOptions);
   };
 </script>
 

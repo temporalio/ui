@@ -1,0 +1,37 @@
+{
+  "eventId": "5",
+  "eventTime": "2024-01-16T09:33:36.709036083Z",
+  "eventType": "MarkerRecorded",
+  "version": "0",
+  "taskId": "1048598",
+  "workerMayIgnore": false,
+  "markerRecordedEventAttributes": {
+    "markerName": "core_local_activity",
+    "details": {
+      "data": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "json/plain"
+            },
+            "data": "ewogICAgICAgICAgICAgICJzZXEiOiAxLAogICAgICAgICAgICAgICJhdHRlbXB0IjogMSwKICAgICAgICAgICAgICAiYWN0aXZpdHlfaWQiOiAiMSIsCiAgICAgICAgICAgICAgImFjdGl2aXR5X3R5cGUiOiAiZ3JlZXQiLAogICAgICAgICAgICAgICJjb21wbGV0ZV90aW1lIjogewogICAgICAgICAgICAgICAgInNlY29uZHMiOiAxNzA1Mzk3NjE2LAogICAgICAgICAgICAgICAgIm5hbm9zIjogNjY1NzkwMzc2CiAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAiYmFja29mZiI6IG51bGwsCiAgICAgICAgICAgICAgIm9yaWdpbmFsX3NjaGVkdWxlX3RpbWUiOiB7CiAgICAgICAgICAgICAgICAic2Vjb25kcyI6IDE3MDUzOTc2MTYsCiAgICAgICAgICAgICAgICAibmFub3MiOiA2OTc1OTAwMDAKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0="
+          }
+        ]
+      },
+      "result": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": "Hello, Temporal!"
+          }
+        ]
+      }
+    },
+    "workflowTaskCompletedEventId": "4",
+    "header": null,
+    "failure": null
+  }
+}
