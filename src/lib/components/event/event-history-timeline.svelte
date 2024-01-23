@@ -165,8 +165,8 @@
   ): CommonHistoryEvent[] => {
     if (!category) return history;
     return history.filter((i) => {
-      if (category.includes(CATEGORIES.LOCAL_ACTIVITY)) {
-        return category.includes(i.category) || isLocalActivityMarkerEvent(i);
+      if (isLocalActivityMarkerEvent(i)) {
+        return category.includes(CATEGORIES.LOCAL_ACTIVITY);
       }
       return category.includes(i.category);
     });

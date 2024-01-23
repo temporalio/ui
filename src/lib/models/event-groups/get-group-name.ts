@@ -74,7 +74,7 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
 
   if (isMarkerRecordedEvent(event)) {
     if (isLocalActivityMarkerEvent(event)) {
-      return 'Local Activity';
+      return '';
     }
     return 'Marker';
   }
