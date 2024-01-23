@@ -39,21 +39,17 @@
       selectedOptions = [...selectedOptions, option];
     }
 
-    if (selectedOptions.length === options.length) {
-      onChange([]);
-    } else {
-      onChange(selectedOptions);
-    }
+    onChange(selectedOptions);
   };
 
   const onSelectAllOptionClick = () => {
     selectedOptions = options;
-    onChange([]);
+    onChange(selectedOptions);
   };
 
   const onRemoveAllOptionClick = () => {
     selectedOptions = [];
-    onChange([]);
+    onChange(selectedOptions);
   };
 </script>
 
