@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test';
 
-import { mockWorkflowsApis, SETTINGS_API } from '~/test-utilities/mock-apis';
+import {
+  mockWorkflowsApis,
+  mockWorkflowsGroupByCountApi,
+  SETTINGS_API,
+  waitForWorkflowsApis,
+} from '~/test-utilities/mock-apis';
 
 const importUrl = '/import/events';
 const importEventHistoryUrl =
@@ -12,7 +17,9 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('Navigate to import page from nav', async ({ page }) => {
+  await mockWorkflowsGroupByCountApi(page);
   await page.goto(workflowsUrl);
+  await waitForWorkflowsApis(page);
 
   const count = await page.getByTestId('workflow-count').innerText();
   expect(count).toBe('31230');
