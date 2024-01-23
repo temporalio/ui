@@ -67,7 +67,6 @@
         </td>
         <td class="hover:text-blue-700 hover:underline">
           <Link
-            newTab
             href={routeForEventHistory({
               namespace: child.namespace,
               workflow: child.workflowId,
@@ -79,7 +78,6 @@
         </td>
         <td class="hover:text-blue-700 hover:underline">
           <Link
-            newTab
             href={routeForEventHistory({
               namespace: child.namespace,
               workflow: child.workflowId,

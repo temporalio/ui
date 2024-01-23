@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
+  import { goto } from '$app/navigation';
+
   import type { IconName } from '$lib/holocene/icon/paths';
 
   import Icon from './icon/icon.svelte';
@@ -20,6 +22,14 @@
   export let active = false;
   export let newTab = false;
   export let icon: IconName = null;
+
+  const onLinkClick = (e: MouseEvent) => {
+    // Skip if middle mouse click or new tab
+    if (e.button === 1 || newTab) return;
+    e.preventDefault();
+    e.stopPropagation();
+    goto(href);
+  };
 </script>
 
 <a
@@ -28,7 +38,7 @@
   rel={newTab ? 'noreferrer' : null}
   class="link {icon ? 'inline-flex' : 'inline'} {className}"
   class:active
-  on:click
+  on:click={onLinkClick}
   tabindex={href ? null : 0}
   {...$$restProps}
 >
@@ -45,5 +55,9 @@
     &.active {
       @apply text-blue-900;
     }
+  }
+
+  .link[role='button'] {
+    @apply no-underline;
   }
 </style>

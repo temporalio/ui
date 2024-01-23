@@ -163,12 +163,7 @@
 {#await scheduleFetch}
   <header class="mb-8">
     <div class="relative flex flex-col gap-4">
-      <Link
-        on:click={() => {
-          goto(routeForSchedules({ namespace }));
-        }}
-        icon="chevron-left"
-      >
+      <Link href={routeForSchedules({ namespace })} icon="chevron-left">
         {translate('schedules.back-to-schedules')}
       </Link>
       <h1 class="select-all text-2xl font-medium" data-testid="schedule-name">
@@ -186,12 +181,7 @@
   {:else}
     <header class="mb-8 flex flex-row justify-between gap-4">
       <div class="relative flex flex-col gap-4">
-        <Link
-          on:click={() => {
-            goto(routeForSchedules({ namespace }));
-          }}
-          icon="chevron-left"
-        >
+        <Link href={routeForSchedules({ namespace })} icon="chevron-left">
           {translate('schedules.back-to-schedules')}
         </Link>
         <h1 class="relative flex items-center text-2xl">
@@ -411,12 +401,7 @@
 {:catch error}
   <header class="mb-8">
     <div class="relative flex flex-col gap-1">
-      <Link
-        on:click={() => {
-          goto(routeForSchedules({ namespace }));
-        }}
-        icon="chevron-left"
-      >
+      <Link href={routeForSchedules({ namespace })} icon="chevron-left">
         {translate('schedules.back-to-schedules')}
       </Link>
       <h1

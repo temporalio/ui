@@ -115,13 +115,11 @@
       <EmptyState title={translate('schedules.empty-state-title')} {error}>
         <p>
           {translate('schedules.getting-started-docs-link-preface')}
-          <Link
-            target="_external"
-            href="https://docs.temporal.io/workflows/#schedule"
+          <Link newTab href="https://docs.temporal.io/workflows/#schedule"
             >{translate('schedules.getting-started-docs-link')}</Link
           >
           {translate('schedules.getting-started-cli-link-preface')}
-          <Link target="_external" href="https://docs.temporal.io/cli/schedule"
+          <Link newTab href="https://docs.temporal.io/cli/schedule"
             >Temporal CLI</Link
           >.
         </p>
