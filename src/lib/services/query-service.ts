@@ -75,7 +75,6 @@ async function fetchQuery(
         },
         query: {
           queryType,
-          runId: workflow.runId,
         },
       }),
     },
