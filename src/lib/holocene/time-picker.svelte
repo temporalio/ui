@@ -20,6 +20,7 @@
     placeholder="00"
     suffix="hrs"
     maxLength={2}
+    hideCount
     error={twelveHourClock ? parseInt(hour) > 12 : parseInt(hour) > 23}
     {disabled}
   />
@@ -32,6 +33,7 @@
     placeholder="00"
     suffix="min"
     maxLength={2}
+    hideCount
     error={Boolean(parseInt(hour) > 59)}
     {disabled}
   />
@@ -43,6 +45,7 @@
     placeholder="00"
     suffix="sec"
     maxLength={2}
+    hideCount
     error={Boolean(parseInt(hour) > 59)}
     {disabled}
   />
