@@ -22,7 +22,7 @@ test('Navigate to import page from nav', async ({ page }) => {
   await waitForWorkflowsApis(page);
 
   const count = await page.getByTestId('workflow-count').innerText();
-  expect(count).toBe('31230');
+  expect(count).toBe('31,230');
 
   await page.goto(importUrl);
   page.waitForRequest(SETTINGS_API);
