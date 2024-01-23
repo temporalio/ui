@@ -28,7 +28,6 @@
     <td class="w-1/3 hover:text-blue-700 hover:underline">
       {#if first}
         <Link
-          newTab
           href={routeForEventHistory({
             namespace,
             workflow: workflow,
@@ -47,7 +46,6 @@
     <td class="w-1/3 hover:text-blue-700 hover:underline">
       {#if previous}
         <Link
-          newTab
           href={routeForEventHistory({
             namespace,
             workflow: workflow,
@@ -66,7 +64,6 @@
     <td class="w-1/3 hover:text-blue-700 hover:underline">
       {#if next}
         <Link
-          newTab
           href={routeForEventHistory({
             namespace,
             workflow: workflow,
