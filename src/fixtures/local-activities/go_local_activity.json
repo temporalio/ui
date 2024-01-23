@@ -1,0 +1,37 @@
+{
+  "eventId": "5",
+  "eventTime": "2024-01-16T09:38:31.928219179Z",
+  "eventType": "MarkerRecorded",
+  "version": "0",
+  "taskId": "1048587",
+  "workerMayIgnore": false,
+  "markerRecordedEventAttributes": {
+    "markerName": "LocalActivity",
+    "details": {
+      "data": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ewogICAiQWN0aXZpdHlJRCI6ICIxIiwKICAgIkFjdGl2aXR5VHlwZSI6ICJBY3Rpdml0eSIsCiAgIlJlcGxheVRpbWUiOiAiMjAyNC0wMS0xNlQwOTozODozMS45MjE1MTQ0N1oiLAogICJBdHRlbXB0IjogMSwKICAiQmFja29mZiI6IDAKfQ=="
+          }
+        ]
+      },
+      "result": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "encodingDecoded": "json/plain"
+            },
+            "data": "Hello Temporal!"
+          }
+        ]
+      }
+    },
+    "workflowTaskCompletedEventId": "4",
+    "header": null,
+    "failure": null
+  }
+}

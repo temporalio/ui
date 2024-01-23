@@ -100,7 +100,6 @@
           container-class="flex-row-reverse xl:flex-row"
         >
           <Link
-            newTab
             href={routeForEventHistory({
               namespace,
               workflow,
@@ -123,7 +122,6 @@
           container-class="xl:flex-row"
         >
           <Link
-            newTab
             href={routeForEventHistory({
               namespace: attributes?.namespace || namespace,
               workflow: attributes.workflowExecutionWorkflowId,
@@ -145,7 +143,7 @@
           content={value}
           container-class="xl:flex-row"
         >
-          <Link newTab href={routeForTaskQueue({ namespace, queue: value })}>
+          <Link href={routeForTaskQueue({ namespace, queue: value })}>
             {value}
           </Link>
         </Copyable>

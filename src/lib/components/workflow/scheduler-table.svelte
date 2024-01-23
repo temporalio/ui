@@ -21,7 +21,6 @@
   <TableRow class="hover:text-blue-700 hover:underline">
     <td>
       <Link
-        newTab
         href={routeForSchedule({
           namespace: namespace,
           scheduleId,

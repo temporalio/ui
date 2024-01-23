@@ -1,7 +1,3 @@
-import {
-  codecEndpoint,
-  passAccessToken as codecPassAccessToken,
-} from '$lib/stores/data-encoder-config';
 import type {
   PendingActivity,
   PendingActivityWithMetadata,
@@ -13,34 +9,18 @@ import {
   type DecodeFunctions,
   decodePayloadAttributes,
 } from '$lib/utilities/decode-payload';
-import {
-  getCodecEndpoint,
-  getCodecPassAccessToken,
-} from '$lib/utilities/get-codec';
 
 export async function getActivityAttributes(
   { activity, namespace, settings, accessToken }: PendingActivityWithMetadata,
   {
     convertWithCodec = convertPayloadToJsonWithCodec,
     decodeAttributes = decodePayloadAttributes,
-    encoderEndpoint = codecEndpoint,
   }: DecodeFunctions = {},
 ): Promise<PendingActivity> {
-  // Use locally set endpoint over settings endpoint for testing purposes
-  const endpoint = getCodecEndpoint(settings, encoderEndpoint);
-  const passAccessToken = getCodecPassAccessToken(
-    settings,
-    codecPassAccessToken,
-  );
-  const _settings = {
-    ...settings,
-    codec: { ...settings?.codec, endpoint, passAccessToken },
-  };
-
   const convertedAttributes = await convertWithCodec({
     attributes: activity,
     namespace,
-    settings: _settings,
+    settings,
     accessToken,
   });
 

@@ -19,7 +19,12 @@
     : translate('events.workflow-events');
 
   let parameter = 'category';
-  let options = compact ? compactEventTypeOptions : allEventTypeOptions;
+  let options = (compact ? compactEventTypeOptions : allEventTypeOptions).map(
+    (o) => ({
+      ...o,
+      label: translate(o.label),
+    }),
+  );
 
   $: {
     if (isVersionNewer('1.21', $temporalVersion)) {
@@ -31,6 +36,10 @@
     : [];
 
   const onOptionClick = (_options) => {
+    if (_options.length === options.length) {
+      _options = [];
+    }
+
     const value = _options.map((o) => o.value).join(',');
     updateQueryParameters({
       parameter: parameter,

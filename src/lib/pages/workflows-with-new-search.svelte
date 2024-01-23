@@ -57,7 +57,6 @@
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { Action } from '$lib/models/workflow-actions';
@@ -205,8 +204,11 @@
       </h1>
     </div>
     <div class="flex items-center gap-2 text-sm">
-      <Link tabindex={0} on:click={() => exportWorkflows($workflows)}
-        >{translate('common.download-json')}</Link
+      <button
+        class="underline hover:text-blue-700"
+        tabindex={0}
+        on:click={() => exportWorkflows($workflows)}
+        >{translate('common.download-json')}</button
       >
     </div>
   </div>
