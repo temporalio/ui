@@ -14,7 +14,7 @@ const MOCK_CLUSTER: Cluster = {
     'temporal-typescript': '\u003c2.0.0',
     'temporal-ui': '\u003c3.0.0',
   },
-  serverVersion: '1.19.3',
+  serverVersion: '1.22.0',
   clusterId: 'f2f23e30-2294-4bf8-a5ec-b505259f30c9',
   versionInfo: null,
   clusterName: 'active',

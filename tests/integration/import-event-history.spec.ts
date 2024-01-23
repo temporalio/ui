@@ -14,8 +14,8 @@ test.beforeEach(async ({ page }) => {
 test('Navigate to import page from nav', async ({ page }) => {
   await page.goto(workflowsUrl);
 
-  const namespace = await page.getByTestId('namespace-name').innerText();
-  expect(namespace).toBe('default');
+  const count = await page.getByTestId('workflow-count').innerText();
+  expect(count).toBe('31230');
 
   await page.goto(importUrl);
   page.waitForRequest(SETTINGS_API);
