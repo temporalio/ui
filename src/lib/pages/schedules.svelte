@@ -67,7 +67,7 @@
       {#if !createDisabled && visibleItems.length}
         <Button
           data-testid="create-schedule"
-          on:click={() => goto(routeForScheduleCreate({ namespace }))}
+          href={routeForScheduleCreate({ namespace })}
           disabled={!writeActionsAreAllowed()}
         >
           {translate('schedules.create')}
