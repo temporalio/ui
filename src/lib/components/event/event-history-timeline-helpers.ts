@@ -10,9 +10,12 @@ import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
 type TimelineOptionsTooltipOverflow = 'flip' | 'none' | 'cap';
 
-export const getTimelineOptions = (workflow: WorkflowExecution) => ({
+export const getTimelineOptions = (
+  workflow: WorkflowExecution,
+  { maxHeight = 520 }: { maxHeight: number },
+) => ({
   stackSubgroups: true,
-  maxHeight: 520,
+  maxHeight,
   min: startOfMinute(new Date(workflow.startTime)),
   max: workflow?.endTime
     ? endOfMinute(new Date(workflow?.endTime))

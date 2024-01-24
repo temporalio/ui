@@ -93,8 +93,8 @@ dependencies:
     specifier: ^9.0.0
     version: 9.0.0
   vis-timeline:
-    specifier: ^7.7.2
-    version: 7.7.2(@egjs/hammerjs@2.0.17)(component-emitter@1.3.0)(keycharm@0.4.0)(moment@2.29.4)(propagating-hammerjs@2.0.1)(uuid@9.0.0)(vis-data@7.1.7)(vis-util@5.0.5)(xss@1.0.14)
+    specifier: ^7.7.3
+    version: 7.7.3(@egjs/hammerjs@2.0.17)(component-emitter@1.3.0)(keycharm@0.4.0)(moment@2.29.4)(propagating-hammerjs@2.0.1)(uuid@9.0.0)(vis-data@7.1.7)(vis-util@5.0.5)(xss@1.0.14)
 
 devDependencies:
   '@axe-core/playwright':
@@ -15185,9 +15185,8 @@ packages:
       vis-util: 5.0.5(@egjs/hammerjs@2.0.17)(component-emitter@1.3.0)
     dev: false
 
-  /vis-timeline@7.7.2(@egjs/hammerjs@2.0.17)(component-emitter@1.3.0)(keycharm@0.4.0)(moment@2.29.4)(propagating-hammerjs@2.0.1)(uuid@9.0.0)(vis-data@7.1.7)(vis-util@5.0.5)(xss@1.0.14):
-    resolution: {integrity: sha512-l7hDBFJ0FI6gX4kzsxAONnAacowK3sHWx3uc5jR1DYs/FAsOEZsHDclVNW3+QAwmV3Xvg61U8//ha6hZNw7G1Q==}
-    requiresBuild: true
+  /vis-timeline@7.7.3(@egjs/hammerjs@2.0.17)(component-emitter@1.3.0)(keycharm@0.4.0)(moment@2.29.4)(propagating-hammerjs@2.0.1)(uuid@9.0.0)(vis-data@7.1.7)(vis-util@5.0.5)(xss@1.0.14):
+    resolution: {integrity: sha512-hGMzTttdOFWaw1PPlJuCXU2/4UjnsIxT684Thg9fV6YU1JuKZJs3s3BrJgZ4hO3gu5i1hsMe1YIi96o+eNT0jg==}
     peerDependencies:
       '@egjs/hammerjs': ^2.0.0
       component-emitter: ^1.3.0
