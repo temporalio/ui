@@ -12,7 +12,7 @@
     checked?: boolean;
     label: string;
     labelHidden?: boolean;
-    onDark?: boolean;
+    theme?: 'dark' | 'light';
     indeterminate?: boolean;
     hoverable?: boolean;
     value?: T;
@@ -24,7 +24,7 @@
   export let checked = false;
   export let label: string;
   export let labelHidden = false;
-  export let onDark = false;
+  export let theme: 'dark' | 'light' = 'light';
   export let indeterminate = false;
   export let disabled = false;
   export let hoverable = false;
@@ -66,10 +66,9 @@
   <label
     on:click
     on:keypress
-    class="checkbox"
-    class:hoverable
+    class="checkbox {theme}"
+    class:hoverable={hoverable && !disabled}
     class:disabled
-    class:on-dark={onDark}
   >
     <input
       on:click|stopPropagation
@@ -84,7 +83,7 @@
       {...omit($$restProps, 'data-testid')}
     />
 
-    <span class="checkmark" class:hoverable class:on-dark={onDark}>
+    <span class="checkmark {theme}" class:disabled>
       {#if indeterminate}
         <Icon class="absolute top-0 left-0 h-4 w-4" name="hyphen" />
       {:else if checked}
@@ -96,7 +95,7 @@
       {/if}
     </span>
 
-    <span class="label" class:hoverable class:sr-only={labelHidden}>
+    <span class="label" class:sr-only={labelHidden}>
       {label}
     </span>
   </label>
@@ -104,17 +103,11 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px] text-primary;
+    @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px];
   }
 
   .checkbox.hoverable:hover .checkmark::before {
-    @apply absolute -left-2.5 -z-10 h-9 w-9 self-center rounded-full bg-purple-200;
-
-    content: ' ';
-  }
-
-  .checkbox.on-dark {
-    @apply text-white;
+    @apply absolute -left-2.5 -z-10 h-9 w-9 self-center rounded-full content-[''];
   }
 
   .label {
@@ -126,36 +119,57 @@
   }
 
   .checkmark {
-    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border border-gray-500 bg-white;
+    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border;
   }
 
-  .checkmark.on-dark {
-    @apply border-white bg-primary;
-  }
-
-  input:checked ~ .checkmark,
-  input.indeterminate ~ .checkmark {
-    @apply bg-primary text-white;
-  }
-
-  input:focus-visible ~ .checkmark {
-    @apply outline outline-blue-700;
-  }
-
-  .checkbox.disabled,
-  .checkbox.disabled .checkmark {
+  .disabled {
     @apply cursor-default;
   }
 
-  .checkbox.disabled.on-dark {
-    @apply text-opacity-80;
+  /** Light Theme Styles */
+  .checkbox.light {
+    @apply text-primary;
   }
 
-  .checkbox.disabled:not(.on-dark) .checkmark {
+  .checkbox.hoverable.light:hover .checkmark::before {
+    @apply bg-purple-200;
+  }
+
+  .checkmark.light {
+    @apply border-primary bg-white;
+  }
+
+  input:focus-visible ~ .checkmark.light {
+    @apply outline outline-blue-700;
+  }
+
+  .checkmark.disabled.light {
     @apply bg-gray-300;
   }
 
-  .checkbox.disabled.on-dark .checkmark {
+  /** Dark Theme Styles */
+
+  .checkbox.dark {
+    @apply text-white;
+  }
+
+  .checkmark.dark {
+    @apply border-white;
+  }
+
+  .checkbox.hoverable.dark:hover .checkmark::before {
+    @apply bg-gray-700;
+  }
+
+  input:focus-visible ~ .checkmark.dark {
+    @apply outline outline-indigo-600;
+  }
+
+  .checkbox.disabled.dark {
+    @apply text-opacity-80;
+  }
+
+  .checkmark.disabled.dark {
     @apply border-opacity-80 text-opacity-80;
   }
 </style>

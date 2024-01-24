@@ -11,36 +11,27 @@
 <Meta
   title="Checkbox"
   component={Checkbox}
-  argTypes={{ label: { control: 'text' } }}
+  argTypes={{
+    label: { control: 'text' },
+    theme: { control: 'select', options: ['light', 'dark'] },
+  }}
 />
 
 <Template let:args>
-  <div class:bg-black={args.onDark}>
-    <Checkbox
-      {...args}
-      on:change={action('change')}
-      on:click={action('click')}
-      on:keypress={action('keypress')}
-    />
-  </div>
+  <Checkbox
+    {...args}
+    on:change={action('change')}
+    on:click={action('click')}
+    on:keypress={action('keypress')}
+  />
 </Template>
 
-<Story
-  name="checkbox"
-  args={{ label: 'Check Me', onDark: false, hoverable: true }}
-/>
+<Story name="checkbox" args={{ label: 'Check Me', hoverable: true }} />
 
-<Story
-  name="So Many"
-  template="Many"
-  args={{ label: loremIpsum, onDark: false }}
-/>
+<Story name="So Many" template="Many" args={{ label: loremIpsum }} />
 
 <Template id="Many" let:args>
-  <div
-    class:bg-black={args.onDark}
-    class="border-bl flex max-w-xl flex-col gap-5 border-2 p-5"
-  >
+  <div class="border-bl flex max-w-xl flex-col gap-5 border-2 p-5">
     <Checkbox
       label={loremIpsum}
       hoverable
