@@ -11,6 +11,7 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import { isChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
@@ -35,7 +36,7 @@
     workflowId: string,
     runId: string,
   ) => {
-    if (!$fullEventHistory.length) {
+    if ($workflowRun.workflow.id !== workflowId || !$fullEventHistory.length) {
       loading = true;
       resetFullHistory();
       $fullEventHistory = await fetchAllEvents({
@@ -75,7 +76,7 @@
 {#if eventGroup}
   <h2 class="flex w-full items-center text-lg font-medium">
     {#if workflowLink}
-      <Link href={workflowLink} newTab>
+      <Link href={workflowLink}>
         {eventGroup.displayName}
       </Link>
     {:else}
