@@ -6,7 +6,6 @@
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import type { NetworkError } from '$lib/types/global';
   import { routeForWorkflows } from '$lib/utilities/route-for';
-  import Logo from '$lib/vendor/logo-dark.svg';
 
   export let error: NetworkError;
 
@@ -30,17 +29,11 @@
       {translate('workflows.back-to-workflows')}
     </Link>
   </div>
-  <h1
-    data-testid="workflow-error-heading"
-    class="overflow-hidden text-3xl font-medium"
-  >
-    {error.statusText}
-  </h1>
 </header>
-<div class="my-24 flex flex-col items-center gap-4 text-center">
-  <p class="text-4xl font-bold text-red-700">{error.statusCode}</p>
-  <h1 class="text-5xl font-semibold">
-    {title}
-  </h1>
-  <img src={Logo} alt="temporal" class="max-h-10 text-black" />
+<div class="text-center align-middle">
+  <h1 class="leading-0 text-[12rem] font-semibold">{error.statusCode}</h1>
+  <p class="-mt-12 text-lg">{title}</p>
+  <p class="text-2xl font-bold text-red-700">
+    {error.statusText}
+  </p>
 </div>

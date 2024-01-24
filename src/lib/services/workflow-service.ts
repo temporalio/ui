@@ -208,8 +208,8 @@ export async function fetchWorkflow(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<{
-  workflow: WorkflowExecution | undefined;
-  error: NetworkError | undefined;
+  workflow?: WorkflowExecution;
+  error?: NetworkError;
 }> {
   const route = routeForApi('workflow', {
     namespace: parameters.namespace,
@@ -224,10 +224,10 @@ export async function fetchWorkflow(
     },
   })
     .then((response) => {
-      return { workflow: toWorkflowExecution(response), error: undefined };
+      return { workflow: toWorkflowExecution(response) };
     })
     .catch((e: NetworkError) => {
-      return { workflow: undefined, error: e };
+      return { error: e };
     });
 }
 
