@@ -20,6 +20,7 @@
     valid?: boolean;
     hintText?: string;
     maxLength?: number;
+    hideCount?: boolean;
     spellcheck?: boolean;
     unroundRight?: boolean;
     unroundLeft?: boolean;
@@ -56,6 +57,7 @@
   export let valid = true;
   export let hintText = '';
   export let maxLength = 0;
+  export let hideCount = false;
   export let spellcheck: boolean = null;
   export let unroundRight = false;
   export let unroundLeft = false;
@@ -140,7 +142,7 @@
         <IconButton label={clearButtonLabel} on:click={onClear} icon="close" />
       </div>
     {/if}
-    {#if maxLength && !disabled}
+    {#if maxLength && !disabled && !hideCount}
       <span class="count">
         <span
           class:ok={maxLength - value.length > 5}
