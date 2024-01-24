@@ -107,7 +107,7 @@ export const Strings = {
   'queries-tab': 'Queries',
   'workflow-404-title': 'This is not the Workflow you are looking for',
   'workflow-error-title':
-    'We are having technical difficulties retreiving this Workflow',
+    'We are having technical difficulties retrieving this Workflow',
   'workflow-error-no-workers-title': 'No Workers Running',
   'workflow-error-no-workers-description':
     'There are no Workers polling the {{taskQueue}} Task Queue.',
