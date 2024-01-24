@@ -36,6 +36,7 @@ import (
 	"github.com/temporalio/ui-server/v2/server/rpc"
 	"github.com/temporalio/ui-server/v2/server/version"
 	"go.temporal.io/api/operatorservice/v1"
+	"go.temporal.io/api/serviceerror"
 	"go.temporal.io/api/temporalproto"
 	"go.temporal.io/api/workflowservice/v1"
 
@@ -145,6 +146,36 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 	}
 }
 
+func errorHandler(
+	ctx context.Context,
+	mux *runtime.ServeMux,
+	marshaler runtime.Marshaler,
+	w http.ResponseWriter,
+	r *http.Request,
+	err error,
+) {
+	// Convert the error using serviceerror. The result does not conform to Google
+	// gRPC status directly (it conforms to gogo gRPC status), but Err() does
+	// based on internal code reading. However, Err() uses Google proto Any
+	// which our marshaler is not expecting. So instead we are embedding similar
+	// logic to runtime.DefaultHTTPProtoErrorHandler in here but with gogo
+	// support. We don't implement custom content type marshaler or trailers at
+	// this time.
+	s := serviceerror.ToStatus(err)
+	w.Header().Set("Content-Type", marshaler.ContentType(struct{}{}))
+
+	buf, merr := marshaler.Marshal(s.Proto())
+	if merr != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(`{"code": 13, "message": "failed to marshal error message"}`))
+		return
+	}
+
+	w.WriteHeader(runtime.HTTPStatusFromCode(s.Code()))
+	_, _ = w.Write(buf)
+}
+
 func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMiddleware []Middleware) (*runtime.ServeMux, error) {
 	var muxOpts []runtime.ServeMuxOption
 	for _, m := range apiMiddleware {
@@ -158,7 +189,7 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 			runtime.WithUnescapingMode(runtime.UnescapingModeAllExceptReserved),
 			// This is necessary to get error details properly
 			// marshalled in unary requests.
-			runtime.WithErrorHandler(runtime.DefaultHTTPErrorHandler),
+			runtime.WithErrorHandler(errorHandler),
 		)...,
 	)
 
