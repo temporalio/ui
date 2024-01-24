@@ -20,6 +20,7 @@ import type {
 } from '$lib/types/api';
 import type {
   NamespaceScopedRequest,
+  NetworkError,
   Replace,
   Settings,
 } from '$lib/types/global';
@@ -206,17 +207,28 @@ export const fetchAllArchivedWorkflows = async (
 export async function fetchWorkflow(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
-): Promise<WorkflowExecution> {
+): Promise<{
+  workflow: WorkflowExecution | undefined;
+  error: NetworkError | undefined;
+}> {
   const route = routeForApi('workflow', {
     namespace: parameters.namespace,
     workflowId: parameters.workflowId,
   });
+
   return requestFromAPI(route, {
     request,
+    notifyOnError: false,
     params: {
       'execution.runId': parameters.runId,
     },
-  }).then(toWorkflowExecution);
+  })
+    .then((response) => {
+      return { workflow: toWorkflowExecution(response), error: undefined };
+    })
+    .catch((e: NetworkError) => {
+      return { workflow: undefined, error: e };
+    });
 }
 
 export async function terminateWorkflow({
