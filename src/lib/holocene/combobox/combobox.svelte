@@ -285,6 +285,7 @@
       tabindex={-1}
       aria-controls="{id}-listbox"
       aria-expanded={$open}
+      type="button"
       on:click={toggleList}
     >
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
@@ -364,10 +365,10 @@
   }
 
   .combobox-wrapper.dark {
-    @apply border-gray-400 bg-primary text-white  focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50;
+    @apply border-gray-400 bg-transparent text-white focus-within:border-indigo-600 focus-within:bg-primary focus-within:shadow-focus focus-within:shadow-indigo-500/50;
 
     > .combobox-input {
-      @apply bg-primary text-white placeholder:text-gray-400;
+      @apply bg-transparent text-white placeholder:text-gray-400;
     }
 
     > .combobox-button {
