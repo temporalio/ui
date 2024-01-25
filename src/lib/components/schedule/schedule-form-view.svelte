@@ -22,6 +22,8 @@
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
+  import ScheduleInputPayload from './schedule-input-payload.svelte';
+
   import type { Schedule } from '$types';
 
   export let schedule: FullSchedule | null = null;
@@ -169,6 +171,7 @@
           on:blur={onBlur}
         />
       </div>
+      <ScheduleInputPayload />
       <SchedulesCalendarView
         let:preset
         {schedule}
