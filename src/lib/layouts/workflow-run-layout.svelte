@@ -3,6 +3,7 @@
 
   import { page } from '$app/stores';
 
+  import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import Header from '$lib/layouts/workflow-header.svelte';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
@@ -26,6 +27,7 @@
     refresh,
     workflowRun,
   } from '$lib/stores/workflow-run';
+  import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import {
     getUniqueBuildIdsFromPollers,
@@ -33,6 +35,7 @@
   } from '$lib/utilities/task-queue-compatibility';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
+  let workflowError: NetworkError;
 
   const getCompatibility = async (
     workflow: WorkflowExecution,
@@ -73,11 +76,17 @@
   ) => {
     const { settings } = $page.data;
 
-    const workflow = await fetchWorkflow({
+    const { workflow, error } = await fetchWorkflow({
       namespace,
       workflowId,
       runId,
     });
+
+    if (error) {
+      workflowError = error;
+      return;
+    }
+
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
     const compatibility = await getCompatibility(workflow, taskQueue);
@@ -112,11 +121,14 @@
     $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
     $eventHistory = initialEventHistory;
+    workflowError = undefined;
   });
 </script>
 
 <div class="flex h-full flex-col gap-6">
-  {#if !$workflowRun.workflow}
+  {#if workflowError}
+    <WorkflowError error={workflowError} />
+  {:else if !$workflowRun.workflow}
     <Loading />
   {:else}
     <Header namespace={$page.params.namespace} />
