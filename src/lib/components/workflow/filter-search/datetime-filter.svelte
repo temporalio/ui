@@ -141,6 +141,7 @@
       unroundLeft
       id="time-range-filter"
       controls="time-range-filter-menu"
+      class="whitespace-nowrap"
     >
       {translate('workflows.select-time')}
     </MenuButton>
