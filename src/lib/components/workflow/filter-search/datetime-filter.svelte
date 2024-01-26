@@ -147,7 +147,7 @@
     <Menu
       keepOpen
       id="time-range-filter-menu"
-      class="w-[25rem] !overflow-visible"
+      class="w-[27rem] !overflow-visible"
     >
       {#if isTimeRange}
         <MenuItem>
