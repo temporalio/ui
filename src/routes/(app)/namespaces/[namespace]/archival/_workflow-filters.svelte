@@ -38,7 +38,7 @@
     },
   };
 
-  let isAdvancedQuery = $page.url.searchParams.has('query');
+  $: isAdvancedQuery = $page.url.searchParams.has('query');
   let workflowIdFilter = '';
   let workflowTypeFilter = '';
 
@@ -48,35 +48,22 @@
     $page.url.searchParams.set('query', String(query));
     goto($page.url.toString());
   };
-
-  const handleToggle =
-    (searchType: 'basic' | 'advanced') =>
-    (event: Event): void => {
-      const element = event.target as HTMLAnchorElement;
-      isAdvancedQuery = searchType === 'advanced';
-
-      if (!isAdvancedQuery) {
-        $page.url.searchParams.delete('query');
-      }
-
-      goto(element.href);
-    };
 </script>
 
 <section class="flex flex-col gap-2">
   <p class="text-right text-xs">
     {#if isAdvancedQuery}
-      <Link href={$page.url.pathname} on:click={handleToggle('basic')}>
+      <Link href={$page.url.pathname}>
         {translate('workflows.basic-search')}
       </Link>
     {:else}
-      <Link class="text-blue-700" on:click={handleToggle('advanced')}>
+      <Link href={`${$page.url.pathname}?query=`}>
         {translate('workflows.advanced-search')}
       </Link>
     {/if}
   </p>
 
-  {#if !isAdvancedQuery}
+  {#if isAdvancedQuery}
     <Search
       icon
       placeholder={translate('common.search')}
