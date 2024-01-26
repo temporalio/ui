@@ -8,7 +8,7 @@
   import Icon from './icon/icon.svelte';
 
   type $$Props = HTMLAnchorAttributes & {
-    href?: string;
+    href: string;
     active?: boolean;
     newTab?: boolean;
     class?: string;
@@ -19,7 +19,7 @@
 
   let className = '';
   export { className as class };
-  export let href: string = null;
+  export let href: string;
   export let active = false;
   export let newTab = false;
   export let icon: IconName = null;
@@ -27,7 +27,7 @@
 
   const onLinkClick = (e: MouseEvent) => {
     // Skip if middle mouse click or new tab
-    if (e.button === 1 || newTab) return;
+    if (e.button === 1 || newTab || e.metaKey) return;
     e.preventDefault();
     e.stopPropagation();
     goto(href);
