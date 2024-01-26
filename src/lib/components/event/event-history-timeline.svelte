@@ -31,6 +31,7 @@
     EventTypeCategory,
   } from '$lib/types/events';
   import { capitalize } from '$lib/utilities/format-camel-case';
+  import { getSummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
   import {
     isActivityTaskScheduledEvent,
     isLocalActivityMarkerEvent,
@@ -53,9 +54,10 @@
   }
 
   function renderGroupName(group) {
-    const { label, category, id } = group;
+    const { label, category, name, id } = group;
     const { workflow, run, namespace } = $page.params;
-    const groupName = capitalize(label || category);
+    const isLocalActivity = isLocalActivityMarkerEvent(group.initialEvent);
+    const groupName = capitalize(isLocalActivity ? name : label || category);
     const href = routeForEventGroup({
       eventId: id,
       namespace,
@@ -177,7 +179,7 @@
         );
       if (groupPendingActivity && isRunning) {
         items.add({
-          id: `pending-${groupPendingActivity.activityId}`,
+          id: `pending-${groupPendingActivity.activityId}-${index}`,
           group: `group-${index}`,
           start: initialEvent.eventTime,
           end: Date.now(),
@@ -189,6 +191,9 @@
           editable: false,
         });
       } else {
+        const singleEventName = isLocalActivityMarkerEvent(group.initialEvent)
+          ? getSummaryAttribute(group.initialEvent)?.value ?? group.name
+          : group.name;
         items.add({
           id: `group-${index}-items`,
           group: `group-${index}`,
@@ -196,7 +201,7 @@
           data: group,
           content:
             group.eventList.length === 1
-              ? group.name
+              ? singleEventName
               : `<div class="bar-content">${group.name}${getIcon(
                   lastEvent.classification,
                 )}</div>`,
