@@ -73,7 +73,7 @@
       namespace,
       workflowId,
       runId,
-      sort: view === 'feed' ? sort : 'ascending',
+      sort,
     });
   };
 
