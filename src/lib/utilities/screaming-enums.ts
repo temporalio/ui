@@ -17,9 +17,9 @@ export const fromScreamingEnum = <T>(
   prefix: string,
 ): T => {
   if (!potentialScreamingEnum) return potentialScreamingEnum;
-  const stringEnum = potentialScreamingEnum as string;
-  const split = stringEnum?.split('_');
-  if (split?.length === 1) return potentialScreamingEnum;
+  const stringEnum = String(potentialScreamingEnum);
+  const split = stringEnum.split('_');
+  if (!split || split.length <= 1) return potentialScreamingEnum;
   const formatted = split
     .map((word) => {
       return word.charAt(0) + word.substring(1).toLowerCase();

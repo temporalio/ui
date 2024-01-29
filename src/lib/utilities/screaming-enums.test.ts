@@ -28,8 +28,19 @@ describe('fromScreamingEnum', () => {
   it('should return empty string', () => {
     expect(fromScreamingEnum('', 'prefix')).toBe('');
   });
+  it('should return empty string', () => {
+    expect(fromScreamingEnum('', 'prefix')).toBe('');
+  });
   it('should return undefined', () => {
     expect(fromScreamingEnum(undefined, 'prefix')).toBe(undefined);
+  });
+  it('should return original object value if not a string', () => {
+    expect(fromScreamingEnum({ test: 'this' }, 'prefix')).toStrictEqual({
+      test: 'this',
+    });
+  });
+  it('should return original array value if not a string', () => {
+    expect(fromScreamingEnum([], 'prefix')).toStrictEqual([]);
   });
 });
 

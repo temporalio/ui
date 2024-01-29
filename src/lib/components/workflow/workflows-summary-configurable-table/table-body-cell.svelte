@@ -83,7 +83,7 @@
     {:else if label === 'Task Queue'}
       {workflow.taskQueue}
     {:else if label === 'Parent Namespace'}
-      {workflow.parentNamespaceId}
+      {workflow?.parentNamespaceId ?? ''}
     {:else if label === 'History Size'}
       {formatBytes(parseInt(workflow.historySizeBytes, 10))}
     {:else if label === 'State Transitions'}
