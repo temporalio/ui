@@ -8,7 +8,6 @@ const useDarkMode = persistStore(
 
 export const darkMode = (node: HTMLElement) => {
   useDarkMode.subscribe((value) => {
-    console.log({ darkMode: value });
     if (value) {
       node.classList.add('dark');
     } else {
