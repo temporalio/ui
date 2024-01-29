@@ -11,7 +11,7 @@ import type {
   WorkflowSearchAttributes,
 } from '$lib/types/workflows';
 import { decodePayload } from '$lib/utilities/decode-payload';
-import { isNull } from '$lib/utilities/is';
+import { toWorkflowStatusReadable } from '$lib/utilities/screaming-enums';
 import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
 import { simplifyAttributes } from './event-history/simplify-attributes';
@@ -30,8 +30,7 @@ const toPendingActivities = (
 const toSearchAttributes = (
   apiSearchAttributes: WorkflowSearchAttributes,
 ): DecodedWorkflowSearchAttributes => {
-  if (isNull(apiSearchAttributes) || isNull(apiSearchAttributes.indexedFields))
-    return {};
+  if (!apiSearchAttributes || !apiSearchAttributes.indexedFields) return {};
   const decoded = Object.entries(apiSearchAttributes.indexedFields).reduce(
     (searchAttributes, [searchAttributeName, payload]) => {
       return {
@@ -59,8 +58,10 @@ export const toWorkflowExecution = (
   const startTime = response.workflowExecutionInfo.startTime;
   const endTime = response.workflowExecutionInfo.closeTime;
   const executionTime = response.workflowExecutionInfo.executionTime;
-  const status = response.workflowExecutionInfo.status;
-  const isRunning = response.workflowExecutionInfo.status === 'Running';
+  const status = toWorkflowStatusReadable(
+    response.workflowExecutionInfo.status,
+  );
+  const isRunning = status === 'Running';
   const historyEvents = response.workflowExecutionInfo.historyLength;
   const historySizeBytes = response.workflowExecutionInfo.historySizeBytes;
   const url = `/workflows/${id}/${runId}`;

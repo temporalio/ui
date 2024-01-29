@@ -8,9 +8,33 @@ import type { Settings } from '$lib/types/global';
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import {
+  toNamespaceArchivalStateReadable,
+  toNamespaceStateReadable,
+} from '$lib/utilities/screaming-enums';
 
 const emptyNamespace = {
   namespaces: [],
+};
+
+const toNamespaceDetails = (
+  namespace: DescribeNamespaceResponse,
+): DescribeNamespaceResponse => {
+  if (namespace.config) {
+    namespace.config.historyArchivalState = toNamespaceArchivalStateReadable(
+      namespace.config.historyArchivalState,
+    );
+    namespace.config.visibilityArchivalState = toNamespaceArchivalStateReadable(
+      namespace.config.visibilityArchivalState,
+    );
+  }
+
+  if (namespace.namespaceInfo) {
+    namespace.namespaceInfo.state = toNamespaceStateReadable(
+      namespace.namespaceInfo?.state,
+    );
+  }
+  return namespace;
 };
 
 export async function fetchNamespaces(
@@ -38,13 +62,13 @@ export async function fetchNamespaces(
       }),
     );
 
-    const _namespaces: DescribeNamespaceResponse[] = (
-      results?.namespaces ?? []
-    ).filter(
-      (namespace: DescribeNamespaceResponse) =>
-        showTemporalSystemNamespace ||
-        namespace.namespaceInfo.name !== 'temporal-system',
-    );
+    const _namespaces: DescribeNamespaceResponse[] = (results?.namespaces ?? [])
+      .filter(
+        (namespace: DescribeNamespaceResponse) =>
+          showTemporalSystemNamespace ||
+          namespace.namespaceInfo.name !== 'temporal-system',
+      )
+      .map(toNamespaceDetails);
 
     namespaces.set(_namespaces);
   } catch (e) {
@@ -70,5 +94,5 @@ export async function fetchNamespace(
       toaster.push({ variant: 'error', message: 'Unable to fetch namespaces' }),
   });
 
-  return results ?? empty;
+  return results ? toNamespaceDetails(results) : empty;
 }

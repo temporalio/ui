@@ -26,8 +26,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gogo/gateway"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -37,7 +36,12 @@ import (
 	"github.com/temporalio/ui-server/v2/server/rpc"
 	"github.com/temporalio/ui-server/v2/server/version"
 	"go.temporal.io/api/operatorservice/v1"
+	"go.temporal.io/api/serviceerror"
+	"go.temporal.io/api/temporalproto"
 	"go.temporal.io/api/workflowservice/v1"
+
+	// DO NOT REMOVE
+	_ "go.temporal.io/api/temporalproto"
 )
 
 type Auth struct {
@@ -142,6 +146,36 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 	}
 }
 
+func errorHandler(
+	ctx context.Context,
+	mux *runtime.ServeMux,
+	marshaler runtime.Marshaler,
+	w http.ResponseWriter,
+	r *http.Request,
+	err error,
+) {
+	// Convert the error using serviceerror. The result does not conform to Google
+	// gRPC status directly (it conforms to gogo gRPC status), but Err() does
+	// based on internal code reading. However, Err() uses Google proto Any
+	// which our marshaler is not expecting. So instead we are embedding similar
+	// logic to runtime.DefaultHTTPProtoErrorHandler in here but with gogo
+	// support. We don't implement custom content type marshaler or trailers at
+	// this time.
+	s := serviceerror.ToStatus(err)
+	w.Header().Set("Content-Type", marshaler.ContentType(struct{}{}))
+
+	buf, merr := marshaler.Marshal(s.Proto())
+	if merr != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(`{"code": 13, "message": "failed to marshal error message"}`))
+		return
+	}
+
+	w.WriteHeader(runtime.HTTPStatusFromCode(s.Code()))
+	_, _ = w.Write(buf)
+}
+
 func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMiddleware []Middleware) (*runtime.ServeMux, error) {
 	var muxOpts []runtime.ServeMuxOption
 	for _, m := range apiMiddleware {
@@ -152,9 +186,10 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 		append(muxOpts,
 			withMarshaler(),
 			version.WithVersionHeader(c),
+			runtime.WithUnescapingMode(runtime.UnescapingModeAllExceptReserved),
 			// This is necessary to get error details properly
 			// marshalled in unary requests.
-			runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
+			runtime.WithErrorHandler(errorHandler),
 		)...,
 	)
 
@@ -169,11 +204,10 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 }
 
 func withMarshaler() runtime.ServeMuxOption {
-	jsonpb := &gateway.JSONPb{
-		EmitDefaults: true,
-		Indent:       "  ",
-		OrigName:     false,
-	}
-
-	return runtime.WithMarshalerOption(runtime.MIMEWildcard, jsonpb)
+	return runtime.WithMarshalerOption(runtime.MIMEWildcard, temporalProtoMarshaler{
+		contentType: runtime.MIMEWildcard,
+		mOpts: temporalproto.CustomJSONMarshalOptions{
+			Indent: "  ",
+		},
+	})
 }
