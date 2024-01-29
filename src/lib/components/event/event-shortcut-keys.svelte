@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
+  import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
   import Shortcut from '$lib/holocene/keyboard-shortcut/shortcut.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -20,49 +21,51 @@
 <Drawer
   {open}
   onClick={onClose}
-  title={translate('common.keyboard-shortcuts')}
   closeButtonLabel={translate('common.close-keyboard-shortcuts')}
+  class="w-[35vw] min-w-min max-w-fit"
 >
-  <div
-    class="grid grid-cols-1 gap-8 text-gray-500 dark:text-gray-400 md:grid-cols-2 xl:grid-cols-4"
-  >
-    <div class="cell">
-      {translate('common.next-page')}
-      <div class="shortcut">
-        <Shortcut
-          arrow="right"
-          title={translate('common.arrow-key-right')}
-        />|<Shortcut title="">L</Shortcut>
+  <DrawerContent title={translate('common.keyboard-shortcuts')}>
+    <div
+      class="grid grid-cols-1 gap-8 text-gray-500 dark:text-gray-400 md:grid-cols-2 xl:grid-cols-4"
+    >
+      <div class="cell">
+        {translate('common.next-page')}
+        <div class="shortcut">
+          <Shortcut
+            arrow="right"
+            title={translate('common.arrow-key-right')}
+          />|<Shortcut title="">L</Shortcut>
+        </div>
+      </div>
+      <div class="cell">
+        {translate('common.previous-page')}
+        <div class="shortcut">
+          <Shortcut
+            arrow="left"
+            title={translate('common.arrow-key-left')}
+          />|<Shortcut title="">H</Shortcut>
+        </div>
+      </div>
+      <div class="cell">
+        {translate('common.next-row')}
+        <div class="shortcut">
+          <Shortcut
+            arrow="down"
+            title={translate('common.arrow-key-down')}
+          />|<Shortcut title="">J</Shortcut>
+        </div>
+      </div>
+      <div class="cell">
+        {translate('common.previous-row')}
+        <div class="shortcut">
+          <Shortcut
+            arrow="up"
+            title={translate('common.arrow-key-up')}
+          />|<Shortcut title="">K</Shortcut>
+        </div>
       </div>
     </div>
-    <div class="cell">
-      {translate('common.previous-page')}
-      <div class="shortcut">
-        <Shortcut
-          arrow="left"
-          title={translate('common.arrow-key-left')}
-        />|<Shortcut title="">H</Shortcut>
-      </div>
-    </div>
-    <div class="cell">
-      {translate('common.next-row')}
-      <div class="shortcut">
-        <Shortcut
-          arrow="down"
-          title={translate('common.arrow-key-down')}
-        />|<Shortcut title="">J</Shortcut>
-      </div>
-    </div>
-    <div class="cell">
-      {translate('common.previous-row')}
-      <div class="shortcut">
-        <Shortcut
-          arrow="up"
-          title={translate('common.arrow-key-up')}
-        />|<Shortcut title="">K</Shortcut>
-      </div>
-    </div>
-  </div>
+  </DrawerContent>
 </Drawer>
 
 <style lang="postcss">

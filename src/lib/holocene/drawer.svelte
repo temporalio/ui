@@ -28,7 +28,7 @@
 
 {#if open}
   <aside
-    class="drawer {position}"
+    class="drawer {position} {$$props.class}"
     class:dark
     class:max-w-fit={position === 'right'}
     transition:fly={flyParams}
@@ -74,9 +74,5 @@
 
   .close-button-wrapper {
     @apply absolute right-2 top-2;
-
-    &.right {
-      @apply pb-20;
-    }
   }
 </style>
