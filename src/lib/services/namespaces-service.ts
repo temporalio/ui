@@ -22,10 +22,10 @@ const toNamespaceDetails = (
 ): DescribeNamespaceResponse => {
   if (namespace.config) {
     namespace.config.historyArchivalState = toNamespaceArchivalStateReadable(
-      namespace.config?.historyArchivalState,
+      namespace.config.historyArchivalState,
     );
     namespace.config.visibilityArchivalState = toNamespaceArchivalStateReadable(
-      namespace.config?.visibilityArchivalState,
+      namespace.config.visibilityArchivalState,
     );
   }
 
