@@ -87,7 +87,13 @@
       <div class="flex w-full flex-col gap-1 rounded-lg bg-blueGray-900">
         {#if $eventViewType === 'feed'}
           <div class="flex gap-0">
-            <EventGraph history={$fullEventHistory} {groups} {activeGroup} />
+            <EventGraph
+              history={$fullEventHistory}
+              {groups}
+              {activeGroup}
+              {onHover}
+              {onHoverLeave}
+            />
             <div class="w-full">
               {#each $fullEventHistory as event}
                 <EventRow {event} {onHover} {onHoverLeave} {activeGroup} />

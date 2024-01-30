@@ -16,6 +16,8 @@
   export let history: WorkflowEvents;
   export let groups: EventGroups;
   export let activeGroup: EventGroup;
+  export let onHover: (workflow: WorkflowEvent) => void;
+  export let onHoverLeave: () => void;
 
   let width = 150;
 
@@ -97,6 +99,8 @@
         active={activeGroup ? activeGroup.eventIds.has(event.id) : true}
         {offset}
         {nextDistance}
+        onHover={() => onHover(event)}
+        {onHoverLeave}
       />
     {/each}
     <DraggableLine x={width} height={canvasY} {onExpand} />
