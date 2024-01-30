@@ -137,14 +137,19 @@ export const routeForEventHistory = ({
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
   return toURL(`${eventHistoryPath}`, queryParams);
 };
+
 export const routeForEventHistoryEvent = ({
   eventId,
   ...parameters
 }: EventParameters): string => {
-  const eventHistoryPath = `${routeForWorkflow(
-    parameters,
-  )}/history/events/${eventId}`;
-  return toURL(`${eventHistoryPath}`);
+  return `${routeForWorkflow(parameters)}/history/events/${eventId}`;
+};
+
+export const routeForEventGroup = ({
+  eventId,
+  ...parameters
+}: EventParameters): string => {
+  return `${routeForWorkflow(parameters)}/history/event-groups/${eventId}`;
 };
 
 export const routeForWorkers = (parameters: WorkflowParameters): string => {

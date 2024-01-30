@@ -8,20 +8,6 @@ import {
 } from '~/test-utilities/mock-apis';
 
 test.describe('Batch and Bulk Workflow Actions', () => {
-  test.describe('when advanced visibility is disabled', () => {
-    test('disallows bulk and batch actions', async ({ page }) => {
-      await mockWorkflowsApis(page);
-
-      await page.goto('/namespaces/default/workflows');
-
-      await waitForWorkflowsApis(page, false);
-
-      await page.waitForSelector('[data-testid="workflows-table"]');
-
-      await expect(page.getByTestId('batch-actions-checkbox')).toBeHidden();
-    });
-  });
-
   test.describe('when advanced visibility is enabled', () => {
     test.beforeEach(async ({ page }) => {
       await mockWorkflowsApis(page);

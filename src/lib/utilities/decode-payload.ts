@@ -1,4 +1,9 @@
+import { get } from 'svelte/store';
+
+import { page } from '$app/stores';
+
 import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
+import { authUser } from '$lib/stores/auth-user';
 import type {
   codecEndpoint,
   includeCredentials,
@@ -14,6 +19,11 @@ import type {
 import type { Optional, Replace, Settings } from '$lib/types/global';
 
 import { atob } from './atob';
+import {
+  getCodecEndpoint,
+  getCodecIncludeCredentials,
+  getCodecPassAccessToken,
+} from './get-codec';
 import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
@@ -166,11 +176,28 @@ const keyIs = (key: string, ...validKeys: string[]) => {
 
 export const decodeAllPotentialPayloadsWithCodec = async (
   anyAttributes: EventAttribute | PotentiallyDecodable,
-  namespace: string,
-  settings: Settings,
-  accessToken: string,
+  namespace: string = get(page).params.namespace,
+  settings: Settings = get(page).data.settings,
+  accessToken: string = get(authUser).accessToken,
 ): Promise<EventAttribute | PotentiallyDecodable> => {
-  const decode = decodePayloadWithCodec(namespace, settings, accessToken);
+  const endpoint = getCodecEndpoint(settings);
+  const passAccessToken = getCodecPassAccessToken(settings);
+  const includeCredentials = getCodecIncludeCredentials(settings);
+  const settingsWithLocalConfig = {
+    ...settings,
+    codec: {
+      ...settings?.codec,
+      endpoint,
+      passAccessToken,
+      includeCredentials,
+    },
+  };
+
+  const decode = decodePayloadWithCodec(
+    namespace,
+    settingsWithLocalConfig,
+    accessToken,
+  );
   if (anyAttributes) {
     for (const key of Object.keys(anyAttributes)) {
       if (keyIs(key, 'payloads', 'encodedAttributes') && anyAttributes[key]) {

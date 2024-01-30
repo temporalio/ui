@@ -3,32 +3,25 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import type { WorkflowEvent } from '$lib/types/events';
-  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  // import type { WorkflowEvent } from '$lib/types/events';
+  // import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getColor, getIcon } from '$lib/utilities/get-row-display';
 
   import EventPayload from './event-payload.svelte';
 
   export let group: EventGroup;
-  export let initialEvent: WorkflowEvent;
   export let level: number;
 
-  let duration = formatDistanceAbbreviated({
-    start: group.initialEvent.eventTime,
-    end: group.lastEvent.eventTime,
-    includeMilliseconds: true,
-  });
-  let elapsedTime = formatDistanceAbbreviated({
-    start: initialEvent.eventTime,
-    end: group.initialEvent.eventTime,
-    includeMilliseconds: true,
-  });
-
-  $: {
-    console.log('duration: ', duration);
-    console.log('elapsedTime: ', elapsedTime);
-    console.log('level: ', level);
-  }
+  // let duration = formatDistanceAbbreviated({
+  //   start: group.initialEvent.eventTime,
+  //   end: group.lastEvent.eventTime,
+  //   includeMilliseconds: true,
+  // });
+  // let elapsedTime = formatDistanceAbbreviated({
+  //   start: initialEvent.eventTime,
+  //   end: group.initialEvent.eventTime,
+  //   includeMilliseconds: true,
+  // });
 </script>
 
 <div

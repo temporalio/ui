@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import Link from '$lib/holocene/link.svelte';
@@ -36,17 +35,12 @@
           <p class="truncate text-sm text-gray-500 md:text-base">
             <Link
               class="truncate"
-              on:click={(e) => {
-                e.stopPropagation();
-                goto(
-                  routeForEventHistoryEvent({
-                    eventId: id,
-                    namespace,
-                    workflow,
-                    run,
-                  }),
-                );
-              }}
+              href={routeForEventHistoryEvent({
+                eventId: id,
+                namespace,
+                workflow,
+                run,
+              })}
             >
               {id}
             </Link>

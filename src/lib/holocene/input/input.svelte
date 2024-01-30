@@ -20,6 +20,7 @@
     valid?: boolean;
     hintText?: string;
     maxLength?: number;
+    hideCount?: boolean;
     spellcheck?: boolean;
     unroundRight?: boolean;
     unroundLeft?: boolean;
@@ -56,6 +57,7 @@
   export let valid = true;
   export let hintText = '';
   export let maxLength = 0;
+  export let hideCount = false;
   export let spellcheck: boolean = null;
   export let unroundRight = false;
   export let unroundLeft = false;
@@ -132,7 +134,7 @@
         />
       </div>
     {:else if disabled}
-      <div class="flex h-full w-9 items-center justify-center">
+      <div class="disabled-icon-container">
         <Icon name="lock" />
       </div>
     {:else if clearable && value}
@@ -140,7 +142,7 @@
         <IconButton label={clearButtonLabel} on:click={onClear} icon="close" />
       </div>
     {/if}
-    {#if maxLength && !disabled}
+    {#if maxLength && !disabled && !hideCount}
       <span class="count">
         <span
           class:ok={maxLength - value.length > 5}
@@ -210,6 +212,10 @@
 
   .copy-icon-container {
     @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r border-l;
+  }
+
+  .disabled-icon-container {
+    @apply flex h-full w-9 items-center justify-center;
   }
 
   .clear-icon-container {
@@ -293,14 +299,18 @@
     }
 
     &.disabled {
-      @apply border-gray-500 bg-gray-700 text-gray-200;
+      @apply border-gray-500 text-gray-200;
 
       > .input {
-        @apply bg-gray-700 placeholder:text-gray-400;
+        @apply text-gray-500 placeholder:text-gray-400;
       }
 
       > .copy-icon-container {
-        @apply border-gray-500 bg-gray-700;
+        @apply border-gray-500;
+      }
+
+      > .disabled-icon-container {
+        @apply text-gray-500;
       }
     }
 

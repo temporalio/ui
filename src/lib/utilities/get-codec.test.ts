@@ -19,6 +19,7 @@ const defaultSettings = {
     enabled: false,
     options: null,
   },
+  bannerText: '',
   defaultNamespace: '',
   showTemporalSystemNamespace: false,
   feedbackURL: '',

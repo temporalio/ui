@@ -12,7 +12,7 @@ exports[`Table_body_cell$ > History Size renders 1`] = `"<td class=\\"workflows-
 
 exports[`Table_body_cell$ > Parent Namespace renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">parent-namespace-id</td>"`;
 
-exports[`Table_body_cell$ > Run ID renders 1`] = `"<td class=\\"workflows-summary-table-body-cell filterable svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\"><a href=\\"/namespaces/default/workflows/abc-123/def-456/history\\" class=\\"link inline svelte-1f9ld6i\\"> def-456</a> </td>"`;
+exports[`Table_body_cell$ > Run ID renders 1`] = `"<td class=\\"workflows-summary-table-body-cell filterable svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\"><a href=\\"/namespaces/default/workflows/abc-123/def-456/history\\" class=\\"link inline svelte-10xxh5w\\">  def-456</a> </td>"`;
 
 exports[`Table_body_cell$ > Scheduled By ID renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">schedule_abc-123</td>"`;
 
@@ -26,6 +26,6 @@ exports[`Table_body_cell$ > Status renders 1`] = `"<td class=\\"workflows-summar
 
 exports[`Table_body_cell$ > Task Queue renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">task-queue</td>"`;
 
-exports[`Table_body_cell$ > Type renders 1`] = `"<td class=\\"workflows-summary-table-body-cell filterable svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\"><a href=\\"/namespaces/default/workflows/abc-123/def-456/history\\" class=\\"link inline svelte-1f9ld6i\\"> mock-workflow</a> </td>"`;
+exports[`Table_body_cell$ > Type renders 1`] = `"<td class=\\"workflows-summary-table-body-cell filterable svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\"><a href=\\"/namespaces/default/workflows/abc-123/def-456/history\\" class=\\"link inline svelte-10xxh5w\\">  mock-workflow</a> </td>"`;
 
-exports[`Table_body_cell$ > Workflow ID renders 1`] = `"<td class=\\"workflows-summary-table-body-cell filterable svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\"><a href=\\"/namespaces/default/workflows/abc-123/def-456/history\\" class=\\"link inline svelte-1f9ld6i\\"> abc-123</a> </td>"`;
+exports[`Table_body_cell$ > Workflow ID renders 1`] = `"<td class=\\"workflows-summary-table-body-cell filterable svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\"><a href=\\"/namespaces/default/workflows/abc-123/def-456/history\\" class=\\"link inline svelte-10xxh5w\\">  abc-123</a> </td>"`;

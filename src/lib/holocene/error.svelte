@@ -3,7 +3,6 @@
   import { createEventDispatcher } from 'svelte';
 
   import { afterNavigate } from '$app/navigation';
-  import { page } from '$app/stores';
 
   import Link from '$lib/holocene/link.svelte';
   import type { NetworkError } from '$lib/types/global';
@@ -18,8 +17,6 @@
   }
 
   const dispatch = createEventDispatcher();
-
-  $: currentLocation = $page.url.toString();
 
   afterNavigate(() => {
     dispatch('clearError', {});
@@ -38,17 +35,18 @@
   </p>
 
   <p class="text-lg">
-    <Link
-      href={currentLocation}
+    <button
+      class="underline hover:text-blue-700"
+      tabindex={0}
       on:click={() => {
         if (BROWSER) {
           window.location.reload();
         }
-      }}
-      target="_self"
-      class="underline underline-offset-2">Try a refresh</Link
+      }}>Try a refresh</button
     >
     or
-    <Link href="https://temporal.io/slack">jump on our Slack Channel</Link>.
+    <Link newTab href="https://temporal.io/slack"
+      >jump on our Slack Channel</Link
+    >.
   </p>
 </section>

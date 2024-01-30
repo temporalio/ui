@@ -1,13 +1,21 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { DataSet, Timeline } from 'vis-timeline/standalone';
+  import {
+    type DataGroup,
+    type DataItem,
+    DataSet,
+    Timeline,
+  } from 'vis-timeline/standalone';
 
-  import Accordion from '$lib/holocene/accordion.svelte';
+  import { page } from '$app/stores';
+
+  import HeartBeat from '$lib/components/heart-beat-indicator.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { IconName } from '$lib/holocene/icon/paths';
+  import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
@@ -19,23 +27,25 @@
   } from '$lib/stores/workflow-run';
   import type {
     CommonHistoryEvent,
+    EventClassification,
     EventTypeCategory,
   } from '$lib/types/events';
   import { capitalize } from '$lib/utilities/format-camel-case';
+  import { getSummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
   import {
     isActivityTaskScheduledEvent,
     isLocalActivityMarkerEvent,
   } from '$lib/utilities/is-event-type';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import { routeForEventGroup } from '$lib/utilities/route-for';
 
   import { getTimelineOptions } from './event-history-timeline-helpers';
 
   export let history: CommonHistoryEvent[] = [];
+  export let maxHeight = 520;
 
   let visualizationRef;
   let timeline;
-
-  $: category = $eventCategoryFilter as EventTypeCategory;
 
   function renderComponentToHTML(Component, props) {
     const container = document.createElement('div');
@@ -44,8 +54,23 @@
   }
 
   function renderGroupName(group) {
-    const groupName = capitalize(group.label || group.category);
-    return `<div class="flex gap-2 items-center">${groupName}</div>`;
+    const { label, category, name, id } = group;
+    const { workflow, run, namespace } = $page.params;
+    const isLocalActivity = isLocalActivityMarkerEvent(group.initialEvent);
+    const groupName = capitalize(isLocalActivity ? name : label || category);
+    const href = routeForEventGroup({
+      eventId: id,
+      namespace,
+      workflow,
+      run,
+    });
+
+    const link = renderComponentToHTML(Link, {
+      href,
+      text: groupName,
+      class: 'flex gap-2 items-center',
+    });
+    return link;
   }
 
   function renderExecutionName() {
@@ -59,9 +84,46 @@
     return `<div class="flex gap-1 items-center"><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div><div class="bar-content"><p>${name}</p></div></div>`;
   }
 
+  function getIconName(classification: EventClassification): IconName | null {
+    switch (classification) {
+      case 'Completed':
+        return 'checkmark';
+      case 'Canceled':
+      case 'Terminated':
+        return 'canceled';
+      case 'Failed':
+        return 'error';
+      case 'TimedOut':
+        return 'clock';
+      // TODO: Add icons for these
+      // case 'Fired':
+      // case 'CancelRequested':
+      // case 'Signaled':
+      // case 'Scheduled':
+      // case 'Open':
+      // case 'New':
+      // case 'Started':
+      // case 'Initiated':
+      default:
+        return null;
+    }
+  }
+
+  function getIcon(classification: EventClassification): string {
+    if (classification === 'Running') {
+      return renderComponentToHTML(HeartBeat, {});
+    }
+    const name = getIconName(classification);
+    return name
+      ? renderComponentToHTML(Icon, {
+          name,
+        })
+      : '';
+  }
+
   type GroupItems = {
-    items: DataSet<unknown, 'id'>;
-    groups: DataSet<unknown, 'id'>;
+    items: DataSet<DataItem>;
+    groups: DataSet<DataGroup>;
   };
 
   const createGroupItems = (
@@ -74,7 +136,7 @@
     const firstEvent = sortedHistory[0];
     const finalEvent = sortedHistory[sortedHistory.length - 1];
 
-    if (!category) {
+    if (!$eventCategoryFilter) {
       groups.add({
         id: 'workflow',
         content: renderExecutionName(),
@@ -94,7 +156,9 @@
           undefined,
           2,
         ),
-        content: $workflowRun.workflow.runId,
+        content: `<div class="bar-content">${
+          $workflowRun.workflow.runId
+        }${getIcon(isRunning ? 'Running' : finalEvent.classification)}</div>`,
         className: isRunning
           ? `${finalEvent.category} Running`
           : `${finalEvent.category} ${finalEvent.classification}`,
@@ -115,7 +179,7 @@
         );
       if (groupPendingActivity && isRunning) {
         items.add({
-          id: `pending-${groupPendingActivity.activityId}`,
+          id: `pending-${groupPendingActivity.activityId}-${index}`,
           group: `group-${index}`,
           start: initialEvent.eventTime,
           end: Date.now(),
@@ -127,6 +191,9 @@
           editable: false,
         });
       } else {
+        const singleEventName = isLocalActivityMarkerEvent(group.initialEvent)
+          ? getSummaryAttribute(group.initialEvent)?.value ?? group.name
+          : group.name;
         items.add({
           id: `group-${index}-items`,
           group: `group-${index}`,
@@ -134,8 +201,10 @@
           data: group,
           content:
             group.eventList.length === 1
-              ? group.name
-              : `<div class="bar-content">${group.name}</div>`,
+              ? singleEventName
+              : `<div class="bar-content">${group.name}${getIcon(
+                  lastEvent.classification,
+                )}</div>`,
           end: lastEvent.eventTime,
           type: group.eventList.length === 1 ? 'point' : 'range',
           className: `${lastEvent.category} ${lastEvent.classification}`,
@@ -163,24 +232,28 @@
 
   const filterHistory = (
     history: CommonHistoryEvent[],
-    category: EventTypeCategory,
+    category: EventTypeCategory[],
   ): CommonHistoryEvent[] => {
     if (!category) return history;
     return history.filter((i) => {
-      if (category === CATEGORIES.LOCAL_ACTIVITY) {
-        return isLocalActivityMarkerEvent(i);
+      if (isLocalActivityMarkerEvent(i)) {
+        return category.includes(CATEGORIES.LOCAL_ACTIVITY);
       }
-      return i.category === category;
+      return category.includes(i.category);
     });
   };
 
-  const buildTimeline = (category: EventTypeCategory): void => {
+  const buildTimeline = (): void => {
     timeline = new Timeline(
       visualizationRef,
       new DataSet([]),
       new DataSet([]),
-      getTimelineOptions($workflowRun.workflow),
+      getTimelineOptions($workflowRun.workflow, { maxHeight }),
     );
+    filterAndSetItems($eventCategoryFilter);
+  };
+
+  const filterAndSetItems = (category: EventTypeCategory[]) => {
     const reverseHistory =
       $eventFilterSort === 'descending' && $eventViewType === 'feed';
     const sortedHistory = reverseHistory
@@ -210,7 +283,7 @@
     if (timeline) {
       timeline.destroy();
     }
-    buildTimeline(category);
+    buildTimeline();
   };
 
   $: {
@@ -220,41 +293,30 @@
   }
 </script>
 
-<Accordion
-  title={translate('common.timeline')}
-  data-testid="timeline-accordion"
-  icon="timeline"
-  open={$workflowTimelineViewOpen}
-  onToggle={() => {
-    $workflowTimelineViewOpen = !$workflowTimelineViewOpen;
-  }}
->
-  <div class="flex flex-col gap-2">
-    <div class="flex items-center justify-end gap-2">
-      <div class="flex gap-2">
-        <ToggleButtons>
-          <ToggleButton
-            data-testid="zoom-in"
-            on:click={() => timeline?.zoomIn(1)}>+</ToggleButton
-          >
-          <ToggleButton
-            data-testid="zoom-in"
-            on:click={() => timeline?.zoomOut(1)}>-</ToggleButton
-          >
-          <ToggleButton
-            data-testid="zoom-in"
-            on:click={() => timeline?.focus('workflow')}>Fit</ToggleButton
-          >
-        </ToggleButtons>
-      </div>
-    </div>
-    <div class="timeline" bind:this={visualizationRef}>
-      {#if !timeline}
-        <Loading title="Building Timeline..." />
-      {/if}
+<div class="flex flex-col gap-2">
+  <div class="flex items-center justify-end gap-2">
+    <div class="flex gap-2 bg-white">
+      <ToggleButtons>
+        <ToggleButton data-testid="zoom-in" on:click={() => timeline?.zoomIn(1)}
+          >+</ToggleButton
+        >
+        <ToggleButton
+          data-testid="zoom-in"
+          on:click={() => timeline?.zoomOut(1)}>-</ToggleButton
+        >
+        <ToggleButton
+          data-testid="zoom-in"
+          on:click={() => timeline?.focus('workflow')}>Fit</ToggleButton
+        >
+      </ToggleButtons>
     </div>
   </div>
-</Accordion>
+  <div class="timeline" bind:this={visualizationRef}>
+    {#if !timeline}
+      <Loading title="Building Timeline..." />
+    {/if}
+  </div>
+</div>
 
 <style lang="postcss">
   :global(.vis-item-content) {
@@ -338,7 +400,7 @@
   }
 
   /* CSS for each classifciation */
-  :global(.vis-item.vis-range.Failed) {
+  :global(.vis-item.vis-range.Failed, .vis-item.vis-range.Terminated) {
     background-color: #fee2e2;
     border-color: #b91c1c;
     border-radius: 9999px;
@@ -346,89 +408,49 @@
     color: #b91c1c;
   }
 
-  :global(.vis-item.vis-point.Failed) {
-    background-color: #b91c1c;
+  :global(.vis-item.vis-point.Failed, .vis-item.vis-range.Terminated) {
     color: #b91c1c;
   }
 
   :global(.vis-item.vis-range.TimedOut) {
     background-color: #ffedd5;
-    border-color: #7c2d12;
+    border-color: #c2410c;
     border-radius: 9999px;
     border-width: 2px;
-    color: #7c2d12;
+    color: #c2410c;
   }
 
   :global(.vis-item.vis-point.TimedOut) {
-    background-color: #7c2d12;
-    color: #7c2d12;
+    color: #c2410c;
   }
 
-  :global(.vis-item.vis-range.Canceled, .vis-item.vis-range.Paused) {
+  :global(
+      .vis-item.vis-range.Canceled,
+      .vis-item.vis-range.CanceledRequested,
+      .vis-item.vis-range.Paused
+    ) {
     background-color: #fef9c3;
-    border-color: #713f12;
+    border-color: #a16207;
     border-radius: 9999px;
     border-width: 2px;
-    color: #713f12;
+    color: #a16207;
   }
 
-  :global(.vis-item.vis-point.Canceled, .vis-item.vis-point.Paused) {
-    background-color: #713f12;
-    color: #713f12;
+  :global(
+      .vis-item.vis-point.Canceled,
+      .vis-item.vis-point.CanceledRequested,
+      .vis-item.vis-point.Paused
+    ) {
+    color: #a16207;
   }
 
-  :global(.vis-item.vis-range.Terminated, .vis-item.vis-range.Fired) {
-    background-color: #e4e4e7;
-    border-color: #18181b;
-    border-radius: 9999px;
-    border-width: 2px;
-    color: #18181b;
-  }
-
-  :global(.vis-item.vis-point.Terminated, .vis-item.vis-point.Fired) {
-    background-color: #18181b;
-    color: #18181b;
-  }
-
-  :global(.vis-item.vis-range.Scheduled) {
-    background-color: #e0e7ff;
-    border-color: #4338ca;
-    border-radius: 9999px;
-    border-width: 2px;
-    color: #4338ca;
-  }
-
-  :global(.vis-item.vis-point.Scheduled) {
-    color: #4338ca;
-  }
-
-  :global(.vis-item.vis-range.ContinuedAsNew) {
-    background-color: #f3e8ff;
-    border-color: #581c87;
-    border-radius: 9999px;
-    border-width: 2px;
-    color: #581c87;
-  }
-
-  :global(.vis-item.vis-point.ContinuedAsNew) {
-    background-color: #581c87;
-    color: #581c87;
-  }
-
-  :global(.vis-item.vis-range.Completed) {
-    background-color: #dcfce7;
-    border-color: #15803d;
-    border-radius: 9999px;
-    border-width: 2px;
-    color: #15803d;
-  }
-
-  :global(.vis-item.vis-point.Completed) {
-    background-color: #15803d;
-    color: #15803d;
-  }
-
-  :global(.vis-item.vis-range.Running) {
+  :global(
+      .vis-item.vis-range.Running,
+      .vis-item.vis-range.Fired,
+      .vis-item.vis-range.Scheduled,
+      .vis-item.vis-range.Started,
+      .vis-item.vis-range.Initiated
+    ) {
     background-color: #dbeafe;
     border-color: #1d4ed8;
     border-radius: 9999px;
@@ -436,21 +458,68 @@
     color: #1d4ed8;
   }
 
-  :global(.vis-item.vis-point.Running) {
-    background-color: #1d4ed8;
+  :global(
+      .vis-item.vis-point.Running,
+      .vis-item.vis-point.Fired,
+      .vis-item.vis-point.Scheduled,
+      .vis-item.vis-point.Started,
+      .vis-item.vis-point.Initiated
+    ) {
     color: #1d4ed8;
   }
 
-  :global(.vis-item.vis-range.Started) {
+  :global(.vis-item.vis-range.workflow.Running) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+  }
+
+  :global(.vis-item.vis-range.ContinuedAsNew) {
     background-color: #e4e4e7;
     border-color: #18181b;
     border-radius: 9999px;
     border-width: 2px;
+    color: #17172c;
+  }
+
+  :global(.vis-item.vis-point.ContinuedAsNew) {
     color: #18181b;
   }
 
-  :global(.vis-item.vis-point.Started) {
-    color: #18181b;
+  :global(.vis-item.vis-range.Completed, .vis-item.vis-range.Open) {
+    background-color: #dcfce7;
+    border-color: #15803d;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #15803d;
+  }
+
+  :global(.vis-item.vis-point.Completed, .vis-item.vis-point.Open) {
+    color: #15803d;
+  }
+
+  :global(.vis-item.vis-range.New) {
+    background-color: #e0eaff;
+    border-color: #4338ca;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #4338ca;
+  }
+
+  :global(.vis-item.vis-point.New) {
+    color: #4338ca;
+  }
+
+  :global(.vis-item.vis-range.Signaled) {
+    background-color: #f3e8ff;
+    border-color: #7e22ce;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #7e22ce;
+  }
+
+  :global(.vis-item.vis-point.Signaled) {
+    color: #7e22ce;
   }
 
   /* CSS for each activity type */
@@ -475,8 +544,8 @@
   }
 
   :global(.bar-content) {
-    display: flex;
-    gap: 2px;
+    display: inline-flex;
+    gap: 4px;
     align-items: center;
   }
 

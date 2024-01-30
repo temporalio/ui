@@ -4,6 +4,8 @@
   import { translate } from '$lib/i18n/translate';
 
   export let loading = false;
+  export let title = translate('events.empty-state-title');
+  export let content = translate('events.empty-state-description');
 </script>
 
 <tr class="row">
@@ -11,10 +13,7 @@
     {#if loading}
       <Loading />
     {:else}
-      <EmptyState
-        title={translate('events.empty-state-title')}
-        content={translate('events.empty-state-description')}
-      />
+      <EmptyState {title} {content} />
     {/if}
   </td>
 </tr>

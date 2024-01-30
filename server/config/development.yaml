@@ -1,6 +1,7 @@
 publicPath:
 port: 8081
 enableUi: true
+bannerText:
 cors:
   cookieInsecure: false
   allowOrigins:

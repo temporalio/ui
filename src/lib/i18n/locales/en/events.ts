@@ -4,6 +4,7 @@ export const Strings = {
   'empty-state-title': 'No Events Match',
   'empty-state-description':
     'There are no events that match your filters or selected view. Adjust your filters or view to see your events.',
+  'group-empty-state-title': 'Event Group Not Found',
   'sort-ascending': 'Sort 1-9',
   'sort-descending': 'Sort 9-1',
   'date-and-time': 'Date & Time',

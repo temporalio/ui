@@ -62,7 +62,7 @@
   {translate('namespaces.namespace')}: {namespace?.namespaceInfo?.name}
 </h1>
 <h2 data-testid="namespace-description">
-  {namespace?.namespaceInfo?.description}
+  {namespace?.namespaceInfo?.description || ''}
 </h2>
 <Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
@@ -132,7 +132,7 @@
       </tr>
       <tr data-testid="namespace-failover">
         <td>{translate('namespaces.failover-version')}</td>
-        <td>{namespace?.failoverVersion}</td>
+        <td>{namespace?.failoverVersion || ''}</td>
       </tr>
       <tr data-testid="namespace-clusters">
         <td>{translate('namespaces.clusters')}</td>

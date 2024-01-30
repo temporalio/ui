@@ -4,18 +4,18 @@
   import EventGraph from '$lib/components/lines-and-dots/event-graph.svelte';
   import EventRow from '$lib/components/lines-and-dots/event-row.svelte';
   import GroupRow from '$lib/components/lines-and-dots/group-row.svelte';
-  import InputAndResultRow from '$lib/components/lines-and-dots/input-and-result-row.svelte';
+  // import InputAndResultRow from '$lib/components/lines-and-dots/input-and-result-row.svelte';
   import WorkflowJsonNavigator from '$lib/components/workflow/workflow-json-navigator.svelte';
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fullEventHistory } from '$lib/stores/events';
   import type { WorkflowEvent } from '$lib/types/events';
-  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
-  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
+  // import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  // import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   $: groups = groupEvents($fullEventHistory);
-  $: workflowEvents =
-    getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
+  // $: workflowEvents =
+  //   getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
   $: timeBasedGroups = groupBy(groups, (g) => g.timestamp);
 
   let activeGroup: undefined | EventGroup;
@@ -57,12 +57,19 @@
           4 && 'py-2'}"
       >
         {#if zoom === 1}
-          <EventGraph history={$fullEventHistory} />
+          <div class="flex gap-0">
+            <EventGraph history={$fullEventHistory} />
+            <div class="w-full">
+              {#each $fullEventHistory as event}
+                <EventRow {event} {onHover} {onHoverLeave} {activeGroup} />
+              {/each}
+            </div>
+          </div>
         {:else if zoom == 2}
-          <InputAndResultRow
+          <!-- <InputAndResultRow
             title="Input"
             value={parseWithBigInt(workflowEvents?.input)}
-          />
+          /> -->
           {#each groups as group}
             <GroupRow
               {group}
@@ -70,22 +77,19 @@
               level={Object.keys(timeBasedGroups).indexOf(group.timestamp)}
             />
           {/each}
-          <InputAndResultRow
+          <!-- <InputAndResultRow
             title="Result"
             value={parseWithBigInt(workflowEvents?.results)}
-          />
+          /> -->
         {:else if zoom == 3}
-          <InputAndResultRow
+          <!-- <InputAndResultRow
             title="Input"
             value={parseWithBigInt(workflowEvents?.input)}
-          />
-          {#each $fullEventHistory as event}
-            <EventRow {event} {onHover} {onHoverLeave} {activeGroup} />
-          {/each}
-          <InputAndResultRow
+          /> -->
+          <!-- <InputAndResultRow
             title="Result"
             value={parseWithBigInt(workflowEvents?.results)}
-          />
+          /> -->
         {:else}
           <WorkflowJsonNavigator events={$fullEventHistory} />
         {/if}

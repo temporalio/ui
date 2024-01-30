@@ -60,7 +60,6 @@
         >
           <Link
             class="truncate"
-            newTab
             href={routeForEventHistory({
               namespace,
               workflow,
@@ -84,7 +83,6 @@
         >
           <Link
             class="truncate"
-            newTab
             href={routeForEventHistory({
               namespace,
               workflow: attributes.workflowExecutionWorkflowId,
@@ -107,7 +105,6 @@
         >
           <Link
             class="truncate"
-            newTab
             href={routeForTaskQueue({ namespace, queue: value })}
           >
             {value}

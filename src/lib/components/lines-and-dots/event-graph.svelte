@@ -1,34 +1,21 @@
 <script lang="ts">
-  import { VisGraph, VisSingleContainer } from '@unovis/svelte';
-  import { GraphLayoutType, GraphNodeShape } from '@unovis/ts';
-
   import type { WorkflowEvents } from '$lib/types/events';
 
-  import { getLinks, getNodes, type LinkDatum, type NodeDatum } from './data';
+  import LineDot from './line-dot.svelte';
+  import Line from './line.svelte';
 
   export let history: WorkflowEvents;
 
-  const layoutType = GraphLayoutType.Parallel;
-  const nodeLabel = () => '';
-  const nodeShape = (n: NodeDatum) => n.shape as GraphNodeShape;
-  const nodeStroke = (l: LinkDatum) => l.color;
-  const linkFlow = (l: LinkDatum) => l.active;
-  const linkStroke = (l: LinkDatum) => l.color;
-
-  const nodes = getNodes(history);
-  const links = getLinks(history);
-  const data = { nodes, links };
+  export let canvasX = 100;
+  export let gap = 38.25;
+  const canvasY = gap * history.length;
 </script>
 
-<VisSingleContainer {data} height={1200}>
-  <VisGraph
-    zoomScaleExtent={[0.1, 2]}
-    {layoutType}
-    {nodeLabel}
-    {nodeShape}
-    {nodeStroke}
-    {linkFlow}
-    {linkStroke}
-    layoutParallelNodesPerColumn={10000}
-  />
-</VisSingleContainer>
+<div class="w-[{canvasX}px]">
+  <svg viewBox="0 0 {canvasX} {canvasY}">
+    <Line {canvasX} start={0} end={canvasY} />
+    {#each history as event, index (event.id)}
+      <LineDot y={index * gap + gap / 2} category={event.category} {canvasX} />
+    {/each}
+  </svg>
+</div>

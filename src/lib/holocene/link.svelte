@@ -1,25 +1,37 @@
 <script lang="ts">
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
+  import { goto } from '$app/navigation';
+
   import type { IconName } from '$lib/holocene/icon/paths';
 
   import Icon from './icon/icon.svelte';
 
   type $$Props = HTMLAnchorAttributes & {
-    href?: string;
+    href: string;
     active?: boolean;
     newTab?: boolean;
     class?: string;
     icon?: IconName;
+    text?: string;
     'data-testid'?: string;
   };
 
   let className = '';
   export { className as class };
-  export let href: string = null;
+  export let href: string;
   export let active = false;
   export let newTab = false;
   export let icon: IconName = null;
+  export let text: string = '';
+
+  const onLinkClick = (e: MouseEvent) => {
+    // Skip if middle mouse click or new tab
+    if (e.button === 1 || newTab || e.metaKey) return;
+    e.preventDefault();
+    e.stopPropagation();
+    goto(href);
+  };
 </script>
 
 <a
@@ -28,12 +40,15 @@
   rel={newTab ? 'noreferrer' : null}
   class="link {icon ? 'inline-flex' : 'inline'} {className}"
   class:active
-  on:click
+  on:click={onLinkClick}
   tabindex={href ? null : 0}
   {...$$restProps}
 >
   {#if icon}
     <Icon width={20} height={20} class="mt-0.5" name={icon} />
+  {/if}
+  {#if text}
+    {text}
   {/if}
   <slot />
 </a>
@@ -45,5 +60,9 @@
     &.active {
       @apply text-blue-900;
     }
+  }
+
+  .link[role='button'] {
+    @apply no-underline;
   }
 </style>
