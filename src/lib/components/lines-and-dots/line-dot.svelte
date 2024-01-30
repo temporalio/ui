@@ -33,6 +33,11 @@
 <style lang="postcss">
   .line {
     fill: #10172a;
+    opacity: 1;
+  }
+
+  .dot {
+    opacity: 1;
   }
 
   .marker,

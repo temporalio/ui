@@ -8,6 +8,7 @@
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
   import EventDetails from './event-details.svelte';
+  import { gap } from './event-graph.svelte';
 
   export let event: WorkflowEvent;
   export let onHover: (workflow: WorkflowEvent) => void;
@@ -18,7 +19,7 @@
 </script>
 
 <div
-  class="flex h-10 h-[36px] w-full grow items-center gap-2 px-4 py-0 text-white hover:bg-blurple"
+  class="flex h-10 h-[{gap}px] w-full grow items-center gap-2 px-4 py-0 text-white hover:bg-blurple"
   in:fade={{ duration: 500 }}
   on:mouseover={() => onHover(event)}
   on:focus={() => onHover(event)}
