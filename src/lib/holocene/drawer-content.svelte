@@ -19,7 +19,7 @@
   <slot />
 </div>
 
-<style>
+<style lang="postcss">
   .title-wrapper {
     @apply flex flex-col justify-center gap-2 py-4 px-8;
 
