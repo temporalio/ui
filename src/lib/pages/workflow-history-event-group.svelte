@@ -10,6 +10,7 @@
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
+  import { eventFilterSort } from '$lib/stores/event-view';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { isChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
@@ -43,7 +44,7 @@
         namespace,
         workflowId,
         runId,
-        sort: 'ascending',
+        sort: $eventFilterSort,
       });
       loading = false;
     }
@@ -56,7 +57,9 @@
     : $eventHistory?.start;
   $: initialItem = currentEvents?.[0];
   $: updating = currentEvents.length && !$fullEventHistory.length;
-  $: eventGroup = groupEvents($fullEventHistory).find((e) => e.id === groupId);
+  $: eventGroup = groupEvents($fullEventHistory, $eventFilterSort).find(
+    (e) => e.id === groupId,
+  );
   $: events = eventGroup ? [eventGroup] : [];
 
   function getLink(group: EventGroup) {

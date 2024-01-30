@@ -19,7 +19,7 @@
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
-  import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
+  import { eventFilterSort } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
   import {
     workflowRun,
@@ -254,11 +254,8 @@
   };
 
   const filterAndSetItems = (category: EventTypeCategory[]) => {
-    const reverseHistory =
-      $eventFilterSort === 'descending' && $eventViewType === 'feed';
-    const sortedHistory = reverseHistory
-      ? [...history].reverse()
-      : [...history];
+    const sortedHistory =
+      $eventFilterSort === 'descending' ? [...history].reverse() : [...history];
     const filteredHistory = filterHistory(sortedHistory, category);
     const eventGroups = groupEvents(filteredHistory);
     const { groups, items } = createGroupItems(
