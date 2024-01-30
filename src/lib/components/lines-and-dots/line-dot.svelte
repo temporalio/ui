@@ -9,7 +9,7 @@
   export let active = false;
 
   const r = 6;
-  const horizontalOffset = category === 'workflow' ? 0 : (offset / 1.3) * 3 * r;
+  const horizontalOffset = category === 'workflow' ? 0 : (offset / 1.5) * 3 * r;
   const x = 50;
   const strokeWidth = 2;
 </script>
