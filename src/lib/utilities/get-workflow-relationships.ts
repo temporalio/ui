@@ -21,7 +21,6 @@ import {
   isChildWorkflowExecutionTimedOutEvent,
   isWorkflowExecutionStartedEvent,
 } from './is-event-type';
-import type { StartAndEndEventHistory } from '../stores/events';
 
 const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
   for (const event of events) {
@@ -67,7 +66,6 @@ type WorkflowRelationships = {
 
 export const getWorkflowRelationships = (
   workflow: WorkflowExecution | null,
-  eventHistory: StartAndEndEventHistory,
   fullEventHistory: WorkflowEvents,
   namespaces: DescribeNamespaceResponse[],
 ): WorkflowRelationships => {
@@ -81,11 +79,11 @@ export const getWorkflowRelationships = (
     return namespace.namespaceInfo.id === workflow.parentNamespaceId;
   })?.namespaceInfo?.name;
 
-  const workflowExecutionStartedEvent = eventHistory.start.find(
+  const workflowExecutionStartedEvent = fullEventHistory.find(
     isWorkflowExecutionStartedEvent,
   );
 
-  const newExecutionRunId = getNewExecutionId(eventHistory.end);
+  const newExecutionRunId = getNewExecutionId(fullEventHistory);
 
   const firstExecutionRunId =
     workflowExecutionStartedEvent?.attributes?.firstExecutionRunId;

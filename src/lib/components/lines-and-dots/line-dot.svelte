@@ -1,27 +1,26 @@
 <script lang="ts">
   import type { EventTypeCategory } from '$lib/types/events';
 
-  export let canvasX: number;
   export let y: number = 20;
   export let category: EventTypeCategory;
   export let nextDistance = 0;
+  export let offset = 1;
+  export let connectLine = true;
+  export let active = false;
 
-  const radius = 6;
-  const r = (canvasX / 100) * radius;
-  const offset =
-    category === 'workflow'
-      ? 0
-      : (canvasX / 100) * (nextDistance ? 5 : 3) * radius;
-  const x = canvasX / 2;
-  const strokeWidth = (canvasX / 100) * 2;
+  const r = 6;
+  const horizontalOffset = category === 'workflow' ? 0 : (offset / 1.3) * 3 * r;
+  const x = 50;
+  const strokeWidth = 2;
 </script>
 
-{#if category !== 'workflow'}
+{#if category !== 'workflow' && connectLine}
   <line
     class="line {category}"
+    class:active
     stroke-width={strokeWidth}
     x1={x}
-    x2={x + offset}
+    x2={x + horizontalOffset}
     y1={y}
     y2={y}
   />
@@ -29,16 +28,18 @@
 <circle
   stroke-width={strokeWidth}
   class="dot {category}"
-  cx={x + offset}
+  class:active
+  cx={x + horizontalOffset}
   cy={y}
   {r}
 />
 {#if nextDistance}
   <line
     class="line {category}"
+    class:active
     stroke-width={strokeWidth}
-    x1={x + offset + r / 2 - strokeWidth}
-    x2={x + offset + r / 2 - strokeWidth}
+    x1={x + horizontalOffset + r / 2 - strokeWidth}
+    x2={x + horizontalOffset + r / 2 - strokeWidth}
     y1={y + r}
     y2={y + nextDistance - r}
   />
@@ -47,10 +48,14 @@
 <style lang="postcss">
   .line {
     fill: #10172a;
-    opacity: 1;
+    opacity: 0.35;
   }
 
   .dot {
+    opacity: 0.35;
+  }
+
+  .active {
     opacity: 1;
   }
 

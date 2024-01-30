@@ -95,6 +95,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     timestamp,
     category,
     classification,
+    level: undefined,
     get eventTime() {
       return this.lastEvent?.eventTime;
     },

@@ -1,16 +1,15 @@
 <script lang="ts">
-  export let canvasX: number;
   export let start = 0;
   export let end = 1000;
 
-  const strokeWidth = (canvasX / 100) * 2;
+  const strokeWidth = 2;
 </script>
 
 <line
   class="line"
   stroke-width={strokeWidth}
-  x1={canvasX / 2}
-  x2={canvasX / 2}
+  x1={50}
+  x2={50}
   y1={start}
   y2={end}
 />
