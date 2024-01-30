@@ -4,10 +4,10 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { WorkflowEvent } from '$lib/types/events';
   import { capitalize } from '$lib/utilities/format-camel-case';
-  import { formatAttributes } from '$lib/utilities/format-event-attributes';
-  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
+  // import { formatAttributes } from '$lib/utilities/format-event-attributes';
+  // import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
-  import EventDetails from './event-details.svelte';
+  // import EventDetails from './event-details.svelte';
   import { gap } from './event-graph.svelte';
 
   export let event: WorkflowEvent;
@@ -34,11 +34,11 @@
       </div>
       <p>{event.name}</p>
     </div>
-    <EventDetails
+    <!-- <EventDetails
       {...getSingleAttributeForEvent(event)}
       attributes={formatAttributes(event)}
       inline
-    />
+    /> -->
   </div>
 </div>
 

@@ -62,6 +62,7 @@ export const Strings = {
   'event-history-view': 'Event History View',
   'event-history': 'Event History',
   history: 'History',
+  'full-history': 'Full History',
   compact: 'Compact',
   json: 'JSON',
   download: 'Download',

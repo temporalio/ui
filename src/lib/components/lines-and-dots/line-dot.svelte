@@ -4,10 +4,14 @@
   export let canvasX: number;
   export let y: number = 20;
   export let category: EventTypeCategory;
+  export let nextDistance = 0;
 
   const radius = 6;
   const r = (canvasX / 100) * radius;
-  const offset = category === 'workflow' ? 0 : (canvasX / 100) * 3 * radius;
+  const offset =
+    category === 'workflow'
+      ? 0
+      : (canvasX / 100) * (nextDistance ? 5 : 3) * radius;
   const x = canvasX / 2;
   const strokeWidth = (canvasX / 100) * 2;
 </script>
@@ -29,6 +33,16 @@
   cy={y}
   {r}
 />
+{#if nextDistance}
+  <line
+    class="line {category}"
+    stroke-width={strokeWidth}
+    x1={x + offset + r / 2 - strokeWidth}
+    x2={x + offset + r / 2 - strokeWidth}
+    y1={y + r}
+    y2={y + nextDistance - r}
+  />
+{/if}
 
 <style lang="postcss">
   .line {
