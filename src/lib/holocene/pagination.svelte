@@ -268,7 +268,7 @@
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-gray-400;
+    @apply cursor-not-allowed text-slate-400;
   }
 
   .arrow {

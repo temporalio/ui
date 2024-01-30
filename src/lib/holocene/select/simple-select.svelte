@@ -49,7 +49,7 @@
 
 <style lang="postcss">
   select {
-    @apply text-gray-500;
+    @apply text-slate-500;
   }
 
   .remove {
@@ -57,6 +57,6 @@
   }
 
   .dark {
-    @apply bg-gray-900 text-white;
+    @apply bg-slate-900 text-white;
   }
 </style>

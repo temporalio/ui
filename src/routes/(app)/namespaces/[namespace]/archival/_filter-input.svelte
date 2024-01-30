@@ -26,7 +26,7 @@
 
 <div class="input-container bg-white focus-within:border-blue-700">
   <label for={id} class="hidden">{name}</label>
-  <span><Icon name="search" class="flex items-center text-gray-700" /></span>
+  <span><Icon name="search" class="flex items-center text-slate-700" /></span>
   <input
     type="search"
     class="block w-full focus:outline-none"

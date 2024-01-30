@@ -144,7 +144,7 @@
   }
 
   .checkmark.disabled.light {
-    @apply bg-gray-300;
+    @apply bg-slate-300;
   }
 
   /** Dark Theme Styles */
@@ -158,7 +158,7 @@
   }
 
   .checkbox.hoverable.dark:hover .checkmark::before {
-    @apply bg-gray-700;
+    @apply bg-slate-700;
   }
 
   input:focus-visible ~ .checkmark.dark {

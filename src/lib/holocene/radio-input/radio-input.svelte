@@ -62,7 +62,7 @@
   }
 
   input[type='radio'] {
-    @apply relative box-content h-4 w-4 min-w-[16px] cursor-pointer appearance-none rounded-full border border-gray-300 bg-white;
+    @apply relative box-content h-4 w-4 min-w-[16px] cursor-pointer appearance-none rounded-full border border-slate-300 bg-white;
 
     &::after {
       @apply absolute top-1 left-1 h-0 w-0 scale-0 rounded-full bg-white transition-transform content-[''];

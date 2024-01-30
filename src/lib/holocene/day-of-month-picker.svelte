@@ -18,7 +18,7 @@
 
 <div class="text-center">
   <div
-    class="grid gap-y-4 gap-x-4 rounded border border-gray-900 bg-white px-0 py-4 text-center md:gap-x-8 md:px-2 xl:gap-x-16 xl:px-4"
+    class="grid gap-y-4 gap-x-4 rounded border border-slate-900 bg-white px-0 py-4 text-center md:gap-x-8 md:px-2 xl:gap-x-16 xl:px-4"
   >
     {#each daysInMonth as day}
       <button
@@ -36,10 +36,10 @@
   }
 
   .cell {
-    @apply h-10 cursor-pointer rounded border-2 border-gray-300 from-blue-100 to-purple-100 p-1  hover:border-gray-900 hover:bg-gradient-to-br hover:text-gray-900;
+    @apply h-10 cursor-pointer rounded border-2 border-slate-300 from-blue-100 to-purple-100 p-1  hover:border-slate-900 hover:bg-gradient-to-br hover:text-slate-900;
   }
 
   .active {
-    @apply border-gray-900 bg-gray-900 text-white;
+    @apply border-slate-900 bg-slate-900 text-white;
   }
 </style>

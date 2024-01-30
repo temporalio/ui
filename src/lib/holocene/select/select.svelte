@@ -129,6 +129,6 @@
   }
 
   .select-input.disabled {
-    @apply bg-gray-50;
+    @apply bg-slate-50;
   }
 </style>

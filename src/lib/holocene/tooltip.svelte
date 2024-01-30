@@ -97,7 +97,7 @@
       class:topLeft
       style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
     >
-      <div class="inline-block rounded-lg bg-gray-800 px-2 py-2">
+      <div class="inline-block rounded-lg bg-slate-800 px-2 py-2">
         {#if copyable}
           <Copyable
             {copySuccessIconTitle}
@@ -107,7 +107,7 @@
             container-class="text-white"
             visible
           >
-            <span class="text-gray-100"
+            <span class="text-slate-100"
               >{#if icon}<Icon
                   name={icon}
                   class="inline h-4 text-white"
@@ -115,7 +115,7 @@
             >
           </Copyable>
         {:else}
-          <span class="flex gap-2 text-gray-100"
+          <span class="flex gap-2 text-slate-100"
             >{#if icon}<Icon
                 name={icon}
                 class="inline h-4 text-white"

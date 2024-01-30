@@ -138,7 +138,7 @@ export type DataEncoderStatus = 'notRequested' | 'success' | 'error';
 export type Color =
   | 'blue'
   | 'lightBlue'
-  | 'blueGray'
+  | 'slate'
   | 'gray'
   | 'orange'
   | 'red'

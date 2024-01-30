@@ -45,7 +45,7 @@
 </script>
 
 <div
-  class="flex w-full cursor-default flex-col rounded-xl border-2 border-gray-900 bg-white p-4 text-primary {className}"
+  class="flex w-full cursor-default flex-col rounded-xl border-2 border-slate-900 bg-white p-4 text-primary {className}"
   {...$$restProps}
 >
   <button
@@ -74,7 +74,7 @@
         <Icon
           name={open ? 'chevron-up' : 'chevron-down'}
           class="rounded-full from-blue-100 to-purple-100 hover:bg-gradient-to-br {disabled
-            ? 'text-gray-500'
+            ? 'text-slate-500'
             : 'text-primary'}"
         />
       {/if}

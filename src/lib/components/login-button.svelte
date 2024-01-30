@@ -17,6 +17,6 @@
   }
 
   .login-button:hover {
-    @apply rounded-md bg-purple-100 text-gray-900;
+    @apply rounded-md bg-purple-100 text-slate-900;
   }
 </style>

@@ -74,7 +74,7 @@
   }
 
   .tab.disabled {
-    @apply cursor-not-allowed text-gray-800 opacity-50;
+    @apply cursor-not-allowed text-slate-800 opacity-50;
   }
 
   .tab.disabled:hover {

@@ -153,10 +153,10 @@
   }
 
   .ghost {
-    @apply border border-[transparent] text-primary hover:border-indigo-600 hover:bg-gray-200 hover:shadow-focus hover:shadow-blue-600/50 focus:bg-gray-200 focus:shadow-focus focus:shadow-blue-600/50 focus:outline-1 focus:outline-indigo-600;
+    @apply border border-[transparent] text-primary hover:border-indigo-600 hover:bg-slate-200 hover:shadow-focus hover:shadow-blue-600/50 focus:bg-slate-200 focus:shadow-focus focus:shadow-blue-600/50 focus:outline-1 focus:outline-indigo-600;
 
     &:disabled {
-      @apply bg-gray-100/50;
+      @apply bg-slate-100/50;
     }
   }
 
@@ -164,7 +164,7 @@
     @apply border border-primary bg-white text-primary;
 
     &:disabled {
-      @apply bg-gray-50;
+      @apply bg-slate-50;
     }
   }
 

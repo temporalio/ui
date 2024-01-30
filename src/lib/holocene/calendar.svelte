@@ -70,7 +70,7 @@
   }
 
   .selected {
-    @apply bg-gradient-to-br from-blue-100  to-purple-100 text-gray-900;
+    @apply bg-gradient-to-br from-blue-100  to-purple-100 text-slate-900;
   }
 
   .disabled {
@@ -86,6 +86,6 @@
   }
 
   .selected.highlight:hover {
-    @apply from-blue-100 to-purple-100  hover:border-gray-900 hover:bg-gradient-to-br;
+    @apply from-blue-100 to-purple-100  hover:border-slate-900 hover:bg-gradient-to-br;
   }
 </style>

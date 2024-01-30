@@ -43,34 +43,34 @@
   }
 
   table.fancy {
-    @apply border-separate border-spacing-0 rounded-xl border-[3px] border-gray-900 bg-white;
+    @apply border-separate border-spacing-0 rounded-xl border-[3px] border-slate-900 bg-white;
 
     thead {
-      @apply bg-gray-900 text-gray-100;
+      @apply bg-slate-900 text-slate-100;
 
       :global(th) {
-        @apply border-t border-gray-900 px-1 py-2;
+        @apply border-t border-slate-900 px-1 py-2;
       }
 
       :global(td) {
-        @apply border-t border-gray-900 px-1 py-2;
+        @apply border-t border-slate-900 px-1 py-2;
 
         &:first-child {
-          @apply w-[1px] rounded-tl-lg border-l border-gray-900;
+          @apply w-[1px] rounded-tl-lg border-l border-slate-900;
         }
 
         &:last-child {
-          @apply w-[1px] rounded-tr-lg border-r border-gray-900;
+          @apply w-[1px] rounded-tr-lg border-r border-slate-900;
         }
       }
     }
 
     tbody :global {
       td {
-        @apply border-t border-gray-900 px-1 py-2 text-sm;
+        @apply border-t border-slate-900 px-1 py-2 text-sm;
 
         &:first-child {
-          @apply border-l border-gray-900 px-1;
+          @apply border-l border-slate-900 px-1;
         }
 
         &:first-child:is(.expanded-cell) {
@@ -78,13 +78,13 @@
         }
 
         &:last-child {
-          @apply w-0 border-r border-gray-900 p-0;
+          @apply w-0 border-r border-slate-900 p-0;
         }
       }
 
       &:last-child {
         td {
-          @apply border-b border-gray-900;
+          @apply border-b border-slate-900;
 
           &:first-child {
             @apply rounded-bl-lg;
@@ -120,7 +120,7 @@
     }
 
     tbody :global(td) {
-      @apply border-b border-gray-900 py-2;
+      @apply border-b border-slate-900 py-2;
     }
 
     &:last-child {

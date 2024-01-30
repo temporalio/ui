@@ -21,7 +21,7 @@
 
 <div
   id="content-wrapper"
-  class="relative h-screen w-max flex-auto overflow-auto bg-gray-100"
+  class="relative h-screen w-max flex-auto overflow-auto bg-slate-100"
   on:scroll={handleOnScroll}
 >
   <slot />

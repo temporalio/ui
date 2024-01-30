@@ -50,14 +50,14 @@
   }
 
   .cloud {
-    @apply text-gray-900;
+    @apply text-slate-900;
   }
 
   .local:hover {
-    @apply bg-white text-gray-900;
+    @apply bg-white text-slate-900;
   }
 
   .cloud:hover {
-    @apply bg-gray-900 text-white;
+    @apply bg-slate-900 text-white;
   }
 </style>
