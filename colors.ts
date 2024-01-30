@@ -137,6 +137,6 @@ const colors = {
     900: '#79360E',
     950: '#461B02',
   },
-};
+} as const;
 
-module.exports = colors;
+export default colors;

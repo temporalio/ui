@@ -1,7 +1,8 @@
-const defaultTheme = require('tailwindcss/defaultTheme');
-const temporalColors = require('./colors.cjs');
+import type { Config } from 'tailwindcss';
+import { fontFamily } from 'tailwindcss/defaultTheme';
 
-/** @type {import('tailwindcss').Config} */
+import temporalColors from './colors';
+
 const config = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   darkMode: 'class',
@@ -10,9 +11,9 @@ const config = {
     textColor: ({ theme }) => theme('colors'),
     backgroundColor: ({ theme }) => theme('colors'),
     fontFamily: {
-      primary: ['Inter Variable', ...defaultTheme.fontFamily.sans],
-      secondary: ['Poppins', ...defaultTheme.fontFamily.sans],
-      mono: ['Noto Sans Mono', ...defaultTheme.fontFamily.mono],
+      primary: ['Inter Variable', ...fontFamily.sans],
+      secondary: ['Poppins', ...fontFamily.sans],
+      mono: ['Noto Sans Mono', ...fontFamily.mono],
     },
     extend: {
       animation: {
@@ -27,6 +28,6 @@ const config = {
     },
   },
   plugins: [],
-};
+} satisfies Config;
 
-module.exports = config;
+export default config;
