@@ -3,3 +3,4 @@
 </script>
 
 <svelte:body use:darkMode />
+<slot />
