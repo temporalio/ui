@@ -11,7 +11,7 @@
   export let onHoverLeave: () => void;
 
   const r = 6;
-  const x = 50;
+  const x = 20;
   const strokeWidth = 2;
   const horizontalOffset = category === 'workflow' ? 0 : (offset / 1.5) * 3 * r;
 </script>

@@ -1,18 +1,11 @@
 <script lang="ts">
-  export let start = 0;
-  export let end = 1000;
+  export let y1 = 0;
+  export let y2 = 1000;
 
   const strokeWidth = 2;
 </script>
 
-<line
-  class="line"
-  stroke-width={strokeWidth}
-  x1={50}
-  x2={50}
-  y1={start}
-  y2={end}
-/>
+<line class="line" stroke-width={strokeWidth} x1={20} x2={20} {y1} {y2} />
 
 <style lang="postcss">
   .line {

@@ -9,19 +9,16 @@
   } from '$lib/models/event-groups/event-groups';
   import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
 
-  import DraggableLine from './draggable-line.svelte';
   import LineDot from './line-dot.svelte';
   import Line from './line.svelte';
 
   export let history: WorkflowEvents;
   export let groups: EventGroups;
+  export let canvasHeight = 1000;
+  export let canvasWidth = 150;
   export let activeGroup: EventGroup;
   export let onHover: (workflow: WorkflowEvent) => void;
   export let onHoverLeave: () => void;
-
-  let width = 150;
-
-  const canvasY = gap * history.length;
 
   const isMiddleEvent = (event: WorkflowEvent): boolean => {
     const group = groups.find((g) => g.eventIds.has(event.id));
@@ -81,28 +78,24 @@
     nextDistance = diff * gap;
     return { nextDistance, offset };
   };
-
-  const onExpand = (x: number) => {
-    width = x;
-  };
 </script>
 
-<div class="overflow-auto" style="width: {width}px;">
-  <svg width={1000} viewBox="0 0 1000 {canvasY}">
-    <Line start={0} end={canvasY} />
+<div style="width: {canvasWidth}px; min-width: {canvasWidth}px;">
+  <svg width={1000} viewBox="0 0 1000 {canvasHeight}">
+    <Line y1={0} y2={canvasHeight} />
     {#each history as event, index (event.id)}
       {@const { nextDistance, offset } = getNextDistanceAndOffset(event)}
       <LineDot
-        y={index * gap + gap / 2}
+        y={(index + 1) * gap + gap / 2}
+        {offset}
+        {nextDistance}
         category={event.category}
         connectLine={!isMiddleEvent(event)}
         active={activeGroup ? activeGroup.eventIds.has(event.id) : true}
-        {offset}
-        {nextDistance}
         onHover={() => onHover(event)}
         {onHoverLeave}
       />
     {/each}
-    <DraggableLine x={width} height={canvasY} {onExpand} />
+    <slot />
   </svg>
 </div>

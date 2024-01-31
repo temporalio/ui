@@ -1,10 +1,13 @@
 <script lang="ts">
   import groupBy from 'lodash.groupby';
 
-  import EventGraph from '$lib/components/lines-and-dots/event-graph.svelte';
+  import DraggableLine from '$lib/components/lines-and-dots/draggable-line.svelte';
+  import EventGraph, {
+    gap,
+  } from '$lib/components/lines-and-dots/event-graph.svelte';
   import EventRow from '$lib/components/lines-and-dots/event-row.svelte';
   import GroupRow from '$lib/components/lines-and-dots/group-row.svelte';
-  // import InputAndResultRow from '$lib/components/lines-and-dots/input-and-result-row.svelte';
+  import InputAndResultRow from '$lib/components/lines-and-dots/input-and-result-row.svelte';
   import WorkflowJsonNavigator from '$lib/components/workflow/workflow-json-navigator.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
@@ -17,14 +20,14 @@
   import { namespaces } from '$lib/stores/namespaces';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowEvent } from '$lib/types/events';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
-  // import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
-  // import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   $: ({ workflow } = $workflowRun);
   $: groups = groupEvents($fullEventHistory);
-  // $: workflowEvents =
-  //   getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
+  $: workflowEvents =
+    getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
   $: timeBasedGroups = groupBy(groups, (g) => g.timestamp);
 
   let activeGroup: undefined | EventGroup;
@@ -45,6 +48,15 @@
     $fullEventHistory,
     $namespaces,
   );
+
+  let canvasWidth = 150;
+  $: canvasHeight = gap + gap * $fullEventHistory.length;
+
+  const onExpand = (x: number) => {
+    if (x >= 10) {
+      canvasWidth = x;
+    }
+  };
 </script>
 
 <div class="flex flex-col gap-2">
@@ -90,21 +102,29 @@
             <EventGraph
               history={$fullEventHistory}
               {groups}
+              {canvasHeight}
+              {canvasWidth}
               {activeGroup}
               {onHover}
               {onHoverLeave}
-            />
-            <div class="w-full">
+            >
+              <DraggableLine x={canvasWidth} height={canvasHeight} {onExpand} />
+            </EventGraph>
+            <div class="relative w-full shrink bg-blueGray-800">
+              <InputAndResultRow
+                title="Input"
+                value={parseWithBigInt(workflowEvents?.input)}
+              />
               {#each $fullEventHistory as event}
                 <EventRow {event} {onHover} {onHoverLeave} {activeGroup} />
               {/each}
+              <!-- <InputAndResultRow
+                title="Result"
+                value={parseWithBigInt(workflowEvents?.results)}
+              /> -->
             </div>
           </div>
         {:else if $eventViewType === 'compact'}
-          <!-- <InputAndResultRow
-            title="Input"
-            value={parseWithBigInt(workflowEvents?.input)}
-          /> -->
           {#each groups as group}
             <GroupRow
               {group}
@@ -112,10 +132,6 @@
               level={Object.keys(timeBasedGroups).indexOf(group.timestamp)}
             />
           {/each}
-          <!-- <InputAndResultRow
-            title="Result"
-            value={parseWithBigInt(workflowEvents?.results)}
-          /> -->
         {:else if $eventViewType === 'json'}
           <WorkflowJsonNavigator events={$fullEventHistory} />
         {/if}

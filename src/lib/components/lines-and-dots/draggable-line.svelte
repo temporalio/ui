@@ -48,7 +48,7 @@
 <svelte:window on:mouseup={stopExpand} on:mousemove={expand} />
 
 <rect
-  x={x - 20}
+  x={x - grabberWidth}
   y={0}
   width={grabberWidth}
   {height}
@@ -65,6 +65,6 @@
 
   .grip.active,
   .grip:hover {
-    fill: #2288;
+    fill: #444ce7;
   }
 </style>
