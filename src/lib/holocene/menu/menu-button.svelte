@@ -129,7 +129,7 @@
   <slot name="trailing" />
   {#if count > 0}
     <Badge
-      class="absolute top-0 right-0 origin-bottom-left translate-y-[-10px] translate-x-[10px]"
+      class="absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
       type="count">{count}</Badge
     >
   {/if}
@@ -137,7 +137,7 @@
 
 <style lang="postcss">
   .menu-button {
-    @apply relative flex h-10 w-full flex-row items-center gap-2 rounded-lg py-2.5 px-4 text-sm disabled:cursor-not-allowed;
+    @apply relative flex h-10 w-full flex-row items-center gap-2 rounded-lg px-4 py-2.5 text-sm disabled:cursor-not-allowed;
 
     &.active {
       @apply after:h-2 after:w-2 after:-translate-x-full after:-translate-y-full after:rounded-full after:bg-blue-300 after:content-[''];

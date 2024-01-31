@@ -53,6 +53,6 @@
   }
 
   .active {
-    @apply border-slate-900 bg-slate-900 text-white hover:text-slate-900;
+    @apply border-slate-900 bg-slate-900 text-white hover:text-primary;
   }
 </style>

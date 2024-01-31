@@ -70,7 +70,7 @@
   }
 
   .selected {
-    @apply bg-gradient-to-br from-blue-100  to-purple-100 text-slate-900;
+    @apply bg-gradient-to-br from-blue-100  to-purple-100 text-primary;
   }
 
   .disabled {

@@ -162,10 +162,10 @@
   }
 
   .unroundRight {
-    @apply rounded-tr-none rounded-br-none;
+    @apply rounded-br-none rounded-tr-none;
   }
 
   .unroundLeft {
-    @apply rounded-tl-none rounded-bl-none;
+    @apply rounded-bl-none rounded-tl-none;
   }
 </style>

@@ -19,7 +19,7 @@
 
 <style lang="postcss">
   .back-to-top {
-    @apply fixed right-8 bottom-5 z-50;
+    @apply fixed bottom-5 right-8 z-50;
   }
 
   .back-to-top.hidden {

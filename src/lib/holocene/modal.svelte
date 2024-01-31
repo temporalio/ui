@@ -131,7 +131,7 @@
 
 <style lang="postcss">
   .body {
-    @apply z-50  w-full max-w-lg overflow-y-auto rounded-lg bg-white p-0 text-slate-900 shadow-xl md:h-max;
+    @apply z-50  w-full max-w-lg overflow-y-auto rounded-lg bg-white p-0 text-primary shadow-xl md:h-max;
   }
 
   .body::backdrop {
@@ -139,7 +139,7 @@
   }
 
   .body.hightlightNav::backdrop {
-    @apply top-[40px] left-[60px];
+    @apply left-[60px] top-[40px];
   }
 
   .large {
@@ -147,7 +147,7 @@
   }
 
   .title {
-    @apply bg-white px-8 pt-8 pb-0 text-2xl;
+    @apply bg-white px-8 pb-0 pt-8 text-2xl;
   }
 
   .content {

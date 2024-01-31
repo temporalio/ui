@@ -51,7 +51,7 @@
 
   .default,
   .gray {
-    @apply border-slate-900 bg-slate-100 text-slate-900;
+    @apply border-slate-900 bg-slate-100 text-primary;
   }
 
   .active,

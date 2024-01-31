@@ -85,10 +85,10 @@
 
     <span class="checkmark {theme}" class:disabled>
       {#if indeterminate}
-        <Icon class="absolute top-0 left-0 h-4 w-4" name="hyphen" />
+        <Icon class="absolute left-0 top-0 h-4 w-4" name="hyphen" />
       {:else if checked}
         <Icon
-          class="absolute top-0 left-0 h-4 w-4"
+          class="absolute left-0 top-0 h-4 w-4"
           name="checkmark"
           strokeWidth={3}
         />

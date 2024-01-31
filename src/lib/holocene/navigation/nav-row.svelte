@@ -50,11 +50,11 @@
   }
 
   .cloud {
-    @apply text-slate-900;
+    @apply text-primary;
   }
 
   .local:hover {
-    @apply bg-white text-slate-900;
+    @apply bg-white text-primary;
   }
 
   .cloud:hover {

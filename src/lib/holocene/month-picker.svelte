@@ -33,7 +33,7 @@
 
 <style lang="postcss">
   .cell {
-    @apply cursor-pointer rounded border-2 border-slate-300 bg-slate-300 from-blue-100 to-purple-100 p-2  hover:border-slate-900 hover:bg-gradient-to-br hover:text-slate-900;
+    @apply cursor-pointer rounded border-2 border-slate-300 bg-slate-300 from-blue-100 to-purple-100 p-2  hover:border-slate-900 hover:bg-gradient-to-br hover:text-primary;
   }
 
   .active {

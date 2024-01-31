@@ -64,7 +64,7 @@
     }
 
     &.right {
-      @apply right-0 top-0 bottom-0 h-full rounded-tr-none rounded-bl-lg;
+      @apply bottom-0 right-0 top-0 h-full rounded-bl-lg rounded-tr-none;
     }
 
     &.dark {

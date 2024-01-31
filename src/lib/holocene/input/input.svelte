@@ -191,15 +191,15 @@
   }
 
   .suffix {
-    @apply block h-full w-fit rounded-tr rounded-br border-l px-4 py-2;
+    @apply block h-full w-fit rounded-br rounded-tr border-l px-4 py-2;
   }
 
   .unroundRight {
-    @apply rounded-tr-none rounded-br-none;
+    @apply rounded-br-none rounded-tr-none;
   }
 
   .unroundLeft {
-    @apply rounded-tl-none rounded-bl-none border-l-0;
+    @apply rounded-bl-none rounded-tl-none border-l-0;
   }
 
   .noBorder {

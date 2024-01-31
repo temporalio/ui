@@ -189,7 +189,7 @@
   }
 
   .paginated-table-controls {
-    @apply sticky bottom-0 left-0 flex w-full grow flex-col gap-2 rounded-b border-t border-slate-200 bg-white py-2 px-4 text-primary lg:flex-row;
+    @apply sticky bottom-0 left-0 flex w-full grow flex-col gap-2 rounded-b border-t border-slate-200 bg-white px-4 py-2 text-primary lg:flex-row;
   }
 
   .paginated-table-controls-start {
