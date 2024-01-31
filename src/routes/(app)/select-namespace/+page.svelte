@@ -16,32 +16,27 @@
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
-  $: namespaceNames = $namespaces.map(
-    (namespace: Namespace) => namespace?.namespaceInfo?.name,
-  );
-
-  $: namespaceList = namespaceNames.map((namespace: string) => {
-    return {
-      namespace,
-      onClick: async (namespace: string) => {
-        const { authorized } = await fetchWorkflowForAuthorization(namespace);
-        if (authorized) {
-          $lastUsedNamespace = namespace;
-          goto(routeForWorkflows({ namespace }));
-        } else {
-          toaster.push({
-            variant: 'error',
-            message: translate('namespaces.unauthorized-namespace-error'),
-          });
-        }
-      },
-    };
-  });
-
   let searchValue = '';
-  $: filteredList = namespaceList.filter(({ namespace }) =>
-    namespace.includes(searchValue),
-  );
+
+  const navigateToNamespace = async (namespace: string) => {
+    const { authorized } = await fetchWorkflowForAuthorization(namespace);
+    if (authorized) {
+      $lastUsedNamespace = namespace;
+      goto(routeForWorkflows({ namespace }));
+    } else {
+      toaster.push({
+        variant: 'error',
+        message: translate('namespaces.unauthorized-namespace-error'),
+      });
+    }
+  };
+
+  $: filteredList = $namespaces
+    .map((namespace: Namespace, index: number) => ({
+      namespace: namespace?.namespaceInfo?.name,
+      index,
+    }))
+    .filter(({ namespace }) => namespace.includes(searchValue));
 </script>
 
 <PageTitle
@@ -64,42 +59,28 @@
       bind:value={searchValue}
     />
   </form>
-  <div class="h-screen w-full" aria-label={translate('common.namespaces')}>
-    {#if namespaceList.length}
-      {#if filteredList.length}
-        <VirtualList items={filteredList} let:item itemHeight={50}>
-          {@const first = item === filteredList[0]}
-          {@const last = item === filteredList[filteredList.length - 1]}
-          <div class="link-item" class:first class:last>
-            <button
-              class="w-full truncate p-3 text-left"
-              on:click={() => item?.onClick(item.namespace)}
-            >
-              {item.namespace}
-            </button>
-          </div>
-        </VirtualList>
-      {:else}
-        <EmptyState title={translate('common.no-results')} />
-      {/if}
+  <div
+    class="group h-screen w-full"
+    aria-label={translate('common.namespaces')}
+  >
+    {#if filteredList.length}
+      <VirtualList items={filteredList} let:item itemHeight={50}>
+        <button
+          on:click={() => navigateToNamespace(item.namespace)}
+          class="surface-primary flex w-full border-collapse cursor-pointer gap-2 truncate border-x border-t from-blue-100 to-purple-100 p-3 text-left hover:bg-gradient-to-br"
+          class:rounded-t={item.index === 0}
+          class:border-b={item.index === filteredList.length - 1}
+          class:rounded-b={item.index === filteredList.length - 1}
+        >
+          {item.namespace}
+        </button>
+      </VirtualList>
     {:else}
       <EmptyState
-        title={translate('namespaces.select-namespace-empty-state')}
+        title={$namespaces.length
+          ? translate('common.no-results')
+          : translate('namespaces.select-namespace-empty-state')}
       />
     {/if}
   </div>
 </div>
-
-<style lang="postcss">
-  .link-item {
-    @apply surface-primary flex border-collapse cursor-pointer gap-2 border border-x  from-blue-100 to-purple-100 hover:bg-gradient-to-br;
-  }
-
-  .link-item.first {
-    @apply rounded-t border-t;
-  }
-
-  .link-item.last {
-    @apply rounded-b border-b;
-  }
-</style>
