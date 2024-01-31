@@ -1,6 +1,13 @@
 type CSSVariable = `--${string}`;
+
 type RGB = `${number} ${number} ${number}`;
+
+type Variables<K extends string = CSSVariable> = Readonly<
+  Record<K, RGB | `var(${CSSVariable})`>
+>;
+
 type HexColor = `#${string}`;
+
 type Shade =
   | 50
   | 100
