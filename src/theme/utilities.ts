@@ -1,5 +1,3 @@
-import type { Variables } from '.';
-
 const removeHexPrefix = (hex: `#${string}`) => hex.replace('#', '');
 
 export const rgb = (hexColor: `#${string}`): RGB => {
