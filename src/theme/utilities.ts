@@ -8,3 +8,5 @@ export const rgb = (hexColor: `#${string}`): RGB => {
   const b = parseInt(hex.substring(4, 6), 16);
   return `${r} ${g} ${b}`;
 };
+
+export const css = (variable: CSSVariable) => `rgb(var(${variable}))`;
