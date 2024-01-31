@@ -6,7 +6,6 @@ import { css, rgb } from './utilities';
 const variables = {
   '--color-primary': rgb(colors.primary),
   '--color-secondary': rgb(colors.secondary),
-  '--color-subtle': rgb(getColor('slate', 300)),
   '--color-inverse': rgb(getColor('slate', 900)),
 
   '--color-text-primary': rgb(colors.primary),
@@ -36,7 +35,6 @@ const variables = {
 const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-primary': rgb(colors.offWhite),
   '--color-secondary': rgb(colors.offBlack),
-  '--color-subtle': rgb(getColor('slate', 800)),
   '--color-inverse': rgb(colors.primary),
 
   '--color-text-primary': rgb(colors.offWhite),
@@ -90,7 +88,6 @@ const temporal = plugin(
         ...theme('colors'),
         primary: css('--color-primary'),
         secondary: css('--color-secondary'),
-        subtle: css('--color-subtle'),
         inverse: css('--color-inverse'),
 
         error: css('--color-surface-error'),
