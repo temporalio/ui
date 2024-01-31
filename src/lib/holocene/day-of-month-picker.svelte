@@ -36,7 +36,7 @@
   }
 
   .cell {
-    @apply hover: h-10 cursor-pointer rounded border-2 border-subtle from-blue-100 to-purple-100  p-1 hover:bg-gradient-to-br hover:text-primary;
+    @apply h-10 cursor-pointer rounded border-2 border-subtle from-blue-100 to-purple-100 p-1 hover:border-primary hover:bg-gradient-to-br hover:text-primary;
   }
 
   .active {

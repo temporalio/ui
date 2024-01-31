@@ -49,7 +49,7 @@
 
 <style lang="postcss">
   .cell {
-    @apply hover: w-auto cursor-pointer rounded border-2 border-subtle bg-slate-300 from-blue-100 to-purple-100  p-2 hover:bg-gradient-to-br;
+    @apply w-auto cursor-pointer rounded border-2 border-subtle bg-slate-300 from-blue-100 to-purple-100 p-2  hover:border-primary hover:bg-gradient-to-br;
   }
 
   .active {
