@@ -11,21 +11,15 @@ const variables = {
   '--color-surface-primary': rgb(colors.white),
   '--color-surface-secondary': rgb(getColor('slate', 100)),
   '--color-border-primary': rgb(getColor('slate', 900)),
+  '--color-border-subtle': rgb(getColor('slate', 300)),
 } as const;
 
 const css = (variable: keyof typeof variables) => `rgb(var(${variable}))`;
 
 const temporal = plugin(
-  ({ addUtilities, addComponents, addBase }) => {
+  ({ addComponents, addBase }) => {
     addBase({
       ':root': variables,
-    });
-
-    addUtilities({
-      '.text-primary': { color: css('--color-text-primary') },
-      '.text-secondary': { color: css('--color-text-secondary') },
-      '.bg-primary': { backgroundColor: css('--color-primary') },
-      '.border-primary': { borderColor: css('--color-primary') },
     });
 
     addComponents({
@@ -42,9 +36,23 @@ const temporal = plugin(
   {
     theme: {
       colors,
+      backgroundColor: ({ theme }) => ({
+        ...theme('colors'),
+        primary: css('--color-primary'),
+        secondary: css('--color-secondary'),
+        DEFAULT: css('--color-surface-primary'),
+      }),
       borderColor: ({ theme }) => ({
         ...theme('colors'),
+        primary: css('--color-border-primary'),
+        subtle: css('--color-border-subtle'),
         DEFAULT: css('--color-border-primary'),
+      }),
+      textColor: ({ theme }) => ({
+        ...theme('colors'),
+        primary: css('--color-text-primary'),
+        secondary: css('--color-text-secondary'),
+        DEFAULT: css('--color-text-primary'),
       }),
     },
   },
