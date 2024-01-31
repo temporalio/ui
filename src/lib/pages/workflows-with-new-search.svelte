@@ -82,17 +82,12 @@
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   $: query = $page.url.searchParams.get('query');
-  $: query && ($workflowsQuery = query);
+  $: query, ($workflowsQuery = query);
+  $: batchOperationQuery = $workflowsQuery ?? 'ExecutionStatus="Running"';
 
   // For returning to page from 'Back to Workflows' with previous search
   $: searchParams = $page.url.searchParams.toString();
   $: searchParams, ($workflowsSearchParams = searchParams);
-
-  $: {
-    if (!$workflowFilters.length) {
-      $workflowsQuery = '';
-    }
-  }
 
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
@@ -157,10 +152,6 @@
       );
     }
   };
-
-  $: batchOperationQuery = !$workflowsQuery
-    ? 'ExecutionStatus="Running"'
-    : $workflowsQuery;
 
   $: {
     if ($updating) {
