@@ -9,4 +9,4 @@ export const rgb = (hexColor: `#${string}`): RGB => {
   return `${r} ${g} ${b}`;
 };
 
-export const css = (variable: Variables) => `rgb(var(${variable}))`;
+export const css = (variable: CSSVariable) => `rgb(var(${variable}))`;
