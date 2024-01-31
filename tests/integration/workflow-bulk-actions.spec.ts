@@ -94,4 +94,22 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await expect(page.locator('#batch-cancel-success-toast')).toBeVisible();
     });
   });
+
+  test('works when visiting a URL directly that has an existing query in it', async ({
+    page,
+  }) => {
+    await page.goto('/namespaces/default/workflows?query=WorkflowId%3D"test"');
+
+    await waitForWorkflowsApis(page);
+
+    await page.getByTestId('batch-actions-checkbox').click();
+    await page.getByTestId('select-all-workflows').click();
+    await page.getByTestId('bulk-cancel-button').click();
+
+    const queryInputValue = await page
+      .getByTestId('batch-action-workflow-query')
+      .inputValue();
+
+    expect(queryInputValue).toBe('WorkflowId="test"');
+  });
 });
