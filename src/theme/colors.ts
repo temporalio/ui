@@ -154,11 +154,13 @@ const colors = {
   primary: '#141414',
   secondary: getColor('slate', 500),
   white: '#ffffff',
+  offWhite: '#F8FAFC',
   black: '#141414',
+  offBlack: '#0F172A',
   transparent: 'transparent',
   danger: getColor('red', 700),
   success: getColor('green', 200),
   ...palette,
-} as const;
+} satisfies Readonly<Record<string, HexColor | 'transparent'>>;
 
 export default colors;
