@@ -64,9 +64,6 @@ const temporal = plugin(
   ({ addComponents, addBase }) => {
     addBase({
       ':root': variables,
-      '@media (prefers-color-scheme: dark)': {
-        ':root': dark,
-      },
       ':is(.dark *)': dark,
     });
 
