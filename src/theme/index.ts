@@ -10,6 +10,7 @@ const variables = {
   '--color-text-secondary': rgb(colors.secondary),
   '--color-surface-primary': rgb(colors.white),
   '--color-surface-secondary': rgb(getColor('slate', 100)),
+  '--color-border-primary': rgb(getColor('slate', 900)),
 } as const;
 
 const css = (variable: keyof typeof variables) => `rgb(var(${variable}))`;
@@ -41,6 +42,10 @@ const temporal = plugin(
   {
     theme: {
       colors,
+      borderColor: ({ theme }) => ({
+        ...theme('colors'),
+        DEFAULT: css('--color-border-primary'),
+      }),
     },
   },
 );
