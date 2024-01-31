@@ -89,7 +89,7 @@
   }
 
   .input-container {
-    @apply relative box-border flex h-10 w-16 items-center rounded border border-slate-900 text-sm focus-within:border-blue-700;
+    @apply relative box-border flex h-10 w-16 items-center rounded border  text-sm focus-within:border-blue-700;
   }
 
   .input-container.search {
@@ -158,7 +158,7 @@
   .input-container.dark.disabled,
   .input-container.dark.disabled .copy-icon-container,
   .input-container.dark.disabled input {
-    @apply border-slate-900 bg-slate-900;
+    @apply bg-slate-900;
   }
 
   .unroundRight {

@@ -86,6 +86,6 @@
   }
 
   .selected.highlight:hover {
-    @apply from-blue-100 to-purple-100  hover:border-slate-900 hover:bg-gradient-to-br;
+    @apply from-blue-100 to-purple-100 hover:border-primary hover:bg-gradient-to-br;
   }
 </style>

@@ -113,7 +113,7 @@
         ? translate('workflows.input')
         : translate('workflows.input-and-results')}
       icon="json"
-      class="border-slate-900"
+      class=""
       data-testid="input-and-results"
     >
       <div class="flex w-full flex-col gap-2 lg:flex-row">

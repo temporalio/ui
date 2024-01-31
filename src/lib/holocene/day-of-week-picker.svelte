@@ -49,10 +49,10 @@
 
 <style lang="postcss">
   .cell {
-    @apply w-auto cursor-pointer rounded border-2 border-slate-300 bg-slate-300 from-blue-100 to-purple-100 p-2  hover:border-slate-900 hover:bg-gradient-to-br;
+    @apply hover: w-auto cursor-pointer rounded border-2 border-slate-300 bg-slate-300 from-blue-100 to-purple-100  p-2 hover:bg-gradient-to-br;
   }
 
   .active {
-    @apply border-slate-900 bg-slate-900 text-white hover:text-primary;
+    @apply bg-slate-900 text-white hover:text-primary;
   }
 </style>

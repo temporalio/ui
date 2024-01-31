@@ -30,7 +30,7 @@
   }
 
   .gray.active {
-    @apply surface-primary border-2 border-slate-900 text-primary;
+    @apply surface-primary border-2  text-primary;
   }
 
   .slate {
@@ -38,7 +38,7 @@
   }
 
   .slate.active {
-    @apply border-2 border-slate-900;
+    @apply border-2;
   }
 
   .blue {
@@ -50,7 +50,7 @@
   }
 
   .lightBlue.active {
-    @apply border-2 border-slate-900 bg-blue-50 text-primary;
+    @apply border-2  bg-blue-50 text-primary;
   }
 
   .green {

@@ -93,7 +93,7 @@
   />
   {#if showDatePicker}
     <div
-      class="surface-primary absolute z-30 inline-block rounded border border-slate-900 shadow"
+      class="surface-primary absolute z-30 inline-block rounded border shadow"
     >
       <div class="mx-3 my-2 flex items-center justify-around">
         <div class="flex items-center justify-center">

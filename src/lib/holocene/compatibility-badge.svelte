@@ -22,7 +22,7 @@
 
 <style lang="postcss">
   .version {
-    @apply flex items-center gap-1 rounded border border-slate-900 px-1 text-sm;
+    @apply flex items-center gap-1 rounded border  px-1 text-sm;
   }
 
   .active-version {
