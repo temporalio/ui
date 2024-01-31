@@ -73,8 +73,8 @@
       {#if !readOnly}
         <Icon
           name={open ? 'chevron-up' : 'chevron-down'}
-          class="rounded-full from-blue-100 to-purple-100 hover:bg-gradient-to-br {disabled
-            ? 'text-slate-500'
+          class="rounded-full from-blue-100 to-purple-100 hover:bg-gradient-to-br dark:from-blue-800 dark:to-purple-800 {disabled
+            ? 'text-disabled'
             : 'text-primary'}"
         />
       {/if}
