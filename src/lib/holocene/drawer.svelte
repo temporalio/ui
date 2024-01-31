@@ -68,7 +68,7 @@
     }
 
     &.dark {
-      @apply bg-slate-900 text-slate-100;
+      @apply bg-inverse text-slate-100;
     }
   }
 

@@ -37,6 +37,6 @@
   }
 
   .active {
-    @apply bg-slate-900 text-white;
+    @apply bg-inverse text-white;
   }
 </style>

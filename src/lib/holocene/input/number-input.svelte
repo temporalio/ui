@@ -148,7 +148,7 @@
   .input-container.dark .icon-container,
   .input-container.dark input,
   .input-container.dark .copy-icon-container {
-    @apply bg-slate-900 text-white;
+    @apply bg-inverse text-white;
   }
 
   .input-container.dark input {
@@ -158,7 +158,7 @@
   .input-container.dark.disabled,
   .input-container.dark.disabled .copy-icon-container,
   .input-container.dark.disabled input {
-    @apply bg-slate-900;
+    @apply bg-inverse;
   }
 
   .unroundRight {

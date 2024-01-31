@@ -135,7 +135,7 @@
   }
 
   .body::backdrop {
-    @apply cursor-pointer bg-slate-900 opacity-70;
+    @apply cursor-pointer bg-inverse opacity-70;
   }
 
   .body.hightlightNav::backdrop {

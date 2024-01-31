@@ -68,7 +68,7 @@
   }
 
   .toggle-button.active {
-    @apply bg-slate-900 text-white hover:text-primary focus-visible:text-primary;
+    @apply bg-inverse text-white hover:text-primary focus-visible:text-primary;
   }
 
   .group:first-child {

@@ -6,11 +6,12 @@ import { rgb } from './utilities';
 const variables = {
   '--color-primary': rgb(colors.primary),
   '--color-secondary': rgb(colors.secondary),
+  '--color-inverse': rgb(getColor('slate', 900)),
   '--color-text-primary': rgb(colors.primary),
   '--color-text-secondary': rgb(colors.secondary),
   '--color-surface-primary': rgb(colors.white),
   '--color-surface-secondary': rgb(getColor('slate', 100)),
-  '--color-border-primary': rgb(getColor('slate', 900)),
+  '--color-border-primary': 'var(--color-inverse)',
   '--color-border-subtle': rgb(getColor('slate', 300)),
 } as const;
 
@@ -40,6 +41,7 @@ const temporal = plugin(
         ...theme('colors'),
         primary: css('--color-primary'),
         secondary: css('--color-secondary'),
+        inverse: css('--color-inverse'),
         DEFAULT: css('--color-surface-primary'),
       }),
       borderColor: ({ theme }) => ({

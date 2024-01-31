@@ -37,7 +37,7 @@
     <div class="flex flex-col gap-2 xl:flex-row">
       <div class="grow overflow-hidden">
         <h3 class="font-medium">{translate('common.execution-details')}</h3>
-        <div class="h-0.5 rounded-full bg-slate-900" />
+        <div class="h-0.5 rounded-full bg-inverse" />
         <WorkflowDetail
           title={translate('common.workflow-type')}
           content={workflow?.name}
@@ -59,7 +59,7 @@
       </div>
       <div class="grow overflow-hidden">
         <h3 class="font-medium">{translate('common.task-queue')}</h3>
-        <div class="h-0.5 rounded-full bg-slate-900" />
+        <div class="h-0.5 rounded-full bg-inverse" />
         <WorkflowDetail
           content={workflow?.taskQueue}
           href={routeForWorkers({
@@ -80,7 +80,7 @@
         <h3 class="font-medium">
           {translate('workflows.start-and-close-time')}
         </h3>
-        <div class="h-0.5 rounded-full bg-slate-900" />
+        <div class="h-0.5 rounded-full bg-inverse" />
         <WorkflowDetail
           title={translate('common.start-time')}
           content={formatDate(workflow?.startTime, $timeFormat, {
@@ -103,7 +103,7 @@
     {#if workflow?.searchAttributes}
       <div class="mt-4 flex flex-col gap-2">
         <h3 class="font-medium">{translate('common.search-attributes')}</h3>
-        <div class="h-0.5 rounded-full bg-slate-900" />
+        <div class="h-0.5 rounded-full bg-inverse" />
         <PayloadDecoder
           value={{ searchAttributes: workflow.searchAttributes }}
           key="searchAttributes"

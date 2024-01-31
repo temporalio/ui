@@ -53,6 +53,6 @@
   }
 
   .active {
-    @apply bg-slate-900 text-white hover:text-primary;
+    @apply bg-inverse text-white hover:text-primary;
   }
 </style>

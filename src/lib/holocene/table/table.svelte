@@ -46,7 +46,7 @@
     @apply surface-primary border-separate border-spacing-0 rounded-xl border-[3px];
 
     thead {
-      @apply bg-slate-900 text-slate-100;
+      @apply bg-inverse text-slate-100;
 
       :global(th) {
         @apply border-t  px-1 py-2;

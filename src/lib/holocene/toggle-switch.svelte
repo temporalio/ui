@@ -123,7 +123,7 @@
     }
 
     &:not(.checked) {
-      @apply left-0.5 bg-slate-900 text-white;
+      @apply left-0.5 bg-inverse text-white;
     }
   }
 </style>
