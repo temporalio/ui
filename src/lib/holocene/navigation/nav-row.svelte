@@ -54,7 +54,7 @@
   }
 
   .local:hover {
-    @apply bg-white text-primary;
+    @apply surface-primary text-primary;
   }
 
   .cloud:hover {

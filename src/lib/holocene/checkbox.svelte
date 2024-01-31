@@ -136,7 +136,7 @@
   }
 
   .checkmark.light {
-    @apply border-primary bg-white;
+    @apply surface-primary border-primary;
   }
 
   input:focus-visible ~ .checkmark.light {

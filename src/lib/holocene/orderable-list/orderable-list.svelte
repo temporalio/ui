@@ -23,6 +23,6 @@
   }
 
   .orderable-list {
-    @apply rounded-lg border-2 border-primary bg-white;
+    @apply surface-primary rounded-lg border-2 border-primary;
   }
 </style>

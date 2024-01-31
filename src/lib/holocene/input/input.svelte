@@ -236,7 +236,7 @@
 
   /* Light theme styles */
   .input-container.light {
-    @apply border-primary bg-white text-primary focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50 focus-within:outline-none;
+    @apply surface-primary border-primary text-primary focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50 focus-within:outline-none;
 
     > .input {
       @apply caret-indigo-600;

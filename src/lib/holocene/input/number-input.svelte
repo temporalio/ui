@@ -51,7 +51,7 @@
         </span>
       {/if}
       <input
-        class="m-2 block w-full bg-white text-center focus:outline-none"
+        class="surface-primary m-2 block w-full text-center focus:outline-none"
         class:disabled
         type="number"
         {max}
@@ -124,7 +124,7 @@
   .input-container.light,
   .input-container.light .icon-container,
   .input-container.light input {
-    @apply bg-white;
+    @apply surface-primary;
   }
 
   .input-container.light .icon-container {

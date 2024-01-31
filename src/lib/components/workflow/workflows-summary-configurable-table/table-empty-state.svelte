@@ -31,7 +31,7 @@
   aria-live="polite"
 >
   <div
-    class="flex w-auto min-w-[280px] flex-col gap-4 border-b-2 border-slate-900 bg-white p-8 xl:min-w-[520px] xl:border-b-0 xl:border-r-2"
+    class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 border-b-2 border-slate-900 p-8 xl:min-w-[520px] xl:border-b-0 xl:border-r-2"
   >
     {#if updating}
       <Loading />

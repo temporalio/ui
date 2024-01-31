@@ -151,7 +151,7 @@
       <h2 class="text-2xl font-medium">
         {translate('workflows.event-history')}
       </h2>
-      <div id="event-view-toggle" class="mt-4 flex gap-4 bg-white">
+      <div id="event-view-toggle" class="surface-primary mt-4 flex gap-4">
         <ToggleButtons>
           <ToggleButton
             icon="feed"

@@ -58,10 +58,10 @@
 
 <style lang="postcss">
   .menu {
-    @apply absolute z-20 mt-1 max-h-[480px] min-w-full list-none overflow-auto rounded-lg border border-slate-900 bg-white text-primary shadow;
+    @apply surface-primary absolute z-20 mt-1 max-h-[480px] min-w-full list-none overflow-auto rounded-lg border border-slate-900 text-primary shadow;
 
     &.light {
-      @apply border-primary bg-white text-primary;
+      @apply surface-primary border-primary text-primary;
     }
 
     &.dark {

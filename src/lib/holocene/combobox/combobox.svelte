@@ -353,10 +353,10 @@
   }
 
   .combobox-wrapper.light {
-    @apply border-primary bg-white text-primary  focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50;
+    @apply surface-primary border-primary text-primary  focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50;
 
     > .combobox-input {
-      @apply bg-white text-primary placeholder:text-slate-400;
+      @apply surface-primary text-primary placeholder:text-slate-400;
     }
 
     > .combobox-button {

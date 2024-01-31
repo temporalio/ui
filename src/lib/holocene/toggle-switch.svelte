@@ -119,7 +119,7 @@
     @apply absolute h-4 w-4 rounded-[50%];
 
     &.checked {
-      @apply right-0.5 bg-white;
+      @apply surface-primary right-0.5;
     }
 
     &:not(.checked) {

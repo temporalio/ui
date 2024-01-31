@@ -43,7 +43,7 @@
   }
 
   table.fancy {
-    @apply border-separate border-spacing-0 rounded-xl border-[3px] border-slate-900 bg-white;
+    @apply surface-primary border-separate border-spacing-0 rounded-xl border-[3px] border-slate-900;
 
     thead {
       @apply bg-slate-900 text-slate-100;

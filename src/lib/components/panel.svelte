@@ -2,7 +2,7 @@
   export let error = false;
 </script>
 
-<div class="panel bg-white {$$props.class}" class:error>
+<div class="panel surface-primary {$$props.class}" class:error>
   <slot />
 </div>
 

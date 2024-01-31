@@ -45,7 +45,7 @@
 </script>
 
 <div
-  class="flex w-full cursor-default flex-col rounded-xl border-2 border-slate-900 bg-white p-4 text-primary {className}"
+  class="surface-primary flex w-full cursor-default flex-col rounded-xl border-2 border-slate-900 p-4 text-primary {className}"
   {...$$restProps}
 >
   <button

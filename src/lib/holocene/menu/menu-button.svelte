@@ -161,7 +161,7 @@
   }
 
   .secondary {
-    @apply border border-primary bg-white text-primary;
+    @apply surface-primary border border-primary text-primary;
 
     &:disabled {
       @apply bg-slate-50;

@@ -30,7 +30,7 @@
   }
 
   .gray.active {
-    @apply border-2 border-slate-900 bg-white text-primary;
+    @apply surface-primary border-2 border-slate-900 text-primary;
   }
 
   .slate {
