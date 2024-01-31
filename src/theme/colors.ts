@@ -151,12 +151,13 @@ export const getColor = <C extends keyof Palette>(
 };
 
 const colors = {
-  primary: '#141414',
+  primary: getColor('slate', 950),
   secondary: getColor('slate', 500),
   white: '#ffffff',
   offWhite: '#F8FAFC',
   black: '#141414',
   offBlack: '#0F172A',
+  blurple: '#444CE7',
   transparent: 'transparent',
   danger: getColor('red', 700),
   success: getColor('green', 200),

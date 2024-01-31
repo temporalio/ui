@@ -120,7 +120,7 @@
       <!-- <p class="mr-3 truncate text-sm">{format(key)}</p> -->
       <p class="truncate text-right text-sm xl:text-left">
         <span
-          class="w-full select-all text-gray-50"
+          class="w-full select-all text-slate-50"
           class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
         >
       </p>
@@ -130,6 +130,6 @@
 
 <style lang="postcss">
   .badge {
-    @apply rounded-lg bg-blueGray-800 py-1 px-2 text-gray-50;
+    @apply rounded-lg bg-slate-800 px-2 py-1 text-slate-50;
   }
 </style>

@@ -10,6 +10,7 @@
   import InputAndResultRow from '$lib/components/lines-and-dots/input-and-result-row.svelte';
   import WorkflowJsonNavigator from '$lib/components/workflow/workflow-json-navigator.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -22,7 +23,10 @@
   import type { WorkflowEvent } from '$lib/types/events';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
-  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import {
+    parseWithBigInt,
+    stringifyWithBigInt,
+  } from '$lib/utilities/parse-with-big-int';
 
   $: ({ workflow } = $workflowRun);
   $: groups = groupEvents($fullEventHistory);
@@ -31,14 +35,18 @@
   $: timeBasedGroups = groupBy(groups, (g) => g.timestamp);
 
   let activeGroup: undefined | EventGroup;
+  let activeEvent: undefined | WorkflowEvent;
+
   // let showDownloadPrompt = false;
 
-  const onHover = (event: WorkflowEvent) => {
+  const setActive = (event: WorkflowEvent) => {
+    activeEvent = event;
     activeGroup = groups.find((g) => g.eventIds.has(event.id));
   };
 
   const onHoverLeave = () => {
     activeGroup = undefined;
+    activeEvent = undefined;
   };
 
   $: initialEvent = $fullEventHistory.find((e) => e.id === '1');
@@ -94,9 +102,9 @@
   </div>
   {#if $fullEventHistory.length}
     <div
-      class="flex w-full flex-col gap-0 rounded-lg bg-blueGray-900 md:h-auto md:flex-row"
+      class="flex w-full flex-col gap-0 rounded-lg bg-slate-900 md:h-auto md:flex-row"
     >
-      <div class="flex w-full flex-col gap-1 rounded-lg bg-blueGray-900">
+      <div class="flex w-full flex-col gap-1 rounded-lg bg-slate-950">
         {#if $eventViewType === 'feed'}
           <div class="flex gap-0">
             <EventGraph
@@ -105,23 +113,30 @@
               {canvasHeight}
               {canvasWidth}
               {activeGroup}
-              {onHover}
+              onHover={setActive}
               {onHoverLeave}
             >
               <DraggableLine x={canvasWidth} height={canvasHeight} {onExpand} />
             </EventGraph>
-            <div class="relative w-full shrink bg-blueGray-800">
-              <InputAndResultRow
-                title="Input"
-                value={parseWithBigInt(workflowEvents?.input)}
-              />
-              {#each $fullEventHistory as event}
-                <EventRow {event} {onHover} {onHoverLeave} {activeGroup} />
-              {/each}
-              <!-- <InputAndResultRow
+            <div class="relative flex w-full shrink gap-2 bg-slate-800">
+              <div>
+                <InputAndResultRow
+                  title="Input"
+                  value={parseWithBigInt(workflowEvents?.input)}
+                />
+                {#each $fullEventHistory as event}
+                  <EventRow {event} onClick={setActive} {activeGroup} />
+                {/each}
+                <!-- <InputAndResultRow
                 title="Result"
                 value={parseWithBigInt(workflowEvents?.results)}
               /> -->
+              </div>
+              <div class="relative h-full w-full">
+                <div class="sticky top-12 h-auto w-full">
+                  <CodeBlock content={stringifyWithBigInt(activeEvent)} />
+                </div>
+              </div>
             </div>
           </div>
         {:else if $eventViewType === 'compact'}
