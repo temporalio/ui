@@ -158,9 +158,10 @@ const colors = {
   black: '#141414',
   offBlack: '#0F172A',
   transparent: 'transparent',
+  current: 'currentColor',
   danger: getColor('red', 700),
   success: getColor('green', 200),
   ...palette,
-} satisfies Readonly<Record<string, HexColor | 'transparent'>>;
+} satisfies Readonly<Record<string, HexColor | 'transparent' | 'currentColor'>>;
 
 export default colors;
