@@ -62,10 +62,10 @@
   }
 
   input[type='radio'] {
-    @apply relative box-content h-4 w-4 min-w-[16px] cursor-pointer appearance-none rounded-full border border-gray-300 bg-white;
+    @apply surface-primary relative box-content h-4 w-4 min-w-[16px] cursor-pointer appearance-none rounded-full border border-subtle;
 
     &::after {
-      @apply absolute top-1 left-1 h-0 w-0 scale-0 rounded-full bg-white transition-transform content-[''];
+      @apply surface-primary absolute left-1 top-1 h-0 w-0 scale-0 rounded-full transition-transform content-[''];
     }
   }
 

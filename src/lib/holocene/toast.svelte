@@ -20,7 +20,7 @@
 
 <div
   {id}
-  class="flex grow-0 items-center justify-between gap-4 rounded py-3 px-4 shadow {variant}"
+  class="flex grow-0 items-center justify-between gap-4 rounded px-4 py-3 shadow {variant}"
   transition:fly={{ x: 250 }}
 >
   <p class="font-secondary text-sm">

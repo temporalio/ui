@@ -129,7 +129,7 @@
 
 <style lang="postcss">
   label {
-    @apply mb-10 text-sm font-medium text-gray-900;
+    @apply mb-10 text-sm font-medium text-primary;
   }
 
   label.required {
@@ -137,7 +137,7 @@
   }
 
   .input-container {
-    @apply flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-gray-900 bg-white p-2 text-sm text-gray-900 focus-within:border-blue-700;
+    @apply surface-primary flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border  p-2 text-sm text-primary focus-within:border-blue-700;
 
     .invalid {
       @apply border-red-700;
@@ -145,7 +145,7 @@
   }
 
   input {
-    @apply inline-block w-full rounded bg-white focus:outline-none;
+    @apply surface-primary inline-block w-full rounded focus:outline-none;
   }
 
   .hint {

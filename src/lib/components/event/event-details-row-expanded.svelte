@@ -168,7 +168,7 @@
   }
 
   .content {
-    @apply block w-full border-b-2 border-gray-200 py-2 text-left;
+    @apply block w-full border-b-2 border-slate-200 py-2 text-left;
   }
 
   .code-block-row {
@@ -188,6 +188,6 @@
   }
 
   .badge {
-    @apply rounded-sm bg-gray-100 p-1 text-gray-900;
+    @apply rounded-sm bg-slate-100 p-1 text-primary;
   }
 </style>

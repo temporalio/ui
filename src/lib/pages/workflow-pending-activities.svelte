@@ -40,7 +40,7 @@
             <Link href="#{id}">{activityId}</Link>
           </div>
         </td>
-        <td class="py-4 px-5">
+        <td class="px-5 py-4">
           <ul>
             <li class="event-table-row">
               <h4 class="font-semibold">
@@ -176,7 +176,7 @@
 
 <style lang="postcss">
   .event-table-row {
-    @apply grid grid-cols-2 border-b border-gray-300 py-1;
+    @apply grid grid-cols-2 border-b border-subtle py-1;
   }
 
   .event-table-row:last-child {

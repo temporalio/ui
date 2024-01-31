@@ -48,13 +48,13 @@
         ?.get('category')
         .split(',') as EventTypeCategory[])
     : undefined;
-  $: intialEvents =
-    $eventFilterSort === 'descending' && !compact
+  $: initialEvents =
+    $eventFilterSort === 'descending'
       ? $eventHistory?.end
       : $eventHistory?.start;
   $: currentEvents = $fullEventHistory.length
     ? $fullEventHistory
-    : intialEvents;
+    : initialEvents;
   $: initialItem = currentEvents?.[0];
   $: items = getEventsOrGroups(currentEvents, $eventCategoryFilter);
   $: updating = currentEvents.length && !$fullEventHistory.length;
@@ -83,7 +83,7 @@
         onRowClick={() => setActiveRowIndex(index)}
       />
     {:else}
-      <EventEmptyRow loading={!intialEvents.length} />
+      <EventEmptyRow loading={!initialEvents.length} />
     {/each}
   </EventSummaryTable>
 </Pagination>

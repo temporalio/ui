@@ -88,10 +88,10 @@
   }
 
   .slider {
-    @apply relative flex h-5 w-9 items-center rounded-xl border border-gray-600 bg-gray-50;
+    @apply relative flex h-5 w-9 items-center rounded-xl border border-slate-600 bg-slate-50;
 
     &.hovered:not(.checked) {
-      @apply bg-gray-200;
+      @apply bg-slate-200;
     }
 
     &.hovered.checked {
@@ -119,11 +119,11 @@
     @apply absolute h-4 w-4 rounded-[50%];
 
     &.checked {
-      @apply right-0.5 bg-white;
+      @apply surface-primary right-0.5;
     }
 
     &:not(.checked) {
-      @apply left-0.5 bg-gray-900 text-white;
+      @apply left-0.5 bg-inverse text-white;
     }
   }
 </style>

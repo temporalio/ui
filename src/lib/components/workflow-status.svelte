@@ -50,11 +50,11 @@
           TimedOut: 'bg-orange-100 text-orange-700',
           Completed: 'bg-green-100 text-green-700',
           Failed: 'bg-red-100 text-red-700',
-          ContinuedAsNew: 'bg-gray-200 text-gray-900',
+          ContinuedAsNew: 'bg-slate-200 text-primary',
           Canceled: 'bg-yellow-100 text-yellow-900',
           Terminated: 'bg-red-100 text-red-700',
           Paused: 'bg-yellow-100 text-yellow-700',
-          Unspecified: 'bg-gray-200 text-gray-900',
+          Unspecified: 'bg-slate-200 text-primary',
           Scheduled: 'bg-blue-100 text-blue-700',
           Started: 'bg-blue-100 text-blue-700',
           Open: 'bg-green-100 text-green-700',
@@ -92,7 +92,7 @@
   </span>
   {#if newCount}
     <span
-      class="font-base rounded-r bg-white px-1 py-0.5 text-xs text-gray-900"
+      class="font-base surface-primary rounded-r px-1 py-0.5 text-xs text-primary"
       in:fade
     >
       {#if newCount > 0}+{/if}{newCount}

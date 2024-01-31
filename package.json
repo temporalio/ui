@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.22.7",
+  "version": "2.23.1",
   "engines": {
     "pnpm": ">=8.6.0",
     "node": ">=18.15.0"
@@ -202,7 +202,7 @@
     "svelte-loader": "^3.1.4",
     "svelte-preprocess": "^5.0.4",
     "svelte2tsx": "^0.6.21",
-    "tailwindcss": "^3.2.4",
+    "tailwindcss": "^3.4.1",
     "tar-fs": "^2.1.1",
     "ts-node": "^10.9.1",
     "ts-proto": "^1.138.0",

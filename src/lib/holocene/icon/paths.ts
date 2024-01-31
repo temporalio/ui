@@ -4,9 +4,11 @@ import arrowLeft from './svg/arrow-left.svelte';
 import arrowRight from './svg/arrow-right.svelte';
 import arrowUp from './svg/arrow-up.svelte';
 import ascending from './svg/ascending.svelte';
+import astronaut from './svg/astronaut.svelte';
 import book from './svg/book.svelte';
 import bookmark from './svg/bookmark.svelte';
 import calendarPlus from './svg/calendar-plus.svelte';
+import calendar from './svg/calendar.svelte';
 import canceled from './svg/canceled.svelte';
 import chart from './svg/chart.svelte';
 import checkmark from './svg/checkmark.svelte';
@@ -61,6 +63,7 @@ import regions from './svg/regions.svelte';
 import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
 import retry from './svg/retry.svelte';
+import robot from './svg/robot.svelte';
 import rocketShip from './svg/rocket-ship.svelte';
 import schedules from './svg/schedules.svelte';
 import search from './svg/search.svelte';
@@ -95,9 +98,11 @@ export const icons = {
   'arrow-up': arrowUp,
   'arrow-right': arrowRight,
   ascending,
+  astronaut,
   book,
   bookmark,
   'calendar-plus': calendarPlus,
+  calendar,
   canceled,
   chart,
   checkmark,
@@ -152,6 +157,7 @@ export const icons = {
   relationship,
   retention,
   retry,
+  robot,
   'rocket-ship': rocketShip,
   schedules,
   search,

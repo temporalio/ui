@@ -42,13 +42,13 @@
     $expandAllEvents = event.detail.expanded;
   }
 
-  $: intialEvents =
-    $eventFilterSort === 'descending' && !compact
+  $: initialEvents =
+    $eventFilterSort === 'descending'
       ? $eventHistory?.end
       : $eventHistory?.start;
   $: currentEvents = $fullEventHistory.length
     ? $fullEventHistory
-    : intialEvents;
+    : initialEvents;
   $: initialItem = currentEvents?.[0];
   $: updating = currentEvents.length && !$fullEventHistory.length;
   $: visibleItems = $fullEventHistory.filter((e) => e.id === $page.params.id);

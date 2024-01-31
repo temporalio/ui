@@ -1,7 +1,7 @@
 import { readdir, stat } from 'fs/promises';
 import { join, resolve } from 'path';
 
-import colors from '../../colors.cjs';
+import colors from '../../src/theme/colors';
 import { getProjectRoot } from '../get-project-root';
 
 export type FileExtension = `.${string}`;

@@ -134,7 +134,7 @@ describe('groupEvents', () => {
 
   it('should add a completed event to the correct group in descending order', () => {
     const groups = groupEvents(
-      [scheduledEvent, completedEvent] as unknown as WorkflowEvents,
+      [completedEvent, scheduledEvent] as unknown as WorkflowEvents,
       'descending',
     );
 

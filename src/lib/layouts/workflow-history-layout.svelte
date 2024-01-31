@@ -73,7 +73,7 @@
       namespace,
       workflowId,
       runId,
-      sort: view === 'feed' ? sort : 'ascending',
+      sort,
     });
   };
 
@@ -113,7 +113,7 @@
         ? translate('workflows.input')
         : translate('workflows.input-and-results')}
       icon="json"
-      class="border-gray-900"
+      class=""
       data-testid="input-and-results"
     >
       <div class="flex w-full flex-col gap-2 lg:flex-row">
@@ -151,7 +151,7 @@
       <h2 class="text-2xl font-medium">
         {translate('workflows.event-history')}
       </h2>
-      <div id="event-view-toggle" class="mt-4 flex gap-4 bg-white">
+      <div id="event-view-toggle" class="surface-primary mt-4 flex gap-4">
         <ToggleButtons>
           <ToggleButton
             icon="feed"

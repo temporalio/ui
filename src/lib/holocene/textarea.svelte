@@ -42,7 +42,7 @@
   {/if}
   <div class="relative">
     <textarea
-      class="min-h-fit w-full rounded border border-gray-900 py-2 px-3 font-mono text-sm"
+      class="min-h-fit w-full rounded border px-3 py-2 font-mono text-sm"
       class:error={!isValid}
       {id}
       bind:value

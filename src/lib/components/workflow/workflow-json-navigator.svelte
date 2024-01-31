@@ -39,7 +39,7 @@
 
 <svelte:window on:keydown={handleKeydown} />
 <div class="flex gap-4 max-sm:flex-col">
-  <div class="flex w-full gap-4 bg-gray-100">
+  <div class="bg-gray-100 flex w-full gap-4">
     <RangeInput
       label={translate('common.event')}
       labelHidden
@@ -117,11 +117,11 @@
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-gray-400;
+    @apply cursor-not-allowed text-slate-400;
   }
 
   .arrow {
-    @apply absolute top-0 left-0 h-0 w-0;
+    @apply absolute left-0 top-0 h-0 w-0;
 
     border-style: solid;
     border-width: 6px 12px 6px 0;

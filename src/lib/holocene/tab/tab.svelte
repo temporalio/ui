@@ -70,11 +70,11 @@
   }
 
   .tab.active {
-    @apply border-b-2 border-blue-700 font-medium text-blurple;
+    @apply text-blurple border-b-2 border-blue-700 font-medium;
   }
 
   .tab.disabled {
-    @apply cursor-not-allowed text-gray-800 opacity-50;
+    @apply cursor-not-allowed text-slate-800 opacity-50;
   }
 
   .tab.disabled:hover {

@@ -85,10 +85,10 @@
 
     <span class="checkmark {theme}" class:disabled>
       {#if indeterminate}
-        <Icon class="absolute top-0 left-0 h-4 w-4" name="hyphen" />
+        <Icon class="absolute left-0 top-0 h-4 w-4" name="hyphen" />
       {:else if checked}
         <Icon
-          class="absolute top-0 left-0 h-4 w-4"
+          class="absolute left-0 top-0 h-4 w-4"
           name="checkmark"
           strokeWidth={3}
         />
@@ -136,7 +136,7 @@
   }
 
   .checkmark.light {
-    @apply border-primary bg-white;
+    @apply surface-primary border-primary;
   }
 
   input:focus-visible ~ .checkmark.light {
@@ -144,7 +144,7 @@
   }
 
   .checkmark.disabled.light {
-    @apply bg-gray-300;
+    @apply bg-slate-300;
   }
 
   /** Dark Theme Styles */
@@ -158,7 +158,7 @@
   }
 
   .checkbox.hoverable.dark:hover .checkmark::before {
-    @apply bg-gray-700;
+    @apply bg-slate-700;
   }
 
   input:focus-visible ~ .checkmark.dark {
