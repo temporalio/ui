@@ -11,24 +11,24 @@ const variables = {
   '--color-text-primary': rgb(colors.primary),
   '--color-text-secondary': rgb(colors.secondary),
   '--color-text-subtle': rgb(getColor('slate', 900)),
-  '--color-text-information': rgb(getColor('blue', 950)),
-  '--color-text-warning': rgb(getColor('yellow', 950)),
   '--color-text-error': rgb(getColor('red', 950)),
+  '--color-text-information': rgb(getColor('blue', 950)),
   '--color-text-success': rgb(getColor('green', 950)),
+  '--color-text-warning': rgb(getColor('yellow', 950)),
 
   '--color-surface-primary': rgb(colors.white),
   '--color-surface-secondary': rgb(colors.offWhite),
-  '--color-surface-information': rgb(getColor('blue', 50)),
-  '--color-surface-warning': rgb(getColor('yellow', 50)),
   '--color-surface-error': rgb(getColor('red', 50)),
+  '--color-surface-information': rgb(getColor('blue', 50)),
   '--color-surface-success': rgb(getColor('green', 50)),
+  '--color-surface-warning': rgb(getColor('yellow', 50)),
 
   '--color-border-primary': 'var(--color-inverse)',
   '--color-border-subtle': rgb(getColor('slate', 300)),
-  '--color-border-information': rgb(getColor('blue', 800)),
-  '--color-border-warning': rgb(getColor('yellow', 800)),
   '--color-border-error': rgb(getColor('red', 800)),
+  '--color-border-information': rgb(getColor('blue', 800)),
   '--color-border-success': rgb(getColor('green', 800)),
+  '--color-border-warning': rgb(getColor('yellow', 800)),
 } satisfies Variables;
 
 const dark: Partial<Variables<keyof typeof variables>> = {
