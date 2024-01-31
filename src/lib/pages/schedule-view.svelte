@@ -340,7 +340,7 @@
             : translate('schedules.pause-reason')}
         </p>
         <input
-          class="mt-4 block w-full rounded-md border border-gray-200 p-2"
+          class="mt-4 block w-full rounded-md border border-slate-200 p-2"
           placeholder={translate('common.reason')}
           bind:value={reason}
           on:keydown|stopPropagation

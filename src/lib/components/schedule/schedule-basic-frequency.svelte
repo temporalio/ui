@@ -16,6 +16,6 @@
 
 <style lang="postcss">
   .frequency {
-    @apply flex flex-col overflow-auto rounded-lg bg-gray-900 px-2 py-2 font-mono text-sm text-[#e9d5ff];
+    @apply flex flex-col overflow-auto rounded-lg bg-inverse px-2 py-2 font-mono text-sm text-[#e9d5ff];
   }
 </style>

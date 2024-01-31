@@ -223,12 +223,12 @@
         </div>
       {:else}
         <div class="flex w-full flex-wrap">
-          <div class="flex w-1/2 flex-col border-b border-gray-300">
+          <div class="flex w-1/2 flex-col border-b border-subtle">
             <MenuItem on:click={() => onChange('All Time')}
               >{translate('common.all-time')}</MenuItem
             >
           </div>
-          <div class="flex w-1/2 flex-col border-b border-gray-300">
+          <div class="flex w-1/2 flex-col border-b border-subtle">
             <MenuItem on:click={() => onChange('Custom')}
               >{translate('common.custom')}</MenuItem
             >
@@ -240,7 +240,7 @@
             </div>
           {/each}
           <div class="flex w-full flex-wrap">
-            <div class="flex w-1/2 flex-col border-t border-gray-300">
+            <div class="flex w-1/2 flex-col border-t border-subtle">
               <MenuItem
                 selected={timeField === 'StartTime'}
                 on:click={() => onTimeFieldChange('StartTime')}
@@ -248,7 +248,7 @@
                 {translate('common.start-time')}
               </MenuItem>
             </div>
-            <div class="flex w-1/2 flex-col border-t border-gray-300">
+            <div class="flex w-1/2 flex-col border-t border-subtle">
               <MenuItem
                 selected={timeField === 'CloseTime'}
                 on:click={() => onTimeFieldChange('CloseTime')}

@@ -97,7 +97,7 @@
       class:topLeft
       style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
     >
-      <div class="inline-block rounded-lg bg-gray-800 px-2 py-2">
+      <div class="inline-block rounded-lg bg-slate-800 px-2 py-2">
         {#if copyable}
           <Copyable
             {copySuccessIconTitle}
@@ -107,7 +107,7 @@
             container-class="text-white"
             visible
           >
-            <span class="text-gray-100"
+            <span class="text-slate-100"
               >{#if icon}<Icon
                   name={icon}
                   class="inline h-4 text-white"
@@ -115,7 +115,7 @@
             >
           </Copyable>
         {:else}
-          <span class="flex gap-2 text-gray-100"
+          <span class="flex gap-2 text-slate-100"
             >{#if icon}<Icon
                 name={icon}
                 class="inline h-4 text-white"
@@ -137,7 +137,7 @@
   }
 
   .tooltip.bottom {
-    @apply left-1/2 bottom-0 -mb-2 -translate-x-1/2 translate-y-full;
+    @apply bottom-0 left-1/2 -mb-2 -translate-x-1/2 translate-y-full;
   }
 
   .tooltip.left {
@@ -145,23 +145,23 @@
   }
 
   .tooltip.right {
-    @apply right-0 top-[50%] -mr-2 translate-x-full -translate-y-1/2;
+    @apply right-0 top-[50%] -mr-2 -translate-y-1/2 translate-x-full;
   }
 
   .tooltip.topRight {
-    @apply left-auto right-0 -mt-2 translate-x-0 -translate-y-full;
+    @apply left-auto right-0 -mt-2 -translate-y-full translate-x-0;
   }
 
   .tooltip.topLeft {
-    @apply left-0 right-auto -mt-2 translate-x-0 -translate-y-full;
+    @apply left-0 right-auto -mt-2 -translate-y-full translate-x-0;
   }
 
   .tooltip.bottomLeft {
-    @apply left-0 right-auto bottom-0 -mb-2 translate-x-0 translate-y-full;
+    @apply bottom-0 left-0 right-auto -mb-2 translate-x-0 translate-y-full;
   }
 
   .tooltip.bottomRight {
-    @apply left-auto right-0 bottom-0 -mb-2 translate-x-0 translate-y-full;
+    @apply bottom-0 left-auto right-0 -mb-2 translate-x-0 translate-y-full;
   }
 
   .wrapper:hover .tooltip {

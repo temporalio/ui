@@ -23,7 +23,7 @@
   }
 
   .feedback-button:hover {
-    @apply bg-gray-700;
+    @apply bg-slate-700;
   }
 
   .feedback-icon {

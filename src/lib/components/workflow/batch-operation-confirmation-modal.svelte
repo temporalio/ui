@@ -86,7 +86,7 @@
           />
         </p>
         <div
-          class="mb-2 overflow-scroll whitespace-nowrap rounded border border-primary bg-gray-100 p-2"
+          class="mb-2 overflow-scroll whitespace-nowrap rounded border border-primary bg-slate-100 p-2"
         >
           <code data-testid="batch-action-workflows-query">
             {query}

@@ -92,7 +92,7 @@
 
 <style lang="postcss">
   .link-item {
-    @apply flex border-collapse cursor-pointer gap-2 border border-x border-gray-900 bg-white from-blue-100 to-purple-100 hover:bg-gradient-to-br;
+    @apply surface-primary flex border-collapse cursor-pointer gap-2 border border-x  from-blue-100 to-purple-100 hover:bg-gradient-to-br;
   }
 
   .link-item.first {

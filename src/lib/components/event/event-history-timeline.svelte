@@ -292,7 +292,7 @@
 
 <div class="flex flex-col gap-2">
   <div class="flex items-center justify-end gap-2">
-    <div class="flex gap-2 bg-white">
+    <div class="surface-primary flex gap-2">
       <ToggleButtons>
         <ToggleButton data-testid="zoom-in" on:click={() => timeline?.zoomIn(1)}
           >+</ToggleButton

@@ -57,18 +57,18 @@
 
 <style lang="postcss">
   .drawer {
-    @apply fixed z-[55] h-auto overflow-y-auto rounded-t-lg bg-white text-primary shadow-xl;
+    @apply surface-primary fixed z-[55] h-auto overflow-y-auto rounded-t-lg text-primary shadow-xl;
 
     &.bottom {
       @apply bottom-0 left-0 right-0;
     }
 
     &.right {
-      @apply right-0 top-0 bottom-0 h-full rounded-tr-none rounded-bl-lg;
+      @apply bottom-0 right-0 top-0 h-full rounded-bl-lg rounded-tr-none;
     }
 
     &.dark {
-      @apply bg-gray-900 text-gray-100;
+      @apply bg-inverse text-slate-100;
     }
   }
 

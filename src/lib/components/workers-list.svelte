@@ -203,6 +203,6 @@
 
 <style lang="postcss">
   .reachability {
-    @apply rounded-sm bg-gray-200 px-2 py-1;
+    @apply rounded-sm bg-slate-200 px-2 py-1;
   }
 </style>

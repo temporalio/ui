@@ -19,9 +19,9 @@
   <slot />
 </div>
 
-<style>
+<style lang="postcss">
   .title-wrapper {
-    @apply flex flex-col justify-center gap-2 py-4 px-8;
+    @apply flex flex-col justify-center gap-2 px-8 py-4;
 
     &.bottom {
       @apply items-center p-0;

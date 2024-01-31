@@ -22,23 +22,23 @@
 
 <style lang="postcss">
   .pill {
-    @apply flex items-center justify-center gap-1 rounded-full border-2 border-gray-100 px-3 py-1 text-sm;
+    @apply flex items-center justify-center gap-1 rounded-full border-2 border-slate-100 px-3 py-1 text-sm;
   }
 
   .gray {
-    @apply bg-gray-100 text-gray-600;
+    @apply bg-slate-100 text-slate-600;
   }
 
   .gray.active {
-    @apply border-2 border-gray-900 bg-white text-gray-900;
+    @apply surface-primary border-2  text-primary;
   }
 
-  .blueGray {
-    @apply bg-blueGray-200 text-blueGray-900;
+  .slate {
+    @apply bg-slate-200 text-primary;
   }
 
-  .blueGray.active {
-    @apply border-2 border-blueGray-900;
+  .slate.active {
+    @apply border-2;
   }
 
   .blue {
@@ -50,7 +50,7 @@
   }
 
   .lightBlue.active {
-    @apply border-2 border-gray-900 bg-blue-50 text-gray-900;
+    @apply border-2  bg-blue-50 text-primary;
   }
 
   .green {

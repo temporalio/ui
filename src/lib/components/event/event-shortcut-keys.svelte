@@ -26,7 +26,7 @@
 >
   <DrawerContent title={translate('common.keyboard-shortcuts')}>
     <div
-      class="grid grid-cols-1 gap-8 text-gray-500 dark:text-gray-400 md:grid-cols-2 xl:grid-cols-4"
+      class="grid grid-cols-1 gap-8 text-slate-500 dark:text-slate-400 md:grid-cols-2 xl:grid-cols-4"
     >
       <div class="cell">
         {translate('common.next-page')}
@@ -70,7 +70,7 @@
 
 <style lang="postcss">
   .shortcut-key-button {
-    @apply fixed right-24 bottom-5 z-50 px-2;
+    @apply fixed bottom-5 right-24 z-50 px-2;
   }
 
   .cell {

@@ -353,10 +353,10 @@
   }
 
   .combobox-wrapper.light {
-    @apply border-primary bg-white text-primary  focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50;
+    @apply surface-primary border-primary text-primary  focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50;
 
     > .combobox-input {
-      @apply bg-white text-primary placeholder:text-gray-400;
+      @apply surface-primary text-primary placeholder:text-slate-400;
     }
 
     > .combobox-button {
@@ -365,14 +365,14 @@
   }
 
   .combobox-wrapper.dark {
-    @apply border-gray-400 bg-transparent text-white focus-within:border-indigo-600 focus-within:bg-primary focus-within:shadow-focus focus-within:shadow-indigo-500/50;
+    @apply border-slate-400 bg-transparent text-white focus-within:border-indigo-600 focus-within:bg-primary focus-within:shadow-focus focus-within:shadow-indigo-500/50;
 
     > .combobox-input {
-      @apply bg-transparent text-white placeholder:text-gray-400;
+      @apply bg-transparent text-white placeholder:text-slate-400;
     }
 
     > .combobox-button {
-      @apply hover:bg-gray-700;
+      @apply hover:bg-slate-700;
     }
   }
 </style>

@@ -163,7 +163,7 @@
     }
 
     &.dark {
-      @apply hover:bg-gray-700 focus-visible:border-indigo-600 focus-visible:bg-gray-800 focus-visible:shadow-indigo-500/50;
+      @apply hover:bg-slate-700 focus-visible:border-indigo-600 focus-visible:bg-slate-800 focus-visible:shadow-indigo-500/50;
     }
   }
 
@@ -186,7 +186,7 @@
   }
 
   .menu-item-description {
-    @apply text-xs font-normal text-gray-500;
+    @apply text-xs font-normal text-slate-500;
   }
 
   .destructive {
@@ -194,6 +194,6 @@
   }
 
   .menu-item.disabled {
-    @apply pointer-events-none cursor-not-allowed text-gray-500;
+    @apply pointer-events-none cursor-not-allowed text-slate-500;
   }
 </style>
