@@ -1,13 +1,4 @@
-const colors = {
-  primary: { DEFAULT: '#18181b' }, // gray-900
-  secondary: '#64748b', // slate-500
-  white: '#ffffff',
-  offWhite: '#F8F8F7',
-  danger: '#b91c1c', // red-700
-  success: '#bbf7d0', // green-200
-  black: '#000000',
-  transparent: 'transparent',
-  lightBlue: '#DFFBFF',
+const palette: Readonly<Record<string, Record<Shade, HexColor>>> = {
   blue: {
     50: '#EFF5FF',
     100: '#DBE8FE',
@@ -20,6 +11,7 @@ const colors = {
     800: '#1E55AF',
     900: '#1E478A',
     950: '#0F172A',
+    DEFAULT: '#3B82F6',
   },
   cyan: {
     50: '#ECFCFF',
@@ -33,9 +25,11 @@ const colors = {
     800: '#156775',
     900: '#165863',
     950: '#083B44',
+    DEFAULT: '#06B6D4',
   },
   green: {
     50: '#EDFFF6',
+    200: '#AEFFD8',
     100: '#D5FFEB',
     300: '#70FFBC',
     400: '#2BFD98',
@@ -45,6 +39,7 @@ const colors = {
     800: '#067541',
     900: '#076037',
     950: '#00371D',
+    DEFAULT: '#00F37E',
   },
   indigo: {
     50: '#EEF4FF',
@@ -58,6 +53,7 @@ const colors = {
     800: '#2F34A4',
     900: '#2D3382',
     950: '#1A1C4C',
+    DEFAULT: '#6173F3',
   },
   orange: {
     50: '#FFF4ED',
@@ -71,6 +67,7 @@ const colors = {
     800: '#9A4A12',
     900: '#7C3D12',
     950: '#432007',
+    DEFAULT: '#F97316',
   },
   pink: {
     50: '#FFF2FF',
@@ -84,6 +81,7 @@ const colors = {
     800: '#A403A5',
     900: '#860985',
     950: '#5C005B',
+    DEFAULT: '#FF26FF',
   },
   purple: {
     50: '#F7F3FF',
@@ -97,6 +95,7 @@ const colors = {
     800: '#4E21B6',
     900: '#421D95',
     950: '#2A1065',
+    DEFAULT: '#8B5CF6',
   },
   red: {
     50: '#FFF3ED',
@@ -110,6 +109,7 @@ const colors = {
     800: '#9E130E',
     900: '#7F140F',
     950: '#450505',
+    DEFAULT: '#FF4518',
   },
   slate: {
     50: '#F5F7F9',
@@ -123,6 +123,7 @@ const colors = {
     800: '#525D7B',
     900: '#444F64',
     950: '#2D323E',
+    DEFAULT: '#7E95B3',
   },
   yellow: {
     50: '#FFFBEB',
@@ -136,7 +137,28 @@ const colors = {
     800: '#94420C',
     900: '#79360E',
     950: '#461B02',
+    DEFAULT: '#F8A208',
   },
+};
+
+type Palette = typeof palette;
+
+export const getColor = <C extends keyof Palette>(
+  color: C,
+  shade: keyof Palette[C] = 'DEFAULT',
+): HexColor => {
+  return palette[color][shade];
+};
+
+const colors = {
+  primary: '#141414',
+  secondary: getColor('slate', 500),
+  white: '#ffffff',
+  black: '#141414',
+  transparent: 'transparent',
+  danger: getColor('red', 700),
+  success: getColor('green', 200),
+  ...palette,
 } as const;
 
 export default colors;

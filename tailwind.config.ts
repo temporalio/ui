@@ -1,13 +1,12 @@
 import type { Config } from 'tailwindcss';
 import { fontFamily } from 'tailwindcss/defaultTheme';
 
-import colors from './colors';
+import temporal from './src/theme';
 
 const config = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   darkMode: 'class',
   theme: {
-    colors,
     fontFamily: {
       primary: ['Inter Variable', ...fontFamily.sans],
       secondary: ['Poppins', ...fontFamily.sans],
@@ -25,7 +24,7 @@ const config = {
       },
     },
   },
-  plugins: [],
+  plugins: [temporal],
 } satisfies Config;
 
 export default config;
