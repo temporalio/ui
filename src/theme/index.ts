@@ -81,7 +81,7 @@ const temporal = plugin(
       },
       '.surface-inverse': {
         backgroundColor: css('--color-surface-inverse'),
-        color: css('--color-text-primary'),
+        color: css('--text-inverse'),
       },
     });
   },
@@ -127,6 +127,14 @@ const temporal = plugin(
 
         DEFAULT: css('--color-text-primary'),
       }),
+      extend: {
+        transitionProperty: {
+          width: 'width',
+          height: 'height',
+          left: 'left',
+          right: 'right',
+        },
+      },
     },
   },
 );
