@@ -4,8 +4,8 @@
   import FeatureGuard from '$lib/components/feature-guard.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
   import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
-  import NavContainer from '$lib/holocene/navigation/nav-container.svelte';
-  import NavRow from '$lib/holocene/navigation/nav-row.svelte';
+  import Navigation from '$lib/holocene/navigation/navigation-container.svelte';
+  import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import { translate } from '$lib/i18n/translate';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
 
@@ -41,9 +41,9 @@
   });
 </script>
 
-<NavContainer {isCloud} {linkList} aria-label={translate('common.primary')}>
+<Navigation {isCloud} {linkList} aria-label={translate('common.primary')}>
   <svelte:fragment slot="top">
-    <NavRow
+    <NavigationItem
       link={linkList.workflows}
       data-testid="workflows-button"
       label={translate('common.workflows')}
@@ -53,7 +53,7 @@
       <FeatureGuard
         enabled={Boolean(activeNamespace?.namespaceInfo?.supportsSchedules)}
       >
-        <NavRow
+        <NavigationItem
           link={linkList.schedules}
           data-testid="schedules-button"
           label={translate('common.schedules')}
@@ -63,14 +63,14 @@
     </IsCloudGuard>
     <slot name="top" />
     <IsCloudGuard {isCloud}>
-      <NavRow
+      <NavigationItem
         link={linkList.archive}
         data-testid="archive-button"
         label={translate('common.archive')}
         icon="archives"
       />
     </IsCloudGuard>
-    <NavRow
+    <NavigationItem
       link={linkList.batchOperations}
       label={translate('batch.nav-title')}
       tooltip={translate('batch.list-page-title')}
@@ -79,7 +79,7 @@
   </svelte:fragment>
   <svelte:fragment slot="middle">
     <IsLegacyCloudGuard {isCloud}>
-      <NavRow
+      <NavigationItem
         link={linkList.namespaces}
         data-testid="namespaces-button"
         label={translate('common.namespaces')}
@@ -92,7 +92,7 @@
     <slot name="bottom" />
     <slot name="import">
       <IsCloudGuard {isCloud}>
-        <NavRow
+        <NavigationItem
           link={linkList.import}
           data-testid="import-button"
           label={translate('common.import')}
@@ -101,11 +101,11 @@
       </IsCloudGuard>
     </slot>
     <slot name="feedback">
-      <NavRow
+      <NavigationItem
         link={linkList.feedback}
         label={translate('common.feedback')}
         icon="feedback"
       />
     </slot>
   </svelte:fragment>
-</NavContainer>
+</Navigation>
