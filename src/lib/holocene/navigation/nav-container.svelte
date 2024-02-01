@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -9,69 +11,49 @@
   export let isCloud = false;
   export let linkList: Partial<Record<string, string>>;
 
-  function toggleNav() {
-    $navOpen = !$navOpen;
-  }
+  const toggle = () => ($navOpen = !$navOpen);
 
   $: version = $page.data?.settings?.version ?? '';
 </script>
 
 <nav
-  class="nav-header transition-width"
-  class:cloud={isCloud}
+  class={merge(
+    'group relative flex h-screen w-16 flex-col justify-between border-r border-primary transition-width dark:surface-primary dark:border-subtle',
+    isCloud ? 'surface-primary' : 'surface-inverse text-white',
+  )}
+  class:w-40={$navOpen}
   data-testid="navigation-header"
   {...$$restProps}
 >
   <div class="relative h-32 min-h-[84px]">
-    <a
-      href={linkList.home}
-      class="absolute block"
-      style="top: 22px; left: 18px;"
-    >
-      <Logo
-        height="24px"
-        width="24px"
-        {isCloud}
-        title={translate('workflows.recent-workflows-link')}
-      />
+    <a href={linkList.home} class="absolute left-[18px] top-[22px] block">
+      <Logo height="24px" width="24px" />
     </a>
     <button
-      class="nav-toggle"
-      class:open={$navOpen}
-      class:close={!$navOpen}
-      on:click={toggleNav}
+      class="absolute left-[18px] top-[52px] hidden transition-left group-hover:block group-focus:block"
       title={$navOpen ? 'Collapse menu' : 'Expand menu'}
+      on:click={toggle}
     >
       <Icon name={$navOpen ? 'chevron-left' : 'chevron-right'} />
     </button>
   </div>
-  <div
-    class="nav-wrapper transition-width"
-    class:open={$navOpen}
-    class:close={!$navOpen}
-  >
-    <div class="nav-section-wrapper">
-      <ul class="nav-section">
+  <div class="flex grow flex-col items-center justify-between">
+    <div class="w-full space-y-8">
+      <ul class="flex flex-col gap-2 px-3">
         <slot name="top" />
       </ul>
-      <hr
-        class="my-8 w-full {isCloud ? 'stroke-slate-200' : 'stroke-slate-700'}"
-      />
-      <ul class="nav-section">
+      <hr class="border-subtle" />
+      <ul class="flex flex-col gap-2 px-3">
         <slot name="middle" />
       </ul>
     </div>
-    <div class="nav-section-wrapper">
-      <ul class="nav-section">
+    <div class="w-full">
+      <ul class="flex flex-col gap-2 px-3">
         <slot name="bottom" />
       </ul>
     </div>
   </div>
-  <div
-    class="h-4 w-full pb-12 pt-24 text-center text-[10px] {isCloud
-      ? 'text-slate-500'
-      : 'text-slate-300'}"
-  >
+  <div class="h-4 w-full pb-12 pt-24 text-center text-[0.6rem] text-secondary">
     {#if version}
       <span class="sr-only">{translate('common.version')}</span>
     {/if}
@@ -79,77 +61,3 @@
   </div>
   <slot name="drawer" />
 </nav>
-
-<style lang="postcss">
-  .nav-header {
-    @apply relative flex h-screen flex-col justify-between bg-primary text-white;
-  }
-
-  .nav-header.cloud {
-    @apply surface-primary text-primary;
-  }
-
-  .nav-wrapper {
-    @apply flex w-16 grow flex-col items-center justify-between;
-  }
-
-  .nav-wrapper.open {
-    @apply w-40;
-  }
-
-  .nav-section-wrapper {
-    @apply flex w-full flex-col;
-  }
-
-  .nav-section {
-    @apply flex flex-col gap-2 px-3;
-  }
-
-  .cloud {
-    @apply surface-primary text-primary;
-  }
-
-  .close :global(.nav-title) {
-    width: 0;
-  }
-
-  .open :global(.nav-title) {
-    width: 100px;
-  }
-
-  .open :global(.namespace) {
-    width: 100px;
-  }
-
-  .nav-toggle {
-    @apply transition-left absolute left-[18px] top-[52px] hidden;
-  }
-
-  .nav-header:hover .nav-toggle {
-    @apply block;
-  }
-
-  .nav-header:focus .nav-toggle {
-    @apply block;
-  }
-
-  .nav-toggle.close {
-    left: 18px;
-  }
-
-  .nav-toggle.open {
-    left: 130px;
-  }
-
-  .transition-left {
-    transition:
-      left 0.15s linear,
-      width 0.15s linear;
-  }
-
-  .transition-width {
-    transition:
-      width 0.15s ease-in-out,
-      width 0.15s ease-in-out;
-  }
-</style>

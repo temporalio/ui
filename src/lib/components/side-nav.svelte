@@ -133,7 +133,7 @@
       </IsCloudGuard>
     </slot>
     <slot name="feedback">
-      <NavRow link={linkList.feedback} {isCloud} externalLink>
+      <NavRow link={linkList.feedback} {isCloud}>
         <NavTooltip text={translate('common.feedback')}>
           <div class="nav-icon">
             <Icon name="feedback" />
@@ -142,21 +142,6 @@
         <div class="nav-title">{translate('common.feedback')}</div>
       </NavRow>
     </slot>
-    <!-- <NavRow {isCloud} handleClick={() => ($labsMode = !$labsMode)}>
-      <NavTooltip right text={labsHoverText}>
-        <div class="nav-icon">
-          <Icon name="labs" active={$labsMode} />
-        </div>
-      </NavTooltip>
-      <div class="nav-title flex flex-col leading-3">
-        <div>{labsText}</div>
-        {#if $labsMode}
-          <p class="text-[12px]">
-            {translate('common.experimental')}
-          </p>
-        {/if}
-      </div>
-    </NavRow> -->
   </svelte:fragment>
 </NavContainer>
 
