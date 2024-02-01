@@ -8,9 +8,8 @@
   export let label: string;
   export let icon: IconName;
   export let tooltip = label;
-  export let externalLink = false;
 
-  const attributes = externalLink
+  const attributes = link.startsWith('http')
     ? {
         rel: 'noreferrer',
         target: '_blank',
