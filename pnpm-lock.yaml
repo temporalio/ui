@@ -7,7 +7,7 @@ settings:
 dependencies:
   '@codemirror/autocomplete':
     specifier: ^6.4.0
-    version: 6.4.0(@codemirror/language@6.3.2)(@codemirror/state@6.2.0)(@codemirror/view@6.7.2)(@lezer/common@1.1.0)
+    version: 6.4.0(@codemirror/language@6.3.2)(@codemirror/state@6.2.0)(@codemirror/view@6.7.2)(@lezer/common@1.2.1)
   '@codemirror/commands':
     specifier: ^6.1.3
     version: 6.1.3
@@ -94,12 +94,12 @@ dependencies:
     version: 9.0.0
   vis-timeline:
     specifier: ^7.7.3
-    version: 7.7.3(@egjs/hammerjs@2.0.17)(component-emitter@1.3.0)(keycharm@0.4.0)(moment@2.29.4)(propagating-hammerjs@2.0.1)(uuid@9.0.0)(vis-data@7.1.7)(vis-util@5.0.5)(xss@1.0.14)
+    version: 7.7.3(@egjs/hammerjs@2.0.17)(component-emitter@1.3.1)(keycharm@0.4.0)(moment@2.30.1)(propagating-hammerjs@2.0.1)(uuid@9.0.0)(vis-data@7.1.9)(vis-util@5.0.7)(xss@1.0.14)
 
 devDependencies:
   '@axe-core/playwright':
     specifier: ^4.7.3
-    version: 4.7.3(playwright-core@1.39.0)
+    version: 4.7.3(playwright-core@1.41.1)
   '@babel/core':
     specifier: ^7.20.12
     version: 7.20.12
@@ -123,7 +123,7 @@ devDependencies:
     version: 7.5.1(react-dom@18.2.0)(react@18.2.0)
   '@storybook/addon-svelte-csf':
     specifier: ^3.0.10
-    version: 3.0.10(@storybook/svelte@7.5.1)(@storybook/theming@7.5.1)(@sveltejs/vite-plugin-svelte@3.0.2)(svelte-loader@3.1.4)(svelte@4.0.0)(vite@5.0.3)
+    version: 3.0.10(@storybook/svelte@7.5.1)(@storybook/theming@7.6.12)(@sveltejs/vite-plugin-svelte@3.0.2)(svelte-loader@3.1.4)(svelte@4.0.0)(vite@5.0.3)
   '@storybook/blocks':
     specifier: ^7.5.1
     version: 7.5.1(react-dom@18.2.0)(react@18.2.0)
@@ -185,7 +185,7 @@ devDependencies:
     specifier: ^1.0.2
     version: 1.0.2
   '@types/node':
-    specifier: ^18.0.0
+    specifier: ^18.13.0
     version: 18.13.0
   '@types/sanitize-html':
     specifier: ^2.8.0
@@ -465,13 +465,13 @@ packages:
       default-browser-id: 3.0.0
     dev: true
 
-  /@axe-core/playwright@4.7.3(playwright-core@1.39.0):
+  /@axe-core/playwright@4.7.3(playwright-core@1.41.1):
     resolution: {integrity: sha512-v2PRgAyGvop7bamrTpNJtc5b1R7giAPnMzZXrS/VDZBCY5+uwVYtCNgDvBsqp5P1QMZxUMoBN+CERJUTMjFN0A==}
     peerDependencies:
       playwright-core: '>= 1.0.0'
     dependencies:
       axe-core: 4.7.2
-      playwright-core: 1.39.0
+      playwright-core: 1.41.1
     dev: true
 
   /@babel/code-frame@7.18.6:
@@ -2201,7 +2201,7 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
 
-  /@codemirror/autocomplete@6.4.0(@codemirror/language@6.3.2)(@codemirror/state@6.2.0)(@codemirror/view@6.7.2)(@lezer/common@1.1.0):
+  /@codemirror/autocomplete@6.4.0(@codemirror/language@6.3.2)(@codemirror/state@6.2.0)(@codemirror/view@6.7.2)(@lezer/common@1.2.1):
     resolution: {integrity: sha512-HLF2PnZAm1s4kGs30EiqKMgD7XsYaQ0XJnMR0rofEWQ5t5D60SfqpDIkIh1ze5tiEbyUWm8+VJ6W1/erVvBMIA==}
     peerDependencies:
       '@codemirror/language': ^6.0.0
@@ -2212,7 +2212,7 @@ packages:
       '@codemirror/language': 6.3.2
       '@codemirror/state': 6.2.0
       '@codemirror/view': 6.7.2
-      '@lezer/common': 1.1.0
+      '@lezer/common': 1.2.1
     dev: false
 
   /@codemirror/commands@6.1.3:
@@ -2321,7 +2321,7 @@ packages:
     resolution: {integrity: sha512-XQsZgjm2EcVUiZQf11UBJQfmZeEmOW8DpI1gsFeln6w0ae0ii4dMQEQ0kjl6DspdWX1aGY1/loyXnP0JS06e/A==}
     engines: {node: '>=0.8.0'}
     dependencies:
-      '@types/hammerjs': 2.0.42
+      '@types/hammerjs': 2.0.45
     dev: false
 
   /@emotion/use-insertion-effect-with-fallbacks@1.0.1(react@18.2.0):
@@ -3271,8 +3271,8 @@ packages:
     resolution: {integrity: sha512-SVgiGtMnMnW3ActR8SXgsDhw7a0w0ChHSYAyAUxxrOiJ1OqYWEKk/xJd84tTSPo1mo6DXLObAJALNnd0Hrv7Ng==}
     dev: false
 
-  /@lezer/common@1.1.0:
-    resolution: {integrity: sha512-XPIN3cYDXsoJI/oDWoR2tD++juVrhgIago9xyKhZ7IhGlzdDM9QgC8D8saKNCz5pindGcznFr2HBSsEQSWnSjw==}
+  /@lezer/common@1.2.1:
+    resolution: {integrity: sha512-yemX0ZD2xS/73llMZIK6KplkjIjf2EvAHcinDi/TfJ9hS25G0388+ClHt6/3but0oOxinTcQHJLDXh6w1crzFQ==}
     dev: false
 
   /@lezer/highlight@1.1.3:
@@ -4304,7 +4304,7 @@ packages:
       - '@types/react-dom'
     dev: true
 
-  /@storybook/addon-svelte-csf@3.0.10(@storybook/svelte@7.5.1)(@storybook/theming@7.5.1)(@sveltejs/vite-plugin-svelte@3.0.2)(svelte-loader@3.1.4)(svelte@4.0.0)(vite@5.0.3):
+  /@storybook/addon-svelte-csf@3.0.10(@storybook/svelte@7.5.1)(@storybook/theming@7.6.12)(@sveltejs/vite-plugin-svelte@3.0.2)(svelte-loader@3.1.4)(svelte@4.0.0)(vite@5.0.3):
     resolution: {integrity: sha512-gI9Gv7RXN485mT0n97FcYNyYauK6ncyfuXQ7LJckh4hN6CGCuu+oO1fjDs9ueEjQIj4wXdclZySV/PjusypQrQ==}
     peerDependencies:
       '@storybook/svelte': ^7.0.0
@@ -4323,7 +4323,7 @@ packages:
     dependencies:
       '@babel/runtime': 7.23.2
       '@storybook/svelte': 7.5.1(svelte@4.0.0)
-      '@storybook/theming': 7.5.1(react-dom@18.2.0)(react@18.2.0)
+      '@storybook/theming': 7.6.12(react-dom@18.2.0)(react@18.2.0)
       '@sveltejs/vite-plugin-svelte': 3.0.2(svelte@4.0.0)(vite@5.0.3)
       dedent: 1.5.1
       fs-extra: 11.1.1
@@ -4551,6 +4551,12 @@ packages:
     resolution: {integrity: sha512-XxbLvg0aQRoBrzxYLcVYCbjDkGbkU8Rfb74XbV2CLiO2bIbFPmA1l1Nwbp+wkCGA+O6Z1zwzSl6wcKKqZ6XZCg==}
     dependencies:
       '@storybook/global': 5.0.0
+
+  /@storybook/client-logger@7.6.12:
+    resolution: {integrity: sha512-hiRv6dXsOttMPqm9SxEuFoAtDe9rs7TUS8XcO5rmJ9BgfwBJsYlHzAxXkazxmvlyZtKL7gMx6m8OYbCdZgUqtA==}
+    dependencies:
+      '@storybook/global': 5.0.0
+    dev: true
 
   /@storybook/codemod@7.5.1:
     resolution: {integrity: sha512-PqHGOz/CZnRG9pWgshezCacu524CrXOJrCOwMUP9OMpH0Jk/NhBkHaBZrB8wMjn5hekTj0UmRa/EN8wJm9CCUQ==}
@@ -4960,6 +4966,20 @@ packages:
       memoizerific: 1.11.3
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+
+  /@storybook/theming@7.6.12(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-P4zoMKlSYbNrWJjQROuz+DZSDEpdf3TUvk203EqBRdElqw2EMHcqZ8+0HGPFfVHpqEj05+B9Mr6R/Z/BURj0lw==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@emotion/use-insertion-effect-with-fallbacks': 1.0.1(react@18.2.0)
+      '@storybook/client-logger': 7.6.12
+      '@storybook/global': 5.0.0
+      memoizerific: 1.11.3
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: true
 
   /@storybook/types@7.5.1:
     resolution: {integrity: sha512-ZcMSaqFNx1E+G00nRDUi8kKL7gxJVlnCvbKLNj3V85guy4DkIYAZr31yDqze07gDWbjvKoHIp3tKpgE+2i8upQ==}
@@ -5504,8 +5524,8 @@ packages:
       '@types/node': 18.13.0
     dev: true
 
-  /@types/hammerjs@2.0.42:
-    resolution: {integrity: sha512-Xxk14BrwHnGi0xlURPRb+Y0UNn2w3cTkeFm7pKMsYOaNgH/kabbJLhcBoNIodwsbTz7Z8KcWjtDvlGH0nc0U9w==}
+  /@types/hammerjs@2.0.45:
+    resolution: {integrity: sha512-qkcUlZmX6c4J8q45taBKTL3p+LbITgyx7qhlPYOdOHZB7B31K0mXbP5YA7i7SgDeEGuI9MnumiKPEMrxg8j3KQ==}
     dev: false
 
   /@types/hast@2.3.5:
@@ -6579,7 +6599,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.21.4
-      caniuse-lite: 1.0.30001442
+      caniuse-lite: 1.0.30001582
       fraction.js: 4.2.0
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -6777,7 +6797,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001442
+      caniuse-lite: 1.0.30001582
       electron-to-chromium: 1.4.284
       node-releases: 2.0.8
       update-browserslist-db: 1.0.10(browserslist@4.21.4)
@@ -6788,7 +6808,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001554
+      caniuse-lite: 1.0.30001582
       electron-to-chromium: 1.4.566
       node-releases: 2.0.13
       update-browserslist-db: 1.0.13(browserslist@4.22.1)
@@ -6889,17 +6909,13 @@ packages:
     resolution: {integrity: sha512-bsTwuIg/BZZK/vreVTYYbSWoe2F+71P7K5QGEX+pT250DZbfU1MQ5prOKpPR+LL6uWKK3KMwMCAS74QB3Um1uw==}
     dependencies:
       browserslist: 4.21.4
-      caniuse-lite: 1.0.30001442
+      caniuse-lite: 1.0.30001582
       lodash.memoize: 4.1.2
       lodash.uniq: 4.5.0
     dev: true
 
-  /caniuse-lite@1.0.30001442:
-    resolution: {integrity: sha512-239m03Pqy0hwxYPYR5JwOIxRJfLTWtle9FV8zosfV5pHg+/51uD4nxcUlM8+mWWGfwKtt8lJNHnD3cWw9VZ6ow==}
-    dev: true
-
-  /caniuse-lite@1.0.30001554:
-    resolution: {integrity: sha512-A2E3U//MBwbJVzebddm1YfNp7Nud5Ip+IPn4BozBmn4KqVX7AvluoIDFWjsv5OkGnKUXQVmMSoMKLa3ScCblcQ==}
+  /caniuse-lite@1.0.30001582:
+    resolution: {integrity: sha512-vsJG3V5vgfduaQGVxL53uSX/HUzxyr2eA8xCo36OLal7sRcSZbibJtLeh0qja4sFOr/QQGt4opB4tOy+eOgAxg==}
     dev: true
 
   /cargo-cp-artifact@0.1.7:
@@ -7170,8 +7186,8 @@ packages:
     resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==}
     dev: true
 
-  /component-emitter@1.3.0:
-    resolution: {integrity: sha512-Rd3se6QB+sO1TwqZjscQrurpEPIfO0/yYnSin6Q/rD3mOutHvUrCAhJub3r90uNb+SESBuE0QYoB90YdfatsRg==}
+  /component-emitter@1.3.1:
+    resolution: {integrity: sha512-T0+barUSQRTUQASh8bx02dl+DhF54GtIDY13Y3m9oWTklKbb3Wv974meRpeZ3lp1JpLVECWWNHC4vaG2XHXouQ==}
     dev: false
 
   /compressible@2.0.18:
@@ -11654,8 +11670,8 @@ packages:
     engines: {node: '>= 8'}
     dev: true
 
-  /moment@2.29.4:
-    resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
+  /moment@2.30.1:
+    resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
     dev: false
 
   /mri@1.2.0:
@@ -12309,8 +12325,8 @@ packages:
     hasBin: true
     dev: true
 
-  /playwright-core@1.39.0:
-    resolution: {integrity: sha512-+k4pdZgs1qiM+OUkSjx96YiKsXsmb59evFoqv8SKO067qBA+Z2s/dCzJij/ZhdQcs2zlTAgRKfeiiLm8PQ2qvw==}
+  /playwright-core@1.41.1:
+    resolution: {integrity: sha512-/KPO5DzXSMlxSX77wy+HihKGOunh3hqndhqeo/nMxfigiKzogn8kfL0ZBDu0L1RKgan5XHCPmn6zXd2NUJgjhg==}
     engines: {node: '>=16'}
     hasBin: true
     dev: true
@@ -15392,17 +15408,17 @@ packages:
       vfile-message: 4.0.2
     dev: true
 
-  /vis-data@7.1.7(uuid@9.0.0)(vis-util@5.0.5):
-    resolution: {integrity: sha512-Jfrb6Ixyr3jdqFgpCBWnzb4w7PdD3UjOY6vea9yXixoKSLveUj+rAuxByoRKRvdjhsRtsYCEXG6MXjjx+uvGvQ==}
+  /vis-data@7.1.9(uuid@9.0.0)(vis-util@5.0.7):
+    resolution: {integrity: sha512-COQsxlVrmcRIbZMMTYwD+C2bxYCFDNQ2EHESklPiInbD/Pk3JZ6qNL84Bp9wWjYjAzXfSlsNaFtRk+hO9yBPWA==}
     peerDependencies:
       uuid: ^3.4.0 || ^7.0.0 || ^8.0.0 || ^9.0.0
       vis-util: ^5.0.1
     dependencies:
       uuid: 9.0.0
-      vis-util: 5.0.5(@egjs/hammerjs@2.0.17)(component-emitter@1.3.0)
+      vis-util: 5.0.7(@egjs/hammerjs@2.0.17)(component-emitter@1.3.1)
     dev: false
 
-  /vis-timeline@7.7.3(@egjs/hammerjs@2.0.17)(component-emitter@1.3.0)(keycharm@0.4.0)(moment@2.29.4)(propagating-hammerjs@2.0.1)(uuid@9.0.0)(vis-data@7.1.7)(vis-util@5.0.5)(xss@1.0.14):
+  /vis-timeline@7.7.3(@egjs/hammerjs@2.0.17)(component-emitter@1.3.1)(keycharm@0.4.0)(moment@2.30.1)(propagating-hammerjs@2.0.1)(uuid@9.0.0)(vis-data@7.1.9)(vis-util@5.0.7)(xss@1.0.14):
     resolution: {integrity: sha512-hGMzTttdOFWaw1PPlJuCXU2/4UjnsIxT684Thg9fV6YU1JuKZJs3s3BrJgZ4hO3gu5i1hsMe1YIi96o+eNT0jg==}
     peerDependencies:
       '@egjs/hammerjs': ^2.0.0
@@ -15416,25 +15432,25 @@ packages:
       xss: ^1.0.0
     dependencies:
       '@egjs/hammerjs': 2.0.17
-      component-emitter: 1.3.0
+      component-emitter: 1.3.1
       keycharm: 0.4.0
-      moment: 2.29.4
+      moment: 2.30.1
       propagating-hammerjs: 2.0.1(@egjs/hammerjs@2.0.17)
       uuid: 9.0.0
-      vis-data: 7.1.7(uuid@9.0.0)(vis-util@5.0.5)
-      vis-util: 5.0.5(@egjs/hammerjs@2.0.17)(component-emitter@1.3.0)
+      vis-data: 7.1.9(uuid@9.0.0)(vis-util@5.0.7)
+      vis-util: 5.0.7(@egjs/hammerjs@2.0.17)(component-emitter@1.3.1)
       xss: 1.0.14
     dev: false
 
-  /vis-util@5.0.5(@egjs/hammerjs@2.0.17)(component-emitter@1.3.0):
-    resolution: {integrity: sha512-NQHl/gkJYW7+MEJ0Ed4oo5nsvtUl95rfruZQj69T2oSLBrnDfxUJzBZ00rA5fNuSLW9DL+FemdMOVGvMu6kIrQ==}
+  /vis-util@5.0.7(@egjs/hammerjs@2.0.17)(component-emitter@1.3.1):
+    resolution: {integrity: sha512-E3L03G3+trvc/X4LXvBfih3YIHcKS2WrP0XTdZefr6W6Qi/2nNCqZfe4JFfJU6DcQLm6Gxqj2Pfl+02859oL5A==}
     engines: {node: '>=8'}
     peerDependencies:
       '@egjs/hammerjs': ^2.0.0
-      component-emitter: ^1.3.0
+      component-emitter: ^1.3.0 || ^2.0.0
     dependencies:
       '@egjs/hammerjs': 2.0.17
-      component-emitter: 1.3.0
+      component-emitter: 1.3.1
     dev: false
 
   /vite-node@0.23.4(@types/node@18.13.0):
