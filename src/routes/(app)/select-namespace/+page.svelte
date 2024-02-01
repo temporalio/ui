@@ -31,12 +31,16 @@
     }
   };
 
-  $: filteredList = $namespaces
-    .map((namespace: Namespace, index: number) => ({
-      namespace: namespace?.namespaceInfo?.name,
-      index,
-    }))
-    .filter(({ namespace }) => namespace.includes(searchValue));
+  $: matchingNamespaces = $namespaces.filter((namespace: Namespace) =>
+    namespace.namespaceInfo.name
+      .toLowerCase()
+      .includes(searchValue.toLowerCase()),
+  );
+
+  $: items = matchingNamespaces.map((namespace: Namespace, index: number) => ({
+    namespace: namespace.namespaceInfo.name,
+    index,
+  }));
 </script>
 
 <PageTitle
@@ -63,12 +67,13 @@
     class="h-96 w-full overflow-hidden rounded-md border"
     aria-label={translate('common.namespaces')}
   >
-    {#if filteredList.length}
-      <VirtualList items={filteredList} let:item itemHeight={50}>
+    {#if items.length}
+      <VirtualList {items} let:item itemHeight={50}>
         <button
           on:click={() => navigateToNamespace(item.namespace)}
-          class="surface-primary flex w-full cursor-pointer gap-2 truncate from-blue-100 to-purple-100 p-3 text-left hover:bg-gradient-to-br"
-          class:border-b={item.index !== filteredList.length - 1}
+          class="surface-primary flex w-full cursor-pointer gap-2 truncate border-b from-blue-100 to-purple-100 p-3 text-left hover:bg-gradient-to-br"
+          class:rounded-t-md={item.index === 0}
+          class:rounded-b-md={item.index === items.length - 1}
         >
           {item.namespace}
         </button>
