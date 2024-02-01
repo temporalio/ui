@@ -10,6 +10,7 @@
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
   import { createEventDispatcher, getContext } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -105,7 +106,7 @@
   aria-controls={controls}
   aria-expanded={$open}
   aria-label={label}
-  class="menu-button {variant} {className}"
+  class={merge('menu-button {variant} ', className)}
   class:unroundLeft
   class:unroundRight
   class:active

@@ -2,6 +2,7 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   import { type ComponentProps, createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
   import { focusTrap } from '$lib/utilities/focus-trap';
@@ -81,7 +82,7 @@
   {id}
   on:close={handleCancel}
   bind:this={modalElement}
-  class="body {className}"
+  class={merge('body ', className)}
   class:large
   class:hightlightNav
   aria-modal="true"

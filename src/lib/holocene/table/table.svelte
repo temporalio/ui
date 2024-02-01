@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLTableAttributes } from 'svelte/elements';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
   interface $$Props extends HTMLTableAttributes {
@@ -16,7 +18,7 @@
   export let updating = false;
 </script>
 
-<table class="{variant} {className}" {...$$restProps}>
+<table class={merge('{variant} ', className)} {...$$restProps}>
   <slot name="caption" />
   <thead>
     <slot name="headers" />

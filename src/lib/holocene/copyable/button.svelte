@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   interface $$Props extends HTMLButtonAttributes {
@@ -18,7 +20,7 @@
   export { className as class };
 </script>
 
-<button class="copy-button {className}" on:click {...$$restProps}>
+<button class={merge('copy-button ', className)} on:click {...$$restProps}>
   <Icon
     title={copied ? copySuccessIconTitle : copyIconTitle}
     name={copied ? 'checkmark' : 'copy'}

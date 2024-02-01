@@ -6,6 +6,7 @@
   import type { Writable } from 'svelte/store';
 
   import { setContext } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import type { RadioGroupContext, RadioGroupProps } from './types';
 
@@ -25,7 +26,7 @@
   });
 </script>
 
-<div class="flex flex-col gap-2 {className}" {...$$restProps}>
+<div class={merge('flex flex-col gap-2 ', className)} {...$$restProps}>
   {#if description}
     <p class="font-secondary text-sm font-medium">{description}</p>
   {/if}

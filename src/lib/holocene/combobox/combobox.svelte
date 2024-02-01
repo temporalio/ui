@@ -3,6 +3,7 @@
   import { writable } from 'svelte/store';
 
   import { createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
@@ -262,7 +263,7 @@
       type="text"
       value={displayValue}
       class:disabled
-      class="combobox-input {className}"
+      class={merge('combobox-input ', className)}
       role="combobox"
       autocomplete="off"
       autocapitalize="off"

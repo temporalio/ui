@@ -7,6 +7,7 @@
   import type { HTMLLiAttributes } from 'svelte/elements';
 
   import { createEventDispatcher, getContext } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
@@ -107,7 +108,7 @@
   <a
     {href}
     role="menuitem"
-    class="menu-item {theme} {className}"
+    class={merge('menu-item {theme} ', className)}
     class:disabled
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
@@ -120,7 +121,7 @@
 {:else}
   <li
     role="menuitem"
-    class="menu-item {theme} {className}"
+    class={merge('menu-item {theme} ', className)}
     class:destructive
     class:disabled
     aria-hidden={disabled ? 'true' : 'false'}

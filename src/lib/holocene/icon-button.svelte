@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
 
@@ -18,7 +20,7 @@
 
 <button
   type="button"
-  class="icon-button {className}"
+  class={merge('icon-button ', className)}
   on:click
   aria-label={label}
   {...$$restProps}

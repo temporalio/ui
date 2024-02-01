@@ -2,6 +2,7 @@
   import type { HTMLAttributes } from 'svelte/elements';
   import { noop } from 'svelte/internal';
 
+  import { twMerge as merge } from 'tailwind-merge';
   import { v4 } from 'uuid';
 
   import Badge from '$lib/holocene/badge.svelte';
@@ -45,7 +46,10 @@
 </script>
 
 <div
-  class="surface-primary flex w-full cursor-default flex-col rounded-xl border-2 p-4 text-primary {className}"
+  class={merge(
+    'surface-primary flex w-full cursor-default flex-col rounded-xl border-2 p-4 text-primary',
+    className,
+  )}
   {...$$restProps}
 >
   <button

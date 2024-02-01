@@ -3,6 +3,7 @@
   import { fly } from 'svelte/transition';
 
   import { getContext } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import { getFocusableElements } from '$lib/utilities/focus-trap';
 
@@ -44,7 +45,7 @@
 <ul
   in:fly={{ duration: 100 }}
   role="menu"
-  class="menu {position} {theme} {className}"
+  class={merge('menu {position} {theme} ', className)}
   class:hidden={!$open}
   aria-labelledby={id}
   tabindex={-1}

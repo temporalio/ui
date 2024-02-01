@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
@@ -83,7 +85,7 @@
 {#if hide}
   <slot />
 {:else}
-  <div class="wrapper relative inline-block {className}">
+  <div class={merge('wrapper relative inline-block ', className)}>
     <slot />
     <div
       class="tooltip"
