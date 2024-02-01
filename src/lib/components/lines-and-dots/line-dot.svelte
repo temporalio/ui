@@ -7,15 +7,17 @@
   export let offset = 1;
   export let connectLine = true;
   export let active = false;
+  export let compact = false;
   export let onHover: () => void;
 
   const r = 6;
   const x = 20;
   const strokeWidth = 2;
-  $: horizontalOffset = category === 'workflow' ? 0 : (offset / 1.5) * 3 * r;
+  $: horizontalOffset =
+    category === 'workflow' || compact ? 0 : (offset / 1.5) * 3 * r;
 </script>
 
-{#if category !== 'workflow' && connectLine}
+{#if !compact && category !== 'workflow' && connectLine}
   <line
     class="line {category}"
     class:active

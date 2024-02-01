@@ -3,6 +3,8 @@
 </script>
 
 <script lang="ts">
+  import { noop } from 'svelte/internal';
+
   import type {
     EventGroup,
     EventGroups,
@@ -18,6 +20,7 @@
   export let canvasWidth = 150;
   export let activeGroup: EventGroup;
   export let activeEvent: WorkflowEvent | 'input' | 'results' = 'input';
+  export let compact = false;
   export let onHover: (workflow: WorkflowEvent) => void;
 
   const isMiddleEvent = (event: WorkflowEvent): boolean => {
@@ -79,30 +82,53 @@
     return { nextDistance, offset };
   };
 
-  $: isActive = (event: WorkflowEvent): boolean => {
+  $: isActive = (event?: WorkflowEvent): boolean => {
     if (activeGroup) {
       return activeGroup?.eventIds.has(event.id);
-    } else if (activeEvent?.id) {
-      return activeEvent.id === event.id;
+    } else if (event && activeEvent?.id) {
+      return activeEvent.id === event?.id;
     } else return true;
+  };
+
+  $: isGroupActive = (group?: EventGroup): boolean => {
+    if (activeGroup) {
+      return activeGroup.id === group.id;
+    }
+    return true;
   };
 </script>
 
 <div style="width: {canvasWidth}px; min-width: {canvasWidth}px;">
   <svg width={1000} viewBox="0 0 1000 {canvasHeight}">
     <Line y1={0} y2={canvasHeight} />
-    {#each history as event, index (event.id)}
-      {@const { nextDistance, offset } = getNextDistanceAndOffset(event)}
-      <LineDot
-        y={(index + 1) * gap + gap / 2}
-        {offset}
-        {nextDistance}
-        category={event.category}
-        connectLine={!isMiddleEvent(event)}
-        active={isActive(event)}
-        onHover={() => onHover(event)}
-      />
-    {/each}
+    {#if compact}
+      {#each groups as group, index (group.id)}
+        <LineDot
+          y={(index + 1) * gap + gap / 2}
+          offset={0}
+          nextDistance={0}
+          {compact}
+          category={group.category}
+          connectLine={false}
+          active={isGroupActive(group)}
+          onHover={noop}
+        />
+      {/each}
+    {:else}
+      {#each history as event, index (event.id)}
+        {@const { nextDistance, offset } = getNextDistanceAndOffset(event)}
+        <LineDot
+          y={(index + 1) * gap + gap / 2}
+          {offset}
+          {nextDistance}
+          {compact}
+          category={event.category}
+          connectLine={!isMiddleEvent(event)}
+          active={isActive(event)}
+          onHover={() => onHover(event)}
+        />
+      {/each}
+    {/if}
     <slot />
   </svg>
 </div>

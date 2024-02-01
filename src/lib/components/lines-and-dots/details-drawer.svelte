@@ -5,16 +5,19 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { WorkflowEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import type { WorkflowInputAndResults } from '$lib/utilities/get-started-completed-and-task-failed-events';
 
-  import EventDetailsRowExpanded from '../event/event-details-row-expanded.svelte';
+  import EventDetailsHeader from './event-details-header.svelte';
+  import EventDetails from './event-details.svelte';
 
   export let activeEvent: WorkflowEvent | 'input' | 'results';
+  export let activeGroup: EventGroup;
   export let workflowEvents: WorkflowInputAndResults;
   export let workflow: WorkflowExecution;
+  export let compact: boolean;
 
   let showJSON = false;
 
@@ -60,18 +63,12 @@
         </PayloadDecoder>
       {/key}
     {/if}
+  {:else if compact}
+    {#each activeGroup.eventList as event}
+      <EventDetailsHeader {event} />
+      <EventDetails {event} />
+    {/each}
   {:else}
-    {@const attributes = formatAttributes(activeEvent)}
-    {@const eventDetails = Object.entries(attributes)}
-    <div class="flex flex-col gap-2">
-      {#each eventDetails as [key, value] (key)}
-        <EventDetailsRowExpanded
-          {key}
-          {value}
-          {attributes}
-          class="w-full text-white"
-        />
-      {/each}
-    </div>
+    <EventDetails event={activeEvent} />
   {/if}
 </div>
