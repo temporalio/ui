@@ -21,11 +21,7 @@
     type EventSortOrder,
     eventViewType,
   } from '$lib/stores/event-view';
-  import {
-    decodeEventHistory,
-    eventHistory,
-    fullEventHistory,
-  } from '$lib/stores/events';
+  import { decodeEventHistory, fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
   import {
     refresh,
@@ -44,11 +40,10 @@
   let showDownloadPrompt = false;
 
   $: workflowEvents =
-    getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
+    getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
   $: ({ workflow } = $workflowRun);
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
-    $eventHistory,
     $fullEventHistory,
     $namespaces,
   );

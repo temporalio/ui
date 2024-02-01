@@ -2,7 +2,7 @@
   import groupBy from 'lodash.groupby';
 
   import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
-  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  import DetailsDrawer from '$lib/components/lines-and-dots/details-drawer.svelte';
   import DraggableLine from '$lib/components/lines-and-dots/draggable-line.svelte';
   import EventGraph, {
     gap,
@@ -10,13 +10,11 @@
   import EventRow from '$lib/components/lines-and-dots/event-row.svelte';
   import GroupRow from '$lib/components/lines-and-dots/group-row.svelte';
   import InputAndResultRow from '$lib/components/lines-and-dots/input-and-result-row.svelte';
-  import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import WorkflowJsonNavigator from '$lib/components/workflow/workflow-json-navigator.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -40,18 +38,18 @@
   $: timeBasedGroups = groupBy(groups, (g) => g.timestamp);
 
   let activeGroup: undefined | EventGroup;
-  let activeEvent: undefined | WorkflowEvent;
+  let activeEvent: WorkflowEvent | 'input' | 'results';
 
   // let showDownloadPrompt = false;
+
+  const clearActives = () => {
+    activeGroup = undefined;
+    activeEvent = 'input';
+  };
 
   const setActive = (event: WorkflowEvent) => {
     activeEvent = event;
     activeGroup = groups.find((g) => g.eventIds.has(event.id));
-  };
-
-  const onHoverLeave = () => {
-    activeGroup = undefined;
-    activeEvent = undefined;
   };
 
   $: initialEvent = $fullEventHistory.find((e) => e.id === '1');
@@ -63,44 +61,21 @@
   );
 
   let canvasWidth = 150;
-  $: canvasHeight = gap + gap * $fullEventHistory.length;
+  $: canvasHeight = gap * 2 + gap * $fullEventHistory.length;
 
   const onExpand = (x: number) => {
     if (x >= 10 && x < 990) {
       canvasWidth = x;
     }
   };
+
+  $: workflow, clearActives();
 </script>
 
 <div class="flex flex-col gap-2">
   <WorkflowSummary />
   <WorkflowRelationships {...workflowRelationships} />
   <PendingActivities />
-  <section>
-    <Accordion
-      title={workflowEvents.contAsNew
-        ? translate('workflows.input')
-        : translate('workflows.input-and-results')}
-      icon="json"
-      class=""
-      data-testid="input-and-results"
-    >
-      <div class="flex w-full flex-col gap-2 lg:flex-row">
-        <InputAndResults
-          title="Input"
-          content={workflowEvents.input}
-          data-testid="workflow-input"
-        />
-        <InputAndResults
-          content={workflowEvents.results}
-          title={workflowEvents.contAsNew
-            ? translate('workflows.continued-as-new-with-input')
-            : translate('workflows.results')}
-          data-testid="workflow-results"
-        />
-      </div>
-    </Accordion>
-  </section>
   <Accordion
     title={translate('common.timeline')}
     data-testid="timeline-accordion"
@@ -144,73 +119,63 @@
       ></ToggleButton> -->
     </ToggleButtons>
   </div>
-  {#if $fullEventHistory.length}
-    <div
-      class="flex w-full flex-col gap-0 rounded-lg bg-slate-900 md:h-auto md:flex-row"
-    >
-      <div class="flex w-full flex-col gap-1 rounded-lg bg-slate-950">
-        {#if $eventViewType === 'feed'}
-          <div class="flex gap-0">
-            <EventGraph
-              history={$fullEventHistory}
-              {groups}
-              {canvasHeight}
-              {canvasWidth}
-              {activeGroup}
-              onHover={setActive}
-              {onHoverLeave}
-            >
-              <DraggableLine x={canvasWidth} height={canvasHeight} {onExpand} />
-            </EventGraph>
-            <div class="relative flex w-full shrink gap-0 bg-slate-800">
-              <div>
-                <InputAndResultRow title="Input" />
-                {#each $fullEventHistory as event}
-                  <EventRow {event} onClick={setActive} {activeGroup} />
-                {/each}
-                <InputAndResultRow title="Result" />
-              </div>
-              <div class="relative h-full w-full">
-                <div class="sticky top-12 h-auto w-full">
-                  {#if !activeEvent}
-                    <InputAndResults
-                      title="Input"
-                      content={workflowEvents.input}
-                      data-testid="workflow-input"
-                    />
-                  {:else}
-                    {#key activeEvent}
-                      <PayloadDecoder
-                        value={activeEvent}
-                        key="payloads"
-                        let:decodedValue
-                      >
-                        <CodeBlock
-                          content={decodedValue}
-                          copyIconTitle={translate('common.copy-icon-title')}
-                          copySuccessIconTitle={translate(
-                            'common.copy-success-icon-title',
-                          )}
-                        />
-                      </PayloadDecoder>
-                    {/key}
-                  {/if}
-                </div>
+  <div
+    class="flex w-full flex-col gap-0 rounded-lg bg-slate-900 md:h-auto md:flex-row"
+  >
+    <div class="flex w-full flex-col gap-1 rounded-lg bg-slate-950">
+      {#if $eventViewType === 'feed'}
+        <div class="flex gap-0">
+          <EventGraph
+            history={$fullEventHistory}
+            {groups}
+            {canvasHeight}
+            {canvasWidth}
+            {activeGroup}
+            onHover={setActive}
+          >
+            <DraggableLine x={canvasWidth} height={canvasHeight} {onExpand} />
+          </EventGraph>
+          <div class="relative flex w-full shrink gap-0 bg-slate-800">
+            <div>
+              <InputAndResultRow
+                type="input"
+                content={workflowEvents.input}
+                onClick={() => (activeEvent = 'input')}
+                active={activeEvent === 'input'}
+              />
+              {#each $fullEventHistory as event}
+                <EventRow
+                  {event}
+                  onClick={setActive}
+                  active={activeEvent?.id === event.id ||
+                    Boolean(activeGroup?.eventIds?.has(event.id))}
+                />
+              {/each}
+              <InputAndResultRow
+                type="result"
+                content={workflowEvents.results}
+                onClick={() => (activeEvent = 'results')}
+                active={activeEvent === 'results'}
+              />
+            </div>
+            <div class="relative h-full w-full bg-slate-950">
+              <div class="sticky top-12 h-auto w-full">
+                <DetailsDrawer {activeEvent} {workflowEvents} {workflow} />
               </div>
             </div>
           </div>
-        {:else if $eventViewType === 'compact'}
-          {#each groups as group}
-            <GroupRow
-              {group}
-              {initialEvent}
-              level={Object.keys(timeBasedGroups).indexOf(group.timestamp)}
-            />
-          {/each}
-        {:else if $eventViewType === 'json'}
-          <WorkflowJsonNavigator events={$fullEventHistory} />
-        {/if}
-      </div>
+        </div>
+      {:else if $eventViewType === 'compact'}
+        {#each groups as group}
+          <GroupRow
+            {group}
+            {initialEvent}
+            level={Object.keys(timeBasedGroups).indexOf(group.timestamp)}
+          />
+        {/each}
+      {:else if $eventViewType === 'json'}
+        <WorkflowJsonNavigator events={$fullEventHistory} />
+      {/if}
     </div>
-  {/if}
+  </div>
 </div>

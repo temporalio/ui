@@ -8,12 +8,11 @@
   export let connectLine = true;
   export let active = false;
   export let onHover: () => void;
-  export let onHoverLeave: () => void;
 
   const r = 6;
   const x = 20;
   const strokeWidth = 2;
-  const horizontalOffset = category === 'workflow' ? 0 : (offset / 1.5) * 3 * r;
+  $: horizontalOffset = category === 'workflow' ? 0 : (offset / 1.5) * 3 * r;
 </script>
 
 {#if category !== 'workflow' && connectLine}
@@ -27,7 +26,6 @@
     y2={y}
     on:mouseover={onHover}
     on:focus={onHover}
-    on:mouseleave={onHoverLeave}
   />
 {/if}
 <circle
@@ -39,7 +37,6 @@
   {r}
   on:mouseover={onHover}
   on:focus={onHover}
-  on:mouseleave={onHoverLeave}
 />
 {#if nextDistance}
   <line
@@ -52,7 +49,6 @@
     y2={y + nextDistance - r}
     on:mouseover={onHover}
     on:focus={onHover}
-    on:mouseleave={onHoverLeave}
   />
 {/if}
 

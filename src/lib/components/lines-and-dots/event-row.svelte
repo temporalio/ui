@@ -1,37 +1,35 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
 
-  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { WorkflowEvent } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
-  import EventDetails from './event-details.svelte';
   import { gap } from './event-graph.svelte';
+  import EventRowDetails from './event-row-details.svelte';
 
   export let event: WorkflowEvent;
   export let onClick: (workflow: WorkflowEvent) => void;
-  export let activeGroup: undefined | EventGroup;
-
-  $: active = activeGroup?.eventIds?.has(event.id);
+  export let active = false;
 </script>
 
 <div
-  class="flex h-10 cursor-pointer max-h-[{gap}px] h-[{gap}px] w-full min-w-max grow items-center gap-2 px-4 py-0 text-white hover:bg-indigo-400"
+  class="flex h-10 cursor-pointer select-none max-h-[{gap}px] h-[{gap}px] w-full min-w-max grow items-center px-4 py-0 text-white hover:bg-indigo-400"
   in:fade={{ duration: 500 }}
   on:click={() => onClick(event)}
   on:focus={() => onClick(event)}
+  on:keydown={() => onClick(event)}
   class:active
 >
-  <div class="flex grow items-center justify-between">
+  <div class="flex grow items-center justify-between gap-2">
     <div class="flex items-center gap-6">
       <div class="flex grow gap-0">
         <p>{event.id}</p>
       </div>
       <p>{spaceBetweenCapitalLetters(event.name)}</p>
     </div>
-    <EventDetails
+    <EventRowDetails
       {...getSingleAttributeForEvent(event)}
       attributes={formatAttributes(event)}
       inline

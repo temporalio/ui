@@ -17,8 +17,8 @@
   export let canvasHeight = 1000;
   export let canvasWidth = 150;
   export let activeGroup: EventGroup;
+  export let activeEvent: WorkflowEvent | 'input' | 'results' = 'input';
   export let onHover: (workflow: WorkflowEvent) => void;
-  export let onHoverLeave: () => void;
 
   const isMiddleEvent = (event: WorkflowEvent): boolean => {
     const group = groups.find((g) => g.eventIds.has(event.id));
@@ -78,6 +78,15 @@
     nextDistance = diff * gap;
     return { nextDistance, offset };
   };
+
+  const isActive = (event: WorkflowEvent): boolean => {
+    if (activeEvent?.id) {
+      return activeEvent.id === event.id;
+    } else if (activeGroup) {
+      return activeGroup?.eventIds.has(event.id);
+    }
+    return true;
+  };
 </script>
 
 <div style="width: {canvasWidth}px; min-width: {canvasWidth}px;">
@@ -91,9 +100,8 @@
         {nextDistance}
         category={event.category}
         connectLine={!isMiddleEvent(event)}
-        active={activeGroup ? activeGroup.eventIds.has(event.id) : true}
+        active={isActive(event)}
         onHover={() => onHover(event)}
-        {onHoverLeave}
       />
     {/each}
     <slot />
