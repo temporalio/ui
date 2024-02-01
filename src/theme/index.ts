@@ -56,7 +56,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-surface-success': rgb(getColor('green', 950)),
 
   '--color-border-primary': rgb(colors.offWhite),
-  '--color-border-subtle': rgb(getColor('slate', 950)),
+  '--color-border-subtle': rgb(getColor('slate', 700)),
   '--color-border-information': rgb(getColor('blue', 700)),
   '--color-border-warning': rgb(getColor('yellow', 700)),
   '--color-border-error': rgb(getColor('red', 700)),
