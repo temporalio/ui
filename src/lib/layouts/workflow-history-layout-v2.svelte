@@ -1,6 +1,8 @@
 <script lang="ts">
   import groupBy from 'lodash.groupby';
 
+  import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
+  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import DraggableLine from '$lib/components/lines-and-dots/draggable-line.svelte';
   import EventGraph, {
     gap,
@@ -8,8 +10,12 @@
   import EventRow from '$lib/components/lines-and-dots/event-row.svelte';
   import GroupRow from '$lib/components/lines-and-dots/group-row.svelte';
   import InputAndResultRow from '$lib/components/lines-and-dots/input-and-result-row.svelte';
+  import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
+  import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import WorkflowJsonNavigator from '$lib/components/workflow/workflow-json-navigator.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
+  import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
+  import Accordion from '$lib/holocene/accordion.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -19,14 +25,13 @@
   import { eventViewType } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import {
+    workflowRun,
+    workflowTimelineViewOpen,
+  } from '$lib/stores/workflow-run';
   import type { WorkflowEvent } from '$lib/types/events';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
-  import {
-    parseWithBigInt,
-    stringifyWithBigInt,
-  } from '$lib/utilities/parse-with-big-int';
 
   $: ({ workflow } = $workflowRun);
   $: groups = groupEvents($fullEventHistory);
@@ -61,14 +66,53 @@
   $: canvasHeight = gap + gap * $fullEventHistory.length;
 
   const onExpand = (x: number) => {
-    if (x >= 10) {
+    if (x >= 10 && x < 990) {
       canvasWidth = x;
     }
   };
 </script>
 
 <div class="flex flex-col gap-2">
+  <WorkflowSummary />
   <WorkflowRelationships {...workflowRelationships} />
+  <PendingActivities />
+  <section>
+    <Accordion
+      title={workflowEvents.contAsNew
+        ? translate('workflows.input')
+        : translate('workflows.input-and-results')}
+      icon="json"
+      class=""
+      data-testid="input-and-results"
+    >
+      <div class="flex w-full flex-col gap-2 lg:flex-row">
+        <InputAndResults
+          title="Input"
+          content={workflowEvents.input}
+          data-testid="workflow-input"
+        />
+        <InputAndResults
+          content={workflowEvents.results}
+          title={workflowEvents.contAsNew
+            ? translate('workflows.continued-as-new-with-input')
+            : translate('workflows.results')}
+          data-testid="workflow-results"
+        />
+      </div>
+    </Accordion>
+  </section>
+  <Accordion
+    title={translate('common.timeline')}
+    data-testid="timeline-accordion"
+    icon="timeline"
+    open={$workflowTimelineViewOpen}
+    onToggle={() => {
+      $workflowTimelineViewOpen = !$workflowTimelineViewOpen;
+    }}
+  >
+    <EventHistoryTimeline history={$fullEventHistory} />
+  </Accordion>
+
   <div class="flex items-center justify-start gap-4 px-4 py-2">
     <h2 class="text-xl font-medium">
       {translate('workflows.event-history')}
@@ -118,23 +162,39 @@
             >
               <DraggableLine x={canvasWidth} height={canvasHeight} {onExpand} />
             </EventGraph>
-            <div class="relative flex w-full shrink gap-2 bg-slate-800">
+            <div class="relative flex w-full shrink gap-0 bg-slate-800">
               <div>
-                <InputAndResultRow
-                  title="Input"
-                  value={parseWithBigInt(workflowEvents?.input)}
-                />
+                <InputAndResultRow title="Input" />
                 {#each $fullEventHistory as event}
                   <EventRow {event} onClick={setActive} {activeGroup} />
                 {/each}
-                <!-- <InputAndResultRow
-                title="Result"
-                value={parseWithBigInt(workflowEvents?.results)}
-              /> -->
+                <InputAndResultRow title="Result" />
               </div>
               <div class="relative h-full w-full">
                 <div class="sticky top-12 h-auto w-full">
-                  <CodeBlock content={stringifyWithBigInt(activeEvent)} />
+                  {#if !activeEvent}
+                    <InputAndResults
+                      title="Input"
+                      content={workflowEvents.input}
+                      data-testid="workflow-input"
+                    />
+                  {:else}
+                    {#key activeEvent}
+                      <PayloadDecoder
+                        value={activeEvent}
+                        key="payloads"
+                        let:decodedValue
+                      >
+                        <CodeBlock
+                          content={decodedValue}
+                          copyIconTitle={translate('common.copy-icon-title')}
+                          copySuccessIconTitle={translate(
+                            'common.copy-success-icon-title',
+                          )}
+                        />
+                      </PayloadDecoder>
+                    {/key}
+                  {/if}
                 </div>
               </div>
             </div>
