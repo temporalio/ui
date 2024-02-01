@@ -131,6 +131,7 @@
             {canvasHeight}
             {canvasWidth}
             {activeGroup}
+            {activeEvent}
             onHover={setActive}
           >
             <DraggableLine x={canvasWidth} height={canvasHeight} {onExpand} />

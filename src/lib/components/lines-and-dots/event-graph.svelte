@@ -79,13 +79,12 @@
     return { nextDistance, offset };
   };
 
-  const isActive = (event: WorkflowEvent): boolean => {
-    if (activeEvent?.id) {
-      return activeEvent.id === event.id;
-    } else if (activeGroup) {
+  $: isActive = (event: WorkflowEvent): boolean => {
+    if (activeGroup) {
       return activeGroup?.eventIds.has(event.id);
-    }
-    return true;
+    } else if (activeEvent?.id) {
+      return activeEvent.id === event.id;
+    } else return true;
   };
 </script>
 
