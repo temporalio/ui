@@ -19,6 +19,7 @@ const variables = {
 
   '--color-surface-primary': rgb(colors.white),
   '--color-surface-secondary': rgb(colors.offWhite),
+  '--color-surface-inverse': rgb(colors.black),
   '--color-surface-error': rgb(getColor('red', 50)),
   '--color-surface-information': rgb(getColor('blue', 50)),
   '--color-surface-success': rgb(getColor('green', 50)),
@@ -76,6 +77,10 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-secondary'),
         color: css('--color-text-primary'),
       },
+      '.surface-inverse': {
+        backgroundColor: css('--color-surface-inverse'),
+        color: css('--text-inverse'),
+      },
     });
   },
   {
@@ -119,6 +124,14 @@ const temporal = plugin(
 
         DEFAULT: css('--color-text-primary'),
       }),
+      extend: {
+        transitionProperty: {
+          width: 'width',
+          height: 'height',
+          left: 'left',
+          right: 'right',
+        },
+      },
     },
   },
 );
