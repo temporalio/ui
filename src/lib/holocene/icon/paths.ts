@@ -5,6 +5,7 @@ import arrowRight from './svg/arrow-right.svelte';
 import arrowUp from './svg/arrow-up.svelte';
 import ascending from './svg/ascending.svelte';
 import astronaut from './svg/astronaut.svelte';
+import batchOperation from './svg/batch-operation.svelte';
 import book from './svg/book.svelte';
 import bookmark from './svg/bookmark.svelte';
 import calendarPlus from './svg/calendar-plus.svelte';
@@ -47,9 +48,6 @@ import invertedCheckmark from './svg/inverted-checkmark.svelte';
 import json from './svg/json.svelte';
 import keyboard from './svg/keyboard.svelte';
 import labs from './svg/labs.svelte';
-import layers1 from './svg/layers-1.svelte';
-import layers2 from './svg/layers-2.svelte';
-import layers3 from './svg/layers-3.svelte';
 import lightningBolt from './svg/lightning-bolt.svelte';
 import link from './svg/link.svelte';
 import lock from './svg/lock.svelte';
@@ -99,6 +97,7 @@ export const icons = {
   'arrow-right': arrowRight,
   ascending,
   astronaut,
+  'batch-operation': batchOperation,
   book,
   bookmark,
   'calendar-plus': calendarPlus,
@@ -141,9 +140,6 @@ export const icons = {
   json,
   keyboard,
   labs,
-  'layers-1': layers1,
-  'layers-2': layers2,
-  'layers-3': layers3,
   'lightning-bolt': lightningBolt,
   link,
   lock,
