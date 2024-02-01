@@ -18,7 +18,7 @@
 
 <nav
   class={merge(
-    'group grid h-screen w-16 grid-cols-[2rem] grid-rows-[fit-content(1.5rem)_minmax(3rem,4rem)_1fr_1fr_8rem] gap-2 px-4 py-5 transition-width dark:surface-primary data-[nav=open]:w-40 data-[nav=open]:grid-cols-[100%]',
+    'group grid h-screen w-16 grid-cols-[2rem] grid-rows-[fit-content(1.5rem)_minmax(3rem,4rem)_1fr_1fr_8rem] gap-2 border-r border-subtle px-4 py-5 transition-width dark:surface-primary data-[nav=open]:w-40 data-[nav=open]:grid-cols-[100%]',
     isCloud ? 'surface-primary' : 'surface-inverse text-white',
   )}
   data-nav={$navOpen ? 'open' : 'closed'}
@@ -37,7 +37,7 @@
   </button>
   <div role="list">
     <slot name="top" />
-    <hr class="my-8" />
+    <hr class="my-8 border-subtle" />
     <slot name="middle" />
   </div>
   <div class="space-y-2 self-center">
