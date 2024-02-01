@@ -18,46 +18,33 @@
 
 <nav
   class={merge(
-    'group relative flex h-screen w-16 flex-col justify-between border-r border-primary transition-width dark:surface-primary dark:border-subtle',
+    'group grid h-screen w-16 grid-cols-[2rem] grid-rows-[fit-content(1.5rem)_minmax(3rem,4rem)_1fr_1fr_8rem] gap-2 px-4 py-5 transition-width dark:surface-primary data-[nav=open]:w-40 data-[nav=open]:grid-cols-[100%]',
     isCloud ? 'surface-primary' : 'surface-inverse text-white',
   )}
-  class:w-40={$navOpen}
+  data-nav={$navOpen ? 'open' : 'closed'}
   data-testid="navigation-header"
   {...$$restProps}
 >
-  <div class="relative h-32 min-h-[84px]">
-    <a href={linkList.home} class="absolute left-[18px] top-[22px] block">
-      <Logo height="24px" width="24px" />
-    </a>
-    <button
-      class="absolute left-[18px] top-[52px] hidden transition-left group-hover:block group-focus:block"
-      title={$navOpen ? 'Collapse menu' : 'Expand menu'}
-      on:click={toggle}
-    >
-      <Icon name={$navOpen ? 'chevron-left' : 'chevron-right'} />
-    </button>
+  <a href={linkList.home}>
+    <Logo height="24px" width="24px" class="m-1" />
+  </a>
+  <button
+    title={$navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
+    class="mx-[4px] self-start justify-self-end opacity-0 transition-[opacity,transform] group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180"
+    on:click={toggle}
+  >
+    <Icon name="chevron-right" />
+  </button>
+  <div role="list">
+    <slot name="top" />
+    <hr class="my-8" />
+    <slot name="middle" />
   </div>
-  <div class="flex grow flex-col items-center justify-between">
-    <div class="w-full space-y-8">
-      <ul class="flex flex-col gap-2 px-3">
-        <slot name="top" />
-      </ul>
-      <hr class="border-subtle" />
-      <ul class="flex flex-col gap-2 px-3">
-        <slot name="middle" />
-      </ul>
-    </div>
-    <div class="w-full">
-      <ul class="flex flex-col gap-2 px-3">
-        <slot name="bottom" />
-      </ul>
-    </div>
+  <div class="space-y-2 self-center">
+    <slot name="bottom" />
   </div>
-  <div class="h-4 w-full pb-12 pt-24 text-center text-[0.6rem] text-secondary">
-    {#if version}
-      <span class="sr-only">{translate('common.version')}</span>
-    {/if}
+  <div class="self-end justify-self-center pb-3 text-[0.6rem] text-secondary">
+    <span class="sr-only">{translate('common.version')}</span>
     {version}
   </div>
-  <slot name="drawer" />
 </nav>
