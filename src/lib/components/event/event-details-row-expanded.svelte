@@ -188,6 +188,6 @@
   }
 
   .badge {
-    @apply rounded-sm bg-slate-100 p-1 text-primary;
+    @apply rounded-sm bg-badge p-1 text-primary;
   }
 </style>

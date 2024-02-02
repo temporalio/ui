@@ -21,6 +21,7 @@ const variables = {
   '--color-surface-primary': rgb(colors.white),
   '--color-surface-secondary': rgb(colors.offWhite),
   '--color-surface-inverse': rgb(colors.primary),
+  '--color-surface-badge': rgb(getColor('slate', 100)),
   '--color-surface-error': rgb(getColor('red', 50)),
   '--color-surface-information': rgb(getColor('blue', 50)),
   '--color-surface-success': rgb(getColor('green', 50)),
@@ -49,6 +50,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
 
   '--color-surface-primary': rgb(colors.black),
   '--color-surface-secondary': rgb(colors.offBlack),
+  '--color-surface-badge': rgb(getColor('slate', 700)),
   '--color-surface-information': rgb(getColor('blue', 950)),
   '--color-surface-warning': rgb(getColor('yellow', 950)),
   '--color-surface-error': rgb(getColor('red', 950)),
@@ -93,6 +95,7 @@ const temporal = plugin(
         secondary: css('--color-secondary'),
         inverse: css('--color-inverse'),
         subtle: css('--color-subtle'),
+        badge: css('--color-surface-badge'),
 
         error: css('--color-surface-error'),
         information: css('--color-surface-information'),
