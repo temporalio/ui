@@ -47,7 +47,7 @@
         >
           <NavTooltip text={translate('common.schedules')}>
             <div class="nav-icon">
-              <Icon name="schedules" height={25} width={24} />
+              <Icon name="schedules" />
             </div>
           </NavTooltip>
           <div class="nav-title">{translate('common.schedules')}</div>

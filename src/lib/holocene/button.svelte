@@ -7,8 +7,8 @@
   import { cva, type VariantProps } from 'class-variance-authority';
 
   import Badge from '$lib/holocene/badge.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
 
   import Link from './link.svelte';
 

@@ -3,7 +3,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import type { IconName } from './icon/paths';
+  import type { IconName } from './icon';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
     intent: typeof intent;

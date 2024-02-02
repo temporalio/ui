@@ -1,6 +1,6 @@
 <script lang="ts">
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import type { Color } from '$lib/types/global';
 
   export let disabled = false;
