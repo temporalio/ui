@@ -29,11 +29,7 @@
   }
 </script>
 
-<Table
-  {updating}
-  class="dark w-full table-fixed"
-  data-testid="event-summary-table"
->
+<Table {updating} class="w-full table-fixed" data-testid="event-summary-table">
   <caption class="sr-only" slot="caption"
     >{translate('workflows.event-history')}</caption
   >

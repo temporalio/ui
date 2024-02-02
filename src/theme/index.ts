@@ -6,7 +6,7 @@ import { css, rgb } from './utilities';
 const variables = {
   '--color-primary': rgb(colors.primary),
   '--color-secondary': rgb(colors.secondary),
-  '--color-inverse': rgb(getColor('slate', 900)),
+  '--color-inverse': rgb(colors.black),
 
   '--color-text-primary': rgb(colors.primary),
   '--color-text-secondary': rgb(colors.secondary),
@@ -19,12 +19,13 @@ const variables = {
 
   '--color-surface-primary': rgb(colors.white),
   '--color-surface-secondary': rgb(colors.offWhite),
+  '--color-surface-inverse': rgb(colors.primary),
   '--color-surface-error': rgb(getColor('red', 50)),
   '--color-surface-information': rgb(getColor('blue', 50)),
   '--color-surface-success': rgb(getColor('green', 50)),
   '--color-surface-warning': rgb(getColor('yellow', 50)),
 
-  '--color-border-primary': 'var(--color-inverse)',
+  '--color-border-primary': rgb(colors.black),
   '--color-border-subtle': rgb(getColor('slate', 300)),
   '--color-border-error': rgb(getColor('red', 800)),
   '--color-border-information': rgb(getColor('blue', 800)),
@@ -64,7 +65,7 @@ const temporal = plugin(
   ({ addComponents, addBase }) => {
     addBase({
       ':root': variables,
-      ':is(.dark *)': dark,
+      ':is(body.dark *)': dark,
     });
 
     addComponents({
@@ -74,6 +75,10 @@ const temporal = plugin(
       },
       '.surface-secondary': {
         backgroundColor: css('--color-surface-secondary'),
+        color: css('--color-text-primary'),
+      },
+      '.surface-inverse': {
+        backgroundColor: css('--color-surface-inverse'),
         color: css('--color-text-primary'),
       },
     });
