@@ -102,7 +102,7 @@
     ];
 
   let coreUser = coreUserStore();
-  let editDisabled =
+  $: editDisabled =
     $coreUser.namespaceWriteDisabled(namespace) || !writeActionsAreAllowed();
 
   const handleDelete = async () => {
