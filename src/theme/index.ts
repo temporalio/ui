@@ -7,6 +7,7 @@ const variables = {
   '--color-primary': rgb(colors.primary),
   '--color-secondary': rgb(colors.secondary),
   '--color-inverse': rgb(colors.black),
+  '--color-subtle': rgb(getColor('slate', 950)),
 
   '--color-text-primary': rgb(colors.primary),
   '--color-text-secondary': rgb(colors.secondary),
@@ -91,6 +92,7 @@ const temporal = plugin(
         primary: css('--color-primary'),
         secondary: css('--color-secondary'),
         inverse: css('--color-inverse'),
+        subtle: css('--color-subtle'),
 
         error: css('--color-surface-error'),
         information: css('--color-surface-information'),
@@ -116,6 +118,7 @@ const temporal = plugin(
         primary: css('--color-text-primary'),
         secondary: css('--color-text-secondary'),
         disabled: css('--color-text-disabled'),
+        subtle: css('--color-text-subtle'),
 
         error: css('--color-text-error'),
         information: css('--color-text-information'),
