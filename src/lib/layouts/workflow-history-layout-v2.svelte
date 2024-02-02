@@ -1,5 +1,6 @@
 <script lang="ts">
   import { noop } from 'svelte/internal';
+  import { fly } from 'svelte/transition';
 
   import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
   import DetailsDrawer from '$lib/components/lines-and-dots/details-drawer.svelte';
@@ -36,28 +37,40 @@
     getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
 
   let activeGroup: undefined | EventGroup;
-  let activeEvent: WorkflowEvent | 'input' | 'results';
+  let activeEvent: WorkflowEvent | 'input' | 'results' | undefined;
 
   // let showDownloadPrompt = false;
 
   const clearActives = () => {
     activeGroup = undefined;
-    activeEvent = 'input';
+    activeEvent = undefined;
   };
 
   const setInputOrResults = (type: 'input' | 'results') => {
-    activeEvent = type;
-    activeGroup = undefined;
+    if (type === activeEvent) {
+      clearActives();
+    } else {
+      activeEvent = type;
+      activeGroup = undefined;
+    }
   };
 
   const setActiveEvent = (event: WorkflowEvent) => {
-    activeEvent = event;
-    activeGroup = groups.find((g) => g.eventIds.has(event.id));
+    if (event.id === activeEvent?.id) {
+      clearActives();
+    } else {
+      activeEvent = event;
+      activeGroup = groups.find((g) => g.eventIds.has(event.id));
+    }
   };
 
   const setActiveGroup = (group: EventGroup) => {
-    activeEvent = undefined;
-    activeGroup = group;
+    if (group.id === activeGroup?.id) {
+      clearActives();
+    } else {
+      activeEvent = undefined;
+      activeGroup = group;
+    }
   };
 
   $: workflowRelationships = getWorkflowRelationships(
@@ -67,7 +80,7 @@
   );
 
   $: compact = $eventViewType === 'compact';
-  $: canvasWidth = compact ? 50 : 100;
+  $: canvasWidth = 100;
   $: canvasHeight =
     gap * 2 + gap * (compact ? groups.length : $fullEventHistory.length);
 
@@ -78,6 +91,7 @@
   };
 
   $: workflow, compact, clearActives();
+  $: drawerOpen = activeEvent || activeGroup;
 </script>
 
 <div class="flex flex-col gap-2">
@@ -160,17 +174,22 @@
                 active={activeEvent === 'results'}
               />
             </div>
-            <div class="relative h-full w-full bg-slate-950">
-              <div class="sticky top-12 h-auto w-full">
-                <DetailsDrawer
-                  {activeEvent}
-                  {activeGroup}
-                  {workflowEvents}
-                  {workflow}
-                  {compact}
-                />
+            {#if drawerOpen}
+              <div
+                class="relative h-full w-full bg-slate-950"
+                transition:fly={{ x: 100 }}
+              >
+                <div class="sticky top-12 h-auto w-full">
+                  <DetailsDrawer
+                    {activeEvent}
+                    {activeGroup}
+                    {workflowEvents}
+                    {workflow}
+                    {compact}
+                  />
+                </div>
               </div>
-            </div>
+            {/if}
           </div>
         </div>
       {:else}
@@ -209,17 +228,22 @@
                 active={activeEvent === 'results'}
               />
             </div>
-            <div class="relative h-full w-full bg-slate-950">
-              <div class="sticky top-12 h-auto w-full">
-                <DetailsDrawer
-                  {activeEvent}
-                  {activeGroup}
-                  {workflowEvents}
-                  {workflow}
-                  {compact}
-                />
+            {#if drawerOpen}
+              <div
+                class="relative h-full w-full bg-slate-950"
+                transition:fly={{ x: 100 }}
+              >
+                <div class="sticky top-12 h-auto w-full">
+                  <DetailsDrawer
+                    {activeEvent}
+                    {activeGroup}
+                    {workflowEvents}
+                    {workflow}
+                    {compact}
+                  />
+                </div>
               </div>
-            </div>
+            {/if}
           </div>
         </div>
       {/if}

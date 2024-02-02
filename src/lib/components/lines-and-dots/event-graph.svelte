@@ -1,5 +1,6 @@
 <script context="module">
   export const gap = 40;
+  export const startingX = 50;
 </script>
 
 <script lang="ts">

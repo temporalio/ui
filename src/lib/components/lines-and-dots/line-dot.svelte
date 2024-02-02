@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { EventTypeCategory } from '$lib/types/events';
 
+  import { startingX } from './event-graph.svelte';
+
   export let y: number = 20;
   export let category: EventTypeCategory;
   export let nextDistance = 0;
@@ -11,7 +13,7 @@
   export let onHover: () => void;
 
   const r = 6;
-  const x = 20;
+  const x = startingX;
   const strokeWidth = 2;
   $: horizontalOffset =
     category === 'workflow' || compact ? 0 : (offset / 1.5) * 3 * r;

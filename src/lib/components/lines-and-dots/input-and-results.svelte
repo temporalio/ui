@@ -23,7 +23,7 @@
 
 <div class="flex w-full flex-col" {...$$restProps}>
   {#if content}
-    <div class="flex h-full flex-col gap-4 overflow-scroll">
+    <div class="flex h-full flex-col gap-0 overflow-scroll">
       {#if showParsedContent}
         <PayloadDecoder value={parsedContent} key="payloads" let:decodedValue>
           {#each parsePayloads(decodedValue) as decodedContent}
