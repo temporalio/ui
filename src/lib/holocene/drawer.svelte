@@ -11,7 +11,7 @@
   export let open = false;
   export let position: 'bottom' | 'right' = 'bottom';
   export let dark = true;
-  export let onClick: () => void;
+  export let onClick: (e: MouseEvent | CustomEvent) => void;
   export let id = 'navigation-drawer';
   export let closeButtonLabel: string;
   export let closePadding: boolean = true;
