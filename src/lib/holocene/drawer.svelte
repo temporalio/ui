@@ -39,16 +39,18 @@
     use:focusTrap={true}
   >
     <div class="relative h-full" class:pt-10={closePadding}>
-      <div class="close-button-wrapper {position}" slot="close-button">
-        <IconButton
-          data-testid="drawer-close-button"
-          label={closeButtonLabel}
-          class="stuff"
-          icon="close"
-          aria-expanded={open}
-          aria-controls="navigation-drawer"
-          on:click={onClick}
-        />
+      <div class="close-button-wrapper {position}">
+        <slot name="close-button">
+          <IconButton
+            data-testid="drawer-close-button"
+            label={closeButtonLabel}
+            class="stuff"
+            icon="close"
+            aria-expanded={open}
+            aria-controls="navigation-drawer"
+            on:click={onClick}
+          />
+        </slot>
       </div>
       <slot />
     </div>
