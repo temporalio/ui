@@ -1,6 +1,6 @@
 <script context="module">
   export const gap = 40;
-  export const startingX = 50;
+  export const startingX = 40;
 </script>
 
 <script lang="ts">
@@ -10,13 +10,18 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
-  import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
+  import type {
+    PendingActivity,
+    WorkflowEvent,
+    WorkflowEvents,
+  } from '$lib/types/events';
 
   import LineDot from './line-dot.svelte';
   import Line from './line.svelte';
 
   export let history: WorkflowEvents;
   export let groups: EventGroups;
+  export let pendingActivities: PendingActivity[];
   export let canvasHeight = 1000;
   export let canvasWidth = 150;
   export let activeGroup: EventGroup;
@@ -65,22 +70,25 @@
 
   const getNextDistanceAndOffset = (
     event: WorkflowEvent,
-  ): { nextDistance: number; offset: number } => {
+    index: number,
+  ): { nextDistance: number; offset: number; y: number } => {
     let nextDistance = 0;
     let offset = 1;
+    let y = (index + 1) * gap + gap / 2;
+
     const group = groups.find((g) => g.eventIds.has(event.id));
     if (!group || group.eventList.length === 1) {
-      return { nextDistance, offset };
+      return { nextDistance, offset, y };
     }
     const currentIndex = group.eventList.indexOf(event);
     const nextEvent = group.eventList[currentIndex + 1];
     offset = getOpenGroups(event);
     if (!nextEvent) {
-      return { nextDistance, offset };
+      return { nextDistance, offset, y };
     }
     const diff = parseInt(nextEvent.id) - parseInt(event.id);
     nextDistance = diff * gap;
-    return { nextDistance, offset };
+    return { nextDistance, offset, y };
   };
 
   $: isActive = (event?: WorkflowEvent): boolean => {
@@ -110,6 +118,7 @@
           nextDistance={0}
           {compact}
           category={group.category}
+          classification={group.classification}
           connectLine={false}
           active={isGroupActive(group)}
           onHover={noop}
@@ -117,16 +126,30 @@
       {/each}
     {:else}
       {#each history as event, index (event.id)}
-        {@const { nextDistance, offset } = getNextDistanceAndOffset(event)}
+        {@const { nextDistance, offset, y } = getNextDistanceAndOffset(
+          event,
+          index,
+        )}
         <LineDot
-          y={(index + 1) * gap + gap / 2}
+          {y}
           {offset}
           {nextDistance}
           {compact}
           category={event.category}
+          classification={event.classification}
           connectLine={!isMiddleEvent(event)}
           active={isActive(event)}
           onHover={() => onHover(event)}
+        />
+      {/each}
+      {#each pendingActivities as pendingActivity, index}
+        <LineDot
+          y={(history.length + index + 1) * gap + gap / 2}
+          offset={0}
+          nextDistance={0}
+          category="pending"
+          active={isActive(pendingActivity)}
+          onHover={() => onHover(pendingActivity)}
         />
       {/each}
     {/if}

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
 
-  import type { WorkflowEvent } from '$lib/types/events';
+  import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
@@ -10,7 +10,8 @@
   import EventRowDetails from './event-row-details.svelte';
 
   export let event: WorkflowEvent;
-  export let onClick: (workflow: WorkflowEvent) => void;
+
+  export let onClick: (workflow: WorkflowEvent | PendingActivity) => void;
   export let active = false;
 </script>
 

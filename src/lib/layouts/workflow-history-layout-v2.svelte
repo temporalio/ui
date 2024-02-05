@@ -1,6 +1,5 @@
 <script lang="ts">
   import { noop } from 'svelte/internal';
-  import { fly } from 'svelte/transition';
 
   import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
   import DetailsDrawer from '$lib/components/lines-and-dots/details-drawer.svelte';
@@ -11,7 +10,7 @@
   import EventRow from '$lib/components/lines-and-dots/event-row.svelte';
   import GroupRow from '$lib/components/lines-and-dots/group-row.svelte';
   import InputAndResultRow from '$lib/components/lines-and-dots/input-and-result-row.svelte';
-  import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
+  import PendingActivityRow from '$lib/components/lines-and-dots/pending-activity-row.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
@@ -27,7 +26,7 @@
     workflowRun,
     workflowTimelineViewOpen,
   } from '$lib/stores/workflow-run';
-  import type { WorkflowEvent } from '$lib/types/events';
+  import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
@@ -35,6 +34,7 @@
   $: groups = groupEvents($fullEventHistory);
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
+  $: pendingActivities = workflow?.pendingActivities;
 
   let activeGroup: undefined | EventGroup;
   let activeEvent: WorkflowEvent | 'input' | 'results' | undefined;
@@ -55,12 +55,12 @@
     }
   };
 
-  const setActiveEvent = (event: WorkflowEvent) => {
+  const setActiveEvent = (event: WorkflowEvent | PendingActivity) => {
     if (event.id === activeEvent?.id) {
       clearActives();
     } else {
       activeEvent = event;
-      activeGroup = groups.find((g) => g.eventIds.has(event.id));
+      activeGroup = groups.find((g) => g.eventIds.has(event?.id));
     }
   };
 
@@ -82,7 +82,11 @@
   $: compact = $eventViewType === 'compact';
   $: canvasWidth = 100;
   $: canvasHeight =
-    gap * 2 + gap * (compact ? groups.length : $fullEventHistory.length);
+    gap * 2 +
+    gap *
+      (compact
+        ? groups.length
+        : $fullEventHistory.length + pendingActivities.length);
 
   const onExpand = (x: number) => {
     if (x >= 10 && x < 990) {
@@ -97,7 +101,6 @@
 <div class="flex flex-col gap-2">
   <WorkflowSummary />
   <WorkflowRelationships {...workflowRelationships} />
-  <PendingActivities />
   <Accordion
     title={translate('common.timeline')}
     data-testid="timeline-accordion"
@@ -143,6 +146,7 @@
           <EventGraph
             history={$fullEventHistory}
             {groups}
+            {pendingActivities}
             {canvasHeight}
             {canvasWidth}
             {activeGroup}
@@ -153,7 +157,7 @@
             <DraggableLine x={canvasWidth} height={canvasHeight} {onExpand} />
           </EventGraph>
           <div class="relative flex w-full shrink gap-0 bg-slate-800">
-            <div>
+            <div class="w-full">
               <InputAndResultRow
                 type="input"
                 content={workflowEvents.input}
@@ -175,20 +179,13 @@
               />
             </div>
             {#if drawerOpen}
-              <div
-                class="relative h-full w-full bg-slate-950"
-                transition:fly={{ x: 100 }}
-              >
-                <div class="sticky top-12 h-auto w-full">
-                  <DetailsDrawer
-                    {activeEvent}
-                    {activeGroup}
-                    {workflowEvents}
-                    {workflow}
-                    {compact}
-                  />
-                </div>
-              </div>
+              <DetailsDrawer
+                {activeEvent}
+                {activeGroup}
+                {workflowEvents}
+                {workflow}
+                {compact}
+              />
             {/if}
           </div>
         </div>
@@ -197,6 +194,7 @@
           <EventGraph
             history={$fullEventHistory}
             {groups}
+            {pendingActivities}
             {canvasHeight}
             {canvasWidth}
             {activeGroup}
@@ -205,8 +203,8 @@
           >
             <DraggableLine x={canvasWidth} height={canvasHeight} {onExpand} />
           </EventGraph>
-          <div class="relative flex w-full shrink gap-0 bg-slate-800">
-            <div>
+          <div class="relative flex w-full gap-0 bg-slate-800">
+            <div class="w-full">
               <InputAndResultRow
                 type="input"
                 content={workflowEvents.input}
@@ -221,6 +219,14 @@
                     Boolean(activeGroup?.eventIds?.has(event.id))}
                 />
               {/each}
+              {#each pendingActivities as pendingActivity}
+                <PendingActivityRow
+                  {pendingActivity}
+                  onClick={setActiveEvent}
+                  active={pendingActivity.activityId ===
+                    activeEvent?.activityId}
+                />
+              {/each}
               <InputAndResultRow
                 type="result"
                 content={workflowEvents.results}
@@ -229,20 +235,13 @@
               />
             </div>
             {#if drawerOpen}
-              <div
-                class="relative h-full w-full bg-slate-950"
-                transition:fly={{ x: 100 }}
-              >
-                <div class="sticky top-12 h-auto w-full">
-                  <DetailsDrawer
-                    {activeEvent}
-                    {activeGroup}
-                    {workflowEvents}
-                    {workflow}
-                    {compact}
-                  />
-                </div>
-              </div>
+              <DetailsDrawer
+                {activeEvent}
+                {activeGroup}
+                {workflowEvents}
+                {workflow}
+                {compact}
+              />
             {/if}
           </div>
         </div>

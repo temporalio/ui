@@ -19,7 +19,7 @@
 
   import EventEmptyRow from './event-empty-row.svelte';
 
-  export let compact = true;
+  export let compact = false;
 
   function handleExpandChange(event: CustomEvent) {
     $expandAllEvents = event.detail.expanded;

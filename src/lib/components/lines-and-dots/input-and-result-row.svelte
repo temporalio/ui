@@ -19,7 +19,7 @@
 </script>
 
 <div
-  class="flex h-10 select-none max-h-[{gap}px] h-[{gap}px] w-full grow items-center gap-2 px-4 py-0 text-white hover:bg-blurple"
+  class="flex h-10 cursor-pointer select-none max-h-[{gap}px] h-[{gap}px] w-full grow items-center gap-2 px-4 py-0 text-white hover:bg-blurple"
   in:fade={{ duration: 500 }}
   on:click={() => onClick(type)}
   on:focus={() => onClick(type)}

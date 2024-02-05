@@ -6,7 +6,7 @@ import { css, rgb } from './utilities';
 const variables = {
   '--color-primary': rgb(colors.primary),
   '--color-secondary': rgb(colors.secondary),
-  '--color-inverse': rgb(colors.black),
+  '--color-inverse': rgb(colors.primary),
 
   '--color-text-primary': rgb(colors.primary),
   '--color-text-secondary': rgb(colors.secondary),
