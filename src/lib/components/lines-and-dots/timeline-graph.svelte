@@ -1,6 +1,7 @@
 <script context="module">
   export const gap = 20;
-  export const gutter = 40;
+  export const gutterStart = 100;
+  export const gutterEnd = 20;
 </script>
 
 <script lang="ts">
@@ -10,6 +11,7 @@
   } from '$lib/models/event-groups/event-groups';
   import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { capitalize } from '$lib/utilities/format-camel-case';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
 
   import CompactLineDot from './compact-line-dot.svelte';
@@ -25,7 +27,6 @@
   export let onHover: (workflow: WorkflowEvent | PendingActivity) => void;
 
   $: canvasHeight = (groups.length + 2) * gap;
-
   $: startTime = workflow.startTime;
   $: endTime = workflow.isRunning ? Date.now() : workflow.endTime;
   $: fullDistance = getMillisecondDuration({
@@ -33,7 +34,7 @@
     end: endTime,
     onlyUnderSecond: false,
   });
-  $: finishingX = canvasWidth - gutter;
+  $: finishingX = canvasWidth - gutterEnd;
 
   const getDistance = (event: WorkflowEvent) => {
     const distance = getMillisecondDuration({
@@ -42,7 +43,9 @@
       onlyUnderSecond: false,
     });
 
-    return Math.round((distance / fullDistance) * (canvasWidth - 2 * gutter));
+    return Math.round(
+      (distance / fullDistance) * (canvasWidth - (gutterStart + gutterEnd)),
+    );
   };
 
   const getNextEventDistance = (
@@ -73,22 +76,27 @@
 
 <div style="width: {canvasWidth}px; min-width: {canvasWidth}px;">
   <svg width={canvasWidth} viewBox="0 0 {canvasWidth} {canvasHeight}">
-    <Line x={gutter} y1={0} y2={canvasHeight} />
+    <Line x={gutterStart} y1={0} y2={canvasHeight} />
+    <Line x={finishingX} y1={0} y2={canvasHeight} />
     {#each groups as group, index (group.id)}
-      {#each group.eventList as event (event.id)}
+      {#each group.eventList as event, i (event.id)}
         {@const { x, nextX } = getNextEventDistance(event, group)}
         <CompactLineDot
           y={(index + 1) * gap + gap / 2}
-          x={gutter + x}
+          x={gutterStart + x}
+          {canvasWidth}
           {nextX}
           category={event.category}
           classification={event.classification}
           active={isActive(event)}
           onHover={() => onHover(event)}
+          startText={i === 0
+            ? capitalize(group?.label || group?.category || group?.name)
+            : ''}
+          endText={i === group.eventList.length - 1 ? group?.name : ''}
         />
       {/each}
     {/each}
-    <Line x={finishingX} y1={0} y2={canvasHeight} />
     <slot />
   </svg>
 </div>

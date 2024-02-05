@@ -1,8 +1,8 @@
 <script lang="ts">
   const grabberWidth = 10;
 
-  export let x = 150;
-  export let height = 1000;
+  export let y = 150;
+  export let width = 1000;
   export let onExpand: (x: number) => void;
 
   let expanding = null;
@@ -11,8 +11,8 @@
 
   function startExpand(event) {
     expanding = true;
-    start = event.pageX;
-    initial = { x };
+    start = event.pageY;
+    initial = { y };
   }
 
   function stopExpand() {
@@ -24,34 +24,20 @@
   function expand(event) {
     if (!expanding) return;
 
-    const delta = start - event.pageX;
+    const delta = start - event.pageY;
     const newX = initial.x - delta;
     onExpand(newX);
     return;
-
-    // Might need directional check
-    // if (expanding == 'left') {
-    // 	const delta = start-event.pageX
-    // 	x = initial.x - delta
-    // 	width = initial.width + delta
-    // 	return
-    // }
-
-    // if (expanding == 'right') {
-    // 	const delta = event.pageX-start
-    // 	width = initial.width + delta
-    // 	return
-    // }
   }
 </script>
 
 <svelte:window on:mouseup={stopExpand} on:mousemove={expand} />
 
 <rect
-  x={x - grabberWidth}
-  y={0}
-  width={grabberWidth}
-  {height}
+  x={0}
+  y={y - grabberWidth}
+  {width}
+  height={grabberWidth}
   on:mousedown={startExpand}
   class="grip"
   class:active={!!expanding}

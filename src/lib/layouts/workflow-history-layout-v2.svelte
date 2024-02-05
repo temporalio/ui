@@ -1,9 +1,8 @@
 <script lang="ts">
   import { noop } from 'svelte/internal';
 
-  import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
   import DetailsDrawer from '$lib/components/lines-and-dots/details-drawer.svelte';
-  import DraggableLine from '$lib/components/lines-and-dots/draggable-line.svelte';
+  import DraggableXLine from '$lib/components/lines-and-dots/draggable-x-line.svelte';
   import EventRow from '$lib/components/lines-and-dots/event-row.svelte';
   import GroupRow from '$lib/components/lines-and-dots/group-row.svelte';
   import EventGraph, {
@@ -14,7 +13,6 @@
   import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
-  import Accordion from '$lib/holocene/accordion.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -23,10 +21,7 @@
   import { eventViewType } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
-  import {
-    workflowRun,
-    workflowTimelineViewOpen,
-  } from '$lib/stores/workflow-run';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
@@ -98,18 +93,6 @@
 <div class="flex flex-col gap-2">
   <WorkflowSummary />
   <WorkflowRelationships {...workflowRelationships} />
-  <Accordion
-    title={translate('common.timeline')}
-    data-testid="timeline-accordion"
-    icon="timeline"
-    open={$workflowTimelineViewOpen}
-    onToggle={() => {
-      $workflowTimelineViewOpen = !$workflowTimelineViewOpen;
-    }}
-  >
-    <EventHistoryTimeline history={$fullEventHistory} />
-  </Accordion>
-
   <div class="flex items-center justify-start gap-4 px-4 py-2">
     <h2 class="text-xl font-medium">
       {translate('workflows.event-history')}
@@ -162,7 +145,7 @@
             {activeEvent}
             onHover={noop}
           >
-            <DraggableLine x={canvasWidth} height={canvasHeight} {onExpand} />
+            <DraggableXLine x={canvasWidth} height={canvasHeight} {onExpand} />
           </EventGraph>
         {/if}
         <div class="relative flex w-full shrink gap-0 bg-slate-800">
