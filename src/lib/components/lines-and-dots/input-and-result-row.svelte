@@ -7,7 +7,7 @@
 
   import { getPayloads, parseContent } from './input-and-result-payloads';
 
-  import { gap } from './event-graph.svelte';
+  import { gap } from './history-graph.svelte';
 
   export let type: 'input' | 'result';
   export let content: string;

@@ -3,8 +3,8 @@
 
   import type { PendingActivity } from '$lib/types/events';
 
-  import { gap } from './event-graph.svelte';
   import EventRowDetails from './event-row-details.svelte';
+  import { gap } from './history-graph.svelte';
 
   export let pendingActivity: PendingActivity;
   export let onClick: (pending: PendingActivity) => void;

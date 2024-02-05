@@ -4,8 +4,6 @@
 </script>
 
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
   import type {
     EventGroup,
     EventGroups,
@@ -16,7 +14,7 @@
     WorkflowEvents,
   } from '$lib/types/events';
 
-  import LineDot from './line-dot.svelte';
+  import HistoryLineDot from './history-line-dot.svelte';
   import Line from './line.svelte';
 
   export let history: WorkflowEvents;
@@ -26,8 +24,7 @@
   export let canvasWidth = 150;
   export let activeGroup: EventGroup;
   export let activeEvent: WorkflowEvent | 'input' | 'results' = 'input';
-  export let compact = false;
-  export let onHover: (workflow: WorkflowEvent) => void;
+  export let onHover: (workflow: WorkflowEvent | PendingActivity) => void;
 
   const isMiddleEvent = (event: WorkflowEvent): boolean => {
     const group = groups.find((g) => g.eventIds.has(event.id));
@@ -91,68 +88,44 @@
     return { nextDistance, offset, y };
   };
 
-  $: isActive = (event?: WorkflowEvent): boolean => {
+  $: isActive = (event?: WorkflowEvent | PendingActivity): boolean => {
     if (activeGroup) {
       return activeGroup?.eventIds.has(event.id);
     } else if (event && activeEvent?.id) {
       return activeEvent.id === event?.id;
     } else return true;
   };
-
-  $: isGroupActive = (group?: EventGroup): boolean => {
-    if (activeGroup) {
-      return activeGroup.id === group.id;
-    }
-    return true;
-  };
 </script>
 
 <div style="width: {canvasWidth}px; min-width: {canvasWidth}px;">
   <svg width={1000} viewBox="0 0 1000 {canvasHeight}">
-    <Line y1={0} y2={canvasHeight} />
-    {#if compact}
-      {#each groups as group, index (group.id)}
-        <LineDot
-          y={(index + 1) * gap + gap / 2}
-          offset={0}
-          nextDistance={0}
-          {compact}
-          category={group.category}
-          classification={group.classification}
-          connectLine={false}
-          active={isGroupActive(group)}
-          onHover={noop}
-        />
-      {/each}
-    {:else}
-      {#each history as event, index (event.id)}
-        {@const { nextDistance, offset, y } = getNextDistanceAndOffset(
-          event,
-          index,
-        )}
-        <LineDot
-          {y}
-          {offset}
-          {nextDistance}
-          {compact}
-          category={event.category}
-          classification={event.classification}
-          connectLine={!isMiddleEvent(event)}
-          active={isActive(event)}
-          onHover={() => onHover(event)}
-        />
-      {/each}
-      {#each pendingActivities as pendingActivity, index}
-        <LineDot
-          y={(history.length + index + 1) * gap + gap / 2}
-          offset={0}
-          nextDistance={0}
-          category="pending"
-          active={isActive(pendingActivity)}
-          onHover={() => onHover(pendingActivity)}
-        />
-      {/each}
-    {/if}
+    <Line x={startingX} y1={0} y2={canvasHeight} />
+    {#each history as event, index (event.id)}
+      {@const { nextDistance, offset, y } = getNextDistanceAndOffset(
+        event,
+        index,
+      )}
+      <HistoryLineDot
+        {y}
+        {offset}
+        {nextDistance}
+        category={event.category}
+        classification={event.classification}
+        connectLine={!isMiddleEvent(event)}
+        active={isActive(event)}
+        onHover={() => onHover(event)}
+      />
+    {/each}
+    {#each pendingActivities as pendingActivity, index}
+      <HistoryLineDot
+        y={(history.length + index + 1) * gap + gap / 2}
+        offset={0}
+        nextDistance={0}
+        category="pending"
+        active={isActive(pendingActivity)}
+        onHover={() => onHover(pendingActivity)}
+      />
+    {/each}
     <slot />
   </svg>
 </div>

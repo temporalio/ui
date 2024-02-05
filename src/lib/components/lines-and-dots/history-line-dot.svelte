@@ -4,7 +4,7 @@
     EventTypeCategory,
   } from '$lib/types/events';
 
-  import { startingX } from './event-graph.svelte';
+  import { startingX } from './history-graph.svelte';
 
   export let y: number = 20;
   export let category: EventTypeCategory | 'pending';
@@ -14,21 +14,18 @@
   export let offset = 1;
   export let connectLine = true;
   export let active = false;
-  export let compact = false;
   export let onHover: () => void;
 
   const r = 6;
   const x = startingX;
   const strokeWidth = 2;
-  $: horizontalOffset =
-    category === 'workflow' || compact ? 0 : (offset / 1.5) * 3 * r;
+  $: horizontalOffset = category === 'workflow' ? 0 : (offset / 1.5) * 3 * r;
 </script>
 
-{#if !compact && category !== 'workflow' && connectLine}
+{#if category !== 'workflow' && connectLine}
   <line
     class="line {category}"
     class:active
-    class:compact
     stroke-width={strokeWidth}
     x1={x}
     x2={x + horizontalOffset - r}
@@ -53,7 +50,6 @@
   <circle
     class="dot {category} {classification}"
     class:active
-    class:compact
     stroke-width={strokeWidth}
     cx={x + horizontalOffset}
     cy={y}
@@ -66,7 +62,6 @@
   <line
     class="line {category}"
     class:active
-    class:compact
     stroke-width={strokeWidth}
     x1={x + horizontalOffset + r / 2 - strokeWidth}
     x2={x + horizontalOffset + r / 2 - strokeWidth}
@@ -100,26 +95,12 @@
     stroke: #ebebeb;
   }
 
-  .marker.compact,
-  .command.compact {
-    fill: #ebebeb;
-    stroke: #ebebeb;
-  }
-
   .timer {
     stroke: #fbbf24;
   }
 
-  .compact.timer {
-    fill: #fbbf24;
-  }
-
   .signal {
     stroke: #ec4899;
-  }
-
-  .compact.signal {
-    fill: #ec4899;
   }
 
   .activity,
@@ -127,16 +108,8 @@
     stroke: #a78bfa;
   }
 
-  .compact.activity {
-    fill: #a78bfa;
-  }
-
   .child-workflow {
     stroke: #b2f8d9;
-  }
-
-  .compact.child-workflow {
-    fill: #b2f8d9;
   }
 
   .workflow {

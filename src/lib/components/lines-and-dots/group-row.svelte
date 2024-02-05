@@ -5,8 +5,8 @@
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
-  import { gap } from './event-graph.svelte';
   import EventRowDetails from './event-row-details.svelte';
+  import { gap } from './history-graph.svelte';
 
   export let group: EventGroup;
   export let onClick: () => void;

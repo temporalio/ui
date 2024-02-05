@@ -4,13 +4,14 @@
   import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
   import DetailsDrawer from '$lib/components/lines-and-dots/details-drawer.svelte';
   import DraggableLine from '$lib/components/lines-and-dots/draggable-line.svelte';
-  import EventGraph, {
-    gap,
-  } from '$lib/components/lines-and-dots/event-graph.svelte';
   import EventRow from '$lib/components/lines-and-dots/event-row.svelte';
   import GroupRow from '$lib/components/lines-and-dots/group-row.svelte';
+  import EventGraph, {
+    gap,
+  } from '$lib/components/lines-and-dots/history-graph.svelte';
   import InputAndResultRow from '$lib/components/lines-and-dots/input-and-result-row.svelte';
   import PendingActivityRow from '$lib/components/lines-and-dots/pending-activity-row.svelte';
+  import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
@@ -73,29 +74,25 @@
     }
   };
 
-  $: workflowRelationships = getWorkflowRelationships(
-    workflow,
-    $fullEventHistory,
-    $namespaces,
-  );
-
-  $: compact = $eventViewType === 'compact';
-  $: canvasWidth = 100;
-  $: canvasHeight =
-    gap * 2 +
-    gap *
-      (compact
-        ? groups.length
-        : $fullEventHistory.length + pendingActivities.length);
-
   const onExpand = (x: number) => {
     if (x >= 10 && x < 990) {
       canvasWidth = x;
     }
   };
 
+  let compactCanvasWidth;
+  let canvasWidth = 100;
+
+  $: compact = $eventViewType === 'compact';
+  $: canvasHeight =
+    gap * 2 + gap * ($fullEventHistory.length + pendingActivities.length);
   $: workflow, compact, clearActives();
   $: drawerOpen = activeEvent || activeGroup;
+  $: workflowRelationships = getWorkflowRelationships(
+    workflow,
+    $fullEventHistory,
+    $namespaces,
+  );
 </script>
 
 <div class="flex flex-col gap-2">
@@ -138,11 +135,23 @@
     </ToggleButtons>
   </div>
   <div
-    class="flex w-full flex-col gap-0 rounded-lg bg-slate-900 md:h-auto md:flex-row"
+    class="flex w-full flex-col gap-0 bg-slate-950"
+    bind:clientWidth={compactCanvasWidth}
   >
-    <div class="flex w-full flex-col gap-1 rounded-lg bg-slate-950">
-      {#if compact}
-        <div class="flex gap-0">
+    {#if compact}
+      <TimelineGraph
+        {workflow}
+        canvasWidth={compactCanvasWidth}
+        {groups}
+        {pendingActivities}
+        {activeGroup}
+        {activeEvent}
+        onHover={noop}
+      />
+    {/if}
+    <div class="flex w-full flex-col gap-0">
+      <div class="flex gap-0">
+        {#if !compact}
           <EventGraph
             history={$fullEventHistory}
             {groups}
@@ -152,18 +161,19 @@
             {activeGroup}
             {activeEvent}
             onHover={noop}
-            compact
           >
             <DraggableLine x={canvasWidth} height={canvasHeight} {onExpand} />
           </EventGraph>
-          <div class="relative flex w-full shrink gap-0 bg-slate-800">
-            <div class="w-full">
-              <InputAndResultRow
-                type="input"
-                content={workflowEvents.input}
-                onClick={() => setInputOrResults('input')}
-                active={activeEvent === 'input'}
-              />
+        {/if}
+        <div class="relative flex w-full shrink gap-0 bg-slate-800">
+          <div class="w-full">
+            <InputAndResultRow
+              type="input"
+              content={workflowEvents.input}
+              onClick={() => setInputOrResults('input')}
+              active={activeEvent === 'input'}
+            />
+            {#if compact}
               {#each groups as group}
                 <GroupRow
                   {group}
@@ -171,46 +181,7 @@
                   active={activeGroup?.id === group.id}
                 />
               {/each}
-              <InputAndResultRow
-                type="result"
-                content={workflowEvents.results}
-                onClick={() => setInputOrResults('results')}
-                active={activeEvent === 'results'}
-              />
-            </div>
-            {#if drawerOpen}
-              <DetailsDrawer
-                {activeEvent}
-                {activeGroup}
-                {workflowEvents}
-                {workflow}
-                {compact}
-              />
-            {/if}
-          </div>
-        </div>
-      {:else}
-        <div class="flex gap-0">
-          <EventGraph
-            history={$fullEventHistory}
-            {groups}
-            {pendingActivities}
-            {canvasHeight}
-            {canvasWidth}
-            {activeGroup}
-            {activeEvent}
-            onHover={setActiveEvent}
-          >
-            <DraggableLine x={canvasWidth} height={canvasHeight} {onExpand} />
-          </EventGraph>
-          <div class="relative flex w-full gap-0 bg-slate-800">
-            <div class="w-full">
-              <InputAndResultRow
-                type="input"
-                content={workflowEvents.input}
-                onClick={() => setInputOrResults('input')}
-                active={activeEvent === 'input'}
-              />
+            {:else}
               {#each $fullEventHistory as event}
                 <EventRow
                   {event}
@@ -219,33 +190,32 @@
                     Boolean(activeGroup?.eventIds?.has(event.id))}
                 />
               {/each}
-              {#each pendingActivities as pendingActivity}
-                <PendingActivityRow
-                  {pendingActivity}
-                  onClick={setActiveEvent}
-                  active={pendingActivity.activityId ===
-                    activeEvent?.activityId}
-                />
-              {/each}
-              <InputAndResultRow
-                type="result"
-                content={workflowEvents.results}
-                onClick={() => setInputOrResults('results')}
-                active={activeEvent === 'results'}
-              />
-            </div>
-            {#if drawerOpen}
-              <DetailsDrawer
-                {activeEvent}
-                {activeGroup}
-                {workflowEvents}
-                {workflow}
-                {compact}
-              />
             {/if}
+            {#each pendingActivities as pendingActivity}
+              <PendingActivityRow
+                {pendingActivity}
+                onClick={setActiveEvent}
+                active={pendingActivity.activityId === activeEvent?.activityId}
+              />
+            {/each}
+            <InputAndResultRow
+              type="result"
+              content={workflowEvents.results}
+              onClick={() => setInputOrResults('results')}
+              active={activeEvent === 'results'}
+            />
           </div>
+          {#if drawerOpen}
+            <DetailsDrawer
+              {activeEvent}
+              {activeGroup}
+              {workflowEvents}
+              {workflow}
+              {compact}
+            />
+          {/if}
         </div>
-      {/if}
+      </div>
     </div>
   </div>
 </div>
