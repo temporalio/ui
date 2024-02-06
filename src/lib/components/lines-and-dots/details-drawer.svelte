@@ -38,16 +38,16 @@
   <div class="sticky top-12 h-auto w-full">
     <div class="flex flex-col gap-0">
       <div class="flex justify-between bg-blurple p-2 text-white">
-        <div class="flex items-center gap-6">
-          <div class="flex grow gap-0">
-            <p>
-              {isInputOrResults
-                ? capitalize(activeEvent)
-                : activeEvent?.name
-                ? spaceBetweenCapitalLetters(activeEvent.name)
-                : activeGroup?.name}
-            </p>
-          </div>
+        <div class="flex items-center gap-1">
+          {isInputOrResults
+            ? capitalize(activeEvent)
+            : activeEvent?.name
+            ? `${activeEvent.id} ${spaceBetweenCapitalLetters(
+                activeEvent.name,
+              )}`
+            : `${activeGroup.lastEvent.id} ${spaceBetweenCapitalLetters(
+                activeGroup.lastEvent.name,
+              )}`}
         </div>
         <div class="flex items-center gap-1">
           <Icon name="info" />
@@ -74,9 +74,10 @@
             data-testid="workflow-result"
             isRunning={workflow.isRunning}
           />
-        {:else}
-          {#key activeEvent}
-            <PayloadDecoder value={activeEvent} key="payloads" let:decodedValue>
+        {:else if compact}
+          {#each activeGroup.eventList.reverse() as event, index}
+            {#if index !== 0}<EventDetailsHeader {event} />{/if}
+            <PayloadDecoder value={event} key="payloads" let:decodedValue>
               <CodeBlock
                 content={decodedValue}
                 copyIconTitle={translate('common.copy-icon-title')}
@@ -85,11 +86,19 @@
                 )}
               />
             </PayloadDecoder>
-          {/key}
+          {/each}
+        {:else}
+          <PayloadDecoder value={activeEvent} key="payloads" let:decodedValue>
+            <CodeBlock
+              content={decodedValue}
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            />
+          </PayloadDecoder>
         {/if}
       {:else if compact}
-        {#each activeGroup.eventList as event}
-          <EventDetailsHeader {event} />
+        {#each activeGroup.eventList.reverse() as event, index}
+          {#if index !== 0}<EventDetailsHeader {event} />{/if}
           <EventDetails {event} />
         {/each}
       {:else if activeEvent?.activityId}

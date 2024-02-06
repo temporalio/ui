@@ -93,23 +93,28 @@
   .marker,
   .command {
     stroke: #ebebeb;
+    fill: #ebebeb;
   }
 
   .timer {
     stroke: #fbbf24;
+    fill: #fbbf24;
   }
 
   .signal {
     stroke: #ec4899;
+    fill: #ec4899;
   }
 
   .activity,
   .pending {
     stroke: #a78bfa;
+    fill: #a78bfa;
   }
 
   .child-workflow {
     stroke: #b2f8d9;
+    fill: #b2f8d9;
   }
 
   .workflow {

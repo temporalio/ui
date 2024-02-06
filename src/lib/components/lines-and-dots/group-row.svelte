@@ -6,7 +6,7 @@
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
   import EventRowDetails from './event-row-details.svelte';
-  import { gap } from './history-graph.svelte';
+  import { historyGap } from './history-graph.svelte';
 
   export let group: EventGroup;
   export let onClick: () => void;
@@ -25,7 +25,7 @@
 </script>
 
 <div
-  class="flex h-10 cursor-pointer select-none max-h-[{gap}px] h-[{gap}px] w-full min-w-max grow items-center px-4 py-0 text-white hover:bg-indigo-400"
+  class="flex h-10 cursor-pointer select-none max-h-[{historyGap}px] h-[{historyGap}px] w-full min-w-max grow items-center px-4 py-0 text-white hover:bg-indigo-400"
   in:fade={{ duration: 500 }}
   on:click={onClick}
   on:focus={onClick}

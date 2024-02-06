@@ -1,9 +1,10 @@
 <script lang="ts">
-  const grabberWidth = 10;
+  const grabberWidth = 12;
 
   export let y = 150;
   export let width = 1000;
   export let onExpand: (x: number) => void;
+  export let onDoubleClick: () => void;
 
   let expanding = null;
   let start = null;
@@ -25,8 +26,8 @@
     if (!expanding) return;
 
     const delta = start - event.pageY;
-    const newX = initial.x - delta;
-    onExpand(newX);
+    const newY = initial.y - delta;
+    onExpand(newY);
     return;
   }
 </script>
@@ -39,13 +40,14 @@
   {width}
   height={grabberWidth}
   on:mousedown={startExpand}
+  on:dblclick={onDoubleClick}
   class="grip"
   class:active={!!expanding}
 />
 
 <style>
   .grip {
-    cursor: col-resize;
+    cursor: row-resize;
     fill: #475569;
   }
 

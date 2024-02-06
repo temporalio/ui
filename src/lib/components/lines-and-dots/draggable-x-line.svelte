@@ -1,5 +1,5 @@
 <script lang="ts">
-  const grabberWidth = 10;
+  const grabberWidth = 12;
 
   export let x = 150;
   export let height = 1000;

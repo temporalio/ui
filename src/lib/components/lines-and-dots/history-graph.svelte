@@ -1,5 +1,5 @@
 <script context="module">
-  export const gap = 40;
+  export const historyGap = 40;
   export const startingX = 40;
 </script>
 
@@ -71,7 +71,7 @@
   ): { nextDistance: number; offset: number; y: number } => {
     let nextDistance = 0;
     let offset = 1;
-    let y = (index + 1) * gap + gap / 2;
+    let y = (index + 1) * historyGap + historyGap / 2;
 
     const group = groups.find((g) => g.eventIds.has(event.id));
     if (!group || group.eventList.length === 1) {
@@ -84,7 +84,7 @@
       return { nextDistance, offset, y };
     }
     const diff = parseInt(nextEvent.id) - parseInt(event.id);
-    nextDistance = diff * gap;
+    nextDistance = diff * historyGap;
     return { nextDistance, offset, y };
   };
 
@@ -118,7 +118,7 @@
     {/each}
     {#each pendingActivities as pendingActivity, index}
       <HistoryLineDot
-        y={(history.length + index + 1) * gap + gap / 2}
+        y={(history.length + index + 1) * historyGap + historyGap / 2}
         offset={0}
         nextDistance={0}
         category="pending"

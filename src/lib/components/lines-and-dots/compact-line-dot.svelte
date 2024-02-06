@@ -14,75 +14,83 @@
   export let startText = '';
   export let endText = '';
   export let active = false;
-  export let onHover: () => void;
+  export let onClick: () => void;
 
   const r = 6;
-  const strokeWidth = 2;
+  const strokeWidth = 3;
+  const textLength = 120;
 
-  $: atTheEnd = canvasWidth - x < 100;
+  $: atTheEnd = canvasWidth - x < textLength;
 </script>
 
-{#if startText}
-  <text x={5} y={y + 3} class="text">{startText}</text>
-{/if}
-{#if nextX}
-  <line
-    class="line {category}"
-    class:active
-    stroke-width={strokeWidth}
-    x1={x + r}
-    x2={x + nextX - r}
-    y1={y}
-    y2={y}
-    on:mouseover={onHover}
-    on:focus={onHover}
-  />
-{/if}
-<g>
-  {#if category === 'pending'}
-    <animateTransform
-      attributeName="transform"
-      attributeType="XML"
-      type="rotate"
-      from="0 {x} {y}"
-      to="360 {x} {y}"
-      dur="2s"
-      repeatCount="indefinite"
+<g on:click={onClick} on:keydown={onClick}>
+  {#if startText}
+    <text x={5} y={y + 3} class="text" class:active>{startText}</text>
+  {/if}
+  {#if nextX}
+    <line
+      class="line {category}"
+      class:active
+      stroke-width={strokeWidth}
+      x1={x + r}
+      x2={x + nextX - r}
+      y1={y}
+      y2={y}
     />
   {/if}
-  <circle
-    class="dot {category} {classification}"
-    class:active
-    stroke-width={strokeWidth}
-    cx={x}
-    cy={y}
-    {r}
-    on:mouseover={onHover}
-    on:focus={onHover}
-  />
+  <g>
+    {#if category === 'pending'}
+      <animateTransform
+        attributeName="transform"
+        attributeType="XML"
+        type="rotate"
+        from="0 {x} {y}"
+        to="360 {x} {y}"
+        dur="2s"
+        repeatCount="indefinite"
+      />
+    {/if}
+    <circle
+      class="dot {category} {classification}"
+      class:active
+      stroke-width={strokeWidth}
+      cx={x}
+      cy={y}
+      {r}
+    />
+  </g>
+  {#if endText}
+    <text
+      x={atTheEnd ? x - textLength : x + r + 5}
+      y={atTheEnd ? y + 14 : y + 3}
+      textLength={atTheEnd ? textLength : 0}
+      class="text"
+      class:active>{endText}</text
+    >
+  {/if}
 </g>
-{#if endText}
-  <text
-    x={atTheEnd ? x - 100 : x + r + 5}
-    y={atTheEnd ? y + 14 : y + 3}
-    textLength={atTheEnd ? 100 : 'none'}
-    class="text">{endText}</text
-  >
-{/if}
 
 <style lang="postcss">
-  .line {
-    opacity: 0.1;
+  g {
+    outline: none;
+  }
+
+  .line,
+  .dot,
+  .text {
+    cursor: pointer;
+    opacity: 0.25;
+    outline: none;
   }
 
   .text {
     fill: white;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .dot {
     fill: #2d323e;
-    opacity: 0.1;
+    z-index: 2;
   }
 
   .pending {
