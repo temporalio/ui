@@ -2,88 +2,100 @@
   import type {
     EventClassification,
     EventTypeCategory,
+    PendingActivity,
+    WorkflowEvent,
   } from '$lib/types/events';
-
-  import { startingX } from './history-graph.svelte';
+  import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
 
   export let y: number = 20;
   export let category: EventTypeCategory | 'pending';
   export let classification: EventClassification | undefined = undefined;
 
+  export let event: WorkflowEvent | PendingActivity;
+  export let startingX: number;
   export let nextDistance = 0;
   export let offset = 1;
   export let connectLine = true;
   export let active = false;
-  export let onHover: () => void;
+  export let onClick: (x: WorkflowEvent | PendingActivity) => void;
 
-  const r = 6;
-  const x = startingX;
+  const r = 3;
   const strokeWidth = 2;
   $: horizontalOffset = category === 'workflow' ? 0 : (offset / 1.5) * 3 * r;
 </script>
 
-{#if category !== 'workflow' && connectLine}
-  <line
-    class="line {category}"
-    class:active
-    stroke-width={strokeWidth}
-    x1={x}
-    x2={x + horizontalOffset - r}
-    y1={y}
-    y2={y}
-    on:mouseover={onHover}
-    on:focus={onHover}
-  />
-{/if}
-<g>
-  {#if category === 'pending'}
-    <animateTransform
-      attributeName="transform"
-      attributeType="XML"
-      type="rotate"
-      from="0 {x + horizontalOffset} {y}"
-      to="360 {x + horizontalOffset} {y}"
-      dur="2s"
-      repeatCount="indefinite"
+<g on:click={() => onClick(event)} on:keypress={() => onClick(event)}>
+  {#if event}<text class="text" class:active x={5} y={y + 3}
+      ><tspan>{event.id}</tspan><tspan x={event.id.length * 5 + 10}
+        >{spaceBetweenCapitalLetters(event?.name || 'Pending')}</tspan
+      ></text
+    >{/if}
+  {#if category !== 'workflow' && connectLine}
+    <line
+      class="line {category}"
+      class:active
+      stroke-width={strokeWidth}
+      x1={startingX}
+      x2={startingX + horizontalOffset - r}
+      y1={y}
+      y2={y}
     />
   {/if}
-  <circle
-    class="dot {category} {classification}"
-    class:active
-    stroke-width={strokeWidth}
-    cx={x + horizontalOffset}
-    cy={y}
-    {r}
-    on:mouseover={onHover}
-    on:focus={onHover}
-  />
+  <g>
+    {#if category === 'pending'}
+      <animateTransform
+        attributeName="transform"
+        attributeType="XML"
+        type="rotate"
+        from="0 {startingX + horizontalOffset} {y}"
+        to="360 {startingX + horizontalOffset} {y}"
+        dur="2s"
+        repeatCount="indefinite"
+      />
+    {/if}
+    <circle
+      class="dot {category} {classification}"
+      class:active
+      stroke-width={strokeWidth}
+      cx={startingX + horizontalOffset}
+      cy={y}
+      {r}
+    />
+  </g>
+  {#if nextDistance}
+    <line
+      class="line {category}"
+      class:active
+      stroke-width={strokeWidth}
+      x1={startingX + horizontalOffset + r / 2 - strokeWidth}
+      x2={startingX + horizontalOffset + r / 2 - strokeWidth}
+      y1={y + r}
+      y2={y + nextDistance - r}
+    />
+  {/if}
 </g>
-{#if nextDistance}
-  <line
-    class="line {category}"
-    class:active
-    stroke-width={strokeWidth}
-    x1={x + horizontalOffset + r / 2 - strokeWidth}
-    x2={x + horizontalOffset + r / 2 - strokeWidth}
-    y1={y + r}
-    y2={y + nextDistance - r}
-    on:mouseover={onHover}
-    on:focus={onHover}
-  />
-{/if}
 
 <style lang="postcss">
-  .line {
-    opacity: 0.35;
+  g {
+    outline: none;
+  }
+
+  .line,
+  .dot,
+  .text {
+    cursor: pointer;
+    opacity: 0.25;
+    outline: none;
   }
 
   .dot {
+    opacity: 0.5;
     fill: #2d323e;
-    opacity: 0.35;
   }
 
-  .pending {
-    stroke-dasharray: 2;
+  .text {
+    fill: white;
+    font-size: 8px;
   }
 
   .active {
@@ -106,10 +118,15 @@
     fill: #ec4899;
   }
 
-  .activity,
-  .pending {
+  .activity {
     stroke: #a78bfa;
     fill: #a78bfa;
+  }
+
+  .pending {
+    stroke: #a78bfa;
+    stroke-dasharray: 2;
+    fill: none;
   }
 
   .child-workflow {

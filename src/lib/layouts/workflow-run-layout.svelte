@@ -6,6 +6,7 @@
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import Header from '$lib/layouts/workflow-header.svelte';
+  import { toEventHistory } from '$lib/models/event-history';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchAllEvents } from '$lib/services/events-service';
   import {
@@ -103,6 +104,10 @@
       workflowId,
       runId,
       sort: 'ascending',
+      onUpdate: (full, current) => {
+        const next = current.history.events;
+        $fullEventHistory = [...$fullEventHistory, ...toEventHistory(next)];
+      },
     });
   };
 

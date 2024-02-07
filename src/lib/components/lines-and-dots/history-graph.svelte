@@ -1,6 +1,5 @@
 <script context="module">
-  export const historyGap = 40;
-  export const startingX = 40;
+  export const historyGap = 20;
 </script>
 
 <script lang="ts">
@@ -14,18 +13,19 @@
     WorkflowEvents,
   } from '$lib/types/events';
 
+  import DetailsDrawer from './details-drawer.svelte';
   import HistoryLineDot from './history-line-dot.svelte';
   import Line from './line.svelte';
 
   export let history: WorkflowEvents;
   export let groups: EventGroups;
   export let pendingActivities: PendingActivity[];
-  export let canvasHeight = 1000;
-  export let canvasWidth = 150;
-  export let activeGroup: EventGroup;
-  export let activeEvent: WorkflowEvent | 'input' | 'results' = 'input';
-  export let onHover: (workflow: WorkflowEvent | PendingActivity) => void;
+  export let activeGroup: EventGroup | undefined = undefined;
+  export let activeEvent: WorkflowEvent | undefined = undefined;
+  export let onClick: (workflow: WorkflowEvent | PendingActivity) => void;
+  export let clearActive: () => void;
 
+  let maxOffset = 1;
   const isMiddleEvent = (event: WorkflowEvent): boolean => {
     const group = groups.find((g) => g.eventIds.has(event.id));
     if (!group) return false;
@@ -80,6 +80,7 @@
     const currentIndex = group.eventList.indexOf(event);
     const nextEvent = group.eventList[currentIndex + 1];
     offset = getOpenGroups(event);
+    if (offset > maxOffset) maxOffset = offset;
     if (!nextEvent) {
       return { nextDistance, offset, y };
     }
@@ -95,17 +96,32 @@
       return activeEvent.id === event?.id;
     } else return true;
   };
+
+  $: startingX = (history[history.length - 1]?.id?.length || 1) * 5 + 200;
+  $: canvasHeight =
+    historyGap * 2 + historyGap * (history.length + pendingActivities.length);
+  $: canvasWidth = Math.max((maxOffset / 1.5) * 3 * 6, 1000) - startingX;
+  $: drawerY = activeEvent
+    ? (history.indexOf(activeEvent) + 1) * historyGap + historyGap / 2
+    : 0;
+
+  $: {
+    console.log('drawerY: ', drawerY);
+    console.log('canvasHeight: ', canvasHeight);
+    console.log('canvasWidth: ', canvasWidth);
+  }
 </script>
 
-<div style="width: {canvasWidth}px; min-width: {canvasWidth}px;">
-  <svg width={1000} viewBox="0 0 1000 {canvasHeight}">
-    <Line x={startingX} y1={0} y2={canvasHeight} />
+<div class="relative h-auto w-full rounded bg-slate-950">
+  <svg class="w-full" viewBox="0 0 {canvasWidth} {canvasHeight}">
     {#each history as event, index (event.id)}
       {@const { nextDistance, offset, y } = getNextDistanceAndOffset(
         event,
         index,
       )}
       <HistoryLineDot
+        {event}
+        {startingX}
         {y}
         {offset}
         {nextDistance}
@@ -113,19 +129,30 @@
         classification={event.classification}
         connectLine={!isMiddleEvent(event)}
         active={isActive(event)}
-        onHover={() => onHover(event)}
+        {onClick}
       />
     {/each}
     {#each pendingActivities as pendingActivity, index}
       <HistoryLineDot
+        event={pendingActivity}
+        {startingX}
         y={(history.length + index + 1) * historyGap + historyGap / 2}
         offset={0}
         nextDistance={0}
         category="pending"
         active={isActive(pendingActivity)}
-        onHover={() => onHover(pendingActivity)}
+        {onClick}
       />
     {/each}
-    <slot />
+    <Line x={startingX} y1={0} y2={canvasHeight} />
   </svg>
+  {#if activeEvent}
+    <DetailsDrawer
+      y={drawerY * 2}
+      {activeEvent}
+      {activeGroup}
+      {clearActive}
+      compact={false}
+    />
+  {/if}
 </div>

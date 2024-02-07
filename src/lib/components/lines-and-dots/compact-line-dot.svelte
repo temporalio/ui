@@ -1,22 +1,25 @@
 <script lang="ts">
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type {
     EventClassification,
     EventTypeCategory,
+    WorkflowEvent,
   } from '$lib/types/events';
+  import { capitalize } from '$lib/utilities/format-camel-case';
 
   export let y: number = 20;
   export let category: EventTypeCategory | 'pending';
   export let classification: EventClassification | undefined = undefined;
 
+  export let group: EventGroup;
+  export let event: WorkflowEvent;
   export let x = 0;
   export let nextX = 0;
   export let canvasWidth: number;
-  export let startText = '';
-  export let endText = '';
   export let active = false;
   export let onClick: () => void;
 
-  const r = 6;
+  const r = 3;
   const strokeWidth = 3;
   const textLength = 120;
 
@@ -24,8 +27,10 @@
 </script>
 
 <g on:click={onClick} on:keydown={onClick}>
-  {#if startText}
-    <text x={5} y={y + 3} class="text" class:active>{startText}</text>
+  {#if group}
+    <text x={5} y={y + 3} class="text" class:active
+      >{capitalize(group?.label || group?.category || group?.name)}</text
+    >
   {/if}
   {#if nextX}
     <line
@@ -59,13 +64,13 @@
       {r}
     />
   </g>
-  {#if endText}
+  {#if group && !nextX}
     <text
       x={atTheEnd ? x - textLength : x + r + 5}
       y={atTheEnd ? y + 14 : y + 3}
       textLength={atTheEnd ? textLength : 0}
       class="text"
-      class:active>{endText}</text
+      class:active>{group?.name}</text
     >
   {/if}
 </g>
@@ -85,7 +90,7 @@
 
   .text {
     fill: white;
-    font-size: 12px;
+    font-size: 10px;
   }
 
   .dot {

@@ -1,19 +1,6 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
-  import DetailsDrawer from '$lib/components/lines-and-dots/details-drawer.svelte';
-  import DraggableXLine from '$lib/components/lines-and-dots/draggable-x-line.svelte';
-  import DraggableYLine from '$lib/components/lines-and-dots/draggable-y-line.svelte';
-  import EventRow from '$lib/components/lines-and-dots/event-row.svelte';
-  import GroupRow from '$lib/components/lines-and-dots/group-row.svelte';
-  import EventGraph, {
-    historyGap,
-  } from '$lib/components/lines-and-dots/history-graph.svelte';
-  import InputAndResultRow from '$lib/components/lines-and-dots/input-and-result-row.svelte';
-  import PendingActivityRow from '$lib/components/lines-and-dots/pending-activity-row.svelte';
-  import TimelineGraph, {
-    compactGap,
-  } from '$lib/components/lines-and-dots/timeline-graph.svelte';
+  import EventGraph from '$lib/components/lines-and-dots/history-graph.svelte';
+  import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
@@ -26,32 +13,20 @@
   import { namespaces } from '$lib/stores/namespaces';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
-  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
   $: ({ workflow } = $workflowRun);
   $: groups = groupEvents($fullEventHistory);
-  $: workflowEvents =
-    getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
   $: pendingActivities = workflow?.pendingActivities;
 
-  let activeGroup: undefined | EventGroup;
-  let activeEvent: WorkflowEvent | 'input' | 'results' | undefined;
+  let activeGroup: EventGroup | undefined = undefined;
+  let activeEvent: WorkflowEvent | undefined = undefined;
 
   // let showDownloadPrompt = false;
 
   const clearActives = () => {
     activeGroup = undefined;
     activeEvent = undefined;
-  };
-
-  const setInputOrResults = (type: 'input' | 'results') => {
-    if (type === activeEvent) {
-      clearActives();
-    } else {
-      activeEvent = type;
-      activeGroup = undefined;
-    }
   };
 
   const setActiveEvent = (event: WorkflowEvent | PendingActivity) => {
@@ -72,37 +47,8 @@
     }
   };
 
-  const onXExpand = (x: number) => {
-    if (x >= 10 && x < 990) {
-      canvasWidth = x;
-    }
-  };
-
-  const onDoubleClick = () => {
-    const max = compactGap * 2 + compactGap * groups.length;
-    if (canvasHeight === max) {
-      canvasHeight = 250;
-    } else {
-      canvasHeight = max;
-    }
-  };
-
-  const onYExpand = (y: number) => {
-    if (y >= 10 && y < compactGap * 2 + compactGap * groups.length) {
-      canvasHeight = y;
-    }
-  };
-
-  let compactCanvasWidth;
-  let canvasWidth = 100;
-
   $: compact = $eventViewType === 'compact';
-  $: canvasHeight = compact
-    ? 250
-    : historyGap * 2 +
-      historyGap * ($fullEventHistory.length + pendingActivities.length);
   $: workflow, compact, clearActives();
-  $: drawerOpen = activeEvent || activeGroup;
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
     $fullEventHistory,
@@ -137,100 +83,26 @@
       ></ToggleButton> -->
     </ToggleButtons>
   </div>
-  <div
-    class="flex w-full flex-col gap-0 rounded bg-slate-950"
-    bind:clientWidth={compactCanvasWidth}
-  >
-    {#if compact}
-      <TimelineGraph
-        {workflow}
-        canvasWidth={compactCanvasWidth}
-        {canvasHeight}
-        {groups}
-        {pendingActivities}
-        {activeGroup}
-        {activeEvent}
-        onClick={setActiveGroup}
-      >
-        <DraggableYLine
-          y={canvasHeight}
-          width={compactCanvasWidth}
-          onExpand={onYExpand}
-          {onDoubleClick}
-        />
-      </TimelineGraph>
-    {/if}
-    <div class="flex w-full flex-col gap-0">
-      <div class="flex gap-0 rounded border-2 {compact && 'border-t-0'}">
-        {#if !compact}
-          <EventGraph
-            history={$fullEventHistory}
-            {groups}
-            {pendingActivities}
-            {canvasHeight}
-            {canvasWidth}
-            {activeGroup}
-            {activeEvent}
-            onHover={noop}
-          >
-            <DraggableXLine
-              x={canvasWidth}
-              height={canvasHeight}
-              onExpand={onXExpand}
-            />
-          </EventGraph>
-        {/if}
-        <div class="relative flex w-full shrink gap-0 bg-slate-800">
-          <div class="w-full">
-            <InputAndResultRow
-              type="input"
-              content={workflowEvents.input}
-              onClick={() => setInputOrResults('input')}
-              active={activeEvent === 'input'}
-            />
-            {#if compact}
-              {#each groups as group}
-                <GroupRow
-                  {group}
-                  onClick={() => setActiveGroup(group)}
-                  active={activeGroup?.id === group.id}
-                />
-              {/each}
-            {:else}
-              {#each $fullEventHistory as event}
-                <EventRow
-                  {event}
-                  onClick={setActiveEvent}
-                  active={activeEvent?.id === event.id ||
-                    Boolean(activeGroup?.eventIds?.has(event.id))}
-                />
-              {/each}
-            {/if}
-            {#each pendingActivities as pendingActivity}
-              <PendingActivityRow
-                {pendingActivity}
-                onClick={setActiveEvent}
-                active={pendingActivity.activityId === activeEvent?.activityId}
-              />
-            {/each}
-            <InputAndResultRow
-              type="result"
-              content={workflowEvents.results}
-              onClick={() => setInputOrResults('results')}
-              active={activeEvent === 'results'}
-            />
-          </div>
-          {#if drawerOpen}
-            <DetailsDrawer
-              {activeEvent}
-              {activeGroup}
-              {workflowEvents}
-              {workflow}
-              {compact}
-            />
-          {/if}
-        </div>
-      </div>
-    </div>
-  </div>
+
+  {#if compact}
+    <TimelineGraph
+      {workflow}
+      {groups}
+      {pendingActivities}
+      {activeGroup}
+      {activeEvent}
+      onClick={setActiveGroup}
+      clearActive={clearActives}
+    />
+  {:else}
+    <EventGraph
+      history={$fullEventHistory}
+      {groups}
+      {pendingActivities}
+      {activeGroup}
+      {activeEvent}
+      onClick={setActiveEvent}
+      clearActive={clearActives}
+    />
+  {/if}
 </div>

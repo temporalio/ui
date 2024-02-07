@@ -11,10 +11,10 @@
   } from '$lib/models/event-groups/event-groups';
   import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { capitalize } from '$lib/utilities/format-camel-case';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
 
   import CompactLineDot from './compact-line-dot.svelte';
+  import DetailsDrawer from './details-drawer.svelte';
   import Line from './line.svelte';
 
   export let workflow: WorkflowExecution;
@@ -23,9 +23,10 @@
 
   export let canvasWidth: number = 1000;
   export let canvasHeight: number = 10;
-  export let activeGroup: EventGroup;
-  export let activeEvent: WorkflowEvent | 'input' | 'results' = 'input';
-  export let onClick: (workflow: WorkflowEvent | PendingActivity) => void;
+  export let activeGroup: EventGroup | undefined = undefined;
+  export let activeEvent: WorkflowEvent | undefined = undefined;
+  export let onClick: (event: EventGroup) => void;
+  export let clearActive: () => void;
 
   $: startTime = workflow.startTime;
   $: endTime = workflow.isRunning ? Date.now() : workflow.endTime;
@@ -74,18 +75,24 @@
       return activeEvent.id === event?.id;
     } else return true;
   };
+
+  $: canvasHeight = compactGap * 2 + compactGap * groups.length;
+  $: canvasWidth = 1000 - gutterStart;
+  $: drawerY = activeGroup
+    ? (groups.indexOf(activeGroup) + 1) * compactGap + compactGap / 2
+    : 0;
 </script>
 
-<div
-  style="width: {canvasWidth}px; min-width: {canvasWidth}px; height: {canvasHeight}px; min-height: {canvasHeight}px;"
->
-  <svg height={canvasHeight} viewBox="0 0 {canvasWidth} {canvasHeight}">
+<div class="relative w-full rounded bg-slate-950">
+  <svg class="w-full" viewBox="0 0 {canvasWidth} {canvasHeight}">
     <Line x={gutterStart} y1={0} y2={canvasHeight} />
     <Line x={finishingX} y1={0} y2={canvasHeight} />
     {#each groups as group, index (group.id)}
-      {#each group.eventList as event, i (event.id)}
+      {#each group.eventList as event (event.id)}
         {@const { x, nextX } = getNextEventDistance(event, group)}
         <CompactLineDot
+          {group}
+          {event}
           y={(index + 1) * compactGap + compactGap / 2}
           x={gutterStart + x}
           {canvasWidth}
@@ -94,13 +101,17 @@
           classification={event.classification}
           active={isActive(event)}
           onClick={() => onClick(group)}
-          startText={i === 0
-            ? capitalize(group?.label || group?.category || group?.name)
-            : ''}
-          endText={i === group.eventList.length - 1 ? group?.name : ''}
         />
       {/each}
     {/each}
-    <slot />
   </svg>
+  {#if activeGroup}
+    <DetailsDrawer
+      y={drawerY}
+      {activeEvent}
+      {activeGroup}
+      {clearActive}
+      compact
+    />
+  {/if}
 </div>
