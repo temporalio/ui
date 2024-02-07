@@ -1,5 +1,6 @@
 <script lang="ts">
   import EventGraph from '$lib/components/lines-and-dots/history-graph.svelte';
+  import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
@@ -84,25 +85,28 @@
     </ToggleButtons>
   </div>
 
-  {#if compact}
-    <TimelineGraph
-      {workflow}
-      {groups}
-      {pendingActivities}
-      {activeGroup}
-      {activeEvent}
-      onClick={setActiveGroup}
-      clearActive={clearActives}
-    />
-  {:else}
-    <EventGraph
-      history={$fullEventHistory}
-      {groups}
-      {pendingActivities}
-      {activeGroup}
-      {activeEvent}
-      onClick={setActiveEvent}
-      clearActive={clearActives}
-    />
-  {/if}
+  <div class="flex flex-col gap-0">
+    <InputAndResults history={$fullEventHistory} />
+    {#if compact}
+      <TimelineGraph
+        {workflow}
+        {groups}
+        {pendingActivities}
+        {activeGroup}
+        {activeEvent}
+        onClick={setActiveGroup}
+        clearActive={clearActives}
+      />
+    {:else}
+      <EventGraph
+        history={$fullEventHistory}
+        {groups}
+        {pendingActivities}
+        {activeGroup}
+        {activeEvent}
+        onClick={setActiveEvent}
+        clearActive={clearActives}
+      />
+    {/if}
+  </div>
 </div>

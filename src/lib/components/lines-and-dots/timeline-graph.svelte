@@ -1,6 +1,6 @@
 <script context="module">
-  export const compactGap = 24;
-  export const gutterStart = 120;
+  export const compactGap = 12;
+  export const gutterStart = 20;
   export const gutterEnd = 20;
 </script>
 
@@ -83,7 +83,7 @@
     : 0;
 </script>
 
-<div class="relative w-full rounded bg-slate-950">
+<div class="relative w-full bg-slate-950">
   <svg class="w-full" viewBox="0 0 {canvasWidth} {canvasHeight}">
     <Line x={gutterStart} y1={0} y2={canvasHeight} />
     <Line x={finishingX} y1={0} y2={canvasHeight} />

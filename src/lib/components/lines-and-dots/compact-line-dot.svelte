@@ -5,7 +5,7 @@
     EventTypeCategory,
     WorkflowEvent,
   } from '$lib/types/events';
-  import { capitalize } from '$lib/utilities/format-camel-case';
+  // import { capitalize } from '$lib/utilities/format-camel-case';
 
   export let y: number = 20;
   export let category: EventTypeCategory | 'pending';
@@ -27,11 +27,11 @@
 </script>
 
 <g on:click={onClick} on:keydown={onClick}>
-  {#if group}
+  <!-- {#if group}
     <text x={5} y={y + 3} class="text" class:active
       >{capitalize(group?.label || group?.category || group?.name)}</text
     >
-  {/if}
+  {/if} -->
   {#if nextX}
     <line
       class="line {category}"
@@ -67,7 +67,7 @@
   {#if group && !nextX}
     <text
       x={atTheEnd ? x - textLength : x + r + 5}
-      y={atTheEnd ? y + 14 : y + 3}
+      y={y + 3}
       textLength={atTheEnd ? textLength : 0}
       class="text"
       class:active>{group?.name}</text

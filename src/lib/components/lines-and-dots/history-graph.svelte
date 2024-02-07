@@ -1,5 +1,5 @@
 <script context="module">
-  export const historyGap = 20;
+  export const historyGap = 12;
 </script>
 
 <script lang="ts">
@@ -112,7 +112,7 @@
   }
 </script>
 
-<div class="relative h-auto w-full rounded bg-slate-950">
+<div class="relative h-auto w-full bg-slate-950">
   <svg class="w-full" viewBox="0 0 {canvasWidth} {canvasHeight}">
     {#each history as event, index (event.id)}
       {@const { nextDistance, offset, y } = getNextDistanceAndOffset(

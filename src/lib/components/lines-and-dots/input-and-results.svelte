@@ -1,56 +1,24 @@
 <script lang="ts">
-  import CodeBlock from '$lib/holocene/code-block.svelte';
-  import { translate } from '$lib/i18n/translate';
-  import {
-    parseWithBigInt,
-    stringifyWithBigInt,
-  } from '$lib/utilities/parse-with-big-int';
+  import type { WorkflowEvents } from '$lib/types/events';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
 
-  import {
-    getPayloads,
-    parseContent,
-    parsePayloads,
-  } from './input-and-result-payloads';
-  import PayloadDecoder from '../event/payload-decoder.svelte';
+  import InputAndResultsPayload from './input-and-results-payload.svelte';
 
-  export let content: string;
+  export let history: WorkflowEvents;
   export let isRunning = true;
 
-  $: parsedContent = parseContent(content);
-  $: payloads = getPayloads(parsedContent);
-  $: showParsedContent = payloads.length > 0;
+  $: workflowEvents = getWorkflowStartedCompletedAndTaskFailedEvents(history);
 </script>
 
-<div class="flex w-full flex-col" {...$$restProps}>
-  {#if content}
-    <div class="flex h-full flex-col gap-0 overflow-scroll">
-      {#if showParsedContent}
-        <PayloadDecoder value={parsedContent} key="payloads" let:decodedValue>
-          {#each parsePayloads(decodedValue) as decodedContent}
-            <CodeBlock
-              content={stringifyWithBigInt(decodedContent)}
-              class="rounded-none"
-              copyIconTitle={translate('common.copy-icon-title')}
-              copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            />
-          {/each}
-        </PayloadDecoder>
-      {:else}
-        <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
-          <CodeBlock
-            content={decodedValue}
-            class="rounded-none"
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        </PayloadDecoder>
-      {/if}
-    </div>
-  {:else}
-    <CodeBlock
-      content={isRunning ? 'Results will appear upon completion.' : ''}
-      language="text"
-      copyable={false}
-    />
-  {/if}
+<div class="flex gap-0">
+  <InputAndResultsPayload
+    content={workflowEvents.input}
+    {isRunning}
+    title="Input"
+  />
+  <InputAndResultsPayload
+    content={workflowEvents.results}
+    {isRunning}
+    title="Results"
+  />
 </div>
