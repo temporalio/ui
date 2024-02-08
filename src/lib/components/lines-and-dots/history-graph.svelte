@@ -129,6 +129,7 @@
 
 <div class="relative h-auto w-full bg-slate-950">
   <svg viewBox="0 0 {canvasWidth} {canvasHeight}">
+    <Line x={startingX} y1={0} y2={canvasHeight} />
     {#each history as event, index (event.id)}
       {@const { nextDistance, offset, y } = getNextDistanceAndOffset(
         event,
@@ -159,7 +160,6 @@
         {onClick}
       />
     {/each}
-    <Line x={startingX} y1={0} y2={canvasHeight} />
   </svg>
   {#if activeEvent}
     <DetailsDrawer

@@ -1,5 +1,5 @@
 <script context="module">
-  export const compactGap = 12;
+  export const compactGap = 16;
   export const gutterStart = 20;
   export const gutterEnd = 20;
 </script>
@@ -84,7 +84,7 @@
 <div class="relative w-full bg-slate-950">
   <svg class="w-full" viewBox="0 0 {canvasWidth} {canvasHeight}">
     <Line x={gutterStart} y1={0} y2={canvasHeight} />
-    <Line x={finishingX} y1={0} y2={canvasHeight} />
+    <Line x={finishingX} y1={0} y2={canvasHeight} status={workflow.status} />
     {#each groups as group, index (group.id)}
       {#each group.eventList as event (event.id)}
         {@const { x, nextX } = getNextEventDistance(event, group)}

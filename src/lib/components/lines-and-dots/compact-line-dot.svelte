@@ -22,7 +22,7 @@
   const r = 3;
   const strokeWidth = 3;
 
-  $: atTheEnd = canvasWidth - x < 200;
+  $: atTheEnd = canvasWidth - x < 100;
   $: showGroupName =
     group.eventList.length === 1 ||
     (group.eventList.length > 1 && group.lastEvent.id === event.id);
