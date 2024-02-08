@@ -1,11 +1,11 @@
 <script lang="ts">
-  import WorkflowStatus from '../workflow-status.svelte';
+  import type { WorkflowStatus } from '$lib/types/workflows';
 
   export let x = 0;
   export let y1 = 0;
   export let y2 = 1000;
 
-  const strokeWidth = 2;
+  const strokeWidth = 4;
 
   export let status: WorkflowStatus | 'none' = 'none';
 </script>

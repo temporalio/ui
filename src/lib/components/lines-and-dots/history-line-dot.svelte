@@ -21,23 +21,23 @@
   export let active = false;
   export let onClick: (x: WorkflowEvent | PendingActivity) => void;
 
-  const r = 3;
-  const strokeWidth = 2;
+  const r = 6;
+  const strokeWidth = r / 2;
   $: horizontalOffset = category === 'workflow' ? 0 : (offset / 1.5) * 3 * r;
 </script>
 
 <g on:click={() => onClick(event)} on:keypress={() => onClick(event)}>
   {#if event}
     <text class="text" class:active x={5} y={y + 3}
-      ><tspan>{event.id}</tspan><tspan x={event.id.length * 5 + 10}
+      ><tspan>{event.id}</tspan><tspan x={event.id.length * 5 + 24}
         >{spaceBetweenCapitalLetters(event?.name || 'Pending')}</tspan
       ></text
     >
     <text
-      class="timestamp"
+      class="timestamp hidden lg:block"
       class:active
-      x={startingX - 110}
-      textLength={100}
+      x={startingX - 210}
+      textLength={200}
       y={y + 2}
       >{event?.timestamp
         ? formatDate(new Date(event.timestamp), $timeFormat)
@@ -114,7 +114,7 @@
 
   text {
     fill: white;
-    font-size: 8px;
+    font-size: 18px;
   }
 
   text.active {

@@ -1,5 +1,5 @@
 <script context="module">
-  export const historyGap = 12;
+  export const historyGap = 24;
 </script>
 
 <script lang="ts">
@@ -131,18 +131,16 @@
     } else return true;
   };
 
+  let canvasWidth;
   $: canvasHeight =
     historyGap * 2 + historyGap * (history.length + pendingActivities.length);
-  // $: canvasWidth = Math.max((maxOffset / 1.5) * 3 * 6, 800);
-  $: canvasWidth = 800;
-
   $: startingX = canvasWidth / 2;
   $: drawerY = activeEvent
     ? (history.indexOf(activeEvent) + 1) * historyGap + historyGap / 2
     : 0;
 </script>
 
-<div class="relative h-auto w-full bg-slate-950">
+<div class="relative h-auto w-full bg-slate-950" bind:clientWidth={canvasWidth}>
   <svg viewBox="0 0 {canvasWidth} {canvasHeight}">
     <Line x={startingX} y1={0} y2={canvasHeight} />
     {#each history as event, index (event.id)}
@@ -179,7 +177,7 @@
   </svg>
   {#if activeEvent}
     <DetailsDrawer
-      y={drawerY * 2 + 10}
+      y={drawerY + 6}
       {activeEvent}
       {activeGroup}
       {clearActive}

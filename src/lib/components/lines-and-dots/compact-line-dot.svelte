@@ -92,7 +92,7 @@
 
   .text {
     fill: white;
-    font-size: 10px;
+    font-size: 16px;
   }
 
   .dot {

@@ -74,14 +74,14 @@
     } else return true;
   };
 
+  let canvasWidth;
   $: canvasHeight = compactGap * 2 + compactGap * groups.length;
-  $: canvasWidth = 1000 - gutterStart;
   $: drawerY = activeGroup
     ? (groups.indexOf(activeGroup) + 1) * compactGap + compactGap / 2
     : 0;
 </script>
 
-<div class="relative w-full bg-slate-950">
+<div class="relative w-full bg-slate-950" bind:clientWidth={canvasWidth}>
   <svg class="w-full" viewBox="0 0 {canvasWidth} {canvasHeight}">
     <Line x={gutterStart} y1={0} y2={canvasHeight} />
     <Line x={finishingX} y1={0} y2={canvasHeight} status={workflow.status} />
