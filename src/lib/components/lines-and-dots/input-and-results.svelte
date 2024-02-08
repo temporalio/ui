@@ -1,13 +1,13 @@
 <script lang="ts">
-  import type { WorkflowEvents } from '$lib/types/events';
+  import { fullEventHistory } from '$lib/stores/events';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
 
   import InputAndResultsPayload from './input-and-results-payload.svelte';
 
-  export let history: WorkflowEvents;
   export let isRunning = true;
 
-  $: workflowEvents = getWorkflowStartedCompletedAndTaskFailedEvents(history);
+  $: workflowEvents =
+    getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
 </script>
 
 <div class="flex flex-col gap-0 border-b-4 lg:flex-row">

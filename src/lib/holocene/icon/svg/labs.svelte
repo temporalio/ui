@@ -3,7 +3,7 @@
 
   export let active = false;
 
-  $: liquidFill = active ? '#2CFA1F' : 'currentColor';
+  $: liquidFill = active ? '#444CE7' : 'currentColor';
 </script>
 
 <Svg {...$$props}>

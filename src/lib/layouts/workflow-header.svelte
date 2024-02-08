@@ -7,7 +7,6 @@
 
   import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
@@ -115,7 +114,7 @@
   );
 </script>
 
-<header class="mb-4 flex flex-col gap-1">
+<header class="mb-2 flex flex-col gap-1">
   <div class="mb-4 block">
     <Link
       href={`${routeForWorkflows({
@@ -141,7 +140,7 @@
     {/if}
   </div>
   <div
-    class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
+    class="flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
   >
     <div
       class="flex w-full flex-col justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
@@ -160,7 +159,6 @@
         />
       </h1>
       <div class="flex flex-wrap items-center gap-4">
-        <WorkflowStatus status={workflow?.status} />
         {#if workflowUsesVersioning}
           <p class="flex items-center gap-1">
             <span>{translate('workers.last-used-version')}</span
@@ -240,7 +238,7 @@
     </div>
   {/if}
   <Tabs>
-    <TabList class="flex flex-wrap gap-6" label="workflow detail">
+    <TabList class="mb-2 flex flex-wrap gap-6" label="workflow detail">
       <Tab
         label={translate('workflows.history-tab')}
         id="history-tab"
@@ -254,7 +252,8 @@
           }),
         )}
       >
-        <Badge type="blue" class="px-2 py-0">{workflow?.historyEvents}</Badge>
+        <Badge type="blurple" class="px-2 py-0">{workflow?.historyEvents}</Badge
+        >
       </Tab>
       <Tab
         label={translate('workflows.workers-tab')}
@@ -265,7 +264,9 @@
           routeForWorkers(routeParameters),
         )}
       >
-        <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
+        <Badge type="blurple" class="px-2 py-0"
+          >{workers?.pollers?.length}</Badge
+        >
       </Tab>
       <Tab
         label={translate('workflows.relationships')}
@@ -276,7 +277,7 @@
           routeForRelationships(routeParameters),
         )}
       >
-        <Badge type="blue" class="px-2 py-0"
+        <Badge type="blurple" class="px-2 py-0"
           >{workflowRelationships.relationshipCount}</Badge
         >
       </Tab>
@@ -289,7 +290,10 @@
           routeForPendingActivities(routeParameters),
         )}
       >
-        <Badge type={activitiesCanceled ? 'warning' : 'blue'} class="px-2 py-0">
+        <Badge
+          type={activitiesCanceled ? 'warning' : 'blurple'}
+          class="px-2 py-0"
+        >
           {#if activitiesCanceled}<Icon
               name="canceled"
               width={20}

@@ -58,6 +58,6 @@
   selectAllLabel={translate('common.select-all')}
   clearAllLabel={translate('common.clear-all-capitalized')}
   onChange={onOptionClick}
-  variant="ghost"
+  variant="primary"
   icon="filter"
 />

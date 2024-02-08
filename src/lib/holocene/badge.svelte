@@ -14,6 +14,7 @@
     | 'green'
     | 'blue'
     | 'purple'
+    | 'blurple'
     | 'gray';
 </script>
 
@@ -62,5 +63,9 @@
 
   .count {
     @apply h-6 w-6 min-w-max rounded-full bg-blue-700 text-white;
+  }
+
+  .blurple {
+    @apply border-blurple bg-indigo-100 text-blurple;
   }
 </style>

@@ -27,6 +27,7 @@
   export let selectAllLabel: string;
   export let clearAllLabel: string;
   export let active = false;
+  export let position = 'left';
 
   let selectedOptions = initialSelected.length ? initialSelected : options;
 
@@ -58,7 +59,7 @@
     {#if icon}<Icon class="md:hidden" name={icon} />{/if}
     <span class="max-md:hidden">{label}</span>
   </MenuButton>
-  <Menu {id} keepOpen>
+  <Menu {id} keepOpen {position}>
     {#each options as option (option)}
       {@const checked = Boolean(
         selectedOptions.find((s) => s.value === option.value),

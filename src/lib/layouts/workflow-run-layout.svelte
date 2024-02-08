@@ -128,7 +128,7 @@
   });
 </script>
 
-<div class="flex h-full flex-col gap-6">
+<div class="flex h-full flex-col gap-0">
   {#if workflowError}
     <WorkflowError error={workflowError} />
   {:else if !$workflowRun.workflow}

@@ -34,78 +34,80 @@
   } = workflowRelationships);
 </script>
 
-<div
-  class="grid grid-cols-2 items-center justify-center gap-2 lg:flex lg:flex-row"
->
-  {#if scheduleId}
-    <Card class="flex grow items-center justify-center bg-blurple text-white">
-      {translate('common.scheduled')}
-    </Card>
-  {/if}
-  <Card
-    class="flex grow items-center justify-center {parent &&
-      'bg-blurple text-white'}"
+<div class="flex flex-col gap-4">
+  <div
+    class="grid grid-cols-2 items-center justify-center gap-2 lg:flex lg:flex-row"
   >
-    {translate('workflows.parents', { count: parent ? 1 : 0 })}
-  </Card>
-  <Card
-    class="flex grow items-center justify-center {$workflowRun.workflow
-      .pendingChildren.length && 'bg-blurple text-white'}"
-  >
-    {translate('workflows.pending-children', {
-      count: $workflowRun.workflow.pendingChildren.length,
-    })}
-  </Card>
-  <Card
-    class="flex grow items-center justify-center {children.length &&
-      'bg-blurple text-white'}"
-  >
-    {translate('workflows.children', { count: children.length })}
-  </Card>
-  <Card
-    class="flex grow items-center justify-center {first &&
-      'bg-blurple text-white'}"
-  >
-    {translate('workflows.first', { count: first ? 1 : 0 })}
-  </Card>
-  <Card
-    class="flex grow items-center justify-center {previous &&
-      'bg-blurple text-white'}"
-  >
-    {translate('workflows.previous', { count: previous ? 1 : 0 })}
-  </Card>
-  <Card
-    class="flex grow items-center justify-center {next &&
-      'bg-blurple text-white'}"
-  >
-    {translate('workflows.next', { count: next ? 1 : 0 })}
-  </Card>
-</div>
-{#if hasRelationships}
-  <div class="flex w-full flex-wrap gap-4">
     {#if scheduleId}
-      <SchedulerTable {scheduleId} {namespace} />
+      <Card class="flex grow items-center justify-center bg-blurple text-white">
+        {translate('common.scheduled')}
+      </Card>
     {/if}
-    {#if parent}
-      <ParentWorkflowTable {parent} {parentNamespaceName} {namespace} />
-    {/if}
-    {#if first || previous || next}
-      <FirstPreviousNextWorkflowTable
-        {first}
-        {previous}
-        {next}
-        workflow={workflowId}
-        {namespace}
+    <Card
+      class="surface-inverse flex grow items-center justify-center {parent &&
+        'bg-blurple text-white'}"
+    >
+      {translate('workflows.parents', { count: parent ? 1 : 0 })}
+    </Card>
+    <Card
+      class="surface-inverse flex grow items-center justify-center {$workflowRun
+        .workflow.pendingChildren.length && 'bg-blurple text-white'}"
+    >
+      {translate('workflows.pending-children', {
+        count: $workflowRun.workflow.pendingChildren.length,
+      })}
+    </Card>
+    <Card
+      class="surface-inverse flex grow items-center justify-center {children.length &&
+        'bg-blurple text-white'}"
+    >
+      {translate('workflows.children', { count: children.length })}
+    </Card>
+    <Card
+      class="surface-inverse flex grow items-center justify-center {first &&
+        'bg-blurple text-white'}"
+    >
+      {translate('workflows.first', { count: first ? 1 : 0 })}
+    </Card>
+    <Card
+      class="surface-inverse flex grow items-center justify-center {previous &&
+        'bg-blurple text-white'}"
+    >
+      {translate('workflows.previous', { count: previous ? 1 : 0 })}
+    </Card>
+    <Card
+      class="surface-inverse flex grow items-center justify-center {next &&
+        'bg-blurple text-white'}"
+    >
+      {translate('workflows.next', { count: next ? 1 : 0 })}
+    </Card>
+  </div>
+  {#if hasRelationships}
+    <div class="flex w-full flex-wrap gap-4">
+      {#if scheduleId}
+        <SchedulerTable {scheduleId} {namespace} />
+      {/if}
+      {#if parent}
+        <ParentWorkflowTable {parent} {parentNamespaceName} {namespace} />
+      {/if}
+      {#if first || previous || next}
+        <FirstPreviousNextWorkflowTable
+          {first}
+          {previous}
+          {next}
+          workflow={workflowId}
+          {namespace}
+        />
+      {/if}
+    </div>
+    {#if hasChildren}
+      <ChildWorkflowsTable
+        {children}
+        pendingChildren={$workflowRun.workflow.pendingChildren}
+        namespace={$page.params.namespace}
       />
     {/if}
-  </div>
-  {#if hasChildren}
-    <ChildWorkflowsTable
-      {children}
-      pendingChildren={$workflowRun.workflow.pendingChildren}
-      namespace={$page.params.namespace}
-    />
+  {:else}
+    <p>{translate('workflows.no-relationships')}</p>
   {/if}
-{:else}
-  <p>{translate('workflows.no-relationships')}</p>
-{/if}
+</div>

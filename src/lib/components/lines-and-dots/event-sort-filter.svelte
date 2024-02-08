@@ -57,14 +57,14 @@
   <MenuButton
     active={!!value}
     hasIndicator
-    variant="ghost"
+    variant="primary"
     controls="event-date-filter-menu"
     data-testid="event-date-filter-button"
   >
     <Icon class="md:hidden" name="clock" />
     <span class="max-md:hidden">{translate('common.date-and-time')}</span>
   </MenuButton>
-  <Menu class="w-80" id="event-date-filter-menu">
+  <Menu class="w-80" id="event-date-filter-menu" position="right">
     {#each sortOptions as { option, label }}
       <MenuItem
         selected={$eventFilterSort === option}
