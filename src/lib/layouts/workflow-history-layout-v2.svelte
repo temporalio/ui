@@ -1,4 +1,6 @@
 <script lang="ts">
+  import EventSortFilter from '$lib/components/lines-and-dots/event-sort-filter.svelte';
+  import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import EventGraph from '$lib/components/lines-and-dots/history-graph.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph.svelte';
@@ -10,14 +12,14 @@
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { eventViewType } from '$lib/stores/event-view';
-  import { fullEventHistory } from '$lib/stores/events';
+  import { filteredEventHistory, fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
   $: ({ workflow } = $workflowRun);
-  $: groups = groupEvents($fullEventHistory);
+  $: groups = groupEvents($filteredEventHistory);
   $: pendingActivities = workflow?.pendingActivities;
 
   let activeGroup: EventGroup | undefined = undefined;
@@ -83,9 +85,11 @@
         on:click={() => (showDownloadPrompt = true)}
       ></ToggleButton> -->
     </ToggleButtons>
+    <EventTypeFilter {compact} />
+    <EventSortFilter {compact} />
   </div>
 
-  <div class="flex flex-col gap-0">
+  <div class="flex flex-col gap-0 bg-slate-950">
     <InputAndResults history={$fullEventHistory} />
     {#if compact}
       <TimelineGraph
@@ -99,7 +103,7 @@
       />
     {:else}
       <EventGraph
-        history={$fullEventHistory}
+        history={$filteredEventHistory}
         {groups}
         {pendingActivities}
         {activeGroup}

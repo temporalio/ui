@@ -70,6 +70,7 @@
     namespace: string,
     workflowId: string,
     runId: string,
+    sort: EventSortOrder,
   ) => {
     const { settings } = $page.data;
 
@@ -103,7 +104,7 @@
       namespace,
       workflowId,
       runId,
-      sort: 'ascending',
+      sort,
       onUpdate: (full, current) => {
         const next = current.history.events;
         $fullEventHistory = [...$fullEventHistory, ...toEventHistory(next)];
@@ -111,7 +112,8 @@
     });
   };
 
-  $: $refresh, getWorkflowAndEventHistory(namespace, workflowId, runId);
+  $: $refresh,
+    getWorkflowAndEventHistory(namespace, workflowId, runId, $eventFilterSort);
 
   onMount(() => {
     const sort = $page.url.searchParams.get('sort');

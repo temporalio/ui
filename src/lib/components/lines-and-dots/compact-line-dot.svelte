@@ -21,9 +21,11 @@
 
   const r = 3;
   const strokeWidth = 3;
-  const textLength = 120;
 
-  $: atTheEnd = canvasWidth - x < textLength;
+  $: atTheEnd = canvasWidth - x < 200;
+  $: showGroupName =
+    group.eventList.length === 1 ||
+    (group.eventList.length > 1 && group.lastEvent.id === event.id);
 </script>
 
 <g on:click={onClick} on:keydown={onClick}>
@@ -64,11 +66,11 @@
       {r}
     />
   </g>
-  {#if group && !nextX}
+  {#if showGroupName}
     <text
-      x={atTheEnd ? x - textLength : x + r + 5}
-      y={y + 3}
-      textLength={atTheEnd ? textLength : 0}
+      x={atTheEnd ? x + r : x + 2 * r}
+      text-anchor={atTheEnd ? 'end' : 'start'}
+      y={atTheEnd ? y + r * 5 : y + r}
       class="text"
       class:active>{group?.name}</text
     >
@@ -141,13 +143,16 @@
   .Failed,
   .Terminated {
     fill: #ff4518;
+    stroke: #ff4518;
   }
 
   .TimedOut {
     fill: #f88f49;
+    stroke: #f88f49;
   }
 
   .Canceled {
     fill: #fff3c6;
+    stroke: #fff3c6;
   }
 </style>

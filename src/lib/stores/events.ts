@@ -85,6 +85,21 @@ export const timelineEvents = writable(null);
 
 export const fullEventHistory = writable<WorkflowEvents>([]);
 
+const category = derived([page], ([$page]) =>
+  $page.url.searchParams.get('category'),
+);
+
+export const filteredEventHistory = derived(
+  [fullEventHistory, category],
+  ([$history, $category]) => {
+    if ($category) {
+      const types = $category.split(',');
+      return $history.filter((event) => types.includes(event.category));
+    }
+    return $history;
+  },
+);
+
 export const resetEvents = derived(fullEventHistory, (events) =>
   events.filter(isResetEvent),
 );

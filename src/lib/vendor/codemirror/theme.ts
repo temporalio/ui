@@ -1,17 +1,18 @@
 import { HighlightStyle } from '@codemirror/language';
 import { EditorView } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
-import colors from 'tailwindcss/colors';
+
+import colors from '../../../theme/colors.ts';
 
 export const TEMPORAL_THEME = EditorView.theme(
   {
     '&': {
       color: 'white',
-      backgroundColor: colors.gray['900'],
-      padding: '0.25rem',
+      backgroundColor: colors.slate['950'],
+      padding: '0.35rem',
     },
     '.cm-matchingBracket': {
-      backgroundColor: colors.gray['800'],
+      backgroundColor: colors.slate['800'],
     },
     '.cm-scroller': {
       fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
@@ -21,16 +22,16 @@ export const TEMPORAL_THEME = EditorView.theme(
       fontSize: '0.875em',
     },
     '.cm-editor&.cm-focused': {
-      outline: `1px solid ${colors.blue['700']}`,
+      outline: `1px solid ${colors.indigo['600']}`,
     },
     '&.cm-focused .cm-matchingBracket': {
-      backgroundColor: colors.gray['700'],
+      backgroundColor: colors.slate['700'],
     },
     '&.cm-focused .cm-cursor': {
       borderLeftColor: colors.white,
     },
     '&.cm-focused .cm-selectionBackground, ::selection': {
-      backgroundColor: colors.gray['700'],
+      backgroundColor: colors.slate['700'],
     },
     '.cm-gutters': {
       backgroundColor: 'transparent',
@@ -45,12 +46,12 @@ export const TEMPORAL_THEME = EditorView.theme(
 );
 
 export const TEMPORAL_SYNTAX = HighlightStyle.define([
-  { tag: tags.punctuation, color: colors.gray['200'] },
+  { tag: tags.punctuation, color: colors.slate['200'] },
   { tag: tags.string, color: colors.green['200'] },
   { tag: tags.propertyName, color: colors.purple['200'] },
   { tag: tags.bool, color: colors.indigo['200'] },
   { tag: tags.number, color: colors.indigo['200'] },
   { tag: tags.operator, color: colors.purple['400'] },
-  { tag: tags.comment, color: colors.gray['400'] },
+  { tag: tags.comment, color: colors.slate['400'] },
   { tag: tags.variableName, color: colors.green['200'] },
 ]);

@@ -10,7 +10,7 @@
   $: eventDetails = Object.entries(attributes);
 </script>
 
-<div class="flex flex-col gap-2">
+<div class="grid grid-cols-1 gap-2">
   {#each eventDetails as [key, value] (key)}
     <EventDetailsRowExpanded
       {key}

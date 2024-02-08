@@ -22,8 +22,8 @@
   $: showParsedContent = payloads.length > 0;
 </script>
 
-<div class="flex w-full grow flex-col">
-  <h3 class="mb-2 flex items-center gap-2 text-lg">
+<div class="flex w-full grow flex-col py-4 {$$restProps.class}">
+  <h3 class="flex items-center gap-2 pl-4 text-lg text-white">
     {title}
   </h3>
   <div class="flex h-full flex-col gap-0 overflow-scroll">

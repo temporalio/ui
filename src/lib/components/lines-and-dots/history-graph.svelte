@@ -59,7 +59,17 @@
         parseInt(g.initialEvent.id) < parseInt(group.initialEvent.id),
     );
 
-    if (openGroups.length === 0 && isConsecutiveGroup(group)) {
+    const pendingGroups = groups.filter(
+      (g) =>
+        !g.eventIds.has(event.id) &&
+        pendingActivities.some((p) => p.activityId === g.initialEvent.id),
+    );
+
+    if (
+      !openGroups.length &&
+      !pendingGroups.length &&
+      isConsecutiveGroup(group)
+    ) {
       group.level = 0;
     }
     group.level = openGroups.length + 2;
@@ -74,17 +84,26 @@
     let y = (index + 1) * historyGap + historyGap / 2;
 
     const group = groups.find((g) => g.eventIds.has(event.id));
-    if (!group || group.eventList.length === 1) {
+    const pendingActivity = pendingActivities.find(
+      (p) => p.activityId === event.id,
+    );
+
+    if ((!group || group.eventList.length === 1) && !pendingActivity) {
       return { nextDistance, offset, y };
     }
     const currentIndex = group.eventList.indexOf(event);
     const nextEvent = group.eventList[currentIndex + 1];
     offset = getOpenGroups(event);
     if (offset > maxOffset) maxOffset = offset;
-    if (!nextEvent) {
+    if (!nextEvent && !pendingActivity) {
       return { nextDistance, offset, y };
     }
-    const diff = parseInt(nextEvent.id) - parseInt(event.id);
+    const diff = pendingActivity
+      ? history.length -
+        parseInt(event.id) +
+        pendingActivities.indexOf(pendingActivity) +
+        1
+      : parseInt(nextEvent.id) - parseInt(event.id);
     nextDistance = diff * historyGap;
     return { nextDistance, offset, y };
   };
@@ -97,23 +116,19 @@
     } else return true;
   };
 
-  $: startingX = (history[history.length - 1]?.id?.length || 1) * 5 + 200;
   $: canvasHeight =
     historyGap * 2 + historyGap * (history.length + pendingActivities.length);
-  $: canvasWidth = Math.max((maxOffset / 1.5) * 3 * 6, 1000) - startingX;
+  // $: canvasWidth = Math.max((maxOffset / 1.5) * 3 * 6, 800);
+  $: canvasWidth = 800;
+
+  $: startingX = canvasWidth / 2;
   $: drawerY = activeEvent
     ? (history.indexOf(activeEvent) + 1) * historyGap + historyGap / 2
     : 0;
-
-  $: {
-    console.log('drawerY: ', drawerY);
-    console.log('canvasHeight: ', canvasHeight);
-    console.log('canvasWidth: ', canvasWidth);
-  }
 </script>
 
 <div class="relative h-auto w-full bg-slate-950">
-  <svg class="w-full" viewBox="0 0 {canvasWidth} {canvasHeight}">
+  <svg viewBox="0 0 {canvasWidth} {canvasHeight}">
     {#each history as event, index (event.id)}
       {@const { nextDistance, offset, y } = getNextDistanceAndOffset(
         event,
@@ -148,7 +163,7 @@
   </svg>
   {#if activeEvent}
     <DetailsDrawer
-      y={drawerY * 2}
+      y={drawerY * 2 + 10}
       {activeEvent}
       {activeGroup}
       {clearActive}

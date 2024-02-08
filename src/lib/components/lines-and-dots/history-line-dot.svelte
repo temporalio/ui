@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { timeFormat } from '$lib/stores/time-format';
   import type {
     EventClassification,
     EventTypeCategory,
@@ -6,6 +7,7 @@
     WorkflowEvent,
   } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
+  import { formatDate } from '$lib/utilities/format-date';
 
   export let y: number = 20;
   export let category: EventTypeCategory | 'pending';
@@ -25,11 +27,23 @@
 </script>
 
 <g on:click={() => onClick(event)} on:keypress={() => onClick(event)}>
-  {#if event}<text class="text" class:active x={5} y={y + 3}
+  {#if event}
+    <text class="text" class:active x={5} y={y + 3}
       ><tspan>{event.id}</tspan><tspan x={event.id.length * 5 + 10}
         >{spaceBetweenCapitalLetters(event?.name || 'Pending')}</tspan
       ></text
-    >{/if}
+    >
+    <text
+      class="timestamp"
+      class:active
+      x={startingX - 110}
+      textLength={100}
+      y={y + 2}
+      >{event?.timestamp
+        ? formatDate(new Date(event.timestamp), $timeFormat)
+        : ''}</text
+    >
+  {/if}
   {#if category !== 'workflow' && connectLine}
     <line
       class="line {category}"
@@ -82,7 +96,8 @@
 
   .line,
   .dot,
-  .text {
+  .text,
+  .timestamp {
     cursor: pointer;
     opacity: 0.25;
     outline: none;
@@ -93,13 +108,17 @@
     fill: #2d323e;
   }
 
-  .text {
+  .active {
+    opacity: 1;
+  }
+
+  text {
     fill: white;
     font-size: 8px;
   }
 
-  .active {
-    opacity: 1;
+  text.active {
+    opacity: 0.85;
   }
 
   .marker,
@@ -125,7 +144,7 @@
 
   .pending {
     stroke: #a78bfa;
-    stroke-dasharray: 2;
+    stroke-dasharray: 1;
     fill: none;
   }
 
@@ -142,13 +161,16 @@
   .Failed,
   .Terminated {
     fill: #ff4518;
+    stroke: #ff4518;
   }
 
   .TimedOut {
     fill: #f88f49;
+    stroke: #f88f49;
   }
 
   .Canceled {
     fill: #fff3c6;
+    stroke: #fff3c6;
   }
 </style>

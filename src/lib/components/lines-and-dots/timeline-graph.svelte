@@ -21,8 +21,6 @@
   export let groups: EventGroups;
   export let pendingActivities: PendingActivity[];
 
-  export let canvasWidth: number = 1000;
-  export let canvasHeight: number = 10;
   export let activeGroup: EventGroup | undefined = undefined;
   export let activeEvent: WorkflowEvent | undefined = undefined;
   export let onClick: (event: EventGroup) => void;

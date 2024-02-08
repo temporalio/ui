@@ -10,11 +10,12 @@
   $: workflowEvents = getWorkflowStartedCompletedAndTaskFailedEvents(history);
 </script>
 
-<div class="flex gap-0">
+<div class="flex flex-col gap-0 border-b-4 lg:flex-row">
   <InputAndResultsPayload
     content={workflowEvents.input}
     {isRunning}
     title="Input"
+    class="border-r-4"
   />
   <InputAndResultsPayload
     content={workflowEvents.results}

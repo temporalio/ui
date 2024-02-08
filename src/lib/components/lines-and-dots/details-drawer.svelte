@@ -24,7 +24,7 @@
 </script>
 
 <div
-  class="absolute right-0 h-auto w-full bg-slate-900 lg:w-1/2"
+  class="absolute left-0 h-auto w-full bg-slate-900 lg:w-1/2"
   style="top: {y}px;"
   in:fly={{ x: 50, delay: 0, duration: 350 }}
 >
