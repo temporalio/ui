@@ -17,7 +17,7 @@
   export let startingX: number;
   export let nextDistance = 0;
   export let offset = 1;
-  export let connectLine = true;
+  export let connectLine = false;
   export let active = false;
   export let onClick: (x: WorkflowEvent | PendingActivity) => void;
 

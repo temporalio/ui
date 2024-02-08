@@ -19,17 +19,20 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
-  import { eventHistory } from '$lib/stores/events';
+  import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import { namespaces } from '$lib/stores/namespaces';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
+  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import { has } from '$lib/utilities/has';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForCallStack,
     routeForEventHistory,
     routeForPendingActivities,
+    routeForRelationships,
     routeForWorkers,
     routeForWorkflowQuery,
     routeForWorkflows,
@@ -104,6 +107,11 @@
   $: defaultVersionForSet = getDefaultVersionForSetFromABuildId(
     compatibility,
     buildId,
+  );
+  $: workflowRelationships = getWorkflowRelationships(
+    workflow,
+    $fullEventHistory,
+    $namespaces,
   );
 </script>
 
@@ -258,6 +266,19 @@
         )}
       >
         <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
+      </Tab>
+      <Tab
+        label={translate('workflows.relationships')}
+        id="relationships-tab"
+        href={routeForRelationships(routeParameters)}
+        active={pathMatches(
+          $page.url.pathname,
+          routeForRelationships(routeParameters),
+        )}
+      >
+        <Badge type="blue" class="px-2 py-0"
+          >{workflowRelationships.relationshipCount}</Badge
+        >
       </Tab>
       <Tab
         label={translate('workflows.pending-activities-tab')}

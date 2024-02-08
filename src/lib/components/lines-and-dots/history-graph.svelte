@@ -48,12 +48,20 @@
     }
   };
 
-  const getOpenGroups = (event: WorkflowEvent): number => {
+  const getOpenGroups = (
+    event: WorkflowEvent,
+    pendingActivity?: PendingActivity,
+  ): number => {
     const group = groups.find((g) => g.eventIds.has(event.id));
+    if (!group.pendingActivity && pendingActivity) {
+      group.pendingActivity = pendingActivity;
+    }
     if (group.level !== undefined) return group.level;
+
     const openGroups = groups.filter(
       (g) =>
         g.eventList.length > 1 &&
+        !g.pendingActivity &&
         !g.eventIds.has(event.id) &&
         g.eventList.some((e) => parseInt(e.id) > parseInt(event.id)) &&
         parseInt(g.initialEvent.id) < parseInt(group.initialEvent.id),
@@ -62,7 +70,8 @@
     const pendingGroups = groups.filter(
       (g) =>
         !g.eventIds.has(event.id) &&
-        pendingActivities.some((p) => p.activityId === g.initialEvent.id),
+        g.pendingActivity &&
+        parseInt(g.initialEvent.id) < parseInt(group.initialEvent.id),
     );
 
     if (
@@ -72,7 +81,8 @@
     ) {
       group.level = 0;
     }
-    group.level = openGroups.length + 2;
+    group.level = openGroups.length + pendingGroups.length + 2;
+    return group.level;
   };
 
   const getNextDistanceAndOffset = (
@@ -88,12 +98,17 @@
       (p) => p.activityId === event.id,
     );
 
-    if ((!group || group.eventList.length === 1) && !pendingActivity) {
+    if (!group) {
       return { nextDistance, offset, y };
     }
+
+    if (group.eventList.length === 1 && !pendingActivity) {
+      return { nextDistance, offset, y };
+    }
+
     const currentIndex = group.eventList.indexOf(event);
     const nextEvent = group.eventList[currentIndex + 1];
-    offset = getOpenGroups(event);
+    offset = getOpenGroups(event, pendingActivity);
     if (offset > maxOffset) maxOffset = offset;
     if (!nextEvent && !pendingActivity) {
       return { nextDistance, offset, y };
@@ -153,7 +168,8 @@
         event={pendingActivity}
         {startingX}
         y={(history.length + index + 1) * historyGap + historyGap / 2}
-        offset={0}
+        offset={groups.find((g) => g?.pendingActivity === pendingActivity)
+          ?.level || 1}
         nextDistance={0}
         category="pending"
         active={isActive(pendingActivity)}

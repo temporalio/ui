@@ -2,89 +2,110 @@
   import { page } from '$app/stores';
 
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
-  import Accordion from '$lib/holocene/accordion.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import Card from '$lib/holocene/card.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fullEventHistory } from '$lib/stores/events';
+  import { namespaces } from '$lib/stores/namespaces';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type { WorkflowIdentifier } from '$lib/types/workflows';
-  import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
+  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
   import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
   import ParentWorkflowTable from './parent-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
 
-  export let hasChildren: boolean;
-  export let hasRelationships: boolean;
-  export let first: string | undefined;
-  export let parent: WorkflowIdentifier | undefined;
-  export let parentNamespaceName: string | undefined;
-  export let children: ChildWorkflowClosedEvent[];
-  export let next: string | undefined;
-  export let previous: string | undefined;
-  export let scheduleId: string | undefined;
+  $: ({ workflow: workflowId, namespace } = $page.params);
+  $: ({ workflow } = $workflowRun);
 
-  $: ({ workflow, namespace } = $page.params);
+  $: workflowRelationships = getWorkflowRelationships(
+    workflow,
+    $fullEventHistory,
+    $namespaces,
+  );
+  $: ({
+    hasChildren,
+    hasRelationships,
+    first,
+    parent,
+    parentNamespaceName,
+    children,
+    next,
+    previous,
+    scheduleId,
+  } = workflowRelationships);
 </script>
 
-<section>
-  <Accordion
-    title={translate('workflows.relationships')}
-    data-testid="relationships-accordion"
-    icon="relationship"
+<div
+  class="grid grid-cols-2 items-center justify-center gap-2 lg:flex lg:flex-row"
+>
+  {#if scheduleId}
+    <Card class="flex grow items-center justify-center bg-blurple text-white">
+      {translate('common.scheduled')}
+    </Card>
+  {/if}
+  <Card
+    class="flex grow items-center justify-center {parent &&
+      'bg-blurple text-white'}"
   >
-    <div slot="summary" class="hidden flex-row gap-2 lg:flex">
-      {#if scheduleId}
-        <Badge type="purple">{translate('common.scheduled')}</Badge>
-      {/if}
-      <Badge type={parent ? 'purple' : 'gray'}
-        >{translate('workflows.parents', { count: parent ? 1 : 0 })}</Badge
-      >
-      <Badge
-        type={$workflowRun.workflow.pendingChildren.length ? 'purple' : 'gray'}
-        >{translate('workflows.pending-children', {
-          count: $workflowRun.workflow.pendingChildren.length,
-        })}
-      </Badge>
-      <Badge type={children.length ? 'purple' : 'gray'}
-        >{translate('workflows.children', { count: children.length })}</Badge
-      >
-      <Badge type={first ? 'purple' : 'gray'}
-        >{translate('workflows.first', { count: first ? 1 : 0 })}</Badge
-      >
-      <Badge type={previous ? 'purple' : 'gray'}>
-        {translate('workflows.previous', { count: previous ? 1 : 0 })}
-      </Badge>
-      <Badge type={next ? 'purple' : 'gray'}>
-        {translate('workflows.next', { count: next ? 1 : 0 })}
-      </Badge>
-    </div>
-    {#if hasRelationships}
-      <div class="flex w-full flex-wrap gap-4">
-        {#if scheduleId}
-          <SchedulerTable {scheduleId} {namespace} />
-        {/if}
-        {#if parent}
-          <ParentWorkflowTable {parent} {parentNamespaceName} {namespace} />
-        {/if}
-        {#if first || previous || next}
-          <FirstPreviousNextWorkflowTable
-            {first}
-            {previous}
-            {next}
-            {workflow}
-            {namespace}
-          />
-        {/if}
-      </div>
-      {#if hasChildren}
-        <ChildWorkflowsTable
-          {children}
-          pendingChildren={$workflowRun.workflow.pendingChildren}
-          namespace={$page.params.namespace}
-        />
-      {/if}
-    {:else}
-      <p>{translate('workflows.no-relationships')}</p>
+    {translate('workflows.parents', { count: parent ? 1 : 0 })}
+  </Card>
+  <Card
+    class="flex grow items-center justify-center {$workflowRun.workflow
+      .pendingChildren.length && 'bg-blurple text-white'}"
+  >
+    {translate('workflows.pending-children', {
+      count: $workflowRun.workflow.pendingChildren.length,
+    })}
+  </Card>
+  <Card
+    class="flex grow items-center justify-center {children.length &&
+      'bg-blurple text-white'}"
+  >
+    {translate('workflows.children', { count: children.length })}
+  </Card>
+  <Card
+    class="flex grow items-center justify-center {first &&
+      'bg-blurple text-white'}"
+  >
+    {translate('workflows.first', { count: first ? 1 : 0 })}
+  </Card>
+  <Card
+    class="flex grow items-center justify-center {previous &&
+      'bg-blurple text-white'}"
+  >
+    {translate('workflows.previous', { count: previous ? 1 : 0 })}
+  </Card>
+  <Card
+    class="flex grow items-center justify-center {next &&
+      'bg-blurple text-white'}"
+  >
+    {translate('workflows.next', { count: next ? 1 : 0 })}
+  </Card>
+</div>
+{#if hasRelationships}
+  <div class="flex w-full flex-wrap gap-4">
+    {#if scheduleId}
+      <SchedulerTable {scheduleId} {namespace} />
     {/if}
-  </Accordion>
-</section>
+    {#if parent}
+      <ParentWorkflowTable {parent} {parentNamespaceName} {namespace} />
+    {/if}
+    {#if first || previous || next}
+      <FirstPreviousNextWorkflowTable
+        {first}
+        {previous}
+        {next}
+        workflow={workflowId}
+        {namespace}
+      />
+    {/if}
+  </div>
+  {#if hasChildren}
+    <ChildWorkflowsTable
+      {children}
+      pendingChildren={$workflowRun.workflow.pendingChildren}
+      namespace={$page.params.namespace}
+    />
+  {/if}
+{:else}
+  <p>{translate('workflows.no-relationships')}</p>
+{/if}

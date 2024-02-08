@@ -6,7 +6,6 @@
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
-  import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
@@ -22,7 +21,6 @@
     eventViewType,
   } from '$lib/stores/event-view';
   import { decodeEventHistory, fullEventHistory } from '$lib/stores/events';
-  import { namespaces } from '$lib/stores/namespaces';
   import {
     refresh,
     workflowRun,
@@ -32,7 +30,6 @@
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
-  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
@@ -41,12 +38,6 @@
 
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
-  $: ({ workflow } = $workflowRun);
-  $: workflowRelationships = getWorkflowRelationships(
-    workflow,
-    $fullEventHistory,
-    $namespaces,
-  );
   $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
     $fullEventHistory,
     $eventFilterSort,
@@ -100,7 +91,6 @@
     <WorkflowTypedError error={workflowTaskFailedError} />
   {/if}
   <WorkflowSummary />
-  <WorkflowRelationships {...workflowRelationships} />
   <PendingActivities />
   <section>
     <Accordion

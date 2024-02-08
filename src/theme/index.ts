@@ -16,6 +16,7 @@ const variables = {
   '--color-text-information': rgb(getColor('blue', 950)),
   '--color-text-success': rgb(getColor('green', 950)),
   '--color-text-warning': rgb(getColor('yellow', 950)),
+  '--color-text-inverse': rgb(colors.offWhite),
 
   '--color-surface-primary': rgb(colors.white),
   '--color-surface-secondary': rgb(colors.offWhite),
@@ -81,7 +82,7 @@ const temporal = plugin(
       },
       '.surface-inverse': {
         backgroundColor: css('--color-surface-inverse'),
-        color: css('--color-text-primary'),
+        color: css('--color-text-inverse'),
       },
     });
   },

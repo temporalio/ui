@@ -156,6 +156,12 @@ export const routeForWorkers = (parameters: WorkflowParameters): string => {
   return `${routeForWorkflow(parameters)}/workers`;
 };
 
+export const routeForRelationships = (
+  parameters: WorkflowParameters,
+): string => {
+  return `${routeForWorkflow(parameters)}/relationships`;
+};
+
 export const routeForTaskQueue = (parameters: TaskQueueParameters): string => {
   const queue = encodeURIForSvelte(parameters.queue);
 

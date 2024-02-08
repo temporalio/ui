@@ -96,6 +96,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     category,
     classification,
     level: undefined,
+    pendingActivity: undefined,
     get eventTime() {
       return this.lastEvent?.eventTime;
     },

@@ -4,7 +4,6 @@
   import EventGraph from '$lib/components/lines-and-dots/history-graph.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph.svelte';
-  import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -13,10 +12,8 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { eventViewType } from '$lib/stores/event-view';
   import { filteredEventHistory, fullEventHistory } from '$lib/stores/events';
-  import { namespaces } from '$lib/stores/namespaces';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
-  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
   $: ({ workflow } = $workflowRun);
   $: groups = groupEvents($filteredEventHistory);
@@ -52,16 +49,10 @@
 
   $: compact = $eventViewType === 'compact';
   $: workflow, compact, clearActives();
-  $: workflowRelationships = getWorkflowRelationships(
-    workflow,
-    $fullEventHistory,
-    $namespaces,
-  );
 </script>
 
 <div class="flex flex-col gap-2">
   <WorkflowSummary />
-  <WorkflowRelationships {...workflowRelationships} />
   <div class="flex items-center justify-start gap-4 px-4 py-2">
     <h2 class="text-xl font-medium">
       {translate('workflows.event-history')}
