@@ -75,11 +75,13 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 	}
 
 	e := echo.New()
-	e.HideBanner = cfg.HideBanner
-	e.HidePort = cfg.HidePort
+	e.HideBanner = cfg.HideLogs
+	e.HidePort = cfg.HideLogs
 
 	// Middleware
-	e.Use(middleware.Logger())
+	if !cfg.HideLogs {
+		e.Use(middleware.Logger())
+	}
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: cfg.CORS.AllowOrigins,
