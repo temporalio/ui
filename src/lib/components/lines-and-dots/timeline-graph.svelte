@@ -74,7 +74,7 @@
     } else return true;
   };
 
-  let canvasWidth;
+  let canvasWidth = 1000;
   $: canvasHeight = compactGap * 2 + compactGap * groups.length;
   $: drawerY = activeGroup
     ? (groups.indexOf(activeGroup) + 1) * compactGap + compactGap / 2

@@ -5,6 +5,9 @@
   export let y1 = 0;
   export let y2 = 1000;
 
+  $: {
+    console.log('X: ', x);
+  }
   const strokeWidth = 4;
 
   export let status: WorkflowStatus | 'none' = 'none';

@@ -30,7 +30,7 @@
 
   $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
-  $: groups = groupEvents($filteredEventHistory);
+  $: groups = groupEvents($filteredEventHistory, $eventFilterSort);
   $: pendingActivities = workflow?.pendingActivities;
 
   let activeGroup: EventGroup | undefined = undefined;

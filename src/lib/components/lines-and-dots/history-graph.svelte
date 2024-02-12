@@ -131,7 +131,7 @@
     } else return true;
   };
 
-  let canvasWidth;
+  let canvasWidth = 1000;
   $: canvasHeight =
     historyGap * 2 + historyGap * (history.length + pendingActivities.length);
   $: startingX = canvasWidth / 2;

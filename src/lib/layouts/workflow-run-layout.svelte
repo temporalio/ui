@@ -100,7 +100,8 @@
       $authUser?.accessToken,
     );
     $workflowRun = { workflow, workers, compatibility, reachability };
-    $fullEventHistory = await fetchAllEvents({
+    $fullEventHistory = [];
+    await fetchAllEvents({
       namespace,
       workflowId,
       runId,
