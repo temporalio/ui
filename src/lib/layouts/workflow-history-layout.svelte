@@ -14,15 +14,9 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fetchAllEvents } from '$lib/services/events-service';
-  import {
-    eventFilterSort,
-    type EventSortOrder,
-    eventViewType,
-  } from '$lib/stores/event-view';
+  import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { decodeEventHistory, fullEventHistory } from '$lib/stores/events';
   import {
-    refresh,
     workflowRun,
     workflowTimelineViewOpen,
   } from '$lib/stores/workflow-run';
@@ -32,7 +26,6 @@
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   let showShortcuts = false;
   let showDownloadPrompt = false;
 
@@ -42,29 +35,6 @@
     $fullEventHistory,
     $eventFilterSort,
   );
-
-  const resetFullHistory = () => {
-    $fullEventHistory = [];
-  };
-
-  const fetchEvents = async (
-    namespace: string,
-    workflowId: string,
-    runId: string,
-    view: EventView,
-    sort: EventSortOrder,
-  ) => {
-    resetFullHistory();
-    $fullEventHistory = await fetchAllEvents({
-      namespace,
-      workflowId,
-      runId,
-      sort,
-    });
-  };
-
-  $: $refresh,
-    fetchEvents(namespace, workflowId, runId, $eventViewType, $eventFilterSort);
 
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {

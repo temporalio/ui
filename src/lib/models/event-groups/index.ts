@@ -1,5 +1,9 @@
 import type { EventSortOrder } from '$lib/stores/event-view';
-import type { CommonHistoryEvent, WorkflowEvent } from '$lib/types/events';
+import type {
+  CommonHistoryEvent,
+  PendingActivity,
+  WorkflowEvent,
+} from '$lib/types/events';
 import { has } from '$lib/utilities/has';
 
 import { createEventGroup } from './create-event-group';
@@ -8,18 +12,27 @@ import { getGroupId } from './get-group-id';
 
 export { getGroupForEvent } from './get-group-for-event';
 
-const addToExistingGroup = (group: EventGroup, event: WorkflowEvent): void => {
+const addToExistingGroup = (
+  group: EventGroup,
+  event: WorkflowEvent,
+  pendingActivity: PendingActivity,
+): void => {
   if (!group) return;
 
   group.events.set(event.id, event);
   group.eventIds.add(event.id);
 
   group.timestamp = event.timestamp;
+
+  if (pendingActivity) {
+    group.pendingActivity = pendingActivity;
+  }
 };
 
 export const groupEvents = (
   events: CommonHistoryEvent[],
   sort: EventSortOrder = 'ascending',
+  pendingActivities: PendingActivity[] = [],
 ): EventGroups => {
   const groups: Record<string, EventGroup> = {};
 
@@ -27,10 +40,16 @@ export const groupEvents = (
     const id = getGroupId(event);
     const group = createEventGroup(event, events);
 
+    const pendingActivity = pendingActivities.find(
+      (p) => p.activityId === event.id,
+    );
     if (group) {
       groups[group.id] = group;
+      if (pendingActivity) {
+        group.pendingActivity = pendingActivity;
+      }
     } else {
-      addToExistingGroup(groups[id], event);
+      addToExistingGroup(groups[id], event, pendingActivity);
     }
   };
 

@@ -30,8 +30,12 @@
 
   $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
-  $: groups = groupEvents($filteredEventHistory, $eventFilterSort);
   $: pendingActivities = workflow?.pendingActivities;
+  $: groups = groupEvents(
+    $filteredEventHistory,
+    $eventFilterSort,
+    pendingActivities,
+  );
 
   let activeGroup: EventGroup | undefined = undefined;
   let activeEvent: WorkflowEvent | undefined = undefined;
@@ -124,7 +128,6 @@
       <TimelineGraph
         {workflow}
         {groups}
-        {pendingActivities}
         {activeGroup}
         {activeEvent}
         onClick={setActiveGroup}

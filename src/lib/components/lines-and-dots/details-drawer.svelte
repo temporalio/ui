@@ -14,6 +14,7 @@
   import EventDetails from './event-details.svelte';
   import PendingDetails from './pending-details.svelte';
 
+  export let canvasHeight = 0;
   export let y = 0;
   export let activeEvent: WorkflowEvent | undefined = undefined;
   export let activeGroup: EventGroup | undefined = undefined;
@@ -24,11 +25,11 @@
 </script>
 
 <div
-  class="absolute left-0 h-auto w-full bg-slate-900 lg:w-1/2"
-  style="top: {y}px;"
+  class="absolute left-0 h-auto w-full lg:w-1/2"
+  style="top: {y}; height: {canvasHeight}px;"
   in:fly={{ x: 50, delay: 0, duration: 350 }}
 >
-  <div class="sticky top-12 h-auto w-full">
+  <div class="sticky top-12 h-auto w-full bg-slate-900">
     <div class="flex flex-col gap-0">
       <div class="flex justify-between bg-blurple p-2 text-white">
         <div class="flex items-center gap-1">

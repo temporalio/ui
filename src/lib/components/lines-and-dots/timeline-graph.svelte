@@ -1,5 +1,5 @@
 <script context="module">
-  export const compactGap = 16;
+  export const compactGap = 24;
   export const gutterStart = 20;
   export const gutterEnd = 20;
 </script>
@@ -19,7 +19,6 @@
 
   export let workflow: WorkflowExecution;
   export let groups: EventGroups;
-  export let pendingActivities: PendingActivity[];
 
   export let activeGroup: EventGroup | undefined = undefined;
   export let activeEvent: WorkflowEvent | undefined = undefined;
@@ -42,11 +41,9 @@
       onlyUnderSecond: false,
     });
 
-    return distance
-      ? Math.round(
-          (distance / fullDistance) * (canvasWidth - (gutterStart + gutterEnd)),
-        )
-      : 0;
+    return Math.round(
+      (distance / fullDistance) * (canvasWidth - (gutterStart + gutterEnd)),
+    );
   };
 
   $: getNextEventDistance = (
@@ -62,23 +59,26 @@
       if (groupIndex < ids.length - 1) {
         nextX = getDistance(group.eventList[groupIndex + 1]) - x;
       }
+    } else if (group.pendingActivity) {
+      nextX = finishingX - x;
     }
+
     return { x, nextX };
   };
 
   $: isActive = (event?: WorkflowEvent | PendingActivity): boolean => {
     if (activeGroup) {
-      return activeGroup?.eventIds.has(event.id);
+      return (
+        activeGroup?.eventIds.has(event.id) ||
+        activeGroup?.pendingActivity?.id === event.id
+      );
     } else if (event && activeEvent?.id) {
       return activeEvent.id === event?.id;
     } else return true;
   };
 
   let canvasWidth = 1000;
-  $: canvasHeight = compactGap * 2 + compactGap * groups.length;
-  $: drawerY = activeGroup
-    ? (groups.indexOf(activeGroup) + 1) * compactGap + compactGap / 2
-    : 0;
+  $: canvasHeight = Math.max(compactGap * 2 + compactGap * groups.length, 200);
 </script>
 
 <div class="relative w-full bg-slate-950" bind:clientWidth={canvasWidth}>
@@ -101,11 +101,24 @@
           onClick={() => onClick(group)}
         />
       {/each}
+      {#if group.pendingActivity}
+        <CompactLineDot
+          {group}
+          event={group.pendingActivity}
+          y={(index + 1) * compactGap + compactGap / 2}
+          x={finishingX}
+          {canvasWidth}
+          category="pending"
+          classification={group.classification}
+          active={isActive(group.pendingActivity)}
+          onClick={() => onClick(group)}
+        />
+      {/if}
     {/each}
   </svg>
   {#if activeGroup}
     <DetailsDrawer
-      y={drawerY}
+      {canvasHeight}
       {activeEvent}
       {activeGroup}
       {clearActive}

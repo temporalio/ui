@@ -94,14 +94,11 @@
     let y = (index + 1) * historyGap + historyGap / 2;
 
     const group = groups.find((g) => g.eventIds.has(event.id));
-    const pendingActivity = pendingActivities.find(
-      (p) => p.activityId === event.id,
-    );
-
     if (!group) {
       return { nextDistance, offset, y };
     }
 
+    const pendingActivity = group.pendingActivity;
     if (group.eventList.length === 1 && !pendingActivity) {
       return { nextDistance, offset, y };
     }
@@ -132,12 +129,11 @@
   };
 
   let canvasWidth = 1000;
-  $: canvasHeight =
-    historyGap * 2 + historyGap * (history.length + pendingActivities.length);
+  $: canvasHeight = Math.max(
+    historyGap * 2 + historyGap * (history.length + pendingActivities.length),
+    600,
+  );
   $: startingX = canvasWidth / 2;
-  $: drawerY = activeEvent
-    ? (history.indexOf(activeEvent) + 1) * historyGap + historyGap / 2
-    : 0;
 </script>
 
 <div class="relative h-auto w-full bg-slate-950" bind:clientWidth={canvasWidth}>
@@ -177,7 +173,7 @@
   </svg>
   {#if activeEvent}
     <DetailsDrawer
-      y={drawerY + 6}
+      {canvasHeight}
       {activeEvent}
       {activeGroup}
       {clearActive}

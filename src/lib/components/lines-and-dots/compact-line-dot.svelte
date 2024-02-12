@@ -70,7 +70,7 @@
     <text
       x={atTheEnd ? x + r : x + 2 * r}
       text-anchor={atTheEnd ? 'end' : 'start'}
-      y={atTheEnd ? y + r * 5 : y + r}
+      y={atTheEnd ? y + r * 6 : y + r}
       class="text"
       class:active>{group?.name}</text
     >
@@ -100,10 +100,6 @@
     z-index: 2;
   }
 
-  .pending {
-    stroke-dasharray: 2;
-  }
-
   .active {
     opacity: 1;
   }
@@ -128,6 +124,11 @@
   .pending {
     stroke: #a78bfa;
     fill: #a78bfa;
+  }
+
+  .pending {
+    stroke-dasharray: 1;
+    fill: none;
   }
 
   .child-workflow {

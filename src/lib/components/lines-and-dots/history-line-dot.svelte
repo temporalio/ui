@@ -38,7 +38,7 @@
       class:active
       x={startingX - 210}
       textLength={200}
-      y={y + 2}
+      y={y + r}
       >{event?.timestamp
         ? formatDate(new Date(event.timestamp), $timeFormat)
         : ''}</text

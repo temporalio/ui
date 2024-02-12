@@ -27,11 +27,6 @@
 
   let loading = false;
 
-  const resetFullHistory = () => {
-    $fullEventHistory = [];
-    loading = true;
-  };
-
   const fetchEvents = async (
     namespace: string,
     workflowId: string,
@@ -39,8 +34,7 @@
   ) => {
     if ($workflowRun.workflow.id !== workflowId || !$fullEventHistory.length) {
       loading = true;
-      resetFullHistory();
-      $fullEventHistory = await fetchAllEvents({
+      await fetchAllEvents({
         namespace,
         workflowId,
         runId,
