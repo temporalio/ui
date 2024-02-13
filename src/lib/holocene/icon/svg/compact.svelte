@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Svg from './svg.svelte';
+  import Svg from '../svg.svelte';
 </script>
 
 <Svg {...$$props}>

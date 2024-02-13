@@ -3,7 +3,7 @@
 
   import { goto } from '$app/navigation';
 
-  import type { IconName } from '$lib/holocene/icon/paths';
+  import type { IconName } from '$lib/holocene/icon';
 
   import Icon from './icon/icon.svelte';
 

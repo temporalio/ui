@@ -3,8 +3,8 @@
 
   import { createEventDispatcher } from 'svelte';
 
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
   import IconButton from '../icon-button.svelte';

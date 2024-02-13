@@ -26,8 +26,8 @@
 
   import { setContext } from 'svelte';
 
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
 
   type T = $$Generic;
