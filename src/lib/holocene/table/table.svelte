@@ -18,7 +18,7 @@
   export let updating = false;
 </script>
 
-<table class={merge('{variant}', className)} {...$$restProps}>
+<table class={merge(variant, className)} {...$$restProps}>
   <slot name="caption" />
   <thead>
     <slot name="headers" />
