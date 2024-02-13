@@ -6,17 +6,18 @@ import { css, rgb } from './utilities';
 const variables = {
   '--color-primary': rgb(colors.primary),
   '--color-secondary': rgb(colors.secondary),
-  '--color-inverse': rgb(colors.primary),
+  '--color-inverse': rgb(colors.black),
+  '--color-subtle': rgb(getColor('slate', 950)),
 
   '--color-text-primary': rgb(colors.primary),
   '--color-text-secondary': rgb(colors.secondary),
+  '--color-text-inverse': rgb(colors.offWhite),
   '--color-text-subtle': rgb(getColor('slate', 900)),
   '--color-text-disabled': rgb(getColor('slate', 500)),
   '--color-text-error': rgb(getColor('red', 950)),
   '--color-text-information': rgb(getColor('blue', 950)),
   '--color-text-success': rgb(getColor('green', 950)),
   '--color-text-warning': rgb(getColor('yellow', 950)),
-  '--color-text-inverse': rgb(colors.offWhite),
 
   '--color-surface-primary': rgb(colors.white),
   '--color-surface-secondary': rgb(colors.offWhite),
@@ -94,6 +95,7 @@ const temporal = plugin(
         primary: css('--color-primary'),
         secondary: css('--color-secondary'),
         inverse: css('--color-inverse'),
+        subtle: css('--color-subtle'),
         badge: css('--color-surface-badge'),
 
         error: css('--color-surface-error'),
@@ -120,6 +122,7 @@ const temporal = plugin(
         primary: css('--color-text-primary'),
         secondary: css('--color-text-secondary'),
         disabled: css('--color-text-disabled'),
+        subtle: css('--color-text-subtle'),
 
         error: css('--color-text-error'),
         information: css('--color-text-information'),
