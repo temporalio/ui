@@ -12,15 +12,6 @@
   export let isCloud = false;
   export let activeNamespace: Namespace;
   export let linkList: Partial<Record<string, string>>;
-
-  // $: labsHoverText = `${translate('common.labs')} ${
-  //   $labsMode
-  //     ? `${translate('common.on')} - ${translate('common.experimental')}`
-  //     : translate('common.off')
-  // }`;
-  // $: labsText = `${translate('common.labs')} ${
-  //   $labsMode ? translate('common.on') : translate('common.off')
-  // }`;
 </script>
 
 <Navigation {isCloud} {linkList} aria-label={translate('common.primary')}>
@@ -56,7 +47,8 @@
       link={linkList.batchOperations}
       label={translate('batch.nav-title')}
       tooltip={translate('batch.list-page-title')}
-      icon={batchOperationIcon}
+      icon="batch-operation"
+      animate={!!$inProgressBatchOperation}
     />
   </svelte:fragment>
   <svelte:fragment slot="middle">
@@ -87,6 +79,7 @@
         link={linkList.feedback}
         label={translate('common.feedback')}
         icon="feedback"
+        external
       />
     </slot>
   </svelte:fragment>
