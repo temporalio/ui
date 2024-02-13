@@ -292,25 +292,25 @@
   }
 
   .input-container.dark {
-    @apply border-slate-400 bg-transparent text-white focus-within:border-indigo-600 focus-within:bg-primary focus-within:shadow-focus focus-within:shadow-indigo-500/50 focus-within:outline-none;
+    @apply border-subtle bg-transparent text-white focus-within:border-indigo-600 focus-within:bg-primary focus-within:shadow-focus focus-within:shadow-indigo-500/50 focus-within:outline-none;
 
     > .input {
-      @apply caret-indigo-600;
+      @apply caret-indigo-600 placeholder:text-primary/50;
     }
 
     &.disabled {
-      @apply border-slate-500 text-slate-200;
+      @apply border-subtle bg-subtle/20;
 
       > .input {
-        @apply text-slate-500 placeholder:text-slate-400;
+        @apply text-primary/50 placeholder:text-primary;
       }
 
       > .copy-icon-container {
-        @apply border-slate-500;
+        @apply border-subtle;
       }
 
       > .disabled-icon-container {
-        @apply text-slate-500;
+        @apply text-primary/50;
       }
     }
 

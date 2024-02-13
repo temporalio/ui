@@ -163,7 +163,7 @@
     }
 
     &.dark {
-      @apply hover:bg-slate-700 focus-visible:border-indigo-600 focus-visible:bg-slate-800 focus-visible:shadow-indigo-500/50;
+      @apply hover:bg-white/10 focus-visible:border-indigo-600 focus-visible:bg-white/20 focus-visible:shadow-indigo-500/50;
     }
   }
 
