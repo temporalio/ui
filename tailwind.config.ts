@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 import { fontFamily } from 'tailwindcss/defaultTheme';
 
-import temporal from './src/lib/theme';
+import temporal from './src/lib/theme/plugin';
 
 const config = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
