@@ -63,6 +63,7 @@ type (
 		HideWorkflowQueryErrors bool `yaml:"hideWorkflowQueryErrors"`
 		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
 		ForwardHeaders []string `yaml:"forwardHeaders"`
+		HideLogs       bool
 	}
 
 	CORS struct {

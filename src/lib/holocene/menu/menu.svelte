@@ -65,7 +65,7 @@
     }
 
     &.dark {
-      @apply border-slate-400 bg-primary text-white;
+      @apply border-subtle bg-primary text-white;
     }
 
     &.left {
