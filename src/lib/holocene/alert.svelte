@@ -47,7 +47,7 @@
 </script>
 
 <div
-  class={merge('alert {intent} flex', className)}
+  class={merge('alert flex', intent, className)}
   class:bold
   class:hidden
   {role}
