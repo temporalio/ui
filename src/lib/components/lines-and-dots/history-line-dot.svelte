@@ -26,7 +26,11 @@
   $: horizontalOffset = category === 'workflow' ? 0 : (offset / 1.5) * 3 * r;
 </script>
 
-<g on:click={() => onClick(event)} on:keypress={() => onClick(event)}>
+<g
+  on:click={() => onClick(event)}
+  on:keypress={() => onClick(event)}
+  class="{category} {classification}"
+>
   {#if event}
     <text class="text" class:active x={5} y={y + 3}
       ><tspan>{event.id}</tspan><tspan x={event.id.length * 5 + 24}
