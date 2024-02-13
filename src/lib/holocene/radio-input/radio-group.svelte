@@ -26,7 +26,7 @@
   });
 </script>
 
-<div class={merge('flex flex-col gap-2 ', className)} {...$$restProps}>
+<div class={merge('flex flex-col gap-2', className)} {...$$restProps}>
   {#if description}
     <p class="font-secondary text-sm font-medium">{description}</p>
   {/if}

@@ -20,7 +20,7 @@
 
 <button
   type="button"
-  class={merge('icon-button ', className)}
+  class={merge('icon-button', className)}
   on:click
   aria-label={label}
   {...$$restProps}

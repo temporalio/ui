@@ -14,7 +14,7 @@
 </script>
 
 <div
-  class={merge('tab-list ', className)}
+  class={merge('tab-list', className)}
   role="tablist"
   aria-label={label}
   {...$$restProps}

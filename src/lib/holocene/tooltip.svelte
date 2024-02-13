@@ -85,7 +85,7 @@
 {#if hide}
   <slot />
 {:else}
-  <div class={merge('wrapper relative inline-block ', className)}>
+  <div class={merge('wrapper relative inline-block', className)}>
     <slot />
     <div
       class="tooltip"

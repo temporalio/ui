@@ -82,7 +82,7 @@
   {id}
   on:close={handleCancel}
   bind:this={modalElement}
-  class={merge('body ', className)}
+  class={merge('body', className)}
   class:large
   class:hightlightNav
   aria-modal="true"

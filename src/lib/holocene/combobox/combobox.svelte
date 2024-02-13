@@ -263,7 +263,7 @@
       type="text"
       value={displayValue}
       class:disabled
-      class={merge('combobox-input ', className)}
+      class={merge('combobox-input', className)}
       role="combobox"
       autocomplete="off"
       autocapitalize="off"

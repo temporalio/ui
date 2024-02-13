@@ -106,7 +106,7 @@
   aria-controls={controls}
   aria-expanded={$open}
   aria-label={label}
-  class={merge('menu-button {variant} ', className)}
+  class={merge('menu-button {variant}', className)}
   class:unroundLeft
   class:unroundRight
   class:active

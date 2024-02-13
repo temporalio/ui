@@ -86,7 +86,7 @@
   $: disabled = disabled || copyable;
 </script>
 
-<div class={merge('flex flex-col gap-1 ', className)}>
+<div class={merge('flex flex-col gap-1', className)}>
   <label class={theme} class:required class:sr-only={labelHidden} for={id}
     >{label}</label
   >

@@ -45,7 +45,7 @@
 <div
   use:clickOutside
   on:click-outside={closeMenu}
-  class={merge('relative ', className)}
+  class={merge('relative', className)}
   {...$$restProps}
 >
   <slot {open} />

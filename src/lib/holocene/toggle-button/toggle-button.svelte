@@ -44,7 +44,7 @@
 
 <svelte:element
   this={href ? 'a' : 'button'}
-  class={merge('toggle-button ', className)}
+  class={merge('toggle-button', className)}
   class:group
   class:active={href ? $page.url.pathname.includes(base) : active}
   href={href ? href + $page.url.search : null}

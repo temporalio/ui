@@ -24,7 +24,7 @@
 
 {#if show}
   <div
-    class={merge('copy-or-filter ', className)}
+    class={merge('copy-or-filter', className)}
     on:click|preventDefault|stopPropagation={noop}
     on:keyup|preventDefault|stopPropagation={noop}
   >

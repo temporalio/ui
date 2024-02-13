@@ -40,7 +40,7 @@
   {href}
   target={newTab ? '_blank' : null}
   rel={newTab ? 'noreferrer' : null}
-  class={merge('link ', icon ? 'inline-flex' : 'inline', className)}
+  class={merge('link', icon ? 'inline-flex' : 'inline', className)}
   class:active
   on:click={onLinkClick}
   tabindex={href ? null : 0}

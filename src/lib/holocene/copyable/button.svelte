@@ -20,7 +20,7 @@
   export { className as class };
 </script>
 
-<button class={merge('copy-button ', className)} on:click {...$$restProps}>
+<button class={merge('copy-button', className)} on:click {...$$restProps}>
   <Icon
     title={copied ? copySuccessIconTitle : copyIconTitle}
     name={copied ? 'checkmark' : 'copy'}
