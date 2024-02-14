@@ -16,6 +16,7 @@
   const dispatch = createEventDispatcher<{
     change: T | string;
     filter: string;
+    close: T | string;
   }>();
 
   type ExtendedInputEvent = Event & {
@@ -131,6 +132,12 @@
   const closeList = () => {
     if (!$open) return;
     $open = false;
+    dispatch('close', selectedOption);
+    resetValueAndOptions();
+  };
+
+  const handleMenuClose = () => {
+    dispatch('close', selectedOption);
     resetValueAndOptions();
   };
 
@@ -246,7 +253,7 @@
   };
 </script>
 
-<MenuContainer {open} on:close={resetValueAndOptions}>
+<MenuContainer {open} on:close={handleMenuClose}>
   <label
     class="combobox-label {theme}"
     class:sr-only={labelHidden}
