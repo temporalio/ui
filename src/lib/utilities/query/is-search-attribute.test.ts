@@ -2,8 +2,9 @@ import { writable } from 'svelte/store';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { SearchAttributes } from '$lib/types/workflows';
+
 import { isSearchAttribute } from './is-search-attribute';
-import type { SearchAttributes } from '../../../types/workflows';
 
 const store = writable<SearchAttributes>({
   WorkflowType: 'Keyword',
