@@ -2,7 +2,7 @@ import { HighlightStyle } from '@codemirror/language';
 import { EditorView } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
 
-import colors from '../../../theme/colors.ts';
+import colors from '$lib/theme/colors.ts';
 
 export const TEMPORAL_THEME = EditorView.theme(
   {
