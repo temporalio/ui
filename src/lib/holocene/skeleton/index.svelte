@@ -1,12 +1,15 @@
+<script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
+  let className = '';
+  export { className as class };
+</script>
+
 <div
-  class="background-animate
-      w-full
-      rounded-full
-      bg-gradient-to-r
-      from-slate-100
-      via-slate-200
-      to-slate-300
-      {$$props.class}"
+  class={merge(
+    'background-animate w-full rounded-full bg-gradient-to-r from-slate-100 via-slate-200 to-slate-300',
+    className,
+  )}
 />
 
 <style lang="postcss">
