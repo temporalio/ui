@@ -11,6 +11,7 @@ export const Strings = {
   schedule: 'Schedule',
   frequency: 'Frequency',
   'schedule-spec': 'Schedule Spec',
+  'schedule-input': 'Schedule Input',
   'empty-state-title': 'No Schedules Found',
   'empty-state-description': 'Try a different search',
   'error-message-fetching': 'Error fetching schedules',

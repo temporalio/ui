@@ -183,7 +183,10 @@
           on:blur={onBlur}
         />
       </div>
-      <ScheduleInputPayload bind:input />
+      <ScheduleInputPayload
+        bind:input
+        payloads={schedule?.action?.startWorkflow?.input}
+      />
       <SchedulesCalendarView
         let:preset
         {schedule}
