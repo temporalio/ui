@@ -7,7 +7,7 @@
   import Accordion from '$lib/holocene/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import { clickOutside } from '$lib/holocene/outside-click';
+  import { clickoutside } from '$lib/holocene/outside-click';
   import { translate } from '$lib/i18n/translate';
   import {
     codecEndpoint,
@@ -76,8 +76,7 @@
 
 {#if $viewDataEncoderSettings}
   <aside
-    use:clickOutside
-    on:click-outside={() => ($viewDataEncoderSettings = false)}
+    use:clickoutside={() => ($viewDataEncoderSettings = false)}
     in:fly={{ y: -50, delay: 0, duration: 500 }}
     class="relative flex h-auto w-full flex-col gap-6 border-b border-blue-100 bg-blue-50 p-12"
   >
