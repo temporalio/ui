@@ -14,9 +14,9 @@
   type T = $$Generic;
 
   const dispatch = createEventDispatcher<{
-    change: T | string;
+    change: { value: string | T };
     filter: string;
-    close: T | string;
+    close: { selectedOption: string | T };
   }>();
 
   type ExtendedInputEvent = Event & {
@@ -132,12 +132,12 @@
   const closeList = () => {
     if (!$open) return;
     $open = false;
-    dispatch('close', selectedOption);
+    dispatch('close', { selectedOption });
     resetValueAndOptions();
   };
 
   const handleMenuClose = () => {
-    dispatch('close', selectedOption);
+    dispatch('close', { selectedOption });
     resetValueAndOptions();
   };
 
@@ -191,7 +191,7 @@
   };
 
   const handleSelectOption = (option: string | T) => {
-    dispatch('change', option);
+    dispatch('change', { value: option });
     setValue(option);
     resetValueAndOptions();
   };

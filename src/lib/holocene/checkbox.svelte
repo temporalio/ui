@@ -31,6 +31,9 @@
   export let value: T = undefined;
   export let group: T[] = undefined;
 
+  let inputElement: HTMLInputElement;
+  $: inputElement !== undefined && (inputElement.indeterminate = indeterminate);
+
   const dispatch = createEventDispatcher<{
     change: { checked: boolean; value?: T };
   }>();
@@ -77,9 +80,9 @@
       {value}
       type="checkbox"
       bind:checked
-      {indeterminate}
       {disabled}
       class:indeterminate
+      bind:this={inputElement}
       {...omit($$restProps, 'data-testid')}
     />
 
