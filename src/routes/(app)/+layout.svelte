@@ -15,6 +15,7 @@
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
   import type { NamespaceListItem } from '$lib/types/global';
+  import DarkMode from '$lib/utilities/dark-mode';
   import {
     routeForArchivalWorkfows,
     routeForBatchOperations,
@@ -103,7 +104,9 @@
   });
 </script>
 
+<DarkMode />
 <SkipNavigation />
+
 <div class="flex w-screen flex-row">
   <Toaster
     closeButtonLabel={translate('common.close')}

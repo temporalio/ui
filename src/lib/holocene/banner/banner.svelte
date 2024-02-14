@@ -18,7 +18,7 @@
     <IconButton
       on:click={() => ($bannerClosed = true)}
       data-testid="close-banner"
-      class="text-black-600 absolute top-0 right-0 mr-5 h-10 w-10"
+      class="text-black-600 absolute right-0 top-0 mr-5 h-10 w-10"
       icon="close"
       label={closeLabel}
     />

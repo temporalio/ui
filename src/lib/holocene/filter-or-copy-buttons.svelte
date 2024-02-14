@@ -56,14 +56,14 @@
 
 <style lang="postcss">
   .copy-or-filter {
-    @apply absolute right-0 top-0 bottom-0 inline-flex gap-2 px-2;
+    @apply absolute bottom-0 right-0 top-0 inline-flex gap-2 px-2;
   }
 
   .copy-or-filter-button {
-    @apply relative top-[50%] h-fit translate-y-[-50%] rounded-full bg-white p-1 text-primary hover:bg-gray-900 hover:text-white;
+    @apply surface-primary relative top-[50%] h-fit translate-y-[-50%] rounded-full p-1 text-primary hover:bg-inverse hover:text-white;
   }
 
   .filtered {
-    @apply bg-gray-900 text-white;
+    @apply bg-inverse text-white;
   }
 </style>

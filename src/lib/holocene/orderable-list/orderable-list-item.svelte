@@ -153,7 +153,7 @@
   }
 
   .orderable-item.readonly {
-    @apply bg-gray-100 bg-opacity-50;
+    @apply bg-badge bg-opacity-50;
   }
 
   hr {

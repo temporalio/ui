@@ -55,7 +55,7 @@
         <slot name="top" />
       </ul>
       <hr
-        class="my-8 w-full {isCloud ? 'stroke-gray-200' : 'stroke-gray-700'}"
+        class="my-8 w-full {isCloud ? 'stroke-slate-200' : 'stroke-slate-700'}"
       />
       <ul class="nav-section">
         <slot name="middle" />
@@ -69,8 +69,8 @@
   </div>
   <div
     class="h-4 w-full pb-12 pt-24 text-center text-[10px] {isCloud
-      ? 'text-gray-500'
-      : 'text-gray-300'}"
+      ? 'text-slate-500'
+      : 'text-slate-300'}"
   >
     {#if version}
       <span class="sr-only">{translate('common.version')}</span>
@@ -86,7 +86,7 @@
   }
 
   .nav-header.cloud {
-    @apply bg-white text-primary;
+    @apply surface-primary text-primary;
   }
 
   .nav-wrapper {
@@ -106,7 +106,7 @@
   }
 
   .cloud {
-    @apply bg-white text-gray-900;
+    @apply surface-primary text-primary;
   }
 
   .close :global(.nav-title) {
@@ -122,7 +122,7 @@
   }
 
   .nav-toggle {
-    @apply transition-left absolute top-[52px] left-[18px] hidden;
+    @apply transition-left absolute left-[18px] top-[52px] hidden;
   }
 
   .nav-header:hover .nav-toggle {

@@ -51,7 +51,7 @@
 
   .default,
   .gray {
-    @apply border-gray-900 bg-gray-100 text-gray-900;
+    @apply bg-badge text-primary;
   }
 
   .active,

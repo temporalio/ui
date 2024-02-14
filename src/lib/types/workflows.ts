@@ -1,4 +1,8 @@
-import type { Payloads, WorkflowVersionTimpstamp } from '$lib/types';
+import type {
+  Payloads,
+  WorkflowExecutionStatus,
+  WorkflowVersionTimpstamp,
+} from '$lib/types';
 
 import type {
   Payload,
@@ -14,7 +18,7 @@ import type { Optional, Replace } from './global';
 export type WorkflowExecutionInfo = Replace<
   import('$lib/types').WorkflowExecutionInfo,
   {
-    status: WorkflowStatus;
+    status: WorkflowExecutionStatus | WorkflowStatus;
     stateTransitionCount: string;
     startTime: string;
     closeTime: string;
@@ -31,8 +35,8 @@ export type ListWorkflowExecutionsResponse = Replace<
 >;
 
 export type CountWorkflowExecutionsResponse = {
-  count: string;
-  groups: { count: string; groupValues: Payloads }[];
+  count?: string;
+  groups?: { count: string; groupValues: Payloads }[];
 };
 
 export type WorkflowExecutionConfig = Replace<
@@ -52,7 +56,6 @@ export type WorkflowStatus =
   | 'TimedOut'
   | 'Completed'
   | 'Failed'
-  | 'Completed'
   | 'ContinuedAsNew'
   | 'Canceled'
   | 'Terminated'

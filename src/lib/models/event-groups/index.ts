@@ -23,7 +23,7 @@ export const groupEvents = (
 ): EventGroups => {
   const groups: Record<string, EventGroup> = {};
 
-  for (const event of events) {
+  const createGroups = (event: CommonHistoryEvent) => {
     const id = getGroupId(event);
     const group = createEventGroup(event, events);
 
@@ -31,6 +31,16 @@ export const groupEvents = (
       groups[group.id] = group;
     } else {
       addToExistingGroup(groups[id], event);
+    }
+  };
+
+  if (sort === 'ascending') {
+    for (const event of events) {
+      createGroups(event);
+    }
+  } else {
+    for (let i = events.length - 1; i >= 0; i--) {
+      createGroups(events[i]);
     }
   }
 

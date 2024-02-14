@@ -191,15 +191,15 @@
   }
 
   .suffix {
-    @apply block h-full w-fit rounded-tr rounded-br border-l px-4 py-2;
+    @apply block h-full w-fit rounded-br rounded-tr border-l px-4 py-2;
   }
 
   .unroundRight {
-    @apply rounded-tr-none rounded-br-none;
+    @apply rounded-br-none rounded-tr-none;
   }
 
   .unroundLeft {
-    @apply rounded-tl-none rounded-bl-none border-l-0;
+    @apply rounded-bl-none rounded-tl-none border-l-0;
   }
 
   .noBorder {
@@ -236,21 +236,21 @@
 
   /* Light theme styles */
   .input-container.light {
-    @apply border-primary bg-white text-primary focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50 focus-within:outline-none;
+    @apply surface-primary border-primary text-primary focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50 focus-within:outline-none;
 
     > .input {
       @apply caret-indigo-600;
     }
 
     &.disabled {
-      @apply border-gray-600 bg-gray-50 text-gray-600;
+      @apply border-slate-600 bg-slate-50 text-slate-600;
 
       > .input {
-        @apply bg-gray-50;
+        @apply bg-slate-50;
       }
 
       > .copy-icon-container {
-        @apply border-gray-600 bg-gray-200;
+        @apply border-slate-600 bg-slate-200;
       }
     }
 
@@ -276,7 +276,7 @@
     }
 
     > .icon-container {
-      @apply text-gray-400;
+      @apply text-slate-400;
     }
 
     + .hint-text.error,
@@ -292,25 +292,25 @@
   }
 
   .input-container.dark {
-    @apply border-gray-400 bg-transparent text-white focus-within:border-indigo-600 focus-within:bg-primary focus-within:shadow-focus focus-within:shadow-indigo-500/50 focus-within:outline-none;
+    @apply border-subtle bg-transparent text-white focus-within:border-indigo-600 focus-within:bg-primary focus-within:shadow-focus focus-within:shadow-indigo-500/50 focus-within:outline-none;
 
     > .input {
-      @apply caret-indigo-600;
+      @apply caret-indigo-600 placeholder:text-primary/50;
     }
 
     &.disabled {
-      @apply border-gray-500 text-gray-200;
+      @apply border-subtle bg-subtle/20;
 
       > .input {
-        @apply text-gray-500 placeholder:text-gray-400;
+        @apply text-primary/50 placeholder:text-primary;
       }
 
       > .copy-icon-container {
-        @apply border-gray-500;
+        @apply border-subtle;
       }
 
       > .disabled-icon-container {
-        @apply text-gray-500;
+        @apply text-primary/50;
       }
     }
 
@@ -336,7 +336,7 @@
     }
 
     > .icon-container {
-      @apply text-gray-200;
+      @apply text-slate-200;
     }
 
     + .hint-text.error,
