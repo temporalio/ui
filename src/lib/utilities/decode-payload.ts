@@ -19,11 +19,7 @@ import type {
 import type { Optional, Replace, Settings } from '$lib/types/global';
 
 import { atob } from './atob';
-import {
-  getCodecEndpoint,
-  getCodecIncludeCredentials,
-  getCodecPassAccessToken,
-} from './get-codec';
+import { getCodecEndpoint } from './get-codec';
 import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
@@ -146,18 +142,15 @@ export const decodePayloadAttributes = <
 };
 
 const decodePayloadWithCodec =
-  (namespace: string, settings: Settings, accessToken: string) =>
+  (settings: Settings) =>
   async (
     payloads: unknown[],
     returnDataOnly: boolean = true,
   ): Promise<unknown[]> => {
-    if (settings?.codec?.endpoint) {
+    if (getCodecEndpoint(settings)) {
       // Convert Payload data
       const awaitData = await convertPayloadsWithCodec({
         payloads: { payloads },
-        namespace,
-        settings,
-        accessToken,
       });
       return (awaitData?.payloads ?? []).map((p) =>
         decodePayload(p, returnDataOnly),
@@ -180,24 +173,8 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   settings: Settings = get(page).data.settings,
   accessToken: string = get(authUser).accessToken,
 ): Promise<EventAttribute | PotentiallyDecodable> => {
-  const endpoint = getCodecEndpoint(settings);
-  const passAccessToken = getCodecPassAccessToken(settings);
-  const includeCredentials = getCodecIncludeCredentials(settings);
-  const settingsWithLocalConfig = {
-    ...settings,
-    codec: {
-      ...settings?.codec,
-      endpoint,
-      passAccessToken,
-      includeCredentials,
-    },
-  };
+  const decode = decodePayloadWithCodec(settings);
 
-  const decode = decodePayloadWithCodec(
-    namespace,
-    settingsWithLocalConfig,
-    accessToken,
-  );
   if (anyAttributes) {
     for (const key of Object.keys(anyAttributes)) {
       if (keyIs(key, 'payloads', 'encodedAttributes') && anyAttributes[key]) {
@@ -232,7 +209,7 @@ export const cloneAllPotentialPayloadsWithCodec = async (
 ): Promise<PotentiallyDecodable | EventAttribute | WorkflowEvent | null> => {
   if (!anyAttributes) return anyAttributes;
 
-  const decode = decodePayloadWithCodec(namespace, settings, accessToken);
+  const decode = decodePayloadWithCodec(settings);
   const clone = { ...anyAttributes };
   if (anyAttributes) {
     for (const key of Object.keys(clone)) {

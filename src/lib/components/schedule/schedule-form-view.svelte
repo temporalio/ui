@@ -55,6 +55,7 @@
   let workflowType = schedule?.action?.startWorkflow?.workflowType?.name ?? '';
   let workflowId = schedule?.action?.startWorkflow?.workflowId ?? '';
   let taskQueue = schedule?.action?.startWorkflow?.taskQueue?.name ?? '';
+  let input = '';
   let daysOfWeek: string[] = [];
   let daysOfMonth: number[] = [];
   let months: string[] = [];
@@ -71,6 +72,7 @@
       workflowType,
       workflowId,
       taskQueue,
+      input,
       hour,
       minute,
       second,
@@ -103,8 +105,18 @@
     }
   };
 
+  const isValidInput = (value: string) => {
+    try {
+      JSON.parse(value);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
   $: isDisabled = (preset: SchedulePreset) => {
     if (!name || !workflowType || !workflowId || !taskQueue) return true;
+    if (input && !isValidInput(input)) return true;
     if (preset === 'interval') return !days && !hour && !minute && !second;
     if (preset === 'week') return !daysOfWeek.length;
     if (preset === 'month') return !daysOfMonth.length || !months.length;
@@ -171,7 +183,7 @@
           on:blur={onBlur}
         />
       </div>
-      <ScheduleInputPayload />
+      <ScheduleInputPayload bind:input />
       <SchedulesCalendarView
         let:preset
         {schedule}

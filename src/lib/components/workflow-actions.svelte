@@ -157,7 +157,6 @@
             passAccessToken: $passAccessToken,
           },
         },
-        accessToken: $authUser.accessToken,
       });
       signalConfirmationModalOpen = false;
       $refresh = Date.now();

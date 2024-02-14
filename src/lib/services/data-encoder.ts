@@ -1,9 +1,19 @@
+import { get } from 'svelte/store';
+
+import { page } from '$app/stores';
+
 import { translate } from '$lib/i18n/translate';
+import { authUser } from '$lib/stores/auth-user';
 import {
   setLastDataEncoderFailure,
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
 import type { NetworkError, Settings } from '$lib/types/global';
+import {
+  getCodecEndpoint,
+  getCodecIncludeCredentials,
+  getCodecPassAccessToken,
+} from '$lib/utilities/get-codec';
 import { has } from '$lib/utilities/has';
 import { validateHttps } from '$lib/utilities/is-http';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -12,20 +22,20 @@ export type PotentialPayloads = { payloads: unknown[] };
 
 export async function convertPayloadsWithCodec({
   payloads,
-  namespace,
-  settings,
-  accessToken,
+  namespace = get(page).params.namespace,
+  settings = get(page).data.settings,
+  accessToken = get(authUser).accessToken,
   encode = false,
 }: {
   payloads: PotentialPayloads;
-  namespace: string;
-  settings: Settings;
-  accessToken: string;
+  namespace?: string;
+  settings?: Settings;
+  accessToken?: string;
   encode?: boolean;
 }): Promise<PotentialPayloads> {
-  const endpoint = settings?.codec?.endpoint;
-  const passAccessToken = settings?.codec?.passAccessToken;
-  const includeCredentials = settings?.codec?.includeCredentials;
+  const endpoint = getCodecEndpoint(settings);
+  const passAccessToken = getCodecPassAccessToken(settings);
+  const includeCredentials = getCodecIncludeCredentials(settings);
 
   const headers = {
     'Content-Type': 'application/json',

@@ -65,7 +65,6 @@ type SignalWorkflowOptions = {
   signalName: string;
   signalInput: string;
   settings: Settings;
-  accessToken: string;
 };
 
 type TerminateWorkflowOptions = {
@@ -281,7 +280,6 @@ export async function signalWorkflow({
   signalName,
   signalInput,
   settings,
-  accessToken,
 }: SignalWorkflowOptions) {
   const route = routeForApi('workflow.signal', {
     namespace,
@@ -295,9 +293,6 @@ export async function signalWorkflow({
     if (settings?.codec?.endpoint) {
       const awaitData = await convertPayloadsWithCodec({
         payloads: { payloads: [JSON.parse(signalInput)] },
-        namespace,
-        settings,
-        accessToken,
         encode: true,
       });
       if (get(lastDataEncoderStatus) === 'error') {
