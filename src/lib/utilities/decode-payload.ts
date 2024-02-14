@@ -151,6 +151,7 @@ const decodePayloadWithCodec =
       // Convert Payload data
       const awaitData = await convertPayloadsWithCodec({
         payloads: { payloads },
+        settings,
       });
       return (awaitData?.payloads ?? []).map((p) =>
         decodePayload(p, returnDataOnly),
