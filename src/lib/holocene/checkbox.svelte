@@ -10,7 +10,7 @@
 
   interface $$Props extends HTMLInputAttributes {
     checked?: boolean;
-    label: string;
+    label?: string;
     labelHidden?: boolean;
     theme?: 'dark' | 'light';
     indeterminate?: boolean;
@@ -22,7 +22,7 @@
 
   export let id = '';
   export let checked = false;
-  export let label: string;
+  export let label = '';
   export let labelHidden = false;
   export let theme: 'dark' | 'light' = 'light';
   export let indeterminate = false;
@@ -95,9 +95,11 @@
       {/if}
     </span>
 
-    <span class="label" class:sr-only={labelHidden}>
-      {label}
-    </span>
+    <slot name="label">
+      <span class="label" class:sr-only={labelHidden}>
+        {label}
+      </span>
+    </slot>
   </label>
 </div>
 

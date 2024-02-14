@@ -16,6 +16,7 @@
   const dispatch = createEventDispatcher<{
     change: T | string;
     filter: string;
+    close: T | string;
   }>();
 
   type ExtendedInputEvent = Event & {
@@ -38,7 +39,8 @@
     maxSize?: number;
     'data-testid'?: string;
     theme?: 'light' | 'dark';
-    filterable?: boolean;
+    error?: string;
+    valid?: boolean;
   }
 
   type UncontrolledStringOptionProps = {
@@ -77,7 +79,8 @@
   export let minSize = 0;
   export let maxSize = 120;
   export let theme: 'light' | 'dark' = 'light';
-  export let filterable = true;
+  export let error = '';
+  export let valid = true;
 
   let displayValue: string;
   let selectedOption: string | T;
@@ -129,6 +132,12 @@
   const closeList = () => {
     if (!$open) return;
     $open = false;
+    dispatch('close', selectedOption);
+    resetValueAndOptions();
+  };
+
+  const handleMenuClose = () => {
+    dispatch('close', selectedOption);
     resetValueAndOptions();
   };
 
@@ -244,12 +253,16 @@
   };
 </script>
 
-<MenuContainer {open} on:close={resetValueAndOptions}>
-  <label class="combobox-label {theme}" class:sr-only={labelHidden} for={id}>
+<MenuContainer {open} on:close={handleMenuClose}>
+  <label
+    class="combobox-label {theme}"
+    class:sr-only={labelHidden}
+    class:invalid={!valid}
+    for={id}
+  >
     {label}
   </label>
-
-  <div class="combobox-wrapper {theme}">
+  <div class="combobox-wrapper {theme}" class:invalid={!valid}>
     {#if leadingIcon}
       <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
@@ -291,6 +304,9 @@
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
     </button>
   </div>
+  {#if error && !valid}
+    <span class="error">{error}</span>
+  {/if}
 
   <Menu
     bind:menuElement
@@ -333,15 +349,27 @@
 
     &.light {
       @apply text-primary;
+
+      &.invalid {
+        @apply text-danger;
+      }
     }
 
     &.dark {
       @apply text-white;
+
+      &.invalid {
+        @apply text-danger;
+      }
     }
   }
 
   .combobox-wrapper {
     @apply flex h-10 w-full flex-row items-center rounded-lg border border-transparent text-sm focus-within:outline-none;
+  }
+
+  .error {
+    @apply absolute text-sm text-danger;
   }
 
   .combobox-input {
@@ -355,8 +383,12 @@
   .combobox-wrapper.light {
     @apply surface-primary border-primary text-primary  focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50;
 
+    &.invalid {
+      @apply border-danger;
+    }
+
     > .combobox-input {
-      @apply surface-primary text-primary placeholder:text-slate-400;
+      @apply surface-primary text-primary placeholder:text-subtle;
     }
 
     > .combobox-button {
@@ -365,10 +397,14 @@
   }
 
   .combobox-wrapper.dark {
-    @apply border-slate-400 bg-transparent text-white focus-within:border-indigo-600 focus-within:bg-primary focus-within:shadow-focus focus-within:shadow-indigo-500/50;
+    @apply border-subtle bg-transparent text-white focus-within:border-indigo-600 focus-within:bg-primary focus-within:shadow-focus focus-within:shadow-indigo-500/50;
+
+    &.invalid {
+      @apply border-danger;
+    }
 
     > .combobox-input {
-      @apply bg-transparent text-white placeholder:text-slate-400;
+      @apply bg-transparent text-primary placeholder:text-primary/50;
     }
 
     > .combobox-button {

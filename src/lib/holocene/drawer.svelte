@@ -11,7 +11,7 @@
   export let open = false;
   export let position: 'bottom' | 'right' = 'bottom';
   export let dark = true;
-  export let onClick: () => void;
+  export let onClick: (e: MouseEvent | CustomEvent) => void;
   export let id = 'navigation-drawer';
   export let closeButtonLabel: string;
   export let closePadding: boolean = true;
@@ -40,15 +40,17 @@
   >
     <div class="relative h-full" class:pt-10={closePadding}>
       <div class="close-button-wrapper {position}">
-        <IconButton
-          data-testid="drawer-close-button"
-          label={closeButtonLabel}
-          class="stuff"
-          icon="close"
-          aria-expanded={open}
-          aria-controls="navigation-drawer"
-          on:click={onClick}
-        />
+        <slot name="close-button">
+          <IconButton
+            data-testid="drawer-close-button"
+            label={closeButtonLabel}
+            class="stuff"
+            icon="close"
+            aria-expanded={open}
+            aria-controls="navigation-drawer"
+            on:click={onClick}
+          />
+        </slot>
       </div>
       <slot />
     </div>

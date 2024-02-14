@@ -26,6 +26,7 @@
 <script lang="ts">
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
+  import { trimTrailingSlash } from '$lib/utilities/trim-trailing-slash';
 
   let endpoint = $codecEndpoint ?? '';
   let passToken = $passAccessToken ?? false;
@@ -61,7 +62,7 @@
 
   const onConfirm = () => {
     error = '';
-    $codecEndpoint = endpoint;
+    $codecEndpoint = trimTrailingSlash(endpoint);
     $passAccessToken = passToken;
     $includeCredentials = includeCreds;
     $viewDataEncoderSettings = false;

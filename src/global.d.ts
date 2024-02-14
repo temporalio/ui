@@ -6,6 +6,6 @@ declare module '@sveltejs/svelte-virtual-list';
 declare namespace svelte.JSX {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface HTMLAttributes<T> {
-    'onclick-outside': () => void;
+    'onclick-outside': (e: CustomEvent) => void;
   }
 }

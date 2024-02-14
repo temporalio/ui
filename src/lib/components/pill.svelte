@@ -26,7 +26,7 @@
   }
 
   .gray {
-    @apply bg-slate-100 text-slate-600;
+    @apply bg-badge text-slate-600;
   }
 
   .gray.active {
