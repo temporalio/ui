@@ -1,14 +1,11 @@
 <script lang="ts">
+  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import Panel from '$lib/components/panel.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { Payloads } from '$lib/types';
 
-  import PayloadDecoder from '../event/payload-decoder.svelte';
-
   export let input: Payloads;
-
-  console.log('INPUT: ', input);
 </script>
 
 <Panel>
