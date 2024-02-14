@@ -30,8 +30,10 @@
   const dispatch = createEventDispatcher<{ close: undefined }>();
 
   const closeMenu = () => {
-    dispatch('close');
-    $open = false;
+    if ($open) {
+      dispatch('close');
+      $open = false;
+    }
   };
 
   setContext<MenuContext>(MENU_CONTEXT, {
