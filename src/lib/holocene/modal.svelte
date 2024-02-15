@@ -131,11 +131,11 @@
 
 <style lang="postcss">
   .body {
-    @apply surface-primary  z-50 w-full max-w-lg overflow-y-auto rounded-lg p-0 text-primary shadow-xl md:h-max;
+    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto rounded-lg p-0 text-primary shadow-xl md:h-max;
   }
 
   .body::backdrop {
-    @apply cursor-pointer bg-inverse opacity-70;
+    @apply cursor-pointer;
   }
 
   .body.hightlightNav::backdrop {
