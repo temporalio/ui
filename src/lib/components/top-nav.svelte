@@ -74,7 +74,7 @@
     {#if showNamespaceSpecificNav}
       <DataEncoderStatus />
     {/if}
-    {#if $authUser.accessToken}
+    {#if $authUser.idToken || $authUser.accessToken}
       <MenuContainer>
         <MenuButton variant="ghost" hasIndicator controls="user-menu">
           <img

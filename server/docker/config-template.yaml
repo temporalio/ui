@@ -40,8 +40,10 @@ auth:
   providers:
   - label: {{ default .Env.TEMPORAL_AUTH_LABEL "sso" }}
     type: {{ default .Env.TEMPORAL_AUTH_TYPE "oidc" }}
+    flow: {{ default .Env.TEMPORAL_AUTH_FLOW_TYPE "authorization-code" }}
     providerUrl: {{ .Env.TEMPORAL_AUTH_PROVIDER_URL }}
     issuerUrl: {{ default .Env.TEMPORAL_AUTH_ISSUER_URL "" }}
+    authorizationUrl:: {{ default .Env.TEMPORAL_AUTH_AUTHORIZATION_URL "" }}
     clientId: {{ .Env.TEMPORAL_AUTH_CLIENT_ID }}
     clientSecret: {{ .Env.TEMPORAL_AUTH_CLIENT_SECRET }}
     callbackUrl: {{ .Env.TEMPORAL_AUTH_CALLBACK_URL }}
