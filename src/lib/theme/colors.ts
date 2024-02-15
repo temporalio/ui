@@ -159,7 +159,6 @@ const colors = {
   offBlack: '#0F172A',
   current: 'currentColor',
   transparent: 'transparent',
-  current: 'currentColor',
   danger: getColor('red', 700),
   success: getColor('green', 200),
   ...palette,
