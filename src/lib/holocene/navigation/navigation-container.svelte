@@ -40,10 +40,11 @@
     <hr class="my-8 border-subtle" />
     <slot name="middle" />
   </div>
-  <div class="space-y-2 self-center">
+
+  <div
+    class="self-center justify-self-center pb-3 text-[0.6rem] text-secondary"
+  >
     <slot name="bottom" />
-  </div>
-  <div class="self-end justify-self-center pb-3 text-[0.6rem] text-secondary">
     <span class="sr-only">{translate('common.version')}</span>
     {version}
   </div>
