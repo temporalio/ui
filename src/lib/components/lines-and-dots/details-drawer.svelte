@@ -14,8 +14,6 @@
   import EventDetails from './event-details.svelte';
   import PendingDetails from './pending-details.svelte';
 
-  export let canvasHeight = 0;
-  export let y = 0;
   export let activeEvent: WorkflowEvent | undefined = undefined;
   export let activeGroup: EventGroup | undefined = undefined;
   export let compact: boolean;
@@ -25,76 +23,71 @@
 </script>
 
 <div
-  class="absolute right-0 h-auto w-full lg:w-1/3"
-  style="top: {y}; height: {canvasHeight}px;"
+  class="flex h-full flex-col gap-0 overflow-auto border-l-4 bg-slate-900"
   in:fly={{ x: 50, delay: 0, duration: 350 }}
 >
-  <div class="sticky top-12 h-auto w-full bg-slate-900">
-    <div class="flex flex-col gap-0">
-      <div class="flex justify-between bg-blurple p-2 text-white">
-        <div class="flex items-center gap-1">
-          {activeEvent?.name
-            ? `${activeEvent.id} ${spaceBetweenCapitalLetters(
-                activeEvent.name,
-              )}`
-            : `${activeGroup.lastEvent.id} ${spaceBetweenCapitalLetters(
-                activeGroup.lastEvent.name,
-              )}`}
-        </div>
-        <div class="flex items-center gap-4">
-          <div class="flex items-center gap-0">
-            <Icon name="info" />
-            <ToggleSwitch
-              label="JSON"
-              labelHidden
-              id="pass-access-token"
-              bind:checked={showJSON}
-              data-testid="show-details-json"
-            />
-            <Icon name="json" />
-          </div>
-          <div
-            class="cursor-pointer"
-            on:click={clearActive}
-            on:keypress={clearActive}
-          >
-            <Icon name="close" />
-          </div>
-        </div>
+  <div class="flex justify-between bg-blurple p-2 text-white">
+    <div class="flex items-center gap-1">
+      {activeEvent?.name
+        ? `${activeEvent.id} ${spaceBetweenCapitalLetters(activeEvent.name)}`
+        : `${activeGroup.lastEvent.id} ${spaceBetweenCapitalLetters(
+            activeGroup.lastEvent.name,
+          )}`}
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-0">
+        <Icon name="info" />
+        <ToggleSwitch
+          label="JSON"
+          labelHidden
+          id="pass-access-token"
+          bind:checked={showJSON}
+          data-testid="show-details-json"
+        />
+        <Icon name="json" />
       </div>
-      {#if showJSON}
-        {#if compact}
-          {#each activeGroup.eventList.reverse() as event, index}
-            {#if index !== 0}<EventDetailsHeader {event} />{/if}
-            <PayloadDecoder value={event} key="payloads" let:decodedValue>
-              <CodeBlock
-                content={decodedValue}
-                copyIconTitle={translate('common.copy-icon-title')}
-                copySuccessIconTitle={translate(
-                  'common.copy-success-icon-title',
-                )}
-              />
-            </PayloadDecoder>
-          {/each}
-        {:else}
-          <PayloadDecoder value={activeEvent} key="payloads" let:decodedValue>
-            <CodeBlock
-              content={decodedValue}
-              copyIconTitle={translate('common.copy-icon-title')}
-              copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            />
-          </PayloadDecoder>
-        {/if}
-      {:else if compact}
-        {#each activeGroup.eventList.reverse() as event, index}
-          {#if index !== 0}<EventDetailsHeader {event} />{/if}
-          <EventDetails {event} />
-        {/each}
-      {:else if activeEvent?.activityId}
-        <PendingDetails pendingActivity={activeEvent} />
-      {:else}
-        <EventDetails event={activeEvent} />
-      {/if}
+      <div
+        class="cursor-pointer"
+        on:click={clearActive}
+        on:keypress={clearActive}
+      >
+        <Icon name="close" />
+      </div>
     </div>
   </div>
+  {#if showJSON}
+    {#if compact}
+      {#each activeGroup.eventList.reverse() as event, index}
+        {#if index !== 0}<EventDetailsHeader text={event.name} />{/if}
+        <PayloadDecoder value={event} key="payloads" let:decodedValue>
+          <CodeBlock
+            content={decodedValue}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          />
+        </PayloadDecoder>
+      {/each}
+    {:else}
+      <PayloadDecoder value={activeEvent} key="payloads" let:decodedValue>
+        <CodeBlock
+          content={decodedValue}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+      </PayloadDecoder>
+    {/if}
+  {:else if compact}
+    {#each activeGroup.eventList.reverse() as event, index}
+      {#if index !== 0}<EventDetailsHeader text={event.name} />{/if}
+      <EventDetails {event} />
+    {/each}
+    {#if activeGroup.pendingActivity}
+      <EventDetailsHeader text="Pending" />
+      <PendingDetails pendingActivity={activeGroup.pendingActivity} />
+    {/if}
+  {:else if activeEvent?.activityId}
+    <PendingDetails pendingActivity={activeEvent} />
+  {:else}
+    <EventDetails event={activeEvent} />
+  {/if}
 </div>

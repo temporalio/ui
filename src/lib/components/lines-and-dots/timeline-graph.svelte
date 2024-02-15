@@ -60,7 +60,7 @@
         nextX = getDistance(group.eventList[groupIndex + 1]) - x;
       }
     } else if (group.pendingActivity) {
-      nextX = finishingX - x;
+      nextX = finishingX - x - gutterStart;
     }
 
     return { x, nextX };
@@ -81,48 +81,63 @@
   $: canvasHeight = Math.max(compactGap * 2 + compactGap * groups.length, 200);
 </script>
 
-<div class="relative w-full bg-slate-950" bind:clientWidth={canvasWidth}>
-  <svg class="w-full" viewBox="0 0 {canvasWidth} {canvasHeight}">
-    <Line x={gutterStart} y1={0} y2={canvasHeight} />
-    <Line x={finishingX} y1={0} y2={canvasHeight} status={workflow.status} />
-    {#each groups as group, index (group.id)}
-      {#each group.eventList as event (event.id)}
-        {@const { x, nextX } = getNextEventDistance(event, group)}
-        <CompactLineDot
-          {group}
-          {event}
-          y={(index + 1) * compactGap + compactGap / 2}
-          x={gutterStart + x}
-          {canvasWidth}
-          {nextX}
-          category={event.category}
-          classification={event.classification}
-          active={isActive(event)}
-          onClick={() => onClick(group)}
-        />
+<div class="relative flex h-auto max-h-[800px] w-full gap-0">
+  <div
+    class="relative w-full overflow-auto bg-slate-950"
+    bind:clientWidth={canvasWidth}
+  >
+    <svg class="w-full" viewBox="0 0 {canvasWidth} {canvasHeight}">
+      <Line x1={gutterStart} x2={gutterStart} y1={0} y2={canvasHeight} />
+      <Line
+        x1={finishingX}
+        x2={finishingX}
+        y1={0}
+        y2={canvasHeight}
+        status={workflow.status}
+      />
+      {#each groups as group, index (group.id)}
+        {#each group.eventList as event (event.id)}
+          {@const { x, nextX } = getNextEventDistance(event, group)}
+          <CompactLineDot
+            {group}
+            y={(index + 1) * compactGap + compactGap / 2}
+            x={gutterStart + x}
+            {canvasWidth}
+            {nextX}
+            category={event.category}
+            classification={event.classification}
+            active={isActive(event)}
+            onClick={() => onClick(group)}
+            showText={(group.eventList.length === 1 &&
+              !group.pendingActivity) ||
+              (group.eventList.length > 1 && group.lastEvent.id === event.id)}
+          />
+        {/each}
+        {#if group.pendingActivity}
+          <CompactLineDot
+            {group}
+            y={(index + 1) * compactGap + compactGap / 2}
+            x={finishingX}
+            {canvasWidth}
+            category="pending"
+            classification={group.classification}
+            active={isActive(group.pendingActivity)}
+            onClick={() => onClick(group)}
+            showText
+          />
+        {/if}
       {/each}
-      {#if group.pendingActivity}
-        <CompactLineDot
-          {group}
-          event={group.pendingActivity}
-          y={(index + 1) * compactGap + compactGap / 2}
-          x={finishingX}
-          {canvasWidth}
-          category="pending"
-          classification={group.classification}
-          active={isActive(group.pendingActivity)}
-          onClick={() => onClick(group)}
-        />
-      {/if}
-    {/each}
-  </svg>
+      <Line
+        x1={gutterStart}
+        x2={finishingX - 2}
+        y1={canvasHeight - 5}
+        y2={canvasHeight - 5}
+      />
+    </svg>
+  </div>
   {#if activeGroup}
-    <DetailsDrawer
-      {canvasHeight}
-      {activeEvent}
-      {activeGroup}
-      {clearActive}
-      compact
-    />
+    <div class="w-full">
+      <DetailsDrawer {activeEvent} {activeGroup} {clearActive} compact />
+    </div>
   {/if}
 </div>

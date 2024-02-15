@@ -1,26 +1,16 @@
 <script lang="ts">
   import type { WorkflowStatus } from '$lib/types/workflows';
 
-  export let x = 0;
+  export let x1 = 0;
+  export let x2 = 1000;
   export let y1 = 0;
   export let y2 = 1000;
-
-  $: {
-    console.log('X: ', x);
-  }
-  const strokeWidth = 4;
-
   export let status: WorkflowStatus | 'none' = 'none';
+
+  const strokeWidth = 4;
 </script>
 
-<line
-  class="line {status}"
-  stroke-width={strokeWidth}
-  x1={x}
-  x2={x}
-  {y1}
-  {y2}
-/>
+<line class="line {status}" stroke-width={strokeWidth} {x1} {x2} {y1} {y2} />
 
 <style lang="postcss">
   line {

@@ -3,37 +3,27 @@
   import type {
     EventClassification,
     EventTypeCategory,
-    WorkflowEvent,
   } from '$lib/types/events';
-  // import { capitalize } from '$lib/utilities/format-camel-case';
 
   export let y: number = 20;
   export let category: EventTypeCategory | 'pending';
   export let classification: EventClassification | undefined = undefined;
 
   export let group: EventGroup;
-  export let event: WorkflowEvent;
   export let x = 0;
   export let nextX = 0;
   export let canvasWidth: number;
   export let active = false;
   export let onClick: () => void;
+  export let showText = false;
 
   const r = 3;
-  const strokeWidth = 3;
+  const strokeWidth = 6;
 
   $: atTheEnd = canvasWidth - x < 100;
-  $: showGroupName =
-    group.eventList.length === 1 ||
-    (group.eventList.length > 1 && group.lastEvent.id === event.id);
 </script>
 
 <g on:click={onClick} on:keydown={onClick}>
-  <!-- {#if group}
-    <text x={5} y={y + 3} class="text" class:active
-      >{capitalize(group?.label || group?.category || group?.name)}</text
-    >
-  {/if} -->
   {#if nextX}
     <line
       class="line {category}"
@@ -60,13 +50,13 @@
     <circle
       class="dot {category} {classification}"
       class:active
-      stroke-width={strokeWidth}
+      stroke-width={category === 'pending' ? strokeWidth * 2 : strokeWidth}
       cx={x}
       cy={y}
       {r}
     />
   </g>
-  {#if showGroupName}
+  {#if showText}
     <text
       x={atTheEnd ? x + r : x + 2 * r}
       text-anchor={atTheEnd ? 'end' : 'start'}

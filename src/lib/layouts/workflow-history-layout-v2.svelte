@@ -93,9 +93,9 @@
     <WorkflowDetails />
     <InputAndResults />
     <div
-      class="surface-inverse flex items-center justify-between border-b-4 bg-slate-900 px-4 py-2"
+      class="surface-inverse flex flex-col items-center justify-between gap-2 border-b-4 bg-slate-900 px-4 py-2 md:flex-row"
     >
-      <div class="flex items-center gap-4">
+      <div class="flex flex-col items-center gap-2 md:flex-row md:gap-4">
         <h2 class="text-xl font-medium">
           {translate('workflows.event-history')}
         </h2>

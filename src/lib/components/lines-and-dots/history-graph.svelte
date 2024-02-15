@@ -3,6 +3,8 @@
 </script>
 
 <script lang="ts">
+  import debounce from 'just-debounce';
+
   import type {
     EventGroup,
     EventGroups,
@@ -128,56 +130,80 @@
     } else return true;
   };
 
+  let scrollTop = 0;
   let canvasWidth = 1000;
   $: canvasHeight = Math.max(
     historyGap * 2 + historyGap * (history.length + pendingActivities.length),
-    600,
+    400,
   );
   $: startingX = canvasWidth / 2;
+
+  const handleScroll = async (e) => {
+    scrollTop = e.target.scrollTop;
+  };
+
+  // $: filterHistory = () => {
+  //   return history.filter((event, index) => {
+  //     const { y } = getNextDistanceAndOffset(event, index);
+  //     return y >= scrollTop - 100 && y <= scrollTop + 900;
+  //   });
+  // };
 </script>
 
-<div class="relative h-auto w-full bg-slate-950" bind:clientWidth={canvasWidth}>
-  <svg viewBox="0 0 {canvasWidth} {canvasHeight}">
-    <Line x={startingX} y1={0} y2={canvasHeight} />
-    {#each history as event, index (event.id)}
-      {@const { nextDistance, offset, y } = getNextDistanceAndOffset(
-        event,
-        index,
-      )}
-      <HistoryLineDot
-        {event}
-        {startingX}
-        {y}
-        {offset}
-        {nextDistance}
-        category={event.category}
-        classification={event.classification}
-        connectLine={!isMiddleEvent(event)}
-        active={isActive(event)}
-        {onClick}
-      />
-    {/each}
-    {#each pendingActivities as pendingActivity, index}
-      <HistoryLineDot
-        event={pendingActivity}
-        {startingX}
-        y={(history.length + index + 1) * historyGap + historyGap / 2}
-        offset={groups.find((g) => g?.pendingActivity === pendingActivity)
-          ?.level || 1}
-        nextDistance={0}
-        category="pending"
-        active={isActive(pendingActivity)}
-        {onClick}
-      />
-    {/each}
-  </svg>
+<div
+  class="relative flex h-auto max-h-[800px] w-full gap-0 overflow-auto"
+  on:scroll={debounce(handleScroll, 50)}
+>
+  <div
+    class="relative h-full {activeEvent
+      ? 'w-1/2'
+      : 'w-full'} overflow-auto bg-slate-950"
+    bind:clientWidth={canvasWidth}
+  >
+    <svg viewBox="0 0 {canvasWidth} {canvasHeight}">
+      <Line x1={startingX} x2={startingX} y1={0} y2={canvasHeight} />
+      {#each history as event, index (event.id)}
+        {@const { nextDistance, offset, y } = getNextDistanceAndOffset(
+          event,
+          index,
+        )}
+        <HistoryLineDot
+          {event}
+          {scrollTop}
+          {startingX}
+          {y}
+          {offset}
+          {nextDistance}
+          category={event.category}
+          classification={event.classification}
+          connectLine={!isMiddleEvent(event)}
+          active={isActive(event)}
+          {onClick}
+        />
+      {/each}
+      {#each pendingActivities as pendingActivity, index}
+        <HistoryLineDot
+          event={pendingActivity}
+          {startingX}
+          y={(history.length + index + 1) * historyGap + historyGap / 2}
+          offset={groups.find((g) => g?.pendingActivity === pendingActivity)
+            ?.level || 1}
+          nextDistance={0}
+          category="pending"
+          active={isActive(pendingActivity)}
+          {onClick}
+        />
+      {/each}
+    </svg>
+  </div>
   {#if activeEvent}
-    <DetailsDrawer
-      {canvasHeight}
-      {activeEvent}
-      {activeGroup}
-      {clearActive}
-      compact={false}
-    />
+    <div class="sticky top-0 w-1/2">
+      <DetailsDrawer
+        {activeEvent}
+        {activeGroup}
+        {clearActive}
+        compact={false}
+      />
+    </div>
   {/if}
 </div>

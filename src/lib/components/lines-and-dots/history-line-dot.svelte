@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { timeFormat } from '$lib/stores/time-format';
+  // import { timeFormat } from '$lib/stores/time-format';
   import type {
     EventClassification,
     EventTypeCategory,
@@ -7,9 +7,10 @@
     WorkflowEvent,
   } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
-  import { formatDate } from '$lib/utilities/format-date';
+  // import { formatDate } from '$lib/utilities/format-date';
 
   export let y: number = 20;
+  export let scrollTop: number = 0;
   export let category: EventTypeCategory | 'pending';
   export let classification: EventClassification | undefined = undefined;
 
@@ -33,20 +34,15 @@
 >
   {#if event}
     <text class="text" class:active x={5} y={y + 3}
-      ><tspan>{event.id}</tspan><tspan x={event.id.length * 5 + 24}
+      ><tspan>{event?.name ? event.id : ''}</tspan><tspan x={50}
         >{spaceBetweenCapitalLetters(event?.name || 'Pending')}</tspan
       ></text
     >
-    <text
-      class="timestamp hidden lg:block"
-      class:active
-      x={startingX - 210}
-      textLength={200}
-      y={y + r}
+    <!-- <text class="timestamp hidden lg:block" class:active x={5} y={y + 15}
       >{event?.timestamp
         ? formatDate(new Date(event.timestamp), $timeFormat)
         : ''}</text
-    >
+    > -->
   {/if}
   {#if category !== 'workflow' && connectLine}
     <line
@@ -87,7 +83,7 @@
       stroke-width={strokeWidth}
       x1={startingX + horizontalOffset + r / 2 - strokeWidth}
       x2={startingX + horizontalOffset + r / 2 - strokeWidth}
-      y1={y + r}
+      y1={y + r + strokeWidth / 2}
       y2={y + nextDistance - r}
     />
   {/if}
@@ -118,7 +114,7 @@
 
   text {
     fill: white;
-    font-size: 18px;
+    font-size: 16px;
   }
 
   text.active {
@@ -176,5 +172,10 @@
   .Canceled {
     fill: #fff3c6;
     stroke: #fff3c6;
+  }
+
+  .timestamp {
+    stroke: white;
+    font-size: 12px;
   }
 </style>

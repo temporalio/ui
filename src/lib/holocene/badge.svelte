@@ -66,6 +66,6 @@
   }
 
   .blurple {
-    @apply border-blurple bg-indigo-100 text-blurple;
+    @apply border-blurple bg-blurple text-indigo-100;
   }
 </style>
