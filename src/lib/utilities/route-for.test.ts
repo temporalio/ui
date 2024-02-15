@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, assert, describe, expect, it, vi } from 'vitest';
 
 import {
   hasParameters,
@@ -6,6 +6,7 @@ import {
   isEventParameters,
   isNamespaceParameter,
   isWorkflowParameters,
+  maybeRouteForOIDCImplicitCallback,
   routeForArchivalWorkfows,
   routeForAuthentication,
   routeForCallStack,
@@ -172,6 +173,7 @@ describe('routeFor SSO authentication ', () => {
   it('Options added through settings should be passed in the url', () => {
     const settings = {
       auth: {
+        flow: 'authorization-code',
         options: ['one'],
       },
       baseUrl: 'https://localhost/',
@@ -192,6 +194,7 @@ describe('routeFor SSO authentication ', () => {
   it('should fallback to the originUrl if returnUrl is not provided', () => {
     const settings = {
       auth: {
+        flow: 'authorization-code',
         options: ['one'],
       },
       baseUrl: 'https://localhost/',
@@ -210,6 +213,7 @@ describe('routeFor SSO authentication ', () => {
   it('should use the returnUrl if provided', () => {
     const settings = {
       auth: {
+        flow: 'authorization-code',
         options: ['one'],
       },
       baseUrl: 'https://localhost/',
@@ -229,6 +233,7 @@ describe('routeFor SSO authentication ', () => {
   it("should not add the options from the search param if they don't exist in the current url params", () => {
     const settings = {
       auth: {
+        flow: 'authorization-code',
         options: ['one'],
       },
       baseUrl: 'https://localhost/',
@@ -245,7 +250,10 @@ describe('routeFor SSO authentication ', () => {
   });
 
   it('Should render a login url', () => {
-    const settings = { auth: {}, baseUrl: 'https://localhost' };
+    const settings = {
+      auth: { flow: 'authorization-code' },
+      baseUrl: 'https://localhost',
+    };
     const searchParams = new URLSearchParams();
 
     const sso = routeForAuthentication({ settings, searchParams });
@@ -254,7 +262,10 @@ describe('routeFor SSO authentication ', () => {
   });
 
   it('Should add return URL search param', () => {
-    const settings = { auth: {}, baseUrl: 'https://localhost' };
+    const settings = {
+      auth: { flow: 'authorization-code' },
+      baseUrl: 'https://localhost',
+    };
 
     const searchParams = new URLSearchParams();
     searchParams.set('returnUrl', 'https://localhost/some/path');
@@ -271,7 +282,10 @@ describe('routeFor SSO authentication ', () => {
   });
 
   it('Should not add return URL search param if undefined', () => {
-    const settings = { auth: {}, baseUrl: 'https://localhost' };
+    const settings = {
+      auth: { flow: 'authorization-code' },
+      baseUrl: 'https://localhost',
+    };
 
     const searchParams = new URLSearchParams();
     const sso = routeForAuthentication({ settings, searchParams });
@@ -283,6 +297,7 @@ describe('routeFor SSO authentication ', () => {
   it('test of the signin flow', () => {
     const settings = {
       auth: {
+        flow: 'authorization-code',
         options: ['organization_name', 'invitation'],
       },
       baseUrl: 'https://localhost/',
@@ -300,6 +315,174 @@ describe('routeFor SSO authentication ', () => {
     expect(sso).toEqual(
       'https://localhost/auth/sso?organization_name=temporal-cloud&invitation=Wwv6g2cKkfjyqoLxnCPUCfiKcjHKpK%5B%E2%80%A6%5Dn9ipxcao0jKYH0I3',
     );
+  });
+
+  describe('implicit oidc flow', () => {
+    it('should add a nonce', () => {
+      const settings = {
+        auth: {
+          flow: 'implicit',
+          authorizationUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+          scopes: ['openid', 'email', 'profile'],
+        },
+        baseUrl: 'https://localhost',
+      };
+
+      const searchParams = new URLSearchParams();
+
+      const sso = routeForAuthentication({
+        settings,
+        searchParams,
+      });
+
+      const ssoUrl = new URL(sso);
+      expect(window.localStorage.getItem('nonce')).toBe(
+        ssoUrl.searchParams.get('nonce'),
+      );
+      window.localStorage.removeItem('nonce');
+    });
+
+    it('should manage state', () => {
+      const settings = {
+        auth: {
+          flow: 'implicit',
+          authorizationUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+          scopes: ['openid', 'email', 'profile'],
+        },
+        baseUrl: 'https://localhost',
+      };
+
+      const searchParams = new URLSearchParams();
+      searchParams.set('returnUrl', 'https://localhost/some/path');
+
+      const sso = routeForAuthentication({
+        settings,
+        searchParams,
+      });
+
+      const ssoUrlStateKey = new URL(sso).searchParams.get('state');
+      expect(ssoUrlStateKey).not.toBeNull();
+      expect(window.sessionStorage.getItem(ssoUrlStateKey as string)).toBe(
+        'https://localhost/some/path',
+      );
+      window.sessionStorage.removeItem(ssoUrlStateKey as string);
+    });
+
+    describe('routeFor oidc implicit callback', () => {
+      it('should return null if passed an empty hash', () => {
+        expect(maybeRouteForOIDCImplicitCallback('#')).toBeNull();
+      });
+
+      it('should return null if no ID token in the hash', () => {
+        const params = new URLSearchParams({ foo: 'bar', biz: 'baz' });
+        expect(maybeRouteForOIDCImplicitCallback(`#${params}`)).toBeNull();
+      });
+
+      it('should throw if invalid ID token in the hash', () => {
+        const params = new URLSearchParams({
+          foo: 'bar',
+          biz: 'baz',
+          id_token: 'scrooge-mcduck',
+        });
+        expect(() => maybeRouteForOIDCImplicitCallback(`#${params}`)).toThrow(
+          'Invalid id_token in hash',
+        );
+      });
+
+      /*
+       * tokens created from https://jwt.io. can be decoded edited and reencoded from there
+       */
+      it('should throw if the nonce is missing from the token', () => {
+        localStorage.setItem('nonce', 'foobar');
+        const params = new URLSearchParams({
+          id_token:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWV3b3Jrd2VhciIsIm5hbWUiOiJEZXJlayBHdXkiLCJpYXQiOjE1MTYyMzkwMjJ9.JXIgh2oYQw3Sk8NQL3e89jqaPF8LX4bt1KyrkqeOFx4',
+        });
+
+        expect(() => maybeRouteForOIDCImplicitCallback(`#${params}`)).toThrow(
+          'No nonce in token',
+        );
+        localStorage.removeItem('nonce');
+      });
+
+      it('should throw if the nonce is mismatched', () => {
+        localStorage.setItem('nonce', 'foobar');
+        const params = new URLSearchParams({
+          id_token:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWV3b3Jrd2VhciIsIm5hbWUiOiJEZXJlayBHdXkiLCJpYXQiOjE1MTYyMzkwMjIsIm5vbmNlIjoiYml6YmF6In0.NZa8yiSta4lRnemoY9M45ErqluvAPtN12JmRGZAECnY',
+        });
+        expect(() => maybeRouteForOIDCImplicitCallback(`#${params}`)).toThrow(
+          'Mismatched nonces',
+        );
+        localStorage.removeItem('nonce');
+      });
+
+      it('should process the hash into the returned callback struct', () => {
+        localStorage.setItem('nonce', 'denim-jacket');
+        sessionStorage.setItem(
+          'roper-boots',
+          'https://nationalcowboymuseum.org/plan-your-visit/',
+        ); // state
+
+        const params = new URLSearchParams({
+          id_token:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWV3b3Jrd2VhciIsIm5hbWUiOiJEZXJlayBHdXkiLCJpYXQiOjE1MTYyMzkwMjIsImVtYWlsIjoiZGVyZWtAZGlld29ya3dlYXIuY29tIiwibm9uY2UiOiJkZW5pbS1qYWNrZXQifQ.wG64FRrUCoHrQC4wASodyO7_3eeOeUx6myM0QvEKNk4',
+          state: 'roper-boots',
+        });
+        const callback = maybeRouteForOIDCImplicitCallback(`#${params}`);
+        expect(callback).not.toBeNull();
+        if (callback === null) {
+          assert.fail('failed to process a valid hash');
+        }
+
+        expect
+          .soft(callback.redirectUrl)
+          .toBe('https://nationalcowboymuseum.org/plan-your-visit/');
+
+        expect.soft(callback.authUser).toEqual({
+          idToken:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWV3b3Jrd2VhciIsIm5hbWUiOiJEZXJlayBHdXkiLCJpYXQiOjE1MTYyMzkwMjIsImVtYWlsIjoiZGVyZWtAZGlld29ya3dlYXIuY29tIiwibm9uY2UiOiJkZW5pbS1qYWNrZXQifQ.wG64FRrUCoHrQC4wASodyO7_3eeOeUx6myM0QvEKNk4',
+          name: 'Derek Guy',
+          email: 'derek@dieworkwear.com',
+        });
+
+        expect.soft(callback.stateKey).toBe('roper-boots');
+
+        localStorage.removeItem('nonce');
+        sessionStorage.removeItem('roper-boots');
+      });
+
+      it('should throw if the hash state key is missing from session storage', () => {
+        localStorage.setItem('nonce', 'denim-jacket');
+
+        const params = new URLSearchParams({
+          id_token:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWV3b3Jrd2VhciIsIm5hbWUiOiJEZXJlayBHdXkiLCJpYXQiOjE1MTYyMzkwMjIsImVtYWlsIjoiZGVyZWtAZGlld29ya3dlYXIuY29tIiwibm9uY2UiOiJkZW5pbS1qYWNrZXQifQ.wG64FRrUCoHrQC4wASodyO7_3eeOeUx6myM0QvEKNk4',
+        });
+
+        expect(() => maybeRouteForOIDCImplicitCallback(`#${params}`)).toThrow(
+          'No state in hash',
+        );
+
+        localStorage.removeItem('nonce');
+      });
+
+      it('should throw if the hash state key is missing from the hash', () => {
+        localStorage.setItem('nonce', 'denim-jacket');
+
+        const params = new URLSearchParams({
+          id_token:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWV3b3Jrd2VhciIsIm5hbWUiOiJEZXJlayBHdXkiLCJpYXQiOjE1MTYyMzkwMjIsImVtYWlsIjoiZGVyZWtAZGlld29ya3dlYXIuY29tIiwibm9uY2UiOiJkZW5pbS1qYWNrZXQifQ.wG64FRrUCoHrQC4wASodyO7_3eeOeUx6myM0QvEKNk4',
+          state: 'western-boots',
+        });
+
+        expect(() => maybeRouteForOIDCImplicitCallback(`#${params}`)).toThrow(
+          'Hash state missing from sessionStorage',
+        );
+
+        localStorage.removeItem('nonce');
+      });
+    });
   });
 
   describe('routeForLoginPage', () => {

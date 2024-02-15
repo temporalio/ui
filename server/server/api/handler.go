@@ -45,8 +45,14 @@ import (
 )
 
 type Auth struct {
-	Enabled bool
-	Options []string
+	Enabled          bool
+	Flow             string
+	ProviderURL      string
+	IssuerURL        string
+	AuthorizationURL string
+	ClientID         string
+	Scopes           []string
+	Options          []string
 }
 
 type CodecResponse struct {
@@ -110,17 +116,24 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 		}
 
 		var options []string
+		var authProviderCfg config.AuthProvider
 		if len(cfg.Auth.Providers) != 0 {
-			authProviderCfg := cfg.Auth.Providers[0].Options
-			for k := range authProviderCfg {
+			authProviderCfg = cfg.Auth.Providers[0]
+			for k := range authProviderCfg.Options {
 				options = append(options, k)
 			}
 		}
 
 		settings := &SettingsResponse{
 			Auth: &Auth{
-				Enabled: cfg.Auth.Enabled,
-				Options: options,
+				Enabled:          cfg.Auth.Enabled,
+				Flow:             authProviderCfg.Flow,
+				ProviderURL:      authProviderCfg.ProviderURL,
+				IssuerURL:        authProviderCfg.IssuerURL,
+				AuthorizationURL: authProviderCfg.AuthorizationURL,
+				ClientID:         authProviderCfg.ClientID,
+				Scopes:           authProviderCfg.Scopes,
+				Options:          options,
 			},
 			BannerText:                  cfg.BannerText,
 			DefaultNamespace:            cfg.DefaultNamespace,

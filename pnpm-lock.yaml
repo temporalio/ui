@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -80,6 +80,9 @@ dependencies:
   just-throttle:
     specifier: ^4.2.0
     version: 4.2.0
+  jwt-decode:
+    specifier: ^4.0.0
+    version: 4.0.0
   lodash.groupby:
     specifier: ^4.6.0
     version: 4.6.0
@@ -10708,6 +10711,11 @@ packages:
 
   /just-throttle@4.2.0:
     resolution: {integrity: sha512-/iAZv1953JcExpvsywaPKjSzfTiCLqeguUTE6+VmK15mOcwxBx7/FHrVvS4WEErMR03TRazH8kcBSHqMagYIYg==}
+    dev: false
+
+  /jwt-decode@4.0.0:
+    resolution: {integrity: sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==}
+    engines: {node: '>=18'}
     dev: false
 
   /keycharm@0.4.0:

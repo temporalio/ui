@@ -20,7 +20,7 @@ batchActionsDisabled: false
 hideWorkflowQueryErrors: false
 auth:
   enabled: false
-  providers:
+  providers:  # only the first is used. second is provided for reference
     - label: Auth0 oidc # for internal use; in future may expose as button text
       type: oidc # for futureproofing; only oidc is supported today
       providerUrl: https://myorg.us.auth0.com/
@@ -36,6 +36,16 @@ auth:
         audience: myorg-dev
         organization: org_xxxxxxxxxxxx
         invitation:
+    - label: oidc implicit flow
+      type: oidc
+      flow: implicit
+      # TODO: support optional issuer validation
+      authorizationUrl: https://accounts.google.com/o/oauth2/v2/auth  # discovery isn't supported for implicit flow. the endpoint must be provided directly
+      clientId: xxxxxxxxxxxxxxxxxxxx
+      scopes:
+        - openid
+        - profile
+        - email
 tls:
   caFile:
   certFile:

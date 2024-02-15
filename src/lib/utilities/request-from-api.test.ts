@@ -110,7 +110,7 @@ describe('requestFromAPI', () => {
     });
   });
 
-  it('should not add csrf cookie to headers if not presdent', async () => {
+  it('should not add csrf cookie to headers if not present', async () => {
     const token = 'token';
 
     const request = fetchMock();

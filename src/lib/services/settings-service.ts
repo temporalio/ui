@@ -20,6 +20,12 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
   const settingsInformation = {
     auth: {
       enabled: !!settingsResponse?.Auth?.Enabled,
+      flow: settingsResponse?.Auth?.Flow,
+      providerUrl: settingsResponse?.Auth?.ProviderURL,
+      issuerUrl: settingsResponse?.Auth?.IssuerURL,
+      authorizationUrl: settingsResponse?.Auth?.AuthorizationURL,
+      clientId: settingsResponse?.Auth?.ClientID,
+      scopes: settingsResponse?.Auth?.Scopes,
       options: settingsResponse?.Auth?.Options,
     },
     bannerText: settingsResponse?.BannerText,
