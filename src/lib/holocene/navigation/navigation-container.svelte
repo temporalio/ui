@@ -18,7 +18,7 @@
 
 <nav
   class={merge(
-    'group grid h-screen w-16 grid-cols-[2rem] grid-rows-[fit-content(1.5rem)_minmax(3rem,4rem)_1fr_1fr_8rem] gap-2 border-r border-subtle px-4 py-5 transition-width dark:surface-primary data-[nav=open]:w-40 data-[nav=open]:grid-cols-[100%]',
+    'group grid h-screen w-16 grid-cols-[2rem] grid-rows-[fit-content(1.5rem)_minmax(3rem,4rem)_1fr_8rem] gap-2 border-r border-subtle px-4 py-5 transition-width dark:surface-primary data-[nav=open]:w-40 data-[nav=open]:grid-cols-[100%]',
     isCloud ? 'surface-primary' : 'surface-inverse text-white',
   )}
   data-nav={$navOpen ? 'open' : 'closed'}
@@ -40,12 +40,13 @@
     <hr class="my-8 border-subtle" />
     <slot name="middle" />
   </div>
-
-  <div
-    class="self-center justify-self-center pb-3 text-[0.6rem] text-secondary"
-  >
+  <div class="self-end">
     <slot name="bottom" />
-    <span class="sr-only">{translate('common.version')}</span>
-    {version}
+    <div
+      class="self-center justify-self-center pb-3 text-[0.6rem] text-secondary"
+    >
+      <span class="sr-only">{translate('common.version')}</span>
+      {version}
+    </div>
   </div>
 </nav>
