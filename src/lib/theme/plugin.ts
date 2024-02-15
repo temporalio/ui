@@ -8,6 +8,7 @@ const variables = {
   '--color-secondary': rgb(colors.secondary),
   '--color-inverse': rgb(colors.black),
   '--color-subtle': rgb(getColor('slate', 950)),
+  '--color-brand': rgb(getColor('indigo', 800)),
 
   '--color-text-primary': rgb(colors.primary),
   '--color-text-secondary': rgb(colors.secondary),
@@ -22,6 +23,7 @@ const variables = {
   '--color-surface-primary': rgb(colors.white),
   '--color-surface-secondary': rgb(colors.offWhite),
   '--color-surface-inverse': rgb(colors.primary),
+  '--color-surface-subtle': rgb(getColor('slate', 100)),
   '--color-surface-badge': rgb(getColor('slate', 100)),
   '--color-surface-error': rgb(getColor('red', 50)),
   '--color-surface-information': rgb(getColor('blue', 50)),
@@ -40,6 +42,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-primary': rgb(colors.offWhite),
   '--color-secondary': rgb(colors.offBlack),
   '--color-inverse': rgb(colors.primary),
+  '--color-brand': rgb(getColor('indigo', 500)),
 
   '--color-text-primary': rgb(colors.offWhite),
   '--color-text-secondary': rgb(getColor('slate', 200)),
@@ -51,6 +54,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
 
   '--color-surface-primary': rgb(colors.black),
   '--color-surface-secondary': rgb(colors.offBlack),
+  '--color-surface-subtle': rgb(getColor('slate', 900)),
   '--color-surface-badge': rgb(getColor('slate', 700)),
   '--color-surface-information': rgb(getColor('blue', 950)),
   '--color-surface-warning': rgb(getColor('yellow', 950)),
@@ -85,11 +89,18 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-inverse'),
         color: css('--color-text-inverse'),
       },
+      '.surface-subtle': {
+        backgroundColor: css('--color-surface-subtle'),
+        color: css('--color-text-primary'),
+      },
     });
   },
   {
     theme: {
-      colors,
+      colors: {
+        ...colors,
+        brand: css('--color-brand'),
+      },
       backgroundColor: ({ theme }) => ({
         ...theme('colors'),
         primary: css('--color-primary'),
@@ -123,6 +134,7 @@ const temporal = plugin(
         secondary: css('--color-text-secondary'),
         disabled: css('--color-text-disabled'),
         subtle: css('--color-text-subtle'),
+        inverse: css('--color-text-inverse'),
 
         error: css('--color-text-error'),
         information: css('--color-text-information'),

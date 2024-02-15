@@ -157,6 +157,7 @@ const colors = {
   offWhite: '#F8FAFC',
   black: '#141414',
   offBlack: '#0F172A',
+  current: 'currentColor',
   transparent: 'transparent',
   current: 'currentColor',
   danger: getColor('red', 700),
