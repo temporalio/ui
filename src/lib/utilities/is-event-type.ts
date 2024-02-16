@@ -116,6 +116,8 @@ export const eventTypes = [
   'UpsertWorkflowSearchAttributes',
   'WorkflowExecutionUpdateAccepted',
   'WorkflowExecutionUpdateCompleted',
+  'WorkflowExecutionUpdateRejected',
+  'WorkflowExecutionUpdateRequested',
 ] as const;
 
 export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
@@ -143,6 +145,8 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'workflowExecutionTerminatedEventAttributes',
   'workflowExecutionUpdateAcceptedEventAttributes',
   'workflowExecutionUpdateCompletedEventAttributes',
+  'workflowExecutionUpdateRejectedEventAttributes',
+  'workflowExecutionUpdateRequestedEventAttributes',
   'workflowExecutionCancelRequestedEventAttributes',
   'workflowExecutionCanceledEventAttributes',
   'requestCancelExternalWorkflowExecutionInitiatedEventAttributes',

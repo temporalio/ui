@@ -252,6 +252,13 @@ describe('toEventNameReadable', () => {
       toEventNameReadable('EVENT_TYPE_WORKFLOW_EXECUTION_FAILED' as EventType),
     ).toBe('WorkflowExecutionFailed');
   });
+  it('should return WorkflowExecutionUpdateRequested from EventType enum', () => {
+    expect(
+      toEventNameReadable(
+        'EVENT_TYPE_WORKFLOW_EXECUTION_UPDATE_REQUESTED' as EventType,
+      ),
+    ).toBe('WorkflowExecutionUpdateRequested');
+  });
   it('should return old TimerStarted enum from EventType enum', () => {
     expect(toEventNameReadable('TimerStarted')).toBe('TimerStarted');
   });

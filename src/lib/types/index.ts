@@ -46,6 +46,8 @@ export type WorkflowExecutionFailedEventAttributes =
   temporal.api.history.v1.IWorkflowExecutionFailedEventAttributes;
 export type WorkflowExecutionTimedOutEventAttributes =
   temporal.api.history.v1.IWorkflowExecutionTimedOutEventAttributes;
+export type WorkflowExecutionUpdateRequestedEventAttributes =
+  temporal.api.history.v1.IWorkflowExecutionUpdateRequestedEventAttributes;
 export type WorkflowTaskScheduledEventAttributes =
   temporal.api.history.v1.IWorkflowTaskScheduledEventAttributes;
 export type WorkflowTaskStartedEventAttributes =
