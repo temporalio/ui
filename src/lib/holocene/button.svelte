@@ -33,11 +33,13 @@
       variants: {
         variant: {
           primary:
-            ' bg-inverse bg-gradient-to-br text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:from-blue-100 [&:not(:disabled):hover]:to-purple-100 [&:not(:disabled):hover]:text-primary [&:not(:disabled):hover]:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-primary focus-visible:border-indigo-600',
+            ' bg-inverse bg-gradient-to-br text-inverse [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:from-blue-100 [&:not(:disabled):hover]:to-purple-100 [&:not(:disabled):hover]:text-secondary [&:not(:disabled):hover]:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-primary focus-visible:border-indigo-600',
           secondary:
             ' surface-primary text-primary [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-inverse [&:not(:disabled):hover]:text-white [&:not(:disabled):hover]:border-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:bg-inverse focus-visible:text-white focus-visible:border-white',
+          // destructive:
+          //   'border-red-700 bg-red-700 text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-red-200/50 [&:not(:disabled):hover]:border-white focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-red-200/50',
           destructive:
-            'border-red-700 bg-red-700 text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-red-200/50 [&:not(:disabled):hover]:border-white focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-red-200/50',
+            'border-warning bg-warning [&:not(:disabled):hover]:shadow-focus dark:[&:not(:disabled):hover]:shadow-red-600/30 [&:not(:disabled):hover]:shadow-red-200/50 [&:not(:disabled):hover]:border-white dark:[&:not(:disabled):hover]:border-red-400/50 dark:[&:not(:disabled):hover]:bg-red-400 focus-visible:border-inverse focus-visible:shadow-focus focus-visible:shadow-red-200/50',
           ghost:
             'border-[transparent] bg-[transparent] text-slate-600 [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-indigo-100 [&:not(:disabled):hover]:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:bg-indigo-100 focus-visible:border-indigo-600',
           'table-header':

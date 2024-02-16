@@ -10,6 +10,7 @@ const variables = {
   '--color-subtle': rgb(getColor('slate', 950)),
   '--color-brand': rgb(getColor('indigo', 800)),
 
+  '--color-text-black': rgb(colors.black),
   '--color-text-primary': rgb(colors.primary),
   '--color-text-secondary': rgb(colors.secondary),
   '--color-text-inverse': rgb(colors.offWhite),
@@ -28,14 +29,14 @@ const variables = {
   '--color-surface-error': rgb(getColor('red', 50)),
   '--color-surface-information': rgb(getColor('blue', 50)),
   '--color-surface-success': rgb(getColor('green', 50)),
-  '--color-surface-warning': rgb(getColor('yellow', 50)),
+  '--color-surface-warning': rgb(getColor('red', 300)),
 
   '--color-border-primary': rgb(colors.black),
   '--color-border-subtle': rgb(getColor('slate', 300)),
   '--color-border-error': rgb(getColor('red', 800)),
   '--color-border-information': rgb(getColor('blue', 800)),
   '--color-border-success': rgb(getColor('green', 800)),
-  '--color-border-warning': rgb(getColor('yellow', 800)),
+  '--color-border-warning': rgb(getColor('red', 300)),
 } satisfies Variables;
 
 const dark: Partial<Variables<keyof typeof variables>> = {
@@ -57,14 +58,14 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-surface-subtle': rgb(getColor('slate', 900)),
   '--color-surface-badge': rgb(getColor('slate', 700)),
   '--color-surface-information': rgb(getColor('blue', 950)),
-  '--color-surface-warning': rgb(getColor('yellow', 950)),
+  '--color-surface-warning': rgb(getColor('red', 300)),
   '--color-surface-error': rgb(getColor('red', 950)),
   '--color-surface-success': rgb(getColor('green', 950)),
 
   '--color-border-primary': rgb(colors.offWhite),
   '--color-border-subtle': rgb(getColor('slate', 950)),
   '--color-border-information': rgb(getColor('blue', 700)),
-  '--color-border-warning': rgb(getColor('yellow', 700)),
+  '--color-border-warning': rgb(getColor('red', 300)),
   '--color-border-error': rgb(getColor('red', 700)),
   '--color-border-success': rgb(getColor('green', 700)),
 } as const;
@@ -92,6 +93,10 @@ const temporal = plugin(
       '.surface-subtle': {
         backgroundColor: css('--color-surface-subtle'),
         color: css('--color-text-primary'),
+      },
+      '.surface-warning': {
+        backgroundColor: css('--color-surface-subtle'),
+        color: css('--color-text-black'),
       },
     });
   },
