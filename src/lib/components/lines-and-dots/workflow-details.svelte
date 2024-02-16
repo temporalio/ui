@@ -8,7 +8,6 @@
   // import { routeForWorkers } from '$lib/utilities/route-for';
 
   // import PayloadDecoder from '../event/payload-decoder.svelte';
-  import WorkflowStatus from '../workflow-status.svelte';
 
   import WorkflowDetail from './workflow-detail.svelte';
 
@@ -24,10 +23,9 @@
   class="flex flex-col rounded-t border-b-4 bg-slate-900 text-white lg:flex-row"
 >
   <div
-    class="flex w-full flex-col items-center justify-between gap-4 border-b-4 p-4 text-sm text-white md:flex-row lg:w-1/2 lg:border-b-0 lg:border-r-4"
+    class="flex w-full flex-col items-center justify-between gap-4 border-b-4 p-2 text-sm text-white md:flex-row lg:w-1/2 lg:border-b-0 lg:border-r-4"
   >
     <div class="flex flex-col gap-2">
-      <WorkflowStatus status={workflow?.status} />
       <div class="flex gap-1">
         <Icon name="clock" class={!workflow?.endTime && 'animate-spin'} />
         {elapsedTime}
@@ -48,7 +46,7 @@
       </div>
     </div>
   </div>
-  <div class="grids-col-1 grid w-full gap-0 p-4 lg:w-1/2 lg:grid-cols-2">
+  <div class="grids-col-1 grid w-full gap-0 p-2 lg:w-1/2 lg:grid-cols-2">
     <WorkflowDetail
       title={translate('common.workflow-type')}
       content={workflow?.name}

@@ -17,6 +17,7 @@
   export let content: string;
   export let isRunning: boolean;
 
+  console.log('Is running: ', isRunning);
   $: parsedContent = parseContent(content);
   $: payloads = getPayloads(parsedContent);
   $: showParsedContent = payloads.length > 0;
@@ -51,7 +52,7 @@
       {/if}
     {:else}
       <CodeBlock
-        content={isRunning ? 'Results will appear upon completion.' : ''}
+        content={isRunning ? 'Results will appear upon completion.' : 'null'}
         language="text"
         copyable={false}
       />

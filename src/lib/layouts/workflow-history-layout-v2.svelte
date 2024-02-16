@@ -38,7 +38,7 @@
   );
 
   let activeGroup: EventGroup | undefined = undefined;
-  let activeEvent: WorkflowEvent | undefined = undefined;
+  let activeEvent: WorkflowEvent | PendingActivity | undefined = undefined;
 
   let showDownloadPrompt = false;
 
@@ -84,12 +84,12 @@
   );
 </script>
 
-<div class="flex flex-col gap-2">
+<div class="flex flex-col gap-0">
   <WorkflowCallStackError />
   {#if workflowTaskFailedError}
     <WorkflowTypedError error={workflowTaskFailedError} />
   {/if}
-  <div class="flex flex-col gap-0 rounded border-4 bg-slate-950">
+  <div class="flex flex-col gap-0 border-4 border-t-0 bg-slate-950">
     <WorkflowDetails />
     <InputAndResults />
     <div

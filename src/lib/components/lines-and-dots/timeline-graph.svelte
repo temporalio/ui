@@ -9,6 +9,7 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
+  import { fullEventHistory } from '$lib/stores/events';
   import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
@@ -25,7 +26,7 @@
   export let onClick: (event: EventGroup) => void;
   export let clearActive: () => void;
 
-  $: startTime = workflow.startTime;
+  $: startTime = $fullEventHistory[0]?.eventTime || workflow.startTime;
   $: endTime = workflow.isRunning ? Date.now() : workflow.endTime;
   $: fullDistance = getMillisecondDuration({
     start: startTime,
@@ -37,7 +38,7 @@
   $: getDistance = (event: WorkflowEvent) => {
     const distance = getMillisecondDuration({
       start: startTime,
-      end: new Date(event.timestamp),
+      end: event.eventTime,
       onlyUnderSecond: false,
     });
 
@@ -81,9 +82,9 @@
   $: canvasHeight = Math.max(compactGap * 2 + compactGap * groups.length, 200);
 </script>
 
-<div class="relative flex h-auto max-h-[800px] w-full gap-0">
+<div class="relative flex h-[800px] w-full gap-0">
   <div
-    class="relative w-full overflow-auto bg-slate-950"
+    class="relative w-full overflow-auto bg-slate-950 pb-12"
     bind:clientWidth={canvasWidth}
   >
     <svg class="w-full" viewBox="0 0 {canvasWidth} {canvasHeight}">
@@ -132,8 +133,8 @@
       <Line
         x1={gutterStart}
         x2={finishingX - 2}
-        y1={canvasHeight - 5}
-        y2={canvasHeight - 5}
+        y1={canvasHeight - 2}
+        y2={canvasHeight - 2}
       />
     </svg>
   </div>

@@ -82,6 +82,7 @@ export const fetchAllEvents = async ({
   const onUpdate = (_full, current) => {
     const next = current?.history?.events;
     if (next) {
+      refresh.set(Date.now());
       fullEventHistory.set([...get(fullEventHistory), ...toEventHistory(next)]);
     }
   };

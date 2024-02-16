@@ -4,8 +4,9 @@
   import { page } from '$app/stores';
 
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
+  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Loading from '$lib/holocene/loading.svelte';
-  import Header from '$lib/layouts/workflow-header.svelte';
+  import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchAllEvents } from '$lib/services/events-service';
   import {
@@ -29,6 +30,8 @@
     getUniqueBuildIdsFromPollers,
     pollerHasVersioning,
   } from '$lib/utilities/task-queue-compatibility';
+
+  import WorkflowHeaderV2 from './workflow-header-v2.svelte';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   let workflowError: NetworkError;
@@ -152,13 +155,27 @@
   });
 </script>
 
-<div class="flex h-full flex-col gap-0">
-  {#if workflowError}
-    <WorkflowError error={workflowError} />
-  {:else if !$workflowRun.workflow}
-    <Loading />
-  {:else}
-    <Header namespace={$page.params.namespace} />
-    <slot />
-  {/if}
-</div>
+<LabsModeGuard>
+  <div
+    class="absolute bottom-0 left-0 right-0 top-0 flex h-full flex-col gap-0 bg-slate-900 text-white"
+  >
+    {#if workflowError}
+      <WorkflowError error={workflowError} />
+    {:else if !$workflowRun.workflow}
+      <Loading />
+    {:else}
+      <WorkflowHeaderV2 namespace={$page.params.namespace} />
+      <slot />
+    {/if}
+  </div>
+  <div class="flex h-full flex-col gap-0" slot="fallback">
+    {#if workflowError}
+      <WorkflowError error={workflowError} />
+    {:else if !$workflowRun.workflow}
+      <Loading />
+    {:else}
+      <WorkflowHeader namespace={$page.params.namespace} />
+      <slot />
+    {/if}
+  </div>
+</LabsModeGuard>
