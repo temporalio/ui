@@ -9,6 +9,8 @@ const variables = {
   '--color-inverse': rgb(colors.black),
   '--color-subtle': rgb(getColor('slate', 950)),
   '--color-brand': rgb(getColor('indigo', 800)),
+  '--color-interactive': rgb(getColor('indigo', 600)),
+  '--color-interactive-hover': rgb(getColor('indigo', 700)),
 
   '--color-text-black': rgb(colors.black),
   '--color-text-primary': rgb(colors.primary),
@@ -37,6 +39,7 @@ const variables = {
   '--color-border-information': rgb(getColor('blue', 800)),
   '--color-border-success': rgb(getColor('green', 800)),
   '--color-border-warning': rgb(getColor('red', 300)),
+  '--color-border-interactive': rgb(getColor('indigo', 600)),
 } satisfies Variables;
 
 const dark: Partial<Variables<keyof typeof variables>> = {
@@ -113,6 +116,8 @@ const temporal = plugin(
         inverse: css('--color-inverse'),
         subtle: css('--color-subtle'),
         badge: css('--color-surface-badge'),
+        interactive: css('--color-interactive'),
+        interactiveHover: css('--color-interactive-hover'),
 
         error: css('--color-surface-error'),
         information: css('--color-surface-information'),
@@ -125,6 +130,8 @@ const temporal = plugin(
         ...theme('colors'),
         primary: css('--color-border-primary'),
         subtle: css('--color-border-subtle'),
+        interactive: css('--color-interactive'),
+        interactiveHover: css('--color-interactive-hover'),
 
         error: css('--color-border-error'),
         information: css('--color-border-information'),
