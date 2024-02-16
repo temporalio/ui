@@ -1,5 +1,6 @@
 <script lang="ts">
   // import { timeFormat } from '$lib/stores/time-format';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type {
     EventClassification,
     EventTypeCategory,
@@ -7,6 +8,7 @@
     WorkflowEvent,
   } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
+  import { isPendingActivity } from '$lib/utilities/is-pending-activity';
   // import { formatDate } from '$lib/utilities/format-date';
 
   export let y: number = 20;
@@ -15,6 +17,8 @@
   export let classification: EventClassification | undefined = undefined;
 
   export let event: WorkflowEvent | PendingActivity;
+  export let group: EventGroup;
+
   export let startingX: number;
   export let nextDistance = 0;
   export let offset = 1;
@@ -25,17 +29,23 @@
   const r = 6;
   const strokeWidth = r / 2;
   $: horizontalOffset = category === 'workflow' ? 0 : (offset / 1.5) * 3 * r;
+  $: nextIsPending =
+    group?.lastEvent.id === event?.id && group?.pendingActivity;
 </script>
 
 <g
   on:click={() => onClick(event)}
   on:keypress={() => onClick(event)}
-  class="{category} {classification}"
+  class="{category} {classification} relative"
 >
-  {#if event}
+  {#if isPendingActivity(event)}
     <text class="text" class:active x={5} y={y + 3}
-      ><tspan>{event?.name ? event.id : ''}</tspan><tspan x={50}
-        >{spaceBetweenCapitalLetters(event?.name || 'Pending')}</tspan
+      ><tspan x={50}>Pending Activity - Attempt {event.attempt}</tspan></text
+    >
+  {:else}
+    <text class="text" class:active x={5} y={y + 3}
+      ><tspan>{event.id}</tspan><tspan x={50}
+        >{spaceBetweenCapitalLetters(event?.name)}</tspan
       ></text
     >
     <!-- <text class="timestamp hidden lg:block" class:active x={5} y={y + 15}
@@ -81,6 +91,7 @@
       class="line {category}"
       class:active
       stroke-width={strokeWidth}
+      stroke-dasharray={nextIsPending ? '3' : 'none'}
       x1={startingX + horizontalOffset + r / 2 - strokeWidth}
       x2={startingX + horizontalOffset + r / 2 - strokeWidth}
       y1={y + r + strokeWidth / 2}

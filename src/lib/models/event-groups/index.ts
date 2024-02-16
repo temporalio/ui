@@ -43,6 +43,7 @@ export const groupEvents = (
     const pendingActivity = pendingActivities.find(
       (p) => p.activityId === event.id,
     );
+
     if (group) {
       groups[group.id] = group;
       if (pendingActivity) {

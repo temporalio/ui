@@ -3,12 +3,15 @@
   import type {
     EventClassification,
     EventTypeCategory,
+    PendingActivity,
+    WorkflowEvent,
   } from '$lib/types/events';
 
   export let y: number = 20;
   export let category: EventTypeCategory | 'pending';
   export let classification: EventClassification | undefined = undefined;
 
+  export let event: WorkflowEvent | PendingActivity;
   export let group: EventGroup;
   export let x = 0;
   export let nextX = 0;
@@ -18,8 +21,10 @@
   export let showText = false;
 
   const r = 3;
-  const strokeWidth = 6;
+  const strokeWidth = r * 2;
 
+  $: nextIsPending =
+    group?.lastEvent.id === event?.id && group?.pendingActivity;
   $: atTheEnd = canvasWidth - x < 100;
 </script>
 
@@ -29,6 +34,7 @@
       class="line {category}"
       class:active
       stroke-width={strokeWidth}
+      stroke-dasharray={nextIsPending ? '3' : 'none'}
       x1={x + r}
       x2={x + nextX - r}
       y1={y}
@@ -58,9 +64,9 @@
   </g>
   {#if showText}
     <text
-      x={atTheEnd ? x + r : x + 2 * r}
+      x={atTheEnd ? x + r : x + 3 * r}
       text-anchor={atTheEnd ? 'end' : 'start'}
-      y={atTheEnd ? y + r * 6 : y + r}
+      y={atTheEnd ? y + r * 6 : y + r + r / 2}
       class="text"
       class:active>{group?.name}</text
     >

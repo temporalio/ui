@@ -102,8 +102,42 @@
     fetchAllEvents({ namespace, workflowId, runId, sort });
   };
 
-  $: $refresh,
-    getWorkflowAndEventHistory(namespace, workflowId, runId, $eventFilterSort);
+  const getOnlyWorkflowWithPendingActivities = async (
+    refresh: number,
+    namespace: string,
+    workflowId: string,
+    runId: string,
+  ) => {
+    if (refresh && $workflowRun?.workflow?.isRunning) {
+      const { settings } = $page.data;
+
+      const { workflow, error } = await fetchWorkflow({
+        namespace,
+        workflowId,
+        runId,
+      });
+
+      if (error) {
+        workflowError = error;
+        return;
+      }
+      workflow.pendingActivities = await toDecodedPendingActivities(
+        workflow,
+        namespace,
+        settings,
+        $authUser?.accessToken,
+      );
+      $workflowRun = { ...$workflowRun, workflow };
+    }
+  };
+
+  $: getWorkflowAndEventHistory(namespace, workflowId, runId, $eventFilterSort);
+  $: getOnlyWorkflowWithPendingActivities(
+    $refresh,
+    namespace,
+    workflowId,
+    runId,
+  );
 
   onMount(() => {
     const sort = $page.url.searchParams.get('sort');

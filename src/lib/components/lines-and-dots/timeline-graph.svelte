@@ -1,5 +1,5 @@
 <script context="module">
-  export const compactGap = 24;
+  export const compactGap = 32;
   export const gutterStart = 20;
   export const gutterEnd = 20;
 </script>
@@ -100,6 +100,7 @@
           {@const { x, nextX } = getNextEventDistance(event, group)}
           <CompactLineDot
             {group}
+            {event}
             y={(index + 1) * compactGap + compactGap / 2}
             x={gutterStart + x}
             {canvasWidth}
@@ -116,6 +117,7 @@
         {#if group.pendingActivity}
           <CompactLineDot
             {group}
+            event={group.pendingActivity}
             y={(index + 1) * compactGap + compactGap / 2}
             x={finishingX}
             {canvasWidth}

@@ -3,6 +3,7 @@ import { get } from 'svelte/store';
 import { toEventHistory } from '$lib/models/event-history';
 import type { EventSortOrder } from '$lib/stores/event-view';
 import { fullEventHistory } from '$lib/stores/events';
+import { refresh } from '$lib/stores/workflow-run';
 import type { WorkflowAPIRoutePath } from '$lib/types/api';
 import type {
   CommonHistoryEvent,
@@ -73,7 +74,6 @@ export const fetchAllEvents = async ({
   workflowId,
   runId,
   sort,
-  onComplete,
 }: FetchEventsParameters): Promise<CommonHistoryEvent[]> => {
   const onStart = () => {
     fullEventHistory.set([]);
@@ -84,6 +84,10 @@ export const fetchAllEvents = async ({
     if (next) {
       fullEventHistory.set([...get(fullEventHistory), ...toEventHistory(next)]);
     }
+  };
+
+  const onComplete = () => {
+    refresh.set(Date.now());
   };
 
   const endpoint = getEndpointForSortOrder(sort);

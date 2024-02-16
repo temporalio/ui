@@ -27,7 +27,6 @@
   export let onClick: (workflow: WorkflowEvent | PendingActivity) => void;
   export let clearActive: () => void;
 
-  let maxOffset = 1;
   const isMiddleEvent = (event: WorkflowEvent): boolean => {
     const group = groups.find((g) => g.eventIds.has(event.id));
     if (!group) return false;
@@ -108,10 +107,15 @@
     const currentIndex = group.eventList.indexOf(event);
     const nextEvent = group.eventList[currentIndex + 1];
     offset = getOpenGroups(event, pendingActivity);
-    if (offset > maxOffset) maxOffset = offset;
     if (!nextEvent && !pendingActivity) {
       return { nextDistance, offset, y };
     }
+
+    // TODO: Dont extend line when activity completes and there was a pending activity
+    // if (!nextEvent && pendingActivity && group.eventList.length === 3) {
+    //   return { nextDistance, offset, y };
+    // }
+
     const diff = pendingActivity
       ? history.length -
         parseInt(event.id) +
@@ -169,6 +173,7 @@
         )}
         <HistoryLineDot
           {event}
+          group={groups.find((g) => g.eventIds.has(event.id))}
           {scrollTop}
           {startingX}
           {y}
@@ -184,6 +189,7 @@
       {#each pendingActivities as pendingActivity, index}
         <HistoryLineDot
           event={pendingActivity}
+          group={groups.find((g) => g.eventIds.has(pendingActivity.activityId))}
           {startingX}
           y={(history.length + index + 1) * historyGap + historyGap / 2}
           offset={groups.find((g) => g?.pendingActivity === pendingActivity)
