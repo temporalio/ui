@@ -43,7 +43,7 @@
   <div class="self-end">
     <slot name="bottom" />
     <div
-      class="self-center justify-self-center pb-3 text-[0.6rem] text-secondary"
+      class="self-center justify-self-center pb-3 text-center text-[0.6rem] text-secondary"
     >
       <span class="sr-only">{translate('common.version')}</span>
       {version}
