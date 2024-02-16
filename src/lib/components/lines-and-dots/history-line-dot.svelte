@@ -25,6 +25,7 @@
   export let connectLine = false;
   export let active = false;
   export let onClick: (x: WorkflowEvent | PendingActivity) => void;
+  export let index: number;
 
   const r = 6;
   const strokeWidth = r / 2;
@@ -36,14 +37,23 @@
 <g
   on:click={() => onClick(event)}
   on:keypress={() => onClick(event)}
-  class="{category} {classification} relative"
+  class="relative cursor-pointer"
 >
+  {#if index % 2 === 1}
+    <rect
+      x={0}
+      y={y - 12}
+      width={startingX - strokeWidth}
+      height={24}
+      fill="#444F64"
+    />
+  {/if}
   {#if isPendingActivity(event)}
-    <text class="text" class:active x={5} y={y + 3}
+    <text class="text" class:active x={5} y={y + 5}
       ><tspan x={50}>Pending Activity - Attempt {event.attempt}</tspan></text
     >
   {:else}
-    <text class="text" class:active x={5} y={y + 3}
+    <text class="text" class:active x={5} y={y + 5}
       ><tspan>{event.id}</tspan><tspan x={50}
         >{spaceBetweenCapitalLetters(event?.name)}</tspan
       ></text
@@ -126,10 +136,7 @@
   text {
     fill: white;
     font-size: 16px;
-  }
-
-  text.active {
-    opacity: 0.85;
+    opacity: 1;
   }
 
   .marker,

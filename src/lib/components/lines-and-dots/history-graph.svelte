@@ -3,8 +3,6 @@
 </script>
 
 <script lang="ts">
-  import debounce from 'just-debounce';
-
   import type {
     EventGroup,
     EventGroups,
@@ -141,23 +139,9 @@
     400,
   );
   $: startingX = canvasWidth / 2;
-
-  const handleScroll = async (e) => {
-    scrollTop = e.target.scrollTop;
-  };
-
-  // $: filterHistory = () => {
-  //   return history.filter((event, index) => {
-  //     const { y } = getNextDistanceAndOffset(event, index);
-  //     return y >= scrollTop - 100 && y <= scrollTop + 900;
-  //   });
-  // };
 </script>
 
-<div
-  class="relative flex h-auto max-h-[800px] w-full gap-0 overflow-auto"
-  on:scroll={debounce(handleScroll, 50)}
->
+<div class="relative flex h-auto max-h-[800px] w-full gap-0 overflow-auto">
   <div
     class="relative h-full {activeEvent
       ? 'w-1/2'
@@ -184,6 +168,7 @@
           connectLine={!isMiddleEvent(event)}
           active={isActive(event)}
           {onClick}
+          {index}
         />
       {/each}
       {#each pendingActivities as pendingActivity, index}

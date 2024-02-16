@@ -9,7 +9,6 @@
   import Badge from '$lib/holocene/badge.svelte';
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
@@ -27,7 +26,6 @@
   import {
     routeForCallStack,
     routeForEventHistory,
-    routeForPendingActivities,
     routeForRelationships,
     routeForWorkers,
     routeForWorkflowQuery,
@@ -51,10 +49,6 @@
   };
 
   $: isRunning = $workflowRun?.workflow?.isRunning;
-  $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
-    $workflowRun.workflow?.status,
-  );
-
   $: cancelInProgress = isCancelInProgress(
     $workflowRun?.workflow?.status,
     $eventHistory,
@@ -211,28 +205,6 @@
         <Badge type="blurple" class="px-2 py-0"
           >{workflowRelationships.relationshipCount}</Badge
         >
-      </Tab>
-      <Tab
-        label={translate('workflows.pending-activities-tab')}
-        id="pending-activities-tab"
-        href={routeForPendingActivities(routeParameters)}
-        active={pathMatches(
-          $page.url.pathname,
-          routeForPendingActivities(routeParameters),
-        )}
-      >
-        <Badge
-          type={activitiesCanceled ? 'warning' : 'blurple'}
-          class="px-2 py-0"
-        >
-          {#if activitiesCanceled}<Icon
-              name="canceled"
-              width={20}
-              height={20}
-            />
-          {/if}
-          {workflow?.pendingActivities?.length}
-        </Badge>
       </Tab>
       <Tab
         label={translate('workflows.call-stack-tab')}

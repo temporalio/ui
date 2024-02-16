@@ -17,6 +17,8 @@
   import CompactLineDot from './compact-line-dot.svelte';
   import DetailsDrawer from './details-drawer.svelte';
   import Line from './line.svelte';
+  import TimelineAxisLabels from './timeline-axis-labels.svelte';
+  import TimelineAxis from './timeline-axis.svelte';
 
   export let workflow: WorkflowExecution;
   export let groups: EventGroups;
@@ -130,13 +132,14 @@
           />
         {/if}
       {/each}
-      <Line
+      <TimelineAxis
         x1={gutterStart}
         x2={finishingX - 2}
-        y1={canvasHeight - 2}
-        y2={canvasHeight - 2}
+        y={canvasHeight - 2}
+        {startTime}
       />
     </svg>
+    <TimelineAxisLabels {startTime} />
   </div>
   {#if activeGroup}
     <div class="w-full">

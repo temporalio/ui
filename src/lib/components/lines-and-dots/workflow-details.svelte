@@ -26,8 +26,8 @@
     class="flex w-full flex-col items-center justify-between gap-4 border-b-4 p-2 text-sm text-white md:flex-row lg:w-1/2 lg:border-b-0 lg:border-r-4"
   >
     <div class="flex flex-col gap-2">
-      <div class="flex gap-1">
-        <Icon name="clock" class={!workflow?.endTime && 'animate-spin'} />
+      <div class="flex items-center gap-1 text-xl">
+        <Icon name="clock" class="scale-130" />
         {elapsedTime}
       </div>
     </div>
