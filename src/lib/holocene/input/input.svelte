@@ -2,6 +2,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   import { createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
@@ -85,7 +86,7 @@
   $: disabled = disabled || copyable;
 </script>
 
-<div class="flex flex-col gap-1 {className}">
+<div class={merge('flex flex-col gap-1', className)}>
   <label class={theme} class:required class:sr-only={labelHidden} for={id}
     >{label}</label
   >

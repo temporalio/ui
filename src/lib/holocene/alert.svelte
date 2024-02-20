@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import type { IconName } from './icon/paths';
@@ -45,7 +47,7 @@
 </script>
 
 <div
-  class="alert flex {intent} {className}"
+  class={merge('alert flex', intent, className)}
   class:bold
   class:hidden
   {role}
