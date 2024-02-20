@@ -11,6 +11,7 @@ const variables = {
   '--color-brand': rgb(getColor('indigo', 800)),
   '--color-interactive': rgb(getColor('indigo', 600)),
   '--color-interactive-hover': rgb(getColor('indigo', 700)),
+  '--color-interactive-secondary': rgb(getColor('slate', 600)),
 
   '--color-text-black': rgb(colors.black),
   '--color-text-primary': rgb(colors.primary),
@@ -25,6 +26,7 @@ const variables = {
 
   '--color-surface-primary': rgb(colors.white),
   '--color-surface-secondary': rgb(colors.offWhite),
+  '--color-surface-interactive-secondary': rgb(getColor('pigeonPost', 300)),
   '--color-surface-inverse': rgb(colors.primary),
   '--color-surface-subtle': rgb(getColor('slate', 100)),
   '--color-surface-badge': rgb(getColor('slate', 100)),
@@ -34,12 +36,14 @@ const variables = {
   '--color-surface-warning': rgb(getColor('red', 300)),
 
   '--color-border-primary': rgb(colors.black),
+  '--color-border-secondary': rgb(getColor('pigeonPost', 300)),
   '--color-border-subtle': rgb(getColor('slate', 300)),
   '--color-border-error': rgb(getColor('red', 800)),
   '--color-border-information': rgb(getColor('blue', 800)),
   '--color-border-success': rgb(getColor('green', 800)),
   '--color-border-warning': rgb(getColor('red', 300)),
   '--color-border-interactive': rgb(getColor('indigo', 600)),
+  '--color-border-interactive-secondary': rgb(getColor('slate', 600)),
 } satisfies Variables;
 
 const dark: Partial<Variables<keyof typeof variables>> = {
@@ -47,6 +51,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-secondary': rgb(colors.offBlack),
   '--color-inverse': rgb(colors.primary),
   '--color-brand': rgb(getColor('indigo', 500)),
+  '--color-interactive-secondary': rgb(getColor('rhino', 950)),
 
   '--color-text-primary': rgb(colors.offWhite),
   '--color-text-secondary': rgb(getColor('slate', 200)),
@@ -58,6 +63,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
 
   '--color-surface-primary': rgb(colors.black),
   '--color-surface-secondary': rgb(colors.offBlack),
+  '--color-surface-interactive-secondary': rgb(getColor('rhino', 950)),
   '--color-surface-subtle': rgb(getColor('slate', 900)),
   '--color-surface-badge': rgb(getColor('slate', 700)),
   '--color-surface-information': rgb(getColor('blue', 950)),
@@ -66,7 +72,9 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-surface-success': rgb(getColor('green', 950)),
 
   '--color-border-primary': rgb(colors.offWhite),
+  '--color-border-secondary': rgb(getColor('slate', 600)),
   '--color-border-subtle': rgb(getColor('slate', 950)),
+  '--color-border-interactive': rgb(getColor('slate', 600)),
   '--color-border-information': rgb(getColor('blue', 700)),
   '--color-border-warning': rgb(getColor('red', 300)),
   '--color-border-error': rgb(getColor('red', 700)),
@@ -87,6 +95,10 @@ const temporal = plugin(
       },
       '.surface-secondary': {
         backgroundColor: css('--color-surface-secondary'),
+        color: css('--color-text-primary'),
+      },
+      '.surface-interactive-secondary': {
+        backgroundColor: css('--color-surface-interactive-secondary'),
         color: css('--color-text-primary'),
       },
       '.surface-inverse': {
@@ -129,6 +141,7 @@ const temporal = plugin(
       borderColor: ({ theme }) => ({
         ...theme('colors'),
         primary: css('--color-border-primary'),
+        secondary: css('--color-border-secondary'),
         subtle: css('--color-border-subtle'),
         interactive: css('--color-interactive'),
         interactiveHover: css('--color-interactive-hover'),
