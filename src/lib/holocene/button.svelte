@@ -38,7 +38,7 @@
           destructive:
             'border-[1px] border-warning bg-warning [&:not(:disabled):hover]:shadow-focus dark:[&:not(:disabled):hover]:shadow-red-600/30 [&:not(:disabled):hover]:shadow-red-200/50 [&:not(:disabled):hover]:border-white dark:[&:not(:disabled):hover]:border-red-400/50 dark:[&:not(:disabled):hover]:bg-red-400 focus-visible:border-inverse focus-visible:shadow-focus focus-visible:shadow-red-200/50',
           ghost:
-            'border-[1px] border-[transparent] bg-[transparent] text-slate-600 [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-indigo-100 [&:not(:disabled):hover]:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:bg-indigo-100 focus-visible:border-indigo-600',
+            'border-[1px] border-[transparent] bg-[transparent] text-primary [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-indigo-600/50 [&:not(:disabled):hover]:surface-interactive-secondary [&:not(:disabled):hover]:border-white dark:[&:not(:disabled):hover]:border-black focus-visible:shadow-focus focus-visible:shadow-indigo-600/50 focus-visible:bg-inverse ',
           'table-header':
             ' bg-inverse text-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:border-white',
         },
