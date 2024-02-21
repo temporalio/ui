@@ -31,9 +31,11 @@
   </div>
 </header>
 <div class="text-center align-middle">
-  <h1 class="leading-0 text-[12rem] font-semibold">{error.statusCode}</h1>
+  <h1 class="leading-0 text-[12rem] font-semibold">
+    {error?.statusCode ?? '500'}
+  </h1>
   <p class="-mt-12 text-lg">{title}</p>
   <p class="text-2xl font-bold text-red-700">
-    {error.statusText}
+    {error?.statusText ?? ''}
   </p>
 </div>
