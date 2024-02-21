@@ -59,8 +59,8 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 
 	providerCfg := serverCfg.Auth.Providers[0] // only single provider is currently supported
 
-	if len(providerCfg.IssuerUrl) > 0 {
-		ctx = oidc.InsecureIssuerURLContext(ctx, providerCfg.IssuerUrl)
+	if len(providerCfg.IssuerURL) > 0 {
+		ctx = oidc.InsecureIssuerURLContext(ctx, providerCfg.IssuerURL)
 	}
 	provider, err := oidc.NewProvider(ctx, providerCfg.ProviderURL)
 	if err != nil {
