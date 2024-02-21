@@ -99,7 +99,7 @@
       class:topLeft
       style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
     >
-      <div class="inline-block rounded-lg bg-slate-800 px-2 py-2">
+      <div class="inline-block rounded-lg bg-primary px-2 py-2">
         {#if copyable}
           <Copyable
             {copySuccessIconTitle}
