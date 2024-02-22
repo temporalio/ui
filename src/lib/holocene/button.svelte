@@ -19,7 +19,7 @@
       'w-fit',
       'items-center',
       'justify-center',
-      'border-[1px]',
+      'border',
       'gap-2',
       'rounded-lg',
       'disabled:opacity-50',
