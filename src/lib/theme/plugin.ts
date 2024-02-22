@@ -9,7 +9,11 @@ const variables = {
   '--color-inverse': rgb(colors.black),
   '--color-subtle': rgb(getColor('slate', 950)),
   '--color-brand': rgb(getColor('indigo', 800)),
+  '--color-interactive': rgb(getColor('indigo', 600)),
+  '--color-interactive-hover': rgb(getColor('indigo', 700)),
+  '--color-interactive-secondary': rgb(getColor('slate', 600)),
 
+  '--color-text-black': rgb(colors.black),
   '--color-text-primary': rgb(colors.primary),
   '--color-text-secondary': rgb(colors.secondary),
   '--color-text-inverse': rgb(colors.offWhite),
@@ -22,20 +26,26 @@ const variables = {
 
   '--color-surface-primary': rgb(colors.white),
   '--color-surface-secondary': rgb(colors.offWhite),
+  '--color-surface-interactive-secondary': rgb(getColor('slate', 300)),
   '--color-surface-inverse': rgb(colors.primary),
   '--color-surface-subtle': rgb(getColor('slate', 100)),
   '--color-surface-badge': rgb(getColor('slate', 100)),
   '--color-surface-error': rgb(getColor('red', 50)),
   '--color-surface-information': rgb(getColor('blue', 50)),
   '--color-surface-success': rgb(getColor('green', 50)),
-  '--color-surface-warning': rgb(getColor('yellow', 50)),
+  '--color-surface-warning': rgb(getColor('yellow', 950)),
+  '--color-surface-danger': rgb(getColor('red', 300)),
 
   '--color-border-primary': rgb(colors.black),
+  '--color-border-secondary': rgb(getColor('slate', 300)),
   '--color-border-subtle': rgb(getColor('slate', 300)),
   '--color-border-error': rgb(getColor('red', 800)),
   '--color-border-information': rgb(getColor('blue', 800)),
   '--color-border-success': rgb(getColor('green', 800)),
-  '--color-border-warning': rgb(getColor('yellow', 800)),
+  '--color-border-warning': rgb(getColor('yellow', 950)),
+  '--color-border-danger': rgb(getColor('red', 300)),
+  '--color-border-interactive': rgb(getColor('indigo', 600)),
+  '--color-border-interactive-secondary': rgb(getColor('slate', 600)),
 } satisfies Variables;
 
 const dark: Partial<Variables<keyof typeof variables>> = {
@@ -43,6 +53,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-secondary': rgb(colors.offBlack),
   '--color-inverse': rgb(colors.primary),
   '--color-brand': rgb(getColor('indigo', 500)),
+  '--color-interactive-secondary': rgb(getColor('slate', 950)),
 
   '--color-text-primary': rgb(colors.offWhite),
   '--color-text-secondary': rgb(getColor('slate', 200)),
@@ -54,17 +65,22 @@ const dark: Partial<Variables<keyof typeof variables>> = {
 
   '--color-surface-primary': rgb(colors.black),
   '--color-surface-secondary': rgb(colors.offBlack),
+  '--color-surface-interactive-secondary': rgb(getColor('slate', 950)),
   '--color-surface-subtle': rgb(getColor('slate', 900)),
   '--color-surface-badge': rgb(getColor('slate', 700)),
   '--color-surface-information': rgb(getColor('blue', 950)),
   '--color-surface-warning': rgb(getColor('yellow', 950)),
+  '--color-surface-danger': rgb(getColor('red', 300)),
   '--color-surface-error': rgb(getColor('red', 950)),
   '--color-surface-success': rgb(getColor('green', 950)),
 
   '--color-border-primary': rgb(colors.offWhite),
+  '--color-border-secondary': rgb(getColor('slate', 600)),
   '--color-border-subtle': rgb(getColor('slate', 950)),
   '--color-border-information': rgb(getColor('blue', 700)),
-  '--color-border-warning': rgb(getColor('yellow', 700)),
+  '--color-border-interactive': rgb(getColor('indigo', 600)),
+  '--color-border-warning': rgb(getColor('yellow', 950)),
+  '--color-border-danger': rgb(getColor('red', 300)),
   '--color-border-error': rgb(getColor('red', 700)),
   '--color-border-success': rgb(getColor('green', 700)),
 } as const;
@@ -85,6 +101,10 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-secondary'),
         color: css('--color-text-primary'),
       },
+      '.surface-interactive-secondary': {
+        backgroundColor: css('--color-surface-interactive-secondary'),
+        color: css('--color-text-primary'),
+      },
       '.surface-inverse': {
         backgroundColor: css('--color-surface-inverse'),
         color: css('--color-text-inverse'),
@@ -92,6 +112,10 @@ const temporal = plugin(
       '.surface-subtle': {
         backgroundColor: css('--color-surface-subtle'),
         color: css('--color-text-primary'),
+      },
+      '.surface-warning': {
+        backgroundColor: css('--color-surface-subtle'),
+        color: css('--color-text-black'),
       },
     });
   },
@@ -108,23 +132,30 @@ const temporal = plugin(
         inverse: css('--color-inverse'),
         subtle: css('--color-subtle'),
         badge: css('--color-surface-badge'),
+        interactive: css('--color-interactive'),
+        interactiveHover: css('--color-interactive-hover'),
 
         error: css('--color-surface-error'),
         information: css('--color-surface-information'),
         success: css('--color-surface-success'),
         warning: css('--color-surface-warning'),
+        danger: css('--color-surface-danger'),
 
         DEFAULT: css('--color-surface-primary'),
       }),
       borderColor: ({ theme }) => ({
         ...theme('colors'),
         primary: css('--color-border-primary'),
+        secondary: css('--color-border-secondary'),
         subtle: css('--color-border-subtle'),
+        interactive: css('--color-interactive'),
+        interactiveHover: css('--color-interactive-hover'),
 
         error: css('--color-border-error'),
         information: css('--color-border-information'),
         success: css('--color-border-success'),
         warning: css('--color-border-warning'),
+        danger: css('--color-border-danger'),
 
         DEFAULT: css('--color-border-primary'),
       }),
