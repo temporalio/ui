@@ -8,10 +8,10 @@ import {
   formatAttributes,
   formatMaximumAttempts,
   formatRetryExpiration,
-  NoExpiration,
 } from './format-event-attributes';
 
 const UnlimitedAttempts = translate('workflows.unlimited');
+const NoExpiration = translate('workflows.no-expiration');
 
 const workflowEvent = {
   eventId: '1',
