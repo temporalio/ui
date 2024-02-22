@@ -138,7 +138,7 @@
 
 <style lang="postcss">
   .menu-button {
-    @apply relative flex h-10 w-full flex-row items-center gap-2 rounded-lg px-4 py-2.5 text-sm disabled:cursor-not-allowed;
+    @apply relative flex h-10 w-full flex-row items-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors transition-shadow focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed;
 
     &.active {
       @apply after:h-2 after:w-2 after:-translate-x-full after:-translate-y-full after:rounded-full after:bg-blue-300 after:content-[''];
@@ -146,15 +146,15 @@
   }
 
   .primary {
-    @apply border-2 border-primary bg-primary bg-gradient-to-br text-white hover:border-indigo-600 hover:from-blue-100 hover:to-purple-100 hover:text-primary hover:shadow-focus hover:shadow-blue-600/50 focus-visible:border-indigo-600 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-primary focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
+    @apply border-interactive bg-interactive text-inverse focus-visible:shadow-primary focus-visible:shadow-primary hover:border-inverse hover:bg-interactive-hover focus-visible:border-inverse focus-visible:bg-interactive-hover;
 
     &:disabled {
-      @apply text-white opacity-75 hover:from-primary hover:to-primary;
+      @apply text-white opacity-75;
     }
   }
 
   .ghost {
-    @apply border border-[transparent] text-primary hover:border-indigo-600 hover:bg-slate-200 hover:shadow-focus hover:shadow-blue-600/50 focus:bg-slate-200 focus:shadow-focus focus:shadow-blue-600/50 focus:outline-1 focus:outline-indigo-600;
+    @apply border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:shadow-primary focus-visible:border-inverse;
 
     &:disabled {
       @apply bg-badge/50;
@@ -162,7 +162,7 @@
   }
 
   .secondary {
-    @apply surface-primary border border-primary text-primary;
+    @apply border-secondary text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:shadow-secondary focus-visible:border-white;
 
     &:disabled {
       @apply bg-slate-50;
@@ -173,13 +173,8 @@
     @apply w-10 rounded-full p-0;
   }
 
-  .secondary,
-  .ghost {
-    @apply focus-visible:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
-  }
-
   .table-header {
-    @apply h-auto max-w-fit border-2 border-[transparent] bg-primary p-0 text-sm text-white focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
+    @apply h-auto max-w-fit border-2 border-transparent bg-primary p-0 text-sm text-white focus-visible:border-white;
   }
 
   .unround {

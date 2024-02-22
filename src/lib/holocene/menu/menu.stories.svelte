@@ -11,11 +11,19 @@
   } from '$lib/holocene/menu';
 </script>
 
-<Meta title="Menu" />
+<Meta
+  title="Menu"
+  argTypes={{
+    variant: {
+      control: 'select',
+      options: ['primary', 'secondary', 'ghost'],
+    },
+  }}
+/>
 
-<Story name="menu">
+<Story name="menu" args={{ variant: 'primary' }} let:args>
   <MenuContainer>
-    <MenuButton hasIndicator controls="menu-1">
+    <MenuButton hasIndicator variant={args.variant} controls="menu-1">
       <Icon slot="leading" name="temporal-logo" />
       Menu
     </MenuButton>

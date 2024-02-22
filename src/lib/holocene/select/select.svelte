@@ -96,7 +96,9 @@
 </script>
 
 <MenuContainer class="w-full" {open}>
-  <label class:sr-only={labelHidden} for={id}>{label}</label>
+  <label class="text-sm text-primary" class:sr-only={labelHidden} for={id}
+    >{label}</label
+  >
   <MenuButton
     hasIndicator={!disabled}
     {disabled}
@@ -125,7 +127,7 @@
 
 <style lang="postcss">
   .select-input {
-    @apply surface-primary pointer-events-none w-full;
+    @apply pointer-events-none w-full bg-transparent;
   }
 
   .select-input.disabled {
