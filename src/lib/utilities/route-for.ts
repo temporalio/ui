@@ -1,9 +1,11 @@
 import { BROWSER } from 'esm-env';
+import { InvalidTokenError, jwtDecode, JwtPayload } from 'jwt-decode';
 
 import { base } from '$app/paths';
 
+import { setAuthUser } from '$lib/stores/auth-user';
 import type { EventView } from '$lib/types/events';
-import type { Settings } from '$lib/types/global';
+import { OIDCFlow, type Settings } from '$lib/types/global';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { toURL } from '$lib/utilities/to-url';
 
@@ -184,7 +186,23 @@ export const routeForAuthentication = (
   parameters: AuthenticationParameters,
 ): string => {
   const { settings, searchParams: currentSearchParams, originUrl } = parameters;
+  switch (settings.auth.flow) {
+    case OIDCFlow.AuthorizationCode:
+      return routeForAuthorizationCodeFlow(
+        settings,
+        currentSearchParams,
+        originUrl,
+      );
+    case OIDCFlow.Implicit:
+      return routeForImplicitFlow(settings, currentSearchParams, originUrl);
+  }
+};
 
+const routeForAuthorizationCodeFlow = (
+  settings: Settings,
+  currentSearchParams: URLSearchParams,
+  originUrl: string,
+) => {
   const login = new URL(`${base}/auth/sso`, settings.baseUrl);
   let opts = settings.auth.options ?? [];
 
@@ -203,6 +221,103 @@ export const routeForAuthentication = (
   }
 
   return login.toString();
+};
+
+/**
+ *
+ * @returns URL for the SSO redirect
+ * @modifies adds items to browser localStorage and sessionStorage
+ *
+ */
+const routeForImplicitFlow = (
+  settings: Settings,
+  currentSearchParams: URLSearchParams,
+  originUrl: string,
+): string => {
+  const authorizationUrl = new URL(settings.auth.authorizationUrl);
+  authorizationUrl.searchParams.set('response_type', 'id_token');
+  authorizationUrl.searchParams.set('client_id', settings.auth.clientId);
+  authorizationUrl.searchParams.set('redirect_uri', settings.auth.callbackUrl);
+  authorizationUrl.searchParams.set('scope', settings.auth.scopes.join(' '));
+
+  const nonce = crypto.randomUUID();
+  window.localStorage.setItem('nonce', nonce);
+  authorizationUrl.searchParams.set('nonce', nonce);
+
+  // state stores a reference to the redirect path
+  const state = crypto.randomUUID();
+  sessionStorage.setItem(
+    state,
+    currentSearchParams.get('returnUrl') ?? (originUrl || '/'),
+  );
+  authorizationUrl.searchParams.set('state', state);
+
+  return authorizationUrl.toString();
+};
+
+export class OIDCImplicitCallbackError extends Error {}
+
+/**
+ *
+ * @returns return URL from the SSO redirect
+ * @throws {OIDCImplicitCallbackError}
+ * @modifies removes items from browser localStorage and sessionStorage
+ *
+ */
+export const routeForOIDCImplicitCallback = (): string => {
+  const hash = new URLSearchParams(window.location.hash.substring(1));
+
+  interface OIDCImplicitJwtPayload extends JwtPayload {
+    nonce?: string;
+    name?: string;
+    email?: string;
+  }
+
+  const rawIdToken = hash.get('id_token');
+  if (!rawIdToken) {
+    throw new OIDCImplicitCallbackError('No id_token in hash');
+  }
+
+  const nonce = window.localStorage.getItem('nonce');
+  window.localStorage.removeItem('nonce');
+  if (!nonce) {
+    throw new OIDCImplicitCallbackError('No nonce in localStorage');
+  }
+
+  let token: OIDCImplicitJwtPayload;
+  try {
+    // validation is delegated to the cluster's ClaimMapper plugin
+    token = jwtDecode<OIDCImplicitJwtPayload>(rawIdToken);
+  } catch (e) {
+    if (e instanceof InvalidTokenError) {
+      throw new OIDCImplicitCallbackError('Invalid id_token in hash');
+    } else {
+      throw new OIDCImplicitCallbackError(e);
+    }
+  }
+
+  // TODO: support optional issuer validation with settings.auth.issuerUrl and token.iss
+
+  if (!token.nonce) {
+    throw new OIDCImplicitCallbackError('No nonce in token');
+  } else if (token.nonce !== nonce) {
+    throw new OIDCImplicitCallbackError('Mismatched nonces');
+  }
+
+  const state = hash.get('state');
+  const redirectUrl = new URL(sessionStorage.getItem(state) ?? '/');
+  sessionStorage.removeItem('state');
+
+  setAuthUser(
+    {
+      idToken: rawIdToken,
+      name: token.name,
+      email: token.email,
+    },
+    OIDCFlow.Implicit,
+  );
+
+  return redirectUrl.toString();
 };
 
 export const routeForLoginPage = (error = '', isBrowser = BROWSER): string => {

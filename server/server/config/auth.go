@@ -52,8 +52,27 @@ func (c *AuthProvider) validate() error {
 		return nil
 	}
 
-	if c.ProviderURL == "" {
-		return errors.New("auth provider url is not")
+	switch flowType := c.Flow; flowType {
+	case "authorization-code":
+		if c.ProviderURL == "" {
+			return errors.New("auth provider url is not set")
+		}
+		if c.AuthorizationURL == "" {
+			return errors.New("auth endpoint url is not used in auth code flow")
+		}
+	case "implicit":
+		if c.ProviderURL != "" {
+			return errors.New("auth provider url is not used in implicit flow")
+		}
+		// TODO: support optional issuer validation
+		if c.AuthorizationURL == "" {
+			return errors.New("auth issuer url is not set")
+		}
+		if c.ClientSecret != "" {
+			return errors.New("no secrets in implicit flow")
+		}
+	default:
+		return errors.New("auth oidc flow is not valid")
 	}
 
 	if c.ClientID == "" {
