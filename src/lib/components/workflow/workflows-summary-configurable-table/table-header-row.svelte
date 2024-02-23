@@ -39,7 +39,6 @@
         labelHidden
         id="select-visible-workflows"
         data-testid="batch-actions-checkbox"
-        theme="dark"
         hoverable
         bind:checked={$pageSelected}
         {indeterminate}
