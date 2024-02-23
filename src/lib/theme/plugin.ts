@@ -201,11 +201,6 @@ const temporal = plugin(
 
         DEFAULT: css('--color-text-primary'),
       }),
-      // boxShadowColor: ({ theme }) => ({
-      //   ...theme('colors'),
-
-      //   active: css('--color-interactive', 50),
-      // }),
       outlineColor: ({ theme }) => ({
         ...theme('colors'),
 
