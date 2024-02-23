@@ -123,7 +123,7 @@
   }
 
   .checkmark {
-    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border border-primary bg-primary dark:bg-transparent;
+    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border border-primary bg-white dark:bg-transparent;
   }
 
   .disabled {
