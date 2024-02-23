@@ -42,6 +42,7 @@ export const variables = {
   '--color-border-secondary': rgb(getColor('slate', 300)),
   '--color-border-subtle': rgb(getColor('slate', 300)),
   '--color-border-inverse': rgb(colors.offWhite),
+  '--color-border-disabled': rgb(getColor('slate', 300)),
   '--color-border-error': rgb(getColor('red', 800)),
   '--color-border-information': rgb(getColor('blue', 800)),
   '--color-border-success': rgb(getColor('green', 800)),
@@ -63,6 +64,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-text-primary': rgb(colors.offWhite),
   '--color-text-secondary': rgb(getColor('slate', 200)),
   '--color-text-subtle': rgb(getColor('slate', 200)),
+  '--color-text-disabled': rgb(getColor('slate', 100)),
   '--color-text-information': rgb(getColor('blue', 300)),
   '--color-text-warning': rgb(getColor('yellow', 300)),
   '--color-text-error': rgb(getColor('red', 100)),
@@ -84,6 +86,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-border-secondary': rgb(getColor('slate', 600)),
   '--color-border-subtle': rgb(getColor('slate', 800)),
   '--color-border-inverse': rgb(colors.black),
+  '--color-border-disabled': rgb(getColor('slate', 100)),
   '--color-border-information': rgb(getColor('blue', 700)),
   '--color-border-interactive': rgb(getColor('indigo', 600)),
   '--color-border-warning': rgb(getColor('yellow', 950)),
@@ -172,6 +175,7 @@ const temporal = plugin(
         interactive: css('--color-interactive'),
         'interactive-hover': css('--color-interactive-hover'),
         inverse: css('--color-border-inverse'),
+        disabled: css('--color-border-disabled'),
 
         error: css('--color-border-error'),
         information: css('--color-border-information'),
@@ -197,10 +201,15 @@ const temporal = plugin(
 
         DEFAULT: css('--color-text-primary'),
       }),
-      boxShadowColor: ({ theme }) => ({
+      // boxShadowColor: ({ theme }) => ({
+      //   ...theme('colors'),
+
+      //   active: css('--color-interactive', 50),
+      // }),
+      outlineColor: ({ theme }) => ({
         ...theme('colors'),
 
-        active: css('--color-interactive', 50),
+        interactive: css('--color-interactive'),
       }),
     },
   },
