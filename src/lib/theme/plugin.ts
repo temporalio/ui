@@ -39,7 +39,7 @@ export const variables = {
   '--color-surface-danger': rgb(getColor('red', 300)),
 
   '--color-border-primary': rgb(colors.black),
-  '--color-border-secondary': rgb(getColor('slate', 300)),
+  '--color-border-secondary': rgb(getColor('slate', 200)),
   '--color-border-subtle': rgb(getColor('slate', 300)),
   '--color-border-inverse': rgb(colors.offWhite),
   '--color-border-disabled': rgb(getColor('slate', 300)),
@@ -49,10 +49,11 @@ export const variables = {
   '--color-border-warning': rgb(getColor('yellow', 950)),
   '--color-border-danger': rgb(getColor('red', 300)),
   '--color-border-interactive': rgb(getColor('indigo', 600)),
-  '--color-border-interactive-secondary': rgb(getColor('slate', 600)),
+  '--color-border-interactive-secondary': rgb(getColor('slate', 100)),
 
   '--color-shadow-primary': rgb(getColor('indigo', 600)),
   '--color-shadow-secondary': rgb(getColor('indigo', 500)),
+  '--color-shadow-destructive': rgb(getColor('red', 200)),
 } as const satisfies Variables;
 
 const dark: Partial<Variables<keyof typeof variables>> = {
@@ -93,6 +94,9 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-border-danger': rgb(getColor('red', 300)),
   '--color-border-error': rgb(getColor('red', 700)),
   '--color-border-success': rgb(getColor('green', 700)),
+  '--color-border-interactive-secondary': rgb(getColor('slate', 800)),
+
+  '--color-shadow-destructive': rgb(getColor('red', 600)),
 } as const;
 
 const temporal = plugin(
@@ -141,6 +145,9 @@ const temporal = plugin(
       '.shadow-secondary': {
         boxShadow: `0 0 0 4px ${css('--color-shadow-secondary')}`,
       },
+      '.shadow-destructive': {
+        boxShadow: `0 0 0 4px ${css('--color-shadow-destructive', 50)}`,
+      },
     });
   },
   {
@@ -174,6 +181,7 @@ const temporal = plugin(
         subtle: css('--color-border-subtle'),
         interactive: css('--color-interactive'),
         'interactive-hover': css('--color-interactive-hover'),
+        'interactive-secondary': css('--color-border-interactive-secondary'),
         inverse: css('--color-border-inverse'),
         disabled: css('--color-border-disabled'),
 
