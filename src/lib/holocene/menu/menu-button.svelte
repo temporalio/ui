@@ -146,7 +146,7 @@
   }
 
   .primary {
-    @apply border-interactive bg-interactive text-inverse focus-visible:shadow-primary focus-visible:shadow-primary hover:border-inverse hover:bg-interactive-hover focus-visible:border-inverse focus-visible:bg-interactive-hover;
+    @apply border-interactive bg-interactive text-inverse focus-visible:shadow-primary focus-visible:shadow-primary hover:border-interactive-hover hover:bg-interactive-hover focus-visible:border-inverse focus-visible:bg-interactive-hover;
 
     &:disabled {
       @apply text-white opacity-75;
@@ -162,7 +162,7 @@
   }
 
   .secondary {
-    @apply border-secondary text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:shadow-secondary focus-visible:border-white;
+    @apply border-secondary text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:shadow-secondary hover:border-interactive-secondary focus-visible:border-white;
 
     &:disabled {
       @apply bg-slate-50;
