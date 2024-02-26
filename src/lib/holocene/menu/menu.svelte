@@ -13,7 +13,6 @@
     id: string;
     keepOpen?: boolean;
     position?: 'left' | 'right';
-    theme?: 'light' | 'dark';
     menuElement?: HTMLUListElement;
   }
 
@@ -22,7 +21,6 @@
   export let id: string;
   export let keepOpen = false;
   export let position: 'left' | 'right' = 'left';
-  export let theme: 'light' | 'dark' = 'light';
   export let menuElement: HTMLUListElement = null;
 
   const {
@@ -45,7 +43,7 @@
 <ul
   in:fly={{ duration: 100 }}
   role="menu"
-  class={merge('menu', position, theme, className)}
+  class={merge('menu', position, className)}
   class:hidden={!$open}
   aria-labelledby={id}
   tabindex={-1}
@@ -59,15 +57,7 @@
 
 <style lang="postcss">
   .menu {
-    @apply surface-primary absolute z-20 mt-1 max-h-[480px] min-w-full list-none overflow-auto rounded-lg border  text-primary shadow;
-
-    &.light {
-      @apply surface-primary border-primary text-primary;
-    }
-
-    &.dark {
-      @apply border-subtle bg-primary text-white;
-    }
+    @apply surface-primary absolute z-20 mt-1 max-h-[480px] min-w-full list-none overflow-auto rounded-lg border text-primary shadow;
 
     &.left {
       @apply left-0 origin-top-left;
