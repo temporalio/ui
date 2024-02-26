@@ -39,7 +39,6 @@
     minSize?: number;
     maxSize?: number;
     'data-testid'?: string;
-    theme?: 'light' | 'dark';
     error?: string;
     valid?: boolean;
   }
@@ -79,7 +78,6 @@
   export let optionLabelKey: keyof T = optionValueKey;
   export let minSize = 0;
   export let maxSize = 120;
-  export let theme: 'light' | 'dark' = 'light';
   export let error = '';
   export let valid = true;
 
@@ -232,7 +230,7 @@
   const handleInput = (event: ExtendedInputEvent) => {
     displayValue = event.currentTarget.value;
     dispatch('filter', displayValue);
-    if (!$open) openList();
+    if (!$open) $open = true;
 
     list = options.filter((option) => {
       if (isStringOption(option)) {
@@ -256,14 +254,14 @@
 
 <MenuContainer {open} on:close={handleMenuClose}>
   <label
-    class="combobox-label {theme}"
+    class="combobox-label"
     class:sr-only={labelHidden}
     class:invalid={!valid}
     for={id}
   >
     {label}
   </label>
-  <div class="combobox-wrapper {theme}" class:invalid={!valid}>
+  <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
     {#if leadingIcon}
       <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
@@ -286,6 +284,7 @@
       aria-expanded={$open}
       aria-required={required}
       aria-autocomplete="list"
+      on:focus|stopPropagation={openList}
       on:input|stopPropagation={handleInput}
       on:keydown|stopPropagation={handleInputKeydown}
       on:click|stopPropagation={handleInputClick}
@@ -309,17 +308,10 @@
     <span class="error">{error}</span>
   {/if}
 
-  <Menu
-    bind:menuElement
-    id="{id}-listbox"
-    role="listbox"
-    class="w-full"
-    {theme}
-  >
+  <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
     {#each list as option}
       {#if isStringOption(option)}
         <ComboboxOption
-          {theme}
           on:click={() => handleSelectOption(option)}
           selected={value === option}
         >
@@ -328,7 +320,6 @@
       {:else if isObjectOption(option)}
         {#if canRenderCustomOption(option)}
           <ComboboxOption
-            {theme}
             on:click={() => handleSelectOption(option)}
             selected={value === option[optionValueKey]}
           >
@@ -346,27 +337,23 @@
 
 <style lang="postcss">
   .combobox-label {
-    @apply font-secondary text-sm font-normal;
+    @apply font-secondary text-sm font-normal text-primary;
 
-    &.light {
-      @apply text-primary;
-
-      &.invalid {
-        @apply text-danger;
-      }
-    }
-
-    &.dark {
-      @apply text-white;
-
-      &.invalid {
-        @apply text-danger;
-      }
+    &.invalid {
+      @apply text-danger;
     }
   }
 
   .combobox-wrapper {
-    @apply flex h-10 w-full flex-row items-center rounded-lg border border-transparent text-sm focus-within:outline-none;
+    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border border-primary text-sm focus-within:shadow-primary dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none dark:bg-transparent;
+
+    &.invalid {
+      @apply border-error text-danger;
+    }
+
+    &.disabled {
+      @apply surface-disabled border-subtle text-disabled;
+    }
   }
 
   .error {
@@ -374,42 +361,10 @@
   }
 
   .combobox-input {
-    @apply ml-2 h-full w-full grow font-primary focus:outline-none;
+    @apply ml-2 h-full w-full grow bg-transparent font-primary text-primary placeholder:text-primary focus:outline-none disabled:text-disabled disabled:placeholder:text-disabled dark:bg-transparent;
   }
 
   .combobox-button {
-    @apply mx-2 flex shrink-0 items-center justify-center rounded-full;
-  }
-
-  .combobox-wrapper.light {
-    @apply surface-primary border-primary text-primary  focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50;
-
-    &.invalid {
-      @apply border-danger;
-    }
-
-    > .combobox-input {
-      @apply surface-primary text-primary placeholder:text-subtle;
-    }
-
-    > .combobox-button {
-      @apply bg-gradient-to-br hover:from-blue-100 hover:to-purple-100;
-    }
-  }
-
-  .combobox-wrapper.dark {
-    @apply border-subtle bg-transparent text-white focus-within:border-indigo-600 focus-within:bg-primary focus-within:shadow-focus focus-within:shadow-indigo-500/50;
-
-    &.invalid {
-      @apply border-danger;
-    }
-
-    > .combobox-input {
-      @apply bg-transparent text-primary placeholder:text-primary/50;
-    }
-
-    > .combobox-button {
-      @apply hover:bg-slate-700;
-    }
+    @apply mx-2 flex shrink-0 items-center justify-center rounded-full hover:surface-interactive-secondary;
   }
 </style>

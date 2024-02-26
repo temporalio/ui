@@ -1,3 +1,5 @@
+import type { variables } from './plugin';
+
 const removeHexPrefix = (hex: `#${string}`) => hex.replace('#', '');
 
 export const rgb = (hexColor: `#${string}`): RGB => {
@@ -9,4 +11,5 @@ export const rgb = (hexColor: `#${string}`): RGB => {
   return `${r} ${g} ${b}`;
 };
 
-export const css = (variable: CSSVariable) => `rgb(var(${variable}))`;
+export const css = (variable: keyof typeof variables, opacity?: Opacity) =>
+  opacity ? `rgb(var(${variable}) / ${opacity}%)` : `rgb(var(${variable}))`;
