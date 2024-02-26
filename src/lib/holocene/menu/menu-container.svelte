@@ -3,6 +3,7 @@
   import { writable, type Writable } from 'svelte/store';
 
   import { createEventDispatcher, setContext } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import { clickoutside } from '$lib/holocene/outside-click';
 
@@ -43,6 +44,10 @@
   });
 </script>
 
-<div use:clickoutside={closeMenu} class="relative {className}" {...$$restProps}>
+<div
+  use:clickoutside={closeMenu}
+  class={merge('relative', className)}
+  {...$$restProps}
+>
   <slot {open} />
 </div>
