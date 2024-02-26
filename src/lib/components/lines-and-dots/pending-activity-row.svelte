@@ -4,7 +4,7 @@
   import type { PendingActivity } from '$lib/types/events';
 
   import EventRowDetails from './event-row-details.svelte';
-  import { historyGap } from './history-graph.svelte';
+  import { historyGap } from './svg/history-graph.svelte';
 
   export let pendingActivity: PendingActivity;
   export let onClick: (pending: PendingActivity) => void;

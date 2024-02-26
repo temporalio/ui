@@ -2,7 +2,6 @@
   export let x1 = 0;
   export let x2 = 1000;
   export let y = 1000;
-  export let startTime: string;
 
   const ticks = 20;
 

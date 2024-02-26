@@ -14,10 +14,11 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
 
+  import DetailsDrawer from '../details-drawer.svelte';
+  import TimelineAxisLabels from '../timeline-axis-labels.svelte';
+
   import CompactLineDot from './compact-line-dot.svelte';
-  import DetailsDrawer from './details-drawer.svelte';
   import Line from './line.svelte';
-  import TimelineAxisLabels from './timeline-axis-labels.svelte';
   import TimelineAxis from './timeline-axis.svelte';
 
   export let workflow: WorkflowExecution;
@@ -132,12 +133,7 @@
           />
         {/if}
       {/each}
-      <TimelineAxis
-        x1={gutterStart}
-        x2={finishingX - 2}
-        y={canvasHeight - 2}
-        {startTime}
-      />
+      <TimelineAxis x1={gutterStart} x2={finishingX - 2} y={canvasHeight - 2} />
     </svg>
     <TimelineAxisLabels {startTime} />
   </div>

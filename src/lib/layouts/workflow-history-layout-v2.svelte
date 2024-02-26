@@ -3,9 +3,9 @@
 
   import EventSortFilter from '$lib/components/lines-and-dots/event-sort-filter.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
-  import EventGraph from '$lib/components/lines-and-dots/history-graph.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
-  import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph.svelte';
+  import HistoryGraph from '$lib/components/lines-and-dots/svg/history-graph.svelte';
+  import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
@@ -134,7 +134,7 @@
         clearActive={clearActives}
       />
     {:else}
-      <EventGraph
+      <HistoryGraph
         history={$filteredEventHistory}
         {groups}
         {pendingActivities}

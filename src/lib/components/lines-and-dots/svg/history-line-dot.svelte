@@ -12,7 +12,6 @@
   // import { formatDate } from '$lib/utilities/format-date';
 
   export let y: number = 20;
-  export let scrollTop: number = 0;
   export let category: EventTypeCategory | 'pending';
   export let classification: EventClassification | undefined = undefined;
 

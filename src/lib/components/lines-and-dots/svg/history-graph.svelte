@@ -13,7 +13,8 @@
     WorkflowEvents,
   } from '$lib/types/events';
 
-  import DetailsDrawer from './details-drawer.svelte';
+  import DetailsDrawer from '../details-drawer.svelte';
+
   import HistoryLineDot from './history-line-dot.svelte';
   import Line from './line.svelte';
 
@@ -132,7 +133,6 @@
     } else return true;
   };
 
-  let scrollTop = 0;
   let canvasWidth = 1000;
   $: canvasHeight = Math.max(
     historyGap * 2 + historyGap * (history.length + pendingActivities.length),
@@ -158,7 +158,6 @@
         <HistoryLineDot
           {event}
           group={groups.find((g) => g.eventIds.has(event.id))}
-          {scrollTop}
           {startingX}
           {y}
           {offset}
@@ -183,6 +182,7 @@
           category="pending"
           active={isActive(pendingActivity)}
           {onClick}
+          {index}
         />
       {/each}
     </svg>
