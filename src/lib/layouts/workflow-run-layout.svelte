@@ -3,6 +3,7 @@
 
   import { page } from '$app/stores';
 
+  import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -153,6 +154,8 @@
     $fullEventHistory = [];
     workflowError = undefined;
   });
+
+  let showShortcuts = false;
 </script>
 
 <LabsModeGuard>
@@ -179,3 +182,8 @@
     {/if}
   </div>
 </LabsModeGuard>
+<EventShortcutKeys
+  open={showShortcuts}
+  onOpen={() => (showShortcuts = true)}
+  onClose={() => (showShortcuts = false)}
+/>

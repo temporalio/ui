@@ -2,15 +2,15 @@
   import Button from '$lib/holocene/button.svelte';
 
   export let hidden: boolean;
-  export let onScrollToTopClick: () => void;
+  export let onScrollToBottomClick: () => void;
 </script>
 
-<div class:hidden>
+<div class="jump-to-bottom relative" class:hidden>
   <Button
     size="sm"
     variant="secondary"
-    on:click={onScrollToTopClick}
-    leadingIcon="arrow-up"
+    on:click={onScrollToBottomClick}
+    leadingIcon="arrow-down"
   />
 </div>
 

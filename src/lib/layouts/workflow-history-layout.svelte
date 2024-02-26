@@ -2,7 +2,6 @@
   import { page } from '$app/stores';
 
   import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
-  import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
@@ -26,7 +25,6 @@
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  let showShortcuts = false;
   let showDownloadPrompt = false;
 
   $: workflowEvents =
@@ -140,11 +138,6 @@
     </nav>
     <slot />
   </section>
-  <EventShortcutKeys
-    open={showShortcuts}
-    onOpen={() => (showShortcuts = true)}
-    onClose={() => (showShortcuts = false)}
-  />
 </div>
 
 <Modal
