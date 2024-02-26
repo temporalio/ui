@@ -81,7 +81,7 @@
       {#if index !== 0}<EventDetailsHeader text={event.name} />{/if}
       <EventDetails {event} />
     {/each}
-    {#if activeGroup.pendingActivity}
+    {#if activeGroup?.pendingActivity}
       <EventDetailsHeader text="Pending" />
       <PendingDetails pendingActivity={activeGroup.pendingActivity} />
     {/if}

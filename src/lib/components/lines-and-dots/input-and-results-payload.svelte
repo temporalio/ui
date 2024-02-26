@@ -17,7 +17,6 @@
   export let content: string;
   export let isRunning: boolean;
 
-  console.log('Is running: ', isRunning);
   $: parsedContent = parseContent(content);
   $: payloads = getPayloads(parsedContent);
   $: showParsedContent = payloads.length > 0;
