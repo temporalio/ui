@@ -79,6 +79,8 @@
     if (selectedOption !== undefined) {
       return selectedOption.label;
     }
+
+    return '';
   }
 
   setContext<SelectContext<T>>(SELECT_CONTEXT, {
