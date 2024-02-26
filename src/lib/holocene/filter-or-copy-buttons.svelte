@@ -1,6 +1,8 @@
 <script lang="ts">
   import { noop } from 'svelte/internal';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
@@ -22,7 +24,7 @@
 
 {#if show}
   <div
-    class="copy-or-filter {className}"
+    class={merge('copy-or-filter', className)}
     on:click|preventDefault|stopPropagation={noop}
     on:keyup|preventDefault|stopPropagation={noop}
   >

@@ -3,6 +3,7 @@
   import { writable } from 'svelte/store';
 
   import { createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
@@ -16,6 +17,7 @@
   const dispatch = createEventDispatcher<{
     change: T | string;
     filter: string;
+    close: T | string;
   }>();
 
   type ExtendedInputEvent = Event & {
@@ -131,6 +133,12 @@
   const closeList = () => {
     if (!$open) return;
     $open = false;
+    dispatch('close', selectedOption);
+    resetValueAndOptions();
+  };
+
+  const handleMenuClose = () => {
+    dispatch('close', selectedOption);
     resetValueAndOptions();
   };
 
@@ -246,7 +254,7 @@
   };
 </script>
 
-<MenuContainer {open} on:close={resetValueAndOptions}>
+<MenuContainer {open} on:close={handleMenuClose}>
   <label
     class="combobox-label {theme}"
     class:sr-only={labelHidden}
@@ -268,7 +276,7 @@
       type="text"
       value={displayValue}
       class:disabled
-      class="combobox-input {className}"
+      class={merge('combobox-input', className)}
       role="combobox"
       autocomplete="off"
       autocapitalize="off"

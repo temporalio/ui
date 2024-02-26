@@ -19,11 +19,11 @@
       'w-fit',
       'items-center',
       'justify-center',
+      'border',
       'gap-2',
       'rounded-lg',
       'disabled:opacity-50',
       'disabled:cursor-not-allowed',
-      'border-2',
       'border-box',
       'transition-colors',
       'transition-shadow',
@@ -33,13 +33,13 @@
       variants: {
         variant: {
           primary:
-            ' bg-inverse bg-gradient-to-br text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:from-blue-100 [&:not(:disabled):hover]:to-purple-100 [&:not(:disabled):hover]:text-primary [&:not(:disabled):hover]:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-primary focus-visible:border-indigo-600',
+            'bg-interactive border-interactive text-inverse hover:enabled:bg-interactiveHover focus-visible:enabled:bg-interactiveHover focus-visible:enabled:border-white dark:focus-visible:enabled:border-black focus-visible:shadow-focus focus-visible:shadow-indigo-600/50 ',
           secondary:
-            ' surface-primary text-primary [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-inverse [&:not(:disabled):hover]:text-white [&:not(:disabled):hover]:border-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:bg-inverse focus-visible:text-white focus-visible:border-white',
+            'border-secondary text-primary focus-visible:enabled:shadow-focus focus-visible:enabled:shadow-indigo-600 hover:enabled:surface-interactive-secondary  dark:hover:enabled:border-[transparent] focus-visible:enabled:surface-interactive-secondary focus-visible:enabled:border-white dark:focus-visible:enabled:border-black',
           destructive:
-            'border-red-700 bg-red-700 text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-red-200/50 [&:not(:disabled):hover]:border-white focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-red-200/50',
+            'border-danger bg-danger dark:hover:enabled:shadow-red-600/30 hover:enabled:bg-red-400 hover:enabled:border-white dark:hover:enabled:border-black dark:hover:enabled:border-red-400/50 dark:hover:enabled:bg-red-400 focus-visible:shadow-focus dark:focus-visible:shadow-red-600/30 focus-visible:shadow-red-200/50 focus-visible:border-white dark:focus-visible:border-red-400/50 dark:focus-visible:bg-red-400',
           ghost:
-            'border-[transparent] bg-[transparent] text-slate-600 [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-indigo-100 [&:not(:disabled):hover]:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:bg-indigo-100 focus-visible:border-indigo-600',
+            'border-[transparent] bg-[transparent] text-primary hover:enabled:surface-interactive-secondary focus-visible:border-white dark:hover:enabled:border-black dark:focus-visible:border-black focus-visible:shadow-focus focus-visible:shadow-indigo-600/50 focus-visible:surface-interactive-secondary ',
           'table-header':
             ' bg-inverse text-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:border-white',
         },
