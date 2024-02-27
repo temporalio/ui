@@ -126,7 +126,13 @@ const withAuth = async (
   options: RequestInit,
   isBrowser = BROWSER,
 ): Promise<RequestInit> => {
-  if (getAuthUser().accessToken) {
+  if (globalThis?.AccessToken) {
+    options.headers = await withBearerToken(
+      options?.headers,
+      globalThis.AccessToken,
+      isBrowser,
+    );
+  } else if (getAuthUser().accessToken) {
     options.headers = await withBearerToken(
       options?.headers,
       async () => getAuthUser().accessToken,
@@ -135,12 +141,6 @@ const withAuth = async (
     options.headers = withIdToken(
       options?.headers,
       getAuthUser().idToken,
-      isBrowser,
-    );
-  } else if (globalThis?.AccessToken) {
-    options.headers = await withBearerToken(
-      options?.headers,
-      globalThis.AccessToken,
       isBrowser,
     );
   }
