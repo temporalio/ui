@@ -29,7 +29,6 @@
     description?: string;
     centered?: boolean;
     class?: string;
-    theme?: 'light' | 'dark';
     'data-testid'?: string;
   }
 
@@ -41,7 +40,6 @@
   export let href = null;
   export let description: string = null;
   export let centered = false;
-  export let theme: 'light' | 'dark' = 'light';
 
   const { keepOpen, open } = getContext<MenuContext>(MENU_CONTEXT);
 
@@ -108,7 +106,7 @@
   <a
     {href}
     role="menuitem"
-    class={merge('menu-item', theme, className)}
+    class={merge('menu-item', className)}
     class:disabled
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
@@ -121,9 +119,10 @@
 {:else}
   <li
     role="menuitem"
-    class={merge('menu-item', theme, className)}
+    class={merge('menu-item', className)}
     class:destructive
     class:disabled
+    class:selected
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -132,7 +131,7 @@
     {...$$restProps}
   >
     <slot name="leading" />
-    <div class:selected class:centered class="menu-item-wrapper {theme}">
+    <div class:centered class="menu-item-wrapper">
       {#if description}
         <div class="flex flex-col">
           <slot />
@@ -157,14 +156,18 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply m-1 flex cursor-pointer flex-row items-center gap-2 rounded border border-transparent px-3 py-2 font-primary text-sm font-medium focus-visible:border focus-visible:shadow-focus focus-visible:outline-none;
+    @apply m-1 flex cursor-pointer flex-row items-center gap-2 rounded border border-transparent px-3 py-2 font-primary text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:shadow-secondary focus-visible:border-inverse focus-visible:outline-none dark:focus-visible:border-interactive;
 
-    &.light {
-      @apply hover:bg-indigo-50 focus-visible:border-indigo-600 focus-visible:bg-indigo-50 focus-visible:shadow-indigo-500/50;
+    &.selected {
+      @apply text-active;
     }
 
-    &.dark {
-      @apply hover:bg-white/10 focus-visible:border-indigo-600 focus-visible:bg-white/20 focus-visible:shadow-indigo-500/50;
+    &.destructive {
+      @apply text-danger;
+    }
+
+    &.disabled {
+      @apply pointer-events-none cursor-not-allowed text-subtle dark:text-secondary;
     }
   }
 
@@ -174,27 +177,9 @@
     &.centered {
       @apply justify-center;
     }
-
-    &.selected {
-      &.light {
-        @apply text-indigo-600;
-      }
-
-      &.dark {
-        @apply text-indigo-500;
-      }
-    }
   }
 
   .menu-item-description {
-    @apply text-xs font-normal text-slate-500;
-  }
-
-  .destructive {
-    @apply text-red-700 hover:bg-red-50;
-  }
-
-  .menu-item.disabled {
-    @apply pointer-events-none cursor-not-allowed text-slate-500;
+    @apply text-xs font-normal text-subtle;
   }
 </style>

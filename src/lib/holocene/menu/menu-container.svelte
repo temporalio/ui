@@ -5,7 +5,7 @@
   import { createEventDispatcher, setContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import { clickOutside } from '$lib/holocene/outside-click';
+  import { clickoutside } from '$lib/holocene/outside-click';
 
   export const MENU_CONTEXT = 'menu-context';
 
@@ -45,8 +45,7 @@
 </script>
 
 <div
-  use:clickOutside
-  on:click-outside={closeMenu}
+  use:clickoutside={closeMenu}
   class={merge('relative', className)}
   {...$$restProps}
 >

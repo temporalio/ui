@@ -13,7 +13,7 @@ export const load: LayoutLoad = async function ({ fetch }) {
   const settings: Settings = await fetchSettings(fetch);
 
   if (!settings.auth.enabled) {
-    throw error(404);
+    error(404);
   }
 
   return {

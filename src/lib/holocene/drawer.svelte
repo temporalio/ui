@@ -3,7 +3,7 @@
 
   import { setContext } from 'svelte';
 
-  import { clickOutside } from '$lib/holocene/outside-click';
+  import { clickoutside } from '$lib/holocene/outside-click';
   import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
@@ -32,11 +32,10 @@
     class:dark
     class:max-w-fit={position === 'right'}
     transition:fly={flyParams}
-    use:clickOutside
     {id}
     role="region"
-    on:click-outside={onClick}
     use:focusTrap={true}
+    use:clickoutside={onClick}
   >
     <div class="relative h-full" class:pt-10={closePadding}>
       <div class="close-button-wrapper {position}">

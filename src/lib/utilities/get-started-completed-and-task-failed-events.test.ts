@@ -126,7 +126,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
       end: completedEventHistory,
     });
     expect(input).toMatchInlineSnapshot(
-      '"{\\"payloads\\":[\\"1656707328774263000\\",\\"canary\\"]}"',
+      '"{"payloads":["1656707328774263000","canary"]}"',
     );
   });
 
@@ -144,7 +144,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
       end: canceledEventHistory,
     });
     expect(input).toMatchInlineSnapshot(
-      '"{\\"payloads\\":[1656706850149404400,480000000000]}"',
+      '"{"payloads":[1656706850149404400,480000000000]}"',
     );
   });
 
@@ -154,7 +154,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
       end: canceledEventHistory,
     });
     expect(results).toMatchInlineSnapshot(
-      '"{\\"type\\":\\"workflowExecutionCanceledEventAttributes\\",\\"workflowTaskCompletedEventId\\":\\"11\\",\\"details\\":null}"',
+      '"{"type":"workflowExecutionCanceledEventAttributes","workflowTaskCompletedEventId":"11","details":null}"',
     );
   });
 
@@ -163,9 +163,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
       start: [...failedEventHistory].reverse(),
       end: failedEventHistory,
     });
-    expect(input).toMatchInlineSnapshot(
-      '"{\\"payloads\\":[1656706968987842000]}"',
-    );
+    expect(input).toMatchInlineSnapshot('"{"payloads":[1656706968987842000]}"');
   });
 
   it('should get the correct result for a failed event history', () => {
@@ -174,7 +172,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
       end: failedEventHistory,
     });
     expect(results).toMatchInlineSnapshot(
-      '"{\\"type\\":\\"workflowExecutionFailedEventAttributes\\",\\"failure\\":{\\"message\\":\\"failing on attempt 2\\",\\"source\\":\\"GoSDK\\",\\"stackTrace\\":\\"\\",\\"cause\\":null,\\"applicationFailureInfo\\":{\\"type\\":\\"\\",\\"nonRetryable\\":false,\\"details\\":null}},\\"retryState\\":\\"InProgress\\",\\"workflowTaskCompletedEventId\\":\\"4\\",\\"newExecutionRunId\\":\\"15e13ed4-880a-4557-96c6-0116e3d07b8d\\"}"',
+      '"{"type":"workflowExecutionFailedEventAttributes","failure":{"message":"failing on attempt 2","source":"GoSDK","stackTrace":"","cause":null,"applicationFailureInfo":{"type":"","nonRetryable":false,"details":null}},"retryState":"InProgress","workflowTaskCompletedEventId":"4","newExecutionRunId":"15e13ed4-880a-4557-96c6-0116e3d07b8d"}"',
     );
   });
 
@@ -184,7 +182,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
       end: runningEventHistory,
     });
     expect(input).toMatchInlineSnapshot(
-      '"{\\"payloads\\":[1656707029044596700,\\"canary\\"]}"',
+      '"{"payloads":[1656707029044596700,"canary"]}"',
     );
   });
 
@@ -202,7 +200,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
       end: terminatedEventHistory,
     });
     expect(input).toMatchInlineSnapshot(
-      '"{\\"payloads\\":[1656706488881881600,\\"temporal.fixture.terminated.workflow.id\\",\\"3cbbf515-36da-43b9-a1f3-18a7ec031ddd\\",\\"canary\\"]}"',
+      '"{"payloads":[1656706488881881600,"temporal.fixture.terminated.workflow.id","3cbbf515-36da-43b9-a1f3-18a7ec031ddd","canary"]}"',
     );
   });
 
@@ -212,7 +210,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
       end: terminatedEventHistory,
     });
     expect(results).toMatchInlineSnapshot(
-      '"{\\"type\\":\\"workflowExecutionTerminatedEventAttributes\\",\\"reason\\":\\"reset canary\\",\\"details\\":null,\\"identity\\":\\"history-service\\"}"',
+      '"{"type":"workflowExecutionTerminatedEventAttributes","reason":"reset canary","details":null,"identity":"history-service"}"',
     );
   });
 
@@ -222,7 +220,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
       end: timedOutEventHistory,
     });
     expect(input).toMatchInlineSnapshot(
-      '"{\\"payloads\\":[1656683778738403300,\\"canary\\"]}"',
+      '"{"payloads":[1656683778738403300,"canary"]}"',
     );
   });
 
@@ -232,7 +230,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
       end: timedOutEventHistory,
     });
     expect(results).toMatchInlineSnapshot(
-      '"{\\"type\\":\\"workflowExecutionTimedOutEventAttributes\\",\\"retryState\\":\\"RetryPolicyNotSet\\",\\"newExecutionRunId\\":\\"\\"}"',
+      '"{"type":"workflowExecutionTimedOutEventAttributes","retryState":"RetryPolicyNotSet","newExecutionRunId":""}"',
     );
   });
 
@@ -249,7 +247,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
       start: [...continuedAsNewEventHistory].reverse(),
       end: continuedAsNewEventHistory,
     });
-    expect(input).toMatchInlineSnapshot('"{\\"payloads\\":[3,2]}"');
+    expect(input).toMatchInlineSnapshot('"{"payloads":[3,2]}"');
   });
 
   it('should get the correct result for a continuedAsNew event history', () => {
@@ -257,7 +255,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
       start: [...continuedAsNewEventHistory].reverse(),
       end: continuedAsNewEventHistory,
     });
-    expect(results).toMatchInlineSnapshot('"{\\"payloads\\":[4,1]}"');
+    expect(results).toMatchInlineSnapshot('"{"payloads":[4,1]}"');
   });
 
   it('should set contAsNew to true for a continuedAsNew event history', () => {

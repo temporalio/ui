@@ -1,4 +1,4 @@
-const palette: Readonly<Record<string, Record<Shade, HexColor>>> = {
+const palette = {
   blue: {
     50: '#EFF5FF',
     100: '#DBE8FE',
@@ -112,18 +112,18 @@ const palette: Readonly<Record<string, Record<Shade, HexColor>>> = {
     DEFAULT: '#FF4518',
   },
   slate: {
-    50: '#F5F7F9',
-    100: '#E7EDF2',
-    200: '#D5DEE8',
-    300: '#B9C9D7',
-    400: '#97AEC3',
-    500: '#7E95B3',
-    600: '#667CA1',
-    700: '#607195',
-    800: '#525D7B',
-    900: '#444F64',
-    950: '#2D323E',
-    DEFAULT: '#7E95B3',
+    50: '#E8EFFF',
+    100: '#C9D9F0',
+    200: '#AEBED9',
+    300: '#92A4C3',
+    400: '#7C8FB1',
+    500: '#667CA1',
+    600: '#576E8F',
+    700: '#465A78',
+    800: '#273860',
+    900: '#1E293B',
+    950: '#0F172A',
+    DEFAULT: '#667CA1',
   },
   yellow: {
     50: '#FFFBEB',
@@ -139,20 +139,23 @@ const palette: Readonly<Record<string, Record<Shade, HexColor>>> = {
     950: '#461B02',
     DEFAULT: '#F8A208',
   },
-};
+} as const satisfies Readonly<Record<string, PaletteColor>>;
 
 type Palette = typeof palette;
 
-export const getColor = <C extends keyof Palette>(
-  color: C,
-  shade: keyof Palette[C] = 'DEFAULT',
+export const getColor = (
+  color: keyof Palette,
+  shade: Shade = 'DEFAULT',
 ): HexColor => {
   return palette[color][shade];
 };
 
 const colors = {
-  primary: getColor('slate', 950),
+  // primary, secondary, danger, and success should be removed at some point
+  primary: '#141414',
   secondary: getColor('slate', 500),
+  danger: getColor('red', 700),
+  success: getColor('green', 200),
   white: '#ffffff',
   offWhite: '#F8FAFC',
   black: '#141414',
@@ -160,9 +163,9 @@ const colors = {
   blurple: '#444CE7',
   current: 'currentColor',
   transparent: 'transparent',
-  danger: getColor('red', 700),
-  success: getColor('green', 200),
   ...palette,
-} satisfies Readonly<Record<string, HexColor | 'transparent' | 'currentColor'>>;
+} satisfies Readonly<
+  Record<string, HexColor | 'transparent' | 'currentColor' | PaletteColor>
+>;
 
 export default colors;
