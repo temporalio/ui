@@ -53,7 +53,7 @@ export const variables = {
 
   '--color-shadow-primary': rgb(getColor('indigo', 600)),
   '--color-shadow-secondary': rgb(getColor('indigo', 500)),
-  '--color-shadow-destructive': rgb(getColor('red', 200)),
+  '--color-shadow-danger': rgb(getColor('red', 200)),
 } as const satisfies Variables;
 
 const dark: Partial<Variables<keyof typeof variables>> = {
@@ -96,7 +96,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-border-success': rgb(getColor('green', 700)),
   '--color-border-interactive-secondary': rgb(getColor('slate', 800)),
 
-  '--color-shadow-destructive': rgb(getColor('red', 600)),
+  '--color-shadow-danger': rgb(getColor('red', 600)),
 } as const;
 
 const temporal = plugin(
@@ -138,15 +138,6 @@ const temporal = plugin(
       '.surface-disabled': {
         backgroundColor: css('--color-surface-secondary'),
         color: css('--color-text-disabled'),
-      },
-      '.shadow-primary': {
-        boxShadow: `0 0 0 4px ${css('--color-shadow-primary', 50)}`,
-      },
-      '.shadow-secondary': {
-        boxShadow: `0 0 0 4px ${css('--color-shadow-secondary')}`,
-      },
-      '.shadow-destructive': {
-        boxShadow: `0 0 0 4px ${css('--color-shadow-destructive', 50)}`,
       },
     });
   },
@@ -213,6 +204,13 @@ const temporal = plugin(
         ...theme('colors'),
 
         interactive: css('--color-interactive'),
+      }),
+      boxShadowColor: ({ theme }) => ({
+        ...theme('colors'),
+
+        primary: css('--color-shadow-primary'),
+        secondary: css('--color-shadow-secondary'),
+        danger: css('--color-shadow-danger'),
       }),
     },
   },

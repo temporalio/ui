@@ -11,5 +11,5 @@ export const rgb = (hexColor: `#${string}`): RGB => {
   return `${r} ${g} ${b}`;
 };
 
-export const css = (variable: keyof typeof variables, opacity?: Opacity) =>
-  opacity ? `rgb(var(${variable}) / ${opacity}%)` : `rgb(var(${variable}))`;
+export const css = (variable: keyof typeof variables) =>
+  `rgb(var(${variable}))`;
