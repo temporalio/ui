@@ -58,7 +58,6 @@ export const eventTypeCategorizations: Readonly<
   WorkflowExecutionStarted: CATEGORIES.WORKFLOW,
   WorkflowExecutionTerminated: CATEGORIES.WORKFLOW,
   WorkflowExecutionTimedOut: CATEGORIES.WORKFLOW,
-  WorkflowExecutionUpdateRequested: CATEGORIES.WORKFLOW,
 
   WorkflowTaskCompleted: CATEGORIES.WORKFLOW,
   WorkflowTaskFailed: CATEGORIES.WORKFLOW,
@@ -74,6 +73,8 @@ export const eventTypeCategorizations: Readonly<
 
   WorkflowExecutionUpdateAccepted: CATEGORIES.UPDATE,
   WorkflowExecutionUpdateCompleted: CATEGORIES.UPDATE,
+  WorkflowExecutionUpdateRequested: CATEGORIES.UPDATE,
+  WorkflowExecutionUpdateRejected: CATEGORIES.UPDATE,
 };
 
 export type EventTypeOption = {
