@@ -11,7 +11,7 @@ export const load: PageLoad = async ({ parent }) => {
   const isCloud = data.settings.runtimeEnvironment?.isCloud;
 
   if (isCloud) {
-    throw redirect(
+    redirect(
       302,
       routeForWorkflows({
         namespace: defaultNamespace,

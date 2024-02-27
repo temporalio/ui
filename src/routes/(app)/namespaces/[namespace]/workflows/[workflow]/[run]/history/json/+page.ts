@@ -11,5 +11,5 @@ export const load: PageLoad = async function ({ params }) {
     workflow,
     run,
   });
-  throw redirect(302, route);
+  redirect(302, route);
 };

@@ -1,4 +1,4 @@
-import { Client, Connection, WorkflowHandle } from '@temporalio/client';
+import { Client, Connection, type WorkflowHandle } from '@temporalio/client';
 
 import { getDataConverter } from './data-converter';
 import {
