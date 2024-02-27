@@ -33,13 +33,13 @@
       variants: {
         variant: {
           primary:
-            'bg-interactive border-interactive text-inverse hover:enabled:bg-interactive-hover hover:enabled:border-interactive-hover focus-visible:enabled:bg-interactive-hover focus-visible:enabled:border-white dark:focus-visible:enabled:border-black focus-visible:shadow-primary ',
+            'bg-interactive border-interactive text-inverse [&:not(:disabled):hover]:bg-interactive-hover hover:border-interactive-hover focus-visible:bg-interactive-hover focus-visible:border-white dark:focus-visible:border-black focus-visible:shadow-primary ',
           secondary:
-            'border-secondary text-primary focus-visible:shadow-secondary hover:enabled:surface-interactive-secondary hover:enabled:border-interactive-secondary dark:hover:enabled:border-transparent focus-visible:enabled:surface-interactive-secondary focus-visible:enabled:border-white dark:focus-visible:enabled:border-black',
+            'border-secondary text-primary focus-visible:shadow-secondary [&:not(:disabled):hover]:surface-interactive-secondary hover:border-interactive-secondary dark:hover:border-transparent focus-visible:surface-interactive-secondary focus-visible:border-white dark:focus-visible:border-black',
           destructive:
-            'border-danger bg-danger dark:hover:enabled:shadow-red-600/30 hover:enabled:bg-red-400 hover:enabled:border-red-400 dark:hover:enabled:border-black dark:hover:enabled:border-red-400/50 dark:hover:enabled:bg-red-400 focus-visible:shadow-focus dark:focus-visible:shadow-red-600/30 focus-visible:shadow-red-200/50 focus-visible:border-white dark:focus-visible:border-red-400/50 dark:focus-visible:bg-red-400',
+            'border-danger bg-danger  [&:not(:disabled):hover]:bg-red-400 [&:not(:disabled):hover]:border-red-400 focus-visible:shadow-focus dark:focus-visible:shadow-red-600/30 focus-visible:shadow-red-200/50 focus-visible:border-white dark:focus-visible:border-red-400/50 dark:focus-visible:bg-red-400',
           ghost:
-            'border-transparent bg-transparent text-primary hover:enabled:surface-interactive-secondary focus-visible:border-white dark:hover:enabled:border-black dark:focus-visible:border-black focus-visible:shadow-primary focus-visible:surface-interactive-secondary ',
+            'border-transparent bg-transparent text-primary [&:not(:disabled):hover]:surface-interactive-secondary focus-visible:border-white dark:hover:border-black dark:focus-visible:border-black focus-visible:shadow-primary focus-visible:surface-interactive-secondary ',
           'table-header':
             ' bg-inverse text-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:border-white',
         },
