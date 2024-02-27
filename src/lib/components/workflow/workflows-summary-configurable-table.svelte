@@ -44,10 +44,11 @@
   </caption>
   <TableHeaderRow
     onClickConfigure={openCustomizationDrawer}
-    workflows={visibleItems}
     columnsCount={columns.length}
     {empty}
     slot="headers"
+    let:visibleItems
+    workflows={visibleItems}
   >
     {#each columns as column}
       <TableHeaderCell {column} />

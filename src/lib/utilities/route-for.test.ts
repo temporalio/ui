@@ -373,36 +373,36 @@ describe('routeFor SSO authentication ', () => {
           eventId: '1234',
         }),
       ).toBe(true);
+    });
 
-      it('should return false if all of the required parametersisWorkflowParameters$x are provided', () => {
-        expect(
-          isWorkflowParameters({
-            namespace: 'default',
-            workflow: 'workflow',
-          }),
-        ).toBe(false);
-      });
+    it('should return false if all of the required parametersisWorkflowParameters$x are provided', () => {
+      expect(
+        isWorkflowParameters({
+          namespace: 'default',
+          workflow: 'workflow',
+        }),
+      ).toBe(false);
+    });
 
-      it('should return false if all of the required parameters for isEventHistoryParameters are provided', () => {
-        expect(
-          isEventHistoryParameters({
-            namespace: 'default',
-            workflow: 'workflow',
-            run: 'run',
-            view: 'feed',
-          }),
-        ).toBe(false);
-      });
+    it('should return false if all of the required parameters for isEventHistoryParameters are provided', () => {
+      expect(
+        isEventHistoryParameters({
+          namespace: 'default',
+          workflow: 'workflow',
+          run: 'run',
+          view: 'feed',
+        }),
+      ).toBe(false);
+    });
 
-      it('should return false if all of the required parameters for isEventParameters are provided', () => {
-        expect(
-          isEventParameters({
-            namespace: 'default',
-            workflow: 'workflow',
-            run: 'run',
-          }),
-        ).toBe(false);
-      });
+    it('should return false if all of the required parameters for isEventParameters are provided', () => {
+      expect(
+        isEventParameters({
+          namespace: 'default',
+          workflow: 'workflow',
+          run: 'run',
+        }),
+      ).toBe(false);
     });
   });
 });

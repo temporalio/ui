@@ -109,7 +109,7 @@
     <EmptyState
       title={translate('common.error-occurred')}
       content={translate('workflows.no-workers-running-message')}
-      error={_error?.message}
+      error={_error?.body?.message}
     />
   {/await}
 </section>

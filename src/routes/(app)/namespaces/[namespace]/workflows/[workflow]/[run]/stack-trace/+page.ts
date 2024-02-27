@@ -5,5 +5,5 @@ import type { PageLoad } from './$types';
 import { routeForCallStack } from '$lib/utilities/route-for';
 
 export const load: PageLoad = async function ({ params }) {
-  throw redirect(302, routeForCallStack(params));
+  redirect(302, routeForCallStack(params));
 };

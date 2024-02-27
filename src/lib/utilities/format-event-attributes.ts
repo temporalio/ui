@@ -37,15 +37,12 @@ const keysToExpand: Readonly<Set<string>> = new Set([
 
 const keysToFormat: Readonly<Set<string>> = new Set(['maximumAttempts']);
 
-export const UnlimitedAttempts = translate('workflows.unlimited');
-export const NoExpiration = translate('workflows.no-expiration');
-
 export const formatRetryExpiration = (
   maxAttempts: number,
   expiration: string,
 ): number | string => {
   if (maxAttempts === 0) {
-    return NoExpiration;
+    return translate('workflows.no-expiration');
   }
   return expiration;
 };
@@ -55,7 +52,7 @@ export const formatAttemptsLeft = (
   attempt: number,
 ): number | string => {
   if (!maxAttempts) {
-    return UnlimitedAttempts;
+    return translate('workflows.unlimited');
   }
   return maxAttempts - attempt;
 };
@@ -64,14 +61,14 @@ export const formatMaximumAttempts = (
   maxAttempts: number | null,
 ): number | string => {
   if (!maxAttempts) {
-    return UnlimitedAttempts;
+    return translate('workflows.unlimited');
   }
   return maxAttempts;
 };
 
 const formatValue = (key: string, value: unknown) => {
   if (key === 'maximumAttempts' && !value) {
-    return UnlimitedAttempts;
+    return translate('workflows.unlimited');
   }
   return value;
 };
