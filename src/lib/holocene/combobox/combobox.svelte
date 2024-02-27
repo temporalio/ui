@@ -257,6 +257,7 @@
     class="combobox-label"
     class:sr-only={labelHidden}
     class:invalid={!valid}
+    class:required
     for={id}
   >
     {label}
@@ -341,6 +342,10 @@
 
     &.invalid {
       @apply text-danger;
+    }
+
+    &.required {
+      @apply after:content-['*'];
     }
   }
 

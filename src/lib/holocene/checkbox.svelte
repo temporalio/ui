@@ -18,6 +18,9 @@
     value?: T;
     group?: T[];
     'data-testid'?: string;
+    required?: boolean;
+    valid?: boolean;
+    error?: string;
   }
 
   export let id = '';
@@ -29,6 +32,9 @@
   export let hoverable = false;
   export let value: T = undefined;
   export let group: T[] = undefined;
+  export let valid = true;
+  export let error = '';
+  export let required = false;
   let className = '';
   export { className as class };
 
@@ -81,12 +87,13 @@
       type="checkbox"
       bind:checked
       {disabled}
+      {required}
       class:indeterminate
       bind:this={inputElement}
       {...omit($$restProps, 'data-testid')}
     />
 
-    <span class="checkmark" class:disabled>
+    <span class="checkmark" class:disabled class:invalid={!valid}>
       {#if indeterminate}
         <Icon class="absolute left-0 top-0 h-4 w-4" name="hyphen" />
       {:else if checked}
@@ -104,6 +111,9 @@
       </span>
     </slot>
   </label>
+  {#if !valid && error}
+    <span class="error">{error}</span>
+  {/if}
 </div>
 
 <style lang="postcss">
@@ -129,9 +139,17 @@
 
   .checkmark {
     @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border border-primary bg-white dark:bg-transparent;
+
+    &.invalid {
+      @apply border-danger;
+    }
   }
 
   .disabled {
     @apply surface-disabled cursor-default border-disabled;
+  }
+
+  .error {
+    @apply text-xs text-danger;
   }
 </style>
