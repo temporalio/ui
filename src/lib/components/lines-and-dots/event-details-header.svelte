@@ -5,7 +5,7 @@
 </script>
 
 <div
-  class="flex items-center items-center gap-1 bg-blurple px-4 py-2 text-slate-100"
+  class="flex items-center items-center gap-1 bg-blurple px-4 py-2 text-white"
 >
   <p>{spaceBetweenCapitalLetters(text)}</p>
 </div>

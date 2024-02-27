@@ -7,7 +7,7 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import type { WorkflowEvent } from '$lib/types/events';
+  import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
@@ -15,11 +15,12 @@
   import EventDetails from './event-details.svelte';
   import PendingDetails from './pending-details.svelte';
 
-  export let activeEvent: WorkflowEvent | undefined = undefined;
+  export let activeEvent: WorkflowEvent | PendingActivity | undefined =
+    undefined;
   export let activeGroup: EventGroup | undefined = undefined;
   export let clearActive: () => void;
 
-  $: compact = activeGroup && !activeEvent;
+  $: timeline = activeGroup && !activeEvent;
 
   let showJSON = false;
 </script>
@@ -30,11 +31,14 @@
 >
   <div class="flex justify-between bg-blurple p-2 text-white">
     <div class="flex items-center gap-1">
-      {activeEvent?.name
-        ? `${activeEvent.id} ${spaceBetweenCapitalLetters(activeEvent.name)}`
-        : `${activeGroup.lastEvent.id} ${spaceBetweenCapitalLetters(
-            activeGroup.lastEvent.name,
-          )}`}
+      {#if timeline}
+        {activeGroup.lastEvent.id}
+        {spaceBetweenCapitalLetters(activeGroup.lastEvent.name)}
+      {:else if isPendingActivity(activeEvent)}
+        Pending
+      {:else}
+        {activeEvent.id} {spaceBetweenCapitalLetters(activeEvent.name)}
+      {/if}
     </div>
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-0">
@@ -58,7 +62,7 @@
     </div>
   </div>
   {#if showJSON}
-    {#if compact}
+    {#if timeline}
       {#each activeGroup.eventList.reverse() as event, index}
         {#if index !== 0}<EventDetailsHeader text={event.name} />{/if}
         <PayloadDecoder value={event} key="payloads" let:decodedValue>
@@ -78,9 +82,11 @@
         />
       </PayloadDecoder>
     {/if}
-  {:else if compact}
+  {:else if timeline}
     {#each activeGroup.eventList.reverse() as event, index}
-      {#if index !== 0}<EventDetailsHeader text={event.name} />{/if}
+      {#if index !== 0}<EventDetailsHeader
+          text={`${event.id} ${event.name}`}
+        />{/if}
       <EventDetails {event} />
     {/each}
     {#if activeGroup?.pendingActivity}

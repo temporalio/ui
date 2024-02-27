@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import HistoryCanvas from '$lib/components/lines-and-dots/canvas/history-canvas.svelte';
   import EventSortFilter from '$lib/components/lines-and-dots/event-sort-filter.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
@@ -42,7 +41,6 @@
   let activeEvent: WorkflowEvent | PendingActivity | undefined = undefined;
 
   let showDownloadPrompt = false;
-  let renderType = 'canvas';
 
   const clearActives = () => {
     activeGroup = undefined;
@@ -122,20 +120,6 @@
         </ToggleButtons>
       </div>
       <div class="flex gap-2">
-        <ToggleButtons>
-          <ToggleButton
-            active={renderType === 'svg'}
-            data-testid="svg"
-            on:click={() => (renderType = 'svg')}>SVG</ToggleButton
-          >
-          <ToggleButton
-            active={renderType === 'canvas'}
-            data-testid="canvas"
-            on:click={() => (renderType = 'canvas')}>Canvas</ToggleButton
-          >
-        </ToggleButtons>
-      </div>
-      <div class="flex gap-2">
         <EventTypeFilter {compact} />
         <EventSortFilter {compact} />
       </div>
@@ -147,16 +131,6 @@
         {activeGroup}
         {activeEvent}
         onClick={setActiveGroup}
-        clearActive={clearActives}
-      />
-    {:else if renderType === 'canvas'}
-      <HistoryCanvas
-        history={$filteredEventHistory}
-        {groups}
-        {pendingActivities}
-        {activeGroup}
-        {activeEvent}
-        onClick={setActiveEvent}
         clearActive={clearActives}
       />
     {:else}

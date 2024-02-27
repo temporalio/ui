@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import type { WorkflowEvent } from '$lib/types/events';
+  import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
 
   import DetailsDrawer from './details-drawer.svelte';
 
-  export let activeGroup: EventGroup | undefined = undefined;
+  export let activeGroup: EventGroup | PendingActivity | undefined = undefined;
   export let activeEvent: WorkflowEvent | undefined = undefined;
   export let clearActive: () => void;
 

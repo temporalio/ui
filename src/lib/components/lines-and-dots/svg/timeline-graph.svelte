@@ -20,7 +20,8 @@
   export let groups: EventGroups;
 
   export let activeGroup: EventGroup | undefined = undefined;
-  export let activeEvent: WorkflowEvent | undefined = undefined;
+  export let activeEvent: WorkflowEvent | PendingActivity | undefined =
+    undefined;
   export let onClick: (event: EventGroup) => void;
   export let clearActive: () => void;
 
