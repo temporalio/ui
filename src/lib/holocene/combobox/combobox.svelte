@@ -256,7 +256,6 @@
   <label
     class="combobox-label"
     class:sr-only={labelHidden}
-    class:invalid={!valid}
     class:required
     for={id}
   >
@@ -338,11 +337,7 @@
 
 <style lang="postcss">
   .combobox-label {
-    @apply font-secondary text-sm font-normal text-primary;
-
-    &.invalid {
-      @apply text-danger;
-    }
+    @apply font-secondary text-sm font-medium text-primary;
 
     &.required {
       @apply after:content-['*'];
@@ -362,7 +357,7 @@
   }
 
   .error {
-    @apply absolute text-sm text-danger;
+    @apply text-xs text-danger;
   }
 
   .combobox-input {
