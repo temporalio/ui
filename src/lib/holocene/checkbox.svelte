@@ -2,6 +2,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   import { createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { omit } from '$lib/utilities/omit';
@@ -28,6 +29,8 @@
   export let hoverable = false;
   export let value: T = undefined;
   export let group: T[] = undefined;
+  let className = '';
+  export { className as class };
 
   let inputElement: HTMLInputElement;
   $: inputElement !== undefined && (inputElement.indeterminate = indeterminate);
@@ -62,12 +65,11 @@
   data-testid={$$restProps['data-testid'] ?? null}
   on:click|stopPropagation
   on:keypress|stopPropagation
-  class={$$props.class}
 >
   <label
     on:click
     on:keypress
-    class="checkbox"
+    class={merge('checkbox', 'text-primary', className)}
     class:hoverable={hoverable && !disabled}
     class:disabled
   >
@@ -106,7 +108,7 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px] text-primary;
+    @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px];
   }
 
   .checkbox.hoverable:hover .checkmark::before {
