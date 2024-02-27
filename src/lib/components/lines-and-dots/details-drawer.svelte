@@ -9,6 +9,7 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { WorkflowEvent } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
+  import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
   import EventDetailsHeader from './event-details-header.svelte';
   import EventDetails from './event-details.svelte';
@@ -16,8 +17,9 @@
 
   export let activeEvent: WorkflowEvent | undefined = undefined;
   export let activeGroup: EventGroup | undefined = undefined;
-  export let compact: boolean;
   export let clearActive: () => void;
+
+  $: compact = activeGroup && !activeEvent;
 
   let showJSON = false;
 </script>
@@ -46,13 +48,13 @@
         />
         <Icon name="json" />
       </div>
-      <div
+      <button
         class="cursor-pointer"
         on:click={clearActive}
         on:keypress={clearActive}
       >
         <Icon name="close" />
-      </div>
+      </button>
     </div>
   </div>
   {#if showJSON}
@@ -85,7 +87,7 @@
       <EventDetailsHeader text="Pending" />
       <PendingDetails pendingActivity={activeGroup.pendingActivity} />
     {/if}
-  {:else if activeEvent?.activityId}
+  {:else if isPendingActivity(activeEvent)}
     <PendingDetails pendingActivity={activeEvent} />
   {:else}
     <EventDetails event={activeEvent} />

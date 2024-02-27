@@ -22,12 +22,7 @@
   </div>
   {#if activeEvent || activeGroup}
     <div class="sticky top-0 w-1/2">
-      <DetailsDrawer
-        {activeEvent}
-        {activeGroup}
-        {clearActive}
-        compact={false}
-      />
+      <DetailsDrawer {activeEvent} {activeGroup} {clearActive} />
     </div>
   {/if}
 </div>
