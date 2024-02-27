@@ -165,4 +165,13 @@ describe('getGroupId', () => {
     } as unknown as CommonHistoryEvent;
     expect(getGroupId(event)).toBe('59');
   });
+
+  it('should get the correct ID for WorkflowExecutionUpdateRequested events', () => {
+    const event = {
+      workflowExecutionUpdateRequestedEventAttributes: {
+        acceptedEventId: 59,
+      },
+    } as unknown as CommonHistoryEvent;
+    expect(getGroupId(event)).toBe('59');
+  });
 });
