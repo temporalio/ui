@@ -214,7 +214,7 @@
     "vitest": "^1.0.0",
     "vitest-localstorage-mock": "^0.0.1",
     "wait-port": "^1.0.4",
-    "webpack": "^5.75.0",
+    "webpack": "^5.76.0",
     "yargs": "^17.7.2",
     "zx": "^7.1.1"
   },
