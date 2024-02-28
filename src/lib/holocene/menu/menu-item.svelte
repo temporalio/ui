@@ -11,6 +11,8 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
+  import Tooltip from '../tooltip.svelte';
+
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
   type ExtendedLIEvent = KeyboardEvent & {
@@ -25,6 +27,7 @@
     selected?: boolean;
     destructive?: boolean;
     disabled?: boolean;
+    disabledText?: string;
     href?: string;
     description?: string;
     centered?: boolean;
@@ -37,6 +40,7 @@
   export let selected = undefined;
   export let destructive = false;
   export let disabled = false;
+  export let disabledText: string = 'unavailable';
   export let href = null;
   export let description: string = null;
   export let centered = false;
@@ -103,19 +107,21 @@
 </script>
 
 {#if href}
-  <a
-    {href}
-    role="menuitem"
-    class={merge('menu-item', className)}
-    class:disabled
-    aria-hidden={disabled ? 'true' : 'false'}
-    aria-disabled={disabled}
-    tabindex={disabled ? -1 : 0}
-    on:keydown|stopPropagation={handleKeydown}
-    {...$$restProps}
-  >
-    <slot />
-  </a>
+  <Tooltip bottom text={disabledText} hide={!disabled}>
+    <a
+      {href}
+      role="menuitem"
+      class={merge('menu-item', className)}
+      class:disabled
+      aria-hidden={disabled ? 'true' : 'false'}
+      aria-disabled={disabled}
+      tabindex={disabled ? -1 : 0}
+      on:keydown|stopPropagation={handleKeydown}
+      {...$$restProps}
+    >
+      <slot />
+    </a>
+  </Tooltip>
 {:else}
   <li
     role="menuitem"
@@ -130,27 +136,29 @@
     on:keydown|stopPropagation={handleKeydown}
     {...$$restProps}
   >
-    <slot name="leading" />
-    <div class:centered class="menu-item-wrapper">
-      {#if description}
-        <div class="flex flex-col">
+    <Tooltip bottom text={disabledText} hide={!disabled}>
+      <slot name="leading" />
+      <div class:centered class="menu-item-wrapper">
+        {#if description}
+          <div class="flex flex-col">
+            <slot />
+            <span class="menu-item-description">
+              {description}
+            </span>
+          </div>
+        {:else}
           <slot />
-          <span class="menu-item-description">
-            {description}
-          </span>
-        </div>
-      {:else}
-        <slot />
-      {/if}
-      {#if selected !== undefined}
-        <div class="flex h-6 w-6 shrink-0">
-          {#if selected}
-            <Icon name="checkmark" />
-          {/if}
-        </div>
-      {/if}
-    </div>
-    <slot name="trailing" />
+        {/if}
+        {#if selected !== undefined}
+          <div class="flex h-6 w-6 shrink-0">
+            {#if selected}
+              <Icon name="checkmark" />
+            {/if}
+          </div>
+        {/if}
+      </div>
+      <slot name="trailing" />
+    </Tooltip>
   </li>
 {/if}
 
@@ -167,7 +175,7 @@
     }
 
     &.disabled {
-      @apply pointer-events-none cursor-not-allowed text-subtle dark:text-secondary;
+      @apply cursor-not-allowed text-subtle dark:text-secondary;
     }
   }
 
