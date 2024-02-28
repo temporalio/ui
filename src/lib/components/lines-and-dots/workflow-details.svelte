@@ -19,19 +19,17 @@
   });
 </script>
 
-<div
-  class="flex flex-col rounded-t border-b-4 bg-slate-900 text-white lg:flex-row"
->
+<div class="flex flex-col rounded-t text-white lg:flex-row">
   <div
-    class="flex w-full flex-col items-center justify-between gap-4 border-b-4 p-2 text-sm text-white md:flex-row lg:w-1/2 lg:border-b-0 lg:border-r-4"
+    class="flex w-full flex-col items-center justify-between gap-4 p-2 text-sm text-white md:flex-row lg:w-1/2"
   >
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-4">
       <div class="flex items-center gap-1 text-xl">
         <Icon name="clock" class="scale-130" />
         {elapsedTime}
       </div>
     </div>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-4">
       <div class="flex justify-end gap-4">
         <p class="text-slate-200">{translate('common.start')}</p>
         {formatDate(workflow?.startTime, $timeFormat, {

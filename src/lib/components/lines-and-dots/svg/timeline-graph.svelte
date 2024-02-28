@@ -12,9 +12,9 @@
   import DrawerWrapper from '../drawer-wrapper.svelte';
   import TimelineAxisLabels from '../timeline-axis-labels.svelte';
 
-  import CompactLineDot from './compact-line-dot.svelte';
   import Line from './line.svelte';
   import TimelineAxis from './timeline-axis.svelte';
+  import TimelineGraphRow from './timeline-graph-row.svelte';
 
   export let workflow: WorkflowExecution;
   export let groups: EventGroups;
@@ -86,12 +86,15 @@
 <DrawerWrapper {activeGroup} {activeEvent} {clearActive} let:canvasWidth>
   {@const finishingX = canvasWidth - gutterEnd}
   <svg class="w-full" viewBox="0 0 {canvasWidth} {canvasHeight}">
-    <Line x1={gutterStart} x2={gutterStart} y1={0} y2={canvasHeight} />
     <Line
-      x1={finishingX}
-      x2={finishingX}
-      y1={0}
-      y2={canvasHeight}
+      startPoint={[gutterStart, 0]}
+      endPoint={[gutterStart, canvasHeight]}
+      strokeWidth={4}
+    />
+    <Line
+      startPoint={[finishingX, 0]}
+      endPoint={[finishingX, canvasHeight]}
+      strokeWidth={4}
       status={workflow.status}
     />
     {#each groups as group, index (group.id)}
@@ -102,7 +105,7 @@
           canvasWidth,
           finishingX,
         )}
-        <CompactLineDot
+        <TimelineGraphRow
           {group}
           {event}
           y={(index + 1) * gap + gap / 2}
@@ -118,7 +121,7 @@
         />
       {/each}
       {#if group.pendingActivity}
-        <CompactLineDot
+        <TimelineGraphRow
           {group}
           event={group.pendingActivity}
           y={(index + 1) * gap + gap / 2}

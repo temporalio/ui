@@ -22,11 +22,11 @@
   $: showParsedContent = payloads.length > 0;
 </script>
 
-<div class="flex w-full grow flex-col py-4 {$$restProps.class}">
-  <h3 class="flex items-center gap-2 pl-4 text-lg text-white">
+<div class="flex w-full grow flex-col gap-2 py-4 {$$restProps.class}">
+  <h3 class="flex items-center gap-2 text-2xl text-white">
     {title}
   </h3>
-  <div class="flex h-full flex-col gap-0 overflow-scroll">
+  <div class="flex h-full flex-col gap-4 overflow-scroll">
     {#if content}
       {#if showParsedContent}
         <PayloadDecoder value={parsedContent} key="payloads" let:decodedValue>

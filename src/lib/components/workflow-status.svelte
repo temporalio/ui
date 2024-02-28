@@ -104,6 +104,6 @@
 
 <style lang="postcss">
   .big {
-    @apply flex w-full justify-center rounded-none py-6 text-xl;
+    @apply flex justify-center p-2 text-lg;
   }
 </style>

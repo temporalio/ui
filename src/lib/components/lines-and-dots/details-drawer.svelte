@@ -26,7 +26,7 @@
 </script>
 
 <div
-  class="flex h-full flex-col gap-0 overflow-auto border-l-4 bg-slate-900"
+  class="flex h-full flex-col gap-0 overflow-auto border-l-4 bg-slate-950"
   in:fly={{ x: 50, delay: 0, duration: 350 }}
 >
   <div class="flex justify-between bg-blurple p-2 text-white">

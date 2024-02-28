@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import EventSortFilter from '$lib/components/lines-and-dots/event-sort-filter.svelte';
+  // import EventSortFilter from '$lib/components/lines-and-dots/event-sort-filter.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
   import HistoryGraph from '$lib/components/lines-and-dots/svg/history-graph.svelte';
@@ -84,19 +84,19 @@
   );
 </script>
 
-<div class="flex flex-col gap-0">
+<div class="flex flex-col gap-0 bg-slate-950 px-4 text-white">
   <WorkflowCallStackError />
   {#if workflowTaskFailedError}
     <WorkflowTypedError error={workflowTaskFailedError} />
   {/if}
-  <div class="flex flex-col gap-0 border-4 border-t-0 bg-slate-950">
+  <div class="flex flex-col gap-0">
     <WorkflowDetails />
     <InputAndResults />
     <div
-      class="surface-inverse flex flex-col items-center justify-between gap-2 border-b-4 bg-slate-900 px-4 py-2 md:flex-row"
+      class="flex flex-col items-center justify-between gap-2 py-2 md:flex-row"
     >
       <div class="flex flex-col items-center gap-2 md:flex-row md:gap-4">
-        <h2 class="text-xl font-medium">
+        <h2 class="text-2xl font-medium">
           {translate('workflows.event-history')}
         </h2>
         <ToggleButtons>
@@ -121,30 +121,32 @@
       </div>
       <div class="flex gap-2">
         <EventTypeFilter {compact} />
-        <EventSortFilter {compact} />
+        <!-- <EventSortFilter {compact} /> -->
       </div>
     </div>
-    {#if compact}
-      <TimelineGraph
-        {workflow}
-        {groups}
-        {activeGroup}
-        {activeEvent}
-        onClick={setActiveGroup}
-        clearActive={clearActives}
-      />
-    {:else}
-      <HistoryGraph
-        history={$filteredEventHistory}
-        {groups}
-        {pendingActivities}
-        {activeGroup}
-        {activeEvent}
-        onClick={setActiveEvent}
-        clearActive={clearActives}
-      />
-    {/if}
   </div>
+</div>
+<div class="bg-primary">
+  {#if compact}
+    <TimelineGraph
+      {workflow}
+      {groups}
+      {activeGroup}
+      {activeEvent}
+      onClick={setActiveGroup}
+      clearActive={clearActives}
+    />
+  {:else}
+    <HistoryGraph
+      history={$filteredEventHistory}
+      {groups}
+      {pendingActivities}
+      {activeGroup}
+      {activeEvent}
+      onClick={setActiveEvent}
+      clearActive={clearActives}
+    />
+  {/if}
 </div>
 <Modal
   id="download-history"

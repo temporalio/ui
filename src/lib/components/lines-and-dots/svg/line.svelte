@@ -1,21 +1,73 @@
 <script lang="ts">
+  import type { EventTypeCategory } from '$lib/types/events';
   import type { WorkflowStatus } from '$lib/types/workflows';
 
-  export let x1 = 0;
-  export let x2 = 1000;
-  export let y1 = 0;
-  export let y2 = 1000;
-  export let status: WorkflowStatus | 'none' = 'none';
+  import { HistoryConfig } from '../constants';
 
-  const strokeWidth = 4;
+  const { radius } = HistoryConfig;
+
+  export let startPoint = [0, 1000];
+  export let endPoint = [0, 1000];
+  export let status: WorkflowStatus | 'none' = 'none';
+  export let category: EventTypeCategory | 'pending' | 'none' = 'none';
+  export let active = true;
+  export let strokeWidth: number = radius / 2;
+  export let strokeDasharray = 'none';
+
+  $: [x1, y1] = startPoint;
+  $: [x2, y2] = endPoint;
 </script>
 
-<line class="line {status}" stroke-width={strokeWidth} {x1} {x2} {y1} {y2} />
+<line
+  class="line {status} {category}"
+  class:active
+  stroke-width={strokeWidth}
+  stroke-dasharray={strokeDasharray}
+  {x1}
+  {x2}
+  {y1}
+  {y2}
+/>
 
 <style lang="postcss">
-  line {
-    stroke: #141414;
-    fill: #141414;
+  .line {
+    cursor: pointer;
+    opacity: 0.25;
+    outline: none;
+  }
+
+  .active {
+    opacity: 1;
+  }
+
+  .marker,
+  .command {
+    stroke: #ebebeb;
+  }
+
+  .timer {
+    stroke: #fbbf24;
+  }
+
+  .signal {
+    stroke: #ec4899;
+  }
+
+  .activity {
+    stroke: #a78bfa;
+  }
+
+  .pending {
+    stroke: #a78bfa;
+    stroke-dasharray: 1;
+  }
+
+  .child-workflow {
+    stroke: #b2f8d9;
+  }
+
+  .workflow {
+    stroke: #059669;
   }
 
   .Completed {

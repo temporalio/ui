@@ -3,11 +3,13 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
+  import { timeFormat } from '$lib/stores/time-format';
   import type {
     PendingActivity,
     WorkflowEvent,
     WorkflowEvents,
   } from '$lib/types/events';
+  import { formatDate } from '$lib/utilities/format-date';
 
   import {
     getNextDistanceAndOffset,
@@ -16,7 +18,7 @@
   } from '../constants';
   import DrawerWrapper from '../drawer-wrapper.svelte';
 
-  import HistoryLineDot from './history-line-dot.svelte';
+  import HistoryGraphRow from './history-graph-row.svelte';
   import Line from './line.svelte';
 
   export let history: WorkflowEvents;
@@ -47,7 +49,11 @@
 <DrawerWrapper {activeGroup} {activeEvent} {clearActive} let:canvasWidth>
   {@const startingX = canvasWidth / 2}
   <svg viewBox="0 0 {canvasWidth} {canvasHeight}">
-    <Line x1={startingX} x2={startingX} y1={0} y2={canvasHeight} />
+    <Line
+      startPoint={[startingX, 0]}
+      endPoint={[startingX, canvasHeight]}
+      strokeWidth={4}
+    />
     {#each history as event, index (event.id)}
       {@const { nextDistance, offset, y } = getNextDistanceAndOffset(
         history,
@@ -57,7 +63,7 @@
         pendingActivities,
         gap,
       )}
-      <HistoryLineDot
+      <HistoryGraphRow
         {event}
         group={groups.find((g) => g.eventIds.has(event.id))}
         {startingX}
@@ -70,10 +76,13 @@
         active={isActive(event)}
         {onClick}
         {index}
+        showTimestamp={!activeEvent &&
+          formatDate(event?.eventTime, $timeFormat) !==
+            formatDate(history[index - 1]?.eventTime, $timeFormat)}
       />
     {/each}
     {#each pendingActivities as pendingActivity, index}
-      <HistoryLineDot
+      <HistoryGraphRow
         event={pendingActivity}
         group={groups.find((g) => g.eventIds.has(pendingActivity.activityId))}
         {startingX}

@@ -4,24 +4,23 @@
 
   import DetailsDrawer from './details-drawer.svelte';
 
-  export let activeGroup: EventGroup | PendingActivity | undefined = undefined;
-  export let activeEvent: WorkflowEvent | undefined = undefined;
+  export let activeGroup: EventGroup | undefined = undefined;
+  export let activeEvent: WorkflowEvent | PendingActivity | undefined =
+    undefined;
   export let clearActive: () => void;
 
   let canvasWidth = 1000;
 </script>
 
-<div class="relative flex h-auto max-h-[800px] w-full gap-0 overflow-auto">
+<div class="relative flex h-auto max-h-[600px] w-full gap-0 overflow-auto">
   <div
-    class="relative h-full {activeEvent
-      ? 'w-1/2'
-      : 'w-full'} overflow-auto bg-slate-950"
+    class="relative h-full {activeEvent ? 'w-1/2' : 'w-full'} overflow-hidden"
     bind:clientWidth={canvasWidth}
   >
     <slot {canvasWidth} />
   </div>
   {#if activeEvent || activeGroup}
-    <div class="sticky top-0 w-1/2">
+    <div class="sticky top-0 w-1/2 grow">
       <DetailsDrawer {activeEvent} {activeGroup} {clearActive} />
     </div>
   {/if}

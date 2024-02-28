@@ -8,8 +8,9 @@ export const TEMPORAL_THEME = EditorView.theme(
   {
     '&': {
       color: 'white',
-      backgroundColor: colors.slate['950'],
-      padding: '0.35rem',
+      backgroundColor: colors.slate['900'],
+      borderRadius: '0.5rem',
+      padding: '0.5rem',
     },
     '.cm-matchingBracket': {
       backgroundColor: colors.slate['800'],
