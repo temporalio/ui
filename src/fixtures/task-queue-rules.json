@@ -1,0 +1,25 @@
+{
+  "assignmentRules": [
+    {
+      "rule": {
+        "targetBuildId": "B",
+        "ramp": {
+          "percentageRamp": {
+            "rampPercentage": 0.5
+          }
+        }
+      },
+      "createTime": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "compatibleRedirectRules": [
+    {
+      "rule": {
+        "sourceBuildId": "A",
+        "targetBuildId": "B"
+      },
+      "createTime": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "conflictToken": "abcd1234"
+}

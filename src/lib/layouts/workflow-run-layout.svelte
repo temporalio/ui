@@ -12,6 +12,7 @@
     getPollers,
     type GetPollersResponse,
     getTaskQueueCompatibility,
+    getTaskQueueRules,
     getWorkerTaskReachability,
   } from '$lib/services/pollers-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
@@ -48,6 +49,13 @@
       queue: taskQueue,
       namespace,
     });
+  };
+
+  const getRules = async (workflow: WorkflowExecution, taskQueue: string) => {
+    const workflowUsesVersioning =
+      workflow?.mostRecentWorkerVersionStamp?.useVersioning;
+    if (!workflowUsesVersioning) return;
+    return await getTaskQueueRules({ namespace, queue: taskQueue });
   };
 
   const getReachability = async ({
@@ -90,6 +98,7 @@
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
     const compatibility = await getCompatibility(workflow, taskQueue);
+    const rules = await getRules(workflow, taskQueue);
     const reachability = await getReachability({
       namespace,
       workers,
@@ -101,7 +110,7 @@
       settings,
       $authUser?.accessToken,
     );
-    $workflowRun = { workflow, workers, compatibility, reachability };
+    $workflowRun = { workflow, workers, rules, compatibility, reachability };
     const events = await fetchStartAndEndEvents({
       namespace,
       workflowId,

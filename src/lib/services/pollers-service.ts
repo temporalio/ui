@@ -12,6 +12,8 @@ import {
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
+import taskQueueRules from '$fixtures/task-queue-rules.json';
+
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 
 export type GetWorkerTaskReachabilityRequest = NamespaceScopedRequest & {
@@ -22,6 +24,31 @@ export type GetWorkerTaskReachabilityRequest = NamespaceScopedRequest & {
 export type GetPollersResponse = {
   pollers?: PollerWithTaskQueueTypes[];
   taskQueueStatus: TaskQueueStatus;
+};
+
+type AssignmentRule = {
+  rule: {
+    targetBuildId: string;
+    ramp: {
+      percentageRamp: {
+        rampPercentage: number;
+      };
+    };
+  };
+  createTime: string;
+};
+
+type CompatibleRedirectRule = {
+  rule: {
+    sourceBuildId: string;
+    targetBuildId: string;
+  };
+  createTime: string;
+};
+export type TaskQueueRules = {
+  assignmentRules: AssignmentRule[];
+  compatibleRedirectRules: CompatibleRedirectRule[];
+  conflictToken: string;
 };
 
 export type TaskQueueCompatibility = {
@@ -120,6 +147,28 @@ export async function getPollers(
     taskQueueStatus,
   };
 }
+
+export async function getTaskQueueRules(
+  parameters: GetAllPollersRequest,
+  // request = fetch,
+): Promise<TaskQueueRules> {
+  console.log('parameters', parameters);
+  // const route = routeForApi('task-queue.rules', parameters);
+  return Promise.resolve({ ...taskQueueRules });
+}
+
+// Add back when ready to implement
+
+// export async function getTaskQueueRules(
+//   parameters: GetAllPollersRequest,
+//   request = fetch,
+// ): Promise<TaskQueueCompatibility> {
+//   const route = routeForApi('task-queue.rules', parameters);
+//   return requestFromAPI(route, {
+//     request,
+//     onError: (e: APIErrorResponse) => console.error(e),
+//   });
+// }
 
 export async function getTaskQueueCompatibility(
   parameters: GetAllPollersRequest,
