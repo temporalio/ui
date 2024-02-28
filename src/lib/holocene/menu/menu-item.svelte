@@ -107,7 +107,7 @@
 </script>
 
 {#if href}
-  <Tooltip bottom text={disabledText} hide={!disabled}>
+  <Tooltip bottomRight text={disabledText} hide={!disabled}>
     <a
       {href}
       role="menuitem"
@@ -136,7 +136,7 @@
     on:keydown|stopPropagation={handleKeydown}
     {...$$restProps}
   >
-    <Tooltip bottom text={disabledText} hide={!disabled}>
+    <Tooltip bottomRight text={disabledText} hide={!disabled}>
       <slot name="leading" />
       <div class:centered class="menu-item-wrapper">
         {#if description}
