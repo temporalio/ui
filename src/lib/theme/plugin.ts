@@ -28,6 +28,7 @@ export const variables = {
   '--color-surface-secondary': rgb(colors.offWhite),
   '--color-surface-interactive': rgb(getColor('indigo', 600)),
   '--color-surface-interactive-secondary': rgb(getColor('slate', 100)),
+  '--color-surface-secondary-active': rgb(getColor('slate', 200)),
   '--color-surface-disabled': rgb(getColor('slate', 50)),
   '--color-surface-inverse': rgb(colors.primary),
   '--color-surface-subtle': rgb(getColor('slate', 100)),
@@ -75,6 +76,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-surface-primary': rgb(colors.black),
   '--color-surface-secondary': rgb(colors.offBlack),
   '--color-surface-interactive-secondary': rgb(getColor('slate', 800)),
+  '--color-surface-secondary-active': rgb(getColor('slate', 700)),
   '--color-surface-subtle': rgb(getColor('slate', 900)),
   '--color-surface-badge': rgb(getColor('slate', 700)),
   '--color-surface-information': rgb(getColor('blue', 950)),
@@ -113,6 +115,10 @@ const temporal = plugin(
       },
       '.surface-secondary': {
         backgroundColor: css('--color-surface-secondary'),
+        color: css('--color-text-primary'),
+      },
+      '.surface-secondary-active': {
+        backgroundColor: css('--color-surface-secondary-active'),
         color: css('--color-text-primary'),
       },
       '.surface-interactive': {
