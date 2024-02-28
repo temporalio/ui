@@ -7,6 +7,8 @@
   import { cva, type VariantProps } from 'class-variance-authority';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import { goto } from '$app/navigation';
+
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
@@ -104,6 +106,14 @@
   export let href: string = null;
   export let target: string = null;
   export let active = false;
+
+  const onLinkClick = (e: MouseEvent) => {
+    // Skip if middle mouse click or new tab
+    if (e.button === 1 || target || e.metaKey) return;
+    e.preventDefault();
+    e.stopPropagation();
+    goto(href);
+  };
 </script>
 
 {#if href && !disabled}
@@ -123,6 +133,7 @@
         borderRadiusModifier,
       }),
     )}
+    on:click={onLinkClick}
     tabindex={href ? null : 0}
     {...$$restProps}
   >
