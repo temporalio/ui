@@ -5,12 +5,11 @@
   } from 'svelte/elements';
 
   import { cva, type VariantProps } from 'class-variance-authority';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
-
-  import Link from './link.svelte';
 
   const buttonStyles = cva(
     [
@@ -33,13 +32,13 @@
       variants: {
         variant: {
           primary:
-            'bg-interactive border-interactive text-inverse [&:not(:disabled):hover]:bg-interactive-hover hover:border-interactive-hover focus-visible:bg-interactive-hover focus-visible:border-white dark:focus-visible:border-black focus-visible:shadow-primary ',
+            'bg-interactive border-interactive text-white hover:text-white hover:bg-interactive-hover hover:border-interactive-hover focus-visible:bg-interactive-hover focus-visible:border-white dark:focus-visible:border-black focus-visible:shadow-primary ',
           secondary:
-            'border-secondary text-primary focus-visible:shadow-secondary [&:not(:disabled):hover]:surface-interactive-secondary hover:border-interactive-secondary dark:hover:border-transparent focus-visible:surface-interactive-secondary focus-visible:border-white dark:focus-visible:border-black',
+            'border-secondary text-primary focus-visible:shadow-secondary hover:surface-interactive-secondary hover:border-interactive-secondary dark:hover:border-transparent focus-visible:surface-interactive-secondary focus-visible:border-white dark:focus-visible:border-black',
           destructive:
-            'border-danger bg-danger  [&:not(:disabled):hover]:bg-red-400 [&:not(:disabled):hover]:border-red-400 focus-visible:shadow-focus dark:focus-visible:shadow-red-600/30 focus-visible:shadow-red-200/50 focus-visible:border-white dark:focus-visible:border-red-400/50 dark:focus-visible:bg-red-400',
+            'border-danger bg-danger  hover:bg-red-400 hover:border-red-400 focus-visible:shadow-focus dark:focus-visible:shadow-red-600/30 focus-visible:shadow-red-200/50 focus-visible:border-white dark:focus-visible:border-red-400/50 dark:focus-visible:bg-red-400',
           ghost:
-            'border-transparent bg-transparent text-primary [&:not(:disabled):hover]:surface-interactive-secondary focus-visible:border-white dark:hover:border-black dark:focus-visible:border-black focus-visible:shadow-primary focus-visible:surface-interactive-secondary ',
+            'border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:border-white dark:hover:border-black dark:focus-visible:border-black focus-visible:shadow-primary focus-visible:surface-interactive-secondary ',
           'table-header':
             ' bg-inverse text-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:border-white',
         },
@@ -68,6 +67,7 @@
   );
 
   type BaseProps = {
+    icon?: IconName;
     disabled?: boolean;
     loading?: boolean;
     leadingIcon?: IconName;
@@ -100,24 +100,30 @@
   export let trailingIcon: IconName = null;
   export let count = 0;
   export let id: string = null;
+  export let icon: IconName = null;
   export let href: string = null;
   export let target: string = null;
   export let active = false;
 </script>
 
 {#if href && !disabled}
-  <Link
-    {target}
+  <a
     {href}
     {id}
     role="button"
     type="button"
-    class={buttonStyles({
-      variant,
-      size,
-      borderModifier,
-      borderRadiusModifier,
-    })}
+    target={target ? '_blank' : null}
+    rel={target ? 'noreferrer' : null}
+    class={merge(
+      icon ? 'inline-flex' : 'inline',
+      buttonStyles({
+        variant,
+        size,
+        borderModifier,
+        borderRadiusModifier,
+      }),
+    )}
+    tabindex={href ? null : 0}
     {...$$restProps}
   >
     {#if leadingIcon || loading}
@@ -137,7 +143,7 @@
         type="count">{count}</Badge
       >
     {/if}
-  </Link>
+  </a>
 {:else}
   <button
     {disabled}
