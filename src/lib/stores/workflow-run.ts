@@ -4,7 +4,6 @@ import type {
   GetPollersResponse,
   TaskQueueCompatibility,
   TaskQueueRules,
-  WorkerReachability,
 } from '$lib/services/pollers-service';
 import { persistStore } from '$lib/stores/persist-store';
 import type { WorkflowExecution } from '$lib/types/workflows';
@@ -16,7 +15,6 @@ export type WorkflowRunWithWorkers = {
   workers: GetPollersResponse;
   rules?: TaskQueueRules;
   compatibility?: TaskQueueCompatibility;
-  reachability?: WorkerReachability;
 };
 
 export const initialWorkflowRun: WorkflowRunWithWorkers = {

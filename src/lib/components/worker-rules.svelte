@@ -10,14 +10,12 @@
   import {
     type GetPollersResponse,
     type TaskQueueRules,
-    type WorkerReachability,
   } from '$lib/services/pollers-service';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
 
   export let workers: GetPollersResponse;
   export let rules: TaskQueueRules | undefined = undefined;
-  export let reachability: WorkerReachability | undefined = undefined;
 
   $: ({ assignmentRules, compatibleRedirectRules } = rules);
 </script>
@@ -152,7 +150,7 @@
     </TableRow>
   {:else}
     <tr class="w-full">
-      <td colspan={reachability?.buildIdReachability?.length ? 8 : 6}>
+      <td colspan={6}>
         <EmptyState title={translate('workflows.workers-empty-state')} />
       </td>
     </tr>

@@ -1,14 +1,37 @@
 <script lang="ts">
-  import WorkersList from '$lib/components/workers-list.svelte';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { page } from '$app/stores';
 
-  $: ({ workers, workflow, rules, compatibility, reachability } = $workflowRun);
+  import WorkersList from '$lib/components/workers-list.svelte';
+  import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
+  import { getWorkerTaskReachability } from '$lib/services/pollers-service';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import {
+    getUniqueBuildIdsFromPollers,
+    pollerHasVersioning,
+  } from '$lib/utilities/task-queue-compatibility';
+
+  let { namespace } = $page.params;
+  $: ({ workers, workflow, rules, compatibility } = $workflowRun);
+
+  $: taskQueue = workflow?.taskQueue;
+  $: versioningEnabled = pollerHasVersioning(workers.pollers);
 </script>
 
-<WorkersList
-  taskQueue={workflow?.taskQueue}
-  {workers}
-  {rules}
-  {compatibility}
-  {reachability}
-/>
+{#if versioningEnabled}
+  {@const buildIds = getUniqueBuildIdsFromPollers(workers.pollers)}
+  {#await getWorkerTaskReachability({ namespace, buildIds, taskQueue })}
+    <SkeletonTable rows={3} />
+  {:then reachability}
+    <WorkersList
+      taskQueue={workflow?.taskQueue}
+      {workers}
+      {rules}
+      {compatibility}
+      {reachability}
+    />
+  {:catch}
+    <WorkersList {taskQueue} {workers} {rules} />
+  {/await}
+{:else}
+  <WorkersList {taskQueue} {workers} />
+{/if}

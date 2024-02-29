@@ -34,7 +34,7 @@
     <span class="select-all font-normal">{taskQueue}</span>
   </h2>
   {#if rules}
-    <WorkerRules {workers} {rules} {reachability} />
+    <WorkerRules {workers} {rules} />
   {:else if versionSets?.length}
     <WorkerCompatibility {taskQueue} {workers} {compatibility} {reachability} />
   {:else}
