@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
 
   import WorkersList from '$lib/components/workers-list.svelte';
+  import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import { getWorkerTaskReachability } from '$lib/services/pollers-service';
   import { workflowRun } from '$lib/stores/workflow-run';
   import {
@@ -18,7 +19,9 @@
 
 {#if versioningEnabled}
   {@const buildIds = getUniqueBuildIdsFromPollers(workers.pollers)}
-  {#await getWorkerTaskReachability( { namespace, buildIds, taskQueue }, ) then reachability}
+  {#await getWorkerTaskReachability({ namespace, buildIds, taskQueue })}
+    <SkeletonTable rows={3} />
+  {:then reachability}
     <WorkersList {taskQueue} {workers} {compatibility} {reachability} />
   {:catch}
     <WorkersList {taskQueue} {workers} />
