@@ -2,12 +2,13 @@
   import WorkersList from '$lib/components/workers-list.svelte';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  $: ({ workers, workflow, compatibility, reachability } = $workflowRun);
+  $: ({ workers, workflow, rules, compatibility, reachability } = $workflowRun);
 </script>
 
 <WorkersList
   taskQueue={workflow?.taskQueue}
   {workers}
+  {rules}
   {compatibility}
   {reachability}
 />

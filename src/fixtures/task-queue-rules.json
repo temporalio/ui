@@ -2,21 +2,43 @@
   "assignmentRules": [
     {
       "rule": {
-        "targetBuildId": "B",
+        "targetBuildId": "1.10",
+        "ramp": {
+          "percentageRamp": {
+            "rampPercentage": 0.2
+          }
+        }
+      },
+      "createTime": "2024-01-01T00:00:00Z"
+    },
+    {
+      "rule": {
+        "targetBuildId": "1.11",
+        "ramp": {
+          "percentageRamp": {
+            "rampPercentage": 0.4
+          }
+        }
+      },
+      "createTime": "2024-02-01T00:00:00Z"
+    },
+    {
+      "rule": {
+        "targetBuildId": "1.12",
         "ramp": {
           "percentageRamp": {
             "rampPercentage": 0.5
           }
         }
       },
-      "createTime": "2024-01-01T00:00:00Z"
+      "createTime": "2024-03-01T00:00:00Z"
     }
   ],
   "compatibleRedirectRules": [
     {
       "rule": {
-        "sourceBuildId": "A",
-        "targetBuildId": "B"
+        "sourceBuildId": "1.12",
+        "targetBuildId": "1.13"
       },
       "createTime": "2024-01-01T00:00:00Z"
     }
