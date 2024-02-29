@@ -103,17 +103,20 @@
           <ToggleButton
             active={$eventViewType === 'compact'}
             data-testid="compact"
+            class="bg-slate-50"
             on:click={() => ($eventViewType = 'compact')}
             >{translate('common.timeline')}</ToggleButton
           >
           <ToggleButton
             active={$eventViewType === 'feed'}
             data-testid="feed"
+            class="bg-slate-50"
             on:click={() => ($eventViewType = 'feed')}
             >{translate('workflows.full-history')}</ToggleButton
           >
           <ToggleButton
             icon="download"
+            class="bg-slate-50"
             data-testid="download"
             on:click={() => (showDownloadPrompt = true)}
           ></ToggleButton>
