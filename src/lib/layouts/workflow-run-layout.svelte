@@ -11,9 +11,7 @@
   import { fetchAllEvents } from '$lib/services/events-service';
   import {
     getPollers,
-    type GetPollersResponse,
     getTaskQueueCompatibility,
-    getWorkerTaskReachability,
   } from '$lib/services/pollers-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
@@ -26,10 +24,6 @@
   } from '$lib/stores/workflow-run';
   import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import {
-    getUniqueBuildIdsFromPollers,
-    pollerHasVersioning,
-  } from '$lib/utilities/task-queue-compatibility';
 
   import WorkflowHeaderV2 from './workflow-header-v2.svelte';
 
@@ -46,25 +40,6 @@
     return await getTaskQueueCompatibility({
       queue: taskQueue,
       namespace,
-    });
-  };
-
-  const getReachability = async ({
-    namespace,
-    workers,
-    taskQueue,
-  }: {
-    namespace: string;
-    workers: GetPollersResponse;
-    taskQueue: string;
-  }) => {
-    const pollerUsesVersioning = pollerHasVersioning(workers.pollers);
-    if (!pollerUsesVersioning) return;
-    const buildIds = getUniqueBuildIdsFromPollers(workers.pollers);
-    return await getWorkerTaskReachability({
-      namespace,
-      buildIds,
-      taskQueue,
     });
   };
 
@@ -90,18 +65,13 @@
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
     const compatibility = await getCompatibility(workflow, taskQueue);
-    const reachability = await getReachability({
-      namespace,
-      workers,
-      taskQueue,
-    });
     workflow.pendingActivities = await toDecodedPendingActivities(
       workflow,
       namespace,
       settings,
       $authUser?.accessToken,
     );
-    $workflowRun = { workflow, workers, compatibility, reachability };
+    $workflowRun = { workflow, workers, compatibility };
     fetchAllEvents({ namespace, workflowId, runId, sort });
   };
 

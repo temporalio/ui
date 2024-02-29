@@ -256,7 +256,7 @@
   <label
     class="combobox-label"
     class:sr-only={labelHidden}
-    class:invalid={!valid}
+    class:required
     for={id}
   >
     {label}
@@ -337,18 +337,18 @@
 
 <style lang="postcss">
   .combobox-label {
-    @apply font-secondary text-sm font-normal text-primary;
+    @apply font-secondary text-sm font-medium text-primary;
 
-    &.invalid {
-      @apply text-danger;
+    &.required {
+      @apply after:content-['*'];
     }
   }
 
   .combobox-wrapper {
-    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border border-primary text-sm focus-within:shadow-primary dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none dark:bg-transparent;
+    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border border-primary text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
 
     &.invalid {
-      @apply border-error text-danger;
+      @apply border-2 border-error text-danger focus-within:shadow-danger/50;
     }
 
     &.disabled {
@@ -357,7 +357,7 @@
   }
 
   .error {
-    @apply absolute text-sm text-danger;
+    @apply text-xs text-danger;
   }
 
   .combobox-input {
