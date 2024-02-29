@@ -324,11 +324,12 @@ export async function signalWorkflow({
       method: 'POST',
       body: stringifyWithBigInt({
         signalName,
+        workflowExecution: {
+          workflowId,
+          runId,
+        },
         input: {
           payloads,
-        },
-        params: {
-          'execution.runId': runId,
         },
       }),
     },
