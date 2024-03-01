@@ -6,14 +6,16 @@
 
   import { HistoryConfig } from '../constants';
 
+  const { radius } = HistoryConfig;
+
   export let point: [number, number];
   export let category: EventTypeCategory | 'pending';
   export let classification: EventClassification | undefined = undefined;
   export let active = false;
+  export let r = radius;
 
   $: [x, y] = point;
-  const { radius } = HistoryConfig;
-  const strokeWidth = radius / 2;
+  const strokeWidth = r / 2;
 </script>
 
 <g>
@@ -34,7 +36,7 @@
     stroke-width={strokeWidth}
     cx={x}
     cy={y}
-    r={radius}
+    {r}
   />
 </g>
 

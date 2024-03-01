@@ -2,7 +2,7 @@
   import type { EventTypeCategory } from '$lib/types/events';
 
   export let point: [number, number] = [0, 0];
-  export let category: EventTypeCategory | 'pending';
+  export let category: EventTypeCategory | 'pending' | 'none' = 'none';
   export let active = false;
   export let textAnchor: 'start' | 'end' = 'start';
 
@@ -22,10 +22,15 @@
 <style lang="postcss">
   text {
     fill: white;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 400;
     opacity: 0.25;
     stroke: none;
+  }
+
+  .none {
+    font-size: 14px;
+    fill: #aebed9;
   }
 
   .active {

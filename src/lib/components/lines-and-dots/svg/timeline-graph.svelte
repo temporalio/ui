@@ -24,8 +24,9 @@
     undefined;
   export let onClick: (event: EventGroup) => void;
   export let clearActive: () => void;
+  export let zoomLevel: number = 1;
 
-  const { gap, gutterStart, gutterEnd } = TimelineConfig;
+  const { gap, gutterStart, gutterEnd, radius } = TimelineConfig;
 
   $: startTime = $fullEventHistory[0]?.eventTime || workflow.startTime;
   $: endTime = workflow.isRunning ? Date.now() : workflow.endTime;
@@ -85,16 +86,22 @@
 
 <DrawerWrapper {activeGroup} {activeEvent} {clearActive} let:canvasWidth>
   {@const finishingX = canvasWidth - gutterEnd}
-  <svg class="w-full" viewBox="0 0 {canvasWidth} {canvasHeight}">
+  <svg
+    class="w-full"
+    viewBox="0 0 {canvasWidth} {canvasHeight}"
+    height={canvasHeight / zoomLevel}
+    width={canvasWidth}
+  >
     <Line
       startPoint={[gutterStart, 0]}
       endPoint={[gutterStart, canvasHeight]}
-      strokeWidth={4}
+      strokeWidth={radius / 2}
+      status={'none'}
     />
     <Line
       startPoint={[finishingX, 0]}
       endPoint={[finishingX, canvasHeight]}
-      strokeWidth={4}
+      strokeWidth={radius / 2}
       status={workflow.status}
     />
     {#each groups as group, index (group.id)}

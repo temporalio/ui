@@ -29,8 +29,10 @@
     undefined;
   export let onClick: (workflow: WorkflowEvent | PendingActivity) => void;
   export let clearActive: () => void;
+  export let zoomLevel: number = 1;
 
-  const { gap } = HistoryConfig;
+  const { gap: defaultGap } = HistoryConfig;
+  $: gap = defaultGap - 2 * zoomLevel;
 
   $: isActive = (event?: WorkflowEvent | PendingActivity): boolean => {
     if (activeGroup) {
@@ -48,7 +50,11 @@
 
 <DrawerWrapper {activeGroup} {activeEvent} {clearActive} let:canvasWidth>
   {@const startingX = canvasWidth / 2}
-  <svg viewBox="0 0 {canvasWidth} {canvasHeight}">
+  <svg
+    viewBox="0 0 {canvasWidth} {canvasHeight}"
+    height={canvasHeight / zoomLevel}
+    width={canvasWidth}
+  >
     <Line
       startPoint={[startingX, 0]}
       endPoint={[startingX, canvasHeight]}
@@ -76,6 +82,7 @@
         active={isActive(event)}
         {onClick}
         {index}
+        showEventType={!activeEvent}
         showTimestamp={!activeEvent &&
           formatDate(event?.eventTime, $timeFormat) !==
             formatDate(history[index - 1]?.eventTime, $timeFormat)}

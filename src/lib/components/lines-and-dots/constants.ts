@@ -10,9 +10,10 @@ import type {
 } from '$lib/types/events';
 
 export const TimelineConfig = {
-  gap: 32,
+  gap: 42,
   gutterStart: 20,
   gutterEnd: 20,
+  radius: 8,
 };
 
 export const HistoryConfig = {

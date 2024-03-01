@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { EventTypeCategory } from '$lib/types/events';
+  import type {
+    EventClassification,
+    EventTypeCategory,
+  } from '$lib/types/events';
   import type { WorkflowStatus } from '$lib/types/workflows';
 
   import { HistoryConfig } from '../constants';
@@ -10,6 +13,7 @@
   export let endPoint = [0, 1000];
   export let status: WorkflowStatus | 'none' = 'none';
   export let category: EventTypeCategory | 'pending' | 'none' = 'none';
+  export let classification: EventClassification | undefined = undefined;
   export let active = true;
   export let strokeWidth: number = radius / 2;
   export let strokeDasharray = 'none';
@@ -19,7 +23,7 @@
 </script>
 
 <line
-  class="line {status} {category}"
+  class="line {status} {category} {classification}"
   class:active
   stroke-width={strokeWidth}
   stroke-dasharray={strokeDasharray}
@@ -38,6 +42,10 @@
 
   .active {
     opacity: 1;
+  }
+
+  .none {
+    stroke: #ebebeb;
   }
 
   .marker,

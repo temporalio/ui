@@ -9,6 +9,7 @@
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -82,6 +83,17 @@
     $fullEventHistory,
     $eventFilterSort,
   );
+
+  let zoomLevel = 1;
+  const zoomIn = () => {
+    if (zoomLevel < 6) zoomLevel += 0.5;
+  };
+
+  const zoomOut = () => {
+    if (zoomLevel > 1) {
+      zoomLevel -= 0.5;
+    }
+  };
 </script>
 
 <div class="flex flex-col gap-0 bg-slate-950 px-4 text-white">
@@ -103,27 +115,40 @@
           <ToggleButton
             active={$eventViewType === 'compact'}
             data-testid="compact"
-            class="bg-slate-50"
+            class="bg-white"
             on:click={() => ($eventViewType = 'compact')}
             >{translate('common.timeline')}</ToggleButton
           >
           <ToggleButton
             active={$eventViewType === 'feed'}
             data-testid="feed"
-            class="bg-slate-50"
+            class="bg-white"
             on:click={() => ($eventViewType = 'feed')}
             >{translate('workflows.full-history')}</ToggleButton
           >
           <ToggleButton
-            icon="download"
-            class="bg-slate-50"
-            data-testid="download"
-            on:click={() => (showDownloadPrompt = true)}
-          ></ToggleButton>
+            data-testid="feed"
+            class="bg-white"
+            disabled={zoomLevel === 1}
+            on:click={zoomOut}>+</ToggleButton
+          >
+          <ToggleButton
+            data-testid="compact"
+            class="bg-white"
+            disabled={zoomLevel === 10}
+            on:click={zoomIn}>-</ToggleButton
+          >
         </ToggleButtons>
+        <span class="text-sm">{(100 / zoomLevel).toFixed(0)}%</span>
       </div>
       <div class="flex gap-2">
         <EventTypeFilter {compact} />
+        <Button
+          leadingIcon="download"
+          data-testid="download"
+          variant="primary"
+          on:click={() => (showDownloadPrompt = true)}
+        ></Button>
         <!-- <EventSortFilter {compact} /> -->
       </div>
     </div>
@@ -136,6 +161,7 @@
       {groups}
       {activeGroup}
       {activeEvent}
+      {zoomLevel}
       onClick={setActiveGroup}
       clearActive={clearActives}
     />
@@ -146,6 +172,7 @@
       {pendingActivities}
       {activeGroup}
       {activeEvent}
+      {zoomLevel}
       onClick={setActiveEvent}
       clearActive={clearActives}
     />

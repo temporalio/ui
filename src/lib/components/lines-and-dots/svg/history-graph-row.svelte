@@ -1,5 +1,4 @@
 <script lang="ts">
-  // import { timeFormat } from '$lib/stores/time-format';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type {
@@ -18,7 +17,6 @@
   import Dot from './dot.svelte';
   import Line from './line.svelte';
   import Text from './text.svelte';
-  // import { formatDate } from '$lib/utilities/format-date';
 
   export let y: number = 20;
   export let category: EventTypeCategory | 'pending';
@@ -35,6 +33,7 @@
   export let onClick: (x: WorkflowEvent | PendingActivity) => void;
   export let index: number;
   export let showTimestamp = false;
+  export let showEventType = false;
 
   const { radius, gap } = HistoryConfig;
   const strokeWidth = radius / 2;
@@ -55,7 +54,6 @@
     point={[0, y - gap / 2]}
     width={startingX - strokeWidth}
     height={gap}
-    {classification}
     {index}
   />
   {#if isPendingActivity(event)}
@@ -63,17 +61,16 @@
     >
   {:else}
     <Text point={[5, y + 5]} {category} {active}>
-      <tspan>{event.id}</tspan><tspan x={50}
-        >{spaceBetweenCapitalLetters(event?.name)}</tspan
-      >
+      <tspan>{event.id}</tspan>
+      <tspan x={50}
+        >{spaceBetweenCapitalLetters(event?.name)}
+        {#if group && showEventType}<tspan dx={5} fill="#fff" font-size="14px"
+            >{group.name}</tspan
+          >{/if}
+      </tspan>
     </Text>
     {#if showTimestamp}
-      <Text
-        point={[startingX - 10, y + 5]}
-        {category}
-        {active}
-        textAnchor="end"
-      >
+      <Text point={[startingX - 10, y + 5]} {active} textAnchor="end">
         {formatDate(event?.eventTime, $timeFormat, {
           relative: $relativeTime,
         })}
@@ -84,7 +81,7 @@
     <Line
       startPoint={[startingX, y]}
       endPoint={[startingX + horizontalOffset - radius, y]}
-      {category}
+      classification={group?.lastEvent?.classification}
       {active}
     />
   {/if}
@@ -105,6 +102,7 @@
         y + nextDistance - radius,
       ]}
       {category}
+      classification={group?.lastEvent?.classification}
       {active}
       strokeDasharray={nextIsPending ? '3' : 'none'}
     />

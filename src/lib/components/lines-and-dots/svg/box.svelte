@@ -18,7 +18,6 @@
   class={classification}
   fill={index % 2 === 1 ? '#1E293B' : '#141414'}
 />
-``` ```svelte
 
 <style lang="postcss">
   .Failed,

@@ -8,7 +8,7 @@
 <div class="jump-to-bottom relative" class:hidden>
   <Button
     size="sm"
-    variant="secondary"
+    variant="primary"
     on:click={onScrollToBottomClick}
     leadingIcon="arrow-down"
   />

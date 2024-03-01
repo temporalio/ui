@@ -7,7 +7,7 @@
     WorkflowEvent,
   } from '$lib/types/events';
 
-  import { HistoryConfig } from '../constants';
+  import { TimelineConfig } from '../constants';
 
   import Dot from './dot.svelte';
   import Line from './line.svelte';
@@ -26,11 +26,11 @@
   export let onClick: () => void;
   export let showText = false;
 
-  const { radius } = HistoryConfig;
+  const { radius } = TimelineConfig;
 
   $: nextIsPending =
     group?.lastEvent.id === event?.id && group?.pendingActivity;
-  $: atTheEnd = canvasWidth - x < 200;
+  $: atTheEnd = canvasWidth - x < group?.name?.length * 8 ?? 200;
 </script>
 
 <g
@@ -42,19 +42,20 @@
 >
   {#if nextX}
     <Line
-      startPoint={[x + radius, y]}
-      endPoint={[x + nextX - radius, y]}
+      startPoint={[x, y]}
+      endPoint={[x + nextX, y]}
       {category}
+      classification={group.lastEvent.classification}
       {active}
-      strokeWidth={radius}
+      strokeWidth={radius * 2}
       strokeDasharray={nextIsPending ? '3' : 'none'}
     />
   {/if}
-  <Dot point={[x, y]} {category} {classification} {active} />
+  <Dot point={[x, y]} {category} {active} r={radius} />
   {#if showText}
     <Text
       point={[
-        atTheEnd ? x + radius : x + 2 * radius,
+        atTheEnd ? x - radius : x + 2 * radius,
         atTheEnd ? y + 3 * radius : y + radius / 1.5,
       ]}
       {category}
@@ -68,6 +69,7 @@
 
 <style lang="postcss">
   g {
+    pointer-events: bounding-box;
     outline: none;
   }
 </style>
