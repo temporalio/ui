@@ -9,17 +9,19 @@
     undefined;
   export let clearActive: () => void;
 
+  $: activeDetails = activeGroup || activeEvent;
+
   let canvasWidth = 1000;
 </script>
 
 <div class="relative flex h-auto max-h-[600px] w-full gap-0 overflow-auto">
   <div
-    class="relative h-full {activeEvent ? 'w-1/2' : 'w-full'} overflow-hidden"
+    class="relative h-full {activeDetails ? 'w-1/2' : 'w-full'} overflow-hidden"
     bind:clientWidth={canvasWidth}
   >
     <slot {canvasWidth} />
   </div>
-  {#if activeEvent || activeGroup}
+  {#if activeDetails}
     <div class="sticky top-0 w-1/2 grow">
       <DetailsDrawer {activeEvent} {activeGroup} {clearActive} />
     </div>

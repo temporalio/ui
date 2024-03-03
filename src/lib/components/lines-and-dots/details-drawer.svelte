@@ -29,7 +29,9 @@
   class="flex h-full flex-col gap-0 overflow-auto border-l-4 bg-slate-950"
   in:fly={{ x: 50, delay: 0, duration: 350 }}
 >
-  <div class="flex justify-between bg-blurple p-2 text-white">
+  <div
+    class="flex flex-col justify-between bg-blurple p-2 text-white md:flex-row"
+  >
     <div class="flex items-center gap-1">
       {#if timeline}
         {activeGroup.lastEvent.id}
@@ -39,8 +41,15 @@
       {:else}
         {activeEvent.id} {spaceBetweenCapitalLetters(activeEvent.name)}
       {/if}
+      <button
+        class="cursor-pointer"
+        on:click={clearActive}
+        on:keypress={clearActive}
+      >
+        <Icon name="chevron-right" />
+      </button>
     </div>
-    <div class="flex items-center gap-4">
+    <div class="flex items-center justify-end gap-4">
       <div class="flex items-center gap-0">
         <Icon name="info" />
         <ToggleSwitch
@@ -52,13 +61,6 @@
         />
         <Icon name="json" />
       </div>
-      <button
-        class="cursor-pointer"
-        on:click={clearActive}
-        on:keypress={clearActive}
-      >
-        <Icon name="close" />
-      </button>
     </div>
   </div>
   {#if showJSON}
