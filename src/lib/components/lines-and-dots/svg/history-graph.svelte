@@ -31,8 +31,7 @@
   export let clearActive: () => void;
   export let zoomLevel: number = 1;
 
-  const { gap: defaultGap } = HistoryConfig;
-  $: gap = defaultGap - 2 * zoomLevel;
+  const { gap } = HistoryConfig;
 
   $: isActive = (event?: WorkflowEvent | PendingActivity): boolean => {
     if (activeGroup) {
@@ -72,6 +71,7 @@
       <HistoryGraphRow
         {event}
         group={groups.find((g) => g.eventIds.has(event.id))}
+        canvasWidth={canvasWidth * zoomLevel}
         {startingX}
         {y}
         {offset}
@@ -92,6 +92,7 @@
       <HistoryGraphRow
         event={pendingActivity}
         group={groups.find((g) => g.eventIds.has(pendingActivity.activityId))}
+        canvasWidth={canvasWidth * zoomLevel}
         {startingX}
         y={(history.length + index + 1) * gap + gap / 2}
         offset={groups.find((g) => g?.pendingActivity === pendingActivity)

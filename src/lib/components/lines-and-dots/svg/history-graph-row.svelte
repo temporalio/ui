@@ -25,6 +25,7 @@
   export let event: WorkflowEvent | PendingActivity;
   export let group: EventGroup;
 
+  export let canvasWidth: number;
   export let startingX: number;
   export let nextDistance = 0;
   export let offset = 1;
@@ -41,6 +42,10 @@
     category === 'workflow' ? 0 : (offset / 1.5) * 3 * radius;
   $: nextIsPending =
     group?.lastEvent.id === event?.id && group?.pendingActivity;
+
+  $: withinCanvas = (x: number) => {
+    return x <= canvasWidth;
+  };
 </script>
 
 <g
@@ -85,13 +90,15 @@
       {active}
     />
   {/if}
-  <Dot
-    point={[startingX + horizontalOffset, y]}
-    {category}
-    {classification}
-    {active}
-  />
-  {#if nextDistance}
+  {#if withinCanvas(startingX + horizontalOffset)}
+    <Dot
+      point={[startingX + horizontalOffset, y]}
+      {category}
+      {classification}
+      {active}
+    />
+  {/if}
+  {#if nextDistance && withinCanvas(startingX + horizontalOffset + radius)}
     <Line
       startPoint={[
         startingX + horizontalOffset + radius / 2 - strokeWidth,

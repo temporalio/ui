@@ -9,6 +9,10 @@ import type {
   WorkflowEvents,
 } from '$lib/types/events';
 
+export const CanvasConfig = {
+  maxHeight: 600,
+};
+
 export const TimelineConfig = {
   gap: 42,
   gutterStart: 20,
