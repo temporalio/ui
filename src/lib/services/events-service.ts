@@ -28,6 +28,7 @@ export type FetchEventsParameters = NamespaceScopedRequest &
     runId: string;
     rawPayloads?: boolean;
     sort?: EventSortOrder;
+    signal?: AbortController['signal'];
   };
 
 export type FetchEventsParametersWithSettings = FetchEventsParameters & {
@@ -74,6 +75,7 @@ export const fetchAllEvents = async ({
   workflowId,
   runId,
   sort,
+  signal,
 }: FetchEventsParameters): Promise<CommonHistoryEvent[]> => {
   const onStart = () => {
     fullEventHistory.set([]);
@@ -98,12 +100,17 @@ export const fetchAllEvents = async ({
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
         token,
         request: fetch,
-        params: { 'execution.runId': runId, waitNewEvent: 'true' },
+        params: {
+          'execution.runId': runId,
+          waitNewEvent: signal ? 'true' : 'false',
+        },
+        options: { signal },
       });
     },
     { onStart, onUpdate, onComplete },
   );
 
+  if (!response?.history) return [];
   const allEvents = await toEventHistory(response.history.events);
   return allEvents;
 };

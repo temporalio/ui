@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { get } from 'svelte/store';
+
   import { onDestroy, onMount } from 'svelte';
 
   import { page } from '$app/stores';
@@ -17,6 +19,7 @@
   import { authUser } from '$lib/stores/auth-user';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
   import { fullEventHistory, timelineEvents } from '$lib/stores/events';
+  import { labsMode } from '$lib/stores/labs-mode';
   import {
     initialWorkflowRun,
     refresh,
@@ -29,6 +32,7 @@
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   let workflowError: NetworkError;
+  let eventHistoryController: AbortController;
 
   const getCompatibility = async (
     workflow: WorkflowExecution,
@@ -72,7 +76,13 @@
       $authUser?.accessToken,
     );
     $workflowRun = { workflow, workers, compatibility };
-    fetchAllEvents({ namespace, workflowId, runId, sort });
+
+    let signal;
+    if (get(labsMode)) {
+      eventHistoryController = new AbortController();
+      signal = eventHistoryController.signal;
+    }
+    fetchAllEvents({ namespace, workflowId, runId, sort, signal });
   };
 
   const getOnlyWorkflowWithPendingActivities = async (
@@ -122,6 +132,10 @@
     $workflowRun = initialWorkflowRun;
     $fullEventHistory = [];
     workflowError = undefined;
+
+    if (eventHistoryController) {
+      eventHistoryController.abort();
+    }
   });
 </script>
 
