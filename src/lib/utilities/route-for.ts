@@ -1,5 +1,5 @@
 import { BROWSER } from 'esm-env';
-import { InvalidTokenError, jwtDecode, JwtPayload } from 'jwt-decode';
+import { InvalidTokenError, jwtDecode, type JwtPayload } from 'jwt-decode';
 
 import { base } from '$app/paths';
 
@@ -305,7 +305,9 @@ export const routeForOIDCImplicitCallback = (): string => {
   }
 
   const state = hash.get('state');
-  const redirectUrl = new URL(sessionStorage.getItem(state) ?? '/');
+  const redirectUrl = new URL(
+    (state ? sessionStorage.getItem(state) : null) ?? '/',
+  );
   sessionStorage.removeItem('state');
 
   setAuthUser(
