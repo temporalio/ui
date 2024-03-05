@@ -104,6 +104,6 @@
 
 <style lang="postcss">
   .big {
-    @apply flex justify-center p-2 text-lg;
+    @apply flex justify-center px-4 text-lg;
   }
 </style>

@@ -15,7 +15,7 @@
   export let r = radius;
 
   $: [x, y] = point;
-  const strokeWidth = r / 2;
+  const strokeWidth = r / 3;
 </script>
 
 <g>
@@ -58,32 +58,39 @@
 
   .marker,
   .command {
-    stroke: #ebebeb;
+    stroke: #141414;
+    fill: #ebebeb;
   }
 
   .timer {
-    stroke: #fbbf24;
+    stroke: #141414;
+    fill: #fbbf24;
   }
 
   .signal {
-    stroke: #ec4899;
+    stroke: #141414;
+    fill: #ec4899;
   }
 
   .activity {
-    stroke: #a78bfa;
+    stroke: #141414;
+    fill: #a78bfa;
   }
 
   .pending {
     stroke: #a78bfa;
+    fill: #141414;
     stroke-dasharray: 1;
   }
 
   .child-workflow {
-    stroke: #b2f8d9;
+    stroke: #141414;
+    fill: #b2f8d9;
   }
 
   .workflow {
-    stroke: #059669;
+    stroke: #141414;
+    fill: #059669;
   }
 
   .Failed,

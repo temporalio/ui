@@ -45,6 +45,17 @@
     gap * 2 + gap * (history.length + pendingActivities.length),
     400,
   );
+
+  // $: visibleHistory = (history: WorkflowEvents, scrollY: number) => {
+  //   return history.filter((event, index) => {
+  //     const y = (index + 1) * gap + gap / 2;
+  //     const scrollStartVisible = scrollY + gap / 2;
+  //     const visible =
+  //       y > scrollStartVisible &&
+  //       y < scrollStartVisible + CanvasConfig.maxHeight;
+  //     return visible;
+  //   });
+  // };
 </script>
 
 <DrawerWrapper {activeGroup} {activeEvent} {clearActive} let:canvasWidth>

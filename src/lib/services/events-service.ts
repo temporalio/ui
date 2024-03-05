@@ -28,7 +28,7 @@ export type FetchEventsParameters = NamespaceScopedRequest &
     runId: string;
     rawPayloads?: boolean;
     sort?: EventSortOrder;
-    signal?: AbortController['signal'];
+    signal?: AbortSignal;
   };
 
 export type FetchEventsParametersWithSettings = FetchEventsParameters & {

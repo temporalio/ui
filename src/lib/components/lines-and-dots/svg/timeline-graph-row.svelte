@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type {
-    EventClassification,
     EventTypeCategory,
     PendingActivity,
     WorkflowEvent,
@@ -15,7 +14,6 @@
 
   export let y: number = 20;
   export let category: EventTypeCategory | 'pending';
-  export let classification: EventClassification | undefined = undefined;
 
   export let event: WorkflowEvent | PendingActivity;
   export let group: EventGroup;
@@ -30,7 +28,7 @@
 
   $: nextIsPending =
     group?.lastEvent.id === event?.id && group?.pendingActivity;
-  $: atTheEnd = canvasWidth - x < group?.name?.length * 8 ?? 200;
+  $: atTheEnd = canvasWidth - x < group?.name?.length * 9 ?? 200;
 </script>
 
 <g

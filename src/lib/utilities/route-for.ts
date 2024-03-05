@@ -180,6 +180,12 @@ export const routeForWorkflowQuery = (
   return `${routeForWorkflow(parameters)}/query`;
 };
 
+export const routeForWorkflowMetadata = (
+  parameters: WorkflowParameters,
+): string => {
+  return `${routeForWorkflow(parameters)}/metadata`;
+};
+
 export const routeForPendingActivities = (
   parameters: WorkflowParameters,
 ): string => {

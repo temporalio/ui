@@ -120,7 +120,6 @@
           {canvasWidth}
           {nextX}
           category={event.category}
-          classification={event.classification}
           active={isActive(event)}
           onClick={() => onClick(group)}
           showText={(group.eventList.length === 1 && !group.pendingActivity) ||
@@ -135,7 +134,6 @@
           x={finishingX}
           {canvasWidth}
           category="pending"
-          classification={group.classification}
           active={isActive(group.pendingActivity)}
           onClick={() => onClick(group)}
           showText

@@ -28,6 +28,7 @@
     routeForEventHistory,
     routeForRelationships,
     routeForWorkers,
+    routeForWorkflowMetadata,
     routeForWorkflowQuery,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
@@ -228,6 +229,15 @@
           active={pathMatches(
             $page.url.pathname,
             routeForWorkflowQuery(routeParameters),
+          )}
+        />
+        <Tab
+          label={translate('workflows.metadata-tab')}
+          id="metadata-tab"
+          href={routeForWorkflowMetadata(routeParameters)}
+          active={pathMatches(
+            $page.url.pathname,
+            routeForWorkflowMetadata(routeParameters),
           )}
         />
       </TabList>

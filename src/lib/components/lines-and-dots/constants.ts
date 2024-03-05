@@ -22,7 +22,7 @@ export const TimelineConfig = {
 
 export const HistoryConfig = {
   gap: 24,
-  radius: 6,
+  radius: 8,
 };
 
 export const isMiddleEvent = (
@@ -129,6 +129,7 @@ export const getNextDistanceAndOffset = (
       1
     : parseInt(nextEvent.id) - parseInt(event.id);
   nextDistance = diff * gap;
+
   return { nextDistance, offset, y };
 };
 

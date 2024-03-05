@@ -77,7 +77,7 @@
     );
     $workflowRun = { workflow, workers, compatibility };
 
-    let signal;
+    let signal: AbortSignal;
     if (get(labsMode)) {
       eventHistoryController = new AbortController();
       signal = eventHistoryController.signal;

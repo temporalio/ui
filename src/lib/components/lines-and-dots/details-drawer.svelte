@@ -42,7 +42,7 @@
         {activeEvent.id} {spaceBetweenCapitalLetters(activeEvent.name)}
       {/if}
       <button
-        class="cursor-pointer"
+        class="h-6 w-6 cursor-pointer rounded-full transition-colors hover:surface-primary"
         on:click={clearActive}
         on:keypress={clearActive}
       >
