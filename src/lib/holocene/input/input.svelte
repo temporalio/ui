@@ -2,6 +2,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   import { createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
@@ -16,7 +17,6 @@
     labelHidden?: boolean;
     icon?: IconName;
     suffix?: string;
-    theme?: 'dark' | 'light';
     valid?: boolean;
     hintText?: string;
     maxLength?: number;
@@ -52,7 +52,6 @@
   export let copyable = false;
   export let disabled = false;
   export let clearable = false;
-  export let theme: 'dark' | 'light' = 'light';
   export let autocomplete = 'off';
   export let valid = true;
   export let hintText = '';
@@ -85,12 +84,10 @@
   $: disabled = disabled || copyable;
 </script>
 
-<div class="flex flex-col gap-1 {className}">
-  <label class={theme} class:required class:sr-only={labelHidden} for={id}
-    >{label}</label
-  >
+<div class={merge('flex flex-col gap-1', className)}>
+  <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
   <div
-    class="input-container {theme}"
+    class="input-container"
     class:disabled
     class:error
     class:unroundRight={unroundRight ?? suffix}
@@ -127,11 +124,13 @@
     />
     {#if copyable}
       <div class="copy-icon-container">
-        <IconButton
-          label={copyButtonLabel}
-          on:click={(e) => copy(e, value)}
-          icon={$copied ? 'checkmark' : 'copy'}
-        />
+        <button aria-label={copyButtonLabel} on:click={(e) => copy(e, value)}>
+          {#if $copied}
+            <Icon name="checkmark" />
+          {:else}
+            <Icon name="copy" />
+          {/if}
+        </button>
       </div>
     {:else if disabled}
       <div class="disabled-icon-container">
@@ -158,7 +157,7 @@
     {/if}
   </div>
   <span
-    class="hint-text inline-block {theme}"
+    class="hint-text inline-block"
     class:invalid={!valid}
     class:error
     class:hidden={!hintText}
@@ -171,7 +170,7 @@
 <style lang="postcss">
   /* Base styles */
   label {
-    @apply font-secondary text-sm font-medium;
+    @apply font-secondary text-sm font-medium text-primary;
   }
 
   label.required {
@@ -179,15 +178,24 @@
   }
 
   .input-container {
-    @apply relative box-border inline-flex h-10 w-full items-center rounded border text-sm;
+    @apply surface-primary relative box-border inline-flex h-10 w-full items-center rounded border border-primary text-sm text-primary dark:focus-within:surface-primary focus-within:border-interactive focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
 
-    &.error {
-      @apply border-2;
+    &.error,
+    &.invalid {
+      @apply border-2 border-error focus-within:shadow-danger/50;
+
+      > .input {
+        @apply caret-danger;
+      }
+    }
+
+    &.disabled {
+      @apply surface-disabled border-subtle text-disabled;
     }
   }
 
   .input {
-    @apply m-2 w-full bg-transparent focus:outline-none;
+    @apply m-2 w-full bg-transparent focus:outline-none enabled:placeholder:text-primary disabled:text-disabled disabled:placeholder:text-disabled;
   }
 
   .suffix {
@@ -211,7 +219,7 @@
   }
 
   .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r border-l;
+    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r border-l border-subtle;
   }
 
   .disabled-icon-container {
@@ -224,6 +232,18 @@
 
   .count {
     @apply mx-2 hidden font-secondary text-sm font-medium tracking-widest;
+
+    > .ok {
+      @apply text-information;
+    }
+
+    > .warn {
+      @apply text-warning;
+    }
+
+    > .error {
+      @apply text-danger;
+    }
   }
 
   .input:focus ~ .count {
@@ -231,117 +251,11 @@
   }
 
   .hint-text {
-    @apply text-xs;
-  }
-
-  /* Light theme styles */
-  .input-container.light {
-    @apply surface-primary border-primary text-primary focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50 focus-within:outline-none;
-
-    > .input {
-      @apply caret-indigo-600;
-    }
-
-    &.disabled {
-      @apply border-slate-600 bg-slate-50 text-slate-600;
-
-      > .input {
-        @apply bg-slate-50;
-      }
-
-      > .copy-icon-container {
-        @apply border-slate-600 bg-slate-200;
-      }
-    }
+    @apply text-xs text-primary;
 
     &.error,
     &.invalid {
-      @apply border-danger text-danger focus-within:shadow-red-500/50;
-
-      > .input {
-        @apply caret-danger;
-      }
-    }
-
-    > .count > .ok {
-      @apply text-blue-700;
-    }
-
-    > .count > .warn {
-      @apply text-orange-600;
-    }
-
-    > .count > .error {
       @apply text-danger;
-    }
-
-    > .icon-container {
-      @apply text-slate-400;
-    }
-
-    + .hint-text.error,
-    + .hint-text.invalid {
-      @apply text-danger;
-    }
-  }
-
-  /* Dark theme styles */
-  label.dark,
-  .hint-text.dark {
-    @apply text-white;
-  }
-
-  .input-container.dark {
-    @apply border-subtle bg-transparent text-white focus-within:border-indigo-600 focus-within:bg-primary focus-within:shadow-focus focus-within:shadow-indigo-500/50 focus-within:outline-none;
-
-    > .input {
-      @apply caret-indigo-600 placeholder:text-primary/50;
-    }
-
-    &.disabled {
-      @apply border-subtle bg-subtle/20;
-
-      > .input {
-        @apply text-primary/50 placeholder:text-primary;
-      }
-
-      > .copy-icon-container {
-        @apply border-subtle;
-      }
-
-      > .disabled-icon-container {
-        @apply text-primary/50;
-      }
-    }
-
-    &.error,
-    &.invalid {
-      @apply border-red-600 text-red-600 focus-within:shadow-red-600/50;
-
-      > .input {
-        @apply caret-red-600;
-      }
-    }
-
-    > .count > .ok {
-      @apply text-blue-300;
-    }
-
-    > .count > .warn {
-      @apply text-orange-300;
-    }
-
-    > .count > .error {
-      @apply text-red-300;
-    }
-
-    > .icon-container {
-      @apply text-slate-200;
-    }
-
-    + .hint-text.error,
-    + .hint-text.invalid {
-      @apply text-red-600;
     }
   }
 

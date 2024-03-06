@@ -1,14 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
+import { translate } from '$lib/i18n/translate';
+
 import {
   attributeGroups,
   formatAttemptsLeft,
   formatAttributes,
   formatMaximumAttempts,
   formatRetryExpiration,
-  NoExpiration,
-  UnlimitedAttempts,
 } from './format-event-attributes';
+
+const UnlimitedAttempts = translate('workflows.unlimited');
+const NoExpiration = translate('workflows.no-expiration');
 
 const workflowEvent = {
   eventId: '1',

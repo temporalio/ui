@@ -2,6 +2,8 @@ import { get } from 'svelte/store';
 
 import { v4 } from 'uuid';
 
+import { page } from '$app/stores';
+
 import { translate } from '$lib/i18n/translate';
 import type { ResetReapplyType } from '$lib/models/workflow-actions';
 import {
@@ -40,6 +42,7 @@ import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { base, pathForApi, routeForApi } from '$lib/utilities/route-for-api';
+import { isVersionNewer } from '$lib/utilities/version-check';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -313,11 +316,20 @@ export async function signalWorkflow({
     }
   }
 
-  return requestFromAPI(route, {
-    notifyOnError: false,
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
+  const version = get(page).data?.settings?.version ?? '';
+  const newVersion = isVersionNewer(version, '2.22');
+  const body = newVersion
+    ? {
+        signalName,
+        workflowExecution: {
+          workflowId,
+          runId,
+        },
+        input: {
+          payloads,
+        },
+      }
+    : {
         signalName,
         input: {
           payloads,
@@ -325,7 +337,13 @@ export async function signalWorkflow({
         params: {
           'execution.runId': runId,
         },
-      }),
+      };
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt(body),
     },
   });
 }

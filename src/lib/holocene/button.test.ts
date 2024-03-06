@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 import Button from '$lib/holocene/button.svelte';
-
 let host: HTMLElement;
 
 const variants: ('primary' | 'secondary' | 'destructive' | 'ghost')[] = [

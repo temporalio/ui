@@ -21,3 +21,5 @@ type Shade =
   | 900
   | 950
   | 'DEFAULT';
+
+type PaletteColor = Record<Shade, HexColor>;
