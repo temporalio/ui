@@ -87,7 +87,6 @@
 <DrawerWrapper {activeGroup} {activeEvent} {clearActive} let:canvasWidth>
   {@const finishingX = canvasWidth - gutterEnd}
   <svg
-    class="w-full"
     viewBox="0 0 {canvasWidth} {canvasHeight}"
     height={canvasHeight / zoomLevel}
     width={canvasWidth}

@@ -16,7 +16,7 @@
 
 <div class="relative flex max-h-[600px] w-full gap-0 overflow-auto">
   <div
-    class="relative h-full {activeDetails ? 'w-1/2' : 'w-full'} overflow-hidden"
+    class="overflow-x-hidden {activeDetails ? 'w-1/2' : 'w-full'}"
     bind:clientWidth={canvasWidth}
   >
     <slot {canvasWidth} />
