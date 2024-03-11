@@ -30,7 +30,7 @@
 
   import { page } from '$app/stores';
 
-  import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
+  import BatchOperationConfirmationModal from '$lib/components/workflow/client-actions/batch-operation-confirmation-modal.svelte';
   import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
