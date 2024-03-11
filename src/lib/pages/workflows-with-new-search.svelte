@@ -1,54 +1,32 @@
 <script lang="ts" context="module">
-  let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
-  let batchCancelConfirmationModal: BatchOperationConfirmationModal;
-  export const allSelected = writable<boolean>(false);
-  export const pageSelected = writable<boolean>(false);
-  export const selectedWorkflows = writable<WorkflowExecution[]>([]);
+  export const BATCH_OPERATION_CONTEXT = 'BATCH_OPERATION_CONTEXT';
 
-  export const batchActionsVisible = derived(
-    selectedWorkflows,
-    (workflows) => workflows.length > 0,
-  );
-
-  export const terminableWorkflows = derived(selectedWorkflows, (workflows) =>
-    workflows.filter((workflow) => workflow.canBeTerminated),
-  );
-
-  export const cancelableWorkflows = derived(selectedWorkflows, (workflows) =>
-    workflows.filter((workflow) => workflow.status === 'Running'),
-  );
-
-  export const openBatchCancelConfirmationModal = () => {
-    batchCancelConfirmationModal?.open();
-  };
-
-  export const openBatchTerminateConfirmationModal = () => {
-    batchTerminateConfirmationModal?.open();
-  };
-
-  export const handleSelectAll = (workflows: WorkflowExecution[]) => {
-    allSelected.set(true);
-    selectedWorkflows.set([...workflows]);
-  };
-
-  export const handleSelectPage = (
-    checked: boolean,
-    workflows: WorkflowExecution[],
-  ) => {
-    pageSelected.set(checked);
-    if (allSelected) allSelected.set(false);
-    if (checked) {
-      selectedWorkflows.set([...workflows]);
-    } else {
-      selectedWorkflows.set([]);
-    }
+  export type BatchOperationContext = {
+    allSelected: Writable<boolean>;
+    pageSelected: Writable<boolean>;
+    terminableWorkflows: Readable<WorkflowExecution[]>;
+    cancelableWorkflows: Readable<WorkflowExecution[]>;
+    selectedWorkflows: Writable<WorkflowExecution[]>;
+    batchActionsVisible: Readable<boolean>;
+    openBatchCancelConfirmationModal: () => void;
+    openBatchTerminateConfirmationModal: () => void;
+    handleSelectAll: (workflows: WorkflowExecution[]) => void;
+    handleSelectPage: (
+      checked: boolean,
+      workflows: WorkflowExecution[],
+    ) => void;
   };
 </script>
 
 <script lang="ts">
-  import { derived, writable } from 'svelte/store';
+  import {
+    derived,
+    type Readable,
+    writable,
+    type Writable,
+  } from 'svelte/store';
 
-  import { onMount } from 'svelte';
+  import { onMount, setContext } from 'svelte';
 
   import { page } from '$app/stores';
 
@@ -103,6 +81,50 @@
     $selectedWorkflows = [];
   };
 
+  let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
+  let batchCancelConfirmationModal: BatchOperationConfirmationModal;
+  const allSelected = writable<boolean>(false);
+  const pageSelected = writable<boolean>(false);
+  const selectedWorkflows = writable<WorkflowExecution[]>([]);
+  const batchActionsVisible = derived(
+    selectedWorkflows,
+    (workflows) => workflows.length > 0,
+  );
+
+  const terminableWorkflows = derived(selectedWorkflows, (workflows) =>
+    workflows.filter((workflow) => workflow.canBeTerminated),
+  );
+
+  const cancelableWorkflows = derived(selectedWorkflows, (workflows) =>
+    workflows.filter((workflow) => workflow.status === 'Running'),
+  );
+
+  const openBatchCancelConfirmationModal = () => {
+    batchCancelConfirmationModal?.open();
+  };
+
+  const openBatchTerminateConfirmationModal = () => {
+    batchTerminateConfirmationModal?.open();
+  };
+
+  const handleSelectAll = (workflows: WorkflowExecution[]) => {
+    allSelected.set(true);
+    selectedWorkflows.set([...workflows]);
+  };
+
+  const handleSelectPage = (
+    checked: boolean,
+    workflows: WorkflowExecution[],
+  ) => {
+    pageSelected.set(checked);
+    if (allSelected) allSelected.set(false);
+    if (checked) {
+      selectedWorkflows.set([...workflows]);
+    } else {
+      selectedWorkflows.set([]);
+    }
+  };
+
   const terminateWorkflows = async (
     event: CustomEvent<{ reason: string; jobId: string }>,
   ) => {
@@ -152,6 +174,19 @@
       );
     }
   };
+
+  setContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT, {
+    allSelected,
+    pageSelected,
+    terminableWorkflows,
+    cancelableWorkflows,
+    selectedWorkflows,
+    batchActionsVisible,
+    openBatchCancelConfirmationModal,
+    openBatchTerminateConfirmationModal,
+    handleSelectAll,
+    handleSelectPage,
+  });
 
   $: {
     if ($updating) {

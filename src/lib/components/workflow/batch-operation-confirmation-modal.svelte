@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, getContext } from 'svelte';
   import { v4 } from 'uuid';
 
   import Input from '$lib/holocene/input/input.svelte';
@@ -7,13 +7,20 @@
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { Action } from '$lib/models/workflow-actions';
-  import { allSelected } from '$lib/pages/workflows-with-new-search.svelte';
+  import {
+    BATCH_OPERATION_CONTEXT,
+    type BatchOperationContext,
+  } from '$lib/pages/workflows-with-new-search.svelte';
   import { authUser } from '$lib/stores/auth-user';
   import { formatReason, getPlacholder } from '$lib/utilities/workflow-actions';
 
   export let action: Action;
   export let actionableWorkflowsLength: number;
   export let query: string;
+
+  const { allSelected } = getContext<BatchOperationContext>(
+    BATCH_OPERATION_CONTEXT,
+  );
 
   let reason = '';
   let isOpen = false;
