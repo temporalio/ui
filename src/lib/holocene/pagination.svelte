@@ -100,14 +100,14 @@
     switch (event.code) {
       case 'ArrowRight':
       case 'KeyL':
-        if ($store.hasNext) {
+        if ($store.hasNext && !event.metaKey) {
           store.next();
           handlePageChange();
         }
         break;
       case 'ArrowLeft':
       case 'KeyH':
-        if ($store.hasPrevious) {
+        if ($store.hasPrevious && !event.metaKey) {
           store.previous();
           handlePageChange();
         }
