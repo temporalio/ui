@@ -54,15 +54,15 @@
 
 <style lang="postcss">
   .description {
-    @apply ml-[26px] text-xs font-light;
+    @apply ml-[26px] text-xs font-normal  text-primary;
   }
 
   label {
-    @apply flex grow cursor-pointer flex-row items-center gap-2 text-sm font-normal focus:outline-none;
+    @apply flex grow cursor-pointer flex-row items-center gap-2 text-sm font-normal text-primary focus:outline-none;
   }
 
   input[type='radio'] {
-    @apply surface-primary relative box-content h-4 w-4 min-w-[16px] cursor-pointer appearance-none rounded-full border border-subtle;
+    @apply surface-primary relative box-content h-4 w-4 min-w-[16px] cursor-pointer appearance-none rounded-full border border-secondary hover:bg-pink;
 
     &::after {
       @apply surface-primary absolute left-1 top-1 h-0 w-0 scale-0 rounded-full transition-transform content-[''];
@@ -70,7 +70,7 @@
   }
 
   input[type='radio']:checked {
-    @apply border-indigo-600 bg-indigo-600;
+    @apply border border-interactive bg-interactive shadow-[inset_0_0_0_1px] shadow-white dark:shadow-black;
 
     &::after {
       @apply h-2 w-2 scale-100;
