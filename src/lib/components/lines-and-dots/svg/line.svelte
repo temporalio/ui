@@ -15,6 +15,7 @@
   export let category: EventTypeCategory | 'pending' | 'none' = 'none';
   export let classification: EventClassification | undefined = undefined;
   export let active = true;
+  export let initiated = false;
   export let strokeWidth: number = radius / 2;
   export let strokeDasharray = 'none';
 
@@ -25,6 +26,7 @@
 <line
   class="line {status} {category} {classification}"
   class:active
+  class:initiated
   stroke-width={strokeWidth}
   stroke-dasharray={strokeDasharray}
   {x1}
@@ -36,12 +38,16 @@
 <style lang="postcss">
   .line {
     cursor: pointer;
-    opacity: 0.25;
+    opacity: 0.15;
     outline: none;
   }
 
   .active {
     opacity: 1;
+  }
+
+  .initiated {
+    opacity: 0.35;
   }
 
   .none {

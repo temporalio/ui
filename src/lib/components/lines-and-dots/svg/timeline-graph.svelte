@@ -115,6 +115,12 @@
           {group}
           {event}
           y={(index + 1) * gap + gap / 2}
+          initialX={getNextEventDistance(
+            group.eventList[0],
+            group,
+            canvasWidth,
+            finishingX,
+          ).x}
           x={gutterStart + x}
           {canvasWidth}
           {nextX}

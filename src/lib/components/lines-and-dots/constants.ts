@@ -15,9 +15,9 @@ export const CanvasConfig = {
 
 export const TimelineConfig = {
   gap: 42,
-  gutterStart: 20,
-  gutterEnd: 20,
-  radius: 8,
+  gutterStart: 24,
+  gutterEnd: 24,
+  radius: 12,
 };
 
 export const HistoryConfig = {

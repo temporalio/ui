@@ -19,6 +19,7 @@
   export let event: WorkflowEvent | PendingActivity;
   export let group: EventGroup;
   export let x = 0;
+  export let initialX = 0;
   export let nextX = 0;
   export let canvasWidth: number;
   export let active = false;
@@ -29,6 +30,10 @@
 
   $: nextIsPending =
     group?.lastEvent.id === event?.id && group?.pendingActivity;
+  $: initiatedEvent =
+    event.id === group.initialEvent.id &&
+    !nextIsPending &&
+    group.eventList.length === 3;
   $: atTheEnd = canvasWidth - x < group?.name?.length * 9 ?? 200;
   $: duration = formatDistanceAbbreviated({
     start: group.initialEvent.eventTime,
@@ -52,16 +57,14 @@
       classification={group.lastEvent.classification}
       {active}
       strokeWidth={radius * 2}
+      initiated={initiatedEvent}
       strokeDasharray={nextIsPending ? '3' : 'none'}
     />
   {/if}
   <Dot point={[x, y]} {category} {active} r={radius} />
   {#if showText}
     <Text
-      point={[
-        atTheEnd ? x - radius : x + 2 * radius,
-        atTheEnd ? y + 3 * radius : y + radius / 1.5,
-      ]}
+      point={[atTheEnd ? initialX : x + 2 * radius, y + radius / 1.5]}
       {category}
       {active}
       textAnchor={atTheEnd ? 'end' : 'start'}
@@ -70,7 +73,7 @@
     </Text>
   {/if}
   {#if event.id === group.initialEvent.id}
-    <Text point={[x, y - radius]} {active} textAnchor="start">
+    <Text point={[x - radius, y - 1.5 * radius]} {active} textAnchor="start">
       {duration}
     </Text>
   {/if}
