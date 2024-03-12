@@ -6,6 +6,8 @@ import arrowUp from './svg/arrow-up.svelte';
 import ascending from './svg/ascending.svelte';
 import astronaut from './svg/astronaut.svelte';
 import batchOperation from './svg/batch-operation.svelte';
+import beaker from './svg/beaker.svelte';
+import binaryCheck from './svg/binary-check.svelte';
 import book from './svg/book.svelte';
 import bookmark from './svg/bookmark.svelte';
 import calendarPlus from './svg/calendar-plus.svelte';
@@ -40,7 +42,9 @@ import fileUpload from './svg/file-upload.svelte';
 import filterSolid from './svg/filter-solid.svelte';
 import filter from './svg/filter.svelte';
 import github from './svg/github.svelte';
+import glassBroken from './svg/glass-broken.svelte';
 import graph from './svg/graph.svelte';
+import hidden from './svg/hidden.svelte';
 import hyphen from './svg/hyphen.svelte';
 import importIcon from './svg/import.svelte';
 import info from './svg/info.svelte';
@@ -55,6 +59,7 @@ import logout from './svg/logout.svelte';
 import merge from './svg/merge.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
+import people from './svg/people.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
 import regions from './svg/regions.svelte';
@@ -66,7 +71,9 @@ import rocketShip from './svg/rocket-ship.svelte';
 import schedules from './svg/schedules.svelte';
 import search from './svg/search.svelte';
 import settings from './svg/settings.svelte';
+import shieldCheck from './svg/shield-check.svelte';
 import sliders from './svg/sliders.svelte';
+import speechBubble from './svg/speech-bubble.svelte';
 import spinnerSolid from './svg/spinner-solid.svelte';
 import spinner from './svg/spinner.svelte';
 import starEmpty from './svg/star-empty.svelte';
@@ -98,6 +105,8 @@ export const icons = {
   ascending,
   astronaut,
   'batch-operation': batchOperation,
+  beaker,
+  'binary-check': binaryCheck,
   book,
   bookmark,
   'calendar-plus': calendarPlus,
@@ -132,7 +141,9 @@ export const icons = {
   filter,
   'filter-solid': filterSolid,
   github,
+  'glass-broken': glassBroken,
   graph,
+  hidden,
   hyphen,
   import: importIcon,
   info,
@@ -147,6 +158,7 @@ export const icons = {
   merge,
   'namespace-switcher': namespaceSwitcher,
   namespace,
+  people,
   'pin-filled': pinFilled,
   pin,
   regions,
@@ -158,7 +170,9 @@ export const icons = {
   schedules,
   search,
   settings,
+  'shield-check': shieldCheck,
   sliders,
+  'speech-bubble': speechBubble,
   spinner,
   'star-empty': starEmpty,
   'star-filled': starFilled,
