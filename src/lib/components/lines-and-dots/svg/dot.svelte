@@ -80,7 +80,7 @@
   .pending {
     stroke: #a78bfa;
     fill: #141414;
-    stroke-dasharray: 1;
+    stroke-dasharray: 2.5;
   }
 
   .child-workflow {

@@ -5,6 +5,7 @@
     PendingActivity,
     WorkflowEvent,
   } from '$lib/types/events';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { TimelineConfig } from '../constants';
 
@@ -29,6 +30,11 @@
   $: nextIsPending =
     group?.lastEvent.id === event?.id && group?.pendingActivity;
   $: atTheEnd = canvasWidth - x < group?.name?.length * 9 ?? 200;
+  $: duration = formatDistanceAbbreviated({
+    start: group.initialEvent.eventTime,
+    end: group.lastEvent.eventTime,
+    includeMilliseconds: true,
+  });
 </script>
 
 <g
@@ -61,6 +67,11 @@
       textAnchor={atTheEnd ? 'end' : 'start'}
     >
       {group?.name}
+    </Text>
+  {/if}
+  {#if event.id === group.initialEvent.id}
+    <Text point={[x, y - radius]} {active} textAnchor="start">
+      {duration}
     </Text>
   {/if}
 </g>
