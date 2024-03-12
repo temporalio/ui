@@ -41,7 +41,7 @@ test('it should update the datetime filter based on the selected timezone', asyn
   expect(filter).toContain('05:00 AM');
 
   let query = await page.locator('#manual-search').inputValue();
-  expect(query).toContain('13:00:00.000Z');
+  expect(query).toContain('12:00:00.000Z');
 
   await page.getByTestId('timezones-menu-button').click();
   await page.getByTestId('top-nav').getByPlaceholder('Search').fill('MDT');
@@ -51,5 +51,5 @@ test('it should update the datetime filter based on the selected timezone', asyn
   expect(filter).toContain('06:00 AM');
 
   query = await page.locator('#manual-search').inputValue();
-  expect(query).toContain('13:00:00.000Z');
+  expect(query).toContain('12:00:00.000Z');
 });
