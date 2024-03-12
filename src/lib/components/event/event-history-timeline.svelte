@@ -68,7 +68,7 @@
 
     const link = renderComponentToHTML(Link, {
       href,
-      text: groupName,
+      text: DOMPurify.sanitize(groupName),
       class: 'flex gap-2 items-center',
     });
     return link;
@@ -82,7 +82,9 @@
     const retryIcon = renderComponentToHTML(Icon, {
       name: 'retry',
     });
-    return `<div class="flex gap-1 items-center"><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div><div class="bar-content"><p>${name}</p></div></div>`;
+    return `<div class="flex gap-1 items-center"><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div><div class="bar-content"><p>${DOMPurify.sanitize(
+      name,
+    )}</p></div></div>`;
   }
 
   function getIconName(classification: EventClassification): IconName | null {
@@ -185,7 +187,7 @@
           start: initialEvent.eventTime,
           end: Date.now(),
           content: renderPendingAttempts(
-            group.name,
+            DOMPurify.sanitize(group.name),
             groupPendingActivity.attempt,
           ),
           className: `${lastEvent.category} ${lastEvent.classification}`,
@@ -203,9 +205,9 @@
           content:
             group.eventList.length === 1
               ? DOMPurify.sanitize(singleEventName)
-              : `<div class="bar-content">${group.name}${getIcon(
-                  lastEvent.classification,
-                )}</div>`,
+              : `<div class="bar-content">${DOMPurify.sanitize(
+                  group.name,
+                )}${getIcon(lastEvent.classification)}</div>`,
           end: lastEvent.eventTime,
           type: group.eventList.length === 1 ? 'point' : 'range',
           className: `${lastEvent.category} ${lastEvent.classification}`,
