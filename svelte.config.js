@@ -33,7 +33,7 @@ export default {
     },
     csp: {
       mode: 'hash',
-      directives: { 'script-src': ['self'] },
+      directives: { 'script-src': ['strict-dynamic'] },
     },
   },
 };
