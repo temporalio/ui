@@ -1,4 +1,5 @@
 <script lang="ts">
+  import DOMPurify from 'dompurify';
   import { onMount } from 'svelte';
   import {
     type DataGroup,
@@ -201,7 +202,7 @@
           data: group,
           content:
             group.eventList.length === 1
-              ? singleEventName
+              ? DOMPurify.sanitize(singleEventName)
               : `<div class="bar-content">${group.name}${getIcon(
                   lastEvent.classification,
                 )}</div>`,
