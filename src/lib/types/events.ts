@@ -145,8 +145,6 @@ export type WorkflowExecutionFailedEvent =
   EventWithAttributes<'workflowExecutionFailedEventAttributes'>;
 export type WorkflowExecutionTimedOutEvent =
   EventWithAttributes<'workflowExecutionTimedOutEventAttributes'>;
-export type WorkflowExecutionUpdateRequestedEvent =
-  EventWithAttributes<'workflowExecutionUpdateRequestedEventAttributes'>;
 export type WorkflowTaskScheduledEvent =
   EventWithAttributes<'workflowTaskScheduledEventAttributes'>;
 export type WorkflowTaskStartedEvent =
@@ -222,6 +220,8 @@ export type WorkflowExecutionUpdateAcceptedEvent =
   EventWithAttributes<'workflowExecutionUpdateAcceptedEventAttributes'>;
 export type WorkflowExecutionUpdateCompletedEvent =
   EventWithAttributes<'workflowExecutionUpdateCompletedEventAttributes'>;
+export type WorkflowExecutionUpdateRequestedEvent =
+  EventWithAttributes<'workflowExecutionUpdateRequestedEventAttributes'>;
 
 export type FailActivityTaskRequest =
   import('$lib/types').ActivityTaskFailedByIdRequest;

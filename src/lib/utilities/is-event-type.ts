@@ -43,6 +43,7 @@ import type {
   WorkflowExecutionTimedOutEvent,
   WorkflowExecutionUpdateAcceptedEvent,
   WorkflowExecutionUpdateCompletedEvent,
+  WorkflowExecutionUpdateRequestedEvent,
   WorkflowTaskCompletedEvent,
   WorkflowTaskFailedEvent,
   WorkflowTaskScheduledEvent,
@@ -437,4 +438,9 @@ export const isFailedWorkflowExecutionUpdateCompletedEvent = (
   isWorkflowExecutionUpdateCompletedEvent(event) &&
   Boolean(
     event.workflowExecutionUpdateCompletedEventAttributes.outcome?.failure,
+  );
+
+export const isWorkflowExecutionUpdateRequestedEvent =
+  hasAttributes<WorkflowExecutionUpdateRequestedEvent>(
+    'workflowExecutionUpdateRequestedEventAttributes',
   );

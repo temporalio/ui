@@ -168,10 +168,9 @@ describe('getGroupId', () => {
 
   it('should get the correct ID for WorkflowExecutionUpdateRequested events', () => {
     const event = {
-      workflowExecutionUpdateRequestedEventAttributes: {
-        acceptedEventId: 59,
-      },
+      id: '5',
+      workflowExecutionUpdateRequestedEventAttributes: {},
     } as unknown as CommonHistoryEvent;
-    expect(getGroupId(event)).toBe('59');
+    expect(getGroupId(event)).toBe('5');
   });
 });
