@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DOMPurify from 'dompurify';
+  import sanitizeHtml from 'sanitize-html';
   import { onMount } from 'svelte';
   import {
     type DataGroup,
@@ -68,7 +68,7 @@
 
     const link = renderComponentToHTML(Link, {
       href,
-      text: DOMPurify.sanitize(groupName),
+      text: sanitizeHtml(groupName),
       class: 'flex gap-2 items-center',
     });
     return link;
@@ -82,7 +82,7 @@
     const retryIcon = renderComponentToHTML(Icon, {
       name: 'retry',
     });
-    return `<div class="flex gap-1 items-center"><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div><div class="bar-content"><p>${DOMPurify.sanitize(
+    return `<div class="flex gap-1 items-center"><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div><div class="bar-content"><p>${sanitizeHtml(
       name,
     )}</p></div></div>`;
   }
@@ -187,7 +187,7 @@
           start: initialEvent.eventTime,
           end: Date.now(),
           content: renderPendingAttempts(
-            DOMPurify.sanitize(group.name),
+            sanitizeHtml(group.name),
             groupPendingActivity.attempt,
           ),
           className: `${lastEvent.category} ${lastEvent.classification}`,
@@ -204,10 +204,10 @@
           data: group,
           content:
             group.eventList.length === 1
-              ? DOMPurify.sanitize(singleEventName)
-              : `<div class="bar-content">${DOMPurify.sanitize(
-                  group.name,
-                )}${getIcon(lastEvent.classification)}</div>`,
+              ? sanitizeHtml(String(singleEventName))
+              : `<div class="bar-content">${sanitizeHtml(group.name)}${getIcon(
+                  lastEvent.classification,
+                )}</div>`,
           end: lastEvent.eventTime,
           type: group.eventList.length === 1 ? 'point' : 'range',
           className: `${lastEvent.category} ${lastEvent.classification}`,
