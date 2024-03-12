@@ -5,12 +5,13 @@
   } from 'svelte/elements';
 
   import { cva, type VariantProps } from 'class-variance-authority';
+  import { twMerge as merge } from 'tailwind-merge';
+
+  import { goto } from '$app/navigation';
 
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
-
-  import Link from './link.svelte';
 
   const buttonStyles = cva(
     [
@@ -33,13 +34,13 @@
       variants: {
         variant: {
           primary:
-            'bg-interactive border-interactive text-inverse hover:enabled:bg-interactive-hover hover:enabled:border-interactive-hover focus-visible:enabled:bg-interactive-hover focus-visible:enabled:border-white dark:focus-visible:enabled:border-black focus-visible:shadow-primary ',
+            'bg-interactive border-interactive text-white hover:text-white hover:bg-interactive-hover hover:border-interactive-hover focus-visible:bg-interactive-hover focus-visible:border-white dark:focus-visible:border-black focus-visible:shadow-primary ',
           secondary:
-            'border-secondary text-primary focus-visible:shadow-secondary hover:enabled:surface-interactive-secondary hover:enabled:border-interactive-secondary dark:hover:enabled:border-transparent focus-visible:enabled:surface-interactive-secondary focus-visible:enabled:border-white dark:focus-visible:enabled:border-black',
+            'border-secondary text-primary focus-visible:shadow-secondary hover:surface-interactive-secondary hover:border-interactive-secondary dark:hover:border-transparent focus-visible:surface-interactive-secondary focus-visible:border-white dark:focus-visible:border-black',
           destructive:
-            'border-danger bg-danger dark:hover:enabled:shadow-red-600/30 hover:enabled:bg-red-400 hover:enabled:border-red-400 dark:hover:enabled:border-black dark:hover:enabled:border-red-400/50 dark:hover:enabled:bg-red-400 focus-visible:shadow-focus dark:focus-visible:shadow-red-600/30 focus-visible:shadow-red-200/50 focus-visible:border-white dark:focus-visible:border-red-400/50 dark:focus-visible:bg-red-400',
+            'border-danger bg-danger  hover:bg-red-400 hover:border-red-400 focus-visible:shadow-focus dark:focus-visible:shadow-red-600/30 focus-visible:shadow-red-200/50 focus-visible:border-white dark:focus-visible:border-red-400/50 dark:focus-visible:bg-red-400',
           ghost:
-            'border-transparent bg-transparent text-primary hover:enabled:surface-interactive-secondary focus-visible:border-white dark:hover:enabled:border-black dark:focus-visible:border-black focus-visible:shadow-primary focus-visible:surface-interactive-secondary ',
+            'border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:border-white dark:hover:border-black dark:focus-visible:border-black focus-visible:shadow-primary focus-visible:surface-interactive-secondary ',
           'table-header':
             ' bg-inverse text-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:border-white',
         },
@@ -68,6 +69,7 @@
   );
 
   type BaseProps = {
+    icon?: IconName;
     disabled?: boolean;
     loading?: boolean;
     leadingIcon?: IconName;
@@ -100,24 +102,39 @@
   export let trailingIcon: IconName = null;
   export let count = 0;
   export let id: string = null;
+  export let icon: IconName = null;
   export let href: string = null;
   export let target: string = null;
   export let active = false;
+
+  const onLinkClick = (e: MouseEvent) => {
+    // Skip if middle mouse click or new tab
+    if (e.button === 1 || target || e.metaKey) return;
+    e.preventDefault();
+    e.stopPropagation();
+    goto(href);
+  };
 </script>
 
 {#if href && !disabled}
-  <Link
-    {target}
+  <a
     {href}
     {id}
     role="button"
     type="button"
-    class={buttonStyles({
-      variant,
-      size,
-      borderModifier,
-      borderRadiusModifier,
-    })}
+    target={target ? '_blank' : null}
+    rel={target ? 'noreferrer' : null}
+    class={merge(
+      icon ? 'inline-flex' : 'inline',
+      buttonStyles({
+        variant,
+        size,
+        borderModifier,
+        borderRadiusModifier,
+      }),
+    )}
+    on:click={onLinkClick}
+    tabindex={href ? null : 0}
     {...$$restProps}
   >
     {#if leadingIcon || loading}
@@ -137,7 +154,7 @@
         type="count">{count}</Badge
       >
     {/if}
-  </Link>
+  </a>
 {:else}
   <button
     {disabled}

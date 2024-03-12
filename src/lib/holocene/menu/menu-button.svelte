@@ -146,7 +146,7 @@
   }
 
   .primary {
-    @apply border-interactive bg-interactive text-inverse focus-visible:shadow-primary focus-visible:shadow-primary hover:border-interactive-hover hover:bg-interactive-hover focus-visible:border-inverse focus-visible:bg-interactive-hover;
+    @apply border-interactive bg-interactive text-inverse hover:border-interactive-hover hover:bg-interactive-hover focus-visible:border-inverse focus-visible:bg-interactive-hover focus-visible:shadow-focus focus-visible:shadow-primary/50;
 
     &:disabled {
       @apply text-white opacity-75;
@@ -154,7 +154,7 @@
   }
 
   .ghost {
-    @apply border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:shadow-primary focus-visible:border-inverse;
+    @apply border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:shadow-focus focus-visible:shadow-primary/50;
 
     &:disabled {
       @apply bg-badge/50;
@@ -162,7 +162,7 @@
   }
 
   .secondary {
-    @apply border-secondary text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:shadow-secondary hover:border-interactive-secondary focus-visible:border-white;
+    @apply border-primary bg-white text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary dark:hover:surface-interactive-secondary hover:border-subtle focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-secondary dark:bg-transparent dark:hover:border-primary;
 
     &:disabled {
       @apply bg-slate-50;
