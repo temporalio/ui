@@ -28,6 +28,7 @@
   class="line {status} {category} {classification}"
   class:active
   class:scheduling
+  class:animate-line={category === 'pending'}
   stroke-width={strokeWidth}
   stroke-dasharray={strokeDasharray}
   {x1}
@@ -74,12 +75,12 @@
 
   .pending {
     stroke: #a78bfa;
-    stroke-dasharray: 1;
+    stroke-dasharray: 3;
   }
 
   .retry {
     stroke: #ff4518;
-    stroke-dasharray: 2;
+    stroke-dasharray: 4;
   }
 
   .child-workflow {
@@ -114,5 +115,20 @@
   .Running {
     stroke: #3b82f6;
     fill: #3b82f6;
+  }
+
+  .animate-line {
+    stroke-dashoffset: 0;
+    animation: dash 60s linear infinite;
+  }
+
+  @keyframes dash {
+    from {
+      stroke-dashoffset: 1000;
+    }
+
+    to {
+      stroke-dashoffset: 0;
+    }
   }
 </style>

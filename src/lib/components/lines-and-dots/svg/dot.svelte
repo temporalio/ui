@@ -19,7 +19,7 @@
 </script>
 
 <g>
-  {#if category === 'pending'}
+  <!-- {#if category === 'pending'}
     <animateTransform
       attributeName="transform"
       attributeType="XML"
@@ -29,7 +29,7 @@
       dur="2s"
       repeatCount="indefinite"
     />
-  {/if}
+  {/if} -->
   <circle
     class="dot {category} {classification}"
     class:active
@@ -82,7 +82,6 @@
   .pending {
     stroke: #a78bfa;
     fill: #141414;
-    stroke-dasharray: 2.5;
   }
 
   .child-workflow {

@@ -1,17 +1,33 @@
 <script lang="ts">
   import type { EventTypeCategory } from '$lib/types/events';
 
+  import { TimelineConfig } from '../constants';
+
   export let point: [number, number] = [0, 0];
   export let category: EventTypeCategory | 'pending' | 'none' = 'none';
   export let active = false;
   export let position: 'start' | 'middle' | 'end' = 'start';
 
+  const { radius } = TimelineConfig;
+
+  let textElement: SVGTextElement;
+
+  $: width = textElement?.getBBox()?.width || 0;
+
   $: [x, y] = point;
 </script>
 
 {#if position === 'middle'}
+  <rect
+    {x}
+    y={y - radius * 1.5}
+    {width}
+    height={radius * 2}
+    opacity=".5"
+    fill="#141414"
+  />
   <text
-    filter="url(#bg-text)"
+    bind:this={textElement}
     class="cursor-pointer select-none outline-none {category} {position}"
     class:active
     {x}

@@ -120,7 +120,6 @@
         classification={group.lastEvent.classification}
         {active}
         strokeWidth={radius * 2}
-        strokeDasharray="3"
       />
     {/if}
     <Dot point={[x, y]} category={group.category} {active} r={radius} />
@@ -145,7 +144,7 @@
       y={y - radius}
       width={radius * 2}
       height={radius * 2}
-      stroke={group.pendingActivity.attempt > 1 ? '#FF4518' : '#ffffff'}
+      stroke={group.pendingActivity.attempt > 1 ? '#FF4518' : '#fff'}
     />
   {/if}
   <Text point={textPoint} category={group.category} {active} {position}>
