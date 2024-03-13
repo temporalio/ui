@@ -23,7 +23,7 @@
 </script>
 
 <div
-  class="{type} flex w-fit flex-row items-center justify-center break-all rounded-sm p-1 text-sm font-medium leading-4 transition-colors {$$props.class}"
+  class="{type} flex w-fit flex-row items-center justify-center text-nowrap break-all rounded-sm p-1 text-sm font-medium leading-4 transition-colors {$$props.class}"
 >
   <slot />
 </div>

@@ -21,7 +21,7 @@
 <button
   type="button"
   class={merge('icon-button', className)}
-  on:click
+  on:click|stopPropagation
   aria-label={label}
   {...$$restProps}
 >
