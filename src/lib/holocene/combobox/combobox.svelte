@@ -190,8 +190,8 @@
   };
 
   const handleSelectOption = (option: string | T) => {
-    dispatch('change', { value: option });
     setValue(option);
+    dispatch('change', { value: option });
     resetValueAndOptions();
   };
 

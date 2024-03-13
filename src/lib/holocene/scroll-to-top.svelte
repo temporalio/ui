@@ -10,7 +10,7 @@
   <div class="back-to-top" class:hidden>
     <Button
       size="sm"
-      variant="secondary"
+      variant="primary"
       on:click={onScrollToTopClick}
       leadingIcon="arrow-up"
     />

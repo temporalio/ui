@@ -231,7 +231,11 @@
     </nav>
   </div>
   {#if $store.loading}
-    <SkeletonTable rows={15} />
+    {#if $$slots.loading}
+      <slot name="loading" />
+    {:else}
+      <SkeletonTable rows={15} />
+    {/if}
   {:else if isEmpty}
     <slot name="empty">{emptyStateMessage}</slot>
   {:else}
