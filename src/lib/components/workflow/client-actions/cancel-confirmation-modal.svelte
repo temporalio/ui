@@ -25,7 +25,7 @@
         workflow,
       });
       open = false;
-      $refresh = Date.now(); // TODO: this should be diff for batch vs. single
+      $refresh = Date.now();
       toaster.push({
         id: 'workflow-cancelation-success-toast',
         message: translate('workflows.cancel-success'),
