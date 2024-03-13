@@ -66,13 +66,13 @@
     >
   {:else}
     <Text point={[5, y + 5]} {category} {active}>
-      <tspan>{event.id}</tspan>
-      <tspan x={50}
+      <tspan fill="#aebed9">{event.id}</tspan>
+      <tspan x={50} fill="#fff"
         >{spaceBetweenCapitalLetters(event?.name)}
-        {#if group && showEventType}<tspan dx={5} fill="#fff" font-size="14px"
-            >{group.name}</tspan
-          >{/if}
       </tspan>
+      {#if group && showEventType}<tspan dx={5} font-size="14px"
+          >{group.name}</tspan
+        >{/if}
     </Text>
     {#if showTimestamp}
       <Text point={[startingX - 10, y + 5]} {active} textAnchor="end">
