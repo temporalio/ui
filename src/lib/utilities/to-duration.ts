@@ -121,12 +121,14 @@ export const fromDate = (
 };
 
 export const fromSeconds = (seconds: string): Duration | undefined => {
-  const milliseconds = parseInt(seconds) * 1000;
+  const parsedSeconds = parseInt(seconds);
+  const parsedDecimal = parseFloat(`.${seconds.split('.')[1] ?? 0}`);
 
   if (!seconds.endsWith('s')) return undefined;
-  if (isNaN(milliseconds)) return undefined;
+  if (isNaN(parsedSeconds) || isNaN(parsedDecimal)) return undefined;
 
-  return intervalToDuration({ start: 0, end: milliseconds });
+  const duration = intervalToDuration({ start: 0, end: parsedSeconds * 1000 });
+  return { ...duration, seconds: duration.seconds + parsedDecimal };
 };
 
 export const isValidDurationQuery = (value: string): boolean => {

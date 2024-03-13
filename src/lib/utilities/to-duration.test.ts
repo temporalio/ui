@@ -342,12 +342,16 @@ describe('toString', () => {
 });
 
 describe('fromSeconds', () => {
-  it('should return undefined if given invalid input', () => {
-    expect(fromSeconds('lolol')).toBeUndefined();
-  });
-
   it('should return undefined given a string that does not end in seconds', () => {
     expect(fromSeconds('3600m')).toBeUndefined();
+  });
+
+  it('should correctly parse seconds', () => {
+    expect(fromSeconds('0s')).toMatchObject({ seconds: 0 });
+    expect(fromSeconds('6s')).toMatchObject({ seconds: 6 });
+    expect(fromSeconds('0.00s')).toMatchObject({ seconds: 0 });
+    expect(fromSeconds('0.06s')).toMatchObject({ seconds: 0.06 });
+    expect(fromSeconds('0.006s')).toMatchObject({ seconds: 0.006 });
   });
 
   it('should correctly parse minutes', () => {
@@ -358,12 +362,32 @@ describe('fromSeconds', () => {
     expect(fromSeconds('3600s')).toMatchObject({ hours: 1 });
   });
 
-  it('should correctly parse minutes', () => {
+  it('should correctly parse hours and minutes', () => {
     expect(fromSeconds('3660s')).toMatchObject({ hours: 1, minutes: 1 });
+  });
+
+  it('should correctly parse hours, minutes and seconds', () => {
+    expect(fromSeconds('3661s')).toMatchObject({
+      hours: 1,
+      minutes: 1,
+      seconds: 1,
+    });
+    expect(fromSeconds('3660.06s')).toMatchObject({
+      hours: 1,
+      minutes: 1,
+      seconds: 0.06,
+    });
+    expect(fromSeconds('3660.006s')).toMatchObject({
+      hours: 1,
+      minutes: 1,
+      seconds: 0.006,
+    });
   });
 
   it('should return undefined if given bogus input', () => {
     expect(fromSeconds('bogus')).toBeUndefined();
+    expect(fromSeconds('bogus.01')).toBeUndefined();
+    expect(fromSeconds('10.bogus')).toBeUndefined();
   });
 });
 
