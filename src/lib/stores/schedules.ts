@@ -76,32 +76,37 @@ const setBodySpec = (
   }
 };
 
+const setBase64Payload = (payload: unknown) => {
+  return {
+    metadata: {
+      encoding: btoa('json/plain'),
+    },
+    data: btoa(JSON.stringify(payload)),
+  };
+};
+
 const setScheduleInputPayloads = async (input: string) => {
   let payloads = null;
 
-  const endpoint = get(dataEncoder).endpoint;
   if (input) {
-    if (endpoint) {
-      const awaitData = await convertPayloadsWithCodec({
-        payloads: { payloads: [JSON.parse(input)] },
-        encode: true,
-      });
-      // if (get(lastDataEncoderStatus) === 'error') {
-      //   throw new Error(
-      //     get(lastDataEncoderError) || translate('common.encode-failed'),
-      //   );
-      // }
-      payloads = awaitData?.payloads ?? null;
-    } else {
-      payloads = [
-        {
-          metadata: {
-            encoding: btoa('json/plain'),
-          },
-          data: btoa(input),
-        },
-      ];
-    }
+    const parsedInput = JSON.parse(input);
+    payloads = Array.isArray(parsedInput)
+      ? parsedInput.map(setBase64Payload)
+      : [setBase64Payload(parsedInput)];
+  }
+
+  const endpoint = get(dataEncoder).endpoint;
+  if (endpoint) {
+    const awaitData = await convertPayloadsWithCodec({
+      payloads: { payloads },
+      encode: true,
+    });
+    // if (get(lastDataEncoderStatus) === 'error') {
+    //   throw new Error(
+    //     get(lastDataEncoderError) || translate('common.encode-failed'),
+    //   );
+    // }
+    payloads = awaitData?.payloads ?? null;
   }
 
   return payloads;

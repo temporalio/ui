@@ -11,11 +11,10 @@
   <TableHeaderRow slot="headers">
     <th class="w-28">{translate('common.status')}</th>
     <th class="md:w-80 xl:w-auto">{translate('schedules.name')}</th>
-    <th class="w-60 max-md:hidden xl:w-80"
-      >{translate('common.workflow-type')}</th
-    >
+    <th class="w-60 max-md:hidden">{translate('common.workflow-type')}</th>
     <th class="w-56 max-xl:hidden">{translate('schedules.recent-runs')}</th>
     <th class="w-56 max-xl:hidden">{translate('schedules.upcoming-runs')}</th>
+    <th class="max-xl:hidden">{translate('schedules.schedule-spec')}</th>
   </TableHeaderRow>
   <slot />
 </Table>

@@ -8,9 +8,7 @@
   export let input: string;
   export let payloads: Payloads;
 
-  let signalInputCodeBlock: CodeBlock;
-
-  const handleSignalInputChange = (event: CustomEvent<string>) => {
+  const handleInputChange = (event: CustomEvent<string>) => {
     input = event.detail;
   };
 </script>
@@ -18,15 +16,16 @@
 <div class="flex flex-col gap-4">
   <label for="schedule-input">{translate('workflows.input')}</label>
   <PayloadDecoder value={payloads} let:decodedValue key="payloads">
-    <CodeBlock
-      id="schedule-input"
-      class="max-h-80 overflow-y-scroll overscroll-contain"
-      content={decodedValue}
-      on:change={handleSignalInputChange}
-      editable
-      copyable={false}
-      bind:this={signalInputCodeBlock}
-    />
+    {#key decodedValue}
+      <CodeBlock
+        id="schedule-input"
+        class="max-h-80 overflow-y-scroll overscroll-contain"
+        content={decodedValue}
+        on:change={handleInputChange}
+        editable
+        copyable={false}
+      />
+    {/key}
   </PayloadDecoder>
   <span class="font-secondary text-xs font-light italic">
     {translate('workflows.signal-payload-input-label-hint')}

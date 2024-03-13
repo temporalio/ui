@@ -46,7 +46,7 @@
   };
 </script>
 
-<article class="flex w-full flex-col lg:w-1/2" {...$$restProps}>
+<article class="flex w-full flex-col" {...$$restProps}>
   <h3 class="mb-2 flex items-center gap-2 text-lg">
     {title}
     {#if showParsedContentCount}

@@ -16,7 +16,7 @@ export const variables = {
   '--color-text-primary': rgb(colors.primary),
   '--color-text-secondary': rgb(colors.secondary),
   '--color-text-inverse': rgb(colors.offWhite),
-  '--color-text-subtle': rgb(getColor('slate', 900)),
+  '--color-text-subtle': rgb(getColor('slate', 300)),
   '--color-text-disabled': rgb(getColor('slate', 500)),
   '--color-text-error': rgb(getColor('red', 700)),
   '--color-text-information': rgb(getColor('blue', 700)),
