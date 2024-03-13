@@ -9,6 +9,7 @@
   import { codecEndpoint } from '$lib/stores/data-encoder-config';
   import { toaster } from '$lib/stores/toaster';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { isNetworkError } from '$lib/utilities/is-network-error';
 
   export let open: boolean;
   export let workflow: WorkflowExecution;
@@ -32,9 +33,9 @@
   };
 
   const signal = async () => {
+    error = '';
+    loading = true;
     try {
-      loading = true;
-      error = '';
       await signalWorkflow({
         namespace,
         workflow,
@@ -48,7 +49,9 @@
       });
       hideSignalModal();
     } catch (err) {
-      error = err?.message ?? translate('common.unknown-error');
+      error = isNetworkError(err)
+        ? err.message
+        : translate('common.unknown-error');
     } finally {
       loading = false;
     }

@@ -1,4 +1,8 @@
 <script lang="ts" context="module">
+  import type { Readable, Writable } from 'svelte/store';
+
+  import type { WorkflowExecution } from '$lib/types/workflows';
+
   export const BATCH_OPERATION_CONTEXT = 'BATCH_OPERATION_CONTEXT';
 
   export type BatchOperationContext = {
@@ -8,6 +12,7 @@
     cancelableWorkflows: Readable<WorkflowExecution[]>;
     selectedWorkflows: Writable<WorkflowExecution[]>;
     batchActionsVisible: Readable<boolean>;
+    query: Readable<string>;
     openBatchCancelConfirmationModal: () => void;
     openBatchTerminateConfirmationModal: () => void;
     handleSelectAll: (workflows: WorkflowExecution[]) => void;
@@ -19,49 +24,41 @@
 </script>
 
 <script lang="ts">
-  import {
-    derived,
-    type Readable,
-    writable,
-    type Writable,
-  } from 'svelte/store';
+  import { derived, writable } from 'svelte/store';
 
   import { onMount, setContext } from 'svelte';
 
   import { page } from '$app/stores';
 
-  import BatchOperationConfirmationModal from '$lib/components/workflow/client-actions/batch-operation-confirmation-modal.svelte';
+  import BatchCancelConfirmationModal from '$lib/components/workflow/client-actions/batch-cancel-confirmation-modal.svelte';
+  import BatchTerminateConfirmationModal from '$lib/components/workflow/client-actions/batch-terminate-confirmation-modal.svelte';
+  import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
+  import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
-  import { Action } from '$lib/models/workflow-actions';
-  import {
-    batchCancelWorkflows,
-    batchTerminateWorkflows,
-  } from '$lib/services/batch-service';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { workflowFilters } from '$lib/stores/filters';
   import { groupByCountEnabled } from '$lib/stores/group-by-enabled';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
-  import { toaster } from '$lib/stores/toaster';
   import {
+    refresh,
     updating,
     workflowCount,
     workflows,
     workflowsQuery,
     workflowsSearchParams,
   } from '$lib/stores/workflows';
-  import type { WorkflowExecution } from '$lib/types/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   $: query = $page.url.searchParams.get('query');
   $: query, ($workflowsQuery = query);
-  $: batchOperationQuery = $workflowsQuery ?? 'ExecutionStatus="Running"';
+  $: namespace = $page.params.namespace;
 
   // For returning to page from 'Back to Workflows' with previous search
   $: searchParams = $page.url.searchParams.toString();
@@ -81,8 +78,14 @@
     $selectedWorkflows = [];
   };
 
-  let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
-  let batchCancelConfirmationModal: BatchOperationConfirmationModal;
+  let batchTerminateConfirmationModalOpen = false;
+  let batchCancelConfirmationModalOpen = false;
+  let terminateConfirmationModalOpen = false;
+  let cancelConfirmationModalOpen = false;
+  const batchOperationQuery = derived(
+    workflowsQuery,
+    (query) => query ?? 'ExecutionStatus="Running"',
+  );
   const allSelected = writable<boolean>(false);
   const pageSelected = writable<boolean>(false);
   const selectedWorkflows = writable<WorkflowExecution[]>([]);
@@ -100,11 +103,15 @@
   );
 
   const openBatchCancelConfirmationModal = () => {
-    batchCancelConfirmationModal?.open();
+    $selectedWorkflows.length > 1
+      ? (batchCancelConfirmationModalOpen = true)
+      : (cancelConfirmationModalOpen = true);
   };
 
   const openBatchTerminateConfirmationModal = () => {
-    batchTerminateConfirmationModal?.open();
+    $selectedWorkflows.length > 1
+      ? (batchTerminateConfirmationModalOpen = true)
+      : (terminateConfirmationModalOpen = true);
   };
 
   const handleSelectAll = (workflows: WorkflowExecution[]) => {
@@ -125,56 +132,6 @@
     }
   };
 
-  const terminateWorkflows = async (
-    event: CustomEvent<{ reason: string; jobId: string }>,
-  ) => {
-    try {
-      const options = {
-        namespace: $page.params.namespace,
-        reason: event.detail.reason,
-        jobId: event.detail.jobId,
-        ...($allSelected
-          ? { query: batchOperationQuery }
-          : { workflows: $terminableWorkflows }),
-      };
-      await batchTerminateWorkflows(options);
-      batchTerminateConfirmationModal?.close();
-      toaster.push({
-        message: translate('workflows.batch-terminate-all-success'),
-        id: 'batch-terminate-success-toast',
-      });
-    } catch (error) {
-      batchTerminateConfirmationModal?.setError(
-        error?.message ?? translate('common.unknown-error'),
-      );
-    }
-  };
-
-  const cancelWorkflows = async (
-    event: CustomEvent<{ reason: string; jobId: string }>,
-  ) => {
-    const options = {
-      namespace: $page.params.namespace,
-      reason: event.detail.reason,
-      jobId: event.detail.jobId,
-      ...($allSelected
-        ? { query: batchOperationQuery }
-        : { workflows: $terminableWorkflows }),
-    };
-    try {
-      await batchCancelWorkflows(options);
-      batchCancelConfirmationModal?.close();
-      toaster.push({
-        message: translate('workflows.batch-cancel-all-success'),
-        id: 'batch-cancel-success-toast',
-      });
-    } catch (error) {
-      batchCancelConfirmationModal?.setError(
-        error?.message ?? translate('common.unknown-error'),
-      );
-    }
-  };
-
   setContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT, {
     allSelected,
     pageSelected,
@@ -186,6 +143,7 @@
     openBatchTerminateConfirmationModal,
     handleSelectAll,
     handleSelectPage,
+    query: batchOperationQuery,
   });
 
   $: {
@@ -195,20 +153,28 @@
   }
 </script>
 
-<BatchOperationConfirmationModal
-  action={Action.Terminate}
-  bind:this={batchTerminateConfirmationModal}
-  actionableWorkflowsLength={$terminableWorkflows.length}
-  query={batchOperationQuery}
-  on:confirm={terminateWorkflows}
+<BatchTerminateConfirmationModal
+  {namespace}
+  bind:open={batchTerminateConfirmationModalOpen}
 />
 
-<BatchOperationConfirmationModal
-  action={Action.Cancel}
-  bind:this={batchCancelConfirmationModal}
-  actionableWorkflowsLength={$cancelableWorkflows.length}
-  query={batchOperationQuery}
-  on:confirm={cancelWorkflows}
+<BatchCancelConfirmationModal
+  {namespace}
+  bind:open={batchCancelConfirmationModalOpen}
+/>
+
+<TerminateConfirmationModal
+  {refresh}
+  {namespace}
+  workflow={$selectedWorkflows[0]}
+  bind:open={terminateConfirmationModalOpen}
+/>
+
+<CancelConfirmationModal
+  {refresh}
+  {namespace}
+  workflow={$selectedWorkflows[0]}
+  bind:open={cancelConfirmationModalOpen}
 />
 
 <header class="flex flex-col gap-2">

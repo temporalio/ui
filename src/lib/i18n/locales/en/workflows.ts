@@ -11,7 +11,8 @@ export const Strings = {
   'filtered-workflows-count':
     'Results {{filtered, number}} of {{total, number}} workflows',
   terminate: 'Terminate',
-  'batch-operation-modal-title': '{{action}} Workflows',
+  'batch-terminate-modal-title': 'Terminate Workflows',
+  'batch-cancel-modal-title': 'Cancel Workflows',
   'workflow-action-reason-placeholder': '{{action}} from the Web UI',
   'workflow-action-reason-placeholder-with-email':
     '{{action}} from the Web UI by {{email}}',

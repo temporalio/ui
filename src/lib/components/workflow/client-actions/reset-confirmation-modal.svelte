@@ -12,6 +12,7 @@
   import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { isNetworkError } from '$lib/utilities/is-network-error';
 
   export let open: boolean;
   export let workflow: WorkflowExecution;
@@ -40,9 +41,9 @@
   };
 
   const reset = async () => {
+    error = '';
+    loading = true;
     try {
-      error = '';
-      loading = true;
       const response = await resetWorkflow({
         namespace,
         workflow,
@@ -60,7 +61,9 @@
       $refresh = Date.now();
       hideResetModal();
     } catch (err) {
-      error = err?.message ?? translate('common.unknown-error');
+      error = isNetworkError(err)
+        ? err.message
+        : translate('common.unknown-error');
     } finally {
       loading = false;
     }

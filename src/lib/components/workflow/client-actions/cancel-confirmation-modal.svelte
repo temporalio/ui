@@ -6,6 +6,7 @@
   import { cancelWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { isNetworkError } from '$lib/utilities/is-network-error';
 
   export let open: boolean;
   export let workflow: WorkflowExecution;
@@ -16,9 +17,9 @@
   let error: string = '';
 
   const cancel = async () => {
+    error = '';
+    loading = true;
     try {
-      error = '';
-      loading = true;
       await cancelWorkflow({
         namespace,
         workflow,
@@ -30,8 +31,9 @@
         message: translate('workflows.cancel-success'),
       });
     } catch (err: unknown) {
-      error =
-        err instanceof Error ? err.message : translate('common.unknown-error');
+      error = isNetworkError(err)
+        ? err.message
+        : translate('common.unknown-error');
     } finally {
       loading = false;
     }
