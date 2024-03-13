@@ -5,19 +5,14 @@
   export let width: number;
   export let height: number;
   export let classification: EventClassification | undefined = undefined;
-  export let index: number;
+  export let fill = '#141414';
 
   $: [x, y] = point;
 </script>
 
-<rect
-  {x}
-  {y}
-  {width}
-  {height}
-  class={classification}
-  fill={index % 2 === 1 ? '#1E293B' : '#141414'}
-/>
+<rect {x} {y} {width} {height} class={classification} {fill}>
+  <slot />
+</rect>
 
 <style lang="postcss">
   .Failed,

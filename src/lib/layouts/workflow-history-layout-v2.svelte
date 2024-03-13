@@ -85,11 +85,11 @@
   );
 
   let zoomLevel = 1;
-  const zoomIn = () => {
+  const zoomOut = () => {
     if (zoomLevel < 6) zoomLevel += 0.5;
   };
 
-  const zoomOut = () => {
+  const zoomIn = () => {
     if (zoomLevel > 1) {
       zoomLevel -= 0.5;
     }
@@ -130,13 +130,13 @@
             data-testid="feed"
             class="bg-white"
             disabled={zoomLevel === 1}
-            on:click={zoomOut}>+</ToggleButton
+            on:click={zoomIn}>+</ToggleButton
           >
           <ToggleButton
             data-testid="compact"
             class="bg-white"
             disabled={zoomLevel === 10}
-            on:click={zoomIn}>-</ToggleButton
+            on:click={zoomOut}>-</ToggleButton
           >
         </ToggleButtons>
         <span class="text-sm">{(100 / zoomLevel).toFixed(0)}%</span>

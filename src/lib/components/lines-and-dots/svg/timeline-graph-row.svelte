@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fullEventHistory } from '$lib/stores/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -7,7 +8,7 @@
     getMillisecondDuration,
   } from '$lib/utilities/format-time';
 
-  import { TimelineConfig } from '../constants';
+  import { DotIcon, TimelineConfig } from '../constants';
 
   import Dot from './dot.svelte';
   import Line from './line.svelte';
@@ -52,12 +53,22 @@
     includeMilliseconds: true,
   });
 
+  $: firstPoint = points[0];
   $: lastPoint = points[points.length - 1];
-  $: textAtEnd = timelineWidth - lastPoint > group?.name?.length * 9 ?? 200;
+  $: textAtBeginning = firstPoint > timelineWidth / 3 && !group.pendingActivity;
+  $: textAtEnd =
+    timelineWidth - lastPoint > timelineWidth / 3 && !group.pendingActivity;
+  $: textInMiddle = !textAtBeginning && !textAtEnd;
+  $: position = textAtEnd ? 'start' : textInMiddle ? 'middle' : 'end';
+
   $: textPoint = [
-    textAtEnd ? lastPoint + radius : points[0] - radius,
+    textAtEnd
+      ? lastPoint + 1.5 * radius
+      : textAtBeginning
+      ? firstPoint - 1.5 * radius
+      : firstPoint + 1.5 * radius,
     y + radius / 2,
-  ];
+  ] as [number, number];
 </script>
 
 <g
@@ -66,6 +77,8 @@
   on:click|preventDefault={onClick}
   on:keypress={onClick}
   class="relative cursor-pointer"
+  height={gap}
+  transform="matrix(1 0 0 1 0 0)"
 >
   {#each points as x, index}
     {@const nextPoint = points[index + 1]}
@@ -77,22 +90,29 @@
         classification={group.lastEvent.classification}
         {active}
         strokeWidth={radius * 2}
-        initiated={index === 0}
+        scheduling={index === 0 &&
+          group.lastEvent.classification === 'Completed'}
       />
     {/if}
     {#if !nextPoint && group.pendingActivity}
       <Line
         startPoint={[x, y]}
         endPoint={[canvasWidth - gutter, y]}
-        category={group.category}
+        category={group.pendingActivity.attempt > 1 ? 'retry' : 'pending'}
         classification={group.lastEvent.classification}
         {active}
         strokeWidth={radius * 2}
-        initiated={index === 0}
         strokeDasharray="3"
       />
     {/if}
     <Dot point={[x, y]} category={group.category} {active} r={radius} />
+    <Icon
+      name={DotIcon[group.category]}
+      x={x - radius}
+      y={y - radius}
+      width={radius * 2}
+      height={radius * 2}
+    />
   {/each}
   {#if group.pendingActivity}
     <Dot
@@ -101,15 +121,20 @@
       {active}
       r={radius}
     />
+    <Icon
+      name="retry"
+      x={canvasWidth - gutter - radius}
+      y={y - radius}
+      width={radius * 2}
+      height={radius * 2}
+      stroke={group.pendingActivity.attempt > 1 ? '#FF4518' : '#ffffff'}
+    />
   {/if}
-  <Text
-    point={textPoint}
-    category={group.category}
-    {active}
-    textAnchor={textAtEnd ? 'start' : 'end'}
-  >
+  <Text point={textPoint} category={group.category} {active} {position}>
     {group?.name}
-    <tspan fill="#aebed9" font-size="12px">{duration}</tspan>
+    <tspan fill={textInMiddle ? '#ffffff' : '#aebed9'} font-size="12px"
+      >{duration}</tspan
+    >
   </Text>
 </g>
 

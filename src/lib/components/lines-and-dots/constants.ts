@@ -21,7 +21,16 @@ export const TimelineConfig = {
 
 export const HistoryConfig = {
   gap: 24,
-  radius: 8,
+  radius: 10,
+};
+
+export const DotIcon = {
+  signal: 'lightning-bolt',
+  command: 'sliders',
+  activity: 'robot',
+  marker: 'pin',
+  timer: 'clock',
+  'child-workflow': 'relationship',
 };
 
 export const isMiddleEvent = (

@@ -37,7 +37,9 @@
     cx={x}
     cy={y}
     {r}
-  />
+  >
+    <slot />
+  </circle>
 </g>
 
 <style lang="postcss">

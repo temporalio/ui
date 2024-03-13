@@ -40,8 +40,5 @@
     endPoint={[x1 + i * tickDistance, y]}
     status="none"
   />
-  <Text
-    point={[x1 + i * tickDistance - radius, y - radius * 2]}
-    textAnchor="start"
-  ></Text>
+  <Text point={[x1 + i * tickDistance - radius, y - radius * 2]}></Text>
 {/each}

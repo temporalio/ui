@@ -12,10 +12,11 @@
   export let startPoint = [0, 1000];
   export let endPoint = [0, 1000];
   export let status: WorkflowStatus | 'none' = 'none';
-  export let category: EventTypeCategory | 'pending' | 'none' = 'none';
+  export let category: EventTypeCategory | 'pending' | 'retry' | 'none' =
+    'none';
   export let classification: EventClassification | undefined = undefined;
   export let active = true;
-  export let initiated = false;
+  export let scheduling = false;
   export let strokeWidth: number = radius / 2;
   export let strokeDasharray = 'none';
 
@@ -26,7 +27,7 @@
 <line
   class="line {status} {category} {classification}"
   class:active
-  class:initiated
+  class:scheduling
   stroke-width={strokeWidth}
   stroke-dasharray={strokeDasharray}
   {x1}
@@ -46,7 +47,7 @@
     opacity: 1;
   }
 
-  .initiated {
+  .scheduling {
     opacity: 0.35;
   }
 
@@ -74,6 +75,11 @@
   .pending {
     stroke: #a78bfa;
     stroke-dasharray: 1;
+  }
+
+  .retry {
+    stroke: #ff4518;
+    stroke-dasharray: 2;
   }
 
   .child-workflow {

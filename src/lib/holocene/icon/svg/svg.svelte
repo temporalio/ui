@@ -14,6 +14,7 @@
   class={$$props.class}
   role="img"
   aria-hidden={!title}
+  {...$$restProps}
 >
   <title>{title}</title>
   <slot />

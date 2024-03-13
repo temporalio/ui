@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type {
@@ -11,7 +12,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
-  import { HistoryConfig } from '../constants';
+  import { DotIcon, HistoryConfig } from '../constants';
 
   import Box from './box.svelte';
   import Dot from './dot.svelte';
@@ -59,7 +60,7 @@
     point={[0, y - gap / 2]}
     width={startingX - strokeWidth}
     height={gap}
-    {index}
+    fill={index % 2 === 1 && '#1E293B'}
   />
   {#if isPendingActivity(event)}
     <Text point={[50, y + 5]} category="pending" {active}>Pending Activity</Text
@@ -75,7 +76,11 @@
         >{/if}
     </Text>
     {#if showTimestamp}
-      <Text point={[startingX - 10, y + 5]} {active} textAnchor="end">
+      <Text
+        point={[startingX - 1.5 * radius, y + radius / 2]}
+        {active}
+        position="end"
+      >
         {formatDate(event?.eventTime, $timeFormat, {
           relative: $relativeTime,
         })}
@@ -96,6 +101,13 @@
       {category}
       {classification}
       {active}
+    />
+    <Icon
+      name={DotIcon[category]}
+      x={startingX + horizontalOffset - radius}
+      y={y - radius}
+      width={radius * 2}
+      height={radius * 2}
     />
   {/if}
   {#if nextDistance && withinCanvas(startingX + horizontalOffset + radius)}
