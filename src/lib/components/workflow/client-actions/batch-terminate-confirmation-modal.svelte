@@ -39,7 +39,7 @@
     jobIdPlaceholder = v4();
   };
 
-  $: open, resetForm();
+  $: if (open) resetForm();
 
   const terminateWorkflows = async () => {
     error = '';
