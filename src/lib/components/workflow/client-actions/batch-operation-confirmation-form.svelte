@@ -1,22 +1,3 @@
-<script lang="ts" context="module">
-  import { writable } from 'svelte/store';
-
-  import { v4 } from 'uuid';
-
-  import { getPlacholder } from '$lib/utilities/workflow-actions';
-
-  export const batchOperationForm = (
-    action: Action,
-    email: string | undefined,
-  ) => ({
-    reason: writable(''),
-    reasonPlaceholder: getPlacholder(action, email),
-    jobId: writable(''),
-    jobIdPlaceholder: v4(),
-    jobIdValid: writable(true),
-  });
-</script>
-
 <script lang="ts">
   import { getContext } from 'svelte';
 

@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { writable } from 'svelte/store';
+
   import { getContext } from 'svelte';
+  import { v4 } from 'uuid';
 
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -13,21 +16,30 @@
   import { authUser } from '$lib/stores/auth-user';
   import { toaster } from '$lib/stores/toaster';
   import { isNetworkError } from '$lib/utilities/is-network-error';
+  import { getPlacholder } from '$lib/utilities/workflow-actions';
 
-  import BatchOperationConfirmationModalBody, {
-    batchOperationForm,
-  } from './batch-operation-confirmation-modal-body.svelte';
+  import BatchOperationConfirmationModalBody from './batch-operation-confirmation-form.svelte';
 
   export let namespace: string;
   export let open: boolean;
-
+  const reason = writable('');
+  const reasonPlaceholder = getPlacholder(Action.Cancel, $authUser.email);
+  const jobId = writable('');
+  const jobIdValid = writable(true);
+  let jobIdPlaceholder = v4();
   let error = '';
 
   const { allSelected, terminableWorkflows, query } =
     getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
 
-  const { jobId, jobIdValid, jobIdPlaceholder, reason, reasonPlaceholder } =
-    batchOperationForm(Action.Terminate, $authUser.email);
+  const resetForm = () => {
+    $reason = '';
+    $jobId = '';
+    $jobIdValid = true;
+    jobIdPlaceholder = v4();
+  };
+
+  $: open, resetForm();
 
   const terminateWorkflows = async () => {
     error = '';
@@ -42,6 +54,7 @@
       };
       await batchTerminateWorkflows(options);
       open = false;
+      resetForm();
       toaster.push({
         message: translate('workflows.batch-terminate-all-success'),
         id: 'batch-terminate-success-toast',
