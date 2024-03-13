@@ -1,6 +1,10 @@
 <script lang="ts">
+  // import { page } from '$app/stores';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  // import { fetchAllEvents } from '$lib/services/events-service';
+  // import { fetchWorkflow } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import {
@@ -21,6 +25,20 @@
   export let canvasWidth: number;
   export let active = true;
   export let onClick: () => void;
+
+  // $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
+
+  const onGroupClick = async () => {
+    onClick();
+    // if (group.category === 'child-workflow') {
+    //   const { workflow } = await fetchWorkflow({
+    //     namespace,
+    //     workflowId,
+    //     runId,
+    //   });
+    //   fetchAllEvents({ namespace, workflowId, runId, sort });
+    // }
+  };
 
   const { gap, gutter, radius } = TimelineConfig;
 
@@ -74,8 +92,8 @@
 <g
   role="button"
   tabindex="0"
-  on:click|preventDefault={onClick}
-  on:keypress={onClick}
+  on:click|preventDefault={onGroupClick}
+  on:keypress={onGroupClick}
   class="relative cursor-pointer"
   height={gap}
   transform="matrix(1 0 0 1 0 0)"

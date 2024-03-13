@@ -21,7 +21,7 @@
   export let activeGroup: EventGroup | undefined = undefined;
   export let activeEvent: WorkflowEvent | PendingActivity | undefined =
     undefined;
-  export let onClick: (event: EventGroup) => void;
+  export let onClick: (group: EventGroup) => void;
   export let clearActive: () => void;
   export let zoomLevel: number = 1;
 
