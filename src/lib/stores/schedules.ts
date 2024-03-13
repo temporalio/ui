@@ -90,9 +90,7 @@ const setScheduleInputPayloads = async (input: string) => {
 
   if (input) {
     const parsedInput = JSON.parse(input);
-    payloads = Array.isArray(parsedInput)
-      ? parsedInput.map(setBase64Payload)
-      : [setBase64Payload(parsedInput)];
+    payloads = [setBase64Payload(parsedInput)];
   }
 
   const endpoint = get(dataEncoder).endpoint;
@@ -101,11 +99,6 @@ const setScheduleInputPayloads = async (input: string) => {
       payloads: { payloads },
       encode: true,
     });
-    // if (get(lastDataEncoderStatus) === 'error') {
-    //   throw new Error(
-    //     get(lastDataEncoderError) || translate('common.encode-failed'),
-    //   );
-    // }
     payloads = awaitData?.payloads ?? null;
   }
 
