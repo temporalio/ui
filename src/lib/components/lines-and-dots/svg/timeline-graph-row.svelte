@@ -104,7 +104,13 @@
         strokeWidth={radius * 2}
       />
     {/if}
-    <Dot point={[x, y]} category={group.category} {active} r={radius} />
+    <Dot
+      point={[x, y]}
+      category={group.category}
+      classification={group.lastEvent.classification}
+      {active}
+      r={radius}
+    />
     <Icon
       name={DotIcon[group.category]}
       x={x - radius}

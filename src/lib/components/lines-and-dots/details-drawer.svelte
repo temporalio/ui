@@ -15,7 +15,7 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { eventFilterSort } from '$lib/stores/event-view';
   import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
-  import { isChildWorkflowExecutionCompletedEvent } from '$lib/utilities/is-event-type';
+  import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
   import EventDetailsHeader from './event-details-header.svelte';
@@ -39,7 +39,7 @@
   const fetchChildWorkflowForGroup = (group: EventGroup) => {
     if (group && group.category === 'child-workflow') {
       const completedEvent = group.eventList.find(
-        isChildWorkflowExecutionCompletedEvent,
+        isChildWorkflowExecutionStartedEvent,
       );
       if (completedEvent) {
         const childWorkflowId =
