@@ -106,17 +106,24 @@
   };
 
   const isValidInput = (value: string) => {
+    if (!input) {
+      errors['input'] = false;
+      return true;
+    }
+
     try {
       JSON.parse(value);
+      errors['input'] = false;
       return true;
     } catch (e) {
+      errors['input'] = true;
       return false;
     }
   };
 
   $: isDisabled = (preset: SchedulePreset) => {
     if (!name || !workflowType || !workflowId || !taskQueue) return true;
-    if (input && !isValidInput(input)) return true;
+    if (!isValidInput(input)) return true;
     if (preset === 'interval') return !days && !hour && !minute && !second;
     if (preset === 'week') return !daysOfWeek.length;
     if (preset === 'month') return !daysOfMonth.length || !months.length;
@@ -186,6 +193,7 @@
       <ScheduleInputPayload
         bind:input
         payloads={schedule?.action?.startWorkflow?.input}
+        error={errors['input']}
       />
       <SchedulesCalendarView
         let:preset

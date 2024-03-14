@@ -13,6 +13,7 @@
 
   export let content: string;
   export let title: string;
+  export let running = false;
 
   $: parsedContent = parseContent(content);
   $: payloads = getPayloads(parsedContent);
@@ -79,7 +80,7 @@
     </div>
   {:else}
     <CodeBlock
-      content="Results will appear upon completion."
+      content={running ? 'Results will appear upon completion.' : ''}
       language="text"
       class="mb-2 lg:max-h-[24rem]"
       copyable={false}
