@@ -6,7 +6,6 @@
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import { signalWorkflow } from '$lib/services/workflow-service';
-  import { codecEndpoint } from '$lib/stores/data-encoder-config';
   import { toaster } from '$lib/stores/toaster';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isNetworkError } from '$lib/utilities/is-network-error';
@@ -22,12 +21,9 @@
   let input = '';
   let codeBlock: CodeBlock;
 
-  const getDefaultSignalInput = () =>
-    $codecEndpoint ? '{"metadata": {"encoding": ""}, "data": ""}' : '';
-
   const hideSignalModal = () => {
     open = false;
-    input = getDefaultSignalInput();
+    input = '';
     name = '';
     codeBlock?.resetView(input);
   };

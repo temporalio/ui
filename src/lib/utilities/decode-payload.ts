@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 
 import { page } from '$app/stores';
 
-import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
+import { decodePayloadsWithCodec } from '$lib/services/data-encoder';
 import { authUser } from '$lib/stores/auth-user';
 import type {
   codecEndpoint,
@@ -141,7 +141,7 @@ export const decodePayloadAttributes = <
   return eventAttribute;
 };
 
-const decodePayloadWithCodec =
+const decodePayloads =
   (settings: Settings) =>
   async (
     payloads: unknown[],
@@ -149,7 +149,7 @@ const decodePayloadWithCodec =
   ): Promise<unknown[]> => {
     if (getCodecEndpoint(settings)) {
       // Convert Payload data
-      const awaitData = await convertPayloadsWithCodec({
+      const awaitData = await decodePayloadsWithCodec({
         payloads: { payloads },
         settings,
       });
@@ -174,7 +174,7 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   settings: Settings = get(page).data.settings,
   accessToken: string = get(authUser).accessToken,
 ): Promise<EventAttribute | PotentiallyDecodable> => {
-  const decode = decodePayloadWithCodec(settings);
+  const decode = decodePayloads(settings);
 
   if (anyAttributes) {
     for (const key of Object.keys(anyAttributes)) {
@@ -210,7 +210,7 @@ export const cloneAllPotentialPayloadsWithCodec = async (
 ): Promise<PotentiallyDecodable | EventAttribute | WorkflowEvent | null> => {
   if (!anyAttributes) return anyAttributes;
 
-  const decode = decodePayloadWithCodec(settings);
+  const decode = decodePayloads(settings);
   const clone = { ...anyAttributes };
   if (anyAttributes) {
     for (const key of Object.keys(clone)) {

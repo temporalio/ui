@@ -2,10 +2,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { Payloads } from '$lib/types';
-  import {
-    parseWithBigInt,
-    stringifyWithBigInt,
-  } from '$lib/utilities/parse-with-big-int';
+  import { getSinglePayload } from '$lib/utilities/encode-payload';
 
   import PayloadDecoder from '../event/payload-decoder.svelte';
 
@@ -20,15 +17,11 @@
 <div class="flex flex-col gap-4">
   <label for="schedule-input">{translate('workflows.input')}</label>
   <PayloadDecoder value={payloads} let:decodedValue key="payloads">
-    {@const singlePayload =
-      decodedValue && parseWithBigInt(decodedValue)?.[0]
-        ? stringifyWithBigInt(parseWithBigInt(decodedValue)[0])
-        : ''}
     {#key decodedValue}
       <CodeBlock
         id="schedule-input"
         class="max-h-80 overflow-y-scroll overscroll-contain"
-        content={singlePayload}
+        content={getSinglePayload(decodedValue)}
         on:change={handleInputChange}
         editable
         copyable={false}
@@ -39,9 +32,3 @@
     {translate('workflows.signal-payload-input-label-hint')}
   </span>
 </div>
-
-<style lang="postcss">
-  .error {
-    @apply border-2 border-red-500;
-  }
-</style>

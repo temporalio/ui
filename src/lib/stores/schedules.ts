@@ -1,10 +1,9 @@
-import { get, writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 import { goto } from '$app/navigation';
 
-import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
+import { translate } from '$lib/i18n/translate';
 import { createSchedule, editSchedule } from '$lib/services/schedule-service';
-import { dataEncoder } from '$lib/stores/data-encoder';
 import type { Schedule } from '$lib/types';
 import type {
   DescribeFullSchedule,
@@ -13,7 +12,7 @@ import type {
   SchedulePresetsParameters,
   ScheduleSpecParameters,
 } from '$lib/types/schedule';
-import { btoa } from '$lib/utilities/btoa';
+import { encodePayloads } from '$lib/utilities/encode-payload';
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
 import {
   convertDaysAndMonths,
@@ -76,35 +75,6 @@ const setBodySpec = (
   }
 };
 
-const setBase64Payload = (payload: unknown) => {
-  return {
-    metadata: {
-      encoding: btoa('json/plain'),
-    },
-    data: btoa(JSON.stringify(payload)),
-  };
-};
-
-const setScheduleInputPayloads = async (input: string) => {
-  let payloads = null;
-
-  if (input) {
-    const parsedInput = JSON.parse(input);
-    payloads = [setBase64Payload(parsedInput)];
-  }
-
-  const endpoint = get(dataEncoder).endpoint;
-  if (endpoint) {
-    const awaitData = await convertPayloadsWithCodec({
-      payloads: { payloads },
-      encode: true,
-    });
-    payloads = awaitData?.payloads ?? null;
-  }
-
-  return payloads;
-};
-
 export const submitCreateSchedule = async ({
   action,
   spec,
@@ -112,7 +82,15 @@ export const submitCreateSchedule = async ({
 }: ScheduleParameterArgs): Promise<void> => {
   const { namespace, name, workflowId, workflowType, taskQueue, input } =
     action;
-  const payloads = await setScheduleInputPayloads(input);
+
+  let payloads;
+  try {
+    payloads = await encodePayloads(input);
+  } catch (e) {
+    error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
+    return;
+  }
+
   const body: DescribeFullSchedule = {
     schedule_id: name.trim(),
     schedule: {
@@ -161,7 +139,13 @@ export const submitEditSchedule = async (
 ): Promise<void> => {
   const { namespace, name, workflowId, workflowType, taskQueue, input } =
     action;
-  const payloads = await setScheduleInputPayloads(input);
+  let payloads;
+  try {
+    payloads = await encodePayloads(input);
+  } catch (e) {
+    error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
+    return;
+  }
   const { preset } = presets;
 
   const body: DescribeFullSchedule = {
