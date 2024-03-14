@@ -37,7 +37,7 @@
   let fetchChildTimeline;
 
   const fetchChildWorkflowForGroup = (group: EventGroup) => {
-    if (group && group.category === 'child-workflow') {
+    if (group && group.category === 'child-workflow' && namespace) {
       const completedEvent = group.eventList.find(
         isChildWorkflowExecutionStartedEvent,
       );
