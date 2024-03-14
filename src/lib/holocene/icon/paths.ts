@@ -67,6 +67,7 @@ import rocketShip from './svg/rocket-ship.svelte';
 import schedules from './svg/schedules.svelte';
 import search from './svg/search.svelte';
 import settings from './svg/settings.svelte';
+import signal from './svg/signal.svelte';
 import sliders from './svg/sliders.svelte';
 import spinnerSolid from './svg/spinner-solid.svelte';
 import spinner from './svg/spinner.svelte';
@@ -161,6 +162,7 @@ export const icons = {
   search,
   settings,
   sliders,
+  signal,
   spinner,
   'star-empty': starEmpty,
   'star-filled': starFilled,

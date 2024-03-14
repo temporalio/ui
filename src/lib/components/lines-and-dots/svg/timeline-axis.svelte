@@ -31,14 +31,12 @@
   strokeWidth={radius / 2}
   startPoint={[x1, y]}
   endPoint={[x1 + distance, y]}
-  status="none"
 />
 {#each Array(ticks) as _, i}
   <Line
     strokeWidth={radius / 2}
     startPoint={[x1 + i * tickDistance, y - 10]}
     endPoint={[x1 + i * tickDistance, y]}
-    status="none"
   />
   <Text point={[x1 + i * tickDistance - radius, y - radius * 2]}></Text>
 {/each}

@@ -16,7 +16,7 @@ export const CanvasConfig = {
 export const TimelineConfig = {
   gap: 42,
   gutter: 24,
-  radius: 12,
+  radius: 16,
 };
 
 export const HistoryConfig = {
@@ -25,11 +25,11 @@ export const HistoryConfig = {
 };
 
 export const DotIcon = {
-  signal: 'lightning-bolt',
+  signal: 'signal',
   command: 'sliders',
   activity: 'robot',
   marker: 'pin',
-  timer: 'clock',
+  timer: 'retention',
   'child-workflow': 'relationship',
 };
 

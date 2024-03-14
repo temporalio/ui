@@ -19,11 +19,11 @@
 
 {#if position === 'middle'}
   <rect
-    {x}
-    y={y - radius * 1.5}
-    {width}
+    x={x - radius / 2}
+    y={y - radius * 1.33}
+    width={width + radius}
     height={radius * 2}
-    opacity=".5"
+    opacity=".65"
     fill="#141414"
   />
   <text
@@ -55,11 +55,6 @@
     font-weight: 400;
     opacity: 0.25;
     stroke: none;
-  }
-
-  .none {
-    font-size: 14px;
-    fill: #aebed9;
   }
 
   .active {

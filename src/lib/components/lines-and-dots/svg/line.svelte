@@ -42,6 +42,7 @@
     cursor: pointer;
     opacity: 0.15;
     outline: none;
+    stroke: #ebebeb;
   }
 
   .active {
@@ -50,10 +51,6 @@
 
   .scheduling {
     opacity: 0.35;
-  }
-
-  .none {
-    stroke: #ebebeb;
   }
 
   .marker,

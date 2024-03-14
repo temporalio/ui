@@ -19,17 +19,6 @@
 </script>
 
 <g>
-  <!-- {#if category === 'pending'}
-    <animateTransform
-      attributeName="transform"
-      attributeType="XML"
-      type="rotate"
-      from="0 {x} {y}"
-      to="360 {x} {y}"
-      dur="2s"
-      repeatCount="indefinite"
-    />
-  {/if} -->
   <circle
     class="dot {category} {classification}"
     class:active

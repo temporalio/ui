@@ -85,7 +85,7 @@
       : textAtBeginning
       ? firstPoint - 1.5 * radius
       : firstPoint + 1.5 * radius,
-    y + radius / 2,
+    y + radius / 3,
   ] as [number, number];
 </script>
 
@@ -129,6 +129,7 @@
       y={y - radius}
       width={radius * 2}
       height={radius * 2}
+      strokeWidth="4"
     />
   {/each}
   {#if group.pendingActivity}
@@ -147,7 +148,7 @@
       stroke={group.pendingActivity.attempt > 1 ? '#FF4518' : '#fff'}
     />
   {/if}
-  <Text point={textPoint} category={group.category} {active} {position}>
+  <Text point={textPoint} {active} {position}>
     {group?.name}
     <tspan fill={textInMiddle ? '#ffffff' : '#aebed9'} font-size="12px"
       >{duration}</tspan
