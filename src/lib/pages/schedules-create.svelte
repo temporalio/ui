@@ -22,6 +22,7 @@
       workflowType,
       workflowId,
       taskQueue,
+      input,
       hour,
       minute,
       second,
@@ -32,12 +33,14 @@
       days,
       months,
     } = args;
+
     const action: ScheduleActionParameters = {
       namespace,
       name,
       workflowType,
       workflowId,
       taskQueue,
+      input,
     };
     const spec: Partial<ScheduleSpecParameters> = {
       hour,
