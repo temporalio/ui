@@ -3,8 +3,11 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
-  import { fullEventHistory } from '$lib/stores/events';
-  import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
+  import type {
+    PendingActivity,
+    WorkflowEvent,
+    WorkflowEvents,
+  } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   import { TimelineConfig } from '../constants';
@@ -16,18 +19,19 @@
   import TimelineGraphRow from './timeline-graph-row.svelte';
 
   export let workflow: WorkflowExecution;
+  export let history: WorkflowEvents;
   export let groups: EventGroups;
 
   export let activeGroup: EventGroup | undefined = undefined;
   export let activeEvent: WorkflowEvent | PendingActivity | undefined =
     undefined;
-  export let onClick: (group: EventGroup) => void;
-  export let clearActive: () => void;
+  export let onClick: (group: EventGroup) => void | undefined = undefined;
+  export let clearActive: () => void | undefined = undefined;
   export let zoomLevel: number = 1;
 
   const { gap, gutter, radius } = TimelineConfig;
 
-  $: startTime = $fullEventHistory[0]?.eventTime || workflow.startTime;
+  $: startTime = history[0]?.eventTime || workflow.startTime;
 
   $: isActive = (group: EventGroup): boolean => {
     if (activeGroup) {
@@ -62,8 +66,9 @@
         {group}
         {index}
         {canvasWidth}
+        {startTime}
         active={isActive(group)}
-        onClick={() => onClick(group)}
+        onClick={() => onClick && onClick(group)}
       />
     {/each}
     <TimelineAxis

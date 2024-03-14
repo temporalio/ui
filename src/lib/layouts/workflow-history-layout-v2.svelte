@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import { page } from '$app/stores';
 
   // import EventSortFilter from '$lib/components/lines-and-dots/event-sort-filter.svelte';
@@ -32,6 +34,11 @@
   $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
   $: pendingActivities = workflow?.pendingActivities;
+
+  onMount(() => {
+    $eventFilterSort = 'ascending';
+  });
+
   $: groups = groupEvents(
     $filteredEventHistory,
     $eventFilterSort,
@@ -158,6 +165,7 @@
   {#if compact}
     <TimelineGraph
       {workflow}
+      history={$filteredEventHistory}
       {groups}
       {activeGroup}
       {activeEvent}

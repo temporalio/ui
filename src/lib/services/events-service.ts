@@ -78,10 +78,12 @@ export const fetchAllEvents = async ({
   signal,
 }: FetchEventsParameters): Promise<CommonHistoryEvent[]> => {
   const onStart = () => {
+    if (!signal) return;
     fullEventHistory.set([]);
   };
 
   const onUpdate = (_full, current) => {
+    if (!signal) return;
     const next = current?.history?.events;
     if (next) {
       refresh.set(Date.now());
@@ -90,6 +92,7 @@ export const fetchAllEvents = async ({
   };
 
   const onComplete = () => {
+    if (!signal) return;
     refresh.set(Date.now());
   };
 

@@ -28,7 +28,7 @@
   class="line {status} {category} {classification}"
   class:active
   class:scheduling
-  class:animate-line={category === 'pending'}
+  class:animate-line={category === 'pending' || category === 'retry'}
   stroke-width={strokeWidth}
   stroke-dasharray={strokeDasharray}
   {x1}

@@ -15,6 +15,7 @@
   export let r = radius;
 
   $: [x, y] = point;
+
   const strokeWidth = r / 3;
 </script>
 
