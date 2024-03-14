@@ -5,12 +5,13 @@ import { v4 } from 'uuid';
 import { page } from '$app/stores';
 
 import { translate } from '$lib/i18n/translate';
-import type { ResetReapplyType } from '$lib/models/workflow-actions';
+import { Action, type ResetReapplyType } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
 import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
+import { authUser } from '$lib/stores/auth-user';
 import {
   lastDataEncoderError,
   lastDataEncoderStatus,
@@ -24,7 +25,6 @@ import type {
   NamespaceScopedRequest,
   NetworkError,
   Replace,
-  Settings,
 } from '$lib/types/global';
 import type {
   ArchiveFilterParameters,
@@ -43,6 +43,7 @@ import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { base, pathForApi, routeForApi } from '$lib/utilities/route-for-api';
 import { isVersionNewer } from '$lib/utilities/version-check';
+import { formatReason } from '$lib/utilities/workflow-actions';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -57,33 +58,28 @@ export type CombinedWorkflowExecutionsResponse = {
 
 type CancelWorkflowOptions = {
   namespace: string;
-  workflowId: string;
-  runId: string;
+  workflow: WorkflowExecution;
 };
 
 type SignalWorkflowOptions = {
   namespace: string;
-  workflowId: string;
-  runId: string;
-  signalName: string;
-  signalInput: string;
-  settings: Settings;
+  workflow: WorkflowExecution;
+  name: string;
+  input: string;
 };
 
 type TerminateWorkflowOptions = {
   workflow: WorkflowExecution;
   namespace: string;
   reason: string;
-  identity?: string;
 };
 
 export type ResetWorkflowOptions = {
   namespace: string;
-  workflowId: string;
-  runId: string;
+  workflow: WorkflowExecution;
   eventId: string;
   reason: string;
-  resetReapplyType: ResetReapplyType;
+  reapplyType: ResetReapplyType;
 };
 
 export type FetchWorkflow =
@@ -237,16 +233,26 @@ export async function terminateWorkflow({
   workflow,
   namespace,
   reason,
-  identity,
 }: TerminateWorkflowOptions): Promise<null> {
   const route = routeForApi('workflow.terminate', {
     namespace,
     workflowId: workflow.id,
   });
+
+  const email = get(authUser).email;
+  const formattedReason = formatReason({
+    reason,
+    action: Action.Terminate,
+    email,
+  });
+
   return await requestFromAPI<null>(route, {
     options: {
       method: 'POST',
-      body: stringifyWithBigInt({ reason, ...(identity && { identity }) }),
+      body: stringifyWithBigInt({
+        reason: formattedReason,
+        ...(email && { identity: email }),
+      }),
     },
     notifyOnError: false,
     params: {
@@ -256,7 +262,7 @@ export async function terminateWorkflow({
 }
 
 export async function cancelWorkflow(
-  { namespace, workflowId, runId }: CancelWorkflowOptions,
+  { namespace, workflow: { id: workflowId, runId } }: CancelWorkflowOptions,
   request = fetch,
 ) {
   const route = routeForApi('workflow.cancel', {
@@ -278,24 +284,27 @@ export async function cancelWorkflow(
 
 export async function signalWorkflow({
   namespace,
-  workflowId,
-  runId,
-  signalName,
-  signalInput,
-  settings,
+  workflow: { id: workflowId, runId },
+  name,
+  input,
 }: SignalWorkflowOptions) {
   const route = routeForApi('workflow.signal', {
     namespace,
     workflowId,
-    signalName,
+    signalName: name,
   });
 
   let payloads = null;
+  const settings = get(page).data.settings;
+  const accessToken = get(authUser).accessToken;
 
-  if (signalInput) {
+  if (input) {
     if (settings?.codec?.endpoint) {
       const awaitData = await convertPayloadsWithCodec({
-        payloads: { payloads: [JSON.parse(signalInput)] },
+        payloads: { payloads: [JSON.parse(input)] },
+        namespace,
+        settings,
+        accessToken,
         encode: true,
       });
       if (get(lastDataEncoderStatus) === 'error') {
@@ -310,7 +319,7 @@ export async function signalWorkflow({
           metadata: {
             encoding: btoa('json/plain'),
           },
-          data: btoa(signalInput),
+          data: btoa(input),
         },
       ];
     }
@@ -320,7 +329,7 @@ export async function signalWorkflow({
   const newVersion = isVersionNewer(version, '2.22');
   const body = newVersion
     ? {
-        signalName,
+        signalName: name,
         workflowExecution: {
           workflowId,
           runId,
@@ -330,7 +339,7 @@ export async function signalWorkflow({
         },
       }
     : {
-        signalName,
+        signalName: name,
         input: {
           payloads,
         },
@@ -350,15 +359,21 @@ export async function signalWorkflow({
 
 export async function resetWorkflow({
   namespace,
-  workflowId,
-  runId,
+  workflow: { id: workflowId, runId },
   eventId,
   reason,
-  resetReapplyType,
+  reapplyType,
 }: ResetWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow.reset', {
     namespace,
     workflowId,
+  });
+
+  const email = get(authUser).email;
+  const formattedReason = formatReason({
+    action: Action.Reset,
+    reason,
+    email,
   });
 
   const body: Replace<
@@ -370,9 +385,9 @@ export async function resetWorkflow({
       runId,
     },
     workflowTaskFinishEventId: eventId,
-    resetReapplyType,
+    resetReapplyType: reapplyType,
     requestId: v4(),
-    reason,
+    reason: formattedReason,
   };
 
   return requestFromAPI<{ runId: string }>(route, {
