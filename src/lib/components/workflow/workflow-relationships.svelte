@@ -2,7 +2,6 @@
   import { page } from '$app/stores';
 
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
-  import Card from '$lib/holocene/card.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
@@ -35,53 +34,6 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <div
-    class="grid grid-cols-2 items-center justify-center gap-2 lg:flex lg:flex-row"
-  >
-    {#if scheduleId}
-      <Card class="flex grow items-center justify-center bg-blurple text-white">
-        {translate('common.scheduled')}
-      </Card>
-    {/if}
-    <Card
-      class="surface-inverse flex grow items-center justify-center {parent &&
-        'bg-blurple text-white'}"
-    >
-      {translate('workflows.parents', { count: parent ? 1 : 0 })}
-    </Card>
-    <Card
-      class="surface-inverse flex grow items-center justify-center {$workflowRun
-        .workflow.pendingChildren.length && 'bg-blurple text-white'}"
-    >
-      {translate('workflows.pending-children', {
-        count: $workflowRun.workflow.pendingChildren.length,
-      })}
-    </Card>
-    <Card
-      class="surface-inverse flex grow items-center justify-center {children.length &&
-        'bg-blurple text-white'}"
-    >
-      {translate('workflows.children', { count: children.length })}
-    </Card>
-    <Card
-      class="surface-inverse flex grow items-center justify-center {first &&
-        'bg-blurple text-white'}"
-    >
-      {translate('workflows.first', { count: first ? 1 : 0 })}
-    </Card>
-    <Card
-      class="surface-inverse flex grow items-center justify-center {previous &&
-        'bg-blurple text-white'}"
-    >
-      {translate('workflows.previous', { count: previous ? 1 : 0 })}
-    </Card>
-    <Card
-      class="surface-inverse flex grow items-center justify-center {next &&
-        'bg-blurple text-white'}"
-    >
-      {translate('workflows.next', { count: next ? 1 : 0 })}
-    </Card>
-  </div>
   {#if hasRelationships}
     <div class="flex w-full flex-wrap gap-4">
       {#if scheduleId}
