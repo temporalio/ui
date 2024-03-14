@@ -82,15 +82,7 @@
       </div>
     {/each}
   </td>
-</TableRow>
-<TableRow class="schedule-spec-row">
-  <td colspan="5" class="hidden xl:table-cell">
-    <ScheduleBasicFrequency {calendar} {interval} />
-  </td>
-  <td colspan="3" class="hidden md:table-cell xl:hidden">
-    <ScheduleBasicFrequency {calendar} {interval} />
-  </td>
-  <td colspan="2" class="md:hidden">
+  <td class="cell hidden xl:table-cell">
     <ScheduleBasicFrequency {calendar} {interval} />
   </td>
 </TableRow>

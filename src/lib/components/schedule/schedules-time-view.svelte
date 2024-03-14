@@ -41,23 +41,27 @@
   <div class="flex flex-col items-center gap-2 lg:flex-row">
     <Input
       id="hour-time"
+      class="w-24"
       label={translate('common.hour-abbreviated')}
       labelHidden
       bind:value={_hour}
       placeholder="00"
       suffix={translate('common.hour-abbreviated')}
       maxLength={2}
+      hideCount
       error={error(_hour, 12)}
     />
     <div class="hidden lg:block">:</div>
     <Input
       id="minute-time"
+      class="w-24"
       label={translate('common.minutes-abbreviated')}
       labelHidden
       bind:value={minute}
       placeholder="00"
       suffix={translate('common.minutes-abbreviated')}
       maxLength={2}
+      hideCount
       error={error(minute, 59)}
     />
     <div class="ml-2">
