@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { get } from 'svelte/store';
-
   import { onDestroy, onMount } from 'svelte';
 
   import { page } from '$app/stores';
@@ -19,7 +17,6 @@
   import { authUser } from '$lib/stores/auth-user';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
   import { fullEventHistory, timelineEvents } from '$lib/stores/events';
-  import { labsMode } from '$lib/stores/labs-mode';
   import {
     initialWorkflowRun,
     refresh,
@@ -77,12 +74,15 @@
     );
     $workflowRun = { workflow, workers, compatibility };
 
-    let signal: AbortSignal;
-    if (get(labsMode)) {
-      eventHistoryController = new AbortController();
-      signal = eventHistoryController.signal;
-    }
-    fetchAllEvents({ namespace, workflowId, runId, sort, signal });
+    eventHistoryController = new AbortController();
+    fetchAllEvents({
+      namespace,
+      workflowId,
+      runId,
+      sort,
+      signal: eventHistoryController.signal,
+      historySize: workflow.historyEvents,
+    });
   };
 
   const getOnlyWorkflowWithPendingActivities = async (

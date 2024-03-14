@@ -1,11 +1,8 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { onDestroy, onMount } from 'svelte';
-
   import { page } from '$app/stores';
 
-  import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
@@ -17,11 +14,10 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { autoRefreshWorkflow } from '$lib/stores/event-view';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
-  import { refresh, workflowRun } from '$lib/stores/workflow-run';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
@@ -47,9 +43,6 @@
   $: ({ workflow, workers, compatibility } = $workflowRun);
   $: id = $page.params.id;
 
-  let refreshInterval: ReturnType<typeof setInterval>;
-  const refreshRate = 15000;
-
   $: routeParameters = {
     namespace,
     workflow: workflow?.id,
@@ -60,37 +53,6 @@
   $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
     $workflowRun.workflow?.status,
   );
-
-  onMount(() => {
-    if (isRunning && $autoRefreshWorkflow === 'on') {
-      // Auto-refresh of 15 seconds if turned on
-      clearInterval(refreshInterval);
-      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
-    }
-  });
-
-  $: {
-    if (!isRunning) {
-      // Stop refresh if workflow is no longer running
-      clearInterval(refreshInterval);
-    }
-  }
-
-  const onRefreshChange = () => {
-    if ($autoRefreshWorkflow === 'on') {
-      $autoRefreshWorkflow = 'off';
-      clearInterval(refreshInterval);
-    } else {
-      $refresh = Date.now();
-      $autoRefreshWorkflow = 'on';
-      clearInterval(refreshInterval);
-      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
-    }
-  };
-
-  onDestroy(() => {
-    clearInterval(refreshInterval);
-  });
 
   $: cancelInProgress = isCancelInProgress(
     $workflowRun?.workflow?.status,
@@ -200,9 +162,6 @@
     <div
       class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
     >
-      {#if isRunning}
-        <AutoRefreshWorkflow onChange={onRefreshChange} />
-      {/if}
       <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
     </div>
   </div>

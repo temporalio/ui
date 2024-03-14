@@ -29,6 +29,7 @@ export type FetchEventsParameters = NamespaceScopedRequest &
     rawPayloads?: boolean;
     sort?: EventSortOrder;
     signal?: AbortSignal;
+    historySize?: string;
   };
 
 export type FetchEventsParametersWithSettings = FetchEventsParameters & {
@@ -76,25 +77,32 @@ export const fetchAllEvents = async ({
   runId,
   sort,
   signal,
+  historySize,
 }: FetchEventsParameters): Promise<CommonHistoryEvent[]> => {
   const onStart = () => {
     if (!signal) return;
     fullEventHistory.set([]);
   };
 
-  const onUpdate = (_full, current) => {
+  const onUpdate = (full, current) => {
     if (!signal) return;
     const next = current?.history?.events;
-    if (next) {
-      refresh.set(Date.now());
-      fullEventHistory.set([...get(fullEventHistory), ...toEventHistory(next)]);
+
+    const firstHistoryBatch = get(fullEventHistory).length === 0;
+    const hasHistorySize =
+      historySize && next.find((e) => e.eventId === historySize);
+    const hasNewHistory =
+      historySize &&
+      next.every((e) => parseInt(e.eventId) > parseInt(historySize));
+    if (firstHistoryBatch || hasHistorySize || hasNewHistory) {
+      fullEventHistory.set([...toEventHistory(full.history?.events)]);
+      if (hasNewHistory) {
+        refresh.set(Date.now());
+      }
     }
   };
 
-  const onComplete = () => {
-    if (!signal) return;
-    refresh.set(Date.now());
-  };
+  const onComplete = () => {};
 
   const endpoint = getEndpointForSortOrder(sort);
   const route = routeForApi(endpoint, { namespace, workflowId });
@@ -105,6 +113,7 @@ export const fetchAllEvents = async ({
         request: fetch,
         params: {
           'execution.runId': runId,
+          pageSize: '1000',
           waitNewEvent: signal ? 'true' : 'false',
         },
         options: { signal },

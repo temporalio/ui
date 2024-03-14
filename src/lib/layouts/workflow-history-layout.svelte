@@ -81,7 +81,7 @@
             ? translate('workflows.continued-as-new-with-input')
             : translate('workflows.results')}
           data-testid="workflow-results"
-          running={workflow.isRunning}
+          running={$workflowRun.workflow?.isRunning}
         />
       </div>
     </Accordion>

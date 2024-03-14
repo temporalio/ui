@@ -63,7 +63,7 @@
   <svg
     viewBox="0 0 {canvasWidth} {canvasHeight}"
     height={canvasHeight / zoomLevel}
-    width={canvasWidth}
+    width={canvasWidth / zoomLevel}
   >
     <Line
       startPoint={[startingX, 0]}
