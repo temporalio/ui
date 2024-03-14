@@ -71,16 +71,6 @@
   in:fly={{ x: 50, delay: 0, duration: 350 }}
 >
   <div class="surface-secondary flex flex-col justify-between p-2 md:flex-row">
-    <div class="flex items-center gap-1">
-      <Button
-        variant="ghost"
-        on:click={clearActive}
-        on:keypress={clearActive}
-        trailingIcon="chevron-right"
-      >
-        Close
-      </Button>
-    </div>
     <div class="flex items-center justify-end gap-4">
       <div class="flex items-center gap-0">
         <Icon name="info" />
@@ -94,6 +84,14 @@
         <Icon name="json" />
       </div>
     </div>
+    <Button
+      variant="ghost"
+      on:click={clearActive}
+      on:keypress={clearActive}
+      trailingIcon="chevron-right"
+    >
+      Close
+    </Button>
   </div>
   {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [childWorkflow, childHistory]}
     {@const groups = groupEvents(
