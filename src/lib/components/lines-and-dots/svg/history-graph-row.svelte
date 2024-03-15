@@ -63,15 +63,25 @@
     fill={index % 2 === 1 && '#1E293B'}
   />
   {#if isPendingActivity(event)}
-    <Text point={[50, y + 5]} category="pending" {active}>Pending Activity</Text
+    <Text point={[60, y + 5]} category="pending" {active}>Pending Activity</Text
     >
   {:else}
-    <Text point={[5, y + 5]} {category} {active}>
+    <Text point={[5, y + 5]} {active}>
       <tspan fill="#aebed9">{event.id}</tspan>
-      <tspan x={50} fill="#fff"
-        >{spaceBetweenCapitalLetters(event?.name)}
+    </Text>
+    <Icon
+      name={DotIcon[category]}
+      x={60}
+      y={y - radius}
+      width={radius * 2}
+      height={radius * 2}
+      class="text-white"
+    />
+    <Text point={[60 + radius * 2.5, y + 5]} {category} {active}>
+      <tspan fill="#fff">
+        {spaceBetweenCapitalLetters(event?.name)}
       </tspan>
-      {#if group && showEventType}<tspan dx={5} font-size="14px"
+      {#if group && showEventType}<tspan dx={3} font-size="14px"
           >{group.name}</tspan
         >{/if}
     </Text>
@@ -81,15 +91,18 @@
         {active}
         position="end"
       >
-        {formatDate(event?.eventTime, $timeFormat, {
-          relative: $relativeTime,
-        })}
-      </Text>
+        <tspan fill="#fff" font-size="12px">
+          {formatDate(event?.eventTime, $timeFormat, {
+            relative: $relativeTime,
+          })}
+          <tspan fill="#fff"> </tspan></tspan
+        ></Text
+      >
     {/if}
   {/if}
   {#if connectLine}
     <Line
-      startPoint={[startingX, y]}
+      startPoint={[startingX + strokeWidth, y]}
       endPoint={[startingX + horizontalOffset - radius, y]}
       classification={group?.lastEvent?.classification}
       {active}
@@ -101,13 +114,6 @@
       {category}
       {classification}
       {active}
-    />
-    <Icon
-      name={DotIcon[category]}
-      x={startingX + horizontalOffset - radius}
-      y={y - radius}
-      width={radius * 2}
-      height={radius * 2}
     />
   {/if}
   {#if nextDistance && withinCanvas(startingX + horizontalOffset + radius)}

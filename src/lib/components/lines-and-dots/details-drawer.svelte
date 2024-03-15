@@ -70,7 +70,7 @@
   class="flex h-full flex-col gap-0 overflow-auto border-l-2 bg-slate-950"
   in:fly={{ x: 50, delay: 0, duration: 350 }}
 >
-  <div class="surface-secondary flex flex-col justify-between p-2 md:flex-row">
+  <div class="flex flex-col justify-between bg-slate-200 p-2 md:flex-row">
     <div class="flex items-center justify-end gap-4">
       <div class="flex items-center gap-0">
         <Icon name="info" />

@@ -25,12 +25,14 @@ export const HistoryConfig = {
 };
 
 export const DotIcon = {
+  workflow: 'workflow',
   signal: 'signal',
   command: 'sliders',
-  activity: 'robot',
+  activity: 'activity',
   marker: 'pin',
   timer: 'retention',
   'child-workflow': 'relationship',
+  update: 'merge',
 };
 
 export const isMiddleEvent = (

@@ -4,7 +4,7 @@
   import { TimelineConfig } from '../constants';
 
   export let point: [number, number] = [0, 0];
-  export let category: EventTypeCategory | 'pending' | 'none' = 'none';
+  export let category: EventTypeCategory | 'pending' | 'none' | 'icon' = 'none';
   export let active = false;
   export let position: 'start' | 'middle' | 'end' = 'start';
 
@@ -88,6 +88,10 @@
 
   text.workflow {
     fill: #059669;
+  }
+
+  text.icon {
+    fill: #141414;
   }
 
   text.middle {

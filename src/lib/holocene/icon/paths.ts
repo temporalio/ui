@@ -1,3 +1,4 @@
+import activity from './svg/activity.svelte';
 import add from './svg/add.svelte';
 import archives from './svg/archives.svelte';
 import arrowDown from './svg/arrow-down.svelte';
@@ -92,6 +93,7 @@ import workflow from './svg/workflow.svelte';
 export type IconName = keyof typeof icons;
 
 export const icons = {
+  activity,
   add,
   archives,
   'arrow-down': arrowDown,

@@ -79,6 +79,11 @@
     fill: #b2f8d9;
   }
 
+  .update {
+    stroke: #141414;
+    fill: #06b6d4;
+  }
+
   .workflow {
     stroke: #141414;
     fill: #059669;
