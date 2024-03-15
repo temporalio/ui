@@ -9,7 +9,7 @@
     getMillisecondDuration,
   } from '$lib/utilities/format-time';
 
-  import { DotIcon, TimelineConfig } from '../constants';
+  import { CategoryIcon, TimelineConfig } from '../constants';
 
   import Dot from './dot.svelte';
   import Line from './line.svelte';
@@ -112,7 +112,7 @@
       r={radius}
     />
     <Icon
-      name={DotIcon[group.category]}
+      name={CategoryIcon[group.category]}
       x={x - radius}
       y={y - radius}
       width={radius * 2}

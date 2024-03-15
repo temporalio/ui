@@ -90,10 +90,11 @@ export const fetchAllEvents = async ({
 
     const firstHistoryBatch = get(fullEventHistory).length === 0;
     const hasHistorySize =
-      historySize && next.find((e) => e.eventId === historySize);
+      historySize && next?.find((e) => e.eventId === historySize);
     const hasNewHistory =
       historySize &&
-      next.every((e) => parseInt(e.eventId) > parseInt(historySize));
+      next?.every((e) => parseInt(e.eventId) > parseInt(historySize));
+
     if (firstHistoryBatch || hasHistorySize || hasNewHistory) {
       fullEventHistory.set([...toEventHistory(full.history?.events)]);
       if (hasNewHistory) {

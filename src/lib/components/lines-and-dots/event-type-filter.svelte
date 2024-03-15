@@ -12,17 +12,18 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { isVersionNewer } from '$lib/utilities/version-check';
 
+  import { CategoryIcon } from './constants';
+
   export let compact = false;
 
-  $: label = compact
-    ? translate('events.event-type')
-    : translate('events.workflow-events');
+  $: label = translate('events.event-type');
 
   let parameter = 'category';
   let options = (compact ? compactEventTypeOptions : allEventTypeOptions).map(
     (o) => ({
       ...o,
       label: translate(o.label),
+      icon: CategoryIcon[o.value],
     }),
   );
 

@@ -89,14 +89,25 @@ const category = derived([page], ([$page]) =>
   $page.url.searchParams.get('category'),
 );
 
+const classification = derived([page], ([$page]) =>
+  $page.url.searchParams.get('classification'),
+);
+
 export const filteredEventHistory = derived(
-  [fullEventHistory, category],
-  ([$history, $category]) => {
+  [fullEventHistory, category, classification],
+  ([$history, $category, $classification]) => {
+    let history = $history;
     if ($category) {
       const types = $category.split(',');
-      return $history.filter((event) => types.includes(event.category));
+      history = $history.filter((event) => types.includes(event.category));
     }
-    return $history;
+    if ($classification) {
+      const classifications = $classification.split(',');
+      history = $history.filter((event) =>
+        classifications.includes(event.classification),
+      );
+    }
+    return history;
   },
 );
 

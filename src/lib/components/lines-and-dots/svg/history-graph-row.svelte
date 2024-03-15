@@ -12,7 +12,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
-  import { DotIcon, HistoryConfig } from '../constants';
+  import { CategoryIcon, HistoryConfig } from '../constants';
 
   import Box from './box.svelte';
   import Dot from './dot.svelte';
@@ -70,7 +70,7 @@
       <tspan fill="#aebed9">{event.id}</tspan>
     </Text>
     <Icon
-      name={DotIcon[category]}
+      name={CategoryIcon[category]}
       x={60}
       y={y - radius}
       width={radius * 2}

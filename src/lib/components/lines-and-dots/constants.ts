@@ -24,7 +24,7 @@ export const HistoryConfig = {
   radius: 10,
 };
 
-export const DotIcon = {
+export const CategoryIcon = {
   workflow: 'workflow',
   signal: 'signal',
   command: 'sliders',

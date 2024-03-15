@@ -31,8 +31,8 @@
   class:animate-line={category === 'pending' || category === 'retry'}
   stroke-width={strokeWidth}
   stroke-dasharray={strokeDasharray}
-  {x1}
-  {x2}
+  x1={Math.max(0, x1)}
+  x2={Math.max(0, x2)}
   {y1}
   {y2}
 />

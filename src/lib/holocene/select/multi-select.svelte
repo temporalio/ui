@@ -14,7 +14,7 @@
   import type { IconName } from '../icon/paths';
   import type { MenuButtonVariant } from '../menu/menu-button.svelte';
 
-  type Option = { label: string; value: string };
+  type Option = { label: string; value: string; icon?: IconName };
   type MultiSelectOptions = Option[];
 
   export let options: MultiSelectOptions = [];
@@ -77,7 +77,12 @@
           label={option.label}
           labelHidden
         />
-        {option.label}
+        <div class="flex items-center gap-2">
+          {#if option.icon}
+            <Icon slot="trailing" name={option.icon} />
+          {/if}
+          {option.label}
+        </div>
       </MenuItem>
     {/each}
     <MenuDivider />
