@@ -1,14 +1,14 @@
 <script lang="ts">
   import { noop } from 'svelte/internal';
 
+  import { getContext } from 'svelte';
+
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
-    batchActionsVisible,
-    handleSelectPage,
-    pageSelected,
-    selectedWorkflows,
+    BATCH_OPERATION_CONTEXT,
+    type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -19,6 +19,13 @@
   export let empty: boolean;
   export let onClickConfigure: () => void = noop;
   export let columnsCount: number;
+
+  const {
+    handleSelectPage,
+    selectedWorkflows,
+    pageSelected,
+    batchActionsVisible,
+  } = getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
 
   const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
     const { checked } = event.detail;

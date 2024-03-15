@@ -7,6 +7,7 @@
   import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
+  import ScheduleInput from '$lib/components/schedule/schedule-input.svelte';
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
@@ -299,7 +300,10 @@
             notes={schedule?.schedule?.state?.notes}
           />
         </div>
-        <div class="w-full xl:w-1/3">
+        <div class="flex w-full flex-col gap-4 xl:w-1/3">
+          <ScheduleInput
+            input={schedule?.schedule?.action?.startWorkflow?.input}
+          />
           <ScheduleFrequencyPanel
             calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
             interval={schedule?.schedule?.spec?.interval?.[0]}

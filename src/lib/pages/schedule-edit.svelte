@@ -35,6 +35,7 @@
       workflowType,
       workflowId,
       taskQueue,
+      input,
       hour,
       minute,
       second,
@@ -51,6 +52,7 @@
       workflowType,
       workflowId,
       taskQueue,
+      input,
     };
     const spec: Partial<ScheduleSpecParameters> = {
       hour,
