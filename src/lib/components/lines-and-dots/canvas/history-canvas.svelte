@@ -73,14 +73,6 @@
           connectLine={!isMiddleEvent(event, groups)}
           {onClick}
         />
-        <!-- {#if index % 2 === 1}
-          <Rectangle
-            x={0}
-            y={y - gap / 2}
-            width={canvasWidth / 2}
-            height={gap}
-          />
-        {/if} -->
       {/each}
       {#each pendingActivities as event, index}
         {@const y = (history.length + index + 1) * gap + gap / 2}

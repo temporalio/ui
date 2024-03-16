@@ -4,6 +4,7 @@
   import EventClassificationFilter from '$lib/components/lines-and-dots/event-classification-filter.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
+  import CompactGraph from '$lib/components/lines-and-dots/svg/compact-graph.svelte';
   import HistoryGraph from '$lib/components/lines-and-dots/svg/history-graph.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
@@ -78,13 +79,13 @@
     });
   };
 
-  $: workflow, timelineView, clearActives();
+  $: workflow, view, clearActives();
   $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
     $fullEventHistory,
     $eventFilterSort,
   );
 
-  let timelineView = true;
+  let view = 'compact';
   let zoomLevel = 1;
   const zoomOut = () => {
     if (zoomLevel < 6) zoomLevel += 0.5;
@@ -114,17 +115,24 @@
         </h2>
         <ToggleButtons>
           <ToggleButton
-            active={timelineView}
+            active={view === 'compact'}
+            data-testid="feed"
+            class="bg-white"
+            on:click={() => (view = 'compact')}
+            >{translate('workflows.compact')}</ToggleButton
+          >
+          <ToggleButton
+            active={view === 'timeline'}
             data-testid="compact"
             class="bg-white"
-            on:click={() => (timelineView = true)}
+            on:click={() => (view = 'timeline')}
             >{translate('common.timeline')}</ToggleButton
           >
           <ToggleButton
-            active={!timelineView}
+            active={view === 'history'}
             data-testid="feed"
             class="bg-white"
-            on:click={() => (timelineView = false)}
+            on:click={() => (view = 'history')}
             >{translate('workflows.full-history')}</ToggleButton
           >
           <ToggleButton
@@ -144,7 +152,7 @@
       </div>
       <div class="flex gap-2">
         <EventClassificationFilter />
-        <EventTypeFilter compact={timelineView} />
+        <EventTypeFilter compact={view === 'compact' || view === 'timeline'} />
         <Button
           leadingIcon="download"
           data-testid="download"
@@ -156,7 +164,7 @@
   </div>
 </div>
 <div class="bg-primary">
-  <div class:hidden={!timelineView}>
+  {#if view === 'timeline'}
     <TimelineGraph
       {workflow}
       history={$filteredEventHistory}
@@ -167,8 +175,18 @@
       onClick={setActiveGroup}
       clearActive={clearActives}
     />
-  </div>
-  <div class:hidden={timelineView}>
+  {:else if view === 'compact'}
+    <CompactGraph
+      {workflow}
+      history={$filteredEventHistory}
+      {groups}
+      {activeGroup}
+      {activeEvent}
+      {zoomLevel}
+      onClick={setActiveGroup}
+      clearActive={clearActives}
+    />
+  {:else}
     <HistoryGraph
       history={$filteredEventHistory}
       {groups}
@@ -179,7 +197,7 @@
       onClick={setActiveEvent}
       clearActive={clearActives}
     />
-  </div>
+  {/if}
 </div>
 <Modal
   id="download-history"

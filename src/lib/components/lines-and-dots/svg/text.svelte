@@ -7,6 +7,7 @@
   export let category: EventTypeCategory | 'pending' | 'none' | 'icon' = 'none';
   export let active = false;
   export let position: 'start' | 'middle' | 'end' = 'start';
+  export let vertical = false;
 
   const { radius } = TimelineConfig;
 
@@ -19,12 +20,13 @@
 
 {#if position === 'middle'}
   <rect
-    x={x - radius / 2}
+    x={Math.max(0, x - radius / 2)}
     y={y - radius * 1.33}
     width={width + radius}
     height={radius * 2}
     opacity=".65"
     fill="#141414"
+    transform={vertical ? `rotate(-90 ${x} ${y})` : ''}
   />
   <text
     bind:this={textElement}
@@ -43,6 +45,7 @@
     {x}
     {y}
     text-anchor={position === 'end' ? 'end' : 'start'}
+    transform={vertical ? `rotate(24 ${x} ${y})` : ''}
   >
     <slot />
   </text>
