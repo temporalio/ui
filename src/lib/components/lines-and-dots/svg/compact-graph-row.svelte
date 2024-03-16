@@ -1,6 +1,10 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import {
+    isStartChildWorkflowExecutionInitiatedEvent,
+    isTimerStartedEvent,
+  } from '$lib/utilities/is-event-type';
 
   import { CategoryIcon, TimelineConfig } from '../constants';
 
@@ -8,21 +12,26 @@
   import Line from './line.svelte';
   import Text from './text.svelte';
 
-  export let groups: EventGroup[];
   export let group: EventGroup;
+  export let count: number;
   export let index: number;
-  export let canvasWidth: number;
+  export let length: number;
+  export let y: number;
   export let active = true;
   export let onClick: () => void;
 
   const { gap, gutter, radius } = TimelineConfig;
 
-  $: y = gap + gap / 2;
-
-  $: timelineWidth = canvasWidth - 2 * gutter;
-  $: length = timelineWidth / groups.length;
   $: start = gutter + index * length;
   $: end = start + length;
+
+  $: isPending = Boolean(
+    group.pendingActivity ||
+      (isTimerStartedEvent(group.initialEvent) &&
+        group.eventList.length === 1) ||
+      (isStartChildWorkflowExecutionInitiatedEvent(group.initialEvent) &&
+        group.eventList.length === 2),
+  );
 </script>
 
 <g
@@ -45,7 +54,7 @@
     classification={group.lastEvent.classification}
     {active}
     strokeWidth={radius * 2}
-    scheduling={index === 0 && group.lastEvent.classification === 'Completed'}
+    pending={isPending}
   />
   <Dot
     point={[start, y]}
@@ -62,7 +71,12 @@
     height={radius * 2}
     strokeWidth="4"
   />
-  <Text vertical point={[start, y + radius * 1.75]} {active}>
+  <Text
+    point={[start + (4 / 3) * radius, y + radius / 3]}
+    {active}
+    position="middle"
+  >
+    {#if count > 1}{count}{/if}
     {group?.name}
   </Text>
 </g>

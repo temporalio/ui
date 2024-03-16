@@ -17,6 +17,7 @@
   export let classification: EventClassification | undefined = undefined;
   export let active = true;
   export let scheduling = false;
+  export let pending = false;
   export let strokeWidth: number = radius / 2;
   export let strokeDasharray = 'none';
 
@@ -28,9 +29,9 @@
   class="line {status} {category} {classification}"
   class:active
   class:scheduling
-  class:animate-line={category === 'pending' || category === 'retry'}
+  class:animate-line={pending}
   stroke-width={strokeWidth}
-  stroke-dasharray={strokeDasharray}
+  stroke-dasharray={pending ? '3' : strokeDasharray}
   x1={Math.max(0, x1)}
   x2={Math.max(0, x2)}
   {y1}
@@ -72,12 +73,10 @@
 
   .pending {
     stroke: #a78bfa;
-    stroke-dasharray: 3;
   }
 
   .retry {
     stroke: #ff4518;
-    stroke-dasharray: 4;
   }
 
   .child-workflow {

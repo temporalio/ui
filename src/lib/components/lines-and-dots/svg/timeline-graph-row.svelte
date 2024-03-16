@@ -8,6 +8,10 @@
     formatDistanceAbbreviated,
     getMillisecondDuration,
   } from '$lib/utilities/format-time';
+  import {
+    isStartChildWorkflowExecutionInitiatedEvent,
+    isTimerStartedEvent,
+  } from '$lib/utilities/is-event-type';
 
   import { CategoryIcon, TimelineConfig } from '../constants';
 
@@ -69,6 +73,14 @@
       : firstPoint + 1.5 * radius,
     y + radius / 3,
   ] as [number, number];
+
+  $: isPending = Boolean(
+    group.pendingActivity ||
+      (isTimerStartedEvent(group.initialEvent) &&
+        group.eventList.length === 1) ||
+      (isStartChildWorkflowExecutionInitiatedEvent(group.initialEvent) &&
+        group.eventList.length === 2),
+  );
 </script>
 
 <g
@@ -94,13 +106,18 @@
           group.lastEvent.classification === 'Completed'}
       />
     {/if}
-    {#if !nextPoint && group.pendingActivity}
+    {#if !nextPoint && isPending}
       <Line
         startPoint={[x, y]}
         endPoint={[canvasWidth - gutter, y]}
-        category={group.pendingActivity.attempt > 1 ? 'retry' : 'pending'}
+        category={group?.pendingActivity
+          ? group?.pendingActivity.attempt > 1
+            ? 'retry'
+            : 'pending'
+          : group.category}
         classification={group.lastEvent.classification}
         {active}
+        pending
         strokeWidth={radius * 2}
       />
     {/if}
@@ -120,23 +137,7 @@
       strokeWidth="4"
     />
   {/each}
-  {#if group.pendingActivity}
-    <Dot
-      point={[canvasWidth - gutter, y]}
-      category="pending"
-      {active}
-      r={radius}
-    />
-    <Icon
-      name="retry"
-      x={canvasWidth - gutter - radius}
-      y={y - radius}
-      width={radius * 2}
-      height={radius * 2}
-      stroke={group.pendingActivity.attempt > 1 ? '#FF4518' : '#fff'}
-    />
-  {/if}
-  <Text point={textPoint} {active} {position}>
+  <Text point={textPoint} {active} position={isPending ? 'middle' : position}>
     {group?.name}
     <tspan fill={textInMiddle ? '#ffffff' : '#aebed9'} font-size="12px"
       >{duration}</tspan

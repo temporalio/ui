@@ -20,7 +20,7 @@ export const TimelineConfig = {
 };
 
 export const HistoryConfig = {
-  gap: 24,
+  gap: 32,
   radius: 10,
 };
 

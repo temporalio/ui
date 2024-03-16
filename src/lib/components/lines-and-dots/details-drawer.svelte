@@ -94,20 +94,21 @@
     </Button>
   </div>
   {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [childWorkflow, childHistory]}
-    {@const groups = groupEvents(
-      childHistory,
-      $eventFilterSort,
-      childWorkflow?.pendingActivities,
-    )}
-    <div class="mb-4 flex flex-col gap-4 bg-primary">
-      <TimelineGraph
-        workflow={childWorkflow.workflow}
-        history={childHistory}
-        {groups}
-      />
-    </div>
+    {#if childWorkflow && childHistory}
+      {@const groups = groupEvents(
+        childHistory,
+        $eventFilterSort,
+        childWorkflow?.pendingActivities,
+      )}
+      <div class="mb-4 flex flex-col gap-4 bg-primary">
+        <TimelineGraph
+          workflow={childWorkflow.workflow}
+          history={childHistory}
+          {groups}
+        />
+      </div>
+    {/if}
   {/await}
-
   {#if showJSON}
     {#if timeline}
       {#each activeGroup.eventList.reverse() as event, index}

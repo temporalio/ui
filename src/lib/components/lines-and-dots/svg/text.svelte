@@ -21,35 +21,25 @@
 {#if position === 'middle'}
   <rect
     x={Math.max(0, x - radius / 2)}
-    y={y - radius * 1.33}
+    y={y - radius}
     width={width + radius}
-    height={radius * 2}
-    opacity=".65"
+    height={radius * 1.33}
+    opacity="1"
     fill="#141414"
-    transform={vertical ? `rotate(-90 ${x} ${y})` : ''}
-  />
-  <text
-    bind:this={textElement}
-    class="cursor-pointer select-none outline-none {category} {position}"
-    class:active
-    {x}
-    {y}
-    text-anchor={'start'}
-  >
-    <slot />
-  </text>
-{:else}
-  <text
-    class="cursor-pointer select-none outline-none {category} {position}"
-    class:active
-    {x}
-    {y}
-    text-anchor={position === 'end' ? 'end' : 'start'}
     transform={vertical ? `rotate(24 ${x} ${y})` : ''}
-  >
-    <slot />
-  </text>
+  />
 {/if}
+<text
+  bind:this={textElement}
+  class="cursor-pointer select-none outline-none {category} {position}"
+  class:active
+  {x}
+  {y}
+  text-anchor={position === 'end' ? 'end' : 'start'}
+  transform={vertical ? `rotate(24 ${x} ${y})` : ''}
+>
+  <slot />
+</text>
 
 <style lang="postcss">
   text {

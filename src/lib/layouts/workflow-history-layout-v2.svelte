@@ -177,7 +177,6 @@
     />
   {:else if view === 'compact'}
     <CompactGraph
-      {workflow}
       history={$filteredEventHistory}
       {groups}
       {activeGroup}
