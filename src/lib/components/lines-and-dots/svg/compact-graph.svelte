@@ -25,7 +25,7 @@
     return true;
   };
 
-  const canvasHeight = 300;
+  const canvasHeight = 400;
 </script>
 
 <DrawerWrapper {activeGroup} {activeEvent} {clearActive} let:canvasWidth>
