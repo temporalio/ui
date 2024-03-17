@@ -15,7 +15,7 @@
   export let canvasWidth: number;
   export let onClick: (group: EventGroup) => void | undefined = undefined;
 
-  const { gap, gutter, radius } = TimelineConfig;
+  const { gap, gutter } = TimelineConfig;
 
   $: isActive = (group: EventGroup): boolean => {
     if (!activeGroup) return true;
@@ -27,9 +27,9 @@
   ) as EventGroups[];
 
   // Need to find the max group size of named groups to determine the canvas height
-  $: maxGroupSize = Math.max(...timeGroups.map((group) => group.length));
+  // $: maxGroupSize = Math.max(...timeGroups.map((group) => group.length));
 
-  $: canvasHeight = Math.max(maxGroupSize * radius * 2, 400);
+  $: canvasHeight = Math.max(0, 400);
 </script>
 
 <svg

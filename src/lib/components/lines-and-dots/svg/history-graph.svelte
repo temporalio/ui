@@ -33,9 +33,9 @@
   $: isActive = (groupOrEvent: EventGroup | WorkflowEvent): boolean => {
     if (!activeEvent && !activeGroup) return true;
     if (activeGroup) {
-      return activeGroup.id === groupOrEvent.id;
-    } else {
-      return activeEvent.id === groupOrEvent.id;
+      return activeGroup.id === groupOrEvent?.id;
+    } else if (activeEvent) {
+      return activeEvent.id === groupOrEvent?.id;
     }
   };
 
@@ -86,6 +86,7 @@
       {y}
       {offset}
       {nextDistance}
+      {zoomLevel}
       category={event.category}
       classification={event.classification}
       connectLine={!isMiddleEvent(event, groups)}

@@ -56,12 +56,14 @@
     if (isEventGroup(eventOrGroup)) {
       if (eventOrGroup.id !== activeGroup?.id) {
         activeGroup = eventOrGroup;
+        activeEvent = undefined;
       } else {
         clearActives();
       }
     } else {
       if (eventOrGroup.id !== activeEvent?.id) {
         activeEvent = eventOrGroup;
+        activeGroup = undefined;
       } else {
         clearActives();
       }
@@ -164,39 +166,37 @@
   </div>
 </div>
 <div class="bg-primary">
-  <div class="relative flex max-h-[600px] w-full gap-0 overflow-auto">
-    <div class="w-full overflow-x-hidden" bind:clientWidth={canvasWidth}>
-      {#if view === 'timeline'}
-        <TimelineGraph
-          {workflow}
-          history={$filteredEventHistory}
-          {groups}
-          {activeGroup}
-          {zoomLevel}
-          {canvasWidth}
-          onClick={setActives}
-        />
-      {:else if view === 'compact'}
-        <CompactGraph
-          {groups}
-          {activeGroup}
-          {zoomLevel}
-          {canvasWidth}
-          onClick={setActives}
-        />
-      {:else}
-        <HistoryGraph
-          history={$filteredEventHistory}
-          {groups}
-          {activeGroup}
-          {activeEvent}
-          {pendingActivities}
-          {zoomLevel}
-          {canvasWidth}
-          onClick={setActives}
-        />
-      {/if}
-    </div>
+  <div class="w-full overflow-x-hidden" bind:clientWidth={canvasWidth}>
+    {#if view === 'timeline'}
+      <TimelineGraph
+        {workflow}
+        history={$filteredEventHistory}
+        {groups}
+        {activeGroup}
+        {zoomLevel}
+        {canvasWidth}
+        onClick={setActives}
+      />
+    {:else if view === 'compact'}
+      <CompactGraph
+        {groups}
+        {activeGroup}
+        {zoomLevel}
+        {canvasWidth}
+        onClick={setActives}
+      />
+    {:else}
+      <HistoryGraph
+        history={$filteredEventHistory}
+        {groups}
+        {activeGroup}
+        {activeEvent}
+        {pendingActivities}
+        {zoomLevel}
+        {canvasWidth}
+        onClick={setActives}
+      />
+    {/if}
   </div>
   {#if activeEvent || activeGroup}
     <DetailsDrawer {activeEvent} {activeGroup} {canvasWidth} {clearActives} />

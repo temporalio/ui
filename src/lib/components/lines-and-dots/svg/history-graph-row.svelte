@@ -34,6 +34,7 @@
   export let active = false;
   export let onClick: (x: WorkflowEvent | PendingActivity) => void;
   export let index: number;
+  export let zoomLevel: number = 1;
 
   const { radius, gap } = HistoryConfig;
   const strokeWidth = radius / 2;
@@ -43,7 +44,7 @@
     group?.lastEvent.id === event?.id && group?.pendingActivity;
 
   $: withinCanvas = (x: number) => {
-    return x <= canvasWidth;
+    return x <= canvasWidth * zoomLevel;
   };
 </script>
 
