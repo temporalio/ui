@@ -14,19 +14,18 @@
   import { fetchAllEvents } from '$lib/services/events-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { eventFilterSort } from '$lib/stores/event-view';
-  import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
+  import type { WorkflowEvent } from '$lib/types/events';
   import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
-  import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
   import EventDetailsHeader from './event-details-header.svelte';
   import EventDetails from './event-details.svelte';
   import PendingDetails from './pending-details.svelte';
   import TimelineGraph from './svg/timeline-graph.svelte';
 
-  export let activeEvent: WorkflowEvent | PendingActivity | undefined =
-    undefined;
+  export let activeEvent: WorkflowEvent | undefined = undefined;
   export let activeGroup: EventGroup | undefined = undefined;
-  export let clearActive: () => void;
+  export let canvasWidth: number;
+  export let clearActives: () => void;
 
   $: timeline = activeGroup && !activeEvent;
   $: ({ namespace } = $page.params);
@@ -67,8 +66,8 @@
 </script>
 
 <div
-  class="flex h-full flex-col gap-0 overflow-auto border-l-2 bg-slate-950"
-  in:fly={{ x: 50, delay: 0, duration: 350 }}
+  class="flex h-full flex-col gap-0 overflow-auto bg-slate-950"
+  in:fly={{ y: 50, delay: 0, duration: 350 }}
 >
   <div class="flex flex-col justify-between bg-slate-200 p-2 md:flex-row">
     <div class="flex items-center justify-end gap-4">
@@ -86,8 +85,8 @@
     </div>
     <Button
       variant="ghost"
-      on:click={clearActive}
-      on:keypress={clearActive}
+      on:click={clearActives}
+      on:keypress={clearActives}
       trailingIcon="chevron-right"
     >
       Close
@@ -105,6 +104,7 @@
           workflow={childWorkflow.workflow}
           history={childHistory}
           {groups}
+          {canvasWidth}
         />
       </div>
     {/if}
@@ -130,7 +130,7 @@
         />
       </PayloadDecoder>
     {/if}
-  {:else if timeline}
+  {:else if activeGroup}
     {#if activeGroup?.pendingActivity}
       <EventDetailsHeader text="Pending" />
       <PendingDetails pendingActivity={activeGroup.pendingActivity} />
@@ -139,9 +139,7 @@
       <EventDetailsHeader text={`${event.id} ${event.name}`} />
       <EventDetails {event} />
     {/each}
-  {:else if isPendingActivity(activeEvent)}
-    <PendingDetails pendingActivity={activeEvent} />
-  {:else}
+  {:else if activeEvent}
     <EventDetailsHeader text={`${activeEvent.id} ${activeEvent.name}`} />
     <EventDetails event={activeEvent} />
   {/if}

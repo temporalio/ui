@@ -34,8 +34,6 @@
   export let active = false;
   export let onClick: (x: WorkflowEvent | PendingActivity) => void;
   export let index: number;
-  export let showTimestamp = false;
-  export let showEventType = false;
 
   const { radius, gap } = HistoryConfig;
   const strokeWidth = radius / 2;
@@ -81,24 +79,20 @@
       <tspan fill="#fff">
         {spaceBetweenCapitalLetters(event?.name)}
       </tspan>
-      {#if group && showEventType}<tspan dx={3} font-size="14px"
-          >{group.name}</tspan
-        >{/if}
+      {#if group}<tspan dx={3} font-size="14px">{group.name}</tspan>{/if}
     </Text>
-    {#if showTimestamp}
-      <Text
-        point={[startingX - 1.5 * radius, y + radius / 2]}
-        {active}
-        position="end"
-      >
-        <tspan fill="#fff" font-size="12px">
-          {formatDate(event?.eventTime, $timeFormat, {
-            relative: $relativeTime,
-          })}
-          <tspan fill="#fff"> </tspan></tspan
-        ></Text
-      >
-    {/if}
+    <Text
+      point={[startingX - 1.5 * radius, y + radius / 2]}
+      {active}
+      position="end"
+    >
+      <tspan fill="#fff" font-size="12px">
+        {formatDate(event?.eventTime, $timeFormat, {
+          relative: $relativeTime,
+        })}
+        <tspan fill="#fff"> </tspan></tspan
+      ></Text
+    >
   {/if}
   {#if connectLine}
     <Line

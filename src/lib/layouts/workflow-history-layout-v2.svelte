@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import DetailsDrawer from '$lib/components/lines-and-dots/details-drawer.svelte';
   import EventClassificationFilter from '$lib/components/lines-and-dots/event-classification-filter.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
@@ -16,7 +17,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { groupEvents } from '$lib/models/event-groups';
+  import { groupEvents, isEventGroup } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { eventFilterSort } from '$lib/stores/event-view';
   import {
@@ -25,7 +26,7 @@
     fullEventHistory,
   } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
+  import type { WorkflowEvent } from '$lib/types/events';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
@@ -41,8 +42,9 @@
   );
 
   let activeGroup: EventGroup | undefined = undefined;
-  let activeEvent: WorkflowEvent | PendingActivity | undefined = undefined;
+  let activeEvent: WorkflowEvent | undefined = undefined;
 
+  let canvasWidth = 0;
   let showDownloadPrompt = false;
 
   const clearActives = () => {
@@ -50,21 +52,19 @@
     activeEvent = undefined;
   };
 
-  const setActiveEvent = (event: WorkflowEvent | PendingActivity) => {
-    if (event.id === activeEvent?.id) {
-      clearActives();
+  const setActives = (eventOrGroup: EventGroup | WorkflowEvent) => {
+    if (isEventGroup(eventOrGroup)) {
+      if (eventOrGroup.id !== activeGroup?.id) {
+        activeGroup = eventOrGroup;
+      } else {
+        clearActives();
+      }
     } else {
-      activeEvent = event;
-      activeGroup = groups.find((g) => g.eventIds.has(event?.id));
-    }
-  };
-
-  const setActiveGroup = (group: EventGroup) => {
-    if (group.id === activeGroup?.id) {
-      clearActives();
-    } else {
-      activeEvent = undefined;
-      activeGroup = group;
+      if (eventOrGroup.id !== activeEvent?.id) {
+        activeEvent = eventOrGroup;
+      } else {
+        clearActives();
+      }
     }
   };
 
@@ -164,38 +164,42 @@
   </div>
 </div>
 <div class="bg-primary">
-  {#if view === 'timeline'}
-    <TimelineGraph
-      {workflow}
-      history={$filteredEventHistory}
-      {groups}
-      {activeGroup}
-      {activeEvent}
-      {zoomLevel}
-      onClick={setActiveGroup}
-      clearActive={clearActives}
-    />
-  {:else if view === 'compact'}
-    <CompactGraph
-      history={$filteredEventHistory}
-      {groups}
-      {activeGroup}
-      {activeEvent}
-      {zoomLevel}
-      onClick={setActiveGroup}
-      clearActive={clearActives}
-    />
-  {:else}
-    <HistoryGraph
-      history={$filteredEventHistory}
-      {groups}
-      {pendingActivities}
-      {activeGroup}
-      {activeEvent}
-      {zoomLevel}
-      onClick={setActiveEvent}
-      clearActive={clearActives}
-    />
+  <div class="relative flex max-h-[600px] w-full gap-0 overflow-auto">
+    <div class="w-full overflow-x-hidden" bind:clientWidth={canvasWidth}>
+      {#if view === 'timeline'}
+        <TimelineGraph
+          {workflow}
+          history={$filteredEventHistory}
+          {groups}
+          {activeGroup}
+          {zoomLevel}
+          {canvasWidth}
+          onClick={setActives}
+        />
+      {:else if view === 'compact'}
+        <CompactGraph
+          {groups}
+          {activeGroup}
+          {zoomLevel}
+          {canvasWidth}
+          onClick={setActives}
+        />
+      {:else}
+        <HistoryGraph
+          history={$filteredEventHistory}
+          {groups}
+          {activeGroup}
+          {activeEvent}
+          {pendingActivities}
+          {zoomLevel}
+          {canvasWidth}
+          onClick={setActives}
+        />
+      {/if}
+    </div>
+  </div>
+  {#if activeEvent || activeGroup}
+    <DetailsDrawer {activeEvent} {activeGroup} {canvasWidth} {clearActives} />
   {/if}
 </div>
 <Modal
