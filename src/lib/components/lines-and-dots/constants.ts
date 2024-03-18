@@ -13,6 +13,12 @@ export const CanvasConfig = {
   maxHeight: 600,
 };
 
+export const CompactConfig = {
+  gap: 64,
+  gutter: 24,
+  radius: 24,
+};
+
 export const TimelineConfig = {
   gap: 42,
   gutter: 24,

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import DetailsTopDrawer from '$lib/components/lines-and-dots/details-top-drawer.svelte';
   import EventClassificationFilter from '$lib/components/lines-and-dots/event-classification-filter.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
@@ -164,9 +163,6 @@
       </div>
     </div>
   </div>
-  {#if activeEvent || activeGroup}
-    <DetailsTopDrawer {activeEvent} {activeGroup} />
-  {/if}
 </div>
 <div class="bg-primary">
   <div class="w-full overflow-x-hidden" bind:clientWidth={canvasWidth}>

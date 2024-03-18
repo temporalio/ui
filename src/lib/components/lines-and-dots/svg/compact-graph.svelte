@@ -4,7 +4,7 @@
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
 
-  import { TimelineConfig } from '../constants';
+  import { CompactConfig } from '../constants';
 
   import CompactGraphRow from './compact-graph-row.svelte';
 
@@ -15,7 +15,7 @@
   export let canvasWidth: number;
   export let onClick: (group: EventGroup) => void | undefined = undefined;
 
-  const { gap, gutter } = TimelineConfig;
+  const { gap, gutter } = CompactConfig;
 
   $: isActive = (group: EventGroup): boolean => {
     if (!activeGroup) return true;

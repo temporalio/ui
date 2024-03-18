@@ -21,6 +21,7 @@
 
   export let workflow: WorkflowExecution;
   export let group: EventGroup;
+  export let activeGroup: EventGroup | undefined = undefined;
   export let index: number;
   export let startTime: Timestamp;
   export let canvasWidth: number;
@@ -29,7 +30,9 @@
 
   const { gap, gutter, radius } = TimelineConfig;
 
-  $: y = (index + 1) * gap + gap / 2;
+  $: activeGroupAbove =
+    activeGroup && parseInt(activeGroup.id) < parseInt(group.id);
+  $: y = (index + 1) * gap + (activeGroupAbove ? 2 * gap : 0);
 
   $: endTime = workflow.isRunning ? Date.now() : workflow.endTime;
   $: workflowDistance = getMillisecondDuration({
@@ -81,6 +84,8 @@
       (isStartChildWorkflowExecutionInitiatedEvent(group.initialEvent) &&
         group.eventList.length === 2),
   );
+
+  $: active = !activeGroup || activeGroup.id === group.id;
 </script>
 
 <g
@@ -90,7 +95,6 @@
   on:keypress={onClick}
   class="relative cursor-pointer"
   height={gap}
-  transform="matrix(1 0 0 1 0 0)"
 >
   {#each points as x, index}
     {@const nextPoint = points[index + 1]}

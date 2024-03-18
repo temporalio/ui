@@ -9,6 +9,7 @@
   import { TimelineConfig } from '../constants';
   import TimelineAxisLabels from '../timeline-axis-labels.svelte';
 
+  import GroupDetailsRow from './group-details-row.svelte';
   import Line from './line.svelte';
   import TimelineAxis from './timeline-axis.svelte';
   import TimelineGraphRow from './timeline-graph-row.svelte';
@@ -25,11 +26,6 @@
   const { gap, gutter, radius } = TimelineConfig;
 
   $: startTime = history[0]?.eventTime || workflow.startTime;
-
-  $: isActive = (group: EventGroup): boolean => {
-    if (!activeGroup) return true;
-    return activeGroup?.id === group.id;
-  };
 
   $: canvasHeight = Math.max(gap * 2 + gap * groups.length, 200);
 </script>
@@ -53,13 +49,21 @@
   {#each groups as group, index (group.id)}
     <TimelineGraphRow
       {workflow}
+      {activeGroup}
       {group}
       {index}
       {canvasWidth}
       {startTime}
-      active={isActive(group)}
       onClick={() => onClick && onClick(group)}
     />
+    {#if activeGroup?.id === group.id}
+      <GroupDetailsRow
+        {group}
+        {index}
+        {canvasWidth}
+        onClick={() => onClick && onClick(group)}
+      />
+    {/if}
   {/each}
   <TimelineAxis
     x1={gutter}

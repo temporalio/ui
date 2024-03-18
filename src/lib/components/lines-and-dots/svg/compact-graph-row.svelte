@@ -6,7 +6,7 @@
     isTimerStartedEvent,
   } from '$lib/utilities/is-event-type';
 
-  import { CategoryIcon, TimelineConfig } from '../constants';
+  import { CategoryIcon, CompactConfig } from '../constants';
 
   import Dot from './dot.svelte';
   import Line from './line.svelte';
@@ -20,7 +20,7 @@
   export let active = true;
   export let onClick: () => void;
 
-  const { gap, gutter, radius } = TimelineConfig;
+  const { gap, gutter, radius } = CompactConfig;
 
   $: start = gutter + index * length;
   $: end = start + length;
@@ -72,11 +72,11 @@
     strokeWidth="4"
   />
   <Text
-    point={[start + (4 / 3) * radius, y + radius / 3]}
+    point={[start + (4 / 3) * radius, y + radius / 4]}
     {active}
     position="middle"
   >
-    {#if count > 1}{count}{/if}
+    {#if count > 1}<tspan font-weight="700">{count}</tspan>{/if}
     {group?.name}
   </Text>
 </g>
