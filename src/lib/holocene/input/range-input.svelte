@@ -117,11 +117,11 @@
 
 <style lang="postcss">
   .range-input-container {
-    @apply inline-flex w-full flex-row items-center gap-4 whitespace-nowrap;
+    @apply inline-flex w-full flex-row items-center gap-4 whitespace-nowrap text-primary;
   }
 
   .numeric-input {
-    @apply h-10 w-10 rounded border border-primary text-center text-sm;
+    @apply surface-primary h-10 w-10 rounded border border-primary text-center text-sm;
 
     appearance: textfield;
   }
