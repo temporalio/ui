@@ -11,21 +11,23 @@
 
   import { DetailsConfig, TimelineConfig } from '../constants';
 
-  import Box from './box.svelte';
-  import Text from './text.svelte';
+  // import Text from './text.svelte';
   import TimelineGraph from './timeline-graph.svelte';
 
   export let group: EventGroup;
+  export let activeGroups: string[] = [];
   export let index: number;
   export let canvasWidth: number;
   export let onClick: () => void;
 
-  const { height, gutter, radius } = TimelineConfig;
+  const { height, radius } = TimelineConfig;
   const { boxHeight } = DetailsConfig;
 
-  $: y = (index + 1) * height;
+  $: activeGroupsAbove = activeGroups.filter((id) => {
+    return parseInt(id) < parseInt(group.id);
+  });
 
-  $: timelineWidth = canvasWidth - 2 * gutter;
+  $: y = (index + 1) * height + activeGroupsAbove.length * boxHeight;
 
   $: ({ namespace } = $page.params);
 
@@ -72,15 +74,9 @@
   class="relative cursor-pointer"
   height={boxHeight}
 >
-  <Box
-    point={[gutter, y + radius]}
-    width={timelineWidth}
-    height={boxHeight}
-    fill="#fff"
-  ></Box>
-  <Text active category="icon" point={[gutter, y + 2 * radius]}
+  <!-- <Text active point={[gutter, y + 2 * radius]}
     >{JSON.stringify(group, undefined, 2)}</Text
-  >
+  > -->
   {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [childWorkflow, childHistory]}
     {#if childWorkflow && childHistory}
       {@const groups = groupEvents(
@@ -90,7 +86,7 @@
       )}
       <TimelineGraph
         x={0}
-        {y}
+        y={y + radius}
         staticHeight={boxHeight}
         workflow={childWorkflow.workflow}
         history={childHistory}

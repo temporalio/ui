@@ -10,7 +10,7 @@
 
   export let groups: EventGroups;
 
-  export let activeGroup: EventGroup | undefined = undefined;
+  export let activeGroups: string[] = [];
   export let zoomLevel: number = 1;
   export let canvasWidth: number;
   export let onClick: (group: EventGroup) => void | undefined = undefined;
@@ -19,8 +19,8 @@
   let exandedGroups = [];
 
   $: isActive = (group: EventGroup): boolean => {
-    if (!activeGroup) return true;
-    return activeGroup?.id === group?.id;
+    if (!activeGroups.length) return true;
+    return activeGroups.includes(group?.id);
   };
 
   $: timeGroups = Object.values(
@@ -64,7 +64,7 @@
       const name = groupNameWithIndex(startIndex, groups[0].name);
       if (exandedGroups.includes(name)) {
         exandedGroups = exandedGroups.filter((n) => n !== name);
-        if (activeGroup) {
+        if (activeGroups.includes(groups[0].id)) {
           onClick(groups[0]);
         }
       } else {

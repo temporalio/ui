@@ -47,31 +47,31 @@
   );
   $: workflow, view, clearActives();
 
-  let activeGroup: EventGroup | undefined = undefined;
-  let activeEvent: WorkflowEvent | undefined = undefined;
+  let activeGroups: string[] = [];
+  let activeEvents: string[] = [];
 
   let canvasWidth = 0;
   let showDownloadPrompt = false;
 
   const clearActives = () => {
-    activeGroup = undefined;
-    activeEvent = undefined;
+    activeGroups = [];
+    activeEvents = [];
   };
 
   const setActives = (eventOrGroup: EventGroup | WorkflowEvent) => {
     if (isEventGroup(eventOrGroup)) {
-      if (eventOrGroup.id !== activeGroup?.id) {
-        activeGroup = eventOrGroup;
-        activeEvent = undefined;
+      activeEvents = [];
+      if (!activeGroups.includes(eventOrGroup.id)) {
+        activeGroups = [...activeGroups, eventOrGroup.id];
       } else {
-        clearActives();
+        activeGroups = activeGroups.filter((id) => id !== eventOrGroup.id);
       }
     } else {
-      if (eventOrGroup.id !== activeEvent?.id) {
-        activeEvent = eventOrGroup;
-        activeGroup = undefined;
+      activeGroups = [];
+      if (!activeEvents.includes(eventOrGroup.id)) {
+        activeEvents = [...activeEvents, eventOrGroup.id];
       } else {
-        clearActives();
+        activeEvents = activeGroups.filter((id) => id !== eventOrGroup.id);
       }
     }
   };
@@ -165,20 +165,20 @@
 </div>
 <div class="bg-primary">
   <div class="w-full overflow-x-hidden" bind:clientWidth={canvasWidth}>
-    {#if view === 'timeline'}
-      <TimelineGraph
-        {workflow}
-        history={$filteredEventHistory}
+    {#if view === 'compact'}
+      <CompactGraph
         {groups}
-        {activeGroup}
+        {activeGroups}
         {zoomLevel}
         {canvasWidth}
         onClick={setActives}
       />
-    {:else if view === 'compact'}
-      <CompactGraph
+    {:else if view === 'timeline'}
+      <TimelineGraph
+        {workflow}
+        history={$filteredEventHistory}
         {groups}
-        {activeGroup}
+        {activeGroups}
         {zoomLevel}
         {canvasWidth}
         onClick={setActives}
@@ -187,8 +187,8 @@
       <HistoryGraph
         history={$filteredEventHistory}
         {groups}
-        {activeGroup}
-        {activeEvent}
+        {activeGroups}
+        {activeEvents}
         {pendingActivities}
         {zoomLevel}
         {canvasWidth}

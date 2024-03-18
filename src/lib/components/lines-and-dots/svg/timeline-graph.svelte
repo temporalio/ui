@@ -22,7 +22,7 @@
   export let history: WorkflowEvents;
   export let groups: EventGroups;
 
-  export let activeGroup: EventGroup | undefined = undefined;
+  export let activeGroups: string[] = [];
   export let zoomLevel: number = 1;
   export let canvasWidth: number;
   export let onClick: (group: EventGroup) => void | undefined = undefined;
@@ -34,7 +34,7 @@
 
   $: canvasHeight =
     Math.max(height * 2 + height * groups.length, 200) +
-    (activeGroup ? boxHeight : 0);
+    activeGroups.length * boxHeight;
 </script>
 
 <svg
@@ -58,16 +58,17 @@
   {#each groups as group, index (group.id)}
     <TimelineGraphRow
       {workflow}
-      {activeGroup}
+      {activeGroups}
       {group}
       {index}
       {canvasWidth}
       {startTime}
       onClick={() => onClick && onClick(group)}
     />
-    {#if activeGroup?.id === group.id}
+    {#if activeGroups.includes(group.id)}
       <GroupDetailsRow
         {group}
+        {activeGroups}
         {index}
         {canvasWidth}
         onClick={() => onClick && onClick(group)}

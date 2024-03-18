@@ -21,7 +21,7 @@
 
   export let workflow: WorkflowExecution;
   export let group: EventGroup;
-  export let activeGroup: EventGroup | undefined = undefined;
+  export let activeGroups: string[] = [];
   export let index: number;
   export let startTime: Timestamp;
   export let canvasWidth: number;
@@ -31,9 +31,11 @@
   const { height, gutter, radius } = TimelineConfig;
   const { boxHeight } = DetailsConfig;
 
-  $: activeGroupAbove =
-    activeGroup && parseInt(activeGroup.id) < parseInt(group.id);
-  $: y = (index + 1) * height + (activeGroupAbove ? boxHeight : 0);
+  $: activeGroupsAbove = activeGroups.filter((id) => {
+    return parseInt(id) < parseInt(group.id);
+  });
+
+  $: y = (index + 1) * height + activeGroupsAbove.length * boxHeight;
 
   $: endTime = workflow.isRunning ? Date.now() : workflow.endTime;
   $: workflowDistance = getMillisecondDuration({
@@ -86,7 +88,7 @@
         group.eventList.length === 2),
   );
 
-  $: active = !activeGroup || activeGroup.id === group.id;
+  $: active = !activeGroups.length || activeGroups.includes(group.id);
 </script>
 
 <g

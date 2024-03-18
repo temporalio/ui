@@ -21,9 +21,8 @@
   export let history: WorkflowEvents;
   export let groups: EventGroups;
   export let pendingActivities: PendingActivity[];
-  export let activeEvent: WorkflowEvent | PendingActivity | undefined =
-    undefined;
-  export let activeGroup: EventGroup | undefined = undefined;
+  export let activeEvents: string[] = [];
+  export let activeGroups: string[] = [];
   export let canvasWidth: number;
   export let zoomLevel: number = 1;
   export let onClick: (groupOrEvent: EventGroup | WorkflowEvent) => void;
@@ -31,11 +30,11 @@
   const { height } = HistoryConfig;
 
   $: isActive = (groupOrEvent: EventGroup | WorkflowEvent): boolean => {
-    if (!activeEvent && !activeGroup) return true;
-    if (activeGroup) {
-      return activeGroup.id === groupOrEvent?.id;
-    } else if (activeEvent) {
-      return activeEvent.id === groupOrEvent?.id;
+    if (!activeEvents.length && !activeGroups.length) return true;
+    if (activeGroups.length) {
+      return activeGroups.includes(groupOrEvent?.id);
+    } else if (activeEvents.length) {
+      return activeEvents.includes(groupOrEvent?.id);
     }
   };
 
@@ -109,7 +108,7 @@
         ?.level || 1}
       nextDistance={0}
       category="pending"
-      active={isActive(activeGroup)}
+      active={isActive(group)}
       onClick={() => onClick(group)}
       {index}
     />
