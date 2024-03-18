@@ -13,7 +13,7 @@
     isTimerStartedEvent,
   } from '$lib/utilities/is-event-type';
 
-  import { CategoryIcon, TimelineConfig } from '../constants';
+  import { CategoryIcon, DetailsConfig, TimelineConfig } from '../constants';
 
   import Dot from './dot.svelte';
   import Line from './line.svelte';
@@ -28,11 +28,12 @@
   export let active = true;
   export let onClick: () => void;
 
-  const { gap, gutter, radius } = TimelineConfig;
+  const { height, gutter, radius } = TimelineConfig;
+  const { boxHeight } = DetailsConfig;
 
   $: activeGroupAbove =
     activeGroup && parseInt(activeGroup.id) < parseInt(group.id);
-  $: y = (index + 1) * gap + (activeGroupAbove ? 2 * gap : 0);
+  $: y = (index + 1) * height + (activeGroupAbove ? boxHeight : 0);
 
   $: endTime = workflow.isRunning ? Date.now() : workflow.endTime;
   $: workflowDistance = getMillisecondDuration({
@@ -94,7 +95,7 @@
   on:click|preventDefault={onClick}
   on:keypress={onClick}
   class="relative cursor-pointer"
-  height={gap}
+  {height}
 >
   {#each points as x, index}
     {@const nextPoint = points[index + 1]}

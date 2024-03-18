@@ -28,7 +28,7 @@
   export let zoomLevel: number = 1;
   export let onClick: (groupOrEvent: EventGroup | WorkflowEvent) => void;
 
-  const { gap } = HistoryConfig;
+  const { height } = HistoryConfig;
 
   $: isActive = (groupOrEvent: EventGroup | WorkflowEvent): boolean => {
     if (!activeEvent && !activeGroup) return true;
@@ -40,7 +40,7 @@
   };
 
   $: canvasHeight = Math.max(
-    gap * 2 + gap * (history.length + pendingActivities.length),
+    height * 2 + height * (history.length + pendingActivities.length),
     400,
   );
 
@@ -48,8 +48,8 @@
 
   // $: visibleHistory = (history: WorkflowEvents, scrollY: number) => {
   //   return history.filter((event, index) => {
-  //     const y = (index + 1) * gap + gap / 2;
-  //     const scrollStartVisible = scrollY + gap / 2;
+  //     const y = (index + 1) * height + height / 2;
+  //     const scrollStartVisible = scrollY + height / 2;
   //     const visible =
   //       y > scrollStartVisible &&
   //       y < scrollStartVisible + CanvasConfig.maxHeight;
@@ -75,7 +75,7 @@
       index,
       groups,
       pendingActivities,
-      gap,
+      height,
     )}
     {@const group = groups.find((g) => g.eventIds.has(event.id))}
     <HistoryGraphRow
@@ -104,7 +104,7 @@
       group={groups.find((g) => g.eventIds.has(pendingActivity.activityId))}
       canvasWidth={canvasWidth * zoomLevel}
       {startingX}
-      y={(history.length + index + 1) * gap + gap / 2}
+      y={(history.length + index + 1) * height + height / 2}
       offset={groups.find((g) => g?.pendingActivity === pendingActivity)
         ?.level || 1}
       nextDistance={0}

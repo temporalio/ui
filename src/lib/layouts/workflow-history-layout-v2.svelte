@@ -30,15 +30,22 @@
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
+  let view = 'compact';
+  let zoomLevel = 1;
+
   $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
   $: pendingActivities = workflow?.pendingActivities;
-
   $: groups = groupEvents(
     $filteredEventHistory,
     $eventFilterSort,
     pendingActivities,
   );
+  $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
+    $fullEventHistory,
+    $eventFilterSort,
+  );
+  $: workflow, view, clearActives();
 
   let activeGroup: EventGroup | undefined = undefined;
   let activeEvent: WorkflowEvent | undefined = undefined;
@@ -80,14 +87,6 @@
     });
   };
 
-  $: workflow, view, clearActives();
-  $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
-    $fullEventHistory,
-    $eventFilterSort,
-  );
-
-  let view = 'compact';
-  let zoomLevel = 1;
   const zoomOut = () => {
     if (zoomLevel < 6) zoomLevel += 0.5;
   };

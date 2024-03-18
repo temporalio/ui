@@ -36,7 +36,7 @@
   export let index: number;
   export let zoomLevel: number = 1;
 
-  const { radius, gap } = HistoryConfig;
+  const { height, radius } = HistoryConfig;
   const strokeWidth = radius / 2;
   $: horizontalOffset =
     category === 'workflow' ? 0 : (offset / 1.5) * 3 * radius;
@@ -56,9 +56,9 @@
   class="relative cursor-pointer"
 >
   <Box
-    point={[0, y - gap / 2]}
+    point={[0, y - height / 2]}
     width={startingX - strokeWidth}
-    height={gap}
+    {height}
     fill={index % 2 === 1 && '#1E293B'}
   />
   {#if isPendingActivity(event)}

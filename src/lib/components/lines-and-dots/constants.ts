@@ -9,25 +9,27 @@ import type {
   WorkflowEvents,
 } from '$lib/types/events';
 
-export const CanvasConfig = {
-  maxHeight: 600,
+const baseRadius = 8;
+
+export const DetailsConfig = {
+  boxHeight: baseRadius * 24,
 };
 
 export const CompactConfig = {
-  gap: 64,
-  gutter: 24,
-  radius: 24,
+  height: baseRadius * 8,
+  gutter: baseRadius * 3,
+  radius: baseRadius * 3,
 };
 
 export const TimelineConfig = {
-  gap: 42,
-  gutter: 24,
-  radius: 16,
+  height: baseRadius * 6,
+  gutter: baseRadius * 3,
+  radius: baseRadius * 2,
 };
 
 export const HistoryConfig = {
-  gap: 32,
-  radius: 10,
+  height: baseRadius * 4,
+  radius: baseRadius,
 };
 
 export const CategoryIcon = {
@@ -110,11 +112,11 @@ export const getNextDistanceAndOffset = (
   index: number,
   groups: EventGroups,
   pendingActivities: PendingActivity[],
-  gap: number,
+  height: number,
 ): { nextDistance: number; offset: number; y: number } => {
   let nextDistance = 0;
   let offset = 1;
-  const y = (index + 1) * gap + gap / 2;
+  const y = (index + 1) * height + height / 2;
 
   const group = groups.find((g) => g.eventIds.has(event.id));
   if (!group) {
@@ -144,7 +146,7 @@ export const getNextDistanceAndOffset = (
       pendingActivities.indexOf(pendingActivity) +
       1
     : parseInt(nextEvent.id) - parseInt(event.id);
-  nextDistance = diff * gap;
+  nextDistance = diff * height;
 
   return { nextDistance, offset, y };
 };

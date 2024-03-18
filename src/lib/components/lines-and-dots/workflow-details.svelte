@@ -5,9 +5,6 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  // import { routeForWorkers } from '$lib/utilities/route-for';
-
-  // import PayloadDecoder from '../event/payload-decoder.svelte';
 
   import WorkflowDetail from './workflow-detail.svelte';
 
@@ -69,21 +66,4 @@
       textSize="sm"
     />
   </div>
-  <!-- {#if workflow?.searchAttributes}
-  <div class="mt-4 flex flex-col gap-2">
-    <h3 class="font-medium">{translate('common.search-attributes')}</h3>
-    <div class="h-0.5 rounded-full bg-inverse" />
-    <PayloadDecoder
-      value={{ searchAttributes: workflow.searchAttributes }}
-      key="searchAttributes"
-      let:decodedValue
-    >
-      <CodeBlock
-        content={decodedValue}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
-    </PayloadDecoder>
-  </div>
-{/if} -->
 </div>
