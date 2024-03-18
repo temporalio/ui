@@ -13,6 +13,7 @@ export const setAuthUser = (user: User, oidcFlow: OIDCFlow) => {
 
   switch (oidcFlow) {
     case OIDCFlow.AuthorizationCode:
+    default:
       if (!accessToken) {
         throw new Error('No access token');
       }
