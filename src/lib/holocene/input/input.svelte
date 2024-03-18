@@ -195,7 +195,7 @@
   }
 
   .input {
-    @apply m-2 w-full bg-transparent focus:outline-none enabled:placeholder:text-primary disabled:text-disabled disabled:placeholder:text-disabled;
+    @apply m-2 w-full bg-transparent focus:outline-none enabled:placeholder:text-subtle disabled:text-disabled disabled:placeholder:text-disabled;
   }
 
   .suffix {
