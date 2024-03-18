@@ -6,7 +6,7 @@
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
   interface $$Props extends HTMLTableAttributes {
-    variant?: 'simple' | 'fancy';
+    variant?: 'simple' | 'fancy' | 'skeleton';
     updating?: boolean;
     class?: string;
     'data-testid'?: string;
@@ -14,7 +14,7 @@
 
   let className = '';
   export { className as class };
-  export let variant: 'simple' | 'fancy' = 'fancy';
+  export let variant: 'simple' | 'fancy' | 'skeleton' = 'fancy';
   export let updating = false;
 </script>
 
@@ -103,6 +103,78 @@
           &:first-child {
             &:first-child {
               @apply rounded-bl-none;
+            }
+          }
+
+          &:last-child {
+            &:last-child {
+              @apply rounded-br-none;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  table.skeleton {
+    @apply border-separate border-spacing-0 rounded-xl border-[3px] border-black bg-white;
+
+    thead {
+      @apply surface-inverse;
+
+      :global(th) {
+        @apply border-t border-black px-1 py-2;
+      }
+
+      :global(td) {
+        @apply border-t border-black px-1 py-2;
+
+        &:first-child {
+          @apply w-[1px] rounded-tl-lg border-l;
+        }
+
+        &:last-child {
+          @apply w-[1px] rounded-tr-lg border-r;
+        }
+      }
+    }
+
+    tbody :global {
+      td {
+        @apply border-t border-black px-1 py-2 text-sm;
+
+        &:first-child {
+          @apply border-l  px-1;
+        }
+
+        &:first-child:is(.expanded-cell) {
+          @apply px-0;
+        }
+
+        &:last-child {
+          @apply w-0 border-r  p-0;
+        }
+      }
+
+      &:last-child {
+        td {
+          @apply border-b;
+
+          &:first-child {
+            @apply rounded-bl-lg;
+          }
+
+          &:last-child {
+            @apply rounded-br-lg;
+          }
+        }
+      }
+
+      tbody :global {
+        td {
+          &:first-child {
+            &:first-child {
+              @apply rounded-bl-none bg-pink;
             }
           }
 
