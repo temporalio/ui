@@ -31,7 +31,7 @@
 
 <style lang="postcss">
   .primary {
-    @apply bg-primary text-white dark:bg-inverse;
+    @apply bg-primary text-white;
   }
 
   .success {
