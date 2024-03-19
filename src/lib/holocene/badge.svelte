@@ -49,6 +49,7 @@
   .warning,
   .yellow {
     @apply border-yellow-900 bg-yellow-100 text-yellow-900;
+    @apply border-yellow-900 bg-yellow-200 text-black;
   }
 
   .default,
