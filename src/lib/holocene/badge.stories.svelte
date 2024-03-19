@@ -16,7 +16,7 @@
         'beta',
         'warning',
         'error',
-        'ative',
+        'active',
         'available',
         'running',
         'red',
