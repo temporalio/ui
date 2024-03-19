@@ -43,6 +43,7 @@
   .error,
   .red {
     @apply border-red-700 bg-red-50 text-red-700;
+    @apply border-red-700 bg-red-300 text-black;
   }
 
   .warning,
