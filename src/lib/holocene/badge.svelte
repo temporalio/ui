@@ -32,6 +32,7 @@
   .running,
   .blue {
     @apply border-blue-700 bg-blue-100 text-blue-700;
+    @apply border-blue-700 bg-indigo-400 text-black;
   }
 
   .alpha,
