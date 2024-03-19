@@ -42,7 +42,7 @@
   {/if}
   <div class="relative">
     <textarea
-      class=" min-h-fit w-full rounded-lg border-2 border-subtle bg-transparent px-3 py-2 font-mono text-sm hover:border-interactive focus-visible:shadow-[0_0_0_4px_rgb(97,115,243,0.7)]"
+      class=" min-h-fit w-full rounded-lg border-2 border-subtle bg-transparent px-3 py-2 font-mono text-sm focus-visible:border-information focus-visible:shadow-[0_0_0_4px_rgb(97,115,243,0.7)] focus-visible:outline-none enabled:hover:border-information"
       class:error={!isValid}
       {id}
       bind:value
