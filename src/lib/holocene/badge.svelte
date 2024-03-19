@@ -62,5 +62,6 @@
 
   .count {
     @apply h-6 w-6 min-w-max rounded-full bg-blue-700 text-white;
+    @apply h-6 w-6 min-w-max rounded-full bg-indigo-400 text-black;
   }
 </style>
