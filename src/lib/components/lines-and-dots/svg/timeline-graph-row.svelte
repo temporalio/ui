@@ -13,29 +13,22 @@
     isTimerStartedEvent,
   } from '$lib/utilities/is-event-type';
 
-  import { CategoryIcon, DetailsConfig, TimelineConfig } from '../constants';
+  import { CategoryIcon, TimelineConfig } from '../constants';
 
   import Dot from './dot.svelte';
   import Line from './line.svelte';
   import Text from './text.svelte';
 
+  export let y = 0;
   export let workflow: WorkflowExecution;
   export let group: EventGroup;
   export let activeGroups: string[] = [];
-  export let index: number;
   export let startTime: Timestamp;
   export let canvasWidth: number;
   export let active = true;
   export let onClick: () => void;
 
   const { height, gutter, radius } = TimelineConfig;
-  const { boxHeight } = DetailsConfig;
-
-  $: activeGroupsAbove = activeGroups.filter((id) => {
-    return parseInt(id) < parseInt(group.id);
-  });
-
-  $: y = (index + 1) * height + activeGroupsAbove.length * boxHeight;
 
   $: endTime = workflow.isRunning ? Date.now() : workflow.endTime;
   $: workflowDistance = getMillisecondDuration({

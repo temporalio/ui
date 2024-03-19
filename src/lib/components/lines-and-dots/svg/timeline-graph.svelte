@@ -6,7 +6,11 @@
   import type { WorkflowEvents } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
-  import { DetailsConfig, TimelineConfig } from '../constants';
+  import {
+    activeGroupsHeightAboveGroup,
+    getDetailsBoxHeight,
+    TimelineConfig,
+  } from '../constants';
   import TimelineAxisLabels from '../timeline-axis-labels.svelte';
 
   import GroupDetailsRow from './group-details-row.svelte';
@@ -27,14 +31,18 @@
   export let canvasWidth: number;
   export let onClick: (group: EventGroup) => void | undefined = undefined;
 
-  const { height, gutter, radius } = TimelineConfig;
-  const { boxHeight } = DetailsConfig;
+  const { height, gutter, radius, fontSizeRatio } = TimelineConfig;
 
   $: startTime = history[0]?.eventTime || workflow.startTime;
+  $: activeDetailsHeight = activeGroups
+    .map((id) => {
+      const group = groups.find((group) => group.id === id);
+      return getDetailsBoxHeight(group, fontSizeRatio);
+    })
+    .reduce((acc, height) => acc + height, 0);
 
   $: canvasHeight =
-    Math.max(height * 2 + height * groups.length, 200) +
-    activeGroups.length * boxHeight;
+    Math.max(height * 2 + height * groups.length, 200) + activeDetailsHeight;
 </script>
 
 <svg
@@ -56,21 +64,24 @@
     status={workflow.status}
   />
   {#each groups as group, index (group.id)}
+    {@const y =
+      (index + 1) * height +
+      activeGroupsHeightAboveGroup(activeGroups, group, groups, fontSizeRatio)}
     <TimelineGraphRow
+      {y}
       {workflow}
-      {activeGroups}
       {group}
-      {index}
+      {activeGroups}
       {canvasWidth}
       {startTime}
       onClick={() => onClick && onClick(group)}
     />
     {#if activeGroups.includes(group.id)}
       <GroupDetailsRow
+        {y}
         {group}
-        {activeGroups}
-        {index}
         {canvasWidth}
+        config={TimelineConfig}
         onClick={() => onClick && onClick(group)}
       />
     {/if}

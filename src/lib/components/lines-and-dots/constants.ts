@@ -8,28 +8,41 @@ import type {
   WorkflowEvent,
   WorkflowEvents,
 } from '$lib/types/events';
+import {
+  formatAttributes,
+  formatPendingAttributes,
+} from '$lib/utilities/format-event-attributes';
 
 const baseRadius = 8;
 
-export const DetailsConfig = {
-  boxHeight: baseRadius * 24,
+export const DetailsChildTimelineHeight = 200;
+
+export type GraphConfig = {
+  height: number;
+  gutter: number;
+  radius: number;
+  fontSizeRatio: number;
 };
 
-export const CompactConfig = {
+export const CompactConfig: GraphConfig = {
   height: baseRadius * 8,
   gutter: baseRadius * 3,
   radius: baseRadius * 3,
+  fontSizeRatio: baseRadius * 3,
 };
 
-export const TimelineConfig = {
+export const TimelineConfig: GraphConfig = {
   height: baseRadius * 6,
   gutter: baseRadius * 3,
   radius: baseRadius * 2,
+  fontSizeRatio: baseRadius * 3,
 };
 
-export const HistoryConfig = {
+export const HistoryConfig: GraphConfig = {
   height: baseRadius * 4,
+  gutter: baseRadius * 2,
   radius: baseRadius,
+  fontSizeRatio: baseRadius * 2,
 };
 
 export const CategoryIcon = {
@@ -173,4 +186,63 @@ export const getEventCategoryColor = (
     default:
       return '#141414';
   }
+};
+
+export const activeRowsHeightAboveGroup = (
+  activeGroups: string[],
+  groupIndex: number,
+  timeGroups: EventGroups[],
+  height: number,
+) => {
+  let activeRowsHeight = 0;
+  activeGroups.forEach((id) => {
+    const activeTimeGroup = timeGroups.find((timeGroup) =>
+      timeGroup.find((g) => g.id === id),
+    );
+    const activeGroup = activeTimeGroup.find((g) => g.id === id);
+    const activeRowIndex = activeTimeGroup.indexOf(activeGroup);
+    if (activeRowIndex < groupIndex) {
+      activeRowsHeight += getDetailsBoxHeight(activeGroup, height);
+    }
+  });
+
+  return activeRowsHeight;
+};
+
+export const activeGroupsHeightAboveGroup = (
+  activeGroups: string[],
+  group: EventGroup,
+  groups: EventGroups,
+  height: number,
+) => {
+  return activeGroups
+    .filter((id) => {
+      return parseInt(id) < parseInt(group.id);
+    })
+    .map((id) => {
+      const group = groups.find((group) => group.id === id);
+      return getDetailsBoxHeight(group, height);
+    })
+    .reduce((acc, height) => acc + height, 0);
+};
+
+export const mergeEventGroupDetails = (group: EventGroup) => {
+  const attributes = group.eventList.map((event) => formatAttributes(event));
+  const attributesList = group.pendingActivity
+    ? [formatPendingAttributes(group.pendingActivity), ...attributes]
+    : attributes;
+  return attributesList.reduce((acc, attribute) => {
+    return { ...acc, ...attribute };
+  }, {});
+};
+
+export const getEventDetailsHeight = (group: EventGroup, height: number) => {
+  return Object.keys(mergeEventGroupDetails(group)).length * height + height;
+};
+
+export const getDetailsBoxHeight = (group: EventGroup, height: number) => {
+  const detailsHeight = getEventDetailsHeight(group, height);
+  return group.category === 'child-workflow'
+    ? DetailsChildTimelineHeight + detailsHeight
+    : detailsHeight;
 };

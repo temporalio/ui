@@ -5,8 +5,9 @@
 
   export let point: [number, number] = [0, 0];
   export let category: EventTypeCategory | 'pending' | 'none' | 'icon' = 'none';
-  export let active = false;
+  export let active = true;
   export let position: 'start' | 'middle' | 'end' = 'start';
+  export let fontSize = '16px';
 
   const { radius } = TimelineConfig;
 
@@ -33,6 +34,7 @@
   class:active
   {x}
   {y}
+  font-size={fontSize}
   text-anchor={position === 'end' ? 'end' : 'start'}
 >
   <slot />
@@ -40,11 +42,14 @@
 
 <style lang="postcss">
   text {
-    fill: #fff;
-    font-size: 16px;
     font-weight: 400;
     opacity: 0.25;
     stroke: none;
+    fill: #fff;
+  }
+
+  text.middle {
+    fill: white;
   }
 
   .active {
@@ -82,9 +87,5 @@
 
   text.icon {
     fill: #141414;
-  }
-
-  text.middle {
-    fill: white;
   }
 </style>

@@ -4,9 +4,14 @@
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
 
-  import { CompactConfig } from '../constants';
+  import {
+    activeRowsHeightAboveGroup,
+    CompactConfig,
+    getDetailsBoxHeight,
+  } from '../constants';
 
   import CompactGraphRow from './compact-graph-row.svelte';
+  import GroupDetailsRow from './group-details-row.svelte';
 
   export let groups: EventGroups;
 
@@ -15,7 +20,7 @@
   export let canvasWidth: number;
   export let onClick: (group: EventGroup) => void | undefined = undefined;
 
-  const { height, gutter } = CompactConfig;
+  const { height, gutter, fontSizeRatio } = CompactConfig;
   let exandedGroups = [];
 
   $: isActive = (group: EventGroup): boolean => {
@@ -39,7 +44,7 @@
       const nameGroups = getNameGroups(groups);
       nameGroups.forEach((group) => {
         const expanded = exandedGroups.includes(
-          groupNameWithIndex(startIndex, group[0].name),
+          groupNameWithIndex(group[0].name, startIndex),
         );
         if (group.length === 1 || !expanded) {
           totalHeight += height;
@@ -52,16 +57,23 @@
     return Math.max(...groupHeights);
   };
 
-  $: canvasHeight = Math.max(maxSegmentSize(), 400);
+  $: activeDetailsHeight = activeGroups
+    .map((id) => {
+      const group = groups.find((group) => group.id === id);
+      return getDetailsBoxHeight(group, fontSizeRatio);
+    })
+    .reduce((acc, height) => acc + height, 0);
 
-  const groupNameWithIndex = (index: number, name: string) =>
+  $: canvasHeight = Math.max(maxSegmentSize(), 400) + activeDetailsHeight;
+
+  const groupNameWithIndex = (name: string, index: number) =>
     `${index}:${name}`;
 
   const onRowClick = (groups: EventGroups, startIndex: number) => {
     if (groups.length === 1) {
       onClick(groups[0]);
     } else {
-      const name = groupNameWithIndex(startIndex, groups[0].name);
+      const name = groupNameWithIndex(groups[0].name, startIndex);
       if (exandedGroups.includes(name)) {
         exandedGroups = exandedGroups.filter((n) => n !== name);
         if (activeGroups.includes(groups[0].id)) {
@@ -81,7 +93,7 @@
     const expandedIndexesAbove = namedGroups
       .map((group) => group[0].name)
       .filter((name) =>
-        exandedGroups.includes(groupNameWithIndex(startIndex, name)),
+        exandedGroups.includes(groupNameWithIndex(name, startIndex)),
       )
       .map((name) => namedGroups.findIndex((group) => group[0].name === name))
       .filter((i) => i < groupIndex);
@@ -89,7 +101,17 @@
     const expandedSize = expandedIndexesAbove
       .map((i) => namedGroups[i].length)
       .reduce((acc, i) => acc + i, 0);
-    return expandedSize * height + groupIndex * height + height / 2;
+
+    const heightAboveRow = activeRowsHeightAboveGroup(
+      activeGroups,
+      groupIndex,
+      timeGroups,
+      fontSizeRatio,
+    );
+
+    return (
+      expandedSize * height + groupIndex * height + height / 2 + heightAboveRow
+    );
   };
 </script>
 
@@ -107,7 +129,7 @@
         startIndex,
       )}
       {@const expanded = exandedGroups.includes(
-        groupNameWithIndex(startIndex, group.name),
+        groupNameWithIndex(group.name, startIndex),
       )}
       <CompactGraphRow
         {group}
@@ -119,16 +141,35 @@
         onClick={() => onRowClick(nameGroup, startIndex)}
         {expanded}
       />
+      {#if activeGroups.includes(group.id) && nameGroup.length === 1}
+        <GroupDetailsRow
+          {group}
+          {canvasWidth}
+          y={startY}
+          config={CompactConfig}
+          onClick={() => onClick && onClick(group)}
+        />
+      {/if}
       {#if expanded}
         {#each nameGroup as group, index}
+          {@const y = startY + (index + 1) * height}
           <CompactGraphRow
             {group}
             {startIndex}
-            y={startY + (index + 1) * height}
+            {y}
             length={(canvasWidth - 2 * gutter) / timeGroups.length}
             active={isActive(group)}
             onClick={() => onClick(group)}
           />
+          {#if activeGroups.includes(group.id)}
+            <GroupDetailsRow
+              {group}
+              {canvasWidth}
+              {y}
+              config={CompactConfig}
+              onClick={() => onClick && onClick(group)}
+            />
+          {/if}
         {/each}
       {/if}
     {/each}
