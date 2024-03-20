@@ -18,7 +18,6 @@
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import { eventFilterSort } from '$lib/stores/event-view';
   import {
     decodeEventHistory,
     filteredEventHistory,
@@ -38,12 +37,12 @@
   $: pendingActivities = workflow?.pendingActivities;
   $: groups = groupEvents(
     $filteredEventHistory,
-    $eventFilterSort,
+    'ascending',
     pendingActivities,
   );
   $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
     $fullEventHistory,
-    $eventFilterSort,
+    'ascending',
   );
   $: workflow, view, clearActives();
 
