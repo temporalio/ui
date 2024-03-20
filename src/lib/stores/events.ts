@@ -13,6 +13,7 @@ import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { isResetEvent } from '$lib/utilities/is-event-type';
 
 import { eventFilterSort } from './event-view';
+import { eventTypeFilter } from './filters';
 import { persistStore } from './persist-store';
 
 const namespace = derived([page], ([$page]) => {
@@ -85,29 +86,10 @@ export const timelineEvents = writable(null);
 
 export const fullEventHistory = writable<WorkflowEvents>([]);
 
-const category = derived([page], ([$page]) =>
-  $page.url.searchParams.get('category'),
-);
-
-const classification = derived([page], ([$page]) =>
-  $page.url.searchParams.get('classification'),
-);
-
 export const filteredEventHistory = derived(
-  [fullEventHistory, category, classification],
-  ([$history, $category, $classification]) => {
-    let history = $history;
-    if ($category) {
-      const types = $category.split(',');
-      history = $history.filter((event) => types.includes(event.category));
-    }
-    if ($classification) {
-      const classifications = $classification.split(',');
-      history = $history.filter((event) =>
-        classifications.includes(event.classification),
-      );
-    }
-    return history;
+  [fullEventHistory, eventTypeFilter],
+  ([$history, $types]) => {
+    return $history.filter((event) => $types.includes(event.category));
   },
 );
 

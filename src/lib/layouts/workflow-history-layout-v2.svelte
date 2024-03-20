@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import EventClassificationFilter from '$lib/components/lines-and-dots/event-classification-filter.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
   import CompactGraph from '$lib/components/lines-and-dots/svg/compact-graph.svelte';
@@ -151,7 +150,6 @@
         <span class="text-sm">{(100 / zoomLevel).toFixed(0)}%</span>
       </div>
       <div class="flex gap-2">
-        <EventClassificationFilter />
         <EventTypeFilter compact={view === 'compact' || view === 'timeline'} />
         <Button
           leadingIcon="download"

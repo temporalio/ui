@@ -31,7 +31,7 @@
   export let config: GraphConfig;
   export let onClick: () => void;
 
-  const { radius, gutter, fontSizeRatio } = config;
+  const { radius, fontSizeRatio, gutter } = config;
 
   $: ({ namespace } = $page.params);
 
@@ -62,7 +62,7 @@
           runId: childRunId,
           sort: 'ascending',
         });
-        startingY += DetailsChildTimelineHeight;
+        textStartingY += DetailsChildTimelineHeight;
       }
     } else {
       fetchChildWorkflow = undefined;
@@ -76,22 +76,19 @@
 
   $: attributes = mergeEventGroupDetails(group);
   $: boxHeight = getDetailsBoxHeight(group, fontSizeRatio);
-  $: boxStartY = y + radius;
-  $: startingX = 1.5 * gutter;
-  let startingY = y + 1.5 * radius;
+  $: startingX = gutter + radius / 2;
+  $: textStartingY = y + radius;
 </script>
 
 <g
   role="button"
   tabindex="0"
-  on:click={onClick}
-  on:keypress={onClick}
   class="relative cursor-pointer"
   height={boxHeight}
 >
   <Box
-    point={[gutter, boxStartY]}
-    width={canvasWidth - 2 * gutter - 4}
+    point={[0, y + radius]}
+    width={canvasWidth}
     height={boxHeight}
     fill="#1E293B"
   />
@@ -114,16 +111,16 @@
     {/if}
   {/await}
   {#each Object.entries(attributes) as [key, value], index (key)}
-    <Text
-      fontSize="14px"
-      point={[startingX, startingY + (index + 1) * fontSizeRatio]}
+    <Text point={[startingX, textStartingY + (index + 1) * fontSizeRatio]}
       >{format(key)}</Text
     >
     <GroupDetailsText
-      point={[startingX + 250, startingY + (index + 1) * fontSizeRatio]}
+      point={[startingX + 320, textStartingY + (index + 1) * fontSizeRatio]}
       {key}
       {value}
       {attributes}
+      {config}
+      {canvasWidth}
     />
   {/each}
 </g>

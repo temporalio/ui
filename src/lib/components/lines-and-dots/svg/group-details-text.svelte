@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
 
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
     getCodeBlockValue,
@@ -15,6 +16,8 @@
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
 
+  import type { GraphConfig } from '../constants';
+
   import TextLink from './text-link.svelte';
   import Text from './text.svelte';
 
@@ -24,7 +27,12 @@
   export let value: string | Record<string, unknown>;
   export let attributes: CombinedAttributes;
   export let point: [number, number] = [0, 0];
+  export let config: GraphConfig;
+  export let canvasWidth: number;
 
+  const { height, fontSizeRatio } = config;
+
+  $: [x, y] = point;
   $: codeBlockValue = getCodeBlockValue(value);
   // $: stackTrace = getStackTrace(codeBlockValue);
 </script>
@@ -33,9 +41,20 @@
   {#if value?.payloads}
     <PayloadDecoder {value} key="payloads" let:decodedValue>
       {#key decodedValue}
-        <Text fontSize="14px" position="middle" {point} category="pending">
+        <foreignObject
+          {x}
+          y={y - 0.75 * fontSizeRatio}
+          width={canvasWidth}
+          {height}
+        >
+          <div class="overflow-auto" style="height: {height}px">
+            <CodeBlock inline content={decodedValue} />
+          </div>
+        </foreignObject>
+
+        <!-- <Text  position="middle" {point} category="pending">
           {decodedValue.slice(1, -1)}
-        </Text>
+        </Text> -->
       {/key}
     </PayloadDecoder>
   {:else if key === 'searchAttributes'}
@@ -45,17 +64,38 @@
       let:decodedValue
     >
       {#key decodedValue}
-        <Text fontSize="14px" position="middle" {point} category="pending">
+        <foreignObject
+          {x}
+          y={y - 0.75 * fontSizeRatio}
+          width={canvasWidth}
+          {height}
+        >
+          <div class="overflow-auto" style="height: {height}px">
+            <CodeBlock inline content={decodedValue} />
+          </div>
+        </foreignObject>
+
+        <!-- <Text  position="middle" {point} category="pending">
           {decodedValue}
-        </Text>
+        </Text> -->
       {/key}
     </PayloadDecoder>
   {:else}
     <PayloadDecoder value={codeBlockValue} let:decodedValue>
       {#key decodedValue}
-        <Text fontSize="14px" position="middle" {point} category="pending">
-          {decodedValue}
-        </Text>
+        <foreignObject
+          {x}
+          y={y - 0.75 * fontSizeRatio}
+          width={canvasWidth}
+          {height}
+        >
+          <div class="overflow-auto" style="height: {height}px">
+            <CodeBlock inline content={decodedValue} />
+          </div>
+        </foreignObject>
+        <!-- <Text  position="middle" {point} category="pending"
+          >{decodedValue}</Text
+        > -->
       {/key}
     </PayloadDecoder>
   {/if}
@@ -69,7 +109,6 @@
       workflow,
       run: value,
     })}
-    fontSize="14px"
     {point}>{value}</TextLink
   >
 {:else if shouldDisplayChildWorkflowLink(key, attributes)}
@@ -79,16 +118,13 @@
       workflow: attributes.workflowExecutionWorkflowId,
       run: attributes.workflowExecutionRunId,
     })}
-    fontSize="14px"
     {point}>{value}</TextLink
   >
   >
 {:else if shouldDisplayAsTaskQueueLink(key)}
-  <TextLink
-    href={routeForTaskQueue({ namespace, queue: value })}
-    fontSize="14px"
-    {point}>{value}</TextLink
+  <TextLink href={routeForTaskQueue({ namespace, queue: value })} {point}
+    >{value}</TextLink
   >
 {:else}
-  <Text fontSize="14px" {point}>{value}</Text>
+  <Text {point}>{value}</Text>
 {/if}

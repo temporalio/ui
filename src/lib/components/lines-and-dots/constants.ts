@@ -26,16 +26,16 @@ export type GraphConfig = {
 
 export const CompactConfig: GraphConfig = {
   height: baseRadius * 8,
-  gutter: baseRadius * 3,
+  gutter: baseRadius * 0,
   radius: baseRadius * 3,
-  fontSizeRatio: baseRadius * 3,
+  fontSizeRatio: baseRadius * 4,
 };
 
 export const TimelineConfig: GraphConfig = {
   height: baseRadius * 6,
   gutter: baseRadius * 3,
   radius: baseRadius * 2,
-  fontSizeRatio: baseRadius * 3,
+  fontSizeRatio: baseRadius * 4,
 };
 
 export const HistoryConfig: GraphConfig = {

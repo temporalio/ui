@@ -136,7 +136,7 @@
         {startIndex}
         count={nameGroup.length}
         y={startY}
-        length={(canvasWidth - 2 * gutter) / timeGroups.length}
+        length={canvasWidth / timeGroups.length}
         active={isActive(group)}
         onClick={() => onRowClick(nameGroup, startIndex)}
         {expanded}

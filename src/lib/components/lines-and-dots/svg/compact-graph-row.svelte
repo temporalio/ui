@@ -21,9 +21,9 @@
   export let expanded = false;
   export let onClick: () => void;
 
-  const { gutter, radius, height } = CompactConfig;
+  const { radius, height } = CompactConfig;
 
-  $: start = gutter + startIndex * length;
+  $: start = radius + startIndex * length;
   $: end = start + length;
   $: aggregateRow = count > 1;
 

@@ -1,25 +1,19 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
-  import MultiSelect from '$lib/holocene/select/multi-select.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     allEventTypeOptions,
     compactEventTypeOptions,
   } from '$lib/models/event-history/get-event-categorization';
-  import { eventCategoryFilter } from '$lib/stores/filters';
+  import { eventTypeFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { isVersionNewer } from '$lib/utilities/version-check';
 
   import { CategoryIcon } from './constants';
 
   export let compact = false;
 
-  $: label = translate('events.event-type');
-
-  let parameter = 'category';
-  let options = (compact ? compactEventTypeOptions : allEventTypeOptions).map(
+  $: options = (compact ? compactEventTypeOptions : allEventTypeOptions).map(
     (o) => ({
       ...o,
       label: translate(o.label),
@@ -32,33 +26,36 @@
       options = options.filter(({ value }) => value !== 'update');
     }
   }
-  $: initialSelected = $eventCategoryFilter
-    ? options.filter((o) => $eventCategoryFilter.includes(o.value))
-    : [];
 
-  const onOptionClick = (_options) => {
-    if (_options.length === options.length) {
-      _options = [];
-    }
-
-    const value = _options.map((o) => o.value).join(',');
-    updateQueryParameters({
-      parameter: parameter,
-      value,
-      url: $page.url,
-    });
+  const onOptionClick = ({ value }) => {
+    $eventTypeFilter = $eventTypeFilter.some((type) => type === value)
+      ? $eventTypeFilter.filter((type) => type !== value)
+      : [...$eventTypeFilter, value];
   };
 </script>
 
-<MultiSelect
-  id="event-category-filter-menu"
-  {options}
-  {initialSelected}
-  {label}
-  active={!!$eventCategoryFilter}
-  selectAllLabel={translate('common.select-all')}
-  clearAllLabel={translate('common.clear-all-capitalized')}
-  onChange={onOptionClick}
-  variant="primary"
-  icon="filter"
-/>
+<div class="flex flex-wrap items-center justify-center gap-4">
+  {#each options as option}
+    <div class="flex items-center gap-2">
+      <input
+        type="checkbox"
+        on:click={() => onOptionClick(option)}
+        checked={$eventTypeFilter.some((type) => type === option.value)}
+      />
+      <div
+        role="button"
+        tabindex="0"
+        class="flex cursor-pointer select-none items-center gap-2 text-sm"
+        on:click={() => onOptionClick(option)}
+        on:keydown={(e) => e.key === 'Enter' && onOptionClick(option)}
+      >
+        {#if option.icon}
+          <span class="lg:hidden"
+            ><Icon slot="trailing" name={option.icon} /></span
+          >
+        {/if}
+        <span class="hidden lg:block">{option.label}</span>
+      </div>
+    </div>
+  {/each}
+</div>

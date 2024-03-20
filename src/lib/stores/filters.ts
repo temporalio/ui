@@ -3,6 +3,7 @@ import { derived, get, writable } from 'svelte/store';
 
 import { page } from '$app/stores';
 
+import { allEventTypeOptions } from '$lib/models/event-history/get-event-categorization';
 import type { WorkflowFilter } from '$lib/models/workflow-filters';
 import { persistStore } from '$lib/stores/persist-store';
 import type { EventClassification, EventTypeCategory } from '$lib/types/events';
@@ -76,3 +77,8 @@ const updateEventClassificationFilter: StartStopNotifier<
 export const eventClassificationFilter = writable<
   EventClassification[] | undefined
 >(undefined, updateEventClassificationFilter);
+
+const defaultOptions = allEventTypeOptions
+  .map(({ value }) => value)
+  .filter((type) => type !== 'marker');
+export const eventTypeFilter = writable<EventTypeCategory[]>(defaultOptions);
