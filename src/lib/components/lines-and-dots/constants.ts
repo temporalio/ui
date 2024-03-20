@@ -1,3 +1,4 @@
+import type { IconName } from '$lib/holocene/icon/paths';
 import type {
   EventGroup,
   EventGroups,
@@ -12,6 +13,11 @@ import {
   formatAttributes,
   formatPendingAttributes,
 } from '$lib/utilities/format-event-attributes';
+import {
+  isStartChildWorkflowExecutionInitiatedEvent,
+  isTimerStartedEvent,
+} from '$lib/utilities/is-event-type';
+import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
 const baseRadius = 8;
 
@@ -28,14 +34,14 @@ export const CompactConfig: GraphConfig = {
   height: baseRadius * 8,
   gutter: baseRadius * 0,
   radius: baseRadius * 3,
-  fontSizeRatio: baseRadius * 4,
+  fontSizeRatio: baseRadius * 3,
 };
 
 export const TimelineConfig: GraphConfig = {
   height: baseRadius * 6,
   gutter: baseRadius * 3,
   radius: baseRadius * 2,
-  fontSizeRatio: baseRadius * 4,
+  fontSizeRatio: baseRadius * 3,
 };
 
 export const HistoryConfig: GraphConfig = {
@@ -45,13 +51,14 @@ export const HistoryConfig: GraphConfig = {
   fontSizeRatio: baseRadius * 2,
 };
 
-export const CategoryIcon = {
+export const CategoryIcon: Record<EventTypeCategory, IconName> = {
   workflow: 'workflow',
   signal: 'signal',
   command: 'sliders',
   activity: 'activity',
   marker: 'pin',
   timer: 'retention',
+  'local-activity': 'summary',
   'child-workflow': 'relationship',
   update: 'merge',
 };
@@ -63,7 +70,7 @@ export const isMiddleEvent = (
   const group = groups.find((g) => g.eventIds.has(event.id));
   if (!group) return false;
   const ids = Array.from(group.eventIds);
-  return ids.indexOf(event.id) === 1;
+  return ids.indexOf(event.id) === 1 && group.eventList.length === 3;
 };
 
 const pairIsConsecutive = (x: string, y: string) => {
@@ -81,8 +88,17 @@ const isConsecutiveGroup = (group: EventGroup): boolean => {
   }
 };
 
+export const isPendingGroup = (group: EventGroup) =>
+  Boolean(
+    group.pendingActivity ||
+      (isTimerStartedEvent(group.initialEvent) &&
+        group.eventList.length === 1) ||
+      (isStartChildWorkflowExecutionInitiatedEvent(group.initialEvent) &&
+        group.eventList.length === 2),
+  );
+
 const getOpenGroups = (
-  event: WorkflowEvent,
+  event: WorkflowEvent | PendingActivity,
   groups: EventGroups,
   pendingActivity?: PendingActivity,
 ): number => {
@@ -104,7 +120,7 @@ const getOpenGroups = (
   const pendingGroups = groups.filter(
     (g) =>
       !g.eventIds.has(event.id) &&
-      g.pendingActivity &&
+      isPendingGroup(g) &&
       parseInt(g.initialEvent.id) < parseInt(group.initialEvent.id),
   );
 
@@ -121,7 +137,7 @@ const getOpenGroups = (
 
 export const getNextDistanceAndOffset = (
   history: WorkflowEvents,
-  event: WorkflowEvent,
+  event: WorkflowEvent | PendingActivity,
   index: number,
   groups: EventGroups,
   pendingActivities: PendingActivity[],
@@ -129,36 +145,49 @@ export const getNextDistanceAndOffset = (
 ): { nextDistance: number; offset: number; y: number } => {
   let nextDistance = 0;
   let offset = 1;
-  const y = (index + 1) * height + height / 2;
+  let y = (index + 1) * height + height / 2;
 
   const group = groups.find((g) => g.eventIds.has(event.id));
   if (!group) {
     return { nextDistance, offset, y };
   }
 
-  const pendingActivity = group.pendingActivity;
-  if (group.eventList.length === 1 && !pendingActivity) {
+  if (group.eventList.length === 1 && !isPendingGroup(group)) {
     return { nextDistance, offset, y };
   }
 
+  const pendingActivity = group.pendingActivity;
   const currentIndex = group.eventList.indexOf(event);
   const nextEvent = group.eventList[currentIndex + 1];
   offset = getOpenGroups(event, groups, pendingActivity);
-  if (!nextEvent && !pendingActivity) {
+
+  if (!nextEvent && !isPendingGroup(group)) {
     return { nextDistance, offset, y };
   }
 
-  // TODO: Dont extend line when activity completes and there was a pending activity
-  // if (!nextEvent && pendingActivity && group.eventList.length === 3) {
-  //   return { nextDistance, offset, y };
-  // }
+  if (
+    isPendingActivity(event) &&
+    event.activityId === group.pendingActivity.activityId
+  ) {
+    y =
+      (history.length + 1) * height +
+      height / 2 +
+      pendingActivities.indexOf(event) * height;
+    return { nextDistance, offset, y };
+  }
 
-  const diff = pendingActivity
-    ? history.length -
+  let diff = 0;
+  if (nextEvent) {
+    diff = parseInt(nextEvent.id) - parseInt(event.id);
+  } else if (pendingActivity) {
+    diff =
+      history.length -
       parseInt(event.id) +
       pendingActivities.indexOf(pendingActivity) +
-      1
-    : parseInt(nextEvent.id) - parseInt(event.id);
+      2;
+  } else if (isPendingGroup(group)) {
+    diff = history.length - parseInt(event.id) + pendingActivities.length + 2;
+  }
   nextDistance = diff * height;
 
   return { nextDistance, offset, y };

@@ -9,11 +9,7 @@
     WorkflowEvents,
   } from '$lib/types/events';
 
-  import {
-    getNextDistanceAndOffset,
-    HistoryConfig,
-    isMiddleEvent,
-  } from '../constants';
+  import { HistoryConfig } from '../constants';
 
   import HistoryGraphRow from './history-graph-row.svelte';
   import Line from './line.svelte';
@@ -68,27 +64,16 @@
     strokeWidth={4}
   />
   {#each history as event, index (event.id)}
-    {@const { nextDistance, offset, y } = getNextDistanceAndOffset(
-      history,
-      event,
-      index,
-      groups,
-      pendingActivities,
-      height,
-    )}
     {@const group = groups.find((g) => g.eventIds.has(event.id))}
     <HistoryGraphRow
       {event}
       {group}
+      {groups}
+      {history}
+      {pendingActivities}
       canvasWidth={canvasWidth * zoomLevel}
       {startingX}
-      {y}
-      {offset}
-      {nextDistance}
       {zoomLevel}
-      category={event.category}
-      classification={event.classification}
-      connectLine={!isMiddleEvent(event, groups)}
       active={isActive(group || event)}
       onClick={() => onClick(group || event)}
       {index}
@@ -100,14 +85,12 @@
     )}
     <HistoryGraphRow
       event={pendingActivity}
-      group={groups.find((g) => g.eventIds.has(pendingActivity.activityId))}
+      {group}
+      {groups}
+      {history}
+      {pendingActivities}
       canvasWidth={canvasWidth * zoomLevel}
       {startingX}
-      y={(history.length + index + 1) * height + height / 2}
-      offset={groups.find((g) => g?.pendingActivity === pendingActivity)
-        ?.level || 1}
-      nextDistance={0}
-      category="pending"
       active={isActive(group)}
       onClick={() => onClick(group)}
       {index}

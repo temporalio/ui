@@ -9,14 +9,14 @@
   const { radius } = HistoryConfig;
 
   export let point: [number, number];
-  export let category: EventTypeCategory | 'pending';
+  export let category: EventTypeCategory | 'pending' | undefined = undefined;
   export let classification: EventClassification | undefined = undefined;
   export let active = false;
   export let r = radius;
 
   $: [x, y] = point;
 
-  const strokeWidth = r / 3;
+  const strokeWidth = 3;
 </script>
 
 <g>
@@ -40,8 +40,9 @@
   .dot {
     cursor: pointer;
     outline: none;
-    fill: #141414;
     opacity: 0.5;
+    stroke: #141414;
+    fill: #e8efff;
   }
 
   .active {
@@ -61,7 +62,7 @@
 
   .signal {
     stroke: #141414;
-    fill: #ec4899;
+    fill: #d300d8;
   }
 
   .activity {
@@ -89,16 +90,38 @@
     fill: #059669;
   }
 
+  .Started {
+    fill: #92a4c3;
+  }
+
+  .Completed {
+    stroke: #00964e;
+    fill: #00f37e;
+  }
+
+  .Fired {
+    stroke: #fed64b;
+    fill: #f8a208;
+  }
+
+  .Signaled {
+    stroke: #ff26ff;
+    fill: #d300d8;
+  }
+
   .Failed,
   .Terminated {
+    stroke: #c71607;
     fill: #ff4518;
   }
 
   .TimedOut {
-    fill: #f88f49;
+    stroke: #f97316;
+    fill: #c2570c;
   }
 
   .Canceled {
-    fill: #fff3c6;
+    stroke: #fff4c6;
+    fill: #fed64b;
   }
 </style>

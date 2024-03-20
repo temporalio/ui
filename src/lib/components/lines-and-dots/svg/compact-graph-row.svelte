@@ -1,12 +1,8 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import {
-    isStartChildWorkflowExecutionInitiatedEvent,
-    isTimerStartedEvent,
-  } from '$lib/utilities/is-event-type';
 
-  import { CategoryIcon, CompactConfig } from '../constants';
+  import { CategoryIcon, CompactConfig, isPendingGroup } from '../constants';
 
   import Dot from './dot.svelte';
   import Line from './line.svelte';
@@ -23,18 +19,11 @@
 
   const { radius, height } = CompactConfig;
 
-  $: start = radius + startIndex * length;
+  $: start = 2 * radius + startIndex * length;
   $: end = start + length;
   $: aggregateRow = count > 1;
 
-  $: isPending =
-    Boolean(
-      group.pendingActivity ||
-        (isTimerStartedEvent(group.initialEvent) &&
-          group.eventList.length === 1) ||
-        (isStartChildWorkflowExecutionInitiatedEvent(group.initialEvent) &&
-          group.eventList.length === 2),
-    ) && !aggregateRow;
+  $: isPending = isPendingGroup(group) && !aggregateRow;
 </script>
 
 <g
@@ -58,9 +47,16 @@
     strokeWidth={radius * 2}
     pending={isPending}
   />
+  <Text
+    point={[start + (4 / 3) * radius, y + radius / 4]}
+    {active}
+    position="middle"
+  >
+    {#if aggregateRow}<tspan font-weight="700">{count}</tspan>{/if}
+    {group?.name}
+  </Text>
   <Dot
     point={[start, y]}
-    category={group.category}
     classification={aggregateRow ? undefined : group.lastEvent.classification}
     {active}
     r={radius}
@@ -85,21 +81,13 @@
   {:else}
     <Icon
       name={CategoryIcon[group.category]}
-      x={start - radius}
-      y={y - radius}
-      width={radius * 2}
-      height={radius * 2}
+      x={start - radius / 1.35}
+      y={y - radius / 1.35}
+      width={radius * 1.5}
+      height={radius * 1.5}
       strokeWidth="4"
     />
   {/if}
-  <Text
-    point={[start + (4 / 3) * radius, y + radius / 4]}
-    {active}
-    position="middle"
-  >
-    {#if aggregateRow}<tspan font-weight="700">{count}</tspan>{/if}
-    {group?.name}
-  </Text>
 </g>
 
 <style lang="postcss">

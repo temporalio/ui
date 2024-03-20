@@ -64,7 +64,7 @@
   }
 
   .signal {
-    stroke: #ec4899;
+    stroke: #d300d8;
   }
 
   .activity {
@@ -88,29 +88,32 @@
   }
 
   .Completed {
-    stroke: #059669;
-    fill: #059669;
+    stroke: #00964e;
   }
 
   .Failed,
   .Terminated {
-    fill: #ff4518;
-    stroke: #ff4518;
+    stroke: #c71607;
+  }
+
+  .Signaled {
+    stroke: #d300d8;
+  }
+
+  .Fired {
+    stroke: #f8a208;
   }
 
   .TimedOut {
-    fill: #f88f49;
-    stroke: #f88f49;
+    stroke: #c2570c;
   }
 
   .Canceled {
-    fill: #fff3c6;
-    stroke: #fff3c6;
+    stroke: #fed64b;
   }
 
   .Running {
     stroke: #3b82f6;
-    fill: #3b82f6;
   }
 
   .animate-line {

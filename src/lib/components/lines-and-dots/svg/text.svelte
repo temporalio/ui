@@ -7,7 +7,7 @@
   export let category: EventTypeCategory | 'pending' | 'none' | 'icon' = 'none';
   export let active = true;
   export let position: 'start' | 'middle' | 'end' = 'start';
-  export let fontSize = '16px';
+  export let fontSize = '14px';
 
   const { radius } = TimelineConfig;
 
@@ -20,11 +20,10 @@
 
 {#if position === 'middle'}
   <rect
-    x={Math.max(0, x - radius / 2)}
+    x={Math.max(0, x - radius / 2 - 3)}
     y={y - radius}
     width={width + radius}
     height={radius * 1.33}
-    opacity="1"
     fill="#141414"
   />
 {/if}

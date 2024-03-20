@@ -8,12 +8,8 @@
     formatDistanceAbbreviated,
     getMillisecondDuration,
   } from '$lib/utilities/format-time';
-  import {
-    isStartChildWorkflowExecutionInitiatedEvent,
-    isTimerStartedEvent,
-  } from '$lib/utilities/is-event-type';
 
-  import { CategoryIcon, TimelineConfig } from '../constants';
+  import { CategoryIcon, isPendingGroup, TimelineConfig } from '../constants';
 
   import Dot from './dot.svelte';
   import Line from './line.svelte';
@@ -36,7 +32,6 @@
     end: endTime,
     onlyUnderSecond: false,
   });
-
   $: timelineWidth = canvasWidth - 2 * gutter;
 
   $: points = group.eventList.map((event) => {
@@ -73,15 +68,16 @@
     y + radius / 3,
   ] as [number, number];
 
-  $: isPending = Boolean(
-    group.pendingActivity ||
-      (isTimerStartedEvent(group.initialEvent) &&
-        group.eventList.length === 1) ||
-      (isStartChildWorkflowExecutionInitiatedEvent(group.initialEvent) &&
-        group.eventList.length === 2),
-  );
-
+  $: isPending = isPendingGroup(group);
   $: active = !activeGroups.length || activeGroups.includes(group.id);
+
+  const getIconIndex = (points: number[]) => {
+    if (!points[1]) return 0;
+    if (points[1] && points[1] - points[0] > radius) return 0;
+    if (!points[2]) return 1;
+    if (points[2] && points[2] - points[1] > radius) return 1;
+    return 2;
+  };
 </script>
 
 <g
@@ -94,6 +90,7 @@
 >
   {#each points as x, index}
     {@const nextPoint = points[index + 1]}
+    {@const showIcon = index === getIconIndex(points)}
     {#if nextPoint}
       <Line
         startPoint={[x, y]}
@@ -121,28 +118,29 @@
         strokeWidth={radius * 2}
       />
     {/if}
+    <Text point={textPoint} {active} position={isPending ? 'middle' : position}>
+      {group?.name}
+      <tspan fill={textInMiddle ? '#ffffff' : '#aebed9'} font-size="12px"
+        >{duration}</tspan
+      >
+    </Text>
     <Dot
       point={[x, y]}
-      category={group.category}
-      classification={group.lastEvent.classification}
+      classification={group.eventList[index]?.classification}
       {active}
       r={radius}
     />
-    <Icon
-      name={CategoryIcon[group.category]}
-      x={x - radius}
-      y={y - radius}
-      width={radius * 2}
-      height={radius * 2}
-      strokeWidth="4"
-    />
+    {#if showIcon}
+      <Icon
+        name={CategoryIcon[group.category]}
+        x={x - radius}
+        y={y - radius}
+        width={radius * 2}
+        height={radius * 2}
+        strokeWidth="4"
+      />
+    {/if}
   {/each}
-  <Text point={textPoint} {active} position={isPending ? 'middle' : position}>
-    {group?.name}
-    <tspan fill={textInMiddle ? '#ffffff' : '#aebed9'} font-size="12px"
-      >{duration}</tspan
-    >
-  </Text>
 </g>
 
 <style lang="postcss">

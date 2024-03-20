@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
 
   export let point: [number, number] = [0, 0];
-  export let fontSize = '16px';
+  export let fontSize = '14px';
   export let href: string;
 
   $: [x, y] = point;

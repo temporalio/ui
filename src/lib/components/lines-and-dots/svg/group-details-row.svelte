@@ -62,11 +62,7 @@
           runId: childRunId,
           sort: 'ascending',
         });
-        textStartingY += DetailsChildTimelineHeight;
       }
-    } else {
-      fetchChildWorkflow = undefined;
-      fetchChildTimeline = undefined;
     }
   };
 
@@ -77,7 +73,9 @@
   $: attributes = mergeEventGroupDetails(group);
   $: boxHeight = getDetailsBoxHeight(group, fontSizeRatio);
   $: startingX = gutter + radius / 2;
-  $: textStartingY = y + radius;
+  $: textStartingY = fetchChildTimeline
+    ? y + radius + DetailsChildTimelineHeight
+    : y + radius;
 </script>
 
 <g

@@ -1,47 +1,68 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import type {
+    EventGroup,
+    EventGroups,
+  } from '$lib/models/event-groups/event-groups';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type {
-    EventClassification,
-    EventTypeCategory,
     PendingActivity,
     WorkflowEvent,
+    WorkflowEvents,
   } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
-  import { CategoryIcon, HistoryConfig } from '../constants';
+  import {
+    CategoryIcon,
+    getNextDistanceAndOffset,
+    HistoryConfig,
+    isMiddleEvent,
+    isPendingGroup,
+  } from '../constants';
 
   import Box from './box.svelte';
   import Dot from './dot.svelte';
   import Line from './line.svelte';
   import Text from './text.svelte';
 
-  export let y: number = 20;
-  export let category: EventTypeCategory | 'pending';
-  export let classification: EventClassification | undefined = undefined;
-
   export let event: WorkflowEvent | PendingActivity;
   export let group: EventGroup;
+  export let history: WorkflowEvents;
+  export let groups: EventGroups;
+  export let pendingActivities: PendingActivity[];
 
   export let canvasWidth: number;
   export let startingX: number;
-  export let nextDistance = 0;
-  export let offset = 1;
-  export let connectLine = false;
   export let active = false;
   export let onClick: (x: WorkflowEvent | PendingActivity) => void;
   export let index: number;
   export let zoomLevel: number = 1;
 
   const { height, radius } = HistoryConfig;
+
+  $: category = isPendingActivity(event) ? 'pending' : event?.category;
+  $: classification = isPendingActivity(event)
+    ? 'pending'
+    : event?.classification;
+  $: connectLine = isPendingActivity(event)
+    ? false
+    : !isMiddleEvent(event, groups);
+
+  $: ({ nextDistance, offset, y } = getNextDistanceAndOffset(
+    history,
+    event,
+    index,
+    groups,
+    pendingActivities,
+    height,
+  ));
+
   const strokeWidth = radius / 2;
   $: horizontalOffset =
     category === 'workflow' ? 0 : (offset / 1.5) * 3 * radius;
-  $: nextIsPending =
-    group?.lastEvent.id === event?.id && group?.pendingActivity;
+  $: nextIsPending = group?.lastEvent.id === event?.id && isPendingGroup(group);
 
   $: withinCanvas = (x: number) => {
     return x <= canvasWidth * zoomLevel;
@@ -99,17 +120,12 @@
     <Line
       startPoint={[startingX + strokeWidth, y]}
       endPoint={[startingX + horizontalOffset - radius, y]}
-      classification={group?.lastEvent?.classification}
+      {category}
       {active}
     />
   {/if}
   {#if withinCanvas(startingX + horizontalOffset)}
-    <Dot
-      point={[startingX + horizontalOffset, y]}
-      {category}
-      {classification}
-      {active}
-    />
+    <Dot point={[startingX + horizontalOffset, y]} {classification} {active} />
   {/if}
   {#if nextDistance && withinCanvas(startingX + horizontalOffset + radius)}
     <Line
@@ -121,10 +137,13 @@
         startingX + horizontalOffset + radius / 2 - strokeWidth,
         y + nextDistance - radius,
       ]}
-      {category}
-      classification={group?.lastEvent?.classification}
+      category={group?.pendingActivity
+        ? group.pendingActivity.attempt > 1
+          ? 'retry'
+          : 'pending'
+        : category}
       {active}
-      strokeDasharray={nextIsPending ? '3' : 'none'}
+      pending={nextIsPending}
     />
   {/if}
 </g>
