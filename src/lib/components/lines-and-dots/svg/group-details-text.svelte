@@ -41,7 +41,12 @@
   {#if value?.payloads}
     <PayloadDecoder {value} key="payloads" let:decodedValue>
       {#key decodedValue}
-        <foreignObject {x} y={y - fontSizeRatio} width={canvasWidth} {height}>
+        <foreignObject
+          {x}
+          y={y - fontSizeRatio}
+          width={canvasWidth - 280}
+          {height}
+        >
           <div class="overflow-auto" style="height: {height}px">
             <CodeBlock inline content={decodedValue} />
           </div>
@@ -58,7 +63,12 @@
       let:decodedValue
     >
       {#key decodedValue}
-        <foreignObject {x} y={y - fontSizeRatio} width={canvasWidth} {height}>
+        <foreignObject
+          {x}
+          y={y - fontSizeRatio}
+          width={canvasWidth - 280}
+          {height}
+        >
           <div class="overflow-auto" style="height: {height}px">
             <CodeBlock inline content={decodedValue} />
           </div>
@@ -72,7 +82,12 @@
   {:else}
     <PayloadDecoder value={codeBlockValue} let:decodedValue>
       {#key decodedValue}
-        <foreignObject {x} y={y - fontSizeRatio} width={canvasWidth} {height}>
+        <foreignObject
+          {x}
+          y={y - fontSizeRatio}
+          width={canvasWidth - 280}
+          {height}
+        >
           <div class="overflow-auto" style="height: {height}px">
             <CodeBlock inline content={decodedValue} />
           </div>

@@ -12,7 +12,6 @@
   const { radius } = TimelineConfig;
 
   let textElement: SVGTextElement;
-
   $: width = textElement?.getBBox()?.width || 0;
 
   $: [x, y] = point;

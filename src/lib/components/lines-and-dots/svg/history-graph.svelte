@@ -9,8 +9,13 @@
     WorkflowEvents,
   } from '$lib/types/events';
 
-  import { HistoryConfig } from '../constants';
+  import {
+    getDetailsBoxHeight,
+    getNextDistanceAndOffset,
+    HistoryConfig,
+  } from '../constants';
 
+  import GroupDetailsRow from './group-details-row.svelte';
   import HistoryGraphRow from './history-graph-row.svelte';
   import Line from './line.svelte';
 
@@ -21,9 +26,9 @@
   export let activeGroups: string[] = [];
   export let canvasWidth: number;
   export let zoomLevel: number = 1;
-  export let onClick: (groupOrEvent: EventGroup | WorkflowEvent) => void;
+  export let onClick: (group: EventGroup, event: WorkflowEvent) => void;
 
-  const { height } = HistoryConfig;
+  const { height, fontSizeRatio, radius } = HistoryConfig;
 
   $: isActive = (groupOrEvent: EventGroup | WorkflowEvent): boolean => {
     if (!activeEvents.length && !activeGroups.length) return true;
@@ -34,8 +39,18 @@
     }
   };
 
+  $: activeDetailsHeight = activeEvents
+    .map((id) => {
+      const group = groups.find((group) => group.id === id);
+      const event = history.find((event) => event.id === id);
+      return getDetailsBoxHeight(group ?? event, fontSizeRatio);
+    })
+    .reduce((acc, height) => acc + height, 0);
+
   $: canvasHeight = Math.max(
-    height * 2 + height * (history.length + pendingActivities.length),
+    height * 2 +
+      height * (history.length + pendingActivities.length) +
+      activeDetailsHeight,
     400,
   );
 
@@ -71,13 +86,34 @@
       {groups}
       {history}
       {pendingActivities}
+      {activeEvents}
       canvasWidth={canvasWidth * zoomLevel}
       {startingX}
       {zoomLevel}
       active={isActive(group || event)}
-      onClick={() => onClick(group || event)}
+      onClick={() => onClick(group, event)}
       {index}
     />
+    {#if activeEvents.includes(event.id)}
+      <GroupDetailsRow
+        y={getNextDistanceAndOffset(
+          history,
+          event,
+          index,
+          groups,
+          pendingActivities,
+          activeEvents,
+          height,
+          fontSizeRatio,
+        ).y +
+          radius / 2}
+        {group}
+        {event}
+        {canvasWidth}
+        view="history"
+        config={HistoryConfig}
+      />
+    {/if}
   {/each}
   {#each pendingActivities as pendingActivity, index}
     {@const group = groups.find((g) =>
@@ -85,6 +121,7 @@
     )}
     <HistoryGraphRow
       event={pendingActivity}
+      {activeEvents}
       {group}
       {groups}
       {history}
@@ -92,7 +129,7 @@
       canvasWidth={canvasWidth * zoomLevel}
       {startingX}
       active={isActive(group)}
-      onClick={() => onClick(group)}
+      onClick={() => onClick(pendingActivity, group)}
       {index}
     />
   {/each}

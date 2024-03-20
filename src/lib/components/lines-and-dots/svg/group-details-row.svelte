@@ -7,6 +7,7 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
+  import type { WorkflowEvent } from '$lib/types/events';
   import { format } from '$lib/utilities/format-camel-case';
   import {
     isChildWorkflowExecutionCompletedEvent,
@@ -17,6 +18,7 @@
     DetailsChildTimelineHeight,
     getDetailsBoxHeight,
     type GraphConfig,
+    type GraphView,
     mergeEventGroupDetails,
   } from '../constants';
 
@@ -26,10 +28,11 @@
   import TimelineGraph from './timeline-graph.svelte';
 
   export let group: EventGroup;
+  export let event: WorkflowEvent | undefined = undefined;
   export let canvasWidth: number;
   export let y: number;
   export let config: GraphConfig;
-  export let onClick: () => void;
+  export let view: GraphView;
 
   const { radius, fontSizeRatio, gutter } = config;
 
@@ -70,12 +73,15 @@
     fetchChildWorkflowForGroup(group);
   });
 
-  $: attributes = mergeEventGroupDetails(group);
-  $: boxHeight = getDetailsBoxHeight(group, fontSizeRatio);
+  $: groupOrEvent = group ?? event;
+  $: attributes = mergeEventGroupDetails(groupOrEvent);
+  $: boxHeight = getDetailsBoxHeight(groupOrEvent, fontSizeRatio);
   $: startingX = gutter + radius / 2;
   $: textStartingY = fetchChildTimeline
     ? y + radius + DetailsChildTimelineHeight
     : y + radius;
+
+  $: width = view === 'history' ? canvasWidth / 2 : canvasWidth;
 </script>
 
 <g
@@ -84,12 +90,7 @@
   class="relative cursor-pointer"
   height={boxHeight}
 >
-  <Box
-    point={[0, y + radius]}
-    width={canvasWidth}
-    height={boxHeight}
-    fill="#1E293B"
-  />
+  <Box point={[0, y + radius]} {width} height={boxHeight} fill="#1E293B" />
   {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [childWorkflow, childHistory]}
     {#if childWorkflow && childHistory}
       {@const groups = groupEvents(
@@ -104,7 +105,7 @@
         workflow={childWorkflow.workflow}
         history={childHistory}
         {groups}
-        {canvasWidth}
+        canvasWidth={width}
       />
     {/if}
   {/await}
@@ -113,12 +114,12 @@
       >{format(key)}</Text
     >
     <GroupDetailsText
-      point={[startingX + 320, textStartingY + (index + 1) * fontSizeRatio]}
+      point={[startingX + 240, textStartingY + (index + 1) * fontSizeRatio]}
       {key}
       {value}
       {attributes}
       {config}
-      {canvasWidth}
+      canvasWidth={width}
     />
   {/each}
 </g>

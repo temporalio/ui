@@ -13,11 +13,15 @@
   import CompactGraphRow from './compact-graph-row.svelte';
   import GroupDetailsRow from './group-details-row.svelte';
 
-  export let groups: EventGroups;
+  export let x = 0;
+  export let y = 0;
+  export let staticHeight = 0;
 
+  export let groups: EventGroups;
   export let activeGroups: string[] = [];
   export let zoomLevel: number = 1;
   export let canvasWidth: number;
+
   export let onClick: (group: EventGroup) => void | undefined = undefined;
 
   const { height, gutter, fontSizeRatio } = CompactConfig;
@@ -116,8 +120,10 @@
 </script>
 
 <svg
+  {x}
+  {y}
   viewBox="0 0 {canvasWidth} {canvasHeight}"
-  height={canvasHeight / zoomLevel}
+  height={(staticHeight || canvasHeight) / zoomLevel}
   width={canvasWidth}
 >
   {#each timeGroups as groups, startIndex}
@@ -147,7 +153,7 @@
           {canvasWidth}
           y={startY}
           config={CompactConfig}
-          onClick={() => onClick && onClick(group)}
+          view="compact"
         />
       {/if}
       {#if expanded}
@@ -167,7 +173,7 @@
               {canvasWidth}
               {y}
               config={CompactConfig}
-              onClick={() => onClick && onClick(group)}
+              view="compact"
             />
           {/if}
         {/each}

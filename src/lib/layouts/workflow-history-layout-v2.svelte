@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import type { GraphView } from '$lib/components/lines-and-dots/constants';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
   import CompactGraph from '$lib/components/lines-and-dots/svg/compact-graph.svelte';
@@ -15,7 +16,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { groupEvents, isEventGroup } from '$lib/models/event-groups';
+  import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { eventFilterSort } from '$lib/stores/event-view';
   import {
@@ -29,7 +30,7 @@
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  let view = 'compact';
+  let view: GraphView = 'history';
   let zoomLevel = 1;
 
   $: ({ namespace } = $page.params);
@@ -57,20 +58,29 @@
     activeEvents = [];
   };
 
-  const setActives = (eventOrGroup: EventGroup | WorkflowEvent) => {
-    if (isEventGroup(eventOrGroup)) {
-      activeEvents = [];
-      if (!activeGroups.includes(eventOrGroup.id)) {
-        activeGroups = [...activeGroups, eventOrGroup.id];
-      } else {
-        activeGroups = activeGroups.filter((id) => id !== eventOrGroup.id);
-      }
+  const setActiveGroup = (group: EventGroup) => {
+    activeEvents = [];
+    if (!activeGroups.includes(group.id)) {
+      activeGroups = [...activeGroups, group.id];
     } else {
-      activeGroups = [];
-      if (!activeEvents.includes(eventOrGroup.id)) {
-        activeEvents = [...activeEvents, eventOrGroup.id];
+      activeGroups = activeGroups.filter((id) => id !== group.id);
+    }
+  };
+
+  const setActiveGroupAndEvent = (group: EventGroup, event: WorkflowEvent) => {
+    if (group) {
+      if (!activeGroups.includes(group.id)) {
+        activeGroups = [...activeGroups, group.id];
       } else {
-        activeEvents = activeGroups.filter((id) => id !== eventOrGroup.id);
+        activeGroups = activeGroups.filter((id) => id !== group.id);
+      }
+    }
+
+    if (event) {
+      if (!activeEvents.includes(event.id)) {
+        activeEvents = [...activeEvents, event.id];
+      } else {
+        activeEvents = activeGroups.filter((id) => id !== event.id);
       }
     }
   };
@@ -169,7 +179,7 @@
         {activeGroups}
         {zoomLevel}
         {canvasWidth}
-        onClick={setActives}
+        onClick={setActiveGroup}
       />
     {:else if view === 'timeline'}
       <TimelineGraph
@@ -179,7 +189,7 @@
         {activeGroups}
         {zoomLevel}
         {canvasWidth}
-        onClick={setActives}
+        onClick={setActiveGroup}
       />
     {:else}
       <HistoryGraph
@@ -190,7 +200,7 @@
         {pendingActivities}
         {zoomLevel}
         {canvasWidth}
-        onClick={setActives}
+        onClick={setActiveGroupAndEvent}
       />
     {/if}
   </div>

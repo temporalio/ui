@@ -32,6 +32,7 @@
   export let history: WorkflowEvents;
   export let groups: EventGroups;
   export let pendingActivities: PendingActivity[];
+  export let activeEvents: string[];
 
   export let canvasWidth: number;
   export let startingX: number;
@@ -40,7 +41,7 @@
   export let index: number;
   export let zoomLevel: number = 1;
 
-  const { height, radius } = HistoryConfig;
+  const { height, radius, fontSizeRatio } = HistoryConfig;
 
   $: category = isPendingActivity(event) ? 'pending' : event?.category;
   $: classification = isPendingActivity(event)
@@ -56,7 +57,9 @@
     index,
     groups,
     pendingActivities,
+    activeEvents,
     height,
+    fontSizeRatio,
   ));
 
   const strokeWidth = radius / 2;

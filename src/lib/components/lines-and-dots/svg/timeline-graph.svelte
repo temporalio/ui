@@ -82,7 +82,7 @@
         {group}
         {canvasWidth}
         config={TimelineConfig}
-        onClick={() => onClick && onClick(group)}
+        view="timeline"
       />
     {/if}
   {/each}
