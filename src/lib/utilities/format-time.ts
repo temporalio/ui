@@ -36,7 +36,7 @@ export function formatDuration(
   delimiter = ', ',
 ): string {
   if (duration === null || !duration) return '';
-  if (typeof duration === 'string') duration = fromSeconds(duration);
+  if (typeof duration === 'string') return fromSeconds(duration, { delimiter });
   return durationToString(duration, { delimiter });
 }
 
@@ -50,6 +50,9 @@ export function formatDurationAbbreviated(
 function formatDistanceToSingleLetters(distance: string) {
   if (!distance) return '';
   distance = distance
+    .replace(/milliseconds/g, 'ms')
+    .replace(/millisecond/g, 'ms')
+    .replace(/ ms/g, 'ms')
     .replace(/seconds/g, 'second')
     .replace(/second/g, 's')
     .replace(/ s/g, 's')
