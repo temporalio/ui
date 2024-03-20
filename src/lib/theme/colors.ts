@@ -160,7 +160,7 @@ const colors = {
   offWhite: '#F8FAFC',
   black: '#141414',
   offBlack: '#0F172A',
-  blurple: '#444CE7',
+  ultraviolet: '#444CE7',
   current: 'currentColor',
   transparent: 'transparent',
   ...palette,

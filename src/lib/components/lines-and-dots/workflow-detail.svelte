@@ -51,6 +51,6 @@
 
 <style lang="postcss">
   .value {
-    @apply flex w-fit flex-row items-center justify-center truncate break-all rounded-sm bg-blurple p-1 leading-4 transition-colors;
+    @apply flex w-fit flex-row items-center justify-center truncate break-all rounded-sm bg-ultraviolet p-1 leading-4 transition-colors;
   }
 </style>

@@ -183,7 +183,7 @@
             }),
           )}
         >
-          <Badge type="blurple" class="px-2 py-0"
+          <Badge type="ultraviolet" class="px-2 py-0"
             >{workflow?.historyEvents}</Badge
           >
         </Tab>
@@ -196,7 +196,7 @@
             routeForWorkers(routeParameters),
           )}
         >
-          <Badge type="blurple" class="px-2 py-0"
+          <Badge type="ultraviolet" class="px-2 py-0"
             >{workers?.pollers?.length}</Badge
           >
         </Tab>
@@ -209,7 +209,7 @@
             routeForRelationships(routeParameters),
           )}
         >
-          <Badge type="blurple" class="px-2 py-0"
+          <Badge type="ultraviolet" class="px-2 py-0"
             >{workflowRelationships.relationshipCount}</Badge
           >
         </Tab>

@@ -14,7 +14,7 @@
     | 'green'
     | 'blue'
     | 'purple'
-    | 'blurple'
+    | 'ultraviolet'
     | 'gray';
 </script>
 
@@ -65,7 +65,7 @@
     @apply h-6 w-6 min-w-max rounded-full bg-blue-700 text-white;
   }
 
-  .blurple {
-    @apply border-blurple bg-blurple text-indigo-100;
+  .ultraviolet {
+    @apply border-ultraviolet bg-ultraviolet text-indigo-100;
   }
 </style>
