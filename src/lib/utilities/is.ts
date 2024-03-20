@@ -97,8 +97,7 @@ export const isQuote = (x: unknown): x is Quote => {
 };
 
 export const isBacktick = (x: unknown): x is Backtick => {
-  if (x === '`') return true;
-  return false;
+  return x === '`';
 };
 
 export const isOperator = (x: unknown): x is Operator => {
