@@ -63,7 +63,6 @@
           namespace,
           workflowId: childWorkflowId,
           runId: childRunId,
-          sort: 'ascending',
         });
       }
     }

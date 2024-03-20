@@ -17,6 +17,7 @@
   import { authUser } from '$lib/stores/auth-user';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
   import { fullEventHistory, timelineEvents } from '$lib/stores/events';
+  import { labsMode } from '$lib/stores/labs-mode';
   import {
     initialWorkflowRun,
     refresh,
@@ -49,6 +50,7 @@
     workflowId: string,
     runId: string,
     sort: EventSortOrder,
+    labsMode: boolean,
   ) => {
     const { settings } = $page.data;
 
@@ -79,7 +81,7 @@
       namespace,
       workflowId,
       runId,
-      sort,
+      sort: labsMode ? 'ascending' : sort,
       signal: eventHistoryController.signal,
       historySize: workflow.historyEvents,
     });
@@ -114,7 +116,13 @@
     }
   };
 
-  $: getWorkflowAndEventHistory(namespace, workflowId, runId, $eventFilterSort);
+  $: getWorkflowAndEventHistory(
+    namespace,
+    workflowId,
+    runId,
+    $eventFilterSort,
+    $labsMode,
+  );
   $: getOnlyWorkflowWithPendingActivities(
     $refresh,
     namespace,

@@ -75,7 +75,7 @@ export const fetchAllEvents = async ({
   namespace,
   workflowId,
   runId,
-  sort,
+  sort = 'ascending',
   signal,
   historySize,
 }: FetchEventsParameters): Promise<CommonHistoryEvent[]> => {
