@@ -1,3 +1,4 @@
+import type { Timestamp } from '@temporalio/common';
 import { v4 as uuidv4 } from 'uuid';
 
 import { translate } from '$lib/i18n/translate';
@@ -249,6 +250,43 @@ export async function triggerImmediately({
     patch: {
       triggerImmediately: {
         overlapPolicy,
+      },
+    },
+  };
+
+  const route = routeForApi('schedule.patch', {
+    namespace,
+    scheduleId: scheduleId,
+  });
+  return await requestFromAPI<null>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        ...options,
+        request_id: uuidv4(),
+      }),
+    },
+  });
+}
+
+type BackfillOptions = TriggerImmediatelyOptions & {
+  startTime: Timestamp;
+  endTime: Timestamp;
+};
+
+export async function backfillRequest({
+  namespace,
+  scheduleId,
+  overlapPolicy,
+  startTime,
+  endTime,
+}: BackfillOptions): Promise<null> {
+  const options = {
+    patch: {
+      backfillRequest: {
+        overlapPolicy,
+        startTime,
+        endTime,
       },
     },
   };

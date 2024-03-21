@@ -32,6 +32,8 @@ export const Strings = {
     'Are you sure you want to unpause {{schedule}}?',
   'unpause-reason': 'Enter a reason for unpausing the schedule.',
   trigger: 'Trigger',
+  backfill: 'Backfill',
+  'more-options': 'More options',
   'trigger-modal-title': 'Trigger Immediately',
   'trigger-unspecified-title': 'Use Policy',
   'trigger-unspecified-description': "Use the Schedule's overlap policy.",
