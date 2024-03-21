@@ -28,7 +28,6 @@
     id="minute"
     label="min"
     labelHidden
-    required
     bind:value={minute}
     placeholder="00"
     suffix="min"
