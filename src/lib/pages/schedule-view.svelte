@@ -1,7 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import { startOfDay } from 'date-fns';
+  import { addDays, addHours, startOfDay } from 'date-fns';
   import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 
   import { goto } from '$app/navigation';
@@ -182,6 +182,26 @@
   const onEndDateChange = (d: CustomEvent) => {
     endDate = startOfDay(d.detail);
   };
+
+  const updateDefaultBackfillTimes = () => {
+    const currentDate = new Date(Date.now());
+    const dateAnHourAhead = addHours(currentDate, 1);
+
+    startHour = currentDate.getUTCHours().toString();
+    startMinute = currentDate.getUTCMinutes().toString();
+    startSecond = currentDate.getUTCSeconds().toString();
+    endHour = dateAnHourAhead.getUTCHours().toString();
+    endMinute = dateAnHourAhead.getUTCMinutes().toString();
+    endSecond = dateAnHourAhead.getUTCSeconds().toString();
+
+    startDate = startOfDay(new Date());
+    endDate =
+      endHour < startHour
+        ? startOfDay(addDays(new Date(), 1))
+        : startOfDay(new Date());
+  };
+
+  $: backfillConfirmationModalOpen && updateDefaultBackfillTimes();
 
   const applyTimeSelection = (): {
     startTime: Timestamp;
