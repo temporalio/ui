@@ -26,6 +26,8 @@
   } = $page.params);
 
   let loading = false;
+  let eventGroup: EventGroup;
+  let events: EventGroup[] = [];
 
   const resetFullHistory = () => {
     $fullEventHistory = [];
@@ -48,6 +50,10 @@
       });
       loading = false;
     }
+    eventGroup = groupEvents($fullEventHistory, $eventFilterSort).find(
+      (e) => e.id === groupId,
+    );
+    if (eventGroup) events = [eventGroup];
   };
 
   $: fetchEvents(namespace, workflowId, runId);
@@ -57,10 +63,6 @@
     : $eventHistory?.start;
   $: initialItem = currentEvents?.[0];
   $: updating = currentEvents.length && !$fullEventHistory.length;
-  $: eventGroup = groupEvents($fullEventHistory, $eventFilterSort).find(
-    (e) => e.id === groupId,
-  );
-  $: events = eventGroup ? [eventGroup] : [];
 
   function getLink(group: EventGroup) {
     const childEvent = group?.eventList.find(isChildWorkflowClosedEvent);
