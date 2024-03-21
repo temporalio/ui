@@ -1,4 +1,11 @@
-import { isConditional, isParenthesis, isQuote, isSpace } from '../is';
+import {
+  isBacktick,
+  isConditional,
+  isOperator,
+  isParenthesis,
+  isQuote,
+  isSpace,
+} from '../is';
 
 type Tokens = string[];
 
@@ -14,8 +21,35 @@ export const tokenize = (string: string): Tokens => {
   let buffer = '';
   let cursor = 0;
 
+  const getAttributeWithSpaces = () => {
+    for (let i = cursor + 1; i < string.length; i++) {
+      const character = string[i];
+
+      if (isBacktick(character)) {
+        addBufferToTokens();
+        cursor = i + 1;
+        return;
+      }
+      buffer += character;
+    }
+    cursor++;
+  };
+
   while (cursor < string.length) {
     const character = string[cursor];
+
+    if (isBacktick(character)) {
+      const isPotentialStartofAttribute =
+        cursor === 0 ||
+        (isSpace(string[cursor - 1]) && isOperator(tokens[tokens.length - 1]));
+      const hasClosingBacktick = string.slice(cursor + 1).includes('`');
+
+      if (isPotentialStartofAttribute && hasClosingBacktick) {
+        addBufferToTokens();
+        getAttributeWithSpaces();
+        continue;
+      }
+    }
 
     if (isParenthesis(character)) {
       buffer += character;

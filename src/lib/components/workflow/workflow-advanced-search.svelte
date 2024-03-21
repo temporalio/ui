@@ -8,6 +8,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowFilters } from '$lib/stores/filters';
+  import { searchAttributes } from '$lib/stores/search-attributes';
   import { refresh, workflowsQuery } from '$lib/stores/workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -30,7 +31,10 @@
       $workflowsQuery = '';
     } else {
       try {
-        $workflowFilters = toListWorkflowFilters(manualSearchString);
+        $workflowFilters = toListWorkflowFilters(
+          manualSearchString,
+          $searchAttributes,
+        );
       } catch (e) {
         console.error(e);
       }
