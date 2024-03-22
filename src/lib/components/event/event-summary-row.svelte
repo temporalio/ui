@@ -144,8 +144,8 @@
           {isEventGroup(event)
             ? event.displayName
             : isLocalActivityMarkerEvent(event)
-            ? 'LocalActivity'
-            : event.name}
+              ? 'LocalActivity'
+              : event.name}
         </p>
         {#if expanded}
           <div>

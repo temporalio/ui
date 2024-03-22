@@ -45,31 +45,31 @@
   }
 
   table.fancy {
-    @apply border-table surface-primary border-separate border-spacing-0 rounded-xl border-2;
+    @apply surface-primary border-separate border-spacing-0 rounded-xl border-2 border-table;
 
     thead {
       @apply surface-table;
 
       :global(th) {
-        @apply border-table border-t px-1 py-2;
+        @apply border-t border-table px-1 py-2;
       }
 
       :global(td) {
         @apply border-t  px-1 py-2;
 
         &:first-child {
-          @apply border-table w-[1px] rounded-tl-lg border-l;
+          @apply w-[1px] rounded-tl-lg border-l border-table;
         }
 
         &:last-child {
-          @apply border-table w-[1px] rounded-tr-lg border-r;
+          @apply w-[1px] rounded-tr-lg border-r border-table;
         }
       }
     }
 
     tbody :global {
       td {
-        @apply border-table border-t px-1 py-2 text-sm;
+        @apply border-t border-table px-1 py-2 text-sm;
 
         &:first-child {
           @apply px-1;

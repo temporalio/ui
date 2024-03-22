@@ -69,8 +69,12 @@
     }
 
     &.dark {
-      @apply bg-inverse text-slate-100;
+      @apply bg-inverse text-white;
     }
+  }
+
+  .stuff:hover {
+    @apply text-red;
   }
 
   .close-button-wrapper {

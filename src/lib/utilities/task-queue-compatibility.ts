@@ -25,8 +25,8 @@ export const getDefaultVersionForSetFromABuildId = (
   compatibility: TaskQueueCompatibility | undefined,
   buildId: string,
 ): string | undefined => {
-  const buildIdSet = compatibility?.majorVersionSets?.find(
-    (set) => set.buildIds?.includes(buildId),
+  const buildIdSet = compatibility?.majorVersionSets?.find((set) =>
+    set.buildIds?.includes(buildId),
   );
   return getDefaultVersionForSet(buildIdSet?.buildIds);
 };
