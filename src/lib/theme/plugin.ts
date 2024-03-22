@@ -13,6 +13,7 @@ export const variables = {
   '--color-interactive-hover': rgb(getColor('indigo', 700)),
 
   '--color-text-black': rgb(colors.black),
+  '--color-text-white': rgb(colors.white),
   '--color-text-primary': rgb(colors.primary),
   '--color-text-secondary': rgb(colors.secondary),
   '--color-text-inverse': rgb(colors.offWhite),
@@ -32,6 +33,7 @@ export const variables = {
   '--color-surface-disabled': rgb(getColor('slate', 50)),
   '--color-surface-inverse': rgb(colors.primary),
   '--color-surface-subtle': rgb(getColor('slate', 100)),
+  '--color-surface-table': rgb(colors.black),
   '--color-surface-badge': rgb(getColor('slate', 100)),
   '--color-surface-error': rgb(getColor('red', 50)),
   '--color-surface-information': rgb(getColor('blue', 50)),
@@ -78,6 +80,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-surface-interactive-secondary': rgb(getColor('slate', 800)),
   '--color-surface-secondary-active': rgb(getColor('slate', 700)),
   '--color-surface-subtle': rgb(getColor('slate', 900)),
+  '--color-surface-table': rgb(getColor('slate', 900)),
   '--color-surface-badge': rgb(getColor('slate', 700)),
   '--color-surface-information': rgb(getColor('blue', 950)),
   '--color-surface-warning': rgb(getColor('yellow', 950)),
@@ -136,6 +139,10 @@ const temporal = plugin(
       '.surface-subtle': {
         backgroundColor: css('--color-surface-subtle'),
         color: css('--color-text-primary'),
+      },
+      '.surface-table': {
+        backgroundColor: css('--color-surface-table'),
+        color: css('--color-text-white'),
       },
       '.surface-warning': {
         backgroundColor: css('--color-surface-subtle'),
