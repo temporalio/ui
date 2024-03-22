@@ -11,7 +11,7 @@
   export let columnWidths: number[] = new Array(columns).fill(100 / columns);
 </script>
 
-<Table class="w-full table-fixed" variant="skeleton">
+<Table class="w-full table-fixed" variant="fancy">
   <TableHeaderRow slot="headers" class="h-8">
     <slot name="headers">
       {#each Array.from(new Array(columns)) as _column, i}
