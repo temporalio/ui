@@ -11,7 +11,7 @@
   } from '$lib/utilities/task-queue-compatibility';
 
   let { namespace } = $page.params;
-  $: ({ workers, workflow, compatibility } = $workflowRun);
+  $: ({ workers, workflow, rules, compatibility } = $workflowRun);
 
   $: taskQueue = workflow?.taskQueue;
   $: versioningEnabled = pollerHasVersioning(workers.pollers);
@@ -22,9 +22,15 @@
   {#await getWorkerTaskReachability({ namespace, buildIds, taskQueue })}
     <SkeletonTable rows={3} />
   {:then reachability}
-    <WorkersList {taskQueue} {workers} {compatibility} {reachability} />
+    <WorkersList
+      taskQueue={workflow?.taskQueue}
+      {workers}
+      {rules}
+      {compatibility}
+      {reachability}
+    />
   {:catch}
-    <WorkersList {taskQueue} {workers} />
+    <WorkersList {taskQueue} {workers} {rules} />
   {/await}
 {:else}
   <WorkersList {taskQueue} {workers} />
