@@ -8,7 +8,9 @@ export const TEMPORAL_THEME = EditorView.theme(
     '&': {
       color: 'white',
       backgroundColor: colors.gray['900'],
-      borderRadius: '0.5rem',
+      borderRadius: '0.75rem',
+      borderWidth: '2px',
+      borderColor: colors.slate['600'],
       padding: '0.5rem',
     },
     '.cm-matchingBracket': {
@@ -34,7 +36,7 @@ export const TEMPORAL_THEME = EditorView.theme(
       backgroundColor: colors.gray['700'],
     },
     '.cm-gutters': {
-      backgroundColor: 'transparent',
+      backgroundColor: colors.gray['900'],
       color: colors.white,
       borderRight: 'none',
     },
@@ -46,12 +48,12 @@ export const TEMPORAL_THEME = EditorView.theme(
 );
 
 export const TEMPORAL_SYNTAX = HighlightStyle.define([
-  { tag: tags.punctuation, color: colors.gray['200'] },
-  { tag: tags.string, color: colors.green['200'] },
-  { tag: tags.propertyName, color: colors.purple['200'] },
-  { tag: tags.bool, color: colors.indigo['200'] },
-  { tag: tags.number, color: colors.indigo['200'] },
-  { tag: tags.operator, color: colors.purple['400'] },
-  { tag: tags.comment, color: colors.gray['400'] },
-  { tag: tags.variableName, color: colors.green['200'] },
+  { tag: tags.punctuation, color: colors.slate['200'] },
+  { tag: tags.string, color: colors.slate['200'] },
+  { tag: tags.propertyName, color: colors.indigo['600'] },
+  { tag: tags.bool, color: colors.slate['200'] },
+  { tag: tags.number, color: colors.slate['200'] },
+  { tag: tags.operator, color: colors.pink['500'] },
+  { tag: tags.comment, color: colors.green['600'] },
+  { tag: tags.variableName, color: colors.pink['500'] },
 ]);
