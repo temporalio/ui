@@ -30,7 +30,8 @@
       {label}
     </Button>
     <MenuButton
-      class="max-w-fit grow-0 sm:px-1"
+      class="max-w-fit grow-0"
+      padding="px-1"
       id="{id}-menu-button"
       label={menuLabel}
       controls="{id}-menu"
