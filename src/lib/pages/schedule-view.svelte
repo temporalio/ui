@@ -69,7 +69,7 @@
   let deleteConfirmationModalOpen = false;
   let reason = '';
   let error = '';
-  let triggerLoading = false;
+  let scheduleUpdating = false;
   let overlapPolicy = writable<OverlapPolicy>('Unspecified');
   let policies: { label: string; description: string; value: OverlapPolicy }[] =
     [
@@ -150,8 +150,13 @@
     pauseConfirmationModalOpen = false;
   };
 
+  const closeTriggerModal = () => {
+    triggerConfirmationModalOpen = false;
+    $overlapPolicy = 'Unspecified';
+  };
+
   const handleTriggerImmediately = async () => {
-    triggerLoading = true;
+    scheduleUpdating = true;
     await triggerImmediately({
       namespace,
       scheduleId,
@@ -159,8 +164,8 @@
     });
     setTimeout(() => {
       scheduleFetch = fetchSchedule(parameters);
-      triggerConfirmationModalOpen = false;
-      triggerLoading = false;
+      closeTriggerModal();
+      scheduleUpdating = false;
     }, 1000);
   };
 
@@ -234,8 +239,14 @@
     return { startTime, endTime };
   };
 
+  const closeBackfillModal = () => {
+    backfillConfirmationModalOpen = false;
+    viewMoreBackfillOptions = false;
+    $overlapPolicy = 'Unspecified';
+  };
+
   const handleBackfill = async () => {
-    triggerLoading = true;
+    scheduleUpdating = true;
     const { startTime, endTime } = applyTimeSelection();
 
     await backfillRequest({
@@ -247,8 +258,8 @@
     });
     setTimeout(() => {
       scheduleFetch = fetchSchedule(parameters);
-      backfillConfirmationModalOpen = false;
-      triggerLoading = false;
+      closeBackfillModal();
+      scheduleUpdating = false;
     }, 1000);
   };
 
@@ -460,12 +471,9 @@
       confirmType="primary"
       confirmText={translate('schedules.trigger')}
       cancelText={translate('common.cancel')}
-      loading={triggerLoading}
+      loading={scheduleUpdating}
       on:confirmModal={() => handleTriggerImmediately()}
-      on:cancelModal={() => {
-        triggerConfirmationModalOpen = false;
-        $overlapPolicy = 'Unspecified';
-      }}
+      on:cancelModal={closeTriggerModal}
     >
       <h3 slot="title">
         {translate('schedules.trigger-modal-title')}
@@ -494,13 +502,9 @@
       confirmType="primary"
       confirmText={translate('schedules.schedule')}
       cancelText={translate('common.cancel')}
-      loading={triggerLoading}
+      loading={scheduleUpdating}
       on:confirmModal={() => handleBackfill()}
-      on:cancelModal={() => {
-        backfillConfirmationModalOpen = false;
-        viewMoreBackfillOptions = false;
-        $overlapPolicy = 'Unspecified';
-      }}
+      on:cancelModal={closeBackfillModal}
     >
       <h3 slot="title">
         {translate('schedules.schedule')}
