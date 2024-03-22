@@ -2,7 +2,6 @@
   import { writable } from 'svelte/store';
 
   import { addDays, addHours, startOfDay } from 'date-fns';
-  import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -209,32 +208,27 @@
   $: backfillConfirmationModalOpen && updateDefaultBackfillTimes();
 
   const applyTimeSelection = (): {
-    startTime: Timestamp;
-    endTime: Timestamp;
+    startTime: string;
+    endTime: string;
   } => {
-    const startTime = new Timestamp();
-    const startTimeInSeconds =
-      Date.UTC(
-        startDate.getFullYear(),
-        startDate.getMonth(),
-        startDate.getDay(),
-        Number(startHour),
-        Number(startMinute),
-        Number(startSecond),
-      ) * 1000;
-    startTime.setSeconds(startTimeInSeconds);
-
-    const endTime = new Timestamp();
-    const endTimeInSeconds =
-      Date.UTC(
-        endDate.getFullYear(),
-        endDate.getMonth(),
-        endDate.getDay(),
-        Number(endHour),
-        Number(endMinute),
-        Number(endSecond),
-      ) * 1000;
-    endTime.setSeconds(endTimeInSeconds);
+    const startTimeUTC = Date.UTC(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDay(),
+      Number(startHour),
+      Number(startMinute),
+      Number(startSecond),
+    );
+    const startTime = new Date(startTimeUTC).toISOString();
+    const endTimeUTC = Date.UTC(
+      endDate.getFullYear(),
+      endDate.getMonth(),
+      endDate.getDay(),
+      Number(endHour),
+      Number(endMinute),
+      Number(endSecond),
+    );
+    const endTime = new Date(endTimeUTC).toISOString();
 
     return { startTime, endTime };
   };

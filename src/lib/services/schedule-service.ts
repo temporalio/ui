@@ -1,4 +1,3 @@
-import type { Timestamp } from '@temporalio/common';
 import { v4 as uuidv4 } from 'uuid';
 
 import { translate } from '$lib/i18n/translate';
@@ -270,8 +269,8 @@ export async function triggerImmediately({
 }
 
 type BackfillOptions = TriggerImmediatelyOptions & {
-  startTime: Timestamp;
-  endTime: Timestamp;
+  startTime: string;
+  endTime: string;
 };
 
 export async function backfillRequest({
@@ -283,11 +282,13 @@ export async function backfillRequest({
 }: BackfillOptions): Promise<null> {
   const options = {
     patch: {
-      backfillRequest: {
-        overlapPolicy,
-        startTime,
-        endTime,
-      },
+      backfillRequest: [
+        {
+          overlapPolicy,
+          startTime,
+          endTime,
+        },
+      ],
     },
   };
 
