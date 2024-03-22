@@ -27,7 +27,6 @@
     hasIndicator?: boolean;
     id?: string;
     label?: string;
-    padding?: string;
     unround?: boolean;
     unroundRight?: boolean;
     unroundLeft?: boolean;
@@ -46,7 +45,6 @@
   export let hasIndicator = false;
   export let id: string = null;
   export let label: string = null;
-  export let padding: string = null;
   export let unround = false;
   export let unroundRight = false;
   export let unroundLeft = false;
@@ -108,7 +106,7 @@
   aria-controls={controls}
   aria-expanded={$open}
   aria-label={label}
-  class={merge('menu-button', variant, className, padding ? padding : 'px-4')}
+  class={merge('menu-button px-4', variant, className)}
   class:unroundLeft
   class:unroundRight
   class:active
