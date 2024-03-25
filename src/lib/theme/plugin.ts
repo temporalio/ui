@@ -11,6 +11,7 @@ export const variables = {
   '--color-brand': rgb(getColor('indigo', 800)),
   '--color-interactive': rgb(getColor('indigo', 600)),
   '--color-interactive-hover': rgb(getColor('indigo', 700)),
+  '--color-secondary-hover': rgb(getColor('slate', 50)),
 
   '--color-text-black': rgb(colors.black),
   '--color-text-primary': rgb(colors.primary),
@@ -62,6 +63,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-secondary': rgb(colors.offBlack),
   '--color-inverse': rgb(colors.primary),
   '--color-brand': rgb(getColor('indigo', 500)),
+  '--color-secondary-hover': rgb(getColor('slate', 900)),
 
   '--color-text-primary': rgb(colors.offWhite),
   '--color-text-secondary': rgb(getColor('slate', 200)),
@@ -162,6 +164,7 @@ const temporal = plugin(
         badge: css('--color-surface-badge'),
         interactive: css('--color-interactive'),
         'interactive-hover': css('--color-interactive-hover'),
+        'secondary-hover': css('--color-secondary-hover'),
 
         error: css('--color-surface-error'),
         information: css('--color-surface-information'),
