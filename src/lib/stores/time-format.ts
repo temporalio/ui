@@ -1,4 +1,4 @@
-import { getTimezoneOffset } from 'date-fns-tz';
+import * as dateTz from 'date-fns-tz';
 
 import { persistStore } from '$lib/stores/persist-store';
 import { getLocalTimezone } from '$lib/utilities/format-date';
@@ -1174,7 +1174,7 @@ export const getUTCOffset = (timeFormat: TimeFormat): string => {
 
   if (offset === undefined) {
     const timezone = getTimezone(timeFormat);
-    const offsetInMilliseconds = getTimezoneOffset(timezone);
+    const offsetInMilliseconds = dateTz.getTimezoneOffset(timezone);
     if (offsetInMilliseconds) {
       offset = offsetInMilliseconds / 1000 / 60 / 60;
     } else {
