@@ -59,6 +59,7 @@
     disabled={$activeQueryIndex !== null}
     count={$filter.attribute ? 0 : $workflowFilters.length}
     on:click={() => (searchAttributeValue = '')}
+    class="text-nowrap"
   >
     <svelte:fragment slot="leading">
       {#if !$filter.attribute}

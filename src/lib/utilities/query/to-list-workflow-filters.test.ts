@@ -26,6 +26,8 @@ const workflowQuery3 =
   'WorkflowType="World" AND StartTime > "2022-04-18T17:45:18-06:00" AND ExecutionStatus="Canceled"';
 const workflowQuery4 =
   '(ExecutionStatus="Canceled" OR ExecutionStatus="Failed" OR ExecutionStatus="Completed") AND WorkflowType="World" AND StartTime > "2022-04-18T17:45:18-06:00"';
+const customAttributesWithSpacesQuery =
+  '`Custom Bool Field`=true AND `Custom Keyword Field`="Test"';
 
 const attributes = {
   CloseTime: 'Datetime',
@@ -34,12 +36,40 @@ const attributes = {
   WorkflowId: 'Keyword',
   WorkflowType: 'Keyword',
   CustomBoolField: 'Bool',
+  'Custom Keyword Field': 'Keyword',
+  'Custom Bool Field': 'Bool',
 };
 
 describe('toListWorkflowFilters', () => {
   afterEach(() => {
     vi.clearAllMocks();
     vi.useRealTimers();
+  });
+
+  it('should parse a query with custom attributes that have spaces', () => {
+    const result = toListWorkflowFilters(
+      customAttributesWithSpacesQuery,
+      attributes,
+    );
+    const expectedFilters = [
+      {
+        attribute: 'Custom Bool Field',
+        type: 'Bool',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'true',
+      },
+      {
+        attribute: 'Custom Keyword Field',
+        type: 'Keyword',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Test',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
   });
 
   it('should parse a query with an executionStatus', () => {
