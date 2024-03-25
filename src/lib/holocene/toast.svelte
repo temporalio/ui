@@ -20,7 +20,7 @@
 
 <div
   {id}
-  class="flex grow-0 items-center justify-between gap-4 rounded px-4 py-3 shadow {variant}"
+  class="flex grow-0 items-center justify-between gap-4 rounded-md px-3 py-2.5 shadow {variant}"
   transition:fly={{ x: 250 }}
 >
   <p class="font-secondary text-sm">
@@ -31,7 +31,7 @@
 
 <style lang="postcss">
   .primary {
-    @apply bg-primary text-white;
+    @apply bg-primary text-white dark:bg-inverse;
   }
 
   .success {

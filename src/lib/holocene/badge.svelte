@@ -32,7 +32,7 @@
   .beta,
   .running,
   .blue {
-    @apply border-blue-700 bg-blue-100 text-blue-700;
+    @apply border-blue-700 bg-indigo-400 text-black;
   }
 
   .alpha,
@@ -42,17 +42,17 @@
 
   .error,
   .red {
-    @apply border-red-700 bg-red-50 text-red-700;
+    @apply border-red-700 bg-red-300 text-black;
   }
 
   .warning,
   .yellow {
-    @apply border-yellow-900 bg-yellow-100 text-yellow-900;
+    @apply border-yellow-900 bg-yellow-200 text-black;
   }
 
   .default,
   .gray {
-    @apply bg-badge text-primary;
+    @apply bg-badge text-primary dark:bg-slate-100 dark:text-black;
   }
 
   .active,
@@ -62,7 +62,7 @@
   }
 
   .count {
-    @apply h-6 w-6 min-w-max rounded-full bg-blue-700 text-white;
+    @apply h-6 w-6 min-w-max rounded-full bg-indigo-400 text-black;
   }
 
   .ultraviolet {

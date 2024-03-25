@@ -48,6 +48,14 @@ const formatValue = (
   return `"${value}"`;
 };
 
+const getQueryKey = (attribute: string | number) => {
+  const key = filterKeys[attribute] ?? attribute;
+  if (typeof key === 'string' && /\s/g.test(key)) {
+    return '`' + key + '`';
+  }
+  return key;
+};
+
 const toFilterQueryStatement = (
   attribute: keyof SearchAttributes,
   type: SearchAttributesValue,
@@ -56,7 +64,7 @@ const toFilterQueryStatement = (
   archived: boolean,
   customDate: boolean,
 ): string => {
-  const queryKey = filterKeys[attribute] ?? attribute;
+  const queryKey = getQueryKey(attribute);
 
   if (value === 'All') return '';
 

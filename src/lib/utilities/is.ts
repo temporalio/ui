@@ -6,6 +6,7 @@ import { has } from './has';
 
 type Space = ' ';
 type Quote = "'" | '"';
+type Backtick = '`';
 type Operator = (typeof operators)[number];
 type Conditional = (typeof conditionals)[number];
 type Parenthesis = (typeof parenthesis)[number];
@@ -93,6 +94,10 @@ export const isQuote = (x: unknown): x is Quote => {
   if (x === "'") return true;
   if (x === '"') return true;
   return false;
+};
+
+export const isBacktick = (x: unknown): x is Backtick => {
+  return x === '`';
 };
 
 export const isOperator = (x: unknown): x is Operator => {
