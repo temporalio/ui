@@ -9,7 +9,6 @@
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
-  import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -20,15 +19,15 @@
   import {
     decodeEventHistory,
     filteredEventHistory,
-    fullEventHistory,
+    // fullEventHistory,
   } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowEvent } from '$lib/types/events';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { exportHistory } from '$lib/utilities/export-history';
-  import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
+  // import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  let view: GraphView = 'compact';
+  let view: GraphView = 'timeline';
   let zoomLevel = 1;
 
   $: ({ namespace } = $page.params);
@@ -39,10 +38,10 @@
     'ascending',
     pendingActivities,
   );
-  $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
-    $fullEventHistory,
-    'ascending',
-  );
+  // $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
+  //   $fullEventHistory,
+  //   'ascending',
+  // );
   $: workflow, view, clearActives();
 
   let activeGroups: string[] = [];
@@ -107,9 +106,9 @@
 
 <div class="surface-secondary flex flex-col gap-0 px-4">
   <WorkflowCallStackError />
-  {#if workflowTaskFailedError}
+  <!-- {#if workflowTaskFailedError}
     <WorkflowTypedError error={workflowTaskFailedError} />
-  {/if}
+  {/if} -->
   <div class="flex flex-col gap-0">
     <WorkflowDetails />
     <InputAndResults />
@@ -189,7 +188,6 @@
         {groups}
         {activeGroups}
         {activeEvents}
-        {pendingActivities}
         {zoomLevel}
         {canvasWidth}
         onClick={setActiveGroupAndEvent}

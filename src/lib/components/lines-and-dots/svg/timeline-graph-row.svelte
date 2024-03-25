@@ -19,7 +19,7 @@
   export let workflow: WorkflowExecution;
   export let group: EventGroup;
   export let activeGroups: string[] = [];
-  export let startTime: Timestamp;
+  export let startTime: string | Timestamp;
   export let canvasWidth: number;
   export let active = true;
   export let onClick: () => void;

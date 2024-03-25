@@ -5,11 +5,7 @@
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import type {
-    PendingActivity,
-    WorkflowEvent,
-    WorkflowEvents,
-  } from '$lib/types/events';
+  import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
@@ -27,17 +23,16 @@
   import Line from './line.svelte';
   import Text from './text.svelte';
 
-  export let event: WorkflowEvent | PendingActivity;
+  export let event: WorkflowEvent;
   export let group: EventGroup;
   export let history: WorkflowEvents;
   export let groups: EventGroups;
-  export let pendingActivities: PendingActivity[];
   export let activeEvents: string[];
 
   export let canvasWidth: number;
   export let startingX: number;
   export let active = false;
-  export let onClick: (x: WorkflowEvent | PendingActivity) => void;
+  export let onClick: (x: WorkflowEvent) => void;
   export let index: number;
   export let zoomLevel: number = 1;
 
@@ -56,7 +51,6 @@
     event,
     index,
     groups,
-    pendingActivities,
     activeEvents,
     height,
     fontSizeRatio,

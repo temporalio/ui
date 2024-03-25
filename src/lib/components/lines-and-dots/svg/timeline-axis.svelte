@@ -1,42 +1,107 @@
 <script lang="ts">
-  // import { getMilliseconds } from 'date-fns';
-  // import { timeFormat } from '$lib/stores/time-format';
-  // import { workflowRun } from '$lib/stores/workflow-run';
-  // import { formatDate } from '$lib/utilities/format-date';
-  // import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import { onDestroy, onMount } from 'svelte';
 
-  import { HistoryConfig } from '../constants';
+  import { timeFormat } from '$lib/stores/time-format';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import { formatDate } from '$lib/utilities/format-date';
+  import {
+    formatDistanceAbbreviated,
+    getMillisecondDuration,
+  } from '$lib/utilities/format-time';
+
+  import { TimelineConfig } from '../constants';
 
   import Line from './line.svelte';
-  import Text from './text.svelte';
 
   export let x1 = 0;
   export let x2 = 1000;
-  export let y = 1000;
+  export let timelineHeight = 1000;
+
+  const { radius } = TimelineConfig;
 
   const ticks = 20;
 
-  // $: ({ workflow } = $workflowRun);
-  // $: duration =
-  //   getMilliseconds(new Date(workflow.endTime)) -
-  //   getMilliseconds(new Date(workflow.startTime));
-
-  const { radius } = HistoryConfig;
-
+  $: ({ workflow } = $workflowRun);
+  $: duration = getMillisecondDuration({
+    start: workflow?.startTime,
+    end: workflow?.endTime || Date.now(),
+    onlyUnderSecond: false,
+  });
   $: distance = x2 - x1;
   $: tickDistance = distance / ticks;
+  $: endTime = workflow?.endTime || new Date();
+
+  let endTimeInterval;
+
+  const clearEndTimeInterval = (endTime: string) => {
+    if (endTime) {
+      clearInterval(endTimeInterval);
+    }
+  };
+
+  onMount(() => {
+    if (!workflow.endTime) {
+      endTimeInterval = setInterval(() => {
+        endTime = new Date();
+      }, 1000);
+    }
+  });
+
+  $: clearEndTimeInterval(workflow.endTime);
+
+  onDestroy(() => {
+    clearInterval(endTimeInterval);
+  });
 </script>
 
 <Line
   strokeWidth={radius / 2}
-  startPoint={[x1, y]}
-  endPoint={[x1 + distance, y]}
+  startPoint={[x1, timelineHeight]}
+  endPoint={[x1 + distance, timelineHeight]}
 />
 {#each Array(ticks) as _, i}
-  <Line
-    strokeWidth={radius / 2}
-    startPoint={[x1 + i * tickDistance, y - 10]}
-    endPoint={[x1 + i * tickDistance, y]}
-  />
-  <Text point={[x1 + i * tickDistance - radius, y - radius * 2]}></Text>
+  {@const tickX = x1 + i * tickDistance}
+  {@const tickY = timelineHeight + radius * 2}
+  {#if i !== 0}
+    <Line
+      strokeWidth={radius / 4}
+      startPoint={[tickX, 0]}
+      endPoint={[tickX, timelineHeight]}
+      active={false}
+    />
+  {/if}
+  <text
+    fill="#fff"
+    font-size="12"
+    transform="rotate(90, {tickX}, {tickY})"
+    x={tickX - radius}
+    y={tickY}
+  >
+    {#if i === 0}
+      <tspan>{formatDate(workflow.startTime, $timeFormat).split(' ')[2]}</tspan>
+      <tspan dy={15} dx={-70}
+        >{formatDate(workflow.startTime, $timeFormat).split(' ')[0]}</tspan
+      >
+    {:else}
+      {formatDistanceAbbreviated({
+        start: workflow.startTime,
+        end: new Date(
+          new Date(workflow.startTime).getTime() + (duration / ticks) * i,
+        ),
+        includeMilliseconds: duration < 1000,
+      })}
+    {/if}
+  </text>
 {/each}
+<text
+  fill="#fff"
+  font-size="12"
+  transform="rotate(90, {x2}, {timelineHeight + radius * 2})"
+  x={x2 - radius}
+  y={timelineHeight + radius * 2 + radius / 2}
+>
+  <tspan>{formatDate(endTime, $timeFormat).split(' ')[2]}</tspan>
+  <tspan dy={15} dx={-70}
+    >{formatDate(endTime, $timeFormat).split(' ')[0]}</tspan
+  >
+</text>

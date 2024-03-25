@@ -41,7 +41,7 @@
 <style lang="postcss">
   .line {
     cursor: pointer;
-    opacity: 0.15;
+    opacity: 0.05;
     outline: none;
     stroke: #ebebeb;
   }

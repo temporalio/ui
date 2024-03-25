@@ -3,11 +3,7 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
-  import type {
-    PendingActivity,
-    WorkflowEvent,
-    WorkflowEvents,
-  } from '$lib/types/events';
+  import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
 
   import {
     getDetailsBoxHeight,
@@ -21,7 +17,6 @@
 
   export let history: WorkflowEvents;
   export let groups: EventGroups;
-  export let pendingActivities: PendingActivity[];
   export let activeEvents: string[] = [];
   export let activeGroups: string[] = [];
   export let canvasWidth: number;
@@ -48,9 +43,7 @@
     .reduce((acc, height) => acc + height, 0);
 
   $: canvasHeight = Math.max(
-    height * 2 +
-      height * (history.length + pendingActivities.length) +
-      activeDetailsHeight,
+    height * history.length + activeDetailsHeight,
     400,
   );
 
@@ -85,7 +78,6 @@
       {group}
       {groups}
       {history}
-      {pendingActivities}
       {activeEvents}
       canvasWidth={canvasWidth * zoomLevel}
       {startingX}
@@ -101,7 +93,6 @@
           event,
           index,
           groups,
-          pendingActivities,
           activeEvents,
           height,
           fontSizeRatio,
@@ -115,7 +106,7 @@
       />
     {/if}
   {/each}
-  {#each pendingActivities as pendingActivity, index}
+  <!-- {#each pendingActivities as pendingActivity, index}
     {@const group = groups.find((g) =>
       g.eventIds.has(pendingActivity.activityId),
     )}
@@ -132,5 +123,5 @@
       onClick={() => onClick(pendingActivity, group)}
       {index}
     />
-  {/each}
+  {/each} -->
 </svg>

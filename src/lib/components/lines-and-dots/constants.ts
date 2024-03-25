@@ -137,7 +137,7 @@ const getOpenGroups = (
 
 export const activeEventsHeightAboveGroup = (
   activeEvents: string[],
-  event: WorkflowEvent | PendingActivity,
+  event: WorkflowEvent,
   history: WorkflowEvents,
   groups: EventGroups,
   height: number,
@@ -157,10 +157,9 @@ export const activeEventsHeightAboveGroup = (
 
 export const getNextDistanceAndOffset = (
   history: WorkflowEvents,
-  event: WorkflowEvent | PendingActivity,
+  event: WorkflowEvent,
   index: number,
   groups: EventGroups,
-  pendingActivities: PendingActivity[],
   activeEvents: string[],
   height: number,
   fontSizeRatio: number,
@@ -172,7 +171,7 @@ export const getNextDistanceAndOffset = (
     groups,
     fontSizeRatio,
   );
-  let y = (index + 1) * height + height / 2 + activeEventsAbove;
+  let y = index * height + height / 2 + activeEventsAbove;
   let nextDistance = 0;
   let offset = 1;
 
@@ -198,25 +197,15 @@ export const getNextDistanceAndOffset = (
     isPendingActivity(event) &&
     event.activityId === group.pendingActivity.activityId
   ) {
-    y =
-      (history.length + 1) * height +
-      height / 2 +
-      pendingActivities.indexOf(event) * height +
-      activeEventsAbove;
+    y = (history.length + 1) * height + height / 2 + activeEventsAbove;
     return { nextDistance, offset, y };
   }
 
   let diff = 0;
   if (nextEvent) {
     diff = parseInt(nextEvent.id) - parseInt(event.id);
-  } else if (pendingActivity) {
-    diff =
-      history.length -
-      parseInt(event.id) +
-      pendingActivities.indexOf(pendingActivity) +
-      2;
   } else if (isPendingGroup(group)) {
-    diff = history.length - parseInt(event.id) + pendingActivities.length + 2;
+    diff = history.length - parseInt(event.id) + 2;
   }
   nextDistance = diff * height;
 

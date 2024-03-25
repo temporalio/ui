@@ -11,7 +11,6 @@
     getDetailsBoxHeight,
     TimelineConfig,
   } from '../constants';
-  import TimelineAxisLabels from '../timeline-axis-labels.svelte';
 
   import GroupDetailsRow from './group-details-row.svelte';
   import Line from './line.svelte';
@@ -41,8 +40,9 @@
     })
     .reduce((acc, height) => acc + height, 0);
 
-  $: canvasHeight =
+  $: timelineHeight =
     Math.max(height * 2 + height * groups.length, 200) + activeDetailsHeight;
+  $: canvasHeight = timelineHeight + 200;
 </script>
 
 <svg
@@ -54,14 +54,19 @@
 >
   <Line
     startPoint={[gutter, 0]}
-    endPoint={[gutter, canvasHeight]}
+    endPoint={[gutter, timelineHeight]}
     strokeWidth={radius / 2}
   />
   <Line
     startPoint={[canvasWidth - gutter, 0]}
-    endPoint={[canvasWidth - gutter, canvasHeight]}
+    endPoint={[canvasWidth - gutter, timelineHeight]}
     strokeWidth={radius / 2}
     status={workflow.status}
+  />
+  <TimelineAxis
+    x1={gutter - radius / 4}
+    x2={canvasWidth - gutter + radius / 4}
+    {timelineHeight}
   />
   {#each groups as group, index (group.id)}
     {@const y =
@@ -86,10 +91,4 @@
       />
     {/if}
   {/each}
-  <TimelineAxis
-    x1={gutter}
-    x2={canvasWidth - gutter - 2}
-    y={canvasHeight - 2}
-  />
 </svg>
-<TimelineAxisLabels {startTime} />

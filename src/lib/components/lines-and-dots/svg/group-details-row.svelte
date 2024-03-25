@@ -78,7 +78,7 @@
   $: textStartingY = fetchChildTimeline
     ? y + radius + DetailsChildTimelineHeight
     : y + radius;
-  $: width = view === 'history' ? canvasWidth / 2 : canvasWidth;
+  $: width = view === 'history' ? canvasWidth / 2 - 2 : canvasWidth;
 
   $: attributes = mergeEventGroupDetails(groupOrEvent);
   $: codeBlockAttributes = Object.entries(attributes).filter(
