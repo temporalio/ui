@@ -23,8 +23,8 @@ export const calendarToComment = ({
     !hour || !parseInt(hour)
       ? '12'
       : parseInt(hour) <= 12
-        ? hour
-        : (parseInt(hour) - 12).toString();
+      ? hour
+      : (parseInt(hour) - 12).toString();
   const timeStamp = `${properHour.padStart(2, '0')}:${
     minute ? minute.padStart(2, '0') : '00'
   }${time}`;
