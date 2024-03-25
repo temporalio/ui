@@ -8,7 +8,7 @@ export const TEMPORAL_THEME = EditorView.theme(
   {
     '&': {
       color: 'white',
-      backgroundColor: colors.gray['900'],
+      backgroundColor: colors.slate['900'],
       borderRadius: '0.75rem',
       borderWidth: '2px',
       borderColor: colors.slate['600'],
@@ -37,7 +37,7 @@ export const TEMPORAL_THEME = EditorView.theme(
       backgroundColor: colors.slate['700'],
     },
     '.cm-gutters': {
-      backgroundColor: colors.gray['900'],
+      backgroundColor: colors.slate['900'],
       color: colors.white,
       borderRight: 'none',
     },
