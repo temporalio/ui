@@ -27,7 +27,7 @@
   ];
 
   $: {
-    if (minimumVersionRequired('1.22.0', $temporalVersion)) {
+    if (minimumVersionRequired('1.23.0', $temporalVersion)) {
       options = [
         ...options,
         { value: 'STARTS_WITH', label: translate('common.starts-with') },
