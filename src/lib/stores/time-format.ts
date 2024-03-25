@@ -1,3 +1,5 @@
+import { getTimezoneOffset } from 'date-fns-tz';
+
 import { persistStore } from '$lib/stores/persist-store';
 import { getLocalTimezone } from '$lib/utilities/format-date';
 
@@ -1160,4 +1162,24 @@ export const TimezoneOptions: TimeFormatOptions = Object.entries(Timezones)
 export const getTimezone = (timeFormat: TimeFormat): string => {
   if (timeFormat === 'local') return getLocalTimezone();
   return Timezones[timeFormat]?.zones[0] ?? timeFormat;
+};
+
+export const formatOffset = (offset: number) => {
+  const formattedOffset = String(Math.abs(offset)).padStart(2, '0');
+  return offset >= 0 ? `+${formattedOffset}:00` : `-${formattedOffset}:00`;
+};
+
+export const getUTCOffset = (timeFormat: TimeFormat): string => {
+  let offset: number | undefined = Timezones[timeFormat]?.offset;
+
+  if (offset === undefined) {
+    const timezone = getTimezone(timeFormat);
+    const offsetInMilliseconds = getTimezoneOffset(timezone);
+    if (offsetInMilliseconds) {
+      offset = offsetInMilliseconds / 1000 / 60 / 60;
+    } else {
+      offset = 0;
+    }
+  }
+  return formatOffset(offset);
 };
