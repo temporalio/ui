@@ -54,6 +54,7 @@ const conditionals = [
   '>',
   '<',
   '!',
+  'starts_with',
 ] as const;
 
 const joins = ['and', 'or'] as const;

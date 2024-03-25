@@ -143,6 +143,8 @@
       <WorkflowAdvancedSearch />
     {:else}
       <div
+        role="button"
+        tabindex="0"
         class="flex items-center"
         class:filter={!showClearAllButton}
         on:keyup={handleKeyUp}

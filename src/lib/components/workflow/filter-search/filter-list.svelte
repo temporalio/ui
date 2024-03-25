@@ -124,7 +124,9 @@
                   })}
                 {/if}
               {:else}
-                {conditional}
+                {conditional === 'STARTS_WITH'
+                  ? translate('common.starts-with')
+                  : conditional}
                 {isTextFilter({ attribute, type }) ? `"${value}"` : value}
               {/if}
             </span>

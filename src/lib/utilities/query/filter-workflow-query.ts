@@ -80,6 +80,10 @@ const toFilterQueryStatement = (
     return `${queryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;
   }
 
+  if (conditional === 'STARTS_WITH') {
+    return `${queryKey} ${conditional} ${formatValue(value, type)}`;
+  }
+
   return `${queryKey}${conditional}${formatValue(value, type)}`;
 };
 
