@@ -137,7 +137,7 @@
   }
 
   .input-container {
-    @apply surface-primary flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border  p-2 text-sm text-primary focus-within:border-blue-700;
+    @apply surface-primary flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-subtle p-2 text-sm text-primary focus-within:border-4 focus-within:border-blue-700;
 
     .invalid {
       @apply border-red-700;
