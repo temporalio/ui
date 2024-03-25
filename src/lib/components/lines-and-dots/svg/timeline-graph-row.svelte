@@ -73,9 +73,9 @@
 
   const getIconIndex = (points: number[]) => {
     if (!points[1]) return 0;
-    if (points[1] && points[1] - points[0] > radius) return 0;
+    if (points[1] && points[1] - points[0] > 2 * radius) return 0;
     if (!points[2]) return 1;
-    if (points[2] && points[2] - points[1] > radius) return 1;
+    if (points[2] && points[2] - points[1] > 2 * radius) return 1;
     return 2;
   };
 </script>
@@ -120,7 +120,9 @@
     {/if}
     {#if showIcon}
       <Text
-        point={textPoint}
+        point={position === 'middle'
+          ? [x + 1.5 * radius, y + radius / 3]
+          : textPoint}
         {active}
         position={isPending ? 'middle' : position}
       >

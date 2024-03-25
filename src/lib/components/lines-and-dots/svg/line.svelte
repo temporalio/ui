@@ -54,6 +54,7 @@
     opacity: 0.35;
   }
 
+  .workflow,
   .marker,
   .command {
     stroke: #ebebeb;
@@ -81,10 +82,6 @@
 
   .child-workflow {
     stroke: #b2f8d9;
-  }
-
-  .workflow {
-    stroke: #059669;
   }
 
   .Completed {

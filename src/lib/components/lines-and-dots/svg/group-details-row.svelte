@@ -36,8 +36,6 @@
 
   const { radius, fontSizeRatio, gutter } = config;
 
-  $: ({ namespace } = $page.params);
-
   let fetchChildWorkflow;
   let fetchChildTimeline;
 
@@ -72,6 +70,7 @@
     fetchChildWorkflowForGroup(group);
   });
 
+  $: ({ namespace } = $page.params);
   $: groupOrEvent = group ?? event;
   $: boxHeight = getDetailsBoxHeight(groupOrEvent, fontSizeRatio);
   $: startingX = gutter + radius / 2;
@@ -79,7 +78,6 @@
     ? y + radius + DetailsChildTimelineHeight
     : y + radius;
   $: width = view === 'history' ? canvasWidth / 2 - 2 : canvasWidth;
-
   $: attributes = mergeEventGroupDetails(groupOrEvent);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',

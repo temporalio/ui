@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { groupWorkflowTaskEvents } from '$lib/models/event-groups';
   import type {
     EventGroup,
     EventGroups,
@@ -23,6 +24,9 @@
   export let zoomLevel: number = 1;
   export let onClick: (group: EventGroup, event: WorkflowEvent) => void;
 
+  $: workflowTaskGroups = groupWorkflowTaskEvents(history);
+  $: allGroups = [...workflowTaskGroups, ...groups];
+
   const { height, fontSizeRatio, radius } = HistoryConfig;
 
   $: isActive = (groupOrEvent: EventGroup | WorkflowEvent): boolean => {
@@ -36,7 +40,7 @@
 
   $: activeDetailsHeight = activeEvents
     .map((id) => {
-      const group = groups.find((group) => group.id === id);
+      const group = allGroups.find((group) => group.id === id);
       const event = history.find((event) => event.id === id);
       return getDetailsBoxHeight(group ?? event, fontSizeRatio);
     })
@@ -72,11 +76,11 @@
     strokeWidth={4}
   />
   {#each history as event, index (event.id)}
-    {@const group = groups.find((g) => g.eventIds.has(event.id))}
+    {@const group = allGroups.find((g) => g.eventIds.has(event.id))}
     <HistoryGraphRow
       {event}
       {group}
-      {groups}
+      groups={allGroups}
       {history}
       {activeEvents}
       canvasWidth={canvasWidth * zoomLevel}
@@ -92,7 +96,7 @@
           history,
           event,
           index,
-          groups,
+          allGroups,
           activeEvents,
           height,
           fontSizeRatio,

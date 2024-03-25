@@ -57,8 +57,7 @@
   ));
 
   const strokeWidth = radius / 2;
-  $: horizontalOffset =
-    category === 'workflow' ? 0 : (offset / 1.5) * 3 * radius;
+  $: horizontalOffset = (offset / 1.5) * 3 * radius;
   $: nextIsPending = group?.lastEvent.id === event?.id && isPendingGroup(group);
 
   $: withinCanvas = (x: number) => {
@@ -98,7 +97,9 @@
       <tspan fill="#fff">
         {spaceBetweenCapitalLetters(event?.name)}
       </tspan>
-      {#if group}<tspan dx={3} font-size="14px">{group.name}</tspan>{/if}
+      {#if group && group.name}<tspan dx={3} font-size="14px"
+          >{group.name}</tspan
+        >{/if}
     </Text>
     <Text
       point={[startingX - 1.5 * radius, y + radius / 2]}

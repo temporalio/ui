@@ -143,10 +143,7 @@ export const activeEventsHeightAboveGroup = (
   height: number,
 ) => {
   return activeEvents
-    .filter((id) => {
-      if (isPendingActivity(event)) return true;
-      return parseInt(id) < parseInt(event.id);
-    })
+    .filter((id) => parseInt(id) < parseInt(event.id))
     .map((id) => {
       const group = groups.find((group) => group.eventIds.has(id));
       const event = history.find((event) => event.id === id);
@@ -164,6 +161,7 @@ export const getNextDistanceAndOffset = (
   height: number,
   fontSizeRatio: number,
 ): { nextDistance: number; offset: number; y: number } => {
+  const group = groups.find((g) => g.eventIds.has(event.id));
   const activeEventsAbove = activeEventsHeightAboveGroup(
     activeEvents,
     event,
@@ -175,7 +173,6 @@ export const getNextDistanceAndOffset = (
   let nextDistance = 0;
   let offset = 1;
 
-  const group = groups.find((g) => g.eventIds.has(event.id));
   if (!group) {
     return { nextDistance, offset, y };
   }

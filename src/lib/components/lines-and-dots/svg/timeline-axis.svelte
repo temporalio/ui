@@ -88,7 +88,7 @@
         end: new Date(
           new Date(workflow.startTime).getTime() + (duration / ticks) * i,
         ),
-        includeMilliseconds: duration < 1000,
+        includeMilliseconds: duration / ticks < 1000,
       })}
     {/if}
   </text>

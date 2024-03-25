@@ -38,6 +38,7 @@
     'ascending',
     pendingActivities,
   );
+
   // $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
   //   $fullEventHistory,
   //   'ascending',
