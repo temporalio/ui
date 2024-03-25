@@ -64,13 +64,13 @@
 
 <style lang="postcss">
   .tab {
-    @apply flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 text-sm outline-none hover:text-brand focus-visible:rounded-sm focus-visible:shadow-focus focus-visible:shadow-indigo-300 dark:text-secondary;
+    @apply flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 text-sm outline-none hover:text-brand focus-visible:rounded-sm focus-visible:shadow-focus focus-visible:shadow-indigo-300 dark:text-secondary hover:dark:text-brand;
 
     border-color: transparent;
   }
 
   .tab.active {
-    @apply border-b-2 border-information font-medium text-primary hover:text-brand focus-visible:shadow-focus focus-visible:shadow-indigo-300 dark:text-secondary;
+    @apply border-b-2 border-information font-medium text-primary hover:text-brand focus-visible:shadow-focus focus-visible:shadow-indigo-300 dark:text-secondary hover:dark:text-brand;
   }
 
   .tab.disabled {

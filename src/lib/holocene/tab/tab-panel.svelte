@@ -20,6 +20,7 @@
 <div
   {id}
   class:hidden={!active}
+  class:active
   aria-labelledby={tabId}
   tabindex="0"
   role="tabpanel"
@@ -27,3 +28,9 @@
 >
   <slot />
 </div>
+
+<style lang="postcss">
+  .active {
+    @apply text-primary;
+  }
+</style>
