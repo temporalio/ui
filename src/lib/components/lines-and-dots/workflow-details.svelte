@@ -16,9 +16,9 @@
   });
 </script>
 
-<div class="flex flex-col rounded-t text-white lg:flex-row">
+<div class="surface-secondary flex flex-col rounded-t lg:flex-row">
   <div
-    class="flex w-full flex-col items-center justify-between gap-4 p-2 text-sm text-white md:flex-row lg:w-1/2"
+    class="flex w-full flex-col items-center justify-between gap-4 p-2 text-sm md:flex-row lg:w-1/2"
   >
     <div class="flex flex-col gap-4">
       <div class="flex items-center gap-1 text-xl">
@@ -27,17 +27,21 @@
       </div>
     </div>
     <div class="flex flex-col gap-4">
-      <div class="flex justify-end gap-4">
-        <p class="text-slate-200">{translate('common.start')}</p>
-        {formatDate(workflow?.startTime, $timeFormat, {
-          relative: $relativeTime,
-        })}
+      <div class="flex items-center justify-end gap-4">
+        <p class="text-primary">{translate('common.start')}</p>
+        <p class="rounded bg-ultraviolet px-1 text-white">
+          {formatDate(workflow?.startTime, $timeFormat, {
+            relative: $relativeTime,
+          })}
+        </p>
       </div>
-      <div class="flex justify-end gap-4">
-        <p class="text-slate-200">{translate('common.end')}</p>
-        {formatDate(workflow?.endTime, $timeFormat, {
-          relative: $relativeTime,
-        })}
+      <div class="flex items-center justify-end gap-4">
+        <p class="text-primary">{translate('common.end')}</p>
+        <p class="rounded bg-ultraviolet px-1 text-white">
+          {formatDate(workflow?.endTime, $timeFormat, {
+            relative: $relativeTime,
+          })}
+        </p>
       </div>
     </div>
   </div>

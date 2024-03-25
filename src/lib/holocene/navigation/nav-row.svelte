@@ -44,20 +44,4 @@
   .wrap {
     @apply whitespace-normal;
   }
-
-  .local {
-    @apply text-white;
-  }
-
-  .cloud {
-    @apply text-primary;
-  }
-
-  .local:hover {
-    @apply surface-primary text-primary;
-  }
-
-  .cloud:hover {
-    @apply bg-inverse text-white;
-  }
 </style>

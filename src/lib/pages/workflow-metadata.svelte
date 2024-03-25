@@ -5,10 +5,6 @@
   import { workflowRun } from '$lib/stores/workflow-run';
 
   $: ({ workflow } = $workflowRun);
-
-  $: {
-    console.log('Workflow: ', workflow);
-  }
 </script>
 
 <div class="flex flex-col gap-4">

@@ -1,14 +1,13 @@
 import { HighlightStyle } from '@codemirror/language';
 import { EditorView } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
-
-import colors from '$lib/theme/colors';
+import colors from 'tailwindcss/colors';
 
 export const TEMPORAL_THEME = EditorView.theme(
   {
     '&': {
       color: 'white',
-      backgroundColor: colors.slate['900'],
+      backgroundColor: colors.gray['900'],
       borderRadius: '0.75rem',
       borderWidth: '2px',
       borderColor: colors.slate['600'],
@@ -37,7 +36,7 @@ export const TEMPORAL_THEME = EditorView.theme(
       backgroundColor: colors.slate['700'],
     },
     '.cm-gutters': {
-      backgroundColor: colors.slate['900'],
+      backgroundColor: colors.gray['900'],
       color: colors.white,
       borderRight: 'none',
     },

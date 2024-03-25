@@ -10,7 +10,6 @@
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -106,7 +105,7 @@
   };
 </script>
 
-<div class="flex flex-col gap-0 bg-slate-950 px-4 text-white">
+<div class="surface-secondary flex flex-col gap-0 px-4">
   <WorkflowCallStackError />
   {#if workflowTaskFailedError}
     <WorkflowTypedError error={workflowTaskFailedError} />
@@ -125,33 +124,33 @@
           <ToggleButton
             active={view === 'compact'}
             data-testid="feed"
-            class="bg-white"
             on:click={() => (view = 'compact')}
             >{translate('workflows.compact')}</ToggleButton
           >
           <ToggleButton
             active={view === 'timeline'}
             data-testid="compact"
-            class="bg-white"
             on:click={() => (view = 'timeline')}
             >{translate('common.timeline')}</ToggleButton
           >
           <ToggleButton
             active={view === 'history'}
             data-testid="feed"
-            class="bg-white"
             on:click={() => (view = 'history')}
             >{translate('workflows.full-history')}</ToggleButton
           >
           <ToggleButton
+            data-testid="download"
+            on:click={() => (showDownloadPrompt = true)}
+            icon="download"
+          />
+          <ToggleButton
             data-testid="zoom-in"
-            class="bg-white"
             disabled={zoomLevel === 1}
             on:click={zoomIn}>+</ToggleButton
           >
           <ToggleButton
             data-testid="zoom-out"
-            class="bg-white"
             disabled={zoomLevel === 10}
             on:click={zoomOut}>-</ToggleButton
           >
@@ -160,17 +159,11 @@
       </div>
       <div class="flex gap-2">
         <EventTypeFilter compact={view === 'compact' || view === 'timeline'} />
-        <Button
-          leadingIcon="download"
-          data-testid="download"
-          variant="primary"
-          on:click={() => (showDownloadPrompt = true)}
-        ></Button>
       </div>
     </div>
   </div>
 </div>
-<div class="bg-primary">
+<div class="surface-inverse">
   <div class="w-full overflow-x-hidden" bind:clientWidth={canvasWidth}>
     {#if view === 'compact'}
       <CompactGraph

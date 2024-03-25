@@ -10,7 +10,7 @@
   $: isRunning = $workflowRun.workflow.isRunning;
 </script>
 
-<div class="flex flex-col gap-4 bg-slate-950 lg:flex-row">
+<div class="flex flex-col gap-4 lg:flex-row">
   <InputAndResultsPayload
     content={workflowEvents.input}
     {isRunning}

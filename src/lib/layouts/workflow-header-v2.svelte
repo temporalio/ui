@@ -72,7 +72,7 @@
   );
 </script>
 
-<div class="bg-slate-950 px-4 text-white">
+<div class="surface-secondary px-4">
   <div class=" pb-2 pt-16">
     <Link
       href={`${routeForWorkflows({
@@ -97,7 +97,7 @@
       </Link>
     {/if}
   </div>
-  <header class="rounded-top flex flex-col gap-0 bg-slate-950 text-white">
+  <header class="rounded-top flex flex-col gap-0">
     <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
       <div class="flex flex-col items-center gap-4 lg:flex-row">
         <div class="px-2">
@@ -167,7 +167,7 @@
     </div>
     <Tabs>
       <TabList
-        class="flex flex-wrap gap-6 bg-slate-950 p-4 text-white"
+        class="surface-secondary flex flex-wrap gap-6 p-4"
         label="workflow detail"
       >
         <Tab

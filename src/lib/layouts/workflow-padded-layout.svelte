@@ -3,7 +3,7 @@
 </script>
 
 <LabsModeGuard>
-  <div class="h-auto bg-slate-950 p-8 text-white">
+  <div class="surface-secondary h-full p-8">
     <slot />
   </div>
   <slot slot="fallback" />

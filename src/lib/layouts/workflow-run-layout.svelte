@@ -149,7 +149,7 @@
 
 <LabsModeGuard>
   <div
-    class="absolute bottom-0 left-0 right-0 top-0 flex h-full flex-col gap-0 bg-slate-950"
+    class="surface-primary absolute bottom-0 left-0 right-0 top-0 flex h-full flex-col gap-0"
   >
     {#if workflowError}
       <WorkflowError error={workflowError} />

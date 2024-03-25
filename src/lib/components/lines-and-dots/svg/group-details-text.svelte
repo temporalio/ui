@@ -30,7 +30,7 @@
   export let config: GraphConfig;
   export let canvasWidth: number;
 
-  const { height, fontSizeRatio } = config;
+  const { fontSizeRatio } = config;
 
   $: [x, y] = point;
   $: codeBlockValue = getCodeBlockValue(value);
@@ -45,9 +45,9 @@
           {x}
           y={y - fontSizeRatio}
           width={canvasWidth - 280}
-          {height}
+          height={2 * fontSizeRatio}
         >
-          <div class="overflow-auto" style="height: {height}px">
+          <div class="overflow-auto" style="height: {2 * fontSizeRatio}px">
             <CodeBlock inline content={decodedValue} />
           </div>
         </foreignObject>
@@ -67,9 +67,9 @@
           {x}
           y={y - fontSizeRatio}
           width={canvasWidth - 280}
-          {height}
+          height={2 * fontSizeRatio}
         >
-          <div class="overflow-auto" style="height: {height}px">
+          <div class="overflow-auto" style="height: {2 * fontSizeRatio}px">
             <CodeBlock inline content={decodedValue} />
           </div>
         </foreignObject>
@@ -86,9 +86,9 @@
           {x}
           y={y - fontSizeRatio}
           width={canvasWidth - 280}
-          {height}
+          height={2 * fontSizeRatio}
         >
-          <div class="overflow-auto" style="height: {height}px">
+          <div class="overflow-auto" style="height: {2 * fontSizeRatio}px">
             <CodeBlock inline content={decodedValue} />
           </div>
         </foreignObject>

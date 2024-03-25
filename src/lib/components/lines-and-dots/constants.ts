@@ -307,8 +307,17 @@ export const getEventDetailsHeight = (
   groupOrEvent: EventGroup | WorkflowEvent,
   height: number,
 ) => {
+  const attributes = mergeEventGroupDetails(groupOrEvent);
+  const codeBlockAttributes = Object.entries(attributes).filter(
+    ([, value]) => typeof value === 'object',
+  );
+  const textAttributes = Object.entries(attributes).filter(
+    ([, value]) => typeof value !== 'object',
+  );
   return (
-    Object.keys(mergeEventGroupDetails(groupOrEvent)).length * height + height
+    codeBlockAttributes.length * 2 * height +
+    textAttributes.length * height +
+    2 * height
   );
 };
 

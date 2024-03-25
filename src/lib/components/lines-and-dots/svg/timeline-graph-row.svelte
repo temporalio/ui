@@ -138,6 +138,7 @@
         width={radius * 2}
         height={radius * 2}
         strokeWidth="4"
+        class="text-black"
       />
     {/if}
   {/each}

@@ -73,14 +73,20 @@
   });
 
   $: groupOrEvent = group ?? event;
-  $: attributes = mergeEventGroupDetails(groupOrEvent);
   $: boxHeight = getDetailsBoxHeight(groupOrEvent, fontSizeRatio);
   $: startingX = gutter + radius / 2;
   $: textStartingY = fetchChildTimeline
     ? y + radius + DetailsChildTimelineHeight
     : y + radius;
-
   $: width = view === 'history' ? canvasWidth / 2 : canvasWidth;
+
+  $: attributes = mergeEventGroupDetails(groupOrEvent);
+  $: codeBlockAttributes = Object.entries(attributes).filter(
+    ([, value]) => typeof value === 'object',
+  );
+  $: textAttributes = Object.entries(attributes).filter(
+    ([, value]) => typeof value !== 'object',
+  );
 </script>
 
 <g
@@ -108,12 +114,35 @@
       />
     {/if}
   {/await}
-  {#each Object.entries(attributes) as [key, value], index (key)}
-    <Text point={[startingX, textStartingY + (index + 1) * fontSizeRatio]}
+  {#each codeBlockAttributes as [key, value], index (key)}
+    <Text point={[startingX, textStartingY + (index + 1) * 2 * fontSizeRatio]}
       >{format(key)}</Text
     >
     <GroupDetailsText
-      point={[startingX + 240, textStartingY + (index + 1) * fontSizeRatio]}
+      point={[startingX + 240, textStartingY + (index + 1) * 2 * fontSizeRatio]}
+      {key}
+      {value}
+      {attributes}
+      {config}
+      canvasWidth={width}
+    />
+  {/each}
+  {#each textAttributes as [key, value], index (key)}
+    <Text
+      point={[
+        startingX,
+        textStartingY +
+          2 * fontSizeRatio * codeBlockAttributes.length +
+          (index + 2) * fontSizeRatio,
+      ]}>{format(key)}</Text
+    >
+    <GroupDetailsText
+      point={[
+        startingX + 240,
+        textStartingY +
+          2 * fontSizeRatio * codeBlockAttributes.length +
+          (index + 2) * fontSizeRatio,
+      ]}
       {key}
       {value}
       {attributes}
