@@ -33,7 +33,7 @@
     @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-[transparent];
 
     &:not(:disabled) {
-      @apply bg-gradient-to-br hover:border-indigo-600 hover:from-blue-100 hover:to-purple-100 hover:text-primary hover:shadow-focus hover:shadow-indigo-500/50 focus-visible:border-indigo-600 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-primary focus-visible:shadow-focus focus-visible:shadow-indigo-500/50 focus-visible:outline-none;
+      @apply bg-gradient-to-br text-primary hover:border-indigo-600 hover:from-blue-100 hover:to-purple-100 hover:text-black hover:shadow-focus hover:shadow-indigo-500/50 focus-visible:border-indigo-600 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-black focus-visible:shadow-focus focus-visible:shadow-indigo-500/50 focus-visible:outline-none;
     }
 
     &:disabled {
