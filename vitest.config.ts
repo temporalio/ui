@@ -24,6 +24,7 @@ export default defineConfig({
         'src/lib/svelte-mocks/**/*',
         'src/lib/utilities/get-environment.ts',
         '**/*.test.ts',
+        '.svelte-kit',
       ],
     },
     exclude: [...configDefaults.exclude, 'package', 'build', 'e2e', 'tests'],
