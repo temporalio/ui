@@ -27,7 +27,7 @@
   import { exportHistory } from '$lib/utilities/export-history';
   // import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  let view: GraphView = 'timeline';
+  let view: GraphView = 'compact';
   let zoomLevel = 1;
 
   $: ({ namespace } = $page.params);
