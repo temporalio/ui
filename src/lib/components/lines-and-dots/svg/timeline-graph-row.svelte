@@ -118,12 +118,18 @@
         strokeWidth={radius * 2}
       />
     {/if}
-    <Text point={textPoint} {active} position={isPending ? 'middle' : position}>
-      {group?.name}
-      <tspan fill={textInMiddle ? '#ffffff' : '#aebed9'} font-size="12px"
-        >{duration}</tspan
+    {#if showIcon}
+      <Text
+        point={textPoint}
+        {active}
+        position={isPending ? 'middle' : position}
       >
-    </Text>
+        {group?.name}
+        <tspan fill={textInMiddle ? '#ffffff' : '#aebed9'} font-size="12px"
+          >{duration}</tspan
+        >
+      </Text>
+    {/if}
     <Dot
       point={[x, y]}
       classification={group.eventList[index]?.classification}
