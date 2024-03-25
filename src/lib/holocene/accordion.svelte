@@ -47,7 +47,7 @@
 
 <div
   class={merge(
-    'surface-primary flex w-full cursor-default flex-col rounded-xl border-2 p-4 text-primary',
+    'surface-primary flex w-full cursor-default flex-col rounded-xl border-2 p-4 text-primary dark:border-subtle',
     className,
   )}
   {...$$restProps}
