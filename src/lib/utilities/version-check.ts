@@ -20,10 +20,14 @@ export const isVersionNewer = (
 
 export const minimumVersionRequired = (
   minimumVersion: string,
-  currentVersion: string,
+  currentVersion: string | undefined,
 ): boolean => {
-  if (!minimumVersion || !currentVersion) {
+  if (!minimumVersion) {
     return false;
+  }
+
+  if (!currentVersion) {
+    return true;
   }
 
   const [major1, minor1, patch1] = minimumVersion.split('.').map(Number);
