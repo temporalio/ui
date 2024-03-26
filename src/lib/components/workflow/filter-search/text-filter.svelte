@@ -9,12 +9,13 @@
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
-  let value = $filter.value;
+  $: ({ value } = $filter);
+  $: _value = value;
 
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter' && value !== '') {
+    if (e.key === 'Enter' && _value !== '') {
       e.preventDefault();
-      $filter.value = value;
+      $filter.value = _value;
       handleSubmit();
     }
   }
@@ -37,6 +38,6 @@
   icon="search"
   class="w-full"
   unroundLeft
-  bind:value
+  bind:value={_value}
   on:keydown={handleKeydown}
 />
