@@ -22,12 +22,8 @@ export const minimumVersionRequired = (
   minimumVersion: string,
   currentVersion: string | undefined,
 ): boolean => {
-  if (!minimumVersion) {
+  if (!minimumVersion || !currentVersion) {
     return false;
-  }
-
-  if (!currentVersion) {
-    return true;
   }
 
   const [major1, minor1, patch1] = minimumVersion.split('.').map(Number);
