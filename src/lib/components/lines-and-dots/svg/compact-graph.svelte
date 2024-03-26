@@ -5,11 +5,7 @@
   } from '$lib/models/event-groups/event-groups';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
-  import {
-    activeRowsHeightAboveGroup,
-    CompactConfig,
-    getDetailsBoxHeight,
-  } from '../constants';
+  import { CompactConfig, getDetailsBoxHeight } from '../constants';
 
   import CompactGraphRow from './compact-graph-row.svelte';
   import GroupDetailsRow from './group-details-row.svelte';
@@ -29,10 +25,14 @@
 
   const { height, gutter, fontSizeRatio } = CompactConfig;
   let exandedGroups = [];
+  let activeY = 0;
+
+  $: activeGroup =
+    activeGroups[0] && groups.find((group) => group.id === activeGroups[0]);
 
   $: isActive = (group: EventGroup): boolean => {
     if (!activeGroups.length) return true;
-    return activeGroups.includes(group?.id);
+    return activeGroup.id === group.id;
   };
 
   $: timeGroups = Object.values(
@@ -74,20 +74,27 @@
   const groupNameWithIndex = (name: string, index: number) =>
     `${index}:${name}`;
 
-  const onRowClick = (groups: EventGroups, startIndex: number) => {
+  const onRowClick = (groups: EventGroups, startIndex: number, y: number) => {
     if (groups.length === 1) {
       onClick(groups[0]);
+      activeY = y;
     } else {
       const name = groupNameWithIndex(groups[0].name, startIndex);
       if (exandedGroups.includes(name)) {
         exandedGroups = exandedGroups.filter((n) => n !== name);
         if (activeGroups.includes(groups[0].id)) {
           onClick(groups[0]);
+          activeY = y;
         }
       } else {
         exandedGroups = [...exandedGroups, name];
       }
     }
+  };
+
+  const onEventClick = (group: EventGroup, y: number) => {
+    onClick(group);
+    activeY = y;
   };
 
   $: getStartYOfGroup = (
@@ -107,16 +114,7 @@
       .map((i) => namedGroups[i].length)
       .reduce((acc, i) => acc + i, 0);
 
-    const heightAboveRow = activeRowsHeightAboveGroup(
-      activeGroups,
-      groupIndex,
-      timeGroups,
-      fontSizeRatio,
-    );
-
-    return (
-      expandedSize * height + groupIndex * height + heightAboveRow + height
-    );
+    return expandedSize * height + (groupIndex + 1) * height;
   };
 
   $: canvasHeight = Math.max(maxSegmentSize(), 400) + activeDetailsHeight;
@@ -145,20 +143,11 @@
         {startIndex}
         count={nameGroup.length}
         y={startY}
-        length={canvasWidth / timeGroups.length}
+        length={(canvasWidth - gutter) / timeGroups.length}
         active={isActive(group)}
-        onClick={() => onRowClick(nameGroup, startIndex)}
+        onClick={() => onRowClick(nameGroup, startIndex, startY)}
         {expanded}
       />
-      {#if activeGroups.includes(group.id) && nameGroup.length === 1}
-        <GroupDetailsRow
-          {group}
-          {canvasWidth}
-          y={startY}
-          config={CompactConfig}
-          view="compact"
-        />
-      {/if}
       {#if expanded}
         {#each nameGroup as group, index}
           {@const y = startY + (index + 1) * height}
@@ -166,22 +155,22 @@
             {group}
             {startIndex}
             {y}
-            length={(canvasWidth - 2 * gutter) / timeGroups.length}
+            length={(canvasWidth - gutter) / timeGroups.length}
             active={isActive(group)}
-            onClick={() => onClick(group)}
+            onClick={() => onEventClick(group, y)}
           />
-          {#if activeGroups.includes(group.id)}
-            <GroupDetailsRow
-              {group}
-              {canvasWidth}
-              {y}
-              config={CompactConfig}
-              view="compact"
-            />
-          {/if}
         {/each}
       {/if}
     {/each}
+    {#if activeGroup}
+      <GroupDetailsRow
+        group={activeGroup}
+        {canvasWidth}
+        y={activeY}
+        config={CompactConfig}
+        view="compact"
+      />
+    {/if}
   {:else}
     <WorkflowRow {workflow} y={height} length={canvasWidth} active />
   {/each}

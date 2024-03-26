@@ -65,6 +65,15 @@
     }
   };
 
+  const setSingleActiveGroup = (group: EventGroup) => {
+    activeEvents = [];
+    if (!activeGroups.includes(group.id)) {
+      activeGroups = [group.id];
+    } else {
+      activeGroups = [];
+    }
+  };
+
   const setActiveGroupAndEvent = (group: EventGroup, event: WorkflowEvent) => {
     if (group) {
       if (!activeGroups.includes(group.id)) {
@@ -170,7 +179,7 @@
         {activeGroups}
         {zoomLevel}
         {canvasWidth}
-        onClick={setActiveGroup}
+        onClick={setSingleActiveGroup}
       />
     {:else if view === 'timeline'}
       <TimelineGraph
