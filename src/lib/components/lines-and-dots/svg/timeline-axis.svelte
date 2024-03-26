@@ -19,17 +19,17 @@
 
   const { radius } = TimelineConfig;
 
-  const ticks = 20;
+  const ticks = 10;
 
   $: ({ workflow } = $workflowRun);
+  $: endTime = workflow?.endTime || new Date();
   $: duration = getMillisecondDuration({
     start: workflow?.startTime,
-    end: workflow?.endTime || Date.now(),
+    end: endTime,
     onlyUnderSecond: false,
   });
   $: distance = x2 - x1;
   $: tickDistance = distance / ticks;
-  $: endTime = workflow?.endTime || new Date();
 
   let endTimeInterval;
 

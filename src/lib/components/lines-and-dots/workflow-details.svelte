@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -16,58 +15,57 @@
   });
 </script>
 
-<div class="surface-secondary flex flex-col rounded-t lg:flex-row">
+<div class="surface-secondary flex flex-col items-center rounded-t lg:flex-row">
   <div
-    class="flex w-full flex-col items-center justify-between gap-4 p-2 text-sm md:flex-row lg:w-1/2"
+    class="grid w-full grid-flow-row grid-cols-1 gap-1 md:grid-cols-2 xl:grid-cols-3"
   >
-    <div class="flex flex-col gap-4">
-      <div class="flex items-center gap-1 text-xl">
-        <Icon name="clock" class="scale-130" />
-        {elapsedTime}
-      </div>
-    </div>
-    <div class="flex flex-col gap-4">
-      <div class="flex items-center justify-end gap-4">
-        <p class="text-primary">{translate('common.start')}</p>
-        <p class="rounded bg-ultraviolet px-1 text-white">
-          {formatDate(workflow?.startTime, $timeFormat, {
+    <WorkflowDetail
+      title={translate('common.duration')}
+      content={elapsedTime}
+      class="order-1 text-sm"
+    />
+    <WorkflowDetail
+      title={translate('common.start')}
+      content={formatDate(workflow?.startTime, $timeFormat, {
+        relative: $relativeTime,
+      })}
+      class="order-2 text-sm md:order-3 xl:order-4"
+    />
+    <WorkflowDetail
+      title={translate('common.end')}
+      content={workflow?.endTime
+        ? formatDate(workflow?.endTime, $timeFormat, {
             relative: $relativeTime,
-          })}
-        </p>
-      </div>
-      <div class="flex items-center justify-end gap-4">
-        <p class="text-primary">{translate('common.end')}</p>
-        <p class="rounded bg-ultraviolet px-1 text-white">
-          {formatDate(workflow?.endTime, $timeFormat, {
-            relative: $relativeTime,
-          })}
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="grids-col-1 grid w-full gap-0 p-2 lg:w-1/2 lg:grid-cols-2">
+          })
+        : '-'}
+      class="order-3 text-sm md:order-5 xl:order-7"
+    />
+    <WorkflowDetail
+      title={translate('common.task-queue')}
+      content={workflow.taskQueue}
+      class="order-4 text-sm md:order-8"
+    />
     <WorkflowDetail
       title={translate('common.workflow-type')}
       content={workflow?.name}
       copyable
-      textSize="sm"
+      class="order-4 text-sm md:order-2 xl:order-2"
     />
     <WorkflowDetail
       title={translate('common.run-id')}
       content={workflow?.runId}
       copyable
-      textSize="sm"
+      class="order-5 text-sm md:order-4 xl:order-5"
     />
     <WorkflowDetail
       title={translate('common.history-size-bytes')}
       content={workflow?.historySizeBytes}
-      copyable
-      textSize="sm"
+      class="order-6 text-sm md:order-6 xl:order-3"
     />
     <WorkflowDetail
       title={translate('workflows.state-transitions')}
       content={workflow?.stateTransitionCount}
-      textSize="sm"
+      class="order-7 text-sm md:order-8 xl:order-6"
     />
   </div>
 </div>

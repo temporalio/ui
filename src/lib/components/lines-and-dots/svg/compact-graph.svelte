@@ -44,7 +44,7 @@
 
   $: maxSegmentSize = () => {
     const groupHeights = timeGroups.map((groups, startIndex) => {
-      let totalHeight = 0;
+      let totalHeight = height;
       const nameGroups = getNameGroups(groups);
       nameGroups.forEach((group) => {
         const expanded = exandedGroups.includes(
@@ -67,8 +67,6 @@
       return getDetailsBoxHeight(group, fontSizeRatio);
     })
     .reduce((acc, height) => acc + height, 0);
-
-  $: canvasHeight = Math.max(maxSegmentSize(), 400) + activeDetailsHeight;
 
   const groupNameWithIndex = (name: string, index: number) =>
     `${index}:${name}`;
@@ -114,9 +112,11 @@
     );
 
     return (
-      expandedSize * height + groupIndex * height + height / 2 + heightAboveRow
+      expandedSize * height + groupIndex * height + heightAboveRow + height
     );
   };
+
+  $: canvasHeight = Math.max(maxSegmentSize(), 400) + activeDetailsHeight;
 </script>
 
 <svg

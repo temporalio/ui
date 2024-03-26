@@ -25,6 +25,17 @@
   export let onClick: (group: EventGroup, event: WorkflowEvent) => void;
 
   $: workflowTaskGroups = groupWorkflowTaskEvents(history);
+  $: workflowTaskSubGroups = workflowTaskGroups.map((group) => {
+    const subGroups = groups.filter(
+      (g) =>
+        g.initialEvent.attributes?.workflowTaskCompletedEventId ===
+        group.lastEvent.id,
+    );
+    return { ...group, subGroups };
+  });
+  $: {
+    console.log('workflowTaskGroups', workflowTaskSubGroups);
+  }
   $: allGroups = [...workflowTaskGroups, ...groups];
 
   const { height, fontSizeRatio, radius } = HistoryConfig;
