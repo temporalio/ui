@@ -41,7 +41,7 @@
     cursor: pointer;
     outline: none;
     opacity: 0.5;
-    stroke: #141414;
+    stroke: #465a78;
     fill: #e8efff;
   }
 
@@ -51,22 +51,18 @@
 
   .marker,
   .command {
-    stroke: #141414;
     fill: #ebebeb;
   }
 
   .timer {
-    stroke: #141414;
     fill: #fbbf24;
   }
 
   .signal {
-    stroke: #141414;
     fill: #d300d8;
   }
 
   .activity {
-    stroke: #141414;
     fill: #a78bfa;
   }
 
@@ -76,17 +72,14 @@
   }
 
   .child-workflow {
-    stroke: #141414;
     fill: #b2f8d9;
   }
 
   .update {
-    stroke: #141414;
     fill: #06b6d4;
   }
 
   .workflow {
-    stroke: #141414;
     fill: #059669;
   }
 

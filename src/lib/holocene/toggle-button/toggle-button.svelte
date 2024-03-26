@@ -49,6 +49,7 @@
   class:active={href ? $page.url.pathname.includes(base) : active}
   href={href ? href + $page.url.search : null}
   class:rounded-lg={!group}
+  class:disabled={$$restProps.disabled}
   on:click
   role="button"
   tabindex="0"
@@ -71,6 +72,10 @@
 
   .toggle-button.active {
     @apply surface-secondary-active;
+  }
+
+  .toggle-button.disabled {
+    @apply surface-disabled;
   }
 
   .group:first-child {

@@ -161,7 +161,7 @@
     </div>
   </div>
 </div>
-<div class="surface-inverse">
+<div class="bg-inverse">
   <div class="w-full overflow-x-hidden" bind:clientWidth={canvasWidth}>
     {#if view === 'compact'}
       <CompactGraph
