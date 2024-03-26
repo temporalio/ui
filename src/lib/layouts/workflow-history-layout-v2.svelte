@@ -105,7 +105,7 @@
   };
 </script>
 
-<div class="surface-secondary flex flex-col gap-0 px-4">
+<div class="surface-secondary flex flex-col gap-0 px-8">
   <WorkflowCallStackError />
   <!-- {#if workflowTaskFailedError}
     <WorkflowTypedError error={workflowTaskFailedError} />
@@ -157,9 +157,7 @@
         </ToggleButtons>
         <span class="text-sm">{(100 / zoomLevel).toFixed(0)}%</span>
       </div>
-      <div class="flex gap-2">
-        <EventTypeFilter compact={view === 'compact' || view === 'timeline'} />
-      </div>
+      <EventTypeFilter compact={view === 'compact' || view === 'timeline'} />
     </div>
   </div>
 </div>

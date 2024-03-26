@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import { routeForWorkers } from '$lib/utilities/route-for';
 
   import WorkflowDetail from './workflow-detail.svelte';
 
@@ -15,14 +18,16 @@
   });
 </script>
 
-<div class="surface-secondary flex flex-col items-center rounded-t lg:flex-row">
+<div class="surface-secondary flex flex-col gap-2">
+  <h3 class="flex items-center text-2xl">Summary</h3>
   <div
-    class="grid w-full grid-flow-row grid-cols-1 gap-1 md:grid-cols-2 xl:grid-cols-3"
+    class="surface-primary grid w-full grid-flow-row grid-cols-1 gap-2 rounded-xl border-2 border-primary p-2 md:grid-cols-2 xl:grid-cols-3"
   >
     <WorkflowDetail
       title={translate('common.duration')}
       content={elapsedTime}
       class="order-1 text-sm"
+      icon="clock"
     />
     <WorkflowDetail
       title={translate('common.start')}
@@ -42,8 +47,13 @@
     />
     <WorkflowDetail
       title={translate('common.task-queue')}
-      content={workflow.taskQueue}
+      content={workflow?.taskQueue}
       class="order-4 text-sm md:order-8"
+      href={routeForWorkers({
+        namespace: $page.params.namespace,
+        workflow: workflow?.id,
+        run: workflow?.runId,
+      })}
     />
     <WorkflowDetail
       title={translate('common.workflow-type')}

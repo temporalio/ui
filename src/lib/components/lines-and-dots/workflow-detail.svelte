@@ -9,7 +9,6 @@
   export let content: string;
   export let copyable = false;
   export let href: string = null;
-  export let textSize = 'md';
   export let icon: IconName | undefined = undefined;
 </script>
 
@@ -20,7 +19,7 @@
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       {content}
       visible
-      container-class="gap-1 w-full"
+      container-class="gap-1 w-full h-4"
     >
       {#if icon}
         <Icon name={icon} />

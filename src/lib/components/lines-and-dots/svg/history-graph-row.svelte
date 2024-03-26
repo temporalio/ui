@@ -118,7 +118,6 @@
     <Line
       startPoint={[startingX + strokeWidth, y]}
       endPoint={[startingX + horizontalOffset - radius, y]}
-      {category}
       {active}
     />
   {/if}

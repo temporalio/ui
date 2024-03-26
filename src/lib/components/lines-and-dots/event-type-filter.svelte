@@ -34,7 +34,7 @@
   };
 </script>
 
-<div class="flex flex-wrap items-center justify-center gap-4">
+<div class="flex flex-wrap items-center justify-center gap-2">
   {#each options as option}
     <div class="flex items-center gap-2">
       <input
