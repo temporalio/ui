@@ -4,10 +4,10 @@ import { genericWeekDays, monthNames, weekDays } from './calendar';
 
 // Examples of output
 // Every 3hrs:5min:20 sec 30 min offset
-// Weekends at 12:00pm PST
-// Sunday, Monday, Tuesday, Wednesday, Thursday, Friday at 12:00pm UTC
-// Every 1, 15, 31 of the month at 12:00pm UTC
-// Every 1, 15, 31 of January, March, April, June, July, September, December at 12:00pm UTC
+// Weekends at 12:00 PST
+// Sunday, Monday, Tuesday, Wednesday, Thursday, Friday at 12:00 UTC
+// Every 1, 15, 31 of the month at 12:00 UTC
+// Every 1, 15, 31 of January, March, April, June, July, September, December at 12:00 UTC
 
 export const calendarToComment = ({
   preset,
@@ -18,16 +18,9 @@ export const calendarToComment = ({
   minute,
 }: Partial<ScheduleParameters>): string => {
   let comment = '';
-  const time = !hour || !parseInt(hour) || parseInt(hour) < 12 ? 'am' : 'pm';
-  const properHour =
-    !hour || !parseInt(hour)
-      ? '12'
-      : parseInt(hour) <= 12
-      ? hour
-      : (parseInt(hour) - 12).toString();
-  const timeStamp = `${properHour.padStart(2, '0')}:${
+  const timeStamp = `${hour ? hour.padStart(2, '0') : '00'}:${
     minute ? minute.padStart(2, '0') : '00'
-  }${time}`;
+  }`;
 
   if (preset === 'week') {
     const genericName = genericWeekDays.find(

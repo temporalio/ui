@@ -18,7 +18,7 @@ describe('calendarToComment', () => {
         minute: '30',
       };
 
-      expect(calendarToComment(options)).toBe('Weekends at 12:30pm');
+      expect(calendarToComment(options)).toBe('Weekends at 12:30');
     });
 
     it('should return correct comment for weekdays', () => {
@@ -31,7 +31,7 @@ describe('calendarToComment', () => {
         minute: '46',
       };
 
-      expect(calendarToComment(options)).toBe('Weekdays at 05:46pm');
+      expect(calendarToComment(options)).toBe('Weekdays at 17:46');
     });
 
     it('should return correct comment for a range of days', () => {
@@ -45,7 +45,7 @@ describe('calendarToComment', () => {
       };
 
       expect(calendarToComment(options)).toBe(
-        'Monday, Tuesday, Friday at 04:15am',
+        'Monday, Tuesday, Friday at 04:15',
       );
     });
 
@@ -60,7 +60,7 @@ describe('calendarToComment', () => {
       };
 
       expect(calendarToComment(options)).toBe(
-        'Friday, Saturday, Sunday at 12:00pm',
+        'Friday, Saturday, Sunday at 12:00',
       );
     });
   });
@@ -76,9 +76,7 @@ describe('calendarToComment', () => {
         minute: '5',
       };
 
-      expect(calendarToComment(options)).toBe(
-        'Every 1 of the month at 11:05pm',
-      );
+      expect(calendarToComment(options)).toBe('Every 1 of the month at 23:05');
     });
 
     it('should return correct comment for all months and multiple day', () => {
@@ -92,7 +90,7 @@ describe('calendarToComment', () => {
       };
 
       expect(calendarToComment(options)).toBe(
-        'Every 3,13,19,28 of the month at 12:05am',
+        'Every 3,13,19,28 of the month at 00:05',
       );
     });
 
@@ -106,7 +104,7 @@ describe('calendarToComment', () => {
         minute: '05',
       };
 
-      expect(calendarToComment(options)).toBe('Every 3 of February at 04:05am');
+      expect(calendarToComment(options)).toBe('Every 3 of February at 04:05');
     });
 
     it('should return correct comment for single months and multiple days', () => {
@@ -120,7 +118,7 @@ describe('calendarToComment', () => {
       };
 
       expect(calendarToComment(options)).toBe(
-        'Every 3,4,5,11 of February at 04:05pm',
+        'Every 3,4,5,11 of February at 16:05',
       );
     });
 
@@ -135,7 +133,7 @@ describe('calendarToComment', () => {
       };
 
       expect(calendarToComment(options)).toBe(
-        'Every 4 of June, July, August at 07:45pm',
+        'Every 4 of June, July, August at 19:45',
       );
     });
 
@@ -150,7 +148,7 @@ describe('calendarToComment', () => {
       };
 
       expect(calendarToComment(options)).toBe(
-        'Every 1,15,30 of January, October, November, December at 06:16am',
+        'Every 1,15,30 of January, October, November, December at 06:16',
       );
     });
   });

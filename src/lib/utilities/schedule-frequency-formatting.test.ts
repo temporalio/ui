@@ -39,24 +39,22 @@ const generateCalendar = ({
 describe('structuredCalendarToFrequency', () => {
   it('daily default frequency', () => {
     const calendar = generateCalendar({});
-    const expected = 'Daily at 12:00am UTC';
+    const expected = 'Daily at 00:00 UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
   });
-  it('daily custom am frequency', () => {
-    const calendar = generateCalendar({ hour: 3, minute: 57 });
-    const expected = 'Daily at 03:57am UTC';
+  it('daily custom frequency', () => {
+    let calendar = generateCalendar({ hour: 3, minute: 57 });
+    let expected = 'Daily at 03:57 UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
-  });
-  it('daily custom pm frequency', () => {
-    const calendar = generateCalendar({ hour: 16, minute: 12 });
-    const expected = 'Daily at 04:12pm UTC';
-    expect(structuredCalendarToFrequency(calendar)).toBe(expected);
-  });
 
+    calendar = generateCalendar({ hour: 16, minute: 12 });
+    expected = 'Daily at 16:12 UTC';
+    expect(structuredCalendarToFrequency(calendar)).toBe(expected);
+  });
   it('single day of week frequency at noon', () => {
     const dayOfWeek: ScheduleRange = [{ start: 3, end: 3, step: 1 }];
     const calendar = generateCalendar({ hour: 12, minute: 0, dayOfWeek });
-    const expected = 'Wednesday at 12:00pm UTC';
+    const expected = 'Wednesday at 12:00 UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
   });
   it('two days of week frequency at 8pm', () => {
@@ -65,7 +63,7 @@ describe('structuredCalendarToFrequency', () => {
       { start: 5, end: 5, step: 1 },
     ];
     const calendar = generateCalendar({ hour: 20, minute: 0, dayOfWeek });
-    const expected = 'Sunday, Friday at 08:00pm UTC';
+    const expected = 'Sunday, Friday at 20:00 UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
   });
   it('multiple days of week frequency', () => {
@@ -75,27 +73,26 @@ describe('structuredCalendarToFrequency', () => {
       { start: 6, end: 6, step: 1 },
     ];
     const calendar = generateCalendar({ dayOfWeek });
-    const expected = 'Monday, Friday, Saturday at 12:00am UTC';
+    const expected = 'Monday, Friday, Saturday at 00:00 UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
   });
   it('range of days of week frequency', () => {
     const dayOfWeek: ScheduleRange = [{ start: 1, end: 5, step: 1 }];
     const calendar = generateCalendar({ dayOfWeek });
-    const expected = 'Monday - Friday at 12:00am UTC';
+    const expected = 'Monday - Friday at 00:00 UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
   });
-
   it('single day of every month', () => {
     const dayOfMonth: ScheduleRange = [{ start: 1, end: 1, step: 1 }];
     const calendar = generateCalendar({ dayOfMonth });
-    const expected = 'Every 1 of the month at 12:00am UTC';
+    const expected = 'Every 1 of the month at 00:00 UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
   });
   it('single day of one month', () => {
     const dayOfMonth: ScheduleRange = [{ start: 1, end: 1, step: 1 }];
     const month: ScheduleRange = [{ start: 1, end: 1, step: 1 }];
     const calendar = generateCalendar({ dayOfMonth, month });
-    const expected = 'Every 1 of January at 12:00am UTC';
+    const expected = 'Every 1 of January at 00:00 UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
   });
   it('single day of multiple months', () => {
@@ -105,7 +102,7 @@ describe('structuredCalendarToFrequency', () => {
       { start: 7, end: 7, step: 1 },
     ];
     const calendar = generateCalendar({ dayOfMonth, month });
-    const expected = 'Every 25 of March, July at 12:00am UTC';
+    const expected = 'Every 25 of March, July at 00:00 UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
   });
   it('multiple days of multiple months', () => {
@@ -122,7 +119,7 @@ describe('structuredCalendarToFrequency', () => {
     ];
     const calendar = generateCalendar({ dayOfMonth, month });
     const expected =
-      'Every 1, 15, 30 of March, July, October, December at 12:00am UTC';
+      'Every 1, 15, 30 of March, July, October, December at 00:00 UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
   });
   it('multiple days of range of months', () => {
@@ -133,7 +130,7 @@ describe('structuredCalendarToFrequency', () => {
     ];
     const month: ScheduleRange = [{ start: 1, end: 4, step: 1 }];
     const calendar = generateCalendar({ dayOfMonth, month });
-    const expected = 'Every 1, 15, 30 of January - April at 12:00am UTC';
+    const expected = 'Every 1, 15, 30 of January - April at 00:00 UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
   });
 });
@@ -141,7 +138,7 @@ describe('structuredCalendarToFrequency', () => {
 describe('commentOrCalendarToFrequency', () => {
   it('should convert a calendar to a frequency', () => {
     const calendar = generateCalendar({});
-    const expected = 'Daily at 12:00am UTC';
+    const expected = 'Daily at 00:00 UTC';
     expect(structuredCalendarToFrequency(calendar)).toBe(expected);
   });
   it('should return a comment as the frequency if one exists', () => {

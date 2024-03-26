@@ -3,10 +3,10 @@ import type { ScheduleRange, StructuredCalendar } from '$lib/types/schedule';
 import { monthNames, weekDays } from './calendar';
 
 // Examples of output
-// Wednesday at 06:30pm UTC
-// Sunday, Monday, Tuesday, Wednesday, Thursday, Friday at 12:00pm UTC
-// Every 1, 15, 31 of the month at 12:00pm UTC
-// Every 1, 15, 31 of January, March, April, June, July, September, December at 12:00pm UTC
+// Wednesday at 18:30 UTC
+// Sunday, Monday, Tuesday, Wednesday, Thursday, Friday at 12:00 UTC
+// Every 1, 15, 31 of the month at 12:00 UTC
+// Every 1, 15, 31 of January, March, April, June, July, September, December at 12:00 UTC
 
 const isDailyForTheMonth = (calendar: StructuredCalendar) => {
   return (
@@ -143,49 +143,28 @@ const getMonths = (calendar: StructuredCalendar) => {
   return months;
 };
 
-const getHour = (calendar: StructuredCalendar) => {
-  const range: ScheduleRange[] = calendar.hour;
-  let hour = 12;
-  let amOrpm = 'am';
-
-  if (range?.length) {
-    const hourRange = range[0];
-    if (hourRange?.start === hourRange?.end) {
-      if (hourRange.start < 12) {
-        hour = hourRange.start === 0 ? 12 : hourRange.start;
-        amOrpm = 'am';
-      } else if (hourRange.start === 12) {
-        hour = hourRange.start;
-        amOrpm = 'pm';
-      } else {
-        hour = hourRange.start - 12;
-        amOrpm = 'pm';
-      }
-    }
-  }
-
-  return { hour: hour.toString().padStart(2, '0'), amOrpm };
-};
-
-const getMinute = (calendar: StructuredCalendar) => {
-  const range: ScheduleRange[] = calendar.minute;
-  let minute = 0;
+const convertRange = (
+  calendar: StructuredCalendar,
+  unit: 'hour' | 'minute',
+) => {
+  const range: ScheduleRange[] = calendar[unit];
+  let time = 0;
 
   if (range?.length) {
     const minuteRange = range[0];
     if (minuteRange?.start === minuteRange?.end) {
-      minute = minuteRange.start;
+      time = minuteRange.start;
     }
   }
 
-  return minute.toString().padStart(2, '0');
+  return time.toString().padStart(2, '0');
 };
 
 const getTime = (calendar: StructuredCalendar) => {
-  const { hour, amOrpm } = getHour(calendar);
-  const minute = getMinute(calendar);
+  const hour = convertRange(calendar, 'hour');
+  const minute = convertRange(calendar, 'minute');
   if (hour) {
-    return `${hour}:${minute}${amOrpm} UTC`;
+    return `${hour}:${minute} UTC`;
   }
 };
 
