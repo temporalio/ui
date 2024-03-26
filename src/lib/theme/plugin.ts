@@ -13,7 +13,7 @@ export const variables = {
   '--color-interactive-hover': rgb(getColor('indigo', 700)),
 
   '--color-text-black': rgb(colors.black),
-  '--color-text-white': rgb(colors.white),
+
   '--color-text-primary': rgb(colors.primary),
   '--color-text-secondary': rgb(colors.secondary),
   '--color-text-inverse': rgb(colors.offWhite),
