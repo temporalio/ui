@@ -41,6 +41,7 @@ const operators = [
   'in',
   '(',
   ')',
+  'starts_with',
 ] as const;
 
 const conditionals = [
@@ -162,4 +163,11 @@ export const isSortOrder = (
 
 export const isError = (e: unknown): e is Error => {
   return has(e, 'name', 'message');
+};
+
+export const isStartsWith = (x: unknown) => {
+  if (!isString(x)) return false;
+  x = x.toLocaleLowerCase();
+
+  return x === 'starts_with';
 };

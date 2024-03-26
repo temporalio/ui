@@ -16,11 +16,11 @@ export const prefixSearchEnabled = derived(
   [page, temporalVersion],
   ([$page, $temporalVersion]) => {
     const serverVersionEnabled = minimumVersionRequired(
-      '1.23.0',
+      '1.22.0',
       $temporalVersion,
     );
     const capabilitiesEnabled = Boolean(
-      $page.data?.systemInfo?.capabilities?.prefixSearchEnabled,
+      $page.data?.systemInfo?.capabilities?.prefixSearch,
     );
     return serverVersionEnabled || capabilitiesEnabled;
   },
