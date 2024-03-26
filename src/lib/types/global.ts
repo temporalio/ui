@@ -69,9 +69,21 @@ export interface NetworkError {
   message?: string;
 }
 
+export enum OIDCFlow {
+  AuthorizationCode = 'authorization-code',
+  Implicit = 'implicit',
+}
+
 export type Settings = {
   auth: {
     enabled: boolean;
+    flow: OIDCFlow;
+    providerUrl: string;
+    issuerUrl: string;
+    authorizationUrl: string;
+    clientId: string;
+    callbackUrl: string;
+    scopes: string[];
     options: string[];
   };
   bannerText: string;

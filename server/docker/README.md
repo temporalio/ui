@@ -15,6 +15,7 @@ docker run \
     -e TEMPORAL_ADDRESS=127.0.0.1:7233 \
     -e TEMPORAL_UI_PORT=8080 \
     -e TEMPORAL_AUTH_ENABLED=true \
+    -e TEMPORAL_AUTH_FLOW_TYPE=authorization-code \
     -e TEMPORAL_AUTH_PROVIDER_URL=https://accounts.google.com \
     -e TEMPORAL_AUTH_CLIENT_ID=xxxxx-xxxx.apps.googleusercontent.com \
     -e TEMPORAL_AUTH_CLIENT_SECRET=xxxxxxxxxxxxxxx \

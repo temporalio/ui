@@ -172,6 +172,7 @@ describe('routeFor SSO authentication ', () => {
   it('Options added through settings should be passed in the url', () => {
     const settings = {
       auth: {
+        flow: 'authorization-code',
         options: ['one'],
       },
       baseUrl: 'https://localhost/',
@@ -192,6 +193,7 @@ describe('routeFor SSO authentication ', () => {
   it('should fallback to the originUrl if returnUrl is not provided', () => {
     const settings = {
       auth: {
+        flow: 'authorization-code',
         options: ['one'],
       },
       baseUrl: 'https://localhost/',
@@ -210,6 +212,7 @@ describe('routeFor SSO authentication ', () => {
   it('should use the returnUrl if provided', () => {
     const settings = {
       auth: {
+        flow: 'authorization-code',
         options: ['one'],
       },
       baseUrl: 'https://localhost/',
@@ -229,6 +232,7 @@ describe('routeFor SSO authentication ', () => {
   it("should not add the options from the search param if they don't exist in the current url params", () => {
     const settings = {
       auth: {
+        flow: 'authorization-code',
         options: ['one'],
       },
       baseUrl: 'https://localhost/',
@@ -245,7 +249,10 @@ describe('routeFor SSO authentication ', () => {
   });
 
   it('Should render a login url', () => {
-    const settings = { auth: {}, baseUrl: 'https://localhost' };
+    const settings = {
+      auth: { flow: 'authorization-code' },
+      baseUrl: 'https://localhost',
+    };
     const searchParams = new URLSearchParams();
 
     const sso = routeForAuthentication({ settings, searchParams });
@@ -254,7 +261,10 @@ describe('routeFor SSO authentication ', () => {
   });
 
   it('Should add return URL search param', () => {
-    const settings = { auth: {}, baseUrl: 'https://localhost' };
+    const settings = {
+      auth: { flow: 'authorization-code' },
+      baseUrl: 'https://localhost',
+    };
 
     const searchParams = new URLSearchParams();
     searchParams.set('returnUrl', 'https://localhost/some/path');
@@ -271,7 +281,10 @@ describe('routeFor SSO authentication ', () => {
   });
 
   it('Should not add return URL search param if undefined', () => {
-    const settings = { auth: {}, baseUrl: 'https://localhost' };
+    const settings = {
+      auth: { flow: 'authorization-code' },
+      baseUrl: 'https://localhost',
+    };
 
     const searchParams = new URLSearchParams();
     const sso = routeForAuthentication({ settings, searchParams });
@@ -283,6 +296,7 @@ describe('routeFor SSO authentication ', () => {
   it('test of the signin flow', () => {
     const settings = {
       auth: {
+        flow: 'authorization-code',
         options: ['organization_name', 'invitation'],
       },
       baseUrl: 'https://localhost/',
@@ -300,6 +314,56 @@ describe('routeFor SSO authentication ', () => {
     expect(sso).toEqual(
       'https://localhost/auth/sso?organization_name=temporal-cloud&invitation=Wwv6g2cKkfjyqoLxnCPUCfiKcjHKpK%5B%E2%80%A6%5Dn9ipxcao0jKYH0I3',
     );
+  });
+
+  describe('implicit oidc flow', () => {
+    it('should add a nonce', () => {
+      const settings = {
+        auth: {
+          flow: 'implicit',
+          authorizationUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+          scopes: ['openid', 'email', 'profile'],
+        },
+        baseUrl: 'https://localhost',
+      };
+
+      const searchParams = new URLSearchParams();
+
+      const sso = routeForAuthentication({
+        settings,
+        searchParams,
+      });
+
+      const ssoUrl = new URL(sso);
+      expect(window.localStorage.getItem('nonce')).toBe(
+        ssoUrl.searchParams.get('nonce'),
+      );
+    });
+
+    it('should manage state', () => {
+      const settings = {
+        auth: {
+          flow: 'implicit',
+          authorizationUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+          scopes: ['openid', 'email', 'profile'],
+        },
+        baseUrl: 'https://localhost',
+      };
+
+      const searchParams = new URLSearchParams();
+      searchParams.set('returnUrl', 'https://localhost/some/path');
+
+      const sso = routeForAuthentication({
+        settings,
+        searchParams,
+      });
+
+      const ssoUrlStateKey = new URL(sso).searchParams.get('state');
+      expect(ssoUrlStateKey).not.toBeNull();
+      expect(window.sessionStorage.getItem(ssoUrlStateKey as string)).toBe(
+        'https://localhost/some/path',
+      );
+    });
   });
 
   describe('routeForLoginPage', () => {
