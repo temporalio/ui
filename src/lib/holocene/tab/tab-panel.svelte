@@ -28,9 +28,3 @@
 >
   <slot />
 </div>
-
-<style lang="postcss">
-  .active {
-    @apply text-primary;
-  }
-</style>
