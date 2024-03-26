@@ -180,7 +180,7 @@
     @apply surface-primary;
 
     :global(tr:not(.empty)) {
-      @apply h-12 border-b border-primary hover:surface-interactive last-of-type:border-0 hover:bg-fixed;
+      @apply h-12 border-b border-primary hover:surface-subtle last-of-type:border-0 hover:bg-fixed;
     }
 
     :global(tr > td > .table-link) {
