@@ -20,7 +20,7 @@
 <div
   {id}
   class:hidden={!active}
-  class:active
+  class:text-primary={active}
   aria-labelledby={tabId}
   tabindex="0"
   role="tabpanel"
