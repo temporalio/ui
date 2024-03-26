@@ -167,7 +167,5 @@ export const isError = (e: unknown): e is Error => {
 
 export const isStartsWith = (x: unknown) => {
   if (!isString(x)) return false;
-  x = x.toLocaleLowerCase();
-
-  return x === 'starts_with';
+  return x.toLocaleLowerCase() === 'starts_with';
 };

@@ -126,7 +126,7 @@
                 {/if}
               {:else}
                 {isStartsWith(conditional)
-                  ? translate('common.starts-with')
+                  ? translate('common.starts-with').toLocaleLowerCase()
                   : conditional}
                 {isTextFilter({ attribute, type }) ? `"${value}"` : value}
               {/if}

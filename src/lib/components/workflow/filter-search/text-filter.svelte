@@ -23,16 +23,10 @@
   let options = [
     { value: '=', label: translate('common.equal-to') },
     { value: '!=', label: translate('common.not-equal-to') },
+    ...($prefixSearchEnabled
+      ? [{ value: 'STARTS_WITH', label: translate('common.starts-with') }]
+      : []),
   ];
-
-  $: {
-    if ($prefixSearchEnabled) {
-      options = [
-        ...options,
-        { value: 'STARTS_WITH', label: translate('common.starts-with') },
-      ];
-    }
-  }
 </script>
 
 <ConditionalMenu {options} inputId="text-filter-search" noBorderLeft />
