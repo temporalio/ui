@@ -24,10 +24,16 @@ export default defineConfig({
         'src/lib/svelte-mocks/**/*',
         'src/lib/utilities/get-environment.ts',
         '**/*.test.ts',
-        '.svelte-kit',
       ],
     },
-    exclude: [...configDefaults.exclude, 'package', 'build', 'e2e', 'tests'],
+    exclude: [
+      ...configDefaults.exclude,
+      'package',
+      'build',
+      'e2e',
+      'tests',
+      '.svelte-kit',
+    ],
     environment: 'jsdom',
     setupFiles: ['./vitest-setup.ts', 'vitest-localstorage-mock'],
     deps: {
