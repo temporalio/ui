@@ -11,7 +11,6 @@
   export let placeholder = '';
   export let name = id;
   export let disabled = false;
-  export let theme: 'dark' | 'light' = 'light';
   export let hintText = '';
   export let max: number = undefined;
   export let min: number = undefined;
@@ -38,7 +37,7 @@
   <label class:sr-only={labelHidden} for={id}>{label}</label>
   <div class="flex items-center gap-2">
     <div
-      class="input-container {theme}"
+      class="input-container"
       class:disabled
       class:search
       class:unroundRight
@@ -89,7 +88,7 @@
   }
 
   .input-container {
-    @apply relative box-border flex h-10 w-16 items-center rounded border  text-sm focus-within:border-blue-700;
+    @apply relative box-border flex h-10 w-16 items-center rounded border-2 text-sm focus-within:border-information dark:border-subtle;
   }
 
   .input-container.search {
@@ -98,14 +97,14 @@
     input {
       @apply text-left;
     }
-  }
 
-  .input-container.disabled {
-    @apply border;
+    input::-webkit-inner-spin-button {
+      @apply bg-pink;
+    }
   }
 
   .icon-container {
-    @apply ml-2 flex items-center justify-center;
+    @apply ml-2 flex items-center justify-center bg-pink text-primary;
   }
 
   .copy-icon-container {
@@ -120,45 +119,25 @@
     @apply invisible mr-2 font-secondary text-sm font-medium text-primary;
   }
 
-  /* Light theme styles */
-  .input-container.light,
-  .input-container.light .icon-container,
-  .input-container.light input {
+  .input-container .icon-container,
+  .input-container input {
     @apply surface-primary;
   }
 
-  .input-container.light .icon-container {
+  .input-container .icon-container {
     @apply text-slate-400;
   }
 
-  .input-container.light.disabled {
-    @apply border-slate-600 bg-slate-50  text-slate-600;
+  .input-container.disabled {
+    @apply border border-slate-600 bg-slate-50  text-slate-600;
   }
 
-  .input-container.light.disabled input {
+  .input-container.disabled input {
     @apply bg-slate-50;
   }
 
-  .input-container.light.disabled .copy-icon-container {
+  .input-container.disabled .copy-icon-container {
     @apply border-slate-600 bg-slate-200;
-  }
-
-  /* Dark theme styles */
-  .input-container.dark,
-  .input-container.dark .icon-container,
-  .input-container.dark input,
-  .input-container.dark .copy-icon-container {
-    @apply border-subtle bg-inverse text-white;
-  }
-
-  .input-container.dark input {
-    @apply placeholder:text-slate-200;
-  }
-
-  .input-container.dark.disabled,
-  .input-container.dark.disabled .copy-icon-container,
-  .input-container.dark.disabled input {
-    @apply bg-inverse;
   }
 
   .unroundRight {
