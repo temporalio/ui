@@ -62,6 +62,7 @@ export type APIRouteParameters = {
   batchJobId: string;
   queue: string;
   queryType: string;
+  queryArgs: string;
   signalName: string;
   activityId: string;
 };
@@ -86,7 +87,7 @@ export type WorkflowRouteParameters = Pick<
 
 export type WorkflowQueryRouteParameters = Pick<
   APIRouteParameters,
-  'namespace' | 'workflowId' | 'queryType'
+  'namespace' | 'workflowId' | 'queryType' | 'queryArgs'
 >;
 
 export type WorkflowActivitiesRouteParameters = Pick<

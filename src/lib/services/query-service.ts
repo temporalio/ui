@@ -1,6 +1,7 @@
 import type { WorkflowQueryRouteParameters } from '$lib/types/api';
 import type { Eventual, Settings } from '$lib/types/global';
 import { convertPayloadToJsonWithCodec } from '$lib/utilities/decode-payload';
+import { encodePayloads } from '$lib/utilities/encode-payload';
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
 import { has } from '$lib/utilities/has';
 import {
@@ -17,6 +18,7 @@ type QueryRequestParameters = {
   workflow: Eventual<{ id: string; runId: string }>;
   namespace: string;
   queryType: string;
+  queryArgs?: string;
 };
 
 type WorkflowParameters = Omit<QueryRequestParameters, 'queryType'>;
@@ -43,17 +45,19 @@ const formatParameters = async (
   namespace: string,
   workflow: Eventual<{ id: string; runId: string }>,
   queryType: string,
+  queryArgs?: string,
 ): Promise<WorkflowQueryRouteParameters> => {
   workflow = await workflow;
   return {
     namespace,
     workflowId: workflow.id,
     queryType,
+    queryArgs,
   };
 };
 
 async function fetchQuery(
-  { workflow, namespace, queryType }: QueryRequestParameters,
+  { workflow, namespace, queryType, queryArgs }: QueryRequestParameters,
   request = fetch,
   onError?: (error: {
     status: number;
@@ -62,7 +66,7 @@ async function fetchQuery(
   }) => void,
 ): Promise<QueryResponse> {
   workflow = await workflow;
-  const parameters = await formatParameters(namespace, workflow, queryType);
+  const parameters = await formatParameters(namespace, workflow, queryType, queryArgs);
   const route = routeForApi('query', parameters);
 
   return await requestFromAPI<QueryResponse>(route, {
@@ -75,6 +79,9 @@ async function fetchQuery(
         },
         query: {
           queryType,
+          queryArgs: {
+            payloads: await encodePayloads(queryArgs ?? '')
+          },
         },
       }),
     },
