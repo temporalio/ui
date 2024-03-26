@@ -165,6 +165,7 @@
   <div class="w-full overflow-x-hidden" bind:clientWidth={canvasWidth}>
     {#if view === 'compact'}
       <CompactGraph
+        {workflow}
         {groups}
         {activeGroups}
         {zoomLevel}

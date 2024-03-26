@@ -3,6 +3,7 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
+  import type { WorkflowExecution } from '$lib/types/workflows';
 
   import {
     activeRowsHeightAboveGroup,
@@ -12,11 +13,13 @@
 
   import CompactGraphRow from './compact-graph-row.svelte';
   import GroupDetailsRow from './group-details-row.svelte';
+  import WorkflowRow from './workflow-row.svelte';
 
   export let x = 0;
   export let y = 0;
   export let staticHeight = 0;
 
+  export let workflow: WorkflowExecution;
   export let groups: EventGroups;
   export let activeGroups: string[] = [];
   export let zoomLevel: number = 1;
@@ -179,5 +182,7 @@
         {/each}
       {/if}
     {/each}
+  {:else}
+    <WorkflowRow {workflow} y={height} length={canvasWidth} active />
   {/each}
 </svg>
