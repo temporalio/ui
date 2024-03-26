@@ -51,7 +51,7 @@
       @apply surface-table;
 
       :global(th) {
-        @apply border-t border-table px-1 py-2;
+        @apply border-t border-table px-1 py-2 text-inverse;
       }
 
       :global(td) {
