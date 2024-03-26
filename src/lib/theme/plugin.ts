@@ -144,7 +144,7 @@ const temporal = plugin(
       },
       '.surface-table': {
         backgroundColor: css('--color-surface-table'),
-        color: css('--color-text-white'),
+        color: css('--color-text-inverse'),
       },
       '.surface-warning': {
         backgroundColor: css('--color-surface-subtle'),
