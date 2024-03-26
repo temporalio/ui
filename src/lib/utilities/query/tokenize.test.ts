@@ -10,7 +10,7 @@ const customAttributesWithSpacesQuery =
 const combinedQuery =
   'WorkflowId="Hello" and WorkflowType="World" and StartTime BETWEEN "2022-04-18T18:09:49-06:00" AND "2022-04-20T18:09:49-06:00"';
 const valuesWithSpacesQuery =
-  '`Custom Key Word`="Hello there world" AND WorkflowId="one and two and three" OR WorkflowType="example = one"';
+  '`Custom Key Word`="Hello there world" AND WorkflowId="one and two = three" OR WorkflowType="example=\'one\'"';
 
 describe('tokenize', () => {
   it('should eliminate spaces', () => {
@@ -107,11 +107,11 @@ describe('tokenize', () => {
       'AND',
       'WorkflowId',
       '=',
-      'one and two and three',
+      'one and two = three',
       'OR',
       'WorkflowType',
       '=',
-      'example = one',
+      "example='one'",
     ]);
   });
 

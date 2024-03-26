@@ -42,9 +42,7 @@ export const tokenize = (string: string): Tokens => {
       const isPotentialStartofAttribute =
         cursor === 0 ||
         (isSpace(string[cursor - 1]) && isOperator(tokens[tokens.length - 1]));
-      const hasClosingBacktick = Array.from(string.slice(cursor + 1)).some(
-        isBacktick,
-      );
+      const hasClosingBacktick = string.slice(cursor + 1).includes(character);
 
       if (isPotentialStartofAttribute && hasClosingBacktick) {
         addBufferToTokens();
@@ -88,11 +86,10 @@ export const tokenize = (string: string): Tokens => {
       addBufferToTokens();
 
       const isPotentialStartOfValue = isConditional(string[cursor - 1]);
-      const hasClosingQuote = Array.from(string.slice(cursor + 1)).some(
-        isQuote,
-      );
+      const hasClosingQuote = string.slice(cursor + 1).includes(character);
       if (isPotentialStartOfValue && hasClosingQuote) {
-        getTokenWithSpaces(isQuote);
+        const isClosingQuote = (value: unknown) => value === character;
+        getTokenWithSpaces(isClosingQuote);
         continue;
       }
       cursor++;
