@@ -30,6 +30,7 @@ const customAttributesWithSpacesQuery =
   '`Custom Bool Field`=true AND `Custom Keyword Field`="Hello world"';
 const workflowQueryWithSpaces =
   'WorkflowId="One and Two" AND `Custom Keyword Field`="Hello = world"';
+const prefixQuery = 'WorkflowType STARTS_WITH "hello"';
 
 const attributes = {
   CloseTime: 'Datetime',
@@ -66,6 +67,21 @@ describe('toListWorkflowFilters', () => {
         operator: '',
         parenthesis: '',
         value: 'Hello = world',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
+  it('should parse a query with prefix search', () => {
+    const result = toListWorkflowFilters(prefixQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        conditional: 'STARTS_WITH',
+        operator: '',
+        parenthesis: '',
+        value: 'hello',
       },
     ];
     expect(result).toEqual(expectedFilters);

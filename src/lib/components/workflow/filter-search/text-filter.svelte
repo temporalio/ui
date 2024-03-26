@@ -3,6 +3,7 @@
 
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { prefixSearchEnabled } from '$lib/stores/capability-enablement';
 
   import ConditionalMenu from './conditional-menu.svelte';
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
@@ -19,16 +20,17 @@
       handleSubmit();
     }
   }
-</script>
 
-<ConditionalMenu
-  options={[
+  let options = [
     { value: '=', label: translate('common.equal-to') },
     { value: '!=', label: translate('common.not-equal-to') },
-  ]}
-  inputId="text-filter-search"
-  noBorderLeft
-/>
+    ...($prefixSearchEnabled
+      ? [{ value: 'STARTS_WITH', label: translate('common.starts-with') }]
+      : []),
+  ];
+</script>
+
+<ConditionalMenu {options} inputId="text-filter-search" noBorderLeft />
 <Input
   label={$filter.attribute}
   labelHidden

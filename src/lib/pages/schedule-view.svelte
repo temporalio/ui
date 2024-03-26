@@ -29,8 +29,8 @@
     triggerImmediately,
     unpauseSchedule,
   } from '$lib/services/schedule-service';
+  import { groupByCountEnabled } from '$lib/stores/capability-enablement';
   import { coreUserStore } from '$lib/stores/core-user';
-  import { groupByCountEnabled } from '$lib/stores/group-by-enabled';
   import { loading } from '$lib/stores/schedules';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { refresh, workflowCount } from '$lib/stores/workflows';

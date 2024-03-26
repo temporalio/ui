@@ -10,7 +10,7 @@ import type { FilterParameters, WorkflowExecution } from '$lib/types/workflows';
 import { withLoading } from '$lib/utilities/stores/with-loading';
 
 import { supportsAdvancedVisibility } from './advanced-visibility';
-import { groupByCountEnabled } from './group-by-enabled';
+import { groupByCountEnabled } from './capability-enablement';
 
 export const refresh = writable(0);
 export const hideWorkflowQueryErrors = derived(

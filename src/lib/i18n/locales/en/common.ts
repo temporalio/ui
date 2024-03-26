@@ -31,6 +31,7 @@ export const Strings = {
   before: 'Before',
   between: 'Between',
   'in-last': 'In Last',
+  'starts-with': 'Starts with',
   equals: 'Equals',
   'greater-than': 'Greater Than',
   'greater-than-or-equal-to': 'Greater than or equal to',
