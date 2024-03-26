@@ -28,6 +28,7 @@ const workflowQuery4 =
   '(ExecutionStatus="Canceled" OR ExecutionStatus="Failed" OR ExecutionStatus="Completed") AND WorkflowType="World" AND StartTime > "2022-04-18T17:45:18-06:00"';
 const customAttributesWithSpacesQuery =
   '`Custom Bool Field`=true AND `Custom Keyword Field`="Test"';
+const prefixQuery = 'WorkflowType STARTS_WITH "hello"';
 
 const attributes = {
   CloseTime: 'Datetime',
@@ -44,6 +45,21 @@ describe('toListWorkflowFilters', () => {
   afterEach(() => {
     vi.clearAllMocks();
     vi.useRealTimers();
+  });
+
+  it('should parse a query with prefix search', () => {
+    const result = toListWorkflowFilters(prefixQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        conditional: 'STARTS_WITH',
+        operator: '',
+        parenthesis: '',
+        value: 'hello',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
   });
 
   it('should parse a query with custom attributes that have spaces', () => {
