@@ -81,11 +81,11 @@
 <style lang="postcss">
   /* Base styles */
   label {
-    @apply mb-10 font-secondary text-sm font-medium;
+    @apply mb-10 font-secondary text-sm font-medium text-primary;
   }
 
   .units {
-    @apply font-secondary text-sm font-medium;
+    @apply font-secondary text-sm font-medium text-primary;
   }
 
   .input-container {
@@ -148,7 +148,7 @@
   .input-container.dark .icon-container,
   .input-container.dark input,
   .input-container.dark .copy-icon-container {
-    @apply bg-inverse text-white;
+    @apply border-subtle bg-inverse text-white;
   }
 
   .input-container.dark input {
