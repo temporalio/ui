@@ -122,7 +122,7 @@
   }
 
   .checkbox.hoverable:hover .checkmark::before {
-    @apply absolute -left-2.5 -z-10 h-9 w-9 self-center rounded-full bg-interactive/20 content-[''];
+    @apply absolute -left-2.5 -z-10 h-9 w-9 self-center bg-interactive/20 content-[''];
   }
 
   .label {
@@ -138,7 +138,7 @@
   }
 
   .checkmark {
-    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border border-primary bg-white dark:bg-transparent;
+    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-md border-2 border-secondary bg-white dark:bg-transparent;
 
     &.invalid {
       @apply border-danger;
