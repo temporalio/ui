@@ -22,6 +22,7 @@
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
+  import { getUTCOffset, timeFormat } from '$lib/stores/time-format';
   import {
     workflowRun,
     workflowTimelineViewOpen,
@@ -251,7 +252,10 @@
       visualizationRef,
       new DataSet([]),
       new DataSet([]),
-      getTimelineOptions($workflowRun.workflow, { maxHeight }),
+      getTimelineOptions($workflowRun.workflow, {
+        maxHeight,
+        offset: getUTCOffset($timeFormat),
+      }),
     );
     filterAndSetItems($eventCategoryFilter);
   };
@@ -277,7 +281,8 @@
     $workflowTimelineViewOpen &&
     $workflowRun.workflow &&
     history.length &&
-    visualizationRef;
+    visualizationRef &&
+    $timeFormat;
 
   const drawTimeline = () => {
     if (timeline) {

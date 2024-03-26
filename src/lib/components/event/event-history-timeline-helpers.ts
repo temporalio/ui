@@ -2,6 +2,7 @@ import { get } from 'svelte/store';
 
 import { endOfMinute, startOfMinute } from 'date-fns';
 import type { TimelineOptionsZoomKey } from 'vis-timeline';
+import { moment } from 'vis-timeline/standalone';
 
 import { relativeTime, timeFormat } from '$lib/stores/time-format';
 import type { WorkflowExecution } from '$lib/types/workflows';
@@ -12,7 +13,7 @@ type TimelineOptionsTooltipOverflow = 'flip' | 'none' | 'cap';
 
 export const getTimelineOptions = (
   workflow: WorkflowExecution,
-  { maxHeight = 520 }: { maxHeight: number },
+  { maxHeight = 520, offset }: { maxHeight: number; offset: string },
 ) => ({
   stackSubgroups: true,
   maxHeight,
@@ -20,6 +21,9 @@ export const getTimelineOptions = (
   max: workflow?.endTime
     ? endOfMinute(new Date(workflow?.endTime))
     : Date.now(),
+  moment: function (date) {
+    return moment(date).utcOffset(offset);
+  },
   horizontalScroll: true,
   verticalScroll: true,
   zoomKey: 'ctrlKey' as TimelineOptionsZoomKey,
