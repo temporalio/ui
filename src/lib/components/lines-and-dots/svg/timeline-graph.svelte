@@ -36,12 +36,13 @@
   $: activeDetailsHeight = activeGroups
     .map((id) => {
       const group = groups.find((group) => group.id === id);
+      if (!group) return 0;
       return getDetailsBoxHeight(group, fontSizeRatio);
     })
     .reduce((acc, height) => acc + height, 0);
 
   $: timelineHeight =
-    Math.max(height * 2 + height * groups.length, 200) + activeDetailsHeight;
+    Math.max(height * (groups.length + 1), 200) + activeDetailsHeight;
   $: canvasHeight = timelineHeight + 200;
 </script>
 

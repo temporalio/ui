@@ -21,7 +21,7 @@
   ) => {
     if (!$fullEventHistory.length) {
       loading = true;
-      await fetchAllEvents({
+      $fullEventHistory = await fetchAllEvents({
         namespace,
         workflowId,
         runId,

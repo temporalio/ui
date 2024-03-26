@@ -103,8 +103,6 @@ export const fetchAllEvents = async ({
     }
   };
 
-  const onComplete = () => {};
-
   const endpoint = getEndpointForSortOrder(sort);
   const route = routeForApi(endpoint, { namespace, workflowId });
   const response = await paginated(
@@ -114,13 +112,12 @@ export const fetchAllEvents = async ({
         request: fetch,
         params: {
           'execution.runId': runId,
-          pageSize: '1000',
           waitNewEvent: signal ? 'true' : 'false',
         },
         options: { signal },
       });
     },
-    { onStart, onUpdate, onComplete },
+    { onStart, onUpdate },
   );
 
   if (!response?.history) return [];

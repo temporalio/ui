@@ -1,53 +1,34 @@
 <script lang="ts">
   import type { EventTypeCategory } from '$lib/types/events';
 
-  import { TimelineConfig } from '../constants';
-
   export let point: [number, number] = [0, 0];
-  export let category: EventTypeCategory | 'pending' | 'none' | 'icon' = 'none';
+  export let category: EventTypeCategory | 'pending' | 'none' | undefined =
+    undefined;
   export let active = true;
-  export let position: 'start' | 'middle' | 'end' = 'start';
   export let fontSize = '14px';
-
-  const { radius } = TimelineConfig;
-
-  let textElement: SVGTextElement;
-  $: width = textElement?.getBBox()?.width || 0;
+  export let fontWeight = '400';
+  export let textAnchor = 'start';
 
   $: [x, y] = point;
 </script>
 
-{#if position === 'middle'}
-  <rect
-    x={Math.max(0, x - radius / 2 - 3)}
-    y={y - radius}
-    width={width + radius}
-    height={radius * 1.33}
-    fill="#141414"
-  />
-{/if}
 <text
-  bind:this={textElement}
-  class="cursor-pointer select-none outline-none {category} {position}"
+  class="cursor-pointer select-none outline-none {category}"
   class:active
   {x}
   {y}
   font-size={fontSize}
-  text-anchor={position === 'end' ? 'end' : 'start'}
+  font-weight={fontWeight}
+  text-anchor={textAnchor}
 >
   <slot />
 </text>
 
 <style lang="postcss">
   text {
-    font-weight: 400;
     opacity: 0.25;
     stroke: none;
     fill: #fff;
-  }
-
-  text.middle {
-    fill: white;
   }
 
   .active {
@@ -83,7 +64,7 @@
     fill: #059669;
   }
 
-  text.icon {
+  text.none {
     fill: #141414;
   }
 </style>

@@ -53,31 +53,13 @@
 
   $: firstPoint = points[0];
   $: lastPoint = points[points.length - 1];
-  $: textAtBeginning = firstPoint > timelineWidth / 3 && !group.pendingActivity;
-  $: textAtEnd =
-    timelineWidth - lastPoint > timelineWidth / 3 && !group.pendingActivity;
-  $: textInMiddle = !textAtBeginning && !textAtEnd;
-  $: position = textAtEnd ? 'start' : textInMiddle ? 'middle' : 'end';
-
-  $: textPoint = [
-    textAtEnd
-      ? lastPoint + 1.5 * radius
-      : textAtBeginning
-      ? firstPoint - 1.5 * radius
-      : firstPoint + 1.5 * radius,
-    y + radius / 3,
-  ] as [number, number];
-
+  $: startsNearTheEnd = firstPoint > (3 / 4) * timelineWidth;
+  $: textAnchor = startsNearTheEnd ? 'end' : 'start';
+  $: textPosition = startsNearTheEnd
+    ? lastPoint + radius / 2
+    : firstPoint + radius / 3;
   $: isPending = isPendingGroup(group);
   $: active = !activeGroups.length || activeGroups.includes(group.id);
-
-  const getIconIndex = (points: number[]) => {
-    if (!points[1]) return 0;
-    if (points[1] && points[1] - points[0] > 2 * radius) return 0;
-    if (!points[2]) return 1;
-    if (points[2] && points[2] - points[1] > 2 * radius) return 1;
-    return 2;
-  };
 </script>
 
 <g
@@ -90,7 +72,7 @@
 >
   {#each points as x, index}
     {@const nextPoint = points[index + 1]}
-    {@const showIcon = index === getIconIndex(points)}
+    {@const showIcon = index === 0}
     {#if nextPoint}
       <Line
         startPoint={[x, y]}
@@ -118,20 +100,6 @@
         strokeWidth={radius * 2}
       />
     {/if}
-    {#if showIcon}
-      <Text
-        point={position === 'middle'
-          ? [x + 1.5 * radius, y + radius / 3]
-          : textPoint}
-        {active}
-        position={isPending ? 'middle' : position}
-      >
-        {group?.name}
-        <tspan fill={textInMiddle ? '#ffffff' : '#aebed9'} font-size="12px"
-          >{duration}</tspan
-        >
-      </Text>
-    {/if}
     <Dot
       point={[x, y]}
       classification={group.eventList[index]?.classification}
@@ -150,6 +118,10 @@
       />
     {/if}
   {/each}
+  <Text point={[textPosition, y - radius - radius / 3]} {active} {textAnchor}>
+    {group?.name}
+    <tspan fill="#aebed9" font-size="12px">{duration}</tspan>
+  </Text>
 </g>
 
 <style lang="postcss">

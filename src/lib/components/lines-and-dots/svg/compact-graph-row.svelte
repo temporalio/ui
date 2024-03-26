@@ -47,10 +47,17 @@
     strokeWidth={radius * 2}
     pending={isPending}
   />
+  <Line
+    startPoint={[start, y]}
+    endPoint={[end, y]}
+    {active}
+    status="none"
+    strokeWidth={radius}
+  />
   <Text
     point={[start + (4 / 3) * radius, y + radius / 4]}
     {active}
-    position="middle"
+    fontWeight="500"
   >
     {#if aggregateRow}<tspan font-weight="700">{count}</tspan>{/if}
     {group?.name}

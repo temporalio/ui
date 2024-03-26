@@ -104,13 +104,12 @@
     <Text
       point={[startingX - 1.5 * radius, y + radius / 2]}
       {active}
-      position="end"
+      textAnchor="end"
     >
-      <tspan fill="#fff" font-size="12px">
+      <tspan fill="#aebed9" font-size="12px">
         {formatDate(event?.eventTime, $timeFormat, {
           relative: $relativeTime,
-        })}
-        <tspan fill="#fff"> </tspan></tspan
+        })}</tspan
       ></Text
     >
   {/if}

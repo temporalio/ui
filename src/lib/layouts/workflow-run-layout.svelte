@@ -77,7 +77,7 @@
     $workflowRun = { workflow, workers, compatibility };
 
     eventHistoryController = new AbortController();
-    fetchAllEvents({
+    $fullEventHistory = await fetchAllEvents({
       namespace,
       workflowId,
       runId,

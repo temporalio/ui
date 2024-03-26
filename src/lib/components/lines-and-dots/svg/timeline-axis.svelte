@@ -19,7 +19,7 @@
 
   const { radius } = TimelineConfig;
 
-  const ticks = 10;
+  const ticks = 20;
 
   $: ({ workflow } = $workflowRun);
   $: endTime = workflow?.endTime || new Date();

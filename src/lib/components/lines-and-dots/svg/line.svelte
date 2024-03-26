@@ -11,9 +11,9 @@
 
   export let startPoint = [0, 1000];
   export let endPoint = [0, 1000];
-  export let status: WorkflowStatus | 'none' = 'none';
-  export let category: EventTypeCategory | 'pending' | 'retry' | 'none' =
-    'none';
+  export let status: WorkflowStatus | 'none' | undefined = undefined;
+  export let category: EventTypeCategory | 'pending' | 'retry' | undefined =
+    undefined;
   export let classification: EventClassification | undefined = undefined;
   export let active = true;
   export let scheduling = false;
@@ -41,13 +41,18 @@
 <style lang="postcss">
   .line {
     cursor: pointer;
-    opacity: 0.05;
+    opacity: 0.15;
     outline: none;
     stroke: #ebebeb;
   }
 
   .active {
     opacity: 1;
+  }
+
+  .none {
+    stroke: #141414;
+    opacity: 0.75;
   }
 
   .scheduling {
@@ -78,6 +83,10 @@
 
   .retry {
     stroke: #ff4518;
+  }
+
+  .pending.retry {
+    stroke: #ff9b70;
   }
 
   .child-workflow {
