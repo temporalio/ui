@@ -20,7 +20,7 @@ export const isVersionNewer = (
 
 export const minimumVersionRequired = (
   minimumVersion: string,
-  currentVersion: string | undefined,
+  currentVersion: string,
 ): boolean => {
   if (!minimumVersion || !currentVersion) {
     return false;
