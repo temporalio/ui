@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
 
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import type { WorkflowExecution } from '$lib/types/workflows';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
 
-  $: ({ workflow } = $workflowRun);
+  export let workflow: WorkflowExecution;
+
   $: endTime = workflow?.endTime || new Date();
   $: duration = getMillisecondDuration({
     start: workflow?.startTime,

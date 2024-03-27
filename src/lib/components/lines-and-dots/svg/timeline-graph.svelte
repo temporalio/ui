@@ -47,7 +47,7 @@
   $: canvasHeight = timelineHeight + 200;
 </script>
 
-<EndTimeInterval let:endTime let:duration>
+<EndTimeInterval {workflow} let:endTime let:duration>
   <svg
     {x}
     {y}

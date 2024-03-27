@@ -34,7 +34,11 @@
   $: isPending = isPendingGroup(group);
   $: active = !activeGroups.length || activeGroups.includes(group.id);
 
-  const getDistancePointsAndPositions = (endTime: string | Date, y: number) => {
+  const getDistancePointsAndPositions = (
+    endTime: string | Date,
+    timelineWidth: number,
+    y: number,
+  ) => {
     const workflowDistance = getMillisecondDuration({
       start: startTime,
       end: endTime,
@@ -59,7 +63,7 @@
   };
 
   $: ({ points, textAnchor, textIndex, textPosition, backdrop } =
-    getDistancePointsAndPositions(endTime, y));
+    getDistancePointsAndPositions(endTime, timelineWidth, y));
 </script>
 
 <g
