@@ -3,7 +3,6 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import type { WorkflowExecution } from '$lib/types/workflows';
   import {
     formatDistanceAbbreviated,
     getMillisecondDuration,
@@ -21,50 +20,46 @@
   import Text from './text.svelte';
 
   export let y = 0;
-  export let workflow: WorkflowExecution;
   export let group: EventGroup;
   export let activeGroups: string[] = [];
   export let startTime: string | Timestamp;
+  export let endTime: string | Date;
   export let canvasWidth: number;
   export let active = true;
   export let onClick: () => void;
 
   const { height, gutter, radius } = TimelineConfig;
 
-  $: endTime = workflow.isRunning ? Date.now() : workflow.endTime;
-  $: workflowDistance = getMillisecondDuration({
-    start: startTime,
-    end: endTime,
-    onlyUnderSecond: false,
-  });
-  $: duration = formatDistanceAbbreviated({
-    start: group.initialEvent.eventTime,
-    end: group.lastEvent.eventTime,
-    includeMilliseconds: true,
-  });
   $: timelineWidth = canvasWidth - 2 * gutter;
-
-  $: points = group.eventList.map((event) => {
-    const distance = getMillisecondDuration({
-      start: startTime,
-      end: event.eventTime,
-      onlyUnderSecond: false,
-    });
-
-    const ratio = distance / workflowDistance;
-    return Math.round(ratio * timelineWidth) + gutter;
-  });
-
   $: isPending = isPendingGroup(group);
   $: active = !activeGroups.length || activeGroups.includes(group.id);
 
-  $: ({ textAnchor, textIndex, textPosition, backdrop } = timelineTextPosition(
-    points,
-    y,
-    timelineWidth,
-    isPending,
-    TimelineConfig,
-  ));
+  const getDistancePointsAndPositions = (endTime: string | Date, y: number) => {
+    const workflowDistance = getMillisecondDuration({
+      start: startTime,
+      end: endTime,
+      onlyUnderSecond: false,
+    });
+
+    const points = group.eventList.map((event) => {
+      const distance = getMillisecondDuration({
+        start: startTime,
+        end: event.eventTime,
+        onlyUnderSecond: false,
+      });
+
+      const ratio = distance / workflowDistance;
+      return Math.round(ratio * timelineWidth) + gutter;
+    });
+
+    const { textAnchor, textIndex, textPosition, backdrop } =
+      timelineTextPosition(points, y, timelineWidth, isPending, TimelineConfig);
+
+    return { points, textAnchor, textIndex, textPosition, backdrop };
+  };
+
+  $: ({ points, textAnchor, textIndex, textPosition, backdrop } =
+    getDistancePointsAndPositions(endTime, y));
 </script>
 
 <g
@@ -107,9 +102,21 @@
       />
     {/if}
     {#if showText}
-      <Text point={textPosition} {active} {textAnchor} {backdrop} {radius}>
+      <Text
+        point={textPosition}
+        {active}
+        {textAnchor}
+        {backdrop}
+        backdropHeight={radius * 2}
+      >
         {group?.name}
-        <tspan fill="#aebed9" font-size="12px">{duration}</tspan>
+        <tspan fill="#aebed9" font-size="12px"
+          >{formatDistanceAbbreviated({
+            start: group.initialEvent.eventTime,
+            end: group.lastEvent.eventTime,
+            includeMilliseconds: true,
+          })}</tspan
+        >
       </Text>
     {/if}
     <Dot

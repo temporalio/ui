@@ -11,7 +11,7 @@
   export let fontWeight = '400';
   export let textAnchor = 'start';
   export let backdrop = false;
-  export let radius = 0;
+  export let backdropHeight = 0;
 
   $: [x, y] = point;
 
@@ -21,11 +21,11 @@
 
 {#if backdrop}
   <Line
-    startPoint={[x - 1.5 * radius, y - radius / 2]}
-    endPoint={[x + width + radius, y - radius / 2]}
+    startPoint={[x - backdropHeight, y - backdropHeight / 4]}
+    endPoint={[x + width, y - backdropHeight / 4]}
     {active}
     status="none"
-    strokeWidth={radius * 2}
+    strokeWidth={backdropHeight}
   />
 {/if}
 <text

@@ -34,7 +34,7 @@ export type GraphConfig = {
 };
 
 export const CompactConfig: GraphConfig = {
-  height: baseRadius * 8,
+  height: baseRadius * 7,
   gutter: baseRadius * 6,
   radius: baseRadius * 3,
   fontSizeRatio: baseRadius * 3,

@@ -11,6 +11,7 @@
     getDetailsBoxHeight,
     TimelineConfig,
   } from '../constants';
+  import EndTimeInterval from '../end-time-interval.svelte';
 
   import GroupDetailsRow from './group-details-row.svelte';
   import Line from './line.svelte';
@@ -46,50 +47,59 @@
   $: canvasHeight = timelineHeight + 200;
 </script>
 
-<svg
-  {x}
-  {y}
-  viewBox="0 0 {canvasWidth} {canvasHeight}"
-  height={(staticHeight || canvasHeight) / zoomLevel}
-  width={canvasWidth}
->
-  <Line
-    startPoint={[gutter, 0]}
-    endPoint={[gutter, timelineHeight]}
-    strokeWidth={radius / 2}
-  />
-  <Line
-    startPoint={[canvasWidth - gutter, 0]}
-    endPoint={[canvasWidth - gutter, timelineHeight]}
-    strokeWidth={radius / 2}
-    status={workflow.status}
-  />
-  <TimelineAxis
-    x1={gutter - radius / 4}
-    x2={canvasWidth - gutter + radius / 4}
-    {timelineHeight}
-  />
-  {#each groups as group, index (group.id)}
-    {@const y =
-      (index + 1) * height +
-      activeGroupsHeightAboveGroup(activeGroups, group, groups, fontSizeRatio)}
-    <TimelineGraphRow
-      {y}
-      {workflow}
-      {group}
-      {activeGroups}
-      {canvasWidth}
-      {startTime}
-      onClick={() => onClick && onClick(group)}
+<EndTimeInterval let:endTime let:duration>
+  <svg
+    {x}
+    {y}
+    viewBox="0 0 {canvasWidth} {canvasHeight}"
+    height={(staticHeight || canvasHeight) / zoomLevel}
+    width={canvasWidth}
+  >
+    <Line
+      startPoint={[gutter, 0]}
+      endPoint={[gutter, timelineHeight]}
+      strokeWidth={radius / 2}
     />
-    {#if activeGroups.includes(group.id)}
-      <GroupDetailsRow
+    <Line
+      startPoint={[canvasWidth - gutter, 0]}
+      endPoint={[canvasWidth - gutter, timelineHeight]}
+      strokeWidth={radius / 2}
+      status={workflow.status}
+    />
+    <TimelineAxis
+      x1={gutter - radius / 4}
+      x2={canvasWidth - gutter + radius / 4}
+      {timelineHeight}
+      {endTime}
+      {duration}
+    />
+    {#each groups as group, index (group.id)}
+      {@const y =
+        (index + 1) * height +
+        activeGroupsHeightAboveGroup(
+          activeGroups,
+          group,
+          groups,
+          fontSizeRatio,
+        )}
+      <TimelineGraphRow
         {y}
         {group}
+        {activeGroups}
         {canvasWidth}
-        config={TimelineConfig}
-        view="timeline"
+        {startTime}
+        {endTime}
+        onClick={() => onClick && onClick(group)}
       />
-    {/if}
-  {/each}
-</svg>
+      {#if activeGroups.includes(group.id)}
+        <GroupDetailsRow
+          {y}
+          {group}
+          {canvasWidth}
+          config={TimelineConfig}
+          view="timeline"
+        />
+      {/if}
+    {/each}
+  </svg>
+</EndTimeInterval>

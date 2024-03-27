@@ -1,13 +1,8 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
-
   import { timeFormat } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { formatDate } from '$lib/utilities/format-date';
-  import {
-    formatDistanceAbbreviated,
-    getMillisecondDuration,
-  } from '$lib/utilities/format-time';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { TimelineConfig } from '../constants';
 
@@ -16,42 +11,15 @@
   export let x1 = 0;
   export let x2 = 1000;
   export let timelineHeight = 1000;
+  export let endTime: string | Date;
+  export let duration: number;
 
   const { radius } = TimelineConfig;
-
   const ticks = 20;
 
   $: ({ workflow } = $workflowRun);
-  $: endTime = workflow?.endTime || new Date();
-  $: duration = getMillisecondDuration({
-    start: workflow?.startTime,
-    end: endTime,
-    onlyUnderSecond: false,
-  });
   $: distance = x2 - x1;
   $: tickDistance = distance / ticks;
-
-  let endTimeInterval;
-
-  const clearEndTimeInterval = (endTime: string) => {
-    if (endTime) {
-      clearInterval(endTimeInterval);
-    }
-  };
-
-  onMount(() => {
-    if (!workflow.endTime) {
-      endTimeInterval = setInterval(() => {
-        endTime = new Date();
-      }, 1000);
-    }
-  });
-
-  $: clearEndTimeInterval(workflow.endTime);
-
-  onDestroy(() => {
-    clearInterval(endTimeInterval);
-  });
 </script>
 
 <Line
