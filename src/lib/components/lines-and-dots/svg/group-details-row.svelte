@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import { page } from '$app/stores';
 
   import { groupEvents } from '$lib/models/event-groups';
@@ -35,9 +33,12 @@
   export let view: GraphView;
 
   const { radius, fontSizeRatio, gutter } = config;
+  $: ({ namespace } = $page.params);
 
   let fetchChildWorkflow;
   let fetchChildTimeline;
+
+  $: fetchChildWorkflowForGroup(group);
 
   const fetchChildWorkflowForGroup = (group: EventGroup) => {
     if (group && group.category === 'child-workflow' && namespace) {
@@ -63,14 +64,12 @@
           runId: childRunId,
         });
       }
+    } else {
+      fetchChildWorkflow = undefined;
+      fetchChildTimeline = undefined;
     }
   };
 
-  onMount(() => {
-    fetchChildWorkflowForGroup(group);
-  });
-
-  $: ({ namespace } = $page.params);
   $: groupOrEvent = group ?? event;
   $: boxHeight = getDetailsBoxHeight(groupOrEvent, fontSizeRatio);
   $: startingX = gutter + radius / 2;
@@ -94,8 +93,8 @@
   height={boxHeight}
 >
   <Box point={[0, y + radius]} {width} height={boxHeight} fill="#1E293B" />
-  {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [childWorkflow, childHistory]}
-    {#if childWorkflow && childHistory}
+  {#if fetchChildWorkflow && fetchChildTimeline}
+    {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [childWorkflow, childHistory]}
       {@const groups = groupEvents(
         childHistory,
         'ascending',
@@ -110,8 +109,8 @@
         {groups}
         canvasWidth={width}
       />
-    {/if}
-  {/await}
+    {/await}
+  {/if}
   {#each codeBlockAttributes as [key, value], index (key)}
     <Text point={[startingX, textStartingY + (index + 1) * 2 * fontSizeRatio]}
       >{format(key)}</Text
