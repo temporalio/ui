@@ -41,7 +41,7 @@ export const CompactConfig: GraphConfig = {
 };
 
 export const TimelineConfig: GraphConfig = {
-  height: baseRadius * 6,
+  height: baseRadius * 4,
   gutter: baseRadius * 3,
   radius: baseRadius * 1.5,
   fontSizeRatio: baseRadius * 3,
@@ -64,6 +64,60 @@ export const CategoryIcon: Record<EventTypeCategory, IconName> = {
   'local-activity': 'summary',
   'child-workflow': 'relationship',
   update: 'merge',
+};
+
+export const timelineTextPosition = (
+  points: number[],
+  y: number,
+  width: number,
+  isPending: boolean,
+  config: GraphConfig,
+) => {
+  const { radius } = config;
+  const firstPoint = points[0];
+  const lastPoint = points[points.length - 1];
+
+  let backdrop = false;
+  const textY = y + radius / 2;
+  let textAnchor = 'start';
+  let textIndex = 0;
+
+  const textToLeft = firstPoint > (1 / 3) * width;
+  let textToRight = !textToLeft && lastPoint < (2 / 3) * width && !isPending;
+
+  if (textToLeft) textAnchor = 'end';
+  if (textToRight) textIndex = points.indexOf(lastPoint);
+
+  let textX = textToRight
+    ? lastPoint + 1.5 * radius
+    : firstPoint - 1.5 * radius;
+
+  // Pending or long events
+  if (!textToRight && !textToLeft) {
+    backdrop = true;
+    textToRight = true;
+    textX = firstPoint + 1.5 * radius;
+
+    if (points.length === 2 && isPending) {
+      const gap = points[1] - points[0];
+      if (gap < width - points[1]) {
+        textIndex = 1;
+        textX = points[1] + 1.5 * radius;
+      }
+    }
+
+    if (points.length > 2) {
+      const gap1 = points[1] - points[0];
+      const gap2 = points[2] - points[1];
+      if (gap2 > gap1) {
+        textIndex = 1;
+        textX = points[1] + 1.5 * radius;
+      }
+    }
+  }
+
+  const textPosition = [textX, textY] as [number, number];
+  return { textPosition, textIndex, textAnchor, backdrop };
 };
 
 export const isMiddleEvent = (

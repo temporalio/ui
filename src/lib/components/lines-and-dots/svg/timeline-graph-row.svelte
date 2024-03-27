@@ -9,7 +9,12 @@
     getMillisecondDuration,
   } from '$lib/utilities/format-time';
 
-  import { CategoryIcon, isPendingGroup, TimelineConfig } from '../constants';
+  import {
+    CategoryIcon,
+    isPendingGroup,
+    TimelineConfig,
+    timelineTextPosition,
+  } from '../constants';
 
   import Dot from './dot.svelte';
   import Line from './line.svelte';
@@ -32,6 +37,11 @@
     end: endTime,
     onlyUnderSecond: false,
   });
+  $: duration = formatDistanceAbbreviated({
+    start: group.initialEvent.eventTime,
+    end: group.lastEvent.eventTime,
+    includeMilliseconds: true,
+  });
   $: timelineWidth = canvasWidth - 2 * gutter;
 
   $: points = group.eventList.map((event) => {
@@ -45,21 +55,16 @@
     return Math.round(ratio * timelineWidth) + gutter;
   });
 
-  $: duration = formatDistanceAbbreviated({
-    start: group.initialEvent.eventTime,
-    end: group.lastEvent.eventTime,
-    includeMilliseconds: true,
-  });
-
-  $: firstPoint = points[0];
-  $: lastPoint = points[points.length - 1];
-  $: startsNearTheEnd = firstPoint > (3 / 4) * timelineWidth;
-  $: textAnchor = startsNearTheEnd ? 'end' : 'start';
-  $: textPosition = startsNearTheEnd
-    ? lastPoint + radius / 2
-    : firstPoint + radius / 3;
   $: isPending = isPendingGroup(group);
   $: active = !activeGroups.length || activeGroups.includes(group.id);
+
+  $: ({ textAnchor, textIndex, textPosition, backdrop } = timelineTextPosition(
+    points,
+    y,
+    timelineWidth,
+    isPending,
+    TimelineConfig,
+  ));
 </script>
 
 <g
@@ -73,6 +78,7 @@
   {#each points as x, index}
     {@const nextPoint = points[index + 1]}
     {@const showIcon = index === 0}
+    {@const showText = textIndex === index}
     {#if nextPoint}
       <Line
         startPoint={[x, y]}
@@ -100,6 +106,12 @@
         strokeWidth={radius * 2}
       />
     {/if}
+    {#if showText}
+      <Text point={textPosition} {active} {textAnchor} {backdrop} {radius}>
+        {group?.name}
+        <tspan fill="#aebed9" font-size="12px">{duration}</tspan>
+      </Text>
+    {/if}
     <Dot
       point={[x, y]}
       classification={group.eventList[index]?.classification}
@@ -118,10 +130,6 @@
       />
     {/if}
   {/each}
-  <Text point={[textPosition, y - radius - radius / 3]} {active} {textAnchor}>
-    {group?.name}
-    <tspan fill="#aebed9" font-size="12px">{duration}</tspan>
-  </Text>
 </g>
 
 <style lang="postcss">

@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { EventTypeCategory } from '$lib/types/events';
 
+  import Line from './line.svelte';
+
   export let point: [number, number] = [0, 0];
   export let category: EventTypeCategory | 'pending' | 'none' | undefined =
     undefined;
@@ -8,11 +10,26 @@
   export let fontSize = '14px';
   export let fontWeight = '400';
   export let textAnchor = 'start';
+  export let backdrop = false;
+  export let radius = 0;
 
   $: [x, y] = point;
+
+  let textElement: SVGTextElement;
+  $: width = textElement?.getBBox()?.width || 0;
 </script>
 
+{#if backdrop}
+  <Line
+    startPoint={[x - 1.5 * radius, y - radius / 2]}
+    endPoint={[x + width + radius, y - radius / 2]}
+    {active}
+    status="none"
+    strokeWidth={radius * 2}
+  />
+{/if}
 <text
+  bind:this={textElement}
   class="cursor-pointer select-none outline-none {category}"
   class:active
   {x}
