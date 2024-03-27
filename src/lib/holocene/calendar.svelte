@@ -66,11 +66,14 @@
   }
 
   .cell {
-    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded p-1 text-sm;
+    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded p-1 text-sm 
+    hover:surface-interactive
+    active:surface-interactive hover:rounded-2xl hover:border
+    hover:border-interactive hover:text-inverse focus:border-none focus:bg-brand active:dark:text-inverse;
   }
 
   .selected {
-    @apply bg-gradient-to-br from-blue-100  to-purple-100 text-primary;
+    @apply rounded-2xl border-brand bg-indigo-300 p-2 text-inverse dark:text-black;
   }
 
   .disabled {
@@ -80,12 +83,8 @@
   }
 
   .highlight {
-    @apply hover:scale-125 hover:cursor-pointer hover:bg-blue-100;
+    @apply hover:scale-125 hover:cursor-pointer;
 
     transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
-  }
-
-  .selected.highlight:hover {
-    @apply from-blue-100 to-purple-100 hover:border-primary hover:bg-gradient-to-br;
   }
 </style>

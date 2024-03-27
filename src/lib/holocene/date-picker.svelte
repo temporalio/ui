@@ -88,7 +88,9 @@
     {disabled}
   />
   {#if showDatePicker}
-    <div class="surface-primary absolute z-30 inline-block rounded shadow">
+    <div
+      class="surface-primary absolute z-30 inline-block rounded border shadow dark:border-none"
+    >
       <div class="mx-3 my-2 flex items-center justify-around">
         <div class="flex items-center justify-center">
           <button type="button" on:click={prev}
