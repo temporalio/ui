@@ -2,6 +2,8 @@ import { derived, type Readable } from 'svelte/store';
 
 import { page } from '$app/stores';
 
+import type { Settings } from '$lib/types/global';
+
 import { namespaces } from './namespaces';
 import { persistStore } from './persist-store';
 import { customSearchAttributes } from './search-attributes';
@@ -171,9 +173,17 @@ export const pinnedColumnsWidth = persistStore<number>(
 
 export const availableSystemSearchAttributeColumns: (
   namespace: string,
-) => Readable<WorkflowHeader[]> = (namespace) =>
+  settings: Settings,
+) => Readable<WorkflowHeader[]> = (namespace, settings) =>
   derived(workflowTableColumns, ($workflowTableColumns) =>
-    [...DEFAULT_COLUMNS, ...DEFAULT_AVAILABLE_COLUMNS].filter(
+    [
+      ...DEFAULT_COLUMNS,
+      ...(settings?.runtimeEnvironment?.isCloud
+        ? DEFAULT_AVAILABLE_COLUMNS.filter(
+            (col) => col.label !== 'Parent Namespace',
+          )
+        : DEFAULT_AVAILABLE_COLUMNS),
+    ].filter(
       (header) =>
         !$workflowTableColumns[namespace]?.some(
           (column) => column.label === header.label,
