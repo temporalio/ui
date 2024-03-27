@@ -16,7 +16,7 @@
     hidden?: boolean;
   }
 
-  export let intent: 'warning' | 'caution' | 'error' | 'success' | 'info';
+  export let intent: 'warning' | 'error' | 'success' | 'info';
   export let title = '';
   export let icon: IconName = null;
   export let bold = false;
@@ -34,11 +34,7 @@
       return 'alert';
     }
 
-    if (
-      alertIntent === 'success' ||
-      alertIntent === 'warning' ||
-      alertIntent === 'caution'
-    ) {
+    if (alertIntent === 'success' || alertIntent === 'warning') {
       return 'status';
     }
 
@@ -89,10 +85,6 @@
 
   .alert.error {
     @apply border-red-700 bg-red-100 text-red-700;
-  }
-
-  .alert.caution {
-    @apply border-orange-700 bg-orange-50 text-orange-700;
   }
 
   .alert.warning {

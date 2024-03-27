@@ -12,7 +12,7 @@
   argTypes={{
     intent: {
       control: 'select',
-      options: ['info', 'error', 'warning', 'caution', 'success'],
+      options: ['info', 'error', 'warning', 'success'],
     },
     icon: {
       control: 'select',
