@@ -8,7 +8,6 @@
   import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
-  import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
   import {
     CategoryIcon,
@@ -35,7 +34,6 @@
 
   const { height, radius, fontSizeRatio } = HistoryConfig;
 
-  $: category = isPendingActivity(event) ? 'pending' : event?.category;
   $: ({ nextDistance, offset, y } = getNextDistanceAndOffset(
     history,
     event,
@@ -48,6 +46,11 @@
 
   $: showTimestamp = canvasWidth > 1200;
   $: showDetails = canvasWidth > 800;
+  $: classification = group?.pendingActivity
+    ? group.pendingActivity.attempt > 1
+      ? 'retry'
+      : 'pending'
+    : event.classification;
 </script>
 
 <g
@@ -61,21 +64,21 @@
     point={[0, y - height / 2]}
     width={startingX - radius / 2}
     {height}
-    classification={event.classification}
+    {classification}
     fill={index % 2 === 1 && '#1E293B'}
   />
   <Text point={[5, y + 5]} {active} fontSize="12px">
     <tspan fill="#aebed9">{event.id}</tspan>
   </Text>
   <Icon
-    name={CategoryIcon[category]}
+    name={CategoryIcon[event.category]}
     x={50}
     y={y - radius}
     width={radius * 2}
     height={radius * 2}
     class="text-white"
   />
-  <Text point={[50 + radius * 2.5, y + 5]} {category} {active}>
+  <Text point={[50 + radius * 2.5, y + 5]} category={event.category} {active}>
     <tspan fill="#fff" font-size={showDetails ? '14px' : '12px'}>
       {spaceBetweenCapitalLetters(event?.name)}
     </tspan>

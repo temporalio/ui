@@ -1,10 +1,8 @@
 <script lang="ts">
-  import type { EventClassification } from '$lib/types/events';
-
   export let point: [number, number];
   export let width: number;
   export let height: number;
-  export let classification: EventClassification | undefined = undefined;
+  export let classification: string | undefined = undefined;
   export let fill = '#141414';
 
   $: [x, y] = point;
@@ -29,5 +27,16 @@
   .Canceled {
     stroke: #fff3c6;
     stroke-width: 3;
+  }
+
+  .pending,
+  .retry {
+    stroke: #a78bfa;
+    stroke-width: 3;
+    stroke-dasharray: 3;
+  }
+
+  .retry {
+    stroke: #ff4518;
   }
 </style>
