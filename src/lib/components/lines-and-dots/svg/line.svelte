@@ -1,20 +1,13 @@
 <script lang="ts">
-  import type {
-    EventClassification,
-    EventTypeCategory,
-  } from '$lib/types/events';
-  import type { WorkflowStatus } from '$lib/types/workflows';
-
   import { HistoryConfig } from '../constants';
 
   const { radius } = HistoryConfig;
 
   export let startPoint = [0, 1000];
   export let endPoint = [0, 1000];
-  export let status: WorkflowStatus | 'none' | undefined = undefined;
-  export let category: EventTypeCategory | 'pending' | 'retry' | undefined =
-    undefined;
-  export let classification: EventClassification | undefined = undefined;
+  export let status: string | undefined = undefined;
+  export let category: string | undefined = undefined;
+  export let classification: string | undefined = undefined;
   export let active = true;
   export let scheduling = false;
   export let pending = false;

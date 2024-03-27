@@ -98,6 +98,7 @@
     "json-beautify": "^1.1.1",
     "json-bigint": "^1.0.0",
     "just-debounce": "^1.1.0",
+    "lodash.groupby": "^4.6.0",
     "remark-stringify": "^10.0.3",
     "sanitize-html": "^2.12.1",
     "tailwind-merge": "^1.14.0",

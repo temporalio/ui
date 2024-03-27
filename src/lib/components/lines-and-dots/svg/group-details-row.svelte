@@ -76,7 +76,6 @@
   $: textStartingY = fetchChildTimeline
     ? y + radius + DetailsChildTimelineHeight
     : y + radius;
-  $: width = view === 'history' ? canvasWidth / 2 - 2 : canvasWidth;
   $: attributes = mergeEventGroupDetails(groupOrEvent);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
@@ -92,7 +91,12 @@
   class="relative cursor-pointer"
   height={boxHeight}
 >
-  <Box point={[0, y + radius]} {width} height={boxHeight} fill="#1E293B" />
+  <Box
+    point={[0, y + radius]}
+    width={canvasWidth}
+    height={boxHeight}
+    fill="#1E293B"
+  />
   {#if fetchChildWorkflow && fetchChildTimeline}
     {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [childWorkflow, childHistory]}
       {@const groups = groupEvents(
@@ -107,7 +111,7 @@
         workflow={childWorkflow.workflow}
         history={childHistory}
         {groups}
-        canvasWidth={width}
+        {canvasWidth}
       />
     {/await}
   {/if}
@@ -121,7 +125,7 @@
       {value}
       {attributes}
       {config}
-      canvasWidth={width}
+      {canvasWidth}
     />
   {/each}
   {#each textAttributes as [key, value], index (key)}
@@ -144,7 +148,7 @@
       {value}
       {attributes}
       {config}
-      canvasWidth={width}
+      {canvasWidth}
     />
   {/each}
 </g>

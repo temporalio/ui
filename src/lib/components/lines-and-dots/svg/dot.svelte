@@ -1,16 +1,11 @@
 <script lang="ts">
-  import type {
-    EventClassification,
-    EventTypeCategory,
-  } from '$lib/types/events';
-
   import { HistoryConfig } from '../constants';
 
   const { radius } = HistoryConfig;
 
   export let point: [number, number];
-  export let category: EventTypeCategory | 'pending' | undefined = undefined;
-  export let classification: EventClassification | undefined = undefined;
+  export let category: string | undefined = undefined;
+  export let classification: string | undefined = undefined;
   export let active = false;
   export let r = radius;
 

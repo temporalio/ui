@@ -1,11 +1,8 @@
 <script lang="ts">
-  import type { EventTypeCategory } from '$lib/types/events';
-
   import Line from './line.svelte';
 
   export let point: [number, number] = [0, 0];
-  export let category: EventTypeCategory | 'pending' | 'none' | undefined =
-    undefined;
+  export let category: string | undefined = undefined;
   export let active = true;
   export let fontSize = '14px';
   export let fontWeight = '400';
@@ -22,7 +19,7 @@
 {#if backdrop}
   <Line
     startPoint={[x - backdropHeight, y - backdropHeight / 4]}
-    endPoint={[x + width, y - backdropHeight / 4]}
+    endPoint={[x + width + 12, y - backdropHeight / 4]}
     {active}
     status="none"
     strokeWidth={backdropHeight}

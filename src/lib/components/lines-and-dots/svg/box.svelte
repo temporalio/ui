@@ -18,13 +18,16 @@
   .Failed,
   .Terminated {
     stroke: #ff4518;
+    stroke-width: 3;
   }
 
   .TimedOut {
     stroke: #f88f49;
+    stroke-width: 3;
   }
 
   .Canceled {
     stroke: #fff3c6;
+    stroke-width: 3;
   }
 </style>

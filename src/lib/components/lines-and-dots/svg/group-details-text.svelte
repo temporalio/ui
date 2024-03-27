@@ -32,6 +32,7 @@
 
   const { fontSizeRatio } = config;
 
+  const codeBlockHeight = 2 * fontSizeRatio;
   $: [x, y] = point;
   $: codeBlockValue = getCodeBlockValue(value);
   // $: stackTrace = getStackTrace(codeBlockValue);
@@ -45,9 +46,9 @@
           {x}
           y={y - fontSizeRatio}
           width={canvasWidth - 280}
-          height={2 * fontSizeRatio}
+          height={codeBlockHeight}
         >
-          <div class="overflow-auto" style="height: {2 * fontSizeRatio}px">
+          <div class="overflow-auto" style="height: {codeBlockHeight}px">
             <CodeBlock inline content={decodedValue} />
           </div>
         </foreignObject>
@@ -67,9 +68,9 @@
           {x}
           y={y - fontSizeRatio}
           width={canvasWidth - 280}
-          height={2 * fontSizeRatio}
+          height={codeBlockHeight}
         >
-          <div class="overflow-auto" style="height: {2 * fontSizeRatio}px">
+          <div class="overflow-auto" style="height: {codeBlockHeight}px">
             <CodeBlock inline content={decodedValue} />
           </div>
         </foreignObject>
@@ -85,10 +86,10 @@
         <foreignObject
           {x}
           y={y - fontSizeRatio}
-          width={canvasWidth - 280}
-          height={2 * fontSizeRatio}
+          width={canvasWidth - 320}
+          height={codeBlockHeight}
         >
-          <div class="overflow-auto" style="height: {2 * fontSizeRatio}px">
+          <div class="overflow-auto" style="height: {codeBlockHeight}px">
             <CodeBlock inline content={decodedValue} />
           </div>
         </foreignObject>

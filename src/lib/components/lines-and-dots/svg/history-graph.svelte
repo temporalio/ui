@@ -25,17 +25,6 @@
   export let onClick: (group: EventGroup, event: WorkflowEvent) => void;
 
   $: workflowTaskGroups = groupWorkflowTaskEvents(history);
-  $: workflowTaskSubGroups = workflowTaskGroups.map((group) => {
-    const subGroups = groups.filter(
-      (g) =>
-        g.initialEvent.attributes?.workflowTaskCompletedEventId ===
-        group.lastEvent.id,
-    );
-    return { ...group, subGroups };
-  });
-  $: {
-    console.log('workflowTaskGroups', workflowTaskSubGroups);
-  }
   $: allGroups = [...workflowTaskGroups, ...groups];
 
   const { height, fontSizeRatio, radius } = HistoryConfig;
@@ -58,12 +47,11 @@
     .reduce((acc, height) => acc + height, 0);
 
   $: canvasHeight = Math.max(
-    height * history.length + activeDetailsHeight,
+    height * history.length + activeDetailsHeight + height,
     400,
   );
 
   $: startingX = canvasWidth / 2;
-
   // $: visibleHistory = (history: WorkflowEvents, scrollY: number) => {
   //   return history.filter((event, index) => {
   //     const y = (index + 1) * height + height / 2;

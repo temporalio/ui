@@ -138,7 +138,7 @@
           >
           <ToggleButton
             active={view === 'timeline'}
-            data-testid="compact"
+            data-testid="timeline"
             on:click={() => (view = 'timeline')}
             >{translate('common.timeline')}</ToggleButton
           >
@@ -166,7 +166,7 @@
         </ToggleButtons>
         <span class="text-sm">{(100 / zoomLevel).toFixed(0)}%</span>
       </div>
-      <EventTypeFilter compact={view === 'compact' || view === 'timeline'} />
+      <EventTypeFilter compact={view !== 'history'} />
     </div>
   </div>
 </div>

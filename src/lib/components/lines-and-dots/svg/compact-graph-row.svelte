@@ -29,7 +29,7 @@
 <g
   role="button"
   tabindex="0"
-  on:click|preventDefault={onClick}
+  on:click={onClick}
   on:keypress={onClick}
   class="relative cursor-pointer"
   {height}
@@ -102,7 +102,6 @@
 
 <style lang="postcss">
   g {
-    pointer-events: bounding-box;
     outline: none;
   }
 </style>

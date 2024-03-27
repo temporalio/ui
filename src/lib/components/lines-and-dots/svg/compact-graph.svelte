@@ -1,4 +1,6 @@
 <script lang="ts">
+  import groupBy from 'lodash.groupby';
+
   import type {
     EventGroup,
     EventGroups,
@@ -36,13 +38,11 @@
   };
 
   $: timeGroups = Object.values(
-    Object.groupBy(groups, ({ initialEvent }) => initialEvent.timestamp),
+    groupBy(groups, ({ initialEvent }) => initialEvent.timestamp),
   ) as EventGroups[];
 
   const getNameGroups = (groups: EventGroups) => {
-    return Object.values(
-      Object.groupBy(groups, ({ name }) => name),
-    ) as EventGroups[];
+    return Object.values(groupBy(groups, ({ name }) => name)) as EventGroups[];
   };
 
   $: maxSegmentSize = () => {

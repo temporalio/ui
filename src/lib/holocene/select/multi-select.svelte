@@ -27,7 +27,7 @@
   export let selectAllLabel: string;
   export let clearAllLabel: string;
   export let active = false;
-  export let position = 'left';
+  export let position: 'left' | 'right' = 'left';
 
   let selectedOptions = initialSelected.length ? initialSelected : options;
 
