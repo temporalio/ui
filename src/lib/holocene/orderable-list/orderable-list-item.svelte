@@ -157,7 +157,7 @@
   }
 
   hr {
-    @apply pointer-events-none border-primary last-of-type:hidden;
+    @apply pointer-events-none border-primary last-of-type:hidden dark:border-subtle;
   }
 
   :global(.orderable-item.dragging-over:not(.locked)) {
