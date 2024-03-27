@@ -27,7 +27,11 @@
     fullEventHistory,
   } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
-  import { refresh, workflowRun } from '$lib/stores/workflow-run';
+  import {
+    refresh,
+    workflowRun,
+    workflowTimelineViewOpen,
+  } from '$lib/stores/workflow-run';
   import type { EventView } from '$lib/types/events';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { exportHistory } from '$lib/utilities/export-history';
@@ -69,7 +73,7 @@
       namespace,
       workflowId,
       runId,
-      sort: view === 'feed' ? sort : 'ascending',
+      sort,
     });
   };
 
@@ -109,7 +113,7 @@
         ? translate('workflows.input')
         : translate('workflows.input-and-results')}
       icon="json"
-      class="border-gray-900"
+      class=""
       data-testid="input-and-results"
     >
       <div class="flex w-full flex-col gap-2 lg:flex-row">
@@ -124,11 +128,22 @@
             ? translate('workflows.continued-as-new-with-input')
             : translate('workflows.results')}
           data-testid="workflow-results"
+          running={workflow.isRunning}
         />
       </div>
     </Accordion>
   </section>
-  <EventHistoryTimeline history={$fullEventHistory} />
+  <Accordion
+    title={translate('common.timeline')}
+    data-testid="timeline-accordion"
+    icon="timeline"
+    open={$workflowTimelineViewOpen}
+    onToggle={() => {
+      $workflowTimelineViewOpen = !$workflowTimelineViewOpen;
+    }}
+  >
+    <EventHistoryTimeline history={$fullEventHistory} />
+  </Accordion>
   <section id="event-history">
     <nav
       class="flex flex-col items-center justify-between gap-4 lg:flex-row lg:items-end"
@@ -137,7 +152,7 @@
       <h2 class="text-2xl font-medium">
         {translate('workflows.event-history')}
       </h2>
-      <div id="event-view-toggle" class="mt-4 flex gap-4 bg-white">
+      <div id="event-view-toggle" class="surface-primary mt-4 flex gap-4">
         <ToggleButtons>
           <ToggleButton
             icon="feed"

@@ -13,7 +13,7 @@
   data-testid={$$props.testId}
 >
   <span
-    class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200"
+    class="flex h-16 w-16 items-center justify-center rounded-full bg-slate-200"
   >
     <Icon name={icon} class="block h-full w-full" /></span
   >

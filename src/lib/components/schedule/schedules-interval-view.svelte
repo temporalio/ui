@@ -41,58 +41,58 @@
   <p>
     {translate('schedules.interval-view-description')}
   </p>
-  <div class="flex flex-row items-center gap-2">
-    <div class="w-24">
-      <Input
-        id="days"
-        label={translate('common.days')}
-        labelHidden
-        bind:value={days}
-        placeholder="00"
-        suffix={translate('common.days')}
-        maxLength={3}
-        error={error(days)}
-      />
-    </div>
-    <div>:</div>
-    <div class="w-24">
-      <Input
-        id="hour-interval"
-        label={translate('common.hours-abbreviated')}
-        labelHidden
-        bind:value={hour}
-        placeholder="00"
-        suffix={translate('common.hours-abbreviated')}
-        maxLength={2}
-        error={error(hour)}
-      />
-    </div>
-    <div>:</div>
-    <div class="w-24">
-      <Input
-        id="minute-interval"
-        label={translate('common.minutes-abbreviated')}
-        labelHidden
-        bind:value={minute}
-        placeholder="00"
-        suffix={translate('common.minutes-abbreviated')}
-        maxLength={2}
-        error={error(minute)}
-      />
-    </div>
-    <div>:</div>
-    <div class="w-24">
-      <Input
-        id="second"
-        label={translate('common.seconds-abbreviated')}
-        labelHidden
-        bind:value={second}
-        placeholder="00"
-        suffix={translate('common.seconds-abbreviated')}
-        maxLength={2}
-        error={error(second)}
-      />
-    </div>
+  <div class="flex flex-col items-center gap-2 lg:flex-row">
+    <Input
+      id="days"
+      class="w-28"
+      label={translate('common.days')}
+      labelHidden
+      bind:value={days}
+      placeholder="000"
+      suffix={translate('common.days')}
+      hideCount
+      maxLength={3}
+      error={error(days)}
+    />
+    <div class="hidden lg:block">:</div>
+    <Input
+      id="hour-interval"
+      class="w-24"
+      label={translate('common.hours-abbreviated')}
+      labelHidden
+      bind:value={hour}
+      placeholder="00"
+      suffix={translate('common.hours-abbreviated')}
+      hideCount
+      maxLength={2}
+      error={error(hour)}
+    />
+    <div class="hidden lg:block">:</div>
+    <Input
+      id="minute-interval"
+      class="w-24"
+      label={translate('common.minutes-abbreviated')}
+      labelHidden
+      bind:value={minute}
+      placeholder="00"
+      suffix={translate('common.minutes-abbreviated')}
+      hideCount
+      maxLength={2}
+      error={error(minute)}
+    />
+    <div class="hidden lg:block">:</div>
+    <Input
+      id="second"
+      class="w-24"
+      label={translate('common.seconds-abbreviated')}
+      labelHidden
+      bind:value={second}
+      placeholder="00"
+      suffix={translate('common.seconds-abbreviated')}
+      hideCount
+      maxLength={2}
+      error={error(second)}
+    />
   </div>
   <h3 class="mt-4 text-lg font-medium">
     {translate('schedules.offset-heading')}
@@ -103,10 +103,13 @@
   <div class="flex w-48 gap-0">
     <Input
       id="phase"
+      class="w-28"
       label={translate('schedules.offset-heading')}
       labelHidden
       bind:value={offset}
       placeholder="00"
+      maxLength={3}
+      hideCount
       error={error(phase)}
       unroundRight
     />

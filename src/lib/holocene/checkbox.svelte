@@ -2,6 +2,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   import { createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { omit } from '$lib/utilities/omit';
@@ -10,26 +11,35 @@
 
   interface $$Props extends HTMLInputAttributes {
     checked?: boolean;
-    label: string;
+    label?: string;
     labelHidden?: boolean;
-    onDark?: boolean;
     indeterminate?: boolean;
     hoverable?: boolean;
     value?: T;
     group?: T[];
     'data-testid'?: string;
+    required?: boolean;
+    valid?: boolean;
+    error?: string;
   }
 
   export let id = '';
   export let checked = false;
-  export let label: string;
+  export let label = '';
   export let labelHidden = false;
-  export let onDark = false;
   export let indeterminate = false;
   export let disabled = false;
   export let hoverable = false;
   export let value: T = undefined;
   export let group: T[] = undefined;
+  export let valid = true;
+  export let error = '';
+  export let required = false;
+  let className = '';
+  export { className as class };
+
+  let inputElement: HTMLInputElement;
+  $: inputElement !== undefined && (inputElement.indeterminate = indeterminate);
 
   const dispatch = createEventDispatcher<{
     change: { checked: boolean; value?: T };
@@ -61,19 +71,14 @@
   data-testid={$$restProps['data-testid'] ?? null}
   on:click|stopPropagation
   on:keypress|stopPropagation
-  class="relative {$$props.class}"
 >
   <label
     on:click
     on:keypress
-    class="checkbox"
-    class:hoverable
+    class={merge('checkbox', 'text-primary', className)}
+    class:hoverable={hoverable && !disabled}
     class:disabled
-    class:on-dark={onDark}
   >
-    <span class="label" class:hoverable class:sr-only={labelHidden}>
-      {label}
-    </span>
     <input
       on:click|stopPropagation
       on:change={handleChange}
@@ -81,85 +86,70 @@
       {value}
       type="checkbox"
       bind:checked
-      {indeterminate}
       {disabled}
+      {required}
       class:indeterminate
+      bind:this={inputElement}
       {...omit($$restProps, 'data-testid')}
     />
-    <span class="checkmark" class:hoverable class:on-dark={onDark}>
+
+    <span class="checkmark" class:disabled class:invalid={!valid}>
       {#if indeterminate}
-        <Icon class="absolute top-0 left-0 h-4 w-4" name="hyphen" />
+        <Icon class="absolute left-0 top-0 h-4 w-4" name="hyphen" />
       {:else if checked}
         <Icon
-          class="absolute top-0 left-0 h-4 w-4"
+          class="absolute left-0 top-0 h-4 w-4"
           name="checkmark"
           strokeWidth={3}
         />
       {/if}
     </span>
+
+    <slot name="label">
+      <span class="label" class:sr-only={labelHidden}>
+        {label}
+      </span>
+    </slot>
   </label>
+  {#if !valid && error}
+    <span class="error">{error}</span>
+  {/if}
 </div>
 
 <style lang="postcss">
   .checkbox {
-    @apply block h-[18px] w-[18px] cursor-pointer select-none text-sm leading-[18px] text-primary;
+    @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px];
   }
 
-  .checkbox.hoverable {
-    @apply h-9 w-9 rounded-full hover:bg-purple-200;
-  }
-
-  .checkbox.on-dark {
-    @apply text-white;
+  .checkbox.hoverable:hover .checkmark::before {
+    @apply absolute -left-2.5 -z-10 h-9 w-9 self-center rounded-full bg-interactive/20 content-[''];
   }
 
   .label {
-    @apply ml-6 flex h-full items-center whitespace-nowrap;
-  }
-
-  .label.hoverable {
-    @apply ml-10;
+    @apply flex;
   }
 
   input {
-    @apply absolute top-0 left-0 h-0 w-0 opacity-0;
+    @apply sr-only;
+  }
+
+  input:focus-visible ~ .checkmark {
+    @apply outline outline-interactive;
   }
 
   .checkmark {
-    @apply absolute top-0 left-0 box-content h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
+    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border border-primary bg-white dark:bg-transparent;
+
+    &.invalid {
+      @apply border-danger;
+    }
   }
 
-  .checkmark.hoverable {
-    @apply translate-x-1/2 translate-y-1/2;
+  .disabled {
+    @apply surface-disabled cursor-default border-disabled;
   }
 
-  .checkmark.on-dark {
-    @apply border-white bg-primary;
-  }
-
-  input:checked + .checkmark,
-  input.indeterminate + .checkmark {
-    @apply bg-primary text-white;
-  }
-
-  input:focus-visible + .checkmark {
-    @apply outline outline-blue-700;
-  }
-
-  .checkbox.disabled,
-  .checkbox.disabled .checkmark {
-    @apply cursor-default;
-  }
-
-  .checkbox.disabled.on-dark {
-    @apply text-opacity-80;
-  }
-
-  .checkbox.disabled:not(.on-dark) .checkmark {
-    @apply bg-gray-300;
-  }
-
-  .checkbox.disabled.on-dark .checkmark {
-    @apply border-opacity-80 text-opacity-80;
+  .error {
+    @apply text-xs text-danger;
   }
 </style>

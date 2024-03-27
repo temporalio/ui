@@ -50,14 +50,14 @@
   }
 
   .cloud {
-    @apply text-gray-900;
+    @apply text-primary;
   }
 
   .local:hover {
-    @apply bg-white text-gray-900;
+    @apply surface-primary text-primary;
   }
 
   .cloud:hover {
-    @apply bg-gray-900 text-white;
+    @apply bg-inverse text-white;
   }
 </style>

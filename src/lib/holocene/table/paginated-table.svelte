@@ -99,7 +99,7 @@
   <table class="paginated-table">
     <slot name="caption" />
     <thead class="paginated-table-header">
-      <slot name="headers" />
+      <slot name="headers" visibleItems={$store.items} />
       {#if updating}
         <ProgressBar />
       {/if}
@@ -177,7 +177,7 @@
   }
 
   .paginated-table-body {
-    @apply bg-white;
+    @apply surface-primary;
 
     :global(tr:not(.empty)) {
       @apply h-12 border-b border-primary last-of-type:border-0 hover:bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 hover:bg-fixed;
@@ -189,7 +189,7 @@
   }
 
   .paginated-table-controls {
-    @apply sticky bottom-0 left-0 flex w-full grow flex-col gap-2 rounded-b border-t border-gray-200 bg-white py-2 px-4 text-primary lg:flex-row;
+    @apply surface-primary sticky bottom-0 left-0 flex w-full grow flex-col gap-2 rounded-b border-t border-slate-200 px-4 py-2 text-primary lg:flex-row;
   }
 
   .paginated-table-controls-start {

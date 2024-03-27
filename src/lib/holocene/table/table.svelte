@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLTableAttributes } from 'svelte/elements';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
   interface $$Props extends HTMLTableAttributes {
@@ -16,7 +18,7 @@
   export let updating = false;
 </script>
 
-<table class="{variant} {className}" {...$$restProps}>
+<table class={merge(variant, className)} {...$$restProps}>
   <slot name="caption" />
   <thead>
     <slot name="headers" />
@@ -43,34 +45,34 @@
   }
 
   table.fancy {
-    @apply border-separate border-spacing-0 rounded-xl border-[3px] border-gray-900 bg-white;
+    @apply surface-primary border-separate border-spacing-0 rounded-xl border-2 border-table;
 
     thead {
-      @apply bg-gray-900 text-gray-100;
+      @apply surface-table;
 
       :global(th) {
-        @apply border-t border-gray-900 px-1 py-2;
+        @apply border-t border-table px-1 py-2 text-inverse;
       }
 
       :global(td) {
-        @apply border-t border-gray-900 px-1 py-2;
+        @apply border-t  px-1 py-2;
 
         &:first-child {
-          @apply w-[1px] rounded-tl-lg border-l border-gray-900;
+          @apply w-[1px] rounded-tl-lg border-l border-table;
         }
 
         &:last-child {
-          @apply w-[1px] rounded-tr-lg border-r border-gray-900;
+          @apply w-[1px] rounded-tr-lg border-r border-table;
         }
       }
     }
 
     tbody :global {
       td {
-        @apply border-t border-gray-900 px-1 py-2 text-sm;
+        @apply border-t border-table px-1 py-2 text-sm;
 
         &:first-child {
-          @apply border-l border-gray-900 px-1;
+          @apply px-1;
         }
 
         &:first-child:is(.expanded-cell) {
@@ -78,20 +80,18 @@
         }
 
         &:last-child {
-          @apply w-0 border-r border-gray-900 p-0;
+          @apply w-0 p-0;
         }
       }
 
       &:last-child {
         td {
-          @apply border-b border-gray-900;
-
           &:first-child {
             @apply rounded-bl-lg;
           }
 
           &:last-child {
-            @apply rounded-br-lg;
+            @apply rounded-br-xl;
           }
         }
       }
@@ -120,7 +120,7 @@
     }
 
     tbody :global(td) {
-      @apply border-b border-gray-900 py-2;
+      @apply border-b  py-2;
     }
 
     &:last-child {

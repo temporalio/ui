@@ -2,6 +2,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   import { createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
@@ -16,10 +17,10 @@
     labelHidden?: boolean;
     icon?: IconName;
     suffix?: string;
-    theme?: 'dark' | 'light';
     valid?: boolean;
     hintText?: string;
     maxLength?: number;
+    hideCount?: boolean;
     spellcheck?: boolean;
     unroundRight?: boolean;
     unroundLeft?: boolean;
@@ -51,11 +52,11 @@
   export let copyable = false;
   export let disabled = false;
   export let clearable = false;
-  export let theme: 'dark' | 'light' = 'light';
   export let autocomplete = 'off';
   export let valid = true;
   export let hintText = '';
   export let maxLength = 0;
+  export let hideCount = false;
   export let spellcheck: boolean = null;
   export let unroundRight = false;
   export let unroundLeft = false;
@@ -83,10 +84,10 @@
   $: disabled = disabled || copyable;
 </script>
 
-<div class={className}>
+<div class={merge('flex flex-col gap-1', className)}>
   <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
   <div
-    class="input-container {theme}"
+    class="input-container"
     class:disabled
     class:error
     class:unroundRight={unroundRight ?? suffix}
@@ -100,7 +101,7 @@
       </span>
     {/if}
     <input
-      class="m-2 block w-full bg-white focus:outline-none"
+      class="input"
       class:disabled
       {disabled}
       data-lpignore="true"
@@ -121,21 +122,18 @@
       use:callFocus
       {...$$restProps}
     />
-    {#if suffix}
-      <div class="suffix">
-        {suffix}
-      </div>
-    {/if}
     {#if copyable}
       <div class="copy-icon-container">
-        <IconButton
-          label={copyButtonLabel}
-          on:click={(e) => copy(e, value)}
-          icon={$copied ? 'checkmark' : 'copy'}
-        />
+        <button aria-label={copyButtonLabel} on:click={(e) => copy(e, value)}>
+          {#if $copied}
+            <Icon name="checkmark" />
+          {:else}
+            <Icon name="copy" />
+          {/if}
+        </button>
       </div>
     {:else if disabled}
-      <div class="flex h-full w-9 items-center justify-center">
+      <div class="disabled-icon-container">
         <Icon name="lock" />
       </div>
     {:else if clearable && value}
@@ -143,14 +141,19 @@
         <IconButton label={clearButtonLabel} on:click={onClear} icon="close" />
       </div>
     {/if}
-    {#if maxLength && !suffix && !disabled}
+    {#if maxLength && !disabled && !hideCount}
       <span class="count">
         <span
-          class="text-blue-700"
+          class:ok={maxLength - value.length > 5}
           class:warn={maxLength - value.length <= 5}
           class:error={maxLength === value.length}>{value.length}</span
-        >&nbsp;/&nbsp;{maxLength}
+        >/{maxLength}
       </span>
+    {/if}
+    {#if suffix}
+      <div class="suffix">
+        {suffix}
+      </div>
     {/if}
   </div>
   <span
@@ -167,7 +170,7 @@
 <style lang="postcss">
   /* Base styles */
   label {
-    @apply font-secondary text-sm font-medium;
+    @apply font-secondary text-sm font-medium text-primary;
   }
 
   label.required {
@@ -175,39 +178,40 @@
   }
 
   .input-container {
-    @apply relative box-border inline-flex h-10 w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+    @apply surface-primary relative box-border inline-flex h-10 w-full items-center rounded border border-primary text-sm text-primary dark:focus-within:surface-primary focus-within:border-interactive focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
+
+    &.error,
+    &.invalid {
+      @apply border-2 border-error focus-within:shadow-danger/50;
+
+      > .input {
+        @apply caret-danger;
+      }
+    }
+
+    &.disabled {
+      @apply surface-disabled border-subtle text-disabled;
+    }
   }
 
-  .input-container.error {
-    @apply border-2 border-red-700;
+  .input {
+    @apply m-2 w-full bg-transparent focus:outline-none enabled:placeholder:text-subtle disabled:text-disabled disabled:placeholder:text-disabled;
   }
 
   .suffix {
-    @apply block h-full w-full rounded-tr rounded-br border-l border-gray-900 bg-offWhite p-2;
-  }
-
-  .input-container:active .suffix {
-    @apply border-blue-700;
-  }
-
-  .input-container.error .suffix {
-    @apply border-red-700 bg-red-100;
+    @apply block h-full w-fit rounded-br rounded-tr border-l px-4 py-2;
   }
 
   .unroundRight {
-    @apply rounded-tr-none rounded-br-none;
+    @apply rounded-br-none rounded-tr-none;
   }
 
   .unroundLeft {
-    @apply rounded-tl-none rounded-bl-none border-l-0;
+    @apply rounded-bl-none rounded-tl-none border-l-0;
   }
 
   .noBorder {
     @apply border-none;
-  }
-
-  .input-container.disabled {
-    @apply border;
   }
 
   .icon-container {
@@ -215,81 +219,44 @@
   }
 
   .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r border-l;
+    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r border-l border-subtle;
+  }
+
+  .disabled-icon-container {
+    @apply flex h-full w-9 items-center justify-center;
   }
 
   .clear-icon-container {
-    @apply mr-2 flex w-6 cursor-pointer items-center justify-center rounded-full text-primary hover:bg-gray-200;
-  }
-
-  .input-container.invalid {
-    @apply border-red-700 text-red-700;
+    @apply mr-2 flex w-6 cursor-pointer items-center justify-center rounded-full;
   }
 
   .count {
-    @apply invisible mr-2 font-secondary text-sm font-medium text-primary;
+    @apply mx-2 hidden font-secondary text-sm font-medium tracking-widest;
+
+    > .ok {
+      @apply text-information;
+    }
+
+    > .warn {
+      @apply text-warning;
+    }
+
+    > .error {
+      @apply text-danger;
+    }
   }
 
-  .count > .warn {
-    @apply text-orange-600;
-  }
-
-  .count > .error {
-    @apply text-red-700;
-  }
-
-  input:focus + .count {
-    @apply visible;
+  .input:focus ~ .count {
+    @apply block;
   }
 
   .hint-text {
-    @apply mt-2 text-xs;
-  }
+    @apply text-xs text-primary;
 
-  .hint-text.error,
-  .hint-text.invalid {
-    @apply text-red-700;
-  }
-
-  /* Light theme styles */
-  .input-container.light,
-  .input-container.light .icon-container,
-  .input-container.light input {
-    @apply bg-white;
-  }
-
-  .input-container.light .icon-container {
-    @apply text-gray-400;
-  }
-
-  .input-container.light.disabled {
-    @apply border-gray-600 bg-gray-50  text-gray-600;
-  }
-
-  .input-container.light.disabled input {
-    @apply bg-gray-50;
-  }
-
-  .input-container.light.disabled .copy-icon-container {
-    @apply border-gray-600 bg-gray-200;
-  }
-
-  /* Dark theme styles */
-  .input-container.dark,
-  .input-container.dark .icon-container,
-  .input-container.dark input,
-  .input-container.dark .copy-icon-container {
-    @apply bg-gray-900 text-white;
-  }
-
-  .input-container.dark input {
-    @apply placeholder:text-gray-200;
-  }
-
-  .input-container.dark.disabled,
-  .input-container.dark.disabled .copy-icon-container,
-  .input-container.dark.disabled input {
-    @apply border-gray-900 bg-gray-900;
+    &.error,
+    &.invalid {
+      @apply text-danger;
+    }
   }
 
   input[type='search']::-webkit-search-cancel-button {

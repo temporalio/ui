@@ -51,7 +51,7 @@
         </span>
       {/if}
       <input
-        class="m-2 block w-full bg-white text-center focus:outline-none"
+        class="surface-primary m-2 block w-full text-center focus:outline-none"
         class:disabled
         type="number"
         {max}
@@ -89,7 +89,7 @@
   }
 
   .input-container {
-    @apply relative box-border flex h-10 w-16 items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+    @apply relative box-border flex h-10 w-16 items-center rounded border  text-sm focus-within:border-blue-700;
   }
 
   .input-container.search {
@@ -124,23 +124,23 @@
   .input-container.light,
   .input-container.light .icon-container,
   .input-container.light input {
-    @apply bg-white;
+    @apply surface-primary;
   }
 
   .input-container.light .icon-container {
-    @apply text-gray-400;
+    @apply text-slate-400;
   }
 
   .input-container.light.disabled {
-    @apply border-gray-600 bg-gray-50  text-gray-600;
+    @apply border-slate-600 bg-slate-50  text-slate-600;
   }
 
   .input-container.light.disabled input {
-    @apply bg-gray-50;
+    @apply bg-slate-50;
   }
 
   .input-container.light.disabled .copy-icon-container {
-    @apply border-gray-600 bg-gray-200;
+    @apply border-slate-600 bg-slate-200;
   }
 
   /* Dark theme styles */
@@ -148,24 +148,24 @@
   .input-container.dark .icon-container,
   .input-container.dark input,
   .input-container.dark .copy-icon-container {
-    @apply bg-gray-900 text-white;
+    @apply bg-inverse text-white;
   }
 
   .input-container.dark input {
-    @apply placeholder:text-gray-200;
+    @apply placeholder:text-slate-200;
   }
 
   .input-container.dark.disabled,
   .input-container.dark.disabled .copy-icon-container,
   .input-container.dark.disabled input {
-    @apply border-gray-900 bg-gray-900;
+    @apply bg-inverse;
   }
 
   .unroundRight {
-    @apply rounded-tr-none rounded-br-none;
+    @apply rounded-br-none rounded-tr-none;
   }
 
   .unroundLeft {
-    @apply rounded-tl-none rounded-bl-none;
+    @apply rounded-bl-none rounded-tl-none;
   }
 </style>

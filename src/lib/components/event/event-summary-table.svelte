@@ -3,13 +3,14 @@
 
   import { page } from '$app/stores';
 
-  import EventCategoryFilter from '$lib/components/event/event-category-filter.svelte';
   import EventDateFilter from '$lib/components/event/event-date-filter.svelte';
   import Button from '$lib/holocene/button.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import { expandAllEvents } from '$lib/stores/event-view';
+
+  import EventCategoryMultiselectFilter from './event-category-multiselect-filter.svelte';
 
   export let compact = false;
   export let updating = false;
@@ -28,11 +29,7 @@
   }
 </script>
 
-<Table
-  {updating}
-  class="dark w-full table-fixed"
-  data-testid="event-summary-table"
->
+<Table {updating} class="w-full table-fixed" data-testid="event-summary-table">
   <caption class="sr-only" slot="caption"
     >{translate('workflows.event-history')}</caption
   >
@@ -41,7 +38,7 @@
     <th class="w-16 md:w-32">
       <EventDateFilter {compact} />
     </th>
-    <th class="w-44"><EventCategoryFilter {compact} /></th>
+    <th class="w-44"><EventCategoryMultiselectFilter {compact} /></th>
     <th class="w-auto xl:w-80">
       <div class="flex w-full justify-end">
         <Button

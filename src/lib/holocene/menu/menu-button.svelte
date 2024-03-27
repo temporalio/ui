@@ -10,6 +10,7 @@
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
   import { createEventDispatcher, getContext } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -105,7 +106,7 @@
   aria-controls={controls}
   aria-expanded={$open}
   aria-label={label}
-  class="menu-button {variant} {className}"
+  class={merge('menu-button px-4', variant, className)}
   class:unroundLeft
   class:unroundRight
   class:active
@@ -129,7 +130,7 @@
   <slot name="trailing" />
   {#if count > 0}
     <Badge
-      class="absolute top-0 right-0 origin-bottom-left translate-y-[-10px] translate-x-[10px]"
+      class="absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
       type="count">{count}</Badge
     >
   {/if}
@@ -137,7 +138,7 @@
 
 <style lang="postcss">
   .menu-button {
-    @apply relative flex h-10 w-full flex-row items-center gap-2 rounded-lg py-2.5 px-4 text-sm disabled:cursor-not-allowed;
+    @apply relative flex h-10 w-full flex-row items-center gap-2 rounded-lg border py-2.5 text-sm transition-colors transition-shadow focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed;
 
     &.active {
       @apply after:h-2 after:w-2 after:-translate-x-full after:-translate-y-full after:rounded-full after:bg-blue-300 after:content-[''];
@@ -145,26 +146,26 @@
   }
 
   .primary {
-    @apply border-2 border-primary bg-primary bg-gradient-to-br text-white hover:border-indigo-600 hover:from-blue-100 hover:to-purple-100 hover:text-primary hover:shadow-focus hover:shadow-blue-600/50 focus-visible:border-indigo-600 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-primary focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
+    @apply border-interactive bg-interactive text-inverse hover:border-interactive-hover hover:bg-interactive-hover focus-visible:border-inverse focus-visible:bg-interactive-hover focus-visible:shadow-focus focus-visible:shadow-primary/50;
 
     &:disabled {
-      @apply text-white opacity-75 hover:from-primary hover:to-primary;
+      @apply text-white opacity-75;
     }
   }
 
   .ghost {
-    @apply border border-[transparent] text-primary hover:border-indigo-600 hover:bg-gray-200 hover:shadow-focus hover:shadow-blue-600/50 focus:bg-gray-200 focus:shadow-focus focus:shadow-blue-600/50 focus:outline-1 focus:outline-indigo-600;
+    @apply border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:shadow-focus focus-visible:shadow-primary/50;
 
     &:disabled {
-      @apply bg-gray-100/50;
+      @apply bg-badge/50;
     }
   }
 
   .secondary {
-    @apply border border-primary bg-white text-primary;
+    @apply border-primary bg-white text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary dark:hover:surface-interactive-secondary hover:border-subtle focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-secondary dark:bg-transparent dark:hover:border-primary;
 
     &:disabled {
-      @apply bg-gray-50;
+      @apply bg-slate-50;
     }
   }
 
@@ -172,13 +173,8 @@
     @apply w-10 rounded-full p-0;
   }
 
-  .secondary,
-  .ghost {
-    @apply focus-visible:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
-  }
-
   .table-header {
-    @apply h-auto max-w-fit border-2 border-[transparent] bg-primary p-0 text-sm text-white focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
+    @apply h-auto max-w-fit border-2 border-transparent bg-primary p-0 text-sm text-white focus-visible:border-white;
   }
 
   .unround {

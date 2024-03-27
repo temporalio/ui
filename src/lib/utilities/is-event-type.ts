@@ -43,6 +43,7 @@ import type {
   WorkflowExecutionTimedOutEvent,
   WorkflowExecutionUpdateAcceptedEvent,
   WorkflowExecutionUpdateCompletedEvent,
+  WorkflowExecutionUpdateRequestedEvent,
   WorkflowTaskCompletedEvent,
   WorkflowTaskFailedEvent,
   WorkflowTaskScheduledEvent,
@@ -116,6 +117,8 @@ export const eventTypes = [
   'UpsertWorkflowSearchAttributes',
   'WorkflowExecutionUpdateAccepted',
   'WorkflowExecutionUpdateCompleted',
+  'WorkflowExecutionUpdateRejected',
+  'WorkflowExecutionUpdateRequested',
 ] as const;
 
 export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
@@ -143,6 +146,8 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'workflowExecutionTerminatedEventAttributes',
   'workflowExecutionUpdateAcceptedEventAttributes',
   'workflowExecutionUpdateCompletedEventAttributes',
+  'workflowExecutionUpdateRejectedEventAttributes',
+  'workflowExecutionUpdateRequestedEventAttributes',
   'workflowExecutionCancelRequestedEventAttributes',
   'workflowExecutionCanceledEventAttributes',
   'requestCancelExternalWorkflowExecutionInitiatedEventAttributes',
@@ -399,12 +404,18 @@ export const isResetEvent = (event: WorkflowEvent): boolean => {
   return validResetEventTypes.includes(event.eventType);
 };
 
+const localActivityMarkerNames = ['LocalActivity', 'core_local_activity'];
+
 export const isLocalActivityMarkerEvent = (
   event: IterableEvent | CommonHistoryEvent,
 ) => {
   if (!isMarkerRecordedEvent(event)) return false;
 
-  if (event.markerRecordedEventAttributes.markerName !== 'LocalActivity') {
+  if (
+    !localActivityMarkerNames.includes(
+      event.markerRecordedEventAttributes.markerName,
+    )
+  ) {
     return false;
   }
 
@@ -427,4 +438,9 @@ export const isFailedWorkflowExecutionUpdateCompletedEvent = (
   isWorkflowExecutionUpdateCompletedEvent(event) &&
   Boolean(
     event.workflowExecutionUpdateCompletedEventAttributes.outcome?.failure,
+  );
+
+export const isWorkflowExecutionUpdateRequestedEvent =
+  hasAttributes<WorkflowExecutionUpdateRequestedEvent>(
+    'workflowExecutionUpdateRequestedEventAttributes',
   );

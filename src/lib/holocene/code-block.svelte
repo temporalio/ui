@@ -9,8 +9,10 @@
     foldGutter,
     indentOnInput,
     indentUnit,
+    StreamLanguage,
     syntaxHighlighting,
   } from '@codemirror/language';
+  import { shell } from '@codemirror/legacy-modes/mode/shell';
   import { EditorState } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
   import { createEventDispatcher, onMount } from 'svelte';
@@ -28,7 +30,7 @@
 
   type BaseProps = HTMLAttributes<HTMLDivElement> & {
     content: string;
-    language?: 'json' | 'text';
+    language?: 'json' | 'text' | 'shell';
     editable?: boolean;
     inline?: boolean;
     testId?: string;
@@ -112,6 +114,10 @@
       extensions.push(json());
     }
 
+    if (language === 'shell') {
+      extensions.push(StreamLanguage.define(shell));
+    }
+
     if (!inline) {
       extensions.push(EditorView.lineWrapping);
     }
@@ -159,7 +165,7 @@
     <CopyButton
       {copyIconTitle}
       {copySuccessIconTitle}
-      class="absolute top-1 right-1 text-white hover:text-gray-900 focus-visible:text-gray-900"
+      class="absolute right-1 top-1 bg-inverse bg-opacity-75 text-white hover:bg-opacity-100 hover:text-primary focus-visible:text-primary"
       on:click={handleCopy}
       copied={$copied}
     />

@@ -26,7 +26,7 @@ const PORT = 8888;
 
 const MOCK_DECODED_PAYLOAD = {
   metadata: {
-    encoding: Buffer.from('binary/plain').toString('base64'),
+    encoding: Buffer.from('json/plain').toString('base64'),
   },
   data: 'Mock decoded payload',
 };
@@ -42,6 +42,16 @@ export async function createCodecServer(
 
   app.use(cors({ allowedHeaders: ['x-namespace', 'content-type'] }));
   app.use(express.json());
+
+  app.post('/encode', async (req, res) => {
+    try {
+      const { payloads: raw } = req.body as Body;
+      res.json({ payloads: raw.map(() => MOCK_DECODED_PAYLOAD) }).end();
+    } catch (err) {
+      console.error('Error in /encode', err);
+      res.status(500).end('Internal server error');
+    }
+  });
 
   app.post('/decode', async (req, res) => {
     try {

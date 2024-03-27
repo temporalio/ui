@@ -20,6 +20,9 @@
     routeForSchedule,
     routeForSchedules,
   } from '$lib/utilities/route-for';
+  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
+
+  import ScheduleInputPayload from './schedule-input-payload.svelte';
 
   import type { Schedule } from '$types';
 
@@ -52,6 +55,7 @@
   let workflowType = schedule?.action?.startWorkflow?.workflowType?.name ?? '';
   let workflowId = schedule?.action?.startWorkflow?.workflowId ?? '';
   let taskQueue = schedule?.action?.startWorkflow?.taskQueue?.name ?? '';
+  let input = '';
   let daysOfWeek: string[] = [];
   let daysOfMonth: number[] = [];
   let months: string[] = [];
@@ -68,6 +72,7 @@
       workflowType,
       workflowId,
       taskQueue,
+      input,
       hour,
       minute,
       second,
@@ -100,8 +105,25 @@
     }
   };
 
+  const isValidInput = (value: string) => {
+    if (!input) {
+      errors['input'] = false;
+      return true;
+    }
+
+    try {
+      JSON.parse(value);
+      errors['input'] = false;
+      return true;
+    } catch (e) {
+      errors['input'] = true;
+      return false;
+    }
+  };
+
   $: isDisabled = (preset: SchedulePreset) => {
     if (!name || !workflowType || !workflowId || !taskQueue) return true;
+    if (!isValidInput(input)) return true;
     if (preset === 'interval') return !days && !hour && !minute && !second;
     if (preset === 'week') return !daysOfWeek.length;
     if (preset === 'month') return !daysOfMonth.length || !months.length;
@@ -168,6 +190,11 @@
           on:blur={onBlur}
         />
       </div>
+      <ScheduleInputPayload
+        bind:input
+        payloads={schedule?.action?.startWorkflow?.input}
+        error={errors['input']}
+      />
       <SchedulesCalendarView
         let:preset
         {schedule}
@@ -183,7 +210,7 @@
       >
         <div class="mt-8 flex items-center gap-2">
           <Button
-            disabled={isDisabled(preset)}
+            disabled={isDisabled(preset) || !writeActionsAreAllowed()}
             on:click={() => handleConfirm(preset, schedule)}
             >{confirmText}</Button
           >

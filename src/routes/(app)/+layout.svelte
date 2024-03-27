@@ -6,6 +6,7 @@
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
+  import Banner from '$lib/holocene/banner/banner.svelte';
   import { ErrorBoundary } from '$lib/holocene/error-boundary';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
@@ -14,6 +15,7 @@
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
   import type { NamespaceListItem } from '$lib/types/global';
+  import DarkMode from '$lib/utilities/dark-mode';
   import {
     routeForArchivalWorkfows,
     routeForBatchOperations,
@@ -102,7 +104,9 @@
   });
 </script>
 
+<DarkMode />
 <SkipNavigation />
+
 <div class="flex w-screen flex-row">
   <Toaster
     closeButtonLabel={translate('common.close')}
@@ -115,6 +119,10 @@
   <MainContentContainer>
     <DataEncoderSettings />
     <TopNavigation {logout} {namespaceList} />
+    <Banner
+      message={$page.data.settings?.bannerText}
+      closeLabel={translate('common.close')}
+    />
     <div
       slot="main"
       class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-8"

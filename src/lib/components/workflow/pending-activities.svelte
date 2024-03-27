@@ -55,7 +55,7 @@
         {#each pendingActivities as { id, ...pendingActivity } (id)}
           {@const failed = pendingActivity.attempt > 1}
           <div class="pending-activity-row-container">
-            <h3 class="w-full self-start text-sm font-normal text-gray-500">
+            <h3 class="w-full self-start text-sm font-normal text-slate-500">
               {pendingActivity.activityId}
             </h3>
             <div class="pending-activity-row">
@@ -189,7 +189,7 @@
   }
 
   .pending-activity-summary {
-    @apply w-full overflow-x-scroll border-b-2 border-gray-300 py-1 text-sm;
+    @apply w-full overflow-x-scroll border-b-2 border-subtle py-1 text-sm;
   }
 
   .pending-activity-row:last-child .pending-activity-summary {

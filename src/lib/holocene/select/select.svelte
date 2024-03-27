@@ -79,6 +79,8 @@
     if (selectedOption !== undefined) {
       return selectedOption.label;
     }
+
+    return '';
   }
 
   setContext<SelectContext<T>>(SELECT_CONTEXT, {
@@ -96,7 +98,9 @@
 </script>
 
 <MenuContainer class="w-full" {open}>
-  <label class:sr-only={labelHidden} for={id}>{label}</label>
+  <label class="text-sm text-primary" class:sr-only={labelHidden} for={id}
+    >{label}</label
+  >
   <MenuButton
     hasIndicator={!disabled}
     {disabled}
@@ -125,10 +129,10 @@
 
 <style lang="postcss">
   .select-input {
-    @apply pointer-events-none w-full bg-white;
+    @apply pointer-events-none w-full bg-transparent;
   }
 
   .select-input.disabled {
-    @apply bg-gray-50;
+    @apply bg-slate-50;
   }
 </style>

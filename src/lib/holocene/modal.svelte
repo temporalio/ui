@@ -2,6 +2,7 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   import { type ComponentProps, createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
   import { focusTrap } from '$lib/utilities/focus-trap';
@@ -81,7 +82,7 @@
   {id}
   on:close={handleCancel}
   bind:this={modalElement}
-  class="body {className}"
+  class={merge('body', className)}
   class:large
   class:hightlightNav
   aria-modal="true"
@@ -131,15 +132,15 @@
 
 <style lang="postcss">
   .body {
-    @apply z-50  w-full max-w-lg overflow-y-auto rounded-lg bg-white p-0 text-gray-900 shadow-xl md:h-max;
+    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto rounded-lg p-0 text-primary shadow-xl md:h-max;
   }
 
   .body::backdrop {
-    @apply cursor-pointer bg-gray-900 opacity-70;
+    @apply cursor-pointer;
   }
 
   .body.hightlightNav::backdrop {
-    @apply top-[40px] left-[60px];
+    @apply left-[60px] top-[40px];
   }
 
   .large {
@@ -147,7 +148,7 @@
   }
 
   .title {
-    @apply bg-white px-8 pt-8 pb-0 text-2xl;
+    @apply surface-primary px-8 pb-0 pt-8 text-2xl;
   }
 
   .content {

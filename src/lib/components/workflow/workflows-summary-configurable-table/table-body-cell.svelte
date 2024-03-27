@@ -83,7 +83,7 @@
     {:else if label === 'Task Queue'}
       {workflow.taskQueue}
     {:else if label === 'Parent Namespace'}
-      {workflow.parentNamespaceId}
+      {workflow?.parentNamespaceId ?? ''}
     {:else if label === 'History Size'}
       {formatBytes(parseInt(workflow.historySizeBytes, 10))}
     {:else if label === 'State Transitions'}
@@ -102,6 +102,14 @@
       })}
     {:else if label === 'History Length'}
       {parseInt(workflow.historyEvents, 10) > 0 ? workflow.historyEvents : ''}
+    {:else if label === 'Scheduled By ID'}
+      {workflow.searchAttributes?.indexedFields?.TemporalScheduledById ?? ''}
+    {:else if label === 'Scheduled Start Time'}
+      {@const content =
+        workflow.searchAttributes?.indexedFields?.TemporalScheduledStartTime}
+      {content && typeof content === 'string'
+        ? formatDate(content, $timeFormat, { relative: $relativeTime })
+        : ''}
     {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
       {@const content = workflow.searchAttributes.indexedFields[label]}
       {#if $customSearchAttributes[label] === 'Datetime' && typeof content === 'string'}

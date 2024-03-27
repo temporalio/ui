@@ -11,7 +11,8 @@ export const Strings = {
   'filtered-workflows-count':
     'Results {{filtered, number}} of {{total, number}} workflows',
   terminate: 'Terminate',
-  'batch-operation-modal-title': '{{action}} Workflows',
+  'batch-terminate-modal-title': 'Terminate Workflows',
+  'batch-cancel-modal-title': 'Cancel Workflows',
   'workflow-action-reason-placeholder': '{{action}} from the Web UI',
   'workflow-action-reason-placeholder-with-email':
     '{{action}} from the Web UI by {{email}}',
@@ -92,7 +93,7 @@ export const Strings = {
   'signal-modal-title': 'Send a Signal',
   'signal-name-label': 'Signal name',
   'signal-payload-input-label': 'Input',
-  'signal-payload-input-label-hint': '(only JSON payloads are supported)',
+  'signal-payload-input-label-hint': '(only single JSON payload supported)',
   'cancel-request-sent': 'Cancel Request Sent',
   'cancel-request-sent-description':
     "The request to cancel this Workflow Execution has been sent. If the Workflow uses the cancellation API, it'll cancel at the next available opportunity.",
@@ -105,6 +106,9 @@ export const Strings = {
   'pending-activities-tab': 'Pending Activities',
   'call-stack-tab': 'Call Stack',
   'queries-tab': 'Queries',
+  'workflow-404-title': 'This is not the Workflow you are looking for',
+  'workflow-error-title':
+    'We are having technical difficulties retrieving this Workflow',
   'workflow-error-no-workers-title': 'No Workers Running',
   'workflow-error-no-workers-description':
     'There are no Workers polling the {{taskQueue}} Task Queue.',

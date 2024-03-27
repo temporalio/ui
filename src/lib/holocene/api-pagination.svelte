@@ -172,63 +172,70 @@
   />
 {/if}
 
+<slot name="header" visibleItems={$store.visibleItems} />
 <div class="relative mb-8 flex flex-col gap-4">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
     <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
-      <slot name="action-top-left" />
+      <slot name="action-top-left" visibleItems={$store.visibleItems} />
     </div>
     <nav
       class="flex flex-col justify-end gap-4 md:flex-row"
       aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
-      {#if pageSizeOptions.length}
-        <FilterSelect
-          label={pageSizeSelectLabel}
-          parameter={$store.key}
-          value={String($store.pageSize)}
-          options={pageSizeOptions}
-        />
-      {/if}
-      <div class="flex items-center justify-center gap-3">
-        <button
-          class="caret"
-          disabled={!$store.hasPrevious}
-          on:click={store.previousPage}
-          aria-label={previousButtonLabel}
-        >
-          <span
-            class="arrow arrow-left"
-            class:arrow-left-disabled={!$store.hasPrevious}
+      {#if $store.visibleItems.length}
+        {#if pageSizeOptions.length}
+          <FilterSelect
+            label={pageSizeSelectLabel}
+            parameter={$store.key}
+            value={String($store.pageSize)}
+            options={pageSizeOptions}
           />
-        </button>
-        <div class="flex gap-1">
-          <p>
-            {$store.indexStart}–{$store.indexEnd}
-          </p>
-          {#if total}
+        {/if}
+        <div class="flex items-center justify-center gap-3">
+          <button
+            class="caret"
+            disabled={!$store.hasPrevious}
+            on:click={store.previousPage}
+            aria-label={previousButtonLabel}
+          >
+            <span
+              class="arrow arrow-left"
+              class:arrow-left-disabled={!$store.hasPrevious}
+            />
+          </button>
+          <div class="flex gap-1">
             <p>
-              of {total}
+              {$store.indexStart}–{$store.indexEnd}
             </p>
-          {/if}
+            {#if total}
+              <p>
+                of {total}
+              </p>
+            {/if}
+          </div>
+          <button
+            class="caret"
+            disabled={!$store.hasNext}
+            on:click={fetchIndexData}
+            aria-label={nextButtonLabel}
+          >
+            <span
+              class="arrow arrow-right"
+              class:arrow-right-disabled={!$store.hasNext}
+            />
+          </button>
         </div>
-        <button
-          class="caret"
-          disabled={!$store.hasNext}
-          on:click={fetchIndexData}
-          aria-label={nextButtonLabel}
-        >
-          <span
-            class="arrow arrow-right"
-            class:arrow-right-disabled={!$store.hasNext}
-          />
-        </button>
-      </div>
+      {/if}
       <slot name="action-top-right" />
     </nav>
   </div>
   {#if $store.loading}
-    <SkeletonTable rows={15} />
+    {#if $$slots.loading}
+      <slot name="loading" />
+    {:else}
+      <SkeletonTable rows={15} />
+    {/if}
   {:else if isEmpty}
     <slot name="empty">{emptyStateMessage}</slot>
   {:else}
@@ -298,7 +305,7 @@
 
 <style lang="postcss">
   .arrow {
-    @apply absolute top-0 left-0 h-0 w-0;
+    @apply absolute left-0 top-0 h-0 w-0;
 
     border-style: solid;
     border-width: 6px 12px 6px 0;
@@ -330,6 +337,6 @@
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-gray-400;
+    @apply cursor-not-allowed text-slate-400;
   }
 </style>

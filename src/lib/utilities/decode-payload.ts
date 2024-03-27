@@ -1,4 +1,9 @@
-import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
+import { get } from 'svelte/store';
+
+import { page } from '$app/stores';
+
+import { decodePayloadsWithCodec } from '$lib/services/data-encoder';
+import { authUser } from '$lib/stores/auth-user';
 import type {
   codecEndpoint,
   includeCredentials,
@@ -14,6 +19,7 @@ import type {
 import type { Optional, Replace, Settings } from '$lib/types/global';
 
 import { atob } from './atob';
+import { getCodecEndpoint } from './get-codec';
 import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
@@ -95,6 +101,13 @@ export const decodePayloadAttributes = <
     Object.entries(searchAttributes).forEach(([key, value]) => {
       searchAttributes[key] = decodePayload(value, returnDataOnly);
     });
+  } else if (has(eventAttribute, 'searchAttributes')) {
+    // Decode Search Attributes on UpsertWorkflowSearchAttributes
+    const searchAttributes = eventAttribute.searchAttributes;
+
+    Object.entries(searchAttributes).forEach(([key, value]) => {
+      searchAttributes[key] = decodePayload(value, returnDataOnly);
+    });
   }
 
   // Decode Memo
@@ -128,19 +141,17 @@ export const decodePayloadAttributes = <
   return eventAttribute;
 };
 
-const decodePayloadWithCodec =
-  (namespace: string, settings: Settings, accessToken: string) =>
+const decodePayloads =
+  (settings: Settings) =>
   async (
     payloads: unknown[],
     returnDataOnly: boolean = true,
   ): Promise<unknown[]> => {
-    if (settings?.codec?.endpoint) {
+    if (getCodecEndpoint(settings)) {
       // Convert Payload data
-      const awaitData = await convertPayloadsWithCodec({
+      const awaitData = await decodePayloadsWithCodec({
         payloads: { payloads },
-        namespace,
         settings,
-        accessToken,
       });
       return (awaitData?.payloads ?? []).map((p) =>
         decodePayload(p, returnDataOnly),
@@ -159,11 +170,12 @@ const keyIs = (key: string, ...validKeys: string[]) => {
 
 export const decodeAllPotentialPayloadsWithCodec = async (
   anyAttributes: EventAttribute | PotentiallyDecodable,
-  namespace: string,
-  settings: Settings,
-  accessToken: string,
+  namespace: string = get(page).params.namespace,
+  settings: Settings = get(page).data.settings,
+  accessToken: string = get(authUser).accessToken,
 ): Promise<EventAttribute | PotentiallyDecodable> => {
-  const decode = decodePayloadWithCodec(namespace, settings, accessToken);
+  const decode = decodePayloads(settings);
+
   if (anyAttributes) {
     for (const key of Object.keys(anyAttributes)) {
       if (keyIs(key, 'payloads', 'encodedAttributes') && anyAttributes[key]) {
@@ -198,7 +210,7 @@ export const cloneAllPotentialPayloadsWithCodec = async (
 ): Promise<PotentiallyDecodable | EventAttribute | WorkflowEvent | null> => {
   if (!anyAttributes) return anyAttributes;
 
-  const decode = decodePayloadWithCodec(namespace, settings, accessToken);
+  const decode = decodePayloads(settings);
   const clone = { ...anyAttributes };
   if (anyAttributes) {
     for (const key of Object.keys(clone)) {

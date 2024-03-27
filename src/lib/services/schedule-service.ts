@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 
+import { translate } from '$lib/i18n/translate';
 import type {
   CreateScheduleRequest,
   ListScheduleResponse,
@@ -25,6 +26,29 @@ export type ScheduleResponse = {
 
 export type FetchSchedule = typeof fetchAllSchedules;
 
+type PaginatedSchedulesPromise = (
+  pageSize: number,
+  token: string,
+) => Promise<{ items: ScheduleListEntry[]; nextPageToken: string }>;
+
+export const fetchPaginatedSchedules = async (
+  namespace: string,
+  request = fetch,
+): Promise<PaginatedSchedulesPromise> => {
+  return (pageSize = 100, token = '') => {
+    const route = routeForApi('schedules', { namespace });
+    return requestFromAPI<ListScheduleResponse>(route, {
+      params: { maximumPageSize: String(pageSize), nextPageToken: token },
+      request,
+    }).then(({ schedules, nextPageToken }) => {
+      return {
+        items: schedules,
+        nextPageToken: nextPageToken ? String(nextPageToken) : '',
+      };
+    });
+  };
+};
+
 export const fetchAllSchedules = async (
   namespace: string,
   request = fetch,
@@ -33,7 +57,9 @@ export const fetchAllSchedules = async (
   const onError: ErrorCallback = (err) =>
     (error =
       err?.body?.message ??
-      `Error fetching schedules: ${err.status}: ${err.statusText}`);
+      `${translate('schedules.error-message-fetching')}: ${err.status}: ${
+        err.statusText
+      }`);
 
   const route = routeForApi('schedules', { namespace });
   const { schedules, nextPageToken } =
@@ -224,6 +250,45 @@ export async function triggerImmediately({
       triggerImmediately: {
         overlapPolicy,
       },
+    },
+  };
+
+  const route = routeForApi('schedule.patch', {
+    namespace,
+    scheduleId: scheduleId,
+  });
+  return await requestFromAPI<null>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        ...options,
+        request_id: uuidv4(),
+      }),
+    },
+  });
+}
+
+type BackfillOptions = TriggerImmediatelyOptions & {
+  startTime: string;
+  endTime: string;
+};
+
+export async function backfillRequest({
+  namespace,
+  scheduleId,
+  overlapPolicy,
+  startTime,
+  endTime,
+}: BackfillOptions): Promise<null> {
+  const options = {
+    patch: {
+      backfillRequest: [
+        {
+          overlapPolicy,
+          startTime,
+          endTime,
+        },
+      ],
     },
   };
 

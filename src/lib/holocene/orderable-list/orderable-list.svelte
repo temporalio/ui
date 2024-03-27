@@ -19,10 +19,10 @@
   }
 
   .orderable-heading {
-    @apply text-sm font-medium;
+    @apply text-sm font-medium text-primary;
   }
 
   .orderable-list {
-    @apply rounded-lg border-2 border-primary bg-white;
+    @apply surface-primary rounded-lg border-2 border-primary dark:border-subtle;
   }
 </style>

@@ -5,6 +5,7 @@ import { page } from '$app/stores';
 
 import type { WorkflowFilter } from '$lib/models/workflow-filters';
 import { persistStore } from '$lib/stores/persist-store';
+import type { EventTypeCategory } from '$lib/types/events';
 
 const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
 const category = derived([page], ([$page]) =>
@@ -38,7 +39,9 @@ export const workflowFilters = writable<WorkflowFilter[]>(
   updateWorkflowFilters,
 );
 
-const updateEventCategoryFilter: StartStopNotifier<string | null> = (set) => {
+const updateEventCategoryFilter: StartStopNotifier<
+  EventTypeCategory[] | null
+> = (set) => {
   return parameters.subscribe(({ category }) => {
     if (!category && get(eventCategoryFilter)) {
       // Clear filter if there is no category
@@ -47,7 +50,7 @@ const updateEventCategoryFilter: StartStopNotifier<string | null> = (set) => {
   });
 };
 
-export const eventCategoryFilter = writable<string | undefined>(
+export const eventCategoryFilter = writable<EventTypeCategory[] | undefined>(
   undefined,
   updateEventCategoryFilter,
 );

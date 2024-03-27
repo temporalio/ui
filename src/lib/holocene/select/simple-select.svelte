@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLSelectAttributes } from 'svelte/elements';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
   import type { SelectOptionValue } from '$lib/types/global';
 
   import Option from './simple-option.svelte';
@@ -30,7 +32,10 @@
 <div>
   <label class="sr-only" for={id}>{label}</label>
   <select
-    class="inline h-10 w-full rounded-lg border-2 px-2 text-base {className}"
+    class={merge(
+      'inline h-10 w-full rounded-lg border-2 px-2 text-base',
+      className,
+    )}
     class:dark
     class:remove={arrow}
     {name}
@@ -49,7 +54,7 @@
 
 <style lang="postcss">
   select {
-    @apply text-gray-500;
+    @apply text-slate-500;
   }
 
   .remove {
@@ -57,6 +62,6 @@
   }
 
   .dark {
-    @apply bg-gray-900 text-white;
+    @apply bg-inverse text-white;
   }
 </style>

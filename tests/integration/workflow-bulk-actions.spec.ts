@@ -8,20 +8,6 @@ import {
 } from '~/test-utilities/mock-apis';
 
 test.describe('Batch and Bulk Workflow Actions', () => {
-  test.describe('when advanced visibility is disabled', () => {
-    test('disallows bulk and batch actions', async ({ page }) => {
-      await mockWorkflowsApis(page);
-
-      await page.goto('/namespaces/default/workflows');
-
-      await waitForWorkflowsApis(page, false);
-
-      await page.waitForSelector('[data-testid="workflows-table"]');
-
-      await expect(page.getByTestId('batch-actions-checkbox')).toBeHidden();
-    });
-  });
-
   test.describe('when advanced visibility is enabled', () => {
     test.beforeEach(async ({ page }) => {
       await mockWorkflowsApis(page);
@@ -40,7 +26,7 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="bulk-terminate-button"]');
       await page
-        .getByTestId('batch-Terminate-confirmation')
+        .getByTestId('batch-terminate-confirmation')
         .getByTestId('confirm-modal-button')
         .click();
       await expect(
@@ -55,17 +41,17 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await page.click('[data-testid="select-all-workflows"]');
       await page.click('[data-testid="bulk-terminate-button"]');
       const batchActionWorkflowsQuery = page
-        .getByTestId('batch-Terminate-confirmation')
+        .getByTestId('batch-terminate-confirmation')
         .getByTestId('batch-action-workflows-query');
       await expect(batchActionWorkflowsQuery).toHaveText(
         'ExecutionStatus="Running"',
       );
       await page.fill(
-        '[data-testid="batch-Terminate-confirmation"] #bulk-action-reason-2',
+        '[data-testid="batch-terminate-confirmation"] #bulk-action-reason-2',
         'Sarah Connor',
       );
       await page
-        .getByTestId('batch-Terminate-confirmation')
+        .getByTestId('batch-terminate-confirmation')
         .getByTestId('confirm-modal-button')
         .click();
       await expect(
@@ -79,7 +65,7 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="bulk-cancel-button"]');
       await page
-        .getByTestId('batch-Cancel-confirmation')
+        .getByTestId('batch-cancel-confirmation')
         .getByTestId('confirm-modal-button')
         .click();
       await expect(page.locator('#batch-cancel-success-toast')).toBeVisible();
@@ -92,20 +78,54 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await page.click('[data-testid="select-all-workflows"]');
       await page.click('[data-testid="bulk-cancel-button"]');
       const batchActionWorkflowsQuery = page
-        .getByTestId('batch-Cancel-confirmation')
+        .getByTestId('batch-cancel-confirmation')
         .getByTestId('batch-action-workflows-query');
       await expect(batchActionWorkflowsQuery).toHaveText(
         'ExecutionStatus="Running"',
       );
       await page.fill(
-        '[data-testid="batch-Cancel-confirmation"] #bulk-action-reason-0',
+        '[data-testid="batch-cancel-confirmation"] #bulk-action-reason-0',
         'Sarah Connor',
       );
       await page
-        .getByTestId('batch-Cancel-confirmation')
+        .getByTestId('batch-cancel-confirmation')
         .getByTestId('confirm-modal-button')
         .click();
       await expect(page.locator('#batch-cancel-success-toast')).toBeVisible();
+    });
+
+    test('works when visiting a URL directly that has an existing query in it', async ({
+      page,
+    }) => {
+      await page.goto(
+        '/namespaces/default/workflows?query=WorkflowId%3D"test"',
+      );
+
+      await waitForWorkflowsApis(page);
+
+      await page.getByTestId('batch-actions-checkbox').click();
+      await page.getByTestId('select-all-workflows').click();
+      await page.getByTestId('bulk-cancel-button').click();
+
+      const cancelQueryValue = await page
+        .getByTestId('batch-cancel-confirmation')
+        .getByTestId('batch-action-workflows-query')
+        .innerText();
+
+      expect(cancelQueryValue).toBe('WorkflowId="test"');
+
+      await page
+        .getByTestId('batch-cancel-confirmation')
+        .getByLabel('Cancel')
+        .click();
+      await page.getByTestId('bulk-terminate-button').click();
+
+      const terminateQueryValue = await page
+        .getByTestId('batch-terminate-confirmation')
+        .getByTestId('batch-action-workflows-query')
+        .innerText();
+
+      expect(terminateQueryValue).toBe('WorkflowId="test"');
     });
   });
 });

@@ -3,6 +3,7 @@
   import { writable } from 'svelte/store';
 
   import { createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
@@ -14,8 +15,9 @@
   type T = $$Generic;
 
   const dispatch = createEventDispatcher<{
-    change: T | string;
+    change: { value: string | T };
     filter: string;
+    close: { selectedOption: string | T };
   }>();
 
   type ExtendedInputEvent = Event & {
@@ -37,6 +39,8 @@
     minSize?: number;
     maxSize?: number;
     'data-testid'?: string;
+    error?: string;
+    valid?: boolean;
   }
 
   type UncontrolledStringOptionProps = {
@@ -74,6 +78,8 @@
   export let optionLabelKey: keyof T = optionValueKey;
   export let minSize = 0;
   export let maxSize = 120;
+  export let error = '';
+  export let valid = true;
 
   let displayValue: string;
   let selectedOption: string | T;
@@ -125,6 +131,12 @@
   const closeList = () => {
     if (!$open) return;
     $open = false;
+    dispatch('close', { selectedOption });
+    resetValueAndOptions();
+  };
+
+  const handleMenuClose = () => {
+    dispatch('close', { selectedOption });
     resetValueAndOptions();
   };
 
@@ -178,8 +190,8 @@
   };
 
   const handleSelectOption = (option: string | T) => {
-    dispatch('change', option);
     setValue(option);
+    dispatch('change', { value: option });
     resetValueAndOptions();
   };
 
@@ -218,7 +230,7 @@
   const handleInput = (event: ExtendedInputEvent) => {
     displayValue = event.currentTarget.value;
     dispatch('filter', displayValue);
-    if (!$open) openList();
+    if (!$open) $open = true;
 
     list = options.filter((option) => {
       if (isStringOption(option)) {
@@ -240,19 +252,18 @@
   };
 </script>
 
-<MenuContainer {open} on:close={resetValueAndOptions}>
-  <label class="combobox-label" class:sr-only={labelHidden} for={id}>
+<MenuContainer {open} on:close={handleMenuClose}>
+  <label
+    class="combobox-label"
+    class:sr-only={labelHidden}
+    class:required
+    for={id}
+  >
     {label}
   </label>
-
-  <div class="combobox-wrapper">
+  <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
     {#if leadingIcon}
-      <Icon
-        width={20}
-        height={20}
-        class="ml-2 shrink-0 text-gray-500"
-        name={leadingIcon}
-      />
+      <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
     <input
       {id}
@@ -263,7 +274,7 @@
       type="text"
       value={displayValue}
       class:disabled
-      class="combobox-input {className}"
+      class={merge('combobox-input', className)}
       role="combobox"
       autocomplete="off"
       autocapitalize="off"
@@ -273,6 +284,7 @@
       aria-expanded={$open}
       aria-required={required}
       aria-autocomplete="list"
+      on:focus|stopPropagation={openList}
       on:input|stopPropagation={handleInput}
       on:keydown|stopPropagation={handleInputKeydown}
       on:click|stopPropagation={handleInputClick}
@@ -286,11 +298,15 @@
       tabindex={-1}
       aria-controls="{id}-listbox"
       aria-expanded={$open}
+      type="button"
       on:click={toggleList}
     >
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
     </button>
   </div>
+  {#if error && !valid}
+    <span class="error">{error}</span>
+  {/if}
 
   <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
     {#each list as option}
@@ -321,18 +337,34 @@
 
 <style lang="postcss">
   .combobox-label {
-    @apply font-secondary text-sm font-normal;
+    @apply font-secondary text-sm font-medium text-primary;
+
+    &.required {
+      @apply after:content-['*'];
+    }
   }
 
   .combobox-wrapper {
-    @apply flex h-10 w-full flex-row items-center rounded-lg border border-primary bg-white text-sm focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-blue-600/50 focus-within:outline-none;
+    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border border-primary text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
+
+    &.invalid {
+      @apply border-2 border-error text-danger focus-within:shadow-danger/50;
+    }
+
+    &.disabled {
+      @apply surface-disabled border-subtle text-disabled;
+    }
+  }
+
+  .error {
+    @apply text-xs text-danger;
   }
 
   .combobox-input {
-    @apply ml-2 h-full w-full grow font-primary focus:outline-none;
+    @apply ml-2 h-full w-full grow bg-transparent font-primary text-primary placeholder:text-primary focus:outline-none disabled:text-disabled disabled:placeholder:text-disabled dark:bg-transparent;
   }
 
   .combobox-button {
-    @apply mx-2 flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br hover:from-blue-100 hover:to-purple-100;
+    @apply mx-2 flex shrink-0 items-center justify-center rounded-full hover:surface-interactive-secondary;
   }
 </style>

@@ -8,6 +8,7 @@
   export let second = '';
   export let half: 'AM' | 'PM' = 'AM';
   export let twelveHourClock = true;
+  export let includeSeconds = true;
   export let disabled = false;
 </script>
 
@@ -20,6 +21,7 @@
     placeholder="00"
     suffix="hrs"
     maxLength={2}
+    hideCount
     error={twelveHourClock ? parseInt(hour) > 12 : parseInt(hour) > 23}
     {disabled}
   />
@@ -27,25 +29,28 @@
     id="minute"
     label="min"
     labelHidden
-    required
     bind:value={minute}
     placeholder="00"
     suffix="min"
     maxLength={2}
+    hideCount
     error={Boolean(parseInt(hour) > 59)}
     {disabled}
   />
-  <Input
-    id="second"
-    label="sec"
-    labelHidden
-    bind:value={second}
-    placeholder="00"
-    suffix="sec"
-    maxLength={2}
-    error={Boolean(parseInt(hour) > 59)}
-    {disabled}
-  />
+  {#if includeSeconds}
+    <Input
+      id="second"
+      label="sec"
+      labelHidden
+      bind:value={second}
+      placeholder="00"
+      suffix="sec"
+      maxLength={2}
+      hideCount
+      error={Boolean(parseInt(hour) > 59)}
+      {disabled}
+    />
+  {/if}
   {#if twelveHourClock}
     <ToggleButtons>
       <ToggleButton active={half === 'AM'} on:click={() => (half = 'AM')}

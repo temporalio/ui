@@ -135,6 +135,7 @@ export type WorkflowExecutionStatus =
   temporal.api.enums.v1.WorkflowExecutionStatus;
 export type Severity = temporal.api.enums.v1.Severity;
 export type ArchivalState = temporal.api.enums.v1.ArchivalState;
+export type NamespaceState = temporal.api.enums.v1.NamespaceState;
 export type TaskReachability = temporal.api.enums.v1.TaskReachability;
 
 // api.workflow
@@ -200,6 +201,7 @@ export type Timestamp = google.protobuf.ITimestamp;
 // extra APIs
 export type SettingsResponse = {
   Auth: { Enabled: boolean; Options: string[] };
+  BannerText: string;
   Codec: {
     Endpoint: string;
     PassAccessToken?: boolean;

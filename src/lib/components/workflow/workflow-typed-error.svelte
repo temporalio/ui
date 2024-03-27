@@ -9,6 +9,7 @@
   import type { WorkflowTaskFailedEventAttributes } from '$lib/types';
   import type { WorkflowTaskFailedEvent } from '$lib/types/events';
   import type { WorkflowTaskFailedCause } from '$lib/types/workflows';
+  import { toWorkflowTaskFailureReadable } from '$lib/utilities/screaming-enums';
 
   function getErrorCause(
     error: WorkflowTaskFailedEvent,
@@ -25,7 +26,7 @@
       return 'WorkflowTaskHeartbeatError';
     }
 
-    return cause;
+    return toWorkflowTaskFailureReadable(cause);
   }
 
   export let error: WorkflowTaskFailedEvent;
@@ -55,7 +56,7 @@
         >.
       </p>
     {/if}
-    <div class="mt-2 bg-white">
+    <div class="surface-primary mt-2">
       <Table class="dark w-full table-fixed">
         <caption class="sr-only" slot="caption"
           >{translate('events.error-event')}</caption

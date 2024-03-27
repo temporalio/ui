@@ -26,7 +26,12 @@
   <RadioGroup name="option" group={value1}>
     <RadioInput id="option-a" label="Option A" value="a" />
     <RadioInput id="option-b" label="Option B" value="b" />
-    <RadioInput id="option-c" label="Option C" value="c" />
+    <RadioInput
+      id="option-c"
+      label="Option C"
+      value="c"
+      description="this is a description"
+    />
     <p>The value is {$value1}</p>
   </RadioGroup>
 </Story>

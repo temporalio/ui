@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-
   import Panel from '$lib/components/panel.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -37,16 +35,12 @@
 
 <Panel class="w-full">
   <div class="flex justify-between">
-    <h2 class="mb-4 text-2xl">{translate('schedules.recent-runs')}</h2>
+    <h2 class="mb-4 text-lg">{translate('schedules.recent-runs')}</h2>
     <Link
-      on:click={() => {
-        goto(
-          routeForWorkflowsWithQuery({
-            namespace,
-            query: workflowQuery,
-          }),
-        );
-      }}
+      href={routeForWorkflowsWithQuery({
+        namespace,
+        query: workflowQuery,
+      })}
     >
       {translate('common.view-all-runs')}
     </Link>
@@ -59,7 +53,6 @@
         </div>
         <div class="mx-2 w-auto break-words">
           <Link
-            newTab
             href={routeForEventHistory({
               workflow: run.startWorkflowResult.workflowId,
               run: run.startWorkflowResult.runId,
@@ -100,6 +93,6 @@
 
 <style lang="postcss">
   .row {
-    @apply my-1 inline-flex w-full items-center border-b-2 border-gray-300 py-1;
+    @apply my-1 inline-flex w-full items-center border-b-2 border-subtle py-1;
   }
 </style>

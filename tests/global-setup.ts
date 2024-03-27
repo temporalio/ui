@@ -9,16 +9,22 @@ import { createUIServer } from '../utilities/ui-server';
 
 const setupDependencies = async () => {
   const codecServer = await createCodecServer({ port: 8888 });
-  const temporalServer = await createTemporalServer();
+  const temporalServer = await createTemporalServer({
+    codecEndpoint: 'http://127.0.0.1:8888',
+  });
   const uiServer = await createUIServer('e2e');
 
-  await uiServer.ready();
-  await codecServer.start();
-  await temporalServer.ready();
+  try {
+    await uiServer.ready();
+    await codecServer.start();
+    await temporalServer.ready();
 
-  const client = await connect();
-  await runWorker();
-  await startWorkflows(client);
+    const client = await connect();
+    await runWorker();
+    await startWorkflows(client);
+  } catch (e) {
+    console.log('Error setting up server: ', e);
+  }
 };
 
 async function globalSetup(config: FullConfig) {

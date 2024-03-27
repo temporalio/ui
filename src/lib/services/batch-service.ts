@@ -7,6 +7,10 @@ import { temporalVersion } from '$lib/stores/versions';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import {
+  toBatchOperationStateReadable,
+  toBatchOperationTypeReadable,
+} from '$lib/utilities/screaming-enums';
 import { isVersionNewer } from '$lib/utilities/version-check';
 
 import type {
@@ -205,18 +209,22 @@ const toBatchOperationDetails = (
 ): BatchOperation => {
   return {
     ...apiBatchOperationDetails,
+    operationType: toBatchOperationTypeReadable(
+      apiBatchOperationDetails.operationType,
+    ),
+    state: toBatchOperationStateReadable(apiBatchOperationDetails.state),
     startTime: apiBatchOperationDetails.startTime,
     closeTime: apiBatchOperationDetails.closeTime,
     totalOperationCount: parseInt(
-      apiBatchOperationDetails.totalOperationCount,
+      apiBatchOperationDetails?.totalOperationCount ?? '0',
       10,
     ),
     completeOperationCount: parseInt(
-      apiBatchOperationDetails.completeOperationCount,
+      apiBatchOperationDetails?.completeOperationCount ?? '0',
       10,
     ),
     failureOperationCount: parseInt(
-      apiBatchOperationDetails.failureOperationCount,
+      apiBatchOperationDetails?.failureOperationCount ?? '0',
       10,
     ),
   };
@@ -250,6 +258,6 @@ const toBatchOperationInfo = (
     startTime: apiBatchOperationInfo.startTime,
     closeTime: apiBatchOperationInfo.closeTime,
     jobId: apiBatchOperationInfo.jobId,
-    state: apiBatchOperationInfo.state,
+    state: toBatchOperationStateReadable(apiBatchOperationInfo.state),
   };
 };

@@ -1,57 +1,56 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { clickOutside } from '$lib/holocene/outside-click';
+  import { setContext } from 'svelte';
+
+  import { clickoutside } from '$lib/holocene/outside-click';
   import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
 
   export let open = false;
-  export let title: string;
   export let position: 'bottom' | 'right' = 'bottom';
   export let dark = true;
-  export let onClick: () => void;
+  export let onClick: (e: MouseEvent | CustomEvent) => void;
   export let id = 'navigation-drawer';
   export let closeButtonLabel: string;
+  export let closePadding: boolean = true;
 
   $: flyParams = {
     duration: 500,
     ...(position === 'bottom' ? { y: 200 } : { x: 200 }),
   };
+
+  $: {
+    setContext('drawer-pos', position);
+  }
 </script>
 
 {#if open}
   <aside
-    class="drawer {position}"
+    class="drawer {position} {$$props.class}"
     class:dark
-    class:max-w-[400px]={position === 'right'}
+    class:max-w-fit={position === 'right'}
     transition:fly={flyParams}
-    use:clickOutside
     {id}
     role="region"
-    on:click-outside={onClick}
     use:focusTrap={true}
+    use:clickoutside={onClick}
   >
-    <div class="close-button-wrapper {position}">
-      <IconButton
-        data-testid="drawer-close-button"
-        label={closeButtonLabel}
-        icon="close"
-        aria-expanded={open}
-        aria-controls="navigation-drawer"
-        on:click={onClick}
-      />
-    </div>
-    <div class="title-wrapper {position}">
-      <h1>{title}</h1>
-      {#if $$slots['subtitle']}
-        <h3 class="font-primary text-xs font-normal">
-          <slot name="subtitle" />
-        </h3>
-      {/if}
-    </div>
-
-    <div class="content {position}">
+    <div class="relative h-full" class:pt-10={closePadding}>
+      <div class="close-button-wrapper {position}">
+        <slot name="close-button">
+          <IconButton
+            data-testid="drawer-close-button"
+            label={closeButtonLabel}
+            class="stuff"
+            icon="close"
+            aria-expanded={open}
+            aria-controls="navigation-drawer"
+            on:click={onClick}
+          />
+        </slot>
+      </div>
       <slot />
     </div>
   </aside>
@@ -59,54 +58,26 @@
 
 <style lang="postcss">
   .drawer {
-    @apply fixed z-[55] h-auto overflow-y-auto rounded-t-lg bg-white text-primary shadow-xl;
+    @apply surface-primary fixed z-[55] h-auto overflow-y-auto rounded-t-lg text-primary shadow-xl;
 
     &.bottom {
       @apply bottom-0 left-0 right-0;
     }
 
     &.right {
-      @apply right-0 top-0 bottom-0 h-full;
+      @apply bottom-0 right-0 top-0 h-full rounded-bl-lg rounded-tr-none;
     }
 
     &.dark {
-      @apply bg-gray-900 text-gray-100;
+      @apply bg-inverse text-white;
     }
+  }
+
+  .stuff:hover {
+    @apply text-red;
   }
 
   .close-button-wrapper {
-    @apply flex w-full justify-end p-2;
-
-    &.right {
-      @apply pb-20;
-    }
-  }
-
-  .title-wrapper {
-    @apply flex flex-col justify-center gap-2 py-4 px-8;
-
-    &.bottom {
-      @apply items-center p-0;
-    }
-
-    &.right {
-      @apply items-start;
-    }
-  }
-
-  .title-wrapper h1 {
-    @apply font-primary text-base font-medium;
-  }
-
-  .content {
-    @apply whitespace-normal px-8;
-
-    &.right {
-      @apply py-4;
-    }
-
-    &.bottom {
-      @apply py-8;
-    }
+    @apply absolute right-2 top-2;
   }
 </style>

@@ -91,6 +91,7 @@
       <EmptyState
         title={translate('common.error-occurred')}
         content={translate('workflows.no-workers-running-message')}
+        error={_error?.message}
       />
     {/await}
   {:else}
@@ -101,6 +102,7 @@
       {#if workflow?.isRunning && workers?.pollers?.length === 0}
         <p>
           {translate('workflows.call-stack-link-preface')}<Link
+            newTab
             href="https://docs.temporal.io/workflows#stack-trace-query"
           >
             {translate('workflows.call-stack-link')}</Link

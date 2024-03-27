@@ -20,7 +20,7 @@ export type GetWorkerTaskReachabilityRequest = NamespaceScopedRequest & {
 };
 
 export type GetPollersResponse = {
-  pollers: PollerWithTaskQueueTypes[];
+  pollers?: PollerWithTaskQueueTypes[];
   taskQueueStatus: TaskQueueStatus;
 };
 
@@ -62,6 +62,9 @@ export async function getPollers(
     params: { taskQueueType: '2' },
   });
 
+  if (!workflowPollers?.pollers) workflowPollers.pollers = [];
+  if (!activityPollers?.pollers) activityPollers.pollers = [];
+
   activityPollers.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
     poller.taskQueueTypes = ['ACTIVITY'];
   });
@@ -101,7 +104,7 @@ export async function getPollers(
     }),
   );
 
-  activityPollers.pollers.reduce(
+  activityPollers.pollers?.reduce(
     r('ACTIVITY'),
     workflowPollers.pollers.reduce(r('WORKFLOW'), {}),
   );

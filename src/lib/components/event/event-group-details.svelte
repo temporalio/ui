@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import Link from '$lib/holocene/link.svelte';
@@ -20,7 +19,7 @@
   $: ({ workflow, run, namespace } = $page.params);
 </script>
 
-<div class="w-full border-gray-700 lg:w-1/3 lg:border-r-2">
+<div class="w-full border-slate-700 lg:w-1/3 lg:border-r-2">
   <Table class="w-full table-fixed pb-2" variant="simple">
     {#each [...eventGroup.events].reverse() as [id, eventInGroup] (id)}
       <tr
@@ -33,20 +32,15 @@
       >
         <td class="w-1/12" />
         <td class="w-24">
-          <p class="truncate text-sm text-gray-500 md:text-base">
+          <p class="truncate text-sm text-slate-500 md:text-base">
             <Link
               class="truncate"
-              on:click={(e) => {
-                e.stopPropagation();
-                goto(
-                  routeForEventHistoryEvent({
-                    eventId: id,
-                    namespace,
-                    workflow,
-                    run,
-                  }),
-                );
-              }}
+              href={routeForEventHistoryEvent({
+                eventId: id,
+                namespace,
+                workflow,
+                run,
+              })}
             >
               {id}
             </Link>

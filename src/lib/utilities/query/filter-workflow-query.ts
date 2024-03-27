@@ -7,6 +7,7 @@ import type {
   SearchAttributesValue,
 } from '$lib/types/workflows';
 
+import { isStartsWith } from '../is';
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 
 export type QueryKey =
@@ -48,6 +49,14 @@ const formatValue = (
   return `"${value}"`;
 };
 
+const getQueryKey = (attribute: string | number) => {
+  const key = filterKeys[attribute] ?? attribute;
+  if (typeof key === 'string' && /\s/g.test(key)) {
+    return '`' + key + '`';
+  }
+  return key;
+};
+
 const toFilterQueryStatement = (
   attribute: keyof SearchAttributes,
   type: SearchAttributesValue,
@@ -56,7 +65,7 @@ const toFilterQueryStatement = (
   archived: boolean,
   customDate: boolean,
 ): string => {
-  const queryKey = filterKeys[attribute] ?? attribute;
+  const queryKey = getQueryKey(attribute);
 
   if (value === 'All') return '';
 
@@ -70,6 +79,10 @@ const toFilterQueryStatement = (
       return `${queryKey} ${conditional} "${toDate(value)}"`;
     }
     return `${queryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;
+  }
+
+  if (isStartsWith(conditional)) {
+    return `${queryKey} ${conditional} ${formatValue(value, type)}`;
   }
 
   return `${queryKey}${conditional}${formatValue(value, type)}`;

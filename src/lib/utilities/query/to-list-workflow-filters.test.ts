@@ -12,9 +12,9 @@ const executionStatusQuery = 'ExecutionStatus="Completed"';
 const multipleExecutionStatusQuery =
   '(ExecutionStatus="Canceled" OR ExecutionStatus="Failed" OR ExecutionStatus="Completed")';
 
-const workflowIdQuery = 'WorkflowId="Hello"';
+const workflowIdQuery = 'WorkflowId="Hello world"';
 const workflowTypeQuery = 'WorkflowType="World"';
-const workflowQuery1 = 'WorkflowId="Hello" AND WorkflowType="World"';
+const workflowQuery1 = 'WorkflowId="Hello world" AND WorkflowType="World"';
 const startTimeQuery = 'StartTime > "2022-04-18T17:45:18-06:00"';
 const closeTimeQuery = 'CloseTime > "2022-04-18T17:45:18-06:00"';
 const booleanQuery = 'CustomBoolField=true';
@@ -26,6 +26,11 @@ const workflowQuery3 =
   'WorkflowType="World" AND StartTime > "2022-04-18T17:45:18-06:00" AND ExecutionStatus="Canceled"';
 const workflowQuery4 =
   '(ExecutionStatus="Canceled" OR ExecutionStatus="Failed" OR ExecutionStatus="Completed") AND WorkflowType="World" AND StartTime > "2022-04-18T17:45:18-06:00"';
+const customAttributesWithSpacesQuery =
+  '`Custom Bool Field`=true AND `Custom Keyword Field`="Hello world"';
+const workflowQueryWithSpaces =
+  'WorkflowId="One and Two" AND `Custom Keyword Field`="Hello = world"';
+const prefixQuery = 'WorkflowType STARTS_WITH "hello"';
 
 const attributes = {
   CloseTime: 'Datetime',
@@ -34,12 +39,78 @@ const attributes = {
   WorkflowId: 'Keyword',
   WorkflowType: 'Keyword',
   CustomBoolField: 'Bool',
+  'Custom Keyword Field': 'Keyword',
+  'Custom Bool Field': 'Bool',
 };
 
 describe('toListWorkflowFilters', () => {
   afterEach(() => {
     vi.clearAllMocks();
     vi.useRealTimers();
+  });
+
+  it('should parse a query with values that have spaces', () => {
+    const result = toListWorkflowFilters(workflowQueryWithSpaces, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowId',
+        type: 'Keyword',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'One and Two',
+      },
+      {
+        attribute: 'Custom Keyword Field',
+        type: 'Keyword',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Hello = world',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
+  it('should parse a query with prefix search', () => {
+    const result = toListWorkflowFilters(prefixQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        conditional: 'STARTS_WITH',
+        operator: '',
+        parenthesis: '',
+        value: 'hello',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
+  it('should parse a query with custom attributes that have spaces', () => {
+    const result = toListWorkflowFilters(
+      customAttributesWithSpacesQuery,
+      attributes,
+    );
+    const expectedFilters = [
+      {
+        attribute: 'Custom Bool Field',
+        type: 'Bool',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'true',
+      },
+      {
+        attribute: 'Custom Keyword Field',
+        type: 'Keyword',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Hello world',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
   });
 
   it('should parse a query with an executionStatus', () => {
@@ -100,7 +171,7 @@ describe('toListWorkflowFilters', () => {
         conditional: '=',
         operator: '',
         parenthesis: '',
-        value: 'Hello',
+        value: 'Hello world',
       },
     ];
     expect(result).toEqual(expectedFilters);
@@ -130,7 +201,7 @@ describe('toListWorkflowFilters', () => {
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
-        value: 'Hello',
+        value: 'Hello world',
       },
       {
         attribute: 'WorkflowType',
@@ -256,7 +327,7 @@ describe('toListWorkflowFilters', () => {
         conditional: '=',
         operator: 'AND',
         parenthesis: '',
-        value: 'Hello',
+        value: 'Hello world',
       },
       {
         attribute: 'StartTime',

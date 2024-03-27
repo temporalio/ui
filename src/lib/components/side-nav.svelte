@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
-
   import FeatureGuard from '$lib/components/feature-guard.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
   import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
@@ -26,31 +24,6 @@
   // $: labsText = `${translate('common.labs')} ${
   //   $labsMode ? translate('common.on') : translate('common.off')
   // }`;
-
-  let batchOperationIcon: 'layers-1' | 'layers-2' | 'layers-3' = 'layers-3';
-
-  const interval = setInterval(() => {
-    if (!$inProgressBatchOperation) {
-      batchOperationIcon = 'layers-3';
-      return;
-    }
-
-    setTimeout(() => {
-      batchOperationIcon = 'layers-1';
-    });
-
-    setTimeout(() => {
-      batchOperationIcon = 'layers-2';
-    }, 330);
-
-    setTimeout(() => {
-      batchOperationIcon = 'layers-3';
-    }, 660);
-  }, 2000);
-
-  onDestroy(() => {
-    clearInterval(interval);
-  });
 </script>
 
 <NavContainer {isCloud} {linkList} aria-label={translate('common.primary')}>
@@ -74,7 +47,7 @@
         >
           <NavTooltip text={translate('common.schedules')}>
             <div class="nav-icon">
-              <Icon name="schedules" />
+              <Icon name="schedules" height={25} width={24} />
             </div>
           </NavTooltip>
           <div class="nav-title">{translate('common.schedules')}</div>
@@ -95,7 +68,7 @@
     <NavRow link={linkList.batchOperations} {isCloud}>
       <NavTooltip text={translate('batch.list-page-title')}>
         <div class="nav-icon">
-          <Icon name={batchOperationIcon} />
+          <Icon name="batch-operation" animate={$inProgressBatchOperation} />
         </div>
       </NavTooltip>
       <div class="nav-title">{translate('batch.nav-title')}</div>

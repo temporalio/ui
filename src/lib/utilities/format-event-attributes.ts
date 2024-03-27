@@ -37,15 +37,12 @@ const keysToExpand: Readonly<Set<string>> = new Set([
 
 const keysToFormat: Readonly<Set<string>> = new Set(['maximumAttempts']);
 
-export const UnlimitedAttempts = translate('workflows.unlimited');
-export const NoExpiration = translate('workflows.no-expiration');
-
 export const formatRetryExpiration = (
   maxAttempts: number,
   expiration: string,
 ): number | string => {
   if (maxAttempts === 0) {
-    return NoExpiration;
+    return translate('workflows.no-expiration');
   }
   return expiration;
 };
@@ -55,7 +52,7 @@ export const formatAttemptsLeft = (
   attempt: number,
 ): number | string => {
   if (!maxAttempts) {
-    return UnlimitedAttempts;
+    return translate('workflows.unlimited');
   }
   return maxAttempts - attempt;
 };
@@ -64,14 +61,14 @@ export const formatMaximumAttempts = (
   maxAttempts: number | null,
 ): number | string => {
   if (!maxAttempts) {
-    return UnlimitedAttempts;
+    return translate('workflows.unlimited');
   }
   return maxAttempts;
 };
 
 const formatValue = (key: string, value: unknown) => {
   if (key === 'maximumAttempts' && !value) {
-    return UnlimitedAttempts;
+    return translate('workflows.unlimited');
   }
   return value;
 };
@@ -125,7 +122,8 @@ export type AttributeGroup =
   | 'taskQueue'
   | 'schedule'
   | 'retryPolicy'
-  | 'workflow';
+  | 'workflow'
+  | 'searchAttributes';
 
 const attributeGroupings: Readonly<AttributeGroup[]> = [
   'summary',
@@ -135,6 +133,7 @@ const attributeGroupings: Readonly<AttributeGroup[]> = [
   'schedule',
   'retryPolicy',
   'workflow',
+  'searchAttributes',
 ];
 
 type GroupingOption = {
@@ -148,6 +147,9 @@ export const attributeGroupingProperties: Readonly<
   parent: { label: 'events.attribute-group.parent' },
   retryPolicy: { label: 'events.attribute-group.retry-policy' },
   schedule: { label: 'events.attribute-group.schedule' },
+  searchAttributes: {
+    label: 'events.attribute-group.search-attributes',
+  },
   summary: { label: 'events.attribute-group.summary' },
   taskQueue: { label: 'events.attribute-group.task-queue' },
   workflow: { label: 'events.attribute-group.workflow' },
@@ -181,7 +183,10 @@ const consolidateActivityGroups = (
 };
 
 const consolidateSingleItemGroups = (groupedAttributes: AttributeGrouping) => {
-  const keysToIgnore: Readonly<Set<string>> = new Set(['summary']);
+  const keysToIgnore: Readonly<Set<string>> = new Set([
+    'summary',
+    'searchAttributes',
+  ]);
   for (const [key, value] of Object.entries(groupedAttributes)) {
     if (value.length === 1 && !keysToIgnore.has(key)) {
       groupedAttributes.summary = [...groupedAttributes.summary, ...value];
@@ -197,9 +202,7 @@ export const attributeGroups = (
   const groupedAttributes: AttributeGrouping = {};
   attributeGroupings.forEach((group) => {
     if (group === 'summary') {
-      groupedAttributes[group] = Object.keys(attributes).filter(
-        (key) => key !== 'searchAttributes',
-      ) as EventAttributeKey[];
+      groupedAttributes[group] = Object.keys(attributes) as EventAttributeKey[];
     } else {
       groupedAttributes[group] = [];
     }

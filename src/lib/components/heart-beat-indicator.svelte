@@ -52,7 +52,7 @@
   }
 
   .fade-in {
-    @apply absolute top-0 right-0 h-full w-full bg-blue-100;
+    @apply absolute right-0 top-0 h-full w-full bg-blue-100;
 
     animation: heartRateIn 2s linear infinite;
     animation-delay: var(--animation-delay, 0);

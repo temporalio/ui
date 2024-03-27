@@ -50,6 +50,20 @@
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
             />
           </PayloadDecoder>
+        {:else if key === 'searchAttributes'}
+          <PayloadDecoder
+            key="searchAttributes"
+            value={{ searchAttributes: codeBlockValue }}
+            let:decodedValue
+          >
+            <CodeBlock
+              content={decodedValue}
+              class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
+              {inline}
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            />
+          </PayloadDecoder>
         {:else}
           <PayloadDecoder value={codeBlockValue} let:decodedValue>
             <CodeBlock
@@ -86,7 +100,6 @@
           container-class="flex-row-reverse xl:flex-row"
         >
           <Link
-            newTab
             href={routeForEventHistory({
               namespace,
               workflow,
@@ -109,7 +122,6 @@
           container-class="xl:flex-row"
         >
           <Link
-            newTab
             href={routeForEventHistory({
               namespace: attributes?.namespace || namespace,
               workflow: attributes.workflowExecutionWorkflowId,
@@ -131,7 +143,7 @@
           content={value}
           container-class="xl:flex-row"
         >
-          <Link newTab href={routeForTaskQueue({ namespace, queue: value })}>
+          <Link href={routeForTaskQueue({ namespace, queue: value })}>
             {value}
           </Link>
         </Copyable>
@@ -156,7 +168,7 @@
   }
 
   .content {
-    @apply block w-full border-b-2 border-gray-200 py-2 text-left;
+    @apply block w-full border-b-2 border-slate-200 py-2 text-left;
   }
 
   .code-block-row {
@@ -176,6 +188,6 @@
   }
 
   .badge {
-    @apply rounded-sm bg-gray-100 p-1 text-gray-900;
+    @apply rounded-sm bg-badge p-1 text-primary;
   }
 </style>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table.svelte';
@@ -43,10 +44,11 @@
   </caption>
   <TableHeaderRow
     onClickConfigure={openCustomizationDrawer}
-    workflows={visibleItems}
     columnsCount={columns.length}
     {empty}
     slot="headers"
+    let:visibleItems
+    workflows={visibleItems}
   >
     {#each columns as column}
       <TableHeaderCell {column} />
@@ -68,15 +70,18 @@
   position="right"
   id="workflows-summary-table-configuration-drawer"
   dark={false}
-  title={translate('workflows.configure-workflows')}
   closeButtonLabel={translate('workflows.close-configure-workflows')}
+  class="w-[35vw] min-w-min max-w-fit"
 >
-  <svelte:fragment slot="subtitle">
-    Add (<Icon class="inline" name="add" />), re-arrange (<Icon
-      class="inline"
-      name="chevron-selector-vertical"
-    />), and remove (<Icon class="inline" name="hyphen" />), Workflow Headings
-    to personalize the Workflow List Table.
-  </svelte:fragment>
-  <WorkflowColumnsOrderableList {namespace} />
+  <DrawerContent title={translate('workflows.configure-workflows')}>
+    <svelte:fragment slot="subtitle">
+      Add (<Icon class="inline" name="add" />), re-arrange (<Icon
+        class="inline"
+        name="chevron-selector-vertical"
+      />), and remove (<Icon class="inline" name="hyphen" />), Workflow Headings
+      to personalize the Workflow List Table.
+    </svelte:fragment>
+
+    <WorkflowColumnsOrderableList {namespace} />
+  </DrawerContent>
 </Drawer>

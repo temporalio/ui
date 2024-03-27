@@ -1,7 +1,7 @@
 import type { Plugin } from 'vite';
 import type { ViteDevServer } from 'vite';
 
-import { createUIServer, UIServer } from '../utilities/ui-server';
+import { createUIServer, type UIServer } from '../utilities/ui-server';
 
 let uiServer: UIServer;
 
@@ -9,9 +9,9 @@ const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.VERCEL) return true;
   if (process.env.VITEST) return true;
   if (process.env.CI) return true;
-  if (server.config.mode !== 'ui-server') return true;
+  if (server.config.mode === 'ui-server') return false;
 
-  return false;
+  return true;
 };
 
 export function uiServerPlugin(): Plugin {

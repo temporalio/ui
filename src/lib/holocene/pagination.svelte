@@ -100,14 +100,14 @@
     switch (event.code) {
       case 'ArrowRight':
       case 'KeyL':
-        if ($store.hasNext) {
+        if ($store.hasNext && !event.metaKey) {
           store.next();
           handlePageChange();
         }
         break;
       case 'ArrowLeft':
       case 'KeyH':
-        if ($store.hasPrevious) {
+        if ($store.hasPrevious && !event.metaKey) {
           store.previous();
           handlePageChange();
         }
@@ -133,9 +133,7 @@
 />
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
-  <div
-    class="flex flex-col items-end justify-end gap-4 lg:flex-row lg:items-start"
-  >
+  <div class="flex flex-col items-end justify-end gap-4 lg:justify-start">
     <div class="w-full">
       <slot name="action-top-left" />
     </div>
@@ -270,11 +268,11 @@
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-gray-400;
+    @apply cursor-not-allowed text-slate-400;
   }
 
   .arrow {
-    @apply absolute top-0 left-0 h-0 w-0;
+    @apply absolute left-0 top-0 h-0 w-0;
 
     border-style: solid;
     border-width: 6px 12px 6px 0;

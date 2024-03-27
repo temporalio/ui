@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
@@ -25,14 +27,14 @@
 
   const getEventsOrGroups = (
     items: CommonHistoryEvent[],
-    category: string,
+    category?: string[],
   ): IterableEvent[] => {
     if (category) {
       const filteredItems = items.filter((i) => {
-        if (category === CATEGORIES.LOCAL_ACTIVITY) {
-          return isLocalActivityMarkerEvent(i);
+        if (isLocalActivityMarkerEvent(i)) {
+          return category.includes(CATEGORIES.LOCAL_ACTIVITY);
         }
-        return i.category === category;
+        return category.includes(i.category);
       });
       return compact
         ? groupEvents(filteredItems, $eventFilterSort)
@@ -41,16 +43,20 @@
     return compact ? groupEvents(items, $eventFilterSort) : items;
   };
 
-  $: category = $eventCategoryFilter as EventTypeCategory;
-  $: intialEvents =
-    $eventFilterSort === 'descending' && !compact
+  $: $eventCategoryFilter = $page.url?.searchParams?.get('category')
+    ? ($page.url?.searchParams
+        ?.get('category')
+        .split(',') as EventTypeCategory[])
+    : undefined;
+  $: initialEvents =
+    $eventFilterSort === 'descending'
       ? $eventHistory?.end
       : $eventHistory?.start;
   $: currentEvents = $fullEventHistory.length
     ? $fullEventHistory
-    : intialEvents;
+    : initialEvents;
   $: initialItem = currentEvents?.[0];
-  $: items = getEventsOrGroups(currentEvents, category);
+  $: items = getEventsOrGroups(currentEvents, $eventCategoryFilter);
   $: updating = currentEvents.length && !$fullEventHistory.length;
 </script>
 
@@ -77,7 +83,7 @@
         onRowClick={() => setActiveRowIndex(index)}
       />
     {:else}
-      <EventEmptyRow loading={!intialEvents.length} />
+      <EventEmptyRow loading={!initialEvents.length} />
     {/each}
   </EventSummaryTable>
 </Pagination>

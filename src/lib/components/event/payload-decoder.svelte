@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import { page } from '$app/stores';
 
   import { authUser } from '$lib/stores/auth-user';
@@ -36,10 +34,12 @@
     },
   };
 
-  const decodePayloads = async () => {
+  const decodePayloads = async (
+    _value: PotentiallyDecodable | EventAttribute | WorkflowEvent,
+  ) => {
     try {
       const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
-        value,
+        _value,
         $page.params.namespace,
         settings,
         $authUser.accessToken,
@@ -58,9 +58,7 @@
     }
   };
 
-  onMount(() => {
-    decodePayloads();
-  });
+  $: decodePayloads(value);
 </script>
 
 <slot {decodedValue} />

@@ -13,7 +13,6 @@ import {
   getEventCategory,
   getEventsInCategory,
   isCategoryType,
-  timelineEventTypeOptions,
 } from './get-event-categorization';
 
 import eventsCompleted from '$fixtures/events.completed.json';
@@ -59,6 +58,8 @@ describe('Event Category Data Structures', () => {
         "WorkflowExecutionTimedOut": "workflow",
         "WorkflowExecutionUpdateAccepted": "update",
         "WorkflowExecutionUpdateCompleted": "update",
+        "WorkflowExecutionUpdateRejected": "update",
+        "WorkflowExecutionUpdateRequested": "update",
         "WorkflowTaskCompleted": "workflow",
         "WorkflowTaskFailed": "workflow",
         "WorkflowTaskScheduled": "workflow",
@@ -72,51 +73,40 @@ describe('Event Category Data Structures', () => {
     expect(allEventTypeOptions).toMatchInlineSnapshot(`
       [
         {
-          "label": "events.category.all",
-          "option": undefined,
-        },
-        {
-          "color": "#8B5CF6",
           "label": "events.category.activity",
-          "option": "activity",
+          "value": "activity",
         },
         {
-          "color": "#F59E0B",
           "label": "events.category.child-workflow",
-          "option": "child-workflow",
+          "value": "child-workflow",
         },
         {
-          "color": "#10B981",
           "label": "events.category.command",
-          "option": "command",
+          "value": "command",
         },
         {
           "label": "events.category.local-activity",
-          "option": "local-activity",
+          "value": "local-activity",
         },
         {
-          "color": "#EC4899",
           "label": "events.category.marker",
-          "option": "marker",
+          "value": "marker",
         },
         {
-          "color": "#DD6B20",
           "label": "events.category.signal",
-          "option": "signal",
+          "value": "signal",
         },
         {
-          "color": "#1D4ED8",
           "label": "events.category.timer",
-          "option": "timer",
+          "value": "timer",
         },
         {
           "label": "events.category.update",
-          "option": "update",
+          "value": "update",
         },
         {
-          "color": "#10B981",
           "label": "events.category.workflow",
-          "option": "workflow",
+          "value": "workflow",
         },
       ]
     `);
@@ -126,41 +116,32 @@ describe('Event Category Data Structures', () => {
     expect(compactEventTypeOptions).toMatchInlineSnapshot(`
       [
         {
-          "label": "events.category.all",
-          "option": undefined,
-        },
-        {
-          "color": "#8B5CF6",
           "label": "events.category.activity",
-          "option": "activity",
+          "value": "activity",
         },
         {
-          "color": "#F59E0B",
           "label": "events.category.child-workflow",
-          "option": "child-workflow",
+          "value": "child-workflow",
         },
         {
           "label": "events.category.local-activity",
-          "option": "local-activity",
+          "value": "local-activity",
         },
         {
-          "color": "#EC4899",
           "label": "events.category.marker",
-          "option": "marker",
+          "value": "marker",
         },
         {
-          "color": "#DD6B20",
           "label": "events.category.signal",
-          "option": "signal",
+          "value": "signal",
         },
         {
-          "color": "#1D4ED8",
           "label": "events.category.timer",
-          "option": "timer",
+          "value": "timer",
         },
         {
           "label": "events.category.update",
-          "option": "update",
+          "value": "update",
         },
       ]
     `);
@@ -305,50 +286,5 @@ describe('isCategoryType', () => {
 
   it('should return false for "bogus"', () => {
     expect(isCategoryType('bogus')).toBe(false);
-  });
-});
-
-describe('timelineEventTypeOptions', () => {
-  it('should match return valid timeline event types', () => {
-    expect(timelineEventTypeOptions).toEqual([
-      {
-        color: '#8B5CF6',
-        label: 'events.category.activity',
-        option: 'activity',
-      },
-      {
-        color: '#F59E0B',
-        label: 'events.category.child-workflow',
-        option: 'child-workflow',
-      },
-      {
-        color: '#10B981',
-        label: 'events.category.command',
-        option: 'command',
-      },
-      {
-        label: 'events.category.local-activity',
-        option: 'local-activity',
-      },
-      {
-        color: '#EC4899',
-        label: 'events.category.marker',
-        option: 'marker',
-      },
-      {
-        color: '#DD6B20',
-        label: 'events.category.signal',
-        option: 'signal',
-      },
-      {
-        color: '#1D4ED8',
-        label: 'events.category.timer',
-        option: 'timer',
-      },
-      {
-        label: 'events.category.update',
-        option: 'update',
-      },
-    ]);
   });
 });

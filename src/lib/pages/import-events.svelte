@@ -23,12 +23,12 @@
     </div>
   </nav>
   <div class="w-full md:w-1/2">
-    <code class="text-md bg-gray-200 p-2 font-medium"
+    <code class="text-md bg-slate-200 p-2 font-medium"
       >type HistoryEvent = temporal.api.history.v1.IHistoryEvent</code
     >
     <div class="mt-4">
       <Link
-        target="_blank"
+        newTab
         href="https://github.com/temporalio/api/blob/1cd0ac0bbd8e71c7bfc9fe1900c678b432e66e5b/temporal/api/history/v1/message.proto"
         class="mb-8">{translate('events.api-history-link')}</Link
       >

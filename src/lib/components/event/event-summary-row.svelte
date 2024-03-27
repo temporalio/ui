@@ -2,7 +2,6 @@
   import { noop } from 'svelte/internal';
   import { fade } from 'svelte/transition';
 
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -93,14 +92,7 @@
 >
   <td />
   <td class="w-24 text-left">
-    <Link
-      class="truncate"
-      data-testid="link"
-      on:click={(e) => {
-        e.stopPropagation();
-        goto(href);
-      }}
-    >
+    <Link class="truncate" data-testid="link" {href}>
       {event.id}
     </Link>
   </td>
@@ -193,7 +185,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex-wrap items-center border-gray-900 text-sm no-underline xl:py-3 xl:text-base;
+    @apply flex-wrap items-center  text-sm no-underline xl:py-3 xl:text-base;
   }
 
   .row:hover {

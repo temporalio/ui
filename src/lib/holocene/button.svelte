@@ -5,6 +5,9 @@
   } from 'svelte/elements';
 
   import { cva, type VariantProps } from 'class-variance-authority';
+  import { twMerge as merge } from 'tailwind-merge';
+
+  import { goto } from '$app/navigation';
 
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -17,11 +20,11 @@
       'w-fit',
       'items-center',
       'justify-center',
+      'border',
       'gap-2',
       'rounded-lg',
       'disabled:opacity-50',
       'disabled:cursor-not-allowed',
-      'border-2',
       'border-box',
       'transition-colors',
       'transition-shadow',
@@ -31,15 +34,15 @@
       variants: {
         variant: {
           primary:
-            'border-gray-900 bg-gray-900 bg-gradient-to-br text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:from-blue-100 [&:not(:disabled):hover]:to-purple-100 [&:not(:disabled):hover]:text-gray-900 [&:not(:disabled):hover]:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-gray-900 focus-visible:border-indigo-600',
+            'bg-interactive border-interactive text-white hover:text-white hover:bg-interactive-hover hover:border-interactive-hover focus-visible:bg-interactive-hover focus-visible:border-white dark:focus-visible:border-black focus-visible:shadow-focus focus-visible:shadow-primary/70',
           secondary:
-            'border-gray-900 bg-white text-gray-900 [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-gray-900 [&:not(:disabled):hover]:text-white [&:not(:disabled):hover]:border-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:bg-gray-900 focus-visible:text-white focus-visible:border-white',
+            'border-secondary text-primary focus-visible:shadow-focus focus-visible:shadow-primary/70 hover:surface-interactive-secondary hover:border-interactive-secondary dark:hover:border-transparent focus-visible:surface-interactive-secondary focus-visible:border-white dark:focus-visible:border-black',
           destructive:
-            'border-red-700 bg-red-700 text-white [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-red-200/50 [&:not(:disabled):hover]:border-white focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-red-200/50',
+            'border-danger bg-danger hover:bg-red-400 hover:border-red-400 focus-visible:shadow-focus focus-visible:shadow-danger/50 focus-visible:border-white dark:focus-visible:border-red-400/50 dark:focus-visible:bg-red-400',
           ghost:
-            'border-[transparent] bg-[transparent] text-gray-600 [&:not(:disabled):hover]:shadow-focus [&:not(:disabled):hover]:shadow-blue-600/50 [&:not(:disabled):hover]:bg-indigo-100 [&:not(:disabled):hover]:border-indigo-600 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:bg-indigo-100 focus-visible:border-indigo-600',
+            'border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:border-white dark:hover:border-black dark:focus-visible:border-black focus-visible:shadow-focus focus-visible:shadow-secondary/70 focus-visible:surface-interactive-secondary ',
           'table-header':
-            'border-gray-900 bg-gray-900 text-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:border-white',
+            ' bg-inverse text-white focus-visible:shadow-focus focus-visible:shadow-primary/50 focus-visible:border-white',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',
@@ -66,6 +69,7 @@
   );
 
   type BaseProps = {
+    icon?: IconName;
     disabled?: boolean;
     loading?: boolean;
     leadingIcon?: IconName;
@@ -98,49 +102,90 @@
   export let trailingIcon: IconName = null;
   export let count = 0;
   export let id: string = null;
+  export let icon: IconName = null;
   export let href: string = null;
   export let target: string = null;
   export let active = false;
+
+  const onLinkClick = (e: MouseEvent) => {
+    // Skip if middle mouse click or new tab
+    if (e.button === 1 || target || e.metaKey) return;
+    e.preventDefault();
+    e.stopPropagation();
+    goto(href);
+  };
 </script>
 
-<svelte:element
-  this={href && !disabled ? 'a' : 'button'}
-  {target}
-  href={disabled ? null : href}
-  {disabled}
-  {id}
-  role="button"
-  type="button"
-  class:active
-  on:click|stopPropagation
-  class={buttonStyles({ variant, size, borderModifier, borderRadiusModifier })}
-  {...$$restProps}
->
-  {#if leadingIcon || loading}
-    <span class:animate-spin={loading}>
-      <Icon name={loading ? 'spinner' : leadingIcon} />
-    </span>
-  {/if}
-  <slot />
-  {#if trailingIcon}
-    <span>
-      <Icon name={trailingIcon} />
-    </span>
-  {/if}
-  {#if count > 0}
-    <Badge
-      class="badge absolute top-0 right-0 origin-bottom-left translate-y-[-10px] translate-x-[10px]"
-      type="count">{count}</Badge
-    >
-  {/if}
-</svelte:element>
-
-<style lang="postcss">
-  .active {
-    @apply bg-indigo-100;
-  }
-
-  a[type='button'] {
-    appearance: none;
-  }
-</style>
+{#if href && !disabled}
+  <a
+    {href}
+    {id}
+    role="button"
+    type="button"
+    target={target ? '_blank' : null}
+    rel={target ? 'noreferrer' : null}
+    class={merge(
+      icon ? 'inline-flex' : 'inline',
+      buttonStyles({
+        variant,
+        size,
+        borderModifier,
+        borderRadiusModifier,
+      }),
+    )}
+    on:click={onLinkClick}
+    tabindex={href ? null : 0}
+    {...$$restProps}
+  >
+    {#if leadingIcon || loading}
+      <span class:animate-spin={loading}>
+        <Icon name={loading ? 'spinner' : leadingIcon} />
+      </span>
+    {/if}
+    <slot />
+    {#if trailingIcon}
+      <span>
+        <Icon name={trailingIcon} />
+      </span>
+    {/if}
+    {#if count > 0}
+      <Badge
+        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
+        type="count">{count}</Badge
+      >
+    {/if}
+  </a>
+{:else}
+  <button
+    {disabled}
+    {id}
+    type="button"
+    class:active
+    on:click|stopPropagation
+    class={buttonStyles({
+      variant,
+      size,
+      borderModifier,
+      borderRadiusModifier,
+    })}
+    {...$$restProps}
+  >
+    {#if leadingIcon || loading}
+      <span class:animate-spin={loading}>
+        <Icon name={loading ? 'spinner' : leadingIcon} />
+      </span>
+    {/if}
+    <slot />
+    {#if trailingIcon}
+      <span>
+        <Icon name={trailingIcon} />
+      </span>
+    {/if}
+    {#if count > 0}
+      <Badge
+        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
+        type="count">{count}</Badge
+      >
+    {/if}
+  </button>
+{/if}

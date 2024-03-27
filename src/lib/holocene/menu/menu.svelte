@@ -3,6 +3,7 @@
   import { fly } from 'svelte/transition';
 
   import { getContext } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import { getFocusableElements } from '$lib/utilities/focus-trap';
 
@@ -42,7 +43,7 @@
 <ul
   in:fly={{ duration: 100 }}
   role="menu"
-  class="menu {position} {className}"
+  class={merge('menu', position, className)}
   class:hidden={!$open}
   aria-labelledby={id}
   tabindex={-1}
@@ -56,7 +57,7 @@
 
 <style lang="postcss">
   .menu {
-    @apply absolute z-20 mt-1 max-h-[480px] min-w-full list-none overflow-auto rounded-lg border border-gray-900 bg-white text-primary shadow;
+    @apply surface-primary absolute z-20 mt-1 max-h-[480px] min-w-full list-none overflow-auto rounded-lg border border-primary text-primary shadow;
 
     &.left {
       @apply left-0 origin-top-left;
