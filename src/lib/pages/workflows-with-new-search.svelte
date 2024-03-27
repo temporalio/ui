@@ -41,8 +41,8 @@
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { groupByCountEnabled } from '$lib/stores/capability-enablement';
   import { workflowFilters } from '$lib/stores/filters';
-  import { groupByCountEnabled } from '$lib/stores/group-by-enabled';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import {

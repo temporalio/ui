@@ -1,6 +1,13 @@
-import { add, intervalToDuration, parseISO, sub } from 'date-fns';
+import {
+  add,
+  formatDuration as durationToString,
+  intervalToDuration,
+  parseISO,
+  sub,
+} from 'date-fns';
 
 import { isObject, isString } from './is';
+import { pluralize } from './pluralize';
 
 type DurationKey = keyof Duration;
 
@@ -120,13 +127,26 @@ export const fromDate = (
   return intervalToDuration({ start, end });
 };
 
-export const fromSeconds = (seconds: string): Duration | undefined => {
-  const milliseconds = parseInt(seconds) * 1000;
+export const fromSeconds = (
+  seconds: string,
+  { delimiter = ', ' } = {},
+): string => {
+  const parsedSeconds = parseInt(seconds);
+  const parsedDecimal = parseFloat(`.${seconds.split('.')[1] ?? 0}`);
 
-  if (!seconds.endsWith('s')) return undefined;
-  if (isNaN(milliseconds)) return undefined;
+  if (!seconds.endsWith('s')) return '';
+  if (isNaN(parsedSeconds) || isNaN(parsedDecimal)) return '';
 
-  return intervalToDuration({ start: 0, end: milliseconds });
+  const duration = intervalToDuration({ start: 0, end: parsedSeconds * 1000 });
+  const durationString = durationToString(duration, { delimiter });
+  const milliseconds =
+    Math.round(parsedDecimal * 1000 * 1000000000) / 1000000000; // round to nanoseconds
+
+  if (!milliseconds) return durationString;
+  const msString = `${milliseconds} ${pluralize('millisecond', milliseconds)}`;
+
+  if (!durationString) return msString;
+  return `${durationString}, ${msString}`;
 };
 
 export const isValidDurationQuery = (value: string): boolean => {

@@ -93,7 +93,7 @@ export const Strings = {
   'signal-modal-title': 'Send a Signal',
   'signal-name-label': 'Signal name',
   'signal-payload-input-label': 'Input',
-  'signal-payload-input-label-hint': '(only JSON payloads are supported)',
+  'signal-payload-input-label-hint': '(only single JSON payload supported)',
   'cancel-request-sent': 'Cancel Request Sent',
   'cancel-request-sent-description':
     "The request to cancel this Workflow Execution has been sent. If the Workflow uses the cancellation API, it'll cancel at the next available opportunity.",

@@ -4,18 +4,12 @@ import { v4 } from 'uuid';
 
 import { page } from '$app/stores';
 
-import { translate } from '$lib/i18n/translate';
 import { Action, type ResetReapplyType } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
-import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
 import { authUser } from '$lib/stores/auth-user';
-import {
-  lastDataEncoderError,
-  lastDataEncoderStatus,
-} from '$lib/stores/data-encoder-config';
 import type { ResetWorkflowRequest } from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
@@ -31,7 +25,7 @@ import type {
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
 } from '$lib/types/workflows';
-import { btoa } from '$lib/utilities/btoa';
+import { encodePayloads } from '$lib/utilities/encode-payload';
 import {
   handleUnauthorizedOrForbiddenError,
   isForbidden,
@@ -293,39 +287,9 @@ export async function signalWorkflow({
     workflowId,
     signalName: name,
   });
-
-  let payloads = null;
+  const payloads = await encodePayloads(input);
   const settings = get(page).data.settings;
-  const accessToken = get(authUser).accessToken;
-
-  if (input) {
-    if (settings?.codec?.endpoint) {
-      const awaitData = await convertPayloadsWithCodec({
-        payloads: { payloads: [JSON.parse(input)] },
-        namespace,
-        settings,
-        accessToken,
-        encode: true,
-      });
-      if (get(lastDataEncoderStatus) === 'error') {
-        throw new Error(
-          get(lastDataEncoderError) || translate('common.encode-failed'),
-        );
-      }
-      payloads = awaitData?.payloads ?? null;
-    } else {
-      payloads = [
-        {
-          metadata: {
-            encoding: btoa('json/plain'),
-          },
-          data: btoa(input),
-        },
-      ];
-    }
-  }
-
-  const version = get(page).data?.settings?.version ?? '';
+  const version = settings?.version ?? '';
   const newVersion = isVersionNewer(version, '2.22');
   const body = newVersion
     ? {
