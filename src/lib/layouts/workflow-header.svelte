@@ -124,41 +124,43 @@
             />
           </h1>
           {#if workflowUsesVersioning}
-            <p class="flex items-center gap-1">
-              <span>{translate('workers.last-used-version')}</span
-              ><CompatibilityBadge
-                defaultVersion={buildId === defaultVersionForSet ||
-                  buildId === overallDefaultVersion}
-                active={buildId === overallDefaultVersion}
-                {buildId}
-              >
-                <svelte:fragment slot="overall-default-worker">
-                  {#if buildId === overallDefaultVersion}{translate(
-                      'workers.overall',
-                    )}{/if}
-                </svelte:fragment>
-                <svelte:fragment slot="default-worker">
-                  {translate('workers.default')}
-                </svelte:fragment>
-              </CompatibilityBadge>
-            </p>
-            <p class="flex items-center gap-1">
-              <span>{translate('workers.next-version')}</span
-              ><CompatibilityBadge
-                defaultVersion={!!defaultVersionForSet}
-                active={defaultVersionForSet === overallDefaultVersion}
-                buildId={defaultVersionForSet}
-              >
-                <svelte:fragment slot="overall-default-worker">
-                  {#if defaultVersionForSet === overallDefaultVersion}{translate(
-                      'workers.overall',
-                    )}{/if}
-                </svelte:fragment>
-                <svelte:fragment slot="default-worker">
-                  {translate('workers.default')}
-                </svelte:fragment>
-              </CompatibilityBadge>
-            </p>
+            <div class="flex gap-4">
+              <p class="flex items-center gap-1">
+                <span>{translate('workers.last-used-version')}</span
+                ><CompatibilityBadge
+                  defaultVersion={buildId === defaultVersionForSet ||
+                    buildId === overallDefaultVersion}
+                  active={buildId === overallDefaultVersion}
+                  {buildId}
+                >
+                  <svelte:fragment slot="overall-default-worker">
+                    {#if buildId === overallDefaultVersion}{translate(
+                        'workers.overall',
+                      )}{/if}
+                  </svelte:fragment>
+                  <svelte:fragment slot="default-worker">
+                    {translate('workers.default')}
+                  </svelte:fragment>
+                </CompatibilityBadge>
+              </p>
+              <p class="flex items-center gap-1">
+                <span>{translate('workers.next-version')}</span
+                ><CompatibilityBadge
+                  defaultVersion={!!defaultVersionForSet}
+                  active={defaultVersionForSet === overallDefaultVersion}
+                  buildId={defaultVersionForSet}
+                >
+                  <svelte:fragment slot="overall-default-worker">
+                    {#if defaultVersionForSet === overallDefaultVersion}{translate(
+                        'workers.overall',
+                      )}{/if}
+                  </svelte:fragment>
+                  <svelte:fragment slot="default-worker">
+                    {translate('workers.default')}
+                  </svelte:fragment>
+                </CompatibilityBadge>
+              </p>
+            </div>
           {/if}
         </div>
       </div>
