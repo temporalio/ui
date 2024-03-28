@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import OrderableListItem from '$lib/holocene/orderable-list/orderable-list-item.svelte';
   import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -14,7 +16,10 @@
   export let namespace: string;
 
   $: columnsInUse = $workflowTableColumns?.[namespace] ?? [];
-  $: availableSystemColumns = availableSystemSearchAttributeColumns(namespace);
+  $: availableSystemColumns = availableSystemSearchAttributeColumns(
+    namespace,
+    $page.data.settings,
+  );
   $: availableCustomColumns = availableCustomSearchAttributeColumns(namespace);
 </script>
 
