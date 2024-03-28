@@ -56,7 +56,11 @@
     emptyStateMessage={translate('schedules.empty-state-title')}
     fallbackErrorMessage={translate('schedules.error-message-fetching')}
   >
-    <header class="flex flex-row justify-between gap-2" slot="header">
+    <header
+      class="flex flex-row justify-between gap-2"
+      slot="header"
+      let:visibleItems
+    >
       <div>
         <h1
           class="flex flex-col gap-0 text-lg md:flex-row md:items-center md:gap-2 md:text-2xl"
@@ -74,7 +78,7 @@
         </Button>
       {/if}
     </header>
-    <svelte:fragment slot="action-top-left">
+    <svelte:fragment slot="action-top-left" let:visibleItems>
       {#if visibleItems.length}
         <div class="w-96">
           <Input

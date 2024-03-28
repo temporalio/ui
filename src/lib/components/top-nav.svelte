@@ -38,8 +38,10 @@
     showProfilePic = false;
   }
 
-  const handleNamespaceSelect = (event: CustomEvent<NamespaceListItem>) => {
-    const namespaceListItem = event.detail;
+  const handleNamespaceSelect = (
+    event: CustomEvent<{ value: NamespaceListItem }>,
+  ) => {
+    const namespaceListItem = event.detail.value;
     $lastUsedNamespace = namespaceListItem.namespace;
     namespaceListItem?.onClick(namespaceListItem.namespace);
   };

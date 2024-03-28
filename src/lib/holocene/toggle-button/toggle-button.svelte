@@ -4,6 +4,8 @@
     HTMLButtonAttributes,
   } from 'svelte/elements';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -42,7 +44,7 @@
 
 <svelte:element
   this={href ? 'a' : 'button'}
-  class="toggle-button {className}"
+  class={merge('toggle-button', className)}
   class:group
   class:active={href ? $page.url.pathname.includes(base) : active}
   href={href ? href + $page.url.search : null}
@@ -64,11 +66,11 @@
 
 <style lang="postcss">
   .toggle-button {
-    @apply flex items-center justify-center border-2  px-4 py-2 text-sm transition-colors hover:bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 hover:text-primary focus:from-blue-100 focus:to-purple-100 focus:outline-none focus-visible:border-indigo-600 focus-visible:bg-gradient-to-br focus-visible:shadow-focus focus-visible:shadow-blue-600/50;
+    @apply flex items-center justify-center border-2 border-secondary px-4 py-2 text-sm text-primary hover:enabled:surface-interactive-secondary focus-visible:enabled:surface-interactive-secondary;
   }
 
   .toggle-button.active {
-    @apply bg-inverse text-white hover:text-primary focus-visible:text-primary;
+    @apply surface-secondary-active;
   }
 
   .group:first-child {

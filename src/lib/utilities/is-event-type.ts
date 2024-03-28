@@ -43,6 +43,7 @@ import type {
   WorkflowExecutionTimedOutEvent,
   WorkflowExecutionUpdateAcceptedEvent,
   WorkflowExecutionUpdateCompletedEvent,
+  WorkflowExecutionUpdateRequestedEvent,
   WorkflowTaskCompletedEvent,
   WorkflowTaskFailedEvent,
   WorkflowTaskScheduledEvent,
@@ -116,6 +117,8 @@ export const eventTypes = [
   'UpsertWorkflowSearchAttributes',
   'WorkflowExecutionUpdateAccepted',
   'WorkflowExecutionUpdateCompleted',
+  'WorkflowExecutionUpdateRejected',
+  'WorkflowExecutionUpdateRequested',
 ] as const;
 
 export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
@@ -143,6 +146,8 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'workflowExecutionTerminatedEventAttributes',
   'workflowExecutionUpdateAcceptedEventAttributes',
   'workflowExecutionUpdateCompletedEventAttributes',
+  'workflowExecutionUpdateRejectedEventAttributes',
+  'workflowExecutionUpdateRequestedEventAttributes',
   'workflowExecutionCancelRequestedEventAttributes',
   'workflowExecutionCanceledEventAttributes',
   'requestCancelExternalWorkflowExecutionInitiatedEventAttributes',
@@ -433,4 +438,9 @@ export const isFailedWorkflowExecutionUpdateCompletedEvent = (
   isWorkflowExecutionUpdateCompletedEvent(event) &&
   Boolean(
     event.workflowExecutionUpdateCompletedEventAttributes.outcome?.failure,
+  );
+
+export const isWorkflowExecutionUpdateRequestedEvent =
+  hasAttributes<WorkflowExecutionUpdateRequestedEvent>(
+    'workflowExecutionUpdateRequestedEventAttributes',
   );

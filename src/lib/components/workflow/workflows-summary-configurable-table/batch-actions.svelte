@@ -1,16 +1,14 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
+
   import { page } from '$app/stores';
 
   import BulkActionButton from '$lib/holocene/table/bulk-action-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import {
-    allSelected,
-    cancelableWorkflows,
-    handleSelectAll,
-    openBatchCancelConfirmationModal,
-    openBatchTerminateConfirmationModal,
-    selectedWorkflows,
+    BATCH_OPERATION_CONTEXT,
+    type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
   import { workflowCount } from '$lib/stores/workflows';
@@ -19,6 +17,15 @@
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
 
   export let workflows: WorkflowExecution[];
+
+  const {
+    selectedWorkflows,
+    allSelected,
+    handleSelectAll,
+    cancelableWorkflows,
+    openBatchCancelConfirmationModal,
+    openBatchTerminateConfirmationModal,
+  } = getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
 
   let coreUser = coreUserStore();
   let selectedWorkflowsCount: number;

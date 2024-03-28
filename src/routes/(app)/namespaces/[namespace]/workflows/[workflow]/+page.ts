@@ -9,8 +9,8 @@ export const load: PageLoad = async function ({ url, params }) {
   const { runId } = await fetchWorkflowForRunId({ namespace, workflowId });
 
   if (runId) {
-    throw redirect(302, `${url.pathname}/${runId}`);
+    redirect(302, `${url.pathname}/${runId}`);
   } else {
-    throw error(404);
+    error(404);
   }
 };

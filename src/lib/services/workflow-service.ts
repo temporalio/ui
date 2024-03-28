@@ -2,17 +2,14 @@ import { get } from 'svelte/store';
 
 import { v4 } from 'uuid';
 
-import { translate } from '$lib/i18n/translate';
-import type { ResetReapplyType } from '$lib/models/workflow-actions';
+import { page } from '$app/stores';
+
+import { Action, type ResetReapplyType } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
-import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
-import {
-  lastDataEncoderError,
-  lastDataEncoderStatus,
-} from '$lib/stores/data-encoder-config';
+import { authUser } from '$lib/stores/auth-user';
 import type { ResetWorkflowRequest } from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
@@ -22,14 +19,13 @@ import type {
   NamespaceScopedRequest,
   NetworkError,
   Replace,
-  Settings,
 } from '$lib/types/global';
 import type {
   ArchiveFilterParameters,
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
 } from '$lib/types/workflows';
-import { btoa } from '$lib/utilities/btoa';
+import { encodePayloads } from '$lib/utilities/encode-payload';
 import {
   handleUnauthorizedOrForbiddenError,
   isForbidden,
@@ -40,6 +36,8 @@ import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { base, pathForApi, routeForApi } from '$lib/utilities/route-for-api';
+import { isVersionNewer } from '$lib/utilities/version-check';
+import { formatReason } from '$lib/utilities/workflow-actions';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -54,34 +52,28 @@ export type CombinedWorkflowExecutionsResponse = {
 
 type CancelWorkflowOptions = {
   namespace: string;
-  workflowId: string;
-  runId: string;
+  workflow: WorkflowExecution;
 };
 
 type SignalWorkflowOptions = {
   namespace: string;
-  workflowId: string;
-  runId: string;
-  signalName: string;
-  signalInput: string;
-  settings: Settings;
-  accessToken: string;
+  workflow: WorkflowExecution;
+  name: string;
+  input: string;
 };
 
 type TerminateWorkflowOptions = {
   workflow: WorkflowExecution;
   namespace: string;
   reason: string;
-  identity?: string;
 };
 
 export type ResetWorkflowOptions = {
   namespace: string;
-  workflowId: string;
-  runId: string;
+  workflow: WorkflowExecution;
   eventId: string;
   reason: string;
-  resetReapplyType: ResetReapplyType;
+  reapplyType: ResetReapplyType;
 };
 
 export type FetchWorkflow =
@@ -235,16 +227,26 @@ export async function terminateWorkflow({
   workflow,
   namespace,
   reason,
-  identity,
 }: TerminateWorkflowOptions): Promise<null> {
   const route = routeForApi('workflow.terminate', {
     namespace,
     workflowId: workflow.id,
   });
+
+  const email = get(authUser).email;
+  const formattedReason = formatReason({
+    reason,
+    action: Action.Terminate,
+    email,
+  });
+
   return await requestFromAPI<null>(route, {
     options: {
       method: 'POST',
-      body: stringifyWithBigInt({ reason, ...(identity && { identity }) }),
+      body: stringifyWithBigInt({
+        reason: formattedReason,
+        ...(email && { identity: email }),
+      }),
     },
     notifyOnError: false,
     params: {
@@ -254,7 +256,7 @@ export async function terminateWorkflow({
 }
 
 export async function cancelWorkflow(
-  { namespace, workflowId, runId }: CancelWorkflowOptions,
+  { namespace, workflow: { id: workflowId, runId } }: CancelWorkflowOptions,
   request = fetch,
 ) {
   const route = routeForApi('workflow.cancel', {
@@ -276,76 +278,66 @@ export async function cancelWorkflow(
 
 export async function signalWorkflow({
   namespace,
-  workflowId,
-  runId,
-  signalName,
-  signalInput,
-  settings,
-  accessToken,
+  workflow: { id: workflowId, runId },
+  name,
+  input,
 }: SignalWorkflowOptions) {
   const route = routeForApi('workflow.signal', {
     namespace,
     workflowId,
-    signalName,
+    signalName: name,
   });
-
-  let payloads = null;
-
-  if (signalInput) {
-    if (settings?.codec?.endpoint) {
-      const awaitData = await convertPayloadsWithCodec({
-        payloads: { payloads: [JSON.parse(signalInput)] },
-        namespace,
-        settings,
-        accessToken,
-        encode: true,
-      });
-      if (get(lastDataEncoderStatus) === 'error') {
-        throw new Error(
-          get(lastDataEncoderError) || translate('common.encode-failed'),
-        );
-      }
-      payloads = awaitData?.payloads ?? null;
-    } else {
-      payloads = [
-        {
-          metadata: {
-            encoding: btoa('json/plain'),
-          },
-          data: btoa(signalInput),
+  const payloads = await encodePayloads(input);
+  const settings = get(page).data.settings;
+  const version = settings?.version ?? '';
+  const newVersion = isVersionNewer(version, '2.22');
+  const body = newVersion
+    ? {
+        signalName: name,
+        workflowExecution: {
+          workflowId,
+          runId,
         },
-      ];
-    }
-  }
-
-  return requestFromAPI(route, {
-    notifyOnError: false,
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        signalName,
+        input: {
+          payloads,
+        },
+      }
+    : {
+        signalName: name,
         input: {
           payloads,
         },
         params: {
           'execution.runId': runId,
         },
-      }),
+      };
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt(body),
     },
   });
 }
 
 export async function resetWorkflow({
   namespace,
-  workflowId,
-  runId,
+  workflow: { id: workflowId, runId },
   eventId,
   reason,
-  resetReapplyType,
+  reapplyType,
 }: ResetWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow.reset', {
     namespace,
     workflowId,
+  });
+
+  const email = get(authUser).email;
+  const formattedReason = formatReason({
+    action: Action.Reset,
+    reason,
+    email,
   });
 
   const body: Replace<
@@ -357,9 +349,9 @@ export async function resetWorkflow({
       runId,
     },
     workflowTaskFinishEventId: eventId,
-    resetReapplyType,
+    resetReapplyType: reapplyType,
     requestId: v4(),
-    reason,
+    reason: formattedReason,
   };
 
   return requestFromAPI<{ runId: string }>(route, {

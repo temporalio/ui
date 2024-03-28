@@ -11,6 +11,7 @@ export const Strings = {
   schedule: 'Schedule',
   frequency: 'Frequency',
   'schedule-spec': 'Schedule Spec',
+  'schedule-input': 'Schedule Input',
   'empty-state-title': 'No Schedules Found',
   'empty-state-description': 'Try a different search',
   'error-message-fetching': 'Error fetching schedules',
@@ -31,6 +32,8 @@ export const Strings = {
     'Are you sure you want to unpause {{schedule}}?',
   'unpause-reason': 'Enter a reason for unpausing the schedule.',
   trigger: 'Trigger',
+  backfill: 'Backfill',
+  'more-options': 'More options',
   'trigger-modal-title': 'Trigger Immediately',
   'trigger-unspecified-title': 'Use Policy',
   'trigger-unspecified-description': "Use the Schedule's overlap policy.",
@@ -69,7 +72,7 @@ export const Strings = {
     'Select the day(s) of the week this schedule will always run on.',
   'time-view-heading': 'Time',
   'time-view-description':
-    'Specify the time (UTC) for this schedule to run. By default, the schedule will run at 12:00am UTC if left blank.',
+    'Specify the time (UTC) for this schedule to run. By default, the schedule will run at 00:00 UTC if left blank.',
   'interval-view-heading': 'Recurring Time',
   'interval-view-description':
     'Specify the time interval for this schedule to run (for example every 5 minutes).',
