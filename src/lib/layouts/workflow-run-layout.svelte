@@ -3,6 +3,7 @@
 
   import { page } from '$app/stores';
 
+  import { viewDataEncoderSettings } from '$lib/components/data-encoder-settings.svelte';
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -147,7 +148,10 @@
 
 <LabsModeGuard>
   <div
-    class="surface-secondary absolute bottom-0 left-0 right-0 top-0 flex h-full flex-col gap-0"
+    class="surface-secondary absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
+      ? 'top-[540px]'
+      : 'top-0'}
+    } flex h-full flex-col gap-0"
   >
     {#if workflowError}
       <WorkflowError error={workflowError} />

@@ -115,7 +115,11 @@
         <div class="nav-title">{translate('common.feedback')}</div>
       </NavRow>
     </slot>
-    <NavRow {isCloud} handleClick={() => ($labsMode = !$labsMode)}>
+    <NavRow
+      {isCloud}
+      handleClick={() => ($labsMode = !$labsMode)}
+      data-testid="labs-mode-button"
+    >
       <NavTooltip right text={labsHoverText}>
         <div class="nav-icon">
           <Icon name="labs" active={$labsMode} />

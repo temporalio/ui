@@ -133,7 +133,7 @@
         <ToggleButtons>
           <ToggleButton
             active={view === 'compact'}
-            data-testid="feed"
+            data-testid="compact"
             on:click={() => (view = 'compact')}
             >{translate('workflows.compact')}</ToggleButton
           >
