@@ -99,17 +99,17 @@
     fill="#1E293B"
   />
   {#if fetchChildWorkflow && fetchChildTimeline}
-    {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [childWorkflow, childHistory]}
+    {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [{ workflow }, childHistory]}
       {@const groups = groupEvents(
         childHistory,
         'ascending',
-        childWorkflow?.pendingActivities,
+        workflow?.pendingActivities,
       )}
       <TimelineGraph
         x={0}
         y={y + radius}
         staticHeight={DetailsChildTimelineHeight}
-        workflow={childWorkflow.workflow}
+        {workflow}
         history={childHistory}
         {groups}
         {canvasWidth}

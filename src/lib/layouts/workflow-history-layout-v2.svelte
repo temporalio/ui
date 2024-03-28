@@ -9,24 +9,30 @@
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
-  import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
+  // import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
-  import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import {
+    activeEvents,
+    activeGroups,
+    clearActives,
+    setActiveGroup,
+    setActiveGroupAndEvent,
+    setSingleActiveGroup,
+  } from '$lib/stores/active-events';
   import {
     decodeEventHistory,
     filteredEventHistory,
-    fullEventHistory,
+    // fullEventHistory,
   } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type { WorkflowEvent } from '$lib/types/events';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { exportHistory } from '$lib/utilities/export-history';
-  import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
+  // import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
   let view: GraphView = 'compact';
   let zoomLevel = 1;
@@ -40,58 +46,14 @@
     pendingActivities,
   );
 
-  $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
-    $fullEventHistory,
-    'ascending',
-  );
+  // $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
+  //   $fullEventHistory,
+  //   'ascending',
+  // );
   $: workflow, view, clearActives();
-
-  let activeGroups: string[] = [];
-  let activeEvents: string[] = [];
 
   let canvasWidth = 0;
   let showDownloadPrompt = false;
-
-  const clearActives = () => {
-    activeGroups = [];
-    activeEvents = [];
-  };
-
-  const setActiveGroup = (group: EventGroup) => {
-    activeEvents = [];
-    if (!activeGroups.includes(group.id)) {
-      activeGroups = [...activeGroups, group.id];
-    } else {
-      activeGroups = activeGroups.filter((id) => id !== group.id);
-    }
-  };
-
-  const setSingleActiveGroup = (group: EventGroup) => {
-    activeEvents = [];
-    if (!activeGroups.includes(group.id)) {
-      activeGroups = [group.id];
-    } else {
-      activeGroups = [];
-    }
-  };
-
-  const setActiveGroupAndEvent = (group: EventGroup, event: WorkflowEvent) => {
-    if (group) {
-      if (!activeGroups.includes(group.id)) {
-        activeGroups = [...activeGroups, group.id];
-      } else {
-        activeGroups = activeGroups.filter((id) => id !== group.id);
-      }
-    }
-
-    if (event) {
-      if (!activeEvents.includes(event.id)) {
-        activeEvents = [...activeEvents, event.id];
-      } else {
-        activeEvents = activeGroups.filter((id) => id !== event.id);
-      }
-    }
-  };
 
   const onDownloadClick = () => {
     showDownloadPrompt = false;
@@ -117,9 +79,9 @@
 
 <div class="surface-secondary flex flex-col gap-0 px-8">
   <WorkflowCallStackError />
-  {#if workflowTaskFailedError}
+  <!-- {#if workflowTaskFailedError}
     <WorkflowTypedError error={workflowTaskFailedError} />
-  {/if}
+  {/if} -->
   <div class="flex flex-col gap-0">
     <WorkflowDetails />
     <InputAndResults />
@@ -177,7 +139,7 @@
       <CompactGraph
         {workflow}
         {groups}
-        {activeGroups}
+        activeGroups={$activeGroups}
         {zoomLevel}
         {canvasWidth}
         onClick={setSingleActiveGroup}
@@ -187,7 +149,7 @@
         {workflow}
         history={$filteredEventHistory}
         {groups}
-        {activeGroups}
+        activeGroups={$activeGroups}
         {zoomLevel}
         {canvasWidth}
         onClick={setActiveGroup}
@@ -196,8 +158,8 @@
       <HistoryGraph
         history={$filteredEventHistory}
         {groups}
-        {activeGroups}
-        {activeEvents}
+        activeGroups={$activeGroups}
+        activeEvents={$activeEvents}
         {zoomLevel}
         {canvasWidth}
         onClick={setActiveGroupAndEvent}
