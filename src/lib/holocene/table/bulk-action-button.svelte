@@ -27,6 +27,6 @@
   }
 
   .bulk-action-button:disabled {
-    @apply pointer-events-none cursor-not-allowed opacity-75;
+    @apply cursor-not-allowed opacity-75;
   }
 </style>
