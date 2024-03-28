@@ -146,7 +146,7 @@
   }
 
   .disabled {
-    @apply surface-disabled cursor-default border-disabled;
+    @apply cursor-default border-disabled text-disabled;
   }
 
   .error {
