@@ -7,6 +7,7 @@ import type {
   EventAttribute,
   EventAttributeKey,
   IterableEvent,
+  PendingActivity,
 } from '$lib/types/events';
 import { capitalize } from '$lib/utilities/format-camel-case';
 import { formatDate } from '$lib/utilities/format-date';
@@ -107,6 +108,20 @@ export const formatAttributes = (
     });
 
   for (const [key, value] of Object.entries(event.attributes)) {
+    const shouldDisplay = shouldDisplayAttribute(key, value);
+    if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
+    formatNestedAttributes(attributes, key);
+  }
+
+  return attributes;
+};
+
+export const formatPendingAttributes = (
+  pendingActivity: PendingActivity,
+): CombinedAttributes => {
+  const attributes: CombinedAttributes = {};
+
+  for (const [key, value] of Object.entries(pendingActivity)) {
     const shouldDisplay = shouldDisplayAttribute(key, value);
     if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
     formatNestedAttributes(attributes, key);

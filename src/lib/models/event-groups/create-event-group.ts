@@ -7,6 +7,7 @@ import type {
   TimerStartedEvent,
   WorkflowExecutionSignaledEvent,
   WorkflowExecutionUpdateAcceptedEvent,
+  WorkflowTaskScheduledEvent,
 } from '$lib/types/events';
 import {
   isActivityTaskScheduledEvent,
@@ -17,6 +18,7 @@ import {
   isTimerStartedEvent,
   isWorkflowExecutionSignaledEvent,
   isWorkflowExecutionUpdateAcceptedEvent,
+  isWorkflowTaskScheduledEvent,
 } from '$lib/utilities/is-event-type';
 
 import type { EventGroup } from './event-groups';
@@ -42,6 +44,7 @@ type StartingEvents = {
   LocalActivity: MarkerRecordedEvent;
   Marker: MarkerRecordedEvent;
   Update: WorkflowExecutionUpdateAcceptedEvent;
+  WorkflowTask: WorkflowTaskScheduledEvent;
 };
 
 const getInitialEvent = (
@@ -95,6 +98,8 @@ const createGroupFor = <K extends keyof StartingEvents>(
     timestamp,
     category,
     classification,
+    level: undefined,
+    pendingActivity: undefined,
     get eventTime() {
       return this.lastEvent?.eventTime;
     },
@@ -146,4 +151,12 @@ export const createEventGroup = (
 
   if (isWorkflowExecutionUpdateAcceptedEvent(event))
     return createGroupFor<'Update'>(event, events);
+};
+
+export const createWorkflowTaskGroup = (
+  event: CommonHistoryEvent,
+  events?: CommonHistoryEvent[],
+): EventGroup => {
+  if (isWorkflowTaskScheduledEvent(event))
+    return createGroupFor<'WorkflowTask'>(event, events);
 };

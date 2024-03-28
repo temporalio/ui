@@ -22,7 +22,7 @@
   {open}
   onClick={onClose}
   closeButtonLabel={translate('common.close-keyboard-shortcuts')}
-  class="w-[35vw] min-w-min max-w-fit"
+  class="min-w-min max-w-fit"
 >
   <DrawerContent title={translate('common.keyboard-shortcuts')}>
     <div
@@ -70,7 +70,7 @@
 
 <style lang="postcss">
   .shortcut-key-button {
-    @apply fixed bottom-5 right-24 z-50 px-2;
+    @apply fixed bottom-5 left-24 z-50;
   }
 
   .cell {

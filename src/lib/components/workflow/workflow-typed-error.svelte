@@ -56,7 +56,7 @@
         >.
       </p>
     {/if}
-    <div class="surface-primary mt-2">
+    <div class="mt-2">
       <Table class="dark w-full table-fixed">
         <caption class="sr-only" slot="caption"
           >{translate('events.error-event')}</caption

@@ -35,6 +35,7 @@ type RequestFromAPIOptions = {
   notifyOnError?: boolean;
   handleError?: typeof handleRequestError;
   isBrowser?: boolean;
+  signal?: AbortController['signal'];
 };
 
 export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>

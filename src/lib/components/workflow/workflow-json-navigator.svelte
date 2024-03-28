@@ -1,7 +1,6 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import RangeInput from '$lib/holocene/input/range-input.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fromEventToRawEvent } from '$lib/models/event-history';
   import { decodeEventHistory } from '$lib/stores/events';
@@ -39,78 +38,74 @@
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
-{#if !events.length}
-  <Loading />
-{:else}
-  <div class="flex gap-4 max-sm:flex-col">
-    <div class="flex w-full gap-4">
-      <RangeInput
-        label={translate('common.event')}
-        labelHidden
-        id="range-input-event-history"
-        min={1}
-        max={events.length}
-        bind:value={index}
-      />
-      <div class="flex items-center justify-center gap-3">
-        <button
-          class="caret"
-          disabled={index === 1}
-          on:click={() => {
-            index -= 1;
-          }}
-          aria-label={translate('common.previous')}
-        >
-          <span
-            class="arrow arrow-left"
-            class:arrow-left-disabled={index === 1}
-          />
-        </button>
-        <button
-          class="caret"
-          disabled={index === events.length}
-          on:click={() => {
-            index += 1;
-          }}
-          aria-label={translate('common.next')}
-        >
-          <span
-            class="arrow arrow-right"
-            class:arrow-right-disabled={index === events.length}
-          />
-        </button>
-      </div>
-    </div>
-    <slot name="decode" />
-  </div>
-  {#if $decodeEventHistory}
-    {#key [index, $decodeEventHistory]}
-      <PayloadDecoder
-        value={fromEventToRawEvent(events[index - 1])}
-        let:decodedValue
+<div class="flex gap-4 max-sm:flex-col">
+  <div class="bg-gray-100 flex w-full gap-4">
+    <RangeInput
+      label={translate('common.event')}
+      labelHidden
+      id="range-input-event-history"
+      min={1}
+      max={events.length}
+      bind:value={index}
+    />
+    <div class="flex items-center justify-center gap-3">
+      <button
+        class="caret"
+        disabled={index === 1}
+        on:click={() => {
+          index -= 1;
+        }}
+        aria-label={translate('common.previous')}
       >
-        <CodeBlock
-          content={decodedValue}
-          testId="event-history-json"
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        <span
+          class="arrow arrow-left"
+          class:arrow-left-disabled={index === 1}
         />
-      </PayloadDecoder>
-    {/key}
-  {:else}
-    {#key index}
+      </button>
+      <button
+        class="caret"
+        disabled={index === events.length}
+        on:click={() => {
+          index += 1;
+        }}
+        aria-label={translate('common.next')}
+      >
+        <span
+          class="arrow arrow-right"
+          class:arrow-right-disabled={index === events.length}
+        />
+      </button>
+    </div>
+  </div>
+  <slot name="decode" />
+</div>
+{#if $decodeEventHistory}
+  {#key [index, $decodeEventHistory]}
+    <PayloadDecoder
+      value={fromEventToRawEvent(events[index - 1])}
+      let:decodedValue
+    >
       <CodeBlock
-        content={stringifyWithBigInt(
-          fromEventToRawEvent(events[index - 1]),
-          undefined,
-          2,
-        )}
+        content={decodedValue}
         testId="event-history-json"
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
-    {/key}
-  {/if}
+    </PayloadDecoder>
+  {/key}
+{:else}
+  {#key index}
+    <CodeBlock
+      content={stringifyWithBigInt(
+        fromEventToRawEvent(events[index - 1]),
+        undefined,
+        2,
+      )}
+      testId="event-history-json"
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+    />
+  {/key}
 {/if}
 
 <style lang="postcss">

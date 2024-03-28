@@ -14,6 +14,7 @@
     | 'green'
     | 'blue'
     | 'purple'
+    | 'ultraviolet'
     | 'gray';
 </script>
 
@@ -62,5 +63,9 @@
 
   .count {
     @apply h-6 w-6 min-w-max rounded-full bg-indigo-400 text-black;
+  }
+
+  .ultraviolet {
+    @apply border-ultraviolet bg-ultraviolet text-indigo-100;
   }
 </style>

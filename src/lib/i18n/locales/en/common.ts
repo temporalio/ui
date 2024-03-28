@@ -153,6 +153,7 @@ export const Strings = {
   'view-more': 'View More...',
   'view-all-runs': 'View All Runs',
   download: 'Download',
+  duration: 'Duration',
   'search-attributes': 'Search Attributes',
   'history-size-bytes': 'History Size (Bytes)',
   'execution-details': 'Execution Details',

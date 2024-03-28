@@ -9,9 +9,14 @@ import {
   isChildWorkflowExecutionCompletedEvent,
   isChildWorkflowExecutionStartedEvent,
   isChildWorkflowExecutionTerminatedEvent,
+  isExternalWorkflowExecutionSignaledEvent,
+  isPureWorkflowTaskFailedEvent,
   isTimerCanceledEvent,
   isTimerFiredEvent,
   isWorkflowExecutionUpdateCompletedEvent,
+  isWorkflowTaskCompletedEvent,
+  isWorkflowTaskStartedEvent,
+  isWorkflowTaskTimedOutEvent,
 } from '$lib/utilities/is-event-type';
 
 export const getGroupId = (event: CommonHistoryEvent): string => {
@@ -70,6 +75,28 @@ export const getGroupId = (event: CommonHistoryEvent): string => {
     return String(
       event.workflowExecutionUpdateCompletedEventAttributes.acceptedEventId,
     );
+  }
+
+  if (isExternalWorkflowExecutionSignaledEvent(event)) {
+    return String(
+      event.externalWorkflowExecutionSignaledEventAttributes.initiatedEventId,
+    );
+  }
+
+  if (isWorkflowTaskStartedEvent(event)) {
+    return String(event.workflowTaskStartedEventAttributes.scheduledEventId);
+  }
+
+  if (isWorkflowTaskCompletedEvent(event)) {
+    return String(event.workflowTaskCompletedEventAttributes.scheduledEventId);
+  }
+
+  if (isPureWorkflowTaskFailedEvent(event)) {
+    return String(event.workflowTaskFailedEventAttributes.scheduledEventId);
+  }
+
+  if (isWorkflowTaskTimedOutEvent(event)) {
+    return String(event.workflowTaskTimedOutEventAttributes.scheduledEventId);
   }
 
   return event.id;

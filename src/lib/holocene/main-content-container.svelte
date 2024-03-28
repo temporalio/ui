@@ -1,7 +1,8 @@
 <script lang="ts">
-  import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
+  import ScrollToContainer from './scroll-to-container.svelte';
 
   let scrollToTopHidden = true;
+  let scrollToBottomHidden = false;
   let showScrollToTopOn = 150; // pixels
 
   function getScrollContainer(): HTMLElement | null {
@@ -10,6 +11,10 @@
 
   function onScrollToTopClick() {
     getScrollContainer()?.scrollTo(0, 0);
+  }
+
+  function onScrollToBottomClick() {
+    getScrollContainer()?.scrollTo(0, getScrollContainer()?.scrollHeight);
   }
 
   function handleOnScroll(event: Event) {
@@ -28,5 +33,10 @@
   <main id="content">
     <slot name="main" />
   </main>
-  <ScrollToTop hidden={scrollToTopHidden} {onScrollToTopClick} />
+  <ScrollToContainer
+    {scrollToTopHidden}
+    {scrollToBottomHidden}
+    {onScrollToTopClick}
+    {onScrollToBottomClick}
+  />
 </div>

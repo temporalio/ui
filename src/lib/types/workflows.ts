@@ -1,4 +1,5 @@
 import type {
+  Memo,
   Payloads,
   WorkflowExecutionStatus,
   WorkflowVersionTimpstamp,
@@ -26,6 +27,7 @@ export type WorkflowExecutionInfo = Replace<
     historySizeBytes: string;
     historyLength: string;
     searchAttributes?: WorkflowSearchAttributes;
+    memo?: Memo;
   }
 >;
 
@@ -122,6 +124,7 @@ export type WorkflowExecution = {
   historySizeBytes: string;
   mostRecentWorkerVersionStamp?: MostRecentWOrkflowVersionStamp;
   searchAttributes?: DecodedWorkflowSearchAttributes;
+  memo: Memo;
   pendingChildren: PendingChildren[];
   pendingActivities: PendingActivity[];
   stateTransitionCount: string;

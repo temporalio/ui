@@ -106,9 +106,11 @@ export function getDuration({
 export function getMillisecondDuration({
   start,
   end,
+  onlyUnderSecond = true,
 }: {
   start: ValidTime | undefined | null;
   end: ValidTime | undefined | null;
+  onlyUnderSecond?: boolean;
 }): number | null {
   if (!start || !end) return null;
 
@@ -124,7 +126,7 @@ export function getMillisecondDuration({
     const parsedStart = parseJSON(start);
     const parsedEnd = parseJSON(end);
     const ms = parsedEnd.getTime() - parsedStart.getTime();
-    return Math.abs(ms % 1000);
+    return onlyUnderSecond ? Math.abs(ms % 1000) : Math.abs(ms);
   } catch {
     return null;
   }

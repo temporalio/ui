@@ -1,13 +1,9 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { onDestroy, onMount } from 'svelte';
-
   import { page } from '$app/stores';
 
-  import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
@@ -18,18 +14,20 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { autoRefreshWorkflow } from '$lib/stores/event-view';
-  import { eventHistory } from '$lib/stores/events';
+  import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import { namespaces } from '$lib/stores/namespaces';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
-  import { refresh, workflowRun } from '$lib/stores/workflow-run';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
+  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import { has } from '$lib/utilities/has';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForCallStack,
     routeForEventHistory,
     routeForPendingActivities,
+    routeForRelationships,
     routeForWorkers,
     routeForWorkflowQuery,
     routeForWorkflows,
@@ -45,9 +43,6 @@
   $: ({ workflow, workers, compatibility } = $workflowRun);
   $: id = $page.params.id;
 
-  let refreshInterval: ReturnType<typeof setInterval>;
-  const refreshRate = 15000;
-
   $: routeParameters = {
     namespace,
     workflow: workflow?.id,
@@ -58,37 +53,6 @@
   $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
     $workflowRun.workflow?.status,
   );
-
-  onMount(() => {
-    if (isRunning && $autoRefreshWorkflow === 'on') {
-      // Auto-refresh of 15 seconds if turned on
-      clearInterval(refreshInterval);
-      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
-    }
-  });
-
-  $: {
-    if (!isRunning) {
-      // Stop refresh if workflow is no longer running
-      clearInterval(refreshInterval);
-    }
-  }
-
-  const onRefreshChange = () => {
-    if ($autoRefreshWorkflow === 'on') {
-      $autoRefreshWorkflow = 'off';
-      clearInterval(refreshInterval);
-    } else {
-      $refresh = Date.now();
-      $autoRefreshWorkflow = 'on';
-      clearInterval(refreshInterval);
-      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
-    }
-  };
-
-  onDestroy(() => {
-    clearInterval(refreshInterval);
-  });
 
   $: cancelInProgress = isCancelInProgress(
     $workflowRun?.workflow?.status,
@@ -105,9 +69,14 @@
     compatibility,
     buildId,
   );
+  $: workflowRelationships = getWorkflowRelationships(
+    workflow,
+    $fullEventHistory,
+    $namespaces,
+  );
 </script>
 
-<header class="mb-4 flex flex-col gap-1">
+<header class="mb-2 flex flex-col gap-1">
   <div class="mb-4 block">
     <Link
       href={`${routeForWorkflows({
@@ -133,7 +102,7 @@
     {/if}
   </div>
   <div
-    class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
+    class="flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
   >
     <div
       class="flex w-full flex-col justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
@@ -152,7 +121,6 @@
         />
       </h1>
       <div class="flex flex-wrap items-center gap-4">
-        <WorkflowStatus status={workflow?.status} />
         {#if workflowUsesVersioning}
           <p class="flex items-center gap-1">
             <span>{translate('workers.last-used-version')}</span
@@ -194,9 +162,6 @@
     <div
       class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
     >
-      {#if isRunning}
-        <AutoRefreshWorkflow onChange={onRefreshChange} />
-      {/if}
       <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
     </div>
   </div>
@@ -232,7 +197,7 @@
     </div>
   {/if}
   <Tabs>
-    <TabList class="flex flex-wrap gap-6" label="workflow detail">
+    <TabList class="mb-2 flex flex-wrap gap-6" label="workflow detail">
       <Tab
         label={translate('workflows.history-tab')}
         id="history-tab"
@@ -246,7 +211,9 @@
           }),
         )}
       >
-        <Badge type="blue" class="px-2 py-0">{workflow?.historyEvents}</Badge>
+        <Badge type="ultraviolet" class="px-2 py-0"
+          >{workflow?.historyEvents}</Badge
+        >
       </Tab>
       <Tab
         label={translate('workflows.workers-tab')}
@@ -257,7 +224,22 @@
           routeForWorkers(routeParameters),
         )}
       >
-        <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
+        <Badge type="ultraviolet" class="px-2 py-0"
+          >{workers?.pollers?.length}</Badge
+        >
+      </Tab>
+      <Tab
+        label={translate('workflows.relationships')}
+        id="relationships-tab"
+        href={routeForRelationships(routeParameters)}
+        active={pathMatches(
+          $page.url.pathname,
+          routeForRelationships(routeParameters),
+        )}
+      >
+        <Badge type="ultraviolet" class="px-2 py-0"
+          >{workflowRelationships.relationshipCount}</Badge
+        >
       </Tab>
       <Tab
         label={translate('workflows.pending-activities-tab')}
@@ -268,7 +250,10 @@
           routeForPendingActivities(routeParameters),
         )}
       >
-        <Badge type={activitiesCanceled ? 'warning' : 'blue'} class="px-2 py-0">
+        <Badge
+          type={activitiesCanceled ? 'warning' : 'ultraviolet'}
+          class="px-2 py-0"
+        >
           {#if activitiesCanceled}<Icon
               name="canceled"
               width={20}

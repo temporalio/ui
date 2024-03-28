@@ -41,23 +41,25 @@ export const paginated = async <T extends WithNextPageToken>(
 
   try {
     const response = await fn(token);
-    const { nextPageToken, ...props } = response;
-    const mergedProps = merge(previousProps, props);
+    if (response) {
+      const { nextPageToken, ...props } = response;
+      const mergedProps = merge(previousProps, props);
 
-    if (isFunction(onUpdate)) onUpdate(mergedProps, props);
+      if (isFunction(onUpdate)) onUpdate(mergedProps, props);
 
-    if (!nextPageToken) {
-      if (isFunction(onComplete)) onComplete(mergedProps);
-      return mergedProps;
+      if (!nextPageToken) {
+        if (isFunction(onComplete)) onComplete(mergedProps);
+        return mergedProps;
+      }
+
+      return paginated(fn, {
+        onStart,
+        onUpdate,
+        onComplete,
+        token: nextPageToken,
+        previousProps: mergedProps,
+      });
     }
-
-    return paginated(fn, {
-      onStart,
-      onUpdate,
-      onComplete,
-      token: nextPageToken,
-      previousProps: mergedProps,
-    });
   } catch (error: unknown) {
     onError(error);
   }

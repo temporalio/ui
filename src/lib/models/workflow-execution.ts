@@ -52,6 +52,7 @@ export const toWorkflowExecution = (
   const searchAttributes = toSearchAttributes(
     response.workflowExecutionInfo.searchAttributes,
   );
+  const memo = response.workflowExecutionInfo.memo;
   const name = response.workflowExecutionInfo.type.name;
   const id = response.workflowExecutionInfo.execution.workflowId;
   const runId = response.workflowExecutionInfo.execution.runId;
@@ -93,6 +94,7 @@ export const toWorkflowExecution = (
     historyEvents,
     historySizeBytes,
     searchAttributes,
+    memo,
     url,
     taskQueue,
     mostRecentWorkerVersionStamp,

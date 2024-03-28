@@ -26,6 +26,7 @@ const workflow: WorkflowExecution = {
       TemporalScheduledStartTime: '2024-01-05T00:00:00.000000000Z',
     },
   },
+  memo: {},
   pendingChildren: [],
   pendingActivities: [],
   stateTransitionCount: '12',

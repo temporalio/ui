@@ -1,5 +1,7 @@
+import activity from './svg/activity.svelte';
 import add from './svg/add.svelte';
 import archives from './svg/archives.svelte';
+import arrowDown from './svg/arrow-down.svelte';
 import arrowLeft from './svg/arrow-left.svelte';
 import arrowRight from './svg/arrow-right.svelte';
 import arrowUp from './svg/arrow-up.svelte';
@@ -66,6 +68,7 @@ import rocketShip from './svg/rocket-ship.svelte';
 import schedules from './svg/schedules.svelte';
 import search from './svg/search.svelte';
 import settings from './svg/settings.svelte';
+import signal from './svg/signal.svelte';
 import sliders from './svg/sliders.svelte';
 import spinnerSolid from './svg/spinner-solid.svelte';
 import spinner from './svg/spinner.svelte';
@@ -90,8 +93,10 @@ import workflow from './svg/workflow.svelte';
 export type IconName = keyof typeof icons;
 
 export const icons = {
+  activity,
   add,
   archives,
+  'arrow-down': arrowDown,
   'arrow-left': arrowLeft,
   'arrow-up': arrowUp,
   'arrow-right': arrowRight,
@@ -159,6 +164,7 @@ export const icons = {
   search,
   settings,
   sliders,
+  signal,
   spinner,
   'star-empty': starEmpty,
   'star-filled': starFilled,
