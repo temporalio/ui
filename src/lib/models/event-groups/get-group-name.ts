@@ -1,5 +1,6 @@
 import type { CommonHistoryEvent } from '$lib/types/events';
 import { formatDurationAbbreviated } from '$lib/utilities/format-time';
+import { getSummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
 import {
   isActivityTaskScheduledEvent,
   isLocalActivityMarkerEvent,
@@ -73,9 +74,6 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
   }
 
   if (isMarkerRecordedEvent(event)) {
-    if (isLocalActivityMarkerEvent(event)) {
-      return '';
-    }
     return 'Marker';
   }
 
@@ -91,8 +89,9 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
 export const getEventGroupDisplayName = (event: CommonHistoryEvent): string => {
   if (!event) return '';
 
-  if (getEventGroupLabel(event)) {
-    return `${getEventGroupLabel(event)}: ${getEventGroupName(event)}`;
+  if (isLocalActivityMarkerEvent(event)) {
+    return getSummaryAttribute(event)?.value?.toString() ?? 'Local Activity';
   }
+
   return getEventGroupName(event);
 };

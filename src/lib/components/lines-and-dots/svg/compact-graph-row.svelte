@@ -60,7 +60,7 @@
     fontWeight="500"
   >
     {#if aggregateRow}<tspan font-weight="700">{count}</tspan>{/if}
-    {group?.name}
+    {group?.displayName}
   </Text>
   <Dot
     point={[start, y]}

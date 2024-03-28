@@ -82,8 +82,12 @@
     <tspan fill="#fff" font-size={showDetails ? '14px' : '12px'}>
       {spaceBetweenCapitalLetters(event?.name)}
     </tspan>
-    {#if group && group.name && showDetails}<tspan dx={3}>{group.name}</tspan
+    {#if group && group.displayName && showDetails}<tspan dx={3}
+        >{group.displayName}</tspan
       >{/if}
+    <!-- <tspan dx={3}
+      ><HistoryRowPayloadDetail {...getSingleAttributeForEvent(event)} /></tspan
+    > -->
   </Text>
   {#if showTimestamp}
     <Text

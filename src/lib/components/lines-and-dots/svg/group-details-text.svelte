@@ -16,7 +16,7 @@
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
 
-  import type { GraphConfig } from '../constants';
+  import { type GraphConfig, staticCodeBlockHeight } from '../constants';
 
   import TextLink from './text-link.svelte';
   import Text from './text.svelte';
@@ -32,7 +32,6 @@
 
   const { fontSizeRatio } = config;
 
-  const codeBlockHeight = 2 * fontSizeRatio;
   $: [x, y] = point;
   $: codeBlockValue = getCodeBlockValue(value);
   // $: stackTrace = getStackTrace(codeBlockValue);
@@ -46,10 +45,10 @@
           {x}
           y={y - fontSizeRatio}
           width={canvasWidth - 280}
-          height={codeBlockHeight}
+          height={staticCodeBlockHeight}
         >
-          <div class="overflow-auto" style="height: {codeBlockHeight}px">
-            <CodeBlock inline content={decodedValue} />
+          <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">
+            <CodeBlock content={decodedValue} />
           </div>
         </foreignObject>
         <!-- <Text  position="middle" {point} category="pending">
@@ -68,10 +67,10 @@
           {x}
           y={y - fontSizeRatio}
           width={canvasWidth - 280}
-          height={codeBlockHeight}
+          height={staticCodeBlockHeight}
         >
-          <div class="overflow-auto" style="height: {codeBlockHeight}px">
-            <CodeBlock inline content={decodedValue} />
+          <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">
+            <CodeBlock content={decodedValue} />
           </div>
         </foreignObject>
 
@@ -87,10 +86,10 @@
           {x}
           y={y - fontSizeRatio}
           width={canvasWidth - 320}
-          height={codeBlockHeight}
+          height={staticCodeBlockHeight}
         >
-          <div class="overflow-auto" style="height: {codeBlockHeight}px">
-            <CodeBlock inline content={decodedValue} />
+          <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">
+            <CodeBlock content={decodedValue} />
           </div>
         </foreignObject>
         <!-- <Text  position="middle" {point} category="pending"

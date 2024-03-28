@@ -42,7 +42,9 @@
   ) as EventGroups[];
 
   const getNameGroups = (groups: EventGroups) => {
-    return Object.values(groupBy(groups, ({ name }) => name)) as EventGroups[];
+    return Object.values(
+      groupBy(groups, ({ displayName }) => displayName),
+    ) as EventGroups[];
   };
 
   $: maxSegmentSize = () => {

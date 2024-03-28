@@ -18,6 +18,7 @@
     type GraphConfig,
     type GraphView,
     mergeEventGroupDetails,
+    staticCodeBlockHeight,
   } from '../constants';
 
   import Box from './box.svelte';
@@ -76,7 +77,7 @@
   $: boxHeight = getDetailsBoxHeight(groupOrEvent, fontSizeRatio);
   $: textStartingY = fetchChildTimeline
     ? y + radius + DetailsChildTimelineHeight
-    : y + radius;
+    : y + 3 * radius;
   $: attributes = mergeEventGroupDetails(groupOrEvent);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
@@ -117,13 +118,13 @@
     {/await}
   {/if}
   {#each codeBlockAttributes as [key, value], index (key)}
-    <Text point={[startingX, textStartingY + (index + 1) * 2 * fontSizeRatio]}
+    <Text point={[startingX, textStartingY + index * staticCodeBlockHeight]}
       >{format(key)}</Text
     >
     <GroupDetailsText
       point={[
         startingX + labelPadding,
-        textStartingY + (index + 1) * 2 * fontSizeRatio,
+        textStartingY + index * staticCodeBlockHeight,
       ]}
       {key}
       {value}
@@ -137,16 +138,16 @@
       point={[
         startingX,
         textStartingY +
-          2 * fontSizeRatio * codeBlockAttributes.length +
-          (index + 2) * fontSizeRatio,
+          staticCodeBlockHeight * codeBlockAttributes.length +
+          (index + 1) * fontSizeRatio,
       ]}>{format(key)}</Text
     >
     <GroupDetailsText
       point={[
         startingX + labelPadding,
         textStartingY +
-          2 * fontSizeRatio * codeBlockAttributes.length +
-          (index + 2) * fontSizeRatio,
+          staticCodeBlockHeight * codeBlockAttributes.length +
+          (index + 1) * fontSizeRatio,
       ]}
       {key}
       {value}

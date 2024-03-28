@@ -10,7 +10,10 @@ import { authUser } from '$lib/stores/auth-user';
 import { refresh } from '$lib/stores/workflow-run';
 import type { WorkflowEvents } from '$lib/types/events';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-import { isResetEvent } from '$lib/utilities/is-event-type';
+import {
+  isLocalActivityMarkerEvent,
+  isResetEvent,
+} from '$lib/utilities/is-event-type';
 
 import { eventFilterSort } from './event-view';
 import { eventTypeFilter } from './filters';
@@ -89,7 +92,12 @@ export const fullEventHistory = writable<WorkflowEvents>([]);
 export const filteredEventHistory = derived(
   [fullEventHistory, eventTypeFilter],
   ([$history, $types]) => {
-    return $history.filter((event) => $types.includes(event.category));
+    return $history.filter((event) => {
+      if (isLocalActivityMarkerEvent(event)) {
+        return $types.includes('local-activity');
+      }
+      return $types.includes(event.category);
+    });
   },
 );
 

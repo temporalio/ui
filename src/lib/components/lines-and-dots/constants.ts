@@ -343,6 +343,8 @@ export const mergeEventGroupDetails = (
   }
 };
 
+export const staticCodeBlockHeight = 160;
+
 export const getEventDetailsHeight = (
   groupOrEvent: EventGroup | WorkflowEvent,
   height: number,
@@ -355,9 +357,9 @@ export const getEventDetailsHeight = (
     ([, value]) => typeof value !== 'object',
   );
   return (
-    codeBlockAttributes.length * 2 * height +
+    codeBlockAttributes.length * staticCodeBlockHeight +
     textAttributes.length * height +
-    2 * height
+    3 * height
   );
 };
 

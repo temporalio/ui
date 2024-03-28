@@ -113,7 +113,7 @@
         {backdrop}
         backdropHeight={radius * 2}
       >
-        {group?.name}
+        {group?.displayName}
         <tspan fill="#aebed9" font-size="12px"
           >{formatDistanceAbbreviated({
             start: group.initialEvent.eventTime,
