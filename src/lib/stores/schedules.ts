@@ -84,11 +84,14 @@ export const submitCreateSchedule = async ({
     action;
 
   let payloads;
-  try {
-    payloads = await encodePayloads(input);
-  } catch (e) {
-    error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
-    return;
+
+  if (input) {
+    try {
+      payloads = await encodePayloads(input);
+    } catch (e) {
+      error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
+      return;
+    }
   }
 
   const body: DescribeFullSchedule = {
@@ -104,7 +107,7 @@ export const submitCreateSchedule = async ({
           workflowId: workflowId,
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
-          input: { payloads },
+          input: payloads ? { payloads } : null,
         },
       },
     },
@@ -139,15 +142,20 @@ export const submitEditSchedule = async (
 ): Promise<void> => {
   const { namespace, name, workflowId, workflowType, taskQueue, input } =
     action;
-  let payloads;
-  try {
-    payloads = await encodePayloads(input);
-  } catch (e) {
-    error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
-    return;
-  }
-  const { preset } = presets;
 
+  let payloads;
+  if (input) {
+    try {
+      payloads = await encodePayloads(input);
+    } catch (e) {
+      error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
+      return;
+    }
+  } else if (!input && schedule.action.startWorkflow.input?.payloads) {
+    payloads = schedule.action.startWorkflow.input.payloads;
+  }
+
+  const { preset } = presets;
   const body: DescribeFullSchedule = {
     schedule_id: scheduleId,
     schedule: {
@@ -158,7 +166,7 @@ export const submitEditSchedule = async (
           workflowId,
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
-          input: { payloads },
+          input: payloads ? { payloads } : null,
         },
       },
     },
