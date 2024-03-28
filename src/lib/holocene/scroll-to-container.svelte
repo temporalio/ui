@@ -15,6 +15,6 @@
 
 <style lang="postcss">
   #scroll-container {
-    @apply fixed bottom-5 right-8 z-50 flex w-auto gap-2;
+    @apply invisible bottom-5 right-8 z-50 flex w-auto gap-2 md:fixed;
   }
 </style>
