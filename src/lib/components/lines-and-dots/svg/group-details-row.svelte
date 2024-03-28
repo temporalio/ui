@@ -32,7 +32,7 @@
   export let config: GraphConfig;
   export let view: GraphView;
 
-  const { radius, fontSizeRatio, gutter } = config;
+  const { radius, fontSizeRatio } = config;
   $: ({ namespace } = $page.params);
 
   let fetchChildWorkflow;
@@ -70,9 +70,10 @@
     }
   };
 
+  const startingX = 24;
+  const labelPadding = 240;
   $: groupOrEvent = group ?? event;
   $: boxHeight = getDetailsBoxHeight(groupOrEvent, fontSizeRatio);
-  $: startingX = gutter + radius / 2;
   $: textStartingY = fetchChildTimeline
     ? y + radius + DetailsChildTimelineHeight
     : y + radius;
@@ -120,7 +121,10 @@
       >{format(key)}</Text
     >
     <GroupDetailsText
-      point={[startingX + 240, textStartingY + (index + 1) * 2 * fontSizeRatio]}
+      point={[
+        startingX + labelPadding,
+        textStartingY + (index + 1) * 2 * fontSizeRatio,
+      ]}
       {key}
       {value}
       {attributes}
@@ -139,7 +143,7 @@
     >
     <GroupDetailsText
       point={[
-        startingX + 240,
+        startingX + labelPadding,
         textStartingY +
           2 * fontSizeRatio * codeBlockAttributes.length +
           (index + 2) * fontSizeRatio,
