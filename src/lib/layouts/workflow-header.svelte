@@ -4,6 +4,7 @@
   import { page } from '$app/stores';
 
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
@@ -15,6 +16,7 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import { labsMode } from '$lib/stores/labs-mode';
   import { namespaces } from '$lib/stores/namespaces';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -29,6 +31,7 @@
     routeForPendingActivities,
     routeForRelationships,
     routeForWorkers,
+    routeForWorkflowMetadata,
     routeForWorkflowQuery,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
@@ -53,7 +56,6 @@
   $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
     $workflowRun.workflow?.status,
   );
-
   $: cancelInProgress = isCancelInProgress(
     $workflowRun?.workflow?.status,
     $eventHistory,
@@ -76,8 +78,8 @@
   );
 </script>
 
-<header class="mb-2 flex flex-col gap-1">
-  <div class="mb-4 block">
+<div class="surface-secondary">
+  <div class="pb-4">
     <Link
       href={`${routeForWorkflows({
         namespace,
@@ -101,186 +103,203 @@
       </Link>
     {/if}
   </div>
-  <div
-    class="flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
-  >
-    <div
-      class="flex w-full flex-col justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
-    >
-      <h1
-        data-testid="workflow-id-heading"
-        class="overflow-hidden text-2xl font-medium"
-      >
-        <Copyable
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={workflow?.id}
-          clickAllToCopy
-          container-class="w-full"
-          class="overflow-hidden text-ellipsis"
+  <header class="rounded-top flex flex-col gap-0">
+    <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
+      <div class="flex flex-col items-center gap-4 lg:flex-row">
+        <div class="px-2">
+          <WorkflowStatus status={workflow?.status} big />
+        </div>
+        <div class="flex flex-col flex-wrap gap-0">
+          <h1
+            data-testid="workflow-id-heading"
+            class="overflow-hidden text-base font-medium lg:text-2xl"
+          >
+            <Copyable
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+              content={workflow?.id}
+              clickAllToCopy
+              container-class="w-full"
+              class="overflow-hidden text-ellipsis"
+            />
+          </h1>
+          {#if workflowUsesVersioning}
+            <p class="flex items-center gap-1">
+              <span>{translate('workers.last-used-version')}</span
+              ><CompatibilityBadge
+                defaultVersion={buildId === defaultVersionForSet ||
+                  buildId === overallDefaultVersion}
+                active={buildId === overallDefaultVersion}
+                {buildId}
+              >
+                <svelte:fragment slot="overall-default-worker">
+                  {#if buildId === overallDefaultVersion}{translate(
+                      'workers.overall',
+                    )}{/if}
+                </svelte:fragment>
+                <svelte:fragment slot="default-worker">
+                  {translate('workers.default')}
+                </svelte:fragment>
+              </CompatibilityBadge>
+            </p>
+            <p class="flex items-center gap-1">
+              <span>{translate('workers.next-version')}</span
+              ><CompatibilityBadge
+                defaultVersion={!!defaultVersionForSet}
+                active={defaultVersionForSet === overallDefaultVersion}
+                buildId={defaultVersionForSet}
+              >
+                <svelte:fragment slot="overall-default-worker">
+                  {#if defaultVersionForSet === overallDefaultVersion}{translate(
+                      'workers.overall',
+                    )}{/if}
+                </svelte:fragment>
+                <svelte:fragment slot="default-worker">
+                  {translate('workers.default')}
+                </svelte:fragment>
+              </CompatibilityBadge>
+            </p>
+          {/if}
+        </div>
+      </div>
+      <div class="px-2">
+        <WorkflowActions
+          {isRunning}
+          {cancelInProgress}
+          {workflow}
+          {namespace}
         />
-      </h1>
-      <div class="flex flex-wrap items-center gap-4">
-        {#if workflowUsesVersioning}
-          <p class="flex items-center gap-1">
-            <span>{translate('workers.last-used-version')}</span
-            ><CompatibilityBadge
-              defaultVersion={buildId === defaultVersionForSet ||
-                buildId === overallDefaultVersion}
-              active={buildId === overallDefaultVersion}
-              {buildId}
-            >
-              <svelte:fragment slot="overall-default-worker">
-                {#if buildId === overallDefaultVersion}{translate(
-                    'workers.overall',
-                  )}{/if}
-              </svelte:fragment>
-              <svelte:fragment slot="default-worker">
-                {translate('workers.default')}
-              </svelte:fragment>
-            </CompatibilityBadge>
-          </p>
-          <p class="flex items-center gap-1">
-            <span>{translate('workers.next-version')}</span><CompatibilityBadge
-              defaultVersion={!!defaultVersionForSet}
-              active={defaultVersionForSet === overallDefaultVersion}
-              buildId={defaultVersionForSet}
-            >
-              <svelte:fragment slot="overall-default-worker">
-                {#if defaultVersionForSet === overallDefaultVersion}{translate(
-                    'workers.overall',
-                  )}{/if}
-              </svelte:fragment>
-              <svelte:fragment slot="default-worker">
-                {translate('workers.default')}
-              </svelte:fragment>
-            </CompatibilityBadge>
-          </p>
-        {/if}
       </div>
     </div>
-    <div
-      class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
-    >
-      <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
-    </div>
-  </div>
-  {#if cancelInProgress}
-    <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
-      <Alert
-        bold
-        icon="info"
-        intent="info"
-        title={translate('workflows.cancel-request-sent')}
+    <Tabs>
+      <TabList
+        class="surface-secondary flex flex-wrap gap-6 p-4"
+        label="workflow detail"
       >
-        {translate('workflows.cancel-request-sent-description')}
-      </Alert>
-    </div>
-  {/if}
-  {#if workflowHasBeenReset}
-    <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
-      <Alert
-        bold
-        icon="info"
-        intent="info"
-        data-testid="workflow-reset-alert"
-        title={translate('workflows.reset-success-alert-title')}
-      >
-        You can find the resulting Workflow Execution <Link
+        <Tab
+          label={translate('workflows.history-tab')}
+          id="history-tab"
           href={routeForEventHistory({
-            namespace,
-            workflow: $workflowRun?.workflow?.id,
-            run: $resetWorkflows[$workflowRun?.workflow?.runId],
-          })}>here</Link
-        >.
-      </Alert>
-    </div>
-  {/if}
-  <Tabs>
-    <TabList class="mb-2 flex flex-wrap gap-6" label="workflow detail">
-      <Tab
-        label={translate('workflows.history-tab')}
-        id="history-tab"
-        href={routeForEventHistory({
-          ...routeParameters,
-        })}
-        active={pathMatches(
-          $page.url.pathname,
-          routeForEventHistory({
             ...routeParameters,
-          }),
-        )}
-      >
-        <Badge type="ultraviolet" class="px-2 py-0"
-          >{workflow?.historyEvents}</Badge
+          })}
+          active={pathMatches(
+            $page.url.pathname,
+            routeForEventHistory({
+              ...routeParameters,
+            }),
+          )}
         >
-      </Tab>
-      <Tab
-        label={translate('workflows.workers-tab')}
-        id="workers-tab"
-        href={routeForWorkers(routeParameters)}
-        active={pathMatches(
-          $page.url.pathname,
-          routeForWorkers(routeParameters),
-        )}
-      >
-        <Badge type="ultraviolet" class="px-2 py-0"
-          >{workers?.pollers?.length}</Badge
+          <Badge type="blue" class="px-2 py-0">{workflow?.historyEvents}</Badge>
+        </Tab>
+        <Tab
+          label={translate('workflows.workers-tab')}
+          id="workers-tab"
+          href={routeForWorkers(routeParameters)}
+          active={pathMatches(
+            $page.url.pathname,
+            routeForWorkers(routeParameters),
+          )}
         >
-      </Tab>
-      <Tab
-        label={translate('workflows.relationships')}
-        id="relationships-tab"
-        href={routeForRelationships(routeParameters)}
-        active={pathMatches(
-          $page.url.pathname,
-          routeForRelationships(routeParameters),
-        )}
-      >
-        <Badge type="ultraviolet" class="px-2 py-0"
-          >{workflowRelationships.relationshipCount}</Badge
+          <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge
+          >
+        </Tab>
+        <Tab
+          label={translate('workflows.relationships')}
+          id="relationships-tab"
+          href={routeForRelationships(routeParameters)}
+          active={pathMatches(
+            $page.url.pathname,
+            routeForRelationships(routeParameters),
+          )}
         >
-      </Tab>
-      <Tab
-        label={translate('workflows.pending-activities-tab')}
-        id="pending-activities-tab"
-        href={routeForPendingActivities(routeParameters)}
-        active={pathMatches(
-          $page.url.pathname,
-          routeForPendingActivities(routeParameters),
-        )}
-      >
-        <Badge
-          type={activitiesCanceled ? 'warning' : 'ultraviolet'}
-          class="px-2 py-0"
+          <Badge type="blue" class="px-2 py-0"
+            >{workflowRelationships.relationshipCount}</Badge
+          >
+        </Tab>
+        {#if !$labsMode}
+          <Tab
+            label={translate('workflows.pending-activities-tab')}
+            id="pending-activities-tab"
+            href={routeForPendingActivities(routeParameters)}
+            active={pathMatches(
+              $page.url.pathname,
+              routeForPendingActivities(routeParameters),
+            )}
+          >
+            <Badge
+              type={activitiesCanceled ? 'warning' : 'blue'}
+              class="px-2 py-0"
+            >
+              {#if activitiesCanceled}<Icon
+                  name="canceled"
+                  width={20}
+                  height={20}
+                />
+              {/if}
+              {workflow?.pendingActivities?.length}
+            </Badge>
+          </Tab>
+        {/if}
+        <Tab
+          label={translate('workflows.call-stack-tab')}
+          id="call-stack-tab"
+          href={routeForCallStack(routeParameters)}
+          active={pathMatches(
+            $page.url.pathname,
+            routeForCallStack(routeParameters),
+          )}
+        />
+        <Tab
+          label={translate('workflows.queries-tab')}
+          id="queries-tab"
+          href={routeForWorkflowQuery(routeParameters)}
+          active={pathMatches(
+            $page.url.pathname,
+            routeForWorkflowQuery(routeParameters),
+          )}
+        />
+        <Tab
+          label={translate('workflows.metadata-tab')}
+          id="metadata-tab"
+          href={routeForWorkflowMetadata(routeParameters)}
+          active={pathMatches(
+            $page.url.pathname,
+            routeForWorkflowMetadata(routeParameters),
+          )}
+        />
+      </TabList>
+    </Tabs>
+
+    {#if cancelInProgress}
+      <div in:fly={{ duration: 200, delay: 100 }}>
+        <Alert
+          bold
+          icon="info"
+          intent="info"
+          title={translate('workflows.cancel-request-sent')}
         >
-          {#if activitiesCanceled}<Icon
-              name="canceled"
-              width={20}
-              height={20}
-            />
-          {/if}
-          {workflow?.pendingActivities?.length}
-        </Badge>
-      </Tab>
-      <Tab
-        label={translate('workflows.call-stack-tab')}
-        id="call-stack-tab"
-        href={routeForCallStack(routeParameters)}
-        active={pathMatches(
-          $page.url.pathname,
-          routeForCallStack(routeParameters),
-        )}
-      />
-      <Tab
-        label={translate('workflows.queries-tab')}
-        id="queries-tab"
-        href={routeForWorkflowQuery(routeParameters)}
-        active={pathMatches(
-          $page.url.pathname,
-          routeForWorkflowQuery(routeParameters),
-        )}
-      />
-    </TabList>
-  </Tabs>
-</header>
+          {translate('workflows.cancel-request-sent-description')}
+        </Alert>
+      </div>
+    {/if}
+    {#if workflowHasBeenReset}
+      <div in:fly={{ duration: 200, delay: 100 }}>
+        <Alert
+          bold
+          icon="info"
+          intent="info"
+          data-testid="workflow-reset-alert"
+          title={translate('workflows.reset-success-alert-title')}
+        >
+          You can find the resulting Workflow Execution <Link
+            href={routeForEventHistory({
+              namespace,
+              workflow: $workflowRun?.workflow?.id,
+              run: $resetWorkflows[$workflowRun?.workflow?.runId],
+            })}>here</Link
+          >.
+        </Alert>
+      </div>
+    {/if}
+  </header>
+</div>

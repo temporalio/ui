@@ -3,7 +3,6 @@
 
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import {
@@ -13,8 +12,6 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { routeForWorkers } from '$lib/utilities/route-for';
-
-  import PayloadDecoder from '../event/payload-decoder.svelte';
 
   $: ({ workflow } = $workflowRun);
   $: elapsedTime = formatDistanceAbbreviated({
@@ -100,22 +97,5 @@
         {/if}
       </div>
     </div>
-    {#if workflow?.searchAttributes}
-      <div class="mt-4 flex flex-col gap-2">
-        <h3 class="font-medium">{translate('common.search-attributes')}</h3>
-        <div class="h-0.5 rounded-full bg-inverse" />
-        <PayloadDecoder
-          value={{ searchAttributes: workflow.searchAttributes }}
-          key="searchAttributes"
-          let:decodedValue
-        >
-          <CodeBlock
-            content={decodedValue}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        </PayloadDecoder>
-      </div>
-    {/if}
   </Accordion>
 </section>

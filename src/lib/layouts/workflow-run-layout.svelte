@@ -26,8 +26,6 @@
   import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
-  import WorkflowHeaderV2 from './workflow-header-v2.svelte';
-
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   let workflowError: NetworkError;
   let eventHistoryController: AbortController;
@@ -149,14 +147,16 @@
 
 <LabsModeGuard>
   <div
-    class="surface-primary absolute bottom-0 left-0 right-0 top-0 flex h-full flex-col gap-0"
+    class="surface-secondary absolute bottom-0 left-0 right-0 top-0 flex h-full flex-col gap-0"
   >
     {#if workflowError}
       <WorkflowError error={workflowError} />
     {:else if !$workflowRun.workflow}
       <Loading />
     {:else}
-      <WorkflowHeaderV2 namespace={$page.params.namespace} />
+      <div class="px-8 pt-20">
+        <WorkflowHeader namespace={$page.params.namespace} />
+      </div>
       <slot />
     {/if}
   </div>
