@@ -37,20 +37,37 @@
 
   let queryResult: Promise<ParsedQuery>;
 
-  const query = (queryType: string) => {
+  const query = (queryType: string, queryArgs: string) => {
     queryResult = getQuery(
       {
         namespace,
         workflow: params,
         queryType,
+        queryArgs
       },
       $page.data?.settings,
       $authUser?.accessToken,
     );
   };
 
+  export let queryArgs = '';
+  export let queryArgsValid = true;
+  const handleQueryArgsChange = (event: CustomEvent<string>) => {
+    queryArgs = event.detail;
+    try {
+      if (queryArgs === '') {
+        queryArgsValid = true;
+        return;
+      }
+      JSON.parse(queryArgs);
+      queryArgsValid = true;
+    } catch (error) {
+      queryArgsValid = false;
+    }
+  };
+
   $: {
-    queryType && query(queryType);
+    queryType && queryArgsValid && query(queryType, queryArgs);
   }
 
   let jsonFormatting = true;
@@ -63,27 +80,42 @@
       <p>{translate('workflows.no-workers-failure-message')}</p>
     </div>
   {:then types}
-    <div class="flex justify-between">
-      <div class="flex items-center gap-4">
-        <Select
-          id="query-select"
-          label={translate('workflows.query-type')}
-          bind:value={queryType}
-          data-testid="query-select"
-        >
-          {#each types as value}
-            <Option {value}>{value}</Option>
-          {/each}
-        </Select>
-        <Button
-          on:click={() => query(queryType)}
-          leadingIcon="retry"
-          loading={isLoading}
-        >
-          {translate('common.refresh')}
-        </Button>
+    <div class="flex justify-between items-end gap">
+      <div class="flex items-start gap-8">
+        <div class="flex flex-col gap-1">
+          <label for="query-select">
+            {translate('workflows.query-type')}
+          </label>
+          <div class="flex items-center h-14">
+          <Select
+            id="query-select"
+            bind:value={queryType}
+            data-testid="query-select"
+          >
+            {#each types as value}
+              <Option {value}>{value}</Option>
+            {/each}
+          </Select>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label for="query-args">
+            {translate('workflows.query-args')}
+          </label>
+        <div class={`border-4 rounded-2xl min-w-96 ${queryArgsValid ? 'border-transparent' : 'border-red-700'}`}
+             class:text-red-700={!queryArgsValid}>
+          <CodeBlock
+            editable
+            inline={false}
+            content={queryArgs}
+            copyable={false}
+            on:change={handleQueryArgsChange}
+          />
+        </div>
+        </div>
       </div>
-      <div class="flex justify-end">
+      <div class="flex justify-end items-center gap-8">
         <ToggleSwitch
           label={translate('workflows.json-formatting')}
           labelPosition="left"
@@ -91,9 +123,26 @@
           checked={jsonFormatting}
           on:change={() => (jsonFormatting = !jsonFormatting)}
         />
+        <Button
+          on:click={() => query(queryType, queryArgs)}
+          leadingIcon="retry"
+          loading={isLoading}
+        >
+          {translate('common.refresh')}
+        </Button>
+
       </div>
     </div>
-    <div class="my-2 flex h-full items-start">
+
+    {#if !queryArgsValid}
+      <div class="mt-4">
+        <EmptyState
+          title={translate('workflows.invalid-query-args')}
+          content={translate('workflows.invalid-query-args-message')}
+        />
+      </div>
+      {:else}
+    <div class="my-4 flex h-full items-start">
       {#await queryResult then result}
         {@const content =
           typeof result !== 'string' ? stringifyWithBigInt(result) : result}
@@ -105,7 +154,8 @@
         />
       {/await}
     </div>
-  {:catch _error}
+    {/if}
+{:catch _error}
     <EmptyState
       title={translate('common.error-occurred')}
       content={translate('workflows.no-workers-running-message')}
