@@ -14,9 +14,8 @@
 
   import {
     DetailsChildTimelineHeight,
+    DetailsConfig,
     getDetailsBoxHeight,
-    type GraphConfig,
-    type GraphView,
     mergeEventGroupDetails,
     staticCodeBlockHeight,
   } from '../constants';
@@ -30,10 +29,8 @@
   export let event: WorkflowEvent | undefined = undefined;
   export let canvasWidth: number;
   export let y: number;
-  export let config: GraphConfig;
-  export let view: GraphView;
 
-  const { radius, fontSizeRatio } = config;
+  const { gutter, fontSizeRatio } = DetailsConfig;
   $: ({ namespace } = $page.params);
 
   let fetchChildWorkflow;
@@ -71,13 +68,12 @@
     }
   };
 
-  const startingX = 24;
   const labelPadding = 240;
   $: groupOrEvent = group ?? event;
-  $: boxHeight = getDetailsBoxHeight(groupOrEvent, fontSizeRatio);
+  $: boxHeight = getDetailsBoxHeight(groupOrEvent);
   $: textStartingY = fetchChildTimeline
-    ? y + radius + DetailsChildTimelineHeight
-    : y + 3 * radius;
+    ? y + gutter + DetailsChildTimelineHeight
+    : y + gutter;
   $: attributes = mergeEventGroupDetails(groupOrEvent);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
@@ -93,12 +89,7 @@
   class="relative cursor-pointer"
   height={boxHeight}
 >
-  <Box
-    point={[0, y + radius]}
-    width={canvasWidth}
-    height={boxHeight}
-    fill="#1E293B"
-  />
+  <Box point={[0, y]} width={canvasWidth} height={boxHeight} fill="#465A78" />
   {#if fetchChildWorkflow && fetchChildTimeline}
     {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [{ workflow }, childHistory]}
       {@const groups = groupEvents(
@@ -108,7 +99,7 @@
       )}
       <TimelineGraph
         x={0}
-        y={y + radius}
+        y={y + gutter}
         staticHeight={DetailsChildTimelineHeight}
         {workflow}
         history={childHistory}
@@ -118,41 +109,37 @@
     {/await}
   {/if}
   {#each codeBlockAttributes as [key, value], index (key)}
-    <Text point={[startingX, textStartingY + index * staticCodeBlockHeight]}
-      >{format(key)}</Text
-    >
+    {@const gridIndex = Math.floor(index / 2)}
+    {@const x = gutter + (index % 2) * (canvasWidth / 2)}
+    {@const y = textStartingY + gridIndex * staticCodeBlockHeight}
+    <Text point={[x, y]}>{format(key)}</Text>
     <GroupDetailsText
-      point={[
-        startingX + labelPadding,
-        textStartingY + index * staticCodeBlockHeight,
-      ]}
+      point={[x, y + 1.5 * fontSizeRatio]}
       {key}
       {value}
       {attributes}
-      {config}
       {canvasWidth}
     />
   {/each}
   {#each textAttributes as [key, value], index (key)}
     <Text
       point={[
-        startingX,
+        gutter,
         textStartingY +
-          staticCodeBlockHeight * codeBlockAttributes.length +
+          staticCodeBlockHeight * Math.ceil(codeBlockAttributes.length / 2) +
           (index + 1) * fontSizeRatio,
       ]}>{format(key)}</Text
     >
     <GroupDetailsText
       point={[
-        startingX + labelPadding,
+        gutter + labelPadding,
         textStartingY +
-          staticCodeBlockHeight * codeBlockAttributes.length +
+          staticCodeBlockHeight * Math.ceil(codeBlockAttributes.length / 2) +
           (index + 1) * fontSizeRatio,
       ]}
       {key}
       {value}
       {attributes}
-      {config}
       {canvasWidth}
     />
   {/each}

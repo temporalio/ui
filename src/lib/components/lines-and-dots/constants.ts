@@ -54,6 +54,13 @@ export const HistoryConfig: GraphConfig = {
   fontSizeRatio: baseRadius * 3,
 };
 
+export const DetailsConfig: GraphConfig = {
+  height: baseRadius * 4,
+  gutter: baseRadius * 3,
+  radius: baseRadius,
+  fontSizeRatio: baseRadius * 3,
+};
+
 export const CategoryIcon: Record<EventTypeCategory, IconName> = {
   workflow: 'workflow',
   signal: 'signal',
@@ -194,14 +201,13 @@ export const activeEventsHeightAboveGroup = (
   event: WorkflowEvent,
   history: WorkflowEvents,
   groups: EventGroups,
-  height: number,
 ) => {
   return activeEvents
     .filter((id) => parseInt(id) < parseInt(event.id))
     .map((id) => {
       const group = groups.find((group) => group.eventIds.has(id));
       const event = history.find((event) => event.id === id);
-      return getDetailsBoxHeight(group ?? event, height);
+      return getDetailsBoxHeight(group ?? event);
     })
     .reduce((acc, height) => acc + height, 0);
 };
@@ -213,7 +219,6 @@ export const getNextDistanceAndOffset = (
   groups: EventGroups,
   activeEvents: string[],
   height: number,
-  fontSizeRatio: number,
 ): { nextDistance: number; offset: number; y: number } => {
   const group = groups.find((g) => g.eventIds.has(event.id));
   const activeEventsAbove = activeEventsHeightAboveGroup(
@@ -221,7 +226,6 @@ export const getNextDistanceAndOffset = (
     event,
     history,
     groups,
-    fontSizeRatio,
   );
   let y = index * height + height / 2 + activeEventsAbove;
   let nextDistance = 0;
@@ -291,7 +295,6 @@ export const activeRowsHeightAboveGroup = (
   activeGroups: string[],
   groupIndex: number,
   timeGroups: EventGroups[],
-  height: number,
 ) => {
   let activeRowsHeight = 0;
   activeGroups.forEach((id) => {
@@ -301,7 +304,7 @@ export const activeRowsHeightAboveGroup = (
     const activeGroup = activeTimeGroup.find((g) => g.id === id);
     const activeRowIndex = activeTimeGroup.indexOf(activeGroup);
     if (activeRowIndex < groupIndex) {
-      activeRowsHeight += getDetailsBoxHeight(activeGroup, height);
+      activeRowsHeight += getDetailsBoxHeight(activeGroup);
     }
   });
 
@@ -312,7 +315,6 @@ export const activeGroupsHeightAboveGroup = (
   activeGroups: string[],
   group: EventGroup,
   groups: EventGroups,
-  height: number,
 ) => {
   return activeGroups
     .filter((id) => {
@@ -320,7 +322,7 @@ export const activeGroupsHeightAboveGroup = (
     })
     .map((id) => {
       const group = groups.find((group) => group.id === id);
-      return getDetailsBoxHeight(group, height);
+      return getDetailsBoxHeight(group);
     })
     .reduce((acc, height) => acc + height, 0);
 };
@@ -347,7 +349,6 @@ export const staticCodeBlockHeight = 160;
 
 export const getEventDetailsHeight = (
   groupOrEvent: EventGroup | WorkflowEvent,
-  height: number,
 ) => {
   const attributes = mergeEventGroupDetails(groupOrEvent);
   const codeBlockAttributes = Object.entries(attributes).filter(
@@ -357,17 +358,16 @@ export const getEventDetailsHeight = (
     ([, value]) => typeof value !== 'object',
   );
   return (
-    codeBlockAttributes.length * staticCodeBlockHeight +
-    textAttributes.length * height +
-    3 * height
+    Math.ceil(codeBlockAttributes.length / 2) * staticCodeBlockHeight +
+    textAttributes.length * DetailsConfig.fontSizeRatio +
+    2 * DetailsConfig.fontSizeRatio
   );
 };
 
 export const getDetailsBoxHeight = (
   groupOrEvent: EventGroup | WorkflowEvent,
-  height: number,
 ) => {
-  const detailsHeight = getEventDetailsHeight(groupOrEvent, height);
+  const detailsHeight = getEventDetailsHeight(groupOrEvent);
   return groupOrEvent.category === 'child-workflow'
     ? DetailsChildTimelineHeight + detailsHeight
     : detailsHeight;

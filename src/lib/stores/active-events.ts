@@ -29,6 +29,26 @@ export const setSingleActiveGroup = (group: EventGroup) => {
   }
 };
 
+export const setActiveEvent = (event: WorkflowEvent, group: EventGroup) => {
+  activeGroups.set([]);
+
+  if (!get(activeEvents).includes(event.id)) {
+    const activeEventInGroup = get(activeEvents).find((id) =>
+      group.eventIds.has(id),
+    );
+    if (activeEventInGroup) {
+      activeEvents.set([
+        ...get(activeEvents).filter((id) => id !== activeEventInGroup),
+        event.id,
+      ]);
+    } else {
+      activeEvents.set([...get(activeEvents), event.id]);
+    }
+  } else {
+    activeEvents.set(get(activeEvents).filter((id) => id !== event.id));
+  }
+};
+
 export const setActiveGroupAndEvent = (
   group: EventGroup,
   event: WorkflowEvent,

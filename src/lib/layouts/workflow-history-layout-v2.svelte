@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { beforeNavigate } from '$app/navigation';
   import { page } from '$app/stores';
 
   import type { GraphView } from '$lib/components/lines-and-dots/constants';
@@ -16,18 +17,11 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
-  import {
-    activeEvents,
-    activeGroups,
-    clearActives,
-    setActiveGroup,
-    setActiveGroupAndEvent,
-    setSingleActiveGroup,
-  } from '$lib/stores/active-events';
+  import { clearActives } from '$lib/stores/active-events';
   import {
     decodeEventHistory,
     filteredEventHistory,
-    // fullEventHistory,
+    fullEventHistory,
   } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
@@ -50,7 +44,12 @@
   //   $fullEventHistory,
   //   'ascending',
   // );
-  $: workflow, view, clearActives();
+
+  $: view, clearActives();
+
+  beforeNavigate(() => {
+    clearActives();
+  });
 
   let canvasWidth = 0;
   let showDownloadPrompt = false;
@@ -136,33 +135,21 @@
 <div class="bg-inverse">
   <div class="w-full overflow-x-hidden" bind:clientWidth={canvasWidth}>
     {#if view === 'compact'}
-      <CompactGraph
-        {workflow}
-        {groups}
-        activeGroups={$activeGroups}
-        {zoomLevel}
-        {canvasWidth}
-        onClick={setSingleActiveGroup}
-      />
+      <CompactGraph {workflow} {groups} {zoomLevel} {canvasWidth} />
     {:else if view === 'timeline'}
       <TimelineGraph
         {workflow}
-        history={$filteredEventHistory}
+        history={$fullEventHistory}
         {groups}
-        activeGroups={$activeGroups}
         {zoomLevel}
         {canvasWidth}
-        onClick={setActiveGroup}
       />
     {:else}
       <HistoryGraph
-        history={$filteredEventHistory}
+        history={$fullEventHistory}
         {groups}
-        activeGroups={$activeGroups}
-        activeEvents={$activeEvents}
         {zoomLevel}
         {canvasWidth}
-        onClick={setActiveGroupAndEvent}
       />
     {/if}
   </div>

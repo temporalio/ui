@@ -27,7 +27,7 @@
 
 <style lang="postcss">
   text {
-    fill: #1d64d8;
+    fill: #93bbfd;
     font-weight: 400;
     opacity: 1;
     stroke: none;

@@ -16,7 +16,7 @@
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
 
-  import { type GraphConfig, staticCodeBlockHeight } from '../constants';
+  import { DetailsConfig, staticCodeBlockHeight } from '../constants';
 
   import TextLink from './text-link.svelte';
   import Text from './text.svelte';
@@ -27,10 +27,9 @@
   export let value: string | Record<string, unknown>;
   export let attributes: CombinedAttributes;
   export let point: [number, number] = [0, 0];
-  export let config: GraphConfig;
   export let canvasWidth: number;
 
-  const { fontSizeRatio } = config;
+  const { fontSizeRatio, gutter } = DetailsConfig;
 
   $: [x, y] = point;
   $: codeBlockValue = getCodeBlockValue(value);
@@ -44,8 +43,8 @@
         <foreignObject
           {x}
           y={y - fontSizeRatio}
-          width={canvasWidth - 280}
-          height={staticCodeBlockHeight}
+          width={canvasWidth / 2 - 2 * gutter}
+          height={staticCodeBlockHeight - 2 * fontSizeRatio}
         >
           <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">
             <CodeBlock content={decodedValue} />
@@ -66,7 +65,7 @@
         <foreignObject
           {x}
           y={y - fontSizeRatio}
-          width={canvasWidth - 280}
+          width={canvasWidth / 2}
           height={staticCodeBlockHeight}
         >
           <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">

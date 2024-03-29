@@ -1,8 +1,6 @@
 <script lang="ts">
-  import type {
-    EventGroup,
-    EventGroups,
-  } from '$lib/models/event-groups/event-groups';
+  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import { activeGroups } from '$lib/stores/active-events';
   import type { WorkflowEvents } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
@@ -25,20 +23,17 @@
   export let workflow: WorkflowExecution;
   export let history: WorkflowEvents;
   export let groups: EventGroups;
-
-  export let activeGroups: string[] = [];
   export let zoomLevel: number = 1;
   export let canvasWidth: number;
-  export let onClick: (group: EventGroup) => void | undefined = undefined;
 
-  const { height, gutter, radius, fontSizeRatio } = TimelineConfig;
+  const { height, gutter, radius } = TimelineConfig;
 
   $: startTime = history[0]?.eventTime || workflow.startTime;
-  $: activeDetailsHeight = activeGroups
+  $: activeDetailsHeight = $activeGroups
     .map((id) => {
       const group = groups.find((group) => group.id === id);
       if (!group) return 0;
-      return getDetailsBoxHeight(group, fontSizeRatio);
+      return getDetailsBoxHeight(group);
     })
     .reduce((acc, height) => acc + height, 0);
 
@@ -76,29 +71,10 @@
     {#each groups as group, index (group.id)}
       {@const y =
         (index + 1) * height +
-        activeGroupsHeightAboveGroup(
-          activeGroups,
-          group,
-          groups,
-          fontSizeRatio,
-        )}
-      <TimelineGraphRow
-        {y}
-        {group}
-        {activeGroups}
-        {canvasWidth}
-        {startTime}
-        {endTime}
-        onClick={() => onClick && onClick(group)}
-      />
-      {#if activeGroups.includes(group.id)}
-        <GroupDetailsRow
-          {y}
-          {group}
-          {canvasWidth}
-          config={TimelineConfig}
-          view="timeline"
-        />
+        activeGroupsHeightAboveGroup($activeGroups, group, groups)}
+      <TimelineGraphRow {y} {group} {canvasWidth} {startTime} {endTime} />
+      {#if $activeGroups.includes(group.id)}
+        <GroupDetailsRow y={y + radius} {group} {canvasWidth} />
       {/if}
     {/each}
   </svg>

@@ -4,6 +4,7 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
+  import { activeEvents, setActiveEvent } from '$lib/stores/active-events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
@@ -23,25 +24,22 @@
   export let group: EventGroup;
   export let history: WorkflowEvents;
   export let groups: EventGroups;
-  export let activeEvents: string[];
 
   export let canvasWidth: number;
   export let startingX: number;
   export let active = false;
-  export let onClick: (x: WorkflowEvent) => void;
   export let index: number;
   export let zoomLevel: number = 1;
 
-  const { height, radius, fontSizeRatio } = HistoryConfig;
+  const { height, radius } = HistoryConfig;
 
   $: ({ nextDistance, offset, y } = getNextDistanceAndOffset(
     history,
     event,
     index,
     groups,
-    activeEvents,
+    $activeEvents,
     height,
-    fontSizeRatio,
   ));
 
   $: showTimestamp = canvasWidth > 1200;
@@ -56,8 +54,8 @@
 <g
   role="button"
   tabindex="0"
-  on:click|preventDefault={() => onClick(event)}
-  on:keypress={() => onClick(event)}
+  on:click|preventDefault={() => setActiveEvent(event, group)}
+  on:keypress={() => setActiveEvent(event, group)}
   class="relative cursor-pointer"
 >
   <Box

@@ -4,6 +4,7 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
+  import { activeEvents, activeGroups } from '$lib/stores/active-events';
   import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
 
   import {
@@ -18,31 +19,31 @@
 
   export let history: WorkflowEvents;
   export let groups: EventGroups;
-  export let activeEvents: string[] = [];
-  export let activeGroups: string[] = [];
   export let canvasWidth: number;
   export let zoomLevel: number = 1;
-  export let onClick: (group: EventGroup, event: WorkflowEvent) => void;
 
   $: workflowTaskGroups = groupWorkflowTaskEvents(history);
   $: allGroups = [...workflowTaskGroups, ...groups];
 
-  const { height, fontSizeRatio, radius } = HistoryConfig;
+  const { height, radius } = HistoryConfig;
 
   $: isActive = (groupOrEvent: EventGroup | WorkflowEvent): boolean => {
-    if (!activeEvents.length && !activeGroups.length) return true;
-    if (activeGroups.length) {
-      return activeGroups.includes(groupOrEvent?.id);
-    } else if (activeEvents.length) {
-      return activeEvents.includes(groupOrEvent?.id);
+    if (!$activeEvents.length && !$activeGroups.length) return true;
+    if ($activeGroups.length) {
+      return $activeGroups.includes(groupOrEvent?.id);
+    } else if ($activeEvents.length) {
+      return $activeEvents.includes(groupOrEvent?.id);
     }
   };
 
-  $: activeDetailsHeight = activeEvents
+  $: activeDetailsHeight = $activeEvents
     .map((id) => {
-      const group = allGroups.find((group) => group.id === id);
+      const group = allGroups.find((group) => group.eventIds.has(id));
+      if (group) {
+        return getDetailsBoxHeight(group);
+      }
       const event = history.find((event) => event.id === id);
-      return getDetailsBoxHeight(group ?? event, fontSizeRatio);
+      return getDetailsBoxHeight(event);
     })
     .reduce((acc, height) => acc + height, 0);
 
@@ -81,32 +82,22 @@
       {group}
       groups={allGroups}
       {history}
-      {activeEvents}
       canvasWidth={canvasWidth * zoomLevel}
       {startingX}
       {zoomLevel}
       active={isActive(group || event)}
-      onClick={() => onClick(group, event)}
       {index}
     />
-    {#if activeEvents.includes(event.id)}
-      <GroupDetailsRow
-        y={getNextDistanceAndOffset(
-          history,
-          event,
-          index,
-          allGroups,
-          activeEvents,
-          height,
-          fontSizeRatio,
-        ).y +
-          radius / 2}
-        {group}
-        {event}
-        {canvasWidth}
-        view="history"
-        config={HistoryConfig}
-      />
+    {#if $activeEvents.includes(event.id)}
+      {@const { y } = getNextDistanceAndOffset(
+        history,
+        event,
+        index,
+        allGroups,
+        $activeEvents,
+        height,
+      )}
+      <GroupDetailsRow y={y + radius} {group} {event} {canvasWidth} />
     {/if}
   {/each}
   <!-- {#each pendingActivities as pendingActivity, index}
