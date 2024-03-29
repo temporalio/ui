@@ -118,11 +118,17 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px];
+    @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px] text-primary;
   }
 
   .checkbox.hoverable:hover .checkmark::before {
-    @apply absolute -left-2.5 -z-10 h-9 w-9 self-center bg-interactive/20 content-[''];
+    @apply absolute -left-2.5 -z-10 h-9 w-9 self-center content-[''];
+  }
+
+  .checkbox.checked .checkmark {
+    &::after {
+      @apply bg-pink;
+    }
   }
 
   .label {
@@ -137,8 +143,12 @@
     @apply outline outline-interactive;
   }
 
+  input:checked ~ .checkmark {
+    @apply border-interactive bg-interactive;
+  }
+
   .checkmark {
-    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-md border-2 border-secondary bg-white dark:bg-transparent;
+    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-md border border-subtle bg-transparent text-white hover:border-2 hover:border-white/30 hover:bg-interactive  hover:shadow-[inset_0_0_0_1.5px] hover:shadow-white hover:dark:border-black/30 hover:dark:shadow-black;
 
     &.invalid {
       @apply border-danger;
