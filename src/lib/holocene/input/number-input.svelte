@@ -84,7 +84,7 @@
   }
 
   .units {
-    @apply font-secondary text-sm font-medium;
+    @apply font-secondary text-sm font-medium text-primary;
   }
 
   .input-container {
