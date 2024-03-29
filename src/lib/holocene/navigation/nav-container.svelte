@@ -22,7 +22,7 @@
   data-testid="navigation-header"
   {...$$restProps}
 >
-  <div class="relative h-32 min-h-[84px]">
+  <div class="surface-inverse relative h-32 min-h-[84px]">
     <a
       href={linkList.home}
       class="absolute block"
@@ -67,11 +67,7 @@
       </ul>
     </div>
   </div>
-  <div
-    class="h-4 w-full pb-12 pt-24 text-center text-[10px] {isCloud
-      ? 'text-slate-500'
-      : 'text-slate-300'}"
-  >
+  <div class="surface-inverse h-4 w-full pb-12 pt-24 text-center text-[10px]">
     {#if version}
       <span class="sr-only">{translate('common.version')}</span>
     {/if}
@@ -82,15 +78,15 @@
 
 <style lang="postcss">
   .nav-header {
-    @apply relative flex h-screen flex-col justify-between bg-primary text-white;
+    @apply relative flex h-screen flex-col justify-between bg-primary;
   }
 
   .nav-header.cloud {
-    @apply surface-primary text-primary;
+    @apply surface-inverse;
   }
 
   .nav-wrapper {
-    @apply flex w-16 grow flex-col items-center justify-between;
+    @apply surface-inverse flex w-16 grow flex-col items-center justify-between;
   }
 
   .nav-wrapper.open {
@@ -98,15 +94,15 @@
   }
 
   .nav-section-wrapper {
-    @apply flex w-full flex-col;
+    @apply surface-inverse flex w-full flex-col;
   }
 
   .nav-section {
-    @apply flex flex-col gap-2 px-3;
+    @apply surface-inverse flex flex-col gap-2 px-3;
   }
 
   .cloud {
-    @apply surface-primary text-primary;
+    @apply surface-inverse;
   }
 
   .close :global(.nav-title) {
