@@ -50,7 +50,7 @@
         </span>
       {/if}
       <input
-        class="surface-primary m-2 block w-full text-center focus:outline-none"
+        class="m-2 block w-full bg-transparent text-center text-primary focus:outline-none"
         class:disabled
         type="number"
         {max}
@@ -84,7 +84,7 @@
   }
 
   .units {
-    @apply font-secondary text-sm font-medium text-primary;
+    @apply font-secondary text-sm font-medium;
   }
 
   .input-container {
@@ -97,14 +97,10 @@
     input {
       @apply text-left;
     }
-
-    input::-webkit-inner-spin-button {
-      @apply bg-pink;
-    }
   }
 
   .icon-container {
-    @apply ml-2 flex items-center justify-center bg-pink text-primary;
+    @apply ml-2 flex items-center justify-center;
   }
 
   .copy-icon-container {
@@ -116,12 +112,7 @@
   }
 
   .count {
-    @apply invisible mr-2 font-secondary text-sm font-medium text-primary;
-  }
-
-  .input-container .icon-container,
-  .input-container input {
-    @apply surface-primary;
+    @apply invisible mr-2 font-secondary text-sm font-medium;
   }
 
   .input-container .icon-container {
