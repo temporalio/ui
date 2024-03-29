@@ -95,7 +95,7 @@
         activeEvents,
         height,
       )}
-      <GroupDetailsRow y={y + radius} {group} {event} {canvasWidth} />
+      <GroupDetailsRow y={y + 2 * radius} {group} {event} {canvasWidth} />
     {/if}
   {/each}
   <!-- {#each pendingActivities as pendingActivity, index}

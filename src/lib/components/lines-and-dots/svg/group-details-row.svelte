@@ -82,12 +82,7 @@
   );
 </script>
 
-<g
-  role="button"
-  tabindex="0"
-  class="relative cursor-pointer"
-  height={boxHeight}
->
+<g role="button" tabindex="0" class="relative cursor-pointer">
   <Box point={[0, y]} width={canvasWidth} height={boxHeight} fill="#465A78" />
   {#each codeBlockAttributes as [key, value], index (key)}
     {@const gridIndex = Math.floor(index / 2)}
@@ -131,12 +126,6 @@
         'ascending',
         workflow?.pendingActivities,
       )}
-      <!-- <Box
-        point={[0, childTimelineY]}
-        width={canvasWidth}
-        height={DetailsChildTimelineHeight}
-        fill="#0F172A"
-      /> -->
       <TimelineGraph
         x={0}
         y={childTimelineY}

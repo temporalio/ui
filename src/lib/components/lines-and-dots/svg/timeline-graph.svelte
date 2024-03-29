@@ -82,7 +82,7 @@
         {endTime}
       />
       {#if activeGroups.includes(group.id)}
-        <GroupDetailsRow y={y + radius} {group} {canvasWidth} />
+        <GroupDetailsRow y={y + 1.33 * radius} {group} {canvasWidth} />
       {/if}
     {/each}
   </svg>

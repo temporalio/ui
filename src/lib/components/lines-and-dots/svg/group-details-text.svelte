@@ -33,6 +33,7 @@
 
   $: [x, y] = point;
   $: codeBlockValue = getCodeBlockValue(value);
+  $: width = canvasWidth / 2 - 2 * gutter;
   // $: stackTrace = getStackTrace(codeBlockValue);
 </script>
 
@@ -43,7 +44,7 @@
         <foreignObject
           {x}
           y={y - fontSizeRatio}
-          width={canvasWidth / 2 - 2 * gutter}
+          {width}
           height={staticCodeBlockHeight - 2 * fontSizeRatio}
         >
           <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">
@@ -65,7 +66,7 @@
         <foreignObject
           {x}
           y={y - fontSizeRatio}
-          width={canvasWidth / 2}
+          {width}
           height={staticCodeBlockHeight}
         >
           <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">
@@ -84,7 +85,7 @@
         <foreignObject
           {x}
           y={y - fontSizeRatio}
-          width={canvasWidth - 320}
+          {width}
           height={staticCodeBlockHeight}
         >
           <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">

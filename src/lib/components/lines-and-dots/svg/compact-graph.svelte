@@ -164,7 +164,11 @@
       {/if}
     {/each}
     {#if activeGroup}
-      <GroupDetailsRow group={activeGroup} {canvasWidth} y={activeY + radius} />
+      <GroupDetailsRow
+        group={activeGroup}
+        {canvasWidth}
+        y={activeY + 1.25 * radius}
+      />
     {/if}
   {:else}
     <WorkflowRow {workflow} y={height} length={canvasWidth} active />
