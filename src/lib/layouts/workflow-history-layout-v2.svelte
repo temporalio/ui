@@ -17,7 +17,11 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
-  import { clearActives } from '$lib/stores/active-events';
+  import {
+    activeEvents,
+    activeGroups,
+    clearActives,
+  } from '$lib/stores/active-events';
   import {
     decodeEventHistory,
     filteredEventHistory,
@@ -135,12 +139,19 @@
 <div class="bg-inverse">
   <div class="w-full overflow-x-hidden" bind:clientWidth={canvasWidth}>
     {#if view === 'compact'}
-      <CompactGraph {workflow} {groups} {zoomLevel} {canvasWidth} />
+      <CompactGraph
+        {workflow}
+        {groups}
+        {zoomLevel}
+        {canvasWidth}
+        activeGroups={$activeGroups}
+      />
     {:else if view === 'timeline'}
       <TimelineGraph
         {workflow}
         history={$fullEventHistory}
         {groups}
+        activeGroups={$activeGroups}
         {zoomLevel}
         {canvasWidth}
       />
@@ -148,6 +159,7 @@
       <HistoryGraph
         history={$fullEventHistory}
         {groups}
+        activeEvents={$activeEvents}
         {zoomLevel}
         {canvasWidth}
       />

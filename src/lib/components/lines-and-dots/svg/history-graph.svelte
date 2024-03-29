@@ -4,7 +4,6 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
-  import { activeEvents, activeGroups } from '$lib/stores/active-events';
   import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
 
   import {
@@ -19,6 +18,7 @@
 
   export let history: WorkflowEvents;
   export let groups: EventGroups;
+  export let activeEvents: string[] = [];
   export let canvasWidth: number;
   export let zoomLevel: number = 1;
 
@@ -28,15 +28,13 @@
   const { height, radius } = HistoryConfig;
 
   $: isActive = (groupOrEvent: EventGroup | WorkflowEvent): boolean => {
-    if (!$activeEvents.length && !$activeGroups.length) return true;
-    if ($activeGroups.length) {
-      return $activeGroups.includes(groupOrEvent?.id);
-    } else if ($activeEvents.length) {
-      return $activeEvents.includes(groupOrEvent?.id);
+    if (activeEvents.length) {
+      return activeEvents.includes(groupOrEvent?.id);
     }
+    return true;
   };
 
-  $: activeDetailsHeight = $activeEvents
+  $: activeDetailsHeight = activeEvents
     .map((id) => {
       const group = allGroups.find((group) => group.eventIds.has(id));
       if (group) {
@@ -88,13 +86,13 @@
       active={isActive(group || event)}
       {index}
     />
-    {#if $activeEvents.includes(event.id)}
+    {#if activeEvents.includes(event.id)}
       {@const { y } = getNextDistanceAndOffset(
         history,
         event,
         index,
         allGroups,
-        $activeEvents,
+        activeEvents,
         height,
       )}
       <GroupDetailsRow y={y + radius} {group} {event} {canvasWidth} />

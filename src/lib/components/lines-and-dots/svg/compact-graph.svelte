@@ -5,10 +5,7 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
-  import {
-    activeGroups,
-    setSingleActiveGroup,
-  } from '$lib/stores/active-events';
+  import { setSingleActiveGroup } from '$lib/stores/active-events';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   import { CompactConfig, getDetailsBoxHeight } from '../constants';
@@ -23,20 +20,19 @@
 
   export let workflow: WorkflowExecution;
   export let groups: EventGroups;
+  export let activeGroups: string[] = [];
   export let zoomLevel: number = 1;
   export let canvasWidth: number;
-
-  export let onClick: (group: EventGroup) => void | undefined = undefined;
 
   const { height, gutter, radius } = CompactConfig;
   let exandedGroups = [];
   let activeY = 0;
 
   $: activeGroup =
-    $activeGroups[0] && groups.find((group) => group.id === $activeGroups[0]);
+    activeGroups[0] && groups.find((group) => group.id === activeGroups[0]);
 
   $: isActive = (group: EventGroup): boolean => {
-    if (!$activeGroups.length) return true;
+    if (!activeGroups.length) return true;
     return activeGroup.id === group.id;
   };
 
@@ -69,7 +65,7 @@
     return Math.max(...groupHeights);
   };
 
-  $: activeDetailsHeight = $activeGroups
+  $: activeDetailsHeight = activeGroups
     .map((id) => {
       const group = groups.find((group) => group.id === id);
       return getDetailsBoxHeight(group);
@@ -81,14 +77,14 @@
 
   const onRowClick = (groups: EventGroups, startIndex: number, y: number) => {
     if (groups.length === 1) {
-      onClick(groups[0]);
+      setSingleActiveGroup(groups[0]);
       activeY = y;
     } else {
       const name = groupNameWithIndex(groups[0].name, startIndex);
       if (exandedGroups.includes(name)) {
         exandedGroups = exandedGroups.filter((n) => n !== name);
-        if ($activeGroups.includes(groups[0].id)) {
-          onClick(groups[0]);
+        if (activeGroups.includes(groups[0].id)) {
+          setSingleActiveGroup(groups[0]);
           activeY = y;
         }
       } else {

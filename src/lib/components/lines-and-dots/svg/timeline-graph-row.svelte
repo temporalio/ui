@@ -3,7 +3,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import { activeGroups, setActiveGroup } from '$lib/stores/active-events';
+  import { setActiveGroup } from '$lib/stores/active-events';
   import {
     formatDistanceAbbreviated,
     getMillisecondDuration,
@@ -22,6 +22,7 @@
 
   export let y = 0;
   export let group: EventGroup;
+  export let activeGroups: string[] = [];
   export let startTime: string | Timestamp;
   export let endTime: string | Date;
   export let canvasWidth: number;
@@ -31,7 +32,7 @@
 
   $: timelineWidth = canvasWidth - 2 * gutter;
   $: isPending = isPendingGroup(group);
-  $: active = !$activeGroups.length || $activeGroups.includes(group.id);
+  $: active = !activeGroups.length || activeGroups.includes(group.id);
 
   const getDistancePointsAndPositions = (
     endTime: string | Date,

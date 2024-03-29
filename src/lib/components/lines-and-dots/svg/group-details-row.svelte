@@ -71,9 +71,8 @@
   const labelPadding = 240;
   $: groupOrEvent = group ?? event;
   $: boxHeight = getDetailsBoxHeight(groupOrEvent);
-  $: textStartingY = fetchChildTimeline
-    ? y + gutter + DetailsChildTimelineHeight
-    : y + gutter;
+  $: textStartingY = y + gutter;
+  $: childTimelineY = y + boxHeight - DetailsChildTimelineHeight;
   $: attributes = mergeEventGroupDetails(groupOrEvent);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
@@ -90,24 +89,6 @@
   height={boxHeight}
 >
   <Box point={[0, y]} width={canvasWidth} height={boxHeight} fill="#465A78" />
-  {#if fetchChildWorkflow && fetchChildTimeline}
-    {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [{ workflow }, childHistory]}
-      {@const groups = groupEvents(
-        childHistory,
-        'ascending',
-        workflow?.pendingActivities,
-      )}
-      <TimelineGraph
-        x={0}
-        y={y + gutter}
-        staticHeight={DetailsChildTimelineHeight}
-        {workflow}
-        history={childHistory}
-        {groups}
-        {canvasWidth}
-      />
-    {/await}
-  {/if}
   {#each codeBlockAttributes as [key, value], index (key)}
     {@const gridIndex = Math.floor(index / 2)}
     {@const x = gutter + (index % 2) * (canvasWidth / 2)}
@@ -143,6 +124,30 @@
       {canvasWidth}
     />
   {/each}
+  {#if fetchChildWorkflow && fetchChildTimeline}
+    {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [{ workflow }, childHistory]}
+      {@const groups = groupEvents(
+        childHistory,
+        'ascending',
+        workflow?.pendingActivities,
+      )}
+      <!-- <Box
+        point={[0, childTimelineY]}
+        width={canvasWidth}
+        height={DetailsChildTimelineHeight}
+        fill="#0F172A"
+      /> -->
+      <TimelineGraph
+        x={0}
+        y={childTimelineY}
+        staticHeight={DetailsChildTimelineHeight}
+        {workflow}
+        history={childHistory}
+        {groups}
+        {canvasWidth}
+      />
+    {/await}
+  {/if}
 </g>
 
 <style lang="postcss">

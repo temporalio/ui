@@ -76,7 +76,7 @@
     height={radius * 2}
     class="text-white"
   />
-  <Text point={[50 + radius * 2.5, y + 5]} category={event.category} {active}>
+  <Text point={[50 + radius * 2.5, y + 5]} category={event.category}>
     <tspan fill="#fff" font-size={showDetails ? '14px' : '12px'}>
       {spaceBetweenCapitalLetters(event?.name)}
     </tspan>
@@ -88,11 +88,7 @@
     > -->
   </Text>
   {#if showTimestamp}
-    <Text
-      point={[startingX - 1.5 * radius, y + radius / 2]}
-      {active}
-      textAnchor="end"
-    >
+    <Text point={[startingX - 1.5 * radius, y + radius / 2]} textAnchor="end">
       <tspan fill="#aebed9" font-size="12px">
         {formatDate(event?.eventTime, $timeFormat, {
           relative: $relativeTime,

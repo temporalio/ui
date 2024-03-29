@@ -33,8 +33,8 @@ export const setActiveEvent = (event: WorkflowEvent, group: EventGroup) => {
   activeGroups.set([]);
 
   if (!get(activeEvents).includes(event.id)) {
-    const activeEventInGroup = get(activeEvents).find((id) =>
-      group.eventIds.has(id),
+    const activeEventInGroup = get(activeEvents).find(
+      (id) => group?.eventIds.has(id),
     );
     if (activeEventInGroup) {
       activeEvents.set([
