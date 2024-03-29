@@ -16,7 +16,7 @@
     hidden?: boolean;
   }
 
-  export let intent: 'warning' | 'caution' | 'error' | 'success' | 'info';
+  export let intent: 'warning' | 'error' | 'success' | 'info';
   export let title = '';
   export let icon: IconName = null;
   export let bold = false;
@@ -34,11 +34,7 @@
       return 'alert';
     }
 
-    if (
-      alertIntent === 'success' ||
-      alertIntent === 'warning' ||
-      alertIntent === 'caution'
-    ) {
+    if (alertIntent === 'success' || alertIntent === 'warning') {
       return 'status';
     }
 
@@ -72,7 +68,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply rounded-md border p-5 font-primary text-sm;
+    @apply rounded-md border p-5 font-primary text-sm text-primary;
   }
 
   .alert.bold {
@@ -80,23 +76,19 @@
   }
 
   .alert.success {
-    @apply border-green-600 bg-green-100 text-green-700;
+    @apply border-success bg-success;
   }
 
   .alert.info {
-    @apply border-blue-700 bg-blue-50 text-blue-700;
+    @apply border-information bg-information;
   }
 
   .alert.error {
-    @apply border-red-700 bg-red-100 text-red-700;
-  }
-
-  .alert.caution {
-    @apply border-orange-700 bg-orange-50 text-orange-700;
+    @apply border-error bg-error;
   }
 
   .alert.warning {
-    @apply border-yellow-700 bg-yellow-50 text-yellow-700;
+    @apply border-warning bg-warning;
   }
 
   .content :global(> *) {
