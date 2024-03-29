@@ -45,7 +45,7 @@
           {x}
           y={y - fontSizeRatio}
           {width}
-          height={staticCodeBlockHeight - 2 * fontSizeRatio}
+          height={staticCodeBlockHeight - fontSizeRatio}
         >
           <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">
             <CodeBlock content={decodedValue} />
@@ -67,7 +67,7 @@
           {x}
           y={y - fontSizeRatio}
           {width}
-          height={staticCodeBlockHeight}
+          height={staticCodeBlockHeight - fontSizeRatio}
         >
           <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">
             <CodeBlock content={decodedValue} />
@@ -86,7 +86,7 @@
           {x}
           y={y - fontSizeRatio}
           {width}
-          height={staticCodeBlockHeight}
+          height={staticCodeBlockHeight - fontSizeRatio}
         >
           <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">
             <CodeBlock content={decodedValue} />
