@@ -68,7 +68,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply rounded-md border p-5 font-primary text-sm;
+    @apply rounded-md border p-5 font-primary text-sm text-primary;
   }
 
   .alert.bold {
@@ -76,19 +76,19 @@
   }
 
   .alert.success {
-    @apply border-green-600 bg-green-100 text-green-700;
+    @apply border-success bg-success;
   }
 
   .alert.info {
-    @apply border-blue-700 bg-blue-50 text-blue-700;
+    @apply border-information bg-information;
   }
 
   .alert.error {
-    @apply border-red-700 bg-red-100 text-red-700;
+    @apply border-error bg-error;
   }
 
   .alert.warning {
-    @apply border-yellow-700 bg-yellow-50 text-yellow-700;
+    @apply border-warning bg-warning;
   }
 
   .content :global(> *) {
