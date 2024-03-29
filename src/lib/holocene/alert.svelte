@@ -68,11 +68,11 @@
 
 <style lang="postcss">
   .alert {
-    @apply rounded-md border p-5 font-primary text-sm text-primary;
+    @apply rounded-md border-2 p-5 font-primary text-sm text-primary;
   }
 
   .alert.bold {
-    @apply rounded-xl border-2;
+    @apply rounded-xl;
   }
 
   .alert.success {
