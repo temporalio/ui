@@ -7,14 +7,14 @@ export const TEMPORAL_THEME = EditorView.theme(
   {
     '&': {
       color: 'white',
-      backgroundColor: colors.gray['900'],
+      backgroundColor: colors.black,
       borderRadius: '0.75rem',
       borderWidth: '2px',
       borderColor: colors.slate['600'],
       padding: '0.5rem',
     },
     '.cm-matchingBracket': {
-      backgroundColor: colors.gray['800'],
+      backgroundColor: colors.black,
     },
     '.cm-scroller': {
       fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
@@ -36,7 +36,7 @@ export const TEMPORAL_THEME = EditorView.theme(
       backgroundColor: colors.gray['700'],
     },
     '.cm-gutters': {
-      backgroundColor: colors.gray['900'],
+      backgroundColor: colors.black,
       color: colors.white,
       borderRight: 'none',
     },
@@ -50,7 +50,7 @@ export const TEMPORAL_THEME = EditorView.theme(
 export const TEMPORAL_SYNTAX = HighlightStyle.define([
   { tag: tags.punctuation, color: colors.slate['200'] },
   { tag: tags.string, color: colors.slate['200'] },
-  { tag: tags.propertyName, color: colors.indigo['600'] },
+  { tag: tags.propertyName, color: colors.indigo['400'] },
   { tag: tags.bool, color: colors.slate['200'] },
   { tag: tags.number, color: colors.slate['200'] },
   { tag: tags.operator, color: colors.pink['500'] },
