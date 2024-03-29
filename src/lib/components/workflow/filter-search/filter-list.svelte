@@ -17,6 +17,7 @@
     type TimeFormat,
   } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
+  import { isStartsWith } from '$lib/utilities/is';
   import {
     isDateTimeFilter,
     isTextFilter,
@@ -124,7 +125,9 @@
                   })}
                 {/if}
               {:else}
-                {conditional}
+                {isStartsWith(conditional)
+                  ? translate('common.starts-with').toLocaleLowerCase()
+                  : conditional}
                 {isTextFilter({ attribute, type }) ? `"${value}"` : value}
               {/if}
             </span>

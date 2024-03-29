@@ -7,7 +7,7 @@
 
 <div
   class={merge(
-    'background-animate w-full rounded-full bg-gradient-to-r from-slate-100 via-slate-200 to-slate-300',
+    'background-animate w-full rounded-full bg-gradient-to-r from-slate-600 via-slate-700 to-slate-800',
     className,
   )}
 />
