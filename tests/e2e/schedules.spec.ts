@@ -22,7 +22,7 @@ test.describe('Schedules Page', () => {
     await page.getByLabel('Workflow Id*').type('e2e-1234');
     await page.getByLabel('Task Queue*').type('default');
     await page.locator('#schedule-input').getByRole('textbox').type('abc');
-    await page.getByRole('textbox', { name: 'hrs.' }).type('1');
+    await page.getByRole('textbox', { name: 'hrs' }).type('1');
     const createSchedule = page.getByRole('button', {
       name: 'Create Schedule',
     });
