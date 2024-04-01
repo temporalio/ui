@@ -1,6 +1,6 @@
 <script lang="ts">
   import { timeFormat } from '$lib/stores/time-format';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import type { Timestamp } from '$lib/types';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
@@ -11,13 +11,13 @@
   export let x1 = 0;
   export let x2 = 1000;
   export let timelineHeight = 1000;
+  export let startTime: string | Timestamp;
   export let endTime: string | Date;
   export let duration: number;
 
   const { radius } = TimelineConfig;
   const ticks = 20;
 
-  $: ({ workflow } = $workflowRun);
   $: distance = x2 - x1;
   $: tickDistance = distance / ticks;
 </script>
@@ -46,15 +46,12 @@
     y={tickY}
   >
     {#if i === 0}
-      <tspan>{formatDate(workflow.startTime, $timeFormat).split(' ')[2]}</tspan>
-      <tspan dy={15} dx={-70}
-        >{formatDate(workflow.startTime, $timeFormat).split(' ')[0]}</tspan
-      >
+      <tspan>{formatDate(startTime, $timeFormat)}</tspan>
     {:else}
       {formatDistanceAbbreviated({
-        start: workflow.startTime,
+        start: startTime,
         end: new Date(
-          new Date(workflow.startTime).getTime() + (duration / ticks) * i,
+          new Date(startTime.toString()).getTime() + (duration / ticks) * i,
         ),
         includeMilliseconds: duration / ticks < 1000,
       })}
@@ -68,8 +65,5 @@
   x={x2 - radius}
   y={timelineHeight + radius * 2 + radius / 2}
 >
-  <tspan>{formatDate(endTime, $timeFormat).split(' ')[2]}</tspan>
-  <tspan dy={15} dx={-70}
-    >{formatDate(endTime, $timeFormat).split(' ')[0]}</tspan
-  >
+  <tspan>{formatDate(endTime, $timeFormat)}</tspan>
 </text>

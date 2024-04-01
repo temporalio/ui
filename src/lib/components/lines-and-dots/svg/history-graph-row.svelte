@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import type {
     EventGroup,
     EventGroups,
@@ -65,18 +64,16 @@
     {classification}
     fill={index % 2 === 1 && '#1E293B'}
   />
-  <Text point={[5, y + 5]} {active} fontSize="12px">
+  <Text point={[5, y]} {active} fontSize="12px">
     <tspan fill="#aebed9">{event.id}</tspan>
   </Text>
-  <Icon
-    name={CategoryIcon[event.category]}
-    x={50}
-    y={y - radius}
-    width={radius * 2}
-    height={radius * 2}
-    class="text-white"
-  />
-  <Text point={[50 + radius * 2.5, y + 5]} category={event.category}>
+  <Text
+    point={[50, y]}
+    category={event.category}
+    {active}
+    icon={CategoryIcon[event.category]}
+    config={HistoryConfig}
+  >
     <tspan fill="#fff" font-size={showDetails ? '14px' : '12px'}>
       {spaceBetweenCapitalLetters(event?.name)}
     </tspan>

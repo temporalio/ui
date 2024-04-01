@@ -1,12 +1,13 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import { groupEvents } from '$lib/models/event-groups';
+  import { groupEvents, isEventGroup } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import type { WorkflowEvent } from '$lib/types/events';
   import { format } from '$lib/utilities/format-camel-case';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import {
     isChildWorkflowExecutionCompletedEvent,
     isChildWorkflowExecutionStartedEvent,
@@ -55,6 +56,9 @@
           namespace,
           workflowId: childWorkflowId,
           runId: childRunId,
+        }).then(({ workflow }) => {
+          result = workflow?.status;
+          return workflow;
         });
         fetchChildTimeline = fetchAllEvents({
           namespace,
@@ -70,8 +74,11 @@
 
   const labelPadding = 240;
   $: groupOrEvent = group ?? event;
+  $: result = isEventGroup(groupOrEvent)
+    ? groupOrEvent.finalClassification
+    : groupOrEvent.classification;
   $: boxHeight = getDetailsBoxHeight(groupOrEvent);
-  $: textStartingY = y + gutter;
+  $: textStartingY = y + gutter + fontSizeRatio;
   $: childTimelineY = y + boxHeight - DetailsChildTimelineHeight;
   $: attributes = mergeEventGroupDetails(groupOrEvent);
   $: codeBlockAttributes = Object.entries(attributes).filter(
@@ -84,6 +91,21 @@
 
 <g role="button" tabindex="0" class="relative cursor-pointer">
   <Box point={[0, y]} width={canvasWidth} height={boxHeight} fill="#465A78" />
+  <Box point={[0, y]} width={canvasWidth} height={fontSizeRatio * 1.5} />
+  <Text point={[gutter, y + 1 * fontSizeRatio]} fontSize="16" fontWeight="500"
+    >{result}</Text
+  >
+  <Text
+    point={[canvasWidth - gutter, y + 1 * fontSizeRatio]}
+    fontSize="16"
+    fontWeight="500"
+    textAnchor="end"
+    >{formatDistanceAbbreviated({
+      start: group?.initialEvent?.eventTime,
+      end: group?.lastEvent?.eventTime,
+      includeMilliseconds: true,
+    })}
+  </Text>
   {#each codeBlockAttributes as [key, value], index (key)}
     {@const gridIndex = Math.floor(index / 2)}
     {@const x = gutter + (index % 2) * (canvasWidth / 2)}
@@ -120,7 +142,7 @@
     />
   {/each}
   {#if fetchChildWorkflow && fetchChildTimeline}
-    {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [{ workflow }, childHistory]}
+    {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [workflow, childHistory]}
       {@const groups = groupEvents(
         childHistory,
         'ascending',

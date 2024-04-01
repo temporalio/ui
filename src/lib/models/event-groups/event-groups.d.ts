@@ -17,6 +17,7 @@ interface EventGroup
   initialEvent: WorkflowEvent;
   lastEvent: WorkflowEvent;
   eventList: WorkflowEvent[];
+  finalClassification: EventClassification;
   isFailureOrTimedOut: boolean;
   isCanceled: boolean;
   isTerminated: boolean;

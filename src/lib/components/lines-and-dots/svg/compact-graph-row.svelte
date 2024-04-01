@@ -54,11 +54,7 @@
     status="none"
     strokeWidth={radius}
   />
-  <Text
-    point={[start + (4 / 3) * radius, y + radius / 4]}
-    {active}
-    fontWeight="500"
-  >
+  <Text point={[start + (4 / 3) * radius, y]} {active} fontWeight="500">
     {#if aggregateRow}<tspan font-weight="700">{count}</tspan>{/if}
     {group?.displayName}
   </Text>

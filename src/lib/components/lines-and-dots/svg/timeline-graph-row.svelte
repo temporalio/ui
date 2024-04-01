@@ -1,13 +1,9 @@
 <script lang="ts">
   import type { Timestamp } from '@temporalio/common';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
-  import {
-    formatDistanceAbbreviated,
-    getMillisecondDuration,
-  } from '$lib/utilities/format-time';
+  import { getMillisecondDuration } from '$lib/utilities/format-time';
 
   import {
     CategoryIcon,
@@ -76,7 +72,6 @@
 >
   {#each points as x, index}
     {@const nextPoint = points[index + 1]}
-    {@const showIcon = index === 0}
     {@const showText = textIndex === index}
     {#if nextPoint}
       <Line
@@ -112,15 +107,10 @@
         {textAnchor}
         {backdrop}
         backdropHeight={radius * 2}
+        icon={CategoryIcon[group.category]}
+        config={TimelineConfig}
       >
         {group?.displayName}
-        <tspan fill="#aebed9" font-size="12px"
-          >{formatDistanceAbbreviated({
-            start: group.initialEvent.eventTime,
-            end: group.lastEvent.eventTime,
-            includeMilliseconds: true,
-          })}</tspan
-        >
       </Text>
     {/if}
     <Dot
@@ -129,17 +119,6 @@
       {active}
       r={radius}
     />
-    {#if showIcon}
-      <Icon
-        name={CategoryIcon[group.category]}
-        x={x - radius}
-        y={y - radius}
-        width={radius * 2}
-        height={radius * 2}
-        strokeWidth="4"
-        class="text-black"
-      />
-    {/if}
   {/each}
 </g>
 

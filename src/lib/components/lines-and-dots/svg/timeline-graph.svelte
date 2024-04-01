@@ -43,7 +43,7 @@
   $: canvasHeight = timelineHeight + 200;
 </script>
 
-<EndTimeInterval {workflow} let:endTime let:duration>
+<EndTimeInterval {workflow} {startTime} let:endTime let:duration>
   <svg
     {x}
     {y}
@@ -66,6 +66,7 @@
       x1={gutter - radius / 4}
       x2={canvasWidth - gutter + radius / 4}
       {timelineHeight}
+      {startTime}
       {endTime}
       {duration}
     />

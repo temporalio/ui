@@ -112,6 +112,9 @@ const createGroupFor = <K extends keyof StartingEvents>(
     get lastEvent() {
       return getLastEvent(this);
     },
+    get finalClassification() {
+      return getLastEvent(this).classification;
+    },
     get isFailureOrTimedOut() {
       return Boolean(this.eventList.find(eventIsFailureOrTimedOut));
     },

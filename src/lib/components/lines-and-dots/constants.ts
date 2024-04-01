@@ -85,7 +85,6 @@ export const timelineTextPosition = (
   const lastPoint = points[points.length - 1];
 
   let backdrop = false;
-  const textY = y + radius / 2;
   let textAnchor = 'start';
   let textIndex = 0;
 
@@ -123,7 +122,7 @@ export const timelineTextPosition = (
     }
   }
 
-  const textPosition = [textX, textY] as [number, number];
+  const textPosition = [textX, y] as [number, number];
   return { textPosition, textIndex, textAnchor, backdrop };
 };
 
@@ -360,7 +359,7 @@ export const getEventDetailsHeight = (
   return (
     Math.ceil(codeBlockAttributes.length / 2) * staticCodeBlockHeight +
     textAttributes.length * DetailsConfig.fontSizeRatio +
-    2 * DetailsConfig.fontSizeRatio
+    3 * DetailsConfig.fontSizeRatio
   );
 };
 

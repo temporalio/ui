@@ -1,14 +1,16 @@
 <script lang="ts">
+  import type { Timestamp } from '@temporalio/common';
   import { onDestroy, onMount } from 'svelte';
 
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
 
   export let workflow: WorkflowExecution;
+  export let startTime: string | Timestamp;
 
   $: endTime = workflow?.endTime || new Date();
   $: duration = getMillisecondDuration({
-    start: workflow?.startTime,
+    start: startTime,
     end: endTime,
     onlyUnderSecond: false,
   });
