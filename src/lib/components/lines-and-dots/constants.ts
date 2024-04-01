@@ -216,17 +216,10 @@ export const getNextDistanceAndOffset = (
   event: WorkflowEvent,
   index: number,
   groups: EventGroups,
-  activeEvents: string[],
   height: number,
 ): { nextDistance: number; offset: number; y: number } => {
   const group = groups.find((g) => g.eventIds.has(event.id));
-  const activeEventsAbove = activeEventsHeightAboveGroup(
-    activeEvents,
-    event,
-    history,
-    groups,
-  );
-  let y = index * height + height / 2 + activeEventsAbove;
+  let y = index * height + height / 2;
   let nextDistance = 0;
   let offset = 1;
 
@@ -251,7 +244,7 @@ export const getNextDistanceAndOffset = (
     isPendingActivity(event) &&
     event.activityId === group.pendingActivity.activityId
   ) {
-    y = (history.length + 1) * height + height / 2 + activeEventsAbove;
+    y = (history.length + 1) * height + height / 2;
     return { nextDistance, offset, y };
   }
 
@@ -367,7 +360,8 @@ export const getDetailsBoxHeight = (
   groupOrEvent: EventGroup | WorkflowEvent,
 ) => {
   const detailsHeight = getEventDetailsHeight(groupOrEvent);
-  return groupOrEvent.category === 'child-workflow'
+  return groupOrEvent.category === 'child-workflow' &&
+    isEventGroup(groupOrEvent)
     ? DetailsChildTimelineHeight + detailsHeight
     : detailsHeight;
 };

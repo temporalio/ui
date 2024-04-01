@@ -32,7 +32,7 @@
   import { exportHistory } from '$lib/utilities/export-history';
   // import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  let view: GraphView = 'timeline';
+  let view: GraphView = 'history';
   let zoomLevel = 1;
 
   $: ({ namespace } = $page.params);
@@ -151,17 +151,17 @@
         {workflow}
         history={$fullEventHistory}
         {groups}
-        activeGroups={$activeGroups}
         {zoomLevel}
         {canvasWidth}
+        activeGroups={$activeGroups}
       />
     {:else}
       <HistoryGraph
         history={$fullEventHistory}
         {groups}
-        activeEvents={$activeEvents}
         {zoomLevel}
         {canvasWidth}
+        activeEvents={$activeEvents}
       />
     {/if}
   </div>

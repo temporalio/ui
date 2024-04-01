@@ -3,7 +3,7 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
-  import { activeEvents, setActiveEvent } from '$lib/stores/active-events';
+  import { setSingleActiveEvent } from '$lib/stores/active-events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
@@ -16,6 +16,7 @@
   } from '../constants';
 
   import Box from './box.svelte';
+  import GroupDetailsRow from './group-details-row.svelte';
   import HistoryGraphRowVisual from './history-graph-row-visual.svelte';
   import Text from './text.svelte';
 
@@ -23,10 +24,10 @@
   export let group: EventGroup;
   export let history: WorkflowEvents;
   export let groups: EventGroups;
+  export let activeEvents: string[] = [];
 
   export let canvasWidth: number;
   export let startingX: number;
-  export let active = false;
   export let index: number;
   export let zoomLevel: number = 1;
 
@@ -37,12 +38,15 @@
     event,
     index,
     groups,
-    $activeEvents,
     height,
   ));
 
-  $: showTimestamp = canvasWidth > 1200;
-  $: showDetails = canvasWidth > 800;
+  $: noActives = !activeEvents.length;
+  $: isActiveEvent = activeEvents[0] === event.id;
+  $: isActiveGroup = group && group.eventIds.has(activeEvents[0]);
+  $: activeEventShown = activeEvents.length;
+  $: showTimestamp = !activeEventShown && canvasWidth > 1200;
+  $: showDetails = !activeEventShown && canvasWidth > 800;
   $: classification = group?.pendingActivity
     ? group.pendingActivity.attempt > 1
       ? 'retry'
@@ -53,8 +57,8 @@
 <g
   role="button"
   tabindex="0"
-  on:click|preventDefault={() => setActiveEvent(event, group)}
-  on:keypress={() => setActiveEvent(event, group)}
+  on:click|preventDefault={() => setSingleActiveEvent(event)}
+  on:keypress={() => setSingleActiveEvent(event)}
   class="relative cursor-pointer"
 >
   <Box
@@ -64,17 +68,17 @@
     {classification}
     fill={index % 2 === 1 && '#1E293B'}
   />
-  <Text point={[5, y]} {active} fontSize="12px">
+  <Text point={[5, y]} active={noActives || isActiveEvent} fontSize="12px">
     <tspan fill="#aebed9">{event.id}</tspan>
   </Text>
   <Text
     point={[50, y]}
     category={event.category}
-    {active}
+    active={noActives || isActiveEvent}
     icon={CategoryIcon[event.category]}
     config={HistoryConfig}
   >
-    <tspan fill="#fff" font-size={showDetails ? '14px' : '12px'}>
+    <tspan fill="#fff">
       {spaceBetweenCapitalLetters(event?.name)}
     </tspan>
     {#if group && group.displayName && showDetails}<tspan dx={3}
@@ -85,7 +89,7 @@
     > -->
   </Text>
   {#if showTimestamp}
-    <Text point={[startingX - 1.5 * radius, y + radius / 2]} textAnchor="end">
+    <Text point={[startingX - 1.5 * radius, y]} textAnchor="end">
       <tspan fill="#aebed9" font-size="12px">
         {formatDate(event?.eventTime, $timeFormat, {
           relative: $relativeTime,
@@ -102,10 +106,19 @@
     {y}
     {canvasWidth}
     {startingX}
-    {active}
+    active={noActives || isActiveEvent || isActiveGroup}
     {zoomLevel}
   />
 </g>
+{#if isActiveEvent}
+  <GroupDetailsRow
+    y={y - height / 2}
+    x={canvasWidth / 2 + 2}
+    {event}
+    {group}
+    {canvasWidth}
+  />
+{/if}
 
 <style lang="postcss">
   g {

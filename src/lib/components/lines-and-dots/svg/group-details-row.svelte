@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import { groupEvents, isEventGroup } from '$lib/models/event-groups';
+  import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
@@ -26,21 +26,22 @@
   import Text from './text.svelte';
   import TimelineGraph from './timeline-graph.svelte';
 
-  export let group: EventGroup;
+  export let group: EventGroup | undefined = undefined;
   export let event: WorkflowEvent | undefined = undefined;
   export let canvasWidth: number;
+  export let x = 0;
   export let y: number;
 
-  const { gutter, fontSizeRatio } = DetailsConfig;
+  let childStatus = '';
+
+  const { gutter, fontSizeRatio, height } = DetailsConfig;
   $: ({ namespace } = $page.params);
 
   let fetchChildWorkflow;
   let fetchChildTimeline;
 
-  $: fetchChildWorkflowForGroup(group);
-
-  const fetchChildWorkflowForGroup = (group: EventGroup) => {
-    if (group && group.category === 'child-workflow' && namespace) {
+  const fetchChildWorkflowForGroup = () => {
+    if (!event && group && group.category === 'child-workflow' && namespace) {
       const completedEvent = group.eventList.find(
         isChildWorkflowExecutionCompletedEvent,
       );
@@ -57,7 +58,7 @@
           workflowId: childWorkflowId,
           runId: childRunId,
         }).then(({ workflow }) => {
-          result = workflow?.status;
+          childStatus = workflow?.status;
           return workflow;
         });
         fetchChildTimeline = fetchAllEvents({
@@ -69,14 +70,13 @@
     } else {
       fetchChildWorkflow = undefined;
       fetchChildTimeline = undefined;
+      childStatus = '';
     }
   };
 
   const labelPadding = 240;
-  $: groupOrEvent = group ?? event;
-  $: result = isEventGroup(groupOrEvent)
-    ? groupOrEvent.finalClassification
-    : groupOrEvent.classification;
+  $: groupOrEvent = event ?? group;
+  $: title = groupOrEvent.name;
   $: boxHeight = getDetailsBoxHeight(groupOrEvent);
   $: textStartingY = y + gutter + fontSizeRatio;
   $: childTimelineY = y + boxHeight - DetailsChildTimelineHeight;
@@ -87,20 +87,21 @@
   $: textAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value !== 'object',
   );
+
+  $: groupOrEvent, fetchChildWorkflowForGroup();
 </script>
 
 <g role="button" tabindex="0" class="relative cursor-pointer">
-  <Box point={[0, y]} width={canvasWidth} height={boxHeight} fill="#465A78" />
-  <Box point={[0, y]} width={canvasWidth} height={fontSizeRatio * 1.5} />
-  <Text point={[gutter, y + 1 * fontSizeRatio]} fontSize="16" fontWeight="500"
-    >{result}</Text
-  >
+  <Box point={[x, y]} width={canvasWidth} height={boxHeight} fill="#465A78" />
+  <Box point={[x, y]} width={canvasWidth} {height} fill="#1E293B" />
+  <Text point={[x + gutter, y + 0.5 * height]} fontWeight="500">{title}</Text>
   <Text
-    point={[canvasWidth - gutter, y + 1 * fontSizeRatio]}
-    fontSize="16"
+    point={[canvasWidth - gutter, y + 0.5 * height]}
     fontWeight="500"
     textAnchor="end"
-    >{formatDistanceAbbreviated({
+  >
+    {#if childStatus}{childStatus}{/if}
+    {formatDistanceAbbreviated({
       start: group?.initialEvent?.eventTime,
       end: group?.lastEvent?.eventTime,
       includeMilliseconds: true,
@@ -108,11 +109,11 @@
   </Text>
   {#each codeBlockAttributes as [key, value], index (key)}
     {@const gridIndex = Math.floor(index / 2)}
-    {@const x = gutter + (index % 2) * (canvasWidth / 2)}
+    {@const blockX = x + gutter + (index % 2) * (canvasWidth / 2)}
     {@const y = textStartingY + gridIndex * staticCodeBlockHeight}
-    <Text point={[x, y]}>{format(key)}</Text>
+    <Text point={[blockX, y]}>{format(key)}</Text>
     <GroupDetailsText
-      point={[x, y + 1.5 * fontSizeRatio]}
+      point={[blockX, y + 1.5 * fontSizeRatio]}
       {key}
       {value}
       {attributes}
@@ -122,7 +123,7 @@
   {#each textAttributes as [key, value], index (key)}
     <Text
       point={[
-        gutter,
+        x + gutter,
         textStartingY +
           staticCodeBlockHeight * Math.ceil(codeBlockAttributes.length / 2) +
           (index + 1) * fontSizeRatio,
@@ -130,7 +131,7 @@
     >
     <GroupDetailsText
       point={[
-        gutter + labelPadding,
+        x + gutter + labelPadding,
         textStartingY +
           staticCodeBlockHeight * Math.ceil(codeBlockAttributes.length / 2) +
           (index + 1) * fontSizeRatio,
@@ -149,7 +150,7 @@
         workflow?.pendingActivities,
       )}
       <TimelineGraph
-        x={0}
+        {x}
         y={childTimelineY}
         staticHeight={DetailsChildTimelineHeight}
         {workflow}

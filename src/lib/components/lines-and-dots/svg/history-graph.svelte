@@ -1,18 +1,10 @@
 <script lang="ts">
   import { groupWorkflowTaskEvents } from '$lib/models/event-groups';
-  import type {
-    EventGroup,
-    EventGroups,
-  } from '$lib/models/event-groups/event-groups';
-  import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
+  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import type { WorkflowEvents } from '$lib/types/events';
 
-  import {
-    getDetailsBoxHeight,
-    getNextDistanceAndOffset,
-    HistoryConfig,
-  } from '../constants';
+  import { getDetailsBoxHeight, HistoryConfig } from '../constants';
 
-  import GroupDetailsRow from './group-details-row.svelte';
   import HistoryGraphRow from './history-graph-row.svelte';
   import Line from './line.svelte';
 
@@ -25,32 +17,8 @@
   $: workflowTaskGroups = groupWorkflowTaskEvents(history);
   $: allGroups = [...workflowTaskGroups, ...groups];
 
-  const { height, radius } = HistoryConfig;
+  const { height } = HistoryConfig;
 
-  $: isActive = (groupOrEvent: EventGroup | WorkflowEvent): boolean => {
-    if (activeEvents.length) {
-      return activeEvents.includes(groupOrEvent?.id);
-    }
-    return true;
-  };
-
-  $: activeDetailsHeight = activeEvents
-    .map((id) => {
-      const group = allGroups.find((group) => group.eventIds.has(id));
-      if (group) {
-        return getDetailsBoxHeight(group);
-      }
-      const event = history.find((event) => event.id === id);
-      return getDetailsBoxHeight(event);
-    })
-    .reduce((acc, height) => acc + height, 0);
-
-  $: canvasHeight = Math.max(
-    height * history.length + activeDetailsHeight + height,
-    400,
-  );
-
-  $: startingX = canvasWidth / 2;
   // $: visibleHistory = (history: WorkflowEvents, scrollY: number) => {
   //   return history.filter((event, index) => {
   //     const y = (index + 1) * height + height / 2;
@@ -61,6 +29,23 @@
   //     return visible;
   //   });
   // };
+
+  $: activeDetailsHeight = activeEvents
+    .map((id) => {
+      // const group = allGroups.find((group) => group.eventIds.has(id));
+      // if (group) {
+      //   return getDetailsBoxHeight(group);
+      // }
+      const event = history.find((event) => event.id === id);
+      return getDetailsBoxHeight(event);
+    })
+    .reduce((acc, height) => acc + height, 0);
+
+  $: canvasHeight = Math.max(
+    height * history.length + activeDetailsHeight + height,
+    400,
+  );
+  $: startingX = activeEvents.length ? canvasWidth / 4 : canvasWidth / 2;
 </script>
 
 <svg
@@ -80,23 +65,12 @@
       {group}
       groups={allGroups}
       {history}
+      {activeEvents}
       canvasWidth={canvasWidth * zoomLevel}
       {startingX}
       {zoomLevel}
-      active={isActive(group || event)}
       {index}
     />
-    {#if activeEvents.includes(event.id)}
-      {@const { y } = getNextDistanceAndOffset(
-        history,
-        event,
-        index,
-        allGroups,
-        activeEvents,
-        height,
-      )}
-      <GroupDetailsRow y={y + 2 * radius} {group} {event} {canvasWidth} />
-    {/if}
   {/each}
   <!-- {#each pendingActivities as pendingActivity, index}
     {@const group = groups.find((g) =>
