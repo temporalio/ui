@@ -204,9 +204,9 @@ export const activeEventsHeightAboveGroup = (
   return activeEvents
     .filter((id) => parseInt(id) < parseInt(event.id))
     .map((id) => {
-      const group = groups.find((group) => group.eventIds.has(id));
       const event = history.find((event) => event.id === id);
-      return getDetailsBoxHeight(group ?? event);
+      const group = groups.find((group) => group.eventIds.has(id));
+      return getDetailsBoxHeight(event ?? group);
     })
     .reduce((acc, height) => acc + height, 0);
 };
@@ -217,9 +217,16 @@ export const getNextDistanceAndOffset = (
   index: number,
   groups: EventGroups,
   height: number,
+  activeEvents: string[],
 ): { nextDistance: number; offset: number; y: number } => {
   const group = groups.find((g) => g.eventIds.has(event.id));
-  let y = index * height + height / 2;
+  const activeEventHeights = activeEventsHeightAboveGroup(
+    activeEvents,
+    event,
+    history,
+    groups,
+  );
+  let y = index * height + height / 2 + activeEventHeights;
   let nextDistance = 0;
   let offset = 1;
 
@@ -234,7 +241,9 @@ export const getNextDistanceAndOffset = (
   const pendingActivity = group.pendingActivity;
   const currentIndex = group.eventList.indexOf(event);
   const nextEvent = group.eventList[currentIndex + 1];
-  offset = getOpenGroups(event, groups, pendingActivity);
+  if (event.category !== 'workflow') {
+    offset = getOpenGroups(event, groups, pendingActivity);
+  }
 
   if (!nextEvent && !isPendingGroup(group)) {
     return { nextDistance, offset, y };
@@ -256,6 +265,9 @@ export const getNextDistanceAndOffset = (
   }
   nextDistance = diff * height;
 
+  if (event && activeEvents[0] == event.id) {
+    nextDistance += getDetailsBoxHeight(event);
+  }
   return { nextDistance, offset, y };
 };
 

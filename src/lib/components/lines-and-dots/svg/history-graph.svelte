@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { scrollTop } from '$lib/holocene/main-content-container.svelte';
   import { groupWorkflowTaskEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import type { WorkflowEvents } from '$lib/types/events';
 
   import { getDetailsBoxHeight, HistoryConfig } from '../constants';
 
+  import HistoryGraphRowVisual from './history-graph-row-visual.svelte';
   import HistoryGraphRow from './history-graph-row.svelte';
   import Line from './line.svelte';
 
@@ -19,46 +21,58 @@
 
   const { height } = HistoryConfig;
 
-  // $: visibleHistory = (history: WorkflowEvents, scrollY: number) => {
-  //   return history.filter((event, index) => {
-  //     const y = (index + 1) * height + height / 2;
-  //     const scrollStartVisible = scrollY + height / 2;
-  //     const visible =
-  //       y > scrollStartVisible &&
-  //       y < scrollStartVisible + CanvasConfig.maxHeight;
-  //     return visible;
-  //   });
-  // };
+  let startIndex = 0;
+  let endIndex = 200;
+  $: diff = endIndex - startIndex;
+
+  const setHistorySlice = (top: number) => {
+    const scrollIndex = Math.round(top / height);
+    // Scrolling up
+    if (endIndex - scrollIndex < 50) {
+      endIndex += 200;
+    }
+
+    if (diff > 400) {
+      startIndex += 200;
+    }
+
+    // Scrolling down
+    if (startIndex >= 200 && scrollIndex - startIndex < 50) {
+      startIndex -= 200;
+      endIndex -= 200;
+    }
+  };
+
+  $: setHistorySlice($scrollTop);
+
+  $: visibleHistory = history.slice(startIndex, endIndex);
 
   $: activeDetailsHeight = activeEvents
     .map((id) => {
-      // const group = allGroups.find((group) => group.eventIds.has(id));
-      // if (group) {
-      //   return getDetailsBoxHeight(group);
-      // }
-      const event = history.find((event) => event.id === id);
+      const event = visibleHistory.find((event) => event.id === id);
       return getDetailsBoxHeight(event);
     })
     .reduce((acc, height) => acc + height, 0);
 
   $: canvasHeight = Math.max(
-    height * history.length + activeDetailsHeight + height,
+    height * visibleHistory.length + activeDetailsHeight + height,
     400,
   );
-  $: startingX = activeEvents.length ? canvasWidth / 4 : canvasWidth / 2;
+
+  $: width = canvasWidth / 4;
 </script>
 
 <svg
   viewBox="0 0 {canvasWidth} {canvasHeight}"
-  height={canvasHeight / zoomLevel}
-  width={canvasWidth / zoomLevel}
+  height={canvasHeight}
+  width={canvasWidth}
 >
   <Line
-    startPoint={[startingX, 0]}
-    endPoint={[startingX, canvasHeight]}
+    startPoint={[width, 0]}
+    endPoint={[width, canvasHeight]}
     strokeWidth={4}
   />
-  {#each history as event, index (event.id)}
+  {#each visibleHistory as event, index (event.id)}
     {@const group = allGroups.find((g) => g.eventIds.has(event.id))}
     <HistoryGraphRow
       {event}
@@ -66,9 +80,7 @@
       groups={allGroups}
       {history}
       {activeEvents}
-      canvasWidth={canvasWidth * zoomLevel}
-      {startingX}
-      {zoomLevel}
+      {canvasWidth}
       {index}
     />
   {/each}
@@ -90,4 +102,23 @@
       {index}
     />
   {/each} -->
+  <svg
+    viewBox="0 0 {canvasWidth / zoomLevel} {canvasHeight * zoomLevel}"
+    height={canvasHeight}
+    width={canvasWidth}
+  >
+    {#each visibleHistory as event, index (event.id)}
+      {@const group = allGroups.find((g) => g.eventIds.has(event.id))}
+      <HistoryGraphRowVisual
+        {event}
+        {group}
+        groups={allGroups}
+        {history}
+        {canvasWidth}
+        {activeEvents}
+        {zoomLevel}
+        {index}
+      />
+    {/each}
+  </svg>
 </svg>

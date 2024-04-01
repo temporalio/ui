@@ -157,7 +157,7 @@
       />
     {:else}
       <HistoryGraph
-        history={$fullEventHistory}
+        history={$filteredEventHistory}
         {groups}
         {zoomLevel}
         {canvasWidth}

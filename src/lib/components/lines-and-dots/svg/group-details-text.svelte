@@ -27,13 +27,13 @@
   export let value: string | Record<string, unknown>;
   export let attributes: CombinedAttributes;
   export let point: [number, number] = [0, 0];
-  export let canvasWidth: number;
+  export let width: number;
 
   const { fontSizeRatio, gutter } = DetailsConfig;
 
   $: [x, y] = point;
   $: codeBlockValue = getCodeBlockValue(value);
-  $: width = canvasWidth / 2 - 2 * gutter;
+  $: width = width / 2 - 2 * gutter;
   // $: stackTrace = getStackTrace(codeBlockValue);
 </script>
 

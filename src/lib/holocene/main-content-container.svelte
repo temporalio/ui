@@ -1,3 +1,9 @@
+<script context="module">
+  import { writable } from 'svelte/store';
+
+  export const scrollTop = writable(0);
+</script>
+
 <script lang="ts">
   import ScrollToContainer from './scroll-to-container.svelte';
 
@@ -19,8 +25,8 @@
 
   function handleOnScroll(event: Event) {
     const scrollEvent = event.target as HTMLDivElement;
-    const top = scrollEvent.scrollTop;
-    scrollToTopHidden = Boolean(top < showScrollToTopOn);
+    $scrollTop = scrollEvent.scrollTop;
+    scrollToTopHidden = Boolean($scrollTop < showScrollToTopOn);
   }
 </script>
 

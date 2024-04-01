@@ -17,7 +17,6 @@
 
   import Box from './box.svelte';
   import GroupDetailsRow from './group-details-row.svelte';
-  import HistoryGraphRowVisual from './history-graph-row-visual.svelte';
   import Text from './text.svelte';
 
   export let event: WorkflowEvent;
@@ -27,31 +26,30 @@
   export let activeEvents: string[] = [];
 
   export let canvasWidth: number;
-  export let startingX: number;
   export let index: number;
-  export let zoomLevel: number = 1;
 
   const { height, radius } = HistoryConfig;
 
-  $: ({ nextDistance, offset, y } = getNextDistanceAndOffset(
+  $: ({ y } = getNextDistanceAndOffset(
     history,
     event,
     index,
     groups,
     height,
+    activeEvents,
   ));
 
   $: noActives = !activeEvents.length;
   $: isActiveEvent = activeEvents[0] === event.id;
-  $: isActiveGroup = group && group.eventIds.has(activeEvents[0]);
-  $: activeEventShown = activeEvents.length;
-  $: showTimestamp = !activeEventShown && canvasWidth > 1200;
-  $: showDetails = !activeEventShown && canvasWidth > 800;
+  $: showTimestamp = canvasWidth > 1200;
+  $: showDetails = canvasWidth > 800;
   $: classification = group?.pendingActivity
     ? group.pendingActivity.attempt > 1
       ? 'retry'
       : 'pending'
     : event.classification;
+
+  $: width = canvasWidth / 4;
 </script>
 
 <g
@@ -62,17 +60,21 @@
   class="relative cursor-pointer"
 >
   <Box
-    point={[0, y - height / 2]}
-    width={startingX - radius / 2}
+    point={[width + 2, y - height / 2]}
+    width={canvasWidth - width - radius / 2}
     {height}
     {classification}
     fill={index % 2 === 1 && '#1E293B'}
   />
-  <Text point={[5, y]} active={noActives || isActiveEvent} fontSize="12px">
+  <Text
+    point={[width + 5, y]}
+    active={noActives || isActiveEvent}
+    fontSize="12px"
+  >
     <tspan fill="#aebed9">{event.id}</tspan>
   </Text>
   <Text
-    point={[50, y]}
+    point={[width + 50, y]}
     category={event.category}
     active={noActives || isActiveEvent}
     icon={CategoryIcon[event.category]}
@@ -89,7 +91,7 @@
     > -->
   </Text>
   {#if showTimestamp}
-    <Text point={[startingX - 1.5 * radius, y]} textAnchor="end">
+    <Text point={[canvasWidth - 1.5 * radius, y]} textAnchor="end">
       <tspan fill="#aebed9" font-size="12px">
         {formatDate(event?.eventTime, $timeFormat, {
           relative: $relativeTime,
@@ -97,23 +99,11 @@
       ></Text
     >
   {/if}
-  <HistoryGraphRowVisual
-    {event}
-    {group}
-    {groups}
-    {nextDistance}
-    {offset}
-    {y}
-    {canvasWidth}
-    {startingX}
-    active={noActives || isActiveEvent || isActiveGroup}
-    {zoomLevel}
-  />
 </g>
 {#if isActiveEvent}
   <GroupDetailsRow
-    y={y - height / 2}
-    x={canvasWidth / 2 + 2}
+    y={y + height / 2}
+    x={width + 2}
     {event}
     {group}
     {canvasWidth}

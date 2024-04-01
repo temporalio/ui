@@ -32,7 +32,7 @@
   export let x = 0;
   export let y: number;
 
-  let childStatus = '';
+  let status = group?.finalClassification || event.classification;
 
   const { gutter, fontSizeRatio, height } = DetailsConfig;
   $: ({ namespace } = $page.params);
@@ -58,7 +58,7 @@
           workflowId: childWorkflowId,
           runId: childRunId,
         }).then(({ workflow }) => {
-          childStatus = workflow?.status;
+          status = workflow?.status;
           return workflow;
         });
         fetchChildTimeline = fetchAllEvents({
@@ -70,7 +70,7 @@
     } else {
       fetchChildWorkflow = undefined;
       fetchChildTimeline = undefined;
-      childStatus = '';
+      status = '';
     }
   };
 
@@ -78,7 +78,7 @@
   $: groupOrEvent = event ?? group;
   $: title = groupOrEvent.name;
   $: boxHeight = getDetailsBoxHeight(groupOrEvent);
-  $: textStartingY = y + gutter + fontSizeRatio;
+  $: textStartingY = event ? y + fontSizeRatio : height + y + fontSizeRatio;
   $: childTimelineY = y + boxHeight - DetailsChildTimelineHeight;
   $: attributes = mergeEventGroupDetails(groupOrEvent);
   $: codeBlockAttributes = Object.entries(attributes).filter(
@@ -89,27 +89,33 @@
   );
 
   $: groupOrEvent, fetchChildWorkflowForGroup();
+  $: width = event ? (3 * canvasWidth) / 4 : canvasWidth;
 </script>
 
 <g role="button" tabindex="0" class="relative cursor-pointer">
-  <Box point={[x, y]} width={canvasWidth} height={boxHeight} fill="#465A78" />
-  <Box point={[x, y]} width={canvasWidth} {height} fill="#1E293B" />
-  <Text point={[x + gutter, y + 0.5 * height]} fontWeight="500">{title}</Text>
-  <Text
-    point={[canvasWidth - gutter, y + 0.5 * height]}
-    fontWeight="500"
-    textAnchor="end"
-  >
-    {#if childStatus}{childStatus}{/if}
-    {formatDistanceAbbreviated({
-      start: group?.initialEvent?.eventTime,
-      end: group?.lastEvent?.eventTime,
-      includeMilliseconds: true,
-    })}
-  </Text>
+  <Box point={[x, y]} {width} height={boxHeight} fill="#465A78" />
+  {#if !event}
+    <Box point={[x, y]} {width} {height} fill="#1E293B" />
+    <Text point={[x + gutter, y + 0.5 * height]} fontWeight="500">{title}</Text>
+    {#if status}<Text
+        point={[width / 2 - gutter, y + 0.5 * height]}
+        fontWeight="500">{status}</Text
+      >{/if}
+    <Text
+      point={[width - gutter, y + 0.5 * height]}
+      fontWeight="500"
+      textAnchor="end"
+    >
+      {formatDistanceAbbreviated({
+        start: group?.initialEvent?.eventTime,
+        end: group?.lastEvent?.eventTime,
+        includeMilliseconds: true,
+      })}
+    </Text>
+  {/if}
   {#each codeBlockAttributes as [key, value], index (key)}
     {@const gridIndex = Math.floor(index / 2)}
-    {@const blockX = x + gutter + (index % 2) * (canvasWidth / 2)}
+    {@const blockX = x + gutter + (index % 2) * (width / 2)}
     {@const y = textStartingY + gridIndex * staticCodeBlockHeight}
     <Text point={[blockX, y]}>{format(key)}</Text>
     <GroupDetailsText
@@ -117,7 +123,7 @@
       {key}
       {value}
       {attributes}
-      {canvasWidth}
+      {width}
     />
   {/each}
   {#each textAttributes as [key, value], index (key)}
@@ -139,7 +145,7 @@
       {key}
       {value}
       {attributes}
-      {canvasWidth}
+      {width}
     />
   {/each}
   {#if fetchChildWorkflow && fetchChildTimeline}
