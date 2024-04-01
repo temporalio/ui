@@ -2,7 +2,6 @@
   import { beforeNavigate } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import type { GraphView } from '$lib/components/lines-and-dots/constants';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
   import CompactGraph from '$lib/components/lines-and-dots/svg/compact-graph.svelte';
@@ -22,6 +21,7 @@
     activeGroups,
     clearActives,
   } from '$lib/stores/active-events';
+  import { eventViewType } from '$lib/stores/event-view';
   import {
     decodeEventHistory,
     filteredEventHistory,
@@ -32,7 +32,6 @@
   import { exportHistory } from '$lib/utilities/export-history';
   // import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  let view: GraphView = 'history';
   let zoomLevel = 1;
 
   $: ({ namespace } = $page.params);
@@ -49,7 +48,7 @@
   //   'ascending',
   // );
 
-  $: view, clearActives();
+  $: $eventViewType, clearActives();
 
   beforeNavigate(() => {
     clearActives();
@@ -97,21 +96,21 @@
         </h2>
         <ToggleButtons>
           <ToggleButton
-            active={view === 'compact'}
+            active={$eventViewType === 'compact'}
             data-testid="compact"
-            on:click={() => (view = 'compact')}
+            on:click={() => ($eventViewType = 'compact')}
             >{translate('workflows.compact')}</ToggleButton
           >
           <ToggleButton
-            active={view === 'timeline'}
+            active={$eventViewType === 'timeline'}
             data-testid="timeline"
-            on:click={() => (view = 'timeline')}
+            on:click={() => ($eventViewType = 'timeline')}
             >{translate('common.timeline')}</ToggleButton
           >
           <ToggleButton
-            active={view === 'history'}
+            active={$eventViewType === 'feed'}
             data-testid="feed"
-            on:click={() => (view = 'history')}
+            on:click={() => ($eventViewType = 'feed')}
             >{translate('workflows.full-history')}</ToggleButton
           >
           <ToggleButton
@@ -132,13 +131,13 @@
         </ToggleButtons>
         <span class="text-sm">{(100 / zoomLevel).toFixed(0)}%</span>
       </div>
-      <EventTypeFilter compact={view !== 'history'} />
+      <EventTypeFilter compact={$eventViewType !== 'feed'} />
     </div>
   </div>
 </div>
 <div class="bg-inverse">
   <div class="w-full overflow-x-hidden" bind:clientWidth={canvasWidth}>
-    {#if view === 'compact'}
+    {#if $eventViewType === 'compact'}
       <CompactGraph
         {workflow}
         {groups}
@@ -146,7 +145,7 @@
         {canvasWidth}
         activeGroups={$activeGroups}
       />
-    {:else if view === 'timeline'}
+    {:else if $eventViewType === 'timeline'}
       <TimelineGraph
         {workflow}
         history={$fullEventHistory}

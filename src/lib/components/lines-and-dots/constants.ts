@@ -20,10 +20,6 @@ import {
 } from '$lib/utilities/is-event-type';
 import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
-export type GraphView = 'compact' | 'timeline' | 'history';
-
-const baseRadius = 8;
-
 export const DetailsChildTimelineHeight = 200;
 
 export type GraphConfig = {
@@ -32,6 +28,8 @@ export type GraphConfig = {
   radius: number;
   fontSizeRatio: number;
 };
+
+const baseRadius = 8;
 
 export const CompactConfig: GraphConfig = {
   height: baseRadius * 7,
