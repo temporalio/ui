@@ -24,7 +24,7 @@
   export let namespace: string;
   export let open: boolean;
   const reason = writable('');
-  const reasonPlaceholder = getPlacholder(Action.Cancel, $authUser.email);
+  const reasonPlaceholder = getPlacholder(Action.Terminate, $authUser.email);
   const jobId = writable('');
   const jobIdValid = writable(true);
   let jobIdPlaceholder = v4();
