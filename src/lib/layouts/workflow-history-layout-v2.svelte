@@ -32,6 +32,7 @@
   import { exportHistory } from '$lib/utilities/export-history';
   // import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
+  let showFilters = false;
   let zoomLevel = 1;
 
   $: ({ namespace } = $page.params);
@@ -69,7 +70,7 @@
   };
 
   const zoomOut = () => {
-    if (zoomLevel < 6) zoomLevel += 0.5;
+    if (zoomLevel < 10) zoomLevel += 0.5;
   };
 
   const zoomIn = () => {
@@ -81,10 +82,7 @@
 
 <div class="surface-secondary flex flex-col gap-0 px-8">
   <WorkflowCallStackError />
-  <!-- {#if workflowTaskFailedError}
-    <WorkflowTypedError error={workflowTaskFailedError} />
-  {/if} -->
-  <div class="flex flex-col gap-0">
+  <div class="flex flex-col gap-2">
     <WorkflowDetails />
     <InputAndResults />
     <div
@@ -113,11 +111,11 @@
             on:click={() => ($eventViewType = 'feed')}
             >{translate('workflows.full-history')}</ToggleButton
           >
-          <ToggleButton
-            data-testid="download"
-            on:click={() => (showDownloadPrompt = true)}
-            icon="download"
-          />
+        </ToggleButtons>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-sm">{(100 / zoomLevel).toFixed(0)}%</span>
+        <ToggleButtons>
           <ToggleButton
             data-testid="zoom-in"
             disabled={zoomLevel === 1}
@@ -128,11 +126,27 @@
             disabled={zoomLevel === 10}
             on:click={zoomOut}>-</ToggleButton
           >
+          <ToggleButton
+            data-testid="filter"
+            on:click={() => (showFilters = !showFilters)}
+            icon="filter"
+          />
+          <ToggleButton
+            data-testid="download"
+            on:click={() => (showDownloadPrompt = true)}
+            icon="download"
+          />
         </ToggleButtons>
-        <span class="text-sm">{(100 / zoomLevel).toFixed(0)}%</span>
       </div>
-      <EventTypeFilter compact={$eventViewType !== 'feed'} />
     </div>
+    {#if showFilters}
+      <div class="flex flex-col items-center justify-center pb-2">
+        <EventTypeFilter compact={$eventViewType !== 'feed'} />
+      </div>
+    {/if}
+    <!-- {#if workflowTaskFailedError}
+      <WorkflowTypedError error={workflowTaskFailedError} />
+    {/if} -->
   </div>
 </div>
 <div class="bg-inverse">

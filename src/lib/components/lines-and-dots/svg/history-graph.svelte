@@ -2,6 +2,11 @@
   import { scrollTop } from '$lib/holocene/main-content-container.svelte';
   import { groupWorkflowTaskEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import {
+    endIndex,
+    indexPageSize,
+    startIndex,
+  } from '$lib/stores/active-events';
   import type { WorkflowEvents } from '$lib/types/events';
 
   import { getDetailsBoxHeight, HistoryConfig } from '../constants';
@@ -21,32 +26,26 @@
 
   const { height } = HistoryConfig;
 
-  let startIndex = 0;
-  let endIndex = 200;
-  $: diff = endIndex - startIndex;
-
   const setHistorySlice = (top: number) => {
-    const scrollIndex = Math.round(top / height);
-    // Scrolling up
-    if (endIndex - scrollIndex < 50) {
-      endIndex += 200;
-    }
-
-    if (diff > 400) {
-      startIndex += 200;
-    }
+    let scrollIndex = Math.round(top / height);
 
     // Scrolling down
-    if (startIndex >= 200 && scrollIndex - startIndex < 50) {
-      startIndex -= 200;
-      endIndex -= 200;
+    if ($endIndex - scrollIndex < indexPageSize / 4) {
+      $endIndex += indexPageSize;
+    } else if ($startIndex > scrollIndex && scrollIndex < indexPageSize / 4) {
+      $startIndex -= indexPageSize;
     }
+
+    console.log('Scroll index: ', scrollIndex);
+    console.log('Start Index: ', $startIndex);
+    console.log('End index: ', $endIndex);
   };
 
   $: setHistorySlice($scrollTop);
 
-  $: visibleHistory = history.slice(startIndex, endIndex);
+  $: visibleHistory = history.slice($startIndex, $endIndex);
 
+  $: console.log('Visible History length: ', visibleHistory.length);
   $: activeDetailsHeight = activeEvents
     .map((id) => {
       const event = visibleHistory.find((event) => event.id === id);
@@ -55,11 +54,10 @@
     .reduce((acc, height) => acc + height, 0);
 
   $: canvasHeight = Math.max(
-    height * visibleHistory.length + activeDetailsHeight + height,
+    visibleHistory.length * height + activeDetailsHeight + height,
     400,
   );
-
-  $: width = canvasWidth / 4;
+  $: visualWidth = canvasWidth / 5;
 </script>
 
 <svg
@@ -68,8 +66,8 @@
   width={canvasWidth}
 >
   <Line
-    startPoint={[width, 0]}
-    endPoint={[width, canvasHeight]}
+    startPoint={[visualWidth, 0]}
+    endPoint={[visualWidth, canvasHeight]}
     strokeWidth={4}
   />
   {#each visibleHistory as event, index (event.id)}
@@ -103,9 +101,9 @@
     />
   {/each} -->
   <svg
-    viewBox="0 0 {canvasWidth / zoomLevel} {canvasHeight * zoomLevel}"
+    viewBox="0 0 {2 * canvasWidth} {canvasHeight * zoomLevel}"
     height={canvasHeight}
-    width={canvasWidth}
+    width={(2 * canvasWidth) / zoomLevel}
   >
     {#each visibleHistory as event, index (event.id)}
       {@const group = allGroups.find((g) => g.eventIds.has(event.id))}

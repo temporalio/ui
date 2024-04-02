@@ -45,7 +45,7 @@
 
   .none {
     stroke: #141414;
-    opacity: 0.75;
+    opacity: 0.65;
   }
 
   .scheduling {

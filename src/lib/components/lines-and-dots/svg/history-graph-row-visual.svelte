@@ -37,6 +37,9 @@
     activeEvents,
   ));
 
+  $: zoomY = y * zoomLevel;
+  $: zoomNextDistance = nextDistance * zoomLevel;
+
   $: category = isPendingActivity(event) ? 'pending' : event?.category;
   $: classification = isPendingActivity(event)
     ? 'pending'
@@ -47,7 +50,7 @@
 
   const strokeWidth = radius / 2;
 
-  $: width = (canvasWidth / 4) * zoomLevel;
+  $: width = (canvasWidth / 5) * zoomLevel;
   $: horizontalOffset = (offset / 1.5) * 3 * radius;
   $: nextIsPending = group?.lastEvent.id === event?.id && isPendingGroup(group);
   $: eventInViewBox = horizontalOffset <= width;
@@ -59,27 +62,27 @@
 
 {#if connectLine}
   <Line
-    startPoint={[width - strokeWidth, y]}
-    endPoint={[width - horizontalOffset - radius, y]}
+    startPoint={[width - strokeWidth, zoomY]}
+    endPoint={[width - horizontalOffset - radius, zoomY]}
     active={isActive}
   />
 {/if}
 {#if eventInViewBox}
   <Dot
-    point={[width - horizontalOffset, y]}
+    point={[width - horizontalOffset, zoomY]}
     {classification}
     active={isActive}
   />
 {/if}
-{#if eventInViewBox && nextDistance}
+{#if eventInViewBox && zoomNextDistance}
   <Line
     startPoint={[
       width - horizontalOffset - radius / 2 + strokeWidth,
-      y + radius + strokeWidth / 2,
+      zoomY + radius + strokeWidth / 2,
     ]}
     endPoint={[
       width - horizontalOffset - radius / 2 + strokeWidth,
-      y + nextDistance + radius,
+      zoomY + zoomNextDistance + radius,
     ]}
     category={group?.pendingActivity
       ? group.pendingActivity.attempt > 1

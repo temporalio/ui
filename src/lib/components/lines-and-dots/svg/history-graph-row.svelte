@@ -48,8 +48,7 @@
       ? 'retry'
       : 'pending'
     : event.classification;
-
-  $: width = canvasWidth / 4;
+  $: visualWidth = canvasWidth / 5;
 </script>
 
 <g
@@ -60,21 +59,21 @@
   class="relative cursor-pointer"
 >
   <Box
-    point={[width + 2, y - height / 2]}
-    width={canvasWidth - width - radius / 2}
+    point={[visualWidth + 2, y - height / 2]}
+    width={canvasWidth - visualWidth - radius / 2}
     {height}
     {classification}
     fill={index % 2 === 1 && '#1E293B'}
   />
   <Text
-    point={[width + 5, y]}
+    point={[visualWidth + 5, y]}
     active={noActives || isActiveEvent}
     fontSize="12px"
   >
     <tspan fill="#aebed9">{event.id}</tspan>
   </Text>
   <Text
-    point={[width + 50, y]}
+    point={[visualWidth + 50, y]}
     category={event.category}
     active={noActives || isActiveEvent}
     icon={CategoryIcon[event.category]}
@@ -103,7 +102,7 @@
 {#if isActiveEvent}
   <GroupDetailsRow
     y={y + height / 2}
-    x={width + 2}
+    x={visualWidth + 2}
     {event}
     {group}
     {canvasWidth}

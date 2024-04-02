@@ -5,6 +5,13 @@
 </script>
 
 <script lang="ts">
+  import {
+    endIndex,
+    indexPageSize,
+    startIndex,
+  } from '$lib/stores/active-events';
+  import { filteredEventHistory } from '$lib/stores/events';
+
   import ScrollToContainer from './scroll-to-container.svelte';
 
   let scrollToTopHidden = true;
@@ -16,10 +23,17 @@
   }
 
   function onScrollToTopClick() {
+    $startIndex = 0;
+    $endIndex = indexPageSize;
     getScrollContainer()?.scrollTo(0, 0);
   }
 
   function onScrollToBottomClick() {
+    const lastIndex = $filteredEventHistory?.length;
+    if (lastIndex) {
+      $endIndex = lastIndex;
+      $startIndex = $endIndex - indexPageSize;
+    }
     getScrollContainer()?.scrollTo(0, getScrollContainer()?.scrollHeight);
   }
 

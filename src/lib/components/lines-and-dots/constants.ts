@@ -46,9 +46,9 @@ export const TimelineConfig: GraphConfig = {
 };
 
 export const HistoryConfig: GraphConfig = {
-  height: baseRadius * 4,
+  height: baseRadius * 3,
   gutter: baseRadius * 2,
-  radius: baseRadius,
+  radius: baseRadius * 0.75,
   fontSizeRatio: baseRadius * 3,
 };
 

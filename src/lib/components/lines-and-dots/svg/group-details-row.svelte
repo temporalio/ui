@@ -89,7 +89,7 @@
   );
 
   $: groupOrEvent, fetchChildWorkflowForGroup();
-  $: width = event ? (3 * canvasWidth) / 4 : canvasWidth;
+  $: width = event ? (4 * canvasWidth) / 5 : canvasWidth;
 </script>
 
 <g role="button" tabindex="0" class="relative cursor-pointer">

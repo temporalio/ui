@@ -56,7 +56,7 @@
   {...$$restProps}
 >
   {#if icon}
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-0">
       <Icon name={icon} />
       <span class="hidden md:block"><slot /></span>
     </div>
