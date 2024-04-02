@@ -11,6 +11,7 @@
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
+  import { workflowsQuery } from '$lib/stores/workflows';
 
   export let action: Action;
   export let reason: string;
@@ -18,7 +19,6 @@
   export let reasonPlaceholder: string;
   export let jobIdPlaceholder: string;
   export let jobIdValid: boolean;
-  export let query: Readable<string>;
 
   const {
     allSelected,
@@ -70,15 +70,13 @@
         replace={{ action: actionText }}
       />
     </p>
-    {#if $query}
-      <div
-        class="mb-2 overflow-scroll whitespace-nowrap rounded border border-primary bg-badge p-2"
-      >
-        <code data-testid="batch-action-workflows-query">
-          {$query}
-        </code>
-      </div>
-    {/if}
+    <div
+      class="mb-2 overflow-scroll whitespace-nowrap rounded border border-primary bg-badge p-2"
+    >
+      <code data-testid="batch-action-workflows-query">
+        {$workflowsQuery}
+      </code>
+    </div>
     <span class="text-xs">
       <Translate
         key="workflows.batch-operation-count-disclaimer"

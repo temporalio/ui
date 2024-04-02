@@ -1,12 +1,10 @@
 <script lang="ts">
-  import { derived, writable } from 'svelte/store';
+  import { writable } from 'svelte/store';
 
   import { getContext } from 'svelte';
   import { v4 } from 'uuid';
 
   import Modal from '$lib/holocene/modal.svelte';
-  // import Option from '$lib/holocene/select/option.svelte';
-  // import Select from '$lib/holocene/select/select.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -34,7 +32,6 @@
   const reasonPlaceholder = getPlacholder(Action.Reset, $authUser.email);
   const jobId = writable('');
   const jobIdValid = writable(true);
-  const query = derived(workflowsQuery, ($wfQuery) => $wfQuery ?? '');
 
   const { allSelected, selectedWorkflows } = getContext<BatchOperationContext>(
     BATCH_OPERATION_CONTEXT,
@@ -56,7 +53,9 @@
       reason: $reason || reasonPlaceholder,
       jobId: $jobId || jobIdPlaceholder,
       resetType: $resetType,
-      ...($allSelected ? { query: $query } : { workflows: $selectedWorkflows }),
+      ...($allSelected
+        ? { query: $workflowsQuery }
+        : { workflows: $selectedWorkflows }),
     };
 
     try {
@@ -92,7 +91,6 @@
       bind:reason={$reason}
       bind:jobId={$jobId}
       bind:jobIdValid={$jobIdValid}
-      {query}
       {jobIdPlaceholder}
       {reasonPlaceholder}
       action={Action.Reset}

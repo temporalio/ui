@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { derived, writable } from 'svelte/store';
+  import { writable } from 'svelte/store';
 
   import { getContext } from 'svelte';
   import { v4 } from 'uuid';
@@ -29,10 +29,6 @@
   const jobIdValid = writable(true);
   let jobIdPlaceholder = v4();
   let error = '';
-  const query = derived(
-    workflowsQuery,
-    ($wfQuery) => $wfQuery ?? 'ExecutionStatus="Running"',
-  );
 
   const { allSelected, terminableWorkflows } =
     getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
@@ -54,7 +50,7 @@
         reason: $reason || reasonPlaceholder,
         jobId: $jobId || jobIdPlaceholder,
         ...($allSelected
-          ? { query: $query }
+          ? { query: $workflowsQuery }
           : { workflows: $terminableWorkflows }),
       };
       await batchTerminateWorkflows(options);
@@ -91,7 +87,6 @@
       bind:reason={$reason}
       bind:jobId={$jobId}
       bind:jobIdValid={$jobIdValid}
-      {query}
       {reasonPlaceholder}
       {jobIdPlaceholder}
       action={Action.Terminate}
