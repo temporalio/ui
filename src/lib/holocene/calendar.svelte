@@ -66,17 +66,11 @@
   }
 
   .cell {
-    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded p-1 text-sm 
-    hover:surface-interactive
-    active:surface-interactive  
-    hover:rounded-2xl 
-    hover:text-inverse 
-    active:text-inverse;
+    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded-2xl p-1 text-sm text-primary;
   }
 
   .selected {
-    @apply surface-interactive rounded-2xl 
-    border-brand p-2 text-inverse dark:bg-indigo-300 dark:text-black;
+    @apply surface-interactive rounded-2xl  p-2 text-offWhite dark:bg-indigo-300 dark:text-black;
   }
 
   .disabled {
@@ -85,9 +79,7 @@
     color: #bfbfbf;
   }
 
-  /* .highlight {
-    @apply hover:scale-125 hover:cursor-pointer;
-
-    transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
-  } */
+  .highlight {
+    @apply hover:bg-interactive hover:text-offWhite;
+  }
 </style>
