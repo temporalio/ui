@@ -37,6 +37,9 @@ test.describe('Batch and Bulk Workflow Actions', () => {
     test('allows running workflows to be terminated by a query', async ({
       page,
     }) => {
+      await page.getByTestId('manual-search-toggle').click();
+      await page.locator('#manual-search').fill('ExecutionStatus="Running"');
+      await page.getByTestId('manual-search-button').click();
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="select-all-workflows"]');
       await page.click('[data-testid="bulk-terminate-button"]');
@@ -74,6 +77,9 @@ test.describe('Batch and Bulk Workflow Actions', () => {
     test('allows running workflows to be cancelled by a query', async ({
       page,
     }) => {
+      await page.getByTestId('manual-search-toggle').click();
+      await page.locator('#manual-search').fill('ExecutionStatus="Running"');
+      await page.getByTestId('manual-search-button').click();
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="select-all-workflows"]');
       await page.click('[data-testid="bulk-cancel-button"]');
