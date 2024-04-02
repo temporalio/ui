@@ -45,7 +45,7 @@
       </h2>
       {#if $workflowError}
         <Alert
-          intent="caution"
+          intent="warning"
           icon="warning"
           title={translate('workflows.workflow-query-error-state')}
           style="overflow-wrap: anywhere"
