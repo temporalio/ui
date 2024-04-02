@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
+  import { derived, writable } from 'svelte/store';
 
   import { getContext } from 'svelte';
   import { v4 } from 'uuid';
@@ -15,6 +15,7 @@
   import { batchCancelWorkflows } from '$lib/services/batch-service';
   import { authUser } from '$lib/stores/auth-user';
   import { toaster } from '$lib/stores/toaster';
+  import { workflowsQuery } from '$lib/stores/workflows';
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { getPlacholder } from '$lib/utilities/workflow-actions';
 
@@ -28,8 +29,12 @@
   const jobIdValid = writable(true);
   let jobIdPlaceholder = v4();
   let error = '';
+  const query = derived(
+    workflowsQuery,
+    ($wfQuery) => $wfQuery ?? 'ExecutionStatus="Running"',
+  );
 
-  const { allSelected, cancelableWorkflows, query } =
+  const { allSelected, cancelableWorkflows } =
     getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
 
   const resetForm = () => {
@@ -86,6 +91,7 @@
       bind:reason={$reason}
       bind:jobId={$jobId}
       bind:jobIdValid={$jobIdValid}
+      {query}
       {jobIdPlaceholder}
       {reasonPlaceholder}
       action={Action.Cancel}

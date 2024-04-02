@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { derived, type Readable } from 'svelte/store';
+
   import { getContext } from 'svelte';
 
   import Input from '$lib/holocene/input/input.svelte';
@@ -16,25 +18,51 @@
   export let reasonPlaceholder: string;
   export let jobIdPlaceholder: string;
   export let jobIdValid: boolean;
+  export let query: Readable<string>;
 
-  const { allSelected, query, terminableWorkflows, cancelableWorkflows } =
-    getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
+  const {
+    allSelected,
+    terminableWorkflows,
+    cancelableWorkflows,
+    selectedWorkflows,
+  } = getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
 
-  $: actionText =
-    action === Action.Cancel
-      ? translate('common.cancel')
-      : translate('workflows.terminate');
-  $: operableWorkflowsCount =
-    action === Action.Terminate
-      ? $terminableWorkflows.length
-      : $cancelableWorkflows.length;
+  $: actionText = getActionText(action);
+  $: operableWorkflowsCount = getOperableWorkflowsCount(action);
+
+  const getActionText = (action: Action): string => {
+    switch (action) {
+      case Action.Cancel:
+        return translate('common.cancel');
+      case Action.Terminate:
+        return translate('workflows.terminate');
+      case Action.Reset:
+        return translate('workflows.reset');
+    }
+  };
+
+  const getOperableWorkflowsCount = (action: Action): Readable<number> => {
+    return derived(
+      [cancelableWorkflows, terminableWorkflows, selectedWorkflows],
+      ([$cancelable, $terminable, $selected]) => {
+        switch (action) {
+          case Action.Cancel:
+            return $cancelable.length;
+          case Action.Terminate:
+            return $terminable.length;
+          case Action.Reset:
+            return $selected.length;
+        }
+      },
+    );
+  };
 
   const handleJobIdChange = (event: Event & { target: HTMLInputElement }) => {
     jobIdValid = /^[\w.~-]*$/.test(event.target.value);
   };
 </script>
 
-<div class="mb-4 flex flex-col gap-2">
+<div class="mb-4 flex flex-col gap-4">
   {#if $allSelected}
     <p class="mb-2">
       <Translate
@@ -42,13 +70,15 @@
         replace={{ action: actionText }}
       />
     </p>
-    <div
-      class="mb-2 overflow-scroll whitespace-nowrap rounded border border-primary bg-badge p-2"
-    >
-      <code data-testid="batch-action-workflows-query">
-        {$query}
-      </code>
-    </div>
+    {#if $query}
+      <div
+        class="mb-2 overflow-scroll whitespace-nowrap rounded border border-primary bg-badge p-2"
+      >
+        <code data-testid="batch-action-workflows-query">
+          {$query}
+        </code>
+      </div>
+    {/if}
     <span class="text-xs">
       <Translate
         key="workflows.batch-operation-count-disclaimer"
@@ -57,12 +87,18 @@
     </span>
   {:else}
     <p>
-      <Translate
-        key={action === Action.Cancel
-          ? 'workflows.batch-cancel-confirmation'
-          : 'workflows.batch-terminate-confirmation'}
-        count={operableWorkflowsCount}
-      />
+      {#if action === Action.Reset}
+        <Translate
+          key="workflows.batch-reset-confirmation"
+          count={$operableWorkflowsCount}
+        />
+      {:else}
+        <Translate
+          key="workflows.batch-confirmation"
+          replace={{ action: actionText }}
+          count={$operableWorkflowsCount}
+        />
+      {/if}
     </p>
   {/if}
   <Input
@@ -85,4 +121,5 @@
     on:input={handleJobIdChange}
     valid={jobIdValid}
   />
+  <slot />
 </div>
