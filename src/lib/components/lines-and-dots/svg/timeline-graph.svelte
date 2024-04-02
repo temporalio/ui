@@ -74,14 +74,16 @@
       {@const y =
         (index + 1) * height +
         activeGroupsHeightAboveGroup(activeGroups, group, groups)}
-      <TimelineGraphRow
-        {y}
-        {group}
-        {activeGroups}
-        {canvasWidth}
-        {startTime}
-        {endTime}
-      />
+      {#key group.eventList.length}
+        <TimelineGraphRow
+          {y}
+          {group}
+          {activeGroups}
+          {canvasWidth}
+          {startTime}
+          {endTime}
+        />
+      {/key}
       {#if activeGroups.includes(group.id)}
         <GroupDetailsRow y={y + 1.33 * radius} {group} {canvasWidth} />
       {/if}

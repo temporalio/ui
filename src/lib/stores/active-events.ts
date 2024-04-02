@@ -4,7 +4,6 @@ import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import type { WorkflowEvent } from '$lib/types/events';
 
 export const indexPageSize = 200;
-export const scrollIndex = writable(0);
 export const startIndex = writable(0);
 export const endIndex = writable(indexPageSize);
 
@@ -14,6 +13,8 @@ export const activeGroups = writable<string[]>([]);
 export const clearActives = () => {
   activeGroups.set([]);
   activeEvents.set([]);
+  startIndex.set(0);
+  endIndex.set(indexPageSize);
 };
 
 export const setActiveGroup = (group: EventGroup) => {

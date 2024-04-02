@@ -29,26 +29,21 @@
   const setHistorySlice = (top: number) => {
     let scrollIndex = Math.round(top / height);
 
-    // Scrolling down
     if ($endIndex - scrollIndex < indexPageSize / 4) {
       $endIndex += indexPageSize;
     } else if ($startIndex > scrollIndex && scrollIndex < indexPageSize / 4) {
-      $startIndex -= indexPageSize;
+      $startIndex = 0;
     }
-
-    console.log('Scroll index: ', scrollIndex);
-    console.log('Start Index: ', $startIndex);
-    console.log('End index: ', $endIndex);
   };
 
   $: setHistorySlice($scrollTop);
 
   $: visibleHistory = history.slice($startIndex, $endIndex);
 
-  $: console.log('Visible History length: ', visibleHistory.length);
   $: activeDetailsHeight = activeEvents
     .map((id) => {
       const event = visibleHistory.find((event) => event.id === id);
+      if (!event) return 0;
       return getDetailsBoxHeight(event);
     })
     .reduce((acc, height) => acc + height, 0);
