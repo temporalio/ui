@@ -5,7 +5,6 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
-  import type { WorkflowEvent } from '$lib/types/events';
   import { format } from '$lib/utilities/format-camel-case';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import {
@@ -16,7 +15,7 @@
   import {
     DetailsChildTimelineHeight,
     DetailsConfig,
-    getDetailsBoxHeight,
+    getGroupDetailsBoxHeight,
     getStatusColor,
     mergeEventGroupDetails,
     staticCodeBlockHeight,
@@ -27,16 +26,12 @@
   import Text from './text.svelte';
   import TimelineGraph from './timeline-graph.svelte';
 
-  export let group: EventGroup | undefined = undefined;
-  export let event: WorkflowEvent | undefined = undefined;
+  export let group: EventGroup;
   export let canvasWidth: number;
   export let x = 0;
   export let y: number;
 
-  $: status =
-    group?.finalClassification ||
-    group?.classification ||
-    event?.classification;
+  $: status = group?.finalClassification || group?.classification;
 
   $: {
     if (group?.pendingActivity) {
@@ -55,7 +50,7 @@
   let fetchChildTimeline;
 
   const fetchChildWorkflowForGroup = () => {
-    if (!event && group && group.category === 'child-workflow' && namespace) {
+    if (group && group.category === 'child-workflow' && namespace) {
       const completedEvent = group.eventList.find(
         isChildWorkflowExecutionCompletedEvent,
       );
@@ -88,55 +83,48 @@
   };
 
   const labelPadding = 240;
-  $: groupOrEvent = event ?? group;
-  $: title = groupOrEvent.name;
-  $: boxHeight = getDetailsBoxHeight(groupOrEvent);
-  $: textStartingY = !event ? height + y + fontSizeRatio : y + fontSizeRatio;
+
+  $: title = group.name;
+  $: boxHeight = getGroupDetailsBoxHeight(group);
+  $: textStartingY = height + y + fontSizeRatio;
   $: childTimelineY = y + boxHeight - DetailsChildTimelineHeight;
-  $: attributes = mergeEventGroupDetails(groupOrEvent);
+  $: attributes = mergeEventGroupDetails(group);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
   );
   $: textAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value !== 'object',
   );
-
-  $: groupOrEvent, fetchChildWorkflowForGroup();
-  $: width = event ? (4 * canvasWidth) / 5 : canvasWidth;
+  $: group, fetchChildWorkflowForGroup();
+  $: width = canvasWidth;
 </script>
 
 <g role="button" tabindex="0" class="relative cursor-pointer">
   <Box point={[x, y]} {width} height={boxHeight} fill="#465A78" />
-  {#if !event}
-    <Box point={[x, y]} {width} {height} fill="#1E293B" />
-    <Box
-      point={[x, y]}
-      width={gutter + 100}
-      {height}
-      fill={getStatusColor(status)}
-    />
-    <Text
-      point={[x + gutter, y + 0.5 * height]}
-      fontWeight="500"
-      category="none"
-    >
-      {status}
-    </Text>
-    <Text point={[x + 1.5 * gutter + 100, y + 0.5 * height]} fontWeight="500">
-      {title}
-    </Text>
-    <Text
-      point={[x + width - gutter, y + 0.5 * height]}
-      fontWeight="500"
-      textAnchor="end"
-    >
-      {formatDistanceAbbreviated({
-        start: group?.initialEvent?.eventTime,
-        end: group?.lastEvent?.eventTime,
-        includeMilliseconds: true,
-      })}
-    </Text>
-  {/if}
+  <Box point={[x, y]} {width} {height} fill="#1E293B" />
+  <Box
+    point={[x, y]}
+    width={gutter + 100}
+    {height}
+    fill={getStatusColor(status)}
+  />
+  <Text point={[x + gutter, y + 0.5 * height]} fontWeight="500" category="none">
+    {status}
+  </Text>
+  <Text point={[x + 1.5 * gutter + 100, y + 0.5 * height]} fontWeight="500">
+    {title}
+  </Text>
+  <Text
+    point={[x + width - gutter, y + 0.5 * height]}
+    fontWeight="500"
+    textAnchor="end"
+  >
+    {formatDistanceAbbreviated({
+      start: group?.initialEvent?.eventTime,
+      end: group?.lastEvent?.eventTime,
+      includeMilliseconds: true,
+    })}
+  </Text>
   {#each codeBlockAttributes as [key, value], index (key)}
     {@const blockX = x + gutter + 0.5 * width}
     {@const y = textStartingY + index * staticCodeBlockHeight}

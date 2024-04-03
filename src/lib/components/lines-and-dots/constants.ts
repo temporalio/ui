@@ -1,5 +1,4 @@
 import type { IconName } from '$lib/holocene/icon/paths';
-import { isEventGroup } from '$lib/models/event-groups';
 import type {
   EventGroup,
   EventGroups,
@@ -182,6 +181,23 @@ const getOpenGroups = (
   return group.level;
 };
 
+const allEventsInGroupHeight = (
+  id: string,
+  history: WorkflowEvents,
+  groups: EventGroups,
+): number => {
+  const event = history.find((event) => event.id === id);
+  const group = groups.find((group) => group.eventIds.has(id));
+  if (group) {
+    return group.eventList.reduce(
+      (sum, event) => (sum += getEventDetailsBoxHeight(event)),
+      0,
+    );
+  }
+  if (event) return getEventDetailsBoxHeight(event);
+  return 0;
+};
+
 export const activeEventsHeightAboveGroup = (
   activeEvents: string[],
   event: WorkflowEvent,
@@ -191,9 +207,7 @@ export const activeEventsHeightAboveGroup = (
   return activeEvents
     .filter((id) => parseInt(id) < parseInt(event.id))
     .map((id) => {
-      const event = history.find((event) => event.id === id);
-      const group = groups.find((group) => group.eventIds.has(id));
-      return getDetailsBoxHeight(event ?? group);
+      return allEventsInGroupHeight(id, history, groups);
     })
     .reduce((acc, height) => acc + height, 0);
 };
@@ -253,7 +267,7 @@ export const getNextDistanceAndOffset = (
   nextDistance = diff * height;
 
   if (event && activeEvents[0] == event.id) {
-    nextDistance += getDetailsBoxHeight(event);
+    nextDistance += allEventsInGroupHeight(event.id, history, groups);
   }
   return { nextDistance, offset, y };
 };
@@ -319,7 +333,7 @@ export const activeRowsHeightAboveGroup = (
     const activeGroup = activeTimeGroup.find((g) => g.id === id);
     const activeRowIndex = activeTimeGroup.indexOf(activeGroup);
     if (activeRowIndex < groupIndex) {
-      activeRowsHeight += getDetailsBoxHeight(activeGroup);
+      activeRowsHeight += getGroupDetailsBoxHeight(activeGroup);
     }
   });
 
@@ -337,35 +351,25 @@ export const activeGroupsHeightAboveGroup = (
     })
     .map((id) => {
       const group = groups.find((group) => group.id === id);
-      return getDetailsBoxHeight(group);
+      return getGroupDetailsBoxHeight(group);
     })
     .reduce((acc, height) => acc + height, 0);
 };
 
-export const mergeEventGroupDetails = (
-  groupOrEvent: EventGroup | WorkflowEvent,
-) => {
-  if (isEventGroup(groupOrEvent)) {
-    const attributes = groupOrEvent.eventList.map((event) =>
-      formatAttributes(event),
-    );
-    const attributesList = groupOrEvent.pendingActivity
-      ? [formatPendingAttributes(groupOrEvent.pendingActivity), ...attributes]
-      : attributes;
-    return attributesList.reduce((acc, attribute) => {
-      return { ...acc, ...attribute };
-    }, {});
-  } else {
-    return formatAttributes(groupOrEvent);
-  }
+export const mergeEventGroupDetails = (group: EventGroup) => {
+  const attributes = group.eventList.map((event) => formatAttributes(event));
+  const attributesList = group.pendingActivity
+    ? [formatPendingAttributes(group.pendingActivity), ...attributes]
+    : attributes;
+  return attributesList.reduce((acc, attribute) => {
+    return { ...acc, ...attribute };
+  }, {});
 };
 
 export const staticCodeBlockHeight = 200;
 
-export const getDetailsBoxHeight = (
-  groupOrEvent: EventGroup | WorkflowEvent,
-) => {
-  const attributes = mergeEventGroupDetails(groupOrEvent);
+export const getGroupDetailsBoxHeight = (group: EventGroup) => {
+  const attributes = mergeEventGroupDetails(group);
   const codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
   );
@@ -376,10 +380,26 @@ export const getDetailsBoxHeight = (
   const codeBlockHeight = codeBlockAttributes.length * staticCodeBlockHeight;
   const textHeight = textAttributes.length * DetailsConfig.fontSizeRatio;
   const totalTextHeight =
-    groupOrEvent.category === 'child-workflow' && isEventGroup(groupOrEvent)
+    group.category === 'child-workflow'
       ? textHeight + DetailsChildTimelineHeight
       : textHeight;
   return (
     Math.max(codeBlockHeight, totalTextHeight) + 3 * DetailsConfig.fontSizeRatio
+  );
+};
+
+export const getEventDetailsBoxHeight = (event: WorkflowEvent) => {
+  const attributes = formatAttributes(event);
+  const codeBlockAttributes = Object.entries(attributes).filter(
+    ([, value]) => typeof value === 'object',
+  );
+  const textAttributes = Object.entries(attributes).filter(
+    ([, value]) => typeof value !== 'object',
+  );
+
+  const codeBlockHeight = codeBlockAttributes.length * staticCodeBlockHeight;
+  const textHeight = textAttributes.length * DetailsConfig.fontSizeRatio;
+  return (
+    Math.max(codeBlockHeight, textHeight) + 2 * DetailsConfig.fontSizeRatio
   );
 };

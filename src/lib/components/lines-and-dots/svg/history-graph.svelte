@@ -9,7 +9,7 @@
   } from '$lib/stores/active-events';
   import type { WorkflowEvents } from '$lib/types/events';
 
-  import { getDetailsBoxHeight, HistoryConfig } from '../constants';
+  import { getEventDetailsBoxHeight, HistoryConfig } from '../constants';
 
   import HistoryGraphRowVisual from './history-graph-row-visual.svelte';
   import HistoryGraphRow from './history-graph-row.svelte';
@@ -42,9 +42,15 @@
 
   $: activeDetailsHeight = activeEvents
     .map((id) => {
-      const event = visibleHistory.find((event) => event.id === id);
-      if (!event) return 0;
-      return getDetailsBoxHeight(event);
+      const event = history.find((event) => event.id === id);
+      const group = allGroups.find((group) => group.eventIds.has(id));
+      if (group) {
+        return group.eventList.reduce(
+          (sum, event) => (sum += getEventDetailsBoxHeight(event)),
+          0,
+        );
+      }
+      return getEventDetailsBoxHeight(event);
     })
     .reduce((acc, height) => acc + height, 0);
 
@@ -77,24 +83,6 @@
       {index}
     />
   {/each}
-  <!-- {#each pendingActivities as pendingActivity, index}
-    {@const group = groups.find((g) =>
-      g.eventIds.has(pendingActivity.activityId),
-    )}
-    <HistoryGraphRow
-      event={pendingActivity}
-      {activeEvents}
-      {group}
-      {groups}
-      {history}
-      {pendingActivities}
-      canvasWidth={canvasWidth * zoomLevel}
-      {startingX}
-      active={isActive(group)}
-      onClick={() => onClick(pendingActivity, group)}
-      {index}
-    />
-  {/each} -->
   <svg
     viewBox="0 0 {2 * canvasWidth} {canvasHeight * zoomLevel}"
     height={canvasHeight}

@@ -13,7 +13,7 @@
 
   import {
     CompactConfig,
-    getDetailsBoxHeight,
+    getGroupDetailsBoxHeight,
     minCompactWidth,
   } from '../constants';
 
@@ -76,7 +76,7 @@
   $: activeDetailsHeight = activeGroups
     .map((id) => {
       const group = groups.find((group) => group.id === id);
-      return getDetailsBoxHeight(group);
+      return getGroupDetailsBoxHeight(group);
     })
     .reduce((acc, height) => acc + height, 0);
 
@@ -142,10 +142,7 @@
 
   $: canvasHeight = Math.max(maxSegmentSize(), 400) + activeDetailsHeight;
   $: width = Math.max(timeGroups.length * minCompactWidth, canvasWidth);
-  $: length = Math.max(
-    minCompactWidth,
-    (canvasWidth - gutter) / timeGroups.length,
-  );
+  $: length = Math.max(minCompactWidth, (width - gutter) / timeGroups.length);
 </script>
 
 <svg
@@ -153,7 +150,7 @@
   {y}
   viewBox="0 0 {width} {canvasHeight}"
   height={(staticHeight || canvasHeight) / zoomLevel}
-  {width}
+  width={width / zoomLevel}
 >
   {#each timeGroups as groups, startIndex}
     {#each getNameGroups(groups) as nameGroup, groupIndex}

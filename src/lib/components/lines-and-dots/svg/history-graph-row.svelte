@@ -3,7 +3,7 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
-  import { setSingleActiveEvent } from '$lib/stores/active-events';
+  import { setActiveEvent } from '$lib/stores/active-events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
@@ -16,7 +16,7 @@
   } from '../constants';
 
   import Box from './box.svelte';
-  import GroupDetailsRow from './group-details-row.svelte';
+  import EventDetailsRow from './event-details-row.svelte';
   import Text from './text.svelte';
 
   export let event: WorkflowEvent;
@@ -40,7 +40,7 @@
   ));
 
   $: noActives = !activeEvents.length;
-  $: isActiveEvent = activeEvents[0] === event.id;
+  $: isActiveEvent = activeEvents.includes(event.id);
   $: showTimestamp = canvasWidth > 1200;
   $: showDetails = canvasWidth > 800;
   $: classification = group?.pendingActivity
@@ -54,8 +54,8 @@
 <g
   role="button"
   tabindex="0"
-  on:click|preventDefault={() => setSingleActiveEvent(event)}
-  on:keypress={() => setSingleActiveEvent(event)}
+  on:click|preventDefault={() => setActiveEvent(event, group)}
+  on:keypress={() => setActiveEvent(event, group)}
   class="relative cursor-pointer"
 >
   <Box
@@ -70,7 +70,7 @@
     active={noActives || isActiveEvent}
     fontSize="12px"
   >
-    <tspan fill="#aebed9">{event.id}</tspan>
+    {event.id}
   </Text>
   <Text
     point={[visualWidth + 50, y]}
@@ -100,7 +100,7 @@
   {/if}
 </g>
 {#if isActiveEvent}
-  <GroupDetailsRow
+  <EventDetailsRow
     y={y + height / 2}
     x={visualWidth + 2}
     {event}

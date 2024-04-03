@@ -85,6 +85,9 @@
   <div class="flex flex-col gap-2">
     <WorkflowDetails />
     <InputAndResults />
+    {#if workflowTaskFailedError}
+      <WorkflowError error={workflowTaskFailedError} />
+    {/if}
     <div
       class="flex flex-col items-center justify-between gap-2 py-2 md:flex-row"
     >
@@ -146,9 +149,6 @@
     {/if}
   </div>
 </div>
-{#if workflowTaskFailedError}
-  <WorkflowError error={workflowTaskFailedError} />
-{/if}
 <div class="bg-inverse">
   <div class="w-full overflow-auto" bind:clientWidth={canvasWidth}>
     {#if $eventViewType === 'compact'}

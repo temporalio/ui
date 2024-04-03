@@ -75,6 +75,7 @@
     stroke: none;
     fill: #fff;
     dominant-baseline: middle;
+    alignment-baseline: baseline;
   }
 
   .active {

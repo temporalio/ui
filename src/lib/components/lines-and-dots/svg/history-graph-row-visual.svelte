@@ -3,6 +3,7 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
+  import { setSingleActiveEvent } from '$lib/stores/active-events';
   import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
@@ -55,40 +56,48 @@
   $: eventInViewBox = horizontalOffset <= width;
   $: isActive =
     !activeEvents.length ||
-    event.id === activeEvents[0] ||
-    group?.eventIds?.has(activeEvents[0]);
+    activeEvents.includes(event.id) ||
+    !!activeEvents.find((id) => group?.eventIds.has(id));
 </script>
 
-{#if connectLine}
-  <Line
-    startPoint={[width - strokeWidth, zoomY]}
-    endPoint={[width - horizontalOffset - radius, zoomY]}
-    active={isActive}
-  />
-{/if}
-{#if eventInViewBox}
-  <Dot
-    point={[width - horizontalOffset, zoomY]}
-    {classification}
-    active={isActive}
-  />
-{/if}
-{#if eventInViewBox && zoomNextDistance}
-  <Line
-    startPoint={[
-      width - horizontalOffset - radius / 2 + strokeWidth,
-      zoomY + radius + strokeWidth / 2,
-    ]}
-    endPoint={[
-      width - horizontalOffset - radius / 2 + strokeWidth,
-      zoomY + zoomNextDistance + radius,
-    ]}
-    category={group?.pendingActivity
-      ? group.pendingActivity.attempt > 1
-        ? 'retry'
-        : 'pending'
-      : category}
-    active={isActive}
-    pending={nextIsPending}
-  />
-{/if}
+<g
+  role="button"
+  tabindex="0"
+  on:click|preventDefault={() => setSingleActiveEvent(event)}
+  on:keypress={() => setSingleActiveEvent(event)}
+  class="relative cursor-pointer"
+>
+  {#if connectLine}
+    <Line
+      startPoint={[width - strokeWidth, zoomY]}
+      endPoint={[width - horizontalOffset - radius, zoomY]}
+      active={isActive}
+    />
+  {/if}
+  {#if eventInViewBox}
+    <Dot
+      point={[width - horizontalOffset, zoomY]}
+      {classification}
+      active={isActive}
+    />
+  {/if}
+  {#if eventInViewBox && zoomNextDistance}
+    <Line
+      startPoint={[
+        width - horizontalOffset - radius / 2 + strokeWidth,
+        zoomY + radius + strokeWidth / 2,
+      ]}
+      endPoint={[
+        width - horizontalOffset - radius / 2 + strokeWidth,
+        zoomY + zoomNextDistance + radius,
+      ]}
+      category={group?.pendingActivity
+        ? group.pendingActivity.attempt > 1
+          ? 'retry'
+          : 'pending'
+        : category}
+      active={isActive}
+      pending={nextIsPending}
+    />
+  {/if}
+</g>

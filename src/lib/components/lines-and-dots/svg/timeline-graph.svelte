@@ -5,7 +5,7 @@
 
   import {
     activeGroupsHeightAboveGroup,
-    getDetailsBoxHeight,
+    getGroupDetailsBoxHeight,
     TimelineConfig,
   } from '../constants';
   import EndTimeInterval from '../end-time-interval.svelte';
@@ -34,7 +34,7 @@
     .map((id) => {
       const group = groups.find((group) => group.id === id);
       if (!group) return 0;
-      return getDetailsBoxHeight(group);
+      return getGroupDetailsBoxHeight(group);
     })
     .reduce((acc, height) => acc + height, 0);
 
