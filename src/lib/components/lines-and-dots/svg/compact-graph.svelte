@@ -5,7 +5,10 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
-  import { setSingleActiveGroup } from '$lib/stores/active-events';
+  import {
+    clearActives,
+    setSingleActiveGroup,
+  } from '$lib/stores/active-events';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   import {
@@ -80,23 +83,30 @@
   const groupNameWithIndex = (name: string, index: number) =>
     `${index}:${name}`;
 
+  const setActiveGroupX = (startIndex: number) => {
+    if (width > canvasWidth) {
+      if (startIndex * length < width - canvasWidth) {
+        activeX = startIndex * length;
+      } else {
+        activeX = width - canvasWidth;
+      }
+    }
+  };
+
   const onRowClick = (groups: EventGroups, startIndex: number, y: number) => {
     if (groups.length === 1) {
       setSingleActiveGroup(groups[0]);
       activeY = y;
-      if (width > canvasWidth) {
-        activeX = startIndex * length;
-      }
+      setActiveGroupX(startIndex);
     } else {
+      clearActives();
       const name = groupNameWithIndex(groups[0].name, startIndex);
       if (exandedGroups.includes(name)) {
         exandedGroups = exandedGroups.filter((n) => n !== name);
         if (activeGroups.includes(groups[0].id)) {
           setSingleActiveGroup(groups[0]);
+          setActiveGroupX(startIndex);
           activeY = y;
-          if (width > canvasWidth) {
-            activeX = startIndex * length;
-          }
         }
       } else {
         exandedGroups = [...exandedGroups, name];
@@ -104,8 +114,9 @@
     }
   };
 
-  const onEventClick = (group: EventGroup, y: number) => {
+  const onEventClick = (group: EventGroup, startIndex: number, y: number) => {
     setSingleActiveGroup(group);
+    setActiveGroupX(startIndex);
     activeY = y;
   };
 
@@ -174,20 +185,20 @@
             {y}
             {length}
             active={isActive(group)}
-            onClick={() => onEventClick(group, y)}
+            onClick={() => onEventClick(group, startIndex, y)}
           />
         {/each}
       {/if}
     {/each}
-    {#if activeGroup}
-      <GroupDetailsRow
-        group={activeGroup}
-        {canvasWidth}
-        x={activeX}
-        y={activeY + 1.25 * radius}
-      />
-    {/if}
   {:else}
     <WorkflowRow {workflow} y={height} length={canvasWidth} active />
   {/each}
+  {#if activeGroup}
+    <GroupDetailsRow
+      group={activeGroup}
+      {canvasWidth}
+      x={activeX}
+      y={activeY + 1.25 * radius}
+    />
+  {/if}
 </svg>
