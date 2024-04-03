@@ -8,7 +8,11 @@
   import { setSingleActiveGroup } from '$lib/stores/active-events';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
-  import { CompactConfig, getDetailsBoxHeight } from '../constants';
+  import {
+    CompactConfig,
+    getDetailsBoxHeight,
+    minCompactWidth,
+  } from '../constants';
 
   import CompactGraphRow from './compact-graph-row.svelte';
   import GroupDetailsRow from './group-details-row.svelte';
@@ -27,6 +31,7 @@
   const { height, gutter, radius } = CompactConfig;
   let exandedGroups = [];
   let activeY = 0;
+  let activeX = 0;
 
   $: activeGroup =
     activeGroups[0] && groups.find((group) => group.id === activeGroups[0]);
@@ -79,6 +84,9 @@
     if (groups.length === 1) {
       setSingleActiveGroup(groups[0]);
       activeY = y;
+      if (width > canvasWidth) {
+        activeX = startIndex * length;
+      }
     } else {
       const name = groupNameWithIndex(groups[0].name, startIndex);
       if (exandedGroups.includes(name)) {
@@ -86,6 +94,9 @@
         if (activeGroups.includes(groups[0].id)) {
           setSingleActiveGroup(groups[0]);
           activeY = y;
+          if (width > canvasWidth) {
+            activeX = startIndex * length;
+          }
         }
       } else {
         exandedGroups = [...exandedGroups, name];
@@ -119,14 +130,19 @@
   };
 
   $: canvasHeight = Math.max(maxSegmentSize(), 400) + activeDetailsHeight;
+  $: width = Math.max(timeGroups.length * minCompactWidth, canvasWidth);
+  $: length = Math.max(
+    minCompactWidth,
+    (canvasWidth - gutter) / timeGroups.length,
+  );
 </script>
 
 <svg
   {x}
   {y}
-  viewBox="0 0 {canvasWidth} {canvasHeight}"
+  viewBox="0 0 {width} {canvasHeight}"
   height={(staticHeight || canvasHeight) / zoomLevel}
-  width={canvasWidth}
+  {width}
 >
   {#each timeGroups as groups, startIndex}
     {#each getNameGroups(groups) as nameGroup, groupIndex}
@@ -144,7 +160,7 @@
         {startIndex}
         count={nameGroup.length}
         y={startY}
-        length={(canvasWidth - gutter) / timeGroups.length}
+        {length}
         active={isActive(group)}
         onClick={() => onRowClick(nameGroup, startIndex, startY)}
         {expanded}
@@ -156,7 +172,7 @@
             {group}
             {startIndex}
             {y}
-            length={(canvasWidth - gutter) / timeGroups.length}
+            {length}
             active={isActive(group)}
             onClick={() => onEventClick(group, y)}
           />
@@ -167,6 +183,7 @@
       <GroupDetailsRow
         group={activeGroup}
         {canvasWidth}
+        x={activeX}
         y={activeY + 1.25 * radius}
       />
     {/if}

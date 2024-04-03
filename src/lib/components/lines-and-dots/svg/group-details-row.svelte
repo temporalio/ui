@@ -33,7 +33,7 @@
   export let x = 0;
   export let y: number;
 
-  let status =
+  $: status =
     group?.finalClassification ||
     group?.classification ||
     event?.classification;
@@ -111,7 +111,7 @@
     <Box point={[x, y]} {width} {height} fill="#1E293B" />
     <Box
       point={[x, y]}
-      width={x + gutter + 100}
+      width={gutter + 100}
       {height}
       fill={getStatusColor(status)}
     />
@@ -126,7 +126,7 @@
       {title}
     </Text>
     <Text
-      point={[width - gutter, y + 0.5 * height]}
+      point={[x + width - gutter, y + 0.5 * height]}
       fontWeight="500"
       textAnchor="end"
     >

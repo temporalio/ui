@@ -29,6 +29,8 @@ export type GraphConfig = {
 
 const baseRadius = 8;
 
+export const minCompactWidth = 100;
+
 export const CompactConfig: GraphConfig = {
   height: baseRadius * 7,
   gutter: baseRadius * 6,

@@ -38,16 +38,25 @@
       active={false}
     />
   {/if}
-  <text
-    fill="#fff"
-    font-size="12"
-    transform="rotate(90, {tickX}, {tickY})"
-    x={tickX - radius}
-    y={tickY}
-  >
-    {#if i === 0}
+  {#if i === 0}
+    <text
+      fill="#fff"
+      font-size="12"
+      transform="rotate(90, {tickX}, {tickY})"
+      x={tickX - radius}
+      y={tickY}
+    >
       <tspan>{formatDate(startTime, $timeFormat)}</tspan>
-    {:else}
+    </text>
+  {:else}
+    <text
+      fill="#fff"
+      font-size="12"
+      opacity={0.5}
+      transform="rotate(90, {tickX}, {16})"
+      x={tickX - radius}
+      y={16}
+    >
       {formatDistanceAbbreviated({
         start: startTime,
         end: new Date(
@@ -55,8 +64,23 @@
         ),
         includeMilliseconds: duration / ticks < 1000,
       })}
-    {/if}
-  </text>
+    </text>
+    <text
+      fill="#fff"
+      font-size="12"
+      transform="rotate(90, {tickX}, {tickY})"
+      x={tickX - radius}
+      y={tickY}
+    >
+      {formatDistanceAbbreviated({
+        start: startTime,
+        end: new Date(
+          new Date(startTime.toString()).getTime() + (duration / ticks) * i,
+        ),
+        includeMilliseconds: duration / ticks < 1000,
+      })}
+    </text>
+  {/if}
 {/each}
 <text
   fill="#fff"

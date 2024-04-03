@@ -150,7 +150,7 @@
   <WorkflowError error={workflowTaskFailedError} />
 {/if}
 <div class="bg-inverse">
-  <div class="w-full overflow-x-hidden" bind:clientWidth={canvasWidth}>
+  <div class="w-full overflow-auto" bind:clientWidth={canvasWidth}>
     {#if $eventViewType === 'compact'}
       <CompactGraph
         {workflow}
