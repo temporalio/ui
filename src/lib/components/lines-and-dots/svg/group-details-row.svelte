@@ -103,7 +103,7 @@
       point={[x, y]}
       width={x + gutter + 100}
       {height}
-      fill={getStatusColor(group.finalClassification)}
+      fill={getStatusColor(status)}
     />
     <Text
       point={[x + gutter, y + 0.5 * height]}
@@ -129,8 +129,8 @@
     </Text>
   {/if}
   {#each codeBlockAttributes as [key, value], index (key)}
-    {@const gridIndex = Math.floor(index / 2)}
-    {@const blockX = x + gutter + (index % 2) * (width / 2)}
+    {@const gridIndex = Math.floor(index / 4)}
+    {@const blockX = x + gutter + (index % 4) * (width / 4)}
     {@const y = textStartingY + gridIndex * staticCodeBlockHeight}
     <Text point={[blockX, y]}>{format(key)}</Text>
     <GroupDetailsText
@@ -138,7 +138,7 @@
       {key}
       {value}
       {attributes}
-      {width}
+      width={width / 2}
     />
   {/each}
   {#each textAttributes as [key, value], index (key)}
@@ -146,7 +146,7 @@
       point={[
         x + gutter,
         textStartingY +
-          staticCodeBlockHeight * Math.ceil(codeBlockAttributes.length / 2) +
+          staticCodeBlockHeight * Math.ceil(codeBlockAttributes.length / 4) +
           (index + 1) * fontSizeRatio,
       ]}>{format(key)}</Text
     >
@@ -154,7 +154,7 @@
       point={[
         x + gutter + labelPadding,
         textStartingY +
-          staticCodeBlockHeight * Math.ceil(codeBlockAttributes.length / 2) +
+          staticCodeBlockHeight * Math.ceil(codeBlockAttributes.length / 4) +
           (index + 1) * fontSizeRatio,
       ]}
       {key}
