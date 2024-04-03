@@ -39,7 +39,7 @@
     event?.classification;
 
   $: {
-    if (group.pendingActivity) {
+    if (group?.pendingActivity) {
       if (group.pendingActivity.attempt > 1) {
         status = 'Retry';
       } else {
