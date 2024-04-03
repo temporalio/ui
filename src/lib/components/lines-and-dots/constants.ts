@@ -300,10 +300,10 @@ export const getStatusColor = (
 ): string => {
   switch (status) {
     case 'Completed':
-      return '#00964e';
+      return '#00f37e';
     case 'Failed':
     case 'Terminated':
-      return '#c71607';
+      return '#ff4518';
     case 'Signaled':
       return '#d300d8';
     case 'Fired':
