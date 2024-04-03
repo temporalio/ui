@@ -41,7 +41,7 @@
   $: {
     if (group?.pendingActivity) {
       if (group.pendingActivity.attempt > 1) {
-        status = 'Retry';
+        status = 'Retrying';
       } else {
         status = 'Pending';
       }

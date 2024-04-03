@@ -8,8 +8,8 @@
   import HistoryGraph from '$lib/components/lines-and-dots/svg/history-graph.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
+  import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
-  import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -144,11 +144,11 @@
         <EventTypeFilter compact={$eventViewType !== 'feed'} />
       </div>
     {/if}
-    {#if workflowTaskFailedError}
-      <WorkflowTypedError error={workflowTaskFailedError} />
-    {/if}
   </div>
 </div>
+{#if workflowTaskFailedError}
+  <WorkflowError error={workflowTaskFailedError} />
+{/if}
 <div class="bg-inverse">
   <div class="w-full overflow-x-hidden" bind:clientWidth={canvasWidth}>
     {#if $eventViewType === 'compact'}

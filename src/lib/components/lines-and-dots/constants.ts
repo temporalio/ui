@@ -37,7 +37,7 @@ export const CompactConfig: GraphConfig = {
 };
 
 export const TimelineConfig: GraphConfig = {
-  height: baseRadius * 5,
+  height: baseRadius * 4,
   gutter: baseRadius * 3,
   radius: baseRadius * 1.5,
   fontSizeRatio: baseRadius * 3,
