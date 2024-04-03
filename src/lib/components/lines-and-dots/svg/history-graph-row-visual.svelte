@@ -10,7 +10,6 @@
     getNextDistanceAndOffset,
     HistoryConfig,
     isMiddleEvent,
-    isPendingGroup,
   } from '../constants';
 
   import Dot from './dot.svelte';
@@ -52,7 +51,7 @@
 
   $: width = (canvasWidth / 5) * zoomLevel;
   $: horizontalOffset = (offset / 1.5) * 3 * radius;
-  $: nextIsPending = group?.lastEvent.id === event?.id && isPendingGroup(group);
+  $: nextIsPending = group?.lastEvent.id === event?.id && group.isPending;
   $: eventInViewBox = horizontalOffset <= width;
   $: isActive =
     !activeEvents.length ||

@@ -30,6 +30,10 @@ const addToExistingGroup = (
   if (pendingActivity) {
     group.pendingActivity = pendingActivity;
   }
+
+  if (group.pendingActivity && group.eventList.length === 3) {
+    delete group.pendingActivity;
+  }
 };
 
 export const groupEvents = (

@@ -3,6 +3,7 @@
 
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
     getCodeBlockValue,
@@ -18,9 +19,6 @@
 
   import { DetailsConfig, staticCodeBlockHeight } from '../constants';
 
-  import TextLink from './text-link.svelte';
-  import Text from './text.svelte';
-
   const { workflow, namespace } = $page.params;
 
   export let key: string;
@@ -29,12 +27,10 @@
   export let point: [number, number] = [0, 0];
   export let width: number;
 
-  const { fontSizeRatio, gutter } = DetailsConfig;
+  const { fontSizeRatio } = DetailsConfig;
 
   $: [x, y] = point;
   $: codeBlockValue = getCodeBlockValue(value);
-  $: width = width / 2 - 2 * gutter;
-  // $: stackTrace = getStackTrace(codeBlockValue);
 </script>
 
 {#if typeof value === 'object'}
@@ -102,28 +98,23 @@
     {stackTrace}
   {/if} -->
 {:else if shouldDisplayAsExecutionLink(key)}
-  <TextLink
+  <Link
     href={routeForEventHistory({
       namespace,
       workflow,
       run: value,
-    })}
-    {point}>{value}</TextLink
+    })}>{value}</Link
   >
 {:else if shouldDisplayChildWorkflowLink(key, attributes)}
-  <TextLink
+  <Link
     href={routeForEventHistory({
       namespace: attributes?.namespace || namespace,
       workflow: attributes.workflowExecutionWorkflowId,
       run: attributes.workflowExecutionRunId,
-    })}
-    {point}>{value}</TextLink
-  >
+    })}>{value}</Link
   >
 {:else if shouldDisplayAsTaskQueueLink(key)}
-  <TextLink href={routeForTaskQueue({ namespace, queue: value })} {point}
-    >{value}</TextLink
-  >
+  <Link href={routeForTaskQueue({ namespace, queue: value })}>{value}</Link>
 {:else}
-  <Text {point}>{value}</Text>
+  {value}
 {/if}

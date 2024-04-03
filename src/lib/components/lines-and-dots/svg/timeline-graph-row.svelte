@@ -7,7 +7,6 @@
 
   import {
     CategoryIcon,
-    isPendingGroup,
     TimelineConfig,
     timelineTextPosition,
   } from '../constants';
@@ -27,7 +26,6 @@
   const { height, gutter, radius } = TimelineConfig;
 
   $: timelineWidth = canvasWidth - 2 * gutter;
-  $: isPending = isPendingGroup(group);
   $: active = !activeGroups.length || activeGroups.includes(group.id);
 
   const getDistancePointsAndPositions = (
@@ -53,7 +51,13 @@
     });
 
     const { textAnchor, textIndex, textPosition, backdrop } =
-      timelineTextPosition(points, y, timelineWidth, isPending, TimelineConfig);
+      timelineTextPosition(
+        points,
+        y,
+        timelineWidth,
+        group.isPending,
+        TimelineConfig,
+      );
 
     return { points, textAnchor, textIndex, textPosition, backdrop };
   };
@@ -85,7 +89,7 @@
           group.lastEvent.classification === 'Completed'}
       />
     {/if}
-    {#if !nextPoint && isPending}
+    {#if !nextPoint && group.isPending}
       <Line
         startPoint={[x, y]}
         endPoint={[canvasWidth - gutter, y]}

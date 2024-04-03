@@ -38,6 +38,16 @@
     group?.classification ||
     event?.classification;
 
+  $: {
+    if (group.pendingActivity) {
+      if (group.pendingActivity.attempt > 1) {
+        status = 'Retry';
+      } else {
+        status = 'Pending';
+      }
+    }
+  }
+
   const { gutter, fontSizeRatio, height } = DetailsConfig;
   $: ({ namespace } = $page.params);
 
@@ -81,7 +91,7 @@
   $: groupOrEvent = event ?? group;
   $: title = groupOrEvent.name;
   $: boxHeight = getDetailsBoxHeight(groupOrEvent);
-  $: textStartingY = event ? y + fontSizeRatio : height + y + fontSizeRatio;
+  $: textStartingY = !event ? height + y + fontSizeRatio : y + fontSizeRatio;
   $: childTimelineY = y + boxHeight - DetailsChildTimelineHeight;
   $: attributes = mergeEventGroupDetails(groupOrEvent);
   $: codeBlockAttributes = Object.entries(attributes).filter(
@@ -115,7 +125,6 @@
     <Text point={[x + 1.5 * gutter + 100, y + 0.5 * height]} fontWeight="500">
       {title}
     </Text>
-
     <Text
       point={[width - gutter, y + 0.5 * height]}
       fontWeight="500"
@@ -129,39 +138,38 @@
     </Text>
   {/if}
   {#each codeBlockAttributes as [key, value], index (key)}
-    {@const gridIndex = Math.floor(index / 4)}
-    {@const blockX = x + gutter + (index % 4) * (width / 4)}
-    {@const y = textStartingY + gridIndex * staticCodeBlockHeight}
+    {@const blockX = x + gutter + 0.5 * width}
+    {@const y = textStartingY + index * staticCodeBlockHeight}
     <Text point={[blockX, y]}>{format(key)}</Text>
     <GroupDetailsText
       point={[blockX, y + 1.5 * fontSizeRatio]}
       {key}
       {value}
       {attributes}
-      width={width / 2}
+      width={0.5 * width - 2 * gutter}
     />
   {/each}
   {#each textAttributes as [key, value], index (key)}
-    <Text
-      point={[
-        x + gutter,
-        textStartingY +
-          staticCodeBlockHeight * Math.ceil(codeBlockAttributes.length / 4) +
-          (index + 1) * fontSizeRatio,
-      ]}>{format(key)}</Text
+    <foreignObject
+      x={x + gutter}
+      y={textStartingY + index * fontSizeRatio}
+      width={0.5 * width - gutter}
+      height={fontSizeRatio}
     >
-    <GroupDetailsText
-      point={[
-        x + gutter + labelPadding,
-        textStartingY +
-          staticCodeBlockHeight * Math.ceil(codeBlockAttributes.length / 4) +
-          (index + 1) * fontSizeRatio,
-      ]}
-      {key}
-      {value}
-      {attributes}
-      {width}
-    />
+      <div class="flex gap-1 text-wrap text-sm text-white">
+        <div class="w-48">{format(key)}</div>
+        <GroupDetailsText
+          point={[
+            x + gutter + labelPadding,
+            textStartingY + index * fontSizeRatio,
+          ]}
+          {key}
+          {value}
+          {attributes}
+          {width}
+        />
+      </div>
+    </foreignObject>
   {/each}
   {#if fetchChildWorkflow && fetchChildTimeline}
     {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [workflow, childHistory]}
@@ -177,7 +185,7 @@
         {workflow}
         history={childHistory}
         {groups}
-        {canvasWidth}
+        canvasWidth={0.5 * width}
       />
     {/await}
   {/if}

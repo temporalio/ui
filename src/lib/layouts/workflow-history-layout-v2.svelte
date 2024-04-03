@@ -9,7 +9,7 @@
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
-  // import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
+  import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -30,7 +30,7 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { exportHistory } from '$lib/utilities/export-history';
-  // import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
+  import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
   let showFilters = false;
   let zoomLevel = 1;
@@ -44,10 +44,10 @@
     pendingActivities,
   );
 
-  // $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
-  //   $fullEventHistory,
-  //   'ascending',
-  // );
+  $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
+    $fullEventHistory,
+    'ascending',
+  );
 
   $: $eventViewType, clearActives();
 
@@ -144,9 +144,9 @@
         <EventTypeFilter compact={$eventViewType !== 'feed'} />
       </div>
     {/if}
-    <!-- {#if workflowTaskFailedError}
+    {#if workflowTaskFailedError}
       <WorkflowTypedError error={workflowTaskFailedError} />
-    {/if} -->
+    {/if}
   </div>
 </div>
 <div class="bg-inverse">

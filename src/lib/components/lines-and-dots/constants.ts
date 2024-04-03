@@ -16,10 +16,6 @@ import {
   formatAttributes,
   formatPendingAttributes,
 } from '$lib/utilities/format-event-attributes';
-import {
-  isStartChildWorkflowExecutionInitiatedEvent,
-  isTimerStartedEvent,
-} from '$lib/utilities/is-event-type';
 import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
 export const DetailsChildTimelineHeight = 200;
@@ -151,15 +147,6 @@ const isConsecutiveGroup = (group: EventGroup): boolean => {
   }
 };
 
-export const isPendingGroup = (group: EventGroup) =>
-  Boolean(
-    group.pendingActivity ||
-      (isTimerStartedEvent(group.initialEvent) &&
-        group.eventList.length === 1) ||
-      (isStartChildWorkflowExecutionInitiatedEvent(group.initialEvent) &&
-        group.eventList.length === 2),
-  );
-
 const getOpenGroups = (
   event: WorkflowEvent | PendingActivity,
   groups: EventGroups,
@@ -172,15 +159,13 @@ const getOpenGroups = (
   if (group.level !== undefined) return group.level;
 
   const pendingGroups = groups
-    .filter((g) => isPendingGroup(g) && g.id !== group.id)
+    .filter((g) => g.isPending && g.id !== group.id)
     .filter(
       (g) => parseInt(g.initialEvent.id) < parseInt(group.initialEvent.id),
     );
 
   const nonPendingGroups = groups
-    .filter(
-      (g) => g.eventList.length > 1 && !isPendingGroup(g) && g.id !== group.id,
-    )
+    .filter((g) => g.eventList.length > 1 && !g.isPending && g.id !== group.id)
     .filter(
       (g) => parseInt(g.initialEvent.id) < parseInt(group.initialEvent.id),
     )
@@ -234,7 +219,7 @@ export const getNextDistanceAndOffset = (
     return { nextDistance, offset, y };
   }
 
-  if (group.eventList.length === 1 && !isPendingGroup(group)) {
+  if (group.eventList.length === 1 && !group.isPending) {
     return { nextDistance, offset, y };
   }
 
@@ -245,7 +230,7 @@ export const getNextDistanceAndOffset = (
     offset = getOpenGroups(event, groups, pendingActivity);
   }
 
-  if (!nextEvent && !isPendingGroup(group)) {
+  if (!nextEvent && !group.isPending) {
     return { nextDistance, offset, y };
   }
 
@@ -260,7 +245,7 @@ export const getNextDistanceAndOffset = (
   let diff = 0;
   if (nextEvent) {
     diff = parseInt(nextEvent.id) - parseInt(event.id);
-  } else if (isPendingGroup(group)) {
+  } else if (group.isPending) {
     diff = history.length - parseInt(event.id) + 2;
   }
   nextDistance = diff * height;
@@ -375,7 +360,7 @@ export const mergeEventGroupDetails = (
 
 export const staticCodeBlockHeight = 200;
 
-export const getEventDetailsHeight = (
+export const getDetailsBoxHeight = (
   groupOrEvent: EventGroup | WorkflowEvent,
 ) => {
   const attributes = mergeEventGroupDetails(groupOrEvent);
@@ -385,19 +370,14 @@ export const getEventDetailsHeight = (
   const textAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value !== 'object',
   );
-  return (
-    Math.ceil(codeBlockAttributes.length / 4) * staticCodeBlockHeight +
-    textAttributes.length * DetailsConfig.fontSizeRatio +
-    3 * DetailsConfig.fontSizeRatio
-  );
-};
 
-export const getDetailsBoxHeight = (
-  groupOrEvent: EventGroup | WorkflowEvent,
-) => {
-  const detailsHeight = getEventDetailsHeight(groupOrEvent);
-  return groupOrEvent.category === 'child-workflow' &&
-    isEventGroup(groupOrEvent)
-    ? DetailsChildTimelineHeight + detailsHeight
-    : detailsHeight;
+  const codeBlockHeight = codeBlockAttributes.length * staticCodeBlockHeight;
+  const textHeight = textAttributes.length * DetailsConfig.fontSizeRatio;
+  const totalTextHeight =
+    groupOrEvent.category === 'child-workflow' && isEventGroup(groupOrEvent)
+      ? textHeight + DetailsChildTimelineHeight
+      : textHeight;
+  return (
+    Math.max(codeBlockHeight, totalTextHeight) + 3 * DetailsConfig.fontSizeRatio
+  );
 };

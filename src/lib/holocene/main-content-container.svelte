@@ -29,9 +29,9 @@
   }
 
   function onScrollToBottomClick() {
-    const lastIndex = $filteredEventHistory?.length;
-    if (lastIndex) {
-      $endIndex = lastIndex;
+    const historyLength = $filteredEventHistory?.length;
+    if (historyLength) {
+      $endIndex = historyLength;
       $startIndex = $endIndex - indexPageSize;
     }
     getScrollContainer()?.scrollTo(0, getScrollContainer()?.scrollHeight);

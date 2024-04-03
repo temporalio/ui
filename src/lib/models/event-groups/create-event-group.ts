@@ -115,6 +115,15 @@ const createGroupFor = <K extends keyof StartingEvents>(
     get finalClassification() {
       return getLastEvent(this).classification;
     },
+    get isPending() {
+      return (
+        this.pendingActivity ||
+        (isTimerStartedEvent(this.initialEvent) &&
+          this.eventList.length === 1) ||
+        (isStartChildWorkflowExecutionInitiatedEvent(this.initialEvent) &&
+          this.eventList.length === 2)
+      );
+    },
     get isFailureOrTimedOut() {
       return Boolean(this.eventList.find(eventIsFailureOrTimedOut));
     },

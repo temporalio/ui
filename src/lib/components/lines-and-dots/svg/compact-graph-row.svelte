@@ -2,7 +2,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
 
-  import { CategoryIcon, CompactConfig, isPendingGroup } from '../constants';
+  import { CategoryIcon, CompactConfig } from '../constants';
 
   import Dot from './dot.svelte';
   import Line from './line.svelte';
@@ -22,8 +22,7 @@
   $: start = 2 * radius + startIndex * length;
   $: end = start + length;
   $: aggregateRow = count > 1;
-
-  $: isPending = isPendingGroup(group) && !aggregateRow;
+  $: isPending = group.isPending && !aggregateRow;
 </script>
 
 <g
