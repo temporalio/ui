@@ -6,7 +6,9 @@ import {
   isActivityTaskFailedEvent,
   isActivityTaskStartedEvent,
   isActivityTaskTimedOutEvent,
+  isChildWorkflowExecutionCanceledEvent,
   isChildWorkflowExecutionCompletedEvent,
+  isChildWorkflowExecutionFailedEvent,
   isChildWorkflowExecutionStartedEvent,
   isChildWorkflowExecutionTerminatedEvent,
   isExternalWorkflowExecutionSignaledEvent,
@@ -60,6 +62,18 @@ export const getGroupId = (event: CommonHistoryEvent): string => {
   if (isChildWorkflowExecutionCompletedEvent(event)) {
     return String(
       event.childWorkflowExecutionCompletedEventAttributes.initiatedEventId,
+    );
+  }
+
+  if (isChildWorkflowExecutionCanceledEvent(event)) {
+    return String(
+      event.childWorkflowExecutionCanceledEventAttributes.initiatedEventId,
+    );
+  }
+
+  if (isChildWorkflowExecutionFailedEvent(event)) {
+    return String(
+      event.childWorkflowExecutionFailedEventAttributes.initiatedEventId,
     );
   }
 
