@@ -17,6 +17,7 @@
     DetailsChildTimelineHeight,
     DetailsConfig,
     getDetailsBoxHeight,
+    getStatusColor,
     mergeEventGroupDetails,
     staticCodeBlockHeight,
   } from '../constants';
@@ -32,7 +33,10 @@
   export let x = 0;
   export let y: number;
 
-  let status = group?.finalClassification || event.classification;
+  let status =
+    group?.finalClassification ||
+    group?.classification ||
+    event?.classification;
 
   const { gutter, fontSizeRatio, height } = DetailsConfig;
   $: ({ namespace } = $page.params);
@@ -70,7 +74,6 @@
     } else {
       fetchChildWorkflow = undefined;
       fetchChildTimeline = undefined;
-      status = '';
     }
   };
 
@@ -96,11 +99,23 @@
   <Box point={[x, y]} {width} height={boxHeight} fill="#465A78" />
   {#if !event}
     <Box point={[x, y]} {width} {height} fill="#1E293B" />
-    <Text point={[x + gutter, y + 0.5 * height]} fontWeight="500">{title}</Text>
-    {#if status}<Text
-        point={[width / 2 - gutter, y + 0.5 * height]}
-        fontWeight="500">{status}</Text
-      >{/if}
+    <Box
+      point={[x, y]}
+      width={x + gutter + 100}
+      {height}
+      fill={getStatusColor(group.finalClassification)}
+    />
+    <Text
+      point={[x + gutter, y + 0.5 * height]}
+      fontWeight="500"
+      category="none"
+    >
+      {status}
+    </Text>
+    <Text point={[x + 1.5 * gutter + 100, y + 0.5 * height]} fontWeight="500">
+      {title}
+    </Text>
+
     <Text
       point={[width - gutter, y + 0.5 * height]}
       fontWeight="500"

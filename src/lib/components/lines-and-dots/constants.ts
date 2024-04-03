@@ -5,11 +5,13 @@ import type {
   EventGroups,
 } from '$lib/models/event-groups/event-groups';
 import type {
+  EventClassification,
   EventTypeCategory,
   PendingActivity,
   WorkflowEvent,
   WorkflowEvents,
 } from '$lib/types/events';
+import type { WorkflowStatus } from '$lib/types/workflows';
 import {
   formatAttributes,
   formatPendingAttributes,
@@ -39,7 +41,7 @@ export const CompactConfig: GraphConfig = {
 };
 
 export const TimelineConfig: GraphConfig = {
-  height: baseRadius * 4,
+  height: baseRadius * 5,
   gutter: baseRadius * 3,
   radius: baseRadius * 1.5,
   fontSizeRatio: baseRadius * 3,
@@ -290,6 +292,30 @@ export const getEventCategoryColor = (
       return '#059669';
     default:
       return '#141414';
+  }
+};
+
+export const getStatusColor = (
+  status: WorkflowStatus | EventClassification,
+): string => {
+  switch (status) {
+    case 'Completed':
+      return '#00964e';
+    case 'Failed':
+    case 'Terminated':
+      return '#c71607';
+    case 'Signaled':
+      return '#d300d8';
+    case 'Fired':
+      return '#f8a208';
+    case 'TimedOut':
+      return '#c2570c';
+    case 'Canceled':
+      return '#fed64b';
+    case 'Running':
+      return '#3b82f6';
+    default:
+      return '#ffffff';
   }
 };
 
