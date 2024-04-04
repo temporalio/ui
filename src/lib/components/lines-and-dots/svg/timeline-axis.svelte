@@ -15,7 +15,7 @@
   export let endTime: string | Date;
   export let duration: number;
 
-  const { radius } = TimelineConfig;
+  const { radius, height } = TimelineConfig;
   const ticks = 20;
 
   $: distance = x2 - x1;
@@ -53,9 +53,9 @@
       fill="#fff"
       font-size="12"
       opacity={0.5}
-      transform="rotate(90, {tickX}, {16})"
+      transform="rotate(90, {tickX}, {height})"
       x={tickX - radius}
-      y={16}
+      y={height}
     >
       {formatDistanceAbbreviated({
         start: startTime,
