@@ -47,7 +47,7 @@
   <svg
     {x}
     {y}
-    viewBox="0 0 {canvasWidth} {canvasHeight}"
+    viewBox="0 0 {canvasWidth} {staticHeight || canvasHeight}"
     height={(staticHeight || canvasHeight) / zoomLevel}
     width={canvasWidth}
   >

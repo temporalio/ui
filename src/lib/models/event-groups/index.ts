@@ -48,7 +48,7 @@ export const groupEvents = (
     const group = createEventGroup(event, events);
 
     const pendingActivity = pendingActivities.find(
-      (p) => p.activityId === event.id,
+      (p) => p.activityId === event.id && event.category === 'activity',
     );
 
     if (group) {

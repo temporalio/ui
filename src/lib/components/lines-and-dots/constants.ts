@@ -13,6 +13,7 @@ import type {
 import type { WorkflowStatus } from '$lib/types/workflows';
 import {
   formatAttributes,
+  formatGroupAttributes,
   formatPendingAttributes,
 } from '$lib/utilities/format-event-attributes';
 
@@ -276,7 +277,7 @@ export const getEventCategoryColor = (
 };
 
 export const getStatusColor = (
-  status: WorkflowStatus | EventClassification,
+  status: WorkflowStatus | EventClassification | 'Pending' | 'Retrying',
 ): string => {
   switch (status) {
     case 'Completed':
@@ -294,6 +295,10 @@ export const getStatusColor = (
       return '#fed64b';
     case 'Running':
       return '#3b82f6';
+    case 'Pending':
+      return '#a78bfa';
+    case 'Retrying':
+      return '#FF9B70';
     default:
       return '#ffffff';
   }
@@ -336,13 +341,10 @@ export const activeGroupsHeightAboveGroup = (
 };
 
 export const mergeEventGroupDetails = (group: EventGroup) => {
-  const attributes = group.eventList.map((event) => formatAttributes(event));
-  const attributesList = group.pendingActivity
-    ? [formatPendingAttributes(group.pendingActivity), ...attributes]
+  const attributes = formatGroupAttributes(group);
+  return group.pendingActivity
+    ? { ...formatPendingAttributes(group.pendingActivity), ...attributes }
     : attributes;
-  return attributesList.reduce((acc, attribute) => {
-    return { ...acc, ...attribute };
-  }, {});
 };
 
 export const staticCodeBlockHeight = 200;

@@ -87,7 +87,6 @@
   $: title = group.name;
   $: boxHeight = getGroupDetailsBoxHeight(group);
   $: textStartingY = height + y + fontSizeRatio;
-  $: childTimelineY = y + boxHeight - DetailsChildTimelineHeight;
   $: attributes = mergeEventGroupDetails(group);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
@@ -95,6 +94,7 @@
   $: textAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value !== 'object',
   );
+  $: childTimelineY = y + textAttributes.length * height;
   $: group, fetchChildWorkflowForGroup();
   $: width = canvasWidth;
 </script>
