@@ -1,6 +1,7 @@
 <script lang="ts">
+  import type { IconName } from '$lib/holocene/icon';
+
   import Icon from '../icon/icon.svelte';
-  import type { IconName } from '../icon/paths';
 
   export let link: string;
   export let label: string;

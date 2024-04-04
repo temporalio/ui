@@ -14,6 +14,6 @@
   role="img"
   aria-hidden={!title}
 >
-  <title>{title}</title>
+  {#if title}<title>{title}</title>{/if}
   <slot />
 </svg>
