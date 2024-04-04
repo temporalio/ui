@@ -47,7 +47,8 @@
       const group = allGroups.find((group) => group.eventIds.has(id));
       if (group) {
         return group.eventList.reduce(
-          (sum, event) => (sum += getEventDetailsBoxHeight(event)),
+          (sum, event) =>
+            (sum += getEventDetailsBoxHeight(event, group.pendingActivity)),
           0,
         );
       }

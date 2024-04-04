@@ -2,10 +2,15 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { WorkflowEvent } from '$lib/types/events';
 
-  import { getEventDetailsBoxHeight, HistoryConfig } from '../constants';
+  import {
+    getEventDetailsBoxHeight,
+    getPendingEventDetailHeight,
+    HistoryConfig,
+  } from '../constants';
 
   import Box from './box.svelte';
   import EventDetailRow from './event-detail-row.svelte';
+  import PendingDetailRow from './pending-detail-row.svelte';
 
   export let event: WorkflowEvent;
   export let group: EventGroup;
@@ -18,7 +23,8 @@
   $: y = index * height;
   $: boxHeight = group
     ? group.eventList.reduce(
-        (sum, event) => (sum += getEventDetailsBoxHeight(event)),
+        (sum, event) =>
+          (sum += getEventDetailsBoxHeight(event, group.pendingActivity)),
         0,
       )
     : getEventDetailsBoxHeight(event);
@@ -28,6 +34,15 @@
 <g role="button" tabindex="0" class="relative cursor-pointer">
   <Box point={[x, y]} {width} height={boxHeight} classification="active" />
   {#if group}
+    {#if group.pendingActivity}
+      <PendingDetailRow
+        event={group.pendingActivity}
+        {canvasWidth}
+        {x}
+        {y}
+        active={event.id === group.pendingActivity.id}
+      />
+    {/if}
     {#each group.eventList as e, index}
       <EventDetailRow
         event={e}
@@ -35,7 +50,9 @@
         {index}
         {canvasWidth}
         {x}
-        {y}
+        y={group.pendingActivity
+          ? y + getPendingEventDetailHeight(group.pendingActivity)
+          : y}
         active={event.id === e.id}
       />
     {/each}

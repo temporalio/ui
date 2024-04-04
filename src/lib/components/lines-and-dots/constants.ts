@@ -25,28 +25,28 @@ export type GraphConfig = {
   fontSizeRatio: number;
 };
 
-const baseRadius = 8;
+const baseRadius = 6;
 
 export const minCompactWidth = 200;
 
 export const CompactConfig: GraphConfig = {
-  height: baseRadius * 7,
-  gutter: baseRadius * 6,
-  radius: baseRadius * 3,
+  height: baseRadius * 9,
+  gutter: baseRadius * 7,
+  radius: baseRadius * 4,
   fontSizeRatio: baseRadius * 3,
 };
 
 export const TimelineConfig: GraphConfig = {
-  height: baseRadius * 4,
-  gutter: baseRadius * 3,
-  radius: baseRadius * 1.5,
+  height: baseRadius * 5,
+  gutter: baseRadius * 4,
+  radius: baseRadius * 2,
   fontSizeRatio: baseRadius * 3,
 };
 
 export const HistoryConfig: GraphConfig = {
-  height: baseRadius * 3,
+  height: baseRadius * 4,
   gutter: baseRadius * 2,
-  radius: baseRadius * 0.75,
+  radius: baseRadius,
   fontSizeRatio: baseRadius * 3,
 };
 
@@ -189,7 +189,8 @@ const allEventsInGroupHeight = (
   const group = groups.find((group) => group.eventIds.has(id));
   if (group) {
     return group.eventList.reduce(
-      (sum, event) => (sum += getEventDetailsBoxHeight(event)),
+      (sum, event) =>
+        (sum += getEventDetailsBoxHeight(event, group.pendingActivity)),
       0,
     );
   }
@@ -366,7 +367,10 @@ export const getGroupDetailsBoxHeight = (group: EventGroup) => {
   );
 };
 
-export const getEventDetailsBoxHeight = (event: WorkflowEvent) => {
+export const getEventDetailsBoxHeight = (
+  event: WorkflowEvent,
+  pendingActivity?: PendingActivity,
+) => {
   const attributes = formatAttributes(event);
   const codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
@@ -375,9 +379,24 @@ export const getEventDetailsBoxHeight = (event: WorkflowEvent) => {
     ([, value]) => typeof value !== 'object',
   );
 
+  let pendingActivityHeight = 0;
+  if (pendingActivity && event.id === pendingActivity.id) {
+    pendingActivityHeight = getPendingEventDetailHeight(pendingActivity);
+  }
   const codeBlockHeight = codeBlockAttributes.length * staticCodeBlockHeight;
   const textHeight = textAttributes.length * DetailsConfig.fontSizeRatio;
   return (
-    Math.max(codeBlockHeight, textHeight) + 2 * DetailsConfig.fontSizeRatio
+    pendingActivityHeight +
+    codeBlockHeight +
+    textHeight +
+    +2 * DetailsConfig.fontSizeRatio
   );
+};
+
+export const getPendingEventDetailHeight = (event: PendingActivity) => {
+  const textHeight = 5 * DetailsConfig.fontSizeRatio;
+  let codeBlockHeight = 0;
+  if (event?.heartbeatDetails) codeBlockHeight += staticCodeBlockHeight;
+  if (event?.lastFailure) codeBlockHeight += staticCodeBlockHeight;
+  return codeBlockHeight + textHeight + 2 * DetailsConfig.fontSizeRatio;
 };

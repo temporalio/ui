@@ -17,6 +17,11 @@ export const clearActives = () => {
   endIndex.set(indexPageSize);
 };
 
+export const clearActiveEvents = () => {
+  activeGroups.set([]);
+  activeEvents.set([]);
+};
+
 export const setActiveGroup = (group: EventGroup) => {
   activeEvents.set([]);
   if (!get(activeGroups).includes(group.id)) {

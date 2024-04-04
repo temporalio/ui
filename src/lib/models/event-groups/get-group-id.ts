@@ -11,6 +11,7 @@ import {
   isChildWorkflowExecutionFailedEvent,
   isChildWorkflowExecutionStartedEvent,
   isChildWorkflowExecutionTerminatedEvent,
+  isChildWorkflowExecutionTimedOutEvent,
   isExternalWorkflowExecutionSignaledEvent,
   isPureWorkflowTaskFailedEvent,
   isTimerCanceledEvent,
@@ -74,6 +75,12 @@ export const getGroupId = (event: CommonHistoryEvent): string => {
   if (isChildWorkflowExecutionFailedEvent(event)) {
     return String(
       event.childWorkflowExecutionFailedEventAttributes.initiatedEventId,
+    );
+  }
+
+  if (isChildWorkflowExecutionTimedOutEvent(event)) {
+    return String(
+      event.childWorkflowExecutionTimedOutEventAttributes.initiatedEventId,
     );
   }
 

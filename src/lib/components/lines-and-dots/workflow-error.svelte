@@ -60,7 +60,7 @@
     {/if}
     <div class="mt-2 flex flex-col gap-0">
       <div
-        class="flex items-center justify-between gap-2 border-4 border-red-500 bg-inverse px-2 py-1 text-white"
+        class="flex items-center justify-between gap-2 border-2 border-red-500 bg-inverse px-2 py-1 text-white"
       >
         <div class="flex items-center gap-2">
           {error.id}

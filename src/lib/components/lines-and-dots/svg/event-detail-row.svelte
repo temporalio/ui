@@ -1,10 +1,12 @@
 <script lang="ts">
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowEvent } from '$lib/types/events';
   import {
     format,
     spaceBetweenCapitalLetters,
   } from '$lib/utilities/format-camel-case';
+  import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
 
   import {
@@ -26,7 +28,7 @@
   export let canvasWidth: number;
   export let active = false;
 
-  const { gutter, fontSizeRatio } = DetailsConfig;
+  const { gutter, fontSizeRatio, radius } = DetailsConfig;
 
   const labelPadding = 240;
   $: attributes = formatAttributes(event);
@@ -38,15 +40,15 @@
   );
 
   $: width = canvasWidth / 2;
-
+  $: showTimestamp = canvasWidth > 800;
   $: eventY =
     index === 0
       ? y
       : index === 1
-      ? y + getEventDetailsBoxHeight(group.eventList[0])
+      ? y + getEventDetailsBoxHeight(group.eventList[0], group.pendingActivity)
       : y +
-        getEventDetailsBoxHeight(group.eventList[0]) +
-        getEventDetailsBoxHeight(group.eventList[1]);
+        getEventDetailsBoxHeight(group.eventList[0], group.pendingActivity) +
+        getEventDetailsBoxHeight(group.eventList[1], group.pendingActivity);
   $: textStartingY = eventY + 1.5 * fontSizeRatio;
 </script>
 
@@ -59,29 +61,29 @@
   />
 {/if}
 <Text
-  point={[x + 0.5 * fontSizeRatio, eventY + 0.6 * fontSizeRatio]}
+  point={[x + 0.5 * fontSizeRatio, eventY + 0.75 * fontSizeRatio]}
   fontSize="13px"
-  fontWeight="500"
+  fontWeight="300"
   >{event.id}<tspan dx={5}>{spaceBetweenCapitalLetters(event?.name)}</tspan
   ></Text
 >
-{#each codeBlockAttributes as [key, value], index (key)}
-  {@const blockX = x + gutter + 0.5 * width}
-  {@const blockY = textStartingY + index * staticCodeBlockHeight}
-  <Text point={[blockX, blockY]}>{format(key)}</Text>
-  <GroupDetailsText
-    point={[blockX, blockY + 1.5 * fontSizeRatio]}
-    {key}
-    {value}
-    {attributes}
-    width={0.5 * width - 2 * gutter}
-  />
-{/each}
+{#if showTimestamp}
+  <Text
+    point={[canvasWidth - 1.5 * radius, eventY + 0.6 * fontSizeRatio]}
+    textAnchor="end"
+  >
+    <tspan fill="#aebed9" font-size="12px">
+      {formatDate(event?.eventTime, $timeFormat, {
+        relative: $relativeTime,
+      })}</tspan
+    ></Text
+  >
+{/if}
 {#each textAttributes as [key, value], index (key)}
   <foreignObject
     x={x + gutter}
     y={textStartingY + index * fontSizeRatio}
-    width={0.5 * width - gutter}
+    width={width - gutter}
     height={fontSizeRatio}
   >
     <div class="flex gap-1 text-wrap text-sm text-white">
@@ -98,6 +100,21 @@
       />
     </div>
   </foreignObject>
+{/each}
+{#each codeBlockAttributes as [key, value], index (key)}
+  {@const blockX = x + gutter}
+  {@const blockY =
+    textStartingY +
+    (textAttributes.length + 1) * fontSizeRatio +
+    index * staticCodeBlockHeight}
+  <Text point={[blockX, blockY]}>{format(key)}</Text>
+  <GroupDetailsText
+    point={[blockX, blockY + 1.5 * fontSizeRatio]}
+    {key}
+    {value}
+    {attributes}
+    width={width - 2 * gutter}
+  />
 {/each}
 <Line
   startPoint={[x, eventY + getEventDetailsBoxHeight(event)]}
