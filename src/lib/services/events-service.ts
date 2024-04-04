@@ -1,5 +1,3 @@
-import { get } from 'svelte/store';
-
 import { toEventHistory } from '$lib/models/event-history';
 import type { EventSortOrder } from '$lib/stores/event-view';
 import { fullEventHistory } from '$lib/stores/events';
@@ -86,20 +84,13 @@ export const fetchAllEvents = async ({
 
   const onUpdate = (full, current) => {
     if (!signal) return;
+    fullEventHistory.set([...toEventHistory(full.history?.events)]);
     const next = current?.history?.events;
-
-    const firstHistoryBatch = get(fullEventHistory).length === 0;
-    const hasHistorySize =
-      historySize && next?.find((e) => e.eventId === historySize);
     const hasNewHistory =
       historySize &&
       next?.every((e) => parseInt(e.eventId) > parseInt(historySize));
-
-    if (firstHistoryBatch || hasHistorySize || hasNewHistory) {
-      fullEventHistory.set([...toEventHistory(full.history?.events)]);
-      if (hasNewHistory) {
-        refresh.set(Date.now());
-      }
+    if (hasNewHistory) {
+      refresh.set(Date.now());
     }
   };
 
