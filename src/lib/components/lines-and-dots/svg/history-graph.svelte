@@ -11,6 +11,7 @@
 
   import { getEventDetailsBoxHeight, HistoryConfig } from '../constants';
 
+  import EventDetailsRow from './event-details-row.svelte';
   import HistoryGraphRowVisual from './history-graph-row-visual.svelte';
   import HistoryGraphRow from './history-graph-row.svelte';
   import Line from './line.svelte';
@@ -58,7 +59,7 @@
     visibleHistory.length * height + activeDetailsHeight + height,
     400,
   );
-  $: visualWidth = canvasWidth / 5;
+  $: visualWidth = canvasWidth / 4;
 </script>
 
 <svg
@@ -72,15 +73,21 @@
     strokeWidth={4}
   />
   {#each visibleHistory as event, index (event.id)}
-    {@const group = allGroups.find((g) => g.eventIds.has(event.id))}
     <HistoryGraphRow
       {event}
-      {group}
-      groups={allGroups}
-      {history}
+      group={allGroups.find((g) => g.eventIds.has(event.id))}
       {activeEvents}
       {canvasWidth}
       {index}
+    />
+  {/each}
+  {#each activeEvents as id}
+    <EventDetailsRow
+      x={canvasWidth / 2 + 2}
+      event={history.find((event) => event.id === id)}
+      group={allGroups.find((group) => group.eventIds.has(id))}
+      index={visibleHistory.indexOf(history.find((event) => event.id === id))}
+      {canvasWidth}
     />
   {/each}
   <svg
@@ -89,10 +96,9 @@
     width={(2 * canvasWidth) / zoomLevel}
   >
     {#each visibleHistory as event, index (event.id)}
-      {@const group = allGroups.find((g) => g.eventIds.has(event.id))}
       <HistoryGraphRowVisual
         {event}
-        {group}
+        group={allGroups.find((g) => g.eventIds.has(event.id))}
         groups={allGroups}
         {history}
         {canvasWidth}

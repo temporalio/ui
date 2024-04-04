@@ -20,21 +20,20 @@
   export let group: EventGroup;
   export let history: WorkflowEvents;
   export let groups: EventGroups;
+  export let index: number;
   export let activeEvents: string[] = [];
 
   export let canvasWidth: number;
-  export let index: number;
   export let zoomLevel: number = 1;
 
   const { height, radius } = HistoryConfig;
 
-  $: ({ nextDistance, offset, y } = getNextDistanceAndOffset(
+  $: y = index * height + height / 2;
+  $: ({ nextDistance, offset } = getNextDistanceAndOffset(
     history,
     event,
-    index,
     groups,
     height,
-    activeEvents,
   ));
 
   $: zoomY = y * zoomLevel;
@@ -50,7 +49,7 @@
 
   const strokeWidth = radius / 2;
 
-  $: width = (canvasWidth / 5) * zoomLevel;
+  $: width = (canvasWidth / 4) * zoomLevel;
   $: horizontalOffset = (offset / 1.5) * 3 * radius;
   $: nextIsPending = group?.lastEvent.id === event?.id && group.isPending;
   $: eventInViewBox = horizontalOffset <= width;

@@ -29,7 +29,6 @@
   const { gutter, fontSizeRatio } = DetailsConfig;
 
   const labelPadding = 240;
-  $: textStartingY = y + 1.5 * fontSizeRatio;
   $: attributes = formatAttributes(event);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
@@ -38,9 +37,9 @@
     ([, value]) => typeof value !== 'object',
   );
 
-  $: width = event ? (4 * canvasWidth) / 5 : canvasWidth;
+  $: width = canvasWidth / 2;
 
-  $: y =
+  $: eventY =
     index === 0
       ? y
       : index === 1
@@ -48,26 +47,30 @@
       : y +
         getEventDetailsBoxHeight(group.eventList[0]) +
         getEventDetailsBoxHeight(group.eventList[1]);
+  $: textStartingY = eventY + 1.5 * fontSizeRatio;
 </script>
 
 {#if active}
   <Box
-    point={[x, y]}
+    point={[x, eventY]}
     {width}
     height={getEventDetailsBoxHeight(event)}
-    fill="#667CA1"
+    fill="#465977"
   />
 {/if}
-<Text point={[x + 0.5 * fontSizeRatio, y + 0.5 * fontSizeRatio]} fontSize="12px"
+<Text
+  point={[x + 0.5 * fontSizeRatio, eventY + 0.6 * fontSizeRatio]}
+  fontSize="13px"
+  fontWeight="500"
   >{event.id}<tspan dx={5}>{spaceBetweenCapitalLetters(event?.name)}</tspan
   ></Text
 >
 {#each codeBlockAttributes as [key, value], index (key)}
   {@const blockX = x + gutter + 0.5 * width}
-  {@const y = textStartingY + index * staticCodeBlockHeight}
-  <Text point={[blockX, y]}>{format(key)}</Text>
+  {@const blockY = textStartingY + index * staticCodeBlockHeight}
+  <Text point={[blockX, blockY]}>{format(key)}</Text>
   <GroupDetailsText
-    point={[blockX, y + 1.5 * fontSizeRatio]}
+    point={[blockX, blockY + 1.5 * fontSizeRatio]}
     {key}
     {value}
     {attributes}
@@ -97,7 +100,7 @@
   </foreignObject>
 {/each}
 <Line
-  startPoint={[x, y + getEventDetailsBoxHeight(event)]}
-  endPoint={[x + width, y + getEventDetailsBoxHeight(event)]}
+  startPoint={[x, eventY + getEventDetailsBoxHeight(event)]}
+  endPoint={[x + width, eventY + getEventDetailsBoxHeight(event)]}
   strokeWidth={3}
 />

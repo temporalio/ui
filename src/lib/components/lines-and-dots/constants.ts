@@ -15,7 +15,6 @@ import {
   formatAttributes,
   formatPendingAttributes,
 } from '$lib/utilities/format-event-attributes';
-import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
 export const DetailsChildTimelineHeight = 200;
 
@@ -215,28 +214,19 @@ export const activeEventsHeightAboveGroup = (
 export const getNextDistanceAndOffset = (
   history: WorkflowEvents,
   event: WorkflowEvent,
-  index: number,
   groups: EventGroups,
   height: number,
-  activeEvents: string[],
-): { nextDistance: number; offset: number; y: number } => {
+): { nextDistance: number; offset: number } => {
   const group = groups.find((g) => g.eventIds.has(event.id));
-  const activeEventHeights = activeEventsHeightAboveGroup(
-    activeEvents,
-    event,
-    history,
-    groups,
-  );
-  let y = index * height + height / 2 + activeEventHeights;
   let nextDistance = 0;
   let offset = 1;
 
   if (!group) {
-    return { nextDistance, offset, y };
+    return { nextDistance, offset };
   }
 
   if (group.eventList.length === 1 && !group.isPending) {
-    return { nextDistance, offset, y };
+    return { nextDistance, offset };
   }
 
   const pendingActivity = group.pendingActivity;
@@ -247,15 +237,7 @@ export const getNextDistanceAndOffset = (
   }
 
   if (!nextEvent && !group.isPending) {
-    return { nextDistance, offset, y };
-  }
-
-  if (
-    isPendingActivity(event) &&
-    event.activityId === group.pendingActivity.activityId
-  ) {
-    y = (history.length + 1) * height + height / 2;
-    return { nextDistance, offset, y };
+    return { nextDistance, offset };
   }
 
   let diff = 0;
@@ -265,11 +247,7 @@ export const getNextDistanceAndOffset = (
     diff = history.length - parseInt(event.id) + 2;
   }
   nextDistance = diff * height;
-
-  if (event && activeEvents[0] == event.id) {
-    nextDistance += allEventsInGroupHeight(event.id, history, groups);
-  }
-  return { nextDistance, offset, y };
+  return { nextDistance, offset };
 };
 
 export const getEventCategoryColor = (

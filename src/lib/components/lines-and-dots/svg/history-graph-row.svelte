@@ -1,28 +1,18 @@
 <script lang="ts">
-  import type {
-    EventGroup,
-    EventGroups,
-  } from '$lib/models/event-groups/event-groups';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveEvent } from '$lib/stores/active-events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
+  import type { WorkflowEvent } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
 
-  import {
-    CategoryIcon,
-    getNextDistanceAndOffset,
-    HistoryConfig,
-  } from '../constants';
+  import { CategoryIcon, HistoryConfig } from '../constants';
 
   import Box from './box.svelte';
-  import EventDetailsRow from './event-details-row.svelte';
   import Text from './text.svelte';
 
   export let event: WorkflowEvent;
   export let group: EventGroup;
-  export let history: WorkflowEvents;
-  export let groups: EventGroups;
   export let activeEvents: string[] = [];
 
   export let canvasWidth: number;
@@ -30,15 +20,7 @@
 
   const { height, radius } = HistoryConfig;
 
-  $: ({ y } = getNextDistanceAndOffset(
-    history,
-    event,
-    index,
-    groups,
-    height,
-    activeEvents,
-  ));
-
+  $: y = index * height + height / 2;
   $: noActives = !activeEvents.length;
   $: isActiveEvent = activeEvents.includes(event.id);
   $: showTimestamp = canvasWidth > 1200;
@@ -48,7 +30,8 @@
       ? 'retry'
       : 'pending'
     : event.classification;
-  $: visualWidth = canvasWidth / 5;
+  $: visualWidth = canvasWidth / 4;
+  $: detailsWidth = canvasWidth - visualWidth;
 </script>
 
 <g
@@ -60,7 +43,7 @@
 >
   <Box
     point={[visualWidth + 2, y - height / 2]}
-    width={canvasWidth - visualWidth - radius / 2}
+    width={detailsWidth}
     {height}
     {classification}
     fill={index % 2 === 1 && '#1E293B'}
@@ -99,15 +82,6 @@
     >
   {/if}
 </g>
-{#if isActiveEvent}
-  <EventDetailsRow
-    y={y + height / 2}
-    x={visualWidth + 2}
-    {event}
-    {group}
-    {canvasWidth}
-  />
-{/if}
 
 <style lang="postcss">
   g {
