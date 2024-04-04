@@ -22,15 +22,15 @@
 
 <style lang="postcss">
   .pill {
-    @apply flex items-center justify-center gap-1 rounded-full border-2 border-slate-100 px-3 py-1 text-sm;
+    @apply flex items-center justify-center gap-1 rounded-full border-2 border-slate-50 px-3 py-1  text-sm text-black text-inverse;
   }
 
   .gray {
-    @apply bg-badge text-slate-600;
+    @apply bg-badge;
   }
 
   .gray.active {
-    @apply surface-primary border-2  text-primary;
+    @apply surface-interactive;
   }
 
   .slate {
@@ -50,7 +50,7 @@
   }
 
   .lightBlue.active {
-    @apply border-2  bg-blue-50 text-primary;
+    @apply border-2 bg-blue-50 text-black;
   }
 
   .green {
