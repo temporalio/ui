@@ -27,6 +27,7 @@
 
   let showDownloadPrompt = false;
 
+  $: ({ workflow } = $workflowRun);
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
   $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
@@ -45,8 +46,8 @@
     showDownloadPrompt = false;
     exportHistory({
       namespace: decodeURIForSvelte($page.params.namespace),
-      workflowId: decodeURIForSvelte($workflowRun.workflow?.id),
-      runId: decodeURIForSvelte($workflowRun.workflow?.runId),
+      workflowId: decodeURIForSvelte(workflow?.id),
+      runId: decodeURIForSvelte(workflow?.runId),
       settings: $page.data.settings,
       decodeEventHistory: $decodeEventHistory,
     });
@@ -81,7 +82,7 @@
             ? translate('workflows.continued-as-new-with-input')
             : translate('workflows.results')}
           data-testid="workflow-results"
-          running={$workflowRun.workflow?.isRunning}
+          running={workflow?.isRunning}
         />
       </div>
     </Accordion>
