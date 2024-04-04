@@ -10,7 +10,7 @@
   component={NumberInput}
   args={{
     label: 'Number Input',
-    placeholder: 'Enter a number',
+    placeholder: '0',
     units: 'days',
     min: 0,
     max: 100,
