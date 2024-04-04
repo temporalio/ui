@@ -156,4 +156,6 @@ export const Strings = {
   'search-attributes': 'Search Attributes',
   'history-size-bytes': 'History Size (Bytes)',
   'execution-details': 'Execution Details',
+  day: 'Day',
+  night: 'Night',
 } as const;

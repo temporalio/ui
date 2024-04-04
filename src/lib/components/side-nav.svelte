@@ -8,7 +8,9 @@
   import NavTooltip from '$lib/holocene/navigation/nav-tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
+  import { useDarkMode } from '$lib/utilities/dark-mode';
   // import { labsMode } from '$lib/stores/labs-mode';
+  import DarkMode from '$lib/utilities/dark-mode/dark-mode.svelte';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
@@ -24,6 +26,8 @@
   // $: labsText = `${translate('common.labs')} ${
   //   $labsMode ? translate('common.on') : translate('common.off')
   // }`;
+
+  console.log('dark', DarkMode);
 </script>
 
 <NavContainer {isCloud} {linkList} aria-label={translate('common.primary')}>
@@ -114,6 +118,27 @@
         </NavTooltip>
         <div class="nav-title">{translate('common.feedback')}</div>
       </NavRow>
+    </slot>
+    <slot name="feedback">
+      {#if !$useDarkMode}
+        <NavRow button handleClick={() => ($useDarkMode = true)} {isCloud}>
+          <NavTooltip text={translate('common.night')}>
+            <div class="nav-icon">
+              <Icon name="moon" />
+            </div>
+          </NavTooltip>
+          <div class="nav-title">{translate('common.night')}</div>
+        </NavRow>
+      {:else}
+        <NavRow button handleClick={() => ($useDarkMode = false)} {isCloud}>
+          <NavTooltip text={translate('common.day')}>
+            <div class="nav-icon">
+              <Icon name="sun" />
+            </div>
+          </NavTooltip>
+          <div class="nav-title">{translate('common.day')}</div>
+        </NavRow>
+      {/if}
     </slot>
     <!-- <NavRow {isCloud} handleClick={() => ($labsMode = !$labsMode)}>
       <NavTooltip right text={labsHoverText}>
