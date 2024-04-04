@@ -94,7 +94,7 @@
   $: textAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value !== 'object',
   );
-  $: childTimelineY = y + textAttributes.length * height;
+  $: childTimelineY = textStartingY + textAttributes.length * fontSizeRatio;
   $: group, fetchChildWorkflowForGroup();
   $: width = canvasWidth;
 </script>
@@ -108,17 +108,13 @@
     {height}
     fill={getStatusColor(status)}
   />
-  <Text point={[x + gutter, y + 0.5 * height]} fontWeight="500" category="none">
+  <Text point={[x + gutter, y + 0.5 * height]} category="none">
     {status}
   </Text>
-  <Text point={[x + 1.5 * gutter + 100, y + 0.5 * height]} fontWeight="500">
+  <Text point={[x + 1.5 * gutter + 100, y + 0.5 * height]}>
     {title}
   </Text>
-  <Text
-    point={[x + width - gutter, y + 0.5 * height]}
-    fontWeight="500"
-    textAnchor="end"
-  >
+  <Text point={[x + width - gutter, y + 0.5 * height]} textAnchor="end">
     {formatDistanceAbbreviated({
       start: group?.initialEvent?.eventTime,
       end: group?.lastEvent?.eventTime,
@@ -126,7 +122,7 @@
     })}
   </Text>
   {#each codeBlockAttributes as [key, value], index (key)}
-    {@const blockX = x + gutter + 0.5 * width}
+    {@const blockX = x + gutter + 0.666 * width}
     {@const y = textStartingY + index * staticCodeBlockHeight}
     <Text point={[blockX, y]}>{format(key)}</Text>
     <GroupDetailsText
@@ -134,28 +130,30 @@
       {key}
       {value}
       {attributes}
-      width={0.5 * width - 2 * gutter}
+      width={0.333 * width - 2 * gutter}
     />
   {/each}
   {#each textAttributes as [key, value], index (key)}
     <foreignObject
       x={x + gutter}
       y={textStartingY + index * fontSizeRatio}
-      width={0.5 * width - gutter}
-      height={fontSizeRatio}
+      width={0.666 * width - gutter}
+      height={fontSizeRatio * 2}
     >
-      <div class="flex gap-1 text-wrap text-sm text-white">
-        <div class="w-48">{format(key)}</div>
-        <GroupDetailsText
-          point={[
-            x + gutter + labelPadding,
-            textStartingY + index * fontSizeRatio,
-          ]}
-          {key}
-          {value}
-          {attributes}
-          {width}
-        />
+      <div class="flex gap-1 text-sm text-white">
+        <div class="w-64">{format(key)}</div>
+        <div class="text-wrap break-all">
+          <GroupDetailsText
+            point={[
+              x + gutter + labelPadding,
+              textStartingY + index * fontSizeRatio,
+            ]}
+            {key}
+            {value}
+            {attributes}
+            {width}
+          />
+        </div>
       </div>
     </foreignObject>
   {/each}

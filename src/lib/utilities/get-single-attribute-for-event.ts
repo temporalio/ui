@@ -81,7 +81,7 @@ export const shouldDisplayGroupAttribute = (
   if (value === '0s') return false;
   if (key === 'type') return false;
   if (key === 'workflowId') return false;
-  if (key === 'iniatedEventId') return false;
+  if (key === 'initiatedEventId') return false;
   if (key === 'startedEventId') return false;
   if (key === 'scheduledEventId') return false;
   if (key === 'activityId') return false;

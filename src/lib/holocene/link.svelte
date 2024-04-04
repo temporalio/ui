@@ -16,6 +16,7 @@
     class?: string;
     icon?: IconName;
     text?: string;
+    inverse?: boolean;
     'data-testid'?: string;
   };
 
@@ -26,6 +27,7 @@
   export let newTab = false;
   export let icon: IconName = null;
   export let text: string = '';
+  export let inverse = false;
 
   const onLinkClick = (e: MouseEvent) => {
     // Skip if middle mouse click or new tab
@@ -42,6 +44,7 @@
   rel={newTab ? 'noreferrer' : null}
   class={merge('link', icon ? 'inline-flex' : 'inline', className)}
   class:active
+  class:inverse
   on:click={onLinkClick}
   tabindex={href ? null : 0}
   {...$$restProps}
@@ -61,6 +64,10 @@
 
     &.active {
       @apply text-blue-900;
+    }
+
+    &.inverse {
+      @apply text-white hover:text-indigo-400 focus-visible:text-indigo-400;
     }
   }
 

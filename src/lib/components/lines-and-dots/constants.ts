@@ -34,28 +34,28 @@ export const CompactConfig: GraphConfig = {
   height: baseRadius * 9,
   gutter: baseRadius * 7,
   radius: baseRadius * 4,
-  fontSizeRatio: baseRadius * 3,
+  fontSizeRatio: baseRadius * 4,
 };
 
 export const TimelineConfig: GraphConfig = {
   height: baseRadius * 5,
   gutter: baseRadius * 4,
   radius: baseRadius * 2,
-  fontSizeRatio: baseRadius * 3,
+  fontSizeRatio: baseRadius * 4,
 };
 
 export const HistoryConfig: GraphConfig = {
   height: baseRadius * 4,
   gutter: baseRadius * 2,
   radius: baseRadius,
-  fontSizeRatio: baseRadius * 3,
+  fontSizeRatio: baseRadius * 4,
 };
 
 export const DetailsConfig: GraphConfig = {
   height: baseRadius * 4,
   gutter: baseRadius * 3,
   radius: baseRadius,
-  fontSizeRatio: baseRadius * 3,
+  fontSizeRatio: baseRadius * 4,
 };
 
 export const CategoryIcon: Record<EventTypeCategory, IconName> = {
