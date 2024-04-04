@@ -54,7 +54,7 @@
 
 <style lang="postcss">
   select {
-    @apply text-slate-500;
+    @apply text-primary;
   }
 
   .remove {
