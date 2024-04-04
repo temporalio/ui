@@ -267,3 +267,42 @@ export async function triggerImmediately({
     },
   });
 }
+
+type BackfillOptions = TriggerImmediatelyOptions & {
+  startTime: string;
+  endTime: string;
+};
+
+export async function backfillRequest({
+  namespace,
+  scheduleId,
+  overlapPolicy,
+  startTime,
+  endTime,
+}: BackfillOptions): Promise<null> {
+  const options = {
+    patch: {
+      backfillRequest: [
+        {
+          overlapPolicy,
+          startTime,
+          endTime,
+        },
+      ],
+    },
+  };
+
+  const route = routeForApi('schedule.patch', {
+    namespace,
+    scheduleId: scheduleId,
+  });
+  return await requestFromAPI<null>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        ...options,
+        request_id: uuidv4(),
+      }),
+    },
+  });
+}

@@ -172,11 +172,11 @@
   />
 {/if}
 
-<slot name="header" />
+<slot name="header" visibleItems={$store.visibleItems} />
 <div class="relative mb-8 flex flex-col gap-4">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
     <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
-      <slot name="action-top-left" />
+      <slot name="action-top-left" visibleItems={$store.visibleItems} />
     </div>
     <nav
       class="flex flex-col justify-end gap-4 md:flex-row"
@@ -231,7 +231,11 @@
     </nav>
   </div>
   {#if $store.loading}
-    <SkeletonTable rows={15} />
+    {#if $$slots.loading}
+      <slot name="loading" />
+    {:else}
+      <SkeletonTable rows={15} />
+    {/if}
   {:else if isEmpty}
     <slot name="empty">{emptyStateMessage}</slot>
   {:else}

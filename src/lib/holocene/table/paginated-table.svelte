@@ -99,7 +99,7 @@
   <table class="paginated-table">
     <slot name="caption" />
     <thead class="paginated-table-header">
-      <slot name="headers" />
+      <slot name="headers" visibleItems={$store.items} />
       {#if updating}
         <ProgressBar />
       {/if}
@@ -157,7 +157,7 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply overflow-auto rounded-lg border-2 border-primary;
+    @apply min-h-[154px] overflow-auto rounded-lg border-2 border-primary;
   }
 
   .paginated-table {
@@ -189,18 +189,18 @@
   }
 
   .paginated-table-controls {
-    @apply surface-primary sticky bottom-0 left-0 flex w-full grow flex-col gap-2 rounded-b border-t border-slate-200 px-4 py-2 text-primary lg:flex-row;
+    @apply surface-primary sticky bottom-0 left-0 flex w-full grow gap-2 rounded-b border-t border-slate-200 px-4 py-2 text-primary;
   }
 
   .paginated-table-controls-start {
-    @apply flex flex-row items-center justify-center lg:justify-start;
+    @apply flex shrink-0 flex-row items-center justify-center lg:justify-start;
   }
 
   .paginated-table-controls-center {
-    @apply flex min-w-fit grow flex-row flex-wrap items-center justify-center gap-4 text-sm;
+    @apply flex grow flex-row items-center justify-start gap-4 overflow-auto text-sm md:justify-center;
   }
 
   .paginated-table-controls-end {
-    @apply flex flex-row items-center justify-between gap-4 lg:justify-end;
+    @apply flex shrink-0 flex-row items-center justify-between gap-4 lg:justify-end;
   }
 </style>

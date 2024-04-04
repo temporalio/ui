@@ -58,6 +58,8 @@ describe('Event Category Data Structures', () => {
         "WorkflowExecutionTimedOut": "workflow",
         "WorkflowExecutionUpdateAccepted": "update",
         "WorkflowExecutionUpdateCompleted": "update",
+        "WorkflowExecutionUpdateRejected": "update",
+        "WorkflowExecutionUpdateRequested": "update",
         "WorkflowTaskCompleted": "workflow",
         "WorkflowTaskFailed": "workflow",
         "WorkflowTaskScheduled": "workflow",

@@ -36,6 +36,7 @@ export type ScheduleActionParameters = {
   workflowType: string;
   workflowId: string;
   taskQueue: string;
+  input: string;
 };
 
 export type ScheduleSpecParameters = {

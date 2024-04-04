@@ -38,8 +38,10 @@
     showProfilePic = false;
   }
 
-  const handleNamespaceSelect = (event: CustomEvent<NamespaceListItem>) => {
-    const namespaceListItem = event.detail;
+  const handleNamespaceSelect = (
+    event: CustomEvent<{ value: NamespaceListItem }>,
+  ) => {
+    const namespaceListItem = event.detail.value;
     $lastUsedNamespace = namespaceListItem.namespace;
     namespaceListItem?.onClick(namespaceListItem.namespace);
   };
@@ -48,7 +50,7 @@
 <svelte:window bind:innerWidth={screenWidth} />
 
 <nav
-  class="surface-secondary sticky top-0 z-40 flex w-full flex-col items-center justify-end border-b-2 p-1 px-4 shadow-md md:flex-row md:px-8"
+  class="surface-secondary sticky top-0 z-40 flex w-full items-center justify-end border-b-2 border-subtle p-1 px-4 shadow-md md:flex-row md:px-8"
   data-testid="top-nav"
   class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
   aria-label={translate('common.main')}

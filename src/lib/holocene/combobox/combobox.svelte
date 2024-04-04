@@ -3,6 +3,7 @@
   import { writable } from 'svelte/store';
 
   import { createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
@@ -14,8 +15,9 @@
   type T = $$Generic;
 
   const dispatch = createEventDispatcher<{
-    change: T | string;
+    change: { value: string | T };
     filter: string;
+    close: { selectedOption: string | T };
   }>();
 
   type ExtendedInputEvent = Event & {
@@ -37,8 +39,8 @@
     minSize?: number;
     maxSize?: number;
     'data-testid'?: string;
-    theme?: 'light' | 'dark';
-    filterable?: boolean;
+    error?: string;
+    valid?: boolean;
   }
 
   type UncontrolledStringOptionProps = {
@@ -76,8 +78,8 @@
   export let optionLabelKey: keyof T = optionValueKey;
   export let minSize = 0;
   export let maxSize = 120;
-  export let theme: 'light' | 'dark' = 'light';
-  export let filterable = true;
+  export let error = '';
+  export let valid = true;
 
   let displayValue: string;
   let selectedOption: string | T;
@@ -129,6 +131,12 @@
   const closeList = () => {
     if (!$open) return;
     $open = false;
+    dispatch('close', { selectedOption });
+    resetValueAndOptions();
+  };
+
+  const handleMenuClose = () => {
+    dispatch('close', { selectedOption });
     resetValueAndOptions();
   };
 
@@ -182,8 +190,8 @@
   };
 
   const handleSelectOption = (option: string | T) => {
-    dispatch('change', option);
     setValue(option);
+    dispatch('change', { value: option });
     resetValueAndOptions();
   };
 
@@ -222,7 +230,7 @@
   const handleInput = (event: ExtendedInputEvent) => {
     displayValue = event.currentTarget.value;
     dispatch('filter', displayValue);
-    if (!$open) openList();
+    if (!$open) $open = true;
 
     list = options.filter((option) => {
       if (isStringOption(option)) {
@@ -244,12 +252,16 @@
   };
 </script>
 
-<MenuContainer {open} on:close={resetValueAndOptions}>
-  <label class="combobox-label {theme}" class:sr-only={labelHidden} for={id}>
+<MenuContainer {open} on:close={handleMenuClose}>
+  <label
+    class="combobox-label"
+    class:sr-only={labelHidden}
+    class:required
+    for={id}
+  >
     {label}
   </label>
-
-  <div class="combobox-wrapper {theme}">
+  <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
     {#if leadingIcon}
       <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
@@ -262,7 +274,7 @@
       type="text"
       value={displayValue}
       class:disabled
-      class="combobox-input {className}"
+      class={merge('combobox-input', className)}
       role="combobox"
       autocomplete="off"
       autocapitalize="off"
@@ -272,6 +284,7 @@
       aria-expanded={$open}
       aria-required={required}
       aria-autocomplete="list"
+      on:focus|stopPropagation={openList}
       on:input|stopPropagation={handleInput}
       on:keydown|stopPropagation={handleInputKeydown}
       on:click|stopPropagation={handleInputClick}
@@ -291,18 +304,14 @@
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
     </button>
   </div>
+  {#if error && !valid}
+    <span class="error">{error}</span>
+  {/if}
 
-  <Menu
-    bind:menuElement
-    id="{id}-listbox"
-    role="listbox"
-    class="w-full"
-    {theme}
-  >
+  <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
     {#each list as option}
       {#if isStringOption(option)}
         <ComboboxOption
-          {theme}
           on:click={() => handleSelectOption(option)}
           selected={value === option}
         >
@@ -311,7 +320,6 @@
       {:else if isObjectOption(option)}
         {#if canRenderCustomOption(option)}
           <ComboboxOption
-            {theme}
             on:click={() => handleSelectOption(option)}
             selected={value === option[optionValueKey]}
           >
@@ -329,50 +337,34 @@
 
 <style lang="postcss">
   .combobox-label {
-    @apply font-secondary text-sm font-normal;
+    @apply font-secondary text-sm font-medium text-primary;
 
-    &.light {
-      @apply text-primary;
-    }
-
-    &.dark {
-      @apply text-white;
+    &.required {
+      @apply after:content-['*'];
     }
   }
 
   .combobox-wrapper {
-    @apply flex h-10 w-full flex-row items-center rounded-lg border border-transparent text-sm focus-within:outline-none;
+    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border border-primary text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
+
+    &.invalid {
+      @apply border-2 border-error text-danger focus-within:shadow-danger/50;
+    }
+
+    &.disabled {
+      @apply surface-disabled border-subtle text-disabled;
+    }
+  }
+
+  .error {
+    @apply text-xs text-danger;
   }
 
   .combobox-input {
-    @apply ml-2 h-full w-full grow font-primary focus:outline-none;
+    @apply ml-2 h-full w-full grow bg-transparent font-primary text-primary placeholder:text-primary focus:outline-none disabled:text-disabled disabled:placeholder:text-disabled dark:bg-transparent;
   }
 
   .combobox-button {
-    @apply mx-2 flex shrink-0 items-center justify-center rounded-full;
-  }
-
-  .combobox-wrapper.light {
-    @apply surface-primary border-primary text-primary  focus-within:border-indigo-600 focus-within:shadow-focus focus-within:shadow-indigo-500/50;
-
-    > .combobox-input {
-      @apply surface-primary text-primary placeholder:text-slate-400;
-    }
-
-    > .combobox-button {
-      @apply bg-gradient-to-br hover:from-blue-100 hover:to-purple-100;
-    }
-  }
-
-  .combobox-wrapper.dark {
-    @apply border-slate-400 bg-transparent text-white focus-within:border-indigo-600 focus-within:bg-primary focus-within:shadow-focus focus-within:shadow-indigo-500/50;
-
-    > .combobox-input {
-      @apply bg-transparent text-white placeholder:text-slate-400;
-    }
-
-    > .combobox-button {
-      @apply hover:bg-slate-700;
-    }
+    @apply mx-2 flex shrink-0 items-center justify-center rounded-full hover:surface-interactive-secondary;
   }
 </style>

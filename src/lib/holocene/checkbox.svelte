@@ -2,6 +2,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   import { createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { omit } from '$lib/utilities/omit';
@@ -10,26 +11,35 @@
 
   interface $$Props extends HTMLInputAttributes {
     checked?: boolean;
-    label: string;
+    label?: string;
     labelHidden?: boolean;
-    theme?: 'dark' | 'light';
     indeterminate?: boolean;
     hoverable?: boolean;
     value?: T;
     group?: T[];
     'data-testid'?: string;
+    required?: boolean;
+    valid?: boolean;
+    error?: string;
   }
 
   export let id = '';
   export let checked = false;
-  export let label: string;
+  export let label = '';
   export let labelHidden = false;
-  export let theme: 'dark' | 'light' = 'light';
   export let indeterminate = false;
   export let disabled = false;
   export let hoverable = false;
   export let value: T = undefined;
   export let group: T[] = undefined;
+  export let valid = true;
+  export let error = '';
+  export let required = false;
+  let className = '';
+  export { className as class };
+
+  let inputElement: HTMLInputElement;
+  $: inputElement !== undefined && (inputElement.indeterminate = indeterminate);
 
   const dispatch = createEventDispatcher<{
     change: { checked: boolean; value?: T };
@@ -61,12 +71,11 @@
   data-testid={$$restProps['data-testid'] ?? null}
   on:click|stopPropagation
   on:keypress|stopPropagation
-  class={$$props.class}
 >
   <label
     on:click
     on:keypress
-    class="checkbox {theme}"
+    class={merge('checkbox', 'text-primary', className)}
     class:hoverable={hoverable && !disabled}
     class:disabled
   >
@@ -77,13 +86,14 @@
       {value}
       type="checkbox"
       bind:checked
-      {indeterminate}
       {disabled}
+      {required}
       class:indeterminate
+      bind:this={inputElement}
       {...omit($$restProps, 'data-testid')}
     />
 
-    <span class="checkmark {theme}" class:disabled>
+    <span class="checkmark" class:disabled class:invalid={!valid}>
       {#if indeterminate}
         <Icon class="absolute left-0 top-0 h-4 w-4" name="hyphen" />
       {:else if checked}
@@ -95,10 +105,15 @@
       {/if}
     </span>
 
-    <span class="label" class:sr-only={labelHidden}>
-      {label}
-    </span>
+    <slot name="label">
+      <span class="label" class:sr-only={labelHidden}>
+        {label}
+      </span>
+    </slot>
   </label>
+  {#if !valid && error}
+    <span class="error">{error}</span>
+  {/if}
 </div>
 
 <style lang="postcss">
@@ -107,7 +122,7 @@
   }
 
   .checkbox.hoverable:hover .checkmark::before {
-    @apply absolute -left-2.5 -z-10 h-9 w-9 self-center rounded-full content-[''];
+    @apply absolute -left-2.5 -z-10 h-9 w-9 self-center rounded-full bg-interactive/20 content-[''];
   }
 
   .label {
@@ -118,58 +133,23 @@
     @apply sr-only;
   }
 
+  input:focus-visible ~ .checkmark {
+    @apply outline outline-interactive;
+  }
+
   .checkmark {
-    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border;
+    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border border-primary bg-white dark:bg-transparent;
+
+    &.invalid {
+      @apply border-danger;
+    }
   }
 
   .disabled {
-    @apply cursor-default;
+    @apply cursor-default border-disabled text-disabled;
   }
 
-  /** Light Theme Styles */
-  .checkbox.light {
-    @apply text-primary;
-  }
-
-  .checkbox.hoverable.light:hover .checkmark::before {
-    @apply bg-purple-200;
-  }
-
-  .checkmark.light {
-    @apply surface-primary border-primary;
-  }
-
-  input:focus-visible ~ .checkmark.light {
-    @apply outline outline-blue-700;
-  }
-
-  .checkmark.disabled.light {
-    @apply bg-slate-300;
-  }
-
-  /** Dark Theme Styles */
-
-  .checkbox.dark {
-    @apply text-white;
-  }
-
-  .checkmark.dark {
-    @apply border-white;
-  }
-
-  .checkbox.hoverable.dark:hover .checkmark::before {
-    @apply bg-slate-700;
-  }
-
-  input:focus-visible ~ .checkmark.dark {
-    @apply outline outline-indigo-600;
-  }
-
-  .checkbox.disabled.dark {
-    @apply text-opacity-80;
-  }
-
-  .checkmark.disabled.dark {
-    @apply border-opacity-80 text-opacity-80;
+  .error {
+    @apply text-xs text-danger;
   }
 </style>

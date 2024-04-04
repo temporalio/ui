@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
@@ -18,8 +20,8 @@
 
 <button
   type="button"
-  class="icon-button {className}"
-  on:click
+  class={merge('icon-button', className)}
+  on:click|stopPropagation
   aria-label={label}
   {...$$restProps}
 >
@@ -31,7 +33,7 @@
     @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-[transparent];
 
     &:not(:disabled) {
-      @apply bg-gradient-to-br hover:border-indigo-600 hover:from-blue-100 hover:to-purple-100 hover:text-primary hover:shadow-focus hover:shadow-indigo-500/50 focus-visible:border-indigo-600 focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:text-primary focus-visible:shadow-focus focus-visible:shadow-indigo-500/50 focus-visible:outline-none;
+      @apply text-primary outline-none hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-indigo-600;
     }
 
     &:disabled {

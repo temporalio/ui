@@ -3,7 +3,7 @@
 
   import { setContext } from 'svelte';
 
-  import { clickOutside } from '$lib/holocene/outside-click';
+  import { clickoutside } from '$lib/holocene/outside-click';
   import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
@@ -11,7 +11,7 @@
   export let open = false;
   export let position: 'bottom' | 'right' = 'bottom';
   export let dark = true;
-  export let onClick: () => void;
+  export let onClick: (e: MouseEvent | CustomEvent) => void;
   export let id = 'navigation-drawer';
   export let closeButtonLabel: string;
   export let closePadding: boolean = true;
@@ -32,23 +32,24 @@
     class:dark
     class:max-w-fit={position === 'right'}
     transition:fly={flyParams}
-    use:clickOutside
     {id}
     role="region"
-    on:click-outside={onClick}
     use:focusTrap={true}
+    use:clickoutside={onClick}
   >
     <div class="relative h-full" class:pt-10={closePadding}>
       <div class="close-button-wrapper {position}">
-        <IconButton
-          data-testid="drawer-close-button"
-          label={closeButtonLabel}
-          class="stuff"
-          icon="close"
-          aria-expanded={open}
-          aria-controls="navigation-drawer"
-          on:click={onClick}
-        />
+        <slot name="close-button">
+          <IconButton
+            data-testid="drawer-close-button"
+            label={closeButtonLabel}
+            class="stuff"
+            icon="close"
+            aria-expanded={open}
+            aria-controls="navigation-drawer"
+            on:click={onClick}
+          />
+        </slot>
       </div>
       <slot />
     </div>
@@ -68,8 +69,12 @@
     }
 
     &.dark {
-      @apply bg-inverse text-slate-100;
+      @apply bg-inverse text-white;
     }
+  }
+
+  .stuff:hover {
+    @apply text-red;
   }
 
   .close-button-wrapper {

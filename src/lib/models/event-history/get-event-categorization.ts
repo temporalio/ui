@@ -72,6 +72,8 @@ export const eventTypeCategorizations: Readonly<
 
   WorkflowExecutionUpdateAccepted: CATEGORIES.UPDATE,
   WorkflowExecutionUpdateCompleted: CATEGORIES.UPDATE,
+  WorkflowExecutionUpdateRequested: CATEGORIES.UPDATE,
+  WorkflowExecutionUpdateRejected: CATEGORIES.UPDATE,
 };
 
 export type EventTypeOption = {

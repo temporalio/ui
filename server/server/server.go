@@ -75,9 +75,13 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 	}
 
 	e := echo.New()
+	e.HideBanner = cfg.HideLogs
+	e.HidePort = cfg.HideLogs
 
 	// Middleware
-	e.Use(middleware.Logger())
+	if !cfg.HideLogs {
+		e.Use(middleware.Logger())
+	}
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: cfg.CORS.AllowOrigins,
@@ -134,20 +138,22 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 
 // Start UI server.
 func (s *Server) Start() error {
-	fmt.Println("Starting UI server...")
+	s.httpServer.Logger.Info("Starting UI server...")
 	cfg, err := s.cfgProvider.GetConfig()
 	if err != nil {
 		return err
 	}
 
 	address := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
-	s.httpServer.Logger.Fatal(s.httpServer.Start(address))
+	if err := s.httpServer.Start(address); err != http.ErrServerClosed {
+		s.httpServer.Logger.Fatal(err)
+	}
 	return nil
 }
 
 // Stop UI server.
 func (s *Server) Stop() {
-	fmt.Println("Stopping UI server...")
+	s.httpServer.Logger.Info("Stopping UI server...")
 	if err := s.httpServer.Close(); err != nil {
 		s.httpServer.Logger.Warn(err)
 	}

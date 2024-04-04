@@ -9,11 +9,14 @@
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
-  let value = $filter.value;
+
+  $: ({ value } = $filter);
+  $: _value = value;
+
   let isValid = true;
 
   const handleKeydown = (e: KeyboardEvent) => {
-    const newValue = value.trim();
+    const newValue = _value.trim();
     if (isValid && e.key === 'Enter' && newValue !== '') {
       $filter.value = newValue;
       e.preventDefault();
@@ -42,7 +45,7 @@
   icon="search"
   class="w-full"
   unroundLeft
-  bind:value
+  bind:value={_value}
   on:keydown={handleKeydown}
   on:input={validateDuration}
   valid={isValid}

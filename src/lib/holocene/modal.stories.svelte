@@ -28,6 +28,7 @@
     confirmText: 'Confirm',
     cancelText: 'Cancel',
     confirmType: 'destructive',
+    open: false,
   }}
   let:args
 >

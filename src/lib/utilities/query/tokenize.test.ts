@@ -5,8 +5,12 @@ import { tokenize } from './tokenize';
 const executionStatusQuery = 'ExecutionStatus="Completed"';
 const startTimeQuery = 'StartTime > "2022-04-18T17:45:18-06:00"';
 const workflowQuery = 'WorkflowId="Hello" and WorkflowType="World"';
+const customAttributesWithSpacesQuery =
+  '(ExecutionStatus="Running" OR ExecutionStatus="TimedOut") AND `Custom Key Word`="Hello there" AND WorkflowId="some workflow" AND `Custom Boolean`=true';
 const combinedQuery =
   'WorkflowId="Hello" and WorkflowType="World" and StartTime BETWEEN "2022-04-18T18:09:49-06:00" AND "2022-04-20T18:09:49-06:00"';
+const valuesWithSpacesQuery =
+  '`Custom Key Word`="Hello there world" AND WorkflowId="one and two = three" OR WorkflowType="example=\'one\'"';
 
 describe('tokenize', () => {
   it('should eliminate spaces', () => {
@@ -54,6 +58,60 @@ describe('tokenize', () => {
       'WorkflowType',
       '=',
       'World',
+    ]);
+  });
+
+  it('should tokenize the customAttributesWithSpacesQuery', () => {
+    const query = customAttributesWithSpacesQuery;
+
+    expect(tokenize(query)).toEqual([
+      '(',
+      'ExecutionStatus',
+      '=',
+      'Running',
+      'OR',
+      'ExecutionStatus',
+      '=',
+      'TimedOut',
+      ')',
+      'AND',
+      'Custom Key Word',
+      '=',
+      'Hello there',
+      'AND',
+      'WorkflowId',
+      '=',
+      'some workflow',
+      'AND',
+      'Custom Boolean',
+      '=true',
+    ]);
+  });
+
+  it('should tokenize with "`" not used in custom attributes with spaces', () => {
+    expect(tokenize('one = "one `"')).toEqual(['one', '=', 'one', '`']);
+    expect(tokenize('one = "one `1`"')).toEqual(['one', '=', 'one', '`1`']);
+    expect(tokenize('one = "`one"')).toEqual(['one', '=', '`one']);
+    expect(tokenize('one = 1 `')).toEqual(['one', '=', '1', '`']);
+    expect(tokenize('`one = 1')).toEqual(['`one', '=', '1']);
+    expect(tokenize('one = `1')).toEqual(['one', '=', '`1']);
+  });
+
+  it('should tokenize the valueWithSpacesQuery', () => {
+    const query = valuesWithSpacesQuery;
+
+    expect(tokenize(query)).toEqual([
+      'Custom Key Word',
+      '=',
+      'Hello there world',
+      'AND',
+      'WorkflowId',
+      '=',
+      'one and two = three',
+      'OR',
+      'WorkflowType',
+      '=',
+      "example='one'",
     ]);
   });
 

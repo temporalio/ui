@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 
 import { goto } from '$app/navigation';
 
+import { translate } from '$lib/i18n/translate';
 import { createSchedule, editSchedule } from '$lib/services/schedule-service';
 import type { Schedule } from '$lib/types';
 import type {
@@ -11,6 +12,7 @@ import type {
   SchedulePresetsParameters,
   ScheduleSpecParameters,
 } from '$lib/types/schedule';
+import { encodePayloads } from '$lib/utilities/encode-payload';
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
 import {
   convertDaysAndMonths,
@@ -78,7 +80,20 @@ export const submitCreateSchedule = async ({
   spec,
   presets,
 }: ScheduleParameterArgs): Promise<void> => {
-  const { namespace, name, workflowId, workflowType, taskQueue } = action;
+  const { namespace, name, workflowId, workflowType, taskQueue, input } =
+    action;
+
+  let payloads;
+
+  if (input) {
+    try {
+      payloads = await encodePayloads(input);
+    } catch (e) {
+      error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
+      return;
+    }
+  }
+
   const body: DescribeFullSchedule = {
     schedule_id: name.trim(),
     schedule: {
@@ -92,6 +107,7 @@ export const submitCreateSchedule = async ({
           workflowId: workflowId,
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
+          input: payloads ? { payloads } : null,
         },
       },
     },
@@ -124,9 +140,22 @@ export const submitEditSchedule = async (
   schedule: Schedule,
   scheduleId: string,
 ): Promise<void> => {
-  const { namespace, name, workflowId, workflowType, taskQueue } = action;
-  const { preset } = presets;
+  const { namespace, name, workflowId, workflowType, taskQueue, input } =
+    action;
 
+  let payloads;
+  if (input) {
+    try {
+      payloads = await encodePayloads(input);
+    } catch (e) {
+      error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
+      return;
+    }
+  } else if (!input && schedule.action.startWorkflow.input?.payloads) {
+    payloads = schedule.action.startWorkflow.input.payloads;
+  }
+
+  const { preset } = presets;
   const body: DescribeFullSchedule = {
     schedule_id: scheduleId,
     schedule: {
@@ -137,6 +166,7 @@ export const submitEditSchedule = async (
           workflowId,
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
+          input: payloads ? { payloads } : null,
         },
       },
     },

@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
   import { goto } from '$app/navigation';
 
   import type { IconName } from '$lib/holocene/icon';
@@ -38,7 +40,7 @@
   {href}
   target={newTab ? '_blank' : null}
   rel={newTab ? 'noreferrer' : null}
-  class="link {icon ? 'inline-flex' : 'inline'} {className}"
+  class={merge('link', icon ? 'inline-flex' : 'inline', className)}
   class:active
   on:click={onLinkClick}
   tabindex={href ? null : 0}
@@ -55,7 +57,7 @@
 
 <style lang="postcss">
   .link {
-    @apply max-w-fit cursor-pointer items-center gap-2 rounded underline underline-offset-2 hover:text-indigo-600 focus-visible:bg-blue-100 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
+    @apply max-w-fit cursor-pointer items-center gap-2 rounded text-primary underline underline-offset-2 hover:text-indigo-600 focus-visible:text-indigo-600 focus-visible:shadow-focus focus-visible:shadow-indigo-600/50 focus-visible:outline-none;
 
     &.active {
       @apply text-blue-900;

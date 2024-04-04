@@ -31,7 +31,7 @@ export const load: LayoutLoad = async function ({
   const user = getAuthUser();
 
   if (!isAuthorized(settings, user)) {
-    throw redirect(302, routeForLoginPage());
+    redirect(302, routeForLoginPage());
   }
 
   fetchNamespaces(settings, fetch);

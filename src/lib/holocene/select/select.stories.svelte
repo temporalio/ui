@@ -10,7 +10,7 @@
 </script>
 
 <Meta
-  title="Select [deprecate me]"
+  title="Select"
   component={Select}
   argTypes={{
     id: { control: 'text' },

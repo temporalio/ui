@@ -10,7 +10,7 @@
   <div class="back-to-top" class:hidden>
     <Button
       size="sm"
-      variant="secondary"
+      variant="primary"
       on:click={onScrollToTopClick}
       leadingIcon="arrow-up"
     />
@@ -19,7 +19,7 @@
 
 <style lang="postcss">
   .back-to-top {
-    @apply fixed bottom-5 right-8 z-50;
+    @apply invisible bottom-5 right-8 z-50 md:fixed;
   }
 
   .back-to-top.hidden {
