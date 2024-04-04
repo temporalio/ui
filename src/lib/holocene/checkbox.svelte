@@ -148,7 +148,7 @@
   }
 
   .checkmark {
-    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-md border border-subtle bg-transparent text-white hover:border-2 hover:border-white/30 hover:bg-interactive  hover:shadow-[inset_0_0_0_1.5px] hover:shadow-white hover:dark:border-black/30 hover:dark:shadow-black;
+    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-md border-2 border-subtle bg-transparent text-white hover:border-white/30 hover:bg-interactive  hover:shadow-[inset_0_0_0_1.5px] hover:shadow-white hover:dark:border-black/30 hover:dark:shadow-black;
 
     &.invalid {
       @apply border-danger;
