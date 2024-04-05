@@ -92,14 +92,14 @@
         icon="feedback"
         external
       />
+      <NavigationButton
+        onClick={() => ($labsMode = !$labsMode)}
+        tooltip={labsHoverText}
+        label={labsText}
+        icon="labs"
+        active={$labsMode}
+        data-testid="labs-mode-button"
+      />
     </slot>
-    <NavigationButton
-      onClick={() => ($labsMode = !$labsMode)}
-      tooltip={labsHoverText}
-      label={labsText}
-      icon="labs"
-      active={$labsMode}
-      data-testid="labs-mode-button"
-    />
   </svelte:fragment>
 </Navigation>
