@@ -6,12 +6,20 @@ import {
   isActivityTaskFailedEvent,
   isActivityTaskStartedEvent,
   isActivityTaskTimedOutEvent,
+  isChildWorkflowExecutionCanceledEvent,
   isChildWorkflowExecutionCompletedEvent,
+  isChildWorkflowExecutionFailedEvent,
   isChildWorkflowExecutionStartedEvent,
   isChildWorkflowExecutionTerminatedEvent,
+  isChildWorkflowExecutionTimedOutEvent,
+  isExternalWorkflowExecutionSignaledEvent,
+  isPureWorkflowTaskFailedEvent,
   isTimerCanceledEvent,
   isTimerFiredEvent,
   isWorkflowExecutionUpdateCompletedEvent,
+  isWorkflowTaskCompletedEvent,
+  isWorkflowTaskStartedEvent,
+  isWorkflowTaskTimedOutEvent,
 } from '$lib/utilities/is-event-type';
 
 export const getGroupId = (event: CommonHistoryEvent): string => {
@@ -58,6 +66,24 @@ export const getGroupId = (event: CommonHistoryEvent): string => {
     );
   }
 
+  if (isChildWorkflowExecutionCanceledEvent(event)) {
+    return String(
+      event.childWorkflowExecutionCanceledEventAttributes.initiatedEventId,
+    );
+  }
+
+  if (isChildWorkflowExecutionFailedEvent(event)) {
+    return String(
+      event.childWorkflowExecutionFailedEventAttributes.initiatedEventId,
+    );
+  }
+
+  if (isChildWorkflowExecutionTimedOutEvent(event)) {
+    return String(
+      event.childWorkflowExecutionTimedOutEventAttributes.initiatedEventId,
+    );
+  }
+
   if (isTimerFiredEvent(event)) {
     return String(event.timerFiredEventAttributes.startedEventId);
   }
@@ -70,6 +96,28 @@ export const getGroupId = (event: CommonHistoryEvent): string => {
     return String(
       event.workflowExecutionUpdateCompletedEventAttributes.acceptedEventId,
     );
+  }
+
+  if (isExternalWorkflowExecutionSignaledEvent(event)) {
+    return String(
+      event.externalWorkflowExecutionSignaledEventAttributes.initiatedEventId,
+    );
+  }
+
+  if (isWorkflowTaskStartedEvent(event)) {
+    return String(event.workflowTaskStartedEventAttributes.scheduledEventId);
+  }
+
+  if (isWorkflowTaskCompletedEvent(event)) {
+    return String(event.workflowTaskCompletedEventAttributes.scheduledEventId);
+  }
+
+  if (isPureWorkflowTaskFailedEvent(event)) {
+    return String(event.workflowTaskFailedEventAttributes.scheduledEventId);
+  }
+
+  if (isWorkflowTaskTimedOutEvent(event)) {
+    return String(event.workflowTaskTimedOutEventAttributes.scheduledEventId);
   }
 
   return event.id;

@@ -7,6 +7,12 @@ export const capitalize = (word: string): string => {
   return word[0].toUpperCase() + word.slice(1);
 };
 
+export const spaceBetweenCapitalLetters = (word: string): string => {
+  return capitalize(word)
+    .replace(/([A-Z])/g, ' $1')
+    .trim();
+};
+
 const labelsToAddName: Readonly<Set<string>> = new Set(['workflowType']);
 const labelsToChange: Readonly<{ [key: string]: string }> = {
   workflowExecutionWorkflowId: 'workflowId',

@@ -2,17 +2,22 @@ import { get } from 'svelte/store';
 
 import type { I18nKey } from '$lib/i18n';
 import { translate } from '$lib/i18n/translate';
+import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { relativeTime, timeFormat } from '$lib/stores/time-format';
 import type {
   EventAttribute,
   EventAttributeKey,
   IterableEvent,
+  PendingActivity,
 } from '$lib/types/events';
 import { capitalize } from '$lib/utilities/format-camel-case';
 import { formatDate } from '$lib/utilities/format-date';
 import {
+  pendingActivityKeys,
   shouldDisplayAttribute,
+  shouldDisplayGroupAttribute,
   shouldDisplayNestedAttribute,
+  shouldDisplayPendingAttribute,
 } from '$lib/utilities/get-single-attribute-for-event';
 
 export type CombinedAttributes = EventAttribute & {
@@ -109,6 +114,53 @@ export const formatAttributes = (
   for (const [key, value] of Object.entries(event.attributes)) {
     const shouldDisplay = shouldDisplayAttribute(key, value);
     if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
+    formatNestedAttributes(attributes, key);
+  }
+
+  return attributes;
+};
+
+export const formatGroupAttributes = (
+  group: EventGroup,
+): CombinedAttributes => {
+  const attributes: CombinedAttributes = {};
+
+  group.eventList.forEach((event) => {
+    for (const [key, value] of Object.entries(event.attributes)) {
+      const shouldDisplay = shouldDisplayAttribute(key, value);
+      if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
+      formatNestedAttributes(attributes, key);
+    }
+  });
+
+  Object.keys(attributes).forEach((key) => {
+    if (!shouldDisplayGroupAttribute(key, attributes[key]))
+      delete attributes[key];
+  });
+  return attributes;
+};
+
+export const formatPendingAttributes = (
+  pendingActivity: PendingActivity,
+): CombinedAttributes => {
+  const attributes: CombinedAttributes = {};
+
+  const sortedEntries = Object.entries(pendingActivity).sort(
+    ([key1], [key2]) => {
+      return (
+        pendingActivityKeys.indexOf(key1) - pendingActivityKeys.indexOf(key2)
+      );
+    },
+  );
+
+  for (const [key, value] of sortedEntries) {
+    const shouldDisplay = shouldDisplayPendingAttribute(key);
+    const formattedValue = key.toLowerCase().includes('time')
+      ? formatDate(String(value), get(timeFormat), {
+          relative: get(relativeTime),
+        })
+      : value;
+    if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = formattedValue;
     formatNestedAttributes(attributes, key);
   }
 

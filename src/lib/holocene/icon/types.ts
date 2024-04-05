@@ -1,6 +1,8 @@
 export type IconName =
+  | 'activity'
   | 'add'
   | 'archives'
+  | 'arrow-down'
   | 'arrow-left'
   | 'arrow-right'
   | 'arrow-up'
@@ -68,6 +70,7 @@ export type IconName =
   | 'search'
   | 'settings'
   | 'sliders'
+  | 'signal'
   | 'spinner-solid'
   | 'spinner'
   | 'star-empty'

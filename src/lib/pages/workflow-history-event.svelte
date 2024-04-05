@@ -25,7 +25,6 @@
     runId: string,
   ) => {
     if (!$fullEventHistory.length) {
-      loading = true;
       resetFullHistory();
       $fullEventHistory = await fetchAllEvents({
         namespace,

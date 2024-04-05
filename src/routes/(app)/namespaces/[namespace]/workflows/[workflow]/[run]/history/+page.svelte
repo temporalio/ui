@@ -2,7 +2,9 @@
   import { page } from '$app/stores';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import { translate } from '$lib/i18n/translate';
+  import WorkflowHistoryLayoutV2 from '$lib/layouts/workflow-history-layout-v2.svelte';
   import WorkflowHistoryLayout from '$lib/layouts/workflow-history-layout.svelte';
   import WorkflowHistoryCompact from '$lib/pages/workflow-history-compact.svelte';
   import WorkflowHistoryFeed from '$lib/pages/workflow-history-feed.svelte';
@@ -22,6 +24,10 @@
   title={`${translate('workflows.workflow-history')} | ${workflow}`}
   url={$page.url.href}
 />
-<WorkflowHistoryLayout>
-  <svelte:component this={view} />
-</WorkflowHistoryLayout>
+
+<LabsModeGuard>
+  <WorkflowHistoryLayoutV2 />
+  <WorkflowHistoryLayout slot="fallback">
+    <svelte:component this={view} />
+  </WorkflowHistoryLayout>
+</LabsModeGuard>

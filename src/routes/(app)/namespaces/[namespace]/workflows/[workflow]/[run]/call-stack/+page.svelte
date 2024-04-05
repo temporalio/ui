@@ -3,6 +3,7 @@
 
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
+  import WorkflowPaddedLayout from '$lib/layouts/workflow-padded-layout.svelte';
   import WorkflowCallStack from '$lib/pages/workflow-call-stack.svelte';
 
   const workflow = $page.params.workflow;
@@ -12,4 +13,6 @@
   title={`${translate('workflows.call-stack-tab')} | ${workflow}`}
   url={$page.url.href}
 />
-<WorkflowCallStack />
+<WorkflowPaddedLayout>
+  <WorkflowCallStack />
+</WorkflowPaddedLayout>

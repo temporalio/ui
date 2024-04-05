@@ -24,16 +24,16 @@ export const TEMPORAL_THEME = EditorView.theme(
       fontSize: '0.875em',
     },
     '.cm-editor&.cm-focused': {
-      outline: `1px solid ${colors.blue['700']}`,
+      outline: `1px solid ${colors.indigo['600']}`,
     },
     '&.cm-focused .cm-matchingBracket': {
-      backgroundColor: colors.gray['700'],
+      backgroundColor: colors.slate['700'],
     },
     '&.cm-focused .cm-cursor': {
       borderLeftColor: colors.white,
     },
     '&.cm-focused .cm-selectionBackground, ::selection': {
-      backgroundColor: colors.gray['700'],
+      backgroundColor: colors.slate['700'],
     },
     '.cm-gutters': {
       backgroundColor: colors.black,

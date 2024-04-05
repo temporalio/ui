@@ -2,16 +2,27 @@
   import FeatureGuard from '$lib/components/feature-guard.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
   import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
+  import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
   import Navigation from '$lib/holocene/navigation/navigation-container.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import { translate } from '$lib/i18n/translate';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
+  import { labsMode } from '$lib/stores/labs-mode';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
   export let isCloud = false;
   export let activeNamespace: Namespace;
   export let linkList: Partial<Record<string, string>>;
+
+  $: labsHoverText = `${translate('common.labs')} ${
+    $labsMode
+      ? `${translate('common.on')} - ${translate('common.experimental')}`
+      : translate('common.off')
+  }`;
+  $: labsText = `${translate('common.labs')} ${
+    $labsMode ? translate('common.on') : translate('common.off')
+  }`;
 </script>
 
 <Navigation {isCloud} {linkList} aria-label={translate('common.primary')}>
@@ -80,6 +91,14 @@
         label={translate('common.feedback')}
         icon="feedback"
         external
+      />
+      <NavigationButton
+        onClick={() => ($labsMode = !$labsMode)}
+        tooltip={labsHoverText}
+        label={labsText}
+        icon="labs"
+        active={$labsMode}
+        data-testid="labs-mode-button"
       />
     </slot>
   </svelte:fragment>

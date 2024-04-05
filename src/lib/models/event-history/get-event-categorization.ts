@@ -45,6 +45,7 @@ export const eventTypeCategorizations: Readonly<
   SignalExternalWorkflowExecutionFailed: CATEGORIES.SIGNAL,
   SignalExternalWorkflowExecutionInitiated: CATEGORIES.SIGNAL,
   WorkflowExecutionSignaled: CATEGORIES.SIGNAL,
+  ExternalWorkflowExecutionSignaled: CATEGORIES.SIGNAL,
 
   TimerCanceled: CATEGORIES.TIMER,
   TimerFired: CATEGORIES.TIMER,
@@ -64,7 +65,6 @@ export const eventTypeCategorizations: Readonly<
   WorkflowTaskStarted: CATEGORIES.WORKFLOW,
   WorkflowTaskTimedOut: CATEGORIES.WORKFLOW,
   ExternalWorkflowExecutionCancelRequested: CATEGORIES.WORKFLOW,
-  ExternalWorkflowExecutionSignaled: CATEGORIES.WORKFLOW,
   RequestCancelExternalWorkflowExecutionFailed: CATEGORIES.WORKFLOW,
   RequestCancelExternalWorkflowExecutionInitiated: CATEGORIES.WORKFLOW,
 
