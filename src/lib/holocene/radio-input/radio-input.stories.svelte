@@ -32,7 +32,7 @@
       value="c"
       description="this is a description"
     />
-    <p>The value is {$value1}</p>
+    <p class="text-primary">The value is {$value1}</p>
   </RadioGroup>
 </Story>
 <Story name="without a radio group">
@@ -52,5 +52,5 @@
       group={value2}
     />
   </div>
-  <p>The value is {$value2}</p>
+  <p class="mt-2 text-primary">The value is {$value2}</p>
 </Story>
