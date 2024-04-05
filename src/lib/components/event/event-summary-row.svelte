@@ -189,7 +189,7 @@
   }
 
   .row:hover {
-    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
+    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed text-black;
   }
 
   .expanded.row {
@@ -237,7 +237,7 @@
   }
 
   .active {
-    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
+    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed dark:text-black;
   }
 
   .canceled:hover,
