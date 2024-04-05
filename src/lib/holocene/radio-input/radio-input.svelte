@@ -15,6 +15,7 @@
   export let label: string;
   export let description: string | undefined = undefined;
   export let labelHidden = false;
+  export let disabled = false;
 
   let internalGroup: Writable<T> = writable(value);
   let internalName: string = '';
@@ -31,7 +32,7 @@
 </script>
 
 <div class="flex flex-col gap-1">
-  <label>
+  <label class:disabled>
     <input
       bind:group={$group}
       type="radio"
@@ -39,6 +40,7 @@
       {name}
       {value}
       {id}
+      {disabled}
       {...$$restProps}
     />
     <span class="label" class:hidden={labelHidden}>
@@ -59,6 +61,10 @@
 
   label {
     @apply flex grow cursor-pointer flex-row items-center gap-2 text-sm font-normal text-primary focus:outline-none;
+
+    &.disabled {
+      @apply cursor-not-allowed;
+    }
   }
 
   input[type='radio'] {
@@ -68,18 +74,26 @@
       @apply absolute left-1 top-1 h-0 w-0 scale-0 rounded-full bg-interactive transition-transform content-[''];
     }
 
-    &:focus-visible,
-    &:hover {
-      @apply border-transparent border-white bg-interactive outline-offset-0 outline-focus dark:border-black;
+    &:enabled {
+      &:focus-visible,
+      &:hover {
+        @apply border-transparent border-white bg-interactive outline-offset-0 outline-focus dark:border-black;
+      }
+    }
+
+    &:disabled {
+      @apply cursor-not-allowed opacity-50;
     }
   }
 
   input[type='radio']:checked {
     @apply bg-interactive shadow-[inset_0_0_0_2px] shadow-white dark:shadow-black;
 
-    &:focus-visible,
-    &:hover {
-      @apply border-white shadow-none dark:border-black;
+    &:enabled {
+      &:focus-visible,
+      &:hover {
+        @apply border-white shadow-none dark:border-black;
+      }
     }
 
     &::after {
