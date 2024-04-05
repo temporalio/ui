@@ -2,11 +2,9 @@
   import { page } from '$app/stores';
 
   import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
-  import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
-  import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
@@ -15,20 +13,9 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fetchAllEvents } from '$lib/services/events-service';
+  import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
+  import { decodeEventHistory, fullEventHistory } from '$lib/stores/events';
   import {
-    eventFilterSort,
-    type EventSortOrder,
-    eventViewType,
-  } from '$lib/stores/event-view';
-  import {
-    decodeEventHistory,
-    eventHistory,
-    fullEventHistory,
-  } from '$lib/stores/events';
-  import { namespaces } from '$lib/stores/namespaces';
-  import {
-    refresh,
     workflowRun,
     workflowTimelineViewOpen,
   } from '$lib/stores/workflow-run';
@@ -36,49 +23,17 @@
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
-  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
-  let showShortcuts = false;
   let showDownloadPrompt = false;
 
-  $: workflowEvents =
-    getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
   $: ({ workflow } = $workflowRun);
-  $: workflowRelationships = getWorkflowRelationships(
-    workflow,
-    $eventHistory,
-    $fullEventHistory,
-    $namespaces,
-  );
+  $: workflowEvents =
+    getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
   $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
     $fullEventHistory,
     $eventFilterSort,
   );
-
-  const resetFullHistory = () => {
-    $fullEventHistory = [];
-  };
-
-  const fetchEvents = async (
-    namespace: string,
-    workflowId: string,
-    runId: string,
-    view: EventView,
-    sort: EventSortOrder,
-  ) => {
-    resetFullHistory();
-    $fullEventHistory = await fetchAllEvents({
-      namespace,
-      workflowId,
-      runId,
-      sort,
-    });
-  };
-
-  $: $refresh,
-    fetchEvents(namespace, workflowId, runId, $eventViewType, $eventFilterSort);
 
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {
@@ -91,8 +46,8 @@
     showDownloadPrompt = false;
     exportHistory({
       namespace: decodeURIForSvelte($page.params.namespace),
-      workflowId: decodeURIForSvelte($workflowRun.workflow?.id),
-      runId: decodeURIForSvelte($workflowRun.workflow?.runId),
+      workflowId: decodeURIForSvelte(workflow?.id),
+      runId: decodeURIForSvelte(workflow?.runId),
       settings: $page.data.settings,
       decodeEventHistory: $decodeEventHistory,
     });
@@ -105,7 +60,6 @@
     <WorkflowTypedError error={workflowTaskFailedError} />
   {/if}
   <WorkflowSummary />
-  <WorkflowRelationships {...workflowRelationships} />
   <PendingActivities />
   <section>
     <Accordion
@@ -128,7 +82,7 @@
             ? translate('workflows.continued-as-new-with-input')
             : translate('workflows.results')}
           data-testid="workflow-results"
-          running={workflow.isRunning}
+          running={workflow?.isRunning}
         />
       </div>
     </Accordion>
@@ -156,7 +110,7 @@
         <ToggleButtons>
           <ToggleButton
             icon="feed"
-            active={$eventViewType === 'feed'}
+            active={$eventViewType === 'feed' || $eventViewType === 'timeline'}
             data-testid="feed"
             on:click={() => onViewClick('feed')}
             >{translate('workflows.history')}</ToggleButton
@@ -186,11 +140,6 @@
     </nav>
     <slot />
   </section>
-  <EventShortcutKeys
-    open={showShortcuts}
-    onOpen={() => (showShortcuts = true)}
-    onClose={() => (showShortcuts = false)}
-  />
 </div>
 
 <Modal
