@@ -110,7 +110,7 @@
         <ToggleButtons>
           <ToggleButton
             icon="feed"
-            active={$eventViewType === 'feed'}
+            active={$eventViewType === 'feed' || $eventViewType === 'timeline'}
             data-testid="feed"
             on:click={() => onViewClick('feed')}
             >{translate('workflows.history')}</ToggleButton
