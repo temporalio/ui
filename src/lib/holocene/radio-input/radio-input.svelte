@@ -62,15 +62,25 @@
   }
 
   input[type='radio'] {
-    @apply relative box-content h-4 w-4 min-w-[16px] cursor-pointer appearance-none rounded-full border border-2 border-subtle bg-transparent hover:border-white/30 hover:bg-interactive  hover:shadow-[inset_0_0_0_1px] hover:shadow-white hover:dark:border-black/30 hover:dark:shadow-black;
+    @apply relative box-content h-4 w-4 min-w-[16px] cursor-pointer appearance-none rounded-full border border-2 border-subtle bg-transparent outline outline-4 outline-transparent dark:text-black;
 
     &::after {
       @apply absolute left-1 top-1 h-0 w-0 scale-0 rounded-full bg-interactive transition-transform content-[''];
     }
+
+    &:focus-visible,
+    &:hover {
+      @apply border-transparent border-white bg-interactive outline-offset-0 outline-focus dark:border-black;
+    }
   }
 
   input[type='radio']:checked {
-    @apply border-white/10 bg-interactive shadow-[inset_0_0_0_2px] shadow-white dark:shadow-black;
+    @apply bg-interactive shadow-[inset_0_0_0_2px] shadow-white dark:shadow-black;
+
+    &:focus-visible,
+    &:hover {
+      @apply border-white shadow-none dark:border-black;
+    }
 
     &::after {
       @apply h-2 w-2 scale-100;
