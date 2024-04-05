@@ -1,6 +1,6 @@
 <script lang="ts">
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { type IconName } from '$lib/holocene/icon/paths';
 
   import type { GraphConfig } from '../constants';
 
@@ -44,6 +44,7 @@
     width={config.radius * 2}
     height={config.radius * 2}
     class="text-white {!active && 'opacity-[.35]'}"
+    noDivWrapper
   />
 {/if}
 <text
@@ -66,6 +67,7 @@
     width={config.radius * 2}
     height={config.radius * 2}
     class="text-white {!active && 'opacity-[.35]'}"
+    noDivWrapper
   />
 {/if}
 

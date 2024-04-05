@@ -1,4 +1,4 @@
-import type { IconName } from '$lib/holocene/icon/paths';
+import type { IconName } from '$lib/holocene/icon';
 import type {
   EventGroup,
   EventGroups,
@@ -290,7 +290,7 @@ export const getStatusColor = (
     case 'Fired':
       return '#f8a208';
     case 'TimedOut':
-      return '#c2570c';
+      return '#F97316';
     case 'Canceled':
       return '#fed64b';
     case 'Running':

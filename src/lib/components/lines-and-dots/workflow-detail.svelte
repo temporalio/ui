@@ -1,7 +1,7 @@
 <script lang="ts">
   import Copyable from '$lib/holocene/copyable/index.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
 

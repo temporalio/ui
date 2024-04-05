@@ -51,6 +51,7 @@
     height={radius * 1.5}
     strokeWidth="4"
     class="text-black"
+    noDivWrapper
   />
 </g>
 

@@ -104,7 +104,7 @@
   }
 
   .TimedOut {
-    stroke: #c2570c;
+    stroke: #f97316;
   }
 
   .Canceled {

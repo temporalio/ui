@@ -1,10 +1,12 @@
 <script lang="ts">
+  import Checkbox from '$lib/holocene/checkbox.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     allEventTypeOptions,
     compactEventTypeOptions,
   } from '$lib/models/event-history/get-event-categorization';
+  import { clearActiveEvents } from '$lib/stores/active-events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
   import { isVersionNewer } from '$lib/utilities/version-check';
@@ -28,6 +30,7 @@
   }
 
   const onOptionClick = ({ value }) => {
+    clearActiveEvents();
     $eventTypeFilter = $eventTypeFilter.some((type) => type === value)
       ? $eventTypeFilter.filter((type) => type !== value)
       : [...$eventTypeFilter, value];
@@ -36,8 +39,8 @@
 
 <div class="flex flex-wrap items-center items-center justify-center gap-2">
   {#each options as option}
-    <div class="flex items-center gap-2">
-      <input
+    <div class="flex items-center">
+      <Checkbox
         type="checkbox"
         on:click={() => onOptionClick(option)}
         checked={$eventTypeFilter.some((type) => type === option.value)}

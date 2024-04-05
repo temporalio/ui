@@ -8,8 +8,8 @@
 
   import { page } from '$app/stores';
 
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import { getAppContext } from '$lib/utilities/get-context';
 
   type BaseProps = {

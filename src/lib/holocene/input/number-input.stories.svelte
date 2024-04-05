@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
 
-  import { iconNames } from '$lib/holocene/icon/paths';
+  import iconNames from '$lib/holocene/icon/icon-names';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
 </script>
 
@@ -10,7 +10,7 @@
   component={NumberInput}
   args={{
     label: 'Number Input',
-    placeholder: 'Enter a number',
+    placeholder: '0',
     units: 'days',
     min: 0,
     max: 100,

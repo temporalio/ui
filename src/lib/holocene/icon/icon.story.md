@@ -14,4 +14,4 @@ The `<Icon />` component allows for rendering of SVG Icons in our app. It is des
 ```
 
 3. Take the `<path />` element(s) from your SVG markup, and paste them in the default slot of the `<Svg />` Component.
-4. Add your new icon to the `icons` object in `src/lib/holocene/icon/paths.ts`.
+4. Run `pnpm generate:icons` to generate a union type that includes the new icon.

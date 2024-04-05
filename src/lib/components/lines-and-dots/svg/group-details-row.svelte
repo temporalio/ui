@@ -5,7 +5,10 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
-  import { format } from '$lib/utilities/format-camel-case';
+  import {
+    format,
+    spaceBetweenCapitalLetters,
+  } from '$lib/utilities/format-camel-case';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import {
     isChildWorkflowExecutionCompletedEvent,
@@ -31,7 +34,8 @@
   export let x = 0;
   export let y: number;
 
-  $: status = group?.finalClassification || group?.classification;
+  $: status =
+    group?.finalClassification || group?.classification || group?.label;
 
   $: {
     if (group?.pendingActivity) {
@@ -109,7 +113,7 @@
     fill={getStatusColor(status)}
   />
   <Text point={[x + gutter, y + 0.5 * height]} category="none">
-    {status}
+    {status ? spaceBetweenCapitalLetters(status) : group.label}
   </Text>
   <Text point={[x + 1.5 * gutter + 100, y + 0.5 * height]}>
     {title}

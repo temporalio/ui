@@ -10,8 +10,8 @@
     MenuItem,
   } from '$lib/holocene/menu';
 
+  import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
-  import type { IconName } from '../icon/paths';
   import type { MenuButtonVariant } from '../menu/menu-button.svelte';
 
   type Option = { label: string; value: string; icon?: IconName };

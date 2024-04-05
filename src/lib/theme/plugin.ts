@@ -216,6 +216,14 @@ const temporal = plugin(
 
         DEFAULT: css('--color-text-primary'),
       }),
+      extend: {
+        transitionProperty: {
+          width: 'width',
+          height: 'height',
+          left: 'left',
+          right: 'right',
+        },
+      },
       outlineColor: ({ theme }) => ({
         ...theme('colors'),
 

@@ -16,6 +16,6 @@
   aria-hidden={!title}
   {...$$restProps}
 >
-  <title>{title}</title>
+  {#if title}<title>{title}</title>{/if}
   <slot />
 </svg>
