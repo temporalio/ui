@@ -191,7 +191,7 @@
   }
 
   .paginated-table-controls {
-    @apply surface-primary sticky bottom-0 left-0 flex w-full grow gap-2 rounded-b border-t border-table px-4 py-2 text-primary;
+    @apply surface-primary sticky bottom-0 left-0 flex w-full grow gap-2 rounded-b border-t border-table px-4 py-2 text-inverse;
   }
 
   .paginated-table-controls-start {
