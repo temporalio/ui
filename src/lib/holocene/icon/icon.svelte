@@ -24,7 +24,7 @@
     />
   {/await}
 {:else}
-  <div style="height: {height}; width: {width};">
+  <div style="height: {height}px; width: {width}px;">
     {#await icon then icon}
       <svelte:component
         this={icon}
