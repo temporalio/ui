@@ -36,7 +36,7 @@
         id="filter-button"
       >
         {#key filtered}
-          <Icon title={filterIconTitle} name="filter" />
+          <Icon title={filterIconTitle} name="filter" stroke="offWhite" />
         {/key}
       </button>
     {/if}
@@ -49,7 +49,7 @@
         <Icon
           title={$copied ? copySuccessIconTitle : copyIconTitle}
           name={$copied ? 'checkmark' : 'copy'}
-          stroke="#000"
+          stroke="offWhite"
         />
       </button>
     {/if}
@@ -62,7 +62,7 @@
   }
 
   .copy-or-filter-button {
-    @apply surface-primary relative top-[50%] h-fit translate-y-[-50%] rounded-full p-1 text-primary hover:bg-inverse hover:text-white;
+    @apply relative top-[50%] h-fit translate-y-[-50%] rounded-full p-1 text-primary hover:bg-inverse hover:text-white;
   }
 
   .filtered {
