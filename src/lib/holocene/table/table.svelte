@@ -55,7 +55,7 @@
       }
 
       :global(td) {
-        @apply border-t  px-1 py-2;
+        @apply border-t  border-table px-1 py-2;
 
         &:first-child {
           @apply w-[1px] rounded-tl-lg border-l border-table;
