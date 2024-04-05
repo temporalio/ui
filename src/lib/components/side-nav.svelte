@@ -99,26 +99,7 @@
       label={labsText}
       icon="labs"
       active={$labsMode}
-    />
-
-    <!-- <NavRow
-      {isCloud}
-      handleClick={() => ($labsMode = !$labsMode)}
       data-testid="labs-mode-button"
-    >
-      <NavTooltip right text={labsHoverText}>
-        <div class="nav-icon">
-          <Icon name="labs" active={$labsMode} />
-        </div>
-      </NavTooltip>
-      <div class="nav-title flex flex-col leading-3">
-        <div>{labsText}</div>
-        {#if $labsMode}
-          <p class="text-[12px]">
-            {translate('common.experimental')}
-          </p>
-        {/if}
-      </div>
-    </NavRow> -->
+    />
   </svelte:fragment>
 </Navigation>
