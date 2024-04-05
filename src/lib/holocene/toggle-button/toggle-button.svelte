@@ -49,13 +49,14 @@
   class:active={href ? $page.url.pathname.includes(base) : active}
   href={href ? href + $page.url.search : null}
   class:rounded-lg={!group}
+  class:disabled={$$restProps.disabled}
   on:click
   role="button"
   tabindex="0"
   {...$$restProps}
 >
   {#if icon}
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-0">
       <Icon name={icon} />
       <span class="hidden md:block"><slot /></span>
     </div>
@@ -71,6 +72,10 @@
 
   .toggle-button.active {
     @apply surface-secondary-active;
+  }
+
+  .toggle-button.disabled {
+    @apply surface-disabled;
   }
 
   .group:first-child {

@@ -179,7 +179,6 @@ const temporal = plugin(
         success: css('--color-surface-success'),
         warning: css('--color-surface-warning'),
         danger: css('--color-surface-danger'),
-
         DEFAULT: css('--color-surface-primary'),
       }),
       borderColor: ({ theme }) => ({
