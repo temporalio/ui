@@ -15,7 +15,7 @@
 
 <style lang="postcss">
   .bulk-action-button {
-    @apply rounded border px-2 py-1 text-xs leading-3 text-white;
+    @apply rounded border px-2 py-1 text-xs leading-3 text-inverse;
   }
 
   .bulk-action-button.primary {
