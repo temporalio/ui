@@ -18,6 +18,7 @@
   export let count: number | undefined = undefined;
   export let loading = false;
   export let newCount: number | undefined = undefined;
+  export let big = false;
 
   const label: Record<Status, string> = {
     Running: translate('workflows.running'),
@@ -78,6 +79,7 @@
       status,
     })}"
     class:rounded-r-none={newCount}
+    class:big
   >
     {#if loading}
       <Spinner class="h-4 w-4 animate-spin" />
@@ -99,3 +101,9 @@
     </span>
   {/if}
 </div>
+
+<style lang="postcss">
+  .big {
+    @apply flex justify-center px-4 text-lg;
+  }
+</style>

@@ -1,5 +1,7 @@
 import { toEventHistory } from '$lib/models/event-history';
 import type { EventSortOrder } from '$lib/stores/event-view';
+import { fullEventHistory } from '$lib/stores/events';
+import { refresh } from '$lib/stores/workflow-run';
 import type { WorkflowAPIRoutePath } from '$lib/types/api';
 import type {
   CommonHistoryEvent,
@@ -24,6 +26,8 @@ export type FetchEventsParameters = NamespaceScopedRequest &
     runId: string;
     rawPayloads?: boolean;
     sort?: EventSortOrder;
+    signal?: AbortSignal;
+    historySize?: string;
   };
 
 export type FetchEventsParametersWithSettings = FetchEventsParameters & {
@@ -69,11 +73,27 @@ export const fetchAllEvents = async ({
   namespace,
   workflowId,
   runId,
-  sort,
-  onStart,
-  onUpdate,
-  onComplete,
+  sort = 'ascending',
+  signal,
+  historySize,
 }: FetchEventsParameters): Promise<CommonHistoryEvent[]> => {
+  const onStart = () => {
+    if (!signal) return;
+    fullEventHistory.set([]);
+  };
+
+  const onUpdate = (full, current) => {
+    if (!signal) return;
+    fullEventHistory.set([...toEventHistory(full.history?.events)]);
+    const next = current?.history?.events;
+    const hasNewHistory =
+      historySize &&
+      next?.every((e) => parseInt(e.eventId) > parseInt(historySize));
+    if (hasNewHistory) {
+      refresh.set(Date.now());
+    }
+  };
+
   const endpoint = getEndpointForSortOrder(sort);
   const route = routeForApi(endpoint, { namespace, workflowId });
   const response = await paginated(
@@ -81,12 +101,17 @@ export const fetchAllEvents = async ({
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
         token,
         request: fetch,
-        params: { 'execution.runId': runId },
+        params: {
+          'execution.runId': runId,
+          waitNewEvent: signal ? 'true' : 'false',
+        },
+        options: { signal },
       });
     },
-    { onStart, onUpdate, onComplete },
+    { onStart, onUpdate },
   );
 
+  if (!response?.history) return [];
   const allEvents = await toEventHistory(response.history.events);
   return allEvents;
 };
