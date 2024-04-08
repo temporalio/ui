@@ -82,6 +82,7 @@
           {canvasWidth}
           {startTime}
           {endTime}
+          readOnly={!!staticHeight}
         />
       {/key}
       {#if activeGroups.includes(group.id)}
