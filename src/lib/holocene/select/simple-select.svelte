@@ -54,7 +54,7 @@
 
 <style lang="postcss">
   select {
-    @apply text-primary;
+    @apply text-primary border-secondary bg-transparent;
   }
 
   .remove {
