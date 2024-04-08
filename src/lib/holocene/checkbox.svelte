@@ -144,7 +144,7 @@
   }
 
   input:checked ~ .checkmark {
-    @apply border-interactive bg-interactive;
+    @apply border-interactive bg-interactive hover:border-white hover:dark:border-black;
   }
 
   .checkmark {
