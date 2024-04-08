@@ -57,7 +57,7 @@
       />
     {/each}
   {:else}
-    <EventDetailRow {event} {canvasWidth} {x} {y} />
+    <EventDetailRow active {event} {canvasWidth} {x} {y} />
   {/if}
 </g>
 

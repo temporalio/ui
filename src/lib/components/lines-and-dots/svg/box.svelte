@@ -30,8 +30,6 @@
   }
 
   .active {
-    stroke: #ebebeb;
-    stroke-width: 3;
     fill: #1e293b;
   }
 
