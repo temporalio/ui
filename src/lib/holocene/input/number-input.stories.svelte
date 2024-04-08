@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
 
-  import iconNames from '$lib/holocene/icon/icon-names';
+  import iconNames from '$lib/holocene/icon';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
 </script>
 

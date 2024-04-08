@@ -44,7 +44,6 @@
     width={config.radius * 2}
     height={config.radius * 2}
     class="text-white {!active && 'opacity-[.35]'}"
-    noDivWrapper
   />
 {/if}
 <text
@@ -67,7 +66,6 @@
     width={config.radius * 2}
     height={config.radius * 2}
     class="text-white {!active && 'opacity-[.35]'}"
-    noDivWrapper
   />
 {/if}
 
