@@ -3,7 +3,7 @@
   import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
 
   import Button from '$lib/holocene/button.svelte';
-  import iconNames from '$lib/holocene/icon/icon-names';
+  import iconNames from '$lib/holocene/icon';
 </script>
 
 <Meta

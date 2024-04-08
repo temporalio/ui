@@ -4,7 +4,7 @@
 
   import IconButton from '$lib/holocene/icon-button.svelte';
 
-  import iconNames from './icon/icon-names';
+  import iconNames from './icon';
 </script>
 
 <Meta
