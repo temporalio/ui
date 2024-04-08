@@ -1,4 +1,5 @@
 <script lang="ts">
+  import debounce from 'just-debounce';
   import { onDestroy, onMount } from 'svelte';
 
   import { page } from '$app/stores';
@@ -86,13 +87,8 @@
     });
   };
 
-  const getOnlyWorkflowWithPendingActivities = async (
-    refresh: number,
-    namespace: string,
-    workflowId: string,
-    runId: string,
-  ) => {
-    if (refresh && $workflowRun?.workflow?.isRunning) {
+  const fetchWorkflowWithPending = debounce(
+    async (namespace: string, workflowId: string, runId: string) => {
       const { settings } = $page.data;
 
       const { workflow, error } = await fetchWorkflow({
@@ -112,6 +108,18 @@
         $authUser?.accessToken,
       );
       $workflowRun = { ...$workflowRun, workflow };
+    },
+    350,
+  );
+
+  const getOnlyWorkflowWithPendingActivities = async (
+    refresh: number,
+    namespace: string,
+    workflowId: string,
+    runId: string,
+  ) => {
+    if (refresh && $workflowRun?.workflow?.isRunning) {
+      fetchWorkflowWithPending(namespace, workflowId, runId);
     }
   };
 
