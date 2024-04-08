@@ -1,39 +1,21 @@
 <script lang="ts">
-  import type { IconName } from './types';
+  import { type IconName, icons } from './paths';
 
   export let name: IconName;
   export let width = 24;
   export let height = 24;
   export let title = '';
-  export let noDivWrapper = false;
 
-  $: icon = import(`./svg/${name}.svelte`)
-    .then((module) => module.default)
-    .catch(() => console.error(`🔥 Icon not found: ${name}`));
+  $: icon = icons[name];
 </script>
 
-{#if noDivWrapper}
-  {#await icon then icon}
-    <svelte:component
-      this={icon}
-      {width}
-      {height}
-      {title}
-      class={$$props.class}
-      {...$$restProps}
-    />
-  {/await}
-{:else}
-  <div style="height: {height}px; width: {width}px;">
-    {#await icon then icon}
-      <svelte:component
-        this={icon}
-        {width}
-        {height}
-        {title}
-        class={$$props.class}
-        {...$$restProps}
-      />
-    {/await}
-  </div>
+{#if icon}
+  <svelte:component
+    this={icon}
+    {width}
+    {height}
+    {title}
+    class={$$props.class}
+    {...$$restProps}
+  />
 {/if}
