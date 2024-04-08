@@ -60,8 +60,9 @@
     fill="#465977"
   />
 {/if}
+<Box point={[x, eventY]} {width} height={fontSizeRatio} fill="#1E293B" />
 <Text
-  point={[x + 0.5 * fontSizeRatio, eventY + 0.75 * fontSizeRatio]}
+  point={[x + 0.5 * fontSizeRatio, eventY + 0.66 * fontSizeRatio]}
   fontSize="13px"
   fontWeight="300"
   >{event.id}<tspan dx={5}>{spaceBetweenCapitalLetters(event?.name)}</tspan
@@ -117,7 +118,17 @@
   />
 {/each}
 <Line
+  startPoint={[x - 1.5, eventY]}
+  endPoint={[x + width, eventY]}
+  strokeWidth={3}
+/>
+<Line
   startPoint={[x, eventY + getEventDetailsBoxHeight(event)]}
   endPoint={[x + width, eventY + getEventDetailsBoxHeight(event)]}
+  strokeWidth={3}
+/>
+<Line
+  startPoint={[x, eventY]}
+  endPoint={[x, eventY + getEventDetailsBoxHeight(event)]}
   strokeWidth={3}
 />
