@@ -132,7 +132,7 @@
   on:keydown={handleKeydown}
 />
 
-<div class="pagination relative mb-8 flex flex-col gap-4 text-primary">
+<div class="pagination relative mb-8 flex flex-col gap-4">
   <div class="flex flex-col items-end justify-end gap-4 lg:justify-start">
     <div class="w-full">
       <slot name="action-top-left" />
@@ -206,7 +206,7 @@
     setActiveRowIndex={store.setActiveRowIndex}
   />
   <nav
-    class={`flex text-primary ${
+    class={`flex  ${
       $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
     }`}
     aria-label="{$$restProps['aria-label']} 2"

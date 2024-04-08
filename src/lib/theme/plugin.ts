@@ -111,7 +111,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
 const temporal = plugin(
   ({ addComponents, addBase }) => {
     addBase({
-      ':root': variables,
+      ':root': dark,
       ':is(body.dark *)': dark,
     });
 
