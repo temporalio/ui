@@ -44,7 +44,7 @@
   };
 </script>
 
-<TableRow class="workflow-summary-row">
+<TableRow class="hover:surface-subtle">
   <td>
     <WorkflowStatus
       status={workflow.status}
@@ -116,14 +116,6 @@
 </TableRow>
 
 <style lang="postcss">
-  :global(.workflow-summary-row:hover) {
-    @apply bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
-
-    .table-link {
-      @apply text-blue-700 underline decoration-blue-700;
-    }
-  }
-
   .time-cell {
     @apply max-xl:hidden;
   }
