@@ -168,7 +168,7 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply h-10 bg-primary text-white;
+      @apply surface-inverse h-10;
     }
 
     :global(tr > th) {
@@ -180,7 +180,7 @@
     @apply surface-primary;
 
     :global(tr:not(.empty)) {
-      @apply h-12 border-b border-primary last-of-type:border-0 hover:bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 hover:bg-fixed;
+      @apply h-12 border-b border-primary hover:surface-subtle last-of-type:border-0 hover:bg-fixed;
     }
 
     :global(tr > td > .table-link) {
