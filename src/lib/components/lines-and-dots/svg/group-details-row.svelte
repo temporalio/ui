@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import { page } from '$app/stores';
 
   import { groupEvents } from '$lib/models/event-groups';
@@ -86,8 +88,11 @@
     }
   };
 
-  const labelPadding = 240;
+  onMount(() => {
+    fetchChildWorkflowForGroup();
+  });
 
+  const labelPadding = 240;
   $: title = group.name;
   $: boxHeight = getGroupDetailsBoxHeight(group);
   $: textStartingY = height + y + fontSizeRatio;
@@ -99,7 +104,6 @@
     ([, value]) => typeof value !== 'object',
   );
   $: childTimelineY = textStartingY + textAttributes.length * fontSizeRatio;
-  $: group, fetchChildWorkflowForGroup();
   $: width = canvasWidth;
 </script>
 

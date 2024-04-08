@@ -109,7 +109,7 @@
       );
       $workflowRun = { ...$workflowRun, workflow };
     },
-    350,
+    500,
   );
 
   const getOnlyWorkflowWithPendingActivities = async (
