@@ -70,7 +70,7 @@
   }
 
   .tab.active {
-    @apply border-information;
+    @apply border-brand;
   }
 
   .tab.disabled {
