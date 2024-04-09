@@ -47,8 +47,9 @@ auth:
     callbackUrl: {{ .Env.TEMPORAL_AUTH_CALLBACK_URL }}
     scopes: {{ if .Env.TEMPORAL_AUTH_SCOPES }} {{ range $seed := (split .Env.TEMPORAL_AUTH_SCOPES ",") }}
       - {{ . }} {{ end }} {{ end }}
-    additionalClaims: {{ if .Env.TEMPORAL_AUTH_SCOPES }} {{ range $seed := (split .Env.TEMPORAL_AUTH_SCOPES ",") }}
-      - {{ . }} {{ end }} {{ end }}      
+    additionalClaims: 
+      {{ if .Env.TEMPORAL_OAUTH_ADDITIONAL_CLAIMS }}{{ .Env.TEMPORAL_OAUTH_ADDITIONAL_CLAIMS }}
+      {{ end }}
 codec:
   endpoint: {{ default .Env.TEMPORAL_CODEC_ENDPOINT "" }}
   passAccessToken: {{ default .Env.TEMPORAL_CODEC_PASS_ACCESS_TOKEN "false" }}
