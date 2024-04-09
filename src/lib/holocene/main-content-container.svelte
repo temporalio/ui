@@ -6,6 +6,7 @@
 
 <script lang="ts">
   import {
+    clearActives,
     endIndex,
     indexPageSize,
     startIndex,
@@ -31,6 +32,7 @@
   function onScrollToBottomClick() {
     const historyLength = $filteredEventHistory?.length;
     if (historyLength) {
+      clearActives();
       $endIndex = historyLength;
       $startIndex = $endIndex - indexPageSize;
     }
