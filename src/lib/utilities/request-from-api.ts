@@ -83,7 +83,9 @@ export const requestFromAPI = async <T>(
 
   try {
     options = withSecurityOptions(options, isBrowser);
-    options = await withAuth(options, isBrowser);
+    if (!endpoint.endsWith('api/v1/settings')) {
+      options = await withAuth(options, isBrowser);
+    }
 
     const response = await request(url, options);
     const body = await response.json();

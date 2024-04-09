@@ -5,7 +5,7 @@ import type { LayoutData, LayoutLoad } from './$types';
 import { fetchCluster, fetchSystemInfo } from '$lib/services/cluster-service';
 import { fetchNamespaces } from '$lib/services/namespaces-service';
 import { fetchSettings } from '$lib/services/settings-service';
-import { getAuthUser, setAuthUser } from '$lib/stores/auth-user';
+import { clearAuthUser, getAuthUser, setAuthUser } from '$lib/stores/auth-user';
 import type { GetClusterInfoResponse, GetSystemInfoResponse } from '$lib/types';
 import type { Settings } from '$lib/types/global';
 import {
@@ -21,6 +21,11 @@ export const load: LayoutLoad = async function ({
   fetch,
 }): Promise<LayoutData> {
   const settings: Settings = await fetchSettings(fetch);
+
+  if (!settings.auth.enabled) {
+    cleanAuthUserCookie();
+    clearAuthUser();
+  }
 
   const authUser = getAuthUserCookie();
   if (authUser?.accessToken) {
