@@ -118,7 +118,7 @@
   }
 
   .nav-toggle {
-    @apply transition-left absolute left-[18px] top-[52px] hidden;
+    @apply absolute left-[18px] top-[52px] hidden transition-left;
   }
 
   .nav-header:hover .nav-toggle {
