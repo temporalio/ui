@@ -50,6 +50,7 @@
   {id}
   bind:this={menuElement}
   on:focusout={handleFocusOut}
+  on:click|stopPropagation
   {...$$restProps}
 >
   <slot />
