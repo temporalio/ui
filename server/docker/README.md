@@ -25,6 +25,7 @@ docker run \
     -e TEMPORAL_TLS_KEY=../cluster.key \
     -e TEMPORAL_TLS_ENABLE_HOST_VERIFICATION=true \
     -e TEMPORAL_TLS_SERVER_NAME=tls-server \
+    -e TEMPORAL_OAUTH_ADDITIONAL_CLAIMS="group: \"mygroup\"" \
     temporalio/ui:latest
 ```
 
