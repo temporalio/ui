@@ -177,7 +177,7 @@ describe('getEventGroupDisplayName', () => {
       name: 'TimerStarted',
     } as unknown as CommonHistoryEvent;
 
-    expect(getEventGroupDisplayName(timerStartedEvent)).toBe('Timer: 8 (4s)');
+    expect(getEventGroupDisplayName(timerStartedEvent)).toBe('8 (4s)');
   });
 
   it('should get the name of a SignalExternalWorkflowExecutionInitiatedEvent', () => {
@@ -188,9 +188,7 @@ describe('getEventGroupDisplayName', () => {
       },
       name: 'WorkflowExecutionSignaled',
     } as unknown as CommonHistoryEvent;
-    expect(getEventGroupDisplayName(signalEvent)).toBe(
-      'Signal: WorkflowSignal',
-    );
+    expect(getEventGroupDisplayName(signalEvent)).toBe('WorkflowSignal');
   });
 
   it('should get the name of a WorkflowExecutionSignaledEvent', () => {
@@ -203,7 +201,7 @@ describe('getEventGroupDisplayName', () => {
     } as unknown as CommonHistoryEvent;
 
     expect(getEventGroupDisplayName(workflowExectutionSignaledEvent)).toBe(
-      'Signal received: signalBeforeReset',
+      'signalBeforeReset',
     );
   });
 
@@ -220,9 +218,7 @@ describe('getEventGroupDisplayName', () => {
       timestamp: '2022-07-01 UTC 20:23:49.13',
     } as unknown as CommonHistoryEvent;
 
-    expect(getEventGroupDisplayName(markerRecordedEvent)).toBe(
-      'Marker: Version',
-    );
+    expect(getEventGroupDisplayName(markerRecordedEvent)).toBe('Version');
   });
 
   it('should get the name of a StartChildWorkflowExecutionInitiatedEvent', () => {
@@ -235,7 +231,7 @@ describe('getEventGroupDisplayName', () => {
     } as unknown as CommonHistoryEvent;
 
     expect(getEventGroupDisplayName(startChildWorkflowEvent)).toBe(
-      'Child Workflow: Workflow Name',
+      'Workflow Name',
     );
   });
 
@@ -253,5 +249,36 @@ describe('getEventGroupDisplayName', () => {
     expect(getEventGroupDisplayName(workflowUpdateAcceptedEvent)).toBe(
       'Start the update',
     );
+  });
+
+  it('should get the name of a Local Activity from payload', () => {
+    const localActivityPayload = {
+      metadata: {
+        encoding: 'anNvbi9wbGFpbg==',
+        type: 'S2V5d29yZA==',
+      },
+      data: 'eyAiYWN0aXZpdHlfdHlwZSI6ICJjYXRzIiB9',
+    };
+
+    const localActivityEvent = {
+      markerRecordedEventAttributes: {
+        markerName: 'core_local_activity',
+        details: {
+          data: {
+            payloads: [localActivityPayload],
+          },
+        },
+      },
+      attributes: {
+        markerName: 'core_local_activity',
+        details: {
+          data: {
+            payloads: [localActivityPayload],
+          },
+        },
+      },
+    } as unknown as CommonHistoryEvent;
+
+    expect(getEventGroupDisplayName(localActivityEvent)).toBe('cats');
   });
 });

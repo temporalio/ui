@@ -1,4 +1,4 @@
-import type { WorkflowEvent } from '$lib/types/events';
+import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
 import type { EventType } from '$lib/utilities/is-event-type';
 
 type EventId = EventType['id'];
@@ -17,9 +17,13 @@ interface EventGroup
   initialEvent: WorkflowEvent;
   lastEvent: WorkflowEvent;
   eventList: WorkflowEvent[];
+  finalClassification: EventClassification;
+  isPending: boolean;
   isFailureOrTimedOut: boolean;
   isCanceled: boolean;
   isTerminated: boolean;
+  level: number | undefined;
+  pendingActivity: PendingActivity | undefined;
 }
 
 type EventGroups = EventGroup[];

@@ -20,20 +20,10 @@ import scheduledWorkflow from '$fixtures/workflow.scheduled.json';
 import timedOutWorkflow from '$fixtures/workflow.timed-out.json';
 
 describe('getWorkflowRelationships', () => {
-  const completedEventHistory = {
-    start: completedEvents,
-    end: completedEvents,
-  };
-  const continuedAsNewEventHistory = {
-    start: continuedAsNewEvents,
-    end: continuedAsNewEvents,
-  };
-
   it('hasChildren should return true if there are pending children', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(pendingChildrenWorkflow),
-        completedEventHistory,
         completedEvents,
         namespaces.namespaces,
       ).hasChildren,
@@ -44,7 +34,6 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(pendingChildrenWorkflow),
-        completedEventHistory,
         childEvents,
         namespaces.namespaces,
       ).hasChildren,
@@ -52,7 +41,6 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(pendingChildrenWorkflow),
-        completedEventHistory,
         childEvents,
         namespaces.namespaces,
       ).children.length,
@@ -63,7 +51,6 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(pendingChildrenWorkflow),
-        completedEventHistory,
         childEvents,
         namespaces.namespaces,
       ).parentNamespaceName,
@@ -74,7 +61,6 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(runningWorkflow),
-        completedEventHistory,
         childEvents,
         namespaces.namespaces,
       ).hasChildren,
@@ -82,7 +68,6 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(runningWorkflow),
-        completedEventHistory,
         childEvents,
         namespaces.namespaces,
       ).children.length,
@@ -93,7 +78,6 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(runningWorkflow),
-        completedEventHistory,
         completedEvents,
         namespaces.namespaces,
       ).hasChildren,
@@ -104,7 +88,6 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(runningWorkflow),
-        completedEventHistory,
         completedEvents,
         namespaces.namespaces,
       ).parentNamespaceName,
@@ -121,8 +104,7 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(continuedAsNewWorkflow),
-        continuedAsNewEventHistory,
-        completedEvents,
+        continuedAsNewEvents,
         namespaces.namespaces,
       ).first,
     ).toBe(firstExecutionRunId);
@@ -140,8 +122,7 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(continuedAsNewWorkflowCopy),
-        continuedAsNewEventHistory,
-        completedEvents,
+        continuedAsNewEvents,
         namespaces.namespaces,
       ).first,
     ).toBe(firstExecutionRunId);
@@ -152,8 +133,7 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(continuedAsNewWorkflowCopy),
-        continuedAsNewEventHistory,
-        completedEvents,
+        continuedAsNewEvents,
         namespaces.namespaces,
       ).first,
     ).toBe(undefined);
@@ -168,8 +148,7 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(continuedAsNewWorkflow),
-        continuedAsNewEventHistory,
-        completedEvents,
+        continuedAsNewEvents,
         namespaces.namespaces,
       ).previous,
     ).toBe(continuedExecutionRunId);
@@ -185,8 +164,7 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(continuedAsNewWorkflow),
-        continuedAsNewEventHistory,
-        completedEvents,
+        continuedAsNewEvents,
         namespaces.namespaces,
       ).next,
     ).toBe(newExecutionRunId);
@@ -202,7 +180,6 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(completedWorkflow),
-        completedEventHistory,
         completedEvents,
         namespaces.namespaces,
       ).next,
@@ -219,11 +196,7 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(timedOutWorkflow),
-        {
-          start: timedOutEvents,
-          end: timedOutEvents,
-        },
-        completedEvents,
+        timedOutEvents,
         namespaces.namespaces,
       ).next,
     ).toBe(newExecutionRunId);
@@ -239,11 +212,7 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(failedWorkflow),
-        {
-          start: failedEvents,
-          end: failedEvents,
-        },
-        completedEvents,
+        failedEvents,
         namespaces.namespaces,
       ).next,
     ).toBe(newExecutionRunId);
@@ -257,7 +226,6 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(scheduledWorkflow),
-        completedEventHistory,
         completedEvents,
         namespaces.namespaces,
       ).scheduleId,
@@ -268,7 +236,6 @@ describe('getWorkflowRelationships', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(completedWorkflow),
-        completedEventHistory,
         completedEvents,
         namespaces.namespaces,
       ).scheduleId,

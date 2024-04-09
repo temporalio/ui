@@ -18,11 +18,11 @@ describe('getGroupId', () => {
   });
 
   it('should get the correct ID for WorkflowTaskCompleted events', () => {
-    expect(getGroupId(events['WorkflowTaskCompleted'])).toBe('4');
+    expect(getGroupId(events['WorkflowTaskCompleted'])).toBe('2');
   });
 
   it('should get the correct ID for WorkflowTaskStarted events', () => {
-    expect(getGroupId(events['WorkflowTaskStarted'])).toBe('3');
+    expect(getGroupId(events['WorkflowTaskStarted'])).toBe('2');
   });
 
   it('should get the correct ID for WorkflowTaskScheduled events', () => {
@@ -78,7 +78,7 @@ describe('getGroupId', () => {
   });
 
   it('should get the correct ID for ExternalWorkflowExecutionSignaled events', () => {
-    expect(getGroupId(events['ExternalWorkflowExecutionSignaled'])).toBe('26');
+    expect(getGroupId(events['ExternalWorkflowExecutionSignaled'])).toBe('25');
   });
 
   it('should get the correct ID for SignalExternalWorkflowExecutionInitiated events', () => {
@@ -96,7 +96,7 @@ describe('getGroupId', () => {
   });
 
   it('should get the correct ID for WorkflowTaskTimedOut events', () => {
-    expect(getGroupId(events['WorkflowTaskTimedOut'])).toBe('16');
+    expect(getGroupId(events['WorkflowTaskTimedOut'])).toBe('15');
   });
 
   it('should get the correct ID for ActivityTaskTimedOut events', () => {
