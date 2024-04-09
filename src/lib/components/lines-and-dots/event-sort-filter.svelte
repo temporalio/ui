@@ -57,7 +57,7 @@
   <MenuButton
     active={!!value}
     hasIndicator
-    variant="primary"
+    variant="table-header"
     controls="event-date-filter-menu"
     data-testid="event-date-filter-button"
   >
