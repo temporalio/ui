@@ -125,10 +125,18 @@ func VerifyAdditionalClaims(additionalClaims map[string]string, claimTokenValues
 	for configClaimKey, configClaimValue := range additionalClaims {
 		claimValues := claimTokenValues[configClaimKey]
 		if claimValues != nil {
-			for _, claimValue := range claimValues.([]interface{}) {
-				if claimValue == configClaimValue {
+			switch t := claimValues.(type) {
+			case string:
+				if t == configClaimValue {
 					successClaimCheck = true
 					return nil
+				}
+			case []interface{}:
+				for _, claimValue := range t {
+					if claimValue == configClaimValue {
+						successClaimCheck = true
+						return nil
+					}
 				}
 			}
 		}
