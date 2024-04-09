@@ -52,18 +52,19 @@
   $: textStartingY = eventY + 1.5 * fontSizeRatio;
 </script>
 
-{#if active}
-  <Box
-    point={[x, eventY]}
-    {width}
-    height={getEventDetailsBoxHeight(event)}
-    fill="#465977"
-  />
-{/if}
-<Box point={[x, eventY]} {width} height={fontSizeRatio} fill="#1E293B" />
+<Box
+  point={[x, eventY]}
+  {width}
+  height={1.25 * fontSizeRatio}
+  fill={active ? '#465977' : ''}
+/>
+<Line
+  startPoint={[x, eventY + 1.25 * fontSizeRatio]}
+  endPoint={[x + width, eventY + 1.25 * fontSizeRatio]}
+  strokeWidth={2}
+/>
 <Text
   point={[x + 0.5 * fontSizeRatio, eventY + 0.66 * fontSizeRatio]}
-  fontSize="13px"
   fontWeight="300"
   >{event.id}<tspan dx={5}>{spaceBetweenCapitalLetters(event?.name)}</tspan
   ></Text
@@ -73,7 +74,7 @@
     point={[canvasWidth - 1.5 * radius, eventY + 0.6 * fontSizeRatio]}
     textAnchor="end"
   >
-    <tspan fill="#aebed9" font-size="12px">
+    <tspan fill="#aebed9" font-size="13px">
       {formatDate(event?.eventTime, $timeFormat, {
         relative: $relativeTime,
       })}</tspan
@@ -120,15 +121,15 @@
 <Line
   startPoint={[x - 1.5, eventY]}
   endPoint={[x + width, eventY]}
-  strokeWidth={3}
+  strokeWidth={2}
 />
 <Line
   startPoint={[x, eventY + getEventDetailsBoxHeight(event)]}
   endPoint={[x + width, eventY + getEventDetailsBoxHeight(event)]}
-  strokeWidth={3}
+  strokeWidth={2}
 />
 <Line
   startPoint={[x, eventY]}
   endPoint={[x, eventY + getEventDetailsBoxHeight(event)]}
-  strokeWidth={3}
+  strokeWidth={2}
 />
