@@ -137,12 +137,9 @@
     runId,
   );
 
-  onMount(() => {
-    const sort = $page.url.searchParams.get('sort');
-    if (sort) $eventFilterSort = sort as EventSortOrder;
-  });
+  $: runId, clearWorkflowData();
 
-  onDestroy(() => {
+  const clearWorkflowData = () => {
     $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
     $fullEventHistory = [];
@@ -151,6 +148,15 @@
     if (eventHistoryController) {
       eventHistoryController.abort();
     }
+  };
+
+  onMount(() => {
+    const sort = $page.url.searchParams.get('sort');
+    if (sort) $eventFilterSort = sort as EventSortOrder;
+  });
+
+  onDestroy(() => {
+    clearWorkflowData();
   });
 </script>
 
