@@ -1,5 +1,4 @@
 <script lang="ts">
-  import debounce from 'just-debounce';
   import { onDestroy, onMount } from 'svelte';
 
   import { page } from '$app/stores';
@@ -53,7 +52,6 @@
     labsMode: boolean,
   ) => {
     const { settings } = $page.data;
-
     const { workflow, error } = await fetchWorkflow({
       namespace,
       workflowId,
@@ -87,8 +85,8 @@
     });
   };
 
-  const fetchWorkflowWithPending = debounce(
-    async (namespace: string, workflowId: string, runId: string) => {
+  const getOnlyWorkflowWithPendingActivities = async (refresh: number) => {
+    if (refresh && $workflowRun?.workflow?.isRunning) {
       const { settings } = $page.data;
 
       const { workflow, error } = await fetchWorkflow({
@@ -108,20 +106,30 @@
         $authUser?.accessToken,
       );
       $workflowRun = { ...$workflowRun, workflow };
-    },
-    500,
-  );
-
-  const getOnlyWorkflowWithPendingActivities = async (
-    refresh: number,
-    namespace: string,
-    workflowId: string,
-    runId: string,
-  ) => {
-    if (refresh && $workflowRun?.workflow?.isRunning) {
-      fetchWorkflowWithPending(namespace, workflowId, runId);
     }
   };
+
+  const abortPolling = () => {
+    $fullEventHistory = [];
+    if (eventHistoryController) {
+      eventHistoryController.abort();
+    }
+  };
+
+  const clearWorkflowData = () => {
+    $timelineEvents = null;
+    $workflowRun = initialWorkflowRun;
+    workflowError = undefined;
+    abortPolling();
+  };
+
+  const clearHistoryData = () => {
+    $timelineEvents = null;
+    abortPolling();
+  };
+
+  $: runId, clearWorkflowData();
+  $: $labsMode, $eventFilterSort, clearHistoryData();
 
   $: getWorkflowAndEventHistory(
     namespace,
@@ -130,25 +138,7 @@
     $eventFilterSort,
     $labsMode,
   );
-  $: getOnlyWorkflowWithPendingActivities(
-    $refresh,
-    namespace,
-    workflowId,
-    runId,
-  );
-
-  $: runId, clearWorkflowData();
-
-  const clearWorkflowData = () => {
-    $timelineEvents = null;
-    $workflowRun = initialWorkflowRun;
-    $fullEventHistory = [];
-    workflowError = undefined;
-
-    if (eventHistoryController) {
-      eventHistoryController.abort();
-    }
-  };
+  $: getOnlyWorkflowWithPendingActivities($refresh);
 
   onMount(() => {
     const sort = $page.url.searchParams.get('sort');
