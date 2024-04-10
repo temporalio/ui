@@ -89,6 +89,7 @@
       group={allGroups.find((group) => group.eventIds.has(id))}
       index={visibleHistory.indexOf(history.find((event) => event.id === id))}
       {canvasWidth}
+      primary={activeEvents[activeEvents.length - 1] === id}
     />
   {/each}
   <svg

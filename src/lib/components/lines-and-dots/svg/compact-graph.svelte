@@ -191,11 +191,13 @@
     <WorkflowRow {workflow} y={height} length={canvasWidth} active />
   {/each}
   {#if activeGroup}
-    <GroupDetailsRow
-      group={activeGroup}
-      {canvasWidth}
-      x={activeX}
-      y={activeY + 1.25 * radius}
-    />
+    {#key activeGroup.id}
+      <GroupDetailsRow
+        group={activeGroup}
+        {canvasWidth}
+        x={activeX}
+        y={activeY + 1.25 * radius}
+      />
+    {/key}
   {/if}
 </svg>

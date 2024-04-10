@@ -3,7 +3,7 @@
   import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
 
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
-  import iconNames from '$lib/holocene/icon/icon-names';
+  import iconNames from '$lib/holocene/icon';
 
   let stringOptions = [
     'English',

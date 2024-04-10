@@ -40,7 +40,7 @@
     point={[x, eventY]}
     {width}
     height={getPendingEventDetailHeight(event)}
-    fill={retrying ? '#FF9B70' : '#a78bfa'}
+    fill={retrying ? '#FFE4D4' : '#E0EAFF'}
   />
 {/if}
 <Text

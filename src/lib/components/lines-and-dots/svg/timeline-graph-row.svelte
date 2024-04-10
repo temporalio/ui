@@ -22,6 +22,7 @@
   export let endTime: string | Date;
   export let canvasWidth: number;
   export let active = true;
+  export let readOnly = false;
 
   const { height, gutter, radius } = TimelineConfig;
 
@@ -64,13 +65,19 @@
 
   $: ({ points, textAnchor, textIndex, textPosition, backdrop } =
     getDistancePointsAndPositions(endTime, timelineWidth, y));
+
+  const onClick = () => {
+    if (!readOnly) {
+      setActiveGroup(group);
+    }
+  };
 </script>
 
 <g
   role="button"
   tabindex="0"
-  on:click|preventDefault={() => setActiveGroup(group)}
-  on:keypress={() => setActiveGroup(group)}
+  on:click|preventDefault={onClick}
+  on:keypress|preventDefault={onClick}
   class="relative cursor-pointer"
   {height}
 >
