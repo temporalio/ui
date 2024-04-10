@@ -13,9 +13,9 @@ export const getPendingActivity = (
     pendingActivity = pendingActivities.find(
       (p) => p.activityId === event.attributes.activityId,
     );
-
-    return pendingActivity;
   }
+
+  return pendingActivity;
 };
 
 export const isAssociatedPendingActivity = (

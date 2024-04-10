@@ -152,12 +152,8 @@ const isConsecutiveGroup = (group: EventGroup): boolean => {
 const getOpenGroups = (
   event: WorkflowEvent | PendingActivity,
   groups: EventGroups,
-  pendingActivity?: PendingActivity,
 ): number => {
   const group = groups.find((g) => g.eventIds.has(event.id));
-  if (!group.pendingActivity && pendingActivity) {
-    group.pendingActivity = pendingActivity;
-  }
   if (group.level !== undefined) return group.level;
 
   const pendingGroups = groups
@@ -232,11 +228,10 @@ export const getNextDistanceAndOffset = (
     return { nextDistance, offset };
   }
 
-  const pendingActivity = group.pendingActivity;
   const currentIndex = group.eventList.indexOf(event);
   const nextEvent = group.eventList[currentIndex + 1];
   if (event.category !== 'workflow') {
-    offset = getOpenGroups(event, groups, pendingActivity);
+    offset = getOpenGroups(event, groups);
   }
 
   if (!nextEvent && !group.isPending) {
