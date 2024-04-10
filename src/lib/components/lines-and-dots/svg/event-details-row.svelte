@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { WorkflowEvent } from '$lib/types/events';
+  import { isAssociatedPendingActivity } from '$lib/utilities/pending-activities';
 
   import {
     getEventDetailsBoxHeight,
@@ -46,7 +47,7 @@
         {canvasWidth}
         {x}
         {y}
-        active={event.id === group.pendingActivity.id}
+        active={isAssociatedPendingActivity(event, group.pendingActivity)}
       />
     {/if}
     {#each group.eventList as e, index}

@@ -16,6 +16,7 @@ import {
   formatGroupAttributes,
   formatPendingAttributes,
 } from '$lib/utilities/format-event-attributes';
+import { isAssociatedPendingActivity } from '$lib/utilities/pending-activities';
 
 export const DetailsChildTimelineHeight = 200;
 
@@ -382,7 +383,7 @@ export const getEventDetailsBoxHeight = (
   );
 
   let pendingActivityHeight = 0;
-  if (pendingActivity && event.id === pendingActivity.id) {
+  if (isAssociatedPendingActivity(event, pendingActivity)) {
     pendingActivityHeight = getPendingEventDetailHeight(pendingActivity);
   }
   const codeBlockHeight = codeBlockAttributes.length * staticCodeBlockHeight;
