@@ -61,7 +61,7 @@
   }
 
   .copy-or-filter-button {
-    @apply relative top-[50%] h-fit translate-y-[-50%] rounded-full p-1 text-primary hover:bg-inverse hover:text-white;
+    @apply surface-primary relative top-[50%] h-fit translate-y-[-50%] rounded-full p-1 text-primary hover:bg-inverse hover:text-white;
   }
 
   .filtered {
