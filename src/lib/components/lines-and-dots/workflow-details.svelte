@@ -24,26 +24,39 @@
     class="surface-primary grid w-full grid-flow-row grid-cols-1 gap-2 rounded-xl border-2 border-primary p-2 md:grid-cols-2 xl:grid-cols-3"
   >
     <WorkflowDetail
-      title={translate('common.duration')}
-      content={elapsedTime}
-      class="order-1 text-sm"
-      icon="clock"
-    />
-    <WorkflowDetail
       title={translate('common.start')}
+      tooltip={$relativeTime
+        ? formatDate(workflow?.startTime, $timeFormat, {
+            relative: false,
+          })
+        : formatDate(workflow?.startTime, $timeFormat, {
+            relative: true,
+          })}
       content={formatDate(workflow?.startTime, $timeFormat, {
         relative: $relativeTime,
       })}
-      class="order-2 text-sm md:order-3 xl:order-4"
+      class="order-1 text-sm "
     />
     <WorkflowDetail
       title={translate('common.end')}
+      tooltip={$relativeTime
+        ? formatDate(workflow?.endTime, $timeFormat, {
+            relative: false,
+          })
+        : formatDate(workflow?.endTime, $timeFormat, {
+            relative: true,
+          })}
       content={workflow?.endTime
         ? formatDate(workflow?.endTime, $timeFormat, {
             relative: $relativeTime,
           })
         : '-'}
+      class="order-2 text-sm md:order-3 xl:order-4"
+    />
+    <WorkflowDetail
+      content={elapsedTime}
       class="order-3 text-sm md:order-5 xl:order-7"
+      icon="clock"
     />
     <WorkflowDetail
       title={translate('common.task-queue')}
