@@ -68,9 +68,6 @@
     {#if group && group.displayName && showDetails}<tspan dx={3}
         >{group.displayName}</tspan
       >{/if}
-    <!-- <tspan dx={3}
-      ><HistoryRowPayloadDetail {...getSingleAttributeForEvent(event)} /></tspan
-    > -->
   </Text>
   {#if showTimestamp}
     <Text point={[canvasWidth - 1.5 * radius, y]} textAnchor="end">

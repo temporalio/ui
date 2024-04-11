@@ -49,7 +49,6 @@
         <Icon
           title={$copied ? copySuccessIconTitle : copyIconTitle}
           name={$copied ? 'checkmark' : 'copy'}
-          stroke="#000"
         />
       </button>
     {/if}
