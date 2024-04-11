@@ -216,6 +216,7 @@ export const getVisualWidth = (
   maxWidth: number,
 ) => {
   let maxOffset = 0;
+  if (!history.length) return maxWidth;
   history.forEach((event) => {
     const group = groups.find((g) => g.eventIds.has(event.id));
     if (group) {
