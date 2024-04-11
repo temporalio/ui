@@ -33,7 +33,7 @@
   <label class="sr-only" for={id}>{label}</label>
   <select
     class={merge(
-      'inline h-10 w-full rounded-lg border-2 px-2 text-base',
+      'inline h-10 w-full rounded-lg border px-2 text-base',
       className,
     )}
     class:dark
