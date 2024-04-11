@@ -5,6 +5,7 @@ import type {
   WorkflowEvent,
 } from '$lib/types/events';
 import { has } from '$lib/utilities/has';
+import { getPendingActivity } from '$lib/utilities/pending-activities';
 
 import {
   createEventGroup,
@@ -46,10 +47,7 @@ export const groupEvents = (
   const createGroups = (event: CommonHistoryEvent) => {
     const id = getGroupId(event);
     const group = createEventGroup(event, events);
-
-    const pendingActivity = pendingActivities.find(
-      (p) => p.activityId === event.id && event.category === 'activity',
-    );
+    const pendingActivity = getPendingActivity(event, pendingActivities);
 
     if (group) {
       groups[group.id] = group;
