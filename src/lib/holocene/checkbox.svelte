@@ -144,7 +144,7 @@
   }
 
   input:checked ~ .checkmark {
-    @apply border-interactive bg-interactive;
+    @apply bg-interactive shadow-[inset_0_0_0_2px] shadow-white dark:shadow-black;
   }
 
   .checkmark {
@@ -153,10 +153,17 @@
     &.invalid {
       @apply border-danger;
     }
-  }
 
-  .disabled {
-    @apply cursor-default border-disabled text-disabled;
+    &:enabled {
+      &:focus-visible,
+      &:hover {
+        @apply border-transparent border-white bg-interactive outline-offset-0 outline-focus dark:border-black;
+      }
+    }
+
+    &:disabled {
+      @apply cursor-default border-disabled text-disabled opacity-50;
+    }
   }
 
   .error {
