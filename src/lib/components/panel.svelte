@@ -9,9 +9,9 @@
 <style lang="postcss">
   .panel {
     @apply rounded-xl border-2 p-8 dark:border-subtle;
-  }
 
-  .error {
-    @apply border-error bg-error;
+    &.error {
+      @apply border-error bg-error;
+    }
   }
 </style>
