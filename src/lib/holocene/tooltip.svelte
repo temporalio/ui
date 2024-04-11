@@ -2,8 +2,8 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Copyable from '$lib/holocene/copyable/index.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import type { Only } from '$lib/types/global';
 
   type BaseProps = {
@@ -99,7 +99,7 @@
       class:topLeft
       style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
     >
-      <div class="inline-block rounded-lg bg-slate-800 px-2 py-2">
+      <div class="inline-block rounded-lg bg-primary px-2 py-2">
         {#if copyable}
           <Copyable
             {copySuccessIconTitle}

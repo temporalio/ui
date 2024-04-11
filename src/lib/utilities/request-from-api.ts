@@ -35,6 +35,7 @@ type RequestFromAPIOptions = {
   notifyOnError?: boolean;
   handleError?: typeof handleRequestError;
   isBrowser?: boolean;
+  signal?: AbortController['signal'];
 };
 
 export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
@@ -83,7 +84,9 @@ export const requestFromAPI = async <T>(
 
   try {
     options = withSecurityOptions(options, isBrowser);
-    options = await withAuth(options, isBrowser);
+    if (!endpoint.endsWith('api/v1/settings')) {
+      options = await withAuth(options, isBrowser);
+    }
 
     const response = await request(url, options);
     const body = await response.json();

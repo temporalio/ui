@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.24.5",
+  "version": "2.25.3",
   "engines": {
     "pnpm": ">=8.6.0",
     "node": ">=18.15.0"
@@ -98,6 +98,8 @@
     "json-beautify": "^1.1.1",
     "json-bigint": "^1.0.0",
     "just-debounce": "^1.1.0",
+    "just-throttle": "^4.2.0",
+    "lodash.groupby": "^4.6.0",
     "remark-stringify": "^10.0.3",
     "sanitize-html": "^2.12.1",
     "tailwind-merge": "^1.14.0",

@@ -133,7 +133,7 @@ export type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
   ChildWorkflowExecutionTimedOutEvent &
   ChildWorkflowExecutionTerminatedEvent;
 
-export type EventView = 'feed' | 'compact' | 'json';
+export type EventView = 'feed' | 'compact' | 'json' | 'timeline';
 
 export type IterableEvent = WorkflowEvent | EventGroup;
 

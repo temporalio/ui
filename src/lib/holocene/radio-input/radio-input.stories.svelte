@@ -1,7 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import { Meta, Story } from '@storybook/addon-svelte-csf';
+  import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
 
   import RadioGroup from './radio-group.svelte';
   import RadioInput from './radio-input.svelte';
@@ -22,20 +22,38 @@
   }}
 />
 
-<Story name="radio input">
+<Story
+  name="radio input"
+  args={{
+    disabled: false,
+  }}
+  template="radio-input"
+/>
+
+<Template id="radio-input" let:args>
   <RadioGroup name="option" group={value1}>
-    <RadioInput id="option-a" label="Option A" value="a" />
-    <RadioInput id="option-b" label="Option B" value="b" />
+    <RadioInput id="option-a" label="Option A" value="a" {...args} />
+    <RadioInput id="option-b" label="Option B" value="b" {...args} />
     <RadioInput
       id="option-c"
       label="Option C"
       value="c"
       description="this is a description"
+      {...args}
     />
-    <p>The value is {$value1}</p>
+    <p class="text-primary">The value is {$value1}</p>
   </RadioGroup>
-</Story>
-<Story name="without a radio group">
+</Template>
+
+<Story
+  name="without a radio group"
+  args={{
+    disabled: false,
+  }}
+  template="no-radio-group"
+/>
+
+<Template id="no-radio-group" let:args>
   <div class="flex flex-col gap-2">
     <RadioInput
       id="option-1"
@@ -43,6 +61,7 @@
       value={1}
       name="number-option"
       group={value2}
+      {...args}
     />
     <RadioInput
       id="option-2"
@@ -50,7 +69,8 @@
       value={2}
       name="number-option"
       group={value2}
+      {...args}
     />
   </div>
-  <p>The value is {$value2}</p>
-</Story>
+  <p class="mt-2 text-primary">The value is {$value2}</p>
+</Template>

@@ -157,7 +157,7 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply min-h-[154px] overflow-auto rounded-lg border-2 border-primary;
+    @apply min-h-[154px] overflow-auto rounded-lg border-2 border-table;
   }
 
   .paginated-table {
@@ -168,7 +168,7 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply h-10 bg-primary text-white;
+      @apply surface-table h-10 text-inverse;
     }
 
     :global(tr > th) {
@@ -180,7 +180,7 @@
     @apply surface-primary;
 
     :global(tr:not(.empty)) {
-      @apply h-12 border-b border-primary last-of-type:border-0 hover:bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 hover:bg-fixed;
+      @apply h-12 border-b border-table hover:surface-subtle last-of-type:border-0 hover:bg-fixed;
     }
 
     :global(tr > td > .table-link) {
@@ -189,7 +189,7 @@
   }
 
   .paginated-table-controls {
-    @apply surface-primary sticky bottom-0 left-0 flex w-full grow gap-2 rounded-b border-t border-slate-200 px-4 py-2 text-primary;
+    @apply surface-primary sticky bottom-0 left-0 flex w-full grow gap-2 rounded-b border-t border-table px-4 py-2 text-inverse;
   }
 
   .paginated-table-controls-start {

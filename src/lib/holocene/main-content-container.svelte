@@ -1,7 +1,22 @@
+<script context="module">
+  import { writable } from 'svelte/store';
+
+  export const scrollTop = writable(0);
+</script>
+
 <script lang="ts">
-  import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
+  import {
+    clearActives,
+    endIndex,
+    indexPageSize,
+    startIndex,
+  } from '$lib/stores/active-events';
+  import { filteredEventHistory } from '$lib/stores/events';
+
+  import ScrollToContainer from './scroll-to-container.svelte';
 
   let scrollToTopHidden = true;
+  let scrollToBottomHidden = false;
   let showScrollToTopOn = 150; // pixels
 
   function getScrollContainer(): HTMLElement | null {
@@ -9,13 +24,25 @@
   }
 
   function onScrollToTopClick() {
+    $startIndex = 0;
+    $endIndex = indexPageSize;
     getScrollContainer()?.scrollTo(0, 0);
+  }
+
+  function onScrollToBottomClick() {
+    const historyLength = $filteredEventHistory?.length;
+    if (historyLength) {
+      clearActives();
+      $endIndex = historyLength;
+      $startIndex = $endIndex - indexPageSize;
+    }
+    getScrollContainer()?.scrollTo(0, getScrollContainer()?.scrollHeight);
   }
 
   function handleOnScroll(event: Event) {
     const scrollEvent = event.target as HTMLDivElement;
-    const top = scrollEvent.scrollTop;
-    scrollToTopHidden = Boolean(top < showScrollToTopOn);
+    $scrollTop = scrollEvent.scrollTop;
+    scrollToTopHidden = Boolean($scrollTop < showScrollToTopOn);
   }
 </script>
 
@@ -28,5 +55,10 @@
   <main id="content">
     <slot name="main" />
   </main>
-  <ScrollToTop hidden={scrollToTopHidden} {onScrollToTopClick} />
+  <ScrollToContainer
+    {scrollToTopHidden}
+    {scrollToBottomHidden}
+    {onScrollToTopClick}
+    {onScrollToBottomClick}
+  />
 </div>
