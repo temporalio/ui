@@ -174,7 +174,7 @@
   }
 
   .table-header {
-    @apply bg-inverse text-white focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-primary/50;
+    @apply h-auto max-w-fit border-2 border-transparent p-0 text-sm text-white focus-visible:border-white;
   }
 
   .unround {
