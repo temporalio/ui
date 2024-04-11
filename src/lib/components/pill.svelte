@@ -26,7 +26,7 @@
   }
 
   .gray {
-    @apply bg-badge;
+    @apply border-none bg-transparent text-primary;
   }
 
   .gray.active {
@@ -50,7 +50,7 @@
   }
 
   .lightBlue.active {
-    @apply border-2 bg-blue-50 text-black;
+    @apply border-2 border-indigo-500 bg-indigo-500;
   }
 
   .green {
