@@ -80,6 +80,13 @@
         <div class="h-0.5 rounded-full bg-inverse" />
         <WorkflowDetail
           title={translate('common.start-time')}
+          tooltip={$relativeTime
+            ? formatDate(workflow?.startTime, $timeFormat, {
+                relative: false,
+              })
+            : formatDate(workflow?.startTime, $timeFormat, {
+                relative: true,
+              })}
           content={formatDate(workflow?.startTime, $timeFormat, {
             relative: $relativeTime,
           })}
@@ -87,6 +94,13 @@
         />
         <WorkflowDetail
           title={translate('common.close-time')}
+          tooltip={$relativeTime
+            ? formatDate(workflow?.endTime, $timeFormat, {
+                relative: false,
+              })
+            : formatDate(workflow?.endTime, $timeFormat, {
+                relative: true,
+              })}
           content={formatDate(workflow?.endTime, $timeFormat, {
             relative: $relativeTime,
           })}

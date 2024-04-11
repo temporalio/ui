@@ -189,35 +189,35 @@
   }
 
   .row:hover {
-    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
+    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed dark:surface-subtle dark:bg-none;
   }
 
   .expanded.row {
-    @apply bg-blue-50;
+    @apply bg-blue-50 dark:surface-subtle;
   }
 
   .failure {
-    @apply bg-red-50;
+    @apply bg-error;
   }
 
   .failure .event-name {
-    @apply text-red-700;
+    @apply text-error;
   }
 
   .canceled {
-    @apply bg-yellow-50;
+    @apply bg-warning;
   }
 
   .canceled .event-name {
-    @apply text-yellow-700;
+    @apply text-warning;
   }
 
   .terminated {
-    @apply bg-pink-50;
+    @apply bg-pink-50 dark:bg-pink-700;
   }
 
   .terminated .event-name {
-    @apply text-pink-700;
+    @apply text-pink-700 dark:text-pink-50;
   }
 
   .expanded-cell {
@@ -237,21 +237,21 @@
   }
 
   .active {
-    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
+    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed dark:surface-subtle dark:bg-none;
   }
 
   .canceled:hover,
   .active.canceled {
-    @apply bg-gradient-to-br from-yellow-100 to-yellow-200 bg-fixed;
+    @apply bg-gradient-to-br from-yellow-100 to-yellow-200 bg-fixed dark:bg-yellow-600 dark:bg-none;
   }
 
   .failure:hover,
   .active.failure {
-    @apply bg-gradient-to-br from-red-100 to-red-200 bg-fixed;
+    @apply bg-gradient-to-br from-red-100 to-red-200 bg-fixed dark:bg-red-900 dark:bg-none;
   }
 
   .terminated:hover,
   .active.terminated {
-    @apply bg-gradient-to-br from-pink-100 to-pink-200 bg-fixed;
+    @apply bg-gradient-to-br from-pink-100 to-pink-200 bg-fixed dark:bg-pink-500 dark:bg-none;
   }
 </style>
