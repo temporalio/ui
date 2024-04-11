@@ -52,7 +52,6 @@
     labsMode: boolean,
   ) => {
     const { settings } = $page.data;
-
     const { workflow, error } = await fetchWorkflow({
       namespace,
       workflowId,
@@ -86,12 +85,7 @@
     });
   };
 
-  const getOnlyWorkflowWithPendingActivities = async (
-    refresh: number,
-    namespace: string,
-    workflowId: string,
-    runId: string,
-  ) => {
+  const getOnlyWorkflowWithPendingActivities = async (refresh: number) => {
     if (refresh && $workflowRun?.workflow?.isRunning) {
       const { settings } = $page.data;
 
@@ -115,6 +109,28 @@
     }
   };
 
+  const abortPolling = () => {
+    $fullEventHistory = [];
+    if (eventHistoryController) {
+      eventHistoryController.abort();
+    }
+  };
+
+  const clearWorkflowData = () => {
+    $timelineEvents = null;
+    $workflowRun = initialWorkflowRun;
+    workflowError = undefined;
+    abortPolling();
+  };
+
+  const clearHistoryData = () => {
+    $timelineEvents = null;
+    abortPolling();
+  };
+
+  $: runId, clearWorkflowData();
+  $: $labsMode, $eventFilterSort, clearHistoryData();
+
   $: getWorkflowAndEventHistory(
     namespace,
     workflowId,
@@ -122,12 +138,7 @@
     $eventFilterSort,
     $labsMode,
   );
-  $: getOnlyWorkflowWithPendingActivities(
-    $refresh,
-    namespace,
-    workflowId,
-    runId,
-  );
+  $: getOnlyWorkflowWithPendingActivities($refresh);
 
   onMount(() => {
     const sort = $page.url.searchParams.get('sort');
@@ -135,14 +146,7 @@
   });
 
   onDestroy(() => {
-    $timelineEvents = null;
-    $workflowRun = initialWorkflowRun;
-    $fullEventHistory = [];
-    workflowError = undefined;
-
-    if (eventHistoryController) {
-      eventHistoryController.abort();
-    }
+    clearWorkflowData();
   });
 </script>
 

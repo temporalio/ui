@@ -1,3 +1,5 @@
+import throttle from 'just-throttle';
+
 import { toEventHistory } from '$lib/models/event-history';
 import type { EventSortOrder } from '$lib/stores/event-view';
 import { fullEventHistory } from '$lib/stores/events';
@@ -69,6 +71,10 @@ export const fetchRawEvents = async ({
   return response.history.events;
 };
 
+const throttleRefresh = throttle(() => {
+  refresh.set(Date.now());
+}, 5000);
+
 export const fetchAllEvents = async ({
   namespace,
   workflowId,
@@ -90,8 +96,13 @@ export const fetchAllEvents = async ({
       historySize &&
       next?.every((e) => parseInt(e.eventId) > parseInt(historySize));
     if (hasNewHistory) {
-      refresh.set(Date.now());
+      throttleRefresh();
     }
+  };
+
+  const onComplete = () => {
+    if (!signal) return;
+    refresh.set(Date.now());
   };
 
   const endpoint = getEndpointForSortOrder(sort);
@@ -108,7 +119,7 @@ export const fetchAllEvents = async ({
         options: { signal },
       });
     },
-    { onStart, onUpdate },
+    { onStart, onUpdate, onComplete },
   );
 
   if (!response?.history) return [];

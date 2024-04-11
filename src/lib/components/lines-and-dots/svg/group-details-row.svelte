@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import { page } from '$app/stores';
 
   import { groupEvents } from '$lib/models/event-groups';
@@ -86,11 +88,29 @@
     }
   };
 
-  const labelPadding = 240;
+  onMount(() => {
+    fetchChildWorkflowForGroup();
+  });
+
+  $: width = canvasWidth;
+  $: boxHeight = getGroupDetailsBoxHeight(group, width);
+  $: isWide = width >= 960;
+
+  $: codeBlockX = x + gutter + (isWide ? 0.666 * width : 0.5 * width);
+  $: codeBlockWidth = (isWide ? 0.333 * width : 0.5 * width) - 2 * gutter;
+
+  $: textStartingY = height + y + fontSizeRatio;
+  $: textHeight = fontSizeRatio * textAttributes.length * (isWide ? 1 : 2);
+  $: textWidth = (isWide ? 0.666 * width : 0.5 * width) - gutter;
+
+  $: childTimelineY = textStartingY + textHeight + fontSizeRatio;
+  $: childTimelineWidth = isWide ? 0.666 * width : 0.5 * width;
+  $: childTimelineHeight = Math.max(
+    DetailsChildTimelineHeight,
+    staticCodeBlockHeight * codeBlockAttributes.length - textHeight,
+  );
 
   $: title = group.name;
-  $: boxHeight = getGroupDetailsBoxHeight(group);
-  $: textStartingY = height + y + fontSizeRatio;
   $: attributes = mergeEventGroupDetails(group);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
@@ -98,9 +118,6 @@
   $: textAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value !== 'object',
   );
-  $: childTimelineY = textStartingY + textAttributes.length * fontSizeRatio;
-  $: group, fetchChildWorkflowForGroup();
-  $: width = canvasWidth;
 </script>
 
 <g role="button" tabindex="0" class="relative cursor-pointer">
@@ -126,41 +143,44 @@
     })}
   </Text>
   {#each codeBlockAttributes as [key, value], index (key)}
-    {@const blockX = x + gutter + 0.666 * width}
     {@const y = textStartingY + index * staticCodeBlockHeight}
-    <Text point={[blockX, y]}>{format(key)}</Text>
+    <Text point={[codeBlockX, y]}>{format(key)}</Text>
     <GroupDetailsText
-      point={[blockX, y + 1.5 * fontSizeRatio]}
+      point={[codeBlockX, y + 1.5 * fontSizeRatio]}
       {key}
       {value}
       {attributes}
-      width={0.333 * width - 2 * gutter}
+      width={codeBlockWidth}
     />
   {/each}
-  {#each textAttributes as [key, value], index (key)}
-    <foreignObject
-      x={x + gutter}
-      y={textStartingY + index * fontSizeRatio}
-      width={0.666 * width - gutter}
-      height={fontSizeRatio * 2}
-    >
-      <div class="flex gap-1 text-sm text-white">
-        <div class="w-64">{format(key)}</div>
-        <div class="text-wrap break-all">
-          <GroupDetailsText
-            point={[
-              x + gutter + labelPadding,
-              textStartingY + index * fontSizeRatio,
-            ]}
-            {key}
-            {value}
-            {attributes}
-            {width}
-          />
+  <foreignObject
+    x={x + gutter}
+    y={textStartingY}
+    width={textWidth}
+    height={textHeight}
+  >
+    <div class="grid grid-cols-1 gap-x-2 lg:grid-cols-2">
+      {#each textAttributes as [key, value], index (key)}
+        <div
+          class="flex flex-col gap-0 text-sm text-white"
+          style="height: {2 * fontSizeRatio}px;"
+        >
+          <div class="font-semibold leading-3 text-[#C9D9F0]">
+            {format(key)}
+          </div>
+          <div class="text-wrap break-all leading-4">
+            <GroupDetailsText
+              point={[x + gutter, textStartingY + index * fontSizeRatio]}
+              {key}
+              {value}
+              {attributes}
+              {width}
+            />
+          </div>
         </div>
-      </div>
-    </foreignObject>
-  {/each}
+      {/each}
+    </div>
+  </foreignObject>
   {#if fetchChildWorkflow && fetchChildTimeline}
     {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [workflow, childHistory]}
       {@const groups = groupEvents(
@@ -171,11 +191,11 @@
       <TimelineGraph
         {x}
         y={childTimelineY}
-        staticHeight={DetailsChildTimelineHeight}
+        staticHeight={childTimelineHeight}
         {workflow}
         history={childHistory}
         {groups}
-        canvasWidth={0.5 * width}
+        canvasWidth={childTimelineWidth}
       />
     {/await}
   {/if}

@@ -16,6 +16,7 @@
   export let activeEvents: string[] = [];
 
   export let canvasWidth: number;
+  export let visualWidth: number;
   export let index: number;
 
   const { height, radius } = HistoryConfig;
@@ -30,7 +31,6 @@
       ? 'retry'
       : 'pending'
     : event.classification;
-  $: visualWidth = canvasWidth / 4;
   $: detailsWidth = canvasWidth - visualWidth;
 </script>
 
@@ -68,9 +68,6 @@
     {#if group && group.displayName && showDetails}<tspan dx={3}
         >{group.displayName}</tspan
       >{/if}
-    <!-- <tspan dx={3}
-      ><HistoryRowPayloadDetail {...getSingleAttributeForEvent(event)} /></tspan
-    > -->
   </Text>
   {#if showTimestamp}
     <Text point={[canvasWidth - 1.5 * radius, y]} textAnchor="end">

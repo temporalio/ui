@@ -10,6 +10,7 @@ export const variables = {
   '--color-subtle': rgb(getColor('slate', 950)),
   '--color-brand': rgb(getColor('indigo', 800)),
   '--color-interactive': rgb(getColor('indigo', 600)),
+  '--color-focus': rgb(getColor('indigo', 500)),
   '--color-interactive-hover': rgb(getColor('indigo', 700)),
   '--color-warning': rgb(getColor('yellow', 100)),
 
@@ -228,6 +229,7 @@ const temporal = plugin(
         ...theme('colors'),
 
         interactive: css('--color-interactive'),
+        focus: css('--color-focus'),
       }),
       boxShadowColor: ({ theme }) => ({
         ...theme('colors'),

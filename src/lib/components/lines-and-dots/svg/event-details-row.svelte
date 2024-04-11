@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { WorkflowEvent } from '$lib/types/events';
+  import { isAssociatedPendingActivity } from '$lib/utilities/pending-activities';
 
   import {
     getEventDetailsBoxHeight,
@@ -17,6 +18,7 @@
   export let canvasWidth: number;
   export let x = 0;
   export let index: number;
+  export let primary = true;
 
   const { height } = HistoryConfig;
 
@@ -31,7 +33,12 @@
   $: width = canvasWidth / 2;
 </script>
 
-<g role="button" tabindex="0" class="relative cursor-pointer">
+<g
+  role="button"
+  tabindex="0"
+  class="relative cursor-pointer"
+  opacity={primary ? '1' : '.6'}
+>
   <Box point={[x, y]} {width} height={boxHeight} classification="active" />
   {#if group}
     {#if group.pendingActivity}
@@ -40,7 +47,7 @@
         {canvasWidth}
         {x}
         {y}
-        active={event.id === group.pendingActivity.id}
+        active={isAssociatedPendingActivity(event, group.pendingActivity)}
       />
     {/if}
     {#each group.eventList as e, index}
@@ -57,7 +64,7 @@
       />
     {/each}
   {:else}
-    <EventDetailRow {event} {canvasWidth} {x} {y} />
+    <EventDetailRow active {event} {canvasWidth} {x} {y} />
   {/if}
 </g>
 

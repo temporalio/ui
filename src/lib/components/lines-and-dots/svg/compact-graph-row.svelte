@@ -72,7 +72,6 @@
       height={radius}
       strokeWidth="4"
       class="text-black"
-      noDivWrapper
     />
     <Icon
       name={expanded ? 'chevron-up' : 'chevron-down'}
@@ -82,7 +81,6 @@
       height={radius}
       strokeWidth="4"
       class="text-black"
-      noDivWrapper
     />
   {:else}
     <Icon
@@ -93,7 +91,6 @@
       height={radius * 1.5}
       strokeWidth="4"
       class="text-black"
-      noDivWrapper
     />
   {/if}
 </g>

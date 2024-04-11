@@ -1,6 +1,7 @@
 <script lang="ts">
   import ScrollToBottom from '$lib/holocene/scroll-to-bottom.svelte';
   import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
+  import { fullEventHistory } from '$lib/stores/events';
 
   export let scrollToTopHidden = true;
   export let scrollToBottomHidden = false;
@@ -10,7 +11,9 @@
 
 <div id="scroll-container" class={$$props.class}>
   <ScrollToTop hidden={scrollToTopHidden} {onScrollToTopClick} />
-  <ScrollToBottom hidden={scrollToBottomHidden} {onScrollToBottomClick} />
+  {#if $fullEventHistory.length}
+    <ScrollToBottom hidden={scrollToBottomHidden} {onScrollToBottomClick} />
+  {/if}
 </div>
 
 <style lang="postcss">
