@@ -3,7 +3,7 @@
 
   import { page } from '$app/stores';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   export let parameter: string;
@@ -24,25 +24,12 @@
   }
 </script>
 
-<div class="input-container surface-primary focus-within:border-blue-700">
-  <label for={id} class="hidden">{name}</label>
-  <span><Icon name="search" class="flex items-center text-slate-700" /></span>
-  <input
-    type="search"
-    class="block w-full focus:outline-none"
-    placeholder={name}
-    {id}
-    bind:value={_value}
-    on:keydown|stopPropagation
-  />
-</div>
-
-<style lang="postcss">
-  .input-container {
-    @apply relative box-border inline-flex h-10 w-full items-center rounded-lg border-2 p-2 text-base;
-  }
-
-  span {
-    @apply mr-1;
-  }
-</style>
+<Input
+  type="search"
+  icon="search"
+  label={name}
+  labelHidden
+  placeholder={name}
+  {id}
+  bind:value={_value}
+/>
