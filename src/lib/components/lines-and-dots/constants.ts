@@ -16,6 +16,7 @@ import {
   formatGroupAttributes,
   formatPendingAttributes,
 } from '$lib/utilities/format-event-attributes';
+import { isAssociatedPendingActivity } from '$lib/utilities/pending-activities';
 
 export const DetailsChildTimelineHeight = 200;
 
@@ -151,12 +152,8 @@ const isConsecutiveGroup = (group: EventGroup): boolean => {
 const getOpenGroups = (
   event: WorkflowEvent | PendingActivity,
   groups: EventGroups,
-  pendingActivity?: PendingActivity,
 ): number => {
   const group = groups.find((g) => g.eventIds.has(event.id));
-  if (!group.pendingActivity && pendingActivity) {
-    group.pendingActivity = pendingActivity;
-  }
   if (group.level !== undefined) return group.level;
 
   const pendingGroups = groups
@@ -231,11 +228,10 @@ export const getNextDistanceAndOffset = (
     return { nextDistance, offset };
   }
 
-  const pendingActivity = group.pendingActivity;
   const currentIndex = group.eventList.indexOf(event);
   const nextEvent = group.eventList[currentIndex + 1];
   if (event.category !== 'workflow') {
-    offset = getOpenGroups(event, groups, pendingActivity);
+    offset = getOpenGroups(event, groups);
   }
 
   if (!nextEvent && !group.isPending) {
@@ -304,30 +300,11 @@ export const getStatusColor = (
   }
 };
 
-export const activeRowsHeightAboveGroup = (
-  activeGroups: string[],
-  groupIndex: number,
-  timeGroups: EventGroups[],
-) => {
-  let activeRowsHeight = 0;
-  activeGroups.forEach((id) => {
-    const activeTimeGroup = timeGroups.find((timeGroup) =>
-      timeGroup.find((g) => g.id === id),
-    );
-    const activeGroup = activeTimeGroup.find((g) => g.id === id);
-    const activeRowIndex = activeTimeGroup.indexOf(activeGroup);
-    if (activeRowIndex < groupIndex) {
-      activeRowsHeight += getGroupDetailsBoxHeight(activeGroup);
-    }
-  });
-
-  return activeRowsHeight;
-};
-
 export const activeGroupsHeightAboveGroup = (
   activeGroups: string[],
   group: EventGroup,
   groups: EventGroups,
+  width: number,
 ) => {
   return activeGroups
     .filter((id) => {
@@ -335,7 +312,7 @@ export const activeGroupsHeightAboveGroup = (
     })
     .map((id) => {
       const group = groups.find((group) => group.id === id);
-      return getGroupDetailsBoxHeight(group);
+      return getGroupDetailsBoxHeight(group, width);
     })
     .reduce((acc, height) => acc + height, 0);
 };
@@ -349,7 +326,8 @@ export const mergeEventGroupDetails = (group: EventGroup) => {
 
 export const staticCodeBlockHeight = 200;
 
-export const getGroupDetailsBoxHeight = (group: EventGroup) => {
+export const getGroupDetailsBoxHeight = (group: EventGroup, width: number) => {
+  const isWide = width >= 960;
   const attributes = mergeEventGroupDetails(group);
   const codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
@@ -359,7 +337,8 @@ export const getGroupDetailsBoxHeight = (group: EventGroup) => {
   );
 
   const codeBlockHeight = codeBlockAttributes.length * staticCodeBlockHeight;
-  const textHeight = textAttributes.length * DetailsConfig.fontSizeRatio;
+  const textHeight =
+    (isWide ? 1 : 2) * textAttributes.length * DetailsConfig.fontSizeRatio;
   const totalTextHeight =
     group.category === 'child-workflow'
       ? textHeight + DetailsChildTimelineHeight
@@ -382,7 +361,7 @@ export const getEventDetailsBoxHeight = (
   );
 
   let pendingActivityHeight = 0;
-  if (pendingActivity && event.id === pendingActivity.id) {
+  if (isAssociatedPendingActivity(event, pendingActivity)) {
     pendingActivityHeight = getPendingEventDetailHeight(pendingActivity);
   }
   const codeBlockHeight = codeBlockAttributes.length * staticCodeBlockHeight;

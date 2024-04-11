@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { IconName } from '$lib/holocene/icon';
+  import { navOpen } from '$lib/stores/nav-open';
 
   import Icon from '../icon/icon.svelte';
 
@@ -27,7 +28,10 @@
     >
       <Icon name={icon} {animate} />
     </div>
-    <div class="opacity-0 transition-opacity group-data-[nav=open]:opacity-100">
+    <div
+      class="opacity-0 transition-opacity group-data-[nav=open]:opacity-100"
+      class:pointer-events-none={!$navOpen}
+    >
       {label}
     </div>
   </a>

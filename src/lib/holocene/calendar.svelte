@@ -66,26 +66,20 @@
   }
 
   .cell {
-    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded p-1 text-sm;
+    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded-xl p-2 text-sm;
   }
 
   .selected {
-    @apply bg-gradient-to-br from-blue-100  to-purple-100 text-primary;
+    @apply bg-interactive text-offWhite;
   }
 
   .disabled {
-    background: #efefef;
-    cursor: not-allowed;
-    color: #bfbfbf;
+    @apply cursor-not-allowed bg-interactive text-disabled opacity-50;
   }
 
   .highlight {
-    @apply hover:scale-125 hover:cursor-pointer hover:bg-blue-100;
+    @apply hover:scale-125 hover:cursor-pointer hover:bg-interactive-hover hover:text-offWhite;
 
     transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
-  }
-
-  .selected.highlight:hover {
-    @apply from-blue-100 to-purple-100 hover:border-primary hover:bg-gradient-to-br;
   }
 </style>

@@ -76,7 +76,7 @@
   $: activeDetailsHeight = activeGroups
     .map((id) => {
       const group = groups.find((group) => group.id === id);
-      return getGroupDetailsBoxHeight(group);
+      return getGroupDetailsBoxHeight(group, canvasWidth);
     })
     .reduce((acc, height) => acc + height, 0);
 

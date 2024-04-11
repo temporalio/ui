@@ -15,11 +15,11 @@
 
 <style lang="postcss">
   .bulk-action-button {
-    @apply rounded border px-2 py-1 text-xs leading-3 text-white;
+    @apply rounded border px-2 py-1 text-xs leading-3 text-offWhite;
   }
 
   .bulk-action-button.primary {
-    @apply border-white bg-primary from-blue-100 to-purple-100 hover:border-primary hover:bg-gradient-to-br hover:text-primary;
+    @apply border-offWhite bg-offBlack from-blue-100 to-purple-100 hover:border-primary hover:bg-gradient-to-br hover:text-offBlack;
   }
 
   .bulk-action-button.destructive {

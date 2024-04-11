@@ -3,6 +3,7 @@
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
   export let title = '';
@@ -10,6 +11,7 @@
   export let copyable = false;
   export let href: string = null;
   export let icon: IconName | undefined = undefined;
+  export let tooltip: string = '';
 </script>
 
 <p class="flex items-center gap-2 whitespace-nowrap {$$restProps.class}">
@@ -30,20 +32,24 @@
       {#if href}
         <Link {href} class="value">{content}</Link>
       {:else}
-        <span class="value select-all">{content}</span>
+        <Tooltip text={tooltip} hide={!tooltip} top>
+          <span class="value select-all">{content}</span>
+        </Tooltip>
       {/if}
     </Copyable>
   {:else}
-    {#if icon}
-      <Icon name={icon} />
-    {/if}
     {#if title}
       {title}
+    {/if}
+    {#if icon}
+      <Icon name={icon} />
     {/if}
     {#if href}
       <Link {href} class="value">{content}</Link>
     {:else}
-      <span class="value select-all">{content}</span>
+      <Tooltip text={tooltip} hide={!tooltip} top>
+        <span class="value select-all">{content}</span>
+      </Tooltip>
     {/if}
   {/if}
 </p>
