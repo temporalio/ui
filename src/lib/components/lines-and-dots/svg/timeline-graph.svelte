@@ -34,7 +34,7 @@
     .map((id) => {
       const group = groups.find((group) => group.id === id);
       if (!group) return 0;
-      return getGroupDetailsBoxHeight(group);
+      return getGroupDetailsBoxHeight(group, canvasWidth);
     })
     .reduce((acc, height) => acc + height, 0);
 
@@ -73,7 +73,7 @@
     {#each groups as group, index (group.id)}
       {@const y =
         (index + 1) * height +
-        activeGroupsHeightAboveGroup(activeGroups, group, groups)}
+        activeGroupsHeightAboveGroup(activeGroups, group, groups, canvasWidth)}
       {#key group.eventList.length}
         <TimelineGraphRow
           {y}
