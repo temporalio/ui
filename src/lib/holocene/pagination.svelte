@@ -206,7 +206,7 @@
     setActiveRowIndex={store.setActiveRowIndex}
   />
   <nav
-    class={`flex  ${
+    class={`flex ${
       $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
     }`}
     aria-label="{$$restProps['aria-label']} 2"
