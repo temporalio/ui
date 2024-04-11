@@ -49,8 +49,8 @@
 
   const strokeWidth = radius / 2;
 
-  $: width = (canvasWidth / 4) * zoomLevel;
-  $: horizontalOffset = (offset / 1.5) * 3 * radius;
+  $: width = canvasWidth * zoomLevel;
+  $: horizontalOffset = offset * 2 * radius;
   $: nextIsPending = group?.lastEvent.id === event?.id && group.isPending;
   $: eventInViewBox = horizontalOffset <= width;
   $: isActive =

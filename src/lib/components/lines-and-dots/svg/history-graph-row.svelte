@@ -16,6 +16,7 @@
   export let activeEvents: string[] = [];
 
   export let canvasWidth: number;
+  export let visualWidth: number;
   export let index: number;
 
   const { height, radius } = HistoryConfig;
@@ -30,7 +31,6 @@
       ? 'retry'
       : 'pending'
     : event.classification;
-  $: visualWidth = canvasWidth / 4;
   $: detailsWidth = canvasWidth - visualWidth;
 </script>
 
