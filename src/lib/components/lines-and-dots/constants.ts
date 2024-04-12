@@ -210,6 +210,25 @@ export const activeEventsHeightAboveGroup = (
     .reduce((acc, height) => acc + height, 0);
 };
 
+export const getVisualWidth = (
+  history: WorkflowEvents,
+  groups: EventGroups,
+  maxWidth: number,
+) => {
+  let maxOffset = 0;
+  if (!history.length) return maxWidth;
+  history.forEach((event) => {
+    const group = groups.find((g) => g.eventIds.has(event.id));
+    if (group) {
+      const offset = getOpenGroups(event, groups);
+      if (offset > maxOffset) {
+        maxOffset = offset;
+      }
+    }
+  });
+  return Math.min(maxWidth, (maxOffset + 2) * 2 * HistoryConfig.radius);
+};
+
 export const getNextDistanceAndOffset = (
   history: WorkflowEvents,
   event: WorkflowEvent,
