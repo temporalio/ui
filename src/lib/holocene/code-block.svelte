@@ -165,7 +165,7 @@
     <CopyButton
       {copyIconTitle}
       {copySuccessIconTitle}
-      class="absolute right-1 top-1 bg-inverse bg-opacity-75 text-white hover:bg-opacity-100 hover:text-primary focus-visible:text-primary"
+      class="absolute right-1 top-1 text-white hover:bg-slate-800"
       on:click={handleCopy}
       copied={$copied}
     />
