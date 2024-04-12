@@ -144,11 +144,11 @@
   }
 
   input:checked ~ .checkmark {
-    @apply bg-interactive shadow-[inset_0_0_0_2px] shadow-white dark:shadow-black;
+    @apply border-interactive bg-interactive hover:border-white hover:dark:border-black;
   }
 
   .checkmark {
-    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-md border-2 border-subtle bg-transparent text-white hover:border-white/30 hover:bg-interactive  hover:shadow-[inset_0_0_0_1.5px] hover:shadow-white hover:dark:border-black/30 hover:dark:shadow-black;
+    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-md border-2 border-subtle bg-transparent text-white outline outline-4 outline-transparent hover:border-transparent hover:border-white hover:bg-interactive hover:outline-interactive dark:text-black hover:dark:border-black;
 
     &.invalid {
       @apply border-danger;
