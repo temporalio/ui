@@ -9,7 +9,11 @@
   } from '$lib/stores/active-events';
   import type { WorkflowEvents } from '$lib/types/events';
 
-  import { getEventDetailsBoxHeight, HistoryConfig } from '../constants';
+  import {
+    getEventDetailsBoxHeight,
+    getVisualWidth,
+    HistoryConfig,
+  } from '../constants';
 
   import EventDetailsRow from './event-details-row.svelte';
   import HistoryGraphRowVisual from './history-graph-row-visual.svelte';
@@ -60,7 +64,7 @@
     visibleHistory.length * height + activeDetailsHeight + height,
     400,
   );
-  $: visualWidth = canvasWidth / 4;
+  $: visualWidth = getVisualWidth(history, allGroups, canvasWidth / 4);
 </script>
 
 <svg
@@ -79,6 +83,7 @@
       group={allGroups.find((g) => g.eventIds.has(event.id))}
       {activeEvents}
       {canvasWidth}
+      {visualWidth}
       {index}
     />
   {/each}
@@ -103,7 +108,7 @@
         group={allGroups.find((g) => g.eventIds.has(event.id))}
         groups={allGroups}
         {history}
-        {canvasWidth}
+        canvasWidth={visualWidth}
         {activeEvents}
         {zoomLevel}
         {index}
