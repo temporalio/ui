@@ -125,12 +125,6 @@
     @apply absolute -left-2.5 -z-10 h-9 w-9 self-center content-[''];
   }
 
-  .checkbox.checked .checkmark {
-    &::after {
-      @apply bg-pink;
-    }
-  }
-
   .label {
     @apply flex;
   }
@@ -139,31 +133,27 @@
     @apply sr-only;
   }
 
-  input:focus-visible ~ .checkmark {
-    @apply outline outline-interactive;
+  .checkmark {
+    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-md border-2 border-subtle bg-transparent text-white outline outline-4 outline-transparent dark:text-black;
+
+    &.invalid {
+      @apply cursor-default border-danger text-disabled;
+    }
+  }
+
+  input:enabled ~ .checkmark {
+    &:focus-visible,
+    &:hover {
+      @apply border-transparent border-white bg-interactive outline-interactive dark:border-black;
+    }
   }
 
   input:checked ~ .checkmark {
-    @apply border-interactive bg-interactive hover:border-white hover:dark:border-black;
+    @apply border-interactive bg-interactive;
   }
 
-  .checkmark {
-    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-md border-2 border-subtle bg-transparent text-white outline outline-4 outline-transparent hover:border-transparent hover:border-white hover:bg-interactive hover:outline-interactive dark:text-black hover:dark:border-black;
-
-    &.invalid {
-      @apply border-danger;
-    }
-
-    &:enabled {
-      &:focus-visible,
-      &:hover {
-        @apply border-transparent border-white bg-interactive outline-offset-0 outline-focus dark:border-black;
-      }
-    }
-
-    &:disabled {
-      @apply cursor-default border-disabled text-disabled opacity-50;
-    }
+  input:disabled ~ .checkmark {
+    @apply cursor-default border-disabled text-disabled opacity-50;
   }
 
   .error {
