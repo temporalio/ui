@@ -26,7 +26,7 @@
   }
 
   .gray {
-    @apply border-none bg-transparent text-primary;
+    @apply bg-badge text-disabled;
   }
 
   .gray.active {
