@@ -50,7 +50,7 @@
   }
 
   .lightBlue.active {
-    @apply border-2 border-indigo-500 bg-indigo-500;
+    @apply border-2 border-interactive bg-interactive;
   }
 
   .green {
