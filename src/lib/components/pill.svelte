@@ -22,7 +22,7 @@
 
 <style lang="postcss">
   .pill {
-    @apply flex items-center justify-center gap-1 rounded-full border-2 border-slate-50 px-3 py-1  text-sm text-black text-inverse;
+    @apply flex items-center justify-center gap-1 rounded-full border-2 border-transparent px-3 py-1 text-sm text-inverse;
   }
 
   .gray {
