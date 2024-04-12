@@ -101,23 +101,18 @@
         active={$labsMode}
         data-testid="labs-mode-button"
       />
-    </slot>
-    <slot name="feedback">
-      {#if !$useDarkMode}
+      <LabsModeGuard>
         <NavigationButton
-          onClick={() => ($useDarkMode = true)}
-          tooltip={translate('common.night')}
-          label={translate('common.night')}
-          icon="moon"
+          onClick={() => ($useDarkMode = !$useDarkMode)}
+          tooltip={$useDarkMode
+            ? translate('common.day')
+            : translate('common.night')}
+          label={$useDarkMode
+            ? translate('common.day')
+            : translate('common.night')}
+          icon={$useDarkMode ? 'sun' : 'moon'}
         />
-      {:else}
-        <NavigationButton
-          onClick={() => ($useDarkMode = false)}
-          tooltip={translate('common.day')}
-          label={translate('common.day')}
-          icon="sun"
-        />
-      {/if}
+      </LabsModeGuard>
     </slot>
   </svelte:fragment>
 </Navigation>
