@@ -42,7 +42,7 @@
           ghost:
             'border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:border-white dark:hover:border-black dark:focus-visible:border-black focus-visible:shadow-focus focus-visible:shadow-secondary/70 focus-visible:surface-interactive-secondary ',
           'table-header':
-            ' bg-inverse text-white focus-visible:shadow-focus focus-visible:shadow-primary/50 focus-visible:border-white',
+            ' border-transparent text-white focus-visible:shadow-focus focus-visible:shadow-primary/50 focus-visible:border-white',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',

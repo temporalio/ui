@@ -33,7 +33,7 @@
   <label class="sr-only" for={id}>{label}</label>
   <select
     class={merge(
-      'inline h-10 w-full rounded-lg border-2 px-2 text-base',
+      'inline h-10 w-full rounded-lg border px-2 text-base',
       className,
     )}
     class:dark
@@ -54,7 +54,7 @@
 
 <style lang="postcss">
   select {
-    @apply text-slate-500;
+    @apply border-secondary bg-transparent text-primary outline-none focus-visible:outline focus-visible:outline-blue-700;
   }
 
   .remove {
