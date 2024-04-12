@@ -64,11 +64,11 @@ export const CategoryIcon: Record<EventTypeCategory, IconName> = {
   signal: 'signal',
   command: 'sliders',
   activity: 'activity',
-  marker: 'pin',
+  marker: 'marker',
   timer: 'retention',
-  'local-activity': 'summary',
+  'local-activity': 'feather',
   'child-workflow': 'relationship',
-  update: 'merge',
+  update: 'update',
 };
 
 export const timelineTextPosition = (

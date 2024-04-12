@@ -5,6 +5,7 @@
   import type { WorkflowEvent } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
   import { CategoryIcon, HistoryConfig } from '../constants';
 
@@ -59,7 +60,9 @@
     point={[visualWidth + 50, y]}
     category={event.category}
     active={noActives || isActiveEvent}
-    icon={CategoryIcon[event.category]}
+    icon={isLocalActivityMarkerEvent(event)
+      ? 'feather'
+      : CategoryIcon[event.category]}
     config={HistoryConfig}
   >
     <tspan fill="#fff">
