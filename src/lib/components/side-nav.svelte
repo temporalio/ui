@@ -2,6 +2,7 @@
   import FeatureGuard from '$lib/components/feature-guard.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
   import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
+  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
   import Navigation from '$lib/holocene/navigation/navigation-container.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
