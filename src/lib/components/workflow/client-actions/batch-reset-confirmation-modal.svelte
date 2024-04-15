@@ -63,7 +63,7 @@
       open = false;
       resetForm();
       toaster.push({
-        message: '',
+        message: translate('workflows.batch-reset-all-success'),
         id: 'batch-reset-success-toast',
       });
     } catch (err) {

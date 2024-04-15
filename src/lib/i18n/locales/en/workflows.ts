@@ -35,6 +35,8 @@ export const Strings = {
     'The batch terminate request is processing in the background.',
   'batch-cancel-all-success':
     'The batch cancel request is processing in the background.',
+  'batch-reset-all-success':
+    'The batch reset request is processing in the background.',
   'configure-workflows': 'Configure Workflow List',
   'open-configure-workflows': 'Open workflow list configuration',
   'close-configure-workflows': 'Close workflow list configuration',
