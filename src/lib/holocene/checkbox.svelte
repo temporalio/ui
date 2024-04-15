@@ -119,10 +119,10 @@
 <style lang="postcss">
   .checkbox {
     @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px] text-primary;
-  }
 
-  .checkbox.hoverable:hover .checkmark::before {
-    @apply absolute -left-2.5 -z-10 h-9 w-9 self-center content-[''];
+    &.disabled {
+      @apply cursor-not-allowed;
+    }
   }
 
   .label {
@@ -137,23 +137,32 @@
     @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-md border-2 border-subtle bg-transparent text-white outline outline-4 outline-transparent dark:text-black;
 
     &.invalid {
-      @apply cursor-default border-danger text-disabled;
+      @apply border-error;
     }
-  }
 
-  input:enabled ~ .checkmark {
-    &:focus-visible,
-    &:hover {
-      @apply border-transparent border-white bg-interactive outline-interactive dark:border-black;
+    &.disabled {
+      @apply cursor-not-allowed opacity-50;
     }
   }
 
   input:checked ~ .checkmark {
     @apply border-interactive bg-interactive;
+
+    &.invalid {
+      @apply border-error;
+    }
   }
 
-  input:disabled ~ .checkmark {
-    @apply cursor-default border-disabled text-disabled opacity-50;
+  .checkbox.hoverable {
+    &:hover {
+      input:enabled ~ .checkmark {
+        @apply border-white bg-interactive outline-offset-0 outline-focus dark:border-black;
+      }
+    }
+  }
+
+  input:focus-visible ~ .checkmark {
+    @apply border-white bg-interactive outline-offset-0 outline-focus dark:border-black;
   }
 
   .error {
