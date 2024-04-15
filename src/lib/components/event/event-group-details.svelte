@@ -20,7 +20,7 @@
 </script>
 
 <div class="w-full border-slate-700 lg:w-1/3 lg:border-r-2">
-  <Table class="w-full table-fixed pb-2" variant="simple">
+  <Table class="surface-primary w-full table-fixed pb-2" variant="simple">
     {#each [...eventGroup.events].reverse() as [id, eventInGroup] (id)}
       <tr
         class="row"
@@ -61,11 +61,11 @@
 
 <style lang="postcss">
   .row:hover {
-    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
+    @apply surface-subtle cursor-pointer bg-fixed;
   }
 
   .active {
-    @apply bg-blue-50;
+    @apply surface-subtle;
   }
 
   .failure {

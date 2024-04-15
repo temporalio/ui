@@ -94,6 +94,18 @@
         icon="feedback"
         external
       />
+      <LabsModeGuard>
+        <NavigationButton
+          onClick={() => ($useDarkMode = !$useDarkMode)}
+          tooltip={$useDarkMode
+            ? translate('common.night')
+            : translate('common.day')}
+          label={$useDarkMode
+            ? translate('common.night')
+            : translate('common.day')}
+          icon={$useDarkMode ? 'moon' : 'sun'}
+        />
+      </LabsModeGuard>
       <NavigationButton
         onClick={() => ($labsMode = !$labsMode)}
         tooltip={labsHoverText}
@@ -102,18 +114,6 @@
         active={$labsMode}
         data-testid="labs-mode-button"
       />
-      <LabsModeGuard>
-        <NavigationButton
-          onClick={() => ($useDarkMode = !$useDarkMode)}
-          tooltip={$useDarkMode
-            ? translate('common.day')
-            : translate('common.night')}
-          label={$useDarkMode
-            ? translate('common.day')
-            : translate('common.night')}
-          icon={$useDarkMode ? 'sun' : 'moon'}
-        />
-      </LabsModeGuard>
     </slot>
   </svelte:fragment>
 </Navigation>
