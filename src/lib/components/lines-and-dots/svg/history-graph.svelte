@@ -78,25 +78,6 @@
     endPoint={[visualWidth, canvasHeight]}
     strokeWidth={6}
   />
-  <svg
-    viewBox="0 0 {2 * canvasWidth} {canvasHeight * zoomLevel}"
-    height={canvasHeight}
-    width={(2 * canvasWidth) / zoomLevel}
-  >
-    {#each visibleHistory as event, index (event.id)}
-      <HistoryGraphRowVisual
-        {event}
-        group={allGroups.find((g) => g.eventIds.has(event.id))}
-        groups={allGroups}
-        {history}
-        canvasWidth={visualWidth}
-        {activeEvents}
-        {zoomLevel}
-        {index}
-      />
-    {/each}
-  </svg>
-
   {#each visibleHistory as event, index (event.id)}
     <HistoryGraphRow
       {event}
@@ -121,4 +102,22 @@
       primary={activeEvents[activeEvents.length - 1] === id}
     />
   {/each}
+  <svg
+    viewBox="0 0 {2 * canvasWidth} {canvasHeight * zoomLevel}"
+    height={canvasHeight}
+    width={(2 * canvasWidth) / zoomLevel}
+  >
+    {#each visibleHistory as event, index (event.id)}
+      <HistoryGraphRowVisual
+        {event}
+        group={allGroups.find((g) => g.eventIds.has(event.id))}
+        groups={allGroups}
+        {history}
+        canvasWidth={visualWidth}
+        {activeEvents}
+        {zoomLevel}
+        {index}
+      />
+    {/each}
+  </svg>
 </svg>
