@@ -61,7 +61,7 @@
     category={event.category}
     active={noActives || isActiveEvent}
     icon={isLocalActivityMarkerEvent(event)
-      ? 'feather'
+      ? CategoryIcon['local-activity']
       : CategoryIcon[event.category]}
     config={HistoryConfig}
   >
