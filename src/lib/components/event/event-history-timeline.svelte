@@ -358,7 +358,6 @@
   }
 
   :global(.vis-content, .vis-group) {
-    /* background-color: white; */
     @apply surface-primary;
   }
 
