@@ -41,6 +41,7 @@
       <PendingDetailRow
         event={group.pendingActivity}
         {canvasWidth}
+        {width}
         {x}
         {y}
         active={isAssociatedPendingActivity(event, group.pendingActivity)}

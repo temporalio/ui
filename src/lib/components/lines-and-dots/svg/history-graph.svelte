@@ -78,30 +78,6 @@
     endPoint={[visualWidth, canvasHeight]}
     strokeWidth={6}
   />
-  {#each visibleHistory as event, index (event.id)}
-    <HistoryGraphRow
-      {event}
-      group={allGroups.find((g) => g.eventIds.has(event.id))}
-      {activeEvents}
-      {canvasWidth}
-      {visualWidth}
-      {index}
-    />
-  {/each}
-  {#each activeEvents as id}
-    {@const index = visibleHistory.indexOf(
-      history.find((event) => event.id === id),
-    )}
-    <EventDetailsRow
-      x={isWide ? canvasWidth / 2 + 2 : visualWidth + 2}
-      y={isWide ? index * height : (index + 1) * height}
-      width={isWide ? canvasWidth / 2 : canvasWidth - visualWidth}
-      event={history.find((event) => event.id === id)}
-      group={allGroups.find((group) => group.eventIds.has(id))}
-      {canvasWidth}
-      primary={activeEvents[activeEvents.length - 1] === id}
-    />
-  {/each}
   <svg
     viewBox="0 0 {2 * canvasWidth} {canvasHeight * zoomLevel}"
     height={canvasHeight}
@@ -120,4 +96,29 @@
       />
     {/each}
   </svg>
+
+  {#each visibleHistory as event, index (event.id)}
+    <HistoryGraphRow
+      {event}
+      group={allGroups.find((g) => g.eventIds.has(event.id))}
+      {activeEvents}
+      {canvasWidth}
+      {visualWidth}
+      {index}
+    />
+  {/each}
+  {#each activeEvents as id}
+    {@const index = visibleHistory.indexOf(
+      history.find((event) => event.id === id),
+    )}
+    <EventDetailsRow
+      x={isWide ? canvasWidth / 2 + 2 : visualWidth}
+      y={isWide ? index * height : (index + 1) * height}
+      width={isWide ? canvasWidth / 2 : canvasWidth - visualWidth}
+      event={history.find((event) => event.id === id)}
+      group={allGroups.find((group) => group.eventIds.has(id))}
+      {canvasWidth}
+      primary={activeEvents[activeEvents.length - 1] === id}
+    />
+  {/each}
 </svg>

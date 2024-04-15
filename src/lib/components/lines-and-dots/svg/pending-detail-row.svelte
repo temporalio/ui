@@ -25,11 +25,11 @@
   export let x = 0;
   export let y: number;
   export let canvasWidth: number;
+  export let width: number;
   export let active = false;
 
   const { gutter, fontSizeRatio } = DetailsConfig;
 
-  $: width = canvasWidth / 2;
   $: eventY = y;
   $: textStartingY = eventY + 1.5 * fontSizeRatio;
   $: retrying = event.attempt > 1;
