@@ -121,28 +121,22 @@ func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, p
 }
 
 func VerifyAdditionalClaims(additionalClaims map[string]string, claimTokenValues map[string]interface{}) error {
-	var successClaimCheck = false
 	for configClaimKey, configClaimValue := range additionalClaims {
 		claimValues := claimTokenValues[configClaimKey]
 		if claimValues != nil {
 			switch t := claimValues.(type) {
 			case string:
 				if t == configClaimValue {
-					successClaimCheck = true
 					return nil
 				}
 			case []interface{}:
 				for _, claimValue := range t {
 					if claimValue == configClaimValue {
-						successClaimCheck = true
 						return nil
 					}
 				}
 			}
 		}
 	}
-	if !successClaimCheck {
-		return echo.NewHTTPError(http.StatusInternalServerError, "No additional Claims defined")
-	}
-	return nil
+	return echo.NewHTTPError(http.StatusInternalServerError, "No additional Claims defined")
 }
