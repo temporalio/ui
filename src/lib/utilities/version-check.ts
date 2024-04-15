@@ -37,7 +37,8 @@ export const minimumVersionRequired = (
     return minor2 > minor1;
   } else {
     if (patch1 === undefined && !!patch2) return true;
-    if (patch1 === undefined && patch2 === undefined) return true;
+    if (patch1 === undefined && (patch2 === undefined || isNaN(patch2)))
+      return true;
     return patch2 >= patch1;
   }
 };

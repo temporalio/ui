@@ -38,11 +38,11 @@
           secondary:
             'border-secondary text-primary focus-visible:shadow-focus focus-visible:shadow-primary/70 hover:surface-interactive-secondary hover:border-interactive-secondary dark:hover:border-transparent focus-visible:surface-interactive-secondary focus-visible:border-white dark:focus-visible:border-black',
           destructive:
-            'border-danger bg-danger hover:bg-red-400 hover:border-red-400 focus-visible:shadow-focus focus-visible:shadow-danger/50 focus-visible:border-white dark:focus-visible:border-red-400/50 dark:focus-visible:bg-red-400',
+            'border-danger bg-danger text-primary hover:bg-red-400 hover:border-red-400 focus-visible:shadow-focus focus-visible:shadow-danger/50 focus-visible:border-white dark:focus-visible:border-red-400/50 dark:focus-visible:bg-red-400',
           ghost:
             'border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:border-white dark:hover:border-black dark:focus-visible:border-black focus-visible:shadow-focus focus-visible:shadow-secondary/70 focus-visible:surface-interactive-secondary ',
           'table-header':
-            'border-transparent text-white focus-visible:shadow-focus focus-visible:shadow-primary/50 focus-visible:border-white',
+            'border-inverse surface-inverse hover:surface-primary focus-visible:shadow-focus focus-visible:shadow-primary/50 focus-visible:border-white',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',

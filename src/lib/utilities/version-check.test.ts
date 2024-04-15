@@ -39,6 +39,10 @@ describe('minimumVersionRequired', () => {
     expect(minimumVersionRequired('1', '2')).toBe(true);
     expect(minimumVersionRequired('1', '1.20')).toBe(true);
   });
+  it('should return true when current release candidate version is equal to or higher than minimum', () => {
+    expect(minimumVersionRequired('1.23', '1.23.0-rc.19')).toBe(true);
+  });
+
   it('should return false when current version is less than than minimum', () => {
     expect(minimumVersionRequired('1.20.1', '1.20.0')).toBe(false);
     expect(minimumVersionRequired('1.20.0', '1.19.0')).toBe(false);
