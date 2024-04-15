@@ -358,13 +358,12 @@
   }
 
   :global(.vis-content, .vis-group) {
-    background-color: white;
+    /* background-color: white; */
+    @apply surface-primary;
   }
 
   :global(.vis-timeline .vis-item) {
-    background-color: #fff;
     border-color: transparent;
-    color: #3f3f46;
     font-size: 12px;
   }
 
