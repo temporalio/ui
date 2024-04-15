@@ -46,9 +46,9 @@ export const TimelineConfig: GraphConfig = {
 };
 
 export const HistoryConfig: GraphConfig = {
-  height: baseRadius * 4,
+  height: baseRadius * 5,
   gutter: baseRadius * 2,
-  radius: baseRadius,
+  radius: baseRadius * 1.333,
   fontSizeRatio: baseRadius * 4,
 };
 
@@ -174,7 +174,7 @@ const getOpenGroups = (
   if (!openGroups.length && isConsecutiveGroup(group)) {
     group.level = 0;
   }
-  group.level = openGroups.length + 2;
+  group.level = openGroups.length + 1;
   return group.level;
 };
 
@@ -237,7 +237,7 @@ export const getNextDistanceAndOffset = (
 ): { nextDistance: number; offset: number } => {
   const group = groups.find((g) => g.eventIds.has(event.id));
   let nextDistance = 0;
-  let offset = 1;
+  let offset = 0;
 
   if (!group) {
     return { nextDistance, offset };

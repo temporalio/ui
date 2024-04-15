@@ -1,8 +1,4 @@
 <script lang="ts">
-  import { HistoryConfig } from '../constants';
-
-  const { radius } = HistoryConfig;
-
   export let startPoint = [0, 1000];
   export let endPoint = [0, 1000];
   export let status: string | undefined = undefined;
@@ -11,7 +7,7 @@
   export let active = true;
   export let scheduling = false;
   export let pending = false;
-  export let strokeWidth: number = radius / 2;
+  export let strokeWidth: number = 2;
   export let strokeDasharray = 'none';
 
   $: [x1, y1] = startPoint;

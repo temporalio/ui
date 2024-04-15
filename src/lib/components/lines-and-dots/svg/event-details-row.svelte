@@ -6,7 +6,6 @@
   import {
     getEventDetailsBoxHeight,
     getPendingEventDetailHeight,
-    HistoryConfig,
   } from '../constants';
 
   import Box from './box.svelte';
@@ -17,12 +16,10 @@
   export let group: EventGroup;
   export let canvasWidth: number;
   export let x = 0;
-  export let index: number;
+  export let y: number;
+  export let width: number;
   export let primary = true;
 
-  const { height } = HistoryConfig;
-
-  $: y = index * height;
   $: boxHeight = group
     ? group.eventList.reduce(
         (sum, event) =>
@@ -30,7 +27,6 @@
         0,
       )
     : getEventDetailsBoxHeight(event);
-  $: width = canvasWidth / 2;
 </script>
 
 <g
@@ -56,6 +52,7 @@
         {group}
         {index}
         {canvasWidth}
+        {width}
         {x}
         y={group.pendingActivity
           ? y + getPendingEventDetailHeight(group.pendingActivity)
@@ -64,7 +61,7 @@
       />
     {/each}
   {:else}
-    <EventDetailRow active {event} {canvasWidth} {x} {y} />
+    <EventDetailRow active {event} {canvasWidth} {width} {x} {y} />
   {/if}
 </g>
 

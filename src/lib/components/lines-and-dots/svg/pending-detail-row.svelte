@@ -55,7 +55,7 @@
   width={width - gutter}
   height={fontSizeRatio}
 >
-  <div class="flex gap-1 text-wrap text-sm text-primary">
+  <div class="flex gap-1 text-wrap text-sm text-black">
     <div class="w-48">{translate('workflows.attempt')}</div>
     {event.attempt}
   </div>
@@ -66,7 +66,7 @@
   width={width - gutter}
   height={fontSizeRatio}
 >
-  <div class="flex gap-1 text-wrap text-sm text-primary">
+  <div class="flex gap-1 text-wrap text-sm text-black">
     <div class="w-48">{translate('workflows.attempts-left')}</div>
     {formatAttemptsLeft(event.maximumAttempts, event.attempt)}
   </div>
@@ -77,7 +77,7 @@
   width={width - gutter}
   height={fontSizeRatio}
 >
-  <div class="flex gap-1 text-wrap text-sm text-primary">
+  <div class="flex gap-1 text-wrap text-sm text-black">
     <div class="w-48">{translate('workflows.last-heartbeat')}</div>
     {formatDate(event.lastHeartbeatTime, $timeFormat, {
       relative: $relativeTime,
@@ -90,7 +90,7 @@
   width={width - gutter}
   height={fontSizeRatio}
 >
-  <div class="flex gap-1 text-wrap text-sm text-primary">
+  <div class="flex gap-1 text-wrap text-sm text-black">
     <div class="w-48">{translate('workflows.next-retry')}</div>
     {toTimeDifference({
       date: event.scheduledTime,
@@ -104,7 +104,7 @@
   width={width - gutter}
   height={fontSizeRatio}
 >
-  <div class="flex gap-1 text-wrap text-sm text-primary">
+  <div class="flex gap-1 text-wrap text-sm text-black">
     <div class="w-48">{translate('workflows.expiration')}</div>
     {formatRetryExpiration(
       event.maximumAttempts,
@@ -124,7 +124,7 @@
     {width}
     height={staticCodeBlockHeight - fontSizeRatio}
   >
-    <div class="w-48 text-wrap text-sm text-primary">
+    <div class="w-48 text-wrap text-sm text-black">
       {translate('workflows.heartbeat-details')}
     </div>
     <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">
@@ -145,7 +145,7 @@
     {width}
     height={staticCodeBlockHeight - fontSizeRatio}
   >
-    <div class="w-48 text-wrap text-sm text-primary">
+    <div class="w-48 text-wrap text-sm text-black">
       {translate('workflows.last-failure')}
     </div>
     <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">

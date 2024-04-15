@@ -5,9 +5,8 @@
   import type { WorkflowEvent } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
-  import { CategoryIcon, HistoryConfig } from '../constants';
+  import { HistoryConfig } from '../constants';
 
   import Box from './box.svelte';
   import Text from './text.svelte';
@@ -50,7 +49,7 @@
     fill={index % 2 === 1 && '#1E293B'}
   />
   <Text
-    point={[visualWidth + 5, y]}
+    point={[visualWidth + 2 * radius, y]}
     active={noActives || isActiveEvent}
     fontSize="12px"
   >
@@ -60,9 +59,6 @@
     point={[visualWidth + 50, y]}
     category={event.category}
     active={noActives || isActiveEvent}
-    icon={isLocalActivityMarkerEvent(event)
-      ? CategoryIcon['local-activity']
-      : CategoryIcon[event.category]}
     config={HistoryConfig}
   >
     <tspan fill="#fff">

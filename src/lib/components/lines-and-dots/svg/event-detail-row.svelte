@@ -26,6 +26,7 @@
   export let x = 0;
   export let y: number;
   export let canvasWidth: number;
+  export let width: number;
   export let active = false;
 
   const { gutter, fontSizeRatio, radius } = DetailsConfig;
@@ -39,7 +40,6 @@
     ([, value]) => typeof value !== 'object',
   );
 
-  $: width = canvasWidth / 2;
   $: showTimestamp = canvasWidth > 800;
   $: eventY =
     index === 0

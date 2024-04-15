@@ -36,7 +36,7 @@
     cursor: pointer;
     outline: none;
     opacity: 0.5;
-    stroke: #465a78;
+    stroke: #141414;
     fill: #e8efff;
   }
 
