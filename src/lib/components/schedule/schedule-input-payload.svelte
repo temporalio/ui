@@ -21,7 +21,7 @@
     {#key decodedValue}
       <CodeBlock
         id="schedule-input"
-        class="max-h-80 overflow-y-scroll overscroll-contain"
+        maxHeight={320}
         content={getSinglePayload(decodedValue)}
         on:change={handleInputChange}
         editable

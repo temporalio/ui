@@ -35,6 +35,8 @@
     inline?: boolean;
     testId?: string;
     copyable?: boolean;
+    minHeight?: number;
+    maxHeight?: number;
   };
 
   type CopyableProps = BaseProps & {
@@ -56,6 +58,8 @@
   export let copyable = true;
   export let copyIconTitle = '';
   export let copySuccessIconTitle = '';
+  export let minHeight = undefined;
+  export let maxHeight = undefined;
 
   const { copy, copied } = copyToClipboard();
 
@@ -124,6 +128,17 @@
 
     if (!inline && !editable) {
       extensions.push(foldGutter());
+    }
+
+    if (minHeight || maxHeight) {
+      extensions.push(
+        EditorView.theme({
+          '&': {
+            ...(minHeight ? { 'min-height': `${minHeight}px` } : {}),
+            ...(maxHeight ? { 'max-height': `${maxHeight}px` } : {}),
+          },
+        }),
+      );
     }
 
     return EditorState.create({

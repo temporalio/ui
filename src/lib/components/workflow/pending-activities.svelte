@@ -138,7 +138,7 @@
                         {translate('workflows.heartbeat-details')}
                       </h4>
                       <CodeBlock
-                        class="max-h-32 overflow-y-scroll"
+                        maxHeight={128}
                         content={stringifyWithBigInt(
                           pendingActivity.heartbeatDetails,
                         )}
@@ -155,7 +155,7 @@
                         {translate('workflows.last-failure')}
                       </h4>
                       <CodeBlock
-                        class="max-h-32 overflow-y-scroll"
+                        maxHeight={128}
                         content={stringifyWithBigInt(
                           pendingActivity.lastFailure,
                         )}
