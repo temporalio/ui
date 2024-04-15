@@ -1,13 +1,16 @@
 <script lang="ts">
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type {
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
   import { setSingleActiveEvent } from '$lib/stores/active-events';
   import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
   import {
+    CategoryIcon,
     getNextDistanceAndOffset,
     HistoryConfig,
     isMiddleEvent,
@@ -37,15 +40,15 @@
   ));
 
   $: zoomY = y * zoomLevel;
-  $: zoomNextDistance = nextDistance * zoomLevel;
+  $: zoomNextDistance = offset > 0 && nextDistance * zoomLevel;
 
   $: category = isPendingActivity(event) ? 'pending' : event?.category;
   $: classification = isPendingActivity(event)
     ? 'pending'
     : event?.classification;
-  $: connectLine = isPendingActivity(event)
-    ? false
-    : !isMiddleEvent(event, groups);
+  $: icon = isLocalActivityMarkerEvent(event)
+    ? CategoryIcon['local-activity']
+    : CategoryIcon[event.category];
 
   const strokeWidth = radius / 2;
 
@@ -57,6 +60,10 @@
     !activeEvents.length ||
     activeEvents.includes(event.id) ||
     !!activeEvents.find((id) => group?.eventIds.has(id));
+  $: connectLine =
+    isPendingActivity(event) || offset === 0
+      ? false
+      : !isMiddleEvent(event, groups);
 </script>
 
 <g
@@ -68,7 +75,7 @@
 >
   {#if connectLine}
     <Line
-      startPoint={[width - strokeWidth, zoomY]}
+      startPoint={[width, zoomY]}
       endPoint={[width - horizontalOffset - radius, zoomY]}
       active={isActive}
     />
@@ -78,6 +85,14 @@
       point={[width - horizontalOffset, zoomY]}
       {classification}
       active={isActive}
+    />
+    <Icon
+      name={icon}
+      x={width - horizontalOffset - radius}
+      y={zoomY - radius}
+      width={radius * 2}
+      height={radius * 2}
+      class="text-black {!isActive && 'opacity-[.35]'}"
     />
   {/if}
   {#if eventInViewBox && zoomNextDistance}
