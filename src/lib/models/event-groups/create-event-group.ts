@@ -7,6 +7,7 @@ import type {
   TimerStartedEvent,
   WorkflowExecutionSignaledEvent,
   WorkflowExecutionUpdateAcceptedEvent,
+  WorkflowTaskScheduledEvent,
 } from '$lib/types/events';
 import {
   isActivityTaskScheduledEvent,
@@ -17,6 +18,7 @@ import {
   isTimerStartedEvent,
   isWorkflowExecutionSignaledEvent,
   isWorkflowExecutionUpdateAcceptedEvent,
+  isWorkflowTaskScheduledEvent,
 } from '$lib/utilities/is-event-type';
 
 import type { EventGroup } from './event-groups';
@@ -42,6 +44,7 @@ type StartingEvents = {
   LocalActivity: MarkerRecordedEvent;
   Marker: MarkerRecordedEvent;
   Update: WorkflowExecutionUpdateAcceptedEvent;
+  WorkflowTask: WorkflowTaskScheduledEvent;
 };
 
 const getInitialEvent = (
@@ -93,8 +96,10 @@ const createGroupFor = <K extends keyof StartingEvents>(
     eventIds: groupEventIds,
     initialEvent,
     timestamp,
-    category,
+    category: isLocalActivityMarkerEvent(event) ? 'local-activity' : category,
     classification,
+    level: undefined,
+    pendingActivity: undefined,
     get eventTime() {
       return this.lastEvent?.eventTime;
     },
@@ -106,6 +111,18 @@ const createGroupFor = <K extends keyof StartingEvents>(
     },
     get lastEvent() {
       return getLastEvent(this);
+    },
+    get finalClassification() {
+      return getLastEvent(this).classification;
+    },
+    get isPending() {
+      return (
+        this.pendingActivity ||
+        (isTimerStartedEvent(this.initialEvent) &&
+          this.eventList.length === 1) ||
+        (isStartChildWorkflowExecutionInitiatedEvent(this.initialEvent) &&
+          this.eventList.length === 2)
+      );
     },
     get isFailureOrTimedOut() {
       return Boolean(this.eventList.find(eventIsFailureOrTimedOut));
@@ -146,4 +163,12 @@ export const createEventGroup = (
 
   if (isWorkflowExecutionUpdateAcceptedEvent(event))
     return createGroupFor<'Update'>(event, events);
+};
+
+export const createWorkflowTaskGroup = (
+  event: CommonHistoryEvent,
+  events?: CommonHistoryEvent[],
+): EventGroup => {
+  if (isWorkflowTaskScheduledEvent(event))
+    return createGroupFor<'WorkflowTask'>(event, events);
 };

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
 
-  import { iconNames } from './paths';
+  import { iconNames } from './index';
 
   import Icon from './icon.svelte';
 </script>

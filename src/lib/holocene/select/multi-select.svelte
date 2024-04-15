@@ -10,11 +10,11 @@
     MenuItem,
   } from '$lib/holocene/menu';
 
+  import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
-  import type { IconName } from '../icon/paths';
   import type { MenuButtonVariant } from '../menu/menu-button.svelte';
 
-  type Option = { label: string; value: string };
+  type Option = { label: string; value: string; icon?: IconName };
   type MultiSelectOptions = Option[];
 
   export let options: MultiSelectOptions = [];
@@ -27,6 +27,7 @@
   export let selectAllLabel: string;
   export let clearAllLabel: string;
   export let active = false;
+  export let position: 'left' | 'right' = 'left';
 
   let selectedOptions = initialSelected.length ? initialSelected : options;
 
@@ -58,7 +59,7 @@
     {#if icon}<Icon class="md:hidden" name={icon} />{/if}
     <span class="max-md:hidden">{label}</span>
   </MenuButton>
-  <Menu {id} keepOpen>
+  <Menu {id} keepOpen {position}>
     {#each options as option (option)}
       {@const checked = Boolean(
         selectedOptions.find((s) => s.value === option.value),
@@ -76,7 +77,12 @@
           label={option.label}
           labelHidden
         />
-        {option.label}
+        <div class="flex items-center gap-2">
+          {#if option.icon}
+            <Icon slot="trailing" name={option.icon} />
+          {/if}
+          {option.label}
+        </div>
       </MenuItem>
     {/each}
     <MenuDivider />

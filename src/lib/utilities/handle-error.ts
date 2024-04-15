@@ -19,6 +19,10 @@ export const handleError = (
   errors = networkError,
   isBrowser = BROWSER,
 ): void => {
+  if (error instanceof DOMException && error.name === 'AbortError') {
+    return;
+  }
+
   if (typeof error === 'string') {
     toasts.push({ variant: 'error', message: error });
   } else {

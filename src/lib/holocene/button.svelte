@@ -10,8 +10,8 @@
   import { goto } from '$app/navigation';
 
   import Badge from '$lib/holocene/badge.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
 
   const buttonStyles = cva(
     [
@@ -189,3 +189,9 @@
     {/if}
   </button>
 {/if}
+
+<style lang="postcss">
+  .active {
+    @apply bg-interactive text-white;
+  }
+</style>

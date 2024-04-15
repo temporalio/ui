@@ -78,7 +78,7 @@
   <aside
     use:clickoutside={() => ($viewDataEncoderSettings = false)}
     in:fly={{ y: -50, delay: 0, duration: 500 }}
-    class="relative flex h-auto w-full flex-col gap-6 border-b border-blue-100 bg-blue-50 p-12"
+    class="surface-primary relative flex h-[540px] w-full flex-col gap-6 overflow-auto border-b border-subtle p-12"
   >
     <div class="flex w-full flex-col gap-4 xl:w-1/2">
       <div class="flex items-center justify-between space-x-2">

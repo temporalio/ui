@@ -40,7 +40,6 @@
     runId: string,
   ) => {
     if ($workflowRun.workflow.id !== workflowId || !$fullEventHistory.length) {
-      loading = true;
       resetFullHistory();
       $fullEventHistory = await fetchAllEvents({
         namespace,

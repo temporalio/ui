@@ -1,7 +1,7 @@
 <script lang="ts">
   import colors from 'tailwindcss/colors';
 
-  import Svg from './svg.svelte';
+  import Svg from '../svg.svelte';
 </script>
 
 <Svg {...$$props}>

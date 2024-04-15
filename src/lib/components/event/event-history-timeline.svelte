@@ -11,8 +11,8 @@
   import { page } from '$app/stores';
 
   import HeartBeat from '$lib/components/heart-beat-indicator.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
@@ -358,13 +358,11 @@
   }
 
   :global(.vis-content, .vis-group) {
-    background-color: white;
+    @apply surface-primary;
   }
 
   :global(.vis-timeline .vis-item) {
-    background-color: #fff;
     border-color: transparent;
-    color: #3f3f46;
     font-size: 12px;
   }
 

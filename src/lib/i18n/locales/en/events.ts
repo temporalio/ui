@@ -43,6 +43,7 @@ export const Strings = {
   'history-expected-formats': 'Expected JSON formats',
   'event-history-import-error': 'Could not create event history from JSON',
   'event-history-load-error': 'Could not parse JSON',
+  'event-classification-label': 'Event Classification',
   'event-classification': {
     unspecified: 'Unspecified',
     scheduled: 'Scheduled',

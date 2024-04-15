@@ -43,9 +43,7 @@ export async function getEventAttributes(
   };
 }
 
-export const toEvent = async (
-  historyEvent: HistoryEvent,
-): Promise<WorkflowEvent> => {
+export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
   const id = String(historyEvent.eventId);
   const eventType = toEventNameReadable(historyEvent.eventType);
   const timestamp = formatDate(String(historyEvent.eventTime));
@@ -65,10 +63,8 @@ export const toEvent = async (
   };
 };
 
-export const toEventHistory = async (
-  events: HistoryEvent[],
-): Promise<WorkflowEvents> => {
-  return await Promise.all(events.map(toEvent));
+export const toEventHistory = (events: HistoryEvent[]): WorkflowEvents => {
+  return events.map(toEvent);
 };
 
 export const isEvent = (event: unknown): event is WorkflowEvent => {

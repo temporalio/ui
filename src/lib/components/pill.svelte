@@ -1,6 +1,6 @@
 <script lang="ts">
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import type { Color } from '$lib/types/global';
 
   export let disabled = false;
@@ -22,15 +22,15 @@
 
 <style lang="postcss">
   .pill {
-    @apply flex items-center justify-center gap-1 rounded-full border-2 border-slate-100 px-3 py-1 text-sm;
+    @apply flex items-center justify-center gap-1 rounded-full border-2 border-transparent px-3 py-1 text-sm text-inverse;
   }
 
   .gray {
-    @apply bg-badge text-slate-600;
+    @apply bg-badge text-disabled;
   }
 
   .gray.active {
-    @apply surface-primary border-2  text-primary;
+    @apply surface-primary border-2 text-primary;
   }
 
   .slate {
@@ -50,7 +50,7 @@
   }
 
   .lightBlue.active {
-    @apply border-2  bg-blue-50 text-primary;
+    @apply border-2 border-interactive bg-interactive;
   }
 
   .green {
