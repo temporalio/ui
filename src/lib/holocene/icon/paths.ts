@@ -34,6 +34,7 @@ import error from './svg/error.svelte';
 import exit from './svg/exit.svelte';
 import eyeHide from './svg/eye-hide.svelte';
 import eyeShow from './svg/eye-show.svelte';
+import feather from './svg/feather.svelte';
 import feed from './svg/feed.svelte';
 import feedbackCircle from './svg/feedback-circle.svelte';
 import feedback from './svg/feedback.svelte';
@@ -54,7 +55,9 @@ import lightningBolt from './svg/lightning-bolt.svelte';
 import link from './svg/link.svelte';
 import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
+import marker from './svg/marker.svelte';
 import merge from './svg/merge.svelte';
+import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
 import pinFilled from './svg/pin-filled.svelte';
@@ -75,6 +78,7 @@ import spinner from './svg/spinner.svelte';
 import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
+import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
 import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
@@ -84,6 +88,7 @@ import transcoderOff from './svg/transcoder-off.svelte';
 import transcoderOn from './svg/transcoder-on.svelte';
 import trash from './svg/trash.svelte';
 import tutorial from './svg/tutorial.svelte';
+import update from './svg/update.svelte';
 import upload from './svg/upload.svelte';
 import usage from './svg/usage.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
@@ -127,6 +132,7 @@ export const icons = {
   exit,
   'eye-hide': eyeHide,
   'eye-show': eyeShow,
+  feather,
   feed,
   'feedback-circle': feedbackCircle,
   feedback,
@@ -147,7 +153,9 @@ export const icons = {
   link,
   lock,
   logout,
+  marker,
   merge,
+  moon,
   'namespace-switcher': namespaceSwitcher,
   namespace,
   'pin-filled': pinFilled,
@@ -166,6 +174,7 @@ export const icons = {
   spinner,
   'star-empty': starEmpty,
   'star-filled': starFilled,
+  sun,
   summary,
   support,
   'spinner-solid': spinnerSolid,
@@ -177,6 +186,7 @@ export const icons = {
   'transcoder-off': transcoderOff,
   trash,
   tutorial,
+  update,
   upload,
   usage,
   'vertical-ellipsis': verticalEllipsis,

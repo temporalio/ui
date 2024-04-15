@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Button from '$lib/holocene/button.svelte';
   import { genericWeekDays, weekDays } from '$lib/utilities/calendar';
 
   export let daysOfWeek: string[];
@@ -29,30 +30,18 @@
 <div class="flex flex-col gap-4 text-center">
   <div class="flex gap-2 text-center">
     {#each genericWeekDays as { label, value }}
-      <button
-        class="cell"
-        class:active={daysOfWeek.includes(value)}
-        on:click|preventDefault={(e) => onClick(e, value)}>{label}</button
-      >
+      {@const active = daysOfWeek.includes(value)}
+      <Button variant="secondary" {active} on:click={(e) => onClick(e, value)}>
+        {label}
+      </Button>
     {/each}
   </div>
   <div class="flex flex-wrap gap-2 text-center">
     {#each weekDays as { label, value }}
-      <button
-        class="cell"
-        class:active={daysOfWeek.includes(value)}
-        on:click|preventDefault={(e) => onClick(e, value)}>{label}</button
-      >
+      {@const active = daysOfWeek.includes(value)}
+      <Button variant="secondary" {active} on:click={(e) => onClick(e, value)}>
+        {label}
+      </Button>
     {/each}
   </div>
 </div>
-
-<style lang="postcss">
-  .cell {
-    @apply w-auto cursor-pointer rounded border-2 border-subtle bg-slate-300 from-blue-100 to-purple-100 p-2  hover:border-primary hover:bg-gradient-to-br;
-  }
-
-  .active {
-    @apply bg-inverse text-white hover:text-primary;
-  }
-</style>

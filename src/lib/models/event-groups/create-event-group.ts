@@ -96,7 +96,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     eventIds: groupEventIds,
     initialEvent,
     timestamp,
-    category,
+    category: isLocalActivityMarkerEvent(event) ? 'local-activity' : category,
     classification,
     level: undefined,
     pendingActivity: undefined,
