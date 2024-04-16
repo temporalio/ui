@@ -56,7 +56,7 @@
   point={[x, eventY]}
   {width}
   height={1.25 * fontSizeRatio}
-  fill={active ? '#465977' : ''}
+  fill={active ? '#444CE7' : ''}
 />
 <Line
   startPoint={[x, eventY + 1.25 * fontSizeRatio]}
