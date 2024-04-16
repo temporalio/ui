@@ -66,7 +66,7 @@
     y={y - 1.666 * radius}
     width={radius * 3}
     height={radius * 3}
-    class="text-white"
+    class="text-white {!noActives && !isActiveEvent && 'opacity-[.35]'}"
   />
   <Text
     point={[visualWidth + 70, y]}
