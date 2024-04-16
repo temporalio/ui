@@ -10,6 +10,7 @@
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import { coreUserStore } from '$lib/stores/core-user';
   import { temporalVersion } from '$lib/stores/versions';
   import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
@@ -41,8 +42,9 @@
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
   $: resetEnabled =
-    workflowResetEnabled($page.data.settings) &&
-    minimumVersionRequired('1.23', $temporalVersion);
+    workflowResetEnabled($page.data.settings) && $isCloud
+      ? true
+      : minimumVersionRequired('1.23', $temporalVersion);
   $: namespaceWriteDisabled = $coreUser.namespaceWriteDisabled(
     $page.params.namespace,
   );
