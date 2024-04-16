@@ -35,9 +35,7 @@ dependencies:
   '@fontsource/noto-sans-mono':
     specifier: ^5.0.9
     version: 5.0.9
-  '@fontsource/poppins':
-    specifier: ^5.0.8
-    version: 5.0.8
+
   '@lezer/highlight':
     specifier: ^1.1.3
     version: 1.1.3
@@ -3069,9 +3067,7 @@ packages:
     resolution: {integrity: sha512-kEnRN/Vs7TgWkY+Y5U36b2NZOYITWEY1T6LYkjFopCA2eaUWY4DDO7UOov55VE/PHDZH8KZZIOoEmBiM4Nv7Kw==}
     dev: false
 
-  /@fontsource/poppins@5.0.8:
-    resolution: {integrity: sha512-P8owfYWluoUY5Nyzk4gT/L6LmLmseP6ezFWhj6VBUa5pRIdnCvNJpoQ6i/vhekjtJOfqX6nKlB+LCttoUl2GQQ==}
-    dev: false
+
 
   /@grpc/grpc-js@1.7.3:
     resolution: {integrity: sha512-H9l79u4kJ2PVSxUNA08HMYAnUBLj9v6KjYQ7SQ71hOZcEXhShE/y5iQCesP8+6/Ik/7i2O0a10bPquIcYfufog==}
