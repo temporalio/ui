@@ -1,21 +1,13 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import { page } from '$app/stores';
 
-  import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import { fetchAllEvents } from '$lib/services/events-service';
-  import { fetchWorkflow } from '$lib/services/workflow-service';
   import {
     format,
     spaceBetweenCapitalLetters,
   } from '$lib/utilities/format-camel-case';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import {
-    isChildWorkflowExecutionCompletedEvent,
-    isChildWorkflowExecutionStartedEvent,
-  } from '$lib/utilities/is-event-type';
+  import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
 
   import {
     DetailsChildTimelineHeight,
@@ -27,9 +19,9 @@
   } from '../constants';
 
   import Box from './box.svelte';
+  import GraphWidget from './graph-widget.svelte';
   import GroupDetailsText from './group-details-text.svelte';
   import Text from './text.svelte';
-  import TimelineGraph from './timeline-graph.svelte';
 
   export let group: EventGroup;
   export let canvasWidth: number;
@@ -52,46 +44,6 @@
   const { gutter, fontSizeRatio, height } = DetailsConfig;
   $: ({ namespace } = $page.params);
 
-  let fetchChildWorkflow;
-  let fetchChildTimeline;
-
-  const fetchChildWorkflowForGroup = () => {
-    if (group && group.category === 'child-workflow' && namespace) {
-      const completedEvent = group.eventList.find(
-        isChildWorkflowExecutionCompletedEvent,
-      );
-      const startedEvent = group.eventList.find(
-        isChildWorkflowExecutionStartedEvent,
-      );
-      const childEvent = completedEvent ?? startedEvent;
-      if (childEvent) {
-        const childWorkflowId =
-          childEvent.attributes.workflowExecution.workflowId;
-        const childRunId = childEvent.attributes.workflowExecution.runId;
-        fetchChildWorkflow = fetchWorkflow({
-          namespace,
-          workflowId: childWorkflowId,
-          runId: childRunId,
-        }).then(({ workflow }) => {
-          status = workflow?.status;
-          return workflow;
-        });
-        fetchChildTimeline = fetchAllEvents({
-          namespace,
-          workflowId: childWorkflowId,
-          runId: childRunId,
-        });
-      }
-    } else {
-      fetchChildWorkflow = undefined;
-      fetchChildTimeline = undefined;
-    }
-  };
-
-  onMount(() => {
-    fetchChildWorkflowForGroup();
-  });
-
   $: width = canvasWidth;
   $: boxHeight = getGroupDetailsBoxHeight(group, width);
   $: isWide = width >= 960;
@@ -100,10 +52,11 @@
   $: codeBlockWidth = (isWide ? 0.333 * width : 0.5 * width) - 2 * gutter;
 
   $: textStartingY = height + y + fontSizeRatio;
-  $: textHeight = fontSizeRatio * textAttributes.length * (isWide ? 1 : 2);
+  $: textHeight =
+    fontSizeRatio * textAttributes.length * (isWide ? 1 : 2) + fontSizeRatio;
   $: textWidth = (isWide ? 0.666 * width : 0.5 * width) - gutter;
 
-  $: childTimelineY = textStartingY + textHeight + fontSizeRatio;
+  $: childTimelineY = textStartingY + textHeight;
   $: childTimelineWidth = isWide ? 0.666 * width : 0.5 * width;
   $: childTimelineHeight = Math.max(
     DetailsChildTimelineHeight,
@@ -118,6 +71,9 @@
   $: textAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value !== 'object',
   );
+
+  $: childWorkflowStartedEvent =
+    group && group.eventList.find(isChildWorkflowExecutionStartedEvent);
 </script>
 
 <g role="button" tabindex="0" class="relative cursor-pointer">
@@ -168,7 +124,7 @@
           <div class="font-semibold leading-3 text-[#C9D9F0]">
             {format(key)}
           </div>
-          <div class="text-wrap break-all leading-4">
+          <div class="text-wrap break-all">
             <GroupDetailsText
               point={[x + gutter, textStartingY + index * fontSizeRatio]}
               {key}
@@ -181,23 +137,25 @@
       {/each}
     </div>
   </foreignObject>
-  {#if fetchChildWorkflow && fetchChildTimeline}
-    {#await Promise.all( [fetchChildWorkflow, fetchChildTimeline], ) then [workflow, childHistory]}
-      {@const groups = groupEvents(
-        childHistory,
-        'ascending',
-        workflow?.pendingActivities,
-      )}
-      <TimelineGraph
-        {x}
-        y={childTimelineY}
-        staticHeight={childTimelineHeight}
-        {workflow}
-        history={childHistory}
-        {groups}
-        canvasWidth={childTimelineWidth}
-      />
-    {/await}
+  {#if childWorkflowStartedEvent}
+    <foreignObject
+      {x}
+      y={childTimelineY}
+      width={childTimelineWidth}
+      height={childTimelineHeight}
+    >
+      {#key group.eventList.length}
+        <GraphWidget
+          {namespace}
+          workflowId={childWorkflowStartedEvent.attributes.workflowExecution
+            .workflowId}
+          runId={childWorkflowStartedEvent.attributes.workflowExecution.runId}
+          height={childTimelineHeight}
+          width={childTimelineWidth}
+          class="overflow-x-hidden rounded-br rounded-tr border-b-4 border-r-4 border-t-4 border-primary bg-primary"
+        />
+      {/key}
+    </foreignObject>
   {/if}
 </g>
 
