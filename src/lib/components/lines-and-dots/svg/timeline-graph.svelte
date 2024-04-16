@@ -60,7 +60,6 @@
       startPoint={[canvasWidth - gutter, 0]}
       endPoint={[canvasWidth - gutter, timelineHeight]}
       strokeWidth={radius / 2}
-      status={workflow.status}
     />
     <TimelineAxis
       x1={gutter - radius / 4}

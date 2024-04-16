@@ -48,7 +48,7 @@ export const TimelineConfig: GraphConfig = {
 export const HistoryConfig: GraphConfig = {
   height: baseRadius * 5,
   gutter: baseRadius * 2,
-  radius: baseRadius * 1.333,
+  radius: baseRadius * 1,
   fontSizeRatio: baseRadius * 4,
 };
 
@@ -62,7 +62,7 @@ export const DetailsConfig: GraphConfig = {
 export const CategoryIcon: Record<EventTypeCategory, IconName> = {
   workflow: 'workflow',
   signal: 'signal',
-  command: 'sliders',
+  command: 'terminal',
   activity: 'activity',
   marker: 'marker',
   timer: 'retention',
@@ -265,30 +265,6 @@ export const getNextDistanceAndOffset = (
   }
   nextDistance = diff * height;
   return { nextDistance, offset };
-};
-
-export const getEventCategoryColor = (
-  category: EventTypeCategory | 'pending' | undefined,
-): string => {
-  switch (category) {
-    case 'marker':
-    case 'command':
-      return '#ebebeb';
-    case 'timer':
-      return '#fbbf24';
-    case 'signal':
-      return '#ec4899';
-    case 'activity':
-      return '#a78bfa';
-    case 'pending':
-      return '#a78bfa';
-    case 'child-workflow':
-      return '#b2f8d9';
-    case 'workflow':
-      return '#059669';
-    default:
-      return '#141414';
-  }
 };
 
 export const getStatusColor = (

@@ -27,7 +27,7 @@ describe('timelineTextPosition', () => {
   test('should calculate the correct text position for History', () => {
     const { textPosition, textIndex, textAnchor, backdrop } =
       timelineTextPosition([17, 85], 100, 1000, false, HistoryConfig);
-    expect(textPosition).toEqual([96.997, 100]);
+    expect(textPosition).toEqual([94, 100]);
     expect(textIndex).toEqual(1);
     expect(textAnchor).toEqual('start');
     expect(backdrop).toEqual(false);
