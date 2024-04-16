@@ -32,7 +32,7 @@
     cursor: pointer;
     opacity: 0.15;
     outline: none;
-    stroke: #ebebeb;
+    stroke: #444ce7;
   }
 
   .active {
@@ -79,7 +79,7 @@
   }
 
   .child-workflow {
-    stroke: #b2f8d9;
+    stroke: #67e4f9;
   }
 
   .Completed {

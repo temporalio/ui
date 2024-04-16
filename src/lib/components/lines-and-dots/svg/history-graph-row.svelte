@@ -1,12 +1,14 @@
 <script lang="ts">
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveEvent } from '$lib/stores/active-events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowEvent } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
-  import { HistoryConfig } from '../constants';
+  import { CategoryIcon, HistoryConfig } from '../constants';
 
   import Box from './box.svelte';
   import Text from './text.svelte';
@@ -32,6 +34,9 @@
       : 'pending'
     : event.classification;
   $: detailsWidth = canvasWidth - visualWidth;
+  $: icon = isLocalActivityMarkerEvent(event)
+    ? CategoryIcon['local-activity']
+    : CategoryIcon[event.category];
 </script>
 
 <g
@@ -55,8 +60,16 @@
   >
     {event.id}
   </Text>
+  <Icon
+    name={icon}
+    x={visualWidth + 8 * radius}
+    y={y - 1.666 * radius}
+    width={radius * 3}
+    height={radius * 3}
+    class="text-white"
+  />
   <Text
-    point={[visualWidth + 50, y]}
+    point={[visualWidth + 70, y]}
     category={event.category}
     active={noActives || isActiveEvent}
     config={HistoryConfig}

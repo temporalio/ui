@@ -119,7 +119,7 @@
   />
 {/each}
 <Line
-  startPoint={[x - 1.5, eventY]}
+  startPoint={[x - 1, eventY]}
   endPoint={[x + width, eventY]}
   strokeWidth={2}
 />

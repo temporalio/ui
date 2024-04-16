@@ -104,7 +104,7 @@
   }
 
   text.child-workflow {
-    fill: #b2f8d9;
+    fill: #67e4f9;
   }
 
   text.workflow {

@@ -24,7 +24,6 @@
   export let event: PendingActivity;
   export let x = 0;
   export let y: number;
-  export let canvasWidth: number;
   export let width: number;
   export let active = false;
 
