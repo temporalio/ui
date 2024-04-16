@@ -156,13 +156,13 @@
   .checkbox.hoverable {
     &:hover {
       input:enabled ~ .checkmark {
-        @apply border-white bg-interactive outline-offset-0 outline-focus dark:border-black;
+        @apply border-white bg-interactive outline-offset-0 outline-interactive/70 dark:border-black;
       }
     }
   }
 
   input:focus-visible ~ .checkmark {
-    @apply border-white bg-interactive outline-offset-0 outline-focus dark:border-black;
+    @apply border-white bg-interactive outline-offset-0 outline-interactive/70 dark:border-black;
   }
 
   .error {
