@@ -28,37 +28,36 @@
   <h3 class="flex items-center gap-2 text-2xl">
     {title}
   </h3>
-  <div
-    class="flex h-full max-h-96 flex-col gap-4 overflow-scroll transition-[height]"
-  >
-    {#if content}
-      {#if showParsedContent}
-        <PayloadDecoder value={parsedContent} key="payloads" let:decodedValue>
-          {#each parsePayloads(decodedValue) as decodedContent}
-            <CodeBlock
-              content={stringifyWithBigInt(decodedContent)}
-              class="rounded-none"
-              copyIconTitle={translate('common.copy-icon-title')}
-              copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            />
-          {/each}
-        </PayloadDecoder>
-      {:else}
-        <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
+  {#if content}
+    {#if showParsedContent}
+      <PayloadDecoder value={parsedContent} key="payloads" let:decodedValue>
+        {#each parsePayloads(decodedValue) as decodedContent}
           <CodeBlock
-            content={decodedValue}
+            content={stringifyWithBigInt(decodedContent)}
             class="rounded-none"
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            maxHeight={300}
           />
-        </PayloadDecoder>
-      {/if}
+        {/each}
+      </PayloadDecoder>
     {:else}
-      <CodeBlock
-        content={isRunning ? 'Results will appear upon completion.' : 'null'}
-        language="text"
-        copyable={false}
-      />
+      <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
+        <CodeBlock
+          content={decodedValue}
+          class="rounded-none"
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          maxHeight={300}
+        />
+      </PayloadDecoder>
     {/if}
-  </div>
+  {:else}
+    <CodeBlock
+      content={isRunning ? 'Results will appear upon completion.' : 'null'}
+      language="text"
+      copyable={false}
+      maxHeight={300}
+    />
+  {/if}
 </div>

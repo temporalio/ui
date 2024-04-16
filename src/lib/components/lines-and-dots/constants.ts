@@ -357,7 +357,8 @@ export const getGroupDetailsBoxHeight = (group: EventGroup, width: number) => {
 
   const codeBlockHeight = codeBlockAttributes.length * staticCodeBlockHeight;
   const textHeight =
-    (isWide ? 1 : 2) * textAttributes.length * DetailsConfig.fontSizeRatio;
+    (isWide ? 1 : 2) * textAttributes.length * DetailsConfig.fontSizeRatio +
+    DetailsConfig.fontSizeRatio;
   const totalTextHeight =
     group.category === 'child-workflow'
       ? textHeight + DetailsChildTimelineHeight

@@ -124,7 +124,7 @@
           <div class="font-semibold leading-3 text-[#C9D9F0]">
             {format(key)}
           </div>
-          <div class="text-wrap break-all">
+          <div class="text-wrap break-all leading-4">
             <GroupDetailsText
               point={[x + gutter, textStartingY + index * fontSizeRatio]}
               {key}
