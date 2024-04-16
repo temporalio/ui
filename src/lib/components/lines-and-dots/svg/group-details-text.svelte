@@ -43,9 +43,10 @@
           {width}
           height={staticCodeBlockHeight - fontSizeRatio}
         >
-          <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">
-            <CodeBlock content={decodedValue} />
-          </div>
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={staticCodeBlockHeight - fontSizeRatio}
+          />
         </foreignObject>
         <!-- <Text  position="middle" {point} category="pending">
           {decodedValue.slice(1, -1)}
@@ -65,9 +66,10 @@
           {width}
           height={staticCodeBlockHeight - fontSizeRatio}
         >
-          <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">
-            <CodeBlock content={decodedValue} />
-          </div>
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={staticCodeBlockHeight - fontSizeRatio}
+          />
         </foreignObject>
 
         <!-- <Text  position="middle" {point} category="pending">
@@ -84,9 +86,10 @@
           {width}
           height={staticCodeBlockHeight - fontSizeRatio}
         >
-          <div class="overflow-auto" style="height: {staticCodeBlockHeight}px">
-            <CodeBlock content={decodedValue} />
-          </div>
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={staticCodeBlockHeight - fontSizeRatio}
+          />
         </foreignObject>
         <!-- <Text  position="middle" {point} category="pending"
           >{decodedValue}</Text

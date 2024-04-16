@@ -67,9 +67,8 @@
     getDistancePointsAndPositions(endTime, timelineWidth, y));
 
   const onClick = () => {
-    if (!readOnly) {
-      setActiveGroup(group);
-    }
+    if (readOnly) return;
+    setActiveGroup(group);
   };
 </script>
 

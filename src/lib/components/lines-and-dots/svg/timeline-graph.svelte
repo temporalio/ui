@@ -17,7 +17,6 @@
 
   export let x = 0;
   export let y = 0;
-  export let staticHeight = 0;
 
   export let workflow: WorkflowExecution;
   export let history: WorkflowEvents;
@@ -26,6 +25,7 @@
   export let activeGroups: string[] = [];
   export let zoomLevel: number = 1;
   export let canvasWidth: number;
+  export let readOnly = false;
 
   const { height, gutter, radius } = TimelineConfig;
 
@@ -47,8 +47,8 @@
   <svg
     {x}
     {y}
-    viewBox="0 0 {canvasWidth} {staticHeight || canvasHeight}"
-    height={(staticHeight || canvasHeight) / zoomLevel}
+    viewBox="0 0 {canvasWidth} {canvasHeight}"
+    height={canvasHeight / zoomLevel}
     width={canvasWidth}
   >
     <Line
@@ -82,7 +82,7 @@
           {canvasWidth}
           {startTime}
           {endTime}
-          readOnly={!!staticHeight}
+          {readOnly}
         />
       {/key}
       {#if activeGroups.includes(group.id)}

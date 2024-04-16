@@ -30,6 +30,7 @@
   export let activeGroups: string[] = [];
   export let zoomLevel: number = 1;
   export let canvasWidth: number;
+  export let readOnly = false;
 
   const { height, gutter, radius } = CompactConfig;
   let exandedGroups = [];
@@ -94,6 +95,7 @@
   };
 
   const onRowClick = (groups: EventGroups, startIndex: number, y: number) => {
+    if (readOnly) return;
     if (groups.length === 1) {
       setSingleActiveGroup(groups[0]);
       activeY = y;
@@ -115,6 +117,7 @@
   };
 
   const onEventClick = (group: EventGroup, startIndex: number, y: number) => {
+    if (readOnly) return;
     setSingleActiveGroup(group);
     setActiveGroupX(startIndex);
     activeY = y;
