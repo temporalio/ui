@@ -9,7 +9,7 @@ const config = {
   theme: {
     fontFamily: {
       primary: ['Inter Variable', ...fontFamily.sans],
-      secondary: ['Poppins', ...fontFamily.sans],
+      secondary: ['Inter', ...fontFamily.sans],
       mono: ['Noto Sans Mono', ...fontFamily.mono],
     },
     extend: {
