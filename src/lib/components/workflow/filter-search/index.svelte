@@ -24,7 +24,7 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
-  import { workflowFilters } from '$lib/stores/filters';
+  import { showChildWorkflows, workflowFilters } from '$lib/stores/filters';
   import { searchInputViewOpen } from '$lib/stores/filters';
   import { refresh } from '$lib/stores/workflows';
   import {
@@ -215,6 +215,16 @@
         {/if}
       </div>
     {/if}
+    <ToggleSwitch
+      data-testid="show-child-workflow-s-toggle"
+      label="Show Child Workflows"
+      labelPosition="left"
+      id="show-child-workflow-input"
+      bind:checked={$showChildWorkflows}
+      on:change={() => {
+        $showChildWorkflows = !$showChildWorkflows;
+      }}
+    />
     <ToggleSwitch
       data-testid="manual-search-toggle"
       label={translate('workflows.view-search-input')}

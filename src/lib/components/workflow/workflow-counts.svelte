@@ -6,6 +6,7 @@
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { workflowStatuses } from '$lib/models/workflow-status';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
+  import { queryWithParentWorkflowId } from '$lib/stores/filters';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { decodePayload } from '$lib/utilities/decode-payload';
@@ -15,7 +16,7 @@
 
   export let staticQuery = '';
   $: namespace = $page.params.namespace;
-  $: query = staticQuery || $page.url.searchParams.get('query');
+  $: query = staticQuery || $queryWithParentWorkflowId;
 
   let statusGroups: { status: WorkflowStatus; count: number }[] = [];
   let newStatusGroups: { status: WorkflowStatus; count: number }[] = [];

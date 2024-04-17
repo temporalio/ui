@@ -11,6 +11,7 @@ import { withLoading } from '$lib/utilities/stores/with-loading';
 
 import { supportsAdvancedVisibility } from './advanced-visibility';
 import { groupByCountEnabled } from './capability-enablement';
+import { queryWithParentWorkflowId } from './filters';
 
 export const refresh = writable(0);
 export const hideWorkflowQueryErrors = derived(
@@ -19,25 +20,24 @@ export const hideWorkflowQueryErrors = derived(
 );
 
 const namespace = derived([page], ([$page]) => $page.params.namespace);
-const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
 const parameters = derived(
   [
     namespace,
-    query,
+    queryWithParentWorkflowId,
     refresh,
     supportsAdvancedVisibility,
     hideWorkflowQueryErrors,
   ],
   ([
     $namespace,
-    $query,
+    $queryWithParentWorkflowId,
     $refresh,
     $supportsAdvancedVisibility,
     $hideWorkflowQueryErrors,
   ]) => {
     return {
       namespace: $namespace,
-      query: $query,
+      query: $queryWithParentWorkflowId,
       refresh: $refresh,
       supportsAdvancedVisibility: $supportsAdvancedVisibility,
       hideWorkflowQueryErrors: $hideWorkflowQueryErrors,

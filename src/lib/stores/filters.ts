@@ -7,8 +7,35 @@ import { allEventTypeOptions } from '$lib/models/event-history/get-event-categor
 import type { WorkflowFilter } from '$lib/models/workflow-filters';
 import { persistStore } from '$lib/stores/persist-store';
 import type { EventClassification, EventTypeCategory } from '$lib/types/events';
+import { minimumVersionRequired } from '$lib/utilities/version-check';
+
+import { isCloud } from './advanced-visibility';
+import { temporalVersion } from './versions';
 
 const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
+
+const parentWorkflowIdQuerySupported = derived(
+  [isCloud, temporalVersion],
+  ([$isCloud, $temporalVersion]) => {
+    return $isCloud || minimumVersionRequired('1.23', $temporalVersion);
+  },
+);
+
+export const showChildWorkflows = writable(true);
+
+export const queryWithParentWorkflowId = derived(
+  [query, parentWorkflowIdQuerySupported, showChildWorkflows],
+  ([$query, $parentWorkflowIdQuerySupported, $showChildWorkflows]) => {
+    if ($parentWorkflowIdQuerySupported && !$showChildWorkflows) {
+      if ($query) {
+        return `ParentWorkflowId is NULL AND ${$query}`;
+      }
+      return 'ParentWorkflowId is NULL';
+    }
+    return $query;
+  },
+);
+
 const category = derived([page], ([$page]) =>
   $page.url.searchParams.get('category'),
 );
