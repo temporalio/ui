@@ -58,6 +58,7 @@ export async function decodePayloadsWithCodec({
       }
     : {
         headers,
+        credentials: 'include',
         method: 'POST',
         body: stringifyWithBigInt(payloads),
       };
