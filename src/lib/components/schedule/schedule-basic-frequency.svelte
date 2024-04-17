@@ -10,12 +10,18 @@
 
 {#key [calendar, interval]}
   <div class="frequency {$$props.class}">
-    <code><pre>{stringifyWithBigInt(calendar || interval)}</pre></code>
+    <code
+      ><pre>{stringifyWithBigInt(
+          calendar || interval,
+          undefined,
+          2,
+        )}</pre></code
+    >
   </div>
 {/key}
 
 <style lang="postcss">
   .frequency {
-    @apply flex flex-col overflow-auto rounded-lg bg-inverse px-2 py-2 font-mono text-sm text-[#e9d5ff];
+    @apply flex h-auto max-h-32 flex-col overflow-auto rounded-lg bg-inverse px-2 py-2 font-mono text-sm text-[#e9d5ff];
   }
 </style>

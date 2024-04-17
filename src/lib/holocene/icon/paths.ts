@@ -1,5 +1,7 @@
+import activity from './svg/activity.svelte';
 import add from './svg/add.svelte';
 import archives from './svg/archives.svelte';
+import arrowDown from './svg/arrow-down.svelte';
 import arrowLeft from './svg/arrow-left.svelte';
 import arrowRight from './svg/arrow-right.svelte';
 import arrowUp from './svg/arrow-up.svelte';
@@ -32,6 +34,7 @@ import error from './svg/error.svelte';
 import exit from './svg/exit.svelte';
 import eyeHide from './svg/eye-hide.svelte';
 import eyeShow from './svg/eye-show.svelte';
+import feather from './svg/feather.svelte';
 import feed from './svg/feed.svelte';
 import feedbackCircle from './svg/feedback-circle.svelte';
 import feedback from './svg/feedback.svelte';
@@ -52,7 +55,9 @@ import lightningBolt from './svg/lightning-bolt.svelte';
 import link from './svg/link.svelte';
 import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
+import marker from './svg/marker.svelte';
 import merge from './svg/merge.svelte';
+import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
 import pinFilled from './svg/pin-filled.svelte';
@@ -66,12 +71,14 @@ import rocketShip from './svg/rocket-ship.svelte';
 import schedules from './svg/schedules.svelte';
 import search from './svg/search.svelte';
 import settings from './svg/settings.svelte';
+import signal from './svg/signal.svelte';
 import sliders from './svg/sliders.svelte';
 import spinnerSolid from './svg/spinner-solid.svelte';
 import spinner from './svg/spinner.svelte';
 import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
+import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
 import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
@@ -81,17 +88,18 @@ import transcoderOff from './svg/transcoder-off.svelte';
 import transcoderOn from './svg/transcoder-on.svelte';
 import trash from './svg/trash.svelte';
 import tutorial from './svg/tutorial.svelte';
+import update from './svg/update.svelte';
 import upload from './svg/upload.svelte';
 import usage from './svg/usage.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
 import warning from './svg/warning.svelte';
 import workflow from './svg/workflow.svelte';
 
-export type IconName = keyof typeof icons;
-
 export const icons = {
+  activity,
   add,
   archives,
+  'arrow-down': arrowDown,
   'arrow-left': arrowLeft,
   'arrow-up': arrowUp,
   'arrow-right': arrowRight,
@@ -124,6 +132,7 @@ export const icons = {
   exit,
   'eye-hide': eyeHide,
   'eye-show': eyeShow,
+  feather,
   feed,
   'feedback-circle': feedbackCircle,
   feedback,
@@ -144,7 +153,9 @@ export const icons = {
   link,
   lock,
   logout,
+  marker,
   merge,
+  moon,
   'namespace-switcher': namespaceSwitcher,
   namespace,
   'pin-filled': pinFilled,
@@ -158,10 +169,12 @@ export const icons = {
   schedules,
   search,
   settings,
+  signal,
   sliders,
   spinner,
   'star-empty': starEmpty,
   'star-filled': starFilled,
+  sun,
   summary,
   support,
   'spinner-solid': spinnerSolid,
@@ -173,11 +186,14 @@ export const icons = {
   'transcoder-off': transcoderOff,
   trash,
   tutorial,
+  update,
   upload,
   usage,
   'vertical-ellipsis': verticalEllipsis,
   warning,
   workflow,
 } as const;
+
+export type IconName = keyof typeof icons;
 
 export const iconNames = Object.keys(icons);

@@ -6,6 +6,7 @@ import { has } from './has';
 
 type Space = ' ';
 type Quote = "'" | '"';
+type Backtick = '`';
 type Operator = (typeof operators)[number];
 type Conditional = (typeof conditionals)[number];
 type Parenthesis = (typeof parenthesis)[number];
@@ -40,6 +41,7 @@ const operators = [
   'in',
   '(',
   ')',
+  'starts_with',
 ] as const;
 
 const conditionals = [
@@ -53,6 +55,7 @@ const conditionals = [
   '>',
   '<',
   '!',
+  'starts_with',
 ] as const;
 
 const joins = ['and', 'or'] as const;
@@ -93,6 +96,10 @@ export const isQuote = (x: unknown): x is Quote => {
   if (x === "'") return true;
   if (x === '"') return true;
   return false;
+};
+
+export const isBacktick = (x: unknown): x is Backtick => {
+  return x === '`';
 };
 
 export const isOperator = (x: unknown): x is Operator => {
@@ -156,4 +163,9 @@ export const isSortOrder = (
 
 export const isError = (e: unknown): e is Error => {
   return has(e, 'name', 'message');
+};
+
+export const isStartsWith = (x: unknown) => {
+  if (!isString(x)) return false;
+  return x.toLocaleLowerCase() === 'starts_with';
 };

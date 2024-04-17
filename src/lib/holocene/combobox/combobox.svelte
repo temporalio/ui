@@ -9,8 +9,8 @@
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
 
+  import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
-  import type { IconName } from '../icon/paths';
 
   type T = $$Generic;
 
@@ -190,8 +190,8 @@
   };
 
   const handleSelectOption = (option: string | T) => {
-    dispatch('change', { value: option });
     setValue(option);
+    dispatch('change', { value: option });
     resetValueAndOptions();
   };
 

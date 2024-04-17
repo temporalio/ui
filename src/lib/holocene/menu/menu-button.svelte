@@ -106,7 +106,7 @@
   aria-controls={controls}
   aria-expanded={$open}
   aria-label={label}
-  class={merge('menu-button', variant, className)}
+  class={merge('menu-button px-4', variant, className)}
   class:unroundLeft
   class:unroundRight
   class:active
@@ -138,7 +138,7 @@
 
 <style lang="postcss">
   .menu-button {
-    @apply relative flex h-10 w-full flex-row items-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors transition-shadow focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed;
+    @apply relative flex h-10 w-full flex-row items-center gap-2 rounded-lg border py-2.5 text-sm transition-colors transition-shadow focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed;
 
     &.active {
       @apply after:h-2 after:w-2 after:-translate-x-full after:-translate-y-full after:rounded-full after:bg-blue-300 after:content-[''];
@@ -174,7 +174,7 @@
   }
 
   .table-header {
-    @apply h-auto max-w-fit border-2 border-transparent bg-primary p-0 text-sm text-white focus-visible:border-white;
+    @apply h-auto max-w-fit border-2 border-transparent p-0 text-sm text-white focus-visible:border-white;
   }
 
   .unround {

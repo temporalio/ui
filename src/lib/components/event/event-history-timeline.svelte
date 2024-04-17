@@ -1,4 +1,5 @@
 <script lang="ts">
+  import sanitizeHtml from 'sanitize-html';
   import { onMount } from 'svelte';
   import {
     type DataGroup,
@@ -10,8 +11,8 @@
   import { page } from '$app/stores';
 
   import HeartBeat from '$lib/components/heart-beat-indicator.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
@@ -21,6 +22,7 @@
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
+  import { getUTCOffset, timeFormat } from '$lib/stores/time-format';
   import {
     workflowRun,
     workflowTimelineViewOpen,
@@ -67,7 +69,7 @@
 
     const link = renderComponentToHTML(Link, {
       href,
-      text: groupName,
+      text: sanitizeHtml(groupName),
       class: 'flex gap-2 items-center',
     });
     return link;
@@ -81,7 +83,9 @@
     const retryIcon = renderComponentToHTML(Icon, {
       name: 'retry',
     });
-    return `<div class="flex gap-1 items-center"><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div><div class="bar-content"><p>${name}</p></div></div>`;
+    return `<div class="flex gap-1 items-center"><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div><div class="bar-content"><p>${sanitizeHtml(
+      name,
+    )}</p></div></div>`;
   }
 
   function getIconName(classification: EventClassification): IconName | null {
@@ -184,7 +188,7 @@
           start: initialEvent.eventTime,
           end: Date.now(),
           content: renderPendingAttempts(
-            group.name,
+            sanitizeHtml(group.name),
             groupPendingActivity.attempt,
           ),
           className: `${lastEvent.category} ${lastEvent.classification}`,
@@ -201,8 +205,8 @@
           data: group,
           content:
             group.eventList.length === 1
-              ? singleEventName
-              : `<div class="bar-content">${group.name}${getIcon(
+              ? sanitizeHtml(String(singleEventName))
+              : `<div class="bar-content">${sanitizeHtml(group.name)}${getIcon(
                   lastEvent.classification,
                 )}</div>`,
           end: lastEvent.eventTime,
@@ -248,7 +252,10 @@
       visualizationRef,
       new DataSet([]),
       new DataSet([]),
-      getTimelineOptions($workflowRun.workflow, { maxHeight }),
+      getTimelineOptions($workflowRun.workflow, {
+        maxHeight,
+        offset: getUTCOffset($timeFormat),
+      }),
     );
     filterAndSetItems($eventCategoryFilter);
   };
@@ -274,7 +281,8 @@
     $workflowTimelineViewOpen &&
     $workflowRun.workflow &&
     history.length &&
-    visualizationRef;
+    visualizationRef &&
+    $timeFormat;
 
   const drawTimeline = () => {
     if (timeline) {
@@ -325,7 +333,7 @@
   }
 
   :global(.vis-label) {
-    font-family: Poppins, sans-serif;
+    font-family: Inter, sans-serif;
     font-size: 12px;
     display: flex;
     align-items: center;
@@ -350,13 +358,11 @@
   }
 
   :global(.vis-content, .vis-group) {
-    background-color: white;
+    @apply surface-primary;
   }
 
   :global(.vis-timeline .vis-item) {
-    background-color: #fff;
     border-color: transparent;
-    color: #3f3f46;
     font-size: 12px;
   }
 

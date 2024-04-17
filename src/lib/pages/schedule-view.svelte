@@ -1,17 +1,22 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
+  import { addDays, addHours, startOfDay } from 'date-fns';
+
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
+  import ScheduleInput from '$lib/components/schedule/schedule-input.svelte';
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import DatePicker from '$lib/holocene/date-picker.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
@@ -19,17 +24,19 @@
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
+  import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import {
+    backfillRequest,
     deleteSchedule,
     fetchSchedule,
     pauseSchedule,
     triggerImmediately,
     unpauseSchedule,
   } from '$lib/services/schedule-service';
+  import { groupByCountEnabled } from '$lib/stores/capability-enablement';
   import { coreUserStore } from '$lib/stores/core-user';
-  import { groupByCountEnabled } from '$lib/stores/group-by-enabled';
   import { loading } from '$lib/stores/schedules';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { refresh, workflowCount } from '$lib/stores/workflows';
@@ -57,10 +64,11 @@
 
   let pauseConfirmationModalOpen = false;
   let triggerConfirmationModalOpen = false;
+  let backfillConfirmationModalOpen = false;
   let deleteConfirmationModalOpen = false;
   let reason = '';
   let error = '';
-  let triggerLoading = false;
+  let scheduleUpdating = false;
   let overlapPolicy = writable<OverlapPolicy>('Unspecified');
   let policies: { label: string; description: string; value: OverlapPolicy }[] =
     [
@@ -68,6 +76,11 @@
         description: translate('schedules.trigger-unspecified-description'),
         label: translate('schedules.trigger-unspecified-title'),
         value: 'Unspecified',
+      },
+      {
+        description: translate('schedules.trigger-buffer-all-description'),
+        label: translate('schedules.trigger-buffer-all-title'),
+        value: 'BufferAll',
       },
       {
         description: translate('schedules.trigger-allow-all-description'),
@@ -83,11 +96,6 @@
         description: translate('schedules.trigger-buffer-one-description'),
         label: translate('schedules.trigger-buffer-one-title'),
         value: 'BufferOne',
-      },
-      {
-        description: translate('schedules.trigger-buffer-all-description'),
-        label: translate('schedules.trigger-buffer-all-title'),
-        value: 'BufferAll',
       },
       {
         description: translate('schedules.trigger-cancel-other-description'),
@@ -141,8 +149,13 @@
     pauseConfirmationModalOpen = false;
   };
 
+  const closeTriggerModal = () => {
+    triggerConfirmationModalOpen = false;
+    $overlapPolicy = 'Unspecified';
+  };
+
   const handleTriggerImmediately = async () => {
-    triggerLoading = true;
+    scheduleUpdating = true;
     await triggerImmediately({
       namespace,
       scheduleId,
@@ -150,8 +163,97 @@
     });
     setTimeout(() => {
       scheduleFetch = fetchSchedule(parameters);
-      triggerConfirmationModalOpen = false;
-      triggerLoading = false;
+      closeTriggerModal();
+      scheduleUpdating = false;
+    }, 1000);
+  };
+
+  let viewMoreBackfillOptions = false;
+  let startDate = startOfDay(new Date());
+  let endDate = startOfDay(new Date());
+
+  let startHour = '';
+  let startMinute = '';
+  let startSecond = '';
+  let endHour = '';
+  let endMinute = '';
+  let endSecond = '';
+
+  const onStartDateChange = (d: CustomEvent) => {
+    startDate = startOfDay(d.detail);
+  };
+
+  const onEndDateChange = (d: CustomEvent) => {
+    endDate = startOfDay(d.detail);
+  };
+
+  const updateDefaultBackfillTimes = () => {
+    const currentDate = new Date(Date.now());
+    const dateAnHourAhead = addHours(currentDate, 1);
+
+    startHour = currentDate.getUTCHours().toString();
+    startMinute = currentDate.getUTCMinutes().toString();
+    startSecond = currentDate.getUTCSeconds().toString();
+    endHour = dateAnHourAhead.getUTCHours().toString();
+    endMinute = dateAnHourAhead.getUTCMinutes().toString();
+    endSecond = dateAnHourAhead.getUTCSeconds().toString();
+
+    startDate = startOfDay(new Date());
+    endDate =
+      endHour < startHour
+        ? startOfDay(addDays(new Date(), 1))
+        : startOfDay(new Date());
+  };
+
+  $: backfillConfirmationModalOpen && updateDefaultBackfillTimes();
+
+  const applyTimeSelection = (): {
+    startTime: string;
+    endTime: string;
+  } => {
+    const startTimeUTC = Date.UTC(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDay(),
+      Number(startHour),
+      Number(startMinute),
+      Number(startSecond),
+    );
+    const startTime = new Date(startTimeUTC).toISOString();
+    const endTimeUTC = Date.UTC(
+      endDate.getFullYear(),
+      endDate.getMonth(),
+      endDate.getDay(),
+      Number(endHour),
+      Number(endMinute),
+      Number(endSecond),
+    );
+    const endTime = new Date(endTimeUTC).toISOString();
+
+    return { startTime, endTime };
+  };
+
+  const closeBackfillModal = () => {
+    backfillConfirmationModalOpen = false;
+    viewMoreBackfillOptions = false;
+    $overlapPolicy = 'Unspecified';
+  };
+
+  const handleBackfill = async () => {
+    scheduleUpdating = true;
+    const { startTime, endTime } = applyTimeSelection();
+
+    await backfillRequest({
+      namespace,
+      scheduleId,
+      overlapPolicy: $overlapPolicy,
+      startTime,
+      endTime,
+    });
+    setTimeout(() => {
+      scheduleFetch = fetchSchedule(parameters);
+      closeBackfillModal();
+      scheduleUpdating = false;
     }, 1000);
   };
 
@@ -235,6 +337,12 @@
           {translate('schedules.trigger')}
         </MenuItem>
         <MenuItem
+          data-testid="backfill-schedule"
+          on:click={() => (backfillConfirmationModalOpen = true)}
+        >
+          {translate('schedules.backfill')}
+        </MenuItem>
+        <MenuItem
           data-testid="edit-schedule"
           href={routeForScheduleEdit({ namespace, scheduleId })}
         >
@@ -299,7 +407,10 @@
             notes={schedule?.schedule?.state?.notes}
           />
         </div>
-        <div class="w-full xl:w-1/3">
+        <div class="flex w-full flex-col gap-4 xl:w-1/3">
+          <ScheduleInput
+            input={schedule?.schedule?.action?.startWorkflow?.input}
+          />
           <ScheduleFrequencyPanel
             calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
             interval={schedule?.schedule?.spec?.interval?.[0]}
@@ -354,9 +465,9 @@
       confirmType="primary"
       confirmText={translate('schedules.trigger')}
       cancelText={translate('common.cancel')}
-      loading={triggerLoading}
+      loading={scheduleUpdating}
       on:confirmModal={() => handleTriggerImmediately()}
-      on:cancelModal={() => (triggerConfirmationModalOpen = false)}
+      on:cancelModal={closeTriggerModal}
     >
       <h3 slot="title">
         {translate('schedules.trigger-modal-title')}
@@ -376,6 +487,92 @@
             />
           {/each}
         </RadioGroup>
+      </div>
+    </Modal>
+    <Modal
+      id="backfill-schedule-modal"
+      large
+      bind:open={backfillConfirmationModalOpen}
+      confirmType="primary"
+      confirmText={translate('schedules.schedule')}
+      cancelText={translate('common.cancel')}
+      loading={scheduleUpdating}
+      on:confirmModal={() => handleBackfill()}
+      on:cancelModal={closeBackfillModal}
+    >
+      <h3 slot="title">
+        {translate('schedules.schedule')}
+        {translate('schedules.backfill')}
+      </h3>
+      <div slot="content" class="p-0">
+        <div class="flex flex-col gap-2 p-2">
+          <DatePicker
+            label={translate('common.start')}
+            on:datechange={onStartDateChange}
+            selected={startDate}
+            todayLabel={translate('common.today')}
+            closeLabel={translate('common.close')}
+            clearLabel={translate('common.clear-input-button-label')}
+          />
+          <TimePicker
+            bind:hour={startHour}
+            bind:minute={startMinute}
+            bind:second={startSecond}
+            twelveHourClock={false}
+          />
+          <DatePicker
+            label={translate('common.end')}
+            on:datechange={onEndDateChange}
+            selected={endDate}
+            todayLabel={translate('common.today')}
+            closeLabel={translate('common.close')}
+            clearLabel={translate('common.clear-input-button-label')}
+          />
+          <TimePicker
+            bind:hour={endHour}
+            bind:minute={endMinute}
+            bind:second={endSecond}
+            twelveHourClock={false}
+          />
+          <div class="flex w-full flex-row items-center gap-2">
+            <Icon name="clock" aria-hidden="true" />
+            <span class="text-xs font-normal text-slate-500"
+              >{translate('common.based-on-time-preface')} Universal Standard Time
+              (UTC)
+            </span>
+          </div>
+        </div>
+
+        <hr
+          tabindex="-1"
+          aria-hidden="true"
+          class="my-4 w-full border-subtle"
+        />
+
+        <div class="flex max-h-52 flex-col gap-2 overflow-auto">
+          <RadioGroup
+            group={overlapPolicy}
+            name="backfill-event-id"
+            class="h-auto overflow-auto"
+          >
+            {#each policies.slice(0, viewMoreBackfillOptions ? policies.length : 3) as policy}
+              <RadioInput
+                id={policy.value}
+                value={policy.value}
+                label={policy.label}
+                description={policy.description}
+              />
+            {/each}
+          </RadioGroup>
+          {#if !viewMoreBackfillOptions}
+            <Button
+              variant="ghost"
+              size="xs"
+              on:click={() => (viewMoreBackfillOptions = true)}
+              >{translate('schedules.more-options')}</Button
+            >
+          {/if}
+        </div>
       </div>
     </Modal>
     <Modal

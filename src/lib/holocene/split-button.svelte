@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
 
   export let label: string;
@@ -30,7 +30,7 @@
       {label}
     </Button>
     <MenuButton
-      class="max-w-fit grow-0"
+      class="max-w-fit grow-0 px-1"
       id="{id}-menu-button"
       label={menuLabel}
       controls="{id}-menu"

@@ -12,7 +12,7 @@
 </script>
 
 <Panel>
-  <h2 class="mb-4 text-2xl">{translate('schedules.schedule-spec')}</h2>
+  <h2 class="mb-4 text-lg">{translate('schedules.schedule-spec')}</h2>
   <div class="pr-2">
     <ScheduleFrequency {calendar} {interval} class="text-base" />
   </div>

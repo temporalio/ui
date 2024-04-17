@@ -10,8 +10,8 @@
   import { goto } from '$app/navigation';
 
   import Badge from '$lib/holocene/badge.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
 
   const buttonStyles = cva(
     [
@@ -34,15 +34,15 @@
       variants: {
         variant: {
           primary:
-            'bg-interactive border-interactive text-white hover:text-white hover:bg-interactive-hover hover:border-interactive-hover focus-visible:bg-interactive-hover focus-visible:border-white dark:focus-visible:border-black focus-visible:shadow-primary ',
+            'bg-interactive border-interactive text-white hover:text-white hover:bg-interactive-hover hover:border-interactive-hover focus-visible:bg-interactive-hover focus-visible:border-white dark:focus-visible:border-black focus-visible:shadow-focus focus-visible:shadow-primary/70',
           secondary:
-            'border-secondary text-primary focus-visible:shadow-secondary hover:surface-interactive-secondary hover:border-interactive-secondary dark:hover:border-transparent focus-visible:surface-interactive-secondary focus-visible:border-white dark:focus-visible:border-black',
+            'border-secondary text-primary focus-visible:shadow-focus focus-visible:shadow-primary/70 hover:surface-interactive-secondary hover:border-interactive-secondary dark:hover:border-transparent focus-visible:surface-interactive-secondary focus-visible:border-white dark:focus-visible:border-black',
           destructive:
-            'border-danger bg-danger  hover:bg-red-400 hover:border-red-400 focus-visible:shadow-focus dark:focus-visible:shadow-red-600/30 focus-visible:shadow-red-200/50 focus-visible:border-white dark:focus-visible:border-red-400/50 dark:focus-visible:bg-red-400',
+            'border-danger bg-danger text-primary hover:bg-red-400 hover:border-red-400 focus-visible:shadow-focus focus-visible:shadow-danger/50 focus-visible:border-white dark:focus-visible:border-red-400/50 dark:focus-visible:bg-red-400',
           ghost:
-            'border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:border-white dark:hover:border-black dark:focus-visible:border-black focus-visible:shadow-primary focus-visible:surface-interactive-secondary ',
+            'border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:border-white dark:hover:border-black dark:focus-visible:border-black focus-visible:shadow-focus focus-visible:shadow-secondary/70 focus-visible:surface-interactive-secondary ',
           'table-header':
-            ' bg-inverse text-white focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:border-white',
+            'border-inverse surface-inverse hover:surface-primary focus-visible:shadow-focus focus-visible:shadow-primary/50 focus-visible:border-white',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',
@@ -189,3 +189,9 @@
     {/if}
   </button>
 {/if}
+
+<style lang="postcss">
+  .active {
+    @apply bg-interactive text-white;
+  }
+</style>

@@ -36,7 +36,7 @@ export function formatDuration(
   delimiter = ', ',
 ): string {
   if (duration === null || !duration) return '';
-  if (typeof duration === 'string') duration = fromSeconds(duration);
+  if (typeof duration === 'string') return fromSeconds(duration, { delimiter });
   return durationToString(duration, { delimiter });
 }
 
@@ -50,6 +50,9 @@ export function formatDurationAbbreviated(
 function formatDistanceToSingleLetters(distance: string) {
   if (!distance) return '';
   distance = distance
+    .replace(/milliseconds/g, 'ms')
+    .replace(/millisecond/g, 'ms')
+    .replace(/ ms/g, 'ms')
     .replace(/seconds/g, 'second')
     .replace(/second/g, 's')
     .replace(/ s/g, 's')
@@ -103,9 +106,11 @@ export function getDuration({
 export function getMillisecondDuration({
   start,
   end,
+  onlyUnderSecond = true,
 }: {
   start: ValidTime | undefined | null;
   end: ValidTime | undefined | null;
+  onlyUnderSecond?: boolean;
 }): number | null {
   if (!start || !end) return null;
 
@@ -121,7 +126,7 @@ export function getMillisecondDuration({
     const parsedStart = parseJSON(start);
     const parsedEnd = parseJSON(end);
     const ms = parsedEnd.getTime() - parsedStart.getTime();
-    return Math.abs(ms % 1000);
+    return onlyUnderSecond ? Math.abs(ms % 1000) : Math.abs(ms);
   } catch {
     return null;
   }

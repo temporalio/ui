@@ -26,7 +26,7 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="bulk-terminate-button"]');
       await page
-        .getByTestId('batch-Terminate-confirmation')
+        .getByTestId('batch-terminate-confirmation')
         .getByTestId('confirm-modal-button')
         .click();
       await expect(
@@ -37,21 +37,24 @@ test.describe('Batch and Bulk Workflow Actions', () => {
     test('allows running workflows to be terminated by a query', async ({
       page,
     }) => {
+      await page.getByTestId('manual-search-toggle').click();
+      await page.locator('#manual-search').fill('ExecutionStatus="Running"');
+      await page.getByTestId('manual-search-button').click();
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="select-all-workflows"]');
       await page.click('[data-testid="bulk-terminate-button"]');
       const batchActionWorkflowsQuery = page
-        .getByTestId('batch-Terminate-confirmation')
+        .getByTestId('batch-terminate-confirmation')
         .getByTestId('batch-action-workflows-query');
       await expect(batchActionWorkflowsQuery).toHaveText(
         'ExecutionStatus="Running"',
       );
       await page.fill(
-        '[data-testid="batch-Terminate-confirmation"] #bulk-action-reason-2',
+        '[data-testid="batch-terminate-confirmation"] #bulk-action-reason-2',
         'Sarah Connor',
       );
       await page
-        .getByTestId('batch-Terminate-confirmation')
+        .getByTestId('batch-terminate-confirmation')
         .getByTestId('confirm-modal-button')
         .click();
       await expect(
@@ -65,7 +68,7 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="bulk-cancel-button"]');
       await page
-        .getByTestId('batch-Cancel-confirmation')
+        .getByTestId('batch-cancel-confirmation')
         .getByTestId('confirm-modal-button')
         .click();
       await expect(page.locator('#batch-cancel-success-toast')).toBeVisible();
@@ -74,21 +77,24 @@ test.describe('Batch and Bulk Workflow Actions', () => {
     test('allows running workflows to be cancelled by a query', async ({
       page,
     }) => {
+      await page.getByTestId('manual-search-toggle').click();
+      await page.locator('#manual-search').fill('ExecutionStatus="Running"');
+      await page.getByTestId('manual-search-button').click();
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="select-all-workflows"]');
       await page.click('[data-testid="bulk-cancel-button"]');
       const batchActionWorkflowsQuery = page
-        .getByTestId('batch-Cancel-confirmation')
+        .getByTestId('batch-cancel-confirmation')
         .getByTestId('batch-action-workflows-query');
       await expect(batchActionWorkflowsQuery).toHaveText(
         'ExecutionStatus="Running"',
       );
       await page.fill(
-        '[data-testid="batch-Cancel-confirmation"] #bulk-action-reason-0',
+        '[data-testid="batch-cancel-confirmation"] #bulk-action-reason-0',
         'Sarah Connor',
       );
       await page
-        .getByTestId('batch-Cancel-confirmation')
+        .getByTestId('batch-cancel-confirmation')
         .getByTestId('confirm-modal-button')
         .click();
       await expect(page.locator('#batch-cancel-success-toast')).toBeVisible();
@@ -108,20 +114,20 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await page.getByTestId('bulk-cancel-button').click();
 
       const cancelQueryValue = await page
-        .getByTestId('batch-Cancel-confirmation')
+        .getByTestId('batch-cancel-confirmation')
         .getByTestId('batch-action-workflows-query')
         .innerText();
 
       expect(cancelQueryValue).toBe('WorkflowId="test"');
 
       await page
-        .getByTestId('batch-Cancel-confirmation')
+        .getByTestId('batch-cancel-confirmation')
         .getByLabel('Cancel')
         .click();
       await page.getByTestId('bulk-terminate-button').click();
 
       const terminateQueryValue = await page
-        .getByTestId('batch-Terminate-confirmation')
+        .getByTestId('batch-terminate-confirmation')
         .getByTestId('batch-action-workflows-query')
         .innerText();
 

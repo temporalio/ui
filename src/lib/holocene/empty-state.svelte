@@ -1,6 +1,6 @@
 <script lang="ts">
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
 
   export let title: string;
   export let content = '';
@@ -9,11 +9,11 @@
 </script>
 
 <div
-  class="my-12 flex flex-col items-center justify-start gap-2 {$$props.class}"
+  class="my-12 flex flex-col items-center justify-start gap-2 text-primary {$$props.class}"
   data-testid={$$props.testId}
 >
   <span
-    class="flex h-16 w-16 items-center justify-center rounded-full bg-slate-200"
+    class="surface-interactive-secondary flex h-16 w-16 items-center justify-center rounded-full"
   >
     <Icon name={icon} class="block h-full w-full" /></span
   >
@@ -22,9 +22,7 @@
     <p class="text-center">{content}</p>
   {/if}
   {#if error}
-    <p
-      class="rounded-md border-2 border-orange-500 bg-orange-100 p-5 text-center"
-    >
+    <p class="rounded-md border-2 border-error bg-error p-5 text-center">
       {error}
     </p>
   {/if}

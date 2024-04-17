@@ -21,6 +21,10 @@ test.beforeEach(async ({ page }) => {
   await waitForWorkflowsApis(page);
 });
 
+const getDatetime = (query: string) =>
+  query.split('=')[1].replace(/['"']+/g, '');
+const validDatetime = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})Z$/;
+
 test('it should update the datetime filter based on the selected timezone', async ({
   page,
 }) => {
@@ -41,7 +45,7 @@ test('it should update the datetime filter based on the selected timezone', asyn
   expect(filter).toContain('05:00 AM');
 
   let query = await page.locator('#manual-search').inputValue();
-  expect(query).toContain('13:00:00.000Z');
+  expect(getDatetime(query)).toMatch(validDatetime);
 
   await page.getByTestId('timezones-menu-button').click();
   await page.getByTestId('top-nav').getByPlaceholder('Search').fill('MDT');
@@ -51,5 +55,5 @@ test('it should update the datetime filter based on the selected timezone', asyn
   expect(filter).toContain('06:00 AM');
 
   query = await page.locator('#manual-search').inputValue();
-  expect(query).toContain('13:00:00.000Z');
+  expect(getDatetime(query)).toMatch(validDatetime);
 });

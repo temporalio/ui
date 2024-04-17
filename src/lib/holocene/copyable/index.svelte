@@ -18,7 +18,7 @@
 
 {#if clickAllToCopy}
   <button
-    class="group flex items-center gap-1 {$$props['container-class']}"
+    class="group flex items-center gap-1 break-all {$$props['container-class']}"
     on:click={handleOnClick}
   >
     <slot>

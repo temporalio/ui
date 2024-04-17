@@ -13,6 +13,7 @@
 
   export let content: string;
   export let title: string;
+  export let running = false;
 
   $: parsedContent = parseContent(content);
   $: payloads = getPayloads(parsedContent);
@@ -46,7 +47,7 @@
   };
 </script>
 
-<article class="flex w-full flex-col lg:w-1/2" {...$$restProps}>
+<article class="flex w-full flex-col" {...$$restProps}>
   <h3 class="mb-2 flex items-center gap-2 text-lg">
     {title}
     {#if showParsedContentCount}
@@ -54,8 +55,8 @@
     {/if}
   </h3>
   {#if content}
-    <div class="flex h-full flex-col overflow-scroll lg:max-h-[24rem]">
-      {#if showParsedContent}
+    {#if showParsedContent}
+      <div class="max-h-96 overflow-auto p-1">
         <PayloadDecoder value={parsedContent} key="payloads" let:decodedValue>
           {#each parsePayloads(decodedValue) as decodedContent}
             <CodeBlock
@@ -66,22 +67,24 @@
             />
           {/each}
         </PayloadDecoder>
-      {:else}
-        <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
-          <CodeBlock
-            content={decodedValue}
-            class="mb-2 lg:max-h-[23.5rem]"
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        </PayloadDecoder>
-      {/if}
-    </div>
+      </div>
+    {:else}
+      <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
+        <CodeBlock
+          content={decodedValue}
+          class="mb-2 pt-1"
+          maxHeight={384}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+      </PayloadDecoder>
+    {/if}
   {:else}
     <CodeBlock
-      content="Results will appear upon completion."
+      content={running ? 'Results will appear upon completion.' : ''}
       language="text"
-      class="mb-2 lg:max-h-[24rem]"
+      class="mb-2 pt-1"
+      maxHeight={384}
       copyable={false}
     />
   {/if}

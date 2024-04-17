@@ -55,6 +55,46 @@ export const shouldDisplayAttribute = (
   return true;
 };
 
+export const pendingActivityKeys = [
+  'attempt',
+  'maximumAttempts',
+  'heartbeatDetails',
+  'lastHeartbeatTime',
+  'lastFailure',
+  'lastStartedTime',
+  'scheduledTime',
+  'expirationTime',
+  'lastWorkerIdentity',
+];
+
+export const shouldDisplayPendingAttribute = (key: string): key is string => {
+  return pendingActivityKeys.includes(key);
+};
+
+export const shouldDisplayGroupAttribute = (
+  key: string,
+  value: unknown,
+): key is string => {
+  if (value === null) return false;
+  if (value === undefined) return false;
+  if (value === '') return false;
+  if (value === '0s') return false;
+  if (key === 'type') return false;
+  if (key === 'workflowId') return false;
+  if (key === 'initiatedEventId') return false;
+  if (key === 'startedEventId') return false;
+  if (key === 'scheduledEventId') return false;
+  if (key === 'activityId') return false;
+  if (key === 'namespace') return false;
+  if (key === 'namespaceId') return false;
+  if (key === 'workflowTaskCompletedEventId') return false;
+  if (key === 'taskQueueKind') return false;
+
+  if ((!value || value === '0') && keysToOmitIfNoValue.has(key)) return false;
+
+  return true;
+};
+
 export const shouldDisplayNestedAttribute = (value: unknown): boolean => {
   if (value === null) return false;
   if (value === undefined) return false;
@@ -141,6 +181,9 @@ export const shouldDisplayChildWorkflowLink = (
 const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
   if (typeof value === 'object') {
     const [firstKey] = Object.keys(value);
+    if (!firstKey) {
+      return { key, value: {} };
+    }
     if (firstKey === 'payloads') {
       return { key, value };
     }
@@ -211,8 +254,9 @@ export const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
 
   for (const [key, value] of Object.entries(event.attributes)) {
     for (const preferredKey of preferredSummaryKeys) {
-      if (key === preferredKey && shouldDisplayAttribute(key, value))
+      if (key === preferredKey && shouldDisplayAttribute(key, value)) {
         return formatSummaryValue(key, value);
+      }
     }
   }
 

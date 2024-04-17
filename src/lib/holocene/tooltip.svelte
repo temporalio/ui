@@ -2,8 +2,8 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Copyable from '$lib/holocene/copyable/index.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import type { Only } from '$lib/types/global';
 
   type BaseProps = {

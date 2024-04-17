@@ -922,5 +922,30 @@
         }
       }
     }
+  },
+  "WorkflowExecutionUpdateRequested": {
+    "eventId": "14",
+    "eventTime": "2023-09-11T13:29:00.588642Z",
+    "eventType": "WorkflowExecutionUpdateRequested",
+    "name": "WorkflowExecutionUpdateRequested",
+    "id": "14",
+    "timestamp": "2023-09-11 UTC 13:29:00.58",
+    "classification": "Completed",
+    "category": "update",
+    "attributes": {
+      "type": "workflowExecutionUpdateRequestedEventAttributes",
+      "origin": "UPDATE_REQUESTED_EVENT_ORIGIN_REAPPLY",
+      "request": {
+        "meta": {
+          "updateId": "31440fef-27ba-4393-bb59-debabc23b77d",
+          "identity": "29187@MacBook-Pro.local@"
+        },
+        "input": {
+          "header": {
+            "fields": {}
+          }
+        }
+      }
+    }
   }
 }

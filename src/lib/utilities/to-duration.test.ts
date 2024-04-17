@@ -342,28 +342,59 @@ describe('toString', () => {
 });
 
 describe('fromSeconds', () => {
-  it('should return undefined if given invalid input', () => {
-    expect(fromSeconds('lolol')).toBeUndefined();
+  it('should return an empty string given a string that does not end in seconds', () => {
+    expect(fromSeconds('3600m')).toEqual('');
   });
 
-  it('should return undefined given a string that does not end in seconds', () => {
-    expect(fromSeconds('3600m')).toBeUndefined();
+  it('should correctly format milliseconds', () => {
+    expect(fromSeconds('0.001s')).toEqual('1 millisecond');
+    expect(fromSeconds('0.006s')).toEqual('6 milliseconds');
+    expect(fromSeconds('0.06s')).toEqual('60 milliseconds');
+    expect(fromSeconds('0.0006s')).toEqual('0.6 milliseconds');
+    expect(fromSeconds('0.00006s')).toEqual('0.06 milliseconds');
+    expect(fromSeconds('0.000000001s')).toEqual('0.000001 milliseconds');
+    expect(fromSeconds('0.000000006s')).toEqual('0.000006 milliseconds');
   });
 
-  it('should correctly parse minutes', () => {
-    expect(fromSeconds('60s')).toMatchObject({ minutes: 1 });
+  it('should correctly format seconds', () => {
+    expect(fromSeconds('0s')).toEqual('');
+    expect(fromSeconds('1s')).toEqual('1 second');
+    expect(fromSeconds('6s')).toEqual('6 seconds');
+    expect(fromSeconds('6.00s')).toEqual('6 seconds');
+    expect(fromSeconds('0.00s')).toEqual('');
   });
 
-  it('should correctly parse hours', () => {
-    expect(fromSeconds('3600s')).toMatchObject({ hours: 1 });
+  it('should correctly format minutes', () => {
+    expect(fromSeconds('60s')).toEqual('1 minute');
   });
 
-  it('should correctly parse minutes', () => {
-    expect(fromSeconds('3660s')).toMatchObject({ hours: 1, minutes: 1 });
+  it('should correctly format hours', () => {
+    expect(fromSeconds('3600s')).toEqual('1 hour');
   });
 
-  it('should return undefined if given bogus input', () => {
-    expect(fromSeconds('bogus')).toBeUndefined();
+  it('should correctly format hours and minutes', () => {
+    expect(fromSeconds('3660s')).toEqual('1 hour, 1 minute');
+  });
+
+  it('should correctly format hours, minutes and seconds', () => {
+    expect(fromSeconds('3661s')).toEqual('1 hour, 1 minute, 1 second');
+    expect(fromSeconds('3666s')).toEqual('1 hour, 1 minute, 6 seconds');
+  });
+
+  it('should correctly format hours, minutes, seconds and milliseconds', () => {
+    expect(fromSeconds('3661s')).toEqual('1 hour, 1 minute, 1 second');
+    expect(fromSeconds('3661.06s')).toEqual(
+      '1 hour, 1 minute, 1 second, 60 milliseconds',
+    );
+    expect(fromSeconds('3661.006s')).toEqual(
+      '1 hour, 1 minute, 1 second, 6 milliseconds',
+    );
+  });
+
+  it('should return an empty string if given bogus input', () => {
+    expect(fromSeconds('bogus')).toEqual('');
+    expect(fromSeconds('bogus.01')).toEqual('');
+    expect(fromSeconds('10.bogus')).toEqual('');
   });
 });
 

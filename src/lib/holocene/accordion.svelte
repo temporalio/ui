@@ -8,7 +8,7 @@
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import type { IconName } from './icon/paths';
+  import type { IconName } from './icon';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
     title: string;
@@ -47,7 +47,7 @@
 
 <div
   class={merge(
-    'surface-primary flex w-full cursor-default flex-col rounded-xl border-2 p-4 text-primary',
+    'surface-primary flex w-full cursor-default flex-col rounded-xl border-2 p-4 text-primary dark:border-subtle',
     className,
   )}
   {...$$restProps}
