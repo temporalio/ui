@@ -90,6 +90,8 @@ export const Strings = {
   'reset-event-radio-group-description': 'Choose an Event to reset to',
   'reset-reapply-type-label':
     'Reapply Signals that happened after the Reset point',
+  'reset-exclude-signals': 'Exclude signals that occur after the reset point.',
+  'reset-exclude-updates': 'Exclude updates that occur after the reset point.',
   'cancel-modal-title': 'Cancel Workflow',
   'cancel-modal-confirmation':
     'Are you sure you want to cancel this workflow? This action cannot be undone.',

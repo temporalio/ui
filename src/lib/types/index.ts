@@ -1,4 +1,4 @@
-import type { google, temporal } from '@temporalio/proto';
+import { type google, temporal } from '@temporalio/proto';
 
 // api.workflowservice
 
@@ -137,6 +137,9 @@ export type Severity = temporal.api.enums.v1.Severity;
 export type ArchivalState = temporal.api.enums.v1.ArchivalState;
 export type NamespaceState = temporal.api.enums.v1.NamespaceState;
 export type TaskReachability = temporal.api.enums.v1.TaskReachability;
+export const ResetReapplyExcludeType =
+  temporal.api.enums.v1.ResetReapplyExcludeType;
+export const ResetReapplyType = temporal.api.enums.v1.ResetReapplyType;
 
 // api.workflow
 

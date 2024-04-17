@@ -4,13 +4,18 @@ import { v4 } from 'uuid';
 
 import { page } from '$app/stores';
 
-import { Action, type ResetReapplyType } from '$lib/models/workflow-actions';
+import { Action } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
 import { authUser } from '$lib/stores/auth-user';
-import type { ResetWorkflowRequest } from '$lib/types';
+import { temporalVersion } from '$lib/stores/versions';
+import {
+  ResetReapplyExcludeType,
+  ResetReapplyType,
+  type ResetWorkflowRequest,
+} from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
   ValidWorkflowParameters,
@@ -36,7 +41,10 @@ import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { base, pathForApi, routeForApi } from '$lib/utilities/route-for-api';
-import { isVersionNewer } from '$lib/utilities/version-check';
+import {
+  isVersionNewer,
+  minimumVersionRequired,
+} from '$lib/utilities/version-check';
 import { formatReason } from '$lib/utilities/workflow-actions';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
@@ -73,7 +81,11 @@ export type ResetWorkflowOptions = {
   workflow: WorkflowExecution;
   eventId: string;
   reason: string;
-  reapplyType: ResetReapplyType;
+  // used pre temporal server v1.24
+  includeSignals: boolean;
+  // used post temporal server v1.24
+  excludeSignals: boolean;
+  excludeUpdates: boolean;
 };
 
 export type FetchWorkflow =
@@ -326,7 +338,9 @@ export async function resetWorkflow({
   workflow: { id: workflowId, runId },
   eventId,
   reason,
-  reapplyType,
+  includeSignals,
+  excludeSignals,
+  excludeUpdates,
 }: ResetWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow.reset', {
     namespace,
@@ -342,17 +356,47 @@ export async function resetWorkflow({
 
   const body: Replace<
     ResetWorkflowRequest,
-    { workflowTaskFinishEventId: string; resetReapplyType: ResetReapplyType }
+    { workflowTaskFinishEventId: string }
   > = {
     workflowExecution: {
       workflowId,
       runId,
     },
     workflowTaskFinishEventId: eventId,
-    resetReapplyType: reapplyType,
     requestId: v4(),
     reason: formattedReason,
   };
+
+  if (minimumVersionRequired('1.24', get(temporalVersion))) {
+    const resetReapplyExcludeTypes: ResetWorkflowRequest['resetReapplyExcludeTypes'] =
+      [];
+
+    if (excludeSignals) {
+      resetReapplyExcludeTypes.push(
+        ResetReapplyExcludeType.RESET_REAPPLY_EXCLUDE_TYPE_SIGNAL,
+      );
+    }
+
+    if (excludeUpdates) {
+      resetReapplyExcludeTypes.push(
+        ResetReapplyExcludeType.RESET_REAPPLY_EXCLUDE_TYPE_UPDATE,
+      );
+    }
+
+    if (resetReapplyExcludeTypes.length) {
+      body.resetReapplyExcludeTypes = resetReapplyExcludeTypes;
+    }
+  } else {
+    let resetReapplyType: ResetWorkflowRequest['resetReapplyType'];
+
+    if (includeSignals) {
+      resetReapplyType = ResetReapplyType.RESET_REAPPLY_TYPE_SIGNAL;
+    } else {
+      resetReapplyType = ResetReapplyType.RESET_REAPPLY_TYPE_NONE;
+    }
+
+    body.resetReapplyType = resetReapplyType;
+  }
 
   return requestFromAPI<{ runId: string }>(route, {
     notifyOnError: false,
