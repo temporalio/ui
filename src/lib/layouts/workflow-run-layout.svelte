@@ -29,6 +29,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
+
   let workflowError: NetworkError;
   let eventHistoryController: AbortController;
 
@@ -75,6 +76,7 @@
     const workers = await getPollers({ queue: taskQueue, namespace });
     const compatibility = await getCompatibility(workflow, taskQueue);
     const rules = await getRules(workflow, taskQueue);
+
     workflow.pendingActivities = await toDecodedPendingActivities(
       workflow,
       namespace,

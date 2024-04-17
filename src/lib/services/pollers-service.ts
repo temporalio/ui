@@ -12,7 +12,7 @@ import {
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
-import taskQueueRules from '$fixtures/task-queue-rules.json';
+// import taskQueueRules from '$fixtures/task-queue-rules.json';
 
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 
@@ -148,27 +148,27 @@ export async function getPollers(
   };
 }
 
-export async function getTaskQueueRules(
-  parameters: GetAllPollersRequest,
-  // request = fetch,
-): Promise<TaskQueueRules> {
-  console.log('parameters', parameters);
-  // const route = routeForApi('task-queue.rules', parameters);
-  return Promise.resolve({ ...taskQueueRules });
-}
-
-// Add back when ready to implement
+// Use for testing
 
 // export async function getTaskQueueRules(
 //   parameters: GetAllPollersRequest,
-//   request = fetch,
-// ): Promise<TaskQueueCompatibility> {
-//   const route = routeForApi('task-queue.rules', parameters);
-//   return requestFromAPI(route, {
-//     request,
-//     onError: (e: APIErrorResponse) => console.error(e),
-//   });
+//   // request = fetch,
+// ): Promise<TaskQueueRules> {
+//   return Promise.resolve({ ...taskQueueRules });
 // }
+
+export async function getTaskQueueRules(
+  parameters: GetAllPollersRequest,
+  request = fetch,
+): Promise<TaskQueueRules | undefined> {
+  const route = routeForApi('task-queue.rules', parameters);
+  return requestFromAPI(route, {
+    request,
+    handleError: (_e: APIErrorResponse) => {
+      return;
+    },
+  });
+}
 
 export async function getTaskQueueCompatibility(
   parameters: GetAllPollersRequest,
@@ -177,7 +177,10 @@ export async function getTaskQueueCompatibility(
   const route = routeForApi('task-queue.compatibility', parameters);
   return requestFromAPI(route, {
     request,
-    onError: (e: APIErrorResponse) => console.error(e),
+    onError: (e: APIErrorResponse) => {
+      console.error(e);
+      return;
+    },
   });
 }
 
