@@ -1,19 +1,45 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import { page } from '$app/stores';
 
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fetchAllWorkflows } from '$lib/services/workflow-service';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
+  import { temporalVersion } from '$lib/stores/versions';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import type { WorkflowExecution } from '$lib/types/workflows';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
+  import { minimumVersionRequired } from '$lib/utilities/version-check';
 
   import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
+  import LiveChildWorkflowsTable from './live-child-workflows-table.svelte';
   import ParentWorkflowTable from './parent-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
 
   $: ({ workflow: workflowId, namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
+
+  $: canFetchLiveChildren =
+    $isCloud || minimumVersionRequired('1.23', $temporalVersion);
+
+  onMount(async () => {
+    if (canFetchLiveChildren) {
+      try {
+        const { workflows } = await fetchAllWorkflows(namespace, {
+          query: `ParentWorkflowId = "${workflowId}"`,
+        });
+        liveChildren = workflows;
+      } catch (e) {
+        // Use the getWorkflowRelationships children in case of failure
+      }
+    }
+  });
+
+  let liveChildren: WorkflowExecution[] = [];
 
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
@@ -52,7 +78,9 @@
         />
       {/if}
     </div>
-    {#if hasChildren}
+    {#if liveChildren.length}
+      <LiveChildWorkflowsTable children={liveChildren} />
+    {:else if hasChildren}
       <ChildWorkflowsTable
         {children}
         pendingChildren={$workflowRun.workflow.pendingChildren}
