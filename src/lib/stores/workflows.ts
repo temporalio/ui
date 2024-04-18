@@ -12,7 +12,7 @@ import { minimumVersionRequired } from '$lib/utilities/version-check';
 
 import { isCloud, supportsAdvancedVisibility } from './advanced-visibility';
 import { groupByCountEnabled } from './capability-enablement';
-import { queryWithParentWorkflowId } from './filters';
+import { query, showChildWorkflows } from './filters';
 import { temporalVersion } from './versions';
 
 export const refresh = writable(0);
@@ -25,6 +25,19 @@ export const canFetchChildWorkflows = derived(
   [isCloud, temporalVersion],
   ([$isCloud, $temporalVersion]) => {
     return $isCloud || minimumVersionRequired('1.23', $temporalVersion);
+  },
+);
+
+export const queryWithParentWorkflowId = derived(
+  [query, canFetchChildWorkflows, showChildWorkflows],
+  ([$query, $canFetchChildWorkflows, $showChildWorkflows]) => {
+    if ($canFetchChildWorkflows && !$showChildWorkflows) {
+      if ($query) {
+        return `ParentWorkflowId is NULL AND ${$query}`;
+      }
+      return 'ParentWorkflowId is NULL';
+    }
+    return $query;
   },
 );
 

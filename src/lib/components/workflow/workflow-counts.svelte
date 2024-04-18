@@ -6,8 +6,11 @@
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { workflowStatuses } from '$lib/models/workflow-status';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
-  import { queryWithParentWorkflowId } from '$lib/stores/filters';
-  import { refresh, workflowCount } from '$lib/stores/workflows';
+  import {
+    queryWithParentWorkflowId,
+    refresh,
+    workflowCount,
+  } from '$lib/stores/workflows';
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { decodePayload } from '$lib/utilities/decode-payload';
   import { getExponentialBackoffSeconds } from '$lib/utilities/refresh-rate';
