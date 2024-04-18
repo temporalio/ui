@@ -8,6 +8,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowFilters } from '$lib/stores/filters';
+  import { currentPageKey } from '$lib/stores/pagination';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { refresh, workflowsQuery } from '$lib/stores/workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
@@ -48,6 +49,7 @@
         parameter: 'query',
         value: manualSearchString,
         allowEmpty: true,
+        clearParameters: [currentPageKey],
       });
     }
   };

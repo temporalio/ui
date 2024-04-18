@@ -31,6 +31,7 @@
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { showChildWorkflows, workflowFilters } from '$lib/stores/filters';
   import { searchInputViewOpen } from '$lib/stores/filters';
+  import { currentPageKey } from '$lib/stores/pagination';
   import { refresh, workflows } from '$lib/stores/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
   import {
@@ -90,6 +91,7 @@
         parameter: 'query',
         value: searchQuery,
         allowEmpty: true,
+        clearParameters: [currentPageKey],
       });
     }
   }

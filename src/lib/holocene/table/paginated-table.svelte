@@ -121,7 +121,7 @@
       <div class="paginated-table-controls-center">
         {#each $store.pageShortcuts as page}
           {#if isNaN(page)}
-            <span>...</span>
+            <span class="text-primary">...</span>
           {:else}
             <Button
               variant="ghost"
