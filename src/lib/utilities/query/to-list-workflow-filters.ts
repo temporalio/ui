@@ -1,6 +1,7 @@
 import debounce from 'just-debounce';
 
 import type { WorkflowFilter } from '$lib/models/workflow-filters';
+import { currentPageKey } from '$lib/stores/pagination';
 import type { FilterParameters, SearchAttributes } from '$lib/types/workflows';
 import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
 
@@ -207,6 +208,7 @@ export const updateQueryParamsFromFilter = debounce(
       parameter: 'query',
       value: query,
       allowEmpty: false,
+      clearParameters: [currentPageKey],
     });
   },
   300,

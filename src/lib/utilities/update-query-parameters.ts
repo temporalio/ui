@@ -8,6 +8,7 @@ type UpdateQueryParams = {
   url: URL;
   goto?: typeof navigateTo;
   allowEmpty?: boolean;
+  clearParameters?: string[];
 };
 
 export const gotoOptions = {
@@ -21,6 +22,7 @@ export const updateQueryParameters = async ({
   url,
   goto = navigateTo,
   allowEmpty = false,
+  clearParameters = [],
 }: UpdateQueryParams): Promise<typeof value> => {
   const next = String(value);
   const params = {};
@@ -35,6 +37,12 @@ export const updateQueryParameters = async ({
     newQuery.set(parameter, next);
   } else if (allowEmpty) {
     newQuery.set(parameter, '');
+  }
+
+  if (clearParameters.length) {
+    clearParameters.forEach((parameter) => {
+      newQuery.delete(parameter);
+    });
   }
 
   if (BROWSER) {
