@@ -190,7 +190,7 @@
     }
 
     &.disabled {
-      @apply surface-disabled border-subtle text-disabled;
+      @apply surface-disabled border-subtle;
     }
   }
 
