@@ -23,7 +23,6 @@
   export let id: string;
   export let value: SelectOptionValue;
   export let label: string = null;
-  export let dark = false;
   export let arrow = false;
   export let name = id;
   export let options: SelectOptionValue[] = [];
@@ -36,7 +35,6 @@
       'inline h-10 w-full rounded-lg border px-2 text-base',
       className,
     )}
-    class:dark
     class:remove={arrow}
     {name}
     {id}
@@ -59,9 +57,5 @@
 
   .remove {
     @apply h-8 appearance-none rounded-xl py-1 pl-3 text-sm;
-  }
-
-  .dark {
-    @apply bg-inverse text-white;
   }
 </style>
