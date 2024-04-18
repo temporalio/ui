@@ -30,7 +30,8 @@
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { showChildWorkflows, workflowFilters } from '$lib/stores/filters';
   import { searchInputViewOpen } from '$lib/stores/filters';
-  import { refresh } from '$lib/stores/workflows';
+  import { refresh, workflows } from '$lib/stores/workflows';
+  import { exportWorkflows } from '$lib/utilities/export-workflows';
   import {
     getFocusedElementId,
     isBooleanFilter,
@@ -56,6 +57,9 @@
   import SearchAttributeMenu from './search-attribute-menu.svelte';
   import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
+
+  export let onClickConfigure: () => void;
+
   const filter = writable<WorkflowFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
@@ -222,15 +226,15 @@
     <MenuContainer>
       <MenuButton
         controls="filter-configuration-menu"
-        count={$searchInputViewOpen && $showChildWorkflows ? 2 : 1}
-        class="text-nowrap"
+        count={Number($searchInputViewOpen) + Number($showChildWorkflows)}
+        class="max-w-[3rem] text-nowrap md:max-w-full"
       >
         <svelte:fragment slot="leading">
           <Icon name="settings" />
         </svelte:fragment>
       </MenuButton>
       <Menu id="filter-configuration-menu" position="right">
-        <div class="flex flex-col gap-4 p-4">
+        <div class="flex flex-col items-start gap-4 p-4 md:items-end">
           <ToggleSwitch
             data-testid="show-child-workflow-s-toggle"
             label="List Child Workflows"
@@ -251,6 +255,21 @@
               resetFilter();
             }}
           />
+          <button
+            data-testid="workflows-summary-table-configuration-button"
+            class="flex min-w-max cursor-pointer items-center gap-2 rounded px-2 text-sm text-primary underline hover:text-blue-700"
+            tabindex={0}
+            on:click={onClickConfigure}
+            >{translate('workflows.configure-workflows')}
+            <Icon name="sliders" />
+          </button>
+          <button
+            class=" group relative flex w-fit min-w-fit cursor-pointer items-center gap-2 rounded px-2 text-sm text-primary underline hover:text-blue-700"
+            tabindex={0}
+            on:click={() => exportWorkflows($workflows)}
+            >{translate('common.download-json')}
+            <Icon name="download" />
+          </button>
         </div>
       </Menu>
     </MenuContainer>

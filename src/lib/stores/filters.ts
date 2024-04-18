@@ -21,7 +21,11 @@ const parentWorkflowIdQuerySupported = derived(
   },
 );
 
-export const showChildWorkflows = writable(true);
+export const showChildWorkflows = persistStore<boolean>(
+  'showChildWorkflows',
+  true,
+  true,
+);
 
 export const queryWithParentWorkflowId = derived(
   [query, parentWorkflowIdQuerySupported, showChildWorkflows],

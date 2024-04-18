@@ -1,10 +1,7 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
   import { getContext } from 'svelte';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     BATCH_OPERATION_CONTEXT,
@@ -17,7 +14,6 @@
 
   export let workflows: WorkflowExecution[];
   export let empty: boolean;
-  export let onClickConfigure: () => void = noop;
   export let columnsCount: number;
 
   const {
@@ -53,6 +49,7 @@
       />
     </th>
   {/if}
+  <th class="w-24" />
   {#if $supportsBulkActions && $batchActionsVisible}
     <th class="batch-actions-table-cell" colspan={columnsCount}>
       <BatchActions {workflows} />
@@ -60,14 +57,7 @@
   {:else}
     <slot />
   {/if}
-  <th class="configuration-button-table-cell">
-    <IconButton
-      data-testid="workflows-summary-table-configuration-button"
-      icon="vertical-ellipsis"
-      label={translate('workflows.open-configure-workflows')}
-      on:click={onClickConfigure}
-    />
-  </th>
+  <th class="configuration-button-table-cell" />
 </tr>
 
 <style lang="postcss">
