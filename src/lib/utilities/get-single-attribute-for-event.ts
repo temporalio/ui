@@ -181,6 +181,9 @@ export const shouldDisplayChildWorkflowLink = (
 const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
   if (typeof value === 'object') {
     const [firstKey] = Object.keys(value);
+    if (!firstKey) {
+      return { key, value: {} };
+    }
     if (firstKey === 'payloads') {
       return { key, value };
     }
@@ -251,8 +254,9 @@ export const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
 
   for (const [key, value] of Object.entries(event.attributes)) {
     for (const preferredKey of preferredSummaryKeys) {
-      if (key === preferredKey && shouldDisplayAttribute(key, value))
+      if (key === preferredKey && shouldDisplayAttribute(key, value)) {
         return formatSummaryValue(key, value);
+      }
     }
   }
 

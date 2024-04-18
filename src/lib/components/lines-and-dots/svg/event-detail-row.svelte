@@ -56,7 +56,7 @@
   point={[x, eventY]}
   {width}
   height={1.25 * fontSizeRatio}
-  fill={active ? '#465977' : ''}
+  fill={active ? '#444CE7' : ''}
 />
 <Line
   startPoint={[x, eventY + 1.25 * fontSizeRatio]}
@@ -119,7 +119,7 @@
   />
 {/each}
 <Line
-  startPoint={[x - 1.5, eventY]}
+  startPoint={[x - 1, eventY]}
   endPoint={[x + width, eventY]}
   strokeWidth={2}
 />

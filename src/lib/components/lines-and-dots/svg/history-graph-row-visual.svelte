@@ -1,16 +1,13 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import type {
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
   import { setSingleActiveEvent } from '$lib/stores/active-events';
   import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
   import {
-    CategoryIcon,
     getNextDistanceAndOffset,
     HistoryConfig,
     isMiddleEvent,
@@ -42,13 +39,9 @@
   $: zoomY = y * zoomLevel;
   $: zoomNextDistance = offset > 0 && nextDistance * zoomLevel;
 
-  $: category = isPendingActivity(event) ? 'pending' : event?.category;
   $: classification = isPendingActivity(event)
     ? 'pending'
     : event?.classification;
-  $: icon = isLocalActivityMarkerEvent(event)
-    ? CategoryIcon['local-activity']
-    : CategoryIcon[event.category];
 
   const strokeWidth = radius / 2;
 
@@ -64,6 +57,11 @@
     isPendingActivity(event) || offset === 0
       ? false
       : !isMiddleEvent(event, groups);
+  $: category = isPendingActivity(event)
+    ? 'pending'
+    : nextIsPending
+    ? event?.category
+    : '';
 </script>
 
 <g
@@ -85,14 +83,6 @@
       point={[width - horizontalOffset, zoomY]}
       {classification}
       active={isActive}
-    />
-    <Icon
-      name={icon}
-      x={width - horizontalOffset - radius}
-      y={zoomY - radius}
-      width={radius * 2}
-      height={radius * 2}
-      class="text-black {!isActive && 'opacity-[.35]'}"
     />
   {/if}
   {#if eventInViewBox && zoomNextDistance}

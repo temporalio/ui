@@ -9,6 +9,7 @@ import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
+import { isCloud } from '$lib/stores/advanced-visibility';
 import { authUser } from '$lib/stores/auth-user';
 import { temporalVersion } from '$lib/stores/versions';
 import {
@@ -424,4 +425,23 @@ export async function fetchWorkflowForSchedule(
     onError,
     handleError: onError,
   }).then(toWorkflowExecution);
+}
+
+export async function fetchAllChildWorkflows(
+  namespace: string,
+  workflowId: string,
+): Promise<WorkflowExecution[]> {
+  const canFetchLiveChildren =
+    get(isCloud) || minimumVersionRequired('1.23', get(temporalVersion));
+  if (!canFetchLiveChildren) {
+    return [];
+  }
+  try {
+    const { workflows } = await fetchAllWorkflows(namespace, {
+      query: `ParentWorkflowId = "${workflowId}"`,
+    });
+    return workflows;
+  } catch (e) {
+    return [];
+  }
 }

@@ -40,7 +40,6 @@
     {#if group.pendingActivity}
       <PendingDetailRow
         event={group.pendingActivity}
-        {canvasWidth}
         {width}
         {x}
         {y}

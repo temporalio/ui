@@ -3,7 +3,8 @@ const isUpperCase = (label: string, index: number): boolean => {
   return charCode >= 65 && charCode <= 90;
 };
 
-export const capitalize = (word: string): string => {
+export const capitalize = (word?: string): string => {
+  if (!word) return '';
   return word[0].toUpperCase() + word.slice(1);
 };
 

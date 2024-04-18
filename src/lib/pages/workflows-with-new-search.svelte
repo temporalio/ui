@@ -34,7 +34,6 @@
   import BatchResetConfirmationModal from '$lib/components/workflow/client-actions/batch-reset-confirmation-modal.svelte';
   import BatchTerminateConfirmationModal from '$lib/components/workflow/client-actions/batch-terminate-confirmation-modal.svelte';
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
-  import ResetConfirmationModal from '$lib/components/workflow/client-actions/reset-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
@@ -85,7 +84,6 @@
   let batchResetConfirmationModalOpen = false;
   let terminateConfirmationModalOpen = false;
   let cancelConfirmationModalOpen = false;
-  let resetConfirmationModalOpen = false;
   const allSelected = writable<boolean>(false);
   const pageSelected = writable<boolean>(false);
   const selectedWorkflows = writable<WorkflowExecution[]>([]);
@@ -115,9 +113,7 @@
   };
 
   const openBatchResetConfirmationModal = () => {
-    $selectedWorkflows.length > 1
-      ? (batchResetConfirmationModalOpen = true)
-      : (resetConfirmationModalOpen = true);
+    batchResetConfirmationModalOpen = true;
   };
 
   const handleSelectAll = (workflows: WorkflowExecution[]) => {
@@ -186,13 +182,6 @@
   {namespace}
   workflow={$selectedWorkflows[0]}
   bind:open={cancelConfirmationModalOpen}
-/>
-
-<ResetConfirmationModal
-  {refresh}
-  {namespace}
-  workflow={$selectedWorkflows[0]}
-  bind:open={resetConfirmationModalOpen}
 />
 
 <header class="flex flex-col gap-2">

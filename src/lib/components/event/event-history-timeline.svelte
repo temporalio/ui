@@ -333,7 +333,7 @@
   }
 
   :global(.vis-label) {
-    font-family: Poppins, sans-serif;
+    font-family: Inter, sans-serif;
     font-size: 12px;
     display: flex;
     align-items: center;
