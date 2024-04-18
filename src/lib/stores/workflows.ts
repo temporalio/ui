@@ -20,7 +20,6 @@ export const hideWorkflowQueryErrors = derived(
 
 const namespace = derived([page], ([$page]) => $page.params.namespace);
 const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
-
 const parameters = derived(
   [
     namespace,
