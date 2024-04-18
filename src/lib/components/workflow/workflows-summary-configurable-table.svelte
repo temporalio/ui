@@ -6,7 +6,12 @@
   import { fetchAllChildWorkflows } from '$lib/services/workflow-service';
   import { showChildWorkflows } from '$lib/stores/filters';
   import { workflowTableColumns } from '$lib/stores/workflow-table-columns';
-  import { updating, workflows } from '$lib/stores/workflows';
+  import {
+    refresh,
+    updating,
+    workflows,
+    workflowsQuery,
+  } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
@@ -28,7 +33,7 @@
     childrenIds = [];
   };
 
-  $: $showChildWorkflows, clearChildren();
+  $: $showChildWorkflows, $refresh, $workflowsQuery, clearChildren();
 
   const viewChildren = async (workflow: WorkflowExecution) => {
     if (childrenActive(workflow)) {

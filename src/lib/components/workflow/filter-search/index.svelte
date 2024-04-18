@@ -230,6 +230,7 @@
       <MenuButton
         controls="filter-configuration-menu"
         count={Number($searchInputViewOpen) + Number($showChildWorkflows)}
+        data-testid="filter-configuration-menu-button"
         class="max-w-[3rem] text-nowrap md:max-w-full"
       >
         <svelte:fragment slot="leading">

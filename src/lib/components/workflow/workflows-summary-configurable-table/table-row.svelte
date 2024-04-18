@@ -82,6 +82,6 @@
 
 <style lang="postcss">
   .child {
-    @apply surface-secondary-active;
+    @apply bg-slate-100/50 dark:bg-slate-100/5;
   }
 </style>
