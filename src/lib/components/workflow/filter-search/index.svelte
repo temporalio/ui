@@ -21,6 +21,10 @@
 
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import MenuButton from '$lib/holocene/menu/menu-button.svelte';
+  import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
+  import Menu from '$lib/holocene/menu/menu.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
@@ -215,26 +219,41 @@
         {/if}
       </div>
     {/if}
-    <ToggleSwitch
-      data-testid="show-child-workflow-s-toggle"
-      label="Show Child Workflows"
-      labelPosition="left"
-      id="show-child-workflow-input"
-      bind:checked={$showChildWorkflows}
-      on:change={() => {
-        $showChildWorkflows = !$showChildWorkflows;
-      }}
-    />
-    <ToggleSwitch
-      data-testid="manual-search-toggle"
-      label={translate('workflows.view-search-input')}
-      labelPosition="left"
-      id="view-search-input"
-      bind:checked={$searchInputViewOpen}
-      on:change={() => {
-        resetFilter();
-      }}
-    />
+    <MenuContainer>
+      <MenuButton
+        controls="filter-configuration-menu"
+        count={$searchInputViewOpen && $showChildWorkflows ? 2 : 1}
+        class="text-nowrap"
+      >
+        <svelte:fragment slot="leading">
+          <Icon name="settings" />
+        </svelte:fragment>
+      </MenuButton>
+      <Menu id="filter-configuration-menu" position="right">
+        <div class="flex flex-col gap-4 p-4">
+          <ToggleSwitch
+            data-testid="show-child-workflow-s-toggle"
+            label="List Child Workflows"
+            labelPosition="left"
+            id="show-child-workflow-input"
+            bind:checked={$showChildWorkflows}
+            on:change={() => {
+              $showChildWorkflows = !$showChildWorkflows;
+            }}
+          />
+          <ToggleSwitch
+            data-testid="manual-search-toggle"
+            label={translate('workflows.view-search-input')}
+            labelPosition="left"
+            id="view-search-input"
+            bind:checked={$searchInputViewOpen}
+            on:change={() => {
+              resetFilter();
+            }}
+          />
+        </div>
+      </Menu>
+    </MenuContainer>
   </div>
   <FilterList />
 </div>
