@@ -4,15 +4,16 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
-  import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
-  import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
+  import Option from '$lib/holocene/select/option.svelte';
+  import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { ResetReapplyType } from '$lib/models/workflow-actions';
   import { resetWorkflow } from '$lib/services/workflow-service';
   import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
+  import { temporalVersion } from '$lib/stores/versions';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isNetworkError } from '$lib/utilities/is-network-error';
+  import { minimumVersionRequired } from '$lib/utilities/version-check';
 
   export let open: boolean;
   export let workflow: WorkflowExecution;
@@ -21,23 +22,19 @@
 
   let error = '';
   let loading = false;
-  let reapplyType: ResetReapplyType;
   let eventId: Writable<string> = writable('');
   let reason: string;
+  let includeSignals = true;
+  let excludeSignals = false;
+  let excludeUpdates = false;
 
   const hideResetModal = () => {
     open = false;
-    reapplyType = ResetReapplyType.Signal;
+    includeSignals = true;
+    excludeSignals = false;
+    excludeUpdates = false;
     $eventId = '';
     reason = '';
-  };
-
-  const handleReapplyTypeChange = (
-    event: CustomEvent<{ checked: boolean }>,
-  ) => {
-    reapplyType = event.detail.checked
-      ? ResetReapplyType.Signal
-      : ResetReapplyType.None;
   };
 
   const reset = async () => {
@@ -49,7 +46,9 @@
         workflow,
         eventId: $eventId,
         reason,
-        reapplyType,
+        includeSignals,
+        excludeSignals,
+        excludeUpdates,
       });
 
       if (response && response.runId) {
@@ -81,31 +80,39 @@
   {loading}
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
-  confirmDisabled={!eventId}
+  confirmDisabled={!$eventId}
 >
   <h3 slot="title">{translate('workflows.reset-modal-title')}</h3>
   <svelte:fragment slot="content">
     <div class="flex w-full flex-col gap-4">
-      <RadioGroup
-        name="reset-event-id"
-        group={eventId}
-        class="max-h-40 overflow-auto"
-        description={translate('workflows.reset-event-radio-group-description')}
+      <Select
+        menuClass="max-h-[16rem]"
+        label={translate('workflows.reset-event-radio-group-description')}
+        bind:value={$eventId}
+        id="reset-event-id"
       >
         {#each $resetEvents as event}
-          <RadioInput
-            id="reset-event-{event.id}"
-            value={event.id}
-            label="{event.id} - {event.eventType}"
-          />
+          <Option value={event.id}>{event.id} - {event.eventType}</Option>
         {/each}
-      </RadioGroup>
-      <Checkbox
-        id="reset-reapply-type-checkbox"
-        checked={reapplyType === ResetReapplyType.Signal}
-        on:change={handleReapplyTypeChange}
-        label={translate('workflows.reset-reapply-type-label')}
-      />
+      </Select>
+      {#if minimumVersionRequired('1.24', $temporalVersion)}
+        <Checkbox
+          id="reset-exclude-signals-checkbox"
+          bind:checked={excludeSignals}
+          label={translate('workflows.reset-exclude-signals')}
+        />
+        <Checkbox
+          id="reset-exclude-updates-checkbox"
+          bind:checked={excludeUpdates}
+          label={translate('workflows.reset-exclude-updates')}
+        />
+      {:else}
+        <Checkbox
+          id="reset-include-signals-checkbox"
+          bind:checked={includeSignals}
+          label={translate('workflows.reset-reapply-type-label')}
+        />
+      {/if}
 
       <Input
         id="reset-reason"

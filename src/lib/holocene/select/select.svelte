@@ -44,6 +44,7 @@
     unroundLeft?: boolean;
     onChange?: (value: T) => void;
     'data-testid'?: string;
+    menuClass?: string;
   };
 
   export let label: string;
@@ -56,6 +57,7 @@
   export let unroundRight = false;
   export let unroundLeft = false;
   export let onChange: (value: T) => void = noop;
+  export let menuClass: string | undefined = undefined;
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
   const valueCtx = writable<T>(value);
@@ -122,7 +124,7 @@
       <Icon slot="trailing" name="lock" />
     {/if}
   </MenuButton>
-  <Menu role="listbox" id="{id}-select">
+  <Menu class={menuClass} role="listbox" id="{id}-select">
     <slot />
   </Menu>
 </MenuContainer>
