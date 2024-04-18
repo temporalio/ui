@@ -8,15 +8,24 @@ import { fetchWorkflowCount } from '$lib/services/workflow-counts';
 import { fetchAllWorkflows } from '$lib/services/workflow-service';
 import type { FilterParameters, WorkflowExecution } from '$lib/types/workflows';
 import { withLoading } from '$lib/utilities/stores/with-loading';
+import { minimumVersionRequired } from '$lib/utilities/version-check';
 
-import { supportsAdvancedVisibility } from './advanced-visibility';
+import { isCloud, supportsAdvancedVisibility } from './advanced-visibility';
 import { groupByCountEnabled } from './capability-enablement';
 import { queryWithParentWorkflowId } from './filters';
+import { temporalVersion } from './versions';
 
 export const refresh = writable(0);
 export const hideWorkflowQueryErrors = derived(
   [page],
   ([$page]) => $page.data?.settings?.hideWorkflowQueryErrors,
+);
+
+export const canFetchChildWorkflows = derived(
+  [isCloud, temporalVersion],
+  ([$isCloud, $temporalVersion]) => {
+    return $isCloud || minimumVersionRequired('1.23', $temporalVersion);
+  },
 );
 
 const namespace = derived([page], ([$page]) => $page.params.namespace);

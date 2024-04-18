@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { noop } from 'svelte/internal';
+
   import { getContext } from 'svelte';
 
+  import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -11,14 +14,13 @@
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import { showChildWorkflows } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   export let workflow: WorkflowExecution | undefined = undefined;
   export let empty = false;
-  export let viewChildren: (workflow: WorkflowExecution) => void;
-  export let viewHistory: (workflowId: WorkflowExecution) => void;
-  export let childActive = false;
-  export let timelineActive = false;
+  export let viewChildren: (workflow?: WorkflowExecution) => void = noop;
+  export let childCount: number | undefined = undefined;
   export let child = false;
 
   const { allSelected, selectedWorkflows } = getContext<BatchOperationContext>(
@@ -28,6 +30,8 @@
   $: label = translate('workflows.select-workflow', {
     workflow: workflow?.id,
   });
+
+  $: childrenShown = childCount !== undefined;
 </script>
 
 <tr
@@ -47,30 +51,30 @@
         aria-label={label}
       />
     </td>
-    <td
-      class="cursor-point relative flex items-center justify-center gap-0.5 pt-2"
-    >
-      {#if !child}
-        <Button
-          size="xxs"
-          variant={childActive ? 'primary' : 'ghost'}
-          on:click={() => viewChildren(workflow)}
+    <IsTemporalServerVersionGuard minimumVersion="1.23">
+      {#if !$showChildWorkflows}
+        <td
+          class="cursor-point relative flex items-center justify-center gap-0.5 pt-2"
         >
-          <Tooltip text="View Children" topLeft>
-            <Icon name="relationship" class="scale-80" />
-          </Tooltip>
-        </Button>
+          {#if !child}
+            <Button
+              size="xxs"
+              variant={childrenShown ? 'primary' : 'ghost'}
+              on:click={() => viewChildren(workflow)}
+            >
+              <Tooltip
+                text={childrenShown
+                  ? `${childCount} Children`
+                  : 'View Children'}
+                topLeft
+              >
+                <Icon name="relationship" class="scale-80" />
+              </Tooltip>
+            </Button>
+          {/if}
+        </td>
       {/if}
-      <Button
-        size="xxs"
-        variant={timelineActive ? 'primary' : 'ghost'}
-        on:click={() => viewHistory(workflow)}
-      >
-        <Tooltip text="View Timeline" topLeft>
-          <Icon name="timeline" class="scale-80" />
-        </Tooltip>
-      </Button>
-    </td>
+    </IsTemporalServerVersionGuard>
   {/if}
   <slot />
   <td />
@@ -78,6 +82,6 @@
 
 <style lang="postcss">
   .child {
-    @apply bg-slate-50;
+    @apply surface-secondary-active;
   }
 </style>

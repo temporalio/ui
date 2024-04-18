@@ -19,6 +19,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -235,16 +236,18 @@
       </MenuButton>
       <Menu id="filter-configuration-menu" position="right">
         <div class="flex flex-col items-start gap-4 p-4 md:items-end">
-          <ToggleSwitch
-            data-testid="show-child-workflow-s-toggle"
-            label="List Child Workflows"
-            labelPosition="left"
-            id="show-child-workflow-input"
-            bind:checked={$showChildWorkflows}
-            on:change={() => {
-              $showChildWorkflows = !$showChildWorkflows;
-            }}
-          />
+          <IsTemporalServerVersionGuard minimumVersion="1.23">
+            <ToggleSwitch
+              data-testid="show-child-workflow-s-toggle"
+              label="List Child Workflows"
+              labelPosition="left"
+              id="show-child-workflow-input"
+              bind:checked={$showChildWorkflows}
+              on:change={() => {
+                $showChildWorkflows = !$showChildWorkflows;
+              }}
+            />
+          </IsTemporalServerVersionGuard>
           <ToggleSwitch
             data-testid="manual-search-toggle"
             label={translate('workflows.view-search-input')}
@@ -257,14 +260,14 @@
           />
           <button
             data-testid="workflows-summary-table-configuration-button"
-            class="flex min-w-max cursor-pointer items-center gap-2 rounded px-2 text-sm text-primary underline hover:text-blue-700"
+            class="flex min-w-max cursor-pointer items-center gap-2 rounded px-2 text-sm text-primary"
             tabindex={0}
             on:click={onClickConfigure}
             >{translate('workflows.configure-workflows')}
-            <Icon name="sliders" />
+            <Icon name="sliders" class="text-indigo-700" />
           </button>
           <button
-            class=" group relative flex w-fit min-w-fit cursor-pointer items-center gap-2 rounded px-2 text-sm text-primary underline hover:text-blue-700"
+            class=" group relative flex w-fit min-w-fit cursor-pointer items-center gap-2 rounded px-2 text-sm text-primary underline hover:text-active"
             tabindex={0}
             on:click={() => exportWorkflows($workflows)}
             >{translate('common.download-json')}

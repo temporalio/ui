@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
+  import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -8,6 +9,7 @@
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import { showChildWorkflows } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   import BatchActions from './batch-actions.svelte';
@@ -49,7 +51,11 @@
       />
     </th>
   {/if}
-  <th class="w-24" />
+  <IsTemporalServerVersionGuard minimumVersion="1.23">
+    {#if !$showChildWorkflows}
+      <th class="w-12" />
+    {/if}
+  </IsTemporalServerVersionGuard>
   {#if $supportsBulkActions && $batchActionsVisible}
     <th class="batch-actions-table-cell" colspan={columnsCount}>
       <BatchActions {workflows} />
