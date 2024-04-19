@@ -106,7 +106,7 @@
   <a
     {href}
     role="menuitem"
-    class={merge('menu-item', className)}
+    class={merge('menu-item', 'm-1', 'px-3', 'py-2', className)}
     class:disabled
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
@@ -119,7 +119,7 @@
 {:else}
   <li
     role="menuitem"
-    class={merge('menu-item', className)}
+    class={merge('menu-item', 'm-1', 'px-3', 'py-2', className)}
     class:destructive
     class:disabled
     class:selected
@@ -156,7 +156,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply m-1 flex cursor-pointer flex-row items-center gap-2 rounded border border-transparent px-3 py-2 font-primary text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:shadow-focus focus-visible:shadow-secondary focus-visible:outline-none dark:focus-visible:border-interactive;
+    @apply flex cursor-pointer flex-row items-center gap-2 rounded border border-transparent font-primary text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:shadow-focus focus-visible:shadow-secondary focus-visible:outline-none dark:focus-visible:border-interactive;
 
     &.selected {
       @apply text-active;

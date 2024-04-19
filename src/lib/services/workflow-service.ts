@@ -9,9 +9,8 @@ import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
-import { isCloud } from '$lib/stores/advanced-visibility';
 import { authUser } from '$lib/stores/auth-user';
-import { temporalVersion } from '$lib/stores/versions';
+import { canFetchChildWorkflows } from '$lib/stores/workflows';
 import type { ResetWorkflowRequest } from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
@@ -38,10 +37,7 @@ import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { base, pathForApi, routeForApi } from '$lib/utilities/route-for-api';
-import {
-  isVersionNewer,
-  minimumVersionRequired,
-} from '$lib/utilities/version-check';
+import { isVersionNewer } from '$lib/utilities/version-check';
 import { formatReason } from '$lib/utilities/workflow-actions';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
@@ -391,9 +387,7 @@ export async function fetchAllChildWorkflows(
   namespace: string,
   workflowId: string,
 ): Promise<WorkflowExecution[]> {
-  const canFetchLiveChildren =
-    get(isCloud) || minimumVersionRequired('1.23', get(temporalVersion));
-  if (!canFetchLiveChildren) {
+  if (!get(canFetchChildWorkflows)) {
     return [];
   }
   try {
