@@ -32,8 +32,7 @@
 <g
   role="button"
   tabindex="0"
-  class="relative cursor-pointer"
-  opacity={primary ? '1' : '.6'}
+  class="relative cursor-pointer {!primary && 'brightness-50'}"
 >
   <Box point={[x, y]} {width} height={boxHeight} classification="active" />
   {#if group}

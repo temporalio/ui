@@ -58,7 +58,7 @@
 {#if active}
   <foreignObject {x} y={y - fontSizeRatio} {width} height={fontSizeRatio}>
     <button
-      class="flex items-center gap-0.5 rounded-t bg-white px-2 text-sm text-black"
+      class="flex items-center gap-0.5 rounded-t bg-white pl-1.5 text-sm text-black"
       on:click|stopPropagation={() => setActiveEvent(event, group)}
     >
       {translate('common.close')}<Icon name="close" />
