@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { setActiveEvent } from '$lib/stores/active-events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowEvent } from '$lib/types/events';
   import {
@@ -29,7 +30,7 @@
   export let width: number;
   export let active = false;
 
-  const { gutter, fontSizeRatio, radius } = DetailsConfig;
+  const { gutter, fontSizeRatio } = DetailsConfig;
 
   const labelPadding = 240;
   $: attributes = formatAttributes(event);
@@ -63,24 +64,25 @@
   endPoint={[x + width, eventY + 1.25 * fontSizeRatio]}
   strokeWidth={2}
 />
-<Text
-  point={[x + 0.5 * fontSizeRatio, eventY + 0.66 * fontSizeRatio]}
-  fontWeight="300"
-  >{event.id}<tspan dx={5}>{spaceBetweenCapitalLetters(event?.name)}</tspan
-  ></Text
->
-{#if showTimestamp}
-  <Text
-    point={[canvasWidth - 1.5 * radius, eventY + 0.6 * fontSizeRatio]}
-    textAnchor="end"
-  >
-    <tspan fill="#aebed9" font-size="13px">
+<foreignObject {x} y={eventY} {width} height={fontSizeRatio}>
+  <div class="flex justify-between px-2 py-1 text-sm text-white">
+    <div class="flex items-center gap-2">
+      {event.id}
+      {spaceBetweenCapitalLetters(event?.name)}
+      <button
+        class="rounded-full bg-black pl-8 text-white"
+        on:click|stopPropagation={() => setActiveEvent(event, group)}
+      >
+        Close
+      </button>
+    </div>
+    {#if showTimestamp}
       {formatDate(event?.eventTime, $timeFormat, {
         relative: $relativeTime,
-      })}</tspan
-    ></Text
-  >
-{/if}
+      })}
+    {/if}
+  </div>
+</foreignObject>
 {#each textAttributes as [key, value], index (key)}
   <foreignObject
     x={x + gutter}
