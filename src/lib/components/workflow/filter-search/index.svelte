@@ -33,7 +33,11 @@
   import { showChildWorkflows, workflowFilters } from '$lib/stores/filters';
   import { searchInputViewOpen } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
-  import { refresh, workflows } from '$lib/stores/workflows';
+  import {
+    canFetchChildWorkflows,
+    refresh,
+    workflows,
+  } from '$lib/stores/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
   import {
     getFocusedElementId,
@@ -230,7 +234,8 @@
     <MenuContainer>
       <MenuButton
         controls="filter-configuration-menu"
-        count={Number($searchInputViewOpen) + Number($showChildWorkflows)}
+        count={Number($searchInputViewOpen) +
+          Number($canFetchChildWorkflows && $showChildWorkflows)}
         data-testid="filter-configuration-menu-button"
         class="max-w-[3rem] text-nowrap md:max-w-full"
       >
