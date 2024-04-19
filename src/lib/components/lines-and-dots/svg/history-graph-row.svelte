@@ -24,7 +24,6 @@
   const { height, radius } = HistoryConfig;
 
   $: y = index * height + height / 2;
-  $: noActives = !activeEvents.length;
   $: isActiveEvent = activeEvents.includes(event.id);
   $: showTimestamp = canvasWidth > 1200;
   $: showDetails = canvasWidth > 800;
@@ -51,13 +50,9 @@
     width={detailsWidth}
     {height}
     {classification}
-    fill={index % 2 === 1 && '#1E293B'}
+    fill={isActiveEvent ? '#444CE7' : index % 2 === 1 && '#1E293B'}
   />
-  <Text
-    point={[visualWidth + 2 * radius, y]}
-    active={noActives || isActiveEvent}
-    fontSize="12px"
-  >
+  <Text point={[visualWidth + 2 * radius, y]} active fontSize="12px">
     {event.id}
   </Text>
   <Icon
@@ -66,12 +61,12 @@
     y={y - 1.666 * radius}
     width={radius * 3}
     height={radius * 3}
-    class="text-white {!noActives && !isActiveEvent && 'opacity-[.35]'}"
+    class="text-white"
   />
   <Text
     point={[visualWidth + 70, y]}
     category={event.category}
-    active={noActives || isActiveEvent}
+    active
     config={HistoryConfig}
   >
     <tspan fill="#fff">

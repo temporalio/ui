@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveEvent } from '$lib/stores/active-events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
@@ -53,6 +54,16 @@
   $: textStartingY = eventY + 1.5 * fontSizeRatio;
 </script>
 
+{#if active}
+  <foreignObject {x} y={y - fontSizeRatio} {width} height={fontSizeRatio}>
+    <button
+      class="surface-secondary flex items-center gap-0.5 rounded-t px-2 text-sm"
+      on:click|stopPropagation={() => setActiveEvent(event, group)}
+    >
+      Close<Icon name="close" />
+    </button>
+  </foreignObject>
+{/if}
 <Box
   point={[x, eventY]}
   {width}
@@ -69,12 +80,14 @@
     <div class="flex items-center gap-2">
       {event.id}
       {spaceBetweenCapitalLetters(event?.name)}
-      <button
-        class="rounded-full bg-black pl-8 text-white"
-        on:click|stopPropagation={() => setActiveEvent(event, group)}
-      >
-        Close
-      </button>
+      <!-- {#if active}
+        <button
+          class="flex items-center gap-0.5 rounded-full bg-black px-2 text-white"
+          on:click|stopPropagation={() => setActiveEvent(event, group)}
+        >
+          Close<Icon name="close" height={16} width={16} />
+        </button>
+      {/if} -->
     </div>
     {#if showTimestamp}
       {formatDate(event?.eventTime, $timeFormat, {
