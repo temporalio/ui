@@ -135,7 +135,7 @@
 
 <style lang="postcss">
   .nav-icon {
-    @apply ml-2 mr-2 mt-0 h-6 cursor-pointer;
+    @apply ml-2 mr-2 mt-0 flex h-6 cursor-pointer flex-row items-center;
   }
 
   .nav-title {

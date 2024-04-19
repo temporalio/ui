@@ -26,7 +26,7 @@
     <a
       href={linkList.home}
       class="absolute block"
-      style="top: 22px; left: 18px;"
+      style="top: 22px; left: 19px;"
     >
       <Logo
         height="24px"
@@ -122,7 +122,7 @@
   }
 
   .nav-toggle {
-    @apply transition-left absolute left-[18px] top-[52px] hidden;
+    @apply transition-left absolute left-[22px] top-[60px] hidden;
   }
 
   .nav-header:hover .nav-toggle {
@@ -134,7 +134,7 @@
   }
 
   .nav-toggle.close {
-    left: 18px;
+    left: 22px;
   }
 
   .nav-toggle.open {

@@ -75,12 +75,14 @@
         <slot name="action" />
       </div>
       {#if !readOnly}
-        <Icon
-          name={open ? 'chevron-up' : 'chevron-down'}
-          class="rounded-full from-blue-100 to-purple-100 hover:bg-gradient-to-br dark:from-blue-800 dark:to-purple-800 {disabled
-            ? 'text-disabled'
-            : 'text-primary'}"
-        />
+        <div
+          class="rounded-full from-blue-100 to-purple-100 p-1 hover:bg-gradient-to-br dark:from-blue-800 dark:to-purple-800"
+        >
+          <Icon
+            name={open ? 'chevron-up' : 'chevron-down'}
+            class=" {disabled ? 'text-disabled' : 'text-primary'}"
+          />
+        </div>
       {/if}
     </div>
     <p class="flex items-center font-secondary">

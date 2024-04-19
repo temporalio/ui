@@ -34,7 +34,7 @@
 
 <style lang="postcss">
   .nav-row {
-    @apply flex flex-row items-center whitespace-nowrap rounded-lg py-1 text-sm font-medium;
+    @apply flex flex-row items-center whitespace-nowrap rounded-lg p-1 text-sm font-medium;
   }
 
   .nav-row.button {

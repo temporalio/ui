@@ -3,16 +3,8 @@
 </script>
 
 <Svg {...$$props}>
-  <path d="M4.75 8H7.25" stroke="currentcolor" />
-  <path d="M12.75 8H19.25" stroke="currentcolor" />
-  <path d="M4.75 16H12.25" stroke="currentcolor" />
-  <path d="M17.75 16H19.25" stroke="currentcolor" />
   <path
-    d="M 10, 8 m -1, 0 a 1,1 0 1,0 2.25,0 a 1,1 0 1,0 -2.25,0"
-    stroke="currentcolor"
-  />
-  <path
-    d="M 15, 16 m -1, 0 a 1,1 0 1,0 2.25,0 a 1,1 0 1,0 -2.25,0"
-    stroke="currentcolor"
+    d="M2.25 18.75H5.25V15.75H2.25V18.75ZM0 21V18.75V15.75V13.5H2.25H5.25H7.5V15.75V16.125H22.875H24V18.375H22.875H7.5V18.75V21H5.25H2.25H0ZM1.125 7.875H0V5.625H1.125H16.5V5.25V3H18.75H21.75H24V5.25V8.25V10.5H21.75H18.75H16.5V8.25V7.875H1.125ZM18.75 5.25V8.25H21.75V5.25H18.75Z"
+    fill="currentcolor"
   />
 </Svg>
