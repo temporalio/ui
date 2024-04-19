@@ -57,7 +57,7 @@
 {#if active}
   <foreignObject {x} y={y - fontSizeRatio} {width} height={fontSizeRatio}>
     <button
-      class="surface-secondary flex items-center gap-0.5 rounded-t px-2 text-sm"
+      class="flex items-center gap-0.5 rounded-t bg-white px-2 text-sm text-black"
       on:click|stopPropagation={() => setActiveEvent(event, group)}
     >
       Close<Icon name="close" />
@@ -76,23 +76,17 @@
   strokeWidth={2}
 />
 <foreignObject {x} y={eventY} {width} height={fontSizeRatio}>
-  <div class="flex justify-between px-2 py-1 text-sm text-white">
+  <div class="flex items-center justify-between px-2 py-1 text-sm text-white">
     <div class="flex items-center gap-2">
       {event.id}
       {spaceBetweenCapitalLetters(event?.name)}
-      <!-- {#if active}
-        <button
-          class="flex items-center gap-0.5 rounded-full bg-black px-2 text-white"
-          on:click|stopPropagation={() => setActiveEvent(event, group)}
-        >
-          Close<Icon name="close" height={16} width={16} />
-        </button>
-      {/if} -->
     </div>
     {#if showTimestamp}
-      {formatDate(event?.eventTime, $timeFormat, {
-        relative: $relativeTime,
-      })}
+      <div class="text-xs">
+        {formatDate(event?.eventTime, $timeFormat, {
+          relative: $relativeTime,
+        })}
+      </div>
     {/if}
   </div>
 </foreignObject>

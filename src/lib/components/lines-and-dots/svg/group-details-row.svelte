@@ -1,7 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { setActiveGroup } from '$lib/stores/active-events';
   import {
     format,
     spaceBetweenCapitalLetters,
@@ -79,25 +81,32 @@
 <g role="button" tabindex="0" class="relative cursor-pointer">
   <Box point={[x, y]} {width} height={boxHeight} fill="#465A78" />
   <Box point={[x, y]} {width} {height} fill="#1E293B" />
-  <Box
-    point={[x, y]}
-    width={gutter + 100}
-    {height}
-    fill={getStatusColor(status)}
-  />
-  <Text point={[x + gutter, y + 0.5 * height]} category="none">
-    {status ? spaceBetweenCapitalLetters(status) : group.label}
-  </Text>
-  <Text point={[x + 1.5 * gutter + 100, y + 0.5 * height]}>
-    {title}
-  </Text>
-  <Text point={[x + width - gutter, y + 0.5 * height]} textAnchor="end">
-    {formatDistanceAbbreviated({
-      start: group?.initialEvent?.eventTime,
-      end: group?.lastEvent?.eventTime,
-      includeMilliseconds: true,
-    })}
-  </Text>
+  <foreignObject {x} {y} {width} height={fontSizeRatio}>
+    <div class="flex h-full items-center justify-between text-sm text-white">
+      <div class="flex h-full items-center gap-2">
+        <div
+          class="px-4 py-1 text-black"
+          style="background-color: {getStatusColor(status)};"
+        >
+          {status ? spaceBetweenCapitalLetters(status) : group.label}
+        </div>
+        {title}
+      </div>
+      <div class="flex items-center gap-4">
+        {formatDistanceAbbreviated({
+          start: group?.initialEvent?.eventTime,
+          end: group?.lastEvent?.eventTime,
+          includeMilliseconds: true,
+        })}
+        <button
+          class="flex items-center gap-0.5 rounded-t bg-white px-2 text-sm text-black"
+          on:click|stopPropagation={() => setActiveGroup(group)}
+        >
+          Close<Icon name="close" />
+        </button>
+      </div>
+    </div>
+  </foreignObject>
   {#each codeBlockAttributes as [key, value], index (key)}
     {@const y = textStartingY + index * staticCodeBlockHeight}
     <Text point={[codeBlockX, y]}>{format(key)}</Text>
