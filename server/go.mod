@@ -10,7 +10,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli/v2 v2.3.0
 	go.temporal.io/api v1.29.1
-	golang.org/x/net v0.22.0
+	golang.org/x/net v0.23.0
 	golang.org/x/oauth2 v0.16.0
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.33.0
