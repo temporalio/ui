@@ -65,7 +65,7 @@
               <Tooltip
                 text={childrenShown
                   ? translate('workflows.children', { count: childCount })
-                  : translate('workflows.view_children')}
+                  : translate('workflows.show-children')}
                 topLeft
               >
                 <Icon name="relationship" class="scale-80" />

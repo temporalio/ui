@@ -131,7 +131,7 @@ export const Strings = {
   'pending-children_other': '{{count}} Pending Children',
   children_one: '1 Child',
   children_other: '{{count}} Children',
-  view_children: 'View Child Workflows',
+  'show-children': 'Show Child Workflows',
   first: '{{count}} First',
   previous: '{{count}} Previous',
   next: '{{count}} Next',

@@ -14,7 +14,10 @@
   class:pointer-events-none={disabled}
   data-testid={$$props['data-testid']}
 >
-  <span class="whitespace-nowrap text-sm" class:sr-only={labelHidden}>
+  <span
+    class="whitespace-nowrap text-sm font-medium"
+    class:sr-only={labelHidden}
+  >
     {label}
   </span>
   <input

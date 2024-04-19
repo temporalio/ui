@@ -25,6 +25,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
+  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -241,14 +242,11 @@
         <div class="flex flex-col items-start gap-4 p-4 md:items-end">
           <IsTemporalServerVersionGuard minimumVersion="1.23">
             <ToggleSwitch
-              data-testid="show-child-workflow-s-toggle"
-              label="List Child Workflows"
+              data-testid="show-child-workflow-toggle"
+              label={translate('workflows.show-children')}
               labelPosition="left"
               id="show-child-workflow-input"
               bind:checked={$showChildWorkflows}
-              on:change={() => {
-                $showChildWorkflows = !$showChildWorkflows;
-              }}
             />
           </IsTemporalServerVersionGuard>
           <ToggleSwitch
@@ -257,25 +255,18 @@
             labelPosition="left"
             id="view-search-input"
             bind:checked={$searchInputViewOpen}
-            on:change={() => {
-              resetFilter();
-            }}
+            on:change={resetFilter}
           />
-          <button
-            data-testid="workflows-summary-table-configuration-button"
-            class="flex min-w-max cursor-pointer items-center gap-2 rounded px-2 text-sm text-primary"
-            tabindex={0}
-            on:click={onClickConfigure}
-            >{translate('workflows.configure-workflows')}
-            <Icon name="sliders" class="text-indigo-700" />
-          </button>
-          <button
-            class=" group relative flex w-fit min-w-fit cursor-pointer items-center gap-2 rounded px-2 text-sm text-primary underline hover:text-active"
-            tabindex={0}
+          <MenuItem on:click={onClickConfigure} class="!m-0 !py-0.5">
+            {translate('workflows.configure-workflows')}
+          </MenuItem>
+          <MenuItem
             on:click={() => exportWorkflows($workflows)}
-            >{translate('common.download-json')}
+            class="!m-0 !py-0.5"
+          >
+            {translate('common.download-json')}
             <Icon name="download" />
-          </button>
+          </MenuItem>
         </div>
       </Menu>
     </MenuContainer>
