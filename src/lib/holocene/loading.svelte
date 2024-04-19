@@ -1,6 +1,7 @@
 <script lang="ts">
   import { translate } from '$lib/i18n/translate';
-  import Logo from '$lib/vendor/Temporal_Logo_Animation.mp4';
+  import mp4Logo from '$lib/vendor/Temporal_Logo_Animation.mp4';
+  import webmLogo from '$lib/vendor/Temporal_Logo_Animation.webm';
 
   export let title = translate('common.loading');
 </script>
@@ -13,11 +14,13 @@
     loop
     muted
     playsinline
-    width="100"
-    height="100"
-    class="dark:invert-[.92]"
+    preload="auto"
+    height="160"
+    width="160"
+    class="dark:invert"
   >
-    <source src={Logo} type="video/mp4" />
+    <source src={mp4Logo} type="video/mp4;codecs=hvc1" />
+    <source src={webmLogo} type="video/webm" />
   </video>
   <h2 class="text-xl font-medium">
     {title}
