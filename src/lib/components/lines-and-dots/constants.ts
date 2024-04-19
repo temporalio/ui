@@ -295,6 +295,29 @@ export const getStatusColor = (
   }
 };
 
+export const getCategoryColor = (type: EventTypeCategory): string => {
+  switch (type) {
+    case 'command':
+    case 'marker':
+    case 'local-activity':
+      return '#ebebeb';
+    case 'timer':
+      return '#fbbf24';
+    case 'signal':
+      return '#ec4899';
+    case 'activity':
+      return '#a78bfa';
+    case 'workflow':
+      return '#059669';
+    case 'child-workflow':
+      return '#67e4f9';
+    case 'update':
+      return '#FF9B70';
+    default:
+      return '#ebebeb';
+  }
+};
+
 export const activeGroupsHeightAboveGroup = (
   activeGroups: string[],
   group: EventGroup,
