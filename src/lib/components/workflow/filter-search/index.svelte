@@ -259,14 +259,14 @@
           />
           <MenuItem
             on:click={onClickConfigure}
-            class="!m-0 !py-0.5"
+            class="m-0 py-0.5"
             data-testid="workflows-summary-table-configuration-button"
           >
             {translate('workflows.configure-workflows')}
           </MenuItem>
           <MenuItem
             on:click={() => exportWorkflows($workflows)}
-            class="!m-0 !py-0.5"
+            class="m-0 py-0.5"
             data-testid="export-history-button"
           >
             {translate('common.download-json')}
