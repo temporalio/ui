@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
   import {
@@ -102,7 +103,7 @@
           class="flex items-center gap-0.5 rounded-t bg-white px-2 text-sm text-black"
           on:click|stopPropagation={() => setActiveGroup(group)}
         >
-          Close<Icon name="close" />
+          {translate('common.close')}<Icon name="close" />
         </button>
       </div>
     </div>

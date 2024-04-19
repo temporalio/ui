@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveEvent } from '$lib/stores/active-events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
@@ -60,7 +61,7 @@
       class="flex items-center gap-0.5 rounded-t bg-white px-2 text-sm text-black"
       on:click|stopPropagation={() => setActiveEvent(event, group)}
     >
-      Close<Icon name="close" />
+      {translate('common.close')}<Icon name="close" />
     </button>
   </foreignObject>
 {/if}
