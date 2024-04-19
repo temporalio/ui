@@ -1,8 +1,9 @@
 <script lang="ts">
   import Copyable from '$lib/holocene/copyable/index.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import Link from '$lib/holocene/link.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
   export let title = '';
@@ -11,6 +12,7 @@
   export let href: string = null;
   export let textSize = 'md';
   export let icon: IconName | undefined = undefined;
+  export let tooltip: string = '';
 </script>
 
 <p class="flex items-center gap-2 text-{textSize} whitespace-nowrap pt-2">
@@ -31,7 +33,9 @@
       {#if href}
         <Link {href} class="value">{content}</Link>
       {:else}
-        <span class="value select-all">{content}</span>
+        <Tooltip text={tooltip} hide={!tooltip} top>
+          <span class="value select-all">{content}</span>
+        </Tooltip>
       {/if}
     </Copyable>
   {:else}
@@ -44,7 +48,9 @@
     {#if href}
       <Link {href} class="value">{content}</Link>
     {:else}
-      <span class="value select-all">{content}</span>
+      <Tooltip text={tooltip} hide={!tooltip} top>
+        <span class="value select-all">{content}</span>
+      </Tooltip>
     {/if}
   {/if}
 </p>

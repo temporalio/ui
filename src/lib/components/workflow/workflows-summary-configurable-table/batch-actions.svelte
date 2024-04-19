@@ -3,17 +3,21 @@
 
   import { page } from '$app/stores';
 
-  import BulkActionButton from '$lib/holocene/table/bulk-action-button.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import {
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import { coreUserStore } from '$lib/stores/core-user';
-  import { workflowCount } from '$lib/stores/workflows';
+  import { temporalVersion } from '$lib/stores/versions';
+  import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
+  import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
 
   export let workflows: WorkflowExecution[];
@@ -25,6 +29,7 @@
     cancelableWorkflows,
     openBatchCancelConfirmationModal,
     openBatchTerminateConfirmationModal,
+    openBatchResetConfirmationModal,
   } = getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
 
   let coreUser = coreUserStore();
@@ -36,6 +41,10 @@
 
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
+  $: resetEnabled =
+    workflowResetEnabled($page.data.settings) && $isCloud
+      ? true
+      : minimumVersionRequired('1.23', $temporalVersion);
   $: namespaceWriteDisabled = $coreUser.namespaceWriteDisabled(
     $page.params.namespace,
   );
@@ -52,34 +61,51 @@
       count={selectedWorkflowsCount}
     /></span
   >
-  <span>
-    (or <button
-      data-testid="select-all-workflows"
-      on:click={() => handleSelectAll(workflows)}
-      class="cursor-pointer underline"
-      ><Translate
-        key="workflows.select-all"
-        count={$workflowCount.count}
-      /></button
-    >)
-  </span>
+  {#if $workflowsQuery}
+    <span>
+      ({translate('workflows.select-all-leading')}
+      <button
+        data-testid="select-all-workflows"
+        on:click={() => handleSelectAll(workflows)}
+        class="cursor-pointer underline"
+        ><Translate
+          key="workflows.select-all"
+          count={$workflowCount.count}
+        /></button
+      >
+      {translate('workflows.select-all-trailing')})
+    </span>
+  {/if}
 {/if}
 <div class="ml-4 inline-flex gap-2">
   {#if cancelEnabled}
-    <BulkActionButton
-      testId="bulk-cancel-button"
+    <Button
+      size="xs"
+      variant="table-header"
+      data-testid="bulk-cancel-button"
       disabled={namespaceWriteDisabled || !$cancelableWorkflows.length}
       on:click={openBatchCancelConfirmationModal}
-      >{translate('workflows.request-cancellation')}</BulkActionButton
+      >{translate('workflows.request-cancellation')}</Button
+    >
+  {/if}
+  {#if resetEnabled}
+    <Button
+      size="xs"
+      variant="table-header"
+      data-testid="bulk-reset-button"
+      disabled={namespaceWriteDisabled}
+      on:click={openBatchResetConfirmationModal}
+      >{translate('workflows.reset')}</Button
     >
   {/if}
   {#if terminateEnabled}
-    <BulkActionButton
+    <Button
+      size="xs"
       variant="destructive"
-      testId="bulk-terminate-button"
+      data-testid="bulk-terminate-button"
       disabled={namespaceWriteDisabled}
       on:click={openBatchTerminateConfirmationModal}
-      >{translate('workflows.terminate')}</BulkActionButton
+      >{translate('workflows.terminate')}</Button
     >
   {/if}
 </div>

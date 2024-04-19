@@ -10,12 +10,14 @@
   const { filter, focusedElementId, handleSubmit } =
     getContext<FilterContext>(FILTER_CONTEXT);
   const min = 0;
-  let value = $filter.value ? Number($filter.value) : null;
+
+  $: ({ value } = $filter);
+  $: _value = value ? Number(value) : null;
 
   const handleKeydown = (e: KeyboardEvent) => {
     $focusedElementId = '';
-    if (e.key === 'Enter' && value !== null && value >= min) {
-      $filter.value = String(value);
+    if (e.key === 'Enter' && _value !== null && _value >= min) {
+      $filter.value = String(_value);
       e.preventDefault();
       handleSubmit();
     }
@@ -23,14 +25,14 @@
 </script>
 
 <div class="flex items-center">
-  <ConditionalMenu inputId="number-filter-search" noBorderLeft noBorderRight />
+  <ConditionalMenu inputId="number-filter-search" noBorderLeft />
   <NumberInput
     label={translate('common.number-input-placeholder')}
     labelHidden
     id="number-filter-search"
     icon="search"
     placeholder={translate('common.number-input-placeholder')}
-    bind:value
+    bind:value={_value}
     {min}
     on:keydown={handleKeydown}
     unroundLeft

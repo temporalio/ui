@@ -49,7 +49,6 @@
         <Icon
           title={$copied ? copySuccessIconTitle : copyIconTitle}
           name={$copied ? 'checkmark' : 'copy'}
-          stroke="#000"
         />
       </button>
     {/if}
@@ -62,7 +61,7 @@
   }
 
   .copy-or-filter-button {
-    @apply surface-primary relative top-[50%] h-fit translate-y-[-50%] rounded-full p-1 text-primary hover:bg-inverse hover:text-white;
+    @apply surface-primary relative top-[50%] h-fit translate-y-[-50%] rounded-full p-1 text-primary hover:bg-primary hover:text-white dark:hover:text-black;
   }
 
   .filtered {

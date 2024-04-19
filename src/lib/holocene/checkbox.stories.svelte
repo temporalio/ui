@@ -26,7 +26,10 @@
   />
 </Template>
 
-<Story name="checkbox" args={{ label: 'Check Me', hoverable: true }} />
+<Story
+  name="checkbox"
+  args={{ label: 'Check Me', hoverable: true, disabled: false }}
+/>
 
 <Story name="So Many" template="Many" args={{ label: loremIpsum }} />
 

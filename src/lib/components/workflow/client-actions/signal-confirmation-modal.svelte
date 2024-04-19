@@ -86,7 +86,7 @@
         {translate('workflows.signal-payload-input-label-hint')}
       </span>
       <CodeBlock
-        class="max-h-80 overflow-y-scroll overscroll-contain"
+        maxHeight={320}
         content={input}
         on:change={handleInputChange}
         editable

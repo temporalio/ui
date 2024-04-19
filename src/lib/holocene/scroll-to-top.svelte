@@ -1,28 +1,21 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
 
-  export let hidden = true;
+  export let hidden: boolean;
   export let onScrollToTopClick: () => void;
 </script>
 
-<div id="scroll-container" class={$$props.class}>
-  <slot />
-  <div class="back-to-top" class:hidden>
-    <Button
-      size="sm"
-      variant="primary"
-      on:click={onScrollToTopClick}
-      leadingIcon="arrow-up"
-    />
-  </div>
+<div class:hidden>
+  <Button
+    size="sm"
+    variant="primary"
+    on:click={onScrollToTopClick}
+    leadingIcon="arrow-up"
+  />
 </div>
 
 <style lang="postcss">
-  .back-to-top {
-    @apply fixed bottom-5 right-8 z-50;
-  }
-
-  .back-to-top.hidden {
+  .hidden {
     @apply invisible;
   }
 </style>

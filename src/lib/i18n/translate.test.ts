@@ -32,7 +32,7 @@ describe('translate', () => {
     translate('common.loading', { foo: 'bar' });
 
     expect(i18next.t).toHaveBeenCalledWith('common:loading', {
-      replace: { foo: 'bar' },
+      foo: 'bar',
     });
   });
 
@@ -56,8 +56,8 @@ describe('translate', () => {
     translate('common.loading', { count: 10, foo: 'bar' });
 
     expect(i18next.t).toHaveBeenCalledWith('common:loading', {
+      foo: 'bar',
       count: 10,
-      replace: { foo: 'bar' },
     });
   });
 });

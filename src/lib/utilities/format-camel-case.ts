@@ -3,8 +3,15 @@ const isUpperCase = (label: string, index: number): boolean => {
   return charCode >= 65 && charCode <= 90;
 };
 
-export const capitalize = (word: string): string => {
+export const capitalize = (word?: string): string => {
+  if (!word) return '';
   return word[0].toUpperCase() + word.slice(1);
+};
+
+export const spaceBetweenCapitalLetters = (word: string): string => {
+  return capitalize(word)
+    .replace(/([A-Z])/g, ' $1')
+    .trim();
 };
 
 const labelsToAddName: Readonly<Set<string>> = new Set(['workflowType']);

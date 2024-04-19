@@ -16,6 +16,8 @@
   argTypes={{
     language: { control: false },
     class: { control: 'text' },
+    minHeight: { control: 'number' },
+    maxHeight: { control: 'number' },
   }}
 />
 

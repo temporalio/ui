@@ -11,8 +11,8 @@
   import { page } from '$app/stores';
 
   import HeartBeat from '$lib/components/heart-beat-indicator.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
@@ -22,6 +22,7 @@
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
+  import { getUTCOffset, timeFormat } from '$lib/stores/time-format';
   import {
     workflowRun,
     workflowTimelineViewOpen,
@@ -251,7 +252,10 @@
       visualizationRef,
       new DataSet([]),
       new DataSet([]),
-      getTimelineOptions($workflowRun.workflow, { maxHeight }),
+      getTimelineOptions($workflowRun.workflow, {
+        maxHeight,
+        offset: getUTCOffset($timeFormat),
+      }),
     );
     filterAndSetItems($eventCategoryFilter);
   };
@@ -277,7 +281,8 @@
     $workflowTimelineViewOpen &&
     $workflowRun.workflow &&
     history.length &&
-    visualizationRef;
+    visualizationRef &&
+    $timeFormat;
 
   const drawTimeline = () => {
     if (timeline) {
@@ -328,7 +333,7 @@
   }
 
   :global(.vis-label) {
-    font-family: Poppins, sans-serif;
+    font-family: Inter, sans-serif;
     font-size: 12px;
     display: flex;
     align-items: center;
@@ -353,13 +358,11 @@
   }
 
   :global(.vis-content, .vis-group) {
-    background-color: white;
+    @apply surface-primary;
   }
 
   :global(.vis-timeline .vis-item) {
-    background-color: #fff;
     border-color: transparent;
-    color: #3f3f46;
     font-size: 12px;
   }
 

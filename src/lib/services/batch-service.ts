@@ -33,6 +33,7 @@ type CreateBatchOperationOptions = {
   jobId: string;
   query?: string;
   workflows?: WorkflowExecution[];
+  resetType?: 'first' | 'last';
 };
 
 type DescribeBatchOperationOptions = {
@@ -56,10 +57,8 @@ const queryFromWorkflows = (
 
 const batchActionToOperation = (
   action: Action,
-): Pick<
-  StartBatchOperationRequest,
-  'cancellationOperation' | 'terminationOperation'
-> => {
+  resetType?: 'first' | 'last',
+): StartBatchOperationRequest => {
   const identity = getAuthUser().email;
 
   switch (action) {
@@ -71,8 +70,15 @@ const batchActionToOperation = (
       return {
         terminationOperation: { identity },
       };
-    default:
-      return {};
+    case Action.Reset: {
+      const options =
+        resetType === 'first'
+          ? { firstWorkflowTask: {} }
+          : { lastWorkflowTask: {} };
+      return {
+        resetOperation: { identity, options },
+      };
+    }
   }
 };
 
@@ -89,7 +95,7 @@ const createBatchOperationRequest = (
     jobId: options.jobId,
     namespace: options.namespace,
     reason: options.reason,
-    ...batchActionToOperation(action),
+    ...batchActionToOperation(action, options.resetType),
   };
 
   if (options.workflows) {
@@ -162,6 +168,30 @@ export async function batchTerminateWorkflows(
     namespace: body.namespace,
   });
 }
+
+export const batchResetWorkflows = async (
+  options: CreateBatchOperationOptions,
+): Promise<void> => {
+  const route = routeForApi('batch-operations', {
+    namespace: options.namespace,
+    batchJobId: options.jobId,
+  });
+
+  const body = createBatchOperationRequest(Action.Reset, options);
+
+  await requestFromAPI<null>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt(body),
+    },
+    notifyOnError: false,
+  });
+
+  inProgressBatchOperation.set({
+    jobId: body.jobId,
+    namespace: body.namespace,
+  });
+};
 
 export async function pollBatchOperation({
   namespace,

@@ -26,6 +26,7 @@
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import { searchInputViewOpen } from '$lib/stores/filters';
+  import { currentPageKey } from '$lib/stores/pagination';
   import { refresh } from '$lib/stores/workflows';
   import {
     getFocusedElementId,
@@ -81,6 +82,7 @@
         parameter: 'query',
         value: searchQuery,
         allowEmpty: true,
+        clearParameters: [currentPageKey],
       });
     }
   }

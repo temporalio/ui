@@ -23,7 +23,6 @@
   export let id: string;
   export let value: SelectOptionValue;
   export let label: string = null;
-  export let dark = false;
   export let arrow = false;
   export let name = id;
   export let options: SelectOptionValue[] = [];
@@ -33,10 +32,9 @@
   <label class="sr-only" for={id}>{label}</label>
   <select
     class={merge(
-      'inline h-10 w-full rounded-lg border-2 px-2 text-base',
+      'inline h-10 w-full rounded-lg border px-2 text-base',
       className,
     )}
-    class:dark
     class:remove={arrow}
     {name}
     {id}
@@ -54,14 +52,10 @@
 
 <style lang="postcss">
   select {
-    @apply text-slate-500;
+    @apply border-secondary bg-transparent text-primary outline-none focus-visible:outline focus-visible:outline-blue-700;
   }
 
   .remove {
     @apply h-8 appearance-none rounded-xl py-1 pl-3 text-sm;
-  }
-
-  .dark {
-    @apply bg-inverse text-white;
   }
 </style>

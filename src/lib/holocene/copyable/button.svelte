@@ -29,6 +29,6 @@
 
 <style lang="postcss">
   .copy-button {
-    @apply m-1 rounded-md border-2 border-[transparent] p-1 hover:border-indigo-600 hover:bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 hover:shadow-focus hover:shadow-blue-600/50 focus-visible:border-indigo-600 focus-visible:bg-gradient-to-br focus-visible:from-blue-100 focus-visible:to-purple-100 focus-visible:shadow-focus focus-visible:shadow-blue-600/50 focus-visible:outline-none;
+    @apply m-1 rounded-md border-2 border-[transparent] bg-transparent p-1 hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-indigo-600 focus-visible:outline-none;
   }
 </style>

@@ -12,7 +12,7 @@
   export let count: number = undefined;
   export let replace: I18nReplace = undefined;
 
-  $: translated = translate(key, { count, ...replace });
+  $: translated = translate(key, { ...replace, count });
 </script>
 
 {#if translated !== key}

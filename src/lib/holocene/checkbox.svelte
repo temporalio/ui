@@ -118,11 +118,11 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px];
-  }
+    @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px] text-primary;
 
-  .checkbox.hoverable:hover .checkmark::before {
-    @apply absolute -left-2.5 -z-10 h-9 w-9 self-center rounded-full bg-interactive/20 content-[''];
+    &.disabled {
+      @apply cursor-not-allowed;
+    }
   }
 
   .label {
@@ -133,20 +133,36 @@
     @apply sr-only;
   }
 
-  input:focus-visible ~ .checkmark {
-    @apply outline outline-interactive;
-  }
-
   .checkmark {
-    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-sm border border-primary bg-white dark:bg-transparent;
+    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-md border-2 border-subtle bg-transparent text-white outline outline-4 outline-transparent dark:text-black;
 
     &.invalid {
-      @apply border-danger;
+      @apply border-error;
+    }
+
+    &.disabled {
+      @apply cursor-not-allowed opacity-50;
     }
   }
 
-  .disabled {
-    @apply surface-disabled cursor-default border-disabled;
+  input:checked ~ .checkmark {
+    @apply border-interactive bg-interactive;
+
+    &.invalid {
+      @apply border-error;
+    }
+  }
+
+  .checkbox.hoverable {
+    &:hover {
+      input:enabled ~ .checkmark {
+        @apply border-white bg-interactive outline-offset-0 outline-interactive/70 dark:border-black;
+      }
+    }
+  }
+
+  input:focus-visible ~ .checkmark {
+    @apply border-white bg-interactive outline-offset-0 outline-interactive/70 dark:border-black;
   }
 
   .error {

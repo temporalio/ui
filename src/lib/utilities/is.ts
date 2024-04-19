@@ -41,6 +41,7 @@ const operators = [
   'in',
   '(',
   ')',
+  'starts_with',
 ] as const;
 
 const conditionals = [
@@ -54,6 +55,7 @@ const conditionals = [
   '>',
   '<',
   '!',
+  'starts_with',
 ] as const;
 
 const joins = ['and', 'or'] as const;
@@ -161,4 +163,9 @@ export const isSortOrder = (
 
 export const isError = (e: unknown): e is Error => {
   return has(e, 'name', 'message');
+};
+
+export const isStartsWith = (x: unknown) => {
+  if (!isString(x)) return false;
+  return x.toLocaleLowerCase() === 'starts_with';
 };

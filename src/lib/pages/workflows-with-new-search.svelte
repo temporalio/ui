@@ -12,9 +12,9 @@
     cancelableWorkflows: Readable<WorkflowExecution[]>;
     selectedWorkflows: Writable<WorkflowExecution[]>;
     batchActionsVisible: Readable<boolean>;
-    query: Readable<string>;
     openBatchCancelConfirmationModal: () => void;
     openBatchTerminateConfirmationModal: () => void;
+    openBatchResetConfirmationModal: () => void;
     handleSelectAll: (workflows: WorkflowExecution[]) => void;
     handleSelectPage: (
       checked: boolean,
@@ -31,6 +31,7 @@
   import { page } from '$app/stores';
 
   import BatchCancelConfirmationModal from '$lib/components/workflow/client-actions/batch-cancel-confirmation-modal.svelte';
+  import BatchResetConfirmationModal from '$lib/components/workflow/client-actions/batch-reset-confirmation-modal.svelte';
   import BatchTerminateConfirmationModal from '$lib/components/workflow/client-actions/batch-terminate-confirmation-modal.svelte';
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
@@ -41,8 +42,8 @@
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { groupByCountEnabled } from '$lib/stores/capability-enablement';
   import { workflowFilters } from '$lib/stores/filters';
-  import { groupByCountEnabled } from '$lib/stores/group-by-enabled';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import {
@@ -80,12 +81,9 @@
 
   let batchTerminateConfirmationModalOpen = false;
   let batchCancelConfirmationModalOpen = false;
+  let batchResetConfirmationModalOpen = false;
   let terminateConfirmationModalOpen = false;
   let cancelConfirmationModalOpen = false;
-  const batchOperationQuery = derived(
-    workflowsQuery,
-    (query) => query ?? 'ExecutionStatus="Running"',
-  );
   const allSelected = writable<boolean>(false);
   const pageSelected = writable<boolean>(false);
   const selectedWorkflows = writable<WorkflowExecution[]>([]);
@@ -112,6 +110,10 @@
     $selectedWorkflows.length > 1
       ? (batchTerminateConfirmationModalOpen = true)
       : (terminateConfirmationModalOpen = true);
+  };
+
+  const openBatchResetConfirmationModal = () => {
+    batchResetConfirmationModalOpen = true;
   };
 
   const handleSelectAll = (workflows: WorkflowExecution[]) => {
@@ -141,9 +143,9 @@
     batchActionsVisible,
     openBatchCancelConfirmationModal,
     openBatchTerminateConfirmationModal,
+    openBatchResetConfirmationModal,
     handleSelectAll,
     handleSelectPage,
-    query: batchOperationQuery,
   });
 
   $: {
@@ -161,6 +163,11 @@
 <BatchCancelConfirmationModal
   {namespace}
   bind:open={batchCancelConfirmationModalOpen}
+/>
+
+<BatchResetConfirmationModal
+  {namespace}
+  bind:open={batchResetConfirmationModalOpen}
 />
 
 <TerminateConfirmationModal

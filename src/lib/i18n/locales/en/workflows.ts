@@ -13,6 +13,7 @@ export const Strings = {
   terminate: 'Terminate',
   'batch-terminate-modal-title': 'Terminate Workflows',
   'batch-cancel-modal-title': 'Cancel Workflows',
+  'batch-reset-modal-title': 'Reset Workflows',
   'workflow-action-reason-placeholder': '{{action}} from the Web UI',
   'workflow-action-reason-placeholder-with-email':
     '{{action}} from the Web UI by {{email}}',
@@ -20,20 +21,22 @@ export const Strings = {
     'Are you sure you want to {{action}} all workflows matching the following query? This action cannot be undone.',
   'batch-operation-count-disclaimer':
     'Note: The actual count of workflows that will be affected is the total number of running workflows matching this query at the time of clicking "{{action}}".',
-  'batch-cancel-confirmation_one':
-    'Are you sure you want to cancel {{count, number}} running workflow?',
-  'batch-cancel-confirmation_other':
-    'Are you sure you want to cancel {{count, number}} running workflows?',
-  'batch-terminate-confirmation_one':
-    'Are you sure you want to terminate {{count, number}} running workflow?',
-  'batch-terminate-confirmation_other':
-    'Are you sure you want to terminate {{count, number}} running workflows?',
+  'batch-confirmation_one':
+    'Are you sure you want to {{action}} one running workflow?',
+  'batch-confirmation_other':
+    'Are you sure you want to {{action}} {{count, number}} running workflows?',
+  'batch-reset-confirmation_one':
+    'Are you sure you want to reset one workflow?',
+  'batch-reset-confirmation_other':
+    'Are you sure you want to reset {{count, number}} workflows?',
   'batch-operation-confirmation-input-hint':
     'If you supply a custom reason, "{{placeholder}}" will be appended to it.',
   'batch-terminate-all-success':
     'The batch terminate request is processing in the background.',
   'batch-cancel-all-success':
     'The batch cancel request is processing in the background.',
+  'batch-reset-all-success':
+    'The batch reset request is processing in the background.',
   'configure-workflows': 'Configure Workflow List',
   'open-configure-workflows': 'Open workflow list configuration',
   'close-configure-workflows': 'Close workflow list configuration',
@@ -53,7 +56,9 @@ export const Strings = {
   signal: 'Send a Signal',
   'n-selected': '{{count, number}} selected',
   'all-selected': 'All {{count, number}} selected.',
-  'select-all': 'select all {{count, number}}',
+  'select-all-leading': 'or ',
+  'select-all': 'select all {{count, number}} workflows',
+  'select-all-trailing': ' matching your query',
   'request-cancellation': 'Request Cancellation',
   'back-to-workflows': 'Back to Workflows',
   input: 'Input',
@@ -63,6 +68,7 @@ export const Strings = {
   'event-history-view': 'Event History View',
   'event-history': 'Event History',
   history: 'History',
+  'full-history': 'Full History',
   compact: 'Compact',
   json: 'JSON',
   download: 'Download',
@@ -106,6 +112,7 @@ export const Strings = {
   'pending-activities-tab': 'Pending Activities',
   'call-stack-tab': 'Call Stack',
   'queries-tab': 'Queries',
+  'metadata-tab': 'Metadata',
   'workflow-404-title': 'This is not the Workflow you are looking for',
   'workflow-error-title':
     'We are having technical difficulties retrieving this Workflow',
