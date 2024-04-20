@@ -8,7 +8,16 @@ import type { WorkflowFilter } from '$lib/models/workflow-filters';
 import { persistStore } from '$lib/stores/persist-store';
 import type { EventClassification, EventTypeCategory } from '$lib/types/events';
 
-const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
+export const query = derived([page], ([$page]) =>
+  $page.url.searchParams.get('query'),
+);
+
+export const showChildWorkflows = persistStore<boolean>(
+  'showChildWorkflows',
+  true,
+  true,
+);
+
 const category = derived([page], ([$page]) =>
   $page.url.searchParams.get('category'),
 );

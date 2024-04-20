@@ -19,15 +19,26 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import MenuButton from '$lib/holocene/menu/menu-button.svelte';
+  import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
+  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
+  import Menu from '$lib/holocene/menu/menu.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
-  import { workflowFilters } from '$lib/stores/filters';
+  import { showChildWorkflows, workflowFilters } from '$lib/stores/filters';
   import { searchInputViewOpen } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
-  import { refresh } from '$lib/stores/workflows';
+  import {
+    canFetchChildWorkflows,
+    refresh,
+    workflows,
+  } from '$lib/stores/workflows';
+  import { exportWorkflows } from '$lib/utilities/export-workflows';
   import {
     getFocusedElementId,
     isBooleanFilter,
@@ -53,6 +64,9 @@
   import SearchAttributeMenu from './search-attribute-menu.svelte';
   import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
+
+  export let onClickConfigure: () => void;
+
   const filter = writable<WorkflowFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
@@ -217,16 +231,55 @@
         {/if}
       </div>
     {/if}
-    <ToggleSwitch
-      data-testid="manual-search-toggle"
-      label={translate('workflows.view-search-input')}
-      labelPosition="left"
-      id="view-search-input"
-      bind:checked={$searchInputViewOpen}
-      on:change={() => {
-        resetFilter();
-      }}
-    />
+    <MenuContainer>
+      <MenuButton
+        controls="filter-configuration-menu"
+        count={Number($searchInputViewOpen) +
+          Number($canFetchChildWorkflows && $showChildWorkflows)}
+        data-testid="filter-configuration-menu-button"
+        class="max-w-[3rem] text-nowrap md:max-w-full"
+      >
+        <svelte:fragment slot="leading">
+          <Icon name="settings" />
+        </svelte:fragment>
+      </MenuButton>
+      <Menu id="filter-configuration-menu" position="right">
+        <div class="flex flex-col items-start gap-4 p-4 md:items-end">
+          <IsTemporalServerVersionGuard minimumVersion="1.23">
+            <ToggleSwitch
+              data-testid="show-child-workflow-toggle"
+              label={translate('workflows.show-children')}
+              labelPosition="left"
+              id="show-child-workflow-input"
+              bind:checked={$showChildWorkflows}
+            />
+          </IsTemporalServerVersionGuard>
+          <ToggleSwitch
+            data-testid="manual-search-toggle"
+            label={translate('workflows.view-search-input')}
+            labelPosition="left"
+            id="view-search-input"
+            bind:checked={$searchInputViewOpen}
+            on:change={resetFilter}
+          />
+          <MenuItem
+            on:click={onClickConfigure}
+            class="m-0 py-0.5"
+            data-testid="workflows-summary-table-configuration-button"
+          >
+            {translate('workflows.configure-workflows')}
+          </MenuItem>
+          <MenuItem
+            on:click={() => exportWorkflows($workflows)}
+            class="m-0 py-0.5"
+            data-testid="export-history-button"
+          >
+            {translate('common.download-json')}
+            <Icon name="download" />
+          </MenuItem>
+        </div>
+      </Menu>
+    </MenuContainer>
   </div>
   <FilterList />
 </div>

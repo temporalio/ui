@@ -38,7 +38,11 @@
   import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
+  import WorkflowColumnsOrderableList from '$lib/components/workflow/workflows-summary-configurable-table/orderable-list.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
+  import DrawerContent from '$lib/holocene/drawer-content.svelte';
+  import Drawer from '$lib/holocene/drawer.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
@@ -50,11 +54,9 @@
     refresh,
     updating,
     workflowCount,
-    workflows,
     workflowsQuery,
     workflowsSearchParams,
   } from '$lib/stores/workflows';
-  import { exportWorkflows } from '$lib/utilities/export-workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   $: query = $page.url.searchParams.get('query');
@@ -153,6 +155,16 @@
       resetSelection();
     }
   }
+
+  let customizationDrawerOpen = false;
+
+  const openCustomizationDrawer = () => {
+    customizationDrawerOpen = true;
+  };
+
+  const closeCustomizationDrawer = () => {
+    customizationDrawerOpen = false;
+  };
 </script>
 
 <BatchTerminateConfirmationModal
@@ -202,14 +214,6 @@
         <WorkflowCountRefresh count={$workflowCount.newCount} />
       </h1>
     </div>
-    <div class="flex items-center gap-2 text-sm">
-      <button
-        class="underline hover:text-blue-700"
-        tabindex={0}
-        on:click={() => exportWorkflows($workflows)}
-        >{translate('common.download-json')}</button
-      >
-    </div>
   </div>
   {#if $groupByCountEnabled}
     <WorkflowCounts />
@@ -217,8 +221,30 @@
 </header>
 
 <div class="flex flex-col gap-2 md:flex-row">
-  <WorkflowFilterSearch />
+  <WorkflowFilterSearch onClickConfigure={openCustomizationDrawer} />
 </div>
 <WorkflowsSummaryConfigurableTable>
   <slot name="cloud" slot="cloud" />
 </WorkflowsSummaryConfigurableTable>
+
+<Drawer
+  open={customizationDrawerOpen}
+  onClick={closeCustomizationDrawer}
+  position="right"
+  id="workflows-summary-table-configuration-drawer"
+  dark={false}
+  closeButtonLabel={translate('workflows.close-configure-workflows')}
+  class="w-[35vw] min-w-min max-w-fit"
+>
+  <DrawerContent title={translate('workflows.configure-workflows')}>
+    <svelte:fragment slot="subtitle">
+      Add (<Icon class="inline" name="add" />), re-arrange (<Icon
+        class="inline"
+        name="chevron-selector-vertical"
+      />), and remove (<Icon class="inline" name="hyphen" />), Workflow Headings
+      to personalize the Workflow List Table.
+    </svelte:fragment>
+
+    <WorkflowColumnsOrderableList {namespace} />
+  </DrawerContent>
+</Drawer>

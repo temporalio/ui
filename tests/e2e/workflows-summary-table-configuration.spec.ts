@@ -50,6 +50,7 @@ test.describe('Workflows Table Configuration', () => {
       ),
     );
 
+    await page.getByTestId('filter-configuration-menu-button').click();
     await page
       .getByTestId('workflows-summary-table-configuration-button')
       .click();
@@ -78,6 +79,7 @@ test.describe('Workflows Table Configuration', () => {
       ),
     );
 
+    await page.getByTestId('filter-configuration-menu-button').click();
     await page
       .getByTestId('workflows-summary-table-configuration-button')
       .click();
@@ -113,6 +115,7 @@ test.describe('Workflows Table Configuration', () => {
       ),
     );
 
+    await page.getByTestId('filter-configuration-menu-button').click();
     await page
       .getByTestId('workflows-summary-table-configuration-button')
       .click();
@@ -155,6 +158,7 @@ test.describe('Workflows Table Configuration', () => {
       ),
     );
 
+    await page.getByTestId('filter-configuration-menu-button').click();
     await page
       .getByTestId('workflows-summary-table-configuration-button')
       .click();
