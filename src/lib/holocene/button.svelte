@@ -45,7 +45,6 @@
             'border-inverse surface-inverse hover:surface-primary focus-visible:shadow-focus focus-visible:shadow-primary/50 focus-visible:border-white',
         },
         size: {
-          xxs: 'h-8 text-xs px-0.5 py-1',
           xs: 'h-8 text-xs px-2 py-1',
           sm: 'h-9 text-sm px-4 py-1.5',
           md: 'h-10 text-base px-4 py-2',
