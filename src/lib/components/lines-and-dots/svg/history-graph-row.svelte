@@ -63,13 +63,8 @@
     >
       <div class="flex gap-4">
         {event.id}
-        <div class="flex gap-1">
-          <Icon
-            name={icon}
-            width={radius * 3}
-            height={radius * 3}
-            class="text-white"
-          />
+        <div class="flex items-center gap-1">
+          <Icon name={icon} class="text-white" />
           {spaceBetweenCapitalLetters(event?.name)}
           {#if group && group.displayName && showDetails}<span
               style="color: {getCategoryColor(group.category)}"

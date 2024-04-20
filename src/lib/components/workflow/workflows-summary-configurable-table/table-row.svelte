@@ -58,7 +58,7 @@
         >
           {#if !child}
             <Button
-              size="xxs"
+              size="xs"
               variant={childrenShown ? 'primary' : 'ghost'}
               on:click={() => viewChildren(workflow)}
             >

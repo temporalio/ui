@@ -24,7 +24,7 @@
   $: showIcon = icon && config;
   $: textWidth = textElement?.getBBox()?.width || 0;
   $: backdropWidth = showIcon ? textWidth + 36 : textWidth + 12;
-  $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 2.25 : x;
+  $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 1.5 : x;
 </script>
 
 {#if backdrop}
@@ -40,9 +40,7 @@
   <Icon
     name={icon}
     {x}
-    y={y - config.radius}
-    width={config.radius * 2}
-    height={config.radius * 2}
+    y={y - 8}
     class="text-white {!active && 'opacity-[.35]'}"
   />
 {/if}
@@ -61,10 +59,8 @@
 {#if showIcon && textAnchor === 'end'}
   <Icon
     name={icon}
-    x={x - textWidth - config.radius * 2}
-    y={y - config.radius}
-    width={config.radius * 2}
-    height={config.radius * 2}
+    x={x - textWidth - config.radius * 1.5}
+    y={y - 8}
     class="text-white {!active && 'opacity-[.35]'}"
   />
 {/if}

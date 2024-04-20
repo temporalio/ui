@@ -37,7 +37,7 @@
   };
 </script>
 
-<div class="flex flex-wrap items-center items-center justify-center gap-2">
+<div class="flex flex-wrap items-center items-center justify-center gap-4">
   {#each options as option}
     <div class="flex items-center">
       <Checkbox
@@ -48,7 +48,7 @@
       <div
         role="button"
         tabindex="0"
-        class="flex cursor-pointer select-none items-center gap-2 text-sm"
+        class="flex cursor-pointer select-none items-center text-sm"
         on:click={() => onOptionClick(option)}
         on:keydown={(e) => e.key === 'Enter' && onOptionClick(option)}
       >

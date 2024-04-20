@@ -45,10 +45,10 @@
   />
   <Icon
     name="workflow"
-    x={start - radius / 1.35}
-    y={y - radius / 1.35}
-    width={radius * 1.5}
-    height={radius * 1.5}
+    x={start - radius / 2}
+    y={y - radius / 2}
+    width={radius}
+    height={radius}
     strokeWidth="4"
     class="text-black"
   />
