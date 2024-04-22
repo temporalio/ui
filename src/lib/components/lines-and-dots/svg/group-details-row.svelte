@@ -110,7 +110,7 @@
   </foreignObject>
   {#each codeBlockAttributes as [key, value], index (key)}
     {@const y = textStartingY + index * staticCodeBlockHeight}
-    <Text point={[codeBlockX, y]}>{format(key)}</Text>
+    <Text point={[codeBlockX, y]} label>{format(key)}</Text>
     <GroupDetailsText
       point={[codeBlockX, y + 1.5 * fontSizeRatio]}
       {key}
@@ -131,7 +131,7 @@
           class="flex flex-col gap-0 text-sm text-white"
           style="height: {2 * fontSizeRatio}px;"
         >
-          <div class="font-semibold leading-3 text-[#C9D9F0]">
+          <div class="font-medium leading-3 text-[#C9D9F0]">
             {format(key)}
           </div>
           <div class="text-wrap break-all leading-4">

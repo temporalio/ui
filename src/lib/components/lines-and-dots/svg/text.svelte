@@ -16,6 +16,7 @@
   export let backdropHeight = 0;
   export let icon: IconName | undefined = undefined;
   export let config: GraphConfig | undefined = undefined;
+  export let label = false;
 
   $: [x, y] = point;
 
@@ -48,6 +49,7 @@
   bind:this={textElement}
   class="cursor-pointer select-none outline-none {category}"
   class:active
+  class:label
   x={textX}
   {y}
   font-size={fontSize}
@@ -72,6 +74,11 @@
     fill: #fff;
     dominant-baseline: middle;
     alignment-baseline: baseline;
+  }
+
+  .label {
+    fill: #c9d9f0;
+    font-weight: 500;
   }
 
   .active {

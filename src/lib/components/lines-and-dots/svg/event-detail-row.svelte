@@ -34,7 +34,6 @@
 
   const { gutter, fontSizeRatio } = DetailsConfig;
 
-  const labelPadding = 240;
   $: attributes = formatAttributes(event);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
@@ -98,18 +97,16 @@
     width={width - gutter}
     height={fontSizeRatio}
   >
-    <div class="flex gap-1 text-wrap text-sm text-white">
-      <div class="w-48">{format(key)}</div>
-      <GroupDetailsText
-        point={[
-          x + gutter + labelPadding,
-          textStartingY + index * fontSizeRatio,
-        ]}
-        {key}
-        {value}
-        {attributes}
-        {width}
-      />
+    <div
+      class="flex items-center gap-2 text-xs text-white md:text-sm"
+      style="height: {fontSizeRatio}px;"
+    >
+      <div class="font-medium leading-3 text-[#C9D9F0]">
+        {format(key)}
+      </div>
+      <div class="text-wrap break-all leading-3">
+        <GroupDetailsText {key} {value} {attributes} {width} />
+      </div>
     </div>
   </foreignObject>
 {/each}
@@ -119,7 +116,7 @@
     textStartingY +
     (textAttributes.length + 1) * fontSizeRatio +
     index * staticCodeBlockHeight}
-  <Text point={[blockX, blockY]}>{format(key)}</Text>
+  <Text point={[blockX, blockY]} label>{format(key)}</Text>
   <GroupDetailsText
     point={[blockX, blockY + 1.5 * fontSizeRatio]}
     {key}
