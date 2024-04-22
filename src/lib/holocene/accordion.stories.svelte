@@ -54,3 +54,49 @@
 <Story name="Disabled Accordion" args={{ disabled: true }} />
 
 <Story name="Accordion with Error" args={{ error: 'Error' }} />
+
+<Story name="Accordion with Icon" args={{ icon: 'workflow' }} />
+
+<Story name="Accordion (Default)" />
+
+<Story
+  name="Open Accordion, Dark"
+  args={{
+    open: true,
+  }}
+  parameters={{
+    themes: {
+      themeOverride: 'dark',
+    },
+  }}
+/>
+
+<Story
+  name="Disabled Accordion, Dark"
+  args={{ disabled: true }}
+  parameters={{
+    themes: {
+      themeOverride: 'dark',
+    },
+  }}
+/>
+
+<Story
+  name="Accordion with Error, Dark"
+  args={{ error: 'Error' }}
+  parameters={{
+    themes: {
+      themeOverride: 'dark',
+    },
+  }}
+/>
+
+<Story
+  name="Accordion with Icon, Dark"
+  args={{ icon: 'workflow' }}
+  parameters={{
+    themes: {
+      themeOverride: 'dark',
+    },
+  }}
+/>
