@@ -1,9 +1,9 @@
 <script lang="ts" context="module">
   import type { Meta } from '@storybook/svelte';
 
-  import Accordion from './accordion.svelte';
+  import iconNames from './icon';
 
-  import { iconNames } from '$holocene/icon';
+  import Accordion from './accordion.svelte';
 
   export const meta = {
     title: 'Accordion',
