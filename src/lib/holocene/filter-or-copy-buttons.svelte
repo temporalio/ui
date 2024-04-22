@@ -36,7 +36,7 @@
         id="filter-button"
       >
         {#key filtered}
-          <Icon title={filterIconTitle} name="filter" />
+          <Icon title={filterIconTitle} name="filter" class="m-1" />
         {/key}
       </button>
     {/if}
@@ -49,6 +49,7 @@
         <Icon
           title={$copied ? copySuccessIconTitle : copyIconTitle}
           name={$copied ? 'checkmark' : 'copy'}
+          class="m-1"
         />
       </button>
     {/if}
