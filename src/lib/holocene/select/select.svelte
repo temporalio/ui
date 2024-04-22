@@ -45,6 +45,7 @@
     unroundLeft?: boolean;
     onChange?: (value: T) => void;
     'data-testid'?: string;
+    variant?: MenuButtonVariant;
   };
 
   export let label: string;
