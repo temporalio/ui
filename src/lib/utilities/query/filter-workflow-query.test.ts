@@ -46,7 +46,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
     ];
     const query = toListWorkflowQueryFromFilters(filters);
-    expect(query).toBe('ExecutionStatus="Running"');
+    expect(query).toBe('`ExecutionStatus`="Running"');
   });
 
   it('should convert multiple ExecutionStatus filters', () => {
@@ -78,7 +78,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     ];
     const query = toListWorkflowQueryFromFilters(combineFilters(filters));
     expect(query).toBe(
-      '(ExecutionStatus="Running" OR ExecutionStatus="Canceled" OR ExecutionStatus="Failed")',
+      '(`ExecutionStatus`="Running" OR `ExecutionStatus`="Canceled" OR `ExecutionStatus`="Failed")',
     );
   });
 
@@ -94,7 +94,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
     ];
     const query = toListWorkflowQueryFromFilters(filters);
-    expect(query).toBe('CustomBoolField=false');
+    expect(query).toBe('`CustomBoolField`=false');
   });
 
   it('should convert two different filters', () => {
@@ -117,7 +117,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
     ];
     const query = toListWorkflowQueryFromFilters(combineFilters(filters));
-    expect(query).toBe('ExecutionStatus="Running" AND WorkflowId="abcd"');
+    expect(query).toBe('`ExecutionStatus`="Running" AND `WorkflowId`="abcd"');
   });
 
   it('should convert three different filters', () => {
@@ -149,7 +149,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     ];
     const query = toListWorkflowQueryFromFilters(combineFilters(filters));
     expect(query).toBe(
-      'ExecutionStatus="Running" AND WorkflowId="abcd" AND WorkflowType="cronWorkflow"',
+      '`ExecutionStatus`="Running" AND `WorkflowId`="abcd" AND `WorkflowType`="cronWorkflow"',
     );
   });
 
@@ -198,7 +198,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       supportsAdvancedVisibility,
     );
     expect(query).toBe(
-      'WorkflowType="cronWorkflow" AND StartTime > "2019-12-30T00:00:00.000Z"',
+      '`WorkflowType`="cronWorkflow" AND StartTime > "2019-12-30T00:00:00.000Z"',
     );
   });
 });
