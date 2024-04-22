@@ -10,6 +10,7 @@
   *,
   html,
   body {
+    @apply surface-background;
     box-sizing: border-box;
   }
 
