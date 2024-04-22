@@ -58,7 +58,9 @@
   {#if icon}
     <div class="flex items-center gap-2">
       <Icon name={icon} />
-      <span class="hidden md:block"><slot /></span>
+      {#if $$slots.default}
+        <span class="hidden md:block"><slot /></span>
+      {/if}
     </div>
   {:else}
     <slot />
