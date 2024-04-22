@@ -73,20 +73,7 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
     },
   );
 
-export type StartAndEndEventHistory = {
-  start: WorkflowEvents;
-  end: WorkflowEvents;
-};
-
-export const initialEventHistory: StartAndEndEventHistory = {
-  start: [],
-  end: [],
-};
-
-export const eventHistory =
-  writable<StartAndEndEventHistory>(initialEventHistory);
 export const timelineEvents = writable(null);
-
 export const fullEventHistory = writable<WorkflowEvents>([]);
 
 export const filteredEventHistory = derived(

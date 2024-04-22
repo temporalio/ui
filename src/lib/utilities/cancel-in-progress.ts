@@ -1,12 +1,12 @@
-import type { StartAndEndEventHistory } from '$lib/stores/events';
+import type { WorkflowEvents } from '$lib/types/events';
 import type { WorkflowStatus } from '$lib/types/workflows';
 
 export const isCancelInProgress = (
   status: WorkflowStatus,
-  eventHistory: StartAndEndEventHistory,
+  eventHistory: WorkflowEvents,
 ) => {
   const isRunning = status === 'Running';
-  const workflowCancelRequested = eventHistory?.end?.some(
+  const workflowCancelRequested = eventHistory?.some(
     (event) => event?.eventType === 'WorkflowExecutionCancelRequested',
   );
   return isRunning && workflowCancelRequested;

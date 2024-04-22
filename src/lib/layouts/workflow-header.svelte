@@ -15,7 +15,7 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import { fullEventHistory } from '$lib/stores/events';
   import { labsMode } from '$lib/stores/labs-mode';
   import { namespaces } from '$lib/stores/namespaces';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
@@ -58,7 +58,7 @@
   );
   $: cancelInProgress = isCancelInProgress(
     $workflowRun?.workflow?.status,
-    $eventHistory,
+    $fullEventHistory,
   );
   $: workflowHasBeenReset = has($resetWorkflows, $workflowRun?.workflow?.runId);
 

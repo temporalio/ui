@@ -11,7 +11,7 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { eventFilterSort } from '$lib/stores/event-view';
-  import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { isChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
   import { routeForEventHistory } from '$lib/utilities/route-for';
@@ -57,11 +57,8 @@
 
   $: fetchEvents(namespace, workflowId, runId);
 
-  $: currentEvents = $fullEventHistory.length
-    ? $fullEventHistory
-    : $eventHistory?.start;
-  $: initialItem = currentEvents?.[0];
-  $: updating = currentEvents.length && !$fullEventHistory.length;
+  $: initialItem = $fullEventHistory?.[0];
+  $: updating = !$fullEventHistory.length;
 
   function getLink(group: EventGroup) {
     const childEvent = group?.eventList.find(isChildWorkflowClosedEvent);

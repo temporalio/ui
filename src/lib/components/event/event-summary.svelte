@@ -8,7 +8,7 @@
   import { groupEvents } from '$lib/models/event-groups';
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
-  import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import { fullEventHistory } from '$lib/stores/events';
   import { eventCategoryFilter } from '$lib/stores/filters';
   import type {
     CommonHistoryEvent,
@@ -48,16 +48,9 @@
         ?.get('category')
         .split(',') as EventTypeCategory[])
     : undefined;
-  $: initialEvents =
-    $eventFilterSort === 'descending'
-      ? $eventHistory?.end
-      : $eventHistory?.start;
-  $: currentEvents = $fullEventHistory.length
-    ? $fullEventHistory
-    : initialEvents;
-  $: initialItem = currentEvents?.[0];
-  $: items = getEventsOrGroups(currentEvents, $eventCategoryFilter);
-  $: updating = currentEvents.length && !$fullEventHistory.length;
+  $: initialItem = $fullEventHistory?.[0];
+  $: items = getEventsOrGroups($fullEventHistory, $eventCategoryFilter);
+  $: updating = !$fullEventHistory.length;
 </script>
 
 <Pagination
@@ -83,7 +76,7 @@
         onRowClick={() => setActiveRowIndex(index)}
       />
     {:else}
-      <EventEmptyRow loading={!initialEvents.length} />
+      <EventEmptyRow loading={!$fullEventHistory.length} />
     {/each}
   </EventSummaryTable>
 </Pagination>
