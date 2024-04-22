@@ -1,22 +1,45 @@
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
-
-  import iconNames from './icon';
+<script lang="ts" context="module">
+  import type { Meta } from '@storybook/svelte';
 
   import Accordion from './accordion.svelte';
+
+  import { iconNames } from '$holocene/icon';
+
+  export const meta = {
+    title: 'Accordion',
+    component: Accordion,
+    args: {
+      title: 'Accordion Title',
+      subtitle: 'Subtitle',
+      disabled: false,
+      open: false,
+      readOnly: false,
+    },
+    argTypes: {
+      title: { control: 'text' },
+      subtitle: { control: 'text' },
+      open: { control: 'boolean' },
+      disabled: { control: 'boolean' },
+      readOnly: { control: 'boolean' },
+      error: { control: 'text' },
+      onToggle: { action: 'onToggle', table: { disable: true } },
+      id: {
+        control: { type: 'text' },
+        defaultValue: 'accordion',
+        table: { disable: true },
+      },
+      class: { table: { disable: true } },
+      icon: {
+        control: { type: 'select', options: iconNames },
+      },
+    },
+  } satisfies Meta;
 </script>
 
-<Meta
-  title="Accordion"
-  component={Accordion}
-  argTypes={{
-    id: { control: 'text' },
-    title: { control: 'text' },
-    icon: { control: 'select', options: iconNames },
-    onToggle: { control: false },
-  }}
-/>
+<script lang="ts">
+  import { action } from '@storybook/addon-actions';
+  import { Story, Template } from '@storybook/addon-svelte-csf';
+</script>
 
 <Template let:args>
   <Accordion {...args} onToggle={action('onToggle')}>
@@ -24,10 +47,10 @@
   </Accordion>
 </Template>
 
-<Story
-  name="accordion"
-  args={{
-    title: 'Accordion Title',
-    subtitle: 'Accordion Subtitle',
-  }}
-/>
+<Story name="Accordion (Default)" />
+
+<Story name="Open Accordion" args={{ open: true }} />
+
+<Story name="Disabled Accordion" args={{ disabled: true }} />
+
+<Story name="Accordion with Error" args={{ error: 'Error' }} />
