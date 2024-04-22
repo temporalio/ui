@@ -68,7 +68,7 @@
         <slot name="summary" />
       </h2>
       <div
-        class="flex flex-row items-center"
+        class="flex flex-row items-center gap-2 pr-2"
         on:click|stopPropagation
         on:keyup|stopPropagation
       >
