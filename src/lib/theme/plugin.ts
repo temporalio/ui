@@ -112,7 +112,7 @@ const temporal = plugin(
   ({ addComponents, addBase }) => {
     addBase({
       ':root': variables,
-      ':is(body.dark *)': dark,
+      '[data-theme="dark"]': dark,
     });
 
     addComponents({
