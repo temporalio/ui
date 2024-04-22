@@ -10,11 +10,11 @@
   *,
   html,
   body {
-    @apply surface-background;
     box-sizing: border-box;
   }
 
   body {
+    @apply surface-background;
     font-family: theme('fontFamily.primary');
     position: relative;
     overscroll-behavior: none;
