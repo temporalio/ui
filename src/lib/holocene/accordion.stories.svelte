@@ -47,20 +47,20 @@
   </Accordion>
 </Template>
 
-<Story name="Accordion (Default)" />
+<Story name="Default" />
 
-<Story name="Open Accordion" args={{ open: true }} />
+<Story name="Open" args={{ open: true }} />
 
-<Story name="Disabled Accordion" args={{ disabled: true }} />
+<Story name="Disabled" args={{ disabled: true }} />
 
-<Story name="Accordion with Error" args={{ error: 'Error' }} />
+<Story name="With Error" args={{ error: 'Error' }} />
 
-<Story name="Accordion with Icon" args={{ icon: 'workflow' }} />
+<Story name="With Icon" args={{ icon: 'workflow' }} />
 
 <Story name="Accordion (Default)" />
 
 <Story
-  name="Open Accordion, Dark"
+  name="Open (Dark)"
   args={{
     open: true,
   }}
@@ -72,7 +72,7 @@
 />
 
 <Story
-  name="Disabled Accordion, Dark"
+  name="Disabled (Dark)"
   args={{ disabled: true }}
   parameters={{
     themes: {
@@ -82,7 +82,7 @@
 />
 
 <Story
-  name="Accordion with Error, Dark"
+  name="With Error (Dark)"
   args={{ error: 'Error' }}
   parameters={{
     themes: {
@@ -92,7 +92,7 @@
 />
 
 <Story
-  name="Accordion with Icon, Dark"
+  name="With Icon (Dark)"
   args={{ icon: 'workflow' }}
   parameters={{
     themes: {
