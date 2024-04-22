@@ -1,6 +1,9 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { setActiveEvent } from '$lib/stores/active-events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { PendingActivity } from '$lib/types/events';
   import { formatDate } from '$lib/utilities/format-date';
@@ -22,6 +25,7 @@
   import Text from './text.svelte';
 
   export let event: PendingActivity;
+  export let group: EventGroup | undefined = undefined;
   export let x = 0;
   export let y: number;
   export let width: number;
@@ -35,6 +39,14 @@
 </script>
 
 {#if active}
+  <foreignObject {x} y={eventY - 20} {width} height={fontSizeRatio}>
+    <button
+      class="flex items-center gap-0.5 rounded-t bg-white pl-1.5 pr-0.5 text-sm text-black"
+      on:click|stopPropagation={() => setActiveEvent(event, group)}
+    >
+      {translate('common.close')}<Icon name="close" />
+    </button>
+  </foreignObject>
   <Box
     point={[x, eventY]}
     {width}

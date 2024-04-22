@@ -55,7 +55,7 @@
   $: textStartingY = eventY + 1.5 * fontSizeRatio;
 </script>
 
-{#if active}
+{#if active && !group?.pendingActivity}
   <foreignObject {x} y={y - 20} {width} height={fontSizeRatio}>
     <button
       class="flex items-center gap-0.5 rounded-t bg-white pl-1.5 pr-0.5 text-sm text-black"

@@ -39,6 +39,7 @@
     {#if group.pendingActivity}
       <PendingDetailRow
         event={group.pendingActivity}
+        {group}
         {width}
         {x}
         {y}
