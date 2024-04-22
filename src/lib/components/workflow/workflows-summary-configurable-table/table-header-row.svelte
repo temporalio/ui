@@ -44,7 +44,6 @@
         labelHidden
         id="select-visible-workflows"
         data-testid="batch-actions-checkbox"
-        hoverable
         bind:checked={$pageSelected}
         {indeterminate}
         on:change={handleCheckboxChange}
