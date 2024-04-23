@@ -16,12 +16,10 @@
     labelHidden: false,
     disabled: false,
     clearable: false,
-    dark: false,
     copyable: false,
     required: false,
     error: false,
     spellcheck: false,
-    theme: 'light',
     hintText: 'This is the hint text',
     clearButtonLabel: 'Clear input',
     copyButtonLabel: 'Copy contents',
@@ -32,7 +30,6 @@
     value: { control: 'text' },
     name: { control: 'text' },
     icon: { control: 'select', options: iconNames },
-    theme: { control: 'select', options: ['dark', 'light'] },
     spellcheck: { control: 'boolean' },
   }}
 />

@@ -1,23 +1,21 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
   import { getContext } from 'svelte';
 
+  import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import { showChildWorkflows } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   import BatchActions from './batch-actions.svelte';
 
   export let workflows: WorkflowExecution[];
   export let empty: boolean;
-  export let onClickConfigure: () => void = noop;
   export let columnsCount: number;
 
   const {
@@ -46,13 +44,17 @@
         labelHidden
         id="select-visible-workflows"
         data-testid="batch-actions-checkbox"
-        hoverable
         bind:checked={$pageSelected}
         {indeterminate}
         on:change={handleCheckboxChange}
       />
     </th>
   {/if}
+  <IsTemporalServerVersionGuard minimumVersion="1.23">
+    {#if !$showChildWorkflows}
+      <th class="w-12" />
+    {/if}
+  </IsTemporalServerVersionGuard>
   {#if $supportsBulkActions && $batchActionsVisible}
     <th class="batch-actions-table-cell" colspan={columnsCount}>
       <BatchActions {workflows} />
@@ -60,14 +62,7 @@
   {:else}
     <slot />
   {/if}
-  <th class="configuration-button-table-cell">
-    <IconButton
-      data-testid="workflows-summary-table-configuration-button"
-      icon="vertical-ellipsis"
-      label={translate('workflows.open-configure-workflows')}
-      on:click={onClickConfigure}
-    />
-  </th>
+  <th class="configuration-button-table-cell" />
 </tr>
 
 <style lang="postcss">

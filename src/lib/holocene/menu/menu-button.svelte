@@ -162,7 +162,7 @@
   }
 
   .secondary {
-    @apply border-primary bg-white text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary dark:hover:surface-interactive-secondary hover:border-subtle focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-secondary dark:bg-transparent dark:hover:border-primary;
+    @apply border-secondary text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary hover:border-interactive-secondary  focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-primary/70 dark:hover:border-transparent dark:focus-visible:border-black;
 
     &:disabled {
       @apply bg-slate-50;

@@ -16,6 +16,7 @@
   export let backdropHeight = 0;
   export let icon: IconName | undefined = undefined;
   export let config: GraphConfig | undefined = undefined;
+  export let label = false;
 
   $: [x, y] = point;
 
@@ -24,7 +25,7 @@
   $: showIcon = icon && config;
   $: textWidth = textElement?.getBBox()?.width || 0;
   $: backdropWidth = showIcon ? textWidth + 36 : textWidth + 12;
-  $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 2.25 : x;
+  $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 1.5 : x;
 </script>
 
 {#if backdrop}
@@ -40,9 +41,7 @@
   <Icon
     name={icon}
     {x}
-    y={y - config.radius}
-    width={config.radius * 2}
-    height={config.radius * 2}
+    y={y - 8}
     class="text-white {!active && 'opacity-[.35]'}"
   />
 {/if}
@@ -50,6 +49,7 @@
   bind:this={textElement}
   class="cursor-pointer select-none outline-none {category}"
   class:active
+  class:label
   x={textX}
   {y}
   font-size={fontSize}
@@ -61,10 +61,8 @@
 {#if showIcon && textAnchor === 'end'}
   <Icon
     name={icon}
-    x={x - textWidth - config.radius * 2}
-    y={y - config.radius}
-    width={config.radius * 2}
-    height={config.radius * 2}
+    x={x - textWidth - config.radius * 1.5}
+    y={y - 8}
     class="text-white {!active && 'opacity-[.35]'}"
   />
 {/if}
@@ -76,6 +74,11 @@
     fill: #fff;
     dominant-baseline: middle;
     alignment-baseline: baseline;
+  }
+
+  .label {
+    fill: #c9d9f0;
+    font-weight: 500;
   }
 
   .active {

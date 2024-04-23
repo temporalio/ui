@@ -30,7 +30,7 @@
   </a>
   <button
     title={$navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-[4px] self-start justify-self-end opacity-0 transition-[opacity,transform] group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180"
+    class="mx-[8px] self-start justify-self-end opacity-0 transition-[opacity,transform] group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180"
     on:click={toggle}
   >
     <Icon name="chevron-right" />

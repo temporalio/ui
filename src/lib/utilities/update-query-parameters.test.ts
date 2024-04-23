@@ -163,6 +163,50 @@ describe('updateQueryParameters', () => {
     expect(href).toBe('/?parameter=');
     expect(options).toEqual(gotoOptions);
   });
+
+  it('should clear single clearParameter when on a page', () => {
+    const parameter = 'parameter';
+    const value = 'value';
+    const url = new URL(
+      `https://temporal.io/?${parameter}=oldvalue&other=value`,
+    );
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
+
+    updateQueryParameters({
+      parameter,
+      value,
+      url,
+      goto,
+      clearParameters: ['other'],
+    });
+
+    const [href, options] = goto.mock.calls[0];
+
+    expect(href).toBe('/?parameter=value');
+    expect(options).toEqual(gotoOptions);
+  });
+
+  it('should clear multiple clearParameters when on a page', () => {
+    const parameter = 'parameter';
+    const value = 'value';
+    const url = new URL(
+      `https://temporal.io/?${parameter}=oldvalue&other=value&page=3`,
+    );
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
+
+    updateQueryParameters({
+      parameter,
+      value,
+      url,
+      goto,
+      clearParameters: ['page', 'other'],
+    });
+
+    const [href, options] = goto.mock.calls[0];
+
+    expect(href).toBe('/?parameter=value');
+    expect(options).toEqual(gotoOptions);
+  });
 });
 
 describe('a sanity test for how URLs work in JavaScript', () => {

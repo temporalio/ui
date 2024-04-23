@@ -15,7 +15,7 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import { fullEventHistory } from '$lib/stores/events';
   import { labsMode } from '$lib/stores/labs-mode';
   import { namespaces } from '$lib/stores/namespaces';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
@@ -53,7 +53,7 @@
   );
   $: cancelInProgress = isCancelInProgress(
     $workflowRun?.workflow?.status,
-    $eventHistory,
+    $fullEventHistory,
   );
   $: workflowHasBeenReset = has($resetWorkflows, $workflowRun?.workflow?.runId);
   $: workflowUsesVersioning =
@@ -183,13 +183,11 @@
               type={activitiesCanceled ? 'warning' : 'blue'}
               class="px-2 py-0"
             >
-              {#if activitiesCanceled}<Icon
-                  name="canceled"
-                  width={20}
-                  height={20}
-                />
-              {/if}
-              {workflow?.pendingActivities?.length}
+              <div class="flex items-center gap-1">
+                {#if activitiesCanceled}<Icon name="canceled" />
+                {/if}
+                {workflow?.pendingActivities?.length}
+              </div>
             </Badge>
           </Tab>
         {/if}

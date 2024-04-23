@@ -50,7 +50,7 @@
   {...$$restProps}
 >
   {#if icon}
-    <div>
+    <div class="pt-1">
       <Icon name={icon} />
     </div>
   {/if}

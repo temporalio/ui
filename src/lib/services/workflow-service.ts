@@ -10,6 +10,7 @@ import {
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
 import { authUser } from '$lib/stores/auth-user';
+import { canFetchChildWorkflows } from '$lib/stores/workflows';
 import type { ResetWorkflowRequest } from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
@@ -380,4 +381,21 @@ export async function fetchWorkflowForSchedule(
     onError,
     handleError: onError,
   }).then(toWorkflowExecution);
+}
+
+export async function fetchAllChildWorkflows(
+  namespace: string,
+  workflowId: string,
+): Promise<WorkflowExecution[]> {
+  if (!get(canFetchChildWorkflows)) {
+    return [];
+  }
+  try {
+    const { workflows } = await fetchAllWorkflows(namespace, {
+      query: `ParentWorkflowId = "${workflowId}"`,
+    });
+    return workflows;
+  } catch (e) {
+    return [];
+  }
 }

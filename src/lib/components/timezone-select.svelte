@@ -113,7 +113,7 @@
         </MenuItem>
       {/each}
 
-      <div class="mx-1 my-4">
+      <div class="mx-2 my-4">
         <ToggleSwitch
           label={translate('common.relative')}
           id="relative-toggle"

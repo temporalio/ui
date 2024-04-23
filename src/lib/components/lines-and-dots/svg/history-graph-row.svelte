@@ -8,10 +8,9 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
-  import { CategoryIcon, HistoryConfig } from '../constants';
+  import { CategoryIcon, getCategoryColor, HistoryConfig } from '../constants';
 
   import Box from './box.svelte';
-  import Text from './text.svelte';
 
   export let event: WorkflowEvent;
   export let group: EventGroup;
@@ -24,7 +23,6 @@
   const { height, radius } = HistoryConfig;
 
   $: y = index * height + height / 2;
-  $: noActives = !activeEvents.length;
   $: isActiveEvent = activeEvents.includes(event.id);
   $: showTimestamp = canvasWidth > 1200;
   $: showDetails = canvasWidth > 800;
@@ -51,45 +49,38 @@
     width={detailsWidth}
     {height}
     {classification}
-    fill={index % 2 === 1 && '#1E293B'}
+    fill={isActiveEvent ? '#444CE7' : index % 2 === 1 && '#1E293B'}
   />
-  <Text
-    point={[visualWidth + 2 * radius, y]}
-    active={noActives || isActiveEvent}
-    fontSize="12px"
+  <foreignObject
+    x={visualWidth + 2 * radius}
+    y={y - height / 2}
+    width={detailsWidth}
+    {height}
   >
-    {event.id}
-  </Text>
-  <Icon
-    name={icon}
-    x={visualWidth + 8 * radius}
-    y={y - 1.666 * radius}
-    width={radius * 3}
-    height={radius * 3}
-    class="text-white {!noActives && !isActiveEvent && 'opacity-[.35]'}"
-  />
-  <Text
-    point={[visualWidth + 70, y]}
-    category={event.category}
-    active={noActives || isActiveEvent}
-    config={HistoryConfig}
-  >
-    <tspan fill="#fff">
-      {spaceBetweenCapitalLetters(event?.name)}
-    </tspan>
-    {#if group && group.displayName && showDetails}<tspan dx={3}
-        >{group.displayName}</tspan
-      >{/if}
-  </Text>
-  {#if showTimestamp}
-    <Text point={[canvasWidth - 1.5 * radius, y]} textAnchor="end">
-      <tspan fill="#aebed9" font-size="12px">
-        {formatDate(event?.eventTime, $timeFormat, {
-          relative: $relativeTime,
-        })}</tspan
-      ></Text
+    <div
+      class="flex items-center justify-between px-2 text-sm text-white"
+      style="height: {height}px;"
     >
-  {/if}
+      <div class="flex gap-4">
+        {event.id}
+        <div class="flex items-center gap-1">
+          <Icon name={icon} class="text-white" />
+          {spaceBetweenCapitalLetters(event?.name)}
+          {#if group && group.displayName && showDetails}<span
+              style="color: {getCategoryColor(group.category)}"
+              >{group.displayName}</span
+            >{/if}
+        </div>
+      </div>
+      {#if showTimestamp}
+        <span class="px-3 text-xs text-slate-100"
+          >{formatDate(event?.eventTime, $timeFormat, {
+            relative: $relativeTime,
+          })}</span
+        >
+      {/if}
+    </div>
+  </foreignObject>
 </g>
 
 <style lang="postcss">

@@ -29,6 +29,7 @@
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
+  import type { MenuButtonVariant } from '$lib/holocene/menu/menu-button.svelte';
 
   type T = $$Generic;
 
@@ -44,6 +45,7 @@
     unroundLeft?: boolean;
     onChange?: (value: T) => void;
     'data-testid'?: string;
+    variant?: MenuButtonVariant;
   };
 
   export let label: string;
@@ -56,6 +58,7 @@
   export let unroundRight = false;
   export let unroundLeft = false;
   export let onChange: (value: T) => void = noop;
+  export let variant: MenuButtonVariant = 'secondary';
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
   const valueCtx = writable<T>(value);
@@ -107,6 +110,7 @@
     {unroundLeft}
     {unroundRight}
     controls="{id}-select"
+    {variant}
   >
     <Icon slot="leading" name={leadingIcon} />
     <input

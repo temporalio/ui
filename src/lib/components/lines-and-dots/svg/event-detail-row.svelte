@@ -1,5 +1,8 @@
 <script lang="ts">
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { setActiveEvent } from '$lib/stores/active-events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowEvent } from '$lib/types/events';
   import {
@@ -29,9 +32,8 @@
   export let width: number;
   export let active = false;
 
-  const { gutter, fontSizeRatio, radius } = DetailsConfig;
+  const { gutter, fontSizeRatio } = DetailsConfig;
 
-  const labelPadding = 240;
   $: attributes = formatAttributes(event);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
@@ -52,6 +54,16 @@
   $: textStartingY = eventY + 1.5 * fontSizeRatio;
 </script>
 
+{#if active && !group?.pendingActivity}
+  <foreignObject {x} y={y - 20} {width} height={fontSizeRatio}>
+    <button
+      class="flex items-center gap-0.5 rounded-t bg-white pl-1.5 pr-0.5 text-sm text-black"
+      on:click|stopPropagation={() => setActiveEvent(event, group)}
+    >
+      {translate('common.close')}<Icon name="close" />
+    </button>
+  </foreignObject>
+{/if}
 <Box
   point={[x, eventY]}
   {width}
@@ -63,24 +75,21 @@
   endPoint={[x + width, eventY + 1.25 * fontSizeRatio]}
   strokeWidth={2}
 />
-<Text
-  point={[x + 0.5 * fontSizeRatio, eventY + 0.66 * fontSizeRatio]}
-  fontWeight="300"
-  >{event.id}<tspan dx={5}>{spaceBetweenCapitalLetters(event?.name)}</tspan
-  ></Text
->
-{#if showTimestamp}
-  <Text
-    point={[canvasWidth - 1.5 * radius, eventY + 0.6 * fontSizeRatio]}
-    textAnchor="end"
-  >
-    <tspan fill="#aebed9" font-size="13px">
-      {formatDate(event?.eventTime, $timeFormat, {
-        relative: $relativeTime,
-      })}</tspan
-    ></Text
-  >
-{/if}
+<foreignObject {x} y={eventY} {width} height={fontSizeRatio}>
+  <div class="flex items-center justify-between px-2 py-1 text-sm text-white">
+    <div class="flex items-center gap-2">
+      {event.id}
+      {spaceBetweenCapitalLetters(event?.name)}
+    </div>
+    {#if showTimestamp}
+      <div class="text-xs">
+        {formatDate(event?.eventTime, $timeFormat, {
+          relative: $relativeTime,
+        })}
+      </div>
+    {/if}
+  </div>
+</foreignObject>
 {#each textAttributes as [key, value], index (key)}
   <foreignObject
     x={x + gutter}
@@ -88,18 +97,16 @@
     width={width - gutter}
     height={fontSizeRatio}
   >
-    <div class="flex gap-1 text-wrap text-sm text-white">
-      <div class="w-48">{format(key)}</div>
-      <GroupDetailsText
-        point={[
-          x + gutter + labelPadding,
-          textStartingY + index * fontSizeRatio,
-        ]}
-        {key}
-        {value}
-        {attributes}
-        {width}
-      />
+    <div
+      class="flex items-center gap-2 text-xs text-white md:text-sm"
+      style="height: {fontSizeRatio}px;"
+    >
+      <div class="font-medium leading-3 text-[#C9D9F0]">
+        {format(key)}
+      </div>
+      <div class="text-wrap break-all leading-3">
+        <GroupDetailsText {key} {value} {attributes} {width} />
+      </div>
     </div>
   </foreignObject>
 {/each}
@@ -109,7 +116,7 @@
     textStartingY +
     (textAttributes.length + 1) * fontSizeRatio +
     index * staticCodeBlockHeight}
-  <Text point={[blockX, blockY]}>{format(key)}</Text>
+  <Text point={[blockX, blockY]} label>{format(key)}</Text>
   <GroupDetailsText
     point={[blockX, blockY + 1.5 * fontSizeRatio]}
     {key}
