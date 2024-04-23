@@ -135,8 +135,4 @@
   .select-input {
     @apply pointer-events-none w-full bg-transparent;
   }
-
-  .select-input.disabled {
-    @apply bg-slate-50;
-  }
 </style>
