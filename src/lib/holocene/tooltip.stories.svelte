@@ -5,7 +5,7 @@
   import { iconNames } from '$lib/holocene/icon';
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
-  export const meta: Meta = {
+  export const meta = {
     title: 'Tooltip',
     component: Tooltip,
     args: {
@@ -87,7 +87,7 @@
       },
       class: { table: { disable: true } },
     },
-  } satisfies Meta;
+  } satisfies Meta<Omit<Tooltip, 'copyIconTitle'>>;
 </script>
 
 <script lang="ts">

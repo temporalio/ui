@@ -3,7 +3,7 @@
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
 
-  export const meta: Meta = {
+  export const meta = {
     title: 'Checkbox',
     component: Checkbox,
     args: {
@@ -30,7 +30,7 @@
       group: { control: 'object', table: { disable: true } },
       valid: { control: 'boolean' },
     },
-  };
+  } satisfies Meta<Checkbox<string>>;
 </script>
 
 <script lang="ts">

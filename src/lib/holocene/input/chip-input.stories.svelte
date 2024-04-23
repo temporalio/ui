@@ -5,7 +5,7 @@
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import { isEmail } from '$lib/utilities/is-email';
 
-  export const meta: Meta = {
+  export const meta = {
     title: 'Chip Input',
     component: ChipInput,
     args: {
@@ -36,7 +36,7 @@
       name: { table: { disable: true } },
       id: { table: { disable: true } },
     },
-  } satisfies Meta;
+  } satisfies Meta<ChipInput>;
 </script>
 
 <script lang="ts">

@@ -3,7 +3,7 @@
 
   import RangeInput from '$lib/holocene/input/range-input.svelte';
 
-  export const meta: Meta = {
+  export const meta = {
     title: 'Range Input',
     component: RangeInput,
     args: {
@@ -47,7 +47,7 @@
       },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
     },
-  } satisfies Meta;
+  } satisfies Meta<RangeInput>;
 </script>
 
 <script lang="ts">

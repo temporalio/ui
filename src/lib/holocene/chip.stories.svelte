@@ -3,7 +3,7 @@
 
   import Chip from '$lib/holocene/chip.svelte';
 
-  export const meta: Meta = {
+  export const meta = {
     title: 'Chip',
     component: Chip,
     args: {
@@ -22,7 +22,7 @@
         },
       },
     },
-  };
+  } satisfies Meta<Chip>;
 </script>
 
 <script lang="ts">

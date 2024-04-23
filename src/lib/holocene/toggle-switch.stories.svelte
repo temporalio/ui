@@ -3,7 +3,7 @@
 
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
 
-  export const meta: Meta = {
+  export const meta = {
     title: 'Toggle Switch',
     component: ToggleSwitch,
     args: {
@@ -29,7 +29,7 @@
         table: { disable: true },
       },
     },
-  } satisfies Meta;
+  } satisfies Meta<ToggleSwitch>;
 </script>
 
 <script lang="ts">

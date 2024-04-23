@@ -3,7 +3,7 @@
 
   import Drawer from './drawer.svelte';
 
-  export const meta: Meta = {
+  export const meta = {
     title: 'Drawer',
     component: Drawer,
     args: {
@@ -34,7 +34,7 @@
       id: { table: { disable: true } },
       open: { table: { disable: true } },
     },
-  };
+  } satisfies Meta<Drawer>;
 </script>
 
 <script lang="ts">

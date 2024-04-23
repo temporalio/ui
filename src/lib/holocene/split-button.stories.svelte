@@ -5,13 +5,13 @@
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
 
-  export const meta: Meta = {
+  export const meta = {
     title: 'Split Button',
     component: SplitButton,
     args: {
       label: 'Split Button',
       menuLabel: 'Actions',
-      variant: 'Primary',
+      variant: 'primary',
       position: 'left',
       icon: undefined,
       disabled: false,
@@ -38,10 +38,10 @@
         control: 'select',
         options: ['Primary', 'Secondary', 'Destructive', 'Ghost'],
         mapping: {
-          Primary: 'primary',
-          Secondary: 'secondary',
-          Destructive: 'destructive',
-          Ghost: 'ghost',
+          primary: 'Primary',
+          secondary: 'Secondary',
+          destructive: 'Destructive',
+          ghost: 'Ghost',
         },
       },
       disabled: { name: 'Disabled', control: 'boolean' },
@@ -50,7 +50,7 @@
         control: 'boolean',
       },
     },
-  } satisfies Meta;
+  } satisfies Meta<SplitButton>;
 </script>
 
 <script lang="ts">

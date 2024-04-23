@@ -3,7 +3,7 @@
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
 
-  export const meta: Meta = {
+  export const meta = {
     title: 'Code Block',
     args: {
       editable: false,
@@ -50,7 +50,7 @@
         table: { category: 'Copy Icon' },
       },
     },
-  };
+  } satisfies Meta<CodeBlock>;
 </script>
 
 <script lang="ts">

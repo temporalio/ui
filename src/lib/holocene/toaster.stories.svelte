@@ -7,7 +7,7 @@
   import Toast from './toast.svelte';
   import Toaster from './toaster.svelte';
 
-  export const meta: Meta = {
+  export const meta = {
     title: 'Toaster',
     component: Toaster,
     args: {
@@ -37,7 +37,7 @@
         table: { category: 'Accessibility' },
       },
     },
-  };
+  } satisfies Meta<Toaster & Toast['variant']>;
 </script>
 
 <script lang="ts">

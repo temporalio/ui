@@ -5,7 +5,7 @@
 
   import { iconNames } from './icon';
 
-  export const meta: Meta = {
+  export const meta = {
     title: 'Icon Button (Deprecated)',
     component: IconButton,
     args: {
@@ -19,7 +19,7 @@
       },
       class: { table: { disable: true } },
     },
-  };
+  } satisfies Meta<IconButton>;
 </script>
 
 <script lang="ts">

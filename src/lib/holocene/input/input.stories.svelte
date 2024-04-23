@@ -6,7 +6,7 @@
 
   import Input from './input.svelte';
 
-  export const meta: Meta = {
+  export const meta = {
     title: 'Input',
     component: Input,
     args: {
@@ -79,7 +79,7 @@
       id: { table: { disable: true } },
       class: { table: { disable: true } },
     },
-  };
+  } satisfies Meta<Input>;
 </script>
 
 <script lang="ts">

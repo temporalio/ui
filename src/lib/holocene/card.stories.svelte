@@ -3,10 +3,10 @@
 
   import Card from './card.svelte';
 
-  export const meta: Meta = {
+  export const meta = {
     title: 'Card',
     component: Card,
-  };
+  } satisfies Meta<Card>;
 </script>
 
 <script lang="ts">
