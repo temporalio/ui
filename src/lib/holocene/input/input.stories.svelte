@@ -29,7 +29,7 @@
     id: { control: 'text' },
     value: { control: 'text' },
     name: { control: 'text' },
-    icon: { control: 'select', options: iconNames },
+    icon: { control: { type: 'select', options: iconNames } },
     spellcheck: { control: 'boolean' },
   }}
 />

@@ -16,7 +16,7 @@
     id: { control: 'text' },
     label: { control: 'text' },
     placeholder: { control: 'text' },
-    leadingIcon: { control: 'select', options: iconNames },
+    leadingIcon: { control: { type: 'select', options: iconNames } },
   }}
 />
 

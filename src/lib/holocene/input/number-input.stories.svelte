@@ -19,7 +19,7 @@
     label: { control: 'text' },
     id: { control: 'text' },
     value: { control: 'number' },
-    icon: { control: 'select', options: iconNames },
+    icon: { control: { type: 'select', options: iconNames } },
     name: { control: 'text' },
     max: { control: 'number' },
     min: { control: 'number' },

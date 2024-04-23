@@ -13,7 +13,7 @@
   title="Toggle Button"
   component={ToggleButton}
   argTypes={{
-    icon: { control: 'select', options: iconNames },
+    icon: { control: { type: 'select', options: iconNames } },
     group: { control: false },
     base: { control: 'text' },
     href: { control: 'text' },

@@ -36,7 +36,7 @@
     leadingIcon: 'search',
   }}
   argTypes={{
-    leadingIcon: { control: 'select', options: iconNames },
+    leadingIcon: { control: { type: 'select', options: iconNames } },
     options: { control: false },
     id: { control: 'text' },
     value: { control: 'text' },
