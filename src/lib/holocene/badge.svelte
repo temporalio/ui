@@ -57,7 +57,7 @@
   .active,
   .available,
   .green {
-    @apply border-green-700 bg-green-100 text-green-700;
+    @apply border-green-700 bg-green-100 text-green-800;
   }
 
   .count {
