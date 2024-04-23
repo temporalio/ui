@@ -1,41 +1,237 @@
-<script lang="ts">
-  import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
+<script lang="ts" context="module">
+  import type { Meta } from '@storybook/svelte';
+  import { expect, userEvent, within } from '@storybook/test';
 
   import iconNames from '$lib/holocene/icon';
 
   import Input from './input.svelte';
-  let value: string = '';
+
+  export const meta: Meta = {
+    title: 'Input',
+    component: Input,
+    args: {
+      value: '',
+      label: 'Input Label',
+      placeholder: 'Placeholder...',
+      labelHidden: false,
+      disabled: false,
+      clearable: false,
+      copyable: false,
+      required: false,
+      error: false,
+      spellcheck: false,
+      autocomplete: 'off',
+      suffix: '',
+      valid: true,
+      hintText: '',
+      clearButtonLabel: 'Clear input',
+      copyButtonLabel: 'Copy contents',
+    },
+    argTypes: {
+      label: { name: 'Label', control: 'text' },
+      value: { name: 'Value', control: 'text' },
+      placeholder: { name: 'Placeholder', control: 'text' },
+      required: { name: 'Required', control: 'boolean' },
+      error: { name: 'Error', control: 'boolean' },
+      disabled: { name: 'Disabled', control: 'boolean' },
+      valid: { name: 'Valid', control: 'boolean' },
+      autocomplete: {
+        name: 'Autocomplete',
+        control: 'inline-radio',
+        options: ['on', 'off'],
+      },
+      autoFocus: { name: 'Auto Focus', control: 'boolean' },
+      hintText: { name: 'Hint Text', control: 'text' },
+      suffix: { name: 'Suffix', control: 'text' },
+      labelHidden: { name: 'Label Hidden', control: 'boolean' },
+      clearable: { name: 'Clearable', control: 'boolean' },
+      copyable: { name: 'Copyable', control: 'boolean' },
+      icon: { name: 'Icon', control: { type: 'select', options: iconNames } },
+      spellcheck: { name: 'Spell Check', control: 'boolean' },
+      maxLength: { name: 'Max Length', control: 'number' },
+      hideCount: { name: 'Hide Count', control: 'boolean' },
+      copyButtonLabel: {
+        name: 'Copy Button Label',
+        control: 'text',
+        table: { category: 'Accessibility' },
+      },
+      clearButtonLabel: {
+        name: 'Clear Button Label',
+        control: 'text',
+        table: { category: 'Accessibility' },
+      },
+      unroundLeft: {
+        name: 'Unround Left',
+        control: 'boolean',
+        table: { category: 'Styling (Deprecated)' },
+      },
+      unroundRight: {
+        name: 'Unround Right',
+        control: 'boolean',
+        table: { category: 'Styling (Deprecated)' },
+      },
+      noBorder: {
+        name: 'No Border',
+        control: 'boolean',
+        table: { category: 'Styling (Deprecated)' },
+      },
+      name: { table: { disable: true } },
+      id: { table: { disable: true } },
+      class: { table: { disable: true } },
+    },
+  };
 </script>
 
-<Meta
-  title="Input"
-  component={Input}
-  args={{
-    label: 'Input',
-    placeholder: 'Placeholder...',
-    labelHidden: false,
-    disabled: false,
-    clearable: false,
-    copyable: false,
-    required: false,
-    error: false,
-    spellcheck: false,
-    hintText: 'This is the hint text',
-    clearButtonLabel: 'Clear input',
-    copyButtonLabel: 'Copy contents',
-  }}
-  argTypes={{
-    label: { control: 'text' },
-    id: { control: 'text' },
-    value: { control: 'text' },
-    name: { control: 'text' },
-    icon: { control: { type: 'select', options: iconNames } },
-    spellcheck: { control: 'boolean' },
+<script lang="ts">
+  import { Story, Template } from '@storybook/addon-svelte-csf';
+</script>
+
+<Template let:args let:context>
+  <Input {...args} id={context.id} data-testid={context.id} />
+</Template>
+
+<Story name="Empty" />
+
+<Story name="Disabled" args={{ disabled: true }} />
+
+<Story name="Required" args={{ required: true }} />
+
+<Story name="Error" args={{ error: true }} />
+
+<Story name="Invalid" args={{ valid: false }} />
+
+<Story name="With Icon" args={{ icon: 'search' }} />
+
+<Story name="With Suffix" args={{ suffix: 'suffix' }} />
+
+<Story name="With Hint Text" args={{ hintText: 'Hint Text' }} />
+
+<Story
+  name="Max Length"
+  args={{ maxLength: 10 }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId(id);
+    await userEvent.type(input, '1234567890');
   }}
 />
 
-<Template let:args>
-  <Input bind:value {...args} />
-</Template>
+<Story
+  name="Less Than Max Length"
+  args={{ maxLength: 10 }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId(id);
+    await userEvent.type(input, '123456789');
+  }}
+/>
 
-<Story args={{ id: 'text-input-1' }} name="input" />
+<Story
+  name="Exceeds Max Length"
+  args={{ maxLength: 5 }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId(id);
+    await userEvent.type(input, '1234567890');
+    expect(input).toHaveValue('12345');
+  }}
+/>
+
+<Story
+  name="Copyable"
+  args={{ copyable: true, value: 'Copy Me' }}
+  play={async ({ canvasElement }) => {
+    userEvent.setup();
+    const canvas = within(canvasElement);
+    canvas.getByLabelText('Copy contents');
+  }}
+/>
+
+<Story name="Empty (Dark)" parameters={{ themes: { themeOverride: 'dark' } }} />
+
+<Story
+  name="Disabled (Dark)"
+  args={{ disabled: true }}
+  parameters={{ themes: { themeOverride: 'dark' } }}
+/>
+
+<Story
+  name="Required (Dark)"
+  args={{ required: true }}
+  parameters={{ themes: { themeOverride: 'dark' } }}
+/>
+
+<Story
+  name="Error (Dark)"
+  args={{ error: true }}
+  parameters={{ themes: { themeOverride: 'dark' } }}
+/>
+
+<Story
+  name="Invalid (Dark)"
+  args={{ valid: false }}
+  parameters={{ themes: { themeOverride: 'dark' } }}
+/>
+
+<Story
+  name="With Icon (Dark)"
+  args={{ icon: 'search' }}
+  parameters={{ themes: { themeOverride: 'dark' } }}
+/>
+
+<Story
+  name="With Suffix (Dark)"
+  args={{ suffix: 'suffix' }}
+  parameters={{ themes: { themeOverride: 'dark' } }}
+/>
+
+<Story
+  name="With Hint Text (Dark)"
+  args={{ hintText: 'Hint Text' }}
+  parameters={{ themes: { themeOverride: 'dark' } }}
+/>
+
+<Story
+  name="Max Length (Dark)"
+  args={{ maxLength: 10 }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId(id);
+    await userEvent.type(input, '1234567890');
+  }}
+  parameters={{ themes: { themeOverride: 'dark' } }}
+/>
+
+<Story
+  name="Less Than Max Length (Dark)"
+  args={{ maxLength: 10 }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId(id);
+    await userEvent.type(input, '123456789');
+  }}
+  parameters={{ themes: { themeOverride: 'dark' } }}
+/>
+
+<Story
+  name="Exceeds Max Length (Dark)"
+  args={{ maxLength: 5 }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId(id);
+    await userEvent.type(input, '1234567890');
+    expect(input).toHaveValue('12345');
+  }}
+  parameters={{ themes: { themeOverride: 'dark' } }}
+/>
+
+<Story
+  name="Copyable (Dark)"
+  args={{ copyable: true, value: 'Copy Me' }}
+  play={async ({ canvasElement }) => {
+    userEvent.setup();
+    const canvas = within(canvasElement);
+    canvas.getByLabelText('Copy contents');
+  }}
+  parameters={{ themes: { themeOverride: 'dark' } }}
+/>
