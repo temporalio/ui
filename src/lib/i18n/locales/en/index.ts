@@ -4,6 +4,7 @@ import * as DataEncoder from './data-encoder';
 import * as DatePicker from './date-picker';
 import * as Events from './events';
 import * as Namespaces from './namespaces';
+import * as Nexus from './nexus';
 import * as Schedules from './schedules';
 import * as TypedErrors from './typed-errors';
 import * as Workers from './workers';
@@ -21,5 +22,6 @@ export const English = {
   [Schedules.Namespace]: Schedules.Strings,
   [DataEncoder.Namespace]: DataEncoder.Strings,
   [Namespaces.Namespace]: Namespaces.Strings,
+  [Nexus.Namespace]: Nexus.Strings,
   [Workers.Namespace]: Workers.Strings,
 } as const;

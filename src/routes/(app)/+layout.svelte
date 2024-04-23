@@ -22,6 +22,7 @@
     routeForEventHistoryImport,
     routeForLoginPage,
     routeForNamespaces,
+    routeForNexus,
     routeForSchedules,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
@@ -55,6 +56,7 @@
     home: routeForWorkflows({ namespace: activeNamespaceName }),
     archive: routeForArchivalWorkfows({ namespace: activeNamespaceName }),
     namespaces: routeForNamespaces(),
+    nexus: routeForNexus(),
     schedules: routeForSchedules({ namespace: activeNamespaceName }),
     workflows: routeForWorkflows({ namespace: activeNamespaceName }),
     batchOperations: routeForBatchOperations({
