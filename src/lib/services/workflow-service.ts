@@ -386,14 +386,17 @@ export async function fetchWorkflowForSchedule(
 export async function fetchAllChildWorkflows(
   namespace: string,
   workflowId: string,
+  runId?: string,
 ): Promise<WorkflowExecution[]> {
   if (!get(canFetchChildWorkflows)) {
     return [];
   }
   try {
-    const { workflows } = await fetchAllWorkflows(namespace, {
-      query: `ParentWorkflowId = "${workflowId}"`,
-    });
+    let query = `ParentWorkflowId = "${workflowId}"`;
+    if (runId) {
+      query += ` AND ParentRunId = "${runId}"`;
+    }
+    const { workflows } = await fetchAllWorkflows(namespace, { query });
     return workflows;
   } catch (e) {
     return [];

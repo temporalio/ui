@@ -41,7 +41,11 @@
         (id) => id.workflowId !== workflow.id && id.runId !== workflow.runId,
       );
     } else {
-      const children = await fetchAllChildWorkflows(namespace, workflow.id);
+      const children = await fetchAllChildWorkflows(
+        namespace,
+        workflow.id,
+        workflow.runId,
+      );
       childrenIds = [
         { workflowId: workflow.id, runId: workflow.runId, children },
         ...childrenIds,

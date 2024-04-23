@@ -17,13 +17,13 @@
   import ParentWorkflowTable from './parent-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
 
-  $: ({ workflow: workflowId, namespace } = $page.params);
+  $: ({ workflow: workflowId, run: runId, namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
 
   let liveChildren: WorkflowExecution[] = [];
 
   onMount(async () => {
-    liveChildren = await fetchAllChildWorkflows(namespace, workflowId);
+    liveChildren = await fetchAllChildWorkflows(namespace, workflowId, runId);
   });
 
   $: workflowRelationships = getWorkflowRelationships(
