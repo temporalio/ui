@@ -17,7 +17,6 @@
       labelHidden: false,
     },
     argTypes: {
-      id: { table: { disable: true } },
       label: { name: 'Label', control: 'text' },
       value: { name: 'Value', control: 'number' },
       min: {

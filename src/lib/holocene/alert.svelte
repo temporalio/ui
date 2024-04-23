@@ -11,7 +11,7 @@
   type AlertIcon = Extract<IconName, Intent>;
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
-    intent: typeof intent;
+    intent: Intent;
     title?: string;
     icon?: AlertIcon;
     bold?: boolean;

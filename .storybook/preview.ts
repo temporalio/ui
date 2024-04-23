@@ -21,6 +21,7 @@ const preview: Preview = {
       disable: true,
     },
     controls: {
+      exclude: /^id|name|class|data-\w+|on\w+/,
       matchers: {
         color: /(background|color)$/i,
         date: /Date$/,

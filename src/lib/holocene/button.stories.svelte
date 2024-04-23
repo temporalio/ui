@@ -2,66 +2,70 @@
   import type { Meta } from '@storybook/svelte';
 
   import Button from '$lib/holocene/button.svelte';
-  import iconNames from '$lib/holocene/icon';
+  import { iconNames } from '$lib/holocene/icon';
 
   export const meta = {
     title: 'Button',
     component: Button,
     args: {
-      variant: 'Primary',
-      size: 'Medium',
+      variant: 'primary',
+      size: 'md',
       loading: false,
       disabled: false,
       active: false,
     },
     argTypes: {
       variant: {
+        name: 'Variant',
         control: 'select',
-        options: ['Primary', 'Secondary', 'Destructive', 'Ghost'],
-        mapping: {
-          Primary: 'primary',
-          Secondary: 'secondary',
-          Destructive: 'destructive',
-          Ghost: 'ghost',
-        },
+        options: ['primary', 'secondary', 'destructive', 'ghost'],
       },
       size: {
+        name: 'Size',
         control: 'select',
-        options: ['Extra Small', 'Small', 'Medium', 'Large'],
-        mapping: {
-          'Extra Small': 'xs',
-          Small: 'sm',
-          Medium: 'md',
-          Large: 'lg',
-        },
+        options: ['xs', 'sm', 'md', 'lg'],
       },
-      loading: { control: 'boolean' },
-      count: { control: { type: 'number', min: 0, max: 99, step: 1 } },
+      loading: {
+        name: 'Loading',
+        control: 'boolean',
+      },
+      count: {
+        name: 'Count',
+        control: { type: 'number', min: 0, max: 99, step: 1 },
+      },
       icon: {
-        control: { type: 'select', options: iconNames },
+        name: 'Icon',
+        control: 'select',
+        options: iconNames,
         table: {
           category: 'Icon',
         },
       },
       leadingIcon: {
-        control: { type: 'select', options: iconNames },
+        name: 'Leading Icon',
+        control: 'select',
+        options: iconNames,
         table: {
           category: 'Icon',
         },
       },
       trailingIcon: {
-        control: { type: 'select', options: iconNames },
+        name: 'Trailing Icon',
+        control: 'select',
+        options: iconNames,
         table: {
           category: 'Icon',
         },
       },
       href: {
+        name: 'Link',
         control: 'text',
         table: {
           category: 'Link',
         },
       },
       target: {
+        name: 'Link Target',
         control: 'select',
         options: ['_blank', '_self', '_parent', '_top'],
         table: {
@@ -70,6 +74,7 @@
         if: { arg: 'href' },
       },
       borderModifier: {
+        name: 'Border Modifier',
         control: 'select',
         options: ['borderless', 'borderless-left', 'borderless-right'],
         table: {
@@ -77,6 +82,7 @@
         },
       },
       borderRadiusModifier: {
+        name: 'Border Radius Modifier',
         control: 'select',
         options: ['square', 'square-left', 'square-right'],
         table: {
@@ -84,13 +90,14 @@
         },
       },
       id: {
+        name: 'ID',
         control: 'text',
         table: {
           disable: true,
         },
       },
     },
-  } satisfies Meta;
+  } satisfies Meta<Button>;
 </script>
 
 <script lang="ts">

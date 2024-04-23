@@ -3,7 +3,7 @@
   import { expect, userEvent, within } from '@storybook/test';
 
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
-  import iconNames from '$lib/holocene/icon';
+  import { iconNames } from '$lib/holocene/icon';
 
   export const meta = {
     title: 'Combobox',
@@ -35,7 +35,8 @@
       maxSize: { name: 'Maximum Size', control: 'number' },
       leadingIcon: {
         name: 'Icon',
-        control: { type: 'select', options: iconNames },
+        control: 'select',
+        options: iconNames,
       },
       toggleLabel: {
         name: 'Toggle Label',
@@ -45,11 +46,10 @@
       noResultsText: { name: 'No Results Text', control: 'text' },
       optionValueKey: { control: 'text', table: { disable: true } },
       optionLabelKey: { control: 'text', table: { disable: true } },
-      id: { control: 'text', table: { disable: true } },
-      class: { control: 'text', table: { disable: true } },
+
       options: { table: { disable: true } },
     },
-  } satisfies Meta;
+  } satisfies Meta<Combobox<unknown>>;
 </script>
 
 <script lang="ts">

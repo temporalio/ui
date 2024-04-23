@@ -15,9 +15,9 @@
     argTypes: {
       label: { control: 'text' },
       icon: {
-        control: { type: 'select', options: iconNames },
+        control: 'select',
+        options: iconNames,
       },
-      class: { table: { disable: true } },
     },
   } satisfies Meta<IconButton>;
 </script>

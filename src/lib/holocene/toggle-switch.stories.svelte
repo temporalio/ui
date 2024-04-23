@@ -14,7 +14,6 @@
       checked: false,
     },
     argTypes: {
-      id: { table: { disable: true } },
       label: { name: 'Label', control: 'text' },
       labelPosition: {
         name: 'Position',

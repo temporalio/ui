@@ -22,8 +22,7 @@
       hoverable: { control: 'boolean' },
       disabled: { control: 'boolean' },
       checked: { control: 'boolean' },
-      class: { table: { disable: true } },
-      id: { table: { disable: true } },
+
       labelHidden: { control: 'boolean' },
       indeterminate: { control: 'boolean' },
       value: { control: 'text', table: { disable: true } },

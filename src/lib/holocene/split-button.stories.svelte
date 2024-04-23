@@ -31,7 +31,7 @@
           category: 'Accessibility',
         },
       },
-      id: { control: 'text', table: { disable: true } },
+
       icon: { name: 'Icon', control: 'select', options: iconNames },
       variant: {
         name: 'Variant',

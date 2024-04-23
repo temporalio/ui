@@ -18,9 +18,8 @@
     argTypes: {
       href: { control: 'text' },
       icon: { control: 'select', options: iconNames },
-      class: { table: { disable: true } },
     },
-  } satisfies Meta;
+  } satisfies Meta<Link>;
 </script>
 
 <script lang="ts">

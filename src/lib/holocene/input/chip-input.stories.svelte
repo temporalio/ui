@@ -33,8 +33,6 @@
         control: 'text',
         table: { category: 'Accessibility' },
       },
-      name: { table: { disable: true } },
-      id: { table: { disable: true } },
     },
   } satisfies Meta<ChipInput>;
 </script>

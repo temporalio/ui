@@ -2,7 +2,7 @@
   import type { Meta } from '@storybook/svelte';
   import { expect, userEvent, within } from '@storybook/test';
 
-  import iconNames from '$lib/holocene/icon';
+  import { iconNames } from '$lib/holocene/icon';
 
   import Input from './input.svelte';
 
@@ -46,7 +46,7 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       clearable: { name: 'Clearable', control: 'boolean' },
       copyable: { name: 'Copyable', control: 'boolean' },
-      icon: { name: 'Icon', control: { type: 'select', options: iconNames } },
+      icon: { name: 'Icon', control: 'select', options: iconNames },
       spellcheck: { name: 'Spell Check', control: 'boolean' },
       maxLength: { name: 'Max Length', control: 'number' },
       hideCount: { name: 'Hide Count', control: 'boolean' },
@@ -75,9 +75,6 @@
         control: 'boolean',
         table: { category: 'Styling (Deprecated)' },
       },
-      name: { table: { disable: true } },
-      id: { table: { disable: true } },
-      class: { table: { disable: true } },
     },
   } satisfies Meta<Input>;
 </script>

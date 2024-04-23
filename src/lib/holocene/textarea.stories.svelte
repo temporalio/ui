@@ -34,9 +34,8 @@
       maxLength: { name: 'Maximum Length', control: 'number' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       id: { name: 'Id', control: 'text', table: { disable: true } },
-      class: { table: { disable: true } },
     },
-  } satisfies Meta;
+  } satisfies Meta<Textarea>;
 </script>
 
 <script lang="ts">

@@ -15,24 +15,20 @@
       disabled: false,
       required: false,
       labelHidden: false,
-      error: '',
       name: 'options',
     },
     argTypes: {
       label: { name: 'Label', control: 'text' },
       description: { name: 'Description', control: 'text' },
-      name: { table: { disable: true } },
-      id: { table: { disable: true } },
       value: { table: { disable: true } },
       checked: { table: { disable: true } },
       disabled: { table: { disable: true } },
       required: { table: { disable: true } },
       labelHidden: { table: { disable: true } },
-      error: { table: { disable: true } },
-      onCheck: { action: 'onCheck', table: { disable: true } },
-      group: { action: 'onCheck', table: { disable: true } },
+      onCheck: { table: { disable: true } },
+      group: { table: { disable: true } },
     },
-  } satisfies Meta;
+  } satisfies Meta<Omit<RadioInput<string>, 'onCheck'> & { onCheck?: unknown }>;
 </script>
 
 <script lang="ts">

@@ -38,7 +38,7 @@
         table: { category: 'Accessibility' },
       },
     },
-  } satisfies Meta;
+  } satisfies Meta<DatePicker>;
 </script>
 
 <script lang="ts">

@@ -28,7 +28,7 @@
         control: 'boolean',
         if: { arg: 'hide', neq: true },
       },
-      icon: { name: 'Icon', control: { type: 'select', options: iconNames } },
+      icon: { name: 'Icon', control: 'select', options: iconNames },
       width: { name: 'Width', control: { type: 'range', min: 0, max: 400 } },
       top: {
         name: 'Top',
@@ -85,7 +85,6 @@
         control: 'text',
         table: { category: 'Copying' },
       },
-      class: { table: { disable: true } },
     },
   } satisfies Meta<Omit<Tooltip, 'copyIconTitle'>>;
 </script>

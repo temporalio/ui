@@ -19,13 +19,14 @@
       content: { control: 'text' },
       error: { control: 'text' },
       icon: {
-        control: { type: 'select', options: iconNames },
+        control: 'select',
+        options: iconNames,
         table: {
           category: 'Icon',
         },
       },
     },
-  } satisfies Meta;
+  } satisfies Meta<EmptyState>;
 </script>
 
 <script lang="ts">

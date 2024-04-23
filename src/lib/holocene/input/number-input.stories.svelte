@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   import type { Meta } from '@storybook/svelte';
 
-  import iconNames from '$lib/holocene/icon';
+  import { iconNames } from '$lib/holocene/icon';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
 
   export const meta = {
@@ -9,7 +9,7 @@
     component: NumberInput,
     args: {
       label: 'Number Input',
-      value: '',
+      value: 0,
       placeholder: '0',
       units: '',
       min: 0,
@@ -29,12 +29,10 @@
       disabled: { name: 'Disabled', control: 'boolean' },
       required: { name: 'Required', control: 'boolean' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
-      icon: { name: 'Icon', control: { type: 'select', options: iconNames } },
+      icon: { name: 'Icon', control: 'select', options: iconNames },
       max: { name: 'Minimum Value', control: { type: 'number', min: 0 } },
       min: { name: 'Maximum Value', control: { type: 'number', min: 0 } },
       search: { name: 'Search', control: 'boolean' },
-      id: { control: 'text', table: { disable: true } },
-      name: { control: 'text', table: { disable: true } },
       unroundLeft: {
         name: 'Left',
         control: 'boolean',
@@ -46,7 +44,7 @@
         table: { category: 'Styling', subcategory: 'Unround' },
       },
     },
-  } satisfies Meta;
+  } satisfies Meta<NumberInput>;
 </script>
 
 <script lang="ts">

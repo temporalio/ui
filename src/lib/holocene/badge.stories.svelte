@@ -34,9 +34,8 @@
       },
       label: { control: 'text', if: { arg: 'type', neq: 'count' } },
       count: { control: 'number', if: { arg: 'type', eq: 'count' } },
-      class: { table: { disable: true } },
     },
-  } satisfies Meta;
+  } satisfies Meta<Badge>;
 </script>
 
 <script lang="ts">

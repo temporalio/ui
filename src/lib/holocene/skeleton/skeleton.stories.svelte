@@ -13,7 +13,7 @@
         description: 'Tailwind compliant "height" class, i.e. h-10',
       },
     },
-  } satisfies Meta;
+  } satisfies Meta<Skeleton>;
 </script>
 
 <script lang="ts">

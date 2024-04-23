@@ -14,30 +14,15 @@
       title: { control: 'text' },
       intent: {
         control: 'select',
-        options: ['Information', 'Success', 'Warning', 'Error'],
-        mapping: {
-          Information: 'info',
-          Success: 'success',
-          Warning: 'warning',
-          Error: 'error',
-        },
+        options: ['info', 'success', 'warning', 'error'],
       },
       icon: {
-        control: {
-          type: 'select',
-          options: ['Information', 'Success', 'Warning', 'Error'],
-          mapping: {
-            Information: 'info',
-            Success: 'success',
-            Warning: 'warning',
-            Error: 'error',
-          },
-        },
+        control: 'select',
+        options: ['info', 'success', 'warning', 'error'],
       },
-      class: { table: { disable: true } },
       hidden: { table: { disable: true } },
     },
-  } satisfies Meta;
+  } satisfies Meta<Alert>;
 </script>
 
 <script lang="ts">

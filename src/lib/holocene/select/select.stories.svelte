@@ -24,7 +24,8 @@
       placeholder: { name: 'Placeholder', control: 'text' },
       leadingIcon: {
         name: 'Icon',
-        control: { type: 'select', options: iconNames },
+        control: 'select',
+        options: iconNames,
       },
       disabled: { name: 'Disabled', control: 'boolean' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
@@ -39,11 +40,9 @@
         table: { category: 'Styling', subcategory: 'Unround' },
       },
       onChange: { table: { disable: true } },
-      id: { table: { disable: true } },
       value: { table: { disable: true } },
-      SELECT_CONTEXT: { table: { disable: true } },
     },
-  } satisfies Meta;
+  } satisfies Meta<Select<string>>;
 </script>
 
 <script lang="ts">

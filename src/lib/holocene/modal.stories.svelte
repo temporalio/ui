@@ -83,11 +83,10 @@
         name: 'Highlight Navigation',
         control: 'boolean',
       },
-      id: { control: 'text', table: { disable: true } },
-      class: { table: { disable: true } },
+
       toggleModal: { table: { disable: true } },
     },
-  } satisfies Meta;
+  } satisfies Meta<Modal>;
 </script>
 
 <script lang="ts">

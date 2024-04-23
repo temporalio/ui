@@ -1,36 +1,34 @@
-<script lang="ts">
-  import { Meta, Story } from '@storybook/addon-svelte-csf';
+<script lang="ts" context="module">
+  import type { Meta } from '@storybook/svelte';
 
   import ScrollToTop from './scroll-to-top.svelte';
 
-  let container: HTMLDivElement;
-  const onScrollToTopClick = () => {
-    container.scrollTo(0, 0);
-  };
+  export const meta = {
+    title: 'Scroll To Top',
+    component: ScrollToTop,
+    args: {
+      hidden: false,
+    },
+    argTypes: {
+      hidden: {
+        control: 'boolean',
+        table: {
+          disable: true,
+        },
+      },
+    },
+  } satisfies Meta<ScrollToTop>;
 </script>
 
-<Meta title="Scroll to Top" component={ScrollToTop} />
+<script lang="ts">
+  import { action } from '@storybook/addon-actions';
+  import { Story, Template } from '@storybook/addon-svelte-csf';
+</script>
 
-<Story name="scroll to top">
-  <div bind:this={container} class="h-[3600px] overflow-auto">
-    <button on:click={() => container.scrollTo(0, 3600)}>Scroll Down</button>
-  </div>
-  <ScrollToTop hidden={false} {onScrollToTopClick} />
-  <!-- <Hst.Variant title="Scroll to top of container">
-    <div class="h-80 surface-primary p-4 text-center text-lg">Scroll down</div>
-    <ScrollToTop scrollToContainer>
-      <div class="border-4 border-black">
-        <div class="h-screen surface-primary p-4 text-center text-lg">
-          Top of container
-        </div>
-        <div class="h-80 surface-primary" />
-      </div>
-    </ScrollToTop>
-  </Hst.Variant>
-  <Hst.Variant title="Custom showOn">
-    <div class="h-screen surface-primary p-4 text-center text-lg">Scroll down</div>
-    <div class="h-[500px] surface-primary" />
-    <div class="h-80 surface-primary text-center text-lg">Button is visible</div>
-    <ScrollToTop showOn={500} />
-  </Hst.Variant> -->
-</Story>
+<Template let:args>
+  <ScrollToTop {...args} onScrollToTopClick={action('scroll-to-top')} />
+</Template>
+
+<Story name="Light" />
+
+<Story name="Dark" parameters={{ themes: { themeOverride: 'dark' } }} />

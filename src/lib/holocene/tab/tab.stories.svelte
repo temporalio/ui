@@ -11,9 +11,14 @@
     component: Tabs,
     subcomponents: { TabList, TabPanel, Tab },
     argTypes: {
-      TABS: { table: { disable: true } },
+      TABS: {
+        name: 'Tabs',
+        table: {
+          disable: true,
+        },
+      },
     },
-  } satisfies Meta;
+  } satisfies Meta<Omit<Tabs, 'TABS'>>;
 </script>
 
 <script lang="ts">

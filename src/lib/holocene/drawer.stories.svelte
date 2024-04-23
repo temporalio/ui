@@ -31,7 +31,7 @@
           category: 'Accessibility',
         },
       },
-      id: { table: { disable: true } },
+
       open: { table: { disable: true } },
     },
   } satisfies Meta<Drawer>;

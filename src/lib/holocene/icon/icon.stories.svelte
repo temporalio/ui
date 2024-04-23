@@ -16,12 +16,13 @@
     argTypes: {
       name: {
         name: 'Icon',
-        control: { type: 'select', options: iconNames },
+        control: 'select',
+        options: iconNames,
       },
       height: { name: 'Height', control: 'number' },
       width: { name: 'Width', control: 'number' },
     },
-  } satisfies Meta;
+  } satisfies Meta<Icon>;
 </script>
 
 <script lang="ts">

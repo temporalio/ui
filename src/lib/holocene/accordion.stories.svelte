@@ -1,7 +1,9 @@
 <script lang="ts" context="module">
   import type { Meta } from '@storybook/svelte';
 
-  import iconNames from './icon';
+  import { iconNames } from '$lib/holocene/icon';
+
+  console.log(iconNames);
 
   import Accordion from './accordion.svelte';
 
@@ -14,26 +16,22 @@
       disabled: false,
       open: false,
       readOnly: false,
+      error: '',
     },
     argTypes: {
-      title: { control: 'text' },
-      subtitle: { control: 'text' },
-      open: { control: 'boolean' },
-      disabled: { control: 'boolean' },
-      readOnly: { control: 'boolean' },
-      error: { control: 'text' },
-      onToggle: { action: 'onToggle', table: { disable: true } },
-      id: {
-        control: { type: 'text' },
-        defaultValue: 'accordion',
-        table: { disable: true },
-      },
-      class: { table: { disable: true } },
+      title: { name: 'Title', control: 'text' },
+      subtitle: { name: 'Subtitle', control: 'text' },
+      open: { name: 'Open', control: 'boolean' },
+      disabled: { name: 'Disabled', control: 'boolean' },
+      readOnly: { name: 'Read Only', control: 'boolean' },
+      error: { name: 'Error', control: 'text' },
       icon: {
-        control: { type: 'select', options: iconNames },
+        name: 'Icon',
+        control: 'select',
+        options: iconNames,
       },
     },
-  } satisfies Meta;
+  } satisfies Meta<Accordion>;
 </script>
 
 <script lang="ts">

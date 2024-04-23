@@ -18,7 +18,9 @@
       columns: { control: 'number' },
       rows: { control: 'number' },
     },
-  } satisfies Meta;
+  } satisfies Meta<
+    Omit<Table, 'columns' | 'rows'> & { columns?: number; rows?: number }
+  >;
 </script>
 
 <script lang="ts">
