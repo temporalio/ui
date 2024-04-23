@@ -13,7 +13,7 @@
     routeForNexusService,
   } from '$lib/utilities/route-for';
 
-  import { services } from './services';
+  import services from '$fixtures/nexus-services.json';
 
   let view: 'all' | 'mine' = 'all';
 </script>

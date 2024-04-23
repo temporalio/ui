@@ -67,6 +67,10 @@ export const routeForEditNexusService = (id: string): string => {
   return `${base}/nexus/${id}/edit`;
 };
 
+export const routeForImportNexusService = (id: string): string => {
+  return `${base}/nexus/${id}/import`;
+};
+
 export const routeForCreateNexusService = (): string => {
   return `${base}/nexus/create`;
 };
