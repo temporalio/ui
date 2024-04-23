@@ -45,7 +45,7 @@
 <Story name="Warning (as Button)" args={{ intent: 'warning', button: true }} />
 
 <Story
-  name="Default"
+  name="Default (Dark)"
   parameters={{
     themes: {
       themeOverride: 'dark',
@@ -54,7 +54,7 @@
 />
 
 <Story
-  name="Warning"
+  name="Warning (Dark)"
   args={{ intent: 'warning' }}
   parameters={{
     themes: {
@@ -64,7 +64,7 @@
 />
 
 <Story
-  name="Default (as Button)"
+  name="Default (as Button, Dark)"
   args={{ button: true }}
   parameters={{
     themes: {
@@ -74,7 +74,7 @@
 />
 
 <Story
-  name="Warning (as Button)"
+  name="Warning (as Button, Dark)"
   args={{ intent: 'warning', button: true }}
   parameters={{
     themes: {

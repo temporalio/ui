@@ -57,7 +57,14 @@
 
 <Story name="With Icon" args={{ icon: 'workflow' }} />
 
-<Story name="Accordion (Default)" />
+<Story
+  name="Accordion (Dark)"
+  parameters={{
+    themes: {
+      themeOverride: 'dark',
+    },
+  }}
+/>
 
 <Story
   name="Open (Dark)"
