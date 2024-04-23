@@ -223,7 +223,7 @@
   }
 
   .disabled-icon-container {
-    @apply flex h-full w-9 items-center justify-center;
+    @apply flex h-full w-9 items-center justify-center px-1;
   }
 
   .clear-icon-container {
