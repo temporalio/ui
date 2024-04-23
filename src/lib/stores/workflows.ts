@@ -12,7 +12,7 @@ import { minimumVersionRequired } from '$lib/utilities/version-check';
 
 import { isCloud, supportsAdvancedVisibility } from './advanced-visibility';
 import { groupByCountEnabled } from './capability-enablement';
-import { query, showChildWorkflows } from './filters';
+import { showChildWorkflows } from './filters';
 import { temporalVersion } from './versions';
 
 export const refresh = writable(0);
@@ -28,6 +28,7 @@ export const canFetchChildWorkflows = derived(
   },
 );
 
+const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
 export const queryWithParentWorkflowId = derived(
   [query, canFetchChildWorkflows, showChildWorkflows],
   ([$query, $canFetchChildWorkflows, $showChildWorkflows]) => {
