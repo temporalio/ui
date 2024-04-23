@@ -5,6 +5,7 @@
 </script>
 
 <div
+  on:click
   class="card flex cursor-pointer flex-col gap-1 rounded-lg px-4 py-8 transition-colors hover:surface-interactive hover:text-white {$$props.class}"
 >
   <h3 class="text-xl font-medium">{title}</h3>

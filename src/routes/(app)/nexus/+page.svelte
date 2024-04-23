@@ -1,11 +1,17 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import GhostCard from '$lib/holocene/ghost-card.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    routeForCreateNexusService,
+    routeForNexusService,
+  } from '$lib/utilities/route-for';
 
   import { services } from './services';
 
@@ -13,9 +19,15 @@
 </script>
 
 <PageTitle title={translate('nexus.nexus')} url={$page.url.href} />
-<h1 data-testid="namespace-selector-title" class="mb-8 text-2xl">
-  {translate('nexus.nexus-services')}
-</h1>
+
+<div class="mb-8 flex items-center justify-between">
+  <h1 data-testid="namespace-selector-title" class="text-2xl">
+    {translate('nexus.services')}
+  </h1>
+  <Button variant="secondary" href={routeForCreateNexusService()}
+    >{translate('nexus.create-service')}</Button
+  >
+</div>
 <div class="flex flex-col gap-4">
   <ToggleButtons>
     <ToggleButton
@@ -39,9 +51,10 @@
   >
     {#each services as service}
       <GhostCard
-        title={service.title}
+        title={service.name}
         subtitle={service.description}
         tags={service.tags}
+        on:click={() => goto(routeForNexusService(service.id))}
       />
     {/each}
   </div>

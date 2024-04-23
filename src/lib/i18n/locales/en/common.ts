@@ -68,6 +68,7 @@ export const Strings = {
   'last-updated': 'Last Updated: {{updated}}',
   edit: 'Edit',
   delete: 'Delete',
+  view: 'View',
   memo: 'Memo',
   notes: 'Notes',
   add: 'Add',

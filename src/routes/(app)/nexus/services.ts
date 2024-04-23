@@ -1,6 +1,6 @@
 type Service = {
   id: string;
-  title: string;
+  name: string;
   description: string;
   tags?: string[];
 };
@@ -8,62 +8,72 @@ type Service = {
 export const services: Service[] = [
   {
     id: '1',
-    title: 'Activity Retry',
-    description: 'Description lorem ipsum dolor sit amet consectetur',
+    name: 'Activity Retry',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae consequat felis, vel ultrices metus. Aenean pharetra varius elit, eu elementum mauris viverra a. Vivamus non nulla at felis hendrerit fermentum ac in nisi. Nullam ut tortor eu erat scelerisque tristique. Sed egestas, magna sed ultrices commodo, sapien massa eleifend eros, vel rutrum arcu turpis eu mi.',
     tags: ['sample', 'go', '<tag>'],
   },
   {
     id: '2',
-    title: 'Money Transfer',
-    description: 'Description lorem ipsum dolor sit amet consectetur',
+    name: 'Money Transfer',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae consequat felis, vel ultrices metus. Aenean pharetra varius elit, eu elementum mauris viverra a. Vivamus non nulla at felis hendrerit fermentum ac in nisi. Nullam ut tortor eu erat scelerisque tristique. Sed egestas, magna sed ultrices commodo, sapien massa eleifend eros, vel rutrum arcu turpis eu mi.',
     tags: ['sample', 'go', '<tag>'],
   },
   {
     id: '3',
-    title: 'Saga',
-    description: 'Description lorem ipsum dolor sit amet consectetur',
+    name: 'Saga',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae consequat felis, vel ultrices metus. Aenean pharetra varius elit, eu elementum mauris viverra a. Vivamus non nulla at felis hendrerit fermentum ac in nisi. Nullam ut tortor eu erat scelerisque tristique. Sed egestas, magna sed ultrices commodo, sapien massa eleifend eros, vel rutrum arcu turpis eu mi.',
     tags: ['sample', 'go', '<tag>'],
   },
   {
     id: '4',
-    title: 'Sleep Await',
-    description: 'Description lorem ipsum dolor sit amet consectetur',
+    name: 'Sleep Await',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae consequat felis, vel ultrices metus. Aenean pharetra varius elit, eu elementum mauris viverra a. Vivamus non nulla at felis hendrerit fermentum ac in nisi. Nullam ut tortor eu erat scelerisque tristique. Sed egestas, magna sed ultrices commodo, sapien massa eleifend eros, vel rutrum arcu turpis eu mi.',
     tags: ['sample', 'go', '<tag>'],
   },
   {
     id: '5',
-    title: '<Service>',
-    description: 'Description lorem ipsum dolor sit amet consectetur',
+    name: '<Service>',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae consequat felis, vel ultrices metus. Aenean pharetra varius elit, eu elementum mauris viverra a. Vivamus non nulla at felis hendrerit fermentum ac in nisi. Nullam ut tortor eu erat scelerisque tristique. Sed egestas, magna sed ultrices commodo, sapien massa eleifend eros, vel rutrum arcu turpis eu mi.',
     tags: ['sample', 'go', '<tag>'],
   },
   {
     id: '6',
-    title: '<Service>',
-    description: 'Description lorem ipsum dolor sit amet consectetur',
+    name: '<Service>',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae consequat felis, vel ultrices metus. Aenean pharetra varius elit, eu elementum mauris viverra a. Vivamus non nulla at felis hendrerit fermentum ac in nisi. Nullam ut tortor eu erat scelerisque tristique. Sed egestas, magna sed ultrices commodo, sapien massa eleifend eros, vel rutrum arcu turpis eu mi.',
     tags: ['sample', 'go', '<tag>'],
   },
   {
     id: '7',
-    title: '<Service>',
-    description: 'Description lorem ipsum dolor sit amet consectetur',
+    name: '<Service>',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae consequat felis, vel ultrices metus. Aenean pharetra varius elit, eu elementum mauris viverra a. Vivamus non nulla at felis hendrerit fermentum ac in nisi. Nullam ut tortor eu erat scelerisque tristique. Sed egestas, magna sed ultrices commodo, sapien massa eleifend eros, vel rutrum arcu turpis eu mi.',
     tags: ['sample', 'go', '<tag>'],
   },
   {
     id: '8',
-    title: '<Service>',
-    description: 'Description lorem ipsum dolor sit amet consectetur',
+    name: '<Service>',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae consequat felis, vel ultrices metus. Aenean pharetra varius elit, eu elementum mauris viverra a. Vivamus non nulla at felis hendrerit fermentum ac in nisi. Nullam ut tortor eu erat scelerisque tristique. Sed egestas, magna sed ultrices commodo, sapien massa eleifend eros, vel rutrum arcu turpis eu mi.',
     tags: ['sample', 'go', '<tag>'],
   },
   {
     id: '9',
-    title: '<Service>',
-    description: 'Description lorem ipsum dolor sit amet consectetur',
+    name: '<Service>',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae consequat felis, vel ultrices metus. Aenean pharetra varius elit, eu elementum mauris viverra a. Vivamus non nulla at felis hendrerit fermentum ac in nisi. Nullam ut tortor eu erat scelerisque tristique. Sed egestas, magna sed ultrices commodo, sapien massa eleifend eros, vel rutrum arcu turpis eu mi.',
     tags: ['sample', 'go', '<tag>'],
   },
   {
     id: '10',
-    title: '<Service>',
-    description: 'Description lorem ipsum dolor sit amet consectetur',
+    name: '<Service>',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae consequat felis, vel ultrices metus. Aenean pharetra varius elit, eu elementum mauris viverra a. Vivamus non nulla at felis hendrerit fermentum ac in nisi. Nullam ut tortor eu erat scelerisque tristique. Sed egestas, magna sed ultrices commodo, sapien massa eleifend eros, vel rutrum arcu turpis eu mi.',
     tags: ['sample', 'go', '<tag>'],
   },
 ];

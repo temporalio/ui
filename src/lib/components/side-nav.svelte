@@ -75,7 +75,7 @@
       <NavigationItem
         link={linkList.nexus}
         data-testid="nexus-button"
-        label={translate('common.nexus')}
+        label={translate('nexus.nexus')}
         icon="nexus"
       />
     </IsLegacyCloudGuard>
