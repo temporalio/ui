@@ -32,7 +32,7 @@
       onCheck: { action: 'onCheck', table: { disable: true } },
       group: { action: 'onCheck', table: { disable: true } },
     },
-  } as Meta;
+  } satisfies Meta;
 </script>
 
 <script lang="ts">

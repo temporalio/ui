@@ -11,10 +11,10 @@
       columns: 4,
     },
     argTypes: {
-      rows: { control: 'number' },
-      columns: { control: 'number' },
+      rows: { name: 'Rows', control: 'number' },
+      columns: { name: 'Columns', control: 'number' },
     },
-  } as Meta;
+  } satisfies Meta<SkeletonTable>;
 </script>
 
 <script lang="ts">
