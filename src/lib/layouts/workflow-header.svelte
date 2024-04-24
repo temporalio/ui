@@ -191,7 +191,9 @@
             }),
           )}
         >
-          <Badge type="blue" class="px-2 py-0">{workflow?.historyEvents}</Badge>
+          <Badge type="history-events" class="px-2 py-0">
+            {workflow?.historyEvents}
+          </Badge>
         </Tab>
         <Tab
           label={translate('workflows.workers-tab')}

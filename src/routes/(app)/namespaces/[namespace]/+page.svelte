@@ -27,7 +27,9 @@
   }
 
   const badgeTypeForArchivalState = (state: ArchivalState): BadgeType => {
-    return state === ArchivalState.ARCHIVAL_STATE_ENABLED ? 'green' : 'default';
+    return state === ArchivalState.ARCHIVAL_STATE_ENABLED
+      ? 'active'
+      : 'inactive';
   };
 
   const badgeTypeForBoolean = (
@@ -35,10 +37,10 @@
     invertLogic = true,
   ): BadgeType => {
     if (invertLogic) {
-      return bool ? 'default' : 'green';
+      return bool ? 'inactive' : 'active';
     }
 
-    return bool ? 'green' : 'default';
+    return bool ? 'active' : 'inactive';
   };
 
   const badgeTextForBoolean = (bool: boolean) => {
