@@ -36,6 +36,7 @@
     <input
       bind:group={$group}
       type="radio"
+      class="surface-input"
       aria-describedby="{id}-description"
       {name}
       {value}
@@ -68,7 +69,7 @@
   }
 
   input[type='radio'] {
-    @apply relative box-content h-4 w-4 min-w-[16px] cursor-pointer appearance-none rounded-full border-2 border-subtle bg-transparent outline outline-4 outline-transparent dark:text-black;
+    @apply relative box-content h-4 w-4 min-w-[16px] cursor-pointer appearance-none rounded-full border-2 border-subtle outline outline-4 outline-transparent dark:text-black;
 
     &::after {
       @apply absolute left-1 top-1 h-0 w-0 scale-0 rounded-full bg-interactive transition-transform content-[''];

@@ -85,6 +85,7 @@
       {id}
       {value}
       type="checkbox"
+      class="surface-input"
       bind:checked
       {disabled}
       {required}

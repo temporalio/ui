@@ -103,6 +103,8 @@
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
+
+  import { shouldNotBeTransparent } from './test-utilities';
 </script>
 
 <Template let:args>
@@ -111,17 +113,21 @@
 
 <Story name="Primary" args={{}} />
 
-<Story name="Secondary" args={{ variant: 'Secondary' }} />
+<Story
+  name="Secondary"
+  args={{ variant: 'secondary' }}
+  play={shouldNotBeTransparent((canvas) => canvas.getByRole('button'))}
+/>
 
-<Story name="Destructive" args={{ variant: 'Destructive' }} />
+<Story name="Destructive" args={{ variant: 'destructive' }} />
 
-<Story name="Ghost" args={{ variant: 'Ghost' }} />
+<Story name="Ghost" args={{ variant: 'ghost' }} />
 
-<Story name="Extra Small" args={{ size: 'Extra Small' }} />
+<Story name="Extra Small" args={{ size: 'xs' }} />
 
-<Story name="Small" args={{ size: 'Small' }} />
+<Story name="Small" args={{ size: 'sm' }} />
 
-<Story name="Large" args={{ size: 'Large' }} />
+<Story name="Large" args={{ size: 'lg' }} />
 
 <Story name="Loading" args={{ loading: true }} />
 
@@ -163,7 +169,8 @@
 
 <Story
   name="Secondary (Dark)"
-  args={{ variant: 'Secondary' }}
+  args={{ variant: 'secondary' }}
+  play={shouldNotBeTransparent((canvas) => canvas.getByRole('button'))}
   parameters={{
     themes: {
       themeOverride: 'dark',
@@ -173,7 +180,7 @@
 
 <Story
   name="Destructive (Dark)"
-  args={{ variant: 'Destructive' }}
+  args={{ variant: 'destructive' }}
   parameters={{
     themes: {
       themeOverride: 'dark',
@@ -183,7 +190,7 @@
 
 <Story
   name="Ghost (Dark)"
-  args={{ variant: 'Ghost' }}
+  args={{ variant: 'ghost' }}
   parameters={{
     themes: {
       themeOverride: 'dark',
@@ -193,7 +200,7 @@
 
 <Story
   name="Extra Small (Dark)"
-  args={{ size: 'Extra Small' }}
+  args={{ size: 'xs' }}
   parameters={{
     themes: {
       themeOverride: 'dark',
@@ -203,7 +210,7 @@
 
 <Story
   name="Small (Dark)"
-  args={{ size: 'Small' }}
+  args={{ size: 'sm' }}
   parameters={{
     themes: {
       themeOverride: 'dark',
@@ -213,7 +220,7 @@
 
 <Story
   name="Large (Dark)"
-  args={{ size: 'Large' }}
+  args={{ size: 'lg' }}
   parameters={{
     themes: {
       themeOverride: 'dark',

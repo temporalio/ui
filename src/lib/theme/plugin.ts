@@ -134,6 +134,10 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-secondary-active'),
         color: css('--color-text-primary'),
       },
+      '.surface-input': {
+        backgroundColor: css('--color-surface-primary'),
+        color: css('--color-text-primary'),
+      },
       '.surface-interactive': {
         backgroundColor: css('--color-surface-interactive'),
         color: css('--color-text-primary'),

@@ -46,6 +46,8 @@
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
+
+  import { shouldNotBeTransparent } from '../test-utilities';
 </script>
 
 <Template let:args let:context>
@@ -68,7 +70,11 @@
 
 <Story name="Primary" args={{ variant: 'primary' }} />
 
-<Story name="Secondary" args={{ variant: 'secondary' }} />
+<Story
+  name="Secondary"
+  args={{ variant: 'secondary' }}
+  play={shouldNotBeTransparent((canvas) => canvas.getByRole('button'))}
+/>
 
 <Story name="Ghost" args={{ variant: 'ghost' }} />
 
