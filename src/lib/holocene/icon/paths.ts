@@ -174,6 +174,7 @@ export const icons = {
   spinner,
   'star-empty': starEmpty,
   'star-filled': starFilled,
+  success: checkmark,
   sun,
   summary,
   support,

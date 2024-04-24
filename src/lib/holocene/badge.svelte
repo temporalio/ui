@@ -2,9 +2,23 @@
   import { cva, type VariantProps } from 'class-variance-authority';
   import { twMerge as merge } from 'tailwind-merge';
 
-  export type BadgeType = VariantProps<typeof badgeTypes>['type'];
+  export type BadgeType = VariantProps<typeof types>['type'];
 
-  const badgeTypes = cva(
+  const type = {
+    alpha: 'border-purple-700 bg-purple-100 text-purple-700',
+    beta: 'border-blue-700 bg-indigo-400 text-black',
+    error: 'border-red-700 bg-red-300 text-black',
+    warning: 'border-yellow-900 bg-yellow-200 text-black',
+    default: 'bg-badge text-primary dark:bg-slate-100 dark:text-black',
+    active: 'border-green-700 bg-green-100 text-green-700',
+    inactive: 'bg-badge text-primary dark:bg-slate-100 dark:text-black',
+    available: 'border-green-700 bg-green-100 text-green-700',
+    running: 'border-blue-700 bg-indigo-400 text-black',
+    'history-events': 'border-blue-700 bg-indigo-400 text-black',
+    count: 'h-6 w-6 min-w-max rounded-full bg-indigo-400 text-black',
+  };
+
+  const types = cva(
     [
       'flex',
       'w-fit',
@@ -22,25 +36,15 @@
     ],
     {
       variants: {
-        type: {
-          alpha: 'border-purple-700 bg-purple-100 text-purple-700',
-          beta: 'border-blue-700 bg-indigo-400 text-black',
-          error: 'border-red-700 bg-red-300 text-black',
-          warning: 'border-yellow-900 bg-yellow-200 text-black',
-          default: 'bg-badge text-primary dark:bg-slate-100 dark:text-black',
-          active: 'border-green-700 bg-green-100 text-green-700',
-          inactive: 'bg-badge text-primary dark:bg-slate-100 dark:text-black',
-          available: 'border-green-700 bg-green-100 text-green-700',
-          running: 'border-blue-700 bg-indigo-400 text-black',
-          'history-events': 'border-blue-700 bg-indigo-400 text-black',
-          count: 'h-6 w-6 min-w-max rounded-full bg-indigo-400 text-black',
-        },
+        type,
       },
       defaultVariants: {
         type: 'default',
       },
     },
   );
+
+  export const badgeTypes = Object.keys(type) as BadgeType[];
 </script>
 
 <script lang="ts">
@@ -50,6 +54,6 @@
   export { className as class };
 </script>
 
-<div class={merge(badgeTypes({ type }), className)}>
+<div class={merge(types({ type }), className)}>
   <slot />
 </div>
