@@ -46,13 +46,13 @@
               <h4 class="font-semibold">
                 {translate('workflows.activity-type')}
               </h4>
-              <Badge type={failed ? 'error' : 'default'}>
+              <Badge type={failed ? 'error' : undefined}>
                 {details.activityType}
               </Badge>
             </li>
             <li class="event-table-row">
               <h4>{translate('workflows.attempt')}</h4>
-              <Badge type={failed ? 'error' : 'default'}>
+              <Badge type={failed ? 'error' : 'unspecified'}>
                 {#if failed}
                   <Icon class="mr-1" name="retry" />
                 {/if}
