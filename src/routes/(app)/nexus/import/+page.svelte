@@ -5,8 +5,8 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import ChipCombobox from '$lib/holocene/combobox/chip-combobox.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
-  import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -22,6 +22,7 @@
   let serviceNamespaces = $namespaces.map(
     (namespace: Namespace) => namespace?.namespaceInfo?.name,
   );
+  let namespaceSearch = '';
 
   const handleServiceSelect = (event: CustomEvent<{ value: NexusService }>) => {
     serviceId = event.detail.value.id;
@@ -73,11 +74,14 @@
       </p>
       <CodeBlock language="text" content={previewString} />
     </div>
-    <ChipInput
+    <ChipCombobox
       id="namespaces"
-      chips={serviceNamespaces}
+      placeholder="Select Namespaces for Service"
+      value={namespaceSearch}
+      chips={[]}
       label={translate('common.namespaces')}
-      removeChipButtonLabel={translate('common.remove')}
+      options={serviceNamespaces}
+      maxSize={5}
     />
     <div class="flex items-center gap-4">
       <Button disabled={!serviceId} variant="primary"

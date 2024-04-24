@@ -86,6 +86,7 @@
   export let valid = true;
   export let href = '';
   export let linkDisabled = false;
+  export let onFilter: (list: string[]) => void | undefined = undefined;
 
   let displayValue: string;
   let selectedOption: string | T;
@@ -196,6 +197,11 @@
   };
 
   const handleSelectOption = (option: string | T) => {
+    if (onFilter && isStringOption(option)) {
+      onFilter([option]);
+      resetValueAndOptions();
+      return;
+    }
     setValue(option);
     dispatch('change', { value: option });
     resetValueAndOptions();
@@ -251,7 +257,13 @@
           .includes(event.currentTarget.value.toLowerCase());
       }
     });
+
+    if (onFilter) {
+      onFilter(list);
+    }
   };
+
+  $: filteredValues = !!displayValue && !!onFilter;
 
   const handleInputClick = () => {
     if (!$open) openList();
@@ -319,7 +331,12 @@
     <span class="error">{error}</span>
   {/if}
 
-  <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
+  <Menu
+    bind:menuElement
+    id="{id}-listbox"
+    role="listbox"
+    class="w-full {filteredValues && 'highlightFiltered'}"
+  >
     {#each list as option}
       {#if isStringOption(option)}
         <ComboboxOption
@@ -353,6 +370,10 @@
     &.required {
       @apply after:content-['*'];
     }
+  }
+
+  :global(.highlightFiltered) {
+    @apply bg-interactive;
   }
 
   .combobox-wrapper {
