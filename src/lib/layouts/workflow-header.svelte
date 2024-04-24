@@ -191,7 +191,9 @@
             }),
           )}
         >
-          <Badge type="blue" class="px-2 py-0">{workflow?.historyEvents}</Badge>
+          <Badge type="information" class="px-2 py-0">
+            {workflow?.historyEvents}
+          </Badge>
         </Tab>
         <Tab
           label={translate('workflows.workers-tab')}
@@ -202,8 +204,9 @@
             routeForWorkers(routeParameters),
           )}
         >
-          <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge
-          >
+          <Badge type="information" class="px-2 py-0">
+            {workers?.pollers?.length}
+          </Badge>
         </Tab>
         <Tab
           label={translate('workflows.relationships')}
@@ -214,7 +217,7 @@
             routeForRelationships(routeParameters),
           )}
         >
-          <Badge type="blue" class="px-2 py-0"
+          <Badge type="information" class="px-2 py-0"
             >{workflowRelationships.relationshipCount}</Badge
           >
         </Tab>
@@ -229,7 +232,7 @@
             )}
           >
             <Badge
-              type={activitiesCanceled ? 'warning' : 'blue'}
+              type={activitiesCanceled ? 'warning' : 'information'}
               class="px-2 py-0"
             >
               <div class="flex items-center gap-1">

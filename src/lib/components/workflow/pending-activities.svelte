@@ -65,7 +65,7 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.activity-type')}
                     </h4>
-                    <Badge type={failed ? 'error' : 'default'}>
+                    <Badge type={failed ? 'error' : undefined}>
                       {pendingActivity.activityType}
                     </Badge>
                   </div>
@@ -85,7 +85,7 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.attempt')}
                     </h4>
-                    <Badge type={failed ? 'error' : 'default'}>
+                    <Badge type={failed ? 'error' : undefined}>
                       {#if failed}
                         <Icon name="retry" />
                       {/if}
@@ -96,7 +96,7 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.attempts-left')}
                     </h4>
-                    <Badge type={failed ? 'error' : 'default'}>
+                    <Badge type={failed ? 'error' : undefined}>
                       {formatAttemptsLeft(
                         pendingActivity.maximumAttempts,
                         pendingActivity.attempt,
@@ -108,7 +108,7 @@
                       <h4 class="pending-activity-detail-header">
                         {translate('workflows.next-retry')}
                       </h4>
-                      <Badge type={failed ? 'error' : 'default'}>
+                      <Badge type={failed ? 'error' : undefined}>
                         {toTimeDifference({
                           date: pendingActivity.scheduledTime,
                           negativeDefault: 'None',
