@@ -111,7 +111,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
 } as const;
 
 const temporal = plugin(
-  ({ addComponents, addBase }) => {
+  ({ addComponents, addBase, addUtilities }) => {
     addBase({
       ':root': variables,
       '[data-theme="dark"]': dark,
@@ -161,6 +161,18 @@ const temporal = plugin(
       '.surface-disabled': {
         backgroundColor: css('--color-surface-secondary'),
         color: css('--color-text-disabled'),
+      },
+    });
+
+    addUtilities({
+      '.flex': {
+        display: 'flex',
+        'align-items': 'center',
+      },
+      '.flex-col': {
+        display: 'flex',
+        'flex-direction': 'column',
+        'align-items': 'start',
       },
     });
   },
