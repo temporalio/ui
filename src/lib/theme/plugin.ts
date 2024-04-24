@@ -26,6 +26,7 @@ export const variables = {
   '--color-text-warning': rgb(getColor('yellow', 500)),
   '--color-text-active': rgb(getColor('indigo', 600)),
 
+  '--color-surface-background': rgb(colors.offWhite),
   '--color-surface-primary': rgb(colors.white),
   '--color-surface-secondary': rgb(colors.offWhite),
   '--color-surface-interactive': rgb(getColor('indigo', 600)),
@@ -78,6 +79,7 @@ const dark: Partial<Variables<keyof typeof variables>> = {
   '--color-text-success': rgb(getColor('green', 100)),
   '--color-text-active': rgb(getColor('indigo', 500)),
 
+  '--color-surface-background': rgb(colors.offBlack),
   '--color-surface-primary': rgb(colors.black),
   '--color-surface-secondary': rgb(colors.offBlack),
   '--color-surface-interactive-secondary': rgb(getColor('slate', 800)),
@@ -112,10 +114,14 @@ const temporal = plugin(
   ({ addComponents, addBase }) => {
     addBase({
       ':root': variables,
-      ':is(body.dark *)': dark,
+      '[data-theme="dark"]': dark,
     });
 
     addComponents({
+      '.surface-background': {
+        backgroundColor: css('--color-surface-background'),
+        color: css('--color-text-primary'),
+      },
       '.surface-primary': {
         backgroundColor: css('--color-surface-primary'),
         color: css('--color-text-primary'),

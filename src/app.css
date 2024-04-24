@@ -14,6 +14,7 @@
   }
 
   body {
+    @apply surface-background;
     font-family: theme('fontFamily.primary');
     position: relative;
     overscroll-behavior: none;

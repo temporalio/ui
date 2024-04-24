@@ -41,13 +41,13 @@
 
   let modalElement: HTMLDialogElement;
 
-  $: open, toggleModal();
+  $: toggleModal(open, modalElement);
 
-  export const toggleModal = () => {
+  export const toggleModal = (open: boolean, modal: HTMLDialogElement) => {
     if (open) {
-      modalElement?.showModal();
+      modal?.showModal();
     } else {
-      modalElement?.close();
+      modal?.close();
     }
   };
 
@@ -78,6 +78,7 @@
 </script>
 
 <svelte:window on:click={handleClick} />
+
 <dialog
   {id}
   on:close={handleCancel}
