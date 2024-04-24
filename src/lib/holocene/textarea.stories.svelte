@@ -41,6 +41,8 @@
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
+
+  import { shouldNotBeTransparent } from './test-utilities';
 </script>
 
 <Template let:args>
@@ -54,7 +56,10 @@
   />
 </Template>
 
-<Story name="Default" />
+<Story
+  name="Default"
+  play={shouldNotBeTransparent((canvas) => canvas.getByRole('textbox'))}
+/>
 
 <Story name="Disabled" args={{ disabled: true }} />
 
@@ -75,6 +80,7 @@
 <Story
   name="Default (Dark)"
   parameters={{ themes: { themeOverride: 'dark' } }}
+  play={shouldNotBeTransparent((canvas) => canvas.getByRole('textbox'))}
 />
 
 <Story
