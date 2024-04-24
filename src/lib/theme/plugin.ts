@@ -169,11 +169,6 @@ const temporal = plugin(
         display: 'flex',
         'align-items': 'center',
       },
-      '.flex-col': {
-        display: 'flex',
-        'flex-direction': 'column',
-        'align-items': 'start',
-      },
     });
   },
   {
