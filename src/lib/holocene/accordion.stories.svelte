@@ -3,8 +3,6 @@
 
   import { iconNames } from '$lib/holocene/icon';
 
-  console.log(iconNames);
-
   import Accordion from './accordion.svelte';
 
   export const meta = {
