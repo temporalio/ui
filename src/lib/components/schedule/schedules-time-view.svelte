@@ -22,7 +22,7 @@
     includeSeconds={false}
   />
 
-  <div class="flex w-full flex-row items-center gap-2">
+  <div class="flex w-full flex-row gap-2">
     <Icon name="clock" aria-hidden="true" />
     <span class="text-xs font-normal text-slate-500"
       >{translate('common.based-on-time-preface')} Universal Standard Time (UTC)

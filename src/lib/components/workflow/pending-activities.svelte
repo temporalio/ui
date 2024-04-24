@@ -40,7 +40,7 @@
       title={translate('workflows.pending-activities')}
       data-testid="pending-activities"
     >
-      <div slot="summary" class="flex items-center gap-2">
+      <div slot="summary" class="flex gap-2">
         <Badge type="count">{pendingActivities.length}</Badge>
         {#if canceled}
           <Tooltip
@@ -185,7 +185,7 @@
   }
 
   .pending-activity-row {
-    @apply flex w-full flex-row items-center gap-2;
+    @apply flex w-full flex-row  gap-2;
   }
 
   .pending-activity-summary {
@@ -201,7 +201,7 @@
   }
 
   .pending-activity-detail {
-    @apply w-full whitespace-nowrap xl:flex xl:flex-row xl:items-center xl:gap-2;
+    @apply xl: w-full whitespace-nowrap xl:flex xl:flex-row xl:gap-2;
   }
 
   .pending-activity-detail-header {

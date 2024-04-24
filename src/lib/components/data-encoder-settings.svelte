@@ -81,7 +81,7 @@
     class="surface-primary relative flex h-[540px] w-full flex-col gap-6 overflow-auto border-b border-subtle p-12"
   >
     <div class="flex w-full flex-col gap-4 xl:w-1/2">
-      <div class="flex items-center justify-between space-x-2">
+      <div class="flex justify-between space-x-2">
         <h3 data-testid="data-encoder-title" class="text-xl">
           {translate('common.codec-server')}
         </h3>
@@ -130,7 +130,7 @@
         bind:includeCreds
         {error}
       />
-      <div class="flex items-center gap-4">
+      <div class="flex gap-4">
         <Button
           disabled={Boolean(error)}
           data-testid="confirm-data-encoder-button"

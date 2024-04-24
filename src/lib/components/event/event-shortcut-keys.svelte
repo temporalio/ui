@@ -74,10 +74,10 @@
   }
 
   .cell {
-    @apply flex items-center justify-center gap-8 text-white;
+    @apply flex  justify-center gap-8 text-white;
   }
 
   .shortcut {
-    @apply flex items-center gap-2;
+    @apply flex  gap-2;
   }
 </style>

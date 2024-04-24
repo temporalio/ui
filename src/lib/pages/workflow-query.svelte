@@ -64,7 +64,7 @@
     </div>
   {:then types}
     <div class="flex justify-between">
-      <div class="flex items-center gap-4">
+      <div class="flex gap-4">
         <Select
           id="query-select"
           label={translate('workflows.query-type')}

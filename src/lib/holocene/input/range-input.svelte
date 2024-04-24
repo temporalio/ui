@@ -73,7 +73,7 @@
       <span class="absolute -bottom-6 left-0 text-xs font-normal">
         {min}
       </span>
-      <div class="relative flex items-center">
+      <div class="relative flex">
         <output
           bind:this={outputElement}
           class:hidden={!valid}
@@ -119,7 +119,7 @@
 
 <style lang="postcss">
   .range-input-container {
-    @apply inline-flex w-full flex-row items-center gap-4 whitespace-nowrap text-primary;
+    @apply inline-flex w-full flex-row  gap-4 whitespace-nowrap text-primary;
   }
 
   .numeric-input {

@@ -61,14 +61,14 @@
     type="button"
     on:click={toggleAccordion}
   >
-    <div class="space-between flex w-full flex-row items-center">
-      <h2 class="flex w-full items-center gap-2 text-lg font-medium">
+    <div class="space-between flex w-full flex-row">
+      <h2 class="flex w-full gap-2 text-lg font-medium">
         {#if icon}<Icon name={icon} />{/if}
         {title}
         <slot name="summary" />
       </h2>
       <div
-        class="flex flex-row items-center gap-2 pr-2"
+        class="flex flex-row gap-2 pr-2"
         on:click|stopPropagation
         on:keyup|stopPropagation
       >
@@ -85,7 +85,7 @@
         </div>
       {/if}
     </div>
-    <p class="flex items-center font-secondary">
+    <p class="flex font-secondary">
       {#if error}
         <Badge class="mr-2" type="error">{error}</Badge>
       {/if}

@@ -40,7 +40,7 @@
 
 <style lang="postcss">
   .heart-beat {
-    @apply relative flex items-center justify-center bg-blue-100 text-center;
+    @apply relative flex  justify-center bg-blue-100 text-center;
   }
 
   .heart-rate {

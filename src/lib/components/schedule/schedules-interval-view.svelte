@@ -41,7 +41,7 @@
   <p>
     {translate('schedules.interval-view-description')}
   </p>
-  <div class="flex flex-col items-center gap-2 lg:flex-row">
+  <div class="flex flex-col gap-2 lg:flex-row">
     <Input
       id="days"
       class="w-28"

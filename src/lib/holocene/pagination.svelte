@@ -155,7 +155,7 @@
           />
         {/if}
         <slot name="pagination-top">
-          <div class="flex items-center justify-center gap-3">
+          <div class="flex justify-center gap-3">
             <button
               class="caret"
               disabled={!$store.hasPrevious}
@@ -222,7 +222,7 @@
           position="bottom"
         />
       {/if}
-      <div class="flex items-center justify-center gap-3">
+      <div class="flex justify-center gap-3">
         <button
           class="caret"
           disabled={!$store.hasPrevious}

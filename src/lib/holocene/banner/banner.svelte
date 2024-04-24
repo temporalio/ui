@@ -27,6 +27,6 @@
 
 <style lang="postcss">
   .banner {
-    @apply relative block flex items-center justify-center bg-indigo-200 text-center leading-10 text-indigo-900;
+    @apply relative block flex  justify-center bg-indigo-200 text-center leading-10 text-indigo-900;
   }
 </style>

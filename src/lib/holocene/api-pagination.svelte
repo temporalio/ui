@@ -174,8 +174,8 @@
 
 <slot name="header" visibleItems={$store.visibleItems} />
 <div class="relative mb-8 flex flex-col gap-4">
-  <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
-    <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
+  <div class="flex flex-col justify-between gap-4 lg:flex-row">
+    <div class="flex gap-1 lg:gap-2 xl:gap-3">
       <slot name="action-top-left" visibleItems={$store.visibleItems} />
     </div>
     <nav
@@ -192,7 +192,7 @@
             options={pageSizeOptions}
           />
         {/if}
-        <div class="flex items-center justify-center gap-3">
+        <div class="flex justify-center gap-3">
           <button
             class="caret"
             disabled={!$store.hasPrevious}
@@ -263,7 +263,7 @@
             options={pageSizeOptions}
           />
         {/if}
-        <div class="flex items-center justify-center gap-3">
+        <div class="flex justify-center gap-3">
           <button
             class="caret"
             disabled={!$store.hasPrevious}

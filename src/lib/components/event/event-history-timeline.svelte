@@ -70,20 +70,20 @@
     const link = renderComponentToHTML(Link, {
       href,
       text: sanitizeHtml(groupName),
-      class: 'flex gap-2 items-center',
+      class: 'flex gap-2 ',
     });
     return link;
   }
 
   function renderExecutionName() {
-    return '<div class="flex gap-1 items-center">Workflow Execution</div>';
+    return '<div class="flex gap-1 ">Workflow Execution</div>';
   }
 
   function renderPendingAttempts(name, attempt) {
     const retryIcon = renderComponentToHTML(Icon, {
       name: 'retry',
     });
-    return `<div class="flex gap-1 items-center"><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div><div class="bar-content"><p>${sanitizeHtml(
+    return `<div class="flex gap-1 "><div class="flex gap-1 ">${retryIcon}${attempt.toString()}</div><div class="bar-content"><p>${sanitizeHtml(
       name,
     )}</p></div></div>`;
   }
@@ -299,7 +299,7 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <div class="flex items-center justify-end gap-2">
+  <div class="flex justify-end gap-2">
     <div class="surface-primary flex gap-2">
       <ToggleButtons>
         <ToggleButton data-testid="zoom-in" on:click={() => timeline?.zoomIn(1)}

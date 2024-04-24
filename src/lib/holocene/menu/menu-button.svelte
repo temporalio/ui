@@ -116,7 +116,7 @@
 >
   <slot name="leading" />
   <div
-    class="flex grow items-center"
+    class="flex grow"
     class:justify-center={round}
     class:hidden={!$$slots.default}
   >
@@ -138,7 +138,7 @@
 
 <style lang="postcss">
   .menu-button {
-    @apply relative flex h-10 w-full flex-row items-center gap-2 rounded-lg border py-2.5 text-sm transition-colors transition-shadow focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed;
+    @apply relative flex h-10 w-full flex-row  gap-2 rounded-lg border py-2.5 text-sm transition-colors transition-shadow focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed;
 
     &.active {
       @apply after:h-2 after:w-2 after:-translate-x-full after:-translate-y-full after:rounded-full after:bg-blue-300 after:content-[''];

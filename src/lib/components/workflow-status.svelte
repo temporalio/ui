@@ -41,9 +41,7 @@
   };
 
   const workflowStatus = cva(
-    [
-      'flex items-center rounded-sm px-1 py-0.5 font-secondary whitespace-nowrap',
-    ],
+    ['flex  rounded-sm px-1 py-0.5 font-secondary whitespace-nowrap'],
     {
       variants: {
         status: {
@@ -71,11 +69,11 @@
 </script>
 
 <div
-  class="relative flex items-center gap-0 text-center text-sm leading-4"
+  class="relative flex gap-0 text-center text-sm leading-4"
   data-testid={$$props['test-id']}
 >
   <span
-    class="flex items-center gap-1 font-medium {workflowStatus({
+    class="flex gap-1 font-medium {workflowStatus({
       status,
     })}"
     class:rounded-r-none={newCount}

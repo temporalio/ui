@@ -11,7 +11,7 @@
   export let id = `${label.toLocaleUpperCase()}-input`;
 </script>
 
-<form on:submit|preventDefault role="search" class="flex items-center">
+<form on:submit|preventDefault role="search" class="flex">
   <Input
     class="w-full"
     unroundRight

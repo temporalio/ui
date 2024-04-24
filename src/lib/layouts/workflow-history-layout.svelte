@@ -100,7 +100,7 @@
   </Accordion>
   <section id="event-history">
     <nav
-      class="flex flex-col items-center justify-between gap-4 lg:flex-row lg:items-end"
+      class="flex flex-col justify-between gap-4 lg:flex-row lg:items-end"
       aria-label={translate('workflows.event-history-view')}
     >
       <h2 class="text-2xl font-medium">

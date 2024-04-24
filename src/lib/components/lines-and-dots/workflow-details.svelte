@@ -19,7 +19,7 @@
 </script>
 
 <div class="surface-secondary flex flex-col gap-2">
-  <h3 class="flex items-center text-2xl">Summary</h3>
+  <h3 class="flex text-2xl">Summary</h3>
   <div
     class="surface-primary grid w-full grid-flow-row grid-cols-1 gap-2 rounded-xl border-2 border-primary p-2 md:grid-cols-2 xl:grid-cols-3"
   >

@@ -48,7 +48,7 @@
       max={events.length}
       bind:value={index}
     />
-    <div class="flex items-center justify-center gap-3">
+    <div class="flex justify-center gap-3">
       <button
         class="caret"
         disabled={index === 1}

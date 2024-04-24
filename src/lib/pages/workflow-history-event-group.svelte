@@ -75,7 +75,7 @@
 </script>
 
 {#if eventGroup}
-  <h2 class="flex w-full items-center text-lg font-medium">
+  <h2 class="flex w-full text-lg font-medium">
     {#if workflowLink}
       <Link href={workflowLink}>
         {eventGroup.displayName}

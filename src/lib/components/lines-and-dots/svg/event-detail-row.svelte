@@ -57,7 +57,7 @@
 {#if active && !group?.pendingActivity}
   <foreignObject {x} y={y - 20} {width} height={fontSizeRatio}>
     <button
-      class="flex items-center gap-0.5 rounded-t bg-white pl-1.5 pr-0.5 text-sm text-black"
+      class="flex gap-0.5 rounded-t bg-white pl-1.5 pr-0.5 text-sm text-black"
       on:click|stopPropagation={() => setActiveEvent(event, group)}
     >
       {translate('common.close')}<Icon name="close" />
@@ -76,8 +76,8 @@
   strokeWidth={2}
 />
 <foreignObject {x} y={eventY} {width} height={fontSizeRatio}>
-  <div class="flex items-center justify-between px-2 py-1 text-sm text-white">
-    <div class="flex items-center gap-2">
+  <div class="flex justify-between px-2 py-1 text-sm text-white">
+    <div class="flex gap-2">
       {event.id}
       {spaceBetweenCapitalLetters(event?.name)}
     </div>
@@ -98,7 +98,7 @@
     height={fontSizeRatio}
   >
     <div
-      class="flex items-center gap-2 text-xs text-white md:text-sm"
+      class="flex gap-2 text-xs text-white md:text-sm"
       style="height: {fontSizeRatio}px;"
     >
       <div class="font-medium leading-3 text-[#C9D9F0]">

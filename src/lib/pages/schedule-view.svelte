@@ -286,12 +286,12 @@
         <Link href={routeForSchedules({ namespace })} icon="chevron-left">
           {translate('schedules.back-to-schedules')}
         </Link>
-        <h1 class="relative flex items-center text-2xl">
+        <h1 class="relative flex text-2xl">
           <span class="select-all font-medium" data-testid="schedule-name">
             {scheduleId}
           </span>
         </h1>
-        <div class="flex items-center gap-2 text-lg">
+        <div class="flex gap-2 text-lg">
           <WorkflowStatus
             status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
           />
@@ -299,7 +299,7 @@
             {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
           </p>
         </div>
-        <div class="flex items-center gap-2 text-sm">
+        <div class="flex gap-2 text-sm">
           <p>
             {translate('common.created', {
               created: formatDate(schedule?.info?.createTime, $timeFormat, {
@@ -309,7 +309,7 @@
           </p>
         </div>
         {#if schedule?.info?.updateTime}
-          <div class="flex items-center gap-2 text-sm">
+          <div class="flex gap-2 text-sm">
             <p>
               {translate('common.last-updated', {
                 updated: formatDate(schedule?.info?.updateTime, $timeFormat, {
@@ -365,7 +365,7 @@
       {/if}
       {#if $groupByCountEnabled}
         <div class="flex w-full flex-col gap-2 text-lg">
-          <div class="flex items-center gap-2">
+          <div class="flex gap-2">
             <span data-testid="workflow-count"
               >{$workflowCount.count.toLocaleString()}
               <Translate
@@ -534,7 +534,7 @@
             bind:second={endSecond}
             twelveHourClock={false}
           />
-          <div class="flex w-full flex-row items-center gap-2">
+          <div class="flex w-full flex-row gap-2">
             <Icon name="clock" aria-hidden="true" />
             <span class="text-xs font-normal text-slate-500"
               >{translate('common.based-on-time-preface')} Universal Standard Time

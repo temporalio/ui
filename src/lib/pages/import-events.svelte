@@ -12,7 +12,7 @@
 <section class="flex flex-col gap-4">
   <nav
     id="event-history"
-    class="block items-center justify-between gap-4 pb-4 lg:flex"
+    class="block justify-between gap-4 pb-4 lg:flex"
     aria-label={translate('events.import-event-history')}
   >
     <h1 class="text-lg font-medium" data-testid="import-event-history">

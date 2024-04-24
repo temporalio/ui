@@ -63,7 +63,7 @@
     >
       <div>
         <h1
-          class="flex flex-col gap-0 text-lg md:flex-row md:items-center md:gap-2 md:text-2xl"
+          class="md: flex flex-col gap-0 text-lg md:flex-row md:gap-2 md:text-2xl"
         >
           {translate('common.schedules')}
         </h1>
@@ -112,10 +112,7 @@
         </TableRow>
       {/each}
     </SchedulesTable>
-    <div
-      class="my-12 flex flex-col items-center justify-start gap-2"
-      slot="empty"
-    >
+    <div class="my-12 flex flex-col justify-start gap-2" slot="empty">
       <EmptyState title={translate('schedules.empty-state-title')} {error}>
         <p>
           {translate('schedules.getting-started-docs-link-preface')}

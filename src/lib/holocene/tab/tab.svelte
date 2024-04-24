@@ -64,7 +64,7 @@
 
 <style lang="postcss">
   .tab {
-    @apply flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 text-sm font-medium outline-none hover:text-brand focus-visible:rounded-sm focus-visible:shadow-focus focus-visible:shadow-indigo-400 dark:text-secondary dark:hover:text-brand;
+    @apply flex cursor-pointer  gap-1 whitespace-nowrap border-b-2 text-sm font-medium outline-none hover:text-brand focus-visible:rounded-sm focus-visible:shadow-focus focus-visible:shadow-indigo-400 dark:text-secondary dark:hover:text-brand;
 
     border-color: transparent;
   }

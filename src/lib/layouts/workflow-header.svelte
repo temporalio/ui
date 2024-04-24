@@ -104,8 +104,8 @@
     {/if}
   </div>
   <header class="rounded-top flex flex-col gap-0">
-    <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
-      <div class="flex flex-col items-center gap-4 lg:flex-row">
+    <div class="flex flex-col justify-between gap-4 lg:flex-row">
+      <div class="flex flex-col gap-4 lg:flex-row">
         <div class="px-2">
           <WorkflowStatus status={workflow?.status} big />
         </div>
@@ -125,7 +125,7 @@
           </h1>
           {#if workflowUsesVersioning}
             <div class="flex gap-4">
-              <p class="flex items-center gap-1">
+              <p class="flex gap-1">
                 <span>{translate('workers.last-used-version')}</span
                 ><CompatibilityBadge
                   defaultVersion={buildId === defaultVersionForSet ||
@@ -143,7 +143,7 @@
                   </svelte:fragment>
                 </CompatibilityBadge>
               </p>
-              <p class="flex items-center gap-1">
+              <p class="flex gap-1">
                 <span>{translate('workers.next-version')}</span
                 ><CompatibilityBadge
                   defaultVersion={!!defaultVersionForSet}
@@ -232,7 +232,7 @@
               type={activitiesCanceled ? 'warning' : 'blue'}
               class="px-2 py-0"
             >
-              <div class="flex items-center gap-1">
+              <div class="flex gap-1">
                 {#if activitiesCanceled}<Icon name="canceled" />
                 {/if}
                 {workflow?.pendingActivities?.length}

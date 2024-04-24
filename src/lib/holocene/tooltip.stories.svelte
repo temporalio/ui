@@ -94,7 +94,7 @@
 </script>
 
 <Template let:args let:context>
-  <div class="flex h-screen w-full items-center justify-center">
+  <div class="flex h-screen w-full justify-center">
     <Tooltip {...args}>
       <Button>{context.name} Tooltip</Button>
     </Tooltip>

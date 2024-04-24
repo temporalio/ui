@@ -14,7 +14,7 @@
   };
 </script>
 
-<div class="mx-1 flex items-center">
+<div class="mx-1 flex">
   {#if $dataEncoder?.endpoint}
     {#if $dataEncoder?.hasNotRequested}
       <Tooltip
@@ -23,7 +23,7 @@
       >
         <IconButton
           label={translate('data-encoder.codec-server-configured')}
-          class="relative flex items-center"
+          class="relative flex "
           data-testid="data-encoder-status-configured"
           icon="transcoder-on"
           on:click={onIconClick}
@@ -33,7 +33,7 @@
       <Tooltip bottomRight text={translate('data-encoder.codec-server-error')}>
         <IconButton
           label={translate('data-encoder.codec-server-error')}
-          class="relative flex items-center"
+          class="relative flex "
           data-testid="data-encoder-status-error"
           icon="transcoder-error"
           on:click={onIconClick}
@@ -46,7 +46,7 @@
       >
         <IconButton
           label={translate('data-encoder.codec-server-success')}
-          class="relative flex items-center"
+          class="relative flex "
           data-testid="data-encoder-status-success"
           icon="transcoder-on"
           on:click={onIconClick}
@@ -60,7 +60,7 @@
     >
       <IconButton
         label={translate('data-encoder.configure-codec-server')}
-        class="relative flex items-center"
+        class="relative flex "
         data-testid="data-encoder-status"
         icon="transcoder-off"
         on:click={onIconClick}

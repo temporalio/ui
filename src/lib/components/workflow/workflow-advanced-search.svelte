@@ -60,10 +60,10 @@
 </script>
 
 <div class="flex grow gap-4">
-  <div class="flex w-full items-center gap-0" in:fade>
+  <div class="flex w-full gap-0" in:fade>
     <form
       on:submit|preventDefault={onSearch}
-      class="relative flex w-full items-center gap-0"
+      class="relative flex w-full gap-0"
       in:fly={{ x: -100, duration: 150 }}
       role="search"
     >

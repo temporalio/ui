@@ -47,7 +47,7 @@
     </div>
     <div class="relative h-2 w-full overflow-hidden rounded bg-indigo-100">
       <div
-        class="absolute left-0 flex h-full items-center bg-indigo-600"
+        class="absolute left-0 flex h-full bg-indigo-600"
         style="width:{progressPercent}%;"
       />
     </div>
@@ -71,11 +71,11 @@
     <div class="relative h-2 w-full overflow-hidden rounded">
       <div
         style="width:{completePercent}%;"
-        class="absolute left-0 flex h-full items-center bg-green-200"
+        class="absolute left-0 flex h-full bg-green-200"
       />
       <div
         style="width:{failurePercent}%;"
-        class="absolute right-0 flex h-full items-center justify-end bg-red-200"
+        class="absolute right-0 flex h-full justify-end bg-red-200"
       />
     </div>
   </div>

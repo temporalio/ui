@@ -66,7 +66,7 @@
   }
 
   .cell {
-    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded-xl p-2 text-sm;
+    @apply m-1 inline-flex h-[24px] w-[24px]  justify-center rounded-xl p-2 text-sm;
   }
 
   .selected {

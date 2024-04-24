@@ -56,7 +56,7 @@
   {...$$restProps}
 >
   {#if icon}
-    <div class="flex items-center gap-2">
+    <div class="flex gap-2">
       <Icon name={icon} />
       {#if $$slots.default}
         <span class="hidden md:block"><slot /></span>
@@ -69,7 +69,7 @@
 
 <style lang="postcss">
   .toggle-button {
-    @apply flex items-center justify-center border-2 border-secondary px-4 py-2 text-sm text-primary hover:enabled:surface-interactive-secondary focus-visible:enabled:surface-interactive-secondary;
+    @apply flex  justify-center border-2 border-secondary px-4 py-2 text-sm text-primary hover:enabled:surface-interactive-secondary focus-visible:enabled:surface-interactive-secondary;
   }
 
   .toggle-button.active {

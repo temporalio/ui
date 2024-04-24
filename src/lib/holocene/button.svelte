@@ -18,7 +18,7 @@
       'relative',
       'flex',
       'w-fit',
-      'items-center',
+      '',
       'justify-center',
       'border',
       'gap-2',

@@ -30,7 +30,7 @@
 
 <style lang="postcss">
   .icon-button {
-    @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-[transparent];
+    @apply inline-flex h-9 w-9 shrink-0  justify-center rounded-full border-2 border-[transparent];
 
     &:not(:disabled) {
       @apply text-primary outline-none hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-indigo-600;

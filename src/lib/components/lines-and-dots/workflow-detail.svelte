@@ -14,7 +14,7 @@
   export let tooltip: string = '';
 </script>
 
-<p class="flex items-center gap-2 whitespace-nowrap {$$restProps.class}">
+<p class="flex gap-2 whitespace-nowrap {$$restProps.class}">
   {#if copyable}
     <Copyable
       copyIconTitle={translate('common.copy-icon-title')}
@@ -56,6 +56,6 @@
 
 <style lang="postcss">
   .value {
-    @apply flex w-fit flex-row items-center justify-center truncate break-all rounded-sm bg-badge p-1 leading-4 transition-colors;
+    @apply flex w-fit flex-row  justify-center truncate break-all rounded-sm bg-badge p-1 leading-4 transition-colors;
   }
 </style>

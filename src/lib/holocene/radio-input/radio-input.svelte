@@ -60,7 +60,7 @@
   }
 
   label {
-    @apply flex grow cursor-pointer flex-row items-center gap-2 text-sm font-normal text-primary focus:outline-none;
+    @apply flex grow cursor-pointer flex-row  gap-2 text-sm font-normal text-primary focus:outline-none;
 
     &.disabled {
       @apply cursor-not-allowed;

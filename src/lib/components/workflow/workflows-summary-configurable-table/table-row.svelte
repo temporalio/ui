@@ -53,9 +53,7 @@
     </td>
     <IsTemporalServerVersionGuard minimumVersion="1.23">
       {#if !$showChildWorkflows}
-        <td
-          class="cursor-point relative flex items-center justify-center gap-0.5 pt-2"
-        >
+        <td class="cursor-point relative flex justify-center gap-0.5 pt-2">
           {#if !child}
             <Button
               size="xs"

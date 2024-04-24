@@ -114,7 +114,7 @@
         {error}
       </p>
     </div>
-    <div class="flex items-center justify-end space-x-2 p-6">
+    <div class="flex justify-end space-x-2 p-6">
       <Button variant="secondary" disabled={loading} on:click={handleCancel}
         >{cancelText}</Button
       >

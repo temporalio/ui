@@ -118,7 +118,7 @@
   $: query, namespace, $refresh, fetchCounts();
 </script>
 
-<div class="flex min-h-[24px] flex-wrap items-center gap-2">
+<div class="flex min-h-[24px] flex-wrap gap-2">
   {#each statusGroups as { count, status } (status)}
     {#if !loading}
       <WorkflowCountStatus

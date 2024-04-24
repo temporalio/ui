@@ -77,7 +77,7 @@
           label={option.label}
           labelHidden
         />
-        <div class="flex items-center gap-2">
+        <div class="flex gap-2">
           {#if option.icon}
             <Icon slot="trailing" name={option.icon} />
           {/if}

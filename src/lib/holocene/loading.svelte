@@ -5,7 +5,7 @@
   export let title = translate('common.loading');
 </script>
 
-<div class="my-12 flex flex-col items-center justify-start {$$props.class}">
+<div class="my-12 flex flex-col justify-start {$$props.class}">
   <img
     src={Logo}
     style="margin-top: -40px;"

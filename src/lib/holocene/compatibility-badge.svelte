@@ -22,10 +22,10 @@
 
 <style lang="postcss">
   .version {
-    @apply flex items-center gap-1 rounded border  px-1 text-sm;
+    @apply flex  gap-1 rounded border  px-1 text-sm;
   }
 
   .active-version {
-    @apply flex items-center gap-1 rounded bg-green-100 px-1 text-sm text-green-700;
+    @apply flex  gap-1 rounded bg-green-100 px-1 text-sm text-green-700;
   }
 </style>

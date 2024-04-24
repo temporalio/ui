@@ -91,17 +91,17 @@
     <div
       class="surface-primary absolute z-30 inline-block rounded border border-subtle shadow dark:bg-secondary"
     >
-      <div class="mx-3 my-2 flex items-center justify-around">
-        <div class="flex items-center justify-center">
+      <div class="mx-3 my-2 flex justify-around">
+        <div class="flex justify-center">
           <button type="button" on:click={prev}
             ><Icon name="chevron-left" /></button
           >
         </div>
-        <div class="flex items-center justify-center">
+        <div class="flex justify-center">
           {getMonthName(month)?.label ?? ''}
           {year}
         </div>
-        <div class="flex items-center justify-center">
+        <div class="flex justify-center">
           <button type="button" on:click={next}
             ><Icon name="chevron-right" /></button
           >

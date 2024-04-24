@@ -85,9 +85,9 @@
   on:dragover|preventDefault|stopPropagation
   data-testid="orderable-list-item-{label}"
 >
-  <div class="flex flex-row items-center gap-2">
+  <div class="flex flex-row gap-2">
     {#if !isStatic && !readonly}
-      <div class="flex items-center">
+      <div class="flex">
         <IconButton
           disabled={index === 0}
           icon="chevron-up"
@@ -145,7 +145,7 @@
 
 <style lang="postcss">
   .orderable-item {
-    @apply flex select-none list-none flex-row items-center justify-between p-2 text-sm font-medium first-of-type:rounded-tl-lg first-of-type:rounded-tr-lg last-of-type:rounded-bl-lg last-of-type:rounded-br-lg;
+    @apply flex select-none list-none flex-row  justify-between p-2 text-sm font-medium first-of-type:rounded-tl-lg first-of-type:rounded-tr-lg last-of-type:rounded-bl-lg last-of-type:rounded-br-lg;
   }
 
   .orderable-item[draggable='true'] {

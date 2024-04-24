@@ -35,7 +35,7 @@
 
 <div class={$$props.class}>
   <label class:sr-only={labelHidden} for={id}>{label}</label>
-  <div class="flex items-center gap-2">
+  <div class="flex gap-2">
     <div
       class="input-container"
       class:disabled
@@ -87,7 +87,7 @@
   }
 
   .input-container {
-    @apply surface-primary relative box-border flex h-10 w-16 items-center rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
+    @apply surface-primary relative box-border flex h-10 w-16  rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
   }
 
   .input-container.search {
@@ -99,7 +99,7 @@
   }
 
   .icon-container {
-    @apply ml-2 flex items-center justify-center;
+    @apply ml-2 flex  justify-center;
   }
 
   .input-container.invalid {

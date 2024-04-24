@@ -178,7 +178,7 @@
   }
 
   .input-container {
-    @apply surface-primary relative box-border inline-flex h-10 w-full items-center rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
+    @apply surface-primary relative box-border inline-flex h-10 w-full  rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
 
     &.error,
     &.invalid {
@@ -215,19 +215,19 @@
   }
 
   .icon-container {
-    @apply ml-2 flex items-center justify-center;
+    @apply ml-2 flex  justify-center;
   }
 
   .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r border-l border-subtle;
+    @apply flex h-full w-9 cursor-pointer  justify-center rounded-r border-l border-subtle;
   }
 
   .disabled-icon-container {
-    @apply flex h-full w-9 items-center justify-center px-1;
+    @apply flex h-full w-9  justify-center px-1;
   }
 
   .clear-icon-container {
-    @apply mr-2 flex w-6 cursor-pointer items-center justify-center rounded-full;
+    @apply mr-2 flex w-6 cursor-pointer  justify-center rounded-full;
   }
 
   .count {

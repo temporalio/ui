@@ -18,7 +18,7 @@
 
 <style lang="postcss">
   .row {
-    @apply items-center border-b-2 p-2 text-sm no-underline last-of-type:border-b-0 md:table-row md:text-base;
+    @apply border-b-2 p-2 text-sm no-underline last-of-type:border-b-0 md:table-row md:text-base;
   }
 
   .cell {

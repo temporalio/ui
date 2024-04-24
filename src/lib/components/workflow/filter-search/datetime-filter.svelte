@@ -125,7 +125,7 @@
   };
 </script>
 
-<div class="flex items-center">
+<div class="flex">
   <ConditionalMenu
     inputId="time-range-filter"
     options={[
@@ -258,7 +258,7 @@
         </MenuItem>
       {/if}
       <MenuDivider />
-      <div class="flex items-center p-2">
+      <div class="flex p-2">
         <Button size="xs" style="width: 100%" on:click={onApply} {disabled}
           >{translate('common.apply')}</Button
         >

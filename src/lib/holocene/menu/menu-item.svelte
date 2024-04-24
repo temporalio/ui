@@ -156,7 +156,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply flex cursor-pointer flex-row items-center gap-2 rounded border border-transparent font-primary text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:shadow-focus focus-visible:shadow-secondary focus-visible:outline-none dark:focus-visible:border-interactive;
+    @apply flex cursor-pointer flex-row  gap-2 rounded border border-transparent font-primary text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:shadow-focus focus-visible:shadow-secondary focus-visible:outline-none dark:focus-visible:border-interactive;
 
     &.selected {
       @apply text-active;
@@ -172,7 +172,7 @@
   }
 
   .menu-item-wrapper {
-    @apply flex grow items-center justify-between gap-2;
+    @apply flex grow  justify-between gap-2;
 
     &.centered {
       @apply justify-center;

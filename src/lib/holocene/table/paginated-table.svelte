@@ -193,14 +193,14 @@
   }
 
   .paginated-table-controls-start {
-    @apply flex shrink-0 flex-row items-center justify-center lg:justify-start;
+    @apply flex shrink-0 flex-row  justify-center lg:justify-start;
   }
 
   .paginated-table-controls-center {
-    @apply flex grow flex-row items-center justify-start gap-4 overflow-auto text-sm md:justify-center;
+    @apply flex grow flex-row  justify-start gap-4 overflow-auto text-sm md:justify-center;
   }
 
   .paginated-table-controls-end {
-    @apply flex shrink-0 flex-row items-center justify-between gap-4 lg:justify-end;
+    @apply flex shrink-0 flex-row  justify-between gap-4 lg:justify-end;
   }
 </style>

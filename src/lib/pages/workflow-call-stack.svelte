@@ -65,7 +65,7 @@
         title={translate('workflows.call-stack-alert')}
         class="mb-4 w-fit"
       />
-      <div class="flex items-center gap-4">
+      <div class="flex gap-4">
         <Button
           on:click={refreshStackTrace}
           leadingIcon="retry"

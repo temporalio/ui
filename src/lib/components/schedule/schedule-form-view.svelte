@@ -208,7 +208,7 @@
         bind:phase
         bind:cronString
       >
-        <div class="mt-8 flex items-center gap-2">
+        <div class="mt-8 flex gap-2">
           <Button
             disabled={isDisabled(preset) || !writeActionsAreAllowed()}
             on:click={() => handleConfirm(preset, schedule)}

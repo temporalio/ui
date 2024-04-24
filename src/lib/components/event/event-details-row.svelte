@@ -30,11 +30,11 @@
 </script>
 
 <div
-  class="flex flex-row items-center gap-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
+  class="flex flex-row gap-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
 >
   {#if typeof value === 'object'}
     <div
-      class="flex w-full flex-wrap items-center justify-between gap-1 pr-1 xl:flex-nowrap xl:gap-4"
+      class="flex w-full flex-wrap justify-between gap-1 pr-1 xl:flex-nowrap xl:gap-4"
     >
       <p class="min-w-fit text-sm">
         {format(key)}
@@ -49,7 +49,7 @@
       </PayloadDecoder>
     </div>
   {:else if shouldDisplayAsExecutionLink(key)}
-    <div class="flex w-full flex-wrap items-center gap-1 pr-1">
+    <div class="flex w-full flex-wrap gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
       <div class="truncate text-sm">
         <Copyable
@@ -72,7 +72,7 @@
       </div>
     </div>
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
-    <div class="flex w-full flex-wrap items-center gap-1 pr-1">
+    <div class="flex w-full flex-wrap gap-1 pr-1">
       <p class="truncate text-sm">{format(key)}</p>
       <div class="truncate text-sm">
         <Copyable
@@ -95,7 +95,7 @@
       </div>
     </div>
   {:else if shouldDisplayAsTaskQueueLink(key)}
-    <div class="flex w-full flex-wrap items-center gap-1 pr-1">
+    <div class="flex w-full flex-wrap gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
       <div class="truncate text-sm">
         <Copyable
@@ -113,7 +113,7 @@
       </div>
     </div>
   {:else}
-    <div class="flex w-full flex-wrap items-center gap-1 pr-1">
+    <div class="flex w-full flex-wrap gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
       <p class="truncate text-right text-sm xl:text-left">
         <span

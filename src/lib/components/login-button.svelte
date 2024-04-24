@@ -13,7 +13,7 @@
 
 <style lang="postcss">
   .login-button {
-    @apply flex items-center justify-center rounded-full px-4 py-2 text-sm text-white;
+    @apply flex  justify-center rounded-full px-4 py-2 text-sm text-white;
   }
 
   .login-button:hover {

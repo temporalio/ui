@@ -83,8 +83,8 @@
   <Box point={[x, y]} {width} height={boxHeight} fill="#465A78" />
   <Box point={[x, y]} {width} {height} fill="#1E293B" />
   <foreignObject {x} {y} {width} height={fontSizeRatio}>
-    <div class="flex h-full items-center justify-between text-sm text-white">
-      <div class="flex h-full items-center gap-2">
+    <div class="flex h-full justify-between text-sm text-white">
+      <div class="flex h-full gap-2">
         <div
           class="px-4 py-1 text-black"
           style="background-color: {getStatusColor(status)};"
@@ -93,14 +93,14 @@
         </div>
         {title}
       </div>
-      <div class="flex items-center gap-4">
+      <div class="flex gap-4">
         {formatDistanceAbbreviated({
           start: group?.initialEvent?.eventTime,
           end: group?.lastEvent?.eventTime,
           includeMilliseconds: true,
         })}
         <button
-          class="flex items-center gap-0.5 rounded-t bg-white px-2 text-sm text-black"
+          class="flex gap-0.5 rounded-t bg-white px-2 text-sm text-black"
           on:click|stopPropagation={() => setActiveGroup(group)}
         >
           {translate('common.close')}<Icon name="close" />

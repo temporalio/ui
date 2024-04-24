@@ -105,7 +105,7 @@
           {/if}
         </p>
         {#if duration && duration !== '0ms'}
-          <div class="flex flex-row items-center gap-0">
+          <div class="flex flex-row gap-0">
             <Icon class="inline" name="clock" />
             <p class="break-word truncate text-sm md:whitespace-normal">
               {duration}
@@ -139,7 +139,7 @@
           <Icon class="mr-1.5 inline text-pink-700" name="clock" />
         {/if}
       </div>
-      <div class="flex w-full items-center justify-between truncate">
+      <div class="flex w-full justify-between truncate">
         <p class="event-name truncate text-sm font-semibold md:text-base">
           {isEventGroup(event)
             ? event.displayName
@@ -157,7 +157,7 @@
   </td>
   {#if !expanded}
     <td class="overflow-hidden">
-      <div class="flex w-full items-center justify-between">
+      <div class="flex w-full justify-between">
         <div class="grow truncate">
           <EventDetailsRow
             {...getSingleAttributeForEvent(currentEvent)}
@@ -185,7 +185,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex-wrap items-center text-sm no-underline xl:py-3 xl:text-base;
+    @apply flex-wrap  text-sm no-underline xl:py-3 xl:text-base;
   }
 
   .row:hover {

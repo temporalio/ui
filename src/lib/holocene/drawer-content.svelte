@@ -24,7 +24,7 @@
     @apply flex flex-col justify-center gap-2 px-8 py-4;
 
     &.bottom {
-      @apply items-center p-0;
+      @apply p-0;
     }
 
     &.right {

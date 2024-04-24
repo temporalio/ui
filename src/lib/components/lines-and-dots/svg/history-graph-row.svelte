@@ -58,12 +58,12 @@
     {height}
   >
     <div
-      class="flex items-center justify-between px-2 text-sm text-white"
+      class="flex justify-between px-2 text-sm text-white"
       style="height: {height}px;"
     >
       <div class="flex gap-4">
         {event.id}
-        <div class="flex items-center gap-1">
+        <div class="flex gap-1">
           <Icon name={icon} class="text-white" />
           {spaceBetweenCapitalLetters(event?.name)}
           {#if group && group.displayName && showDetails}<span

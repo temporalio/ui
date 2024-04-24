@@ -25,7 +25,7 @@
 <div
   class="surface-secondary flex w-full grow flex-col gap-2 py-4 {$$restProps.class}"
 >
-  <h3 class="flex items-center gap-2 text-2xl">
+  <h3 class="flex gap-2 text-2xl">
     {title}
   </h3>
   {#if content}

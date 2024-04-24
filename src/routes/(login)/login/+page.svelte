@@ -18,7 +18,7 @@
 </script>
 
 <PageTitle title="Login" url={$page.url.href} />
-<header class="flex h-16 w-full items-center justify-between bg-primary px-10">
+<header class="flex h-16 w-full justify-between bg-primary px-10">
   <img src={Logo} alt="" class="max-h-10" />
   <FeedbackButton />
 </header>
@@ -27,7 +27,7 @@
     Welcome back.
   </h1>
   <p class="my-7" data-testid="login-info">Let's get you signed in.</p>
-  <div class="flex items-center justify-center">
+  <div class="flex justify-center">
     <Button
       data-testid="login-button"
       leadingIcon="lock"
@@ -46,7 +46,7 @@
   </div>
 
   {#if error}
-    <div class="my-12 flex flex-col items-center justify-start gap-2">
+    <div class="my-12 flex flex-col justify-start gap-2">
       <p
         class="rounded-md border-2 border-orange-500 bg-orange-100 p-5 text-center"
       >
