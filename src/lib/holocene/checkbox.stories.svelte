@@ -63,7 +63,7 @@
 
 <Story name="Required" args={{ required: true }} />
 
-<Story name="Error" args={{ error: 'Error' }} />
+<Story name="Invalid with Error" args={{ error: 'Error', valid: false }} />
 
 <Story name="Valid" args={{ valid: true }} />
 
@@ -127,8 +127,8 @@
 />
 
 <Story
-  name="Error (Dark)"
-  args={{ error: 'Error' }}
+  name="Invalid (Dark)"
+  args={{ valid: false }}
   parameters={{
     themes: {
       themeOverride: 'dark',
@@ -137,8 +137,8 @@
 />
 
 <Story
-  name="Valid (Dark)"
-  args={{ valid: true }}
+  name="Invalid with Error (Dark)"
+  args={{ error: 'Error', valid: false }}
   parameters={{
     themes: {
       themeOverride: 'dark',
