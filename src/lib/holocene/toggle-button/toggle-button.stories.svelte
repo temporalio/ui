@@ -11,18 +11,14 @@
     title: 'Toggle Button',
     component: ToggleButton,
     subcomponents: { ToggleButtons },
-    args: {
-      label: 'Option',
-    },
     argTypes: {
-      label: { name: 'Label', control: 'text' },
       icon: { name: 'Icon', control: 'select', options: iconNames },
       group: { table: { disable: true } },
       base: { table: { disable: true } },
       href: { table: { disable: true } },
       active: { table: { disable: true } },
     },
-  } as Meta<ToggleButton>;
+  } satisfies Meta<ToggleButton>;
 </script>
 
 <script lang="ts">

@@ -11,7 +11,7 @@
 
   export const meta = {
     title: 'Menu',
-    component: Menu,
+    component: MenuButton,
     subcomponents: { MenuButton, MenuContainer, MenuItem },
     args: {
       variant: 'primary',
@@ -40,7 +40,7 @@
         },
       },
     },
-  } as Meta<Menu>;
+  } satisfies Meta<MenuButton | Menu>;
 </script>
 
 <script lang="ts">
