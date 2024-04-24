@@ -38,7 +38,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <div class="flex flex-row">
+  <div class="flex">
     <Link href={routeForBatchOperations({ namespace })} icon="chevron-left">
       {translate('batch.back-link')}
     </Link>

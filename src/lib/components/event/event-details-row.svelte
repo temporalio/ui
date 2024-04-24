@@ -29,9 +29,7 @@
   const { workflow, namespace } = $page.params;
 </script>
 
-<div
-  class="flex flex-row gap-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
->
+<div class="flex gap-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}">
   {#if typeof value === 'object'}
     <div
       class="flex w-full flex-wrap justify-between gap-1 pr-1 xl:flex-nowrap xl:gap-4"

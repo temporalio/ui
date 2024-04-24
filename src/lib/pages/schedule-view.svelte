@@ -281,7 +281,7 @@
   {#if $loading}
     <Loading title={translate('schedules.deleting')} class="my-2" />
   {:else}
-    <header class="mb-8 flex flex-row justify-between gap-4">
+    <header class="mb-8 flex justify-between gap-4">
       <div class="relative flex flex-col gap-4">
         <Link href={routeForSchedules({ namespace })} icon="chevron-left">
           {translate('schedules.back-to-schedules')}

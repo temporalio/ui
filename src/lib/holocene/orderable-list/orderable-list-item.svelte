@@ -85,7 +85,7 @@
   on:dragover|preventDefault|stopPropagation
   data-testid="orderable-list-item-{label}"
 >
-  <div class="flex flex-row gap-2">
+  <div class="flex gap-2">
     {#if !isStatic && !readonly}
       <div class="flex">
         <IconButton

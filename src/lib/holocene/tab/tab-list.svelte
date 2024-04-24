@@ -24,6 +24,6 @@
 
 <style lang="postcss">
   .tab-list {
-    @apply flex flex-row gap-4;
+    @apply flex gap-4;
   }
 </style>

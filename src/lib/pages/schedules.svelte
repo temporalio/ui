@@ -56,11 +56,7 @@
     emptyStateMessage={translate('schedules.empty-state-title')}
     fallbackErrorMessage={translate('schedules.error-message-fetching')}
   >
-    <header
-      class="flex flex-row justify-between gap-2"
-      slot="header"
-      let:visibleItems
-    >
+    <header class="flex justify-between gap-2" slot="header" let:visibleItems>
       <div>
         <h1
           class="md: flex flex-col gap-0 text-lg md:flex-row md:gap-2 md:text-2xl"
