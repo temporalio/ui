@@ -24,7 +24,7 @@
   <h1 data-testid="namespace-selector-title" class="text-2xl">
     {translate('nexus.services')}
   </h1>
-  <Button variant="secondary" href={routeForCreateNexusService()}
+  <Button variant="primary" href={routeForCreateNexusService()}
     >{translate('nexus.create-service')}</Button
   >
 </div>

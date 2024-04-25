@@ -46,6 +46,13 @@
     </div>
   </div>
   <div class="flex w-full flex-col gap-4 xl:w-1/2">
+    <Input
+      bind:value={alias}
+      label={translate('nexus.service-name')}
+      id="service-name"
+      maxLength={255}
+      placeholder={translate('nexus.service-name')}
+    />
     <Combobox
       required
       label={translate('nexus.service')}
@@ -60,13 +67,6 @@
       placeholder={translate('nexus.select-service')}
       on:change={handleServiceSelect}
       minSize={32}
-    />
-    <Input
-      bind:value={alias}
-      label={translate('nexus.service-alias')}
-      id="service-name"
-      maxLength={255}
-      placeholder={translate('nexus.service-alias')}
     />
     <div>
       <p class="text-gray-500 text-sm font-medium">
