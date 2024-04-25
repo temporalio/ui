@@ -13,6 +13,7 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     MENU_CONTEXT,
@@ -45,11 +46,7 @@
   export let hasIndicator = false;
   export let id: string = null;
   export let label: string = null;
-  export let unround = false;
-  export let unroundRight = false;
-  export let unroundLeft = false;
   export let variant: MenuButtonVariant = 'secondary';
-  export let active = false;
   export let round = false;
 
   const dispatch = createEventDispatcher<{ click: { open: boolean } }>();
@@ -96,22 +93,18 @@
   };
 </script>
 
-<button
+<Button
   {id}
   {disabled}
   type="button"
-  on:click|stopPropagation|preventDefault={handleClick}
+  on:click={handleClick}
   on:keydown={handleKeyDown}
   aria-haspopup={!disabled}
   aria-controls={controls}
   aria-expanded={$open}
   aria-label={label}
-  class={merge('menu-button px-4', variant, className)}
-  class:unroundLeft
-  class:unroundRight
-  class:active
-  class:unround
-  class:round
+  {variant}
+  class={merge(className)}
   {...$$restProps}
 >
   <slot name="leading" />
@@ -134,58 +127,4 @@
       type="count">{count}</Badge
     >
   {/if}
-</button>
-
-<style lang="postcss">
-  .menu-button {
-    @apply relative flex h-10 w-full flex-row items-center gap-2 rounded-lg border py-2.5 text-sm transition-colors transition-shadow focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed;
-
-    &.active {
-      @apply after:h-2 after:w-2 after:-translate-x-full after:-translate-y-full after:rounded-full after:bg-blue-300 after:content-[''];
-    }
-  }
-
-  .primary {
-    @apply border-interactive bg-interactive text-inverse hover:border-interactive-hover hover:bg-interactive-hover focus-visible:border-inverse focus-visible:bg-interactive-hover focus-visible:shadow-focus focus-visible:shadow-primary/50;
-
-    &:disabled {
-      @apply text-white opacity-75;
-    }
-  }
-
-  .ghost {
-    @apply border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:shadow-focus focus-visible:shadow-primary/50;
-
-    &:disabled {
-      @apply bg-badge/50;
-    }
-  }
-
-  .secondary {
-    @apply surface-input border-secondary text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary hover:border-interactive-secondary  focus-visible:border-white focus-visible:shadow-focus focus-visible:shadow-primary/70 dark:hover:border-transparent dark:focus-visible:border-black;
-
-    &:disabled {
-      @apply bg-slate-50;
-    }
-  }
-
-  .round {
-    @apply w-10 rounded-full p-0;
-  }
-
-  .table-header {
-    @apply h-auto max-w-fit border-2 border-transparent p-0 text-sm text-white focus-visible:border-white;
-  }
-
-  .unround {
-    @apply rounded-none;
-  }
-
-  .unroundLeft {
-    @apply rounded-l-none;
-  }
-
-  .unroundRight {
-    @apply rounded-r-none;
-  }
-</style>
+</Button>
