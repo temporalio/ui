@@ -81,7 +81,7 @@
     class:disabled
   >
     <input
-      on:click|stopPropagation
+      on:click
       on:change={handleChange}
       {id}
       {value}
