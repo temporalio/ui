@@ -36,13 +36,7 @@
       variant: {
         name: 'Variant',
         control: 'select',
-        options: ['Primary', 'Secondary', 'Destructive', 'Ghost'],
-        mapping: {
-          primary: 'Primary',
-          secondary: 'Secondary',
-          destructive: 'Destructive',
-          ghost: 'Ghost',
-        },
+        options: ['primary', 'secondary', 'destructive', 'ghost'],
       },
       disabled: { name: 'Disabled', control: 'boolean' },
       primaryActionDisabled: {
@@ -67,6 +61,15 @@
 <Story name="Primary" />
 
 <Story name="Primary Icon" args={{ icon: 'trash' }} />
+
+<Story name="With Long Title" let:args>
+  <div class="max-w-16">
+    <SplitButton {...args} label="Request Cancellation">
+      <MenuItem>View</MenuItem>
+      <MenuItem destructive>Delete</MenuItem>
+    </SplitButton>
+  </div>
+</Story>
 
 <Story
   name="Primary with Right-Positioned Icon"

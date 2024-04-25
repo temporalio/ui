@@ -29,6 +29,7 @@
       'transition-colors',
       'transition-shadow',
       'focus-visible:outline-none',
+      'whitespace-nowrap',
     ],
     {
       variants: {
