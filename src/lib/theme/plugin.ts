@@ -210,6 +210,22 @@ const temporal = plugin(
 
         DEFAULT: css('--color-border-primary'),
       }),
+      ringColor: {
+        primary: css('--color-border-primary'),
+        secondary: css('--color-border-secondary'),
+        subtle: css('--color-border-subtle'),
+        interactive: css('--color-interactive'),
+        'interactive-hover': css('--color-interactive-hover'),
+        'interactive-secondary': css('--color-border-interactive-secondary'),
+        inverse: css('--color-border-inverse'),
+        disabled: css('--color-border-disabled'),
+        table: css('--color-border-table'),
+        error: css('--color-border-error'),
+        information: css('--color-border-information'),
+        success: css('--color-border-success'),
+        warning: css('--color-border-warning'),
+        danger: css('--color-border-danger'),
+      },
       textColor: ({ theme }) => ({
         ...theme('colors'),
         primary: css('--color-text-primary'),
