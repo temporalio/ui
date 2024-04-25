@@ -51,11 +51,7 @@
           md: 'h-10 text-base px-4 py-2',
           lg: 'h-11 text-lg px-5 py-2.5',
         },
-        borderModifier: {
-          borderless: 'border-0',
-          'borderless-left': 'border-l-0',
-          'borderless-right': 'border-r-0',
-        },
+
         borderRadiusModifier: {
           square: 'rounded-none',
           'square-left': 'rounded-l-none',
@@ -95,7 +91,6 @@
 
   export let variant: ButtonStyles['variant'] = 'primary';
   export let size: ButtonStyles['size'] = 'md';
-  export let borderModifier: ButtonStyles['borderModifier'] = null;
   export let borderRadiusModifier: ButtonStyles['borderRadiusModifier'] = null;
   export let disabled = false;
   export let loading = false;
@@ -130,7 +125,6 @@
       buttonStyles({
         variant,
         size,
-        borderModifier,
         borderRadiusModifier,
       }),
     )}
@@ -166,7 +160,6 @@
     class={buttonStyles({
       variant,
       size,
-      borderModifier,
       borderRadiusModifier,
     })}
     {...$$restProps}

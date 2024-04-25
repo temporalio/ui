@@ -73,14 +73,6 @@
         },
         if: { arg: 'href' },
       },
-      borderModifier: {
-        name: 'Border Modifier',
-        control: 'select',
-        options: ['borderless', 'borderless-left', 'borderless-right'],
-        table: {
-          category: 'Modifiers',
-        },
-      },
       borderRadiusModifier: {
         name: 'Border Radius Modifier',
         control: 'select',
@@ -150,12 +142,6 @@
 <Story name="With Trailing Icon" args={{ trailingIcon: 'workflow' }} />
 
 <Story name="With Link" args={{ href: 'https://example.com' }} />
-
-<Story name="Borderless" args={{ borderModifier: 'borderless' }} />
-
-<Story name="Borderless Left" args={{ borderModifier: 'borderless-left' }} />
-
-<Story name="Borderless Right" args={{ borderModifier: 'borderless-right' }} />
 
 <Story name="Square" args={{ borderRadiusModifier: 'square' }} />
 
@@ -307,36 +293,6 @@
 <Story
   name="With Link (Dark)"
   args={{ href: 'https://example.com' }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Borderless (Dark)"
-  args={{ borderModifier: 'borderless' }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Borderless Left (Dark)"
-  args={{ borderModifier: 'borderless-left' }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Borderless Right (Dark)"
-  args={{ borderModifier: 'borderless-right' }}
   parameters={{
     themes: {
       themeOverride: 'dark',
