@@ -178,7 +178,7 @@
   }
 
   .input-container {
-    @apply surface-primary relative box-border inline-flex h-10 w-full items-center rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
+    @apply surface-input relative box-border inline-flex h-10 w-full items-center rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
 
     &.error,
     &.invalid {
@@ -190,7 +190,7 @@
     }
 
     &.disabled {
-      @apply surface-disabled border-subtle text-disabled;
+      @apply surface-disabled border-subtle;
     }
   }
 
@@ -223,7 +223,7 @@
   }
 
   .disabled-icon-container {
-    @apply flex h-full w-9 items-center justify-center;
+    @apply flex h-full w-9 items-center justify-center px-1;
   }
 
   .clear-icon-container {

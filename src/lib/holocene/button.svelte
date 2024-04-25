@@ -36,7 +36,7 @@
           primary:
             'bg-interactive border-interactive text-white hover:text-white hover:bg-interactive-hover hover:border-interactive-hover focus-visible:bg-interactive-hover focus-visible:border-white dark:focus-visible:border-black focus-visible:shadow-focus focus-visible:shadow-primary/70',
           secondary:
-            'border-secondary text-primary focus-visible:shadow-focus focus-visible:shadow-primary/70 hover:surface-interactive-secondary hover:border-interactive-secondary dark:hover:border-transparent focus-visible:surface-interactive-secondary focus-visible:border-white dark:focus-visible:border-black',
+            'border-secondary surface-input text-primary focus-visible:shadow-focus focus-visible:shadow-primary/70 hover:surface-interactive-secondary hover:border-interactive-secondary dark:hover:border-transparent focus-visible:surface-interactive-secondary focus-visible:border-white dark:focus-visible:border-black',
           destructive:
             'border-danger bg-danger text-primary hover:bg-red-400 hover:border-red-400 focus-visible:shadow-focus focus-visible:shadow-danger/50 focus-visible:border-white dark:focus-visible:border-red-400/50 dark:focus-visible:bg-red-400',
           ghost:

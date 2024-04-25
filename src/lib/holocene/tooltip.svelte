@@ -12,6 +12,7 @@
     hide?: boolean;
     width?: number;
     class?: string;
+    show?: boolean;
   };
 
   type BasePositionProps = {
@@ -80,15 +81,19 @@
   export let width: number | null = null;
   export let copyIconTitle = '';
   export let copySuccessIconTitle = '';
+  export let show = false;
 </script>
 
 {#if hide}
   <slot />
 {:else}
-  <div class={merge('wrapper relative inline-block', className)}>
+  <div class={merge('wrapper group relative inline-block', className)}>
     <slot />
     <div
-      class="tooltip"
+      class={merge(
+        'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover:inline-block group-hover:opacity-90',
+        show && 'inline-block opacity-90',
+      )}
       class:left
       class:right
       class:bottom
@@ -130,10 +135,6 @@
 {/if}
 
 <style lang="postcss">
-  .tooltip {
-    @apply absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all;
-  }
-
   .tooltip.top {
     @apply left-1/2 -mt-2 -translate-x-1/2 -translate-y-full;
   }
@@ -164,9 +165,5 @@
 
   .tooltip.bottomRight {
     @apply bottom-0 left-auto right-0 -mb-2 translate-x-0 translate-y-full;
-  }
-
-  .wrapper:hover .tooltip {
-    @apply inline-block opacity-90;
   }
 </style>

@@ -1,25 +1,35 @@
-<script lang="ts">
-  import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
+<script lang="ts" context="module">
+  import type { Meta } from '@storybook/svelte';
 
-  import iconNames from './icon';
+  export const meta = {
+    title: 'Alert',
+    component: Alert,
+    args: {
+      title: 'Alert Title',
+      intent: 'info',
+      bold: false,
+      hidden: false,
+    },
+    argTypes: {
+      title: { control: 'text' },
+      intent: {
+        control: 'select',
+        options: ['info', 'success', 'warning', 'error'],
+      },
+      icon: {
+        control: 'select',
+        options: ['info', 'success', 'warning', 'error'],
+      },
+      hidden: { table: { disable: true } },
+    },
+  } satisfies Meta<Alert>;
+</script>
+
+<script lang="ts">
+  import { Story, Template } from '@storybook/addon-svelte-csf';
 
   import Alert from './alert.svelte';
 </script>
-
-<Meta
-  title="Alert"
-  component={Alert}
-  argTypes={{
-    intent: {
-      control: 'select',
-      options: ['info', 'error', 'warning', 'success'],
-    },
-    icon: {
-      control: 'select',
-      options: iconNames,
-    },
-  }}
-/>
 
 <Template let:args>
   <Alert {...args}>
@@ -32,7 +42,50 @@
   </Alert>
 </Template>
 
+<Story name="Information" args={{ intent: 'info' }} />
+
+<Story name="Error" args={{ intent: 'error' }} />
+
+<Story name="Success" args={{ intent: 'success' }} />
+
+<Story name="Warning" args={{ intent: 'warning' }} />
+
 <Story
-  name="alert"
-  args={{ title: 'Alert Title', intent: 'info', icon: 'info' }}
+  name="Information (Dark)"
+  args={{ intent: 'info' }}
+  parameters={{
+    themes: {
+      themeOverride: 'dark',
+    },
+  }}
+/>
+
+<Story
+  name="Error (Dark)"
+  args={{ intent: 'error' }}
+  parameters={{
+    themes: {
+      themeOverride: 'dark',
+    },
+  }}
+/>
+
+<Story
+  name="Success (Dark)"
+  args={{ intent: 'success' }}
+  parameters={{
+    themes: {
+      themeOverride: 'dark',
+    },
+  }}
+/>
+
+<Story
+  name="Warning (Dark)"
+  args={{ intent: 'warning' }}
+  parameters={{
+    themes: {
+      themeOverride: 'dark',
+    },
+  }}
 />

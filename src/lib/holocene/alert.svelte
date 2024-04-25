@@ -7,18 +7,21 @@
 
   import type { IconName } from './icon';
 
+  type Intent = 'warning' | 'error' | 'success' | 'info';
+  type AlertIcon = Extract<IconName, Intent>;
+
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
-    intent: typeof intent;
+    intent: Intent;
     title?: string;
-    icon?: IconName;
+    icon?: AlertIcon;
     bold?: boolean;
     'data-testid'?: string;
     hidden?: boolean;
   }
 
-  export let intent: 'warning' | 'error' | 'success' | 'info';
+  export let intent: Intent;
   export let title = '';
-  export let icon: IconName = null;
+  export let icon: AlertIcon = intent;
   export let bold = false;
   export let hidden = false;
 
@@ -50,7 +53,7 @@
   {...$$restProps}
 >
   {#if icon}
-    <div>
+    <div class="pt-1">
       <Icon name={icon} />
     </div>
   {/if}

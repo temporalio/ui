@@ -74,11 +74,10 @@
   </div>
 </div>
 {#if !valid && hintText}
-  <span class="mt-1 text-xs text-red-700">{hintText}</span>
+  <span class="mt-1 text-xs text-danger">{hintText}</span>
 {/if}
 
 <style lang="postcss">
-  /* Base styles */
   label {
     @apply mb-10 font-secondary text-sm font-medium text-primary;
   }
@@ -88,7 +87,7 @@
   }
 
   .input-container {
-    @apply relative box-border flex h-10 w-16 items-center rounded border-2 text-sm focus-within:border-information dark:border-subtle;
+    @apply surface-primary relative box-border flex h-10 w-16 items-center rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
   }
 
   .input-container.search {
@@ -103,32 +102,12 @@
     @apply ml-2 flex items-center justify-center;
   }
 
-  .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r border-l;
-  }
-
   .input-container.invalid {
-    @apply border-red-700 text-red-700;
-  }
-
-  .count {
-    @apply invisible mr-2 font-secondary text-sm font-medium;
-  }
-
-  .input-container .icon-container {
-    @apply text-slate-400;
+    @apply border-error focus-within:shadow-danger/50;
   }
 
   .input-container.disabled {
-    @apply border border-slate-600 bg-slate-50  text-slate-600;
-  }
-
-  .input-container.disabled input {
-    @apply bg-slate-50;
-  }
-
-  .input-container.disabled .copy-icon-container {
-    @apply border-slate-600 bg-slate-200;
+    @apply surface-disabled;
   }
 
   .unroundRight {
@@ -136,6 +115,6 @@
   }
 
   .unroundLeft {
-    @apply rounded-bl-none rounded-tl-none;
+    @apply rounded-bl-none rounded-tl-none border-l-0;
   }
 </style>

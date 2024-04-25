@@ -1,32 +1,62 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import DrawerContent from '$lib/holocene/drawer-content.svelte';
-  import Drawer from '$lib/holocene/drawer.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fetchAllChildWorkflows } from '$lib/services/workflow-service';
+  import { showChildWorkflows } from '$lib/stores/filters';
   import { workflowTableColumns } from '$lib/stores/workflow-table-columns';
-  import { updating, workflows } from '$lib/stores/workflows';
+  import {
+    refresh,
+    updating,
+    workflows,
+    workflowsQuery,
+  } from '$lib/stores/workflows';
+  import type { WorkflowExecution } from '$lib/types/workflows';
 
-  import WorkflowColumnsOrderableList from './workflows-summary-configurable-table/orderable-list.svelte';
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
   import TableHeaderRow from './workflows-summary-configurable-table/table-header-row.svelte';
   import TableRow from './workflows-summary-configurable-table/table-row.svelte';
 
-  let customizationDrawerOpen = false;
-
   $: ({ namespace } = $page.params);
   $: columns = $workflowTableColumns?.[namespace] ?? [];
   $: empty = $workflows.length === 0;
 
-  const openCustomizationDrawer = () => {
-    customizationDrawerOpen = true;
+  let childrenIds: {
+    workflowId: string;
+    runId: string;
+    children: WorkflowExecution[];
+  }[] = [];
+
+  const clearChildren = () => {
+    childrenIds = [];
   };
 
-  const closeCustomizationDrawer = () => {
-    customizationDrawerOpen = false;
+  $: $showChildWorkflows, $refresh, $workflowsQuery, clearChildren();
+
+  const viewChildren = async (workflow: WorkflowExecution) => {
+    if (childrenActive(workflow)) {
+      childrenIds = childrenIds.filter(
+        (id) => id.workflowId !== workflow.id && id.runId !== workflow.runId,
+      );
+    } else {
+      const children = await fetchAllChildWorkflows(
+        namespace,
+        workflow.id,
+        workflow.runId,
+      );
+      childrenIds = [
+        { workflowId: workflow.id, runId: workflow.runId, children },
+        ...childrenIds,
+      ];
+    }
+  };
+
+  $: childrenActive = (workflow: WorkflowExecution) => {
+    return childrenIds.find(
+      (id) => id.workflowId === workflow.id && id.runId === workflow.runId,
+    );
   };
 </script>
 
@@ -43,7 +73,6 @@
     {translate('common.workflows')}
   </caption>
   <TableHeaderRow
-    onClickConfigure={openCustomizationDrawer}
     columnsCount={columns.length}
     {empty}
     slot="headers"
@@ -55,33 +84,24 @@
     {/each}
   </TableHeaderRow>
   {#each visibleItems as workflow}
-    <TableRow {workflow}>
+    <TableRow
+      {workflow}
+      {viewChildren}
+      childCount={childrenActive(workflow)?.children.length}
+    >
       {#each columns as column}
         <TableBodyCell {workflow} {column} />
       {/each}
     </TableRow>
+    {#if childrenActive(workflow)}
+      {#each childrenActive(workflow).children as child}
+        <TableRow workflow={child} child>
+          {#each columns as column}
+            <TableBodyCell workflow={child} {column} />
+          {/each}
+        </TableRow>
+      {/each}
+    {/if}
   {/each}
   <slot name="cloud" slot="cloud" />
 </PaginatedTable>
-
-<Drawer
-  open={customizationDrawerOpen}
-  onClick={closeCustomizationDrawer}
-  position="right"
-  id="workflows-summary-table-configuration-drawer"
-  dark={false}
-  closeButtonLabel={translate('workflows.close-configure-workflows')}
-  class="w-[35vw] min-w-min max-w-fit"
->
-  <DrawerContent title={translate('workflows.configure-workflows')}>
-    <svelte:fragment slot="subtitle">
-      Add (<Icon class="inline" name="add" />), re-arrange (<Icon
-        class="inline"
-        name="chevron-selector-vertical"
-      />), and remove (<Icon class="inline" name="hyphen" />), Workflow Headings
-      to personalize the Workflow List Table.
-    </svelte:fragment>
-
-    <WorkflowColumnsOrderableList {namespace} />
-  </DrawerContent>
-</Drawer>

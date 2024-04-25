@@ -5,8 +5,8 @@
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import { fetchAllEvents } from '$lib/services/events-service';
-  import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
-  import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import { expandAllEvents } from '$lib/stores/event-view';
+  import { fullEventHistory } from '$lib/stores/events';
 
   export let compact = false;
 
@@ -41,15 +41,8 @@
     $expandAllEvents = event.detail.expanded;
   }
 
-  $: initialEvents =
-    $eventFilterSort === 'descending'
-      ? $eventHistory?.end
-      : $eventHistory?.start;
-  $: currentEvents = $fullEventHistory.length
-    ? $fullEventHistory
-    : initialEvents;
-  $: initialItem = currentEvents?.[0];
-  $: updating = currentEvents.length && !$fullEventHistory.length;
+  $: initialItem = $fullEventHistory?.[0];
+  $: updating = !$fullEventHistory.length;
   $: visibleItems = $fullEventHistory.filter((e) => e.id === $page.params.id);
 </script>
 

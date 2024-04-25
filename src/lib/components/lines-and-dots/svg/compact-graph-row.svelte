@@ -67,29 +67,26 @@
     <Icon
       name={CategoryIcon[group.category]}
       x={start - radius / 2}
-      y={y - radius / 1.5}
+      y={y - radius / 2}
       width={radius}
       height={radius}
-      strokeWidth="4"
       class="text-black"
     />
     <Icon
       name={expanded ? 'chevron-up' : 'chevron-down'}
-      x={start - radius / 2}
-      {y}
-      width={radius}
-      height={radius}
-      strokeWidth="4"
+      x={start - radius / 3}
+      y={y + radius / 3.33}
+      width={radius / 1.5}
+      height={radius / 1.5}
       class="text-black"
     />
   {:else}
     <Icon
       name={CategoryIcon[group.category]}
-      x={start - radius / 1.35}
-      y={y - radius / 1.35}
-      width={radius * 1.5}
-      height={radius * 1.5}
-      strokeWidth="4"
+      x={start - radius / 2}
+      y={y - radius / 2}
+      width={radius}
+      height={radius}
       class="text-black"
     />
   {/if}
