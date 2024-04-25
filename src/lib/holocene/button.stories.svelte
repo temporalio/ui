@@ -113,6 +113,12 @@
 
 <Story name="Primary" args={{}} />
 
+<Story name="With Long Title" let:args>
+  <div class="max-w-16">
+    <Button {...args} on:click={action('click')}>Request Cancellation</Button>
+  </div>
+</Story>
+
 <Story
   name="Secondary"
   args={{ variant: 'secondary' }}
