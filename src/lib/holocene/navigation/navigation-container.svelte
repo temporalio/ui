@@ -26,7 +26,7 @@
   {...$$restProps}
 >
   <a href={linkList.home}>
-    <Logo height="24px" width="24px" class="m-1" />
+    <Logo height={24} width={24} class="m-1" />
   </a>
   <button
     title={$navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
