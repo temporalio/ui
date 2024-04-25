@@ -71,10 +71,11 @@
   data-testid={$$restProps['data-testid'] ?? null}
   on:click|stopPropagation
   on:keypress|stopPropagation
+  role="checkbox"
+  aria-checked={checked}
+  tabindex={-1}
 >
   <label
-    on:click
-    on:keypress
     class={merge('checkbox', 'text-primary', className)}
     class:hoverable={hoverable && !disabled}
     class:disabled
@@ -85,6 +86,7 @@
       {id}
       {value}
       type="checkbox"
+      class="surface-input"
       bind:checked
       {disabled}
       {required}
@@ -118,7 +120,7 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px] text-primary;
+    @apply flex cursor-pointer select-none items-center gap-3 text-sm leading-[18px] text-primary;
 
     &.disabled {
       @apply cursor-not-allowed;

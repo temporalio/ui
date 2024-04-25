@@ -1,11 +1,10 @@
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Meta, Story } from '@storybook/addon-svelte-csf';
+<script lang="ts" context="module">
+  import type { Meta } from '@storybook/svelte';
 
   import OrderableListItem from './orderable-list-item.svelte';
   import OrderableList from './orderable-list.svelte';
 
-  let items = [
+  const items = [
     { label: 'Item A', pinned: true },
     { label: 'Item B', pinned: true },
     { label: 'Item C' },
@@ -13,13 +12,38 @@
     { label: 'Item E' },
     { label: 'Item F' },
   ];
+
+  export const meta = {
+    title: 'Orderable List',
+    component: OrderableList,
+    subcomponents: { OrderableListItem },
+    argTypes: {
+      items: {
+        name: 'Items',
+        control: { type: 'object' },
+      },
+    },
+  } satisfies Meta<OrderableList>;
 </script>
 
-<Meta title="Orderable List" component={OrderableList} />
+<script lang="ts">
+  import { action } from '@storybook/addon-actions';
+  import { Story } from '@storybook/addon-svelte-csf';
+</script>
 
-<Story name="orderable list">
+<Story name="Empty">
+  <OrderableList />
+</Story>
+
+<Story name="Heading" let:context>
   <OrderableList>
-    <svelte:fragment slot="heading">Items</svelte:fragment>
+    <span slot="heading">{context.name}</span>
+  </OrderableList>
+</Story>
+
+<Story name="With Items" let:context>
+  <OrderableList>
+    <span slot="heading">{context.name}</span>
     {#each items as item, index (item.label)}
       <OrderableListItem
         on:moveItem={action('moveItem')}
@@ -30,8 +54,31 @@
         pinned={item.pinned}
         {index}
       />
-    {:else}
-      <OrderableListItem readonly label="No items" />
+    {/each}
+  </OrderableList>
+</Story>
+
+<Story name="Empty (Dark)" parameters={{ themes: { themeOverride: 'dark' } }}>
+  <OrderableList />
+</Story>
+
+<Story
+  name="With Items (Dark)"
+  parameters={{ themes: { themeOverride: 'dark' } }}
+  let:context
+>
+  <OrderableList>
+    <span slot="heading">{context.name}</span>
+    {#each items as item, index (item.label)}
+      <OrderableListItem
+        on:moveItem={action('moveItem')}
+        on:removeItem={action('removeItem')}
+        addButtonLabel="Add"
+        static={false}
+        label={item.label}
+        pinned={item.pinned}
+        {index}
+      />
     {/each}
   </OrderableList>
 </Story>

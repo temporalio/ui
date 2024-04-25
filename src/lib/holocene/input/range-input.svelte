@@ -10,6 +10,7 @@
     labelHidden?: boolean;
     min?: number;
     max?: number;
+    step?: number;
     'data-testid'?: string;
   }
 
@@ -17,6 +18,7 @@
   export let labelHidden = false;
   export let min: number = undefined;
   export let max: number = undefined;
+  export let step: number = undefined;
   export let id: string = undefined;
   export let value: number = Math.round((min + max) / 2);
   let valid = true;
@@ -87,7 +89,7 @@
           on:input={handleInput}
           {min}
           {max}
-          step={$$props.step}
+          {step}
           {...omit($$restProps, 'class')}
         />
       </div>

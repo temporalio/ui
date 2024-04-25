@@ -5,7 +5,7 @@ import temporal from './src/lib/theme/plugin';
 
 const config = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
-  darkMode: 'class',
+  darkMode: ['selector', '[data-theme="dark"]'],
   theme: {
     fontFamily: {
       primary: ['Inter Variable', ...fontFamily.sans],

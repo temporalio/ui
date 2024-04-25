@@ -113,6 +113,7 @@
       {name}
       {required}
       multiple
+      data-testid={id}
       bind:this={input}
       bind:value={displayValue}
       on:blur={handleBlur}
