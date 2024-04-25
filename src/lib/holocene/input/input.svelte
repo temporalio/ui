@@ -84,7 +84,7 @@
   $: disabled = disabled || copyable;
 </script>
 
-<div class={merge('flex flex-col gap-1', className)}>
+<div class={merge('flex flex-col gap-1', className)} role="textbox">
   <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
   <div
     class="input-container"
@@ -101,7 +101,7 @@
       </span>
     {/if}
     <input
-      class="input"
+      class="input peer/input"
       class:disabled
       {disabled}
       data-lpignore="true"
@@ -155,6 +155,7 @@
         {suffix}
       </div>
     {/if}
+    <slot />
   </div>
   <span
     class="hint-text inline-block"
@@ -178,7 +179,7 @@
   }
 
   .input-container {
-    @apply surface-input relative box-border inline-flex h-10 w-full items-center rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
+    @apply ring-subtle surface-input relative inline-flex h-10 w-full items-center rounded text-sm ring ring-1 focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
 
     &.error,
     &.invalid {

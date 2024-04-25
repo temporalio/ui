@@ -30,6 +30,10 @@
       'transition-shadow',
       'focus-visible:outline-none',
       'whitespace-nowrap',
+      '[input+&]:rounded-l-none',
+      '[input+&]:rounded-r',
+      '[input+&]:border-0',
+      '[input+&]:active:border-0',
     ],
     {
       variants: {
