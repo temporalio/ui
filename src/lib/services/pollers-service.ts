@@ -147,15 +147,6 @@ export async function getPollers(
   };
 }
 
-// Use for testing
-
-// export async function getTaskQueueRules(
-//   parameters: GetAllPollersRequest,
-//   // request = fetch,
-// ): Promise<TaskQueueRules> {
-//   return Promise.resolve({ ...taskQueueRules });
-// }
-
 export async function getTaskQueueRules(
   parameters: GetAllPollersRequest,
   request = fetch,
@@ -163,6 +154,7 @@ export async function getTaskQueueRules(
   const route = routeForApi('task-queue.rules', parameters);
   return requestFromAPI(route, {
     request,
+    notifyOnError: false,
     handleError: (_e: APIErrorResponse) => {
       return;
     },
@@ -176,6 +168,7 @@ export async function getTaskQueueCompatibility(
   const route = routeForApi('task-queue.compatibility', parameters);
   return requestFromAPI(route, {
     request,
+    notifyOnError: false,
     onError: (e: APIErrorResponse) => {
       console.error(e);
       return;
