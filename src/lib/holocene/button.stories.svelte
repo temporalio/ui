@@ -119,7 +119,6 @@
   </div>
 </Story>
 
-
 <Story
   name="Secondary"
   args={{ variant: 'secondary' }}
