@@ -111,6 +111,14 @@
   </div>
 </Story>
 
+<Story name="Button Group" let:args>
+  <div class="button-group flex">
+    <Button {...args} on:click={action('click')}>First</Button>
+    <Button {...args} on:click={action('click')}>Middle</Button>
+    <Button {...args} on:click={action('click')}>Last</Button>
+  </div>
+</Story>
+
 <Story
   name="Secondary"
   args={{ variant: 'secondary' }}
@@ -142,12 +150,6 @@
 <Story name="With Trailing Icon" args={{ trailingIcon: 'workflow' }} />
 
 <Story name="With Link" args={{ href: 'https://example.com' }} />
-
-<Story name="Square" args={{ borderRadiusModifier: 'square' }} />
-
-<Story name="Square Left" args={{ borderRadiusModifier: 'square-left' }} />
-
-<Story name="Square Right" args={{ borderRadiusModifier: 'square-right' }} />
 
 <Story
   name="Primary (Dark)"
@@ -293,36 +295,6 @@
 <Story
   name="With Link (Dark)"
   args={{ href: 'https://example.com' }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Square (Dark)"
-  args={{ borderRadiusModifier: 'square' }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Square Left (Dark)"
-  args={{ borderRadiusModifier: 'square-left' }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Square Right (Dark)"
-  args={{ borderRadiusModifier: 'square-right' }}
   parameters={{
     themes: {
       themeOverride: 'dark',

@@ -30,6 +30,9 @@
       'transition-shadow',
       'focus-visible:outline-none',
       'whitespace-nowrap',
+      '[.button-group>&]:rounded-none',
+      '[.button-group>&:first-of-type]:rounded-l-lg',
+      '[.button-group>&:last-of-type]:rounded-r-lg',
     ],
     {
       variants: {
@@ -51,7 +54,6 @@
           md: 'h-10 text-base px-4 py-2',
           lg: 'h-11 text-lg px-5 py-2.5',
         },
-
         borderRadiusModifier: {
           square: 'rounded-none',
           'square-left': 'rounded-l-none',
@@ -102,6 +104,9 @@
   export let href: string = null;
   export let target: string = null;
   export let active = false;
+
+  let className = '';
+  export { className as class };
 
   const onLinkClick = (e: MouseEvent) => {
     // Skip if middle mouse click or new tab
@@ -157,11 +162,15 @@
     type="button"
     class:active
     on:click|stopPropagation
-    class={buttonStyles({
-      variant,
-      size,
-      borderRadiusModifier,
-    })}
+    on:keydown|stopPropagation
+    class={merge(
+      buttonStyles({
+        variant,
+        size,
+        borderRadiusModifier,
+      }),
+      className,
+    )}
     {...$$restProps}
   >
     {#if leadingIcon || loading}
