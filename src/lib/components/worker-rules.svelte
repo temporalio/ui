@@ -2,7 +2,6 @@
   import Badge from '$lib/holocene/badge.svelte';
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
@@ -13,6 +12,8 @@
   } from '$lib/services/pollers-service';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
+
+  import PollerIcon from './poller-icon.svelte';
 
   export let workers: GetPollersResponse;
   export let rules: TaskQueueRules | undefined = undefined;
@@ -118,34 +119,14 @@
         </p>
       </td>
       <td data-testid="workflow-poller">
-        {#if poller.taskQueueTypes.includes('WORKFLOW')}
-          <Icon
-            name="checkmark"
-            class="m-auto text-blue-700"
-            title={translate('common.yes')}
-          />
-        {:else}
-          <Icon
-            name="close"
-            class="m-auto text-primary"
-            title={translate('common.no')}
-          />
-        {/if}
+        <PollerIcon
+          includesTaskQueueType={poller.taskQueueTypes.includes('WORKFLOW')}
+        />
       </td>
       <td data-testid="activity-poller">
-        {#if poller.taskQueueTypes.includes('ACTIVITY')}
-          <Icon
-            name="checkmark"
-            class="m-auto text-blue-700"
-            title={translate('common.yes')}
-          />
-        {:else}
-          <Icon
-            name="close"
-            class="m-auto text-primary"
-            title={translate('common.no')}
-          />
-        {/if}
+        <PollerIcon
+          includesTaskQueueType={poller.taskQueueTypes.includes('ACTIVITY')}
+        />
       </td>
     </TableRow>
   {:else}
