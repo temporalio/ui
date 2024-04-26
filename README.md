@@ -92,6 +92,49 @@ pnpn run build:docker
 pnpn run preview:docker
 ```
 
+
+### Running UI and Temporal Server locally
+
+1. Build the ui-server image:
+    
+    ```diff
+    cd server
+    docker build -t my-ui-server .
+    ```
+    
+2. In `temporal` repo
+    1. checkout feature branch or main
+    2. edit ui-server image name in `develop/docker-compose/docker-compose.yml`
+        
+        ```yaml
+          temporal-ui:
+            image: my-ui-server
+        ```
+        
+    
+    And start the server dependencies
+    
+    ```yaml
+    make start-dependencies
+    ```
+
+3. Start the Temporal server
+
+    ```yaml
+    make start
+    ```
+
+4. Change Vite port due to Grafana being on port 3000
+
+```ts
+  server: {
+    port: 3001,
+  }
+```
+
+    
+
+
 ## Testing
 We use [Playwright](https://playwright.dev) to interactively test the Temporal UI.
 
