@@ -56,6 +56,15 @@
 
 <Story name="With Icon" args={{ icon: 'trash' }} />
 
+<Story name="With Long Title" let:args>
+  <div class="max-w-16">
+    <SplitButton {...args} label="Request Cancellation">
+      <MenuItem>View</MenuItem>
+      <MenuItem destructive>Delete</MenuItem>
+    </SplitButton>
+  </div>
+</Story>
+
 <Story
   name="With Right-Positioned Icon"
   args={{

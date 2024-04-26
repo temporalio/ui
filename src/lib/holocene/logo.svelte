@@ -4,20 +4,21 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   interface $$Props extends SVGAttributes<SVGElement> {
-    width?: string;
-    height?: string;
+    width?: number;
+    height?: number;
   }
 
-  export let width = '100px';
-  export let height = '100px';
+  export let width = 100;
+  export let height = 100;
 </script>
 
 <svg
   xmlns="http://www.w3.org/2000/svg"
+  role="img"
   viewBox="0 0 100 100"
   {width}
   {height}
-  class={merge('fill-current stroke-current', $$restProps.class)}
+  class={merge('fill-current', $$restProps.class)}
 >
   <path
     fill-rule="evenodd"

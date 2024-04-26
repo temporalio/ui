@@ -73,6 +73,14 @@
         },
         if: { arg: 'href' },
       },
+      borderRadiusModifier: {
+        name: 'Border Radius Modifier',
+        control: 'select',
+        options: ['square', 'square-left', 'square-right'],
+        table: {
+          category: 'Modifiers',
+        },
+      },
       id: {
         name: 'ID',
         control: 'text',
@@ -110,6 +118,7 @@
     <Button {...args} on:click={action('click')}>Last</Button>
   </div>
 </Story>
+
 
 <Story
   name="Secondary"
