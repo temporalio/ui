@@ -29,10 +29,8 @@ export type GetPollersResponse = {
 type AssignmentRule = {
   rule: {
     targetBuildId: string;
-    ramp: {
-      percentageRamp: {
-        rampPercentage: number;
-      };
+    percentageRamp: {
+      rampPercentage: number;
     };
   };
   createTime: string;
@@ -45,6 +43,7 @@ type CompatibleRedirectRule = {
   };
   createTime: string;
 };
+
 export type TaskQueueRules = {
   assignmentRules: AssignmentRule[];
   compatibleRedirectRules: CompatibleRedirectRule[];
