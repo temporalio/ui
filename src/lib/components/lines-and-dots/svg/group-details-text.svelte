@@ -22,15 +22,267 @@
   const { workflow, namespace } = $page.params;
 
   export let key: string;
-  export let value: string | Record<string, unknown>;
+  // export let value: string | Record<string, unknown>;
   export let attributes: CombinedAttributes;
   export let point: [number, number] = [0, 0];
   export let width: number;
 
+  let value = {
+    id: '5',
+    name: 'Marker: Version',
+    events: {},
+    eventIds: {},
+    initialEvent: {
+      eventId: '5',
+      eventTime: '2022-07-01T20:20:50.175413503Z',
+      eventType: 'MarkerRecorded',
+      version: '0',
+      taskId: '29875719',
+      markerRecordedEventAttributes: {
+        markerName: 'Version',
+        details: {
+          'change-id': {
+            payloads: [
+              {
+                metadata: {
+                  encoding: 'anNvbi9wbGFpbg==',
+                },
+                data: 'ImluaXRpYWwgdmVyc2lvbiI=',
+              },
+            ],
+          },
+          version: {
+            payloads: [
+              {
+                metadata: {
+                  encoding: 'anNvbi9wbGFpbg==',
+                },
+                data: 'Mw==',
+              },
+            ],
+          },
+        },
+        workflowTaskCompletedEventId: '4',
+        header: null,
+        failure: null,
+      },
+      attributes: {
+        type: 'markerRecordedEventAttributes',
+        markerName: 'Version',
+        details: {
+          'change-id': {
+            payloads: [
+              {
+                metadata: {
+                  encoding: 'anNvbi9wbGFpbg==',
+                },
+                data: 'ImluaXRpYWwgdmVyc2lvbiI=',
+              },
+            ],
+          },
+          version: {
+            payloads: [
+              {
+                metadata: {
+                  encoding: 'anNvbi9wbGFpbg==',
+                },
+                data: 'Mw==',
+              },
+            ],
+          },
+        },
+        workflowTaskCompletedEventId: '4',
+        header: null,
+        failure: null,
+      },
+      category: 'marker',
+      id: '5',
+      name: 'MarkerRecorded',
+      timestamp: '2022-07-01 UTC 20:20:50.17',
+    },
+    timestamp: '2022-07-01 UTC 20:20:50.17',
+    category: 'marker',
+    eventTime: '2022-07-01T20:20:50.175413503Z',
+    attributes: {
+      type: 'markerRecordedEventAttributes',
+      markerName: 'Version',
+      details: {
+        'change-id': {
+          payloads: [
+            {
+              metadata: {
+                encoding: 'anNvbi9wbGFpbg==',
+              },
+              data: 'ImluaXRpYWwgdmVyc2lvbiI=',
+            },
+          ],
+        },
+        version: {
+          payloads: [
+            {
+              metadata: {
+                encoding: 'anNvbi9wbGFpbg==',
+              },
+              data: 'Mw==',
+            },
+          ],
+        },
+      },
+      workflowTaskCompletedEventId: '4',
+      header: null,
+      failure: null,
+    },
+    eventList: [
+      {
+        eventId: '5',
+        eventTime: '2022-07-01T20:20:50.175413503Z',
+        eventType: 'MarkerRecorded',
+        version: '0',
+        taskId: '29875719',
+        markerRecordedEventAttributes: {
+          markerName: 'Version',
+          details: {
+            'change-id': {
+              payloads: [
+                {
+                  metadata: {
+                    encoding: 'anNvbi9wbGFpbg==',
+                  },
+                  data: 'ImluaXRpYWwgdmVyc2lvbiI=',
+                },
+              ],
+            },
+            version: {
+              payloads: [
+                {
+                  metadata: {
+                    encoding: 'anNvbi9wbGFpbg==',
+                  },
+                  data: 'Mw==',
+                },
+              ],
+            },
+          },
+          workflowTaskCompletedEventId: '4',
+          header: null,
+          failure: null,
+        },
+        attributes: {
+          type: 'markerRecordedEventAttributes',
+          markerName: 'Version',
+          details: {
+            'change-id': {
+              payloads: [
+                {
+                  metadata: {
+                    encoding: 'anNvbi9wbGFpbg==',
+                  },
+                  data: 'ImluaXRpYWwgdmVyc2lvbiI=',
+                },
+              ],
+            },
+            version: {
+              payloads: [
+                {
+                  metadata: {
+                    encoding: 'anNvbi9wbGFpbg==',
+                  },
+                  data: 'Mw==',
+                },
+              ],
+            },
+          },
+          workflowTaskCompletedEventId: '4',
+          header: null,
+          failure: null,
+        },
+        category: 'marker',
+        id: '5',
+        name: 'MarkerRecorded',
+        timestamp: '2022-07-01 UTC 20:20:50.17',
+      },
+    ],
+    lastEvent: {
+      eventId: '5',
+      eventTime: '2022-07-01T20:20:50.175413503Z',
+      eventType: 'MarkerRecorded',
+      version: '0',
+      taskId: '29875719',
+      markerRecordedEventAttributes: {
+        markerName: 'Version',
+        details: {
+          'change-id': {
+            payloads: [
+              {
+                metadata: {
+                  encoding: 'anNvbi9wbGFpbg==',
+                },
+                data: 'ImluaXRpYWwgdmVyc2lvbiI=',
+              },
+            ],
+          },
+          version: {
+            payloads: [
+              {
+                metadata: {
+                  encoding: 'anNvbi9wbGFpbg==',
+                },
+                data: 'Mw==',
+              },
+            ],
+          },
+        },
+        workflowTaskCompletedEventId: '4',
+        header: null,
+        failure: null,
+      },
+      attributes: {
+        type: 'markerRecordedEventAttributes',
+        markerName: 'Version',
+        details: {
+          'change-id': {
+            payloads: [
+              {
+                metadata: {
+                  encoding: 'anNvbi9wbGFpbg==',
+                },
+                data: 'ImluaXRpYWwgdmVyc2lvbiI=',
+              },
+            ],
+          },
+          version: {
+            payloads: [
+              {
+                metadata: {
+                  encoding: 'anNvbi9wbGFpbg==',
+                },
+                data: 'Mw==',
+              },
+            ],
+          },
+        },
+        workflowTaskCompletedEventId: '4',
+        header: null,
+        failure: null,
+      },
+      category: 'marker',
+      id: '5',
+      name: 'MarkerRecorded',
+      timestamp: '2022-07-01 UTC 20:20:50.17',
+    },
+    isFailureOrTimedOut: false,
+    isCanceled: false,
+    isTerminated: false,
+  };
   const { fontSizeRatio } = DetailsConfig;
+
+  let hovering = false;
 
   $: [x, y] = point;
   $: codeBlockValue = getCodeBlockValue(value);
+  $: maxHeight = hovering
+    ? 3 * staticCodeBlockHeight
+    : staticCodeBlockHeight - fontSizeRatio;
 </script>
 
 {#if typeof value === 'object'}
@@ -38,19 +290,17 @@
     <PayloadDecoder {value} key="payloads" let:decodedValue>
       {#key decodedValue}
         <foreignObject
+          role="note"
           {x}
           y={y - fontSizeRatio}
           {width}
-          height={staticCodeBlockHeight - fontSizeRatio}
+          height={maxHeight}
+          id={hovering ? 'hover' : ''}
+          on:mouseenter={() => (hovering = true)}
+          on:mouseleave={() => (hovering = false)}
         >
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={staticCodeBlockHeight - fontSizeRatio}
-          />
+          <CodeBlock content={decodedValue} {maxHeight} />
         </foreignObject>
-        <!-- <Text  position="middle" {point} category="pending">
-          {decodedValue.slice(1, -1)}
-        </Text> -->
       {/key}
     </PayloadDecoder>
   {:else if key === 'searchAttributes'}
@@ -61,39 +311,34 @@
     >
       {#key decodedValue}
         <foreignObject
+          role="note"
           {x}
           y={y - fontSizeRatio}
           {width}
-          height={staticCodeBlockHeight - fontSizeRatio}
+          height={maxHeight}
+          id={hovering ? 'hover' : ''}
+          on:mouseenter={() => (hovering = true)}
+          on:mouseleave={() => (hovering = false)}
         >
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={staticCodeBlockHeight - fontSizeRatio}
-          />
+          <CodeBlock content={decodedValue} {maxHeight} />
         </foreignObject>
-
-        <!-- <Text  position="middle" {point} category="pending">
-          {decodedValue}
-        </Text> -->
       {/key}
     </PayloadDecoder>
   {:else}
     <PayloadDecoder value={codeBlockValue} let:decodedValue>
       {#key decodedValue}
         <foreignObject
+          role="note"
           {x}
           y={y - fontSizeRatio}
           {width}
-          height={staticCodeBlockHeight - fontSizeRatio}
+          height={maxHeight}
+          id={hovering ? 'hover' : ''}
+          on:mouseenter={() => (hovering = true)}
+          on:mouseleave={() => (hovering = false)}
         >
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={staticCodeBlockHeight - fontSizeRatio}
-          />
+          <CodeBlock content={decodedValue} {maxHeight} />
         </foreignObject>
-        <!-- <Text  position="middle" {point} category="pending"
-          >{decodedValue}</Text
-        > -->
       {/key}
     </PayloadDecoder>
   {/if}
