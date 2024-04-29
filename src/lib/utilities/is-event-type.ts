@@ -199,8 +199,8 @@ export const findAttributesAndKey = (
 
 const hasAttributes =
   <T extends EventWithAttributes<EventAttributeKey>>(key: EventAttributeKey) =>
-  (event: IterableEvent | CommonHistoryEvent): event is T => {
-    return Boolean(event[key]);
+  (event: IterableEvent | CommonHistoryEvent | undefined): event is T => {
+    return Boolean(event?.[key]);
   };
 
 export const isWorkflowExecutionStartedEvent =
