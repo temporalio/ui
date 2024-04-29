@@ -77,8 +77,8 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 
 	api := e.Group("/auth")
 	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options))
-	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider))
-	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider)) // compatibility with UI v1
+	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, providerCfg.AdditionalClaims))
+	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, providerCfg.AdditionalClaims)) // compatibility with UI v1
 }
 
 func authenticate(config *oauth2.Config, options map[string]interface{}) func(echo.Context) error {
@@ -119,9 +119,9 @@ func authenticate(config *oauth2.Config, options map[string]interface{}) func(ec
 	}
 }
 
-func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider) func(echo.Context) error {
+func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, additionalClaims map[string]string) func(echo.Context) error {
 	return func(c echo.Context) error {
-		user, err := auth.ExchangeCode(ctx, c.Request(), oauthCfg, provider)
+		user, err := auth.ExchangeCode(ctx, c.Request(), oauthCfg, provider, additionalClaims)
 		if err != nil {
 			return err
 		}
