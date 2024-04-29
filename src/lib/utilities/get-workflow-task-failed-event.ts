@@ -22,10 +22,11 @@ const getFailedWorkflowTask = (
   fullEventHistory: WorkflowEvents,
 ): WorkflowTaskFailedEvent | undefined => {
   const failedWorkflowTaskIndex = fullEventHistory.findIndex(isFailedTaskEvent);
-  const completedWorkflowTaskIndex =
-    fullEventHistory.findIndex(isCompletedTaskEvent);
 
   if (failedWorkflowTaskIndex < 0) return;
+
+  const completedWorkflowTaskIndex =
+    fullEventHistory.findIndex(isCompletedTaskEvent);
 
   const failedWorkflowTask = fullEventHistory.find((event) =>
     isFailedTaskEvent(event),
