@@ -32,8 +32,7 @@ const getFailedWorkflowTask = (
     isFailedTaskEvent(event),
   ) as WorkflowTaskFailedEvent;
 
-  if (completedWorkflowTaskIndex < 0 && failedWorkflowTaskIndex >= 0)
-    return failedWorkflowTask;
+  if (completedWorkflowTaskIndex < 0) return failedWorkflowTask;
 
   // History is sorted in descending order, so index of failed task should be less than index of completed task
   if (failedWorkflowTaskIndex < completedWorkflowTaskIndex) {
