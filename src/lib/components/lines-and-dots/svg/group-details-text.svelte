@@ -27,7 +27,7 @@
   export let point: [number, number] = [0, 0];
   export let width: number;
   export let onHover: (key: string) => void | undefined = undefined;
-  export let active = true;
+  export let active = false;
 
   const { fontSizeRatio } = DetailsConfig;
 
