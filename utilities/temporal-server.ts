@@ -58,7 +58,7 @@ export const createTemporalServer = async ({
   port = 7233,
   uiPort = port + 1000,
   path = localCLIPath,
-  logLevel = 'fatal',
+  logLevel = 'error',
   codecEndpoint,
   headless = false,
 }: TemporalServerOptions = {}) => {
