@@ -77,6 +77,11 @@
 
   $: childWorkflowStartedEvent =
     group && group.eventList.find(isChildWorkflowExecutionStartedEvent);
+
+  let hoverKey = '';
+  const setHoverKey = (key: string) => {
+    hoverKey = key;
+  };
 </script>
 
 <g role="button" tabindex="0" class="relative">
@@ -110,14 +115,19 @@
   </foreignObject>
   {#each codeBlockAttributes as [key, value], index (key)}
     {@const y = textStartingY + index * staticCodeBlockHeight}
-    <Text point={[codeBlockX, y]} label>{format(key)}</Text>
-    <GroupDetailsText
-      point={[codeBlockX, y + 1.5 * fontSizeRatio]}
-      {key}
-      {value}
-      {attributes}
-      width={codeBlockWidth}
-    />
+    {@const visible = !hoverKey || hoverKey === key}
+    {#if visible}
+      <Text point={[codeBlockX, y]} label>{format(key)}</Text>
+      <GroupDetailsText
+        point={[codeBlockX, y + 1.5 * fontSizeRatio]}
+        {key}
+        {value}
+        {attributes}
+        width={codeBlockWidth}
+        onHover={setHoverKey}
+        active={hoverKey === key || codeBlockAttributes.length === 1}
+      />
+    {/if}
   {/each}
   <foreignObject
     x={x + gutter}
