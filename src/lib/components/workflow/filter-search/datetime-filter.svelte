@@ -138,7 +138,6 @@
   />
   <MenuContainer>
     <MenuButton
-      unroundLeft
       id="time-range-filter"
       controls="time-range-filter-menu"
       class="whitespace-nowrap"
@@ -211,7 +210,6 @@
                 disabled={$type !== 'relative'}
               />
               <Select
-                unroundLeft
                 bind:value={timeUnit}
                 id="relative-datetime-unit-input"
                 label={translate('common.time-unit')}

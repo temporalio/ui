@@ -288,4 +288,12 @@
   .filter {
     @apply grow;
   }
+
+  :global(.attribute-selected) {
+    @apply rounded-r-none;
+  }
+
+  :global(#conditional-menu-button) {
+    @apply rounded-none;
+  }
 </style>
