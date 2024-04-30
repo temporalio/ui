@@ -43,7 +43,6 @@
 
 <MenuContainer>
   <MenuButton
-    unround
     class="{noBorderRight ? '!border-r-0' : ''} {noBorderLeft
       ? '!border-l-0'
       : ''} whitespace-nowrap"

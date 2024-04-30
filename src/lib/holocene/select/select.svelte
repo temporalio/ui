@@ -41,8 +41,6 @@
     placeholder?: string;
     disabled?: boolean;
     leadingIcon?: IconName;
-    unroundRight?: boolean;
-    unroundLeft?: boolean;
     onChange?: (value: T) => void;
     'data-testid'?: string;
     variant?: MenuButtonVariant;
@@ -55,8 +53,6 @@
   export let placeholder = '';
   export let disabled = false;
   export let leadingIcon: IconName = null;
-  export let unroundRight = false;
-  export let unroundLeft = false;
   export let onChange: (value: T) => void = noop;
   export let variant: MenuButtonVariant = 'secondary';
 
@@ -107,8 +103,6 @@
   <MenuButton
     hasIndicator={!disabled}
     {disabled}
-    {unroundLeft}
-    {unroundRight}
     controls="{id}-select"
     {variant}
   >

@@ -28,9 +28,6 @@
     hasIndicator?: boolean;
     id?: string;
     label?: string;
-    unround?: boolean;
-    unroundRight?: boolean;
-    unroundLeft?: boolean;
     variant?: MenuButtonVariant;
     class?: string;
     active?: boolean;
