@@ -296,4 +296,8 @@
   :global(#conditional-menu-button) {
     @apply rounded-none;
   }
+
+  :global(#time-range-filter) {
+    @apply rounded-l-none;
+  }
 </style>

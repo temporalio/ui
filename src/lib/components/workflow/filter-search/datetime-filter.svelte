@@ -147,7 +147,7 @@
     <Menu
       keepOpen
       id="time-range-filter-menu"
-      class="w-[27rem] !overflow-visible"
+      class="max-h-fit w-[27rem] !overflow-visible"
     >
       {#if isTimeRange}
         <MenuItem>
@@ -197,7 +197,7 @@
               name="time-filter-type"
               group={type}
             />
-            <div class="ml-6 flex gap-0 pt-2">
+            <div class="ml-6 flex gap-2 pt-2">
               <Input
                 label={translate('common.relative')}
                 labelHidden
@@ -205,7 +205,6 @@
                 bind:value={relativeTime}
                 placeholder="00"
                 error={error(relativeTime)}
-                unroundRight
                 class="h-10"
                 disabled={$type !== 'relative'}
               />
