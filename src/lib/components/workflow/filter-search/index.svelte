@@ -297,7 +297,8 @@
     @apply rounded-none;
   }
 
-  :global(#time-range-filter) {
+  :global(#time-range-filter),
+  :global(#boolean-filter) {
     @apply rounded-l-none;
   }
 </style>
