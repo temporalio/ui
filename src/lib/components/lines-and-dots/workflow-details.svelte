@@ -6,10 +6,14 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { routeForWorkers } from '$lib/utilities/route-for';
+  import {
+    routeForWorkers,
+    routeForWorkflowsWithQuery,
+  } from '$lib/utilities/route-for';
 
   import WorkflowDetail from './workflow-detail.svelte';
 
+  $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
   $: elapsedTime = formatDistanceAbbreviated({
     start: workflow?.startTime,
@@ -72,7 +76,12 @@
       title={translate('common.workflow-type')}
       content={workflow?.name}
       copyable
+      filterable
       class="order-4 text-sm md:order-2 xl:order-2"
+      href={routeForWorkflowsWithQuery({
+        namespace,
+        query: `WorkflowType="${workflow?.name}"`,
+      })}
     />
     <WorkflowDetail
       title={translate('common.run-id')}
