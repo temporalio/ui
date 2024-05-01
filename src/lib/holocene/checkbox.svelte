@@ -103,7 +103,6 @@
       bind:checked
       {disabled}
       {required}
-      class:indeterminate
       bind:this={inputElement}
       {...omit($$restProps, 'data-testid')}
     />
