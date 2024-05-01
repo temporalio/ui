@@ -40,7 +40,7 @@ let arch = process.arch;
 
 if (arch === 'x64') arch = 'amd64';
 
-const downloadUrl = `https://temporal.download/cli/archive/latest?platform=${platform}&arch=${arch}`;
+const downloadUrl = `https://temporal.download/cli/archive/v0.10.7?platform=${platform}&arch=${arch}`;
 
 removeDirectory();
 await mkdirp(destinationDirectory);
