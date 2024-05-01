@@ -69,7 +69,7 @@
 
 <style lang="postcss">
   .toggle-button {
-    @apply flex items-center justify-center border-2 border-secondary px-4 py-2 text-sm text-primary hover:enabled:surface-interactive-secondary focus-visible:enabled:surface-interactive-secondary;
+    @apply surface-input flex items-center justify-center border-2 border-secondary px-4 py-2 text-sm text-primary hover:enabled:surface-interactive-secondary focus-visible:enabled:surface-interactive-secondary;
   }
 
   .toggle-button.active {
