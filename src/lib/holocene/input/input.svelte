@@ -199,7 +199,7 @@
   }
 
   .suffix {
-    @apply block h-full w-fit rounded-br rounded-tr border-l px-4 py-2;
+    @apply block h-full w-fit rounded-br rounded-tr border-l border-subtle px-4 py-2;
   }
 
   .unroundRight {
