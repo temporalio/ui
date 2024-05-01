@@ -145,12 +145,10 @@
           : 'border-red-500 peer-checked:bg-interactive-error peer-indeterminate:bg-interactive-error',
       )}
     >
-      {#if indeterminate}
-        <Icon class="absolute left-0 top-0 h-4 w-4" name="hyphen" />
-      {:else if checked}
+      {#if indeterminate || checked}
         <Icon
           class="absolute left-0 top-0 h-4 w-4"
-          name="checkmark"
+          name={indeterminate ? 'hyphen' : checked ? 'checkmark' : null}
           strokeWidth={3}
         />
       {/if}
