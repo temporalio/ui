@@ -9,17 +9,18 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { namespaces } from '$lib/stores/namespaces';
   import { routeForNamespace } from '$lib/utilities/route-for';
+
+  $: namespaces = $page.data.namespaces || [];
 </script>
 
 <PageTitle title="Namespaces" url={$page.url.href} />
 <h1 data-testid="namespace-selector-title" class="mb-8 text-2xl">
   {translate('common.namespaces')}
 </h1>
-{#if $namespaces?.length > 0}
+{#if namespaces?.length > 0}
   <Pagination
-    items={$namespaces}
+    items={namespaces}
     let:visibleItems
     aria-label={translate('common.namespaces')}
     pageSizeSelectLabel={translate('common.per-page')}

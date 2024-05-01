@@ -210,7 +210,8 @@
       >
         <div class="mt-8 flex items-center gap-2">
           <Button
-            disabled={isDisabled(preset) || !writeActionsAreAllowed()}
+            disabled={isDisabled(preset) ||
+              !writeActionsAreAllowed($page.data.settings)}
             on:click={() => handleConfirm(preset, schedule)}
             >{confirmText}</Button
           >

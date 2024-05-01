@@ -1,8 +1,5 @@
-import { get } from 'svelte/store';
+import type { Settings } from '$lib/types/global';
 
-import { settings } from '$lib/stores/settings';
-
-export const writeActionsAreAllowed = (store = settings): boolean => {
-  const isDisabled = get(store).disableWriteActions;
-  return !isDisabled;
+export const writeActionsAreAllowed = (settings: Settings): boolean => {
+  return !settings.disableWriteActions;
 };

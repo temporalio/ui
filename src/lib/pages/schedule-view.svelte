@@ -111,7 +111,8 @@
 
   let coreUser = coreUserStore();
   $: editDisabled =
-    $coreUser.namespaceWriteDisabled(namespace) || !writeActionsAreAllowed();
+    $coreUser.namespaceWriteDisabled(namespace) ||
+    !writeActionsAreAllowed($page.data.settings);
 
   const handleDelete = async () => {
     error = '';
@@ -387,7 +388,7 @@
               {/if}
             </Button>
           </div>
-          <WorkflowCounts staticQuery={workflowQuery} />
+          <WorkflowCounts />
         </div>
       {/if}
       <div class="flex flex-col gap-4 xl:flex-row">

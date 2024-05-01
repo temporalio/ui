@@ -11,13 +11,13 @@ const { cyan, magenta } = chalk;
 
 let temporal: TemporalServer;
 
-const shouldSkip = (server: ViteDevServer): boolean => {
+const shouldSkip = (_server: ViteDevServer): boolean => {
   if (process.env.VERCEL) return true;
   if (process.env.VITEST) return true;
   if (temporal) return true;
   if (process.platform === 'win32') return true;
-  if (!['temporal-server', 'ui-server'].includes(server.config.mode))
-    return true;
+  // if (!['temporal-server', 'ui-server'].includes(server.config.mode))
+  //   return true;
 
   return false;
 };
@@ -60,6 +60,10 @@ export function temporalServer(): Plugin {
       if (shouldSkip(server)) return;
 
       const port = validatePort(server.config.env.VITE_TEMPORAL_PORT, 7233);
+      const httpPort = getPortFromApiEndpoint(
+        server.config.env.VITE_TEMPORAL_HTTP_PORT,
+        8234,
+      );
       const uiPort = getPortFromApiEndpoint(server.config.env.VITE_API);
 
       console.log(magenta(`Starting Temporal Server on Port ${port}…`));
@@ -67,6 +71,7 @@ export function temporalServer(): Plugin {
 
       temporal = await createTemporalServer({
         port,
+        httpPort,
         uiPort,
       });
 

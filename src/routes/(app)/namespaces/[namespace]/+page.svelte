@@ -13,12 +13,13 @@
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { searchAttributes } from '$lib/stores/search-attributes';
   import { settings } from '$lib/stores/settings';
   import { temporalVersion, uiVersion } from '$lib/stores/versions';
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-time';
 
   export let data: PageData;
+
+  $: searchAttributes = data.attributes;
 
   enum ArchivalState {
     ARCHIVAL_STATE_UNSPECIFIED = 0,
@@ -231,7 +232,7 @@
   </article>
 </Card>
 
-{#if $searchAttributes}
+{#if searchAttributes}
   <section>
     <h3 class="my-4 text-lg font-medium">
       {translate('events.attribute-group.search-attributes')}
@@ -244,7 +245,7 @@
         <th>{translate('common.key')}</th>
         <th>{translate('common.type')}</th>
       </TableHeaderRow>
-      {#each Object.entries($searchAttributes) as [key, type]}
+      {#each Object.entries(searchAttributes) as [key, type]}
         <TableRow>
           <td>{key}</td>
           <td>{type}</td>

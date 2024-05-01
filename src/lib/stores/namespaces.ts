@@ -1,9 +1,11 @@
-import { writable } from 'svelte/store';
+import { derived } from 'svelte/store';
 
-import type { DescribeNamespaceResponse } from '$lib/types';
+import { page } from '$app/stores';
 
 import { persistStore } from './persist-store';
 
 export const lastUsedNamespace = persistStore('lastNamespace', 'default', true);
 
-export const namespaces = writable<DescribeNamespaceResponse[]>([]);
+export const namespaces = derived([page], ([$page]) => {
+  return $page.data.namespaces || [];
+});

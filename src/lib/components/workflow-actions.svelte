@@ -12,7 +12,6 @@
   import { translate } from '$lib/i18n/translate';
   import { coreUserStore } from '$lib/stores/core-user';
   import { resetEvents } from '$lib/stores/events';
-  import { settings } from '$lib/stores/settings';
   import { refresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
@@ -96,7 +95,7 @@
 
   $: actionsDisabled =
     $coreUser.namespaceWriteDisabled(namespace) ||
-    !writeActionsAreAllowed(settings);
+    !writeActionsAreAllowed($page.data.settings);
 </script>
 
 {#if isRunning}

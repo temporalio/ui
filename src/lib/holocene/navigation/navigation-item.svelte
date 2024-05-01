@@ -20,6 +20,7 @@
     href={link}
     {rel}
     {target}
+    data-sveltekit-preload-data="hover"
     class="mb-1 flex items-center gap-2 whitespace-nowrap rounded-lg p-1 pl-2 text-sm font-medium group-[.surface-inverse]:hover:bg-white group-[.surface-primary]:hover:bg-black group-[.surface-inverse]:hover:text-black group-[.surface-primary]:hover:text-white"
   >
     <div

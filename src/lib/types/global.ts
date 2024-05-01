@@ -75,7 +75,6 @@ export type Settings = {
     options: string[];
   };
   bannerText: string;
-  baseUrl: string;
   codec: {
     endpoint?: string;
     passAccessToken?: boolean;
@@ -92,11 +91,6 @@ export type Settings = {
   showTemporalSystemNamespace: boolean;
   notifyOnNewVersion: boolean;
   feedbackURL: string;
-  runtimeEnvironment: {
-    isCloud: boolean;
-    isLocal: boolean;
-    envOverride: boolean;
-  };
   version: string;
 };
 

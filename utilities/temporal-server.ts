@@ -12,6 +12,7 @@ const localCLIPath = join(process.cwd(), 'bin', 'cli', 'temporal');
 
 export type TemporalServerOptions = {
   port?: number;
+  httpPort?: number;
   uiPort?: number;
   path?: string;
   logLevel?: string;
@@ -57,6 +58,7 @@ export const getTemporalServer = (): TemporalServer => temporalServer;
 export const createTemporalServer = async ({
   port = 7233,
   uiPort = port + 1000,
+  httpPort = port + 1001,
   path = localCLIPath,
   logLevel = 'error',
   codecEndpoint,
@@ -66,6 +68,7 @@ export const createTemporalServer = async ({
 
   const flags = [
     `--port=${port}`,
+    `--http-port=${httpPort}`,
     `--ui-port=${uiPort}`,
     `--log-level=${logLevel}`,
   ];

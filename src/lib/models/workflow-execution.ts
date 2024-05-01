@@ -12,7 +12,6 @@ import type {
 } from '$lib/types/workflows';
 import { decodePayload } from '$lib/utilities/decode-payload';
 import { toWorkflowStatusReadable } from '$lib/utilities/screaming-enums';
-import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
 import { simplifyAttributes } from './event-history/simplify-attributes';
 
@@ -106,7 +105,9 @@ export const toWorkflowExecution = (
     isRunning,
     defaultWorkflowTaskTimeout,
     get canBeTerminated(): boolean {
-      return isRunning && writeActionsAreAllowed();
+      // Figure out how to pass settings
+      // return isRunning && writeActionsAreAllowed();
+      return isRunning;
     },
   };
 };

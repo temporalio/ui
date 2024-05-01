@@ -9,8 +9,8 @@ import { temporalVersion } from './versions';
 
 export const supportsBulkActions = derived(
   [temporalVersion, supportsAdvancedVisibility, settings, isCloud],
-  ([$temporalVersion, $supportsAdvancedVisibility, $settings, $isCloud]) =>
-    ($isCloud ? true : isVersionNewer($temporalVersion, '1.18.0')) &&
+  ([$temporalVersion, $supportsAdvancedVisibility, $settings]) =>
+    isVersionNewer($temporalVersion, '1.18.0') &&
     $supportsAdvancedVisibility &&
     bulkActionsEnabled($settings),
 );

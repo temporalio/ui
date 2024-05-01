@@ -63,6 +63,9 @@
   $: query, ($workflowsQuery = query);
   $: namespace = $page.params.namespace;
 
+  $: {
+    console.log('Data: ', $page.data);
+  }
   // For returning to page from 'Back to Workflows' with previous search
   $: searchParams = $page.url.searchParams.toString();
   $: searchParams, ($workflowsSearchParams = searchParams);
@@ -202,7 +205,7 @@
       <h1 class="flex items-center gap-2 text-2xl" data-cy="workflows-title">
         {#if $supportsAdvancedVisibility}
           <span data-testid="workflow-count"
-            >{$workflowCount.count.toLocaleString()}</span
+            >{$page.data.count.toLocaleString()}</span
           >
           <Translate
             key="common.workflows-plural"

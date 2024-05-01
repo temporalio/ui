@@ -1,15 +1,14 @@
-import type { PageLoad } from './$types';
+import type { PageServerLoad } from './$types';
 
-import { fetchNamespace } from '$lib/services/namespaces-service';
 import { getClusters } from '$lib/utilities/get-clusters';
+import { HttpApi } from '$lib/utilities/http-api';
 
-export const load: PageLoad = async function ({ params, parent, url }) {
+export const load: PageServerLoad = async ({ params, url }) => {
   const { searchParams } = url;
 
   if (searchParams.has('time-range')) searchParams.delete('time-range');
 
-  await parent();
-  const namespace = await fetchNamespace(params.namespace);
+  const namespace = await HttpApi.namespace(params.namespace);
   const clusters = getClusters(namespace);
 
   return {

@@ -16,7 +16,6 @@ const settings: Settings = {
     enabled: false,
     options: null,
   },
-  baseUrl: 'http://localhost:3000',
   bannerText: '',
   codec: {
     endpoint: '',
@@ -34,11 +33,6 @@ const settings: Settings = {
   hideWorkflowQueryErrors: false,
   notifyOnNewVersion: true,
   feedbackURL: '',
-  runtimeEnvironment: {
-    isCloud: false,
-    isLocal: true,
-    envOverride: true,
-  },
   version: '2.0.0',
 };
 

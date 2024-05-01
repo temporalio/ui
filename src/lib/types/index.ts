@@ -197,26 +197,3 @@ export type BatchTerminateOperation =
 // google
 
 export type Timestamp = google.protobuf.ITimestamp;
-
-// extra APIs
-export type SettingsResponse = {
-  Auth: { Enabled: boolean; Options: string[] };
-  BannerText: string;
-  Codec: {
-    Endpoint: string;
-    PassAccessToken?: boolean;
-    IncludeCredentials?: boolean;
-  };
-  DefaultNamespace: string;
-  DisableWriteActions: boolean;
-  WorkflowTerminateDisabled: boolean;
-  WorkflowCancelDisabled: boolean;
-  WorkflowSignalDisabled: boolean;
-  WorkflowResetDisabled: boolean;
-  BatchActionsDisabled: boolean;
-  HideWorkflowQueryErrors: boolean;
-  ShowTemporalSystemNamespace: boolean;
-  NotifyOnNewVersion: boolean;
-  FeedbackURL: string;
-  Version: string;
-};

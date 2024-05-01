@@ -72,7 +72,7 @@
         <Button
           data-testid="create-schedule"
           href={routeForScheduleCreate({ namespace })}
-          disabled={!writeActionsAreAllowed()}
+          disabled={!writeActionsAreAllowed($page.data.settings)}
         >
           {translate('schedules.create')}
         </Button>
@@ -131,7 +131,7 @@
           <Button
             data-testid="create-schedule"
             on:click={() => goto(routeForScheduleCreate({ namespace }))}
-            disabled={!writeActionsAreAllowed()}
+            disabled={!writeActionsAreAllowed($page.data.settings)}
           >
             {translate('schedules.create')}
           </Button>

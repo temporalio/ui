@@ -1,7 +1,6 @@
 <script lang="ts">
   import FeatureGuard from '$lib/components/feature-guard.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
-  import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
   import Navigation from '$lib/holocene/navigation/navigation-container.svelte';
@@ -65,14 +64,14 @@
     />
   </svelte:fragment>
   <svelte:fragment slot="middle">
-    <IsLegacyCloudGuard {isCloud}>
+    <IsCloudGuard {isCloud}>
       <NavigationItem
         link={linkList.namespaces}
         data-testid="namespaces-button"
         label={translate('common.namespaces')}
         icon="namespace"
       />
-    </IsLegacyCloudGuard>
+    </IsCloudGuard>
     <slot name="middle" />
   </svelte:fragment>
   <svelte:fragment slot="bottom">
