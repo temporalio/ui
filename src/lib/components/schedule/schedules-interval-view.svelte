@@ -100,7 +100,7 @@
   <p>
     {translate('schedules.offset-description')}
   </p>
-  <div class="flex w-48 gap-0">
+  <div class="flex w-48 gap-2">
     <Input
       id="phase"
       class="w-28"
@@ -111,12 +111,10 @@
       maxLength={3}
       hideCount
       error={error(phase)}
-      unroundRight
     />
     <Select
       label={translate('schedules.offset-unit')}
       labelHidden
-      unroundLeft
       id="phase-unit"
       bind:value={offsetUnit}
     >

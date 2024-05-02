@@ -16,8 +16,6 @@
       leadingIcon: undefined,
       labelHidden: false,
       disabled: false,
-      unroundLeft: false,
-      unroundRight: false,
     },
     argTypes: {
       label: { name: 'Label', control: 'text' },
@@ -29,16 +27,6 @@
       },
       disabled: { name: 'Disabled', control: 'boolean' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
-      unroundLeft: {
-        name: 'Left',
-        control: 'boolean',
-        table: { category: 'Styling', subcategory: 'Unround' },
-      },
-      unroundRight: {
-        name: 'Right',
-        control: 'boolean',
-        table: { category: 'Styling', subcategory: 'Unround' },
-      },
       onChange: { table: { disable: true } },
       value: { table: { disable: true } },
     },

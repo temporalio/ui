@@ -25,7 +25,7 @@ type RouteParameters = {
 export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
 export type WorkflowsParameter = Pick<
   RouteParameters,
-  'namespace' | 'query' | 'search' | 'page'
+  'namespace' | 'query' | 'page'
 >;
 export type TaskQueueParameters = Pick<RouteParameters, 'namespace' | 'queue'>;
 export type WorkflowParameters = Pick<
@@ -72,7 +72,6 @@ export const routeForWorkflows = (parameters: NamespaceParameter): string => {
 export const routeForWorkflowsWithQuery = ({
   namespace,
   query,
-  search,
   page,
 }: WorkflowsParameter): string | undefined => {
   if (!BROWSER) {
@@ -81,7 +80,6 @@ export const routeForWorkflowsWithQuery = ({
 
   return toURL(routeForWorkflows({ namespace }), {
     query,
-    search,
     ...(page && { page }),
   });
 };

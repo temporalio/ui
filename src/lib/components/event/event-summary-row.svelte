@@ -105,7 +105,7 @@
           {/if}
         </p>
         {#if duration && duration !== '0ms'}
-          <div class="flex flex-row items-center gap-0">
+          <div class="flex flex-row items-center gap-1">
             <Icon class="inline" name="clock" />
             <p class="break-word truncate text-sm md:whitespace-normal">
               {duration}
