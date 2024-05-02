@@ -280,7 +280,6 @@
   $: readyToDraw =
     $workflowTimelineViewOpen &&
     $workflowRun.workflow &&
-    history.length &&
     visualizationRef &&
     $timeFormat;
 
@@ -292,7 +291,7 @@
   };
 
   $: {
-    if (readyToDraw) {
+    if (readyToDraw && history.length) {
       drawTimeline();
     }
   }
