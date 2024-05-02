@@ -245,7 +245,7 @@
       </MenuButton>
       <Menu id="filter-configuration-menu" position="right">
         <div class="flex flex-col items-start gap-4 p-4 md:items-end">
-          <IsTemporalServerVersionGuard minimumVersion="1.23">
+          <IsTemporalServerVersionGuard minimumVersion="1.23.0">
             <ToggleSwitch
               data-testid="show-child-workflow-toggle"
               label={translate('workflows.show-children')}
