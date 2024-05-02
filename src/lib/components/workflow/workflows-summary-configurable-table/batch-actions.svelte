@@ -44,7 +44,7 @@
   $: resetEnabled =
     workflowResetEnabled($page.data.settings) && $isCloud
       ? true
-      : minimumVersionRequired('1.23', $temporalVersion);
+      : minimumVersionRequired('1.23.0', $temporalVersion);
   $: namespaceWriteDisabled = $coreUser.namespaceWriteDisabled(
     $page.params.namespace,
   );
