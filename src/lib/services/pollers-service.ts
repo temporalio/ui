@@ -24,6 +24,30 @@ export type GetPollersResponse = {
   taskQueueStatus: TaskQueueStatus;
 };
 
+type AssignmentRule = {
+  rule: {
+    targetBuildId: string;
+    percentageRamp: {
+      rampPercentage: number;
+    };
+  };
+  createTime: string;
+};
+
+type CompatibleRedirectRule = {
+  rule: {
+    sourceBuildId: string;
+    targetBuildId: string;
+  };
+  createTime: string;
+};
+
+export type TaskQueueRules = {
+  assignmentRules: AssignmentRule[];
+  compatibleRedirectRules: CompatibleRedirectRule[];
+  conflictToken: string;
+};
+
 export type TaskQueueCompatibility = {
   majorVersionSets: TaskQueueCompatibleVersionSet[];
 };
@@ -121,6 +145,20 @@ export async function getPollers(
   };
 }
 
+export async function getTaskQueueRules(
+  parameters: GetAllPollersRequest,
+  request = fetch,
+): Promise<TaskQueueRules | undefined> {
+  const route = routeForApi('task-queue.rules', parameters);
+  return requestFromAPI(route, {
+    request,
+    notifyOnError: false,
+    handleError: (_e: APIErrorResponse) => {
+      return;
+    },
+  });
+}
+
 export async function getTaskQueueCompatibility(
   parameters: GetAllPollersRequest,
   request = fetch,
@@ -128,7 +166,11 @@ export async function getTaskQueueCompatibility(
   const route = routeForApi('task-queue.compatibility', parameters);
   return requestFromAPI(route, {
     request,
-    onError: (e: APIErrorResponse) => console.error(e),
+    notifyOnError: false,
+    onError: (e: APIErrorResponse) => {
+      console.error(e);
+      return;
+    },
   });
 }
 

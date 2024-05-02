@@ -5,9 +5,9 @@
 
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import WorkflowVersioningHeader from '$lib/components/workflow-versioning-header.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
-  import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -35,15 +35,10 @@
     routeForWorkflowQuery,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
-  import {
-    getCurrentCompatibilityDefaultVersion,
-    getCurrentWorkflowBuildId,
-    getDefaultVersionForSetFromABuildId,
-  } from '$lib/utilities/task-queue-compatibility';
 
   export let namespace: string;
 
-  $: ({ workflow, workers, compatibility } = $workflowRun);
+  $: ({ workflow, workers, rules, compatibility } = $workflowRun);
   $: id = $page.params.id;
 
   $: routeParameters = {
@@ -61,16 +56,8 @@
     $fullEventHistory,
   );
   $: workflowHasBeenReset = has($resetWorkflows, $workflowRun?.workflow?.runId);
-
   $: workflowUsesVersioning =
     workflow?.mostRecentWorkerVersionStamp?.useVersioning;
-  $: buildId = getCurrentWorkflowBuildId(workflow);
-  $: overallDefaultVersion =
-    getCurrentCompatibilityDefaultVersion(compatibility);
-  $: defaultVersionForSet = getDefaultVersionForSetFromABuildId(
-    compatibility,
-    buildId,
-  );
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
     $fullEventHistory,
@@ -124,43 +111,7 @@
             />
           </h1>
           {#if workflowUsesVersioning}
-            <div class="flex gap-4">
-              <p class="flex items-center gap-1">
-                <span>{translate('workers.last-used-version')}</span
-                ><CompatibilityBadge
-                  defaultVersion={buildId === defaultVersionForSet ||
-                    buildId === overallDefaultVersion}
-                  active={buildId === overallDefaultVersion}
-                  {buildId}
-                >
-                  <svelte:fragment slot="overall-default-worker">
-                    {#if buildId === overallDefaultVersion}{translate(
-                        'workers.overall',
-                      )}{/if}
-                  </svelte:fragment>
-                  <svelte:fragment slot="default-worker">
-                    {translate('workers.default')}
-                  </svelte:fragment>
-                </CompatibilityBadge>
-              </p>
-              <p class="flex items-center gap-1">
-                <span>{translate('workers.next-version')}</span
-                ><CompatibilityBadge
-                  defaultVersion={!!defaultVersionForSet}
-                  active={defaultVersionForSet === overallDefaultVersion}
-                  buildId={defaultVersionForSet}
-                >
-                  <svelte:fragment slot="overall-default-worker">
-                    {#if defaultVersionForSet === overallDefaultVersion}{translate(
-                        'workers.overall',
-                      )}{/if}
-                  </svelte:fragment>
-                  <svelte:fragment slot="default-worker">
-                    {translate('workers.default')}
-                  </svelte:fragment>
-                </CompatibilityBadge>
-              </p>
-            </div>
+            <WorkflowVersioningHeader {workflow} {rules} {compatibility} />
           {/if}
         </div>
       </div>

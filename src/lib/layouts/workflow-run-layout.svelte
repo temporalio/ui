@@ -13,6 +13,7 @@
   import {
     getPollers,
     getTaskQueueCompatibility,
+    getTaskQueueRules,
   } from '$lib/services/pollers-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
@@ -28,6 +29,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
+
   let workflowError: NetworkError;
   let eventHistoryController: AbortController;
 
@@ -42,6 +44,13 @@
       queue: taskQueue,
       namespace,
     });
+  };
+
+  const getRules = async (workflow: WorkflowExecution, taskQueue: string) => {
+    const workflowUsesVersioning =
+      workflow?.mostRecentWorkerVersionStamp?.useVersioning;
+    if (!workflowUsesVersioning) return;
+    return await getTaskQueueRules({ namespace, queue: taskQueue });
   };
 
   const getWorkflowAndEventHistory = async (
@@ -66,13 +75,15 @@
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
     const compatibility = await getCompatibility(workflow, taskQueue);
+    const rules = await getRules(workflow, taskQueue);
+
     workflow.pendingActivities = await toDecodedPendingActivities(
       workflow,
       namespace,
       settings,
       $authUser?.accessToken,
     );
-    $workflowRun = { workflow, workers, compatibility };
+    $workflowRun = { workflow, workers, rules, compatibility };
 
     eventHistoryController = new AbortController();
     $fullEventHistory = await fetchAllEvents({
