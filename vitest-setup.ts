@@ -3,13 +3,13 @@ import { noop } from 'svelte/internal';
 import i18next from 'i18next';
 import { vi } from 'vitest';
 
-import { I18nNamespaces } from './src/lib/i18n';
+import { i18nNamespaces } from './src/lib/i18n';
 import resources from './src/lib/i18n/locales';
 
 i18next.init({
   fallbackLng: 'en',
   load: 'languageOnly',
-  ns: I18nNamespaces,
+  ns: i18nNamespaces,
   defaultNS: 'common',
   detection: {
     order: ['querystring', 'localStorage', 'navigator'],
