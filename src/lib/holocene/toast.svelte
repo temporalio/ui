@@ -2,15 +2,23 @@
   import { fly } from 'svelte/transition';
 
   import { createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import type { ToastVariant } from '$lib/types/holocene';
-
-  import IconButton from './icon-button.svelte';
 
   const dispatch = createEventDispatcher<{ dismiss: { id: string } }>();
 
+  const variants: Readonly<Record<ToastVariant, string>> = {
+    primary: 'bg-primary text-inverse dark:bg-inverse',
+    success: 'bg-success text-success',
+    error: 'bg-error text-error',
+    info: 'bg-information text-information',
+    warning: 'bg-warning text-warning',
+  };
+
   export let id: string;
-  export let variant: ToastVariant;
+  export let variant: keyof typeof variants;
   export let closeButtonLabel: string;
 
   const handleDismiss = () => {
@@ -20,7 +28,10 @@
 
 <div
   {id}
-  class="flex grow-0 items-center justify-between gap-4 rounded-md px-3 py-2.5 shadow {variant}"
+  class={merge(
+    'flex grow-0 items-center justify-between gap-4 rounded-md px-3 py-2.5 shadow',
+    variants[variant],
+  )}
   transition:fly={{ x: 250 }}
 >
   <p class="font-secondary text-sm">
@@ -28,25 +39,3 @@
   </p>
   <IconButton label={closeButtonLabel} icon="close" on:click={handleDismiss} />
 </div>
-
-<style lang="postcss">
-  .primary {
-    @apply bg-primary text-white dark:bg-inverse;
-  }
-
-  .success {
-    @apply bg-green-50 text-green-900;
-  }
-
-  .error {
-    @apply bg-red-50 text-red-900;
-  }
-
-  .info {
-    @apply bg-blue-50 text-blue-900;
-  }
-
-  .warning {
-    @apply bg-yellow-50 text-yellow-900;
-  }
-</style>

@@ -24,8 +24,8 @@ export const variables = {
   '--color-text-disabled': rgb(getColor('slate', 500)),
   '--color-text-error': rgb(getColor('red', 700)),
   '--color-text-information': rgb(getColor('blue', 700)),
-  '--color-text-success': rgb(getColor('green', 700)),
-  '--color-text-warning': rgb(getColor('yellow', 500)),
+  '--color-text-success': rgb(getColor('green', 800)),
+  '--color-text-warning': rgb(getColor('yellow', 800)),
   '--color-text-active': rgb(getColor('indigo', 600)),
 
   '--color-surface-background': rgb(colors.offWhite),
@@ -183,11 +183,14 @@ const temporal = plugin(
       },
       backgroundColor: ({ theme }) => ({
         ...theme('colors'),
+
         primary: css('--color-primary'),
         secondary: css('--color-secondary'),
         inverse: css('--color-inverse'),
         subtle: css('--color-subtle'),
+
         badge: css('--color-surface-badge'),
+
         interactive: css('--color-interactive'),
         'interactive-hover': css('--color-interactive-hover'),
         'interactive-active': css('--color-interactive-active'),
@@ -199,6 +202,7 @@ const temporal = plugin(
         success: css('--color-surface-success'),
         warning: css('--color-surface-warning'),
         danger: css('--color-surface-danger'),
+
         DEFAULT: css('--color-surface-primary'),
       }),
       borderColor: ({ theme }) => ({
