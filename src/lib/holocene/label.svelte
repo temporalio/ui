@@ -39,5 +39,7 @@
   )}
 >
   <slot><span>{label}</span></slot>
-  {#if required}<span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>{/if}
+  {#if required}
+    <span class="h-1.5 w-1.5 rounded-full bg-interactive-required" />
+  {/if}
 </label>
