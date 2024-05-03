@@ -6,6 +6,7 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
 
@@ -253,14 +254,13 @@
 </script>
 
 <MenuContainer {open} on:close={handleMenuClose}>
-  <label
+  <Label
     class="combobox-label"
-    class:sr-only={labelHidden}
-    class:required
-    for={id}
-  >
+    hidden={labelHidden}
+    {required}
     {label}
-  </label>
+    for={id}
+  />
   <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
     {#if leadingIcon}
       <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />

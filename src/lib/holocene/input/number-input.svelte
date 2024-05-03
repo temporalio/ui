@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Label from '$lib/holocene/label.svelte';
 
   export let icon: IconName = null;
   export let id: string;
@@ -11,6 +12,7 @@
   export let placeholder = '';
   export let name = id;
   export let disabled = false;
+  export let required = false;
   export let hintText = '';
   export let max: number = undefined;
   export let min: number = undefined;
@@ -34,7 +36,7 @@
 </script>
 
 <div class={$$props.class}>
-  <label class:sr-only={labelHidden} for={id}>{label}</label>
+  <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="flex items-center gap-2">
     <div
       class="input-container"
@@ -78,10 +80,6 @@
 {/if}
 
 <style lang="postcss">
-  label {
-    @apply mb-10 font-secondary text-sm font-medium text-primary;
-  }
-
   .units {
     @apply font-secondary text-sm font-medium text-primary;
   }

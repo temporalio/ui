@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
 
   import Button from '$lib/holocene/button.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import { toEventHistory } from '$lib/models/event-history';
@@ -58,9 +59,11 @@
   };
 </script>
 
-<label class="sr-only" for="import-event-history-file-upload">
-  {translate('events.import-event-history-file-upload')}
-</label>
+<Label
+  hidden
+  for="import-event-history-file-upload"
+  label={translate('events.import-event-history-file-upload')}
+/>
 <input
   id="import-event-history-file-upload"
   class="import-input block rounded-md border border-slate-200 p-2"

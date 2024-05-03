@@ -192,6 +192,7 @@ const temporal = plugin(
         'interactive-hover': css('--color-interactive-hover'),
         'interactive-active': css('--color-interactive-active'),
         'interactive-error': css('--color-interactive-error'),
+        'interactive-required': css('--color-interactive-error'),
 
         error: css('--color-surface-error'),
         information: css('--color-surface-information'),

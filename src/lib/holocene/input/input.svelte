@@ -6,6 +6,7 @@
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
   import IconButton from '../icon-button.svelte';
@@ -85,7 +86,7 @@
 </script>
 
 <div class={merge('flex flex-col gap-1', className)}>
-  <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
+  <Label {required} {label} hidden={labelHidden} for={id} />
   <div
     class="input-container"
     class:disabled
@@ -169,14 +170,6 @@
 
 <style lang="postcss">
   /* Base styles */
-  label {
-    @apply font-secondary text-sm font-medium text-primary;
-  }
-
-  label.required {
-    @apply after:content-["*"];
-  }
-
   .input-container {
     @apply surface-input relative box-border inline-flex h-10 w-full items-center rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
 

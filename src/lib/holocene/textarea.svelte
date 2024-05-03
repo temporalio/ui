@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLTextareaAttributes } from 'svelte/elements';
 
+  import Label from './label.svelte';
+
   type $$Props = HTMLTextareaAttributes & {
     disabled?: boolean;
     error?: string;
@@ -36,7 +38,7 @@
 </script>
 
 <div class={className}>
-  <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
+  <Label {required} hidden={labelHidden} {label} for={id} />
   {#if description}
     <p class="pb-2 text-sm">{description}</p>
   {/if}
@@ -82,14 +84,6 @@
 </div>
 
 <style lang="postcss">
-  label {
-    @apply mb-10 font-secondary text-sm font-medium;
-  }
-
-  label.required {
-    @apply after:content-["*"];
-  }
-
   .error {
     @apply border-danger hover:border-danger focus-visible:border-danger focus-visible:shadow-[0_0_0_4px_rgb(249,115,22,0.7)];
   }
