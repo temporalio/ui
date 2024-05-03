@@ -14,7 +14,6 @@
 <form on:submit|preventDefault role="search" class="flex items-center">
   <Input
     class="w-full"
-    unroundRight
     {label}
     {id}
     labelHidden
@@ -25,6 +24,9 @@
     {placeholder}
     autocomplete="off"
     on:input
-  />
-  <Button borderRadiusModifier="square-left" type="submit">{label}</Button>
+  >
+    <Button slot="after-input" type="submit">
+      {label}
+    </Button>
+  </Input>
 </form>
