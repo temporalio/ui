@@ -22,14 +22,22 @@
 <label
   {...$$restProps}
   class={merge(
-    'flex grow cursor-pointer flex-row items-center gap-2 font-secondary text-sm font-medium font-normal text-primary text-primary focus:outline-none',
+    'inline-flex',
+    'flex-row',
+    'items-center',
+    'grow',
+    'cursor-pointer',
+    'gap-2',
+    'text-primary',
+    'text-sm',
+    'font-secondary',
+    'font-medium',
+    'focus:outline-none',
+    hidden && 'sr-only',
+    disabled && 'cursor-not-allowed',
     className,
   )}
-  class:sr-only={hidden}
-  class:cursor-not-allowed={disabled}
 >
-  <slot>{label}</slot>
-  {#if required}
-    <span class="text-red-500">*</span>
-  {/if}
+  <slot><span>{label}</span></slot>
+  {#if required}<span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>{/if}
 </label>
