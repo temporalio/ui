@@ -4,6 +4,7 @@
   import { afterUpdate, onDestroy } from 'svelte';
 
   import Chip from '$lib/holocene/chip.svelte';
+  import Label from '$lib/holocene/label.svelte';
 
   export let id: string;
   export let chips: string[];
@@ -90,7 +91,7 @@
 </script>
 
 <div class={$$props.class}>
-  <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
+  <Label {required} {label} hidden={labelHidden} for={id} />
   <div bind:this={inputContainer} class="input-container" class:invalid>
     {#if $values.length > 0}
       {#each $values as chip, i (`${chip}-${i}`)}

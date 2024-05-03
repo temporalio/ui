@@ -28,6 +28,7 @@
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import type { MenuButtonVariant } from '$lib/holocene/menu/menu-button.svelte';
 
@@ -97,9 +98,7 @@
 </script>
 
 <MenuContainer class="w-full" {open}>
-  <label class="text-sm text-primary" class:sr-only={labelHidden} for={id}
-    >{label}</label
-  >
+  <Label {label} hidden={labelHidden} for={id} />
   <MenuButton
     hasIndicator={!disabled}
     {disabled}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
 
+  import Label from '$lib/holocene/label.svelte';
   import { omit } from '$lib/utilities/omit';
 
   interface $$Props extends HTMLInputAttributes {
@@ -111,9 +112,7 @@
         step={$$props.step}
       />
     </div>
-    <label class:sr-only={labelHidden} class="flex shrink text-sm" for={id}>
-      {label}
-    </label>
+    <Label hidden={labelHidden} class="shrink" {label} for={id} />
   </div>
 </div>
 

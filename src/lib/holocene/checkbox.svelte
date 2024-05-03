@@ -7,6 +7,8 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { omit } from '$lib/utilities/omit';
 
+  import Label from './label.svelte';
+
   type T = $$Generic;
 
   interface $$Props extends HTMLInputAttributes {
@@ -35,6 +37,7 @@
   export let valid = true;
   export let error = '';
   export let required = false;
+
   let className = '';
   export { className as class };
 
@@ -75,7 +78,7 @@
   aria-checked={checked}
   tabindex={-1}
 >
-  <label
+  <Label
     class={merge(
       [
         'flex',
@@ -89,9 +92,9 @@
         'group',
       ],
       disabled && 'cursor-not-allowed',
+      hoverable && !disabled && 'hoverable',
       className,
     )}
-    class:hoverable={hoverable && !disabled}
   >
     <input
       on:click
@@ -158,7 +161,7 @@
         {label}
       </span>
     </slot>
-  </label>
+  </Label>
   {#if !valid && error}
     <span class="text-xs text-danger">{error}</span>
   {/if}

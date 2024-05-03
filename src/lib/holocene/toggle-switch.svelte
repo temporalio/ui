@@ -1,5 +1,9 @@
 <!-- Based loosely on https://www.w3.org/WAI/ARIA/apg/patterns/switch/examples/switch-checkbox/a -->
 <script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
+  import Label from '$lib/holocene/label.svelte';
+
   export let id: string;
   export let label: string;
   export let disabled = false;
@@ -8,10 +12,12 @@
   export let labelHidden = false;
 </script>
 
-<label
-  class="group relative flex w-fit min-w-fit cursor-pointer items-center gap-2 rounded px-2 text-primary"
-  class:flex-row-reverse={labelPosition === 'right'}
-  class:pointer-events-none={disabled}
+<Label
+  class={merge(
+    'group relative flex w-fit min-w-fit cursor-pointer rounded px-2 text-primary',
+    labelPosition === 'right' ? 'flex-row-reverse' : 'flex-row',
+  )}
+  {disabled}
   data-testid={$$props['data-testid']}
 >
   <span
@@ -34,4 +40,4 @@
   >
     <span class="h-4 w-4 rounded-[50%] bg-current" />
   </span>
-</label>
+</Label>

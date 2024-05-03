@@ -3,6 +3,8 @@
 
   import { getContext } from 'svelte';
 
+  import Label from '$lib/holocene/label.svelte';
+
   import type { RadioGroupContext, RadioInputProps } from './types';
 
   import { RADIO_GROUP_CONTEXT } from './radio-group.svelte';
@@ -32,7 +34,7 @@
 </script>
 
 <div class="flex flex-col gap-1">
-  <label class:disabled>
+  <Label {disabled}>
     <input
       bind:group={$group}
       type="radio"
@@ -47,7 +49,7 @@
     <span class="label" class:hidden={labelHidden}>
       {label}
     </span>
-  </label>
+  </Label>
   {#if description}
     <p class="description" id="{id}-description">
       {description}
@@ -58,14 +60,6 @@
 <style lang="postcss">
   .description {
     @apply ml-[26px] text-xs font-normal text-primary;
-  }
-
-  label {
-    @apply flex grow cursor-pointer flex-row items-center gap-2 text-sm font-normal text-primary focus:outline-none;
-
-    &.disabled {
-      @apply cursor-not-allowed;
-    }
   }
 
   input[type='radio'] {
