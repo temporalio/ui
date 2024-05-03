@@ -8,6 +8,7 @@
     hidden?: boolean;
     required?: boolean;
     disabled?: boolean;
+    'data-testid'?: string;
   };
 
   export let label = '';
@@ -20,7 +21,6 @@
 </script>
 
 <label
-  {...$$restProps}
   class={merge(
     'inline-flex',
     'flex-row',
@@ -37,6 +37,8 @@
     disabled && 'cursor-not-allowed',
     className,
   )}
+  data-required={required}
+  {...$$restProps}
 >
   <slot><span>{label}</span></slot>
   {#if required}

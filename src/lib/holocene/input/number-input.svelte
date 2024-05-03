@@ -80,10 +80,6 @@
 {/if}
 
 <style lang="postcss">
-  label {
-    @apply mb-10 font-secondary text-sm font-medium text-primary;
-  }
-
   .units {
     @apply font-secondary text-sm font-medium text-primary;
   }

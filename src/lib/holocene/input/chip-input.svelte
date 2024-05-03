@@ -130,14 +130,6 @@
 </div>
 
 <style lang="postcss">
-  label {
-    @apply mb-10 text-sm font-medium text-primary;
-  }
-
-  label.required {
-    @apply after:content-["*"];
-  }
-
   .input-container {
     @apply surface-primary flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-subtle p-2 text-sm text-primary focus-within:border-4 focus-within:border-blue-700;
 
