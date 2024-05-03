@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLTextareaAttributes } from 'svelte/elements';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
   import Label from './label.svelte';
 
   type $$Props = HTMLTextareaAttributes & {
@@ -44,10 +46,13 @@
   {/if}
   <div class="relative">
     <textarea
-      class="surface-input min-h-fit w-full rounded-lg border-2 border-subtle px-3 py-2 font-mono text-sm focus-visible:border-information focus-visible:shadow-[0_0_0_4px_rgb(97,115,243,0.7)] focus-visible:outline-none enabled:hover:border-information"
-      class:error={!isValid}
-      {id}
       bind:value
+      class={merge(
+        'surface-input min-h-fit w-full rounded-lg border-2 border-subtle px-3 py-2 font-mono text-sm focus-visible:border-information focus-visible:shadow-[0_0_0_4px_rgb(97,115,243,0.7)] focus-visible:outline-none enabled:hover:border-information',
+        disabled && 'cursor-not-allowed opacity-50',
+        !isValid && 'error',
+      )}
+      {id}
       {disabled}
       {placeholder}
       {rows}
