@@ -11,17 +11,13 @@
     args: {
       title: 'Accordion Title',
       subtitle: 'Subtitle',
-      disabled: false,
       open: false,
-      readOnly: false,
       error: '',
     },
     argTypes: {
       title: { name: 'Title', control: 'text' },
       subtitle: { name: 'Subtitle', control: 'text' },
       open: { name: 'Open', control: 'boolean' },
-      disabled: { name: 'Disabled', control: 'boolean' },
-      readOnly: { name: 'Read Only', control: 'boolean' },
       error: { name: 'Error', control: 'text' },
       icon: {
         name: 'Icon',
@@ -47,8 +43,6 @@
 
 <Story name="Open" args={{ open: true }} />
 
-<Story name="Disabled" args={{ disabled: true }} />
-
 <Story name="With Error" args={{ error: 'Error' }} />
 
 <Story name="With Icon" args={{ icon: 'workflow' }} />
@@ -67,16 +61,6 @@
   args={{
     open: true,
   }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Disabled (Dark)"
-  args={{ disabled: true }}
   parameters={{
     themes: {
       themeOverride: 'dark',
