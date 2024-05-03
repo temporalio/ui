@@ -31,7 +31,7 @@
 </script>
 
 <div>
-  <Label {required} {label} for={id} />
+  <Label {required} {label} hidden for={id} />
   <select
     class={merge(
       'inline h-10 w-full rounded-lg border px-2 text-base',
