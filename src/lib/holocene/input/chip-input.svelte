@@ -2,6 +2,7 @@
   import { writable } from 'svelte/store';
 
   import { afterUpdate, onDestroy } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Chip from '$lib/holocene/chip.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -24,6 +25,9 @@
   let input: HTMLInputElement;
 
   $: invalid = $values.some((chip) => !validator(chip));
+
+  let className = '';
+  export { className as class };
 
   const scrollToInput = () => {
     let rect = input.getBoundingClientRect();
@@ -90,9 +94,16 @@
   };
 </script>
 
-<div class={$$props.class}>
-  <Label {required} {label} hidden={labelHidden} for={id} />
-  <div bind:this={inputContainer} class="input-container" class:invalid>
+<div class={merge(disabled && 'cursor-not-allowed', className)}>
+  <Label {required} {label} {disabled} hidden={labelHidden} for={id} />
+  <div
+    bind:this={inputContainer}
+    class={merge(
+      'input-container',
+      disabled && 'cursor-not-allowed opacity-50',
+      invalid && 'invalid',
+    )}
+  >
     {#if $values.length > 0}
       {#each $values as chip, i (`${chip}-${i}`)}
         {@const valid = validator(chip)}
@@ -101,13 +112,15 @@
             ? removeChipButtonLabel
             : removeChipButtonLabel(chip)}
           on:remove={() => removeChip(i)}
-          intent={valid ? 'default' : 'warning'}>{chip}</Chip
+          intent={valid ? 'default' : 'warning'}
+          {disabled}>{chip}</Chip
         >
       {/each}
     {/if}
     <input
       data-lpignore="true"
       autocomplete="off"
+      class:cursor-not-allowed={disabled}
       {disabled}
       {placeholder}
       {id}
