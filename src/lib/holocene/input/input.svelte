@@ -28,6 +28,7 @@
     noBorder?: boolean;
     autoFocus?: boolean;
     error?: boolean;
+    'data-testid'?: string;
   };
 
   type CopyableProps = BaseProps & {
@@ -71,6 +72,8 @@
   let className = '';
   export { className as class };
 
+  let testId = $$props['data-testid'] || id;
+
   function callFocus(input: HTMLInputElement) {
     if (autoFocus && input) input.focus();
   }
@@ -85,20 +88,21 @@
   $: disabled = disabled || copyable;
 </script>
 
-<div class={merge('flex flex-col gap-1', className)}>
+<div class={merge('flex flex-col gap-1', className)} data-testid={testId}>
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div
     class="input-group flex rounded focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none"
   >
-    <slot name="before-input" />
+    <slot name="before-input" {disabled} />
     <div
       class="input-container"
       class:disabled
       class:error
-      class:unroundRight={$$slots['after-input'] ?? suffix}
-      class:unroundLeft={$$slots['before-input']}
       class:noBorder
+      class:unroundLeft={unroundLeft || $$slots['before-input']}
+      class:unroundRight={unroundRight || $$slots['after-input'] || suffix}
       class:invalid={!valid}
+      data-testid="{testId}-input-container"
     >
       {#if icon}
         <span class="icon-container">
@@ -125,6 +129,7 @@
         on:focus
         on:blur
         use:callFocus
+        data-testid="{testId}-input"
         {...$$restProps}
       />
       {#if copyable}
@@ -165,7 +170,7 @@
         </div>
       {/if}
     </div>
-    <slot name="after-input" />
+    <slot name="after-input" {disabled} />
   </div>
 
   <span
@@ -186,7 +191,7 @@
 
     &.error,
     &.invalid {
-      @apply border-2 border-error focus-within:shadow-danger/50;
+      @apply border-error focus-within:shadow-danger/50;
 
       > .input {
         @apply caret-danger;
