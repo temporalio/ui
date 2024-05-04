@@ -5,7 +5,7 @@
   import Search from './search.svelte';
 
   export const meta = {
-    title: 'Holocene/Search',
+    title: 'Search',
     component: Search,
   } satisfies Meta<Search>;
 </script>
