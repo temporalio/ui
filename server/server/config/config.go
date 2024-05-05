@@ -93,19 +93,23 @@ type (
 	}
 
 	AuthProvider struct {
-		// Label - optional label for the provider
+		// Optional. Label for the provider.
 		Label string `yaml:"label"`
-		// Type of the auth provider. Only OIDC is supported today
+		// Type of the auth provider. Only OIDC is supported today.
 		Type string `yaml:"type"`
-		// OIDC .well-known/openid-configuration URL, ex. https://accounts.google.com/
+		// OIDC login flow type. The "authorization-code" and "implicit" flows are supported.
+		Flow string `yaml:"flow"`
+		// OIDC .well-known/openid-configuration URL, e.g. https://accounts.google.com/. Discovery unsupported in implicit flow.
 		ProviderURL string `yaml:"providerUrl"`
-		// IssuerUrl - optional. Needed only when differs from the auth provider URL
-		IssuerUrl    string `yaml:"issuerUrl"`
-		ClientID     string `yaml:"clientId"`
-		ClientSecret string `yaml:"clientSecret"`
+		// Optional. Needed only when differs from the auth provider URL. In implicit flow, enables token issuer validation.
+		IssuerURL string `yaml:"issuerUrl"`
+		// Required for implicit flow. OIDC authorization endpoint URL, e.g. https://accounts.google.com/o/oauth2/v2/auth.
+		AuthorizationURL string `yaml:"authorizationUrl"`
+		ClientID         string `yaml:"clientId"`
+		ClientSecret     string `yaml:"clientSecret"`
 		// Scopes for auth. Typically [openid, profile, email]
 		Scopes []string `yaml:"scopes"`
-		// CallbackURL - URL for the callback URL, ex. https://localhost:8080/sso/callback
+		// URL for the callback, e.g. https://localhost:8080/sso/callback. Not used in the implicit flow.
 		CallbackURL string `yaml:"callbackUrl"`
 		// Options added as URL query params when redirecting to auth provider. Can be used to configure custom auth flows such as Auth0 invitation flow.
 		Options map[string]interface{} `yaml:"options"`
