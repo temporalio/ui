@@ -77,6 +77,9 @@ dependencies:
   just-throttle:
     specifier: ^4.2.0
     version: 4.2.0
+  kebab-case:
+    specifier: ^1.0.2
+    version: 1.0.2
   lodash.groupby:
     specifier: ^4.6.0
     version: 4.6.0
@@ -9719,6 +9722,10 @@ packages:
 
   /just-throttle@4.2.0:
     resolution: {integrity: sha512-/iAZv1953JcExpvsywaPKjSzfTiCLqeguUTE6+VmK15mOcwxBx7/FHrVvS4WEErMR03TRazH8kcBSHqMagYIYg==}
+    dev: false
+
+  /kebab-case@1.0.2:
+    resolution: {integrity: sha512-7n6wXq4gNgBELfDCpzKc+mRrZFs7D+wgfF5WRFLNAr4DA/qtr9Js8uOAVAfHhuLMfAcQ0pRKqbpjx+TcJVdE1Q==}
     dev: false
 
   /keycharm@0.4.0:
