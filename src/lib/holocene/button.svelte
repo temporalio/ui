@@ -71,7 +71,6 @@
   );
 
   type BaseProps = {
-    icon?: IconName;
     disabled?: boolean;
     loading?: boolean;
     leadingIcon?: IconName;
@@ -103,7 +102,6 @@
   export let trailingIcon: IconName = null;
   export let count = 0;
   export let id: string = null;
-  export let icon: IconName = null;
   export let href: string = null;
   export let target: string = null;
   export let active = false;
@@ -128,14 +126,11 @@
     type="button"
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
-    class={merge(
-      icon ? 'inline-flex' : 'inline',
-      buttonStyles({
-        variant,
-        size,
-        borderRadiusModifier,
-      }),
-    )}
+    class={buttonStyles({
+      variant,
+      size,
+      borderRadiusModifier,
+    })}
     on:click={onLinkClick}
     tabindex={href ? null : 0}
     {...$$restProps}
