@@ -33,6 +33,9 @@
       '[.button-group>&]:rounded-none',
       '[.button-group>&:first-of-type]:rounded-l-lg',
       '[.button-group>&:last-of-type]:rounded-r-lg',
+      '[.input-group>&]:rounded-none',
+      'last:[.input-group>&]:rounded-r',
+      'first:[.input-group>&]:rounded-l',
     ],
     {
       variants: {

@@ -28,6 +28,7 @@
     noBorder?: boolean;
     autoFocus?: boolean;
     error?: boolean;
+    'data-testid'?: string;
   };
 
   type CopyableProps = BaseProps & {
@@ -71,6 +72,8 @@
   let className = '';
   export { className as class };
 
+  let testId = $$props['data-testid'] || id;
+
   function callFocus(input: HTMLInputElement) {
     if (autoFocus && input) input.focus();
   }
@@ -85,78 +88,91 @@
   $: disabled = disabled || copyable;
 </script>
 
-<div class={merge('flex flex-col gap-1', className)}>
+<div class={merge('flex flex-col gap-1', className)} data-testid={testId}>
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div
-    class="input-container"
-    class:disabled
-    class:error
-    class:unroundRight={unroundRight ?? suffix}
-    class:unroundLeft
-    class:noBorder
-    class:invalid={!valid}
+    class="input-group flex rounded focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none"
   >
-    {#if icon}
-      <span class="icon-container">
-        <Icon name={icon} />
-      </span>
-    {/if}
-    <input
-      class="input"
+    <slot name="before-input" {disabled} />
+    <div
+      class="input-container"
       class:disabled
-      {disabled}
-      data-lpignore="true"
-      maxlength={maxLength > 0 ? maxLength : undefined}
-      {placeholder}
-      {id}
-      {name}
-      {spellcheck}
-      {required}
-      {autocomplete}
-      bind:value
-      on:click|stopPropagation
-      on:input
-      on:keydown|stopPropagation
-      on:change
-      on:focus
-      on:blur
-      use:callFocus
-      {...$$restProps}
-    />
-    {#if copyable}
-      <div class="copy-icon-container">
-        <button aria-label={copyButtonLabel} on:click={(e) => copy(e, value)}>
-          {#if $copied}
-            <Icon name="checkmark" />
-          {:else}
-            <Icon name="copy" />
-          {/if}
-        </button>
-      </div>
-    {:else if disabled}
-      <div class="disabled-icon-container">
-        <Icon name="lock" />
-      </div>
-    {:else if clearable && value}
-      <div class="clear-icon-container" data-testid="clear-input">
-        <IconButton label={clearButtonLabel} on:click={onClear} icon="close" />
-      </div>
-    {/if}
-    {#if maxLength && !disabled && !hideCount}
-      <span class="count">
-        <span
-          class:ok={maxLength - value.length > 5}
-          class:warn={maxLength - value.length <= 5}
-          class:error={maxLength === value.length}>{value.length}</span
-        >/{maxLength}
-      </span>
-    {/if}
-    {#if suffix}
-      <div class="suffix">
-        {suffix}
-      </div>
-    {/if}
+      class:error
+      class:noBorder
+      class:unroundLeft={unroundLeft || $$slots['before-input']}
+      class:unroundRight={unroundRight || $$slots['after-input'] || suffix}
+      class:invalid={!valid}
+      data-testid="{testId}-input-container"
+    >
+      {#if icon}
+        <span class="icon-container">
+          <Icon name={icon} />
+        </span>
+      {/if}
+      <input
+        class="input"
+        class:disabled
+        {disabled}
+        data-lpignore="true"
+        maxlength={maxLength > 0 ? maxLength : undefined}
+        {placeholder}
+        {id}
+        {name}
+        {spellcheck}
+        {required}
+        {autocomplete}
+        bind:value
+        on:click|stopPropagation
+        on:input
+        on:keydown|stopPropagation
+        on:change
+        on:focus
+        on:blur
+        use:callFocus
+        data-testid="{testId}-input"
+        {...$$restProps}
+      />
+      {#if copyable}
+        <div class="copy-icon-container">
+          <button aria-label={copyButtonLabel} on:click={(e) => copy(e, value)}>
+            {#if $copied}
+              <Icon name="checkmark" />
+            {:else}
+              <Icon name="copy" />
+            {/if}
+          </button>
+        </div>
+      {:else if disabled}
+        <div class="disabled-icon-container">
+          <Icon name="lock" />
+        </div>
+      {:else if clearable && value}
+        <div class="clear-icon-container" data-testid="clear-input">
+          <IconButton
+            label={clearButtonLabel}
+            on:click={onClear}
+            icon="close"
+          />
+        </div>
+      {/if}
+      {#if maxLength && !disabled && !hideCount}
+        <span class="count">
+          <span
+            class:ok={maxLength - value.length > 5}
+            class:warn={maxLength - value.length <= 5}
+            class:error={maxLength === value.length}>{value.length}</span
+          >/{maxLength}
+        </span>
+      {/if}
+      {#if suffix}
+        <div class="suffix">
+          {suffix}
+        </div>
+      {/if}
+    </div>
+    <slot name="after-input" {disabled} />
   </div>
+
   <span
     class="hint-text inline-block"
     class:invalid={!valid}
@@ -171,11 +187,11 @@
 <style lang="postcss">
   /* Base styles */
   .input-container {
-    @apply surface-input relative box-border inline-flex h-10 w-full items-center rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
+    @apply surface-input relative box-border inline-flex h-10 w-full items-center rounded border border-subtle text-sm;
 
     &.error,
     &.invalid {
-      @apply border-2 border-error focus-within:shadow-danger/50;
+      @apply border-error focus-within:shadow-danger/50;
 
       > .input {
         @apply caret-danger;
@@ -196,7 +212,7 @@
   }
 
   .unroundRight {
-    @apply rounded-br-none rounded-tr-none;
+    @apply rounded-br-none rounded-tr-none border-r-0;
   }
 
   .unroundLeft {
