@@ -93,8 +93,9 @@
     >
       <div class="mx-3 my-2 flex items-center justify-around">
         <div class="flex items-center justify-center">
-          <button type="button" on:click={prev}
-            ><Icon name="chevron-left" /></button
+          <button type="button" on:click={prev} title="Previous Month">
+            <span class="sr-only">Previous Month</span>
+            <Icon name="chevron-left" /></button
           >
         </div>
         <div class="flex items-center justify-center">
@@ -102,9 +103,10 @@
           {year}
         </div>
         <div class="flex items-center justify-center">
-          <button type="button" on:click={next}
-            ><Icon name="chevron-right" /></button
-          >
+          <span class="sr-only">Next Month</span>
+          <button type="button" on:click={next} title="Next Month">
+            <Icon name="chevron-right" />
+          </button>
         </div>
       </div>
       <Calender

@@ -38,20 +38,24 @@
 
   <div class="row">
     {#each cells as { allowed, value }, index (index)}
-      <button
-        type="button"
-        on:click={allowed && value ? () => onChange(value) : noop}
-        class="cell"
-        class:highlight={allowed && value}
-        class:disabled={!allowed}
-        class:selected={new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          date.getDate(),
-        ).getTime() === new Date(year, month, value).getTime()}
-      >
-        {value || ''}
-      </button>
+      {#if value}
+        <button
+          type="button"
+          on:click={allowed && value ? () => onChange(value) : noop}
+          class="cell"
+          class:highlight={allowed && value}
+          class:disabled={!allowed}
+          class:selected={new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate(),
+          ).getTime() === new Date(year, month, value).getTime()}
+        >
+          {value || ''}
+        </button>
+      {:else}
+        <div class="cell"></div>
+      {/if}
     {/each}
   </div>
 </div>
@@ -74,7 +78,7 @@
   }
 
   .disabled {
-    @apply cursor-not-allowed bg-interactive text-disabled opacity-50;
+    @apply cursor-not-allowed bg-interactive/50 text-disabled;
   }
 
   .highlight {
