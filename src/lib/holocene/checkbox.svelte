@@ -82,13 +82,11 @@
     class={merge(
       [
         'flex',
-        'cursor-pointer',
         'select-none',
         'items-center',
         'gap-3',
         'text-sm',
         'leading-[18px]',
-        'text-primary',
         'group',
       ],
       disabled && 'cursor-not-allowed',
