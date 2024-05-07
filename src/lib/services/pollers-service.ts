@@ -153,7 +153,7 @@ export async function getTaskQueueRules(
   return requestFromAPI(route, {
     request,
     notifyOnError: false,
-    handleError: (_e: APIErrorResponse) => {
+    onError: (_e: APIErrorResponse) => {
       return;
     },
   });
