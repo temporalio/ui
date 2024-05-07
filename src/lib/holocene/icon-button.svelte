@@ -15,7 +15,7 @@
   let className = '';
   export { className as class };
   export let icon: IconName;
-  export let label;
+  export let label: string;
 </script>
 
 <button

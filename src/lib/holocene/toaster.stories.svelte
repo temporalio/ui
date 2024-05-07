@@ -97,6 +97,16 @@
 />
 
 <Story
+  name="Warning (Dark)"
+  args={{ variant: 'Warning' }}
+  parameters={{
+    themes: {
+      themeOverride: 'dark',
+    },
+  }}
+/>
+
+<Story
   name="Error (Dark)"
   args={{ variant: 'Error' }}
   parameters={{
