@@ -11,11 +11,12 @@ import {
   requestFromAPI,
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { getOrderedVersionSets } from '$lib/utilities/task-queue-compatibility';
 
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 
 export type GetWorkerTaskReachabilityRequest = NamespaceScopedRequest & {
-  taskQueue: string;
+  queue: string;
   buildIds: string[];
 };
 
@@ -144,6 +145,22 @@ export async function getPollers(
     taskQueueStatus,
   };
 }
+export type VersionResults = {
+  rules: TaskQueueRules | undefined;
+  compatibility: TaskQueueCompatibility | undefined;
+  versionSets: TaskQueueCompatibleVersionSet[];
+};
+
+export async function getVersioning(
+  parameters: GetAllPollersRequest,
+  request = fetch,
+): Promise<VersionResults> {
+  const rules = await getTaskQueueRules(parameters, request);
+  const compatibility = await getTaskQueueCompatibility(parameters, request);
+  const versionSets = getOrderedVersionSets(compatibility);
+
+  return { rules, compatibility, versionSets };
+}
 
 export async function getTaskQueueRules(
   parameters: GetAllPollersRequest,
@@ -152,8 +169,7 @@ export async function getTaskQueueRules(
   const route = routeForApi('task-queue.rules', parameters);
   return requestFromAPI(route, {
     request,
-    notifyOnError: false,
-    onError: (_e: APIErrorResponse) => {
+    handleError: (_e: APIErrorResponse) => {
       return;
     },
   });
@@ -162,13 +178,11 @@ export async function getTaskQueueRules(
 export async function getTaskQueueCompatibility(
   parameters: GetAllPollersRequest,
   request = fetch,
-): Promise<TaskQueueCompatibility> {
+): Promise<TaskQueueCompatibility | undefined> {
   const route = routeForApi('task-queue.compatibility', parameters);
   return requestFromAPI(route, {
     request,
-    notifyOnError: false,
-    onError: (e: APIErrorResponse) => {
-      console.error(e);
+    handleError: (_e: APIErrorResponse) => {
       return;
     },
   });
@@ -178,7 +192,7 @@ export async function getWorkerTaskReachability(
   parameters: GetWorkerTaskReachabilityRequest,
   request = fetch,
 ): Promise<WorkerReachability> {
-  const { namespace, buildIds, taskQueue } = parameters;
+  const { namespace, buildIds, queue } = parameters;
   const route = routeForApi('worker-task-reachability', { namespace });
   const params = new URLSearchParams();
 
@@ -188,14 +202,13 @@ export async function getWorkerTaskReachability(
     }
   } else {
     params.append('buildIds', '');
-    params.append('taskQueues', taskQueue);
+    params.append('taskQueues', queue);
   }
 
   return await requestFromAPI(route, {
     request,
     params,
-    onError: (e: APIErrorResponse) => {
-      console.error(e);
+    handleError: (_e: APIErrorResponse) => {
       return {
         buildIdReachability: [],
       };

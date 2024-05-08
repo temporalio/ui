@@ -1,11 +1,14 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import WorkersList from '$lib/components/workers-list.svelte';
+  import WorkerCompatibility from '$lib/components/worker-compatibility.svelte';
+  import WorkerRules from '$lib/components/worker-rules.svelte';
+  import WorkerTable from '$lib/components/worker-table.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
+  import { translate } from '$lib/i18n/translate';
   import {
-    getPollers,
-    getTaskQueueCompatibility,
+    type GetPollersResponse,
+    getVersioning,
     getWorkerTaskReachability,
   } from '$lib/services/pollers-service';
   import {
@@ -13,21 +16,39 @@
     pollerHasVersioning,
   } from '$lib/utilities/task-queue-compatibility';
 
-  let { queue, namespace, taskQueue } = $page.params;
+  export let taskQueue: string;
+  export let workers: GetPollersResponse;
+
+  $: ({ namespace } = $page.params);
+  $: versioningEnabled = pollerHasVersioning(workers.pollers);
+  $: buildIds = getUniqueBuildIdsFromPollers(workers.pollers);
 </script>
 
-{#await getPollers({ queue, namespace }) then workers}
-  {@const versioningEnabled = pollerHasVersioning(workers.pollers)}
-  {#if versioningEnabled}
-    {@const buildIds = getUniqueBuildIdsFromPollers(workers.pollers)}
-    {#await Promise.all( [getTaskQueueCompatibility( { queue, namespace }, ), getWorkerTaskReachability( { namespace, buildIds, taskQueue }, )], )}
-      <SkeletonTable rows={3} />
-    {:then [compatibility, reachability]}
-      <WorkersList taskQueue={queue} {workers} {compatibility} {reachability} />
-    {:catch}
-      <WorkersList taskQueue={queue} {workers} />
-    {/await}
-  {:else}
-    <WorkersList taskQueue={queue} {workers} />
-  {/if}
-{/await}
+<section class="flex flex-col gap-4">
+  <h2 class="text-lg font-medium" data-testid="task-queue-name">
+    {translate('common.task-queue')}:
+    <span class="select-all font-normal">{taskQueue}</span>
+  </h2>
+  {#await getVersioning({ namespace, queue: taskQueue })}
+    <SkeletonTable rows={3} />
+  {:then { rules, compatibility, versionSets }}
+    {#if rules}
+      <WorkerRules {workers} {rules} />
+    {:else if versioningEnabled && versionSets?.length}
+      {#await getWorkerTaskReachability( { namespace, buildIds, queue: taskQueue }, )}
+        <SkeletonTable rows={3} />
+      {:then reachability}
+        <WorkerCompatibility
+          {taskQueue}
+          {workers}
+          {compatibility}
+          {reachability}
+        />
+      {/await}
+    {:else}
+      <WorkerTable {workers} />
+    {/if}
+  {:catch}
+    <WorkerTable {workers} />
+  {/await}
+</section>

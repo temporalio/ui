@@ -38,7 +38,7 @@
 
   export let namespace: string;
 
-  $: ({ workflow, workers, rules, compatibility } = $workflowRun);
+  $: ({ workflow, workers } = $workflowRun);
   $: id = $page.params.id;
 
   $: routeParameters = {
@@ -111,7 +111,7 @@
             />
           </h1>
           {#if workflowUsesVersioning}
-            <WorkflowVersioningHeader {workflow} {rules} {compatibility} />
+            <WorkflowVersioningHeader {workflow} />
           {/if}
         </div>
       </div>
