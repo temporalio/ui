@@ -44,7 +44,6 @@
       <Checkbox
         {label}
         labelHidden
-        hoverable
         bind:group={$selectedWorkflows}
         value={workflow}
         disabled={$allSelected}

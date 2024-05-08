@@ -16,7 +16,6 @@
     label?: string;
     labelHidden?: boolean;
     indeterminate?: boolean;
-    hoverable?: boolean;
     value?: T;
     group?: T[];
     'data-testid'?: string;
@@ -31,7 +30,6 @@
   export let labelHidden = false;
   export let indeterminate = false;
   export let disabled = false;
-  export let hoverable = false;
   export let value: T = undefined;
   export let group: T[] = undefined;
   export let valid = true;
@@ -82,17 +80,14 @@
     class={merge(
       [
         'flex',
-        'cursor-pointer',
         'select-none',
         'items-center',
         'gap-3',
         'text-sm',
         'leading-[18px]',
-        'text-primary',
         'group',
       ],
       disabled && 'cursor-not-allowed',
-      hoverable && !disabled && 'hoverable',
       className,
     )}
   >
@@ -127,19 +122,20 @@
           'outline',
           'outline-4',
           'outline-transparent',
-          'group-hover:border-white',
+          'bg-clip-padding',
+          'peer-indeterminate:bg-interactive-active',
+          'peer-checked:bg-interactive-active',
+          'dark:text-black',
+        ],
+        !disabled && [
+          'group-hover:border-transparent',
           'group-hover:bg-interactive',
           'group-hover:outline-offset-0',
           'group-hover:outline-interactive/70',
-          'group-hover:dark:border-black',
-          'peer-checked:bg-interactive-active',
-          'peer-indeterminate:bg-interactive-active',
-          'peer-focus-visible:border-white',
+          'peer-focus-visible:border-transparent',
           'peer-focus-visible:bg-interactive',
           'peer-focus-visible:outline-offset-0',
           'peer-focus-visible:outline-interactive/70',
-          'peer-focus-visible:dark:border-black',
-          'dark:text-black',
         ],
         disabled && ['cursor-not-allowed', 'opacity-50'],
         valid
