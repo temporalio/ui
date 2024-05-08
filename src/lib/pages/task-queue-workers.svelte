@@ -18,6 +18,7 @@
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;
+  export let useVersioning = true;
 
   $: ({ namespace } = $page.params);
   $: versioningEnabled = pollerHasVersioning(workers.pollers);
@@ -29,26 +30,31 @@
     {translate('common.task-queue')}:
     <span class="select-all font-normal">{taskQueue}</span>
   </h2>
-  {#await getVersioning({ namespace, queue: taskQueue })}
-    <SkeletonTable rows={3} />
-  {:then { rules, compatibility, versionSets }}
-    {#if rules}
-      <WorkerRules {workers} {rules} />
-    {:else if versioningEnabled && versionSets?.length}
-      {#await getWorkerTaskReachability( { namespace, buildIds, queue: taskQueue }, )}
-        <SkeletonTable rows={3} />
-      {:then reachability}
-        <WorkerCompatibility
-          {taskQueue}
-          {workers}
-          {compatibility}
-          {reachability}
-        />
-      {/await}
-    {:else}
+  {#if useVersioning}
+    {#await getVersioning({ namespace, queue: taskQueue })}
+      <SkeletonTable rows={3} />
+    {:then { rules, compatibility, versionSets }}
+      {#if rules}
+        <WorkerRules {workers} {rules} />
+      {:else if versioningEnabled && versionSets?.length}
+        {#await getWorkerTaskReachability( { namespace, buildIds, queue: taskQueue }, )}
+          <SkeletonTable rows={3} />
+        {:then reachability}
+          <slot {compatibility} />
+          <WorkerCompatibility
+            {taskQueue}
+            {workers}
+            {compatibility}
+            {reachability}
+          />
+        {/await}
+      {:else}
+        <WorkerTable {workers} />
+      {/if}
+    {:catch}
       <WorkerTable {workers} />
-    {/if}
-  {:catch}
+    {/await}
+  {:else}
     <WorkerTable {workers} />
-  {/await}
+  {/if}
 </section>
