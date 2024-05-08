@@ -345,7 +345,7 @@
   }
 
   .combobox-wrapper {
-    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border border-primary text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
+    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border border-primary text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none;
 
     &.invalid {
       @apply border-2 border-error text-danger focus-within:shadow-danger/50;
@@ -361,7 +361,7 @@
   }
 
   .combobox-input {
-    @apply ml-2 h-full w-full grow bg-transparent font-primary text-primary placeholder:text-primary focus:outline-none disabled:text-disabled disabled:placeholder:text-disabled dark:bg-transparent;
+    @apply ml-2 h-full w-full grow bg-transparent font-primary text-primary placeholder:text-primary focus:outline-none disabled:text-disabled disabled:placeholder:text-disabled;
   }
 
   .combobox-button {
