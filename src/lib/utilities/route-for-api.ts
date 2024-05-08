@@ -81,7 +81,7 @@ const encode = (
 ): APIRouteParameters => {
   return Object.keys(parameters ?? {}).reduce(
     (acc, key) => {
-      acc[key] = encodeURIComponent(encodeURIComponent(parameters[key]));
+      acc[key] = encodeURIComponent(parameters[key]);
       return acc;
     },
     {
