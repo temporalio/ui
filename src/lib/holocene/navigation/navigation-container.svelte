@@ -39,7 +39,7 @@
   </button>
   <div role="list">
     <slot name="top" />
-    <hr class="my-8 border-subtle" />
+    <hr class="-mx-4 my-8 border-subtle" />
     <slot name="middle" />
   </div>
   <div class="self-end">
