@@ -63,7 +63,9 @@
   const labelCtx = writable<string>(value?.toString());
   const open = writable<boolean>(false);
 
-  $: {
+  $: value, updateContext();
+
+  function updateContext() {
     $valueCtx = value;
     $labelCtx = getLabelFromOptions(value);
   }
@@ -99,26 +101,28 @@
 
 <MenuContainer class="w-full" {open}>
   <Label {label} hidden={labelHidden} for={id} />
-  <MenuButton
-    hasIndicator={!disabled}
-    {disabled}
-    controls="{id}-select"
-    {variant}
-  >
-    <Icon slot="leading" name={leadingIcon} />
-    <input
-      {id}
-      value={!value && placeholder !== '' ? placeholder : $labelCtx}
-      tabindex="-1"
-      class="select-input"
-      disabled
-      class:disabled
-      {...$$restProps}
-    />
-    {#if disabled}
-      <Icon slot="trailing" name="lock" />
-    {/if}
-  </MenuButton>
+  {#key $labelCtx}
+    <MenuButton
+      hasIndicator={!disabled}
+      {disabled}
+      controls="{id}-select"
+      {variant}
+    >
+      <Icon slot="leading" name={leadingIcon} />
+      <input
+        {id}
+        value={!value && placeholder !== '' ? placeholder : $labelCtx}
+        tabindex="-1"
+        class="select-input"
+        disabled
+        class:disabled
+        {...$$restProps}
+      />
+      {#if disabled}
+        <Icon slot="trailing" name="lock" />
+      {/if}
+    </MenuButton>
+  {/key}
   <Menu role="listbox" id="{id}-select">
     <slot />
   </Menu>
