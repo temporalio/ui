@@ -28,16 +28,6 @@ export const getRGB = (color: Color): RGB => {
   return rgb(getColor(paletteColor, shade));
 };
 
-export const toColor = ({
-  light,
-  dark,
-}: {
-  light: Color;
-  dark: Color;
-}): { light: RGB; dark: RGB } => {
-  return { light: getRGB(light), dark: getRGB(dark) };
-};
-
 export const isHexColor = (color: unknown): color is HexColor => {
   if (typeof color !== 'string') return false;
   return /^#[0-9A-F]{6}$/i.test(color);

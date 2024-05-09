@@ -2,7 +2,9 @@ type RGB = `${number} ${number} ${number}`;
 type HexColor = `#${string}`;
 
 type CSSVariable = `--${string}`;
-type ColorVariables = Readonly<Record<CSSVariable, { light: RGB; dark: RGB }>>;
+type ColorVariables = Readonly<
+  Record<CSSVariable, { light: Color; dark: Color }>
+>;
 
 type Shade =
   | 50
