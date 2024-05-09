@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Checkout and Setup Node
@@ -28,7 +28,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout UI Server
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: temporalio/ui-server
           path: ui-server
