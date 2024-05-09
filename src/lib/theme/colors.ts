@@ -1,4 +1,6 @@
-const palette = {
+export type PaletteColor = keyof typeof palette;
+
+export const palette = {
   blue: {
     50: '#EFF5FF',
     100: '#DBE8FE',
@@ -139,23 +141,14 @@ const palette = {
     950: '#461B02',
     DEFAULT: '#F8A208',
   },
-} as const satisfies Readonly<Record<string, PaletteColor>>;
+} as const satisfies Record<string, Shades>;
 
-type Palette = typeof palette;
-
-export const getColor = (
-  color: keyof Palette,
-  shade: Shade = 'DEFAULT',
-): HexColor => {
-  return palette[color][shade];
-};
-
-const colors = {
+export const colors = {
   // primary, secondary, danger, and success should be removed at some point
   primary: '#141414',
-  secondary: getColor('slate', 500),
-  danger: getColor('red', 700),
-  success: getColor('green', 200),
+  secondary: palette['slate'][500],
+  danger: palette['red'][700],
+  success: palette['green'][200],
   white: '#ffffff',
   offWhite: '#F8FAFC',
   black: '#141414',
@@ -165,7 +158,5 @@ const colors = {
   transparent: 'transparent',
   ...palette,
 } satisfies Readonly<
-  Record<string, HexColor | 'transparent' | 'currentColor' | PaletteColor>
+  Record<string, HexColor | 'transparent' | 'currentColor' | Shades>
 >;
-
-export default colors;
