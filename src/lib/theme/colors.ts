@@ -1,4 +1,4 @@
-export type PaletteColor = keyof typeof palette;
+export type PaletteColor = keyof Palette;
 
 export const palette = {
   blue: {
@@ -157,6 +157,11 @@ export const colors = {
   current: 'currentColor',
   transparent: 'transparent',
   ...palette,
-} satisfies Readonly<
-  Record<string, HexColor | 'transparent' | 'currentColor' | Shades>
+} as const satisfies Record<
+  string,
+  HexColor | 'transparent' | 'currentColor' | Shades
 >;
+
+export type ColorName =
+  | Exclude<keyof typeof colors, PaletteColor>
+  | `${PaletteColor}.${Shade}`;

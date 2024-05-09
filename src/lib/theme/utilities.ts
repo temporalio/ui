@@ -1,4 +1,4 @@
-import { palette } from './colors';
+import { colors, palette } from './colors';
 import type { Variable } from './variables';
 
 const removeHexPrefix = (hex: HexColor) => hex.replace('#', '');
@@ -14,18 +14,14 @@ export const rgb = (hexColor: HexColor): RGB => {
 
 export const css = (variable: Variable) => `rgb(var(${variable}))`;
 
-export const getColor = (
-  color: PaletteColor | HexColor,
-  shade: Shade = 'DEFAULT',
-): HexColor => {
-  if (isHexColor(color)) return color;
-  return palette[color][shade];
-};
-
-export const getRGB = (color: Color): RGB => {
-  if (isHexColor(color)) return rgb(color);
-  const [paletteColor, shade] = color;
-  return rgb(getColor(paletteColor, shade));
+export const toColor = (name: ColorName): RGB => {
+  const [paletteColor, shade] = name.split('.') as [PaletteColor, Shade];
+  if (isHexColor(colors[paletteColor])) return rgb(colors[paletteColor]);
+  if (isPaletteColor(paletteColor)) {
+    const color = palette[paletteColor];
+    if (shade) return rgb(color[shade]);
+    return rgb(color.DEFAULT);
+  }
 };
 
 export const isHexColor = (color: unknown): color is HexColor => {
