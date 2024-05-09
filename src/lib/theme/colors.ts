@@ -1,3 +1,4 @@
+export type Palette = typeof palette;
 export type PaletteColor = keyof Palette;
 
 export const palette = {
@@ -161,7 +162,3 @@ export const colors = {
   string,
   HexColor | 'transparent' | 'currentColor' | Shades
 >;
-
-export type ColorName =
-  | Exclude<keyof typeof colors, PaletteColor>
-  | `${PaletteColor}.${Shade}`;
