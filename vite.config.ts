@@ -16,6 +16,7 @@ export default defineConfig({
       $fixtures: path.resolve('./src/fixtures'),
       $components: path.resolve('./src/lib/components/'),
       $holocene: path.resolve('./src/lib/holocene'),
+      $api: path.resolve('./src/api'),
     },
   },
   server: {
