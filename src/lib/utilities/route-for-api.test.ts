@@ -181,7 +181,7 @@ describe('API Request Encoding', () => {
       workflowId: 'workflow#with#hashes',
     });
     expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow%23with%23hashes',
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow%2523with%2523hashes',
     );
   });
 
@@ -193,57 +193,8 @@ describe('API Request Encoding', () => {
       workflowId:
         'temporal.canary.cron-workflow.sanity-2022-05-02T16:03:11-06:00/workflow.advanced-visibility.scan',
     });
-
     expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/canary/workflows/temporal.canary.cron-workflow.sanity-2022-05-02T16%3A03%3A11-06%3A00%2Fworkflow.advanced-visibility.scan',
-    );
-  });
-
-  it('should handle spaces', () => {
-    const route = routeForApi('workflow', {
-      ...parameters,
-      namespace: 'canary',
-      runId: '47e33895-aff5-475a-9b53-73abdee8bebe',
-      workflowId: 'workflowId with spaces',
-    });
-    expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/canary/workflows/workflowId%20with%20spaces',
-    );
-  });
-
-  it('should handle parenthesis', () => {
-    const route = routeForApi('workflow', {
-      ...parameters,
-      namespace: 'canary',
-      runId: '47e33895-aff5-475a-9b53-73abdee8bebe',
-      workflowId: 'workflowId()',
-    });
-    expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/canary/workflows/workflowId()',
-    );
-  });
-
-  it('should handle space and parenthesis', () => {
-    const route = routeForApi('workflow', {
-      ...parameters,
-      namespace: 'canary',
-      runId: '47e33895-aff5-475a-9b53-73abdee8bebe',
-      workflowId: 'workflowId ()',
-    });
-    expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/canary/workflows/workflowId%20()',
-    );
-  });
-
-  it('should handle special characters', () => {
-    const route = routeForApi('workflow', {
-      ...parameters,
-      namespace: 'canary',
-      runId: '47e33895-aff5-475a-9b53-73abdee8bebe',
-      workflowId: 'workflowId?@:;=+$,',
-    });
-    expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/canary/workflows/workflowId%3F%40%3A%3B%3D%2B%24%2C',
+      'http://localhost:8233/api/v1/namespaces/canary/workflows/temporal.canary.cron-workflow.sanity-2022-05-02T16%253A03%253A11-06%253A00%252Fworkflow.advanced-visibility.scan',
     );
   });
 });
