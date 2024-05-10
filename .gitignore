@@ -5,6 +5,7 @@ node_modules
 /coverage
 *.log
 *.swp
+/tmp
 /.vercel_build_output
 /.vercel
 /build-local
