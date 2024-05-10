@@ -16,10 +16,11 @@ export const css = (variable: Variable) => `rgb(var(${variable}))`;
 
 export const toColor = (name: ColorName): RGB => {
   const [paletteColor, shade] = name.split('.') as [PaletteColor, Shade];
-  if (isHexColor(colors[paletteColor])) return rgb(colors[paletteColor]);
+  const color = colors[paletteColor];
+  if (isHexColor(color)) return rgb(color);
   if (isPaletteColor(paletteColor)) {
     const color = palette[paletteColor];
-    if (shade) return rgb(color[shade]);
+    if (isShade(shade)) return rgb(color[shade]);
     return rgb(color.DEFAULT);
   }
 };
@@ -31,3 +32,6 @@ export const isHexColor = (color: unknown): color is HexColor => {
 
 export const isPaletteColor = (color: string): color is PaletteColor =>
   color in palette;
+
+export const isShade = (shade: unknown): shade is Shade =>
+  typeof shade === 'number' || shade === 'DEFAULT';
