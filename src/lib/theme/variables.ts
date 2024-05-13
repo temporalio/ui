@@ -60,7 +60,7 @@ export const variables = {
   },
   '--color-text-inverse': {
     light: 'offWhite',
-    dark: 'primary',
+    dark: 'offWhite',
   },
   '--color-text-subtle': {
     light: 'slate.300',
