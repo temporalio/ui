@@ -34,4 +34,4 @@ export const isPaletteColor = (color: string): color is PaletteColor =>
   color in palette;
 
 export const isShade = (shade: unknown): shade is Shade =>
-  typeof shade === 'number' || shade === 'DEFAULT';
+  typeof shade === 'number' || typeof Number(shade) === 'number' || shade === 'DEFAULT';
