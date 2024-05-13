@@ -13,6 +13,8 @@ import {
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { getOrderedVersionSets } from '$lib/utilities/task-queue-compatibility';
 
+// import versioningFixture from '$fixtures/task-queue-rules.json';
+
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 
 export type GetWorkerTaskReachabilityRequest = NamespaceScopedRequest & {
@@ -28,8 +30,8 @@ export type GetPollersResponse = {
 type AssignmentRule = {
   rule: {
     targetBuildId: string;
-    percentageRamp: {
-      rampPercentage: number;
+    percentageRamp?: {
+      rampPercentage?: number;
     };
   };
   createTime: string;
@@ -44,8 +46,8 @@ type CompatibleRedirectRule = {
 };
 
 export type TaskQueueRules = {
-  assignmentRules: AssignmentRule[];
-  compatibleRedirectRules: CompatibleRedirectRule[];
+  assignmentRules?: AssignmentRule[];
+  compatibleRedirectRules?: CompatibleRedirectRule[];
   conflictToken: string;
 };
 
@@ -146,8 +148,8 @@ export async function getPollers(
   };
 }
 export type VersionResults = {
-  rules: TaskQueueRules | undefined;
-  compatibility: TaskQueueCompatibility | undefined;
+  rules: TaskQueueRules;
+  compatibility: TaskQueueCompatibility;
   versionSets: TaskQueueCompatibleVersionSet[];
 };
 
@@ -155,6 +157,7 @@ export async function getVersioning(
   parameters: GetAllPollersRequest,
   request = fetch,
 ): Promise<VersionResults> {
+  // const rules = await versioningFixture
   const rules = await getTaskQueueRules(parameters, request);
   const compatibility = await getTaskQueueCompatibility(parameters, request);
   const versionSets = getOrderedVersionSets(compatibility);

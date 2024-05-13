@@ -71,6 +71,7 @@ export const toWorkflowExecution = (
     response?.workflowExecutionInfo?.taskQueue;
   const mostRecentWorkerVersionStamp =
     response?.workflowExecutionInfo?.mostRecentWorkerVersionStamp;
+  const assignedBuildId = response?.workflowExecutionInfo?.assignedBuildId;
   const parentNamespaceId = response?.workflowExecutionInfo?.parentNamespaceId;
   const parent = response?.workflowExecutionInfo?.parentExecution;
   const stateTransitionCount =
@@ -97,6 +98,7 @@ export const toWorkflowExecution = (
     memo,
     url,
     taskQueue,
+    assignedBuildId,
     mostRecentWorkerVersionStamp,
     pendingActivities,
     pendingChildren,

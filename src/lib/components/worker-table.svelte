@@ -34,7 +34,7 @@
       <p class="text-center">{translate('workflows.activity-handler')}</p>
     </th>
   </TableHeaderRow>
-  {#each workers?.pollers as poller (poller.identity)}
+  {#each workers?.pollers as poller}
     <TableRow data-testid="worker-row">
       <td class="text-left" data-testid="worker-identity">
         <p class="select-all">{poller.identity}</p>
