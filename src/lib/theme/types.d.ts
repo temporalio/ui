@@ -1,12 +1,13 @@
-type CSSVariable = `--${string}`;
+type PaletteColor = import('./colors').PaletteColor;
+type Palette = import('./colors').Palette;
 
 type RGB = `${number} ${number} ${number}`;
-
-type Variables<K extends string = CSSVariable> = Readonly<
-  Record<K, RGB | `var(${CSSVariable})`>
->;
-
 type HexColor = `#${string}`;
+
+type CSSVariable = `--${string}`;
+type ColorVariables = Readonly<
+  Record<CSSVariable, { light: ColorName; dark: ColorName }>
+>;
 
 type Shade =
   | 50
@@ -22,4 +23,10 @@ type Shade =
   | 950
   | 'DEFAULT';
 
-type PaletteColor = Record<Shade, HexColor>;
+type Shades = Record<Shade, HexColor>;
+
+type Color = [PaletteColor, Shade | undefined] | HexColor;
+
+type ColorName =
+  | Exclude<keyof typeof import('./colors').colors, PaletteColor>
+  | `${PaletteColor}.${Shade}`;
