@@ -40,6 +40,7 @@
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowColumnsOrderableList from '$lib/components/workflow/workflows-summary-configurable-table/orderable-list.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -58,6 +59,7 @@
     workflowsSearchParams,
   } from '$lib/stores/workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { routeForWorkflowStart } from '$lib/utilities/route-for';
 
   $: query = $page.url.searchParams.get('query');
   $: query, ($workflowsQuery = query);
@@ -198,22 +200,21 @@
 
 <header class="flex flex-col gap-2">
   <div class="flex items-center justify-between">
-    <div>
-      <h1 class="flex items-center gap-2 text-2xl" data-cy="workflows-title">
-        {#if $supportsAdvancedVisibility}
-          <span data-testid="workflow-count"
-            >{$workflowCount.count.toLocaleString()}</span
-          >
-          <Translate
-            key="common.workflows-plural"
-            count={$workflowCount.count}
-          />
-        {:else}
-          <Translate key="workflows.recent-workflows" />
-        {/if}
-        <WorkflowCountRefresh count={$workflowCount.newCount} />
-      </h1>
-    </div>
+    <h1 class="flex items-center gap-2 text-2xl" data-cy="workflows-title">
+      {#if $supportsAdvancedVisibility}
+        <span data-testid="workflow-count"
+          >{$workflowCount.count.toLocaleString()}</span
+        >
+        <Translate key="common.workflows-plural" count={$workflowCount.count} />
+      {:else}
+        <Translate key="workflows.recent-workflows" />
+      {/if}
+      <WorkflowCountRefresh count={$workflowCount.newCount} />
+    </h1>
+    <Button
+      leadingIcon="lightning-bolt"
+      href={routeForWorkflowStart({ namespace })}>Start Workflow</Button
+    >
   </div>
   {#if $groupByCountEnabled}
     <WorkflowCounts />

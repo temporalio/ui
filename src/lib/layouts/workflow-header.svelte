@@ -3,6 +3,7 @@
 
   import { page } from '$app/stores';
 
+  import StartWorkflowButton from '$lib/components/workflow/start-workflow-button.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import WorkflowVersioningHeader from '$lib/components/workflow-versioning-header.svelte';
@@ -66,29 +67,37 @@
 </script>
 
 <div class="surface-secondary">
-  <div class="pb-4">
-    <Link
-      href={`${routeForWorkflows({
-        namespace,
-      })}?${$workflowsSearchParams}`}
-      data-testid="back-to-workflows"
-      icon="chevron-left"
-    >
-      {id
-        ? translate('common.workflows')
-        : translate('workflows.back-to-workflows')}
-    </Link>
-    {#if id}
+  <div class="flex items-center justify-between pb-4">
+    <div class="flex items-center gap-2">
       <Link
-        href={routeForEventHistory({
-          ...routeParameters,
-        })}
-        data-testid="back-to-workflow-execution"
+        href={`${routeForWorkflows({
+          namespace,
+        })}?${$workflowsSearchParams}`}
+        data-testid="back-to-workflows"
         icon="chevron-left"
       >
-        {workflow?.runId}
+        {id
+          ? translate('common.workflows')
+          : translate('workflows.back-to-workflows')}
       </Link>
-    {/if}
+      {#if id}
+        <Link
+          href={routeForEventHistory({
+            ...routeParameters,
+          })}
+          data-testid="back-to-workflow-execution"
+          icon="chevron-left"
+        >
+          {workflow?.runId}
+        </Link>
+      {/if}
+    </div>
+    <StartWorkflowButton
+      {namespace}
+      workflowId={workflow?.id}
+      taskQueue={workflow?.taskQueue}
+      workflowType={workflow?.name}
+    />
   </div>
   <header class="rounded-top flex flex-col gap-0">
     <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
@@ -99,7 +108,7 @@
         <div class="flex flex-col flex-wrap gap-0">
           <h1
             data-testid="workflow-id-heading"
-            class="overflow-hidden text-base font-medium lg:text-2xl"
+            class="gap-0 overflow-hidden text-base font-medium lg:text-2xl"
           >
             <Copyable
               copyIconTitle={translate('common.copy-icon-title')}

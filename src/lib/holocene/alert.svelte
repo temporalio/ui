@@ -57,7 +57,7 @@
       <Icon name={icon} />
     </div>
   {/if}
-  <div class="ml-1">
+  <div class="ml-1 grow">
     <p class="font-semibold leading-6" class:hidden={!title}>
       {title}
     </p>

@@ -62,6 +62,13 @@ type SignalWorkflowOptions = {
   name: string;
   input: string;
 };
+type StartWorkflowOptions = {
+  namespace: string;
+  workflowId: string;
+  taskQueue: string;
+  workflowType: string;
+  input: string;
+};
 
 type TerminateWorkflowOptions = {
   workflow: WorkflowExecution;
@@ -401,4 +408,38 @@ export async function fetchAllChildWorkflows(
   } catch (e) {
     return [];
   }
+}
+
+export async function startWorkflow({
+  namespace,
+  workflowId,
+  taskQueue,
+  workflowType,
+  input,
+}: StartWorkflowOptions) {
+  const route = routeForApi('workflow', {
+    namespace,
+    workflowId,
+  });
+  const payloads = (await encodePayloads(input)) || [];
+  const body = {
+    workflowId,
+    taskQueue: {
+      name: taskQueue,
+    },
+    workflowType: {
+      name: workflowType,
+    },
+    input: {
+      payloads,
+    },
+  };
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt(body),
+    },
+  });
 }
