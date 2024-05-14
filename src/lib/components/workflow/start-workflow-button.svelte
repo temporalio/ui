@@ -23,7 +23,7 @@
   });
 </script>
 
-<Tooltip text="Start Workflow" left>
+<Tooltip text="Start Workflow" topLeft>
   <button
     class={merge('start-button', className)}
     on:click={() => goto(href)}

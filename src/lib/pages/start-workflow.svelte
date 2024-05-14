@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import StartWorkflowInputUpload from '$lib/components/workflow/start-workflow-input-upload.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -13,7 +14,10 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getPollers } from '$lib/services/pollers-service';
-  import { startWorkflow } from '$lib/services/workflow-service';
+  import {
+    fetchInputForStartWorkflow,
+    startWorkflow,
+  } from '$lib/services/workflow-service';
   import { pluralize } from '$lib/utilities/pluralize';
   import {
     routeForTaskQueue,
@@ -77,6 +81,16 @@
     pollerCount = pollers.length;
   };
 
+  $: getPreviousInput = async () => {
+    console.log('WorkflowType: ', workflowType);
+    console.log('WorkflowID: ', workflowId);
+    input = await fetchInputForStartWorkflow({
+      namespace,
+      workflowType,
+      workflowId,
+    });
+  };
+
   const onInputChange = (e: Event, parameter: string) => {
     const value = (e.target as HTMLInputElement).value;
     updateQueryParameters({
@@ -85,6 +99,10 @@
       url: $page.url,
       allowEmpty: true,
     });
+  };
+
+  const onInputUpload = (uploadInput: string) => {
+    input = uploadInput;
   };
 
   $: enableStart = !!workflowId && !!taskQueue && !!workflowType;
@@ -152,19 +170,30 @@
       label="Workflow Type"
       on:input={(e) => onInputChange(e, 'workflowType')}
     />
-    <Label for="schedule-input" label={translate('workflows.input')} />
-    <CodeBlock
-      id="workflow-input"
-      maxHeight={320}
-      content={input}
-      on:change={handleInputChange}
-      editable
-      copyable={false}
-    />
+    <div class="flex w-full items-end justify-between">
+      <Label for="workflow-input" label={translate('workflows.input')} />
+      <div class="flex items-center gap-2">
+        <StartWorkflowInputUpload onUpload={onInputUpload} />
+        <Button
+          variant="secondary"
+          disabled={!workflowType}
+          on:click={getPreviousInput}>Previous Input</Button
+        >
+      </div>
+    </div>
+    {#key input}
+      <CodeBlock
+        id="workflow-input"
+        minHeight={120}
+        content={input}
+        on:change={handleInputChange}
+        editable
+        copyable={false}
+      />
+    {/key}
     <div class="mt-4 flex w-full justify-between">
       <Button
         variant="ghost"
-        disabled={!enableStart}
         on:click={() => (viewAdvancedOptions = !viewAdvancedOptions)}
         >Advanced Options</Button
       >

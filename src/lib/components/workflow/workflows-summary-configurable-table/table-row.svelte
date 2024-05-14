@@ -3,6 +3,8 @@
 
   import { getContext } from 'svelte';
 
+  import { page } from '$app/stores';
+
   import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
@@ -17,6 +19,8 @@
   import { showChildWorkflows } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
+  import StartWorkflowButton from '../start-workflow-button.svelte';
+
   export let workflow: WorkflowExecution | undefined = undefined;
   export let empty = false;
   export let viewChildren: (workflow?: WorkflowExecution) => void = noop;
@@ -26,6 +30,8 @@
   const { allSelected, selectedWorkflows } = getContext<BatchOperationContext>(
     BATCH_OPERATION_CONTEXT,
   );
+
+  $: ({ namespace } = $page.params);
 
   $: label = translate('workflows.select-workflow', {
     workflow: workflow?.id,
@@ -50,30 +56,34 @@
         aria-label={label}
       />
     </td>
-    <IsTemporalServerVersionGuard minimumVersion="1.23.0">
-      {#if !$showChildWorkflows}
-        <td
-          class="cursor-point relative flex items-center justify-center gap-0.5 pt-2"
-        >
-          {#if !child}
-            <Button
-              size="xs"
-              variant={childrenShown ? 'primary' : 'ghost'}
-              on:click={() => viewChildren(workflow)}
+    <td
+      class="cursor-point relative flex items-center justify-center gap-0.5 pt-2"
+    >
+      <StartWorkflowButton
+        {namespace}
+        workflowId={workflow.id}
+        taskQueue={workflow.taskQueue}
+        workflowType={workflow.name}
+      />
+      <IsTemporalServerVersionGuard minimumVersion="1.23.0">
+        {#if !$showChildWorkflows && !child}
+          <Button
+            size="xs"
+            variant={childrenShown ? 'primary' : 'ghost'}
+            on:click={() => viewChildren(workflow)}
+          >
+            <Tooltip
+              text={childrenShown
+                ? translate('workflows.children', { count: childCount })
+                : translate('workflows.show-children')}
+              topLeft
             >
-              <Tooltip
-                text={childrenShown
-                  ? translate('workflows.children', { count: childCount })
-                  : translate('workflows.show-children')}
-                topLeft
-              >
-                <Icon name="relationship" class="scale-80" />
-              </Tooltip>
-            </Button>
-          {/if}
-        </td>
-      {/if}
-    </IsTemporalServerVersionGuard>
+              <Icon name="relationship" class="scale-80" />
+            </Tooltip>
+          </Button>
+        {/if}
+      </IsTemporalServerVersionGuard>
+    </td>
   {/if}
   <slot />
   <td />

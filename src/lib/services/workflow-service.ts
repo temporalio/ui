@@ -26,6 +26,10 @@ import type {
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
 } from '$lib/types/workflows';
+import {
+  cloneAllPotentialPayloadsWithCodec,
+  type PotentiallyDecodable,
+} from '$lib/utilities/decode-payload';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 import {
   handleUnauthorizedOrForbiddenError,
@@ -39,6 +43,8 @@ import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { base, pathForApi, routeForApi } from '$lib/utilities/route-for-api';
 import { isVersionNewer } from '$lib/utilities/version-check';
 import { formatReason } from '$lib/utilities/workflow-actions';
+
+import { fetchInitialEvent } from './events-service';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -443,3 +449,53 @@ export async function startWorkflow({
     },
   });
 }
+
+export const fetchInputForStartWorkflow = async ({
+  namespace,
+  workflowType,
+  workflowId,
+}: {
+  namespace: string;
+  workflowType?: string;
+  workflowId?: string;
+}): Promise<string> => {
+  const handleError: ErrorCallback = (err) => {
+    console.error(err);
+  };
+
+  try {
+    let query = '';
+    if (workflowType && workflowId) {
+      query = `WorkflowType = "${workflowType}" AND WorkflowId = "${workflowId}"`;
+    } else if (workflowType) {
+      query = `WorkflowType = "${workflowType}"`;
+    } else if (workflowId) {
+      query = `WorkflowId = "${workflowId}"`;
+    }
+
+    const route = routeForApi('workflows', { namespace, query });
+    const workflows = await requestFromAPI<ListWorkflowExecutionsResponse>(
+      route,
+      {
+        params: { pageSize: '1' },
+        handleError,
+      },
+    );
+    const workflow = workflows?.executions?.[0];
+    if (!workflow) return '';
+    const firstEvent = await fetchInitialEvent({
+      namespace,
+      workflowId: workflow.execution?.workflowId,
+      runId: workflow.execution?.runId,
+    });
+    const convertedAttributes = (await cloneAllPotentialPayloadsWithCodec(
+      firstEvent?.attributes?.input,
+      namespace,
+      get(page).data.settings,
+      get(authUser).accessToken,
+    )) as PotentiallyDecodable;
+    return stringifyWithBigInt(convertedAttributes?.payloads);
+  } catch (e) {
+    return '';
+  }
+};
