@@ -73,7 +73,7 @@
   }
 
   .toggle-button.active {
-    @apply surface-secondary-active;
+    @apply bg-interactive-secondary-active;
   }
 
   .toggle-button.disabled {

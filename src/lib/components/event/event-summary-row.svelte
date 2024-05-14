@@ -197,7 +197,7 @@
   }
 
   .failure {
-    @apply bg-error;
+    @apply bg-danger;
   }
 
   .failure .event-name {

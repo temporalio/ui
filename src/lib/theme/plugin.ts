@@ -24,21 +24,29 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-secondary'),
         color: css('--color-text-primary'),
       },
-      '.surface-secondary-active': {
-        backgroundColor: css('--color-surface-secondary-active'),
-        color: css('--color-text-primary'),
-      },
       '.surface-input': {
         backgroundColor: css('--color-surface-primary'),
         color: css('--color-text-primary'),
       },
       '.surface-interactive': {
-        backgroundColor: css('--color-surface-interactive'),
+        backgroundColor: css('--color-interactive-surface'),
         color: css('--color-text-primary'),
+        '&:focus-visible': {
+          backgroundColor: css('--color-interactive-hover'),
+        },
+        '&:hover': {
+          backgroundColor: css('--color-interactive-hover'),
+        },
       },
       '.surface-interactive-secondary': {
-        backgroundColor: css('--color-surface-interactive-secondary'),
+        backgroundColor: css('--color-interactive-secondary-surface'),
         color: css('--color-text-primary'),
+        '&:focus-visible': {
+          backgroundColor: css('--color-interactive-secondary-hover'),
+        },
+        '&:hover': {
+          backgroundColor: css('--color-interactive-secondary-hover'),
+        },
       },
       '.surface-inverse': {
         backgroundColor: css('--color-surface-inverse'),
@@ -50,10 +58,6 @@ const temporal = plugin(
       },
       '.surface-table': {
         backgroundColor: css('--color-surface-table'),
-        color: css('--color-text-inverse'),
-      },
-      '.surface-error': {
-        backgroundColor: css('--color-surface-error'),
         color: css('--color-text-inverse'),
       },
       '.surface-warning': {
@@ -70,25 +74,27 @@ const temporal = plugin(
     theme: {
       colors: {
         ...colors,
-        brand: css('--color-brand'),
+        brand: css('--color-surface-brand'),
       },
       backgroundColor: ({ theme }) => ({
         ...theme('colors'),
 
-        primary: css('--color-primary'),
-        secondary: css('--color-secondary'),
-        inverse: css('--color-inverse'),
-        subtle: css('--color-subtle'),
+        primary: css('--color-surface-primary'),
+        secondary: css('--color-surface-secondary'),
+        inverse: css('--color-surface-inverse'),
+        subtle: css('--color-surface-subtle'),
 
         badge: css('--color-surface-badge'),
 
-        interactive: css('--color-interactive'),
+        interactive: css('--color-interactive-surface'),
         'interactive-hover': css('--color-interactive-hover'),
         'interactive-active': css('--color-interactive-active'),
-        'interactive-error': css('--color-interactive-error'),
-        'interactive-required': css('--color-interactive-error'),
+        'interactive-error': css('--color-interactive-danger-surface'),
 
-        error: css('--color-surface-error'),
+        'interactive-secondary-active': css(
+          '--color-interactive-secondary-active',
+        ),
+
         information: css('--color-surface-information'),
         success: css('--color-surface-success'),
         warning: css('--color-surface-warning'),
@@ -101,7 +107,7 @@ const temporal = plugin(
         primary: css('--color-border-primary'),
         secondary: css('--color-border-secondary'),
         subtle: css('--color-border-subtle'),
-        interactive: css('--color-interactive'),
+        interactive: css('--color-interactive-surface'),
         'interactive-hover': css('--color-interactive-hover'),
         'interactive-secondary': css('--color-border-interactive-secondary'),
         inverse: css('--color-border-inverse'),
@@ -119,7 +125,7 @@ const temporal = plugin(
         primary: css('--color-border-primary'),
         secondary: css('--color-border-secondary'),
         subtle: css('--color-border-subtle'),
-        interactive: css('--color-interactive'),
+        interactive: css('--color-interactive-surface'),
         'interactive-hover': css('--color-interactive-hover'),
         'interactive-secondary': css('--color-border-interactive-secondary'),
         inverse: css('--color-border-inverse'),
@@ -158,7 +164,7 @@ const temporal = plugin(
       outlineColor: ({ theme }) => ({
         ...theme('colors'),
 
-        interactive: css('--color-interactive'),
+        interactive: css('--color-interactive-surface'),
       }),
       boxShadowColor: ({ theme }) => ({
         ...theme('colors'),

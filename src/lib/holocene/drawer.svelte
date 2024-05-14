@@ -69,7 +69,7 @@
     }
 
     &.dark {
-      @apply bg-inverse text-white;
+      @apply bg-black text-offWhite;
     }
   }
 

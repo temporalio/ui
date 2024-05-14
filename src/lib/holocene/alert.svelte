@@ -87,7 +87,7 @@
   }
 
   .alert.error {
-    @apply border-error bg-error;
+    @apply border-error bg-danger;
   }
 
   .alert.warning {
