@@ -1,5 +1,7 @@
 import { get } from 'svelte/store';
 
+import { temporal } from '@temporalio/proto';
+
 import { Action } from '$lib/models/workflow-actions';
 import { getAuthUser } from '$lib/stores/auth-user';
 import { inProgressBatchOperation } from '$lib/stores/batch-operations';
@@ -26,6 +28,8 @@ import type {
   ListBatchOperationsResponse,
 } from '$types/batch';
 import type { WorkflowExecution } from '$types/workflows';
+
+const ResetType = temporal.api.enums.v1.ResetType;
 
 type CreateBatchOperationOptions = {
   namespace: string;
@@ -75,8 +79,18 @@ const batchActionToOperation = (
         resetType === 'first'
           ? { firstWorkflowTask: {} }
           : { lastWorkflowTask: {} };
+
       return {
-        resetOperation: { identity, options },
+        resetOperation: {
+          identity,
+          // options is a new field for server versions 1.23 and later
+          options,
+          // resetType is a deprecated field for server versions 1.23 and earlier
+          resetType:
+            resetType === 'first'
+              ? ResetType.RESET_TYPE_FIRST_WORKFLOW_TASK
+              : ResetType.RESET_TYPE_LAST_WORKFLOW_TASK,
+        },
       };
     }
   }
