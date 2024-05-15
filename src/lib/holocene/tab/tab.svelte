@@ -64,7 +64,7 @@
 
 <style lang="postcss">
   .tab {
-    @apply flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 text-sm font-medium outline-none hover:text-brand focus-visible:rounded-sm focus-visible:ring-4 focus-visible:ring-primary/70 dark:text-secondary dark:hover:text-brand;
+    @apply flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 text-sm font-medium outline-none hover:text-brand focus-visible:rounded-sm focus-visible:ring-4 focus-visible:ring-primary/70;
 
     border-color: transparent;
   }
@@ -74,7 +74,7 @@
   }
 
   .tab.disabled {
-    @apply cursor-not-allowed text-slate-800 opacity-50;
+    @apply cursor-not-allowed text-disabled opacity-50;
   }
 
   .tab.disabled:hover {

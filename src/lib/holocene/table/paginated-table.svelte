@@ -168,7 +168,7 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply surface-table h-10 text-inverse;
+      @apply surface-table h-10 text-offWhite;
     }
 
     :global(tr > th) {

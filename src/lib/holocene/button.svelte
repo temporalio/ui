@@ -49,7 +49,7 @@
           ghost:
             'border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:border-white dark:hover:border-black dark:focus-visible:border-black focus-visible:ring-4 focus-visible:ring-primary/70 focus-visible:surface-interactive-secondary ',
           'table-header':
-            'border-inverse surface-table hover:surface-primary focus-visible:ring-4 focus-visible:border-white',
+            'border-transparent bg-transparent focus-visible:ring-4 focus-visible:ring-primary/70 text-offWhite',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',
