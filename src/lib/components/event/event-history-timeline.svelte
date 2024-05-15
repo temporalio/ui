@@ -453,11 +453,11 @@
       .vis-item.vis-range.Started,
       .vis-item.vis-range.Initiated
     ) {
-    background-color: #dbeafe;
-    border-color: #1d4ed8;
+    background-color: #8098f9;
+    border-color: #2f34a4;
     border-radius: 9999px;
     border-width: 2px;
-    color: #1d4ed8;
+    color: #000;
   }
 
   :global(
@@ -467,7 +467,7 @@
       .vis-item.vis-point.Started,
       .vis-item.vis-point.Initiated
     ) {
-    color: #1d4ed8;
+    color: #2f34a4;
   }
 
   :global(.vis-item.vis-range.workflow.Running) {

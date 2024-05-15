@@ -40,7 +40,7 @@
 
 <style lang="postcss">
   .heart-beat {
-    @apply relative flex items-center justify-center bg-blue-100 text-center;
+    @apply relative flex items-center justify-center bg-indigo-400 text-center;
   }
 
   .heart-rate {
@@ -52,7 +52,7 @@
   }
 
   .fade-in {
-    @apply absolute right-0 top-0 h-full w-full bg-blue-100;
+    @apply absolute right-0 top-0 h-full w-full bg-indigo-400;
 
     animation: heartRateIn 2s linear infinite;
     animation-delay: var(--animation-delay, 0);
@@ -65,35 +65,35 @@
     left: 0;
     animation: heartRateOut 2s linear infinite;
     animation-delay: var(--animation-delay, 0);
-    background: rgb(219 234 254);
+    background: rgb(128 152 249);
     background: linear-gradient(
       to left,
-      rgb(219 234 254) 0%,
-      rgb(219 234 254) 50%,
+      rgb(128 152 249) 0%,
+      rgb(128 152 249) 50%,
       rgb(255 255 255 / 0%) 100%
     );
     background: linear-gradient(
       to left,
-      rgb(219 234 254) 0%,
-      rgb(219 234 254) 50%,
+      rgb(128 152 249) 0%,
+      rgb(128 152 249) 50%,
       rgb(255 255 255 / 0%) 100%
     );
     background: linear-gradient(
       to left,
-      rgb(219 234 254) 0%,
-      rgb(219 234 254) 50%,
+      rgb(128 152 249) 0%,
+      rgb(128 152 249) 50%,
       rgb(255 255 255 / 0%) 100%
     );
     background: linear-gradient(
       to left,
-      rgb(219 234 254) 0%,
-      rgb(219 234 254) 50%,
+      rgb(128 152 249) 0%,
+      rgb(128 152 249) 50%,
       rgb(255 255 255 / 0%) 100%
     );
     background: linear-gradient(
       to right,
-      rgb(219 234 254) 0%,
-      rgb(219 234 254) 80%,
+      rgb(128 152 249) 0%,
+      rgb(128 152 249) 80%,
       rgb(255 255 255 / 0%) 100%
     );
   }
