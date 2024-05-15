@@ -90,7 +90,7 @@
 
 <div class={merge('flex flex-col gap-1', className)} data-testid={testId}>
   <Label {required} {label} hidden={labelHidden} for={id} />
-  <div class="input-group flex rounded">
+  <div class="input-group flex rounded-lg">
     <slot name="before-input" {disabled} />
     <div
       class="input-container"
@@ -98,7 +98,7 @@
       class:error
       class:noBorder
       class:unroundLeft={unroundLeft || $$slots['before-input']}
-      class:unroundRight={unroundRight || $$slots['after-input'] || suffix}
+      class:unroundRight={unroundRight || $$slots['after-input']}
       class:invalid={!valid}
       data-testid="{testId}-input-container"
     >
@@ -185,7 +185,7 @@
 <style lang="postcss">
   /* Base styles */
   .input-container {
-    @apply surface-input relative box-border inline-flex h-10 w-full items-center rounded border border-subtle text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply surface-input relative box-border inline-flex h-10 w-full items-center rounded-lg border-2 border-subtle text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     &.error,
     &.invalid {
@@ -197,12 +197,12 @@
     }
 
     &.disabled {
-      @apply surface-disabled border-subtle;
+      @apply opacity-50;
     }
   }
 
   .input {
-    @apply m-2 w-full bg-transparent focus:outline-none enabled:placeholder:text-subtle disabled:text-disabled disabled:placeholder:text-disabled;
+    @apply m-2 w-full bg-transparent placeholder:text-subtle focus:outline-none;
   }
 
   .suffix {

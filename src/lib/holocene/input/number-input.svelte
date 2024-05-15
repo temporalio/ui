@@ -85,7 +85,7 @@
   }
 
   .input-container {
-    @apply surface-primary relative box-border flex h-10 w-16 items-center rounded border border-subtle text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70 dark:bg-transparent;
+    @apply surface-primary relative box-border flex h-10 w-16 items-center rounded-lg border-2 border-subtle text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
   }
 
   .input-container.search {
@@ -105,7 +105,7 @@
   }
 
   .input-container.disabled {
-    @apply surface-disabled;
+    @apply opacity-50;
   }
 
   .unroundRight {

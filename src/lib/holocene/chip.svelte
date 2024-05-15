@@ -36,7 +36,7 @@
 
 <style lang="postcss">
   .chip {
-    @apply surface-subtle flex h-8 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-md border border-subtle p-1 text-sm;
+    @apply surface-subtle flex h-8 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-md p-1 text-sm;
 
     :global(.icon-button) {
       @apply ml-1 h-auto w-fit;
@@ -44,6 +44,6 @@
   }
 
   .warning {
-    @apply border-red-700 bg-red-50 text-red-700;
+    @apply bg-danger;
   }
 </style>
