@@ -198,17 +198,8 @@ export const variables = {
     light: 'indigo.600',
     dark: 'indigo.600',
   },
-  // Shadow
-  '--color-shadow-primary': {
-    light: 'indigo.600',
-    dark: 'indigo.600',
-  },
-  '--color-shadow-secondary': {
-    light: 'indigo.500',
-    dark: 'indigo.500',
-  },
-  '--color-shadow-danger': {
-    light: 'red.200',
+  '--color-border-focus-danger': {
+    light: 'red.600',
     dark: 'red.600',
   },
 } as const satisfies ColorVariables;

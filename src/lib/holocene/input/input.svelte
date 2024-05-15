@@ -91,7 +91,7 @@
 <div class={merge('flex flex-col gap-1', className)} data-testid={testId}>
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div
-    class="input-group flex rounded focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none"
+    class="input-group flex rounded focus-within:shadow-focus focus-within:outline-none"
   >
     <slot name="before-input" {disabled} />
     <div

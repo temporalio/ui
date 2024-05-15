@@ -85,7 +85,7 @@
   }
 
   .input-container {
-    @apply surface-primary relative box-border flex h-10 w-16 items-center rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
+    @apply surface-primary relative box-border flex h-10 w-16 items-center rounded border border-subtle text-sm focus-within:shadow-focus focus-within:outline-none dark:bg-transparent;
   }
 
   .input-container.search {
