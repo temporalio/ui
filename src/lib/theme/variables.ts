@@ -159,39 +159,31 @@ export const variables = {
   },
   // Border
   '--color-border-primary': {
-    light: 'black',
-    dark: 'slate.600',
+    light: 'spaceBlack',
+    dark: 'slate.400',
   },
   '--color-border-secondary': {
-    light: 'slate.200',
+    light: 'slate.300',
     dark: 'slate.700',
   },
   '--color-border-subtle': {
-    light: 'slate.300',
+    light: 'slate.200',
     dark: 'slate.800',
   },
   '--color-border-table': {
-    light: 'black',
+    light: 'spaceBlack',
     dark: 'slate.900',
   },
   '--color-border-inverse': {
     light: 'offWhite',
-    dark: 'black',
-  },
-  '--color-border-disabled': {
-    light: 'slate.300',
-    dark: 'slate.100',
-  },
-  '--color-border-error': {
-    light: 'red.500',
-    dark: 'red.700',
+    dark: 'spaceBlack',
   },
   '--color-border-information': {
-    light: 'blue.800',
-    dark: 'blue.700',
+    light: 'indigo.600',
+    dark: 'indigo.500',
   },
   '--color-border-success': {
-    light: 'green.800',
+    light: 'green.600',
     dark: 'green.700',
   },
   '--color-border-warning': {
@@ -199,16 +191,8 @@ export const variables = {
     dark: 'yellow.700',
   },
   '--color-border-danger': {
-    light: 'red.300',
-    dark: 'red.300',
-  },
-  '--color-border-interactive': {
-    light: 'indigo.600',
-    dark: 'indigo.600',
-  },
-  '--color-border-interactive-secondary': {
-    light: 'slate.100',
-    dark: 'slate.800',
+    light: 'red.500',
+    dark: 'red.400',
   },
   '--color-border-focus-info': {
     light: 'indigo.600',

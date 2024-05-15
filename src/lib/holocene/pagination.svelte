@@ -285,7 +285,7 @@
   }
 
   .arrow-left-disabled {
-    @apply border-b-transparent border-l-transparent border-r-disabled border-t-transparent;
+    @apply opacity-50;
   }
 
   .arrow-right {
@@ -295,6 +295,6 @@
   }
 
   .arrow-right-disabled {
-    @apply border-b-transparent border-l-disabled border-r-transparent border-t-transparent;
+    @apply opacity-50;
   }
 </style>

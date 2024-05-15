@@ -101,7 +101,7 @@
   }
 
   .input-container.invalid {
-    @apply border-error focus-within:shadow-danger/50;
+    @apply border-danger focus-within:shadow-danger/50;
   }
 
   .input-container.disabled {

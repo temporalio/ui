@@ -191,7 +191,7 @@
 
     &.error,
     &.invalid {
-      @apply border-error focus-within:shadow-danger/50;
+      @apply border-danger focus-within:shadow-danger/50;
 
       > .input {
         @apply caret-danger;
