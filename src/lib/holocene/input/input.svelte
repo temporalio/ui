@@ -90,9 +90,7 @@
 
 <div class={merge('flex flex-col gap-1', className)} data-testid={testId}>
   <Label {required} {label} hidden={labelHidden} for={id} />
-  <div
-    class="input-group flex rounded focus-within:shadow-focus focus-within:outline-none"
-  >
+  <div class="input-group flex rounded">
     <slot name="before-input" {disabled} />
     <div
       class="input-container"
@@ -187,11 +185,11 @@
 <style lang="postcss">
   /* Base styles */
   .input-container {
-    @apply surface-input relative box-border inline-flex h-10 w-full items-center rounded border border-subtle text-sm;
+    @apply surface-input relative box-border inline-flex h-10 w-full items-center rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/70 focus-within:outline-none;
 
     &.error,
     &.invalid {
-      @apply border-danger focus-within:shadow-danger/50;
+      @apply border-danger focus-within:shadow-danger/70;
 
       > .input {
         @apply caret-red-700;

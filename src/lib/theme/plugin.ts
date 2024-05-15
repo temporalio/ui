@@ -169,8 +169,8 @@ const temporal = plugin(
       boxShadowColor: ({ theme }) => ({
         ...theme('colors'),
 
+        primary: css('--color-border-focus-info'),
         danger: css('--color-border-focus-danger'),
-        focus: css('--color-border-focus-info'),
       }),
     },
   },
