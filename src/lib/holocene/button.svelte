@@ -41,15 +41,15 @@
       variants: {
         variant: {
           primary:
-            'bg-interactive border-interactive text-white hover:text-white hover:bg-interactive-hover hover:border-interactive-hover focus-visible:bg-interactive-hover focus-visible:border-white dark:focus-visible:border-black focus-visible:shadow-focus shadow-primary/70',
+            'bg-interactive border-interactive text-white hover:text-white hover:bg-interactive-hover hover:border-interactive-hover focus-visible:bg-interactive-hover focus-visible:border-white dark:focus-visible:border-black focus-visible:ring-4 focus-visible:ring-primary/70',
           secondary:
-            'border-subtle surface-primary focus-visible:shadow-focus focus-visible:shadow-primary/70 active:bg-interactive-secondary-active hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse',
+            'border-subtle surface-primary focus-visible:ring-4 focus-visible:ring-primary/70 active:bg-interactive-secondary-active hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse',
           destructive:
-            'border-danger bg-danger text-primary hover:bg-red-400 hover:border-red-400 focus-visible:shadow-focus focus-visible:shadow-danger/70 focus-visible:bg-red-40 focus-visible:border-white dark:focus-visible:border-black ',
+            'border-danger bg-danger text-primary hover:bg-red-400 hover:border-red-400 focus-visible:ring-4 focus-visible:ring-danger/70 focus-visible:bg-red-40 focus-visible:border-white dark:focus-visible:border-black ',
           ghost:
-            'border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:border-white dark:hover:border-black dark:focus-visible:border-black focus-visible:shadow-focus focus-visible:shadow-primary/70 focus-visible:surface-interactive-secondary ',
+            'border-transparent bg-transparent text-primary hover:surface-interactive-secondary focus-visible:border-white dark:hover:border-black dark:focus-visible:border-black focus-visible:ring-4 focus-visible:ring-primary/70 focus-visible:surface-interactive-secondary ',
           'table-header':
-            'border-inverse surface-table hover:surface-primary focus-visible:shadow-focus focus-visible:border-white',
+            'border-inverse surface-table hover:surface-primary focus-visible:ring-4 focus-visible:border-white',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',

@@ -144,7 +144,7 @@
 
 <style lang="postcss">
   .input-container {
-    @apply surface-primary flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-subtle p-2 text-sm text-primary ring-inset ring-interactive focus-within:border-interactive focus-within:ring-2;
+    @apply surface-primary flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-subtle p-2 text-sm text-primary focus-within:border-interactive focus-within:ring-4 focus-within:ring-primary/70;
 
     .invalid {
       @apply border-red-700;

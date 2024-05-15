@@ -185,11 +185,11 @@
 <style lang="postcss">
   /* Base styles */
   .input-container {
-    @apply surface-input relative box-border inline-flex h-10 w-full items-center rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/70 focus-within:outline-none;
+    @apply surface-input relative box-border inline-flex h-10 w-full items-center rounded border border-subtle text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     &.error,
     &.invalid {
-      @apply border-danger focus-within:shadow-danger/70;
+      @apply border-danger focus-within:ring-danger/70;
 
       > .input {
         @apply caret-red-700;

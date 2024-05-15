@@ -60,7 +60,7 @@
 
 <style lang="postcss">
   .link {
-    @apply max-w-fit cursor-pointer items-center gap-2 rounded text-primary underline underline-offset-2 hover:text-brand focus-visible:text-brand focus-visible:shadow-focus focus-visible:shadow-primary/70 focus-visible:outline-none;
+    @apply max-w-fit cursor-pointer items-center gap-2 rounded text-primary underline underline-offset-2 hover:text-brand focus-visible:text-brand focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70;
 
     &.active {
       @apply text-brand;

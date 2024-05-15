@@ -345,10 +345,10 @@
   }
 
   .combobox-wrapper {
-    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border border-primary text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:shadow-focus focus-within:shadow-primary/70 focus-within:outline-none;
+    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border border-primary text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     &.invalid {
-      @apply border-2 border-danger text-danger focus-within:shadow-danger/70;
+      @apply border-2 border-danger text-danger focus-within:ring-danger/70;
     }
 
     &.disabled {

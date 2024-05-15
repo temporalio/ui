@@ -125,17 +125,8 @@ const temporal = plugin(
         DEFAULT: css('--color-border-primary'),
       }),
       ringColor: {
-        primary: css('--color-border-primary'),
-        secondary: css('--color-border-secondary'),
-        subtle: css('--color-border-subtle'),
-        interactive: css('--color-interactive-surface'),
-        'interactive-hover': css('--color-interactive-hover'),
-        inverse: css('--color-border-inverse'),
-        table: css('--color-border-table'),
-        information: css('--color-border-information'),
-        success: css('--color-border-success'),
-        warning: css('--color-border-warning'),
-        danger: css('--color-border-danger'),
+        primary: css('--color-border-focus-info'),
+        danger: css('--color-border-focus-danger'),
       },
       textColor: ({ theme }) => ({
         ...theme('colors'),
@@ -165,12 +156,6 @@ const temporal = plugin(
         ...theme('colors'),
 
         interactive: css('--color-interactive-surface'),
-      }),
-      boxShadowColor: ({ theme }) => ({
-        ...theme('colors'),
-
-        primary: css('--color-border-focus-info'),
-        danger: css('--color-border-focus-danger'),
       }),
     },
   },
