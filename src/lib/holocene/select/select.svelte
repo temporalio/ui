@@ -113,7 +113,6 @@
         {id}
         value={!value && placeholder !== '' ? placeholder : $labelCtx}
         tabindex="-1"
-        class="select-input"
         disabled
         class:disabled
         {...$$restProps}
@@ -129,7 +128,7 @@
 </MenuContainer>
 
 <style lang="postcss">
-  .select-input {
+  input {
     @apply pointer-events-none w-full bg-transparent;
   }
 </style>

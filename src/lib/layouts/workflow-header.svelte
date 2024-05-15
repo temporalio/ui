@@ -3,7 +3,6 @@
 
   import { page } from '$app/stores';
 
-  import StartWorkflowButton from '$lib/components/workflow/start-workflow-button.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import WorkflowVersioningHeader from '$lib/components/workflow-versioning-header.svelte';
@@ -92,12 +91,6 @@
         </Link>
       {/if}
     </div>
-    <StartWorkflowButton
-      {namespace}
-      workflowId={workflow?.id}
-      taskQueue={workflow?.taskQueue}
-      workflowType={workflow?.name}
-    />
   </div>
   <header class="rounded-top flex flex-col gap-0">
     <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">

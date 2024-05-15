@@ -6,6 +6,7 @@
   import { page } from '$app/stores';
 
   import StartWorkflowInputUpload from '$lib/components/workflow/start-workflow-input-upload.svelte';
+  import StartWorkflowSearchAttributes from '$lib/components/workflow/start-workflow-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -18,6 +19,7 @@
     fetchInputForStartWorkflow,
     startWorkflow,
   } from '$lib/services/workflow-service';
+  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
   import { pluralize } from '$lib/utilities/pluralize';
   import {
     routeForTaskQueue,
@@ -31,12 +33,13 @@
   let taskQueue = '';
   let workflowType = '';
   let input = '';
+  let inputRetrieved = 0;
 
   let error = '';
   let pollerCount: undefined | number = undefined;
   let viewAdvancedOptions = false;
 
-  let searchAttributes = '';
+  let searchAttributes: SearchAttributeInput[] = [];
 
   onMount(() => {
     workflowId = $page.url.searchParams.get('workflowId') || '';
@@ -57,6 +60,7 @@
         taskQueue,
         workflowType,
         input,
+        searchAttributes,
       });
       setTimeout(() => {
         goto(routeForWorkflows({ namespace }));
@@ -82,13 +86,12 @@
   };
 
   $: getPreviousInput = async () => {
-    console.log('WorkflowType: ', workflowType);
-    console.log('WorkflowID: ', workflowId);
     input = await fetchInputForStartWorkflow({
       namespace,
       workflowType,
       workflowId,
     });
+    inputRetrieved = Date.now();
   };
 
   const onInputChange = (e: Event, parameter: string) => {
@@ -103,12 +106,13 @@
 
   const onInputUpload = (uploadInput: string) => {
     input = uploadInput;
+    inputRetrieved = Date.now();
   };
 
   $: enableStart = !!workflowId && !!taskQueue && !!workflowType;
 </script>
 
-<div class="flex w-full flex-col items-center">
+<div class="flex w-full flex-col items-center pb-24">
   <div class="flex w-full flex-col gap-4 lg:w-2/3 2xl:w-1/2">
     <h1 class="mb-4 overflow-hidden text-base font-medium lg:text-2xl">
       Start a Workflow
@@ -120,10 +124,10 @@
         bind:value={workflowId}
         label="Workflow ID"
         class="grow"
-        on:input={(e) => onInputChange(e, 'workflowId')}
+        on:blur={(e) => onInputChange(e, 'workflowId')}
       />
       <Button
-        class="mt-5"
+        class="mt-6"
         variant="secondary"
         on:click={generateRandomWorkflowId}>Generate</Button
       >
@@ -135,10 +139,10 @@
         bind:value={taskQueue}
         label="Task Queue"
         class="grow"
-        on:input={(e) => onInputChange(e, 'taskQueue')}
+        on:blur={(e) => onInputChange(e, 'taskQueue')}
       />
       <Button
-        class="mt-5"
+        class="mt-6"
         variant="secondary"
         disabled={!taskQueue}
         on:click={checkTaskQueue}>Check Status</Button
@@ -168,7 +172,7 @@
       required
       bind:value={workflowType}
       label="Workflow Type"
-      on:input={(e) => onInputChange(e, 'workflowType')}
+      on:blur={(e) => onInputChange(e, 'workflowType')}
     />
     <div class="flex w-full items-end justify-between">
       <Label for="workflow-input" label={translate('workflows.input')} />
@@ -181,7 +185,7 @@
         >
       </div>
     </div>
-    {#key input}
+    {#key inputRetrieved}
       <CodeBlock
         id="workflow-input"
         minHeight={120}
@@ -191,11 +195,15 @@
         copyable={false}
       />
     {/key}
+    {#if viewAdvancedOptions}
+      <StartWorkflowSearchAttributes bind:attributesToAdd={searchAttributes} />
+    {/if}
     <div class="mt-4 flex w-full justify-between">
       <Button
         variant="ghost"
+        trailingIcon={viewAdvancedOptions ? 'chevron-up' : 'chevron-down'}
         on:click={() => (viewAdvancedOptions = !viewAdvancedOptions)}
-        >Advanced Options</Button
+        >More options</Button
       >
       <Button disabled={!enableStart} on:click={onWorkflowStart}
         >Start Workflow</Button
@@ -203,14 +211,6 @@
     </div>
     {#if error}
       <Alert intent="error" title={error} />
-    {/if}
-    {#if viewAdvancedOptions}
-      <Input
-        id="searchAttributes"
-        bind:value={searchAttributes}
-        label="Search Attributes"
-        on:input={(e) => onInputChange(e, 'searchAttributes')}
-      />
     {/if}
   </div>
 </div>

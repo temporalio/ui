@@ -10,12 +10,14 @@ import {
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
 import { authUser } from '$lib/stores/auth-user';
+import type { SearchAttributeInput } from '$lib/stores/search-attributes';
 import { canFetchChildWorkflows } from '$lib/stores/workflows';
 import type { ResetWorkflowRequest } from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
   ValidWorkflowParameters,
 } from '$lib/types/api';
+import type { Payload, WorkflowExecutionStartedEvent } from '$lib/types/events';
 import type {
   NamespaceScopedRequest,
   NetworkError,
@@ -30,7 +32,10 @@ import {
   cloneAllPotentialPayloadsWithCodec,
   type PotentiallyDecodable,
 } from '$lib/utilities/decode-payload';
-import { encodePayloads } from '$lib/utilities/encode-payload';
+import {
+  encodePayloads,
+  setBase64Payload,
+} from '$lib/utilities/encode-payload';
 import {
   handleUnauthorizedOrForbiddenError,
   isForbidden,
@@ -68,12 +73,14 @@ type SignalWorkflowOptions = {
   name: string;
   input: string;
 };
+
 type StartWorkflowOptions = {
   namespace: string;
   workflowId: string;
   taskQueue: string;
   workflowType: string;
   input: string;
+  searchAttributes: SearchAttributeInput[];
 };
 
 type TerminateWorkflowOptions = {
@@ -416,19 +423,42 @@ export async function fetchAllChildWorkflows(
   }
 }
 
+const setSearchAttributes = (
+  attributes: SearchAttributeInput[],
+): Record<string, Payload> => {
+  if (!attributes.length) return {};
+
+  const searchAttributes: Record<string, Payload> = {};
+  attributes.forEach((attribute) => {
+    searchAttributes[attribute.attribute] = setBase64Payload(attribute.value);
+  });
+
+  return searchAttributes;
+};
+
 export async function startWorkflow({
   namespace,
   workflowId,
   taskQueue,
   workflowType,
   input,
+  searchAttributes,
 }: StartWorkflowOptions) {
   const route = routeForApi('workflow', {
     namespace,
     workflowId,
   });
-  const payloads = (await encodePayloads(input)) || [];
-  const body = {
+  let payloads;
+
+  if (input) {
+    try {
+      payloads = await encodePayloads(input);
+    } catch (_) {
+      console.error('Could not decode input for starting workflow');
+    }
+  }
+
+  const body = stringifyWithBigInt({
     workflowId,
     taskQueue: {
       name: taskQueue,
@@ -436,16 +466,22 @@ export async function startWorkflow({
     workflowType: {
       name: workflowType,
     },
-    input: {
-      payloads,
-    },
-  };
+    input: payloads ? { payloads } : null,
+    searchAttributes:
+      searchAttributes.length === 0
+        ? null
+        : {
+            indexedFields: {
+              ...setSearchAttributes(searchAttributes),
+            },
+          },
+  });
 
   return requestFromAPI(route, {
     notifyOnError: false,
     options: {
       method: 'POST',
-      body: stringifyWithBigInt(body),
+      body,
     },
   });
 }
@@ -473,11 +509,11 @@ export const fetchInputForStartWorkflow = async ({
       query = `WorkflowId = "${workflowId}"`;
     }
 
-    const route = routeForApi('workflows', { namespace, query });
+    const route = routeForApi('workflows', { namespace });
     const workflows = await requestFromAPI<ListWorkflowExecutionsResponse>(
       route,
       {
-        params: { pageSize: '1' },
+        params: { query, pageSize: '1' },
         handleError,
       },
     );
@@ -488,8 +524,10 @@ export const fetchInputForStartWorkflow = async ({
       workflowId: workflow.execution?.workflowId,
       runId: workflow.execution?.runId,
     });
+
+    const startEvent = firstEvent as WorkflowExecutionStartedEvent;
     const convertedAttributes = (await cloneAllPotentialPayloadsWithCodec(
-      firstEvent?.attributes?.input,
+      startEvent?.attributes?.input,
       namespace,
       get(page).data.settings,
       get(authUser).accessToken,

@@ -3,6 +3,7 @@
     label: string;
     value: T;
     description?: string;
+    disabled?: boolean;
   }
 
   export const EMPTY_OPTION: OptionType<string> = {
@@ -32,6 +33,7 @@
 
   export let value: T;
   export let description = '';
+  export let disabled = false;
 
   let selected = false;
   let _value: T | string;
@@ -68,7 +70,13 @@
   };
 </script>
 
-<MenuItem on:click={handleOptionClick} role="option" {selected} {description}>
+<MenuItem
+  on:click={handleOptionClick}
+  role="option"
+  {selected}
+  {description}
+  {disabled}
+>
   <slot name="leading" slot="leading" />
   <span bind:this={slotWrapper}>
     <slot />
