@@ -20,6 +20,7 @@
         control: 'radio',
         options: ['bottom', 'right'],
       },
+      title: { name: 'Title', control: 'text' },
       dark: { name: 'Dark', control: 'boolean' },
       onClick: { control: false, table: { disable: true } },
       closePadding: { control: 'boolean', table: { disable: true } },
@@ -33,7 +34,7 @@
 
       open: { table: { disable: true } },
     },
-  } satisfies Meta<Drawer>;
+  } satisfies Meta<Drawer['$$prop_def'] & { title: string }>;
 </script>
 
 <script lang="ts">
