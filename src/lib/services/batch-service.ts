@@ -1,7 +1,5 @@
 import { get } from 'svelte/store';
 
-import { temporal } from '@temporalio/proto';
-
 import { Action } from '$lib/models/workflow-actions';
 import { getAuthUser } from '$lib/stores/auth-user';
 import { inProgressBatchOperation } from '$lib/stores/batch-operations';
@@ -29,7 +27,11 @@ import type {
 } from '$types/batch';
 import type { WorkflowExecution } from '$types/workflows';
 
-const ResetType = temporal.api.enums.v1.ResetType;
+// https://github.com/temporalio/api/blob/master/temporal/api/enums/v1/reset.proto
+enum ResetType {
+  RESET_TYPE_FIRST_WORKFLOW_TASK = 1,
+  RESET_TYPE_LAST_WORKFLOW_TASK = 2,
+}
 
 type CreateBatchOperationOptions = {
   namespace: string;
