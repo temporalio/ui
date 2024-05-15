@@ -20,7 +20,6 @@
         control: 'radio',
         options: ['bottom', 'right'],
       },
-      title: { name: 'Title', control: 'text' },
       dark: { name: 'Dark', control: 'boolean' },
       onClick: { control: false, table: { disable: true } },
       closePadding: { control: 'boolean', table: { disable: true } },
