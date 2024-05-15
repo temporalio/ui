@@ -194,7 +194,7 @@
       @apply border-danger focus-within:shadow-danger/50;
 
       > .input {
-        @apply caret-danger;
+        @apply caret-red-700;
       }
     }
 

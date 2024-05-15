@@ -145,11 +145,6 @@ export const palette = {
 } as const satisfies Record<string, Shades>;
 
 export const colors = {
-  // primary, secondary, danger, and success should be removed at some point
-  primary: '#141414',
-  secondary: palette['slate'][500],
-  danger: palette['red'][700],
-  success: palette['green'][200],
   white: '#FFFFFF',
   offWhite: '#F8FAFC',
   black: '#000000',

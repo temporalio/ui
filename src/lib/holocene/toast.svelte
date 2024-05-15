@@ -12,7 +12,7 @@
   const variants: Readonly<Record<ToastVariant, string>> = {
     primary: 'surface-inverse',
     success: 'bg-success text-success',
-    error: 'bg-danger text-error',
+    error: 'bg-danger text-danger',
     info: 'bg-information text-information',
     warning: 'bg-warning text-warning',
   };

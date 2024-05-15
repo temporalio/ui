@@ -146,7 +146,7 @@ const temporal = plugin(
         inverse: css('--color-text-inverse'),
         brand: css('--color-text-brand'),
 
-        error: css('--color-text-danger'),
+        danger: css('--color-text-danger'),
         information: css('--color-text-information'),
         success: css('--color-text-success'),
         warning: css('--color-text-warning'),

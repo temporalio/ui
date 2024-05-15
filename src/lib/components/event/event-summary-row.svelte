@@ -201,7 +201,7 @@
   }
 
   .failure .event-name {
-    @apply text-error;
+    @apply text-danger;
   }
 
   .canceled {
