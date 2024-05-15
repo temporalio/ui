@@ -20,24 +20,13 @@
 
 <button
   type="button"
-  class={merge('icon-button', className)}
+  class={merge(
+    'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-[transparent] text-primary outline-none hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-indigo-600 disabled:cursor-not-allowed disabled:opacity-50',
+    className,
+  )}
   on:click|stopPropagation
   aria-label={label}
   {...$$restProps}
 >
   <Icon name={icon} />
 </button>
-
-<style lang="postcss">
-  .icon-button {
-    @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-[transparent];
-
-    &:not(:disabled) {
-      @apply text-primary outline-none hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-indigo-600;
-    }
-
-    &:disabled {
-      @apply cursor-not-allowed opacity-50;
-    }
-  }
-</style>
