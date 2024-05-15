@@ -12,9 +12,6 @@
       text: 'This is a tooltip',
       show: true,
       hide: false,
-      copyable: false,
-      copyIconTitle: 'Click to copy content',
-      copySuccessIconTitle: 'Content copied to clipboard',
     },
     argTypes: {
       text: { name: 'Content', control: 'text' },
@@ -70,21 +67,6 @@
         control: 'boolean',
         table: { category: 'Positioning' },
       },
-      copyable: {
-        name: 'Copyable',
-        control: 'boolean',
-        table: { category: 'Copying' },
-      },
-      copyIconTitle: {
-        name: 'Copy Icon Title',
-        control: 'text',
-        table: { category: 'Copying' },
-      },
-      copySuccessIconTitle: {
-        name: 'Copy Icon Success Title',
-        control: 'text',
-        table: { category: 'Copying' },
-      },
     },
   } satisfies Meta<Omit<Tooltip, 'copyIconTitle'>>;
 </script>
@@ -138,10 +120,6 @@
 <Story name="Right" args={{ right: true }} />
 
 <Story name="Right with Icon" args={{ right: true, icon: 'trash' }} />
-
-<Story name="Copyable" args={{ copyable: true }} />
-
-<Story name="Copyable with Icon" args={{ copyable: true, icon: 'trash' }} />
 
 <Story
   name="Top (Dark)"
@@ -236,17 +214,5 @@
 <Story
   name="Right with Icon (Dark)"
   args={{ right: true, icon: 'trash' }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Copyable (Dark)"
-  args={{ copyable: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Copyable with Icon (Dark)"
-  args={{ copyable: true, icon: 'trash' }}
   parameters={{ themes: { themeOverride: 'dark' } }}
 />
