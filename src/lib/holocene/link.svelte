@@ -60,14 +60,14 @@
 
 <style lang="postcss">
   .link {
-    @apply max-w-fit cursor-pointer items-center gap-2 rounded text-primary underline underline-offset-2 hover:text-active focus-visible:text-active focus-visible:shadow-focus focus-visible:shadow-indigo-600/50 focus-visible:outline-none;
+    @apply max-w-fit cursor-pointer items-center gap-2 rounded text-primary underline underline-offset-2 hover:text-brand focus-visible:text-brand focus-visible:shadow-focus focus-visible:outline-none;
 
     &.active {
-      @apply text-blue-900;
+      @apply text-brand;
     }
 
     &.inverse {
-      @apply text-white hover:text-indigo-400 focus-visible:text-indigo-400;
+      @apply text-inverse hover:text-brand focus-visible:text-brand;
     }
   }
 

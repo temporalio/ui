@@ -6,51 +6,60 @@ const light: Record<CSSVariable, RGB> = {};
 const dark: Record<CSSVariable, RGB> = {};
 
 export const variables = {
+  // Text
   '--color-text-black': {
-    light: 'black',
-    dark: 'black',
+    light: 'spaceBlack',
+    dark: 'spaceBlack',
+  },
+  '--color-text-white': {
+    light: 'offWhite',
+    dark: 'offWhite',
   },
   '--color-text-primary': {
-    light: 'primary',
+    light: 'spaceBlack',
     dark: 'offWhite',
   },
   '--color-text-secondary': {
-    light: 'secondary',
+    light: 'slate.900',
     dark: 'slate.200',
   },
   '--color-text-inverse': {
     light: 'offWhite',
-    dark: 'offWhite',
+    dark: 'spaceBlack',
   },
   '--color-text-subtle': {
-    light: 'slate.300',
-    dark: 'slate.200',
+    light: 'slate.700',
+    dark: 'slate.700',
+  },
+  '--color-text-danger': {
+    light: 'red.500',
+    dark: 'red.400',
+  },
+  '--color-text-information': {
+    light: 'indigo.600',
+    dark: 'indigo.500',
+  },
+  '--color-text-success': {
+    light: 'green.700',
+    dark: 'green.600',
+  },
+  '--color-text-warning': {
+    light: 'yellow.600',
+    dark: 'yellow.500',
+  },
+  '--color-text-pink': {
+    light: 'pink.500',
+    dark: 'pink.400',
+  },
+  '--color-text-brand': {
+    light: 'indigo.600',
+    dark: 'indigo.400',
   },
   '--color-text-disabled': {
     light: 'slate.500',
     dark: 'slate.100',
   },
-  '--color-text-error': {
-    light: 'red.700',
-    dark: 'red.100',
-  },
-  '--color-text-information': {
-    light: 'blue.700',
-    dark: 'blue.300',
-  },
-  '--color-text-success': {
-    light: 'green.700',
-    dark: 'green.100',
-  },
-  '--color-text-warning': {
-    light: 'yellow.500',
-    dark: 'yellow.300',
-  },
-  '--color-text-active': {
-    light: 'indigo.600',
-    dark: 'indigo.500',
-  },
-
+  // Surface
   '--color-surface-background': {
     light: 'offWhite',
     dark: 'spaceBlack',
@@ -107,6 +116,7 @@ export const variables = {
     light: 'slate.100',
     dark: 'slate.700',
   },
+  // Interactive
   '--color-interactive-surface': {
     light: 'indigo.600',
     dark: 'indigo.600',
@@ -147,7 +157,7 @@ export const variables = {
     light: 'slate.50',
     dark: 'slate.900',
   },
-
+  // Border
   '--color-border-primary': {
     light: 'black',
     dark: 'slate.600',
@@ -200,6 +210,11 @@ export const variables = {
     light: 'slate.100',
     dark: 'slate.800',
   },
+  '--color-border-focus-info': {
+    light: 'indigo.600',
+    dark: 'indigo.600',
+  },
+  // Shadow
   '--color-shadow-primary': {
     light: 'indigo.600',
     dark: 'indigo.600',

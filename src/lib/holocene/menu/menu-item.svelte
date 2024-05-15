@@ -159,7 +159,7 @@
     @apply flex cursor-pointer flex-row items-center gap-2 rounded border border-transparent font-primary text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:shadow-focus focus-visible:shadow-secondary focus-visible:outline-none dark:focus-visible:border-interactive;
 
     &.selected {
-      @apply text-active;
+      @apply text-brand;
     }
 
     &.destructive {

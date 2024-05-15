@@ -144,12 +144,12 @@ const temporal = plugin(
         disabled: css('--color-text-disabled'),
         subtle: css('--color-text-subtle'),
         inverse: css('--color-text-inverse'),
+        brand: css('--color-text-brand'),
 
-        error: css('--color-text-error'),
+        error: css('--color-text-danger'),
         information: css('--color-text-information'),
         success: css('--color-text-success'),
         warning: css('--color-text-warning'),
-        active: css('--color-text-active'),
 
         DEFAULT: css('--color-text-primary'),
       }),
@@ -172,6 +172,8 @@ const temporal = plugin(
         primary: css('--color-shadow-primary'),
         secondary: css('--color-shadow-secondary'),
         danger: css('--color-shadow-danger'),
+
+        focus: css('--color-border-focus-info'),
       }),
     },
   },
