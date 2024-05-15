@@ -115,6 +115,7 @@
   }
 
   table.simple {
+    thead :global(td),
     thead :global(th) {
       @apply border-b border-primary py-2;
     }
