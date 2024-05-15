@@ -26,6 +26,7 @@
     routeForWorkflows,
   } from '$lib/utilities/route-for';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
   $: ({ namespace } = $page.params);
 
@@ -109,7 +110,9 @@
     inputRetrieved = Date.now();
   };
 
-  $: enableStart = !!workflowId && !!taskQueue && !!workflowType;
+  $: createDisabled = workflowCreateDisabled($page);
+  $: enableStart =
+    !!workflowId && !!taskQueue && !!workflowType && !createDisabled;
 </script>
 
 <div class="flex w-full flex-col items-center pb-24">
@@ -203,10 +206,10 @@
         variant="ghost"
         trailingIcon={viewAdvancedOptions ? 'chevron-up' : 'chevron-down'}
         on:click={() => (viewAdvancedOptions = !viewAdvancedOptions)}
-        >More options</Button
+        >{translate('common.more-options')}</Button
       >
       <Button disabled={!enableStart} on:click={onWorkflowStart}
-        >Start Workflow</Button
+        >{translate('workflows.start-workflow')}</Button
       >
     </div>
     {#if error}

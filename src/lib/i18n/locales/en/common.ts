@@ -152,6 +152,7 @@ export const Strings = {
   'auto-refresh-tooltip': '{{ interval }} second page refresh',
   'view-more': 'View More...',
   'view-all-runs': 'View All Runs',
+  'more-options': 'More options',
   download: 'Download',
   duration: 'Duration',
   'search-attributes': 'Search Attributes',

@@ -18,6 +18,7 @@
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import { showChildWorkflows } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
   import StartWorkflowButton from '../start-workflow-button.svelte';
 
@@ -38,6 +39,7 @@
   });
 
   $: childrenShown = childCount !== undefined;
+  $: createDisabled = workflowCreateDisabled($page);
 </script>
 
 <tr
@@ -60,6 +62,7 @@
       class="cursor-point relative flex items-center justify-center gap-0.5 pt-2"
     >
       <StartWorkflowButton
+        disabled={createDisabled}
         {namespace}
         workflowId={workflow.id}
         taskQueue={workflow.taskQueue}

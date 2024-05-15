@@ -60,6 +60,7 @@
   } from '$lib/stores/workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
+  import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
   $: query = $page.url.searchParams.get('query');
   $: query, ($workflowsQuery = query);
@@ -68,6 +69,7 @@
   // For returning to page from 'Back to Workflows' with previous search
   $: searchParams = $page.url.searchParams.toString();
   $: searchParams, ($workflowsSearchParams = searchParams);
+  $: createDisabled = workflowCreateDisabled($page);
 
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
@@ -212,6 +214,7 @@
       <WorkflowCountRefresh count={$workflowCount.newCount} />
     </h1>
     <Button
+      disabled={createDisabled}
       leadingIcon="lightning-bolt"
       href={routeForWorkflowStart({ namespace })}>Start Workflow</Button
     >

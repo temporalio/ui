@@ -6,7 +6,6 @@
   import ResetConfirmationModal from '$lib/components/workflow/client-actions/reset-confirmation-modal.svelte';
   import SignalConfirmationModal from '$lib/components/workflow/client-actions/signal-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -18,6 +17,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
+  import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
   import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
   import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
@@ -38,6 +38,7 @@
   $: signalEnabled = workflowSignalEnabled($page.data.settings);
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: resetEnabled = workflowResetEnabled($page.data.settings);
+  $: createDisabled = workflowCreateDisabled($page);
 
   let workflowActions: {
     label: string;
@@ -95,7 +96,6 @@
   ];
 
   let coreUser = coreUserStore();
-
   $: actionsDisabled =
     $coreUser.namespaceWriteDisabled(namespace) ||
     !writeActionsAreAllowed(settings);
@@ -139,8 +139,8 @@
         )}
       data-testid="start-workflow-button"
     >
-      <div class="flex items-center gap-1">
-        <Icon name="lightning-bolt" /> Start Workflow
+      <div class="flex grow items-center gap-1">
+        {translate('workflows.start-workflow-like-this-one')}
       </div>
     </MenuItem>
   </SplitButton>
@@ -148,13 +148,13 @@
   <SplitButton
     id="workflow-actions"
     position="right"
-    disabled={actionsDisabled}
     primaryActionDisabled={!resetAllowed}
     on:click={() => (resetConfirmationModalOpen = true)}
     label={translate('workflows.reset')}
     menuLabel={translate('workflows.workflow-actions')}
   >
     <MenuItem
+      disabled={createDisabled}
       on:click={() =>
         goto(
           routeForWorkflowStart({
@@ -167,7 +167,7 @@
       data-testid="start-workflow-button"
     >
       <div class="flex items-center gap-1">
-        <Icon name="lightning-bolt" /> Start Workflow
+        {translate('workflows.start-workflow-like-this-one')}
       </div>
     </MenuItem>
   </SplitButton>
