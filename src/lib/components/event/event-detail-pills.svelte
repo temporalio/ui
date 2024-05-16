@@ -25,10 +25,7 @@
       {#each Object.entries(attributeGrouping) as [key, value] (key)}
         {@const active = activePill === key}
         {#if value.length}
-          <Pill
-            {active}
-            on:click={() => dispatch('pillChange', { key })}
-            color={active ? 'lightBlue' : 'gray'}
+          <Pill {active} on:click={() => dispatch('pillChange', { key })}
             >{translate(attributeGroupingProperties[key].label)}</Pill
           >
         {/if}
@@ -39,6 +36,6 @@
 
 <style lang="postcss">
   .pill-container {
-    @apply inline-flex flex-col items-center justify-start gap-2 rounded-md bg-badge px-2 py-2 md:flex-row md:rounded-full;
+    @apply surface-subtle inline-flex flex-col items-center justify-start gap-2 rounded-md px-2 py-2 md:flex-row md:rounded-full;
   }
 </style>

@@ -352,7 +352,7 @@
     }
 
     &.disabled {
-      @apply surface-disabled border-subtle text-disabled;
+      @apply opacity-50;
     }
   }
 
@@ -361,7 +361,7 @@
   }
 
   .combobox-input {
-    @apply ml-2 h-full w-full grow bg-transparent font-primary text-primary placeholder:text-primary focus:outline-none disabled:text-disabled disabled:placeholder:text-disabled;
+    @apply ml-2 h-full w-full grow bg-transparent font-primary text-primary placeholder:text-secondary focus:outline-none;
   }
 
   .combobox-button {

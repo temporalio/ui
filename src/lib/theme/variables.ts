@@ -20,8 +20,8 @@ export const variables = {
     dark: 'offWhite',
   },
   '--color-text-secondary': {
-    light: 'slate.900',
-    dark: 'slate.200',
+    light: 'slate.800',
+    dark: 'slate.300',
   },
   '--color-text-inverse': {
     light: 'offWhite',
@@ -54,10 +54,6 @@ export const variables = {
   '--color-text-brand': {
     light: 'indigo.600',
     dark: 'indigo.400',
-  },
-  '--color-text-disabled': {
-    light: 'slate.500',
-    dark: 'slate.100',
   },
   // Surface
   '--color-surface-background': {

@@ -96,10 +96,6 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-subtle'),
         color: css('--color-text-black'),
       },
-      '.surface-disabled': {
-        backgroundColor: css('--color-surface-secondary'),
-        color: css('--color-text-disabled'),
-      },
     });
   },
   {
@@ -158,7 +154,6 @@ const temporal = plugin(
         ...theme('colors'),
         primary: css('--color-text-primary'),
         secondary: css('--color-text-secondary'),
-        disabled: css('--color-text-disabled'),
         subtle: css('--color-text-subtle'),
         inverse: css('--color-text-inverse'),
         brand: css('--color-text-brand'),

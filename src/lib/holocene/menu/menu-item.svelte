@@ -167,7 +167,7 @@
     }
 
     &.disabled {
-      @apply pointer-events-none cursor-not-allowed text-subtle dark:text-secondary;
+      @apply pointer-events-none cursor-not-allowed opacity-50;
     }
   }
 

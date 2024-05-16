@@ -165,10 +165,7 @@
               }}
               aria-label={previousButtonLabel}
             >
-              <span
-                class="arrow arrow-left"
-                class:arrow-left-disabled={!$store.hasPrevious}
-              />
+              <span class="arrow arrow-left" />
             </button>
             <p>
               {#if updating}
@@ -188,10 +185,7 @@
               }}
               aria-label={nextButtonLabel}
             >
-              <span
-                class="arrow arrow-right"
-                class:arrow-right-disabled={!$store.hasNext}
-              />
+              <span class="arrow arrow-right" />
             </button>
           </div>
         </slot>
@@ -229,10 +223,7 @@
           on:click={() => store.previous()}
           aria-label={previousButtonLabel}
         >
-          <span
-            class="arrow arrow-left"
-            class:arrow-left-disabled={!$store.hasPrevious}
-          />
+          <span class="arrow arrow-left" />
         </button>
         <p>
           {#if updating}
@@ -248,10 +239,7 @@
           on:click={() => store.next()}
           aria-label={nextButtonLabel}
         >
-          <span
-            class="arrow arrow-right"
-            class:arrow-right-disabled={!$store.hasNext}
-          />
+          <span class="arrow arrow-right" />
         </button>
       </div>
       <slot name="action-bottom-right" />
@@ -268,7 +256,7 @@
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-disabled;
+    @apply cursor-not-allowed opacity-50;
   }
 
   .arrow {
@@ -284,17 +272,9 @@
     @apply border-b-transparent border-l-transparent border-r-primary border-t-transparent;
   }
 
-  .arrow-left-disabled {
-    @apply opacity-50;
-  }
-
   .arrow-right {
     border-width: 6px 0 6px 12px;
 
     @apply border-b-transparent border-l-primary border-r-transparent border-t-transparent;
-  }
-
-  .arrow-right-disabled {
-    @apply opacity-50;
   }
 </style>

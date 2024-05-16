@@ -202,7 +202,7 @@
   }
 
   .input {
-    @apply m-2 w-full bg-transparent placeholder:text-subtle focus:outline-none;
+    @apply m-2 w-full bg-transparent placeholder:text-secondary focus:outline-none;
   }
 
   .suffix {
