@@ -155,7 +155,11 @@ export const variables = {
   },
   '--color-interactive-ghost-hover': {
     light: 'slate.50',
-    dark: 'slate.900',
+    dark: 'slate.700',
+  },
+  '--color-interactive-ghost-active': {
+    light: 'slate.100',
+    dark: 'slate.950',
   },
   // Border
   '--color-border-primary': {

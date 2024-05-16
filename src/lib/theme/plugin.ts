@@ -54,6 +54,32 @@ const temporal = plugin(
           backgroundColor: css('--color-interactive-secondary-active'),
         },
       },
+      '.surface-interactive-danger': {
+        backgroundColor: css('--color-interactive-danger-surface'),
+        color: css('--color-text-black'),
+        '&:focus-visible': {
+          backgroundColor: css('--color-interactive-danger-hover'),
+        },
+        '&:hover': {
+          backgroundColor: css('--color-interactive-danger-hover'),
+        },
+        '&:active': {
+          backgroundColor: css('--color-interactive-danger-active'),
+        },
+      },
+      '.surface-interactive-ghost': {
+        backgroundColor: css('--color-surface-primary'),
+        color: css('--color-text-primary'),
+        '&:focus-visible': {
+          backgroundColor: css('--color-interactive-ghost-hover'),
+        },
+        '&:hover': {
+          backgroundColor: css('--color-interactive-ghost-hover'),
+        },
+        '&:active': {
+          backgroundColor: css('--color-interactive-ghost-active'),
+        },
+      },
       '.surface-inverse': {
         backgroundColor: css('--color-surface-inverse'),
         color: css('--color-text-inverse'),

@@ -69,7 +69,11 @@
 
 <style lang="postcss">
   .toggle-button {
-    @apply surface-input flex items-center justify-center border-2 border-secondary px-4 py-2 text-sm text-primary hover:enabled:surface-interactive-secondary focus-visible:enabled:surface-interactive-secondary;
+    @apply surface-primary flex items-center justify-center border-2 border-subtle px-4 py-2 text-sm text-primary focus-visible:outline-none;
+
+    &:not(.disabled) {
+      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-4 focus-visible:ring-primary/70;
+    }
   }
 
   .toggle-button.active {
@@ -77,7 +81,7 @@
   }
 
   .toggle-button.disabled {
-    @apply surface-disabled;
+    @apply cursor-not-allowed opacity-50;
   }
 
   .group:first-child {

@@ -81,7 +81,8 @@
   {#if cancelEnabled}
     <Button
       size="xs"
-      variant="table-header"
+      variant="ghost"
+      class="text-offWhite focus-visible:border-table"
       data-testid="bulk-cancel-button"
       disabled={namespaceWriteDisabled || !$cancelableWorkflows.length}
       on:click={openBatchCancelConfirmationModal}
@@ -91,7 +92,8 @@
   {#if resetEnabled}
     <Button
       size="xs"
-      variant="table-header"
+      variant="ghost"
+      class="text-offWhite focus-visible:border-table"
       data-testid="bulk-reset-button"
       disabled={namespaceWriteDisabled}
       on:click={openBatchResetConfirmationModal}
@@ -102,6 +104,7 @@
     <Button
       size="xs"
       variant="destructive"
+      class="focus-visible:border-table"
       data-testid="bulk-terminate-button"
       disabled={namespaceWriteDisabled}
       on:click={openBatchTerminateConfirmationModal}
