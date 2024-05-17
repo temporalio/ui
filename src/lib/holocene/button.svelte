@@ -33,6 +33,7 @@
       'focus-visible:border-inverse',
       'focus-visible:ring-4',
       'whitespace-nowrap',
+      'no-underline',
       '[.button-group>&]:rounded-none',
       '[.button-group>&:first-of-type]:rounded-l-lg',
       '[.button-group>&:last-of-type]:rounded-r-lg',
