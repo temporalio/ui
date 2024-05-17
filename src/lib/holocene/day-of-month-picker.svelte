@@ -26,7 +26,7 @@
       {@const active = daysOfMonth.includes(day)}
       <Button
         variant="secondary"
-        class={active ? 'bg-interactive-secondary-active' : ''}
+        class={active && 'bg-interactive-secondary-active'}
         on:click={(e) => onClick(e, day)}
       >
         {day}
