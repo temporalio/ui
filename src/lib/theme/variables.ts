@@ -8,24 +8,24 @@ const dark: Record<CSSVariable, RGB> = {};
 export const variables = {
   // Text
   '--color-text-black': {
-    light: 'spaceBlack',
-    dark: 'spaceBlack',
+    light: 'space-black',
+    dark: 'space-black',
   },
   '--color-text-white': {
-    light: 'offWhite',
-    dark: 'offWhite',
+    light: 'off-white',
+    dark: 'off-white',
   },
   '--color-text-primary': {
-    light: 'spaceBlack',
-    dark: 'offWhite',
+    light: 'space-black',
+    dark: 'off-white',
   },
   '--color-text-secondary': {
     light: 'slate.800',
     dark: 'slate.300',
   },
   '--color-text-inverse': {
-    light: 'offWhite',
-    dark: 'spaceBlack',
+    light: 'off-white',
+    dark: 'space-black',
   },
   '--color-text-subtle': {
     light: 'slate.700',
@@ -57,23 +57,23 @@ export const variables = {
   },
   // Surface
   '--color-surface-background': {
-    light: 'offWhite',
-    dark: 'spaceBlack',
+    light: 'off-white',
+    dark: 'space-black',
   },
   '--color-surface-primary': {
     light: 'white',
     dark: 'black',
   },
   '--color-surface-secondary': {
-    light: 'offWhite',
-    dark: 'offBlack',
+    light: 'off-white',
+    dark: 'off-black',
   },
   '--color-surface-subtle': {
     light: 'slate.100',
     dark: 'slate.800',
   },
   '--color-surface-table': {
-    light: 'spaceBlack',
+    light: 'space-black',
     dark: 'slate.900',
   },
   '--color-surface-success': {
@@ -105,8 +105,8 @@ export const variables = {
     dark: 'indigo.500',
   },
   '--color-surface-inverse': {
-    light: 'spaceBlack',
-    dark: 'offWhite',
+    light: 'space-black',
+    dark: 'off-white',
   },
   // Interactive
   '--color-interactive-surface': {
@@ -155,7 +155,7 @@ export const variables = {
   },
   // Border
   '--color-border-primary': {
-    light: 'spaceBlack',
+    light: 'space-black',
     dark: 'slate.400',
   },
   '--color-border-secondary': {
@@ -167,12 +167,12 @@ export const variables = {
     dark: 'slate.800',
   },
   '--color-border-table': {
-    light: 'spaceBlack',
+    light: 'space-black',
     dark: 'slate.900',
   },
   '--color-border-inverse': {
-    light: 'offWhite',
-    dark: 'spaceBlack',
+    light: 'off-white',
+    dark: 'space-black',
   },
   '--color-border-information': {
     light: 'indigo.600',

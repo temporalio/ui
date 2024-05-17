@@ -82,7 +82,7 @@
     <Button
       size="xs"
       variant="ghost"
-      class="text-offWhite focus-visible:border-table"
+      class="text-off-white focus-visible:border-table"
       data-testid="bulk-cancel-button"
       disabled={namespaceWriteDisabled || !$cancelableWorkflows.length}
       on:click={openBatchCancelConfirmationModal}
@@ -93,7 +93,7 @@
     <Button
       size="xs"
       variant="ghost"
-      class="text-offWhite focus-visible:border-table"
+      class="text-off-white focus-visible:border-table"
       data-testid="bulk-reset-button"
       disabled={namespaceWriteDisabled}
       on:click={openBatchResetConfirmationModal}

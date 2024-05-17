@@ -21,7 +21,7 @@
     'group grid h-screen w-16 grid-cols-[2rem] grid-rows-[fit-content(1.5rem)_minmax(3rem,4rem)_1fr_8rem] gap-2 border-r border-subtle px-4 py-5 transition-width data-[nav=open]:w-40 data-[nav=open]:grid-cols-[100%]',
     isCloud
       ? 'surface-primary from-indigo-600 to-indigo-950 dark:bg-gradient-to-b'
-      : 'bg-black text-offWhite',
+      : 'bg-black text-off-white',
   )}
   data-nav={$navOpen ? 'open' : 'closed'}
   data-testid="navigation-header"

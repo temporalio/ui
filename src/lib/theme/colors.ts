@@ -146,10 +146,10 @@ export const palette = {
 
 export const colors = {
   white: '#FFFFFF',
-  offWhite: '#F8FAFC',
+  'off-white': '#F8FAFC',
   black: '#000000',
-  spaceBlack: '#141414',
-  offBlack: palette['slate'][950],
+  'space-black': '#141414',
+  'off-black': palette['slate'][950],
   current: 'currentColor',
   transparent: 'transparent',
   ...palette,

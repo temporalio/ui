@@ -51,7 +51,7 @@
       @apply surface-table;
 
       :global(th) {
-        @apply border-t border-table px-1 py-2 text-offWhite;
+        @apply border-t border-table px-1 py-2 text-off-white;
       }
 
       :global(td) {

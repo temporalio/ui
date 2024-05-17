@@ -149,7 +149,7 @@
     {/if}
   </div>
 </div>
-<div class="bg-offBlack">
+<div class="bg-off-black">
   <div class="w-full overflow-auto" bind:clientWidth={canvasWidth}>
     {#if $eventViewType === 'compact'}
       <CompactGraph
