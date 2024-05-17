@@ -173,11 +173,6 @@ const temporal = plugin(
           right: 'right',
         },
       },
-      outlineColor: ({ theme }) => ({
-        ...theme('colors'),
-
-        interactive: css('--color-interactive-surface'),
-      }),
     },
   },
 );
