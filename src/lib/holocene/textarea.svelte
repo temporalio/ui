@@ -48,7 +48,7 @@
     <textarea
       bind:value
       class={merge(
-        'surface-input min-h-fit w-full rounded-lg border-2 border-subtle px-3 py-2 text-sm focus-visible:border-information focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70 enabled:hover:border-information',
+        'surface-primary min-h-fit w-full rounded-lg border-2 border-subtle px-3 py-2 text-sm focus-visible:border-information focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70 enabled:hover:border-information',
         disabled && 'cursor-not-allowed opacity-50',
         !isValid && 'error',
       )}

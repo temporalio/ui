@@ -38,7 +38,7 @@
     <input
       bind:group={$group}
       type="radio"
-      class="surface-input"
+      class="surface-primary"
       aria-describedby="{id}-description"
       {name}
       {value}

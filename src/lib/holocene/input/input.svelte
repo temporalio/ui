@@ -185,7 +185,7 @@
 <style lang="postcss">
   /* Base styles */
   .input-container {
-    @apply surface-input relative box-border inline-flex h-10 w-full items-center rounded-lg border-2 border-subtle text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply surface-primary relative box-border inline-flex h-10 w-full items-center rounded-lg border-2 border-subtle text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     &.error,
     &.invalid {
