@@ -135,7 +135,7 @@
 
 <LabsModeGuard>
   <div
-    class="surface-secondary absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
+    class="absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
       ? 'top-[540px]'
       : 'top-0'}
     } flex h-full flex-col gap-0"
