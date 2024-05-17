@@ -336,7 +336,8 @@
     font-size: 12px;
     display: flex;
     align-items: center;
-    color: #18181b;
+
+    @apply !text-primary;
   }
 
   :global(.vis-timeline) {
@@ -349,15 +350,15 @@
   }
 
   :global(.vis-background, .vis-timeline) {
-    background-color: #18181b;
+    background-color: #000;
     color: white;
     border-radius: 0.75rem;
     border-width: 2px;
-    border: 2px solid #18181b;
+    border: 2px solid #000;
   }
 
   :global(.vis-content, .vis-group) {
-    @apply surface-primary;
+    @apply surface-secondary;
   }
 
   :global(.vis-timeline .vis-item) {
