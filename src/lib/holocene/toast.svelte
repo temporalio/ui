@@ -10,11 +10,11 @@
   const dispatch = createEventDispatcher<{ dismiss: { id: string } }>();
 
   const variants: Readonly<Record<ToastVariant, string>> = {
-    primary: 'surface-inverse',
-    success: 'bg-success text-success',
-    error: 'bg-danger text-danger',
-    info: 'bg-information text-information',
-    warning: 'bg-warning text-warning',
+    primary: 'bg-slate-800 text-white',
+    success: 'bg-success',
+    error: 'bg-danger',
+    info: 'bg-information',
+    warning: 'bg-warning',
   };
 
   export let id: string;
