@@ -112,8 +112,6 @@ const temporal = plugin(
         inverse: css('--color-surface-inverse'),
         subtle: css('--color-surface-subtle'),
 
-        badge: css('--color-surface-badge'),
-
         interactive: css('--color-interactive-surface'),
         'interactive-hover': css('--color-interactive-hover'),
         'interactive-active': css('--color-interactive-active'),

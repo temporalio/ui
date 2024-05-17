@@ -153,7 +153,7 @@
   }
 
   .orderable-item.readonly {
-    @apply bg-badge bg-opacity-50;
+    @apply surface-secondary;
   }
 
   hr {

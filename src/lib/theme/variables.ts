@@ -108,10 +108,6 @@ export const variables = {
     light: 'spaceBlack',
     dark: 'offWhite',
   },
-  '--color-surface-badge': {
-    light: 'slate.100',
-    dark: 'slate.700',
-  },
   // Interactive
   '--color-interactive-surface': {
     light: 'indigo.600',
