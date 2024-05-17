@@ -192,7 +192,7 @@
       @apply border-danger focus-within:ring-danger/70;
 
       > .input {
-        @apply caret-red-700;
+        @apply caret-danger;
       }
     }
 

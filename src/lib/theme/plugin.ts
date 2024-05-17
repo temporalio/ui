@@ -162,6 +162,11 @@ const temporal = plugin(
 
         DEFAULT: css('--color-text-primary'),
       }),
+      caretColor: ({ theme }) => ({
+        ...theme('colors'),
+
+        danger: css('--color-text-danger'),
+      }),
       extend: {
         transitionProperty: {
           width: 'width',
