@@ -29,7 +29,6 @@
       'transition-colors',
       'transition-shadow',
       'focus-visible:outline-none',
-      'focus-visible:border',
       'focus-visible:border-inverse',
       'focus-visible:ring-4',
       'whitespace-nowrap',
@@ -47,7 +46,7 @@
           primary:
             'surface-interactive border-transparent text-white focus-visible:ring-primary/70',
           secondary:
-            'surface-primary border-subtle focus-visible:border focus-visible:ring-primary/70 hover:surface-interactive-secondary focus-visible:surface-interactive-secondary',
+            'surface-primary border-subtle focus-visible:ring-primary/70 hover:surface-interactive-secondary focus-visible:surface-interactive-secondary',
           destructive:
             'surface-interactive-danger border-transparent focus-visible:ring-danger/70',
           ghost:
