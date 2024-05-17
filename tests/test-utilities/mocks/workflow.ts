@@ -1,6 +1,9 @@
 import type { Page } from '@playwright/test';
 
+import type { WorkflowExecutionAPIResponse } from '$src/lib/types/workflows';
+
 export const WORKFLOW_API = '**/api/v1/namespaces/*/workflows/*?';
+export const WORKFLOW_RESET_API = '**/api/v1/namespaces/*/workflows/*/reset*';
 
 export const mockWorkflow = {
   executionConfig: {
@@ -26,6 +29,7 @@ export const mockWorkflow = {
     historyLength: '6',
     parentNamespaceId: '',
     parentExecution: null,
+    historySizeBytes: '',
     executionTime: '2022-04-28T05:50:48.264756929Z',
     memo: {
       fields: {},
@@ -117,13 +121,79 @@ export const mockWorkflow = {
     },
   ],
   pendingChildren: [],
-  pendingWorkflowTask: null,
-};
+} satisfies WorkflowExecutionAPIResponse;
 
-export const mockWorkflowApi = (page: Page) => {
+export const mockCompletedWorkflow = {
+  executionConfig: {
+    taskQueue: {
+      name: 'await_signals',
+      kind: 'TASK_QUEUE_KIND_NORMAL',
+    },
+    workflowExecutionTimeout: '0s',
+    workflowRunTimeout: '0s',
+    defaultWorkflowTaskTimeout: '10s',
+  },
+  workflowExecutionInfo: {
+    execution: {
+      workflowId: 'await_signals_f1483b17-152e-442d-a8c0-145682f76d4f',
+      runId: '5776fab0-f316-4880-9fa5-6ebb2293a1c5',
+    },
+    type: {
+      name: 'AwaitSignalsWorkflow',
+    },
+    startTime: '2024-05-17T15:25:26.888913Z',
+    closeTime: '2024-05-17T15:25:30.921605Z',
+    status: 'WORKFLOW_EXECUTION_STATUS_COMPLETED',
+    historyLength: '16',
+    executionTime: '2024-05-17T15:25:26.888913Z',
+    memo: {},
+    searchAttributes: {
+      indexedFields: {
+        BuildIds: {
+          metadata: {
+            encoding: 'anNvbi9wbGFpbg==',
+            type: 'S2V5d29yZExpc3Q=',
+          },
+          data: 'WyJ1bnZlcnNpb25lZCIsInVudmVyc2lvbmVkOjYzNTliM2IxYWQwYTZhYWY3N2M3NTdlODU0NzA3YTA1Il0=',
+        },
+      },
+    },
+    autoResetPoints: {
+      points: [
+        {
+          buildId: '6359b3b1ad0a6aaf77c757e854707a05',
+          runId: '5776fab0-f316-4880-9fa5-6ebb2293a1c5',
+          firstWorkflowTaskCompletedId: '5',
+          createTime: '2024-05-17T15:25:26.894727Z',
+          resettable: true,
+        },
+      ],
+    },
+    taskQueue: 'await_signals',
+    stateTransitionCount: '10',
+    historySizeBytes: '1668',
+    mostRecentWorkerVersionStamp: {
+      buildId: '6359b3b1ad0a6aaf77c757e854707a05',
+    },
+  },
+} satisfies WorkflowExecutionAPIResponse;
+
+export const mockWorkflowApi = (
+  page: Page,
+  workflow: WorkflowExecutionAPIResponse = mockWorkflow,
+) => {
   return page.route(WORKFLOW_API, (route) => {
     return route.fulfill({
-      json: mockWorkflow,
+      json: workflow,
     });
   });
+};
+
+export const mockWorkflowResetApi = (page: Page) => {
+  return page.route(WORKFLOW_RESET_API, (route) => {
+    return route.fulfill({
+      json: {},
+    });
+  });
+  return;
 };

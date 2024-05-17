@@ -132,6 +132,7 @@
       disabled={!resetAllowed}
       variant="primary"
       on:click={() => (resetConfirmationModalOpen = true)}
+      data-testid="workflow-reset-button"
     >
       {translate('workflows.reset')}
     </Button>
