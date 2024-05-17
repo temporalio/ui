@@ -119,6 +119,9 @@ const temporal = plugin(
         'interactive-active': css('--color-interactive-active'),
         'interactive-error': css('--color-interactive-danger-surface'),
 
+        'interactive-secondary-hover': css(
+          '--color-interactive-secondary-hover',
+        ),
         'interactive-secondary-active': css(
           '--color-interactive-secondary-active',
         ),
