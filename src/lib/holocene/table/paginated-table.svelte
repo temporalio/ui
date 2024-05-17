@@ -126,7 +126,9 @@
             <Button
               variant="ghost"
               size="sm"
-              active={page === $store.currentPage}
+              class={page === $store.currentPage
+                ? 'bg-interactive-secondary-active'
+                : ''}
               aria-label={pageButtonLabel(page)}
               on:click={() => handlePageChange(page)}>{page}</Button
             >

@@ -20,7 +20,6 @@
   export let loading = false;
   export let newCount: number | undefined = undefined;
   export let big = false;
-  newCount = 9;
 
   const label: Record<Status, string> = {
     Running: translate('workflows.running'),
