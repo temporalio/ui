@@ -74,16 +74,18 @@
   }
 
   .selected {
-    @apply bg-interactive text-offWhite;
+    @apply bg-interactive text-off-white;
   }
 
   .disabled {
-    @apply cursor-not-allowed bg-interactive/50 text-disabled;
+    @apply cursor-not-allowed bg-interactive opacity-50;
   }
 
   .highlight {
-    @apply hover:scale-125 hover:cursor-pointer hover:bg-interactive-hover hover:text-offWhite;
+    &:not(.disabled) {
+      @apply hover:scale-125 hover:cursor-pointer hover:bg-interactive-hover hover:text-off-white;
 
-    transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+      transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
   }
 </style>

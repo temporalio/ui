@@ -4,17 +4,17 @@
   import { createEventDispatcher } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import IconButton from '$lib/holocene/icon-button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { ToastVariant } from '$lib/types/holocene';
 
   const dispatch = createEventDispatcher<{ dismiss: { id: string } }>();
 
   const variants: Readonly<Record<ToastVariant, string>> = {
-    primary: 'bg-primary text-inverse dark:bg-inverse',
-    success: 'bg-success text-success',
-    error: 'bg-error text-error',
-    info: 'bg-information text-information',
-    warning: 'bg-warning text-warning',
+    primary: 'bg-slate-800 text-white',
+    success: 'bg-success',
+    error: 'bg-danger',
+    info: 'bg-information',
+    warning: 'bg-warning',
   };
 
   export let id: string;
@@ -37,5 +37,11 @@
   <p class="font-secondary text-sm">
     <slot />
   </p>
-  <IconButton label={closeButtonLabel} icon="close" on:click={handleDismiss} />
+  <button
+    type="button"
+    on:click|stopPropagation={handleDismiss}
+    aria-label={closeButtonLabel}
+  >
+    <Icon name="close" />
+  </button>
 </div>

@@ -80,7 +80,7 @@
   };
 </script>
 
-<div class="surface-secondary flex flex-col gap-0 px-8">
+<div class="flex flex-col gap-0 px-8">
   <WorkflowCallStackError />
   <div class="flex flex-col gap-2">
     <WorkflowDetails />
@@ -149,7 +149,7 @@
     {/if}
   </div>
 </div>
-<div class="bg-inverse">
+<div class="bg-off-black">
   <div class="w-full overflow-auto" bind:clientWidth={canvasWidth}>
     {#if $eventViewType === 'compact'}
       <CompactGraph

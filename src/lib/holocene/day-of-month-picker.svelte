@@ -24,7 +24,11 @@
   >
     {#each daysInMonth as day}
       {@const active = daysOfMonth.includes(day)}
-      <Button variant="secondary" {active} on:click={(e) => onClick(e, day)}>
+      <Button
+        variant="secondary"
+        class={active && 'bg-interactive-secondary-active'}
+        on:click={(e) => onClick(e, day)}
+      >
         {day}
       </Button>
     {/each}

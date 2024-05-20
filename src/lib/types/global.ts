@@ -134,17 +134,3 @@ export type SelectOptionValue = number | string | boolean;
 export type BooleanString = 'true' | 'false';
 
 export type DataEncoderStatus = 'notRequested' | 'success' | 'error';
-
-export type Color =
-  | 'blue'
-  | 'lightBlue'
-  | 'slate'
-  | 'gray'
-  | 'orange'
-  | 'red'
-  | 'green'
-  | 'red'
-  | 'indigo'
-  | 'yellow'
-  | 'purple'
-  | 'pink';
