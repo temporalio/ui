@@ -14,6 +14,7 @@ export const CATEGORIES = {
   COMMAND: 'command',
   LOCAL_ACTIVITY: 'local-activity',
   MARKER: 'marker',
+  NEXUS: 'nexus',
   SIGNAL: 'signal',
   TIMER: 'timer',
   UPDATE: 'update',
@@ -74,6 +75,10 @@ export const eventTypeCategorizations: Readonly<
   WorkflowExecutionUpdateCompleted: CATEGORIES.UPDATE,
   WorkflowExecutionUpdateRequested: CATEGORIES.UPDATE,
   WorkflowExecutionUpdateRejected: CATEGORIES.UPDATE,
+
+  // NexusOperationScheduled: CATEGORIES.NEXUS,
+  // NexusOperationStarted: CATEGORIES.NEXUS,
+  // NexusOperationCompleted: CATEGORIES.NEXUS,
 };
 
 export type EventTypeOption = {
