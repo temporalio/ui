@@ -12,7 +12,6 @@
       size: 'md',
       loading: false,
       disabled: false,
-      active: false,
     },
     argTypes: {
       variant: {

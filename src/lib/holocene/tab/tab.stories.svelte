@@ -33,13 +33,13 @@
       <Tab id="tab-c" panelId="tab-panel-c" label="Tab C" />
     </TabList>
     <TabPanel id="tab-panel-a" tabId="tab-a">
-      <p class="surface-secondary py-4">Tab A Content</p>
+      <p class="py-4">Tab A Content</p>
     </TabPanel>
     <TabPanel id="tab-panel-b" tabId="tab-b">
-      <p class="surface-secondary py-4">Tab B Content</p>
+      <p class="py-4">Tab B Content</p>
     </TabPanel>
     <TabPanel id="tab-panel-c" tabId="tab-c">
-      <p class="surface-secondary py-4">Tab C Content</p>
+      <p class="py-4">Tab C Content</p>
     </TabPanel>
   </Tabs>
 </Template>

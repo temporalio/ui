@@ -156,10 +156,10 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply flex cursor-pointer flex-row items-center gap-2 rounded border border-transparent font-primary text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:shadow-focus focus-visible:shadow-secondary focus-visible:outline-none dark:focus-visible:border-interactive;
+    @apply flex cursor-pointer flex-row items-center gap-2 rounded border border-transparent font-primary text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
 
     &.selected {
-      @apply text-active;
+      @apply text-brand;
     }
 
     &.destructive {
@@ -167,7 +167,7 @@
     }
 
     &.disabled {
-      @apply pointer-events-none cursor-not-allowed text-subtle dark:text-secondary;
+      @apply pointer-events-none cursor-not-allowed opacity-50;
     }
   }
 

@@ -51,7 +51,7 @@
       @apply surface-table;
 
       :global(th) {
-        @apply border-t border-table px-1 py-2 text-inverse;
+        @apply border-t border-table px-1 py-2 text-off-white;
       }
 
       :global(td) {
@@ -115,6 +115,7 @@
   }
 
   table.simple {
+    thead :global(td),
     thead :global(th) {
       @apply border-b border-primary py-2;
     }

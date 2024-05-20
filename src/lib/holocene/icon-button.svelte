@@ -3,8 +3,8 @@
 
   import { twMerge as merge } from 'tailwind-merge';
 
+  import Button from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
 
   interface $$Props extends HTMLButtonAttributes {
     icon: IconName;
@@ -18,15 +18,11 @@
   export let label: string;
 </script>
 
-<button
-  type="button"
-  class={merge(
-    'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-[transparent] text-primary outline-none hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-indigo-600 disabled:cursor-not-allowed disabled:opacity-50',
-    className,
-  )}
-  on:click|stopPropagation
+<Button
+  variant="ghost"
+  leadingIcon={icon}
+  class={merge('h-9 w-9 shrink-0 rounded-full p-0', className)}
   aria-label={label}
+  on:click
   {...$$restProps}
->
-  <Icon name={icon} />
-</button>
+/>
