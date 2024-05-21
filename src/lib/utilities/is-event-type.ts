@@ -21,6 +21,13 @@ import type {
   HistoryEvent,
   IterableEvent,
   MarkerRecordedEvent,
+  NexusOperationCanceledEvent,
+  NexusOperationCancelRequestedEvent,
+  NexusOperationCompletedEvent,
+  NexusOperationFailedEvent,
+  NexusOperationScheduledEvent,
+  NexusOperationStartedEvent,
+  NexusOperationTimedOutEvent,
   RequestCancelExternalWorkflowExecutionFailedEvent,
   RequestCancelExternalWorkflowExecutionInitiatedEvent,
   SignalExternalWorkflowExecutionFailedEvent,
@@ -90,6 +97,16 @@ const childEvents = [
   'StartChildWorkflowExecutionFailed',
 ] as const;
 
+const nexusEvents = [
+  'NexusOperationScheduled',
+  'NexusOperationStarted',
+  'NexusOperationCompleted',
+  'NexusOperationFailed',
+  'NexusOperationCanceled',
+  'NexusOperationTimedOut',
+  'NexusOperationCancelRequested',
+] as const;
+
 export type EventType = (typeof eventTypes)[number];
 export const eventTypes = [
   ...activityEvents,
@@ -97,6 +114,7 @@ export const eventTypes = [
   ...signalEvents,
   ...markerEvents,
   ...childEvents,
+  ...nexusEvents,
   'WorkflowExecutionCanceled',
   'WorkflowExecutionCancelRequested',
   'WorkflowExecutionCompleted',
@@ -166,6 +184,13 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'signalExternalWorkflowExecutionFailedEventAttributes',
   'externalWorkflowExecutionSignaledEventAttributes',
   'upsertWorkflowSearchAttributesEventAttributes',
+  'nexusOperationScheduledEventAttributes',
+  'nexusOperationStartedEventAttributes',
+  'nexusOperationCompletedEventAttributes',
+  'nexusOperationFailedEventAttributes',
+  'nexusOperationCanceledEventAttributes',
+  'nexusOperationTimedOutEventAttributes',
+  'nexusOperationCancelRequestedEventAttributes',
 ] as const;
 
 export type ResetEventType = (typeof validResetEventTypes)[number];
@@ -443,4 +468,39 @@ export const isFailedWorkflowExecutionUpdateCompletedEvent = (
 export const isWorkflowExecutionUpdateRequestedEvent =
   hasAttributes<WorkflowExecutionUpdateRequestedEvent>(
     'workflowExecutionUpdateRequestedEventAttributes',
+  );
+
+export const isNexusOperationScheduledEvent =
+  hasAttributes<NexusOperationScheduledEvent>(
+    'nexusOperationScheduledEventAttributes',
+  );
+
+export const isNexusOperationStartedEvent =
+  hasAttributes<NexusOperationStartedEvent>(
+    'nexusOperationStartedEventAttributes',
+  );
+
+export const isNexusOperationCompletedEvent =
+  hasAttributes<NexusOperationCompletedEvent>(
+    'nexusOperationCompletedEventAttributes',
+  );
+
+export const isNexusOperationFailedEvent =
+  hasAttributes<NexusOperationFailedEvent>(
+    'nexusOperationFailedEventAttributes',
+  );
+
+export const isNexusOperationCanceledEvent =
+  hasAttributes<NexusOperationCanceledEvent>(
+    'nexusOperationCanceledEventAttributes',
+  );
+
+export const isNexusOperationTimedOutEvent =
+  hasAttributes<NexusOperationTimedOutEvent>(
+    'nexusOperationTimedOutEventAttributes',
+  );
+
+export const isNexusOperationCancelRequestedEvent =
+  hasAttributes<NexusOperationCancelRequestedEvent>(
+    'nexusOperationCancelRequestedEventAttributes',
   );

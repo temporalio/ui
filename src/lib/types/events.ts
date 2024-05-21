@@ -222,6 +222,20 @@ export type WorkflowExecutionUpdateCompletedEvent =
   EventWithAttributes<'workflowExecutionUpdateCompletedEventAttributes'>;
 export type WorkflowExecutionUpdateRequestedEvent =
   EventWithAttributes<'workflowExecutionUpdateRequestedEventAttributes'>;
+export type NexusOperationScheduledEvent =
+  EventWithAttributes<'nexusOperationScheduledEventAttributes'>;
+export type NexusOperationStartedEvent =
+  EventWithAttributes<'nexusOperationStartedEventAttributes'>;
+export type NexusOperationCompletedEvent =
+  EventWithAttributes<'nexusOperationCompletedEventAttributes'>;
+export type NexusOperationFailedEvent =
+  EventWithAttributes<'nexusOperationFailedEventAttributes'>;
+export type NexusOperationCanceledEvent =
+  EventWithAttributes<'nexusOperationCanceledEventAttributes'>;
+export type NexusOperationTimedOutEvent =
+  EventWithAttributes<'nexusOperationTimedOutEventAttributes'>;
+export type NexusOperationCancelRequestedEvent =
+  EventWithAttributes<'nexusOperationCancelRequestedEventAttributes'>;
 
 export type FailActivityTaskRequest =
   import('$lib/types').ActivityTaskFailedByIdRequest;

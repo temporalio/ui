@@ -76,9 +76,13 @@ export const eventTypeCategorizations: Readonly<
   WorkflowExecutionUpdateRequested: CATEGORIES.UPDATE,
   WorkflowExecutionUpdateRejected: CATEGORIES.UPDATE,
 
-  // NexusOperationScheduled: CATEGORIES.NEXUS,
-  // NexusOperationStarted: CATEGORIES.NEXUS,
-  // NexusOperationCompleted: CATEGORIES.NEXUS,
+  NexusOperationScheduled: CATEGORIES.NEXUS,
+  NexusOperationStarted: CATEGORIES.NEXUS,
+  NexusOperationCompleted: CATEGORIES.NEXUS,
+  NexusOperationFailed: CATEGORIES.NEXUS,
+  NexusOperationCanceled: CATEGORIES.NEXUS,
+  NexusOperationTimedOut: CATEGORIES.NEXUS,
+  NexusOperationCancelRequested: CATEGORIES.NEXUS,
 };
 
 export type EventTypeOption = {
@@ -116,6 +120,7 @@ export const allEventTypeOptions: EventTypeOption[] = [
     value: CATEGORIES.TIMER,
   },
   { label: 'events.category.update', value: CATEGORIES.UPDATE },
+  { label: 'events.category.nexus', value: CATEGORIES.NEXUS },
   {
     label: 'events.category.workflow',
     value: CATEGORIES.WORKFLOW,
@@ -130,6 +135,7 @@ const compactEventTypes: EventTypeCategory[] = [
   CATEGORIES.TIMER,
   CATEGORIES.MARKER,
   CATEGORIES.UPDATE,
+  CATEGORIES.NEXUS,
 ];
 
 export const compactEventTypeOptions: EventTypeOption[] =
