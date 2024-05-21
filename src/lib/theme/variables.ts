@@ -108,6 +108,10 @@ export const variables = {
     light: 'space-black',
     dark: 'off-white',
   },
+  '--color-surface-black': {
+    light: 'black',
+    dark: 'black',
+  },
   // Interactive
   '--color-interactive-surface': {
     light: 'indigo.600',

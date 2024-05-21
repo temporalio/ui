@@ -92,6 +92,10 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-subtle'),
         color: css('--color-text-black'),
       },
+      '.surface-black': {
+        backgroundColor: css('--color-surface-black'),
+        color: css('--color-text-white'),
+      },
     });
   },
   {
@@ -146,6 +150,7 @@ const temporal = plugin(
       ringColor: {
         primary: css('--color-border-focus-info'),
         danger: css('--color-border-focus-danger'),
+        success: css('--color-surface-success-loud'),
       },
       textColor: ({ theme }) => ({
         ...theme('colors'),
