@@ -15,6 +15,7 @@
   import { dataEncoder } from '$lib/stores/data-encoder';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
+  import { routeForNamespace } from '$lib/utilities/route-for';
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
@@ -69,6 +70,7 @@
         optionValueKey="namespace"
         on:change={handleNamespaceSelect}
         minSize={32}
+        href={routeForNamespace({ namespace })}
       />
     {/if}
   </div>
