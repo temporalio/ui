@@ -22,23 +22,23 @@
 
 <div class="mb-8 flex items-center justify-between">
   <h1 data-testid="namespace-selector-title" class="text-2xl">
-    {translate('nexus.services')}
+    {translate('nexus.endpoints')}
   </h1>
   <Button variant="primary" href={routeForCreateNexusService()}
-    >{translate('nexus.create-service')}</Button
+    >{translate('nexus.create-endpoint')}</Button
   >
 </div>
 <div class="flex flex-col gap-4">
   <ToggleButtons>
     <ToggleButton
-      data-testid="all-services"
+      data-testid="all-endpoints"
       on:click={() => (view = 'all')}
-      active={view === 'all'}>{translate('nexus.all-services')}</ToggleButton
+      active={view === 'all'}>{translate('nexus.all-endpoints')}</ToggleButton
     >
     <ToggleButton
-      data-testid="all-services"
+      data-testid="my-endpoints"
       on:click={() => (view = 'mine')}
-      active={view === 'mine'}>{translate('nexus.my-services')}</ToggleButton
+      active={view === 'mine'}>{translate('nexus.my-endpoints')}</ToggleButton
     >
   </ToggleButtons>
   <GhostCard

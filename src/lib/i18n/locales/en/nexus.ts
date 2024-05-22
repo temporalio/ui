@@ -2,18 +2,25 @@ export const Namespace = 'nexus' as const;
 
 export const Strings = {
   nexus: 'Nexus',
-  service: 'Service',
-  services: 'Nexus Services',
-  'all-services': 'All Services',
-  'my-services': 'My Services',
-  'back-to-services': 'Back To Nexus Services',
-  'create-service': 'Create Service',
-  'use-service': 'Use This Service',
-  'import-service': 'Import Service',
-  'create-service': 'Create Service',
-  'service-name': 'Service Name',
-  'select-service': 'Select a Service',
-  'service-alias': 'Service Alias',
-  'namespace-handler': 'Namespace Handler',
+  endpoint: 'Endpoint',
+  endpoints: 'Nexus Endpoints',
+  'all-endpoints': 'All Endpoints',
+  'my-endpoints': 'My Endpoints',
+  'back-to-endpoints': 'Back To Nexus Endpoints',
+  'create-endpoint': 'Create Nexus Endpoint',
+  'endpoint-name': 'Endpoint Name',
+  'endpoint-name-placeholder': 'Nexus Endpoint must have a unique name',
+  'select-endpoint': 'Select a Endpoint',
+  'task-queue-placeholder': 'Enter a Task Queue',
+  'endpoint-alias': 'Endpoint Alias',
+  target: 'Target',
+  'target-description':
+    'Specify the target Namespace and task queue the worker will poll on.',
+  'target-namespace': 'Target Namespace',
+  'select-namespace': 'Select a Namespace',
+  'nexus-description':
+    'Add a link to your repo or instructions to help other users in this account use this endpoint.',
+  'description-placeholder':
+    '//Provide a readme for users to use this endpoint',
   handler: 'Handler',
 } as const;

@@ -102,6 +102,7 @@
     "just-throttle": "^4.2.0",
     "kebab-case": "^1.0.2",
     "lodash.groupby": "^4.6.0",
+    "markdown-it": "^14.1.0",
     "remark-stringify": "^10.0.3",
     "sanitize-html": "^2.12.1",
     "tailwind-merge": "^1.14.0",
