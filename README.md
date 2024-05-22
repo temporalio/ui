@@ -95,44 +95,32 @@ pnpn run preview:docker
 
 ### Running UI and Temporal Server locally
 
-1. Build the ui-server image:
+1. In `temporal` repo, run Temporal server locally
     
-    ```diff
-    cd server
-    docker build -t my-ui-server .
-    ```
-    
-2. In `temporal` repo
-    1. checkout feature branch or main
-    2. edit ui-server image name in `develop/docker-compose/docker-compose.yml`
-        
-        ```yaml
-          temporal-ui:
-            image: my-ui-server
-        ```
-        
-    
-    And start the server dependencies
-    
-    ```yaml
-    make start-dependencies
-    ```
-
-3. Start the Temporal server
-
-    ```yaml
-    make start
-    ```
-
-4. Change Vite port due to Grafana being on port 3000
-
-```ts
-  server: {
-    port: 3001,
-  }
+```diff
+make start
 ```
 
-    
+2. In `ui` repo, add .env.local-temporal file with the following env variables
+
+```diff
+VITE_TEMPORAL_PORT="7134"
+VITE_API="http://localhost:8081"
+VITE_MODE="development"
+VITE_TEMPORAL_UI_BUILD_TARGET="local"
+```
+
+3. Run UI with pnpm dev:local-temporal
+
+```diff
+pnpm dev:local-temporal
+```
+
+4. Create namespace with CLI (Temporal server does not do this automatically unlike CLI)
+
+```diff
+temporal operator namespace create default
+```
 
 
 ## Testing
