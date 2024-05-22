@@ -2,14 +2,10 @@
   import { page } from '$app/stores';
 
   import PageTitle from '$lib/components/page-title.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { NexusService } from '$lib/types/nexus';
-  import {
-    routeForImportNexusService,
-    routeForNexus,
-  } from '$lib/utilities/route-for';
+  import { routeForNexus } from '$lib/utilities/route-for';
 
   export let service: NexusService;
 </script>
@@ -18,7 +14,7 @@
 <div class="flex flex-col gap-8">
   <div class="relative flex flex-col gap-4 text-sm">
     <Link href={routeForNexus()} icon="chevron-left">
-      {translate('nexus.back-to-services')}
+      {translate('nexus.back-to-endpoints')}
     </Link>
   </div>
   <div class="flex flex-col gap-1">
@@ -26,9 +22,6 @@
       <h1 data-testid="namespace-selector-title" class="text-2xl">
         {service.name}
       </h1>
-      <Button variant="primary" href={routeForImportNexusService(service.id)}
-        >{translate('nexus.use-service')}</Button
-      >
     </div>
     <p class="w-full xl:w-1/2">{service.description}</p>
   </div>

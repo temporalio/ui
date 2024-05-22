@@ -170,26 +170,26 @@ devDependencies:
     specifier: ^3.0.2
     version: 3.0.2(svelte@4.0.0)(vite@5.0.13)
   '@temporalio/activity':
-    specifier: ^1.9.3
-    version: 1.9.3
+    specifier: ^1.10.0
+    version: 1.10.0
   '@temporalio/client':
-    specifier: ^1.9.3
-    version: 1.9.3
+    specifier: ^1.10.0
+    version: 1.10.0
   '@temporalio/common':
-    specifier: ^1.9.3
-    version: 1.9.3
+    specifier: ^1.10.0
+    version: 1.10.0
   '@temporalio/proto':
-    specifier: ^1.9.3
-    version: 1.9.3
+    specifier: ^1.10.0
+    version: 1.10.0
   '@temporalio/testing':
-    specifier: ^1.9.3
-    version: 1.9.3(esbuild@0.13.15)
+    specifier: ^1.10.0
+    version: 1.10.0(esbuild@0.13.15)
   '@temporalio/worker':
-    specifier: ^1.9.3
-    version: 1.9.3(esbuild@0.13.15)
+    specifier: ^1.10.0
+    version: 1.10.0(esbuild@0.13.15)
   '@temporalio/workflow':
-    specifier: ^1.9.3
-    version: 1.9.3
+    specifier: ^1.10.0
+    version: 1.10.0
   '@types/base-64':
     specifier: ^1.0.0
     version: 1.0.0
@@ -3142,12 +3142,31 @@ packages:
     resolution: {integrity: sha512-kEnRN/Vs7TgWkY+Y5U36b2NZOYITWEY1T6LYkjFopCA2eaUWY4DDO7UOov55VE/PHDZH8KZZIOoEmBiM4Nv7Kw==}
     dev: false
 
+  /@grpc/grpc-js@1.10.8:
+    resolution: {integrity: sha512-vYVqYzHicDqyKB+NQhAc54I1QWCBLCrYG6unqOIcBTHx+7x8C9lcoLj3KVJXs2VB4lUbpWY+Kk9NipcbXYWmvg==}
+    engines: {node: '>=12.10.0'}
+    dependencies:
+      '@grpc/proto-loader': 0.7.13
+      '@js-sdsl/ordered-map': 4.4.2
+    dev: true
+
   /@grpc/grpc-js@1.7.3:
     resolution: {integrity: sha512-H9l79u4kJ2PVSxUNA08HMYAnUBLj9v6KjYQ7SQ71hOZcEXhShE/y5iQCesP8+6/Ik/7i2O0a10bPquIcYfufog==}
     engines: {node: ^8.13.0 || >=10.10.0}
     dependencies:
       '@grpc/proto-loader': 0.7.4
       '@types/node': 18.15.3
+    dev: true
+
+  /@grpc/proto-loader@0.7.13:
+    resolution: {integrity: sha512-AiXO/bfe9bmxBjxxtYxFAXGZvMaN5s8kO+jBHAJCON8rJoB5YS/D6X7ZNc6XQkuHNmyl4CYaMI1fJ/Gn27RGGw==}
+    engines: {node: '>=6'}
+    hasBin: true
+    dependencies:
+      lodash.camelcase: 4.3.0
+      long: 5.2.3
+      protobufjs: 7.2.5
+      yargs: 17.7.2
     dev: true
 
   /@grpc/proto-loader@0.7.4:
@@ -3536,6 +3555,10 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.15
+    dev: true
+
+  /@js-sdsl/ordered-map@4.4.2:
+    resolution: {integrity: sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==}
     dev: true
 
   /@lezer/common@1.0.2:
@@ -5457,58 +5480,57 @@ packages:
   /@temporalio/activity@1.9.3:
     resolution: {integrity: sha512-QmY2dCNNSANhCgy4HCaeRmosyg73wI7KFbxTpnCrFjAWjxpJqBYC5qROrWHQEG/52Mcf59MtmznWSqz3M04Naw==}
     dependencies:
-      '@temporalio/common': 1.9.3
+      '@temporalio/common': 1.10.0
       abort-controller: 3.0.0
     dev: true
 
-  /@temporalio/client@1.9.3:
-    resolution: {integrity: sha512-RgcqMqgrzQG3jOrCxnh8mYqwDqngAMKoCUOPwZZU5AAJa0sBcBLV2lEhJ9KGEavpfZej/duplUa67EV0s+M/6w==}
+  /@temporalio/client@1.10.0:
+    resolution: {integrity: sha512-r54Lb8vEgrJP84n/HvvLr7MzpR7SAdmhIksUg91GV8vjOgWhBUlERG3yxPi/9nzxg3wiBq0bbz2zHiwMlmkKjg==}
     dependencies:
-      '@grpc/grpc-js': 1.7.3
-      '@temporalio/common': 1.9.3
-      '@temporalio/proto': 1.9.3
+      '@grpc/grpc-js': 1.10.8
+      '@temporalio/common': 1.10.0
+      '@temporalio/proto': 1.10.0
       abort-controller: 3.0.0
       long: 5.2.3
       uuid: 9.0.1
     dev: true
 
-  /@temporalio/common@1.9.3:
-    resolution: {integrity: sha512-o6aAiqyIyu8b1bUOeY4nu04ZMwLAPR66Vtc8W/xYs7WM874wNhZlm8XWspqnmflI3W7td4y3Y50AHRi/BUNxRg==}
+  /@temporalio/common@1.10.0:
+    resolution: {integrity: sha512-KWL5QE8ZLdmL2XUnh/Bo6YdU1pUJZS5h/asLrTueBRrbQSwjvFOvU55JNkUyh9eChF5XJj0i5tuX85ScouwOCg==}
     dependencies:
-      '@temporalio/proto': 1.9.3
+      '@temporalio/proto': 1.10.0
       long: 5.2.3
       ms: 3.0.0-canary.1
       proto3-json-serializer: 2.0.1
     dev: true
 
-  /@temporalio/core-bridge@1.9.3:
-    resolution: {integrity: sha512-0cYVDzypc+ilpWeBsYkHP8wv/SbtcLZA4z4ZZd2c6OWKEM3+p4UuW8AiXZf/avL+rpo7cjrSRl+PTWe52vPReg==}
+  /@temporalio/core-bridge@1.10.0:
+    resolution: {integrity: sha512-0LUM2hGbZ+n092TgTmWrPdg+pKuxGPgleisOaAbr4yKPl9sLbBkkn8MqB3Rkr0J/hziepfgkV+pB6V3abA92Uw==}
     requiresBuild: true
     dependencies:
-      '@temporalio/common': 1.9.3
+      '@temporalio/common': 1.10.0
       arg: 5.0.2
       cargo-cp-artifact: 0.1.8
       which: 4.0.0
     dev: true
 
-  /@temporalio/proto@1.9.3:
-    resolution: {integrity: sha512-YOeelTGdz8zLX8LUlXlERvd/VTaCPmV9xN/JEUQoxsyc7YpOB2wVwdrXS7Al/2b1jOTYRm00vbn3rljRV9W5dA==}
+  /@temporalio/proto@1.10.0:
+    resolution: {integrity: sha512-mqJPonTPXkYrolSFfoUfqz+ZqJoPysi3AaQseoeRfm9qohqQpw0hGa4PELhoDKcX9rL9RyF0fJhcpbEVee8i0Q==}
     dependencies:
       long: 5.2.3
       protobufjs: 7.2.5
     dev: true
 
-  /@temporalio/testing@1.9.3(esbuild@0.13.15):
-    resolution: {integrity: sha512-HsNH552QdooJ0LNLM5fXe3CG9Een2vAYcO9RHg7zHiBNuF4PSb4JxCL9v16Y1lhf1aSZJuQEBHShpXxb0RgTDw==}
+  /@temporalio/testing@1.10.0(esbuild@0.13.15):
+    resolution: {integrity: sha512-P5oagVA0rvRZia4zcztU3YhWpN7ws/yvzzixpjXuQqiojF52vhxCTpk1n/LPHad3WdjZl9P51MqnmWCLL5JYGQ==}
     dependencies:
-      '@grpc/grpc-js': 1.7.3
-      '@temporalio/activity': 1.9.3
-      '@temporalio/client': 1.9.3
-      '@temporalio/common': 1.9.3
-      '@temporalio/core-bridge': 1.9.3
-      '@temporalio/proto': 1.9.3
-      '@temporalio/worker': 1.9.3(esbuild@0.13.15)
-      '@temporalio/workflow': 1.9.3
+      '@temporalio/activity': 1.10.0
+      '@temporalio/client': 1.10.0
+      '@temporalio/common': 1.10.0
+      '@temporalio/core-bridge': 1.10.0
+      '@temporalio/proto': 1.10.0
+      '@temporalio/worker': 1.10.0(esbuild@0.13.15)
+      '@temporalio/workflow': 1.10.0
       abort-controller: 3.0.0
     transitivePeerDependencies:
       - '@swc/helpers'
@@ -5517,23 +5539,24 @@ packages:
       - webpack-cli
     dev: true
 
-  /@temporalio/worker@1.9.3(esbuild@0.13.15):
-    resolution: {integrity: sha512-RFotNUeWNnLDk4EvnPVZBiYAZWc+daezr/Prn/iMsCI6e3CxbchDha6GiqIVkIF3ppq1R2Vl+FpouNA/gBniGg==}
-    engines: {node: '>= 14.18.0'}
+  /@temporalio/worker@1.10.0(esbuild@0.13.15):
+    resolution: {integrity: sha512-2SnPiHid14ZB8XncZgQ9BpzyIQJH8PObFqnuJLfVHFULfeUpxXqNaThRkM9ioUOxj9p8s/6NzXOObYX3lUh09w==}
+    engines: {node: '>= 16.0.0'}
     dependencies:
       '@swc/core': 1.4.2
-      '@temporalio/activity': 1.9.3
-      '@temporalio/client': 1.9.3
-      '@temporalio/common': 1.9.3
-      '@temporalio/core-bridge': 1.9.3
-      '@temporalio/proto': 1.9.3
-      '@temporalio/workflow': 1.9.3
+      '@temporalio/activity': 1.10.0
+      '@temporalio/client': 1.10.0
+      '@temporalio/common': 1.10.0
+      '@temporalio/core-bridge': 1.10.0
+      '@temporalio/proto': 1.10.0
+      '@temporalio/workflow': 1.10.0
       abort-controller: 3.0.0
       heap-js: 2.3.0
       memfs: 4.7.7
       rxjs: 7.8.1
       source-map: 0.7.4
       source-map-loader: 4.0.2(webpack@5.90.3)
+      supports-color: 8.1.1
       swc-loader: 0.2.3(@swc/core@1.4.2)(webpack@5.90.3)
       unionfs: 4.5.1
       webpack: 5.90.3(@swc/core@1.4.2)(esbuild@0.13.15)
@@ -5544,11 +5567,11 @@ packages:
       - webpack-cli
     dev: true
 
-  /@temporalio/workflow@1.9.3:
-    resolution: {integrity: sha512-JU3SKZf+Cdm9ebNIbhLB3DM3NmGyusOCCZ1eSOWCHPAJo+fW9Zi6B2ba+Td7XRu6EGWJwvBwh6fnqzVCxtBPMA==}
+  /@temporalio/workflow@1.10.0:
+    resolution: {integrity: sha512-/Urq2Iz6IiqJ32dC8apuYMdEzVs0nNhJl8XD352B5w+rF61FKzSsCcSm3na3bW2lOp+V43lJJAkKXUtuAB5b/A==}
     dependencies:
-      '@temporalio/common': 1.9.3
-      '@temporalio/proto': 1.9.3
+      '@temporalio/common': 1.10.0
+      '@temporalio/proto': 1.10.0
     dev: true
 
   /@testing-library/dom@9.3.4:

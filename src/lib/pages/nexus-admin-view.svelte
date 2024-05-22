@@ -20,7 +20,7 @@
 <div class="flex flex-col gap-8">
   <div class="relative flex flex-col gap-4 text-sm">
     <Link href={routeForNexus()} icon="chevron-left">
-      {translate('nexus.back-to-services')}
+      {translate('nexus.back-to-endpoints')}
     </Link>
   </div>
   <div class="flex flex-col gap-1">
