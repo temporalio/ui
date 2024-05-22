@@ -44,6 +44,7 @@
     error?: string;
     valid?: boolean;
     href?: string;
+    linkDisabled?: boolean;
   }
 
   type UncontrolledStringOptionProps = {
@@ -84,6 +85,7 @@
   export let error = '';
   export let valid = true;
   export let href = '';
+  export let linkDisabled = false;
 
   let displayValue: string;
   let selectedOption: string | T;
@@ -297,7 +299,6 @@
     />
     <Button
       aria-label={toggleLabel}
-      class="combobox-button"
       tabindex={-1}
       aria-controls="{id}-listbox"
       aria-expanded={$open}
@@ -308,8 +309,8 @@
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
     </Button>
     {#if href}
-      <div class="ml-1 h-full w-1 border-l-2" />
-      <Button variant="ghost" size="xs" {href}
+      <div class="ml-1 h-full w-1 border-l-2 border-subtle" />
+      <Button variant="ghost" size="xs" {href} disabled={linkDisabled}
         ><Icon name="external-link" /></Button
       >
     {/if}
@@ -355,7 +356,7 @@
   }
 
   .combobox-wrapper {
-    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border-2 border-primary text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border-2 border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     &.invalid {
       @apply border-2 border-danger text-danger focus-within:ring-danger/70;
@@ -372,9 +373,5 @@
 
   .combobox-input {
     @apply ml-2 h-full w-full grow bg-transparent font-primary text-primary placeholder:text-secondary focus:outline-none;
-  }
-
-  .combobox-button {
-    @apply mx-2 flex shrink-0 items-center justify-center rounded-full hover:surface-interactive-secondary;
   }
 </style>

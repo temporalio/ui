@@ -32,6 +32,9 @@
       pathNameSplit.includes('batch-operations') ||
       pathNameSplit.includes('task-queues') ||
       pathNameSplit.includes('import'));
+  $: namespaceExists = namespaceList.some(
+    (namespaceListItem) => namespaceListItem.namespace === namespace,
+  );
 
   let showProfilePic = true;
 
@@ -71,6 +74,7 @@
         on:change={handleNamespaceSelect}
         minSize={32}
         href={routeForNamespace({ namespace })}
+        linkDisabled={!namespaceExists}
       />
     {/if}
   </div>
