@@ -121,6 +121,8 @@
   }
 
   .preview {
+    @apply my-4;
+
     :global(h1) {
       @apply text-4xl;
     }
