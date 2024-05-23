@@ -1,6 +1,20 @@
-export type NexusService = {
+export type NexusEndpoint = {
+  version: string;
   id: string;
-  name: string;
-  description: string;
-  tags?: string[];
+  spec: {
+    name: string;
+    description?: string;
+    target: {
+      worker: {
+        namespace: string;
+        taskQueue: string;
+      };
+      external?: {
+        url: string;
+      };
+    };
+  };
+  createdTime: string;
+  lastModifiedTime: string;
+  urlPrefix: string;
 };

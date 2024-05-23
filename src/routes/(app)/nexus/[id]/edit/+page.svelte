@@ -2,30 +2,46 @@
   import { page } from '$app/stores';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { routeForNexusService } from '$lib/utilities/route-for';
+  import NexusForm, { endpointForm } from '$lib/pages/nexus-form.svelte';
+  import { routeForNexus } from '$lib/utilities/route-for';
 
-  import services from '$fixtures/nexus-services.json';
+  import type { LayoutData } from '../$types';
 
-  $: ({ id } = $page.params);
+  export let data: LayoutData;
 
-  $: service = services.find((service) => service.id === id);
+  $: ({ endpoint } = data);
+
+  const onSave = () => {
+    console.log('$endpointForm: ', $endpointForm);
+  };
 </script>
 
 <PageTitle title={translate('nexus.nexus')} url={$page.url.href} />
 <div class="flex flex-col gap-8">
   <div class="relative flex flex-col gap-4 text-sm">
-    <Link href={routeForNexusService(service.id)} icon="chevron-left">
-      {translate('common.view')}
-      {service.name}
+    <Link href={routeForNexus()} icon="chevron-left">
+      {translate('nexus.back-to-endpoints')}
     </Link>
   </div>
   <div class="flex flex-col gap-1">
     <div class="flex items-center justify-between">
       <h1 data-testid="namespace-selector-title" class="text-2xl">
-        {service.name}
+        {endpoint.spec.name}
       </h1>
+      <div class="flex items-center gap-2">
+        <Button variant="destructive"
+          >{translate('nexus.delete-endpoint')}</Button
+        >
+        <Button on:click={onSave}>{translate('common.save')}</Button>
+      </div>
     </div>
+  </div>
+  <NexusForm endpoint={data.endpoint} />
+  <div class="flex items-center gap-4">
+    <Button on:click={onSave}>{translate('common.save')}</Button>
+    <Button variant="ghost">{translate('common.cancel')}</Button>
   </div>
 </div>

@@ -10,6 +10,8 @@ import type {
   BatchRouteParameters,
   NamespaceAPIRoutePath,
   NamespaceRouteParameters,
+  NexusAPIRoutePath,
+  NexusRouteParameters,
   ParameterlessAPIRoutePath,
   ScheduleAPIRoutePath,
   ScheduleListRouteParameters,
@@ -93,6 +95,7 @@ const encode = (
       signalName: '',
       batchJobId: '',
       activityId: '',
+      endpointId: '',
     },
   );
 };
@@ -135,6 +138,9 @@ export function pathForApi(
     'activity.fail': `/namespaces/${parameters.namespace}/activities/fail-by-id`,
     'batch-operations.list': `/namespaces/${parameters.namespace}/batch-operations`,
     'batch-operations': `/namespaces/${parameters.namespace}/batch-operations/${parameters?.batchJobId}`,
+    'nexus-endpoints': '/nexus/endpoints',
+    'nexus-endpoint': `/nexus/endpoints/${parameters.endpointId}`,
+    'nexus-endpoint.update': `/nexus/endpoints/${parameters.endpointId}/update`,
   };
 
   return getPath(routes[route]);
@@ -197,6 +203,11 @@ export function routeForApi(
 export function routeForApi(
   route: SearchAttributesRoutePath,
   parameters: SearchAttributesRouteParameters,
+): string;
+export function routeForApi(
+  route: NexusAPIRoutePath,
+  parameters: NexusRouteParameters,
+  shouldEncode?: boolean,
 ): string;
 export function routeForApi(route: ParameterlessAPIRoutePath): string;
 export function routeForApi(

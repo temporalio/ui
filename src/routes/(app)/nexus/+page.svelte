@@ -1,19 +1,25 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import GhostCard from '$lib/holocene/ghost-card.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { timeFormat } from '$lib/stores/time-format';
+  import { formatDate } from '$lib/utilities/format-date';
   import {
-    routeForCreateNexusService,
-    routeForNexusService,
+    routeForNexusEndpoint,
+    routeForNexusEndpointCreate,
   } from '$lib/utilities/route-for';
 
-  import services from '$fixtures/nexus-services.json';
+  import type { PageData } from '../$types';
+
+  export let data: PageData;
+
+  $: ({ endpoints } = data);
 
   let view: 'all' | 'mine' = 'all';
 </script>
@@ -24,7 +30,7 @@
   <h1 data-testid="namespace-selector-title" class="text-2xl">
     {translate('nexus.endpoints')}
   </h1>
-  <Button variant="primary" href={routeForCreateNexusService()}
+  <Button variant="primary" href={routeForNexusEndpointCreate()}
     >{translate('nexus.create-endpoint')}</Button
   >
 </div>
@@ -41,21 +47,23 @@
       active={view === 'mine'}>{translate('nexus.my-endpoints')}</ToggleButton
     >
   </ToggleButtons>
-  <GhostCard
-    class="py-12"
-    title="Get Started"
-    subtitle="Description lorem ipsum dolor sit amet consectetur"
-  />
   <div
-    class="grid grid-cols-1 gap-4 pr-8 md:grid-cols-2 md:pr-24 xl:grid-cols-3 xl:pr-48"
+    class="grid grid-cols-1 gap-4 pr-8 md:grid-cols-2 md:pr-24 lg:grid-cols-3 xl:grid-cols-4 xl:pr-48"
   >
-    {#each services as service}
-      <GhostCard
-        title={service.name}
-        subtitle={service.description}
-        tags={service.tags}
-        on:click={() => goto(routeForNexusService(service.id))}
-      />
+    {#each endpoints as endpoint}
+      <Link href={routeForNexusEndpoint(endpoint.id)} role="button">
+        <div
+          class="transition:colors surface-primary flex cursor-pointer flex-col gap-1 rounded-lg p-4 duration-200 ease-in-out hover:surface-interactive"
+        >
+          <h3 class="text-lg font-medium">
+            {endpoint.spec.name}
+          </h3>
+          <p class="text-xs text-secondary">
+            Created on {formatDate(endpoint.createdTime, $timeFormat)}
+          </p>
+          <Badge type="information" class="px-2 py-1">## Namespaces</Badge>
+        </div>
+      </Link>
     {/each}
   </div>
 </div>

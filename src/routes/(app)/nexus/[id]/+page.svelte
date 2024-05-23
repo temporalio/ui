@@ -1,15 +1,11 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  // import NexusAdminView from '$lib/pages/nexus-admin-view.svelte';
+  import type { PageData } from './$types';
 
-  import NexusView from '$lib/pages/nexus-view.svelte';
+  import NexusEndpoint from '$lib/pages/nexus-endpoint.svelte';
 
-  import services from '$fixtures/nexus-services.json';
+  export let data: PageData;
 
-  $: ({ id } = $page.params);
-
-  $: service = services.find((service) => service.id === id);
+  $: ({ endpoint } = data);
 </script>
 
-<!-- <NexusAdminView {service} /> -->
-<NexusView {service} />
+<NexusEndpoint {endpoint} />

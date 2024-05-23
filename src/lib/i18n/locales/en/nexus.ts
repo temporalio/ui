@@ -23,4 +23,5 @@ export const Strings = {
   'description-placeholder':
     '//Provide a readme for users to use this endpoint',
   handler: 'Handler',
+  'delete-endpoint': 'Delete Endpoint',
 } as const;
