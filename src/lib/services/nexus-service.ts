@@ -12,7 +12,7 @@ export const fetchNexusEndpoints = async (
   const { endpoints } = await requestFromAPI<NexusEndpoints>(route, {
     request,
   });
-  return endpoints;
+  return endpoints || [];
 };
 
 export const fetchNexusEndpoint = async (
