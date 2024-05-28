@@ -7,11 +7,14 @@
 
   export let calendar: StructuredCalendar | undefined = undefined;
   export let interval: IntervalSpec | undefined = undefined;
+  export let timezoneName = 'UTC';
+
   export let inline = false;
 </script>
 
 {#key [calendar, interval]}
   <div class="flex flex-col {$$props.class}">
+    <p>Timezone: {timezoneName}</p>
     <CodeBlock
       copyable
       {inline}

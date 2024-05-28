@@ -6,10 +6,6 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import type {
-    FullScheduleSpec,
-    StructuredCalendar,
-  } from '$lib/types/schedule';
   import { formatDate } from '$lib/utilities/format-date';
   import {
     routeForEventHistory,
@@ -24,9 +20,10 @@
 
   export let schedule: ScheduleListEntry;
 
-  const spec: FullScheduleSpec = schedule?.info?.spec;
-  const calendar: StructuredCalendar = spec?.structuredCalendar?.[0];
-  const interval = spec?.interval?.[0];
+  $: spec = schedule?.info?.spec;
+  $: calendar = spec?.structuredCalendar?.[0];
+  $: interval = spec?.interval?.[0];
+  $: timezoneName = spec?.timezoneName || 'UTC';
 
   const sortRecentActions = (recentActions: ScheduleActionResult[]) => {
     return (
@@ -83,6 +80,7 @@
     {/each}
   </td>
   <td class="cell hidden xl:table-cell">
+    <p>Timezone: {timezoneName}</p>
     <ScheduleBasicFrequency {calendar} {interval} />
   </td>
 </TableRow>
