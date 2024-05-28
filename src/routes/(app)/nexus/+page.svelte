@@ -8,4 +8,12 @@
   $: ({ endpoints } = data);
 </script>
 
-<NexusEndpoints {endpoints} />
+<div class="surface-secondary" class:empty={!endpoints?.length}>
+  <NexusEndpoints {endpoints} />
+</div>
+
+<style lang="postcss">
+  .empty {
+    @apply absolute left-0 right-0 top-12;
+  }
+</style>
