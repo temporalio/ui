@@ -209,6 +209,16 @@ const categories: Record<
     'WorkflowExecutionUpdateAccepted',
     'WorkflowExecutionUpdateCompleted',
   ],
+
+  nexus: [
+    'NexusOperationScheduled',
+    'NexusOperationStarted',
+    'NexusOperationCompleted',
+    'NexusOperationFailed',
+    'NexusOperationCanceled',
+    'NexusOperationTimedOut',
+    'NexusOperationCancelRequested',
+  ],
 };
 
 describe('getEventCategory', () => {

@@ -24,4 +24,9 @@ export const Strings = {
     '//Provide a readme for users to use this endpoint',
   handler: 'Handler',
   'delete-endpoint': 'Delete Endpoint',
+  'delete-modal-title': 'Delete Nexus Endpoint?',
+  'delete-modal-confirmation':
+    'Are you sure you want to delete {{endpoint}}? Any Workflows calling this endpoint will encounter failures.',
+  'delete-modal-confirmation-label':
+    'Type “DELETE {{endpoint}}" to delete this endpoint.',
 } as const;

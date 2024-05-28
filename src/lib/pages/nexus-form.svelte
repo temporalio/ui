@@ -19,14 +19,17 @@
 
   import { onDestroy } from 'svelte';
 
+  import Alert from '$lib/holocene/alert.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Markdown from '$lib/holocene/markdown.svelte';
   import { translate } from '$lib/i18n/translate';
   import { namespaces } from '$lib/stores/namespaces';
+  import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
 
   export let endpoint: NexusEndpoint | undefined = undefined;
+  export let error: NetworkError | undefined = undefined;
 
   let name = endpoint?.spec?.name || '';
   let description = endpoint?.spec?.description || '';
@@ -67,9 +70,10 @@
 <div class="flex w-full flex-col gap-4 xl:w-1/2">
   <Input
     bind:value={name}
+    required
+    error={!name}
     label={translate('nexus.endpoint-name')}
     id="name"
-    required
     maxLength={255}
     placeholder={translate('nexus.endpoint-name-placeholder')}
   />
@@ -83,7 +87,9 @@
     label={translate('nexus.target-namespace')}
     toggleLabel={translate('common.namespaces')}
     noResultsText={translate('common.no-results')}
-    value={target}
+    valid={!!target}
+    error="Please select a target Namespace."
+    bind:value={target}
     required
     id="target-namespace"
     placeholder={translate('nexus.select-namespace')}
@@ -93,8 +99,9 @@
     minSize={32}
   />
   <Input
-    required
     bind:value={taskQueue}
+    required
+    error={!taskQueue}
     label={translate('common.task-queue')}
     id="task-queue"
     placeholder={translate('nexus.task-queue-placeholder')}
@@ -113,3 +120,6 @@
   </Markdown>
   <slot name="footer" />
 </div>
+<Alert title={error?.statusText} intent="error" hidden={!error}>
+  {error?.message}
+</Alert>
