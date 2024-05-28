@@ -1,5 +1,6 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { StructuredCalendar } from '$lib/types/schedule';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
@@ -14,7 +15,7 @@
 
 {#key [calendar, interval]}
   <div class="flex flex-col {$$props.class}">
-    <p>Timezone: {timezoneName}</p>
+    <p>{@html translate('common.timezone', { timezone: timezoneName })}</p>
     <CodeBlock
       copyable
       {inline}

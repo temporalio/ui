@@ -80,7 +80,7 @@
     {/each}
   </td>
   <td class="cell hidden xl:table-cell">
-    <p>Timezone: {timezoneName}</p>
+    <p>{@html translate('common.timezone', { timezone: timezoneName })}</p>
     <ScheduleBasicFrequency {calendar} {interval} />
   </td>
 </TableRow>
