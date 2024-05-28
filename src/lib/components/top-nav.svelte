@@ -15,6 +15,7 @@
   import { dataEncoder } from '$lib/stores/data-encoder';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
+  import { routeForNamespace } from '$lib/utilities/route-for';
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
@@ -31,6 +32,9 @@
       pathNameSplit.includes('batch-operations') ||
       pathNameSplit.includes('task-queues') ||
       pathNameSplit.includes('import'));
+  $: namespaceExists = namespaceList.some(
+    (namespaceListItem) => namespaceListItem.namespace === namespace,
+  );
 
   let showProfilePic = true;
 
@@ -69,6 +73,8 @@
         optionValueKey="namespace"
         on:change={handleNamespaceSelect}
         minSize={32}
+        href={routeForNamespace({ namespace })}
+        linkDisabled={!namespaceExists}
       />
     {/if}
   </div>
