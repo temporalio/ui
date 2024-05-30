@@ -15,17 +15,20 @@
     input = event.detail;
   };
 
-  const setInitialInput = (payload: string): string => {
-    input = payload;
-    return '';
+  const setInitialInput = (decodedValue: string): void => {
+    input = getSinglePayload(decodedValue);
   };
 </script>
 
 <div class="flex flex-col gap-4">
   <Label for="schedule-input" label={translate('workflows.input')} />
-  <PayloadDecoder value={payloads} let:decodedValue key="payloads">
+  <PayloadDecoder
+    value={payloads}
+    let:decodedValue
+    key="payloads"
+    onDecode={setInitialInput}
+  >
     {#key decodedValue}
-      {setInitialInput(getSinglePayload(decodedValue))}
       <CodeBlock
         id="schedule-input"
         maxHeight={320}
