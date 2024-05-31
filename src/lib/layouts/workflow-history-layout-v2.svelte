@@ -7,6 +7,7 @@
   import CompactGraph from '$lib/components/lines-and-dots/svg/compact-graph.svelte';
   import HistoryGraph from '$lib/components/lines-and-dots/svg/history-graph.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
+  import VerticalCompactGraph from '$lib/components/lines-and-dots/svg/vertical-compact-graph.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
@@ -152,6 +153,13 @@
 <div class="bg-off-black">
   <div class="w-full overflow-auto" bind:clientWidth={canvasWidth}>
     {#if $eventViewType === 'compact'}
+      <VerticalCompactGraph
+        {workflow}
+        {groups}
+        {zoomLevel}
+        {canvasWidth}
+        activeGroups={$activeGroups}
+      />
       <CompactGraph
         {workflow}
         {groups}
