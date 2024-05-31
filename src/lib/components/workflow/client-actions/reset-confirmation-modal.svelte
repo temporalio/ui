@@ -21,23 +21,15 @@
 
   let error = '';
   let loading = false;
-  let reapplyType: ResetReapplyType;
   let eventId: Writable<string> = writable('');
   let reason: string;
+  let reapplySignals = false;
 
   const hideResetModal = () => {
     open = false;
-    reapplyType = ResetReapplyType.Signal;
+    reapplySignals = false;
     $eventId = '';
     reason = '';
-  };
-
-  const handleReapplyTypeChange = (
-    event: CustomEvent<{ checked: boolean }>,
-  ) => {
-    reapplyType = event.detail.checked
-      ? ResetReapplyType.Signal
-      : ResetReapplyType.None;
   };
 
   const reset = async () => {
@@ -49,7 +41,9 @@
         workflow,
         eventId: $eventId,
         reason,
-        reapplyType,
+        reapplyType: reapplySignals
+          ? ResetReapplyType.Signal
+          : ResetReapplyType.None,
       });
 
       if (response && response.runId) {
@@ -102,8 +96,7 @@
       </RadioGroup>
       <Checkbox
         id="reset-reapply-type-checkbox"
-        checked={reapplyType === ResetReapplyType.Signal}
-        on:change={handleReapplyTypeChange}
+        bind:checked={reapplySignals}
         label={translate('workflows.reset-reapply-type-label')}
       />
 

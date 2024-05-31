@@ -15,6 +15,7 @@
   import { dataEncoder } from '$lib/stores/data-encoder';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
+  import { routeForNamespace } from '$lib/utilities/route-for';
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
@@ -31,6 +32,9 @@
       pathNameSplit.includes('batch-operations') ||
       pathNameSplit.includes('task-queues') ||
       pathNameSplit.includes('import'));
+  $: namespaceExists = namespaceList.some(
+    (namespaceListItem) => namespaceListItem.namespace === namespace,
+  );
 
   let showProfilePic = true;
 
@@ -50,7 +54,7 @@
 <svelte:window bind:innerWidth={screenWidth} />
 
 <nav
-  class="surface-secondary sticky top-0 z-40 flex w-full flex-col items-center justify-end border-b-2 border-subtle p-1 px-4 shadow-md md:flex-row md:px-8"
+  class="surface-primary sticky top-0 z-40 flex w-full flex-col items-center justify-end border-b-2 border-subtle p-1 px-4 shadow-md md:flex-row md:px-8"
   data-testid="top-nav"
   class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
   aria-label={translate('common.main')}
@@ -69,6 +73,8 @@
         optionValueKey="namespace"
         on:change={handleNamespaceSelect}
         minSize={32}
+        href={routeForNamespace({ namespace })}
+        linkDisabled={!namespaceExists}
       />
     {/if}
   </div>

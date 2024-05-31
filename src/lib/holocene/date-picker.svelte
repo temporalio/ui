@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
 
   import { clickoutside } from '$lib/holocene/outside-click';
+  import { translate } from '$lib/i18n/translate';
   import { getMonthName } from '$lib/utilities/calendar';
 
   import Calender from './calendar.svelte';
@@ -70,6 +71,9 @@
     showDatePicker = false;
     dispatch('datechange', d.detail);
   };
+
+  const previousMonth = translate('date-picker.previous-month');
+  const nextMonth = translate('date-picker.next-month');
 </script>
 
 <div class="relative" use:clickoutside={() => (showDatePicker = false)}>
@@ -89,12 +93,13 @@
   />
   {#if showDatePicker}
     <div
-      class="surface-primary absolute z-30 inline-block rounded border border-subtle shadow dark:bg-secondary"
+      class="surface-primary absolute z-30 inline-block rounded border border-subtle shadow"
     >
       <div class="mx-3 my-2 flex items-center justify-around">
         <div class="flex items-center justify-center">
-          <button type="button" on:click={prev}
-            ><Icon name="chevron-left" /></button
+          <button type="button" on:click={prev} title={previousMonth}>
+            <span class="sr-only">{previousMonth}</span>
+            <Icon name="chevron-left" /></button
           >
         </div>
         <div class="flex items-center justify-center">
@@ -102,9 +107,11 @@
           {year}
         </div>
         <div class="flex items-center justify-center">
-          <button type="button" on:click={next}
-            ><Icon name="chevron-right" /></button
-          >
+          <span class="sr-only">Next Month</span>
+          <button type="button" on:click={next} title={nextMonth}>
+            <span class="sr-only">{nextMonth}</span>
+            <Icon name="chevron-right" />
+          </button>
         </div>
       </div>
       <Calender

@@ -55,11 +55,10 @@
 <MenuContainer>
   <MenuButton
     controls="search-attribute-menu"
-    unroundRight={Boolean($filter.attribute)}
     disabled={$activeQueryIndex !== null}
     count={$filter.attribute ? 0 : $workflowFilters.length}
     on:click={() => (searchAttributeValue = '')}
-    class="text-nowrap"
+    class="text-nowrap {!!$filter.attribute && 'attribute-selected'}"
   >
     <svelte:fragment slot="leading">
       {#if !$filter.attribute}

@@ -11,7 +11,7 @@
     @apply rounded-xl border-2 p-8 dark:border-subtle;
 
     &.error {
-      @apply border-error bg-error;
+      @apply border-danger bg-danger;
     }
   }
 </style>

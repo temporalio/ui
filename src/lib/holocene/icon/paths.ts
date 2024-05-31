@@ -33,6 +33,7 @@ import descending from './svg/descending.svelte';
 import download from './svg/download.svelte';
 import error from './svg/error.svelte';
 import exit from './svg/exit.svelte';
+import externalLink from './svg/external-link.svelte';
 import eyeHide from './svg/eye-hide.svelte';
 import eyeShow from './svg/eye-show.svelte';
 import feather from './svg/feather.svelte';
@@ -131,6 +132,7 @@ export const icons = {
   download,
   error,
   exit,
+  'external-link': externalLink,
   'eye-hide': eyeHide,
   'eye-show': eyeShow,
   feather,

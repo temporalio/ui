@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
 
+  import Label from '$lib/holocene/label.svelte';
   import { omit } from '$lib/utilities/omit';
 
   interface $$Props extends HTMLInputAttributes {
@@ -111,9 +112,7 @@
         step={$$props.step}
       />
     </div>
-    <label class:sr-only={labelHidden} class="flex shrink text-sm" for={id}>
-      {label}
-    </label>
+    <Label hidden={labelHidden} class="shrink" {label} for={id} />
   </div>
 </div>
 
@@ -123,7 +122,7 @@
   }
 
   .numeric-input {
-    @apply surface-primary h-10 w-10 rounded border border-primary text-center text-sm;
+    @apply surface-primary h-10 w-10 rounded-lg border-2 border-subtle text-center text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     appearance: textfield;
   }

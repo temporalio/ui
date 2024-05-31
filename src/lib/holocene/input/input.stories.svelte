@@ -81,6 +81,8 @@
 
 <script lang="ts">
   import { Story, Template } from '@storybook/addon-svelte-csf';
+
+  import Button from '../button.svelte';
 </script>
 
 <Template let:args let:context>
@@ -232,3 +234,10 @@
   }}
   parameters={{ themes: { themeOverride: 'dark' } }}
 />
+
+<Story name="With Buttons" let:args let:context>
+  <Input {...args} id={context.id} data-testid={context.id}>
+    <Button slot="before-input" type="button">Before</Button>
+    <Button slot="after-input" type="button">After</Button>
+  </Input>
+</Story>

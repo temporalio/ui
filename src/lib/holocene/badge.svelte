@@ -5,18 +5,18 @@
   export type BadgeType = VariantProps<typeof types>['type'];
 
   const type = {
-    alpha: 'border-purple-700 bg-purple-100 text-purple-700',
-    beta: 'border-blue-700 bg-indigo-400 text-black',
-    success: 'border-green-700 bg-green-100 text-green-800',
-    information: 'border-blue-700 bg-indigo-400 text-black',
-    error: 'border-red-700 bg-red-300 text-black',
-    warning: 'border-yellow-900 bg-yellow-200 text-black',
-    unspecified: 'bg-badge text-primary dark:bg-slate-100 dark:text-black',
-    active: 'border-green-700 bg-green-100 text-green-800',
-    inactive: 'bg-badge text-primary dark:bg-slate-100 dark:text-black',
-    available: 'border-green-700 bg-green-100 text-green-700',
-    running: 'border-blue-700 bg-indigo-400 text-black',
-    count: 'h-6 w-6 min-w-max rounded-full bg-indigo-400 text-black',
+    alpha: 'bg-purple-100 text-purple-700',
+    beta: 'bg-indigo-400',
+    success: 'bg-green-100 text-green-800',
+    information: 'bg-indigo-400',
+    error: 'bg-red-300',
+    warning: 'bg-yellow-200',
+    unspecified: 'bg-slate-100',
+    active: 'bg-green-100 text-green-800',
+    inactive: 'bg-slate-100',
+    available: 'bg-green-100 text-green-800',
+    running: 'bg-indigo-400',
+    count: 'h-6 w-6 min-w-max rounded-full bg-indigo-400',
   };
 
   const types = cva(
@@ -34,6 +34,7 @@
       'font-medium',
       'leading-4',
       'transition-colors',
+      'text-black',
     ],
     {
       variants: {

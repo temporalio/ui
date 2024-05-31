@@ -9,6 +9,7 @@
   export let title = '';
   export let content: string;
   export let copyable = false;
+  export let filterable = false;
   export let href: string = null;
   export let icon: IconName | undefined = undefined;
   export let tooltip: string = '';
@@ -30,7 +31,12 @@
         {title}
       {/if}
       {#if href}
-        <Link {href} class="value">{content}</Link>
+        <Link {href} class="value flex items-center gap-1"
+          >{content}
+          {#if filterable}
+            <Icon name="filter" />
+          {/if}
+        </Link>
       {:else}
         <Tooltip text={tooltip} hide={!tooltip} top>
           <span class="value select-all">{content}</span>
@@ -56,6 +62,6 @@
 
 <style lang="postcss">
   .value {
-    @apply flex w-fit flex-row items-center justify-center truncate break-all rounded-sm bg-badge p-1 leading-4 transition-colors;
+    @apply surface-subtle flex w-fit flex-row items-center justify-center truncate break-all rounded-sm p-1 leading-4 transition-colors;
   }
 </style>

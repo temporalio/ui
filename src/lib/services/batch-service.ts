@@ -27,6 +27,12 @@ import type {
 } from '$types/batch';
 import type { WorkflowExecution } from '$types/workflows';
 
+// https://github.com/temporalio/api/blob/master/temporal/api/enums/v1/reset.proto
+enum ResetType {
+  RESET_TYPE_FIRST_WORKFLOW_TASK = 1,
+  RESET_TYPE_LAST_WORKFLOW_TASK = 2,
+}
+
 type CreateBatchOperationOptions = {
   namespace: string;
   reason: string;
@@ -75,8 +81,18 @@ const batchActionToOperation = (
         resetType === 'first'
           ? { firstWorkflowTask: {} }
           : { lastWorkflowTask: {} };
+
       return {
-        resetOperation: { identity, options },
+        resetOperation: {
+          identity,
+          // options is a new field for server versions 1.23 and later
+          options,
+          // resetType is a deprecated field for server versions 1.23 and earlier
+          resetType:
+            resetType === 'first'
+              ? ResetType.RESET_TYPE_FIRST_WORKFLOW_TASK
+              : ResetType.RESET_TYPE_LAST_WORKFLOW_TASK,
+        },
       };
     }
   }

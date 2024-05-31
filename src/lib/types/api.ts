@@ -25,7 +25,10 @@ export type BatchAPIRoutePath = 'batch-operations.list' | 'batch-operations';
 
 export type NamespaceAPIRoutePath = 'namespace';
 
-export type TaskQueueAPIRoutePath = 'task-queue' | 'task-queue.compatibility';
+export type TaskQueueAPIRoutePath =
+  | 'task-queue'
+  | 'task-queue.compatibility'
+  | 'task-queue.rules';
 export type ParameterlessAPIRoutePath =
   | 'systemInfo'
   | 'cluster'

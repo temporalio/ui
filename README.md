@@ -92,6 +92,37 @@ pnpn run build:docker
 pnpn run preview:docker
 ```
 
+
+### Running UI and Temporal Server locally
+
+1. In `temporal` repo, run Temporal server locally
+    
+```diff
+make start
+```
+
+2. In `ui` repo, add .env.local-temporal file with the following env variables
+
+```diff
+VITE_TEMPORAL_PORT="7134"
+VITE_API="http://localhost:8081"
+VITE_MODE="development"
+VITE_TEMPORAL_UI_BUILD_TARGET="local"
+```
+
+3. Run UI with pnpm dev:local-temporal
+
+```diff
+pnpm dev:local-temporal
+```
+
+4. Create namespace with CLI (Temporal server does not do this automatically unlike CLI)
+
+```diff
+temporal operator namespace create default
+```
+
+
 ## Testing
 We use [Playwright](https://playwright.dev) to interactively test the Temporal UI.
 

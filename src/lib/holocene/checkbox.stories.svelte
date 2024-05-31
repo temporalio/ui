@@ -8,7 +8,6 @@
     component: Checkbox,
     args: {
       label: 'Check Me',
-      hoverable: true,
       disabled: false,
       checked: false,
       labelHidden: false,
@@ -19,7 +18,6 @@
     },
     argTypes: {
       label: { control: 'text' },
-      hoverable: { control: 'boolean' },
       disabled: { control: 'boolean' },
       checked: { control: 'boolean' },
 

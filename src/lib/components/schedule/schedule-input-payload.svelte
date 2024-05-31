@@ -1,5 +1,6 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { Payloads } from '$lib/types';
   import { getSinglePayload } from '$lib/utilities/encode-payload';
@@ -16,7 +17,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <label for="schedule-input">{translate('workflows.input')}</label>
+  <Label for="schedule-input" label={translate('workflows.input')} />
   <PayloadDecoder value={payloads} let:decodedValue key="payloads">
     {#key decodedValue}
       <CodeBlock

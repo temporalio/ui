@@ -10,10 +10,7 @@
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchAllEvents } from '$lib/services/events-service';
-  import {
-    getPollers,
-    getTaskQueueCompatibility,
-  } from '$lib/services/pollers-service';
+  import { getPollers } from '$lib/services/pollers-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
@@ -25,24 +22,11 @@
     workflowRun,
   } from '$lib/stores/workflow-run';
   import type { NetworkError } from '$lib/types/global';
-  import type { WorkflowExecution } from '$lib/types/workflows';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
+
   let workflowError: NetworkError;
   let eventHistoryController: AbortController;
-
-  const getCompatibility = async (
-    workflow: WorkflowExecution,
-    taskQueue: string,
-  ) => {
-    const workflowUsesVersioning =
-      workflow?.mostRecentWorkerVersionStamp?.useVersioning;
-    if (!workflowUsesVersioning) return;
-    return await getTaskQueueCompatibility({
-      queue: taskQueue,
-      namespace,
-    });
-  };
 
   const getWorkflowAndEventHistory = async (
     namespace: string,
@@ -65,15 +49,14 @@
 
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
-    const compatibility = await getCompatibility(workflow, taskQueue);
+
     workflow.pendingActivities = await toDecodedPendingActivities(
       workflow,
       namespace,
       settings,
       $authUser?.accessToken,
     );
-    $workflowRun = { workflow, workers, compatibility };
-
+    $workflowRun = { workflow, workers };
     eventHistoryController = new AbortController();
     $fullEventHistory = await fetchAllEvents({
       namespace,
@@ -152,7 +135,7 @@
 
 <LabsModeGuard>
   <div
-    class="surface-secondary absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
+    class="absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
       ? 'top-[540px]'
       : 'top-0'}
     } flex h-full flex-col gap-0"
@@ -160,7 +143,7 @@
     {#if workflowError}
       <WorkflowError error={workflowError} />
     {:else if !$workflowRun.workflow}
-      <Loading />
+      <Loading class="pt-24" />
     {:else}
       <div class="px-8 pt-24 md:pt-20">
         <WorkflowHeader namespace={$page.params.namespace} />

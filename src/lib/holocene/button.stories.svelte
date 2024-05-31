@@ -12,7 +12,6 @@
       size: 'md',
       loading: false,
       disabled: false,
-      active: false,
     },
     argTypes: {
       variant: {
@@ -32,14 +31,6 @@
       count: {
         name: 'Count',
         control: { type: 'number', min: 0, max: 99, step: 1 },
-      },
-      icon: {
-        name: 'Icon',
-        control: 'select',
-        options: iconNames,
-        table: {
-          category: 'Icon',
-        },
       },
       leadingIcon: {
         name: 'Leading Icon',
@@ -142,8 +133,6 @@
 <Story name="Active" args={{ active: true }} />
 
 <Story name="With Count" args={{ count: 5 }} />
-
-<Story name="With Icon" args={{ icon: 'workflow' }} />
 
 <Story name="With Leading Icon" args={{ leadingIcon: 'workflow' }} />
 
@@ -255,16 +244,6 @@
 <Story
   name="With Count (Dark)"
   args={{ count: 5 }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="With Icon (Dark)"
-  args={{ icon: 'workflow' }}
   parameters={{
     themes: {
       themeOverride: 'dark',

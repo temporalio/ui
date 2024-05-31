@@ -50,7 +50,7 @@
       />
     </th>
   {/if}
-  <IsTemporalServerVersionGuard minimumVersion="1.23">
+  <IsTemporalServerVersionGuard minimumVersion="1.23.0">
     {#if !$showChildWorkflows}
       <th class="w-12" />
     {/if}

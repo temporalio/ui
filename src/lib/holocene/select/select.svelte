@@ -28,6 +28,7 @@
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import type { MenuButtonVariant } from '$lib/holocene/menu/menu-button.svelte';
 
@@ -41,8 +42,6 @@
     placeholder?: string;
     disabled?: boolean;
     leadingIcon?: IconName;
-    unroundRight?: boolean;
-    unroundLeft?: boolean;
     onChange?: (value: T) => void;
     'data-testid'?: string;
     variant?: MenuButtonVariant;
@@ -55,8 +54,6 @@
   export let placeholder = '';
   export let disabled = false;
   export let leadingIcon: IconName = null;
-  export let unroundRight = false;
-  export let unroundLeft = false;
   export let onChange: (value: T) => void = noop;
   export let variant: MenuButtonVariant = 'secondary';
 
@@ -66,7 +63,9 @@
   const labelCtx = writable<string>(value?.toString());
   const open = writable<boolean>(false);
 
-  $: {
+  $: value, updateContext();
+
+  function updateContext() {
     $valueCtx = value;
     $labelCtx = getLabelFromOptions(value);
   }
@@ -101,31 +100,29 @@
 </script>
 
 <MenuContainer class="w-full" {open}>
-  <label class="text-sm text-primary" class:sr-only={labelHidden} for={id}
-    >{label}</label
-  >
-  <MenuButton
-    hasIndicator={!disabled}
-    {disabled}
-    {unroundLeft}
-    {unroundRight}
-    controls="{id}-select"
-    {variant}
-  >
-    <Icon slot="leading" name={leadingIcon} />
-    <input
-      {id}
-      value={!value && placeholder !== '' ? placeholder : $labelCtx}
-      tabindex="-1"
-      class="select-input"
-      disabled
-      class:disabled
-      {...$$restProps}
-    />
-    {#if disabled}
-      <Icon slot="trailing" name="lock" />
-    {/if}
-  </MenuButton>
+  <Label {label} hidden={labelHidden} for={id} />
+  {#key $labelCtx}
+    <MenuButton
+      hasIndicator={!disabled}
+      {disabled}
+      controls="{id}-select"
+      {variant}
+    >
+      <Icon slot="leading" name={leadingIcon} />
+      <input
+        {id}
+        value={!value && placeholder !== '' ? placeholder : $labelCtx}
+        tabindex="-1"
+        class="select-input"
+        disabled
+        class:disabled
+        {...$$restProps}
+      />
+      {#if disabled}
+        <Icon slot="trailing" name="lock" />
+      {/if}
+    </MenuButton>
+  {/key}
   <Menu role="listbox" id="{id}-select">
     <slot />
   </Menu>

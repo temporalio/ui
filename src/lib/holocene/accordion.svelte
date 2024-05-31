@@ -16,7 +16,6 @@
     subtitle?: string;
     icon?: IconName;
     open?: boolean;
-    disabled?: boolean;
     readOnly?: boolean;
     error?: string;
     onToggle?: () => void;
@@ -28,18 +27,13 @@
   export let subtitle = '';
   export let icon = null;
   export let open = false;
-  export let disabled = false;
-  export let readOnly = false;
   export let error = '';
   export let onToggle = noop;
 
   let className = '';
   export { className as class };
 
-  $: open = disabled ? true : open;
-
   const toggleAccordion = () => {
-    if (disabled || readOnly) return;
     open = !open;
     onToggle();
   };
@@ -57,7 +51,6 @@
     aria-expanded={open}
     aria-controls="{id}-content"
     class="flex w-full flex-col"
-    disabled={disabled || readOnly}
     type="button"
     on:click={toggleAccordion}
   >
@@ -74,16 +67,11 @@
       >
         <slot name="action" />
       </div>
-      {#if !readOnly}
-        <div
-          class="rounded-full from-blue-100 to-purple-100 p-1 hover:bg-gradient-to-br dark:from-blue-800 dark:to-purple-800"
-        >
-          <Icon
-            name={open ? 'chevron-up' : 'chevron-down'}
-            class=" {disabled ? 'text-disabled' : 'text-primary'}"
-          />
-        </div>
-      {/if}
+      <div
+        class="rounded-full from-blue-100 to-purple-100 p-1 hover:bg-gradient-to-br dark:from-blue-800 dark:to-purple-800"
+      >
+        <Icon name={open ? 'chevron-up' : 'chevron-down'} />
+      </div>
     </div>
     <p class="flex items-center font-secondary">
       {#if error}

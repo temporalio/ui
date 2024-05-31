@@ -13,7 +13,6 @@
       step: 1,
       label: 'Label',
       required: false,
-      disabled: false,
       labelHidden: false,
     },
     argTypes: {
@@ -32,11 +31,6 @@
       step: {
         name: 'Step',
         control: { type: 'number', min: 0 },
-        table: { category: 'Attributes' },
-      },
-      disabled: {
-        name: 'Disabled',
-        control: 'boolean',
         table: { category: 'Attributes' },
       },
       required: {
@@ -59,20 +53,12 @@
 
 <Story name="Default" />
 
-<Story name="Disabled" args={{ disabled: true }} />
-
 <Story name="Required" args={{ required: true }} />
 
 <Story name="Label Hidden" args={{ labelHidden: true }} />
 
 <Story
   name="Default (Dark)"
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Disabled (Dark)"
-  args={{ disabled: true }}
   parameters={{ themes: { themeOverride: 'dark' } }}
 />
 

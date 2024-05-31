@@ -26,7 +26,9 @@ import (
 	"bytes"
 	"fmt"
 	"io/fs"
+	"log"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -56,6 +58,11 @@ func SetUIRoutes(e *echo.Echo, publicPath string, assets fs.FS) error {
 	return nil
 }
 
+func removeCSPMeta(htmlStr string) string {
+	re := regexp.MustCompile(`(?i)<meta[^>]*http-equiv\s*=\s*["']content-security-policy["'][^>]*>`)
+	return re.ReplaceAllString(htmlStr, "")
+}
+
 func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, error) {
 	indexHTMLBytes, err := fs.ReadFile(assets, "index.html")
 	if err != nil {
@@ -65,6 +72,8 @@ func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, err
 		indexHTML := string(indexHTMLBytes)
 		indexHTML = strings.ReplaceAll(indexHTML, "base: \"\"", fmt.Sprintf("base: \"%s\"", publicPath))
 		indexHTML = strings.ReplaceAll(indexHTML, "\"/_app/", fmt.Sprintf("\"%s/_app/", publicPath))
+		log.Printf("WARNING: CSP IS DISABLED WHEN USING PUBLIC PATH!")
+		indexHTML = removeCSPMeta(indexHTML)
 		indexHTMLBytes = []byte(indexHTML)
 	}
 

@@ -4,6 +4,25 @@ import { withThemeByDataAttribute } from '@storybook/addon-themes';
 
 import '../src/app.css';
 
+import i18next from 'i18next';
+
+import { i18nNamespaces } from '../src/lib/i18n';
+import resources from '../src/lib/i18n/locales';
+
+i18next.init({
+  fallbackLng: 'en',
+  load: 'languageOnly',
+  ns: i18nNamespaces,
+  defaultNS: 'common',
+  detection: {
+    order: ['querystring', 'localStorage', 'navigator'],
+    caches: ['localStorage'],
+    lookupQuerystring: 'lng',
+    lookupLocalStorage: 'locale',
+  },
+  resources,
+});
+
 const preview: Preview = {
   decorators: [
     withThemeByDataAttribute({

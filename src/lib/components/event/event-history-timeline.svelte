@@ -280,7 +280,6 @@
   $: readyToDraw =
     $workflowTimelineViewOpen &&
     $workflowRun.workflow &&
-    history.length &&
     visualizationRef &&
     $timeFormat;
 
@@ -292,7 +291,7 @@
   };
 
   $: {
-    if (readyToDraw) {
+    if (readyToDraw && history.length) {
       drawTimeline();
     }
   }
@@ -337,7 +336,8 @@
     font-size: 12px;
     display: flex;
     align-items: center;
-    color: #18181b;
+
+    @apply !text-primary;
   }
 
   :global(.vis-timeline) {
@@ -350,15 +350,15 @@
   }
 
   :global(.vis-background, .vis-timeline) {
-    background-color: #18181b;
+    background-color: #000;
     color: white;
     border-radius: 0.75rem;
     border-width: 2px;
-    border: 2px solid #18181b;
+    border: 2px solid #000;
   }
 
   :global(.vis-content, .vis-group) {
-    @apply surface-primary;
+    @apply surface-secondary;
   }
 
   :global(.vis-timeline .vis-item) {
@@ -454,11 +454,11 @@
       .vis-item.vis-range.Started,
       .vis-item.vis-range.Initiated
     ) {
-    background-color: #dbeafe;
-    border-color: #1d4ed8;
+    background-color: #8098f9;
+    border-color: #2f34a4;
     border-radius: 9999px;
     border-width: 2px;
-    color: #1d4ed8;
+    color: #000;
   }
 
   :global(
@@ -468,7 +468,7 @@
       .vis-item.vis-point.Started,
       .vis-item.vis-point.Initiated
     ) {
-    color: #1d4ed8;
+    color: #2f34a4;
   }
 
   :global(.vis-item.vis-range.workflow.Running) {

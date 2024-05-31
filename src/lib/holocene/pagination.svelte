@@ -165,10 +165,7 @@
               }}
               aria-label={previousButtonLabel}
             >
-              <span
-                class="arrow arrow-left"
-                class:arrow-left-disabled={!$store.hasPrevious}
-              />
+              <span class="arrow arrow-left" />
             </button>
             <p>
               {#if updating}
@@ -188,10 +185,7 @@
               }}
               aria-label={nextButtonLabel}
             >
-              <span
-                class="arrow arrow-right"
-                class:arrow-right-disabled={!$store.hasNext}
-              />
+              <span class="arrow arrow-right" />
             </button>
           </div>
         </slot>
@@ -229,10 +223,7 @@
           on:click={() => store.previous()}
           aria-label={previousButtonLabel}
         >
-          <span
-            class="arrow arrow-left"
-            class:arrow-left-disabled={!$store.hasPrevious}
-          />
+          <span class="arrow arrow-left" />
         </button>
         <p>
           {#if updating}
@@ -248,10 +239,7 @@
           on:click={() => store.next()}
           aria-label={nextButtonLabel}
         >
-          <span
-            class="arrow arrow-right"
-            class:arrow-right-disabled={!$store.hasNext}
-          />
+          <span class="arrow arrow-right" />
         </button>
       </div>
       <slot name="action-bottom-right" />
@@ -268,7 +256,7 @@
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-slate-400;
+    @apply cursor-not-allowed opacity-50;
   }
 
   .arrow {
@@ -280,19 +268,13 @@
 
   .arrow-left {
     border-width: 6px 12px 6px 0;
-    border-color: transparent #18181b transparent transparent;
-  }
 
-  .arrow-left-disabled {
-    border-color: transparent #d4d4d8 transparent transparent;
+    @apply border-b-transparent border-l-transparent border-r-primary border-t-transparent;
   }
 
   .arrow-right {
     border-width: 6px 0 6px 12px;
-    border-color: transparent transparent transparent #18181b;
-  }
 
-  .arrow-right-disabled {
-    border-color: transparent transparent transparent #d4d4d8;
+    @apply border-b-transparent border-l-primary border-r-transparent border-t-transparent;
   }
 </style>

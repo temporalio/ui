@@ -6,9 +6,11 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
 
+  import Button from '../button.svelte';
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
 
@@ -41,6 +43,8 @@
     'data-testid'?: string;
     error?: string;
     valid?: boolean;
+    href?: string;
+    linkDisabled?: boolean;
   }
 
   type UncontrolledStringOptionProps = {
@@ -80,6 +84,8 @@
   export let maxSize = 120;
   export let error = '';
   export let valid = true;
+  export let href = '';
+  export let linkDisabled = false;
 
   let displayValue: string;
   let selectedOption: string | T;
@@ -253,14 +259,13 @@
 </script>
 
 <MenuContainer {open} on:close={handleMenuClose}>
-  <label
+  <Label
     class="combobox-label"
-    class:sr-only={labelHidden}
-    class:required
-    for={id}
-  >
+    hidden={labelHidden}
+    {required}
     {label}
-  </label>
+    for={id}
+  />
   <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
     {#if leadingIcon}
       <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
@@ -292,17 +297,23 @@
       bind:this={inputElement}
       {...$$restProps}
     />
-    <button
+    <Button
       aria-label={toggleLabel}
-      class="combobox-button"
       tabindex={-1}
       aria-controls="{id}-listbox"
       aria-expanded={$open}
-      type="button"
+      variant="ghost"
+      size="xs"
       on:click={toggleList}
     >
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
-    </button>
+    </Button>
+    {#if href}
+      <div class="ml-1 h-full w-1 border-l-2 border-subtle" />
+      <Button variant="ghost" size="xs" {href} disabled={linkDisabled}
+        ><Icon name="external-link" /></Button
+      >
+    {/if}
   </div>
   {#if error && !valid}
     <span class="error">{error}</span>
@@ -345,14 +356,14 @@
   }
 
   .combobox-wrapper {
-    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border border-primary text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
+    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border-2 border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     &.invalid {
-      @apply border-2 border-error text-danger focus-within:shadow-danger/50;
+      @apply border-2 border-danger text-danger focus-within:ring-danger/70;
     }
 
     &.disabled {
-      @apply surface-disabled border-subtle text-disabled;
+      @apply opacity-50;
     }
   }
 
@@ -361,10 +372,6 @@
   }
 
   .combobox-input {
-    @apply ml-2 h-full w-full grow bg-transparent font-primary text-primary placeholder:text-primary focus:outline-none disabled:text-disabled disabled:placeholder:text-disabled dark:bg-transparent;
-  }
-
-  .combobox-button {
-    @apply mx-2 flex shrink-0 items-center justify-center rounded-full hover:surface-interactive-secondary;
+    @apply ml-2 h-full w-full grow bg-transparent font-primary text-primary placeholder:text-secondary focus:outline-none;
   }
 </style>

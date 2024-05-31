@@ -28,13 +28,9 @@
     hasIndicator?: boolean;
     id?: string;
     label?: string;
-    unround?: boolean;
-    unroundRight?: boolean;
-    unroundLeft?: boolean;
     variant?: MenuButtonVariant;
     class?: string;
     active?: boolean;
-    round?: boolean;
     'data-testid'?: string;
   }
 
@@ -47,7 +43,6 @@
   export let id: string = null;
   export let label: string = null;
   export let variant: MenuButtonVariant = 'secondary';
-  export let round = false;
 
   const dispatch = createEventDispatcher<{ click: { open: boolean } }>();
   const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);
@@ -108,11 +103,7 @@
   {...$$restProps}
 >
   <slot name="leading" />
-  <div
-    class="flex grow items-center"
-    class:justify-center={round}
-    class:hidden={!$$slots.default}
-  >
+  <div class="flex grow items-center" class:hidden={!$$slots.default}>
     <slot />
   </div>
   {#if hasIndicator}

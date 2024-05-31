@@ -42,7 +42,7 @@
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { OverlapPolicy } from '$lib/types/schedule';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-  import { formatDate } from '$lib/utilities/format-date';
+  import { formatDate, getUTCString } from '$lib/utilities/format-date';
   import {
     routeForScheduleEdit,
     routeForSchedules,
@@ -207,32 +207,6 @@
 
   $: backfillConfirmationModalOpen && updateDefaultBackfillTimes();
 
-  const applyTimeSelection = (): {
-    startTime: string;
-    endTime: string;
-  } => {
-    const startTimeUTC = Date.UTC(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      startDate.getDay(),
-      Number(startHour),
-      Number(startMinute),
-      Number(startSecond),
-    );
-    const startTime = new Date(startTimeUTC).toISOString();
-    const endTimeUTC = Date.UTC(
-      endDate.getFullYear(),
-      endDate.getMonth(),
-      endDate.getDay(),
-      Number(endHour),
-      Number(endMinute),
-      Number(endSecond),
-    );
-    const endTime = new Date(endTimeUTC).toISOString();
-
-    return { startTime, endTime };
-  };
-
   const closeBackfillModal = () => {
     backfillConfirmationModalOpen = false;
     viewMoreBackfillOptions = false;
@@ -241,7 +215,19 @@
 
   const handleBackfill = async () => {
     scheduleUpdating = true;
-    const { startTime, endTime } = applyTimeSelection();
+
+    const startTime = getUTCString({
+      date: startDate,
+      hour: startHour,
+      minute: startMinute,
+      second: startSecond,
+    });
+    const endTime = getUTCString({
+      date: endDate,
+      hour: endHour,
+      minute: endMinute,
+      second: endSecond,
+    });
 
     await backfillRequest({
       namespace,

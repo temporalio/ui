@@ -3,6 +3,7 @@
 
   import { twMerge as merge } from 'tailwind-merge';
 
+  import Label from '$lib/holocene/label.svelte';
   import type { SelectOptionValue } from '$lib/types/global';
 
   import Option from './simple-option.svelte';
@@ -25,11 +26,12 @@
   export let label: string = null;
   export let arrow = false;
   export let name = id;
+  export let required = false;
   export let options: SelectOptionValue[] = [];
 </script>
 
 <div>
-  <label class="sr-only" for={id}>{label}</label>
+  <Label {required} {label} hidden for={id} />
   <select
     class={merge(
       'inline h-10 w-full rounded-lg border px-2 text-base',

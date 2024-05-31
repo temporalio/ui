@@ -1,6 +1,10 @@
 <script lang="ts">
   import type { HTMLTextareaAttributes } from 'svelte/elements';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
+  import Label from './label.svelte';
+
   type $$Props = HTMLTextareaAttributes & {
     disabled?: boolean;
     error?: string;
@@ -36,16 +40,19 @@
 </script>
 
 <div class={className}>
-  <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
+  <Label {required} hidden={labelHidden} {label} for={id} />
   {#if description}
     <p class="pb-2 text-sm">{description}</p>
   {/if}
   <div class="relative">
     <textarea
-      class="surface-input min-h-fit w-full rounded-lg border-2 border-subtle px-3 py-2 font-mono text-sm focus-visible:border-information focus-visible:shadow-[0_0_0_4px_rgb(97,115,243,0.7)] focus-visible:outline-none enabled:hover:border-information"
-      class:error={!isValid}
-      {id}
       bind:value
+      class={merge(
+        'surface-primary min-h-fit w-full rounded-lg border-2 border-subtle px-3 py-2 text-sm focus-visible:border-information focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70 enabled:hover:border-information',
+        disabled && 'cursor-not-allowed opacity-50',
+        !isValid && 'error',
+      )}
+      {id}
       {disabled}
       {placeholder}
       {rows}
@@ -60,7 +67,7 @@
     {#if maxLength && !disabled}
       <span class="count">
         <span
-          class="text-blue-700"
+          class="text-information"
           class:warn={maxLength - value?.length <= 5}
           class:error={maxLength === value?.length}>{value?.length ?? 0}</span
         >&nbsp;/&nbsp;{maxLength}
@@ -82,16 +89,8 @@
 </div>
 
 <style lang="postcss">
-  label {
-    @apply mb-10 font-secondary text-sm font-medium;
-  }
-
-  label.required {
-    @apply after:content-["*"];
-  }
-
   .error {
-    @apply border-danger hover:border-danger focus-visible:border-danger focus-visible:shadow-[0_0_0_4px_rgb(249,115,22,0.7)];
+    @apply border-danger hover:border-danger focus-visible:border-danger focus-visible:ring-4 focus-visible:ring-danger/70;
   }
 
   .error-msg {
@@ -107,11 +106,11 @@
   }
 
   .count > .warn {
-    @apply text-orange-600;
+    @apply text-warning;
   }
 
   .count > .error {
-    @apply text-red-700;
+    @apply text-danger;
   }
 
   textarea:focus + .count {

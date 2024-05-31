@@ -24,7 +24,7 @@ export const hideWorkflowQueryErrors = derived(
 export const canFetchChildWorkflows = derived(
   [isCloud, temporalVersion],
   ([$isCloud, $temporalVersion]) => {
-    return $isCloud || minimumVersionRequired('1.23', $temporalVersion);
+    return $isCloud || minimumVersionRequired('1.23.0', $temporalVersion);
   },
 );
 
