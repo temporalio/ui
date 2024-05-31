@@ -39,6 +39,6 @@
 
 <style lang="postcss">
   .file-upload-label {
-    @apply surface-input relative flex h-10 w-fit cursor-pointer items-center justify-center rounded-lg border border-secondary px-4 py-2 text-base text-primary transition-shadow hover:surface-interactive-secondary focus-visible:surface-interactive-secondary hover:border-interactive-secondary focus-visible:border-white focus-visible:shadow-primary/70 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:hover:border-transparent dark:focus-visible:border-black;
+    @apply relative flex h-10 w-fit cursor-pointer items-center justify-center rounded-lg border border-secondary px-4 py-2 text-base text-primary transition-shadow hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-white focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:hover:border-transparent dark:focus-visible:border-black;
   }
 </style>
