@@ -197,11 +197,11 @@
   }
 
   .failure {
-    @apply bg-error;
+    @apply bg-danger;
   }
 
   .failure .event-name {
-    @apply text-error;
+    @apply text-danger;
   }
 
   .canceled {

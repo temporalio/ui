@@ -43,28 +43,28 @@
 
   const workflowStatus = cva(
     [
-      'flex items-center rounded-sm px-1 py-0.5 font-secondary whitespace-nowrap',
+      'flex items-center rounded-sm px-1 py-0.5 font-secondary whitespace-nowrap text-black',
     ],
     {
       variants: {
         status: {
-          Running: 'bg-blue-100 text-blue-800',
-          TimedOut: 'bg-orange-100 text-orange-800',
-          Completed: 'bg-green-100 text-green-800',
-          Failed: 'bg-red-100 text-red-800',
-          ContinuedAsNew: 'bg-slate-200 text-slate-800',
-          Canceled: 'bg-yellow-100 text-yellow-900',
-          Terminated: 'bg-red-100 text-red-800',
-          Paused: 'bg-yellow-100 text-yellow-800',
-          Unspecified: 'bg-slate-200 text-slate-800',
-          Scheduled: 'bg-blue-100 text-blue-800',
-          Started: 'bg-blue-100 text-blue-800',
-          Open: 'bg-green-100 text-green-800',
-          New: 'bg-indigo-100 text-indigo-800',
-          Initiated: 'bg-blue-100 text-blue-800',
-          Fired: 'bg-blue-100 text-blue-800',
-          CancelRequested: 'bg-yellow-100 text-yellow-900',
-          Signaled: 'bg-purple-100 text-purple-800',
+          Running: 'bg-indigo-400',
+          TimedOut: 'bg-orange-300',
+          Completed: 'bg-green-300',
+          Failed: 'bg-red-300',
+          ContinuedAsNew: 'bg-purple-300',
+          Canceled: 'bg-slate-100',
+          Terminated: 'bg-yellow-300',
+          Paused: 'bg-yellow-200',
+          Unspecified: 'bg-slate-100',
+          Scheduled: 'bg-indigo-400',
+          Started: 'bg-blue-300',
+          Open: 'bg-green-300',
+          New: 'bg-indigo-400',
+          Initiated: 'bg-indigo-400',
+          Fired: 'bg-pink-300',
+          CancelRequested: 'bg-yellow-300',
+          Signaled: 'bg-pink-200',
         },
       },
     },
@@ -96,7 +96,7 @@
   {#if newCount}
     <span
       class={merge(
-        'font-base surface-primary rounded-r px-1 py-0.5 text-xs text-primary',
+        'font-base surface-primary rounded-r px-1 py-0.5 text-xs',
         big && 'text-lg',
       )}
       in:fade

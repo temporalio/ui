@@ -127,6 +127,6 @@
 
 <style lang="postcss">
   .badge {
-    @apply rounded-sm bg-badge p-1 text-primary;
+    @apply surface-subtle rounded-sm p-1;
   }
 </style>

@@ -30,7 +30,7 @@ export const Strings = {
   'batch-reset-confirmation_other':
     'Are you sure you want to reset {{count, number}} workflows?',
   'batch-operation-confirmation-input-hint':
-    'If you supply a custom reason, "{{placeholder}}" will be appended to it.',
+    'If you supply a custom reason, "{{placeholder}}" will be appended to it. If you omit a reason, the placeholder will be used.',
   'batch-terminate-all-success':
     'The batch terminate request is processing in the background.',
   'batch-cancel-all-success':

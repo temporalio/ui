@@ -122,7 +122,7 @@
   }
 
   .numeric-input {
-    @apply surface-primary h-10 w-10 rounded border border-primary text-center text-sm;
+    @apply surface-primary h-10 w-10 rounded-lg border-2 border-subtle text-center text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     appearance: textfield;
   }

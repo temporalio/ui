@@ -126,7 +126,9 @@
             <Button
               variant="ghost"
               size="sm"
-              active={page === $store.currentPage}
+              class={page === $store.currentPage
+                ? 'bg-interactive-secondary-active'
+                : ''}
               aria-label={pageButtonLabel(page)}
               on:click={() => handlePageChange(page)}>{page}</Button
             >
@@ -168,7 +170,7 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply surface-table h-10 text-inverse;
+      @apply surface-table h-10 text-off-white;
     }
 
     :global(tr > th) {

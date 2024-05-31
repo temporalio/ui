@@ -48,7 +48,7 @@
 
 <div
   id="content-wrapper"
-  class="surface-secondary relative h-screen w-max flex-auto overflow-auto"
+  class="relative h-screen w-max flex-auto overflow-auto"
   on:scroll={handleOnScroll}
 >
   <slot />

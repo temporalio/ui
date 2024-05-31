@@ -62,6 +62,6 @@
 
 <style lang="postcss">
   .value {
-    @apply flex w-fit flex-row items-center justify-center truncate break-all rounded-sm bg-badge p-1 leading-4 transition-colors;
+    @apply surface-subtle flex w-fit flex-row items-center justify-center truncate break-all rounded-sm p-1 leading-4 transition-colors;
   }
 </style>

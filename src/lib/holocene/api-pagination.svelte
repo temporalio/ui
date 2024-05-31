@@ -199,10 +199,7 @@
             on:click={store.previousPage}
             aria-label={previousButtonLabel}
           >
-            <span
-              class="arrow arrow-left"
-              class:arrow-left-disabled={!$store.hasPrevious}
-            />
+            <span class="arrow arrow-left" />
           </button>
           <div class="flex gap-1">
             <p>
@@ -220,10 +217,7 @@
             on:click={fetchIndexData}
             aria-label={nextButtonLabel}
           >
-            <span
-              class="arrow arrow-right"
-              class:arrow-right-disabled={!$store.hasNext}
-            />
+            <span class="arrow arrow-right" />
           </button>
         </div>
       {/if}
@@ -270,10 +264,7 @@
             on:click={store.previousPage}
             aria-label={previousButtonLabel}
           >
-            <span
-              class="arrow arrow-left"
-              class:arrow-left-disabled={!$store.hasPrevious}
-            />
+            <span class="arrow arrow-left" />
           </button>
           <div class="flex gap-1">
             <p>
@@ -291,10 +282,7 @@
             on:click={fetchIndexData}
             aria-label={nextButtonLabel}
           >
-            <span
-              class="arrow arrow-right"
-              class:arrow-right-disabled={!$store.hasNext}
-            />
+            <span class="arrow arrow-right" />
           </button>
         </div>
       {/if}
@@ -317,18 +305,10 @@
     @apply border-b-transparent border-l-transparent border-r-primary border-t-transparent;
   }
 
-  .arrow-left-disabled {
-    @apply border-b-transparent border-l-transparent border-r-disabled border-t-transparent;
-  }
-
   .arrow-right {
     border-width: 6px 0 6px 12px;
 
     @apply border-b-transparent border-l-primary border-r-transparent border-t-transparent;
-  }
-
-  .arrow-right-disabled {
-    @apply border-b-transparent border-l-disabled border-r-transparent border-t-transparent;
   }
 
   .caret {
@@ -339,6 +319,6 @@
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-disabled;
+    @apply cursor-not-allowed opacity-50;
   }
 </style>

@@ -34,7 +34,7 @@
 
       open: { table: { disable: true } },
     },
-  } satisfies Meta<Drawer>;
+  } satisfies Meta<Drawer['$$prop_def'] & { title: string }>;
 </script>
 
 <script lang="ts">
