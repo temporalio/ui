@@ -4,7 +4,7 @@
 
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
-  import CompactGraph from '$lib/components/lines-and-dots/svg/compact-graph.svelte';
+  // import CompactGraph from '$lib/components/lines-and-dots/svg/compact-graph.svelte';
   import HistoryGraph from '$lib/components/lines-and-dots/svg/history-graph.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import VerticalCompactGraph from '$lib/components/lines-and-dots/svg/vertical-compact-graph.svelte';
@@ -160,13 +160,13 @@
         {canvasWidth}
         activeGroups={$activeGroups}
       />
-      <CompactGraph
+      <!-- <CompactGraph
         {workflow}
         {groups}
         {zoomLevel}
         {canvasWidth}
         activeGroups={$activeGroups}
-      />
+      /> -->
     {:else if $eventViewType === 'timeline'}
       <TimelineGraph
         {workflow}

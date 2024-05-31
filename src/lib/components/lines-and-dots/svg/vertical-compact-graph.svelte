@@ -17,8 +17,10 @@
     minCompactWidth,
   } from '../constants';
 
-  import CompactGraphRow from './compact-graph-row.svelte';
   import GroupDetailsRow from './group-details-row.svelte';
+  import Line from './line.svelte';
+  import Text from './text.svelte';
+  import VerticalCompactGraphRow from './vertical-compact-graph-row.svelte';
   import WorkflowRow from './workflow-row.svelte';
 
   export let x = 0;
@@ -32,10 +34,10 @@
   export let canvasWidth: number;
   export let readOnly = false;
 
-  const { height, gutter, radius } = CompactConfig;
+  const { height, fontSizeRatio, radius } = CompactConfig;
   let exandedGroups = [];
   let activeY = 0;
-  let activeX = 0;
+  let activeIndex = null;
 
   $: activeGroup =
     activeGroups[0] && groups.find((group) => group.id === activeGroups[0]);
@@ -65,31 +67,22 @@
   const groupNameWithIndex = (name: string, index: number) =>
     `${index}:${name}`;
 
-  const setActiveGroupX = (startIndex: number) => {
-    if (width > canvasWidth) {
-      if (startIndex * length < width - canvasWidth) {
-        activeX = startIndex * length;
-      } else {
-        activeX = width - canvasWidth;
-      }
-    }
-  };
-
   const onRowClick = (groups: EventGroups, startIndex: number, y: number) => {
     if (readOnly) return;
     if (groups.length === 1) {
       setSingleActiveGroup(groups[0]);
       activeY = y;
-      setActiveGroupX(startIndex);
+      activeIndex = startIndex;
     } else {
       clearActives();
+      activeIndex = null;
       const name = groupNameWithIndex(groups[0].name, startIndex);
       if (exandedGroups.includes(name)) {
         exandedGroups = exandedGroups.filter((n) => n !== name);
         if (activeGroups.includes(groups[0].id)) {
           setSingleActiveGroup(groups[0]);
-          setActiveGroupX(startIndex);
           activeY = y;
+          activeIndex = startIndex;
         }
       } else {
         exandedGroups = [...exandedGroups, name];
@@ -100,13 +93,12 @@
   const onEventClick = (group: EventGroup, startIndex: number, y: number) => {
     if (readOnly) return;
     setSingleActiveGroup(group);
-    setActiveGroupX(startIndex);
+    activeIndex = startIndex;
     activeY = y;
   };
 
-  $: canvasHeight = Math.max(timeGroups.length, 200) + activeDetailsHeight;
+  $: canvasHeight = (timeGroups.length + 3) * height + activeDetailsHeight;
   $: width = Math.max(timeGroups.length * minCompactWidth, canvasWidth);
-  $: length = Math.max(minCompactWidth, (width - gutter) / timeGroups.length);
 
   $: previousExpanded = (index: number, nameGroups: EventGroups[]) => {
     let count = 0;
@@ -127,19 +119,35 @@
   viewBox="0 0 {width} {staticHeight || canvasHeight}"
   height={(staticHeight || canvasHeight) / zoomLevel}
   width={width / zoomLevel}
+  class="mb-32"
 >
+  <Line
+    startPoint={[0, height]}
+    endPoint={[canvasWidth, height]}
+    strokeWidth={radius / 2}
+  />
+  <Text
+    point={[canvasWidth / 2 - 8, height - fontSizeRatio]}
+    fontSize="24px"
+    fontWeight="700">Start</Text
+  >
   {#each timeGroups as groups, startIndex}
     {@const nameGroups = getNameGroups(groups)}
     {#each nameGroups as nameGroup, groupIndex}
       {@const group = nameGroup[0]}
-      {@const startY = (startIndex + 1) * height}
+      {@const expandedHeight =
+        activeIndex !== null && activeIndex < startIndex
+          ? activeDetailsHeight
+          : 0}
+      {@const startY = (startIndex + 2) * height + expandedHeight}
+      {console.log(startY)}
       {@const expanded = exandedGroups.includes(
         groupNameWithIndex(group.name, startIndex),
       )}
       {@const expandedIndex =
         groupIndex + previousExpanded(groupIndex, nameGroups)}
       {#if !expanded}
-        <CompactGraphRow
+        <VerticalCompactGraphRow
           {group}
           startIndex={expandedIndex}
           count={nameGroup.length}
@@ -152,7 +160,7 @@
       {:else}
         {#each nameGroup as group, index}
           {@const y = startY}
-          <CompactGraphRow
+          <VerticalCompactGraphRow
             {group}
             startIndex={expandedIndex + index}
             {y}
@@ -165,16 +173,29 @@
       {/if}
     {/each}
   {:else}
-    <WorkflowRow {workflow} y={height} length={canvasWidth} active />
+    <WorkflowRow {workflow} y={2 * height} length={canvasWidth} active />
   {/each}
   {#if activeGroup}
     {#key activeGroup.id}
       <GroupDetailsRow
         group={activeGroup}
         {canvasWidth}
-        x={activeX}
+        x={0}
         y={activeY + 1.25 * radius}
       />
     {/key}
+  {/if}
+  <Line
+    startPoint={[0, canvasHeight - height]}
+    endPoint={[canvasWidth, canvasHeight - height]}
+    strokeWidth={radius / 2}
+    pending={workflow.isRunning}
+  />
+  {#if !workflow.isRunning}
+    <Text
+      point={[canvasWidth / 2, canvasHeight - height + 1.2 * fontSizeRatio]}
+      fontSize="24px"
+      fontWeight="700">End</Text
+    >
   {/if}
 </svg>
