@@ -48,7 +48,7 @@
     {
       variants: {
         status: {
-          Running: 'bg-indigo-400',
+          Running: 'bg-blue-300',
           TimedOut: 'bg-orange-300',
           Completed: 'bg-green-300',
           Failed: 'bg-red-300',
