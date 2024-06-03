@@ -39,15 +39,26 @@
     selectedWorkflowsCount = $selectedWorkflows?.length ?? 0;
   }
 
-  $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
-  $: cancelEnabled = workflowCancelEnabled($page.data.settings);
-  $: resetEnabled =
-    workflowResetEnabled($page.data.settings) && $isCloud
-      ? true
-      : minimumVersionRequired('1.23.0', $temporalVersion);
-  $: namespaceWriteDisabled = $coreUser.namespaceWriteDisabled(
+  $: terminateEnabled = workflowTerminateEnabled(
+    $page.data.settings,
+    $coreUser,
     $page.params.namespace,
   );
+
+  $: cancelEnabled = workflowCancelEnabled(
+    $page.data.settings,
+    $coreUser,
+    $page.params.namespace,
+  );
+
+  $: resetEnabled =
+    workflowResetEnabled(
+      $page.data.settings,
+      $coreUser,
+      $page.params.namespace,
+    ) && $isCloud
+      ? true
+      : minimumVersionRequired('1.23.0', $temporalVersion);
 </script>
 
 {#if $allSelected}
@@ -84,7 +95,7 @@
       variant="ghost"
       class="text-off-white focus-visible:border-table"
       data-testid="bulk-cancel-button"
-      disabled={namespaceWriteDisabled || !$cancelableWorkflows.length}
+      disabled={!$cancelableWorkflows.length}
       on:click={openBatchCancelConfirmationModal}
       >{translate('workflows.request-cancellation')}</Button
     >
@@ -95,7 +106,6 @@
       variant="ghost"
       class="text-off-white focus-visible:border-table"
       data-testid="bulk-reset-button"
-      disabled={namespaceWriteDisabled}
       on:click={openBatchResetConfirmationModal}
       >{translate('workflows.reset')}</Button
     >
@@ -106,7 +116,6 @@
       variant="destructive"
       class="focus-visible:border-table"
       data-testid="bulk-terminate-button"
-      disabled={namespaceWriteDisabled}
       on:click={openBatchTerminateConfirmationModal}
       >{translate('workflows.terminate')}</Button
     >
