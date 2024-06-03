@@ -1,9 +1,11 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import debounce from 'just-debounce';
   import { onMount } from 'svelte';
 
   import Alert from '$lib/holocene/alert.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import {
@@ -29,11 +31,14 @@
     itemsKeyname?: string;
     previousButtonLabel: string;
     nextButtonLabel: string;
+    filterable?: boolean | undefined;
+    filterInputLabel?: string | undefined;
   }
 
   type PaginatedRequest<T> = (
     size: number,
     token: string,
+    query?: string,
   ) => Promise<{ items: T[]; nextPageToken: string }>;
 
   export let onError: (error: Error) => void | undefined = undefined;
@@ -52,6 +57,10 @@
   export let itemsKeyname = 'items';
   export let previousButtonLabel: string;
   export let nextButtonLabel: string;
+  export let filterable = false;
+  export let filterInputLabel: string = undefined;
+
+  let query = '';
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
@@ -157,6 +166,22 @@
         break;
     }
   }
+
+  const handleFilter = async () => {
+    clearError();
+    store.reset();
+    store.setUpdating();
+    try {
+      const fetchItems = await onFetch();
+      const response = await fetchItems($store.pageSize, '', query);
+      const { nextPageToken } = response;
+      const items = response[itemsKeyname] || [];
+      store.nextPageWithItems(nextPageToken, items);
+    } catch (err) {
+      error = err;
+      if (onError) onError(error);
+    }
+  };
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -175,11 +200,27 @@
 <slot name="header" visibleItems={$store.visibleItems} />
 <div class="relative mb-8 flex flex-col gap-4">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
-    <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
-      <slot name="action-top-left" visibleItems={$store.visibleItems} />
-    </div>
+    {#if $$slots['action-top-left']}
+      <div class="flex shrink-0 items-center gap-1 lg:gap-2 xl:gap-3">
+        <slot name="action-top-left" visibleItems={$store.visibleItems} />
+      </div>
+    {/if}
+    {#if filterable && filterInputLabel}
+      <Input
+        id="api-pagination-search-input"
+        class="grow"
+        bind:value={query}
+        slot="action-top-left"
+        label={filterInputLabel}
+        labelHidden
+        placeholder={filterInputLabel}
+        on:input={debounce(handleFilter, 1000)}
+        on:clear={handleFilter}
+        clearable
+      />
+    {/if}
     <nav
-      class="flex flex-col justify-end gap-4 md:flex-row"
+      class="flex shrink-0 flex-col justify-end gap-4 md:flex-row"
       aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
