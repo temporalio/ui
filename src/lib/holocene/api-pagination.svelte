@@ -16,7 +16,7 @@
   import { isError } from '$lib/utilities/is';
 
   type T = $$Generic;
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+  type BaseProps = HTMLAttributes<HTMLDivElement> & {
     onError?: (error: Error | unknown) => void | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
     onShiftUp?: (event: KeyboardEvent) => void | undefined;
@@ -31,9 +31,18 @@
     itemsKeyname?: string;
     previousButtonLabel: string;
     nextButtonLabel: string;
-    filterable?: boolean | undefined;
-    filterInputLabel?: string | undefined;
-  }
+  };
+
+  type NonFilterableProps = {
+    filterable?: false;
+  };
+
+  type FilterableProps = {
+    filterable: true;
+    filterInputPlaceholder: string;
+  };
+
+  type $$Props = BaseProps & (FilterableProps | NonFilterableProps);
 
   type PaginatedRequest<T> = (
     size: number,
@@ -58,7 +67,7 @@
   export let previousButtonLabel: string;
   export let nextButtonLabel: string;
   export let filterable = false;
-  export let filterInputLabel: string = undefined;
+  export let filterInputPlaceholder: string = undefined;
 
   let query = '';
 
@@ -205,15 +214,15 @@
         <slot name="action-top-left" visibleItems={$store.visibleItems} />
       </div>
     {/if}
-    {#if filterable && filterInputLabel}
+    {#if filterable && filterInputPlaceholder}
       <Input
+        icon="search"
         id="api-pagination-search-input"
         class="grow"
         bind:value={query}
-        slot="action-top-left"
-        label={filterInputLabel}
+        label={filterInputPlaceholder}
         labelHidden
-        placeholder={filterInputLabel}
+        placeholder={filterInputPlaceholder}
         on:input={debounce(handleFilter, 1000)}
         on:clear={handleFilter}
         clearable
