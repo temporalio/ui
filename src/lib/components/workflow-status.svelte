@@ -50,7 +50,7 @@
         status: {
           Running: 'bg-blue-300',
           TimedOut: 'bg-orange-300',
-          Completed: 'bg-green-300',
+          Completed: 'bg-[#71D375]',
           Failed: 'bg-red-300',
           ContinuedAsNew: 'bg-purple-300',
           Canceled: 'bg-slate-100',
@@ -59,7 +59,7 @@
           Unspecified: 'bg-slate-100',
           Scheduled: 'bg-indigo-300',
           Started: 'bg-blue-300',
-          Open: 'bg-green-300',
+          Open: 'bg-[#71D375]',
           New: 'bg-indigo-400',
           Initiated: 'bg-indigo-400',
           Fired: 'bg-pink-300',
