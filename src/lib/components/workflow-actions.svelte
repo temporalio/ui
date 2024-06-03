@@ -73,7 +73,7 @@
 
   $: {
     if (!resetAuthorized) {
-      resetTooltipText = translate('workflows.reset-disabled');
+      resetTooltipText = translate('workflows.reset-disabled-unauthorized');
     } else if (resetAuthorized && workflow?.pendingChildren?.length > 0) {
       resetTooltipText = translate('workflows.reset-disabled-pending-children');
     } else if (
