@@ -159,4 +159,5 @@ export const Strings = {
   'execution-details': 'Execution Details',
   day: 'Day',
   night: 'Night',
+  docs: 'Docs',
 } as const;
