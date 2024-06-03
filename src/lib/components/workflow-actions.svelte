@@ -60,11 +60,6 @@
     }
   }
 
-  $: resetAllowed =
-    resetEnabled &&
-    workflow?.pendingChildren?.length === 0 &&
-    $resetEvents.length > 0;
-
   $: workflowActions = [
     {
       label: translate('workflows.reset'),
@@ -97,6 +92,12 @@
   $: actionsDisabled =
     $coreUser.namespaceWriteDisabled(namespace) ||
     !writeActionsAreAllowed(settings);
+
+  $: resetAllowed =
+    resetEnabled &&
+    workflow?.pendingChildren?.length === 0 &&
+    $resetEvents.length > 0 &&
+    !actionsDisabled;
 </script>
 
 {#if isRunning}
