@@ -23,11 +23,7 @@
 </script>
 
 {#if show}
-  <div
-    class={merge('copy-or-filter', className)}
-    on:click|preventDefault|stopPropagation={noop}
-    on:keyup|preventDefault|stopPropagation={noop}
-  >
+  <div class={merge('copy-or-filter', className)}>
     {#if filterable}
       <button
         on:click|preventDefault|stopPropagation={onFilter}
