@@ -400,6 +400,7 @@
           <ScheduleFrequencyPanel
             calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
             interval={schedule?.schedule?.spec?.interval?.[0]}
+            timezoneName={schedule?.schedule?.spec?.timezoneName}
           />
         </div>
       </div>

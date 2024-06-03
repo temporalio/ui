@@ -144,6 +144,7 @@ export const submitEditSchedule = async (
     action;
 
   let payloads;
+
   if (input) {
     try {
       payloads = await encodePayloads(input);
@@ -151,8 +152,6 @@ export const submitEditSchedule = async (
       error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
       return;
     }
-  } else if (!input && schedule.action.startWorkflow.input?.payloads) {
-    payloads = schedule.action.startWorkflow.input.payloads;
   }
 
   const { preset } = presets;

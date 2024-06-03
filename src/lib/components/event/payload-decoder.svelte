@@ -17,6 +17,7 @@
 
   export let value: PotentiallyDecodable | EventAttribute | WorkflowEvent;
   export let key = '';
+  export let onDecode: (decodedValue: string) => void | undefined = undefined;
 
   let keyedValue = key && value?.[key] ? value[key] : value;
   let decodedValue = stringifyWithBigInt(keyedValue);
@@ -52,6 +53,9 @@
         decodedValue = stringifyWithBigInt(keyExists);
       } else {
         decodedValue = stringifyWithBigInt(decodedAttributes);
+      }
+      if (onDecode) {
+        onDecode(decodedValue);
       }
     } catch (e) {
       console.error('Could not decode payloads');
