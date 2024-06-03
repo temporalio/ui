@@ -74,12 +74,14 @@
       />
     </IsLegacyCloudGuard>
     <slot name="middle" />
-    <NavigationItem
-      link={linkList.docs}
-      data-testid="docs-button"
-      label={translate('common.docs')}
-      icon="book"
-    />
+    <IsCloudGuard {isCloud}>
+      <NavigationItem
+        link={linkList.docs}
+        data-testid="docs-button"
+        label={translate('common.docs')}
+        icon="book"
+      />
+    </IsCloudGuard>
   </svelte:fragment>
   <svelte:fragment slot="bottom">
     <slot name="bottom" />
