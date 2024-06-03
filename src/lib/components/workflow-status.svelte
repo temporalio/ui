@@ -57,7 +57,7 @@
           Terminated: 'bg-yellow-300',
           Paused: 'bg-yellow-200',
           Unspecified: 'bg-slate-100',
-          Scheduled: 'bg-indigo-400',
+          Scheduled: 'bg-indigo-300',
           Started: 'bg-blue-300',
           Open: 'bg-green-300',
           New: 'bg-indigo-400',
