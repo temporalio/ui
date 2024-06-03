@@ -72,14 +72,14 @@
         label={translate('common.namespaces')}
         icon="namespace"
       />
-      <NavigationItem
-        link={linkList.docs}
-        data-testid="docs-button"
-        label={translate('common.docs')}
-        icon="book"
-      />
     </IsLegacyCloudGuard>
     <slot name="middle" />
+    <NavigationItem
+      link={linkList.docs}
+      data-testid="docs-button"
+      label={translate('common.docs')}
+      icon="book"
+    />
   </svelte:fragment>
   <svelte:fragment slot="bottom">
     <slot name="bottom" />
