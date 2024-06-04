@@ -290,9 +290,7 @@
       <SkeletonTable rows={15} />
     {/if}
   {:else if isEmpty}
-    <slot name="empty" {query} loading={$store.loading}
-      >{emptyStateMessage}</slot
-    >
+    <slot name="empty" {query}>{emptyStateMessage}</slot>
   {:else}
     <slot
       updating={$store.updating}
