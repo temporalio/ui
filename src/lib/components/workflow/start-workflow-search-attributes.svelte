@@ -9,6 +9,10 @@
 
   export let attributesToAdd: SearchAttributeInput[] = [];
 
+  $: {
+    console.log('searchAttributes', attributesToAdd);
+  }
+
   const addSearchAttribute = () => {
     attributesToAdd = [...attributesToAdd, { attribute: '', value: '' }];
   };

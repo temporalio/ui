@@ -62,6 +62,7 @@ export const Strings = {
   'request-cancellation': 'Request Cancellation',
   'back-to-workflows': 'Back to Workflows',
   input: 'Input',
+  'initial-input': 'Initial Input',
   'input-and-results': 'Input and Results',
   'continued-as-new-with-input': 'Continued as New with Input',
   results: 'Results',

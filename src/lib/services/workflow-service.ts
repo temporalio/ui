@@ -486,7 +486,7 @@ export async function startWorkflow({
   });
 }
 
-export const fetchInputForStartWorkflow = async ({
+export const fetchInitialValuesForStartWorkflow = async ({
   namespace,
   workflowType,
   workflowId,
@@ -494,11 +494,14 @@ export const fetchInputForStartWorkflow = async ({
   namespace: string;
   workflowType?: string;
   workflowId?: string;
-}): Promise<string> => {
+}): Promise<{
+  input: string;
+  searchAttributes: Record<string, string | Payload> | undefined;
+}> => {
   const handleError: ErrorCallback = (err) => {
     console.error(err);
   };
-
+  const emptyValues = { input: '', searchAttributes: undefined };
   try {
     let query = '';
     if (workflowType && workflowId) {
@@ -517,12 +520,14 @@ export const fetchInputForStartWorkflow = async ({
         handleError,
       },
     );
-    const workflow = workflows?.executions?.[0];
-    if (!workflow) return '';
+
+    if (!workflows?.executions?.[0]) return emptyValues;
+    const workflow = toWorkflowExecutions(workflows)[0];
+
     const firstEvent = await fetchInitialEvent({
       namespace,
-      workflowId: workflow.execution?.workflowId,
-      runId: workflow.execution?.runId,
+      workflowId: workflow.id,
+      runId: workflow.runId,
     });
 
     const startEvent = firstEvent as WorkflowExecutionStartedEvent;
@@ -532,8 +537,13 @@ export const fetchInputForStartWorkflow = async ({
       get(page).data.settings,
       get(authUser).accessToken,
     )) as PotentiallyDecodable;
-    return stringifyWithBigInt(convertedAttributes?.payloads);
+
+    const input = stringifyWithBigInt(convertedAttributes?.payloads);
+    return {
+      input,
+      searchAttributes: workflow?.searchAttributes?.indexedFields,
+    };
   } catch (e) {
-    return '';
+    return emptyValues;
   }
 };

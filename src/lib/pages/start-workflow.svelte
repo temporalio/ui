@@ -16,10 +16,13 @@
   import { translate } from '$lib/i18n/translate';
   import { getPollers } from '$lib/services/pollers-service';
   import {
-    fetchInputForStartWorkflow,
+    fetchInitialValuesForStartWorkflow,
     startWorkflow,
   } from '$lib/services/workflow-service';
-  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+  import {
+    customSearchAttributes,
+    type SearchAttributeInput,
+  } from '$lib/stores/search-attributes';
   import { pluralize } from '$lib/utilities/pluralize';
   import {
     routeForTaskQueue,
@@ -33,8 +36,12 @@
   let workflowId = '';
   let taskQueue = '';
   let workflowType = '';
+  let initialInput = '';
   let input = '';
   let inputRetrieved = 0;
+
+  let initialWorkflowId = '';
+  let initialWorkflowType = '';
 
   let error = '';
   let pollerCount: undefined | number = undefined;
@@ -42,10 +49,18 @@
 
   let searchAttributes: SearchAttributeInput[] = [];
 
+  $: taskQueueParam = $page.url.searchParams.get('taskQueue');
+
   onMount(() => {
     workflowId = $page.url.searchParams.get('workflowId') || '';
     taskQueue = $page.url.searchParams.get('taskQueue') || '';
     workflowType = $page.url.searchParams.get('workflowType') || '';
+    initialWorkflowId = $page.url.searchParams.get('workflowId') || '';
+    initialWorkflowType = $page.url.searchParams.get('workflowType') || '';
+
+    if (initialWorkflowId || initialWorkflowType) {
+      getInitialValues(initialWorkflowId, initialWorkflowType);
+    }
   });
 
   const handleInputChange = (event: CustomEvent<string>) => {
@@ -63,9 +78,7 @@
         input,
         searchAttributes,
       });
-      setTimeout(() => {
-        goto(routeForWorkflows({ namespace }));
-      }, 150);
+      goto(routeForWorkflows({ namespace }));
     } catch (e) {
       error = e?.message || 'Error start Workflow';
     }
@@ -81,18 +94,31 @@
     });
   };
 
-  const checkTaskQueue = async () => {
-    const { pollers } = await getPollers({ namespace, queue: taskQueue });
-    pollerCount = pollers.length;
+  const checkTaskQueue = async (queue: string) => {
+    if (queue) {
+      const { pollers } = await getPollers({ namespace, queue });
+      pollerCount = pollers.length;
+    }
   };
 
-  $: getPreviousInput = async () => {
-    input = await fetchInputForStartWorkflow({
+  const getInitialValues = async (id: string, type: string) => {
+    const initialValues = await fetchInitialValuesForStartWorkflow({
       namespace,
-      workflowType,
-      workflowId,
+      workflowId: id,
+      workflowType: type,
     });
+    initialInput = initialValues.input;
+    input = initialInput;
     inputRetrieved = Date.now();
+    if (initialValues?.searchAttributes) {
+      const customSAKeys = Object.keys($customSearchAttributes);
+      Object.entries(initialValues.searchAttributes).forEach(([key, value]) => {
+        if (customSAKeys.includes(key)) {
+          searchAttributes.push({ attribute: key, value: String(value) });
+        }
+      });
+      viewAdvancedOptions = true;
+    }
   };
 
   const onInputChange = (e: Event, parameter: string) => {
@@ -113,6 +139,8 @@
   $: createDisabled = workflowCreateDisabled($page);
   $: enableStart =
     !!workflowId && !!taskQueue && !!workflowType && !createDisabled;
+
+  $: checkTaskQueue(taskQueueParam);
 </script>
 
 <div class="flex w-full flex-col items-center pb-24">
@@ -120,19 +148,22 @@
     <h1 class="mb-4 overflow-hidden text-base font-medium lg:text-2xl">
       Start a Workflow
     </h1>
-    <div class="flex w-full items-center justify-between gap-4">
+    <div
+      class="flex w-full flex-col items-center justify-between gap-2 md:flex-row md:gap-4"
+    >
       <Input
         id="workflowId"
         required
         bind:value={workflowId}
         label="Workflow ID"
-        class="grow"
+        class="w-full grow"
         on:blur={(e) => onInputChange(e, 'workflowId')}
       />
       <Button
-        class="mt-6"
+        class="mt-0 md:mt-6"
         variant="secondary"
-        on:click={generateRandomWorkflowId}>Generate</Button
+        leadingIcon="retry"
+        on:click={generateRandomWorkflowId}>Random UUID</Button
       >
     </div>
     <div class="flex w-full items-center justify-between gap-4">
@@ -144,12 +175,6 @@
         class="grow"
         on:blur={(e) => onInputChange(e, 'taskQueue')}
       />
-      <Button
-        class="mt-6"
-        variant="secondary"
-        disabled={!taskQueue}
-        on:click={checkTaskQueue}>Check Status</Button
-      >
     </div>
     {#if pollerCount !== undefined}
       <Alert
@@ -177,27 +202,39 @@
       label="Workflow Type"
       on:blur={(e) => onInputChange(e, 'workflowType')}
     />
-    <div class="flex w-full items-end justify-between">
-      <Label for="workflow-input" label={translate('workflows.input')} />
-      <div class="flex items-center gap-2">
-        <StartWorkflowInputUpload onUpload={onInputUpload} />
-        <Button
-          variant="secondary"
-          disabled={!workflowType}
-          on:click={getPreviousInput}>Previous Input</Button
-        >
+    <div
+      class="flex w-full flex-col items-end justify-between gap-4 md:flex-row"
+    >
+      <div class="flex w-full flex-col gap-2 md:w-1/2">
+        <Label
+          class="text-subtle"
+          for="workflow-initial-input"
+          label={translate('workflows.initial-input')}
+        />
+        <CodeBlock
+          id="workflow-initial-input"
+          minHeight={120}
+          content={initialInput}
+          copyable
+        />
+      </div>
+      <div class="flex w-full flex-col gap-2 md:w-1/2">
+        <div class="flex w-full items-end justify-between">
+          <Label for="workflow-input" label={translate('workflows.input')} />
+          <StartWorkflowInputUpload onUpload={onInputUpload} />
+        </div>
+        {#key inputRetrieved}
+          <CodeBlock
+            id="workflow-input"
+            minHeight={120}
+            content={input}
+            on:change={handleInputChange}
+            editable
+            copyable={false}
+          />
+        {/key}
       </div>
     </div>
-    {#key inputRetrieved}
-      <CodeBlock
-        id="workflow-input"
-        minHeight={120}
-        content={input}
-        on:change={handleInputChange}
-        editable
-        copyable={false}
-      />
-    {/key}
     {#if viewAdvancedOptions}
       <StartWorkflowSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}
