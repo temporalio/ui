@@ -193,6 +193,11 @@
       if (onError) onError(error);
     }
   };
+
+  const debouncedHandleFilter = debounce(
+    handleFilter,
+    filterDebounceInMilliseconds,
+  );
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -227,7 +232,7 @@
         label={filterInputPlaceholder}
         labelHidden
         placeholder={filterInputPlaceholder}
-        on:input={debounce(handleFilter, filterDebounceInMilliseconds)}
+        on:input={debouncedHandleFilter}
         on:clear={handleFilter}
         clearable
       />
@@ -285,7 +290,9 @@
       <SkeletonTable rows={15} />
     {/if}
   {:else if isEmpty}
-    <slot name="empty">{emptyStateMessage}</slot>
+    <slot name="empty" {query} loading={$store.loading}
+      >{emptyStateMessage}</slot
+    >
   {:else}
     <slot
       updating={$store.updating}
