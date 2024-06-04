@@ -40,6 +40,7 @@
   type FilterableProps = {
     filterable: true;
     filterInputPlaceholder: string;
+    filterDebounceInMilliseconds?: number;
   };
 
   type $$Props = BaseProps & (FilterableProps | NonFilterableProps);
@@ -68,6 +69,7 @@
   export let nextButtonLabel: string;
   export let filterable = false;
   export let filterInputPlaceholder: string = undefined;
+  export let filterDebounceInMilliseconds = 1000;
 
   let query = '';
 
@@ -191,6 +193,11 @@
       if (onError) onError(error);
     }
   };
+
+  const debouncedHandleFilter = debounce(
+    handleFilter,
+    filterDebounceInMilliseconds,
+  );
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -208,12 +215,14 @@
 
 <slot name="header" visibleItems={$store.visibleItems} />
 <div class="relative mb-8 flex flex-col gap-4">
-  <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
-    {#if $$slots['action-top-left']}
-      <div class="flex shrink-0 items-center gap-1 lg:gap-2 xl:gap-3">
-        <slot name="action-top-left" visibleItems={$store.visibleItems} />
-      </div>
-    {/if}
+  <div
+    class="flex flex-col items-center gap-4 lg:flex-row {$$slots[
+      'action-top-left'
+    ]
+      ? 'justify-between'
+      : 'justify-end'}"
+  >
+    <slot name="action-top-left" visibleItems={$store.visibleItems} />
     {#if filterable && filterInputPlaceholder}
       <Input
         icon="search"
@@ -223,13 +232,13 @@
         label={filterInputPlaceholder}
         labelHidden
         placeholder={filterInputPlaceholder}
-        on:input={debounce(handleFilter, 1000)}
+        on:input={debouncedHandleFilter}
         on:clear={handleFilter}
         clearable
       />
     {/if}
     <nav
-      class="flex shrink-0 flex-col justify-end gap-4 md:flex-row"
+      class="flex shrink-0 flex-col gap-4 md:flex-row"
       aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
@@ -281,7 +290,7 @@
       <SkeletonTable rows={15} />
     {/if}
   {:else if isEmpty}
-    <slot name="empty">{emptyStateMessage}</slot>
+    <slot name="empty" {query}>{emptyStateMessage}</slot>
   {:else}
     <slot
       updating={$store.updating}
@@ -291,9 +300,9 @@
     />
   {/if}
   <nav
-    class={`flex ${
-      $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
-    }`}
+    class="flex {$$slots['action-bottom-left']
+      ? 'justify-between'
+      : 'justify-end'}"
     aria-label="{$$restProps['aria-label']} 2"
   >
     <slot name="action-bottom-left" />
