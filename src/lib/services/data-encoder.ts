@@ -24,12 +24,10 @@ export async function decodePayloadsWithCodec({
   payloads,
   namespace = get(page).params.namespace,
   settings = get(page).data.settings,
-  accessToken = get(authUser).accessToken,
 }: {
   payloads: PotentialPayloads;
   namespace?: string;
   settings?: Settings;
-  accessToken?: string;
 }): Promise<PotentialPayloads> {
   const endpoint = getCodecEndpoint(settings);
   const passAccessToken = getCodecPassAccessToken(settings);
@@ -42,6 +40,10 @@ export async function decodePayloadsWithCodec({
 
   if (passAccessToken) {
     if (validateHttps(endpoint)) {
+      let accessToken = get(authUser).accessToken;
+      if (globalThis?.AccessToken) {
+        accessToken = await globalThis?.AccessToken();
+      }
       headers['Authorization'] = `Bearer ${accessToken}`;
     } else {
       setLastDataEncoderFailure();
