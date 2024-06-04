@@ -40,6 +40,7 @@
   type FilterableProps = {
     filterable: true;
     filterInputPlaceholder: string;
+    filterDebounceInMiliseconds?: number;
   };
 
   type $$Props = BaseProps & (FilterableProps | NonFilterableProps);
@@ -68,6 +69,7 @@
   export let nextButtonLabel: string;
   export let filterable = false;
   export let filterInputPlaceholder: string = undefined;
+  export let filterDebounceInMiliseconds = 1000;
 
   let query = '';
 
@@ -225,7 +227,7 @@
         label={filterInputPlaceholder}
         labelHidden
         placeholder={filterInputPlaceholder}
-        on:input={debounce(handleFilter, 1000)}
+        on:input={debounce(handleFilter, filterDebounceInMiliseconds)}
         on:clear={handleFilter}
         clearable
       />
