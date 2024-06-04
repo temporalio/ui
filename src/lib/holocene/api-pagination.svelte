@@ -208,12 +208,13 @@
 
 <slot name="header" visibleItems={$store.visibleItems} />
 <div class="relative mb-8 flex flex-col gap-4">
-  <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
-    {#if $$slots['action-top-left']}
-      <div class="flex shrink-0 items-center gap-1 lg:gap-2 xl:gap-3">
-        <slot name="action-top-left" visibleItems={$store.visibleItems} />
-      </div>
-    {/if}
+  <div
+    class="flex flex-col items-center justify-between gap-4 lg:flex-row"
+    class:justify-end={!$$slots['action-top-left']}
+  >
+    <!-- <div class="flex shrink-0 items-center gap-1 lg:gap-2 xl:gap-3"> -->
+    <slot name="action-top-left" visibleItems={$store.visibleItems} />
+    <!-- </div> -->
     {#if filterable && filterInputPlaceholder}
       <Input
         icon="search"
@@ -229,7 +230,7 @@
       />
     {/if}
     <nav
-      class="flex shrink-0 flex-col justify-end gap-4 md:flex-row"
+      class="flex shrink-0 flex-col gap-4 md:flex-row"
       aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
