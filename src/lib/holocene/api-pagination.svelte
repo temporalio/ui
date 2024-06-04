@@ -210,7 +210,7 @@
 <div class="relative mb-8 flex flex-col gap-4">
   <div
     class="flex flex-col items-center gap-4 lg:flex-row {$$slots[
-      'action-bottom-left'
+      'action-top-left'
     ]
       ? 'justify-between'
       : 'justify-end'}"
