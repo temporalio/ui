@@ -1,7 +1,6 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import NumberInput from '$lib/holocene/input/number-input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import type {
@@ -16,10 +15,6 @@
 
   $: type =
     searchAttributes.find((a) => a.value === attribute.attribute)?.type ?? '';
-
-  const clearValue = (_) => (attribute.value = '');
-
-  $: clearValue(type);
 
   $: isDisabled = (value: string) => {
     return !!attributesToAdd.find((a) => a.attribute === value);
@@ -39,21 +34,7 @@
       >
     {/each}
   </Select>
-  {#if type === 'Keyword' || type === 'KeywordList' || type === 'Text'}
-    <Input
-      label="Value"
-      id="attribute-value"
-      class="w-full"
-      bind:value={attribute.value}
-    />
-  {:else if type === 'Double' || type === 'Int'}
-    <NumberInput
-      label="Value"
-      id="attribute-value"
-      type="number"
-      bind:value={attribute.value}
-    />
-  {:else if type === 'Bool'}
+  {#if type === 'Bool'}
     <Select
       class="w-full"
       label="Value"
@@ -68,6 +49,13 @@
       label="Value"
       id="attribute-value"
       type="datetime-local"
+      class="w-full"
+      bind:value={attribute.value}
+    />
+  {:else}
+    <Input
+      label="Value"
+      id="attribute-value"
       class="w-full"
       bind:value={attribute.value}
     />

@@ -54,7 +54,7 @@ export type SearchAttributeOption = {
 
 export type SearchAttributeInput = {
   attribute: string;
-  value: string | number | boolean;
+  value: string;
 };
 
 export const searchAttributeOptions: Readable<SearchAttributeOption[]> =

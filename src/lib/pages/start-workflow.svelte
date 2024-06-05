@@ -114,7 +114,10 @@
       const customSAKeys = Object.keys($customSearchAttributes);
       Object.entries(initialValues.searchAttributes).forEach(([key, value]) => {
         if (customSAKeys.includes(key)) {
-          searchAttributes.push({ attribute: key, value: String(value) });
+          searchAttributes = [
+            ...searchAttributes,
+            { attribute: key, value: String(value) },
+          ];
         }
       });
       viewAdvancedOptions = true;
