@@ -3,6 +3,7 @@ export const Namespace = 'workers' as const;
 export const Strings = {
   workers: 'Workers',
   version: 'Version',
+  versioning: 'Versioning',
   retirability: 'Retirability',
   buildId: 'Build ID',
   'assignment-rules': 'Assignment Rules',
@@ -14,6 +15,7 @@ export const Strings = {
   'no-version-sets-found': 'No Version Sets found',
   'no-assignment-rules-found': 'No Assignment Rules found',
   'no-redirect-rules-found': 'No Redirect Rules found',
+  'view-all-assignment-rules': 'View all Assignment Rules',
   'last-used-version': 'Last used version',
   'next-version': 'Next version',
   'ready-to-be-retired': 'Ready to be Retired',

@@ -57,6 +57,7 @@
   );
   $: workflowHasBeenReset = has($resetWorkflows, $workflowRun?.workflow?.runId);
   $: workflowUsesVersioning =
+    workflow?.assignedBuildId ??
     workflow?.mostRecentWorkerVersionStamp?.useVersioning;
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
@@ -125,7 +126,7 @@
       </div>
     </div>
     <Tabs>
-      <TabList class="flex flex-wrap gap-6 p-4" label="workflow detail">
+      <TabList class="flex flex-wrap gap-6 p-4 pl-0" label="workflow detail">
         <Tab
           label={translate('workflows.history-tab')}
           id="history-tab"

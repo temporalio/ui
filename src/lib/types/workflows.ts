@@ -16,8 +16,12 @@ import type { Optional, Replace } from './global';
 /**
  * Replace Longs, ITimestamps, UInt8Array's etc. with their corresponding http values
  */
+
+type WorkflowExeuctionWithAssignedBuildId =
+  import('$lib/types').WorkflowExecutionInfo & { assignedBuildId: string };
+
 export type WorkflowExecutionInfo = Replace<
-  import('$lib/types').WorkflowExecutionInfo,
+  WorkflowExeuctionWithAssignedBuildId,
   {
     status: WorkflowExecutionStatus | WorkflowStatus;
     stateTransitionCount: string;
@@ -123,6 +127,7 @@ export type WorkflowExecution = {
   historyEvents: string;
   historySizeBytes: string;
   mostRecentWorkerVersionStamp?: MostRecentWOrkflowVersionStamp;
+  assignedBuildId?: string;
   searchAttributes?: DecodedWorkflowSearchAttributes;
   memo: Memo;
   pendingChildren: PendingChildren[];

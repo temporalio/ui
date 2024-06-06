@@ -51,6 +51,7 @@ export const getCurrentCompatibilityDefaultVersion = (
 export const getCurrentWorkflowBuildId = (
   workflow: WorkflowExecution,
 ): string | undefined => {
+  if (workflow?.assignedBuildId) return workflow.assignedBuildId;
   if (workflow?.mostRecentWorkerVersionStamp?.useVersioning) {
     return workflow.mostRecentWorkerVersionStamp?.buildId || undefined;
   }

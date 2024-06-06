@@ -28,8 +28,8 @@ export type GetPollersResponse = {
 type AssignmentRule = {
   rule: {
     targetBuildId: string;
-    percentageRamp: {
-      rampPercentage: number;
+    percentageRamp?: {
+      rampPercentage?: number;
     };
   };
   createTime: string;
@@ -44,8 +44,8 @@ type CompatibleRedirectRule = {
 };
 
 export type TaskQueueRules = {
-  assignmentRules: AssignmentRule[];
-  compatibleRedirectRules: CompatibleRedirectRule[];
+  assignmentRules?: AssignmentRule[];
+  compatibleRedirectRules?: CompatibleRedirectRule[];
   conflictToken: string;
 };
 
@@ -146,8 +146,8 @@ export async function getPollers(
   };
 }
 export type VersionResults = {
-  rules: TaskQueueRules | undefined;
-  compatibility: TaskQueueCompatibility | undefined;
+  rules: TaskQueueRules;
+  compatibility: TaskQueueCompatibility;
   versionSets: TaskQueueCompatibleVersionSet[];
 };
 
