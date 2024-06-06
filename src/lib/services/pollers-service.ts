@@ -13,8 +13,6 @@ import {
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { getOrderedVersionSets } from '$lib/utilities/task-queue-compatibility';
 
-// import versioningFixture from '$fixtures/task-queue-rules.json';
-
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 
 export type GetWorkerTaskReachabilityRequest = NamespaceScopedRequest & {
@@ -157,7 +155,6 @@ export async function getVersioning(
   parameters: GetAllPollersRequest,
   request = fetch,
 ): Promise<VersionResults> {
-  // const rules = await versioningFixture
   const rules = await getTaskQueueRules(parameters, request);
   const compatibility = await getTaskQueueCompatibility(parameters, request);
   const versionSets = getOrderedVersionSets(compatibility);

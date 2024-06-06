@@ -20,12 +20,16 @@
   $: ({ namespace } = $page.params);
   $: versioningEnabled = pollerHasVersioning(workers.pollers);
   $: buildIds = getUniqueBuildIdsFromPollers(workers.pollers);
+
+  $: hasRules = (rules) => {
+    return rules?.assignmentRules || rules?.compatibleRedirectRules;
+  };
 </script>
 
 {#await getVersioning({ namespace, queue: taskQueue })}
   <SkeletonTable rows={3} />
 {:then { rules, compatibility, versionSets }}
-  {#if rules}
+  {#if hasRules(rules)}
     <WorkerRules {rules} />
   {:else if versioningEnabled && versionSets?.length}
     {#await getWorkerTaskReachability( { namespace, buildIds, queue: taskQueue }, )}
