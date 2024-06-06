@@ -21,10 +21,7 @@
       {taskQueue}
     </h2>
     <Tabs>
-      <TabList
-        class="surface-secondary flex flex-wrap gap-6 p-4 pl-0"
-        label="task queue detail"
-      >
+      <TabList class="flex flex-wrap gap-6 p-4 pl-0" label="task queue detail">
         <Tab
           label={translate('workers.workers')}
           id="worker-tab"
