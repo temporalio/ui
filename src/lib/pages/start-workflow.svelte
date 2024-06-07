@@ -36,12 +36,12 @@
   let workflowId = '';
   let taskQueue = '';
   let workflowType = '';
-  let initialInput = '';
   let input = '';
   let inputRetrieved = 0;
 
   let initialWorkflowId = '';
   let initialWorkflowType = '';
+  let initialInput = '';
 
   let error = '';
   let pollerCount: undefined | number = undefined;
@@ -208,20 +208,22 @@
     <div
       class="flex w-full flex-col items-end justify-between gap-4 md:flex-row"
     >
-      <div class="flex w-full flex-col gap-2 md:w-1/2">
-        <Label
-          class="text-subtle"
-          for="workflow-initial-input"
-          label={translate('workflows.initial-input')}
-        />
-        <CodeBlock
-          id="workflow-initial-input"
-          minHeight={120}
-          content={initialInput}
-          copyable
-        />
-      </div>
-      <div class="flex w-full flex-col gap-2 md:w-1/2">
+      {#if initialInput}
+        <div class="flex w-full flex-col gap-2 md:w-1/2">
+          <Label
+            class="text-subtle"
+            for="workflow-example-input"
+            label={translate('workflows.example-input')}
+          />
+          <CodeBlock
+            id="workflow-initial-input"
+            minHeight={120}
+            content={initialInput}
+            copyable
+          />
+        </div>
+      {/if}
+      <div class="flex w-full flex-col gap-2 {initialInput && 'md:w-1/2'}">
         <div class="flex w-full items-end justify-between">
           <Label for="workflow-input" label={translate('workflows.input')} />
           <StartWorkflowInputUpload onUpload={onInputUpload} />

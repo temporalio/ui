@@ -63,6 +63,7 @@ export const Strings = {
   'back-to-workflows': 'Back to Workflows',
   input: 'Input',
   'initial-input': 'Initial Input',
+  'example-input': 'Example Input',
   'input-and-results': 'Input and Results',
   'continued-as-new-with-input': 'Continued as New with Input',
   results: 'Results',

@@ -538,7 +538,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
       get(authUser).accessToken,
     )) as PotentiallyDecodable;
 
-    const input = stringifyWithBigInt(convertedAttributes?.payloads);
+    const input = stringifyWithBigInt(convertedAttributes?.payloads[0]);
     return {
       input,
       searchAttributes: workflow?.searchAttributes?.indexedFields,
