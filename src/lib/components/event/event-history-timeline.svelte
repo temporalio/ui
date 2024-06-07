@@ -346,15 +346,15 @@
 
   :global(.vis-time-axis .vis-text) {
     font-size: 10px;
-    color: white !important;
+    color: theme(colors.white) !important;
   }
 
   :global(.vis-background, .vis-timeline) {
-    background-color: #000;
-    color: white;
+    background-color: theme(colors.black);
+    color: theme(colors.white);
     border-radius: 0.75rem;
     border-width: 2px;
-    border: 2px solid #000;
+    border: 2px solid theme(colors.black);
   }
 
   :global(.vis-content, .vis-group) {
@@ -367,7 +367,7 @@
   }
 
   :global(.vis-item.vis-dot) {
-    background-color: #18181b;
+    background-color: theme(colors.off-black);
   }
 
   :global(.vis-item-overflow) {
@@ -375,11 +375,11 @@
   }
 
   :global(.vis-tooltip) {
-    background-color: #18181b !important;
+    background-color: theme(colors.off-black) !important;
     color: white !important;
     border-radius: 0.75rem !important;
     border-width: 2px !important;
-    border: 2px solid #18181b !important;
+    border: 2px solid theme(colors.off-black) !important;
     height: auto !important;
     font-size: 0.5em !important;
   }
@@ -390,85 +390,111 @@
 
   /* CSS for each activity type block */
   :global(.vis-item.vis-range.workflow) {
-    background-color: #f4f4f5;
-    border-color: #18181b;
+    background-color: theme(colors.off-white);
+    border-color: theme(colors.off-black);
     border-radius: 9999px;
     border-width: 2px;
-    color: #18181b;
+    color: theme(colors.black);
   }
 
   :global(.vis-item.vis-point.workflow) {
-    background-color: #18181b;
-    color: #18181b;
+    background-color: theme(colors.off-black);
+    color: theme(colors.off-black);
   }
 
   /* CSS for each classifciation */
-  :global(.vis-item.vis-range.Failed, .vis-item.vis-range.Terminated) {
-    background-color: #fee2e2;
-    border-color: #b91c1c;
+  :global(.vis-item.vis-range.Failed) {
+    background-color: theme(colors.red.300);
+    border-color: theme(colors.red.300);
     border-radius: 9999px;
     border-width: 2px;
-    color: #b91c1c;
+    color: theme(colors.black);
   }
 
-  :global(.vis-item.vis-point.Failed, .vis-item.vis-range.Terminated) {
-    color: #b91c1c;
+  :global(.vis-item.vis-point.Failed) {
+    color: theme(colors.red.300);
+  }
+
+  :global(.vis-item.vis-range.Terminated, .vis-item.vis-range.CancelRequested) {
+    background-color: theme(colors.yellow.300);
+    border-color: theme(colors.yellow.300);
+    border-radius: 9999px;
+    border-width: 2px;
+    color: theme(colors.black);
+  }
+
+  :global(.vis-item.vis-point.Terminated, .vis-item.vis-point.CancelRequested) {
+    color: theme(colors.yellow.300);
   }
 
   :global(.vis-item.vis-range.TimedOut) {
-    background-color: #ffedd5;
-    border-color: #c2410c;
+    background-color: theme(colors.orange.300);
+    border-color: theme(colors.orange.300);
     border-radius: 9999px;
     border-width: 2px;
-    color: #c2410c;
+    color: theme(colors.black);
   }
 
   :global(.vis-item.vis-point.TimedOut) {
-    color: #c2410c;
+    color: theme(colors.orange.300);
   }
 
-  :global(
-      .vis-item.vis-range.Canceled,
-      .vis-item.vis-range.CanceledRequested,
-      .vis-item.vis-range.Paused
-    ) {
-    background-color: #fef9c3;
-    border-color: #a16207;
+  :global(.vis-item.vis-range.Canceled, .vis-item.vis-range.Unspecified) {
+    background-color: theme(colors.slate.100);
+    border-color: theme(colors.slate.100);
     border-radius: 9999px;
     border-width: 2px;
-    color: #a16207;
+    color: theme(colors.black);
   }
 
-  :global(
-      .vis-item.vis-point.Canceled,
-      .vis-item.vis-point.CanceledRequested,
-      .vis-item.vis-point.Paused
-    ) {
-    color: #a16207;
+  :global(.vis-item.vis-point.Canceled, .vis-item.vis-point.Unspecified) {
+    color: theme(colors.slate.100);
+  }
+
+  :global(.vis-item.vis-range.Fired) {
+    background-color: theme(colors.pink.300);
+    border-color: theme(colors.pink.300);
+    border-radius: 9999px;
+    border-width: 2px;
+    color: theme(colors.black);
+  }
+
+  :global(.vis-item.vis-point.Fired) {
+    color: theme(colors.pink.300);
+  }
+
+  :global(.vis-item.vis-range.Scheduled) {
+    background-color: theme(colors.indigo.300);
+    border-color: theme(colors.indigo.300);
+    border-radius: 9999px;
+    border-width: 2px;
+    color: theme(colors.black);
+  }
+
+  :global(.vis-item.vis-point.Scheduled) {
+    color: theme(colors.indigo.300);
   }
 
   :global(
       .vis-item.vis-range.Running,
-      .vis-item.vis-range.Fired,
-      .vis-item.vis-range.Scheduled,
+      .vis-item.vis-range.New,
       .vis-item.vis-range.Started,
       .vis-item.vis-range.Initiated
     ) {
-    background-color: #93bbfd;
-    border-color: #1d4ed8;
+    background-color: theme(colors.blue.300);
+    border-color: theme(colors.blue.300);
     border-radius: 9999px;
     border-width: 2px;
-    color: #000;
+    color: theme(colors.black);
   }
 
   :global(
       .vis-item.vis-point.Running,
-      .vis-item.vis-point.Fired,
-      .vis-item.vis-point.Scheduled,
+      .vis-item.vis-point.New,
       .vis-item.vis-point.Started,
       .vis-item.vis-point.Initiated
     ) {
-    color: #1d4ed8;
+    color: theme(colors.blue.300);
   }
 
   :global(.vis-item.vis-range.workflow.Running) {
@@ -478,72 +504,72 @@
   }
 
   :global(.vis-item.vis-range.ContinuedAsNew) {
-    background-color: #e4e4e7;
-    border-color: #18181b;
+    background-color: theme(colors.purple.300);
+    border-color: theme(colors.purple.300);
     border-radius: 9999px;
     border-width: 2px;
-    color: #17172c;
+    color: theme(colors.black);
   }
 
   :global(.vis-item.vis-point.ContinuedAsNew) {
-    color: #18181b;
+    color: theme(colors.purple.300);
   }
 
   :global(.vis-item.vis-range.Completed, .vis-item.vis-range.Open) {
-    background-color: #dcfce7;
-    border-color: #15803d;
+    background-color: #71d375;
+    border-color: #71d375;
     border-radius: 9999px;
     border-width: 2px;
-    color: #15803d;
+    color: theme(colors.black);
   }
 
   :global(.vis-item.vis-point.Completed, .vis-item.vis-point.Open) {
-    color: #15803d;
-  }
-
-  :global(.vis-item.vis-range.New) {
-    background-color: #e0eaff;
-    border-color: #4338ca;
-    border-radius: 9999px;
-    border-width: 2px;
-    color: #4338ca;
-  }
-
-  :global(.vis-item.vis-point.New) {
-    color: #4338ca;
+    color: #71d375;
   }
 
   :global(.vis-item.vis-range.Signaled) {
-    background-color: #f3e8ff;
-    border-color: #7e22ce;
+    background-color: theme(colors.pink.200);
+    border-color: theme(colors.pink.200);
     border-radius: 9999px;
     border-width: 2px;
-    color: #7e22ce;
+    color: theme(colors.black);
   }
 
   :global(.vis-item.vis-point.Signaled) {
-    color: #7e22ce;
+    color: theme(colors.pink.200);
+  }
+
+  :global(.vis-item.vis-range.Paused) {
+    background-color: theme(colors.yellow.200);
+    border-color: theme(colors.yellow.200);
+    border-radius: 9999px;
+    border-width: 2px;
+    color: theme(colors.black);
+  }
+
+  :global(.vis-item.vis-point.Paused) {
+    color: theme(colors.yellow.200);
   }
 
   /* CSS for each activity type */
   :global(.vis-item.vis-dot.marker) {
-    border-color: #18181b;
+    border-color: theme(colors.off-black);
   }
 
   :global(.vis-item.vis-range.signal) {
-    color: #652b19;
+    color: theme(colors.orange.900);
   }
 
   :global(.vis-item.vis-point.signal) {
-    color: #652b19;
+    color: theme(colors.orange.900);
   }
 
   :global(.vis-item.vis-range.update) {
-    background-color: #f3e8ff;
-    border-color: #581c87;
+    background-color: theme(colors.purple.100);
+    border-color: theme(colors.purple.900);
     border-radius: 9999px;
     border-width: 2px;
-    color: #581c87;
+    color: theme(colors.purple.900);
   }
 
   :global(.bar-content) {
