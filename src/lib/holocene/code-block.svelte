@@ -168,7 +168,6 @@
 
 <div class="relative min-w-[80px] grow">
   <div
-    on:keydown|stopPropagation
     bind:this={editor}
     class={className}
     data-testid={$$props.testId}

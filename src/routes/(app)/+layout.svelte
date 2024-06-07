@@ -64,6 +64,7 @@
     feedback:
       $page.data?.settings?.feedbackURL ||
       'https://github.com/temporalio/ui/issues/new/choose',
+    docs: 'http://docs.temporal.io',
   };
 
   function getCurrentHref(namespace: string) {

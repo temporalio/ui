@@ -83,6 +83,7 @@
   <div
     id="{id}-content"
     aria-labelledby="{id}-trigger"
+    role="textbox"
     class="mt-8 block w-full"
     class:hidden={!open}
   >

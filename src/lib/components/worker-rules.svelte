@@ -1,24 +1,30 @@
 <script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
-  import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    type GetPollersResponse,
-    type TaskQueueRules,
-  } from '$lib/services/pollers-service';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { type TaskQueueRules } from '$lib/services/pollers-service';
+  import { timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
 
-  import PollerIcon from './poller-icon.svelte';
+  export let rules: TaskQueueRules;
 
-  export let workers: GetPollersResponse;
-  export let rules: TaskQueueRules | undefined = undefined;
+  let showAll = false;
 
-  $: ({ assignmentRules, compatibleRedirectRules } = rules);
+  $: ({ assignmentRules = [], compatibleRedirectRules = [] } = rules);
+
+  $: catchAllRule = assignmentRules.find(
+    (rule) =>
+      !rule.rule?.percentageRamp?.rampPercentage ||
+      rule.rule?.percentageRamp?.rampPercentage.toFixed(0) === '1',
+  );
+  $: catchAllIndex = assignmentRules.indexOf(catchAllRule);
+
+  $: activeRules = assignmentRules.filter((r, i) => i <= catchAllIndex);
+  $: inactiveRules = assignmentRules.filter((r, i) => i > catchAllIndex);
+
+  $: visibleRules = showAll ? [...activeRules, ...inactiveRules] : activeRules;
 </script>
 
 <h2 class="text-base font-medium" data-testid="worker-rules">
@@ -26,17 +32,28 @@
 </h2>
 <Table class="mb-6 w-full table-fixed">
   <TableHeaderRow slot="headers">
-    <th class="w-2/3">Target Build ID</th>
-    <th class="w-1/3 text-right">Create Time</th>
+    <th class="w-20">Index</th>
+    <th class="grow">Target Build ID</th>
+    <th class="w-20">Ramp</th>
+    <th class="text-right">Create Time</th>
   </TableHeaderRow>
-  {#each assignmentRules as rule, index (index)}
+  {#each visibleRules as rule, index (index)}
     <TableRow data-testid="version-row">
-      <td class="text-left" data-testid="target-source"
-        >{rule.rule.targetBuildId}</td
+      <td class="text-left" data-testid="index">{index}</td>
+      <td class="break-all text-left" data-testid="target-source"
+        >{rule.rule?.targetBuildId}</td
       >
       <td class="text-right" data-testid="target-source"
-        >{formatDate(rule.createTime, $timeFormat)}</td
+        >{((rule.rule?.percentageRamp?.rampPercentage || 1) * 100).toFixed(
+          0,
+        )}%</td
       >
+      <td
+        class="justfiy-between flex w-full items-center text-right"
+        data-testid="target-source"
+      >
+        <p>{formatDate(rule.createTime, $timeFormat)}</p>
+      </td>
     </TableRow>
   {:else}
     <tr class="w-full">
@@ -45,6 +62,20 @@
       </td>
     </tr>
   {/each}
+  {#if !showAll && inactiveRules?.length}
+    <TableRow
+      data-testid="view-all"
+      class="cursor-pointer bg-slate-100"
+      on:click={() => (showAll = !showAll)}
+    >
+      <td></td>
+      <td class="break-all text-left text-blue-700 underline"
+        >{translate('workers.view-all-assignment-rules')}</td
+      >
+      <td />
+      <td />
+    </TableRow>
+  {/if}
 </Table>
 
 <h2 class="text-base font-medium" data-testid="worker-rules">
@@ -72,67 +103,6 @@
     <tr class="w-full">
       <td colspan="6">
         <EmptyState title={translate('workers.no-redirect-rules-found')} />
-      </td>
-    </tr>
-  {/each}
-</Table>
-
-<h2 class="flex items-center gap-2 text-base font-medium" data-testid="workers">
-  {translate('workers.workers')}
-  <Badge type="count" class="rounded-sm">{workers?.pollers?.length || 0}</Badge>
-</h2>
-<Table class="mb-6 w-full min-w-[600px] table-fixed">
-  <caption class="sr-only" slot="caption"
-    >{translate('workflows.workers-tab')}</caption
-  >
-  <TableHeaderRow slot="headers">
-    <th class={'w-3/12'}>{translate('common.id')}</th>
-    <th class="w-3/12">{translate('workers.buildId')}</th>
-    <th class="w-2/12">{translate('workflows.last-accessed')}</th>
-    <th class="w-2/12">
-      <p class="text-center">
-        {translate('workflows.workflow-task-handler')}
-      </p>
-    </th>
-    <th class="w-2/12 text-center">
-      <p class="text-center">{translate('workflows.activity-handler')}</p>
-    </th>
-  </TableHeaderRow>
-  {#each workers?.pollers as poller (poller.identity)}
-    <TableRow data-testid="worker-row">
-      <td class="text-left" data-testid="worker-identity">
-        <p class="select-all">{poller.identity}</p>
-      </td>
-      <td class="text-left" data-testid="worker-identity">
-        <p class="select-all">
-          <CompatibilityBadge
-            active
-            buildId={poller?.workerVersionCapabilities?.buildId}
-          />
-        </p>
-      </td>
-      <td class="text-left" data-testid="worker-last-access-time">
-        <p class="select-all">
-          {formatDate(poller.lastAccessTime, $timeFormat, {
-            relative: $relativeTime,
-          })}
-        </p>
-      </td>
-      <td data-testid="workflow-poller">
-        <PollerIcon
-          includesTaskQueueType={poller.taskQueueTypes.includes('WORKFLOW')}
-        />
-      </td>
-      <td data-testid="activity-poller">
-        <PollerIcon
-          includesTaskQueueType={poller.taskQueueTypes.includes('ACTIVITY')}
-        />
-      </td>
-    </TableRow>
-  {:else}
-    <tr class="w-full">
-      <td colspan={6}>
-        <EmptyState title={translate('workflows.workers-empty-state')} />
       </td>
     </tr>
   {/each}
