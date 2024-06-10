@@ -75,7 +75,7 @@
     </div>
     <p class="flex items-center font-secondary">
       {#if error}
-        <Badge class="mr-2" type="error">{error}</Badge>
+        <Badge class="mr-2" type="danger">{error}</Badge>
       {/if}
       {subtitle}
     </p>

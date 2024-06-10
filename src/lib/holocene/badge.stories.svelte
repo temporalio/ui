@@ -3,9 +3,7 @@
 
   import Badge, { badgeTypes } from './badge.svelte';
 
-  const types = badgeTypes.filter(
-    (type) => type !== 'count' && type !== 'unspecified',
-  );
+  const types = badgeTypes.filter((type) => type !== 'count');
 
   export const meta = {
     title: 'Badge',
@@ -30,7 +28,6 @@
 
 <Template let:args>
   <div class="flex flex-col gap-2">
-    <Badge type="unspecified">{args.label}</Badge>
     {#each types as type}
       <Badge {type} class="capitalize">{type.replace(/-/g, ' ')}</Badge>
     {/each}
