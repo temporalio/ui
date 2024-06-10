@@ -23,6 +23,7 @@
 package route
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -55,6 +56,12 @@ func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, a
 
 	writeControlMiddleware := DisableWriteMiddleware(cfgProvider)
 
-	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware), writeControlMiddleware)
+	// Create gRPC connection to the temporal server.
+	conn, err := api.CreateGRPCConnection(cfgProvider)
+	if err != nil {
+		return fmt.Errorf("failed to create gRPC connection to temporal server: %w", err)
+	}
+
+	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
 	return nil
 }
