@@ -44,7 +44,7 @@
   };
 </script>
 
-<TableRow class="hover:surface-subtle">
+<TableRow class="hover:bg-interactive-table-hover">
   <td>
     <WorkflowStatus
       status={workflow.status}

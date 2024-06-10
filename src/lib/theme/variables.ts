@@ -157,6 +157,10 @@ export const variables = {
     light: 'slate.100',
     dark: 'slate.950',
   },
+  '--color-interactive-table-hover': {
+    light: 'indigo.100',
+    dark: 'slate.900',
+  },
   // Border
   '--color-border-primary': {
     light: 'space-black',

@@ -189,11 +189,11 @@
   }
 
   .row:hover {
-    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed dark:surface-subtle dark:bg-none;
+    @apply cursor-pointer bg-interactive-table-hover dark:bg-none;
   }
 
   .expanded.row {
-    @apply bg-blue-50 dark:surface-subtle;
+    @apply bg-interactive-table-hover;
   }
 
   .failure {
@@ -237,21 +237,21 @@
   }
 
   .active {
-    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed dark:surface-subtle dark:bg-none;
+    @apply cursor-pointer bg-interactive-table-hover bg-fixed dark:bg-none;
   }
 
   .canceled:hover,
   .active.canceled {
-    @apply bg-gradient-to-br from-yellow-100 to-yellow-200 bg-fixed dark:bg-yellow-600 dark:bg-none;
+    @apply bg-yellow-200 bg-fixed dark:bg-yellow-600 dark:bg-none;
   }
 
   .failure:hover,
   .active.failure {
-    @apply bg-gradient-to-br from-red-100 to-red-200 bg-fixed dark:bg-red-900 dark:bg-none;
+    @apply bg-red-200 bg-fixed dark:bg-red-900 dark:bg-none;
   }
 
   .terminated:hover,
   .active.terminated {
-    @apply bg-gradient-to-br from-pink-100 to-pink-200 bg-fixed dark:bg-pink-500 dark:bg-none;
+    @apply bg-pink-200 bg-fixed dark:bg-pink-500 dark:bg-none;
   }
 </style>
