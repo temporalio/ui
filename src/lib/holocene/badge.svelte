@@ -9,7 +9,7 @@
     secondary: 'bg-purple-300',
     default: 'bg-slate-100',
     warning: 'bg-yellow-200',
-    success: 'bg-[#71D375]',
+    success: 'bg-green-300',
     danger: 'bg-red-300',
     count: 'h-6 w-6 min-w-max rounded-full bg-blue-300',
   };

@@ -516,15 +516,15 @@
   }
 
   :global(.vis-item.vis-range.Completed, .vis-item.vis-range.Open) {
-    background-color: #71d375;
-    border-color: #71d375;
+    background-color: theme(colors.green.300);
+    border-color: theme(colors.green.300);
     border-radius: 9999px;
     border-width: 2px;
     color: theme(colors.black);
   }
 
   :global(.vis-item.vis-point.Completed, .vis-item.vis-point.Open) {
-    color: #71d375;
+    color: theme(colors.green.300);
   }
 
   :global(.vis-item.vis-range.Signaled) {
