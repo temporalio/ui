@@ -82,10 +82,10 @@ const toFilterQueryStatement = (
   }
 
   if (isStartsWith(conditional)) {
-    return `${queryKey} ${conditional} ${formatValue(value, type)}`;
+    return `\`${queryKey}\` ${conditional} ${formatValue(value, type)}`;
   }
 
-  return `${queryKey}${conditional}${formatValue(value, type)}`;
+  return `\`${queryKey}\`${conditional}${formatValue(value, type)}`;
 };
 
 const toQueryStatementsFromFilters = (
