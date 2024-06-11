@@ -38,7 +38,7 @@
       position === 'bottom' && 'bottom-0 left-0 right-0',
       position === 'right' &&
         'bottom-0 right-0 top-0 h-full rounded-bl-lg rounded-tr-none',
-      dark && 'bg-black text-off-white',
+      dark && 'border border-slate-900 bg-black text-off-white',
       className,
     )}
     class:max-w-fit={position === 'right'}
