@@ -52,6 +52,7 @@
         {endTime}
         {duration}
         {durationToNow}
+        showRelative={false}
       />
 
       {#each deployment as step, index (step.id)}

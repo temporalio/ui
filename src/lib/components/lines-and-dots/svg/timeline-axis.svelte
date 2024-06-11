@@ -15,7 +15,8 @@
   export let startTime: string | Timestamp;
   export let endTime: string | Date;
   export let duration: number;
-  export let durationToNow: number;
+  export let durationToNow: number = 0;
+  export let showRelative = true;
 
   $: timelineWidth = canvasWidth - 2 * gutter;
 
@@ -78,13 +79,20 @@
       x={tickX - radius}
       y={tickY}
     >
-      {formatDistanceAbbreviated({
-        start: startTime,
-        end: new Date(
-          new Date(startTime.toString()).getTime() + (duration / ticks) * i,
-        ),
-        includeMilliseconds: duration / ticks < 1000,
-      })}
+      {showRelative
+        ? formatDistanceAbbreviated({
+            start: startTime,
+            end: new Date(
+              new Date(startTime.toString()).getTime() + (duration / ticks) * i,
+            ),
+            includeMilliseconds: duration / ticks < 1000,
+          })
+        : formatDate(
+            new Date(
+              new Date(startTime.toString()).getTime() + (duration / ticks) * i,
+            ),
+            $timeFormat,
+          )}
     </text>
   {/if}
 {/each}
@@ -97,9 +105,11 @@
 >
   <tspan>{formatDate(endTime, $timeFormat)}</tspan>
 </text>
-<Line
-  strokeWidth={radius / 4}
-  startPoint={[now, 0]}
-  endPoint={[now, timelineHeight]}
-  pending
-/>
+{#if durationToNow}
+  <Line
+    strokeWidth={radius / 4}
+    startPoint={[now, 0]}
+    endPoint={[now, timelineHeight]}
+    pending
+  />
+{/if}
