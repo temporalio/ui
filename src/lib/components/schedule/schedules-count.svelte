@@ -28,8 +28,9 @@
 
 <div class="flex flex-wrap items-center gap-2">
   {#if !loading}
-    {$schedulesCount} {translate('common.schedules')}
+    {$schedulesCount}
   {:else}
-    <Skeleton class="h-6 w-24 rounded" />
+    <Skeleton class="h-6 w-6 rounded" />
   {/if}
+  {translate('common.schedules')}
 </div>
