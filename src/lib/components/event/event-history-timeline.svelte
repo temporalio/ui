@@ -70,7 +70,7 @@
     const link = renderComponentToHTML(Link, {
       href,
       text: sanitizeHtml(groupName),
-      class: 'flex gap-2 items-center',
+      class: 'flex gap-2 items-center !text-space-black',
     });
     return link;
   }
@@ -337,7 +337,7 @@
     display: flex;
     align-items: center;
 
-    @apply !text-primary;
+    @apply !text-space-black;
   }
 
   :global(.vis-timeline) {
@@ -358,7 +358,7 @@
   }
 
   :global(.vis-content, .vis-group) {
-    @apply surface-secondary;
+    @apply bg-off-white;
   }
 
   :global(.vis-timeline .vis-item) {
@@ -394,7 +394,7 @@
     border-color: theme(colors.off-black);
     border-radius: 9999px;
     border-width: 2px;
-    color: theme(colors.black);
+    color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.workflow) {
@@ -408,7 +408,7 @@
     border-color: theme(colors.red.300);
     border-radius: 9999px;
     border-width: 2px;
-    color: theme(colors.black);
+    color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.Failed) {
@@ -420,7 +420,7 @@
     border-color: theme(colors.yellow.300);
     border-radius: 9999px;
     border-width: 2px;
-    color: theme(colors.black);
+    color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.Terminated, .vis-item.vis-point.CancelRequested) {
@@ -432,7 +432,7 @@
     border-color: theme(colors.orange.300);
     border-radius: 9999px;
     border-width: 2px;
-    color: theme(colors.black);
+    color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.TimedOut) {
@@ -444,7 +444,7 @@
     border-color: theme(colors.slate.100);
     border-radius: 9999px;
     border-width: 2px;
-    color: theme(colors.black);
+    color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.Canceled, .vis-item.vis-point.Unspecified) {
@@ -456,7 +456,7 @@
     border-color: theme(colors.pink.300);
     border-radius: 9999px;
     border-width: 2px;
-    color: theme(colors.black);
+    color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.Fired) {
@@ -468,7 +468,7 @@
     border-color: theme(colors.indigo.300);
     border-radius: 9999px;
     border-width: 2px;
-    color: theme(colors.black);
+    color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.Scheduled) {
@@ -485,7 +485,7 @@
     border-color: theme(colors.blue.300);
     border-radius: 9999px;
     border-width: 2px;
-    color: theme(colors.black);
+    color: theme(colors.space-black);
   }
 
   :global(
@@ -508,7 +508,7 @@
     border-color: theme(colors.purple.300);
     border-radius: 9999px;
     border-width: 2px;
-    color: theme(colors.black);
+    color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.ContinuedAsNew) {
@@ -520,7 +520,7 @@
     border-color: theme(colors.green.300);
     border-radius: 9999px;
     border-width: 2px;
-    color: theme(colors.black);
+    color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.Completed, .vis-item.vis-point.Open) {
@@ -532,7 +532,7 @@
     border-color: theme(colors.pink.200);
     border-radius: 9999px;
     border-width: 2px;
-    color: theme(colors.black);
+    color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.Signaled) {
@@ -544,7 +544,7 @@
     border-color: theme(colors.yellow.200);
     border-radius: 9999px;
     border-width: 2px;
-    color: theme(colors.black);
+    color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.Paused) {
