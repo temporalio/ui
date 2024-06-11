@@ -16,6 +16,7 @@
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
   import { coreUserStore } from '$lib/stores/core-user';
+  import { schedulesCount } from '$lib/stores/schedules';
   import type { ScheduleListEntry } from '$lib/types';
   import type { ErrorCallback } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
@@ -50,6 +51,7 @@
     let:visibleItems
     {onFetch}
     {onError}
+    total={$schedulesCount}
     aria-label={translate('common.schedules')}
     pageSizeSelectLabel={translate('common.per-page')}
     nextButtonLabel={translate('common.next')}
@@ -102,6 +104,7 @@
         <SchedulesTableRow {schedule} />
       {:else}
         <TableRow>
+          <td class="hidden xl:table-cell" />
           <td class="hidden xl:table-cell" />
           <td colspan="3">
             <EmptyState
