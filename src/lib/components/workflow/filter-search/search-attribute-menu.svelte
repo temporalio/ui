@@ -70,7 +70,7 @@
   <Menu id="search-attribute-menu" keepOpen>
     <MenuItem
       class="p-0"
-      hover={false}
+      hoverable={false}
       on:click={() => {
         document.getElementById('filter-search')?.focus();
       }}
