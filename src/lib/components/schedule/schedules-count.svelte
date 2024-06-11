@@ -11,6 +11,7 @@
   let loading = false;
 
   const fetchCounts = async () => {
+    loading = true;
     try {
       $schedulesCount = await fetchScheduleCount({
         namespace,
