@@ -4,6 +4,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
   import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
   import ApiPagination from '$lib/holocene/api-pagination.svelte';
@@ -65,7 +66,7 @@
         <h1
           class="flex flex-col gap-0 text-lg md:flex-row md:items-center md:gap-2 md:text-2xl"
         >
-          {translate('common.schedules')}
+          <SchedulesCount />
         </h1>
       </div>
       {#if !createDisabled && visibleItems.length}
