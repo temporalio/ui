@@ -11,15 +11,21 @@
   export let x1 = 0;
   export let x2 = 1000;
   export let timelineHeight = 1000;
+  export let canvasWidth: number;
   export let startTime: string | Timestamp;
   export let endTime: string | Date;
   export let duration: number;
+  export let durationToNow: number;
 
-  const { radius, height } = TimelineConfig;
+  $: timelineWidth = canvasWidth - 2 * gutter;
+
+  const { radius, height, gutter } = TimelineConfig;
   const ticks = 20;
 
   $: distance = x2 - x1;
   $: tickDistance = distance / ticks;
+
+  $: now = (durationToNow / duration) * timelineWidth + gutter;
 </script>
 
 <Line
@@ -91,3 +97,9 @@
 >
   <tspan>{formatDate(endTime, $timeFormat)}</tspan>
 </text>
+<Line
+  strokeWidth={radius / 4}
+  startPoint={[now, 0]}
+  endPoint={[now, timelineHeight]}
+  pending
+/>

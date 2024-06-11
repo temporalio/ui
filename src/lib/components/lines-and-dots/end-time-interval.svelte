@@ -5,7 +5,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
 
-  export let workflow: WorkflowExecution;
+  export let workflow: WorkflowExecution | undefined = undefined;
   export let startTime: string | Timestamp;
 
   $: endTime = workflow?.endTime || new Date();
@@ -24,14 +24,14 @@
   };
 
   onMount(() => {
-    if (!workflow.endTime) {
+    if (!workflow?.endTime) {
       endTimeInterval = setInterval(() => {
         endTime = new Date();
       }, 1000);
     }
   });
 
-  $: clearEndTimeInterval(workflow.endTime);
+  $: clearEndTimeInterval(workflow?.endTime);
 
   onDestroy(() => {
     clearInterval(endTimeInterval);

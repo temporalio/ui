@@ -1,6 +1,4 @@
-import type { Timestamp } from '$lib/types';
-
-export interface Deployment {}
+export type Deployment = Step[];
 
 enum StepType {
   UNSPECIFIED = 0,
@@ -29,9 +27,9 @@ export interface Step {
   status: StepStatus;
 
   // For a future deployment this would be the only value
-  expected_start_time: string | Timestamp;
-  start_time: string | Timestamp;
-  end_time: string | Timestamp;
+  expectedStartTime: string;
+  startTime: string;
+  endTime: string;
 
   target_cell: string;
 }
@@ -41,72 +39,72 @@ export const deployment: Step[] = [
     id: '1',
     type: StepType.CONFIG,
     status: StepStatus.COMPLETED,
-    expected_start_time: '2024-07-01 UTC 12:30:00.00',
-    start_time: '',
-    end_time: '',
+    expectedStartTime: '2024-06-11 UTC 12:30:00.00',
+    startTime: '2024-06-11 UTC 12:30:00.00',
+    endTime: '2024-06-11 UTC 13:30:00.00',
     target_cell: 'cell1',
   },
   {
     id: '2',
     type: StepType.DEPLOYMENT,
-    status: StepStatus.IN_PROGRESS,
-    expected_start_time: '2024-07-01 UTC 12:30:00.00',
-    start_time: '2024-07-01 UTC 12:30:00.00',
-    end_time: '',
-    target_cell: 'cell1',
+    status: StepStatus.FAILED,
+    expectedStartTime: '2024-06-11 UTC 12:30:00.00',
+    startTime: '2024-06-11 UTC 12:45:03.00',
+    endTime: '2024-06-11 UTC 13:36:39.00',
+    target_cell: 'cell2',
   },
   {
     id: '3',
     type: StepType.RESTART,
-    status: StepStatus.SCHEDULED,
-    expected_start_time: '2024-07-01 UTC 12:30:00.00',
-    start_time: '',
-    end_time: '',
-    target_cell: 'cell1',
+    status: StepStatus.IN_PROGRESS,
+    expectedStartTime: '2024-06-11 UTC 13:45:00.00',
+    startTime: '2024-06-11 UTC 13:45:00.00',
+    endTime: '',
+    target_cell: 'cell3',
   },
   {
     id: '4',
-    type: StepType.USER_INPUT,
-    status: StepStatus.FAILED,
-    expected_start_time: '2024-07-01 UTC 12:30:00.00',
-    start_time: '',
-    end_time: '',
-    target_cell: 'cell1',
+    type: StepType.DEPLOYMENT,
+    status: StepStatus.SCHEDULED,
+    expectedStartTime: '2024-06-11 UTC 16:30:00.00',
+    startTime: '',
+    endTime: '',
+    target_cell: 'cell4',
   },
   {
     id: '5',
-    type: StepType.USER_INPUT,
+    type: StepType.DEPLOYMENT,
     status: StepStatus.SCHEDULED,
-    expected_start_time: '2024-07-01 UTC 12:30:00.00',
-    start_time: '',
-    end_time: '',
-    target_cell: 'cell1',
+    expectedStartTime: '2024-06-11 UTC 17:30:00.00',
+    startTime: '',
+    endTime: '',
+    target_cell: 'cell5',
   },
   {
     id: '6',
-    type: StepType.USER_INPUT,
-    status: StepStatus.IN_PROGRESS,
-    expected_start_time: '2024-07-01 UTC 12:30:00.00',
-    start_time: '',
-    end_time: '',
-    target_cell: 'cell1',
+    type: StepType.DEPLOYMENT,
+    status: StepStatus.SCHEDULED,
+    expectedStartTime: '2024-06-11 UTC 18:30:00.00',
+    startTime: '',
+    endTime: '',
+    target_cell: 'cell6',
   },
   {
     id: '7',
-    type: StepType.USER_INPUT,
-    status: StepStatus.COMPLETED,
-    expected_start_time: '2024-07-01 UTC 12:30:00.00',
-    start_time: '',
-    end_time: '',
-    target_cell: 'cell1',
+    type: StepType.DEPLOYMENT,
+    status: StepStatus.SCHEDULED,
+    expectedStartTime: '2024-06-11 UTC 19:30:00.00',
+    startTime: '',
+    endTime: '',
+    target_cell: 'cell7',
   },
   {
     id: '8',
-    type: StepType.USER_INPUT,
-    status: StepStatus.UNSPECIFIED,
-    expected_start_time: '2024-07-01 UTC 12:30:00.00',
-    start_time: '',
-    end_time: '',
-    target_cell: 'cell1',
+    type: StepType.DEPLOYMENT,
+    status: StepStatus.SCHEDULED,
+    expectedStartTime: '2024-06-11 UTC 20:30:00.00',
+    startTime: '',
+    endTime: '',
+    target_cell: 'cell8',
   },
 ];
