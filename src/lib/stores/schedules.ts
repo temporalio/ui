@@ -200,3 +200,4 @@ export const submitEditSchedule = async (
 
 export const loading = writable(false);
 export const error = writable('');
+export const schedulesCount = writable('0');

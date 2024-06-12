@@ -48,3 +48,25 @@ export const fetchWorkflowCountByExecutionStatus = async ({
     });
   return { count: count ?? '0', groups };
 };
+
+export const fetchScheduleCount = async ({
+  namespace,
+}: {
+  namespace: string;
+}): Promise<string> => {
+  const query =
+    'TemporalNamespaceDivision="TemporalScheduler" AND ExecutionStatus="Running"';
+  const countRoute = routeForApi('workflows.count', {
+    namespace,
+  });
+  const { count } = await requestFromAPI<CountWorkflowExecutionsResponse>(
+    countRoute,
+    {
+      params: {
+        query,
+      },
+      notifyOnError: false,
+    },
+  );
+  return count ?? '0';
+};
