@@ -225,7 +225,6 @@
     {#if cancelInProgress}
       <div in:fly={{ duration: 200, delay: 100 }}>
         <Alert
-          bold
           icon="info"
           intent="info"
           title={translate('workflows.cancel-request-sent')}
@@ -237,7 +236,6 @@
     {#if workflowHasBeenReset}
       <div in:fly={{ duration: 200, delay: 100 }}>
         <Alert
-          bold
           icon="info"
           intent="info"
           data-testid="workflow-reset-alert"
