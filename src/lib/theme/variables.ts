@@ -150,7 +150,7 @@ export const variables = {
     dark: 'red.500',
   },
   '--color-interactive-ghost-hover': {
-    light: 'slate.50',
+    light: 'slate.100',
     dark: 'slate.700',
   },
   '--color-interactive-ghost-active': {
