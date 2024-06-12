@@ -327,6 +327,22 @@ describe('updateMultipleQueryParameters', () => {
     expect(options).toEqual(gotoOptions);
   });
 
+  it('should call `goto` with the correct path if multiple parameters are provided', () => {
+    const url = new URL('https://temporal.io');
+    const parameters = [
+      { parameter: 'A', value: 'value' },
+      { parameter: 'B', value: 'value' },
+    ];
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
+
+    updateMultipleQueryParameters({ parameters, url, goto });
+
+    const [href, options] = goto.mock.calls[0];
+
+    expect(href).toBe('/?A=value&B=value');
+    expect(options).toEqual(gotoOptions);
+  });
+
   it('should call `goto` with the correct path when there are other params', () => {
     const url = new URL('https://temporal.io/?other=value');
     const parameters = [{ parameter: 'parameter', value: 'value' }];
@@ -337,6 +353,22 @@ describe('updateMultipleQueryParameters', () => {
     const [href, options] = goto.mock.calls[0];
 
     expect(href).toBe('/?other=value&parameter=value');
+    expect(options).toEqual(gotoOptions);
+  });
+
+  it('should call `goto` with the correct path when there are other params and multiple parameters are provided', () => {
+    const url = new URL('https://temporal.io/?other=value');
+    const parameters = [
+      { parameter: 'A', value: 'value' },
+      { parameter: 'B', value: 'value' },
+    ];
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
+
+    updateMultipleQueryParameters({ parameters, url, goto });
+
+    const [href, options] = goto.mock.calls[0];
+
+    expect(href).toBe('/?other=value&A=value&B=value');
     expect(options).toEqual(gotoOptions);
   });
 
