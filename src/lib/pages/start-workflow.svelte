@@ -139,16 +139,21 @@
     inputRetrieved = Date.now();
   };
 
-  $: createDisabled = workflowCreateDisabled($page);
   $: enableStart =
-    !!workflowId && !!taskQueue && !!workflowType && !createDisabled;
+    !!workflowId &&
+    !!taskQueue &&
+    !!workflowType &&
+    !workflowCreateDisabled($page);
 
   $: checkTaskQueue(taskQueueParam);
 </script>
 
 <div class="flex w-full flex-col items-center pb-24">
   <div class="flex w-full flex-col gap-4 lg:w-2/3 2xl:w-1/2">
-    <h1 class="mb-4 overflow-hidden text-base font-medium lg:text-2xl">
+    <h1
+      class="mb-4 overflow-hidden text-base font-medium lg:text-2xl"
+      data-testid="start-workflow"
+    >
       Start a Workflow
     </h1>
     <div
@@ -250,7 +255,10 @@
         on:click={() => (viewAdvancedOptions = !viewAdvancedOptions)}
         >{translate('common.more-options')}</Button
       >
-      <Button disabled={!enableStart} on:click={onWorkflowStart}
+      <Button
+        disabled={!enableStart}
+        on:click={onWorkflowStart}
+        data-testid="start-workflow-button"
         >{translate('workflows.start-workflow')}</Button
       >
     </div>

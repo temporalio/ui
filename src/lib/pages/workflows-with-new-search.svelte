@@ -69,7 +69,6 @@
   // For returning to page from 'Back to Workflows' with previous search
   $: searchParams = $page.url.searchParams.toString();
   $: searchParams, ($workflowsSearchParams = searchParams);
-  $: createDisabled = workflowCreateDisabled($page);
 
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
@@ -213,11 +212,13 @@
       {/if}
       <WorkflowCountRefresh count={$workflowCount.newCount} />
     </h1>
-    <Button
-      disabled={createDisabled}
-      leadingIcon="lightning-bolt"
-      href={routeForWorkflowStart({ namespace })}>Start Workflow</Button
-    >
+    {#if !workflowCreateDisabled($page)}
+      <Button
+        leadingIcon="lightning-bolt"
+        href={routeForWorkflowStart({ namespace })}
+        >{translate('workflows.start-workflow')}</Button
+      >
+    {/if}
   </div>
   {#if $groupByCountEnabled}
     <WorkflowCounts />

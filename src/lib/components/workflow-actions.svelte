@@ -6,6 +6,7 @@
   import ResetConfirmationModal from '$lib/components/workflow/client-actions/reset-confirmation-modal.svelte';
   import SignalConfirmationModal from '$lib/components/workflow/client-actions/signal-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -158,7 +159,7 @@
       </div>
     </MenuItem>
   </SplitButton>
-{:else}
+{:else if !workflowCreateDisabled($page)}
   <SplitButton
     id="workflow-actions"
     position="right"
@@ -168,7 +169,6 @@
     menuLabel={translate('workflows.workflow-actions')}
   >
     <MenuItem
-      disabled={workflowCreateDisabled($page)}
       on:click={() =>
         goto(
           routeForWorkflowStart({
@@ -185,6 +185,18 @@
       </div>
     </MenuItem>
   </SplitButton>
+{:else}
+  <Tooltip bottomRight width={200} text={resetTooltipText} hide={resetEnabled}>
+    <Button
+      aria-label={translate('workflows.reset')}
+      disabled={!resetEnabled}
+      variant="primary"
+      on:click={() => (resetConfirmationModalOpen = true)}
+      data-testid="workflow-reset-button"
+    >
+      {translate('workflows.reset')}
+    </Button>
+  </Tooltip>
 {/if}
 
 {#if resetEnabled}

@@ -39,7 +39,6 @@
   });
 
   $: childrenShown = childCount !== undefined;
-  $: createDisabled = workflowCreateDisabled($page);
 </script>
 
 <tr
@@ -61,13 +60,14 @@
     <td
       class="cursor-point relative flex items-center justify-center gap-0.5 pt-2"
     >
-      <StartWorkflowButton
-        disabled={createDisabled}
-        {namespace}
-        workflowId={workflow.id}
-        taskQueue={workflow.taskQueue}
-        workflowType={workflow.name}
-      />
+      {#if !workflowCreateDisabled($page)}
+        <StartWorkflowButton
+          {namespace}
+          workflowId={workflow.id}
+          taskQueue={workflow.taskQueue}
+          workflowType={workflow.name}
+        />
+      {/if}
       <IsTemporalServerVersionGuard minimumVersion="1.23.0">
         {#if !$showChildWorkflows && !child}
           <Button
