@@ -54,3 +54,5 @@ codec:
 
 forwardHeaders: {{ if .Env.TEMPORAL_FORWARD_HEADERS }} {{ range $seed := (split .Env.TEMPORAL_FORWARD_HEADERS ",") }}
   - {{ . }} {{ end }} {{ end }}
+
+hideLogs: {{ default .Env.TEMPORAL_HIDE_LOGS "false"}}
