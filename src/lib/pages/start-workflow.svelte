@@ -5,11 +5,11 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import StartWorkflowInputUpload from '$lib/components/workflow/start-workflow-input-upload.svelte';
   import StartWorkflowSearchAttributes from '$lib/components/workflow/start-workflow-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import FileInput from '$lib/holocene/file-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -134,7 +134,7 @@
     });
   };
 
-  const onInputUpload = (uploadInput: string) => {
+  const onUpload = (uploadInput: string) => {
     input = uploadInput;
     inputRetrieved = Date.now();
   };
@@ -231,7 +231,7 @@
       <div class="flex w-full flex-col gap-2 {initialInput && 'md:w-1/2'}">
         <div class="flex w-full items-end justify-between">
           <Label for="workflow-input" label={translate('workflows.input')} />
-          <StartWorkflowInputUpload onUpload={onInputUpload} />
+          <FileInput id="start-workflow-input-file-upload" {onUpload} />
         </div>
         {#key inputRetrieved}
           <CodeBlock

@@ -161,4 +161,5 @@ export const Strings = {
   day: 'Day',
   night: 'Night',
   docs: 'Docs',
+  'upload-error': 'Error uploading file',
 } as const;

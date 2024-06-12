@@ -3,6 +3,8 @@
   import { translate } from '$lib/i18n/translate';
   import { toaster } from '$lib/stores/toaster';
 
+  export let id: string;
+  export let accept = '.json';
   export let onUpload: (input: string) => void;
 
   const onFileSelect = async (e: Event) => {
@@ -18,7 +20,7 @@
         } catch (e) {
           toaster.push({
             variant: 'error',
-            message: translate('events.event-history-load-error'),
+            message: translate('common.upload-error'),
           });
         }
       };
@@ -26,16 +28,10 @@
   };
 </script>
 
-<label for="start-workflow-input-file-upload" class="file-upload-label">
+<label for={id} class="file-upload-label">
   <Icon name="upload" />
 </label>
-<input
-  id="start-workflow-input-file-upload"
-  class="hidden"
-  type="file"
-  accept=".json"
-  on:change={onFileSelect}
-/>
+<input {id} class="hidden" type="file" {accept} on:change={onFileSelect} />
 
 <style lang="postcss">
   .file-upload-label {
