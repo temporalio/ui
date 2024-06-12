@@ -140,7 +140,7 @@
             }),
           )}
         >
-          <Badge type="information" class="px-2 py-0">
+          <Badge type="primary" class="px-2 py-0">
             {workflow?.historyEvents}
           </Badge>
         </Tab>
@@ -153,7 +153,7 @@
             routeForWorkers(routeParameters),
           )}
         >
-          <Badge type="information" class="px-2 py-0">
+          <Badge type="primary" class="px-2 py-0">
             {workers?.pollers?.length}
           </Badge>
         </Tab>
@@ -166,7 +166,7 @@
             routeForRelationships(routeParameters),
           )}
         >
-          <Badge type="information" class="px-2 py-0"
+          <Badge type="primary" class="px-2 py-0"
             >{workflowRelationships.relationshipCount}</Badge
           >
         </Tab>
@@ -181,7 +181,7 @@
             )}
           >
             <Badge
-              type={activitiesCanceled ? 'warning' : 'information'}
+              type={activitiesCanceled ? 'warning' : 'primary'}
               class="px-2 py-0"
             >
               <div class="flex items-center gap-1">
@@ -225,7 +225,6 @@
     {#if cancelInProgress}
       <div in:fly={{ duration: 200, delay: 100 }}>
         <Alert
-          bold
           icon="info"
           intent="info"
           title={translate('workflows.cancel-request-sent')}
@@ -237,7 +236,6 @@
     {#if workflowHasBeenReset}
       <div in:fly={{ duration: 200, delay: 100 }}>
         <Alert
-          bold
           icon="info"
           intent="info"
           data-testid="workflow-reset-alert"

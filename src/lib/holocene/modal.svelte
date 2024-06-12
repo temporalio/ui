@@ -115,7 +115,7 @@
       </p>
     </div>
     <div class="flex items-center justify-end space-x-2 p-6">
-      <Button variant="secondary" disabled={loading} on:click={handleCancel}
+      <Button variant="ghost" disabled={loading} on:click={handleCancel}
         >{cancelText}</Button
       >
       {#if !hideConfirm}
@@ -133,7 +133,7 @@
 
 <style lang="postcss">
   .body {
-    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto rounded-lg p-0 text-primary shadow-xl md:h-max;
+    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto rounded-2xl border-2 border-secondary p-0 text-primary shadow-xl md:h-max;
   }
 
   .body::backdrop {

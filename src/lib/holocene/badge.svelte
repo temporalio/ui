@@ -5,18 +5,13 @@
   export type BadgeType = VariantProps<typeof types>['type'];
 
   const type = {
-    alpha: 'bg-purple-100 text-purple-700',
-    beta: 'bg-indigo-400',
-    success: 'bg-green-100 text-green-800',
-    information: 'bg-indigo-400',
-    error: 'bg-red-300',
+    primary: 'bg-blue-300',
+    secondary: 'bg-purple-300',
+    default: 'bg-slate-100',
     warning: 'bg-yellow-200',
-    unspecified: 'bg-slate-100',
-    active: 'bg-green-100 text-green-800',
-    inactive: 'bg-slate-100',
-    available: 'bg-green-100 text-green-800',
-    running: 'bg-indigo-400',
-    count: 'h-6 w-6 min-w-max rounded-full bg-indigo-400',
+    success: 'bg-green-300',
+    danger: 'bg-red-300',
+    count: 'h-6 w-6 min-w-max rounded-full bg-blue-300',
   };
 
   const types = cva(
@@ -41,7 +36,7 @@
         type,
       },
       defaultVariants: {
-        type: 'unspecified',
+        type: 'default',
       },
     },
   );
@@ -50,12 +45,12 @@
 </script>
 
 <script lang="ts">
-  export let type: BadgeType | undefined | null | false = 'unspecified';
+  export let type: BadgeType | undefined | null | false = 'default';
 
   let className = '';
   export { className as class };
 </script>
 
-<div class={merge(types({ type: type || 'unspecified' }), className)}>
+<div class={merge(types({ type: type || 'default' }), className)}>
   <slot />
 </div>

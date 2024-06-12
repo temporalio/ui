@@ -34,10 +34,10 @@
   <aside
     {id}
     class={merge(
-      'surface-primary fixed z-[55] h-auto overflow-y-auto rounded-t-lg text-primary shadow-xl',
-      position === 'bottom' && 'bottom-0 left-0 right-0',
+      'surface-primary fixed z-[55] h-auto overflow-y-auto border-subtle text-primary',
+      position === 'bottom' && 'bottom-0 left-0 right-0 border-t',
       position === 'right' &&
-        'bottom-0 right-0 top-0 h-full rounded-bl-lg rounded-tr-none',
+        'bottom-0 right-0 top-0 h-full rounded-bl-lg rounded-tr-none border-l',
       dark && 'bg-black text-off-white',
       className,
     )}

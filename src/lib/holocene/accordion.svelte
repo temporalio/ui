@@ -10,13 +10,14 @@
 
   import type { IconName } from './icon';
 
+  import Button from './button.svelte';
+
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
     title: string;
     id?: string;
     subtitle?: string;
     icon?: IconName;
     open?: boolean;
-    readOnly?: boolean;
     error?: string;
     onToggle?: () => void;
     'data-testid'?: string;
@@ -41,7 +42,7 @@
 
 <div
   class={merge(
-    'surface-primary flex w-full cursor-default flex-col rounded-xl border-2 p-4 text-primary dark:border-subtle',
+    'surface-primary flex w-full cursor-default flex-col rounded-2xl border-2 border-subtle p-4 text-primary hover:bg-interactive-secondary-hover',
     className,
   )}
   {...$$restProps}
@@ -67,15 +68,14 @@
       >
         <slot name="action" />
       </div>
-      <div
-        class="rounded-full from-blue-100 to-purple-100 p-1 hover:bg-gradient-to-br dark:from-blue-800 dark:to-purple-800"
-      >
-        <Icon name={open ? 'chevron-up' : 'chevron-down'} />
-      </div>
+      <Button
+        leadingIcon={open ? 'chevron-up' : 'chevron-down'}
+        variant="ghost"
+      />
     </div>
     <p class="flex items-center font-secondary">
       {#if error}
-        <Badge class="mr-2" type="error">{error}</Badge>
+        <Badge class="mr-2" type="danger">{error}</Badge>
       {/if}
       {subtitle}
     </p>
