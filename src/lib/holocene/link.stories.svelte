@@ -13,7 +13,7 @@
       icon: undefined,
       active: false,
       newTab: false,
-      inverse: false,
+      light: false,
     },
     argTypes: {
       href: { control: 'text' },
@@ -28,7 +28,7 @@
 </script>
 
 <Template let:args>
-  <div class={twMerge(args.inverse && 'bg-inverse')}>
+  <div class={twMerge(args.light && 'bg-space-black')}>
     <Link {...args}>This is a link.</Link>
   </div>
 </Template>
@@ -41,7 +41,7 @@
 
 <Story name="Open in New Tab" args={{ newTab: true }} />
 
-<Story name="Inverse" args={{ inverse: true }} />
+<Story name="Light" args={{ light: true }} />
 
 <Story
   name="Default (Dark)"
@@ -83,8 +83,8 @@
 />
 
 <Story
-  name="Inverse (Dark)"
-  args={{ inverse: true }}
+  name="Light (Dark)"
+  args={{ light: true }}
   parameters={{
     themes: {
       themeOverride: 'dark',
