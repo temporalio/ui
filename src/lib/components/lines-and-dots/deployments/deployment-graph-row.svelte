@@ -63,9 +63,9 @@
       pending={step.startTime && !step.endTime}
     />
   {:else}
-    <Dot point={[x, y]} {active} r={radius} category="pending" />
+    <Dot point={[x, y]} {active} r={radius} category="Started" />
   {/if}
-  <Text point={[x + radius, y]}>{step.target_cell}</Text>
+  <Text point={[x, y]}>{step.target_cell}</Text>
 </g>
 
 <style lang="postcss">

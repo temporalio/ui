@@ -2,13 +2,9 @@
   import { page } from '$app/stores';
 
   import DeploymentGraph from '$lib/components/lines-and-dots/deployments/deployment-graph.svelte';
+  import { deployment } from '$lib/components/lines-and-dots/deployments/deployments';
   import PageTitle from '$lib/components/page-title.svelte';
 </script>
 
 <PageTitle title="Deployments" url={$page.url.href} />
-<div
-  class="surface-black absolute left-0 top-0 h-auto h-full min-h-screen w-full"
->
-  <h1>Deployments</h1>
-  <DeploymentGraph />
-</div>
+<DeploymentGraph {deployment} />

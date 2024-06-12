@@ -1,30 +1,46 @@
 <script lang="ts">
-  import { deployment } from './deployments';
-  import { TimelineConfig } from '../constants';
-  import Line from '../svg/line.svelte';
-  import TimelineAxis from '../svg/timeline-axis.svelte';
+  import { onMount } from 'svelte';
 
+  import type { Deployment } from './deployments';
+  import { TimelineConfig } from '../constants';
+
+  import DeploymentAxis from './deployment-axis.svelte';
   import DeploymentGraphRow from './deployment-graph-row.svelte';
   import DeploymentInterval from './deployment-interval.svelte';
 
+  export let deployment: Deployment;
   export let x = 0;
   export let y = 0;
 
-  let canvasWidth: number = 1000;
-  let canvasHeight: number = 800;
+  const { height } = TimelineConfig;
 
-  const { height, gutter, radius } = TimelineConfig;
+  let canvasContainer;
+  const canvasWidth: number = 8000;
 
-  console.log(deployment);
+  const canvasPadding = 200;
+  $: canvasHeight = (deployment?.length + 1) * height + canvasPadding;
+
+  onMount(() => {
+    scollToNow();
+  });
+
+  const scollToNow = () => {
+    if (canvasContainer && window) {
+      canvasContainer.scrollLeft = canvasWidth / 2 - window.innerWidth / 2;
+    }
+  };
 </script>
 
-<div class="surface-black h-full w-full pt-12" bind:clientWidth={canvasWidth}>
-  <DeploymentInterval
-    {deployment}
-    let:startTime
-    let:endTime
-    let:duration
-    let:durationToNow
+<DeploymentInterval
+  let:startTime
+  let:endTime
+  let:duration
+  let:now
+  onNowClick={scollToNow}
+>
+  <div
+    class="surface-black h-auto h-auto w-full overflow-auto rounded pt-20"
+    bind:this={canvasContainer}
   >
     <svg
       {x}
@@ -33,28 +49,14 @@
       height={canvasHeight}
       width={canvasWidth}
     >
-      <Line
-        startPoint={[gutter, 0]}
-        endPoint={[gutter, canvasHeight - 200]}
-        strokeWidth={radius / 2}
-      />
-      <Line
-        startPoint={[canvasWidth - gutter, 0]}
-        endPoint={[canvasWidth - gutter, canvasHeight - 200]}
-        strokeWidth={radius / 2}
-      />
-      <TimelineAxis
-        x1={gutter - radius / 4}
-        x2={canvasWidth - gutter + radius / 4}
+      <DeploymentAxis
         {canvasWidth}
-        timelineHeight={canvasHeight - 200}
+        timelineHeight={canvasHeight - canvasPadding}
+        {now}
         {startTime}
         {endTime}
         {duration}
-        {durationToNow}
-        showRelative={false}
       />
-
       {#each deployment as step, index (step.id)}
         <DeploymentGraphRow
           {step}
@@ -65,5 +67,5 @@
         />
       {/each}
     </svg>
-  </DeploymentInterval>
-</div>
+  </div>
+</DeploymentInterval>
