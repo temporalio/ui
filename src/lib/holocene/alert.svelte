@@ -14,7 +14,6 @@
     intent: Intent;
     title?: string;
     icon?: AlertIcon;
-    bold?: boolean;
     'data-testid'?: string;
     hidden?: boolean;
   }
@@ -22,7 +21,6 @@
   export let intent: Intent;
   export let title = '';
   export let icon: AlertIcon = intent;
-  export let bold = false;
   export let hidden = false;
 
   let className = '';
@@ -47,7 +45,6 @@
 
 <div
   class={merge('alert flex', intent, className)}
-  class:bold
   class:hidden
   {role}
   {...$$restProps}
@@ -71,11 +68,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply rounded-md border-2 p-5 font-primary text-sm text-primary;
-  }
-
-  .alert.bold {
-    @apply rounded-xl;
+    @apply rounded-lg border-2 p-5 font-primary text-sm text-primary;
   }
 
   .alert.success {

@@ -46,13 +46,13 @@
               <h4 class="font-semibold">
                 {translate('workflows.activity-type')}
               </h4>
-              <Badge type={failed ? 'error' : undefined}>
+              <Badge type={failed ? 'danger' : undefined}>
                 {details.activityType}
               </Badge>
             </li>
             <li class="event-table-row">
               <h4>{translate('workflows.attempt')}</h4>
-              <Badge type={failed ? 'error' : 'unspecified'}>
+              <Badge type={failed ? 'danger' : undefined}>
                 {#if failed}
                   <Icon class="mr-1" name="retry" />
                 {/if}
@@ -62,14 +62,14 @@
             {#if failed}
               <li class="event-table-row">
                 <h4>{translate('workflows.attempts-left')}</h4>
-                <Badge type="error">
+                <Badge type="danger">
                   {formatAttemptsLeft(details.maximumAttempts, details.attempt)}
                 </Badge>
               </li>
               {#if details.scheduledTime}
                 <li class="event-table-row">
                   <h4>{translate('workflows.next-retry')}</h4>
-                  <Badge type="error">
+                  <Badge type="danger">
                     {toTimeDifference({
                       date: details.scheduledTime,
                       negativeDefault: translate('workflows.no-retry'),

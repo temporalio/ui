@@ -4,6 +4,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
   import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
   import ApiPagination from '$lib/holocene/api-pagination.svelte';
@@ -15,6 +16,7 @@
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
   import { coreUserStore } from '$lib/stores/core-user';
+  import { schedulesCount } from '$lib/stores/schedules';
   import type { ScheduleListEntry } from '$lib/types';
   import type { ErrorCallback } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
@@ -49,6 +51,7 @@
     let:visibleItems
     {onFetch}
     {onError}
+    total={$schedulesCount}
     aria-label={translate('common.schedules')}
     pageSizeSelectLabel={translate('common.per-page')}
     nextButtonLabel={translate('common.next')}
@@ -65,7 +68,7 @@
         <h1
           class="flex flex-col gap-0 text-lg md:flex-row md:items-center md:gap-2 md:text-2xl"
         >
-          {translate('common.schedules')}
+          <SchedulesCount />
         </h1>
       </div>
       {#if !createDisabled && visibleItems.length}
@@ -101,6 +104,7 @@
         <SchedulesTableRow {schedule} />
       {:else}
         <TableRow>
+          <td class="hidden xl:table-cell" />
           <td class="hidden xl:table-cell" />
           <td colspan="3">
             <EmptyState

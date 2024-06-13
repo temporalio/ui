@@ -24,9 +24,9 @@
 
   const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
     Completed: 'success',
-    Running: 'running',
-    Failed: 'error',
-    Unspecified: 'unspecified',
+    Running: 'primary',
+    Failed: 'danger',
+    Unspecified: undefined,
   };
 </script>
 

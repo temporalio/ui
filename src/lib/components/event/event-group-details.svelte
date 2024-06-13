@@ -61,11 +61,11 @@
 
 <style lang="postcss">
   .row:hover {
-    @apply surface-subtle cursor-pointer bg-fixed;
+    @apply cursor-pointer bg-interactive-table-hover bg-fixed;
   }
 
   .active {
-    @apply surface-subtle;
+    @apply bg-interactive-table-hover;
   }
 
   .failure {

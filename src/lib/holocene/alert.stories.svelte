@@ -7,7 +7,6 @@
     args: {
       title: 'Alert Title',
       intent: 'info',
-      bold: false,
       hidden: false,
     },
     argTypes: {

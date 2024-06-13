@@ -39,7 +39,6 @@
 
 {#if cause}
   <Alert
-    bold
     icon="warning"
     intent="warning"
     title={translate(`typed-errors.${cause}.title`)}
