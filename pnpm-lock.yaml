@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@buf/temporal_api-cloud.connectrpc_es':
+    specifier: 1.4.0-20240614173613-ba4ac681e791.3
+    version: 1.4.0-20240614173613-ba4ac681e791.3(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0)
   '@codemirror/autocomplete':
     specifier: ^6.4.0
     version: 6.4.0(@codemirror/language@6.3.2)(@codemirror/state@6.2.0)(@codemirror/view@6.7.2)(@lezer/common@1.2.1)
@@ -26,6 +29,12 @@ dependencies:
   '@codemirror/view':
     specifier: ^6.7.2
     version: 6.7.2
+  '@connectrpc/connect':
+    specifier: ^1.4.0
+    version: 1.4.0(@bufbuild/protobuf@1.10.0)
+  '@connectrpc/connect-web':
+    specifier: ^1.4.0
+    version: 1.4.0(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0)
   '@crownframework/svelte-error-boundary':
     specifier: ^1.0.3
     version: 1.0.3
@@ -2234,6 +2243,50 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
 
+  /@buf/googleapis_googleapis.bufbuild_es@1.7.2-20230727201444-711e289f6a38.2(@bufbuild/protobuf@1.10.0):
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/googleapis_googleapis.bufbuild_es/-/googleapis_googleapis.bufbuild_es-1.7.2-20230727201444-711e289f6a38.2.tgz}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.7.2
+    dependencies:
+      '@bufbuild/protobuf': 1.10.0
+    dev: false
+
+  /@buf/googleapis_googleapis.connectrpc_es@1.4.0-20230727201444-711e289f6a38.3(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0):
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/googleapis_googleapis.connectrpc_es/-/googleapis_googleapis.connectrpc_es-1.4.0-20230727201444-711e289f6a38.3.tgz}
+    peerDependencies:
+      '@connectrpc/connect': ^1.4.0
+    dependencies:
+      '@buf/googleapis_googleapis.bufbuild_es': 1.7.2-20230727201444-711e289f6a38.2(@bufbuild/protobuf@1.10.0)
+      '@connectrpc/connect': 1.4.0(@bufbuild/protobuf@1.10.0)
+    transitivePeerDependencies:
+      - '@bufbuild/protobuf'
+    dev: false
+
+  /@buf/temporal_api-cloud.bufbuild_es@1.7.2-20240614173613-ba4ac681e791.2(@bufbuild/protobuf@1.10.0):
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/temporal_api-cloud.bufbuild_es/-/temporal_api-cloud.bufbuild_es-1.7.2-20240614173613-ba4ac681e791.2.tgz}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.7.2
+    dependencies:
+      '@buf/googleapis_googleapis.bufbuild_es': 1.7.2-20230727201444-711e289f6a38.2(@bufbuild/protobuf@1.10.0)
+      '@bufbuild/protobuf': 1.10.0
+    dev: false
+
+  /@buf/temporal_api-cloud.connectrpc_es@1.4.0-20240614173613-ba4ac681e791.3(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0):
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/temporal_api-cloud.connectrpc_es/-/temporal_api-cloud.connectrpc_es-1.4.0-20240614173613-ba4ac681e791.3.tgz}
+    peerDependencies:
+      '@connectrpc/connect': ^1.4.0
+    dependencies:
+      '@buf/googleapis_googleapis.connectrpc_es': 1.4.0-20230727201444-711e289f6a38.3(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0)
+      '@buf/temporal_api-cloud.bufbuild_es': 1.7.2-20240614173613-ba4ac681e791.2(@bufbuild/protobuf@1.10.0)
+      '@connectrpc/connect': 1.4.0(@bufbuild/protobuf@1.10.0)
+    transitivePeerDependencies:
+      - '@bufbuild/protobuf'
+    dev: false
+
+  /@bufbuild/protobuf@1.10.0:
+    resolution: {integrity: sha512-QDdVFLoN93Zjg36NoQPZfsVH9tZew7wKDKyV5qRdj8ntT4wQCOradQjRaTdwMhWUYsgKsvCINKKm87FdEk96Ag==}
+    dev: false
+
   /@codemirror/autocomplete@6.4.0(@codemirror/language@6.3.2)(@codemirror/state@6.2.0)(@codemirror/view@6.7.2)(@lezer/common@1.2.1):
     resolution: {integrity: sha512-HLF2PnZAm1s4kGs30EiqKMgD7XsYaQ0XJnMR0rofEWQ5t5D60SfqpDIkIh1ze5tiEbyUWm8+VJ6W1/erVvBMIA==}
     peerDependencies:
@@ -2299,6 +2352,24 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@connectrpc/connect-web@1.4.0(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0):
+    resolution: {integrity: sha512-13aO4psFbbm7rdOFGV0De2Za64DY/acMspgloDlcOKzLPPs0yZkhp1OOzAQeiAIr7BM/VOHIA3p8mF0inxCYTA==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.4.2
+      '@connectrpc/connect': 1.4.0
+    dependencies:
+      '@bufbuild/protobuf': 1.10.0
+      '@connectrpc/connect': 1.4.0(@bufbuild/protobuf@1.10.0)
+    dev: false
+
+  /@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.10.0):
+    resolution: {integrity: sha512-vZeOkKaAjyV4+RH3+rJZIfDFJAfr+7fyYr6sLDKbYX3uuTVszhFe9/YKf5DNqrDb5cKdKVlYkGn6DTDqMitAnA==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.4.2
+    dependencies:
+      '@bufbuild/protobuf': 1.10.0
+    dev: false
 
   /@crownframework/svelte-error-boundary@1.0.3:
     resolution: {integrity: sha512-ZtfYF9if48Ok8BTx/fn7bERJFKHKO6Ih5d/fkY6/pC3DQEnJq4vy6JOBFcisnpKYcZbjG5F/D4r06kqX7JKyqw==}
