@@ -88,7 +88,7 @@
   $: disabled = disabled || copyable;
 </script>
 
-<div class={merge('flex flex-col gap-1', className)} data-testid={testId}>
+<div class={merge('flex flex-col gap-1', className)}>
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="input-group flex rounded-lg">
     <slot name="before-input" {disabled} />
@@ -100,7 +100,6 @@
       class:unroundLeft={unroundLeft || $$slots['before-input']}
       class:unroundRight={unroundRight || $$slots['after-input']}
       class:invalid={!valid}
-      data-testid="{testId}-input-container"
     >
       {#if icon}
         <span class="icon-container">
@@ -127,7 +126,7 @@
         on:focus
         on:blur
         use:callFocus
-        data-testid="{testId}-input"
+        data-testid={testId}
         {...$$restProps}
       />
       {#if copyable}
