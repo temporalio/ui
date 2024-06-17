@@ -39,7 +39,7 @@
       bind:group={$group}
       type="radio"
       class="surface-primary"
-      aria-describedby="{id}-description"
+      aria-describedby={description ? `${id}-description` : null}
       {name}
       {value}
       {id}
