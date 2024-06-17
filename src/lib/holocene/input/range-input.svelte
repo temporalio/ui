@@ -83,6 +83,7 @@
           for="range">{value ?? ''}</output
         >
         <input
+          id="{id}-range"
           name="range"
           type="range"
           class="h-0 w-full cursor-pointer appearance-none rounded border-y-2 border-primary"
@@ -93,6 +94,7 @@
           {step}
           {...omit($$restProps, 'class')}
         />
+        <Label hidden {label} for="{id}-range" />
       </div>
       <span class="absolute -bottom-6 right-0 text-xs font-normal">
         {max}
