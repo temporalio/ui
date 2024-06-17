@@ -71,6 +71,7 @@
       <Button
         leadingIcon={open ? 'chevron-up' : 'chevron-down'}
         variant="ghost"
+        on:click={toggleAccordion}
       />
     </div>
     <p class="flex items-center font-secondary">
