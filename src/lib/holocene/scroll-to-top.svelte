@@ -11,5 +11,6 @@
     variant="primary"
     on:click={onScrollToTopClick}
     leadingIcon="arrow-up"
+    {...$$restProps}
   />
 </div>
