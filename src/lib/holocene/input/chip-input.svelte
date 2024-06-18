@@ -100,7 +100,7 @@
     bind:this={inputContainer}
     class={merge(
       'input-container',
-      disabled && 'cursor-not-allowed opacity-50',
+      disabled && 'cursor-not-allowed opacity-65',
       invalid && 'invalid',
     )}
   >
