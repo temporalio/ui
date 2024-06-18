@@ -52,6 +52,9 @@
         static={false}
         label={item.label}
         pinned={item.pinned}
+        moveUpButtonLabel="Move Up"
+        moveDownButtonLabel="Move Down"
+        removeButtonLabel="Remove"
         {index}
       />
     {/each}
@@ -77,6 +80,9 @@
         static={false}
         label={item.label}
         pinned={item.pinned}
+        moveUpButtonLabel="Move Up"
+        moveDownButtonLabel="Move Down"
+        removeButtonLabel="Remove"
         {index}
       />
     {/each}
