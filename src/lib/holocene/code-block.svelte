@@ -142,6 +142,7 @@
           },
         }),
       );
+      extensions.push(EditorView.contentAttributes.of({ tabindex: '0' }));
     }
 
     return EditorState.create({
