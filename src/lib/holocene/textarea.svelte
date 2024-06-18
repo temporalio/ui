@@ -39,18 +39,23 @@
   export { className as class };
 </script>
 
-<div class={className}>
+<div class={merge('group', className)}>
   <Label {required} hidden={labelHidden} {label} for={id} />
   {#if description}
     <p class="pb-2 text-sm">{description}</p>
   {/if}
-  <div class="relative">
+  <div
+    class={merge(
+      'relative box-border inline-flex w-full rounded-lg border-2 border-subtle focus-within:border-information focus-within:ring-4 focus-within:ring-primary/70',
+      !isValid && 'error',
+      !disabled && 'hover:border-information',
+    )}
+  >
     <textarea
       bind:value
       class={merge(
-        'surface-primary min-h-fit w-full rounded-lg border-2 border-subtle px-3 py-2 text-sm focus-visible:border-information focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70 enabled:hover:border-information',
+        'surface-primary min-h-fit w-full rounded-lg px-3 py-2 text-sm focus-visible:outline-none',
         disabled && 'cursor-not-allowed opacity-50',
-        !isValid && 'error',
       )}
       {id}
       {disabled}
@@ -64,6 +69,20 @@
       on:keydown|stopPropagation
       maxlength={maxLength > 0 ? maxLength : undefined}
     />
+  </div>
+  <div class="mt-2 flex justify-between gap-2">
+    <div
+      class="error-msg"
+      class:min-width={maxLength}
+      aria-live={isValid ? 'off' : 'assertive'}
+    >
+      {#if !isValid}
+        {#if error}
+          <p>{error}</p>
+        {/if}
+        <slot name="error" />
+      {/if}
+    </div>
     {#if maxLength && !disabled}
       <span class="count">
         <span
@@ -74,23 +93,11 @@
       </span>
     {/if}
   </div>
-  <div
-    class="error-msg"
-    class:min-width={maxLength}
-    aria-live={isValid ? 'off' : 'assertive'}
-  >
-    {#if !isValid}
-      {#if error}
-        <p>{error}</p>
-      {/if}
-      <slot name="error" />
-    {/if}
-  </div>
 </div>
 
 <style lang="postcss">
   .error {
-    @apply border-danger hover:border-danger focus-visible:border-danger focus-visible:ring-4 focus-visible:ring-danger/70;
+    @apply border-danger focus-within:border-danger focus-within:ring-4 focus-within:ring-danger/70;
   }
 
   .error-msg {
@@ -102,7 +109,7 @@
   }
 
   .count {
-    @apply invisible absolute -bottom-5 right-0 font-secondary text-sm font-medium text-primary;
+    @apply invisible text-right font-secondary text-sm font-medium text-primary group-focus-within:visible;
   }
 
   .count > .warn {
@@ -111,9 +118,5 @@
 
   .count > .error {
     @apply text-danger;
-  }
-
-  textarea:focus + .count {
-    @apply visible;
   }
 </style>
