@@ -5,6 +5,7 @@
   import { getContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import Badge from '$lib/holocene/badge.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { isNull } from '$lib/utilities/is';
@@ -18,6 +19,7 @@
     loading?: boolean;
     active?: boolean;
     icon?: IconName;
+    count?: number;
     class?: string;
   } & HTMLButtonAttributes;
 
@@ -27,6 +29,7 @@
   export let loading = false;
   export let active: boolean = null;
   export let icon: IconName = null;
+  export let count: number = null;
   let className = '';
   export { className as class };
 
@@ -59,4 +62,7 @@
     </span>
   {/if}
   <slot />
+  {#if !isNull(count)}
+    <Badge type="count">{count}</Badge>
+  {/if}
 </button>
