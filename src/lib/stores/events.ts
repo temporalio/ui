@@ -97,3 +97,12 @@ export const decodeEventHistory = persistStore<boolean>(
   true,
   true,
 );
+
+export type DownloadEventHistorySetting = 'encoded' | 'decoded' | 'readable';
+
+export const downloadEventHistorySetting =
+  persistStore<DownloadEventHistorySetting>(
+    'downloadEventHistorySetting',
+    'encoded',
+    true,
+  );

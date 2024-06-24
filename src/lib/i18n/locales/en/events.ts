@@ -62,4 +62,7 @@ export const Strings = {
     terminated: 'Terminated',
   },
   'decode-event-history': 'Decode Event History',
+  encoded: 'Encoded',
+  decoded: 'Decoded (Codec Server decoded and base64 encoded)',
+  readable: 'Human Readable (Codec Server decoded and base64 decoded)',
 } as const;

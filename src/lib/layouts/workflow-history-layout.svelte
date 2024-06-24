@@ -2,31 +2,29 @@
   import { page } from '$app/stores';
 
   import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
+  import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
-  import { decodeEventHistory, fullEventHistory } from '$lib/stores/events';
+  import { fullEventHistory } from '$lib/stores/events';
   import {
     workflowRun,
     workflowTimelineViewOpen,
   } from '$lib/stores/workflow-run';
   import type { EventView } from '$lib/types/events';
-  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-  import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
   let showDownloadPrompt = false;
 
+  $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
@@ -40,17 +38,6 @@
       $page.url.searchParams.delete('page');
     }
     $eventViewType = view;
-  };
-
-  const onDownloadClick = () => {
-    showDownloadPrompt = false;
-    exportHistory({
-      namespace: decodeURIForSvelte($page.params.namespace),
-      workflowId: decodeURIForSvelte(workflow?.id),
-      runId: decodeURIForSvelte(workflow?.runId),
-      settings: $page.data.settings,
-      decodeEventHistory: $decodeEventHistory,
-    });
   };
 </script>
 
@@ -141,26 +128,9 @@
     <slot />
   </section>
 </div>
-
-<Modal
-  id="download-history"
-  large
+<DownloadEventHistoryModal
   bind:open={showDownloadPrompt}
-  confirmType="primary"
-  confirmText={translate('common.download')}
-  cancelText={translate('common.cancel')}
-  on:confirmModal={() => onDownloadClick()}
-  on:cancelModal={() => (showDownloadPrompt = false)}
->
-  <h3 slot="title">
-    {translate('common.download-json')}
-  </h3>
-  <div slot="content" class="flex flex-col gap-4">
-    <ToggleSwitch
-      label={translate('events.decode-event-history')}
-      id="decode-event-history"
-      bind:checked={$decodeEventHistory}
-      data-testid="decode-event-history-toggle"
-    />
-  </div>
-</Modal>
+  {namespace}
+  workflowId={workflow.id}
+  runId={workflow.runId}
+/>
