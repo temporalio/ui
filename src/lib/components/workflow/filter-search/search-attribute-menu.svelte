@@ -67,17 +67,25 @@
     </svelte:fragment>
     {$filter.attribute || translate('workflows.filter')}
   </MenuButton>
-  <Menu id="search-attribute-menu">
-    <Input
-      label={translate('common.search')}
-      labelHidden
-      id="filter-search"
-      noBorder
-      bind:value={searchAttributeValue}
-      icon="search"
-      placeholder={translate('common.search')}
-      class="mb-1"
-    />
+  <Menu id="search-attribute-menu" keepOpen>
+    <MenuItem
+      class="p-0"
+      hoverable={false}
+      on:click={() => {
+        document.getElementById('filter-search')?.focus();
+      }}
+    >
+      <Input
+        label={translate('common.search')}
+        labelHidden
+        id="filter-search"
+        noBorder
+        bind:value={searchAttributeValue}
+        icon="search"
+        placeholder={translate('common.search')}
+        class="w-full"
+      />
+    </MenuItem>
 
     {#each filteredOptions as { value, label, type }}
       {@const disabled = isOptionDisabled(value, $workflowFilters)}

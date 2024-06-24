@@ -32,7 +32,7 @@
     }}
   >
     <div class="flex flex-col gap-2 xl:flex-row">
-      <div class="grow overflow-hidden">
+      <div class="grow basis-1/3 overflow-hidden">
         <h3 class="font-medium">{translate('common.execution-details')}</h3>
         <div class="h-0.5 rounded-full bg-inverse" />
         <WorkflowDetail

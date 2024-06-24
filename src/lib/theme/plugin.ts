@@ -123,6 +123,7 @@ const temporal = plugin(
         'interactive-secondary-active': css(
           '--color-interactive-secondary-active',
         ),
+        'interactive-table-hover': css('--color-interactive-table-hover'),
 
         information: css('--color-surface-information'),
         success: css('--color-surface-success'),

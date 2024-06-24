@@ -12,7 +12,6 @@
       loading: false,
       error: '',
       confirmText: 'Confirm',
-      confirmType: 'destructive',
       hideConfirm: false,
       confirmDisabled: false,
       cancelText: 'Cancel',

@@ -162,6 +162,7 @@
         class="flex items-center"
         class:filter={!showClearAllButton}
         on:keyup={handleKeyUp}
+        role="none"
       >
         {#if isStatusFilter(attribute)}
           <StatusFilter />

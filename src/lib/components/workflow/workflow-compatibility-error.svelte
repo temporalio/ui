@@ -19,7 +19,6 @@
 {#if !runningWithNoWorkers && runningWithNoCompatibleWorkers}
   <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
     <Alert
-      bold
       icon="warning"
       intent="warning"
       title={translate('workflows.workflow-error-no-compatible-workers-title')}

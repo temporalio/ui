@@ -23,6 +23,6 @@
   }
 
   .orderable-list {
-    @apply surface-primary rounded-lg border-2 border-primary dark:border-subtle;
+    @apply surface-primary rounded-lg border-2 border-subtle;
   }
 </style>
