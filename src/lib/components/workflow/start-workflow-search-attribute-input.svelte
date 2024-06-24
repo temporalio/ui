@@ -63,7 +63,7 @@
   <Button
     variant="secondary"
     leadingIcon="close"
-    class="mt-6"
+    class="mt-6 w-10 rounded-full"
     on:click={() => onRemove(attribute.attribute)}
   />
 </div>

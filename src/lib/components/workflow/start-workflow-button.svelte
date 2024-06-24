@@ -2,7 +2,6 @@
   import { goto } from '$app/navigation';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
@@ -20,17 +19,13 @@
   });
 </script>
 
-<Tooltip text={translate('workflows.start-workflow-like-this-one')} right>
+<Tooltip text={translate('workflows.start-workflow-like-this-one')} topLeft>
   <Button
     size="xs"
     variant="ghost"
     class="start-button"
+    leadingIcon="lightning-bolt"
     on:click={() => goto(href)}
     {...$$restProps}
-  >
-    <Icon
-      title={translate('workflows.start-workflow-like-this-one')}
-      name="lightning-bolt"
-    />
-  </Button>
+  ></Button>
 </Tooltip>

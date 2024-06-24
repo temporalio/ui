@@ -154,9 +154,7 @@
         )}
       data-testid="start-workflow-button"
     >
-      <div class="flex grow items-center gap-1">
-        {translate('workflows.start-workflow-like-this-one')}
-      </div>
+      {translate('workflows.start-workflow-like-this-one')}
     </MenuItem>
   </SplitButton>
 {:else if !workflowCreateDisabled($page)}
@@ -180,9 +178,7 @@
         )}
       data-testid="start-workflow-button"
     >
-      <div class="flex items-center gap-1">
-        {translate('workflows.start-workflow-like-this-one')}
-      </div>
+      {translate('workflows.start-workflow-like-this-one')}
     </MenuItem>
   </SplitButton>
 {:else}

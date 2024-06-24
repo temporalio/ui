@@ -23,6 +23,7 @@
     customSearchAttributes,
     type SearchAttributeInput,
   } from '$lib/stores/search-attributes';
+  import { workflowsSearchParams } from '$lib/stores/workflows';
   import { pluralize } from '$lib/utilities/pluralize';
   import {
     routeForTaskQueue,
@@ -149,6 +150,17 @@
 </script>
 
 <div class="flex w-full flex-col items-center pb-24">
+  <div class="mb-6 flex w-full items-start">
+    <Link
+      href={`${routeForWorkflows({
+        namespace,
+      })}?${$workflowsSearchParams}`}
+      data-testid="back-to-workflows"
+      icon="chevron-left"
+    >
+      {translate('workflows.back-to-workflows')}
+    </Link>
+  </div>
   <div class="flex w-full flex-col gap-4 lg:w-2/3 2xl:w-1/2">
     <h1
       class="mb-4 overflow-hidden text-base font-medium lg:text-2xl"
