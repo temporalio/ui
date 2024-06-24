@@ -5477,8 +5477,8 @@ packages:
       '@swc/counter': 0.1.3
     dev: true
 
-  /@temporalio/activity@1.9.3:
-    resolution: {integrity: sha512-QmY2dCNNSANhCgy4HCaeRmosyg73wI7KFbxTpnCrFjAWjxpJqBYC5qROrWHQEG/52Mcf59MtmznWSqz3M04Naw==}
+  /@temporalio/activity@1.10.0:
+    resolution: {integrity: sha512-010TgQ9cwwWQLhqMGlAtn/zNZTo4UTDIb9pF43XJj+QLlPBZBw9KkYq7k6dnY8caGZME57qu+J327PbR8829xw==}
     dependencies:
       '@temporalio/common': 1.10.0
       abort-controller: 3.0.0
