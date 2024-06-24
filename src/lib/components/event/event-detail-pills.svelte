@@ -1,13 +1,13 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
-  import Pill from '$lib/components/pill.svelte';
+  import PillContainer from '$lib/holocene/pill-container/pill-container.svelte';
+  import Pill from '$lib/holocene/pill-container/pill.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { AttributeGrouping } from '$lib/utilities/format-event-attributes';
   import { attributeGroupingProperties } from '$lib/utilities/format-event-attributes';
 
   export let attributeGrouping: AttributeGrouping;
-  export let activePill: string;
 
   const dispatch = createEventDispatcher();
 
@@ -21,16 +21,15 @@
 
 {#if pillCount > 1}
   <div class="p-2 text-center xl:text-left">
-    <div class="pill-container">
+    <PillContainer>
       {#each Object.entries(attributeGrouping) as [key, value] (key)}
-        {@const active = activePill === key}
         {#if value.length}
-          <Pill {active} on:click={() => dispatch('pillChange', { key })}
+          <Pill id={key} onClick={() => dispatch('pillChange', { key })}
             >{translate(attributeGroupingProperties[key].label)}</Pill
           >
         {/if}
       {/each}
-    </div>
+    </PillContainer>
   </div>
 {/if}
 
