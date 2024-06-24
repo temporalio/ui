@@ -54,12 +54,14 @@
         data-testid="use-decoded-setting-input"
         value="decoded"
         label={translate('events.decoded')}
+        description={translate('events.decoded-description')}
       />
       <RadioInput
         id="use-readable-setting"
         data-testid="use-readable-setting-input"
         value="readable"
         label={translate('events.readable')}
+        description={translate('events.readable-description')}
       />
     </RadioGroup>
   </div>
