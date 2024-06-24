@@ -4,6 +4,7 @@ import { page } from '$app/stores';
 
 import { fetchRawEvents } from '$lib/services/events-service';
 import { authUser } from '$lib/stores/auth-user';
+import type { DownloadEventHistorySetting } from '$lib/stores/events';
 import type { HistoryEvent } from '$lib/types/events';
 import type { Settings } from '$lib/types/global';
 
@@ -18,7 +19,11 @@ import {
 } from './get-codec';
 import { stringifyWithBigInt } from './parse-with-big-int';
 
-const decodePayloads = async (event: HistoryEvent, settings: Settings) => {
+const decodePayloads = async (
+  event: HistoryEvent,
+  settings: Settings,
+  decodeSetting: DownloadEventHistorySetting,
+) => {
   const endpoint = getCodecEndpoint(settings);
   const passAccessToken = getCodecPassAccessToken(settings);
   const includeCredentials = getCodecIncludeCredentials(settings);
@@ -40,8 +45,10 @@ const decodePayloads = async (event: HistoryEvent, settings: Settings) => {
       get(page).params.namespace,
       settingsWithLocalConfig,
       get(authUser).accessToken,
+      decodeSetting,
       returnDataOnly,
     );
+
     return decodePayloadAttributes(convertedAttributes, returnDataOnly);
   } catch (e) {
     return event;
@@ -66,13 +73,13 @@ export const exportHistory = async ({
   workflowId,
   runId,
   settings,
-  decodeEventHistory,
+  decodeSetting,
 }: {
   namespace: string;
   workflowId: string;
   runId: string;
   settings: Settings;
-  decodeEventHistory: boolean;
+  decodeSetting: DownloadEventHistorySetting;
 }) => {
   try {
     const rawEvents = await fetchRawEvents({
@@ -82,15 +89,19 @@ export const exportHistory = async ({
       sort: 'ascending',
     });
 
-    if (decodeEventHistory) {
+    if (decodeSetting === 'encoded') {
+      download(rawEvents, `${runId}/events.json`, 'text/plain');
+    } else {
       const decodedEvents = [];
       for (const event of rawEvents) {
-        const decodedEvent = await decodePayloads(event, settings);
+        const decodedEvent = await decodePayloads(
+          event,
+          settings,
+          decodeSetting,
+        );
         decodedEvents.push(decodedEvent);
       }
       download(decodedEvents, `${runId}/events.json`, 'text/plain');
-    } else {
-      download(rawEvents, `${runId}/events.json`, 'text/plain');
     }
   } catch (e) {
     console.error('Could not download event history');

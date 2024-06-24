@@ -9,11 +9,10 @@
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
+  import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import {
@@ -22,14 +21,8 @@
     clearActives,
   } from '$lib/stores/active-events';
   import { eventViewType } from '$lib/stores/event-view';
-  import {
-    decodeEventHistory,
-    filteredEventHistory,
-    fullEventHistory,
-  } from '$lib/stores/events';
+  import { filteredEventHistory, fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-  import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
   let showFilters = false;
@@ -57,17 +50,6 @@
 
   let canvasWidth = 0;
   let showDownloadPrompt = false;
-
-  const onDownloadClick = () => {
-    showDownloadPrompt = false;
-    exportHistory({
-      namespace: decodeURIForSvelte(namespace),
-      workflowId: decodeURIForSvelte(workflow?.id),
-      runId: decodeURIForSvelte(workflow?.runId),
-      settings: $page.data.settings,
-      decodeEventHistory: $decodeEventHistory,
-    });
-  };
 
   const zoomOut = () => {
     if (zoomLevel < 10) zoomLevel += 0.5;
@@ -179,25 +161,9 @@
     {/if}
   </div>
 </div>
-<Modal
-  id="download-history"
-  large
+<DownloadEventHistoryModal
   bind:open={showDownloadPrompt}
-  confirmType="primary"
-  confirmText={translate('common.download')}
-  cancelText={translate('common.cancel')}
-  on:confirmModal={() => onDownloadClick()}
-  on:cancelModal={() => (showDownloadPrompt = false)}
->
-  <h3 slot="title">
-    {translate('common.download-json')}
-  </h3>
-  <div slot="content" class="flex flex-col gap-4">
-    <ToggleSwitch
-      label={translate('events.decode-event-history')}
-      id="decode-event-history"
-      bind:checked={$decodeEventHistory}
-      data-testid="decode-event-history-toggle"
-    />
-  </div>
-</Modal>
+  {namespace}
+  workflowId={workflow.id}
+  runId={workflow.runId}
+/>
