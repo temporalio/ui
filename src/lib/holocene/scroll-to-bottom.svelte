@@ -11,6 +11,7 @@
     variant="primary"
     on:click={onScrollToBottomClick}
     leadingIcon="arrow-down"
+    {...$$restProps}
   />
 </div>
 

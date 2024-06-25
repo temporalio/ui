@@ -68,10 +68,7 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       await page.getByTestId('workflow-reset-button').click();
       await page.locator('#reset-event-5').click();
       await page
-        .getByRole('checkbox', {
-          name: 'Reapply Signals that happened after the Reset point',
-        })
-        .first()
+        .getByText('Reapply Signals that happened after the Reset point')
         .click();
 
       await page

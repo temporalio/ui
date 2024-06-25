@@ -87,7 +87,7 @@
   class:large
   class:hightlightNav
   aria-modal="true"
-  aria-labelledby="modal-title"
+  aria-labelledby="modal-title-{id}"
   data-testid={$$props['data-testid']}
   {...$$restProps}
   use:focusTrap={true}

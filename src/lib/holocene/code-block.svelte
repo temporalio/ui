@@ -37,6 +37,7 @@
     copyable?: boolean;
     minHeight?: number;
     maxHeight?: number;
+    label?: string;
   };
 
   type CopyableProps = BaseProps & {
@@ -60,6 +61,7 @@
   export let copySuccessIconTitle = '';
   export let minHeight = undefined;
   export let maxHeight = undefined;
+  export let label = '';
 
   const { copy, copied } = copyToClipboard();
 
@@ -112,6 +114,7 @@
       indentOnInput(),
       bracketMatching(),
       EditorState.readOnly.of(!editable),
+      EditorView.contentAttributes.of({ 'aria-label': label }),
     ];
 
     if (language === 'json') {
@@ -139,6 +142,7 @@
           },
         }),
       );
+      extensions.push(EditorView.contentAttributes.of({ tabindex: '0' }));
     }
 
     return EditorState.create({

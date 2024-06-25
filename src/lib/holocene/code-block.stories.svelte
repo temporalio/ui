@@ -10,6 +10,7 @@
       inline: false,
       language: 'json',
       copyable: false,
+      label: 'JSON content',
     },
     argTypes: {
       editable: {
@@ -61,33 +62,15 @@
 </script>
 
 <Template id="json" let:args>
-  <CodeBlock
-    language="json"
-    copyIconTitle="Click to copy content"
-    copySuccessIconTitle="Content copied to clipboard"
-    {...args}
-    on:change={action('change')}
-  />
+  <CodeBlock language="json" {...args} on:change={action('change')} />
 </Template>
 
 <Template id="shell" let:args>
-  <CodeBlock
-    language="shell"
-    copyIconTitle="Click to copy content"
-    copySuccessIconTitle="Content copied to clipboard"
-    {...args}
-    on:change={action('change')}
-  />
+  <CodeBlock language="shell" {...args} on:change={action('change')} />
 </Template>
 
 <Template id="text" let:args>
-  <CodeBlock
-    language="text"
-    copyIconTitle="Click to copy content"
-    copySuccessIconTitle="Content copied to clipboard"
-    {...args}
-    on:change={action('change')}
-  />
+  <CodeBlock language="text" {...args} on:change={action('change')} />
 </Template>
 
 <Template let:args>
@@ -122,6 +105,8 @@
   args={{
     copyable: true,
     content: stringifyWithBigInt({ hello: 'world' }, null, 2),
+    copyIconTitle: 'Click to copy content',
+    copySuccessIconTitle: 'Content copied to clipboard',
   }}
 />
 
@@ -167,6 +152,8 @@
     language: 'shell',
     copyable: true,
     content: 'echo "Hello, World!"',
+    copyIconTitle: 'Click to copy content',
+    copySuccessIconTitle: 'Content copied to clipboard',
   }}
 />
 
@@ -176,6 +163,8 @@
     language: 'text',
     copyable: true,
     content: 'Hello, World!',
+    copyIconTitle: 'Click to copy content',
+    copySuccessIconTitle: 'Content copied to clipboard',
   }}
 />
 
@@ -185,6 +174,8 @@
     language: 'json',
     copyable: true,
     content: stringifyWithBigInt({ hello: 'world' }, null, 2),
+    copyIconTitle: 'Click to copy content',
+    copySuccessIconTitle: 'Content copied to clipboard',
   }}
   parameters={{
     themes: {

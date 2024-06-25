@@ -78,7 +78,7 @@
   }
 
   .disabled {
-    @apply cursor-not-allowed bg-interactive opacity-50;
+    @apply cursor-not-allowed bg-interactive/50 text-primary;
   }
 
   .highlight {

@@ -10,8 +10,6 @@
 
   import type { IconName } from './icon';
 
-  import Button from './button.svelte';
-
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
     title: string;
     id?: string;
@@ -42,7 +40,7 @@
 
 <div
   class={merge(
-    'surface-primary flex w-full cursor-default flex-col rounded-2xl border-2 border-subtle p-4 text-primary hover:bg-interactive-secondary-hover',
+    'surface-primary flex w-full cursor-default flex-col rounded-2xl border-2 border-subtle p-2 text-primary focus-within:ring-4 focus-within:ring-primary/70',
     className,
   )}
   {...$$restProps}
@@ -51,7 +49,7 @@
     id="{id}-trigger"
     aria-expanded={open}
     aria-controls="{id}-content"
-    class="flex w-full flex-col"
+    class="flex w-full flex-col rounded-lg p-2 hover:bg-interactive-secondary-hover focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
     type="button"
     on:click={toggleAccordion}
   >
@@ -68,11 +66,7 @@
       >
         <slot name="action" />
       </div>
-      <Button
-        leadingIcon={open ? 'chevron-up' : 'chevron-down'}
-        variant="ghost"
-        on:click={toggleAccordion}
-      />
+      <Icon class="m-2" name={open ? 'chevron-up' : 'chevron-down'} />
     </div>
     <p class="flex items-center font-secondary">
       {#if error}
@@ -85,7 +79,7 @@
     id="{id}-content"
     aria-labelledby="{id}-trigger"
     role="textbox"
-    class="mt-8 block w-full"
+    class="mt-6 block w-full p-2"
     class:hidden={!open}
   >
     <slot />

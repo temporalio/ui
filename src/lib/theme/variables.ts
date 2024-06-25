@@ -32,7 +32,7 @@ export const variables = {
     dark: 'slate.700',
   },
   '--color-text-danger': {
-    light: 'red.500',
+    light: 'red.700',
     dark: 'red.400',
   },
   '--color-text-information': {
