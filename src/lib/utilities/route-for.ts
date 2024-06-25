@@ -69,6 +69,21 @@ export const routeForWorkflows = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/workflows`;
 };
 
+type StartWorkflowParameters = NamespaceParameter &
+  Partial<{ workflowId: string; taskQueue: string; workflowType: string }>;
+export const routeForWorkflowStart = ({
+  namespace,
+  workflowId,
+  taskQueue,
+  workflowType,
+}: StartWorkflowParameters): string => {
+  return toURL(`${routeForNamespace({ namespace })}/workflows/start-workflow`, {
+    workflowId: workflowId || '',
+    taskQueue: taskQueue || '',
+    workflowType: workflowType || '',
+  });
+};
+
 export const routeForWorkflowsWithQuery = ({
   namespace,
   query,

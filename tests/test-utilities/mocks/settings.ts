@@ -25,6 +25,7 @@ const defaultSettings = {
   WorkflowCancelDisabled: false,
   WorkflowSignalDisabled: false,
   WorkflowResetDisabled: false,
+  StartWorkflowDisabled: true,
   BatchActionsDisabled: false,
   HideWorkflowQueryErrors: false,
 };

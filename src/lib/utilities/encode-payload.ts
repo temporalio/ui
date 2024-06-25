@@ -19,7 +19,7 @@ export const getSinglePayload = (decodedValue: string): string => {
   return '';
 };
 
-const setBase64Payload = (payload: unknown) => {
+export const setBase64Payload = (payload: unknown) => {
   return {
     metadata: {
       encoding: btoa('json/plain'),

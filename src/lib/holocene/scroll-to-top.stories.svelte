@@ -26,7 +26,11 @@
 </script>
 
 <Template let:args>
-  <ScrollToTop {...args} onScrollToTopClick={action('scroll-to-top')} />
+  <ScrollToTop
+    {...args}
+    onScrollToTopClick={action('scroll-to-top')}
+    aria-label="Scroll to top"
+  />
 </Template>
 
 <Story name="Light" />

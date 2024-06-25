@@ -72,9 +72,7 @@
   data-testid={$$restProps['data-testid'] ?? null}
   on:click|stopPropagation
   on:keypress|stopPropagation
-  role="checkbox"
-  aria-checked={checked}
-  tabindex={-1}
+  role="none"
 >
   <Label
     class={merge(

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
@@ -14,7 +15,9 @@
   import { resetEvents } from '$lib/stores/events';
   import { refresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
+  import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
   import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
   import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
@@ -138,6 +141,45 @@
         </MenuItem>
       </Tooltip>
     {/each}
+    <MenuDivider />
+    <MenuItem
+      on:click={() =>
+        goto(
+          routeForWorkflowStart({
+            namespace,
+            workflowId: workflow.id,
+            taskQueue: workflow.taskQueue,
+            workflowType: workflow.name,
+          }),
+        )}
+      data-testid="start-workflow-button"
+    >
+      {translate('workflows.start-workflow-like-this-one')}
+    </MenuItem>
+  </SplitButton>
+{:else if !workflowCreateDisabled($page)}
+  <SplitButton
+    id="workflow-actions"
+    position="right"
+    primaryActionDisabled={!resetEnabled}
+    on:click={() => (resetConfirmationModalOpen = true)}
+    label={translate('workflows.reset')}
+    menuLabel={translate('workflows.workflow-actions')}
+  >
+    <MenuItem
+      on:click={() =>
+        goto(
+          routeForWorkflowStart({
+            namespace,
+            workflowId: workflow.id,
+            taskQueue: workflow.taskQueue,
+            workflowType: workflow.name,
+          }),
+        )}
+      data-testid="start-workflow-button"
+    >
+      {translate('workflows.start-workflow-like-this-one')}
+    </MenuItem>
   </SplitButton>
 {:else}
   <Tooltip bottomRight width={200} text={resetTooltipText} hide={resetEnabled}>

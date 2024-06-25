@@ -17,6 +17,7 @@ workflowCancelDisabled: false
 workflowSignalDisabled: false
 workflowResetDisabled: false
 batchActionsDisabled: false
+startWorkflowDisabled: false
 hideWorkflowQueryErrors: false
 auth:
   enabled: false

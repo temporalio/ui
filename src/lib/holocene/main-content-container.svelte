@@ -60,5 +60,7 @@
     {scrollToBottomHidden}
     {onScrollToTopClick}
     {onScrollToBottomClick}
+    scrollToTopAriaLabel="Scroll to top"
+    scrollToBottomAriaLabel="Scroll to bottom"
   />
 </div>

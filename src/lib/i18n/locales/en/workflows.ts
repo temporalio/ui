@@ -62,6 +62,8 @@ export const Strings = {
   'request-cancellation': 'Request Cancellation',
   'back-to-workflows': 'Back to Workflows',
   input: 'Input',
+  'initial-input': 'Initial Input',
+  'example-input': 'Example Input',
   'input-and-results': 'Input and Results',
   'continued-as-new-with-input': 'Continued as New with Input',
   results: 'Results',
@@ -233,4 +235,6 @@ export const Strings = {
   'pending-activities-link': 'Show all Pending Activities',
   'duration-filter-placeholder':
     'e.g. "2h45m", "hh:mm:ss", or "1000" nanoseconds',
+  'start-workflow': 'Start Workflow',
+  'start-workflow-like-this-one': 'Start Workflow Like This One',
 } as const;

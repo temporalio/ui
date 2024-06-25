@@ -10,12 +10,14 @@ import {
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
 import { authUser } from '$lib/stores/auth-user';
+import type { SearchAttributeInput } from '$lib/stores/search-attributes';
 import { canFetchChildWorkflows } from '$lib/stores/workflows';
 import type { ResetWorkflowRequest } from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
   ValidWorkflowParameters,
 } from '$lib/types/api';
+import type { Payload, WorkflowExecutionStartedEvent } from '$lib/types/events';
 import type {
   NamespaceScopedRequest,
   NetworkError,
@@ -26,7 +28,14 @@ import type {
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
 } from '$lib/types/workflows';
-import { encodePayloads } from '$lib/utilities/encode-payload';
+import {
+  cloneAllPotentialPayloadsWithCodec,
+  type PotentiallyDecodable,
+} from '$lib/utilities/decode-payload';
+import {
+  encodePayloads,
+  setBase64Payload,
+} from '$lib/utilities/encode-payload';
 import {
   handleUnauthorizedOrForbiddenError,
   isForbidden,
@@ -39,6 +48,8 @@ import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { base, pathForApi, routeForApi } from '$lib/utilities/route-for-api';
 import { isVersionNewer } from '$lib/utilities/version-check';
 import { formatReason } from '$lib/utilities/workflow-actions';
+
+import { fetchInitialEvent } from './events-service';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -61,6 +72,15 @@ type SignalWorkflowOptions = {
   workflow: WorkflowExecution;
   name: string;
   input: string;
+};
+
+type StartWorkflowOptions = {
+  namespace: string;
+  workflowId: string;
+  taskQueue: string;
+  workflowType: string;
+  input: string;
+  searchAttributes: SearchAttributeInput[];
 };
 
 type TerminateWorkflowOptions = {
@@ -402,3 +422,128 @@ export async function fetchAllChildWorkflows(
     return [];
   }
 }
+
+const setSearchAttributes = (
+  attributes: SearchAttributeInput[],
+): Record<string, Payload> => {
+  if (!attributes.length) return {};
+
+  const searchAttributes: Record<string, Payload> = {};
+  attributes.forEach((attribute) => {
+    searchAttributes[attribute.attribute] = setBase64Payload(attribute.value);
+  });
+
+  return searchAttributes;
+};
+
+export async function startWorkflow({
+  namespace,
+  workflowId,
+  taskQueue,
+  workflowType,
+  input,
+  searchAttributes,
+}: StartWorkflowOptions) {
+  const route = routeForApi('workflow', {
+    namespace,
+    workflowId,
+  });
+  let payloads;
+
+  if (input) {
+    try {
+      payloads = await encodePayloads(input);
+    } catch (_) {
+      console.error('Could not decode input for starting workflow');
+    }
+  }
+
+  const body = stringifyWithBigInt({
+    workflowId,
+    taskQueue: {
+      name: taskQueue,
+    },
+    workflowType: {
+      name: workflowType,
+    },
+    input: payloads ? { payloads } : null,
+    searchAttributes:
+      searchAttributes.length === 0
+        ? null
+        : {
+            indexedFields: {
+              ...setSearchAttributes(searchAttributes),
+            },
+          },
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body,
+    },
+  });
+}
+
+export const fetchInitialValuesForStartWorkflow = async ({
+  namespace,
+  workflowType,
+  workflowId,
+}: {
+  namespace: string;
+  workflowType?: string;
+  workflowId?: string;
+}): Promise<{
+  input: string;
+  searchAttributes: Record<string, string | Payload> | undefined;
+}> => {
+  const handleError: ErrorCallback = (err) => {
+    console.error(err);
+  };
+  const emptyValues = { input: '', searchAttributes: undefined };
+  try {
+    let query = '';
+    if (workflowType && workflowId) {
+      query = `WorkflowType = "${workflowType}" AND WorkflowId = "${workflowId}"`;
+    } else if (workflowType) {
+      query = `WorkflowType = "${workflowType}"`;
+    } else if (workflowId) {
+      query = `WorkflowId = "${workflowId}"`;
+    }
+
+    const route = routeForApi('workflows', { namespace });
+    const workflows = await requestFromAPI<ListWorkflowExecutionsResponse>(
+      route,
+      {
+        params: { query, pageSize: '1' },
+        handleError,
+      },
+    );
+
+    if (!workflows?.executions?.[0]) return emptyValues;
+    const workflow = toWorkflowExecutions(workflows)[0];
+
+    const firstEvent = await fetchInitialEvent({
+      namespace,
+      workflowId: workflow.id,
+      runId: workflow.runId,
+    });
+
+    const startEvent = firstEvent as WorkflowExecutionStartedEvent;
+    const convertedAttributes = (await cloneAllPotentialPayloadsWithCodec(
+      startEvent?.attributes?.input,
+      namespace,
+      get(page).data.settings,
+      get(authUser).accessToken,
+    )) as PotentiallyDecodable;
+
+    const input = stringifyWithBigInt(convertedAttributes?.payloads[0]);
+    return {
+      input,
+      searchAttributes: workflow?.searchAttributes?.indexedFields,
+    };
+  } catch (e) {
+    return emptyValues;
+  }
+};

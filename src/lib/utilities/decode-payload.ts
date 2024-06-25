@@ -9,6 +9,7 @@ import type {
   includeCredentials,
   passAccessToken,
 } from '$lib/stores/data-encoder-config';
+import type { DownloadEventHistorySetting } from '$lib/stores/events';
 import type { Payloads } from '$lib/types';
 import type {
   EventAttribute,
@@ -141,7 +142,7 @@ export const decodePayloadAttributes = <
   return eventAttribute;
 };
 
-const decodePayloads =
+const decodeReadablePayloads =
   (settings: Settings) =>
   async (
     payloads: unknown[],
@@ -161,6 +162,21 @@ const decodePayloads =
     }
   };
 
+const decodePayloads =
+  (settings: Settings) =>
+  async (payloads: unknown[]): Promise<unknown[]> => {
+    if (getCodecEndpoint(settings)) {
+      // Convert Payload data
+      const awaitData = await decodePayloadsWithCodec({
+        payloads: { payloads },
+        settings,
+      });
+      return awaitData?.payloads ?? [];
+    } else {
+      return payloads;
+    }
+  };
+
 const keyIs = (key: string, ...validKeys: string[]) => {
   for (const validKey of validKeys) {
     if (key === validKey) return true;
@@ -174,7 +190,7 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   settings: Settings = get(page).data.settings,
   accessToken: string = get(authUser).accessToken,
 ): Promise<EventAttribute | PotentiallyDecodable> => {
-  const decode = decodePayloads(settings);
+  const decode = decodeReadablePayloads(settings);
 
   if (anyAttributes) {
     for (const key of Object.keys(anyAttributes)) {
@@ -206,11 +222,15 @@ export const cloneAllPotentialPayloadsWithCodec = async (
   namespace: string,
   settings: Settings,
   accessToken: string,
+  decodeSetting: DownloadEventHistorySetting = 'readable',
   returnDataOnly: boolean = true,
 ): Promise<PotentiallyDecodable | EventAttribute | WorkflowEvent | null> => {
   if (!anyAttributes) return anyAttributes;
 
-  const decode = decodePayloads(settings);
+  const decode =
+    decodeSetting === 'readable'
+      ? decodeReadablePayloads(settings)
+      : decodePayloads(settings);
   const clone = { ...anyAttributes };
   if (anyAttributes) {
     for (const key of Object.keys(clone)) {
@@ -226,6 +246,7 @@ export const cloneAllPotentialPayloadsWithCodec = async (
             namespace,
             settings,
             accessToken,
+            decodeSetting,
             returnDataOnly,
           );
         }

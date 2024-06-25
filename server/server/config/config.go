@@ -59,6 +59,8 @@ type (
 		WorkflowResetDisabled     bool `yaml:"workflowResetDisabled"`
 		// Whether bulk/batch actions are enabled in the UI
 		BatchActionsDisabled bool `yaml:"batchActionsDisabled"`
+		// Whether start workflow is enabled in the UI
+		StartWorkflowDisabled bool `yaml:"startWorkflowDisabled"`
 		// Whether to hide server errors for workflow queries in UI
 		HideWorkflowQueryErrors bool `yaml:"hideWorkflowQueryErrors"`
 		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
