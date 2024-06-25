@@ -46,10 +46,15 @@ export const workflowIncludesSearchAttribute = (
   return searchAttribute in (workflow?.searchAttributes?.indexedFields ?? {});
 };
 
-type SearchAttributeOption = {
+export type SearchAttributeOption = {
   label: string;
   value: string;
   type: SearchAttributesValue;
+};
+
+export type SearchAttributeInput = {
+  attribute: string;
+  value: string;
 };
 
 export const searchAttributeOptions: Readable<SearchAttributeOption[]> =
