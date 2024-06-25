@@ -61,7 +61,7 @@
     />
   {/if}
   <Button
-    variant="secondary"
+    variant="ghost"
     leadingIcon="close"
     class="mt-6 w-10 rounded-full"
     on:click={() => onRemove(attribute.attribute)}
