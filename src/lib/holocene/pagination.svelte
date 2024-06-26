@@ -134,64 +134,70 @@
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
   <div class="flex flex-col items-end justify-end gap-4 lg:justify-start">
-    <div class="w-full">
-      <slot name="action-top-left" />
-    </div>
-    <nav
-      style={floatStyle}
-      bind:clientHeight={height}
-      class="flex min-w-fit flex-col items-end gap-4 md:flex-row"
-      aria-label="{$$restProps['aria-label']} 1"
+    <div
+      class="flex w-full flex-col items-center gap-4 lg:flex-row {$$slots[
+        'action-top-left'
+      ]
+        ? 'justify-between'
+        : 'justify-end'}"
     >
-      <slot name="action-top-center" />
-      <div class="flex gap-4">
-        {#if !itemsPerPage}
-          <FilterSelect
-            label={pageSizeSelectLabel}
-            parameter={perPageKey}
-            value={perPage}
-            {options}
-            position="top"
-          />
-        {/if}
-        <slot name="pagination-top">
-          <div class="flex items-center justify-center gap-3">
-            <button
-              class="caret"
-              disabled={!$store.hasPrevious}
-              on:click={() => {
-                store.previous();
-                handlePageChange();
-              }}
-              aria-label={previousButtonLabel}
-            >
-              <span class="arrow arrow-left" />
-            </button>
-            <p>
-              {#if updating}
-                <Skeleton class="block h-5 w-24" />
-              {:else}
-                {$store.length
-                  ? $store.startingIndex + 1
-                  : 0}–{$store.endingIndex + 1} of {$store.length}
-              {/if}
-            </p>
-            <button
-              class="caret"
-              disabled={!$store.hasNext}
-              on:click={() => {
-                store.next();
-                handlePageChange();
-              }}
-              aria-label={nextButtonLabel}
-            >
-              <span class="arrow arrow-right" />
-            </button>
-          </div>
-        </slot>
-      </div>
-      <slot name="action-top-right" />
-    </nav>
+      <slot name="action-top-left" />
+      <nav
+        style={floatStyle}
+        bind:clientHeight={height}
+        class="flex min-w-fit flex-col items-center gap-4 md:flex-row"
+        aria-label="{$$restProps['aria-label']} 1"
+      >
+        <slot name="action-top-center" />
+        <div class="flex gap-4">
+          {#if !itemsPerPage}
+            <FilterSelect
+              label={pageSizeSelectLabel}
+              parameter={perPageKey}
+              value={perPage}
+              {options}
+              position="top"
+            />
+          {/if}
+          <slot name="pagination-top">
+            <div class="flex items-center justify-center gap-3">
+              <button
+                class="caret"
+                disabled={!$store.hasPrevious}
+                on:click={() => {
+                  store.previous();
+                  handlePageChange();
+                }}
+                aria-label={previousButtonLabel}
+              >
+                <span class="arrow arrow-left" />
+              </button>
+              <p>
+                {#if updating}
+                  <Skeleton class="block h-5 w-24" />
+                {:else}
+                  {$store.length
+                    ? $store.startingIndex + 1
+                    : 0}–{$store.endingIndex + 1} of {$store.length}
+                {/if}
+              </p>
+              <button
+                class="caret"
+                disabled={!$store.hasNext}
+                on:click={() => {
+                  store.next();
+                  handlePageChange();
+                }}
+                aria-label={nextButtonLabel}
+              >
+                <span class="arrow arrow-right" />
+              </button>
+            </div>
+          </slot>
+        </div>
+        <slot name="action-top-right" />
+      </nav>
+    </div>
   </div>
   <slot
     visibleItems={$store.items}

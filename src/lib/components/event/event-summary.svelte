@@ -65,6 +65,10 @@
   previousButtonLabel={translate('common.previous')}
   nextButtonLabel={translate('common.next')}
 >
+  <svelte:fragment slot="action-top-left">
+    <slot name="action-top-left" />
+  </svelte:fragment>
+
   <svelte:fragment slot="action-top-center">
     <slot name="action-top-center" />
   </svelte:fragment>
