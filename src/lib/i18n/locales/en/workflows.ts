@@ -73,6 +73,7 @@ export const Strings = {
   'full-history': 'Full History',
   compact: 'Compact',
   json: 'JSON',
+  table: 'Table',
   download: 'Download',
   'workflow-actions': 'Workflow Actions',
   'reset-disabled-unauthorized':

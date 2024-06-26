@@ -65,6 +65,10 @@
   previousButtonLabel={translate('common.previous')}
   nextButtonLabel={translate('common.next')}
 >
+  <svelte:fragment slot="action-top-center">
+    <slot name="action-top-center" />
+  </svelte:fragment>
+
   <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
     {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
       <EventSummaryRow
