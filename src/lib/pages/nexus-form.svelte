@@ -24,11 +24,11 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Markdown from '$lib/holocene/markdown.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { namespaces } from '$lib/stores/namespaces';
   import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
 
   export let endpoint: NexusEndpoint | undefined = undefined;
+  export let namespaceList: { namespace: string }[] = [];
   export let error: NetworkError | undefined = undefined;
 
   let name = endpoint?.spec?.name || '';
@@ -61,10 +61,6 @@
   onDestroy(() => {
     $endpointForm = emptyEndpoint;
   });
-
-  $: namespaceList = $namespaces.map((namespace) => ({
-    namespace: namespace.namespaceInfo.name,
-  }));
 </script>
 
 <div class="flex w-full flex-col gap-4 xl:w-1/2">

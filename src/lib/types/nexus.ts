@@ -1,20 +1,11 @@
-export type NexusEndpoint = {
-  version: string;
-  id: string;
-  spec: {
-    name: string;
-    description?: string;
-    target: {
-      worker: {
-        namespace: string;
-        taskQueue: string;
-      };
-      external?: {
-        url: string;
-      };
-    };
-  };
-  createdTime: string;
-  lastModifiedTime: string;
-  urlPrefix: string;
-};
+import type { Endpoint, EndpointSpec } from '$lib/types';
+
+interface NexusEndpointSpec extends EndpointSpec {
+  descriptionString?: string;
+  allowedCallerNamespaces?: string[];
+}
+export interface NexusEndpoint extends Endpoint {
+  asyncOperationId?: string;
+  state?: string;
+  spec?: NexusEndpointSpec;
+}

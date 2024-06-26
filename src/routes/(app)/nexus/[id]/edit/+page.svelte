@@ -13,6 +13,7 @@
     deleteNexusEndpoint,
     updateNexusEndpoint,
   } from '$lib/services/nexus-service';
+  import { namespaces } from '$lib/stores/namespaces';
   import type { NetworkError } from '$lib/types/global';
   import { routeForNexus } from '$lib/utilities/route-for';
 
@@ -52,60 +53,11 @@
       console.error('Error deleting endpoint', e);
     }
   };
+
+  $: namespaceList = $namespaces.map((namespace) => ({
+    namespace: namespace.namespaceInfo.name,
+  }));
 </script>
 
 <PageTitle title={translate('nexus.nexus')} url={$page.url.href} />
-<div class="flex flex-col gap-8">
-  <div class="relative flex flex-col gap-4 text-sm">
-    <Link href={routeForNexus()} icon="chevron-left">
-      {translate('nexus.back-to-endpoints')}
-    </Link>
-  </div>
-  <div class="flex flex-col gap-1">
-    <div class="flex items-center justify-between">
-      <h1 data-testid="namespace-selector-title" class="text-2xl">
-        {endpoint.spec.name}
-      </h1>
-      <div class="flex items-center gap-2">
-        <Button
-          variant="destructive"
-          on:click={() => (deleteConfirmationModalOpen = true)}
-          >{translate('nexus.delete-endpoint')}</Button
-        >
-        <Button on:click={onSave}>{translate('common.save')}</Button>
-      </div>
-    </div>
-  </div>
-  <NexusForm endpoint={data.endpoint} {error} />
-  <div class="flex items-center gap-4">
-    <Button on:click={onSave}>{translate('common.save')}</Button>
-    <Button variant="ghost">{translate('common.cancel')}</Button>
-  </div>
-</div>
-<Modal
-  id="delete-endpoint-modal"
-  bind:open={deleteConfirmationModalOpen}
-  confirmType="destructive"
-  confirmText={translate('common.delete')}
-  cancelText={translate('common.cancel')}
-  on:confirmModal={onDelete}
-  on:cancelModal={() => (deleteConfirmationModalOpen = false)}
-  confirmDisabled={confirmDeleteInput !== `DELETE ${endpoint.id}`}
->
-  <h3 slot="title">{translate('nexus.delete-modal-title')}</h3>
-  <div slot="content" class="flex flex-col gap-4">
-    <p>
-      {translate('nexus.delete-modal-confirmation', {
-        endpoint: endpoint.id,
-      })}
-    </p>
-    <Input
-      id="delete-endpoint"
-      required
-      label={translate('nexus.delete-modal-confirmation-label', {
-        endpoint: endpoint.id,
-      })}
-      bind:value={confirmDeleteInput}
-    />
-  </div>
-</Modal>
+<NexusEditEndpoint {endpoint} {namespaceList} {onUpdate} {onDelete} {error} />

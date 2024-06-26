@@ -8,6 +8,7 @@
   import { translate } from '$lib/i18n/translate';
   import NexusForm, { endpointForm } from '$lib/pages/nexus-form.svelte';
   import { createNexusEndpoint } from '$lib/services/nexus-service';
+  import { namespaces } from '$lib/stores/namespaces';
   import type { NetworkError } from '$lib/types/global';
   import { routeForNexus } from '$lib/utilities/route-for';
 
@@ -26,29 +27,10 @@
     }
   };
 
-  $: createDisabled =
-    $endpointForm.spec.name === '' ||
-    $endpointForm.spec.target.worker.namespace === '' ||
-    $endpointForm.spec.target.worker.taskQueue === '';
+  $: namespaceList = $namespaces.map((namespace) => ({
+    namespace: namespace.namespaceInfo.name,
+  }));
 </script>
 
 <PageTitle title={translate('nexus.nexus')} url={$page.url.href} />
-<div class="flex w-full flex-col gap-8">
-  <div class="text-sm">
-    <Link href={routeForNexus()} icon="chevron-left">
-      {translate('nexus.back-to-endpoints')}
-    </Link>
-  </div>
-  <h1 data-testid="namespace-selector-title" class="text-2xl">
-    {translate('nexus.create-endpoint')}
-  </h1>
-  <NexusForm {error} />
-  <div class="flex items-center gap-4">
-    <Button variant="primary" on:click={onCreate} disabled={createDisabled}
-      >{translate('nexus.create-endpoint')}</Button
-    >
-    <Button variant="ghost" on:click={() => goto(routeForNexus())}
-      >{translate('common.cancel')}</Button
-    >
-  </div>
-</div>
+<NexusCreateEndpoint {onCreate} {namespaceList} {error} />

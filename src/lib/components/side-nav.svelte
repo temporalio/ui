@@ -72,12 +72,14 @@
         label={translate('common.namespaces')}
         icon="namespace"
       />
-      <NavigationItem
-        link={linkList.nexus}
-        data-testid="nexus-button"
-        label={translate('nexus.nexus')}
-        icon="nexus"
-      />
+      <IsCloudGuard {isCloud}>
+        <NavigationItem
+          link={linkList.nexus}
+          data-testid="nexus-button"
+          label={translate('nexus.nexus')}
+          icon="nexus"
+        />
+      </IsCloudGuard>
     </IsLegacyCloudGuard>
     <slot name="middle" />
     <IsCloudGuard {isCloud}>

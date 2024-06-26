@@ -12,9 +12,6 @@
   } from '$lib/utilities/route-for';
 
   export let endpoint: NexusEndpoint;
-
-  console.log('Endpoint', endpoint);
-  const namespaces = [...Array(40).keys()];
 </script>
 
 <PageTitle title={translate('nexus.nexus')} url={$page.url.href} />
@@ -39,7 +36,7 @@
     class="surface-primary max-w-fit rounded-lg border-2 border-secondary p-4"
   >
     <h4>Target</h4>
-    <div class="flex gap-4">
+    <div class="flex flex-col gap-4 lg:flex-row">
       <div class="flex gap-1">
         Namespace <i>{endpoint.spec.target.worker.namespace}</i>
       </div>
@@ -52,10 +49,12 @@
   <p class="w-full xl:w-1/2">
     {endpoint.spec?.description || 'No description provided'}
   </p>
-  <h2 class="text-xl">Allowed Caller Namespaces</h2>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    {#each namespaces as _namespace}
-      <div>caller-namespace</div>
-    {/each}
-  </div>
+  {#if endpoint.spec?.allowedCallerNamespaces}
+    <h2 class="text-xl">Allowed Caller Namespaces</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {#each endpoint.spec?.allowedCallerNamespaces as namespace}
+        <div>{namespace}</div>
+      {/each}
+    </div>
+  {/if}
 </div>
