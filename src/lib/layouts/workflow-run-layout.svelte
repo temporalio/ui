@@ -5,6 +5,7 @@
 
   import { viewDataEncoderSettings } from '$lib/components/data-encoder-settings.svelte';
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
+  import CopyButton from '$lib/holocene/copyable/button.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
@@ -22,12 +23,21 @@
     workflowRun,
   } from '$lib/stores/workflow-run';
   import type { NetworkError } from '$lib/types/global';
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: raw = $page.url.searchParams.has('json');
+  $: fullJson = { ...$workflowRun, eventHistory: $fullEventHistory };
 
   let workflowError: NetworkError;
   let eventHistoryController: AbortController;
+
+  const { copy, copied } = copyToClipboard();
+
+  const handleCopy = (e: Event) => {
+    copy(e, stringifyWithBigInt(fullJson));
+  };
 
   const getWorkflowAndEventHistory = async (
     namespace: string,
@@ -135,12 +145,15 @@
 </script>
 
 {#if raw}
-  <div class="h-auto whitespace-break-spaces rounded bg-primary p-4">
-    {JSON.stringify(
-      { ...$workflowRun, eventHistory: $fullEventHistory },
-      null,
-      2,
-    )}
+  <div class="relative h-auto whitespace-break-spaces rounded bg-primary p-4">
+    <CopyButton
+      copyIconTitle="Copy JSON to clipboard"
+      copySuccessIconTitle="JSON copied to clipboard"
+      class="absolute right-1 top-1"
+      on:click={handleCopy}
+      copied={$copied}
+    />
+    {stringifyWithBigInt(fullJson, null, 2)}
   </div>
 {:else}
   <LabsModeGuard>
