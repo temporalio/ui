@@ -136,7 +136,11 @@
 
 {#if raw}
   <div class="h-auto whitespace-break-spaces rounded bg-primary p-4">
-    {JSON.stringify($fullEventHistory, null, 2)}
+    {JSON.stringify(
+      { ...$workflowRun, eventHistory: $fullEventHistory },
+      null,
+      2,
+    )}
   </div>
 {:else}
   <LabsModeGuard>
