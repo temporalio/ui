@@ -8,8 +8,12 @@
   import { groupEvents } from '$lib/models/event-groups';
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
-  import { fullEventHistory } from '$lib/stores/events';
+  import {
+    fullEventHistory,
+    reversedFullEventHistory,
+  } from '$lib/stores/events';
   import { eventCategoryFilter } from '$lib/stores/filters';
+  import { labsMode } from '$lib/stores/labs-mode';
   import type {
     CommonHistoryEvent,
     EventTypeCategory,
@@ -48,8 +52,12 @@
         ?.get('category')
         .split(',') as EventTypeCategory[])
     : undefined;
-  $: initialItem = $fullEventHistory?.[0];
-  $: items = getEventsOrGroups($fullEventHistory, $eventCategoryFilter);
+  $: eventHistory =
+    $labsMode && $eventFilterSort === 'descending'
+      ? $reversedFullEventHistory
+      : $fullEventHistory;
+  $: initialItem = eventHistory?.[0];
+  $: items = getEventsOrGroups(eventHistory, $eventCategoryFilter);
   $: updating = !$fullEventHistory.length;
 </script>
 
