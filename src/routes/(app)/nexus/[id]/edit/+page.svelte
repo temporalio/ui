@@ -3,12 +3,9 @@
   import { page } from '$app/stores';
 
   import PageTitle from '$lib/components/page-title.svelte';
-  import Button from '$lib/holocene/button.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import Link from '$lib/holocene/link.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
-  import NexusForm, { endpointForm } from '$lib/pages/nexus-form.svelte';
+  import NexusEditEndpoint from '$lib/pages/nexus-edit-endpoint.svelte';
+  import { endpointForm } from '$lib/pages/nexus-form.svelte';
   import {
     deleteNexusEndpoint,
     updateNexusEndpoint,
@@ -25,9 +22,12 @@
 
   let deleteConfirmationModalOpen = false;
   let confirmDeleteInput = '';
+
+  console.log(deleteConfirmationModalOpen, confirmDeleteInput);
+
   let error: NetworkError | undefined = undefined;
 
-  const onSave = async () => {
+  const onUpdate = async () => {
     error = undefined;
     const body = { ...$endpointForm };
     body.id = endpoint.id;

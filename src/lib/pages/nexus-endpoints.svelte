@@ -38,7 +38,7 @@
 
 <PageTitle title={translate('nexus.nexus')} url={$page.url.href} />
 
-{#if !endpoints?.length && !!search}
+{#if !endpoints?.length && !search}
   <NexusEmptyState />
 {:else}
   <div class="mb-8 flex items-center justify-between">

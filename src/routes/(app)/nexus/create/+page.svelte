@@ -3,10 +3,9 @@
   import { page } from '$app/stores';
 
   import PageTitle from '$lib/components/page-title.svelte';
-  import Button from '$lib/holocene/button.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import NexusForm, { endpointForm } from '$lib/pages/nexus-form.svelte';
+  import NexusCreateEndpoint from '$lib/pages/nexus-create-endpoint.svelte';
+  import { endpointForm } from '$lib/pages/nexus-form.svelte';
   import { createNexusEndpoint } from '$lib/services/nexus-service';
   import { namespaces } from '$lib/stores/namespaces';
   import type { NetworkError } from '$lib/types/global';

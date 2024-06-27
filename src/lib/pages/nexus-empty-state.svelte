@@ -6,13 +6,13 @@
   import andromeda from '$lib/vendor/andromeda.png';
 </script>
 
-<div class="surface-inverse flex min-h-screen flex-col gap-8 p-10">
+<div class="surface-black flex min-h-screen flex-col gap-8 p-10">
   <div class="flex flex-col gap-4 lg:flex-row">
     <div>
       <div class="mb-8 flex items-center gap-4">
         <h1
           data-testid="namespace-selector-title"
-          class="font-mono text-2xl uppercase text-marketingGreen"
+          class="text-marketingGreen font-mono text-2xl uppercase"
         >
           {translate('nexus.endpoints')}
         </h1>

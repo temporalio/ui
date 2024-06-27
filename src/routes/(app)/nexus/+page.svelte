@@ -8,7 +8,7 @@
   $: ({ endpoints } = data);
 </script>
 
-<div class="surface-secondary" class:empty={!endpoints?.length}>
+<div class:empty={!endpoints?.length}>
   <NexusEndpoints {endpoints} />
 </div>
 
