@@ -25,3 +25,17 @@ export const prefixSearchEnabled = derived(
     return serverVersionEnabled || capabilitiesEnabled;
   },
 );
+
+export const nexusEnabled = derived(
+  [page, temporalVersion],
+  ([$page, $temporalVersion]) => {
+    const serverVersionEnabled = minimumVersionRequired(
+      '1.24.0',
+      $temporalVersion,
+    );
+    const capabilitiesEnabled = Boolean(
+      $page.data?.systemInfo?.capabilities?.nexusEnabled,
+    );
+    return serverVersionEnabled || capabilitiesEnabled;
+  },
+);
