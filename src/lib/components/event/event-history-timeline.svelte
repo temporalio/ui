@@ -404,39 +404,47 @@
 
   /* CSS for each classifciation */
   :global(.vis-item.vis-range.Failed) {
-    background-color: theme(colors.red.300);
-    border-color: theme(colors.red.300);
+    background-color: theme(colors.red.200);
+    border-color: theme(colors.red.200);
     border-radius: 9999px;
     border-width: 2px;
     color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.Failed) {
-    color: theme(colors.red.300);
+    color: theme(colors.red.200);
   }
 
-  :global(.vis-item.vis-range.Terminated, .vis-item.vis-range.CancelRequested) {
-    background-color: theme(colors.yellow.300);
-    border-color: theme(colors.yellow.300);
+  :global(
+      .vis-item.vis-range.Terminated,
+      .vis-item.vis-range.CancelRequested,
+      .vis-item.vis-range.Paused
+    ) {
+    background-color: theme(colors.yellow.200);
+    border-color: theme(colors.yellow.200);
     border-radius: 9999px;
     border-width: 2px;
     color: theme(colors.space-black);
   }
 
-  :global(.vis-item.vis-point.Terminated, .vis-item.vis-point.CancelRequested) {
-    color: theme(colors.yellow.300);
+  :global(
+      .vis-item.vis-point.Terminated,
+      .vis-item.vis-point.CancelRequested,
+      .vis-item.vis-point.Paused
+    ) {
+    color: theme(colors.yellow.200);
   }
 
   :global(.vis-item.vis-range.TimedOut) {
-    background-color: theme(colors.orange.300);
-    border-color: theme(colors.orange.300);
+    background-color: theme(colors.orange.200);
+    border-color: theme(colors.orange.200);
     border-radius: 9999px;
     border-width: 2px;
     color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.TimedOut) {
-    color: theme(colors.orange.300);
+    color: theme(colors.orange.200);
   }
 
   :global(.vis-item.vis-range.Canceled, .vis-item.vis-range.Unspecified) {
@@ -451,38 +459,15 @@
     color: theme(colors.slate.100);
   }
 
-  :global(.vis-item.vis-range.Fired) {
-    background-color: theme(colors.pink.300);
-    border-color: theme(colors.pink.300);
-    border-radius: 9999px;
-    border-width: 2px;
-    color: theme(colors.space-black);
-  }
-
-  :global(.vis-item.vis-point.Fired) {
-    color: theme(colors.pink.300);
-  }
-
-  :global(.vis-item.vis-range.Scheduled) {
-    background-color: theme(colors.indigo.300);
-    border-color: theme(colors.indigo.300);
-    border-radius: 9999px;
-    border-width: 2px;
-    color: theme(colors.space-black);
-  }
-
-  :global(.vis-item.vis-point.Scheduled) {
-    color: theme(colors.indigo.300);
-  }
-
   :global(
       .vis-item.vis-range.Running,
       .vis-item.vis-range.New,
       .vis-item.vis-range.Started,
-      .vis-item.vis-range.Initiated
+      .vis-item.vis-range.Initiated,
+      .vis-item.vis-range.Scheduled
     ) {
-    background-color: theme(colors.blue.300);
-    border-color: theme(colors.blue.300);
+    background-color: theme(colors.blue.200);
+    border-color: theme(colors.blue.200);
     border-radius: 9999px;
     border-width: 2px;
     color: theme(colors.space-black);
@@ -492,9 +477,10 @@
       .vis-item.vis-point.Running,
       .vis-item.vis-point.New,
       .vis-item.vis-point.Started,
-      .vis-item.vis-point.Initiated
+      .vis-item.vis-point.Initiated,
+      .vis-item.vis-point.Scheduled
     ) {
-    color: theme(colors.blue.300);
+    color: theme(colors.blue.200);
   }
 
   :global(.vis-item.vis-range.workflow.Running) {
@@ -504,30 +490,30 @@
   }
 
   :global(.vis-item.vis-range.ContinuedAsNew) {
-    background-color: theme(colors.purple.300);
-    border-color: theme(colors.purple.300);
+    background-color: theme(colors.purple.200);
+    border-color: theme(colors.purple.200);
     border-radius: 9999px;
     border-width: 2px;
     color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.ContinuedAsNew) {
-    color: theme(colors.purple.300);
+    color: theme(colors.purple.200);
   }
 
   :global(.vis-item.vis-range.Completed, .vis-item.vis-range.Open) {
-    background-color: theme(colors.green.300);
-    border-color: theme(colors.green.300);
+    background-color: theme(colors.green.200);
+    border-color: theme(colors.green.200);
     border-radius: 9999px;
     border-width: 2px;
     color: theme(colors.space-black);
   }
 
   :global(.vis-item.vis-point.Completed, .vis-item.vis-point.Open) {
-    color: theme(colors.green.300);
+    color: theme(colors.green.200);
   }
 
-  :global(.vis-item.vis-range.Signaled) {
+  :global(.vis-item.vis-range.Fired, .vis-item.vis-range.Signaled) {
     background-color: theme(colors.pink.200);
     border-color: theme(colors.pink.200);
     border-radius: 9999px;
@@ -535,20 +521,8 @@
     color: theme(colors.space-black);
   }
 
-  :global(.vis-item.vis-point.Signaled) {
+  :global(.vis-item.vis-point.Fired, .vis-item.vis-point.Signaled) {
     color: theme(colors.pink.200);
-  }
-
-  :global(.vis-item.vis-range.Paused) {
-    background-color: theme(colors.yellow.200);
-    border-color: theme(colors.yellow.200);
-    border-radius: 9999px;
-    border-width: 2px;
-    color: theme(colors.space-black);
-  }
-
-  :global(.vis-item.vis-point.Paused) {
-    color: theme(colors.yellow.200);
   }
 
   /* CSS for each activity type */
