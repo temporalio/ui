@@ -14,6 +14,7 @@
   export let onUpdate: () => void;
   export let onDelete: () => void;
   export let error: NetworkError | undefined = undefined;
+  export let loading = false;
 
   let deleteConfirmationModalOpen = false;
   let confirmDeleteInput = '';
@@ -42,7 +43,7 @@
   </div>
   <NexusForm {endpoint} {namespaceList} {error} />
   <div class="flex items-center gap-4">
-    <Button on:click={onUpdate}>{translate('common.save')}</Button>
+    <Button on:click={onUpdate} {loading}>{translate('common.save')}</Button>
     <Button variant="ghost">{translate('common.cancel')}</Button>
   </div>
 </div>

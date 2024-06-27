@@ -32,7 +32,7 @@
   export let error: NetworkError | undefined = undefined;
 
   let name = endpoint?.spec?.name || '';
-  let description = endpoint?.spec?.description || '';
+  let description = endpoint?.spec?.descriptionString || '';
   let target = endpoint?.spec?.target?.worker?.namespace || '';
   let taskQueue = endpoint?.spec?.target?.worker?.taskQueue || '';
 

@@ -26,23 +26,31 @@
   console.log(deleteConfirmationModalOpen, confirmDeleteInput);
 
   let error: NetworkError | undefined = undefined;
+  let loading = false;
 
   const onUpdate = async () => {
     error = undefined;
+    loading = true;
     const body = { ...$endpointForm };
     body.id = endpoint.id;
     body.version = endpoint.version;
-    // delete body.spec.description;
-    console.log('Endpoint body: ', body);
+
+    // TODO: Set this as a legit payload with data = body.spec.description;
+    body.spec.description = {};
     try {
       await updateNexusEndpoint(endpoint.id, body);
+      goto(routeForNexus());
     } catch (e: unknown) {
       error = e as NetworkError;
       console.error('Error updating endpoint', e);
+    } finally {
+      loading = false;
     }
   };
 
   const onDelete = async () => {
+    error = undefined;
+    loading = true;
     try {
       await deleteNexusEndpoint(endpoint.id, endpoint.version);
       deleteConfirmationModalOpen = false;
@@ -51,6 +59,8 @@
     } catch (e) {
       error = e as NetworkError;
       console.error('Error deleting endpoint', e);
+    } finally {
+      loading = false;
     }
   };
 
@@ -60,4 +70,11 @@
 </script>
 
 <PageTitle title={translate('nexus.nexus')} url={$page.url.href} />
-<NexusEditEndpoint {endpoint} {namespaceList} {onUpdate} {onDelete} {error} />
+<NexusEditEndpoint
+  {endpoint}
+  {loading}
+  {namespaceList}
+  {onUpdate}
+  {onDelete}
+  {error}
+/>

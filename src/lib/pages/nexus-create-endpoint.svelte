@@ -11,6 +11,7 @@
   export let onCreate: () => void;
   export let namespaceList: { namespace: string }[] = [];
   export let error: NetworkError | undefined = undefined;
+  export let loading = false;
 
   $: createDisabled =
     $endpointForm.spec.name === '' ||
@@ -29,8 +30,11 @@
   </h1>
   <NexusForm {error} {namespaceList} />
   <div class="flex items-center gap-4">
-    <Button variant="primary" on:click={onCreate} disabled={createDisabled}
-      >{translate('nexus.create-endpoint')}</Button
+    <Button
+      variant="primary"
+      on:click={onCreate}
+      disabled={createDisabled}
+      {loading}>{translate('nexus.create-endpoint')}</Button
     >
     <Button variant="ghost" on:click={() => goto(routeForNexus())}
       >{translate('common.cancel')}</Button

@@ -12,17 +12,21 @@
   import { routeForNexus } from '$lib/utilities/route-for';
 
   let error: NetworkError | undefined = undefined;
+  let loading = false;
 
   const onCreate = async () => {
+    loading = true;
     try {
       const body = { ...$endpointForm };
-      delete body.spec.description;
-      console.log('Endpoint body: ', body);
+      // TODO: Set this as a legit payload with data = body.spec.description;
+      body.spec.description = {};
       await createNexusEndpoint(body);
       goto(routeForNexus());
     } catch (e) {
       error = e as NetworkError;
       console.error('Error creating endpoint', e);
+    } finally {
+      loading = false;
     }
   };
 
@@ -32,4 +36,4 @@
 </script>
 
 <PageTitle title={translate('nexus.nexus')} url={$page.url.href} />
-<NexusCreateEndpoint {onCreate} {namespaceList} {error} />
+<NexusCreateEndpoint {onCreate} {namespaceList} {error} {loading} />

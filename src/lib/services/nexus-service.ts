@@ -6,11 +6,13 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 type NexusEndpoints = { endpoints: NexusEndpoint[] };
 
 export const fetchNexusEndpoints = async (
+  search: string = '',
   request = fetch,
 ): Promise<NexusEndpoint[]> => {
   const route = routeForApi('nexus-endpoints');
   const { endpoints } = await requestFromAPI<NexusEndpoints>(route, {
     request,
+    params: { name: search },
   });
   return endpoints || [];
 };

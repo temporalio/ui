@@ -1,4 +1,6 @@
 <script lang="ts">
+  import debounce from 'just-debounce';
+
   import { page } from '$app/stores';
 
   import PageTitle from '$lib/components/page-title.svelte';
@@ -16,29 +18,29 @@
     routeForNexusEndpoint,
     routeForNexusEndpointCreate,
   } from '$lib/utilities/route-for';
-  // import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  // import debounce from 'just-debounce';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   export let endpoints: NexusEndpoint[] = [];
 
   let search = '';
+  $: searchParam = $page.url.searchParams.get('search') || '';
 
-  // const searchParamUpdate = debounce((value) => {
-  //   updateQueryParameters({
-  //     parameter: 'search',
-  //     value,
-  //     url: $page.url,
-  //   }),
-  // }, 350);
+  const searchParamUpdate = debounce((value) => {
+    updateQueryParameters({
+      parameter: 'search',
+      value,
+      url: $page.url,
+    });
+  }, 350);
 
-  // $: {
-  //   searchParamUpdate(search)
-  // }
+  $: {
+    searchParamUpdate(search);
+  }
 </script>
 
 <PageTitle title={translate('nexus.nexus')} url={$page.url.href} />
 
-{#if !endpoints?.length && !search}
+{#if !endpoints?.length && !searchParam}
   <NexusEmptyState />
 {:else}
   <div class="mb-8 flex items-center justify-between">
@@ -53,7 +55,7 @@
     <div class="flex flex-col justify-between lg:flex-row">
       <Input
         id="endpoint-search"
-        value={search}
+        bind:value={search}
         label={translate('common.search')}
         labelHidden
         type="search"
@@ -61,33 +63,37 @@
         class="w-full lg:w-1/2"
       />
     </div>
-    <div
-      class="grid grid-cols-1 gap-4 pr-8 md:grid-cols-2 md:pr-24 lg:grid-cols-3 xl:grid-cols-4 xl:pr-48"
-    >
-      {#each endpoints as endpoint}
-        <Link href={routeForNexusEndpoint(endpoint.id)} role="button">
-          <div
-            class="transition:colors flex cursor-pointer flex-col gap-1 rounded-lg p-4 duration-200 ease-in-out"
-          >
-            <h3 class="text-lg font-medium">
-              {endpoint.spec.name}
-            </h3>
-            <p class="text-xs text-secondary">
-              Last update {formatDate(endpoint.lastModifiedTime, $timeFormat)}
-            </p>
-            <p class="text-xs text-secondary">
-              Created on {formatDate(endpoint.createdTime, $timeFormat)}
-            </p>
-            {#if endpoint.spec?.allowedCallerNamespaces}
-              <Badge type="primary" class="px-2 py-1"
-                >{endpoint.spec?.allowedCallerNamespaces.length} Namespaces</Badge
-              >
-            {/if}
-          </div>
-        </Link>
-      {:else}
-        <EmptyState title="No endpoints found, try a new search" />
-      {/each}
-    </div>
+    {#if endpoints.length}
+      <div
+        class="grid grid-cols-1 gap-4 pr-8 md:grid-cols-2 md:pr-24 lg:grid-cols-3 xl:grid-cols-4 xl:pr-48"
+      >
+        {#each endpoints as endpoint}
+          <Link href={routeForNexusEndpoint(endpoint.id)} role="button">
+            <div
+              class="transition:colors flex cursor-pointer flex-col gap-1 rounded-lg p-4 duration-200 ease-in-out"
+            >
+              <h3 class="text-lg font-medium">
+                {endpoint.spec.name}
+              </h3>
+              <p class="text-xs text-secondary">
+                Last update {formatDate(endpoint.lastModifiedTime, $timeFormat)}
+              </p>
+              <p class="text-xs text-secondary">
+                Created on {formatDate(endpoint.createdTime, $timeFormat)}
+              </p>
+              {#if endpoint.spec?.allowedCallerNamespaces}
+                <Badge type="primary" class="px-2 py-1"
+                  >{endpoint.spec?.allowedCallerNamespaces.length} Namespaces</Badge
+                >
+              {/if}
+            </div>
+          </Link>
+        {/each}
+      </div>
+    {:else}
+      <div class="flex w-full justify-center">
+        <EmptyState title="No Endpoints found, try a new search" />
+      </div>
+    {/if}
   </div>
 {/if}
