@@ -8,6 +8,7 @@
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Loading from '$lib/holocene/loading.svelte';
+  import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchAllEvents } from '$lib/services/events-service';
@@ -27,7 +28,7 @@
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
-  $: raw = $page.url.searchParams.has('json');
+  $: showJson = $page.url.searchParams.has('json');
   $: fullJson = { ...$workflowRun, eventHistory: $fullEventHistory };
 
   let workflowError: NetworkError;
@@ -144,11 +145,13 @@
   });
 </script>
 
-{#if raw}
-  <div class="relative h-auto whitespace-break-spaces rounded bg-primary p-4">
+{#if showJson}
+  <div
+    class="relative h-auto whitespace-break-spaces break-words rounded bg-primary p-4"
+  >
     <CopyButton
-      copyIconTitle="Copy JSON to clipboard"
-      copySuccessIconTitle="JSON copied to clipboard"
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
       class="absolute right-1 top-1"
       on:click={handleCopy}
       copied={$copied}
