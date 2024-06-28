@@ -15,6 +15,8 @@
   export let onDelete: () => void;
   export let error: NetworkError | undefined = undefined;
   export let loading = false;
+  export let hintText = '';
+  export let isCloud = false;
 
   let deleteConfirmationModalOpen = false;
   let confirmDeleteInput = '';
@@ -41,7 +43,14 @@
       </div>
     </div>
   </div>
-  <NexusForm {endpoint} {namespaceList} {error} />
+  <NexusForm
+    {endpoint}
+    {namespaceList}
+    {error}
+    {hintText}
+    {isCloud}
+    nameDisabled
+  />
   <div class="flex items-center gap-4">
     <Button on:click={onUpdate} {loading}>{translate('common.save')}</Button>
     <Button variant="ghost">{translate('common.cancel')}</Button>

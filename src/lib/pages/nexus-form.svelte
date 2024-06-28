@@ -19,10 +19,12 @@
 
   import { onDestroy } from 'svelte';
 
+  import IsOssGuard from '$lib/components/is-oss-guard.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Markdown from '$lib/holocene/markdown.svelte';
+  import MultiSelect from '$lib/holocene/select/multi-select.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
@@ -30,6 +32,9 @@
   export let endpoint: NexusEndpoint | undefined = undefined;
   export let namespaceList: { namespace: string }[] = [];
   export let error: NetworkError | undefined = undefined;
+  export let hintText = '';
+  export let nameDisabled = false;
+  export let isCloud = true;
 
   let name = endpoint?.spec?.name || '';
   let description = endpoint?.spec?.descriptionString || '';
@@ -58,6 +63,21 @@
 
   $: setFormStore(name, description, target, taskQueue);
 
+  $: workerNamespace = $endpointForm?.spec?.target?.worker?.namespace;
+  $: callerNamespaces = namespaceList
+    .filter((n) => n.namespace !== workerNamespace)
+    .map((n) => ({ value: n.namespace, label: n.namespace }));
+
+  $: {
+    console.log('Caller Namespaces: ', callerNamespaces);
+  }
+  const onCallerNamespaceChange = (
+    selected: { value: string; label: string }[],
+  ) => {
+    const namespaces = selected.map((n) => n.value);
+    $endpointForm.spec.allowedCallerNamespaces = namespaces;
+  };
+
   onDestroy(() => {
     $endpointForm = emptyEndpoint;
   });
@@ -67,7 +87,9 @@
   <Input
     bind:value={name}
     required
+    disabled={nameDisabled}
     error={!name}
+    {hintText}
     label={translate('nexus.endpoint-name')}
     id="name"
     maxLength={255}
@@ -102,12 +124,30 @@
     id="task-queue"
     placeholder={translate('nexus.task-queue-placeholder')}
   />
+  <IsOssGuard {isCloud}>
+    <div class="flex flex-col gap-0">
+      <p class="text-base text-primary">{translate('nexus.access-policy')}</p>
+      <p class="text-xs text-secondary">
+        {translate('nexus.allowed-caller-namespaces-description')}
+      </p>
+    </div>
+    <MultiSelect
+      id="caller-namespace-filter-menu"
+      options={callerNamespaces}
+      initialSelected={[]}
+      label={translate('nexus.select-namespaces')}
+      selectAllLabel={translate('common.select-all')}
+      clearAllLabel={translate('common.clear-all-capitalized')}
+      initialSelectedAll={false}
+      disabled={!$endpointForm.spec.target.worker.namespace}
+      onChange={onCallerNamespaceChange}
+    />
+  </IsOssGuard>
   <Markdown
     label={translate('common.description')}
     description={translate('nexus.nexus-description')}
     bind:value={description}
     id="description"
-    isValid={false}
     placeholder={translate('nexus.description-placeholder')}
   >
     <p class="text-xs text-secondary" slot="info">

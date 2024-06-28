@@ -12,6 +12,8 @@
   export let namespaceList: { namespace: string }[] = [];
   export let error: NetworkError | undefined = undefined;
   export let loading = false;
+  export let hintText = '';
+  export let isCloud = false;
 
   $: createDisabled =
     $endpointForm.spec.name === '' ||
@@ -28,7 +30,7 @@
   <h1 data-testid="namespace-selector-title" class="text-2xl">
     {translate('nexus.create-endpoint')}
   </h1>
-  <NexusForm {error} {namespaceList} />
+  <NexusForm {error} {namespaceList} {hintText} {isCloud} />
   <div class="flex items-center gap-4">
     <Button
       variant="primary"

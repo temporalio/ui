@@ -29,4 +29,11 @@ export const Strings = {
     'Are you sure you want to delete {{endpoint}}? Any Workflows calling this endpoint will encounter failures.',
   'delete-modal-confirmation-label':
     'Type “DELETE {{endpoint}}" to delete this endpoint.',
+  'endpoint-name-hint':
+    'Endpoint name must start with A-Z, a-z or _ and can only contain A-Z, a-z, 0-9, or _',
+  'access-policy': 'Access Policy',
+  'allowed-caller-namespaces': 'Allowed caller namespaces',
+  'allowed-caller-namespaces-description':
+    'Specify the Namespace(s) that are allowed to call the target Namespace to use this endpoint.',
+  'select-namespaces': 'Select Namespace(s)',
 } as const;

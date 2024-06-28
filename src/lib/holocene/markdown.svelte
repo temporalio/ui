@@ -10,7 +10,6 @@
 
   type $$Props = HTMLTextareaAttributes & {
     disabled?: boolean;
-    isValid?: boolean;
     placeholder?: string;
     rows?: number;
     spellcheck?: boolean;
@@ -117,7 +116,7 @@
   }
 
   textarea {
-    @apply surface-inverse;
+    @apply surface-primary dark:bg-transparent;
   }
 
   .preview {
