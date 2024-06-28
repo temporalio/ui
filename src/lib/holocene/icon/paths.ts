@@ -44,6 +44,7 @@ import fileImport from './svg/file-import.svelte';
 import fileUpload from './svg/file-upload.svelte';
 import filterSolid from './svg/filter-solid.svelte';
 import filter from './svg/filter.svelte';
+import fireHydrant from './svg/fire-hydrant.svelte';
 import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
 import hyphen from './svg/hyphen.svelte';
@@ -143,6 +144,7 @@ export const icons = {
   'file-upload': fileUpload,
   filter,
   'filter-solid': filterSolid,
+  'fire-hydrant': fireHydrant,
   github,
   graph,
   hyphen,
