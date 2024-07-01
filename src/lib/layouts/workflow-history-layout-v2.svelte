@@ -2,6 +2,8 @@
   import { beforeNavigate } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import EventSummary from '$lib/components/event/event-summary.svelte';
+  import EventHistoryViewTypeToggle from '$lib/components/lines-and-dots/event-history-view-type-toggle.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
   import CompactGraph from '$lib/components/lines-and-dots/svg/compact-graph.svelte';
@@ -13,7 +15,6 @@
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import {
     activeEvents,
@@ -73,56 +74,34 @@
     <div
       class="flex flex-col items-center justify-between gap-2 py-2 md:flex-row"
     >
-      <div class="flex flex-col items-center gap-2 md:flex-row md:gap-4">
-        <h2 class="text-2xl font-medium">
-          {translate('workflows.event-history')}
-        </h2>
-        <ToggleButtons>
-          <ToggleButton
-            active={$eventViewType === 'compact'}
-            data-testid="compact"
-            on:click={() => ($eventViewType = 'compact')}
-            >{translate('workflows.compact')}</ToggleButton
-          >
-          <ToggleButton
-            active={$eventViewType === 'timeline'}
-            data-testid="timeline"
-            on:click={() => ($eventViewType = 'timeline')}
-            >{translate('common.timeline')}</ToggleButton
-          >
-          <ToggleButton
-            active={$eventViewType === 'feed'}
-            data-testid="feed"
-            on:click={() => ($eventViewType = 'feed')}
-            >{translate('workflows.full-history')}</ToggleButton
-          >
-        </ToggleButtons>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="font-mono text-sm">{(100 / zoomLevel).toFixed(0)}%</span>
-        <ToggleButtons>
-          <ToggleButton
-            data-testid="zoom-in"
-            disabled={zoomLevel === 1}
-            on:click={zoomIn}>+</ToggleButton
-          >
-          <ToggleButton
-            data-testid="zoom-out"
-            disabled={zoomLevel === 10}
-            on:click={zoomOut}>-</ToggleButton
-          >
-          <ToggleButton
-            data-testid="filter"
-            on:click={() => (showFilters = !showFilters)}
-            icon="filter"
-          />
-          <ToggleButton
-            data-testid="download"
-            on:click={() => (showDownloadPrompt = true)}
-            icon="download"
-          />
-        </ToggleButtons>
-      </div>
+      {#if $eventViewType !== 'table'}
+        <EventHistoryViewTypeToggle />
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-sm">{(100 / zoomLevel).toFixed(0)}%</span>
+          <ToggleButtons>
+            <ToggleButton
+              data-testid="zoom-in"
+              disabled={zoomLevel === 1}
+              on:click={zoomIn}>+</ToggleButton
+            >
+            <ToggleButton
+              data-testid="zoom-out"
+              disabled={zoomLevel === 10}
+              on:click={zoomOut}>-</ToggleButton
+            >
+            <ToggleButton
+              data-testid="filter"
+              on:click={() => (showFilters = !showFilters)}
+              icon="filter"
+            />
+            <ToggleButton
+              data-testid="download"
+              on:click={() => (showDownloadPrompt = true)}
+              icon="download"
+            />
+          </ToggleButtons>
+        </div>
+      {/if}
     </div>
     {#if showFilters}
       <div class="flex flex-col items-center justify-center pb-2">
@@ -131,36 +110,53 @@
     {/if}
   </div>
 </div>
-<div class="bg-off-black">
-  <div class="w-full overflow-auto" bind:clientWidth={canvasWidth}>
-    {#if $eventViewType === 'compact'}
-      <CompactGraph
-        {workflow}
-        {groups}
-        {zoomLevel}
-        {canvasWidth}
-        activeGroups={$activeGroups}
-      />
-    {:else if $eventViewType === 'timeline'}
-      <TimelineGraph
-        {workflow}
-        history={$fullEventHistory}
-        {groups}
-        {zoomLevel}
-        {canvasWidth}
-        activeGroups={$activeGroups}
-      />
-    {:else}
-      <HistoryGraph
-        history={$filteredEventHistory}
-        {groups}
-        {zoomLevel}
-        {canvasWidth}
-        activeEvents={$activeEvents}
-      />
-    {/if}
+{#if $eventViewType === 'table'}
+  <div class="px-4 md:px-8">
+    <EventSummary>
+      <svelte:fragment slot="action-top-left">
+        <EventHistoryViewTypeToggle />
+      </svelte:fragment>
+      <svelte:fragment slot="action-top-center">
+        <ToggleButton
+          data-testid="download"
+          on:click={() => (showDownloadPrompt = true)}
+          icon="download"
+        />
+      </svelte:fragment>
+    </EventSummary>
   </div>
-</div>
+{:else}
+  <div class="bg-off-black">
+    <div class="w-full overflow-auto" bind:clientWidth={canvasWidth}>
+      {#if $eventViewType === 'compact'}
+        <CompactGraph
+          {workflow}
+          {groups}
+          {zoomLevel}
+          {canvasWidth}
+          activeGroups={$activeGroups}
+        />
+      {:else if $eventViewType === 'timeline'}
+        <TimelineGraph
+          {workflow}
+          history={$fullEventHistory}
+          {groups}
+          {zoomLevel}
+          {canvasWidth}
+          activeGroups={$activeGroups}
+        />
+      {:else}
+        <HistoryGraph
+          history={$filteredEventHistory}
+          {groups}
+          {zoomLevel}
+          {canvasWidth}
+          activeEvents={$activeEvents}
+        />
+      {/if}
+    </div>
+  </div>
+{/if}
 <DownloadEventHistoryModal
   bind:open={showDownloadPrompt}
   {namespace}

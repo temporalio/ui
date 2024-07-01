@@ -76,6 +76,10 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
 export const timelineEvents = writable(null);
 export const fullEventHistory = writable<WorkflowEvents>([]);
 
+export const reversedFullEventHistory = derived(fullEventHistory, ($history) =>
+  [...$history].reverse(),
+);
+
 export const filteredEventHistory = derived(
   [fullEventHistory, eventTypeFilter],
   ([$history, $types]) => {
