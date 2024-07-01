@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-export const NAMESPACES_API = '**/namespaces?';
+export const NAMESPACES_API = '**/cluster/namespaces?';
 
 const MOCK_NAMESPACES = {
   namespaces: [

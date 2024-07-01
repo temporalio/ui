@@ -2,7 +2,8 @@ import type { Page } from '@playwright/test';
 
 import type { SearchAttributesResponse } from '$src/lib/types/workflows';
 
-export const SEARCH_ATTRIBUTES_API = '**/namespaces/*/search-attributes?';
+export const SEARCH_ATTRIBUTES_API =
+  '**/cluster/namespaces/*/search-attributes?';
 
 const MOCK_SEARCH_ATTRIBUTES: SearchAttributesResponse = {
   systemAttributes: {
