@@ -68,7 +68,7 @@ export const base = (namespace?: string): string => {
 
 const getPath = (endpoint: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  return `/api/v1/${endpoint}`;
+  return `/${endpoint}`;
 };
 
 const withBase = (path: string, namespace?: string): string => {
@@ -105,18 +105,18 @@ export function pathForApi(
   if (shouldEncode) parameters = encode(parameters);
 
   const routes: { [K in APIRoutePath]: string } = {
-    cluster: '/cluster-info',
     systemInfo: '/system-info',
+    cluster: '/cluster-info',
+    namespaces: '/cluster/namespaces',
+    namespace: `/cluster/namespaces/${parameters?.namespace}`,
+    'search-attributes': `/cluster/namespaces/${parameters.namespace}/search-attributes`,
     'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history`,
     'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history-reverse`,
-    namespaces: '/namespaces',
-    namespace: `/namespaces/${parameters?.namespace}`,
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/query/${parameters.queryType}`,
     schedule: `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
     'schedule.patch': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}/patch`,
     'schedule.edit': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}/update`,
     schedules: `/namespaces/${parameters?.namespace}/schedules`,
-    'search-attributes': `/namespaces/${parameters.namespace}/search-attributes`,
     settings: '/settings',
     'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
     'task-queue.compatibility': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/worker-build-id-compatibility`,

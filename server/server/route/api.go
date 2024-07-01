@@ -50,11 +50,18 @@ func DisableWriteMiddleware(cfgProvider *config.ConfigProviderWithRefresh) echo.
 
 // SetAPIRoutes sets api routes
 func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []api.Middleware) error {
-	route := e.Group("/api")
-	route.GET("/v1/settings", api.GetSettings(cfgProvider))
+	e.GET("/settings", api.GetSettings(cfgProvider))
 
 	writeControlMiddleware := DisableWriteMiddleware(cfgProvider)
 
-	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware), writeControlMiddleware)
+	e.GET("/cluster-info", api.TemporalAPIHandler(cfgProvider, apiMiddleware), writeControlMiddleware)
+	e.GET("/system-info", api.TemporalAPIHandler(cfgProvider, apiMiddleware), writeControlMiddleware)
+
+	cluster := e.Group("/cluster")
+	cluster.Match([]string{"GET", "POST"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware), writeControlMiddleware)
+
+	namespaces := e.Group("/namespaces")
+	namespaces.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware), writeControlMiddleware)
+
 	return nil
 }
