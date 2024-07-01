@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-export const SCHEDULES_API = '**/api/v1/namespaces/*/schedules**';
+export const SCHEDULES_API = '**/namespaces/*/schedules**';
 
 export const mockSchedule = {
   scheduleId: 'test-schedule',

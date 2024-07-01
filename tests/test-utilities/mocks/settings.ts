@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 
 import { SettingsResponse } from '$src/lib/types';
 
-export const SETTINGS_API = '**/api/v1/settings**';
+export const SETTINGS_API = '**/settings**';
 
 const defaultSettings = {
   Auth: {

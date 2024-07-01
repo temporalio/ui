@@ -33,7 +33,7 @@ import (
 
 func TestSkipOnAuthorizationHeader(t *testing.T) {
 	e := echo.New()
-	req := httptest.NewRequest(echo.GET, "/api/v1/settings", nil)
+	req := httptest.NewRequest(echo.GET, "/settings", nil)
 	rec := httptest.NewRecorder()
 
 	tests := map[string]struct {

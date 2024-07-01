@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
       update: false,
       updateContent: 'embed',
       notFound: 'fallback',
-      url: '**/api/v1/**',
+      url: '**/**',
     },
   );
 });
@@ -49,7 +49,7 @@ test.describe('Accessibility: With Workflows', () => {
       page,
     }, testInfo) => {
       await page.goto(url);
-      await page.waitForRequest('**/api/v1/**');
+      await page.waitForRequest('**/**');
       await page.waitForSelector('#content', { state: 'visible' });
 
       const accessibilityScanResults = await new AxeBuilder({
