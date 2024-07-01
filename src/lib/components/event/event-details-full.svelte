@@ -37,11 +37,7 @@
       onGroupClick={handleGroupClick}
     />
     <div class="block w-full lg:w-2/3">
-      <EventDetailPills
-        {attributeGrouping}
-        {activePill}
-        on:pillChange={handlePillChange}
-      />
+      <EventDetailPills {attributeGrouping} on:pillChange={handlePillChange} />
       {#each eventDetails as [key, value] (key)}
         {#if attributeGrouping[activePill]?.includes(key)}
           <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
@@ -51,11 +47,7 @@
   </div>
 {:else}
   <div class="w-full">
-    <EventDetailPills
-      {attributeGrouping}
-      {activePill}
-      on:pillChange={handlePillChange}
-    />
+    <EventDetailPills {attributeGrouping} on:pillChange={handlePillChange} />
     {#each eventDetails as [key, value] (key)}
       {#if attributeGrouping[activePill]?.includes(key)}
         <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
