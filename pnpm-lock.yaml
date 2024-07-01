@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
 
 settings:
   autoInstallPeers: true
@@ -113,7 +113,7 @@ devDependencies:
     specifier: ^7.18.6
     version: 7.18.6(@babel/core@7.20.12)
   '@grpc/grpc-js':
-    specifier: ^1.7.3
+    specifier: ^1.8.22
     version: 1.8.22
   '@playwright/test':
     specifier: ^1.44.1
