@@ -4,27 +4,25 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { type TaskQueueRules } from '$lib/services/pollers-service';
+  import {
+    type AssignmentRule,
+    type TaskQueueRules,
+  } from '$lib/services/pollers-service';
   import { timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
 
   export let rules: TaskQueueRules;
 
-  let showAll = false;
-
   $: ({ assignmentRules = [], compatibleRedirectRules = [] } = rules);
 
-  $: catchAllRule = assignmentRules.find(
-    (rule) =>
-      !rule.rule?.percentageRamp?.rampPercentage ||
-      rule.rule?.percentageRamp?.rampPercentage.toFixed(0) === '1',
-  );
+  $: catchAllRule = assignmentRules.find((rule) => getPercentage(rule) === 100);
   $: catchAllIndex = assignmentRules.indexOf(catchAllRule);
 
-  $: activeRules = assignmentRules.filter((r, i) => i <= catchAllIndex);
-  $: inactiveRules = assignmentRules.filter((r, i) => i > catchAllIndex);
-
-  $: visibleRules = showAll ? [...activeRules, ...inactiveRules] : activeRules;
+  const getPercentage = (rule: AssignmentRule): number => {
+    if (!rule.rule?.percentageRamp) return 100;
+    if (!rule.rule?.percentageRamp?.rampPercentage) return 0;
+    return rule.rule.percentageRamp.rampPercentage;
+  };
 </script>
 
 <h2 class="text-base font-medium" data-testid="worker-rules">
@@ -35,22 +33,24 @@
     <th class="w-20">Index</th>
     <th class="grow">Target Build ID</th>
     <th class="w-20">Ramp</th>
+    <th class="w-20">Status</th>
     <th class="text-right">Create Time</th>
   </TableHeaderRow>
-  {#each visibleRules as rule, index (index)}
+  {#each assignmentRules as rule, index (index)}
+    {@const ramp = getPercentage(rule)}
+    {@const inactive = ramp === 0 || index > catchAllIndex}
     <TableRow data-testid="version-row">
       <td class="text-left" data-testid="index">{index}</td>
-      <td class="break-all text-left" data-testid="target-source"
+      <td class="break-all text-left" data-testid="target-build-id"
         >{rule.rule?.targetBuildId}</td
       >
-      <td class="text-right" data-testid="target-source"
-        >{((rule.rule?.percentageRamp?.rampPercentage || 1) * 100).toFixed(
-          0,
-        )}%</td
+      <td class="text-right" data-testid="target-ramp">{ramp.toFixed(0)}%</td>
+      <td class="text-right" data-testid="target-status"
+        >{inactive ? 'Inactive' : 'Active'}</td
       >
       <td
         class="justfiy-between flex w-full items-center text-right"
-        data-testid="target-source"
+        data-testid="target-create-time"
       >
         <p>{formatDate(rule.createTime, $timeFormat)}</p>
       </td>
@@ -62,20 +62,6 @@
       </td>
     </tr>
   {/each}
-  {#if !showAll && inactiveRules?.length}
-    <TableRow
-      data-testid="view-all"
-      class="cursor-pointer bg-slate-100"
-      on:click={() => (showAll = !showAll)}
-    >
-      <td></td>
-      <td class="break-all text-left text-blue-700 underline"
-        >{translate('workers.view-all-assignment-rules')}</td
-      >
-      <td />
-      <td />
-    </TableRow>
-  {/if}
 </Table>
 
 <h2 class="text-base font-medium" data-testid="worker-rules">

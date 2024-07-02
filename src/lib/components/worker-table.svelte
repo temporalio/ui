@@ -12,6 +12,8 @@
   import PollerIcon from './poller-icon.svelte';
 
   export let workers: GetPollersResponse;
+
+  console.log('Workers', workers);
 </script>
 
 <h2 class="flex items-center gap-2 text-base font-medium" data-testid="workers">
@@ -23,7 +25,8 @@
     >{translate('workflows.workers-tab')}</caption
   >
   <TableHeaderRow slot="headers">
-    <th class={'w-6/12'}>{translate('common.id')}</th>
+    <th class={'w-4/12'}>{translate('common.id')}</th>
+    <th class={'w-3/12'}>{translate('workers.buildId')}</th>
     <th class="w-2/12">{translate('workflows.last-accessed')}</th>
     <th class="w-2/12">
       <p class="text-center">
@@ -38,6 +41,11 @@
     <TableRow data-testid="worker-row">
       <td class="text-left" data-testid="worker-identity">
         <p class="select-all">{poller.identity}</p>
+      </td>
+      <td class="text-left" data-testid="worker-build-id">
+        <p class="select-all break-all">
+          {poller?.workerVersionCapabilities?.buildId ?? ''}
+        </p>
       </td>
       <td class="text-left" data-testid="worker-last-access-time">
         <p class="select-all">
