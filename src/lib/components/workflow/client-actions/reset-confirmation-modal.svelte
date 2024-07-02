@@ -61,7 +61,6 @@
     } finally {
       loading = false;
     }
-    hideResetModal();
   };
 </script>
 
@@ -75,7 +74,7 @@
   {loading}
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
-  confirmDisabled={!eventId}
+  confirmDisabled={!$eventId}
 >
   <h3 slot="title">{translate('workflows.reset-modal-title')}</h3>
   <svelte:fragment slot="content">
