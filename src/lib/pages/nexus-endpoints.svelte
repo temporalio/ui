@@ -3,7 +3,6 @@
 
   import { page } from '$app/stores';
 
-  import PageTitle from '$lib/components/page-title.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -37,8 +36,6 @@
     searchParamUpdate(search);
   }
 </script>
-
-<PageTitle title={translate('nexus.nexus')} url={$page.url.href} />
 
 {#if !endpoints?.length && !searchParam}
   <NexusEmptyState />

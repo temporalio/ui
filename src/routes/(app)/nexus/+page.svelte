@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PageTitle from '$lib/components/page-title.svelte';
+  import { translate } from '$lib/i18n/translate';
   import NexusEndpoints from '$lib/pages/nexus-endpoints.svelte';
   import { page } from '$lib/svelte-mocks/app/stores';
 
@@ -12,6 +14,7 @@
   $: empty = !endpoints?.length && !search;
 </script>
 
+<PageTitle title={translate('nexus.endpoints')} url={$page.url.href} />
 <div class:empty>
   <NexusEndpoints {endpoints} />
 </div>

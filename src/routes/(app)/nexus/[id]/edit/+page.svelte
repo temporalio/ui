@@ -12,7 +12,10 @@
   } from '$lib/services/nexus-service';
   import { namespaces } from '$lib/stores/namespaces';
   import type { NetworkError } from '$lib/types/global';
-  import { routeForNexus } from '$lib/utilities/route-for';
+  import {
+    routeForNexus,
+    routeForNexusEndpoint,
+  } from '$lib/utilities/route-for';
 
   import type { LayoutData } from '../$types';
 
@@ -39,7 +42,7 @@
     body.spec.description = {};
     try {
       await updateNexusEndpoint(endpoint.id, body);
-      goto(routeForNexus());
+      goto(routeForNexusEndpoint(endpoint.id));
     } catch (e: unknown) {
       error = e as NetworkError;
       console.error('Error updating endpoint', e);
@@ -69,7 +72,10 @@
   }));
 </script>
 
-<PageTitle title={translate('nexus.nexus')} url={$page.url.href} />
+<PageTitle
+  title={`Edit ${translate('nexus.nexus-endpoint', { id: $page.params.id })}`}
+  url={$page.url.href}
+/>
 <NexusEditEndpoint
   {endpoint}
   {loading}

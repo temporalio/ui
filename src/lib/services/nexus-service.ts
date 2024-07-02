@@ -20,9 +20,9 @@ export const fetchNexusEndpoints = async (
 export const fetchNexusEndpoint = async (
   id: string,
   request = fetch,
-): Promise<NexusEndpoint> => {
+): Promise<{ endpoint: NexusEndpoint }> => {
   const route = routeForApi('nexus-endpoint', { endpointId: id });
-  const endpoint: NexusEndpoint = await requestFromAPI<NexusEndpoint>(route, {
+  const endpoint = await requestFromAPI<{ endpoint: NexusEndpoint }>(route, {
     request,
   });
   return endpoint;

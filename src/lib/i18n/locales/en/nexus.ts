@@ -2,11 +2,13 @@ export const Namespace = 'nexus' as const;
 
 export const Strings = {
   nexus: 'Nexus',
+  'nexus-endpoint': 'Nexus Endpoint | {{id}}',
   endpoint: 'Endpoint',
   endpoints: 'Nexus Endpoints',
   'all-endpoints': 'All Endpoints',
   'my-endpoints': 'My Endpoints',
   'back-to-endpoints': 'Back To Nexus Endpoints',
+  'back-to-endpoint': 'Back To Nexus Endpoint',
   'create-endpoint': 'Create Nexus Endpoint',
   'endpoint-name': 'Endpoint Name',
   'endpoint-name-placeholder': 'Nexus Endpoint must have a unique name',

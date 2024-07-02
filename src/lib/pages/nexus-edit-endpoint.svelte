@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -7,7 +10,7 @@
   import NexusForm from '$lib/pages/nexus-form.svelte';
   import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
-  import { routeForNexus } from '$lib/utilities/route-for';
+  import { routeForNexusEndpoint } from '$lib/utilities/route-for';
 
   export let endpoint: NexusEndpoint;
   export let namespaceList: { namespace: string }[] = [];
@@ -24,8 +27,8 @@
 
 <div class="flex flex-col gap-8">
   <div class="relative flex flex-col gap-4 text-sm">
-    <Link href={routeForNexus()} icon="chevron-left">
-      {translate('nexus.back-to-endpoints')}
+    <Link href={routeForNexusEndpoint($page.params.id)} icon="chevron-left">
+      {translate('nexus.back-to-endpoint')}
     </Link>
   </div>
   <div class="flex flex-col gap-1">
@@ -53,7 +56,11 @@
   />
   <div class="flex items-center gap-4">
     <Button on:click={onUpdate} {loading}>{translate('common.save')}</Button>
-    <Button variant="ghost">{translate('common.cancel')}</Button>
+    <Button
+      variant="ghost"
+      on:click={() => goto(routeForNexusEndpoint($page.params.id))}
+      >{translate('common.cancel')}</Button
+    >
   </div>
 </div>
 <Modal

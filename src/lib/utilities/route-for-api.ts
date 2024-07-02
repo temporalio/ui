@@ -138,9 +138,9 @@ export function pathForApi(
     'activity.fail': `/namespaces/${parameters.namespace}/activities/fail-by-id`,
     'batch-operations.list': `/namespaces/${parameters.namespace}/batch-operations`,
     'batch-operations': `/namespaces/${parameters.namespace}/batch-operations/${parameters?.batchJobId}`,
-    'nexus-endpoints': '/nexus/endpoints',
-    'nexus-endpoint': `/nexus/endpoints/${parameters.endpointId}`,
-    'nexus-endpoint.update': `/nexus/endpoints/${parameters.endpointId}/update`,
+    'nexus-endpoints': '/cluster/nexus/endpoints',
+    'nexus-endpoint': `/cluster/nexus/endpoints/${parameters.endpointId}`,
+    'nexus-endpoint.update': `/cluster/nexus/endpoints/${parameters.endpointId}/update`,
   };
 
   return getPath(routes[route]);

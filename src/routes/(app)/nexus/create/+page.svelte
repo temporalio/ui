@@ -35,5 +35,5 @@
   }));
 </script>
 
-<PageTitle title={translate('nexus.nexus')} url={$page.url.href} />
+<PageTitle title={translate('nexus.create-endpoint')} url={$page.url.href} />
 <NexusCreateEndpoint {onCreate} {namespaceList} {error} {loading} />

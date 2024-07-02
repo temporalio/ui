@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
-  import PageTitle from '$lib/components/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -14,7 +11,6 @@
   export let endpoint: NexusEndpoint;
 </script>
 
-<PageTitle title={translate('nexus.nexus')} url={$page.url.href} />
 <div class="flex flex-col gap-8">
   <div class="relative flex flex-col gap-4 text-sm">
     <Link href={routeForNexus()} icon="chevron-left">
