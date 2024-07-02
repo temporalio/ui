@@ -5,8 +5,10 @@
 
   import { viewDataEncoderSettings } from '$lib/components/data-encoder-settings.svelte';
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
+  import CopyButton from '$lib/holocene/copyable/button.svelte';
   import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Loading from '$lib/holocene/loading.svelte';
+  import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchAllEvents } from '$lib/services/events-service';
@@ -22,11 +24,21 @@
     workflowRun,
   } from '$lib/stores/workflow-run';
   import type { NetworkError } from '$lib/types/global';
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
+  $: showJson = $page.url.searchParams.has('json');
+  $: fullJson = { ...$workflowRun, eventHistory: $fullEventHistory };
 
   let workflowError: NetworkError;
   let eventHistoryController: AbortController;
+
+  const { copy, copied } = copyToClipboard();
+
+  const handleCopy = (e: Event) => {
+    copy(e, stringifyWithBigInt(fullJson));
+  };
 
   const getWorkflowAndEventHistory = async (
     namespace: string,
@@ -133,32 +145,47 @@
   });
 </script>
 
-<LabsModeGuard>
+{#if showJson}
   <div
-    class="absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
-      ? 'top-[540px]'
-      : 'top-0'}
-    } flex h-full flex-col gap-0"
+    class="relative h-auto whitespace-break-spaces break-words rounded bg-primary p-4"
   >
-    {#if workflowError}
-      <WorkflowError error={workflowError} />
-    {:else if !$workflowRun.workflow}
-      <Loading class="pt-24" />
-    {:else}
-      <div class="px-8 pt-24 md:pt-20">
+    <CopyButton
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      class="absolute right-1 top-1"
+      on:click={handleCopy}
+      copied={$copied}
+    />
+    {stringifyWithBigInt(fullJson, null, 2)}
+  </div>
+{:else}
+  <LabsModeGuard>
+    <div
+      class="absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
+        ? 'top-[540px]'
+        : 'top-0'}
+    } flex h-full flex-col gap-0"
+    >
+      {#if workflowError}
+        <WorkflowError error={workflowError} />
+      {:else if !$workflowRun.workflow}
+        <Loading class="pt-24" />
+      {:else}
+        <div class="px-8 pt-24 md:pt-20">
+          <WorkflowHeader namespace={$page.params.namespace} />
+        </div>
+        <slot />
+      {/if}
+    </div>
+    <div class="flex h-full flex-col gap-0" slot="fallback">
+      {#if workflowError}
+        <WorkflowError error={workflowError} />
+      {:else if !$workflowRun.workflow}
+        <Loading />
+      {:else}
         <WorkflowHeader namespace={$page.params.namespace} />
-      </div>
-      <slot />
-    {/if}
-  </div>
-  <div class="flex h-full flex-col gap-0" slot="fallback">
-    {#if workflowError}
-      <WorkflowError error={workflowError} />
-    {:else if !$workflowRun.workflow}
-      <Loading />
-    {:else}
-      <WorkflowHeader namespace={$page.params.namespace} />
-      <slot />
-    {/if}
-  </div>
-</LabsModeGuard>
+        <slot />
+      {/if}
+    </div>
+  </LabsModeGuard>
+{/if}

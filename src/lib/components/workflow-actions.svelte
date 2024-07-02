@@ -141,21 +141,23 @@
         </MenuItem>
       </Tooltip>
     {/each}
-    <MenuDivider />
-    <MenuItem
-      on:click={() =>
-        goto(
-          routeForWorkflowStart({
-            namespace,
-            workflowId: workflow.id,
-            taskQueue: workflow.taskQueue,
-            workflowType: workflow.name,
-          }),
-        )}
-      data-testid="start-workflow-button"
-    >
-      {translate('workflows.start-workflow-like-this-one')}
-    </MenuItem>
+    {#if !workflowCreateDisabled($page)}
+      <MenuDivider />
+      <MenuItem
+        on:click={() =>
+          goto(
+            routeForWorkflowStart({
+              namespace,
+              workflowId: workflow.id,
+              taskQueue: workflow.taskQueue,
+              workflowType: workflow.name,
+            }),
+          )}
+        data-testid="start-workflow-button"
+      >
+        {translate('workflows.start-workflow-like-this-one')}
+      </MenuItem>
+    {/if}
   </SplitButton>
 {:else if !workflowCreateDisabled($page)}
   <SplitButton

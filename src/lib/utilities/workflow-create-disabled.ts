@@ -12,5 +12,7 @@ export const workflowCreateDisabled = (
   const namespaceWriteDisabled = get(coreUser).namespaceWriteDisabled(
     namespace ?? page.params.namespace,
   );
-  return page.data.settings.startWorkflowDisabled || namespaceWriteDisabled;
+  if (page.data.settings.startWorkflowDisabled) return true;
+
+  return namespaceWriteDisabled;
 };
