@@ -305,6 +305,7 @@
       variant="ghost"
       size="xs"
       on:click={toggleList}
+      {disabled}
     >
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
     </Button>
