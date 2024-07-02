@@ -2,8 +2,8 @@ import type { Page } from '@playwright/test';
 
 import type { WorkflowExecutionAPIResponse } from '$src/lib/types/workflows';
 
-export const WORKFLOW_API = '**/api/v1/namespaces/*/workflows/*?';
-export const WORKFLOW_RESET_API = '**/api/v1/namespaces/*/workflows/*/reset*';
+export const WORKFLOW_API = '**/namespaces/*/workflows/*?';
+export const WORKFLOW_RESET_API = '**/namespaces/*/workflows/*/reset*';
 
 export const mockWorkflow = {
   executionConfig: {
