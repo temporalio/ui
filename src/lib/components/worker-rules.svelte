@@ -46,7 +46,9 @@
       >
       <td class="text-right" data-testid="target-ramp">{ramp.toFixed(0)}%</td>
       <td class="text-right" data-testid="target-status"
-        >{inactive ? 'Inactive' : 'Active'}</td
+        >{inactive
+          ? translate('common.inactive')
+          : translate('common.active')}</td
       >
       <td
         class="justfiy-between flex w-full items-center text-right"

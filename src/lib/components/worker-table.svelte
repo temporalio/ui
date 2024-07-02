@@ -12,8 +12,6 @@
   import PollerIcon from './poller-icon.svelte';
 
   export let workers: GetPollersResponse;
-
-  console.log('Workers', workers);
 </script>
 
 <h2 class="flex items-center gap-2 text-base font-medium" data-testid="workers">
