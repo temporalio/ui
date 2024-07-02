@@ -5,13 +5,13 @@
   export type BadgeType = VariantProps<typeof types>['type'];
 
   const type = {
-    primary: 'bg-blue-200',
+    primary: 'bg-blue-300',
     secondary: 'bg-purple-200',
     default: 'bg-slate-100',
     warning: 'bg-yellow-200',
     success: 'bg-green-200',
     danger: 'bg-red-200',
-    count: 'h-6 w-6 min-w-max rounded-full bg-blue-200',
+    count: 'h-6 w-6 min-w-max rounded-full bg-blue-300',
   };
 
   const types = cva(
