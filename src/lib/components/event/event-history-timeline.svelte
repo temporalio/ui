@@ -466,8 +466,8 @@
       .vis-item.vis-range.Initiated,
       .vis-item.vis-range.Scheduled
     ) {
-    background-color: theme(colors.blue.200);
-    border-color: theme(colors.blue.200);
+    background-color: theme(colors.blue.300);
+    border-color: theme(colors.blue.300);
     border-radius: 9999px;
     border-width: 2px;
     color: theme(colors.space-black);
@@ -480,7 +480,7 @@
       .vis-item.vis-point.Initiated,
       .vis-item.vis-point.Scheduled
     ) {
-    color: theme(colors.blue.200);
+    color: theme(colors.blue.300);
   }
 
   :global(.vis-item.vis-range.workflow.Running) {
