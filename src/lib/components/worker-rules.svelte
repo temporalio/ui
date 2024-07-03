@@ -13,10 +13,17 @@
 
   export let rules: TaskQueueRules;
 
+  let showAll = false;
+
   $: ({ assignmentRules = [], compatibleRedirectRules = [] } = rules);
 
   $: catchAllRule = assignmentRules.find((rule) => getPercentage(rule) === 100);
   $: catchAllIndex = assignmentRules.indexOf(catchAllRule);
+
+  $: activeRules = assignmentRules.filter((_, i) => i <= catchAllIndex);
+  $: inactiveRules = assignmentRules.filter((_, i) => i > catchAllIndex);
+
+  $: visibleRules = showAll ? [...activeRules, ...inactiveRules] : activeRules;
 
   const getPercentage = (rule: AssignmentRule): number => {
     if (!rule.rule?.percentageRamp) return 100;
@@ -33,22 +40,16 @@
     <th class="w-20">Index</th>
     <th class="grow">Target Build ID</th>
     <th class="w-20">Ramp</th>
-    <th class="w-20">Status</th>
     <th class="text-right">Create Time</th>
   </TableHeaderRow>
-  {#each assignmentRules as rule, index (index)}
-    {@const ramp = getPercentage(rule)}
-    {@const inactive = ramp === 0 || index > catchAllIndex}
+  {#each visibleRules as rule, index (index)}
     <TableRow data-testid="version-row">
       <td class="text-left" data-testid="index">{index}</td>
       <td class="break-all text-left" data-testid="target-build-id"
         >{rule.rule?.targetBuildId}</td
       >
-      <td class="text-right" data-testid="target-ramp">{ramp.toFixed(0)}%</td>
-      <td class="text-right" data-testid="target-status"
-        >{inactive
-          ? translate('common.inactive')
-          : translate('common.active')}</td
+      <td class="text-right" data-testid="target-ramp"
+        >{getPercentage(rule).toFixed(0)}%</td
       >
       <td
         class="justfiy-between flex w-full items-center text-right"
@@ -64,6 +65,20 @@
       </td>
     </tr>
   {/each}
+  {#if !showAll && inactiveRules?.length}
+    <TableRow
+      data-testid="view-all"
+      class="surface-subtle cursor-pointer"
+      on:click={() => (showAll = !showAll)}
+    >
+      <td></td>
+      <td class="break-all text-left text-blue-700 underline"
+        >{translate('workers.show-inactive-assignment-rules')}</td
+      >
+      <td />
+      <td />
+    </TableRow>
+  {/if}
 </Table>
 
 <h2 class="text-base font-medium" data-testid="worker-rules">
