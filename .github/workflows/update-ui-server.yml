@@ -4,11 +4,7 @@ on:
   push:
     branches:
       - main
-    secrets:
-      TEMPORAL_CICD_APP_ID:
-        required: true
-      TEMPORAL_CICD_PRIVATE_KEY:
-        required: true
+      - GithubAppToken
 
 jobs:
   sync:
@@ -39,8 +35,6 @@ jobs:
           app_id: ${{ secrets.TEMPORAL_CICD_APP_ID }}
           private_key: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
           permissions:
-            contents: read
-            pull_requests: write
 
       - name: Checkout UI Server
         uses: actions/checkout@v4
@@ -53,13 +47,13 @@ jobs:
       - name: Build UI
         run: pnpm build:server
 
-      - name: Sync UI Server
-        run: |
-          rm -rf ui-server/*
-          rm -rf server/proto/dependencies/api
-          cp -r server/* ui-server
-          cd ui-server
-          git config --local user.name 'Temporal Data (cicd)'
-          git config --local user.email 'commander-data@temporal.io'
-          git add .
-          git commit -m "Update UI Server" && git push || echo "No changes to commit"
+      # - name: Sync UI Server
+      #   run: |
+      #     rm -rf ui-server/*
+      #     rm -rf server/proto/dependencies/api
+      #     cp -r server/* ui-server
+      #     cd ui-server
+      #     git config --local user.name 'Temporal Data (cicd)'
+      #     git config --local user.email 'commander-data@temporal.io'
+      #     git add .
+      #     git commit -m "Update UI Server" && git push || echo "No changes to commit"
