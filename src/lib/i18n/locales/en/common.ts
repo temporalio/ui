@@ -164,4 +164,6 @@ export const Strings = {
   night: 'Night',
   docs: 'Docs',
   'upload-error': 'Error uploading file',
+  active: 'Active',
+  inactive: 'Inactive',
 } as const;

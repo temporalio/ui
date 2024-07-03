@@ -4,7 +4,10 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { type TaskQueueRules } from '$lib/services/pollers-service';
+  import {
+    type AssignmentRule,
+    type TaskQueueRules,
+  } from '$lib/services/pollers-service';
   import { timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
 
@@ -14,17 +17,19 @@
 
   $: ({ assignmentRules = [], compatibleRedirectRules = [] } = rules);
 
-  $: catchAllRule = assignmentRules.find(
-    (rule) =>
-      !rule.rule?.percentageRamp?.rampPercentage ||
-      rule.rule?.percentageRamp?.rampPercentage.toFixed(0) === '1',
-  );
+  $: catchAllRule = assignmentRules.find((rule) => getPercentage(rule) === 100);
   $: catchAllIndex = assignmentRules.indexOf(catchAllRule);
 
-  $: activeRules = assignmentRules.filter((r, i) => i <= catchAllIndex);
-  $: inactiveRules = assignmentRules.filter((r, i) => i > catchAllIndex);
+  $: activeRules = assignmentRules.filter((_, i) => i <= catchAllIndex);
+  $: inactiveRules = assignmentRules.filter((_, i) => i > catchAllIndex);
 
   $: visibleRules = showAll ? [...activeRules, ...inactiveRules] : activeRules;
+
+  const getPercentage = (rule: AssignmentRule): number => {
+    if (!rule.rule?.percentageRamp) return 100;
+    if (!rule.rule?.percentageRamp?.rampPercentage) return 0;
+    return rule.rule.percentageRamp.rampPercentage;
+  };
 </script>
 
 <h2 class="text-base font-medium" data-testid="worker-rules">
@@ -40,17 +45,15 @@
   {#each visibleRules as rule, index (index)}
     <TableRow data-testid="version-row">
       <td class="text-left" data-testid="index">{index}</td>
-      <td class="break-all text-left" data-testid="target-source"
+      <td class="break-all text-left" data-testid="target-build-id"
         >{rule.rule?.targetBuildId}</td
       >
-      <td class="text-right" data-testid="target-source"
-        >{((rule.rule?.percentageRamp?.rampPercentage || 1) * 100).toFixed(
-          0,
-        )}%</td
+      <td class="text-right" data-testid="target-ramp"
+        >{getPercentage(rule).toFixed(0)}%</td
       >
       <td
         class="justfiy-between flex w-full items-center text-right"
-        data-testid="target-source"
+        data-testid="target-create-time"
       >
         <p>{formatDate(rule.createTime, $timeFormat)}</p>
       </td>
@@ -65,12 +68,12 @@
   {#if !showAll && inactiveRules?.length}
     <TableRow
       data-testid="view-all"
-      class="cursor-pointer bg-slate-100"
+      class="surface-subtle cursor-pointer"
       on:click={() => (showAll = !showAll)}
     >
       <td></td>
       <td class="break-all text-left text-blue-700 underline"
-        >{translate('workers.view-all-assignment-rules')}</td
+        >{translate('workers.show-inactive-assignment-rules')}</td
       >
       <td />
       <td />
