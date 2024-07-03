@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - GithubAppToken
 
 jobs:
   sync:
@@ -46,13 +45,13 @@ jobs:
       - name: Build UI
         run: pnpm build:server
 
-      # - name: Sync UI Server
-      #   run: |
-      #     rm -rf ui-server/*
-      #     rm -rf server/proto/dependencies/api
-      #     cp -r server/* ui-server
-      #     cd ui-server
-      #     git config --local user.name 'Temporal Data (cicd)'
-      #     git config --local user.email 'commander-data@temporal.io'
-      #     git add .
-      #     git commit -m "Update UI Server" && git push || echo "No changes to commit"
+      - name: Sync UI Server
+        run: |
+          rm -rf ui-server/*
+          rm -rf server/proto/dependencies/api
+          cp -r server/* ui-server
+          cd ui-server
+          git config --local user.name 'Temporal Data (cicd)'
+          git config --local user.email 'commander-data@temporal.io'
+          git add .
+          git commit -m "Update UI Server" && git push || echo "No changes to commit"
