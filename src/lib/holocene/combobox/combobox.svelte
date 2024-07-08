@@ -259,13 +259,7 @@
 </script>
 
 <MenuContainer {open} on:close={handleMenuClose}>
-  <Label
-    class="combobox-label"
-    hidden={labelHidden}
-    {required}
-    {label}
-    for={id}
-  />
+  <Label hidden={labelHidden} {required} {label} for={id} />
   <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
     {#if leadingIcon}
       <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
@@ -348,14 +342,6 @@
 </MenuContainer>
 
 <style lang="postcss">
-  .combobox-label {
-    @apply font-secondary text-sm font-medium text-primary;
-
-    &.required {
-      @apply after:content-['*'];
-    }
-  }
-
   .combobox-wrapper {
     @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border-2 border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
