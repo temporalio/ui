@@ -181,7 +181,7 @@ describe('API Request Encoding', () => {
       workflowId: 'workflow#with#hashes',
     });
     expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow%2523with%2523hashes',
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow%23with%23hashes',
     );
   });
 
@@ -194,7 +194,7 @@ describe('API Request Encoding', () => {
         'temporal.canary.cron-workflow.sanity-2022-05-02T16:03:11-06:00/workflow.advanced-visibility.scan',
     });
     expect(route).toBe(
-      'http://localhost:8233/api/v1/namespaces/canary/workflows/temporal.canary.cron-workflow.sanity-2022-05-02T16%253A03%253A11-06%253A00%252Fworkflow.advanced-visibility.scan',
+      'http://localhost:8233/api/v1/namespaces/canary/workflows/temporal.canary.cron-workflow.sanity-2022-05-02T16%3A03%3A11-06%3A00%2Fworkflow.advanced-visibility.scan',
     );
   });
 });

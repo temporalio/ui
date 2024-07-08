@@ -39,7 +39,7 @@ const settings: Settings = {
     isLocal: true,
     envOverride: true,
   },
-  version: '2.0.0',
+  version: '2.28.0',
 };
 
 const data: App.PageData = {
