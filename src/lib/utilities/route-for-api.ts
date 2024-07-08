@@ -33,6 +33,7 @@ import type {
 } from '$lib/types/api';
 
 import { getApiOrigin } from './get-api-origin';
+import { minimumVersionRequired } from './version-check';
 
 const replaceNamespaceInApiUrl = (
   apiUrl: string,
@@ -79,9 +80,15 @@ const withBase = (path: string, namespace?: string): string => {
 const encode = (
   parameters: Partial<APIRouteParameters>,
 ): APIRouteParameters => {
+  const version = get(page)?.data?.settings?.version;
   return Object.keys(parameters ?? {}).reduce(
     (acc, key) => {
-      acc[key] = encodeURIComponent(parameters[key]);
+      if (version && minimumVersionRequired('2.23.0', version)) {
+        console.log('SINGLE ENCODING');
+        acc[key] = encodeURIComponent(parameters[key]);
+      } else {
+        acc[key] = encodeURIComponent(encodeURIComponent(parameters[key]));
+      }
       return acc;
     },
     {
