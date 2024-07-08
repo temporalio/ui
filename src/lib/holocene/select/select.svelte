@@ -110,7 +110,11 @@
       controls="{id}-select"
       {variant}
     >
-      <Icon slot="leading" name={leadingIcon} />
+      <slot name="leading" slot="leading">
+        {#if leadingIcon}
+          <Icon name={leadingIcon} />
+        {/if}
+      </slot>
       <input
         {id}
         value={!value && placeholder !== '' ? placeholder : $labelCtx}
