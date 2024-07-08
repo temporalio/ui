@@ -167,4 +167,6 @@ export const Strings = {
   docs: 'Docs',
   'upload-error': 'Error uploading file',
   description: 'Description',
+  active: 'Active',
+  inactive: 'Inactive',
 } as const;

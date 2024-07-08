@@ -15,7 +15,7 @@ export const Strings = {
   'no-version-sets-found': 'No Version Sets found',
   'no-assignment-rules-found': 'No Assignment Rules found',
   'no-redirect-rules-found': 'No Redirect Rules found',
-  'view-all-assignment-rules': 'View all Assignment Rules',
+  'show-inactive-assignment-rules': 'Show Inactive Assignment Rules',
   'last-used-version': 'Last used version',
   'next-version': 'Next version',
   'ready-to-be-retired': 'Ready to be Retired',
