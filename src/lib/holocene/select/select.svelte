@@ -45,6 +45,7 @@
     onChange?: (value: T) => void;
     'data-testid'?: string;
     variant?: MenuButtonVariant;
+    required?: boolean;
   };
 
   export let label: string;
@@ -56,6 +57,7 @@
   export let leadingIcon: IconName = null;
   export let onChange: (value: T) => void = noop;
   export let variant: MenuButtonVariant = 'secondary';
+  export let required = false;
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
   const valueCtx = writable<T>(value);
@@ -100,7 +102,7 @@
 </script>
 
 <MenuContainer class="w-full" {open}>
-  <Label {label} hidden={labelHidden} for={id} />
+  <Label {label} hidden={labelHidden} for={id} {required} />
   {#key $labelCtx}
     <MenuButton
       hasIndicator={!disabled}
@@ -115,6 +117,8 @@
         tabindex="-1"
         disabled
         class:disabled
+        {required}
+        aria-required={required}
         {...$$restProps}
       />
       {#if disabled}
