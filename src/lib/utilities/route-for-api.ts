@@ -84,7 +84,6 @@ const encode = (
   return Object.keys(parameters ?? {}).reduce(
     (acc, key) => {
       if (version && minimumVersionRequired('2.23.0', version)) {
-        console.log('SINGLE ENCODING');
         acc[key] = encodeURIComponent(parameters[key]);
       } else {
         acc[key] = encodeURIComponent(encodeURIComponent(parameters[key]));
