@@ -2,6 +2,7 @@
   import { afterNavigate, goto } from '$app/navigation';
   import { page, updated } from '$app/stores';
 
+  import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
@@ -114,7 +115,7 @@
     pop={toaster.pop}
     toasts={toaster.toasts}
   />
-  <div class="sticky top-0 z-30 h-screen w-auto">
+  <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
     <SideNavigation {activeNamespace} {linkList} {isCloud} />
   </div>
   <MainContentContainer>
@@ -132,5 +133,12 @@
         <slot />
       </ErrorBoundary>
     </div>
+    <BottomNavigation
+      slot="footer"
+      {linkList}
+      {logout}
+      {namespaceList}
+      {isCloud}
+    />
   </MainContentContainer>
 </div>

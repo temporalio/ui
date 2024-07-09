@@ -7,7 +7,7 @@
 
 <div class:invisible={hidden}>
   <Button
-    size="sm"
+    size="xs"
     variant="primary"
     on:click={onScrollToTopClick}
     leadingIcon="arrow-up"

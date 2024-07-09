@@ -54,7 +54,7 @@
 <svelte:window bind:innerWidth={screenWidth} />
 
 <nav
-  class="surface-primary sticky top-0 z-40 flex w-full flex-col items-center justify-end border-b border-subtle p-1 px-4 md:flex-row md:px-8"
+  class="surface-primary sticky top-0 z-40 flex hidden w-full flex-col items-center justify-end border-b border-subtle p-1 px-4 md:flex md:flex-row md:px-8"
   data-testid="top-nav"
   class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
   aria-label={translate('common.main')}

@@ -200,8 +200,11 @@
 />
 
 <header class="flex flex-col gap-2">
-  <div class="flex items-center justify-between">
-    <h1 class="flex items-center gap-2 text-2xl" data-cy="workflows-title">
+  <div class="flex flex-col justify-between gap-2 md:flex-row">
+    <h1
+      class="flex items-center gap-2 text-xl md:text-2xl"
+      data-cy="workflows-title"
+    >
       {#if $supportsAdvancedVisibility}
         <span data-testid="workflow-count"
           >{$workflowCount.count.toLocaleString()}</span

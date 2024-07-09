@@ -1,12 +1,13 @@
 export const Namespace = 'data-encoder' as const;
 
 export const Strings = {
+  'codec-server': 'Codec Server',
   'endpoint-title': 'Codec Server browser endpoint',
   'endpoint-description':
     'Enter a Codec Server endpoint for this browser. This will be stored in your browser and will only be accessible by you.',
   'endpoint-placeholder': 'Paste your endpoint here',
-  'pass-access-token-label': 'Pass the user access token with your endpoint.',
-  'include-cross-origin-credentials-label': 'Include cross-origin credentials.',
+  'pass-access-token-label': 'Pass the user access token',
+  'include-cross-origin-credentials-label': 'Include cross-origin credentials',
   'include-cross-origin-credentials-warning':
     'Warning: Pre-flight checks will be done and could result in failure to decode if incorrectly configured.',
   'port-title': 'tctl plugin port ',
