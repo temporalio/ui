@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import Modal from '$lib/holocene/modal.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import { translate } from '$lib/i18n/translate';
   import { downloadEventHistorySetting } from '$lib/stores/events';
-  import { page } from '$lib/svelte-mocks/app/stores';
   import { exportHistory } from '$lib/utilities/export-history';
 
   export let open = false;
