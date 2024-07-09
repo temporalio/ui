@@ -1,6 +1,8 @@
 module github.com/temporalio/ui-server/v2
 
-go 1.20
+go 1.21
+
+toolchain go1.22.2
 
 require (
 	github.com/coreos/go-oidc/v3 v3.1.0
@@ -9,10 +11,10 @@ require (
 	github.com/labstack/echo/v4 v4.9.1
 	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli/v2 v2.3.0
-	go.temporal.io/api v1.35.0
+	go.temporal.io/api v1.35.1-0.20240703163315-0370a9f602df
 	golang.org/x/net v0.26.0
 	golang.org/x/oauth2 v0.20.0
-	google.golang.org/grpc v1.64.0
+	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
 	gopkg.in/validator.v2 v2.0.0-20210331031555-b37d688a7fb0
 	gopkg.in/yaml.v3 v3.0.1
@@ -33,8 +35,8 @@ require (
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240624140628-dc46fd24d27d // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240624140628-dc46fd24d27d // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240701130421-f6361c86f094 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240701130421-f6361c86f094 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )
 
