@@ -9,6 +9,7 @@
           taskQueue: '',
         },
       },
+      allowedCallerNamespaces: [],
     },
   };
   export const endpointForm = writable<Partial<NexusEndpoint>>(emptyEndpoint);
@@ -39,12 +40,14 @@
   let description = endpoint?.spec?.descriptionString || '';
   let target = endpoint?.spec?.target?.worker?.namespace || '';
   let taskQueue = endpoint?.spec?.target?.worker?.taskQueue || '';
+  let allowedCallerNamespaces = endpoint?.spec?.allowedCallerNamespaces || [];
 
   const setFormStore = (
     name: string,
     description: string,
     target: string,
     taskQueue: string,
+    allowedCallerNamespaces: string[],
   ) => {
     $endpointForm = {
       spec: {
@@ -56,11 +59,18 @@
             taskQueue,
           },
         },
+        allowedCallerNamespaces,
       },
     };
   };
 
-  $: setFormStore(name, description, target, taskQueue);
+  $: setFormStore(
+    name,
+    description,
+    target,
+    taskQueue,
+    allowedCallerNamespaces,
+  );
 
   $: callerNamespaces = namespaceList.map((n) => ({
     value: n.namespace,
@@ -74,8 +84,7 @@
   const onCallerNamespaceChange = (
     selected: { value: string; label: string }[],
   ) => {
-    const namespaces = selected.map((n) => n.value);
-    $endpointForm.spec.allowedCallerNamespaces = namespaces;
+    allowedCallerNamespaces = selected.map((n) => n.value);
   };
 
   onDestroy(() => {
@@ -138,9 +147,9 @@
       id="caller-namespace-filter-menu"
       options={callerNamespaces}
       initialSelected={initialCallerNamespaces}
-      label={$endpointForm.spec.allowedCallerNamespaces.length
+      label={allowedCallerNamespaces.length
         ? translate('nexus.selected-namespaces', {
-            count: $endpointForm.spec.allowedCallerNamespaces.length,
+            count: allowedCallerNamespaces.length,
           })
         : translate('nexus.select-namespaces')}
       selectAllLabel={translate('common.select-all')}

@@ -20,6 +20,7 @@
       const body = { ...$endpointForm };
       // TODO: Set this as a legit payload with data = body.spec.description;
       body.spec.description = {};
+      delete body.spec.allowedCallerNamespaces;
       await createNexusEndpoint(body);
       goto(routeForNexus());
     } catch (e) {

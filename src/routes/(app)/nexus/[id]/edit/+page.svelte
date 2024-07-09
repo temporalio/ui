@@ -32,6 +32,7 @@
     const body = { ...$endpointForm };
     body.id = endpoint.id;
     body.version = endpoint.version;
+    delete body.spec.allowedCallerNamespaces;
 
     // TODO: Set this as a legit payload with data = body.spec.description;
     body.spec.description = {};
