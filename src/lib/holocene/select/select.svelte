@@ -101,7 +101,7 @@
   });
 </script>
 
-<MenuContainer class="w-full" {open}>
+<MenuContainer {open}>
   <Label {label} hidden={labelHidden} for={id} {required} />
   {#key $labelCtx}
     <MenuButton
