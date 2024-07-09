@@ -115,7 +115,7 @@ export function pathForApi(
 
   const routes: { [K in APIRoutePath]: string } = {
     systemInfo: '/system-info',
-    cluster: '/cluster-info',
+    cluster: '/cluster',
     namespaces: '/cluster/namespaces',
     namespace: `/cluster/namespaces/${parameters?.namespace}`,
     'search-attributes': `/cluster/namespaces/${parameters.namespace}/search-attributes`,

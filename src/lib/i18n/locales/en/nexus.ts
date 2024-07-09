@@ -38,4 +38,6 @@ export const Strings = {
   'allowed-caller-namespaces-description':
     'Specify the Namespace(s) that are allowed to call the target Namespace to use this endpoint.',
   'select-namespaces': 'Select Namespace(s)',
+  'selected-namespaces_one': '{{count}} Namespace selected',
+  'selected-namespaces_other': '{{count}} Namespaces selected',
 } as const;

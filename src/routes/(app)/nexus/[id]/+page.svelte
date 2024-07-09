@@ -10,10 +10,6 @@
   export let data: LayoutData;
 
   $: ({ endpoint } = data);
-
-  $: {
-    console.log('ENDPOINT', endpoint);
-  }
 </script>
 
 <PageTitle

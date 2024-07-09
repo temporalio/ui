@@ -23,11 +23,6 @@
 
   $: ({ endpoint } = data);
 
-  let deleteConfirmationModalOpen = false;
-  let confirmDeleteInput = '';
-
-  console.log(deleteConfirmationModalOpen, confirmDeleteInput);
-
   let error: NetworkError | undefined = undefined;
   let loading = false;
 
@@ -56,8 +51,6 @@
     loading = true;
     try {
       await deleteNexusEndpoint(endpoint.id, endpoint.version);
-      deleteConfirmationModalOpen = false;
-      confirmDeleteInput = '';
       goto(routeForNexus());
     } catch (e) {
       error = e as NetworkError;

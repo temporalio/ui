@@ -60,7 +60,7 @@ func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, a
 		return fmt.Errorf("Failed to create gRPC connection to Temporal server: %w", err)
 	}
 
-	e.GET("/cluster-info", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
+	e.GET("/cluster", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
 	e.GET("/system-info", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
 
 	cluster := e.Group("/cluster")

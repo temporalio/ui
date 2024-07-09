@@ -69,7 +69,7 @@
             <div
               class="transition:colors flex cursor-pointer flex-col gap-1 rounded-lg p-4 duration-200 ease-in-out"
             >
-              <h3 class="text-lg font-medium">
+              <h3 class="break-all text-lg font-medium">
                 {endpoint.spec.name}
               </h3>
               <p class="text-xs text-secondary">

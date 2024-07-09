@@ -1,13 +1,10 @@
-<script context="module">
-  export const nexusVersion = '1.25.0';
-</script>
-
 <script lang="ts">
-  import { temporalVersion } from '$lib/stores/versions';
-  import { minimumVersionRequired } from '$lib/utilities/version-check';
+  import { page } from '$app/stores';
+
+  $: nexusEnabled = $page.data?.systemInfo?.capabilities?.nexus;
 </script>
 
-{#if minimumVersionRequired(nexusVersion, $temporalVersion)}
+{#if nexusEnabled}
   <slot />
 {:else}
   <slot name="fallback" />

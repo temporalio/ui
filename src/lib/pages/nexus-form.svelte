@@ -32,7 +32,6 @@
   export let endpoint: NexusEndpoint | undefined = undefined;
   export let namespaceList: { namespace: string }[] = [];
   export let error: NetworkError | undefined = undefined;
-  export let hintText = '';
   export let nameDisabled = false;
   export let isCloud = true;
 
@@ -63,14 +62,15 @@
 
   $: setFormStore(name, description, target, taskQueue);
 
-  $: workerNamespace = $endpointForm?.spec?.target?.worker?.namespace;
-  $: callerNamespaces = namespaceList
-    .filter((n) => n.namespace !== workerNamespace)
-    .map((n) => ({ value: n.namespace, label: n.namespace }));
+  $: callerNamespaces = namespaceList.map((n) => ({
+    value: n.namespace,
+    label: n.namespace,
+  }));
+  $: initialCallerNamespaces =
+    endpoint?.spec?.allowedCallerNamespaces?.map((n) => {
+      return { value: n, label: n };
+    }) || [];
 
-  $: {
-    console.log('Caller Namespaces: ', callerNamespaces);
-  }
   const onCallerNamespaceChange = (
     selected: { value: string; label: string }[],
   ) => {
@@ -81,6 +81,9 @@
   onDestroy(() => {
     $endpointForm = emptyEndpoint;
   });
+
+  const pattern = /^[A-Za-z_][A-Za-z0-9_]*$/;
+  $: validName = (name) => pattern.test(name);
 </script>
 
 <div class="flex w-full flex-col gap-4 xl:w-1/2">
@@ -88,8 +91,8 @@
     bind:value={name}
     required
     disabled={nameDisabled}
-    error={!name}
-    {hintText}
+    error={!name || !validName(name)}
+    hintText={translate('nexus.endpoint-name-hint')}
     label={translate('nexus.endpoint-name')}
     id="name"
     maxLength={255}
@@ -134,12 +137,15 @@
     <MultiSelect
       id="caller-namespace-filter-menu"
       options={callerNamespaces}
-      initialSelected={[]}
-      label={translate('nexus.select-namespaces')}
+      initialSelected={initialCallerNamespaces}
+      label={$endpointForm.spec.allowedCallerNamespaces.length
+        ? translate('nexus.selected-namespaces', {
+            count: $endpointForm.spec.allowedCallerNamespaces.length,
+          })
+        : translate('nexus.select-namespaces')}
       selectAllLabel={translate('common.select-all')}
       clearAllLabel={translate('common.clear-all-capitalized')}
       initialSelectedAll={false}
-      disabled={!$endpointForm.spec.target.worker.namespace}
       onChange={onCallerNamespaceChange}
     />
   </IsOssGuard>
