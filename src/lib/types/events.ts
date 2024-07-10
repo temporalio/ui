@@ -220,8 +220,6 @@ export type WorkflowExecutionUpdateAcceptedEvent =
   EventWithAttributes<'workflowExecutionUpdateAcceptedEventAttributes'>;
 export type WorkflowExecutionUpdateCompletedEvent =
   EventWithAttributes<'workflowExecutionUpdateCompletedEventAttributes'>;
-export type WorkflowExecutionUpdateRequestedEvent =
-  EventWithAttributes<'workflowExecutionUpdateRequestedEventAttributes'>;
 export type NexusOperationScheduledEvent =
   EventWithAttributes<'nexusOperationScheduledEventAttributes'>;
 export type NexusOperationStartedEvent =

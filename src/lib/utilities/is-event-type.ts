@@ -50,7 +50,6 @@ import type {
   WorkflowExecutionTimedOutEvent,
   WorkflowExecutionUpdateAcceptedEvent,
   WorkflowExecutionUpdateCompletedEvent,
-  WorkflowExecutionUpdateRequestedEvent,
   WorkflowTaskCompletedEvent,
   WorkflowTaskFailedEvent,
   WorkflowTaskScheduledEvent,
@@ -165,7 +164,6 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'workflowExecutionUpdateAcceptedEventAttributes',
   'workflowExecutionUpdateCompletedEventAttributes',
   'workflowExecutionUpdateRejectedEventAttributes',
-  'workflowExecutionUpdateRequestedEventAttributes',
   'workflowExecutionCancelRequestedEventAttributes',
   'workflowExecutionCanceledEventAttributes',
   'requestCancelExternalWorkflowExecutionInitiatedEventAttributes',
@@ -463,11 +461,6 @@ export const isFailedWorkflowExecutionUpdateCompletedEvent = (
   isWorkflowExecutionUpdateCompletedEvent(event) &&
   Boolean(
     event.workflowExecutionUpdateCompletedEventAttributes.outcome?.failure,
-  );
-
-export const isWorkflowExecutionUpdateRequestedEvent =
-  hasAttributes<WorkflowExecutionUpdateRequestedEvent>(
-    'workflowExecutionUpdateRequestedEventAttributes',
   );
 
 export const isNexusOperationScheduledEvent =
