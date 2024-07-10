@@ -145,5 +145,6 @@ export type NavLinkListItem = {
   external?: boolean;
   divider?: boolean;
   enabled?: boolean;
+  hidden?: boolean;
   animate?: boolean;
 };

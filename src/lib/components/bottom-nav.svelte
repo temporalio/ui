@@ -159,11 +159,11 @@
         class:hidden={!showProfilePic}
       />
       <div
-        class="flex aspect-square h-full w-[32px] items-center justify-center rounded-md bg-blue-200 p-0.5"
+        class="flex aspect-square h-full w-[32px] items-center justify-center rounded-md bg-blue-200"
         class:hidden={showProfilePic}
       >
         {#if $authUser?.name}
-          <div class="text-center text-sm text-black">
+          <div class="w-full text-center text-sm text-black">
             {$authUser?.name.trim().charAt(0)}
           </div>
         {/if}

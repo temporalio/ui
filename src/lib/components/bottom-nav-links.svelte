@@ -8,7 +8,7 @@
 
 {#if open}
   <div class="flex h-full flex-col justify-start gap-4">
-    {#each linkList.reverse() as item}
+    {#each [...linkList].reverse() as item}
       {#if item.divider}
         <hr class="border-subtle" />
       {/if}
