@@ -40,6 +40,9 @@
 {#if open}
   <div class="flex h-full flex-col justify-start gap-4">
     <TimezoneSelect position="left" />
+    {#if $dataEncoder.hasError}
+      <p class="text-red-400">{translate('data-encoder.codec-server-error')}</p>
+    {/if}
     <NavigationButton
       onClick={onCodecServerClick}
       tooltip={translate('data-encoder.codec-server')}

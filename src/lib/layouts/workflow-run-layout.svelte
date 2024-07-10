@@ -15,6 +15,7 @@
   import { getPollers } from '$lib/services/pollers-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
+  import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
   import { fullEventHistory, timelineEvents } from '$lib/stores/events';
   import { labsMode } from '$lib/stores/labs-mode';
@@ -116,6 +117,7 @@
     $workflowRun = initialWorkflowRun;
     workflowError = undefined;
     abortPolling();
+    resetLastDataEncoderSuccess();
   };
 
   const clearHistoryData = () => {

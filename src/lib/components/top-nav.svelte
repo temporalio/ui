@@ -23,7 +23,7 @@
 
   let screenWidth: number;
 
-  $: namespace = $page.params.namespace;
+  $: namespace = $page.params.namespace || $lastUsedNamespace;
   $: pathNameSplit = $page.url.pathname.split('/');
   $: showNamespaceSpecificNav =
     namespace &&
@@ -56,33 +56,29 @@
 <nav
   class="surface-primary sticky top-0 z-40 flex hidden w-full flex-col items-center justify-end border-b border-subtle p-1 px-4 md:flex md:flex-row md:px-8"
   data-testid="top-nav"
-  class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
+  class:bg-red-400={$dataEncoder.hasError && showNamespaceSpecificNav}
   aria-label={translate('common.main')}
 >
   <div class="flex grow items-center">
-    {#if showNamespaceSpecificNav}
-      <Combobox
-        label={translate('namespaces.namespace-label', { namespace })}
-        toggleLabel={translate('common.namespaces')}
-        noResultsText={translate('common.no-results')}
-        labelHidden
-        value={namespace}
-        id="namespace-switcher"
-        leadingIcon="namespace-switcher"
-        options={namespaceList}
-        optionValueKey="namespace"
-        on:change={handleNamespaceSelect}
-        minSize={32}
-        href={routeForNamespace({ namespace })}
-        linkDisabled={!namespaceExists}
-      />
-    {/if}
+    <Combobox
+      label={translate('namespaces.namespace-label', { namespace })}
+      toggleLabel={translate('common.namespaces')}
+      noResultsText={translate('common.no-results')}
+      labelHidden
+      value={namespace}
+      id="namespace-switcher"
+      leadingIcon="namespace-switcher"
+      options={namespaceList}
+      optionValueKey="namespace"
+      on:change={handleNamespaceSelect}
+      minSize={32}
+      href={routeForNamespace({ namespace })}
+      linkDisabled={!namespaceExists}
+    />
   </div>
   <div class="flex items-center gap-2">
     <TimezoneSelect position={screenWidth < 768 ? 'left' : 'right'} />
-    {#if showNamespaceSpecificNav}
-      <DataEncoderStatus />
-    {/if}
+    <DataEncoderStatus />
     {#if $authUser.accessToken}
       <MenuContainer>
         <MenuButton variant="ghost" hasIndicator controls="user-menu">

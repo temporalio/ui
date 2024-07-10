@@ -103,7 +103,7 @@
       : 'surface-primary border-t border-subtle',
   )}
   data-testid="top-nav"
-  class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
+  class:bg-red-400={$dataEncoder.hasError && showNamespaceSpecificNav}
   aria-label={translate('common.main')}
 >
   <button
