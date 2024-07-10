@@ -146,12 +146,12 @@
       <img
         src={$authUser.picture}
         alt={$authUser?.profile ?? translate('common.user-profile')}
-        class="h-[36px] w-[36px] cursor-pointer rounded-md"
+        class="w-[36px] min-w-[36px] cursor-pointer rounded-md"
         on:error={fixImage}
         class:hidden={!showProfilePic}
       />
       <div
-        class="flex aspect-square h-full w-[36px] items-center justify-center rounded-md bg-blue-200"
+        class="flex aspect-square w-[36px] min-w-[36px] items-center justify-center rounded-md bg-blue-200"
         class:hidden={showProfilePic}
       >
         {#if $authUser?.name}
@@ -162,7 +162,7 @@
       </div>
     {:else}
       <div
-        class="flex aspect-square h-full items-center justify-center rounded-md p-1"
+        class="flex aspect-square items-center justify-center rounded-md p-1"
       >
         <Icon name="settings" height={32} width={32} />
       </div>
