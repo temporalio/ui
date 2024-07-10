@@ -15,7 +15,11 @@
   $: target = external ? '_blank' : '';
 </script>
 
-<div role="listitem" data-testid={$$props['data-testid']} class="relative">
+<div
+  role="listitem"
+  data-testid={$$props?.['data-testid'] || `${icon}-button`}
+  class="relative"
+>
   <a
     href={link}
     {rel}
