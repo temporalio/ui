@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-export const TASK_QUEUES_API = '**/namespaces/*/task-queues/*?*';
+export const TASK_QUEUES_API = '**/api/v1/namespaces/*/task-queues/*?*';
 
 const mockTaskQueues = {
   pollers: [

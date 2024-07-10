@@ -71,7 +71,7 @@ export const base = (namespace?: string): string => {
 
 const getPath = (endpoint: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  return `/${endpoint}`;
+  return `/api/v1/${endpoint}`;
 };
 
 const withBase = (path: string, namespace?: string): string => {
@@ -115,10 +115,10 @@ export function pathForApi(
 
   const routes: { [K in APIRoutePath]: string } = {
     systemInfo: '/system-info',
-    cluster: '/cluster',
-    namespaces: '/cluster/namespaces',
-    namespace: `/cluster/namespaces/${parameters?.namespace}`,
-    'search-attributes': `/cluster/namespaces/${parameters.namespace}/search-attributes`,
+    cluster: '/cluster-info',
+    namespaces: '/namespaces',
+    namespace: `/namespaces/${parameters?.namespace}`,
+    'search-attributes': `/namespaces/${parameters.namespace}/search-attributes`,
     'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history`,
     'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history-reverse`,
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/query/${parameters.queryType}`,
@@ -144,9 +144,9 @@ export function pathForApi(
     'activity.fail': `/namespaces/${parameters.namespace}/activities/fail-by-id`,
     'batch-operations.list': `/namespaces/${parameters.namespace}/batch-operations`,
     'batch-operations': `/namespaces/${parameters.namespace}/batch-operations/${parameters?.batchJobId}`,
-    'nexus-endpoints': '/cluster/nexus/endpoints',
-    'nexus-endpoint': `/cluster/nexus/endpoints/${parameters.endpointId}`,
-    'nexus-endpoint.update': `/cluster/nexus/endpoints/${parameters.endpointId}/update`,
+    'nexus-endpoints': '/nexus/endpoints',
+    'nexus-endpoint': `/nexus/endpoints/${parameters.endpointId}`,
+    'nexus-endpoint.update': `/nexus/endpoints/${parameters.endpointId}/update`,
   };
 
   return getPath(routes[route]);

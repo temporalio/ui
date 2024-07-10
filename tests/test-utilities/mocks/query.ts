@@ -13,7 +13,7 @@ const json = {
 
 export default async function mockQueryApiWithStackTraceError(page: Page) {
   await page.route(
-    '**/namespaces/default/workflows/*/runs/*/query*',
+    '**/api/v1/namespaces/default/workflows/*/runs/*/query*',
     async (route) => {
       route.fulfill({ json });
     },

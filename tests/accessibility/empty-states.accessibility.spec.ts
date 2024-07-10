@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
       update: false,
       updateContent: 'embed',
       notFound: 'fallback',
-      url: '**/**',
+      url: '**/api/v1/**',
     },
   );
 });

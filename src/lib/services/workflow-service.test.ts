@@ -28,7 +28,7 @@ describe('workflow service', () => {
 
       expect(requestFromAPI).toHaveBeenCalledOnce();
       expect(requestFromAPI).toHaveBeenCalledWith(
-        'http://localhost:8233/namespaces/test/workflows',
+        'http://localhost:8233/api/v1/namespaces/test/workflows',
         {
           handleError: expect.any(Function),
           onError: expect.any(Function),
@@ -48,7 +48,7 @@ describe('workflow service', () => {
 
       expect(requestFromAPI).toHaveBeenCalledOnce();
       expect(requestFromAPI).toHaveBeenCalledWith(
-        'http://localhost:8233/namespaces/test/workflows',
+        'http://localhost:8233/api/v1/namespaces/test/workflows',
         {
           params: {
             query: `WorkflowId="${workflowId}"`,

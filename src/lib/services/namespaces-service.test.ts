@@ -42,7 +42,7 @@ describe('fetchNamespaces', () => {
 
     await fetchNamespaces({ runtimeEnvironment: { isCloud: false } }, request);
     expect(request).toHaveBeenCalledWith(
-      'http://localhost:8233/cluster/namespaces?',
+      'http://localhost:8233/api/v1/namespaces?',
       {
         credentials: 'include',
         headers: {

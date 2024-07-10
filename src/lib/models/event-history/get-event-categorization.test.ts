@@ -37,6 +37,13 @@ describe('Event Category Data Structures', () => {
         "ExternalWorkflowExecutionCancelRequested": "workflow",
         "ExternalWorkflowExecutionSignaled": "signal",
         "MarkerRecorded": "marker",
+        "NexusOperationCancelRequested": "nexus",
+        "NexusOperationCanceled": "nexus",
+        "NexusOperationCompleted": "nexus",
+        "NexusOperationFailed": "nexus",
+        "NexusOperationScheduled": "nexus",
+        "NexusOperationStarted": "nexus",
+        "NexusOperationTimedOut": "nexus",
         "RequestCancelExternalWorkflowExecutionFailed": "workflow",
         "RequestCancelExternalWorkflowExecutionInitiated": "workflow",
         "SignalExternalWorkflowExecutionFailed": "signal",
@@ -105,6 +112,10 @@ describe('Event Category Data Structures', () => {
           "value": "update",
         },
         {
+          "label": "events.category.nexus",
+          "value": "nexus",
+        },
+        {
           "label": "events.category.workflow",
           "value": "workflow",
         },
@@ -142,6 +153,10 @@ describe('Event Category Data Structures', () => {
         {
           "label": "events.category.update",
           "value": "update",
+        },
+        {
+          "label": "events.category.nexus",
+          "value": "nexus",
         },
       ]
     `);
