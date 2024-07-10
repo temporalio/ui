@@ -36,7 +36,7 @@ test.describe('Accessibility: Empty States', () => {
       page,
     }, testInfo) => {
       await page.goto(url);
-      await page.waitForRequest('**/**');
+      await page.waitForRequest('**/api/v1/**');
       await page.waitForSelector('#content', { state: 'visible' });
 
       const accessibilityScanResults = await new AxeBuilder({
