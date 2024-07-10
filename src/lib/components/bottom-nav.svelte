@@ -49,14 +49,6 @@
     showProfilePic = false;
   }
 
-  // const handleNamespaceSelect = (
-  //   event: CustomEvent<{ value: NamespaceListItem }>,
-  // ) => {
-  //   const namespaceListItem = event.detail.value;
-  //   $lastUsedNamespace = namespaceListItem.namespace;
-  //   namespaceListItem?.onClick(namespaceListItem.namespace);
-  // };
-
   const onLinksClick = () => {
     viewSettings = false;
     viewNamespaces = false;
@@ -115,11 +107,11 @@
   aria-label={translate('common.main')}
 >
   <button
-    class="flex w-fit items-center rounded-full border-2 transition-colors duration-200 ease-in-out"
-    class:border-subtle={!viewLinks && !isCloud}
-    class:border-interactive={viewLinks && !isCloud}
-    class:border-slate-200={!viewLinks && isCloud}
-    class:border-mint={viewLinks && isCloud}
+    class="shadow-button"
+    class:active-shadow={!isCloud && viewLinks}
+    class:cloud-shadow-button={isCloud}
+    class:cloud-active-shadow={isCloud && viewLinks}
+    type="button"
     on:click={onLinksClick}
   >
     <Logo height={32} width={32} class="m-1" />
@@ -141,11 +133,11 @@
     >
   </div>
   <button
-    class="flex w-[44px] w-fit min-w-[44px] items-center border-2 p-1 transition-colors duration-200 ease-in-out"
-    class:border-subtle={!viewSettings && !isCloud}
-    class:border-interactive={viewSettings && !isCloud}
-    class:border-slate-200={!viewLinks && isCloud}
-    class:border-mint={viewSettings && isCloud}
+    class="shadow-button"
+    class:active-shadow={!isCloud && viewSettings}
+    class:cloud-shadow-button={isCloud}
+    class:cloud-active-shadow={isCloud && viewSettings}
+    type="button"
     class:rounded-md={$authUser.accessToken}
     class:rounded-full={!$authUser.accessToken}
     on:click={onSettingsClick}
@@ -181,5 +173,21 @@
 <style lang="postcss">
   .namespace-wrapper {
     @apply surface-primary flex flex h-10 w-full grow flex-row items-center items-center rounded-lg border-2 border-subtle px-0.5 text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+  }
+
+  .shadow-button {
+    @apply relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg text-center align-middle text-xs font-medium uppercase shadow-md shadow-slate-900/40 transition-all dark:shadow-slate-300/60;
+  }
+
+  .active-shadow {
+    @apply shadow-lg shadow-slate-900/80 dark:shadow-slate-300/80;
+  }
+
+  .cloud-shadow-button {
+    @apply shadow-slate-300/60 dark:shadow-slate-300/60;
+  }
+
+  .cloud-active-shadow {
+    @apply shadow-lg shadow-slate-300/80 dark:shadow-slate-300/80;
   }
 </style>

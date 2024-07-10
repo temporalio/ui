@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
+
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
@@ -29,6 +31,10 @@
   const onCodecServerClick = () => {
     $viewDataEncoderSettings = !$viewDataEncoderSettings;
   };
+
+  onDestroy(() => {
+    $viewDataEncoderSettings = false;
+  });
 </script>
 
 {#if open}
