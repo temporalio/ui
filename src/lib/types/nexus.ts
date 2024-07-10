@@ -1,6 +1,6 @@
 import type { Endpoint, EndpointSpec } from '$lib/types';
 
-interface NexusEndpointSpec extends EndpointSpec {
+export interface NexusEndpointSpec extends EndpointSpec {
   descriptionString?: string;
   allowedCallerNamespaces?: string[];
 }
