@@ -1,12 +1,9 @@
 <script lang="ts">
   import type { HTMLTextareaAttributes } from 'svelte/elements';
 
-  import markdownit from 'markdown-it';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Label from './label.svelte';
-  import ToggleButton from './toggle-button/toggle-button.svelte';
-  import ToggleButtons from './toggle-button/toggle-buttons.svelte';
 
   type $$Props = HTMLTextareaAttributes & {
     disabled?: boolean;
@@ -36,11 +33,6 @@
 
   let className = 'text-primary';
   export { className as class };
-
-  let preview = false;
-
-  const md = markdownit();
-  $: result = md.render(value);
 </script>
 
 <div class={className}>
@@ -48,47 +40,33 @@
   {#if description}
     <p class="pb-2 text-sm">{description}</p>
   {/if}
-  <ToggleButtons>
-    <ToggleButton active={!preview} on:click={() => (preview = false)}
-      >Write</ToggleButton
-    >
-    <ToggleButton active={preview} on:click={() => (preview = true)}
-      >Preview</ToggleButton
-    >
-  </ToggleButtons>
   <div class="relative mt-2">
-    {#if preview}
-      <div class="preview">
-        {@html result}
-      </div>
-    {:else}
-      <textarea
-        bind:value
-        class={merge(
-          'surface-input min-h-fit w-full rounded-lg border-2 border-subtle px-3 py-2 font-mono text-sm focus-visible:border-information focus-visible:shadow-[0_0_0_4px_rgb(97,115,243,0.7)] focus-visible:outline-none enabled:hover:border-information',
-          disabled && 'cursor-not-allowed opacity-50',
-        )}
-        {id}
-        {disabled}
-        {placeholder}
-        {rows}
-        {spellcheck}
-        on:input
-        on:change
-        on:focus
-        on:blur
-        on:keydown|stopPropagation
-        maxlength={maxLength > 0 ? maxLength : undefined}
-      />
-      {#if maxLength && !disabled}
-        <span class="count">
-          <span
-            class="text-blue-700"
-            class:warn={maxLength - value?.length <= 5}
-            class:error={maxLength === value?.length}>{value?.length ?? 0}</span
-          >&nbsp;/&nbsp;{maxLength}
-        </span>
-      {/if}
+    <textarea
+      bind:value
+      class={merge(
+        'surface-input min-h-fit w-full rounded-lg border-2 border-subtle px-3 py-2 font-mono text-sm focus-visible:border-information focus-visible:shadow-[0_0_0_4px_rgb(97,115,243,0.7)] focus-visible:outline-none enabled:hover:border-information',
+        disabled && 'cursor-not-allowed opacity-50',
+      )}
+      {id}
+      {disabled}
+      {placeholder}
+      {rows}
+      {spellcheck}
+      on:input
+      on:change
+      on:focus
+      on:blur
+      on:keydown|stopPropagation
+      maxlength={maxLength > 0 ? maxLength : undefined}
+    />
+    {#if maxLength && !disabled}
+      <span class="count">
+        <span
+          class="text-blue-700"
+          class:warn={maxLength - value?.length <= 5}
+          class:error={maxLength === value?.length}>{value?.length ?? 0}</span
+        >&nbsp;/&nbsp;{maxLength}
+      </span>
     {/if}
   </div>
   <slot name="info" />

@@ -43,7 +43,7 @@
     </div>
   </div>
   <h2 class="text-xl">Description</h2>
-  <p class="w-full xl:w-1/2">
+  <p class="w-full whitespace-pre-wrap xl:w-1/2">
     {endpoint.spec?.description || 'No description provided'}
   </p>
   {#if endpoint.spec?.allowedCallerNamespaces}
