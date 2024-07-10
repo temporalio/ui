@@ -3,6 +3,7 @@
 
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import {
     Menu,
@@ -72,9 +73,16 @@
       optionValueKey="namespace"
       on:change={handleNamespaceSelect}
       minSize={32}
-      href={routeForNamespace({ namespace })}
-      linkDisabled={!namespaceExists}
-    />
+    >
+      <Button
+        slot="action"
+        variant="ghost"
+        size="xs"
+        href={routeForNamespace({ namespace })}
+        disabled={!namespaceExists}
+        leadingIcon="external-link"
+      />
+    </Combobox>
   </div>
   <div class="flex items-center gap-2">
     <TimezoneSelect position={screenWidth < 768 ? 'left' : 'right'} />
