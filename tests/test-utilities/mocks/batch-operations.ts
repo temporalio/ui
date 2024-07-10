@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 
-export const CREATE_BATCH_OPERATION_API = '**/namespaces/*/batch-operations*';
+export const CREATE_BATCH_OPERATION_API =
+  '**/api/v1/namespaces/*/batch-operations*';
 
 export const DESCRIBE_BATCH_OPERATION_API =
   '**/api/v1/namespaces/*/batch-operations/*';
