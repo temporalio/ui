@@ -141,7 +141,7 @@
     >
   </div>
   <button
-    class="flex w-fit items-center border-2 border-subtle p-1 transition-colors duration-200 ease-in-out"
+    class="flex w-[44px] w-fit min-w-[44px] items-center border-2 p-1 transition-colors duration-200 ease-in-out"
     class:border-subtle={!viewSettings && !isCloud}
     class:border-interactive={viewSettings && !isCloud}
     class:border-slate-200={!viewLinks && isCloud}
