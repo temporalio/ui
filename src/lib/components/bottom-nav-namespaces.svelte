@@ -23,6 +23,7 @@
       type="search"
       label="Namespace search"
       labelHidden
+      autoFocus
       placeholder="Search"
       class="sticky top-0 w-full"
       bind:value={search}

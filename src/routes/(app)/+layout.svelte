@@ -32,7 +32,7 @@
 
   let namespaceList: NamespaceListItem[];
 
-  $: isCloud = !$page.data?.settings?.runtimeEnvironment?.isCloud;
+  $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
   $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
   $: namespaceNames = isCloud
     ? [$page.params.namespace]
