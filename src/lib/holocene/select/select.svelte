@@ -137,6 +137,6 @@
 
 <style lang="postcss">
   input {
-    @apply pointer-events-none w-full bg-transparent;
+    @apply pointer-events-none w-full bg-transparent text-sm;
   }
 </style>
