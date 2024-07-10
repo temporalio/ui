@@ -41,7 +41,8 @@
           on:click={() => (deleteConfirmationModalOpen = true)}
           >{translate('nexus.delete-endpoint')}</Button
         >
-        <Button on:click={onUpdate}>{translate('common.save')}</Button>
+        <Button on:click={onUpdate} {loading}>{translate('common.save')}</Button
+        >
       </div>
     </div>
   </div>
