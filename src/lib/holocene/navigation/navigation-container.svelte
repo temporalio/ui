@@ -9,7 +9,6 @@
   import { navOpen } from '$lib/stores/nav-open';
 
   export let isCloud = false;
-  export let linkList: Partial<Record<string, string>>;
 
   const toggle = () => ($navOpen = !$navOpen);
 
@@ -28,7 +27,7 @@
   data-testid="navigation-header"
   {...$$restProps}
 >
-  <a href={linkList.home} class="w-fit rounded-lg">
+  <a href="/" class="w-fit rounded-lg">
     <Logo height={24} width={24} class="m-1" />
   </a>
   <button
@@ -41,9 +40,7 @@
     <Icon name="chevron-right" />
   </button>
   <div role="list">
-    <slot name="top" />
-    <hr class="-mx-4 my-8 border-subtle" />
-    <slot name="middle" />
+    <slot />
   </div>
   <div class="self-end">
     <slot name="bottom" />

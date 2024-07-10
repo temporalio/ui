@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
@@ -16,16 +14,6 @@
   export let open = false;
   export let logout: () => void;
   export let userEmaiLink = '';
-
-  $: namespace = $page.params.namespace;
-  $: pathNameSplit = $page.url.pathname.split('/');
-  $: showNamespaceSpecificNav =
-    namespace &&
-    (pathNameSplit.includes('workflows') ||
-      pathNameSplit.includes('schedules') ||
-      pathNameSplit.includes('batch-operations') ||
-      pathNameSplit.includes('task-queues') ||
-      pathNameSplit.includes('import'));
 
   $: labsHoverText = `${translate('common.labs')} ${
     $labsMode
@@ -46,14 +34,12 @@
 {#if open}
   <div class="flex h-full flex-col justify-start gap-4">
     <TimezoneSelect position="left" />
-    {#if showNamespaceSpecificNav}
-      <NavigationButton
-        onClick={onCodecServerClick}
-        tooltip={translate('data-encoder.codec-server')}
-        label={translate('data-encoder.codec-server')}
-        icon={hasCodecServer ? 'transcoder-on' : 'transcoder-off'}
-      />
-    {/if}
+    <NavigationButton
+      onClick={onCodecServerClick}
+      tooltip={translate('data-encoder.codec-server')}
+      label={translate('data-encoder.codec-server')}
+      icon={hasCodecServer ? 'transcoder-on' : 'transcoder-off'}
+    />
     <DataEncoderSettings />
     <div class="border-b-2 border-subtle" />
     <NavigationButton
