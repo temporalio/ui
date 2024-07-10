@@ -2,7 +2,7 @@
   const emptyEndpoint = {
     spec: {
       name: '',
-      description: '',
+      descriptionString: '',
       target: {
         worker: {
           namespace: '',
@@ -44,7 +44,7 @@
 
   const setFormStore = (
     name: string,
-    description: string,
+    descriptionString: string,
     target: string,
     taskQueue: string,
     allowedCallerNamespaces: string[],
@@ -52,7 +52,7 @@
     $endpointForm = {
       spec: {
         name,
-        description,
+        descriptionString,
         target: {
           worker: {
             namespace: target,

@@ -10,11 +10,10 @@ import type {
   passAccessToken,
 } from '$lib/stores/data-encoder-config';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
-import type { Payloads } from '$lib/types';
+import type { Payload, Payloads } from '$lib/types';
 import type {
   EventAttribute,
   EventRequestMetadata,
-  Payload,
   WorkflowEvent,
 } from '$lib/types/events';
 import type { Optional, Replace, Settings } from '$lib/types/global';
@@ -182,6 +181,20 @@ const keyIs = (key: string, ...validKeys: string[]) => {
     if (key === validKey) return true;
   }
   return false;
+};
+
+export const decodeSingleReadablePayloadWithCodec = async (
+  payload: Payload,
+  settings: Settings = get(page).data.settings,
+): Promise<string> => {
+  try {
+    const decode = decodeReadablePayloads(settings);
+    const data = await decode([payload]);
+    const result = data[0] as string;
+    return result || '';
+  } catch {
+    return '';
+  }
 };
 
 export const decodeAllPotentialPayloadsWithCodec = async (

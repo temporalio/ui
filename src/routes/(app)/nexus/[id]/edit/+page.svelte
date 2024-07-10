@@ -12,6 +12,7 @@
   } from '$lib/services/nexus-service';
   import { namespaces } from '$lib/stores/namespaces';
   import type { NetworkError } from '$lib/types/global';
+  import { encodePayloads } from '$lib/utilities/encode-payload';
   import {
     routeForNexus,
     routeForNexusEndpoint,
@@ -32,10 +33,15 @@
     const body = { ...$endpointForm };
     body.id = endpoint.id;
     body.version = endpoint.version;
-    delete body.spec.allowedCallerNamespaces;
 
-    // TODO: Set this as a legit payload with data = body.spec.description;
-    body.spec.description = {};
+    const payloads = await encodePayloads(
+      JSON.stringify(body.spec.descriptionString),
+    );
+    body.spec.description = payloads[0];
+
+    delete body.spec.allowedCallerNamespaces;
+    delete body.spec.descriptionString;
+
     try {
       await updateNexusEndpoint(endpoint.id, body);
       goto(routeForNexusEndpoint(endpoint.id));

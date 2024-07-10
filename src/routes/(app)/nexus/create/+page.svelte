@@ -9,6 +9,7 @@
   import { createNexusEndpoint } from '$lib/services/nexus-service';
   import { namespaces } from '$lib/stores/namespaces';
   import type { NetworkError } from '$lib/types/global';
+  import { encodePayloads } from '$lib/utilities/encode-payload';
   import { routeForNexus } from '$lib/utilities/route-for';
 
   let error: NetworkError | undefined = undefined;
@@ -18,9 +19,15 @@
     loading = true;
     try {
       const body = { ...$endpointForm };
-      // TODO: Set this as a legit payload with data = body.spec.description;
-      body.spec.description = {};
+
+      const payloads = await encodePayloads(
+        JSON.stringify(body.spec.descriptionString),
+      );
+      body.spec.description = payloads[0];
+
       delete body.spec.allowedCallerNamespaces;
+      delete body.spec.descriptionString;
+
       await createNexusEndpoint(body);
       goto(routeForNexus());
     } catch (e) {

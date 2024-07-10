@@ -1,6 +1,5 @@
 import { fetchNexusEndpoint } from '$lib/services/nexus-service.js';
-import { decodeAllPotentialPayloadsWithCodec } from '$lib/utilities/decode-payload.js';
-// import { decodePayload } from '$lib/utilities/decode-payload.js';
+import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload.js';
 
 export const load = async ({ params, fetch, parent }) => {
   const { id } = params;
@@ -9,14 +8,13 @@ export const load = async ({ params, fetch, parent }) => {
 
   let description = '';
   if (endpoint?.spec?.description?.data) {
-    const decodedDescription = await decodeAllPotentialPayloadsWithCodec(
-      endpoint?.spec?.description,
-      '',
+    const decodedDescription = await decodeSingleReadablePayloadWithCodec(
+      endpoint.spec.description,
       data.settings,
     );
     description = decodedDescription;
   }
-  endpoint.spec.description = description;
+  endpoint.spec.descriptionString = description;
   return {
     endpoint,
   };
