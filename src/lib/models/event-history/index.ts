@@ -49,6 +49,7 @@ export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
   const timestamp = formatDate(String(historyEvent.eventTime));
   const classification = getEventClassification(eventType);
   const category = getEventCategory(eventType);
+
   const { key, attributes } = findAttributesAndKey(historyEvent);
 
   return {

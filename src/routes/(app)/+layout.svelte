@@ -24,6 +24,7 @@
     routeForEventHistoryImport,
     routeForLoginPage,
     routeForNamespaces,
+    routeForNexus,
     routeForSchedules,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
@@ -83,6 +84,11 @@
         href: routeForNamespaces(),
         icon: 'namespace',
         label: translate('common.namespaces'),
+      },
+      {
+        href: routeForNexus(),
+        icon: 'nexus',
+        label: translate('nexus.nexus'),
       },
       {
         href: routeForEventHistoryImport(),

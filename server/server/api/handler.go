@@ -74,24 +74,12 @@ type SettingsResponse struct {
 	HideWorkflowQueryErrors     bool
 }
 
-func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware) echo.HandlerFunc {
+func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware, conn *grpc.ClientConn) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		err := auth.ValidateAuthHeaderExists(c, cfgProvider)
 		if err != nil {
 			return err
 		}
-
-		cfg, err := cfgProvider.GetConfig()
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err)
-		}
-
-		tls, err := rpc.CreateTLSConfig(cfg.TemporalGRPCAddress, &cfg.TLS)
-		if err != nil {
-			fmt.Printf("unable to read TLS configs: %s", err)
-		}
-		conn := rpc.CreateGRPCConnection(cfg.TemporalGRPCAddress, tls)
-		defer conn.Close()
 
 		mux, err := getTemporalClientMux(c, conn, apiMiddleware)
 		if err != nil {
@@ -101,6 +89,21 @@ func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddle
 		mux.ServeHTTP(c.Response(), c.Request())
 		return nil
 	}
+}
+
+func CreateGRPCConnection(cfgProvider *config.ConfigProviderWithRefresh) (*grpc.ClientConn, error) {
+	cfg, err := cfgProvider.GetConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	tls, err := rpc.CreateTLSConfig(cfg.TemporalGRPCAddress, &cfg.TLS)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to read TLS configs: %w", err)
+	}
+
+	conn := rpc.CreateGRPCConnection(cfg.TemporalGRPCAddress, tls)
+	return conn, nil
 }
 
 func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Context) error {

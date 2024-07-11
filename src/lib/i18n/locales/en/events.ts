@@ -18,6 +18,7 @@ export const Strings = {
     command: 'Command',
     'local-activity': 'Local Activity',
     marker: 'Marker',
+    nexus: 'Nexus',
     signal: 'Signal',
     timer: 'Timer',
     update: 'Update',

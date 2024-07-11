@@ -34,6 +34,7 @@ export type ParameterlessAPIRoutePath =
   | 'cluster'
   | 'settings'
   | 'user'
+  | 'nexus-endpoints'
   | 'namespaces';
 export type WorkerAPIRoutePath = 'worker-task-reachability';
 export type SchedulesAPIRoutePath = 'schedules';
@@ -42,6 +43,7 @@ export type ScheduleAPIRoutePath =
   | 'schedule.patch'
   | 'schedule.edit';
 export type SearchAttributesRoutePath = 'search-attributes';
+export type NexusAPIRoutePath = 'nexus-endpoint' | 'nexus-endpoint.update';
 
 export type APIRoutePath =
   | ParameterlessAPIRoutePath
@@ -56,7 +58,8 @@ export type APIRoutePath =
   | WorkflowActivitiesAPIRoutePath
   | WorkflowsAPIRoutePath
   | NamespaceAPIRoutePath
-  | BatchAPIRoutePath;
+  | BatchAPIRoutePath
+  | NexusAPIRoutePath;
 
 export type APIRouteParameters = {
   namespace: string;
@@ -67,6 +70,7 @@ export type APIRouteParameters = {
   queryType: string;
   signalName: string;
   activityId: string;
+  endpointId: string;
 };
 
 export type WorkflowListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
@@ -117,3 +121,5 @@ export type ScheduleRouteParameters = Pick<
   APIRouteParameters,
   'namespace' | 'scheduleId'
 >;
+
+export type NexusRouteParameters = Pick<APIRouteParameters, 'endpointId'>;

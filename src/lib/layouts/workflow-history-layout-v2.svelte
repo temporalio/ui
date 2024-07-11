@@ -31,10 +31,13 @@
   $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
   $: pendingActivities = workflow?.pendingActivities;
+  $: pendingNexusOperations = workflow?.pendingNexusOperations;
+
   $: groups = groupEvents(
     $filteredEventHistory,
     'ascending',
     pendingActivities,
+    pendingNexusOperations,
   );
 
   $: workflowTaskFailedError = getWorkflowTaskFailedEvent(

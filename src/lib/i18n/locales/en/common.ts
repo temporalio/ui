@@ -6,6 +6,7 @@ export const Strings = {
   'unknown-error': 'An unknown error occurred.',
   search: 'Search',
   apply: 'Apply',
+  remove: 'Remove',
   query: 'Query',
   ago: 'ago',
   'all-time': 'All Time',
@@ -68,6 +69,7 @@ export const Strings = {
   'last-updated': 'Last Updated: {{updated}}',
   edit: 'Edit',
   delete: 'Delete',
+  view: 'View',
   memo: 'Memo',
   notes: 'Notes',
   add: 'Add',
@@ -164,6 +166,7 @@ export const Strings = {
   night: 'Night',
   docs: 'Docs',
   'upload-error': 'Error uploading file',
+  description: 'Description',
   active: 'Active',
   inactive: 'Inactive',
 } as const;

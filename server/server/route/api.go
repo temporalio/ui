@@ -23,6 +23,7 @@
 package route
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -50,11 +51,29 @@ func DisableWriteMiddleware(cfgProvider *config.ConfigProviderWithRefresh) echo.
 
 // SetAPIRoutes sets api routes
 func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []api.Middleware) error {
-	route := e.Group("/api")
-	route.GET("/v1/settings", api.GetSettings(cfgProvider))
+
+	route := e.Group("/api/v1")
+	route.GET("/settings", api.GetSettings(cfgProvider))
 
 	writeControlMiddleware := DisableWriteMiddleware(cfgProvider)
+	conn, err := api.CreateGRPCConnection(cfgProvider)
 
-	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware), writeControlMiddleware)
+	if err != nil {
+		return fmt.Errorf("Failed to create gRPC connection to Temporal server: %w", err)
+	}
+
+	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
+
+	// New api paths with remove prefix. We will be switching to this but need to support both for now
+	e.GET("/settings", api.GetSettings(cfgProvider))
+	e.GET("/cluster", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
+	e.GET("/system-info", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
+
+	cluster := e.Group("/cluster")
+	cluster.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
+
+	namespaces := e.Group("/namespaces")
+	namespaces.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
+
 	return nil
 }
