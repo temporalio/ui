@@ -1,6 +1,7 @@
 import type {
   ArchivalState,
   NamespaceState,
+  PendingNexusOperationState,
   WorkflowExecutionStatus,
 } from '$lib/types';
 import type { BatchOperationState, BatchOperationType } from '$lib/types/batch';
@@ -72,4 +73,11 @@ export const toWorkflowTaskFailureReadable = (
   cause: WorkflowTaskFailedCause,
 ): WorkflowTaskFailedCause => {
   return fromScreamingEnum(cause, 'WorkflowTaskFailedCause');
+};
+
+export const toPendingNexusOperationStateReadable = (
+  state?: PendingNexusOperationState,
+): PendingNexusOperationState => {
+  if (!state) return state;
+  return fromScreamingEnum(state, 'PendingNexusOperationState');
 };

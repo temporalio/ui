@@ -103,6 +103,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     classification,
     level: undefined,
     pendingActivity: undefined,
+    pendingNexusOperation: undefined,
     get eventTime() {
       return this.lastEvent?.eventTime;
     },
@@ -121,6 +122,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     get isPending() {
       return (
         this.pendingActivity ||
+        this.pendingNexusOperation ||
         (isTimerStartedEvent(this.initialEvent) &&
           this.eventList.length === 1) ||
         (isStartChildWorkflowExecutionInitiatedEvent(this.initialEvent) &&

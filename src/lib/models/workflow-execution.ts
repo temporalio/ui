@@ -2,6 +2,7 @@ import type {
   PendingActivity,
   PendingActivityInfo,
   PendingChildren,
+  PendingNexusOperation,
 } from '$lib/types/events';
 import type {
   DecodedWorkflowSearchAttributes,
@@ -11,7 +12,10 @@ import type {
   WorkflowSearchAttributes,
 } from '$lib/types/workflows';
 import { decodePayload } from '$lib/utilities/decode-payload';
-import { toWorkflowStatusReadable } from '$lib/utilities/screaming-enums';
+import {
+  toPendingNexusOperationStateReadable,
+  toWorkflowStatusReadable,
+} from '$lib/utilities/screaming-enums';
 import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
 import { simplifyAttributes } from './event-history/simplify-attributes';
@@ -24,6 +28,18 @@ const toPendingActivities = (
     const id = activity.activityId;
 
     return { ...attributes, id };
+  });
+};
+
+const toPendingNexusOperations = (
+  operations?: PendingNexusOperation[],
+): PendingNexusOperation[] => {
+  if (!operations) return [];
+  return operations.map((operation): PendingNexusOperation => {
+    return {
+      ...operation,
+      state: toPendingNexusOperationStateReadable(operation.state),
+    };
   });
 };
 
@@ -83,6 +99,8 @@ export const toWorkflowExecution = (
     response.pendingActivities,
   );
   const pendingChildren: PendingChildren[] = response?.pendingChildren ?? [];
+  const pendingNexusOperations: PendingNexusOperation[] =
+    toPendingNexusOperations(response?.pendingNexusOperations);
 
   return {
     name,
@@ -102,6 +120,7 @@ export const toWorkflowExecution = (
     mostRecentWorkerVersionStamp,
     pendingActivities,
     pendingChildren,
+    pendingNexusOperations,
     parentNamespaceId,
     parent,
     stateTransitionCount,

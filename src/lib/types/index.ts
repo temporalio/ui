@@ -137,12 +137,16 @@ export type Severity = temporal.api.enums.v1.Severity;
 export type ArchivalState = temporal.api.enums.v1.ArchivalState;
 export type NamespaceState = temporal.api.enums.v1.NamespaceState;
 export type TaskReachability = temporal.api.enums.v1.TaskReachability;
+export type PendingNexusOperationState =
+  temporal.api.enums.v1.PendingNexusOperationState;
 
 // api.workflow
 
 export type PendingActivityInfo = temporal.api.workflow.v1.IPendingActivityInfo;
 export type PendingChildrenInfo =
   temporal.api.workflow.v1.IPendingChildExecutionInfo;
+export type PendingNexusInfo =
+  temporal.api.workflow.v1.IPendingNexusOperationInfo;
 export type WorkflowExecutionConfig =
   temporal.api.workflow.v1.IWorkflowExecutionConfig;
 export type WorkflowExecutionInfo =
