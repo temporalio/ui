@@ -78,12 +78,12 @@
         href: routeForArchivalWorkfows({ namespace }),
         icon: 'archives',
         label: translate('common.archive'),
-        divider: true,
       },
       {
         href: routeForNamespaces(),
         icon: 'namespace',
         label: translate('common.namespaces'),
+        divider: true,
       },
       {
         href: routeForNexus(),
