@@ -89,6 +89,7 @@
         href: routeForNexus(),
         icon: 'nexus',
         label: translate('nexus.nexus'),
+        hidden: !$page.data?.systemInfo?.capabilities?.nexus,
       },
       {
         href: routeForEventHistoryImport(),
