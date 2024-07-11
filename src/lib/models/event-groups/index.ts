@@ -2,10 +2,19 @@ import type { EventSortOrder } from '$lib/stores/event-view';
 import type {
   CommonHistoryEvent,
   PendingActivity,
+  PendingNexusOperation,
   WorkflowEvent,
 } from '$lib/types/events';
 import { has } from '$lib/utilities/has';
-import { getPendingActivity } from '$lib/utilities/pending-activities';
+import {
+  isNexusOperationCanceledEvent,
+  isNexusOperationCompletedEvent,
+  isNexusOperationFailedEvent,
+} from '$lib/utilities/is-event-type';
+import {
+  getPendingActivity,
+  getPendingNexusOperation,
+} from '$lib/utilities/pending-activities';
 
 import {
   createEventGroup,
@@ -20,6 +29,7 @@ const addToExistingGroup = (
   group: EventGroup,
   event: WorkflowEvent,
   pendingActivity: PendingActivity | undefined = undefined,
+  pendingNexusOperation: PendingNexusOperation | undefined = undefined,
 ): void => {
   if (!group) return;
 
@@ -35,12 +45,25 @@ const addToExistingGroup = (
   if (group.pendingActivity && group.eventList.length === 3) {
     delete group.pendingActivity;
   }
+
+  if (pendingNexusOperation) {
+    group.pendingNexusOperation = pendingNexusOperation;
+  }
+
+  const completedNexusEvent =
+    isNexusOperationCompletedEvent(event) ||
+    isNexusOperationFailedEvent(event) ||
+    isNexusOperationCanceledEvent(event);
+  if (group.pendingNexusOperation && completedNexusEvent) {
+    delete group.pendingNexusOperation;
+  }
 };
 
 export const groupEvents = (
   events: CommonHistoryEvent[],
   sort: EventSortOrder = 'ascending',
   pendingActivities: PendingActivity[] = [],
+  pendingNexusOperations: PendingNexusOperation[] = [],
 ): EventGroups => {
   const groups: Record<string, EventGroup> = {};
 
@@ -48,14 +71,26 @@ export const groupEvents = (
     const id = getGroupId(event);
     const group = createEventGroup(event, events);
     const pendingActivity = getPendingActivity(event, pendingActivities);
+    const pendingNexusOperation = getPendingNexusOperation(
+      event,
+      pendingNexusOperations,
+    );
 
     if (group) {
       groups[group.id] = group;
       if (pendingActivity) {
         group.pendingActivity = pendingActivity;
       }
+      if (pendingNexusOperation) {
+        group.pendingNexusOperation = pendingNexusOperation;
+      }
     } else {
-      addToExistingGroup(groups[id], event, pendingActivity);
+      addToExistingGroup(
+        groups[id],
+        event,
+        pendingActivity,
+        pendingNexusOperation,
+      );
     }
   };
 

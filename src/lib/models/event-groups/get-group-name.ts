@@ -5,6 +5,7 @@ import {
   isActivityTaskScheduledEvent,
   isLocalActivityMarkerEvent,
   isMarkerRecordedEvent,
+  isNexusOperationScheduledEvent,
   isSignalExternalWorkflowExecutionInitiatedEvent,
   isStartChildWorkflowExecutionInitiatedEvent,
   isTimerStartedEvent,
@@ -51,6 +52,10 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (isWorkflowExecutionUpdateAcceptedEvent(event)) {
     return event.workflowExecutionUpdateAcceptedEventAttributes?.acceptedRequest
       ?.input?.name;
+  }
+
+  if (isNexusOperationScheduledEvent(event)) {
+    return `${event.nexusOperationScheduledEventAttributes.service}.${event.nexusOperationScheduledEventAttributes.operation}`;
   }
 };
 

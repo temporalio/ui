@@ -265,4 +265,38 @@ describe('getSummaryEvent', () => {
       value: 'DoStaticThing',
     });
   });
+
+  it('should return expected payload for a Nexus single payload', async () => {
+    const nexusEvent = {
+      eventId: '5',
+      eventTime: '2024-07-11T17:42:53.326959Z',
+      eventType: 'EVENT_TYPE_NEXUS_OPERATION_SCHEDULED',
+      taskId: '1098294',
+      nexusOperationScheduledEventAttributes: {
+        endpoint: 'sdk_go_nexus_test_ep_c5559a73_33a7_436e_bfa0_f794d2f26795',
+        service: 'test',
+        operation: 'custom-op',
+        input: {
+          metadata: {
+            encoding: 'anNvbi9wbGFpbg==',
+          },
+          data: 'InN0YXJ0LWFzeW5jIg==',
+        },
+        scheduleToCloseTimeout: '0s',
+        workflowTaskCompletedEventId: '4',
+        requestId: '4e393ac4-564f-4856-9ddc-fbe1fdc0a7f7',
+        endpointId: 'f0a6cc80-cb36-4e3c-92a6-92681687b0ee',
+      },
+    };
+    const event = await toEvent(nexusEvent);
+    expect(getSummaryAttribute(event)).toStrictEqual({
+      key: 'input',
+      value: {
+        metadata: {
+          encoding: 'anNvbi9wbGFpbg==',
+        },
+        data: 'InN0YXJ0LWFzeW5jIg==',
+      },
+    });
+  });
 });

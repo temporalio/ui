@@ -1,7 +1,10 @@
-import type { PendingActivity } from '$lib/types/events';
+import type { PendingActivity, PendingNexusOperation } from '$lib/types/events';
 import type { WorkflowEvent } from '$lib/types/events';
 
-import { isActivityTaskScheduledEvent } from './is-event-type';
+import {
+  isActivityTaskScheduledEvent,
+  isNexusOperationScheduledEvent,
+} from './is-event-type';
 
 export const getPendingActivity = (
   event: WorkflowEvent,
@@ -27,4 +30,21 @@ export const isAssociatedPendingActivity = (
   }
 
   return false;
+};
+
+export const getPendingNexusOperation = (
+  event: WorkflowEvent,
+  pendingNexusOperations: PendingNexusOperation[],
+): PendingNexusOperation | undefined => {
+  let pendingOperation: PendingNexusOperation | undefined;
+
+  // TODO: Add this when PendingNexusOperation has scheduledEventId
+  if (isNexusOperationScheduledEvent(event)) {
+    pendingOperation = pendingNexusOperations.find(
+      (_) => false,
+      // (p) => p.scheduledEventId === event.id,
+    );
+  }
+
+  return pendingOperation;
 };

@@ -63,6 +63,7 @@ import merge from './svg/merge.svelte';
 import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
+import nexus from './svg/nexus.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
 import regions from './svg/regions.svelte';
@@ -163,6 +164,7 @@ export const icons = {
   moon,
   'namespace-switcher': namespaceSwitcher,
   namespace,
+  nexus,
   'pin-filled': pinFilled,
   pin,
   regions,

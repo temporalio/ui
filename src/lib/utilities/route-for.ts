@@ -55,6 +55,22 @@ export const routeForNamespaces = (): string => {
   return `${base}/namespaces`;
 };
 
+export const routeForNexus = (): string => {
+  return `${base}/nexus`;
+};
+
+export const routeForNexusEndpoint = (id: string): string => {
+  return `${base}/nexus/${id}`;
+};
+
+export const routeForNexusEndpointEdit = (id: string): string => {
+  return `${base}/nexus/${id}/edit`;
+};
+
+export const routeForNexusEndpointCreate = (): string => {
+  return `${base}/nexus/create`;
+};
+
 export const routeForNamespace = ({
   namespace,
 }: NamespaceParameter): string => {

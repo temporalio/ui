@@ -10,6 +10,8 @@
   import { labsMode } from '$lib/stores/labs-mode';
   import { useDarkMode } from '$lib/utilities/dark-mode';
 
+  import NexusGuard from './nexus-guard.svelte';
+
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
   export let isCloud = false;
@@ -71,6 +73,16 @@
         label={translate('common.namespaces')}
         icon="namespace"
       />
+      <IsCloudGuard {isCloud}>
+        <NexusGuard>
+          <NavigationItem
+            link={linkList.nexus}
+            data-testid="nexus-button"
+            label={translate('nexus.nexus')}
+            icon="nexus"
+          />
+        </NexusGuard>
+      </IsCloudGuard>
     </IsLegacyCloudGuard>
     <slot name="middle" />
     <IsCloudGuard {isCloud}>

@@ -65,6 +65,7 @@ export const CategoryIcon: Record<EventTypeCategory, IconName> = {
   command: 'terminal',
   activity: 'activity',
   marker: 'marker',
+  nexus: 'nexus',
   timer: 'retention',
   'local-activity': 'feather',
   'child-workflow': 'relationship',
@@ -313,6 +314,8 @@ export const getCategoryColor = (type: EventTypeCategory): string => {
       return '#67e4f9';
     case 'update':
       return '#FF9B70';
+    case 'nexus':
+      return '#3b82f6';
     default:
       return '#ebebeb';
   }
