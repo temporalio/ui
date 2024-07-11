@@ -19,7 +19,6 @@
     loading = true;
     try {
       const body = { ...$endpointForm };
-
       const payloads = await encodePayloads(
         JSON.stringify(body.spec.descriptionString),
       );
@@ -29,7 +28,7 @@
       delete body.spec.descriptionString;
 
       await createNexusEndpoint(body);
-      goto(routeForNexus());
+      goto(routeForNexus(), { invalidateAll: true });
     } catch (e) {
       error = e as NetworkError;
       console.error('Error creating endpoint', e);

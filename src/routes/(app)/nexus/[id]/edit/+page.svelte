@@ -44,7 +44,7 @@
 
     try {
       await updateNexusEndpoint(endpoint.id, body);
-      goto(routeForNexusEndpoint(endpoint.id));
+      goto(routeForNexusEndpoint(endpoint.id), { invalidateAll: true });
     } catch (e: unknown) {
       error = e as NetworkError;
       console.error('Error updating endpoint', e);

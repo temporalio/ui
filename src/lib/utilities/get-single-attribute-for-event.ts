@@ -5,7 +5,7 @@ import type { WorkflowEvent } from '$lib/types/events';
 import type { Payload } from '$lib/types/events';
 import { capitalize } from '$lib/utilities/format-camel-case';
 
-import { decodePayload } from './decode-payload';
+import { decodePayload, isSinglePayload } from './decode-payload';
 import type { CombinedAttributes } from './format-event-attributes';
 import { has } from './has';
 import { isObject } from './is';
@@ -180,6 +180,9 @@ export const shouldDisplayChildWorkflowLink = (
 
 const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
   if (typeof value === 'object') {
+    if (isSinglePayload(value)) {
+      return { key, value };
+    }
     const [firstKey] = Object.keys(value);
     if (!firstKey) {
       return { key, value: {} };

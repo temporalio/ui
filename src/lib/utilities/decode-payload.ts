@@ -231,6 +231,14 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   return anyAttributes;
 };
 
+export const isSinglePayload = (payload: unknown): boolean => {
+  if (!isObject(payload)) return false;
+  const keys = Object.keys(payload);
+  return (
+    keys.length === 2 && keys.includes('metadata') && keys.includes('data')
+  );
+};
+
 export const cloneAllPotentialPayloadsWithCodec = async (
   anyAttributes: PotentiallyDecodable | EventAttribute | WorkflowEvent | null,
   namespace: string,
@@ -247,6 +255,13 @@ export const cloneAllPotentialPayloadsWithCodec = async (
       : decodePayloads(settings);
   const clone = { ...anyAttributes };
   if (anyAttributes) {
+    // Now that we can have single Payload that is not an array (Nexus)
+    if (isSinglePayload(clone)) {
+      const data = toArray(clone as Payload);
+      const decoded = await decode(data, returnDataOnly);
+      return decoded?.[0] || clone;
+    }
+
     for (const key of Object.keys(clone)) {
       if (keyIs(key, 'payloads', 'encodedAttributes') && clone[key]) {
         const data = toArray(clone[key]);
