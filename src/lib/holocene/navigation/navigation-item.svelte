@@ -6,10 +6,11 @@
 
   export let link: string;
   export let label: string;
-  export let icon: IconName;
+  export let icon: IconName | undefined = undefined;
   export let tooltip = label;
   export let external = false;
   export let animate = false;
+  export let disabled = false;
 
   $: rel = external ? 'noopener noreferrer' : '';
   $: target = external ? '_blank' : '';
@@ -24,13 +25,20 @@
     href={link}
     {rel}
     {target}
+    aria-hidden={disabled ? 'true' : 'false'}
+    aria-disabled={disabled}
+    class:disabled
+    tabindex={disabled ? -1 : 0}
     class="mb-1 flex items-center whitespace-nowrap rounded-lg p-1 pl-2 text-sm font-medium hover:bg-white hover:text-black group-[.surface-primary]:hover:bg-black group-[.surface-primary]:hover:text-white group-[.surface-primary]:dark:hover:bg-white group-[.surface-primary]:dark:hover:text-black"
+    class:text-disabled={disabled}
   >
     <div
       class="flex h-6 w-6 items-center after:absolute after:left-[calc(100%_+_1.5rem)] after:top-0 after:hidden after:h-8 after:items-center after:rounded-md after:bg-slate-800 after:p-1 after:px-2 after:text-xs after:text-white after:content-[attr(data-tooltip)] group-data-[nav=closed]:hover:after:flex"
       data-tooltip={tooltip}
     >
-      <Icon name={icon} {animate} />
+      {#if icon}
+        <Icon name={icon} {animate} />
+      {/if}
     </div>
     <div
       class="opacity-0 transition-opacity group-data-[nav=open]:opacity-100"
@@ -40,3 +48,9 @@
     </div>
   </a>
 </div>
+
+<style lang="postcss">
+  a.disabled {
+    @apply pointer-events-none cursor-not-allowed opacity-50;
+  }
+</style>

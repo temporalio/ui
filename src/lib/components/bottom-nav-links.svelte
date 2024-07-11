@@ -7,8 +7,10 @@
 </script>
 
 {#if open}
-  <div class="flex h-full flex-col justify-start gap-4">
-    {#each [...linkList].reverse() as item}
+  <div
+    class="flex h-full flex-col flex-col-reverse justify-start gap-8 overflow-auto"
+  >
+    {#each linkList as item}
       {#if item.divider}
         <hr class="border-subtle" />
       {/if}
