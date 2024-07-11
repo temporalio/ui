@@ -43,8 +43,6 @@
     'data-testid'?: string;
     error?: string;
     valid?: boolean;
-    href?: string;
-    linkDisabled?: boolean;
   }
 
   type UncontrolledStringOptionProps = {
@@ -84,8 +82,6 @@
   export let maxSize = 120;
   export let error = '';
   export let valid = true;
-  export let href = '';
-  export let linkDisabled = false;
 
   let displayValue: string;
   let selectedOption: string | T;
@@ -259,13 +255,7 @@
 </script>
 
 <MenuContainer {open} on:close={handleMenuClose}>
-  <Label
-    class="combobox-label"
-    hidden={labelHidden}
-    {required}
-    {label}
-    for={id}
-  />
+  <Label hidden={labelHidden} {required} {label} for={id} />
   <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
     {#if leadingIcon}
       <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
@@ -309,11 +299,9 @@
     >
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
     </Button>
-    {#if href}
+    {#if $$slots.action}
       <div class="ml-1 h-full w-1 border-l-2 border-subtle" />
-      <Button variant="ghost" size="xs" {href} disabled={linkDisabled}
-        ><Icon name="external-link" /></Button
-      >
+      <slot name="action" />
     {/if}
   </div>
   {#if error && !valid}

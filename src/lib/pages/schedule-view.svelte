@@ -17,6 +17,7 @@
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
@@ -437,11 +438,12 @@
             ? translate('schedules.unpause-reason')
             : translate('schedules.pause-reason')}
         </p>
-        <input
-          class="mt-4 block w-full rounded-md border border-slate-200 p-2"
-          placeholder={translate('common.reason')}
+        <Input
+          id="pause-reason"
           bind:value={reason}
-          on:keydown|stopPropagation
+          placeholder={translate('common.reason')}
+          label={translate('common.reason')}
+          labelHidden
         />
       </div>
     </Modal>
