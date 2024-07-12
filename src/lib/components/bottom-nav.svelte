@@ -158,15 +158,6 @@
   }
 
   .active-shadow {
-    /* @apply shadow-lg shadow-slate-900/80 dark:shadow-slate-300/80; */
     box-shadow: inset 0 0 10px #8098f9;
-  }
-
-  .cloud-shadow-button {
-    @apply shadow-slate-300/60 dark:shadow-slate-300/60;
-  }
-
-  .cloud-active-shadow {
-    @apply shadow-lg shadow-slate-300/80 dark:shadow-slate-300/80;
   }
 </style>
