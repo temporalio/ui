@@ -52,7 +52,7 @@
   on:scroll={handleOnScroll}
 >
   <slot />
-  <main id="content" class="pb-12 md:pb-0">
+  <main id="content" class="pb-16 md:pb-0">
     <slot name="main" />
   </main>
   <slot name="footer" />
