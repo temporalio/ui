@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { uuid4 } from '@temporalio/workflow';
   import { onMount } from 'svelte';
+  import { v4 } from 'uuid';
 
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -86,7 +86,7 @@
   };
 
   const generateRandomWorkflowId = () => {
-    workflowId = uuid4();
+    workflowId = v4();
     updateQueryParameters({
       parameter: 'workflowId',
       value: workflowId,
