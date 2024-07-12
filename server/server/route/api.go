@@ -64,16 +64,16 @@ func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, a
 
 	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
 
-	// New api paths with remove prefix. We will be switching to this but need to support both for now
-	e.GET("/settings", api.GetSettings(cfgProvider))
-	e.GET("/cluster", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
-	e.GET("/system-info", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
+	// New api paths with removed prefix. Need to figure out how to handle when ui and ui server are on same host
+	// e.GET("/settings", api.GetSettings(cfgProvider))
+	// e.GET("/cluster", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
+	// e.GET("/system-info", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
 
-	cluster := e.Group("/cluster")
-	cluster.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
+	// cluster := e.Group("/cluster")
+	// cluster.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
 
-	namespaces := e.Group("/namespaces")
-	namespaces.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
+	// namespaces := e.Group("/namespaces")
+	// namespaces.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
 
 	return nil
 }
