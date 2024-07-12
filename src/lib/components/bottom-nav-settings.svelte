@@ -38,7 +38,7 @@
 </script>
 
 {#if open}
-  <div class="flex h-full flex-col justify-end gap-8 overflow-auto">
+  <div class="flex h-full flex-col justify-end gap-8 overflow-auto px-4 py-8">
     <TimezoneSelect position="left" />
     {#if $dataEncoder.hasError}
       <p class="text-red-400">{translate('data-encoder.codec-server-error')}</p>

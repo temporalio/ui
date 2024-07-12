@@ -78,7 +78,7 @@
 
 {#if menuIsOpen}
   <div
-    class="group surface-primary fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto px-4 py-8 md:hidden"
+    class="group surface-primary fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto md:hidden"
     data-nav="open"
     in:slide={{ duration: 200, delay: 0 }}
     out:slide={{ duration: 200, delay: 0 }}
