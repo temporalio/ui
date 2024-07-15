@@ -100,7 +100,7 @@
   aria-label={translate('common.main')}
 >
   <button
-    class="shadow-button"
+    class="nav-button relative"
     class:active-shadow={viewLinks}
     type="button"
     on:click={onLinksClick}
@@ -129,7 +129,7 @@
     >
   </div>
   <button
-    class="shadow-button"
+    class="nav-button"
     class:active-shadow={viewSettings}
     type="button"
     on:click={onSettingsClick}
@@ -151,13 +151,7 @@
     @apply surface-black flex h-10 w-full grow flex-row items-center items-center rounded-lg border-2 border-subtle px-0.5 text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
   }
 
-  .shadow-button {
+  .nav-button {
     @apply relative select-none rounded-lg p-1 text-center align-middle text-xs font-medium uppercase transition-all;
-
-    box-shadow: inset 0 0 10px #8098f9;
-  }
-
-  .active-shadow {
-    box-shadow: inset 0 0 10px #8098f9;
   }
 </style>
