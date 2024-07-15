@@ -23,6 +23,9 @@
 <Navigation {isCloud} aria-label={translate('common.primary')}>
   {#each linkList as item}
     {#if !item?.hidden}
+      {#if item.divider}
+        <hr class="-mx-4 my-8 border-subtle" />
+      {/if}
       <NavigationItem
         link={item.href}
         label={item.label}
@@ -31,9 +34,6 @@
         external={item?.external}
         animate={item?.animate}
       />
-      {#if item.divider}
-        <hr class="-mx-4 my-8 border-subtle" />
-      {/if}
     {/if}
   {/each}
   <svelte.fragment slot="bottom">

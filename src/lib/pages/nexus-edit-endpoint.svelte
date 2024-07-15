@@ -13,7 +13,8 @@
   import { routeForNexusEndpoint } from '$lib/utilities/route-for';
 
   export let endpoint: NexusEndpoint;
-  export let namespaceList: { namespace: string }[] = [];
+  export let targetNamespaceList: { namespace: string }[] = [];
+  export let callerNamespaceList: { namespace: string }[] = [];
   export let onUpdate: () => void;
   export let onDelete: () => void;
   export let error: NetworkError | undefined = undefined;
@@ -46,7 +47,14 @@
       </div>
     </div>
   </div>
-  <NexusForm {endpoint} {namespaceList} {error} {isCloud} nameDisabled />
+  <NexusForm
+    {endpoint}
+    {targetNamespaceList}
+    {callerNamespaceList}
+    {error}
+    {isCloud}
+    nameDisabled
+  />
   <div class="flex items-center gap-4">
     <Button on:click={onUpdate} {loading}>{translate('common.save')}</Button>
     <Button

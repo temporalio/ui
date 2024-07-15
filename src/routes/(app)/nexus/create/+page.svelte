@@ -37,10 +37,10 @@
     }
   };
 
-  $: namespaceList = $namespaces.map((namespace) => ({
+  $: targetNamespaceList = $namespaces.map((namespace) => ({
     namespace: namespace.namespaceInfo.name,
   }));
 </script>
 
 <PageTitle title={translate('nexus.create-endpoint')} url={$page.url.href} />
-<NexusCreateEndpoint {onCreate} {namespaceList} {error} {loading} />
+<NexusCreateEndpoint {onCreate} {targetNamespaceList} {error} {loading} />

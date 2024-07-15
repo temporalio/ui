@@ -9,7 +9,8 @@
   import { routeForNexus } from '$lib/utilities/route-for';
 
   export let onCreate: () => void;
-  export let namespaceList: { namespace: string }[] = [];
+  export let targetNamespaceList: { namespace: string }[] = [];
+  export let callerNamespaceList: { namespace: string }[] = [];
   export let error: NetworkError | undefined = undefined;
   export let loading = false;
   export let isCloud = false;
@@ -29,7 +30,7 @@
   <h1 data-testid="namespace-selector-title" class="text-2xl">
     {translate('nexus.create-endpoint')}
   </h1>
-  <NexusForm {error} {namespaceList} {isCloud} />
+  <NexusForm {error} {targetNamespaceList} {callerNamespaceList} {isCloud} />
   <div class="flex items-center gap-4">
     <Button
       variant="primary"
