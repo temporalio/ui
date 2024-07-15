@@ -52,9 +52,10 @@
   on:scroll={handleOnScroll}
 >
   <slot />
-  <main id="content">
+  <main id="content" class="pb-16 md:pb-0">
     <slot name="main" />
   </main>
+  <slot name="footer" />
   <ScrollToContainer
     {scrollToTopHidden}
     {scrollToBottomHidden}

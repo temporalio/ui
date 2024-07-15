@@ -152,6 +152,7 @@ export const colors = {
   'off-black': palette['slate'][950],
   current: 'currentColor',
   transparent: 'transparent',
+  mint: '#59FDA0',
   ...palette,
 } as const satisfies Record<
   string,

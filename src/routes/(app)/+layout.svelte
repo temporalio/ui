@@ -2,6 +2,7 @@
   import { afterNavigate, goto } from '$app/navigation';
   import { page, updated } from '$app/stores';
 
+  import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
@@ -12,9 +13,10 @@
   import Toaster from '$lib/holocene/toaster.svelte';
   import { translate } from '$lib/i18n/translate';
   import { clearAuthUser } from '$lib/stores/auth-user';
+  import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
-  import type { NamespaceListItem } from '$lib/types/global';
+  import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
   import DarkMode from '$lib/utilities/dark-mode';
   import {
     routeForArchivalWorkfows,
@@ -33,10 +35,6 @@
 
   $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
   $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
-  $: activeNamespace = $namespaces.find(
-    (namespace: Namespace) =>
-      namespace?.namespaceInfo?.name === activeNamespaceName,
-  );
   $: namespaceNames = isCloud
     ? [$page.params.namespace]
     : $namespaces.map((namespace: Namespace) => namespace?.namespaceInfo?.name);
@@ -52,21 +50,67 @@
     };
   });
 
-  $: linkList = {
-    home: routeForWorkflows({ namespace: activeNamespaceName }),
-    archive: routeForArchivalWorkfows({ namespace: activeNamespaceName }),
-    namespaces: routeForNamespaces(),
-    nexus: routeForNexus(),
-    schedules: routeForSchedules({ namespace: activeNamespaceName }),
-    workflows: routeForWorkflows({ namespace: activeNamespaceName }),
-    batchOperations: routeForBatchOperations({
-      namespace: activeNamespaceName,
-    }),
-    import: routeForEventHistoryImport(),
-    feedback:
-      $page.data?.settings?.feedbackURL ||
-      'https://github.com/temporalio/ui/issues/new/choose',
-    docs: 'http://docs.temporal.io',
+  $: linkList = getLinkList(activeNamespaceName, !!$inProgressBatchOperation);
+
+  const getLinkList = (
+    namespace: string,
+    inProgressBatch: boolean,
+  ): NavLinkListItem[] => {
+    return [
+      {
+        href: routeForWorkflows({ namespace }),
+        icon: 'workflow',
+        label: translate('common.workflows'),
+      },
+      {
+        href: routeForSchedules({ namespace }),
+        icon: 'schedules',
+        label: translate('common.schedules'),
+      },
+      {
+        href: routeForBatchOperations({ namespace }),
+        icon: 'batch-operation',
+        label: translate('batch.nav-title'),
+        tooltip: translate('batch.list-page-title'),
+        animate: inProgressBatch,
+      },
+      {
+        href: routeForArchivalWorkfows({ namespace }),
+        icon: 'archives',
+        label: translate('common.archive'),
+      },
+      {
+        href: routeForNamespaces(),
+        icon: 'namespace',
+        label: translate('common.namespaces'),
+        divider: true,
+      },
+      {
+        href: routeForNexus(),
+        icon: 'nexus',
+        label: translate('nexus.nexus'),
+        hidden: !$page.data?.systemInfo?.capabilities?.nexus,
+      },
+      {
+        href: routeForEventHistoryImport(),
+        icon: 'import',
+        label: translate('common.import'),
+      },
+      {
+        href: 'http://docs.temporal.io',
+        icon: 'book',
+        label: translate('common.docs'),
+        external: true,
+      },
+      {
+        href:
+          $page.data?.settings?.feedbackURL ||
+          'https://github.com/temporalio/ui/issues/new/choose',
+        icon: 'feedback',
+        label: translate('common.feedback'),
+        external: true,
+      },
+    ];
   };
 
   function getCurrentHref(namespace: string) {
@@ -116,8 +160,8 @@
     pop={toaster.pop}
     toasts={toaster.toasts}
   />
-  <div class="sticky top-0 z-30 h-screen w-auto">
-    <SideNavigation {activeNamespace} {linkList} {isCloud} />
+  <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
+    <SideNavigation {linkList} {isCloud} />
   </div>
   <MainContentContainer>
     <DataEncoderSettings />
@@ -134,5 +178,12 @@
         <slot />
       </ErrorBoundary>
     </div>
+    <BottomNavigation
+      slot="footer"
+      {linkList}
+      {logout}
+      {namespaceList}
+      {isCloud}
+    />
   </MainContentContainer>
 </div>

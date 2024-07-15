@@ -12,6 +12,14 @@
       document.getElementById('content-wrapper')?.scrollTo(0, 0);
     }
   };
+
+  let variant: 'primary' | 'ghost' = 'ghost';
+
+  const updateVariant = (open: boolean) => {
+    variant = open ? 'primary' : 'ghost';
+  };
+
+  $: updateVariant($viewDataEncoderSettings);
 </script>
 
 <div class="mx-1 flex items-center">
@@ -22,6 +30,7 @@
         text={translate('data-encoder.codec-server-configured')}
       >
         <IconButton
+          {variant}
           label={translate('data-encoder.codec-server-configured')}
           class="relative flex items-center"
           data-testid="data-encoder-status-configured"
@@ -32,6 +41,7 @@
     {:else if $dataEncoder.hasError}
       <Tooltip bottomRight text={translate('data-encoder.codec-server-error')}>
         <IconButton
+          {variant}
           label={translate('data-encoder.codec-server-error')}
           class="relative flex items-center"
           data-testid="data-encoder-status-error"
@@ -45,6 +55,7 @@
         text={translate('data-encoder.codec-server-success')}
       >
         <IconButton
+          {variant}
           label={translate('data-encoder.codec-server-success')}
           class="relative flex items-center"
           data-testid="data-encoder-status-success"
@@ -59,6 +70,7 @@
       text={translate('data-encoder.configure-codec-server')}
     >
       <IconButton
+        {variant}
         label={translate('data-encoder.configure-codec-server')}
         class="relative flex items-center"
         data-testid="data-encoder-status"

@@ -59,18 +59,20 @@
   };
 </script>
 
-<Label
-  hidden
-  for="import-event-history-file-upload"
-  label={translate('events.import-event-history-file-upload')}
-/>
-<input
-  id="import-event-history-file-upload"
-  class="import-input block rounded-md border border-slate-200 p-2"
-  type="file"
-  accept=".json"
-  on:change={onFileSelect}
-/>
-<Button leadingIcon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
-  >{translate('common.import')}</Button
->
+<div class="flex flex-col items-start gap-2 md:flex-row md:items-center">
+  <Label
+    hidden
+    for="import-event-history-file-upload"
+    label={translate('events.import-event-history-file-upload')}
+  />
+  <input
+    id="import-event-history-file-upload"
+    class="import-input block rounded-md border border-slate-200 p-2"
+    type="file"
+    accept=".json"
+    on:change={onFileSelect}
+  />
+  <Button leadingIcon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
+    >{translate('common.import')}</Button
+  >
+</div>

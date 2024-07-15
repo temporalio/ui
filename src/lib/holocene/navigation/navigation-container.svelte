@@ -9,7 +9,6 @@
   import { navOpen } from '$lib/stores/nav-open';
 
   export let isCloud = false;
-  export let linkList: Partial<Record<string, string>>;
 
   const toggle = () => ($navOpen = !$navOpen);
 
@@ -18,7 +17,7 @@
 
 <nav
   class={merge(
-    'group grid h-screen w-16 grid-cols-[2rem] grid-rows-[fit-content(1.5rem)_minmax(3rem,4rem)_1fr_8rem] gap-2 border-r border-subtle px-4 py-5 transition-width data-[nav=open]:w-40 data-[nav=open]:grid-cols-[100%]',
+    'group grid h-screen min-h-[600px] w-16 grid-cols-[2rem] grid-rows-[fit-content(1.5rem)_minmax(3rem,4rem)_1fr_8rem] gap-2 border-r border-subtle px-4 py-5 transition-width data-[nav=open]:w-40 data-[nav=open]:grid-cols-[100%]',
     'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-4 focus-visible:[&_[role=button]]:ring-primary/70 focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-4 focus-visible:[&_a]:ring-primary/70',
     isCloud
       ? 'bg-gradient-to-b from-indigo-600 to-indigo-950 text-off-white focus-visible:[&_[role=button]]:ring-success focus-visible:[&_a]:ring-success'
@@ -28,7 +27,7 @@
   data-testid="navigation-header"
   {...$$restProps}
 >
-  <a href={linkList.home} class="w-fit rounded-lg">
+  <a href="/" class="w-fit rounded-lg">
     <Logo height={24} width={24} class="m-1" />
   </a>
   <button
@@ -41,9 +40,7 @@
     <Icon name="chevron-right" />
   </button>
   <div role="list">
-    <slot name="top" />
-    <hr class="-mx-4 my-8 border-subtle" />
-    <slot name="middle" />
+    <slot />
   </div>
   <div class="self-end">
     <slot name="bottom" />
