@@ -55,6 +55,7 @@
         bind:value={search}
         label={translate('common.search')}
         labelHidden
+        autoFocus
         type="search"
         placeholder={translate('common.search')}
         class="w-full lg:w-1/2"
@@ -75,9 +76,11 @@
               <p class="text-xs text-secondary">
                 Last update {formatDate(endpoint.lastModifiedTime, $timeFormat)}
               </p>
-              <p class="text-xs text-secondary">
-                Created on {formatDate(endpoint.createdTime, $timeFormat)}
-              </p>
+              {#if endpoint.createdTime}
+                <p class="text-xs text-secondary">
+                  Created on {formatDate(endpoint.createdTime, $timeFormat)}
+                </p>
+              {/if}
               {#if endpoint.spec?.allowedCallerNamespaces}
                 <Badge type="primary" class="px-2 py-1"
                   >{endpoint.spec?.allowedCallerNamespaces.length} Namespaces</Badge
@@ -89,7 +92,9 @@
       </div>
     {:else}
       <div class="flex w-full justify-center">
-        <EmptyState title="No Endpoints found, try a new search" />
+        <EmptyState
+          title="No Endpoints found, try a new search. Exact matches only."
+        />
       </div>
     {/if}
   </div>

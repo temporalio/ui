@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { NexusEndpoint } from '$lib/types/nexus';
@@ -10,6 +11,7 @@
   } from '$lib/utilities/route-for';
 
   export let endpoint: NexusEndpoint;
+  export let editDisabled = false;
 </script>
 
 <div class="flex flex-col gap-8">
@@ -23,8 +25,9 @@
       <h1 data-testid="namespace-selector-title" class="text-2xl">
         {endpoint.spec.name}
       </h1>
-      <Button href={routeForNexusEndpointEdit(endpoint.id)}
-        >{translate('common.edit')}</Button
+      <Button
+        href={routeForNexusEndpointEdit(endpoint.id)}
+        disabled={editDisabled}>{translate('common.edit')}</Button
       >
     </div>
     <p>UUID: {endpoint.id}</p>
@@ -32,13 +35,27 @@
   <div
     class="surface-primary max-w-fit rounded-lg border-2 border-secondary p-4"
   >
-    <h4>Target</h4>
+    <p class="text-lg">Target</p>
     <div class="flex flex-col gap-4 lg:flex-row">
-      <div class="flex gap-1">
-        Namespace <i>{endpoint.spec.target.worker.namespace}</i>
+      <div class="flex items-center gap-2">
+        <span class="font-medium">Namespace</span>
+        <Link
+          href={routeForNamespace({
+            namespace: endpoint.spec.target.worker.namespace,
+          })}
+        >
+          <i>{endpoint.spec.target.worker.namespace}</i>
+        </Link>
       </div>
-      <div class="flex gap-1">
-        Task Queue <i>{endpoint.spec.target.worker.taskQueue}</i>
+      <div class="flex items-center gap-2">
+        <span class="font-medium">Task Queue</span>
+        <Copyable
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          content={endpoint.spec.target.worker.taskQueue}
+        >
+          <i>{endpoint.spec.target.worker.taskQueue}</i>
+        </Copyable>
       </div>
     </div>
   </div>

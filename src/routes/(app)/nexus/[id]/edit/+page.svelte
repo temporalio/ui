@@ -67,7 +67,7 @@
     }
   };
 
-  $: namespaceList = $namespaces.map((namespace) => ({
+  $: targetNamespaceList = $namespaces.map((namespace) => ({
     namespace: namespace.namespaceInfo.name,
   }));
 </script>
@@ -79,7 +79,7 @@
 <NexusEditEndpoint
   {endpoint}
   {loading}
-  {namespaceList}
+  {targetNamespaceList}
   {onUpdate}
   {onDelete}
   {error}

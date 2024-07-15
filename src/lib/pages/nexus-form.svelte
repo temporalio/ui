@@ -31,7 +31,8 @@
   import type { NexusEndpoint } from '$lib/types/nexus';
 
   export let endpoint: NexusEndpoint | undefined = undefined;
-  export let namespaceList: { namespace: string }[] = [];
+  export let targetNamespaceList: { namespace: string }[] = [];
+  export let callerNamespaceList: { namespace: string }[] = [];
   export let error: NetworkError | undefined = undefined;
   export let nameDisabled = false;
   export let isCloud = true;
@@ -72,7 +73,7 @@
     allowedCallerNamespaces,
   );
 
-  $: callerNamespaces = namespaceList.map((n) => ({
+  $: callerNamespaces = callerNamespaceList.map((n) => ({
     value: n.namespace,
     label: n.namespace,
   }));
@@ -124,7 +125,7 @@
     id="target-namespace"
     placeholder={translate('nexus.select-namespace')}
     leadingIcon="namespace-switcher"
-    options={namespaceList}
+    options={targetNamespaceList}
     optionValueKey="namespace"
     minSize={32}
   />
