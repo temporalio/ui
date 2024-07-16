@@ -30,6 +30,7 @@ import converterDown from './svg/converter-down.svelte';
 import converterUp from './svg/converter-up.svelte';
 import copy from './svg/copy.svelte';
 import descending from './svg/descending.svelte';
+import dollarBadge from './svg/dollar-badge.svelte';
 import download from './svg/download.svelte';
 import error from './svg/error.svelte';
 import exit from './svg/exit.svelte';
@@ -132,6 +133,7 @@ export const icons = {
   copy,
   descending,
   download,
+  'dollar-badge': dollarBadge,
   error,
   exit,
   'external-link': externalLink,

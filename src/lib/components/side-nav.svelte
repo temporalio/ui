@@ -36,7 +36,7 @@
       {/if}
     {/if}
   {/each}
-  <svelte.fragment slot="bottom">
+  <svelte:fragment slot="bottom">
     <NavigationButton
       onClick={() => ($useDarkMode = !$useDarkMode)}
       tooltip={$useDarkMode
@@ -53,5 +53,6 @@
       active={$labsMode}
       data-testid="labs-mode-button"
     />
-  </svelte.fragment>
+    <slot name="bottom" />
+  </svelte:fragment>
 </Navigation>
