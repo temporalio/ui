@@ -32,7 +32,8 @@
       : 'pending'
     : event.classification;
   $: detailsWidth = canvasWidth - visualWidth;
-  $: icon = isLocalActivityMarkerEvent(event)
+  $: isLocalActivity = isLocalActivityMarkerEvent(event);
+  $: icon = isLocalActivity
     ? CategoryIcon['local-activity']
     : CategoryIcon[event.category];
 </script>
@@ -65,7 +66,9 @@
         {event.id}
         <div class="flex items-center gap-1">
           <Icon name={icon} class="text-white" />
-          {spaceBetweenCapitalLetters(event?.name)}
+          {spaceBetweenCapitalLetters(
+            isLocalActivity ? 'LocalActivity' : event?.name,
+          )}
           {#if group && group.displayName && showDetails}<span
               style="color: {getCategoryColor(group.category)}"
               >{group.displayName}</span

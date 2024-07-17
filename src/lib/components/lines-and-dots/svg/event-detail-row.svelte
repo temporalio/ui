@@ -11,6 +11,7 @@
   } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
   import {
     DetailsConfig,
@@ -55,13 +56,15 @@
 </script>
 
 {#if active && !group?.pendingActivity}
-  <foreignObject {x} y={y - 20} {width} height={fontSizeRatio}>
-    <button
-      class="flex items-center gap-0.5 rounded-t bg-white pl-1.5 pr-0.5 text-sm text-black"
-      on:click|stopPropagation={() => setActiveEvent(event, group)}
-    >
-      {translate('common.close')}<Icon name="close" />
-    </button>
+  <foreignObject {x} y={y - 24} {width} height={fontSizeRatio}>
+    <div class="flex w-full items-center justify-end px-1">
+      <button
+        class="flex items-center gap-0.5 rounded-t bg-white pl-1.5 pr-0.5 text-black"
+        on:click|stopPropagation={() => setActiveEvent(event, group)}
+      >
+        {translate('common.close')}<Icon name="close" />
+      </button>
+    </div>
   </foreignObject>
 {/if}
 <Box
@@ -79,7 +82,9 @@
   <div class="flex items-center justify-between px-2 py-1 text-sm text-white">
     <div class="flex items-center gap-2">
       {event.id}
-      {spaceBetweenCapitalLetters(event?.name)}
+      {spaceBetweenCapitalLetters(
+        isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event?.name,
+      )}
     </div>
     {#if showTimestamp}
       <div class="text-xs">
