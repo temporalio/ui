@@ -301,7 +301,9 @@
     </Button>
     {#if $$slots.action}
       <div class="ml-1 h-full w-1 border-l-2 border-subtle" />
-      <slot name="action" />
+      <div class="-ml-px px-0.5">
+        <slot name="action" />
+      </div>
     {/if}
   </div>
   {#if error && !valid}
