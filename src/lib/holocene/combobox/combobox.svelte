@@ -300,8 +300,7 @@
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
     </Button>
     {#if $$slots.action}
-      <div class="ml-1 h-full w-1 border-l-2 border-subtle" />
-      <div class="-ml-px px-0.5">
+      <div class="ml-1 flex h-full items-center border-l-2 border-subtle p-0.5">
         <slot name="action" />
       </div>
     {/if}
