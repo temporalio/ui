@@ -45,6 +45,7 @@
     onChange?: (value: T) => void;
     'data-testid'?: string;
     variant?: MenuButtonVariant;
+    required?: boolean;
   };
 
   export let label: string;
@@ -56,6 +57,7 @@
   export let leadingIcon: IconName = null;
   export let onChange: (value: T) => void = noop;
   export let variant: MenuButtonVariant = 'secondary';
+  export let required = false;
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
   const valueCtx = writable<T>(value);
@@ -99,8 +101,8 @@
   });
 </script>
 
-<MenuContainer class="w-full" {open}>
-  <Label {label} hidden={labelHidden} for={id} />
+<MenuContainer {open}>
+  <Label {label} hidden={labelHidden} for={id} {required} />
   {#key $labelCtx}
     <MenuButton
       hasIndicator={!disabled}
@@ -108,13 +110,19 @@
       controls="{id}-select"
       {variant}
     >
-      <Icon slot="leading" name={leadingIcon} />
+      <slot name="leading" slot="leading">
+        {#if leadingIcon}
+          <Icon name={leadingIcon} />
+        {/if}
+      </slot>
       <input
         {id}
         value={!value && placeholder !== '' ? placeholder : $labelCtx}
         tabindex="-1"
         disabled
         class:disabled
+        {required}
+        aria-required={required}
         {...$$restProps}
       />
       {#if disabled}
@@ -129,6 +137,6 @@
 
 <style lang="postcss">
   input {
-    @apply pointer-events-none w-full bg-transparent;
+    @apply pointer-events-none w-full bg-transparent text-sm;
   }
 </style>

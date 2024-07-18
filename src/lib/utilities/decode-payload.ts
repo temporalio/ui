@@ -10,7 +10,7 @@ import type {
   passAccessToken,
 } from '$lib/stores/data-encoder-config';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
-import type { Payloads } from '$lib/types';
+import type { Payloads, Payload as RawPayload } from '$lib/types';
 import type {
   EventAttribute,
   EventRequestMetadata,
@@ -184,6 +184,20 @@ const keyIs = (key: string, ...validKeys: string[]) => {
   return false;
 };
 
+export const decodeSingleReadablePayloadWithCodec = async (
+  payload: RawPayload,
+  settings: Settings = get(page).data.settings,
+): Promise<string> => {
+  try {
+    const decode = decodeReadablePayloads(settings);
+    const data = await decode([payload]);
+    const result = data[0] as string;
+    return result || '';
+  } catch {
+    return '';
+  }
+};
+
 export const decodeAllPotentialPayloadsWithCodec = async (
   anyAttributes: EventAttribute | PotentiallyDecodable,
   namespace: string = get(page).params.namespace,
@@ -217,6 +231,14 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   return anyAttributes;
 };
 
+export const isSinglePayload = (payload: unknown): boolean => {
+  if (!isObject(payload)) return false;
+  const keys = Object.keys(payload);
+  return (
+    keys.length === 2 && keys.includes('metadata') && keys.includes('data')
+  );
+};
+
 export const cloneAllPotentialPayloadsWithCodec = async (
   anyAttributes: PotentiallyDecodable | EventAttribute | WorkflowEvent | null,
   namespace: string,
@@ -233,6 +255,13 @@ export const cloneAllPotentialPayloadsWithCodec = async (
       : decodePayloads(settings);
   const clone = { ...anyAttributes };
   if (anyAttributes) {
+    // Now that we can have single Payload that is not an array (Nexus)
+    if (isSinglePayload(clone)) {
+      const data = toArray(clone as Payload);
+      const decoded = await decode(data, returnDataOnly);
+      return decoded?.[0] || clone;
+    }
+
     for (const key of Object.keys(clone)) {
       if (keyIs(key, 'payloads', 'encodedAttributes') && clone[key]) {
         const data = toArray(clone[key]);

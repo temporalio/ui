@@ -4,6 +4,7 @@
     value: T;
     description?: string;
     disabled?: boolean;
+    class?: string;
   }
 
   export const EMPTY_OPTION: OptionType<string> = {
@@ -34,6 +35,8 @@
   export let value: T;
   export let description = '';
   export let disabled = false;
+  let className = '';
+  export { className as class };
 
   let selected = false;
   let _value: T | string;
@@ -76,6 +79,7 @@
   {selected}
   {description}
   {disabled}
+  class={className}
 >
   <slot name="leading" slot="leading" />
   <span bind:this={slotWrapper}>

@@ -43,6 +43,7 @@ export type PendingActivityState =
   | 'CancelRequested';
 
 export type PendingChildren = import('$lib/types').PendingChildrenInfo;
+export type PendingNexusOperation = import('$lib/types').PendingNexusInfo;
 
 export type EventRequestMetadata = {
   namespace: string;
@@ -220,8 +221,20 @@ export type WorkflowExecutionUpdateAcceptedEvent =
   EventWithAttributes<'workflowExecutionUpdateAcceptedEventAttributes'>;
 export type WorkflowExecutionUpdateCompletedEvent =
   EventWithAttributes<'workflowExecutionUpdateCompletedEventAttributes'>;
-export type WorkflowExecutionUpdateRequestedEvent =
-  EventWithAttributes<'workflowExecutionUpdateRequestedEventAttributes'>;
+export type NexusOperationScheduledEvent =
+  EventWithAttributes<'nexusOperationScheduledEventAttributes'>;
+export type NexusOperationStartedEvent =
+  EventWithAttributes<'nexusOperationStartedEventAttributes'>;
+export type NexusOperationCompletedEvent =
+  EventWithAttributes<'nexusOperationCompletedEventAttributes'>;
+export type NexusOperationFailedEvent =
+  EventWithAttributes<'nexusOperationFailedEventAttributes'>;
+export type NexusOperationCanceledEvent =
+  EventWithAttributes<'nexusOperationCanceledEventAttributes'>;
+export type NexusOperationTimedOutEvent =
+  EventWithAttributes<'nexusOperationTimedOutEventAttributes'>;
+export type NexusOperationCancelRequestedEvent =
+  EventWithAttributes<'nexusOperationCancelRequestedEventAttributes'>;
 
 export type FailActivityTaskRequest =
   import('$lib/types').ActivityTaskFailedByIdRequest;

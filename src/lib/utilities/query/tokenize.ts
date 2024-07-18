@@ -41,7 +41,9 @@ export const tokenize = (string: string): Tokens => {
     if (isBacktick(character)) {
       const isPotentialStartofAttribute =
         cursor === 0 ||
-        (isSpace(string[cursor - 1]) && isOperator(tokens[tokens.length - 1]));
+        (isSpace(string[cursor - 1]) &&
+          isOperator(tokens[tokens.length - 1])) ||
+        isParenthesis(string[cursor - 1]);
       const hasClosingBacktick = string.slice(cursor + 1).includes(character);
 
       if (isPotentialStartofAttribute && hasClosingBacktick) {

@@ -2,15 +2,15 @@ import { describe, expect, it } from 'vitest';
 
 import { tokenize } from './tokenize';
 
-const executionStatusQuery = 'ExecutionStatus="Completed"';
-const startTimeQuery = 'StartTime > "2022-04-18T17:45:18-06:00"';
-const workflowQuery = 'WorkflowId="Hello" and WorkflowType="World"';
+const executionStatusQuery = '`ExecutionStatus`="Completed"';
+const startTimeQuery = '`StartTime` > "2022-04-18T17:45:18-06:00"';
+const workflowQuery = '`WorkflowId`="Hello" and `WorkflowType`="World"';
 const customAttributesWithSpacesQuery =
-  '(ExecutionStatus="Running" OR ExecutionStatus="TimedOut") AND `Custom Key Word`="Hello there" AND WorkflowId="some workflow" AND `Custom Boolean`=true';
+  '(`ExecutionStatus`="Running" OR `ExecutionStatus`="TimedOut") AND `Custom Key Word`="Hello there" AND `WorkflowId`="some workflow" AND `Custom Boolean`=true';
 const combinedQuery =
-  'WorkflowId="Hello" and WorkflowType="World" and StartTime BETWEEN "2022-04-18T18:09:49-06:00" AND "2022-04-20T18:09:49-06:00"';
+  '`WorkflowId`="Hello" and `WorkflowType`="World" and `StartTime` BETWEEN "2022-04-18T18:09:49-06:00" AND "2022-04-20T18:09:49-06:00"';
 const valuesWithSpacesQuery =
-  '`Custom Key Word`="Hello there world" AND WorkflowId="one and two = three" OR WorkflowType="example=\'one\'"';
+  '`Custom Key Word`="Hello there world" AND `WorkflowId`="one and two = three" OR `WorkflowType`="example=\'one\'"';
 
 describe('tokenize', () => {
   it('should eliminate spaces', () => {

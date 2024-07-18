@@ -30,6 +30,7 @@ import converterDown from './svg/converter-down.svelte';
 import converterUp from './svg/converter-up.svelte';
 import copy from './svg/copy.svelte';
 import descending from './svg/descending.svelte';
+import dollarBadge from './svg/dollar-badge.svelte';
 import download from './svg/download.svelte';
 import error from './svg/error.svelte';
 import exit from './svg/exit.svelte';
@@ -44,7 +45,7 @@ import fileImport from './svg/file-import.svelte';
 import fileUpload from './svg/file-upload.svelte';
 import filterSolid from './svg/filter-solid.svelte';
 import filter from './svg/filter.svelte';
-import fireHydrant from './svg/fire-hydrant.svelte';
+import fireExtinguisher from './svg/fire-extinguisher.svelte';
 import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
 import hyphen from './svg/hyphen.svelte';
@@ -63,6 +64,7 @@ import merge from './svg/merge.svelte';
 import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
+import nexus from './svg/nexus.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
 import regions from './svg/regions.svelte';
@@ -131,6 +133,7 @@ export const icons = {
   copy,
   descending,
   download,
+  'dollar-badge': dollarBadge,
   error,
   exit,
   'external-link': externalLink,
@@ -144,7 +147,7 @@ export const icons = {
   'file-upload': fileUpload,
   filter,
   'filter-solid': filterSolid,
-  'fire-hydrant': fireHydrant,
+  'fire-extinguisher': fireExtinguisher,
   github,
   graph,
   hyphen,
@@ -163,6 +166,7 @@ export const icons = {
   moon,
   'namespace-switcher': namespaceSwitcher,
   namespace,
+  nexus,
   'pin-filled': pinFilled,
   pin,
   regions,

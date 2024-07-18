@@ -25,7 +25,7 @@ export type GetPollersResponse = {
   taskQueueStatus: TaskQueueStatus;
 };
 
-type AssignmentRule = {
+export type AssignmentRule = {
   rule: {
     targetBuildId: string;
     percentageRamp?: {

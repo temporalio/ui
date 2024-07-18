@@ -122,7 +122,7 @@ test.describe('Data Encoder without Configuration Settings', () => {
 
     await page
       .locator('label')
-      .filter({ hasText: 'Pass the user access token with your endpoint.' })
+      .filter({ hasText: 'Pass the user access token' })
       .click();
 
     await expect(page.locator('.error-msg')).toHaveText(
@@ -167,7 +167,7 @@ test.describe('Data Encoder without Configuration Settings', () => {
 
     await page
       .locator('label')
-      .filter({ hasText: 'Include cross-origin credentials.' })
+      .filter({ hasText: 'Include cross-origin credentials' })
       .click();
 
     await dataEncoderConfirmButton.click();

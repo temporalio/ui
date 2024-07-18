@@ -10,6 +10,7 @@ import type {
   PendingActivity,
   PendingActivityInfo,
   PendingChildren,
+  PendingNexusOperation,
 } from './events';
 import type { Optional, Replace } from './global';
 
@@ -54,6 +55,7 @@ export type WorkflowExecutionAPIResponse = Optional<{
   workflowExecutionInfo: WorkflowExecutionInfo;
   pendingActivities: PendingActivityInfo[];
   pendingChildren: PendingChildren[];
+  pendingNexusOperations: PendingNexusOperation[];
   executionConfig: WorkflowExecutionConfig;
 }>;
 
@@ -131,6 +133,7 @@ export type WorkflowExecution = {
   searchAttributes?: DecodedWorkflowSearchAttributes;
   memo: Memo;
   pendingChildren: PendingChildren[];
+  pendingNexusOperations: PendingNexusOperation[];
   pendingActivities: PendingActivity[];
   stateTransitionCount: string;
   parentNamespaceId?: string;
