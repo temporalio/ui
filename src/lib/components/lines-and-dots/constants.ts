@@ -62,14 +62,13 @@ export const DetailsConfig: GraphConfig = {
 export const CategoryIcon: Record<EventTypeCategory, IconName> = {
   workflow: 'workflow',
   signal: 'signal',
-  command: 'terminal',
   activity: 'activity',
-  marker: 'marker',
   nexus: 'nexus',
   timer: 'retention',
   'local-activity': 'feather',
   'child-workflow': 'relationship',
   update: 'update',
+  other: 'terminal',
 };
 
 export const timelineTextPosition = (
@@ -298,8 +297,7 @@ export const getStatusColor = (
 
 export const getCategoryColor = (type: EventTypeCategory): string => {
   switch (type) {
-    case 'command':
-    case 'marker':
+    case 'other':
     case 'local-activity':
       return '#ebebeb';
     case 'timer':

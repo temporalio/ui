@@ -128,6 +128,8 @@ export type ActivityTaskCompletedByIdRequest =
   temporal.api.workflowservice.v1.IRespondActivityTaskCompletedRequest;
 export type ActivityTaskCompletedByIdResponse =
   temporal.api.workflowservice.v1.IRespondActivityTaskCompletedResponse;
+export type WorkflowPropertiesModifiedEventAttributes =
+  temporal.api.history.v1.IWorkflowPropertiesModifiedEventAttributes;
 
 // api.enums
 
