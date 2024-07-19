@@ -87,7 +87,5 @@ export const eventClassificationFilter = writable<
   EventClassification[] | undefined
 >(undefined, updateEventClassificationFilter);
 
-const defaultOptions = allEventTypeOptions
-  .map(({ value }) => value)
-  .filter((type) => type !== 'marker');
+const defaultOptions = allEventTypeOptions.map(({ value }) => value);
 export const eventTypeFilter = writable<EventTypeCategory[]>(defaultOptions);

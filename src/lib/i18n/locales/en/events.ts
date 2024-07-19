@@ -16,6 +16,7 @@ export const Strings = {
     activity: 'Activity',
     'child-workflow': 'Child Workflow',
     command: 'Command',
+    other: 'Other',
     'local-activity': 'Local Activity',
     marker: 'Marker',
     nexus: 'Nexus',
