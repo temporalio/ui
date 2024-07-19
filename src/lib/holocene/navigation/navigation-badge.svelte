@@ -7,11 +7,18 @@
   export let tooltip: string = '';
   export let external = false;
 
+  let className: string = '';
+  export { className as class };
+
   $: rel = external ? 'noopener noreferrer' : '';
   $: target = external ? '_blank' : '';
 </script>
 
-<div class="relative" role="listitem" data-testid={$$props['data-testid']}>
+<div
+  class="relative {className}"
+  role="listitem"
+  data-testid={$$props['data-testid']}
+>
   <a
     href={link}
     {rel}
@@ -26,9 +33,7 @@
         <Icon name={icon} />
       {/if}
     </div>
-    <div
-      class="text-xs font-medium group-data-[nav=open]:visible group-data-[nav=closed]:hidden"
-    >
+    <div class="group-data-[nav=open]:visible group-data-[nav=closed]:hidden">
       <slot />
     </div>
   </a>
