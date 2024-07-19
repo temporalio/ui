@@ -300,13 +300,13 @@ export const getCategoryColor = (type: EventTypeCategory): string => {
   switch (type) {
     case 'command':
     case 'marker':
-    case 'local-activity':
       return '#ebebeb';
     case 'timer':
       return '#fbbf24';
     case 'signal':
       return '#ec4899';
     case 'activity':
+    case 'local-activity':
       return '#a78bfa';
     case 'workflow':
       return '#059669';

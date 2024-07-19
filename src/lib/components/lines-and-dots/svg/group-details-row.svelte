@@ -66,7 +66,7 @@
     staticCodeBlockHeight * codeBlockAttributes.length - textHeight,
   );
 
-  $: title = group.name;
+  $: title = group.displayName;
   $: attributes = mergeEventGroupDetails(group);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
