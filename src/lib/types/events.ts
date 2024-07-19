@@ -235,6 +235,8 @@ export type NexusOperationTimedOutEvent =
   EventWithAttributes<'nexusOperationTimedOutEventAttributes'>;
 export type NexusOperationCancelRequestedEvent =
   EventWithAttributes<'nexusOperationCancelRequestedEventAttributes'>;
+export type WorkflowPropertiesModifiedEvent =
+  EventWithAttributes<'workflowPropertiesModifiedEventAttributes'>;
 
 export type FailActivityTaskRequest =
   import('$lib/types').ActivityTaskFailedByIdRequest;

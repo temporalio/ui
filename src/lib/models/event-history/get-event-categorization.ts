@@ -11,14 +11,13 @@ export type EventTypeCategory = Categories[keyof Categories];
 export const CATEGORIES = {
   ACTIVITY: 'activity',
   CHILD_WORKFLOW: 'child-workflow',
-  COMMAND: 'command',
   LOCAL_ACTIVITY: 'local-activity',
-  MARKER: 'marker',
   NEXUS: 'nexus',
   SIGNAL: 'signal',
   TIMER: 'timer',
   UPDATE: 'update',
   WORKFLOW: 'workflow',
+  OTHER: 'other',
 } as const;
 
 export const eventTypeCategorizations: Readonly<
@@ -40,8 +39,6 @@ export const eventTypeCategorizations: Readonly<
   ChildWorkflowExecutionTimedOut: CATEGORIES.CHILD_WORKFLOW,
   StartChildWorkflowExecutionFailed: CATEGORIES.CHILD_WORKFLOW,
   StartChildWorkflowExecutionInitiated: CATEGORIES.CHILD_WORKFLOW,
-
-  MarkerRecorded: CATEGORIES.MARKER,
 
   SignalExternalWorkflowExecutionFailed: CATEGORIES.SIGNAL,
   SignalExternalWorkflowExecutionInitiated: CATEGORIES.SIGNAL,
@@ -69,8 +66,6 @@ export const eventTypeCategorizations: Readonly<
   RequestCancelExternalWorkflowExecutionFailed: CATEGORIES.WORKFLOW,
   RequestCancelExternalWorkflowExecutionInitiated: CATEGORIES.WORKFLOW,
 
-  UpsertWorkflowSearchAttributes: CATEGORIES.COMMAND,
-
   WorkflowExecutionUpdateAccepted: CATEGORIES.UPDATE,
   WorkflowExecutionUpdateCompleted: CATEGORIES.UPDATE,
   WorkflowExecutionUpdateRequested: CATEGORIES.UPDATE,
@@ -83,6 +78,10 @@ export const eventTypeCategorizations: Readonly<
   NexusOperationCanceled: CATEGORIES.NEXUS,
   NexusOperationTimedOut: CATEGORIES.NEXUS,
   NexusOperationCancelRequested: CATEGORIES.NEXUS,
+
+  MarkerRecorded: CATEGORIES.OTHER,
+  UpsertWorkflowSearchAttributes: CATEGORIES.OTHER,
+  WorkflowPropertiesModified: CATEGORIES.OTHER,
 };
 
 export type EventTypeOption = {
@@ -100,16 +99,8 @@ export const allEventTypeOptions: EventTypeOption[] = [
     value: CATEGORIES.CHILD_WORKFLOW,
   },
   {
-    label: 'events.category.command',
-    value: CATEGORIES.COMMAND,
-  },
-  {
     label: 'events.category.local-activity',
     value: CATEGORIES.LOCAL_ACTIVITY,
-  },
-  {
-    label: 'events.category.marker',
-    value: CATEGORIES.MARKER,
   },
   {
     label: 'events.category.signal',
@@ -125,6 +116,10 @@ export const allEventTypeOptions: EventTypeOption[] = [
     label: 'events.category.workflow',
     value: CATEGORIES.WORKFLOW,
   },
+  {
+    label: 'events.category.other',
+    value: CATEGORIES.OTHER,
+  },
 ];
 
 const compactEventTypes: EventTypeCategory[] = [
@@ -133,16 +128,16 @@ const compactEventTypes: EventTypeCategory[] = [
   CATEGORIES.CHILD_WORKFLOW,
   CATEGORIES.SIGNAL,
   CATEGORIES.TIMER,
-  CATEGORIES.MARKER,
   CATEGORIES.UPDATE,
   CATEGORIES.NEXUS,
+  CATEGORIES.OTHER,
 ];
 
 export const compactEventTypeOptions: EventTypeOption[] =
   allEventTypeOptions.filter(({ value }) => compactEventTypes.includes(value));
 
 export const getEventCategory = (eventType: EventType): EventTypeCategory => {
-  return eventTypeCategorizations[eventType];
+  return eventTypeCategorizations?.[eventType] || CATEGORIES.OTHER;
 };
 
 export const isCategoryType = (value: string): value is EventTypeCategory => {
