@@ -45,24 +45,3 @@
     error: 'This is an error message.',
   }}
 />
-
-<Story
-  name="Default (Dark)"
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Error (Dark)"
-  args={{
-    error: 'This is an error message.',
-  }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>

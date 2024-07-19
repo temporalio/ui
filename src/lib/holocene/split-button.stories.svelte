@@ -76,14 +76,3 @@
 <Story name="Primary, Disabled" args={{ disabled: true }} />
 
 <Story name="Disabled with Icon" args={{ icon: 'trash', disabled: true }} />
-
-<Story
-  name="Primary (Dark)"
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Primary with Icon (Dark)"
-  args={{ icon: 'trash' }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>

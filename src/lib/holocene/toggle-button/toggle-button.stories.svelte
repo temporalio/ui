@@ -80,6 +80,4 @@
   </ToggleButtons>
 </Template>
 
-<Story name="Light" {play} />
-
-<Story name="Dark" {play} parameters={{ themes: { themeOverride: 'dark' } }} />
+<Story name="Default" {play} />

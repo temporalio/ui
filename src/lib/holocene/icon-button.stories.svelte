@@ -32,12 +32,3 @@
 </Template>
 
 <Story name="Default" />
-
-<Story
-  name="Default (Dark)"
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>

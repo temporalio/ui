@@ -82,36 +82,3 @@
   }}
   play={focus}
 />
-
-<Story
-  name="Default (Dark)"
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Disabled (Dark)"
-  args={{ disabled: true }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Disallowed Dates, Focused (Dark)"
-  args={{
-    selected: new Date('2012-09-19'),
-    isAllowed: disallowSundays,
-  }}
-  play={focus}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
