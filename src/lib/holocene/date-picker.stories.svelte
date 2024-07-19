@@ -61,21 +61,14 @@
   <DatePicker {...args} on:datechange={action('date-change')} />
 </Template>
 
-<Story name="Default" />
-
-<Story name="Focused" play={focus} />
+<Story name="Default" play={focus} />
 
 <Story name="Disabled" args={{ disabled: true }} />
 
 <Story name="Hidden Label" args={{ labelHidden: true }} />
 
 <Story
-  name="Disabled with Hidden Label"
-  args={{ disabled: true, labelHidden: true }}
-/>
-
-<Story
-  name="Disallowed Dates, Focused"
+  name="Disallowed Dates"
   args={{
     selected: new Date('2012-09-19'),
     isAllowed: disallowSundays,

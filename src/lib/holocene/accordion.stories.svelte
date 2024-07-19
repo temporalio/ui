@@ -39,9 +39,7 @@
   </Accordion>
 </Template>
 
-<Story name="Default" />
-
-<Story name="Open" args={{ open: true }} />
+<Story name="Default" args={{ open: true }} />
 
 <Story name="With Error" args={{ error: 'Error' }} />
 

@@ -39,6 +39,4 @@
 
 <Story name="Active" args={{ active: true }} />
 
-<Story name="Open in New Tab" args={{ newTab: true }} />
-
 <Story name="Light" args={{ light: true }} />

@@ -69,8 +69,6 @@
 
 <Story name="Hidden Label" args={{ labelHidden: true }} />
 
-<Story name="Spellcheck" args={{ spellcheck: true }} />
-
 <Story name="With Maximum Length" args={{ maxLength: 10 }} />
 
 <Story name="With Value" args={{ value: 'Some text…' }} />
