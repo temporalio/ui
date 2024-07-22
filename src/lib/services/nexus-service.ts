@@ -24,6 +24,7 @@ export const fetchNexusEndpoint = async (
   const route = routeForApi('nexus-endpoint', { endpointId: id });
   const endpoint = await requestFromAPI<{ endpoint: NexusEndpoint }>(route, {
     request,
+    notifyOnError: false,
   });
   return endpoint;
 };

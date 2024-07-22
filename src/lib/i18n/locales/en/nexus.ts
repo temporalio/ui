@@ -30,7 +30,7 @@ export const Strings = {
   'delete-modal-confirmation':
     'Are you sure you want to delete {{endpoint}}? Any Workflows calling this endpoint will encounter failures.',
   'delete-modal-confirmation-label':
-    'Type “DELETE {{endpoint}}" to delete this endpoint.',
+    'Type “{{endpoint}}" to delete this endpoint.',
   'endpoint-name-hint':
     'Endpoint name must start with A-Z, a-z or _ and can only contain A-Z, a-z, 0-9, or _',
   'access-policy': 'Access Policy',
