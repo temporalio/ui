@@ -66,8 +66,12 @@
     dispatch('confirmModal');
   };
 
+  const closeModal = () => {
+    open = false;
+  };
+
   const handleClick = (event: MouseEvent) => {
-    if (event.target === modalElement) handleCancel();
+    if (event.target === modalElement) closeModal();
   };
 
   $: {
@@ -97,7 +101,7 @@
       label={cancelText}
       icon="close"
       class="float-right m-4"
-      on:click={handleCancel}
+      on:click={closeModal}
     />
   {/if}
   <div id="modal-title-{id}" class="title">
@@ -115,7 +119,7 @@
       </p>
     </div>
     <div class="flex items-center justify-end space-x-2 p-6">
-      <Button variant="ghost" disabled={loading} on:click={handleCancel}
+      <Button variant="ghost" disabled={loading} on:click={closeModal}
         >{cancelText}</Button
       >
       {#if !hideConfirm}

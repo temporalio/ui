@@ -153,6 +153,7 @@
 
   onMount(() => {
     view = createEditorView();
+    return () => view.destroy();
   });
 
   export const resetView = (value = '', format = true) => {
