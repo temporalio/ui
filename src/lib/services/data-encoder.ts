@@ -45,6 +45,10 @@ export async function decodePayloadsWithCodec({
         accessToken = await globalThis?.AccessToken();
       }
       headers['Authorization'] = `Bearer ${accessToken}`;
+      const accessTokenExtras = get(authUser).idToken;
+      if (accessTokenExtras) {
+        headers['Authorization-Extras'] = accessTokenExtras;
+      }
     } else {
       setLastDataEncoderFailure();
       return payloads;
@@ -117,6 +121,10 @@ export async function encodePayloadsWithCodec({
   if (passAccessToken) {
     if (validateHttps(endpoint)) {
       headers['Authorization'] = `Bearer ${accessToken}`;
+      const accessTokenExtras = get(authUser).idToken;
+      if (accessTokenExtras) {
+        headers['Authorization-Extras'] = accessTokenExtras;
+      }
     } else {
       setLastDataEncoderFailure();
       return payloads;
