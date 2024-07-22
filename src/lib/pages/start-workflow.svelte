@@ -5,7 +5,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import StartWorkflowSearchAttributes from '$lib/components/workflow/start-workflow-search-attributes.svelte';
+  import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -258,7 +258,7 @@
       </div>
     </div>
     {#if viewAdvancedOptions}
-      <StartWorkflowSearchAttributes bind:attributesToAdd={searchAttributes} />
+      <AddSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}
     <div class="mt-4 flex w-full justify-between">
       <Button

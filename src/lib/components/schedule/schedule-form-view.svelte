@@ -11,6 +11,7 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import { error, loading } from '$lib/stores/schedules';
+  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
   import type {
     FullSchedule,
     ScheduleParameters,
@@ -21,6 +22,8 @@
     routeForSchedules,
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
+
+  import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
 
@@ -65,6 +68,7 @@
   let second = '';
   let phase = '';
   let cronString = '';
+  let searchAttributes: SearchAttributeInput[] = [];
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: Partial<ScheduleParameters> = {
@@ -82,6 +86,7 @@
       daysOfMonth,
       days,
       months,
+      searchAttributes,
     };
 
     onConfirm(preset, args, schedule);
@@ -194,6 +199,10 @@
         bind:input
         payloads={schedule?.action?.startWorkflow?.input}
         error={errors['input']}
+      />
+      <AddSearchAttributes
+        bind:attributesToAdd={searchAttributes}
+        class="w-full"
       />
       <SchedulesCalendarView
         let:preset

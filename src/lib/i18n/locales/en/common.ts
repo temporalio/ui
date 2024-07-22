@@ -170,4 +170,5 @@ export const Strings = {
   active: 'Active',
   inactive: 'Inactive',
   'page-not-found': 'Page Not Found',
+  value: 'Value',
 } as const;

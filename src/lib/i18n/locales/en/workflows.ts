@@ -237,4 +237,7 @@ export const Strings = {
     'e.g. "2h45m", "hh:mm:ss", or "1000" nanoseconds',
   'start-workflow': 'Start Workflow',
   'start-workflow-like-this-one': 'Start Workflow Like This One',
+  'custom-search-attribute': 'Custom Search Attribute',
+  'select-attribute': 'Select Attribute',
+  'add-search-attribute': 'Add a Search Attribute',
 } as const;

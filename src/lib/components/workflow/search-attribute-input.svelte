@@ -3,6 +3,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type {
     SearchAttributeInput,
     SearchAttributeOption,
@@ -21,11 +22,12 @@
   };
 </script>
 
-<div class="flex items-end items-center justify-between gap-2">
+<div class="flex items-center justify-between gap-2">
   <Select
     id="search-attribute"
-    label="Custom Search Attribute"
-    placeholder="Select Attribute"
+    label={translate('workflows.custom-search-attribute')}
+    class="w-full"
+    placeholder={translate('workflows.select-attribute')}
     bind:value={attribute.attribute}
   >
     {#each searchAttributes as { value, label, type }}
@@ -36,27 +38,27 @@
   </Select>
   {#if type === 'Bool'}
     <Select
-      class="w-full"
-      label="Value"
+      class="grow"
+      label={translate('common.value')}
       id="attribute-value"
       bind:value={attribute.value}
     >
-      <Option value={true}>True</Option>
-      <Option value={false}>False</Option>
+      <Option value={true}>{translate('common.true')}</Option>
+      <Option value={false}>{translate('common.false')}</Option>
     </Select>
   {:else if type === 'Datetime'}
     <Input
-      label="Value"
+      label={translate('common.value')}
       id="attribute-value"
       type="datetime-local"
-      class="w-full"
+      class="grow"
       bind:value={attribute.value}
     />
   {:else}
     <Input
-      label="Value"
+      label={translate('common.value')}
       id="attribute-value"
-      class="w-full"
+      class="grow"
       bind:value={attribute.value}
     />
   {/if}

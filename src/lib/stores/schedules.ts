@@ -4,6 +4,7 @@ import { goto } from '$app/navigation';
 
 import { translate } from '$lib/i18n/translate';
 import { createSchedule, editSchedule } from '$lib/services/schedule-service';
+import { setSearchAttributes } from '$lib/services/workflow-service';
 import type { Schedule } from '$lib/types';
 import type {
   DescribeFullSchedule,
@@ -80,8 +81,15 @@ export const submitCreateSchedule = async ({
   spec,
   presets,
 }: ScheduleParameterArgs): Promise<void> => {
-  const { namespace, name, workflowId, workflowType, taskQueue, input } =
-    action;
+  const {
+    namespace,
+    name,
+    workflowId,
+    workflowType,
+    taskQueue,
+    input,
+    searchAttributes,
+  } = action;
 
   let payloads;
 
@@ -108,6 +116,14 @@ export const submitCreateSchedule = async ({
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
           input: payloads ? { payloads } : null,
+          searchAttributes:
+            searchAttributes.length === 0
+              ? null
+              : {
+                  indexedFields: {
+                    ...setSearchAttributes(searchAttributes),
+                  },
+                },
         },
       },
     },
