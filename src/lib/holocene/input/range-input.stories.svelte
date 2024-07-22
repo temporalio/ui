@@ -56,20 +56,3 @@
 <Story name="Required" args={{ required: true }} />
 
 <Story name="Label Hidden" args={{ labelHidden: true }} />
-
-<Story
-  name="Default (Dark)"
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Required (Dark)"
-  args={{ required: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Label Hidden (Dark)"
-  args={{ labelHidden: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
