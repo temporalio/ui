@@ -44,18 +44,14 @@
 </script>
 
 <div
-  class={merge('alert flex', intent, className)}
+  class={merge('alert', intent, className)}
   class:hidden
   {role}
   {...$$restProps}
 >
-  {#if icon}
-    <div class="pt-1">
-      <Icon name={icon} />
-    </div>
-  {/if}
-  <div class="ml-1 grow">
-    <p class="font-semibold leading-6" class:hidden={!title}>
+  <Icon name={icon} class="mt-0.5 shrink-0" />
+  <div class="min-w-0 gap-1">
+    <p class="font-medium">
       {title}
     </p>
     {#if $$slots.default}
@@ -68,7 +64,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply rounded-lg border-2 p-5 font-primary text-sm text-primary;
+    @apply flex items-start gap-2 break-words rounded-lg border-2 p-5 font-primary text-sm text-primary;
   }
 
   .alert.success {
