@@ -13,6 +13,12 @@
 </rect>
 
 <style lang="postcss">
+  .Started {
+    stroke: #a78bfa;
+    fill: #a78bfa;
+    stroke-width: 3;
+  }
+
   .Failed,
   .Terminated {
     stroke: #ff4518;
