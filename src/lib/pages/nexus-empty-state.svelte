@@ -13,7 +13,7 @@
       <div class="mb-8 flex items-center gap-4">
         <h1
           data-testid="namespace-selector-title"
-          class="text-marketingGreen font-mono text-2xl uppercase"
+          class="text-marketingGreen font-mono uppercase"
         >
           {translate('nexus.endpoints')}
         </h1>

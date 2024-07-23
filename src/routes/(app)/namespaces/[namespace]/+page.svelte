@@ -60,7 +60,7 @@
   }`}
   url={$page.url.href}
 />
-<h1 class="text-2xl" data-testid="namespace-title">
+<h1 data-testid="namespace-title">
   {translate('namespaces.namespace')}: {namespace?.namespaceInfo?.name}
 </h1>
 <h2 data-testid="namespace-description">

@@ -22,7 +22,7 @@
   </div>
   <div class="flex flex-col gap-1">
     <div class="flex items-center justify-between">
-      <h1 data-testid="namespace-selector-title" class="text-2xl">
+      <h1 data-testid="namespace-selector-title">
         {endpoint.spec.name}
       </h1>
       <Button

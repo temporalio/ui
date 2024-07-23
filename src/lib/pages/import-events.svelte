@@ -15,7 +15,7 @@
     class="block items-center justify-between gap-4 pb-4 lg:flex"
     aria-label={translate('events.import-event-history')}
   >
-    <h1 class="text-lg font-medium" data-testid="import-event-history">
+    <h1 data-testid="import-event-history">
       {translate('events.import-event-history')}
     </h1>
     <div class="flex gap-4">

@@ -31,6 +31,15 @@
     font-family: theme('fontFamily.secondary');
   }
 
+  h1 {
+    font-size: theme('fontSize.2xl');
+    font-weight: theme('fontWeight.medium');
+
+    @media (min-width: theme('screens.md')) {
+      font-size: theme('fontSize.3xl');
+    }
+  }
+
   input[type='search']::-webkit-search-cancel-button {
     display: none;
   }
