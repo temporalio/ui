@@ -17,14 +17,15 @@
     minCompactWidth,
   } from '../constants';
 
-  import CompactGraphRow from './compact-graph-row.svelte';
+  import CompactGraphVerticalRow from './compact-graph-vertical-row.svelte';
   import GroupDetailsRow from './group-details-row.svelte';
+  import Line from './line.svelte';
+  import Text from './text.svelte';
   import WorkflowRow from './workflow-row.svelte';
 
   export let x = 0;
   export let y = 0;
   export let staticHeight = 0;
-
   export let workflow: WorkflowExecution;
   export let groups: EventGroups;
   export let activeGroups: string[] = [];
@@ -32,10 +33,11 @@
   export let canvasWidth: number;
   export let readOnly = false;
 
-  const { height, gutter, radius } = CompactConfig;
+  const { height, fontSizeRatio, radius } = CompactConfig;
+
   let exandedGroups = [];
   let activeY = 0;
-  let activeX = 0;
+  let activeIndex = null;
 
   $: activeGroup =
     activeGroups[0] && groups.find((group) => group.id === activeGroups[0]);
@@ -48,161 +50,145 @@
   $: timeGroups = Object.values(
     groupBy(groups, ({ initialEvent }) => initialEvent.timestamp),
   ) as EventGroups[];
-
   const getNameGroups = (groups: EventGroups) => {
     return Object.values(
       groupBy(groups, ({ displayName }) => displayName),
     ) as EventGroups[];
   };
-
-  $: maxSegmentSize = () => {
-    const groupHeights = timeGroups.map((groups, startIndex) => {
-      let totalHeight = height;
-      const nameGroups = getNameGroups(groups);
-      nameGroups.forEach((group) => {
-        const expanded = exandedGroups.includes(
-          groupNameWithIndex(group[0].name, startIndex),
-        );
-        if (group.length === 1 || !expanded) {
-          totalHeight += height;
-        } else {
-          totalHeight += (group.length + 1) * height;
-        }
-      });
-      return totalHeight;
-    });
-    return Math.max(...groupHeights);
-  };
-
   $: activeDetailsHeight = activeGroups
     .map((id) => {
       const group = groups.find((group) => group.id === id);
       return getGroupDetailsBoxHeight(group, canvasWidth);
     })
     .reduce((acc, height) => acc + height, 0);
-
   const groupNameWithIndex = (name: string, index: number) =>
     `${index}:${name}`;
-
-  const setActiveGroupX = (startIndex: number) => {
-    if (width > canvasWidth) {
-      if (startIndex * length < width - canvasWidth) {
-        activeX = startIndex * length;
-      } else {
-        activeX = width - canvasWidth;
-      }
-    }
-  };
-
   const onRowClick = (groups: EventGroups, startIndex: number, y: number) => {
     if (readOnly) return;
     if (groups.length === 1) {
       setSingleActiveGroup(groups[0]);
       activeY = y;
-      setActiveGroupX(startIndex);
+      activeIndex = startIndex;
     } else {
       clearActives();
+      activeIndex = null;
       const name = groupNameWithIndex(groups[0].name, startIndex);
       if (exandedGroups.includes(name)) {
         exandedGroups = exandedGroups.filter((n) => n !== name);
         if (activeGroups.includes(groups[0].id)) {
           setSingleActiveGroup(groups[0]);
-          setActiveGroupX(startIndex);
           activeY = y;
+          activeIndex = startIndex;
         }
       } else {
         exandedGroups = [...exandedGroups, name];
       }
     }
   };
-
   const onEventClick = (group: EventGroup, startIndex: number, y: number) => {
     if (readOnly) return;
     setSingleActiveGroup(group);
-    setActiveGroupX(startIndex);
+    activeIndex = startIndex;
     activeY = y;
   };
-
-  $: getStartYOfGroup = (
-    namedGroups: EventGroups[],
-    groupIndex: number,
-    startIndex: number,
-  ) => {
-    const expandedIndexesAbove = namedGroups
-      .map((group) => group[0].name)
-      .filter((name) =>
-        exandedGroups.includes(groupNameWithIndex(name, startIndex)),
-      )
-      .map((name) => namedGroups.findIndex((group) => group[0].name === name))
-      .filter((i) => i < groupIndex);
-
-    const expandedSize = expandedIndexesAbove
-      .map((i) => namedGroups[i].length)
-      .reduce((acc, i) => acc + i, 0);
-
-    return expandedSize * height + (groupIndex + 1) * height;
-  };
-
-  $: canvasHeight = Math.max(maxSegmentSize(), 400) + activeDetailsHeight;
+  $: canvasHeight = (timeGroups.length + 3) * height + activeDetailsHeight;
   $: width = Math.max(timeGroups.length * minCompactWidth, canvasWidth);
-  $: length = Math.max(minCompactWidth, (width - gutter) / timeGroups.length);
+  $: previousExpanded = (index: number, nameGroups: EventGroups[]) => {
+    let count = 0;
+    for (let i = 0; i < index; i++) {
+      if (
+        exandedGroups.includes(groupNameWithIndex(nameGroups[i][0].name, i))
+      ) {
+        count++;
+      }
+    }
+    return count;
+  };
 </script>
 
-<div class="bg-space-black">
-  <svg
-    {x}
-    {y}
-    viewBox="0 0 {width} {staticHeight || canvasHeight}"
-    height={(staticHeight || canvasHeight) / zoomLevel}
-    width={width / zoomLevel}
+<svg
+  {x}
+  {y}
+  viewBox="0 0 {width} {staticHeight || canvasHeight}"
+  height={(staticHeight || canvasHeight) / zoomLevel}
+  width={width / zoomLevel}
+  class="mb-32"
+>
+  <Line
+    startPoint={[0, height]}
+    endPoint={[canvasWidth, height]}
+    strokeWidth={radius / 2}
+  />
+  <Text
+    point={[canvasWidth / 2 - 8, height - fontSizeRatio]}
+    fontSize="24px"
+    fontWeight="700">Start</Text
   >
-    {#each timeGroups as groups, startIndex}
-      {#each getNameGroups(groups) as nameGroup, groupIndex}
-        {@const group = nameGroup[0]}
-        {@const startY = getStartYOfGroup(
-          getNameGroups(groups),
-          groupIndex,
-          startIndex,
-        )}
-        {@const expanded = exandedGroups.includes(
-          groupNameWithIndex(group.name, startIndex),
-        )}
-        <CompactGraphRow
+  {#each timeGroups as groups, startIndex}
+    {@const nameGroups = getNameGroups(groups)}
+    {#each nameGroups as nameGroup, groupIndex}
+      {@const group = nameGroup[0]}
+      {@const expandedHeight =
+        activeIndex !== null && activeIndex < startIndex
+          ? activeDetailsHeight
+          : 0}
+      {@const startY = (startIndex + 2) * height + expandedHeight}
+      {console.log(startY)}
+      {@const expanded = exandedGroups.includes(
+        groupNameWithIndex(group.name, startIndex),
+      )}
+      {@const expandedIndex =
+        groupIndex + previousExpanded(groupIndex, nameGroups)}
+      {#if !expanded}
+        <CompactGraphVerticalRow
           {group}
-          {startIndex}
+          startIndex={expandedIndex}
           count={nameGroup.length}
           y={startY}
-          {length}
+          length={(canvasWidth - 100) / nameGroups.length}
           active={isActive(group)}
           onClick={() => onRowClick(nameGroup, startIndex, startY)}
           {expanded}
         />
-        {#if expanded}
-          {#each nameGroup as group, index}
-            {@const y = startY + (index + 1) * height}
-            <CompactGraphRow
-              {group}
-              {startIndex}
-              {y}
-              {length}
-              active={isActive(group)}
-              onClick={() => onEventClick(group, startIndex, y)}
-            />
-          {/each}
-        {/if}
-      {/each}
-    {:else}
-      <WorkflowRow {workflow} y={height} length={canvasWidth} active />
+      {:else}
+        {#each nameGroup as group, index}
+          {@const y = startY}
+          <CompactGraphVerticalRow
+            {group}
+            startIndex={expandedIndex + index}
+            {y}
+            length={(canvasWidth - 100) /
+              (nameGroups.length + nameGroup.length)}
+            active={isActive(group)}
+            onClick={() => onEventClick(group, startIndex, y)}
+          />
+        {/each}
+      {/if}
     {/each}
-    {#if activeGroup}
-      {#key activeGroup.id}
-        <GroupDetailsRow
-          group={activeGroup}
-          {canvasWidth}
-          x={activeX}
-          y={activeY + 1.25 * radius}
-        />
-      {/key}
-    {/if}
-  </svg>
-</div>
+  {:else}
+    <WorkflowRow {workflow} y={2 * height} length={canvasWidth} active />
+  {/each}
+  {#if activeGroup}
+    {#key activeGroup.id}
+      <GroupDetailsRow
+        group={activeGroup}
+        {canvasWidth}
+        x={0}
+        y={activeY + 1.25 * radius}
+      />
+    {/key}
+  {/if}
+  <Line
+    startPoint={[0, canvasHeight - height]}
+    endPoint={[canvasWidth, canvasHeight - height]}
+    strokeWidth={radius / 2}
+    pending={workflow.isRunning}
+  />
+  {#if !workflow.isRunning}
+    <Text
+      point={[canvasWidth / 2, canvasHeight - height + 1.2 * fontSizeRatio]}
+      fontSize="24px"
+      fontWeight="700">End</Text
+    >
+  {/if}
+</svg>
