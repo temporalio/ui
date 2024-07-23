@@ -65,8 +65,10 @@ import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
 import nexus from './svg/nexus.svelte';
+import pause from './svg/pause.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
+import play from './svg/play.svelte';
 import regions from './svg/regions.svelte';
 import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
@@ -167,6 +169,8 @@ export const icons = {
   'namespace-switcher': namespaceSwitcher,
   namespace,
   nexus,
+  play,
+  pause,
   'pin-filled': pinFilled,
   pin,
   regions,

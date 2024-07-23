@@ -17,7 +17,12 @@
   import { authUser } from '$lib/stores/auth-user';
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
-  import { fullEventHistory, timelineEvents } from '$lib/stores/events';
+  import {
+    currentEventHistory,
+    fullEventHistory,
+    pauseLiveUpdates,
+    timelineEvents,
+  } from '$lib/stores/events';
   import { labsMode } from '$lib/stores/labs-mode';
   import {
     initialWorkflowRun,
@@ -136,6 +141,14 @@
     $labsMode,
   );
   $: getOnlyWorkflowWithPendingActivities($refresh);
+
+  const setCurrentEvents = (fullHistory, pause) => {
+    if (!pause) {
+      $currentEventHistory = fullHistory;
+    }
+  };
+
+  $: setCurrentEvents($fullEventHistory, $pauseLiveUpdates);
 
   onMount(() => {
     const sort = $page.url.searchParams.get('sort');

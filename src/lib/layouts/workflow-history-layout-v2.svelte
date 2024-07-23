@@ -11,8 +11,10 @@
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import {
@@ -21,7 +23,11 @@
     clearActives,
   } from '$lib/stores/active-events';
   import { eventViewType } from '$lib/stores/event-view';
-  import { filteredEventHistory, fullEventHistory } from '$lib/stores/events';
+  import {
+    currentEventHistory,
+    filteredEventHistory,
+    pauseLiveUpdates,
+  } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
@@ -41,7 +47,7 @@
   );
 
   $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
-    $fullEventHistory,
+    $currentEventHistory,
     'ascending',
   );
 
@@ -100,6 +106,20 @@
             >{translate('workflows.full-history')}</ToggleButton
           >
         </ToggleButtons>
+        {#if workflow.isRunning}
+          <Tooltip
+            text={$pauseLiveUpdates
+              ? 'Resume Live Updates'
+              : 'Pause Live Updates'}
+            top
+          >
+            <Button
+              variant="secondary"
+              leadingIcon={$pauseLiveUpdates ? 'play' : 'pause'}
+              on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
+            />
+          </Tooltip>
+        {/if}
       </div>
       <div class="flex items-center gap-2">
         <span class="font-mono text-sm">{(100 / zoomLevel).toFixed(0)}%</span>
@@ -147,7 +167,7 @@
     {:else if $eventViewType === 'timeline'}
       <TimelineGraph
         {workflow}
-        history={$fullEventHistory}
+        history={$currentEventHistory}
         {groups}
         {zoomLevel}
         {canvasWidth}
