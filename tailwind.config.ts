@@ -8,8 +8,7 @@ const config = {
   darkMode: ['selector', '[data-theme="dark"]'],
   theme: {
     fontFamily: {
-      primary: ['Inter Variable', ...fontFamily.sans],
-      secondary: ['Inter', ...fontFamily.sans],
+      sans: ['Inter', ...fontFamily.sans],
       mono: ['Noto Sans Mono', ...fontFamily.mono],
     },
     extend: {

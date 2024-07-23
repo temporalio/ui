@@ -354,6 +354,6 @@
   }
 
   .combobox-input {
-    @apply ml-2 h-full w-full grow bg-transparent font-primary text-primary placeholder:text-secondary focus:outline-none;
+    @apply ml-2 h-full w-full grow bg-transparent text-primary placeholder:text-secondary focus:outline-none;
   }
 </style>

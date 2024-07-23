@@ -64,7 +64,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply flex items-start gap-2 break-words rounded-lg border-2 p-5 font-primary text-sm text-primary;
+    @apply flex items-start gap-2 break-words rounded-lg border-2 p-5 text-sm text-primary;
   }
 
   .alert.success {
@@ -84,6 +84,6 @@
   }
 
   .content :global(> *) {
-    @apply font-secondary text-sm font-normal;
+    @apply text-sm font-normal;
   }
 </style>

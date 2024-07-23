@@ -81,7 +81,7 @@
 
 <style lang="postcss">
   .units {
-    @apply font-secondary text-sm font-medium text-primary;
+    @apply text-sm font-medium text-primary;
   }
 
   .input-container {

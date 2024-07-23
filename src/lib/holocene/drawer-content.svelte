@@ -9,7 +9,7 @@
 <div class="title-wrapper {position}">
   <h2>{title}</h2>
   {#if $$slots['subtitle']}
-    <p class="font-primary text-xs font-normal">
+    <p class="text-xs font-normal">
       <slot name="subtitle" />
     </p>
   {/if}

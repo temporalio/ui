@@ -237,7 +237,7 @@
   }
 
   .count {
-    @apply mx-2 hidden font-secondary text-sm font-medium tracking-widest;
+    @apply mx-2 hidden text-sm font-medium tracking-widest;
 
     > .ok {
       @apply text-information;

@@ -15,20 +15,9 @@
 
   body {
     @apply surface-background;
-    font-family: theme('fontFamily.primary');
+    font-family: theme('fontFamily.sans');
     position: relative;
     overscroll-behavior: none;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  titles,
-  labels {
-    font-family: theme('fontFamily.secondary');
   }
 
   h1 {

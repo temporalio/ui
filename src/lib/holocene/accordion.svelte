@@ -68,7 +68,7 @@
       </div>
       <Icon class="m-2" name={open ? 'chevron-up' : 'chevron-down'} />
     </div>
-    <p class="flex items-center font-secondary">
+    <p class="flex items-center">
       {#if error}
         <Badge class="mr-2" type="danger">{error}</Badge>
       {/if}

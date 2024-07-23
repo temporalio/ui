@@ -79,10 +79,10 @@
       bind:value={name}
     />
     <div>
-      <span class="font-secondary text-sm font-medium"
+      <span class="text-sm font-medium"
         >{translate('workflows.signal-payload-input-label')}</span
       >
-      <span class="font-secondary text-xs font-light italic">
+      <span class="text-xs font-light italic">
         {translate('workflows.signal-payload-input-label-hint')}
       </span>
       <CodeBlock
