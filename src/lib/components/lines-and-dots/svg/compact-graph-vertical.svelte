@@ -76,18 +76,18 @@
       point={[0.5 * radius, radius]}
       width={radius * 1.5}
       height={radius * 1.5}
-      classification="Started"
+      classification="start"
     />
     <Line
-      startPoint={[0.5 * radius, radius]}
-      endPoint={[0.5 * radius, canvasHeight - radius]}
+      startPoint={[0.6 * radius, radius]}
+      endPoint={[0.6 * radius, canvasHeight - radius]}
       strokeWidth={radius / 4}
     />
     <Box
-      point={[0.5 * radius, canvasHeight - radius]}
+      point={[0.5 * radius, canvasHeight - height]}
       width={radius * 1.5}
       height={radius * 1.5}
-      classification="Started"
+      classification="start"
     />
 
     {#each timeGroups as group, startIndex}

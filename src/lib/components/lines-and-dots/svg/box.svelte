@@ -13,12 +13,6 @@
 </rect>
 
 <style lang="postcss">
-  .Started {
-    stroke: #a78bfa;
-    fill: #a78bfa;
-    stroke-width: 3;
-  }
-
   .Failed,
   .Terminated {
     stroke: #ff4518;
@@ -37,6 +31,12 @@
 
   .active {
     fill: #1e293b;
+  }
+
+  .start {
+    stroke: #444ce7;
+    fill: #444ce7;
+    stroke-width: 3;
   }
 
   .pending,
