@@ -5,7 +5,8 @@
   import EventSummary from '$lib/components/event/event-summary.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
-  import CompactGraph from '$lib/components/lines-and-dots/svg/compact-graph.svelte';
+  import CompactGraphVertical from '$lib/components/lines-and-dots/svg/compact-graph-vertical.svelte';
+  // import CompactGraph from '$lib/components/lines-and-dots/svg/compact-graph.svelte';
   import HistoryGraph from '$lib/components/lines-and-dots/svg/history-graph.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
@@ -195,7 +196,7 @@
 <div class="pb-24">
   <div class="w-full overflow-auto" bind:clientWidth={canvasWidth}>
     {#if $eventViewType === 'compact'}
-      <CompactGraph
+      <CompactGraphVertical
         {workflow}
         {groups}
         {zoomLevel}
