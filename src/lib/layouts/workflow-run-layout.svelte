@@ -6,7 +6,6 @@
   import { viewDataEncoderSettings } from '$lib/components/data-encoder-settings.svelte';
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
   import CopyButton from '$lib/holocene/copyable/button.svelte';
-  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
@@ -23,7 +22,6 @@
     pauseLiveUpdates,
     timelineEvents,
   } from '$lib/stores/events';
-  import { labsMode } from '$lib/stores/labs-mode';
   import {
     initialWorkflowRun,
     refresh,
@@ -50,8 +48,6 @@
     namespace: string,
     workflowId: string,
     runId: string,
-    sort: EventSortOrder,
-    labsMode: boolean,
   ) => {
     const { settings } = $page.data;
     const { workflow, error } = await fetchWorkflow({
@@ -80,7 +76,7 @@
       namespace,
       workflowId,
       runId,
-      sort: labsMode ? 'ascending' : sort,
+      sort: 'ascending',
       signal: eventHistoryController.signal,
       historySize: workflow.historyEvents,
     });
@@ -125,21 +121,9 @@
     resetLastDataEncoderSuccess();
   };
 
-  const clearHistoryData = () => {
-    $timelineEvents = null;
-    abortPolling();
-  };
-
   $: runId, clearWorkflowData();
-  $: $labsMode, $eventFilterSort, clearHistoryData();
 
-  $: getWorkflowAndEventHistory(
-    namespace,
-    workflowId,
-    runId,
-    $eventFilterSort,
-    $labsMode,
-  );
+  $: getWorkflowAndEventHistory(namespace, workflowId, runId);
   $: getOnlyWorkflowWithPendingActivities($refresh);
 
   const setCurrentEvents = (fullHistory, pause) => {
@@ -174,33 +158,21 @@
     {stringifyWithBigInt(fullJson, null, 2)}
   </div>
 {:else}
-  <LabsModeGuard>
-    <div
-      class="absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
-        ? 'top-[540px]'
-        : 'top-0'}
+  <div
+    class="absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
+      ? 'top-[540px]'
+      : 'top-0'}
     } flex h-full flex-col gap-0"
-    >
-      {#if workflowError}
-        <WorkflowError error={workflowError} />
-      {:else if !$workflowRun.workflow}
-        <Loading class="pt-24" />
-      {:else}
-        <div class="px-8 pt-8 md:pt-20">
-          <WorkflowHeader namespace={$page.params.namespace} />
-        </div>
-        <slot />
-      {/if}
-    </div>
-    <div class="flex h-full flex-col gap-0" slot="fallback">
-      {#if workflowError}
-        <WorkflowError error={workflowError} />
-      {:else if !$workflowRun.workflow}
-        <Loading />
-      {:else}
+  >
+    {#if workflowError}
+      <WorkflowError error={workflowError} />
+    {:else if !$workflowRun.workflow}
+      <Loading class="pt-24" />
+    {:else}
+      <div class="px-8 pt-8 md:pt-20">
         <WorkflowHeader namespace={$page.params.namespace} />
-        <slot />
-      {/if}
-    </div>
-  </LabsModeGuard>
+      </div>
+      <slot />
+    {/if}
+  </div>
 {/if}

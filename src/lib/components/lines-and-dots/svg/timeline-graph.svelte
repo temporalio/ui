@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import { eventFilterSort } from '$lib/stores/event-view';
   import type { WorkflowEvents } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
@@ -43,50 +44,58 @@
   $: canvasHeight = timelineHeight + 200;
 </script>
 
-<EndTimeInterval {workflow} {startTime} let:endTime let:duration>
-  <svg
-    {x}
-    {y}
-    viewBox="0 0 {canvasWidth} {canvasHeight}"
-    height={canvasHeight / zoomLevel}
-    width={canvasWidth}
-  >
-    <Line
-      startPoint={[gutter, 0]}
-      endPoint={[gutter, timelineHeight]}
-      strokeWidth={radius / 2}
-    />
-    <Line
-      startPoint={[canvasWidth - gutter, 0]}
-      endPoint={[canvasWidth - gutter, timelineHeight]}
-      strokeWidth={radius / 2}
-    />
-    <TimelineAxis
-      x1={gutter - radius / 4}
-      x2={canvasWidth - gutter + radius / 4}
-      {timelineHeight}
-      {startTime}
-      {endTime}
-      {duration}
-    />
-    {#each groups as group, index (group.id)}
-      {@const y =
-        (index + 1) * height +
-        activeGroupsHeightAboveGroup(activeGroups, group, groups, canvasWidth)}
-      {#key group.eventList.length}
-        <TimelineGraphRow
-          {y}
-          {group}
-          {activeGroups}
-          {canvasWidth}
-          {startTime}
-          {endTime}
-          {readOnly}
-        />
-      {/key}
-      {#if activeGroups.includes(group.id)}
-        <GroupDetailsRow y={y + 1.33 * radius} {group} {canvasWidth} />
-      {/if}
-    {/each}
-  </svg>
-</EndTimeInterval>
+<div class="bg-space-black">
+  <EndTimeInterval {workflow} {startTime} let:endTime let:duration>
+    <svg
+      {x}
+      {y}
+      viewBox="0 0 {canvasWidth} {canvasHeight}"
+      height={canvasHeight / zoomLevel}
+      width={canvasWidth}
+    >
+      <Line
+        startPoint={[gutter, 0]}
+        endPoint={[gutter, timelineHeight]}
+        strokeWidth={radius / 2}
+      />
+      <Line
+        startPoint={[canvasWidth - gutter, 0]}
+        endPoint={[canvasWidth - gutter, timelineHeight]}
+        strokeWidth={radius / 2}
+      />
+      <TimelineAxis
+        x1={gutter - radius / 4}
+        x2={canvasWidth - gutter + radius / 4}
+        {timelineHeight}
+        {startTime}
+        {endTime}
+        {duration}
+      />
+      {#each groups as group, index (group.id)}
+        {@const y =
+          (index + 1) * height +
+          activeGroupsHeightAboveGroup(
+            activeGroups,
+            group,
+            groups,
+            canvasWidth,
+            $eventFilterSort,
+          )}
+        {#key group.eventList.length}
+          <TimelineGraphRow
+            {y}
+            {group}
+            {activeGroups}
+            {canvasWidth}
+            {startTime}
+            {endTime}
+            {readOnly}
+          />
+        {/key}
+        {#if activeGroups.includes(group.id)}
+          <GroupDetailsRow y={y + 1.33 * radius} {group} {canvasWidth} />
+        {/if}
+      {/each}
+    </svg>
+  </EndTimeInterval>
+</div>

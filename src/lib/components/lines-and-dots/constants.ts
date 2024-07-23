@@ -3,6 +3,7 @@ import type {
   EventGroup,
   EventGroups,
 } from '$lib/models/event-groups/event-groups';
+import type { EventSortOrder } from '$lib/stores/event-view';
 import type {
   EventClassification,
   EventTypeCategory,
@@ -226,7 +227,7 @@ export const getVisualWidth = (
       }
     }
   });
-  return Math.min(maxWidth, (maxOffset + 2) * 2 * HistoryConfig.radius);
+  return Math.min(maxWidth, (maxOffset + 2) * 4 * HistoryConfig.radius);
 };
 
 export const getNextDistanceAndOffset = (
@@ -234,6 +235,7 @@ export const getNextDistanceAndOffset = (
   event: WorkflowEvent,
   groups: EventGroups,
   height: number,
+  sort: EventSortOrder,
 ): { nextDistance: number; offset: number } => {
   const group = groups.find((g) => g.eventIds.has(event.id));
   let nextDistance = 0;
@@ -263,7 +265,8 @@ export const getNextDistanceAndOffset = (
   } else if (group.isPending) {
     diff = history.length - parseInt(event.id) + 2;
   }
-  nextDistance = diff * height;
+  const distance = diff * height;
+  nextDistance = sort === 'ascending' ? distance : -distance;
   return { nextDistance, offset };
 };
 
@@ -324,10 +327,12 @@ export const activeGroupsHeightAboveGroup = (
   group: EventGroup,
   groups: EventGroups,
   width: number,
+  sort: EventSortOrder,
 ) => {
   return activeGroups
     .filter((id) => {
-      return parseInt(id) < parseInt(group.id);
+      if (sort === 'ascending') return parseInt(id) < parseInt(group.id);
+      return parseInt(id) > parseInt(group.id);
     })
     .map((id) => {
       const group = groups.find((group) => group.id === id);

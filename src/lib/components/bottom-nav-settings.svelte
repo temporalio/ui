@@ -8,7 +8,6 @@
   import { translate } from '$lib/i18n/translate';
   import { authUser } from '$lib/stores/auth-user';
   import { dataEncoder } from '$lib/stores/data-encoder';
-  import { labsMode } from '$lib/stores/labs-mode';
   import { useDarkMode } from '$lib/utilities/dark-mode';
 
   import { viewDataEncoderSettings } from './data-encoder-settings.svelte';
@@ -16,15 +15,6 @@
   export let open = false;
   export let logout: () => void;
   export let userEmaiLink = '';
-
-  $: labsHoverText = `${translate('common.labs')} ${
-    $labsMode
-      ? `${translate('common.on')} - ${translate('common.experimental')}`
-      : translate('common.off')
-  }`;
-  $: labsText = `${translate('common.labs')} ${
-    $labsMode ? translate('common.on') : translate('common.off')
-  }`;
 
   $: hasCodecServer = $dataEncoder?.endpoint;
 
@@ -58,14 +48,6 @@
         : translate('common.day')}
       label={$useDarkMode ? translate('common.night') : translate('common.day')}
       icon={$useDarkMode ? 'moon' : 'sun'}
-    />
-    <NavigationButton
-      onClick={() => ($labsMode = !$labsMode)}
-      tooltip={labsHoverText}
-      label={labsText}
-      icon="labs"
-      active={$labsMode}
-      data-testid="labs-mode-button"
     />
     {#if $authUser.accessToken}
       <div class="border-b-2 border-subtle" />

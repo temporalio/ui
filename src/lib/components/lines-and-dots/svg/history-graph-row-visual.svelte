@@ -4,6 +4,7 @@
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
   import { setSingleActiveEvent } from '$lib/stores/active-events';
+  import { eventFilterSort } from '$lib/stores/event-view';
   import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
@@ -34,6 +35,7 @@
     event,
     groups,
     height,
+    $eventFilterSort,
   ));
 
   $: zoomY = y * zoomLevel;

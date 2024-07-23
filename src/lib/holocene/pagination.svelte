@@ -133,7 +133,9 @@
 />
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
-  <div class="flex flex-col items-end justify-end gap-4 lg:justify-start">
+  <div
+    class="flex flex-col items-center justify-between gap-2 md:flex-row md:items-start"
+  >
     <div class="w-full">
       <slot name="action-top-left" />
     </div>

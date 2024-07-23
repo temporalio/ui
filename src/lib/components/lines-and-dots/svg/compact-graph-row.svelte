@@ -42,14 +42,14 @@
         : 'pending'
       : group.category}
     classification={aggregateRow ? undefined : group.lastEvent.classification}
-    {active}
+    active
     strokeWidth={radius * 2}
     pending={isPending}
   />
   <Line
     startPoint={[start, y]}
     endPoint={[end, y]}
-    {active}
+    active
     status="none"
     strokeWidth={radius}
   />
@@ -60,7 +60,7 @@
   <Dot
     point={[start, y]}
     classification={aggregateRow ? undefined : group.lastEvent.classification}
-    {active}
+    active
     r={radius}
   />
   {#if aggregateRow}

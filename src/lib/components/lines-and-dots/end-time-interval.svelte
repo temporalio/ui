@@ -8,7 +8,13 @@
   export let workflow: WorkflowExecution;
   export let startTime: string | Timestamp;
 
-  $: endTime = workflow?.endTime || new Date();
+  const rightNow = () => {
+    const now = new Date();
+    now.setSeconds(now.getSeconds() + 1);
+    return now;
+  };
+
+  $: endTime = workflow?.endTime || rightNow();
   $: duration = getMillisecondDuration({
     start: startTime,
     end: endTime,
@@ -26,7 +32,7 @@
   onMount(() => {
     if (!workflow.endTime) {
       endTimeInterval = setInterval(() => {
-        endTime = new Date();
+        endTime = rightNow();
       }, 1000);
     }
   });

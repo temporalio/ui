@@ -87,6 +87,7 @@ import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
 import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
+import table from './svg/table.svelte';
 import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
 import timeline from './svg/timeline.svelte';
@@ -192,6 +193,7 @@ export const icons = {
   summary,
   support,
   'spinner-solid': spinnerSolid,
+  table,
   'temporal-logo': temporalLogo,
   terminal,
   timeline,

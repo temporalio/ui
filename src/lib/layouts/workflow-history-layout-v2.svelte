@@ -2,6 +2,7 @@
   import { beforeNavigate } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import EventSummary from '$lib/components/event/event-summary.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
   import CompactGraph from '$lib/components/lines-and-dots/svg/compact-graph.svelte';
@@ -11,18 +12,17 @@
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
+  import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import {
     activeEvents,
     activeGroups,
     clearActives,
   } from '$lib/stores/active-events';
-  import { eventViewType } from '$lib/stores/event-view';
+  import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import {
     currentEventHistory,
     filteredEventHistory,
@@ -39,12 +39,17 @@
   $: pendingActivities = workflow?.pendingActivities;
   $: pendingNexusOperations = workflow?.pendingNexusOperations;
 
-  $: groups = groupEvents(
+  $: ascendingGroups = groupEvents(
     $filteredEventHistory,
     'ascending',
     pendingActivities,
     pendingNexusOperations,
   );
+
+  $: groups =
+    $eventFilterSort === 'ascending'
+      ? ascendingGroups
+      : [...ascendingGroups].reverse();
 
   $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
     $currentEventHistory,
@@ -60,15 +65,31 @@
   let canvasWidth = 0;
   let showDownloadPrompt = false;
 
-  const zoomOut = () => {
-    if (zoomLevel < 10) zoomLevel += 0.5;
-  };
+  // const zoomOut = () => {
+  //   if (zoomLevel < 10) zoomLevel += 0.5;
+  // };
 
-  const zoomIn = () => {
-    if (zoomLevel > 1) {
-      zoomLevel -= 0.5;
+  // const zoomIn = () => {
+  //   if (zoomLevel > 1) {
+  //     zoomLevel -= 0.5;
+  //   }
+  // };
+
+  $: {
+    if (!workflow.isRunning && $pauseLiveUpdates) {
+      $pauseLiveUpdates = false;
+    }
+  }
+
+  const onSort = () => {
+    if (reverseSort) {
+      $eventFilterSort = 'ascending';
+    } else {
+      $eventFilterSort = 'descending';
     }
   };
+
+  $: reverseSort = $eventFilterSort === 'descending';
 </script>
 
 <div class="flex flex-col gap-0 px-8">
@@ -90,41 +111,44 @@
           <ToggleButton
             active={$eventViewType === 'compact'}
             data-testid="compact"
+            icon="feed"
             on:click={() => ($eventViewType = 'compact')}
             >{translate('workflows.compact')}</ToggleButton
           >
           <ToggleButton
             active={$eventViewType === 'timeline'}
             data-testid="timeline"
+            icon="timeline"
             on:click={() => ($eventViewType = 'timeline')}
             >{translate('common.timeline')}</ToggleButton
           >
           <ToggleButton
             active={$eventViewType === 'feed'}
             data-testid="feed"
+            icon="compact"
             on:click={() => ($eventViewType = 'feed')}
-            >{translate('workflows.full-history')}</ToggleButton
+            >{translate('common.graph')}</ToggleButton
+          >
+          <ToggleButton
+            active={$eventViewType === 'table'}
+            data-testid="table"
+            icon="table"
+            on:click={() => ($eventViewType = 'table')}
+            >{translate('common.table')}</ToggleButton
+          >
+          <ToggleButton
+            active={$eventViewType === 'json'}
+            data-testid="json"
+            icon="json"
+            on:click={() => ($eventViewType = 'json')}
+            >{translate('workflows.json')}</ToggleButton
           >
         </ToggleButtons>
-        {#if workflow.isRunning}
-          <Tooltip
-            text={$pauseLiveUpdates
-              ? 'Resume Live Updates'
-              : 'Pause Live Updates'}
-            top
-          >
-            <Button
-              variant="secondary"
-              leadingIcon={$pauseLiveUpdates ? 'play' : 'pause'}
-              on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
-            />
-          </Tooltip>
-        {/if}
       </div>
       <div class="flex items-center gap-2">
-        <span class="font-mono text-sm">{(100 / zoomLevel).toFixed(0)}%</span>
+        <!-- <span class="font-mono text-sm">{(100 / zoomLevel).toFixed(0)}%</span> -->
         <ToggleButtons>
-          <ToggleButton
+          <!-- <ToggleButton
             data-testid="zoom-in"
             disabled={zoomLevel === 1}
             on:click={zoomIn}>+</ToggleButton
@@ -133,6 +157,20 @@
             data-testid="zoom-out"
             disabled={zoomLevel === 10}
             on:click={zoomOut}>-</ToggleButton
+          > -->
+          <ToggleButton
+            disabled={!workflow.isRunning}
+            icon={$pauseLiveUpdates ? 'play' : 'pause'}
+            data-testid="pause"
+            tooltip={$pauseLiveUpdates
+              ? 'Resume Live Updates'
+              : 'Pause Live Updates'}
+            on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
+          />
+          <ToggleButton
+            icon={reverseSort ? 'arrow-down' : 'arrow-up'}
+            data-testid="zoom-in"
+            on:click={onSort}>{reverseSort ? '9 - 1' : '1 - 9'}</ToggleButton
           >
           <ToggleButton
             data-testid="filter"
@@ -154,7 +192,7 @@
     {/if}
   </div>
 </div>
-<div class="bg-off-black pb-24">
+<div class="pb-24">
   <div class="w-full overflow-auto" bind:clientWidth={canvasWidth}>
     {#if $eventViewType === 'compact'}
       <CompactGraph
@@ -173,14 +211,21 @@
         {canvasWidth}
         activeGroups={$activeGroups}
       />
-    {:else}
+    {:else if $eventViewType === 'feed'}
       <HistoryGraph
-        history={$filteredEventHistory}
         {groups}
         {zoomLevel}
         {canvasWidth}
         activeEvents={$activeEvents}
       />
+    {:else if $eventViewType === 'json'}
+      <div class="px-4 md:px-8">
+        <WorkflowHistoryJson />
+      </div>
+    {:else}
+      <div class="px-4 md:px-8">
+        <EventSummary />
+      </div>
     {/if}
   </div>
 </div>

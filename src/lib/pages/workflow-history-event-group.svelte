@@ -86,7 +86,7 @@
   </h2>
 {/if}
 <EventHistoryTimeline history={$fullEventHistory} maxHeight={240} />
-<EventSummaryTable {updating} {compact}>
+<EventSummaryTable {updating}>
   {#each events as event (`${event.id}-${event.timestamp}`)}
     <EventSummaryRow
       {event}

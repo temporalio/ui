@@ -147,6 +147,7 @@ export const Strings = {
   'download-json': 'Download JSON',
   'skip-nav': 'Skip to Main Content',
   timeline: 'Timeline',
+  graph: 'Graph',
   'equal-to': 'Equal to',
   'not-equal-to': 'Not equal to',
   'encode-failed': 'Data encoding failed',
@@ -170,4 +171,5 @@ export const Strings = {
   active: 'Active',
   inactive: 'Inactive',
   'page-not-found': 'Page Not Found',
+  table: 'Table',
 } as const;

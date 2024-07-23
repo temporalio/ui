@@ -36,7 +36,7 @@
   previousButtonLabel={translate('common.previous')}
   nextButtonLabel={translate('common.next')}
 >
-  <EventSummaryTable {compact} on:expandAll={handleExpandChange}>
+  <EventSummaryTable on:expandAll={handleExpandChange}>
     {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
       <EventSummaryRow
         {event}

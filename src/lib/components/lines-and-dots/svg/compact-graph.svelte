@@ -148,59 +148,61 @@
   $: length = Math.max(minCompactWidth, (width - gutter) / timeGroups.length);
 </script>
 
-<svg
-  {x}
-  {y}
-  viewBox="0 0 {width} {staticHeight || canvasHeight}"
-  height={(staticHeight || canvasHeight) / zoomLevel}
-  width={width / zoomLevel}
->
-  {#each timeGroups as groups, startIndex}
-    {#each getNameGroups(groups) as nameGroup, groupIndex}
-      {@const group = nameGroup[0]}
-      {@const startY = getStartYOfGroup(
-        getNameGroups(groups),
-        groupIndex,
-        startIndex,
-      )}
-      {@const expanded = exandedGroups.includes(
-        groupNameWithIndex(group.name, startIndex),
-      )}
-      <CompactGraphRow
-        {group}
-        {startIndex}
-        count={nameGroup.length}
-        y={startY}
-        {length}
-        active={isActive(group)}
-        onClick={() => onRowClick(nameGroup, startIndex, startY)}
-        {expanded}
-      />
-      {#if expanded}
-        {#each nameGroup as group, index}
-          {@const y = startY + (index + 1) * height}
-          <CompactGraphRow
-            {group}
-            {startIndex}
-            {y}
-            {length}
-            active={isActive(group)}
-            onClick={() => onEventClick(group, startIndex, y)}
-          />
-        {/each}
-      {/if}
+<div class="bg-space-black">
+  <svg
+    {x}
+    {y}
+    viewBox="0 0 {width} {staticHeight || canvasHeight}"
+    height={(staticHeight || canvasHeight) / zoomLevel}
+    width={width / zoomLevel}
+  >
+    {#each timeGroups as groups, startIndex}
+      {#each getNameGroups(groups) as nameGroup, groupIndex}
+        {@const group = nameGroup[0]}
+        {@const startY = getStartYOfGroup(
+          getNameGroups(groups),
+          groupIndex,
+          startIndex,
+        )}
+        {@const expanded = exandedGroups.includes(
+          groupNameWithIndex(group.name, startIndex),
+        )}
+        <CompactGraphRow
+          {group}
+          {startIndex}
+          count={nameGroup.length}
+          y={startY}
+          {length}
+          active={isActive(group)}
+          onClick={() => onRowClick(nameGroup, startIndex, startY)}
+          {expanded}
+        />
+        {#if expanded}
+          {#each nameGroup as group, index}
+            {@const y = startY + (index + 1) * height}
+            <CompactGraphRow
+              {group}
+              {startIndex}
+              {y}
+              {length}
+              active={isActive(group)}
+              onClick={() => onEventClick(group, startIndex, y)}
+            />
+          {/each}
+        {/if}
+      {/each}
+    {:else}
+      <WorkflowRow {workflow} y={height} length={canvasWidth} active />
     {/each}
-  {:else}
-    <WorkflowRow {workflow} y={height} length={canvasWidth} active />
-  {/each}
-  {#if activeGroup}
-    {#key activeGroup.id}
-      <GroupDetailsRow
-        group={activeGroup}
-        {canvasWidth}
-        x={activeX}
-        y={activeY + 1.25 * radius}
-      />
-    {/key}
-  {/if}
-</svg>
+    {#if activeGroup}
+      {#key activeGroup.id}
+        <GroupDetailsRow
+          group={activeGroup}
+          {canvasWidth}
+          x={activeX}
+          y={activeY + 1.25 * radius}
+        />
+      {/key}
+    {/if}
+  </svg>
+</div>
