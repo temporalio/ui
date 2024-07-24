@@ -20,12 +20,28 @@
     overscroll-behavior: none;
   }
 
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: theme('fontWeight.medium');
+  }
+
   h1 {
     font-size: theme('fontSize.2xl');
-    font-weight: theme('fontWeight.medium');
 
     @media (min-width: theme('screens.md')) {
       font-size: theme('fontSize.3xl');
+    }
+  }
+
+  h2 {
+    font-size: theme('fontSize.xl');
+
+    @media (min-width: theme('screens.md')) {
+      font-size: theme('fontSize.2xl');
     }
   }
 

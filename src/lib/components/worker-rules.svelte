@@ -32,7 +32,7 @@
   };
 </script>
 
-<h2 class="text-base font-medium" data-testid="worker-rules">
+<h2 data-testid="worker-rules">
   {translate('workers.assignment-rules')}
 </h2>
 <Table class="mb-6 w-full table-fixed">
@@ -81,7 +81,7 @@
   {/if}
 </Table>
 
-<h2 class="text-base font-medium" data-testid="worker-rules">
+<h2 data-testid="worker-rules">
   {translate('workers.redirect-rules')}
 </h2>
 <Table class="mb-6 w-full table-fixed">

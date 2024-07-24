@@ -33,7 +33,7 @@
   $: defaultVersion = getCurrentCompatibilityDefaultVersion(compatibility);
 </script>
 
-<h2 class="text-base font-medium" data-testid="version-sets">
+<h2 data-testid="version-sets">
   {translate('workers.version-sets')}
 </h2>
 <Table class="mb-6 w-full min-w-[600px] table-fixed">
@@ -77,7 +77,7 @@
     </tr>
   {/each}
 </Table>
-<h2 class="flex items-center gap-2 text-base font-medium" data-testid="workers">
+<h2 class="flex items-center gap-2" data-testid="workers">
   {translate('workers.workers')}
   <Badge type="count" class="rounded-sm">{workers?.pollers?.length || 0}</Badge>
 </h2>

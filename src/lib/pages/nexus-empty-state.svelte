@@ -21,7 +21,7 @@
       </div>
       <div class="surface-information flex w-full flex-col gap-4 pr-8 md:pr-24">
         <h2 class="text-4xl">Get Started</h2>
-        <p class="">
+        <p>
           Nexus RPC is a modern open-source service framework for
           arbitrary-length operations whose lifetime may extend beyond a
           traditional RPC. Nexus was designed with Durable Execution in mind, as
@@ -29,7 +29,7 @@
           Namespaces, clusters, and regions – with a clean API contract to
           streamline multi-team collaboration.
         </p>
-        <p class="">
+        <p>
           Any service can be exposed via a Nexus Endpoint as a set of sync or
           async Nexus operations – the latter provides an operation identity and
           a uniform interface to get the status of an operation or its result,
