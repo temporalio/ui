@@ -77,6 +77,7 @@
         <p>{translate('common.failure')}</p>
         <CodeBlock
           content={error.attributes?.failure?.message || ''}
+          language="text"
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
         />
