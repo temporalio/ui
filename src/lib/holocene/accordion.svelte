@@ -54,11 +54,11 @@
     on:click={toggleAccordion}
   >
     <div class="space-between flex w-full flex-row items-center">
-      <h2 class="flex w-full items-center gap-2">
+      <h3 class="flex w-full items-center gap-2">
         {#if icon}<Icon name={icon} />{/if}
         {title}
         <slot name="summary" />
-      </h2>
+      </h3>
       <div
         class="flex flex-row items-center gap-2 pr-2"
         on:click|stopPropagation

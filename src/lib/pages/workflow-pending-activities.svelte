@@ -43,7 +43,7 @@
         <td class="px-5 py-4">
           <ul>
             <li class="event-table-row">
-              <h4 class="font-semibold">
+              <h4>
                 {translate('workflows.activity-type')}
               </h4>
               <Badge type={failed ? 'danger' : undefined}>

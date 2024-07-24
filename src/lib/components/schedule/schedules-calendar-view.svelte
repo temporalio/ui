@@ -112,7 +112,7 @@
     </TabPanel>
     <TabPanel id="string-panel" tabId="string-tab">
       <div class="my-2 flex w-full flex-col gap-4">
-        <h3 class="text-lg font-medium">
+        <h3>
           {translate('schedules.cron-view-title')}
         </h3>
         <p>{translate('schedules.cron-view-description')}</p>

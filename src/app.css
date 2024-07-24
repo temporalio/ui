@@ -45,6 +45,38 @@
     }
   }
 
+  h3 {
+    font-size: theme('fontSize.lg');
+
+    @media (min-width: theme('screens.md')) {
+      font-size: theme('fontSize.xl');
+    }
+  }
+
+  h4 {
+    font-size: theme('fontSize.base');
+
+    @media (min-width: theme('screens.md')) {
+      font-size: theme('fontSize.lg');
+    }
+  }
+
+  h5 {
+    font-size: theme('fontSize.sm');
+
+    @media (min-width: theme('screens.md')) {
+      font-size: theme('fontSize.base');
+    }
+  }
+
+  h6 {
+    font-size: theme('fontSize.xs');
+
+    @media (min-width: theme('screens.md')) {
+      font-size: theme('fontSize.sm');
+    }
+  }
+
   input[type='search']::-webkit-search-cancel-button {
     display: none;
   }

@@ -10,7 +10,7 @@
 </script>
 
 <div class="my-2 flex flex-col gap-4">
-  <h3 class="text-lg font-medium">
+  <h3>
     {translate('schedules.recurring-days-heading')}
   </h3>
   <p>{translate('schedules.recurring-days-description')}</p>

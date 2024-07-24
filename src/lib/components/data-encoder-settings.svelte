@@ -80,7 +80,7 @@
   >
     <div class="flex w-full flex-col gap-4 xl:w-1/2">
       <div class="flex items-center justify-between space-x-2">
-        <h3 data-testid="data-encoder-title" class="text-xl">
+        <h3 data-testid="data-encoder-title">
           {translate('common.codec-server')}
         </h3>
       </div>
