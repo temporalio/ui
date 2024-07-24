@@ -26,7 +26,7 @@
       return 'WorkflowTaskHeartbeatError';
     }
 
-    return toWorkflowTaskFailureReadable(cause);
+    return toWorkflowTaskFailureReadable(cause || 'Unspecified');
   }
 
   export let error: WorkflowTaskFailedEvent;
