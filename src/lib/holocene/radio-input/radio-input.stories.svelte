@@ -75,11 +75,6 @@
   }}
 />
 
-<Story
-  name="Disabled with Description"
-  args={{ disabled: true, description: 'This is a description.' }}
-/>
-
 <Story name="Group Description" let:args let:context>
   <RadioGroup
     name={args.name}
@@ -91,82 +86,6 @@
 </Story>
 
 <Story name="Long Group Description" let:args let:context>
-  <RadioGroup
-    name={args.name}
-    description={loremIpsum}
-    group={writable('checked')}
-  >
-    <RadioInput {...args} id={context.id} />
-    <RadioInput {...args} value="unchecked" id={context.id} />
-  </RadioGroup>
-</Story>
-
-<Story
-  name="Checked (Dark)"
-  parameters={{ themes: { themeOverride: 'dark' } }}
-  play={shouldNotBeTransparent((canvas) => canvas.getByRole('radio'))}
-/>
-
-<Story
-  name="Unchecked (Dark)"
-  args={{ value: 'unchecked' }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-  play={shouldNotBeTransparent((canvas) => canvas.getByRole('radio'))}
-/>
-
-<Story
-  name="Checked and Disabled (Dark)"
-  args={{ disabled: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Unchecked and Disabled (Dark)"
-  args={{ value: 'unchecked', disabled: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Description (Dark)"
-  args={{ description: 'This is a description.' }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Long Description (Dark)"
-  args={{
-    description: loremIpsum,
-  }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Disabled with Description (Dark)"
-  args={{ disabled: true, description: 'This is a description.' }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Group Description (Dark)"
-  let:args
-  let:context
-  parameters={{ themes: { themeOverride: 'dark' } }}
->
-  <RadioGroup
-    name={args.name}
-    description="This is a group description."
-    group={writable('checked')}
-  >
-    <RadioInput {...args} id={context.id} />
-  </RadioGroup>
-</Story>
-
-<Story
-  name="Long Group Description (Dark)"
-  let:args
-  let:context
-  parameters={{ themes: { themeOverride: 'dark' } }}
->
   <RadioGroup
     name={args.name}
     description={loremIpsum}

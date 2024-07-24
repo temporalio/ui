@@ -167,19 +167,3 @@
     copySuccessIconTitle: 'Content copied to clipboard',
   }}
 />
-
-<Story
-  name="Copyable (Dark)"
-  args={{
-    language: 'json',
-    copyable: true,
-    content: stringifyWithBigInt({ hello: 'world' }, null, 2),
-    copyIconTitle: 'Click to copy content',
-    copySuccessIconTitle: 'Content copied to clipboard',
-  }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>

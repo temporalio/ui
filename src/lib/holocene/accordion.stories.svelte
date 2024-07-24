@@ -39,51 +39,8 @@
   </Accordion>
 </Template>
 
-<Story name="Default" />
-
-<Story name="Open" args={{ open: true }} />
+<Story name="Default" args={{ open: true }} />
 
 <Story name="With Error" args={{ error: 'Error' }} />
 
 <Story name="With Icon" args={{ icon: 'workflow' }} />
-
-<Story
-  name="Accordion (Dark)"
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Open (Dark)"
-  args={{
-    open: true,
-  }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="With Error (Dark)"
-  args={{ error: 'Error' }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="With Icon (Dark)"
-  args={{ icon: 'workflow' }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>

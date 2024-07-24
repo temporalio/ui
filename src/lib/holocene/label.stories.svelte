@@ -30,6 +30,4 @@
   <Label {...args} />
 </Template>
 
-<Story name="Light" />
-
-<Story name="Dark" />
+<Story name="Default" />

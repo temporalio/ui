@@ -222,7 +222,10 @@
         <button
           class="caret"
           disabled={!$store.hasPrevious}
-          on:click={() => store.previous()}
+          on:click={() => {
+            store.previous();
+            handlePageChange();
+          }}
           aria-label={previousButtonLabel}
         >
           <span class="arrow arrow-left" />
@@ -238,7 +241,10 @@
         <button
           class="caret"
           disabled={!$store.hasNext}
-          on:click={() => store.next()}
+          on:click={() => {
+            store.next();
+            handlePageChange();
+          }}
           aria-label={nextButtonLabel}
         >
           <span class="arrow arrow-right" />

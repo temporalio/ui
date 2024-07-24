@@ -35,13 +35,4 @@
   </div>
 </Template>
 
-<Story name="Light" />
-
-<Story
-  name="Dark"
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
+<Story name="Default" />
