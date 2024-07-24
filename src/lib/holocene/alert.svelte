@@ -44,7 +44,7 @@
 </script>
 
 <div
-  class={merge('alert', intent, className)}
+  class={merge('alert flex', intent, className)}
   class:hidden
   {role}
   {...$$restProps}
@@ -64,7 +64,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply flex items-start gap-2 break-words rounded-lg border-2 p-5 font-primary text-sm text-primary;
+    @apply items-start gap-2 break-words rounded-lg border-2 p-5 font-primary text-sm text-primary;
   }
 
   .alert.success {
