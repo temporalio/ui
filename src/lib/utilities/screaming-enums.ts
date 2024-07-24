@@ -70,8 +70,9 @@ export const toBatchOperationTypeReadable = (
 };
 
 export const toWorkflowTaskFailureReadable = (
-  cause: WorkflowTaskFailedCause,
+  cause?: WorkflowTaskFailedCause,
 ): WorkflowTaskFailedCause => {
+  if (!cause) return 'Unspecified';
   return fromScreamingEnum(cause, 'WorkflowTaskFailedCause');
 };
 
