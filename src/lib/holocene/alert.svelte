@@ -44,13 +44,13 @@
 </script>
 
 <div
-  class={merge('alert', intent, className)}
+  class={merge('alert flex', intent, className)}
   class:hidden
   {role}
   {...$$restProps}
 >
   <Icon name={icon} class="mt-0.5 shrink-0" />
-  <div class="min-w-0 gap-1">
+  <div class="w-full min-w-0 gap-1">
     <p class="font-medium">
       {title}
     </p>
@@ -64,7 +64,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply flex items-start gap-2 break-words rounded-lg border-2 p-5 text-sm text-primary;
+    @apply items-start gap-2 break-words rounded-lg border-2 p-5 text-sm text-primary;
   }
 
   .alert.success {
