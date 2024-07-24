@@ -16,6 +16,8 @@
   body {
     @apply surface-background;
     font-family: theme('fontFamily.sans');
+    font-size: theme('fontSize.sm');
+    font-weight: theme('fontWeight.normal');
     position: relative;
     overscroll-behavior: none;
   }
