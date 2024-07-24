@@ -10,7 +10,6 @@
   import type { WorkflowTaskFailedCause } from '$lib/types/workflows';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
-  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toWorkflowTaskFailureReadable } from '$lib/utilities/screaming-enums';
 
   import { CategoryIcon } from './constants';
@@ -77,9 +76,7 @@
       <div class="flex flex-col gap-2 bg-space-black p-4 text-white">
         <p>{translate('common.failure')}</p>
         <CodeBlock
-          content={stringifyWithBigInt(
-            error.attributes?.failure?.message || '',
-          )}
+          content={error.attributes?.failure?.message || ''}
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
         />
