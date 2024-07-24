@@ -50,7 +50,7 @@
   {...$$restProps}
 >
   <Icon name={icon} class="mt-0.5 shrink-0" />
-  <div class="min-w-0 gap-1">
+  <div class="w-full min-w-0 gap-1">
     <p class="font-medium">
       {title}
     </p>
