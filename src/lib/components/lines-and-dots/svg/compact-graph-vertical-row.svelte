@@ -16,7 +16,7 @@
   export let expanded = false;
   export let onClick: () => void;
   const { radius, height } = CompactConfig;
-  $: start = 2 * radius + startIndex * length;
+  $: start = 2 * radius + startIndex * length + 200;
   $: end = start + length;
   $: aggregateRow = count > 1;
   $: isPending = group.isPending && !aggregateRow;
