@@ -6,13 +6,11 @@
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
   import { setSingleActiveGroup } from '$lib/stores/active-events';
+  import { timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { formatDate } from '$lib/utilities/format-date';
 
-  import {
-    CompactConfig,
-    getGroupDetailsBoxHeight,
-    minCompactWidth,
-  } from '../constants';
+  import { CompactConfig, getGroupDetailsBoxHeight } from '../constants';
 
   import Box from './box.svelte';
   import CompactGraphVerticalRow from './compact-graph-vertical-row.svelte';
@@ -31,7 +29,7 @@
   export let canvasWidth: number;
   export let readOnly = false;
 
-  const { height, radius } = CompactConfig;
+  const { height, radius, width: blockWidth } = CompactConfig;
 
   let activeY = 0;
   let activeIndex = null;
@@ -46,7 +44,7 @@
 
   $: timeGroups = Object.entries(
     groupBy(groups, ({ initialEvent }) => initialEvent.timestamp),
-  );
+  ) as [string, EventGroups][];
 
   $: activeDetailsHeight = activeGroups
     .map((id) => {
@@ -61,8 +59,12 @@
     activeIndex = startIndex;
     activeY = y;
   };
+
+  $: maxGroupSize = Math.max(
+    ...timeGroups.map(([_, group]: [string, EventGroups]) => group.length),
+  );
   $: canvasHeight = (timeGroups.length + 3) * height + activeDetailsHeight;
-  $: width = Math.max(timeGroups.length * minCompactWidth, canvasWidth);
+  $: width = Math.max(maxGroupSize * blockWidth + 2 * blockWidth, canvasWidth);
 </script>
 
 <div class="bg-space-black">
@@ -74,36 +76,37 @@
     width={width / zoomLevel}
   >
     <Box
-      point={[0, radius]}
+      point={[radius, radius]}
       width={radius * 1.5}
       height={radius * 1.5}
       classification="start"
     />
     <Line
-      startPoint={[0, radius]}
-      endPoint={[0, canvasHeight - radius]}
+      startPoint={[radius + 0.75, radius]}
+      endPoint={[radius, canvasHeight - radius]}
       strokeWidth={radius / 4}
     />
     <Box
-      point={[0, canvasHeight - height]}
+      point={[radius + 0.75, canvasHeight - height]}
       width={radius * 1.5}
       height={radius * 1.5}
       classification="start"
     />
-
     {#each timeGroups as [time, group], startIndex}
       {@const expandedHeight =
         activeIndex !== null && activeIndex < startIndex
           ? activeDetailsHeight
           : 0}
       {@const startY = (startIndex + 2) * height + expandedHeight}
-      <Text point={[0, startY]}>{time}</Text>
+      <Text point={[radius * 2, startY]}
+        >{formatDate(new Date(time), $timeFormat)}</Text
+      >
       {#each group as event, index}
         <CompactGraphVerticalRow
           group={event}
           startIndex={index}
           y={startY}
-          length={200}
+          length={blockWidth}
           active={isActive(event)}
           onClick={() => onEventClick(event, startIndex, y)}
         />

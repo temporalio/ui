@@ -32,8 +32,9 @@ const baseRadius = 6;
 
 export const minCompactWidth = 200;
 
-export const CompactConfig: GraphConfig = {
-  height: baseRadius * 6,
+export const CompactConfig: GraphConfig & { width: number } = {
+  height: baseRadius * 7,
+  width: 200,
   gutter: baseRadius * 4,
   radius: baseRadius * 3,
   fontSizeRatio: baseRadius * 4,
