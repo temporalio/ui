@@ -5,8 +5,8 @@ export const Strings = {
   'empty-state-description':
     'There are no events that match your filters or selected view. Adjust your filters or view to see your events.',
   'group-empty-state-title': 'Event Group Not Found',
-  'sort-ascending': 'Sort 1-9',
-  'sort-descending': 'Sort 9-1',
+  'sort-ascending': 'Ascending',
+  'sort-descending': 'Descending',
   'date-and-time': 'Date & Time',
   'show-elapsed-time': 'Show Elapsed Time & Duration',
   'event-type': 'Event Type',
