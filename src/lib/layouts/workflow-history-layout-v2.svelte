@@ -102,9 +102,9 @@
       <WorkflowError error={workflowTaskFailedError} />
     {/if}
     <div
-      class="flex flex-col items-center justify-between gap-2 py-2 md:flex-row"
+      class="flex flex-col items-center gap-2 py-2 xl:flex-row xl:justify-between xl:gap-8"
     >
-      <div class="flex flex-col items-center gap-2 md:flex-row md:gap-4">
+      <div class="flex flex-col items-center gap-2 xl:flex-row xl:gap-4">
         <h2 class="text-2xl font-medium">
           {translate('workflows.event-history')}
         </h2>
@@ -146,10 +146,9 @@
           >
         </ToggleButtons>
       </div>
-      <div class="flex items-center gap-2">
-        <!-- <span class="font-mono text-sm">{(100 / zoomLevel).toFixed(0)}%</span> -->
-        <ToggleButtons>
-          <!-- <ToggleButton
+      <!-- <span class="font-mono text-sm">{(100 / zoomLevel).toFixed(0)}%</span> -->
+      <ToggleButtons>
+        <!-- <ToggleButton
             data-testid="zoom-in"
             disabled={zoomLevel === 1}
             on:click={zoomIn}>+</ToggleButton
@@ -159,32 +158,31 @@
             disabled={zoomLevel === 10}
             on:click={zoomOut}>-</ToggleButton
           > -->
-          <ToggleButton
-            disabled={!workflow.isRunning}
-            icon={$pauseLiveUpdates ? 'play' : 'pause'}
-            data-testid="pause"
-            tooltip={$pauseLiveUpdates
-              ? 'Resume Live Updates'
-              : 'Pause Live Updates'}
-            on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
-          />
-          <ToggleButton
-            icon={reverseSort ? 'arrow-down' : 'arrow-up'}
-            data-testid="zoom-in"
-            on:click={onSort}>{reverseSort ? '9 - 1' : '1 - 9'}</ToggleButton
-          >
-          <ToggleButton
-            data-testid="filter"
-            on:click={() => (showFilters = !showFilters)}
-            icon="filter"
-          />
-          <ToggleButton
-            data-testid="download"
-            on:click={() => (showDownloadPrompt = true)}
-            icon="download"
-          />
-        </ToggleButtons>
-      </div>
+        <ToggleButton
+          disabled={!workflow.isRunning}
+          icon={$pauseLiveUpdates ? 'play' : 'pause'}
+          data-testid="pause"
+          tooltip={$pauseLiveUpdates
+            ? 'Resume Live Updates'
+            : 'Pause Live Updates'}
+          on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
+        />
+        <ToggleButton
+          icon={reverseSort ? 'arrow-down' : 'arrow-up'}
+          data-testid="zoom-in"
+          on:click={onSort}>{reverseSort ? 'Desc' : 'Asc'}</ToggleButton
+        >
+        <ToggleButton
+          data-testid="filter"
+          on:click={() => (showFilters = !showFilters)}
+          icon="filter"
+        />
+        <ToggleButton
+          data-testid="download"
+          on:click={() => (showDownloadPrompt = true)}
+          icon="download"
+        />
+      </ToggleButtons>
     </div>
     {#if showFilters}
       <div class="flex flex-col items-center justify-center pb-2">

@@ -12,10 +12,9 @@
 
   import { CompactConfig, getGroupDetailsBoxHeight } from '../constants';
 
-  import Box from './box.svelte';
+  import CompactFlagPosts from './compact-flag-posts.svelte';
   import CompactGraphVerticalRow from './compact-graph-vertical-row.svelte';
   import GroupDetailsRow from './group-details-row.svelte';
-  import Line from './line.svelte';
   import Text from './text.svelte';
   import WorkflowRow from './workflow-row.svelte';
 
@@ -67,7 +66,7 @@
   $: width = Math.max(maxGroupSize * blockWidth + 2 * blockWidth, canvasWidth);
 </script>
 
-<div class="bg-space-black">
+<div class="bg-space-black" style="width: {width}px">
   <svg
     {x}
     {y}
@@ -75,29 +74,13 @@
     height={(staticHeight || canvasHeight) / zoomLevel}
     width={width / zoomLevel}
   >
-    <Box
-      point={[radius, radius]}
-      width={radius * 1.5}
-      height={radius * 1.5}
-      classification="start"
-    />
-    <Line
-      startPoint={[radius + 0.75, radius]}
-      endPoint={[radius, canvasHeight - radius]}
-      strokeWidth={radius / 4}
-    />
-    <Box
-      point={[radius + 0.75, canvasHeight - height]}
-      width={radius * 1.5}
-      height={radius * 1.5}
-      classification="start"
-    />
+    <CompactFlagPosts {canvasHeight} status={workflow.status} />
     {#each timeGroups as [time, group], startIndex}
       {@const expandedHeight =
         activeIndex !== null && activeIndex < startIndex
           ? activeDetailsHeight
           : 0}
-      {@const startY = (startIndex + 2) * height + expandedHeight}
+      {@const startY = (startIndex + 1.5) * height + expandedHeight}
       <Text point={[radius * 2, startY]}
         >{formatDate(new Date(time), $timeFormat)}</Text
       >
@@ -124,12 +107,5 @@
         />
       {/key}
     {/if}
-    <!-- {#if !workflow.isRunning}
-      <Text
-        point={[canvasWidth / 2, canvasHeight - height + 1.2 * fontSizeRatio]}
-        fontSize="24px"
-        fontWeight="700">End</Text
-      >
-    {/if} -->
   </svg>
 </div>

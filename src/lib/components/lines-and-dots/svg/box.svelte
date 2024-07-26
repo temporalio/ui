@@ -33,12 +33,6 @@
     fill: #1e293b;
   }
 
-  .start {
-    stroke: #444ce7;
-    fill: #444ce7;
-    stroke-width: 3;
-  }
-
   .pending,
   .retry {
     stroke: #a78bfa;

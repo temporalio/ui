@@ -13,7 +13,6 @@
   export let length: number;
   export let y: number;
   export let active = true;
-  export let expanded = false;
   export let onClick: () => void;
   const { radius, height } = CompactConfig;
   $: start = 4 * radius + startIndex * length + 200;
@@ -60,42 +59,9 @@
     {active}
     r={radius}
   />
-  {#if aggregateRow}
-    <Icon
-      name={CategoryIcon[group.category]}
-      x={start - radius / 2}
-      y={y - radius / 2}
-      width={radius}
-      height={radius}
-      class="text-black"
-    />
-    <Icon
-      name={expanded ? 'chevron-up' : 'chevron-down'}
-      x={start - radius / 3}
-      y={y + radius / 3.33}
-      width={radius / 1.5}
-      height={radius / 1.5}
-      class="text-black"
-    />
-  {:else}
-    <Icon
-      name={CategoryIcon[group.category]}
-      x={start - radius / 2}
-      y={y - radius / 2}
-      width={radius}
-      height={radius}
-      class="text-black"
-    />
-  {/if}
-  <Dot
-    point={[end, y]}
-    classification={aggregateRow ? undefined : group.lastEvent.classification}
-    {active}
-    r={radius}
-  />
   <Icon
     name={CategoryIcon[group.category]}
-    x={end - radius / 2}
+    x={start - radius / 2}
     y={y - radius / 2}
     width={radius}
     height={radius}

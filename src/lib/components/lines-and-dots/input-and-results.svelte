@@ -14,11 +14,11 @@
   <InputAndResultsPayload
     content={workflowEvents.input}
     {isRunning}
-    title="Input"
+    title="Inputs"
   />
   <InputAndResultsPayload
     content={workflowEvents.results}
     {isRunning}
-    title="Results"
+    title="Result"
   />
 </div>
