@@ -114,6 +114,7 @@
       indentOnInput(),
       bracketMatching(),
       EditorState.readOnly.of(!editable),
+      EditorView.editable.of(editable),
       EditorView.contentAttributes.of({ 'aria-label': label }),
     ];
 
