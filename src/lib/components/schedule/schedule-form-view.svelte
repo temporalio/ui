@@ -17,6 +17,7 @@
     ScheduleParameters,
     SchedulePreset,
   } from '$lib/types/schedule';
+  import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
   import {
     routeForSchedule,
     routeForSchedules,
@@ -55,9 +56,12 @@
 
   let errors = {};
   let name = scheduleId ?? '';
-  let workflowType = schedule?.action?.startWorkflow?.workflowType?.name ?? '';
-  let workflowId = schedule?.action?.startWorkflow?.workflowId ?? '';
-  let taskQueue = schedule?.action?.startWorkflow?.taskQueue?.name ?? '';
+  const decodedWorkflow = decodePayloadAttributes(
+    schedule?.action?.startWorkflow,
+  );
+  let workflowType = decodedWorkflow?.workflowType?.name ?? '';
+  let workflowId = decodedWorkflow?.workflowId ?? '';
+  let taskQueue = decodedWorkflow?.taskQueue?.name ?? '';
   let input = '';
   let daysOfWeek: string[] = [];
   let daysOfMonth: number[] = [];
@@ -68,7 +72,12 @@
   let second = '';
   let phase = '';
   let cronString = '';
-  let searchAttributes: SearchAttributeInput[] = [];
+  const indexedFields =
+    decodedWorkflow?.searchAttributes?.indexedFields ??
+    ({} as { [k: string]: string });
+  let searchAttributes: SearchAttributeInput[] = Object.entries(
+    indexedFields,
+  ).map(([attribute, value]) => ({ attribute, value }));
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: Partial<ScheduleParameters> = {
@@ -150,9 +159,7 @@
       <h1 class="font-base text-2xl">{title}</h1>
     </header>
     <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
-      <Alert intent="error" title="" hidden={!$error}>
-        {$error}
-      </Alert>
+      <Alert intent="error" title={$error} hidden={!$error} />
       <div class="w-full">
         <Input
           id="name"

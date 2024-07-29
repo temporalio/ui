@@ -14,21 +14,32 @@
   export let attribute: SearchAttributeInput;
   export let onRemove: (attribute: string) => void;
 
-  $: type =
-    searchAttributes.find((a) => a.value === attribute.attribute)?.type ?? '';
+  $: type = getType(searchAttributes, attribute.attribute);
 
   $: isDisabled = (value: string) => {
     return !!attributesToAdd.find((a) => a.attribute === value);
   };
+
+  function getType(
+    searchAttributes: SearchAttributeOption[],
+    attribute: string,
+  ): string {
+    return searchAttributes.find((a) => a.value === attribute)?.type ?? '';
+  }
 </script>
 
-<div class="flex items-center justify-between gap-2">
+<div class="flex gap-2">
   <Select
     id="search-attribute"
     label={translate('workflows.custom-search-attribute')}
     class="w-full"
     placeholder={translate('workflows.select-attribute')}
     bind:value={attribute.attribute}
+    onChange={(value) => {
+      if (type !== getType(searchAttributes, value)) {
+        attribute.value = '';
+      }
+    }}
   >
     {#each searchAttributes as { value, label, type }}
       <Option disabled={isDisabled(value)} {value} description={type}
@@ -38,7 +49,6 @@
   </Select>
   {#if type === 'Bool'}
     <Select
-      class="grow"
       label={translate('common.value')}
       id="attribute-value"
       bind:value={attribute.value}
@@ -51,7 +61,6 @@
       label={translate('common.value')}
       id="attribute-value"
       type="datetime-local"
-      class="grow"
       bind:value={attribute.value}
     />
   {:else}

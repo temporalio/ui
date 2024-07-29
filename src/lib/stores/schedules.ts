@@ -156,8 +156,15 @@ export const submitEditSchedule = async (
   schedule: Schedule,
   scheduleId: string,
 ): Promise<void> => {
-  const { namespace, name, workflowId, workflowType, taskQueue, input } =
-    action;
+  const {
+    namespace,
+    name,
+    workflowId,
+    workflowType,
+    taskQueue,
+    input,
+    searchAttributes,
+  } = action;
 
   let payloads;
 
@@ -182,6 +189,14 @@ export const submitEditSchedule = async (
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
           input: payloads ? { payloads } : null,
+          searchAttributes:
+            searchAttributes.length === 0
+              ? null
+              : {
+                  indexedFields: {
+                    ...setSearchAttributes(searchAttributes),
+                  },
+                },
         },
       },
     },
