@@ -86,7 +86,7 @@
           id="{id}-range"
           name="range"
           type="range"
-          class="h-0 w-full cursor-pointer appearance-none rounded border-y-2 border-primary"
+          class="surface-information h-0 w-full cursor-pointer appearance-none rounded border-y border-primary"
           bind:value
           on:input={handleInput}
           {min}
@@ -124,7 +124,7 @@
   }
 
   .numeric-input {
-    @apply surface-primary h-10 w-10 rounded-lg border-2 border-subtle text-center text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply h-10 w-10 rounded-lg border-2 border-subtle bg-information text-center text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     appearance: textfield;
   }
@@ -148,7 +148,7 @@
   }
 
   input[type='range']::-webkit-slider-thumb {
-    @apply h-4 w-8 appearance-none rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100;
+    @apply surface-information h-4 w-8 appearance-none rounded-full border-2 border-solid border-primary;
   }
 
   input[type='range']::-moz-range-thumb {
