@@ -1,30 +1,48 @@
 <script lang="ts">
+  import * as dateTz from 'date-fns-tz';
+
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type {
-    SearchAttributeInput,
-    SearchAttributeOption,
+  import {
+    customSearchAttributes,
+    type SearchAttributeInput,
+    type SearchAttributeInputValue,
   } from '$lib/stores/search-attributes';
+  import type { SearchAttributes } from '$lib/types/workflows';
+
+  import NumberInput from './number-input.svelte';
+  import TextInput from './text-input.svelte';
 
   export let attributesToAdd: SearchAttributeInput[] = [];
-  export let searchAttributes: SearchAttributeOption[] = [];
+  export let searchAttributes: SearchAttributes = $customSearchAttributes;
   export let attribute: SearchAttributeInput;
   export let onRemove: (attribute: string) => void;
 
-  $: type = getType(searchAttributes, attribute.attribute);
+  $: type = searchAttributes[attribute.attribute];
+  $: searchAttributesOptions = [...Object.entries(searchAttributes)]
+    .map(([key, value]) => ({ label: key, value: key, type: value }))
+    .filter(({ type }) => type !== 'KeywordList');
 
   $: isDisabled = (value: string) => {
     return !!attributesToAdd.find((a) => a.attribute === value);
   };
 
-  function getType(
-    searchAttributes: SearchAttributeOption[],
-    attribute: string,
-  ): string {
-    return searchAttributes.find((a) => a.value === attribute)?.type ?? '';
+  function updateDatetime(e: Event & { target: HTMLInputElement }) {
+    attribute.value = new Date(e.target.value);
+  }
+
+  const dateFormat = "yyyy-MM-dd'T'hh:mm";
+
+  function formatDate(value: SearchAttributeInputValue): string {
+    if (!value) return '';
+    if (typeof value === 'string' || typeof value === 'number') {
+      return dateTz.format(new Date(String(value)), dateFormat);
+    } else {
+      return dateTz.format(value, dateFormat);
+    }
   }
 </script>
 
@@ -35,13 +53,13 @@
     class="w-full"
     placeholder={translate('workflows.select-attribute')}
     bind:value={attribute.attribute}
-    onChange={(value) => {
-      if (type !== getType(searchAttributes, value)) {
+    onChange={() => {
+      if (type !== searchAttributes[attribute.attribute]) {
         attribute.value = '';
       }
     }}
   >
-    {#each searchAttributes as { value, label, type }}
+    {#each searchAttributesOptions as { value, label, type }}
       <Option disabled={isDisabled(value)} {value} description={type}
         >{label}</Option
       >
@@ -61,15 +79,13 @@
       label={translate('common.value')}
       id="attribute-value"
       type="datetime-local"
-      bind:value={attribute.value}
+      value={formatDate(attribute.value)}
+      on:input={updateDatetime}
     />
+  {:else if type === 'Int' || type === 'Double'}
+    <NumberInput bind:value={attribute.value} />
   {:else}
-    <Input
-      label={translate('common.value')}
-      id="attribute-value"
-      class="grow"
-      bind:value={attribute.value}
-    />
+    <TextInput bind:value={attribute.value} />
   {/if}
   <Button
     variant="ghost"

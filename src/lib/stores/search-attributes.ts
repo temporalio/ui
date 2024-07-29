@@ -52,9 +52,11 @@ export type SearchAttributeOption = {
   type: SearchAttributesValue;
 };
 
+export type SearchAttributeInputValue = string | number | Date;
+
 export type SearchAttributeInput = {
   attribute: string;
-  value: string;
+  value: SearchAttributeInputValue;
 };
 
 export const searchAttributeOptions: Readable<SearchAttributeOption[]> =

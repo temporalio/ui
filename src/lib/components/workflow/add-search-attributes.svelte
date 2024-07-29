@@ -6,7 +6,7 @@
     type SearchAttributeInput as SAInput,
   } from '$lib/stores/search-attributes';
 
-  import SearchAttributeInput from './search-attribute-input.svelte';
+  import SearchAttributeInput from './search-attribute-input/index.svelte';
 
   let className = '';
   export { className as class };
@@ -16,9 +16,7 @@
     attributesToAdd = [...attributesToAdd, { attribute: '', value: '' }];
   };
 
-  $: searchAttributes = [...Object.entries($customSearchAttributes)].map(
-    ([key, value]) => ({ label: key, value: key, type: value }),
-  );
+  $: searchAttributes = Object.keys($customSearchAttributes);
 
   const onRemove = (attribute: string) => {
     attributesToAdd = attributesToAdd.filter((a) => a.attribute !== attribute);
@@ -27,12 +25,7 @@
 
 <div class="flex flex-col gap-2 {className}">
   {#each attributesToAdd as attribute}
-    <SearchAttributeInput
-      {attributesToAdd}
-      {searchAttributes}
-      bind:attribute
-      {onRemove}
-    />
+    <SearchAttributeInput {attributesToAdd} bind:attribute {onRemove} />
   {/each}
   <Button
     variant="ghost"
