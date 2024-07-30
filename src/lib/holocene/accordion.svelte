@@ -49,8 +49,14 @@
     id="{id}-trigger"
     aria-expanded={open}
     aria-controls="{id}-content"
-    class="flex w-full flex-col rounded-lg p-2 hover:bg-interactive-secondary-hover focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
+    class={merge(
+      'flex w-full flex-col rounded-lg p-2',
+      $$slots.default
+        ? 'hover:bg-interactive-secondary-hover focus-visible:bg-interactive-secondary-hover focus-visible:outline-none'
+        : '',
+    )}
     type="button"
+    disabled={!$$slots.default}
     on:click={toggleAccordion}
   >
     <div class="space-between flex w-full flex-row items-center">
@@ -59,14 +65,16 @@
         {title}
         <slot name="summary" />
       </h2>
-      <div
-        class="flex flex-row items-center gap-2 pr-2"
-        on:click|stopPropagation
-        on:keyup|stopPropagation
-      >
-        <slot name="action" />
-      </div>
-      <Icon class="m-2" name={open ? 'chevron-up' : 'chevron-down'} />
+      {#if $$slots.default}
+        <div
+          class="flex flex-row items-center gap-2 pr-2"
+          on:click|stopPropagation
+          on:keyup|stopPropagation
+        >
+          <slot name="action" />
+        </div>
+        <Icon class="m-2" name={open ? 'chevron-up' : 'chevron-down'} />
+      {/if}
     </div>
     <p class="flex items-center font-secondary">
       {#if error}
@@ -75,6 +83,7 @@
       {subtitle}
     </p>
   </button>
+
   <div
     id="{id}-content"
     aria-labelledby="{id}-trigger"

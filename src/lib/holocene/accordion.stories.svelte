@@ -37,9 +37,10 @@
   <Accordion {...args} onToggle={action('onToggle')}>
     <p>Accordion Content</p>
   </Accordion>
+  <Accordion {...args} onToggle={action('onToggle')}></Accordion>
 </Template>
 
-<Story name="Default" args={{ open: true }} />
+<Story name="Default" args={{ open: false }} />
 
 <Story name="With Error" args={{ error: 'Error' }} />
 
