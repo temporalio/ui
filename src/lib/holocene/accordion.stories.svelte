@@ -37,6 +37,7 @@
   <Accordion {...args} onToggle={action('onToggle')}>
     <p>Accordion Content</p>
   </Accordion>
+  <div class="h-10"></div>
   <Accordion {...args} onToggle={action('onToggle')}></Accordion>
 </Template>
 
