@@ -81,27 +81,3 @@
 <Story name="Keep Open" args={{ keepOpen: true }} />
 
 <Story name="Right" args={{ position: 'right' }} />
-
-<Story
-  name="Primary (Dark)"
-  args={{ variant: 'primary' }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Secondary (Dark)"
-  args={{ variant: 'secondary' }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Ghost (Dark)"
-  args={{ variant: 'ghost' }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Keep Open (Dark)"
-  args={{ keepOpen: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>

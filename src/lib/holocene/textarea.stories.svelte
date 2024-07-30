@@ -69,64 +69,8 @@
 
 <Story name="Hidden Label" args={{ labelHidden: true }} />
 
-<Story name="Spellcheck" args={{ spellcheck: true }} />
-
 <Story name="With Maximum Length" args={{ maxLength: 10 }} />
 
 <Story name="With Value" args={{ value: 'Some text…' }} />
 
 <Story name="With Rows" args={{ rows: 10 }} />
-
-<Story
-  name="Default (Dark)"
-  parameters={{ themes: { themeOverride: 'dark' } }}
-  play={shouldNotBeTransparent((canvas) => canvas.getByRole('textbox'))}
-/>
-
-<Story
-  name="Disabled (Dark)"
-  args={{ disabled: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Error (Dark)"
-  args={{ error: 'An error message.', isValid: false }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Required (Dark)"
-  args={{ required: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Hidden Label (Dark)"
-  args={{ labelHidden: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Spellcheck (Dark)"
-  args={{ spellcheck: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="With Maximum Length (Dark)"
-  args={{ maxLength: 10 }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="With Value (Dark)"
-  args={{ value: 'Some text…' }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="With Rows (Dark)"
-  args={{ rows: 10 }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>

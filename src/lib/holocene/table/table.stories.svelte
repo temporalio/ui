@@ -56,26 +56,3 @@
 <Story name="Simple, Updating" args={{ updating: true }} />
 
 <Story name="Fancy, Updating" args={{ updating: true, variant: 'fancy' }} />
-
-<Story
-  name="Simple (Dark)"
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Fancy (Dark)"
-  args={{ variant: 'fancy' }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Simple, Updating (Dark)"
-  args={{ updating: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Fancy, Updating  (Dark)"
-  args={{ updating: true, variant: 'fancy' }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>

@@ -60,31 +60,3 @@
     {/each}
   </OrderableList>
 </Story>
-
-<Story name="Empty (Dark)" parameters={{ themes: { themeOverride: 'dark' } }}>
-  <OrderableList />
-</Story>
-
-<Story
-  name="With Items (Dark)"
-  parameters={{ themes: { themeOverride: 'dark' } }}
-  let:context
->
-  <OrderableList>
-    <span slot="heading">{context.name}</span>
-    {#each items as item, index (item.label)}
-      <OrderableListItem
-        on:moveItem={action('moveItem')}
-        on:removeItem={action('removeItem')}
-        addButtonLabel="Add"
-        static={false}
-        label={item.label}
-        pinned={item.pinned}
-        moveUpButtonLabel="Move Up"
-        moveDownButtonLabel="Move Down"
-        removeButtonLabel="Remove"
-        {index}
-      />
-    {/each}
-  </OrderableList>
-</Story>

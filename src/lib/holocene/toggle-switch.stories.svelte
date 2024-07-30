@@ -50,27 +50,3 @@
 <Story name="Label Left" args={{ labelPosition: 'left' }} />
 
 <Story name="Unchecked" />
-
-<Story
-  name="Checked (Dark)"
-  args={{ checked: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Disabled (Dark)"
-  args={{ disabled: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Label Hidden (Dark)"
-  args={{ labelHidden: true }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
-
-<Story
-  name="Label Left (Dark)"
-  args={{ labelPosition: 'left' }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
