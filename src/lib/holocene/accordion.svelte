@@ -65,14 +65,14 @@
         {title}
         <slot name="summary" />
       </h2>
+      <div
+        class="flex flex-row items-center gap-2 pr-2"
+        on:click|stopPropagation
+        on:keyup|stopPropagation
+      >
+        <slot name="action" />
+      </div>
       {#if $$slots.default}
-        <div
-          class="flex flex-row items-center gap-2 pr-2"
-          on:click|stopPropagation
-          on:keyup|stopPropagation
-        >
-          <slot name="action" />
-        </div>
         <Icon class="m-2" name={open ? 'chevron-up' : 'chevron-down'} />
       {/if}
     </div>
