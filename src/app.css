@@ -14,7 +14,7 @@
   }
 
   body {
-    @apply surface-background relative overscroll-none font-sans text-sm font-normal;
+    @apply body-normal surface-background relative overscroll-none;
   }
 
   h1,

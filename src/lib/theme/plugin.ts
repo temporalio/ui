@@ -5,10 +5,31 @@ import { css } from './utilities';
 import { dark, light } from './variables';
 
 const temporal = plugin(
-  ({ addComponents, addBase }) => {
+  ({ addComponents, addBase, theme }) => {
     addBase({
       ':root': light,
       '[data-theme="dark"]': dark,
+      '.body-normal': {
+        fontSize: theme('fontSize.sm'),
+        fontWeight: theme('fontWeight.normal'),
+      },
+      '.body-medium': {
+        fontSize: theme('fontSize.sm'),
+        fontWeight: theme('fontWeight.medium'),
+      },
+      '.body-small': {
+        fontSize: theme('fontSize.xs'),
+        fontWeight: theme('fontWeight.normal'),
+      },
+      '.body-small-medium': {
+        fontSize: theme('fontSize.xs'),
+        fontWeight: theme('fontWeight.medium'),
+      },
+      '.body-small-mono': {
+        fontFamily: theme('fontFamily.mono'),
+        fontSize: theme('fontSize.xs'),
+        fontWeight: theme('fontWeight.normal'),
+      },
     });
 
     addComponents({
