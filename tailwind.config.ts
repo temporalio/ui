@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 import { fontFamily } from 'tailwindcss/defaultTheme';
 
-import temporal from './src/lib/theme/plugin';
+import temporal, { textStyles } from './src/lib/theme/plugin';
 
 const config = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
@@ -20,7 +20,7 @@ const config = {
       },
     },
   },
-  plugins: [temporal],
+  plugins: [temporal, textStyles],
 } satisfies Config;
 
 export default config;

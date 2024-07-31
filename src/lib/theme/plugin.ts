@@ -4,32 +4,61 @@ import { colors } from './colors';
 import { css } from './utilities';
 import { dark, light } from './variables';
 
+const textStyles = plugin(({ addBase, theme }) => {
+  addBase({
+    h1: {
+      fontSize: theme('fontSize.3xl'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    h2: {
+      fontSize: theme('fontSize.2xl'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    h3: {
+      fontSize: theme('fontSize.xl'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    h4: {
+      fontSize: theme('fontSize.lg'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    h5: {
+      fontSize: theme('fontSize.base'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    h6: {
+      fontSize: theme('fontSize.sm'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    '.body-normal': {
+      fontSize: theme('fontSize.sm'),
+      fontWeight: theme('fontWeight.normal'),
+    },
+    '.body-medium': {
+      fontSize: theme('fontSize.sm'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    '.body-small': {
+      fontSize: theme('fontSize.xs'),
+      fontWeight: theme('fontWeight.normal'),
+    },
+    '.body-small-medium': {
+      fontSize: theme('fontSize.xs'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    '.body-small-mono': {
+      fontFamily: theme('fontFamily.mono'),
+      fontSize: theme('fontSize.xs'),
+      fontWeight: theme('fontWeight.normal'),
+    },
+  });
+});
+
 const temporal = plugin(
-  ({ addComponents, addBase, theme }) => {
+  ({ addComponents, addBase }) => {
     addBase({
       ':root': light,
       '[data-theme="dark"]': dark,
-      '.body-normal': {
-        fontSize: theme('fontSize.sm'),
-        fontWeight: theme('fontWeight.normal'),
-      },
-      '.body-medium': {
-        fontSize: theme('fontSize.sm'),
-        fontWeight: theme('fontWeight.medium'),
-      },
-      '.body-small': {
-        fontSize: theme('fontSize.xs'),
-        fontWeight: theme('fontWeight.normal'),
-      },
-      '.body-small-medium': {
-        fontSize: theme('fontSize.xs'),
-        fontWeight: theme('fontWeight.medium'),
-      },
-      '.body-small-mono': {
-        fontFamily: theme('fontFamily.mono'),
-        fontSize: theme('fontSize.xs'),
-        fontWeight: theme('fontWeight.normal'),
-      },
     });
 
     addComponents({
@@ -207,4 +236,4 @@ const temporal = plugin(
 );
 
 export default temporal;
-export { colors };
+export { colors, textStyles };
