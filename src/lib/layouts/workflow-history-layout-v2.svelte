@@ -77,7 +77,7 @@
       class="flex flex-col items-center justify-between gap-2 py-2 md:flex-row"
     >
       <div class="flex flex-col items-center gap-2 md:flex-row md:gap-4">
-        <h2 class="text-2xl font-medium">
+        <h2>
           {translate('workflows.event-history')}
         </h2>
         <ToggleButtons>

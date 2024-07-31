@@ -22,7 +22,7 @@
   </div>
   <div class="flex flex-col gap-1">
     <div class="flex items-center justify-between">
-      <h1 data-testid="namespace-selector-title" class="text-2xl">
+      <h1 data-testid="namespace-selector-title">
         {endpoint.spec.name}
       </h1>
       <Button
@@ -59,12 +59,12 @@
       </div>
     </div>
   </div>
-  <h2 class="text-xl">Description</h2>
+  <h2>Description</h2>
   <p class="w-full whitespace-pre-wrap xl:w-1/2">
     {endpoint.spec?.descriptionString || 'No description provided'}
   </p>
   {#if endpoint.spec?.allowedCallerNamespaces}
-    <h2 class="text-xl">Allowed Caller Namespaces</h2>
+    <h2>Allowed Caller Namespaces</h2>
     <div class="flex flex-wrap items-center gap-4">
       {#each endpoint.spec?.allowedCallerNamespaces as namespace}
         <Link href={routeForNamespace({ namespace })}>{namespace}</Link>

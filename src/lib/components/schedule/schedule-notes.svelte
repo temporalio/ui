@@ -5,6 +5,6 @@
 </script>
 
 <div>
-  <h2 class="mb-4 text-lg">{translate('common.notes')}</h2>
+  <h2 class="mb-4">{translate('common.notes')}</h2>
   <p>{notes}</p>
 </div>

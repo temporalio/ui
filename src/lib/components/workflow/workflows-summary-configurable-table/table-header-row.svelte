@@ -65,7 +65,7 @@
   }
 
   .batch-actions-table-cell {
-    @apply overflow-visible whitespace-nowrap px-2 text-left font-secondary text-sm font-medium;
+    @apply overflow-visible whitespace-nowrap px-2 text-left text-sm font-medium;
   }
 
   .configuration-button-table-cell {

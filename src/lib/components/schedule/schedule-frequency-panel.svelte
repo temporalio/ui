@@ -13,7 +13,7 @@
 </script>
 
 <Panel>
-  <h2 class="mb-4 text-lg">{translate('schedules.schedule-spec')}</h2>
+  <h2 class="mb-4">{translate('schedules.schedule-spec')}</h2>
   <div class="pr-2">
     <ScheduleFrequency {calendar} {interval} {timezoneName} class="text-base" />
   </div>

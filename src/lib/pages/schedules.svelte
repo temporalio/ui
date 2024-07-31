@@ -65,9 +65,7 @@
       let:visibleItems
     >
       <div>
-        <h1
-          class="flex flex-col gap-0 text-xl md:flex-row md:items-center md:gap-2 md:text-2xl"
-        >
+        <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
           <SchedulesCount />
         </h1>
       </div>

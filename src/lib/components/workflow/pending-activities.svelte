@@ -55,7 +55,7 @@
         {#each pendingActivities as { id, ...pendingActivity } (id)}
           {@const failed = pendingActivity.attempt > 1}
           <div class="pending-activity-row-container">
-            <h3 class="w-full self-start text-sm font-normal text-slate-500">
+            <h3 class="w-full self-start text-sm text-secondary">
               {pendingActivity.activityId}
             </h3>
             <div class="pending-activity-row">

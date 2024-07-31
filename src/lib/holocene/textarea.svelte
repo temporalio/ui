@@ -101,7 +101,7 @@
   }
 
   .error-msg {
-    @apply min-h-[1.25rem] break-words border-danger font-primary text-sm font-normal text-danger;
+    @apply min-h-[1.25rem] break-words border-danger text-sm font-normal text-danger;
   }
 
   .error-msg.min-width {
@@ -109,7 +109,7 @@
   }
 
   .count {
-    @apply invisible text-right font-secondary text-sm font-medium text-primary group-focus-within:visible;
+    @apply invisible text-right text-sm font-medium text-primary group-focus-within:visible;
   }
 
   .count > .warn {
