@@ -10,16 +10,11 @@
   *,
   html,
   body {
-    box-sizing: border-box;
+    @apply box-border;
   }
 
   body {
-    @apply surface-background;
-    font-family: theme('fontFamily.sans');
-    font-size: theme('fontSize.sm');
-    font-weight: theme('fontWeight.normal');
-    position: relative;
-    overscroll-behavior: none;
+    @apply surface-background relative overscroll-none font-sans text-sm font-normal;
   }
 
   h1,
@@ -28,58 +23,34 @@
   h4,
   h5,
   h6 {
-    font-weight: theme('fontWeight.medium');
+    @apply font-medium;
   }
 
   h1 {
-    font-size: theme('fontSize.2xl');
-
-    @media (min-width: theme('screens.md')) {
-      font-size: theme('fontSize.3xl');
-    }
+    @apply text-3xl;
   }
 
   h2 {
-    font-size: theme('fontSize.xl');
-
-    @media (min-width: theme('screens.md')) {
-      font-size: theme('fontSize.2xl');
-    }
+    @apply text-2xl;
   }
 
   h3 {
-    font-size: theme('fontSize.lg');
-
-    @media (min-width: theme('screens.md')) {
-      font-size: theme('fontSize.xl');
-    }
+    @apply text-xl;
   }
 
   h4 {
-    font-size: theme('fontSize.base');
-
-    @media (min-width: theme('screens.md')) {
-      font-size: theme('fontSize.lg');
-    }
+    @apply text-lg;
   }
 
   h5 {
-    font-size: theme('fontSize.sm');
-
-    @media (min-width: theme('screens.md')) {
-      font-size: theme('fontSize.base');
-    }
+    @apply text-base;
   }
 
   h6 {
-    font-size: theme('fontSize.xs');
-
-    @media (min-width: theme('screens.md')) {
-      font-size: theme('fontSize.sm');
-    }
+    @apply text-sm;
   }
 
   input[type='search']::-webkit-search-cancel-button {
-    display: none;
+    @apply hidden;
   }
 }
