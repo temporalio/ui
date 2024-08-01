@@ -19,7 +19,7 @@
         </h1>
         <Badge type="primary">Pre-Release</Badge>
       </div>
-      <div class="surface-information flex w-full flex-col gap-4 pr-8 md:pr-24">
+      <div class="flex w-full flex-col gap-4 pr-8 md:pr-24">
         <h2 class="text-4xl">Get Started</h2>
         <p>
           Nexus RPC is a modern open-source service framework for

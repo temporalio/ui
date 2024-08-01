@@ -40,4 +40,5 @@ export const Strings = {
   'select-namespaces': 'Select Namespace(s)',
   'selected-namespaces_one': '{{count}} Namespace selected',
   'selected-namespaces_other': '{{count}} Namespaces selected',
+  'empty-state': 'No Nexus Endpoints found, try a new search.',
 } as const;
