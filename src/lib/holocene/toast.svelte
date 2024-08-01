@@ -34,7 +34,7 @@
   )}
   transition:fly={{ x: 250 }}
 >
-  <p class="font-secondary text-sm">
+  <p class="text-sm">
     <slot />
   </p>
   <button

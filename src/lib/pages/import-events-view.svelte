@@ -12,7 +12,7 @@
     class="flex flex-col items-start justify-between gap-4 pb-4 md:flex-row"
     aria-label={translate('events.import-event-history')}
   >
-    <h3 class="text-lg font-medium">
+    <h3>
       {translate('events.import-event-history')}
     </h3>
     <div class="flex gap-4">

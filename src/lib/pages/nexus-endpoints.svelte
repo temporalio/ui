@@ -41,7 +41,7 @@
   <NexusEmptyState />
 {:else}
   <div class="mb-8 flex items-center justify-between">
-    <h1 data-testid="namespace-selector-title" class="text-2xl">
+    <h1 data-testid="namespace-selector-title">
       {translate('nexus.endpoints')}
     </h1>
     <Button variant="primary" href={routeForNexusEndpointCreate()}
@@ -70,7 +70,7 @@
             <div
               class="transition:colors flex cursor-pointer flex-col gap-1 rounded-lg p-4 duration-200 ease-in-out"
             >
-              <h3 class="break-all text-lg font-medium">
+              <h3 class="break-all">
                 {endpoint.spec.name}
               </h3>
               <p class="text-xs text-secondary">

@@ -36,7 +36,7 @@
     @apply relative;
 
     thead :global(th) {
-      @apply text-left font-secondary text-sm font-medium;
+      @apply text-left text-sm font-medium;
     }
 
     tbody :global(td) {

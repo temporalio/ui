@@ -90,7 +90,7 @@
       class="flex flex-col items-center justify-between gap-4 lg:flex-row lg:items-end"
       aria-label={translate('workflows.event-history-view')}
     >
-      <h2 class="text-2xl font-medium">
+      <h2>
         {translate('workflows.event-history')}
       </h2>
       <div id="event-view-toggle" class="surface-primary mt-4 flex gap-4">

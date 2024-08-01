@@ -14,7 +14,7 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <h2 class="text-lg font-medium" data-testid="task-queue-name">
+  <h2 data-testid="task-queue-name">
     {translate('common.task-queue')}:
     <Link
       href={routeForTaskQueue({

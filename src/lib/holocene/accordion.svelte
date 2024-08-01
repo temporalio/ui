@@ -60,11 +60,11 @@
     on:click={toggleAccordion}
   >
     <div class="space-between flex w-full flex-row items-center">
-      <h2 class="flex w-full items-center gap-2 text-lg font-medium">
+      <h3 class="flex w-full items-center gap-2">
         {#if icon}<Icon name={icon} />{/if}
         {title}
         <slot name="summary" />
-      </h2>
+      </h3>
       <div
         class="flex flex-row items-center gap-2 pr-2"
         on:click|stopPropagation
@@ -76,7 +76,7 @@
         <Icon class="m-2" name={open ? 'chevron-up' : 'chevron-down'} />
       {/if}
     </div>
-    <p class="flex items-center font-secondary">
+    <p class="flex items-center">
       {#if error}
         <Badge class="mr-2" type="danger">{error}</Badge>
       {/if}

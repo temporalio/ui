@@ -78,7 +78,7 @@
   }
 
   .count {
-    @apply invisible absolute -bottom-5 right-0 font-secondary text-sm font-medium text-primary;
+    @apply invisible absolute -bottom-5 right-0 text-sm font-medium text-primary;
   }
 
   .count > .warn {

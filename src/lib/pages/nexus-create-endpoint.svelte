@@ -27,7 +27,7 @@
       {translate('nexus.back-to-endpoints')}
     </Link>
   </div>
-  <h1 data-testid="namespace-selector-title" class="text-2xl">
+  <h1 data-testid="namespace-selector-title">
     {translate('nexus.create-endpoint')}
   </h1>
   <NexusForm {error} {targetNamespaceList} {callerNamespaceList} {isCloud} />
