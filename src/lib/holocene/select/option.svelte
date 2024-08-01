@@ -5,7 +5,7 @@
     description?: string;
     disabled?: boolean;
     class?: string;
-    ['data-testid']?: string;
+    'data-testid'?: string;
   }
 
   export const EMPTY_OPTION: OptionType<string> = {
