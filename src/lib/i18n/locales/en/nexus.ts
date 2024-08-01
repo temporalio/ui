@@ -27,12 +27,15 @@ export const Strings = {
   handler: 'Handler',
   'delete-endpoint': 'Delete Endpoint',
   'delete-modal-title': 'Delete Nexus Endpoint?',
-  'delete-modal-confirmation':
-    'Are you sure you want to delete {{endpoint}}? Any Workflows calling this endpoint will encounter failures.',
-  'delete-modal-confirmation-label':
-    'Type “{{endpoint}}" to delete this endpoint.',
+  'delete-modal-confirmation-preface': 'Are you sure you want to delete ',
+  'delete-modal-confirmation-postface':
+    'Any Workflows calling this endpoint will encounter failures.',
+  'type-confirm-preface': 'Type ',
+  'type-confirm-postface': 'to delete this endpoint.',
   'endpoint-name-hint':
     'Endpoint name must start with A-Z, a-z or _ and can only contain A-Z, a-z, 0-9, or _',
+  'endpoint-name-hint-with-dash':
+    'Endpoint name must start with A-Z, a-z or _ and can only contain A-Z, a-z, 0-9, _ or -',
   'access-policy': 'Access Policy',
   'allowed-caller-namespaces': 'Allowed caller namespaces',
   'allowed-caller-namespaces-description':

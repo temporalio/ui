@@ -75,9 +75,14 @@
               <h3 class="break-all">
                 {endpoint.spec.name}
               </h3>
-              <p class="text-xs text-secondary">
-                Last update {formatDate(endpoint.lastModifiedTime, $timeFormat)}
-              </p>
+              {#if endpoint.lastModifiedTime}
+                <p class="text-xs text-secondary">
+                  Last update {formatDate(
+                    endpoint.lastModifiedTime,
+                    $timeFormat,
+                  )}
+                </p>
+              {/if}
               {#if endpoint.createdTime}
                 <p class="text-xs text-secondary">
                   Created on {formatDate(endpoint.createdTime, $timeFormat)}

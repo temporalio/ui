@@ -20,6 +20,8 @@
   export let error: NetworkError | undefined = undefined;
   export let loading = false;
   export let isCloud = false;
+  export let nameHintText = translate('nexus.endpoint-name-hint');
+  export let nameRegexPattern = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
   let deleteConfirmationModalOpen = false;
   let confirmDeleteInput = '';
@@ -53,6 +55,8 @@
     {callerNamespaceList}
     {error}
     {isCloud}
+    {nameHintText}
+    {nameRegexPattern}
     nameDisabled
   />
   <div class="flex items-center gap-4">
@@ -67,6 +71,7 @@
 <Modal
   id="delete-endpoint-modal"
   bind:open={deleteConfirmationModalOpen}
+  {loading}
   confirmType="destructive"
   confirmText={translate('common.delete')}
   cancelText={translate('common.cancel')}
@@ -77,16 +82,19 @@
   <h3 slot="title">{translate('nexus.delete-modal-title')}</h3>
   <div slot="content" class="flex flex-col gap-4">
     <p>
-      {translate('nexus.delete-modal-confirmation', {
-        endpoint: endpoint.spec.name,
-      })}
+      {translate('nexus.delete-modal-confirmation-preface')}
+      <strong class="select-all">{endpoint.spec.name}</strong>?
+      {translate('nexus.delete-modal-confirmation-postface')}
+    </p>
+    <p>
+      {translate('nexus.type-confirm-preface')}
+      <strong class="select-all">{endpoint.spec.name}</strong>
+      {translate('nexus.type-confirm-postface')}
     </p>
     <Input
       id="delete-endpoint"
-      required
-      label={translate('nexus.delete-modal-confirmation-label', {
-        endpoint: endpoint.spec.name,
-      })}
+      labelHidden
+      label={translate('nexus.delete-endpoint')}
       bind:value={confirmDeleteInput}
     />
   </div>

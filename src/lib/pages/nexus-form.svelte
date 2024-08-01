@@ -36,6 +36,8 @@
   export let error: NetworkError | undefined = undefined;
   export let nameDisabled = false;
   export let isCloud = true;
+  export let nameHintText = translate('nexus.endpoint-name-hint');
+  export let nameRegexPattern = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
   let name = endpoint?.spec?.name || '';
   let description = endpoint?.spec?.descriptionString || '';
@@ -92,8 +94,7 @@
     $endpointForm = emptyEndpoint;
   });
 
-  const pattern = /^[A-Za-z_][A-Za-z0-9_]*$/;
-  $: validName = (name) => pattern.test(name);
+  $: validName = (name) => nameRegexPattern.test(name);
 </script>
 
 <div class="flex w-full flex-col gap-4 xl:w-1/2">
@@ -102,7 +103,7 @@
     required
     disabled={nameDisabled}
     error={!name || !validName(name)}
-    hintText={translate('nexus.endpoint-name-hint')}
+    hintText={nameHintText}
     label={translate('nexus.endpoint-name')}
     id="name"
     maxLength={255}
