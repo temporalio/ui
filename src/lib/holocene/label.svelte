@@ -30,7 +30,6 @@
     'gap-2',
     'text-primary',
     'text-sm',
-    'font-secondary',
     'font-medium',
     'focus:outline-none',
     hidden && 'sr-only',

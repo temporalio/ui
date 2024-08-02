@@ -109,6 +109,7 @@
       {disabled}
       controls="{id}-select"
       {variant}
+      data-testid={`${$$restProps['data-testid'] ?? ''}-button`}
     >
       <slot name="leading" slot="leading">
         {#if leadingIcon}

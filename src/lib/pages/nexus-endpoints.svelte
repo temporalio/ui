@@ -20,6 +20,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   export let endpoints: NexusEndpoint[] = [];
+  export let searchPlaceholder = translate('common.search');
 
   let search = '';
   $: searchParam = $page.url.searchParams.get('search') || '';
@@ -41,7 +42,7 @@
   <NexusEmptyState />
 {:else}
   <div class="mb-8 flex items-center justify-between">
-    <h1 data-testid="namespace-selector-title" class="text-2xl">
+    <h1 data-testid="namespace-selector-title">
       {translate('nexus.endpoints')}
     </h1>
     <Button variant="primary" href={routeForNexusEndpointCreate()}
@@ -53,11 +54,12 @@
       <Input
         id="endpoint-search"
         bind:value={search}
-        label={translate('common.search')}
+        icon="search"
+        label={searchPlaceholder}
         labelHidden
         autoFocus
         type="search"
-        placeholder={translate('common.search')}
+        placeholder={searchPlaceholder}
         class="w-full lg:w-1/2"
       />
     </div>
@@ -70,12 +72,17 @@
             <div
               class="transition:colors flex cursor-pointer flex-col gap-1 rounded-lg p-4 duration-200 ease-in-out"
             >
-              <h3 class="break-all text-lg font-medium">
+              <h3 class="break-all">
                 {endpoint.spec.name}
               </h3>
-              <p class="text-xs text-secondary">
-                Last update {formatDate(endpoint.lastModifiedTime, $timeFormat)}
-              </p>
+              {#if endpoint.lastModifiedTime}
+                <p class="text-xs text-secondary">
+                  Last update {formatDate(
+                    endpoint.lastModifiedTime,
+                    $timeFormat,
+                  )}
+                </p>
+              {/if}
               {#if endpoint.createdTime}
                 <p class="text-xs text-secondary">
                   Created on {formatDate(endpoint.createdTime, $timeFormat)}
@@ -92,9 +99,7 @@
       </div>
     {:else}
       <div class="flex w-full justify-center">
-        <EmptyState
-          title="No Endpoints found, try a new search. Exact matches only."
-        />
+        <EmptyState title={translate('nexus.empty-state')} />
       </div>
     {/if}
   </div>

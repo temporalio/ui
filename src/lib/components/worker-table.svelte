@@ -14,7 +14,7 @@
   export let workers: GetPollersResponse;
 </script>
 
-<h2 class="flex items-center gap-2 text-base font-medium" data-testid="workers">
+<h2 class="flex items-center gap-2" data-testid="workers">
   {translate('workers.workers')}
   <Badge type="count" class="rounded-sm">{workers?.pollers?.length || 0}</Badge>
 </h2>

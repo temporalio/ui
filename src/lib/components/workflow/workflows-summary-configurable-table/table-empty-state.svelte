@@ -36,7 +36,7 @@
     {#if updating}
       <Loading />
     {:else}
-      <h2 class="text-lg font-medium">
+      <h2>
         {#if query}
           {translate('workflows.workflow-query-empty-state-title')}
         {:else}

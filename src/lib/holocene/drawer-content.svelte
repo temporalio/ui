@@ -7,11 +7,11 @@
 </script>
 
 <div class="title-wrapper {position}">
-  <h1>{title}</h1>
+  <h2>{title}</h2>
   {#if $$slots['subtitle']}
-    <h3 class="font-primary text-xs font-normal">
+    <p class="text-xs font-normal">
       <slot name="subtitle" />
-    </h3>
+    </p>
   {/if}
 </div>
 
@@ -30,10 +30,6 @@
     &.right {
       @apply items-start;
     }
-  }
-
-  .title-wrapper h1 {
-    @apply font-primary text-base font-medium;
   }
 
   .content {
