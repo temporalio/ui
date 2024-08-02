@@ -6,6 +6,7 @@
   import { v4 } from 'uuid';
 
   import Badge from '$lib/holocene/badge.svelte';
+  import Card from '$lib/holocene/card.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import type { IconName } from './icon';
@@ -89,16 +90,8 @@
       <slot />
     </div>
   </div>
-{/if}
-
-{#if !expandable}
-  <div
-    class={merge(
-      'surface-primary flex w-full cursor-default flex-col rounded-2xl border-2 border-subtle p-2 text-primary focus-within:ring-4 focus-within:ring-primary/70',
-      className,
-    )}
-    {...$$restProps}
-  >
+{:else}
+  <Card {...$$restProps}>
     <div class="flex w-full flex-col rounded-lg p-2">
       <div class="space-between flex w-full flex-row items-center">
         <h3 class="flex w-full items-center gap-2">
@@ -126,5 +119,5 @@
     >
       <slot />
     </div>
-  </div>
+  </Card>
 {/if}
