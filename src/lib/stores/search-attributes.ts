@@ -52,7 +52,7 @@ export type SearchAttributeOption = {
   type: SearchAttributesValue;
 };
 
-export type SearchAttributeInputValue = string | number | Date;
+export type SearchAttributeInputValue = string | number;
 
 export type SearchAttributeInput = {
   attribute: string;

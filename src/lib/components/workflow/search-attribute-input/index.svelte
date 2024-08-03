@@ -1,18 +1,15 @@
 <script lang="ts">
-  import * as dateTz from 'date-fns-tz';
-
   import Button from '$lib/holocene/button.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     customSearchAttributes,
     type SearchAttributeInput,
-    type SearchAttributeInputValue,
   } from '$lib/stores/search-attributes';
   import type { SearchAttributes } from '$lib/types/workflows';
 
+  import DatetimeInput from './datetime-input.svelte';
   import NumberInput from './number-input.svelte';
   import TextInput from './text-input.svelte';
 
@@ -29,21 +26,6 @@
   $: isDisabled = (value: string) => {
     return !!attributesToAdd.find((a) => a.attribute === value);
   };
-
-  function updateDatetime(e: Event & { target: HTMLInputElement }) {
-    attribute.value = new Date(e.target.value);
-  }
-
-  const dateFormat = "yyyy-MM-dd'T'hh:mm";
-
-  function formatDate(value: SearchAttributeInputValue): string {
-    if (!value) return '';
-    if (typeof value === 'string' || typeof value === 'number') {
-      return dateTz.format(new Date(String(value)), dateFormat);
-    } else {
-      return dateTz.format(value, dateFormat);
-    }
-  }
 </script>
 
 <div class="flex gap-2">
@@ -53,8 +35,8 @@
     class="w-full"
     placeholder={translate('workflows.select-attribute')}
     bind:value={attribute.attribute}
-    onChange={() => {
-      if (type !== searchAttributes[attribute.attribute]) {
+    onChange={(attr) => {
+      if (type !== searchAttributes[attr]) {
         attribute.value = '';
       }
     }}
@@ -75,13 +57,7 @@
       <Option value={false}>{translate('common.false')}</Option>
     </Select>
   {:else if type === 'Datetime'}
-    <Input
-      label={translate('common.value')}
-      id="attribute-value"
-      type="datetime-local"
-      value={formatDate(attribute.value)}
-      on:input={updateDatetime}
-    />
+    <DatetimeInput bind:value={attribute.value} />
   {:else if type === 'Int' || type === 'Double'}
     <NumberInput bind:value={attribute.value} />
   {:else}
