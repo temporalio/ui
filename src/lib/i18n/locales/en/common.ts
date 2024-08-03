@@ -159,7 +159,6 @@ export const Strings = {
   'more-options': 'More options',
   download: 'Download',
   duration: 'Duration',
-  'search-attributes': 'Search Attributes',
   'history-size-bytes': 'History Size (Bytes)',
   'execution-details': 'Execution Details',
   day: 'Day',

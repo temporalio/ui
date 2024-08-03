@@ -33,7 +33,7 @@
     on:click={addSearchAttribute}
     disabled={!searchAttributes.length ||
       attributesToAdd.length === searchAttributes.length ||
-      attributesToAdd.filter((a) => a.value === '').length > 0}
-    >{translate('workflows.add-search-attribute')}</Button
+      attributesToAdd.filter((a) => a.value === '' || a.value === null).length >
+        0}>{translate('workflows.add-search-attribute')}</Button
   >
 </div>

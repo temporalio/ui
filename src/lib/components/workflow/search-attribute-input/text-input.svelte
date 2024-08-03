@@ -4,11 +4,7 @@
   import type { SearchAttributeInputValue } from '$lib/stores/search-attributes';
 
   export let value: SearchAttributeInputValue;
-  let _value = value ? String(value) : '';
-
-  $: {
-    value = _value;
-  }
+  $: _value = value ? String(value) : '';
 </script>
 
 <Input

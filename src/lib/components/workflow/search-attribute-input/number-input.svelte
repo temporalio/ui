@@ -2,9 +2,10 @@
   import NumberInput from '$lib/holocene/input/number-input.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeInputValue } from '$lib/stores/search-attributes';
+  import { isNumber } from '$lib/utilities/is';
 
   export let value: SearchAttributeInputValue;
-  let _value = value ? Number(value) : null;
+  let _value = value !== '' && isNumber(Number(value)) ? Number(value) : null;
 
   $: {
     value = _value;

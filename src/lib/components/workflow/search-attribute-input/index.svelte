@@ -28,25 +28,27 @@
   };
 </script>
 
-<div class="flex gap-2">
-  <Select
-    id="search-attribute"
-    label={translate('workflows.custom-search-attribute')}
-    class="w-full"
-    placeholder={translate('workflows.select-attribute')}
-    bind:value={attribute.attribute}
-    onChange={(attr) => {
-      if (type !== searchAttributes[attr]) {
-        attribute.value = '';
-      }
-    }}
-  >
-    {#each searchAttributesOptions as { value, label, type }}
-      <Option disabled={isDisabled(value)} {value} description={type}
-        >{label}</Option
-      >
-    {/each}
-  </Select>
+<div class="flex items-start gap-2">
+  <div class="min-w-fit">
+    <Select
+      id="search-attribute"
+      label={translate('workflows.custom-search-attribute')}
+      class="w-full"
+      placeholder={translate('workflows.select-attribute')}
+      bind:value={attribute.attribute}
+      onChange={(attr) => {
+        if (type !== searchAttributes[attr]) {
+          attribute.value = '';
+        }
+      }}
+    >
+      {#each searchAttributesOptions as { value, label, type }}
+        <Option disabled={isDisabled(value)} {value} description={type}
+          >{label}</Option
+        >
+      {/each}
+    </Select>
+  </div>
   {#if type === 'Bool'}
     <Select
       label={translate('common.value')}

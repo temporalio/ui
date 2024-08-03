@@ -6,27 +6,38 @@
   import { translate } from '$lib/i18n/translate';
   import type { Schedule } from '$lib/types';
   import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
+  import { capitalize } from '$lib/utilities/format-camel-case';
+  import { pluralize } from '$lib/utilities/pluralize';
 
   export let schedule: Schedule | undefined;
 
   $: decodedPaylod = decodePayloadAttributes(schedule?.action?.startWorkflow);
   $: searchAttributes = decodedPaylod?.searchAttributes?.indexedFields ?? {};
+
+  $: searchAttributeCount = Object.keys(searchAttributes).length;
 </script>
 
-<Accordion title={translate('common.search-attributes')}>
-  <Table class="w-full" variant="simple">
-    <caption class="sr-only" slot="caption"
-      >{translate('common.search-attributes')}</caption
-    >
-    <TableHeaderRow slot="headers">
-      <th>{translate('workflows.custom-search-attribute')}</th>
-      <th>{translate('common.value')}</th>
-    </TableHeaderRow>
-    {#each Object.entries(searchAttributes) as [searchAttrName, searchAttrValue]}
-      <TableRow>
-        <td>{searchAttrName}</td>
-        <td>{searchAttrValue}</td>
-      </TableRow>
-    {/each}
-  </Table>
+<Accordion
+  title={translate('events.custom-search-attributes')}
+  subtitle={`${searchAttributeCount} ${translate(
+    'events.custom-search',
+  )} ${pluralize(translate('events.attribute'), searchAttributeCount)}`}
+>
+  {#if searchAttributeCount}
+    <Table class="w-full" variant="simple">
+      <caption class="sr-only" slot="caption"
+        >{translate('events.custom-search-attributes')}</caption
+      >
+      <TableHeaderRow slot="headers">
+        <th>{capitalize(translate('events.attribute'))}</th>
+        <th>{translate('common.value')}</th>
+      </TableHeaderRow>
+      {#each Object.entries(searchAttributes) as [searchAttrName, searchAttrValue]}
+        <TableRow>
+          <td>{searchAttrName}</td>
+          <td>{searchAttrValue}</td>
+        </TableRow>
+      {/each}
+    </Table>
+  {/if}
 </Accordion>
