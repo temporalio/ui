@@ -42,9 +42,7 @@
   };
 
   const workflowStatus = cva(
-    [
-      'flex items-center rounded-sm px-1 py-0.5 font-secondary whitespace-nowrap text-black',
-    ],
+    ['flex items-center rounded-sm px-1 py-0.5 whitespace-nowrap text-black'],
     {
       variants: {
         status: {

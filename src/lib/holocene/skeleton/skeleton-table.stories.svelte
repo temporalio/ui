@@ -34,10 +34,4 @@
   </SkeletonTable>
 </Template>
 
-<Story name="Light" args={{ rows: 10, columns: 4 }} />
-
-<Story
-  name="Dark"
-  args={{ rows: 10, columns: 4 }}
-  parameters={{ themes: { themeOverride: 'dark' } }}
-/>
+<Story name="Default" args={{ rows: 10, columns: 4 }} />

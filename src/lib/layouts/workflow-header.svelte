@@ -99,10 +99,7 @@
         <WorkflowStatus status={workflow?.status} big />
       </div>
       <div class="flex flex-col flex-wrap gap-0">
-        <h1
-          data-testid="workflow-id-heading"
-          class="gap-0 overflow-hidden text-base font-medium lg:text-2xl"
-        >
+        <h1 data-testid="workflow-id-heading" class="gap-0 overflow-hidden">
           <Copyable
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}

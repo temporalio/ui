@@ -5,6 +5,7 @@
     description?: string;
     disabled?: boolean;
     class?: string;
+    'data-testid'?: string;
   }
 
   export const EMPTY_OPTION: OptionType<string> = {
@@ -80,6 +81,7 @@
   {description}
   {disabled}
   class={className}
+  data-testid={$$restProps['data-testid'] ?? ''}
 >
   <slot name="leading" slot="leading" />
   <span bind:this={slotWrapper}>

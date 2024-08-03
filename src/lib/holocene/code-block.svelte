@@ -114,6 +114,7 @@
       indentOnInput(),
       bracketMatching(),
       EditorState.readOnly.of(!editable),
+      EditorView.editable.of(editable),
       EditorView.contentAttributes.of({ 'aria-label': label }),
     ];
 
@@ -153,12 +154,18 @@
 
   onMount(() => {
     view = createEditorView();
+    return () => view.destroy();
   });
 
   export const resetView = (value = '', format = true) => {
     const formattedValue = format ? formatValue({ value, language }) : value;
-    const newState = createEditorState(formattedValue);
-    view.setState(newState);
+    view.dispatch({
+      changes: {
+        from: 0,
+        to: view.state.doc.length,
+        insert: formattedValue,
+      },
+    });
   };
 
   const setView = () => {

@@ -1,5 +1,6 @@
 <script lang="ts">
   import Alert from '$lib/holocene/alert.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -9,7 +10,6 @@
   import type { WorkflowTaskFailedCause } from '$lib/types/workflows';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
-  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
   import { toWorkflowTaskFailureReadable } from '$lib/utilities/screaming-enums';
 
   import { CategoryIcon } from './constants';
@@ -58,22 +58,43 @@
         >.
       </p>
     {/if}
-    <div class="mt-2 flex flex-col gap-0">
-      <div
-        class="flex items-center justify-between gap-2 border-2 border-red-500 bg-danger px-2 py-1"
-      >
+    <div
+      class="mt-2 flex w-full flex-col gap-0 overflow-hidden rounded-xl border-2 border-danger"
+    >
+      <div class="flex items-center justify-between gap-2 bg-danger px-2 py-1">
         <div class="flex items-center gap-2">
           {error.id}
           <Icon name={CategoryIcon[error.category]} />
-          {spaceBetweenCapitalLetters(error?.name)}
+          <span class="font-semibold text-danger"
+            >{spaceBetweenCapitalLetters(error?.name)}</span
+          >
         </div>
         {formatDate(error?.eventTime, $timeFormat, {
           relative: $relativeTime,
         })}
       </div>
-      <div class="flex items-center gap-2 bg-slate-500 px-2 py-1 text-white">
-        {spaceBetweenCapitalLetters(getSingleAttributeForEvent(error).key)}
-        {getSingleAttributeForEvent(error).value}
+      <div class="flex flex-col gap-2 bg-space-black p-4 text-white">
+        <p>{translate('common.failure')}</p>
+        <CodeBlock
+          content={error.attributes?.failure?.message || ''}
+          language="text"
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+        <p>{translate('common.stack-trace')}</p>
+        <CodeBlock
+          content={error.attributes?.failure?.stackTrace || ''}
+          language="text"
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+        <p>{translate('common.source')}</p>
+        <CodeBlock
+          content={error.attributes?.failure?.source || ''}
+          language="text"
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
       </div>
     </div>
   </Alert>

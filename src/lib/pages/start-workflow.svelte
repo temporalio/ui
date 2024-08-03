@@ -162,10 +162,7 @@
     </Link>
   </div>
   <div class="flex w-full flex-col gap-4 lg:w-2/3 2xl:w-1/2">
-    <h1
-      class="mb-4 overflow-hidden text-base font-medium lg:text-2xl"
-      data-testid="start-workflow"
-    >
+    <h1 class="mb-4 overflow-hidden" data-testid="start-workflow">
       Start a Workflow
     </h1>
     <div

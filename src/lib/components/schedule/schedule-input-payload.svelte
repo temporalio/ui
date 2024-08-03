@@ -39,10 +39,7 @@
       />
     {/key}
   </PayloadDecoder>
-  <span
-    class="font-secondary text-xs font-light italic"
-    class:text-red-700={error}
-  >
+  <span class="text-xs font-light italic" class:text-red-700={error}>
     {translate('workflows.signal-payload-input-label-hint')}
   </span>
 </div>

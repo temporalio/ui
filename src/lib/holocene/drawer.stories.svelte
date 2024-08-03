@@ -71,45 +71,6 @@
 
 <Story name="Right" args={{ position: 'right' }} />
 
-<Story name="Bottom, Light" args={{ dark: false }} />
+<Story name="Bottom (Light)" args={{ dark: false }} />
 
-<Story name="Right, Light" args={{ position: 'right', dark: false }} />
-
-<Story
-  name="Bottom (Dark Mode)"
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Right (Dark Mode)"
-  args={{ position: 'right' }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Bottom, Light (Dark Mode)"
-  args={{ dark: false }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
-
-<Story
-  name="Right, Light (Dark Mode)"
-  args={{ position: 'right', dark: false }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
+<Story name="Right (Light)" args={{ position: 'right', dark: false }} />

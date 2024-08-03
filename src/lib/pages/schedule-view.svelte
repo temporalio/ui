@@ -256,7 +256,7 @@
       <Link href={routeForSchedules({ namespace })} icon="chevron-left">
         {translate('schedules.back-to-schedules')}
       </Link>
-      <h1 class="select-all text-2xl font-medium" data-testid="schedule-name">
+      <h1 class="select-all" data-testid="schedule-name">
         {scheduleId}
       </h1>
       <p class="text-sm">
@@ -274,8 +274,8 @@
         <Link href={routeForSchedules({ namespace })} icon="chevron-left">
           {translate('schedules.back-to-schedules')}
         </Link>
-        <h1 class="relative flex items-center text-2xl">
-          <span class="select-all font-medium" data-testid="schedule-name">
+        <h1 class="relative flex items-center">
+          <span class="select-all" data-testid="schedule-name">
             {scheduleId}
           </span>
         </h1>
@@ -592,10 +592,7 @@
       <Link href={routeForSchedules({ namespace })} icon="chevron-left">
         {translate('schedules.back-to-schedules')}
       </Link>
-      <h1
-        class="mt-8 select-all text-2xl font-medium"
-        data-testid="schedule-name"
-      >
+      <h1 class="mt-8 select-all" data-testid="schedule-name">
         {scheduleId}
       </h1>
       <p class="text-sm">

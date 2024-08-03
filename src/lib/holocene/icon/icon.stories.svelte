@@ -33,14 +33,4 @@
   <Icon {...args} />
 </Template>
 
-<Story name="Light" args={{ name: 'add', height: 24, width: 24 }} />
-
-<Story
-  name="Dark"
-  args={{ name: 'add', height: 24, width: 24 }}
-  parameters={{
-    themes: {
-      themeOverride: 'dark',
-    },
-  }}
-/>
+<Story name="Default" args={{ name: 'add', height: 24, width: 24 }} />
