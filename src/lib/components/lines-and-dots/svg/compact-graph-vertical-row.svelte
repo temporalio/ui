@@ -4,7 +4,6 @@
 
   import { CategoryIcon, CompactConfig } from '../constants';
 
-  import Dot from './dot.svelte';
   import Line from './line.svelte';
   import Text from './text.svelte';
   export let group: EventGroup;
@@ -53,19 +52,19 @@
     {#if aggregateRow}<tspan font-weight="700">{count}</tspan>{/if}
     {group?.displayName}
   </Text>
-  <Dot
+  <!-- <Dot
     point={[start, y]}
     classification={aggregateRow ? undefined : group.lastEvent.classification}
     {active}
     r={radius}
-  />
+  /> -->
   <Icon
     name={CategoryIcon[group.category]}
-    x={start - radius / 2}
+    x={start}
     y={y - radius / 2}
     width={radius}
     height={radius}
-    class="text-black"
+    class="text-white"
   />
 </g>
 

@@ -114,6 +114,10 @@
     fill: #059669;
   }
 
+  text.Failed {
+    fill: #ff4518;
+  }
+
   text.none {
     fill: #141414;
   }

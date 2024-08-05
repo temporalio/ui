@@ -54,7 +54,7 @@
       font-size="12"
       opacity={0.5}
       transform="rotate(90, {tickX}, {height})"
-      x={tickX - radius}
+      x={tickX + radius}
       y={height}
     >
       {formatDistanceAbbreviated({

@@ -1,8 +1,12 @@
 <script lang="ts">
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { eventFilterSort } from '$lib/stores/event-view';
-  import type { WorkflowEvents } from '$lib/types/events';
+  import type {
+    WorkflowEvents,
+    WorkflowTaskFailedEvent,
+  } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { getMillisecondDuration } from '$lib/utilities/format-time';
 
   import {
     activeGroupsHeightAboveGroup,
@@ -11,8 +15,10 @@
   } from '../constants';
   import EndTimeInterval from '../end-time-interval.svelte';
 
+  import Dot from './dot.svelte';
   import GroupDetailsRow from './group-details-row.svelte';
   import Line from './line.svelte';
+  import Text from './text.svelte';
   import TimelineAxis from './timeline-axis.svelte';
   import TimelineGraphRow from './timeline-graph-row.svelte';
 
@@ -27,6 +33,8 @@
   export let zoomLevel: number = 1;
   export let canvasWidth: number;
   export let readOnly = false;
+  export let workflowTaskFailedError: WorkflowTaskFailedEvent | undefined =
+    undefined;
 
   const { height, gutter, radius } = TimelineConfig;
 
@@ -40,8 +48,25 @@
     .reduce((acc, height) => acc + height, 0);
 
   $: timelineHeight =
-    Math.max(height * (groups.length + 1), 200) + activeDetailsHeight;
+    Math.max(height * (groups.length + 2), 200) + activeDetailsHeight;
   $: canvasHeight = timelineHeight + 200;
+
+  const getWorkflowTaskPosition = (endTime, failedTime) => {
+    const workflowDistance = getMillisecondDuration({
+      start: startTime,
+      end: endTime,
+      onlyUnderSecond: false,
+    });
+
+    const distance = getMillisecondDuration({
+      start: startTime,
+      end: failedTime,
+      onlyUnderSecond: false,
+    });
+
+    const ratio = distance / workflowDistance;
+    return Math.round(ratio * (canvasWidth - 2 * gutter)) + gutter;
+  };
 </script>
 
 <div class="bg-space-black">
@@ -71,9 +96,47 @@
         {endTime}
         {duration}
       />
+      {#if workflowTaskFailedError}
+        <Line
+          startPoint={[
+            getWorkflowTaskPosition(endTime, workflowTaskFailedError.eventTime),
+            radius * 2,
+          ]}
+          endPoint={[
+            getWorkflowTaskPosition(endTime, workflowTaskFailedError.eventTime),
+            timelineHeight,
+          ]}
+          strokeWidth={radius / 2}
+          classification="Failed"
+        />
+        <Dot
+          r={radius}
+          point={[
+            getWorkflowTaskPosition(endTime, workflowTaskFailedError.eventTime),
+            radius * 2,
+          ]}
+          active
+          classification="Failed"
+        />
+        <Text
+          point={[
+            getWorkflowTaskPosition(
+              endTime,
+              workflowTaskFailedError.eventTime,
+            ) +
+              radius * 1.5,
+            radius * 2,
+          ]}
+          active
+          textAnchor="start"
+          category="Failed"
+          fontWeight="600"
+          config={TimelineConfig}>Workflow Task Failed</Text
+        >
+      {/if}
       {#each groups as group, index (group.id)}
         {@const y =
-          (index + 1) * height +
+          (index + 2) * height +
           activeGroupsHeightAboveGroup(
             activeGroups,
             group,

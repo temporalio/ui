@@ -57,6 +57,10 @@
     'ascending',
   );
 
+  $: {
+    console.log('workflowTaskFailedError: ', workflowTaskFailedError);
+  }
+
   $: $eventViewType, clearActives();
 
   beforeNavigate(() => {
@@ -209,6 +213,7 @@
         {zoomLevel}
         {canvasWidth}
         activeGroups={$activeGroups}
+        {workflowTaskFailedError}
       />
     {:else if $eventViewType === 'feed'}
       <HistoryGraph
