@@ -26,6 +26,12 @@
   $: isDisabled = (value: string) => {
     return !!attributesToAdd.find((a) => a.attribute === value);
   };
+
+  const handleAttributeChange = (attr: string) => {
+    if (type !== searchAttributes[attr]) {
+      attribute.value = null;
+    }
+  };
 </script>
 
 <div class="flex items-start gap-2">
@@ -36,11 +42,7 @@
       class="w-full"
       placeholder={translate('workflows.select-attribute')}
       bind:value={attribute.attribute}
-      onChange={(attr) => {
-        if (type !== searchAttributes[attr]) {
-          attribute.value = '';
-        }
-      }}
+      onChange={handleAttributeChange}
     >
       {#each searchAttributesOptions as { value, label, type }}
         <Option disabled={isDisabled(value)} {value} description={type}

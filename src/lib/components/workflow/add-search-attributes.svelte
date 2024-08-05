@@ -13,7 +13,7 @@
   export let attributesToAdd: SAInput[] = [];
 
   const addSearchAttribute = () => {
-    attributesToAdd = [...attributesToAdd, { attribute: '', value: '' }];
+    attributesToAdd = [...attributesToAdd, { attribute: '', value: null }];
   };
 
   $: searchAttributes = Object.keys($customSearchAttributes);

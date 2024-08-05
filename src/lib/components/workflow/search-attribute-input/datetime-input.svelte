@@ -27,6 +27,8 @@
       hour = String(datetime.getUTCHours());
       minute = String(datetime.getUTCMinutes());
       second = String(datetime.getUTCSeconds());
+    } else {
+      updateDatetime();
     }
   });
 
