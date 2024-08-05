@@ -1,12 +1,8 @@
 <script lang="ts">
   import Accordion from '$lib/holocene/accordion.svelte';
-  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
-  import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { Schedule } from '$lib/types';
   import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
-  import { capitalize } from '$lib/utilities/format-camel-case';
   import { pluralize } from '$lib/utilities/pluralize';
 
   export let schedule: Schedule | undefined;
@@ -24,20 +20,17 @@
   )} ${pluralize(translate('events.attribute'), searchAttributeCount)}`}
 >
   {#if searchAttributeCount}
-    <Table class="w-full" variant="simple">
-      <caption class="sr-only" slot="caption"
-        >{translate('events.custom-search-attributes')}</caption
-      >
-      <TableHeaderRow slot="headers">
-        <th>{capitalize(translate('events.attribute'))}</th>
-        <th>{translate('common.value')}</th>
-      </TableHeaderRow>
+    <ul class="w-full">
       {#each Object.entries(searchAttributes) as [searchAttrName, searchAttrValue]}
-        <TableRow>
-          <td>{searchAttrName}</td>
-          <td>{searchAttrValue}</td>
-        </TableRow>
+        <li
+          class="flex flex-wrap items-center gap-2 border-b py-2 last-of-type:border-b-0"
+        >
+          <span class="break-all">{searchAttrName}</span>
+          <span class="surface-subtle select-all rounded-sm p-1 leading-4"
+            >{searchAttrValue}</span
+          >
+        </li>
       {/each}
-    </Table>
+    </ul>
   {/if}
 </Accordion>

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -35,7 +37,7 @@
   }
 </script>
 
-<div class={$$props.class}>
+<div class={merge('flex flex-col gap-1', $$props.class)}>
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="flex items-center gap-2">
     <div
