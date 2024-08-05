@@ -12,12 +12,14 @@
       title: 'Accordion Title',
       subtitle: 'Subtitle',
       open: false,
+      expandable: true,
       error: '',
     },
     argTypes: {
       title: { name: 'Title', control: 'text' },
       subtitle: { name: 'Subtitle', control: 'text' },
       open: { name: 'Open', control: 'boolean' },
+      expandable: { name: 'Expandable', control: 'boolean' },
       error: { name: 'Error', control: 'text' },
       icon: {
         name: 'Icon',
@@ -39,7 +41,9 @@
   </Accordion>
 </Template>
 
-<Story name="Default" args={{ open: true }} />
+<Story name="Default" args={{ open: false }} />
+
+<Story name="Not Expandable" args={{ expandable: false }} />
 
 <Story name="With Error" args={{ error: 'Error' }} />
 
