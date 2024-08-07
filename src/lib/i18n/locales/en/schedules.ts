@@ -13,7 +13,8 @@ export const Strings = {
   'schedule-spec': 'Schedule Spec',
   'schedule-input': 'Schedule Input',
   'empty-state-title': 'No Schedules Found',
-  'empty-state-description': 'Try a different search',
+  'empty-state-description':
+    'Try adjusting or clearing the filters to see the Schedules running on this Namespace.',
   'error-message-fetching': 'Error fetching schedules',
   'recent-runs': 'Recent Runs',
   'recent-runs-empty-state-title': 'No Recent Runs',

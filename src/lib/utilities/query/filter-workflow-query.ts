@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 
-import type { WorkflowFilter } from '$lib/models/workflow-filters';
+import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
 import type {
   SearchAttributes,
@@ -89,7 +89,7 @@ const toFilterQueryStatement = (
 };
 
 const toQueryStatementsFromFilters = (
-  filters: WorkflowFilter[],
+  filters: SearchAttributeFilter[],
   archived: boolean,
 ): string[] => {
   return filters
@@ -128,7 +128,7 @@ const toQueryStatementsFromFilters = (
 };
 
 export const toListWorkflowQueryFromFilters = (
-  filters: WorkflowFilter[] = [],
+  filters: SearchAttributeFilter[] = [],
   archived = false,
 ): string => {
   return toQueryStatementsFromFilters(filters, archived).join('');

@@ -1,6 +1,6 @@
 import debounce from 'just-debounce';
 
-import type { WorkflowFilter } from '$lib/models/workflow-filters';
+import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { currentPageKey } from '$lib/stores/pagination';
 import type { FilterParameters, SearchAttributes } from '$lib/types/workflows';
 import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
@@ -38,7 +38,7 @@ export const getLargestDurationUnit = (duration: Duration): Duration => {
 const isDatetimeStatement = is('Datetime');
 const isBoolStatement = is('Bool');
 
-export const emptyFilter = (): WorkflowFilter => ({
+export const emptyFilter = (): SearchAttributeFilter => ({
   attribute: '',
   type: 'Keyword',
   value: '',
@@ -59,9 +59,9 @@ const DefaultAttributes: SearchAttributes = {
 export const toListWorkflowFilters = (
   query: string,
   attributes: SearchAttributes = DefaultAttributes,
-): WorkflowFilter[] => {
+): SearchAttributeFilter[] => {
   const tokens = tokenize(query);
-  const filters: WorkflowFilter[] = [];
+  const filters: SearchAttributeFilter[] = [];
   let filter = emptyFilter();
 
   if (!query) {
@@ -127,7 +127,7 @@ export const toListWorkflowFilters = (
   }
 };
 
-export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
+export const combineDropdownFilters = (filters: SearchAttributeFilter[]) => {
   const statusFilters = filters.filter(
     (f) => f.attribute === 'ExecutionStatus' && f.value,
   );
@@ -168,7 +168,7 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
   ];
 };
 
-export const combineFilters = (filters: WorkflowFilter[]) => {
+export const combineFilters = (filters: SearchAttributeFilter[]) => {
   filters.forEach((filter, index) => {
     const previousFilter = filters[index - 1];
     if (previousFilter && !previousFilter.operator) {
@@ -198,7 +198,7 @@ export const combineFilters = (filters: WorkflowFilter[]) => {
 };
 
 export const updateQueryParamsFromFilter = debounce(
-  (url: URL, filters: WorkflowFilter[], isDropdownFilter = false) => {
+  (url: URL, filters: SearchAttributeFilter[], isDropdownFilter = false) => {
     const allFilters = isDropdownFilter
       ? combineDropdownFilters(filters)
       : combineFilters(filters);

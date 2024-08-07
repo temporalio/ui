@@ -5,11 +5,11 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import {
     attributeToHumanReadable,
     attributeToId,
     type TextFilterAttributes,
-    type WorkflowFilter,
   } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
@@ -25,7 +25,7 @@
   const onInput = (e: Event) => {
     const { value } = e.target as HTMLInputElement;
     if (value) {
-      const filter: WorkflowFilter = {
+      const filter: SearchAttributeFilter = {
         attribute,
         type: 'Keyword',
         value,

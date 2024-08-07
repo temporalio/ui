@@ -4,10 +4,10 @@
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import {
     searchAttributeToWorkflowKey,
     type TextFilterAttributes,
-    type WorkflowFilter,
   } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -32,7 +32,7 @@
       $workflowFilters.filter((f) => f.attribute !== attribute);
 
     if (!filter) {
-      const newFilter: WorkflowFilter = {
+      const newFilter: SearchAttributeFilter = {
         attribute,
         type: 'Keyword',
         value,
