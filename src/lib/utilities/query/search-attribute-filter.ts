@@ -80,7 +80,7 @@ export function getFocusedElementId({
   )
     return 'conditional-menu-button';
 
-  if (isListFilter({ attribute, type })) return 'list-filter-search';
+  if (isListFilter({ attribute, type })) return 'list-filter';
 
   if (isBooleanFilter({ attribute, type })) return 'boolean-filter';
 

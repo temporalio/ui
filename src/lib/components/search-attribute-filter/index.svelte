@@ -24,6 +24,7 @@
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
+  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import {
     getFocusedElementId,
     isBooleanFilter,
@@ -32,8 +33,7 @@
     isNumberFilter,
     isStatusFilter,
     isTextFilter,
-  } from '$lib/utilities/query/filter-search';
-  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
+  } from '$lib/utilities/query/search-attribute-filter';
   import {
     combineFilters,
     emptyFilter,

@@ -35,7 +35,7 @@
   import BatchTerminateConfirmationModal from '$lib/components/workflow/client-actions/batch-terminate-confirmation-modal.svelte';
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
-  import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
+  import WorkflowSearchAttributeFilter from '$lib/components/workflow/search-attribute-filter/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowColumnsOrderableList from '$lib/components/workflow/workflows-summary-configurable-table/orderable-list.svelte';
@@ -226,7 +226,7 @@
 </header>
 
 <div class="flex flex-col gap-2 md:flex-row">
-  <WorkflowFilterSearch onClickConfigure={openCustomizationDrawer} />
+  <WorkflowSearchAttributeFilter onClickConfigure={openCustomizationDrawer} />
 </div>
 <WorkflowsSummaryConfigurableTable>
   <slot name="cloud" slot="cloud" />
