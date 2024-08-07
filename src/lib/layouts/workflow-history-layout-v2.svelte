@@ -11,6 +11,8 @@
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
+  import Editor from '$lib/holocene/monaco/editor.svelte';
+  import Markdown from '$lib/holocene/monaco/markdown.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -24,6 +26,8 @@
   import { filteredEventHistory, fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
+
+  export let content: string;
 
   let showFilters = false;
   let zoomLevel = 1;
@@ -68,6 +72,10 @@
 <div class="flex flex-col gap-0 px-8">
   <WorkflowCallStackError />
   <div class="flex flex-col gap-2">
+    <div class="grid grid-cols-2">
+      <Editor {content} on:change={(event) => (content = event.detail.value)} />
+      <Markdown {content} />
+    </div>
     <WorkflowDetails />
     <InputAndResults />
     {#if workflowTaskFailedError}
