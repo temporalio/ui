@@ -43,7 +43,10 @@ export type PendingActivityState =
   | 'CancelRequested';
 
 export type PendingChildren = import('$lib/types').PendingChildrenInfo;
-export type PendingNexusOperation = import('$lib/types').PendingNexusInfo;
+export type PendingNexusOperation = import('$lib/types').PendingNexusInfo & {
+  scheduledEventId: string;
+};
+export type Callbacks = import('$lib/types').CallbackInfo[];
 
 export type EventRequestMetadata = {
   namespace: string;
