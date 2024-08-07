@@ -1,6 +1,6 @@
 <script lang="ts">
-  import FilterSearch from '$lib/components/filter-search/index.svelte';
   import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
+  import SearchAttributeFilter from '$lib/components/search-attribute-filter/index.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
@@ -18,7 +18,7 @@
   export let onClickConfigure: () => void;
 </script>
 
-<FilterSearch
+<SearchAttributeFilter
   showFilter={!$searchInputViewOpen}
   bind:filters={$workflowFilters}
   refresh={() => {
@@ -78,4 +78,4 @@
       </Menu>
     </MenuContainer>
   </svelte:fragment>
-</FilterSearch>
+</SearchAttributeFilter>

@@ -21,7 +21,7 @@
   import {
     isDateTimeFilter,
     isTextFilter,
-  } from '$lib/utilities/query/filter-search';
+  } from '$lib/utilities/query/search-attribute-filter';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 

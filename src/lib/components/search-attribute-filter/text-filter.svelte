@@ -30,11 +30,11 @@
   ];
 </script>
 
-<ConditionalMenu {options} inputId="text-filter-search" noBorderLeft />
+<ConditionalMenu {options} inputId="text-filter" noBorderLeft />
 <Input
   label={$filter.attribute}
   labelHidden
-  id="text-filter-search"
+  id="text-filter"
   type="search"
   placeholder={`${translate('common.enter')} ${$filter.attribute}`}
   icon="search"

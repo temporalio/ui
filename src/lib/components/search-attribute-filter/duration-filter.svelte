@@ -33,11 +33,11 @@
   };
 </script>
 
-<ConditionalMenu inputId="duration-filter-search" noBorderLeft />
+<ConditionalMenu inputId="duration-filter" noBorderLeft />
 <Input
   label={$filter.attribute}
   labelHidden
-  id="duration-filter-search"
+  id="duration-filter"
   type="search"
   placeholder={`${translate('common.enter')} ${$filter.attribute} (${translate(
     'workflows.duration-filter-placeholder',

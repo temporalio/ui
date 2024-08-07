@@ -23,7 +23,7 @@
   <ChipInput
     label={$filter.attribute}
     labelHidden
-    id="list-filter-search"
+    id="list-filter"
     bind:chips={list}
     class="w-full rounded-none"
     removeChipButtonLabel={(chip) =>

@@ -16,7 +16,7 @@
   import {
     getFocusedElementId,
     isListFilter,
-  } from '$lib/utilities/query/filter-search';
+  } from '$lib/utilities/query/search-attribute-filter';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';

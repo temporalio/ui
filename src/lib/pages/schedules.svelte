@@ -4,10 +4,10 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import FilterSearch from '$lib/components/filter-search/index.svelte';
   import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
   import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
+  import SearchAttributeFilter from '$lib/components/search-attribute-filter/index.svelte';
   import ApiPagination from '$lib/holocene/api-pagination.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -104,7 +104,7 @@
     </header>
     <svelte:fragment slot="action-top-left" let:visibleItems>
       {#if visibleItems.length || query}
-        <FilterSearch
+        <SearchAttributeFilter
           bind:filters={$scheduleFilters}
           options={searchAttributeOptions}
           refresh={() => {

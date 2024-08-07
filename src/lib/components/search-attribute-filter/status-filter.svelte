@@ -17,7 +17,7 @@
   import Translate from '$lib/i18n/translate.svelte';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowStatusFilters } from '$lib/models/workflow-status';
-  import { isStatusFilter } from '$lib/utilities/query/filter-search';
+  import { isStatusFilter } from '$lib/utilities/query/search-attribute-filter';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
