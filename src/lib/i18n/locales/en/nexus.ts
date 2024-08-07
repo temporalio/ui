@@ -44,4 +44,17 @@ export const Strings = {
   'selected-namespaces_one': '{{count}} Namespace selected',
   'selected-namespaces_other': '{{count}} Namespaces selected',
   'empty-state': 'No Nexus Endpoints found, try a new search.',
+  'nexus-callback': 'Nexus Callback',
+  callback: {
+    standby: 'Nexus Callback is standing by, waiting to be triggered.',
+    scheduled:
+      'Nexus Callback is in the queue waiting to be executed or is currently executing.',
+    'backing-off':
+      'Nexus Callback has failed with a retryable error and is backing off before the next attempt.',
+    failed: 'Nexus Callback has failed.',
+    succeeded: 'Nexus Callback has succeeded.',
+  },
+  'last-attempt-completed-time': 'Last Attempt Completed Time',
+  'next-attempt-scheduled-time': 'Next Attempt Scheduled Time',
+  'last-attempt-failure': 'Last Attempt Failure',
 } as const;

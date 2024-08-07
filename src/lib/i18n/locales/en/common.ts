@@ -173,4 +173,7 @@ export const Strings = {
   failure: 'Failure',
   'stack-trace': 'Stack Trace',
   source: 'Source',
+  url: 'URL',
+  state: 'State',
+  attempt: 'Attempt',
 } as const;
