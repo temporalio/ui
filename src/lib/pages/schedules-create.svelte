@@ -32,6 +32,7 @@
       daysOfMonth,
       days,
       months,
+      searchAttributes,
     } = args;
 
     const action: ScheduleActionParameters = {
@@ -41,6 +42,7 @@
       workflowId,
       taskQueue,
       input,
+      searchAttributes,
     };
     const spec: Partial<ScheduleSpecParameters> = {
       hour,

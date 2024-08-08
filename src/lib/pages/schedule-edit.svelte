@@ -45,6 +45,7 @@
       daysOfMonth,
       days,
       months,
+      searchAttributes,
     } = args;
     const action: ScheduleActionParameters = {
       namespace,
@@ -53,6 +54,7 @@
       workflowId,
       taskQueue,
       input,
+      searchAttributes,
     };
     const spec: Partial<ScheduleSpecParameters> = {
       hour,
@@ -75,6 +77,6 @@
 
 {#await scheduleFetch}
   <Loading title={translate('schedules.loading')} />
-{:then { schedule }}
-  <ScheduleFormView onConfirm={handleEdit} {schedule} />
+{:then { schedule, searchAttributes }}
+  <ScheduleFormView onConfirm={handleEdit} {schedule} {searchAttributes} />
 {/await}

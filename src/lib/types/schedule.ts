@@ -1,3 +1,4 @@
+import type { SearchAttributeInput } from '$lib/stores/search-attributes';
 import type {
   CalendarSpec,
   DescribeScheduleResponse,
@@ -37,6 +38,7 @@ export type ScheduleActionParameters = {
   workflowId: string;
   taskQueue: string;
   input: string;
+  searchAttributes: SearchAttributeInput[];
 };
 
 export type ScheduleSpecParameters = {
@@ -48,6 +50,7 @@ export type ScheduleSpecParameters = {
   second: string;
   phase: string;
   cronString: string;
+  searchAttributes: SearchAttributeInput[];
 };
 
 // For UI Only
