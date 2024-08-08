@@ -7,7 +7,7 @@
 </script>
 
 <section class="h-full w-full">
-  {#key $useDarkMode}
+  {#key theme}
     <iframe
       title="output"
       src="/render?content={encodeURIComponent(content)}&theme={theme}"
