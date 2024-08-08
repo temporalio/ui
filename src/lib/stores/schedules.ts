@@ -104,6 +104,14 @@ export const submitCreateSchedule = async ({
 
   const body: DescribeFullSchedule = {
     schedule_id: name.trim(),
+    searchAttributes:
+      searchAttributes.length === 0
+        ? null
+        : {
+            indexedFields: {
+              ...setSearchAttributes(searchAttributes),
+            },
+          },
     schedule: {
       spec: {
         calendar: [],
@@ -116,14 +124,6 @@ export const submitCreateSchedule = async ({
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
           input: payloads ? { payloads } : null,
-          searchAttributes:
-            searchAttributes.length === 0
-              ? null
-              : {
-                  indexedFields: {
-                    ...setSearchAttributes(searchAttributes),
-                  },
-                },
         },
       },
     },
@@ -180,6 +180,14 @@ export const submitEditSchedule = async (
   const { preset } = presets;
   const body: DescribeFullSchedule = {
     schedule_id: scheduleId,
+    searchAttributes:
+      searchAttributes.length === 0
+        ? null
+        : {
+            indexedFields: {
+              ...setSearchAttributes(searchAttributes),
+            },
+          },
     schedule: {
       ...schedule,
       action: {
@@ -189,14 +197,6 @@ export const submitEditSchedule = async (
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
           input: payloads ? { payloads } : null,
-          searchAttributes:
-            searchAttributes.length === 0
-              ? null
-              : {
-                  indexedFields: {
-                    ...setSearchAttributes(searchAttributes),
-                  },
-                },
         },
       },
     },

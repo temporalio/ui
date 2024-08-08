@@ -394,7 +394,9 @@
             policies={schedule?.schedule?.policies}
             notes={schedule?.schedule?.state?.notes}
           />
-          <ScheduleSearchAttributes schedule={schedule?.schedule} />
+          <ScheduleSearchAttributes
+            searchAttributes={schedule?.searchAttributes ?? {}}
+          />
         </div>
         <div class="flex w-full flex-col gap-4 xl:w-1/3">
           <ScheduleInput

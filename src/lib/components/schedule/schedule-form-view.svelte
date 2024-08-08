@@ -28,9 +28,11 @@
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
 
-  import type { Schedule } from '$types';
+  import type { Schedule, SearchAttribute } from '$types';
 
   export let schedule: FullSchedule | null = null;
+  export let searchAttributes: SearchAttribute = {};
+
   export let onConfirm: (
     preset: SchedulePreset,
     args: Partial<ScheduleParameters>,
@@ -59,6 +61,10 @@
   const decodedWorkflow = decodePayloadAttributes(
     schedule?.action?.startWorkflow,
   );
+  const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
+  const indexedFields =
+    decodedSearchAttributes?.searchAttributes.indexedFields ?? {};
+
   let workflowType = decodedWorkflow?.workflowType?.name ?? '';
   let workflowId = decodedWorkflow?.workflowId ?? '';
   let taskQueue = decodedWorkflow?.taskQueue?.name ?? '';
@@ -72,10 +78,7 @@
   let second = '';
   let phase = '';
   let cronString = '';
-  const indexedFields =
-    decodedWorkflow?.searchAttributes?.indexedFields ??
-    ({} as { [k: string]: string });
-  let searchAttributes: SearchAttributeInput[] = Object.entries(
+  let searchAttributesInput: SearchAttributeInput[] = Object.entries(
     indexedFields,
   ).map(([attribute, value]) => ({ attribute, value }));
 
@@ -95,7 +98,7 @@
       daysOfMonth,
       days,
       months,
-      searchAttributes,
+      searchAttributes: searchAttributesInput,
     };
 
     onConfirm(preset, args, schedule);
@@ -208,7 +211,7 @@
         error={errors['input']}
       />
       <AddSearchAttributes
-        bind:attributesToAdd={searchAttributes}
+        bind:attributesToAdd={searchAttributesInput}
         class="w-full"
       />
       <SchedulesCalendarView

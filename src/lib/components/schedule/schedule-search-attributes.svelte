@@ -1,16 +1,16 @@
 <script lang="ts">
   import Accordion from '$lib/holocene/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { Schedule } from '$lib/types';
+  import type { SearchAttribute } from '$lib/types';
   import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
   import { pluralize } from '$lib/utilities/pluralize';
 
-  export let schedule: Schedule | undefined;
+  export let searchAttributes: SearchAttribute;
 
-  $: decodedPaylod = decodePayloadAttributes(schedule?.action?.startWorkflow);
-  $: searchAttributes = decodedPaylod?.searchAttributes?.indexedFields ?? {};
-
-  $: searchAttributeCount = Object.keys(searchAttributes).length;
+  $: decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
+  $: indexedFields =
+    decodedSearchAttributes?.searchAttributes.indexedFields ?? {};
+  $: searchAttributeCount = Object.keys(indexedFields).length;
 </script>
 
 <Accordion
@@ -21,7 +21,7 @@
 >
   {#if searchAttributeCount}
     <ul class="w-full">
-      {#each Object.entries(searchAttributes) as [searchAttrName, searchAttrValue]}
+      {#each Object.entries(indexedFields) as [searchAttrName, searchAttrValue]}
         <li
           class="flex flex-wrap items-center gap-2 border-b py-2 last-of-type:border-b-0"
         >
