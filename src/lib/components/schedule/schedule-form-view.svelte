@@ -63,7 +63,8 @@
   );
   const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
   const indexedFields =
-    decodedSearchAttributes?.searchAttributes.indexedFields ?? {};
+    decodedSearchAttributes?.searchAttributes.indexedFields ??
+    ({} as { [k: string]: string });
 
   let workflowType = decodedWorkflow?.workflowType?.name ?? '';
   let workflowId = decodedWorkflow?.workflowId ?? '';
