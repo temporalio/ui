@@ -1,11 +1,17 @@
 <script lang="ts">
+  import { useDarkMode } from '$lib/utilities/dark-mode';
+
   export let content: string;
+
+  $: theme = $useDarkMode ? 'dark' : '';
 </script>
 
 <section class="h-full w-full">
-  <iframe
-    title="output"
-    src="/render?content={encodeURIComponent(content)}"
-    class="min-h-[300px] w-full rounded-md bg-white p-4 shadow-md"
-  />
+  {#key $useDarkMode}
+    <iframe
+      title="output"
+      src="/render?content={encodeURIComponent(content)}&theme={theme}"
+      class="min-h-[300px] w-full rounded-md bg-primary shadow-md"
+    />
+  {/key}
 </section>

@@ -2,6 +2,8 @@
   import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
   import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 
+  import { useDarkMode } from '$lib/utilities/dark-mode/dark-mode';
+
   const dispatch = createEventDispatcher();
 
   let monaco: typeof Monaco;
@@ -15,7 +17,6 @@
 
     const editor = monaco.editor.create(container, {
       language: 'markdown',
-      theme: 'vs-dark',
     });
 
     const model = monaco.editor.createModel(content, 'markdown');
@@ -28,10 +29,18 @@
     editor.setModel(model);
   });
 
+  $: {
+    if ($useDarkMode) {
+      monaco?.editor.setTheme('vs-dark');
+    } else {
+      monaco?.editor.setTheme('vs');
+    }
+  }
+
   onDestroy(() => {
     monaco?.editor.getModels().forEach((model) => model.dispose());
     editor?.dispose();
   });
 </script>
 
-<div class="h-full" bind:this={container} />
+<div class="h-full min-h-64" bind:this={container} />

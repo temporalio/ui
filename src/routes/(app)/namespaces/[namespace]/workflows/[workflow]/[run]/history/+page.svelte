@@ -10,11 +10,8 @@
   import WorkflowHistoryFeed from '$lib/pages/workflow-history-feed.svelte';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import { eventViewType } from '$lib/stores/event-view';
+
   const workflow = $page.params.workflow;
-
-  export let data;
-
-  let content = data.content || '';
 
   const views = {
     feed: WorkflowHistoryFeed,
@@ -30,7 +27,7 @@
 />
 
 <LabsModeGuard>
-  <WorkflowHistoryLayoutV2 {content} />
+  <WorkflowHistoryLayoutV2 />
   <WorkflowHistoryLayout slot="fallback">
     <svelte:component this={view} />
   </WorkflowHistoryLayout>

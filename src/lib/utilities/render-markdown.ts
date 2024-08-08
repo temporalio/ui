@@ -15,6 +15,7 @@ export const process = async (markdown: string) => {
 
   remove(ast, 'image');
   remove(ast, 'html');
+  remove(ast, 'script');
 
   const hast = toHast(ast);
 

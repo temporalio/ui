@@ -11,6 +11,7 @@ import css from '../../../markdown.css';
 type RenderOptions = {
   host: string;
   nonce: string;
+  theme?: string;
 };
 
 /**
@@ -24,7 +25,7 @@ const generateNonce = (): string => crypto.randomBytes(16).toString('hex');
  * @returns
  */
 const generateContentSecurityPolicy = ({ nonce }: RenderOptions) => {
-  return `base-uri 'self'; default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; frame-ancestors 'self'; form-action 'none'; sandbox allow-same-origin allow-scripts;`;
+  return `base-uri 'self'; default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; frame-ancestors 'self'; form-action 'none'; sandbox allow-scripts;`;
 };
 
 /**
@@ -32,7 +33,7 @@ const generateContentSecurityPolicy = ({ nonce }: RenderOptions) => {
  */
 const createPage = (
   ast: ReturnType<typeof toHast>,
-  { nonce }: RenderOptions,
+  { nonce, theme }: RenderOptions,
 ) => {
   return toHtml(
     h('html', [
@@ -45,7 +46,7 @@ const createPage = (
         }),
         h('style', { nonce }, String(css)),
       ]),
-      h('body.prose', h('main', ast)),
+      h('body.prose', { 'data-theme': theme }, h('main', ast)),
     ]),
   );
 };
@@ -55,6 +56,7 @@ export const GET = async (req: Request) => {
 
   const host = url.origin;
   const content = url.searchParams.get('content') || '';
+  const theme = url.searchParams.get('theme') || '';
 
   if (host === null) return new Response('Not found', { status: 404 });
   if (content === null) return new Response('Not found', { status: 404 });
@@ -62,7 +64,7 @@ export const GET = async (req: Request) => {
   const nonce = generateNonce();
 
   const response = new Response(
-    createPage(await process(content), { nonce, host }),
+    createPage(await process(content), { nonce, host, theme }),
     {
       headers: {
         'Content-Type': 'text/html',
