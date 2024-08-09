@@ -305,9 +305,6 @@
       </div>
     {/if}
   </div>
-  {#if error && !valid}
-    <span class="error">{error}</span>
-  {/if}
 
   <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
     {#each list as option}
@@ -334,6 +331,10 @@
       <ComboboxOption disabled>{noResultsText}</ComboboxOption>
     {/each}
   </Menu>
+
+  {#if error && !valid}
+    <span class="error">{error}</span>
+  {/if}
 </MenuContainer>
 
 <style lang="postcss">

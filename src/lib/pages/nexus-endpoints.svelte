@@ -20,6 +20,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   export let endpoints: NexusEndpoint[] = [];
+  export let searchPlaceholder = translate('common.search');
 
   let search = '';
   $: searchParam = $page.url.searchParams.get('search') || '';
@@ -53,11 +54,12 @@
       <Input
         id="endpoint-search"
         bind:value={search}
-        label={translate('common.search')}
+        icon="search"
+        label={searchPlaceholder}
         labelHidden
         autoFocus
         type="search"
-        placeholder={translate('common.search')}
+        placeholder={searchPlaceholder}
         class="w-full lg:w-1/2"
       />
     </div>
@@ -73,9 +75,14 @@
               <h3 class="break-all">
                 {endpoint.spec.name}
               </h3>
-              <p class="text-xs text-secondary">
-                Last update {formatDate(endpoint.lastModifiedTime, $timeFormat)}
-              </p>
+              {#if endpoint.lastModifiedTime}
+                <p class="text-xs text-secondary">
+                  Last update {formatDate(
+                    endpoint.lastModifiedTime,
+                    $timeFormat,
+                  )}
+                </p>
+              {/if}
               {#if endpoint.createdTime}
                 <p class="text-xs text-secondary">
                   Created on {formatDate(endpoint.createdTime, $timeFormat)}
@@ -92,9 +99,7 @@
       </div>
     {:else}
       <div class="flex w-full justify-center">
-        <EmptyState
-          title="No Endpoints found, try a new search. Exact matches only."
-        />
+        <EmptyState title={translate('nexus.empty-state')} />
       </div>
     {/if}
   </div>

@@ -86,7 +86,7 @@
           id="{id}-range"
           name="range"
           type="range"
-          class="surface-information h-0 w-full cursor-pointer appearance-none rounded border-y border-primary"
+          class="h-0 w-full cursor-pointer appearance-none rounded border-y border-primary"
           bind:value
           on:input={handleInput}
           {min}
@@ -148,7 +148,7 @@
   }
 
   input[type='range']::-webkit-slider-thumb {
-    @apply surface-information h-4 w-8 appearance-none rounded-full border-2 border-solid border-primary;
+    @apply h-4 w-8 appearance-none rounded-full border-2 border-solid border-primary bg-information;
   }
 
   input[type='range']::-moz-range-thumb {

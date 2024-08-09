@@ -141,6 +141,7 @@ export type NamespaceState = temporal.api.enums.v1.NamespaceState;
 export type TaskReachability = temporal.api.enums.v1.TaskReachability;
 export type PendingNexusOperationState =
   temporal.api.enums.v1.PendingNexusOperationState;
+export type CallbackState = temporal.api.enums.v1.CallbackState;
 
 // api.workflow
 
@@ -149,6 +150,7 @@ export type PendingChildrenInfo =
   temporal.api.workflow.v1.IPendingChildExecutionInfo;
 export type PendingNexusInfo =
   temporal.api.workflow.v1.IPendingNexusOperationInfo;
+export type CallbackInfo = temporal.api.workflow.v1.ICallbackInfo;
 export type WorkflowExecutionConfig =
   temporal.api.workflow.v1.IWorkflowExecutionConfig;
 export type WorkflowExecutionInfo =

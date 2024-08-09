@@ -27,12 +27,15 @@ export const Strings = {
   handler: 'Handler',
   'delete-endpoint': 'Delete Endpoint',
   'delete-modal-title': 'Delete Nexus Endpoint?',
-  'delete-modal-confirmation':
-    'Are you sure you want to delete {{endpoint}}? Any Workflows calling this endpoint will encounter failures.',
-  'delete-modal-confirmation-label':
-    'Type “{{endpoint}}" to delete this endpoint.',
+  'delete-modal-confirmation-preface': 'Are you sure you want to delete ',
+  'delete-modal-confirmation-postface':
+    'Any Workflows calling this endpoint will encounter failures.',
+  'type-confirm-preface': 'Type ',
+  'type-confirm-postface': 'to delete this endpoint.',
   'endpoint-name-hint':
     'Endpoint name must start with A-Z, a-z or _ and can only contain A-Z, a-z, 0-9, or _',
+  'endpoint-name-hint-with-dash':
+    'Endpoint name must start with A-Z, a-z or _ and can only contain A-Z, a-z, 0-9, _ or -',
   'access-policy': 'Access Policy',
   'allowed-caller-namespaces': 'Allowed caller namespaces',
   'allowed-caller-namespaces-description':
@@ -40,4 +43,18 @@ export const Strings = {
   'select-namespaces': 'Select Namespace(s)',
   'selected-namespaces_one': '{{count}} Namespace selected',
   'selected-namespaces_other': '{{count}} Namespaces selected',
+  'empty-state': 'No Nexus Endpoints found, try a new search.',
+  'nexus-callback': 'Nexus Callback',
+  callback: {
+    standby: 'Nexus Callback is standing by, waiting to be triggered.',
+    scheduled:
+      'Nexus Callback is in the queue waiting to be executed or is currently executing.',
+    'backing-off':
+      'Nexus Callback has failed with a retryable error and is backing off before the next attempt.',
+    failed: 'Nexus Callback has failed.',
+    succeeded: 'Nexus Callback has succeeded.',
+  },
+  'last-attempt-completed-time': 'Last Attempt Completed Time',
+  'next-attempt-scheduled-time': 'Next Attempt Scheduled Time',
+  'last-attempt-failure': 'Last Attempt Failure',
 } as const;

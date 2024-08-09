@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
 
 settings:
   autoInstallPeers: true
@@ -170,26 +170,26 @@ devDependencies:
     specifier: ^3.0.2
     version: 3.0.2(svelte@4.0.0)(vite@5.0.13)
   '@temporalio/activity':
-    specifier: ^1.10.1
-    version: 1.10.1
+    specifier: ^1.10.3
+    version: 1.10.3
   '@temporalio/client':
-    specifier: ^1.10.1
-    version: 1.10.1
+    specifier: ^1.10.3
+    version: 1.10.3
   '@temporalio/common':
-    specifier: ^1.10.1
-    version: 1.10.1
+    specifier: ^1.10.3
+    version: 1.10.3
   '@temporalio/proto':
-    specifier: ^1.10.1
-    version: 1.10.1
+    specifier: ^1.10.3
+    version: 1.10.3
   '@temporalio/testing':
-    specifier: ^1.10.1
-    version: 1.10.1(esbuild@0.13.15)
+    specifier: ^1.10.3
+    version: 1.10.3(esbuild@0.13.15)
   '@temporalio/worker':
-    specifier: ^1.10.1
-    version: 1.10.1(esbuild@0.13.15)
+    specifier: ^1.10.3
+    version: 1.10.3(esbuild@0.13.15)
   '@temporalio/workflow':
-    specifier: ^1.10.1
-    version: 1.10.1
+    specifier: ^1.10.3
+    version: 1.10.3
   '@types/base-64':
     specifier: ^1.0.0
     version: 1.0.0
@@ -5230,60 +5230,60 @@ packages:
       '@swc/counter': 0.1.3
     dev: true
 
-  /@temporalio/activity@1.10.1:
-    resolution: {integrity: sha512-ZCUOq3pzIYuWeGCtY5cAbtjUqFr8qg6oQJ64gHqUlstk9mweeOtMhYUyBUNBeb+MlYn+YhtxyCaUc1HQlVXkHg==}
+  /@temporalio/activity@1.10.3:
+    resolution: {integrity: sha512-2wGEnH3lzfRkAPsM29Uih4jaXPjsRDCsXdSFJqmHz2fxcfodcjSjgTAJERFKRVOb9JfYmzsITRIrkKAfs3kvxA==}
     dependencies:
-      '@temporalio/common': 1.10.1
+      '@temporalio/common': 1.10.3
       abort-controller: 3.0.0
     dev: true
 
-  /@temporalio/client@1.10.1:
-    resolution: {integrity: sha512-j7ey7jvE9/2LPNggmItlvjugMbDIfN76wiQkxoXvS4Y4/6JHgcCAANJ5UpzkHR51LREkRBzDLVeRtxqrfgGMWw==}
+  /@temporalio/client@1.10.3:
+    resolution: {integrity: sha512-0xGYlURFoHrWByIJB3vNCaY7p9lnUkvrlA4uVAG92AwI0z/kcXdkUwn+VTOBBJi83iX6NZ0QS47HA6sCr00OPw==}
     dependencies:
       '@grpc/grpc-js': 1.10.8
-      '@temporalio/common': 1.10.1
-      '@temporalio/proto': 1.10.1
+      '@temporalio/common': 1.10.3
+      '@temporalio/proto': 1.10.3
       abort-controller: 3.0.0
       long: 5.2.3
       uuid: 9.0.1
     dev: true
 
-  /@temporalio/common@1.10.1:
-    resolution: {integrity: sha512-0l2XS2+4NW8y7zsCAMixAK0UEIEQLwx/f32j67VGT/DjJ1ri63W5ZTbZU7DoAB3yHjlfymblLQXgK46SzHgP3Q==}
+  /@temporalio/common@1.10.3:
+    resolution: {integrity: sha512-0LF4UZQomMy+K3dGR0PGkBAqBByavjldeUKyMONtDrVqtq4sO2+2NtLW9mvmXGCH15jsabye1pQZdZxlTGP/CQ==}
     dependencies:
-      '@temporalio/proto': 1.10.1
+      '@temporalio/proto': 1.10.3
       long: 5.2.3
       ms: 3.0.0-canary.1
       proto3-json-serializer: 2.0.1
     dev: true
 
-  /@temporalio/core-bridge@1.10.1:
-    resolution: {integrity: sha512-HnyZ+6fcy0B5PjbzNaw+7ei51z86dQXYJMXx/B4p07Bmid1lSTqKzfd0WddjM+4u4kxiCBGXZ4A0OcfMRnjLRA==}
+  /@temporalio/core-bridge@1.10.3:
+    resolution: {integrity: sha512-TJV8Th8h0pv6gwwEqcTUIbOZVqfKj/6qWgNBnZuHi3BYd1WKzvXGGg0r1gorwlfapaC3Mms/Rqed9Xlnl9xjDQ==}
     requiresBuild: true
     dependencies:
-      '@temporalio/common': 1.10.1
+      '@temporalio/common': 1.10.3
       arg: 5.0.2
       cargo-cp-artifact: 0.1.8
       which: 4.0.0
     dev: true
 
-  /@temporalio/proto@1.10.1:
-    resolution: {integrity: sha512-kKe/B6yZU1iMmTQP161GLGHmWIhwhyn79rOFaurZ87kXswLmmss1TGO37H0GVqR1k4K8S8fewLPbayiYf+oksw==}
+  /@temporalio/proto@1.10.3:
+    resolution: {integrity: sha512-ugp04SpQFNmOa0+/kpg2vLfWMBPD2UW4s4XRaN23v9RREZ0HqV+DB+ZTT+03F9jeZlIFB0hxbF1Xd65tAF6fKg==}
     dependencies:
       long: 5.2.3
       protobufjs: 7.2.5
     dev: true
 
-  /@temporalio/testing@1.10.1(esbuild@0.13.15):
-    resolution: {integrity: sha512-5nN8WkgsQFrfNLrjfjDxml24mi7WeFffOqPIxJcZ/upwkp+PVZQHwt/8ujbfJCuG4atsBcUcGqNSmT+Y70+/+g==}
+  /@temporalio/testing@1.10.3(esbuild@0.13.15):
+    resolution: {integrity: sha512-c88EapF8Y0wf2X/OjNX9LJH9loDJhMVbDqs1Lb99INbeYpyTHs1l4wttkAezhAnP5Ct6o6pzpyqKe20Uk0n7zw==}
     dependencies:
-      '@temporalio/activity': 1.10.1
-      '@temporalio/client': 1.10.1
-      '@temporalio/common': 1.10.1
-      '@temporalio/core-bridge': 1.10.1
-      '@temporalio/proto': 1.10.1
-      '@temporalio/worker': 1.10.1(esbuild@0.13.15)
-      '@temporalio/workflow': 1.10.1
+      '@temporalio/activity': 1.10.3
+      '@temporalio/client': 1.10.3
+      '@temporalio/common': 1.10.3
+      '@temporalio/core-bridge': 1.10.3
+      '@temporalio/proto': 1.10.3
+      '@temporalio/worker': 1.10.3(esbuild@0.13.15)
+      '@temporalio/workflow': 1.10.3
       abort-controller: 3.0.0
     transitivePeerDependencies:
       - '@swc/helpers'
@@ -5292,17 +5292,17 @@ packages:
       - webpack-cli
     dev: true
 
-  /@temporalio/worker@1.10.1(esbuild@0.13.15):
-    resolution: {integrity: sha512-bGgA7ahVPc9OskeezYpkixQV4pCriEVm++M2wVxOz8wOygWokfqjpduE0sXmtKt7YNGM4oFTgs3ObQ3H9s7Ryg==}
+  /@temporalio/worker@1.10.3(esbuild@0.13.15):
+    resolution: {integrity: sha512-IGHSpp9usFcn1kuYs234xOP2xjBJVyEtjborV8ZEFi9Eu01s7BfrNrVZUMQjs6dRTOCvvvkiFhU3MNuyk2qkWA==}
     engines: {node: '>= 16.0.0'}
     dependencies:
       '@swc/core': 1.5.7
-      '@temporalio/activity': 1.10.1
-      '@temporalio/client': 1.10.1
-      '@temporalio/common': 1.10.1
-      '@temporalio/core-bridge': 1.10.1
-      '@temporalio/proto': 1.10.1
-      '@temporalio/workflow': 1.10.1
+      '@temporalio/activity': 1.10.3
+      '@temporalio/client': 1.10.3
+      '@temporalio/common': 1.10.3
+      '@temporalio/core-bridge': 1.10.3
+      '@temporalio/proto': 1.10.3
+      '@temporalio/workflow': 1.10.3
       abort-controller: 3.0.0
       heap-js: 2.3.0
       memfs: 4.7.7
@@ -5320,11 +5320,11 @@ packages:
       - webpack-cli
     dev: true
 
-  /@temporalio/workflow@1.10.1:
-    resolution: {integrity: sha512-EaZEXxSjqcDI1PLo1RKU5eMAXzal98/bWw1pC71fN55AhW1YsxiS8upJQESp20Y+kkMmxJfBrpvinbFtMDgBvg==}
+  /@temporalio/workflow@1.10.3:
+    resolution: {integrity: sha512-XnP1Srb4r1dhl4g5U/KDTSSJ9zixIeqBd5lfC0wol257ItjfJPJgXAYUNg0YqPg4HyE77OlG7Qh6qhyAU80ubg==}
     dependencies:
-      '@temporalio/common': 1.10.1
-      '@temporalio/proto': 1.10.1
+      '@temporalio/common': 1.10.3
+      '@temporalio/proto': 1.10.3
     dev: true
 
   /@testing-library/dom@9.3.4:
