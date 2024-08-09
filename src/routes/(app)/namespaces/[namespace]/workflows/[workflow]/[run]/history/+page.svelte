@@ -10,6 +10,7 @@
   import WorkflowHistoryFeed from '$lib/pages/workflow-history-feed.svelte';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import { eventViewType } from '$lib/stores/event-view';
+
   const workflow = $page.params.workflow;
 
   const views = {

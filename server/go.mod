@@ -1,6 +1,8 @@
 module github.com/temporalio/ui-server/v2
 
-go 1.20
+go 1.21
+
+toolchain go1.22.2
 
 require (
 	github.com/coreos/go-oidc/v3 v3.1.0

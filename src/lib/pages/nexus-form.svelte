@@ -24,8 +24,11 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Markdown from '$lib/holocene/markdown.svelte';
+  import Editor from '$lib/holocene/monaco/editor.svelte';
+  import Markdown from '$lib/holocene/monaco/markdown.svelte';
   import MultiSelect from '$lib/holocene/select/multi-select.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
@@ -44,6 +47,8 @@
   let target = endpoint?.spec?.target?.worker?.namespace || '';
   let taskQueue = endpoint?.spec?.target?.worker?.taskQueue || '';
   let allowedCallerNamespaces = endpoint?.spec?.allowedCallerNamespaces || [];
+
+  let showPreview = false;
 
   const setFormStore = (
     name: string,
@@ -160,17 +165,32 @@
       onChange={onCallerNamespaceChange}
     />
   </IsOssGuard>
-  <Markdown
-    label={translate('common.description')}
-    description={translate('nexus.nexus-description')}
-    bind:value={description}
-    id="description"
-    placeholder={translate('nexus.description-placeholder')}
-  >
-    <p class="text-xs text-secondary" slot="info">
-      Do not include sensitive data.
-    </p>
-  </Markdown>
+
+  <ToggleButtons>
+    <ToggleButton
+      active={showPreview === false}
+      data-testid="description-editor"
+      on:click={() => (showPreview = false)}
+      >{translate('common.description')}</ToggleButton
+    >
+    <ToggleButton
+      active={showPreview === true}
+      data-testid="description-preview"
+      on:click={() => (showPreview = true)}
+      >{translate('common.preview')}</ToggleButton
+    >
+  </ToggleButtons>
+  <div>
+    {#if showPreview}
+      <Markdown content={description} />
+    {:else}
+      <Editor
+        content={description}
+        on:change={(event) => (description = event.detail.value)}
+      />
+    {/if}
+    <p class="my-2 text-xs text-secondary">Do not include sensitive data.</p>
+  </div>
   <slot name="footer" />
 </div>
 <Alert title={error?.statusText} intent="error" hidden={!error}>

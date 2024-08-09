@@ -2,6 +2,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Markdown from '$lib/holocene/monaco/markdown.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { NexusEndpoint } from '$lib/types/nexus';
   import {
@@ -59,10 +60,12 @@
       </div>
     </div>
   </div>
-  <h2>Description</h2>
-  <p class="w-full whitespace-pre-wrap xl:w-1/2">
-    {endpoint.spec?.descriptionString || 'No description provided'}
-  </p>
+  <div class="w-full xl:w-1/2">
+    <h2>Description</h2>
+    <Markdown
+      content={endpoint.spec?.descriptionString || 'No description provided'}
+    />
+  </div>
   {#if endpoint.spec?.allowedCallerNamespaces}
     <h2>Allowed Caller Namespaces</h2>
     <div class="flex flex-wrap items-center gap-4">
