@@ -43,4 +43,4 @@
   });
 </script>
 
-<div class="h-full min-h-64" bind:this={container} />
+<div class="h-full min-h-80" bind:this={container} />
