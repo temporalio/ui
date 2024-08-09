@@ -8,8 +8,6 @@ import { toHast } from 'mdast-util-to-hast';
 
 import { process } from '$lib/utilities/render-markdown';
 
-// import css from '../../../markdown.css';
-
 type RenderOptions = {
   host: string;
   nonce: string;
@@ -37,7 +35,7 @@ const createPage = (
   ast: ReturnType<typeof toHast>,
   { nonce, theme }: RenderOptions,
 ) => {
-  const cssPath = path.resolve('src/markdown.css');
+  const cssPath = path.resolve('src/markdown.reset.css');
   const css = fs.readFileSync(cssPath, 'utf8');
   return toHtml(
     h('html', [
