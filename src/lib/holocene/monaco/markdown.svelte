@@ -3,7 +3,7 @@
 
   export let content: string;
 
-  $: theme = $useDarkMode ? 'dark' : '';
+  $: theme = $useDarkMode ? 'dark' : 'light';
 </script>
 
 <section class="h-full w-full">

@@ -1,4 +1,6 @@
+import fs from 'fs';
 import crypto from 'node:crypto';
+import path from 'path';
 
 import { toHtml } from 'hast-util-to-html';
 import { h } from 'hastscript';
@@ -6,7 +8,7 @@ import { toHast } from 'mdast-util-to-hast';
 
 import { process } from '$lib/utilities/render-markdown';
 
-import css from '../../../markdown.css';
+// import css from '../../../markdown.css';
 
 type RenderOptions = {
   host: string;
@@ -35,6 +37,8 @@ const createPage = (
   ast: ReturnType<typeof toHast>,
   { nonce, theme }: RenderOptions,
 ) => {
+  const cssPath = path.resolve('src/markdown.css');
+  const css = fs.readFileSync(cssPath, 'utf8');
   return toHtml(
     h('html', [
       h('head', [
@@ -44,7 +48,7 @@ const createPage = (
           name: 'viewport',
           content: 'width=device-width, initial-scale=1',
         }),
-        h('style', { nonce }, String(css)),
+        h('style', { nonce }, css),
       ]),
       h('body.prose', { 'data-theme': theme }, h('main', ast)),
     ]),
