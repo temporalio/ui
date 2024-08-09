@@ -6,31 +6,20 @@
 
   import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
-  import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
-  import ApiPagination from '$lib/holocene/api-pagination.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
   import { coreUserStore } from '$lib/stores/core-user';
   import { schedulesCount } from '$lib/stores/schedules';
   import type { ScheduleListEntry } from '$lib/types';
-  import type { ErrorCallback } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   $: namespace = $page.params.namespace;
-
-  let error = '';
-  const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `${translate('schedules.error-message-fetching')}: ${err.status}: ${
-        err.statusText
-      }`);
 
   let coreUser = coreUserStore();
   $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
@@ -47,10 +36,9 @@
 </script>
 
 {#key namespace}
-  <ApiPagination
+  <PaginatedTable
     let:visibleItems
     {onFetch}
-    {onError}
     total={$schedulesCount}
     aria-label={translate('common.schedules')}
     pageSizeSelectLabel={translate('common.per-page')}
@@ -59,66 +47,69 @@
     emptyStateMessage={translate('schedules.empty-state-title')}
     fallbackErrorMessage={translate('schedules.error-message-fetching')}
   >
-    <header
-      class="flex flex-row justify-between gap-2"
-      slot="header"
-      let:visibleItems
+    <caption class="sr-only" slot="caption"
+      >{translate('common.schedules')}</caption
     >
-      <div>
-        <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
-          <SchedulesCount />
-        </h1>
+
+    <div class="flex flex-col gap-4" slot="header" let:visibleItems>
+      <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
+        <SchedulesCount />
+      </h1>
+
+      <div class="flex flex-row flex-wrap justify-between gap-2">
+        {#if visibleItems.length}
+          <div class="w-96">
+            <Input
+              icon="search"
+              type="search"
+              label={translate('schedules.name')}
+              labelHidden
+              id="schedule-name-filter"
+              placeholder={translate('schedules.name')}
+              clearable
+              clearButtonLabel={translate('common.clear-input-button-label')}
+              bind:value={search}
+              on:submit={noop}
+            />
+          </div>
+        {/if}
+        {#if !createDisabled && visibleItems.length}
+          <Button
+            data-testid="create-schedule"
+            href={routeForScheduleCreate({ namespace })}
+            disabled={!writeActionsAreAllowed()}
+          >
+            {translate('schedules.create')}
+          </Button>
+        {/if}
       </div>
-      {#if !createDisabled && visibleItems.length}
-        <Button
-          data-testid="create-schedule"
-          href={routeForScheduleCreate({ namespace })}
-          disabled={!writeActionsAreAllowed()}
-        >
-          {translate('schedules.create')}
-        </Button>
-      {/if}
-    </header>
-    <svelte:fragment slot="action-top-left" let:visibleItems>
-      {#if visibleItems.length}
-        <div class="w-96">
-          <Input
-            icon="search"
-            type="search"
-            label={translate('schedules.name')}
-            labelHidden
-            id="schedule-name-filter"
-            placeholder={translate('schedules.name')}
-            clearable
-            clearButtonLabel={translate('common.clear-input-button-label')}
-            bind:value={search}
-            on:submit={noop}
-          />
-        </div>
-      {/if}
-    </svelte:fragment>
-    <SchedulesTable>
-      {#each filteredSchedules(visibleItems) as schedule}
-        <SchedulesTableRow {schedule} />
-      {:else}
-        <TableRow>
-          <td class="hidden xl:table-cell" />
-          <td class="hidden xl:table-cell" />
-          <td colspan="3">
+    </div>
+
+    <tr slot="headers" class="text-left">
+      <th class="px-2">{translate('common.status')}</th>
+      <th class="px-2">{translate('schedules.name')}</th>
+      <th class="px-2">{translate('common.workflow-type')}</th>
+      <th class="px-2">{translate('schedules.recent-runs')}</th>
+      <th class="px-2">{translate('schedules.upcoming-runs')}</th>
+      <th class="px-2">{translate('schedules.schedule-spec')}</th>
+    </tr>
+    {#each filteredSchedules(visibleItems) as schedule}
+      <SchedulesTableRow {schedule} />
+    {:else}
+      {#if search}
+        <tr>
+          <td colspan="6">
             <EmptyState
               title={translate('schedules.empty-state-title')}
               content={translate('schedules.empty-state-description')}
             />
           </td>
-          <td class="hidden xl:table-cell" />
-        </TableRow>
-      {/each}
-    </SchedulesTable>
-    <div
-      class="my-12 flex flex-col items-center justify-start gap-2"
-      slot="empty"
-    >
-      <EmptyState title={translate('schedules.empty-state-title')} {error}>
+        </tr>
+      {/if}
+    {/each}
+
+    <svelte:fragment slot="empty">
+      <EmptyState title={translate('schedules.empty-state-title')}>
         <p>
           {translate('schedules.getting-started-docs-link-preface')}
           <Link newTab href="https://docs.temporal.io/workflows/#schedule"
@@ -129,7 +120,7 @@
             >Temporal CLI</Link
           >.
         </p>
-        {#if !error && !createDisabled}
+        {#if !createDisabled}
           <Button
             data-testid="create-schedule"
             on:click={() => goto(routeForScheduleCreate({ namespace }))}
@@ -139,6 +130,6 @@
           </Button>
         {/if}
       </EmptyState>
-    </div>
-  </ApiPagination>
+    </svelte:fragment>
+  </PaginatedTable>
 {/key}

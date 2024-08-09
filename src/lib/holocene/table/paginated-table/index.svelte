@@ -43,7 +43,7 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply min-h-[154px] overflow-auto rounded-lg border-2 border-table;
+    @apply surface-primary min-h-[154px] overflow-auto rounded-lg border-2 border-table;
   }
 
   .paginated-table {
@@ -63,8 +63,6 @@
   }
 
   .paginated-table-body {
-    @apply surface-primary;
-
     :global(tr:not(.empty)) {
       @apply h-12 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }

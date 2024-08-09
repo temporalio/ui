@@ -182,6 +182,8 @@
           />
         </EmptyState>
       {/if}
+    {:else if $$slots.empty}
+      <slot name="empty" />
     {:else}
       <EmptyState title="" content={emptyStateMessage} />
     {/if}
