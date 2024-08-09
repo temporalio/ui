@@ -105,6 +105,18 @@ code {
   color: #121416;
 }
 
+pre {
+  font-family: monospace;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  background: #e8efff;
+  color: #121416;
+  code {
+    padding: 0;
+  }
+}
+
+
 body[data-theme='light'] {
   background-color: #fff;
   color: #121416;

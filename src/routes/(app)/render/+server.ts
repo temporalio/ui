@@ -25,7 +25,7 @@ const generateNonce = (): string => crypto.randomBytes(16).toString('hex');
  * @returns
  */
 const generateContentSecurityPolicy = ({ nonce }: RenderOptions) => {
-  return `base-uri 'self'; default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; frame-ancestors 'self'; form-action 'none'; sandbox allow-same-origin allow-scripts;`;
+  return `base-uri 'self'; default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; frame-ancestors 'self'; form-action 'none'; sandbox allow-same-origin allow-popups;`;
 };
 
 /**
@@ -41,6 +41,7 @@ const createPage = (
     h('html', [
       h('head', [
         h('title', 'Rendered Markdown'),
+        h('base', { target: '_blank' }),
         h('meta', { charset: 'utf-8' }),
         h('meta', {
           name: 'viewport',
