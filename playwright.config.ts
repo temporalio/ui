@@ -16,7 +16,7 @@ export default defineConfig({
   reporter: [
     ['html'],
     ['json', { outputFile: 'playwright-report/test-results.json' }],
-    [process.env.CI ? 'githb' : 'list'],
+    [process.env.CI ? 'github' : 'list'],
     [
       './tests/test-utilities/accessibility-reporter',
       { outputFile: 'playwright-report/accessibility-violations.json' },
