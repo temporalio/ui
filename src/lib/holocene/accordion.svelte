@@ -111,12 +111,7 @@
       </p>
     </div>
 
-    <div
-      id="{id}-content"
-      aria-labelledby="{id}-trigger"
-      role="textbox"
-      class="mt-6 block w-full p-2"
-    >
+    <div class="mt-6 block w-full p-2">
       <slot />
     </div>
   </Card>
