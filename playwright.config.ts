@@ -12,11 +12,11 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 3 : 1,
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 4 : undefined,
   reporter: [
     ['html'],
     ['json', { outputFile: 'playwright-report/test-results.json' }],
-    // [process.env.CI ? 'github' : 'list'],
+    [process.env.CI ? 'github' : 'list'],
     [
       './tests/test-utilities/accessibility-reporter',
       { outputFile: 'playwright-report/accessibility-violations.json' },
