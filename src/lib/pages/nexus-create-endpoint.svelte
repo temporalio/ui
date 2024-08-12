@@ -14,6 +14,7 @@
   export let error: NetworkError | undefined = undefined;
   export let loading = false;
   export let isCloud = false;
+  export let nameRegexPattern: RegExp = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
   $: createDisabled =
     $endpointForm.spec.name === '' ||
@@ -30,7 +31,13 @@
   <h1 data-testid="namespace-selector-title">
     {translate('nexus.create-endpoint')}
   </h1>
-  <NexusForm {error} {targetNamespaceList} {callerNamespaceList} {isCloud} />
+  <NexusForm
+    {nameRegexPattern}
+    {error}
+    {targetNamespaceList}
+    {callerNamespaceList}
+    {isCloud}
+  />
   <div class="flex items-center gap-4">
     <Button
       variant="primary"

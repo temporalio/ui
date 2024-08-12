@@ -40,7 +40,7 @@
   export let nameDisabled = false;
   export let isCloud = true;
   export let nameHintText = translate('nexus.endpoint-name-hint');
-  export let nameRegexPattern = /^[A-Za-z_][A-Za-z0-9_]*$/;
+  export let nameRegexPattern: RegExp;
 
   let name = endpoint?.spec?.name || '';
   let description = endpoint?.spec?.descriptionString || '';

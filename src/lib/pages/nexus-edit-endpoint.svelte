@@ -20,6 +20,7 @@
   export let error: NetworkError | undefined = undefined;
   export let loading = false;
   export let isCloud = false;
+  export let nameRegexPattern: RegExp = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
   let deleteConfirmationModalOpen = false;
   let confirmDeleteInput = '';
@@ -49,6 +50,7 @@
   </div>
   <NexusForm
     {endpoint}
+    {nameRegexPattern}
     {targetNamespaceList}
     {callerNamespaceList}
     {error}
