@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const PLAYWRIGHT_MODE = process.env.PW_MODE;
-const PORT = PLAYWRIGHT_MODE === 'e2e' ? 3001 : 3333;
+const PORT = PLAYWRIGHT_MODE === 'e2e' ? 3000 : 3333;
 
 export default defineConfig({
   testDir: './tests',
@@ -15,12 +15,12 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [
     ['html'],
-    ['json', { outputFile: 'playwright-report/test-results.json' }],
-    [process.env.CI ? 'github' : 'list'],
-    [
-      './tests/test-utilities/accessibility-reporter',
-      { outputFile: 'playwright-report/accessibility-violations.json' },
-    ],
+    // ['json', { outputFile: 'playwright-report/test-results.json' }],
+    // [process.env.CI ? 'github' : 'list'],
+    // [
+    //   './tests/test-utilities/accessibility-reporter',
+    //   { outputFile: 'playwright-report/accessibility-violations.json' },
+    // ],
   ],
   use: {
     actionTimeout: 0,
