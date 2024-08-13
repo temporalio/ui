@@ -15,6 +15,7 @@
   export let loading = false;
   export let isCloud = false;
   export let nameRegexPattern: RegExp = /^[A-Za-z_][A-Za-z0-9_]*$/;
+  export let nameHintText = translate('nexus.endpoint-name-hint');
 
   $: createDisabled =
     $endpointForm.spec.name === '' ||
@@ -33,6 +34,7 @@
   </h1>
   <NexusForm
     {nameRegexPattern}
+    {nameHintText}
     {error}
     {targetNamespaceList}
     {callerNamespaceList}

@@ -21,6 +21,7 @@
   export let loading = false;
   export let isCloud = false;
   export let nameRegexPattern: RegExp = /^[A-Za-z_][A-Za-z0-9_]*$/;
+  export let nameHintText = translate('nexus.endpoint-name-hint');
 
   let deleteConfirmationModalOpen = false;
   let confirmDeleteInput = '';
@@ -50,6 +51,7 @@
   </div>
   <NexusForm
     {endpoint}
+    {nameHintText}
     {nameRegexPattern}
     {targetNamespaceList}
     {callerNamespaceList}
