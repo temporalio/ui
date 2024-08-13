@@ -15,7 +15,7 @@
   export let endTime: string | Date;
   export let duration: number;
 
-  const { radius, height } = TimelineConfig;
+  const { radius, height, gutter } = TimelineConfig;
   const ticks = 20;
 
   $: distance = x2 - x1;
@@ -42,9 +42,9 @@
     <text
       fill="#fff"
       font-size="12"
-      transform="rotate(90, {tickX}, {tickY})"
-      x={tickX - radius}
-      y={tickY}
+      transform="rotate(90, 0, 0)"
+      x={4}
+      y={-gutter / 2}
     >
       <tspan>{formatDate(startTime, $timeFormat)}</tspan>
     </text>
@@ -85,9 +85,9 @@
 <text
   fill="#fff"
   font-size="12"
-  transform="rotate(90, {x2}, {timelineHeight + radius * 2})"
-  x={x2 - radius}
-  y={timelineHeight + radius * 2 + radius / 2}
+  transform="rotate(90, {x2 - 4}, 0)"
+  x={x2}
+  y={-gutter / 3}
 >
   <tspan>{formatDate(endTime, $timeFormat)}</tspan>
 </text>

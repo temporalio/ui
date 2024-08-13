@@ -25,7 +25,7 @@
   $: showIcon = icon && config;
   $: textWidth = textElement?.getBBox()?.width || 0;
   $: backdropWidth = showIcon ? textWidth + 36 : textWidth + 12;
-  $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 1.5 : x;
+  $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 2 : x;
 </script>
 
 {#if backdrop}

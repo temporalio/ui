@@ -16,15 +16,16 @@
     HistoryConfig,
   } from '../constants';
 
-  import EventDetailsRow from './event-details-row.svelte';
+  // import EventDetailsRow from './event-details-row.svelte';
   import HistoryGraphRowVisual from './history-graph-row-visual.svelte';
-  import HistoryGraphRow from './history-graph-row.svelte';
+  // import HistoryGraphRow from './history-graph-row.svelte';
   import Line from './line.svelte';
 
   export let groups: EventGroups;
   export let activeEvents: string[] = [];
-  export let canvasWidth: number;
   export let zoomLevel: number = 1;
+
+  let canvasWidth: number;
 
   $: workflowTaskGroups = groupWorkflowTaskEvents(
     $filteredEventHistory,
@@ -68,11 +69,11 @@
     .reduce((acc, height) => acc + height, 0);
 
   $: canvasHeight = visibleHistory.length * height + activeDetailsHeight;
-  $: visualWidth = getVisualWidth(history, allGroups, canvasWidth / 4);
-  $: isWide = canvasWidth >= 960;
+  $: visualWidth = getVisualWidth(history, allGroups, 110);
+  // $: isWide = canvasWidth >= 960;
 </script>
 
-<div class="bg-space-black">
+<div class="bg-space-black" bind:clientWidth={canvasWidth}>
   <svg
     viewBox="0 0 {canvasWidth} {canvasHeight}"
     height={canvasHeight}
@@ -83,7 +84,7 @@
       endPoint={[visualWidth, canvasHeight]}
       strokeWidth={6}
     />
-    {#each visibleHistory as event, index (event.id)}
+    <!-- {#each visibleHistory as event, index (event.id)}
       <HistoryGraphRow
         {event}
         group={allGroups.find((g) => g.eventIds.has(event.id))}
@@ -106,7 +107,7 @@
         {canvasWidth}
         primary={activeEvents[activeEvents.length - 1] === id}
       />
-    {/each}
+    {/each} -->
     <svg
       viewBox="0 0 {2 * canvasWidth} {canvasHeight * zoomLevel}"
       height={canvasHeight}

@@ -21,6 +21,7 @@
   import Text from './text.svelte';
   import TimelineAxis from './timeline-axis.svelte';
   import TimelineGraphRow from './timeline-graph-row.svelte';
+  import WorkflowRow from './workflow-row.svelte';
 
   export let x = 0;
   export let y = 0;
@@ -31,12 +32,12 @@
 
   export let activeGroups: string[] = [];
   export let zoomLevel: number = 1;
-  export let canvasWidth: number;
   export let readOnly = false;
   export let workflowTaskFailedError: WorkflowTaskFailedEvent | undefined =
     undefined;
 
   const { height, gutter, radius } = TimelineConfig;
+  let canvasWidth = 0;
 
   $: startTime = history[0]?.eventTime || workflow.startTime;
   $: activeDetailsHeight = activeGroups
@@ -48,8 +49,8 @@
     .reduce((acc, height) => acc + height, 0);
 
   $: timelineHeight =
-    Math.max(height * (groups.length + 2), 200) + activeDetailsHeight;
-  $: canvasHeight = timelineHeight + 200;
+    Math.max(height * (groups.length + 2), 100) + activeDetailsHeight;
+  $: canvasHeight = timelineHeight + 100;
 
   const getWorkflowTaskPosition = (endTime, failedTime) => {
     const workflowDistance = getMillisecondDuration({
@@ -69,7 +70,10 @@
   };
 </script>
 
-<div class="bg-space-black">
+<div
+  class="h-80 overflow-auto rounded-xl border-4 border-subtle bg-space-black"
+  bind:clientWidth={canvasWidth}
+>
   <EndTimeInterval {workflow} {startTime} let:endTime let:duration>
     <svg
       {x}
@@ -134,6 +138,7 @@
           config={TimelineConfig}>Workflow Task Failed</Text
         >
       {/if}
+      <WorkflowRow {workflow} y={height} length={canvasWidth} />
       {#each groups as group, index (group.id)}
         {@const y =
           (index + 2) * height +

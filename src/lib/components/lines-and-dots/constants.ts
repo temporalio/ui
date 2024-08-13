@@ -42,13 +42,13 @@ export const CompactConfig: GraphConfig & { width: number } = {
 
 export const TimelineConfig: GraphConfig = {
   height: baseRadius * 5,
-  gutter: baseRadius * 4,
-  radius: baseRadius * 2,
+  gutter: baseRadius * 8,
+  radius: baseRadius * 1.75,
   fontSizeRatio: baseRadius * 4,
 };
 
 export const HistoryConfig: GraphConfig = {
-  height: baseRadius * 5,
+  height: 42,
   gutter: baseRadius * 2,
   radius: baseRadius * 1,
   fontSizeRatio: baseRadius * 4,

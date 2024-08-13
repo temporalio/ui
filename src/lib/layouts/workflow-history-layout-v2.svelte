@@ -5,7 +5,7 @@
   import EventSummary from '$lib/components/event/event-summary.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
-  import CompactGraphVertical from '$lib/components/lines-and-dots/svg/compact-graph-vertical.svelte';
+  // import CompactGraphVertical from '$lib/components/lines-and-dots/svg/compact-graph-vertical.svelte';
   // import CompactGraph from '$lib/components/lines-and-dots/svg/compact-graph.svelte';
   import HistoryGraph from '$lib/components/lines-and-dots/svg/history-graph.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
@@ -18,9 +18,9 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
-  import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
+  // import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import {
-    activeEvents,
+    // activeEvents,
     activeGroups,
     clearActives,
   } from '$lib/stores/active-events';
@@ -68,7 +68,6 @@
     clearActives();
   });
 
-  let canvasWidth = 0;
   let showDownloadPrompt = false;
 
   // const zoomOut = () => {
@@ -116,56 +115,8 @@
         <h2>
           {translate('workflows.event-history')}
         </h2>
-        <ToggleButtons>
-          <ToggleButton
-            active={$eventViewType === 'compact'}
-            data-testid="compact"
-            icon="feed"
-            on:click={() => ($eventViewType = 'compact')}
-            >{translate('workflows.compact')}</ToggleButton
-          >
-          <ToggleButton
-            active={$eventViewType === 'timeline'}
-            data-testid="timeline"
-            icon="timeline"
-            on:click={() => ($eventViewType = 'timeline')}
-            >{translate('common.timeline')}</ToggleButton
-          >
-          <ToggleButton
-            active={$eventViewType === 'feed'}
-            data-testid="feed"
-            icon="compact"
-            on:click={() => ($eventViewType = 'feed')}
-            >{translate('common.graph')}</ToggleButton
-          >
-          <ToggleButton
-            active={$eventViewType === 'table'}
-            data-testid="table"
-            icon="table"
-            on:click={() => ($eventViewType = 'table')}
-            >{translate('common.table')}</ToggleButton
-          >
-          <ToggleButton
-            active={$eventViewType === 'json'}
-            data-testid="json"
-            icon="json"
-            on:click={() => ($eventViewType = 'json')}
-            >{translate('workflows.json')}</ToggleButton
-          >
-        </ToggleButtons>
       </div>
-      <!-- <span class="font-mono text-sm">{(100 / zoomLevel).toFixed(0)}%</span> -->
       <ToggleButtons>
-        <!-- <ToggleButton
-            data-testid="zoom-in"
-            disabled={zoomLevel === 1}
-            on:click={zoomIn}>+</ToggleButton
-          >
-          <ToggleButton
-            data-testid="zoom-out"
-            disabled={zoomLevel === 10}
-            on:click={zoomOut}>-</ToggleButton
-          > -->
         <ToggleButton
           disabled={!workflow.isRunning}
           icon={$pauseLiveUpdates ? 'play' : 'pause'}
@@ -200,41 +151,29 @@
   </div>
 </div>
 <div class="pb-24">
-  <div class="w-full overflow-auto" bind:clientWidth={canvasWidth}>
-    {#if $eventViewType === 'compact'}
-      <CompactGraphVertical
-        {workflow}
-        {groups}
-        {zoomLevel}
-        {canvasWidth}
-        activeGroups={$activeGroups}
-      />
-    {:else if $eventViewType === 'timeline'}
-      <TimelineGraph
-        {workflow}
-        history={$currentEventHistory}
-        {groups}
-        {zoomLevel}
-        {canvasWidth}
-        activeGroups={$activeGroups}
-        {workflowTaskFailedError}
-      />
-    {:else if $eventViewType === 'feed'}
-      <HistoryGraph
-        {groups}
-        {zoomLevel}
-        {canvasWidth}
-        activeEvents={$activeEvents}
-      />
-    {:else if $eventViewType === 'json'}
-      <div class="px-4 md:px-8">
-        <WorkflowHistoryJson />
+  <div class="flex w-full flex-col gap-4 overflow-auto px-12">
+    <TimelineGraph
+      {workflow}
+      history={$currentEventHistory}
+      {groups}
+      {zoomLevel}
+      activeGroups={$activeGroups}
+      {workflowTaskFailedError}
+    />
+    <div class="flex gap-0">
+      <div class="w-[120px] pt-28">
+        <HistoryGraph
+          history={$currentEventHistory}
+          {groups}
+          {zoomLevel}
+          activeGroups={$activeGroups}
+          {workflowTaskFailedError}
+        />
       </div>
-    {:else}
-      <div class="px-4 md:px-8">
+      <div class="w-full">
         <EventSummary />
       </div>
-    {/if}
+    </div>
   </div>
 </div>
 <DownloadEventHistoryModal

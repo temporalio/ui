@@ -51,11 +51,11 @@
       @apply surface-table;
 
       :global(th) {
-        @apply border-t border-table px-1 py-2 text-off-white;
+        @apply border-t border-table px-1 py-0 text-off-white;
       }
 
       :global(td) {
-        @apply border-t border-table px-1 py-2;
+        @apply border-t border-table px-1 py-0;
 
         &:first-child {
           @apply w-[1px] rounded-tl-lg border-l border-table;
@@ -69,7 +69,7 @@
 
     tbody :global {
       td {
-        @apply border-t border-table px-1 py-2 text-sm;
+        @apply border-t border-table px-1 py-0 text-sm;
 
         &:first-child {
           @apply px-1;
