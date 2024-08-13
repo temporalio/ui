@@ -1,7 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import PaginatedTable from '$lib/holocene/table/paginated-table.svelte';
+  import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
+  import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchAllChildWorkflows } from '$lib/services/workflow-service';
   import { showChildWorkflows } from '$lib/stores/filters';
@@ -61,6 +62,7 @@
 </script>
 
 <PaginatedTable
+  aria-label={translate('common.workflows')}
   perPageLabel={translate('common.per-page')}
   nextPageButtonLabel={translate('common.next-page')}
   previousPageButtonLabel={translate('common.previous-page')}
@@ -103,5 +105,9 @@
       {/each}
     {/if}
   {/each}
-  <slot name="cloud" slot="cloud" />
+  <svelte:fragment slot="empty" let:updating>
+    <TableEmptyState {updating}>
+      <slot name="cloud" slot="cloud" />
+    </TableEmptyState>
+  </svelte:fragment>
 </PaginatedTable>

@@ -47,7 +47,7 @@
   class:child
 >
   {#if !empty && $supportsBulkActions}
-    <td class="relative px-2">
+    <td class="relative">
       <Checkbox
         {label}
         labelHidden

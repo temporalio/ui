@@ -1,5 +1,6 @@
 import type {
   ArchivalState,
+  CallbackState,
   NamespaceState,
   PendingNexusOperationState,
   WorkflowExecutionStatus,
@@ -81,4 +82,11 @@ export const toPendingNexusOperationStateReadable = (
 ): PendingNexusOperationState => {
   if (!state) return state;
   return fromScreamingEnum(state, 'PendingNexusOperationState');
+};
+
+export const toCallbackStateReadable = (
+  state?: CallbackState,
+): CallbackState => {
+  if (!state) return state;
+  return fromScreamingEnum(state, 'CallbackState');
 };

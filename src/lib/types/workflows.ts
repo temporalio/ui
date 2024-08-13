@@ -6,6 +6,7 @@ import type {
 } from '$lib/types';
 
 import type {
+  Callbacks,
   Payload,
   PendingActivity,
   PendingActivityInfo,
@@ -57,6 +58,7 @@ export type WorkflowExecutionAPIResponse = Optional<{
   pendingChildren: PendingChildren[];
   pendingNexusOperations: PendingNexusOperation[];
   executionConfig: WorkflowExecutionConfig;
+  callbacks: Callbacks;
 }>;
 
 export type WorkflowStatus =
@@ -142,6 +144,7 @@ export type WorkflowExecution = {
   isRunning: boolean;
   defaultWorkflowTaskTimeout: Duration;
   canBeTerminated: boolean;
+  callbacks: Callbacks;
 };
 
 export type WorkflowTaskFailedCause =
