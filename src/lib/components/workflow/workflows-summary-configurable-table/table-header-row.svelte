@@ -61,14 +61,14 @@
 
 <style lang="postcss">
   .batch-actions-checkbox-table-cell {
-    @apply w-10 rounded-tl-lg px-2;
+    @apply w-10 rounded-tl-lg;
   }
 
   .batch-actions-table-cell {
-    @apply overflow-visible whitespace-nowrap px-2 text-left text-sm font-medium;
+    @apply overflow-visible whitespace-nowrap text-sm font-medium;
   }
 
   .configuration-button-table-cell {
-    @apply h-10 w-10 px-2 py-1;
+    @apply h-10 w-10 py-1;
   }
 </style>
