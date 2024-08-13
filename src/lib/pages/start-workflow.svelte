@@ -13,6 +13,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import EditorWithPreview from '$lib/holocene/monaco/editor-with-preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getPollers } from '$lib/services/pollers-service';
   import {
@@ -38,6 +39,9 @@
   let taskQueue = '';
   let workflowType = '';
   let input = '';
+  let summary = '';
+  let details = '';
+
   let inputRetrieved = 0;
 
   let initialWorkflowId = '';
@@ -77,6 +81,8 @@
         taskQueue,
         workflowType,
         input,
+        summary,
+        details,
         searchAttributes,
       });
       goto(routeForWorkflows({ namespace }));
@@ -254,6 +260,8 @@
         {/key}
       </div>
     </div>
+    <EditorWithPreview key="summary" bind:content={summary} />
+    <EditorWithPreview key="details" bind:content={details} />
     {#if viewAdvancedOptions}
       <StartWorkflowSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}

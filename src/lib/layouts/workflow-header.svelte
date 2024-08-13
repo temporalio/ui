@@ -30,6 +30,7 @@
     routeForEventHistory,
     routeForPendingActivities,
     routeForRelationships,
+    routeForStory,
     routeForWorkers,
     routeForWorkflowMetadata,
     routeForWorkflowQuery,
@@ -120,6 +121,19 @@
   </div>
   <Tabs>
     <TabList class="flex flex-wrap gap-6 p-4 pl-0" label="workflow detail">
+      <Tab
+        label="Story"
+        id="story-tab"
+        href={routeForStory({
+          ...routeParameters,
+        })}
+        active={pathMatches(
+          $page.url.pathname,
+          routeForStory({
+            ...routeParameters,
+          }),
+        )}
+      ></Tab>
       <Tab
         label={translate('workflows.history-tab')}
         id="history-tab"

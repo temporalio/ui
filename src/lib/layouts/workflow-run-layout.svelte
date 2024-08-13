@@ -69,6 +69,7 @@
       settings,
       $authUser?.accessToken,
     );
+
     $workflowRun = { workflow, workers };
     eventHistoryController = new AbortController();
     $fullEventHistory = await fetchAllEvents({

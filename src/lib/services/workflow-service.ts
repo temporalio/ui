@@ -81,6 +81,8 @@ type StartWorkflowOptions = {
   workflowType: string;
   input: string;
   searchAttributes: SearchAttributeInput[];
+  summary: string;
+  details: string;
 };
 
 type TerminateWorkflowOptions = {
@@ -442,6 +444,8 @@ export async function startWorkflow({
   taskQueue,
   workflowType,
   input,
+  summary = '',
+  details = '',
   searchAttributes,
 }: StartWorkflowOptions) {
   const route = routeForApi('workflow', {
@@ -475,6 +479,10 @@ export async function startWorkflow({
               ...setSearchAttributes(searchAttributes),
             },
           },
+    userMetadata: {
+      summary: setBase64Payload(summary),
+      details: setBase64Payload(details),
+    },
   });
 
   return requestFromAPI(route, {
