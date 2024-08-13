@@ -33,8 +33,10 @@
     onSpace?: (event: KeyboardEvent) => void | undefined;
     total?: string | number;
     pageSizeSelectLabel: string;
-    emptyStateMessage: string;
-    fallbackErrorMessage: string;
+    emptyStateTitle?: string;
+    emptyStateMessage?: string;
+    errorTitle?: string;
+    errorMessage?: string;
     itemsKeyname?: string;
     previousButtonLabel: string;
     nextButtonLabel: string;
@@ -49,8 +51,10 @@
 
   export let total: string | number = '';
   export let pageSizeSelectLabel: string;
-  export let emptyStateMessage: string;
-  export let fallbackErrorMessage: string;
+  export let emptyStateTitle = '';
+  export let emptyStateMessage = '';
+  export let errorTitle = '';
+  export let errorMessage = '';
   export let itemsKeyname = 'items';
   export let previousButtonLabel: string;
   export let nextButtonLabel: string;
@@ -168,26 +172,19 @@
 
   <svelte:fragment slot="empty">
     {#if $store.loading}
-      {#if $$slots.loading}
-        <slot name="loading" />
-      {:else}
+      <slot name="loading">
         <Loading />
-      {/if}
+      </slot>
     {:else if error}
-      {#if $$slots.error}
-        <slot name="error" />
-      {:else}
-        <EmptyState title="">
-          <Alert
-            intent="error"
-            title={error?.message ?? fallbackErrorMessage}
-          />
+      <slot name="error">
+        <EmptyState title={errorTitle}>
+          <Alert intent="error" title={error?.message ?? errorMessage} />
         </EmptyState>
-      {/if}
-    {:else if $$slots.empty}
-      <slot name="empty" />
+      </slot>
     {:else}
-      <EmptyState title="" content={emptyStateMessage} />
+      <slot name="empty">
+        <EmptyState title={emptyStateTitle} content={emptyStateMessage} />
+      </slot>
     {/if}
   </svelte:fragment>
 

@@ -45,7 +45,7 @@
     nextButtonLabel={translate('common.next')}
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('schedules.empty-state-title')}
-    fallbackErrorMessage={translate('schedules.error-message-fetching')}
+    errorMessage={translate('schedules.error-message-fetching')}
   >
     <caption class="sr-only" slot="caption"
       >{translate('common.schedules')}</caption
