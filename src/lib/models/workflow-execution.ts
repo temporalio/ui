@@ -1,4 +1,6 @@
+import type { CallbackInfo } from '$lib/types';
 import type {
+  Callbacks,
   PendingActivity,
   PendingActivityInfo,
   PendingChildren,
@@ -13,6 +15,7 @@ import type {
 } from '$lib/types/workflows';
 import { decodePayload } from '$lib/utilities/decode-payload';
 import {
+  toCallbackStateReadable,
   toPendingNexusOperationStateReadable,
   toWorkflowStatusReadable,
 } from '$lib/utilities/screaming-enums';
@@ -39,6 +42,16 @@ const toPendingNexusOperations = (
     return {
       ...operation,
       state: toPendingNexusOperationStateReadable(operation.state),
+    };
+  });
+};
+
+const toCallbacks = (callbacks?: Callbacks): Callbacks => {
+  if (!callbacks) return [];
+  return callbacks.map((callback): CallbackInfo => {
+    return {
+      ...callback,
+      state: toCallbackStateReadable(callback.state),
     };
   });
 };
@@ -101,6 +114,7 @@ export const toWorkflowExecution = (
   const pendingChildren: PendingChildren[] = response?.pendingChildren ?? [];
   const pendingNexusOperations: PendingNexusOperation[] =
     toPendingNexusOperations(response?.pendingNexusOperations);
+  const callbacks = toCallbacks(response?.callbacks);
 
   return {
     name,
@@ -121,6 +135,7 @@ export const toWorkflowExecution = (
     pendingActivities,
     pendingChildren,
     pendingNexusOperations,
+    callbacks,
     parentNamespaceId,
     parent,
     stateTransitionCount,

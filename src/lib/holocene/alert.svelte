@@ -7,7 +7,7 @@
 
   import type { IconName } from './icon';
 
-  type Intent = 'warning' | 'error' | 'success' | 'info';
+  type Intent = 'warning' | 'error' | 'success' | 'info' | 'nexus';
   type AlertIcon = Extract<IconName, Intent>;
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {

@@ -3,6 +3,7 @@
 exports[`toWorkflowExecution > should match the snapshot for Canceled workflows 1`] = `
 {
   "assignedBuildId": undefined,
+  "callbacks": [],
   "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T20:20:50.181506253Z",
@@ -47,6 +48,7 @@ exports[`toWorkflowExecution > should match the snapshot for Canceled workflows 
 exports[`toWorkflowExecution > should match the snapshot for Completed workflows 1`] = `
 {
   "assignedBuildId": undefined,
+  "callbacks": [],
   "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T20:28:52.916373379Z",
@@ -91,6 +93,7 @@ exports[`toWorkflowExecution > should match the snapshot for Completed workflows
 exports[`toWorkflowExecution > should match the snapshot for Failed workflows 1`] = `
 {
   "assignedBuildId": undefined,
+  "callbacks": [],
   "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T20:22:50.027441003Z",
@@ -128,6 +131,7 @@ exports[`toWorkflowExecution > should match the snapshot for Failed workflows 1`
 exports[`toWorkflowExecution > should match the snapshot for Running workflows 1`] = `
 {
   "assignedBuildId": undefined,
+  "callbacks": [],
   "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": null,
@@ -198,6 +202,7 @@ exports[`toWorkflowExecution > should match the snapshot for Running workflows 1
 exports[`toWorkflowExecution > should match the snapshot for Terminated workflows 1`] = `
 {
   "assignedBuildId": undefined,
+  "callbacks": [],
   "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T20:14:51.002030504Z",
@@ -273,6 +278,7 @@ exports[`toWorkflowExecution > should match the snapshot for Terminated workflow
 exports[`toWorkflowExecution > should match the snapshot for TimedOut workflows 1`] = `
 {
   "assignedBuildId": undefined,
+  "callbacks": [],
   "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T14:16:18.804308503Z",
@@ -318,6 +324,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
 [
   {
     "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:20:50.181506253Z",
@@ -356,6 +363,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
   },
   {
     "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:28:52.916373379Z",
@@ -394,6 +402,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
   },
   {
     "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:22:50.027441003Z",
@@ -428,6 +437,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
   },
   {
     "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": null,
@@ -466,6 +476,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
   },
   {
     "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:14:51.073853795Z",
@@ -504,6 +515,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
   },
   {
     "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:14:51.002030504Z",
@@ -542,6 +554,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
   },
   {
     "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T14:16:18.804308503Z",

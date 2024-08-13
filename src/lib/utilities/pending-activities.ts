@@ -38,11 +38,9 @@ export const getPendingNexusOperation = (
 ): PendingNexusOperation | undefined => {
   let pendingOperation: PendingNexusOperation | undefined;
 
-  // TODO: Add this when PendingNexusOperation has scheduledEventId
   if (isNexusOperationScheduledEvent(event)) {
     pendingOperation = pendingNexusOperations.find(
-      (_) => false,
-      // (p) => p.scheduledEventId === event.id,
+      (p) => p.scheduledEventId === event.id,
     );
   }
 
