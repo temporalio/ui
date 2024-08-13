@@ -3,7 +3,6 @@
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
@@ -43,7 +42,7 @@
   });
 </script>
 
-<TableRow class="schedule-row">
+<tr>
   <td class="cell">
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </td>
@@ -53,7 +52,7 @@
   <td class="cell whitespace-pre-line break-words max-md:hidden">
     {schedule?.info?.workflowType?.name ?? ''}
   </td>
-  <td class="cell links truncate max-xl:hidden">
+  <td class="cell truncate">
     {#each sortRecentActions(schedule?.info?.recentActions) as run}
       <p>
         <Link
@@ -69,7 +68,7 @@
       </p>
     {/each}
   </td>
-  <td class="cell truncate max-xl:hidden">
+  <td class="cell truncate">
     {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
       <div>
         {formatDate(run, $timeFormat, {
@@ -79,18 +78,14 @@
       </div>
     {/each}
   </td>
-  <td class="cell hidden xl:table-cell">
+  <td class="cell">
     <p>{@html translate('common.timezone', { timezone: timezoneName })}</p>
     <ScheduleBasicFrequency {calendar} {interval} />
   </td>
-</TableRow>
+</tr>
 
 <style lang="postcss">
   .cell {
     @apply p-2 text-left;
-  }
-
-  :global(.schedule-spec-row td) {
-    @apply !border-t-0;
   }
 </style>

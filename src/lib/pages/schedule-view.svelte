@@ -259,9 +259,6 @@
       <h1 class="select-all" data-testid="schedule-name">
         {scheduleId}
       </h1>
-      <p class="text-sm">
-        {namespace}
-      </p>
     </div>
   </header>
   <Loading />
