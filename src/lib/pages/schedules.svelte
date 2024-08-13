@@ -86,12 +86,12 @@
     </div>
 
     <tr slot="headers" class="text-left">
-      <th class="px-2">{translate('common.status')}</th>
-      <th class="px-2">{translate('schedules.name')}</th>
-      <th class="px-2">{translate('common.workflow-type')}</th>
-      <th class="px-2">{translate('schedules.recent-runs')}</th>
-      <th class="px-2">{translate('schedules.upcoming-runs')}</th>
-      <th class="px-2">{translate('schedules.schedule-spec')}</th>
+      <th>{translate('common.status')}</th>
+      <th>{translate('schedules.name')}</th>
+      <th>{translate('common.workflow-type')}</th>
+      <th>{translate('schedules.recent-runs')}</th>
+      <th>{translate('schedules.upcoming-runs')}</th>
+      <th>{translate('schedules.schedule-spec')}</th>
     </tr>
     {#each filteredSchedules(visibleItems) as schedule}
       <SchedulesTableRow {schedule} />

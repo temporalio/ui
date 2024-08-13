@@ -1,3 +1,10 @@
+<script lang="ts" context="module">
+  export type PaginatedRequest<T> = (
+    size: number,
+    token: string,
+  ) => Promise<{ items: T[]; nextPageToken: string }>;
+</script>
+
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
@@ -32,11 +39,6 @@
     previousButtonLabel: string;
     nextButtonLabel: string;
   };
-
-  type PaginatedRequest<T> = (
-    size: number,
-    token: string,
-  ) => Promise<{ items: T[]; nextPageToken: string }>;
 
   export let onError: (error: Error) => void | undefined = undefined;
   export let onFetch: () => Promise<PaginatedRequest<T>>;
