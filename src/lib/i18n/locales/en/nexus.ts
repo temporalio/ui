@@ -35,7 +35,7 @@ export const Strings = {
   'endpoint-name-hint':
     'Endpoint name must start with A-Z, a-z or _ and can only contain A-Z, a-z, 0-9, or _',
   'endpoint-name-hint-with-dash':
-    'Endpoint name must start with A-Z, a-z or _ and can only contain A-Z, a-z, 0-9, _ or -',
+    'Endpoint name must start with A-Z or a-z and can only contain A-Z, a-z, 0-9 or -',
   'access-policy': 'Access Policy',
   'allowed-caller-namespaces': 'Allowed caller namespaces',
   'allowed-caller-namespaces-description':

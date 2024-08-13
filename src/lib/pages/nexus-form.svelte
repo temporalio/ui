@@ -39,7 +39,7 @@
   export let error: NetworkError | undefined = undefined;
   export let nameDisabled = false;
   export let isCloud = true;
-  export let nameHintText = translate('nexus.endpoint-name-hint');
+  export let nameHintText: string;
   export let nameRegexPattern: RegExp;
 
   let name = endpoint?.spec?.name || '';
