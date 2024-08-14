@@ -16,9 +16,7 @@
     HistoryConfig,
   } from '../constants';
 
-  // import EventDetailsRow from './event-details-row.svelte';
   import HistoryGraphRowVisual from './history-graph-row-visual.svelte';
-  // import HistoryGraphRow from './history-graph-row.svelte';
   import Line from './line.svelte';
 
   export let groups: EventGroups;
@@ -73,7 +71,7 @@
   // $: isWide = canvasWidth >= 960;
 </script>
 
-<div class="bg-space-black" bind:clientWidth={canvasWidth}>
+<div bind:clientWidth={canvasWidth}>
   <svg
     viewBox="0 0 {canvasWidth} {canvasHeight}"
     height={canvasHeight}
@@ -84,30 +82,6 @@
       endPoint={[visualWidth, canvasHeight]}
       strokeWidth={6}
     />
-    <!-- {#each visibleHistory as event, index (event.id)}
-      <HistoryGraphRow
-        {event}
-        group={allGroups.find((g) => g.eventIds.has(event.id))}
-        {activeEvents}
-        {canvasWidth}
-        {visualWidth}
-        {index}
-      />
-    {/each}
-    {#each activeEvents as id}
-      {@const index = visibleHistory.indexOf(
-        history.find((event) => event.id === id),
-      )}
-      <EventDetailsRow
-        x={isWide ? canvasWidth / 2 + 2 : visualWidth}
-        y={isWide ? index * height : (index + 1) * height}
-        width={isWide ? canvasWidth / 2 : canvasWidth - visualWidth}
-        event={history.find((event) => event.id === id)}
-        group={allGroups.find((group) => group.eventIds.has(id))}
-        {canvasWidth}
-        primary={activeEvents[activeEvents.length - 1] === id}
-      />
-    {/each} -->
     <svg
       viewBox="0 0 {2 * canvasWidth} {canvasHeight * zoomLevel}"
       height={canvasHeight}

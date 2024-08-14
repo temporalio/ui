@@ -25,6 +25,7 @@
     classification={workflow.status}
     {active}
     strokeWidth={radius * 2}
+    pending={workflow.isRunning}
   />
   <Dot
     point={[start, y]}
@@ -35,6 +36,16 @@
   <Icon
     name="workflow"
     x={start - radius / 2}
+    y={y - radius / 2}
+    width={radius}
+    height={radius}
+    strokeWidth="4"
+    class="text-black"
+  />
+  <Dot point={[end, y]} classification={workflow.status} {active} r={radius} />
+  <Icon
+    name="workflow"
+    x={end - radius / 2}
     y={y - radius / 2}
     width={radius}
     height={radius}

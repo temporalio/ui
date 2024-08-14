@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { eventFilterSort } from '$lib/stores/event-view';
   import type {
@@ -38,6 +40,7 @@
 
   const { height, gutter, radius } = TimelineConfig;
   let canvasWidth = 0;
+  let viewportHeight = 40;
 
   $: startTime = history[0]?.eventTime || workflow.startTime;
   $: activeDetailsHeight = activeGroups
@@ -68,12 +71,33 @@
     const ratio = distance / workflowDistance;
     return Math.round(ratio * (canvasWidth - 2 * gutter)) + gutter;
   };
+
+  const onExpandCollapse = () => {
+    if (viewportHeight === 40) {
+      viewportHeight = 80;
+    } else {
+      viewportHeight = 40;
+    }
+  };
 </script>
 
 <div
-  class="h-80 overflow-auto rounded-xl border-4 border-subtle bg-space-black"
+  class="border-subtle] relative h-80 overflow-auto rounded-xl border-4"
   bind:clientWidth={canvasWidth}
+  style="height: {viewportHeight}vh;"
 >
+  <Button
+    size="xs"
+    variant="ghost"
+    class="sticky left-1 top-1"
+    on:click={onExpandCollapse}
+  >
+    <Icon
+      name={viewportHeight === 40 ? 'chevron-down' : 'chevron-up'}
+      x={canvasWidth - 2 * radius}
+      y={radius}
+    />
+  </Button>
   <EndTimeInterval {workflow} {startTime} let:endTime let:duration>
     <svg
       {x}
@@ -81,11 +105,13 @@
       viewBox="0 0 {canvasWidth} {canvasHeight}"
       height={canvasHeight / zoomLevel}
       width={canvasWidth}
+      class="-mt-6"
     >
       <Line
         startPoint={[gutter, 0]}
         endPoint={[gutter, timelineHeight]}
         strokeWidth={radius / 2}
+        on:click={() => onExpandCollapse()}
       />
       <Line
         startPoint={[canvasWidth - gutter, 0]}

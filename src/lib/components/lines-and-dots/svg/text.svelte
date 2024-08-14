@@ -8,7 +8,6 @@
 
   export let point: [number, number] = [0, 0];
   export let category: string | undefined = undefined;
-  export let active = true;
   export let fontSize = '14px';
   export let fontWeight = '400';
   export let textAnchor = 'start';
@@ -32,24 +31,18 @@
   <Line
     startPoint={[x - backdropHeight, y]}
     endPoint={[x + backdropWidth, y]}
-    {active}
     status="none"
     strokeWidth={backdropHeight}
   />
 {/if}
 {#if showIcon && textAnchor === 'start'}
-  <Icon
-    name={icon}
-    {x}
-    y={y - 8}
-    class="text-white {!active && 'opacity-[.35]'}"
-  />
+  <Icon name={icon} {x} y={y - 8} class="text-white" />
 {/if}
 <text
   bind:this={textElement}
-  class="cursor-pointer select-none outline-none {category}"
-  class:active
+  class="cursor-pointer select-none outline-none {category} text-primary"
   class:label
+  class:backdrop
   x={textX}
   {y}
   font-size={fontSize}
@@ -63,26 +56,27 @@
     name={icon}
     x={x - textWidth - config.radius * 1.5}
     y={y - 8}
-    class="text-white {!active && 'opacity-[.35]'}"
+    class="text-white"
   />
 {/if}
 
 <style lang="postcss">
   text {
-    opacity: 0.25;
+    @apply fill-current;
+
+    opacity: 1;
     stroke: none;
-    fill: #fff;
     dominant-baseline: middle;
     alignment-baseline: baseline;
+  }
+
+  text.backdrop {
+    @apply fill-white;
   }
 
   .label {
     fill: #c9d9f0;
     font-weight: 500;
-  }
-
-  .active {
-    opacity: 1;
   }
 
   text.marker,

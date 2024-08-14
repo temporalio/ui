@@ -15,7 +15,7 @@
   export let endTime: string | Date;
   export let duration: number;
 
-  const { radius, height, gutter } = TimelineConfig;
+  const { radius, height } = TimelineConfig;
   const ticks = 20;
 
   $: distance = x2 - x1;
@@ -32,10 +32,9 @@
   {@const tickY = timelineHeight + radius * 2}
   {#if i !== 0}
     <Line
-      strokeWidth={radius / 4}
+      strokeWidth={0.5}
       startPoint={[tickX, 0]}
       endPoint={[tickX, timelineHeight]}
-      active={false}
     />
   {/if}
   {#if i === 0}
@@ -43,28 +42,12 @@
       fill="#fff"
       font-size="12"
       transform="rotate(90, 0, 0)"
-      x={4}
-      y={-gutter / 2}
+      x={height + radius}
+      y={-height}
     >
       <tspan>{formatDate(startTime, $timeFormat)}</tspan>
     </text>
   {:else}
-    <text
-      fill="#fff"
-      font-size="12"
-      opacity={0.5}
-      transform="rotate(90, {tickX}, {height})"
-      x={tickX + radius}
-      y={height}
-    >
-      {formatDistanceAbbreviated({
-        start: startTime,
-        end: new Date(
-          new Date(startTime.toString()).getTime() + (duration / ticks) * i,
-        ),
-        includeMilliseconds: duration / ticks < 1000,
-      })}
-    </text>
     <text
       fill="#fff"
       font-size="12"
@@ -86,8 +69,14 @@
   fill="#fff"
   font-size="12"
   transform="rotate(90, {x2 - 4}, 0)"
-  x={x2}
-  y={-gutter / 3}
+  x={x2 + height + radius}
+  y={-radius}
 >
   <tspan>{formatDate(endTime, $timeFormat)}</tspan>
 </text>
+
+<style lang="postcss">
+  text {
+    @apply fill-current;
+  }
+</style>

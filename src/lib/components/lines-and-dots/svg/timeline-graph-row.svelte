@@ -117,7 +117,6 @@
         {textAnchor}
         {backdrop}
         backdropHeight={radius * 2}
-        icon={CategoryIcon[group.category]}
         config={TimelineConfig}
       >
         {group?.displayName}
@@ -127,6 +126,7 @@
       point={[x, y]}
       classification={group.eventList[index]?.classification}
       {active}
+      icon={CategoryIcon[group.category]}
       r={radius}
     />
   {/each}
