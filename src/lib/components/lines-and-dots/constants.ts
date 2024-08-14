@@ -48,7 +48,7 @@ export const TimelineConfig: GraphConfig = {
 };
 
 export const HistoryConfig: GraphConfig = {
-  height: 42,
+  height: 33,
   gutter: baseRadius * 2,
   radius: baseRadius * 1,
   fontSizeRatio: baseRadius * 4,
@@ -210,25 +210,6 @@ export const activeEventsHeightAboveGroup = (
       return allEventsInGroupHeight(id, history, groups);
     })
     .reduce((acc, height) => acc + height, 0);
-};
-
-export const getVisualWidth = (
-  history: WorkflowEvents,
-  groups: EventGroups,
-  maxWidth: number,
-) => {
-  let maxOffset = 0;
-  if (!history.length) return maxWidth;
-  history.forEach((event) => {
-    const group = groups.find((g) => g.eventIds.has(event.id));
-    if (group) {
-      const offset = getOpenGroups(event, groups);
-      if (offset > maxOffset) {
-        maxOffset = offset;
-      }
-    }
-  });
-  return Math.min(maxWidth, (maxOffset + 2) * 4 * HistoryConfig.radius);
 };
 
 export const getNextDistanceAndOffset = (

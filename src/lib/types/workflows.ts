@@ -1,6 +1,7 @@
 import type {
   Memo,
   Payloads,
+  PendingWorkflowTaskInfo,
   WorkflowExecutionStatus,
   WorkflowVersionTimpstamp,
 } from '$lib/types';
@@ -59,6 +60,7 @@ export type WorkflowExecutionAPIResponse = Optional<{
   pendingNexusOperations: PendingNexusOperation[];
   executionConfig: WorkflowExecutionConfig;
   callbacks: Callbacks;
+  pendingWorkflowTask: PendingWorkflowTaskInfo;
 }>;
 
 export type WorkflowStatus =
@@ -137,6 +139,7 @@ export type WorkflowExecution = {
   pendingChildren: PendingChildren[];
   pendingNexusOperations: PendingNexusOperation[];
   pendingActivities: PendingActivity[];
+  pendingWorkflowTask: PendingWorkflowTaskInfo;
   stateTransitionCount: string;
   parentNamespaceId?: string;
   parent?: WorkflowIdentifier;

@@ -9,33 +9,26 @@
   } from '$lib/stores/active-events';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { filteredEventHistory } from '$lib/stores/events';
+  import type { WorkflowEvents } from '$lib/types/events';
 
-  import {
-    getEventDetailsBoxHeight,
-    getVisualWidth,
-    HistoryConfig,
-  } from '../constants';
+  import { getEventDetailsBoxHeight, HistoryConfig } from '../constants';
 
   import HistoryGraphRowVisual from './history-graph-row-visual.svelte';
   import Line from './line.svelte';
 
   export let groups: EventGroups;
+  export let history: WorkflowEvents;
   export let activeEvents: string[] = [];
   export let zoomLevel: number = 1;
-
-  let canvasWidth: number;
+  export let canvasWidth = 0;
 
   $: workflowTaskGroups = groupWorkflowTaskEvents(
     $filteredEventHistory,
     $eventFilterSort,
   );
   $: allGroups = [...workflowTaskGroups, ...groups];
-  $: history =
-    $eventFilterSort === 'descending'
-      ? [...$filteredEventHistory].reverse()
-      : $filteredEventHistory;
 
-  const { height } = HistoryConfig;
+  const { height, radius } = HistoryConfig;
 
   const setHistorySlice = (top: number) => {
     let scrollIndex = Math.round(top / height);
@@ -67,38 +60,35 @@
     .reduce((acc, height) => acc + height, 0);
 
   $: canvasHeight = visibleHistory.length * height + activeDetailsHeight;
-  $: visualWidth = getVisualWidth(history, allGroups, 110);
+  $: visualWidth = canvasWidth - 2 * radius;
   // $: isWide = canvasWidth >= 960;
 </script>
 
-<div bind:clientWidth={canvasWidth}>
+<svg
+  viewBox="0 0 {canvasWidth} {canvasHeight}"
+  height={canvasHeight}
+  width={canvasWidth}
+>
+  <Line
+    startPoint={[visualWidth, height / 2]}
+    endPoint={[visualWidth, canvasHeight]}
+    strokeWidth={6}
+  />
   <svg
-    viewBox="0 0 {canvasWidth} {canvasHeight}"
+    viewBox="0 0 {canvasWidth} {canvasHeight * zoomLevel}"
     height={canvasHeight}
-    width={canvasWidth}
+    width={canvasWidth / zoomLevel}
   >
-    <Line
-      startPoint={[visualWidth, 0]}
-      endPoint={[visualWidth, canvasHeight]}
-      strokeWidth={6}
-    />
-    <svg
-      viewBox="0 0 {2 * canvasWidth} {canvasHeight * zoomLevel}"
-      height={canvasHeight}
-      width={(2 * canvasWidth) / zoomLevel}
-    >
-      {#each visibleHistory as event, index (event.id)}
-        <HistoryGraphRowVisual
-          {event}
-          group={allGroups.find((g) => g.eventIds.has(event.id))}
-          groups={allGroups}
-          {history}
-          canvasWidth={visualWidth}
-          {activeEvents}
-          {zoomLevel}
-          {index}
-        />
-      {/each}
-    </svg>
+    {#each visibleHistory as event, index (event.id)}
+      <HistoryGraphRowVisual
+        {event}
+        group={allGroups.find((g) => g.eventIds.has(event.id))}
+        groups={allGroups}
+        {history}
+        canvasWidth={visualWidth}
+        {zoomLevel}
+        {index}
+      />
+    {/each}
   </svg>
-</div>
+</svg>

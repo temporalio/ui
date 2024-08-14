@@ -1,12 +1,9 @@
 <script lang="ts">
   import { isEventGroup } from '$lib/models/event-groups';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
-  import {
-    attributeGroups,
-    formatAttributes,
-  } from '$lib/utilities/format-event-attributes';
+  import { formatAttributes } from '$lib/utilities/format-event-attributes';
 
-  import EventDetailPills from './event-detail-pills.svelte';
   import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
   import EventGroupDetails from './event-group-details.svelte';
 
@@ -15,16 +12,8 @@
   export let compact = false;
   export let selectedId: string;
 
-  $: attributes = formatAttributes(currentEvent, { compact });
-  $: attributeGrouping = attributeGroups(event, attributes);
-  $: activePill = Object.keys(attributeGrouping).find(
-    (key) => attributeGrouping[key].length,
-  );
+  $: attributes = formatAttributes(currentEvent, $timeFormat, $relativeTime);
   $: eventDetails = Object.entries(attributes);
-
-  const handlePillChange = (event: CustomEvent) => {
-    activePill = event.detail.key;
-  };
 
   const handleGroupClick = (id: string) => (selectedId = id);
 </script>
@@ -37,21 +26,15 @@
       onGroupClick={handleGroupClick}
     />
     <div class="block w-full lg:w-2/3">
-      <EventDetailPills {attributeGrouping} on:pillChange={handlePillChange} />
       {#each eventDetails as [key, value] (key)}
-        {#if attributeGrouping[activePill]?.includes(key)}
-          <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
-        {/if}
+        <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
       {/each}
     </div>
   </div>
 {:else}
   <div class="w-full">
-    <EventDetailPills {attributeGrouping} on:pillChange={handlePillChange} />
     {#each eventDetails as [key, value] (key)}
-      {#if attributeGrouping[activePill]?.includes(key)}
-        <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
-      {/if}
+      <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
     {/each}
   </div>
 {/if}

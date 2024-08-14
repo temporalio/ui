@@ -2,6 +2,8 @@
   import { noop } from 'svelte/internal';
   import { fade } from 'svelte/transition';
 
+  import { onMount } from 'svelte';
+
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -49,7 +51,7 @@
   $: showElapsed = $eventShowElapsed === 'true';
   $: showElapsedTimeDiff =
     showElapsed && initialItem && event.id !== initialItem.id;
-  $: attributes = formatAttributes(event, { compact });
+  $: attributes = formatAttributes(event, $timeFormat, $relativeTime);
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
   $: elapsedTime = formatDistanceAbbreviated({
@@ -76,6 +78,12 @@
   const failure = eventOrGroupIsFailureOrTimedOut(event);
   const canceled = eventOrGroupIsCanceled(event);
   const terminated = eventOrGroupIsTerminated(event);
+
+  onMount(() => {
+    if ($page.url.hash === `#${event.id}`) {
+      expanded = true;
+    }
+  });
 </script>
 
 <tr
@@ -99,7 +107,7 @@
   <td class="text-left">
     <div class="flex flex-col gap-0">
       {#if showElapsedTimeDiff}
-        <p class="break-word truncate text-sm md:whitespace-normal">
+        <p class="truncate text-sm">
           {#if elapsedTime}
             {descending ? '-' : '+'}{elapsedTime}
           {/if}
@@ -107,15 +115,13 @@
         {#if duration && duration !== '0ms'}
           <div class="flex flex-row items-center gap-1">
             <Icon class="inline" name="clock" />
-            <p class="break-word truncate text-sm md:whitespace-normal">
+            <p class="truncate text-sm md:whitespace-normal">
               {duration}
             </p>
           </div>
         {/if}
       {:else}
-        <p
-          class="break-word truncate text-sm md:whitespace-normal md:text-base"
-        >
+        <p class="truncate text-sm">
           {formatDate(event?.eventTime, $timeFormat, {
             relative: $relativeTime,
           })}
@@ -160,7 +166,9 @@
       <div class="flex w-full items-center justify-between">
         <div class="grow truncate">
           <EventDetailsRow
-            {...getSingleAttributeForEvent(currentEvent)}
+            {...getSingleAttributeForEvent(
+              isEventGroup(event) ? event.initialEvent : event,
+            )}
             {attributes}
             class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
             inline
@@ -185,7 +193,7 @@
 
 <style lang="postcss">
   .row {
-    @apply h-[44px] max-h-[44px] flex-wrap items-center text-sm no-underline xl:py-3 xl:text-base;
+    @apply max-h-[35px] flex-wrap items-center text-sm no-underline xl:py-3 xl:text-base;
   }
 
   .row:hover {

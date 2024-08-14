@@ -10,7 +10,6 @@
   export let workflow: WorkflowExecution;
   export let length: number;
   export let y: number;
-  export let active = true;
 
   const { radius, height, gutter } = TimelineConfig;
 
@@ -23,16 +22,10 @@
     startPoint={[start, y]}
     endPoint={[end, y]}
     classification={workflow.status}
-    {active}
     strokeWidth={radius * 2}
     pending={workflow.isRunning}
   />
-  <Dot
-    point={[start, y]}
-    classification={workflow.status}
-    {active}
-    r={radius}
-  />
+  <Dot point={[start, y]} classification={workflow.status} r={radius} />
   <Icon
     name="workflow"
     x={start - radius / 2}
@@ -42,7 +35,7 @@
     strokeWidth="4"
     class="text-black"
   />
-  <Dot point={[end, y]} classification={workflow.status} {active} r={radius} />
+  <Dot point={[end, y]} classification={workflow.status} r={radius} />
   <Icon
     name="workflow"
     x={end - radius / 2}

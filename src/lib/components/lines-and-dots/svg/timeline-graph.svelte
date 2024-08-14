@@ -3,12 +3,9 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { eventFilterSort } from '$lib/stores/event-view';
-  import type {
-    WorkflowEvents,
-    WorkflowTaskFailedEvent,
-  } from '$lib/types/events';
+  import { fullEventHistory } from '$lib/stores/events';
+  import type { WorkflowTaskFailedEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { getMillisecondDuration } from '$lib/utilities/format-time';
 
   import {
     activeGroupsHeightAboveGroup,
@@ -17,21 +14,16 @@
   } from '../constants';
   import EndTimeInterval from '../end-time-interval.svelte';
 
-  import Dot from './dot.svelte';
   import GroupDetailsRow from './group-details-row.svelte';
   import Line from './line.svelte';
-  import Text from './text.svelte';
   import TimelineAxis from './timeline-axis.svelte';
   import TimelineGraphRow from './timeline-graph-row.svelte';
   import WorkflowRow from './workflow-row.svelte';
 
   export let x = 0;
   export let y = 0;
-
   export let workflow: WorkflowExecution;
-  export let history: WorkflowEvents;
   export let groups: EventGroups;
-
   export let activeGroups: string[] = [];
   export let zoomLevel: number = 1;
   export let readOnly = false;
@@ -42,7 +34,7 @@
   let canvasWidth = 0;
   let viewportHeight = 40;
 
-  $: startTime = history[0]?.eventTime || workflow.startTime;
+  $: startTime = $fullEventHistory[0]?.eventTime || workflow.startTime;
   $: activeDetailsHeight = activeGroups
     .map((id) => {
       const group = groups.find((group) => group.id === id);
@@ -52,25 +44,8 @@
     .reduce((acc, height) => acc + height, 0);
 
   $: timelineHeight =
-    Math.max(height * (groups.length + 2), 100) + activeDetailsHeight;
-  $: canvasHeight = timelineHeight + 100;
-
-  const getWorkflowTaskPosition = (endTime, failedTime) => {
-    const workflowDistance = getMillisecondDuration({
-      start: startTime,
-      end: endTime,
-      onlyUnderSecond: false,
-    });
-
-    const distance = getMillisecondDuration({
-      start: startTime,
-      end: failedTime,
-      onlyUnderSecond: false,
-    });
-
-    const ratio = distance / workflowDistance;
-    return Math.round(ratio * (canvasWidth - 2 * gutter)) + gutter;
-  };
+    Math.max(height * (groups.length + 2), 140) + activeDetailsHeight;
+  $: canvasHeight = timelineHeight + 140;
 
   const onExpandCollapse = () => {
     if (viewportHeight === 40) {
@@ -82,14 +57,14 @@
 </script>
 
 <div
-  class="border-subtle] relative h-80 overflow-auto rounded-xl border-4"
+  class="border-subtle] relative h-auto overflow-auto rounded-xl border-4"
   bind:clientWidth={canvasWidth}
-  style="height: {viewportHeight}vh;"
+  style="max-height: {viewportHeight}vh;"
 >
   <Button
     size="xs"
     variant="ghost"
-    class="sticky left-1 top-1"
+    class="sticky left-0.5 top-1"
     on:click={onExpandCollapse}
   >
     <Icon
@@ -106,12 +81,12 @@
       height={canvasHeight / zoomLevel}
       width={canvasWidth}
       class="-mt-8"
+      class:error={workflowTaskFailedError}
     >
       <Line
         startPoint={[gutter, 0]}
         endPoint={[gutter, timelineHeight]}
         strokeWidth={radius / 2}
-        on:click={() => onExpandCollapse()}
       />
       <Line
         startPoint={[canvasWidth - gutter, 0]}
@@ -126,44 +101,6 @@
         {endTime}
         {duration}
       />
-      {#if workflowTaskFailedError}
-        <Line
-          startPoint={[
-            getWorkflowTaskPosition(endTime, workflowTaskFailedError.eventTime),
-            radius * 2,
-          ]}
-          endPoint={[
-            getWorkflowTaskPosition(endTime, workflowTaskFailedError.eventTime),
-            timelineHeight,
-          ]}
-          strokeWidth={radius / 2}
-          classification="Failed"
-        />
-        <Dot
-          r={radius}
-          point={[
-            getWorkflowTaskPosition(endTime, workflowTaskFailedError.eventTime),
-            radius * 2,
-          ]}
-          active
-          classification="Failed"
-        />
-        <Text
-          point={[
-            getWorkflowTaskPosition(
-              endTime,
-              workflowTaskFailedError.eventTime,
-            ) +
-              radius * 1.5,
-            radius * 2,
-          ]}
-          active
-          textAnchor="start"
-          category="Failed"
-          fontWeight="600"
-          config={TimelineConfig}>Workflow Task Failed</Text
-        >
-      {/if}
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
       {#each groups as group, index (group.id)}
         {@const y =
@@ -193,3 +130,9 @@
     </svg>
   </EndTimeInterval>
 </div>
+
+<style lang="postcss">
+  .error {
+    @apply bg-danger;
+  }
+</style>

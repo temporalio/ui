@@ -3,45 +3,33 @@
 
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { groupEvents } from '$lib/models/event-groups';
-  import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
-  import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
-  import { filteredEventHistory, fullEventHistory } from '$lib/stores/events';
+  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
+  import { expandAllEvents } from '$lib/stores/event-view';
+  import { fullEventHistory } from '$lib/stores/events';
   import { eventCategoryFilter } from '$lib/stores/filters';
-  import type {
-    CommonHistoryEvent,
-    EventTypeCategory,
-    IterableEvent,
-  } from '$lib/types/events';
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import type { EventTypeCategory, WorkflowEvents } from '$lib/types/events';
+
+  import HistoryGraph from '../lines-and-dots/svg/history-graph.svelte';
 
   import EventEmptyRow from './event-empty-row.svelte';
 
+  export let history: WorkflowEvents;
+  export let groups: EventGroups;
   export let compact = false;
+
+  let showJSON = false;
+  let canvasWidth = 120;
 
   function handleExpandChange(event: CustomEvent) {
     $expandAllEvents = event.detail.expanded;
   }
-
-  $: getEventsOrGroups = (
-    items: CommonHistoryEvent[],
-    category?: string[],
-  ): IterableEvent[] => {
-    if (category) {
-      const filteredItems = items.filter((i) => {
-        if (isLocalActivityMarkerEvent(i)) {
-          return category.includes(CATEGORIES.LOCAL_ACTIVITY);
-        }
-        return category.includes(i.category);
-      });
-      return compact ? groupEvents(filteredItems, 'ascending') : filteredItems;
-    }
-    return compact ? groupEvents(items, 'ascending') : items;
-  };
 
   $: $eventCategoryFilter = $page.url?.searchParams?.get('category')
     ? ($page.url?.searchParams
@@ -50,13 +38,31 @@
     : undefined;
 
   $: initialItem = $fullEventHistory?.[0];
-  $: items =
-    $eventFilterSort === 'descending'
-      ? [
-          ...getEventsOrGroups($filteredEventHistory, $eventCategoryFilter),
-        ].reverse()
-      : getEventsOrGroups($filteredEventHistory, $eventCategoryFilter);
+  $: items = compact ? groups : history;
   $: updating = !$fullEventHistory.length;
+
+  const onExpandCollapse = () => {
+    if (canvasWidth === 120) {
+      canvasWidth = 400;
+    } else {
+      canvasWidth = 120;
+    }
+  };
+
+  const onAllClick = () => {
+    compact = false;
+    showJSON = false;
+  };
+
+  const onCompactClick = () => {
+    compact = true;
+    showJSON = false;
+  };
+
+  const onJSONClick = () => {
+    compact = true;
+    showJSON = true;
+  };
 </script>
 
 <Pagination
@@ -71,34 +77,67 @@
   previousButtonLabel={translate('common.previous')}
   nextButtonLabel={translate('common.next')}
 >
-  <svelte:fragment slot="action-top-left">
+  <svelte:fragment slot="action-top-center">
     <div class="flex flex-col items-center md:items-start">
       <ToggleButtons>
         <ToggleButton
-          active={!compact}
+          active={!compact && !showJSON}
           data-testid="all"
-          on:click={() => (compact = false)}>All</ToggleButton
+          on:click={() => onAllClick()}>All</ToggleButton
         >
         <ToggleButton
-          active={compact}
+          active={compact && !showJSON}
           data-testid="compact"
-          on:click={() => (compact = true)}>Compact</ToggleButton
+          on:click={() => onCompactClick()}>Compact</ToggleButton
+        >
+        <ToggleButton
+          active={showJSON}
+          data-testid="json"
+          on:click={onJSONClick}>JSON</ToggleButton
         >
       </ToggleButtons>
     </div>
   </svelte:fragment>
-  <EventSummaryTable {updating} on:expandAll={handleExpandChange}>
-    {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
-      <EventSummaryRow
-        {event}
-        {compact}
-        expandAll={$expandAllEvents === 'true'}
-        {initialItem}
-        active={activeRowIndex === index}
-        onRowClick={() => setActiveRowIndex(index)}
-      />
-    {:else}
-      <EventEmptyRow loading={!$fullEventHistory.length} />
-    {/each}
-  </EventSummaryTable>
+  <div class="flex gap-0">
+    {#if !compact && !showJSON}
+      <div
+        class="relative hidden pt-12 lg:block"
+        style="width: {canvasWidth}px;"
+      >
+        <Button
+          size="xs"
+          variant="ghost"
+          class="absolute right-1 top-1"
+          on:click={onExpandCollapse}
+        >
+          <Icon
+            name={canvasWidth === 120 ? 'chevron-right' : 'chevron-left'}
+            x={4}
+            y={8}
+          />
+        </Button>
+        <HistoryGraph {groups} history={visibleItems} {canvasWidth} />
+      </div>
+    {/if}
+    <div class="w-full">
+      {#if showJSON}
+        <WorkflowHistoryJson />
+      {:else}
+        <EventSummaryTable {updating} on:expandAll={handleExpandChange}>
+          {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
+            <EventSummaryRow
+              {event}
+              {compact}
+              expandAll={$expandAllEvents === 'true'}
+              {initialItem}
+              active={activeRowIndex === index}
+              onRowClick={() => setActiveRowIndex(index)}
+            />
+          {:else}
+            <EventEmptyRow loading={!$fullEventHistory.length} />
+          {/each}
+        </EventSummaryTable>
+      {/if}
+    </div>
+  </div>
 </Pagination>

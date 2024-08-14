@@ -5,9 +5,6 @@
   import EventSummary from '$lib/components/event/event-summary.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
-  // import CompactGraphVertical from '$lib/components/lines-and-dots/svg/compact-graph-vertical.svelte';
-  // import CompactGraph from '$lib/components/lines-and-dots/svg/compact-graph.svelte';
-  import HistoryGraph from '$lib/components/lines-and-dots/svg/history-graph.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import WorkflowCallback from '$lib/components/lines-and-dots/workflow-callback.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
@@ -18,12 +15,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
-  // import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
-  import {
-    // activeEvents,
-    activeGroups,
-    clearActives,
-  } from '$lib/stores/active-events';
+  import { activeGroups, clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import {
     currentEventHistory,
@@ -34,7 +26,7 @@
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
   let showFilters = false;
-  let zoomLevel = 1;
+  let showDownloadPrompt = false;
 
   $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
@@ -53,32 +45,21 @@
       ? ascendingGroups
       : [...ascendingGroups].reverse();
 
+  $: history =
+    $eventFilterSort === 'ascending'
+      ? $filteredEventHistory
+      : [...$filteredEventHistory].reverse();
+
   $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
     $currentEventHistory,
     'ascending',
   );
-
-  $: {
-    console.log('workflowTaskFailedError: ', workflowTaskFailedError);
-  }
 
   $: $eventViewType, clearActives();
 
   beforeNavigate(() => {
     clearActives();
   });
-
-  let showDownloadPrompt = false;
-
-  // const zoomOut = () => {
-  //   if (zoomLevel < 10) zoomLevel += 0.5;
-  // };
-
-  // const zoomIn = () => {
-  //   if (zoomLevel > 1) {
-  //     zoomLevel -= 0.5;
-  //   }
-  // };
 
   $: {
     if (!workflow.isRunning && $pauseLiveUpdates) {
@@ -103,7 +84,10 @@
     <WorkflowDetails />
     <InputAndResults />
     {#if workflowTaskFailedError}
-      <WorkflowError error={workflowTaskFailedError} />
+      <WorkflowError
+        error={workflowTaskFailedError}
+        pendingTask={workflow?.pendingWorkflowTask}
+      />
     {/if}
     {#if workflow?.callbacks?.length}
       <WorkflowCallback callback={workflow.callbacks[0]} />
@@ -111,11 +95,9 @@
     <div
       class="flex flex-col items-center gap-2 py-2 xl:flex-row xl:justify-between xl:gap-8"
     >
-      <div class="flex flex-col items-center gap-2 xl:flex-row xl:gap-4">
-        <h2>
-          {translate('workflows.event-history')}
-        </h2>
-      </div>
+      <h2>
+        {translate('workflows.event-history')}
+      </h2>
       <ToggleButtons>
         <ToggleButton
           disabled={!workflow.isRunning}
@@ -151,29 +133,16 @@
   </div>
 </div>
 <div class="pb-24">
-  <div class="flex w-full flex-col gap-4 overflow-auto px-12">
+  <div class="flex w-full flex-col gap-4 overflow-auto px-8">
     <TimelineGraph
       {workflow}
-      history={$currentEventHistory}
       {groups}
-      {zoomLevel}
       activeGroups={$activeGroups}
       {workflowTaskFailedError}
     />
-    <div class="flex gap-0">
-      <div class="w-[120px] pt-28">
-        <HistoryGraph
-          history={$currentEventHistory}
-          {groups}
-          {zoomLevel}
-          activeGroups={$activeGroups}
-          {workflowTaskFailedError}
-        />
-      </div>
-      <div class="w-full">
-        <EventSummary />
-      </div>
-    </div>
+    {#key $eventFilterSort}
+      <EventSummary {groups} {history} />
+    {/key}
   </div>
 </div>
 <DownloadEventHistoryModal

@@ -22,14 +22,14 @@
   export let history: WorkflowEvents;
   export let groups: EventGroups;
   export let index: number;
-  export let activeEvents: string[] = [];
 
   export let canvasWidth: number;
   export let zoomLevel: number = 1;
 
   const { height, radius } = HistoryConfig;
+  const strokeWidth = radius / 2;
 
-  $: y = index * height + height / 2;
+  $: y = index * height + height / 3;
   $: ({ nextDistance, offset } = getNextDistanceAndOffset(
     history,
     event,
@@ -45,16 +45,10 @@
     ? 'pending'
     : event?.classification;
 
-  const strokeWidth = radius / 2;
-
   $: width = canvasWidth * zoomLevel;
-  $: horizontalOffset = offset * 2 * radius;
+  $: horizontalOffset = offset * 1.75 * radius;
   $: nextIsPending = group?.lastEvent.id === event?.id && group.isPending;
   $: eventInViewBox = horizontalOffset <= width;
-  $: isActive =
-    !activeEvents.length ||
-    activeEvents.includes(event.id) ||
-    !!activeEvents.find((id) => group?.eventIds.has(id));
   $: connectLine =
     isPendingActivity(event) || offset === 0
       ? false
@@ -77,15 +71,10 @@
     <Line
       startPoint={[width, zoomY]}
       endPoint={[width - horizontalOffset - radius, zoomY]}
-      active={isActive}
     />
   {/if}
   {#if eventInViewBox}
-    <Dot
-      point={[width - horizontalOffset, zoomY]}
-      {classification}
-      active={isActive}
-    />
+    <Dot point={[width - horizontalOffset, zoomY]} {classification} />
   {/if}
   {#if eventInViewBox && zoomNextDistance}
     <Line
@@ -102,7 +91,6 @@
           ? 'retry'
           : 'pending'
         : category}
-      active={isActive}
       pending={nextIsPending}
     />
   {/if}

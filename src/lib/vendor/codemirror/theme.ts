@@ -13,6 +13,9 @@ export const TEMPORAL_THEME = EditorView.theme(
       borderColor: colors.slate['600'],
       padding: '0.5rem',
     },
+    '.inline &': {
+      padding: '0rem',
+    },
     '.cm-matchingBracket': {
       backgroundColor: colors.black,
     },

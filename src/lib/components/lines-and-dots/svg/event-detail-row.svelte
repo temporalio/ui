@@ -34,7 +34,7 @@
 
   const { gutter, fontSizeRatio } = DetailsConfig;
 
-  $: attributes = formatAttributes(event);
+  $: attributes = formatAttributes(event, $timeFormat, $relativeTime);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
   );

@@ -43,7 +43,7 @@
       font-size="12"
       transform="rotate(90, 0, 0)"
       x={height + radius}
-      y={-height}
+      y={-0.75 * height}
     >
       <tspan>{formatDate(startTime, $timeFormat)}</tspan>
     </text>

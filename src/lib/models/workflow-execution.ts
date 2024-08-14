@@ -114,6 +114,7 @@ export const toWorkflowExecution = (
   const pendingChildren: PendingChildren[] = response?.pendingChildren ?? [];
   const pendingNexusOperations: PendingNexusOperation[] =
     toPendingNexusOperations(response?.pendingNexusOperations);
+  const pendingWorkflowTask = response?.pendingWorkflowTask;
   const callbacks = toCallbacks(response?.callbacks);
 
   return {
@@ -135,6 +136,7 @@ export const toWorkflowExecution = (
     pendingActivities,
     pendingChildren,
     pendingNexusOperations,
+    pendingWorkflowTask,
     callbacks,
     parentNamespaceId,
     parent,
