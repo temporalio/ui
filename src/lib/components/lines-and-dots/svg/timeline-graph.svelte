@@ -105,7 +105,7 @@
       viewBox="0 0 {canvasWidth} {canvasHeight}"
       height={canvasHeight / zoomLevel}
       width={canvasWidth}
-      class="-mt-6"
+      class="-mt-8"
     >
       <Line
         startPoint={[gutter, 0]}
