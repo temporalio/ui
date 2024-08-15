@@ -13,8 +13,10 @@ export const TEMPORAL_THEME = EditorView.theme(
       borderColor: colors.slate['600'],
       padding: '0.5rem',
     },
-    '.inline &': {
+    '.thin &': {
       padding: '0rem',
+      height: '1.5rem',
+      borderWidth: 'inset 2px',
     },
     '.cm-matchingBracket': {
       backgroundColor: colors.black,
@@ -25,6 +27,9 @@ export const TEMPORAL_THEME = EditorView.theme(
     '.cm-content': {
       caretColor: colors.white,
       fontSize: '0.875em',
+    },
+    '.thin & .cm-content': {
+      padding: '2px 0px',
     },
     '.cm-editor&.cm-focused': {
       outline: `1px solid ${colors.indigo['600']}`,

@@ -171,7 +171,6 @@
             )}
             {attributes}
             class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-            inline
           />
         </div>
         <div>
@@ -193,7 +192,7 @@
 
 <style lang="postcss">
   .row {
-    @apply max-h-[35px] flex-wrap items-center text-sm no-underline xl:py-3 xl:text-base;
+    @apply max-h-[35px] select-none flex-wrap items-center text-sm no-underline xl:py-3 xl:text-base;
   }
 
   .row:hover {

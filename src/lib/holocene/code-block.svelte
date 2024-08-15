@@ -33,6 +33,7 @@
     language?: 'json' | 'text' | 'shell';
     editable?: boolean;
     inline?: boolean;
+    thin?: boolean;
     testId?: string;
     copyable?: boolean;
     minHeight?: number;
@@ -55,6 +56,7 @@
   export { className as class };
   export let editable = false;
   export let inline = false;
+  export let thin = false;
   export let language = 'json';
   export let copyable = true;
   export let copyIconTitle = '';
@@ -182,6 +184,7 @@
     bind:this={editor}
     class={className}
     class:inline
+    class:thin
     data-testid={$$props.testId}
     class:editable
     class:readOnly={!editable}

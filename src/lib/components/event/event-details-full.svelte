@@ -25,14 +25,14 @@
       {selectedId}
       onGroupClick={handleGroupClick}
     />
-    <div class="block w-full lg:w-2/3">
+    <div class="block w-full bg-interactive-table-hover lg:w-2/3">
       {#each eventDetails as [key, value] (key)}
         <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
       {/each}
     </div>
   </div>
 {:else}
-  <div class="w-full">
+  <div class="w-full bg-interactive-table-hover">
     {#each eventDetails as [key, value] (key)}
       <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
     {/each}

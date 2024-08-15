@@ -24,7 +24,6 @@
   export let key: string;
   export let value: string | Record<string, unknown> | Payloads;
   export let attributes: CombinedAttributes;
-  export let inline = false;
 
   const { workflow, namespace } = $page.params;
 </script>
@@ -42,7 +41,8 @@
       <PayloadDecoder {value} key="payloads" let:decodedValue>
         <CodeBlock
           content={decodedValue}
-          {inline}
+          inline
+          thin
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
         />
