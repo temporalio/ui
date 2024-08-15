@@ -31,8 +31,10 @@
     undefined;
 
   const { height, gutter, radius } = TimelineConfig;
+
   let canvasWidth = 0;
   let viewportHeight = 40;
+  let scrollY = 0;
 
   $: startTime = $fullEventHistory[0]?.eventTime || workflow.startTime;
   $: activeDetailsHeight = activeGroups
@@ -54,12 +56,17 @@
       viewportHeight = 40;
     }
   };
+
+  const handleScroll = (e) => {
+    scrollY = e?.target?.scrollTop;
+  };
 </script>
 
 <div
   class="border-subtle] relative h-auto overflow-auto rounded-xl border-4"
   bind:clientWidth={canvasWidth}
   style="max-height: {viewportHeight}vh;"
+  on:scroll={handleScroll}
 >
   <Button
     size="xs"
@@ -112,17 +119,19 @@
             canvasWidth,
             $eventFilterSort,
           )}
-        {#key group.eventList.length}
-          <TimelineGraphRow
-            {y}
-            {group}
-            {activeGroups}
-            {canvasWidth}
-            {startTime}
-            {endTime}
-            {readOnly}
-          />
-        {/key}
+        {#if y > scrollY - 2 * height && y < scrollY + viewportHeight * height}
+          {#key group.eventList.length}
+            <TimelineGraphRow
+              {y}
+              {group}
+              {activeGroups}
+              {canvasWidth}
+              {startTime}
+              {endTime}
+              {readOnly}
+            />
+          {/key}
+        {/if}
         {#if activeGroups.includes(group.id)}
           <GroupDetailsRow y={y + 1.33 * radius} {group} {canvasWidth} />
         {/if}

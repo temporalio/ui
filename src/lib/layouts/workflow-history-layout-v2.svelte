@@ -140,9 +140,7 @@
       activeGroups={$activeGroups}
       {workflowTaskFailedError}
     />
-    {#key $eventFilterSort}
-      <EventSummary {groups} {history} />
-    {/key}
+    <EventSummary {groups} {history} />
   </div>
 </div>
 <DownloadEventHistoryModal

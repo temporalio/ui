@@ -89,7 +89,6 @@
         endPoint={[nextPoint, y]}
         category={group.category}
         classification={group.lastEvent.classification}
-        {active}
         strokeWidth={radius * 2}
         scheduling={index === 0 &&
           group.lastEvent.classification === 'Completed'}
@@ -105,7 +104,6 @@
             : 'pending'
           : group.category}
         classification={group.lastEvent.classification}
-        {active}
         pending
         strokeWidth={radius * 2}
       />
@@ -113,7 +111,6 @@
     {#if showText}
       <Text
         point={textPosition}
-        {active}
         {textAnchor}
         {backdrop}
         backdropHeight={radius * 2}
@@ -125,7 +122,6 @@
     <Dot
       point={[x, y]}
       classification={group.eventList[index]?.classification}
-      {active}
       icon={CategoryIcon[group.category]}
       r={radius}
     />
