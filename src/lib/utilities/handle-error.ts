@@ -38,7 +38,11 @@ export const handleError = (
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(error?.message));
+    toasts.push({
+      variant: 'error',
+      message: 'Forbidden!',
+    });
+    return;
   }
 
   if (isNetworkError(error)) {
@@ -65,7 +69,6 @@ export const handleUnauthorizedOrForbiddenError = (
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(msg));
     return;
   }
 };
