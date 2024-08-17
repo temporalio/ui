@@ -103,7 +103,7 @@
           />
         </div>
       {/if}
-      <div class="flex flex-row flex-wrap justify-between gap-2">
+      <div class="flex flex-col justify-between gap-2 md:flex-row">
         {#if showActions}
           <SearchAttributeFilter
             bind:filters={$scheduleFilters}
