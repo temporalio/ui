@@ -21,10 +21,10 @@
     }
   }
 
-  let options = [
+  $: options = [
     { value: '=', label: translate('common.equal-to') },
     { value: '!=', label: translate('common.not-equal-to') },
-    ...($prefixSearchEnabled
+    ...($prefixSearchEnabled && $filter.type === 'Keyword'
       ? [{ value: 'STARTS_WITH', label: translate('common.starts-with') }]
       : []),
   ];
