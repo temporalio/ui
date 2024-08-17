@@ -1,13 +1,13 @@
 <script lang="ts">
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Badge from '$lib/holocene/badge.svelte';
+  import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import {
     customSearchAttributes,
     isCustomSearchAttribute,
     workflowIncludesSearchAttribute,
   } from '$lib/stores/search-attributes';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
   import { formatDate } from '$lib/utilities/format-date';
@@ -15,7 +15,7 @@
 
   import FilterableTableCell from './filterable-table-cell.svelte';
 
-  export let column: WorkflowHeader;
+  export let column: ConfigurableTableHeader;
   export let workflow: WorkflowExecution;
 
   $: ({ label } = column);
@@ -127,7 +127,7 @@
 
 <style lang="postcss">
   .workflows-summary-table-body-cell {
-    @apply h-10 whitespace-nowrap px-2 text-sm;
+    @apply h-10 whitespace-nowrap;
 
     &.filterable {
       @apply relative pr-24;

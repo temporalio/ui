@@ -64,7 +64,9 @@
             class="m-0 py-0.5"
             data-testid="workflows-summary-table-configuration-button"
           >
-            {translate('workflows.configure-workflows')}
+            {translate('workflows.configure-headers', {
+              title: translate('common.workflows', { count: 2 }),
+            })}
           </MenuItem>
           <MenuItem
             on:click={() => exportWorkflows($workflows)}

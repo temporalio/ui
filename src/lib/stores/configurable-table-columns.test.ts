@@ -8,13 +8,14 @@ import {
   persistedWorkflowTableColumns,
   pinColumn,
   removeColumn,
-} from './workflow-table-columns';
+  TABLE_TYPE,
+} from './configurable-table-columns';
 
 describe('Workflow Table Columns store', () => {
   describe('addColumn', () => {
     test('moves a column from the availableColumns array to the columns array', () => {
       persistedWorkflowTableColumns.set({ default: [] });
-      addColumn('Workflow ID', 'default');
+      addColumn('Workflow ID', 'default', TABLE_TYPE.WORKFLOWS);
       expect(get(persistedWorkflowTableColumns)).toEqual({
         default: [{ label: 'Workflow ID', pinned: false }],
       });
@@ -26,7 +27,7 @@ describe('Workflow Table Columns store', () => {
       persistedWorkflowTableColumns.set({
         default: [{ label: 'Workflow ID', pinned: true }],
       });
-      removeColumn('Workflow ID', 'default');
+      removeColumn('Workflow ID', 'default', TABLE_TYPE.WORKFLOWS);
       expect(get(persistedWorkflowTableColumns)).toEqual({ default: [] });
     });
   });
@@ -39,7 +40,7 @@ describe('Workflow Table Columns store', () => {
           { label: 'Start', pinned: false },
         ],
       });
-      moveColumn(1, 0, 'default');
+      moveColumn(1, 0, 'default', TABLE_TYPE.WORKFLOWS);
       expect(get(persistedWorkflowTableColumns)).toEqual({
         default: [
           { label: 'Start', pinned: true },
@@ -55,7 +56,7 @@ describe('Workflow Table Columns store', () => {
           { label: 'Start', pinned: false },
         ],
       });
-      moveColumn(0, 1, 'default');
+      moveColumn(0, 1, 'default', TABLE_TYPE.WORKFLOWS);
       expect(get(persistedWorkflowTableColumns)).toEqual({
         default: [
           { label: 'Start', pinned: false },
@@ -71,7 +72,7 @@ describe('Workflow Table Columns store', () => {
           { label: 'Start', pinned: true },
         ],
       });
-      moveColumn(1, 0, 'default');
+      moveColumn(1, 0, 'default', TABLE_TYPE.WORKFLOWS);
       expect(get(persistedWorkflowTableColumns)).toEqual({
         default: [
           { label: 'Start', pinned: true },
@@ -87,7 +88,7 @@ describe('Workflow Table Columns store', () => {
           { label: 'Start', pinned: true },
         ],
       });
-      moveColumn(0, 1, 'default');
+      moveColumn(0, 1, 'default', TABLE_TYPE.WORKFLOWS);
       expect(get(persistedWorkflowTableColumns)).toEqual({
         default: [
           { label: 'Start', pinned: true },
@@ -106,7 +107,7 @@ describe('Workflow Table Columns store', () => {
           { label: 'History Length', pinned: false },
         ],
       });
-      moveColumn(4, 0, 'default');
+      moveColumn(4, 0, 'default', TABLE_TYPE.WORKFLOWS);
       expect(get(persistedWorkflowTableColumns)).toEqual({
         default: [
           { label: 'History Length', pinned: true },
@@ -128,7 +129,7 @@ describe('Workflow Table Columns store', () => {
           { label: 'History Length', pinned: false },
         ],
       });
-      moveColumn(0, 4, 'default');
+      moveColumn(0, 4, 'default', TABLE_TYPE.WORKFLOWS);
       expect(get(persistedWorkflowTableColumns)).toEqual({
         default: [
           { label: 'End', pinned: true },
@@ -150,7 +151,7 @@ describe('Workflow Table Columns store', () => {
           { label: 'Run ID', pinned: false },
         ],
       });
-      pinColumn('End', 'default');
+      pinColumn('End', 'default', TABLE_TYPE.WORKFLOWS);
       expect(get(persistedWorkflowTableColumns)).toEqual({
         default: [
           { label: 'Start', pinned: true },
@@ -168,7 +169,7 @@ describe('Workflow Table Columns store', () => {
           { label: 'End', pinned: false },
         ],
       });
-      pinColumn('End', 'default');
+      pinColumn('End', 'default', TABLE_TYPE.WORKFLOWS);
       expect(get(persistedWorkflowTableColumns)).toEqual({
         default: [
           { label: 'Start', pinned: true },
@@ -186,7 +187,7 @@ describe('Workflow Table Columns store', () => {
           { label: 'End', pinned: true },
         ],
       });
-      pinColumn('Start', 'default');
+      pinColumn('Start', 'default', TABLE_TYPE.WORKFLOWS);
       expect(get(persistedWorkflowTableColumns)).toEqual({
         default: [
           { label: 'Run ID', pinned: true },

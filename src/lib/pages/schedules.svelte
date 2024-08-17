@@ -7,12 +7,18 @@
   import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
   import SearchAttributeFilter from '$lib/components/search-attribute-filter/index.svelte';
+  import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
+  import {
+    availableScheduleColumns,
+    configurableTableColumns,
+    TABLE_TYPE,
+  } from '$lib/stores/configurable-table-columns';
   import { coreUserStore } from '$lib/stores/core-user';
   import { scheduleFilters } from '$lib/stores/filters';
   import { schedulesCount } from '$lib/stores/schedules';
@@ -24,10 +30,16 @@
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  $: namespace = $page.params.namespace;
-
   let refresh = Date.now();
   let coreUser = coreUserStore();
+  let customizationDrawerOpen = false;
+
+  const openCustomizationDrawer = () => {
+    customizationDrawerOpen = true;
+  };
+
+  $: namespace = $page.params.namespace;
+  $: columns = $configurableTableColumns?.[namespace]?.schedules ?? [];
   $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
   $: searchAttributeOptions = Object.entries($customSearchAttributes).map(
     ([key, value]) => {
@@ -40,6 +52,7 @@
   );
   $: query = $page.url.searchParams.get('query');
   $: onFetch = () => fetchPaginatedSchedules(namespace, query);
+  $: availableColumns = availableScheduleColumns(namespace);
 
   onMount(() => {
     if (query) {
@@ -79,8 +92,13 @@
               refresh = Date.now();
             }}
           />
+          <Button
+            leadingIcon="settings"
+            variant="secondary"
+            on:click={openCustomizationDrawer}
+          />
         {/if}
-        {#if !createDisabled && visibleItems.length}
+        {#if !createDisabled && (visibleItems.length || query)}
           <Button
             data-testid="create-schedule"
             href={routeForScheduleCreate({ namespace })}
@@ -93,15 +111,12 @@
     </div>
 
     <tr slot="headers" class="text-left">
-      <th>{translate('common.status')}</th>
-      <th>{translate('schedules.name')}</th>
-      <th>{translate('common.workflow-type')}</th>
-      <th>{translate('schedules.recent-runs')}</th>
-      <th>{translate('schedules.upcoming-runs')}</th>
-      <th>{translate('schedules.schedule-spec')}</th>
+      {#each columns as { label }}
+        <th>{label}</th>
+      {/each}
     </tr>
     {#each visibleItems as schedule}
-      <SchedulesTableRow {schedule} />
+      <SchedulesTableRow {schedule} {columns} />
     {/each}
 
     <svelte:fragment slot="empty">
@@ -136,3 +151,11 @@
     </svelte:fragment>
   </PaginatedTable>
 {/key}
+
+<ConfigurableTableHeadersDrawer
+  {availableColumns}
+  bind:open={customizationDrawerOpen}
+  table={TABLE_TYPE.SCHEDULES}
+  type={translate('schedules.schedule')}
+  title={translate('common.schedules')}
+/>

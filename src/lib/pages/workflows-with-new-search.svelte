@@ -35,19 +35,17 @@
   import BatchTerminateConfirmationModal from '$lib/components/workflow/client-actions/batch-terminate-confirmation-modal.svelte';
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
+  import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import WorkflowSearchAttributeFilter from '$lib/components/workflow/search-attribute-filter/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
-  import WorkflowColumnsOrderableList from '$lib/components/workflow/workflows-summary-configurable-table/orderable-list.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import DrawerContent from '$lib/holocene/drawer-content.svelte';
-  import Drawer from '$lib/holocene/drawer.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { groupByCountEnabled } from '$lib/stores/capability-enablement';
+  import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
@@ -69,6 +67,11 @@
   // For returning to page from 'Back to Workflows' with previous search
   $: searchParams = $page.url.searchParams.toString();
   $: searchParams, ($workflowsSearchParams = searchParams);
+
+  $: availableColumns = availableWorkflowSystemSearchAttributeColumns(
+    namespace,
+    $page.data.settings,
+  );
 
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
@@ -164,10 +167,6 @@
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
-
-  const closeCustomizationDrawer = () => {
-    customizationDrawerOpen = false;
-  };
 </script>
 
 <BatchTerminateConfirmationModal
@@ -232,24 +231,9 @@
   <slot name="cloud" slot="cloud" />
 </WorkflowsSummaryConfigurableTable>
 
-<Drawer
-  open={customizationDrawerOpen}
-  onClick={closeCustomizationDrawer}
-  position="right"
-  id="workflows-summary-table-configuration-drawer"
-  dark={false}
-  closeButtonLabel={translate('workflows.close-configure-workflows')}
-  class="w-[35vw] min-w-min max-w-fit"
->
-  <DrawerContent title={translate('workflows.configure-workflows')}>
-    <svelte:fragment slot="subtitle">
-      Add (<Icon class="inline" name="add" />), re-arrange (<Icon
-        class="inline"
-        name="chevron-selector-vertical"
-      />), and remove (<Icon class="inline" name="hyphen" />), Workflow Headings
-      to personalize the Workflow List Table.
-    </svelte:fragment>
-
-    <WorkflowColumnsOrderableList {namespace} />
-  </DrawerContent>
-</Drawer>
+<ConfigurableTableHeadersDrawer
+  {availableColumns}
+  bind:open={customizationDrawerOpen}
+  type={translate('common.workflows', { count: 1 })}
+  title={translate('common.workflows', { count: 2 })}
+/>
