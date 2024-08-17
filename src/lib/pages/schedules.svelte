@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { noop } from 'svelte/internal';
+
   import { onMount } from 'svelte';
 
   import { goto } from '$app/navigation';
@@ -10,6 +12,7 @@
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -33,6 +36,7 @@
   let refresh = Date.now();
   let coreUser = coreUserStore();
   let customizationDrawerOpen = false;
+  let search = '';
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
@@ -79,12 +83,28 @@
     >
 
     <div class="flex flex-col gap-4" slot="header" let:visibleItems>
+      {@const showActions = visibleItems.length || query}
       <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
         <SchedulesCount />
       </h1>
-
+      {#if showActions}
+        <div class="w-96">
+          <Input
+            icon="search"
+            type="search"
+            label={translate('schedules.name')}
+            labelHidden
+            id="schedule-name-filter"
+            placeholder={translate('schedules.name')}
+            clearable
+            clearButtonLabel={translate('common.clear-input-button-label')}
+            bind:value={search}
+            on:submit={noop}
+          />
+        </div>
+      {/if}
       <div class="flex flex-row flex-wrap justify-between gap-2">
-        {#if visibleItems.length || query}
+        {#if showActions}
           <SearchAttributeFilter
             bind:filters={$scheduleFilters}
             options={searchAttributeOptions}
@@ -97,15 +117,15 @@
             variant="secondary"
             on:click={openCustomizationDrawer}
           />
-        {/if}
-        {#if !createDisabled && (visibleItems.length || query)}
-          <Button
-            data-testid="create-schedule"
-            href={routeForScheduleCreate({ namespace })}
-            disabled={!writeActionsAreAllowed()}
-          >
-            {translate('schedules.create')}
-          </Button>
+          {#if !createDisabled}
+            <Button
+              data-testid="create-schedule"
+              href={routeForScheduleCreate({ namespace })}
+              disabled={!writeActionsAreAllowed()}
+            >
+              {translate('schedules.create')}
+            </Button>
+          {/if}
         {/if}
       </div>
     </div>
@@ -115,17 +135,26 @@
         <th>{label}</th>
       {/each}
     </tr>
-    {#each visibleItems as schedule}
+    {@const filteredItems = search
+      ? visibleItems.filter((schedule) =>
+          schedule.scheduleId.toLowerCase().includes(search.toLowerCase()),
+        )
+      : visibleItems}
+    {#each filteredItems as schedule}
       <SchedulesTableRow {schedule} {columns} />
+    {:else}
+      <tr>
+        <td colspan={columns.length}>
+          <EmptyState
+            title={translate('schedules.empty-state-title')}
+            content={translate('schedules.empty-state-description')}
+          />
+        </td>
+      </tr>
     {/each}
 
     <svelte:fragment slot="empty">
-      {#if query}
-        <EmptyState
-          title={translate('schedules.empty-state-title')}
-          content={translate('schedules.empty-state-description')}
-        />
-      {:else}
+      {#if !query}
         <EmptyState title={translate('schedules.empty-state-title')}>
           <p>
             {translate('schedules.getting-started-docs-link-preface')}
