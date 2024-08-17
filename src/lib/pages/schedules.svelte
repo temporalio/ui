@@ -143,18 +143,25 @@
     {#each filteredItems as schedule}
       <SchedulesTableRow {schedule} {columns} />
     {:else}
-      <tr>
-        <td colspan={columns.length}>
-          <EmptyState
-            title={translate('schedules.empty-state-title')}
-            content={translate('schedules.empty-state-description')}
-          />
-        </td>
-      </tr>
+      {#if visibleItems.length}
+        <tr>
+          <td colspan={columns.length}>
+            <EmptyState
+              title={translate('schedules.empty-state-title')}
+              content={translate('schedules.empty-state-description')}
+            />
+          </td>
+        </tr>
+      {/if}
     {/each}
 
     <svelte:fragment slot="empty">
-      {#if !query}
+      {#if query}
+        <EmptyState
+          title={translate('schedules.empty-state-title')}
+          content={translate('schedules.empty-state-description')}
+        />
+      {:else}
         <EmptyState title={translate('schedules.empty-state-title')}>
           <p>
             {translate('schedules.getting-started-docs-link-preface')}
