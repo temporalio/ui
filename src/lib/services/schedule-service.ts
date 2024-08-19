@@ -34,6 +34,7 @@ type PaginatedSchedulesPromise = (
 export const fetchPaginatedSchedules = async (
   namespace: string,
   query: string,
+  onError: ErrorCallback,
   request = fetch,
 ): Promise<PaginatedSchedulesPromise> => {
   return (pageSize = 100, token = '') => {
@@ -45,6 +46,7 @@ export const fetchPaginatedSchedules = async (
         ...(query ? { query } : {}),
       },
       request,
+      onError,
     }).then(({ schedules, nextPageToken }) => {
       return {
         items: schedules,

@@ -10,6 +10,7 @@
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
   import SearchAttributeFilter from '$lib/components/search-attribute-filter/index.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -30,6 +31,7 @@
     searchAttributes,
   } from '$lib/stores/search-attributes';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import type { APIErrorResponse } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
@@ -37,6 +39,7 @@
   let coreUser = coreUserStore();
   let customizationDrawerOpen = false;
   let search = '';
+  let error = '';
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
@@ -55,7 +58,10 @@
     },
   );
   $: query = $page.url.searchParams.get('query');
-  $: onFetch = () => fetchPaginatedSchedules(namespace, query);
+  $: onFetch = () => {
+    error = '';
+    return fetchPaginatedSchedules(namespace, query, onError);
+  };
   $: availableColumns = availableScheduleColumns(namespace);
 
   onMount(() => {
@@ -64,12 +70,17 @@
       $scheduleFilters = toListWorkflowFilters(query, $searchAttributes);
     }
   });
+
+  const onError = (err: APIErrorResponse) => {
+    error = err?.body?.message || translate('schedules.error-message-fetching');
+  };
 </script>
 
 {#key [namespace, query, refresh]}
   <PaginatedTable
     let:visibleItems
     {onFetch}
+    {onError}
     total={$schedulesCount}
     aria-label={translate('common.schedules')}
     pageSizeSelectLabel={translate('common.per-page')}
@@ -156,7 +167,13 @@
     {/each}
 
     <svelte:fragment slot="empty">
-      {#if query}
+      {#if error}
+        <EmptyState title={translate('schedules.empty-state-title')}>
+          <Alert intent="warning" icon="warning" class="mx-12">
+            {error}
+          </Alert>
+        </EmptyState>
+      {:else if query}
         <EmptyState
           title={translate('schedules.empty-state-title')}
           content={translate('schedules.empty-state-description')}
