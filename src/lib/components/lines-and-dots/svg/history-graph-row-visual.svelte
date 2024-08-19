@@ -29,7 +29,7 @@
   const { height, radius } = HistoryConfig;
   const strokeWidth = radius / 2;
 
-  $: y = index * height + height / 3;
+  $: y = index * height + radius * 1.5;
   $: ({ nextDistance, offset } = getNextDistanceAndOffset(
     history,
     event,

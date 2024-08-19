@@ -18,6 +18,7 @@
 
   type Item = $$Generic;
 
+  export let variant: 'primary' | 'ghost' = 'primary';
   export let items: Item[];
   export let updating = false;
   export let perPageLabel: string;
@@ -86,13 +87,15 @@
     if (perPageParam) store.adjustPageSize(perPageParam);
   }
 
-  $: tableOffset = tableContainer?.offsetTop
-    ? tableContainer?.offsetTop + 32
-    : 0;
+  // $: tableOffset = tableContainer?.offsetTop
+  //   ? tableContainer?.offsetTop + 32
+  //   : 0;
+
+  $: tableOffset = 0;
 </script>
 
 <div
-  class="paginated-table-wrapper"
+  class="paginated-table-wrapper {variant}"
   bind:this={tableContainer}
   style="max-height: calc(100vh - {tableOffset}px)"
 >
@@ -105,6 +108,7 @@
       {/if}
     </thead>
     <tbody class="paginated-table-body">
+      <slot name="visual" />
       <slot visibleItems={$store.items} />
     </tbody>
   </table>
@@ -159,7 +163,15 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply min-h-[154px] overflow-auto rounded-lg border-2 border-table;
+    @apply min-h-[154px] overflow-auto;
+  }
+
+  .primary {
+    @apply border-2 border-table;
+  }
+
+  .ghost {
+    @apply border-t-2 border-subtle;
   }
 
   .paginated-table {
@@ -173,16 +185,28 @@
       @apply surface-table h-10 text-off-white;
     }
 
+    :global(tr.dense) {
+      @apply h-8;
+    }
+
     :global(tr > th) {
       @apply first-of-type:rounded-tl last-of-type:rounded-tr;
     }
   }
 
   .paginated-table-body {
-    @apply surface-primary;
+    @apply surface-primary flex gap-0;
 
     :global(tr:not(.empty)) {
       @apply h-12 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+    }
+
+    :global(tr.dense) {
+      @apply h-8 hover:cursor-pointer;
+    }
+
+    :global(tr.dense:nth-of-type(odd)) {
+      @apply surface-interactive-ghost;
     }
 
     :global(tr > td > .table-link) {

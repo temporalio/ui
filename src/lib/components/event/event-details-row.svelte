@@ -6,7 +6,6 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { Payloads } from '$lib/types';
-  import { format } from '$lib/utilities/format-camel-case';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
     shouldDisplayAsExecutionLink,
@@ -35,9 +34,6 @@
     <div
       class="flex w-full items-center justify-between gap-2 pr-1 xl:flex-nowrap"
     >
-      <p class="min-w-fit text-sm">
-        {format(key)}
-      </p>
       <PayloadDecoder {value} key="payloads" let:decodedValue>
         <CodeBlock
           content={decodedValue}
@@ -50,7 +46,6 @@
     </div>
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="flex w-full items-center gap-2 pr-1">
-      <p class="truncate text-sm">{format(key)}</p>
       <div class="truncate text-sm">
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
@@ -73,7 +68,6 @@
     </div>
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
     <div class="flex w-full items-center gap-2 pr-1">
-      <p class="truncate text-sm">{format(key)}</p>
       <div class="truncate text-sm">
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
@@ -96,7 +90,6 @@
     </div>
   {:else if shouldDisplayAsTaskQueueLink(key)}
     <div class="flex w-full items-center gap-2 pr-1">
-      <p class="truncate text-sm">{format(key)}</p>
       <div class="truncate text-sm">
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
@@ -114,7 +107,6 @@
     </div>
   {:else}
     <div class="flex w-full items-center gap-2 pr-1">
-      <p class="truncate text-sm">{format(key)}</p>
       <p class="truncate text-right text-sm xl:text-left">
         <span
           class="w-full select-all text-slate-700"

@@ -60,7 +60,7 @@
     .reduce((acc, height) => acc + height, 0);
 
   $: canvasHeight = visibleHistory.length * height + activeDetailsHeight;
-  $: visualWidth = canvasWidth - 2 * radius;
+  $: visualWidth = canvasWidth - 1.5 * radius;
   // $: isWide = canvasWidth >= 960;
 </script>
 

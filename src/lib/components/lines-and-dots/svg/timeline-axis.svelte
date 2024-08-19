@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { timeFormat } from '$lib/stores/time-format';
   import type { Timestamp } from '$lib/types';
-  import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { TimelineConfig } from '../constants';
@@ -12,10 +10,9 @@
   export let x2 = 1000;
   export let timelineHeight = 1000;
   export let startTime: string | Timestamp;
-  export let endTime: string | Date;
   export let duration: number;
 
-  const { radius, height } = TimelineConfig;
+  const { radius } = TimelineConfig;
   const ticks = 20;
 
   $: distance = x2 - x1;
@@ -37,17 +34,7 @@
       endPoint={[tickX, timelineHeight]}
     />
   {/if}
-  {#if i === 0}
-    <text
-      fill="#fff"
-      font-size="12"
-      transform="rotate(90, 0, 0)"
-      x={height + radius}
-      y={-0.75 * height}
-    >
-      <tspan>{formatDate(startTime, $timeFormat)}</tspan>
-    </text>
-  {:else}
+  {#if i !== 0}
     <text
       fill="#fff"
       font-size="12"
@@ -65,15 +52,6 @@
     </text>
   {/if}
 {/each}
-<text
-  fill="#fff"
-  font-size="12"
-  transform="rotate(90, {x2 - 4}, 0)"
-  x={x2 + height + radius}
-  y={-radius}
->
-  <tspan>{formatDate(endTime, $timeFormat)}</tspan>
-</text>
 
 <style lang="postcss">
   text {

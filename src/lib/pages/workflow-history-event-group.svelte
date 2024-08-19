@@ -2,7 +2,6 @@
   import { page } from '$app/stores';
 
   import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
-  import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -74,32 +73,33 @@
   $: workflowLink = getLink(eventGroup);
 </script>
 
-{#if eventGroup}
-  <h2 class="flex w-full items-center">
-    {#if workflowLink}
-      <Link href={workflowLink}>
+<div class="px-8">
+  {#if eventGroup}
+    <h2 class="flex w-full items-center">
+      {#if workflowLink}
+        <Link href={workflowLink}>
+          {eventGroup.displayName}
+        </Link>
+      {:else}
         {eventGroup.displayName}
-      </Link>
+      {/if}
+    </h2>
+  {/if}
+  <EventSummaryTable {updating}>
+    {#each events as event (`${event.id}-${event.timestamp}`)}
+      <EventSummaryRow
+        {event}
+        {compact}
+        expandAll={true}
+        {initialItem}
+        active={true}
+      />
     {:else}
-      {eventGroup.displayName}
-    {/if}
-  </h2>
-{/if}
-<EventHistoryTimeline history={$fullEventHistory} maxHeight={240} />
-<EventSummaryTable {updating}>
-  {#each events as event (`${event.id}-${event.timestamp}`)}
-    <EventSummaryRow
-      {event}
-      {compact}
-      expandAll={true}
-      {initialItem}
-      active={true}
-    />
-  {:else}
-    <EventEmptyRow
-      {loading}
-      title={translate('events.group-empty-state-title')}
-      content=""
-    />
-  {/each}
-</EventSummaryTable>
+      <EventEmptyRow
+        {loading}
+        title={translate('events.group-empty-state-title')}
+        content=""
+      />
+    {/each}
+  </EventSummaryTable>
+</div>

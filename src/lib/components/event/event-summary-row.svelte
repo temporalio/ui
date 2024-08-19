@@ -2,8 +2,6 @@
   import { noop } from 'svelte/internal';
   import { fade } from 'svelte/transition';
 
-  import { onMount } from 'svelte';
-
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -23,6 +21,8 @@
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
+
+  import { CategoryIcon } from '../lines-and-dots/constants';
 
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
@@ -79,15 +79,13 @@
   const canceled = eventOrGroupIsCanceled(event);
   const terminated = eventOrGroupIsTerminated(event);
 
-  onMount(() => {
-    if ($page.url.hash === `#${event.id}`) {
-      expanded = true;
-    }
-  });
+  $: icon = isLocalActivityMarkerEvent(event)
+    ? CategoryIcon['local-activity']
+    : CategoryIcon[event.category];
 </script>
 
 <tr
-  class="row"
+  class="row dense"
   id={event.id}
   class:expanded={expanded && !expandAll}
   class:active
@@ -98,14 +96,47 @@
   data-testid="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td />
-  <td class="w-24 text-left">
+  <td class="px-1 text-left">
     <Link class="truncate" data-testid="link" {href}>
       {event.id}
     </Link>
   </td>
-  <td class="text-left">
-    <div class="flex flex-col gap-0">
+  <td class="text-right text-sm font-normal xl:text-left">
+    <div class="flex">
+      <div>
+        {#if compact && failure}
+          <Icon class="mr-1.5 inline text-red-700" name="clock" />
+        {/if}
+        {#if compact && canceled}
+          <Icon class="mr-1.5 inline text-yellow-700" name="clock" />
+        {/if}
+        {#if compact && terminated}
+          <Icon class="mr-1.5 inline text-pink-700" name="clock" />
+        {/if}
+      </div>
+      <div class="flex w-full items-center gap-2">
+        <Icon name={icon} />
+        <p class="event-name truncate text-sm font-semibold md:text-base">
+          {isEventGroup(event)
+            ? event.displayName
+            : isLocalActivityMarkerEvent(event)
+            ? 'LocalActivity'
+            : event.name}
+        </p>
+        <div class="grow truncate">
+          <EventDetailsRow
+            {...getSingleAttributeForEvent(
+              isEventGroup(event) ? event.initialEvent : event,
+            )}
+            {attributes}
+            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
+          />
+        </div>
+      </div>
+    </div>
+  </td>
+  <td class="overflow-hidden px-1">
+    <div class="flex flex-col gap-0 text-right">
       {#if showElapsedTimeDiff}
         <p class="truncate text-sm">
           {#if elapsedTime}
@@ -129,62 +160,10 @@
       {/if}
     </div>
   </td>
-  <td
-    colspan={expanded ? 2 : 1}
-    class="text-right text-sm font-normal xl:text-left"
-  >
-    <div class="flex">
-      <div>
-        {#if compact && failure}
-          <Icon class="mr-1.5 inline text-red-700" name="clock" />
-        {/if}
-        {#if compact && canceled}
-          <Icon class="mr-1.5 inline text-yellow-700" name="clock" />
-        {/if}
-        {#if compact && terminated}
-          <Icon class="mr-1.5 inline text-pink-700" name="clock" />
-        {/if}
-      </div>
-      <div class="flex w-full items-center justify-between truncate">
-        <p class="event-name truncate text-sm font-semibold md:text-base">
-          {isEventGroup(event)
-            ? event.displayName
-            : isLocalActivityMarkerEvent(event)
-            ? 'LocalActivity'
-            : event.name}
-        </p>
-        {#if expanded}
-          <div>
-            <Icon class="inline" name="chevron-up" />
-          </div>
-        {/if}
-      </div>
-    </div>
-  </td>
-  {#if !expanded}
-    <td class="overflow-hidden">
-      <div class="flex w-full items-center justify-between">
-        <div class="grow truncate">
-          <EventDetailsRow
-            {...getSingleAttributeForEvent(
-              isEventGroup(event) ? event.initialEvent : event,
-            )}
-            {attributes}
-            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-          />
-        </div>
-        <div>
-          <Icon class="inline" name="chevron-down" />
-        </div>
-      </div>
-    </td>
-  {/if}
-
-  <td />
 </tr>
 {#if expanded}
   <tr in:fade|local class:typedError>
-    <td class="expanded-cell" colspan="6">
+    <td class="expanded-cell" colspan="3">
       <EventDetailsFull {event} {currentEvent} {compact} bind:selectedId />
     </td>
   </tr>
@@ -192,19 +171,11 @@
 
 <style lang="postcss">
   .row {
-    @apply max-h-[35px] select-none flex-wrap items-center text-sm no-underline xl:py-3 xl:text-base;
-  }
-
-  .row:hover {
-    @apply cursor-pointer bg-interactive-table-hover dark:bg-none;
-  }
-
-  .expanded.row {
-    @apply bg-interactive-table-hover;
+    @apply select-none flex-wrap items-center text-sm no-underline xl:py-3 xl:text-base;
   }
 
   .failure {
-    @apply bg-danger;
+    @apply border-2 border-danger;
   }
 
   .failure .event-name {
@@ -212,7 +183,7 @@
   }
 
   .canceled {
-    @apply bg-warning;
+    @apply border-2 border-warning;
   }
 
   .canceled .event-name {
@@ -220,15 +191,15 @@
   }
 
   .terminated {
-    @apply bg-pink-50 dark:bg-pink-700;
+    @apply border-2 border-pink-50 dark:border-pink-700;
   }
 
   .terminated .event-name {
-    @apply text-pink-700 dark:text-pink-50;
+    @apply border-2 border-pink-700 dark:border-pink-50;
   }
 
   .expanded-cell {
-    @apply w-full flex-wrap text-sm no-underline xl:text-base;
+    @apply w-full flex-wrap px-4 text-sm no-underline xl:text-base;
   }
 
   .typedError .expanded-cell {
@@ -241,24 +212,5 @@
     &.expanded {
       @apply rounded-b-none;
     }
-  }
-
-  .active {
-    @apply cursor-pointer bg-interactive-table-hover bg-fixed dark:bg-none;
-  }
-
-  .canceled:hover,
-  .active.canceled {
-    @apply bg-yellow-200 bg-fixed dark:bg-yellow-600 dark:bg-none;
-  }
-
-  .failure:hover,
-  .active.failure {
-    @apply bg-red-200 bg-fixed dark:bg-red-900 dark:bg-none;
-  }
-
-  .terminated:hover,
-  .active.terminated {
-    @apply bg-pink-200 bg-fixed dark:bg-pink-500 dark:bg-none;
   }
 </style>

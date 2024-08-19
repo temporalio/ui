@@ -32,7 +32,7 @@
   $: stackTrace = getStackTrace(codeBlockValue);
 </script>
 
-<div class="row {$$props.class}">
+<div class="flex {$$props.class}">
   {#if typeof value === 'object'}
     <div
       class="content code-block-row"
@@ -166,10 +166,6 @@
 </div>
 
 <style lang="postcss">
-  .row {
-    @apply flex px-4 first:pt-0;
-  }
-
   .content {
     @apply block w-full border-b-2 border-slate-200 py-2 text-left;
   }
@@ -184,10 +180,6 @@
 
   .detail-row {
     @apply flex w-full items-center gap-4 py-2 text-left xl:flex;
-  }
-
-  .row:last-of-type .content {
-    @apply border-b-0;
   }
 
   .badge {

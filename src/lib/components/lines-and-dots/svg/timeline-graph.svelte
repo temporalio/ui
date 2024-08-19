@@ -4,8 +4,10 @@
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
+  import { timeFormat } from '$lib/stores/time-format';
   import type { WorkflowTaskFailedEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { formatDate } from '$lib/utilities/format-date';
 
   import {
     activeGroupsHeightAboveGroup,
@@ -33,7 +35,7 @@
   const { height, gutter, radius } = TimelineConfig;
 
   let canvasWidth = 0;
-  let viewportHeight = 40;
+  let viewportHeight = 400;
   let scrollY = 0;
 
   $: startTime = $fullEventHistory[0]?.eventTime || workflow.startTime;
@@ -50,10 +52,10 @@
   $: canvasHeight = timelineHeight + 140;
 
   const onExpandCollapse = () => {
-    if (viewportHeight === 40) {
-      viewportHeight = 80;
+    if (viewportHeight === 400) {
+      viewportHeight = 800;
     } else {
-      viewportHeight = 40;
+      viewportHeight = 400;
     }
   };
 
@@ -63,31 +65,44 @@
 </script>
 
 <div
-  class="border-subtle] relative h-auto overflow-auto rounded-xl border-4"
+  class="relative h-auto overflow-auto border-b-2 border-subtle"
   bind:clientWidth={canvasWidth}
-  style="max-height: {viewportHeight}vh;"
+  style="max-height: {viewportHeight}px;"
   on:scroll={handleScroll}
 >
-  <Button
-    size="xs"
-    variant="ghost"
-    class="sticky left-0.5 top-1"
-    on:click={onExpandCollapse}
-  >
-    <Icon
-      name={viewportHeight === 40 ? 'chevron-down' : 'chevron-up'}
-      x={canvasWidth - 2 * radius}
-      y={radius}
-    />
-  </Button>
   <EndTimeInterval {workflow} {startTime} let:endTime let:duration>
+    <Button
+      size="xs"
+      variant="ghost"
+      class="sticky left-0.5 top-1"
+      on:click={onExpandCollapse}
+    >
+      <Icon
+        name={viewportHeight === 400 ? 'chevron-down' : 'chevron-up'}
+        x={canvasWidth - 2 * radius}
+        y={radius}
+      />
+    </Button>
+    <div
+      class="sticky {viewportHeight === 400 ? 'top-[300px]' : 'top-[700px]'}"
+      class:invisible={!!activeGroups.length}
+    >
+      <div class="flex w-full justify-between text-xs">
+        <p class="w-60 -translate-x-24 rotate-90">
+          {formatDate(startTime, $timeFormat)}
+        </p>
+        <p class="w-60 translate-x-24 rotate-90">
+          {formatDate(endTime, $timeFormat)}
+        </p>
+      </div>
+    </div>
     <svg
       {x}
       {y}
       viewBox="0 0 {canvasWidth} {canvasHeight}"
       height={canvasHeight / zoomLevel}
       width={canvasWidth}
-      class="-mt-8"
+      class="-mt-12"
       class:error={workflowTaskFailedError}
     >
       <Line
@@ -105,7 +120,6 @@
         x2={canvasWidth - gutter + radius / 4}
         {timelineHeight}
         {startTime}
-        {endTime}
         {duration}
       />
       <WorkflowRow {workflow} y={height} length={canvasWidth} />

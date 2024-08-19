@@ -46,16 +46,18 @@
   $: visibleItems = $fullEventHistory.filter((e) => e.id === $page.params.id);
 </script>
 
-<EventSummaryTable {updating} on:expandAll={handleExpandChange}>
-  {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
-    <EventSummaryRow
-      {event}
-      {compact}
-      expandAll={true}
-      {initialItem}
-      active={true}
-    />
-  {:else}
-    <EventEmptyRow {loading} />
-  {/each}
-</EventSummaryTable>
+<div class="px-8">
+  <EventSummaryTable {updating} on:expandAll={handleExpandChange}>
+    {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
+      <EventSummaryRow
+        {event}
+        {compact}
+        expandAll={true}
+        {initialItem}
+        active={true}
+      />
+    {:else}
+      <EventEmptyRow {loading} />
+    {/each}
+  </EventSummaryTable>
+</div>

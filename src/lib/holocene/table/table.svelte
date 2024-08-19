@@ -114,24 +114,6 @@
     }
   }
 
-  table.dense {
-    thead {
-      :global(th) {
-        @apply py-1;
-      }
-
-      :global(td) {
-        @apply py-1;
-      }
-    }
-
-    tbody :global {
-      td {
-        @apply py-1;
-      }
-    }
-  }
-
   table.simple {
     thead :global(td),
     thead :global(th) {

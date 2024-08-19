@@ -79,7 +79,7 @@
     group && group.eventList.find(isChildWorkflowExecutionStartedEvent);
 </script>
 
-<g role="button" tabindex="0" class="relative cursor-pointer">
+<g role="button" tabindex="0" class="relative z-50 cursor-pointer">
   <Box point={[x, y]} {width} height={boxHeight} fill="#465A78" />
   <Box point={[x, y]} {width} {height} fill="#1E293B" />
   <foreignObject {x} {y} {width} height={fontSizeRatio}>
