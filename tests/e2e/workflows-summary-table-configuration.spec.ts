@@ -121,7 +121,7 @@ test.describe('Workflows Table Configuration', () => {
       .click();
 
     await expect(
-      page.locator('#workflows-summary-table-configuration-drawer'),
+      page.locator('#workflows-table-configuration-drawer'),
     ).toBeVisible();
 
     for (let i = 0; i < 3; i++) {
@@ -164,7 +164,7 @@ test.describe('Workflows Table Configuration', () => {
       .click();
 
     await expect(
-      page.locator('#workflows-summary-table-configuration-drawer'),
+      page.locator('#workflows-table-configuration-drawer'),
     ).toBeVisible();
 
     const sourceElement = page.getByTestId('orderable-list-item-Run ID');
