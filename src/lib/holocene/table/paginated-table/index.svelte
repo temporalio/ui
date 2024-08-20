@@ -73,15 +73,27 @@
   }
 
   .paginated-table-body {
-    :global(tr:not(.empty)) {
+    :global(tr.primary) {
       @apply h-12 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
 
     :global(tr.dense) {
-      @apply h-8 hover:cursor-pointer;
+      @apply h-8 hover:cursor-pointer hover:bg-interactive-table-hover hover:bg-fixed;
+    }
+
+    :global(tr.expanded) {
+      @apply w-full hover:bg-primary;
     }
 
     :global(tr.dense:nth-of-type(odd)) {
+      @apply surface-background hover:bg-interactive-table-hover;
+    }
+
+    :global(tr.dense.expanded) {
+      @apply bg-interactive-secondary-active;
+    }
+
+    :global(tr.dense.active) {
       @apply bg-interactive-table-hover;
     }
 
@@ -91,6 +103,12 @@
 
     :global(tr > td > .table-link) {
       @apply hover:text-blue-700 hover:underline hover:decoration-blue-700;
+    }
+  }
+
+  .primary .paginated-table-body {
+    :global(tr:not(.empty)) {
+      @apply h-12 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
   }
 

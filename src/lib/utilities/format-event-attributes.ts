@@ -115,12 +115,13 @@ export const formatAttributes = (
     relative: relativeTime,
   });
 
-  for (const [key, value] of Object.entries(event.attributes)) {
-    const shouldDisplay = shouldDisplayAttribute(key, value);
-    if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
-    formatNestedAttributes(attributes, key);
+  if (event.attributes) {
+    for (const [key, value] of Object.entries(event.attributes)) {
+      const shouldDisplay = shouldDisplayAttribute(key, value);
+      if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
+      formatNestedAttributes(attributes, key);
+    }
   }
-
   return attributes;
 };
 

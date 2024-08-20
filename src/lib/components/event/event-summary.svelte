@@ -33,6 +33,21 @@
         .split(',') as EventTypeCategory[])
     : undefined;
 
+  // $: {
+  //   console.log('Pending Activities: ', workflow.pendingActivities);
+  // }
+  // $: formattedPending = workflow.pendingActivities.map((event) => ({
+  //   ...event,
+  //   id: event.id,
+  //   name: 'Pending Activity',
+  //   startTime: event.lastStartedTime,
+  //   endTime: event.expirationTime,
+  //   attributes: {
+  //     attempt: event.attempt,
+  //     state: event.state,
+  //   },
+  // }));
+
   $: items = compact ? groups : history;
   $: updating = !$fullEventHistory.length;
 
@@ -123,7 +138,7 @@
     </div>
   </div>
   {#if showFilters}
-    <div class="flex flex-col items-center justify-center pb-2">
+    <div class="flex flex-col items-center justify-center px-4 pb-2">
       <EventTypeFilter compact={$eventViewType === 'compact'} />
     </div>
   {/if}

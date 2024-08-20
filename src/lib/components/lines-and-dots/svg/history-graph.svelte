@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  // import Button from '$lib/holocene/button.svelte';
+  // import Icon from '$lib/holocene/icon/icon.svelte';
   import { scrollTop } from '$lib/holocene/main-content-container.svelte';
   import { groupWorkflowTaskEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
@@ -65,43 +65,45 @@
   $: visualWidth = canvasWidth - 1.5 * radius;
 </script>
 
-<Button
+<!-- <Button
   size="xs"
   variant="ghost"
   class="sticky left-0.5 top-1"
-  on:click={() => (canvasWidth = canvasWidth === 200 ? 400 : 200)}
+  on:click={() => (canvasWidth = canvasWidth === 100 ? 400 : 100)}
 >
   <Icon
-    name={canvasWidth === 400 ? 'chevron-left' : 'chevron-right'}
+    name={canvasWidth === 100 ? 'chevron-left' : 'chevron-right'}
     x={canvasWidth - 2 * radius}
     y={radius}
   />
-</Button>
-<svg
-  viewBox="0 0 {canvasWidth} {canvasHeight}"
-  height={canvasHeight}
-  width={canvasWidth}
->
-  <Line
-    startPoint={[visualWidth, height / 2]}
-    endPoint={[visualWidth, canvasHeight]}
-    strokeWidth={6}
-  />
+</Button> -->
+<div class="hidden md:block" style="min-width: {canvasWidth}px">
   <svg
-    viewBox="0 0 {canvasWidth} {canvasHeight * zoomLevel}"
+    viewBox="0 0 {canvasWidth} {canvasHeight}"
     height={canvasHeight}
-    width={canvasWidth / zoomLevel}
+    width={canvasWidth}
   >
-    {#each visibleHistory as event, index (event.id)}
-      <HistoryGraphRowVisual
-        {event}
-        group={allGroups.find((g) => g.eventIds.has(event.id))}
-        groups={allGroups}
-        {history}
-        canvasWidth={visualWidth}
-        {zoomLevel}
-        {index}
-      />
-    {/each}
+    <Line
+      startPoint={[visualWidth, height / 2]}
+      endPoint={[visualWidth, canvasHeight]}
+      strokeWidth={6}
+    />
+    <svg
+      viewBox="0 0 {canvasWidth} {canvasHeight * zoomLevel}"
+      height={canvasHeight}
+      width={canvasWidth / zoomLevel}
+    >
+      {#each visibleHistory as event, index (event.id)}
+        <HistoryGraphRowVisual
+          {event}
+          group={allGroups.find((g) => g.eventIds.has(event.id))}
+          groups={allGroups}
+          {history}
+          canvasWidth={visualWidth}
+          {zoomLevel}
+          {index}
+        />
+      {/each}
+    </svg>
   </svg>
-</svg>
+</div>

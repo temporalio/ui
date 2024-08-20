@@ -32,7 +32,7 @@
 >
   {#if typeof value === 'object'}
     <div
-      class="flex w-full items-center justify-between gap-2 pr-1 xl:flex-nowrap"
+      class="flex w-full max-w-6xl items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
     >
       <PayloadDecoder {value} key="payloads" let:decodedValue>
         <CodeBlock

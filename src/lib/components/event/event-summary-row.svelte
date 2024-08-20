@@ -96,12 +96,14 @@
   data-testid="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td class="w-20 px-1 text-left">
+  <td class="w-12 px-1 text-left">
     <Link class="truncate" data-testid="link" {href}>
       {event.id}
     </Link>
   </td>
-  <td class="w-full text-right text-sm font-normal xl:text-left">
+  <td
+    class="w-full grow overflow-hidden text-right text-sm font-normal xl:text-left"
+  >
     <div class="flex">
       <div>
         {#if compact && failure}
@@ -114,7 +116,7 @@
           <Icon class="mr-1.5 inline text-pink-700" name="clock" />
         {/if}
       </div>
-      <div class="flex w-full items-center gap-2">
+      <div class="flex w-full grow items-center gap-2">
         <Icon name={icon} />
         <p class="event-name truncate text-sm font-semibold md:text-base">
           {isEventGroup(event)
@@ -123,7 +125,7 @@
             ? 'LocalActivity'
             : event.name}
         </p>
-        <div class="grow truncate">
+        <div class="truncate">
           <EventDetailsRow
             {...getSingleAttributeForEvent(
               isEventGroup(event) ? event.initialEvent : event,
@@ -135,7 +137,7 @@
       </div>
     </div>
   </td>
-  <td class="w-full overflow-hidden px-4">
+  <td class="w-60 px-4">
     <div class="flex flex-col gap-0 text-right">
       {#if showElapsedTimeDiff}
         <p class="truncate text-sm">
@@ -162,7 +164,7 @@
   </td>
 </tr>
 {#if expanded}
-  <tr in:fade|local class:typedError>
+  <tr in:fade|local class:typedError class="expanded">
     <td class="expanded-cell" colspan="3">
       <EventDetailsFull {event} {currentEvent} {compact} bind:selectedId />
     </td>
@@ -171,7 +173,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex select-none items-center text-sm no-underline;
+    @apply flex min-w-fit select-none items-center text-sm no-underline;
   }
 
   .failure {
@@ -198,8 +200,12 @@
     @apply border-2 border-pink-700 dark:border-pink-50;
   }
 
+  .expanded {
+    @apply w-full;
+  }
+
   .expanded-cell {
-    @apply flex px-4 text-sm no-underline xl:text-base;
+    @apply flex text-sm no-underline;
   }
 
   .typedError .expanded-cell {
