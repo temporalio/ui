@@ -158,6 +158,7 @@
           disabled={Boolean(scheduleId)}
           on:input={onInput}
           on:blur={onBlur}
+          required
         />
       </div>
       <div class="w-full">
@@ -168,6 +169,7 @@
           error={errors['workflowType']}
           on:input={onInput}
           on:blur={onBlur}
+          required
         />
       </div>
       <div class="w-full">
@@ -178,6 +180,7 @@
           error={errors['workflowId']}
           on:input={onInput}
           on:blur={onBlur}
+          required
         />
       </div>
       <div class="w-full">
@@ -188,6 +191,7 @@
           error={errors['taskQueue']}
           on:input={onInput}
           on:blur={onBlur}
+          required
         />
       </div>
       <ScheduleInputPayload
