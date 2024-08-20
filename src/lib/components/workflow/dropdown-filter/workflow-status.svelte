@@ -15,6 +15,7 @@
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowStatusFilters } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   $: statusFilters = $workflowFilters.filter(
@@ -24,7 +25,7 @@
   function mapStatusToFilter(value: string): SearchAttributeFilter {
     return {
       attribute: 'ExecutionStatus',
-      type: 'Keyword',
+      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
       value,
       conditional: '=',
       operator: '',

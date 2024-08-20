@@ -7,6 +7,7 @@
     SearchAttributeInput,
     SearchAttributeOption,
   } from '$lib/stores/search-attributes';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
   export let attributesToAdd: SearchAttributeInput[] = [];
   export let searchAttributes: SearchAttributeOption[] = [];
@@ -34,7 +35,7 @@
       >
     {/each}
   </Select>
-  {#if type === 'Bool'}
+  {#if type === SEARCH_ATTRIBUTE_TYPE.BOOL}
     <Select
       class="w-full"
       label="Value"
@@ -44,7 +45,7 @@
       <Option value={true}>True</Option>
       <Option value={false}>False</Option>
     </Select>
-  {:else if type === 'Datetime'}
+  {:else if type === SEARCH_ATTRIBUTE_TYPE.DATETIME}
     <Input
       label="Value"
       id="attribute-value"

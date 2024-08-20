@@ -4,6 +4,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
   import { prefixSearchEnabled } from '$lib/stores/capability-enablement';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
   import ConditionalMenu from './conditional-menu.svelte';
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
@@ -24,7 +25,7 @@
   $: options = [
     { value: '=', label: translate('common.equal-to') },
     { value: '!=', label: translate('common.not-equal-to') },
-    ...($prefixSearchEnabled && $filter.type === 'Keyword'
+    ...($prefixSearchEnabled && $filter.type === SEARCH_ATTRIBUTE_TYPE.KEYWORD
       ? [{ value: 'STARTS_WITH', label: translate('common.starts-with') }]
       : []),
   ];

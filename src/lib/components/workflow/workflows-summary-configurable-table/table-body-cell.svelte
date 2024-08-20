@@ -8,7 +8,10 @@
     workflowIncludesSearchAttribute,
   } from '$lib/stores/search-attributes';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import type { WorkflowExecution } from '$lib/types/workflows';
+  import {
+    SEARCH_ATTRIBUTE_TYPE,
+    type WorkflowExecution,
+  } from '$lib/types/workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistance } from '$lib/utilities/format-time';
@@ -112,11 +115,11 @@
         : ''}
     {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
       {@const content = workflow.searchAttributes.indexedFields[label]}
-      {#if $customSearchAttributes[label] === 'Datetime' && typeof content === 'string'}
+      {#if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof content === 'string'}
         {formatDate(content, $timeFormat, {
           relative: $relativeTime,
         })}
-      {:else if $customSearchAttributes[label] === 'Bool'}
+      {:else if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.BOOL}
         <Badge>{content}</Badge>
       {:else}
         {content}

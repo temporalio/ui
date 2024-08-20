@@ -1,11 +1,11 @@
 import type {
   SearchAttributes,
-  SearchAttributesValue,
+  SearchAttributeType,
 } from '$lib/types/workflows';
 
 export type SearchAttributeFilter = {
   attribute: Extract<keyof SearchAttributes, string>;
-  type: SearchAttributesValue;
+  type: SearchAttributeType;
   value: string;
   operator: string;
   parenthesis: string;

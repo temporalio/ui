@@ -2,7 +2,11 @@ import debounce from 'just-debounce';
 
 import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { currentPageKey } from '$lib/stores/pagination';
-import type { FilterParameters, SearchAttributes } from '$lib/types/workflows';
+import {
+  type FilterParameters,
+  SEARCH_ATTRIBUTE_TYPE,
+  type SearchAttributes,
+} from '$lib/types/workflows';
 import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
 
 import { tokenize } from './tokenize';
@@ -35,12 +39,12 @@ export const getLargestDurationUnit = (duration: Duration): Duration => {
   }
 };
 
-const isDatetimeStatement = is('Datetime');
-const isBoolStatement = is('Bool');
+const isDatetimeStatement = is(SEARCH_ATTRIBUTE_TYPE.DATETIME);
+const isBoolStatement = is(SEARCH_ATTRIBUTE_TYPE.BOOL);
 
 export const emptyFilter = (): SearchAttributeFilter => ({
   attribute: '',
-  type: 'Keyword',
+  type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   value: '',
   operator: '',
   parenthesis: '',
@@ -48,12 +52,12 @@ export const emptyFilter = (): SearchAttributeFilter => ({
 });
 
 const DefaultAttributes: SearchAttributes = {
-  ExecutionStatus: 'Keyword',
-  StartTime: 'Datetime',
-  CloseTime: 'Datetime',
-  WorkflowId: 'Keyword',
-  WorkflowType: 'Keyword',
-  RunId: 'Keyword',
+  ExecutionStatus: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  StartTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+  CloseTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+  WorkflowId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  WorkflowType: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  RunId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
 };
 
 export const toListWorkflowFilters = (

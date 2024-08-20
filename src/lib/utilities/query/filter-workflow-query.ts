@@ -2,9 +2,10 @@ import { get } from 'svelte/store';
 
 import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-import type {
-  SearchAttributes,
-  SearchAttributesValue,
+import {
+  SEARCH_ATTRIBUTE_TYPE,
+  type SearchAttributes,
+  type SearchAttributeType,
 } from '$lib/types/workflows';
 
 import { isStartsWith } from '../is';
@@ -41,9 +42,9 @@ const isValid = (value: unknown): boolean => {
 
 const formatValue = (
   value: string,
-  type: SearchAttributesValue,
+  type: SearchAttributeType,
 ): string | boolean => {
-  if (type === 'Bool') {
+  if (type === SEARCH_ATTRIBUTE_TYPE.BOOL) {
     return value.toLowerCase() === 'true' ? true : false;
   }
   return `"${value}"`;
@@ -59,7 +60,7 @@ const getQueryKey = (attribute: string | number) => {
 
 const toFilterQueryStatement = (
   attribute: keyof SearchAttributes,
-  type: SearchAttributesValue,
+  type: SearchAttributeType,
   value: FilterValue,
   conditional = '=',
   archived: boolean,

@@ -12,7 +12,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
-  import type { SearchAttributesValue } from '$lib/types/workflows';
+  import type { SearchAttributeType } from '$lib/types/workflows';
   import {
     getFocusedElementId,
     isListFilter,
@@ -35,7 +35,7 @@
     );
   }
 
-  function handleNewQuery(value: string, type: SearchAttributesValue) {
+  function handleNewQuery(value: string, type: SearchAttributeType) {
     searchAttributeValue = '';
     filter.set({ ...emptyFilter(), attribute: value, conditional: '=', type });
     $focusedElementId = getFocusedElementId({ attribute: value, type });

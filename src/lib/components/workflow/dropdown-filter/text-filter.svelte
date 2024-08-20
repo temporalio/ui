@@ -12,6 +12,7 @@
     type TextFilterAttributes,
   } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   let value = '';
@@ -27,7 +28,7 @@
     if (value) {
       const filter: SearchAttributeFilter = {
         attribute,
-        type: 'Keyword',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
         value,
         conditional: '=',
         operator: '',
