@@ -96,12 +96,12 @@
   data-testid="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td class="px-1 text-left">
+  <td class="w-20 px-1 text-left">
     <Link class="truncate" data-testid="link" {href}>
       {event.id}
     </Link>
   </td>
-  <td class="text-right text-sm font-normal xl:text-left">
+  <td class="w-full text-right text-sm font-normal xl:text-left">
     <div class="flex">
       <div>
         {#if compact && failure}
@@ -135,7 +135,7 @@
       </div>
     </div>
   </td>
-  <td class="overflow-hidden px-1">
+  <td class="w-full overflow-hidden px-4">
     <div class="flex flex-col gap-0 text-right">
       {#if showElapsedTimeDiff}
         <p class="truncate text-sm">
@@ -171,7 +171,7 @@
 
 <style lang="postcss">
   .row {
-    @apply select-none flex-wrap items-center text-sm no-underline xl:py-3 xl:text-base;
+    @apply flex select-none items-center text-sm no-underline;
   }
 
   .failure {
@@ -199,7 +199,7 @@
   }
 
   .expanded-cell {
-    @apply w-full flex-wrap px-4 text-sm no-underline xl:text-base;
+    @apply flex px-4 text-sm no-underline xl:text-base;
   }
 
   .typedError .expanded-cell {

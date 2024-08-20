@@ -6,19 +6,15 @@
   import { fullEventHistory } from '$lib/stores/events';
   import type { WorkflowEvents } from '$lib/types/events';
 
+  import HistoryGraph from '../lines-and-dots/svg/history-graph.svelte';
+
   import EventEmptyRow from './event-empty-row.svelte';
   import EventSummaryRow from './event-summary-row.svelte';
 
-  // import Button from '$lib/holocene/button.svelte';
-  // import HistoryGraph from '../lines-and-dots/svg/history-graph.svelte';
-  // import Icon from '$lib/holocene/icon/icon.svelte';
-
   export let items: WorkflowEvents;
   export let groups: EventGroups;
-  export let canvasWidth: number;
   export let updating = false;
   export let compact = false;
-  export let onExpandCollapse: () => void;
 
   $: initialItem = $fullEventHistory?.[0];
 
@@ -35,29 +31,14 @@
   let:visibleItems
   variant="ghost"
 >
-  <!-- <div
-    class="relative hidden pt-12 lg:block"
-    style="width: {canvasWidth}px;"
-    slot="visual"
-  >
-    <Button
-      size="xs"
-      variant="ghost"
-      class="absolute right-1 top-1"
-      on:click={onExpandCollapse}
-    >
-      <Icon
-        name={canvasWidth === 120 ? 'chevron-right' : 'chevron-left'}
-        x={4}
-        y={8}
-      />
-    </Button>
-    <HistoryGraph {groups} history={[]} {canvasWidth} />
-  </div> -->
-  {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
-    <EventSummaryRow {event} {compact} {expandAll} {initialItem} />
-  {:else}
-    <EventEmptyRow loading={!$fullEventHistory.length} />
-  {/each}
-  <!-- </div> -->
+  {#if !compact}
+    <HistoryGraph {groups} history={visibleItems} />
+  {/if}
+  <div class="grow">
+    {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
+      <EventSummaryRow {event} {compact} {expandAll} {initialItem} />
+    {:else}
+      <EventEmptyRow loading={!$fullEventHistory.length} />
+    {/each}
+  </div>
 </PaginatedTable>

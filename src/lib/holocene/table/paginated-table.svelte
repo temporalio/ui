@@ -108,7 +108,6 @@
       {/if}
     </thead>
     <tbody class="paginated-table-body">
-      <slot name="visual" />
       <slot visibleItems={$store.items} />
     </tbody>
   </table>
@@ -163,7 +162,7 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply min-h-[154px] overflow-auto;
+    @apply min-h-[154px] w-full overflow-auto;
   }
 
   .primary {
@@ -172,6 +171,10 @@
 
   .ghost {
     @apply border-t-2 border-subtle;
+  }
+
+  .ghost .paginated-table-body {
+    @apply flex;
   }
 
   .paginated-table {
@@ -195,7 +198,7 @@
   }
 
   .paginated-table-body {
-    @apply surface-primary flex gap-0;
+    @apply surface-primary flex;
 
     :global(tr:not(.empty)) {
       @apply h-12 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
@@ -206,7 +209,7 @@
     }
 
     :global(tr.dense:nth-of-type(odd)) {
-      @apply surface-interactive-ghost;
+      @apply bg-interactive-table-hover;
     }
 
     :global(tr > td > .table-link) {

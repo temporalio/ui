@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { scrollTop } from '$lib/holocene/main-content-container.svelte';
   import { groupWorkflowTaskEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
@@ -20,7 +22,7 @@
   export let history: WorkflowEvents;
   export let activeEvents: string[] = [];
   export let zoomLevel: number = 1;
-  export let canvasWidth = 0;
+  export let canvasWidth = 200;
 
   $: workflowTaskGroups = groupWorkflowTaskEvents(
     $filteredEventHistory,
@@ -61,9 +63,20 @@
 
   $: canvasHeight = visibleHistory.length * height + activeDetailsHeight;
   $: visualWidth = canvasWidth - 1.5 * radius;
-  // $: isWide = canvasWidth >= 960;
 </script>
 
+<Button
+  size="xs"
+  variant="ghost"
+  class="sticky left-0.5 top-1"
+  on:click={() => (canvasWidth = canvasWidth === 200 ? 400 : 200)}
+>
+  <Icon
+    name={canvasWidth === 400 ? 'chevron-left' : 'chevron-right'}
+    x={canvasWidth - 2 * radius}
+    y={radius}
+  />
+</Button>
 <svg
   viewBox="0 0 {canvasWidth} {canvasHeight}"
   height={canvasHeight}
