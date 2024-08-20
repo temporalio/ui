@@ -1,5 +1,5 @@
 <script lang="ts">
-  import PaginatedTable from '$lib/holocene/table/paginated-table.svelte';
+  import Paginated from '$lib/holocene/table/paginated-table/paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { expandAllEvents } from '$lib/stores/event-view';
@@ -21,7 +21,7 @@
   let expandAll = $expandAllEvents === 'true';
 </script>
 
-<PaginatedTable
+<Paginated
   perPageLabel={translate('common.per-page')}
   nextPageButtonLabel={translate('common.next-page')}
   previousPageButtonLabel={translate('common.previous-page')}
@@ -29,7 +29,8 @@
   {updating}
   {items}
   let:visibleItems
-  variant="ghost"
+  variant="split"
+  maxHeight="calc(100vh - 200px)"
 >
   {#if !compact}
     <HistoryGraph {groups} history={visibleItems} />
@@ -41,4 +42,4 @@
       <EventEmptyRow loading={!$fullEventHistory.length} />
     {/each}
   </div>
-</PaginatedTable>
+</Paginated>

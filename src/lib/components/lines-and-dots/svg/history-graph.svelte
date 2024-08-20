@@ -22,7 +22,7 @@
   export let history: WorkflowEvents;
   export let activeEvents: string[] = [];
   export let zoomLevel: number = 1;
-  export let canvasWidth = 200;
+  export let canvasWidth = 100;
 
   $: workflowTaskGroups = groupWorkflowTaskEvents(
     $filteredEventHistory,
