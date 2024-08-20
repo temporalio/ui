@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
   import { onMount } from 'svelte';
 
   import { goto } from '$app/navigation';
@@ -13,7 +11,6 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -38,7 +35,6 @@
   let refresh = Date.now();
   let coreUser = coreUserStore();
   let customizationDrawerOpen = false;
-  let search = '';
   let error = '';
 
   const openCustomizationDrawer = () => {
@@ -98,22 +94,6 @@
       <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
         <SchedulesCount />
       </h1>
-      {#if showActions}
-        <div class="w-96">
-          <Input
-            icon="search"
-            type="search"
-            label={translate('schedules.name')}
-            labelHidden
-            id="schedule-name-filter"
-            placeholder={translate('schedules.name')}
-            clearable
-            clearButtonLabel={translate('common.clear-input-button-label')}
-            bind:value={search}
-            on:submit={noop}
-          />
-        </div>
-      {/if}
       <div class="flex flex-col justify-between gap-2 md:flex-row">
         {#if showActions}
           <SearchAttributeFilter
@@ -146,24 +126,8 @@
         <th>{label}</th>
       {/each}
     </tr>
-    {@const filteredItems = search
-      ? visibleItems.filter((schedule) =>
-          schedule.scheduleId.toLowerCase().includes(search.toLowerCase()),
-        )
-      : visibleItems}
-    {#each filteredItems as schedule}
+    {#each visibleItems as schedule}
       <SchedulesTableRow {schedule} {columns} />
-    {:else}
-      {#if visibleItems.length}
-        <tr>
-          <td colspan={columns.length}>
-            <EmptyState
-              title={translate('schedules.empty-state-title')}
-              content={translate('schedules.empty-state-description')}
-            />
-          </td>
-        </tr>
-      {/if}
     {/each}
 
     <svelte:fragment slot="empty">
