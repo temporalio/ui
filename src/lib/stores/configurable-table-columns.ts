@@ -118,7 +118,7 @@ const DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS: ConfigurableTableHeader[] = [
 
 const DEFAULT_SCHEDULES_COLUMNS: ConfigurableTableHeader[] = [
   { label: translate('common.status'), pinned: false },
-  { label: translate('schedules.name'), pinned: false },
+  { label: translate('schedules.id'), pinned: false },
   { label: translate('common.workflow-type'), pinned: false },
   { label: translate('schedules.recent-runs'), pinned: false },
   { label: translate('schedules.upcoming-runs'), pinned: false },

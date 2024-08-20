@@ -7,7 +7,7 @@ export const Strings = {
   creating: 'Creating Schedule...',
   'back-to-schedule': 'Back to Schedule',
   'back-to-schedules': 'Back to Schedules',
-  name: 'Schedule Name',
+  id: 'Schedule ID',
   schedule: 'Schedule',
   frequency: 'Frequency',
   'schedule-spec': 'Schedule Spec',

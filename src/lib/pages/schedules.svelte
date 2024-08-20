@@ -27,9 +27,12 @@
     customSearchAttributes,
     searchAttributes,
   } from '$lib/stores/search-attributes';
+  import { temporalVersion } from '$lib/stores/versions';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
+  import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   let refresh = Date.now();
@@ -44,15 +47,18 @@
   $: namespace = $page.params.namespace;
   $: columns = $configurableTableColumns?.[namespace]?.schedules ?? [];
   $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
-  $: searchAttributeOptions = Object.entries($customSearchAttributes).map(
-    ([key, value]) => {
-      return {
-        label: key,
-        value: key,
-        type: value,
-      };
-    },
-  );
+  $: searchAttributeOptions = Object.entries({
+    ...(minimumVersionRequired('1.25.0', $temporalVersion) && {
+      ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    }),
+    ...$customSearchAttributes,
+  }).map(([key, value]) => {
+    return {
+      label: key,
+      value: key,
+      type: value,
+    };
+  });
   $: query = $page.url.searchParams.get('query');
   $: onFetch = () => {
     error = '';

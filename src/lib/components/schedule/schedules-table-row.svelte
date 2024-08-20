@@ -55,7 +55,7 @@
           status={schedule?.info?.paused ? 'Paused' : 'Running'}
         />
       </td>
-    {:else if label === translate('schedules.name')}
+    {:else if label === translate('schedules.id')}
       <td class="cell whitespace-pre-line break-words">
         <Link href={route}>{schedule.scheduleId}</Link>
       </td>
