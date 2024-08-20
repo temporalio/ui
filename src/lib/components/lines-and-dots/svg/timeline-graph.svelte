@@ -35,7 +35,7 @@
   const { height, gutter, radius } = TimelineConfig;
 
   let canvasWidth = 0;
-  let viewportHeight = 400;
+  let viewportHeight = 320;
   let scrollY = 0;
 
   $: startTime = $fullEventHistory[0]?.eventTime || workflow.startTime;
@@ -48,14 +48,15 @@
     .reduce((acc, height) => acc + height, 0);
 
   $: timelineHeight =
-    Math.max(height * (groups.length + 2), 140) + activeDetailsHeight;
+    Math.max(height * (groups.length + 2), viewportHeight) +
+    activeDetailsHeight;
   $: canvasHeight = timelineHeight + 140;
 
   const onExpandCollapse = () => {
-    if (viewportHeight === 400) {
+    if (viewportHeight === 320) {
       viewportHeight = 800;
     } else {
-      viewportHeight = 400;
+      viewportHeight = 320;
     }
   };
 
@@ -78,13 +79,13 @@
       on:click={onExpandCollapse}
     >
       <Icon
-        name={viewportHeight === 400 ? 'chevron-down' : 'chevron-up'}
+        name={viewportHeight === 320 ? 'chevron-down' : 'chevron-up'}
         x={canvasWidth - 2 * radius}
         y={radius}
       />
     </Button>
     <div
-      class="sticky {viewportHeight === 400 ? 'top-[300px]' : 'top-[700px]'}"
+      class="sticky {viewportHeight === 320 ? 'top-[220px]' : 'top-[700px]'}"
       class:invisible={!!activeGroups.length}
     >
       <div class="flex w-full justify-between text-xs">

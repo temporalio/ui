@@ -198,7 +198,7 @@
   }
 
   .paginated-table-body {
-    @apply surface-primary flex;
+    @apply surface-primary;
 
     :global(tr:not(.empty)) {
       @apply h-12 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
