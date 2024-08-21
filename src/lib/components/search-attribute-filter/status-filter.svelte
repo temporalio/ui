@@ -15,24 +15,25 @@
     MenuItem,
   } from '$lib/holocene/menu';
   import Translate from '$lib/i18n/translate.svelte';
-  import type { WorkflowFilter } from '$lib/models/workflow-filters';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowStatusFilters } from '$lib/models/workflow-status';
-  import { workflowFilters } from '$lib/stores/filters';
-  import { isStatusFilter } from '$lib/utilities/query/filter-search';
+  import { isStatusFilter } from '$lib/utilities/query/search-attribute-filter';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
+  export let filters: SearchAttributeFilter[];
+
   const { filter, resetFilter } = getContext<FilterContext>(FILTER_CONTEXT);
   const open = writable(true);
-  $: filters = [...$workflowFilters];
-  $: statusFilters = filters.filter((filter) =>
+  $: _filters = [...filters];
+  $: statusFilters = _filters.filter((filter) =>
     isStatusFilter(filter.attribute),
   );
 
   function apply() {
-    $workflowFilters = filters;
-    updateQueryParamsFromFilter($page.url, $workflowFilters);
+    filters = _filters;
+    updateQueryParamsFromFilter($page.url, filters);
   }
 
   function mapStatusToFilter(value: string) {
@@ -42,12 +43,12 @@
     };
   }
 
-  function mapStatusesToFilters(filters: WorkflowFilter[]) {
-    if (filters.length === 1) {
-      return [mapStatusToFilter(filters[0].value)];
+  function mapStatusesToFilters(_filters: SearchAttributeFilter[]) {
+    if (_filters.length === 1) {
+      return [mapStatusToFilter(_filters[0].value)];
     } else {
-      return filters.map((filter, i) => {
-        const operator = i === filters.length - 1 ? '' : 'OR';
+      return _filters.map((filter, i) => {
+        const operator = i === _filters.length - 1 ? '' : 'OR';
         return {
           ...filter,
           operator,
@@ -58,14 +59,12 @@
 
   const onStatusClick = (status: string) => {
     if (status === 'All') {
-      filters = $workflowFilters.filter(
-        (f) => f.attribute !== 'ExecutionStatus',
-      );
+      _filters = filters.filter((f) => f.attribute !== 'ExecutionStatus');
     } else if (statusFilters.find((s) => s.value === status)) {
-      const nonStatusFilters = $workflowFilters.filter(
+      const nonStatusFilters = filters.filter(
         (f) => !isStatusFilter(f.attribute),
       );
-      filters = [
+      _filters = [
         ...nonStatusFilters,
         ...mapStatusesToFilters(
           statusFilters.filter((s) => s.value !== status),
@@ -73,12 +72,12 @@
       ];
     } else {
       if (!statusFilters.length) {
-        filters = [...filters, mapStatusToFilter(status)];
+        _filters = [..._filters, mapStatusToFilter(status)];
       } else {
-        const nonStatusFilters = filters.filter(
+        const nonStatusFilters = _filters.filter(
           (f) => !isStatusFilter(f.attribute),
         );
-        filters = [
+        _filters = [
           ...nonStatusFilters,
           ...mapStatusesToFilters([
             ...statusFilters,

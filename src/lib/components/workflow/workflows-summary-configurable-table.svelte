@@ -5,8 +5,8 @@
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchAllChildWorkflows } from '$lib/services/workflow-service';
+  import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
   import { showChildWorkflows } from '$lib/stores/filters';
-  import { workflowTableColumns } from '$lib/stores/workflow-table-columns';
   import {
     refresh,
     updating,
@@ -21,7 +21,7 @@
   import TableRow from './workflows-summary-configurable-table/table-row.svelte';
 
   $: ({ namespace } = $page.params);
-  $: columns = $workflowTableColumns?.[namespace] ?? [];
+  $: columns = $configurableTableColumns?.[namespace]?.workflows ?? [];
   $: empty = $workflows.length === 0;
 
   let childrenIds: {

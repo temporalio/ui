@@ -7,7 +7,10 @@
     customSearchAttributes,
     type SearchAttributeInput,
   } from '$lib/stores/search-attributes';
-  import type { SearchAttributes } from '$lib/types/workflows';
+  import {
+    SEARCH_ATTRIBUTE_TYPE,
+    type SearchAttributes,
+  } from '$lib/types/workflows';
 
   import DatetimeInput from './datetime-input.svelte';
   import NumberInput from './number-input.svelte';
@@ -51,7 +54,7 @@
       {/each}
     </Select>
   </div>
-  {#if type === 'Bool'}
+  {#if type === SEARCH_ATTRIBUTE_TYPE.BOOL}
     <Select
       label={translate('common.value')}
       id="attribute-value"
@@ -60,9 +63,9 @@
       <Option value={true}>{translate('common.true')}</Option>
       <Option value={false}>{translate('common.false')}</Option>
     </Select>
-  {:else if type === 'Datetime'}
+  {:else if type === SEARCH_ATTRIBUTE_TYPE.DATETIME}
     <DatetimeInput bind:value={attribute.value} />
-  {:else if type === 'Int' || type === 'Double'}
+  {:else if type === SEARCH_ATTRIBUTE_TYPE.INT || type === SEARCH_ATTRIBUTE_TYPE.DOUBLE}
     <NumberInput bind:value={attribute.value} />
   {:else}
     <TextInput bind:value={attribute.value} />

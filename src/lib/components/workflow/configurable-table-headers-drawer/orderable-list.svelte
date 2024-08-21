@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Readable } from 'svelte/store';
+
   import { page } from '$app/stores';
 
   import OrderableListItem from '$lib/holocene/orderable-list/orderable-list-item.svelte';
@@ -7,26 +9,29 @@
   import {
     addColumn,
     availableCustomSearchAttributeColumns,
-    availableSystemSearchAttributeColumns,
+    configurableTableColumns,
+    type ConfigurableTableHeader,
+    type ConfigurableTableType,
     moveColumn,
     removeColumn,
-    workflowTableColumns,
-  } from '$lib/stores/workflow-table-columns';
+  } from '$lib/stores/configurable-table-columns';
 
-  export let namespace: string;
+  export let table: ConfigurableTableType;
+  export let availableColumns: Readable<ConfigurableTableHeader[]>;
+  export let type: string;
 
-  $: columnsInUse = $workflowTableColumns?.[namespace] ?? [];
-  $: availableSystemColumns = availableSystemSearchAttributeColumns(
+  $: namespace = $page.params.namespace;
+  $: columnsInUse = $configurableTableColumns?.[namespace]?.[table] ?? [];
+  $: availableCustomColumns = availableCustomSearchAttributeColumns(
     namespace,
-    $page.data.settings,
+    table,
   );
-  $: availableCustomColumns = availableCustomSearchAttributeColumns(namespace);
 </script>
 
 <div class="flex flex-col gap-4">
   <OrderableList>
     <svelte:fragment slot="heading">
-      Workflow Headings <span class="font-normal">(in view)</span>
+      {type} Headings <span class="font-normal">(in view)</span>
     </svelte:fragment>
     {#each columnsInUse as { label }, index (label)}
       <OrderableListItem
@@ -34,8 +39,8 @@
         {label}
         totalItems={columnsInUse.length}
         on:moveItem={(event) =>
-          moveColumn(event.detail.from, event.detail.to, namespace)}
-        on:removeItem={() => removeColumn(label, namespace)}
+          moveColumn(event.detail.from, event.detail.to, namespace, table)}
+        on:removeItem={() => removeColumn(label, namespace, table)}
         addButtonLabel={translate('workflows.add-column-label', {
           column: label,
         })}
@@ -66,10 +71,10 @@
     <svelte:fragment slot="heading">
       Available Headings <span class="font-normal">(not in view)</span>
     </svelte:fragment>
-    {#each $availableSystemColumns as { label }}
+    {#each $availableColumns as { label }}
       <OrderableListItem
         static
-        on:addItem={() => addColumn(label, namespace)}
+        on:addItem={() => addColumn(label, namespace, table)}
         addButtonLabel={translate('workflows.add-column-label', {
           column: label,
         })}
@@ -90,7 +95,7 @@
     {#each $availableCustomColumns as { label }}
       <OrderableListItem
         static
-        on:addItem={() => addColumn(label, namespace)}
+        on:addItem={() => addColumn(label, namespace, table)}
         addButtonLabel={translate('workflows.add-column-label', {
           column: label,
         })}

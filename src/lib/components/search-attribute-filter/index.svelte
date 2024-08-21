@@ -8,7 +8,7 @@
   export const FILTER_CONTEXT = 'filter-context';
 
   export interface FilterContext {
-    filter: Writable<WorkflowFilter>;
+    filter: Writable<SearchAttributeFilter>;
     activeQueryIndex: Writable<number>;
     handleSubmit: () => void;
     focusedElementId: Writable<string>;
@@ -19,26 +19,12 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
-  import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import MenuButton from '$lib/holocene/menu/menu-button.svelte';
-  import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
-  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
-  import Menu from '$lib/holocene/menu/menu.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { WorkflowFilter } from '$lib/models/workflow-filters';
-  import { showChildWorkflows, workflowFilters } from '$lib/stores/filters';
-  import { searchInputViewOpen } from '$lib/stores/filters';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
-  import {
-    canFetchChildWorkflows,
-    refresh,
-    workflows,
-  } from '$lib/stores/workflows';
-  import { exportWorkflows } from '$lib/utilities/export-workflows';
+  import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
+  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import {
     getFocusedElementId,
     isBooleanFilter,
@@ -47,8 +33,7 @@
     isNumberFilter,
     isStatusFilter,
     isTextFilter,
-  } from '$lib/utilities/query/filter-search';
-  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
+  } from '$lib/utilities/query/search-attribute-filter';
   import {
     combineFilters,
     emptyFilter,
@@ -65,15 +50,18 @@
   import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
 
-  export let onClickConfigure: () => void;
+  export let filters: SearchAttributeFilter[];
+  export let options = $sortedSearchAttributeOptions;
+  export let showFilter = true;
+  export let refresh: () => void;
 
-  const filter = writable<WorkflowFilter>(emptyFilter());
+  const filter = writable<SearchAttributeFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
 
   $: ({ attribute, type } = $filter);
   $: searchParamQuery = $page.url.searchParams.get('query');
-  $: showClearAllButton = $workflowFilters.length && !attribute;
+  $: showClearAllButton = showFilter && filters.length && !attribute;
 
   setContext<FilterContext>(FILTER_CONTEXT, {
     filter,
@@ -84,12 +72,10 @@
   });
 
   function onSearch() {
-    const searchQuery = toListWorkflowQueryFromFilters(
-      combineFilters($workflowFilters),
-    );
+    const searchQuery = toListWorkflowQueryFromFilters(combineFilters(filters));
 
     if (searchQuery && searchQuery === searchParamQuery) {
-      $refresh = Date.now();
+      refresh();
     } else {
       updateQueryParameters({
         url: $page.url,
@@ -103,17 +89,17 @@
 
   function handleSubmit() {
     if ($activeQueryIndex !== null) {
-      $workflowFilters[$activeQueryIndex] = $filter;
+      filters[$activeQueryIndex] = $filter;
       $activeQueryIndex = null;
     } else {
-      $workflowFilters = [...$workflowFilters, $filter];
+      filters = [...filters, $filter];
     }
     filter.set(emptyFilter());
     onSearch();
   }
 
   function handleClearInput() {
-    $workflowFilters = [];
+    filters = [];
     onSearch();
   }
 
@@ -124,6 +110,7 @@
   }
 
   $: $activeQueryIndex, updateFocusedElementId();
+  $: !showFilter && resetFilter();
 
   function updateFocus() {
     if ($focusedElementId) {
@@ -155,9 +142,8 @@
 
 <div class="flex grow flex-col">
   <div class="flex grow flex-col gap-4 sm:flex-row sm:items-center">
-    {#if $searchInputViewOpen}
-      <WorkflowAdvancedSearch />
-    {:else}
+    <slot />
+    {#if showFilter}
       <div
         class="flex items-center"
         class:filter={!showClearAllButton}
@@ -165,9 +151,9 @@
         role="none"
       >
         {#if isStatusFilter(attribute)}
-          <StatusFilter />
+          <StatusFilter bind:filters />
         {:else}
-          <SearchAttributeMenu />
+          <SearchAttributeMenu {filters} {options} />
         {/if}
 
         {#if attribute}
@@ -181,9 +167,9 @@
             </div>
             <!-- TODO: Add KeywordList support -->
             <!-- {:else if isListFilter(attribute)}
-        <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
-          <ListFilter />
-        </div> -->
+            <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+                <ListFilter />
+            </div> -->
           {:else if isDurationFilter(attribute)}
             <div
               class="flex w-full items-center"
@@ -219,70 +205,21 @@
           {/if}
         {/if}
       </div>
-
-      <div
-        class="flex flex-col sm:flex-row {showClearAllButton
-          ? 'w-full justify-between'
-          : 'justify-end'}"
-      >
-        {#if showClearAllButton}
-          <Button variant="ghost" on:click={handleClearInput}
-            >{translate('common.clear-all')}</Button
-          >
-        {/if}
-      </div>
     {/if}
-    <MenuContainer>
-      <MenuButton
-        controls="filter-configuration-menu"
-        count={Number($searchInputViewOpen) +
-          Number($canFetchChildWorkflows && $showChildWorkflows)}
-        data-testid="filter-configuration-menu-button"
-        class="max-w-[3rem] text-nowrap md:max-w-full"
-      >
-        <svelte:fragment slot="leading">
-          <Icon name="settings" />
-        </svelte:fragment>
-      </MenuButton>
-      <Menu id="filter-configuration-menu" position="right">
-        <div class="flex flex-col items-start gap-4 p-4 md:items-end">
-          <IsTemporalServerVersionGuard minimumVersion="1.23.0">
-            <ToggleSwitch
-              data-testid="show-child-workflow-toggle"
-              label={translate('workflows.show-children')}
-              labelPosition="left"
-              id="show-child-workflow-input"
-              bind:checked={$showChildWorkflows}
-            />
-          </IsTemporalServerVersionGuard>
-          <ToggleSwitch
-            data-testid="manual-search-toggle"
-            label={translate('workflows.view-search-input')}
-            labelPosition="left"
-            id="view-search-input"
-            bind:checked={$searchInputViewOpen}
-            on:change={resetFilter}
-          />
-          <MenuItem
-            on:click={onClickConfigure}
-            class="m-0 py-0.5"
-            data-testid="workflows-summary-table-configuration-button"
-          >
-            {translate('workflows.configure-workflows')}
-          </MenuItem>
-          <MenuItem
-            on:click={() => exportWorkflows($workflows)}
-            class="m-0 py-0.5"
-            data-testid="export-history-button"
-          >
-            {translate('common.download-json')}
-            <Icon name="download" />
-          </MenuItem>
-        </div>
-      </Menu>
-    </MenuContainer>
+    <div
+      class="flex flex-col sm:flex-row {showClearAllButton
+        ? 'w-full justify-between'
+        : 'justify-end'}"
+    >
+      {#if showClearAllButton}
+        <Button variant="ghost" on:click={handleClearInput}
+          >{translate('common.clear-all')}</Button
+        >
+      {/if}
+    </div>
+    <slot name="actions" />
   </div>
-  <FilterList />
+  <FilterList bind:filters />
 </div>
 
 <style lang="postcss">

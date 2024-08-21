@@ -87,22 +87,26 @@ export type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
 
 export type WorkflowIdentifier = import('$lib/types').WorkflowExecutionInput;
 
-export type SearchAttributesValue =
-  | 'Bool'
-  | 'Datetime'
-  | 'Double'
-  | 'Int'
-  | 'Keyword'
-  | 'Text'
-  | 'KeywordList';
+export const SEARCH_ATTRIBUTE_TYPE = {
+  BOOL: 'Bool',
+  DATETIME: 'Datetime',
+  DOUBLE: 'Double',
+  INT: 'Int',
+  KEYWORD: 'Keyword',
+  TEXT: 'Text',
+  KEYWORDLIST: 'KeywordList',
+} as const;
+
+type Keys = keyof typeof SEARCH_ATTRIBUTE_TYPE;
+export type SearchAttributeType = (typeof SEARCH_ATTRIBUTE_TYPE)[Keys];
 
 export type SearchAttributes = {
-  [k: string]: SearchAttributesValue;
+  [k: string]: SearchAttributeType;
 };
 
 export type SearchAttributesResponse = {
-  customAttributes: Record<string, SearchAttributesValue>;
-  systemAttributes: Record<string, SearchAttributesValue>;
+  customAttributes: Record<string, SearchAttributeType>;
+  systemAttributes: Record<string, SearchAttributeType>;
   storageSchema: import('$lib/types').ListSearchAttributesResponse['storageSchema'];
 };
 

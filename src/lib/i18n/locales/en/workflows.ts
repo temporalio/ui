@@ -37,11 +37,10 @@ export const Strings = {
     'The batch cancel request is processing in the background.',
   'batch-reset-all-success':
     'The batch reset request is processing in the background.',
-  'configure-workflows': 'Configure Workflow List',
-  'open-configure-workflows': 'Open workflow list configuration',
-  'close-configure-workflows': 'Close workflow list configuration',
-  'configure-workflows-description':
-    'Add (<1></1>), re-arrange (<2></2>), and remove (<3></3>), Workflow Headings to personalize the Workflow List Table.',
+  'configure-headers': 'Configure {{title}}',
+  'close-configure-headers': 'Close {{title}} configuration',
+  'configure-headers-description':
+    'Add (<1></1>), re-arrange (<2></2>), and remove (<3></3>), {{type}} Headings to personalize the {{title}} Table.',
   'all-statuses': 'All Statuses',
   running: 'Running',
   'timed-out': 'Timed Out',
