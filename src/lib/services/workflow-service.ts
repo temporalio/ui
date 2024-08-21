@@ -12,7 +12,7 @@ import {
 import { authUser } from '$lib/stores/auth-user';
 import type { SearchAttributeInput } from '$lib/stores/search-attributes';
 import { canFetchChildWorkflows } from '$lib/stores/workflows';
-import type { ResetWorkflowRequest } from '$lib/types';
+import type { ResetWorkflowRequest, SearchAttribute } from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
   ValidWorkflowParameters,
@@ -423,12 +423,12 @@ export async function fetchAllChildWorkflows(
   }
 }
 
-const setSearchAttributes = (
+export const setSearchAttributes = (
   attributes: SearchAttributeInput[],
-): Record<string, Payload> => {
+): SearchAttribute => {
   if (!attributes.length) return {};
 
-  const searchAttributes: Record<string, Payload> = {};
+  const searchAttributes: SearchAttribute = {};
   attributes.forEach((attribute) => {
     searchAttributes[attribute.attribute] = setBase64Payload(attribute.value);
   });

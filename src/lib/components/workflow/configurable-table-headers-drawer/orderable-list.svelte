@@ -89,7 +89,8 @@
   </OrderableList>
   <OrderableList>
     <svelte:fragment slot="heading">
-      Custom Search Attributes <span class="font-normal">(not in view)</span>
+      {translate('events.custom-search-attributes')}
+      <span class="font-normal">(not in view)</span>
     </svelte:fragment>
     {#each $availableCustomColumns as { label }}
       <OrderableListItem
