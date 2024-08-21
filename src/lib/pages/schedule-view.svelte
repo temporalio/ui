@@ -11,6 +11,7 @@
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
   import ScheduleInput from '$lib/components/schedule/schedule-input.svelte';
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
+  import ScheduleSearchAttributes from '$lib/components/schedule/schedule-search-attributes.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -389,6 +390,9 @@
             state={schedule?.schedule?.state}
             policies={schedule?.schedule?.policies}
             notes={schedule?.schedule?.state?.notes}
+          />
+          <ScheduleSearchAttributes
+            searchAttributes={schedule?.searchAttributes ?? {}}
           />
         </div>
         <div class="flex w-full flex-col gap-4 xl:w-1/3">

@@ -91,8 +91,8 @@
     </div>
   </div>
 {:else}
-  <Card {...$$restProps}>
-    <div class="flex w-full flex-col rounded-lg p-2">
+  <Card class="w-full" {...$$restProps}>
+    <div class="flex w-full flex-col rounded-lg">
       <div class="space-between flex w-full flex-row items-center">
         <h3 class="flex w-full items-center gap-2">
           {#if icon}<Icon name={icon} />{/if}
@@ -111,7 +111,7 @@
       </p>
     </div>
 
-    <div class="mt-6 block w-full p-2">
+    <div class="mt-6 block w-full" class:hidden={!open}>
       <slot />
     </div>
   </Card>
