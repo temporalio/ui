@@ -15,6 +15,7 @@
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import {
     availableScheduleColumns,
     configurableTableColumns,
@@ -48,7 +49,7 @@
   $: columns = $configurableTableColumns?.[namespace]?.schedules ?? [];
   $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
   $: searchAttributeOptions = Object.entries({
-    ...(minimumVersionRequired('1.25.0', $temporalVersion) && {
+    ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
       ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
     }),
     ...$customSearchAttributes,
