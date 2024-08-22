@@ -167,11 +167,11 @@
 
 <style lang="postcss">
   .content {
-    @apply block w-full border-b-2 border-slate-200 py-2 text-left;
+    @apply block w-full border-b-2 border-subtle py-1 text-left;
   }
 
   .code-block-row {
-    @apply block w-full py-2 text-left;
+    @apply block w-full py-1 text-left;
   }
 
   .code-with-stack-trace {
@@ -179,7 +179,7 @@
   }
 
   .detail-row {
-    @apply flex w-full items-center gap-4 py-2 text-left xl:flex;
+    @apply flex w-full items-center gap-4 py-1 text-left xl:flex;
   }
 
   .badge {

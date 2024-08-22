@@ -1,6 +1,5 @@
 <script lang="ts">
   import { noop } from 'svelte/internal';
-  import { fade } from 'svelte/transition';
 
   import { page } from '$app/stores';
 
@@ -15,6 +14,7 @@
   import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { IterableEvent } from '$lib/types/events';
+  import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
@@ -82,6 +82,14 @@
   $: icon = isLocalActivityMarkerEvent(event)
     ? CategoryIcon['local-activity']
     : CategoryIcon[event.category];
+
+  $: displayName = spaceBetweenCapitalLetters(
+    isEventGroup(event)
+      ? event.displayName
+      : isLocalActivityMarkerEvent(event)
+      ? 'LocalActivity'
+      : event.name,
+  );
 </script>
 
 <tr
@@ -119,11 +127,7 @@
       <div class="flex w-full grow items-center gap-2">
         <Icon name={icon} />
         <p class="event-name truncate text-sm font-semibold md:text-base">
-          {isEventGroup(event)
-            ? event.displayName
-            : isLocalActivityMarkerEvent(event)
-            ? 'LocalActivity'
-            : event.name}
+          {displayName}
         </p>
         <div class="truncate">
           <EventDetailsRow
@@ -164,9 +168,9 @@
   </td>
 </tr>
 {#if expanded}
-  <tr in:fade|local class:typedError class="expanded">
-    <td class="expanded-cell" colspan="3">
-      <EventDetailsFull {event} {currentEvent} {compact} bind:selectedId />
+  <tr class:typedError class="row expanded">
+    <td class="expanded-cell w-full" colspan="3">
+      <EventDetailsFull {event} {currentEvent} {compact} />
     </td>
   </tr>
 {/if}
@@ -200,12 +204,8 @@
     @apply border-2 border-pink-700 dark:border-pink-50;
   }
 
-  .expanded {
-    @apply w-full;
-  }
-
   .expanded-cell {
-    @apply flex text-sm no-underline;
+    @apply text-sm no-underline;
   }
 
   .typedError .expanded-cell {

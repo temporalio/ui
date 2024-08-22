@@ -5,36 +5,39 @@
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
 
   import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
-  import EventGroupDetails from './event-group-details.svelte';
 
   export let event: IterableEvent;
   export let currentEvent: WorkflowEvent;
   export let compact = false;
-  export let selectedId: string;
 
-  $: attributes = formatAttributes(currentEvent, $timeFormat, $relativeTime);
-  $: eventDetails = Object.entries(attributes);
-
-  const handleGroupClick = (id: string) => (selectedId = id);
+  const getAttributes = (event: WorkflowEvent) =>
+    formatAttributes(event, $timeFormat, $relativeTime);
 </script>
 
 {#if compact && isEventGroup(event)}
-  <div class="flex w-full flex-col lg:flex-row">
-    <EventGroupDetails
-      eventGroup={event}
-      {selectedId}
-      onGroupClick={handleGroupClick}
-    />
-    <div class="block w-full lg:w-2/3">
-      {#each eventDetails as [key, value] (key)}
-        <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
-      {/each}
-    </div>
+  <div class="flex w-full flex-col xl:flex-row">
+    {#each event.eventList as groupEvent}
+      {@const attributes = getAttributes(groupEvent)}
+      {@const details = Object.entries(attributes)}
+      <div class="border-r-0 border-subtle px-1 xl:border-r-4">
+        <EventDetailsRowExpanded key="id" value={groupEvent.id} {attributes} />
+        <EventDetailsRowExpanded
+          key="status"
+          value={groupEvent.classification}
+          {attributes}
+        />
+        {#each details as [key, value] (key)}
+          <EventDetailsRowExpanded {key} {value} {attributes} />
+        {/each}
+      </div>
+    {/each}
   </div>
 {:else}
-  <div class="w-full">
-    {#each eventDetails as [key, value] (key)}
-      <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
+  {@const attributes = getAttributes(currentEvent)}
+  {@const details = Object.entries(attributes)}
+  <div>
+    {#each details as [key, value] (key)}
+      <EventDetailsRowExpanded {key} {value} {attributes} />
     {/each}
   </div>
 {/if}

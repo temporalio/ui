@@ -16,16 +16,13 @@
 
   export let history: WorkflowEvents;
   export let groups: EventGroups;
-  export let compact = false;
 
   $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
   $: reverseSort = $eventFilterSort === 'descending';
 
-  let showJSON = false;
   let showFilters = false;
   let showDownloadPrompt = false;
-  let canvasWidth = 120;
 
   $: $eventCategoryFilter = $page.url?.searchParams?.get('category')
     ? ($page.url?.searchParams
@@ -48,30 +45,20 @@
   //   },
   // }));
 
+  $: compact = $eventViewType === 'compact';
   $: items = compact ? groups : history;
   $: updating = !$fullEventHistory.length;
 
-  const onExpandCollapse = () => {
-    if (canvasWidth === 120) {
-      canvasWidth = 400;
-    } else {
-      canvasWidth = 120;
-    }
-  };
-
   const onAllClick = () => {
-    compact = false;
-    showJSON = false;
+    $eventViewType = 'feed';
   };
 
   const onCompactClick = () => {
-    compact = true;
-    showJSON = false;
+    $eventViewType = 'compact';
   };
 
   const onJSONClick = () => {
-    compact = true;
-    showJSON = true;
+    $eventViewType = 'json';
   };
 
   const onSort = () => {
@@ -88,17 +75,17 @@
     <div class="flex items-center gap-2 px-4">
       <ToggleButtons>
         <ToggleButton
-          active={!compact && !showJSON}
+          active={$eventViewType === 'feed'}
           data-testid="all"
-          on:click={() => onAllClick()}>All</ToggleButton
+          on:click={onAllClick}>All</ToggleButton
         >
         <ToggleButton
-          active={compact && !showJSON}
+          active={$eventViewType === 'compact'}
           data-testid="compact"
-          on:click={() => onCompactClick()}>Compact</ToggleButton
+          on:click={onCompactClick}>Compact</ToggleButton
         >
         <ToggleButton
-          active={showJSON}
+          active={$eventViewType === 'json'}
           data-testid="json"
           on:click={onJSONClick}>JSON</ToggleButton
         >
@@ -139,23 +126,16 @@
   </div>
   {#if showFilters}
     <div class="flex flex-col items-center justify-center px-4 pb-2">
-      <EventTypeFilter compact={$eventViewType === 'compact'} />
+      <EventTypeFilter {compact} />
     </div>
   {/if}
 </div>
-{#if showJSON}
+{#if $eventViewType === 'json'}
   <div class="px-4">
     <WorkflowHistoryJson />
   </div>
 {:else}
-  <EventSummaryTable
-    {updating}
-    {items}
-    {groups}
-    {canvasWidth}
-    {compact}
-    {onExpandCollapse}
-  />
+  <EventSummaryTable {updating} {items} {groups} {compact} />
 {/if}
 <DownloadEventHistoryModal
   bind:open={showDownloadPrompt}
