@@ -29,6 +29,7 @@
   </span>
   <input
     on:change
+    on:click|stopPropagation
     bind:checked
     {id}
     {disabled}
