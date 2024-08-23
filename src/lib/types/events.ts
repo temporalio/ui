@@ -141,6 +141,13 @@ export type EventView = 'compact' | 'feed' | 'json' | 'table' | 'timeline';
 
 export type IterableEvent = WorkflowEvent | EventGroup;
 
+export type WorkflowEventWithPending =
+  | WorkflowEvent
+  | PendingActivity
+  | PendingNexusOperation;
+
+export type IterableEventWithPending = EventGroup | WorkflowEventWithPending;
+
 export type WorkflowExecutionStartedEvent =
   EventWithAttributes<'workflowExecutionStartedEventAttributes'>;
 export type WorkflowExecutionCompletedEvent =

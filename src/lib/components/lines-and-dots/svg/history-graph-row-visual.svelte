@@ -3,10 +3,13 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
-  import { setSingleActiveEvent } from '$lib/stores/active-events';
+  import { isEvent } from '$lib/models/event-history';
   import { eventFilterSort } from '$lib/stores/event-view';
-  import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
-  import { isPendingActivity } from '$lib/utilities/is-pending-activity';
+  import type { WorkflowEventWithPending } from '$lib/types/events';
+  import {
+    isPendingActivity,
+    isPendingNexusOperation,
+  } from '$lib/utilities/is-pending-activity';
 
   import {
     getNextDistanceAndOffset,
@@ -17,9 +20,9 @@
   import Dot from './dot.svelte';
   import Line from './line.svelte';
 
-  export let event: WorkflowEvent;
+  export let event: WorkflowEventWithPending;
   export let group: EventGroup;
-  export let history: WorkflowEvents;
+  export let history: WorkflowEventWithPending[];
   export let groups: EventGroups;
   export let index: number;
 
@@ -41,42 +44,39 @@
   $: zoomY = y * zoomLevel;
   $: zoomNextDistance = offset > 0 && nextDistance * zoomLevel;
 
-  $: classification = isPendingActivity(event)
-    ? 'pending'
-    : event?.classification;
+  $: classification =
+    isPendingActivity(event) || isPendingNexusOperation(event)
+      ? 'pending'
+      : event?.classification;
 
   $: width = canvasWidth * zoomLevel;
   $: horizontalOffset = offset * 1.75 * radius;
-  $: nextIsPending = group?.lastEvent.id === event?.id && group.isPending;
-  $: eventInViewBox = horizontalOffset <= width;
+  $: nextIsPending =
+    isEvent(event) && group?.lastEvent.id === event?.id && group?.isPending;
   $: connectLine =
-    isPendingActivity(event) || offset === 0
+    isPendingActivity(event) || isPendingNexusOperation(event) || offset === 0
       ? false
       : !isMiddleEvent(event, groups);
-  $: category = isPendingActivity(event)
-    ? 'pending'
-    : nextIsPending
-    ? event?.category
-    : '';
+  $: category =
+    isPendingActivity(event) || isPendingNexusOperation(event)
+      ? 'pending'
+      : nextIsPending
+      ? event?.category
+      : '';
+  $: reverseSort = $eventFilterSort === 'descending';
 </script>
 
-<g
-  role="button"
-  tabindex="0"
-  on:click|preventDefault={() => setSingleActiveEvent(event)}
-  on:keypress={() => setSingleActiveEvent(event)}
-  class="relative cursor-pointer"
->
+<g role="button" tabindex="0" class="relative cursor-pointer">
   {#if connectLine}
     <Line
       startPoint={[width, zoomY]}
       endPoint={[width - horizontalOffset - radius, zoomY]}
     />
   {/if}
-  {#if eventInViewBox}
+  {#if !reverseSort}
     <Dot point={[width - horizontalOffset, zoomY]} {classification} />
   {/if}
-  {#if eventInViewBox && zoomNextDistance}
+  {#if zoomNextDistance}
     <Line
       startPoint={[
         width - horizontalOffset - radius / 2 + strokeWidth,
@@ -93,5 +93,8 @@
         : category}
       pending={nextIsPending}
     />
+  {/if}
+  {#if reverseSort}
+    <Dot point={[width - horizontalOffset, zoomY]} {classification} />
   {/if}
 </g>

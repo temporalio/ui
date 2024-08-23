@@ -35,10 +35,12 @@
       <p>
         {translate('common.state')} <span class="badge">{callback.state}</span>
       </p>
-      <p>
-        {translate('common.attempt')}
-        <span class="badge">{callback.attempt}</span>
-      </p>
+      {#if callback.attempt}
+        <p>
+          {translate('common.attempt')}
+          <span class="badge">{callback.attempt}</span>
+        </p>
+      {/if}
       {#if callback.lastAttemptCompleteTime}
         <p>
           {translate('nexus.last-attempt-completed-time')}

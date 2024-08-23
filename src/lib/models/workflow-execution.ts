@@ -23,7 +23,7 @@ import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed
 
 import { simplifyAttributes } from './event-history/simplify-attributes';
 
-const toPendingActivities = (
+export const toPendingActivities = (
   pendingActivity: PendingActivityInfo[] = [],
 ): PendingActivity[] => {
   return pendingActivity.map((activity): PendingActivity => {

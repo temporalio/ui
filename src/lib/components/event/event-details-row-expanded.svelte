@@ -21,7 +21,7 @@
   import PayloadDecoder from './payload-decoder.svelte';
 
   export let key: string;
-  export let value: string | Record<string, unknown>;
+  export let value: string | number | Record<string, unknown>;
   export let attributes: CombinedAttributes;
   export let inline = false;
 
@@ -92,7 +92,7 @@
           href={routeForEventHistory({
             namespace,
             workflow,
-            run: value,
+            run: value.toString(),
           })}
         >
           {value}
@@ -118,7 +118,7 @@
     <div class="content detail-row">
       <p class="text-sm">{format(key)}</p>
       <div class="badge text-sm">
-        <Link href={routeForTaskQueue({ namespace, queue: value })}>
+        <Link href={routeForTaskQueue({ namespace, queue: value.toString() })}>
           {value}
         </Link>
       </div>

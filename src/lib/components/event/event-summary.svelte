@@ -16,17 +16,23 @@
   import { fullEventHistory, pauseLiveUpdates } from '$lib/stores/events';
   import { eventCategoryFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type { EventTypeCategory, WorkflowEvents } from '$lib/types/events';
+  import type {
+    EventTypeCategory,
+    IterableEventWithPending,
+  } from '$lib/types/events';
 
-  export let history: WorkflowEvents;
+  export let history: IterableEventWithPending[];
   export let groups: EventGroups;
+
+  let showFilters = false;
+  let showDownloadPrompt = false;
 
   $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
   $: reverseSort = $eventFilterSort === 'descending';
-
-  let showFilters = false;
-  let showDownloadPrompt = false;
+  $: updating = !$fullEventHistory.length;
+  $: compact = $eventViewType === 'compact';
+  $: expandAll = $expandAllEvents === 'true';
 
   $: $eventCategoryFilter = $page.url?.searchParams?.get('category')
     ? ($page.url?.searchParams
@@ -34,24 +40,14 @@
         .split(',') as EventTypeCategory[])
     : undefined;
 
-  // $: {
-  //   console.log('Pending Activities: ', workflow.pendingActivities);
-  // }
-  // $: formattedPending = workflow.pendingActivities.map((event) => ({
-  //   ...event,
-  //   id: event.id,
-  //   name: 'Pending Activity',
-  //   startTime: event.lastStartedTime,
-  //   endTime: event.expirationTime,
-  //   attributes: {
-  //     attempt: event.attempt,
-  //     state: event.state,
-  //   },
-  // }));
+  $: pendingActivities = workflow.pendingActivities;
+  $: pendingNexusOperations = workflow.pendingNexusOperations;
 
-  $: compact = $eventViewType === 'compact';
-  $: items = compact ? groups : history;
-  $: updating = !$fullEventHistory.length;
+  $: items = compact
+    ? groups
+    : reverseSort
+    ? [...pendingNexusOperations, ...pendingActivities, ...history]
+    : [...history, ...pendingActivities, ...pendingNexusOperations];
 
   const onAllClick = () => {
     $eventViewType = 'feed';
@@ -72,8 +68,6 @@
       $eventFilterSort = 'descending';
     }
   };
-
-  $: expandAll = $expandAllEvents === 'true';
 
   const onExpandAll = () => {
     if (expandAll) {
@@ -106,19 +100,21 @@
       </ToggleButtons>
     </div>
     <div class="flex items-center gap-2 px-4">
-      <ToggleButtons>
-        <ToggleButton
-          icon={reverseSort ? 'arrow-down' : 'arrow-up'}
-          data-testid="zoom-in"
-          on:click={onSort}>{reverseSort ? 'Desc' : 'Asc'}</ToggleButton
-        >
-        <ToggleButton
-          icon={expandAll ? 'chevron-up' : 'chevron-down'}
-          data-testid="expandAll"
-          tooltip={expandAll ? 'Collapse All Events' : 'Expand All Events'}
-          on:click={onExpandAll}
-        />
-      </ToggleButtons>
+      {#if $eventViewType !== 'json'}
+        <ToggleButtons>
+          <ToggleButton
+            icon={reverseSort ? 'arrow-down' : 'arrow-up'}
+            data-testid="zoom-in"
+            on:click={onSort}>{reverseSort ? 'Desc' : 'Asc'}</ToggleButton
+          >
+          <ToggleButton
+            icon={expandAll ? 'chevron-up' : 'chevron-down'}
+            data-testid="expandAll"
+            tooltip={expandAll ? 'Collapse All Events' : 'Expand All Events'}
+            on:click={onExpandAll}
+          />
+        </ToggleButtons>
+      {/if}
       <ToggleButtons>
         <ToggleButton
           disabled={!workflow.isRunning}
@@ -132,6 +128,7 @@
         <ToggleButton
           data-testid="filter"
           icon="filter"
+          active={showFilters}
           on:click={() => (showFilters = !showFilters)}
           tooltip={showFilters ? 'Hide Filters' : 'Show Filters'}
         />

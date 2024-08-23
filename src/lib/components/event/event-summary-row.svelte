@@ -31,6 +31,7 @@
   export let event: IterableEvent;
   export let group: EventGroup | undefined = undefined;
   export let initialItem: IterableEvent | undefined;
+  export let index = 0;
   export let compact = false;
   export let expandAll = false;
   export let typedError = false;
@@ -57,7 +58,7 @@
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
   $: elapsedTime = formatDistanceAbbreviated({
-    start: initialItem.eventTime,
+    start: initialItem?.eventTime,
     end: isEventGroup(event)
       ? event.initialEvent.eventTime
       : currentEvent.eventTime,
@@ -96,7 +97,7 @@
 
 <tr
   class="row dense"
-  id={event.id}
+  id={`${event.id}-${index}`}
   class:expanded={expanded && !expandAll}
   class:active
   class:failure
@@ -109,7 +110,7 @@
   {#if !compact}
     <td class="w-12 text-left">
       <Link class="truncate px-2" data-testid="link" {href}>
-        {currentEvent.id}
+        {event.id}
       </Link>
     </td>
   {:else}
@@ -213,11 +214,11 @@
   }
 
   .terminated {
-    @apply border-2 border-pink-50 dark:border-pink-700;
+    @apply border-2 border-pink-700;
   }
 
   .terminated .event-name {
-    @apply border-2 border-pink-700 dark:border-pink-50;
+    @apply text-pink-700;
   }
 
   .expanded-cell {

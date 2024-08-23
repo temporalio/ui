@@ -3,16 +3,26 @@
   import { translate } from '$lib/i18n/translate';
   import { isEventGroup } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import { isEvent } from '$lib/models/event-history';
   import { expandAllEvents } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
-  import type { IterableEvent, WorkflowEvents } from '$lib/types/events';
+  import type {
+    IterableEventWithPending,
+    WorkflowEventWithPending,
+  } from '$lib/types/events';
+  import {
+    isPendingActivity,
+    isPendingNexusOperation,
+  } from '$lib/utilities/is-pending-activity';
 
   import HistoryGraph from '../lines-and-dots/svg/history-graph.svelte';
 
   import EventEmptyRow from './event-empty-row.svelte';
   import EventSummaryRow from './event-summary-row.svelte';
+  import PendingActivitySummaryRow from './pending-activity-summary-row.svelte';
+  import PendingNexusSummaryRow from './pending-nexus-summary-row.svelte';
 
-  export let items: IterableEvent[];
+  export let items: IterableEventWithPending[];
   export let groups: EventGroups = [];
   export let updating = false;
   export let compact = false;
@@ -21,8 +31,8 @@
 
   $: expandAll = $expandAllEvents === 'true';
 
-  const history = (items: IterableEvent[]) => {
-    return items as WorkflowEvents;
+  const history = (items: IterableEventWithPending[]) => {
+    return items as WorkflowEventWithPending[];
   };
 </script>
 
@@ -41,16 +51,44 @@
     <HistoryGraph {groups} history={history(visibleItems)} />
   {/if}
   <div class="w-full">
-    {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
-      <EventSummaryRow
-        {event}
-        group={isEventGroup(event)
-          ? event
-          : groups.find((g) => g.eventIds.has(event.id))}
-        {compact}
-        {expandAll}
-        {initialItem}
-      />
+    {#each visibleItems as event, index}
+      {#if isEventGroup(event)}
+        <EventSummaryRow
+          {event}
+          {index}
+          group={event}
+          {compact}
+          {expandAll}
+          {initialItem}
+        />
+      {:else if isEvent(event)}
+        <EventSummaryRow
+          {event}
+          {index}
+          group={groups.find((g) => g.eventIds.has(event.id))}
+          {compact}
+          {expandAll}
+          {initialItem}
+        />
+      {:else if isPendingActivity(event)}
+        <PendingActivitySummaryRow
+          {event}
+          {index}
+          group={groups.find((g) => g?.pendingActivity?.id === event.id)}
+          {expandAll}
+        />
+      {:else if isPendingNexusOperation(event)}
+        <PendingNexusSummaryRow
+          {event}
+          {index}
+          group={groups.find(
+            (g) =>
+              g?.pendingNexusOperation?.scheduledEventId ===
+              event.scheduledEventId,
+          )}
+          {expandAll}
+        />
+      {/if}
     {:else}
       <EventEmptyRow loading={!$fullEventHistory.length} />
     {/each}

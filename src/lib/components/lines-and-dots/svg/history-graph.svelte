@@ -5,16 +5,16 @@
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { filteredEventHistory } from '$lib/stores/events';
-  import type { WorkflowEvents } from '$lib/types/events';
+  import type { WorkflowEventWithPending } from '$lib/types/events';
+  import { getGroupForEventOrPendingEvent } from '$lib/utilities/pending-activities';
 
-  import { getEventDetailsBoxHeight, HistoryConfig } from '../constants';
+  import { HistoryConfig } from '../constants';
 
   import HistoryGraphRowVisual from './history-graph-row-visual.svelte';
   import Line from './line.svelte';
 
   export let groups: EventGroups;
-  export let history: WorkflowEvents;
-  export let activeEvents: string[] = [];
+  export let history: WorkflowEventWithPending[];
   export let zoomLevel: number = 1;
   export let canvasWidth = 100;
 
@@ -26,23 +26,9 @@
 
   const { height, radius } = HistoryConfig;
 
-  $: activeDetailsHeight = activeEvents
-    .map((id) => {
-      const event = history.find((event) => event.id === id);
-      const group = allGroups.find((group) => group.eventIds.has(id));
-      if (group) {
-        return group.eventList.reduce(
-          (sum, event) =>
-            (sum += getEventDetailsBoxHeight(event, group.pendingActivity)),
-          0,
-        );
-      }
-      return getEventDetailsBoxHeight(event);
-    })
-    .reduce((acc, height) => acc + height, 0);
-
-  $: canvasHeight = history.length * height + activeDetailsHeight;
+  $: canvasHeight = history.length * height;
   $: visualWidth = canvasWidth - 1.5 * radius;
+  $: reverseSort = $eventFilterSort === 'descending';
 </script>
 
 <!-- <Button
@@ -64,8 +50,11 @@
     width={canvasWidth}
   >
     <Line
-      startPoint={[visualWidth, height / 2]}
-      endPoint={[visualWidth, canvasHeight]}
+      startPoint={[visualWidth, reverseSort ? 0 : height / 2]}
+      endPoint={[
+        visualWidth,
+        reverseSort ? canvasHeight - height / 2 : canvasHeight,
+      ]}
       strokeWidth={6}
     />
     <svg
@@ -73,10 +62,11 @@
       height={canvasHeight}
       width={canvasWidth / zoomLevel}
     >
-      {#each history as event, index (event.id)}
+      {#each history as event, index}
+        {@const group = getGroupForEventOrPendingEvent(allGroups, event)}
         <HistoryGraphRowVisual
           {event}
-          group={allGroups.find((g) => g.eventIds.has(event.id))}
+          {group}
           groups={allGroups}
           {history}
           canvasWidth={visualWidth}

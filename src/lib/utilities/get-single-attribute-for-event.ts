@@ -1,7 +1,12 @@
 import { isEventGroup } from '$lib/models/event-groups';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import { isEvent } from '$lib/models/event-history';
 import type { Payloads } from '$lib/types';
-import type { WorkflowEvent } from '$lib/types/events';
+import type {
+  PendingActivity,
+  PendingNexusOperation,
+  WorkflowEvent,
+} from '$lib/types/events';
 import type { Payload } from '$lib/types/events';
 import { capitalize } from '$lib/utilities/format-camel-case';
 
@@ -10,6 +15,7 @@ import type { CombinedAttributes } from './format-event-attributes';
 import { has } from './has';
 import { isObject } from './is';
 import { isLocalActivityMarkerEvent } from './is-event-type';
+import { isPendingActivity } from './is-pending-activity';
 
 type SummaryAttribute = {
   key: string;
@@ -236,7 +242,10 @@ const isJavaSDK = (event: WorkflowEvent): boolean => {
  * preferred keys. If a preferred key is found, it will be returned.
  * Otherwise, it will return the first eligible event attribute.
  */
-export const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
+
+export const getEventSummaryAttribute = (
+  event: WorkflowEvent,
+): SummaryAttribute => {
   const first = getFirstDisplayAttribute(event);
 
   if (isLocalActivityMarkerEvent(event)) {
@@ -264,6 +273,27 @@ export const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
   }
 
   return first;
+};
+
+export const getPendingActivitySummaryAttribute = (
+  event: PendingActivity,
+): SummaryAttribute => {
+  return { key: 'attempt', value: event.attempt.toString() };
+};
+
+export const getPendingNexusOperationSummaryAttribute = (
+  event: PendingNexusOperation,
+): SummaryAttribute => {
+  return { key: 'attempt', value: event.attempt.toString() };
+};
+
+export const getSummaryAttribute = (
+  event: WorkflowEvent | PendingActivity | PendingNexusOperation,
+): SummaryAttribute => {
+  if (isEvent(event)) return getEventSummaryAttribute(event);
+  if (isPendingActivity(event))
+    return getPendingActivitySummaryAttribute(event);
+  return getPendingNexusOperationSummaryAttribute(event);
 };
 
 export const getSummaryForEventGroup = ({
