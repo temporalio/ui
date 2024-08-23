@@ -61,11 +61,6 @@ export function decodePayload(
 
   const encoding = atob(String(payload?.metadata?.encoding ?? ''));
 
-  // Help users out with an english encoding
-  if (payload?.metadata) {
-    (payload.metadata.encodingDecoded as unknown as string) = encoding;
-  }
-
   if (encoding?.startsWith('json/')) {
     try {
       const data = parseWithBigInt(atob(String(payload?.data ?? '')));
