@@ -3,11 +3,7 @@ import { get } from 'svelte/store';
 import type { I18nKey } from '$lib/i18n';
 import { translate } from '$lib/i18n/translate';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
-import {
-  relativeTime,
-  timeFormat,
-  type TimeFormat,
-} from '$lib/stores/time-format';
+import { relativeTime, timeFormat } from '$lib/stores/time-format';
 import type {
   EventAttribute,
   EventAttributeKey,
@@ -104,16 +100,8 @@ const formatNestedAttributes = (
   }
 };
 
-export const formatAttributes = (
-  event: IterableEvent,
-  timeFormat: TimeFormat = 'UTC',
-  relativeTime: boolean = false,
-): CombinedAttributes => {
+export const formatAttributes = (event: IterableEvent): CombinedAttributes => {
   const attributes: CombinedAttributes = {};
-
-  attributes.eventTime = formatDate(event.eventTime, timeFormat, {
-    relative: relativeTime,
-  });
 
   if (event.attributes) {
     for (const [key, value] of Object.entries(event.attributes)) {

@@ -9,7 +9,6 @@
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
     shouldDisplayAsExecutionLink,
-    shouldDisplayAsPlainText,
     shouldDisplayAsTaskQueueLink,
     shouldDisplayChildWorkflowLink,
   } from '$lib/utilities/get-single-attribute-for-event';
@@ -32,7 +31,7 @@
 >
   {#if typeof value === 'object'}
     <div
-      class="flex w-full max-w-6xl items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
+      class="flex w-full max-w-xl items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
     >
       <PayloadDecoder {value} key="payloads" let:decodedValue>
         <CodeBlock
@@ -54,7 +53,7 @@
           container-class="xl:flex-row"
         >
           <Link
-            class="truncate"
+            class="badge truncate"
             href={routeForEventHistory({
               namespace,
               workflow,
@@ -76,7 +75,7 @@
           container-class="xl:flex-row"
         >
           <Link
-            class="truncate"
+            class="badge truncate"
             href={routeForEventHistory({
               namespace,
               workflow: attributes.workflowExecutionWorkflowId,
@@ -97,7 +96,7 @@
           content={value}
         >
           <Link
-            class="truncate"
+            class="badge truncate"
             href={routeForTaskQueue({ namespace, queue: value })}
           >
             {value}
@@ -108,10 +107,7 @@
   {:else}
     <div class="flex w-full items-center gap-2 pr-1">
       <p class="truncate text-right text-sm xl:text-left">
-        <span
-          class="w-full select-all text-slate-700"
-          class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
-        >
+        <span class="badge w-full select-all text-slate-700">{value}</span>
       </p>
     </div>
   {/if}

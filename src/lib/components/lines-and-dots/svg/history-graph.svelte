@@ -1,14 +1,8 @@
 <script lang="ts">
   // import Button from '$lib/holocene/button.svelte';
   // import Icon from '$lib/holocene/icon/icon.svelte';
-  import { scrollTop } from '$lib/holocene/main-content-container.svelte';
   import { groupWorkflowTaskEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
-  import {
-    endIndex,
-    indexPageSize,
-    startIndex,
-  } from '$lib/stores/active-events';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { filteredEventHistory } from '$lib/stores/events';
   import type { WorkflowEvents } from '$lib/types/events';
@@ -32,20 +26,6 @@
 
   const { height, radius } = HistoryConfig;
 
-  const setHistorySlice = (top: number) => {
-    let scrollIndex = Math.round(top / height);
-
-    if ($endIndex - scrollIndex < indexPageSize / 4) {
-      $endIndex += indexPageSize;
-    } else if ($startIndex > scrollIndex && scrollIndex < indexPageSize / 4) {
-      $startIndex = 0;
-    }
-  };
-
-  $: setHistorySlice($scrollTop);
-
-  $: visibleHistory = history.slice($startIndex, $endIndex);
-
   $: activeDetailsHeight = activeEvents
     .map((id) => {
       const event = history.find((event) => event.id === id);
@@ -61,7 +41,7 @@
     })
     .reduce((acc, height) => acc + height, 0);
 
-  $: canvasHeight = visibleHistory.length * height + activeDetailsHeight;
+  $: canvasHeight = history.length * height + activeDetailsHeight;
   $: visualWidth = canvasWidth - 1.5 * radius;
 </script>
 
@@ -93,7 +73,7 @@
       height={canvasHeight}
       width={canvasWidth / zoomLevel}
     >
-      {#each visibleHistory as event, index (event.id)}
+      {#each history as event, index (event.id)}
         <HistoryGraphRowVisual
           {event}
           group={allGroups.find((g) => g.eventIds.has(event.id))}

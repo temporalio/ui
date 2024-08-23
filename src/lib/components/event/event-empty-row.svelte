@@ -8,18 +8,14 @@
   export let content = translate('events.empty-state-description');
 </script>
 
-<tr class="row">
-  <td colspan="6">
-    {#if loading}
-      <Loading />
-    {:else}
-      <EmptyState {title} {content} />
-    {/if}
-  </td>
-</tr>
+{#if loading}
+  <Loading />
+{:else}
+  <EmptyState {title} {content} />
+{/if}
 
 <style lang="postcss">
   .row {
-    @apply border-2  p-2 text-center text-sm;
+    @apply flex grow p-2 text-center text-sm;
   }
 </style>

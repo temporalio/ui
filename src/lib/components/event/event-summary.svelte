@@ -8,7 +8,11 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
-  import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
+  import {
+    eventFilterSort,
+    eventViewType,
+    expandAllEvents,
+  } from '$lib/stores/event-view';
   import { fullEventHistory, pauseLiveUpdates } from '$lib/stores/events';
   import { eventCategoryFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -68,6 +72,16 @@
       $eventFilterSort = 'descending';
     }
   };
+
+  $: expandAll = $expandAllEvents === 'true';
+
+  const onExpandAll = () => {
+    if (expandAll) {
+      $expandAllEvents = 'false';
+    } else {
+      $expandAllEvents = 'true';
+    }
+  };
 </script>
 
 <div class="flex flex-col items-center gap-4 md:items-start">
@@ -98,6 +112,12 @@
           data-testid="zoom-in"
           on:click={onSort}>{reverseSort ? 'Desc' : 'Asc'}</ToggleButton
         >
+        <ToggleButton
+          icon={expandAll ? 'chevron-up' : 'chevron-down'}
+          data-testid="expandAll"
+          tooltip={expandAll ? 'Collapse All Events' : 'Expand All Events'}
+          on:click={onExpandAll}
+        />
       </ToggleButtons>
       <ToggleButtons>
         <ToggleButton

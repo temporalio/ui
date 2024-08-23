@@ -114,6 +114,10 @@
 
   .split .paginated-table-body {
     @apply flex;
+
+    :global(tr > td) {
+      @apply px-0;
+    }
   }
 
   .paginated-table-controls {

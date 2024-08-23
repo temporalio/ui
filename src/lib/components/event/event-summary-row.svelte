@@ -6,6 +6,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { isEventGroup } from '$lib/models/event-groups';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
     eventOrGroupIsCanceled,
     eventOrGroupIsFailureOrTimedOut,
@@ -28,6 +29,7 @@
   import EventDetailsRow from './event-details-row.svelte';
 
   export let event: IterableEvent;
+  export let group: EventGroup | undefined = undefined;
   export let initialItem: IterableEvent | undefined;
   export let compact = false;
   export let expandAll = false;
@@ -51,7 +53,7 @@
   $: showElapsed = $eventShowElapsed === 'true';
   $: showElapsedTimeDiff =
     showElapsed && initialItem && event.id !== initialItem.id;
-  $: attributes = formatAttributes(event, $timeFormat, $relativeTime);
+  $: attributes = formatAttributes(event);
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
   $: elapsedTime = formatDistanceAbbreviated({
@@ -104,13 +106,17 @@
   data-testid="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td class="w-12 px-1 text-left">
-    <Link class="truncate" data-testid="link" {href}>
-      {event.id}
-    </Link>
-  </td>
+  {#if !compact}
+    <td class="w-12 text-left">
+      <Link class="truncate px-2" data-testid="link" {href}>
+        {currentEvent.id}
+      </Link>
+    </td>
+  {:else}
+    <td class="w-4" />
+  {/if}
   <td
-    class="w-full grow overflow-hidden text-right text-sm font-normal xl:text-left"
+    class="w-full overflow-hidden text-right text-sm font-normal xl:text-left"
   >
     <div class="flex">
       <div>
@@ -124,7 +130,7 @@
           <Icon class="mr-1.5 inline text-pink-700" name="clock" />
         {/if}
       </div>
-      <div class="flex w-full grow items-center gap-2">
+      <div class="flex w-full items-center gap-2">
         <Icon name={icon} />
         <p class="event-name truncate text-sm font-semibold md:text-base">
           {displayName}
@@ -141,43 +147,53 @@
       </div>
     </div>
   </td>
-  <td class="w-60 px-4">
-    <div class="flex flex-col gap-0 text-right">
-      {#if showElapsedTimeDiff}
-        <p class="truncate text-sm">
-          {#if elapsedTime}
-            {descending ? '-' : '+'}{elapsedTime}
+  <td>
+    {#if isEventGroup(event)}
+      <div class="flex items-center gap-0.5 px-2">
+        {#each event.eventList as groupEvent}
+          <Link class="truncate" data-testid="link" {href}>
+            {groupEvent.id}
+          </Link>
+        {/each}
+      </div>
+    {:else}
+      <div class="flex flex-col gap-0 px-2 text-right">
+        {#if showElapsedTimeDiff}
+          <p class="truncate text-sm">
+            {#if elapsedTime}
+              {descending ? '-' : '+'}{elapsedTime}
+            {/if}
+          </p>
+          {#if duration && duration !== '0ms'}
+            <div class="flex flex-row items-center gap-1">
+              <Icon class="inline" name="clock" />
+              <p class="truncate text-sm md:whitespace-normal">
+                {duration}
+              </p>
+            </div>
           {/if}
-        </p>
-        {#if duration && duration !== '0ms'}
-          <div class="flex flex-row items-center gap-1">
-            <Icon class="inline" name="clock" />
-            <p class="truncate text-sm md:whitespace-normal">
-              {duration}
-            </p>
-          </div>
+        {:else}
+          <p class="truncate text-sm">
+            {formatDate(currentEvent?.eventTime, $timeFormat, {
+              relative: $relativeTime,
+            })}
+          </p>
         {/if}
-      {:else}
-        <p class="truncate text-sm">
-          {formatDate(event?.eventTime, $timeFormat, {
-            relative: $relativeTime,
-          })}
-        </p>
-      {/if}
-    </div>
+      </div>
+    {/if}
   </td>
 </tr>
 {#if expanded}
   <tr class:typedError class="row expanded">
     <td class="expanded-cell w-full" colspan="3">
-      <EventDetailsFull {event} {currentEvent} {compact} />
+      <EventDetailsFull {group} event={currentEvent} />
     </td>
   </tr>
 {/if}
 
 <style lang="postcss">
   .row {
-    @apply flex min-w-fit select-none items-center text-sm no-underline;
+    @apply flex select-none items-center text-sm no-underline;
   }
 
   .failure {
