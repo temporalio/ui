@@ -68,7 +68,7 @@ export const getGroupForEventOrPendingEvent = (
       return g.pendingActivity?.id === event.id;
     } else if (isPendingNexusOperation(event)) {
       return (
-        g.pendingNexusOperation.scheduledEventId === event?.scheduledEventId
+        g?.pendingNexusOperation?.scheduledEventId === event?.scheduledEventId
       );
     }
   });

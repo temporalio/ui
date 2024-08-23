@@ -65,7 +65,7 @@
         <EventSummaryRow
           {event}
           {index}
-          group={groups.find((g) => g.eventIds.has(event.id))}
+          group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
           {compact}
           {expandAll}
           {initialItem}
@@ -74,7 +74,10 @@
         <PendingActivitySummaryRow
           {event}
           {index}
-          group={groups.find((g) => g?.pendingActivity?.id === event.id)}
+          group={groups.find(
+            (g) =>
+              isPendingActivity(event) && g?.pendingActivity?.id === event.id,
+          )}
           {expandAll}
         />
       {:else if isPendingNexusOperation(event)}
@@ -83,8 +86,9 @@
           {index}
           group={groups.find(
             (g) =>
+              isPendingNexusOperation(event) &&
               g?.pendingNexusOperation?.scheduledEventId ===
-              event.scheduledEventId,
+                event.scheduledEventId,
           )}
           {expandAll}
         />
