@@ -16,7 +16,7 @@ export const TEMPORAL_THEME = EditorView.theme(
     '.thin &': {
       padding: '0rem',
       height: '1.5rem',
-      borderWidth: 'inset 2px',
+      borderRadius: '0.15rem',
     },
     '.cm-matchingBracket': {
       backgroundColor: colors.black,

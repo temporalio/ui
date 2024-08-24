@@ -1,5 +1,6 @@
 <script lang="ts">
   import { noop } from 'svelte/internal';
+  import { fade, slide } from 'svelte/transition';
 
   import { page } from '$app/stores';
 
@@ -19,7 +20,10 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
+  import {
+    getPrimaryAttributeForEvent,
+    getSecondaryAttributeForEvent,
+  } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
 
@@ -86,13 +90,23 @@
     ? CategoryIcon['local-activity']
     : CategoryIcon[event.category];
 
-  $: displayName = spaceBetweenCapitalLetters(
-    isEventGroup(event)
-      ? event.displayName
-      : isLocalActivityMarkerEvent(event)
-      ? 'LocalActivity'
-      : event.name,
+  $: displayName = isEventGroup(event)
+    ? event.label
+    : isLocalActivityMarkerEvent(event)
+    ? 'Local Activity'
+    : spaceBetweenCapitalLetters(event.name);
+
+  $: primaryAttribute = getPrimaryAttributeForEvent(
+    isEventGroup(event) ? event.initialEvent : event,
   );
+  $: secondaryAttribute = getSecondaryAttributeForEvent(
+    isEventGroup(event) ? event.lastEvent : event,
+    primaryAttribute.key,
+  );
+  $: pendingAttempt =
+    isEventGroup(event) &&
+    event.isPending &&
+    (event?.pendingActivity?.attempt || event?.pendingNexusOperation?.attempt);
 </script>
 
 <tr
@@ -119,32 +133,44 @@
   <td
     class="w-full overflow-hidden text-right text-sm font-normal xl:text-left"
   >
-    <div class="flex">
-      <div>
-        {#if compact && failure}
-          <Icon class="mr-1.5 inline text-red-700" name="clock" />
-        {/if}
-        {#if compact && canceled}
-          <Icon class="mr-1.5 inline text-yellow-700" name="clock" />
-        {/if}
-        {#if compact && terminated}
-          <Icon class="mr-1.5 inline text-pink-700" name="clock" />
-        {/if}
-      </div>
-      <div class="flex w-full items-center gap-2">
-        <Icon name={icon} />
-        <p class="event-name truncate text-sm font-semibold md:text-base">
-          {displayName}
+    <div class="flex w-full items-center gap-2">
+      <Icon name={icon} />
+      <p
+        class="max-w-fit whitespace-nowrap pr-4 text-sm font-semibold md:text-base"
+      >
+        {displayName}
+      </p>
+      {#if isEventGroup(event) && event.pendingNexusOperation}
+        <p class="text-sm">
+          {event.pendingNexusOperation.state}
         </p>
-        <div class="truncate">
+      {/if}
+      <div class="flex w-full gap-4 truncate">
+        {#if pendingAttempt}
+          <div class="flex items-center gap-1">
+            <Icon
+              class="mr-1.5 inline {pendingAttempt > 1
+                ? 'text-red-700'
+                : 'text-indigo-700'}"
+              name="retry"
+            />
+            {pendingAttempt}
+          </div>
+        {/if}
+        <EventDetailsRow
+          {...primaryAttribute}
+          {attributes}
+          showKey
+          class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
+        />
+        {#if compact}
           <EventDetailsRow
-            {...getSingleAttributeForEvent(
-              isEventGroup(event) ? event.initialEvent : event,
-            )}
+            {...secondaryAttribute}
             {attributes}
+            showKey
             class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
           />
-        </div>
+        {/if}
       </div>
     </div>
   </td>
@@ -185,9 +211,14 @@
   </td>
 </tr>
 {#if expanded}
-  <tr class:typedError class="row expanded">
+  <tr
+    in:fade
+    out:slide={{ duration: 175 }}
+    class:typedError
+    class="row expanded"
+  >
     <td class="expanded-cell w-full" colspan="3">
-      <EventDetailsFull {group} event={currentEvent} />
+      <EventDetailsFull {group} event={currentEvent} {compact} />
     </td>
   </tr>
 {/if}

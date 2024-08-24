@@ -32,23 +32,26 @@
   data-testid="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td class="w-10" />
+  <td />
   <td
     class="w-full overflow-hidden text-right text-sm font-normal xl:text-left"
   >
     <div class="flex">
       <div class="flex w-full items-center gap-2">
         <Icon name="nexus" />
-        <p class="event-name truncate text-sm font-semibold md:text-base">
-          Pending Nexus Operation
-        </p>
-        <Icon
-          class="mr-1.5 inline {event.attempt > 1
-            ? 'text-red-700'
-            : 'text-green-700'}"
-          name="retry"
-        />
-        {event.attempt}
+        <p class="font-semibold md:text-base">Pending Nexus Operation</p>
+        <p>{event.state}</p>
+        {#if event.attempt}
+          <div class="flex items-center gap-1">
+            <Icon
+              class="mr-1.5 inline {event.attempt > 1
+                ? 'text-red-700'
+                : 'text-indigo-700'}"
+              name="retry"
+            />
+            {event.attempt}
+          </div>
+        {/if}
       </div>
     </div>
   </td>

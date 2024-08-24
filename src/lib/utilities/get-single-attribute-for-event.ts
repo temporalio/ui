@@ -1,5 +1,3 @@
-import { isEventGroup } from '$lib/models/event-groups';
-import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { isEvent } from '$lib/models/event-history';
 import type { Payloads } from '$lib/types';
 import type {
@@ -206,13 +204,18 @@ const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
  * A list of the keys that should be shown in the summary view.
  */
 const preferredSummaryKeys = [
+  'activityType',
+  'signalName',
+  'workflowType',
+  'result',
   'failure',
   'input',
-  'activityType',
-  'parentInitiatedEventId',
+  'outcome',
   'workflowExecution',
-  'workflowType',
-  'taskQueue',
+  'taskQueueName',
+  'startToFireTimeout',
+  'identity',
+  'parentInitiatedEventId',
 ] as const;
 
 /**
@@ -264,8 +267,8 @@ export const getEventSummaryAttribute = (
     }
   }
 
-  for (const [key, value] of Object.entries(event.attributes)) {
-    for (const preferredKey of preferredSummaryKeys) {
+  for (const preferredKey of preferredSummaryKeys) {
+    for (const [key, value] of Object.entries(event.attributes)) {
       if (key === preferredKey && shouldDisplayAttribute(key, value)) {
         return formatSummaryValue(key, value);
       }
@@ -296,20 +299,34 @@ export const getSummaryAttribute = (
   return getPendingNexusOperationSummaryAttribute(event);
 };
 
-export const getSummaryForEventGroup = ({
-  lastEvent,
-}: EventGroup): SummaryAttribute => {
-  return getSummaryAttribute(lastEvent);
-};
-
-export const getSingleAttributeForEvent = (
-  event: WorkflowEvent | EventGroup,
+export const getPrimaryAttributeForEvent = (
+  event: WorkflowEvent,
 ): SummaryAttribute => {
   if (!event) return emptyAttribute;
 
-  if (isEventGroup(event)) {
-    return getSummaryForEventGroup(event);
+  return getSummaryAttribute(event);
+};
+
+export const getSecondaryAttributeForEvent = (
+  event: WorkflowEvent,
+  primaryKey: string,
+): SummaryAttribute => {
+  if (!event) return emptyAttribute;
+
+  console.log('primaryKey', primaryKey);
+  for (const preferredKey of preferredSummaryKeys) {
+    for (const [key, value] of Object.entries(event.attributes)) {
+      if (
+        key === preferredKey &&
+        key !== primaryKey &&
+        shouldDisplayAttribute(key, value)
+      ) {
+        console.log('key', key);
+
+        return formatSummaryValue(key, value);
+      }
+    }
   }
 
-  return getSummaryAttribute(event);
+  return emptyAttribute;
 };

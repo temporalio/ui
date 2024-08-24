@@ -14,7 +14,7 @@
   <InputAndResultsPayload
     content={workflowEvents.input}
     {isRunning}
-    title="Inputs"
+    title="Input"
   />
   <InputAndResultsPayload
     content={workflowEvents.results}

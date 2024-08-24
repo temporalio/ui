@@ -32,7 +32,7 @@
   data-testid="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td class="w-10" />
+  <td />
   <td
     class="w-full overflow-hidden text-right text-sm font-normal xl:text-left"
   >
@@ -45,7 +45,7 @@
         <Icon
           class="mr-1.5 inline {event.attempt > 1
             ? 'text-red-700'
-            : 'text-green-700'}"
+            : 'text-indigo-700'}"
           name="retry"
         />
         {event.attempt} / {event.maximumAttempts || '∞'}
