@@ -50,7 +50,7 @@
       {/each}
       {#if pendingEvent}
         {@const details = Object.entries(pendingEvent)}
-        <div class="w-full border-interactive [&:not(:last-child)]:border-r-2">
+        <div class="w-full border-subtle [&:not(:last-child)]:border-r-2">
           <div class="pending flex w-full justify-between px-2 py-1 text-white">
             <div class="flex gap-2">
               Pending {isPendingActivity(pendingEvent)
@@ -78,7 +78,7 @@
   {@const attributes = formatAttributes(event)}
   {@const details = Object.entries(attributes)}
   <div class="w-full p-2">
-    <div class="w-full overflow-hidden rounded-xl border-2 border-interactive">
+    <div class="w-full overflow-hidden rounded-xl border-2 border-subtle">
       {#each details as [key, value] (key)}
         <EventDetailsRowExpanded {key} {value} {attributes} />
       {/each}

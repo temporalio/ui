@@ -46,7 +46,7 @@
             <Icon
               class="mr-1.5 inline {event.attempt > 1
                 ? 'text-red-700'
-                : 'text-indigo-700'}"
+                : 'text-primary'}"
               name="retry"
             />
             {event.attempt}
