@@ -212,7 +212,7 @@ const preferredSummaryKeys = [
   'input',
   'outcome',
   'workflowExecution',
-  'taskQueueName',
+  'taskQueue',
   'startToFireTimeout',
   'identity',
   'parentInitiatedEventId',

@@ -136,7 +136,7 @@
     <div class="flex w-full items-center gap-2">
       <Icon name={icon} />
       <p
-        class="max-w-fit whitespace-nowrap pr-4 text-sm font-semibold md:text-base"
+        class="event-name max-w-fit whitespace-nowrap pr-4 text-sm font-semibold md:text-base"
       >
         {displayName}
       </p>

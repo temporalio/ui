@@ -261,6 +261,7 @@ describe('getEventGroupDisplayName', () => {
     };
 
     const localActivityEvent = {
+      eventType: 'MarkerRecorded',
       markerRecordedEventAttributes: {
         markerName: 'core_local_activity',
         details: {

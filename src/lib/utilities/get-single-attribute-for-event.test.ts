@@ -128,29 +128,32 @@ describe('getPrimaryAttributeForEvent', () => {
     });
   });
 
-  it('should return "taskqueue.name" if the workflow type does not exists', async () => {
+  it('should return "input" if the workflow type does not exists', async () => {
     const event = { ...workflowEvent };
     event.attributes.workflowType = null;
     expect(await getPrimaryAttributeForEvent(event)).toStrictEqual({
-      key: 'taskQueueName',
-      value: 'rainbow-statuses',
+      key: 'input',
+      value: {
+        payloads: [
+          {
+            At: '2022-04-04T11:50:28.151785-05:00',
+            Hey: 'from Mars',
+          },
+        ],
+      },
     });
   });
 
-  it('should return "parentInitiatedEventId" if the workflow type and task queue does not exist', async () => {
+  it('should return "taskQueue" if the workflow type and input does not exist', async () => {
     const event = { ...workflowEvent };
     event.attributes.workflowType = null as unknown as {
       name: string;
     };
-
-    event.attributes.taskQueue = null as unknown as {
-      name: string;
-      kind: string;
-    };
+    event.attributes.input = null;
 
     expect(await getPrimaryAttributeForEvent(event)).toStrictEqual({
-      key: 'parentInitiatedEventId',
-      value: '0',
+      key: 'taskQueueName',
+      value: 'rainbow-statuses',
     });
   });
 

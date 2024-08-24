@@ -13,9 +13,3 @@
 {:else}
   <EmptyState {title} {content} />
 {/if}
-
-<style lang="postcss">
-  .row {
-    @apply flex grow p-2 text-center text-sm;
-  }
-</style>
