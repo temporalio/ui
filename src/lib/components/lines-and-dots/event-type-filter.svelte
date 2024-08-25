@@ -1,6 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     allEventTypeOptions,
@@ -20,6 +21,7 @@
       ...o,
       label: translate(o.label),
       icon: CategoryIcon[o.value],
+      tooltip: translate(o.label + '-tooltip'),
     }),
   );
 
@@ -45,26 +47,28 @@
 
 <div class="flex flex-wrap items-center items-center justify-center gap-4">
   {#each options as option}
-    <div class="flex items-center">
-      <Checkbox
-        type="checkbox"
-        on:click={() => onOptionClick(option)}
-        checked={$eventTypeFilter.some((type) => type === option.value)}
-      />
-      <div
-        role="button"
-        tabindex="0"
-        class="flex cursor-pointer select-none items-center text-sm"
-        on:click={() => onOptionClick(option)}
-        on:keydown={(e) => e.key === 'Enter' && onOptionClick(option)}
-      >
-        {#if option.icon}
-          <span class="lg:hidden"
-            ><Icon slot="trailing" name={option.icon} /></span
-          >
-        {/if}
-        <span class="hidden lg:block">{option.label}</span>
+    <Tooltip width={200} text={option.tooltip} top>
+      <div class="flex items-center">
+        <Checkbox
+          type="checkbox"
+          on:click={() => onOptionClick(option)}
+          checked={$eventTypeFilter.some((type) => type === option.value)}
+        />
+        <div
+          role="button"
+          tabindex="0"
+          class="flex cursor-pointer select-none items-center text-sm"
+          on:click={() => onOptionClick(option)}
+          on:keydown={(e) => e.key === 'Enter' && onOptionClick(option)}
+        >
+          {#if option.icon}
+            <span class="lg:hidden"
+              ><Icon slot="trailing" name={option.icon} /></span
+            >
+          {/if}
+          <span class="hidden lg:block">{option.label}</span>
+        </div>
       </div>
-    </div>
+    </Tooltip>
   {/each}
 </div>

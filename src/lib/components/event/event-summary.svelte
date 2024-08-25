@@ -135,10 +135,14 @@
       </ToggleButtons>
     </div>
   </div>
-  <div class="flex w-full flex-col justify-between gap-2 px-4 pb-2 lg:flex-row">
-    <EventTypeFilter {compact} />
-    <EventStatusFilter />
-  </div>
+  {#if $eventViewType !== 'json'}
+    <div
+      class="flex w-full flex-col justify-between gap-2 px-4 pb-2 lg:flex-row"
+    >
+      <EventStatusFilter />
+      <EventTypeFilter {compact} />
+    </div>
+  {/if}
 </div>
 {#if $eventViewType === 'json'}
   <div class="px-4">

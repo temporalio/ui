@@ -40,17 +40,18 @@
   let viewportHeight = 360;
   let scrollY = 0;
 
+  $: filteredGroups = getFailedOrPendingGroups(groups, $eventStatusFilter);
   $: startTime = $fullEventHistory[0]?.eventTime || workflow.startTime;
   $: activeDetailsHeight = activeGroups
     .map((id) => {
-      const group = groups.find((group) => group.id === id);
+      const group = filteredGroups.find((group) => group.id === id);
       if (!group) return 0;
       return getGroupDetailsBoxHeight(group, canvasWidth);
     })
     .reduce((acc, height) => acc + height, 0);
 
   $: timelineHeight =
-    Math.max(height * (groups.length + 2), 120) + activeDetailsHeight;
+    Math.max(height * (filteredGroups.length + 2), 120) + activeDetailsHeight;
   $: canvasHeight = timelineHeight + 140;
 
   const onExpandCollapse = () => {
@@ -129,13 +130,13 @@
         {duration}
       />
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
-      {#each getFailedOrPendingGroups(groups, $eventStatusFilter) as group, index (group.id)}
+      {#each filteredGroups as group, index (group.id)}
         {@const y =
           (index + 2) * height +
           activeGroupsHeightAboveGroup(
             activeGroups,
             group,
-            groups,
+            filteredGroups,
             canvasWidth,
             $eventFilterSort,
           )}
