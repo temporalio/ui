@@ -40,15 +40,12 @@
       <div class="flex w-full items-center gap-2">
         <Icon name="nexus" />
         <p class="font-semibold md:text-base">Pending Nexus Operation</p>
-        <p>{event.state}</p>
         {#if event.attempt}
-          <div class="flex items-center gap-1">
-            <Icon
-              class="mr-1.5 inline {event.attempt > 1
-                ? 'text-red-700'
-                : 'text-primary'}"
-              name="retry"
-            />
+          <div
+            class="flex items-center gap-1 {event.attempt > 1 &&
+              'surface-danger rounded px-1 py-0.5'}"
+          >
+            <Icon class="mr-1.5 inline" name="retry" />
             {event.attempt}
           </div>
         {/if}

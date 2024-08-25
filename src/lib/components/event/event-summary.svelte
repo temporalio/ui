@@ -21,10 +21,11 @@
     IterableEventWithPending,
   } from '$lib/types/events';
 
+  import EventStatusFilter from '../lines-and-dots/event-status-filter.svelte';
+
   export let history: IterableEventWithPending[];
   export let groups: EventGroups;
 
-  let showFilters = false;
   let showDownloadPrompt = false;
 
   $: ({ namespace } = $page.params);
@@ -126,13 +127,6 @@
           on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
         />
         <ToggleButton
-          data-testid="filter"
-          icon="filter"
-          active={showFilters}
-          on:click={() => (showFilters = !showFilters)}
-          tooltip={showFilters ? 'Hide Filters' : 'Show Filters'}
-        />
-        <ToggleButton
           data-testid="download"
           icon="download"
           tooltip="Download Event History"
@@ -141,11 +135,10 @@
       </ToggleButtons>
     </div>
   </div>
-  {#if showFilters}
-    <div class="flex flex-col items-center justify-center px-4 pb-2">
-      <EventTypeFilter {compact} />
-    </div>
-  {/if}
+  <div class="flex w-full flex-col justify-between gap-2 px-4 pb-2 lg:flex-row">
+    <EventTypeFilter {compact} />
+    <EventStatusFilter />
+  </div>
 </div>
 {#if $eventViewType === 'json'}
   <div class="px-4">

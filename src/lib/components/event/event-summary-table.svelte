@@ -6,10 +6,12 @@
   import { isEvent } from '$lib/models/event-history';
   import { expandAllEvents } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
+  import { eventStatusFilter } from '$lib/stores/filters';
   import type {
     IterableEventWithPending,
     WorkflowEventWithPending,
   } from '$lib/types/events';
+  import { getFailedOrPendingEvents } from '$lib/utilities/get-failed-or-pending';
   import {
     isPendingActivity,
     isPendingNexusOperation,
@@ -34,6 +36,9 @@
   const history = (items: IterableEventWithPending[]) => {
     return items as WorkflowEventWithPending[];
   };
+
+  $: filteredForStatus = (items: IterableEventWithPending[]) =>
+    getFailedOrPendingEvents(items, $eventStatusFilter);
 </script>
 
 <Paginated
@@ -42,7 +47,7 @@
   previousPageButtonLabel={translate('common.previous-page')}
   pageButtonLabel={(page) => translate('common.go-to-page', { page })}
   {updating}
-  {items}
+  items={filteredForStatus(items)}
   let:visibleItems
   variant="split"
   maxHeight="calc(100vh - 200px)"

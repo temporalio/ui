@@ -30,14 +30,16 @@
 
 {#if key}
   <div
-    class="flex flex-row items-center gap-2 first:pt-0 last:border-b-0 {$$props.class}"
+    class="flex max-w-xl flex-row items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 {$$props.class}"
   >
     {#if showKey}
-      <p class="max-w-fit text-right text-xs">{format(key)}</p>
+      <p class="max-w-fit whitespace-nowrap text-right text-xs">
+        {format(key)}
+      </p>
     {/if}
     {#if typeof value === 'object'}
       <div
-        class="flex w-full max-w-xl items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
+        class="flex w-full items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
       >
         <PayloadDecoder {value} key="payloads" let:decodedValue>
           <CodeBlock

@@ -14,12 +14,12 @@
 
   export let group: EventGroup | undefined = undefined;
   export let event: WorkflowEvent | undefined = undefined;
-  export let compact = false;
 
   $: pendingEvent = group?.pendingActivity || group?.pendingNexusOperation;
   $: showEventGroup = group && (group.eventList.length > 1 || pendingEvent);
-  $: childWorkflowEvent =
-    compact && group?.eventList.find(isChildWorkflowExecutionStartedEvent);
+  $: childWorkflowEvent = group?.eventList.find(
+    isChildWorkflowExecutionStartedEvent,
+  );
 </script>
 
 {#if showEventGroup}

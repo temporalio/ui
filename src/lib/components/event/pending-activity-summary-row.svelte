@@ -6,6 +6,7 @@
   import type { PendingActivity } from '$lib/types/events';
 
   import EventDetailsFull from './event-details-full.svelte';
+  import EventDetailsRow from './event-details-row.svelte';
 
   export let event: PendingActivity;
   export let group: EventGroup | undefined = undefined;
@@ -36,22 +37,27 @@
   <td
     class="w-full overflow-hidden text-right text-sm font-normal xl:text-left"
   >
-    <div class="flex">
-      <div class="flex w-full items-center gap-2">
-        <Icon name="activity" />
-        <p class="event-name truncate text-sm font-semibold md:text-base">
-          Pending Activity
-        </p>
-        <Icon
-          class="mr-1.5 inline {event.attempt > 1
-            ? 'text-red-700'
-            : 'text-primary'}"
-          name="retry"
-        />
+    <div class="flex w-full items-center gap-2">
+      <Icon name="activity" />
+      <p class="event-name truncate text-sm font-semibold md:text-base">
+        Pending Activity
+      </p>
+      <div
+        class="flex items-center gap-1 {event.attempt > 1 &&
+          'surface-danger rounded px-1 py-0.5'}"
+      >
+        <Icon class="mr-1.5 inline" name="retry" />
         {event.attempt} / {event.maximumAttempts || '∞'}
       </div>
-    </div>
-  </td>
+      <EventDetailsRow
+        key="activityType"
+        value={event.activityType}
+        showKey
+        attributes={event}
+        class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
+      />
+    </div></td
+  >
   <td />
 </tr>
 {#if expanded}

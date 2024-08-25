@@ -82,9 +82,9 @@
     onRowClick();
   };
 
-  const failure = eventOrGroupIsFailureOrTimedOut(event);
-  const canceled = eventOrGroupIsCanceled(event);
-  const terminated = eventOrGroupIsTerminated(event);
+  $: failure = eventOrGroupIsFailureOrTimedOut(event);
+  $: canceled = eventOrGroupIsCanceled(event);
+  $: terminated = eventOrGroupIsTerminated(event);
 
   $: icon = isLocalActivityMarkerEvent(event)
     ? CategoryIcon['local-activity']
@@ -107,6 +107,7 @@
     isEventGroup(event) &&
     event.isPending &&
     (event?.pendingActivity?.attempt || event?.pendingNexusOperation?.attempt);
+  $: hasPendingActivity = isEventGroup(event) && event?.pendingActivity;
 </script>
 
 <tr
@@ -123,7 +124,7 @@
 >
   {#if !compact}
     <td class="w-12 text-left">
-      <Link class="truncate px-2" data-testid="link" {href}>
+      <Link class="truncate px-1" data-testid="link" {href}>
         {event.id}
       </Link>
     </td>
@@ -133,28 +134,26 @@
   <td
     class="w-full overflow-hidden text-right text-sm font-normal xl:text-left"
   >
-    <div class="flex w-full items-center gap-2">
+    <div
+      class="flex w-full max-w-screen-sm items-center gap-2 lg:max-w-screen-md xl:max-w-screen-xl"
+    >
       <Icon name={icon} />
       <p
         class="event-name max-w-fit whitespace-nowrap pr-4 text-sm font-semibold md:text-base"
       >
         {displayName}
       </p>
-      {#if isEventGroup(event) && event.pendingNexusOperation}
-        <p class="text-sm">
-          {event.pendingNexusOperation.state}
-        </p>
-      {/if}
       <div class="flex w-full gap-4 truncate">
         {#if pendingAttempt}
-          <div class="flex items-center gap-1">
-            <Icon
-              class="mr-1.5 inline {pendingAttempt > 1
-                ? 'text-red-700'
-                : 'text-primary'}"
-              name="retry"
-            />
+          <div
+            class="flex items-center gap-1 {pendingAttempt > 1 &&
+              'surface-danger rounded px-1 py-0.5'}"
+          >
+            <Icon class="mr-1.5 inline" name="retry" />
             {pendingAttempt}
+            {#if hasPendingActivity}
+              / {hasPendingActivity.maximumAttempts || '∞'}
+            {/if}
           </div>
         {/if}
         <EventDetailsRow
@@ -218,7 +217,7 @@
     class="row expanded"
   >
     <td class="expanded-cell w-full" colspan="3">
-      <EventDetailsFull {group} event={currentEvent} {compact} />
+      <EventDetailsFull {group} event={currentEvent} />
     </td>
   </tr>
 {/if}

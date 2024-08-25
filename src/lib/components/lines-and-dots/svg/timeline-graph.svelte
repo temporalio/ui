@@ -4,10 +4,12 @@
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
+  import { eventStatusFilter } from '$lib/stores/filters';
   import { timeFormat } from '$lib/stores/time-format';
   import type { WorkflowTaskFailedEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
+  import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';
 
   import {
     activeGroupsHeightAboveGroup,
@@ -127,7 +129,7 @@
         {duration}
       />
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
-      {#each groups as group, index (group.id)}
+      {#each getFailedOrPendingGroups(groups, $eventStatusFilter) as group, index (group.id)}
         {@const y =
           (index + 2) * height +
           activeGroupsHeightAboveGroup(

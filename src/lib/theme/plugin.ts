@@ -142,6 +142,10 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-subtle'),
         color: css('--color-text-black'),
       },
+      '.surface-danger': {
+        backgroundColor: css('--color-surface-danger'),
+        color: css('--color-text-primary'),
+      },
       '.surface-black': {
         backgroundColor: css('--color-surface-black'),
         color: css('--color-text-white'),

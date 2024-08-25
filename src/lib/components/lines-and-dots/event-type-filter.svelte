@@ -24,8 +24,14 @@
   );
 
   $: {
-    if (isVersionNewer('1.21', $temporalVersion)) {
+    if (isVersionNewer('1.21.0', $temporalVersion)) {
       options = options.filter(({ value }) => value !== 'update');
+    }
+  }
+
+  $: {
+    if (isVersionNewer('1.25.0', $temporalVersion)) {
+      options = options.filter(({ value }) => value !== 'nexus');
     }
   }
 
