@@ -183,12 +183,14 @@
   </td>
   <td>
     {#if isEventGroup(event)}
-      <div class="flex items-center gap-0.5 px-2">
-        <!-- {#each event.eventList as groupEvent}
-          <Link class="truncate" data-testid="link" {href}>
-            {groupEvent.id}
-          </Link>
-        {/each} -->
+      <div class="flex items-center gap-2 px-2">
+        <div class="flex gap-0.5">
+          {#each event.eventList as groupEvent}
+            <Link class="truncate" data-testid="link" {href}>
+              {groupEvent.id}
+            </Link>
+          {/each}
+        </div>
         {#if duration && duration !== '0ms'}
           <div class="flex flex-row items-center gap-1">
             <Icon class="inline" name="clock" />
