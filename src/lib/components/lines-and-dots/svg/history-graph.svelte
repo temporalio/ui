@@ -1,6 +1,4 @@
 <script lang="ts">
-  // import Button from '$lib/holocene/button.svelte';
-  // import Icon from '$lib/holocene/icon/icon.svelte';
   import { groupWorkflowTaskEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { eventFilterSort } from '$lib/stores/event-view';
@@ -31,18 +29,6 @@
   $: reverseSort = $eventFilterSort === 'descending';
 </script>
 
-<!-- <Button
-  size="xs"
-  variant="ghost"
-  class="sticky left-0.5 top-1"
-  on:click={() => (canvasWidth = canvasWidth === 100 ? 400 : 100)}
->
-  <Icon
-    name={canvasWidth === 100 ? 'chevron-left' : 'chevron-right'}
-    x={canvasWidth - 2 * radius}
-    y={radius}
-  />
-</Button> -->
 <div class="hidden md:block" style="min-width: {canvasWidth}px">
   <svg
     viewBox="0 0 {canvasWidth} {canvasHeight}"

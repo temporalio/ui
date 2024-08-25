@@ -192,9 +192,9 @@
           {/each}
         </div>
         {#if duration && duration !== '0ms'}
-          <div class="flex flex-row items-center gap-1">
+          <div class="flex flex-row items-center gap-1 text-sm text-secondary">
             <Icon class="inline" name="clock" />
-            <p class="whitespace-noline truncate text-sm">
+            <p class="whitespace-noline truncate">
               {duration}
             </p>
           </div>
@@ -202,7 +202,7 @@
       </div>
     {:else}
       <div class="flex flex-col gap-0 px-2 text-right">
-        <p class="-mb-0.5 truncate text-xs leading-3 text-secondary">
+        <p class="-mb-1 truncate text-xs leading-3 text-secondary">
           {#if elapsedTime}
             +{elapsedTime}
           {/if}

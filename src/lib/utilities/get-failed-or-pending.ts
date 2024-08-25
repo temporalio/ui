@@ -31,6 +31,7 @@ export const getFailedOrPendingGroups = (
   return items.filter(
     (item) =>
       isEventGroup(item) &&
+      item.eventList.length > 1 &&
       (item.isPending || item.finalClassification === 'Failed'),
   );
 };

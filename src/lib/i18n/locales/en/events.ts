@@ -28,7 +28,8 @@ export const Strings = {
     'local-activity-tooltip':
       'A Local Activity is an Activity Execution that executes in the same process as the Workflow Execution that spawns it.',
     nexus: 'Nexus',
-    'nexus-tooltip': 'A Nexus Operation ',
+    'nexus-tooltip':
+      'A Nexus Operation connects durable executions within and across Namespaces using a Nexus Endpoint, a Nexus Service contract, and Nexus Operations.',
     signal: 'Signal',
     'signal-tooltip':
       'Signals are asynchronous write requests. They cause changes in the running Workflow, but you cannot await any response or error.',

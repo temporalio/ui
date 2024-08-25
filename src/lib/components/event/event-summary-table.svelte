@@ -28,10 +28,11 @@
   export let groups: EventGroups = [];
   export let updating = false;
   export let compact = false;
+  export let openExpanded = false;
 
   $: initialItem = $fullEventHistory?.[0];
 
-  $: expandAll = $expandAllEvents === 'true';
+  $: expandAll = openExpanded || $expandAllEvents === 'true';
 
   const history = (items: IterableEventWithPending[]) => {
     return items as WorkflowEventWithPending[];

@@ -3,7 +3,12 @@
   import { clearActiveEvents } from '$lib/stores/active-events';
   import { eventStatusFilter } from '$lib/stores/filters';
 
-  const options = [{ label: 'Pending and Failed Only', value: 'pending' }];
+  const options = [
+    {
+      label: 'Pending and Failed Only',
+      value: 'pending',
+    },
+  ];
 
   const onOptionClick = () => {
     clearActiveEvents();

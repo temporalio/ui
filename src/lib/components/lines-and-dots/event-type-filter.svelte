@@ -21,7 +21,7 @@
       ...o,
       label: translate(o.label),
       icon: CategoryIcon[o.value],
-      tooltip: translate(o.label + '-tooltip'),
+      tooltip: translate(o.tooltip),
     }),
   );
 
@@ -47,7 +47,7 @@
 
 <div class="flex flex-wrap items-center items-center justify-center gap-4">
   {#each options as option}
-    <Tooltip width={200} text={option.tooltip} top>
+    <Tooltip width={200} text={option.tooltip} topRight>
       <div class="flex items-center">
         <Checkbox
           type="checkbox"
