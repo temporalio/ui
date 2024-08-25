@@ -23,7 +23,7 @@
   export let key: string;
   export let value: string | Record<string, unknown> | Payloads;
   export let attributes: CombinedAttributes;
-  export let showKey = false;
+  export let showKey = true;
 
   const { workflow, namespace } = $page.params;
 </script>

@@ -214,6 +214,8 @@ const preferredSummaryKeys = [
   'workflowExecution',
   'taskQueue',
   'startToFireTimeout',
+  'attempt',
+  'historySizeBytes',
   'identity',
   'parentInitiatedEventId',
 ] as const;
@@ -313,7 +315,6 @@ export const getSecondaryAttributeForEvent = (
 ): SummaryAttribute => {
   if (!event) return emptyAttribute;
 
-  console.log('primaryKey', primaryKey);
   for (const preferredKey of preferredSummaryKeys) {
     for (const [key, value] of Object.entries(event.attributes)) {
       if (
@@ -321,8 +322,6 @@ export const getSecondaryAttributeForEvent = (
         key !== primaryKey &&
         shouldDisplayAttribute(key, value)
       ) {
-        console.log('key', key);
-
         return formatSummaryValue(key, value);
       }
     }

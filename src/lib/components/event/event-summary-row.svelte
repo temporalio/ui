@@ -13,7 +13,6 @@
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
-  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { IterableEvent } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
@@ -24,7 +23,10 @@
     getPrimaryAttributeForEvent,
     getSecondaryAttributeForEvent,
   } from '$lib/utilities/get-single-attribute-for-event';
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import {
+    isActivityTaskStartedEvent,
+    isLocalActivityMarkerEvent,
+  } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
 
   import { CategoryIcon } from '../lines-and-dots/constants';
@@ -54,10 +56,6 @@
     run,
   });
   $: expanded = expandAll;
-  $: descending = $eventFilterSort === 'descending';
-  $: showElapsed = $eventShowElapsed === 'true';
-  $: showElapsedTimeDiff =
-    showElapsed && initialItem && event.id !== initialItem.id;
   $: attributes = formatAttributes(event);
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
@@ -66,14 +64,14 @@
     end: isEventGroup(event)
       ? event.initialEvent.eventTime
       : currentEvent.eventTime,
-    includeMilliseconds: true,
+    includeMillisecondsForUnderSecond: true,
   });
 
   $: duration = isEventGroup(event)
     ? formatDistanceAbbreviated({
         start: event.initialEvent.eventTime,
         end: event.lastEvent.eventTime,
-        includeMilliseconds: true,
+        includeMillisecondsForUnderSecond: true,
       })
     : '';
 
@@ -103,11 +101,15 @@
     isEventGroup(event) ? event.lastEvent : event,
     primaryAttribute.key,
   );
+  $: hasPendingActivity = isEventGroup(event) && event?.pendingActivity;
   $: pendingAttempt =
     isEventGroup(event) &&
     event.isPending &&
     (event?.pendingActivity?.attempt || event?.pendingNexusOperation?.attempt);
-  $: hasPendingActivity = isEventGroup(event) && event?.pendingActivity;
+  $: nonPendingActivityAttempt =
+    isEventGroup(event) &&
+    !event.isPending &&
+    event.eventList.find(isActivityTaskStartedEvent)?.attributes?.attempt;
 </script>
 
 <tr
@@ -159,14 +161,20 @@
         <EventDetailsRow
           {...primaryAttribute}
           {attributes}
-          showKey
           class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
         />
+        {#if nonPendingActivityAttempt}
+          <EventDetailsRow
+            key="attempt"
+            value={nonPendingActivityAttempt.toString()}
+            {attributes}
+            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
+          />
+        {/if}
         {#if compact}
           <EventDetailsRow
             {...secondaryAttribute}
             {attributes}
-            showKey
             class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
           />
         {/if}
@@ -176,35 +184,32 @@
   <td>
     {#if isEventGroup(event)}
       <div class="flex items-center gap-0.5 px-2">
-        {#each event.eventList as groupEvent}
+        <!-- {#each event.eventList as groupEvent}
           <Link class="truncate" data-testid="link" {href}>
             {groupEvent.id}
           </Link>
-        {/each}
+        {/each} -->
+        {#if duration && duration !== '0ms'}
+          <div class="flex flex-row items-center gap-1">
+            <Icon class="inline" name="clock" />
+            <p class="whitespace-noline truncate text-sm">
+              {duration}
+            </p>
+          </div>
+        {/if}
       </div>
     {:else}
       <div class="flex flex-col gap-0 px-2 text-right">
-        {#if showElapsedTimeDiff}
-          <p class="truncate text-sm">
-            {#if elapsedTime}
-              {descending ? '-' : '+'}{elapsedTime}
-            {/if}
-          </p>
-          {#if duration && duration !== '0ms'}
-            <div class="flex flex-row items-center gap-1">
-              <Icon class="inline" name="clock" />
-              <p class="truncate text-sm md:whitespace-normal">
-                {duration}
-              </p>
-            </div>
+        <p class="-mb-0.5 truncate text-xs leading-3 text-secondary">
+          {#if elapsedTime}
+            +{elapsedTime}
           {/if}
-        {:else}
-          <p class="truncate text-sm">
-            {formatDate(currentEvent?.eventTime, $timeFormat, {
-              relative: $relativeTime,
-            })}
-          </p>
-        {/if}
+        </p>
+        <p class="truncate text-sm">
+          {formatDate(currentEvent?.eventTime, $timeFormat, {
+            relative: $relativeTime,
+          })}
+        </p>
       </div>
     {/if}
   </td>
