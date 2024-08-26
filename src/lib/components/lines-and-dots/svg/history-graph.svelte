@@ -13,7 +13,6 @@
 
   export let groups: EventGroups;
   export let history: WorkflowEventWithPending[];
-  export let zoomLevel: number = 1;
 
   $: workflowTaskGroups = groupWorkflowTaskEvents(
     $filteredEventHistory,
@@ -64,9 +63,9 @@
       strokeWidth={3}
     />
     <svg
-      viewBox="0 0 {canvasWidth} {canvasHeight * zoomLevel}"
+      viewBox="0 0 {canvasWidth} {canvasHeight}"
       height={canvasHeight}
-      width={canvasWidth / zoomLevel}
+      width={canvasWidth}
     >
       {#each history as event, index}
         {@const group = getGroupForEventOrPendingEvent(allGroups, event)}
@@ -76,7 +75,6 @@
           groups={allGroups}
           {history}
           canvasWidth={visualWidth}
-          {zoomLevel}
           {index}
         />
       {/each}

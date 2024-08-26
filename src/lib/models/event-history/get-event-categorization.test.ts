@@ -82,38 +82,47 @@ describe('Event Category Data Structures', () => {
       [
         {
           "label": "events.category.activity",
+          "tooltip": "events.category.activity-tooltip",
           "value": "activity",
         },
         {
           "label": "events.category.child-workflow",
+          "tooltip": "events.category.child-workflow-tooltip",
           "value": "child-workflow",
         },
         {
           "label": "events.category.local-activity",
+          "tooltip": "events.category.local-activity-tooltip",
           "value": "local-activity",
         },
         {
           "label": "events.category.signal",
+          "tooltip": "events.category.signal-tooltip",
           "value": "signal",
         },
         {
           "label": "events.category.timer",
+          "tooltip": "events.category.timer-tooltip",
           "value": "timer",
         },
         {
           "label": "events.category.update",
+          "tooltip": "events.category.update-tooltip",
           "value": "update",
         },
         {
           "label": "events.category.nexus",
+          "tooltip": "events.category.nexus-tooltip",
           "value": "nexus",
         },
         {
           "label": "events.category.workflow",
+          "tooltip": "events.category.workflow-tooltip",
           "value": "workflow",
         },
         {
           "label": "events.category.other",
+          "tooltip": "events.category.other-tooltip",
           "value": "other",
         },
       ]
@@ -125,34 +134,42 @@ describe('Event Category Data Structures', () => {
       [
         {
           "label": "events.category.activity",
+          "tooltip": "events.category.activity-tooltip",
           "value": "activity",
         },
         {
           "label": "events.category.child-workflow",
+          "tooltip": "events.category.child-workflow-tooltip",
           "value": "child-workflow",
         },
         {
           "label": "events.category.local-activity",
+          "tooltip": "events.category.local-activity-tooltip",
           "value": "local-activity",
         },
         {
           "label": "events.category.signal",
+          "tooltip": "events.category.signal-tooltip",
           "value": "signal",
         },
         {
           "label": "events.category.timer",
+          "tooltip": "events.category.timer-tooltip",
           "value": "timer",
         },
         {
           "label": "events.category.update",
+          "tooltip": "events.category.update-tooltip",
           "value": "update",
         },
         {
           "label": "events.category.nexus",
+          "tooltip": "events.category.nexus-tooltip",
           "value": "nexus",
         },
         {
           "label": "events.category.other",
+          "tooltip": "events.category.other-tooltip",
           "value": "other",
         },
       ]

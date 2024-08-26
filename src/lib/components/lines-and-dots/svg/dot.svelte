@@ -11,10 +11,9 @@
   export let classification: string | undefined = undefined;
   export let r = radius;
   export let icon: IconName | undefined = undefined;
+  export let strokeWidth = 2;
 
   $: [x, y] = point;
-
-  const strokeWidth = 3;
 </script>
 
 <g>

@@ -25,9 +25,7 @@
   export let history: WorkflowEventWithPending[];
   export let groups: EventGroups;
   export let index: number;
-
   export let canvasWidth: number;
-  export let zoomLevel: number = 1;
 
   const { height, radius } = HistoryConfig;
   const strokeWidth = radius / 2;
@@ -41,15 +39,13 @@
     $eventFilterSort,
   ));
 
-  $: zoomY = y * zoomLevel;
-  $: zoomNextDistance = offset > 0 && nextDistance * zoomLevel;
+  $: zoomNextDistance = offset > 0 && nextDistance;
 
   $: classification =
     isPendingActivity(event) || isPendingNexusOperation(event)
       ? 'pending'
       : event?.classification;
 
-  $: width = canvasWidth * zoomLevel;
   $: horizontalOffset = offset * 1.75 * radius;
   $: nextIsPending =
     isEvent(event) && group?.lastEvent.id === event?.id && group?.isPending;
@@ -69,22 +65,26 @@
 <g role="button" tabindex="0" class="relative cursor-pointer">
   {#if connectLine}
     <Line
-      startPoint={[width, zoomY]}
-      endPoint={[width - horizontalOffset - radius, zoomY]}
+      startPoint={[canvasWidth, y]}
+      endPoint={[canvasWidth - horizontalOffset - radius, y]}
     />
   {/if}
   {#if !reverseSort}
-    <Dot point={[width - horizontalOffset, zoomY]} {classification} />
+    <Dot
+      point={[canvasWidth - horizontalOffset, y]}
+      {classification}
+      strokeWidth={1}
+    />
   {/if}
   {#if zoomNextDistance}
     <Line
       startPoint={[
-        width - horizontalOffset - radius / 2 + strokeWidth,
-        zoomY + radius + strokeWidth / 2,
+        canvasWidth - horizontalOffset - radius / 2 + strokeWidth,
+        y + radius + strokeWidth / 2,
       ]}
       endPoint={[
-        width - horizontalOffset - radius / 2 + strokeWidth,
-        zoomY + zoomNextDistance + radius,
+        canvasWidth - horizontalOffset - radius / 2 + strokeWidth,
+        y + zoomNextDistance + radius,
       ]}
       category={group?.pendingActivity
         ? group.pendingActivity.attempt > 1
@@ -95,6 +95,10 @@
     />
   {/if}
   {#if reverseSort}
-    <Dot point={[width - horizontalOffset, zoomY]} {classification} />
+    <Dot
+      point={[canvasWidth - horizontalOffset, y]}
+      {classification}
+      strokeWidth={1}
+    />
   {/if}
 </g>

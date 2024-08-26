@@ -29,7 +29,6 @@
   export let workflow: WorkflowExecution;
   export let groups: EventGroups;
   export let activeGroups: string[] = [];
-  export let zoomLevel: number = 1;
   export let readOnly = false;
   export let workflowTaskFailedError: WorkflowTaskFailedEvent | undefined =
     undefined;
@@ -107,7 +106,7 @@
       {x}
       {y}
       viewBox="0 0 {canvasWidth} {canvasHeight}"
-      height={canvasHeight / zoomLevel}
+      height={canvasHeight}
       width={canvasWidth}
       class="-mt-12"
       class:error={workflowTaskFailedError}
