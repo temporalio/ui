@@ -41,7 +41,7 @@
   data-testid="pending-nexus-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td class="w-12 text-left">
+  <td class="w-10 text-left">
     <Link class="truncate px-1" data-testid="link" {href}>
       {event.scheduledEventId}
     </Link>

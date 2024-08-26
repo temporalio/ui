@@ -6,7 +6,7 @@
   import type { WorkflowEventWithPending } from '$lib/types/events';
   import { getGroupForEventOrPendingEvent } from '$lib/utilities/pending-activities';
 
-  import { HistoryConfig } from '../constants';
+  import { getNextDistanceAndOffset, HistoryConfig } from '../constants';
 
   import HistoryGraphRowVisual from './history-graph-row-visual.svelte';
   import Line from './line.svelte';
@@ -14,7 +14,6 @@
   export let groups: EventGroups;
   export let history: WorkflowEventWithPending[];
   export let zoomLevel: number = 1;
-  export let canvasWidth = 100;
 
   $: workflowTaskGroups = groupWorkflowTaskEvents(
     $filteredEventHistory,
@@ -24,24 +23,45 @@
 
   const { height, radius } = HistoryConfig;
 
+  const nodeBuffer = 4 * radius;
+  const maxWidth = 300;
+
+  let canvasWidth = nodeBuffer;
+  let visualWidth = 0;
+
   $: canvasHeight = history.length * height;
-  $: visualWidth = canvasWidth - 1.5 * radius;
-  $: reverseSort = $eventFilterSort === 'descending';
+
+  $: getMaxWidth = (items: WorkflowEventWithPending[]) => {
+    items.forEach((event) => {
+      const { offset } = getNextDistanceAndOffset(
+        history,
+        event,
+        groups,
+        height,
+        $eventFilterSort,
+      );
+      canvasWidth = Math.max(canvasWidth, offset * 1.75 * radius + nodeBuffer);
+      visualWidth = Math.min(canvasWidth - 2 * radius, maxWidth);
+    });
+  };
+
+  $: getMaxWidth(history);
 </script>
 
-<div class="hidden md:block" style="min-width: {canvasWidth}px">
+<div
+  class="hidden text-right md:block"
+  style="width: {canvasWidth}px; max-width: {maxWidth}px;"
+  class:overflow-hidden={canvasWidth > maxWidth}
+>
   <svg
     viewBox="0 0 {canvasWidth} {canvasHeight}"
     height={canvasHeight}
     width={canvasWidth}
   >
     <Line
-      startPoint={[visualWidth, reverseSort ? 0 : height / 2]}
-      endPoint={[
-        visualWidth,
-        reverseSort ? canvasHeight - height / 2 : canvasHeight,
-      ]}
-      strokeWidth={6}
+      startPoint={[visualWidth, 0]}
+      endPoint={[visualWidth, canvasHeight]}
+      strokeWidth={3}
     />
     <svg
       viewBox="0 0 {canvasWidth} {canvasHeight * zoomLevel}"
