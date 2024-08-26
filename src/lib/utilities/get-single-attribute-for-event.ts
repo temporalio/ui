@@ -319,7 +319,7 @@ export const getSecondaryAttributeForEvent = (
   event: WorkflowEvent,
   primaryKey: string,
 ): SummaryAttribute => {
-  if (!event) return emptyAttribute;
+  if (!event || !event?.attributes) return emptyAttribute;
 
   for (const preferredKey of preferredSummaryKeys) {
     for (const [key, value] of Object.entries(event.attributes)) {
