@@ -40,6 +40,7 @@
     itemsKeyname?: string;
     previousButtonLabel: string;
     nextButtonLabel: string;
+    pageSizeOptions?: string[];
   };
 
   export let onError: (error: Error) => void | undefined = undefined;
@@ -58,8 +59,12 @@
   export let itemsKeyname = 'items';
   export let previousButtonLabel: string;
   export let nextButtonLabel: string;
+  export let pageSizeOptions = options;
 
-  let store: PaginationStore<T> = createPaginationStore();
+  let store: PaginationStore<T> = createPaginationStore(
+    pageSizeOptions,
+    pageSizeOptions[0],
+  );
   let error: Error;
 
   function clearError() {
@@ -193,7 +198,7 @@
       label={pageSizeSelectLabel}
       parameter={$store.key}
       value={String($store.pageSize)}
-      {options}
+      options={pageSizeOptions}
     />
   </svelte:fragment>
 

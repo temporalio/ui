@@ -45,7 +45,7 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply surface-primary min-h-[154px] overflow-auto;
+    @apply surface-primary max-h-none min-h-[154px] overflow-auto;
   }
 
   .primary {
