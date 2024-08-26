@@ -43,7 +43,7 @@
 >
   <td class="w-10 text-left">
     <Link class="truncate px-1" data-testid="link" {href}>
-      {event.scheduledEventId}
+      {event.scheduledEventId || ''}
     </Link>
   </td>
   <td

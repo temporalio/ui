@@ -17,6 +17,5 @@ export const isPendingNexusOperation = (
   if (typeof event !== 'object') return false;
   if (Array.isArray(event)) return false;
   if (has(event, 'operation') && has(event, 'endpoint')) return true;
-  console.log('Not a pending nexus operation', event);
   return false;
 };
