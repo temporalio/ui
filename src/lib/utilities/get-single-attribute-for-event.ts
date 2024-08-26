@@ -13,7 +13,10 @@ import type { CombinedAttributes } from './format-event-attributes';
 import { has } from './has';
 import { isObject } from './is';
 import { isLocalActivityMarkerEvent } from './is-event-type';
-import { isPendingActivity } from './is-pending-activity';
+import {
+  isPendingActivity,
+  isPendingNexusOperation,
+} from './is-pending-activity';
 
 type SummaryAttribute = {
   key: string;
@@ -289,6 +292,7 @@ export const getPendingActivitySummaryAttribute = (
 export const getPendingNexusOperationSummaryAttribute = (
   event: PendingNexusOperation,
 ): SummaryAttribute => {
+  if (!event.attempt) return emptyAttribute;
   return { key: 'attempt', value: event.attempt.toString() };
 };
 
@@ -298,7 +302,9 @@ export const getSummaryAttribute = (
   if (isEvent(event)) return getEventSummaryAttribute(event);
   if (isPendingActivity(event))
     return getPendingActivitySummaryAttribute(event);
-  return getPendingNexusOperationSummaryAttribute(event);
+  if (isPendingNexusOperation(event))
+    return getPendingNexusOperationSummaryAttribute(event);
+  return emptyAttribute;
 };
 
 export const getPrimaryAttributeForEvent = (
