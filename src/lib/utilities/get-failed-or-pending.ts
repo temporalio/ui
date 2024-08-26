@@ -16,10 +16,12 @@ export const getFailedOrPendingEvents = (
   return items.filter(
     (item) =>
       (isEvent(item) && item.classification === 'Failed') ||
-      (isEventGroup(item) &&
-        (item.isPending || item.finalClassification === 'Failed')) ||
       isPendingActivity(item) ||
-      isPendingNexusOperation(item),
+      isPendingNexusOperation(item) ||
+      (isEventGroup(item) &&
+        (item.pendingActivity ||
+          item.pendingNexusOperation ||
+          item.finalClassification === 'Failed')),
   );
 };
 
