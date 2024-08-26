@@ -23,10 +23,7 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
     await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
-    await expect(page.getByTestId('summary-accordion')).toBeVisible();
-    await expect(page.getByTestId('pending-activities')).toBeVisible();
-    await expect(page.getByTestId('input-and-results')).toBeVisible();
-    await expect(page.getByTestId('timeline-accordion')).toBeVisible();
+    await expect(page.getByTestId('input-and-result')).toBeVisible();
     await expect(page.getByTestId('feed')).toBeVisible();
     await expect(page.getByTestId('compact')).toBeVisible();
     await expect(page.getByTestId('json')).toBeVisible();
@@ -69,10 +66,7 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
     await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
-    await expect(page.getByTestId('summary-accordion')).toBeHidden();
-    await expect(page.getByTestId('pending-activities')).toBeHidden();
-    await expect(page.getByTestId('input-and-results')).toBeHidden();
-    await expect(page.getByTestId('timeline-accordion')).toBeHidden();
+    await expect(page.getByTestId('input-and-result')).toBeHidden();
     await expect(page.getByTestId('feed')).toBeHidden();
     await expect(page.getByTestId('compact')).toBeHidden();
     await expect(page.getByTestId('json')).toBeHidden();
@@ -86,10 +80,7 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
     await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
-    await expect(page.getByTestId('summary-accordion')).toBeVisible();
-    await expect(page.getByTestId('pending-activities')).toBeVisible();
-    await expect(page.getByTestId('input-and-results')).toBeVisible();
-    await expect(page.getByTestId('timeline-accordion')).toBeVisible();
+    await expect(page.getByTestId('input-and-result')).toBeVisible();
     await expect(page.getByTestId('feed')).toBeVisible();
     await expect(page.getByTestId('compact')).toBeVisible();
     await expect(page.getByTestId('json')).toBeVisible();

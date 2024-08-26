@@ -67,15 +67,6 @@
           {expandAll}
           {initialItem}
         />
-      {:else if isEvent(event)}
-        <EventSummaryRow
-          {event}
-          {index}
-          group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
-          {compact}
-          {expandAll}
-          {initialItem}
-        />
       {:else if isPendingActivity(event)}
         <PendingActivitySummaryRow
           {event}
@@ -97,6 +88,15 @@
                 event.scheduledEventId,
           )}
           {expandAll}
+        />
+      {:else}
+        <EventSummaryRow
+          {event}
+          {index}
+          group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
+          {compact}
+          {expandAll}
+          {initialItem}
         />
       {/if}
     {:else}

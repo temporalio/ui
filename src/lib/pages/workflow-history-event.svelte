@@ -32,6 +32,6 @@
   $: visibleItems = $fullEventHistory.filter((e) => e.id === $page.params.id);
 </script>
 
-<div class="px-8">
+<div class="px-8" data-testid="event-summary-table">
   <EventSummaryTable items={visibleItems} {updating} openExpanded />
 </div>

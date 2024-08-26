@@ -85,7 +85,7 @@
       <ToggleButtons>
         <ToggleButton
           active={$eventViewType === 'feed'}
-          data-testid="all"
+          data-testid="feed"
           on:click={onAllClick}>All</ToggleButton
         >
         <ToggleButton
@@ -149,7 +149,9 @@
     <WorkflowHistoryJson />
   </div>
 {:else}
-  <EventSummaryTable {updating} {items} {groups} {compact} />
+  <div data-testid="event-summary-table">
+    <EventSummaryTable {updating} {items} {groups} {compact} />
+  </div>
 {/if}
 <DownloadEventHistoryModal
   bind:open={showDownloadPrompt}

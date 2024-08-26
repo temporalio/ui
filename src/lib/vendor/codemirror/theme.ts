@@ -24,6 +24,9 @@ export const TEMPORAL_THEME = EditorView.theme(
     '.cm-scroller': {
       fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
     },
+    '.thin & .cm-scroller': {
+      overflow: 'hidden',
+    },
     '.cm-content': {
       caretColor: colors.white,
       fontSize: '0.875em',
