@@ -43,7 +43,7 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply surface-primary min-h-[154px] overflow-auto rounded-lg border-2 border-table;
+    @apply surface-primary max-h-none min-h-[154px] overflow-auto rounded-lg border-2 border-table;
   }
 
   .paginated-table {
