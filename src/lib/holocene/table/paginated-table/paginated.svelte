@@ -19,11 +19,13 @@
   type Item = $$Generic;
 
   export let items: Item[];
+  export let variant: 'primary' | 'split' = 'primary';
   export let updating = false;
   export let perPageLabel: string;
   export let pageButtonLabel: (page: number) => string;
   export let nextPageButtonLabel: string;
   export let previousPageButtonLabel: string;
+  export let maxHeight = '';
 
   $: url = $page.url;
   $: perPageParam =
@@ -85,7 +87,7 @@
   }
 </script>
 
-<PaginatedTable {updating} visibleItems={$store.items}>
+<PaginatedTable {updating} {variant} {maxHeight} visibleItems={$store.items}>
   <slot name="caption" slot="caption" />
   <slot name="headers" slot="headers" visibleItems={$store.items} />
   <slot visibleItems={$store.items} />

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   getCodeBlockValue,
-  getSingleAttributeForEvent,
+  getPrimaryAttributeForEvent,
   getSummaryAttribute,
   shouldDisplayAsExecutionLink,
   shouldDisplayAttribute,
@@ -15,7 +15,7 @@ import javaLocalActivity from '$fixtures/local-activities/java_local_activity.js
 import pythonLocalActivity from '$fixtures/local-activities/python_local_activity.json';
 import tsLocalActivity from '$fixtures/local-activities/ts_local_activity.json';
 
-describe('getSingleAttributeForEvent', () => {
+describe('getPrimaryAttributeForEvent', () => {
   const workflowEvent = {
     eventId: '1',
     eventTime: '2022-03-14T17:44:14.996241458Z',
@@ -122,40 +122,43 @@ describe('getSingleAttributeForEvent', () => {
   };
 
   it('should return "workflowType.name" if the workflow type exists', async () => {
-    expect(await getSingleAttributeForEvent(workflowEvent)).toStrictEqual({
+    expect(await getPrimaryAttributeForEvent(workflowEvent)).toStrictEqual({
       key: 'workflowTypeName',
       value: 'RainbowStatusesWorkflow',
     });
   });
 
-  it('should return "taskqueue.name" if the workflow type does not exists', async () => {
+  it('should return "input" if the workflow type does not exists', async () => {
     const event = { ...workflowEvent };
     event.attributes.workflowType = null;
-    expect(await getSingleAttributeForEvent(event)).toStrictEqual({
+    expect(await getPrimaryAttributeForEvent(event)).toStrictEqual({
+      key: 'input',
+      value: {
+        payloads: [
+          {
+            At: '2022-04-04T11:50:28.151785-05:00',
+            Hey: 'from Mars',
+          },
+        ],
+      },
+    });
+  });
+
+  it('should return "taskQueue" if the workflow type and input does not exist', async () => {
+    const event = { ...workflowEvent };
+    event.attributes.workflowType = null as unknown as {
+      name: string;
+    };
+    event.attributes.input = null;
+
+    expect(await getPrimaryAttributeForEvent(event)).toStrictEqual({
       key: 'taskQueueName',
       value: 'rainbow-statuses',
     });
   });
 
-  it('should return "parentInitiatedEventId" if the workflow type and task queue does not exist', async () => {
-    const event = { ...workflowEvent };
-    event.attributes.workflowType = null as unknown as {
-      name: string;
-    };
-
-    event.attributes.taskQueue = null as unknown as {
-      name: string;
-      kind: string;
-    };
-
-    expect(await getSingleAttributeForEvent(event)).toStrictEqual({
-      key: 'parentInitiatedEventId',
-      value: '0',
-    });
-  });
-
   it('should return empty key value object if none of the attributes display', async () => {
-    expect(await getSingleAttributeForEvent(null)).toStrictEqual({
+    expect(await getPrimaryAttributeForEvent(null)).toStrictEqual({
       key: '',
       value: '',
     });

@@ -2,7 +2,6 @@
   import { page } from '$app/stores';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { format } from '$lib/utilities/format-camel-case';
@@ -11,7 +10,6 @@
     getCodeBlockValue,
     getStackTrace,
     shouldDisplayAsExecutionLink,
-    shouldDisplayAsPlainText,
     shouldDisplayAsTaskQueueLink,
     shouldDisplayChildWorkflowLink,
   } from '$lib/utilities/get-single-attribute-for-event';
@@ -23,7 +21,7 @@
   import PayloadDecoder from './payload-decoder.svelte';
 
   export let key: string;
-  export let value: string | Record<string, unknown>;
+  export let value: string | number | Record<string, unknown>;
   export let attributes: CombinedAttributes;
   export let inline = false;
 
@@ -32,19 +30,15 @@
   $: stackTrace = getStackTrace(codeBlockValue);
 </script>
 
-<div class="row {$$props.class}">
+<div class="flex {$$props.class}">
   {#if typeof value === 'object'}
-    <div
-      class="content code-block-row"
-      class:code-with-stack-trace={stackTrace}
-    >
-      <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
+    <div class="content code-block-row">
+      <div class="flex flex-col">
         <p class="text-sm">{format(key)}</p>
         {#if value?.payloads}
           <PayloadDecoder {value} key="payloads" let:decodedValue>
             <CodeBlock
               content={decodedValue}
-              class={stackTrace ? 'mb-2' : ''}
               maxHeight={384}
               {inline}
               copyIconTitle={translate('common.copy-icon-title')}
@@ -59,7 +53,6 @@
           >
             <CodeBlock
               content={decodedValue}
-              class={stackTrace ? 'mb-2' : ''}
               maxHeight={384}
               {inline}
               copyIconTitle={translate('common.copy-icon-title')}
@@ -70,7 +63,6 @@
           <PayloadDecoder value={codeBlockValue} let:decodedValue>
             <CodeBlock
               content={decodedValue}
-              class={stackTrace ? 'mb-2' : ''}
               maxHeight={384}
               {inline}
               copyIconTitle={translate('common.copy-icon-title')}
@@ -80,7 +72,7 @@
         {/if}
       </div>
       {#if stackTrace && !inline}
-        <div class="flex flex-col lg:w-1/2">
+        <div class="flex flex-col">
           <p class="text-sm">{translate('workflows.call-stack-tab')}</p>
           <CodeBlock
             content={stackTrace}
@@ -95,102 +87,66 @@
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="content detail-row">
       <p class="text-sm">{format(key)}</p>
-      <div class="text-sm">
-        <Copyable
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={value}
-          container-class="flex-row-reverse xl:flex-row"
+      <div class="badge text-sm">
+        <Link
+          href={routeForEventHistory({
+            namespace,
+            workflow,
+            run: value.toString(),
+          })}
         >
-          <Link
-            href={routeForEventHistory({
-              namespace,
-              workflow,
-              run: value,
-            })}
-          >
-            {value}
-          </Link>
-        </Copyable>
+          {value}
+        </Link>
       </div>
     </div>
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
     <div class="content detail-row">
       <p class="text-sm">{format(key)}</p>
-      <div class="text-sm">
-        <Copyable
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={value}
-          container-class="xl:flex-row"
+      <div class="badge text-sm">
+        <Link
+          href={routeForEventHistory({
+            namespace: attributes?.namespace || namespace,
+            workflow: attributes.workflowExecutionWorkflowId,
+            run: attributes.workflowExecutionRunId,
+          })}
         >
-          <Link
-            href={routeForEventHistory({
-              namespace: attributes?.namespace || namespace,
-              workflow: attributes.workflowExecutionWorkflowId,
-              run: attributes.workflowExecutionRunId,
-            })}
-          >
-            {value}
-          </Link>
-        </Copyable>
+          {value}
+        </Link>
       </div>
     </div>
   {:else if shouldDisplayAsTaskQueueLink(key)}
     <div class="content detail-row">
       <p class="text-sm">{format(key)}</p>
-      <div class="text-sm">
-        <Copyable
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={value}
-          container-class="xl:flex-row"
-        >
-          <Link href={routeForTaskQueue({ namespace, queue: value })}>
-            {value}
-          </Link>
-        </Copyable>
+      <div class="badge text-sm">
+        <Link href={routeForTaskQueue({ namespace, queue: value.toString() })}>
+          {value}
+        </Link>
       </div>
     </div>
   {:else}
     <div class="content detail-row">
       <p class="text-sm">{format(key)}</p>
       <p class="text-sm">
-        <span
-          class="select-all px-2"
-          class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
-        >
+        <span class="badge select-all break-all px-2">{value}</span>
       </p>
     </div>
   {/if}
 </div>
 
 <style lang="postcss">
-  .row {
-    @apply flex px-4 first:pt-0;
-  }
-
   .content {
-    @apply block w-full border-b-2 border-slate-200 py-2 text-left;
+    @apply block w-full px-2 py-1 text-left;
   }
 
   .code-block-row {
-    @apply block w-full py-2 text-left;
-  }
-
-  .code-with-stack-trace {
-    @apply flex flex-col gap-2 lg:flex-row;
+    @apply block w-full py-1 text-left;
   }
 
   .detail-row {
-    @apply flex w-full items-center gap-4 py-2 text-left xl:flex;
-  }
-
-  .row:last-of-type .content {
-    @apply border-b-0;
+    @apply flex w-full items-center gap-4 py-1 text-left xl:flex;
   }
 
   .badge {
-    @apply surface-subtle rounded-sm p-1;
+    @apply surface-subtle rounded-sm px-1 py-0.5;
   }
 </style>

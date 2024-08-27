@@ -4,7 +4,6 @@
   export let status: string | undefined = undefined;
   export let category: string | undefined = undefined;
   export let classification: string | undefined = undefined;
-  export let active = true;
   export let scheduling = false;
   export let pending = false;
   export let strokeWidth: number = 2;
@@ -16,7 +15,6 @@
 
 <line
   class="line {status} {category} {classification}"
-  class:active
   class:scheduling
   class:animate-line={pending}
   stroke-width={strokeWidth}
@@ -30,13 +28,9 @@
 <style lang="postcss">
   .line {
     cursor: pointer;
-    opacity: 0.15;
+    opacity: 1;
     outline: none;
     stroke: #444ce7;
-  }
-
-  .active {
-    opacity: 1;
   }
 
   .none {
@@ -118,7 +112,7 @@
 
   @keyframes dash {
     from {
-      stroke-dashoffset: 1000;
+      stroke-dashoffset: 200;
     }
 
     to {

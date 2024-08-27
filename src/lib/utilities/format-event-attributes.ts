@@ -100,23 +100,16 @@ const formatNestedAttributes = (
   }
 };
 
-export const formatAttributes = (
-  event: IterableEvent,
-  { compact } = { compact: false },
-): CombinedAttributes => {
+export const formatAttributes = (event: IterableEvent): CombinedAttributes => {
   const attributes: CombinedAttributes = {};
 
-  if (compact)
-    attributes.eventTime = formatDate(event.eventTime, get(timeFormat), {
-      relative: get(relativeTime),
-    });
-
-  for (const [key, value] of Object.entries(event.attributes)) {
-    const shouldDisplay = shouldDisplayAttribute(key, value);
-    if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
-    formatNestedAttributes(attributes, key);
+  if (event.attributes) {
+    for (const [key, value] of Object.entries(event.attributes)) {
+      const shouldDisplay = shouldDisplayAttribute(key, value);
+      if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
+      formatNestedAttributes(attributes, key);
+    }
   }
-
   return attributes;
 };
 

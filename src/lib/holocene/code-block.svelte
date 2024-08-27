@@ -181,6 +181,7 @@
   <div
     bind:this={editor}
     class={className}
+    class:inline
     data-testid={$$props.testId}
     class:editable
     class:readOnly={!editable}

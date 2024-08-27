@@ -23,10 +23,7 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
     await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
-    await expect(page.getByTestId('summary-accordion')).toBeVisible();
-    await expect(page.getByTestId('pending-activities')).toBeVisible();
-    await expect(page.getByTestId('input-and-results')).toBeVisible();
-    await expect(page.getByTestId('timeline-accordion')).toBeVisible();
+    await expect(page.getByTestId('input-and-result')).toBeVisible();
     await expect(page.getByTestId('feed')).toBeVisible();
     await expect(page.getByTestId('compact')).toBeVisible();
     await expect(page.getByTestId('json')).toBeVisible();
@@ -69,10 +66,7 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
     await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
-    await expect(page.getByTestId('summary-accordion')).toBeHidden();
-    await expect(page.getByTestId('pending-activities')).toBeHidden();
-    await expect(page.getByTestId('input-and-results')).toBeHidden();
-    await expect(page.getByTestId('timeline-accordion')).toBeHidden();
+    await expect(page.getByTestId('input-and-result')).toBeHidden();
     await expect(page.getByTestId('feed')).toBeHidden();
     await expect(page.getByTestId('compact')).toBeHidden();
     await expect(page.getByTestId('json')).toBeHidden();
@@ -86,41 +80,10 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
     await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
-    await expect(page.getByTestId('summary-accordion')).toBeVisible();
-    await expect(page.getByTestId('pending-activities')).toBeVisible();
-    await expect(page.getByTestId('input-and-results')).toBeVisible();
-    await expect(page.getByTestId('timeline-accordion')).toBeVisible();
+    await expect(page.getByTestId('input-and-result')).toBeVisible();
     await expect(page.getByTestId('feed')).toBeVisible();
     await expect(page.getByTestId('compact')).toBeVisible();
     await expect(page.getByTestId('json')).toBeVisible();
     await expect(page.getByTestId('event-summary-table')).toBeVisible();
-  });
-
-  test('Workflow Execution shows WorkflowId and all sections and event history with Labs Mode on', async ({
-    page,
-  }) => {
-    await mockWorkflowApis(page);
-    await expect(page.getByTestId('workflow-id-heading')).toHaveText(
-      '09db15_Running Click to copy content',
-    );
-
-    await expect(page.getByTestId('labs-mode-button')).toBeVisible();
-    await page.getByTestId('labs-mode-button').click();
-
-    await expect(page.getByTestId('history-tab')).toBeVisible();
-    await expect(page.getByTestId('workers-tab')).toBeVisible();
-    await expect(page.getByTestId('relationships-tab')).toBeVisible();
-    await expect(page.getByTestId('pending-activities-tab')).toBeHidden();
-    await expect(page.getByTestId('call-stack-tab')).toBeVisible();
-    await expect(page.getByTestId('queries-tab')).toBeVisible();
-    await expect(page.getByTestId('summary-accordion')).toBeHidden();
-    await expect(page.getByTestId('pending-activities')).toBeHidden();
-    await expect(page.getByTestId('input-and-results')).toBeHidden();
-    await expect(page.getByTestId('timeline-accordion')).toBeHidden();
-    await expect(page.getByTestId('feed')).toBeVisible();
-    await expect(page.getByTestId('timeline')).toBeVisible();
-    await expect(page.getByTestId('compact')).toBeVisible();
-    await expect(page.getByTestId('json')).toBeHidden();
-    await expect(page.getByTestId('event-summary-table')).toBeHidden();
   });
 });

@@ -1,12 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
-  import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
-  import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
@@ -16,8 +12,6 @@
   import { isChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
-  const compact = true;
-
   $: ({
     namespace,
     workflow: workflowId,
@@ -25,13 +19,11 @@
     id: groupId,
   } = $page.params);
 
-  let loading = false;
   let eventGroup: EventGroup;
   let events: EventGroup[] = [];
 
   const resetFullHistory = () => {
     $fullEventHistory = [];
-    loading = true;
   };
 
   const fetchEvents = async (
@@ -47,7 +39,6 @@
         runId,
         sort: $eventFilterSort,
       });
-      loading = false;
     }
     eventGroup = groupEvents($fullEventHistory, $eventFilterSort).find(
       (e) => e.id === groupId,
@@ -57,7 +48,6 @@
 
   $: fetchEvents(namespace, workflowId, runId);
 
-  $: initialItem = $fullEventHistory?.[0];
   $: updating = !$fullEventHistory.length;
 
   function getLink(group: EventGroup) {
@@ -74,32 +64,19 @@
   $: workflowLink = getLink(eventGroup);
 </script>
 
-{#if eventGroup}
-  <h2 class="flex w-full items-center">
-    {#if workflowLink}
-      <Link href={workflowLink}>
+<div class="px-8">
+  {#if eventGroup}
+    <h2 class="flex w-full items-center">
+      {#if workflowLink}
+        <Link href={workflowLink}>
+          {eventGroup.displayName}
+        </Link>
+      {:else}
         {eventGroup.displayName}
-      </Link>
-    {:else}
-      {eventGroup.displayName}
-    {/if}
-  </h2>
-{/if}
-<EventHistoryTimeline history={$fullEventHistory} maxHeight={240} />
-<EventSummaryTable {updating} {compact}>
-  {#each events as event (`${event.id}-${event.timestamp}`)}
-    <EventSummaryRow
-      {event}
-      {compact}
-      expandAll={true}
-      {initialItem}
-      active={true}
-    />
-  {:else}
-    <EventEmptyRow
-      {loading}
-      title={translate('events.group-empty-state-title')}
-      content=""
-    />
-  {/each}
-</EventSummaryTable>
+      {/if}
+    </h2>
+  {/if}
+  <div data-testid="event-summary-table">
+    <EventSummaryTable items={events} groups={events} {updating} openExpanded />
+  </div>
+</div>

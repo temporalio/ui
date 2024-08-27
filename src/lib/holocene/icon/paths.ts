@@ -46,6 +46,7 @@ import fileUpload from './svg/file-upload.svelte';
 import filterSolid from './svg/filter-solid.svelte';
 import filter from './svg/filter.svelte';
 import fireExtinguisher from './svg/fire-extinguisher.svelte';
+import flag from './svg/flag.svelte';
 import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
 import hyphen from './svg/hyphen.svelte';
@@ -65,8 +66,10 @@ import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
 import nexus from './svg/nexus.svelte';
+import pause from './svg/pause.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
+import play from './svg/play.svelte';
 import regions from './svg/regions.svelte';
 import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
@@ -85,6 +88,7 @@ import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
 import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
+import table from './svg/table.svelte';
 import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
 import timeline from './svg/timeline.svelte';
@@ -143,6 +147,7 @@ export const icons = {
   feed,
   'feedback-circle': feedbackCircle,
   feedback,
+  flag,
   'file-import': fileImport,
   'file-upload': fileUpload,
   filter,
@@ -167,6 +172,8 @@ export const icons = {
   'namespace-switcher': namespaceSwitcher,
   namespace,
   nexus,
+  play,
+  pause,
   'pin-filled': pinFilled,
   pin,
   regions,
@@ -188,6 +195,7 @@ export const icons = {
   summary,
   support,
   'spinner-solid': spinnerSolid,
+  table,
   'temporal-logo': temporalLogo,
   terminal,
   timeline,

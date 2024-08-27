@@ -23,7 +23,7 @@ import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed
 
 import { simplifyAttributes } from './event-history/simplify-attributes';
 
-const toPendingActivities = (
+export const toPendingActivities = (
   pendingActivity: PendingActivityInfo[] = [],
 ): PendingActivity[] => {
   return pendingActivity.map((activity): PendingActivity => {
@@ -114,6 +114,7 @@ export const toWorkflowExecution = (
   const pendingChildren: PendingChildren[] = response?.pendingChildren ?? [];
   const pendingNexusOperations: PendingNexusOperation[] =
     toPendingNexusOperations(response?.pendingNexusOperations);
+  const pendingWorkflowTask = response?.pendingWorkflowTask;
   const callbacks = toCallbacks(response?.callbacks);
 
   return {
@@ -135,6 +136,7 @@ export const toWorkflowExecution = (
     pendingActivities,
     pendingChildren,
     pendingNexusOperations,
+    pendingWorkflowTask,
     callbacks,
     parentNamespaceId,
     parent,

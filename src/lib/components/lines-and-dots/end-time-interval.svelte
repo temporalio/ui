@@ -1,14 +1,21 @@
 <script lang="ts">
   import type { Timestamp } from '@temporalio/common';
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy } from 'svelte';
 
+  import { pauseLiveUpdates } from '$lib/stores/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
 
   export let workflow: WorkflowExecution;
   export let startTime: string | Timestamp;
 
-  $: endTime = workflow?.endTime || new Date();
+  const rightNow = () => {
+    const now = new Date();
+    now.setSeconds(now.getSeconds() + 1);
+    return now;
+  };
+
+  $: endTime = workflow?.endTime || rightNow();
   $: duration = getMillisecondDuration({
     start: startTime,
     end: endTime,
@@ -20,21 +27,28 @@
   const clearEndTimeInterval = (endTime: string) => {
     if (endTime) {
       clearInterval(endTimeInterval);
+      endTimeInterval = null;
     }
   };
 
-  onMount(() => {
-    if (!workflow.endTime) {
+  const startStopInterval = (pauseLiveUpdates) => {
+    if (pauseLiveUpdates) {
+      clearInterval(endTimeInterval);
+      endTimeInterval = null;
+    } else if (!endTimeInterval && workflow.isRunning) {
       endTimeInterval = setInterval(() => {
-        endTime = new Date();
+        endTime = rightNow();
       }, 1000);
     }
-  });
+  };
 
   $: clearEndTimeInterval(workflow.endTime);
+  $: startStopInterval($pauseLiveUpdates);
 
   onDestroy(() => {
     clearInterval(endTimeInterval);
+    endTimeInterval = null;
+    $pauseLiveUpdates = false;
   });
 </script>
 
