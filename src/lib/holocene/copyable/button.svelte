@@ -29,6 +29,6 @@
 
 <style lang="postcss">
   .copy-button {
-    @apply surface-interactive-secondary rounded-md border-2 border-[transparent] bg-transparent p-0.5 opacity-50 hover:opacity-100 focus-visible:border-indigo-600 focus-visible:outline-none dark:text-black dark:hover:text-white;
+    @apply surface-interactive-secondary m-1 rounded-md border-2 border-[transparent] bg-transparent p-1 focus-visible:border-indigo-600 focus-visible:outline-none;
   }
 </style>

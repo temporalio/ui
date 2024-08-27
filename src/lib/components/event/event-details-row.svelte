@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -30,7 +29,7 @@
 
 {#if key}
   <div
-    class="flex max-w-xl flex-row items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 {$$props.class}"
+    class="flex max-w-lg flex-row items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 xl:max-w-xl {$$props.class}"
   >
     {#if showKey}
       <p class="max-w-fit whitespace-nowrap text-right text-xs">
@@ -42,13 +41,9 @@
         class="flex w-full items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
       >
         <PayloadDecoder {value} key="payloads" let:decodedValue>
-          <CodeBlock
-            content={decodedValue}
-            inline
-            thin
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
+          <div class="payload {$$props.class}">
+            <code><pre>{decodedValue}</pre></code>
+          </div>
         </PayloadDecoder>
       </div>
     {:else if shouldDisplayAsExecutionLink(key)}
@@ -125,5 +120,9 @@
 <style lang="postcss">
   .badge {
     @apply surface-subtle overflow-hidden rounded-sm p-1;
+  }
+
+  .payload {
+    @apply overflow-hidden rounded bg-space-black px-1 py-0.5 font-mono text-xs text-white;
   }
 </style>
