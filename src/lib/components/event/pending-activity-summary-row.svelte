@@ -8,6 +8,7 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { PendingActivity } from '$lib/types/events';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
+  import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
@@ -62,6 +63,14 @@
         <Icon class="mr-1.5 inline" name="retry" />
         {event.attempt} / {event.maximumAttempts || '∞'}
       </div>
+      {#if event.attempt > 1 && event.scheduledTime}
+        <div class="surface-danger flex items-center gap-1 rounded px-1 py-0.5">
+          {toTimeDifference({
+            date: event.scheduledTime,
+            negativeDefault: 'None',
+          })}
+        </div>
+      {/if}
       <EventDetailsRow
         key="activityType"
         value={event.activityType}
