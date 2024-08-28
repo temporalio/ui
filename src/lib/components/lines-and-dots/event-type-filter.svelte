@@ -31,8 +31,10 @@
     }
   }
 
+  // For now, don't show Nexus filter but allow Nexus events to be shown
+  const hideNexusFilter = true;
   $: {
-    if (isVersionNewer('1.25.0', $temporalVersion)) {
+    if (hideNexusFilter) {
       options = options.filter(({ value }) => value !== 'nexus');
     }
   }

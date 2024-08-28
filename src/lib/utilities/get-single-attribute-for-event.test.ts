@@ -5,6 +5,7 @@ import {
   getPrimaryAttributeForEvent,
   getSummaryAttribute,
   shouldDisplayAsExecutionLink,
+  shouldDisplayAsTime,
   shouldDisplayAttribute,
 } from './get-single-attribute-for-event';
 import { toEvent } from '../models/event-history';
@@ -177,6 +178,19 @@ describe('shouldDisplayAsExecutionLink', () => {
     expect(shouldDisplayAsExecutionLink('workflowType.name')).toBe(false);
     expect(shouldDisplayAsExecutionLink('parentInitiatedEventId')).toBe(false);
     expect(shouldDisplayAsExecutionLink('inlineRunIdSample')).toBe(false);
+  });
+});
+
+describe('shouldDisplayAsTime', () => {
+  it('should return non-time values as is', () => {
+    expect(shouldDisplayAsTime('originalExecutionRunId')).toBe(false);
+    expect(shouldDisplayAsTime('lastScheduledTimeout')).toBe(false);
+    expect(shouldDisplayAsTime('timeToFire')).toBe(false);
+  });
+  it('should return time values as formatted time', () => {
+    expect(shouldDisplayAsTime('lastScheduledTime')).toBe(true);
+    expect(shouldDisplayAsTime('expirationTime')).toBe(true);
+    expect(shouldDisplayAsTime('lastHeartbeatTime')).toBe(true);
   });
 });
 
