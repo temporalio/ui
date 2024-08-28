@@ -28,6 +28,7 @@
     isLocalActivityMarkerEvent,
   } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
+  import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   import { CategoryIcon } from '../lines-and-dots/constants';
 
@@ -157,6 +158,16 @@
               / {hasPendingActivity.maximumAttempts || '∞'}
             {/if}
           </div>
+          {#if pendingAttempt > 1 && hasPendingActivity && hasPendingActivity.scheduledTime}
+            <div
+              class="surface-danger flex items-center gap-1 rounded px-1 py-0.5"
+            >
+              {toTimeDifference({
+                date: hasPendingActivity.scheduledTime,
+                negativeDefault: 'None',
+              })}
+            </div>
+          {/if}
         {/if}
         <EventDetailsRow
           {...primaryAttribute}

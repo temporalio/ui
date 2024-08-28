@@ -73,7 +73,7 @@ export const fetchRawEvents = async ({
   return response.history.events;
 };
 
-const throttleRefresh = throttle(() => {
+export const throttleRefresh = throttle(() => {
   refresh.set(Date.now());
 }, 5000);
 
