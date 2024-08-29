@@ -68,7 +68,7 @@
     }
 
     :global(tr > th) {
-      @apply px-2 text-left first-of-type:rounded-tl last-of-type:rounded-tr;
+      @apply px-2 text-left font-medium first-of-type:rounded-tl last-of-type:rounded-tr;
     }
   }
 
