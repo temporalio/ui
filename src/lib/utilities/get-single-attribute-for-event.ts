@@ -284,7 +284,7 @@ export const getEventSummaryAttribute = (
     }
   }
 
-  return first;
+  return first || emptyAttribute;
 };
 
 export const getPendingActivitySummaryAttribute = (
