@@ -73,7 +73,7 @@
     </div></td
   >
   <td>
-    {#if event.attempt > 1 && event.scheduledTime}
+    {#if event.attempt > 1}
       <div class="flex items-center gap-2 px-2">
         <p class="max-w-fit whitespace-nowrap text-right text-xs">Next Retry</p>
         <p class="flex items-center gap-0">

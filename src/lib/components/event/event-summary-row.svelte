@@ -200,7 +200,7 @@
             </p>
           </div>
         {/if}
-        {#if event?.pendingActivity?.attempt > 1 && event?.pendingActivity?.scheduledTime}
+        {#if pendingAttempt > 1 && hasPendingActivity}
           <div class="flex items-center gap-2 px-2">
             <p class="max-w-fit whitespace-nowrap text-right text-xs">
               Next Retry
@@ -208,7 +208,7 @@
             <p class="flex items-center gap-0">
               <Icon class="mr-1.5 inline" name="clock" />
               {toTimeDifference({
-                date: event?.pendingActivity?.scheduledTime,
+                date: hasPendingActivity.scheduledTime,
                 negativeDefault: 'None',
               })}
             </p>
