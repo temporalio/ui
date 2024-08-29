@@ -63,14 +63,6 @@
         <Icon class="mr-1.5 inline" name="retry" />
         {event.attempt} / {event.maximumAttempts || '∞'}
       </div>
-      {#if event.attempt > 1 && event.scheduledTime}
-        <div class="surface-danger flex items-center gap-1 rounded px-1 py-0.5">
-          {toTimeDifference({
-            date: event.scheduledTime,
-            negativeDefault: 'None',
-          })}
-        </div>
-      {/if}
       <EventDetailsRow
         key="activityType"
         value={event.activityType}
@@ -80,7 +72,20 @@
       />
     </div></td
   >
-  <td />
+  <td>
+    {#if event.attempt > 1}
+      <div class="flex items-center gap-2 px-2">
+        <p class="max-w-fit whitespace-nowrap text-right text-xs">Next Retry</p>
+        <p class="flex items-center gap-0">
+          <Icon class="mr-1.5 inline" name="clock" />
+          {toTimeDifference({
+            date: event.scheduledTime,
+            negativeDefault: 'None',
+          })}
+        </p>
+      </div>
+    {/if}
+  </td>
 </tr>
 {#if expanded}
   <tr class="row expanded">

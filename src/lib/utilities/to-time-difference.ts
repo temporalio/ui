@@ -20,7 +20,7 @@ export const toTimeDifference = ({
       return negativeDefault;
     }
 
-    return !isNaN(timeFromNow) ? `${timeFromNow}s` : '';
+    return !isNaN(timeFromNow) ? `${timeFromNow.toFixed(0)}s` : '';
   } catch (error) {
     return '';
   }
