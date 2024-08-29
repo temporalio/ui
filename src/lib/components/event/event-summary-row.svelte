@@ -100,7 +100,7 @@
   );
   $: secondaryAttribute = getSecondaryAttributeForEvent(
     isEventGroup(event) ? event.lastEvent : event,
-    primaryAttribute.key,
+    primaryAttribute?.key,
   );
   $: hasPendingActivity = isEventGroup(event) && event?.pendingActivity;
   $: pendingAttempt =
