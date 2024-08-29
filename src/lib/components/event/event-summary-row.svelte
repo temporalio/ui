@@ -193,7 +193,7 @@
           {/each}
         </div>
         {#if duration && duration !== '0ms'}
-          <div class="flex flex-row items-center gap-1 text-sm text-secondary">
+          <div class="flex items-center gap-1 text-sm text-secondary">
             <Icon class="inline" name="clock" />
             <p class="whitespace-noline truncate">
               {duration}
@@ -201,7 +201,7 @@
           </div>
         {/if}
         {#if pendingAttempt > 1 && hasPendingActivity}
-          <div class="flex items-center gap-2 px-2">
+          <div class="flex items-center gap-2 text-sm">
             <p class="max-w-fit whitespace-nowrap text-right text-xs">
               Next Retry
             </p>
