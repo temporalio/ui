@@ -11,6 +11,7 @@
   export let disabled = false;
   export let position: 'left' | 'right' = 'left';
   export let primaryActionDisabled = false;
+  export let href: string | undefined = undefined;
 </script>
 
 <MenuContainer class={$$props.class}>
@@ -18,6 +19,7 @@
     <Button
       disabled={disabled || primaryActionDisabled}
       id="{id}-primary-button"
+      {href}
       on:click
     >
       {#if icon}
@@ -36,7 +38,7 @@
     />
   </div>
 
-  <Menu id="{id}-menu" {position} class="w-full">
+  <Menu id="{id}-menu" {position} class="max-w-fit">
     <slot />
   </Menu>
 </MenuContainer>
