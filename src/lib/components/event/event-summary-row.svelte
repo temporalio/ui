@@ -159,11 +159,13 @@
             {/if}
           </div>
         {/if}
-        <EventDetailsRow
-          {...primaryAttribute}
-          {attributes}
-          class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-        />
+        {#if primaryAttribute?.key}
+          <EventDetailsRow
+            {...primaryAttribute}
+            {attributes}
+            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
+          />
+        {/if}
         {#if nonPendingActivityAttempt}
           <EventDetailsRow
             key="attempt"
@@ -172,7 +174,7 @@
             class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
           />
         {/if}
-        {#if compact}
+        {#if compact && secondaryAttribute?.key}
           <EventDetailsRow
             {...secondaryAttribute}
             {attributes}
