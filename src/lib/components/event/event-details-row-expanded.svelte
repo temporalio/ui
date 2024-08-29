@@ -146,7 +146,7 @@
   }
 
   .code-block-row {
-    @apply block w-full py-1 text-left;
+    @apply block w-full select-all py-1 text-left;
   }
 
   .detail-row {
