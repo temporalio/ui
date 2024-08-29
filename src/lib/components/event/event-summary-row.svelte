@@ -158,16 +158,6 @@
               / {hasPendingActivity.maximumAttempts || '∞'}
             {/if}
           </div>
-          {#if pendingAttempt > 1 && hasPendingActivity && hasPendingActivity.scheduledTime}
-            <div
-              class="surface-danger flex items-center gap-1 rounded px-1 py-0.5"
-            >
-              {toTimeDifference({
-                date: hasPendingActivity.scheduledTime,
-                negativeDefault: 'None',
-              })}
-            </div>
-          {/if}
         {/if}
         <EventDetailsRow
           {...primaryAttribute}
@@ -207,6 +197,20 @@
             <Icon class="inline" name="clock" />
             <p class="whitespace-noline truncate">
               {duration}
+            </p>
+          </div>
+        {/if}
+        {#if event?.pendingActivity?.attempt > 1 && event?.pendingActivity?.scheduledTime}
+          <div class="flex items-center gap-2 px-2">
+            <p class="max-w-fit whitespace-nowrap text-right text-xs">
+              Next Retry
+            </p>
+            <p class="flex items-center gap-0">
+              <Icon class="mr-1.5 inline" name="clock" />
+              {toTimeDifference({
+                date: event?.pendingActivity?.scheduledTime,
+                negativeDefault: 'None',
+              })}
             </p>
           </div>
         {/if}
