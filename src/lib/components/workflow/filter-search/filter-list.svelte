@@ -17,7 +17,7 @@
     type TimeFormat,
   } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
-  import { isStartsWith } from '$lib/utilities/is';
+  import { isNullConditional, isStartsWith } from '$lib/utilities/is';
   import {
     isDateTimeFilter,
     isTextFilter,
@@ -114,7 +114,10 @@
           {:else}
             <span class="max-w-xs truncate md:max-w-lg xl:max-w-2xl">
               {attribute}
-              {#if isDateTimeFilter({ attribute, type })}
+              {#if isNullConditional(conditional)}
+                {conditional}
+                {value}
+              {:else if isDateTimeFilter({ attribute, type })}
                 {#if customDate}
                   {formatDateTimeRange(value, $timeFormat, $relativeTime)}
                 {:else}

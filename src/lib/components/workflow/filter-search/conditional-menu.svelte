@@ -7,10 +7,12 @@
     MenuContainer,
     MenuItem,
   } from '$lib/holocene/menu';
+  import { translate } from '$lib/i18n/translate';
+  import { isNullConditional } from '$lib/utilities/is';
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
-  const { filter, focusedElementId } =
+  const { filter, focusedElementId, handleSubmit } =
     getContext<FilterContext>(FILTER_CONTEXT);
   const defaultConditionOptions = [
     { value: '>' },
@@ -27,16 +29,29 @@
   export let noBorderLeft = false;
   export let noBorderRight = false;
 
-  $: filterConditionalOption = options.find(
+  let conditionalOptions = [
+    ...options,
+    { value: 'is', label: translate('common.is-null') },
+    { value: 'is not', label: translate('common.is-not-null') },
+  ];
+
+  $: filterConditionalOption = conditionalOptions.find(
     (o) => o.value === $filter.conditional,
   );
-  $: options, updateFilterConditional();
-  $: selectedOption = filterConditionalOption ?? options[0];
+  $: conditionalOptions, updateFilterConditional();
+  $: selectedOption = filterConditionalOption ?? conditionalOptions[0];
   $: selectedLabel = selectedOption?.label ?? selectedOption?.value;
+  $: isNullFilter = isNullConditional($filter.conditional);
+  $: isNullFilter && handleNullFilter();
+
+  function handleNullFilter() {
+    $filter.value = null;
+    handleSubmit();
+  }
 
   function updateFilterConditional() {
     if (!filterConditionalOption) {
-      $filter.conditional = options[0].value;
+      $filter.conditional = conditionalOptions[0].value;
     }
   }
 </script>
@@ -53,7 +68,7 @@
     {selectedLabel}
   </MenuButton>
   <Menu id="conditional-menu" class="whitespace-nowrap">
-    {#each options as { value, label }}
+    {#each conditionalOptions as { value, label }}
       <MenuItem
         on:click={() => {
           $filter.conditional = value;
@@ -65,3 +80,6 @@
     {/each}
   </Menu>
 </MenuContainer>
+{#if !isNullFilter}
+  <slot />
+{/if}
