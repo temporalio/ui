@@ -28,6 +28,7 @@
     isLocalActivityMarkerEvent,
   } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
+  import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   import { CategoryIcon } from '../lines-and-dots/constants';
 
@@ -99,7 +100,7 @@
   );
   $: secondaryAttribute = getSecondaryAttributeForEvent(
     isEventGroup(event) ? event.lastEvent : event,
-    primaryAttribute.key,
+    primaryAttribute?.key,
   );
   $: hasPendingActivity = isEventGroup(event) && event?.pendingActivity;
   $: pendingAttempt =
@@ -158,11 +159,13 @@
             {/if}
           </div>
         {/if}
-        <EventDetailsRow
-          {...primaryAttribute}
-          {attributes}
-          class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-        />
+        {#if primaryAttribute?.key}
+          <EventDetailsRow
+            {...primaryAttribute}
+            {attributes}
+            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
+          />
+        {/if}
         {#if nonPendingActivityAttempt}
           <EventDetailsRow
             key="attempt"
@@ -171,7 +174,7 @@
             class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
           />
         {/if}
-        {#if compact}
+        {#if compact && secondaryAttribute?.key}
           <EventDetailsRow
             {...secondaryAttribute}
             {attributes}
@@ -192,10 +195,24 @@
           {/each}
         </div>
         {#if duration && duration !== '0ms'}
-          <div class="flex flex-row items-center gap-1 text-sm text-secondary">
+          <div class="flex items-center gap-1 text-sm text-secondary">
             <Icon class="inline" name="clock" />
             <p class="whitespace-noline truncate">
               {duration}
+            </p>
+          </div>
+        {/if}
+        {#if pendingAttempt > 1 && hasPendingActivity}
+          <div class="flex items-center gap-2 text-sm">
+            <p class="max-w-fit whitespace-nowrap text-right text-xs">
+              Next Retry
+            </p>
+            <p class="flex items-center gap-0">
+              <Icon class="mr-1.5 inline" name="clock" />
+              {toTimeDifference({
+                date: hasPendingActivity.scheduledTime,
+                negativeDefault: 'None',
+              })}
             </p>
           </div>
         {/if}

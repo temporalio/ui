@@ -185,6 +185,10 @@ export const shouldDisplayChildWorkflowLink = (
   return false;
 };
 
+export const shouldDisplayAsTime = (key: string): boolean => {
+  return key?.toLowerCase()?.endsWith('time');
+};
+
 const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
   if (typeof value === 'object') {
     if (isSinglePayload(value)) {
@@ -280,7 +284,7 @@ export const getEventSummaryAttribute = (
     }
   }
 
-  return first;
+  return first || emptyAttribute;
 };
 
 export const getPendingActivitySummaryAttribute = (

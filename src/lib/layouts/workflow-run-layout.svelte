@@ -10,7 +10,10 @@
   import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
-  import { fetchAllEvents } from '$lib/services/events-service';
+  import {
+    fetchAllEvents,
+    throttleRefresh,
+  } from '$lib/services/events-service';
   import { getPollers } from '$lib/services/pollers-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
@@ -37,6 +40,7 @@
 
   let workflowError: NetworkError;
   let eventHistoryController: AbortController;
+  let refreshInterval;
 
   const { copy, copied } = copyToClipboard();
 
@@ -119,6 +123,8 @@
     workflowError = undefined;
     abortPolling();
     resetLastDataEncoderSuccess();
+    clearInterval(refreshInterval);
+    refreshInterval = null;
   };
 
   $: runId, clearWorkflowData();
@@ -137,6 +143,9 @@
   onMount(() => {
     const sort = $page.url.searchParams.get('sort');
     if (sort) $eventFilterSort = sort as EventSortOrder;
+    refreshInterval = setInterval(() => {
+      throttleRefresh();
+    }, 10000);
   });
 
   onDestroy(() => {

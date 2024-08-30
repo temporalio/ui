@@ -4,13 +4,16 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { timeFormat } from '$lib/stores/time-format';
   import { format } from '$lib/utilities/format-camel-case';
+  import { formatDate } from '$lib/utilities/format-date';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
     getCodeBlockValue,
     getStackTrace,
     shouldDisplayAsExecutionLink,
     shouldDisplayAsTaskQueueLink,
+    shouldDisplayAsTime,
     shouldDisplayChildWorkflowLink,
   } from '$lib/utilities/get-single-attribute-for-event';
   import {
@@ -127,7 +130,11 @@
     <div class="content detail-row">
       <p class="text-sm">{format(key)}</p>
       <p class="text-sm">
-        <span class="badge select-all break-all px-2">{value}</span>
+        <span class="badge select-all break-all px-2"
+          >{shouldDisplayAsTime(key)
+            ? formatDate(value, $timeFormat)
+            : value}</span
+        >
       </p>
     </div>
   {/if}
@@ -139,7 +146,7 @@
   }
 
   .code-block-row {
-    @apply block w-full py-1 text-left;
+    @apply block w-full select-all py-1 text-left;
   }
 
   .detail-row {
