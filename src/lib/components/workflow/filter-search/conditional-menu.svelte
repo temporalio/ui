@@ -38,11 +38,10 @@
   $: filterConditionalOption = conditionalOptions.find(
     (o) => o.value === $filter.conditional,
   );
-  $: conditionalOptions, updateFilterConditional();
+  $: filterConditionalOption, updateFilterConditional();
+  $: isNullFilter = isNullConditional($filter.conditional);
   $: selectedOption = filterConditionalOption ?? conditionalOptions[0];
   $: selectedLabel = selectedOption?.label ?? selectedOption?.value;
-  $: isNullFilter = isNullConditional($filter.conditional);
-  $: isNullFilter && handleNullFilter();
 
   function handleNullFilter() {
     $filter.value = null;
@@ -50,9 +49,8 @@
   }
 
   function updateFilterConditional() {
-    if (!filterConditionalOption) {
+    if (!filterConditionalOption)
       $filter.conditional = conditionalOptions[0].value;
-    }
   }
 </script>
 
@@ -60,7 +58,9 @@
   <MenuButton
     class="{noBorderRight ? '!border-r-0' : ''} {noBorderLeft
       ? '!border-l-0'
-      : ''} whitespace-nowrap"
+      : ''} whitespace-nowrap {isNullFilter
+      ? 'rounded-l-none'
+      : 'rounded-none'}"
     id="conditional-menu-button"
     controls="conditional-menu"
     {disabled}
@@ -73,6 +73,7 @@
         on:click={() => {
           $filter.conditional = value;
           $focusedElementId = inputId;
+          if (isNullConditional(value)) handleNullFilter();
         }}
       >
         {label ?? value}
