@@ -10,6 +10,7 @@
     copySuccessIconTitle: string;
     copied: boolean;
     'data-testid'?: string;
+    'data-theme'?: string;
   }
 
   export let copyIconTitle: string;
