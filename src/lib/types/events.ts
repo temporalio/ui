@@ -87,7 +87,7 @@ export interface WorkflowEvent extends HistoryEvent {
   classification: EventClassification;
   category: EventTypeCategory;
   name: EventType;
-  links: EventLink[];
+  links?: EventLink[];
 }
 
 export type WorkflowEvents = WorkflowEvent[];
