@@ -34,6 +34,7 @@
 
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
+  import EventLink from './event-link.svelte';
 
   export let event: IterableEvent;
   export let group: EventGroup | undefined = undefined;
@@ -158,6 +159,9 @@
               / {hasPendingActivity.maximumAttempts || '∞'}
             {/if}
           </div>
+        {/if}
+        {#if currentEvent?.links?.length}
+          <EventLink link={currentEvent.links[0]} />
         {/if}
         {#if primaryAttribute?.key}
           <EventDetailsRow

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -90,7 +91,7 @@
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="content detail-row">
       <p class="text-sm">{format(key)}</p>
-      <div class="badge text-sm">
+      <Badge type="subtle">
         <Link
           href={routeForEventHistory({
             namespace,
@@ -100,12 +101,12 @@
         >
           {value}
         </Link>
-      </div>
+      </Badge>
     </div>
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
     <div class="content detail-row">
       <p class="text-sm">{format(key)}</p>
-      <div class="badge text-sm">
+      <Badge type="subtle">
         <Link
           href={routeForEventHistory({
             namespace: attributes?.namespace || namespace,
@@ -115,27 +116,23 @@
         >
           {value}
         </Link>
-      </div>
+      </Badge>
     </div>
   {:else if shouldDisplayAsTaskQueueLink(key)}
     <div class="content detail-row">
       <p class="text-sm">{format(key)}</p>
-      <div class="badge text-sm">
+      <Badge type="subtle">
         <Link href={routeForTaskQueue({ namespace, queue: value.toString() })}>
           {value}
         </Link>
-      </div>
+      </Badge>
     </div>
   {:else}
     <div class="content detail-row">
       <p class="text-sm">{format(key)}</p>
-      <p class="text-sm">
-        <span class="badge select-all break-all px-2"
-          >{shouldDisplayAsTime(key)
-            ? formatDate(value, $timeFormat)
-            : value}</span
-        >
-      </p>
+      <Badge type="subtle">
+        {shouldDisplayAsTime(key) ? formatDate(value, $timeFormat) : value}
+      </Badge>
     </div>
   {/if}
 </div>
@@ -151,9 +148,5 @@
 
   .detail-row {
     @apply flex w-full items-center gap-4 py-1 text-left xl:flex;
-  }
-
-  .badge {
-    @apply surface-subtle rounded-sm px-1 py-0.5;
   }
 </style>

@@ -11,6 +11,7 @@
   import GraphWidget from '../lines-and-dots/svg/graph-widget.svelte';
 
   import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
+  import EventLinksExpanded from './event-links-expanded.svelte';
 
   export let group: EventGroup | undefined = undefined;
   export let event: WorkflowEvent | undefined = undefined;
@@ -43,6 +44,7 @@
               })}
             </div>
           </div>
+          <EventLinksExpanded links={groupEvent?.links} />
           {#each details as [key, value] (key)}
             <EventDetailsRowExpanded {key} {value} {attributes} />
           {/each}
@@ -79,6 +81,7 @@
   {@const details = Object.entries(attributes)}
   <div class="w-full p-2">
     <div class="w-full overflow-hidden rounded-xl border-2 border-subtle">
+      <EventLinksExpanded links={event?.links} />
       {#each details as [key, value] (key)}
         <EventDetailsRowExpanded {key} {value} {attributes} />
       {/each}

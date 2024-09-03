@@ -12,6 +12,10 @@ export type GetClusterInfoResponse =
   temporal.api.workflowservice.v1.IGetClusterInfoResponse;
 export type GetSystemInfoResponse =
   temporal.api.workflowservice.v1.IGetSystemInfoResponse;
+export type Capabilities =
+  temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities & {
+    nexus?: boolean;
+  };
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
 export type GetSearchAttributesResponse =

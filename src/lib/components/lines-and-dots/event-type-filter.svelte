@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -10,6 +12,7 @@
   import { clearActiveEvents } from '$lib/stores/active-events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
+  import { nexusEnabled } from '$lib/utilities/nexus-enabled';
   import { isVersionNewer } from '$lib/utilities/version-check';
 
   import { CategoryIcon } from './constants';
@@ -31,10 +34,8 @@
     }
   }
 
-  // For now, don't show Nexus filter but allow Nexus events to be shown
-  const hideNexusFilter = true;
   $: {
-    if (hideNexusFilter) {
+    if (!nexusEnabled($page.data.systemInfo?.capabilities)) {
       options = options.filter(({ value }) => value !== 'nexus');
     }
   }

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -55,16 +56,18 @@
             content={value}
             container-class="xl:flex-row"
           >
-            <Link
-              class="badge truncate"
-              href={routeForEventHistory({
-                namespace,
-                workflow,
-                run: value,
-              })}
-            >
-              {value}
-            </Link>
+            <Badge type="subtle" class="select-none">
+              <Link
+                class="truncate"
+                href={routeForEventHistory({
+                  namespace,
+                  workflow,
+                  run: value,
+                })}
+              >
+                {value}
+              </Link>
+            </Badge>
           </Copyable>
         </div>
       </div>
@@ -77,16 +80,18 @@
             content={value}
             container-class="xl:flex-row"
           >
-            <Link
-              class="badge truncate"
-              href={routeForEventHistory({
-                namespace,
-                workflow: attributes.workflowExecutionWorkflowId,
-                run: attributes.workflowExecutionRunId,
-              })}
-            >
-              {value}
-            </Link>
+            <Badge type="subtle" class="select-none">
+              <Link
+                class="truncate"
+                href={routeForEventHistory({
+                  namespace,
+                  workflow: attributes.workflowExecutionWorkflowId,
+                  run: attributes.workflowExecutionRunId,
+                })}
+              >
+                {value}
+              </Link>
+            </Badge>
           </Copyable>
         </div>
       </div>
@@ -98,19 +103,23 @@
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
             content={value}
           >
-            <Link
-              class="badge truncate"
-              href={routeForTaskQueue({ namespace, queue: value })}
-            >
-              {value}
-            </Link>
+            <Badge type="subtle" class="select-none">
+              <Link
+                class="truncate"
+                href={routeForTaskQueue({ namespace, queue: value })}
+              >
+                {value}
+              </Link>
+            </Badge>
           </Copyable>
         </div>
       </div>
     {:else}
       <div class="flex w-full items-center gap-2 pr-1">
         <p class="truncate text-right text-sm xl:text-left">
-          <span class="badge w-full select-none text-slate-700">{value}</span>
+          <Badge type="subtle" class="select-none">
+            {value}
+          </Badge>
         </p>
       </div>
     {/if}
@@ -118,10 +127,6 @@
 {/if}
 
 <style lang="postcss">
-  .badge {
-    @apply surface-subtle overflow-hidden rounded-sm p-1;
-  }
-
   .payload {
     @apply overflow-hidden rounded bg-space-black px-1 py-0.5 font-mono text-xs text-white;
   }
