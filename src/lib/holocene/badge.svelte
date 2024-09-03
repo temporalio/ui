@@ -12,6 +12,7 @@
     success: 'bg-green-200',
     danger: 'bg-red-200',
     count: 'h-6 w-6 min-w-max rounded-full bg-blue-300',
+    subtle: 'surface-subtle dark:text-white font-normal select-all',
   };
 
   const types = cva(
