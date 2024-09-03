@@ -14,7 +14,7 @@
   {#each linkList as item}
     {#if !item?.hidden}
       {#if item.divider}
-        <hr class="-mx-4 my-8 border-subtle" />
+        <hr class="-mx-4 my-4 border-subtle" />
       {/if}
       <NavigationItem
         link={item.href}
