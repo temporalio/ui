@@ -18,7 +18,7 @@
 <div
   class="paginated-table-wrapper {variant}"
   bind:this={tableContainer}
-  style="max-height: {maxHeight ?? `calc(100vh - ${tableOffset}px)`}"
+  style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`}"
 >
   <table class="paginated-table">
     <slot name="caption" />
@@ -45,7 +45,7 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply surface-primary max-h-none min-h-[154px] overflow-auto;
+    @apply surface-primary min-h-[154px] overflow-auto;
   }
 
   .primary {
