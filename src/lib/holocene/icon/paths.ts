@@ -29,6 +29,7 @@ import compact from './svg/compact.svelte';
 import converterDown from './svg/converter-down.svelte';
 import converterUp from './svg/converter-up.svelte';
 import copy from './svg/copy.svelte';
+import creditCard from './svg/credit-card.svelte';
 import descending from './svg/descending.svelte';
 import dollarBadge from './svg/dollar-badge.svelte';
 import download from './svg/download.svelte';
@@ -135,6 +136,7 @@ export const icons = {
   'converter-down': converterDown,
   'converter-up': converterUp,
   copy,
+  'credit-card': creditCard,
   descending,
   download,
   'dollar-badge': dollarBadge,
