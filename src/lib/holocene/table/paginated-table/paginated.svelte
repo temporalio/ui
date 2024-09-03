@@ -26,10 +26,10 @@
   export let nextPageButtonLabel: string;
   export let previousPageButtonLabel: string;
   export let maxHeight = '';
+  export let pageSizeOptions: string[] = options;
 
   $: url = $page.url;
-  $: perPageParam =
-    url.searchParams.get(perPageKey) ?? String(defaultItemsPerPage);
+  $: perPageParam = url.searchParams.get(perPageKey) ?? pageSizeOptions[0];
   $: currentPageParam = url.searchParams.get(currentPageKey) ?? '1';
   $: store = pagination(items, perPageParam, currentPageParam);
 
@@ -41,7 +41,7 @@
         value: MAX_PAGE_SIZE,
         url,
       });
-    } else if (!options.includes(perPageParam)) {
+    } else if (!pageSizeOptions.includes(perPageParam)) {
       updateQueryParameters({
         parameter: perPageKey,
         value: defaultItemsPerPage,
@@ -97,7 +97,7 @@
       label={perPageLabel}
       parameter={perPageKey}
       value={perPageParam}
-      {options}
+      options={pageSizeOptions}
     />
   </svelte:fragment>
 
