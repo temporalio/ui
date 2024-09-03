@@ -15,6 +15,7 @@
       icon: undefined,
       disabled: false,
       primaryActionDisabled: false,
+      href: 'https://caniuse.com',
     },
     argTypes: {
       position: {
@@ -46,10 +47,12 @@
 </script>
 
 <Template let:args>
-  <SplitButton {...args}>
-    <MenuItem>View</MenuItem>
-    <MenuItem destructive>Delete</MenuItem>
-  </SplitButton>
+  <div class="flex">
+    <SplitButton {...args}>
+      <MenuItem>View</MenuItem>
+      <MenuItem destructive>Delete</MenuItem>
+    </SplitButton>
+  </div>
 </Template>
 
 <Story name="Default" />
