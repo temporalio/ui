@@ -65,6 +65,7 @@ export type CombinedWorkflowExecutionsResponse = {
 type CancelWorkflowOptions = {
   namespace: string;
   workflow: WorkflowExecution;
+  reason: string;
 };
 
 type SignalWorkflowOptions = {
@@ -277,7 +278,11 @@ export async function terminateWorkflow({
 }
 
 export async function cancelWorkflow(
-  { namespace, workflow: { id: workflowId, runId } }: CancelWorkflowOptions,
+  {
+    namespace,
+    workflow: { id: workflowId, runId },
+    reason,
+  }: CancelWorkflowOptions,
   request = fetch,
 ) {
   const route = routeForApi('workflow.cancel', {
@@ -285,11 +290,22 @@ export async function cancelWorkflow(
     workflowId,
   });
 
+  const email = get(authUser).email;
+  const formattedReason = formatReason({
+    action: Action.Cancel,
+    reason,
+    email,
+  });
+
   return requestFromAPI(route, {
     request,
     notifyOnError: false,
     options: {
       method: 'POST',
+      body: stringifyWithBigInt({
+        reason: formattedReason,
+        ...(email && { identity: email }),
+      }),
     },
     params: {
       'execution.runId': runId,
