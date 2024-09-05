@@ -7,7 +7,13 @@ import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-work
 
 import { tokenize } from './tokenize';
 import { isValidDate } from '../format-date';
-import { isBetween, isConditional, isJoin, isParenthesis } from '../is';
+import {
+  isBetween,
+  isConditional,
+  isJoin,
+  isNullConditional,
+  isParenthesis,
+} from '../is';
 import { durationKeys } from '../to-duration';
 import { updateQueryParameters } from '../update-query-parameters';
 type Tokens = string[];
@@ -20,8 +26,14 @@ const is =
     return false;
   };
 
+const getOneAhead = (tokens: Tokens, index: number): string =>
+  tokens[index + 1];
+
 const getTwoAhead = (tokens: Tokens, index: number): string =>
   tokens[index + 2];
+
+const getThreeAhead = (tokens: Tokens, index: number): string =>
+  tokens[index + 3];
 
 const getTwoBehind = (tokens: Tokens, index: number): string =>
   tokens[index - 2];
@@ -70,14 +82,23 @@ export const toListWorkflowFilters = (
 
   try {
     tokens.forEach((token, index) => {
+      const nextToken = getOneAhead(tokens, index);
+      const tokenTwoAhead = getTwoAhead(tokens, index);
+
       if (attributes[token]) {
         filter.attribute = token;
         filter.type = attributes[token];
-        if (isDatetimeStatement(attributes[token])) {
-          const start = getTwoAhead(tokens, index);
+
+        if (isNullConditional(nextToken)) {
+          const combinedTokens = `${nextToken} ${tokenTwoAhead}`;
+          filter.value = isNullConditional(combinedTokens)
+            ? getThreeAhead(tokens, index)
+            : tokenTwoAhead;
+        } else if (isDatetimeStatement(attributes[token])) {
+          const start = tokenTwoAhead;
           const hasValidStartTime = isValidDate(start);
 
-          if (isBetween(tokens[index + 1])) {
+          if (isBetween(nextToken)) {
             const end = tokens[index + 4];
             const hasValidEndTime = isValidDate(end);
 
@@ -93,15 +114,20 @@ export const toListWorkflowFilters = (
             console.error('Error parsing Datetime field from query');
           }
         } else if (isBoolStatement(filter.type)) {
-          filter.value = tokens[index + 1].replace('=', '');
+          filter.value = nextToken.replace('=', '');
           filter.conditional = '=';
         } else {
-          filter.value = getTwoAhead(tokens, index);
+          filter.value = tokenTwoAhead;
         }
       }
 
       if (isConditional(token)) {
-        filter.conditional = token;
+        const combinedTokens = `${token} ${nextToken}`;
+        if (isNullConditional(combinedTokens)) {
+          filter.conditional = combinedTokens;
+        } else {
+          filter.conditional = token;
+        }
       }
 
       if (isParenthesis(token)) {

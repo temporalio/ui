@@ -125,17 +125,16 @@
   };
 </script>
 
-<div class="flex items-center">
-  <ConditionalMenu
-    inputId="time-range-filter"
-    options={[
-      { value: '<=', label: translate('common.before') },
-      { value: 'BETWEEN', label: translate('common.between') },
-      { value: '>=', label: translate('common.after') },
-    ]}
-    noBorderLeft
-    noBorderRight
-  />
+<ConditionalMenu
+  inputId="time-range-filter"
+  options={[
+    { value: '<=', label: translate('common.before') },
+    { value: 'BETWEEN', label: translate('common.between') },
+    { value: '>=', label: translate('common.after') },
+  ]}
+  noBorderLeft
+  noBorderRight
+>
   <MenuContainer>
     <MenuButton
       id="time-range-filter"
@@ -267,4 +266,4 @@
       </MenuItem>
     </Menu>
   </MenuContainer>
-</div>
+</ConditionalMenu>
