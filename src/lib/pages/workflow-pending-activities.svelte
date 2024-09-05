@@ -73,7 +73,8 @@
                     {translate('workflows.next-retry')}
                   </h4>
                   <Tooltip
-                    topRight
+                    width={200}
+                    left
                     text={formatDate(details.scheduledTime, $timeFormat, {
                       relative: $relativeTime,
                     })}
