@@ -14,16 +14,33 @@ export const Strings = {
   category: {
     all: 'All',
     activity: 'Activity',
+    'activity-tooltip':
+      "An Activity is a normal function or method execution that's intended to execute a single, well-defined action.",
     'child-workflow': 'Child Workflow',
+    'child-workflow-tooltip':
+      'A Child Workflow Execution is a Workflow Execution that is spawned from within another Workflow in the same Namespace.',
     command: 'Command',
+    'command-tooltip': 'Command Events',
     other: 'Other',
+    'other-tooltip':
+      'Marker Recorded, Upsert Search Attributes and Workflow Properties Modified.',
     'local-activity': 'Local Activity',
-    marker: 'Marker',
+    'local-activity-tooltip':
+      'A Local Activity is an Activity Execution that executes in the same process as the Workflow Execution that spawns it.',
     nexus: 'Nexus',
+    'nexus-tooltip':
+      'Nexus connects durable executions within and across Namespaces.',
     signal: 'Signal',
+    'signal-tooltip':
+      'Signals are asynchronous write requests. They cause changes in the running Workflow, but you cannot await any response or error.',
     timer: 'Timer',
+    'timer-tooltip': 'Timers are durable timers set for a fixed time period.',
     update: 'Update',
+    'update-tooltip':
+      'Updates are synchronous, tracked write requests. The sender of the Update can wait for a response on completion or an error on failure.',
     workflow: 'Workflow',
+    'workflow-tooltip':
+      'A Workflow Task is a Task that contains the context needed to make progress with a Workflow Execution.',
   },
   'attribute-group': {
     activity: 'Activity',

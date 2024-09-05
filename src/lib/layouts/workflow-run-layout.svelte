@@ -6,19 +6,25 @@
   import { viewDataEncoderSettings } from '$lib/components/data-encoder-settings.svelte';
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
   import CopyButton from '$lib/holocene/copyable/button.svelte';
-  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
-  import { fetchAllEvents } from '$lib/services/events-service';
+  import {
+    fetchAllEvents,
+    throttleRefresh,
+  } from '$lib/services/events-service';
   import { getPollers } from '$lib/services/pollers-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
-  import { fullEventHistory, timelineEvents } from '$lib/stores/events';
-  import { labsMode } from '$lib/stores/labs-mode';
+  import {
+    currentEventHistory,
+    fullEventHistory,
+    pauseLiveUpdates,
+    timelineEvents,
+  } from '$lib/stores/events';
   import {
     initialWorkflowRun,
     refresh,
@@ -34,6 +40,7 @@
 
   let workflowError: NetworkError;
   let eventHistoryController: AbortController;
+  let refreshInterval;
 
   const { copy, copied } = copyToClipboard();
 
@@ -45,8 +52,6 @@
     namespace: string,
     workflowId: string,
     runId: string,
-    sort: EventSortOrder,
-    labsMode: boolean,
   ) => {
     const { settings } = $page.data;
     const { workflow, error } = await fetchWorkflow({
@@ -75,7 +80,7 @@
       namespace,
       workflowId,
       runId,
-      sort: labsMode ? 'ascending' : sort,
+      sort: 'ascending',
       signal: eventHistoryController.signal,
       historySize: workflow.historyEvents,
     });
@@ -118,28 +123,29 @@
     workflowError = undefined;
     abortPolling();
     resetLastDataEncoderSuccess();
-  };
-
-  const clearHistoryData = () => {
-    $timelineEvents = null;
-    abortPolling();
+    clearInterval(refreshInterval);
+    refreshInterval = null;
   };
 
   $: runId, clearWorkflowData();
-  $: $labsMode, $eventFilterSort, clearHistoryData();
 
-  $: getWorkflowAndEventHistory(
-    namespace,
-    workflowId,
-    runId,
-    $eventFilterSort,
-    $labsMode,
-  );
+  $: getWorkflowAndEventHistory(namespace, workflowId, runId);
   $: getOnlyWorkflowWithPendingActivities($refresh);
+
+  const setCurrentEvents = (fullHistory, pause) => {
+    if (!pause) {
+      $currentEventHistory = fullHistory;
+    }
+  };
+
+  $: setCurrentEvents($fullEventHistory, $pauseLiveUpdates);
 
   onMount(() => {
     const sort = $page.url.searchParams.get('sort');
     if (sort) $eventFilterSort = sort as EventSortOrder;
+    refreshInterval = setInterval(() => {
+      throttleRefresh();
+    }, 10000);
   });
 
   onDestroy(() => {
@@ -161,33 +167,21 @@
     {stringifyWithBigInt(fullJson, null, 2)}
   </div>
 {:else}
-  <LabsModeGuard>
-    <div
-      class="absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
-        ? 'top-[540px]'
-        : 'top-0'}
+  <div
+    class="absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
+      ? 'top-[540px]'
+      : 'top-0'}
     } flex h-full flex-col gap-0"
-    >
-      {#if workflowError}
-        <WorkflowError error={workflowError} />
-      {:else if !$workflowRun.workflow}
-        <Loading class="pt-24" />
-      {:else}
-        <div class="px-8 pt-8 md:pt-20">
-          <WorkflowHeader namespace={$page.params.namespace} />
-        </div>
-        <slot />
-      {/if}
-    </div>
-    <div class="flex h-full flex-col gap-0" slot="fallback">
-      {#if workflowError}
-        <WorkflowError error={workflowError} />
-      {:else if !$workflowRun.workflow}
-        <Loading />
-      {:else}
+  >
+    {#if workflowError}
+      <WorkflowError error={workflowError} />
+    {:else if !$workflowRun.workflow}
+      <Loading class="pt-24" />
+    {:else}
+      <div class="px-8 pt-8 md:pt-20">
         <WorkflowHeader namespace={$page.params.namespace} />
-        <slot />
-      {/if}
-    </div>
-  </LabsModeGuard>
+      </div>
+      <slot />
+    {/if}
+  </div>
 {/if}

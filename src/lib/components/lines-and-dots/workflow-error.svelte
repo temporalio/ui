@@ -5,7 +5,10 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import type { WorkflowTaskFailedEventAttributes } from '$lib/types';
+  import type {
+    PendingWorkflowTaskInfo,
+    WorkflowTaskFailedEventAttributes,
+  } from '$lib/types';
   import type { WorkflowTaskFailedEvent } from '$lib/types/events';
   import type { WorkflowTaskFailedCause } from '$lib/types/workflows';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
@@ -13,6 +16,11 @@
   import { toWorkflowTaskFailureReadable } from '$lib/utilities/screaming-enums';
 
   import { CategoryIcon } from './constants';
+
+  export let error: WorkflowTaskFailedEvent;
+  export let pendingTask: PendingWorkflowTaskInfo | undefined = undefined;
+
+  let cause: WorkflowTaskFailedCause;
 
   function getErrorCause(
     error: WorkflowTaskFailedEvent,
@@ -32,9 +40,6 @@
     return toWorkflowTaskFailureReadable(cause);
   }
 
-  export let error: WorkflowTaskFailedEvent;
-
-  let cause: WorkflowTaskFailedCause;
   $: {
     cause = getErrorCause(error);
   }
@@ -97,5 +102,37 @@
         />
       </div>
     </div>
+
+    {#if pendingTask}
+      <div class="flex flex-col gap-2 pt-4">
+        <h5>Pending Workflow Task Info</h5>
+        <p>
+          {translate('common.state')}
+          <span class="badge">{pendingTask.state}</span>
+        </p>
+        <p>
+          {translate('common.attempt')}
+          <span class="badge">{pendingTask.attempt}</span>
+        </p>
+        <p>
+          <span class="inline-block w-48">Original Scheduled Time</span>
+          <span class="badge"
+            >{formatDate(pendingTask.originalScheduledTime, $timeFormat)}</span
+          >
+        </p>
+        <p>
+          <span class="inline-block w-48">Scheduled Time</span>
+          <span class="badge"
+            >{formatDate(pendingTask.scheduledTime, $timeFormat)}</span
+          >
+        </p>
+        <p>
+          <span class="inline-block w-48">Started Time</span>
+          <span class="badge"
+            >{formatDate(pendingTask.startedTime, $timeFormat)}</span
+          >
+        </p>
+      </div>
+    {/if}
   </Alert>
 {/if}

@@ -4,7 +4,9 @@
   type Item = $$Generic;
 
   export let visibleItems: Item[];
+  export let variant: 'primary' | 'split' = 'primary';
   export let updating = false;
+  export let maxHeight = '';
 
   let tableContainer: HTMLDivElement;
 
@@ -14,9 +16,9 @@
 </script>
 
 <div
-  class="paginated-table-wrapper"
+  class="paginated-table-wrapper {variant}"
   bind:this={tableContainer}
-  style="max-height: calc(100vh - {tableOffset}px)"
+  style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`}"
 >
   <table class="paginated-table">
     <slot name="caption" />
@@ -43,7 +45,15 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply surface-primary min-h-[154px] overflow-auto rounded-lg border-2 border-table;
+    @apply surface-primary min-h-[154px] overflow-auto;
+  }
+
+  .primary {
+    @apply rounded-lg border-2 border-table;
+  }
+
+  .split {
+    @apply border-t-2 border-subtle;
   }
 
   .paginated-table {
@@ -63,8 +73,28 @@
   }
 
   .paginated-table-body {
-    :global(tr:not(.empty)) {
+    :global(tr.primary) {
       @apply h-12 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+    }
+
+    :global(tr.dense) {
+      @apply h-8 hover:cursor-pointer hover:bg-interactive-table-hover hover:bg-fixed;
+    }
+
+    :global(tr.expanded) {
+      @apply w-full hover:bg-primary;
+    }
+
+    :global(tr.dense:nth-of-type(odd)) {
+      @apply surface-background hover:bg-interactive-table-hover;
+    }
+
+    :global(tr.dense.expanded) {
+      @apply bg-interactive-secondary-active;
+    }
+
+    :global(tr.dense.active) {
+      @apply bg-interactive-table-hover;
     }
 
     :global(tr > td) {
@@ -73,6 +103,20 @@
 
     :global(tr > td > .table-link) {
       @apply hover:text-blue-700 hover:underline hover:decoration-blue-700;
+    }
+  }
+
+  .primary .paginated-table-body {
+    :global(tr:not(.empty)) {
+      @apply h-12 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+    }
+  }
+
+  .split .paginated-table-body {
+    @apply flex;
+
+    :global(tr > td) {
+      @apply px-0;
     }
   }
 

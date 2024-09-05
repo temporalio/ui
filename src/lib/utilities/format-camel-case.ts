@@ -39,6 +39,7 @@ const formatLabel = (label?: string): string => {
 
 export const format = (label?: string): string => {
   if (!label) return '';
+  if (label === 'id') return 'ID';
 
   let result = '';
   let index = 0;

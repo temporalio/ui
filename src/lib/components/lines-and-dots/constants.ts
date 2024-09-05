@@ -3,12 +3,14 @@ import type {
   EventGroup,
   EventGroups,
 } from '$lib/models/event-groups/event-groups';
+import { isEvent } from '$lib/models/event-history';
+import type { EventSortOrder } from '$lib/stores/event-view';
 import type {
   EventClassification,
   EventTypeCategory,
   PendingActivity,
   WorkflowEvent,
-  WorkflowEvents,
+  WorkflowEventWithPending,
 } from '$lib/types/events';
 import type { WorkflowStatus } from '$lib/types/workflows';
 import {
@@ -16,7 +18,10 @@ import {
   formatGroupAttributes,
   formatPendingAttributes,
 } from '$lib/utilities/format-event-attributes';
-import { isAssociatedPendingActivity } from '$lib/utilities/pending-activities';
+import {
+  getGroupForEventOrPendingEvent,
+  isAssociatedPendingActivity,
+} from '$lib/utilities/pending-activities';
 
 export const DetailsChildTimelineHeight = 200;
 
@@ -31,24 +36,17 @@ const baseRadius = 6;
 
 export const minCompactWidth = 200;
 
-export const CompactConfig: GraphConfig = {
-  height: baseRadius * 9,
-  gutter: baseRadius * 7,
-  radius: baseRadius * 4,
-  fontSizeRatio: baseRadius * 4,
-};
-
 export const TimelineConfig: GraphConfig = {
   height: baseRadius * 5,
-  gutter: baseRadius * 4,
+  gutter: baseRadius * 8,
   radius: baseRadius * 2,
   fontSizeRatio: baseRadius * 4,
 };
 
 export const HistoryConfig: GraphConfig = {
-  height: baseRadius * 5,
+  height: 32,
   gutter: baseRadius * 2,
-  radius: baseRadius * 1,
+  radius: 4,
   fontSizeRatio: baseRadius * 4,
 };
 
@@ -150,10 +148,10 @@ const isConsecutiveGroup = (group: EventGroup): boolean => {
 };
 
 const getOpenGroups = (
-  event: WorkflowEvent | PendingActivity,
+  event: WorkflowEventWithPending,
   groups: EventGroups,
 ): number => {
-  const group = groups.find((g) => g.eventIds.has(event.id));
+  const group = getGroupForEventOrPendingEvent(groups, event);
   if (group.level !== undefined) return group.level;
 
   const pendingGroups = groups
@@ -178,64 +176,14 @@ const getOpenGroups = (
   return group.level;
 };
 
-const allEventsInGroupHeight = (
-  id: string,
-  history: WorkflowEvents,
-  groups: EventGroups,
-): number => {
-  const event = history.find((event) => event.id === id);
-  const group = groups.find((group) => group.eventIds.has(id));
-  if (group) {
-    return group.eventList.reduce(
-      (sum, event) =>
-        (sum += getEventDetailsBoxHeight(event, group.pendingActivity)),
-      0,
-    );
-  }
-  if (event) return getEventDetailsBoxHeight(event);
-  return 0;
-};
-
-export const activeEventsHeightAboveGroup = (
-  activeEvents: string[],
-  event: WorkflowEvent,
-  history: WorkflowEvents,
-  groups: EventGroups,
-) => {
-  return activeEvents
-    .filter((id) => parseInt(id) < parseInt(event.id))
-    .map((id) => {
-      return allEventsInGroupHeight(id, history, groups);
-    })
-    .reduce((acc, height) => acc + height, 0);
-};
-
-export const getVisualWidth = (
-  history: WorkflowEvents,
-  groups: EventGroups,
-  maxWidth: number,
-) => {
-  let maxOffset = 0;
-  if (!history.length) return maxWidth;
-  history.forEach((event) => {
-    const group = groups.find((g) => g.eventIds.has(event.id));
-    if (group) {
-      const offset = getOpenGroups(event, groups);
-      if (offset > maxOffset) {
-        maxOffset = offset;
-      }
-    }
-  });
-  return Math.min(maxWidth, (maxOffset + 2) * 2 * HistoryConfig.radius);
-};
-
 export const getNextDistanceAndOffset = (
-  history: WorkflowEvents,
-  event: WorkflowEvent,
+  history: WorkflowEventWithPending[],
+  event: WorkflowEventWithPending,
   groups: EventGroups,
   height: number,
+  sort: EventSortOrder,
 ): { nextDistance: number; offset: number } => {
-  const group = groups.find((g) => g.eventIds.has(event.id));
+  const group = getGroupForEventOrPendingEvent(groups, event);
   let nextDistance = 0;
   let offset = 0;
 
@@ -247,9 +195,9 @@ export const getNextDistanceAndOffset = (
     return { nextDistance, offset };
   }
 
-  const currentIndex = group.eventList.indexOf(event);
-  const nextEvent = group.eventList[currentIndex + 1];
-  if (event.category !== 'workflow') {
+  const currentIndex = isEvent(event) && group.eventList.indexOf(event);
+  const nextEvent = isEvent(event) && group.eventList[currentIndex + 1];
+  if (!isEvent(event) || event.category !== 'workflow') {
     offset = getOpenGroups(event, groups);
   }
 
@@ -260,10 +208,11 @@ export const getNextDistanceAndOffset = (
   let diff = 0;
   if (nextEvent) {
     diff = parseInt(nextEvent.id) - parseInt(event.id);
-  } else if (group.isPending) {
+  } else if (group.isPending && isEvent(event)) {
     diff = history.length - parseInt(event.id) + 2;
   }
-  nextDistance = diff * height;
+  const distance = diff * height;
+  nextDistance = sort === 'ascending' ? distance : -distance;
   return { nextDistance, offset };
 };
 
@@ -324,10 +273,12 @@ export const activeGroupsHeightAboveGroup = (
   group: EventGroup,
   groups: EventGroups,
   width: number,
+  sort: EventSortOrder,
 ) => {
   return activeGroups
     .filter((id) => {
-      return parseInt(id) < parseInt(group.id);
+      if (sort === 'ascending') return parseInt(id) < parseInt(group.id);
+      return parseInt(id) > parseInt(group.id);
     })
     .map((id) => {
       const group = groups.find((group) => group.id === id);

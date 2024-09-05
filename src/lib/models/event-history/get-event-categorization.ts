@@ -87,38 +87,54 @@ export const eventTypeCategorizations: Readonly<
 export type EventTypeOption = {
   label: I18nKey;
   value: EventTypeCategory;
+  tooltip?: I18nKey;
 };
 
 export const allEventTypeOptions: EventTypeOption[] = [
   {
     label: 'events.category.activity',
     value: CATEGORIES.ACTIVITY,
+    tooltip: 'events.category.activity-tooltip',
   },
   {
     label: 'events.category.child-workflow',
     value: CATEGORIES.CHILD_WORKFLOW,
+    tooltip: 'events.category.child-workflow-tooltip',
   },
   {
     label: 'events.category.local-activity',
     value: CATEGORIES.LOCAL_ACTIVITY,
+    tooltip: 'events.category.local-activity-tooltip',
   },
   {
     label: 'events.category.signal',
     value: CATEGORIES.SIGNAL,
+    tooltip: 'events.category.signal-tooltip',
   },
   {
     label: 'events.category.timer',
     value: CATEGORIES.TIMER,
+    tooltip: 'events.category.timer-tooltip',
   },
-  { label: 'events.category.update', value: CATEGORIES.UPDATE },
-  { label: 'events.category.nexus', value: CATEGORIES.NEXUS },
+  {
+    label: 'events.category.update',
+    value: CATEGORIES.UPDATE,
+    tooltip: 'events.category.update-tooltip',
+  },
+  {
+    label: 'events.category.nexus',
+    value: CATEGORIES.NEXUS,
+    tooltip: 'events.category.nexus-tooltip',
+  },
   {
     label: 'events.category.workflow',
     value: CATEGORIES.WORKFLOW,
+    tooltip: 'events.category.workflow-tooltip',
   },
   {
     label: 'events.category.other',
     value: CATEGORIES.OTHER,
+    tooltip: 'events.category.other-tooltip',
   },
 ];
 

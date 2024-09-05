@@ -7,9 +7,21 @@ export type EventHistory = Replace<
   { events: HistoryEvent[] }
 >;
 
+export type EventLink = {
+  workflowEvent: {
+    eventRef: {
+      eventType: string;
+      eventId?: string;
+    };
+    namespace: string;
+    workflowId: string;
+    runId: string;
+  };
+};
+
 export type HistoryEvent = Replace<
   import('$lib/types').HistoryEvent,
-  { eventType: EventType; eventId: string }
+  { eventType: EventType; eventId: string; links?: EventLink[] }
 >;
 
 export type GetWorkflowExecutionHistoryResponse = Replace<
@@ -75,6 +87,7 @@ export interface WorkflowEvent extends HistoryEvent {
   classification: EventClassification;
   category: EventTypeCategory;
   name: EventType;
+  links?: EventLink[];
 }
 
 export type WorkflowEvents = WorkflowEvent[];
@@ -137,9 +150,17 @@ export type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
   ChildWorkflowExecutionTimedOutEvent &
   ChildWorkflowExecutionTerminatedEvent;
 
-export type EventView = 'feed' | 'compact' | 'json' | 'timeline';
+export type EventView = 'compact' | 'feed' | 'json';
+export type TaskQueueView = 'workers' | 'versioning';
 
 export type IterableEvent = WorkflowEvent | EventGroup;
+
+export type WorkflowEventWithPending =
+  | WorkflowEvent
+  | PendingActivity
+  | PendingNexusOperation;
+
+export type IterableEventWithPending = EventGroup | WorkflowEventWithPending;
 
 export type WorkflowExecutionStartedEvent =
   EventWithAttributes<'workflowExecutionStartedEventAttributes'>;

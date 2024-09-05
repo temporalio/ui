@@ -16,7 +16,6 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fullEventHistory } from '$lib/stores/events';
-  import { labsMode } from '$lib/stores/labs-mode';
   import { namespaces } from '$lib/stores/namespaces';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -163,28 +162,26 @@
           >{workflowRelationships.relationshipCount}</Badge
         >
       </Tab>
-      {#if !$labsMode}
-        <Tab
-          label={translate('workflows.pending-activities-tab')}
-          id="pending-activities-tab"
-          href={routeForPendingActivities(routeParameters)}
-          active={pathMatches(
-            $page.url.pathname,
-            routeForPendingActivities(routeParameters),
-          )}
+      <Tab
+        label={translate('workflows.pending-activities-tab')}
+        id="pending-activities-tab"
+        href={routeForPendingActivities(routeParameters)}
+        active={pathMatches(
+          $page.url.pathname,
+          routeForPendingActivities(routeParameters),
+        )}
+      >
+        <Badge
+          type={activitiesCanceled ? 'warning' : 'primary'}
+          class="px-2 py-0"
         >
-          <Badge
-            type={activitiesCanceled ? 'warning' : 'primary'}
-            class="px-2 py-0"
-          >
-            <div class="flex items-center gap-1">
-              {#if activitiesCanceled}<Icon name="canceled" />
-              {/if}
-              {workflow?.pendingActivities?.length}
-            </div>
-          </Badge>
-        </Tab>
-      {/if}
+          <div class="flex items-center gap-1">
+            {#if activitiesCanceled}<Icon name="canceled" />
+            {/if}
+            {workflow?.pendingActivities?.length}
+          </div>
+        </Badge>
+      </Tab>
       <Tab
         label={translate('workflows.call-stack-tab')}
         id="call-stack-tab"

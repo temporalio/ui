@@ -14,8 +14,8 @@
   export let error: NetworkError | undefined = undefined;
   export let loading = false;
   export let isCloud = false;
-  export let nameRegexPattern: RegExp = /^[A-Za-z_][A-Za-z0-9_]*$/;
-  export let nameHintText = translate('nexus.endpoint-name-hint');
+  export let nameRegexPattern: RegExp = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/;
+  export let nameHintText = translate('nexus.endpoint-name-hint-with-dash');
 
   $: createDisabled =
     $endpointForm.spec.name === '' ||

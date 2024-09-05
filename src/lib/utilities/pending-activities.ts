@@ -1,10 +1,20 @@
-import type { PendingActivity, PendingNexusOperation } from '$lib/types/events';
+import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import { isEvent } from '$lib/models/event-history';
+import type {
+  PendingActivity,
+  PendingNexusOperation,
+  WorkflowEventWithPending,
+} from '$lib/types/events';
 import type { WorkflowEvent } from '$lib/types/events';
 
 import {
   isActivityTaskScheduledEvent,
   isNexusOperationScheduledEvent,
 } from './is-event-type';
+import {
+  isPendingActivity,
+  isPendingNexusOperation,
+} from './is-pending-activity';
 
 export const getPendingActivity = (
   event: WorkflowEvent,
@@ -45,4 +55,21 @@ export const getPendingNexusOperation = (
   }
 
   return pendingOperation;
+};
+
+export const getGroupForEventOrPendingEvent = (
+  groups: EventGroup[],
+  event: WorkflowEventWithPending,
+) => {
+  return groups.find((g) => {
+    if (isEvent(event)) {
+      return g.eventIds.has(event.id);
+    } else if (isPendingActivity(event)) {
+      return g.pendingActivity?.id === event.id;
+    } else if (isPendingNexusOperation(event)) {
+      return (
+        g?.pendingNexusOperation?.scheduledEventId === event?.scheduledEventId
+      );
+    }
+  });
 };

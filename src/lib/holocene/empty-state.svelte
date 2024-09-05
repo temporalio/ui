@@ -9,7 +9,7 @@
 </script>
 
 <div
-  class="my-12 flex flex-col items-center justify-start gap-2 text-primary {$$props.class}"
+  class="my-12 flex w-full flex-col items-center justify-start gap-2 text-primary {$$props.class}"
   data-testid={$$props.testId}
 >
   <span

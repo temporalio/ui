@@ -12,6 +12,10 @@ export type GetClusterInfoResponse =
   temporal.api.workflowservice.v1.IGetClusterInfoResponse;
 export type GetSystemInfoResponse =
   temporal.api.workflowservice.v1.IGetSystemInfoResponse;
+export type Capabilities =
+  temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities & {
+    nexus?: boolean;
+  };
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
 export type GetSearchAttributesResponse =
@@ -142,6 +146,8 @@ export type TaskReachability = temporal.api.enums.v1.TaskReachability;
 export type PendingNexusOperationState =
   temporal.api.enums.v1.PendingNexusOperationState;
 export type CallbackState = temporal.api.enums.v1.CallbackState;
+export type PendingWorkflowTaskInfo =
+  temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
 
 // api.workflow
 

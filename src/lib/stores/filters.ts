@@ -107,3 +107,4 @@ export const eventClassificationFilter = writable<
 
 const defaultOptions = allEventTypeOptions.map(({ value }) => value);
 export const eventTypeFilter = writable<EventTypeCategory[]>(defaultOptions);
+export const eventStatusFilter = writable<boolean>(false);

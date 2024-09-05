@@ -6,6 +6,7 @@ import {
   isLocalActivityMarkerEvent,
   isMarkerRecordedEvent,
   isNexusOperationScheduledEvent,
+  isNexusOperationStartedEvent,
   isSignalExternalWorkflowExecutionInitiatedEvent,
   isStartChildWorkflowExecutionInitiatedEvent,
   isTimerStartedEvent,
@@ -63,7 +64,7 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
   if (!event) return '';
 
   if (isActivityTaskScheduledEvent(event)) {
-    return '';
+    return 'Activity';
   }
 
   if (isTimerStartedEvent(event)) {
@@ -78,6 +79,10 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
     return 'Signal received';
   }
 
+  if (isLocalActivityMarkerEvent(event)) {
+    return 'Local Activity';
+  }
+
   if (isMarkerRecordedEvent(event)) {
     return 'Marker';
   }
@@ -87,7 +92,14 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
   }
 
   if (isWorkflowExecutionUpdateAcceptedEvent(event)) {
-    return '';
+    return 'Workflow Update';
+  }
+
+  if (
+    isNexusOperationScheduledEvent(event) ||
+    isNexusOperationStartedEvent(event)
+  ) {
+    return 'Nexus Operation';
   }
 };
 

@@ -7,12 +7,15 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getPollers } from '$lib/services/pollers-service';
+  import { taskQueueView } from '$lib/stores/task-queue-view';
 
   import TaskQueueVersioning from './task-queue-versioning.svelte';
 
   $: ({ queue: taskQueue, namespace } = $page.params);
 
-  let view: 'workers' | 'versioning' = 'workers';
+  const onTab = (view: 'workers' | 'versioning') => {
+    $taskQueueView = view;
+  };
 </script>
 
 {#await getPollers({ queue: taskQueue, namespace }) then workers}
@@ -25,16 +28,18 @@
         <Tab
           label={translate('workers.workers')}
           id="worker-tab"
-          onClick={() => (view = 'workers')}
+          onClick={() => onTab('workers')}
+          active={$taskQueueView === 'workers'}
         />
         <Tab
           label={translate('workers.versioning')}
           id="versioning-tab"
-          onClick={() => (view = 'versioning')}
+          onClick={() => onTab('versioning')}
+          active={$taskQueueView === 'versioning'}
         />
       </TabList>
     </Tabs>
-    {#if view === 'versioning'}
+    {#if $taskQueueView === 'versioning'}
       <TaskQueueVersioning {taskQueue} {workers} />
     {:else}
       <WorkerTable {workers} />

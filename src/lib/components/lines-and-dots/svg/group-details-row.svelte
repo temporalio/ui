@@ -66,7 +66,7 @@
     staticCodeBlockHeight * codeBlockAttributes.length - textHeight,
   );
 
-  $: title = group.name;
+  $: title = group.displayName;
   $: attributes = mergeEventGroupDetails(group);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
@@ -79,7 +79,7 @@
     group && group.eventList.find(isChildWorkflowExecutionStartedEvent);
 </script>
 
-<g role="button" tabindex="0" class="relative cursor-pointer">
+<g role="button" tabindex="0" class="relative z-50 cursor-pointer">
   <Box point={[x, y]} {width} height={boxHeight} fill="#465A78" />
   <Box point={[x, y]} {width} {height} fill="#1E293B" />
   <foreignObject {x} {y} {width} height={fontSizeRatio}>
@@ -162,7 +162,7 @@
           runId={childWorkflowStartedEvent.attributes.workflowExecution.runId}
           height={childTimelineHeight}
           width={childTimelineWidth}
-          class="overflow-x-hidden rounded-br rounded-tr border-b-4 border-r-4 border-t-4 border-black bg-black"
+          class="overflow-x-hidden rounded-br rounded-tr border-b-2 border-r-2 border-t-2 border-subtle bg-primary"
         />
       {/key}
     </foreignObject>

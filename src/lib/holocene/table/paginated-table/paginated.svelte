@@ -19,15 +19,17 @@
   type Item = $$Generic;
 
   export let items: Item[];
+  export let variant: 'primary' | 'split' = 'primary';
   export let updating = false;
   export let perPageLabel: string;
   export let pageButtonLabel: (page: number) => string;
   export let nextPageButtonLabel: string;
   export let previousPageButtonLabel: string;
+  export let maxHeight = '';
+  export let pageSizeOptions: string[] = options;
 
   $: url = $page.url;
-  $: perPageParam =
-    url.searchParams.get(perPageKey) ?? String(defaultItemsPerPage);
+  $: perPageParam = url.searchParams.get(perPageKey) ?? pageSizeOptions[0];
   $: currentPageParam = url.searchParams.get(currentPageKey) ?? '1';
   $: store = pagination(items, perPageParam, currentPageParam);
 
@@ -39,7 +41,7 @@
         value: MAX_PAGE_SIZE,
         url,
       });
-    } else if (!options.includes(perPageParam)) {
+    } else if (!pageSizeOptions.includes(perPageParam)) {
       updateQueryParameters({
         parameter: perPageKey,
         value: defaultItemsPerPage,
@@ -85,7 +87,7 @@
   }
 </script>
 
-<PaginatedTable {updating} visibleItems={$store.items}>
+<PaginatedTable {updating} {variant} {maxHeight} visibleItems={$store.items}>
   <slot name="caption" slot="caption" />
   <slot name="headers" slot="headers" visibleItems={$store.items} />
   <slot visibleItems={$store.items} />
@@ -95,7 +97,7 @@
       label={perPageLabel}
       parameter={perPageKey}
       value={perPageParam}
-      {options}
+      options={pageSizeOptions}
     />
   </svelte:fragment>
 
