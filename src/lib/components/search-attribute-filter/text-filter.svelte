@@ -31,16 +31,17 @@
   ];
 </script>
 
-<ConditionalMenu {options} inputId="text-filter" noBorderLeft />
-<Input
-  label={$filter.attribute}
-  labelHidden
-  id="text-filter"
-  type="search"
-  placeholder={`${translate('common.enter')} ${$filter.attribute}`}
-  icon="search"
-  class="w-full"
-  unroundLeft
-  bind:value={_value}
-  on:keydown={handleKeydown}
-/>
+<ConditionalMenu {options} inputId="text-filter" noBorderLeft>
+  <Input
+    label={$filter.attribute}
+    labelHidden
+    id="text-filter"
+    type="search"
+    placeholder={`${translate('common.enter')} ${$filter.attribute}`}
+    icon="search"
+    class="w-full"
+    unroundLeft
+    bind:value={_value}
+    on:keydown={handleKeydown}
+  />
+</ConditionalMenu>

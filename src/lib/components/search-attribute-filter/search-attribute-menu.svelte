@@ -30,7 +30,7 @@
   function isOptionDisabled(value: string, filters: SearchAttributeFilter[]) {
     return filters.some(
       (filter) =>
-        (filter.conditional === '=' || filter.conditional === '!=') &&
+        ['=', '!=', 'is', 'is not'].includes(filter.conditional) &&
         filter.attribute === value,
     );
   }

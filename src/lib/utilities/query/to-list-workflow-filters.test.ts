@@ -31,6 +31,8 @@ const customAttributesWithSpacesQuery =
 const workflowQueryWithSpaces =
   '`WorkflowId`="One and Two" AND `Custom Keyword Field`="Hello = world"';
 const prefixQuery = '`WorkflowType` STARTS_WITH "hello"';
+const isEmptyQuery = '`WorkflowType` is null';
+const isNotEmptyQuery = '`StartTime` IS NOT NULL';
 
 const attributes = {
   CloseTime: 'Datetime',
@@ -1080,5 +1082,61 @@ describe('combineFilters', () => {
         value: 'World',
       },
     ]);
+  });
+
+  it('should parse a query with IS NULL', () => {
+    const result = toListWorkflowFilters(isEmptyQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        conditional: 'is',
+        operator: '',
+        parenthesis: '',
+        value: 'null',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
+  it('should parse a query with IS NOT NULL', () => {
+    const result = toListWorkflowFilters(isNotEmptyQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'StartTime',
+        type: 'Datetime',
+        conditional: 'IS NOT',
+        operator: '',
+        parenthesis: '',
+        value: 'NULL',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
+  it('should parse a query with IS NULL and IS NOT NULL', () => {
+    const result = toListWorkflowFilters(
+      `${isEmptyQuery} AND ${isNotEmptyQuery}`,
+      attributes,
+    );
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        conditional: 'is',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'null',
+      },
+      {
+        attribute: 'StartTime',
+        type: 'Datetime',
+        conditional: 'IS NOT',
+        operator: '',
+        parenthesis: '',
+        value: 'NULL',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
   });
 });

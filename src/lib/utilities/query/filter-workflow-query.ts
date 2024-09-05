@@ -8,7 +8,7 @@ import {
   type SearchAttributeType,
 } from '$lib/types/workflows';
 
-import { isStartsWith } from '../is';
+import { isNullConditional, isStartsWith } from '../is';
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 
 export type QueryKey =
@@ -31,8 +31,8 @@ const filterKeys: Readonly<Record<string, QueryKey>> = {
   runId: 'RunId',
 } as const;
 
-const isValid = (value: unknown): boolean => {
-  if (value === null) return false;
+const isValid = (value: unknown, conditional: string): boolean => {
+  if (value === null && !isNullConditional(conditional)) return false;
   if (value === undefined) return false;
   if (value === '') return false;
   if (typeof value === 'string' && value === 'undefined') return false;
@@ -75,6 +75,10 @@ const toFilterQueryStatement = (
     return `${queryKey} ${value}`;
   }
 
+  if (isNullConditional(conditional)) {
+    return `\`${queryKey}\` ${conditional} ${value}`;
+  }
+
   if (isDuration(value) || isDurationString(value)) {
     if (archived || get(supportsAdvancedVisibility)) {
       return `${queryKey} ${conditional} "${toDate(value)}"`;
@@ -104,7 +108,7 @@ const toQueryStatementsFromFilters = (
         parenthesis,
         customDate,
       }) => {
-        if (isValid(value)) {
+        if (isValid(value, conditional)) {
           let statement = toFilterQueryStatement(
             attribute,
             type,

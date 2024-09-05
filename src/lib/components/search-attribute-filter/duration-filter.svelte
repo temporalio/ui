@@ -33,20 +33,21 @@
   };
 </script>
 
-<ConditionalMenu inputId="duration-filter" noBorderLeft />
-<Input
-  label={$filter.attribute}
-  labelHidden
-  id="duration-filter"
-  type="search"
-  placeholder={`${translate('common.enter')} ${$filter.attribute} (${translate(
-    'workflows.duration-filter-placeholder',
-  )})`}
-  icon="search"
-  class="w-full"
-  unroundLeft
-  bind:value={_value}
-  on:keydown={handleKeydown}
-  on:input={validateDuration}
-  valid={isValid}
-/>
+<ConditionalMenu inputId="duration-filter" noBorderLeft>
+  <Input
+    label={$filter.attribute}
+    labelHidden
+    id="duration-filter"
+    type="search"
+    placeholder={`${translate('common.enter')} ${
+      $filter.attribute
+    } (${translate('workflows.duration-filter-placeholder')})`}
+    icon="search"
+    class="w-full"
+    unroundLeft
+    bind:value={_value}
+    on:keydown={handleKeydown}
+    on:input={validateDuration}
+    valid={isValid}
+  />
+</ConditionalMenu>

@@ -24,8 +24,7 @@
   };
 </script>
 
-<div class="flex items-center">
-  <ConditionalMenu inputId="number-filter" noBorderLeft />
+<ConditionalMenu inputId="number-filter" noBorderLeft>
   <NumberInput
     label={translate('common.number-input-placeholder')}
     labelHidden
@@ -39,4 +38,4 @@
     search
     class="-mr-2"
   />
-</div>
+</ConditionalMenu>
