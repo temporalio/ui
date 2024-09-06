@@ -300,6 +300,9 @@ describe('getTimestampDifference', () => {
   });
 
   describe('formatDurationAbbreviated', () => {
+    it('should return duration abbreviated with full milliseconds if under one second', () => {
+      expect(formatDurationAbbreviated('0.86920383s')).toBe('869.20383ms');
+    });
     it('should return duration abbreviated with rounded milliseconds if under one minute', () => {
       expect(formatDurationAbbreviated('13.439023207s')).toBe('13s, 439ms');
     });
