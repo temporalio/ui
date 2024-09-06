@@ -131,6 +131,7 @@ export const fromSeconds = (
   seconds: string,
   { delimiter = ', ' } = {},
 ): string => {
+  console.log('SECONDS: ', seconds);
   const parsedSeconds = parseInt(seconds);
   const parsedDecimal = parseFloat(`.${seconds.split('.')[1] ?? 0}`);
 
@@ -143,10 +144,16 @@ export const fromSeconds = (
     Math.round(parsedDecimal * 1000 * 1000000000) / 1000000000; // round to nanoseconds
 
   if (!milliseconds) return durationString;
-  const msString = `${milliseconds} ${pluralize('millisecond', milliseconds)}`;
+  if (!durationString)
+    return `${milliseconds} ${pluralize('millisecond', milliseconds)}`;
+  if (parsedSeconds < 60) {
+    return `${durationString}, ${milliseconds.toFixed(0)} ${pluralize(
+      'millisecond',
+      milliseconds,
+    )}`;
+  }
 
-  if (!durationString) return msString;
-  return `${durationString}, ${msString}`;
+  return `${durationString}`;
 };
 
 export const isValidDurationQuery = (value: string): boolean => {
