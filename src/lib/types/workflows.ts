@@ -97,6 +97,7 @@ export const SEARCH_ATTRIBUTE_TYPE = {
   KEYWORD: 'Keyword',
   TEXT: 'Text',
   KEYWORDLIST: 'KeywordList',
+  UNSPECIFIED: 'Unspecified',
 } as const;
 
 type Keys = keyof typeof SEARCH_ATTRIBUTE_TYPE;
