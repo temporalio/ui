@@ -122,7 +122,10 @@
 <div class="flex min-h-[24px] flex-wrap items-center gap-2">
   {#each statusGroups as { count, status } (status)}
     {#if !loading}
-      <Link href={`/workflows/${namespace}/?status=${status}`} role="button">
+      <Link
+        href={`/namespaces/${namespace}/workflows?query=%60ExecutionStatus%60%3D"${status}"`}
+        role="button"
+      >
         <WorkflowCountStatus
           {status}
           {count}
