@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
 
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
-  import Accordion from '$lib/holocene/accordion.svelte';
+  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import {

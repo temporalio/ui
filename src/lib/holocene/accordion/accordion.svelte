@@ -6,9 +6,8 @@
   import { v4 } from 'uuid';
 
   import Badge from '$lib/holocene/badge.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-
-  import type { IconName } from './icon';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
     title: string;
@@ -66,6 +65,7 @@
           class="flex flex-row items-center gap-2 pr-2"
           on:click|stopPropagation
           on:keyup|stopPropagation
+          role="none"
         >
           <slot name="action" />
         </div>
