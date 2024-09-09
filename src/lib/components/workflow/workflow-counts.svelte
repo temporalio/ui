@@ -3,6 +3,7 @@
 
   import { page } from '$app/stores';
 
+  import Link from '$lib/holocene/link.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { workflowStatuses } from '$lib/models/workflow-status';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
@@ -121,13 +122,15 @@
 <div class="flex min-h-[24px] flex-wrap items-center gap-2">
   {#each statusGroups as { count, status } (status)}
     {#if !loading}
-      <WorkflowCountStatus
-        {status}
-        {count}
-        newCount={newStatusGroups.find((g) => g.status === status)
-          ? newStatusGroups.find((g) => g.status === status).count - count
-          : 0}
-      />
+      <Link href={`/workflows/${namespace}/?status=${status}`} role="button">
+        <WorkflowCountStatus
+          {status}
+          {count}
+          newCount={newStatusGroups.find((g) => g.status === status)
+            ? newStatusGroups.find((g) => g.status === status).count - count
+            : 0}
+        />
+      </Link>
     {:else}
       <Skeleton class="h-6 w-24 rounded" />
     {/if}
