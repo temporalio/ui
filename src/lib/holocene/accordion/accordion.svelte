@@ -6,7 +6,6 @@
   import { v4 } from 'uuid';
 
   import Badge from '$lib/holocene/badge.svelte';
-  import Card from '$lib/holocene/card.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import type { IconName } from './icon';
@@ -91,7 +90,10 @@
     </div>
   </div>
 {:else}
-  <Card class="w-full" {...$$restProps}>
+  <div
+    class="surface-primary w-full rounded-2xl border-2 border-subtle p-4"
+    {...$$restProps}
+  >
     <div class="flex w-full flex-col rounded-lg">
       <div class="space-between flex w-full flex-row items-center">
         <h3 class="flex w-full items-center gap-2">
@@ -114,5 +116,5 @@
     <div class="mt-6 block w-full" class:hidden={!open}>
       <slot />
     </div>
-  </Card>
+  </div>
 {/if}
