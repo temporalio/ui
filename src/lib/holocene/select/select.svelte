@@ -102,7 +102,7 @@
 </script>
 
 <MenuContainer {open}>
-  <Label {label} hidden={labelHidden} for={id} {required} />
+  <Label class="pb-1" {label} hidden={labelHidden} for={id} {required} />
   {#key $labelCtx}
     <MenuButton
       hasIndicator={!disabled}

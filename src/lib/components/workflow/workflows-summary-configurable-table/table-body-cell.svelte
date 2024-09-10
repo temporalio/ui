@@ -1,21 +1,24 @@
 <script lang="ts">
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Badge from '$lib/holocene/badge.svelte';
+  import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import {
     customSearchAttributes,
     isCustomSearchAttribute,
     workflowIncludesSearchAttribute,
   } from '$lib/stores/search-attributes';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
-  import type { WorkflowExecution } from '$lib/types/workflows';
+  import {
+    SEARCH_ATTRIBUTE_TYPE,
+    type WorkflowExecution,
+  } from '$lib/types/workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistance } from '$lib/utilities/format-time';
 
   import FilterableTableCell from './filterable-table-cell.svelte';
 
-  export let column: WorkflowHeader;
+  export let column: ConfigurableTableHeader;
   export let workflow: WorkflowExecution;
 
   $: ({ label } = column);
@@ -112,11 +115,11 @@
         : ''}
     {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
       {@const content = workflow.searchAttributes.indexedFields[label]}
-      {#if $customSearchAttributes[label] === 'Datetime' && typeof content === 'string'}
+      {#if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof content === 'string'}
         {formatDate(content, $timeFormat, {
           relative: $relativeTime,
         })}
-      {:else if $customSearchAttributes[label] === 'Bool'}
+      {:else if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.BOOL}
         <Badge>{content}</Badge>
       {:else}
         {content}
@@ -127,7 +130,7 @@
 
 <style lang="postcss">
   .workflows-summary-table-body-cell {
-    @apply h-10 whitespace-nowrap px-2 text-sm;
+    @apply h-10 whitespace-nowrap;
 
     &.filterable {
       @apply relative pr-24;

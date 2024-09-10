@@ -21,9 +21,10 @@
   import MenuDivider from '$lib/holocene/menu/menu-divider.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { WorkflowFilter } from '$lib/models/workflow-filters';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { workflowFilters } from '$lib/stores/filters';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import { getLocalTime } from '$lib/utilities/format-date';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
@@ -80,9 +81,9 @@
     } else if (value === 'Custom') {
       custom = true;
     } else {
-      const filter: WorkflowFilter = {
+      const filter: SearchAttributeFilter = {
         attribute: timeField,
-        type: 'Datetime',
+        type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
         value,
         conditional: '>',
         operator: '',
@@ -154,9 +155,9 @@
         )}"`
       : `> "${formatISO(startDateWithTime)}"`;
 
-    const filter: WorkflowFilter = {
+    const filter: SearchAttributeFilter = {
       attribute: timeField,
-      type: 'Datetime',
+      type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
       value: query,
       conditional: '=',
       operator: '',

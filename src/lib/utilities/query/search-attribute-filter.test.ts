@@ -12,7 +12,7 @@ import {
   isNumberFilter,
   isStatusFilter,
   isTextFilter,
-} from './filter-search';
+} from './search-attribute-filter';
 
 const store = writable<SearchAttributes>({
   BuildIds: 'KeywordList',
