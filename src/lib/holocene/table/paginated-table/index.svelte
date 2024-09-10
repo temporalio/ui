@@ -68,7 +68,7 @@
     }
 
     :global(tr > th) {
-      @apply px-2 text-left font-medium first-of-type:rounded-tl last-of-type:rounded-tr;
+      @apply whitespace-nowrap px-2 text-left font-medium first-of-type:rounded-tl last-of-type:rounded-tr;
     }
   }
 
@@ -98,7 +98,7 @@
     }
 
     :global(tr > td) {
-      @apply px-2;
+      @apply whitespace-nowrap px-2;
     }
 
     :global(tr > td > .table-link) {

@@ -7,7 +7,7 @@ import type {
 } from '$lib/types';
 import type { BatchOperationState, BatchOperationType } from '$lib/types/batch';
 import type {
-  SearchAttributesValue,
+  SearchAttributeType,
   WorkflowStatus,
   WorkflowTaskFailedCause,
 } from '$lib/types/workflows';
@@ -31,8 +31,8 @@ export const fromScreamingEnum = <T>(
 };
 
 export const toSearchAttributeTypeReadable = (
-  status: SearchAttributesValue,
-): SearchAttributesValue => {
+  status: SearchAttributeType,
+): SearchAttributeType => {
   return fromScreamingEnum(status, 'IndexedValueType');
 };
 

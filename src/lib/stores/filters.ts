@@ -4,7 +4,7 @@ import { derived, get, writable } from 'svelte/store';
 import { page } from '$app/stores';
 
 import { allEventTypeOptions } from '$lib/models/event-history/get-event-categorization';
-import type { WorkflowFilter } from '$lib/models/workflow-filters';
+import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { persistStore } from '$lib/stores/persist-store';
 import type { EventClassification, EventTypeCategory } from '$lib/types/events';
 
@@ -36,7 +36,9 @@ const parameters = derived(
   },
 );
 
-const updateWorkflowFilters: StartStopNotifier<WorkflowFilter[]> = (set) => {
+const updateWorkflowFilters: StartStopNotifier<SearchAttributeFilter[]> = (
+  set,
+) => {
   return parameters.subscribe(({ query }) => {
     if (!query && get(workflowFilters).length) {
       // Clear filters if there is no query
@@ -51,9 +53,25 @@ export const searchInputViewOpen = persistStore<boolean>(
   true,
 );
 
-export const workflowFilters = writable<WorkflowFilter[]>(
+export const workflowFilters = writable<SearchAttributeFilter[]>(
   [],
   updateWorkflowFilters,
+);
+
+const updateScheduleFilters: StartStopNotifier<SearchAttributeFilter[]> = (
+  set,
+) => {
+  return parameters.subscribe(({ query }) => {
+    if (!query && get(scheduleFilters).length) {
+      // Clear filters if there is no query
+      set([]);
+    }
+  });
+};
+
+export const scheduleFilters = writable<SearchAttributeFilter[]>(
+  [],
+  updateScheduleFilters,
 );
 
 const updateEventCategoryFilter: StartStopNotifier<

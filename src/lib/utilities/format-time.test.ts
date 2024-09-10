@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   formatDistance,
   formatDistanceAbbreviated,
+  formatDurationAbbreviated,
   fromSecondsToDaysOrHours,
   fromSecondsToMinutesAndSeconds,
   getDuration,
@@ -296,5 +297,28 @@ describe('getTimestampDifference', () => {
     const start = '2022-04-13T02:30:59.120571Z';
     const end = '2022-04-13T16:29:35.633009Z';
     expect(getTimestampDifference(start, end)).toBe(50316513);
+  });
+
+  describe('formatDurationAbbreviated', () => {
+    it('should return duration abbreviated with full milliseconds if under one second', () => {
+      expect(formatDurationAbbreviated('0.86920383s')).toBe('869.20383ms');
+    });
+    it('should return duration abbreviated with rounded milliseconds if under one minute', () => {
+      expect(formatDurationAbbreviated('13.439023207s')).toBe('13s, 439ms');
+    });
+    it('should return duration abbreviated with no milliseconds if over one minute', () => {
+      expect(formatDurationAbbreviated('64.2134111s')).toBe('1m, 4s');
+    });
+    it('should return duration abbreviated', () => {
+      expect(formatDurationAbbreviated('2652361s')).toBe('30d, 16h, 46m, 1s');
+    });
+    it('should return duration abbreviated', () => {
+      expect(formatDurationAbbreviated('2694361s')).toBe('1month, 4h, 26m, 1s');
+    });
+    it('should return duration abbreviated', () => {
+      expect(formatDurationAbbreviated('32694361s')).toBe(
+        '1year, 13d, 9h, 46m, 1s',
+      );
+    });
   });
 });

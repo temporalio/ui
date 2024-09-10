@@ -1,8 +1,12 @@
 import debounce from 'just-debounce';
 
-import type { WorkflowFilter } from '$lib/models/workflow-filters';
+import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { currentPageKey } from '$lib/stores/pagination';
-import type { FilterParameters, SearchAttributes } from '$lib/types/workflows';
+import {
+  type FilterParameters,
+  SEARCH_ATTRIBUTE_TYPE,
+  type SearchAttributes,
+} from '$lib/types/workflows';
 import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
 
 import { tokenize } from './tokenize';
@@ -47,12 +51,12 @@ export const getLargestDurationUnit = (duration: Duration): Duration => {
   }
 };
 
-const isDatetimeStatement = is('Datetime');
-const isBoolStatement = is('Bool');
+const isDatetimeStatement = is(SEARCH_ATTRIBUTE_TYPE.DATETIME);
+const isBoolStatement = is(SEARCH_ATTRIBUTE_TYPE.BOOL);
 
-export const emptyFilter = (): WorkflowFilter => ({
+export const emptyFilter = (): SearchAttributeFilter => ({
   attribute: '',
-  type: 'Keyword',
+  type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   value: '',
   operator: '',
   parenthesis: '',
@@ -60,20 +64,20 @@ export const emptyFilter = (): WorkflowFilter => ({
 });
 
 const DefaultAttributes: SearchAttributes = {
-  ExecutionStatus: 'Keyword',
-  StartTime: 'Datetime',
-  CloseTime: 'Datetime',
-  WorkflowId: 'Keyword',
-  WorkflowType: 'Keyword',
-  RunId: 'Keyword',
+  ExecutionStatus: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  StartTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+  CloseTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+  WorkflowId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  WorkflowType: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  RunId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
 };
 
 export const toListWorkflowFilters = (
   query: string,
   attributes: SearchAttributes = DefaultAttributes,
-): WorkflowFilter[] => {
+): SearchAttributeFilter[] => {
   const tokens = tokenize(query);
-  const filters: WorkflowFilter[] = [];
+  const filters: SearchAttributeFilter[] = [];
   let filter = emptyFilter();
 
   if (!query) {
@@ -153,7 +157,7 @@ export const toListWorkflowFilters = (
   }
 };
 
-export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
+export const combineDropdownFilters = (filters: SearchAttributeFilter[]) => {
   const statusFilters = filters.filter(
     (f) => f.attribute === 'ExecutionStatus' && f.value,
   );
@@ -194,7 +198,7 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
   ];
 };
 
-export const combineFilters = (filters: WorkflowFilter[]) => {
+export const combineFilters = (filters: SearchAttributeFilter[]) => {
   filters.forEach((filter, index) => {
     const previousFilter = filters[index - 1];
     if (previousFilter && !previousFilter.operator) {
@@ -224,7 +228,7 @@ export const combineFilters = (filters: WorkflowFilter[]) => {
 };
 
 export const updateQueryParamsFromFilter = debounce(
-  (url: URL, filters: WorkflowFilter[], isDropdownFilter = false) => {
+  (url: URL, filters: SearchAttributeFilter[], isDropdownFilter = false) => {
     const allFilters = isDropdownFilter
       ? combineDropdownFilters(filters)
       : combineFilters(filters);

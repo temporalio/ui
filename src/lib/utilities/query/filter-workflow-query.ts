@@ -1,10 +1,11 @@
 import { get } from 'svelte/store';
 
-import type { WorkflowFilter } from '$lib/models/workflow-filters';
+import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-import type {
-  SearchAttributes,
-  SearchAttributesValue,
+import {
+  SEARCH_ATTRIBUTE_TYPE,
+  type SearchAttributes,
+  type SearchAttributeType,
 } from '$lib/types/workflows';
 
 import { isNullConditional, isStartsWith } from '../is';
@@ -41,9 +42,9 @@ const isValid = (value: unknown, conditional: string): boolean => {
 
 const formatValue = (
   value: string,
-  type: SearchAttributesValue,
+  type: SearchAttributeType,
 ): string | boolean => {
-  if (type === 'Bool') {
+  if (type === SEARCH_ATTRIBUTE_TYPE.BOOL) {
     return value.toLowerCase() === 'true' ? true : false;
   }
   return `"${value}"`;
@@ -59,7 +60,7 @@ const getQueryKey = (attribute: string | number) => {
 
 const toFilterQueryStatement = (
   attribute: keyof SearchAttributes,
-  type: SearchAttributesValue,
+  type: SearchAttributeType,
   value: FilterValue,
   conditional = '=',
   archived: boolean,
@@ -93,7 +94,7 @@ const toFilterQueryStatement = (
 };
 
 const toQueryStatementsFromFilters = (
-  filters: WorkflowFilter[],
+  filters: SearchAttributeFilter[],
   archived: boolean,
 ): string[] => {
   return filters
@@ -132,7 +133,7 @@ const toQueryStatementsFromFilters = (
 };
 
 export const toListWorkflowQueryFromFilters = (
-  filters: WorkflowFilter[] = [],
+  filters: SearchAttributeFilter[] = [],
   archived = false,
 ): string => {
   return toQueryStatementsFromFilters(filters, archived).join('');

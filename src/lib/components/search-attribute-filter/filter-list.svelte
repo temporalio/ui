@@ -9,8 +9,8 @@
   import Button from '$lib/holocene/button.svelte';
   import Chip from '$lib/holocene/chip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { isWorkflowStatusType } from '$lib/models/workflow-status';
-  import { workflowFilters } from '$lib/stores/filters';
   import {
     relativeTime,
     timeFormat,
@@ -21,22 +21,24 @@
   import {
     isDateTimeFilter,
     isTextFilter,
-  } from '$lib/utilities/query/filter-search';
+  } from '$lib/utilities/query/search-attribute-filter';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
+  export let filters: SearchAttributeFilter[];
+
   const { filter, activeQueryIndex } =
     getContext<FilterContext>(FILTER_CONTEXT);
 
   const removeQuery = (index: number) => {
-    $workflowFilters.splice(index, 1);
-    $workflowFilters = $workflowFilters;
-    updateQueryParamsFromFilter($page.url, $workflowFilters);
+    filters.splice(index, 1);
+    filters = filters;
+    updateQueryParamsFromFilter($page.url, filters);
 
-    if (index === $workflowFilters.length) {
-      const previousQuery = $workflowFilters[$workflowFilters.length - 1];
+    if (index === filters.length) {
+      const previousQuery = filters[filters.length - 1];
       if (previousQuery) {
         previousQuery.operator = '';
       }
@@ -52,8 +54,8 @@
 
   let totalFiltersInView = 5;
 
-  $: visibleFilters = $workflowFilters.slice(0, totalFiltersInView);
-  $: hasMoreFilters = totalFiltersInView < $workflowFilters.length;
+  $: visibleFilters = filters.slice(0, totalFiltersInView);
+  $: hasMoreFilters = totalFiltersInView < filters.length;
 
   const viewMoreFilters = () => {
     if (hasMoreFilters) {

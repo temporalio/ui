@@ -24,11 +24,11 @@
   };
 </script>
 
-<ConditionalMenu inputId="number-filter-search" noBorderLeft>
+<ConditionalMenu inputId="number-filter" noBorderLeft>
   <NumberInput
     label={translate('common.number-input-placeholder')}
     labelHidden
-    id="number-filter-search"
+    id="number-filter"
     icon="search"
     placeholder={translate('common.number-input-placeholder')}
     bind:value={_value}
