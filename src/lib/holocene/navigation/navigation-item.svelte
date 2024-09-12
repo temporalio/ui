@@ -13,7 +13,7 @@
   export let external = false;
   export let animate = false;
   export let disabled = false;
-  export let isActive: (path: string | undefined) => boolean = () => false;
+  export let isActive: (path: string) => boolean = () => false;
 
   $: rel = external ? 'noopener noreferrer' : '';
   $: target = external ? '_blank' : '';
