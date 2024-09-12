@@ -46,7 +46,7 @@
   export let active = false;
   export let onRowClick: () => void = noop;
 
-  let selectedId = isEventGroup(event)
+  $: selectedId = isEventGroup(event)
     ? Array.from(event.events.keys()).pop()
     : event.id;
 
@@ -193,7 +193,16 @@
       <div class="flex items-center gap-2 px-2">
         <div class="flex gap-0.5">
           {#each event.eventList as groupEvent}
-            <Link class="truncate" data-testid="link" {href}>
+            <Link
+              class="truncate"
+              data-testid="link"
+              href={routeForEventHistoryEvent({
+                eventId: groupEvent.id,
+                namespace,
+                workflow,
+                run,
+              })}
+            >
               {groupEvent.id}
             </Link>
           {/each}

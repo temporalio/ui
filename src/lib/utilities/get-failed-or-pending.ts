@@ -16,12 +16,13 @@ export const getFailedOrPendingEvents = (
   return items.filter(
     (item) =>
       (isEvent(item) && item.classification === 'Failed') ||
+      (isEvent(item) && item.classification === 'TimedOut') ||
       isPendingActivity(item) ||
       isPendingNexusOperation(item) ||
       (isEventGroup(item) &&
-        (item.pendingActivity ||
-          item.pendingNexusOperation ||
-          item.finalClassification === 'Failed')),
+        (item.isPending ||
+          item.finalClassification === 'Failed' ||
+          item.finalClassification === 'TimedOut')),
   );
 };
 
@@ -33,7 +34,8 @@ export const getFailedOrPendingGroups = (
   return items.filter(
     (item) =>
       isEventGroup(item) &&
-      item.eventList.length > 1 &&
-      (item.isPending || item.finalClassification === 'Failed'),
+      (item.isPending ||
+        item.finalClassification === 'Failed' ||
+        item.finalClassification === 'TimedOut'),
   );
 };
