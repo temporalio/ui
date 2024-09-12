@@ -146,7 +146,6 @@
         url: $page.url,
         parameter: 'query',
         value: searchQuery,
-        allowEmpty: true,
         clearParameters: [currentPageKey],
       });
     }
