@@ -13,10 +13,11 @@
   export let external = false;
   export let animate = false;
   export let disabled = false;
-  export let isActive: (path: string) => boolean = () => false;
+  export let isActive: (path: string) => boolean | undefined = undefined;
 
   $: rel = external ? 'noopener noreferrer' : '';
   $: target = external ? '_blank' : '';
+  $: active = isActive && isActive($page.url.href);
 </script>
 
 <div
@@ -32,7 +33,7 @@
     aria-disabled={disabled}
     class:disabled
     tabindex={disabled ? -1 : 0}
-    class:active={isActive($page.url.href)}
+    class:active
     class="mb-1 flex items-center whitespace-nowrap rounded-lg p-1 pl-2 text-sm font-medium"
     class:text-disabled={disabled}
   >
