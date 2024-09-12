@@ -37,9 +37,9 @@ export const Strings = {
   'endpoint-name-hint-with-dash':
     'Endpoint name must start with A-Z or a-z and can only contain A-Z, a-z, 0-9 or -',
   'access-policy': 'Access Policy',
-  'allowed-caller-namespaces': 'Allowed caller namespaces',
+  'allowed-caller-namespaces': 'Allowed caller Namespaces',
   'allowed-caller-namespaces-description':
-    'Specify the Namespace(s) that are allowed to call the target Namespace to use this endpoint.',
+    'Namespace(s) that are allowed to call this Endpoint.',
   'select-namespaces': 'Select Namespace(s)',
   'selected-namespaces_one': '{{count}} Namespace selected',
   'selected-namespaces_other': '{{count}} Namespaces selected',
