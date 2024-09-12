@@ -124,25 +124,32 @@
   };
 
   const onStatusClick = (status) => {
-    const filter = {
-      attribute: 'ExecutionStatus',
-      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-      value: status,
-      operator: '',
-      conditional: '=',
-      parenthesis: '',
-    };
-    $workflowFilters = [...$workflowFilters, filter];
-    const searchQuery = toListWorkflowQueryFromFilters(
-      combineFilters($workflowFilters),
+    const statusExists = $workflowFilters.some(
+      (filter) =>
+        filter.attribute === 'ExecutionStatus' && filter.value === status,
     );
-    updateQueryParameters({
-      url: $page.url,
-      parameter: 'query',
-      value: searchQuery,
-      allowEmpty: true,
-      clearParameters: [currentPageKey],
-    });
+
+    if (!statusExists) {
+      const filter = {
+        attribute: 'ExecutionStatus',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+        value: status,
+        operator: '',
+        conditional: '=',
+        parenthesis: '',
+      };
+      $workflowFilters = [...$workflowFilters, filter];
+      const searchQuery = toListWorkflowQueryFromFilters(
+        combineFilters($workflowFilters),
+      );
+      updateQueryParameters({
+        url: $page.url,
+        parameter: 'query',
+        value: searchQuery,
+        allowEmpty: true,
+        clearParameters: [currentPageKey],
+      });
+    }
   };
 
   $: query, namespace, $refresh, fetchCounts();
