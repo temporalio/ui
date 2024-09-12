@@ -147,4 +147,5 @@ export type NavLinkListItem = {
   enabled?: boolean;
   hidden?: boolean;
   animate?: boolean;
+  isActive?: (path: string) => boolean;
 };
