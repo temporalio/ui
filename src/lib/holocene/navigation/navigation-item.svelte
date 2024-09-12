@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import type { IconName } from '$lib/holocene/icon';
   import { navOpen } from '$lib/stores/nav-open';
 
@@ -11,6 +13,7 @@
   export let external = false;
   export let animate = false;
   export let disabled = false;
+  export let isActive: (path: string | undefined) => boolean = () => false;
 
   $: rel = external ? 'noopener noreferrer' : '';
   $: target = external ? '_blank' : '';
@@ -29,7 +32,8 @@
     aria-disabled={disabled}
     class:disabled
     tabindex={disabled ? -1 : 0}
-    class="mb-1 flex items-center whitespace-nowrap rounded-lg p-1 pl-2 text-sm font-medium hover:bg-white hover:text-black group-[.surface-primary]:hover:bg-black group-[.surface-primary]:hover:text-white group-[.surface-primary]:dark:hover:bg-white group-[.surface-primary]:dark:hover:text-black"
+    class:active={isActive($page.url.href)}
+    class="mb-1 flex items-center whitespace-nowrap rounded-lg p-1 pl-2 text-sm font-medium"
     class:text-disabled={disabled}
   >
     <div
@@ -52,5 +56,10 @@
 <style lang="postcss">
   a.disabled {
     @apply pointer-events-none cursor-not-allowed opacity-50;
+  }
+
+  a:hover,
+  a.active {
+    @apply bg-white text-black group-[.surface-primary]:bg-black group-[.surface-primary]:text-white group-[.surface-primary]:dark:bg-white group-[.surface-primary]:dark:text-black;
   }
 </style>
