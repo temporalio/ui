@@ -3,18 +3,25 @@
 
   import { page } from '$app/stores';
 
-  import Link from '$lib/holocene/link.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { workflowStatuses } from '$lib/models/workflow-status';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
+  import { workflowFilters } from '$lib/stores/filters';
+  import { currentPageKey } from '$lib/stores/pagination';
   import {
     queryWithParentWorkflowId,
     refresh,
     workflowCount,
   } from '$lib/stores/workflows';
-  import type { WorkflowStatus } from '$lib/types/workflows';
+  import {
+    SEARCH_ATTRIBUTE_TYPE,
+    type WorkflowStatus,
+  } from '$lib/types/workflows';
   import { decodePayload } from '$lib/utilities/decode-payload';
+  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
+  import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { getExponentialBackoffSeconds } from '$lib/utilities/refresh-rate';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   import WorkflowCountStatus from './workflow-count-status.svelte';
 
@@ -116,16 +123,35 @@
     }
   };
 
+  const onStatusClick = (status) => {
+    const filter = {
+      attribute: 'ExecutionStatus',
+      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      value: status,
+      operator: '',
+      conditional: '=',
+      parenthesis: '',
+    };
+    $workflowFilters = [...$workflowFilters, filter];
+    const searchQuery = toListWorkflowQueryFromFilters(
+      combineFilters($workflowFilters),
+    );
+    updateQueryParameters({
+      url: $page.url,
+      parameter: 'query',
+      value: searchQuery,
+      allowEmpty: true,
+      clearParameters: [currentPageKey],
+    });
+  };
+
   $: query, namespace, $refresh, fetchCounts();
 </script>
 
 <div class="flex min-h-[24px] flex-wrap items-center gap-2">
   {#each statusGroups as { count, status } (status)}
     {#if !loading}
-      <Link
-        href={`/namespaces/${namespace}/workflows?query=%60ExecutionStatus%60%3D"${status}"`}
-        role="button"
-      >
+      <button on:click={() => onStatusClick(status)}>
         <WorkflowCountStatus
           {status}
           {count}
@@ -133,7 +159,7 @@
             ? newStatusGroups.find((g) => g.status === status).count - count
             : 0}
         />
-      </Link>
+      </button>
     {:else}
       <Skeleton class="h-6 w-24 rounded" />
     {/if}

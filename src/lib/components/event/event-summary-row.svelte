@@ -46,7 +46,7 @@
   export let active = false;
   export let onRowClick: () => void = noop;
 
-  let selectedId = isEventGroup(event)
+  $: selectedId = isEventGroup(event)
     ? Array.from(event.events.keys()).pop()
     : event.id;
 
