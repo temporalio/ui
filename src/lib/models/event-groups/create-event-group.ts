@@ -121,8 +121,8 @@ const createGroupFor = <K extends keyof StartingEvents>(
     },
     get isPending() {
       return (
-        this.pendingActivity ||
-        this.pendingNexusOperation ||
+        !!this.pendingActivity ||
+        !!this.pendingNexusOperation ||
         (isTimerStartedEvent(this.initialEvent) &&
           this.eventList.length === 1) ||
         (isStartChildWorkflowExecutionInitiatedEvent(this.initialEvent) &&
