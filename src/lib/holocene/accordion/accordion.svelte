@@ -6,10 +6,8 @@
   import { v4 } from 'uuid';
 
   import Badge from '$lib/holocene/badge.svelte';
-  import Card from '$lib/holocene/card.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-
-  import type { IconName } from './icon';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
     title: string;
@@ -44,7 +42,7 @@
 {#if expandable}
   <div
     class={merge(
-      'surface-primary flex w-full cursor-default flex-col rounded-2xl border-2 border-subtle p-2 text-primary focus-within:ring-4 focus-within:ring-primary/70',
+      'surface-primary w-full rounded-2xl border-2 border-subtle p-2 focus-within:ring-4 focus-within:ring-inset focus-within:ring-primary/70',
       className,
     )}
     {...$$restProps}
@@ -67,6 +65,7 @@
           class="flex flex-row items-center gap-2 pr-2"
           on:click|stopPropagation
           on:keyup|stopPropagation
+          role="none"
         >
           <slot name="action" />
         </div>
@@ -91,7 +90,10 @@
     </div>
   </div>
 {:else}
-  <Card class="w-full" {...$$restProps}>
+  <div
+    class="surface-primary w-full rounded-2xl border-2 border-subtle p-4"
+    {...$$restProps}
+  >
     <div class="flex w-full flex-col rounded-lg">
       <div class="space-between flex w-full flex-row items-center">
         <h3 class="flex w-full items-center gap-2">
@@ -114,5 +116,5 @@
     <div class="mt-6 block w-full" class:hidden={!open}>
       <slot />
     </div>
-  </Card>
+  </div>
 {/if}

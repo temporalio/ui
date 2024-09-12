@@ -33,12 +33,27 @@
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
+
+  import AccordionGroup from './accordion-group.svelte';
 </script>
 
 <Template let:args>
-  <Accordion {...args} onToggle={action('onToggle')}>
-    <p>Accordion Content</p>
-  </Accordion>
+  <div class="flex flex-col gap-2">
+    <Accordion {...args} onToggle={action('onToggle')}>
+      <p>Accordion Content</p>
+    </Accordion>
+    <AccordionGroup>
+      <Accordion {...args} onToggle={action('onToggle')}>
+        <p>Accordion Content</p>
+      </Accordion>
+      <Accordion {...args} onToggle={action('onToggle')}>
+        <p>Accordion Content</p>
+      </Accordion>
+      <Accordion {...args} onToggle={action('onToggle')}>
+        <p>Accordion Content</p>
+      </Accordion>
+    </AccordionGroup>
+  </div>
 </Template>
 
 <Story name="Default" args={{ open: false }} />

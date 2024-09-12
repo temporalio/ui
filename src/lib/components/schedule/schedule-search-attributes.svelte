@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Accordion from '$lib/holocene/accordion.svelte';
+  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttribute } from '$lib/types';
   import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
