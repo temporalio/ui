@@ -120,3 +120,14 @@
 <Story name="Right" args={{ right: true }} />
 
 <Story name="Right with Icon" args={{ right: true, icon: 'trash' }} />
+
+<Story name="With Content instead of text">
+  <Tooltip bottomRight show>
+    <div slot="content">
+      <div>whadup</div>
+      <div>whadup</div>
+      <div>whadup</div>
+    </div>
+    <Button>Tooltip</Button>
+  </Tooltip>
+</Story>
