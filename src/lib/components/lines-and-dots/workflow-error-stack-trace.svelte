@@ -9,10 +9,7 @@
 
 {#if failure}
   <Accordion title={translate('common.failure')} class="text-sm">
-    <div
-      class="hidden w-full text-right text-xs text-danger lg:block"
-      slot="description"
-    >
+    <div class="hidden w-full text-right text-xs lg:block" slot="description">
       {failure?.message}
     </div>
     <div class="flex flex-col gap-2">
