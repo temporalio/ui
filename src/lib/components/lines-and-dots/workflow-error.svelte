@@ -1,4 +1,5 @@
 <script lang="ts">
+  import AccordionGroup from '$lib/holocene/accordion/accordion-group.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -16,6 +17,8 @@
   import { toWorkflowTaskFailureReadable } from '$lib/utilities/screaming-enums';
 
   import { CategoryIcon } from './constants';
+
+  import WorkflowErrorStackTrace from './workflow-error-stack-trace.svelte';
 
   export let error: WorkflowTaskFailedEvent;
   export let pendingTask: PendingWorkflowTaskInfo | undefined = undefined;
@@ -78,28 +81,21 @@
           relative: $relativeTime,
         })}
       </div>
-      <div class="flex flex-col gap-2 bg-space-black p-4 text-white">
-        <p>{translate('common.failure')}</p>
-        <CodeBlock
-          content={error.attributes?.failure?.message || ''}
-          language="text"
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
-        <p>{translate('common.stack-trace')}</p>
-        <CodeBlock
-          content={error.attributes?.failure?.stackTrace || ''}
-          language="text"
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
-        <p>{translate('common.source')}</p>
-        <CodeBlock
-          content={error.attributes?.failure?.source || ''}
-          language="text"
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
+      <div class="flex flex-col gap-2 bg-primary p-4">
+        {#if error.attributes?.failure?.source}
+          <p>{translate('common.source')}</p>
+          <CodeBlock
+            content={error.attributes.failure.source}
+            language="text"
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          />
+        {/if}
+        {#if error.attributes?.failure}
+          <AccordionGroup>
+            <WorkflowErrorStackTrace failure={error.attributes?.failure} />
+          </AccordionGroup>
+        {/if}
       </div>
     </div>
 
