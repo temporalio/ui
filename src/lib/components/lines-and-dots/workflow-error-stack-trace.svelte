@@ -20,6 +20,15 @@
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
+      {#if failure?.source}
+        <p>{translate('common.source')}</p>
+        <CodeBlock
+          content={failure.source}
+          language="text"
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+      {/if}
       {#if failure?.stackTrace}
         <p>{translate('common.stack-trace')}</p>
         <CodeBlock
