@@ -55,12 +55,13 @@
       type="button"
       on:click={toggleAccordion}
     >
-      <div class="space-between flex w-full flex-row items-center">
-        <h3 class="flex w-full items-center gap-2">
+      <div class="flex w-full flex-row items-center justify-between gap-2">
+        <h3 class="flex items-center gap-2">
           {#if icon}<Icon name={icon} />{/if}
           {title}
           <slot name="summary" />
         </h3>
+        <slot name="description" />
         <div
           class="flex flex-row items-center gap-2 pr-2"
           on:click|stopPropagation
@@ -69,7 +70,10 @@
         >
           <slot name="action" />
         </div>
-        <Icon class="m-2" name={open ? 'chevron-up' : 'chevron-down'} />
+        <Icon
+          class="m-2 shrink-0"
+          name={open ? 'chevron-up' : 'chevron-down'}
+        />
       </div>
       <p class="flex items-center">
         {#if error}
