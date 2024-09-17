@@ -56,7 +56,7 @@
       on:click={toggleAccordion}
     >
       <div class="space-between flex w-full flex-row items-center">
-        <h3 class="flex min-w-fit items-center gap-2">
+        <h3 class="flex w-full items-center gap-2">
           {#if icon}<Icon name={icon} />{/if}
           {title}
           <slot name="summary" />
