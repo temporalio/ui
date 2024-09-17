@@ -16,6 +16,7 @@
   import LiveChildWorkflowsTable from './live-child-workflows-table.svelte';
   import ParentWorkflowTable from './parent-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
+  import WorkflowElectron from './workflow-electron.svelte';
 
   $: ({ workflow: workflowId, run: runId, namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
@@ -44,6 +45,7 @@
   } = workflowRelationships);
 </script>
 
+<WorkflowElectron />
 <div class="flex flex-col gap-4">
   {#if hasRelationships}
     <div class="flex w-full flex-wrap gap-4">
