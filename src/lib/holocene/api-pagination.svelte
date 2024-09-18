@@ -215,7 +215,7 @@
 <slot name="header" visibleItems={$store.visibleItems} />
 <div class="relative mb-8 flex flex-col gap-4">
   <div
-    class="flex flex-col items-center gap-4 lg:flex-row {$$slots[
+    class="flex flex-col items-center gap-4 sm:flex-row md:flex-row lg:flex-col {$$slots[
       'action-top-left'
     ]
       ? 'justify-between'
@@ -226,7 +226,7 @@
       <Input
         icon="search"
         id="api-pagination-search-input"
-        class="grow"
+        class="w-1/2 grow"
         bind:value={query}
         label={filterInputPlaceholder}
         labelHidden
@@ -237,7 +237,7 @@
       />
     {/if}
     <nav
-      class="flex shrink-0 flex-col gap-4 md:flex-row"
+      class="flex shrink-0 flex-col gap-4 sm:flex-row lg:flex-col"
       aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
