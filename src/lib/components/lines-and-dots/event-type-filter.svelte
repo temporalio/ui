@@ -14,6 +14,13 @@
   import { temporalVersion } from '$lib/stores/versions';
   import { nexusEnabled } from '$lib/utilities/nexus-enabled';
   import { isVersionNewer } from '$lib/utilities/version-check';
+  // import {
+  //   Menu,
+  //   MenuButton,
+  //   MenuContainer,
+  //   MenuDivider,
+  //   MenuItem,
+  // } from '$lib/holocene/menu';
 
   import { CategoryIcon } from './constants';
 
@@ -74,4 +81,37 @@
       </div>
     </Tooltip>
   {/each}
+  <!-- 
+  <MenuContainer {open} on:close={resetFilter}>
+    <MenuButton
+      controls="status-menu"
+      on:click={() => {
+        if ($open) resetFilter();
+      }}
+    >
+      {$filter.attribute}
+    </MenuButton>
+    <Menu id="status-menu" keepOpen>
+      {#each options as option}
+        {@const checked =
+          $eventTypeFilter.some((filter) => filter === option.value) ||
+          (!$eventTypeFilter.length && option.value === 'All')}
+        <MenuItem
+          data-testid={option.value}
+          on:click={() => {
+            onStatusClick(status);
+          }}
+        >
+          <Checkbox
+            on:click={() => onStatusClick(status)}
+            slot="leading"
+            {checked}
+            label={status}
+            labelHidden
+          />
+        </MenuItem>
+      {/each}
+      <MenuDivider />
+    </Menu>
+  </MenuContainer> -->
 </div>
