@@ -577,6 +577,8 @@ const buildRoots = (
         );
         getOrCreateNodes(child, nodeChildren);
       });
+    } else {
+      node.children = [];
     }
   };
 

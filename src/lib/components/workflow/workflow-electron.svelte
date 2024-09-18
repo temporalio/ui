@@ -1,168 +1,87 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import { page } from '$app/stores';
 
-  import { fetchAllRootWorkflows } from '$lib/services/workflow-service';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import type { RootNode } from './workflow-atom.svelte';
+  export let index: number;
+  export let center: { x: number; y: number };
+  export let node: RootNode;
+  export let parent: RootNode;
+  export let parentCenter: { x: number; y: number } = center;
+  export let parentAngle = 0;
+  export let radius: number;
+  export let orbits: { [key: string]: number };
+  export let generation: number;
+  export let zoomLevel: number;
 
-  $: ({ namespace } = $page.params);
-  $: ({ workflow } = $workflowRun);
+  $: ({ workflow: id, run: runId } = $page.params);
 
-  let root = { children: [], workflow };
-  let container;
+  $: numberOfSiblings = parent?.children?.length;
 
-  onMount(async () => {
-    root = await fetchAllRootWorkflows(namespace, workflow);
-  });
+  $: orbit = orbits[`level${generation}`];
+  $: ({ x, y, angle } = getPosition({
+    index,
+    numberOfSiblings,
+    orbit,
+    center,
+  }));
+  $: activeNode = node.workflow.runId === runId && node.workflow.id === id;
+  $: r = activeNode ? radius * 2 : radius;
 
-  $: width = container?.clientWidth;
-  $: height = container?.clientHeight;
-
-  $: centerX = width / 2;
-  $: centerY = height / 2;
-
-  $: radiusRoot = width / 36;
-  $: radius1 = radiusRoot * 2;
-  $: radius2 = radiusRoot * 3;
-  $: radius3 = radiusRoot * 4;
-
-  const getChildPosition = (
-    i: number,
-    numOfChildren: number,
-    radius: number,
-    center = { x: centerX, y: centerY },
-  ) => {
-    const angleStep = (2 * Math.PI) / numOfChildren;
-    const angle = i * angleStep;
-    const x = center.x + radius * Math.cos(angle);
-    const y = center.y + radius * Math.sin(angle);
+  const getPosition = ({
+    index,
+    numberOfSiblings,
+    orbit,
+    center,
+  }: {
+    index: number;
+    numberOfSiblings: number;
+    orbit: number;
+    center: { x: number; y: number };
+  }) => {
+    let angleStep = (2 * Math.PI) / numberOfSiblings;
+    let angle = index * angleStep;
+    if (generation > 1) {
+      angleStep = 0.025 / zoomLevel;
+      angle =
+        index % 2 === 0
+          ? parentAngle + index * angleStep
+          : parentAngle - index * angleStep;
+    }
+    const x = center.x + orbit * Math.cos(angle);
+    const y = center.y + orbit * Math.sin(angle);
     return { x, y, angle };
-  };
-
-  const getGrandChildPosition = (
-    angle: number,
-    radius: number,
-    center = { x: centerX, y: centerY },
-    i: number,
-  ) => {
-    const angleStep = 0.05;
-    const adjustedAngle =
-      i % 2 === 0 ? angle + i * angleStep : angle - i * angleStep;
-    const x = center.x + radius * Math.cos(adjustedAngle);
-    const y = center.y + radius * Math.sin(adjustedAngle);
-    return { x, y, angle: adjustedAngle };
   };
 </script>
 
-<div
-  class="flex h-[600px] w-full grow flex-col items-center justify-center rounded-xl border-2 border-subtle bg-primary xl:grow-0"
-  bind:this={container}
->
-  <svg {width} {height}>
-    <circle
-      class="stroke-black dark:stroke-white"
-      cx={centerX}
-      cy={centerY}
-      r={radius3}
-      stroke-width="1"
-      fill-opacity="0"
+{#if generation + 1 < 5}
+  {#each node.children as child, i}
+    <svelte:self
+      index={i}
+      node={child}
+      {center}
+      parent={node}
+      parentCenter={{ x, y }}
+      parentAngle={angle}
+      {radius}
+      {orbits}
+      generation={generation + 1}
+      {zoomLevel}
     />
-    <circle
-      class="stroke-black dark:stroke-white"
-      cx={centerX}
-      cy={centerY}
-      r={radius2}
-      stroke-width="1"
-      fill-opacity="0"
-    />
-    <circle
-      class="stroke-black dark:stroke-white"
-      cx={centerX}
-      cy={centerY}
-      r={radius1}
-      stroke="black"
-      stroke-width="1"
-      fill-opacity="0"
-    />
-    {#each root.children as child, i}
-      {@const { x, y, angle } = getChildPosition(
-        i,
-        root.children.length,
-        radius1,
-      )}
-      {#each child.children as grandChild, j}
-        {@const { x: gx, y: gy } = getGrandChildPosition(
-          angle,
-          radius2 - radius1,
-          {
-            x,
-            y,
-          },
-          j,
-        )}
-        <line
-          x1={x}
-          y1={y}
-          x2={gx}
-          y2={gy}
-          class="stroke-black dark:stroke-white"
-          stroke-width="1"
-          opacity="0.5"
-        />
-        <circle
-          class="stroke-black dark:stroke-white {grandChild.workflow.status}"
-          cx={gx}
-          cy={gy}
-          r={6}
-          stroke="black"
-          stroke-width="1"
-        />
-      {/each}
-      <line
-        x1={centerX}
-        y1={centerY}
-        x2={x}
-        y2={y}
-        class="stroke-black dark:stroke-white"
-        stroke-width="1"
-        opacity="0.5"
-      />
-      <circle
-        class="stroke-black dark:stroke-white {child.workflow.status}"
-        cx={x}
-        cy={y}
-        r={8}
-        stroke="black"
-        stroke-width="1"
-      />
-    {/each}
-    <circle
-      class="{workflow.status} stroke-black dark:stroke-white"
-      cx={centerX}
-      cy={centerY}
-      r={radiusRoot}
-      stroke="black"
-      stroke-width="1"
-    />
-  </svg>
-</div>
+  {/each}
+{/if}
+<line
+  x1={x}
+  y1={y}
+  x2={parentCenter.x}
+  y2={parentCenter.y}
+  class="stroke-black dark:stroke-white"
+  stroke-width="2"
+  opacity="0.5"
+  stroke-dasharray={node.workflow.status === 'Running' ? '5' : 'none'}
+/>
+<circle class={node.workflow.status} cx={x} cy={y} {r} />
 
 <style lang="postcss">
-  .spin {
-    animation: spin 60s linear infinite;
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
   .Running {
     fill: #93bbfd;
   }

@@ -1,52 +1,51 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  // import { onMount } from 'svelte';
+  // import { page } from '$app/stores';
 
-  import { page } from '$app/stores';
+  // import { fetchAllChildWorkflows } from '$lib/services/workflow-service';
+  // import type { WorkflowExecution } from '$lib/types/workflows';
+  // import { fullEventHistory } from '$lib/stores/events';
+  // import { namespaces } from '$lib/stores/namespaces';
+  // import { workflowRun } from '$lib/stores/workflow-run';
+  // import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
+  // import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
+  // import { translate } from '$lib/i18n/translate';
+  // import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
+  // import LiveChildWorkflowsTable from './live-child-workflows-table.svelte';
+  // import ParentWorkflowTable from './parent-workflow-table.svelte';
+  // import SchedulerTable from './scheduler-table.svelte';
 
-  import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
-  import { translate } from '$lib/i18n/translate';
-  import { fetchAllChildWorkflows } from '$lib/services/workflow-service';
-  import { fullEventHistory } from '$lib/stores/events';
-  import { namespaces } from '$lib/stores/namespaces';
-  import { workflowRun } from '$lib/stores/workflow-run';
-  import type { WorkflowExecution } from '$lib/types/workflows';
-  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
+  import WorkflowAtom from './workflow-atom.svelte';
 
-  import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
-  import LiveChildWorkflowsTable from './live-child-workflows-table.svelte';
-  import ParentWorkflowTable from './parent-workflow-table.svelte';
-  import SchedulerTable from './scheduler-table.svelte';
-  import WorkflowElectron from './workflow-electron.svelte';
+  // $: ({ workflow: workflowId, run: runId, namespace } = $page.params);
+  // $: ({ workflow } = $workflowRun);
 
-  $: ({ workflow: workflowId, run: runId, namespace } = $page.params);
-  $: ({ workflow } = $workflowRun);
+  // let liveChildren: WorkflowExecution[] = [];
 
-  let liveChildren: WorkflowExecution[] = [];
+  // onMount(async () => {
+  //   liveChildren = await fetchAllChildWorkflows(namespace, workflowId, runId);
+  // });
 
-  onMount(async () => {
-    liveChildren = await fetchAllChildWorkflows(namespace, workflowId, runId);
-  });
-
-  $: workflowRelationships = getWorkflowRelationships(
-    workflow,
-    $fullEventHistory,
-    $namespaces,
-  );
-  $: ({
-    hasChildren,
-    hasRelationships,
-    first,
-    parent,
-    parentNamespaceName,
-    children,
-    next,
-    previous,
-    scheduleId,
-  } = workflowRelationships);
+  // $: workflowRelationships = getWorkflowRelationships(
+  //   workflow,
+  //   $fullEventHistory,
+  //   $namespaces,
+  // );
+  // $: ({
+  //   hasChildren,
+  //   hasRelationships,
+  //   first,
+  //   parent,
+  //   parentNamespaceName,
+  //   children,
+  //   next,
+  //   previous,
+  //   scheduleId,
+  // } = workflowRelationships);
 </script>
 
-<WorkflowElectron />
-<div class="flex flex-col gap-4">
+<WorkflowAtom />
+<!-- <div class="flex flex-col gap-4">
   {#if hasRelationships}
     <div class="flex w-full flex-wrap gap-4">
       {#if scheduleId}
@@ -77,4 +76,4 @@
   {:else}
     <p>{translate('workflows.no-relationships')}</p>
   {/if}
-</div>
+</div> -->
