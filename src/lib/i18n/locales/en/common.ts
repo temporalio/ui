@@ -178,4 +178,5 @@ export const Strings = {
   url: 'URL',
   state: 'State',
   attempt: 'Attempt',
+  message: 'Message',
 } as const;

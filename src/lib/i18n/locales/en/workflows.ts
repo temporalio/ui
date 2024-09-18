@@ -239,4 +239,7 @@ export const Strings = {
   'custom-search-attribute': 'Custom Search Attribute',
   'select-attribute': 'Select Attribute',
   'add-search-attribute': 'Add a Search Attribute',
+  'pending-workflow-task': 'Pending Workflow Task',
+  'original-scheduled-time': 'Original Scheduled Time',
+  'started-time': 'Started Time',
 } as const;
