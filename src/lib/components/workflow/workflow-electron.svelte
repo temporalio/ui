@@ -56,7 +56,7 @@
 </script>
 
 <div
-  class="flex h-[600px] w-full grow flex-col items-center justify-center xl:grow-0"
+  class="flex h-[600px] w-full grow flex-col items-center justify-center rounded-xl border-2 border-subtle bg-primary xl:grow-0"
   bind:this={container}
 >
   <svg {width} {height}>
