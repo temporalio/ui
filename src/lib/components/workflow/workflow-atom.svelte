@@ -8,30 +8,32 @@
 </script>
 
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import { page } from '$app/stores';
 
+  import Button from '$lib/holocene/button.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import ZoomSvg from '$lib/holocene/zoom-svg.svelte';
-  import { fetchAllRootWorkflows } from '$lib/services/workflow-service';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import WorkflowElectron from './workflow-electron.svelte';
 
   $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
 
-  let root: RootNode = { children: [], workflow };
+  export let root: RootNode;
 
-  onMount(async () => {
-    root = await fetchAllRootWorkflows(namespace, workflow);
-  });
+  let allActive = false;
+  $: rootActive = allActive;
+  $: currentNode =
+    root?.workflow?.runId === workflow.runId &&
+    root?.workflow?.id === workflow.id;
 
   const getPositions = (width: number, height: number, zoomLevel: number) => {
     const centerX = width / 2;
     const centerY = height / 2;
     const orbits = {
-      root: width / 40 / zoomLevel,
+      root: width / 50 / zoomLevel,
       level1: width / 16 / zoomLevel,
       level2: width / 9 / zoomLevel,
       level3: width / 6 / zoomLevel,
@@ -49,7 +51,7 @@
 
 <div class="w-full rounded-xl border-2 border-subtle bg-primary">
   <ZoomSvg
-    initialZoom={0.55}
+    initialZoom={0.65}
     maxZoomOut={1}
     maxZoomIn={0.25}
     let:width
@@ -62,6 +64,18 @@
       height,
       zoomLevel,
     )}
+    <svelte:fragment slot="controls">
+      <Tooltip text={allActive ? 'Hide All' : 'Show All'} left>
+        <Button
+          variant="secondary"
+          size="sm"
+          leadingIcon={allActive ? 'eye-hide' : 'eye-show'}
+          on:click={() => {
+            allActive = !allActive;
+          }}
+        />
+      </Tooltip>
+    </svelte:fragment>
     <circle
       class="stroke-black dark:stroke-white"
       cx={centerX}
@@ -71,7 +85,7 @@
       fill-opacity="0"
     />
     <circle
-      class="stroke-black dark:stroke-white"
+      class="stroke-black opacity-50 dark:stroke-white"
       cx={centerX}
       cy={centerY}
       r={orbits.level2}
@@ -79,7 +93,7 @@
       fill-opacity="0"
     />
     <circle
-      class="stroke-black dark:stroke-white"
+      class="stroke-black opacity-50 dark:stroke-white"
       cx={centerX}
       cy={centerY}
       r={orbits.level3}
@@ -87,7 +101,7 @@
       fill-opacity="0"
     />
     <circle
-      class="stroke-black dark:stroke-white"
+      class="stroke-black opacity-50 dark:stroke-white"
       cx={centerX}
       cy={centerY}
       r={orbits.level4}
@@ -100,31 +114,61 @@
         node={child}
         parent={root}
         center={{ x: centerX, y: centerY }}
+        parentCenter={{ x: centerX, y: centerY }}
         {radius}
         {orbits}
         generation={1}
         {zoomLevel}
+        {allActive}
       />
     {/each}
-    <circle class={workflow.status} cx={centerX} cy={centerY} r={orbits.root} />
+    <g
+      class="outline-none"
+      role="button"
+      tabindex="0"
+      on:keypress={() => (rootActive = !rootActive)}
+      on:click={() => (rootActive = !rootActive)}
+    >
+      {#if currentNode}
+        <circle
+          class="dark:fill-white"
+          cx={centerX}
+          cy={centerY}
+          r={orbits.root * 1.1}
+        />
+      {/if}
+      <circle
+        class={workflow.status}
+        cx={centerX}
+        cy={centerY}
+        r={orbits.root}
+      />
+      {#if root?.workflow && rootActive}
+        <text
+          x={centerX}
+          y={centerY}
+          text-anchor="middle"
+          dominant-baseline="middle"
+          class="text-sm underline"
+          fill="currentColor"
+        >
+          <a
+            href={routeForEventHistory({
+              namespace,
+              workflow: root?.workflow?.id,
+              run: root?.workflow?.runId,
+            })}
+            class="hover:fill-brand dark:fill-white"
+          >
+            {root?.workflow?.id}
+          </a>
+        </text>
+      {/if}
+    </g>
   </ZoomSvg>
 </div>
 
 <style lang="postcss">
-  .spin {
-    animation: spin 500s linear infinite;
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
   .Running {
     fill: #93bbfd;
   }

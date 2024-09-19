@@ -1,22 +1,23 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import { routeForEventHistory } from '$lib/utilities/route-for';
+
   import type { RootNode } from './workflow-atom.svelte';
   export let index: number;
   export let center: { x: number; y: number };
   export let node: RootNode;
   export let parent: RootNode;
-  export let parentCenter: { x: number; y: number } = center;
+  export let parentCenter: { x: number; y: number };
   export let parentAngle = 0;
   export let radius: number;
   export let orbits: { [key: string]: number };
   export let generation: number;
   export let zoomLevel: number;
+  export let allActive = false;
 
-  $: ({ workflow: id, run: runId } = $page.params);
-
+  $: ({ namespace, workflow: id, run: runId } = $page.params);
   $: numberOfSiblings = parent?.children?.length;
-
   $: orbit = orbits[`level${generation}`];
   $: ({ x, y, angle } = getPosition({
     index,
@@ -24,8 +25,9 @@
     orbit,
     center,
   }));
-  $: activeNode = node.workflow.runId === runId && node.workflow.id === id;
-  $: r = activeNode ? radius * 2 : radius;
+  $: currentNode = node.workflow.runId === runId && node.workflow.id === id;
+
+  $: active = allActive;
 
   const getPosition = ({
     index,
@@ -40,6 +42,7 @@
   }) => {
     let angleStep = (2 * Math.PI) / numberOfSiblings;
     let angle = index * angleStep;
+
     if (generation > 1) {
       angleStep = 0.025 / zoomLevel;
       angle =
@@ -50,6 +53,10 @@
     const x = center.x + orbit * Math.cos(angle);
     const y = center.y + orbit * Math.sin(angle);
     return { x, y, angle };
+  };
+
+  const onNodeClick = () => {
+    active = !active;
   };
 </script>
 
@@ -66,6 +73,7 @@
       {orbits}
       generation={generation + 1}
       {zoomLevel}
+      {allActive}
     />
   {/each}
 {/if}
@@ -76,10 +84,49 @@
   y2={parentCenter.y}
   class="stroke-black dark:stroke-white"
   stroke-width="2"
-  opacity="0.5"
+  opacity="0.35"
   stroke-dasharray={node.workflow.status === 'Running' ? '5' : 'none'}
 />
-<circle class={node.workflow.status} cx={x} cy={y} {r} />
+<g
+  class="outline-none"
+  role="button"
+  tabindex="0"
+  on:keypress={onNodeClick}
+  on:click={onNodeClick}
+>
+  {#if currentNode}
+    <circle class="dark:fill-white" cx={x} cy={y} r={radius * 1.5} />
+  {/if}
+  <circle
+    class="{node.workflow.status} hover:cursor-pointer"
+    cx={x}
+    cy={y}
+    r={radius}
+  />
+</g>
+
+{#if active}
+  <text
+    x={x < center.x ? x - 1.25 * radius : x + 1.25 * radius}
+    y={y + radius / 3}
+    text-anchor={x < center.x ? 'end' : 'start'}
+    dominant-baseline="start"
+    font-size="14px"
+    class="text-sm underline"
+    fill="currentColor"
+  >
+    <a
+      href={routeForEventHistory({
+        namespace,
+        workflow: node.workflow.id,
+        run: node.workflow.runId,
+      })}
+      class="hover:fill-brand dark:fill-white"
+    >
+      {node.workflow.id}
+    </a>
+  </text>
+{/if}
 
 <style lang="postcss">
   .Running {

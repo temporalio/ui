@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from './button.svelte';
+  import Tooltip from './tooltip.svelte';
 
   export let containerHeight = 600;
   export let initialZoom = 1;
@@ -31,7 +32,7 @@
     const mouseX = event.clientX - rect.left;
     const mouseY = event.clientY - rect.top;
 
-    const zoomAmount = -event.deltaY * 0.001;
+    const zoomAmount = event.deltaY * 0.001;
     let newZoomLevel = zoomLevel + zoomAmount;
 
     if (newZoomLevel < maxZoomIn || newZoomLevel > maxZoomOut) return;
@@ -89,14 +90,20 @@
   bind:clientHeight={height}
   style="height: {containerHeight}px"
 >
-  <Button
-    class="absolute right-4 top-4 z-20 cursor-pointer"
-    variant="secondary"
-    size="sm"
-    on:click={() => {
-      onCenter();
-    }}>Center</Button
-  >
+  <div class="absolute right-4 top-4 z-20 flex flex-col items-center gap-2">
+    <Tooltip text="Center" left>
+      <Button
+        class="cursor-pointer"
+        variant="secondary"
+        size="sm"
+        leadingIcon="target"
+        on:click={() => {
+          onCenter();
+        }}
+      />
+    </Tooltip>
+    <slot name="controls" />
+  </div>
   <svg
     role="presentation"
     bind:this={svg}
