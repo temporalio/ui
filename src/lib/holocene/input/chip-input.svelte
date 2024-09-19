@@ -95,7 +95,14 @@
 </script>
 
 <div class={merge(disabled && 'cursor-not-allowed', className)}>
-  <Label {required} {label} {disabled} hidden={labelHidden} for={id} />
+  <Label
+    class="pb-1"
+    {required}
+    {label}
+    {disabled}
+    hidden={labelHidden}
+    for={id}
+  />
   <div
     bind:this={inputContainer}
     class={merge(

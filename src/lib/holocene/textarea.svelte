@@ -39,10 +39,10 @@
   export { className as class };
 </script>
 
-<div class={merge('group', className)}>
+<div class={merge('group flex flex-col gap-1', className)}>
   <Label {required} hidden={labelHidden} {label} for={id} />
   {#if description}
-    <p class="pb-2 text-sm">{description}</p>
+    <p class="-mt-1 text-sm">{description}</p>
   {/if}
   <div
     class={merge(
@@ -70,7 +70,7 @@
       maxlength={maxLength > 0 ? maxLength : undefined}
     />
   </div>
-  <div class="mt-2 flex justify-between gap-2">
+  <div class="flex justify-between gap-2">
     <div
       class="error-msg"
       class:min-width={maxLength}
