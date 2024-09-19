@@ -223,7 +223,7 @@
       class="flex w-full flex-col items-end justify-between gap-4 md:flex-row"
     >
       {#if initialInput}
-        <div class="flex w-full flex-col gap-2 md:w-1/2">
+        <div class="flex w-full flex-col gap-1 md:w-1/2">
           <Label
             class="text-subtle"
             for="workflow-example-input"
@@ -237,7 +237,7 @@
           />
         </div>
       {/if}
-      <div class="flex w-full flex-col gap-2 {initialInput && 'md:w-1/2'}">
+      <div class="flex w-full flex-col gap-1 {initialInput && 'md:w-1/2'}">
         <div class="flex w-full items-end justify-between">
           <Label for="workflow-input" label={translate('workflows.input')} />
           <FileInput id="start-workflow-input-file-upload" {onUpload} />
