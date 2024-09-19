@@ -116,7 +116,7 @@ export const toWorkflowExecution = (
     toPendingNexusOperations(response?.pendingNexusOperations);
   const pendingWorkflowTask = response?.pendingWorkflowTask;
   const callbacks = toCallbacks(response?.callbacks);
-  const rootExecution = response.workflowExecutionInfo.rootExecution;
+  const rootExecution = response.workflowExecutionInfo?.rootExecution;
 
   return {
     name,

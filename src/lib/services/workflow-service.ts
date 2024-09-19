@@ -595,28 +595,20 @@ export async function fetchAllRootWorkflows(
   namespace: string,
   workflow: WorkflowExecution,
 ): Promise<RootNode | undefined> {
-  // if (!get(canFetchRootWorkflows)) {
-  //   return;
-  // }
-
   const rootWorkflowId = workflow.rootExecution.workflowId;
   const rootRunId = workflow.rootExecution.runId;
-  try {
-    let query = `RootWorkflowId = "${rootWorkflowId}"`;
-    if (rootRunId) {
-      query += ` AND RootRunId = "${rootRunId}"`;
-    }
-
-    const root = await fetchWorkflow({
-      namespace,
-      workflowId: rootWorkflowId,
-      runId: rootRunId,
-    });
-    const workflows = await fetchAllPaginatedWorkflows(namespace, { query });
-    return buildRoots(root?.workflow, workflows);
-  } catch (e) {
-    return;
+  let query = `RootWorkflowId = "${rootWorkflowId}"`;
+  if (rootRunId) {
+    query += ` AND RootRunId = "${rootRunId}"`;
   }
+
+  const root = await fetchWorkflow({
+    namespace,
+    workflowId: rootWorkflowId,
+    runId: rootRunId,
+  });
+  const workflows = await fetchAllPaginatedWorkflows(namespace, { query });
+  return buildRoots(root?.workflow, workflows);
 }
 
 function sleep(ms) {
