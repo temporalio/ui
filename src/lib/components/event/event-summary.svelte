@@ -79,8 +79,10 @@
   };
 </script>
 
-<div class="flex flex-col items-center gap-4 md:items-start">
-  <div class="flex flex-col items-center gap-2 px-4 md:flex-row md:items-start">
+<div
+  class="flex flex-col items-center justify-between gap-4 py-4 lg:flex-row lg:py-8"
+>
+  <div class="flex flex-col items-center gap-2 px-4 md:flex-row">
     <div class="flex items-center gap-2 px-4">
       <ToggleButtons>
         <ToggleButton
@@ -135,14 +137,12 @@
       </ToggleButtons>
     </div>
   </div>
-  {#if $eventViewType !== 'json'}
-    <div
-      class="flex w-full flex-col justify-between gap-2 px-4 pb-2 lg:flex-row"
-    >
-      <EventStatusFilter />
-      <EventTypeFilter {compact} />
-    </div>
-  {/if}
+  <div
+    class="flex w-full flex-col items-center justify-end gap-4 px-4 lg:flex-row"
+  >
+    <EventStatusFilter />
+    <EventTypeFilter {compact} />
+  </div>
 </div>
 {#if $eventViewType === 'json'}
   <div class="px-4">
