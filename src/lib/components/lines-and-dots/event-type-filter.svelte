@@ -79,7 +79,12 @@
     </div>
     {translate('events.event-types')}
   </MenuButton>
-  <Menu id="event-type-menu" keepOpen position="topRight" class="w-[400px]">
+  <Menu
+    id="event-type-menu"
+    keepOpen
+    position="topRight"
+    class="w-[240px] md:w-[400px]"
+  >
     <MenuItem
       data-testid={translate('common.all')}
       on:click={() => {
