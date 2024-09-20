@@ -13,6 +13,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getPollers } from '$lib/services/pollers-service';
   import {
@@ -140,10 +141,26 @@
     inputRetrieved = Date.now();
   };
 
+  const inputIsJSON = (input: string) => {
+    try {
+      JSON.parse(input);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  $: inputValid = !input || inputIsJSON(input);
+
+  $: {
+    console.log('Input valid: ', inputValid);
+  }
+
   $: enableStart =
     !!workflowId &&
     !!taskQueue &&
     !!workflowType &&
+    !!inputValid &&
     !workflowCreateDisabled($page);
 
   $: checkTaskQueue(taskQueueParam);
@@ -222,25 +239,12 @@
     <div
       class="flex w-full flex-col items-end justify-between gap-4 md:flex-row"
     >
-      {#if initialInput}
-        <div class="flex w-full flex-col gap-2 md:w-1/2">
-          <Label
-            class="text-subtle"
-            for="workflow-example-input"
-            label={translate('workflows.example-input')}
-          />
-          <CodeBlock
-            id="workflow-initial-input"
-            minHeight={120}
-            content={initialInput}
-            copyable
-          />
-        </div>
-      {/if}
-      <div class="flex w-full flex-col gap-2 {initialInput && 'md:w-1/2'}">
+      <div class="flex w-full flex-col gap-2">
         <div class="flex w-full items-end justify-between">
           <Label for="workflow-input" label={translate('workflows.input')} />
-          <FileInput id="start-workflow-input-file-upload" {onUpload} />
+          <Tooltip text={translate('common.upload-json')} left>
+            <FileInput id="start-workflow-input-file-upload" {onUpload} />
+          </Tooltip>
         </div>
         {#key inputRetrieved}
           <CodeBlock
@@ -252,6 +256,9 @@
             copyable={false}
           />
         {/key}
+        {#if !inputValid}
+          <Alert intent="error" title="Input must be valid JSON" />
+        {/if}
       </div>
     </div>
     {#if viewAdvancedOptions}

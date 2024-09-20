@@ -179,4 +179,5 @@ export const Strings = {
   state: 'State',
   attempt: 'Attempt',
   message: 'Message',
+  'upload-json': 'Upload JSON',
 } as const;
