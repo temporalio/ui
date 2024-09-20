@@ -152,10 +152,6 @@
 
   $: inputValid = !input || inputIsJSON(input);
 
-  $: {
-    console.log('Input valid: ', inputValid);
-  }
-
   $: enableStart =
     !!workflowId &&
     !!taskQueue &&
