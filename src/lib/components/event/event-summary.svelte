@@ -140,7 +140,9 @@
   <div
     class="flex w-full flex-col items-center justify-end gap-4 px-4 lg:flex-row"
   >
-    <EventStatusFilter />
+    {#if $eventViewType !== 'json'}
+      <EventStatusFilter />
+    {/if}
     <EventTypeFilter {compact} />
   </div>
 </div>
