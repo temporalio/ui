@@ -253,7 +253,7 @@
           />
         {/key}
         {#if !inputValid}
-          <Alert intent="error" title="Input must be valid JSON" />
+          <Alert intent="error" title={translate('common.input-valid-json')} />
         {/if}
       </div>
     </div>
