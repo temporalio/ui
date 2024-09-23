@@ -5,10 +5,7 @@
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
-  import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
-
-  import GraphWidget from '../lines-and-dots/svg/graph-widget.svelte';
 
   import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
   import EventLinksExpanded from './event-links-expanded.svelte';
@@ -18,16 +15,12 @@
 
   $: pendingEvent = group?.pendingActivity || group?.pendingNexusOperation;
   $: showEventGroup = group && (group.eventList.length > 1 || pendingEvent);
-  $: childWorkflowEvent = group?.eventList.find(
-    isChildWorkflowExecutionStartedEvent,
-  );
 </script>
 
 {#if showEventGroup}
   <div class="w-full p-2">
     <div
       class="flex flex-col gap-0 overflow-hidden rounded-xl border-2 border-subtle xl:flex-row"
-      class:rounded-b-none={!!childWorkflowEvent}
     >
       {#each group.eventList as groupEvent}
         {@const attributes = formatAttributes(groupEvent)}
@@ -66,15 +59,6 @@
         </div>
       {/if}
     </div>
-    {#if childWorkflowEvent}
-      <GraphWidget
-        namespace={childWorkflowEvent.attributes.namespace}
-        workflowId={childWorkflowEvent.attributes.workflowExecution.workflowId}
-        runId={childWorkflowEvent.attributes.workflowExecution.runId}
-        height={240}
-        class="overflow-x-hidden"
-      />
-    {/if}
   </div>
 {:else if event}
   {@const attributes = formatAttributes(event)}

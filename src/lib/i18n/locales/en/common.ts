@@ -178,4 +178,7 @@ export const Strings = {
   url: 'URL',
   state: 'State',
   attempt: 'Attempt',
+  message: 'Message',
+  'upload-json': 'Upload JSON',
+  'input-valid-json': 'Input must be valid JSON',
 } as const;
