@@ -255,7 +255,7 @@
 </script>
 
 <MenuContainer {open} on:close={handleMenuClose}>
-  <Label hidden={labelHidden} {required} {label} for={id} />
+  <Label class="pb-1" hidden={labelHidden} {required} {label} for={id} />
   <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
     {#if leadingIcon}
       <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
