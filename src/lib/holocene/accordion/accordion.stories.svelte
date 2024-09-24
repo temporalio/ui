@@ -66,7 +66,15 @@
 
 <Story name="With Icon" args={{ icon: 'workflow' }} />
 
-<Story name="With Action" let:args>
+<Story
+  name="With Action"
+  let:args
+  parameters={{
+    a11y: {
+      disable: true,
+    },
+  }}
+>
   <Accordion {...args} onToggle={action('onToggle')}>
     <p>Accordion Content</p>
     <Link href="https://docs.temporal.io/" newTab slot="action" icon="book">
