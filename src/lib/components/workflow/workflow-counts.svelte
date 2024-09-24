@@ -9,6 +9,7 @@
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
+    disableWorkflowCountsRefresh,
     queryWithParentWorkflowId,
     refresh,
     workflowCount,
@@ -102,13 +103,15 @@
 
   const fetchCounts = async () => {
     clearNewCounts();
-    const interval =
-      getExponentialBackoffSeconds(
-        initialIntervalSeconds,
-        attempt,
-        maxAttempts,
-      ) * 1000;
-    refreshInterval = setInterval(() => fetchNewCounts(), interval);
+    if (!$disableWorkflowCountsRefresh) {
+      const interval =
+        getExponentialBackoffSeconds(
+          initialIntervalSeconds,
+          attempt,
+          maxAttempts,
+        ) * 1000;
+      refreshInterval = setInterval(() => fetchNewCounts(), interval);
+    }
     try {
       const { count, groups } = await fetchWorkflowCountByExecutionStatus({
         namespace,
