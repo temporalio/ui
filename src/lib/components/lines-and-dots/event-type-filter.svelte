@@ -75,7 +75,7 @@
   <Menu
     id="event-type-menu"
     keepOpen
-    position="topRight"
+    position="top-right"
     class="w-[240px] md:w-[400px]"
   >
     <MenuItem

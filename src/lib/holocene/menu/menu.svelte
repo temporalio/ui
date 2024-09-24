@@ -12,7 +12,7 @@
   interface $$Props extends HTMLAttributes<HTMLUListElement> {
     id: string;
     keepOpen?: boolean;
-    position?: 'left' | 'right' | 'topLeft' | 'topRight';
+    position?: 'left' | 'right' | 'top-light' | 'top-right';
     menuElement?: HTMLUListElement;
   }
 
@@ -21,7 +21,7 @@
   export { className as class };
   export let id: string;
   export let keepOpen = false;
-  export let position: 'left' | 'right' | 'topLeft' | 'topRight' = 'left';
+  export let position: 'left' | 'right' | 'top-left' | 'top-right' = 'left';
   export let menuElement: HTMLUListElement = null;
 
   const {
@@ -48,7 +48,7 @@
   class:hidden={!$open}
   aria-labelledby={id}
   tabindex={-1}
-  style={position === 'topRight' || position === 'topLeft'
+  style={position === 'top-right' || position === 'top-left'
     ? `top: -${height + 16}px;`
     : ''}
   {id}
@@ -66,12 +66,12 @@
     @apply surface-primary absolute z-20 mt-1 min-w-fit list-none overflow-auto rounded-lg border-2 border-subtle text-primary shadow;
 
     &.left,
-    &.topLeft {
+    &.top-left {
       @apply left-0 origin-top-left;
     }
 
     &.right,
-    &.topRight {
+    &.top-right {
       @apply right-0 origin-top-right;
     }
   }
