@@ -79,34 +79,36 @@
   </div>
   <slot name="decode" />
 </div>
-{#if $decodeEventHistory}
-  {#key [index, $decodeEventHistory]}
-    <PayloadDecoder
-      value={fromEventToRawEvent(events[index - 1])}
-      let:decodedValue
-    >
+<div class="py-4">
+  {#if $decodeEventHistory}
+    {#key [index, $decodeEventHistory]}
+      <PayloadDecoder
+        value={fromEventToRawEvent(events[index - 1])}
+        let:decodedValue
+      >
+        <CodeBlock
+          content={decodedValue}
+          testId="event-history-json"
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+      </PayloadDecoder>
+    {/key}
+  {:else}
+    {#key index}
       <CodeBlock
-        content={decodedValue}
+        content={stringifyWithBigInt(
+          fromEventToRawEvent(events[index - 1]),
+          undefined,
+          2,
+        )}
         testId="event-history-json"
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
-    </PayloadDecoder>
-  {/key}
-{:else}
-  {#key index}
-    <CodeBlock
-      content={stringifyWithBigInt(
-        fromEventToRawEvent(events[index - 1]),
-        undefined,
-        2,
-      )}
-      testId="event-history-json"
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-    />
-  {/key}
-{/if}
+    {/key}
+  {/if}
+</div>
 
 <style lang="postcss">
   .caret {

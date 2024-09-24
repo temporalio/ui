@@ -83,9 +83,7 @@
   </div>
 </div>
 <div class="px-8 pb-24">
-  <div
-    class="flex w-full flex-col gap-4 overflow-auto rounded-xl border-2 border-subtle"
-  >
+  <div class="flex w-full flex-col rounded-sm border-2 border-subtle">
     <TimelineGraph
       {workflow}
       {groups}
