@@ -12,7 +12,7 @@
   interface $$Props extends HTMLAttributes<HTMLUListElement> {
     id: string;
     keepOpen?: boolean;
-    position?: 'left' | 'right' | 'top-light' | 'top-right';
+    position?: 'left' | 'right' | 'top-left' | 'top-right';
     menuElement?: HTMLUListElement;
   }
 
