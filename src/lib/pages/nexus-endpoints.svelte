@@ -13,6 +13,7 @@
   import { timeFormat } from '$lib/stores/time-format';
   import type { NexusEndpoint } from '$lib/types/nexus';
   import { formatDate } from '$lib/utilities/format-date';
+  import { pluralize } from '$lib/utilities/pluralize';
   import {
     routeForNexusEndpoint,
     routeForNexusEndpointCreate,
@@ -90,7 +91,11 @@
               {/if}
               {#if endpoint.spec?.allowedCallerNamespaces}
                 <Badge type="primary" class="px-2 py-1"
-                  >{endpoint.spec?.allowedCallerNamespaces.length} Namespaces</Badge
+                  >{endpoint.spec?.allowedCallerNamespaces.length}
+                  {pluralize(
+                    translate('namespaces.namespace'),
+                    endpoint.spec?.allowedCallerNamespaces.length,
+                  )}</Badge
                 >
               {/if}
             </div>

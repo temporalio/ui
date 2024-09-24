@@ -34,6 +34,8 @@
   import { action } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
 
+  import Link from '../link.svelte';
+
   import AccordionGroup from './accordion-group.svelte';
 </script>
 
@@ -63,3 +65,20 @@
 <Story name="With Error" args={{ error: 'Error' }} />
 
 <Story name="With Icon" args={{ icon: 'workflow' }} />
+
+<Story
+  name="With Action"
+  let:args
+  parameters={{
+    a11y: {
+      disable: true,
+    },
+  }}
+>
+  <Accordion {...args} onToggle={action('onToggle')}>
+    <p>Accordion Content</p>
+    <Link href="https://docs.temporal.io/" newTab slot="action" icon="book">
+      <span class="sr-only">docs</span>
+    </Link>
+  </Accordion>
+</Story>
