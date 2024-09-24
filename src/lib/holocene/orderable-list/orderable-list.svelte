@@ -15,7 +15,7 @@
 
 <style lang="postcss">
   .orderable-section {
-    @apply flex flex-col gap-2;
+    @apply flex flex-col gap-1;
   }
 
   .orderable-list {

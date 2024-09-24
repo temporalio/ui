@@ -81,48 +81,48 @@ describe('Event Category Data Structures', () => {
     expect(allEventTypeOptions).toMatchInlineSnapshot(`
       [
         {
+          "description": "events.category.activity-tooltip",
           "label": "events.category.activity",
-          "tooltip": "events.category.activity-tooltip",
           "value": "activity",
         },
         {
+          "description": "events.category.child-workflow-tooltip",
           "label": "events.category.child-workflow",
-          "tooltip": "events.category.child-workflow-tooltip",
           "value": "child-workflow",
         },
         {
+          "description": "events.category.local-activity-tooltip",
           "label": "events.category.local-activity",
-          "tooltip": "events.category.local-activity-tooltip",
           "value": "local-activity",
         },
         {
+          "description": "events.category.signal-tooltip",
           "label": "events.category.signal",
-          "tooltip": "events.category.signal-tooltip",
           "value": "signal",
         },
         {
+          "description": "events.category.timer-tooltip",
           "label": "events.category.timer",
-          "tooltip": "events.category.timer-tooltip",
           "value": "timer",
         },
         {
+          "description": "events.category.update-tooltip",
           "label": "events.category.update",
-          "tooltip": "events.category.update-tooltip",
           "value": "update",
         },
         {
+          "description": "events.category.nexus-tooltip",
           "label": "events.category.nexus",
-          "tooltip": "events.category.nexus-tooltip",
           "value": "nexus",
         },
         {
+          "description": "events.category.workflow-tooltip",
           "label": "events.category.workflow",
-          "tooltip": "events.category.workflow-tooltip",
           "value": "workflow",
         },
         {
+          "description": "events.category.other-tooltip",
           "label": "events.category.other",
-          "tooltip": "events.category.other-tooltip",
           "value": "other",
         },
       ]
@@ -133,43 +133,43 @@ describe('Event Category Data Structures', () => {
     expect(compactEventTypeOptions).toMatchInlineSnapshot(`
       [
         {
+          "description": "events.category.activity-tooltip",
           "label": "events.category.activity",
-          "tooltip": "events.category.activity-tooltip",
           "value": "activity",
         },
         {
+          "description": "events.category.child-workflow-tooltip",
           "label": "events.category.child-workflow",
-          "tooltip": "events.category.child-workflow-tooltip",
           "value": "child-workflow",
         },
         {
+          "description": "events.category.local-activity-tooltip",
           "label": "events.category.local-activity",
-          "tooltip": "events.category.local-activity-tooltip",
           "value": "local-activity",
         },
         {
+          "description": "events.category.signal-tooltip",
           "label": "events.category.signal",
-          "tooltip": "events.category.signal-tooltip",
           "value": "signal",
         },
         {
+          "description": "events.category.timer-tooltip",
           "label": "events.category.timer",
-          "tooltip": "events.category.timer-tooltip",
           "value": "timer",
         },
         {
+          "description": "events.category.update-tooltip",
           "label": "events.category.update",
-          "tooltip": "events.category.update-tooltip",
           "value": "update",
         },
         {
+          "description": "events.category.nexus-tooltip",
           "label": "events.category.nexus",
-          "tooltip": "events.category.nexus-tooltip",
           "value": "nexus",
         },
         {
+          "description": "events.category.other-tooltip",
           "label": "events.category.other",
-          "tooltip": "events.category.other-tooltip",
           "value": "other",
         },
       ]

@@ -21,6 +21,11 @@ export const hideWorkflowQueryErrors = derived(
   ([$page]) => $page.data?.settings?.hideWorkflowQueryErrors,
 );
 
+export const disableWorkflowCountsRefresh = derived(
+  [page],
+  ([$page]) => $page.data?.settings?.refreshWorkflowCountsDisabled,
+);
+
 export const canFetchChildWorkflows = derived(
   [isCloud, temporalVersion],
   ([$isCloud, $temporalVersion]) => {

@@ -20,7 +20,7 @@
   };
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-1">
   <Label for="schedule-input" label={translate('workflows.input')} />
   <PayloadDecoder
     value={payloads}

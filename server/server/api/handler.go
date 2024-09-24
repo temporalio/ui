@@ -56,22 +56,23 @@ type CodecResponse struct {
 }
 
 type SettingsResponse struct {
-	Auth                        *Auth
-	BannerText                  string
-	DefaultNamespace            string
-	ShowTemporalSystemNamespace bool
-	FeedbackURL                 string
-	NotifyOnNewVersion          bool
-	Codec                       *CodecResponse
-	Version                     string
-	DisableWriteActions         bool
-	WorkflowTerminateDisabled   bool
-	WorkflowCancelDisabled      bool
-	WorkflowSignalDisabled      bool
-	WorkflowResetDisabled       bool
-	BatchActionsDisabled        bool
-	StartWorkflowDisabled       bool
-	HideWorkflowQueryErrors     bool
+	Auth                          *Auth
+	BannerText                    string
+	DefaultNamespace              string
+	ShowTemporalSystemNamespace   bool
+	FeedbackURL                   string
+	NotifyOnNewVersion            bool
+	Codec                         *CodecResponse
+	Version                       string
+	DisableWriteActions           bool
+	WorkflowTerminateDisabled     bool
+	WorkflowCancelDisabled        bool
+	WorkflowSignalDisabled        bool
+	WorkflowResetDisabled         bool
+	BatchActionsDisabled          bool
+	StartWorkflowDisabled         bool
+	HideWorkflowQueryErrors       bool
+	RefreshWorkflowCountsDisabled bool
 }
 
 func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware, conn *grpc.ClientConn) echo.HandlerFunc {
@@ -136,15 +137,16 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 				PassAccessToken:    cfg.Codec.PassAccessToken,
 				IncludeCredentials: cfg.Codec.IncludeCredentials,
 			},
-			Version:                   version.UIVersion,
-			DisableWriteActions:       cfg.DisableWriteActions,
-			WorkflowTerminateDisabled: cfg.WorkflowTerminateDisabled,
-			WorkflowCancelDisabled:    cfg.WorkflowCancelDisabled,
-			WorkflowSignalDisabled:    cfg.WorkflowSignalDisabled,
-			WorkflowResetDisabled:     cfg.WorkflowResetDisabled,
-			BatchActionsDisabled:      cfg.BatchActionsDisabled,
-			StartWorkflowDisabled:     cfg.StartWorkflowDisabled,
-			HideWorkflowQueryErrors:   cfg.HideWorkflowQueryErrors,
+			Version:                       version.UIVersion,
+			DisableWriteActions:           cfg.DisableWriteActions,
+			WorkflowTerminateDisabled:     cfg.WorkflowTerminateDisabled,
+			WorkflowCancelDisabled:        cfg.WorkflowCancelDisabled,
+			WorkflowSignalDisabled:        cfg.WorkflowSignalDisabled,
+			WorkflowResetDisabled:         cfg.WorkflowResetDisabled,
+			BatchActionsDisabled:          cfg.BatchActionsDisabled,
+			StartWorkflowDisabled:         cfg.StartWorkflowDisabled,
+			HideWorkflowQueryErrors:       cfg.HideWorkflowQueryErrors,
+			RefreshWorkflowCountsDisabled: cfg.RefreshWorkflowCountsDisabled,
 		}
 
 		return c.JSON(http.StatusOK, settings)
