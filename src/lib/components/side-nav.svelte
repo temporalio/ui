@@ -23,6 +23,7 @@
         tooltip={item?.tooltip || item.label}
         external={item?.external}
         animate={item?.animate}
+        isActive={item.isActive}
       />
     {/if}
   {/each}

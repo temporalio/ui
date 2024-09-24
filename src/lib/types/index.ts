@@ -213,6 +213,9 @@ export type BatchTerminateOperation =
 export type Endpoint = temporal.api.nexus.v1.IEndpoint;
 export type EndpointSpec = temporal.api.nexus.v1.IEndpointSpec;
 
+// api.failure
+export type Failure = temporal.api.failure.v1.IFailure;
+
 // google
 
 export type Timestamp = google.protobuf.ITimestamp;
@@ -235,6 +238,7 @@ export type SettingsResponse = {
   BatchActionsDisabled: boolean;
   StartWorkflowDisabled: boolean;
   HideWorkflowQueryErrors: boolean;
+  RefreshWorkflowCountsDisabled: boolean;
   ShowTemporalSystemNamespace: boolean;
   NotifyOnNewVersion: boolean;
   FeedbackURL: string;
