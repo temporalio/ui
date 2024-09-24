@@ -53,13 +53,6 @@
 
   const onOptionClick = ({ value }) => {
     clearActiveEvents();
-    if (value === 'none') {
-      $eventTypeFilter = [];
-      return;
-    } else if (value === 'all') {
-      $eventTypeFilter = defaultOptions;
-      return;
-    }
     $eventTypeFilter = $eventTypeFilter.some((type) => type === value)
       ? $eventTypeFilter.filter((type) => type !== value)
       : [...$eventTypeFilter, value];
