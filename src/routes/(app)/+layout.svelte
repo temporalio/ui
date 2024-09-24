@@ -69,13 +69,13 @@
         href: workflowsRoute,
         icon: 'workflow',
         label: translate('common.workflows'),
-        isActive: (path) => Boolean(path.includes(workflowsRoute)),
+        isActive: (path) => path.includes(workflowsRoute),
       },
       {
         href: schedulesRoute,
         icon: 'schedules',
         label: translate('common.schedules'),
-        isActive: (path) => Boolean(path.includes(schedulesRoute)),
+        isActive: (path) => path.includes(schedulesRoute),
       },
       {
         href: batchOperationsRoute,
@@ -83,13 +83,13 @@
         label: translate('batch.nav-title'),
         tooltip: translate('batch.list-page-title'),
         animate: inProgressBatch,
-        isActive: (path) => Boolean(path.includes(batchOperationsRoute)),
+        isActive: (path) => path.includes(batchOperationsRoute),
       },
       {
         href: archivalRoute,
         icon: 'archives',
         label: translate('common.archive'),
-        isActive: (path) => Boolean(path.includes(archivalRoute)),
+        isActive: (path) => path.includes(archivalRoute),
       },
       {
         href: namespacesRoute,
@@ -97,26 +97,24 @@
         label: translate('common.namespaces'),
         divider: true,
         isActive: (path) =>
-          Boolean(
-            path.includes(namespacesRoute) &&
-              !path.includes(workflowsRoute) &&
-              !path.includes(schedulesRoute) &&
-              !path.includes(batchOperationsRoute) &&
-              !path.includes(archivalRoute),
-          ),
+          path.includes(namespacesRoute) &&
+          !path.includes(workflowsRoute) &&
+          !path.includes(schedulesRoute) &&
+          !path.includes(batchOperationsRoute) &&
+          !path.includes(archivalRoute),
       },
       {
         href: nexusRoute,
         icon: 'nexus',
         label: translate('nexus.nexus'),
         hidden: !$page.data?.systemInfo?.capabilities?.nexus,
-        isActive: (path) => Boolean(path.includes(nexusRoute)),
+        isActive: (path) => path.includes(nexusRoute),
       },
       {
         href: historyImportRoute,
         icon: 'import',
         label: translate('common.import'),
-        isActive: (path) => Boolean(path.includes(historyImportRoute)),
+        isActive: (path) => path.includes(historyImportRoute),
       },
       {
         href: 'http://docs.temporal.io',
