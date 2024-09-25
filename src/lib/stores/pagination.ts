@@ -158,8 +158,17 @@ export const pagination = <T>(
   items: Readonly<T[]> = [],
   perPage: number | string = defaultItemsPerPage,
   startingIndex: string | number = 0,
+  hash: string = '',
 ): PaginationStore<T> => {
   perPage = perPageFromSearchParameter(perPage);
+
+  const hashId = hash?.slice(1);
+  if (hashId) {
+    const itemIndex = items.findIndex((item) => item.id === hashId);
+    if (itemIndex !== -1) {
+      startingIndex = itemIndex;
+    }
+  }
 
   const start = getNearestStartingIndex(
     toNumber(startingIndex),

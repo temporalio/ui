@@ -124,6 +124,9 @@
   class:terminated
   class:typedError
   data-testid="event-summary-row"
+  data-eventids={isEventGroup(event)
+    ? Array.from(event.events.keys())
+    : event.id}
   on:click|stopPropagation={onLinkClick}
 >
   {#if !compact}
