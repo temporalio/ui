@@ -164,7 +164,7 @@ export const pagination = <T>(
 
   const hashId = hash?.slice(1);
   if (hashId) {
-    const itemIndex = items.findIndex((item) => item.id === hashId);
+    const itemIndex = items.findIndex((item: unknown) => item?.id === hashId);
     if (itemIndex !== -1) {
       startingIndex = itemIndex;
     }

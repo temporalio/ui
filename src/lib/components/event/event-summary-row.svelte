@@ -46,6 +46,8 @@
   export let active = false;
   export let onRowClick: () => void = noop;
 
+  let row;
+
   $: selectedId = isEventGroup(event)
     ? Array.from(event.events.keys()).pop()
     : event.id;
@@ -57,6 +59,7 @@
     workflow,
     run,
   });
+
   $: expanded = expandAll;
   $: attributes = formatAttributes(event);
 
@@ -112,9 +115,25 @@
     isEventGroup(event) &&
     !event.isPending &&
     event.eventList.find(isActivityTaskStartedEvent)?.attributes?.attempt;
+
+  const scrollToId = (hash: string) => {
+    if (hash) {
+      const id = hash.slice(1);
+      const isHashRow = compact ? group?.eventIds.has(id) : event?.id === id;
+      if (isHashRow) {
+        expanded = true;
+        setTimeout(() => {
+          row.scrollIntoView({ behavior: 'smooth' });
+        }, 500);
+      }
+    }
+  };
+
+  $: scrollToId($page.url.hash);
 </script>
 
 <tr
+  bind:this={row}
   class="row dense"
   id={`${event.id}-${index}`}
   class:expanded={expanded && !expandAll}

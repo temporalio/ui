@@ -83,7 +83,7 @@
   };
 
   $: {
-    if (currentPageParam) store.jumpToPage(currentPageParam);
+    if (currentPageParam && !hash) store.jumpToPage(currentPageParam);
     if (perPageParam) store.adjustPageSize(perPageParam);
   }
 </script>
