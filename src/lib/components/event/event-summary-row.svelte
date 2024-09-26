@@ -180,7 +180,7 @@
           </div>
         {/if}
         {#if currentEvent?.links?.length}
-          <EventLink link={currentEvent.links[0]} />
+          <EventLink link={currentEvent.links[0]} xs />
         {/if}
         {#if primaryAttribute?.key}
           <EventDetailsRow

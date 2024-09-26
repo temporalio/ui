@@ -1,16 +1,23 @@
 <script lang="ts">
   import Alert from '$lib/holocene/alert.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fullEventHistory } from '$lib/stores/events';
   import { timeFormat } from '$lib/stores/time-format';
   import type { CallbackInfo } from '$lib/types';
   import { formatDate } from '$lib/utilities/format-date';
+
+  import EventLink from '../event/event-link.svelte';
 
   export let callback: CallbackInfo;
 
   $: completedTime = formatDate(callback.lastAttemptCompleteTime, $timeFormat);
   $: nextTime = formatDate(callback.nextAttemptScheduleTime, $timeFormat);
   $: failure = callback?.lastAttemptFailure?.message;
+
+  $: initialEvent = $fullEventHistory[0];
+  $: link = initialEvent?.links[0];
 
   const titles = {
     Standby: translate('nexus.callback.standby'),
@@ -25,32 +32,42 @@
 
 <Alert icon="nexus" intent="info" {title}>
   <div class="flex flex-col gap-2 pt-2">
-    <div class="flex items-center gap-2">
-      <p>
-        {translate('common.url')}
-        <span class="badge">{callback.callback.nexus.url}</span>
-      </p>
-    </div>
+    {#if link}
+      <EventLink {link} />
+    {/if}
+    <p class="flex items-center gap-2">
+      {translate('common.url')}
+      <Badge type="subtle">
+        {callback.callback.nexus.url}
+      </Badge>
+    </p>
     <div class="flex flex-col items-start gap-2 md:flex-row md:items-center">
-      <p>
-        {translate('common.state')} <span class="badge">{callback.state}</span>
+      <p class="flex items-center gap-2">
+        {translate('common.state')}
+        <Badge type="subtle">{callback.state}</Badge>
       </p>
       {#if callback.attempt}
-        <p>
+        <p class="flex items-center gap-2">
           {translate('common.attempt')}
-          <span class="badge">{callback.attempt}</span>
+          <Badge type="subtle">
+            {callback.attempt}
+          </Badge>
         </p>
       {/if}
       {#if callback.lastAttemptCompleteTime}
-        <p>
+        <p class="flex items-center gap-2">
           {translate('nexus.last-attempt-completed-time')}
-          <span class="badge">{completedTime}</span>
+          <Badge type="subtle">
+            {completedTime}
+          </Badge>
         </p>
       {/if}
       {#if callback.nextAttemptScheduleTime}
-        <p>
+        <p class="flex items-center gap-2">
           {translate('nexus.next-attempt-scheduled-time')}
-          <span class="badge">{nextTime}</span>
+          <Badge type="subtle">
+            {nextTime}
+          </Badge>
         </p>
       {/if}
     </div>
