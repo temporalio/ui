@@ -349,7 +349,11 @@
     {#if leadingIcon}
       <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
-    <div class="flex w-full flex-wrap items-center gap-2 py-1">
+    <div
+      class="flex w-full flex-wrap items-center"
+      class:gap-2={multiselect}
+      class:py-1={multiselect}
+    >
       {#if multiselect && isArrayValue(value) && value.length > 0}
         {#if displayChips}
           {#each value.slice(0, chipLimit) as v}
@@ -418,7 +422,7 @@
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
     </Button>
     {#if $$slots.action}
-      <div class="ml-1 flex h-full items-center border-l-2 border-subtle p-0.5">
+      <div class="ml-1 flex h-full items-center border-l-2 border-subtle p-1">
         <slot name="action" />
       </div>
     {/if}
