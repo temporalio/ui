@@ -349,11 +349,7 @@
     {#if leadingIcon}
       <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
-    <div
-      class="flex w-full flex-wrap items-center"
-      class:gap-2={multiselect}
-      class:py-1={multiselect}
-    >
+    <div class="input-wrapper" class:multiselect>
       {#if multiselect && isArrayValue(value) && value.length > 0}
         {#if displayChips}
           {#each value.slice(0, chipLimit) as v}
@@ -469,7 +465,7 @@
 
 <style lang="postcss">
   .combobox-wrapper {
-    @apply surface-primary flex w-full flex-row items-center gap-2 rounded-lg border-2 border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply surface-primary flex w-full flex-row items-center rounded-lg border-2 border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     &.invalid {
       @apply border-2 border-danger text-danger focus-within:ring-danger/70;
@@ -482,6 +478,14 @@
 
   .error {
     @apply text-xs text-danger;
+  }
+
+  .input-wrapper {
+    @apply ml-2 flex w-full flex-wrap items-center;
+
+    &.multiselect {
+      @apply gap-1 py-1;
+    }
   }
 
   .combobox-input {
