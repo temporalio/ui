@@ -1,121 +1,71 @@
 import plugin from 'tailwindcss/plugin';
 
-import colors, { getColor } from './colors';
-import { css, rgb } from './utilities';
+import { colors } from './colors';
+import { css } from './utilities';
+import { dark, light } from './variables';
 
-export const variables = {
-  '--color-primary': rgb(colors.primary),
-  '--color-secondary': rgb(colors.secondary),
-  '--color-inverse': rgb(colors.black),
-  '--color-subtle': rgb(getColor('slate', 950)),
-  '--color-brand': rgb(getColor('indigo', 800)),
-  '--color-interactive': rgb(getColor('indigo', 600)),
-  '--color-interactive-hover': rgb(getColor('indigo', 700)),
-  '--color-warning': rgb(getColor('yellow', 100)),
-
-  '--color-text-black': rgb(colors.black),
-
-  '--color-text-primary': rgb(colors.primary),
-  '--color-text-secondary': rgb(colors.secondary),
-  '--color-text-inverse': rgb(colors.offWhite),
-  '--color-text-subtle': rgb(getColor('slate', 300)),
-  '--color-text-disabled': rgb(getColor('slate', 500)),
-  '--color-text-error': rgb(getColor('red', 700)),
-  '--color-text-information': rgb(getColor('blue', 700)),
-  '--color-text-success': rgb(getColor('green', 700)),
-  '--color-text-warning': rgb(getColor('yellow', 500)),
-  '--color-text-active': rgb(getColor('indigo', 600)),
-
-  '--color-surface-primary': rgb(colors.white),
-  '--color-surface-secondary': rgb(colors.offWhite),
-  '--color-surface-interactive': rgb(getColor('indigo', 600)),
-  '--color-surface-interactive-secondary': rgb(getColor('slate', 100)),
-  '--color-surface-secondary-active': rgb(getColor('slate', 200)),
-  '--color-surface-disabled': rgb(getColor('slate', 50)),
-  '--color-surface-inverse': rgb(colors.primary),
-  '--color-surface-subtle': rgb(getColor('slate', 100)),
-  '--color-surface-table': rgb(colors.black),
-  '--color-surface-badge': rgb(getColor('slate', 100)),
-  '--color-surface-error': rgb(getColor('red', 50)),
-  '--color-surface-information': rgb(getColor('blue', 50)),
-  '--color-surface-success': rgb(getColor('green', 50)),
-  '--color-surface-warning': rgb(getColor('yellow', 100)),
-  '--color-surface-danger': rgb(getColor('red', 300)),
-
-  '--color-border-primary': rgb(colors.black),
-  '--color-border-secondary': rgb(getColor('slate', 200)),
-  '--color-border-subtle': rgb(getColor('slate', 300)),
-  '--color-border-table': rgb(colors.black),
-  '--color-border-inverse': rgb(colors.offWhite),
-  '--color-border-disabled': rgb(getColor('slate', 300)),
-  '--color-border-error': rgb(getColor('red', 500)),
-  '--color-border-information': rgb(getColor('blue', 800)),
-  '--color-border-success': rgb(getColor('green', 800)),
-  '--color-border-warning': rgb(getColor('yellow', 400)),
-  '--color-border-danger': rgb(getColor('red', 300)),
-  '--color-border-interactive': rgb(getColor('indigo', 600)),
-  '--color-border-interactive-secondary': rgb(getColor('slate', 100)),
-
-  '--color-shadow-primary': rgb(getColor('indigo', 600)),
-  '--color-shadow-secondary': rgb(getColor('indigo', 500)),
-  '--color-shadow-danger': rgb(getColor('red', 200)),
-} as const satisfies Variables;
-
-const dark: Partial<Variables<keyof typeof variables>> = {
-  '--color-primary': rgb(colors.offWhite),
-  '--color-secondary': rgb(colors.offBlack),
-  '--color-inverse': rgb(colors.primary),
-  '--color-brand': rgb(getColor('indigo', 500)),
-  '--color-warning': rgb(getColor('yellow', 950)),
-
-  '--color-text-primary': rgb(colors.offWhite),
-  '--color-text-secondary': rgb(getColor('slate', 200)),
-  '--color-text-subtle': rgb(getColor('slate', 200)),
-  '--color-text-disabled': rgb(getColor('slate', 100)),
-  '--color-text-information': rgb(getColor('blue', 300)),
-  '--color-text-warning': rgb(getColor('yellow', 300)),
-  '--color-text-error': rgb(getColor('red', 100)),
-  '--color-text-success': rgb(getColor('green', 100)),
-  '--color-text-active': rgb(getColor('indigo', 500)),
-
-  '--color-surface-primary': rgb(colors.black),
-  '--color-surface-secondary': rgb(colors.offBlack),
-  '--color-surface-interactive-secondary': rgb(getColor('slate', 800)),
-  '--color-surface-secondary-active': rgb(getColor('slate', 700)),
-  '--color-surface-subtle': rgb(getColor('slate', 900)),
-  '--color-surface-table': rgb(getColor('slate', 900)),
-  '--color-surface-badge': rgb(getColor('slate', 700)),
-  '--color-surface-information': rgb(getColor('indigo', 950)),
-  '--color-surface-warning': rgb(getColor('yellow', 950)),
-  '--color-surface-danger': rgb(getColor('red', 300)),
-  '--color-surface-error': rgb(getColor('red', 950)),
-  '--color-surface-success': rgb(getColor('green', 950)),
-
-  '--color-border-primary': rgb(colors.offWhite),
-  '--color-border-secondary': rgb(getColor('slate', 600)),
-  '--color-border-subtle': rgb(getColor('slate', 800)),
-  '--color-border-table': rgb(getColor('slate', 900)),
-  '--color-border-inverse': rgb(colors.black),
-  '--color-border-disabled': rgb(getColor('slate', 100)),
-  '--color-border-information': rgb(getColor('blue', 700)),
-  '--color-border-interactive': rgb(getColor('indigo', 600)),
-  '--color-border-warning': rgb(getColor('yellow', 700)),
-  '--color-border-danger': rgb(getColor('red', 300)),
-  '--color-border-error': rgb(getColor('red', 700)),
-  '--color-border-success': rgb(getColor('green', 700)),
-  '--color-border-interactive-secondary': rgb(getColor('slate', 800)),
-
-  '--color-shadow-danger': rgb(getColor('red', 600)),
-} as const;
+const textStyles = plugin(({ addBase, theme }) => {
+  addBase({
+    h1: {
+      fontSize: theme('fontSize.3xl'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    h2: {
+      fontSize: theme('fontSize.2xl'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    h3: {
+      fontSize: theme('fontSize.xl'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    h4: {
+      fontSize: theme('fontSize.lg'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    h5: {
+      fontSize: theme('fontSize.base'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    h6: {
+      fontSize: theme('fontSize.sm'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    '.body-normal': {
+      fontSize: theme('fontSize.sm'),
+      fontWeight: theme('fontWeight.normal'),
+    },
+    '.body-medium': {
+      fontSize: theme('fontSize.sm'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    '.body-small': {
+      fontSize: theme('fontSize.xs'),
+      fontWeight: theme('fontWeight.normal'),
+    },
+    '.body-small-medium': {
+      fontSize: theme('fontSize.xs'),
+      fontWeight: theme('fontWeight.medium'),
+    },
+    '.body-small-mono': {
+      fontFamily: theme('fontFamily.mono'),
+      fontSize: theme('fontSize.xs'),
+      fontWeight: theme('fontWeight.normal'),
+    },
+  });
+});
 
 const temporal = plugin(
   ({ addComponents, addBase }) => {
     addBase({
-      ':root': variables,
-      ':is(body.dark *)': dark,
+      ':root': light,
+      '[data-theme="dark"]': dark,
     });
 
     addComponents({
+      '.surface-background': {
+        backgroundColor: css('--color-surface-background'),
+        color: css('--color-text-primary'),
+      },
       '.surface-primary': {
         backgroundColor: css('--color-surface-primary'),
         color: css('--color-text-primary'),
@@ -124,17 +74,57 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-secondary'),
         color: css('--color-text-primary'),
       },
-      '.surface-secondary-active': {
-        backgroundColor: css('--color-surface-secondary-active'),
-        color: css('--color-text-primary'),
-      },
       '.surface-interactive': {
-        backgroundColor: css('--color-surface-interactive'),
+        backgroundColor: css('--color-interactive-surface'),
         color: css('--color-text-primary'),
+        '&:focus-visible': {
+          backgroundColor: css('--color-interactive-hover'),
+        },
+        '&:hover': {
+          backgroundColor: css('--color-interactive-hover'),
+        },
+        '&:active': {
+          backgroundColor: css('--color-interactive-active'),
+        },
       },
       '.surface-interactive-secondary': {
-        backgroundColor: css('--color-surface-interactive-secondary'),
+        backgroundColor: css('--color-interactive-secondary-surface'),
         color: css('--color-text-primary'),
+        '&:focus-visible': {
+          backgroundColor: css('--color-interactive-secondary-hover'),
+        },
+        '&:hover': {
+          backgroundColor: css('--color-interactive-secondary-hover'),
+        },
+        '&:active': {
+          backgroundColor: css('--color-interactive-secondary-active'),
+        },
+      },
+      '.surface-interactive-danger': {
+        backgroundColor: css('--color-interactive-danger-surface'),
+        color: css('--color-text-black'),
+        '&:focus-visible': {
+          backgroundColor: css('--color-interactive-danger-hover'),
+        },
+        '&:hover': {
+          backgroundColor: css('--color-interactive-danger-hover'),
+        },
+        '&:active': {
+          backgroundColor: css('--color-interactive-danger-active'),
+        },
+      },
+      '.surface-interactive-ghost': {
+        backgroundColor: css('--color-surface-primary'),
+        color: css('--color-text-primary'),
+        '&:focus-visible': {
+          backgroundColor: css('--color-interactive-ghost-hover'),
+        },
+        '&:hover': {
+          backgroundColor: css('--color-interactive-ghost-hover'),
+        },
+        '&:active': {
+          backgroundColor: css('--color-interactive-ghost-active'),
+        },
       },
       '.surface-inverse': {
         backgroundColor: css('--color-surface-inverse'),
@@ -152,9 +142,13 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-subtle'),
         color: css('--color-text-black'),
       },
-      '.surface-disabled': {
-        backgroundColor: css('--color-surface-secondary'),
-        color: css('--color-text-disabled'),
+      '.surface-danger': {
+        backgroundColor: css('--color-surface-danger'),
+        color: css('--color-text-primary'),
+      },
+      '.surface-black': {
+        backgroundColor: css('--color-surface-black'),
+        color: css('--color-text-white'),
       },
     });
   },
@@ -162,23 +156,34 @@ const temporal = plugin(
     theme: {
       colors: {
         ...colors,
-        brand: css('--color-brand'),
+        brand: css('--color-surface-brand'),
       },
       backgroundColor: ({ theme }) => ({
         ...theme('colors'),
-        primary: css('--color-primary'),
-        secondary: css('--color-secondary'),
-        inverse: css('--color-inverse'),
-        subtle: css('--color-subtle'),
-        badge: css('--color-surface-badge'),
-        interactive: css('--color-interactive'),
-        'interactive-hover': css('--color-interactive-hover'),
 
-        error: css('--color-surface-error'),
+        primary: css('--color-surface-primary'),
+        secondary: css('--color-surface-secondary'),
+        inverse: css('--color-surface-inverse'),
+        subtle: css('--color-surface-subtle'),
+
+        interactive: css('--color-interactive-surface'),
+        'interactive-hover': css('--color-interactive-hover'),
+        'interactive-active': css('--color-interactive-active'),
+        'interactive-error': css('--color-interactive-danger-surface'),
+
+        'interactive-secondary-hover': css(
+          '--color-interactive-secondary-hover',
+        ),
+        'interactive-secondary-active': css(
+          '--color-interactive-secondary-active',
+        ),
+        'interactive-table-hover': css('--color-interactive-table-hover'),
+
         information: css('--color-surface-information'),
         success: css('--color-surface-success'),
         warning: css('--color-surface-warning'),
         danger: css('--color-surface-danger'),
+
         DEFAULT: css('--color-surface-primary'),
       }),
       borderColor: ({ theme }) => ({
@@ -186,13 +191,10 @@ const temporal = plugin(
         primary: css('--color-border-primary'),
         secondary: css('--color-border-secondary'),
         subtle: css('--color-border-subtle'),
-        interactive: css('--color-interactive'),
+        interactive: css('--color-interactive-surface'),
         'interactive-hover': css('--color-interactive-hover'),
-        'interactive-secondary': css('--color-border-interactive-secondary'),
         inverse: css('--color-border-inverse'),
-        disabled: css('--color-border-disabled'),
         table: css('--color-border-table'),
-        error: css('--color-border-error'),
         information: css('--color-border-information'),
         success: css('--color-border-success'),
         warning: css('--color-border-warning'),
@@ -200,21 +202,30 @@ const temporal = plugin(
 
         DEFAULT: css('--color-border-primary'),
       }),
+      ringColor: {
+        primary: css('--color-border-focus-info'),
+        danger: css('--color-border-focus-danger'),
+        success: css('--color-surface-success-loud'),
+      },
       textColor: ({ theme }) => ({
         ...theme('colors'),
         primary: css('--color-text-primary'),
         secondary: css('--color-text-secondary'),
-        disabled: css('--color-text-disabled'),
         subtle: css('--color-text-subtle'),
         inverse: css('--color-text-inverse'),
+        brand: css('--color-text-brand'),
 
-        error: css('--color-text-error'),
+        danger: css('--color-text-danger'),
         information: css('--color-text-information'),
         success: css('--color-text-success'),
         warning: css('--color-text-warning'),
-        active: css('--color-text-active'),
 
         DEFAULT: css('--color-text-primary'),
+      }),
+      caretColor: ({ theme }) => ({
+        ...theme('colors'),
+
+        danger: css('--color-text-danger'),
       }),
       extend: {
         transitionProperty: {
@@ -224,21 +235,9 @@ const temporal = plugin(
           right: 'right',
         },
       },
-      outlineColor: ({ theme }) => ({
-        ...theme('colors'),
-
-        interactive: css('--color-interactive'),
-      }),
-      boxShadowColor: ({ theme }) => ({
-        ...theme('colors'),
-
-        primary: css('--color-shadow-primary'),
-        secondary: css('--color-shadow-secondary'),
-        danger: css('--color-shadow-danger'),
-      }),
     },
   },
 );
 
 export default temporal;
-export { colors };
+export { colors, textStyles };

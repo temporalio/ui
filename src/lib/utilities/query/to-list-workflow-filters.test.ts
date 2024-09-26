@@ -8,29 +8,31 @@ import {
   toListWorkflowFilters,
 } from './to-list-workflow-filters';
 
-const executionStatusQuery = 'ExecutionStatus="Completed"';
+const executionStatusQuery = '`ExecutionStatus`="Completed"';
 const multipleExecutionStatusQuery =
-  '(ExecutionStatus="Canceled" OR ExecutionStatus="Failed" OR ExecutionStatus="Completed")';
+  '(`ExecutionStatus`="Canceled" OR `ExecutionStatus`="Failed" OR `ExecutionStatus`="Completed")';
 
-const workflowIdQuery = 'WorkflowId="Hello world"';
-const workflowTypeQuery = 'WorkflowType="World"';
-const workflowQuery1 = 'WorkflowId="Hello world" AND WorkflowType="World"';
-const startTimeQuery = 'StartTime > "2022-04-18T17:45:18-06:00"';
-const closeTimeQuery = 'CloseTime > "2022-04-18T17:45:18-06:00"';
-const booleanQuery = 'CustomBoolField=true';
+const workflowIdQuery = '`WorkflowId`="Hello world"';
+const workflowTypeQuery = '`WorkflowType`="World"';
+const workflowQuery1 = '`WorkflowId`="Hello world" AND `WorkflowType`="World"';
+const startTimeQuery = '`StartTime` > "2022-04-18T17:45:18-06:00"';
+const closeTimeQuery = '`CloseTime` > "2022-04-18T17:45:18-06:00"';
+const booleanQuery = '`CustomBoolField`=true';
 const betweenTimeQuery =
-  'StartTime BETWEEN "2023-07-28T00:00:00-00:00" AND "2023-07-28T06:00:00-00:00"';
+  '`StartTime` BETWEEN "2023-07-28T00:00:00-00:00" AND "2023-07-28T06:00:00-00:00"';
 const workflowQuery2 =
-  'WorkflowType="World" AND StartTime > "2022-04-18T17:45:18-06:00"';
+  '`WorkflowType`="World" AND `StartTime` > "2022-04-18T17:45:18-06:00"';
 const workflowQuery3 =
-  'WorkflowType="World" AND StartTime > "2022-04-18T17:45:18-06:00" AND ExecutionStatus="Canceled"';
+  '`WorkflowType`="World" AND `StartTime` > "2022-04-18T17:45:18-06:00" AND `ExecutionStatus`="Canceled"';
 const workflowQuery4 =
-  '(ExecutionStatus="Canceled" OR ExecutionStatus="Failed" OR ExecutionStatus="Completed") AND WorkflowType="World" AND StartTime > "2022-04-18T17:45:18-06:00"';
+  '(`ExecutionStatus`="Canceled" OR `ExecutionStatus`="Failed" OR `ExecutionStatus`="Completed") AND WorkflowType="World" AND StartTime > "2022-04-18T17:45:18-06:00"';
 const customAttributesWithSpacesQuery =
   '`Custom Bool Field`=true AND `Custom Keyword Field`="Hello world"';
 const workflowQueryWithSpaces =
-  'WorkflowId="One and Two" AND `Custom Keyword Field`="Hello = world"';
-const prefixQuery = 'WorkflowType STARTS_WITH "hello"';
+  '`WorkflowId`="One and Two" AND `Custom Keyword Field`="Hello = world"';
+const prefixQuery = '`WorkflowType` STARTS_WITH "hello"';
+const isEmptyQuery = '`WorkflowType` is null';
+const isNotEmptyQuery = '`StartTime` IS NOT NULL';
 
 const attributes = {
   CloseTime: 'Datetime',
@@ -1080,5 +1082,61 @@ describe('combineFilters', () => {
         value: 'World',
       },
     ]);
+  });
+
+  it('should parse a query with IS NULL', () => {
+    const result = toListWorkflowFilters(isEmptyQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        conditional: 'is',
+        operator: '',
+        parenthesis: '',
+        value: 'null',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
+  it('should parse a query with IS NOT NULL', () => {
+    const result = toListWorkflowFilters(isNotEmptyQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'StartTime',
+        type: 'Datetime',
+        conditional: 'IS NOT',
+        operator: '',
+        parenthesis: '',
+        value: 'NULL',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
+  it('should parse a query with IS NULL and IS NOT NULL', () => {
+    const result = toListWorkflowFilters(
+      `${isEmptyQuery} AND ${isNotEmptyQuery}`,
+      attributes,
+    );
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        conditional: 'is',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'null',
+      },
+      {
+        attribute: 'StartTime',
+        type: 'Datetime',
+        conditional: 'IS NOT',
+        operator: '',
+        parenthesis: '',
+        value: 'NULL',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
   });
 });

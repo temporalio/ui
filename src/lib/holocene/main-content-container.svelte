@@ -48,17 +48,20 @@
 
 <div
   id="content-wrapper"
-  class="surface-secondary relative h-screen w-max flex-auto overflow-auto"
+  class="relative h-screen w-max flex-auto overflow-auto"
   on:scroll={handleOnScroll}
 >
   <slot />
-  <main id="content">
+  <main id="content" class="pb-16 md:pb-0">
     <slot name="main" />
   </main>
+  <slot name="footer" />
   <ScrollToContainer
     {scrollToTopHidden}
     {scrollToBottomHidden}
     {onScrollToTopClick}
     {onScrollToBottomClick}
+    scrollToTopAriaLabel="Scroll to top"
+    scrollToBottomAriaLabel="Scroll to bottom"
   />
 </div>

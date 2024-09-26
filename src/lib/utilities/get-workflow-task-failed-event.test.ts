@@ -31,6 +31,20 @@ describe('getWorkflowTaskFailedEvent', () => {
     timestamp: '2022-10-31 UTC 22:41:28.91',
   };
 
+  const completedEvent = {
+    eventId: '16',
+    eventTime: '2022-07-01T20:20:50.181498878Z',
+    eventType: 'WorkflowTaskCompleted',
+    version: '0',
+    taskId: '29875730',
+    workflowTaskCompletedEventAttributes: {
+      scheduledEventId: '9',
+      startedEventId: '10',
+      identity: '83579@MacBook-Pro-2.local@',
+      binaryChecksum: 'e56c0141e58df0bd405138565d0526f9',
+    },
+  };
+
   it('should get the correct error for a WorkflowTaskFailed event when events are in descending order', () => {
     const history = [failedEvent, ...runningEventHistory];
     const error = getWorkflowTaskFailedEvent(history, 'descending');
@@ -45,31 +59,6 @@ describe('getWorkflowTaskFailedEvent', () => {
 
   it('should get the last error for a workflow that has multiple WorkflowTaskFailed events', () => {
     const history = [
-      {
-        eventId: '12',
-        eventTime: '2022-07-01T20:28:52.916365546Z',
-        eventType: 'WorkflowTaskCompleted',
-        version: '0',
-        taskId: '29887669',
-        workflowTaskCompletedEventAttributes: {
-          scheduledEventId: '15',
-          startedEventId: '16',
-          identity: '83579@MacBook-Pro-2.local@',
-          binaryChecksum: 'e56c0141e58df0bd405138565d0526f9',
-        },
-        attributes: {
-          type: 'workflowTaskCompletedEventAttributes',
-          scheduledEventId: '15',
-          startedEventId: '16',
-          identity: '83579@MacBook-Pro-2.local@',
-          binaryChecksum: 'e56c0141e58df0bd405138565d0526f9',
-        },
-        classification: 'Completed',
-        category: 'workflow',
-        id: '12',
-        name: 'WorkflowTaskCompleted',
-        timestamp: '2022-07-01 UTC 20:28:52.91',
-      },
       {
         eventId: '11',
         eventTime: '2022-10-31T22:41:28.917920758Z',
@@ -154,5 +143,21 @@ describe('getWorkflowTaskFailedEvent', () => {
 
     error = getWorkflowTaskFailedEvent([...history].reverse(), 'ascending');
     expect(error).toMatchInlineSnapshot(expectedError);
+  });
+
+  it('should not return WorkflowTaskFailed event if CompletedWorkflowTask event occurs after WorkflowTaskFailed event when events are in descending order', () => {
+    const history = [completedEvent, failedEvent, ...runningEventHistory];
+    const error = getWorkflowTaskFailedEvent(history, 'descending');
+    expect(error).toBe(undefined);
+  });
+
+  it('should not return WorkflowTaskFailed event if CompletedWorkflowTask event occurs after WorkflowTaskFailed event when events are in ascending order', () => {
+    const history = [
+      completedEvent,
+      failedEvent,
+      ...runningEventHistory,
+    ].reverse();
+    const error = getWorkflowTaskFailedEvent(history, 'ascending');
+    expect(error).toBe(undefined);
   });
 });

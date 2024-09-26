@@ -36,7 +36,14 @@ describe('Event Category Data Structures', () => {
         "ChildWorkflowExecutionTimedOut": "child-workflow",
         "ExternalWorkflowExecutionCancelRequested": "workflow",
         "ExternalWorkflowExecutionSignaled": "signal",
-        "MarkerRecorded": "marker",
+        "MarkerRecorded": "other",
+        "NexusOperationCancelRequested": "nexus",
+        "NexusOperationCanceled": "nexus",
+        "NexusOperationCompleted": "nexus",
+        "NexusOperationFailed": "nexus",
+        "NexusOperationScheduled": "nexus",
+        "NexusOperationStarted": "nexus",
+        "NexusOperationTimedOut": "nexus",
         "RequestCancelExternalWorkflowExecutionFailed": "workflow",
         "RequestCancelExternalWorkflowExecutionInitiated": "workflow",
         "SignalExternalWorkflowExecutionFailed": "signal",
@@ -46,7 +53,7 @@ describe('Event Category Data Structures', () => {
         "TimerCanceled": "timer",
         "TimerFired": "timer",
         "TimerStarted": "timer",
-        "UpsertWorkflowSearchAttributes": "command",
+        "UpsertWorkflowSearchAttributes": "other",
         "WorkflowExecutionCancelRequested": "workflow",
         "WorkflowExecutionCanceled": "workflow",
         "WorkflowExecutionCompleted": "workflow",
@@ -60,6 +67,7 @@ describe('Event Category Data Structures', () => {
         "WorkflowExecutionUpdateCompleted": "update",
         "WorkflowExecutionUpdateRejected": "update",
         "WorkflowExecutionUpdateRequested": "update",
+        "WorkflowPropertiesModified": "other",
         "WorkflowTaskCompleted": "workflow",
         "WorkflowTaskFailed": "workflow",
         "WorkflowTaskScheduled": "workflow",
@@ -73,40 +81,49 @@ describe('Event Category Data Structures', () => {
     expect(allEventTypeOptions).toMatchInlineSnapshot(`
       [
         {
+          "description": "events.category.activity-tooltip",
           "label": "events.category.activity",
           "value": "activity",
         },
         {
+          "description": "events.category.child-workflow-tooltip",
           "label": "events.category.child-workflow",
           "value": "child-workflow",
         },
         {
-          "label": "events.category.command",
-          "value": "command",
-        },
-        {
+          "description": "events.category.local-activity-tooltip",
           "label": "events.category.local-activity",
           "value": "local-activity",
         },
         {
-          "label": "events.category.marker",
-          "value": "marker",
-        },
-        {
+          "description": "events.category.signal-tooltip",
           "label": "events.category.signal",
           "value": "signal",
         },
         {
+          "description": "events.category.timer-tooltip",
           "label": "events.category.timer",
           "value": "timer",
         },
         {
+          "description": "events.category.update-tooltip",
           "label": "events.category.update",
           "value": "update",
         },
         {
+          "description": "events.category.nexus-tooltip",
+          "label": "events.category.nexus",
+          "value": "nexus",
+        },
+        {
+          "description": "events.category.workflow-tooltip",
           "label": "events.category.workflow",
           "value": "workflow",
+        },
+        {
+          "description": "events.category.other-tooltip",
+          "label": "events.category.other",
+          "value": "other",
         },
       ]
     `);
@@ -116,32 +133,44 @@ describe('Event Category Data Structures', () => {
     expect(compactEventTypeOptions).toMatchInlineSnapshot(`
       [
         {
+          "description": "events.category.activity-tooltip",
           "label": "events.category.activity",
           "value": "activity",
         },
         {
+          "description": "events.category.child-workflow-tooltip",
           "label": "events.category.child-workflow",
           "value": "child-workflow",
         },
         {
+          "description": "events.category.local-activity-tooltip",
           "label": "events.category.local-activity",
           "value": "local-activity",
         },
         {
-          "label": "events.category.marker",
-          "value": "marker",
-        },
-        {
+          "description": "events.category.signal-tooltip",
           "label": "events.category.signal",
           "value": "signal",
         },
         {
+          "description": "events.category.timer-tooltip",
           "label": "events.category.timer",
           "value": "timer",
         },
         {
+          "description": "events.category.update-tooltip",
           "label": "events.category.update",
           "value": "update",
+        },
+        {
+          "description": "events.category.nexus-tooltip",
+          "label": "events.category.nexus",
+          "value": "nexus",
+        },
+        {
+          "description": "events.category.other-tooltip",
+          "label": "events.category.other",
+          "value": "other",
         },
       ]
     `);
@@ -173,8 +202,6 @@ const categories: Record<
     'StartChildWorkflowExecutionInitiated',
   ],
 
-  marker: ['MarkerRecorded'],
-
   signal: [
     'SignalExternalWorkflowExecutionFailed',
     'SignalExternalWorkflowExecutionInitiated',
@@ -203,11 +230,25 @@ const categories: Record<
     'RequestCancelExternalWorkflowExecutionInitiated',
   ],
 
-  command: ['UpsertWorkflowSearchAttributes'],
-
   update: [
     'WorkflowExecutionUpdateAccepted',
     'WorkflowExecutionUpdateCompleted',
+  ],
+
+  nexus: [
+    'NexusOperationScheduled',
+    'NexusOperationStarted',
+    'NexusOperationCompleted',
+    'NexusOperationFailed',
+    'NexusOperationCanceled',
+    'NexusOperationTimedOut',
+    'NexusOperationCancelRequested',
+  ],
+
+  other: [
+    'MarkerRecorded',
+    'UpsertWorkflowSearchAttributes',
+    'WorkflowPropertiesModified',
   ],
 };
 
@@ -219,6 +260,10 @@ describe('getEventCategory', () => {
       });
     }
   }
+});
+
+it('should return other for unknown eventType', () => {
+  expect(getEventCategory('crazyUnknownNewEvent' as EventType)).toBe('other');
 });
 
 describe('getEventsInCategory', () => {
@@ -234,14 +279,6 @@ describe('getEventsInCategory', () => {
     expect(getEventsInCategory(events, 'child-workflow')).toMatchSnapshot();
   });
 
-  it('should return the correct events for the command" category', () => {
-    expect(getEventsInCategory(events, 'command')).toMatchSnapshot();
-  });
-
-  it('should return the correct events for the marker" category', () => {
-    expect(getEventsInCategory(events, 'marker')).toMatchSnapshot();
-  });
-
   it('should return the correct events for the signal" category', () => {
     expect(getEventsInCategory(events, 'signal')).toMatchSnapshot();
   });
@@ -252,6 +289,10 @@ describe('getEventsInCategory', () => {
 
   it('should return the correct events for the workflow" category', () => {
     expect(getEventsInCategory(events, 'workflow')).toMatchSnapshot();
+  });
+
+  it('should return the correct events for the other" category', () => {
+    expect(getEventsInCategory(events, 'other')).toMatchSnapshot();
   });
 
   it('should return the original set of events if given an invalid category', () => {
@@ -280,8 +321,16 @@ describe('isCategoryType', () => {
     expect(isCategoryType('workflow')).toBeTruthy();
   });
 
-  it('should return true for "command"', () => {
-    expect(isCategoryType('command')).toBeTruthy();
+  it('should return true for "nexus"', () => {
+    expect(isCategoryType('nexus')).toBeTruthy();
+  });
+
+  it('should return true for "local-activity"', () => {
+    expect(isCategoryType('local-activity')).toBeTruthy();
+  });
+
+  it('should return true for "other"', () => {
+    expect(isCategoryType('other')).toBeTruthy();
   });
 
   it('should return false for "bogus"', () => {

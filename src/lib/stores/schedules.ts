@@ -4,6 +4,7 @@ import { goto } from '$app/navigation';
 
 import { translate } from '$lib/i18n/translate';
 import { createSchedule, editSchedule } from '$lib/services/schedule-service';
+import { setSearchAttributes } from '$lib/services/workflow-service';
 import type { Schedule } from '$lib/types';
 import type {
   DescribeFullSchedule,
@@ -80,8 +81,15 @@ export const submitCreateSchedule = async ({
   spec,
   presets,
 }: ScheduleParameterArgs): Promise<void> => {
-  const { namespace, name, workflowId, workflowType, taskQueue, input } =
-    action;
+  const {
+    namespace,
+    name,
+    workflowId,
+    workflowType,
+    taskQueue,
+    input,
+    searchAttributes,
+  } = action;
 
   let payloads;
 
@@ -96,6 +104,14 @@ export const submitCreateSchedule = async ({
 
   const body: DescribeFullSchedule = {
     schedule_id: name.trim(),
+    searchAttributes:
+      searchAttributes.length === 0
+        ? null
+        : {
+            indexedFields: {
+              ...setSearchAttributes(searchAttributes),
+            },
+          },
     schedule: {
       spec: {
         calendar: [],
@@ -140,10 +156,18 @@ export const submitEditSchedule = async (
   schedule: Schedule,
   scheduleId: string,
 ): Promise<void> => {
-  const { namespace, name, workflowId, workflowType, taskQueue, input } =
-    action;
+  const {
+    namespace,
+    name,
+    workflowId,
+    workflowType,
+    taskQueue,
+    input,
+    searchAttributes,
+  } = action;
 
   let payloads;
+
   if (input) {
     try {
       payloads = await encodePayloads(input);
@@ -151,13 +175,19 @@ export const submitEditSchedule = async (
       error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
       return;
     }
-  } else if (!input && schedule.action.startWorkflow.input?.payloads) {
-    payloads = schedule.action.startWorkflow.input.payloads;
   }
 
   const { preset } = presets;
   const body: DescribeFullSchedule = {
     schedule_id: scheduleId,
+    searchAttributes:
+      searchAttributes.length === 0
+        ? null
+        : {
+            indexedFields: {
+              ...setSearchAttributes(searchAttributes),
+            },
+          },
     schedule: {
       ...schedule,
       action: {
@@ -201,3 +231,4 @@ export const submitEditSchedule = async (
 
 export const loading = writable(false);
 export const error = writable('');
+export const schedulesCount = writable('0');

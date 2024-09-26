@@ -12,11 +12,14 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { getAppContext } from '$lib/utilities/get-context';
 
+  import Tooltip from '../tooltip.svelte';
+
   type BaseProps = {
     icon?: IconName;
     group?: boolean;
     active?: boolean;
     'data-testid'?: string;
+    tooltip?: string;
   };
 
   type AnchorProps = BaseProps &
@@ -40,6 +43,7 @@
   export let href = '';
   export let base = href;
   export let active = false;
+  export let tooltip = '';
 </script>
 
 <svelte:element
@@ -55,27 +59,35 @@
   tabindex="0"
   {...$$restProps}
 >
-  {#if icon}
-    <div class="flex items-center gap-0">
-      <Icon name={icon} />
-      <span class="hidden md:block"><slot /></span>
-    </div>
-  {:else}
-    <slot />
-  {/if}
+  <Tooltip hide={!tooltip} text={tooltip} top>
+    {#if icon}
+      <div class="flex items-center gap-2">
+        <Icon name={icon} />
+        {#if $$slots.default}
+          <span class="hidden md:block"><slot /></span>
+        {/if}
+      </div>
+    {:else}
+      <slot />
+    {/if}
+  </Tooltip>
 </svelte:element>
 
 <style lang="postcss">
   .toggle-button {
-    @apply flex items-center justify-center border-2 border-secondary px-4 py-2 text-sm text-primary hover:enabled:surface-interactive-secondary focus-visible:enabled:surface-interactive-secondary;
+    @apply surface-primary flex items-center justify-center border-2 border-subtle px-4 py-2 text-sm leading-4 text-primary focus-visible:outline-none;
+
+    &:not(.disabled) {
+      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-4 focus-visible:ring-primary/70;
+    }
   }
 
   .toggle-button.active {
-    @apply surface-secondary-active;
+    @apply bg-interactive-secondary-active;
   }
 
   .toggle-button.disabled {
-    @apply surface-disabled;
+    @apply cursor-not-allowed opacity-50;
   }
 
   .group:first-child {

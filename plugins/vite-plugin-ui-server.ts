@@ -9,7 +9,8 @@ const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.VERCEL) return true;
   if (process.env.VITEST) return true;
   if (process.env.CI) return true;
-  if (server.config.mode === 'ui-server') return false;
+  if (['ui-server', 'local-temporal'].includes(server.config.mode))
+    return false;
 
   return true;
 };

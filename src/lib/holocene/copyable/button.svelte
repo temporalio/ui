@@ -10,6 +10,7 @@
     copySuccessIconTitle: string;
     copied: boolean;
     'data-testid'?: string;
+    'data-theme'?: string;
   }
 
   export let copyIconTitle: string;
@@ -20,15 +21,16 @@
   export { className as class };
 </script>
 
-<button class={merge('copy-button', className)} on:click {...$$restProps}>
+<button
+  class={merge(
+    'surface-interactive-secondary m-1 rounded-md border-2 border-[transparent] bg-transparent p-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70',
+    className,
+  )}
+  on:click
+  {...$$restProps}
+>
   <Icon
     title={copied ? copySuccessIconTitle : copyIconTitle}
     name={copied ? 'checkmark' : 'copy'}
   />
 </button>
-
-<style lang="postcss">
-  .copy-button {
-    @apply m-1 rounded-md border-2 border-[transparent] bg-transparent hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-indigo-600 focus-visible:outline-none;
-  }
-</style>

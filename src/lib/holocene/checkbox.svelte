@@ -7,6 +7,8 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { omit } from '$lib/utilities/omit';
 
+  import Label from './label.svelte';
+
   type T = $$Generic;
 
   interface $$Props extends HTMLInputAttributes {
@@ -14,7 +16,6 @@
     label?: string;
     labelHidden?: boolean;
     indeterminate?: boolean;
-    hoverable?: boolean;
     value?: T;
     group?: T[];
     'data-testid'?: string;
@@ -29,12 +30,12 @@
   export let labelHidden = false;
   export let indeterminate = false;
   export let disabled = false;
-  export let hoverable = false;
   export let value: T = undefined;
   export let group: T[] = undefined;
   export let valid = true;
   export let error = '';
   export let required = false;
+
   let className = '';
   export { className as class };
 
@@ -71,101 +72,91 @@
   data-testid={$$restProps['data-testid'] ?? null}
   on:click|stopPropagation
   on:keypress|stopPropagation
+  role="none"
 >
-  <label
-    on:click
-    on:keypress
-    class={merge('checkbox', 'text-primary', className)}
-    class:hoverable={hoverable && !disabled}
-    class:disabled
+  <Label
+    class={merge(
+      [
+        'flex',
+        'select-none',
+        'items-center',
+        'gap-3',
+        'text-sm',
+        'leading-[18px]',
+        'group',
+      ],
+      disabled && 'cursor-not-allowed',
+      className,
+    )}
   >
     <input
-      on:click|stopPropagation
+      on:click
       on:change={handleChange}
       {id}
       {value}
       type="checkbox"
+      class="peer sr-only"
       bind:checked
       {disabled}
       {required}
-      class:indeterminate
       bind:this={inputElement}
       {...omit($$restProps, 'data-testid')}
     />
 
-    <span class="checkmark" class:disabled class:invalid={!valid}>
-      {#if indeterminate}
-        <Icon class="absolute left-0 top-0 h-4 w-4" name="hyphen" />
-      {:else if checked}
+    <span
+      class={merge(
+        [
+          'relative',
+          'box-content',
+          'flex',
+          'h-4',
+          'w-4',
+          'flex-none',
+          'cursor-pointer',
+          'rounded-md',
+          'border-2',
+          'bg-transparent',
+          'text-inverse',
+          'bg-clip-padding',
+          'peer-indeterminate:bg-interactive',
+          'peer-indeterminate:border-interactive',
+          'peer-checked:bg-interactive',
+          'peer-checked:border-interactive',
+        ],
+        !disabled && [
+          'group-hover:border-transparent',
+          'peer-focus-visible:border-transparent',
+          'group-hover:peer-checked:border-transparent',
+          'group-hover:peer-indeterminate:border-transparent',
+          'group-hover:bg-interactive-active',
+          'peer-focus-visible:bg-interactive-active',
+          'group-hover:peer-checked:bg-interactive-active',
+          'group-hover:peer-indeterminate:bg-interactive-active',
+          'group-hover:ring-4',
+          'group-hover:ring-primary/70',
+          'peer-focus-visible:ring-4',
+          'peer-focus-visible:ring-primary/70',
+        ],
+        disabled && ['cursor-not-allowed', 'opacity-50'],
+        valid ? 'border-secondary' : 'border-danger peer-checked:border-danger',
+      )}
+    >
+      {#if indeterminate || checked}
         <Icon
           class="absolute left-0 top-0 h-4 w-4"
-          name="checkmark"
+          name={indeterminate ? 'hyphen' : checked ? 'checkmark' : null}
           strokeWidth={3}
         />
       {/if}
     </span>
 
-    <slot name="label">
+    <slot name="flex">
       <span class="label" class:sr-only={labelHidden}>
         {label}
       </span>
     </slot>
-  </label>
+  </Label>
   {#if !valid && error}
-    <span class="error">{error}</span>
+    <span class="text-xs text-danger">{error}</span>
   {/if}
 </div>
-
-<style lang="postcss">
-  .checkbox {
-    @apply flex cursor-pointer select-none items-start gap-3 text-sm leading-[18px] text-primary;
-
-    &.disabled {
-      @apply cursor-not-allowed;
-    }
-  }
-
-  .label {
-    @apply flex;
-  }
-
-  input {
-    @apply sr-only;
-  }
-
-  .checkmark {
-    @apply relative box-content flex h-4 w-4 flex-none cursor-pointer rounded-md border-2 border-subtle bg-transparent text-white outline outline-4 outline-transparent dark:text-black;
-
-    &.invalid {
-      @apply border-error;
-    }
-
-    &.disabled {
-      @apply cursor-not-allowed opacity-50;
-    }
-  }
-
-  input:checked ~ .checkmark {
-    @apply border-interactive bg-interactive;
-
-    &.invalid {
-      @apply border-error;
-    }
-  }
-
-  .checkbox.hoverable {
-    &:hover {
-      input:enabled ~ .checkmark {
-        @apply border-white bg-interactive outline-offset-0 outline-interactive/70 dark:border-black;
-      }
-    }
-  }
-
-  input:focus-visible ~ .checkmark {
-    @apply border-white bg-interactive outline-offset-0 outline-interactive/70 dark:border-black;
-  }
-
-  .error {
-    @apply text-xs text-danger;
-  }
-</style>

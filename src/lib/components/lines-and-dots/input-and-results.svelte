@@ -10,7 +10,7 @@
   $: isRunning = $workflowRun.workflow.isRunning;
 </script>
 
-<div class="flex flex-col gap-4 lg:flex-row">
+<div class="flex flex-col gap-4 lg:flex-row" data-testid="input-and-result">
   <InputAndResultsPayload
     content={workflowEvents.input}
     {isRunning}
@@ -19,6 +19,6 @@
   <InputAndResultsPayload
     content={workflowEvents.results}
     {isRunning}
-    title="Results"
+    title="Result"
   />
 </div>

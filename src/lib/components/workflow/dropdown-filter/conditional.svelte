@@ -23,6 +23,6 @@
 
 <style lang="postcss">
   .active {
-    @apply bg-inverse text-white;
+    @apply bg-black text-white;
   }
 </style>

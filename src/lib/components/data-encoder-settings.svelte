@@ -4,10 +4,9 @@
 
   import { page } from '$app/stores';
 
-  import Accordion from '$lib/holocene/accordion.svelte';
+  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import { clickoutside } from '$lib/holocene/outside-click';
   import { translate } from '$lib/i18n/translate';
   import {
     codecEndpoint,
@@ -76,13 +75,12 @@
 
 {#if $viewDataEncoderSettings}
   <aside
-    use:clickoutside={() => ($viewDataEncoderSettings = false)}
     in:fly={{ y: -50, delay: 0, duration: 500 }}
-    class="surface-primary relative flex h-[540px] w-full flex-col gap-6 overflow-auto border-b border-subtle p-12"
+    class="surface-primary relative flex h-[540px] w-full flex-col gap-6 overflow-auto border-b border-subtle p-4 md:p-12"
   >
     <div class="flex w-full flex-col gap-4 xl:w-1/2">
       <div class="flex items-center justify-between space-x-2">
-        <h3 data-testid="data-encoder-title" class="text-xl">
+        <h3 data-testid="data-encoder-title">
           {translate('common.codec-server')}
         </h3>
       </div>

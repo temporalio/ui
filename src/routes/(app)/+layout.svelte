@@ -2,6 +2,7 @@
   import { afterNavigate, goto } from '$app/navigation';
   import { page, updated } from '$app/stores';
 
+  import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
@@ -12,9 +13,10 @@
   import Toaster from '$lib/holocene/toaster.svelte';
   import { translate } from '$lib/i18n/translate';
   import { clearAuthUser } from '$lib/stores/auth-user';
+  import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
-  import type { NamespaceListItem } from '$lib/types/global';
+  import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
   import DarkMode from '$lib/utilities/dark-mode';
   import {
     routeForArchivalWorkfows,
@@ -22,6 +24,7 @@
     routeForEventHistoryImport,
     routeForLoginPage,
     routeForNamespaces,
+    routeForNexus,
     routeForSchedules,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
@@ -32,10 +35,6 @@
 
   $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
   $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
-  $: activeNamespace = $namespaces.find(
-    (namespace: Namespace) =>
-      namespace?.namespaceInfo?.name === activeNamespaceName,
-  );
   $: namespaceNames = isCloud
     ? [$page.params.namespace]
     : $namespaces.map((namespace: Namespace) => namespace?.namespaceInfo?.name);
@@ -51,19 +50,87 @@
     };
   });
 
-  $: linkList = {
-    home: routeForWorkflows({ namespace: activeNamespaceName }),
-    archive: routeForArchivalWorkfows({ namespace: activeNamespaceName }),
-    namespaces: routeForNamespaces(),
-    schedules: routeForSchedules({ namespace: activeNamespaceName }),
-    workflows: routeForWorkflows({ namespace: activeNamespaceName }),
-    batchOperations: routeForBatchOperations({
-      namespace: activeNamespaceName,
-    }),
-    import: routeForEventHistoryImport(),
-    feedback:
-      $page.data?.settings?.feedbackURL ||
-      'https://github.com/temporalio/ui/issues/new/choose',
+  $: linkList = getLinkList(activeNamespaceName, !!$inProgressBatchOperation);
+
+  const getLinkList = (
+    namespace: string,
+    inProgressBatch: boolean,
+  ): NavLinkListItem[] => {
+    const workflowsRoute = routeForWorkflows({ namespace });
+    const schedulesRoute = routeForSchedules({ namespace });
+    const batchOperationsRoute = routeForBatchOperations({ namespace });
+    const archivalRoute = routeForArchivalWorkfows({ namespace });
+    const namespacesRoute = routeForNamespaces();
+    const nexusRoute = routeForNexus();
+    const historyImportRoute = routeForEventHistoryImport();
+
+    return [
+      {
+        href: workflowsRoute,
+        icon: 'workflow',
+        label: translate('common.workflows'),
+        isActive: (path) => path.includes(workflowsRoute),
+      },
+      {
+        href: schedulesRoute,
+        icon: 'schedules',
+        label: translate('common.schedules'),
+        isActive: (path) => path.includes(schedulesRoute),
+      },
+      {
+        href: batchOperationsRoute,
+        icon: 'batch-operation',
+        label: translate('batch.nav-title'),
+        tooltip: translate('batch.list-page-title'),
+        animate: inProgressBatch,
+        isActive: (path) => path.includes(batchOperationsRoute),
+      },
+      {
+        href: archivalRoute,
+        icon: 'archives',
+        label: translate('common.archive'),
+        isActive: (path) => path.includes(archivalRoute),
+      },
+      {
+        href: namespacesRoute,
+        icon: 'namespace',
+        label: translate('common.namespaces'),
+        divider: true,
+        isActive: (path) =>
+          path.includes(namespacesRoute) &&
+          !path.includes(workflowsRoute) &&
+          !path.includes(schedulesRoute) &&
+          !path.includes(batchOperationsRoute) &&
+          !path.includes(archivalRoute),
+      },
+      {
+        href: nexusRoute,
+        icon: 'nexus',
+        label: translate('nexus.nexus'),
+        hidden: !$page.data?.systemInfo?.capabilities?.nexus,
+        isActive: (path) => path.includes(nexusRoute),
+      },
+      {
+        href: historyImportRoute,
+        icon: 'import',
+        label: translate('common.import'),
+        isActive: (path) => path.includes(historyImportRoute),
+      },
+      {
+        href: 'http://docs.temporal.io',
+        icon: 'book',
+        label: translate('common.docs'),
+        external: true,
+      },
+      {
+        href:
+          $page.data?.settings?.feedbackURL ||
+          'https://github.com/temporalio/ui/issues/new/choose',
+        icon: 'feedback',
+        label: translate('common.feedback'),
+        external: true,
+      },
+    ];
   };
 
   function getCurrentHref(namespace: string) {
@@ -113,8 +180,8 @@
     pop={toaster.pop}
     toasts={toaster.toasts}
   />
-  <div class="sticky top-0 z-30 h-screen w-auto">
-    <SideNavigation {activeNamespace} {linkList} {isCloud} />
+  <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
+    <SideNavigation {linkList} {isCloud} />
   </div>
   <MainContentContainer>
     <DataEncoderSettings />
@@ -131,5 +198,12 @@
         <slot />
       </ErrorBoundary>
     </div>
+    <BottomNavigation
+      slot="footer"
+      {linkList}
+      {logout}
+      {namespaceList}
+      {isCloud}
+    />
   </MainContentContainer>
 </div>

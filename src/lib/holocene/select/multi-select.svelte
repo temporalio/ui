@@ -27,9 +27,15 @@
   export let selectAllLabel: string;
   export let clearAllLabel: string;
   export let active = false;
+  export let disabled = false;
   export let position: 'left' | 'right' = 'left';
+  export let initialSelectedAll = true;
 
-  let selectedOptions = initialSelected.length ? initialSelected : options;
+  let selectedOptions = initialSelected.length
+    ? initialSelected
+    : initialSelectedAll
+    ? options
+    : [];
 
   const open = writable(false);
 
@@ -55,7 +61,7 @@
 </script>
 
 <MenuContainer {open}>
-  <MenuButton hasIndicator controls={id} {variant} {active}>
+  <MenuButton hasIndicator controls={id} {variant} {active} {disabled}>
     {#if icon}<Icon class="md:hidden" name={icon} />{/if}
     <span class="max-md:hidden">{label}</span>
   </MenuButton>

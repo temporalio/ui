@@ -11,22 +11,28 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import { error, loading } from '$lib/stores/schedules';
+  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
   import type {
     FullSchedule,
     ScheduleParameters,
     SchedulePreset,
   } from '$lib/types/schedule';
+  import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
   import {
     routeForSchedule,
     routeForSchedules,
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
+  import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
+
   import ScheduleInputPayload from './schedule-input-payload.svelte';
 
-  import type { Schedule } from '$types';
+  import type { Schedule, SearchAttribute } from '$types';
 
   export let schedule: FullSchedule | null = null;
+  export let searchAttributes: SearchAttribute = {};
+
   export let onConfirm: (
     preset: SchedulePreset,
     args: Partial<ScheduleParameters>,
@@ -52,9 +58,17 @@
 
   let errors = {};
   let name = scheduleId ?? '';
-  let workflowType = schedule?.action?.startWorkflow?.workflowType?.name ?? '';
-  let workflowId = schedule?.action?.startWorkflow?.workflowId ?? '';
-  let taskQueue = schedule?.action?.startWorkflow?.taskQueue?.name ?? '';
+  const decodedWorkflow = decodePayloadAttributes(
+    schedule?.action?.startWorkflow,
+  );
+  const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
+  const indexedFields =
+    decodedSearchAttributes?.searchAttributes.indexedFields ??
+    ({} as { [k: string]: string });
+
+  let workflowType = decodedWorkflow?.workflowType?.name ?? '';
+  let workflowId = decodedWorkflow?.workflowId ?? '';
+  let taskQueue = decodedWorkflow?.taskQueue?.name ?? '';
   let input = '';
   let daysOfWeek: string[] = [];
   let daysOfMonth: number[] = [];
@@ -65,6 +79,9 @@
   let second = '';
   let phase = '';
   let cronString = '';
+  let searchAttributesInput: SearchAttributeInput[] = Object.entries(
+    indexedFields,
+  ).map(([attribute, value]) => ({ attribute, value }));
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: Partial<ScheduleParameters> = {
@@ -82,6 +99,7 @@
       daysOfMonth,
       days,
       months,
+      searchAttributes: searchAttributesInput,
     };
 
     onConfirm(preset, args, schedule);
@@ -142,12 +160,10 @@
       <Link href={backHref} icon="chevron-left">
         {backTitle}
       </Link>
-      <h1 class="font-base text-2xl">{title}</h1>
+      <h1>{title}</h1>
     </header>
     <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
-      <Alert intent="error" title="" hidden={!$error} bold>
-        {$error}
-      </Alert>
+      <Alert intent="error" title={$error} hidden={!$error} />
       <div class="w-full">
         <Input
           id="name"
@@ -158,6 +174,7 @@
           disabled={Boolean(scheduleId)}
           on:input={onInput}
           on:blur={onBlur}
+          required
         />
       </div>
       <div class="w-full">
@@ -168,6 +185,7 @@
           error={errors['workflowType']}
           on:input={onInput}
           on:blur={onBlur}
+          required
         />
       </div>
       <div class="w-full">
@@ -178,6 +196,7 @@
           error={errors['workflowId']}
           on:input={onInput}
           on:blur={onBlur}
+          required
         />
       </div>
       <div class="w-full">
@@ -188,12 +207,17 @@
           error={errors['taskQueue']}
           on:input={onInput}
           on:blur={onBlur}
+          required
         />
       </div>
       <ScheduleInputPayload
         bind:input
         payloads={schedule?.action?.startWorkflow?.input}
         error={errors['input']}
+      />
+      <AddSearchAttributes
+        bind:attributesToAdd={searchAttributesInput}
+        class="w-full"
       />
       <SchedulesCalendarView
         let:preset

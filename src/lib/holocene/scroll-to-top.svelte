@@ -5,17 +5,12 @@
   export let onScrollToTopClick: () => void;
 </script>
 
-<div class:hidden>
+<div class:invisible={hidden}>
   <Button
-    size="sm"
+    size="xs"
     variant="primary"
     on:click={onScrollToTopClick}
     leadingIcon="arrow-up"
+    {...$$restProps}
   />
 </div>
-
-<style lang="postcss">
-  .hidden {
-    @apply invisible;
-  }
-</style>

@@ -1,41 +1,62 @@
-<script lang="ts">
-  import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
+<script lang="ts" context="module">
+  import type { Meta } from '@storybook/svelte';
 
-  import iconNames from '$lib/holocene/icon';
+  import { iconNames } from '$lib/holocene/icon';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
+
+  export const meta = {
+    title: 'Split Button',
+    component: SplitButton,
+    args: {
+      label: 'Split Button',
+      menuLabel: 'Actions',
+      position: 'left',
+      icon: undefined,
+      disabled: false,
+      primaryActionDisabled: false,
+      href: 'https://caniuse.com',
+    },
+    argTypes: {
+      position: {
+        name: 'Position',
+        control: 'radio',
+        options: ['left', 'right'],
+      },
+      label: { name: 'Label', control: 'text' },
+      menuLabel: {
+        name: 'Menu Label',
+        control: 'text',
+        table: {
+          category: 'Accessibility',
+        },
+      },
+
+      icon: { name: 'Icon', control: 'select', options: iconNames },
+      disabled: { name: 'Disabled', control: 'boolean' },
+      primaryActionDisabled: {
+        name: 'Primary Action Disabled',
+        control: 'boolean',
+      },
+    },
+  } satisfies Meta<SplitButton>;
 </script>
 
-<Meta
-  title="Split Button"
-  component={SplitButton}
-  argTypes={{
-    position: { control: 'radio', options: ['left', 'right'] },
-    label: { control: 'text' },
-    menuLabel: { control: 'text' },
-    id: { control: 'text' },
-    icon: { control: 'select', options: iconNames },
-    variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'destructive', 'ghost'],
-    },
-  }}
-/>
+<script lang="ts">
+  import { Story, Template } from '@storybook/addon-svelte-csf';
+</script>
 
 <Template let:args>
-  <SplitButton {...args}>
-    <MenuItem>View</MenuItem>
-    <MenuItem destructive>Delete</MenuItem>
-  </SplitButton>
+  <div class="flex">
+    <SplitButton {...args}>
+      <MenuItem>View</MenuItem>
+      <MenuItem destructive>Delete</MenuItem>
+    </SplitButton>
+  </div>
 </Template>
 
-<Story
-  args={{
-    label: 'Edit',
-    menuLabel: 'Actions',
-    id: 'button-1',
-    variant: 'primary',
-    position: 'left',
-  }}
-  name="split button"
-/>
+<Story name="Default" />
+
+<Story name="With Icon" args={{ icon: 'trash' }} />
+
+<Story name="Disabled" args={{ disabled: true }} />

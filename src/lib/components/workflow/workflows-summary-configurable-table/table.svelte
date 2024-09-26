@@ -1,11 +1,11 @@
 <script lang="ts">
   import Loading from '$lib/holocene/loading.svelte';
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
-  import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
+  import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import { loading, updating } from '$lib/stores/workflows';
 
   export let pinned = false;
-  export let columns: WorkflowHeader[];
+  export let columns: ConfigurableTableHeader[];
 </script>
 
 <table class="workflows-summary-table" class:pinned>

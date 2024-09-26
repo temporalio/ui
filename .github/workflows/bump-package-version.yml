@@ -2,8 +2,6 @@ name: Bump Package Version
 
 on:
   workflow_dispatch:
-    branches:
-      - main
     inputs:
       bump:
         required: true
@@ -20,12 +18,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Node setup
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           registry-url: 'https://registry.npmjs.org'
+      - name: Prepare checkout token
+        id: generate_token
+        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92
+        with:
+          app_id: ${{ secrets.TEMPORAL_CICD_APP_ID }}
+          private_key: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
+
       - name: Configure Git
         run: |
           git config --local user.name 'Temporal Data (cicd)'
@@ -37,8 +42,8 @@ jobs:
           version=`git describe --abbrev=0 --tags`
           branch="releases/$version"
           git checkout -b $branch
-          git remote set-url origin "https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/${{ github.repository }}"
+          git remote set-url origin "https://x-access-token:${{ steps.generate_token.outputs.token }}@github.com/${{ github.repository }}"
           git push origin $branch
           gh pr create -B main -H $branch --title "bump version in package.json to $version" --body "release version $version"
         env:
-          GH_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}

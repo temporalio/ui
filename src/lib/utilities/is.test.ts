@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   isExecutionStatus,
   isNull,
+  isNullConditional,
   isNumber,
   isObject,
   isOperator,
@@ -335,5 +336,21 @@ describe('isQuote', () => {
 
   it('should return false for undefined', () => {
     expect(isQuote(undefined)).toBe(false);
+  });
+});
+
+describe('isNullConditional', () => {
+  it('should return true for is', () => {
+    expect(isNullConditional('IS')).toBe(true);
+    expect(isNullConditional('is')).toBe(true);
+  });
+
+  it('should return true for is not', () => {
+    expect(isNullConditional('IS NOT')).toBe(true);
+    expect(isNullConditional('is not')).toBe(true);
+  });
+
+  it('should return false for null', () => {
+    expect(isNullConditional(null)).toBe(false);
   });
 });

@@ -26,7 +26,7 @@
     >
       <polyline
         fill="none"
-        stroke="#1D4ED8"
+        stroke="#000000"
         stroke-width="3"
         stroke-miterlimit="10"
         points="0,45.486 18.514,45.486 24.595,33.324 32.676,45.486 37.771,45.486 42.838,55.622 51.959,18 56.067,45 60.067,60.729 63.122,45.486 77.297,45.486 83.379,41.419 90.473,45.486 100,45.486"
@@ -40,7 +40,7 @@
 
 <style lang="postcss">
   .heart-beat {
-    @apply relative flex items-center justify-center bg-blue-100 text-center;
+    @apply relative flex items-center justify-center bg-blue-300 text-center;
   }
 
   .heart-rate {
@@ -52,7 +52,7 @@
   }
 
   .fade-in {
-    @apply absolute right-0 top-0 h-full w-full bg-blue-100;
+    @apply absolute right-0 top-0 h-full w-full bg-blue-300;
 
     animation: heartRateIn 2s linear infinite;
     animation-delay: var(--animation-delay, 0);
@@ -65,35 +65,35 @@
     left: 0;
     animation: heartRateOut 2s linear infinite;
     animation-delay: var(--animation-delay, 0);
-    background: rgb(219 234 254);
+    background: rgb(147 187 253);
     background: linear-gradient(
       to left,
-      rgb(219 234 254) 0%,
-      rgb(219 234 254) 50%,
+      rgb(147 187 253) 50%,
+      rgb(147 187 253) 50%,
       rgb(255 255 255 / 0%) 100%
     );
     background: linear-gradient(
       to left,
-      rgb(219 234 254) 0%,
-      rgb(219 234 254) 50%,
+      rgb(147 187 253) 0%,
+      rgb(147 187 253) 50%,
       rgb(255 255 255 / 0%) 100%
     );
     background: linear-gradient(
       to left,
-      rgb(219 234 254) 0%,
-      rgb(219 234 254) 50%,
+      rgb(147 187 253) 0%,
+      rgb(147 187 253) 50%,
       rgb(255 255 255 / 0%) 100%
     );
     background: linear-gradient(
       to left,
-      rgb(219 234 254) 0%,
-      rgb(219 234 254) 50%,
+      rgb(147 187 253) 0%,
+      rgb(147 187 253) 50%,
       rgb(255 255 255 / 0%) 100%
     );
     background: linear-gradient(
       to right,
-      rgb(219 234 254) 0%,
-      rgb(219 234 254) 80%,
+      rgb(147 187 253) 0%,
+      rgb(147 187 253) 80%,
       rgb(255 255 255 / 0%) 100%
     );
   }

@@ -25,8 +25,10 @@ const defaultSettings = {
   WorkflowCancelDisabled: false,
   WorkflowSignalDisabled: false,
   WorkflowResetDisabled: false,
+  StartWorkflowDisabled: true,
   BatchActionsDisabled: false,
   HideWorkflowQueryErrors: false,
+  RefreshWorkflowCountsDisabled: false,
 };
 
 export const mockSettingsApi = async (

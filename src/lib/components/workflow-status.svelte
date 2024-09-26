@@ -2,6 +2,7 @@
   import { fade } from 'svelte/transition';
 
   import { cva } from 'class-variance-authority';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Spinner from '$lib/holocene/icon/svg/spinner.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -29,7 +30,7 @@
     Canceled: translate('workflows.canceled'),
     Terminated: translate('workflows.terminated'),
     Paused: translate('workflows.paused'),
-    Scheduled: translate('events.event-classification.started'),
+    Scheduled: translate('events.event-classification.scheduled'),
     Started: translate('events.event-classification.started'),
     Unspecified: translate('events.event-classification.unspecified'),
     Open: translate('events.event-classification.open'),
@@ -41,29 +42,27 @@
   };
 
   const workflowStatus = cva(
-    [
-      'flex items-center rounded-sm px-1 py-0.5 font-secondary whitespace-nowrap',
-    ],
+    ['flex items-center rounded-sm px-1 py-0.5 whitespace-nowrap text-black'],
     {
       variants: {
         status: {
-          Running: 'bg-blue-100 text-blue-700',
-          TimedOut: 'bg-orange-100 text-orange-700',
-          Completed: 'bg-green-100 text-green-700',
-          Failed: 'bg-red-100 text-red-700',
-          ContinuedAsNew: 'bg-slate-200 text-primary',
-          Canceled: 'bg-yellow-100 text-yellow-900',
-          Terminated: 'bg-red-100 text-red-700',
-          Paused: 'bg-yellow-100 text-yellow-700',
-          Unspecified: 'bg-slate-200 text-primary',
-          Scheduled: 'bg-blue-100 text-blue-700',
-          Started: 'bg-blue-100 text-blue-700',
-          Open: 'bg-green-100 text-green-700',
-          New: 'bg-indigo-100 text-indigo-700',
-          Initiated: 'bg-blue-100 text-blue-700',
-          Fired: 'bg-blue-100 text-blue-700',
-          CancelRequested: 'bg-yellow-100 text-yellow-900',
-          Signaled: 'bg-purple-100 text-purple-700',
+          Running: 'bg-blue-300',
+          TimedOut: 'bg-orange-200',
+          Completed: 'bg-green-200',
+          Failed: 'bg-red-200',
+          ContinuedAsNew: 'bg-purple-200',
+          Canceled: 'bg-slate-100',
+          Terminated: 'bg-yellow-200',
+          Paused: 'bg-yellow-200',
+          Unspecified: 'bg-slate-100',
+          Scheduled: 'bg-blue-300',
+          Started: 'bg-blue-300',
+          Open: 'bg-green-200',
+          New: 'bg-blue-300',
+          Initiated: 'bg-blue-300',
+          Fired: 'bg-pink-200',
+          CancelRequested: 'bg-yellow-200',
+          Signaled: 'bg-pink-200',
         },
       },
     },
@@ -94,7 +93,10 @@
   </span>
   {#if newCount}
     <span
-      class="font-base surface-primary rounded-r px-1 py-0.5 text-xs text-primary"
+      class={merge(
+        'font-base surface-primary rounded-r px-1 py-0.5 text-xs',
+        big && 'text-lg',
+      )}
       in:fade
     >
       {#if newCount > 0}+{/if}{newCount}

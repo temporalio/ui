@@ -349,6 +349,7 @@ describe('fromSeconds', () => {
   it('should correctly format milliseconds', () => {
     expect(fromSeconds('0.001s')).toEqual('1 millisecond');
     expect(fromSeconds('0.006s')).toEqual('6 milliseconds');
+    expect(fromSeconds('0.6s')).toEqual('600 milliseconds');
     expect(fromSeconds('0.06s')).toEqual('60 milliseconds');
     expect(fromSeconds('0.0006s')).toEqual('0.6 milliseconds');
     expect(fromSeconds('0.00006s')).toEqual('0.06 milliseconds');
@@ -358,14 +359,17 @@ describe('fromSeconds', () => {
 
   it('should correctly format seconds', () => {
     expect(fromSeconds('0s')).toEqual('');
+    expect(fromSeconds('0.00s')).toEqual('');
     expect(fromSeconds('1s')).toEqual('1 second');
     expect(fromSeconds('6s')).toEqual('6 seconds');
     expect(fromSeconds('6.00s')).toEqual('6 seconds');
-    expect(fromSeconds('0.00s')).toEqual('');
+    expect(fromSeconds('6.412382134s')).toEqual('6 seconds, 412 milliseconds');
+    expect(fromSeconds('59.32322s')).toEqual('59 seconds, 323 milliseconds');
   });
 
   it('should correctly format minutes', () => {
     expect(fromSeconds('60s')).toEqual('1 minute');
+    expect(fromSeconds('61.1234123412s')).toEqual('1 minute, 1 second');
   });
 
   it('should correctly format hours', () => {
@@ -383,11 +387,10 @@ describe('fromSeconds', () => {
 
   it('should correctly format hours, minutes, seconds and milliseconds', () => {
     expect(fromSeconds('3661s')).toEqual('1 hour, 1 minute, 1 second');
-    expect(fromSeconds('3661.06s')).toEqual(
-      '1 hour, 1 minute, 1 second, 60 milliseconds',
-    );
-    expect(fromSeconds('3661.006s')).toEqual(
-      '1 hour, 1 minute, 1 second, 6 milliseconds',
+    expect(fromSeconds('3661.06s')).toEqual('1 hour, 1 minute, 1 second');
+    expect(fromSeconds('3661.006s')).toEqual('1 hour, 1 minute, 1 second');
+    expect(fromSeconds('2148128.1234123412s')).toEqual(
+      '24 days, 20 hours, 42 minutes, 8 seconds',
     );
   });
 

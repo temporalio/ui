@@ -9,7 +9,7 @@
   export let namespace: string;
 </script>
 
-<h1 class="text-2xl">{translate('batch.list-page-title')}</h1>
+<h1>{translate('batch.list-page-title')}</h1>
 {#await listBatchOperations(namespace)}
   <Loading />
 {:then { operations }}

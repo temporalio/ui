@@ -8,7 +8,8 @@ import arrowUp from './svg/arrow-up.svelte';
 import ascending from './svg/ascending.svelte';
 import astronaut from './svg/astronaut.svelte';
 import batchOperation from './svg/batch-operation.svelte';
-import book from './svg/book.svelte';
+import book from './svg/book-sparkles.svelte';
+// import book from './svg/book.svelte';
 import bookmark from './svg/bookmark.svelte';
 import calendarPlus from './svg/calendar-plus.svelte';
 import calendar from './svg/calendar.svelte';
@@ -28,10 +29,13 @@ import compact from './svg/compact.svelte';
 import converterDown from './svg/converter-down.svelte';
 import converterUp from './svg/converter-up.svelte';
 import copy from './svg/copy.svelte';
+import creditCard from './svg/credit-card.svelte';
 import descending from './svg/descending.svelte';
+import dollarBadge from './svg/dollar-badge.svelte';
 import download from './svg/download.svelte';
 import error from './svg/error.svelte';
 import exit from './svg/exit.svelte';
+import externalLink from './svg/external-link.svelte';
 import eyeHide from './svg/eye-hide.svelte';
 import eyeShow from './svg/eye-show.svelte';
 import feather from './svg/feather.svelte';
@@ -42,6 +46,8 @@ import fileImport from './svg/file-import.svelte';
 import fileUpload from './svg/file-upload.svelte';
 import filterSolid from './svg/filter-solid.svelte';
 import filter from './svg/filter.svelte';
+import fireExtinguisher from './svg/fire-extinguisher.svelte';
+import flag from './svg/flag.svelte';
 import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
 import hyphen from './svg/hyphen.svelte';
@@ -60,8 +66,11 @@ import merge from './svg/merge.svelte';
 import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
+import nexus from './svg/nexus.svelte';
+import pause from './svg/pause.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
+import play from './svg/play.svelte';
 import regions from './svg/regions.svelte';
 import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
@@ -80,6 +89,7 @@ import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
 import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
+import table from './svg/table.svelte';
 import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
 import timeline from './svg/timeline.svelte';
@@ -126,20 +136,25 @@ export const icons = {
   'converter-down': converterDown,
   'converter-up': converterUp,
   copy,
+  'credit-card': creditCard,
   descending,
   download,
+  'dollar-badge': dollarBadge,
   error,
   exit,
+  'external-link': externalLink,
   'eye-hide': eyeHide,
   'eye-show': eyeShow,
   feather,
   feed,
   'feedback-circle': feedbackCircle,
   feedback,
+  flag,
   'file-import': fileImport,
   'file-upload': fileUpload,
   filter,
   'filter-solid': filterSolid,
+  'fire-extinguisher': fireExtinguisher,
   github,
   graph,
   hyphen,
@@ -158,6 +173,9 @@ export const icons = {
   moon,
   'namespace-switcher': namespaceSwitcher,
   namespace,
+  nexus,
+  play,
+  pause,
   'pin-filled': pinFilled,
   pin,
   regions,
@@ -174,10 +192,12 @@ export const icons = {
   spinner,
   'star-empty': starEmpty,
   'star-filled': starFilled,
+  success: checkmark,
   sun,
   summary,
   support,
   'spinner-solid': spinnerSolid,
+  table,
   'temporal-logo': temporalLogo,
   terminal,
   timeline,

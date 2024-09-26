@@ -23,15 +23,14 @@
   <Table class="surface-primary w-full table-fixed pb-2" variant="simple">
     {#each [...eventGroup.events].reverse() as [id, eventInGroup] (id)}
       <tr
-        class="row"
+        class="row dense"
         class:active={id === selectedId}
         class:failure={eventOrGroupIsFailureOrTimedOut(eventInGroup)}
         class:canceled={eventOrGroupIsCanceled(eventInGroup)}
         class:terminated={eventOrGroupIsTerminated(eventInGroup)}
         on:click|preventDefault|stopPropagation={() => onGroupClick(id)}
       >
-        <td class="w-1/12" />
-        <td class="w-24">
+        <td class="w-20">
           <p class="truncate text-sm text-slate-500 md:text-base">
             <Link
               class="truncate"
@@ -61,11 +60,11 @@
 
 <style lang="postcss">
   .row:hover {
-    @apply surface-subtle cursor-pointer bg-fixed;
+    @apply cursor-pointer bg-interactive-table-hover bg-fixed;
   }
 
   .active {
-    @apply surface-subtle;
+    @apply bg-interactive-table-hover;
   }
 
   .failure {

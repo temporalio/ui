@@ -39,7 +39,6 @@
 
 {#if cause}
   <Alert
-    bold
     icon="warning"
     intent="warning"
     title={translate(`typed-errors.${cause}.title`)}
@@ -57,7 +56,7 @@
       </p>
     {/if}
     <div class="mt-2">
-      <Table class="dark w-full table-fixed">
+      <Table class="w-full table-fixed">
         <caption class="sr-only" slot="caption"
           >{translate('events.error-event')}</caption
         >

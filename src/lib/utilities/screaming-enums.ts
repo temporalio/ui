@@ -1,11 +1,13 @@
 import type {
   ArchivalState,
+  CallbackState,
   NamespaceState,
+  PendingNexusOperationState,
   WorkflowExecutionStatus,
 } from '$lib/types';
 import type { BatchOperationState, BatchOperationType } from '$lib/types/batch';
 import type {
-  SearchAttributesValue,
+  SearchAttributeType,
   WorkflowStatus,
   WorkflowTaskFailedCause,
 } from '$lib/types/workflows';
@@ -29,8 +31,8 @@ export const fromScreamingEnum = <T>(
 };
 
 export const toSearchAttributeTypeReadable = (
-  status: SearchAttributesValue,
-): SearchAttributesValue => {
+  status: SearchAttributeType,
+): SearchAttributeType => {
   return fromScreamingEnum(status, 'IndexedValueType');
 };
 
@@ -69,7 +71,22 @@ export const toBatchOperationTypeReadable = (
 };
 
 export const toWorkflowTaskFailureReadable = (
-  cause: WorkflowTaskFailedCause,
+  cause?: WorkflowTaskFailedCause,
 ): WorkflowTaskFailedCause => {
+  if (!cause) return 'Unspecified';
   return fromScreamingEnum(cause, 'WorkflowTaskFailedCause');
+};
+
+export const toPendingNexusOperationStateReadable = (
+  state?: PendingNexusOperationState,
+): PendingNexusOperationState => {
+  if (!state) return state;
+  return fromScreamingEnum(state, 'PendingNexusOperationState');
+};
+
+export const toCallbackStateReadable = (
+  state?: CallbackState,
+): CallbackState => {
+  if (!state) return state;
+  return fromScreamingEnum(state, 'CallbackState');
 };

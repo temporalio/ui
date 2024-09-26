@@ -3,21 +3,24 @@
 </script>
 
 <Svg {...$$props}>
+  <path d="M23 14H13L14 21H23V14Z" fill="#F87171" />
+  <path d="M1 14H11L10 21H1V14Z" fill="#F87171" />
   <path
-    d="M9.5 7L2 11H6.875L9.5 7.5L11 9L9.5 7Z"
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M3.31653 3L9.19612 4.17592L8.80388 6.13708L4.68347 5.31299L2.36447 12.5H21.6355L19.3165 5.313L15.1961 6.13708L14.8039 4.17592L20.6835 3L24 13.3459V22H13.5144L12.3686 17.5H11.6314L10.4856 22H0V13.3459L3.31653 3ZM14.1179 16.2649L15.0689 20H22V14.5H13.7134L14.1179 16.2649ZM10.2866 14.5H2V20H8.93106L9.88212 16.2649L10.2866 14.5Z"
     fill="currentcolor"
-    stroke="currentcolor"
   />
   <path
-    d="M14.5 7L22 11H17.125L14.5 7.5L13 9L14.5 7Z"
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M4.89645 17.3536L3.25 15.7071L3.95711 15L5.60355 16.6464L7.25 15L7.95711 15.7071L6.31066 17.3536L7.95711 19L7.25 19.7071L5.60355 18.0607L3.95711 19.7071L3.25 19L4.89645 17.3536Z"
     fill="currentcolor"
-    stroke="currentcolor"
   />
-  <path d="M22.5 11H11.5L13.5 18H22.5V11Z" fill="#F87171" />
-  <path d="M1.5 11H12.5L10.5 18H1.5V11Z" fill="#F87171" />
-  <path d="M16 13L19 16M19 13L16 16" stroke="currentcolor" />
-  <path d="M5 13L8 16M8 13L5 16" stroke="currentcolor" />
-  <path d="M12 11L10.5 15H13.5L12 11Z" fill="currentcolor" />
-  <path d="M2 11.5H11.8371L10.1228 17.5H2V11.5Z" stroke="currentcolor" />
-  <path d="M22 11.5H12.1629L13.8772 17.5H22V11.5Z" stroke="currentcolor" />
+  <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M17.6893 17.3536L16.0429 15.7071L16.75 15L18.3964 16.6464L20.0429 15L20.75 15.7071L19.1036 17.3536L20.75 19L20.0429 19.7071L18.3964 18.0607L16.75 19.7071L16.0429 19L17.6893 17.3536Z"
+    fill="currentcolor"
+  />
 </Svg>

@@ -1,7 +1,8 @@
 import { get, writable } from 'svelte/store';
 
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
-import type { WorkflowEvent } from '$lib/types/events';
+import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
+import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
 export const indexPageSize = 200;
 export const startIndex = writable(0);
@@ -49,8 +50,16 @@ export const setSingleActiveEvent = (event: WorkflowEvent) => {
   }
 };
 
-export const setActiveEvent = (event: WorkflowEvent, group: EventGroup) => {
+export const setActiveEvent = (
+  event: WorkflowEvent | PendingActivity,
+  group: EventGroup,
+) => {
   activeGroups.set([]);
+
+  if (isPendingActivity(event)) {
+    activeEvents.set(get(activeEvents).filter((id) => id !== event.activityId));
+    return;
+  }
 
   if (!get(activeEvents).includes(event.id)) {
     const activeEventInGroup = get(activeEvents).find(

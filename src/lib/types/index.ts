@@ -23,6 +23,10 @@ export type GetClusterInfoResponse =
   temporal.api.workflowservice.v1.IGetClusterInfoResponse;
 export type GetSystemInfoResponse =
   temporal.api.workflowservice.v1.IGetSystemInfoResponse;
+export type Capabilities =
+  temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities & {
+    nexus?: boolean;
+  };
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
 export type GetSearchAttributesResponse =
@@ -139,6 +143,8 @@ export type ActivityTaskCompletedByIdRequest =
   temporal.api.workflowservice.v1.IRespondActivityTaskCompletedRequest;
 export type ActivityTaskCompletedByIdResponse =
   temporal.api.workflowservice.v1.IRespondActivityTaskCompletedResponse;
+export type WorkflowPropertiesModifiedEventAttributes =
+  temporal.api.history.v1.IWorkflowPropertiesModifiedEventAttributes;
 
 // api.enums
 
@@ -148,21 +154,27 @@ export type Severity = temporal.api.enums.v1.Severity;
 export type ArchivalState = temporal.api.enums.v1.ArchivalState;
 export type NamespaceState = temporal.api.enums.v1.NamespaceState;
 export type TaskReachability = temporal.api.enums.v1.TaskReachability;
-// export const ResetReapplyExcludeType =
-//   protos.temporal.api.enums.v1.ResetReapplyExcludeType;
-// export const ResetReapplyType = protos.temporal.api.enums.v1.ResetReapplyType;
+export type PendingNexusOperationState =
+  temporal.api.enums.v1.PendingNexusOperationState;
+export type CallbackState = temporal.api.enums.v1.CallbackState;
+export type PendingWorkflowTaskInfo =
+  temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
 
 // api.workflow
 
 export type PendingActivityInfo = temporal.api.workflow.v1.IPendingActivityInfo;
 export type PendingChildrenInfo =
   temporal.api.workflow.v1.IPendingChildExecutionInfo;
+export type PendingNexusInfo =
+  temporal.api.workflow.v1.IPendingNexusOperationInfo;
+export type CallbackInfo = temporal.api.workflow.v1.ICallbackInfo;
 export type WorkflowExecutionConfig =
   temporal.api.workflow.v1.IWorkflowExecutionConfig;
 export type WorkflowExecutionInfo =
   temporal.api.workflow.v1.IWorkflowExecutionInfo;
 export type WorkflowVersionTimpstamp =
   temporal.api.common.v1.IWorkerVersionStamp;
+export type SearchAttribute = temporal.api.common.v1.ISearchAttributes;
 
 // api response
 export type Payload = temporal.api.common.v1.IPayload;
@@ -208,6 +220,13 @@ export type BatchCancelOperation =
 export type BatchTerminateOperation =
   temporal.api.batch.v1.IBatchOperationTermination;
 
+// api.nexus
+export type Endpoint = temporal.api.nexus.v1.IEndpoint;
+export type EndpointSpec = temporal.api.nexus.v1.IEndpointSpec;
+
+// api.failure
+export type Failure = temporal.api.failure.v1.IFailure;
+
 // google
 
 export type Timestamp = google.protobuf.ITimestamp;
@@ -228,7 +247,9 @@ export type SettingsResponse = {
   WorkflowSignalDisabled: boolean;
   WorkflowResetDisabled: boolean;
   BatchActionsDisabled: boolean;
+  StartWorkflowDisabled: boolean;
   HideWorkflowQueryErrors: boolean;
+  RefreshWorkflowCountsDisabled: boolean;
   ShowTemporalSystemNamespace: boolean;
   NotifyOnNewVersion: boolean;
   FeedbackURL: string;

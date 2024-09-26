@@ -83,6 +83,7 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 		e.Use(middleware.Logger())
 	}
 	e.Use(middleware.Recover())
+	e.Use(middleware.Gzip())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: cfg.CORS.AllowOrigins,
 		AllowHeaders: []string{

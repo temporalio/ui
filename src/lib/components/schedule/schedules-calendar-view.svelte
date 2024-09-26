@@ -45,7 +45,7 @@
 </script>
 
 <Tabs class="mt-8 w-full">
-  <h2 class="mb-4 text-lg">{translate('schedules.schedule-spec')}</h2>
+  <h2 class="mb-4">{translate('schedules.schedule-spec')}</h2>
   <TabList label="Schedule Tabs" class="flex flex-wrap gap-6">
     {#if schedule}
       <Tab
@@ -86,6 +86,7 @@
         <ScheduleFrequency
           calendar={schedule?.spec?.structuredCalendar?.[0]}
           interval={schedule?.spec?.interval?.[0]}
+          timezoneName={schedule?.spec?.timezoneName}
         />
       </TabPanel>
     {/if}
@@ -111,7 +112,7 @@
     </TabPanel>
     <TabPanel id="string-panel" tabId="string-tab">
       <div class="my-2 flex w-full flex-col gap-4">
-        <h3 class="text-lg font-medium">
+        <h3>
           {translate('schedules.cron-view-title')}
         </h3>
         <p>{translate('schedules.cron-view-description')}</p>

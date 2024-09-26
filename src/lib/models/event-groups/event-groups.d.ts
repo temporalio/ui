@@ -1,4 +1,8 @@
-import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
+import type {
+  PendingActivity,
+  PendingNexusOperation,
+  WorkflowEvent,
+} from '$lib/types/events';
 import type { EventType } from '$lib/utilities/is-event-type';
 
 type EventId = EventType['id'];
@@ -24,6 +28,7 @@ interface EventGroup
   isTerminated: boolean;
   level: number | undefined;
   pendingActivity: PendingActivity | undefined;
+  pendingNexusOperation: PendingNexusOperation | undefined;
 }
 
 type EventGroups = EventGroup[];

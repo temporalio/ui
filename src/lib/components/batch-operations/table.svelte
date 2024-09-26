@@ -18,10 +18,10 @@
   export let operations: BatchOperationInfo[];
 
   const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
-    Completed: 'green',
-    Running: 'blue',
-    Failed: 'red',
-    Unspecified: 'gray',
+    Completed: 'success',
+    Running: 'primary',
+    Failed: 'danger',
+    Unspecified: undefined,
   };
 </script>
 

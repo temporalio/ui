@@ -8,6 +8,7 @@ type UpdateQueryParams = {
   url: URL;
   goto?: typeof navigateTo;
   allowEmpty?: boolean;
+  clearParameters?: string[];
 };
 
 export const gotoOptions = {
@@ -21,6 +22,7 @@ export const updateQueryParameters = async ({
   url,
   goto = navigateTo,
   allowEmpty = false,
+  clearParameters = [],
 }: UpdateQueryParams): Promise<typeof value> => {
   const next = String(value);
   const params = {};
@@ -37,6 +39,12 @@ export const updateQueryParameters = async ({
     newQuery.set(parameter, '');
   }
 
+  if (clearParameters.length) {
+    clearParameters.forEach((parameter) => {
+      newQuery.delete(parameter);
+    });
+  }
+
   if (BROWSER) {
     const query = newQuery?.toString();
     const newUrl = query ? `${url.pathname}?${query}` : url.pathname;
@@ -45,4 +53,50 @@ export const updateQueryParameters = async ({
   }
 
   return value;
+};
+
+export type QueryParameter = {
+  parameter: string;
+  value?: string | number | boolean;
+};
+
+type UpdateMultipleQueryParams = {
+  parameters: QueryParameter[];
+  url: URL;
+  goto?: typeof navigateTo;
+  clearParameters?: string[];
+};
+
+export const updateMultipleQueryParameters = async ({
+  parameters,
+  url,
+  goto = navigateTo,
+  clearParameters = [],
+}: UpdateMultipleQueryParams) => {
+  const params: { [key: string]: string } = {};
+  url.searchParams.forEach((value, key) => {
+    if (!parameters.find(({ parameter }) => parameter === key)) {
+      params[key] = value;
+    }
+  });
+  const newQuery = new URLSearchParams(params);
+
+  parameters.forEach(({ parameter, value }) => {
+    if (value || value === false) {
+      newQuery.set(parameter, String(value));
+    }
+  });
+
+  if (clearParameters.length) {
+    clearParameters.forEach((parameter) => {
+      newQuery.delete(parameter);
+    });
+  }
+
+  if (BROWSER) {
+    const query = newQuery?.toString();
+    const newUrl = query ? `${url.pathname}?${query}` : url.pathname;
+
+    goto(newUrl, gotoOptions);
+  }
 };

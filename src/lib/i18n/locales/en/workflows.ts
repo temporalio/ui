@@ -30,18 +30,17 @@ export const Strings = {
   'batch-reset-confirmation_other':
     'Are you sure you want to reset {{count, number}} workflows?',
   'batch-operation-confirmation-input-hint':
-    'If you supply a custom reason, "{{placeholder}}" will be appended to it.',
+    'If you supply a custom reason, "{{placeholder}}" will be appended to it. If you omit a reason, the placeholder will be used.',
   'batch-terminate-all-success':
     'The batch terminate request is processing in the background.',
   'batch-cancel-all-success':
     'The batch cancel request is processing in the background.',
   'batch-reset-all-success':
     'The batch reset request is processing in the background.',
-  'configure-workflows': 'Configure Workflow List',
-  'open-configure-workflows': 'Open workflow list configuration',
-  'close-configure-workflows': 'Close workflow list configuration',
-  'configure-workflows-description':
-    'Add (<1></1>), re-arrange (<2></2>), and remove (<3></3>), Workflow Headings to personalize the Workflow List Table.',
+  'configure-headers': 'Configure {{title}}',
+  'close-configure-headers': 'Close {{title}} configuration',
+  'configure-headers-description':
+    'Add (<1></1>), re-arrange (<2></2>), and remove (<3></3>), {{type}} Headings to personalize the {{title}} Table.',
   'all-statuses': 'All Statuses',
   running: 'Running',
   'timed-out': 'Timed Out',
@@ -62,6 +61,8 @@ export const Strings = {
   'request-cancellation': 'Request Cancellation',
   'back-to-workflows': 'Back to Workflows',
   input: 'Input',
+  'initial-input': 'Initial Input',
+  'example-input': 'Example Input',
   'input-and-results': 'Input and Results',
   'continued-as-new-with-input': 'Continued as New with Input',
   results: 'Results',
@@ -73,7 +74,7 @@ export const Strings = {
   json: 'JSON',
   download: 'Download',
   'workflow-actions': 'Workflow Actions',
-  'reset-disabled':
+  'reset-disabled-unauthorized':
     'Resetting workflows is not enabled, please contact your administrator for assistance.',
   'reset-disabled-pending-children':
     'Cannot reset workflows with pending children.',
@@ -135,6 +136,7 @@ export const Strings = {
   'pending-children_other': '{{count}} Pending Children',
   children_one: '1 Child',
   children_other: '{{count}} Children',
+  'show-children': 'Show Child Workflows',
   first: '{{count}} First',
   previous: '{{count}} Previous',
   next: '{{count}} Next',
@@ -236,4 +238,12 @@ export const Strings = {
   'pending-activities-link': 'Show all Pending Activities',
   'duration-filter-placeholder':
     'e.g. "2h45m", "hh:mm:ss", or "1000" nanoseconds',
+  'start-workflow': 'Start Workflow',
+  'start-workflow-like-this-one': 'Start Workflow Like This One',
+  'custom-search-attribute': 'Custom Search Attribute',
+  'select-attribute': 'Select Attribute',
+  'add-search-attribute': 'Add a Search Attribute',
+  'pending-workflow-task': 'Pending Workflow Task',
+  'original-scheduled-time': 'Original Scheduled Time',
+  'started-time': 'Started Time',
 } as const;

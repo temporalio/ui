@@ -31,12 +31,12 @@
   aria-live="polite"
 >
   <div
-    class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 border-b-2 p-8 xl:min-w-[520px] xl:border-b-0 xl:border-r-2"
+    class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 border-b-2 border-table p-8 xl:min-w-[520px] xl:border-b-0 xl:border-r-2"
   >
     {#if updating}
       <Loading />
     {:else}
-      <h2 class="text-lg font-medium">
+      <h2>
         {#if query}
           {translate('workflows.workflow-query-empty-state-title')}
         {:else}

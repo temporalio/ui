@@ -3,6 +3,8 @@
 
   import { getContext } from 'svelte';
 
+  import Label from '$lib/holocene/label.svelte';
+
   import type { RadioGroupContext, RadioInputProps } from './types';
 
   import { RADIO_GROUP_CONTEXT } from './radio-group.svelte';
@@ -32,11 +34,12 @@
 </script>
 
 <div class="flex flex-col gap-1">
-  <label class:disabled>
+  <Label {disabled}>
     <input
       bind:group={$group}
       type="radio"
-      aria-describedby="{id}-description"
+      class="surface-primary"
+      aria-describedby={description ? `${id}-description` : null}
       {name}
       {value}
       {id}
@@ -46,7 +49,7 @@
     <span class="label" class:hidden={labelHidden}>
       {label}
     </span>
-  </label>
+  </Label>
   {#if description}
     <p class="description" id="{id}-description">
       {description}
@@ -56,48 +59,40 @@
 
 <style lang="postcss">
   .description {
-    @apply ml-[26px] text-xs font-normal text-primary;
-  }
-
-  label {
-    @apply flex grow cursor-pointer flex-row items-center gap-2 text-sm font-normal text-primary focus:outline-none;
-
-    &.disabled {
-      @apply cursor-not-allowed;
-    }
+    @apply ml-7 text-xs font-normal text-primary;
   }
 
   input[type='radio'] {
-    @apply relative box-content h-4 w-4 min-w-[16px] cursor-pointer appearance-none rounded-full border-2 border-subtle bg-transparent outline outline-4 outline-transparent dark:text-black;
+    @apply box-border h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-secondary outline-none;
 
-    &::after {
-      @apply absolute left-1 top-1 h-0 w-0 scale-0 rounded-full bg-interactive transition-transform content-[''];
+    &:checked {
+      @apply bg-interactive;
     }
 
     &:enabled {
       &:focus-visible,
       &:hover {
-        @apply border-transparent border-white bg-interactive outline-offset-0 outline-interactive/70 dark:border-black;
+        @apply bg-interactive-active ring-4 ring-primary/70;
+
+        &:checked {
+          &:not(:active) {
+            @apply shadow-none;
+          }
+        }
+
+        &:not(:active) {
+          @apply border-inverse;
+        }
       }
+    }
+
+    &:checked,
+    &:active {
+      @apply shadow-[inset_0_0_0_2px] shadow-white dark:shadow-black;
     }
 
     &:disabled {
       @apply cursor-not-allowed opacity-50;
-    }
-  }
-
-  input[type='radio']:checked {
-    @apply bg-interactive shadow-[inset_0_0_0_2px] shadow-white dark:shadow-black;
-
-    &:enabled {
-      &:focus-visible,
-      &:hover {
-        @apply border-white shadow-none dark:border-black;
-      }
-    }
-
-    &::after {
-      @apply h-2 w-2 scale-100;
     }
   }
 </style>

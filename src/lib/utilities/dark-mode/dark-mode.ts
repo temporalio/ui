@@ -9,9 +9,9 @@ export const useDarkMode = persistStore(
 export const darkMode = (node: HTMLElement) => {
   useDarkMode.subscribe((value) => {
     if (value) {
-      node.classList.add('dark');
+      node.dataset.theme = 'dark';
     } else {
-      node.classList.remove('dark');
+      node.dataset.theme = 'light';
     }
   });
 };

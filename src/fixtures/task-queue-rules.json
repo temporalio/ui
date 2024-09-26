@@ -1,0 +1,59 @@
+{
+  "assignmentRules": [
+    {
+      "rule": {
+        "targetBuildId": "1.12-alpha",
+        "percentageRamp": {
+          "rampPercentage": 0.2
+        }
+      },
+      "createTime": "2024-04-04T00:00:00Z"
+    },
+    {
+      "rule": {
+        "targetBuildId": "1.11-beta",
+        "percentageRamp": {
+          "rampPercentage": 0.4
+        }
+      },
+      "createTime": "2024-04-02T00:00:00Z"
+    },
+    {
+      "rule": {
+        "targetBuildId": "1.1",
+        "percentageRamp": {
+          "rampPercentage": 1
+        }
+      },
+      "createTime": "2024-04-01T00:00:00Z"
+    },
+    {
+      "rule": {
+        "targetBuildId": "1.01",
+        "percentageRamp": {
+          "rampPercentage": 1
+        }
+      },
+      "createTime": "2024-03-15T00:00:00Z"
+    },
+    {
+      "rule": {
+        "targetBuildId": "1.00",
+        "percentageRamp": {
+          "rampPercentage": 1
+        }
+      },
+      "createTime": "2024-03-01T00:00:00Z"
+    }
+  ],
+  "compatibleRedirectRules": [
+    {
+      "rule": {
+        "sourceBuildId": "1.12",
+        "targetBuildId": "1.13"
+      },
+      "createTime": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "conflictToken": "abcd1234"
+}

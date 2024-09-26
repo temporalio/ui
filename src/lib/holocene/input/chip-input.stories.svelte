@@ -1,35 +1,86 @@
-<script lang="ts">
-  import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
+<script lang="ts" context="module">
+  import type { Meta } from '@storybook/svelte';
+  import { userEvent, within } from '@storybook/test';
 
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import { isEmail } from '$lib/utilities/is-email';
 
-  let chips: string[] = ['tobias@temporal.io'];
+  export const meta = {
+    title: 'Chip Input',
+    component: ChipInput,
+    args: {
+      label: 'Chip Input',
+      placeholder: 'Placeholder...',
+      disabled: false,
+      required: false,
+      hintText: 'This is the hint text...',
+      removeChipButtonLabel: 'Remove',
+      labelHidden: false,
+      validator: isEmail,
+      chips: ['tobias@temporal.io'],
+    },
+    argTypes: {
+      label: { name: 'Label', control: 'text' },
+      placeholder: { name: 'Placeholder', control: 'text' },
+      hintText: { name: 'Hint Text', control: 'text' },
+      disabled: { name: 'Disabled', control: 'boolean' },
+      required: { name: 'Required', control: 'boolean' },
+      labelHidden: { name: 'Label Hidden', control: 'boolean' },
+      chips: { name: 'Chips', table: { disable: true } },
+      validator: { table: { disable: true } },
+      removeChipButtonLabel: {
+        name: 'Aria label for remove button',
+        control: 'text',
+        table: { category: 'Accessibility' },
+      },
+    },
+  } satisfies Meta<ChipInput>;
 </script>
 
-<Meta
-  title="Chip Input"
-  component={ChipInput}
-  args={{
-    label: 'Chip Input',
-    placeholder: 'Placeholder...',
-    disabled: false,
-    required: false,
-    hintText: 'This is the hint text...',
-    removeChipButtonLabel: 'Remove',
-  }}
-  argTypes={{
-    chips: { control: false },
-    validator: { control: false },
-    id: { control: 'text' },
-    label: { control: 'text' },
-    removeChipButtonLabel: { control: 'text' },
-    name: { control: 'text' },
+<script lang="ts">
+  import { Story, Template } from '@storybook/addon-svelte-csf';
+</script>
+
+<Template let:args let:context>
+  <ChipInput {...args} id={context.id} />
+</Template>
+
+<Story name="Default" />
+
+<Story name="Disabled" args={{ disabled: true }} />
+
+<Story name="Required" args={{ required: true }} />
+
+<Story name="Label Hidden" args={{ labelHidden: true }} />
+
+<Story name="Empty" args={{ chips: [] }} />
+
+<Story
+  name="Partial Input"
+  args={{ chips: [] }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId(id);
+    await userEvent.type(input, 'bonbon');
   }}
 />
 
-<Template let:args>
-  <ChipInput bind:chips {...args} />
-</Template>
+<Story
+  name="Partial Input with Chips"
+  args={{ chips: ['finn@temporal.io'] }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId(id);
+    await userEvent.type(input, 'bonbon');
+  }}
+/>
 
-<Story name="chip input" args={{ id: 'chip-input-1', validator: isEmail }} />
+<Story
+  name="Invalid"
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId(id);
+    await userEvent.type(input, 'bonbon');
+    await userEvent.keyboard('{enter}');
+  }}
+/>

@@ -3,9 +3,9 @@
 </script>
 
 <div class="orderable-section">
-  <h4 class="orderable-heading">
+  <h5>
     <slot name="heading">Items</slot>
-  </h4>
+  </h5>
   <ol class="orderable-list">
     <slot>
       <OrderableListItem readonly label="No Items" pinned={false} />
@@ -15,14 +15,10 @@
 
 <style lang="postcss">
   .orderable-section {
-    @apply flex flex-col gap-2;
-  }
-
-  .orderable-heading {
-    @apply text-sm font-medium text-primary;
+    @apply flex flex-col gap-1;
   }
 
   .orderable-list {
-    @apply surface-primary rounded-lg border-2 border-primary dark:border-subtle;
+    @apply surface-primary rounded-lg border-2 border-subtle;
   }
 </style>

@@ -2,7 +2,7 @@ import { derived, get, type Readable, writable } from 'svelte/store';
 
 import type {
   SearchAttributes,
-  SearchAttributesValue,
+  SearchAttributeType,
   WorkflowExecution,
 } from '$lib/types/workflows';
 
@@ -46,10 +46,17 @@ export const workflowIncludesSearchAttribute = (
   return searchAttribute in (workflow?.searchAttributes?.indexedFields ?? {});
 };
 
-type SearchAttributeOption = {
+export type SearchAttributeOption = {
   label: string;
   value: string;
-  type: SearchAttributesValue;
+  type: SearchAttributeType;
+};
+
+export type SearchAttributeInputValue = string | number;
+
+export type SearchAttributeInput = {
+  attribute: string;
+  value: SearchAttributeInputValue;
 };
 
 export const searchAttributeOptions: Readable<SearchAttributeOption[]> =

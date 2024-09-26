@@ -47,7 +47,7 @@ test.describe('Disable write actions on empty schedules list actions', () => {
     await page.goto(schedulesUrl);
 
     const namespace = await page.locator('h1').innerText();
-    expect(namespace).toBe('Schedules');
+    expect(namespace).toBe('0 Schedules');
 
     const createButton = page.getByTestId('create-schedule');
     await expect(createButton).toBeDisabled();

@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Label from '$lib/holocene/label.svelte';
 
   export let icon: IconName = null;
   export let id: string;
@@ -11,6 +14,7 @@
   export let placeholder = '';
   export let name = id;
   export let disabled = false;
+  export let required = false;
   export let hintText = '';
   export let max: number = undefined;
   export let min: number = undefined;
@@ -33,8 +37,8 @@
   }
 </script>
 
-<div class={$$props.class}>
-  <label class:sr-only={labelHidden} for={id}>{label}</label>
+<div class={merge('flex flex-col gap-1', $$props.class)}>
+  <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="flex items-center gap-2">
     <div
       class="input-container"
@@ -74,21 +78,16 @@
   </div>
 </div>
 {#if !valid && hintText}
-  <span class="mt-1 text-xs text-red-700">{hintText}</span>
+  <span class="mt-1 text-xs text-danger">{hintText}</span>
 {/if}
 
 <style lang="postcss">
-  /* Base styles */
-  label {
-    @apply mb-10 font-secondary text-sm font-medium text-primary;
-  }
-
   .units {
-    @apply font-secondary text-sm font-medium text-primary;
+    @apply text-sm font-medium text-primary;
   }
 
   .input-container {
-    @apply relative box-border flex h-10 w-16 items-center rounded border-2 text-sm focus-within:border-information dark:border-subtle;
+    @apply surface-primary relative box-border flex h-10 w-16 items-center rounded-lg border-2 border-subtle text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
   }
 
   .input-container.search {
@@ -103,32 +102,12 @@
     @apply ml-2 flex items-center justify-center;
   }
 
-  .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r border-l;
-  }
-
   .input-container.invalid {
-    @apply border-red-700 text-red-700;
-  }
-
-  .count {
-    @apply invisible mr-2 font-secondary text-sm font-medium;
-  }
-
-  .input-container .icon-container {
-    @apply text-slate-400;
+    @apply border-danger focus-within:ring-danger/70;
   }
 
   .input-container.disabled {
-    @apply border border-slate-600 bg-slate-50  text-slate-600;
-  }
-
-  .input-container.disabled input {
-    @apply bg-slate-50;
-  }
-
-  .input-container.disabled .copy-icon-container {
-    @apply border-slate-600 bg-slate-200;
+    @apply opacity-50;
   }
 
   .unroundRight {
@@ -136,6 +115,6 @@
   }
 
   .unroundLeft {
-    @apply rounded-bl-none rounded-tl-none;
+    @apply rounded-bl-none rounded-tl-none border-l-0;
   }
 </style>

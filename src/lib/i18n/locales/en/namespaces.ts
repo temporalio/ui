@@ -24,4 +24,5 @@ export const Strings = {
   'search-namespaces': 'Search Namespaces',
   'select-namespace-empty-state':
     'No Namespaces. Contact your admin to create one.',
+  'back-to-namespaces': 'Back to Namespaces',
 } as const;

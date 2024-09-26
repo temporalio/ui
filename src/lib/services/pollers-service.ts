@@ -11,17 +11,42 @@ import {
   requestFromAPI,
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { getOrderedVersionSets } from '$lib/utilities/task-queue-compatibility';
 
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 
 export type GetWorkerTaskReachabilityRequest = NamespaceScopedRequest & {
-  taskQueue: string;
+  queue: string;
   buildIds: string[];
 };
 
 export type GetPollersResponse = {
   pollers?: PollerWithTaskQueueTypes[];
   taskQueueStatus: TaskQueueStatus;
+};
+
+export type AssignmentRule = {
+  rule: {
+    targetBuildId: string;
+    percentageRamp?: {
+      rampPercentage?: number;
+    };
+  };
+  createTime: string;
+};
+
+type CompatibleRedirectRule = {
+  rule: {
+    sourceBuildId: string;
+    targetBuildId: string;
+  };
+  createTime: string;
+};
+
+export type TaskQueueRules = {
+  assignmentRules?: AssignmentRule[];
+  compatibleRedirectRules?: CompatibleRedirectRule[];
+  conflictToken: string;
 };
 
 export type TaskQueueCompatibility = {
@@ -120,15 +145,46 @@ export async function getPollers(
     taskQueueStatus,
   };
 }
+export type VersionResults = {
+  rules: TaskQueueRules;
+  compatibility: TaskQueueCompatibility;
+  versionSets: TaskQueueCompatibleVersionSet[];
+};
+
+export async function getVersioning(
+  parameters: GetAllPollersRequest,
+  request = fetch,
+): Promise<VersionResults> {
+  const rules = await getTaskQueueRules(parameters, request);
+  const compatibility = await getTaskQueueCompatibility(parameters, request);
+  const versionSets = getOrderedVersionSets(compatibility);
+
+  return { rules, compatibility, versionSets };
+}
+
+export async function getTaskQueueRules(
+  parameters: GetAllPollersRequest,
+  request = fetch,
+): Promise<TaskQueueRules | undefined> {
+  const route = routeForApi('task-queue.rules', parameters);
+  return requestFromAPI(route, {
+    request,
+    handleError: (_e: APIErrorResponse) => {
+      return;
+    },
+  });
+}
 
 export async function getTaskQueueCompatibility(
   parameters: GetAllPollersRequest,
   request = fetch,
-): Promise<TaskQueueCompatibility> {
+): Promise<TaskQueueCompatibility | undefined> {
   const route = routeForApi('task-queue.compatibility', parameters);
   return requestFromAPI(route, {
     request,
-    onError: (e: APIErrorResponse) => console.error(e),
+    handleError: (_e: APIErrorResponse) => {
+      return;
+    },
   });
 }
 
@@ -136,7 +192,7 @@ export async function getWorkerTaskReachability(
   parameters: GetWorkerTaskReachabilityRequest,
   request = fetch,
 ): Promise<WorkerReachability> {
-  const { namespace, buildIds, taskQueue } = parameters;
+  const { namespace, buildIds, queue } = parameters;
   const route = routeForApi('worker-task-reachability', { namespace });
   const params = new URLSearchParams();
 
@@ -146,14 +202,13 @@ export async function getWorkerTaskReachability(
     }
   } else {
     params.append('buildIds', '');
-    params.append('taskQueues', taskQueue);
+    params.append('taskQueues', queue);
   }
 
   return await requestFromAPI(route, {
     request,
     params,
-    onError: (e: APIErrorResponse) => {
-      console.error(e);
+    handleError: (_e: APIErrorResponse) => {
       return {
         buildIdReachability: [],
       };

@@ -1,49 +1,83 @@
-<script lang="ts">
-  import { Meta, Story } from '@storybook/addon-svelte-csf';
+<script lang="ts" context="module">
+  import type { Meta } from '@storybook/svelte';
+  import { expect, userEvent, within } from '@storybook/test';
 
-  import iconNames from '$lib/holocene/icon';
+  import { iconNames } from '$lib/holocene/icon';
 
   import ToggleButton from './toggle-button.svelte';
   import ToggleButtons from './toggle-buttons.svelte';
 
-  let activeOption = 'a';
+  export const meta = {
+    title: 'Toggle Button',
+    component: ToggleButton,
+    subcomponents: { ToggleButtons },
+    argTypes: {
+      icon: { name: 'Icon', control: 'select', options: iconNames },
+      group: { table: { disable: true } },
+      base: { table: { disable: true } },
+      href: { table: { disable: true } },
+      active: { table: { disable: true } },
+    },
+  } satisfies Meta<ToggleButton>;
 </script>
 
-<Meta
-  title="Toggle Button"
-  component={ToggleButton}
-  argTypes={{
-    icon: { control: 'select', options: iconNames },
-    group: { control: false },
-    base: { control: 'text' },
-    href: { control: 'text' },
-    label: { control: 'text' },
-  }}
-/>
+<script lang="ts">
+  import { get, writable } from 'svelte/store';
 
-<Story name="toggle buttons" let:args>
+  import { action } from '@storybook/addon-actions';
+  import { Story, Template } from '@storybook/addon-svelte-csf';
+
+  const selected = writable(0);
+  const select = (index: number) => {
+    selected.set(index);
+    action('select')(index);
+  };
+
+  const play: Story['play'] = async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    selected.set(0);
+
+    const first = await canvas.findByTestId('toggle-button-0');
+    const second = await canvas.findByTestId('toggle-button-1');
+    const third = await canvas.findByTestId('toggle-button-2');
+    const fourth = await canvas.findByTestId('toggle-button-3');
+
+    await step('Validate that the selected toggle is active', async () => {
+      const selectedToggle = await canvas.findByTestId(
+        `toggle-button-${get(selected)}`,
+      );
+
+      expect(selectedToggle).toHaveClass('active');
+    });
+
+    await step('Validate that the other toggles are not active', async () => {
+      expect(second).not.toHaveClass('active');
+      expect(third).not.toHaveClass('active');
+      expect(fourth).not.toHaveClass('active');
+    });
+
+    await step('Click the second toggle', async () => {
+      await userEvent.click(second);
+      expect(first).not.toHaveClass('active');
+      expect(second).toHaveClass('active');
+    });
+  };
+</script>
+
+<Template let:args>
   <ToggleButtons>
-    <ToggleButton
-      {...args}
-      on:click
-      on:click={() => {
-        activeOption = 'a';
-      }}
-      active={activeOption === 'a'}>{args.label ?? 'Option A'}</ToggleButton
-    >
-    <ToggleButton
-      on:click
-      on:click={() => {
-        activeOption = 'b';
-      }}
-      active={activeOption === 'b'}>Option B</ToggleButton
-    >
-    <ToggleButton
-      on:click
-      on:click={() => {
-        activeOption = 'c';
-      }}
-      active={activeOption === 'c'}>Option C</ToggleButton
-    >
+    {#each ['John', 'Paul', 'George', 'Ringo'] as name, index}
+      <ToggleButton
+        {...args}
+        data-testid={`toggle-button-${index}`}
+        active={$selected === index}
+        on:click={() => select(index)}
+      >
+        {name}
+      </ToggleButton>
+    {/each}
   </ToggleButtons>
-</Story>
+</Template>
+
+<Story name="Default" {play} />

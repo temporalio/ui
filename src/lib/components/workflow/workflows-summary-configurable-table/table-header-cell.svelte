@@ -1,20 +1,11 @@
 <script lang="ts">
-  import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
+  import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
 
-  export let column: WorkflowHeader;
+  export let column: ConfigurableTableHeader;
 
   $: ({ label } = column);
 </script>
 
-<th
-  class="workflows-summary-table-header-cell"
-  data-testid="workflows-summary-table-header-cell-{label}"
->
+<th data-testid="workflows-summary-table-header-cell-{label}">
   {label}
 </th>
-
-<style lang="postcss">
-  .workflows-summary-table-header-cell {
-    @apply whitespace-nowrap px-2 text-left font-secondary text-sm font-medium;
-  }
-</style>

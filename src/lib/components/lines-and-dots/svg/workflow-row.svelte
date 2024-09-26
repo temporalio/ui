@@ -2,21 +2,19 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
-  import { CompactConfig } from '../constants';
+  import { TimelineConfig } from '../constants';
 
   import Dot from './dot.svelte';
   import Line from './line.svelte';
-  import Text from './text.svelte';
 
   export let workflow: WorkflowExecution;
   export let length: number;
   export let y: number;
-  export let active = true;
 
-  const { radius, height } = CompactConfig;
+  const { radius, height, gutter } = TimelineConfig;
 
-  $: start = 2 * radius;
-  $: end = start + length;
+  $: start = gutter;
+  $: end = start + length - 2 * gutter;
 </script>
 
 <g role="button" tabindex="0" class="relative cursor-pointer" {height}>
@@ -24,31 +22,26 @@
     startPoint={[start, y]}
     endPoint={[end, y]}
     classification={workflow.status}
-    {active}
     strokeWidth={radius * 2}
+    pending={workflow.isRunning}
   />
-  <Line
-    startPoint={[start, y]}
-    endPoint={[end, y]}
-    {active}
-    status="none"
-    strokeWidth={radius}
-  />
-  <Text point={[start + (4 / 3) * radius, y]} {active} fontWeight="500">
-    {workflow.name}
-  </Text>
-  <Dot
-    point={[start, y]}
-    classification={workflow.status}
-    {active}
-    r={radius}
-  />
+  <Dot point={[start, y]} classification={workflow.status} r={radius} />
   <Icon
     name="workflow"
-    x={start - radius / 1.35}
-    y={y - radius / 1.35}
-    width={radius * 1.5}
-    height={radius * 1.5}
+    x={start - radius / 2}
+    y={y - radius / 2}
+    width={radius}
+    height={radius}
+    strokeWidth="4"
+    class="text-black"
+  />
+  <Dot point={[end, y]} classification={workflow.status} r={radius} />
+  <Icon
+    name="workflow"
+    x={end - radius / 2}
+    y={y - radius / 2}
+    width={radius}
+    height={radius}
     strokeWidth="4"
     class="text-black"
   />
@@ -56,6 +49,7 @@
 
 <style lang="postcss">
   g {
+    cursor: default;
     pointer-events: bounding-box;
     outline: none;
   }

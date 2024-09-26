@@ -170,4 +170,24 @@ export const Strings = {
     description:
       'A Workflow Update was received by the Temporal Server while a Workflow Task was being processed on a Worker.',
   },
+  BadScheduleNexusOperationAttributes: {
+    title: 'Bad Schedule Nexus Operation Attributes',
+    description:
+      'A workflow task completed with an invalid ScheduleNexusOperation command.',
+  },
+  PendingNexusOperationsLimitExceeded: {
+    title: 'Pending Nexus Operations Limit Exceeded',
+    description:
+      'A workflow task completed requesting to schedule a Nexus Operation exceeding the server configured limit.',
+  },
+  BadRequestCancelNexusOperationAttributes: {
+    title: 'Bad Request Cancel Nexus Operation Attributes',
+    description:
+      'A workflow task completed with an invalid RequestCancelNexusOperation command.',
+  },
+  FeatureDisabled: {
+    title: 'Feature Disabled',
+    description:
+      "A workflow task completed requesting a feature that's disabled on the server (either system wide or - typically - for the workflow's namespace). Check the workflow task failure message for more information.",
+  },
 } as const;

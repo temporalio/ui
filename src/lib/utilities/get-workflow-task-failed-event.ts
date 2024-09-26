@@ -2,6 +2,7 @@ import type { EventSortOrder } from '$lib/stores/event-view';
 import type {
   WorkflowEvent,
   WorkflowEvents,
+  WorkflowTaskCompletedEvent,
   WorkflowTaskFailedEvent,
 } from '$lib/types/events';
 
@@ -11,18 +12,42 @@ const isFailedTaskEvent = (
   return event.eventType === 'WorkflowTaskFailed';
 };
 
+const isCompletedTaskEvent = (
+  event: WorkflowEvent,
+): event is WorkflowTaskCompletedEvent => {
+  return event.eventType === 'WorkflowTaskCompleted';
+};
+
+const getFailedWorkflowTask = (
+  fullEventHistory: WorkflowEvents,
+): WorkflowTaskFailedEvent | undefined => {
+  const failedWorkflowTaskIndex = fullEventHistory.findIndex(isFailedTaskEvent);
+
+  if (failedWorkflowTaskIndex < 0) return;
+
+  const completedWorkflowTaskIndex =
+    fullEventHistory.findIndex(isCompletedTaskEvent);
+
+  const failedWorkflowTask = fullEventHistory.find((event) =>
+    isFailedTaskEvent(event),
+  ) as WorkflowTaskFailedEvent;
+
+  if (completedWorkflowTaskIndex < 0) return failedWorkflowTask;
+
+  // History is sorted in descending order, so index of failed task should be less than index of completed task
+  if (failedWorkflowTaskIndex < completedWorkflowTaskIndex) {
+    return failedWorkflowTask;
+  }
+};
+
 export const getWorkflowTaskFailedEvent = (
   fullEventHistory: WorkflowEvents,
   sortOrder: EventSortOrder,
 ): WorkflowTaskFailedEvent | undefined => {
   if (sortOrder === 'descending') {
-    return fullEventHistory.find((event) =>
-      isFailedTaskEvent(event),
-    ) as WorkflowTaskFailedEvent;
+    return getFailedWorkflowTask(fullEventHistory);
   } else {
-    for (let i = fullEventHistory.length - 1; i >= 0; i--) {
-      const event = fullEventHistory[i];
-      if (isFailedTaskEvent(event)) return event;
-    }
+    const reversedEventHistory = [...fullEventHistory].reverse();
+    return getFailedWorkflowTask(reversedEventHistory);
   }
 };

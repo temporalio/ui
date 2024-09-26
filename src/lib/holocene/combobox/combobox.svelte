@@ -6,9 +6,11 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
 
+  import Button from '../button.svelte';
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
 
@@ -253,14 +255,7 @@
 </script>
 
 <MenuContainer {open} on:close={handleMenuClose}>
-  <label
-    class="combobox-label"
-    class:sr-only={labelHidden}
-    class:required
-    for={id}
-  >
-    {label}
-  </label>
+  <Label class="pb-1" hidden={labelHidden} {required} {label} for={id} />
   <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
     {#if leadingIcon}
       <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
@@ -292,21 +287,24 @@
       bind:this={inputElement}
       {...$$restProps}
     />
-    <button
+    <Button
       aria-label={toggleLabel}
-      class="combobox-button"
       tabindex={-1}
       aria-controls="{id}-listbox"
       aria-expanded={$open}
-      type="button"
+      variant="ghost"
+      size="xs"
       on:click={toggleList}
+      {disabled}
     >
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
-    </button>
+    </Button>
+    {#if $$slots.action}
+      <div class="ml-1 flex h-full items-center border-l-2 border-subtle p-0.5">
+        <slot name="action" />
+      </div>
+    {/if}
   </div>
-  {#if error && !valid}
-    <span class="error">{error}</span>
-  {/if}
 
   <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
     {#each list as option}
@@ -333,26 +331,22 @@
       <ComboboxOption disabled>{noResultsText}</ComboboxOption>
     {/each}
   </Menu>
+
+  {#if error && !valid}
+    <span class="error">{error}</span>
+  {/if}
 </MenuContainer>
 
 <style lang="postcss">
-  .combobox-label {
-    @apply font-secondary text-sm font-medium text-primary;
-
-    &.required {
-      @apply after:content-['*'];
-    }
-  }
-
   .combobox-wrapper {
-    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border border-primary text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
+    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border-2 border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     &.invalid {
-      @apply border-2 border-error text-danger focus-within:shadow-danger/50;
+      @apply border-2 border-danger text-danger focus-within:ring-danger/70;
     }
 
     &.disabled {
-      @apply surface-disabled border-subtle text-disabled;
+      @apply opacity-50;
     }
   }
 
@@ -361,10 +355,6 @@
   }
 
   .combobox-input {
-    @apply ml-2 h-full w-full grow bg-transparent font-primary text-primary placeholder:text-primary focus:outline-none disabled:text-disabled disabled:placeholder:text-disabled dark:bg-transparent;
-  }
-
-  .combobox-button {
-    @apply mx-2 flex shrink-0 items-center justify-center rounded-full hover:surface-interactive-secondary;
+    @apply ml-2 h-full w-full grow bg-transparent text-primary placeholder:text-secondary focus:outline-none;
   }
 </style>

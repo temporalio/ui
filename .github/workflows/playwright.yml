@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
       - name: Install Playwright Browsers
@@ -39,7 +39,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Checkout and Setup Node

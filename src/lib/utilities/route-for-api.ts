@@ -10,6 +10,8 @@ import type {
   BatchRouteParameters,
   NamespaceAPIRoutePath,
   NamespaceRouteParameters,
+  NexusAPIRoutePath,
+  NexusRouteParameters,
   ParameterlessAPIRoutePath,
   ScheduleAPIRoutePath,
   ScheduleListRouteParameters,
@@ -33,6 +35,7 @@ import type {
 } from '$lib/types/api';
 
 import { getApiOrigin } from './get-api-origin';
+import { minimumVersionRequired } from './version-check';
 
 const replaceNamespaceInApiUrl = (
   apiUrl: string,
@@ -79,9 +82,14 @@ const withBase = (path: string, namespace?: string): string => {
 const encode = (
   parameters: Partial<APIRouteParameters>,
 ): APIRouteParameters => {
+  const version = get(page)?.data?.settings?.version;
   return Object.keys(parameters ?? {}).reduce(
     (acc, key) => {
-      acc[key] = encodeURIComponent(encodeURIComponent(parameters[key]));
+      if (version && minimumVersionRequired('2.23.0', version)) {
+        acc[key] = encodeURIComponent(parameters[key]);
+      } else {
+        acc[key] = encodeURIComponent(encodeURIComponent(parameters[key]));
+      }
       return acc;
     },
     {
@@ -93,6 +101,7 @@ const encode = (
       signalName: '',
       batchJobId: '',
       activityId: '',
+      endpointId: '',
     },
   );
 };
@@ -105,21 +114,22 @@ export function pathForApi(
   if (shouldEncode) parameters = encode(parameters);
 
   const routes: { [K in APIRoutePath]: string } = {
-    cluster: '/cluster-info',
     systemInfo: '/system-info',
-    'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history`,
-    'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history-reverse`,
+    cluster: '/cluster-info',
     namespaces: '/namespaces',
     namespace: `/namespaces/${parameters?.namespace}`,
+    'search-attributes': `/namespaces/${parameters.namespace}/search-attributes`,
+    'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history`,
+    'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history-reverse`,
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/query/${parameters.queryType}`,
     schedule: `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
     'schedule.patch': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}/patch`,
     'schedule.edit': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}/update`,
     schedules: `/namespaces/${parameters?.namespace}/schedules`,
-    'search-attributes': `/namespaces/${parameters.namespace}/search-attributes`,
     settings: '/settings',
     'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
     'task-queue.compatibility': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/worker-build-id-compatibility`,
+    'task-queue.rules': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/worker-versioning-rules`,
     user: '/me',
     'worker-task-reachability': `/namespaces/${parameters?.namespace}/worker-task-reachability`,
     'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/terminate`,
@@ -127,13 +137,16 @@ export function pathForApi(
     'workflow.signal': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/signal/${parameters.signalName}`,
     'workflow.reset': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/reset`,
     workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}`,
-    'workflows.archived': `/namespaces/${parameters?.namespace}/archived-workflows`,
     workflows: `/namespaces/${parameters?.namespace}/workflows`,
+    'workflows.archived': `/namespaces/${parameters?.namespace}/archived-workflows`,
     'workflows.count': `/namespaces/${parameters?.namespace}/workflow-count`,
     'activity.complete': `/namespaces/${parameters.namespace}/activities/complete-by-id`,
     'activity.fail': `/namespaces/${parameters.namespace}/activities/fail-by-id`,
     'batch-operations.list': `/namespaces/${parameters.namespace}/batch-operations`,
     'batch-operations': `/namespaces/${parameters.namespace}/batch-operations/${parameters?.batchJobId}`,
+    'nexus-endpoints': '/nexus/endpoints',
+    'nexus-endpoint': `/nexus/endpoints/${parameters.endpointId}`,
+    'nexus-endpoint.update': `/nexus/endpoints/${parameters.endpointId}/update`,
   };
 
   return getPath(routes[route]);
@@ -196,6 +209,11 @@ export function routeForApi(
 export function routeForApi(
   route: SearchAttributesRoutePath,
   parameters: SearchAttributesRouteParameters,
+): string;
+export function routeForApi(
+  route: NexusAPIRoutePath,
+  parameters: NexusRouteParameters,
+  shouldEncode?: boolean,
 ): string;
 export function routeForApi(route: ParameterlessAPIRoutePath): string;
 export function routeForApi(

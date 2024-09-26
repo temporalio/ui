@@ -25,7 +25,7 @@ type RouteParameters = {
 export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
 export type WorkflowsParameter = Pick<
   RouteParameters,
-  'namespace' | 'query' | 'search' | 'page'
+  'namespace' | 'query' | 'page'
 >;
 export type TaskQueueParameters = Pick<RouteParameters, 'namespace' | 'queue'>;
 export type WorkflowParameters = Pick<
@@ -55,6 +55,22 @@ export const routeForNamespaces = (): string => {
   return `${base}/namespaces`;
 };
 
+export const routeForNexus = (): string => {
+  return `${base}/nexus`;
+};
+
+export const routeForNexusEndpoint = (id: string): string => {
+  return `${base}/nexus/${id}`;
+};
+
+export const routeForNexusEndpointEdit = (id: string): string => {
+  return `${base}/nexus/${id}/edit`;
+};
+
+export const routeForNexusEndpointCreate = (): string => {
+  return `${base}/nexus/create`;
+};
+
 export const routeForNamespace = ({
   namespace,
 }: NamespaceParameter): string => {
@@ -69,10 +85,24 @@ export const routeForWorkflows = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/workflows`;
 };
 
+type StartWorkflowParameters = NamespaceParameter &
+  Partial<{ workflowId: string; taskQueue: string; workflowType: string }>;
+export const routeForWorkflowStart = ({
+  namespace,
+  workflowId,
+  taskQueue,
+  workflowType,
+}: StartWorkflowParameters): string => {
+  return toURL(`${routeForNamespace({ namespace })}/workflows/start-workflow`, {
+    workflowId: workflowId || '',
+    taskQueue: taskQueue || '',
+    workflowType: workflowType || '',
+  });
+};
+
 export const routeForWorkflowsWithQuery = ({
   namespace,
   query,
-  search,
   page,
 }: WorkflowsParameter): string | undefined => {
   if (!BROWSER) {
@@ -81,7 +111,6 @@ export const routeForWorkflowsWithQuery = ({
 
   return toURL(routeForWorkflows({ namespace }), {
     query,
-    search,
     ...(page && { page }),
   });
 };

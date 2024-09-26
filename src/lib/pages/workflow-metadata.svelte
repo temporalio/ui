@@ -10,7 +10,9 @@
 <div class="flex flex-col gap-4">
   {#if workflow?.searchAttributes}
     <div class="mt-4 flex flex-col gap-2">
-      <h3 class="font-medium">{translate('common.search-attributes')}</h3>
+      <h3>
+        {translate('events.attribute-group.search-attributes')}
+      </h3>
       <div class="h-0.5 rounded-full bg-inverse" />
       <PayloadDecoder
         value={{ searchAttributes: workflow.searchAttributes }}
@@ -28,7 +30,7 @@
 
   {#if workflow?.memo}
     <div class="mt-4 flex flex-col gap-2">
-      <h3 class="font-medium">{translate('common.memo')}</h3>
+      <h3>{translate('common.memo')}</h3>
       <div class="h-0.5 rounded-full bg-inverse" />
       <PayloadDecoder
         value={{ memo: workflow.memo }}

@@ -19,7 +19,7 @@ export function timestampToDate(ts: Timestamp): Date {
 
   const d = new Date();
 
-  d.setTime(Number(ts.seconds) * 1000 + (ts.nanos || 0) / 1000);
+  d.setTime(Number(ts.seconds) * 1000 + (ts.nanos || 0) / 1000000);
 
   return d;
 }

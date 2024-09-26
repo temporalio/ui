@@ -22,8 +22,7 @@
         "payloads": [
           {
             "metadata": {
-              "encoding": "anNvbi9wbGFpbg==",
-              "encodingDecoded": "json/plain"
+              "encoding": "anNvbi9wbGFpbg=="
             },
             "data": "Hello Temporal!"
           }

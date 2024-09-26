@@ -35,7 +35,7 @@
 
 <Panel class="w-full">
   <div class="flex justify-between">
-    <h2 class="mb-4 text-lg">{translate('schedules.recent-runs')}</h2>
+    <h2 class="mb-4">{translate('schedules.recent-runs')}</h2>
     <Link
       href={routeForWorkflowsWithQuery({
         namespace,

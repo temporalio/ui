@@ -7,17 +7,27 @@
   export let scrollToBottomHidden = false;
   export let onScrollToTopClick: () => void;
   export let onScrollToBottomClick: () => void;
+  export let scrollToTopAriaLabel: string;
+  export let scrollToBottomAriaLabel: string;
 </script>
 
 <div id="scroll-container" class={$$props.class}>
-  <ScrollToTop hidden={scrollToTopHidden} {onScrollToTopClick} />
+  <ScrollToTop
+    hidden={scrollToTopHidden}
+    {onScrollToTopClick}
+    aria-label={scrollToTopAriaLabel}
+  />
   {#if $fullEventHistory.length}
-    <ScrollToBottom hidden={scrollToBottomHidden} {onScrollToBottomClick} />
+    <ScrollToBottom
+      hidden={scrollToBottomHidden}
+      {onScrollToBottomClick}
+      aria-label={scrollToBottomAriaLabel}
+    />
   {/if}
 </div>
 
 <style lang="postcss">
   #scroll-container {
-    @apply fixed bottom-5 right-8 z-50 flex w-auto gap-2;
+    @apply fixed bottom-5 right-8 z-50 hidden w-auto gap-2 md:flex;
   }
 </style>

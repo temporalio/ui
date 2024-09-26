@@ -37,6 +37,7 @@
     copyable?: boolean;
     minHeight?: number;
     maxHeight?: number;
+    label?: string;
   };
 
   type CopyableProps = BaseProps & {
@@ -60,6 +61,7 @@
   export let copySuccessIconTitle = '';
   export let minHeight = undefined;
   export let maxHeight = undefined;
+  export let label = '';
 
   const { copy, copied } = copyToClipboard();
 
@@ -112,6 +114,8 @@
       indentOnInput(),
       bracketMatching(),
       EditorState.readOnly.of(!editable),
+      EditorView.editable.of(editable),
+      EditorView.contentAttributes.of({ 'aria-label': label }),
     ];
 
     if (language === 'json') {
@@ -139,6 +143,7 @@
           },
         }),
       );
+      extensions.push(EditorView.contentAttributes.of({ tabindex: '0' }));
     }
 
     return EditorState.create({
@@ -149,12 +154,18 @@
 
   onMount(() => {
     view = createEditorView();
+    return () => view.destroy();
   });
 
   export const resetView = (value = '', format = true) => {
     const formattedValue = format ? formatValue({ value, language }) : value;
-    const newState = createEditorState(formattedValue);
-    view.setState(newState);
+    view.dispatch({
+      changes: {
+        from: 0,
+        to: view.state.doc.length,
+        insert: formattedValue,
+      },
+    });
   };
 
   const setView = () => {
@@ -168,9 +179,9 @@
 
 <div class="relative min-w-[80px] grow">
   <div
-    on:keydown|stopPropagation
     bind:this={editor}
     class={className}
+    class:inline
     data-testid={$$props.testId}
     class:editable
     class:readOnly={!editable}
@@ -180,7 +191,8 @@
     <CopyButton
       {copyIconTitle}
       {copySuccessIconTitle}
-      class="absolute right-1 top-1 text-white hover:bg-slate-800"
+      class="absolute right-1 top-1 text-secondary"
+      data-theme="dark"
       on:click={handleCopy}
       copied={$copied}
     />

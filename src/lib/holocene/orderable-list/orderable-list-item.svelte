@@ -141,11 +141,10 @@
     {/if}
   {/if}
 </li>
-<hr />
 
 <style lang="postcss">
   .orderable-item {
-    @apply flex select-none list-none flex-row items-center justify-between p-2 text-sm font-medium first-of-type:rounded-tl-lg first-of-type:rounded-tr-lg last-of-type:rounded-bl-lg last-of-type:rounded-br-lg;
+    @apply flex select-none list-none flex-row items-center justify-between border-b border-subtle p-2 text-sm font-medium first-of-type:rounded-tl-lg first-of-type:rounded-tr-lg last-of-type:rounded-bl-lg last-of-type:rounded-br-lg last-of-type:border-b-0;
   }
 
   .orderable-item[draggable='true'] {
@@ -153,11 +152,7 @@
   }
 
   .orderable-item.readonly {
-    @apply bg-badge bg-opacity-50;
-  }
-
-  hr {
-    @apply pointer-events-none border-primary last-of-type:hidden dark:border-subtle;
+    @apply surface-secondary;
   }
 
   :global(.orderable-item.dragging-over:not(.locked)) {

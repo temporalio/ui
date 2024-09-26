@@ -1,5 +1,6 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { Payloads } from '$lib/types';
   import { getSinglePayload } from '$lib/utilities/encode-payload';
@@ -13,11 +14,20 @@
   const handleInputChange = (event: CustomEvent<string>) => {
     input = event.detail;
   };
+
+  const setInitialInput = (decodedValue: string): void => {
+    input = getSinglePayload(decodedValue);
+  };
 </script>
 
-<div class="flex flex-col gap-4">
-  <label for="schedule-input">{translate('workflows.input')}</label>
-  <PayloadDecoder value={payloads} let:decodedValue key="payloads">
+<div class="flex flex-col gap-1">
+  <Label for="schedule-input" label={translate('workflows.input')} />
+  <PayloadDecoder
+    value={payloads}
+    let:decodedValue
+    key="payloads"
+    onDecode={setInitialInput}
+  >
     {#key decodedValue}
       <CodeBlock
         id="schedule-input"
@@ -29,10 +39,7 @@
       />
     {/key}
   </PayloadDecoder>
-  <span
-    class="font-secondary text-xs font-light italic"
-    class:text-red-700={error}
-  >
+  <span class="text-xs font-light italic" class:text-red-700={error}>
     {translate('workflows.signal-payload-input-label-hint')}
   </span>
 </div>

@@ -9,7 +9,7 @@ jobs:
     if: startsWith(github.head_ref, 'releases/') && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
       - name: Build package
@@ -24,6 +24,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Prepare checkout token
+        id: generate_token
+        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92
+        with:
+          app_id: ${{ secrets.TEMPORAL_CICD_APP_ID }}
+          private_key: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
+
       - name: Create Release
         run: |
           version=`cat ./package.json | jq -r .version`
@@ -32,4 +39,4 @@ jobs:
           echo "creating release: $tag"
           gh release create $tag --generate-notes
         env:
-          GH_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}

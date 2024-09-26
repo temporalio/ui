@@ -43,10 +43,9 @@ describe('routeFor', () => {
     const path = routeForWorkflowsWithQuery({
       namespace: 'default',
       query: 'ExecutionStatus="Running"',
-      search: 'basic',
     });
     expect(path).toBe(
-      '/namespaces/default/workflows?query=ExecutionStatus%3D%22Running%22&search=basic',
+      '/namespaces/default/workflows?query=ExecutionStatus%3D%22Running%22',
     );
   });
 

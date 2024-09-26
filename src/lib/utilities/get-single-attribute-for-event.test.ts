@@ -2,9 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import {
   getCodeBlockValue,
-  getSingleAttributeForEvent,
+  getPrimaryAttributeForEvent,
   getSummaryAttribute,
   shouldDisplayAsExecutionLink,
+  shouldDisplayAsTime,
   shouldDisplayAttribute,
 } from './get-single-attribute-for-event';
 import { toEvent } from '../models/event-history';
@@ -15,7 +16,7 @@ import javaLocalActivity from '$fixtures/local-activities/java_local_activity.js
 import pythonLocalActivity from '$fixtures/local-activities/python_local_activity.json';
 import tsLocalActivity from '$fixtures/local-activities/ts_local_activity.json';
 
-describe('getSingleAttributeForEvent', () => {
+describe('getPrimaryAttributeForEvent', () => {
   const workflowEvent = {
     eventId: '1',
     eventTime: '2022-03-14T17:44:14.996241458Z',
@@ -122,40 +123,43 @@ describe('getSingleAttributeForEvent', () => {
   };
 
   it('should return "workflowType.name" if the workflow type exists', async () => {
-    expect(await getSingleAttributeForEvent(workflowEvent)).toStrictEqual({
+    expect(await getPrimaryAttributeForEvent(workflowEvent)).toStrictEqual({
       key: 'workflowTypeName',
       value: 'RainbowStatusesWorkflow',
     });
   });
 
-  it('should return "taskqueue.name" if the workflow type does not exists', async () => {
+  it('should return "input" if the workflow type does not exists', async () => {
     const event = { ...workflowEvent };
     event.attributes.workflowType = null;
-    expect(await getSingleAttributeForEvent(event)).toStrictEqual({
+    expect(await getPrimaryAttributeForEvent(event)).toStrictEqual({
+      key: 'input',
+      value: {
+        payloads: [
+          {
+            At: '2022-04-04T11:50:28.151785-05:00',
+            Hey: 'from Mars',
+          },
+        ],
+      },
+    });
+  });
+
+  it('should return "taskQueue" if the workflow type and input does not exist', async () => {
+    const event = { ...workflowEvent };
+    event.attributes.workflowType = null as unknown as {
+      name: string;
+    };
+    event.attributes.input = null;
+
+    expect(await getPrimaryAttributeForEvent(event)).toStrictEqual({
       key: 'taskQueueName',
       value: 'rainbow-statuses',
     });
   });
 
-  it('should return "parentInitiatedEventId" if the workflow type and task queue does not exist', async () => {
-    const event = { ...workflowEvent };
-    event.attributes.workflowType = null as unknown as {
-      name: string;
-    };
-
-    event.attributes.taskQueue = null as unknown as {
-      name: string;
-      kind: string;
-    };
-
-    expect(await getSingleAttributeForEvent(event)).toStrictEqual({
-      key: 'parentInitiatedEventId',
-      value: '0',
-    });
-  });
-
   it('should return empty key value object if none of the attributes display', async () => {
-    expect(await getSingleAttributeForEvent(null)).toStrictEqual({
+    expect(await getPrimaryAttributeForEvent(null)).toStrictEqual({
       key: '',
       value: '',
     });
@@ -174,6 +178,19 @@ describe('shouldDisplayAsExecutionLink', () => {
     expect(shouldDisplayAsExecutionLink('workflowType.name')).toBe(false);
     expect(shouldDisplayAsExecutionLink('parentInitiatedEventId')).toBe(false);
     expect(shouldDisplayAsExecutionLink('inlineRunIdSample')).toBe(false);
+  });
+});
+
+describe('shouldDisplayAsTime', () => {
+  it('should return non-time values as is', () => {
+    expect(shouldDisplayAsTime('originalExecutionRunId')).toBe(false);
+    expect(shouldDisplayAsTime('lastScheduledTimeout')).toBe(false);
+    expect(shouldDisplayAsTime('timeToFire')).toBe(false);
+  });
+  it('should return time values as formatted time', () => {
+    expect(shouldDisplayAsTime('lastScheduledTime')).toBe(true);
+    expect(shouldDisplayAsTime('expirationTime')).toBe(true);
+    expect(shouldDisplayAsTime('lastHeartbeatTime')).toBe(true);
   });
 });
 
@@ -263,6 +280,40 @@ describe('getSummaryEvent', () => {
     expect(getSummaryAttribute(localActivity)).toStrictEqual({
       key: 'ActivityType',
       value: 'DoStaticThing',
+    });
+  });
+
+  it('should return expected payload for a Nexus single payload', async () => {
+    const nexusEvent = {
+      eventId: '5',
+      eventTime: '2024-07-11T17:42:53.326959Z',
+      eventType: 'EVENT_TYPE_NEXUS_OPERATION_SCHEDULED',
+      taskId: '1098294',
+      nexusOperationScheduledEventAttributes: {
+        endpoint: 'sdk_go_nexus_test_ep_c5559a73_33a7_436e_bfa0_f794d2f26795',
+        service: 'test',
+        operation: 'custom-op',
+        input: {
+          metadata: {
+            encoding: 'anNvbi9wbGFpbg==',
+          },
+          data: 'InN0YXJ0LWFzeW5jIg==',
+        },
+        scheduleToCloseTimeout: '0s',
+        workflowTaskCompletedEventId: '4',
+        requestId: '4e393ac4-564f-4856-9ddc-fbe1fdc0a7f7',
+        endpointId: 'f0a6cc80-cb36-4e3c-92a6-92681687b0ee',
+      },
+    };
+    const event = await toEvent(nexusEvent);
+    expect(getSummaryAttribute(event)).toStrictEqual({
+      key: 'input',
+      value: {
+        metadata: {
+          encoding: 'anNvbi9wbGFpbg==',
+        },
+        data: 'InN0YXJ0LWFzeW5jIg==',
+      },
     });
   });
 });

@@ -1,11 +1,13 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   export let intent: 'warning' | 'default' = 'default';
   export let button = false;
   export let removeButtonLabel: string;
+  export let disabled = false;
 
   const dispatch = createEventDispatcher();
 
@@ -15,7 +17,7 @@
   };
 </script>
 
-<span class="chip {intent}">
+<span class={merge('chip', intent)}>
   {#if button}
     <button class="flex items-center gap-1" on:click>
       <slot />
@@ -23,14 +25,18 @@
   {:else}
     <slot />
   {/if}
-  <button aria-label={removeButtonLabel} on:click={handleRemove}>
+  <button
+    aria-label={removeButtonLabel}
+    class:hidden={disabled}
+    on:click={handleRemove}
+  >
     <Icon name="close" />
   </button>
 </span>
 
 <style lang="postcss">
   .chip {
-    @apply surface-subtle flex h-8 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-md border border-subtle p-1 text-sm;
+    @apply surface-subtle flex h-8 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-md p-1 text-sm;
 
     :global(.icon-button) {
       @apply ml-1 h-auto w-fit;
@@ -38,6 +44,6 @@
   }
 
   .warning {
-    @apply border-red-700 bg-red-50 text-red-700;
+    @apply bg-danger;
   }
 </style>

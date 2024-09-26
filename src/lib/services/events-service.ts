@@ -9,6 +9,7 @@ import type {
   CommonHistoryEvent,
   GetWorkflowExecutionHistoryResponse,
   HistoryEvent,
+  WorkflowEvent,
   WorkflowEvents,
 } from '$lib/types/events';
 import type {
@@ -30,6 +31,7 @@ export type FetchEventsParameters = NamespaceScopedRequest &
     sort?: EventSortOrder;
     signal?: AbortSignal;
     historySize?: string;
+    maximumPageSize?: string;
   };
 
 export type FetchEventsParametersWithSettings = FetchEventsParameters & {
@@ -71,7 +73,7 @@ export const fetchRawEvents = async ({
   return response.history.events;
 };
 
-const throttleRefresh = throttle(() => {
+export const throttleRefresh = throttle(() => {
   refresh.set(Date.now());
 }, 5000);
 
@@ -132,6 +134,7 @@ export const fetchPartialRawEvents = async ({
   workflowId,
   runId,
   sort,
+  maximumPageSize = '20',
 }: FetchEventsParameters): Promise<HistoryEvent[]> => {
   const route = routeForApi(`events.${sort}`, {
     namespace,
@@ -143,7 +146,7 @@ export const fetchPartialRawEvents = async ({
       route,
       {
         request: fetch,
-        params: { maximumPageSize: '20', 'execution.runId': runId },
+        params: { maximumPageSize, 'execution.runId': runId },
       },
     );
 
@@ -151,24 +154,6 @@ export const fetchPartialRawEvents = async ({
   } catch (e) {
     return [];
   }
-};
-
-export const fetchStartAndEndEvents = async (
-  parameters: FetchEventsParameters,
-): Promise<{ start: WorkflowEvents; end: WorkflowEvents }> => {
-  const startEventsRaw = await fetchPartialRawEvents({
-    ...parameters,
-    sort: 'ascending',
-  });
-  const endEventsRaw = await fetchPartialRawEvents({
-    ...parameters,
-    sort: 'descending',
-  });
-  const [start, end] = await Promise.all([
-    toEventHistory(startEventsRaw),
-    toEventHistory(endEventsRaw),
-  ]);
-  return { start, end };
 };
 
 type PaginatedEventParams = {
@@ -221,3 +206,15 @@ export async function getPaginatedEvents({
     };
   };
 }
+
+export const fetchInitialEvent = async (
+  parameters: FetchEventsParameters,
+): Promise<WorkflowEvent> => {
+  const startEventsRaw = await fetchPartialRawEvents({
+    ...parameters,
+    sort: 'ascending',
+    maximumPageSize: '1',
+  });
+  const start = await toEventHistory(startEventsRaw);
+  return start[0];
+};

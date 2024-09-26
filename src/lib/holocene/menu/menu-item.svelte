@@ -30,6 +30,7 @@
     centered?: boolean;
     class?: string;
     'data-testid'?: string;
+    hoverable?: boolean;
   }
 
   let className = '';
@@ -40,6 +41,7 @@
   export let href = null;
   export let description: string = null;
   export let centered = false;
+  export let hoverable = true;
 
   const { keepOpen, open } = getContext<MenuContext>(MENU_CONTEXT);
 
@@ -106,8 +108,9 @@
   <a
     {href}
     role="menuitem"
-    class={merge('menu-item', className)}
+    class={merge('menu-item', 'm-1', 'px-3', 'py-2', className)}
     class:disabled
+    class:hoverable
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -119,7 +122,7 @@
 {:else}
   <li
     role="menuitem"
-    class={merge('menu-item', className)}
+    class={merge('menu-item', 'm-1', 'px-3', 'py-2', className)}
     class:destructive
     class:disabled
     class:selected
@@ -156,10 +159,14 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply m-1 flex cursor-pointer flex-row items-center gap-2 rounded border border-transparent px-3 py-2 font-primary text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:shadow-focus focus-visible:shadow-secondary focus-visible:outline-none dark:focus-visible:border-interactive;
+    @apply flex cursor-pointer flex-row items-center gap-2 rounded border border-transparent text-sm font-medium focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+
+    &.hoverable {
+      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary;
+    }
 
     &.selected {
-      @apply text-active;
+      @apply text-brand;
     }
 
     &.destructive {
@@ -167,7 +174,7 @@
     }
 
     &.disabled {
-      @apply pointer-events-none cursor-not-allowed text-subtle dark:text-secondary;
+      @apply pointer-events-none cursor-not-allowed opacity-50;
     }
   }
 

@@ -1,13 +1,27 @@
-<script lang="ts">
-  import { Meta, Story } from '@storybook/addon-svelte-csf';
+<script lang="ts" context="module">
+  import type { Meta } from '@storybook/svelte';
 
   import Card from './card.svelte';
+
+  export const meta = {
+    title: 'Card',
+    component: Card,
+  } satisfies Meta<Card>;
 </script>
 
-<Meta title="Card" component={Card} />
+<script lang="ts">
+  import { Story, Template } from '@storybook/addon-svelte-csf';
+</script>
 
-<Story name="card">
-  <Card>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+<Template let:args>
+  <Card {...args}>
+    <p>
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate
+      exercitationem quia quibusdam excepturi rem saepe dolore quas, odit vero
+      sed rerum necessitatibus minima nobis, ullam minus inventore voluptates
+      itaque?
+    </p>
   </Card>
-</Story>
+</Template>
+
+<Story name="Default" />

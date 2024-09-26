@@ -11,12 +11,14 @@
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
   import ScheduleInput from '$lib/components/schedule/schedule-input.svelte';
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
+  import ScheduleSearchAttributes from '$lib/components/schedule/schedule-search-attributes.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
@@ -42,7 +44,7 @@
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { OverlapPolicy } from '$lib/types/schedule';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-  import { formatDate } from '$lib/utilities/format-date';
+  import { formatDate, getUTCString } from '$lib/utilities/format-date';
   import {
     routeForScheduleEdit,
     routeForSchedules,
@@ -207,32 +209,6 @@
 
   $: backfillConfirmationModalOpen && updateDefaultBackfillTimes();
 
-  const applyTimeSelection = (): {
-    startTime: string;
-    endTime: string;
-  } => {
-    const startTimeUTC = Date.UTC(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      startDate.getDay(),
-      Number(startHour),
-      Number(startMinute),
-      Number(startSecond),
-    );
-    const startTime = new Date(startTimeUTC).toISOString();
-    const endTimeUTC = Date.UTC(
-      endDate.getFullYear(),
-      endDate.getMonth(),
-      endDate.getDay(),
-      Number(endHour),
-      Number(endMinute),
-      Number(endSecond),
-    );
-    const endTime = new Date(endTimeUTC).toISOString();
-
-    return { startTime, endTime };
-  };
-
   const closeBackfillModal = () => {
     backfillConfirmationModalOpen = false;
     viewMoreBackfillOptions = false;
@@ -241,7 +217,19 @@
 
   const handleBackfill = async () => {
     scheduleUpdating = true;
-    const { startTime, endTime } = applyTimeSelection();
+
+    const startTime = getUTCString({
+      date: startDate,
+      hour: startHour,
+      minute: startMinute,
+      second: startSecond,
+    });
+    const endTime = getUTCString({
+      date: endDate,
+      hour: endHour,
+      minute: endMinute,
+      second: endSecond,
+    });
 
     await backfillRequest({
       namespace,
@@ -268,12 +256,9 @@
       <Link href={routeForSchedules({ namespace })} icon="chevron-left">
         {translate('schedules.back-to-schedules')}
       </Link>
-      <h1 class="select-all text-2xl font-medium" data-testid="schedule-name">
+      <h1 class="select-all" data-testid="schedule-name">
         {scheduleId}
       </h1>
-      <p class="text-sm">
-        {namespace}
-      </p>
     </div>
   </header>
   <Loading />
@@ -286,8 +271,8 @@
         <Link href={routeForSchedules({ namespace })} icon="chevron-left">
           {translate('schedules.back-to-schedules')}
         </Link>
-        <h1 class="relative flex items-center text-2xl">
-          <span class="select-all font-medium" data-testid="schedule-name">
+        <h1 class="relative flex items-center">
+          <span class="select-all" data-testid="schedule-name">
             {scheduleId}
           </span>
         </h1>
@@ -406,6 +391,9 @@
             policies={schedule?.schedule?.policies}
             notes={schedule?.schedule?.state?.notes}
           />
+          <ScheduleSearchAttributes
+            searchAttributes={schedule?.searchAttributes ?? {}}
+          />
         </div>
         <div class="flex w-full flex-col gap-4 xl:w-1/3">
           <ScheduleInput
@@ -414,6 +402,7 @@
           <ScheduleFrequencyPanel
             calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
             interval={schedule?.schedule?.spec?.interval?.[0]}
+            timezoneName={schedule?.schedule?.spec?.timezoneName}
           />
         </div>
       </div>
@@ -450,11 +439,12 @@
             ? translate('schedules.unpause-reason')
             : translate('schedules.pause-reason')}
         </p>
-        <input
-          class="mt-4 block w-full rounded-md border border-slate-200 p-2"
-          placeholder={translate('common.reason')}
+        <Input
+          id="pause-reason"
           bind:value={reason}
-          on:keydown|stopPropagation
+          placeholder={translate('common.reason')}
+          label={translate('common.reason')}
+          labelHidden
         />
       </div>
     </Modal>
@@ -601,10 +591,7 @@
       <Link href={routeForSchedules({ namespace })} icon="chevron-left">
         {translate('schedules.back-to-schedules')}
       </Link>
-      <h1
-        class="mt-8 select-all text-2xl font-medium"
-        data-testid="schedule-name"
-      >
+      <h1 class="mt-8 select-all" data-testid="schedule-name">
         {scheduleId}
       </h1>
       <p class="text-sm">

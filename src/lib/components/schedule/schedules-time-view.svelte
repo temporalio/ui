@@ -8,7 +8,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <h3 class="text-lg font-medium">
+  <h3>
     {translate('schedules.time-view-heading')}
   </h3>
   <p>

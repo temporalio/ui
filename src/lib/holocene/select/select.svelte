@@ -28,7 +28,9 @@
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
+  import type { MenuButtonVariant } from '$lib/holocene/menu/menu-button.svelte';
 
   type T = $$Generic;
 
@@ -40,11 +42,11 @@
     placeholder?: string;
     disabled?: boolean;
     leadingIcon?: IconName;
-    unroundRight?: boolean;
-    unroundLeft?: boolean;
     onChange?: (value: T) => void;
     'data-testid'?: string;
     menuClass?: string;
+    variant?: MenuButtonVariant;
+    required?: boolean;
   };
 
   export let label: string;
@@ -54,10 +56,10 @@
   export let placeholder = '';
   export let disabled = false;
   export let leadingIcon: IconName = null;
-  export let unroundRight = false;
-  export let unroundLeft = false;
   export let onChange: (value: T) => void = noop;
   export let menuClass: string | undefined = undefined;
+  export let variant: MenuButtonVariant = 'secondary';
+  export let required = false;
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
   const valueCtx = writable<T>(value);
@@ -65,7 +67,9 @@
   const labelCtx = writable<string>(value?.toString());
   const open = writable<boolean>(false);
 
-  $: {
+  $: value, updateContext();
+
+  function updateContext() {
     $valueCtx = value;
     $labelCtx = getLabelFromOptions(value);
   }
@@ -99,42 +103,43 @@
   });
 </script>
 
-<MenuContainer class="w-full" {open}>
-  <label class="text-sm text-primary" class:sr-only={labelHidden} for={id}
-    >{label}</label
-  >
-  <MenuButton
-    hasIndicator={!disabled}
-    {disabled}
-    {unroundLeft}
-    {unroundRight}
-    controls="{id}-select"
-  >
-    <Icon slot="leading" name={leadingIcon} />
-    <input
-      {id}
-      value={!value && placeholder !== '' ? placeholder : $labelCtx}
-      tabindex="-1"
-      class="select-input"
-      disabled
-      class:disabled
-      {...$$restProps}
-    />
-    {#if disabled}
-      <Icon slot="trailing" name="lock" />
-    {/if}
-  </MenuButton>
-  <Menu class={menuClass} role="listbox" id="{id}-select">
+<MenuContainer {open}>
+  <Label class="pb-1" {label} hidden={labelHidden} for={id} {required} />
+  {#key $labelCtx}
+    <MenuButton
+      hasIndicator={!disabled}
+      {disabled}
+      controls="{id}-select"
+      {variant}
+      data-testid={`${$$restProps['data-testid'] ?? ''}-button`}
+    >
+      <slot name="leading" slot="leading">
+        {#if leadingIcon}
+          <Icon name={leadingIcon} />
+        {/if}
+      </slot>
+      <input
+        {id}
+        value={!value && placeholder !== '' ? placeholder : $labelCtx}
+        tabindex="-1"
+        disabled
+        class:disabled
+        {required}
+        aria-required={required}
+        {...$$restProps}
+      />
+      {#if disabled}
+        <Icon slot="trailing" name="lock" />
+      {/if}
+    </MenuButton>
+  {/key}
+  <Menu role="listbox" id="{id}-select" class={menuClass}>
     <slot />
   </Menu>
 </MenuContainer>
 
 <style lang="postcss">
-  .select-input {
-    @apply pointer-events-none w-full bg-transparent;
-  }
-
-  .select-input.disabled {
-    @apply bg-slate-50;
+  input {
+    @apply pointer-events-none w-full bg-transparent text-sm;
   }
 </style>

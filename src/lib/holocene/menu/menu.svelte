@@ -12,15 +12,16 @@
   interface $$Props extends HTMLAttributes<HTMLUListElement> {
     id: string;
     keepOpen?: boolean;
-    position?: 'left' | 'right';
+    position?: 'left' | 'right' | 'top-left' | 'top-right';
     menuElement?: HTMLUListElement;
   }
 
   let className = '';
+  let height = 0;
   export { className as class };
   export let id: string;
   export let keepOpen = false;
-  export let position: 'left' | 'right' = 'left';
+  export let position: 'left' | 'right' | 'top-left' | 'top-right' = 'left';
   export let menuElement: HTMLUListElement = null;
 
   const {
@@ -47,8 +48,12 @@
   class:hidden={!$open}
   aria-labelledby={id}
   tabindex={-1}
+  style={position === 'top-right' || position === 'top-left'
+    ? `top: -${height + 16}px;`
+    : ''}
   {id}
   bind:this={menuElement}
+  bind:clientHeight={height}
   on:focusout={handleFocusOut}
   on:click|stopPropagation
   {...$$restProps}
@@ -58,13 +63,15 @@
 
 <style lang="postcss">
   .menu {
-    @apply surface-primary absolute z-20 mt-1 min-w-full list-none overflow-auto rounded-lg border border-primary text-primary shadow;
+    @apply surface-primary absolute z-20 mt-1 min-w-fit list-none overflow-auto rounded-lg border-2 border-subtle text-primary shadow;
 
-    &.left {
+    &.left,
+    &.top-left {
       @apply left-0 origin-top-left;
     }
 
-    &.right {
+    &.right,
+    &.top-right {
       @apply right-0 origin-top-right;
     }
   }

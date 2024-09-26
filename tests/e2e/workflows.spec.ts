@@ -11,13 +11,8 @@ test.describe('Workflow Execution Page', () => {
       .getByRole('link', { name: 'e2e-workflow-1' })
       .click({ force: true });
 
-    const codeBlock = page.getByTestId('input-and-results');
-    const toggle = codeBlock.getByRole('heading', {
-      name: 'Input and Results',
-    });
-    await toggle.click();
-    const input = page.getByTestId('workflow-input');
-    await expect(input).toContainText('Mock decoded payload');
+    const inputAndResult = page.getByTestId('input-and-result');
+    await expect(inputAndResult).toContainText('Mock decoded payload');
   });
 
   test('should render decoded call stack', async ({ page }) => {

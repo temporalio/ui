@@ -11,13 +11,13 @@ export type EventTypeCategory = Categories[keyof Categories];
 export const CATEGORIES = {
   ACTIVITY: 'activity',
   CHILD_WORKFLOW: 'child-workflow',
-  COMMAND: 'command',
   LOCAL_ACTIVITY: 'local-activity',
-  MARKER: 'marker',
+  NEXUS: 'nexus',
   SIGNAL: 'signal',
   TIMER: 'timer',
   UPDATE: 'update',
   WORKFLOW: 'workflow',
+  OTHER: 'other',
 } as const;
 
 export const eventTypeCategorizations: Readonly<
@@ -39,8 +39,6 @@ export const eventTypeCategorizations: Readonly<
   ChildWorkflowExecutionTimedOut: CATEGORIES.CHILD_WORKFLOW,
   StartChildWorkflowExecutionFailed: CATEGORIES.CHILD_WORKFLOW,
   StartChildWorkflowExecutionInitiated: CATEGORIES.CHILD_WORKFLOW,
-
-  MarkerRecorded: CATEGORIES.MARKER,
 
   SignalExternalWorkflowExecutionFailed: CATEGORIES.SIGNAL,
   SignalExternalWorkflowExecutionInitiated: CATEGORIES.SIGNAL,
@@ -68,52 +66,75 @@ export const eventTypeCategorizations: Readonly<
   RequestCancelExternalWorkflowExecutionFailed: CATEGORIES.WORKFLOW,
   RequestCancelExternalWorkflowExecutionInitiated: CATEGORIES.WORKFLOW,
 
-  UpsertWorkflowSearchAttributes: CATEGORIES.COMMAND,
-
   WorkflowExecutionUpdateAccepted: CATEGORIES.UPDATE,
   WorkflowExecutionUpdateCompleted: CATEGORIES.UPDATE,
   WorkflowExecutionUpdateRequested: CATEGORIES.UPDATE,
   WorkflowExecutionUpdateRejected: CATEGORIES.UPDATE,
+
+  NexusOperationScheduled: CATEGORIES.NEXUS,
+  NexusOperationStarted: CATEGORIES.NEXUS,
+  NexusOperationCompleted: CATEGORIES.NEXUS,
+  NexusOperationFailed: CATEGORIES.NEXUS,
+  NexusOperationCanceled: CATEGORIES.NEXUS,
+  NexusOperationTimedOut: CATEGORIES.NEXUS,
+  NexusOperationCancelRequested: CATEGORIES.NEXUS,
+
+  MarkerRecorded: CATEGORIES.OTHER,
+  UpsertWorkflowSearchAttributes: CATEGORIES.OTHER,
+  WorkflowPropertiesModified: CATEGORIES.OTHER,
 };
 
 export type EventTypeOption = {
   label: I18nKey;
   value: EventTypeCategory;
+  description?: I18nKey;
 };
 
 export const allEventTypeOptions: EventTypeOption[] = [
   {
     label: 'events.category.activity',
     value: CATEGORIES.ACTIVITY,
+    description: 'events.category.activity-tooltip',
   },
   {
     label: 'events.category.child-workflow',
     value: CATEGORIES.CHILD_WORKFLOW,
-  },
-  {
-    label: 'events.category.command',
-    value: CATEGORIES.COMMAND,
+    description: 'events.category.child-workflow-tooltip',
   },
   {
     label: 'events.category.local-activity',
     value: CATEGORIES.LOCAL_ACTIVITY,
-  },
-  {
-    label: 'events.category.marker',
-    value: CATEGORIES.MARKER,
+    description: 'events.category.local-activity-tooltip',
   },
   {
     label: 'events.category.signal',
     value: CATEGORIES.SIGNAL,
+    description: 'events.category.signal-tooltip',
   },
   {
     label: 'events.category.timer',
     value: CATEGORIES.TIMER,
+    description: 'events.category.timer-tooltip',
   },
-  { label: 'events.category.update', value: CATEGORIES.UPDATE },
+  {
+    label: 'events.category.update',
+    value: CATEGORIES.UPDATE,
+    description: 'events.category.update-tooltip',
+  },
+  {
+    label: 'events.category.nexus',
+    value: CATEGORIES.NEXUS,
+    description: 'events.category.nexus-tooltip',
+  },
   {
     label: 'events.category.workflow',
     value: CATEGORIES.WORKFLOW,
+    description: 'events.category.workflow-tooltip',
+  },
+  {
+    label: 'events.category.other',
+    value: CATEGORIES.OTHER,
+    description: 'events.category.other-tooltip',
   },
 ];
 
@@ -123,15 +144,16 @@ const compactEventTypes: EventTypeCategory[] = [
   CATEGORIES.CHILD_WORKFLOW,
   CATEGORIES.SIGNAL,
   CATEGORIES.TIMER,
-  CATEGORIES.MARKER,
   CATEGORIES.UPDATE,
+  CATEGORIES.NEXUS,
+  CATEGORIES.OTHER,
 ];
 
 export const compactEventTypeOptions: EventTypeOption[] =
   allEventTypeOptions.filter(({ value }) => compactEventTypes.includes(value));
 
 export const getEventCategory = (eventType: EventType): EventTypeCategory => {
-  return eventTypeCategorizations[eventType];
+  return eventTypeCategorizations?.[eventType] || CATEGORIES.OTHER;
 };
 
 export const isCategoryType = (value: string): value is EventTypeCategory => {

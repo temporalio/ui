@@ -1,10 +1,11 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   formatDate,
   formatUTCOffset,
   getLocalTime,
   getSelectedTimezone,
+  getUTCString,
   isValidDate,
 } from './format-date';
 
@@ -143,5 +144,33 @@ describe('getSelectedTimezone', () => {
 
   it('should return the time format if there is no matching timezone found', () => {
     expect(getSelectedTimezone('UTC')).toBe('UTC');
+  });
+});
+
+describe('getUTCString', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2020-01-01').getTime());
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('should default to 00:00 for the current date', () => {
+    expect(getUTCString()).toBe('2020-01-01T00:00:00.000Z');
+  });
+
+  it('should return a string with hours, minutes, and seconds set', () => {
+    expect(getUTCString({ hour: 1, minute: 1, second: 1 })).toBe(
+      '2020-01-01T01:01:01.000Z',
+    );
+    expect(getUTCString({ hour: 1, minute: 61, second: 1 })).toBe(
+      '2020-01-01T02:01:01.000Z',
+    );
+    expect(getUTCString({ hour: 1, minute: 1, second: 61 })).toBe(
+      '2020-01-01T01:02:01.000Z',
+    );
+    expect(getUTCString({ hour: 25 })).toBe('2020-01-02T01:00:00.000Z');
   });
 });

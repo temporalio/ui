@@ -1,39 +1,52 @@
 <script lang="ts">
   import { noop } from 'svelte/internal';
-  import { fade } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
 
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { isEventGroup } from '$lib/models/event-groups';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
     eventOrGroupIsCanceled,
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
-  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { IterableEvent } from '$lib/types/events';
+  import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import {
+    getPrimaryAttributeForEvent,
+    getSecondaryAttributeForEvent,
+  } from '$lib/utilities/get-single-attribute-for-event';
+  import {
+    isActivityTaskStartedEvent,
+    isLocalActivityMarkerEvent,
+  } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
+  import { toTimeDifference } from '$lib/utilities/to-time-difference';
+
+  import { CategoryIcon } from '../lines-and-dots/constants';
 
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
+  import EventLink from './event-link.svelte';
 
   export let event: IterableEvent;
+  export let group: EventGroup | undefined = undefined;
   export let initialItem: IterableEvent | undefined;
+  export let index = 0;
   export let compact = false;
   export let expandAll = false;
   export let typedError = false;
   export let active = false;
   export let onRowClick: () => void = noop;
 
-  let selectedId = isEventGroup(event)
+  $: selectedId = isEventGroup(event)
     ? Array.from(event.events.keys()).pop()
     : event.id;
 
@@ -45,26 +58,22 @@
     run,
   });
   $: expanded = expandAll;
-  $: descending = $eventFilterSort === 'descending';
-  $: showElapsed = $eventShowElapsed === 'true';
-  $: showElapsedTimeDiff =
-    showElapsed && initialItem && event.id !== initialItem.id;
-  $: attributes = formatAttributes(event, { compact });
+  $: attributes = formatAttributes(event);
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
   $: elapsedTime = formatDistanceAbbreviated({
-    start: initialItem.eventTime,
+    start: initialItem?.eventTime,
     end: isEventGroup(event)
       ? event.initialEvent.eventTime
       : currentEvent.eventTime,
-    includeMilliseconds: true,
+    includeMillisecondsForUnderSecond: true,
   });
 
   $: duration = isEventGroup(event)
     ? formatDistanceAbbreviated({
         start: event.initialEvent.eventTime,
         end: event.lastEvent.eventTime,
-        includeMilliseconds: true,
+        includeMillisecondsForUnderSecond: true,
       })
     : '';
 
@@ -73,14 +82,41 @@
     onRowClick();
   };
 
-  const failure = eventOrGroupIsFailureOrTimedOut(event);
-  const canceled = eventOrGroupIsCanceled(event);
-  const terminated = eventOrGroupIsTerminated(event);
+  $: failure = eventOrGroupIsFailureOrTimedOut(event);
+  $: canceled = eventOrGroupIsCanceled(event);
+  $: terminated = eventOrGroupIsTerminated(event);
+
+  $: icon = isLocalActivityMarkerEvent(event)
+    ? CategoryIcon['local-activity']
+    : CategoryIcon[event.category];
+
+  $: displayName = isEventGroup(event)
+    ? event.label
+    : isLocalActivityMarkerEvent(event)
+    ? 'Local Activity'
+    : spaceBetweenCapitalLetters(event.name);
+
+  $: primaryAttribute = getPrimaryAttributeForEvent(
+    isEventGroup(event) ? event.initialEvent : event,
+  );
+  $: secondaryAttribute = getSecondaryAttributeForEvent(
+    isEventGroup(event) ? event.lastEvent : event,
+    primaryAttribute?.key,
+  );
+  $: hasPendingActivity = isEventGroup(event) && event?.pendingActivity;
+  $: pendingAttempt =
+    isEventGroup(event) &&
+    event.isPending &&
+    (event?.pendingActivity?.attempt || event?.pendingNexusOperation?.attempt);
+  $: nonPendingActivityAttempt =
+    isEventGroup(event) &&
+    !event.isPending &&
+    event.eventList.find(isActivityTaskStartedEvent)?.attributes?.attempt;
 </script>
 
 <tr
-  class="row"
-  id={event.id}
+  class="row dense"
+  id={`${event.id}-${index}`}
   class:expanded={expanded && !expandAll}
   class:active
   class:failure
@@ -90,122 +126,154 @@
   data-testid="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td />
-  <td class="w-24 text-left">
-    <Link class="truncate" data-testid="link" {href}>
-      {event.id}
-    </Link>
+  {#if !compact}
+    <td class="w-12 text-left">
+      <Link class="truncate px-1" data-testid="link" {href}>
+        {event.id}
+      </Link>
+    </td>
+  {:else}
+    <td class="w-4" />
+  {/if}
+  <td
+    class="w-full overflow-hidden text-right text-sm font-normal xl:text-left"
+  >
+    <div
+      class="flex w-full max-w-screen-sm items-center gap-2 lg:max-w-screen-md xl:max-w-screen-xl"
+    >
+      <Icon name={icon} />
+      <p
+        class="event-name max-w-fit whitespace-nowrap pr-4 text-sm font-semibold md:text-base"
+      >
+        {displayName}
+      </p>
+      <div class="flex w-full gap-4 truncate">
+        {#if pendingAttempt}
+          <div
+            class="flex items-center gap-1 {pendingAttempt > 1 &&
+              'surface-danger rounded px-1 py-0.5'}"
+          >
+            <Icon class="mr-1.5 inline" name="retry" />
+            {pendingAttempt}
+            {#if hasPendingActivity}
+              / {hasPendingActivity.maximumAttempts || '∞'}
+            {/if}
+          </div>
+        {/if}
+        {#if currentEvent?.links?.length}
+          <EventLink link={currentEvent.links[0]} />
+        {/if}
+        {#if primaryAttribute?.key}
+          <EventDetailsRow
+            {...primaryAttribute}
+            {attributes}
+            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
+          />
+        {/if}
+        {#if nonPendingActivityAttempt}
+          <EventDetailsRow
+            key="attempt"
+            value={nonPendingActivityAttempt.toString()}
+            {attributes}
+            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
+          />
+        {/if}
+        {#if compact && secondaryAttribute?.key}
+          <EventDetailsRow
+            {...secondaryAttribute}
+            {attributes}
+            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
+          />
+        {/if}
+      </div>
+    </div>
   </td>
-  <td class="text-left">
-    <div class="flex flex-col gap-0">
-      {#if showElapsedTimeDiff}
-        <p class="break-word truncate text-sm md:whitespace-normal">
-          {#if elapsedTime}
-            {descending ? '-' : '+'}{elapsedTime}
-          {/if}
-        </p>
+  <td>
+    {#if isEventGroup(event)}
+      <div class="flex items-center gap-2 px-2">
+        <div class="flex gap-0.5">
+          {#each event.eventList as groupEvent}
+            <Link
+              class="truncate"
+              data-testid="link"
+              href={routeForEventHistoryEvent({
+                eventId: groupEvent.id,
+                namespace,
+                workflow,
+                run,
+              })}
+            >
+              {groupEvent.id}
+            </Link>
+          {/each}
+        </div>
         {#if duration && duration !== '0ms'}
-          <div class="flex flex-row items-center gap-0">
+          <div class="flex items-center gap-1 text-sm text-secondary">
             <Icon class="inline" name="clock" />
-            <p class="break-word truncate text-sm md:whitespace-normal">
+            <p class="whitespace-noline truncate">
               {duration}
             </p>
           </div>
         {/if}
-      {:else}
-        <p
-          class="break-word truncate text-sm md:whitespace-normal md:text-base"
-        >
-          {formatDate(event?.eventTime, $timeFormat, {
-            relative: $relativeTime,
-          })}
-        </p>
-      {/if}
-    </div>
-  </td>
-  <td
-    colspan={expanded ? 2 : 1}
-    class="text-right text-sm font-normal xl:text-left"
-  >
-    <div class="flex">
-      <div>
-        {#if compact && failure}
-          <Icon class="mr-1.5 inline text-red-700" name="clock" />
-        {/if}
-        {#if compact && canceled}
-          <Icon class="mr-1.5 inline text-yellow-700" name="clock" />
-        {/if}
-        {#if compact && terminated}
-          <Icon class="mr-1.5 inline text-pink-700" name="clock" />
-        {/if}
-      </div>
-      <div class="flex w-full items-center justify-between truncate">
-        <p class="event-name truncate text-sm font-semibold md:text-base">
-          {isEventGroup(event)
-            ? event.displayName
-            : isLocalActivityMarkerEvent(event)
-            ? 'LocalActivity'
-            : event.name}
-        </p>
-        {#if expanded}
-          <div>
-            <Icon class="inline" name="chevron-up" />
+        {#if pendingAttempt > 1 && hasPendingActivity}
+          <div class="flex items-center gap-2 text-sm">
+            <p class="max-w-fit whitespace-nowrap text-right text-xs">
+              Next Retry
+            </p>
+            <p class="flex items-center gap-0">
+              <Icon class="mr-1.5 inline" name="clock" />
+              {toTimeDifference({
+                date: hasPendingActivity.scheduledTime,
+                negativeDefault: 'None',
+              })}
+            </p>
           </div>
         {/if}
       </div>
-    </div>
-  </td>
-  {#if !expanded}
-    <td class="overflow-hidden">
-      <div class="flex w-full items-center justify-between">
-        <div class="grow truncate">
-          <EventDetailsRow
-            {...getSingleAttributeForEvent(currentEvent)}
-            {attributes}
-            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-            inline
-          />
-        </div>
-        <div>
-          <Icon class="inline" name="chevron-down" />
-        </div>
+    {:else}
+      <div class="flex flex-col gap-0 px-2 text-right">
+        <p class="-mb-1 truncate text-xs leading-3 text-secondary">
+          {#if elapsedTime}
+            +{elapsedTime}
+          {/if}
+        </p>
+        <p class="truncate text-sm">
+          {formatDate(currentEvent?.eventTime, $timeFormat, {
+            relative: $relativeTime,
+          })}
+        </p>
       </div>
-    </td>
-  {/if}
-
-  <td />
+    {/if}
+  </td>
 </tr>
 {#if expanded}
-  <tr in:fade|local class:typedError>
-    <td class="expanded-cell" colspan="6">
-      <EventDetailsFull {event} {currentEvent} {compact} bind:selectedId />
+  <tr
+    in:fade
+    out:slide={{ duration: 175 }}
+    class:typedError
+    class="row expanded"
+  >
+    <td class="expanded-cell w-full" colspan="3">
+      <EventDetailsFull {group} event={currentEvent} />
     </td>
   </tr>
 {/if}
 
 <style lang="postcss">
   .row {
-    @apply flex-wrap items-center text-sm no-underline xl:py-3 xl:text-base;
-  }
-
-  .row:hover {
-    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed dark:surface-subtle dark:bg-none;
-  }
-
-  .expanded.row {
-    @apply bg-blue-50 dark:surface-subtle;
+    @apply flex select-none items-center text-sm no-underline;
   }
 
   .failure {
-    @apply bg-error;
+    @apply border-2 border-danger;
   }
 
   .failure .event-name {
-    @apply text-error;
+    @apply text-danger;
   }
 
   .canceled {
-    @apply bg-warning;
+    @apply border-2 border-warning;
   }
 
   .canceled .event-name {
@@ -213,15 +281,15 @@
   }
 
   .terminated {
-    @apply bg-pink-50 dark:bg-pink-700;
+    @apply border-2 border-pink-700;
   }
 
   .terminated .event-name {
-    @apply text-pink-700 dark:text-pink-50;
+    @apply text-pink-700;
   }
 
   .expanded-cell {
-    @apply w-full flex-wrap text-sm no-underline xl:text-base;
+    @apply text-sm no-underline;
   }
 
   .typedError .expanded-cell {
@@ -234,24 +302,5 @@
     &.expanded {
       @apply rounded-b-none;
     }
-  }
-
-  .active {
-    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed dark:surface-subtle dark:bg-none;
-  }
-
-  .canceled:hover,
-  .active.canceled {
-    @apply bg-gradient-to-br from-yellow-100 to-yellow-200 bg-fixed dark:bg-yellow-600 dark:bg-none;
-  }
-
-  .failure:hover,
-  .active.failure {
-    @apply bg-gradient-to-br from-red-100 to-red-200 bg-fixed dark:bg-red-900 dark:bg-none;
-  }
-
-  .terminated:hover,
-  .active.terminated {
-    @apply bg-gradient-to-br from-pink-100 to-pink-200 bg-fixed dark:bg-pink-500 dark:bg-none;
   }
 </style>

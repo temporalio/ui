@@ -2,8 +2,10 @@
   import { writable } from 'svelte/store';
 
   import { afterUpdate, onDestroy } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Chip from '$lib/holocene/chip.svelte';
+  import Label from '$lib/holocene/label.svelte';
 
   export let id: string;
   export let chips: string[];
@@ -23,6 +25,9 @@
   let input: HTMLInputElement;
 
   $: invalid = $values.some((chip) => !validator(chip));
+
+  let className = '';
+  export { className as class };
 
   const scrollToInput = () => {
     let rect = input.getBoundingClientRect();
@@ -89,9 +94,23 @@
   };
 </script>
 
-<div class={$$props.class}>
-  <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
-  <div bind:this={inputContainer} class="input-container" class:invalid>
+<div class={merge(disabled && 'cursor-not-allowed', className)}>
+  <Label
+    class="pb-1"
+    {required}
+    {label}
+    {disabled}
+    hidden={labelHidden}
+    for={id}
+  />
+  <div
+    bind:this={inputContainer}
+    class={merge(
+      'input-container',
+      disabled && 'cursor-not-allowed opacity-65',
+      invalid && 'invalid',
+    )}
+  >
     {#if $values.length > 0}
       {#each $values as chip, i (`${chip}-${i}`)}
         {@const valid = validator(chip)}
@@ -100,19 +119,22 @@
             ? removeChipButtonLabel
             : removeChipButtonLabel(chip)}
           on:remove={() => removeChip(i)}
-          intent={valid ? 'default' : 'warning'}>{chip}</Chip
+          intent={valid ? 'default' : 'warning'}
+          {disabled}>{chip}</Chip
         >
       {/each}
     {/if}
     <input
       data-lpignore="true"
       autocomplete="off"
+      class:cursor-not-allowed={disabled}
       {disabled}
       {placeholder}
       {id}
       {name}
       {required}
       multiple
+      data-testid={id}
       bind:this={input}
       bind:value={displayValue}
       on:blur={handleBlur}
@@ -128,27 +150,19 @@
 </div>
 
 <style lang="postcss">
-  label {
-    @apply mb-10 text-sm font-medium text-primary;
-  }
-
-  label.required {
-    @apply after:content-["*"];
-  }
-
   .input-container {
-    @apply surface-primary flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-subtle p-2 text-sm text-primary focus-within:border-4 focus-within:border-blue-700;
+    @apply surface-primary flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded-lg border-2 border-subtle p-2 text-sm text-primary focus-within:border-interactive focus-within:ring-4 focus-within:ring-primary/70;
+  }
 
-    .invalid {
-      @apply border-red-700;
-    }
+  .invalid {
+    @apply border-danger focus-within:border-danger focus-within:ring-4 focus-within:ring-danger/70;
   }
 
   input {
-    @apply surface-primary inline-block w-full rounded focus:outline-none;
+    @apply surface-primary inline-block w-full focus:outline-none;
   }
 
   .hint {
-    @apply text-xs text-red-700;
+    @apply text-xs text-danger;
   }
 </style>

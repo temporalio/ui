@@ -1,4 +1,7 @@
 <script lang="ts">
+  import type { IconName } from '$lib/holocene/icon';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+
   import { HistoryConfig } from '../constants';
 
   const { radius } = HistoryConfig;
@@ -6,18 +9,16 @@
   export let point: [number, number];
   export let category: string | undefined = undefined;
   export let classification: string | undefined = undefined;
-  export let active = false;
   export let r = radius;
+  export let icon: IconName | undefined = undefined;
+  export let strokeWidth = 2;
 
   $: [x, y] = point;
-
-  const strokeWidth = 3;
 </script>
 
 <g>
   <circle
     class="dot {category} {classification}"
-    class:active
     stroke-width={strokeWidth}
     cx={x}
     cy={y}
@@ -25,6 +26,16 @@
   >
     <slot />
   </circle>
+  {#if icon}
+    <Icon
+      name={icon}
+      x={x - r / 2}
+      y={y - r / 2}
+      width={r}
+      height={r}
+      class="text-black"
+    />
+  {/if}
 </g>
 
 <style lang="postcss">
@@ -35,13 +46,9 @@
   .dot {
     cursor: pointer;
     outline: none;
-    opacity: 0.5;
+    opacity: 1;
     stroke: #141414;
     fill: #e8efff;
-  }
-
-  .active {
-    opacity: 1;
   }
 
   .marker,

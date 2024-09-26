@@ -1,10 +1,25 @@
-<script lang="ts">
-  import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
+<script lang="ts" context="module">
+  import type { Meta } from '@storybook/svelte';
 
   import SkeletonTable from './table.svelte';
+
+  export const meta = {
+    title: 'Skeleton Table',
+    component: SkeletonTable,
+    args: {
+      rows: 10,
+      columns: 4,
+    },
+    argTypes: {
+      rows: { name: 'Rows', control: 'number' },
+      columns: { name: 'Columns', control: 'number' },
+    },
+  } satisfies Meta<SkeletonTable>;
 </script>
 
-<Meta title="Skeleton Table" component={SkeletonTable} />
+<script lang="ts">
+  import { Story, Template } from '@storybook/addon-svelte-csf';
+</script>
 
 <Template let:args>
   {@const columnWidths = Array.from(new Array(args.columns)).fill(
@@ -19,4 +34,4 @@
   </SkeletonTable>
 </Template>
 
-<Story name="skeleton table" args={{ rows: 10, columns: 4 }} />
+<Story name="Default" args={{ rows: 10, columns: 4 }} />

@@ -33,7 +33,7 @@ export const TEMPORAL_THEME = EditorView.theme(
       borderLeftColor: colors.white,
     },
     '&.cm-focused .cm-selectionBackground, ::selection': {
-      backgroundColor: colors.slate['700'],
+      backgroundColor: colors.indigo['500'],
     },
     '.cm-gutters': {
       backgroundColor: colors.black,

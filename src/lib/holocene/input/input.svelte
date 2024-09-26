@@ -6,6 +6,7 @@
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
   import IconButton from '../icon-button.svelte';
@@ -27,6 +28,7 @@
     noBorder?: boolean;
     autoFocus?: boolean;
     error?: boolean;
+    'data-testid'?: string;
   };
 
   type CopyableProps = BaseProps & {
@@ -70,6 +72,8 @@
   let className = '';
   export { className as class };
 
+  let testId = $$props['data-testid'] || id;
+
   function callFocus(input: HTMLInputElement) {
     if (autoFocus && input) input.focus();
   }
@@ -85,77 +89,87 @@
 </script>
 
 <div class={merge('flex flex-col gap-1', className)}>
-  <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
-  <div
-    class="input-container"
-    class:disabled
-    class:error
-    class:unroundRight={unroundRight ?? suffix}
-    class:unroundLeft
-    class:noBorder
-    class:invalid={!valid}
-  >
-    {#if icon}
-      <span class="icon-container">
-        <Icon name={icon} />
-      </span>
-    {/if}
-    <input
-      class="input"
+  <Label {required} {label} hidden={labelHidden} for={id} />
+  <div class="input-group flex rounded-lg">
+    <slot name="before-input" {disabled} />
+    <div
+      class="input-container"
       class:disabled
-      {disabled}
-      data-lpignore="true"
-      maxlength={maxLength > 0 ? maxLength : undefined}
-      {placeholder}
-      {id}
-      {name}
-      {spellcheck}
-      {required}
-      {autocomplete}
-      bind:value
-      on:click|stopPropagation
-      on:input
-      on:keydown|stopPropagation
-      on:change
-      on:focus
-      on:blur
-      use:callFocus
-      {...$$restProps}
-    />
-    {#if copyable}
-      <div class="copy-icon-container">
-        <button aria-label={copyButtonLabel} on:click={(e) => copy(e, value)}>
-          {#if $copied}
-            <Icon name="checkmark" />
-          {:else}
-            <Icon name="copy" />
-          {/if}
-        </button>
-      </div>
-    {:else if disabled}
-      <div class="disabled-icon-container">
-        <Icon name="lock" />
-      </div>
-    {:else if clearable && value}
-      <div class="clear-icon-container" data-testid="clear-input">
-        <IconButton label={clearButtonLabel} on:click={onClear} icon="close" />
-      </div>
-    {/if}
-    {#if maxLength && !disabled && !hideCount}
-      <span class="count">
-        <span
-          class:ok={maxLength - value.length > 5}
-          class:warn={maxLength - value.length <= 5}
-          class:error={maxLength === value.length}>{value.length}</span
-        >/{maxLength}
-      </span>
-    {/if}
-    {#if suffix}
-      <div class="suffix">
-        {suffix}
-      </div>
-    {/if}
+      class:error
+      class:noBorder
+      class:unroundLeft={unroundLeft || $$slots['before-input']}
+      class:unroundRight={unroundRight || $$slots['after-input']}
+      class:invalid={!valid}
+    >
+      {#if icon}
+        <span class="icon-container">
+          <Icon name={icon} />
+        </span>
+      {/if}
+      <input
+        class="input"
+        class:disabled
+        {disabled}
+        data-lpignore="true"
+        maxlength={maxLength > 0 ? maxLength : undefined}
+        {placeholder}
+        {id}
+        {name}
+        {spellcheck}
+        {required}
+        {autocomplete}
+        bind:value
+        on:click|stopPropagation
+        on:input
+        on:keydown|stopPropagation
+        on:change
+        on:focus
+        on:blur
+        use:callFocus
+        data-testid={testId}
+        {...$$restProps}
+      />
+      {#if copyable}
+        <div class="copy-icon-container">
+          <button aria-label={copyButtonLabel} on:click={(e) => copy(e, value)}>
+            {#if $copied}
+              <Icon name="checkmark" />
+            {:else}
+              <Icon name="copy" />
+            {/if}
+          </button>
+        </div>
+      {:else if disabled}
+        <div class="disabled-icon-container">
+          <Icon name="lock" />
+        </div>
+      {:else if clearable && value}
+        <div class="clear-icon-container" data-testid="clear-input">
+          <IconButton
+            label={clearButtonLabel}
+            on:click={onClear}
+            icon="close"
+          />
+        </div>
+      {/if}
+      {#if maxLength && !disabled && !hideCount}
+        <span class="count">
+          <span
+            class:ok={maxLength - value.length > 5}
+            class:warn={maxLength - value.length <= 5}
+            class:error={maxLength === value.length}>{value.length}</span
+          >/{maxLength}
+        </span>
+      {/if}
+      {#if suffix}
+        <div class="suffix">
+          {suffix}
+        </div>
+      {/if}
+    </div>
+    <slot name="after-input" {disabled} />
   </div>
+
   <span
     class="hint-text inline-block"
     class:invalid={!valid}
@@ -169,20 +183,12 @@
 
 <style lang="postcss">
   /* Base styles */
-  label {
-    @apply font-secondary text-sm font-medium text-primary;
-  }
-
-  label.required {
-    @apply after:content-["*"];
-  }
-
   .input-container {
-    @apply surface-primary relative box-border inline-flex h-10 w-full items-center rounded border border-subtle text-sm focus-within:shadow-focus focus-within:shadow-primary/50 focus-within:outline-none dark:bg-transparent;
+    @apply surface-primary relative box-border inline-flex h-10 w-full items-center rounded-lg border-2 border-subtle text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     &.error,
     &.invalid {
-      @apply border-2 border-error focus-within:shadow-danger/50;
+      @apply border-danger focus-within:ring-danger/70;
 
       > .input {
         @apply caret-danger;
@@ -190,20 +196,20 @@
     }
 
     &.disabled {
-      @apply surface-disabled border-subtle text-disabled;
+      @apply opacity-50;
     }
   }
 
   .input {
-    @apply m-2 w-full bg-transparent focus:outline-none enabled:placeholder:text-subtle disabled:text-disabled disabled:placeholder:text-disabled;
+    @apply m-2 w-full bg-transparent placeholder:text-secondary focus:outline-none;
   }
 
   .suffix {
-    @apply block h-full w-fit rounded-br rounded-tr border-l px-4 py-2;
+    @apply block h-full w-fit rounded-br rounded-tr border-l border-subtle px-4 py-2;
   }
 
   .unroundRight {
-    @apply rounded-br-none rounded-tr-none;
+    @apply rounded-br-none rounded-tr-none border-r-0;
   }
 
   .unroundLeft {
@@ -223,7 +229,7 @@
   }
 
   .disabled-icon-container {
-    @apply flex h-full w-9 items-center justify-center;
+    @apply flex h-full w-9 items-center justify-center px-1;
   }
 
   .clear-icon-container {
@@ -231,10 +237,10 @@
   }
 
   .count {
-    @apply mx-2 hidden font-secondary text-sm font-medium tracking-widest;
+    @apply mx-2 hidden text-sm font-medium tracking-widest;
 
     > .ok {
-      @apply text-information;
+      @apply text-success;
     }
 
     > .warn {

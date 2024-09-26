@@ -19,3 +19,5 @@ server/ui/assets
 /playwright/.cache/
 /dist
 /audits
+go.work
+go.work.sum

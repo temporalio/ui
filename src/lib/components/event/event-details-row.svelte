@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -10,7 +10,6 @@
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
     shouldDisplayAsExecutionLink,
-    shouldDisplayAsPlainText,
     shouldDisplayAsTaskQueueLink,
     shouldDisplayChildWorkflowLink,
   } from '$lib/utilities/get-single-attribute-for-event';
@@ -24,109 +23,111 @@
   export let key: string;
   export let value: string | Record<string, unknown> | Payloads;
   export let attributes: CombinedAttributes;
-  export let inline = false;
+  export let showKey = true;
 
   const { workflow, namespace } = $page.params;
 </script>
 
-<div
-  class="flex flex-row items-center gap-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
->
-  {#if typeof value === 'object'}
-    <div
-      class="flex w-full flex-wrap items-center justify-between gap-1 pr-1 xl:flex-nowrap xl:gap-4"
-    >
-      <p class="min-w-fit text-sm">
+{#if key}
+  <div
+    class="flex max-w-lg flex-row items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 xl:max-w-xl {$$props.class}"
+  >
+    {#if showKey}
+      <p class="max-w-fit whitespace-nowrap text-right text-xs">
         {format(key)}
       </p>
-      <PayloadDecoder {value} key="payloads" let:decodedValue>
-        <CodeBlock
-          content={decodedValue}
-          {inline}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
-      </PayloadDecoder>
-    </div>
-  {:else if shouldDisplayAsExecutionLink(key)}
-    <div class="flex w-full flex-wrap items-center gap-1 pr-1">
-      <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <div class="truncate text-sm">
-        <Copyable
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={value}
-          container-class="xl:flex-row"
-        >
-          <Link
-            class="truncate"
-            href={routeForEventHistory({
-              namespace,
-              workflow,
-              run: value,
-            })}
-          >
-            {value}
-          </Link>
-        </Copyable>
+    {/if}
+    {#if typeof value === 'object'}
+      <div
+        class="flex w-full items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
+      >
+        <PayloadDecoder {value} key="payloads" let:decodedValue>
+          <div class="payload {$$props.class}">
+            <code><pre>{decodedValue}</pre></code>
+          </div>
+        </PayloadDecoder>
       </div>
-    </div>
-  {:else if shouldDisplayChildWorkflowLink(key, attributes)}
-    <div class="flex w-full flex-wrap items-center gap-1 pr-1">
-      <p class="truncate text-sm">{format(key)}</p>
-      <div class="truncate text-sm">
-        <Copyable
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={value}
-          container-class="xl:flex-row"
-        >
-          <Link
-            class="truncate"
-            href={routeForEventHistory({
-              namespace,
-              workflow: attributes.workflowExecutionWorkflowId,
-              run: attributes.workflowExecutionRunId,
-            })}
+    {:else if shouldDisplayAsExecutionLink(key)}
+      <div class="flex w-full items-center gap-2 pr-1">
+        <div class="truncate text-sm">
+          <Copyable
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            content={value}
+            container-class="xl:flex-row"
           >
-            {value}
-          </Link>
-        </Copyable>
+            <Badge type="subtle" class="select-none">
+              <Link
+                class="truncate"
+                href={routeForEventHistory({
+                  namespace,
+                  workflow,
+                  run: value,
+                })}
+              >
+                {value}
+              </Link>
+            </Badge>
+          </Copyable>
+        </div>
       </div>
-    </div>
-  {:else if shouldDisplayAsTaskQueueLink(key)}
-    <div class="flex w-full flex-wrap items-center gap-1 pr-1">
-      <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <div class="truncate text-sm">
-        <Copyable
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={value}
-        >
-          <Link
-            class="truncate"
-            href={routeForTaskQueue({ namespace, queue: value })}
+    {:else if shouldDisplayChildWorkflowLink(key, attributes)}
+      <div class="flex w-full items-center gap-2 pr-1">
+        <div class="truncate text-sm">
+          <Copyable
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            content={value}
+            container-class="xl:flex-row"
           >
-            {value}
-          </Link>
-        </Copyable>
+            <Badge type="subtle" class="select-none">
+              <Link
+                class="truncate"
+                href={routeForEventHistory({
+                  namespace,
+                  workflow: attributes.workflowExecutionWorkflowId,
+                  run: attributes.workflowExecutionRunId,
+                })}
+              >
+                {value}
+              </Link>
+            </Badge>
+          </Copyable>
+        </div>
       </div>
-    </div>
-  {:else}
-    <div class="flex w-full flex-wrap items-center gap-1 pr-1">
-      <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <p class="truncate text-right text-sm xl:text-left">
-        <span
-          class="w-full select-all text-slate-700"
-          class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
-        >
-      </p>
-    </div>
-  {/if}
-</div>
+    {:else if shouldDisplayAsTaskQueueLink(key)}
+      <div class="flex w-full items-center gap-2 pr-1">
+        <div class="truncate text-sm">
+          <Copyable
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            content={value}
+          >
+            <Badge type="subtle" class="select-none">
+              <Link
+                class="truncate"
+                href={routeForTaskQueue({ namespace, queue: value })}
+              >
+                {value}
+              </Link>
+            </Badge>
+          </Copyable>
+        </div>
+      </div>
+    {:else}
+      <div class="flex w-full items-center gap-2 pr-1">
+        <p class="truncate text-right text-sm xl:text-left">
+          <Badge type="subtle" class="select-none">
+            {value}
+          </Badge>
+        </p>
+      </div>
+    {/if}
+  </div>
+{/if}
 
 <style lang="postcss">
-  .badge {
-    @apply rounded-sm bg-badge p-1 text-primary;
+  .payload {
+    @apply overflow-hidden rounded bg-space-black px-1 py-0.5 font-mono text-xs text-white;
   }
 </style>

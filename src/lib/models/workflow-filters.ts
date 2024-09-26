@@ -1,8 +1,4 @@
-import type {
-  SearchAttributes,
-  SearchAttributesValue,
-  WorkflowExecution,
-} from '$lib/types/workflows';
+import type { SearchAttributes, WorkflowExecution } from '$lib/types/workflows';
 
 export type TextFilterAttributes = 'WorkflowId' | 'WorkflowType' | 'RunId';
 export type TextFilterKeys = Extract<
@@ -29,16 +25,6 @@ export const searchAttributeToWorkflowKey: Record<
   WorkflowId: 'id',
   WorkflowType: 'name',
   RunId: 'runId',
-};
-
-export type WorkflowFilter = {
-  attribute: Extract<keyof SearchAttributes, string>;
-  type: SearchAttributesValue;
-  value: string;
-  operator: string;
-  parenthesis: string;
-  conditional: string;
-  customDate?: boolean;
 };
 
 export type SortOrder = 'asc' | 'desc';

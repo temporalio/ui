@@ -3,6 +3,9 @@
     label: string;
     value: T;
     description?: string;
+    disabled?: boolean;
+    class?: string;
+    'data-testid'?: string;
   }
 
   export const EMPTY_OPTION: OptionType<string> = {
@@ -32,6 +35,9 @@
 
   export let value: T;
   export let description = '';
+  export let disabled = false;
+  let className = '';
+  export { className as class };
 
   let selected = false;
   let _value: T | string;
@@ -68,7 +74,15 @@
   };
 </script>
 
-<MenuItem on:click={handleOptionClick} role="option" {selected} {description}>
+<MenuItem
+  on:click={handleOptionClick}
+  role="option"
+  {selected}
+  {description}
+  {disabled}
+  class={className}
+  data-testid={$$restProps['data-testid'] ?? ''}
+>
   <slot name="leading" slot="leading" />
   <span bind:this={slotWrapper}>
     <slot />

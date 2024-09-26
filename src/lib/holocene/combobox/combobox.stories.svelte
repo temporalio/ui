@@ -1,56 +1,66 @@
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
+<script lang="ts" context="module">
+  import type { Meta } from '@storybook/svelte';
+  import { expect, userEvent, within } from '@storybook/test';
 
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
-  import iconNames from '$lib/holocene/icon';
+  import { iconNames } from '$lib/holocene/icon';
 
-  let stringOptions = [
-    'English',
-    'English (UK)',
-    'German',
-    'French',
-    'Japanese',
-  ];
+  export const meta = {
+    title: 'Combobox',
+    component: Combobox,
+    args: {
+      label: 'Select a Language',
+      placeholder: 'Start Typing...',
+      noResultsText: 'No Results',
+      toggleLabel: 'Show Results',
+      readonly: false,
+      required: false,
+      disabled: false,
+      valid: true,
+      error: '',
+      leadingIcon: 'search',
+      labelHidden: false,
+    },
+    argTypes: {
+      label: { name: 'Label', control: 'text' },
+      value: { name: 'Value', control: 'text', table: { disable: true } },
+      placeholder: { name: 'Placeholder', control: 'text' },
+      readonly: { name: 'Read Only', control: 'boolean' },
+      required: { name: 'Required', control: 'boolean' },
+      disabled: { name: 'Disabled', control: 'boolean' },
+      error: { name: 'Error', control: 'text' },
+      valid: { name: 'Valid', control: 'boolean' },
+      labelHidden: { name: 'Label Hidden', control: 'boolean' },
+      minSize: { name: 'Minimum Size', control: 'number' },
+      maxSize: { name: 'Maximum Size', control: 'number' },
+      leadingIcon: {
+        name: 'Icon',
+        control: 'select',
+        options: iconNames,
+      },
+      toggleLabel: {
+        name: 'Toggle Label',
+        control: 'text',
+        table: { category: 'Accessibility' },
+      },
+      noResultsText: { name: 'No Results Text', control: 'text' },
+      optionValueKey: { control: 'text', table: { disable: true } },
+      optionLabelKey: { control: 'text', table: { disable: true } },
 
-  let customOptions = [
-    { label: 'English', value: 'en-us' },
-    { label: 'English (UK)', value: 'en-uk' },
-    { label: 'German', value: 'de' },
-    { label: 'French', value: 'fr' },
-    { label: 'Japanese', value: 'jp' },
-  ];
+      options: { table: { disable: true } },
+    },
+  } satisfies Meta<Combobox<unknown>>;
 </script>
 
-<Meta
-  title="Combobox"
-  component={Combobox}
-  args={{
-    label: 'Select a Language',
-    placeholder: 'Start Typing...',
-    noResultsText: 'No Results',
-    toggleLabel: 'Show Results',
-    readonly: false,
-    required: false,
-    disabled: false,
-    leadingIcon: 'search',
-  }}
-  argTypes={{
-    leadingIcon: { control: 'select', options: iconNames },
-    options: { control: false },
-    id: { control: 'text' },
-    value: { control: 'text' },
-    toggleLabel: { control: 'text' },
-    noResultsText: { control: 'text' },
-    placeholder: { control: 'text' },
-    label: { control: 'text' },
-    optionValueKey: { control: 'text' },
-    optionLabelKey: { control: 'text' },
-  }}
-/>
+<script lang="ts">
+  import { action } from '@storybook/addon-actions';
+  import { Story, Template } from '@storybook/addon-svelte-csf';
+</script>
 
-<Template let:args>
+<Template let:args let:context>
   <Combobox
+    id={context.id}
+    data-testid={context.id}
     on:change={action('change')}
     on:filter={action('filter')}
     {...args}
@@ -58,52 +68,57 @@
 </Template>
 
 <Story
-  name="with string options"
-  args={{ id: 'combobox-1', options: stringOptions }}
-/>
-<Story
-  name="with custom options"
+  name="String Options"
   args={{
-    id: 'combobox-2',
-    options: customOptions,
-    optionLabelKey: 'label',
-    optionValueKey: 'value',
+    options: ['English', 'English (UK)', 'German', 'French', 'Japanese'],
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+    await userEvent.type(combobox, 'English');
   }}
 />
 
-<!-- <Hst.Story title="combobox">
-  <Hst.Variant title="a combobox with string options (uncontrolled)">
-    <Combobox
-      bind:value
-      {leadingIcon}
-      label="Select a Language"
-      placeholder="Type a Language..."
-      noResultsText="No Results"
-      toggleLabel="Show Results"
-      id="combobox-1"
-      options={stringOptions}
-    />
-  </Hst.Variant>
+<Story
+  name="Custom Options"
+  args={{
+    options: [
+      { label: 'English', value: 'en-us' },
+      { label: 'English (UK)', value: 'en-uk' },
+      { label: 'German', value: 'de' },
+      { label: 'French', value: 'fr' },
+      { label: 'Japanese', value: 'jp' },
+    ],
+    optionLabelKey: 'label',
+    optionValueKey: 'value',
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
 
-  <Hst.Variant title="a combobox with custom options (uncontrolled)">
-    <Combobox
-      bind:value={customValue}
-      {leadingIcon}
-      label="Select a Language"
-      noResultsText="No Results"
-      toggleLabel="Show Results"
-      id="combobox-2"
-      options={customOptions}
-      optionLabelKey="label"
-      optionValueKey="value"
-    />
-  </Hst.Variant>
+    await userEvent.type(combobox, 'Japanese');
 
-  <svelte:fragment slot="controls">
-    <Hst.Select
-      bind:value={leadingIcon}
-      title="Leading Icon"
-      options={[{ label: 'None', value: '' }, ...Object.keys(icons)]}
-    />
-  </svelte:fragment>
-</Hst.Story> -->
+    const menu = canvas.getByRole('listbox');
+
+    expect(menu).toBeInTheDocument();
+  }}
+/>
+
+<Story
+  name="No Results"
+  args={{
+    options: ['English', 'English (UK)', 'German', 'French', 'Japanese'],
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+
+    await userEvent.type(combobox, 'Jerseyan');
+
+    const menu = canvas.getByRole('listbox');
+    const noResults = canvas.getByText('No Results');
+
+    expect(menu).toBeInTheDocument();
+    expect(noResults).toBeInTheDocument();
+  }}
+/>

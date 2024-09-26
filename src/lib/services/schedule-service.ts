@@ -33,13 +33,20 @@ type PaginatedSchedulesPromise = (
 
 export const fetchPaginatedSchedules = async (
   namespace: string,
+  query: string,
+  onError: ErrorCallback,
   request = fetch,
 ): Promise<PaginatedSchedulesPromise> => {
   return (pageSize = 100, token = '') => {
     const route = routeForApi('schedules', { namespace });
     return requestFromAPI<ListScheduleResponse>(route, {
-      params: { maximumPageSize: String(pageSize), nextPageToken: token },
+      params: {
+        maximumPageSize: String(pageSize),
+        nextPageToken: token,
+        ...(query ? { query } : {}),
+      },
       request,
+      onError,
     }).then(({ schedules, nextPageToken }) => {
       return {
         items: schedules,

@@ -35,14 +35,17 @@
   import BatchTerminateConfirmationModal from '$lib/components/workflow/client-actions/batch-terminate-confirmation-modal.svelte';
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
-  import WorkflowFilterSearch from '$lib/components/workflow/filter-search/index.svelte';
+  import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
+  import WorkflowSearchAttributeFilter from '$lib/components/workflow/search-attribute-filter/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { groupByCountEnabled } from '$lib/stores/capability-enablement';
+  import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
@@ -50,12 +53,12 @@
     refresh,
     updating,
     workflowCount,
-    workflows,
     workflowsQuery,
     workflowsSearchParams,
   } from '$lib/stores/workflows';
-  import { exportWorkflows } from '$lib/utilities/export-workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { routeForWorkflowStart } from '$lib/utilities/route-for';
+  import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
   $: query = $page.url.searchParams.get('query');
   $: query, ($workflowsQuery = query);
@@ -64,6 +67,11 @@
   // For returning to page from 'Back to Workflows' with previous search
   $: searchParams = $page.url.searchParams.toString();
   $: searchParams, ($workflowsSearchParams = searchParams);
+
+  $: availableColumns = availableWorkflowSystemSearchAttributeColumns(
+    namespace,
+    $page.data.settings,
+  );
 
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
@@ -153,6 +161,12 @@
       resetSelection();
     }
   }
+
+  let customizationDrawerOpen = false;
+
+  const openCustomizationDrawer = () => {
+    customizationDrawerOpen = true;
+  };
 </script>
 
 <BatchTerminateConfirmationModal
@@ -185,31 +199,25 @@
 />
 
 <header class="flex flex-col gap-2">
-  <div class="flex items-center justify-between">
-    <div>
-      <h1 class="flex items-center gap-2 text-2xl" data-cy="workflows-title">
-        {#if $supportsAdvancedVisibility}
-          <span data-testid="workflow-count"
-            >{$workflowCount.count.toLocaleString()}</span
-          >
-          <Translate
-            key="common.workflows-plural"
-            count={$workflowCount.count}
-          />
-        {:else}
-          <Translate key="workflows.recent-workflows" />
-        {/if}
-        <WorkflowCountRefresh count={$workflowCount.newCount} />
-      </h1>
-    </div>
-    <div class="flex items-center gap-2 text-sm">
-      <button
-        class="underline hover:text-blue-700"
-        tabindex={0}
-        on:click={() => exportWorkflows($workflows)}
-        >{translate('common.download-json')}</button
+  <div class="flex flex-col justify-between gap-2 md:flex-row">
+    <h1 class="flex items-center gap-2" data-cy="workflows-title">
+      {#if $supportsAdvancedVisibility}
+        <span data-testid="workflow-count"
+          >{$workflowCount.count.toLocaleString()}</span
+        >
+        <Translate key="common.workflows-plural" count={$workflowCount.count} />
+      {:else}
+        <Translate key="workflows.recent-workflows" />
+      {/if}
+      <WorkflowCountRefresh count={$workflowCount.newCount} />
+    </h1>
+    {#if !workflowCreateDisabled($page)}
+      <Button
+        leadingIcon="lightning-bolt"
+        href={routeForWorkflowStart({ namespace })}
+        >{translate('workflows.start-workflow')}</Button
       >
-    </div>
+    {/if}
   </div>
   {#if $groupByCountEnabled}
     <WorkflowCounts />
@@ -217,8 +225,15 @@
 </header>
 
 <div class="flex flex-col gap-2 md:flex-row">
-  <WorkflowFilterSearch />
+  <WorkflowSearchAttributeFilter onClickConfigure={openCustomizationDrawer} />
 </div>
 <WorkflowsSummaryConfigurableTable>
   <slot name="cloud" slot="cloud" />
 </WorkflowsSummaryConfigurableTable>
+
+<ConfigurableTableHeadersDrawer
+  {availableColumns}
+  bind:open={customizationDrawerOpen}
+  type={translate('common.workflows', { count: 1 })}
+  title={translate('common.workflows', { count: 2 })}
+/>

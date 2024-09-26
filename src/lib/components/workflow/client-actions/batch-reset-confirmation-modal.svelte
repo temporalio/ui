@@ -27,7 +27,7 @@
   export let open = false;
   let error = '';
   let jobIdPlaceholder = v4();
-  let resetType = writable<'first' | 'last'>();
+  let resetType = writable<'first' | 'last'>('first');
   const reason = writable('');
   const reasonPlaceholder = getPlacholder(Action.Reset, $authUser.email);
   const jobId = writable('');

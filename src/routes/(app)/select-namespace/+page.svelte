@@ -48,7 +48,7 @@
   url={$page.url.href}
 />
 <div class="w-full p-8 xl:w-1/2">
-  <h1 class="my-4 text-3xl">
+  <h1 class="my-4">
     {translate('namespaces.select-namespace-welcome')}
   </h1>
   <p class="mb-8">{translate('namespaces.select-namespace')}</p>

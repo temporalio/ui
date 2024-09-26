@@ -8,20 +8,18 @@
   export let menuLabel: string;
   export let icon: IconName | undefined = undefined;
   export let id: string;
-  export let variant: 'primary' | 'secondary' | 'destructive' | 'ghost' =
-    'primary';
   export let disabled = false;
   export let position: 'left' | 'right' = 'left';
   export let primaryActionDisabled = false;
+  export let href: string | undefined = undefined;
 </script>
 
 <MenuContainer class={$$props.class}>
-  <div class="split-button">
+  <div class="button-group flex h-10 cursor-pointer flex-row gap-[1px]">
     <Button
-      {variant}
-      borderRadiusModifier="square-right"
       disabled={disabled || primaryActionDisabled}
       id="{id}-primary-button"
+      {href}
       on:click
     >
       {#if icon}
@@ -30,24 +28,17 @@
       {label}
     </Button>
     <MenuButton
-      class="max-w-fit grow-0 px-1"
+      class="max-w-fit grow-0 px-3"
       id="{id}-menu-button"
       label={menuLabel}
       controls="{id}-menu"
       variant="primary"
-      unroundLeft
       {disabled}
       hasIndicator
     />
   </div>
 
-  <Menu id="{id}-menu" {position} class="w-full">
+  <Menu id="{id}-menu" {position} class="max-w-fit">
     <slot />
   </Menu>
 </MenuContainer>
-
-<style lang="postcss">
-  .split-button {
-    @apply flex h-10 cursor-pointer flex-row gap-[1px];
-  }
-</style>

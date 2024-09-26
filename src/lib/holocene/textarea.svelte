@@ -1,6 +1,10 @@
 <script lang="ts">
   import type { HTMLTextareaAttributes } from 'svelte/elements';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
+  import Label from './label.svelte';
+
   type $$Props = HTMLTextareaAttributes & {
     disabled?: boolean;
     error?: string;
@@ -35,17 +39,25 @@
   export { className as class };
 </script>
 
-<div class={className}>
-  <label class:required class:sr-only={labelHidden} for={id}>{label}</label>
+<div class={merge('group flex flex-col gap-1', className)}>
+  <Label {required} hidden={labelHidden} {label} for={id} />
   {#if description}
-    <p class="pb-2 text-sm">{description}</p>
+    <p class="-mt-1 text-sm">{description}</p>
   {/if}
-  <div class="relative">
+  <div
+    class={merge(
+      'relative box-border inline-flex w-full rounded-lg border-2 border-subtle focus-within:border-information focus-within:ring-4 focus-within:ring-primary/70',
+      !isValid && 'error',
+      !disabled && 'hover:border-information',
+    )}
+  >
     <textarea
-      class=" min-h-fit w-full rounded-lg border-2 border-subtle bg-transparent px-3 py-2 font-mono text-sm focus-visible:border-information focus-visible:shadow-[0_0_0_4px_rgb(97,115,243,0.7)] focus-visible:outline-none enabled:hover:border-information"
-      class:error={!isValid}
-      {id}
       bind:value
+      class={merge(
+        'surface-primary min-h-fit w-full rounded-lg px-3 py-2 text-sm focus-visible:outline-none',
+        disabled && 'cursor-not-allowed opacity-50',
+      )}
+      {id}
       {disabled}
       {placeholder}
       {rows}
@@ -57,45 +69,39 @@
       on:keydown|stopPropagation
       maxlength={maxLength > 0 ? maxLength : undefined}
     />
+  </div>
+  <div class="flex justify-between gap-2">
+    <div
+      class="error-msg"
+      class:min-width={maxLength}
+      aria-live={isValid ? 'off' : 'assertive'}
+    >
+      {#if !isValid}
+        {#if error}
+          <p>{error}</p>
+        {/if}
+        <slot name="error" />
+      {/if}
+    </div>
     {#if maxLength && !disabled}
       <span class="count">
         <span
-          class="text-blue-700"
+          class="text-information"
           class:warn={maxLength - value?.length <= 5}
           class:error={maxLength === value?.length}>{value?.length ?? 0}</span
         >&nbsp;/&nbsp;{maxLength}
       </span>
     {/if}
   </div>
-  <div
-    class="error-msg"
-    class:min-width={maxLength}
-    aria-live={isValid ? 'off' : 'assertive'}
-  >
-    {#if !isValid}
-      {#if error}
-        <p>{error}</p>
-      {/if}
-      <slot name="error" />
-    {/if}
-  </div>
 </div>
 
 <style lang="postcss">
-  label {
-    @apply mb-10 font-secondary text-sm font-medium;
-  }
-
-  label.required {
-    @apply after:content-["*"];
-  }
-
   .error {
-    @apply border-danger hover:border-danger focus-visible:border-danger focus-visible:shadow-[0_0_0_4px_rgb(249,115,22,0.7)];
+    @apply border-danger focus-within:border-danger focus-within:ring-4 focus-within:ring-danger/70;
   }
 
   .error-msg {
-    @apply min-h-[1.25rem] break-words border-danger font-primary text-sm font-normal text-danger;
+    @apply min-h-[1.25rem] break-words border-danger text-sm font-normal text-danger;
   }
 
   .error-msg.min-width {
@@ -103,18 +109,18 @@
   }
 
   .count {
-    @apply invisible absolute -bottom-5 right-0 font-secondary text-sm font-medium text-primary;
+    @apply invisible text-right text-sm font-medium text-primary group-focus-within:visible;
   }
 
   .count > .warn {
-    @apply text-orange-600;
+    @apply text-warning;
   }
 
   .count > .error {
-    @apply text-red-700;
+    @apply text-danger;
   }
 
-  textarea:focus + .count {
-    @apply visible;
+  textarea {
+    @apply surface-primary dark:bg-transparent;
   }
 </style>

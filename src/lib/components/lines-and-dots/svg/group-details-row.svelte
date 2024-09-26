@@ -1,7 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { setActiveGroup } from '$lib/stores/active-events';
   import {
     format,
     spaceBetweenCapitalLetters,
@@ -63,7 +66,7 @@
     staticCodeBlockHeight * codeBlockAttributes.length - textHeight,
   );
 
-  $: title = group.name;
+  $: title = group.displayName;
   $: attributes = mergeEventGroupDetails(group);
   $: codeBlockAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value === 'object',
@@ -76,31 +79,38 @@
     group && group.eventList.find(isChildWorkflowExecutionStartedEvent);
 </script>
 
-<g role="button" tabindex="0" class="relative cursor-pointer">
+<g role="button" tabindex="0" class="relative z-50 cursor-pointer">
   <Box point={[x, y]} {width} height={boxHeight} fill="#465A78" />
   <Box point={[x, y]} {width} {height} fill="#1E293B" />
-  <Box
-    point={[x, y]}
-    width={gutter + 100}
-    {height}
-    fill={getStatusColor(status)}
-  />
-  <Text point={[x + gutter, y + 0.5 * height]} category="none">
-    {status ? spaceBetweenCapitalLetters(status) : group.label}
-  </Text>
-  <Text point={[x + 1.5 * gutter + 100, y + 0.5 * height]}>
-    {title}
-  </Text>
-  <Text point={[x + width - gutter, y + 0.5 * height]} textAnchor="end">
-    {formatDistanceAbbreviated({
-      start: group?.initialEvent?.eventTime,
-      end: group?.lastEvent?.eventTime,
-      includeMilliseconds: true,
-    })}
-  </Text>
+  <foreignObject {x} {y} {width} height={fontSizeRatio}>
+    <div class="flex h-full items-center justify-between text-sm text-white">
+      <div class="flex h-full items-center gap-2">
+        <div
+          class="px-4 py-1 text-black"
+          style="background-color: {getStatusColor(status)};"
+        >
+          {status ? spaceBetweenCapitalLetters(status) : group.label}
+        </div>
+        {title}
+      </div>
+      <div class="flex items-center gap-4">
+        {formatDistanceAbbreviated({
+          start: group?.initialEvent?.eventTime,
+          end: group?.lastEvent?.eventTime,
+          includeMilliseconds: true,
+        })}
+        <button
+          class="flex items-center gap-0.5 rounded-t bg-white px-2 text-sm text-black"
+          on:click|stopPropagation={() => setActiveGroup(group)}
+        >
+          {translate('common.close')}<Icon name="close" />
+        </button>
+      </div>
+    </div>
+  </foreignObject>
   {#each codeBlockAttributes as [key, value], index (key)}
     {@const y = textStartingY + index * staticCodeBlockHeight}
-    <Text point={[codeBlockX, y]}>{format(key)}</Text>
+    <Text point={[codeBlockX, y]} label>{format(key)}</Text>
     <GroupDetailsText
       point={[codeBlockX, y + 1.5 * fontSizeRatio]}
       {key}
@@ -121,7 +131,7 @@
           class="flex flex-col gap-0 text-sm text-white"
           style="height: {2 * fontSizeRatio}px;"
         >
-          <div class="font-semibold leading-3 text-[#C9D9F0]">
+          <div class="font-medium leading-3 text-[#C9D9F0]">
             {format(key)}
           </div>
           <div class="text-wrap break-all leading-4">
@@ -152,7 +162,7 @@
           runId={childWorkflowStartedEvent.attributes.workflowExecution.runId}
           height={childTimelineHeight}
           width={childTimelineWidth}
-          class="overflow-x-hidden rounded-br rounded-tr border-b-4 border-r-4 border-t-4 border-black bg-black"
+          class="overflow-x-hidden rounded-br rounded-tr border-b-2 border-r-2 border-t-2 border-subtle bg-primary"
         />
       {/key}
     </foreignObject>

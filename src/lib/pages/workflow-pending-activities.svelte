@@ -7,6 +7,7 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -43,16 +44,16 @@
         <td class="px-5 py-4">
           <ul>
             <li class="event-table-row">
-              <h4 class="font-semibold">
+              <h4>
                 {translate('workflows.activity-type')}
               </h4>
-              <Badge type={failed ? 'error' : 'default'}>
+              <Badge type={failed ? 'danger' : undefined}>
                 {details.activityType}
               </Badge>
             </li>
             <li class="event-table-row">
               <h4>{translate('workflows.attempt')}</h4>
-              <Badge type={failed ? 'error' : 'default'}>
+              <Badge type={failed ? 'danger' : undefined}>
                 {#if failed}
                   <Icon class="mr-1" name="retry" />
                 {/if}
@@ -62,19 +63,29 @@
             {#if failed}
               <li class="event-table-row">
                 <h4>{translate('workflows.attempts-left')}</h4>
-                <Badge type="error">
+                <Badge type="danger">
                   {formatAttemptsLeft(details.maximumAttempts, details.attempt)}
                 </Badge>
               </li>
               {#if details.scheduledTime}
                 <li class="event-table-row">
-                  <h4>{translate('workflows.next-retry')}</h4>
-                  <Badge type="error">
-                    {toTimeDifference({
-                      date: details.scheduledTime,
-                      negativeDefault: translate('workflows.no-retry'),
+                  <h4>
+                    {translate('workflows.next-retry')}
+                  </h4>
+                  <Tooltip
+                    width={200}
+                    left
+                    text={formatDate(details.scheduledTime, $timeFormat, {
+                      relative: $relativeTime,
                     })}
-                  </Badge>
+                  >
+                    <Badge type="danger">
+                      {toTimeDifference({
+                        date: details.scheduledTime,
+                        negativeDefault: translate('workflows.no-retry'),
+                      })}
+                    </Badge>
+                  </Tooltip>
                 </li>
               {/if}
             {/if}

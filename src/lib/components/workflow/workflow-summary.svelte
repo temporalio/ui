@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
 
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
-  import Accordion from '$lib/holocene/accordion.svelte';
+  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import {
@@ -32,8 +32,8 @@
     }}
   >
     <div class="flex flex-col gap-2 xl:flex-row">
-      <div class="grow overflow-hidden">
-        <h3 class="font-medium">{translate('common.execution-details')}</h3>
+      <div class="grow basis-1/3 overflow-hidden">
+        <h4>{translate('common.execution-details')}</h4>
         <div class="h-0.5 rounded-full bg-inverse" />
         <WorkflowDetail
           title={translate('common.workflow-type')}
@@ -55,7 +55,7 @@
         />
       </div>
       <div class="grow overflow-hidden">
-        <h3 class="font-medium">{translate('common.task-queue')}</h3>
+        <h4>{translate('common.task-queue')}</h4>
         <div class="h-0.5 rounded-full bg-inverse" />
         <WorkflowDetail
           content={workflow?.taskQueue}
@@ -74,9 +74,9 @@
         />
       </div>
       <div class="grow-0">
-        <h3 class="font-medium">
+        <h4>
           {translate('workflows.start-and-close-time')}
-        </h3>
+        </h4>
         <div class="h-0.5 rounded-full bg-inverse" />
         <WorkflowDetail
           title={translate('common.start-time')}

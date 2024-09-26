@@ -16,7 +16,7 @@ export default defineConfig({
   reporter: [
     ['html'],
     ['json', { outputFile: 'playwright-report/test-results.json' }],
-    [process.env.CI ? 'list' : 'github'],
+    [process.env.CI ? 'github' : 'list'],
     [
       './tests/test-utilities/accessibility-reporter',
       { outputFile: 'playwright-report/accessibility-violations.json' },
@@ -36,6 +36,7 @@ export default defineConfig({
     },
   ],
   webServer: {
+    timeout: 2 * 60 * 1000,
     command: `pnpm serve:playwright:${PLAYWRIGHT_MODE}`,
     port: PORT,
   },

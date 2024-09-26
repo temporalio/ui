@@ -2,10 +2,10 @@
   import WorkflowJsonNavigator from '$lib/components/workflow/workflow-json-navigator.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { decodeEventHistory, fullEventHistory } from '$lib/stores/events';
+  import { decodeEventHistory, filteredEventHistory } from '$lib/stores/events';
 </script>
 
-<WorkflowJsonNavigator events={$fullEventHistory}>
+<WorkflowJsonNavigator events={$filteredEventHistory}>
   <ToggleSwitch
     slot="decode"
     label={translate('events.decode-event-history')}

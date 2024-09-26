@@ -1,82 +1,169 @@
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Meta, Story, Template } from '@storybook/addon-svelte-csf';
+<script lang="ts" context="module">
+  import type { Meta } from '@storybook/svelte';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  const handleChange = (e) => {
-    action('change')(e);
-  };
+  export const meta = {
+    title: 'Code Block',
+    args: {
+      editable: false,
+      inline: false,
+      language: 'json',
+      copyable: false,
+      label: 'JSON content',
+    },
+    argTypes: {
+      editable: {
+        control: 'boolean',
+        table: { category: 'Properties' },
+      },
+      inline: {
+        control: 'boolean',
+        table: { category: 'Properties' },
+      },
+      copyable: {
+        control: 'boolean',
+        table: { category: 'Properties' },
+      },
+      content: {
+        control: 'text',
+        table: { category: 'Content' },
+      },
+      language: {
+        control: 'select',
+        options: ['json', 'shell', 'text'],
+        table: { category: 'Content' },
+      },
+      minHeight: {
+        control: { type: 'number', min: 0, max: 9999, step: 1 },
+        table: { category: 'Size' },
+      },
+      maxHeight: {
+        control: { type: 'number', min: 0, max: 9999, step: 1 },
+        table: { category: 'Size' },
+      },
+      copyIconTitle: {
+        control: 'text',
+        table: { category: 'Copy Icon' },
+      },
+      copySuccessIconTitle: {
+        control: 'text',
+        table: { category: 'Copy Icon' },
+      },
+    },
+  } satisfies Meta<CodeBlock>;
 </script>
 
-<Meta
-  title="Code Block"
-  component={CodeBlock}
-  argTypes={{
-    language: { control: false },
-    class: { control: 'text' },
-    minHeight: { control: 'number' },
-    maxHeight: { control: 'number' },
-  }}
-/>
+<script lang="ts">
+  import { action } from '@storybook/addon-actions';
+  import { Story, Template } from '@storybook/addon-svelte-csf';
+
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+</script>
 
 <Template id="json" let:args>
-  <CodeBlock
-    language="json"
-    copyIconTitle="Click to copy content"
-    copySuccessIconTitle="Content copied to clipboard"
-    {...args}
-    on:change={handleChange}
-  />
+  <CodeBlock language="json" {...args} on:change={action('change')} />
 </Template>
 
 <Template id="shell" let:args>
-  <CodeBlock
-    language="shell"
-    copyIconTitle="Click to copy content"
-    copySuccessIconTitle="Content copied to clipboard"
-    {...args}
-    on:change={handleChange}
-  />
+  <CodeBlock language="shell" {...args} on:change={action('change')} />
 </Template>
 
 <Template id="text" let:args>
-  <CodeBlock
-    language="text"
-    copyIconTitle="Click to copy content"
-    copySuccessIconTitle="Content copied to clipboard"
-    {...args}
-    on:change={handleChange}
-  />
+  <CodeBlock language="text" {...args} on:change={action('change')} />
+</Template>
+
+<Template let:args>
+  <CodeBlock {...args} />
 </Template>
 
 <Story
-  template="json"
-  name="json code block"
+  name="Default"
   args={{
-    content: stringifyWithBigInt({ foo: 'bar', baz: false, blue: 42 }),
-    editable: false,
+    content: stringifyWithBigInt({ hello: 'world' }, null, 2),
   }}
 />
 
 <Story
-  template="shell"
-  name="shell code block"
+  name="Editable"
   args={{
-    content: `# clone the repository 
-    git clone https://github.com/temporalio/ui
-# setup locally
-    cd ui
-    npm install`,
-    editable: false,
+    editable: true,
+    content: stringifyWithBigInt({ hello: 'world' }, null, 2),
   }}
 />
 
 <Story
-  template="text"
-  name="text code block"
+  name="Inline"
   args={{
-    content: 'This is the text',
+    inline: true,
+    content: stringifyWithBigInt({ hello: 'world' }, null, 2),
+  }}
+/>
+
+<Story
+  name="Copyable"
+  args={{
+    copyable: true,
+    content: stringifyWithBigInt({ hello: 'world' }, null, 2),
+    copyIconTitle: 'Click to copy content',
+    copySuccessIconTitle: 'Content copied to clipboard',
+  }}
+/>
+
+<Story
+  name="Minimum Height"
+  args={{
+    minHeight: 400,
+    content: stringifyWithBigInt({ hello: 'world' }, null, 2),
+  }}
+/>
+
+<Story
+  name="Maximum Height"
+  args={{
+    maxHeight: 100,
+    content: stringifyWithBigInt(
+      Object.getOwnPropertyDescriptors(Array.prototype),
+      null,
+      2,
+    ),
+  }}
+/>
+
+<Story
+  name="Shell"
+  args={{
+    language: 'shell',
+    content: 'echo "Hello, World!"',
+  }}
+/>
+
+<Story
+  name="Text"
+  args={{
+    language: 'text',
+    content: 'Hello, World!',
+  }}
+/>
+
+<Story
+  name="Copyable (Shell)"
+  args={{
+    language: 'shell',
+    copyable: true,
+    content: 'echo "Hello, World!"',
+    copyIconTitle: 'Click to copy content',
+    copySuccessIconTitle: 'Content copied to clipboard',
+  }}
+/>
+
+<Story
+  name="Copyable (Text)"
+  args={{
+    language: 'text',
+    copyable: true,
+    content: 'Hello, World!',
+    copyIconTitle: 'Click to copy content',
+    copySuccessIconTitle: 'Content copied to clipboard',
   }}
 />

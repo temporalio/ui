@@ -16,7 +16,7 @@
     class?: string;
     icon?: IconName;
     text?: string;
-    inverse?: boolean;
+    light?: boolean;
     'data-testid'?: string;
   };
 
@@ -27,7 +27,7 @@
   export let newTab = false;
   export let icon: IconName = null;
   export let text: string = '';
-  export let inverse = false;
+  export let light = false;
 
   const onLinkClick = (e: MouseEvent) => {
     // Skip if middle mouse click or new tab
@@ -44,13 +44,13 @@
   rel={newTab ? 'noreferrer' : null}
   class={merge('link', icon ? 'inline-flex' : 'inline', className)}
   class:active
-  class:inverse
+  class:light
   on:click={onLinkClick}
   tabindex={href ? null : 0}
   {...$$restProps}
 >
   {#if icon}
-    <Icon width={20} height={20} class="mt-0.5" name={icon} />
+    <Icon class="mt-0.5" name={icon} />
   {/if}
   {#if text}
     {text}
@@ -60,14 +60,14 @@
 
 <style lang="postcss">
   .link {
-    @apply max-w-fit cursor-pointer items-center gap-2 rounded text-primary underline underline-offset-2 hover:text-active focus-visible:text-active focus-visible:shadow-focus focus-visible:shadow-indigo-600/50 focus-visible:outline-none;
+    @apply max-w-fit cursor-pointer items-center gap-2 rounded text-primary underline underline-offset-2 hover:text-brand focus-visible:text-brand focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70;
 
     &.active {
-      @apply text-blue-900;
+      @apply text-brand;
     }
 
-    &.inverse {
-      @apply text-white hover:text-indigo-400 focus-visible:text-indigo-400;
+    &.light {
+      @apply text-off-white;
     }
   }
 

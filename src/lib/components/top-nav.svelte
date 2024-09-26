@@ -3,6 +3,7 @@
 
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import {
     Menu,
@@ -15,6 +16,7 @@
   import { dataEncoder } from '$lib/stores/data-encoder';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
+  import { routeForNamespace } from '$lib/utilities/route-for';
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
@@ -22,7 +24,7 @@
 
   let screenWidth: number;
 
-  $: namespace = $page.params.namespace;
+  $: namespace = $page.params.namespace || $lastUsedNamespace;
   $: pathNameSplit = $page.url.pathname.split('/');
   $: showNamespaceSpecificNav =
     namespace &&
@@ -31,6 +33,9 @@
       pathNameSplit.includes('batch-operations') ||
       pathNameSplit.includes('task-queues') ||
       pathNameSplit.includes('import'));
+  $: namespaceExists = namespaceList.some(
+    (namespaceListItem) => namespaceListItem.namespace === namespace,
+  );
 
   let showProfilePic = true;
 
@@ -50,33 +55,38 @@
 <svelte:window bind:innerWidth={screenWidth} />
 
 <nav
-  class="surface-secondary sticky top-0 z-40 flex w-full flex-col items-center justify-end border-b-2 border-subtle p-1 px-4 shadow-md md:flex-row md:px-8"
+  class="surface-primary sticky top-0 z-40 flex hidden w-full flex-col items-center justify-end border-b border-subtle p-1 px-4 md:flex md:flex-row md:px-8"
   data-testid="top-nav"
-  class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
+  class:bg-red-400={$dataEncoder.hasError && showNamespaceSpecificNav}
   aria-label={translate('common.main')}
 >
   <div class="flex grow items-center">
-    {#if showNamespaceSpecificNav}
-      <Combobox
-        label={translate('namespaces.namespace-label', { namespace })}
-        toggleLabel={translate('common.namespaces')}
-        noResultsText={translate('common.no-results')}
-        labelHidden
-        value={namespace}
-        id="namespace-switcher"
-        leadingIcon="namespace-switcher"
-        options={namespaceList}
-        optionValueKey="namespace"
-        on:change={handleNamespaceSelect}
-        minSize={32}
+    <Combobox
+      label={translate('namespaces.namespace-label', { namespace })}
+      toggleLabel={translate('common.namespaces')}
+      noResultsText={translate('common.no-results')}
+      labelHidden
+      value={namespace}
+      id="namespace-switcher"
+      leadingIcon="namespace-switcher"
+      options={namespaceList}
+      optionValueKey="namespace"
+      on:change={handleNamespaceSelect}
+      minSize={32}
+    >
+      <Button
+        slot="action"
+        variant="ghost"
+        size="xs"
+        href={routeForNamespace({ namespace })}
+        disabled={!namespaceExists}
+        leadingIcon="external-link"
       />
-    {/if}
+    </Combobox>
   </div>
   <div class="flex items-center gap-2">
     <TimezoneSelect position={screenWidth < 768 ? 'left' : 'right'} />
-    {#if showNamespaceSpecificNav}
-      <DataEncoderStatus />
-    {/if}
+    <DataEncoderStatus />
     {#if $authUser.accessToken}
       <MenuContainer>
         <MenuButton variant="ghost" hasIndicator controls="user-menu">

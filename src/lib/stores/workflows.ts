@@ -8,9 +8,12 @@ import { fetchWorkflowCount } from '$lib/services/workflow-counts';
 import { fetchAllWorkflows } from '$lib/services/workflow-service';
 import type { FilterParameters, WorkflowExecution } from '$lib/types/workflows';
 import { withLoading } from '$lib/utilities/stores/with-loading';
+import { minimumVersionRequired } from '$lib/utilities/version-check';
 
-import { supportsAdvancedVisibility } from './advanced-visibility';
+import { isCloud, supportsAdvancedVisibility } from './advanced-visibility';
 import { groupByCountEnabled } from './capability-enablement';
+import { showChildWorkflows } from './filters';
+import { temporalVersion } from './versions';
 
 export const refresh = writable(0);
 export const hideWorkflowQueryErrors = derived(
@@ -18,26 +21,51 @@ export const hideWorkflowQueryErrors = derived(
   ([$page]) => $page.data?.settings?.hideWorkflowQueryErrors,
 );
 
-const namespace = derived([page], ([$page]) => $page.params.namespace);
+export const disableWorkflowCountsRefresh = derived(
+  [page],
+  ([$page]) => $page.data?.settings?.refreshWorkflowCountsDisabled,
+);
+
+export const canFetchChildWorkflows = derived(
+  [isCloud, temporalVersion],
+  ([$isCloud, $temporalVersion]) => {
+    return $isCloud || minimumVersionRequired('1.23.0', $temporalVersion);
+  },
+);
+
 const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
+export const queryWithParentWorkflowId = derived(
+  [query, canFetchChildWorkflows, showChildWorkflows],
+  ([$query, $canFetchChildWorkflows, $showChildWorkflows]) => {
+    if ($canFetchChildWorkflows && !$showChildWorkflows) {
+      if ($query) {
+        return `ParentWorkflowId is NULL AND ${$query}`;
+      }
+      return 'ParentWorkflowId is NULL';
+    }
+    return $query;
+  },
+);
+
+const namespace = derived([page], ([$page]) => $page.params.namespace);
 const parameters = derived(
   [
     namespace,
-    query,
+    queryWithParentWorkflowId,
     refresh,
     supportsAdvancedVisibility,
     hideWorkflowQueryErrors,
   ],
   ([
     $namespace,
-    $query,
+    $queryWithParentWorkflowId,
     $refresh,
     $supportsAdvancedVisibility,
     $hideWorkflowQueryErrors,
   ]) => {
     return {
       namespace: $namespace,
-      query: $query,
+      query: $queryWithParentWorkflowId,
       refresh: $refresh,
       supportsAdvancedVisibility: $supportsAdvancedVisibility,
       hideWorkflowQueryErrors: $hideWorkflowQueryErrors,

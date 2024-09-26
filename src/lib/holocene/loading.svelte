@@ -1,19 +1,55 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
+  import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
-  import Logo from '$lib/vendor/Temporal_Logo_Animation.gif';
+  import mp4Logo from '$lib/vendor/Temporal_Logo_Animation.mp4';
+  import webmLogo from '$lib/vendor/Temporal_Logo_Animation.webm';
 
   export let title = translate('common.loading');
+
+  let isAutoplayAllowed = true;
+  let videoElement: HTMLVideoElement;
+
+  onMount(async () => {
+    const autoplay = videoElement?.play();
+
+    if (autoplay !== undefined) {
+      try {
+        await autoplay;
+      } catch (e) {
+        if (videoElement) {
+          isAutoplayAllowed = false;
+        }
+      }
+    } else {
+      isAutoplayAllowed = false;
+    }
+  });
 </script>
 
-<div class="my-12 flex flex-col items-center justify-start {$$props.class}">
-  <img
-    src={Logo}
-    style="margin-top: -40px;"
-    alt=""
-    width="200px"
-    height="200px"
-  />
-  <h2 class="text-xl font-medium" style="margin-top: -40px;">
+<div
+  class="my-12 flex flex-col items-center justify-start gap-4 {$$props.class}"
+>
+  {#if isAutoplayAllowed}
+    <video
+      autoplay
+      loop
+      muted
+      playsinline
+      preload="auto"
+      height="160"
+      width="160"
+      class="dark:invert"
+      bind:this={videoElement}
+    >
+      <source src={mp4Logo} type="video/mp4;codecs=hvc1" />
+      <source src={webmLogo} type="video/webm" />
+    </video>
+  {:else}
+    <Logo height={160} width={160} />
+  {/if}
+  <h2>
     {title}
   </h2>
 </div>

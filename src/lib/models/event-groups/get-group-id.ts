@@ -13,6 +13,10 @@ import {
   isChildWorkflowExecutionTerminatedEvent,
   isChildWorkflowExecutionTimedOutEvent,
   isExternalWorkflowExecutionSignaledEvent,
+  isNexusOperationCanceledEvent,
+  isNexusOperationCompletedEvent,
+  isNexusOperationFailedEvent,
+  isNexusOperationStartedEvent,
   isPureWorkflowTaskFailedEvent,
   isTimerCanceledEvent,
   isTimerFiredEvent,
@@ -118,6 +122,24 @@ export const getGroupId = (event: CommonHistoryEvent): string => {
 
   if (isWorkflowTaskTimedOutEvent(event)) {
     return String(event.workflowTaskTimedOutEventAttributes.scheduledEventId);
+  }
+
+  if (isNexusOperationStartedEvent(event)) {
+    return String(event.nexusOperationStartedEventAttributes.scheduledEventId);
+  }
+
+  if (isNexusOperationCompletedEvent(event)) {
+    return String(
+      event.nexusOperationCompletedEventAttributes.scheduledEventId,
+    );
+  }
+
+  if (isNexusOperationFailedEvent(event)) {
+    return String(event.nexusOperationFailedEventAttributes.scheduledEventId);
+  }
+
+  if (isNexusOperationCanceledEvent(event)) {
+    return String(event.nexusOperationCanceledEventAttributes.scheduledEventId);
   }
 
   return event.id;

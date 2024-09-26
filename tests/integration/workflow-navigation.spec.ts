@@ -61,14 +61,13 @@ test('Top Navigation current namespace is present and has other namespaces to se
   ).toBeHidden();
 });
 
-test('Top Navigation current namespace is not present on non-namespace specific pages', async ({
+test('Top Navigation current namespace is present on non-namespace specific pages', async ({
   page,
 }) => {
   const switcher = page.getByTestId('namespace-switcher');
 
   await expect(switcher).toBeVisible();
   await page.getByRole('link', { name: 'Namespaces' }).click();
-  await expect(switcher).toBeHidden();
   await page.getByRole('link', { name: 'Workflows' }).first().click();
   await expect(switcher).toBeVisible();
 });

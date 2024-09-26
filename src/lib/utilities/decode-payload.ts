@@ -9,7 +9,8 @@ import type {
   includeCredentials,
   passAccessToken,
 } from '$lib/stores/data-encoder-config';
-import type { Payloads } from '$lib/types';
+import type { DownloadEventHistorySetting } from '$lib/stores/events';
+import type { Payloads, Payload as RawPayload } from '$lib/types';
 import type {
   EventAttribute,
   EventRequestMetadata,
@@ -59,11 +60,6 @@ export function decodePayload(
   }
 
   const encoding = atob(String(payload?.metadata?.encoding ?? ''));
-
-  // Help users out with an english encoding
-  if (payload?.metadata) {
-    (payload.metadata.encodingDecoded as unknown as string) = encoding;
-  }
 
   if (encoding?.startsWith('json/')) {
     try {
@@ -141,7 +137,7 @@ export const decodePayloadAttributes = <
   return eventAttribute;
 };
 
-const decodePayloads =
+const decodeReadablePayloads =
   (settings: Settings) =>
   async (
     payloads: unknown[],
@@ -161,11 +157,40 @@ const decodePayloads =
     }
   };
 
+const decodePayloads =
+  (settings: Settings) =>
+  async (payloads: unknown[]): Promise<unknown[]> => {
+    if (getCodecEndpoint(settings)) {
+      // Convert Payload data
+      const awaitData = await decodePayloadsWithCodec({
+        payloads: { payloads },
+        settings,
+      });
+      return awaitData?.payloads ?? [];
+    } else {
+      return payloads;
+    }
+  };
+
 const keyIs = (key: string, ...validKeys: string[]) => {
   for (const validKey of validKeys) {
     if (key === validKey) return true;
   }
   return false;
+};
+
+export const decodeSingleReadablePayloadWithCodec = async (
+  payload: RawPayload,
+  settings: Settings = get(page).data.settings,
+): Promise<string> => {
+  try {
+    const decode = decodeReadablePayloads(settings);
+    const data = await decode([payload]);
+    const result = data[0] as string;
+    return result || '';
+  } catch {
+    return '';
+  }
 };
 
 export const decodeAllPotentialPayloadsWithCodec = async (
@@ -174,7 +199,7 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   settings: Settings = get(page).data.settings,
   accessToken: string = get(authUser).accessToken,
 ): Promise<EventAttribute | PotentiallyDecodable> => {
-  const decode = decodePayloads(settings);
+  const decode = decodeReadablePayloads(settings);
 
   if (anyAttributes) {
     for (const key of Object.keys(anyAttributes)) {
@@ -201,18 +226,37 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   return anyAttributes;
 };
 
+export const isSinglePayload = (payload: unknown): boolean => {
+  if (!isObject(payload)) return false;
+  const keys = Object.keys(payload);
+  return (
+    keys.length === 2 && keys.includes('metadata') && keys.includes('data')
+  );
+};
+
 export const cloneAllPotentialPayloadsWithCodec = async (
   anyAttributes: PotentiallyDecodable | EventAttribute | WorkflowEvent | null,
   namespace: string,
   settings: Settings,
   accessToken: string,
+  decodeSetting: DownloadEventHistorySetting = 'readable',
   returnDataOnly: boolean = true,
 ): Promise<PotentiallyDecodable | EventAttribute | WorkflowEvent | null> => {
   if (!anyAttributes) return anyAttributes;
 
-  const decode = decodePayloads(settings);
+  const decode =
+    decodeSetting === 'readable'
+      ? decodeReadablePayloads(settings)
+      : decodePayloads(settings);
   const clone = { ...anyAttributes };
   if (anyAttributes) {
+    // Now that we can have single Payload that is not an array (Nexus)
+    if (isSinglePayload(clone)) {
+      const data = toArray(clone as Payload);
+      const decoded = await decode(data, returnDataOnly);
+      return decoded?.[0] || clone;
+    }
+
     for (const key of Object.keys(clone)) {
       if (keyIs(key, 'payloads', 'encodedAttributes') && clone[key]) {
         const data = toArray(clone[key]);
@@ -226,6 +270,7 @@ export const cloneAllPotentialPayloadsWithCodec = async (
             namespace,
             settings,
             accessToken,
+            decodeSetting,
             returnDataOnly,
           );
         }

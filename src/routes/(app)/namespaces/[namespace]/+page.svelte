@@ -27,7 +27,9 @@
   }
 
   const badgeTypeForArchivalState = (state: ArchivalState): BadgeType => {
-    return state === ArchivalState.ARCHIVAL_STATE_ENABLED ? 'green' : 'default';
+    return state === ArchivalState.ARCHIVAL_STATE_ENABLED
+      ? 'success'
+      : undefined;
   };
 
   const badgeTypeForBoolean = (
@@ -35,10 +37,10 @@
     invertLogic = true,
   ): BadgeType => {
     if (invertLogic) {
-      return bool ? 'default' : 'green';
+      return bool ? undefined : 'success';
     }
 
-    return bool ? 'green' : 'default';
+    return bool ? 'success' : undefined;
   };
 
   const badgeTextForBoolean = (bool: boolean) => {
@@ -58,7 +60,7 @@
   }`}
   url={$page.url.href}
 />
-<h1 class="text-2xl" data-testid="namespace-title">
+<h1 data-testid="namespace-title">
   {translate('namespaces.namespace')}: {namespace?.namespaceInfo?.name}
 </h1>
 <h2 data-testid="namespace-description">
@@ -66,7 +68,7 @@
 </h2>
 <Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
-    <h3 class="text-lg font-medium">{translate('common.details')}</h3>
+    <h3>{translate('common.details')}</h3>
     <Table variant="simple">
       <caption class="sr-only" slot="caption"
         >{`${translate('namespaces.namespace')} ${translate(
@@ -142,7 +144,7 @@
   </article>
 
   <article class="namespace-info flex w-full flex-col">
-    <h3 class="text-lg font-medium">{translate('namespaces.versions')}</h3>
+    <h3>{translate('namespaces.versions')}</h3>
     <Table variant="simple">
       <caption class="sr-only" slot="caption"
         >{translate('namespaces.versions')}</caption
@@ -163,7 +165,7 @@
   </article>
 
   <article class="namespace-info flex w-full flex-col">
-    <h3 class="text-lg font-medium">
+    <h3>
       {translate('namespaces.client-actions')}
     </h3>
     <Table variant="simple">
@@ -231,7 +233,7 @@
 
 {#if $searchAttributes}
   <section>
-    <h3 class="my-4 text-lg font-medium">
+    <h3 class="my-4">
       {translate('events.attribute-group.search-attributes')}
     </h3>
     <Table class="w-full">

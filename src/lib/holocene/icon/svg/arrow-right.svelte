@@ -4,10 +4,7 @@
 
 <Svg {...$$props}>
   <path
-    d="M14 18L20 12M20 12L14 6M20 12L4 12"
-    stroke="currentcolor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
+    d="M23.2031 12.7969L24 12L23.2031 11.2031L16.8281 4.82812L16.0312 4.03125L14.4422 5.625L15.2391 6.42188L19.6922 10.875H1.125H0V13.125H1.125H19.6922L15.2391 17.5781L14.4422 18.375L16.0312 19.9641L16.8281 19.1672L23.2031 12.7969Z"
+    fill="currentcolor"
   />
 </Svg>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
@@ -12,14 +13,14 @@
   import { translate } from '$lib/i18n/translate';
   import { coreUserStore } from '$lib/stores/core-user';
   import { resetEvents } from '$lib/stores/events';
-  import { settings } from '$lib/stores/settings';
   import { refresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
+  import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
   import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
   import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
-  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -31,28 +32,55 @@
   let resetConfirmationModalOpen = false;
   let signalConfirmationModalOpen = false;
   let resetTooltipText: string;
+  let coreUser = coreUserStore();
 
-  $: cancelEnabled = workflowCancelEnabled($page.data.settings);
-  $: signalEnabled = workflowSignalEnabled($page.data.settings);
-  $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
-  $: resetEnabled = workflowResetEnabled($page.data.settings);
+  $: cancelEnabled = workflowCancelEnabled(
+    $page.data.settings,
+    $coreUser,
+    namespace,
+  );
+
+  $: signalEnabled = workflowSignalEnabled(
+    $page.data.settings,
+    $coreUser,
+    namespace,
+  );
+
+  $: terminateEnabled = workflowTerminateEnabled(
+    $page.data.settings,
+    $coreUser,
+    namespace,
+  );
+
+  $: resetAuthorized = workflowResetEnabled(
+    $page.data.settings,
+    $coreUser,
+    namespace,
+  );
+
+  $: resetEnabled =
+    resetAuthorized &&
+    workflow.pendingChildren.length === 0 &&
+    $resetEvents.length > 0;
+
+  $: actionsDisabled = !resetEnabled && !signalEnabled && !terminateEnabled;
 
   let workflowActions: {
     label: string;
     onClick: () => void;
-    allowed: boolean;
+    enabled: boolean;
     testId: string;
     destructive?: boolean;
     tooltip?: string;
   }[];
 
   $: {
-    if (!resetEnabled) {
-      resetTooltipText = translate('workflows.reset-disabled');
-    } else if (resetEnabled && workflow?.pendingChildren?.length > 0) {
+    if (!resetAuthorized) {
+      resetTooltipText = translate('workflows.reset-disabled-unauthorized');
+    } else if (resetAuthorized && workflow?.pendingChildren?.length > 0) {
       resetTooltipText = translate('workflows.reset-disabled-pending-children');
     } else if (
-      resetEnabled &&
+      resetAuthorized &&
       workflow?.pendingChildren?.length === 0 &&
       $resetEvents.length === 0
     ) {
@@ -60,43 +88,32 @@
     }
   }
 
-  $: resetAllowed =
-    resetEnabled &&
-    workflow?.pendingChildren?.length === 0 &&
-    $resetEvents.length > 0;
-
   $: workflowActions = [
     {
       label: translate('workflows.reset'),
       onClick: () => (resetConfirmationModalOpen = true),
       testId: 'reset-button',
-      allowed: resetAllowed,
-      tooltip: resetAllowed ? '' : resetTooltipText,
+      enabled: resetEnabled,
+      tooltip: resetEnabled ? '' : resetTooltipText,
     },
     {
       label: translate('workflows.signal'),
       onClick: () => (signalConfirmationModalOpen = true),
       testId: 'signal-button',
-      allowed: signalEnabled,
+      enabled: signalEnabled,
       tooltip: signalEnabled ? '' : translate('workflows.signal-disabled'),
     },
     {
       label: translate('workflows.terminate'),
       onClick: () => (terminateConfirmationModalOpen = true),
       testId: 'terminate-button',
-      allowed: terminateEnabled,
+      enabled: terminateEnabled,
       destructive: true,
       tooltip: terminateEnabled
         ? ''
         : translate('workflows.terminate-disabled'),
     },
   ];
-
-  let coreUser = coreUserStore();
-
-  $: actionsDisabled =
-    $coreUser.namespaceWriteDisabled(namespace) ||
-    !writeActionsAreAllowed(settings);
 </script>
 
 {#if isRunning}
@@ -109,7 +126,7 @@
     label={translate('workflows.request-cancellation')}
     menuLabel={translate('workflows.workflow-actions')}
   >
-    {#each workflowActions as { onClick, destructive, label, allowed, testId, tooltip }}
+    {#each workflowActions as { onClick, destructive, label, enabled, testId, tooltip }}
       {#if destructive}
         <MenuDivider />
       {/if}
@@ -117,48 +134,101 @@
         <MenuItem
           on:click={onClick}
           {destructive}
-          disabled={!allowed}
+          disabled={!enabled}
           data-testid={testId}
         >
           {label}
         </MenuItem>
       </Tooltip>
     {/each}
+    {#if !workflowCreateDisabled($page)}
+      <MenuDivider />
+      <MenuItem
+        on:click={() =>
+          goto(
+            routeForWorkflowStart({
+              namespace,
+              workflowId: workflow.id,
+              taskQueue: workflow.taskQueue,
+              workflowType: workflow.name,
+            }),
+          )}
+        data-testid="start-workflow-button"
+      >
+        {translate('workflows.start-workflow-like-this-one')}
+      </MenuItem>
+    {/if}
+  </SplitButton>
+{:else if !workflowCreateDisabled($page)}
+  <SplitButton
+    id="workflow-actions"
+    position="right"
+    primaryActionDisabled={!resetEnabled}
+    on:click={() => (resetConfirmationModalOpen = true)}
+    label={translate('workflows.reset')}
+    menuLabel={translate('workflows.workflow-actions')}
+  >
+    <MenuItem
+      on:click={() =>
+        goto(
+          routeForWorkflowStart({
+            namespace,
+            workflowId: workflow.id,
+            taskQueue: workflow.taskQueue,
+            workflowType: workflow.name,
+          }),
+        )}
+      data-testid="start-workflow-button"
+    >
+      {translate('workflows.start-workflow-like-this-one')}
+    </MenuItem>
   </SplitButton>
 {:else}
-  <Tooltip bottomRight width={200} text={resetTooltipText} hide={resetAllowed}>
+  <Tooltip bottomRight width={200} text={resetTooltipText} hide={resetEnabled}>
     <Button
       aria-label={translate('workflows.reset')}
-      disabled={!resetAllowed}
+      disabled={!resetEnabled}
       variant="primary"
       on:click={() => (resetConfirmationModalOpen = true)}
+      data-testid="workflow-reset-button"
     >
       {translate('workflows.reset')}
     </Button>
   </Tooltip>
 {/if}
 
-<ResetConfirmationModal
-  {refresh}
-  {workflow}
-  {namespace}
-  bind:open={resetConfirmationModalOpen}
-/>
-<SignalConfirmationModal
-  {refresh}
-  {workflow}
-  {namespace}
-  bind:open={signalConfirmationModalOpen}
-/>
-<CancelConfirmationModal
-  {refresh}
-  {workflow}
-  {namespace}
-  bind:open={cancelConfirmationModalOpen}
-/>
-<TerminateConfirmationModal
-  {refresh}
-  {workflow}
-  {namespace}
-  bind:open={terminateConfirmationModalOpen}
-/>
+{#if resetEnabled}
+  <ResetConfirmationModal
+    {refresh}
+    {workflow}
+    {namespace}
+    bind:open={resetConfirmationModalOpen}
+  />
+{/if}
+
+{#if signalEnabled}
+  <SignalConfirmationModal
+    {refresh}
+    {workflow}
+    {namespace}
+    bind:open={signalConfirmationModalOpen}
+  />
+{/if}
+
+{#if cancelEnabled}
+  <CancelConfirmationModal
+    {refresh}
+    {workflow}
+    {namespace}
+    bind:open={cancelConfirmationModalOpen}
+  />
+{/if}
+
+{#if terminateEnabled}
+  <TerminateConfirmationModal
+    {refresh}
+    {workflow}
+    {namespace}
+    bind:open={terminateConfirmationModalOpen}
+  />
+{/if}

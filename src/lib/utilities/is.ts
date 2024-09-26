@@ -56,6 +56,8 @@ const conditionals = [
   '<',
   '!',
   'starts_with',
+  'is',
+  'is not',
 ] as const;
 
 const joins = ['and', 'or'] as const;
@@ -151,6 +153,13 @@ export const isBetween = (x: unknown) => {
   x = x.toLocaleLowerCase();
 
   return x === 'between';
+};
+
+export const isNullConditional = (x: unknown) => {
+  if (!isString(x)) return false;
+  x = x.toLocaleLowerCase();
+
+  return x === 'is' || x === 'is not';
 };
 
 export const isSortOrder = (

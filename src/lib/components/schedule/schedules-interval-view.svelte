@@ -35,7 +35,7 @@
 </script>
 
 <div class="my-2 flex flex-col gap-4">
-  <h3 class="text-lg font-medium">
+  <h3>
     {translate('schedules.interval-view-heading')}
   </h3>
   <p>
@@ -94,13 +94,13 @@
       error={error(second)}
     />
   </div>
-  <h3 class="mt-4 text-lg font-medium">
+  <h3 class="mt-4">
     {translate('schedules.offset-heading')}
   </h3>
   <p>
     {translate('schedules.offset-description')}
   </p>
-  <div class="flex w-48 gap-0">
+  <div class="flex w-48 gap-2">
     <Input
       id="phase"
       class="w-28"
@@ -111,12 +111,10 @@
       maxLength={3}
       hideCount
       error={error(phase)}
-      unroundRight
     />
     <Select
       label={translate('schedules.offset-unit')}
       labelHidden
-      unroundLeft
       id="phase-unit"
       bind:value={offsetUnit}
     >

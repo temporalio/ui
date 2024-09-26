@@ -36,6 +36,7 @@ test.describe('Workflows List with Counts when countGroupByExecutionStatus is di
 
       await expect(page.getByTestId('workflow-count')).toHaveText('15');
 
+      await page.getByTestId('filter-configuration-menu-button').click();
       await page.getByTestId('manual-search-toggle').click();
       await page.fill('#manual-search', 'WorkflowType="ImportantWorkflowType"');
       await page.getByTestId('manual-search-button').click();

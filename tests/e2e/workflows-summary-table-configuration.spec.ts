@@ -50,6 +50,7 @@ test.describe('Workflows Table Configuration', () => {
       ),
     );
 
+    await page.getByTestId('filter-configuration-menu-button').click();
     await page
       .getByTestId('workflows-summary-table-configuration-button')
       .click();
@@ -78,6 +79,7 @@ test.describe('Workflows Table Configuration', () => {
       ),
     );
 
+    await page.getByTestId('filter-configuration-menu-button').click();
     await page
       .getByTestId('workflows-summary-table-configuration-button')
       .click();
@@ -113,12 +115,13 @@ test.describe('Workflows Table Configuration', () => {
       ),
     );
 
+    await page.getByTestId('filter-configuration-menu-button').click();
     await page
       .getByTestId('workflows-summary-table-configuration-button')
       .click();
 
     await expect(
-      page.locator('#workflows-summary-table-configuration-drawer'),
+      page.locator('#workflows-table-configuration-drawer'),
     ).toBeVisible();
 
     for (let i = 0; i < 3; i++) {
@@ -155,12 +158,13 @@ test.describe('Workflows Table Configuration', () => {
       ),
     );
 
+    await page.getByTestId('filter-configuration-menu-button').click();
     await page
       .getByTestId('workflows-summary-table-configuration-button')
       .click();
 
     await expect(
-      page.locator('#workflows-summary-table-configuration-drawer'),
+      page.locator('#workflows-table-configuration-drawer'),
     ).toBeVisible();
 
     const sourceElement = page.getByTestId('orderable-list-item-Run ID');

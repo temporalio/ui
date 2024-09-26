@@ -3,9 +3,13 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
-  import { setSingleActiveEvent } from '$lib/stores/active-events';
-  import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
-  import { isPendingActivity } from '$lib/utilities/is-pending-activity';
+  import { isEvent } from '$lib/models/event-history';
+  import { eventFilterSort } from '$lib/stores/event-view';
+  import type { WorkflowEventWithPending } from '$lib/types/events';
+  import {
+    isPendingActivity,
+    isPendingNexusOperation,
+  } from '$lib/utilities/is-pending-activity';
 
   import {
     getNextDistanceAndOffset,
@@ -16,17 +20,15 @@
   import Dot from './dot.svelte';
   import Line from './line.svelte';
 
-  export let event: WorkflowEvent;
+  export let event: WorkflowEventWithPending;
   export let group: EventGroup;
-  export let history: WorkflowEvents;
+  export let history: WorkflowEventWithPending[];
   export let groups: EventGroups;
   export let index: number;
-  export let activeEvents: string[] = [];
-
   export let canvasWidth: number;
-  export let zoomLevel: number = 1;
 
   const { height, radius } = HistoryConfig;
+  const strokeWidth = radius / 2;
 
   $: y = index * height + height / 2;
   $: ({ nextDistance, offset } = getNextDistanceAndOffset(
@@ -34,74 +36,69 @@
     event,
     groups,
     height,
+    $eventFilterSort,
   ));
 
-  $: zoomY = y * zoomLevel;
-  $: zoomNextDistance = offset > 0 && nextDistance * zoomLevel;
+  $: zoomNextDistance = offset > 0 && nextDistance;
 
-  $: classification = isPendingActivity(event)
-    ? 'pending'
-    : event?.classification;
+  $: classification =
+    isPendingActivity(event) || isPendingNexusOperation(event)
+      ? 'pending'
+      : event?.classification;
 
-  const strokeWidth = radius / 2;
-
-  $: width = canvasWidth * zoomLevel;
-  $: horizontalOffset = offset * 2 * radius;
-  $: nextIsPending = group?.lastEvent.id === event?.id && group.isPending;
-  $: eventInViewBox = horizontalOffset <= width;
-  $: isActive =
-    !activeEvents.length ||
-    activeEvents.includes(event.id) ||
-    !!activeEvents.find((id) => group?.eventIds.has(id));
+  $: horizontalOffset = offset * 1.75 * radius;
+  $: nextIsPending =
+    isEvent(event) && group?.lastEvent.id === event?.id && group?.isPending;
   $: connectLine =
-    isPendingActivity(event) || offset === 0
+    isPendingActivity(event) || isPendingNexusOperation(event) || offset === 0
       ? false
       : !isMiddleEvent(event, groups);
-  $: category = isPendingActivity(event)
-    ? 'pending'
-    : nextIsPending
-    ? event?.category
-    : '';
+  $: category =
+    isPendingActivity(event) || isPendingNexusOperation(event)
+      ? 'pending'
+      : nextIsPending
+      ? event?.category
+      : '';
+  $: reverseSort = $eventFilterSort === 'descending';
 </script>
 
-<g
-  role="button"
-  tabindex="0"
-  on:click|preventDefault={() => setSingleActiveEvent(event)}
-  on:keypress={() => setSingleActiveEvent(event)}
-  class="relative cursor-pointer"
->
+<g role="button" tabindex="0" class="relative cursor-pointer">
   {#if connectLine}
     <Line
-      startPoint={[width, zoomY]}
-      endPoint={[width - horizontalOffset - radius, zoomY]}
-      active={isActive}
+      startPoint={[canvasWidth, y]}
+      endPoint={[canvasWidth - horizontalOffset - radius, y]}
     />
   {/if}
-  {#if eventInViewBox}
+  {#if !reverseSort}
     <Dot
-      point={[width - horizontalOffset, zoomY]}
+      point={[canvasWidth - horizontalOffset, y]}
       {classification}
-      active={isActive}
+      strokeWidth={1}
     />
   {/if}
-  {#if eventInViewBox && zoomNextDistance}
+  {#if zoomNextDistance}
     <Line
       startPoint={[
-        width - horizontalOffset - radius / 2 + strokeWidth,
-        zoomY + radius + strokeWidth / 2,
+        canvasWidth - horizontalOffset - radius / 2 + strokeWidth,
+        y + radius + strokeWidth / 2,
       ]}
       endPoint={[
-        width - horizontalOffset - radius / 2 + strokeWidth,
-        zoomY + zoomNextDistance + radius,
+        canvasWidth - horizontalOffset - radius / 2 + strokeWidth,
+        y + zoomNextDistance + radius,
       ]}
       category={group?.pendingActivity
         ? group.pendingActivity.attempt > 1
           ? 'retry'
           : 'pending'
         : category}
-      active={isActive}
       pending={nextIsPending}
+    />
+  {/if}
+  {#if reverseSort}
+    <Dot
+      point={[canvasWidth - horizontalOffset, y]}
+      {classification}
+      strokeWidth={1}
     />
   {/if}
 </g>

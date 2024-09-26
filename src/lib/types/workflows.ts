@@ -1,23 +1,30 @@
 import type {
   Memo,
   Payloads,
+  PendingWorkflowTaskInfo,
   WorkflowExecutionStatus,
   WorkflowVersionTimpstamp,
 } from '$lib/types';
 
 import type {
+  Callbacks,
   Payload,
   PendingActivity,
   PendingActivityInfo,
   PendingChildren,
+  PendingNexusOperation,
 } from './events';
 import type { Optional, Replace } from './global';
 
 /**
  * Replace Longs, ITimestamps, UInt8Array's etc. with their corresponding http values
  */
+
+type WorkflowExeuctionWithAssignedBuildId =
+  import('$lib/types').WorkflowExecutionInfo & { assignedBuildId: string };
+
 export type WorkflowExecutionInfo = Replace<
-  import('$lib/types').WorkflowExecutionInfo,
+  WorkflowExeuctionWithAssignedBuildId,
   {
     status: WorkflowExecutionStatus | WorkflowStatus;
     stateTransitionCount: string;
@@ -50,7 +57,10 @@ export type WorkflowExecutionAPIResponse = Optional<{
   workflowExecutionInfo: WorkflowExecutionInfo;
   pendingActivities: PendingActivityInfo[];
   pendingChildren: PendingChildren[];
+  pendingNexusOperations: PendingNexusOperation[];
   executionConfig: WorkflowExecutionConfig;
+  callbacks: Callbacks;
+  pendingWorkflowTask: PendingWorkflowTaskInfo;
 }>;
 
 export type WorkflowStatus =
@@ -79,22 +89,27 @@ export type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
 
 export type WorkflowIdentifier = import('$lib/types').WorkflowExecutionInput;
 
-export type SearchAttributesValue =
-  | 'Bool'
-  | 'Datetime'
-  | 'Double'
-  | 'Int'
-  | 'Keyword'
-  | 'Text'
-  | 'KeywordList';
+export const SEARCH_ATTRIBUTE_TYPE = {
+  BOOL: 'Bool',
+  DATETIME: 'Datetime',
+  DOUBLE: 'Double',
+  INT: 'Int',
+  KEYWORD: 'Keyword',
+  TEXT: 'Text',
+  KEYWORDLIST: 'KeywordList',
+  UNSPECIFIED: 'Unspecified',
+} as const;
+
+type Keys = keyof typeof SEARCH_ATTRIBUTE_TYPE;
+export type SearchAttributeType = (typeof SEARCH_ATTRIBUTE_TYPE)[Keys];
 
 export type SearchAttributes = {
-  [k: string]: SearchAttributesValue;
+  [k: string]: SearchAttributeType;
 };
 
 export type SearchAttributesResponse = {
-  customAttributes: Record<string, SearchAttributesValue>;
-  systemAttributes: Record<string, SearchAttributesValue>;
+  customAttributes: Record<string, SearchAttributeType>;
+  systemAttributes: Record<string, SearchAttributeType>;
   storageSchema: import('$lib/types').ListSearchAttributesResponse['storageSchema'];
 };
 
@@ -123,10 +138,13 @@ export type WorkflowExecution = {
   historyEvents: string;
   historySizeBytes: string;
   mostRecentWorkerVersionStamp?: MostRecentWOrkflowVersionStamp;
+  assignedBuildId?: string;
   searchAttributes?: DecodedWorkflowSearchAttributes;
   memo: Memo;
   pendingChildren: PendingChildren[];
+  pendingNexusOperations: PendingNexusOperation[];
   pendingActivities: PendingActivity[];
+  pendingWorkflowTask: PendingWorkflowTaskInfo;
   stateTransitionCount: string;
   parentNamespaceId?: string;
   parent?: WorkflowIdentifier;
@@ -134,6 +152,7 @@ export type WorkflowExecution = {
   isRunning: boolean;
   defaultWorkflowTaskTimeout: Duration;
   canBeTerminated: boolean;
+  callbacks: Callbacks;
 };
 
 export type WorkflowTaskFailedCause =

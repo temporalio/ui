@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import Accordion from '$lib/holocene/accordion.svelte';
+  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -55,7 +55,7 @@
         {#each pendingActivities as { id, ...pendingActivity } (id)}
           {@const failed = pendingActivity.attempt > 1}
           <div class="pending-activity-row-container">
-            <h3 class="w-full self-start text-sm font-normal text-slate-500">
+            <h3 class="w-full self-start text-sm text-secondary">
               {pendingActivity.activityId}
             </h3>
             <div class="pending-activity-row">
@@ -65,7 +65,7 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.activity-type')}
                     </h4>
-                    <Badge type={failed ? 'error' : 'default'}>
+                    <Badge type={failed ? 'danger' : undefined}>
                       {pendingActivity.activityType}
                     </Badge>
                   </div>
@@ -85,7 +85,7 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.attempt')}
                     </h4>
-                    <Badge type={failed ? 'error' : 'default'}>
+                    <Badge type={failed ? 'danger' : undefined}>
                       {#if failed}
                         <Icon name="retry" />
                       {/if}
@@ -96,7 +96,7 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.attempts-left')}
                     </h4>
-                    <Badge type={failed ? 'error' : 'default'}>
+                    <Badge type={failed ? 'danger' : undefined}>
                       {formatAttemptsLeft(
                         pendingActivity.maximumAttempts,
                         pendingActivity.attempt,
@@ -108,7 +108,7 @@
                       <h4 class="pending-activity-detail-header">
                         {translate('workflows.next-retry')}
                       </h4>
-                      <Badge type={failed ? 'error' : 'default'}>
+                      <Badge type={failed ? 'danger' : undefined}>
                         {toTimeDifference({
                           date: pendingActivity.scheduledTime,
                           negativeDefault: 'None',

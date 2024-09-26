@@ -23,26 +23,26 @@
   };
 
   const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
-    Completed: 'green',
-    Running: 'blue',
-    Failed: 'red',
-    Unspecified: 'gray',
+    Completed: 'success',
+    Running: 'primary',
+    Failed: 'danger',
+    Unspecified: undefined,
   };
 </script>
 
 <div class="flex items-center justify-between">
   <div class="flex flex-col gap-2">
-    <div class="flex flex-row gap-2 max-sm:flex-col">
-      <h1 class="text-2xl">
+    <div class="flex flex-row items-center gap-2 max-sm:flex-col">
+      <h1>
         {translate('batch.describe-page-title')}
       </h1>
       <Badge type={jobStateToBadgeType[operation.state]}>
         {operation.state}
       </Badge>
     </div>
-    <h2 class="text-sm">
+    <p>
       {operation.jobId}
-    </h2>
+    </p>
   </div>
   {#if operation.state === 'Running'}
     <Tooltip

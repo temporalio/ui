@@ -1,10 +1,7 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
   import { getContext } from 'svelte';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     BATCH_OPERATION_CONTEXT,
@@ -17,7 +14,6 @@
 
   export let workflows: WorkflowExecution[];
   export let empty: boolean;
-  export let onClickConfigure: () => void = noop;
   export let columnsCount: number;
 
   const {
@@ -46,13 +42,13 @@
         labelHidden
         id="select-visible-workflows"
         data-testid="batch-actions-checkbox"
-        hoverable
         bind:checked={$pageSelected}
         {indeterminate}
         on:change={handleCheckboxChange}
       />
     </th>
   {/if}
+  <th class="w-12" />
   {#if $supportsBulkActions && $batchActionsVisible}
     <th class="batch-actions-table-cell" colspan={columnsCount}>
       <BatchActions {workflows} />
@@ -60,26 +56,19 @@
   {:else}
     <slot />
   {/if}
-  <th class="configuration-button-table-cell">
-    <IconButton
-      data-testid="workflows-summary-table-configuration-button"
-      icon="vertical-ellipsis"
-      label={translate('workflows.open-configure-workflows')}
-      on:click={onClickConfigure}
-    />
-  </th>
+  <th class="configuration-button-table-cell" />
 </tr>
 
 <style lang="postcss">
   .batch-actions-checkbox-table-cell {
-    @apply w-10 rounded-tl-lg px-2;
+    @apply w-10 rounded-tl-lg;
   }
 
   .batch-actions-table-cell {
-    @apply overflow-visible whitespace-nowrap px-2 text-left font-secondary text-sm font-medium;
+    @apply overflow-visible whitespace-nowrap font-medium;
   }
 
   .configuration-button-table-cell {
-    @apply h-10 w-10 px-2 py-1;
+    @apply h-10 w-10 py-1;
   }
 </style>

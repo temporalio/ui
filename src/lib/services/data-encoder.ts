@@ -20,16 +20,16 @@ import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 export type PotentialPayloads = { payloads: unknown[] };
 
-export async function decodePayloadsWithCodec({
+export async function codeServerRequest({
+  type,
   payloads,
   namespace = get(page).params.namespace,
   settings = get(page).data.settings,
-  accessToken = get(authUser).accessToken,
 }: {
+  type: 'decode' | 'encode';
   payloads: PotentialPayloads;
   namespace?: string;
   settings?: Settings;
-  accessToken?: string;
 }): Promise<PotentialPayloads> {
   const endpoint = getCodecEndpoint(settings);
   const passAccessToken = getCodecPassAccessToken(settings);
@@ -42,6 +42,10 @@ export async function decodePayloadsWithCodec({
 
   if (passAccessToken) {
     if (validateHttps(endpoint)) {
+      let accessToken = get(authUser).accessToken;
+      if (globalThis?.AccessToken) {
+        accessToken = await globalThis?.AccessToken();
+      }
       headers['Authorization'] = `Bearer ${accessToken}`;
     } else {
       setLastDataEncoderFailure();
@@ -63,7 +67,7 @@ export async function decodePayloadsWithCodec({
       };
 
   const decoderResponse: Promise<PotentialPayloads> = fetch(
-    endpoint + '/decode',
+    endpoint + `/${type}`,
     requestOptions,
   )
     .then((response) => {
@@ -72,7 +76,7 @@ export async function decodePayloadsWithCodec({
           statusCode: response.status,
           statusText: response.statusText,
           response,
-          message: translate('common.decode-failed'),
+          message: translate(`common.${type}-failed`),
         } as NetworkError;
       } else {
         return response.json();
@@ -85,80 +89,36 @@ export async function decodePayloadsWithCodec({
     })
     .catch((err: unknown) => {
       setLastDataEncoderFailure(err);
-
-      return payloads;
+      if (type === 'decode') {
+        return payloads;
+      } else {
+        throw err;
+      }
     });
 
   return decoderResponse;
+}
+
+export async function decodePayloadsWithCodec({
+  payloads,
+  namespace = get(page).params.namespace,
+  settings = get(page).data.settings,
+}: {
+  payloads: PotentialPayloads;
+  namespace?: string;
+  settings?: Settings;
+}): Promise<PotentialPayloads> {
+  return codeServerRequest({ type: 'decode', payloads, namespace, settings });
 }
 
 export async function encodePayloadsWithCodec({
   payloads,
   namespace = get(page).params.namespace,
   settings = get(page).data.settings,
-  accessToken = get(authUser).accessToken,
 }: {
   payloads: PotentialPayloads;
   namespace?: string;
   settings?: Settings;
-  accessToken?: string;
 }): Promise<PotentialPayloads> {
-  const endpoint = getCodecEndpoint(settings);
-  const passAccessToken = getCodecPassAccessToken(settings);
-  const includeCredentials = getCodecIncludeCredentials(settings);
-
-  const headers = {
-    'Content-Type': 'application/json',
-    'X-Namespace': namespace,
-  };
-
-  if (passAccessToken) {
-    if (validateHttps(endpoint)) {
-      headers['Authorization'] = `Bearer ${accessToken}`;
-    } else {
-      setLastDataEncoderFailure();
-      return payloads;
-    }
-  }
-
-  const requestOptions = includeCredentials
-    ? {
-        headers,
-        credentials: 'include' as RequestCredentials,
-        method: 'POST',
-        body: stringifyWithBigInt(payloads),
-      }
-    : {
-        headers,
-        method: 'POST',
-        body: stringifyWithBigInt(payloads),
-      };
-
-  const encoderResponse: Promise<PotentialPayloads> = fetch(
-    endpoint + '/encode',
-    requestOptions,
-  )
-    .then((response) => {
-      if (has(response, 'ok') && !response.ok) {
-        throw {
-          statusCode: response.status,
-          statusText: response.statusText,
-          response,
-          message: translate('common.encode-failed'),
-        } as NetworkError;
-      } else {
-        return response.json();
-      }
-    })
-    .then((response) => {
-      setLastDataEncoderSuccess();
-
-      return response;
-    })
-    .catch((err: unknown) => {
-      setLastDataEncoderFailure(err);
-      throw err;
-    });
-
-  return encoderResponse;
+  return codeServerRequest({ type: 'encode', payloads, namespace, settings });
 }

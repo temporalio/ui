@@ -31,10 +31,17 @@
         {title}
       {/if}
       {#if href}
-        <Link {href} class="value">{content}</Link>
+        <Link
+          {href}
+          class="surface-subtle w-fit truncate rounded-sm p-1 leading-4"
+          >{content}</Link
+        >
       {:else}
         <Tooltip text={tooltip} hide={!tooltip} top>
-          <span class="value select-all">{content}</span>
+          <span
+            class="surface-subtle w-fit select-all truncate rounded-sm p-1 leading-4"
+            >{content}</span
+          >
         </Tooltip>
       {/if}
     </Copyable>
@@ -46,17 +53,18 @@
       {title}
     {/if}
     {#if href}
-      <Link {href} class="value">{content}</Link>
+      <Link
+        {href}
+        class="surface-subtle w-fit truncate rounded-sm p-1 leading-4"
+        >{content}</Link
+      >
     {:else}
       <Tooltip text={tooltip} hide={!tooltip} top>
-        <span class="value select-all">{content}</span>
+        <span
+          class="surface-subtle w-fit select-all truncate rounded-sm p-1 leading-4"
+          >{content}</span
+        >
       </Tooltip>
     {/if}
   {/if}
 </p>
-
-<style lang="postcss">
-  .value {
-    @apply flex w-fit flex-row items-center justify-center truncate break-all rounded-sm bg-badge p-1 leading-4 transition-colors;
-  }
-</style>

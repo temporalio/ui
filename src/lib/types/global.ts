@@ -1,3 +1,5 @@
+import type { IconName } from '$lib/holocene/icon';
+
 export type NamespaceListItem = {
   namespace: string;
   onClick: (namspace: string) => void;
@@ -135,16 +137,15 @@ export type BooleanString = 'true' | 'false';
 
 export type DataEncoderStatus = 'notRequested' | 'success' | 'error';
 
-export type Color =
-  | 'blue'
-  | 'lightBlue'
-  | 'slate'
-  | 'gray'
-  | 'orange'
-  | 'red'
-  | 'green'
-  | 'red'
-  | 'indigo'
-  | 'yellow'
-  | 'purple'
-  | 'pink';
+export type NavLinkListItem = {
+  href: string;
+  icon: IconName;
+  label: string;
+  tooltip?: string;
+  external?: boolean;
+  divider?: boolean;
+  enabled?: boolean;
+  hidden?: boolean;
+  animate?: boolean;
+  isActive?: (path: string) => boolean;
+};

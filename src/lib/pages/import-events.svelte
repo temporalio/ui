@@ -15,7 +15,7 @@
     class="block items-center justify-between gap-4 pb-4 lg:flex"
     aria-label={translate('events.import-event-history')}
   >
-    <h1 class="text-lg font-medium" data-testid="import-event-history">
+    <h1 data-testid="import-event-history">
       {translate('events.import-event-history')}
     </h1>
     <div class="flex gap-4">
@@ -23,7 +23,7 @@
     </div>
   </nav>
   <div class="w-full md:w-1/2">
-    <code class="text-md bg-slate-200 p-2 font-medium"
+    <code class="md:text-md font-mono text-sm leading-8"
       >type HistoryEvent = temporal.api.history.v1.IHistoryEvent</code
     >
     <div class="mt-4">
@@ -33,7 +33,7 @@
         class="mb-8">{translate('events.api-history-link')}</Link
       >
     </div>
-    <h2 class="mt-8 text-lg font-medium">
+    <h2 class="mt-8">
       {translate('events.history-expected-formats')}
     </h2>
     <div class="h-40 text-center">

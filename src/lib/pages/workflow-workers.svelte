@@ -1,31 +1,27 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import WorkersList from '$lib/components/workers-list.svelte';
-  import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
-  import { getWorkerTaskReachability } from '$lib/services/pollers-service';
-  import { workflowRun } from '$lib/stores/workflow-run';
-  import {
-    getUniqueBuildIdsFromPollers,
-    pollerHasVersioning,
-  } from '$lib/utilities/task-queue-compatibility';
+  import WorkerTable from '$lib/components/worker-table.svelte';
+  import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { type GetPollersResponse } from '$lib/services/pollers-service';
+  import { routeForTaskQueue } from '$lib/utilities/route-for';
 
-  let { namespace } = $page.params;
-  $: ({ workers, workflow, compatibility } = $workflowRun);
+  export let taskQueue: string;
+  export let workers: GetPollersResponse;
 
-  $: taskQueue = workflow?.taskQueue;
-  $: versioningEnabled = pollerHasVersioning(workers.pollers);
+  $: ({ namespace } = $page.params);
 </script>
 
-{#if versioningEnabled}
-  {@const buildIds = getUniqueBuildIdsFromPollers(workers.pollers)}
-  {#await getWorkerTaskReachability({ namespace, buildIds, taskQueue })}
-    <SkeletonTable rows={3} />
-  {:then reachability}
-    <WorkersList {taskQueue} {workers} {compatibility} {reachability} />
-  {:catch}
-    <WorkersList {taskQueue} {workers} />
-  {/await}
-{:else}
-  <WorkersList {taskQueue} {workers} />
-{/if}
+<section class="flex flex-col gap-4">
+  <h2 data-testid="task-queue-name">
+    {translate('common.task-queue')}:
+    <Link
+      href={routeForTaskQueue({
+        namespace,
+        queue: taskQueue,
+      })}>{taskQueue}</Link
+    >
+  </h2>
+  <WorkerTable {workers} />
+</section>

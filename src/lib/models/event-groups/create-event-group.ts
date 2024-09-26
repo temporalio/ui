@@ -2,6 +2,7 @@ import type {
   ActivityTaskScheduledEvent,
   CommonHistoryEvent,
   MarkerRecordedEvent,
+  NexusOperationScheduledEvent,
   SignalExternalWorkflowExecutionInitiatedEvent,
   StartChildWorkflowExecutionInitiatedEvent,
   TimerStartedEvent,
@@ -13,6 +14,7 @@ import {
   isActivityTaskScheduledEvent,
   isLocalActivityMarkerEvent,
   isMarkerRecordedEvent,
+  isNexusOperationScheduledEvent,
   isSignalExternalWorkflowExecutionInitiatedEvent,
   isStartChildWorkflowExecutionInitiatedEvent,
   isTimerStartedEvent,
@@ -45,6 +47,7 @@ type StartingEvents = {
   Marker: MarkerRecordedEvent;
   Update: WorkflowExecutionUpdateAcceptedEvent;
   WorkflowTask: WorkflowTaskScheduledEvent;
+  Nexus: NexusOperationScheduledEvent;
 };
 
 const getInitialEvent = (
@@ -100,6 +103,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     classification,
     level: undefined,
     pendingActivity: undefined,
+    pendingNexusOperation: undefined,
     get eventTime() {
       return this.lastEvent?.eventTime;
     },
@@ -117,7 +121,8 @@ const createGroupFor = <K extends keyof StartingEvents>(
     },
     get isPending() {
       return (
-        this.pendingActivity ||
+        !!this.pendingActivity ||
+        !!this.pendingNexusOperation ||
         (isTimerStartedEvent(this.initialEvent) &&
           this.eventList.length === 1) ||
         (isStartChildWorkflowExecutionInitiatedEvent(this.initialEvent) &&
@@ -163,6 +168,9 @@ export const createEventGroup = (
 
   if (isWorkflowExecutionUpdateAcceptedEvent(event))
     return createGroupFor<'Update'>(event, events);
+
+  if (isNexusOperationScheduledEvent(event))
+    return createGroupFor<'Nexus'>(event, events);
 };
 
 export const createWorkflowTaskGroup = (

@@ -7,19 +7,20 @@
 
   import type { IconName } from './icon';
 
+  type Intent = 'warning' | 'error' | 'success' | 'info' | 'nexus';
+  type AlertIcon = Extract<IconName, Intent>;
+
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
-    intent: typeof intent;
+    intent: Intent;
     title?: string;
-    icon?: IconName;
-    bold?: boolean;
+    icon?: AlertIcon;
     'data-testid'?: string;
     hidden?: boolean;
   }
 
-  export let intent: 'warning' | 'error' | 'success' | 'info';
+  export let intent: Intent;
   export let title = '';
-  export let icon: IconName = null;
-  export let bold = false;
+  export let icon: AlertIcon = intent;
   export let hidden = false;
 
   let className = '';
@@ -44,18 +45,13 @@
 
 <div
   class={merge('alert flex', intent, className)}
-  class:bold
   class:hidden
   {role}
   {...$$restProps}
 >
-  {#if icon}
-    <div>
-      <Icon name={icon} />
-    </div>
-  {/if}
-  <div class="ml-1">
-    <p class="font-semibold leading-6" class:hidden={!title}>
+  <Icon name={icon} class="mt-0.5 shrink-0" />
+  <div class="w-full min-w-0 gap-1">
+    <p class="font-medium">
       {title}
     </p>
     {#if $$slots.default}
@@ -68,11 +64,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply rounded-md border-2 p-5 font-primary text-sm text-primary;
-  }
-
-  .alert.bold {
-    @apply rounded-xl;
+    @apply items-start gap-2 break-words rounded-lg border-2 p-5 text-sm text-primary;
   }
 
   .alert.success {
@@ -84,7 +76,7 @@
   }
 
   .alert.error {
-    @apply border-error bg-error;
+    @apply border-danger bg-danger;
   }
 
   .alert.warning {
@@ -92,6 +84,6 @@
   }
 
   .content :global(> *) {
-    @apply font-secondary text-sm font-normal;
+    @apply text-sm font-normal;
   }
 </style>

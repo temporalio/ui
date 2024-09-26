@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
 
+  import Label from '$lib/holocene/label.svelte';
   import { omit } from '$lib/utilities/omit';
 
   interface $$Props extends HTMLInputAttributes {
@@ -10,6 +11,7 @@
     labelHidden?: boolean;
     min?: number;
     max?: number;
+    step?: number;
     'data-testid'?: string;
   }
 
@@ -17,6 +19,7 @@
   export let labelHidden = false;
   export let min: number = undefined;
   export let max: number = undefined;
+  export let step: number = undefined;
   export let id: string = undefined;
   export let value: number = Math.round((min + max) / 2);
   let valid = true;
@@ -80,16 +83,18 @@
           for="range">{value ?? ''}</output
         >
         <input
+          id="{id}-range"
           name="range"
           type="range"
-          class="h-0 w-full cursor-pointer appearance-none rounded border-y-2 border-primary"
+          class="h-0 w-full cursor-pointer appearance-none rounded border-y border-primary"
           bind:value
           on:input={handleInput}
           {min}
           {max}
-          step={$$props.step}
+          {step}
           {...omit($$restProps, 'class')}
         />
+        <Label hidden {label} for="{id}-range" />
       </div>
       <span class="absolute -bottom-6 right-0 text-xs font-normal">
         {max}
@@ -109,9 +114,7 @@
         step={$$props.step}
       />
     </div>
-    <label class:sr-only={labelHidden} class="flex shrink text-sm" for={id}>
-      {label}
-    </label>
+    <Label hidden={labelHidden} class="shrink" {label} for={id} />
   </div>
 </div>
 
@@ -121,7 +124,7 @@
   }
 
   .numeric-input {
-    @apply surface-primary h-10 w-10 rounded border border-primary text-center text-sm;
+    @apply h-10 w-10 rounded-lg border-2 border-subtle bg-information text-center text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     appearance: textfield;
   }
@@ -145,7 +148,7 @@
   }
 
   input[type='range']::-webkit-slider-thumb {
-    @apply h-4 w-8 appearance-none rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100;
+    @apply h-4 w-8 appearance-none rounded-full border-2 border-solid border-primary bg-information;
   }
 
   input[type='range']::-moz-range-thumb {

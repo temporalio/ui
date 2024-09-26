@@ -272,4 +272,7 @@ describe('toWorkflowTaskFailureReadable', () => {
       ),
     ).toBe('UnhandledCommand');
   });
+  it('should return Unspecified enum if no cause', () => {
+    expect(toWorkflowTaskFailureReadable()).toBe('Unspecified');
+  });
 });

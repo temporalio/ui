@@ -73,24 +73,14 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
     },
   );
 
-export type StartAndEndEventHistory = {
-  start: WorkflowEvents;
-  end: WorkflowEvents;
-};
-
-export const initialEventHistory: StartAndEndEventHistory = {
-  start: [],
-  end: [],
-};
-
-export const eventHistory =
-  writable<StartAndEndEventHistory>(initialEventHistory);
 export const timelineEvents = writable(null);
-
 export const fullEventHistory = writable<WorkflowEvents>([]);
 
+export const pauseLiveUpdates = writable(false);
+export const currentEventHistory = writable<WorkflowEvents>([]);
+
 export const filteredEventHistory = derived(
-  [fullEventHistory, eventTypeFilter],
+  [currentEventHistory, eventTypeFilter],
   ([$history, $types]) => {
     return $history.filter((event) => {
       if (isLocalActivityMarkerEvent(event)) {
@@ -110,3 +100,12 @@ export const decodeEventHistory = persistStore<boolean>(
   true,
   true,
 );
+
+export type DownloadEventHistorySetting = 'encoded' | 'decoded' | 'readable';
+
+export const downloadEventHistorySetting =
+  persistStore<DownloadEventHistorySetting>(
+    'downloadEventHistorySetting',
+    'encoded',
+    true,
+  );

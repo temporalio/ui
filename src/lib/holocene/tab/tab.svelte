@@ -38,6 +38,7 @@
   $: isActive = isNull(active) ? $activeTab === id : active;
 
   const handleClick = () => {
+    if (disabled) return;
     selectTab(id);
     onClick && onClick();
   };
@@ -64,9 +65,11 @@
 
 <style lang="postcss">
   .tab {
-    @apply flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 text-sm font-medium outline-none hover:text-brand focus-visible:rounded-sm focus-visible:shadow-focus focus-visible:shadow-indigo-400 dark:text-secondary dark:hover:text-brand;
+    @apply flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 border-transparent text-sm font-medium outline-none focus-visible:rounded-sm focus-visible:ring-4 focus-visible:ring-primary/70;
 
-    border-color: transparent;
+    &:not(.disabled) {
+      @apply hover:text-brand;
+    }
   }
 
   .tab.active {
@@ -74,10 +77,6 @@
   }
 
   .tab.disabled {
-    @apply cursor-not-allowed text-slate-800 opacity-50;
-  }
-
-  .tab.disabled:hover {
-    border-color: transparent;
+    @apply cursor-not-allowed opacity-50;
   }
 </style>

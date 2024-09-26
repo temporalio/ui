@@ -15,7 +15,7 @@ test.describe('Schedules List with no schedules', () => {
     await page.goto(schedulesUrl);
 
     const namespace = await page.locator('h1').innerText();
-    expect(namespace).toBe('Schedules');
+    expect(namespace).toBe('0 Schedules');
 
     const createButton = page.getByTestId('create-schedule');
     await expect(createButton).toBeEnabled();
@@ -33,7 +33,7 @@ test.describe('Schedules List with schedules', () => {
     await page.goto(schedulesUrl);
 
     const namespace = await page.locator('h1').innerText();
-    expect(namespace).toBe('Schedules');
+    expect(namespace).toBe('0 Schedules');
 
     const createButton = page.getByTestId('create-schedule');
     await expect(createButton).toBeEnabled();

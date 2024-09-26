@@ -17,12 +17,14 @@ import { mockSearchAttributesApi } from './mocks/search-attributes';
 import { mockSettingsApi, SETTINGS_API } from './mocks/settings';
 import { mockSystemInfoApi } from './mocks/system-info';
 import { mockTaskQueuesApi, TASK_QUEUES_API } from './mocks/task-queues';
-import { mockWorkflowApi, WORKFLOW_API } from './mocks/workflow';
+import { mockWorkflow, mockWorkflowApi, WORKFLOW_API } from './mocks/workflow';
 import { mockWorkflowsApi, WORKFLOWS_API } from './mocks/workflows';
 import {
   mockWorkflowsCountApi,
   WORKFLOWS_COUNT_API,
 } from './mocks/workflows-count';
+
+import { WorkflowExecutionAPIResponse } from '$src/lib/types/workflows';
 
 export { mockClusterApi, CLUSTER_API } from './mocks/cluster';
 export { mockNamespaceApi, NAMESPACE_API } from './mocks/namespace';
@@ -91,10 +93,13 @@ export const mockBatchOperationApis = (page: Page) => {
   ]);
 };
 
-export const mockWorkflowApis = (page: Page) => {
+export const mockWorkflowApis = (
+  page: Page,
+  workflow: WorkflowExecutionAPIResponse = mockWorkflow,
+) => {
   return Promise.all([
     mockNamespaceApis(page),
-    mockWorkflowApi(page),
+    mockWorkflowApi(page, workflow),
     mockEventHistoryApi(page),
     mockTaskQueuesApi(page),
   ]);

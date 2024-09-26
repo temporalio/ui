@@ -10,27 +10,14 @@
   *,
   html,
   body {
-    box-sizing: border-box;
+    @apply box-border;
   }
 
   body {
-    font-family: theme('fontFamily.primary');
-    position: relative;
-    overscroll-behavior: none;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  titles,
-  labels {
-    font-family: theme('fontFamily.secondary');
+    @apply body-normal surface-background relative overscroll-none;
   }
 
   input[type='search']::-webkit-search-cancel-button {
-    display: none;
+    @apply hidden;
   }
 }

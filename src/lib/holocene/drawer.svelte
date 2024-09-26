@@ -2,6 +2,7 @@
   import { fly } from 'svelte/transition';
 
   import { setContext } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import { clickoutside } from '$lib/holocene/outside-click';
   import { focusTrap } from '$lib/utilities/focus-trap';
@@ -16,6 +17,9 @@
   export let closeButtonLabel: string;
   export let closePadding: boolean = true;
 
+  let className = '';
+  export { className as class };
+
   $: flyParams = {
     duration: 500,
     ...(position === 'bottom' ? { y: 200 } : { x: 200 }),
@@ -28,22 +32,31 @@
 
 {#if open}
   <aside
-    class="drawer {position} {$$props.class}"
-    class:dark
+    {id}
+    class={merge(
+      'surface-primary fixed z-[55] h-auto overflow-y-auto border-subtle text-primary',
+      position === 'bottom' && 'bottom-0 left-0 right-0 border-t',
+      position === 'right' &&
+        'bottom-0 right-0 top-0 h-full rounded-bl-lg rounded-tr-none border-l',
+      dark && 'bg-black text-off-white',
+      className,
+    )}
     class:max-w-fit={position === 'right'}
     transition:fly={flyParams}
-    {id}
     role="region"
     use:focusTrap={true}
     use:clickoutside={onClick}
   >
     <div class="relative h-full" class:pt-10={closePadding}>
-      <div class="close-button-wrapper {position}">
+      <div class="absolute right-2 top-2">
         <slot name="close-button">
           <IconButton
             data-testid="drawer-close-button"
             label={closeButtonLabel}
-            class="stuff"
+            class={merge(
+              dark ? 'text-white' : 'text-primary',
+              'hover:text-primary',
+            )}
             icon="close"
             aria-expanded={open}
             aria-controls="navigation-drawer"
@@ -55,29 +68,3 @@
     </div>
   </aside>
 {/if}
-
-<style lang="postcss">
-  .drawer {
-    @apply surface-primary fixed z-[55] h-auto overflow-y-auto rounded-t-lg text-primary shadow-xl;
-
-    &.bottom {
-      @apply bottom-0 left-0 right-0;
-    }
-
-    &.right {
-      @apply bottom-0 right-0 top-0 h-full rounded-bl-lg rounded-tr-none;
-    }
-
-    &.dark {
-      @apply bg-inverse text-white;
-    }
-  }
-
-  .stuff:hover {
-    @apply text-red;
-  }
-
-  .close-button-wrapper {
-    @apply absolute right-2 top-2;
-  }
-</style>

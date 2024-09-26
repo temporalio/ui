@@ -31,7 +31,7 @@
   url={$page.url.href}
 />
 {#if archivalEnabled && visibilityArchivalEnabled}
-  <h1 class="text-2xl" data-testid="archived-enabled-title">
+  <h1 data-testid="archived-enabled-title">
     {translate('workflows.archived-workflows')}
   </h1>
   {#if !archivalQueryingNotSupported}<WorkflowFilters />{/if}
@@ -57,7 +57,7 @@
     />
   {/if}
 {:else if archivalEnabled}
-  <h1 class="text-2xl" data-testid="visibility-disabled-title">
+  <h1 data-testid="visibility-disabled-title">
     {translate('workflows.visibility-disabled-archival')}
   </h1>
   <p>
@@ -76,7 +76,7 @@
     copySuccessIconTitle={translate('common.copy-success-icon-title')}
   />
 {:else}
-  <h1 class="text-2xl" data-testid="archived-disabled-title">
+  <h1 data-testid="archived-disabled-title">
     {translate('workflows.archival-disabled-title')}
   </h1>
   <p>{translate('workflows.archival-disabled-details')}:</p>

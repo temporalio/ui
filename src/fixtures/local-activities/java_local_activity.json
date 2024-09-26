@@ -12,8 +12,7 @@
         "payloads": [
           {
             "metadata": {
-              "encoding": "anNvbi9wbGFpbg==",
-              "encodingDecoded": "json/plain"
+              "encoding": "anNvbi9wbGFpbg=="
             },
             "data": "9376db60-4eb5-3525-8f39-e61024fab1d1"
           }
@@ -23,15 +22,13 @@
         "payloads": [
           {
             "metadata": {
-              "encoding": "anNvbi9wbGFpbg==",
-              "encodingDecoded": "json/plain"
+              "encoding": "anNvbi9wbGFpbg=="
             },
             "data": "Hello"
           },
           {
             "metadata": {
-              "encoding": "anNvbi9wbGFpbg==",
-              "encodingDecoded": "json/plain"
+              "encoding": "anNvbi9wbGFpbg=="
             },
             "data": "World"
           }
@@ -41,8 +38,7 @@
         "payloads": [
           {
             "metadata": {
-              "encoding": "anNvbi9wbGFpbg==",
-              "encodingDecoded": "json/plain"
+              "encoding": "anNvbi9wbGFpbg=="
             },
             "data": {
               "firstSkd": 1705398005183,
@@ -56,8 +52,7 @@
         "payloads": [
           {
             "metadata": {
-              "encoding": "anNvbi9wbGFpbg==",
-              "encodingDecoded": "json/plain"
+              "encoding": "anNvbi9wbGFpbg=="
             },
             "data": "Hello World!"
           }
@@ -67,8 +62,7 @@
         "payloads": [
           {
             "metadata": {
-              "encoding": "anNvbi9wbGFpbg==",
-              "encodingDecoded": "json/plain"
+              "encoding": "anNvbi9wbGFpbg=="
             },
             "data": 1705398005129
           }

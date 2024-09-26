@@ -20,11 +20,15 @@
 
 <div class="text-center">
   <div
-    class="surface-primary grid gap-x-4 gap-y-4 rounded border px-0 py-4 text-center md:gap-x-8 md:px-2 xl:gap-x-16 xl:px-4"
+    class="surface-primary grid gap-x-4 gap-y-4 rounded border border-subtle px-0 py-4 text-center md:gap-x-8 md:px-2 xl:gap-x-16 xl:px-4"
   >
     {#each daysInMonth as day}
       {@const active = daysOfMonth.includes(day)}
-      <Button variant="secondary" {active} on:click={(e) => onClick(e, day)}>
+      <Button
+        variant="secondary"
+        class={active && 'bg-interactive-secondary-active'}
+        on:click={(e) => onClick(e, day)}
+      >
         {day}
       </Button>
     {/each}

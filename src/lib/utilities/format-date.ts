@@ -104,3 +104,25 @@ export function getSelectedTimezone(timeFormat: TimeFormat): string {
 
   return timeFormat;
 }
+
+export function getUTCString({
+  date = new Date(),
+  hour = 0,
+  minute = 0,
+  second = 0,
+}: {
+  date?: Date;
+  hour?: string | number;
+  minute?: string | number;
+  second?: string | number;
+} = {}): string {
+  const utcTime = Date.UTC(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    Number(hour),
+    Number(minute),
+    Number(second),
+  );
+  return new Date(utcTime).toISOString();
+}

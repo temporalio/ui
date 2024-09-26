@@ -5,15 +5,16 @@
   import { translate } from '$lib/i18n/translate';
   import WorkflowPaddedLayout from '$lib/layouts/workflow-padded-layout.svelte';
   import WorkflowWorkers from '$lib/pages/workflow-workers.svelte';
+  import { workflowRun } from '$lib/stores/workflow-run';
 
-  const workflow = $page.params.workflow;
+  $: ({ workflow: workflowId } = $page.params);
+  $: ({ workers, workflow } = $workflowRun);
 </script>
 
 <PageTitle
-  title={`${translate('workflows.workers-tab')} | ${workflow}`}
+  title={`${translate('workflows.workers-tab')} | ${workflowId}`}
   url={$page.url.href}
 />
-
 <WorkflowPaddedLayout>
-  <WorkflowWorkers />
+  <WorkflowWorkers {workers} taskQueue={workflow?.taskQueue} />
 </WorkflowPaddedLayout>

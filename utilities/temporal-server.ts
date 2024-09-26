@@ -58,7 +58,7 @@ export const createTemporalServer = async ({
   port = 7233,
   uiPort = port + 1000,
   path = localCLIPath,
-  logLevel = 'fatal',
+  logLevel = 'error',
   codecEndpoint,
   headless = false,
 }: TemporalServerOptions = {}) => {
@@ -68,6 +68,7 @@ export const createTemporalServer = async ({
     `--port=${port}`,
     `--ui-port=${uiPort}`,
     `--log-level=${logLevel}`,
+    `--http-port=${port + 1}`,
   ];
 
   if (codecEndpoint) {
@@ -79,7 +80,7 @@ export const createTemporalServer = async ({
   }
 
   const temporal =
-    $`${cliPath} server start-dev --dynamic-config-value frontend.enableUpdateWorkflowExecution=true --dynamic-config-value frontend.workerVersioningDataAPIs=true --dynamic-config-value frontend.workerVersioningWorkflowAPIs=true --dynamic-config-value worker.buildIdScavengerEnabled=true ${flags}`.quiet();
+    $`${cliPath} server start-dev --dynamic-config-value frontend.enableUpdateWorkflowExecution=true --dynamic-config-value frontend.enableUpdateWorkflowExecutionAsyncAccepted=true --dynamic-config-value frontend.workerVersioningDataAPIs=true --dynamic-config-value frontend.workerVersioningWorkflowAPIs=true --dynamic-config-value worker.buildIdScavengerEnabled=true ${flags}`.quiet();
 
   temporal.catch(async ({ stdout, stderr, exitCode }) => {
     console.log('EXIT CODE', exitCode);

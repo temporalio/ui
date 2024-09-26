@@ -5,6 +5,8 @@ import {
   isActivityTaskScheduledEvent,
   isLocalActivityMarkerEvent,
   isMarkerRecordedEvent,
+  isNexusOperationScheduledEvent,
+  isNexusOperationStartedEvent,
   isSignalExternalWorkflowExecutionInitiatedEvent,
   isStartChildWorkflowExecutionInitiatedEvent,
   isTimerStartedEvent,
@@ -22,8 +24,7 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (isTimerStartedEvent(event)) {
     return `${event.timerStartedEventAttributes
       ?.timerId} (${formatDurationAbbreviated(
-      event.timerStartedEventAttributes
-        ?.startToFireTimeout as unknown as Duration,
+      event.timerStartedEventAttributes?.startToFireTimeout,
     )})`;
   }
 
@@ -52,13 +53,17 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
     return event.workflowExecutionUpdateAcceptedEventAttributes?.acceptedRequest
       ?.input?.name;
   }
+
+  if (isNexusOperationScheduledEvent(event)) {
+    return `${event.nexusOperationScheduledEventAttributes.service}.${event.nexusOperationScheduledEventAttributes.operation}`;
+  }
 };
 
 export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
   if (!event) return '';
 
   if (isActivityTaskScheduledEvent(event)) {
-    return '';
+    return 'Activity';
   }
 
   if (isTimerStartedEvent(event)) {
@@ -73,6 +78,10 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
     return 'Signal received';
   }
 
+  if (isLocalActivityMarkerEvent(event)) {
+    return 'Local Activity';
+  }
+
   if (isMarkerRecordedEvent(event)) {
     return 'Marker';
   }
@@ -82,7 +91,14 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
   }
 
   if (isWorkflowExecutionUpdateAcceptedEvent(event)) {
-    return '';
+    return 'Workflow Update';
+  }
+
+  if (
+    isNexusOperationScheduledEvent(event) ||
+    isNexusOperationStartedEvent(event)
+  ) {
+    return 'Nexus Operation';
   }
 };
 

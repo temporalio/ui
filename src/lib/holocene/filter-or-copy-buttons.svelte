@@ -23,11 +23,7 @@
 </script>
 
 {#if show}
-  <div
-    class={merge('copy-or-filter', className)}
-    on:click|preventDefault|stopPropagation={noop}
-    on:keyup|preventDefault|stopPropagation={noop}
-  >
+  <div class={merge('copy-or-filter', className)}>
     {#if filterable}
       <button
         on:click|preventDefault|stopPropagation={onFilter}
@@ -36,7 +32,7 @@
         id="filter-button"
       >
         {#key filtered}
-          <Icon title={filterIconTitle} name="filter" />
+          <Icon title={filterIconTitle} name="filter" class="m-1" />
         {/key}
       </button>
     {/if}
@@ -49,6 +45,7 @@
         <Icon
           title={$copied ? copySuccessIconTitle : copyIconTitle}
           name={$copied ? 'checkmark' : 'copy'}
+          class="m-1"
         />
       </button>
     {/if}
@@ -61,10 +58,10 @@
   }
 
   .copy-or-filter-button {
-    @apply surface-primary relative top-[50%] h-fit translate-y-[-50%] rounded-full p-1 text-primary hover:bg-primary hover:text-white dark:hover:text-black;
+    @apply surface-primary relative top-[50%] h-fit translate-y-[-50%] rounded-full p-1 text-primary hover:surface-inverse;
   }
 
   .filtered {
-    @apply bg-inverse text-white;
+    @apply surface-inverse;
   }
 </style>

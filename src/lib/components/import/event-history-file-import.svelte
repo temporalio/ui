@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
 
   import Button from '$lib/holocene/button.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import { toEventHistory } from '$lib/models/event-history';
@@ -58,16 +59,20 @@
   };
 </script>
 
-<label class="sr-only" for="import-event-history-file-upload">
-  {translate('events.import-event-history-file-upload')}
-</label>
-<input
-  id="import-event-history-file-upload"
-  class="import-input block rounded-md border border-slate-200 p-2"
-  type="file"
-  accept=".json"
-  on:change={onFileSelect}
-/>
-<Button leadingIcon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
-  >{translate('common.import')}</Button
->
+<div class="flex flex-col items-start gap-2 md:flex-row md:items-center">
+  <Label
+    hidden
+    for="import-event-history-file-upload"
+    label={translate('events.import-event-history-file-upload')}
+  />
+  <input
+    id="import-event-history-file-upload"
+    class="import-input block rounded-md border border-slate-200 p-2"
+    type="file"
+    accept=".json"
+    on:change={onFileSelect}
+  />
+  <Button leadingIcon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
+    >{translate('common.import')}</Button
+  >
+</div>

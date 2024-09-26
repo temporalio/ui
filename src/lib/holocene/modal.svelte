@@ -41,13 +41,13 @@
 
   let modalElement: HTMLDialogElement;
 
-  $: open, toggleModal();
+  $: toggleModal(open, modalElement);
 
-  export const toggleModal = () => {
+  export const toggleModal = (open: boolean, modal: HTMLDialogElement) => {
     if (open) {
-      modalElement?.showModal();
+      modal?.showModal();
     } else {
-      modalElement?.close();
+      modal?.close();
     }
   };
 
@@ -66,8 +66,12 @@
     dispatch('confirmModal');
   };
 
+  const closeModal = () => {
+    open = false;
+  };
+
   const handleClick = (event: MouseEvent) => {
-    if (event.target === modalElement) handleCancel();
+    if (event.target === modalElement) closeModal();
   };
 
   $: {
@@ -78,6 +82,7 @@
 </script>
 
 <svelte:window on:click={handleClick} />
+
 <dialog
   {id}
   on:close={handleCancel}
@@ -86,7 +91,7 @@
   class:large
   class:hightlightNav
   aria-modal="true"
-  aria-labelledby="modal-title"
+  aria-labelledby="modal-title-{id}"
   data-testid={$$props['data-testid']}
   {...$$restProps}
   use:focusTrap={true}
@@ -96,7 +101,7 @@
       label={cancelText}
       icon="close"
       class="float-right m-4"
-      on:click={handleCancel}
+      on:click={closeModal}
     />
   {/if}
   <div id="modal-title-{id}" class="title">
@@ -114,7 +119,7 @@
       </p>
     </div>
     <div class="flex items-center justify-end space-x-2 p-6">
-      <Button variant="secondary" disabled={loading} on:click={handleCancel}
+      <Button variant="ghost" disabled={loading} on:click={closeModal}
         >{cancelText}</Button
       >
       {#if !hideConfirm}
@@ -132,7 +137,7 @@
 
 <style lang="postcss">
   .body {
-    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto rounded-lg p-0 text-primary shadow-xl md:h-max;
+    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto rounded-2xl border-2 border-secondary p-0 text-primary shadow-xl md:h-max;
   }
 
   .body::backdrop {

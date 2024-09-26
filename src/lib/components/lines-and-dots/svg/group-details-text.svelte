@@ -102,7 +102,7 @@
   {/if} -->
 {:else if shouldDisplayAsExecutionLink(key)}
   <Link
-    inverse
+    light
     href={routeForEventHistory({
       namespace,
       workflow,
@@ -111,7 +111,7 @@
   >
 {:else if shouldDisplayChildWorkflowLink(key, attributes)}
   <Link
-    inverse
+    light
     href={routeForEventHistory({
       namespace: attributes?.namespace || namespace,
       workflow: attributes.workflowExecutionWorkflowId,
@@ -119,7 +119,7 @@
     })}>{value}</Link
   >
 {:else if shouldDisplayAsTaskQueueLink(key)}
-  <Link inverse href={routeForTaskQueue({ namespace, queue: value })}
+  <Link light href={routeForTaskQueue({ namespace, queue: value })}
     >{value}</Link
   >
 {:else}

@@ -1,7 +1,10 @@
+import type { CallbackInfo } from '$lib/types';
 import type {
+  Callbacks,
   PendingActivity,
   PendingActivityInfo,
   PendingChildren,
+  PendingNexusOperation,
 } from '$lib/types/events';
 import type {
   DecodedWorkflowSearchAttributes,
@@ -11,12 +14,16 @@ import type {
   WorkflowSearchAttributes,
 } from '$lib/types/workflows';
 import { decodePayload } from '$lib/utilities/decode-payload';
-import { toWorkflowStatusReadable } from '$lib/utilities/screaming-enums';
+import {
+  toCallbackStateReadable,
+  toPendingNexusOperationStateReadable,
+  toWorkflowStatusReadable,
+} from '$lib/utilities/screaming-enums';
 import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
 import { simplifyAttributes } from './event-history/simplify-attributes';
 
-const toPendingActivities = (
+export const toPendingActivities = (
   pendingActivity: PendingActivityInfo[] = [],
 ): PendingActivity[] => {
   return pendingActivity.map((activity): PendingActivity => {
@@ -24,6 +31,28 @@ const toPendingActivities = (
     const id = activity.activityId;
 
     return { ...attributes, id };
+  });
+};
+
+const toPendingNexusOperations = (
+  operations?: PendingNexusOperation[],
+): PendingNexusOperation[] => {
+  if (!operations) return [];
+  return operations.map((operation): PendingNexusOperation => {
+    return {
+      ...operation,
+      state: toPendingNexusOperationStateReadable(operation.state),
+    };
+  });
+};
+
+const toCallbacks = (callbacks?: Callbacks): Callbacks => {
+  if (!callbacks) return [];
+  return callbacks.map((callback): CallbackInfo => {
+    return {
+      ...callback,
+      state: toCallbackStateReadable(callback.state),
+    };
   });
 };
 
@@ -71,6 +100,7 @@ export const toWorkflowExecution = (
     response?.workflowExecutionInfo?.taskQueue;
   const mostRecentWorkerVersionStamp =
     response?.workflowExecutionInfo?.mostRecentWorkerVersionStamp;
+  const assignedBuildId = response?.workflowExecutionInfo?.assignedBuildId;
   const parentNamespaceId = response?.workflowExecutionInfo?.parentNamespaceId;
   const parent = response?.workflowExecutionInfo?.parentExecution;
   const stateTransitionCount =
@@ -82,6 +112,10 @@ export const toWorkflowExecution = (
     response.pendingActivities,
   );
   const pendingChildren: PendingChildren[] = response?.pendingChildren ?? [];
+  const pendingNexusOperations: PendingNexusOperation[] =
+    toPendingNexusOperations(response?.pendingNexusOperations);
+  const pendingWorkflowTask = response?.pendingWorkflowTask;
+  const callbacks = toCallbacks(response?.callbacks);
 
   return {
     name,
@@ -97,9 +131,13 @@ export const toWorkflowExecution = (
     memo,
     url,
     taskQueue,
+    assignedBuildId,
     mostRecentWorkerVersionStamp,
     pendingActivities,
     pendingChildren,
+    pendingNexusOperations,
+    pendingWorkflowTask,
+    callbacks,
     parentNamespaceId,
     parent,
     stateTransitionCount,

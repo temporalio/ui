@@ -2,6 +2,8 @@
 
 exports[`toWorkflowExecution > should match the snapshot for Canceled workflows 1`] = `
 {
+  "assignedBuildId": undefined,
+  "callbacks": [],
   "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T20:20:50.181506253Z",
@@ -22,6 +24,8 @@ exports[`toWorkflowExecution > should match the snapshot for Canceled workflows 
   "parentNamespaceId": "c3e6ec56-8059-4bdf-99ac-d50d3fa1616c",
   "pendingActivities": [],
   "pendingChildren": [],
+  "pendingNexusOperations": [],
+  "pendingWorkflowTask": null,
   "runId": "346e7a24-c660-4f91-a777-ffe3274d8144",
   "searchAttributes": {
     "indexedFields": {
@@ -44,6 +48,8 @@ exports[`toWorkflowExecution > should match the snapshot for Canceled workflows 
 
 exports[`toWorkflowExecution > should match the snapshot for Completed workflows 1`] = `
 {
+  "assignedBuildId": undefined,
+  "callbacks": [],
   "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T20:28:52.916373379Z",
@@ -64,6 +70,8 @@ exports[`toWorkflowExecution > should match the snapshot for Completed workflows
   "parentNamespaceId": "c3e6ec56-8059-4bdf-99ac-d50d3fa1616c",
   "pendingActivities": [],
   "pendingChildren": [],
+  "pendingNexusOperations": [],
+  "pendingWorkflowTask": null,
   "runId": "202dcff6-7f35-4c65-995c-bcadce524fb1",
   "searchAttributes": {
     "indexedFields": {
@@ -86,6 +94,8 @@ exports[`toWorkflowExecution > should match the snapshot for Completed workflows
 
 exports[`toWorkflowExecution > should match the snapshot for Failed workflows 1`] = `
 {
+  "assignedBuildId": undefined,
+  "callbacks": [],
   "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T20:22:50.027441003Z",
@@ -103,6 +113,8 @@ exports[`toWorkflowExecution > should match the snapshot for Failed workflows 1`
   "parentNamespaceId": "",
   "pendingActivities": [],
   "pendingChildren": [],
+  "pendingNexusOperations": [],
+  "pendingWorkflowTask": null,
   "runId": "7e00b341-c579-4bb5-9e28-810d34ef4329",
   "searchAttributes": {
     "indexedFields": {
@@ -121,6 +133,8 @@ exports[`toWorkflowExecution > should match the snapshot for Failed workflows 1`
 
 exports[`toWorkflowExecution > should match the snapshot for Running workflows 1`] = `
 {
+  "assignedBuildId": undefined,
+  "callbacks": [],
   "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": null,
@@ -167,6 +181,8 @@ exports[`toWorkflowExecution > should match the snapshot for Running workflows 1
     },
   ],
   "pendingChildren": [],
+  "pendingNexusOperations": [],
+  "pendingWorkflowTask": null,
   "runId": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
   "searchAttributes": {
     "indexedFields": {
@@ -189,6 +205,8 @@ exports[`toWorkflowExecution > should match the snapshot for Running workflows 1
 
 exports[`toWorkflowExecution > should match the snapshot for Terminated workflows 1`] = `
 {
+  "assignedBuildId": undefined,
+  "callbacks": [],
   "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T20:14:51.002030504Z",
@@ -240,6 +258,8 @@ exports[`toWorkflowExecution > should match the snapshot for Terminated workflow
     },
   ],
   "pendingChildren": [],
+  "pendingNexusOperations": [],
+  "pendingWorkflowTask": null,
   "runId": "16c5fbe5-f82d-43c1-acbc-18c65c449ace",
   "searchAttributes": {
     "indexedFields": {
@@ -262,6 +282,8 @@ exports[`toWorkflowExecution > should match the snapshot for Terminated workflow
 
 exports[`toWorkflowExecution > should match the snapshot for TimedOut workflows 1`] = `
 {
+  "assignedBuildId": undefined,
+  "callbacks": [],
   "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T14:16:18.804308503Z",
@@ -282,6 +304,14 @@ exports[`toWorkflowExecution > should match the snapshot for TimedOut workflows 
   "parentNamespaceId": "c3e6ec56-8059-4bdf-99ac-d50d3fa1616c",
   "pendingActivities": [],
   "pendingChildren": [],
+  "pendingNexusOperations": [],
+  "pendingWorkflowTask": {
+    "attempt": 1,
+    "originalScheduledTime": "2022-07-01T14:00:34.963148219Z",
+    "scheduledTime": "2022-07-01T14:00:34.963148844Z",
+    "startedTime": null,
+    "state": "Scheduled",
+  },
   "runId": "445a17cb-6cb4-4508-bc59-187d08c6c6e2",
   "searchAttributes": {
     "indexedFields": {
@@ -305,6 +335,8 @@ exports[`toWorkflowExecution > should match the snapshot for TimedOut workflows 
 exports[`toWorkflowExecutions > should match the snapshot 1`] = `
 [
   {
+    "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:20:50.181506253Z",
@@ -322,6 +354,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
+    "pendingNexusOperations": [],
+    "pendingWorkflowTask": undefined,
     "runId": "346e7a24-c660-4f91-a777-ffe3274d8144",
     "searchAttributes": {
       "indexedFields": {
@@ -341,6 +375,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "url": "/workflows/temporal.fixture.cancelled.workflow.id/346e7a24-c660-4f91-a777-ffe3274d8144",
   },
   {
+    "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:28:52.916373379Z",
@@ -358,6 +394,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
+    "pendingNexusOperations": [],
+    "pendingWorkflowTask": undefined,
     "runId": "202dcff6-7f35-4c65-995c-bcadce524fb1",
     "searchAttributes": {
       "indexedFields": {
@@ -377,6 +415,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "url": "/workflows/temporal.fixture.completed.workflow.id/202dcff6-7f35-4c65-995c-bcadce524fb1",
   },
   {
+    "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:22:50.027441003Z",
@@ -394,6 +434,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
+    "pendingNexusOperations": [],
+    "pendingWorkflowTask": undefined,
     "runId": "7e00b341-c579-4bb5-9e28-810d34ef4329",
     "searchAttributes": {
       "indexedFields": {
@@ -409,6 +451,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "url": "/workflows/temporal.fixture.failed.workflow.id/7e00b341-c579-4bb5-9e28-810d34ef4329",
   },
   {
+    "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": null,
@@ -426,6 +470,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
+    "pendingNexusOperations": [],
+    "pendingWorkflowTask": undefined,
     "runId": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
     "searchAttributes": {
       "indexedFields": {
@@ -445,6 +491,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "url": "/workflows/temporal.fixture.running.workflow.id/2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
   },
   {
+    "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:14:51.073853795Z",
@@ -462,6 +510,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
+    "pendingNexusOperations": [],
+    "pendingWorkflowTask": undefined,
     "runId": "dfd4039d-4bc0-4864-9a24-85d136814977",
     "searchAttributes": {
       "indexedFields": {
@@ -481,6 +531,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "url": "/workflows/temporal.fixture.completed.workflow.id/dfd4039d-4bc0-4864-9a24-85d136814977",
   },
   {
+    "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:14:51.002030504Z",
@@ -498,6 +550,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
+    "pendingNexusOperations": [],
+    "pendingWorkflowTask": undefined,
     "runId": "16c5fbe5-f82d-43c1-acbc-18c65c449ace",
     "searchAttributes": {
       "indexedFields": {
@@ -517,6 +571,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "url": "/workflows/temporal.fixture.terminated.workflow.id/16c5fbe5-f82d-43c1-acbc-18c65c449ace",
   },
   {
+    "assignedBuildId": undefined,
+    "callbacks": [],
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T14:16:18.804308503Z",
@@ -534,6 +590,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
+    "pendingNexusOperations": [],
+    "pendingWorkflowTask": undefined,
     "runId": "445a17cb-6cb4-4508-bc59-187d08c6c6e2",
     "searchAttributes": {
       "indexedFields": {

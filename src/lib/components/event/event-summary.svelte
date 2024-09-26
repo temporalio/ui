@@ -1,89 +1,163 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
-  import Pagination from '$lib/holocene/pagination.svelte';
-  import { translate } from '$lib/i18n/translate';
-  import { groupEvents } from '$lib/models/event-groups';
-  import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
-  import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
-  import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
+  import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
+  import {
+    eventFilterSort,
+    eventViewType,
+    expandAllEvents,
+  } from '$lib/stores/event-view';
+  import { fullEventHistory, pauseLiveUpdates } from '$lib/stores/events';
   import { eventCategoryFilter } from '$lib/stores/filters';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type {
-    CommonHistoryEvent,
     EventTypeCategory,
-    IterableEvent,
+    IterableEventWithPending,
   } from '$lib/types/events';
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
-  import EventEmptyRow from './event-empty-row.svelte';
+  import EventStatusFilter from '../lines-and-dots/event-status-filter.svelte';
 
-  export let compact = false;
+  export let history: IterableEventWithPending[];
+  export let groups: EventGroups;
 
-  function handleExpandChange(event: CustomEvent) {
-    $expandAllEvents = event.detail.expanded;
-  }
+  let showDownloadPrompt = false;
 
-  const getEventsOrGroups = (
-    items: CommonHistoryEvent[],
-    category?: string[],
-  ): IterableEvent[] => {
-    if (category) {
-      const filteredItems = items.filter((i) => {
-        if (isLocalActivityMarkerEvent(i)) {
-          return category.includes(CATEGORIES.LOCAL_ACTIVITY);
-        }
-        return category.includes(i.category);
-      });
-      return compact
-        ? groupEvents(filteredItems, $eventFilterSort)
-        : filteredItems;
-    }
-    return compact ? groupEvents(items, $eventFilterSort) : items;
-  };
+  $: ({ namespace } = $page.params);
+  $: ({ workflow } = $workflowRun);
+  $: reverseSort = $eventFilterSort === 'descending';
+  $: updating = !$fullEventHistory.length;
+  $: compact = $eventViewType === 'compact';
+  $: expandAll = $expandAllEvents === 'true';
 
   $: $eventCategoryFilter = $page.url?.searchParams?.get('category')
     ? ($page.url?.searchParams
         ?.get('category')
         .split(',') as EventTypeCategory[])
     : undefined;
-  $: initialEvents =
-    $eventFilterSort === 'descending'
-      ? $eventHistory?.end
-      : $eventHistory?.start;
-  $: currentEvents = $fullEventHistory.length
-    ? $fullEventHistory
-    : initialEvents;
-  $: initialItem = currentEvents?.[0];
-  $: items = getEventsOrGroups(currentEvents, $eventCategoryFilter);
-  $: updating = currentEvents.length && !$fullEventHistory.length;
+
+  $: pendingActivities = workflow.pendingActivities;
+  $: pendingNexusOperations = workflow.pendingNexusOperations;
+
+  $: items = compact
+    ? groups
+    : reverseSort
+    ? [...pendingNexusOperations, ...pendingActivities, ...history]
+    : [...history, ...pendingActivities, ...pendingNexusOperations];
+
+  const onAllClick = () => {
+    $eventViewType = 'feed';
+  };
+
+  const onCompactClick = () => {
+    $eventViewType = 'compact';
+  };
+
+  const onJSONClick = () => {
+    $eventViewType = 'json';
+  };
+
+  const onSort = () => {
+    if (reverseSort) {
+      $eventFilterSort = 'ascending';
+    } else {
+      $eventFilterSort = 'descending';
+    }
+  };
+
+  const onExpandAll = () => {
+    if (expandAll) {
+      $expandAllEvents = 'false';
+    } else {
+      $expandAllEvents = 'true';
+    }
+  };
 </script>
 
-<Pagination
-  floatId="event-view-toggle"
-  {items}
-  {updating}
-  let:visibleItems
-  let:activeRowIndex
-  let:setActiveRowIndex
-  aria-label={translate('workflows.event-history')}
-  pageSizeSelectLabel={translate('common.per-page')}
-  previousButtonLabel={translate('common.previous')}
-  nextButtonLabel={translate('common.next')}
+<div
+  class="flex flex-col items-center justify-between gap-4 py-4 lg:flex-row lg:py-8"
 >
-  <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
-    {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
-      <EventSummaryRow
-        {event}
-        {compact}
-        expandAll={$expandAllEvents === 'true'}
-        {initialItem}
-        active={activeRowIndex === index}
-        onRowClick={() => setActiveRowIndex(index)}
-      />
-    {:else}
-      <EventEmptyRow loading={!initialEvents.length} />
-    {/each}
-  </EventSummaryTable>
-</Pagination>
+  <div class="flex flex-col items-center gap-2 px-4 md:flex-row">
+    <div class="flex items-center gap-2 px-4">
+      <ToggleButtons>
+        <ToggleButton
+          active={$eventViewType === 'feed'}
+          data-testid="feed"
+          on:click={onAllClick}>All</ToggleButton
+        >
+        <ToggleButton
+          active={$eventViewType === 'compact'}
+          data-testid="compact"
+          on:click={onCompactClick}>Compact</ToggleButton
+        >
+        <ToggleButton
+          active={$eventViewType === 'json'}
+          data-testid="json"
+          on:click={onJSONClick}>JSON</ToggleButton
+        >
+      </ToggleButtons>
+    </div>
+    <div class="flex items-center gap-2 px-4">
+      {#if $eventViewType !== 'json'}
+        <ToggleButtons>
+          <ToggleButton
+            icon={reverseSort ? 'arrow-down' : 'arrow-up'}
+            data-testid="zoom-in"
+            on:click={onSort}>{reverseSort ? 'Desc' : 'Asc'}</ToggleButton
+          >
+          <ToggleButton
+            icon={expandAll ? 'chevron-up' : 'chevron-down'}
+            data-testid="expandAll"
+            tooltip={expandAll ? 'Collapse All Events' : 'Expand All Events'}
+            on:click={onExpandAll}
+          />
+        </ToggleButtons>
+      {/if}
+      <ToggleButtons>
+        <ToggleButton
+          disabled={!workflow.isRunning}
+          icon={$pauseLiveUpdates ? 'play' : 'pause'}
+          data-testid="pause"
+          tooltip={$pauseLiveUpdates
+            ? 'Resume Live Updates'
+            : 'Pause Live Updates'}
+          on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
+        />
+        <ToggleButton
+          data-testid="download"
+          icon="download"
+          tooltip="Download Event History"
+          on:click={() => (showDownloadPrompt = true)}
+        />
+      </ToggleButtons>
+    </div>
+  </div>
+  <div
+    class="flex w-full flex-col items-center justify-end gap-4 px-4 lg:flex-row"
+  >
+    {#if $eventViewType !== 'json'}
+      <EventStatusFilter />
+    {/if}
+    <EventTypeFilter {compact} />
+  </div>
+</div>
+{#if $eventViewType === 'json'}
+  <div class="px-4">
+    <WorkflowHistoryJson />
+  </div>
+{:else}
+  <div data-testid="event-summary-table">
+    <EventSummaryTable {updating} {items} {groups} {compact} />
+  </div>
+{/if}
+<DownloadEventHistoryModal
+  bind:open={showDownloadPrompt}
+  {namespace}
+  workflowId={workflow.id}
+  runId={workflow.runId}
+/>

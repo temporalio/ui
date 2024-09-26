@@ -1,9 +1,11 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import debounce from 'just-debounce';
   import { onMount } from 'svelte';
 
   import Alert from '$lib/holocene/alert.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import {
@@ -14,7 +16,7 @@
   import { isError } from '$lib/utilities/is';
 
   type T = $$Generic;
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+  type BaseProps = HTMLAttributes<HTMLDivElement> & {
     onError?: (error: Error | unknown) => void | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
     onShiftUp?: (event: KeyboardEvent) => void | undefined;
@@ -29,11 +31,24 @@
     itemsKeyname?: string;
     previousButtonLabel: string;
     nextButtonLabel: string;
-  }
+  };
+
+  type NonFilterableProps = {
+    filterable?: false;
+  };
+
+  type FilterableProps = {
+    filterable: true;
+    filterInputPlaceholder: string;
+    filterDebounceInMilliseconds?: number;
+  };
+
+  type $$Props = BaseProps & (FilterableProps | NonFilterableProps);
 
   type PaginatedRequest<T> = (
     size: number,
     token: string,
+    query?: string,
   ) => Promise<{ items: T[]; nextPageToken: string }>;
 
   export let onError: (error: Error) => void | undefined = undefined;
@@ -52,6 +67,11 @@
   export let itemsKeyname = 'items';
   export let previousButtonLabel: string;
   export let nextButtonLabel: string;
+  export let filterable = false;
+  export let filterInputPlaceholder: string = undefined;
+  export let filterDebounceInMilliseconds = 1000;
+
+  let query = '';
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
@@ -157,6 +177,27 @@
         break;
     }
   }
+
+  const handleFilter = async () => {
+    clearError();
+    store.reset();
+    store.setUpdating();
+    try {
+      const fetchItems = await onFetch();
+      const response = await fetchItems($store.pageSize, '', query);
+      const { nextPageToken } = response;
+      const items = response[itemsKeyname] || [];
+      store.nextPageWithItems(nextPageToken, items);
+    } catch (err) {
+      error = err;
+      if (onError) onError(error);
+    }
+  };
+
+  const debouncedHandleFilter = debounce(
+    handleFilter,
+    filterDebounceInMilliseconds,
+  );
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -165,7 +206,6 @@
   <slot name="error" />
 {:else if error}
   <Alert
-    bold
     intent="error"
     class="mb-10"
     title={error?.message ?? fallbackErrorMessage}
@@ -174,12 +214,30 @@
 
 <slot name="header" visibleItems={$store.visibleItems} />
 <div class="relative mb-8 flex flex-col gap-4">
-  <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
-    <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
-      <slot name="action-top-left" visibleItems={$store.visibleItems} />
-    </div>
+  <div
+    class="flex flex-col items-center gap-4 lg:flex-row {$$slots[
+      'action-top-left'
+    ]
+      ? 'justify-between'
+      : 'justify-end'}"
+  >
+    <slot name="action-top-left" visibleItems={$store.visibleItems} />
+    {#if filterable && filterInputPlaceholder}
+      <Input
+        icon="search"
+        id="api-pagination-search-input"
+        class="grow"
+        bind:value={query}
+        label={filterInputPlaceholder}
+        labelHidden
+        placeholder={filterInputPlaceholder}
+        on:input={debouncedHandleFilter}
+        on:clear={handleFilter}
+        clearable
+      />
+    {/if}
     <nav
-      class="flex flex-col justify-end gap-4 md:flex-row"
+      class="flex shrink-0 flex-col gap-4 md:flex-row"
       aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
@@ -199,10 +257,7 @@
             on:click={store.previousPage}
             aria-label={previousButtonLabel}
           >
-            <span
-              class="arrow arrow-left"
-              class:arrow-left-disabled={!$store.hasPrevious}
-            />
+            <span class="arrow arrow-left" />
           </button>
           <div class="flex gap-1">
             <p>
@@ -220,10 +275,7 @@
             on:click={fetchIndexData}
             aria-label={nextButtonLabel}
           >
-            <span
-              class="arrow arrow-right"
-              class:arrow-right-disabled={!$store.hasNext}
-            />
+            <span class="arrow arrow-right" />
           </button>
         </div>
       {/if}
@@ -237,7 +289,7 @@
       <SkeletonTable rows={15} />
     {/if}
   {:else if isEmpty}
-    <slot name="empty">{emptyStateMessage}</slot>
+    <slot name="empty" {query}>{emptyStateMessage}</slot>
   {:else}
     <slot
       updating={$store.updating}
@@ -247,9 +299,9 @@
     />
   {/if}
   <nav
-    class={`flex ${
-      $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
-    }`}
+    class="flex {$$slots['action-bottom-left']
+      ? 'justify-between'
+      : 'justify-end'}"
     aria-label="{$$restProps['aria-label']} 2"
   >
     <slot name="action-bottom-left" />
@@ -270,10 +322,7 @@
             on:click={store.previousPage}
             aria-label={previousButtonLabel}
           >
-            <span
-              class="arrow arrow-left"
-              class:arrow-left-disabled={!$store.hasPrevious}
-            />
+            <span class="arrow arrow-left" />
           </button>
           <div class="flex gap-1">
             <p>
@@ -291,10 +340,7 @@
             on:click={fetchIndexData}
             aria-label={nextButtonLabel}
           >
-            <span
-              class="arrow arrow-right"
-              class:arrow-right-disabled={!$store.hasNext}
-            />
+            <span class="arrow arrow-right" />
           </button>
         </div>
       {/if}
@@ -313,20 +359,14 @@
 
   .arrow-left {
     border-width: 6px 12px 6px 0;
-    border-color: transparent #18181b transparent transparent;
-  }
 
-  .arrow-left-disabled {
-    border-color: transparent #d4d4d8 transparent transparent;
+    @apply border-b-transparent border-l-transparent border-r-primary border-t-transparent;
   }
 
   .arrow-right {
     border-width: 6px 0 6px 12px;
-    border-color: transparent transparent transparent #18181b;
-  }
 
-  .arrow-right-disabled {
-    border-color: transparent transparent transparent #d4d4d8;
+    @apply border-b-transparent border-l-primary border-r-transparent border-t-transparent;
   }
 
   .caret {
@@ -337,6 +377,6 @@
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-slate-400;
+    @apply cursor-not-allowed opacity-50;
   }
 </style>

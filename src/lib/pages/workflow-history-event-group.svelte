@@ -1,22 +1,16 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
-  import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
-  import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { eventFilterSort } from '$lib/stores/event-view';
-  import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { isChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
   import { routeForEventHistory } from '$lib/utilities/route-for';
-
-  const compact = true;
 
   $: ({
     namespace,
@@ -25,13 +19,11 @@
     id: groupId,
   } = $page.params);
 
-  let loading = false;
   let eventGroup: EventGroup;
   let events: EventGroup[] = [];
 
   const resetFullHistory = () => {
     $fullEventHistory = [];
-    loading = true;
   };
 
   const fetchEvents = async (
@@ -47,7 +39,6 @@
         runId,
         sort: $eventFilterSort,
       });
-      loading = false;
     }
     eventGroup = groupEvents($fullEventHistory, $eventFilterSort).find(
       (e) => e.id === groupId,
@@ -57,11 +48,7 @@
 
   $: fetchEvents(namespace, workflowId, runId);
 
-  $: currentEvents = $fullEventHistory.length
-    ? $fullEventHistory
-    : $eventHistory?.start;
-  $: initialItem = currentEvents?.[0];
-  $: updating = currentEvents.length && !$fullEventHistory.length;
+  $: updating = !$fullEventHistory.length;
 
   function getLink(group: EventGroup) {
     const childEvent = group?.eventList.find(isChildWorkflowClosedEvent);
@@ -77,32 +64,19 @@
   $: workflowLink = getLink(eventGroup);
 </script>
 
-{#if eventGroup}
-  <h2 class="flex w-full items-center text-lg font-medium">
-    {#if workflowLink}
-      <Link href={workflowLink}>
+<div class="px-8">
+  {#if eventGroup}
+    <h2 class="flex w-full items-center">
+      {#if workflowLink}
+        <Link href={workflowLink}>
+          {eventGroup.displayName}
+        </Link>
+      {:else}
         {eventGroup.displayName}
-      </Link>
-    {:else}
-      {eventGroup.displayName}
-    {/if}
-  </h2>
-{/if}
-<EventHistoryTimeline history={$fullEventHistory} maxHeight={240} />
-<EventSummaryTable {updating} {compact}>
-  {#each events as event (`${event.id}-${event.timestamp}`)}
-    <EventSummaryRow
-      {event}
-      {compact}
-      expandAll={true}
-      {initialItem}
-      active={true}
-    />
-  {:else}
-    <EventEmptyRow
-      {loading}
-      title={translate('events.group-empty-state-title')}
-      content=""
-    />
-  {/each}
-</EventSummaryTable>
+      {/if}
+    </h2>
+  {/if}
+  <div data-testid="event-summary-table">
+    <EventSummaryTable items={events} groups={events} {updating} openExpanded />
+  </div>
+</div>

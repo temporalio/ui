@@ -1,14 +1,14 @@
 <script lang="ts">
-  export let width = 24;
-  export let height = 24;
-  export let viewBox = '0 0 24 24';
   export let title = '';
+
+  export let width = 16;
+  export let height = 16;
 </script>
 
 <svg
   {width}
   {height}
-  {viewBox}
+  viewBox="0 0 24 24"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
   class={$$props.class}
@@ -16,6 +16,6 @@
   aria-hidden={!title}
   {...$$restProps}
 >
-  {#if title}<title>{title}</title>{/if}
+  <title>{title}</title>
   <slot />
 </svg>
