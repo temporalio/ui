@@ -10,6 +10,7 @@
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
 
+  import Badge from '../badge.svelte';
   import Button from '../button.svelte';
   import Chip from '../chip.svelte';
   import type { IconName } from '../icon';
@@ -109,7 +110,7 @@
   export let deselectAllLabel = 'Deselect All';
   export let removeChipLabel = 'Remove Option';
   export let numberOfItemsSelectedLabel = (count: number) =>
-    `${count} options selected`;
+    `${count} option${count > 1 ? 's' : ''} selected`;
 
   let displayValue: string = '';
   let selectedOption: string | T;
@@ -349,7 +350,11 @@
     {#if leadingIcon}
       <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
-    <div class="input-wrapper" class:multiselect>
+    <div
+      class="input-wrapper"
+      class:gap-1={multiselect}
+      class:py-1={multiselect && displayChips}
+    >
       {#if multiselect && isArrayValue(value) && value.length > 0}
         {#if displayChips}
           {#each value.slice(0, chipLimit) as v}
@@ -362,7 +367,7 @@
             <p>+{value.slice(chipLimit).length}</p>
           {/if}
         {:else}
-          <p>{numberOfItemsSelectedLabel(value.length)}</p>
+          <Badge>{numberOfItemsSelectedLabel(value.length)}</Badge>
         {/if}
       {/if}
       <input
@@ -482,10 +487,6 @@
 
   .input-wrapper {
     @apply ml-2 flex w-full flex-wrap items-center;
-
-    &.multiselect {
-      @apply gap-1 py-1;
-    }
   }
 
   .combobox-input {
