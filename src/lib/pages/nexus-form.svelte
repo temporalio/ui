@@ -145,11 +145,7 @@
       displayChips={false}
       bind:value={allowedCallerNamespaces}
       options={callerNamespaces}
-      label={allowedCallerNamespaces.length
-        ? translate('nexus.selected-namespaces', {
-            count: allowedCallerNamespaces.length,
-          })
-        : translate('nexus.select-namespaces')}
+      label={translate('nexus.allowed-caller-namespaces')}
       toggleLabel={translate('common.namespaces')}
       leadingIcon="search"
       noResultsText={translate('common.no-results')}
