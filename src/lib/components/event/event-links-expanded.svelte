@@ -17,6 +17,7 @@
             namespace: link.workflowEvent.namespace,
             workflow: link.workflowEvent.workflowId,
             run: link.workflowEvent.runId,
+            eventId: link.workflowEvent.eventRef?.eventId,
           })}
         >
           {link.workflowEvent.workflowId}

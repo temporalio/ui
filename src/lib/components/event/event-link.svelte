@@ -5,6 +5,12 @@
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
   export let link: EventLink;
+  $: href = routeForEventHistory({
+    namespace: link.workflowEvent.namespace,
+    workflow: link.workflowEvent.workflowId,
+    run: link.workflowEvent.runId,
+    eventId: link.workflowEvent.eventRef?.eventId,
+  });
 </script>
 
 <div
@@ -13,13 +19,7 @@
   <p class="max-w-fit whitespace-nowrap text-right text-xs">Link</p>
   <div class="overflow-hidden truncate pr-1">
     <Badge type="subtle">
-      <Link
-        href={routeForEventHistory({
-          namespace: link.workflowEvent.namespace,
-          workflow: link.workflowEvent.workflowId,
-          run: link.workflowEvent.runId,
-        })}
-      >
+      <Link {href}>
         {link.workflowEvent.workflowId}
       </Link>
     </Badge>
