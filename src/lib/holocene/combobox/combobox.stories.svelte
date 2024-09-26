@@ -122,3 +122,20 @@
     expect(noResults).toBeInTheDocument();
   }}
 />
+
+<Story
+  name="Multiselect"
+  args={{
+    options: [
+      'English',
+      'English (UK)',
+      'German',
+      'French',
+      'Japanese',
+      'Spanish',
+      'Portuguese',
+    ],
+    multiselect: true,
+    value: [],
+  }}
+/>
