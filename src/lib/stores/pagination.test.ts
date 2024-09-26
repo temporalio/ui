@@ -573,7 +573,7 @@ describe('getStartingIndexForPage', () => {
   });
 });
 
-describe.only('hash included', () => {
+describe('hash included in pagination store', () => {
   it('should return true if object has id', () => {
     expect(hasId({ id: '1234', name: 'cats' })).toBe(true);
   });
