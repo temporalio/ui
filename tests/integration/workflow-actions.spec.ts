@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { ResetReapplyType } from '$src/lib/models/workflow-actions';
+import { ResetReapplyType } from '$src/lib/types';
 import { mockSettingsApi, mockWorkflowApis } from '~/test-utilities/mock-apis';
 import {
   mockCompletedWorkflow,
@@ -57,7 +57,9 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       const request = await requestPromise;
       const body = request.postDataJSON();
 
-      expect(body.resetReapplyType).toBe(ResetReapplyType.None);
+      expect(body.resetReapplyType).toBe(
+        ResetReapplyType.RESET_REAPPLY_TYPE_NONE,
+      );
     });
 
     test('allows reapplying signals after the reset point', async ({
@@ -79,7 +81,9 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       const request = await requestPromise;
       const body = request.postDataJSON();
 
-      expect(body.resetReapplyType).toBe(ResetReapplyType.Signal);
+      expect(body.resetReapplyType).toBe(
+        ResetReapplyType.RESET_REAPPLY_TYPE_SIGNAL,
+      );
     });
   });
 });
