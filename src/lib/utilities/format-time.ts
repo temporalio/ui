@@ -193,9 +193,11 @@ export function getMilliseconds(date: ValidTime | undefined | null): number {
 
 export function fromSecondsToMinutesAndSeconds(seconds: number): string {
   if (!seconds) return '';
+  const start = new Date(Date.UTC(0, 0, 0, 0, 0, 0));
+  const end = new Date(Date.UTC(0, 0, 0, 0, 0, Math.floor(seconds)));
   const duration = intervalToDuration({
-    start: 0,
-    end: Math.floor(seconds) * 1000,
+    start,
+    end,
   });
   return durationToString(duration, { format: ['minutes', 'seconds'] });
 }
