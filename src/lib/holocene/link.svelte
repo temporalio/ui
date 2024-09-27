@@ -33,7 +33,6 @@
     // Skip if middle mouse click or new tab
     if (e.button === 1 || newTab || e.metaKey) return;
     e.preventDefault();
-    e.stopPropagation();
     goto(href);
   };
 </script>
@@ -45,7 +44,7 @@
   class={merge('link', icon ? 'inline-flex' : 'inline', className)}
   class:active
   class:light
-  on:click={onLinkClick}
+  on:click|stopPropagation={onLinkClick}
   tabindex={href ? null : 0}
   {...$$restProps}
 >
