@@ -68,8 +68,6 @@
     }
     hideResetModal();
   };
-
-  $: console.log($temporalVersion);
 </script>
 
 <Modal
