@@ -86,6 +86,7 @@
   <svelte:fragment slot="content">
     <div class="flex w-full flex-col gap-4">
       <Select
+        data-testid="workflow-reset-event-id-select"
         menuClass="max-h-[16rem]"
         label={translate('workflows.reset-event-radio-group-description')}
         bind:value={$eventId}

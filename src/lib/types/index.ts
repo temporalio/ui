@@ -1,15 +1,4 @@
-import { type google, temporal } from '@temporalio/proto';
-// for CommonJS shenanigans when using Enums
-import * as protos from '@temporalio/proto';
-export const {
-  temporal: {
-    api: {
-      enums: {
-        v1: { ResetReapplyExcludeType, ResetReapplyType },
-      },
-    },
-  },
-} = protos;
+import type { google, temporal } from '@temporalio/proto';
 
 // api.workflowservice
 
@@ -159,6 +148,21 @@ export type PendingNexusOperationState =
 export type CallbackState = temporal.api.enums.v1.CallbackState;
 export type PendingWorkflowTaskInfo =
   temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
+
+// temporal.api.enums.v1.ResetReapplyExcludeType
+export enum ResetReapplyExcludeType {
+  RESET_REAPPLY_EXCLUDE_TYPE_UNSPECIFIED = 0,
+  RESET_REAPPLY_EXCLUDE_TYPE_SIGNAL = 1,
+  RESET_REAPPLY_EXCLUDE_TYPE_UPDATE = 2,
+}
+
+// temporal.api.enums.v1.ResetReapplyType
+export enum ResetReapplyType {
+  RESET_REAPPLY_TYPE_UNSPECIFIED = 0,
+  RESET_REAPPLY_TYPE_SIGNAL = 1,
+  RESET_REAPPLY_TYPE_NONE = 2,
+  RESET_REAPPLY_TYPE_ALL_ELIGIBLE = 3,
+}
 
 // api.workflow
 

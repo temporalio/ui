@@ -42,13 +42,19 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       await expect(page.getByTestId('workflow-reset-button')).toBeDisabled();
     });
 
-    test('allows NOT reapplying signals after the reset point', async ({
+    test('allows reapplying signals after the reset point', async ({
       page,
     }) => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
       await page.getByTestId('workflow-reset-button').click();
-      await page.locator('#reset-event-5').click();
+      await page.getByTestId('workflow-reset-event-id-select-button').click();
+      await page
+        .locator('#reset-event-id-select')
+        .locator('[role="option"]')
+        .first()
+        .click();
+
       await page
         .getByTestId('reset-confirmation-modal')
         .getByTestId('confirm-modal-button')
@@ -58,20 +64,27 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       const body = request.postDataJSON();
 
       expect(body.resetReapplyType).toBe(
-        ResetReapplyType.RESET_REAPPLY_TYPE_NONE,
+        ResetReapplyType.RESET_REAPPLY_TYPE_SIGNAL,
       );
     });
 
-    test('allows reapplying signals after the reset point', async ({
+    test('allows NOT reapplying signals after the reset point', async ({
       page,
     }) => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
       await page.getByTestId('workflow-reset-button').click();
-      await page.locator('#reset-event-5').click();
+      await page.getByTestId('workflow-reset-event-id-select-button').click();
       await page
-        .getByText('Reapply Signals that happened after the Reset point')
+        .locator('#reset-event-id-select')
+        .locator('[role="option"]')
+        .first()
         .click();
+
+      // this checkbox is defaulted to "checked", so click it to uncheck it
+      await page
+        .locator('#reset-include-signals-checkbox')
+        .click({ force: true });
 
       await page
         .getByTestId('reset-confirmation-modal')
