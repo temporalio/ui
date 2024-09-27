@@ -9,6 +9,7 @@ import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
+import { isCloud } from '$lib/stores/advanced-visibility';
 import { authUser } from '$lib/stores/auth-user';
 import type { SearchAttributeInput } from '$lib/stores/search-attributes';
 import { temporalVersion } from '$lib/stores/versions';
@@ -389,7 +390,7 @@ export async function resetWorkflow({
     reason: formattedReason,
   };
 
-  if (minimumVersionRequired('1.24.0', get(temporalVersion))) {
+  if (get(isCloud) || minimumVersionRequired('1.24.0', get(temporalVersion))) {
     const resetReapplyExcludeTypes: ResetWorkflowRequest['resetReapplyExcludeTypes'] =
       [];
 

@@ -8,6 +8,7 @@
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
   import { resetWorkflow } from '$lib/services/workflow-service';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { temporalVersion } from '$lib/stores/versions';
@@ -96,7 +97,7 @@
           <Option value={event.id}>{event.id} - {event.eventType}</Option>
         {/each}
       </Select>
-      {#if minimumVersionRequired('1.24.0', $temporalVersion)}
+      {#if $isCloud || minimumVersionRequired('1.24.0', $temporalVersion)}
         <Checkbox
           id="reset-exclude-signals-checkbox"
           data-testid="reset-exclude-signals-checkbox"
