@@ -393,6 +393,12 @@ export async function resetWorkflow({
     const resetReapplyExcludeTypes: ResetWorkflowRequest['resetReapplyExcludeTypes'] =
       [];
 
+    if (!excludeSignals && !excludeUpdates) {
+      resetReapplyExcludeTypes.push(
+        ResetReapplyExcludeType.RESET_REAPPLY_EXCLUDE_TYPE_UNSPECIFIED,
+      );
+    }
+
     if (excludeSignals) {
       resetReapplyExcludeTypes.push(
         ResetReapplyExcludeType.RESET_REAPPLY_EXCLUDE_TYPE_SIGNAL,
@@ -405,9 +411,7 @@ export async function resetWorkflow({
       );
     }
 
-    if (resetReapplyExcludeTypes.length) {
-      body.resetReapplyExcludeTypes = resetReapplyExcludeTypes;
-    }
+    body.resetReapplyExcludeTypes = resetReapplyExcludeTypes;
   } else {
     let resetReapplyType: ResetWorkflowRequest['resetReapplyType'];
 

@@ -131,8 +131,9 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       const request = await requestPromise;
       const body = request.postDataJSON();
 
-      // default behavior of the API is to apply Signals and Updates when resetReapplyExcludeTypes in unspecified
-      expect(body.resetReapplyExcludeTypes).toBe(undefined);
+      expect(body.resetReapplyExcludeTypes).toStrictEqual([
+        ResetReapplyExcludeType.RESET_REAPPLY_EXCLUDE_TYPE_UNSPECIFIED,
+      ]);
     });
 
     test('Allows excluding Signals after the reset point', async ({ page }) => {
