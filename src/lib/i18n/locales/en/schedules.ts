@@ -19,6 +19,7 @@ export const Strings = {
   'recent-runs': 'Recent Runs',
   'recent-runs-empty-state-title': 'No Recent Runs',
   'upcoming-runs': 'Upcoming Runs',
+  'upcoming-runs-empty-state-title': 'No Upcoming Runs',
   loading: 'Loading Schedule...',
   deleting: 'Deleting Schedule...',
   'delete-schedule-error': 'Cannot delete schedule. {{error}}',
