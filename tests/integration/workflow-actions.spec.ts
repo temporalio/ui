@@ -1,7 +1,11 @@
 import { expect, test } from '@playwright/test';
 
-import { ResetReapplyType } from '$src/lib/types';
-import { mockSettingsApi, mockWorkflowApis } from '~/test-utilities/mock-apis';
+import { ResetReapplyExcludeType, ResetReapplyType } from '$src/lib/types';
+import {
+  mockClusterApi,
+  mockSettingsApi,
+  mockWorkflowApis,
+} from '~/test-utilities/mock-apis';
 import {
   mockCompletedWorkflow,
   mockWorkflow,
@@ -18,14 +22,14 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
 
   const workflowUrl = `/namespaces/default/workflows/${workflowId}/${runId}/history`;
 
-  test.beforeEach(async ({ page }) => {
-    await page.goto(workflowUrl);
+  test.describe('Workflow Reset for server version <1.24', () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto(workflowUrl);
 
-    await mockWorkflowApis(page, mockCompletedWorkflow);
-    await mockWorkflowResetApi(page);
-  });
+      await mockWorkflowApis(page, mockCompletedWorkflow);
+      await mockWorkflowResetApi(page);
+    });
 
-  test.describe('Workflow Reset', () => {
     test('is disabled when global write actions are disabled via Settings API', async ({
       page,
     }) => {
@@ -81,10 +85,8 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
         .first()
         .click();
 
-      // this checkbox is defaulted to "checked", so click it to uncheck it
-      await page
-        .locator('#reset-include-signals-checkbox')
-        .click({ force: true });
+      // this checkbox is defaulted to checked, so click it to uncheck it
+      await page.getByTestId('reset-include-signals-checkbox').click();
 
       await page
         .getByTestId('reset-confirmation-modal')
@@ -95,8 +97,94 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       const body = request.postDataJSON();
 
       expect(body.resetReapplyType).toBe(
-        ResetReapplyType.RESET_REAPPLY_TYPE_SIGNAL,
+        ResetReapplyType.RESET_REAPPLY_TYPE_NONE,
       );
+    });
+  });
+
+  test.describe('Workflow Reset for server version >=1.24', () => {
+    test.beforeEach(async ({ page }) => {
+      await mockWorkflowApis(page, mockCompletedWorkflow);
+      await mockClusterApi(page, { serverVersion: '1.24.0' });
+      await mockWorkflowResetApi(page);
+      await page.goto(workflowUrl);
+    });
+
+    test('Allows reapplying Signals and Updates after the reset point', async ({
+      page,
+    }) => {
+      const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
+
+      await page.getByTestId('workflow-reset-button').click();
+      await page.getByTestId('workflow-reset-event-id-select-button').click();
+      await page
+        .locator('#reset-event-id-select')
+        .locator('[role="option"]')
+        .first()
+        .click();
+
+      await page
+        .getByTestId('reset-confirmation-modal')
+        .getByTestId('confirm-modal-button')
+        .click();
+
+      const request = await requestPromise;
+      const body = request.postDataJSON();
+
+      // default behavior of the API is to apply Signals and Updates when resetReapplyExcludeTypes in unspecified
+      expect(body.resetReapplyExcludeTypes).toBe(undefined);
+    });
+
+    test('Allows excluding Signals after the reset point', async ({ page }) => {
+      const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
+
+      await page.getByTestId('workflow-reset-button').click();
+      await page.getByTestId('workflow-reset-event-id-select-button').click();
+      await page
+        .locator('#reset-event-id-select')
+        .locator('[role="option"]')
+        .first()
+        .click();
+
+      await page.getByTestId('reset-exclude-signals-checkbox').click();
+
+      await page
+        .getByTestId('reset-confirmation-modal')
+        .getByTestId('confirm-modal-button')
+        .click();
+
+      const request = await requestPromise;
+      const body = request.postDataJSON();
+
+      expect(body.resetReapplyExcludeTypes).toStrictEqual([
+        ResetReapplyExcludeType.RESET_REAPPLY_EXCLUDE_TYPE_SIGNAL,
+      ]);
+    });
+
+    test('Allows excluding Updates after the reset point', async ({ page }) => {
+      const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
+
+      await page.getByTestId('workflow-reset-button').click();
+      await page.getByTestId('workflow-reset-event-id-select-button').click();
+      await page
+        .locator('#reset-event-id-select')
+        .locator('[role="option"]')
+        .first()
+        .click();
+
+      await page.getByTestId('reset-exclude-updates-checkbox').click();
+
+      await page
+        .getByTestId('reset-confirmation-modal')
+        .getByTestId('confirm-modal-button')
+        .click();
+
+      const request = await requestPromise;
+      const body = request.postDataJSON();
+
+      expect(body.resetReapplyExcludeTypes).toStrictEqual([
+        ResetReapplyExcludeType.RESET_REAPPLY_EXCLUDE_TYPE_UPDATE,
+      ]);
     });
   });
 });

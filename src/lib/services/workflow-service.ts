@@ -389,7 +389,7 @@ export async function resetWorkflow({
     reason: formattedReason,
   };
 
-  if (minimumVersionRequired('1.24', get(temporalVersion))) {
+  if (minimumVersionRequired('1.24.0', get(temporalVersion))) {
     const resetReapplyExcludeTypes: ResetWorkflowRequest['resetReapplyExcludeTypes'] =
       [];
 

@@ -68,6 +68,8 @@
     }
     hideResetModal();
   };
+
+  $: console.log($temporalVersion);
 </script>
 
 <Modal
@@ -96,20 +98,23 @@
           <Option value={event.id}>{event.id} - {event.eventType}</Option>
         {/each}
       </Select>
-      {#if minimumVersionRequired('1.24', $temporalVersion)}
+      {#if minimumVersionRequired('1.24.0', $temporalVersion)}
         <Checkbox
           id="reset-exclude-signals-checkbox"
+          data-testid="reset-exclude-signals-checkbox"
           bind:checked={excludeSignals}
           label={translate('workflows.reset-exclude-signals')}
         />
         <Checkbox
           id="reset-exclude-updates-checkbox"
+          data-testid="reset-exclude-updates-checkbox"
           bind:checked={excludeUpdates}
           label={translate('workflows.reset-exclude-updates')}
         />
       {:else}
         <Checkbox
           id="reset-include-signals-checkbox"
+          data-testid="reset-include-signals-checkbox"
           bind:checked={includeSignals}
           label={translate('workflows.reset-reapply-type-label')}
         />
