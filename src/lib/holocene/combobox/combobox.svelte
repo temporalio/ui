@@ -10,6 +10,7 @@
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
 
+  import Badge from '../badge.svelte';
   import Button from '../button.svelte';
   import Chip from '../chip.svelte';
   import type { IconName } from '../icon';
@@ -109,7 +110,7 @@
   export let deselectAllLabel = 'Deselect All';
   export let removeChipLabel = 'Remove Option';
   export let numberOfItemsSelectedLabel = (count: number) =>
-    `${count} options selected`;
+    `${count} option${count > 1 ? 's' : ''} selected`;
 
   let displayValue: string = '';
   let selectedOption: string | T;
@@ -349,7 +350,11 @@
     {#if leadingIcon}
       <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
-    <div class="flex w-full flex-wrap items-center gap-2 py-1">
+    <div
+      class="input-wrapper"
+      class:gap-1={multiselect}
+      class:py-1={multiselect && displayChips}
+    >
       {#if multiselect && isArrayValue(value) && value.length > 0}
         {#if displayChips}
           {#each value.slice(0, chipLimit) as v}
@@ -362,7 +367,7 @@
             <p>+{value.slice(chipLimit).length}</p>
           {/if}
         {:else}
-          <p>{numberOfItemsSelectedLabel(value.length)}</p>
+          <Badge>{numberOfItemsSelectedLabel(value.length)}</Badge>
         {/if}
       {/if}
       <input
@@ -418,7 +423,7 @@
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
     </Button>
     {#if $$slots.action}
-      <div class="ml-1 flex h-full items-center border-l-2 border-subtle p-0.5">
+      <div class="ml-1 flex h-full items-center border-l-2 border-subtle p-1">
         <slot name="action" />
       </div>
     {/if}
@@ -465,7 +470,7 @@
 
 <style lang="postcss">
   .combobox-wrapper {
-    @apply surface-primary flex w-full flex-row items-center gap-2 rounded-lg border-2 border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply surface-primary flex w-full flex-row items-center rounded-lg border-2 border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     &.invalid {
       @apply border-2 border-danger text-danger focus-within:ring-danger/70;
@@ -478,6 +483,10 @@
 
   .error {
     @apply text-xs text-danger;
+  }
+
+  .input-wrapper {
+    @apply ml-2 flex w-full flex-wrap items-center;
   }
 
   .combobox-input {
