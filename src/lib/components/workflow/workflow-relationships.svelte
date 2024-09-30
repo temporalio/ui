@@ -1,13 +1,11 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import { page } from '$app/stores';
 
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    fetchAllChildWorkflows,
     fetchAllRootWorkflows,
-    type RootNode,
   } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
@@ -15,46 +13,52 @@
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
   import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
+  import LiveChildWorkflowsTable from './live-child-workflows-table.svelte';
+  import ParentWorkflowTable from './parent-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
   import WorkflowAtom from './workflow-atom.svelte';
 
-  $: ({ workflow: workflowId, namespace } = $page.params);
+  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: ({ workflow } = $workflowRun);
-
-  let root: RootNode | undefined = undefined;
-  let loading = false;
-
-  onMount(async () => {
-    try {
-      loading = true;
-      root = await fetchAllRootWorkflows(namespace, workflow);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      loading = false;
-    }
-  });
 
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
     $fullEventHistory,
     $namespaces,
   );
-  $: ({ hasRelationships, first, next, previous, scheduleId } =
-    workflowRelationships);
+  $: ({
+    hasChildren,
+    hasRelationships,
+    first,
+    parent,
+    parentNamespaceName,
+    next,
+    previous,
+    scheduleId,
+  } = workflowRelationships);
 </script>
 
-<h2>{translate('workflows.relationships')}</h2>
-{#if loading}
-  <Loading />
-{:else if root?.children?.length}
-  <WorkflowAtom {root} />
-{/if}
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-4 pb-8">
+  <h2>{translate('workflows.relationships')}</h2>
   {#if hasRelationships}
-    <div class="flex w-full flex-wrap gap-4">
+    <div class="flex w-full flex-col justify-center gap-4">
+      {#await fetchAllRootWorkflows(namespace, workflow)}
+        <Loading />
+      {:then root}
+        {#if root && !!root.children.length}
+          <WorkflowAtom {root} />
+        {/if}
+      {/await}
       {#if scheduleId}
         <SchedulerTable {scheduleId} {namespace} />
+      {/if}
+      {#if parent}
+        <ParentWorkflowTable {parent} {parentNamespaceName} {namespace} />
+      {/if}
+      {#if hasChildren}
+        {#await fetchAllChildWorkflows(namespace, workflowId, runId) then children}
+          <LiveChildWorkflowsTable {children} />
+        {/await}
       {/if}
       {#if first || previous || next}
         <FirstPreviousNextWorkflowTable

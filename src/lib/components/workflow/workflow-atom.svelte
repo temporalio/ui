@@ -14,11 +14,11 @@
 
   export let root: RootNode;
 
-  let allActive = false;
   let activeNode: RootNode | undefined;
+  let hoverNode: RootNode | undefined;
+
   let links: { copy: string; href: string }[] = [];
 
-  $: rootActive = allActive;
   $: currentNode =
     root?.workflow?.runId === workflow.runId &&
     root?.workflow?.id === workflow.id;
@@ -43,13 +43,13 @@
   };
 
   const onNodeMouseEnter = (node: RootNode) => {
-    if (!activeNode) {
-      activeNode = node;
-    }
+    if (activeNode) return;
+    hoverNode = node;
   };
 
   const onNodeMouseLeave = (_node: RootNode) => {
-    activeNode = undefined;
+    if (activeNode) return;
+    hoverNode = undefined;
   };
 
   const onNodeClick = (node: RootNode) => {
@@ -134,6 +134,7 @@
         generation={1}
         {zoomLevel}
         {activeNode}
+        {hoverNode}
         {onNodeClick}
         {onNodeMouseEnter}
         {onNodeMouseLeave}
@@ -155,32 +156,11 @@
         />
       {/if}
       <circle
-        class={workflow.status}
+        class={root.workflow.status}
         cx={centerX}
         cy={centerY}
         r={orbits.root}
       />
-      {#if root?.workflow && rootActive}
-        <text
-          x={centerX}
-          y={centerY}
-          text-anchor="middle"
-          dominant-baseline="middle"
-          class="text-sm underline"
-          fill="currentColor"
-        >
-          <a
-            href={routeForEventHistory({
-              namespace,
-              workflow: root?.workflow?.id,
-              run: root?.workflow?.runId,
-            })}
-            class="hover:fill-brand dark:fill-white"
-          >
-            {root?.workflow?.id}
-          </a>
-        </text>
-      {/if}
     </g>
   </ZoomSvg>
 </div>

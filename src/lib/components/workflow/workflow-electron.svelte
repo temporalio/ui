@@ -14,16 +14,24 @@
   export let generation: number;
   export let zoomLevel: number;
   export let activeNode: RootNode | undefined = undefined;
+  export let hoverNode: RootNode | undefined = undefined;
   export let onNodeClick: (node: RootNode) => void;
   export let onNodeMouseEnter: (node: RootNode) => void;
   export let onNodeMouseLeave: (node: RootNode) => void;
 
   $: ({ workflow: id, run: runId } = $page.params);
 
-  $: isSub = activeNode?.rootPaths.every((path) =>
-    node?.rootPaths.includes(path),
-  );
-  $: active = !activeNode || activeNode === node || isSub;
+  const inPathOfNode = (focusNode: RootNode) => {
+    return (
+      focusNode?.rootPaths.every((path) => node?.rootPaths.includes(path)) ||
+      node?.rootPaths.every((path) => focusNode?.rootPaths.includes(path))
+    );
+  };
+
+  $: isActiveNodeInPath = inPathOfNode(hoverNode) || inPathOfNode(activeNode);
+
+  $: active =
+    (!activeNode && !hoverNode) || activeNode === node || isActiveNodeInPath;
 
   $: numberOfSiblings = parent?.children?.length;
   $: orbit = orbits[`level${generation}`];
@@ -76,6 +84,7 @@
       generation={generation + 1}
       {zoomLevel}
       {activeNode}
+      {hoverNode}
       {onNodeClick}
       {onNodeMouseEnter}
       {onNodeMouseLeave}
@@ -87,13 +96,13 @@
   y1={y}
   x2={parentCenter.x}
   y2={parentCenter.y}
-  class="stroke-black dark:stroke-white"
+  class="stroke-black transition-all duration-300 ease-in-out dark:stroke-white"
   stroke-width="2"
   stroke-opacity={active ? 0.35 : 0.05}
   stroke-dasharray={node.workflow.status === 'Running' ? '5' : 'none'}
 />
 <g
-  class="outline-none transition-all"
+  class="outline-none transition-all duration-300 ease-in-out"
   role="button"
   tabindex="0"
   on:keypress={() => onNodeClick(node)}
