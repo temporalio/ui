@@ -134,6 +134,8 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       expect(body.resetReapplyExcludeTypes).toStrictEqual([
         ResetReapplyExcludeType.RESET_REAPPLY_EXCLUDE_TYPE_UNSPECIFIED,
       ]);
+
+      expect(body.resetReapplyType).toBe(3);
     });
 
     test('Allows excluding Signals after the reset point', async ({ page }) => {
@@ -160,6 +162,8 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       expect(body.resetReapplyExcludeTypes).toStrictEqual([
         ResetReapplyExcludeType.RESET_REAPPLY_EXCLUDE_TYPE_SIGNAL,
       ]);
+
+      expect(body.resetReapplyType).toBe(3);
     });
 
     test('Allows excluding Updates after the reset point', async ({ page }) => {
@@ -186,6 +190,8 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       expect(body.resetReapplyExcludeTypes).toStrictEqual([
         ResetReapplyExcludeType.RESET_REAPPLY_EXCLUDE_TYPE_UPDATE,
       ]);
+
+      expect(body.resetReapplyType).toBe(3);
     });
   });
 });

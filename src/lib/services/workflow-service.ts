@@ -413,6 +413,7 @@ export async function resetWorkflow({
     }
 
     body.resetReapplyExcludeTypes = resetReapplyExcludeTypes;
+    body.resetReapplyType = ResetReapplyType.RESET_REAPPLY_TYPE_ALL_ELIGIBLE;
   } else {
     let resetReapplyType: ResetWorkflowRequest['resetReapplyType'];
 
