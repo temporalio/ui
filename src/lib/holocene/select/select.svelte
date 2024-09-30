@@ -44,6 +44,7 @@
     leadingIcon?: IconName;
     onChange?: (value: T) => void;
     'data-testid'?: string;
+    menuClass?: string;
     variant?: MenuButtonVariant;
     required?: boolean;
   };
@@ -56,6 +57,7 @@
   export let disabled = false;
   export let leadingIcon: IconName = null;
   export let onChange: (value: T) => void = noop;
+  export let menuClass: string | undefined = undefined;
   export let variant: MenuButtonVariant = 'secondary';
   export let required = false;
 
@@ -131,7 +133,7 @@
       {/if}
     </MenuButton>
   {/key}
-  <Menu role="listbox" id="{id}-select">
+  <Menu role="listbox" id="{id}-select" class={menuClass}>
     <slot />
   </Menu>
 </MenuContainer>

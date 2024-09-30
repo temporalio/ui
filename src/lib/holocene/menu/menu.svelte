@@ -44,7 +44,7 @@
 <ul
   in:fly={{ duration: 100 }}
   role="menu"
-  class={merge(['menu', 'max-h-[320px]'], position, className)}
+  class={merge('menu', 'max-h-[20rem]', position, className)}
   class:hidden={!$open}
   aria-labelledby={id}
   tabindex={-1}
