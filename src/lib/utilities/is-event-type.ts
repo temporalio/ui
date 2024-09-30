@@ -270,7 +270,6 @@ export const isPureWorkflowTaskFailedEvent =
   hasAttributes<WorkflowTaskFailedEvent>('workflowTaskFailedEventAttributes');
 
 export const isWorkflowTaskFailedEvent = (event: WorkflowEvent) => {
-  console.log(event);
   return (
     isPureWorkflowTaskFailedEvent(event) &&
     event.workflowTaskFailedEventAttributes?.failure?.message !==
