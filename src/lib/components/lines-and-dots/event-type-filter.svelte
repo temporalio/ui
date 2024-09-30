@@ -120,6 +120,7 @@
         on:click={() => {
           onOptionClick(option);
         }}
+        class="items-start"
       >
         <Checkbox
           on:click={() => onOptionClick(option)}

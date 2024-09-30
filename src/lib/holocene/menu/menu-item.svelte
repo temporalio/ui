@@ -108,7 +108,12 @@
   <a
     {href}
     role="menuitem"
-    class={merge('menu-item', 'm-1', 'px-3', 'py-2', className)}
+    class={merge(
+      'menu-item',
+      'm-1 px-3 py-2',
+      'flex items-center gap-2',
+      className,
+    )}
     class:disabled
     class:hoverable
     class:justify-center={centered}
@@ -123,7 +128,12 @@
 {:else}
   <li
     role="menuitem"
-    class={merge('menu-item', 'm-1', 'px-3', 'py-2', className)}
+    class={merge(
+      'menu-item',
+      'm-1 px-3 py-2',
+      'flex items-center gap-2',
+      className,
+    )}
     class:destructive
     class:disabled
     class:selected
@@ -154,7 +164,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply flex cursor-pointer flex-row items-center gap-2 rounded border border-transparent text-sm font-medium focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+    @apply cursor-pointer rounded border border-transparent text-sm font-medium focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
 
     &.hoverable {
       @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary;
