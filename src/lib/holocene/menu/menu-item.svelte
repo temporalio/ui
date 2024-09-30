@@ -111,6 +111,7 @@
     class={merge('menu-item', 'm-1', 'px-3', 'py-2', className)}
     class:disabled
     class:hoverable
+    class:justify-center={centered}
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -136,21 +137,17 @@
     <slot name="leading" />
     <div class:centered class="menu-item-wrapper">
       {#if description}
-        <div class="flex flex-col">
+        <div class="flex flex-col" class:items-center={centered}>
           <slot />
-          <span class="menu-item-description">
+          <span class="menu-item-description" class:text-center={centered}>
             {description}
           </span>
         </div>
       {:else}
         <slot />
       {/if}
-      {#if selected !== undefined}
-        <div class="flex h-6 w-6 shrink-0">
-          {#if selected}
-            <Icon name="checkmark" />
-          {/if}
-        </div>
+      {#if selected}
+        <Icon name="checkmark" class="shrink-0" />
       {/if}
     </div>
     <slot name="trailing" />
