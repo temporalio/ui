@@ -5,15 +5,12 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import type {
-    PendingWorkflowTaskInfo,
-    WorkflowTaskFailedEventAttributes,
-  } from '$lib/types';
+  import type { PendingWorkflowTaskInfo } from '$lib/types';
   import type { WorkflowTaskFailedEvent } from '$lib/types/events';
   import type { WorkflowTaskFailedCause } from '$lib/types/workflows';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
-  import { toWorkflowTaskFailureReadable } from '$lib/utilities/screaming-enums';
+  import { getErrorCause } from '$lib/utilities/get-workflow-task-failed-event';
 
   import { CategoryIcon } from './constants';
 
@@ -25,30 +22,12 @@
 
   let cause: WorkflowTaskFailedCause;
 
-  function getErrorCause(
-    error: WorkflowTaskFailedEvent,
-  ): WorkflowTaskFailedCause {
-    const {
-      workflowTaskFailedEventAttributes: { failure, cause },
-    } = error as WorkflowTaskFailedEvent & {
-      workflowTaskFailedEventAttributes: WorkflowTaskFailedEventAttributes;
-    };
-
-    if (
-      failure?.applicationFailureInfo?.type === 'workflowTaskHeartbeatError'
-    ) {
-      return 'WorkflowTaskHeartbeatError';
-    }
-
-    return toWorkflowTaskFailureReadable(cause);
-  }
-
   $: {
     cause = getErrorCause(error);
   }
 </script>
 
-{#if cause}
+{#if cause && cause !== 'ResetWorkflow'}
   <Alert
     icon="warning"
     intent="warning"
