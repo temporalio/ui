@@ -85,10 +85,10 @@ describe('eventIsFailureOrTimedOut', () => {
     expect(eventIsFailureOrTimedOut(event)).toBe(false);
   });
 
-  it('should return false if provided an event with workflowTaskFailedEventAttributes and has ResetWorkflow message', () => {
+  it('should return false if provided an event with workflowTaskFailedEventAttributes and has resetWorkflowFailureInfo', () => {
     const event = {
       workflowTaskFailedEventAttributes: {
-        failure: { message: 'ResetWorkflow' },
+        failure: { resetWorkflowFailureInfo: {} },
       },
     } as unknown as WorkflowEvent;
     expect(eventIsFailureOrTimedOut(event)).toBe(false);
