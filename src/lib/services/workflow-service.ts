@@ -552,6 +552,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
 export interface RootNode {
   workflow: WorkflowExecution;
   children: RootNode[];
+  rootPaths: { runId: string; workflowId: string }[];
 }
 
 const buildRoots = (
@@ -561,6 +562,7 @@ const buildRoots = (
   const rootMap: RootNode = {
     workflow: root,
     children: [],
+    rootPaths: [{ runId: root.runId, workflowId: root.id }],
   };
 
   const getOrCreateNodes = (node: RootNode, children: WorkflowExecution[]) => {
@@ -568,6 +570,7 @@ const buildRoots = (
       node.children = children.map((wf) => ({
         workflow: wf,
         children: [],
+        rootPaths: [...node.rootPaths, { runId: wf.runId, workflowId: wf.id }],
       }));
       node.children.forEach((child) => {
         const nodeChildren = workflows.filter(

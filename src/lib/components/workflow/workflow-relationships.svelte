@@ -3,6 +3,7 @@
 
   import { page } from '$app/stores';
 
+  import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchAllRootWorkflows } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
@@ -18,12 +19,16 @@
   $: ({ workflow } = $workflowRun);
 
   let root: RootNode = { children: [], workflow };
+  let loading = false;
 
   onMount(async () => {
     try {
+      loading = true;
       root = await fetchAllRootWorkflows(namespace, workflow);
     } catch (error) {
       console.error(error);
+    } finally {
+      loading = false;
     }
   });
 
@@ -37,7 +42,9 @@
 </script>
 
 <h2>{translate('workflows.relationships')}</h2>
-{#if root?.children?.length}
+{#if loading}
+  <Loading />
+{:else if root?.children?.length}
   <WorkflowAtom {root} />
 {/if}
 <div class="flex flex-col gap-4">

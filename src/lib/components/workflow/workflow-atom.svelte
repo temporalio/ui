@@ -1,18 +1,9 @@
-<script context="module" lang="ts">
-  import type { WorkflowExecution } from '$lib/types/workflows';
-
-  export type RootNode = {
-    children: RootNode[];
-    workflow: WorkflowExecution;
-  };
-</script>
-
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import Button from '$lib/holocene/button.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import Breadcrumbs from '$lib/holocene/breadcrumbs.svelte';
   import ZoomSvg from '$lib/holocene/zoom-svg.svelte';
+  import type { RootNode } from '$lib/services/workflow-service';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
@@ -24,6 +15,8 @@
   export let root: RootNode;
 
   let allActive = false;
+  let links: { copy: string; href: string }[] = [];
+
   $: rootActive = allActive;
   $: currentNode =
     root?.workflow?.runId === workflow.runId &&
@@ -47,8 +40,24 @@
       radius,
     };
   };
+
+  const onNodeClick = (node: RootNode) => {
+    links = node.rootPaths.map((path) => {
+      return {
+        copy: node.workflow.id,
+        href: routeForEventHistory({
+          namespace,
+          workflow: path.workflowId,
+          run: path.runId,
+        }),
+      };
+    });
+  };
 </script>
 
+{#if links.length}
+  <Breadcrumbs {links} />
+{/if}
 <div class="w-full rounded-xl border-2 border-subtle bg-primary">
   <ZoomSvg
     initialZoom={0.65}
@@ -64,18 +73,6 @@
       height,
       zoomLevel,
     )}
-    <svelte:fragment slot="controls">
-      <Tooltip text={allActive ? 'Hide All' : 'Show All'} left>
-        <Button
-          variant="secondary"
-          size="sm"
-          leadingIcon={allActive ? 'eye-hide' : 'eye-show'}
-          on:click={() => {
-            allActive = !allActive;
-          }}
-        />
-      </Tooltip>
-    </svelte:fragment>
     <circle
       class="stroke-black dark:stroke-white"
       cx={centerX}
@@ -120,14 +117,15 @@
         generation={1}
         {zoomLevel}
         {allActive}
+        {onNodeClick}
       />
     {/each}
     <g
       class="outline-none"
       role="button"
       tabindex="0"
-      on:keypress={() => (rootActive = !rootActive)}
-      on:click={() => (rootActive = !rootActive)}
+      on:keypress={() => onNodeClick(root)}
+      on:click={() => onNodeClick(root)}
     >
       {#if currentNode}
         <circle

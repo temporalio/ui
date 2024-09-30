@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import type { RootNode } from '$lib/services/workflow-service';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
-  import type { RootNode } from './workflow-atom.svelte';
   export let index: number;
   export let center: { x: number; y: number };
   export let node: RootNode;
@@ -15,8 +15,10 @@
   export let generation: number;
   export let zoomLevel: number;
   export let allActive = false;
+  export let onNodeClick: (node: RootNode) => void;
 
   $: ({ namespace, workflow: id, run: runId } = $page.params);
+
   $: numberOfSiblings = parent?.children?.length;
   $: orbit = orbits[`level${generation}`];
   $: ({ x, y, angle } = getPosition({
@@ -54,10 +56,6 @@
     const y = center.y + orbit * Math.sin(angle);
     return { x, y, angle };
   };
-
-  const onNodeClick = () => {
-    active = !active;
-  };
 </script>
 
 {#if generation + 1 < 5}
@@ -74,6 +72,7 @@
       generation={generation + 1}
       {zoomLevel}
       {allActive}
+      {onNodeClick}
     />
   {/each}
 {/if}
@@ -91,8 +90,8 @@
   class="outline-none"
   role="button"
   tabindex="0"
-  on:keypress={onNodeClick}
-  on:click={onNodeClick}
+  on:keypress={() => onNodeClick(node)}
+  on:click={() => onNodeClick(node)}
 >
   {#if currentNode}
     <circle class="dark:fill-white" cx={x} cy={y} r={radius * 1.5} />
