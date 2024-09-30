@@ -141,6 +141,24 @@ const keysWithExecutionLinks = [
   'originalExecutionRunId',
 ] as const;
 
+export type EventLinkType =
+  | 'execution'
+  | 'task-queue'
+  | 'child-workflow'
+  | 'nexus-endpoint'
+  | 'none';
+
+export const displayLinkType = (
+  key: string,
+  attributes: CombinedAttributes,
+): EventLinkType => {
+  if (shouldDisplayAsExecutionLink(key)) return 'execution';
+  if (shouldDisplayAsTaskQueueLink(key)) return 'task-queue';
+  if (shouldDisplayChildWorkflowLink(key, attributes)) return 'child-workflow';
+  if (shouldDisplayNexusEndpointLink(key)) return 'nexus-endpoint';
+  return 'none';
+};
+
 // For linking to same workflow but different execution
 export const shouldDisplayAsExecutionLink = (
   key: string,
@@ -180,6 +198,16 @@ export const shouldDisplayChildWorkflowLink = (
   );
   for (const workflowKey of keysWithChildExecutionLinks) {
     if (key === workflowKey && workflowLinkAttributesExist) return true;
+  }
+
+  return false;
+};
+
+const keysWithNexusEndpointLinks = ['endpointId'] as const;
+
+export const shouldDisplayNexusEndpointLink = (key: string): boolean => {
+  for (const taskQueueKey of keysWithNexusEndpointLinks) {
+    if (key === taskQueueKey) return true;
   }
 
   return false;
@@ -225,6 +253,7 @@ const preferredSummaryKeys = [
   'historySizeBytes',
   'identity',
   'parentInitiatedEventId',
+  'endpointId',
 ] as const;
 
 /**

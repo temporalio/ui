@@ -1,23 +1,11 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import Badge from '$lib/holocene/badge.svelte';
-  import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Link from '$lib/holocene/link.svelte';
-  import { translate } from '$lib/i18n/translate';
   import type { Payloads } from '$lib/types';
   import { format } from '$lib/utilities/format-camel-case';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
-  import {
-    shouldDisplayAsExecutionLink,
-    shouldDisplayAsTaskQueueLink,
-    shouldDisplayChildWorkflowLink,
-  } from '$lib/utilities/get-single-attribute-for-event';
-  import {
-    routeForEventHistory,
-    routeForTaskQueue,
-  } from '$lib/utilities/route-for';
+  import { displayLinkType } from '$lib/utilities/get-single-attribute-for-event';
 
+  import EventDetailsLink from './event-details-link.svelte';
   import PayloadDecoder from './payload-decoder.svelte';
 
   export let key: string;
@@ -25,7 +13,7 @@
   export let attributes: CombinedAttributes;
   export let showKey = true;
 
-  const { workflow, namespace } = $page.params;
+  $: linkType = displayLinkType(key, attributes);
 </script>
 
 {#if key}
@@ -47,71 +35,10 @@
           </div>
         </PayloadDecoder>
       </div>
-    {:else if shouldDisplayAsExecutionLink(key)}
+    {:else if linkType !== 'none'}
       <div class="flex w-full items-center gap-2 pr-1">
         <div class="truncate text-sm">
-          <Copyable
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={value}
-            container-class="xl:flex-row"
-          >
-            <Badge type="subtle" class="select-none">
-              <Link
-                class="truncate"
-                href={routeForEventHistory({
-                  namespace,
-                  workflow,
-                  run: value,
-                })}
-              >
-                {value}
-              </Link>
-            </Badge>
-          </Copyable>
-        </div>
-      </div>
-    {:else if shouldDisplayChildWorkflowLink(key, attributes)}
-      <div class="flex w-full items-center gap-2 pr-1">
-        <div class="truncate text-sm">
-          <Copyable
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={value}
-            container-class="xl:flex-row"
-          >
-            <Badge type="subtle" class="select-none">
-              <Link
-                class="truncate"
-                href={routeForEventHistory({
-                  namespace,
-                  workflow: attributes.workflowExecutionWorkflowId,
-                  run: attributes.workflowExecutionRunId,
-                })}
-              >
-                {value}
-              </Link>
-            </Badge>
-          </Copyable>
-        </div>
-      </div>
-    {:else if shouldDisplayAsTaskQueueLink(key)}
-      <div class="flex w-full items-center gap-2 pr-1">
-        <div class="truncate text-sm">
-          <Copyable
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={value}
-          >
-            <Badge type="subtle" class="select-none">
-              <Link
-                class="truncate"
-                href={routeForTaskQueue({ namespace, queue: value })}
-              >
-                {value}
-              </Link>
-            </Badge>
-          </Copyable>
+          <EventDetailsLink {value} {attributes} type={linkType} />
         </div>
       </div>
     {:else}

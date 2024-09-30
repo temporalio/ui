@@ -1,27 +1,19 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { timeFormat } from '$lib/stores/time-format';
   import { format } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
+    displayLinkType,
     getCodeBlockValue,
     getStackTrace,
-    shouldDisplayAsExecutionLink,
-    shouldDisplayAsTaskQueueLink,
     shouldDisplayAsTime,
-    shouldDisplayChildWorkflowLink,
   } from '$lib/utilities/get-single-attribute-for-event';
-  import {
-    routeForEventHistory,
-    routeForTaskQueue,
-  } from '$lib/utilities/route-for';
 
+  import EventDetailsLink from './event-details-link.svelte';
   import PayloadDecoder from './payload-decoder.svelte';
 
   export let key: string;
@@ -29,9 +21,9 @@
   export let attributes: CombinedAttributes;
   export let inline = false;
 
-  const { workflow, namespace } = $page.params;
   $: codeBlockValue = getCodeBlockValue(value);
   $: stackTrace = getStackTrace(codeBlockValue);
+  $: linkType = displayLinkType(key, attributes);
 </script>
 
 <div class="flex {$$props.class}">
@@ -88,44 +80,10 @@
         </div>
       {/if}
     </div>
-  {:else if shouldDisplayAsExecutionLink(key)}
+  {:else if linkType !== 'none'}
     <div class="content detail-row">
       <p class="text-sm">{format(key)}</p>
-      <Badge type="subtle">
-        <Link
-          href={routeForEventHistory({
-            namespace,
-            workflow,
-            run: value.toString(),
-          })}
-        >
-          {value}
-        </Link>
-      </Badge>
-    </div>
-  {:else if shouldDisplayChildWorkflowLink(key, attributes)}
-    <div class="content detail-row">
-      <p class="text-sm">{format(key)}</p>
-      <Badge type="subtle">
-        <Link
-          href={routeForEventHistory({
-            namespace: attributes?.namespace || namespace,
-            workflow: attributes.workflowExecutionWorkflowId,
-            run: attributes.workflowExecutionRunId,
-          })}
-        >
-          {value}
-        </Link>
-      </Badge>
-    </div>
-  {:else if shouldDisplayAsTaskQueueLink(key)}
-    <div class="content detail-row">
-      <p class="text-sm">{format(key)}</p>
-      <Badge type="subtle">
-        <Link href={routeForTaskQueue({ namespace, queue: value.toString() })}>
-          {value}
-        </Link>
-      </Badge>
+      <EventDetailsLink value={String(value)} {attributes} type={linkType} />
     </div>
   {:else}
     <div class="content detail-row">
