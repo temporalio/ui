@@ -135,19 +135,17 @@
     {...$$restProps}
   >
     <slot name="leading" />
-    <div class:centered class="menu-item-wrapper">
-      {#if description}
-        <div class="flex flex-col" class:items-center={centered}>
-          <slot />
-          <span class="menu-item-description" class:text-center={centered}>
-            {description}
-          </span>
-        </div>
-      {:else}
+    <div class="grow">
+      <div class:centered class="menu-item-wrapper">
         <slot />
-      {/if}
-      {#if selected}
-        <Icon name="checkmark" class="shrink-0" />
+        {#if selected}
+          <Icon name="checkmark" class="shrink-0" />
+        {/if}
+      </div>
+      {#if description}
+        <div class="menu-item-description" class:text-center={centered}>
+          {description}
+        </div>
       {/if}
     </div>
     <slot name="trailing" />
@@ -176,7 +174,7 @@
   }
 
   .menu-item-wrapper {
-    @apply flex grow items-center justify-between gap-2;
+    @apply flex items-center justify-between gap-2;
 
     &.centered {
       @apply justify-center;
@@ -184,6 +182,6 @@
   }
 
   .menu-item-description {
-    @apply text-xs font-normal text-subtle;
+    @apply mr-6 text-xs font-normal text-subtle;
   }
 </style>
