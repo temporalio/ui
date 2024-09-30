@@ -15,6 +15,7 @@
   export let root: RootNode;
 
   let allActive = false;
+  let activeNode: RootNode | undefined;
   let links: { copy: string; href: string }[] = [];
 
   $: rootActive = allActive;
@@ -41,17 +42,33 @@
     };
   };
 
+  const onNodeMouseEnter = (node: RootNode) => {
+    if (!activeNode) {
+      activeNode = node;
+    }
+  };
+
+  const onNodeMouseLeave = (_node: RootNode) => {
+    activeNode = undefined;
+  };
+
   const onNodeClick = (node: RootNode) => {
-    links = node.rootPaths.map((path) => {
-      return {
-        copy: node.workflow.id,
-        href: routeForEventHistory({
-          namespace,
-          workflow: path.workflowId,
-          run: path.runId,
-        }),
-      };
-    });
+    if (activeNode === node) {
+      activeNode = undefined;
+      links = [];
+    } else {
+      activeNode = node;
+      links = node.rootPaths.map((path) => {
+        return {
+          copy: node.workflow.id,
+          href: routeForEventHistory({
+            namespace,
+            workflow: path.workflowId,
+            run: path.runId,
+          }),
+        };
+      });
+    }
   };
 </script>
 
@@ -116,8 +133,10 @@
         {orbits}
         generation={1}
         {zoomLevel}
-        {allActive}
+        {activeNode}
         {onNodeClick}
+        {onNodeMouseEnter}
+        {onNodeMouseLeave}
       />
     {/each}
     <g

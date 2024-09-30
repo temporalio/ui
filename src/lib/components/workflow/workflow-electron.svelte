@@ -2,7 +2,6 @@
   import { page } from '$app/stores';
 
   import type { RootNode } from '$lib/services/workflow-service';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   export let index: number;
   export let center: { x: number; y: number };
@@ -14,10 +13,17 @@
   export let orbits: { [key: string]: number };
   export let generation: number;
   export let zoomLevel: number;
-  export let allActive = false;
+  export let activeNode: RootNode | undefined = undefined;
   export let onNodeClick: (node: RootNode) => void;
+  export let onNodeMouseEnter: (node: RootNode) => void;
+  export let onNodeMouseLeave: (node: RootNode) => void;
 
-  $: ({ namespace, workflow: id, run: runId } = $page.params);
+  $: ({ workflow: id, run: runId } = $page.params);
+
+  $: isSub = activeNode?.rootPaths.every((path) =>
+    node?.rootPaths.includes(path),
+  );
+  $: active = !activeNode || activeNode === node || isSub;
 
   $: numberOfSiblings = parent?.children?.length;
   $: orbit = orbits[`level${generation}`];
@@ -28,8 +34,6 @@
     center,
   }));
   $: currentNode = node.workflow.runId === runId && node.workflow.id === id;
-
-  $: active = allActive;
 
   const getPosition = ({
     index,
@@ -71,8 +75,10 @@
       {orbits}
       generation={generation + 1}
       {zoomLevel}
-      {allActive}
+      {activeNode}
       {onNodeClick}
+      {onNodeMouseEnter}
+      {onNodeMouseLeave}
     />
   {/each}
 {/if}
@@ -83,15 +89,18 @@
   y2={parentCenter.y}
   class="stroke-black dark:stroke-white"
   stroke-width="2"
-  opacity="0.35"
+  stroke-opacity={active ? 0.35 : 0.05}
   stroke-dasharray={node.workflow.status === 'Running' ? '5' : 'none'}
 />
 <g
-  class="outline-none"
+  class="outline-none transition-all"
   role="button"
   tabindex="0"
   on:keypress={() => onNodeClick(node)}
   on:click={() => onNodeClick(node)}
+  on:mouseenter={() => onNodeMouseEnter(node)}
+  on:mouseleave={() => onNodeMouseLeave(node)}
+  fill-opacity={active ? 1 : 0.05}
 >
   {#if currentNode}
     <circle class="dark:fill-white" cx={x} cy={y} r={radius * 1.5} />
@@ -103,29 +112,6 @@
     r={radius}
   />
 </g>
-
-{#if active}
-  <text
-    x={x < center.x ? x - 1.25 * radius : x + 1.25 * radius}
-    y={y + radius / 3}
-    text-anchor={x < center.x ? 'end' : 'start'}
-    dominant-baseline="start"
-    font-size="14px"
-    class="text-sm underline"
-    fill="currentColor"
-  >
-    <a
-      href={routeForEventHistory({
-        namespace,
-        workflow: node.workflow.id,
-        run: node.workflow.runId,
-      })}
-      class="hover:fill-brand dark:fill-white"
-    >
-      {node.workflow.id}
-    </a>
-  </text>
-{/if}
 
 <style lang="postcss">
   .Running {

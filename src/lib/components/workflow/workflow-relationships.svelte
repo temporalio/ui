@@ -5,7 +5,10 @@
 
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fetchAllRootWorkflows } from '$lib/services/workflow-service';
+  import {
+    fetchAllRootWorkflows,
+    type RootNode,
+  } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -13,12 +16,12 @@
 
   import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
-  import WorkflowAtom, { type RootNode } from './workflow-atom.svelte';
+  import WorkflowAtom from './workflow-atom.svelte';
 
   $: ({ workflow: workflowId, namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
 
-  let root: RootNode = { children: [], workflow };
+  let root: RootNode | undefined = undefined;
   let loading = false;
 
   onMount(async () => {
