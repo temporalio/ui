@@ -37,7 +37,7 @@
   }
 </script>
 
-{#if cause}
+{#if cause && cause !== 'ResetWorkflow'}
   <Alert
     icon="warning"
     intent="warning"

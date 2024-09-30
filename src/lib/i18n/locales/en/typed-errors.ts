@@ -108,11 +108,6 @@ export const Strings = {
     description:
       'The payload has exceeded the available input size on a Signal.',
   },
-  ResetWorkflow: {
-    title: 'Reset Workflow',
-    description:
-      'The system failed this Workflow Task. If a reset for this Workflow was requested check the progress on the new Workflow, otherwise reset this Workflow.',
-  },
   BadBinary: {
     title: 'Bad Binary',
     description:

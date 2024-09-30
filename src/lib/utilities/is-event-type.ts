@@ -272,8 +272,9 @@ export const isPureWorkflowTaskFailedEvent =
 export const isWorkflowTaskFailedEvent = (event: WorkflowEvent) => {
   return (
     isPureWorkflowTaskFailedEvent(event) &&
-    event.workflowTaskFailedEventAttributes?.failure?.message !==
-      'UnhandledCommand'
+    ['UnhandledCommand', 'ResetWorkflow'].includes(
+      event.workflowTaskFailedEventAttributes?.failure?.message,
+    )
   );
 };
 
