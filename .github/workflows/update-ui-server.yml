@@ -23,11 +23,9 @@ jobs:
           app_id: ${{ secrets.TEMPORAL_CICD_APP_ID }}
           private_key: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
 
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
-          go-version-file: server/go.mod
-          cache: true
-          cache-dependency-path: server/go.sum
+          go-version: '1.23'
       - name: Setup Protoc
         uses: arduino/setup-protoc@v1
         with:
