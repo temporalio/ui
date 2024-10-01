@@ -19,19 +19,24 @@
 
   $: ({ workflow, namespace } = $page.params);
 
-  $: hrefs = {
-    execution: routeForEventHistory({
-      namespace,
-      workflow,
-      run: value,
-    }),
-    'task-queue': routeForTaskQueue({ namespace, queue: value }),
-    'child-workflow': routeForEventHistory({
-      namespace,
-      workflow: attributes.workflowExecutionWorkflowId,
-      run: attributes.workflowExecutionRunId,
-    }),
-    'nexus-endpoint': routeForNexusEndpoint(value),
+  $: executionLink = routeForEventHistory({
+    namespace,
+    workflow,
+    run: value,
+  });
+  $: taskQueueLink = routeForTaskQueue({ namespace, queue: value });
+  $: childWorkflowLink = routeForEventHistory({
+    namespace,
+    workflow: attributes.workflowExecutionWorkflowId,
+    run: attributes.workflowExecutionRunId,
+  });
+  $: nexusEndpointLink = routeForNexusEndpoint(value);
+
+  const hrefs: Record<Exclude<EventLinkType, 'none'>, string> = {
+    execution: executionLink,
+    'task-queue': taskQueueLink,
+    'child-workflow': childWorkflowLink,
+    'nexus-endpoint': nexusEndpointLink,
   };
 
   $: href = hrefs[type];
