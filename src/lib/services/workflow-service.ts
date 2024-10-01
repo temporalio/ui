@@ -596,11 +596,10 @@ const buildRoots = (
 
 export async function fetchAllRootWorkflows(
   namespace: string,
-  workflow: WorkflowExecution,
+  rootWorkflowId: string,
+  rootRunId?: string,
 ): Promise<RootNode | undefined> {
   try {
-    const rootWorkflowId = workflow.rootExecution.workflowId;
-    const rootRunId = workflow.rootExecution.runId;
     let query = `RootWorkflowId = "${rootWorkflowId}"`;
     if (rootRunId) {
       query += ` AND RootRunId = "${rootRunId}"`;

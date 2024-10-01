@@ -21,6 +21,9 @@
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: ({ workflow } = $workflowRun);
 
+  $: rootWorkflowId = workflow.rootExecution.workflowId;
+  $: rootRunId = workflow.rootExecution.runId;
+
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
     $fullEventHistory,
@@ -42,7 +45,7 @@
   <h2>{translate('workflows.relationships')}</h2>
   {#if hasRelationships}
     <div class="flex w-full flex-col justify-center gap-4">
-      {#await fetchAllRootWorkflows(namespace, workflow)}
+      {#await fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId)}
         <Loading />
       {:then root}
         {#if root && !!root.children.length}
