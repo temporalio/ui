@@ -32,12 +32,12 @@
   });
   $: nexusEndpointLink = routeForNexusEndpoint(value);
 
-  const hrefs: Record<Exclude<EventLinkType, 'none'>, string> = {
+  $: hrefs = {
     execution: executionLink,
     'task-queue': taskQueueLink,
     'child-workflow': childWorkflowLink,
     'nexus-endpoint': nexusEndpointLink,
-  };
+  } as Record<Exclude<EventLinkType, 'none'>, string>;
 
   $: href = hrefs[type];
 </script>
