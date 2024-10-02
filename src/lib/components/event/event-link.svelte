@@ -5,18 +5,14 @@
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
   export let link: EventLink;
+  export let label = 'Link';
   export let xs = false;
 
-  $: initialEventLink =
-    link.workflowEvent.eventRef?.eventType ===
-    'EVENT_TYPE_WORKFLOW_EXECUTION_STARTED';
-  $: eventId =
-    link.workflowEvent.eventRef?.eventId || (initialEventLink && '1');
   $: href = routeForEventHistory({
     namespace: link.workflowEvent.namespace,
     workflow: link.workflowEvent.workflowId,
     run: link.workflowEvent.runId,
-    eventId,
+    eventId: link.workflowEvent.eventRef?.eventId,
   });
 </script>
 
@@ -24,7 +20,7 @@
   class="flex max-w-lg flex-row items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 xl:max-w-xl {$$props.class}"
 >
   <p class="max-w-fit whitespace-nowrap text-right text-sm" class:text-xs={xs}>
-    Link
+    {label}
   </p>
   <div class="overflow-hidden truncate pr-1">
     <Badge type="subtle">
