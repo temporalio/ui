@@ -17,7 +17,7 @@ import {
 
 export const getEventGroupName = (
   event: CommonHistoryEvent,
-  initialEvent: CommonHistoryEvent,
+  initialEvent?: CommonHistoryEvent,
 ): string => {
   if (!event) return '';
 
@@ -55,7 +55,6 @@ export const getEventGroupName = (
 
   if (isWorkflowExecutionUpdateAcceptedEvent(event)) {
     if (isWorkflowExecutionUpdateAdmittedEvent(initialEvent)) {
-      // console.log('hello', event, initialEvent);
       return initialEvent.workflowExecutionUpdateAdmittedEventAttributes
         ?.request?.input?.name;
     } else {
