@@ -147,6 +147,6 @@
   }
 
   .detail-row {
-    @apply flex w-full items-center gap-4 py-1 text-left xl:flex;
+    @apply flex w-full items-center gap-2 py-1 text-left xl:flex;
   }
 </style>
