@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { translate } from '$lib/i18n/translate';
   import type { EventLink as ELink } from '$lib/types/events';
+  import { routeForNamespace } from '$lib/utilities/route-for';
 
   import EventLink from './event-link.svelte';
 
@@ -13,12 +15,15 @@
     >
       <EventLink {link} />
     </div>
-  {/if}
-  <!-- {#if link?.workflowEvent}
     <div
       class="block flex w-full items-center gap-4 px-2 py-1 py-1 text-left text-left xl:flex"
     >
-      Link Namespace
+      <EventLink
+        {link}
+        label={translate('common.link-namespace')}
+        value={link.workflowEvent.namespace}
+        href={routeForNamespace({ namespace: link.workflowEvent.namespace })}
+      />
     </div>
-  {/if} -->
+  {/if}
 {/each}

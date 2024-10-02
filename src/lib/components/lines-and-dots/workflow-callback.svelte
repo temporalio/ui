@@ -7,6 +7,7 @@
   import { timeFormat } from '$lib/stores/time-format';
   import type { CallbackInfo } from '$lib/types';
   import { formatDate } from '$lib/utilities/format-date';
+  import { routeForNamespace } from '$lib/utilities/route-for';
 
   import EventLink from '../event/event-link.svelte';
 
@@ -34,13 +35,13 @@
   <div class="flex flex-col gap-2 pt-2">
     {#if link}
       <EventLink {link} />
+      <EventLink
+        {link}
+        label={translate('common.link-namespace')}
+        value={link.workflowEvent.namespace}
+        href={routeForNamespace({ namespace: link.workflowEvent.namespace })}
+      />
     {/if}
-    <p class="flex items-center gap-2">
-      {translate('common.url')}
-      <Badge type="subtle">
-        {callback.callback.nexus.url}
-      </Badge>
-    </p>
     <div class="flex flex-col items-start gap-2 md:flex-row md:items-center">
       <p class="flex items-center gap-2">
         {translate('common.state')}
