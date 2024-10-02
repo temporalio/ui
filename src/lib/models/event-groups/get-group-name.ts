@@ -12,9 +12,13 @@ import {
   isTimerStartedEvent,
   isWorkflowExecutionSignaledEvent,
   isWorkflowExecutionUpdateAcceptedEvent,
+  isWorkflowExecutionUpdateAdmittedEvent,
 } from '$lib/utilities/is-event-type';
 
-export const getEventGroupName = (event: CommonHistoryEvent): string => {
+export const getEventGroupName = (
+  event: CommonHistoryEvent,
+  initialEvent: CommonHistoryEvent,
+): string => {
   if (!event) return '';
 
   if (isActivityTaskScheduledEvent(event)) {
@@ -50,8 +54,14 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   }
 
   if (isWorkflowExecutionUpdateAcceptedEvent(event)) {
-    return event.workflowExecutionUpdateAcceptedEventAttributes?.acceptedRequest
-      ?.input?.name;
+    if (isWorkflowExecutionUpdateAdmittedEvent(initialEvent)) {
+      // console.log('hello', event, initialEvent);
+      return initialEvent.workflowExecutionUpdateAdmittedEventAttributes
+        ?.request?.input?.name;
+    } else {
+      return event.workflowExecutionUpdateAcceptedEventAttributes
+        ?.acceptedRequest?.input?.name;
+    }
   }
 
   if (isNexusOperationScheduledEvent(event)) {
@@ -102,12 +112,15 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
   }
 };
 
-export const getEventGroupDisplayName = (event: CommonHistoryEvent): string => {
+export const getEventGroupDisplayName = (
+  event: CommonHistoryEvent,
+  initialEvent: CommonHistoryEvent,
+): string => {
   if (!event) return '';
 
   if (isLocalActivityMarkerEvent(event)) {
     return getSummaryAttribute(event)?.value?.toString() ?? 'Local Activity';
   }
 
-  return getEventGroupName(event);
+  return getEventGroupName(event, initialEvent);
 };
