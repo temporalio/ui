@@ -113,7 +113,7 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
 
 export const getEventGroupDisplayName = (
   event: CommonHistoryEvent,
-  initialEvent: CommonHistoryEvent,
+  initialEvent?: CommonHistoryEvent,
 ): string => {
   if (!event) return '';
 
