@@ -1,10 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import Badge from '$lib/holocene/badge.svelte';
-  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import { translate } from '$lib/i18n/translate';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import { type EventLinkType } from '$lib/utilities/get-single-attribute-for-event';
   import {
@@ -16,6 +13,7 @@
   export let value: string;
   export let attributes: CombinedAttributes;
   export let type: EventLinkType;
+  export let light = false;
 
   $: ({ workflow, namespace } = $page.params);
 
@@ -42,14 +40,6 @@
   $: href = hrefs[type];
 </script>
 
-<Copyable
-  copyIconTitle={translate('common.copy-icon-title')}
-  copySuccessIconTitle={translate('common.copy-success-icon-title')}
-  content={value}
->
-  <Badge type="subtle" class="select-none">
-    <Link class="truncate break-all" {href}>
-      {value}
-    </Link>
-  </Badge>
-</Copyable>
+<Link class="truncate break-all" {href} {light}>
+  {value}
+</Link>

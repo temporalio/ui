@@ -1,5 +1,7 @@
 <script lang="ts">
   import Badge from '$lib/holocene/badge.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { Payloads } from '$lib/types';
   import { format } from '$lib/utilities/format-camel-case';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
@@ -38,7 +40,15 @@
     {:else if linkType !== 'none'}
       <div class="flex w-full items-center gap-2 pr-1">
         <div class="truncate text-sm">
-          <EventDetailsLink {value} {attributes} type={linkType} />
+          <Copyable
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            content={value}
+          >
+            <Badge type="subtle" class="select-none">
+              <EventDetailsLink {value} {attributes} type={linkType} />
+            </Badge>
+          </Copyable>
         </div>
       </div>
     {:else}

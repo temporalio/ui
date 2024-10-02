@@ -1,6 +1,7 @@
 <script lang="ts">
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import { timeFormat } from '$lib/stores/time-format';
   import { format } from '$lib/utilities/format-camel-case';
@@ -83,7 +84,19 @@
   {:else if linkType !== 'none'}
     <div class="content detail-row">
       <p class="text-sm">{format(key)}</p>
-      <EventDetailsLink value={String(value)} {attributes} type={linkType} />
+      <Copyable
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        content={String(value)}
+      >
+        <Badge type="subtle" class="select-none">
+          <EventDetailsLink
+            value={String(value)}
+            {attributes}
+            type={linkType}
+          />
+        </Badge>
+      </Copyable>
     </div>
   {:else}
     <div class="content detail-row">
