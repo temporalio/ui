@@ -20,10 +20,10 @@
 
 {#if key}
   <div
-    class="flex max-w-lg flex-row items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 xl:max-w-xl {$$props.class}"
+    class="flex flex-row items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 {$$props.class}"
   >
     {#if showKey}
-      <p class="max-w-fit whitespace-nowrap text-right text-xs">
+      <p class="whitespace-nowrap text-right text-xs">
         {format(key)}
       </p>
     {/if}
@@ -38,19 +38,15 @@
         </PayloadDecoder>
       </div>
     {:else if linkType !== 'none'}
-      <div class="flex w-full items-center gap-2 pr-1">
-        <div class="truncate text-sm">
-          <Copyable
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={value}
-          >
-            <Badge type="subtle" class="select-none">
-              <EventDetailsLink {value} {attributes} type={linkType} />
-            </Badge>
-          </Copyable>
-        </div>
-      </div>
+      <Copyable
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        content={value}
+      >
+        <Badge type="subtle" class="select-none">
+          <EventDetailsLink {value} {attributes} type={linkType} />
+        </Badge>
+      </Copyable>
     {:else}
       <div class="flex w-full items-center gap-2 pr-1">
         <p class="truncate text-right text-sm xl:text-left">

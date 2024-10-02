@@ -138,9 +138,7 @@
   <td
     class="w-full overflow-hidden text-right text-sm font-normal xl:text-left"
   >
-    <div
-      class="flex w-full max-w-screen-sm items-center gap-2 lg:max-w-screen-md xl:max-w-screen-xl"
-    >
+    <div class="flex w-full items-center gap-2">
       <Icon name={icon} />
       <p
         class="event-name max-w-fit whitespace-nowrap pr-4 text-sm font-semibold md:text-base"
