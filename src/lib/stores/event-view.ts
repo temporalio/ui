@@ -1,5 +1,5 @@
 import { persistStore } from '$lib/stores/persist-store';
-import type { EventView } from '$lib/types/events';
+import type { EventMode, EventView } from '$lib/types/events';
 import type { BooleanString } from '$lib/types/global';
 
 export type EventSortOrder = 'ascending' | 'descending';
@@ -14,6 +14,11 @@ export const autoRefreshWorkflow = persistStore<'on' | 'off'>(
 );
 
 export const eventViewType = persistStore<EventView>('eventView', 'feed', true);
+export const eventViewMode = persistStore<EventMode>(
+  'eventMode',
+  'dense',
+  true,
+);
 
 export const expandAllEvents = persistStore('expandAllEvents', 'false');
 

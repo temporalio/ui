@@ -4,7 +4,7 @@
   import { isEventGroup } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
-  import { expandAllEvents } from '$lib/stores/event-view';
+  import { eventViewMode, expandAllEvents } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
   import type {
@@ -20,6 +20,7 @@
   import HistoryGraph from '../lines-and-dots/svg/history-graph.svelte';
 
   import EventEmptyRow from './event-empty-row.svelte';
+  import EventSummaryRowComfy from './event-summary-row-comfy.svelte';
   import EventSummaryRow from './event-summary-row.svelte';
   import PendingActivitySummaryRow from './pending-activity-summary-row.svelte';
   import PendingNexusSummaryRow from './pending-nexus-summary-row.svelte';
@@ -31,6 +32,7 @@
   export let openExpanded = false;
 
   $: initialItem = $fullEventHistory?.[0];
+  $: dense = $eventViewMode === 'dense';
 
   $: expandAll = openExpanded || $expandAllEvents === 'true';
 
@@ -40,6 +42,8 @@
 
   $: filteredForStatus = (items: IterableEventWithPending[]) =>
     getFailedOrPendingEvents(items, $eventStatusFilter);
+
+  $: rowComponent = dense ? EventSummaryRow : EventSummaryRowComfy;
 </script>
 
 <Paginated
@@ -53,13 +57,14 @@
   variant="split"
   maxHeight="calc(100vh - 200px)"
 >
-  {#if !compact}
+  {#if !compact && dense}
     <HistoryGraph {groups} history={history(visibleItems)} />
   {/if}
   <div class="w-full">
     {#each visibleItems as event, index}
       {#if isEventGroup(event)}
-        <EventSummaryRow
+        <svelte:component
+          this={rowComponent}
           {event}
           {index}
           group={event}
@@ -90,7 +95,8 @@
           {expandAll}
         />
       {:else}
-        <EventSummaryRow
+        <svelte:component
+          this={rowComponent}
           {event}
           {index}
           group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
