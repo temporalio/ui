@@ -20,13 +20,11 @@
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
 
-  import { CategoryIcon } from '../lines-and-dots/constants';
-
   import EventDetailsFull from './event-details-full.svelte';
 
   export let event: IterableEvent;
   export let group: EventGroup | undefined = undefined;
-  export let initialItem: IterableEvent | undefined;
+  export let initialItem: IterableEvent | undefined = undefined;
   export let index = 0;
   export let compact = false;
   export let expandAll = false;
@@ -58,10 +56,6 @@
   $: canceled = eventOrGroupIsCanceled(event);
   $: terminated = eventOrGroupIsTerminated(event);
 
-  $: icon = isLocalActivityMarkerEvent(event)
-    ? CategoryIcon['local-activity']
-    : CategoryIcon[event.category];
-
   $: displayName = isEventGroup(event)
     ? event.label
     : isLocalActivityMarkerEvent(event)
@@ -88,13 +82,12 @@
   on:click|stopPropagation={onLinkClick}
 >
   <td class="w-full overflow-hidden text-right font-normal xl:text-left">
-    <div class="flex w-full items-center gap-4 px-2">
+    <div class="flex w-full items-center gap-2 px-2">
       <p class="text-lg">
         {formatDate(currentEvent?.eventTime, $timeFormat, {
           relative: $relativeTime,
         })}
       </p>
-      <Icon name={icon} />
       <p class="event-name max-w-fit whitespace-nowrap text-xl font-semibold">
         {displayName}
       </p>
@@ -116,7 +109,7 @@
   </td>
   {#if isEventGroup(event)}
     <td class="w-auto text-left">
-      <div class="flex items-center gap-0.5 px-2">
+      <div class="flex items-center gap-0.5 px-4">
         {#each event.eventList as groupEvent}
           <Link
             class="truncate"
