@@ -23,7 +23,7 @@
     class="invisible flex w-0 items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 md:visible md:w-auto"
   >
     {#if showKey}
-      <p class="truncate whitespace-nowrap text-right text-xs">
+      <p class="whitespace-nowrap text-right text-xs">
         {format(key)}
       </p>
     {/if}
@@ -42,13 +42,14 @@
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
         content={value}
+        container-class="truncate"
       >
         <p class="select-none truncate">
           <EventDetailsLink {value} {attributes} type={linkType} />
         </p>
       </Copyable>
     {:else}
-      <Badge type="subtle" class="block min-w-fit select-none truncate">
+      <Badge type="subtle" class="block select-none truncate">
         {value}
       </Badge>
     {/if}
