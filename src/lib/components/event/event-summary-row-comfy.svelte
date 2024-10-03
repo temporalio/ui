@@ -33,7 +33,7 @@
   export let onRowClick: () => void = noop;
 
   $: selectedId = isEventGroup(event)
-    ? Array.from(event.events.keys()).pop()
+    ? Array.from(event.events.keys()).shift()
     : event.id;
 
   $: ({ workflow, run, namespace } = $page.params);
