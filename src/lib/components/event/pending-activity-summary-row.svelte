@@ -68,7 +68,6 @@
         value={event.activityType}
         showKey
         attributes={event}
-        class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
       />
     </div></td
   >

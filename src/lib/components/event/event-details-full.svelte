@@ -25,8 +25,12 @@
       {#each group.eventList as groupEvent}
         {@const attributes = formatAttributes(groupEvent)}
         {@const details = Object.entries(attributes)}
-        <div class="w-full border-subtle [&:not(:last-child)]:border-r-2">
-          <div class="flex w-full justify-between bg-subtle px-2 py-1">
+        <div
+          class="w-full border-subtle xl:w-1/3 [&:not(:last-child)]:border-r-2"
+        >
+          <div
+            class="flex w-full flex-wrap justify-between bg-subtle px-2 py-1"
+          >
             <div class="flex gap-2">
               {groupEvent.id}
               {spaceBetweenCapitalLetters(groupEvent.name)}
