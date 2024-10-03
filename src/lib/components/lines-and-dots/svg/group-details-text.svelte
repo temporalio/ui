@@ -1,25 +1,14 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
+  import EventDetailsLink from '$lib/components/event/event-details-link.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
+    displayLinkType,
     getCodeBlockValue,
-    // getStackTrace,
-    shouldDisplayAsExecutionLink,
-    shouldDisplayAsTaskQueueLink,
-    shouldDisplayChildWorkflowLink,
   } from '$lib/utilities/get-single-attribute-for-event';
-  import {
-    routeForEventHistory,
-    routeForTaskQueue,
-  } from '$lib/utilities/route-for';
 
   import { DetailsConfig, staticCodeBlockHeight } from '../constants';
-
-  const { workflow, namespace } = $page.params;
 
   export let key: string;
   export let value: string | Record<string, unknown>;
@@ -31,6 +20,7 @@
 
   $: [x, y] = point;
   $: codeBlockValue = getCodeBlockValue(value);
+  $: linkType = displayLinkType(key, attributes);
 </script>
 
 {#if typeof value === 'object'}
@@ -48,9 +38,6 @@
             maxHeight={staticCodeBlockHeight - fontSizeRatio}
           />
         </foreignObject>
-        <!-- <Text  position="middle" {point} category="pending">
-          {decodedValue.slice(1, -1)}
-        </Text> -->
       {/key}
     </PayloadDecoder>
   {:else if key === 'searchAttributes'}
@@ -71,10 +58,6 @@
             maxHeight={staticCodeBlockHeight - fontSizeRatio}
           />
         </foreignObject>
-
-        <!-- <Text  position="middle" {point} category="pending">
-          {decodedValue}
-        </Text> -->
       {/key}
     </PayloadDecoder>
   {:else}
@@ -91,37 +74,11 @@
             maxHeight={staticCodeBlockHeight - fontSizeRatio}
           />
         </foreignObject>
-        <!-- <Text  position="middle" {point} category="pending"
-          >{decodedValue}</Text
-        > -->
       {/key}
     </PayloadDecoder>
   {/if}
-  <!-- {#if stackTrace}
-    {stackTrace}
-  {/if} -->
-{:else if shouldDisplayAsExecutionLink(key)}
-  <Link
-    light
-    href={routeForEventHistory({
-      namespace,
-      workflow,
-      run: value,
-    })}>{value}</Link
-  >
-{:else if shouldDisplayChildWorkflowLink(key, attributes)}
-  <Link
-    light
-    href={routeForEventHistory({
-      namespace: attributes?.namespace || namespace,
-      workflow: attributes.workflowExecutionWorkflowId,
-      run: attributes.workflowExecutionRunId,
-    })}>{value}</Link
-  >
-{:else if shouldDisplayAsTaskQueueLink(key)}
-  <Link light href={routeForTaskQueue({ namespace, queue: value })}
-    >{value}</Link
-  >
+{:else if linkType !== 'none'}
+  <EventDetailsLink {value} {attributes} type={linkType} light />
 {:else}
   {value}
 {/if}

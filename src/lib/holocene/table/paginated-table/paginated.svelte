@@ -27,6 +27,7 @@
   export let previousPageButtonLabel: string;
   export let maxHeight = '';
   export let pageSizeOptions: string[] = options;
+  export let fixed = false;
 
   $: url = $page.url;
   $: perPageParam = url.searchParams.get(perPageKey) ?? pageSizeOptions[0];
@@ -87,7 +88,13 @@
   }
 </script>
 
-<PaginatedTable {updating} {variant} {maxHeight} visibleItems={$store.items}>
+<PaginatedTable
+  {updating}
+  {variant}
+  {maxHeight}
+  visibleItems={$store.items}
+  {fixed}
+>
   <slot name="caption" slot="caption" />
   <slot name="headers" slot="headers" visibleItems={$store.items} />
   <slot visibleItems={$store.items} />

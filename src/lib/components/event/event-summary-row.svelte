@@ -136,57 +136,42 @@
     <td class="w-4" />
   {/if}
   <td
-    class="w-full overflow-hidden text-right text-sm font-normal xl:text-left"
+    class="flex w-full items-center gap-2 overflow-hidden text-right text-sm font-normal xl:text-left"
   >
-    <div
-      class="flex w-full max-w-screen-sm items-center gap-2 lg:max-w-screen-md xl:max-w-screen-xl"
+    <Icon name={icon} />
+    <p
+      class="event-name max-w-fit whitespace-nowrap text-sm font-semibold md:text-base"
     >
-      <Icon name={icon} />
-      <p
-        class="event-name max-w-fit whitespace-nowrap pr-4 text-sm font-semibold md:text-base"
+      {displayName}
+    </p>
+    {#if pendingAttempt}
+      <div
+        class="flex items-center gap-1 {pendingAttempt > 1 &&
+          'surface-danger rounded px-1 py-0.5'}"
       >
-        {displayName}
-      </p>
-      <div class="flex w-full gap-4 truncate">
-        {#if pendingAttempt}
-          <div
-            class="flex items-center gap-1 {pendingAttempt > 1 &&
-              'surface-danger rounded px-1 py-0.5'}"
-          >
-            <Icon class="mr-1.5 inline" name="retry" />
-            {pendingAttempt}
-            {#if hasPendingActivity}
-              / {hasPendingActivity.maximumAttempts || '∞'}
-            {/if}
-          </div>
-        {/if}
-        {#if currentEvent?.links?.length}
-          <EventLink link={currentEvent.links[0]} />
-        {/if}
-        {#if primaryAttribute?.key}
-          <EventDetailsRow
-            {...primaryAttribute}
-            {attributes}
-            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-          />
-        {/if}
-        {#if nonPendingActivityAttempt}
-          <EventDetailsRow
-            key="attempt"
-            value={nonPendingActivityAttempt.toString()}
-            {attributes}
-            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-          />
-        {/if}
-        {#if compact && secondaryAttribute?.key}
-          <EventDetailsRow
-            {...secondaryAttribute}
-            {attributes}
-            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-          />
+        <Icon class="mr-1.5 inline" name="retry" />
+        {pendingAttempt}
+        {#if hasPendingActivity}
+          / {hasPendingActivity.maximumAttempts || '∞'}
         {/if}
       </div>
-    </div>
+    {/if}
+    {#if currentEvent?.links?.length}
+      <EventLink link={currentEvent.links[0]} />
+    {/if}
+    {#if primaryAttribute?.key}
+      <EventDetailsRow {...primaryAttribute} {attributes} />
+    {/if}
+    {#if nonPendingActivityAttempt}
+      <EventDetailsRow
+        key="attempt"
+        value={nonPendingActivityAttempt.toString()}
+        {attributes}
+      />
+    {/if}
+    {#if compact && secondaryAttribute?.key}
+      <EventDetailsRow {...secondaryAttribute} {attributes} />
+    {/if}
   </td>
   <td>
     {#if isEventGroup(event)}

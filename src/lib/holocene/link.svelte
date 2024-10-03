@@ -66,7 +66,7 @@
     }
 
     &.light {
-      @apply text-off-white;
+      @apply text-off-white hover:text-indigo-400;
     }
   }
 
