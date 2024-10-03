@@ -101,7 +101,7 @@
   {:else}
     <div class="content detail-row">
       <p class="text-sm">{format(key)}</p>
-      <Badge type="subtle">
+      <Badge type="subtle" class="inline-block whitespace-pre-wrap">
         {shouldDisplayAsTime(key) ? formatDate(value, $timeFormat) : value}
       </Badge>
     </div>
@@ -118,6 +118,6 @@
   }
 
   .detail-row {
-    @apply flex w-full items-center gap-4 py-1 text-left xl:flex;
+    @apply flex w-full items-center gap-2 py-1 text-left;
   }
 </style>

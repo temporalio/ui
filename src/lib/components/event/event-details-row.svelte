@@ -20,16 +20,16 @@
 
 {#if key}
   <div
-    class="flex flex-row items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 {$$props.class}"
+    class="invisible flex w-0 items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 md:visible md:w-auto"
   >
     {#if showKey}
-      <p class="whitespace-nowrap text-right text-xs">
+      <p class="truncate whitespace-nowrap text-right text-xs">
         {format(key)}
       </p>
     {/if}
     {#if typeof value === 'object'}
       <div
-        class="flex w-full items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
+        class="flex max-w-sm items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
       >
         <PayloadDecoder {value} key="payloads" let:decodedValue>
           <div class="payload {$$props.class}">
@@ -43,18 +43,14 @@
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
         content={value}
       >
-        <Badge type="subtle" class="select-none">
+        <p class="select-none truncate">
           <EventDetailsLink {value} {attributes} type={linkType} />
-        </Badge>
+        </p>
       </Copyable>
     {:else}
-      <div class="flex w-full items-center gap-2 pr-1">
-        <p class="truncate text-right text-sm xl:text-left">
-          <Badge type="subtle" class="select-none">
-            {value}
-          </Badge>
-        </p>
-      </div>
+      <Badge type="subtle" class="block min-w-fit select-none truncate">
+        {value}
+      </Badge>
     {/if}
   </div>
 {/if}
