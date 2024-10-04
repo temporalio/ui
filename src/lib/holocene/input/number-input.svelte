@@ -61,6 +61,7 @@
         {min}
         {disabled}
         data-lpignore="true"
+        data-1p-ignore="true"
         {placeholder}
         {id}
         {name}
