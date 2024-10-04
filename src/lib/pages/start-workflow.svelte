@@ -73,6 +73,7 @@
         taskQueue,
         workflowType,
         input,
+        encoding,
         searchAttributes,
       });
       goto(routeForWorkflows({ namespace }));

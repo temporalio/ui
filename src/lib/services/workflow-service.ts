@@ -92,6 +92,7 @@ type StartWorkflowOptions = {
   taskQueue: string;
   workflowType: string;
   input: string;
+  encoding: string;
   searchAttributes: SearchAttributeInput[];
 };
 
@@ -498,6 +499,7 @@ export async function startWorkflow({
   taskQueue,
   workflowType,
   input,
+  encoding,
   searchAttributes,
 }: StartWorkflowOptions) {
   const route = routeForApi('workflow', {
@@ -508,7 +510,7 @@ export async function startWorkflow({
 
   if (input) {
     try {
-      payloads = await encodePayloads(input);
+      payloads = await encodePayloads(input, encoding);
     } catch (_) {
       console.error('Could not decode input for starting workflow');
     }
