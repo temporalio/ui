@@ -339,7 +339,7 @@
 
   <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
     {#if leadingIcon}
-      <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
+      <Icon width={20} height={20} class="ml-2" name={leadingIcon} />
     {/if}
     <div
       class="input-wrapper"
