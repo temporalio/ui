@@ -11,7 +11,6 @@
   import Menu from '$lib/holocene/menu/menu.svelte';
 
   import Badge from '../badge.svelte';
-  import Button from '../button.svelte';
   import Chip from '../chip.svelte';
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
@@ -144,14 +143,6 @@
 
     displayValue = getDisplayValue(selectedOption);
   }
-
-  const toggleList = () => {
-    if ($open) {
-      closeList();
-    } else {
-      openList();
-    }
-  };
 
   const openList = () => {
     $open = true;
@@ -398,30 +389,6 @@
         {...$$restProps}
       />
     </div>
-    {#if multiselect && isArrayValue(value) && value.length > 0}
-      <Button
-        aria-label={deselectAllLabel}
-        tabindex={-1}
-        variant="ghost"
-        size="xs"
-        on:click={deselectAll}
-        {disabled}
-      >
-        <Icon name="close" />
-      </Button>
-    {/if}
-    <Button
-      aria-label={toggleLabel}
-      tabindex={-1}
-      aria-controls="{id}-listbox"
-      aria-expanded={$open}
-      variant="ghost"
-      size="xs"
-      on:click={toggleList}
-      {disabled}
-    >
-      <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
-    </Button>
     {#if $$slots.action}
       <div class="ml-1 flex h-full items-center border-l-2 border-subtle p-0.5">
         <slot name="action" />
