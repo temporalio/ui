@@ -126,6 +126,7 @@
     {/if}
     <input
       data-lpignore="true"
+      data-1p-ignore="true"
       autocomplete="off"
       class:cursor-not-allowed={disabled}
       {disabled}

@@ -111,6 +111,7 @@
         class:disabled
         {disabled}
         data-lpignore="true"
+        data-1p-ignore="true"
         maxlength={maxLength > 0 ? maxLength : undefined}
         {placeholder}
         {id}

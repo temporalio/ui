@@ -376,6 +376,7 @@
         autocapitalize="off"
         spellcheck="false"
         data-lpignore="true"
+        data-1p-ignore="true"
         aria-controls="{id}-listbox"
         aria-expanded={$open}
         aria-required={required}
