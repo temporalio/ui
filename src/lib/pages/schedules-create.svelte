@@ -23,6 +23,7 @@
       workflowId,
       taskQueue,
       input,
+      encoding,
       hour,
       minute,
       second,
@@ -42,6 +43,7 @@
       workflowId,
       taskQueue,
       input,
+      encoding,
       searchAttributes,
     };
     const spec: Partial<ScheduleSpecParameters> = {

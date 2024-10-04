@@ -70,6 +70,7 @@
   let workflowId = decodedWorkflow?.workflowId ?? '';
   let taskQueue = decodedWorkflow?.taskQueue?.name ?? '';
   let input = '';
+  let encoding = '';
   let daysOfWeek: string[] = [];
   let daysOfMonth: number[] = [];
   let months: string[] = [];
@@ -90,6 +91,7 @@
       workflowId,
       taskQueue,
       input,
+      encoding,
       hour,
       minute,
       second,
@@ -163,7 +165,6 @@
       <h1>{title}</h1>
     </header>
     <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
-      <Alert intent="error" title={$error} hidden={!$error} />
       <div class="w-full">
         <Input
           id="name"
@@ -212,8 +213,8 @@
       </div>
       <ScheduleInputPayload
         bind:input
+        bind:encoding
         payloads={schedule?.action?.startWorkflow?.input}
-        error={errors['input']}
       />
       <AddSearchAttributes
         bind:attributesToAdd={searchAttributesInput}
@@ -243,6 +244,7 @@
           >
         </div>
       </SchedulesCalendarView>
+      <Alert intent="error" title={$error} hidden={!$error} />
     </form>
   {/if}
 </div>

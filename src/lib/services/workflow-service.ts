@@ -35,6 +35,7 @@ import type {
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
 } from '$lib/types/workflows';
+import { atob } from '$lib/utilities/atob';
 import {
   cloneAllPotentialPayloadsWithCodec,
   type PotentiallyDecodable,
@@ -82,6 +83,7 @@ type SignalWorkflowOptions = {
   workflow: WorkflowExecution;
   name: string;
   input: string;
+  encoding: string;
 };
 
 type StartWorkflowOptions = {
@@ -316,13 +318,14 @@ export async function signalWorkflow({
   workflow: { id: workflowId, runId },
   name,
   input,
+  encoding,
 }: SignalWorkflowOptions) {
   const route = routeForApi('workflow.signal', {
     namespace,
     workflowId,
     signalName: name,
   });
-  const payloads = await encodePayloads(input);
+  const payloads = await encodePayloads(input, encoding);
   const settings = get(page).data.settings;
   const version = settings?.version ?? '';
   const newVersion = isVersionNewer(version, '2.22');
@@ -481,7 +484,9 @@ export const setSearchAttributes = (
 
   const searchAttributes: SearchAttribute = {};
   attributes.forEach((attribute) => {
-    searchAttributes[attribute.attribute] = setBase64Payload(attribute.value);
+    searchAttributes[attribute.attribute] = setBase64Payload(
+      String(attribute.value),
+    );
   });
 
   return searchAttributes;
@@ -547,12 +552,17 @@ export const fetchInitialValuesForStartWorkflow = async ({
   workflowId?: string;
 }): Promise<{
   input: string;
+  encoding: string;
   searchAttributes: Record<string, string | Payload> | undefined;
 }> => {
   const handleError: ErrorCallback = (err) => {
     console.error(err);
   };
-  const emptyValues = { input: '', searchAttributes: undefined };
+  const emptyValues = {
+    input: '',
+    encoding: 'json/plain',
+    searchAttributes: undefined,
+  };
   try {
     let query = '';
     if (workflowType && workflowId) {
@@ -590,8 +600,15 @@ export const fetchInitialValuesForStartWorkflow = async ({
     )) as PotentiallyDecodable;
 
     const input = stringifyWithBigInt(convertedAttributes?.payloads[0]);
+    const encoding = atob(
+      String(
+        convertedAttributes?.payloads[0]?.metadata?.encoding ?? 'json/plain',
+      ),
+    );
+
     return {
       input,
+      encoding,
       searchAttributes: workflow?.searchAttributes?.indexedFields,
     };
   } catch (e) {

@@ -5,13 +5,12 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import PayloadInput from '$lib/components/payload-input.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import FileInput from '$lib/holocene/file-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -39,11 +38,11 @@
   let taskQueue = '';
   let workflowType = '';
   let input = '';
+  let encoding = 'json/plain';
   let inputRetrieved = 0;
 
   let initialWorkflowId = '';
   let initialWorkflowType = '';
-  let initialInput = '';
 
   let error = '';
   let pollerCount: undefined | number = undefined;
@@ -64,10 +63,6 @@
       getInitialValues(initialWorkflowId, initialWorkflowType);
     }
   });
-
-  const handleInputChange = (event: CustomEvent<string>) => {
-    input = event.detail;
-  };
 
   const onWorkflowStart = async () => {
     try {
@@ -109,8 +104,8 @@
       workflowId: id,
       workflowType: type,
     });
-    initialInput = initialValues.input;
-    input = initialInput;
+    input = initialValues.input;
+    encoding = initialValues.encoding;
     inputRetrieved = Date.now();
     if (initialValues?.searchAttributes) {
       const customSAKeys = Object.keys($customSearchAttributes);
@@ -232,31 +227,13 @@
       label="Workflow Type"
       on:blur={(e) => onInputChange(e, 'workflowType')}
     />
-    <div
-      class="flex w-full flex-col items-end justify-between gap-4 md:flex-row"
-    >
-      <div class="flex w-full flex-col gap-2">
-        <div class="flex w-full items-end justify-between">
-          <Label for="workflow-input" label={translate('workflows.input')} />
-          <Tooltip text={translate('common.upload-json')} left>
-            <FileInput id="start-workflow-input-file-upload" {onUpload} />
-          </Tooltip>
-        </div>
-        {#key inputRetrieved}
-          <CodeBlock
-            id="workflow-input"
-            minHeight={120}
-            content={input}
-            on:change={handleInputChange}
-            editable
-            copyable={false}
-          />
-        {/key}
-        {#if !inputValid}
-          <Alert intent="error" title={translate('common.input-valid-json')} />
-        {/if}
-      </div>
-    </div>
+    {#key inputRetrieved}
+      <PayloadInput bind:input bind:encoding>
+        <Tooltip text={translate('common.upload-json')} topRight>
+          <FileInput id="start-workflow-input-file-upload" {onUpload} />
+        </Tooltip>
+      </PayloadInput>
+    {/key}
     {#if viewAdvancedOptions}
       <AddSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}

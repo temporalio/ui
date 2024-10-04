@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
-  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import PayloadInput from '$lib/components/payload-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -18,14 +18,13 @@
   let error: string = '';
   let loading = false;
   let name = '';
+
+  let encoding = 'json/plain';
   let input = '';
-  let codeBlock: CodeBlock;
 
   const hideSignalModal = () => {
     open = false;
-    input = '';
     name = '';
-    codeBlock?.resetView(input);
   };
 
   const signal = async () => {
@@ -36,6 +35,7 @@
         namespace,
         workflow,
         input,
+        encoding,
         name,
       });
       $refresh = Date.now();
@@ -52,10 +52,6 @@
       loading = false;
     }
   };
-
-  const handleInputChange = (event: CustomEvent<string>): void => {
-    input = event.detail;
-  };
 </script>
 
 <Modal
@@ -66,7 +62,7 @@
   {loading}
   confirmText={translate('common.submit')}
   cancelText={translate('common.cancel')}
-  confirmDisabled={!name}
+  confirmDisabled={!name || !encoding}
   on:cancelModal={hideSignalModal}
   on:confirmModal={signal}
 >
@@ -78,21 +74,6 @@
       required
       bind:value={name}
     />
-    <div>
-      <span class="text-sm font-medium"
-        >{translate('workflows.signal-payload-input-label')}</span
-      >
-      <span class="text-xs font-light italic">
-        {translate('workflows.signal-payload-input-label-hint')}
-      </span>
-      <CodeBlock
-        maxHeight={320}
-        content={input}
-        on:change={handleInputChange}
-        editable
-        copyable={false}
-        bind:this={codeBlock}
-      />
-    </div>
+    <PayloadInput bind:input bind:encoding resetValues={!open} />
   </div>
 </Modal>

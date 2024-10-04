@@ -21,6 +21,7 @@
       const body = { ...$endpointForm };
       const payloads = await encodePayloads(
         JSON.stringify(body.spec.descriptionString),
+        'json/plain',
       );
       body.spec.description = payloads[0];
 
