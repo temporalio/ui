@@ -43,8 +43,11 @@ export async function codeServerRequest({
   if (passAccessToken) {
     if (validateHttps(endpoint)) {
       let accessToken = get(authUser).accessToken;
+      const accessTokenExtras = get(authUser).idToken;
       if (globalThis?.AccessToken) {
         accessToken = await globalThis?.AccessToken();
+      } else if (accessTokenExtras) {
+        headers['Authorization-Extras'] = accessTokenExtras;
       }
       headers['Authorization'] = `Bearer ${accessToken}`;
     } else {
