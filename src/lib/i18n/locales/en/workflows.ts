@@ -103,7 +103,7 @@ export const Strings = {
     'Are you sure you want to terminate this workflow? This action cannot be undone.',
   'signal-modal-title': 'Send a Signal',
   'signal-name-label': 'Signal name',
-  'signal-payload-input-label': 'Payload',
+  'signal-payload-input-label': 'Data',
   'signal-payload-input-label-hint': '(only single JSON payload supported)',
   'cancel-request-sent': 'Cancel Request Sent',
   'cancel-request-sent-description':

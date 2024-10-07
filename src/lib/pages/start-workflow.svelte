@@ -13,10 +13,8 @@
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import FileInput from '$lib/holocene/file-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getPollers } from '$lib/services/pollers-service';
   import {
@@ -110,7 +108,6 @@
       workflowType: type,
     });
     input = initialValues.input;
-    $encoding = initialValues.encoding as PayloadInputEncoding;
     inputRetrieved = Date.now();
     if (initialValues?.searchAttributes) {
       const customSAKeys = Object.keys($customSearchAttributes);
@@ -134,11 +131,6 @@
       url: $page.url,
       allowEmpty: true,
     });
-  };
-
-  const onUpload = (uploadInput: string) => {
-    input = uploadInput;
-    inputRetrieved = Date.now();
   };
 
   const inputIsJSON = (input: string) => {
@@ -233,11 +225,7 @@
       on:blur={(e) => onInputChange(e, 'workflowType')}
     />
     {#key inputRetrieved}
-      <PayloadInput bind:input bind:encoding>
-        <Tooltip text={translate('common.upload-json')} left>
-          <FileInput id="start-workflow-input-file-upload" {onUpload} />
-        </Tooltip>
-      </PayloadInput>
+      <PayloadInput bind:input bind:encoding />
     {/key}
     {#if viewAdvancedOptions}
       <AddSearchAttributes bind:attributesToAdd={searchAttributes} />

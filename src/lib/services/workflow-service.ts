@@ -35,7 +35,6 @@ import type {
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
 } from '$lib/types/workflows';
-import { atob } from '$lib/utilities/atob';
 import {
   cloneAllPotentialPayloadsWithCodec,
   type PotentiallyDecodable,
@@ -554,7 +553,6 @@ export const fetchInitialValuesForStartWorkflow = async ({
   workflowId?: string;
 }): Promise<{
   input: string;
-  encoding: string;
   searchAttributes: Record<string, string | Payload> | undefined;
 }> => {
   const handleError: ErrorCallback = (err) => {
@@ -562,7 +560,6 @@ export const fetchInitialValuesForStartWorkflow = async ({
   };
   const emptyValues = {
     input: '',
-    encoding: 'json/plain',
     searchAttributes: undefined,
   };
   try {
@@ -602,15 +599,8 @@ export const fetchInitialValuesForStartWorkflow = async ({
     )) as PotentiallyDecodable;
 
     const input = stringifyWithBigInt(convertedAttributes?.payloads[0]);
-    const encoding = atob(
-      String(
-        convertedAttributes?.payloads[0]?.metadata?.encoding ?? 'json/plain',
-      ),
-    );
-
     return {
       input,
-      encoding,
       searchAttributes: workflow?.searchAttributes?.indexedFields,
     };
   } catch (e) {

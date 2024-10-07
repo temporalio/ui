@@ -10,9 +10,11 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import FileInput from '$lib/holocene/file-input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
   export let input: string;
@@ -21,16 +23,22 @@
   export let resetValues = false;
 
   let codeBlock: CodeBlock;
+  let uploaded = false;
+
+  $: error = !isValidInput(input);
+
+  $: {
+    if (resetValues) {
+      clearValues();
+    }
+  }
 
   const handleInputChange = (event: CustomEvent<string>): void => {
     input = event.detail;
   };
 
   const isValidInput = (value: string) => {
-    if (!input) {
-      return true;
-    }
-
+    if (!input) return true;
     try {
       JSON.parse(value);
       return true;
@@ -39,27 +47,29 @@
     }
   };
 
-  $: error = !isValidInput(input);
-
   const clearValues = () => {
     $encoding = 'json/plain';
     input = '';
     codeBlock?.resetView(input);
-    input = '';
+    uploaded = false;
   };
 
-  $: {
-    if (resetValues) {
-      clearValues();
-    }
-  }
+  const onUpload = (uploadInput: string) => {
+    input = uploadInput;
+    uploaded = true;
+  };
 
   onDestroy(() => {
     clearValues();
   });
 </script>
 
-<h5>Input</h5>
+<div class="flex items-center justify-between">
+  <h5>Input</h5>
+  <span class="text-xs font-light italic">
+    {translate('workflows.signal-payload-input-label-hint')}
+  </span>
+</div>
 <Card class="flex flex-col gap-2">
   <div class="flex items-center justify-between">
     <RadioGroup description={'Encoding'} bind:group={encoding} name="encoding">
@@ -70,27 +80,26 @@
         label="json/protobuf"
       />
     </RadioGroup>
-    <slot />
+    <Tooltip text={translate('common.upload-json')} left>
+      <FileInput id="start-workflow-input-file-upload" {onUpload} />
+    </Tooltip>
   </div>
   <div class="flex flex-col gap-2">
-    <div class="flex items-center gap-1">
-      <Label
-        for="payload-input"
-        label={translate('workflows.signal-payload-input-label')}
-      />
-      <span class="text-xs font-light italic">
-        {translate('workflows.signal-payload-input-label-hint')}
-      </span>
-    </div>
-    <CodeBlock
-      id="payload-input"
-      maxHeight={320}
-      content={input}
-      on:change={handleInputChange}
-      editable
-      copyable={false}
-      bind:this={codeBlock}
+    <Label
+      for="payload-input"
+      label={translate('workflows.signal-payload-input-label')}
     />
+    {#key uploaded}
+      <CodeBlock
+        id="payload-input"
+        maxHeight={320}
+        content={input}
+        on:change={handleInputChange}
+        editable
+        copyable={false}
+        bind:this={codeBlock}
+      />
+    {/key}
     {#if error}
       <Alert intent="error" title={translate('common.input-valid-json')} />
     {/if}
