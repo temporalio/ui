@@ -90,21 +90,20 @@ export const timelineTextPosition = (
   if (textToLeft) textAnchor = 'end';
   if (textToRight) textIndex = points.indexOf(lastPoint);
 
-  let textX = textToRight
-    ? lastPoint + 1.5 * radius
-    : firstPoint - 1.5 * radius;
+  const offset = 1.5 * radius;
+  let textX = textToRight ? lastPoint + offset : firstPoint - offset;
 
   // Pending or long events
   if (!textToRight && !textToLeft) {
     backdrop = true;
     textToRight = true;
-    textX = firstPoint + 1.5 * radius;
+    textX = firstPoint + offset;
 
     if (points.length === 2 && isPending) {
       const gap = points[1] - points[0];
       if (gap < width - points[1]) {
         textIndex = 1;
-        textX = points[1] + 1.5 * radius;
+        textX = points[1] + offset;
       }
     }
 
@@ -113,7 +112,7 @@ export const timelineTextPosition = (
       const gap2 = points[2] - points[1];
       if (gap2 > gap1) {
         textIndex = 1;
-        textX = points[1] + 1.5 * radius;
+        textX = points[1] + offset;
       }
     }
   }
