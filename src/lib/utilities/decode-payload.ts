@@ -61,15 +61,15 @@ export function decodePayload(
 
   const encoding = atob(String(payload?.metadata?.encoding ?? ''));
 
-  // if (encoding?.startsWith('json/')) {
-  try {
-    const data = parseWithBigInt(atob(String(payload?.data ?? '')));
-    return returnDataOnly ? data : { ...payload, data };
-  } catch (_e) {
-    console.warn('Could not parse payload: ', _e);
-    // Couldn't correctly decode this just let the user deal with the data as is
+  if (encoding?.startsWith('json/')) {
+    try {
+      const data = parseWithBigInt(atob(String(payload?.data ?? '')));
+      return returnDataOnly ? data : { ...payload, data };
+    } catch (_e) {
+      console.warn('Could not parse payload: ', _e);
+      // Couldn't correctly decode this just let the user deal with the data as is
+    }
   }
-  // }
 
   if (encoding === 'binary/null') {
     return returnDataOnly ? null : { ...payload, data: null };

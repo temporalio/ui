@@ -1,11 +1,15 @@
 <script lang="ts">
+  import { writable, type Writable } from 'svelte/store';
+
   import { onMount } from 'svelte';
   import { v4 } from 'uuid';
 
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import PayloadInput from '$lib/components/payload-input.svelte';
+  import PayloadInput, {
+    type PayloadInputEncoding,
+  } from '$lib/components/payload-input.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -38,7 +42,7 @@
   let taskQueue = '';
   let workflowType = '';
   let input = '';
-  let encoding = 'json/plain';
+  let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let inputRetrieved = 0;
 
   let initialWorkflowId = '';
@@ -73,7 +77,7 @@
         taskQueue,
         workflowType,
         input,
-        encoding,
+        encoding: $encoding,
         searchAttributes,
       });
       goto(routeForWorkflows({ namespace }));
@@ -106,7 +110,7 @@
       workflowType: type,
     });
     input = initialValues.input;
-    encoding = initialValues.encoding;
+    $encoding = initialValues.encoding as PayloadInputEncoding;
     inputRetrieved = Date.now();
     if (initialValues?.searchAttributes) {
       const customSAKeys = Object.keys($customSearchAttributes);
@@ -230,7 +234,7 @@
     />
     {#key inputRetrieved}
       <PayloadInput bind:input bind:encoding>
-        <Tooltip text={translate('common.upload-json')} topRight>
+        <Tooltip text={translate('common.upload-json')} left>
           <FileInput id="start-workflow-input-file-upload" {onUpload} />
         </Tooltip>
       </PayloadInput>

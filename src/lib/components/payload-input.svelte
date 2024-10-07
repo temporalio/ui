@@ -1,15 +1,22 @@
+<script context="module" lang="ts">
+  export type PayloadInputEncoding = 'json/plain' | 'json/protobuf';
+</script>
+
 <script lang="ts">
+  import { type Writable } from 'svelte/store';
+
   import { onDestroy } from 'svelte';
 
   import Alert from '$lib/holocene/alert.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
+  import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
+  import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import { translate } from '$lib/i18n/translate';
 
   export let input: string;
-  export let encoding: string;
+  export let encoding: Writable<PayloadInputEncoding>;
   export let error = false;
   export let resetValues = false;
 
@@ -35,7 +42,7 @@
   $: error = !isValidInput(input);
 
   const clearValues = () => {
-    encoding = 'json/plain';
+    $encoding = 'json/plain';
     input = '';
     codeBlock?.resetView(input);
     input = '';
@@ -54,14 +61,15 @@
 
 <h5>Input</h5>
 <Card class="flex flex-col gap-2">
-  <div class="flex items-end gap-2">
-    <Input
-      id="payload-encoding"
-      label="Encoding"
-      class="w-full"
-      required
-      bind:value={encoding}
-    />
+  <div class="flex items-center justify-between">
+    <RadioGroup description={'Encoding'} bind:group={encoding} name="encoding">
+      <RadioInput id="json/plain" value="json/plain" label="json/plain" />
+      <RadioInput
+        id="json/protobuf"
+        value="json/protobuf"
+        label="json/protobuf"
+      />
+    </RadioGroup>
     <slot />
   </div>
   <div class="flex flex-col gap-2">

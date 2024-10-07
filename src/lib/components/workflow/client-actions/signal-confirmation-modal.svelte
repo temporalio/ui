@@ -1,7 +1,9 @@
 <script lang="ts">
-  import type { Writable } from 'svelte/store';
+  import { writable, type Writable } from 'svelte/store';
 
-  import PayloadInput from '$lib/components/payload-input.svelte';
+  import PayloadInput, {
+    type PayloadInputEncoding,
+  } from '$lib/components/payload-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -19,7 +21,7 @@
   let loading = false;
   let name = '';
 
-  let encoding = 'json/plain';
+  let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let input = '';
 
   const hideSignalModal = () => {
@@ -35,7 +37,7 @@
         namespace,
         workflow,
         input,
-        encoding,
+        encoding: $encoding,
         name,
       });
       $refresh = Date.now();

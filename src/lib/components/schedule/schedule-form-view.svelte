@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { writable, type Writable } from 'svelte/store';
+
   import { onDestroy } from 'svelte';
 
   import { page } from '$app/stores';
@@ -24,6 +26,7 @@
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
+  import type { PayloadInputEncoding } from '../payload-input.svelte';
   import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
@@ -70,7 +73,7 @@
   let workflowId = decodedWorkflow?.workflowId ?? '';
   let taskQueue = decodedWorkflow?.taskQueue?.name ?? '';
   let input = '';
-  let encoding = '';
+  let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let daysOfWeek: string[] = [];
   let daysOfMonth: number[] = [];
   let months: string[] = [];
@@ -91,7 +94,7 @@
       workflowId,
       taskQueue,
       input,
-      encoding,
+      encoding: $encoding,
       hour,
       minute,
       second,
