@@ -31,7 +31,6 @@
     {name}
     {value}
     {placeholder}
-    autocomplete="off"
     data-testid={`${testId}-input`}
     on:input
   >

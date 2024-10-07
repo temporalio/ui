@@ -69,13 +69,12 @@ const createGroupFor = <K extends keyof StartingEvents>(
   events?: CommonHistoryEvent[],
 ): EventGroup => {
   const id = getGroupId(event);
-  const name = getEventGroupName(event);
+  const initialEvent = getInitialEvent(event, events);
+  const name = getEventGroupName(event, initialEvent);
   const label = getEventGroupLabel(event);
-  const displayName = getEventGroupDisplayName(event);
+  const displayName = getEventGroupDisplayName(event, initialEvent);
 
   const { timestamp, category, classification } = event;
-
-  const initialEvent = getInitialEvent(event, events);
 
   const groupEvents: EventGroup['events'] = new Map();
   const groupEventIds: EventGroup['eventIds'] = new Set();

@@ -241,6 +241,8 @@ export type ExternalWorkflowExecutionSignaledEvent =
   EventWithAttributes<'externalWorkflowExecutionSignaledEventAttributes'>;
 export type UpsertWorkflowSearchAttributesEvent =
   EventWithAttributes<'upsertWorkflowSearchAttributesEventAttributes'>;
+export type WorkflowExecutionUpdateAdmittedEvent =
+  EventWithAttributes<'workflowExecutionUpdateAdmittedEventAttributes'>;
 export type WorkflowExecutionUpdateAcceptedEvent =
   EventWithAttributes<'workflowExecutionUpdateAcceptedEventAttributes'>;
 export type WorkflowExecutionUpdateCompletedEvent =
