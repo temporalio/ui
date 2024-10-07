@@ -125,7 +125,7 @@
         {group?.displayName}
       </Text>
     {/if}
-    {#if hasPendingActivity}
+    {#if hasPendingActivity && pendingActivity.attempt > 1}
       <Text
         point={[textPosition[0] + textWidth + 36, textPosition[1]]}
         textAnchor="start"
