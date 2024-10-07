@@ -1,33 +1,29 @@
 <script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
-  import Link from '$lib/holocene/link.svelte';
-  import type { EventLink } from '$lib/types/events';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { translate } from '$lib/i18n/translate';
+  import type { EventLink as ELink } from '$lib/types/events';
+  import { routeForNamespace } from '$lib/utilities/route-for';
 
-  export let links: EventLink[] = [];
+  import EventLink from './event-link.svelte';
+
+  export let links: ELink[] = [];
 </script>
 
 {#each links as link}
   {#if link?.workflowEvent}
-    <div class="content">
-      <p class="text-sm">Link</p>
-      <Badge type="subtle">
-        <Link
-          href={routeForEventHistory({
-            namespace: link.workflowEvent.namespace,
-            workflow: link.workflowEvent.workflowId,
-            run: link.workflowEvent.runId,
-          })}
-        >
-          {link.workflowEvent.workflowId}
-        </Link>
-      </Badge>
+    <div
+      class="block flex w-full items-center gap-4 px-2 py-1 py-1 text-left text-left xl:flex"
+    >
+      <EventLink {link} />
+    </div>
+    <div
+      class="block flex w-full items-center gap-4 px-2 py-1 py-1 text-left text-left xl:flex"
+    >
+      <EventLink
+        {link}
+        label={translate('common.link-namespace')}
+        value={link.workflowEvent.namespace}
+        href={routeForNamespace({ namespace: link.workflowEvent.namespace })}
+      />
     </div>
   {/if}
 {/each}
-
-<style lang="postcss">
-  .content {
-    @apply block flex w-full w-full items-center gap-4 px-2 py-1 py-1 text-left text-left xl:flex;
-  }
-</style>

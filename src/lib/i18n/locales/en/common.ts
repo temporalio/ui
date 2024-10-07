@@ -181,4 +181,6 @@ export const Strings = {
   message: 'Message',
   'upload-json': 'Upload JSON',
   'input-valid-json': 'Input must be valid JSON',
+  link: 'Link',
+  'link-namespace': 'Link Namespace',
 } as const;
