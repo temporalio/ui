@@ -8,6 +8,7 @@
 
   export let point: [number, number] = [0, 0];
   export let category: string | undefined = undefined;
+  export let status: string | undefined = 'none';
   export let fontSize = '14px';
   export let fontWeight = '400';
   export let textAnchor = 'start';
@@ -16,6 +17,8 @@
   export let icon: IconName | undefined = undefined;
   export let config: GraphConfig | undefined = undefined;
   export let label = false;
+  export let textWidth = 0;
+  export let noOffset = false;
 
   $: [x, y] = point;
 
@@ -23,27 +26,28 @@
 
   $: showIcon = icon && config;
   $: textWidth = textElement?.getBBox()?.width || 0;
-  $: backdropWidth = showIcon ? textWidth + 36 : textWidth + 12;
+  $: backdropWidth = showIcon && !noOffset ? textWidth + 36 : textWidth + 12;
   $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 2 : x;
+  $: offset = noOffset ? config.radius * 1.5 : 0;
 </script>
 
 {#if backdrop}
   <Line
     startPoint={[x - backdropHeight, y]}
     endPoint={[x + backdropWidth, y]}
-    status="none"
+    {status}
     strokeWidth={backdropHeight}
   />
 {/if}
 {#if showIcon && textAnchor === 'start'}
-  <Icon name={icon} {x} y={y - 8} class="text-white" />
+  <Icon name={icon} x={x - offset} y={y - 8} class="text-white" />
 {/if}
 <text
   bind:this={textElement}
   class="cursor-pointer select-none outline-none {category} text-primary"
   class:label
   class:backdrop
-  x={textX}
+  x={textX - offset}
   {y}
   font-size={fontSize}
   font-weight={fontWeight}
@@ -52,12 +56,7 @@
   <slot />
 </text>
 {#if showIcon && textAnchor === 'end'}
-  <Icon
-    name={icon}
-    x={x - textWidth - config.radius * 1.5}
-    y={y - 8}
-    class="text-white"
-  />
+  <Icon name={icon} x={x - offset} y={y - 8} class="text-white" />
 {/if}
 
 <style lang="postcss">
