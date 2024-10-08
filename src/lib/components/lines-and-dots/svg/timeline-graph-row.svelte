@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Timestamp } from '@temporalio/common';
 
+  import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
@@ -141,6 +142,7 @@
         noOffset
         dark
       >
+        {translate('workflows.retry')}
         {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
       </Text>
     {/if}

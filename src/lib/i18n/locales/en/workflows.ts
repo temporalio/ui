@@ -155,6 +155,7 @@ export const Strings = {
   'last-heartbeat': 'Last Heartbeat',
   attempt: 'Attempt',
   'attempts-left': 'Attempts Left',
+  retry: 'Retry',
   'next-retry': 'Next Retry',
   expiration: 'Expiration',
   'heartbeat-details': 'Heartbeat Details',

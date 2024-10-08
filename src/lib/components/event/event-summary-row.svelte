@@ -6,6 +6,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { isEventGroup } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
@@ -150,6 +151,7 @@
           'surface-retry rounded px-1 py-0.5'}"
       >
         <Icon class="mr-1.5 inline" name="retry" />
+        {translate('workflows.retry')}
         {pendingAttempt}
         {#if hasPendingActivity}
           / {hasPendingActivity.maximumAttempts || '∞'}

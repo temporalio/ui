@@ -5,6 +5,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { PendingNexusOperation } from '$lib/types/events';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
@@ -60,6 +61,7 @@
               'surface-retry rounded px-1 py-0.5'}"
           >
             <Icon class="mr-1.5 inline" name="retry" />
+            {translate('workflows.retry')}
             {event.attempt}
           </div>
         {/if}
