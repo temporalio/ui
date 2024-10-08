@@ -10,6 +10,7 @@
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import {
     eventFilterSort,
+    eventViewMode,
     eventViewType,
     expandAllEvents,
   } from '$lib/stores/event-view';
@@ -80,10 +81,10 @@
 </script>
 
 <div
-  class="flex flex-col items-center justify-between gap-4 py-4 lg:flex-row lg:py-8"
+  class="flex flex-col items-center justify-between gap-4 px-4 py-4 lg:py-8 xl:flex-row"
 >
-  <div class="flex flex-col items-center gap-2 px-4 md:flex-row">
-    <div class="flex items-center gap-2 px-4">
+  <div class="flex flex-col items-center gap-4 lg:flex-row">
+    <div class="flex items-center">
       <ToggleButtons>
         <ToggleButton
           active={$eventViewType === 'feed'}
@@ -102,7 +103,21 @@
         >
       </ToggleButtons>
     </div>
-    <div class="flex items-center gap-2 px-4">
+    <div class="flex items-center">
+      <ToggleButtons>
+        <ToggleButton
+          active={$eventViewMode === 'comfy'}
+          data-testid="comfy"
+          on:click={() => ($eventViewMode = 'comfy')}>Comfy</ToggleButton
+        >
+        <ToggleButton
+          active={$eventViewMode === 'dense'}
+          data-testid="dense"
+          on:click={() => ($eventViewMode = 'dense')}>Dense</ToggleButton
+        >
+      </ToggleButtons>
+    </div>
+    <div class="flex items-center gap-4">
       {#if $eventViewType !== 'json'}
         <ToggleButtons>
           <ToggleButton
@@ -137,9 +152,7 @@
       </ToggleButtons>
     </div>
   </div>
-  <div
-    class="flex w-full flex-col items-center justify-end gap-4 px-4 lg:flex-row"
-  >
+  <div class="flex w-full flex-col items-center justify-end gap-4 xl:flex-row">
     {#if $eventViewType !== 'json'}
       <EventStatusFilter />
     {/if}
