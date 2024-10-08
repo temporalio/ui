@@ -139,6 +139,7 @@
         icon="retry"
         status="retry"
         noOffset
+        dark
       >
         {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
       </Text>

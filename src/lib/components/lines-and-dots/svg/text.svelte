@@ -24,6 +24,7 @@
   export let label = false;
   export let textWidth = 0;
   export let noOffset = false;
+  export let dark = false;
 
   $: [x, y] = point;
 
@@ -48,13 +49,19 @@
   />
 {/if}
 {#if showIcon && textAnchor === 'start'}
-  <Icon name={icon} x={x - offset} y={y - 8} class="text-white" />
+  <Icon
+    name={icon}
+    x={x - offset}
+    y={y - 8}
+    class={dark ? 'text-black' : 'text-white'}
+  />
 {/if}
 <text
   bind:this={textElement}
   class="cursor-pointer select-none outline-none {category} text-primary"
   class:label
   class:backdrop
+  class:dark
   x={textX - offset}
   {y}
   font-size={fontSize}
@@ -64,7 +71,12 @@
   <slot />
 </text>
 {#if showIcon && textAnchor === 'end'}
-  <Icon name={icon} x={x - offset} y={y - 8} class="text-white" />
+  <Icon
+    name={icon}
+    x={x - offset}
+    y={y - 8}
+    class={dark ? 'text-black' : 'text-white'}
+  />
 {/if}
 
 <style lang="postcss">
@@ -119,7 +131,8 @@
     fill: #ff4518;
   }
 
+  text.dark,
   text.none {
-    fill: #141414;
+    fill: theme('colors.space-black');
   }
 </style>
