@@ -56,6 +56,6 @@
 
 <style lang="postcss">
   a.disabled {
-    @apply pointer-events-none cursor-not-allowed bg-white text-black opacity-50;
+    @apply pointer-events-none cursor-not-allowed text-subtle;
   }
 </style>
