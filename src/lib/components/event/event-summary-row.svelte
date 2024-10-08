@@ -155,6 +155,13 @@
         {pendingAttempt}
         {#if hasPendingActivity}
           / {hasPendingActivity.maximumAttempts || '∞'}
+          {#if pendingAttempt > 1}
+            • {translate('workflows.next-retry')}
+            {toTimeDifference({
+              date: hasPendingActivity.scheduledTime,
+              negativeDefault: 'None',
+            })}
+          {/if}
         {/if}
       </div>
     {/if}
@@ -199,20 +206,6 @@
             <Icon class="inline" name="clock" />
             <p class="whitespace-noline truncate">
               {duration}
-            </p>
-          </div>
-        {/if}
-        {#if pendingAttempt > 1 && hasPendingActivity}
-          <div class="flex items-center gap-2 text-sm">
-            <p class="max-w-fit whitespace-nowrap text-right text-xs">
-              Next Retry
-            </p>
-            <p class="flex items-center gap-0">
-              <Icon class="mr-1.5 inline" name="clock" />
-              {toTimeDifference({
-                date: hasPendingActivity.scheduledTime,
-                negativeDefault: 'None',
-              })}
             </p>
           </div>
         {/if}

@@ -63,25 +63,19 @@
             <Icon class="mr-1.5 inline" name="retry" />
             {translate('workflows.retry')}
             {event.attempt}
+            {#if event.attempt > 1}
+              • {translate('workflows.next-retry')}
+              {toTimeDifference({
+                date: event.nextAttemptScheduleTime,
+                negativeDefault: 'None',
+              })}
+            {/if}
           </div>
         {/if}
       </div>
     </div>
   </td>
-  <td>
-    {#if event.attempt > 1}
-      <div class="flex items-center gap-2 px-2">
-        <p class="max-w-fit whitespace-nowrap text-right text-xs">Next Retry</p>
-        <p class="flex items-center gap-0">
-          <Icon class="mr-1.5 inline" name="clock" />
-          {toTimeDifference({
-            date: event.nextAttemptScheduleTime,
-            negativeDefault: 'None',
-          })}
-        </p>
-      </div>
-    {/if}
-  </td>
+  <td />
 </tr>
 {#if expanded}
   <tr class="row expanded">
