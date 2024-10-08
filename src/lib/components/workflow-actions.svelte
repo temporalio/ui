@@ -119,6 +119,7 @@
 {#if isRunning}
   <SplitButton
     id="workflow-actions"
+    menuClass="w-[24rem]"
     position="right"
     disabled={actionsDisabled}
     primaryActionDisabled={!cancelEnabled || cancelInProgress}
@@ -161,6 +162,7 @@
 {:else if !workflowCreateDisabled($page)}
   <SplitButton
     id="workflow-actions"
+    menuClass="w-[16rem]"
     position="right"
     primaryActionDisabled={!resetEnabled}
     on:click={() => (resetConfirmationModalOpen = true)}
