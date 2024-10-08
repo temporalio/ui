@@ -19,22 +19,21 @@ export const getSinglePayload = (decodedValue: string): string => {
   return '';
 };
 
-export const setBase64Payload = (payload: unknown) => {
+export const setBase64Payload = (payload: string, encoding = 'json/plain') => {
   return {
     metadata: {
-      encoding: btoa('json/plain'),
+      encoding: btoa(encoding),
     },
     data: btoa(JSON.stringify(payload)),
   };
 };
 
-export const encodePayloads = async (input: string) => {
+export const encodePayloads = async (input: string, encoding: string) => {
   let payloads = null;
 
   if (input) {
     const parsedInput = JSON.parse(input);
-    payloads = [setBase64Payload(parsedInput)];
-
+    payloads = [setBase64Payload(parsedInput, encoding)];
     const endpoint = get(dataEncoder).endpoint;
     if (endpoint) {
       const awaitData = await encodePayloadsWithCodec({

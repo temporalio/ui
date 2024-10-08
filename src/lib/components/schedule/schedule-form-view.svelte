@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { writable, type Writable } from 'svelte/store';
+
   import { onDestroy } from 'svelte';
 
   import { page } from '$app/stores';
@@ -24,6 +26,7 @@
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
+  import type { PayloadInputEncoding } from '../payload-input.svelte';
   import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
@@ -70,6 +73,7 @@
   let workflowId = decodedWorkflow?.workflowId ?? '';
   let taskQueue = decodedWorkflow?.taskQueue?.name ?? '';
   let input = '';
+  let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let daysOfWeek: string[] = [];
   let daysOfMonth: number[] = [];
   let months: string[] = [];
@@ -90,6 +94,7 @@
       workflowId,
       taskQueue,
       input,
+      encoding: $encoding,
       hour,
       minute,
       second,
@@ -163,7 +168,6 @@
       <h1>{title}</h1>
     </header>
     <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
-      <Alert intent="error" title={$error} hidden={!$error} />
       <div class="w-full">
         <Input
           id="name"
@@ -212,8 +216,8 @@
       </div>
       <ScheduleInputPayload
         bind:input
+        bind:encoding
         payloads={schedule?.action?.startWorkflow?.input}
-        error={errors['input']}
       />
       <AddSearchAttributes
         bind:attributesToAdd={searchAttributesInput}
@@ -243,6 +247,7 @@
           >
         </div>
       </SchedulesCalendarView>
+      <Alert intent="error" title={$error} hidden={!$error} />
     </form>
   {/if}
 </div>

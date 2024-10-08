@@ -7,7 +7,7 @@
   export let accept = '.json';
   export let onUpload: (input: string) => void;
 
-  const onFileSelect = async (e: Event) => {
+  const onFileSelect = (e: Event) => {
     const target = e.target as HTMLInputElement;
     const file = target?.files?.[0];
     const reader = new FileReader();

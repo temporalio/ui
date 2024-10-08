@@ -1,19 +1,20 @@
 <script lang="ts">
+  import { writable, type Writable } from 'svelte/store';
+
   import { onMount } from 'svelte';
   import { v4 } from 'uuid';
 
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import PayloadInput, {
+    type PayloadInputEncoding,
+  } from '$lib/components/payload-input.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
-  import FileInput from '$lib/holocene/file-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getPollers } from '$lib/services/pollers-service';
   import {
@@ -39,11 +40,11 @@
   let taskQueue = '';
   let workflowType = '';
   let input = '';
+  let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let inputRetrieved = 0;
 
   let initialWorkflowId = '';
   let initialWorkflowType = '';
-  let initialInput = '';
 
   let error = '';
   let pollerCount: undefined | number = undefined;
@@ -65,10 +66,6 @@
     }
   });
 
-  const handleInputChange = (event: CustomEvent<string>) => {
-    input = event.detail;
-  };
-
   const onWorkflowStart = async () => {
     try {
       error = '';
@@ -78,6 +75,7 @@
         taskQueue,
         workflowType,
         input,
+        encoding: $encoding,
         searchAttributes,
       });
       goto(routeForWorkflows({ namespace }));
@@ -109,8 +107,7 @@
       workflowId: id,
       workflowType: type,
     });
-    initialInput = initialValues.input;
-    input = initialInput;
+    input = initialValues.input;
     inputRetrieved = Date.now();
     if (initialValues?.searchAttributes) {
       const customSAKeys = Object.keys($customSearchAttributes);
@@ -134,11 +131,6 @@
       url: $page.url,
       allowEmpty: true,
     });
-  };
-
-  const onUpload = (uploadInput: string) => {
-    input = uploadInput;
-    inputRetrieved = Date.now();
   };
 
   const inputIsJSON = (input: string) => {
@@ -232,31 +224,9 @@
       label="Workflow Type"
       on:blur={(e) => onInputChange(e, 'workflowType')}
     />
-    <div
-      class="flex w-full flex-col items-end justify-between gap-4 md:flex-row"
-    >
-      <div class="flex w-full flex-col gap-2">
-        <div class="flex w-full items-end justify-between">
-          <Label for="workflow-input" label={translate('workflows.input')} />
-          <Tooltip text={translate('common.upload-json')} left>
-            <FileInput id="start-workflow-input-file-upload" {onUpload} />
-          </Tooltip>
-        </div>
-        {#key inputRetrieved}
-          <CodeBlock
-            id="workflow-input"
-            minHeight={120}
-            content={input}
-            on:change={handleInputChange}
-            editable
-            copyable={false}
-          />
-        {/key}
-        {#if !inputValid}
-          <Alert intent="error" title={translate('common.input-valid-json')} />
-        {/if}
-      </div>
-    </div>
+    {#key inputRetrieved}
+      <PayloadInput bind:input bind:encoding />
+    {/key}
     {#if viewAdvancedOptions}
       <AddSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}

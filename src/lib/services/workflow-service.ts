@@ -82,6 +82,7 @@ type SignalWorkflowOptions = {
   workflow: WorkflowExecution;
   name: string;
   input: string;
+  encoding: string;
 };
 
 type StartWorkflowOptions = {
@@ -90,6 +91,7 @@ type StartWorkflowOptions = {
   taskQueue: string;
   workflowType: string;
   input: string;
+  encoding: string;
   searchAttributes: SearchAttributeInput[];
 };
 
@@ -316,13 +318,14 @@ export async function signalWorkflow({
   workflow: { id: workflowId, runId },
   name,
   input,
+  encoding,
 }: SignalWorkflowOptions) {
   const route = routeForApi('workflow.signal', {
     namespace,
     workflowId,
     signalName: name,
   });
-  const payloads = await encodePayloads(input);
+  const payloads = await encodePayloads(input, encoding);
   const settings = get(page).data.settings;
   const version = settings?.version ?? '';
   const newVersion = isVersionNewer(version, '2.22');
@@ -481,7 +484,9 @@ export const setSearchAttributes = (
 
   const searchAttributes: SearchAttribute = {};
   attributes.forEach((attribute) => {
-    searchAttributes[attribute.attribute] = setBase64Payload(attribute.value);
+    searchAttributes[attribute.attribute] = setBase64Payload(
+      String(attribute.value),
+    );
   });
 
   return searchAttributes;
@@ -493,6 +498,7 @@ export async function startWorkflow({
   taskQueue,
   workflowType,
   input,
+  encoding,
   searchAttributes,
 }: StartWorkflowOptions) {
   const route = routeForApi('workflow', {
@@ -503,7 +509,7 @@ export async function startWorkflow({
 
   if (input) {
     try {
-      payloads = await encodePayloads(input);
+      payloads = await encodePayloads(input, encoding);
     } catch (_) {
       console.error('Could not decode input for starting workflow');
     }
@@ -552,7 +558,10 @@ export const fetchInitialValuesForStartWorkflow = async ({
   const handleError: ErrorCallback = (err) => {
     console.error(err);
   };
-  const emptyValues = { input: '', searchAttributes: undefined };
+  const emptyValues = {
+    input: '',
+    searchAttributes: undefined,
+  };
   try {
     let query = '';
     if (workflowType && workflowId) {
