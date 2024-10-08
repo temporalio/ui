@@ -237,7 +237,7 @@
       />
     {/if}
     <nav
-      class="flex shrink-0 flex-col gap-4 sm:flex-row"
+      class="flex gap-4 flex-row flex-wrap justify-center"
       aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
