@@ -69,6 +69,11 @@ export const CategoryIcon: Record<EventTypeCategory, IconName> = {
   other: 'terminal',
 };
 
+export const textBackdropOffsetWithIcon = 36;
+export const textBackdropOffset = 12;
+
+export const getTextOffset = (radius: number) => 1.5 * radius;
+
 export const timelineTextPosition = (
   points: number[],
   y: number,
@@ -90,7 +95,7 @@ export const timelineTextPosition = (
   if (textToLeft) textAnchor = 'end';
   if (textToRight) textIndex = points.indexOf(lastPoint);
 
-  const offset = 1.5 * radius;
+  const offset = getTextOffset(radius);
   let textX = textToRight ? lastPoint + offset : firstPoint - offset;
 
   // Pending or long events

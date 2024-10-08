@@ -2,7 +2,12 @@
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import type { GraphConfig } from '../constants';
+  import {
+    getTextOffset,
+    type GraphConfig,
+    textBackdropOffset,
+    textBackdropOffsetWithIcon,
+  } from '../constants';
 
   import Line from './line.svelte';
 
@@ -26,9 +31,12 @@
 
   $: showIcon = icon && config;
   $: textWidth = textElement?.getBBox()?.width || 0;
-  $: backdropWidth = showIcon && !noOffset ? textWidth + 36 : textWidth + 12;
+  $: backdropWidth =
+    showIcon && !noOffset
+      ? textWidth + textBackdropOffsetWithIcon
+      : textWidth + textBackdropOffset;
   $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 2 : x;
-  $: offset = noOffset ? config.radius * 1.5 : 0;
+  $: offset = noOffset ? getTextOffset(config.radius || 0) : 0;
 </script>
 
 {#if backdrop}

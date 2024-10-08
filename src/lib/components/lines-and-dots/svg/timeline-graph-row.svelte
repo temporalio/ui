@@ -8,6 +8,7 @@
 
   import {
     CategoryIcon,
+    textBackdropOffsetWithIcon,
     TimelineConfig,
     timelineTextPosition,
   } from '../constants';
@@ -127,7 +128,10 @@
     {/if}
     {#if hasPendingActivity && pendingActivity.attempt > 1}
       <Text
-        point={[textPosition[0] + textWidth + 36, textPosition[1]]}
+        point={[
+          textPosition[0] + textWidth + textBackdropOffsetWithIcon,
+          textPosition[1],
+        ]}
         textAnchor="start"
         {backdrop}
         backdropHeight={radius * 2}
