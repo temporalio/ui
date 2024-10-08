@@ -137,6 +137,7 @@
     class:destructive
     class:disabled
     class:selected
+    class:hoverable
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
