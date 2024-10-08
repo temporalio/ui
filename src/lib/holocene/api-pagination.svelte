@@ -215,7 +215,7 @@
 <slot name="header" visibleItems={$store.visibleItems} />
 <div class="relative mb-8 flex flex-col gap-4">
   <div
-    class="flex flex-col items-center gap-4 max-xl:flex max-xl:flex-col sm:flex-row {$$slots[
+    class="flex flex-row items-center gap-4 flex-wrap {$$slots[
       'action-top-left'
     ]
       ? 'justify-between'
