@@ -13,6 +13,7 @@
     label={$authUser.email}
     icon="astronaut"
     data-testid="email"
+    disabled
   />
   <NavigationButton
     onClick={logout}

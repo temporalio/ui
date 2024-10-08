@@ -9,6 +9,7 @@
   export let tooltip = label;
   export let animate = false;
   export let active = false;
+  export let disabled = false;
 </script>
 
 <div
@@ -17,6 +18,7 @@
   on:keypress={onClick}
   tabindex="0"
   data-testid={$$props['data-testid']}
+  class:disabled
   class="relative mb-1 flex items-center whitespace-nowrap rounded-lg p-1 py-2 pl-2 text-sm font-medium hover:bg-white hover:text-black group-[.surface-primary]:hover:bg-black group-[.surface-primary]:hover:text-white group-[.surface-primary]:dark:hover:bg-white group-[.surface-primary]:dark:hover:text-black"
 >
   {#if icon}
@@ -31,3 +33,9 @@
     {label}
   </div>
 </div>
+
+<style lang="postcss">
+  .disabled {
+    @apply pointer-events-none cursor-not-allowed bg-white text-black opacity-50;
+  }
+</style>

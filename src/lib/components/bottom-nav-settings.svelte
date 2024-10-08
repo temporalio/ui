@@ -24,7 +24,7 @@
 </script>
 
 {#if open}
-  <div class="flex h-full flex-col justify-end gap-4 overflow-auto px-4 py-8">
+  <div class="flex h-full flex-col justify-end gap-6 overflow-auto px-4 py-8">
     <TimezoneSelect position="left" />
     {#if $dataEncoder.hasError}
       <p class="text-red-400">{translate('data-encoder.codec-server-error')}</p>
