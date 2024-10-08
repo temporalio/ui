@@ -12,6 +12,7 @@
   export let position: 'left' | 'right' = 'left';
   export let primaryActionDisabled = false;
   export let href: string | undefined = undefined;
+  export let menuClass: string | undefined = undefined;
 </script>
 
 <MenuContainer class={$$props.class}>
@@ -38,7 +39,7 @@
     />
   </div>
 
-  <Menu id="{id}-menu" {position} class="max-w-fit">
+  <Menu id="{id}-menu" {position} class={menuClass}>
     <slot />
   </Menu>
 </MenuContainer>
