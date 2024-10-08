@@ -5,14 +5,12 @@
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
-  import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import { dataEncoder } from '$lib/stores/data-encoder';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
 
-  export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
 
   let screenWidth: number;
@@ -73,6 +71,6 @@
   <div class="flex items-center gap-2">
     <TimezoneSelect position={screenWidth < 768 ? 'left' : 'right'} />
     <DataEncoderStatus />
-    <UserMenu {logout} />
+    <slot />
   </div>
 </nav>

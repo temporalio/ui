@@ -40,21 +40,19 @@
         {/if}
       </div>
     </MenuButton>
-    <slot>
-      <Menu id="user-menu" position="right">
-        <MenuItem hoverable={false}>
-          <div class="flex items-center justify-start gap-4">
-            <Icon name="astronaut" />
-            <p>{$authUser?.email}</p>
-          </div>
-        </MenuItem>
-        <MenuItem on:click={logout}>
-          <div class="flex items-center justify-start gap-4">
-            <Icon name="exit" />
-            {translate('common.log-out')}
-          </div>
-        </MenuItem>
-      </Menu>
-    </slot>
+    <Menu id="user-menu" position="right">
+      <MenuItem hoverable={false}>
+        <div class="flex items-center justify-start gap-4">
+          <Icon name="astronaut" />
+          <p>{$authUser?.email}</p>
+        </div>
+      </MenuItem>
+      <MenuItem on:click={logout}>
+        <div class="flex items-center justify-start gap-4">
+          <Icon name="exit" />
+          {translate('common.log-out')}
+        </div>
+      </MenuItem>
+    </Menu>
   </MenuContainer>
 {/if}

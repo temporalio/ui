@@ -11,6 +11,8 @@
   import { ErrorBoundary } from '$lib/holocene/error-boundary';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
+  import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
+  import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import { clearAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
@@ -185,7 +187,9 @@
   </div>
   <MainContentContainer>
     <DataEncoderSettings />
-    <TopNavigation {logout} {namespaceList} />
+    <TopNavigation {namespaceList}>
+      <UserMenu {logout} />
+    </TopNavigation>
     <Banner
       message={$page.data.settings?.bannerText}
       closeLabel={translate('common.close')}
@@ -198,12 +202,8 @@
         <slot />
       </ErrorBoundary>
     </div>
-    <BottomNavigation
-      slot="footer"
-      {linkList}
-      {logout}
-      {namespaceList}
-      {isCloud}
-    />
+    <BottomNavigation slot="footer" {linkList} {namespaceList} {isCloud}>
+      <UserMenuMobile {logout} />
+    </BottomNavigation>
   </MainContentContainer>
 </div>
