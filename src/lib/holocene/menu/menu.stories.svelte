@@ -58,7 +58,7 @@
         Menu
       </MenuButton>
       <Menu id={context.id} class="w-64" {...args}>
-        <MenuItem href="https://temporal.io" on:click={action('click')}>
+        <MenuItem href="https://temporal.io" newTab on:click={action('click')}>
           Link
         </MenuItem>
         <MenuItem disabled href="https://temporal.io">Disabled Link</MenuItem>
