@@ -53,7 +53,7 @@
     name={icon}
     x={x - offset}
     y={y - 8}
-    class={dark ? 'text-black' : 'text-white'}
+    class={dark ? 'text-black' : !backdrop ? 'text-primary' : 'text-white'}
   />
 {/if}
 <text
@@ -75,7 +75,7 @@
     name={icon}
     x={x - offset}
     y={y - 8}
-    class={dark ? 'text-black' : 'text-white'}
+    class={dark ? 'text-black' : !backdrop ? 'text-primary' : 'text-white'}
   />
 {/if}
 
