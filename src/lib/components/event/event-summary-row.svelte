@@ -6,6 +6,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { isEventGroup } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
@@ -147,12 +148,20 @@
     {#if pendingAttempt}
       <div
         class="flex items-center gap-1 {pendingAttempt > 1 &&
-          'surface-danger rounded px-1 py-0.5'}"
+          'surface-retry rounded px-1 py-0.5'}"
       >
         <Icon class="mr-1.5 inline" name="retry" />
+        {translate('workflows.retry')}
         {pendingAttempt}
         {#if hasPendingActivity}
           / {hasPendingActivity.maximumAttempts || '∞'}
+          {#if pendingAttempt > 1}
+            • {translate('workflows.next-retry')}
+            {toTimeDifference({
+              date: hasPendingActivity.scheduledTime,
+              negativeDefault: 'None',
+            })}
+          {/if}
         {/if}
       </div>
     {/if}
@@ -197,20 +206,6 @@
             <Icon class="inline" name="clock" />
             <p class="whitespace-noline truncate">
               {duration}
-            </p>
-          </div>
-        {/if}
-        {#if pendingAttempt > 1 && hasPendingActivity}
-          <div class="flex items-center gap-2 text-sm">
-            <p class="max-w-fit whitespace-nowrap text-right text-xs">
-              Next Retry
-            </p>
-            <p class="flex items-center gap-0">
-              <Icon class="mr-1.5 inline" name="clock" />
-              {toTimeDifference({
-                date: hasPendingActivity.scheduledTime,
-                negativeDefault: 'None',
-              })}
             </p>
           </div>
         {/if}

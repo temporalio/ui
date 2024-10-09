@@ -65,11 +65,7 @@
   }
 
   .retry {
-    stroke: #ff4518;
-  }
-
-  .pending.retry {
-    stroke: #ff9b70;
+    stroke: theme('colors.red.300');
   }
 
   .child-workflow {
