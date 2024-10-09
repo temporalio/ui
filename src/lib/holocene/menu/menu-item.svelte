@@ -4,7 +4,7 @@
 </script>
 
 <script lang="ts">
-  import type { HTMLLiAttributes } from 'svelte/elements';
+  import type { HTMLAnchorAttributes, HTMLLiAttributes } from 'svelte/elements';
 
   import { createEventDispatcher, getContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -21,17 +21,26 @@
     currentTarget: EventTarget & HTMLAnchorElement;
   };
 
-  interface $$Props extends HTMLLiAttributes {
+  type BaseProps = {
     selected?: boolean;
     destructive?: boolean;
     disabled?: boolean;
-    href?: string;
     description?: string;
     centered?: boolean;
     class?: string;
     'data-testid'?: string;
     hoverable?: boolean;
-  }
+  };
+
+  type MenuItemWithoutHrefProps = BaseProps & HTMLLiAttributes;
+
+  type MenuItemWithHrefProps = BaseProps &
+    HTMLAnchorAttributes & {
+      href: string;
+      newTab?: boolean;
+    };
+
+  type $$Props = MenuItemWithoutHrefProps | MenuItemWithHrefProps;
 
   let className = '';
   export { className as class };
@@ -42,6 +51,7 @@
   export let description: string = null;
   export let centered = false;
   export let hoverable = true;
+  export let newTab = false;
 
   const { keepOpen, open } = getContext<MenuContext>(MENU_CONTEXT);
 
@@ -107,6 +117,8 @@
 {#if href}
   <a
     {href}
+    target={newTab ? '_blank' : null}
+    rel={newTab ? 'noreferrer' : null}
     role="menuitem"
     class={merge(
       'menu-item',
