@@ -32,7 +32,11 @@
     hoverable?: boolean;
   };
 
-  type MenuItemWithoutHrefProps = BaseProps & HTMLLiAttributes;
+  type MenuItemWithoutHrefProps = BaseProps &
+    HTMLLiAttributes & {
+      href?: never;
+      newTab?: never;
+    };
 
   type MenuItemWithHrefProps = BaseProps &
     HTMLAnchorAttributes & {
