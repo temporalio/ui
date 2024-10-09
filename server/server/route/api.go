@@ -77,3 +77,12 @@ func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, a
 
 	return nil
 }
+
+// SetMarkdownRoute sets /render routes
+func SetMarkdownRoute(e *echo.Echo) error {
+	e.GET("/render", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, map[string]string{"status": "OK"})
+	})
+
+	return nil
+}
