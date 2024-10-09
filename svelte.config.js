@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-static';
+import node from '@sveltejs/adapter-node';
 import vercel from '@sveltejs/adapter-vercel';
 import preprocess from 'svelte-preprocess';
 
@@ -23,10 +23,8 @@ export default {
   kit: {
     adapter: ci
       ? vercel()
-      : adapter({
-          fallback: 'index.html',
-          pages: buildPath,
-          assets: buildPath,
+      : node({
+          out: buildPath,
         }),
     prerender: {
       entries: [],
