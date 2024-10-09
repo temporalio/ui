@@ -65,15 +65,15 @@
   $: elapsedTime = formatDistanceAbbreviated({
     start: initialItem?.eventTime,
     end: isEventGroup(event)
-      ? event.initialEvent.eventTime
+      ? event.initialEvent?.eventTime
       : currentEvent.eventTime,
     includeMillisecondsForUnderSecond: true,
   });
 
   $: duration = isEventGroup(event)
     ? formatDistanceAbbreviated({
-        start: event.initialEvent.eventTime,
-        end: event.lastEvent.eventTime,
+        start: event.initialEvent?.eventTime,
+        end: event.lastEvent?.eventTime,
         includeMillisecondsForUnderSecond: true,
       })
     : '';
