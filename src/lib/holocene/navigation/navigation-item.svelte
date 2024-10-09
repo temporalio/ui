@@ -34,7 +34,7 @@
     class:disabled
     tabindex={disabled ? -1 : 0}
     class:active
-    class="mb-1 flex items-center whitespace-nowrap rounded-lg p-1 pl-2 text-sm font-medium hover:bg-white hover:text-black group-[.surface-primary]:hover:bg-black group-[.surface-primary]:hover:text-white group-[.surface-primary]:dark:hover:bg-white group-[.surface-primary]:dark:hover:text-black"
+    class="mb-1 flex items-center whitespace-nowrap rounded-lg p-1 pl-2 text-sm font-medium"
     class:text-disabled={disabled}
   >
     {#if icon}
@@ -55,6 +55,11 @@
 </div>
 
 <style lang="postcss">
+  a:hover,
+  a.active {
+    @apply bg-white text-black group-[.surface-primary]:bg-black group-[.surface-primary]:text-white group-[.surface-primary]:dark:bg-white group-[.surface-primary]:dark:text-black;
+  }
+
   a.disabled {
     @apply pointer-events-none cursor-not-allowed text-subtle;
   }
