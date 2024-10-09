@@ -9,6 +9,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { dataEncoder } from '$lib/stores/data-encoder';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
@@ -120,13 +121,15 @@
       on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
     >
     <div class="ml-1 h-full w-1 border-l-2 border-subtle" />
-    <Button
-      variant="ghost"
-      size="xs"
-      href={routeForNamespace({ namespace })}
-      disabled={!namespaceExists}
-      ><Icon class="text-white" name="external-link" /></Button
-    >
+    <Tooltip text={translate('namespaces.go-to-namespace')} top>
+      <Button
+        variant="ghost"
+        size="xs"
+        href={routeForNamespace({ namespace })}
+        disabled={!namespaceExists}
+        ><Icon class="text-white" name="external-link" /></Button
+      >
+    </Tooltip>
   </div>
   <button
     class="nav-button"

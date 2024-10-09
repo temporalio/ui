@@ -57,6 +57,7 @@
       optionValueKey="namespace"
       on:change={handleNamespaceSelect}
       minSize={32}
+      actionTooltip={translate('namespaces.go-to-namespace')}
     >
       <Button
         slot="action"
