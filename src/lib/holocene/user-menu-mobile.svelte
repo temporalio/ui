@@ -19,7 +19,7 @@
     onClick={logout}
     tooltip={translate('common.log-out')}
     label={translate('common.log-out')}
-    icon="exit"
+    icon="logout"
     data-testid="log-out"
   />
 {/if}

@@ -49,7 +49,7 @@
       </MenuItem>
       <MenuItem on:click={logout}>
         <div class="flex items-center justify-start gap-4">
-          <Icon name="exit" />
+          <Icon name="logout" />
           {translate('common.log-out')}
         </div>
       </MenuItem>
