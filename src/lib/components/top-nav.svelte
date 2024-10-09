@@ -5,22 +5,13 @@
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
-  import {
-    Menu,
-    MenuButton,
-    MenuContainer,
-    MenuItem,
-  } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
-  import { authUser } from '$lib/stores/auth-user';
   import { dataEncoder } from '$lib/stores/data-encoder';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
 
-  export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
-  export let userEmaiLink = '';
 
   let screenWidth: number;
 
@@ -37,12 +28,6 @@
     (namespaceListItem) => namespaceListItem.namespace === namespace,
   );
 
-  let showProfilePic = true;
-
-  function fixImage() {
-    showProfilePic = false;
-  }
-
   const handleNamespaceSelect = (
     event: CustomEvent<{ value: NamespaceListItem }>,
   ) => {
@@ -53,7 +38,6 @@
 </script>
 
 <svelte:window bind:innerWidth={screenWidth} />
-
 <nav
   class="surface-primary sticky top-0 z-40 flex hidden w-full flex-col items-center justify-end border-b border-subtle p-1 px-4 md:flex md:flex-row md:px-8"
   data-testid="top-nav"
@@ -73,6 +57,7 @@
       optionValueKey="namespace"
       on:change={handleNamespaceSelect}
       minSize={32}
+      actionTooltip={translate('namespaces.go-to-namespace')}
     >
       <Button
         slot="action"
@@ -87,34 +72,6 @@
   <div class="flex items-center gap-2">
     <TimezoneSelect position={screenWidth < 768 ? 'left' : 'right'} />
     <DataEncoderStatus />
-    {#if $authUser.accessToken}
-      <MenuContainer>
-        <MenuButton variant="ghost" hasIndicator controls="user-menu">
-          <img
-            src={$authUser?.picture}
-            alt={$authUser?.profile ?? translate('common.user-profile')}
-            class="h-[24px] w-[24px] cursor-pointer rounded-md"
-            on:error={fixImage}
-            class:hidden={!showProfilePic}
-          />
-          <div
-            class="aspect-square h-full w-[24px] rounded-md bg-blue-200 p-0.5"
-            class:hidden={showProfilePic}
-          >
-            {#if $authUser?.name}
-              <div class="text-center text-sm text-black">
-                {$authUser?.name.trim().charAt(0)}
-              </div>
-            {/if}
-          </div>
-        </MenuButton>
-        <Menu id="user-menu" position="right">
-          <MenuItem href={userEmaiLink} disabled={!userEmaiLink}>
-            {$authUser.email}
-          </MenuItem>
-          <MenuItem on:click={logout}>{translate('common.log-out')}</MenuItem>
-        </Menu>
-      </MenuContainer>
-    {/if}
+    <slot />
   </div>
 </nav>

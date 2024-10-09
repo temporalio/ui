@@ -15,6 +15,7 @@
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
   import MenuDivider from '../menu/menu-divider.svelte';
+  import Tooltip from '../tooltip.svelte';
 
   type T = $$Generic;
 
@@ -44,6 +45,7 @@
     'data-testid'?: string;
     error?: string;
     valid?: boolean;
+    actionTooltip?: string;
   }
 
   type MultiSelectProps = {
@@ -108,6 +110,8 @@
   export let selectAllLabel = 'Select All';
   export let deselectAllLabel = 'Deselect All';
   export let removeChipLabel = 'Remove Option';
+  export let actionTooltip = '';
+
   export let numberOfItemsSelectedLabel = (count: number) =>
     `${count} option${count > 1 ? 's' : ''} selected`;
 
@@ -392,7 +396,13 @@
     </div>
     {#if $$slots.action}
       <div class="ml-1 flex h-full items-center border-l-2 border-subtle p-0.5">
-        <slot name="action" />
+        {#if actionTooltip}
+          <Tooltip text={actionTooltip} right>
+            <slot name="action" />
+          </Tooltip>
+        {:else}
+          <slot name="action" />
+        {/if}
       </div>
     {/if}
   </div>
