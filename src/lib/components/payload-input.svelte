@@ -21,9 +21,9 @@
   export let encoding: Writable<PayloadInputEncoding>;
   export let error = false;
   export let resetValues = false;
+  export let loading = false;
 
   let codeBlock: CodeBlock;
-  let uploaded = false;
 
   $: error = !isValidInput(input);
 
@@ -51,12 +51,12 @@
     $encoding = 'json/plain';
     input = '';
     codeBlock?.resetView(input);
-    uploaded = false;
+    loading = false;
   };
 
   const onUpload = (uploadInput: string) => {
     input = uploadInput;
-    uploaded = true;
+    loading = true;
   };
 
   onDestroy(() => {
@@ -89,7 +89,7 @@
       for="payload-input"
       label={translate('workflows.signal-payload-input-label')}
     />
-    {#key uploaded}
+    {#key loading}
       <CodeBlock
         id="payload-input"
         maxHeight={320}

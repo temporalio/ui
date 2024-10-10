@@ -27,8 +27,6 @@
 
 <div class="flex flex-col gap-1">
   <PayloadDecoder value={payloads} key="payloads" onDecode={setInitialInput}>
-    {#key loading}
-      <PayloadInput bind:input bind:encoding />
-    {/key}
+    <PayloadInput bind:input bind:encoding bind:loading />
   </PayloadDecoder>
 </div>
