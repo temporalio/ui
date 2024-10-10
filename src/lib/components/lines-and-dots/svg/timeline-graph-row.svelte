@@ -9,6 +9,7 @@
 
   import {
     CategoryIcon,
+    textBackdropOffset,
     textBackdropOffsetWithIcon,
     TimelineConfig,
     timelineTextPosition,
@@ -30,11 +31,13 @@
   const { height, gutter, radius } = TimelineConfig;
 
   let textWidth = 0;
+  let retryAttemptTextWidth = 0;
 
   $: timelineWidth = canvasWidth - 2 * gutter;
   $: active = !activeGroups.length || activeGroups.includes(group.id);
   $: ({ pendingActivity } = group);
-  $: hasPendingActivity = isPendingActivity(pendingActivity);
+  $: showRetryAttempts =
+    isPendingActivity(pendingActivity) && pendingActivity.attempt > 1;
 
   const getDistancePointsAndPositions = (
     endTime: string | Date,
@@ -117,7 +120,14 @@
     {/if}
     {#if showText}
       <Text
-        point={textPosition}
+        point={[
+          showRetryAttempts && textAnchor === 'end'
+            ? textPosition[0] -
+              retryAttemptTextWidth -
+              textBackdropOffsetWithIcon
+            : textPosition[0],
+          textPosition[1],
+        ]}
         {textAnchor}
         {backdrop}
         backdropHeight={radius * 2}
@@ -127,10 +137,12 @@
         {group?.displayName}
       </Text>
     {/if}
-    {#if hasPendingActivity && pendingActivity.attempt > 1}
+    {#if showRetryAttempts}
       <Text
         point={[
-          textPosition[0] + textWidth + textBackdropOffsetWithIcon,
+          textAnchor === 'end'
+            ? textPosition[0] - retryAttemptTextWidth - textBackdropOffset
+            : textPosition[0] + textWidth + textBackdropOffsetWithIcon,
           textPosition[1],
         ]}
         textAnchor="start"
@@ -140,7 +152,8 @@
         icon="retry"
         status="retry"
         noOffset
-        dark
+        dark={backdrop}
+        bind:textWidth={retryAttemptTextWidth}
       >
         {translate('workflows.retry')}
         {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
