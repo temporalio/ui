@@ -89,7 +89,7 @@
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: Partial<ScheduleParameters> = {
-      name,
+      name: name.trimEnd(),
       workflowType,
       workflowId,
       taskQueue,
