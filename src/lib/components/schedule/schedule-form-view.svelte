@@ -73,6 +73,7 @@
   let workflowId = decodedWorkflow?.workflowId ?? '';
   let taskQueue = decodedWorkflow?.taskQueue?.name ?? '';
   let input = '';
+  let initialInput = '';
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let daysOfWeek: string[] = [];
   let daysOfMonth: number[] = [];
@@ -93,7 +94,7 @@
       workflowType,
       workflowId,
       taskQueue,
-      input,
+      ...(initialInput !== input && { input }),
       encoding: $encoding,
       hour,
       minute,
@@ -216,6 +217,7 @@
       </div>
       <ScheduleInputPayload
         bind:input
+        bind:initialInput
         bind:encoding
         payloads={schedule?.action?.startWorkflow?.input}
       />

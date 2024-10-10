@@ -11,13 +11,15 @@
   } from '../payload-input.svelte';
 
   export let input: string;
+  export let initialInput = '';
   export let encoding: Writable<PayloadInputEncoding>;
   export let payloads: Payloads;
 
   let loading = true;
 
   const setInitialInput = (decodedValue: string): void => {
-    input = getSinglePayload(decodedValue);
+    initialInput = getSinglePayload(decodedValue);
+    input = initialInput;
     $encoding = atob(
       String(payloads?.payloads[0]?.metadata?.encoding ?? 'json/plain'),
     ) as PayloadInputEncoding;
