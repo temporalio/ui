@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
+  import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import { cancelWorkflow } from '$lib/services/workflow-service';
@@ -15,6 +16,7 @@
 
   let loading: boolean;
   let error: string = '';
+  let reason: string;
 
   const cancel = async () => {
     error = '';
@@ -23,8 +25,10 @@
       await cancelWorkflow({
         namespace,
         workflow,
+        reason,
       });
       open = false;
+      reason = '';
       $refresh = Date.now();
       toaster.push({
         id: 'workflow-cancelation-success-toast',
@@ -50,11 +54,22 @@
   {loading}
   confirmType="destructive"
   on:confirmModal={cancel}
+  on:cancelModal={() => {
+    reason = '';
+  }}
 >
   <h3 slot="title">{translate('workflows.cancel-modal-title')}</h3>
   <svelte:fragment slot="content">
     <p>
       {translate('workflows.cancel-modal-confirmation')}
     </p>
+    <Input
+      id="cancel-reason"
+      class="mt-4"
+      bind:value={reason}
+      label={translate('common.reason')}
+      placeholder={translate('common.reason-placeholder')}
+      labelHidden
+    />
   </svelte:fragment>
 </Modal>
