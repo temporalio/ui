@@ -6,7 +6,7 @@
 
 <div class="flex items-center gap-1 p-1">
   {#each links as { copy, href }, i}
-    <Link {href} {...$$restProps} icon={i !== 0 && 'chevron-left'}>
+    <Link {href} {...$$restProps} icon={i !== 0 ? 'chevron-left' : undefined}>
       {copy}
     </Link>
   {/each}
