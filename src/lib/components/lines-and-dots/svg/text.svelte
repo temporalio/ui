@@ -2,12 +2,18 @@
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import type { GraphConfig } from '../constants';
+  import {
+    getTextOffset,
+    type GraphConfig,
+    textBackdropOffset,
+    textBackdropOffsetWithIcon,
+  } from '../constants';
 
   import Line from './line.svelte';
 
   export let point: [number, number] = [0, 0];
   export let category: string | undefined = undefined;
+  export let status: string | undefined = 'none';
   export let fontSize = '14px';
   export let fontWeight = '400';
   export let textAnchor = 'start';
@@ -16,6 +22,9 @@
   export let icon: IconName | undefined = undefined;
   export let config: GraphConfig | undefined = undefined;
   export let label = false;
+  export let textWidth = 0;
+  export let noOffset = false;
+  export let dark = false;
 
   $: [x, y] = point;
 
@@ -23,27 +32,37 @@
 
   $: showIcon = icon && config;
   $: textWidth = textElement?.getBBox()?.width || 0;
-  $: backdropWidth = showIcon ? textWidth + 36 : textWidth + 12;
+  $: backdropWidth =
+    showIcon && !noOffset
+      ? textWidth + textBackdropOffsetWithIcon
+      : textWidth + textBackdropOffset;
   $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 2 : x;
+  $: offset = noOffset ? getTextOffset(config.radius || 0) : 0;
 </script>
 
 {#if backdrop}
   <Line
     startPoint={[x - backdropHeight, y]}
     endPoint={[x + backdropWidth, y]}
-    status="none"
+    {status}
     strokeWidth={backdropHeight}
   />
 {/if}
 {#if showIcon && textAnchor === 'start'}
-  <Icon name={icon} {x} y={y - 8} class="text-white" />
+  <Icon
+    name={icon}
+    x={x - offset}
+    y={y - 8}
+    class={dark ? 'text-black' : 'text-white'}
+  />
 {/if}
 <text
   bind:this={textElement}
   class="cursor-pointer select-none outline-none {category} text-primary"
   class:label
   class:backdrop
-  x={textX}
+  class:dark
+  x={textX - offset}
   {y}
   font-size={fontSize}
   font-weight={fontWeight}
@@ -54,9 +73,9 @@
 {#if showIcon && textAnchor === 'end'}
   <Icon
     name={icon}
-    x={x - textWidth - config.radius * 1.5}
+    x={x - offset}
     y={y - 8}
-    class="text-white"
+    class={dark ? 'text-black' : 'text-white'}
   />
 {/if}
 
@@ -112,7 +131,8 @@
     fill: #ff4518;
   }
 
+  text.dark,
   text.none {
-    fill: #141414;
+    fill: theme('colors.space-black');
   }
 </style>

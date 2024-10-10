@@ -137,7 +137,9 @@ export const fromSeconds = (
   if (!seconds.endsWith('s')) return '';
   if (isNaN(parsedSeconds) || isNaN(parsedDecimal)) return '';
 
-  const duration = intervalToDuration({ start: 0, end: parsedSeconds * 1000 });
+  const start = new Date(Date.UTC(0, 0, 0, 0, 0, 0));
+  const end = new Date(Date.UTC(0, 0, 0, 0, 0, parsedSeconds));
+  const duration = intervalToDuration({ start, end });
   const durationString = durationToString(duration, { delimiter });
   const milliseconds =
     Math.round(parsedDecimal * 1000 * 1000000000) / 1000000000; // round to nanoseconds

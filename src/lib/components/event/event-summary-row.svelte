@@ -6,6 +6,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { isEventGroup } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
@@ -64,15 +65,15 @@
   $: elapsedTime = formatDistanceAbbreviated({
     start: initialItem?.eventTime,
     end: isEventGroup(event)
-      ? event.initialEvent.eventTime
+      ? event.initialEvent?.eventTime
       : currentEvent.eventTime,
     includeMillisecondsForUnderSecond: true,
   });
 
   $: duration = isEventGroup(event)
     ? formatDistanceAbbreviated({
-        start: event.initialEvent.eventTime,
-        end: event.lastEvent.eventTime,
+        start: event.initialEvent?.eventTime,
+        end: event.lastEvent?.eventTime,
         includeMillisecondsForUnderSecond: true,
       })
     : '';
@@ -136,57 +137,50 @@
     <td class="w-4" />
   {/if}
   <td
-    class="w-full overflow-hidden text-right text-sm font-normal xl:text-left"
+    class="flex w-full items-center gap-2 overflow-hidden text-right text-sm font-normal xl:text-left"
   >
-    <div
-      class="flex w-full max-w-screen-sm items-center gap-2 lg:max-w-screen-md xl:max-w-screen-xl"
+    <Icon name={icon} />
+    <p
+      class="event-name max-w-fit whitespace-nowrap text-sm font-semibold md:text-base"
     >
-      <Icon name={icon} />
-      <p
-        class="event-name max-w-fit whitespace-nowrap pr-4 text-sm font-semibold md:text-base"
+      {displayName}
+    </p>
+    {#if pendingAttempt}
+      <div
+        class="flex items-center gap-1 {pendingAttempt > 1 &&
+          'surface-retry rounded px-1 py-0.5'}"
       >
-        {displayName}
-      </p>
-      <div class="flex w-full gap-4 truncate">
-        {#if pendingAttempt}
-          <div
-            class="flex items-center gap-1 {pendingAttempt > 1 &&
-              'surface-danger rounded px-1 py-0.5'}"
-          >
-            <Icon class="mr-1.5 inline" name="retry" />
-            {pendingAttempt}
-            {#if hasPendingActivity}
-              / {hasPendingActivity.maximumAttempts || '∞'}
-            {/if}
-          </div>
-        {/if}
-        {#if currentEvent?.links?.length}
-          <EventLink link={currentEvent.links[0]} />
-        {/if}
-        {#if primaryAttribute?.key}
-          <EventDetailsRow
-            {...primaryAttribute}
-            {attributes}
-            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-          />
-        {/if}
-        {#if nonPendingActivityAttempt}
-          <EventDetailsRow
-            key="attempt"
-            value={nonPendingActivityAttempt.toString()}
-            {attributes}
-            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-          />
-        {/if}
-        {#if compact && secondaryAttribute?.key}
-          <EventDetailsRow
-            {...secondaryAttribute}
-            {attributes}
-            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-          />
+        <Icon class="mr-1.5 inline" name="retry" />
+        {translate('workflows.retry')}
+        {pendingAttempt}
+        {#if hasPendingActivity}
+          / {hasPendingActivity.maximumAttempts || '∞'}
+          {#if pendingAttempt > 1}
+            • {translate('workflows.next-retry')}
+            {toTimeDifference({
+              date: hasPendingActivity.scheduledTime,
+              negativeDefault: 'None',
+            })}
+          {/if}
         {/if}
       </div>
-    </div>
+    {/if}
+    {#if currentEvent?.links?.length}
+      <EventLink link={currentEvent.links[0]} />
+    {/if}
+    {#if primaryAttribute?.key}
+      <EventDetailsRow {...primaryAttribute} {attributes} />
+    {/if}
+    {#if nonPendingActivityAttempt}
+      <EventDetailsRow
+        key="attempt"
+        value={nonPendingActivityAttempt.toString()}
+        {attributes}
+      />
+    {/if}
+    {#if compact && secondaryAttribute?.key}
+      <EventDetailsRow {...secondaryAttribute} {attributes} />
+    {/if}
   </td>
   <td>
     {#if isEventGroup(event)}
@@ -212,20 +206,6 @@
             <Icon class="inline" name="clock" />
             <p class="whitespace-noline truncate">
               {duration}
-            </p>
-          </div>
-        {/if}
-        {#if pendingAttempt > 1 && hasPendingActivity}
-          <div class="flex items-center gap-2 text-sm">
-            <p class="max-w-fit whitespace-nowrap text-right text-xs">
-              Next Retry
-            </p>
-            <p class="flex items-center gap-0">
-              <Icon class="mr-1.5 inline" name="clock" />
-              {toTimeDifference({
-                date: hasPendingActivity.scheduledTime,
-                negativeDefault: 'None',
-              })}
             </p>
           </div>
         {/if}

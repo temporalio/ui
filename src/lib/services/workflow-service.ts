@@ -4,15 +4,22 @@ import { v4 } from 'uuid';
 
 import { page } from '$app/stores';
 
-import { Action, type ResetReapplyType } from '$lib/models/workflow-actions';
+import { Action } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
+import { isCloud } from '$lib/stores/advanced-visibility';
 import { authUser } from '$lib/stores/auth-user';
 import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+import { temporalVersion } from '$lib/stores/versions';
 import { canFetchChildWorkflows } from '$lib/stores/workflows';
-import type { ResetWorkflowRequest, SearchAttribute } from '$lib/types';
+import {
+  ResetReapplyExcludeType,
+  ResetReapplyType,
+  type ResetWorkflowRequest,
+  type SearchAttribute,
+} from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
   ValidWorkflowParameters,
@@ -47,7 +54,10 @@ import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { base, pathForApi, routeForApi } from '$lib/utilities/route-for-api';
-import { isVersionNewer } from '$lib/utilities/version-check';
+import {
+  isVersionNewer,
+  minimumVersionRequired,
+} from '$lib/utilities/version-check';
 import { formatReason } from '$lib/utilities/workflow-actions';
 
 import { fetchInitialEvent } from './events-service';
@@ -73,6 +83,7 @@ type SignalWorkflowOptions = {
   workflow: WorkflowExecution;
   name: string;
   input: string;
+  encoding: string;
 };
 
 type StartWorkflowOptions = {
@@ -81,6 +92,7 @@ type StartWorkflowOptions = {
   taskQueue: string;
   workflowType: string;
   input: string;
+  encoding: string;
   searchAttributes: SearchAttributeInput[];
 };
 
@@ -95,7 +107,11 @@ export type ResetWorkflowOptions = {
   workflow: WorkflowExecution;
   eventId: string;
   reason: string;
-  reapplyType: ResetReapplyType;
+  // used pre temporal server v1.24
+  includeSignals: boolean;
+  // used post temporal server v1.24
+  excludeSignals: boolean;
+  excludeUpdates: boolean;
 };
 
 export type FetchWorkflow =
@@ -303,13 +319,14 @@ export async function signalWorkflow({
   workflow: { id: workflowId, runId },
   name,
   input,
+  encoding,
 }: SignalWorkflowOptions) {
   const route = routeForApi('workflow.signal', {
     namespace,
     workflowId,
     signalName: name,
   });
-  const payloads = await encodePayloads(input);
+  const payloads = await encodePayloads(input, encoding);
   const settings = get(page).data.settings;
   const version = settings?.version ?? '';
   const newVersion = isVersionNewer(version, '2.22');
@@ -348,7 +365,9 @@ export async function resetWorkflow({
   workflow: { id: workflowId, runId },
   eventId,
   reason,
-  reapplyType,
+  includeSignals,
+  excludeSignals,
+  excludeUpdates,
 }: ResetWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow.reset', {
     namespace,
@@ -364,17 +383,52 @@ export async function resetWorkflow({
 
   const body: Replace<
     ResetWorkflowRequest,
-    { workflowTaskFinishEventId: string; resetReapplyType: ResetReapplyType }
+    { workflowTaskFinishEventId: string }
   > = {
     workflowExecution: {
       workflowId,
       runId,
     },
     workflowTaskFinishEventId: eventId,
-    resetReapplyType: reapplyType,
     requestId: v4(),
     reason: formattedReason,
   };
+
+  if (get(isCloud) || minimumVersionRequired('1.24.0', get(temporalVersion))) {
+    const resetReapplyExcludeTypes: ResetWorkflowRequest['resetReapplyExcludeTypes'] =
+      [];
+
+    if (!excludeSignals && !excludeUpdates) {
+      resetReapplyExcludeTypes.push(
+        ResetReapplyExcludeType.RESET_REAPPLY_EXCLUDE_TYPE_UNSPECIFIED,
+      );
+    }
+
+    if (excludeSignals) {
+      resetReapplyExcludeTypes.push(
+        ResetReapplyExcludeType.RESET_REAPPLY_EXCLUDE_TYPE_SIGNAL,
+      );
+    }
+
+    if (excludeUpdates) {
+      resetReapplyExcludeTypes.push(
+        ResetReapplyExcludeType.RESET_REAPPLY_EXCLUDE_TYPE_UPDATE,
+      );
+    }
+
+    body.resetReapplyExcludeTypes = resetReapplyExcludeTypes;
+    body.resetReapplyType = ResetReapplyType.RESET_REAPPLY_TYPE_ALL_ELIGIBLE;
+  } else {
+    let resetReapplyType: ResetWorkflowRequest['resetReapplyType'];
+
+    if (includeSignals) {
+      resetReapplyType = ResetReapplyType.RESET_REAPPLY_TYPE_SIGNAL;
+    } else {
+      resetReapplyType = ResetReapplyType.RESET_REAPPLY_TYPE_NONE;
+    }
+
+    body.resetReapplyType = resetReapplyType;
+  }
 
   return requestFromAPI<{ runId: string }>(route, {
     notifyOnError: false,
@@ -431,7 +485,9 @@ export const setSearchAttributes = (
 
   const searchAttributes: SearchAttribute = {};
   attributes.forEach((attribute) => {
-    searchAttributes[attribute.attribute] = setBase64Payload(attribute.value);
+    searchAttributes[attribute.attribute] = setBase64Payload(
+      String(attribute.value),
+    );
   });
 
   return searchAttributes;
@@ -443,6 +499,7 @@ export async function startWorkflow({
   taskQueue,
   workflowType,
   input,
+  encoding,
   searchAttributes,
 }: StartWorkflowOptions) {
   const route = routeForApi('workflow', {
@@ -453,7 +510,7 @@ export async function startWorkflow({
 
   if (input) {
     try {
-      payloads = await encodePayloads(input);
+      payloads = await encodePayloads(input, encoding);
     } catch (_) {
       console.error('Could not decode input for starting workflow');
     }
@@ -502,7 +559,10 @@ export const fetchInitialValuesForStartWorkflow = async ({
   const handleError: ErrorCallback = (err) => {
     console.error(err);
   };
-  const emptyValues = { input: '', searchAttributes: undefined };
+  const emptyValues = {
+    input: '',
+    searchAttributes: undefined,
+  };
   try {
     let query = '';
     if (workflowType && workflowId) {

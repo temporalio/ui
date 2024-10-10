@@ -91,6 +91,10 @@ export const Strings = {
   'reset-event-radio-group-description': 'Choose an Event to reset to',
   'reset-reapply-type-label':
     'Reapply Signals that happened after the Reset point',
+  'reset-exclude-signals':
+    'Exclude Signals that happened after the Reset point.',
+  'reset-exclude-updates':
+    'Exclude Updates that happened after the Reset point.',
   'cancel-modal-title': 'Cancel Workflow',
   'cancel-modal-confirmation':
     'Are you sure you want to cancel this workflow? This action cannot be undone.',
@@ -99,7 +103,7 @@ export const Strings = {
     'Are you sure you want to terminate this workflow? This action cannot be undone.',
   'signal-modal-title': 'Send a Signal',
   'signal-name-label': 'Signal name',
-  'signal-payload-input-label': 'Input',
+  'signal-payload-input-label': 'Data',
   'signal-payload-input-label-hint': '(only single JSON payload supported)',
   'cancel-request-sent': 'Cancel Request Sent',
   'cancel-request-sent-description':
@@ -151,6 +155,7 @@ export const Strings = {
   'last-heartbeat': 'Last Heartbeat',
   attempt: 'Attempt',
   'attempts-left': 'Attempts Left',
+  retry: 'Retry',
   'next-retry': 'Next Retry',
   expiration: 'Expiration',
   'heartbeat-details': 'Heartbeat Details',

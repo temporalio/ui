@@ -10,9 +10,12 @@
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
 
-  import Button from '../button.svelte';
+  import Badge from '../badge.svelte';
+  import Chip from '../chip.svelte';
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
+  import MenuDivider from '../menu/menu-divider.svelte';
+  import Tooltip from '../tooltip.svelte';
 
   type T = $$Generic;
 
@@ -30,7 +33,6 @@
     id: string;
     label: string;
     toggleLabel: string;
-    value: string;
     noResultsText: string;
     disabled?: boolean;
     labelHidden?: boolean;
@@ -43,30 +45,51 @@
     'data-testid'?: string;
     error?: string;
     valid?: boolean;
+    actionTooltip?: string;
   }
 
-  type UncontrolledStringOptionProps = {
+  type MultiSelectProps = {
+    multiselect: true;
+    value: string[];
+    displayChips?: boolean;
+    chipLimit?: number;
+    removeChipLabel?: string;
+    selectAllLabel?: string;
+    selectNoneLabel?: string;
+    numberOfItemsSelectedLabel?: (count: number) => string;
+  };
+
+  type SingleSelectProps = {
+    multiselect?: false;
+    value: string;
+    chipLimit?: never;
+  };
+
+  type StringOptionProps = {
     options: string[];
     optionValueKey?: never;
     optionLabelKey?: never;
     displayValue?: never;
   };
 
-  type UncontrolledCustomOptionProps = {
+  type CustomOptionProps = {
     options: T[];
     optionValueKey: keyof T;
     optionLabelKey?: keyof T;
   };
 
   type $$Props =
-    | (BaseProps & UncontrolledStringOptionProps)
-    | (BaseProps & UncontrolledCustomOptionProps);
+    | (BaseProps & StringOptionProps & SingleSelectProps)
+    | (BaseProps & StringOptionProps & MultiSelectProps)
+    | (BaseProps & CustomOptionProps & SingleSelectProps)
+    | (BaseProps & CustomOptionProps & MultiSelectProps);
 
   let className = '';
   export { className as class };
   export let id: string;
   export let label: string;
-  export let value: string = undefined;
+  export let multiselect = false;
+  export let value: string | string[] = multiselect ? [] : undefined;
   export let toggleLabel: string;
   export let noResultsText: string;
   export let disabled = false;
@@ -82,8 +105,17 @@
   export let maxSize = 120;
   export let error = '';
   export let valid = true;
+  export let displayChips = true;
+  export let chipLimit = 5;
+  export let selectAllLabel = 'Select All';
+  export let deselectAllLabel = 'Deselect All';
+  export let removeChipLabel = 'Remove Option';
+  export let actionTooltip = '';
 
-  let displayValue: string;
+  export let numberOfItemsSelectedLabel = (count: number) =>
+    `${count} option${count > 1 ? 's' : ''} selected`;
+
+  let displayValue: string = '';
   let selectedOption: string | T;
   let menuElement: HTMLUListElement;
   let inputElement: HTMLInputElement;
@@ -102,7 +134,7 @@
     }
   }
 
-  $: {
+  $: if (!multiselect) {
     selectedOption = options.find((option) => {
       if (isStringOption(option)) {
         return option === value;
@@ -115,14 +147,6 @@
 
     displayValue = getDisplayValue(selectedOption);
   }
-
-  const toggleList = () => {
-    if ($open) {
-      closeList();
-    } else {
-      openList();
-    }
-  };
 
   const openList = () => {
     $open = true;
@@ -147,7 +171,9 @@
     list = options;
   };
 
-  const narrowOption = (option: unknown): T => option as T;
+  const isArrayValue = (value: string | string[]): value is string[] => {
+    return Array.isArray(value);
+  };
 
   const isStringOption = (option: string | T): option is string => {
     return typeof option === 'string';
@@ -170,7 +196,13 @@
   };
 
   const getDisplayValue = (option: string | T | undefined): string => {
-    if (!option) return value ?? '';
+    if (!option) {
+      if (isArrayValue(value)) {
+        return '';
+      }
+
+      return value ?? '';
+    }
 
     if (isStringOption(option)) {
       return option;
@@ -183,18 +215,59 @@
 
   const setValue = (option: string | T): void => {
     if (isStringOption(option)) {
-      value = option;
+      if (isArrayValue(value)) {
+        if (value.includes(option)) {
+          value = value.filter((o) => o !== option);
+        } else {
+          value = [...value, option];
+        }
+      } else {
+        value = option;
+      }
     }
 
     if (isObjectOption(option) && canRenderCustomOption(option)) {
-      value = String(option[optionValueKey]);
+      const opt = String(option[optionValueKey]);
+      if (isArrayValue(value)) {
+        if (value.includes(opt)) {
+          value = value.filter((o) => o !== opt);
+        } else {
+          value = [...value, opt];
+        }
+      } else {
+        value = opt;
+      }
     }
   };
 
   const handleSelectOption = (option: string | T) => {
     setValue(option);
     dispatch('change', { value: option });
-    resetValueAndOptions();
+    if (!multiselect) {
+      resetValueAndOptions();
+    }
+  };
+
+  const removeOption = (option: string) => {
+    if (isArrayValue(value)) {
+      value = value.filter((o) => o !== option);
+    }
+  };
+
+  const selectAll = () => {
+    if (!multiselect || !isArrayValue(value)) return;
+
+    value = list.map((option) => {
+      if (isObjectOption(option) && canRenderCustomOption(option)) {
+        return String(option[optionValueKey]);
+      } else if (isStringOption(option)) {
+        return option;
+      }
+    });
+  };
+
+  const deselectAll = () => {
+    value = [];
   };
 
   const focusFirstOption = () => {
@@ -252,84 +325,120 @@
   const handleInputClick = () => {
     if (!$open) openList();
   };
+
+  const isSelected = (option: string | T): boolean => {
+    if (isObjectOption(option)) {
+      const o = String(option[optionValueKey]);
+      return isArrayValue(value) ? value.includes(o) : value === o;
+    } else if (isStringOption(option)) {
+      return isArrayValue(value) ? value.includes(option) : value === option;
+    }
+
+    return false;
+  };
 </script>
 
 <MenuContainer {open} on:close={handleMenuClose}>
   <Label class="pb-1" hidden={labelHidden} {required} {label} for={id} />
+
   <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
     {#if leadingIcon}
-      <Icon width={20} height={20} class="ml-2 shrink-0" name={leadingIcon} />
+      <Icon width={20} height={20} class="ml-2" name={leadingIcon} />
     {/if}
-    <input
-      {id}
-      {placeholder}
-      {required}
-      {readonly}
-      {disabled}
-      type="text"
-      value={displayValue}
-      class:disabled
-      class={merge('combobox-input', className)}
-      role="combobox"
-      autocomplete="off"
-      autocapitalize="off"
-      spellcheck="false"
-      data-lpignore="true"
-      aria-controls="{id}-listbox"
-      aria-expanded={$open}
-      aria-required={required}
-      aria-autocomplete="list"
-      on:focus|stopPropagation={openList}
-      on:input|stopPropagation={handleInput}
-      on:keydown|stopPropagation={handleInputKeydown}
-      on:click|stopPropagation={handleInputClick}
-      data-testid={$$props['data-testid'] ?? id}
-      bind:this={inputElement}
-      {...$$restProps}
-    />
-    <Button
-      aria-label={toggleLabel}
-      tabindex={-1}
-      aria-controls="{id}-listbox"
-      aria-expanded={$open}
-      variant="ghost"
-      size="xs"
-      on:click={toggleList}
-      {disabled}
+    <div
+      class="input-wrapper"
+      class:gap-1={multiselect}
+      class:py-1={multiselect && displayChips}
     >
-      <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
-    </Button>
+      {#if multiselect && isArrayValue(value) && value.length > 0}
+        {#if displayChips}
+          {#each value.slice(0, chipLimit) as v}
+            <Chip
+              on:remove={() => removeOption(v)}
+              removeButtonLabel={removeChipLabel}>{v}</Chip
+            >
+          {/each}
+          {#if value.length > chipLimit}
+            <p>+{value.slice(chipLimit).length}</p>
+          {/if}
+        {:else}
+          <Badge>{numberOfItemsSelectedLabel(value.length)}</Badge>
+        {/if}
+      {/if}
+      <input
+        {id}
+        {placeholder}
+        {required}
+        {readonly}
+        {disabled}
+        type="text"
+        value={displayValue}
+        class:disabled
+        class={merge('combobox-input', className)}
+        role="combobox"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        data-lpignore="true"
+        data-1p-ignore="true"
+        aria-controls="{id}-listbox"
+        aria-expanded={$open}
+        aria-required={required}
+        aria-autocomplete="list"
+        on:focus|stopPropagation={openList}
+        on:input|stopPropagation={handleInput}
+        on:keydown|stopPropagation={handleInputKeydown}
+        on:click|stopPropagation={handleInputClick}
+        data-testid={$$props['data-testid'] ?? id}
+        bind:this={inputElement}
+        {...$$restProps}
+      />
+    </div>
     {#if $$slots.action}
       <div class="ml-1 flex h-full items-center border-l-2 border-subtle p-0.5">
-        <slot name="action" />
+        {#if actionTooltip}
+          <Tooltip text={actionTooltip} right>
+            <slot name="action" />
+          </Tooltip>
+        {:else}
+          <slot name="action" />
+        {/if}
       </div>
     {/if}
   </div>
 
-  <Menu bind:menuElement id="{id}-listbox" role="listbox" class="w-full">
-    {#each list as option}
-      {#if isStringOption(option)}
+  <Menu
+    keepOpen={multiselect}
+    bind:menuElement
+    id="{id}-listbox"
+    role="listbox"
+    class="w-full"
+  >
+    {#if multiselect && isArrayValue(value)}
+      <ComboboxOption
+        disabled={value.length === options.length}
+        on:click={selectAll}
+        label={selectAllLabel}
+      />
+      <ComboboxOption
+        disabled={value.length === 0}
+        on:click={deselectAll}
+        label={deselectAllLabel}
+      />
+      <MenuDivider />
+    {/if}
+    {#key value}
+      {#each list as option}
         <ComboboxOption
+          {multiselect}
           on:click={() => handleSelectOption(option)}
-          selected={value === option}
-        >
-          {option}
-        </ComboboxOption>
-      {:else if isObjectOption(option)}
-        {#if canRenderCustomOption(option)}
-          <ComboboxOption
-            on:click={() => handleSelectOption(option)}
-            selected={value === option[optionValueKey]}
-          >
-            {option[optionLabelKey]}
-          </ComboboxOption>
-        {:else}
-          <slot option={narrowOption(option)} />
-        {/if}
-      {/if}
-    {:else}
-      <ComboboxOption disabled>{noResultsText}</ComboboxOption>
-    {/each}
+          selected={isSelected(option)}
+          label={getDisplayValue(option)}
+        />
+      {:else}
+        <ComboboxOption disabled label={noResultsText} />
+      {/each}
+    {/key}
   </Menu>
 
   {#if error && !valid}
@@ -339,7 +448,7 @@
 
 <style lang="postcss">
   .combobox-wrapper {
-    @apply surface-primary flex h-10 w-full flex-row items-center rounded-lg border-2 border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply surface-primary flex w-full flex-row items-center rounded-lg border-2 border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     &.invalid {
       @apply border-2 border-danger text-danger focus-within:ring-danger/70;
@@ -354,7 +463,11 @@
     @apply text-xs text-danger;
   }
 
+  .input-wrapper {
+    @apply ml-2 flex w-full flex-wrap items-center;
+  }
+
   .combobox-input {
-    @apply ml-2 h-full w-full grow bg-transparent text-primary placeholder:text-secondary focus:outline-none;
+    @apply flex h-9 grow bg-transparent text-primary placeholder:text-secondary focus:outline-none;
   }
 </style>

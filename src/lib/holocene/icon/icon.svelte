@@ -15,7 +15,7 @@
     {width}
     {height}
     {title}
-    class={$$props.class}
+    class="shrink-0 {$$props.class}"
     {...$$restProps}
   />
 {/if}

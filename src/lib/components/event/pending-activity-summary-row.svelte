@@ -5,6 +5,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { PendingActivity } from '$lib/types/events';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
@@ -58,34 +59,28 @@
       </p>
       <div
         class="flex items-center gap-1 {event.attempt > 1 &&
-          'surface-danger rounded px-1 py-0.5'}"
+          'surface-retry rounded px-1 py-0.5'}"
       >
         <Icon class="mr-1.5 inline" name="retry" />
+        {translate('workflows.retry')}
         {event.attempt} / {event.maximumAttempts || '∞'}
+        {#if event.attempt > 1}
+          • {translate('workflows.next-retry')}
+          {toTimeDifference({
+            date: event.scheduledTime,
+            negativeDefault: 'None',
+          })}
+        {/if}
       </div>
       <EventDetailsRow
         key="activityType"
         value={event.activityType}
         showKey
         attributes={event}
-        class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
       />
     </div></td
   >
-  <td>
-    {#if event.attempt > 1}
-      <div class="flex items-center gap-2 px-2">
-        <p class="max-w-fit whitespace-nowrap text-right text-xs">Next Retry</p>
-        <p class="flex items-center gap-0">
-          <Icon class="mr-1.5 inline" name="clock" />
-          {toTimeDifference({
-            date: event.scheduledTime,
-            negativeDefault: 'None',
-          })}
-        </p>
-      </div>
-    {/if}
-  </td>
+  <td />
 </tr>
 {#if expanded}
   <tr class="row expanded">

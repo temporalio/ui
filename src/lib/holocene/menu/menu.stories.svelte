@@ -31,7 +31,7 @@
       position: {
         name: 'Position',
         control: 'inline-radio',
-        options: ['left', 'right'],
+        options: ['left', 'right', 'top-left', 'top-right'],
       },
       menuElement: {
         name: 'Menu Element',
@@ -51,21 +51,31 @@
 </script>
 
 <Template let:args let:context>
-  <MenuContainer>
-    <MenuButton hasIndicator variant={args.variant} controls={context.id}>
-      <Icon slot="leading" name="temporal-logo" />
-      Menu
-    </MenuButton>
-    <Menu id={context.id}>
-      <MenuItem href="https://temporal.io" on:click={action('click')}>
-        Link
-      </MenuItem>
-      <MenuItem disabled href="https://temporal.io">Disabled Link</MenuItem>
-      <MenuItem on:click={action('click')} selected>Selected</MenuItem>
-      <MenuItem on:click={action('click')}>Standard</MenuItem>
-      <MenuItem on:click={action('click')} destructive>Destructive</MenuItem>
-    </Menu>
-  </MenuContainer>
+  <div class="flex items-center justify-center">
+    <MenuContainer>
+      <MenuButton hasIndicator variant={args.variant} controls={context.id}>
+        <Icon slot="leading" name="temporal-logo" />
+        Menu
+      </MenuButton>
+      <Menu id={context.id} class="w-64" {...args}>
+        <MenuItem href="https://temporal.io" newTab on:click={action('click')}>
+          Link
+        </MenuItem>
+        <MenuItem disabled href="https://temporal.io">Disabled Link</MenuItem>
+        <MenuItem on:click={action('click')} selected>Selected</MenuItem>
+        <MenuItem
+          on:click={action('click')}
+          description="Selected description"
+          selected>Selected With Description</MenuItem
+        >
+        <MenuItem on:click={action('click')}>Standard</MenuItem>
+        <MenuItem on:click={action('click')} description="Standard description"
+          >Standard With Description</MenuItem
+        >
+        <MenuItem on:click={action('click')} destructive>Destructive</MenuItem>
+      </Menu>
+    </MenuContainer>
+  </div>
 </Template>
 
 <Story name="Primary" args={{ variant: 'primary' }} />

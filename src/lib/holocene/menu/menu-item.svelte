@@ -4,7 +4,7 @@
 </script>
 
 <script lang="ts">
-  import type { HTMLLiAttributes } from 'svelte/elements';
+  import type { HTMLAnchorAttributes, HTMLLiAttributes } from 'svelte/elements';
 
   import { createEventDispatcher, getContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -21,17 +21,30 @@
     currentTarget: EventTarget & HTMLAnchorElement;
   };
 
-  interface $$Props extends HTMLLiAttributes {
+  type BaseProps = {
     selected?: boolean;
     destructive?: boolean;
     disabled?: boolean;
-    href?: string;
     description?: string;
     centered?: boolean;
     class?: string;
     'data-testid'?: string;
     hoverable?: boolean;
-  }
+  };
+
+  type MenuItemWithoutHrefProps = BaseProps &
+    HTMLLiAttributes & {
+      href?: never;
+      newTab?: never;
+    };
+
+  type MenuItemWithHrefProps = BaseProps &
+    HTMLAnchorAttributes & {
+      href: string;
+      newTab?: boolean;
+    };
+
+  type $$Props = MenuItemWithoutHrefProps | MenuItemWithHrefProps;
 
   let className = '';
   export { className as class };
@@ -42,6 +55,7 @@
   export let description: string = null;
   export let centered = false;
   export let hoverable = true;
+  export let newTab = false;
 
   const { keepOpen, open } = getContext<MenuContext>(MENU_CONTEXT);
 
@@ -107,10 +121,18 @@
 {#if href}
   <a
     {href}
+    target={newTab ? '_blank' : null}
+    rel={newTab ? 'noreferrer' : null}
     role="menuitem"
-    class={merge('menu-item', 'm-1', 'px-3', 'py-2', className)}
+    class={merge(
+      'menu-item',
+      'm-1 px-3 py-2',
+      'flex items-center gap-2',
+      className,
+    )}
     class:disabled
     class:hoverable
+    class:justify-center={centered}
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -122,10 +144,16 @@
 {:else}
   <li
     role="menuitem"
-    class={merge('menu-item', 'm-1', 'px-3', 'py-2', className)}
+    class={merge(
+      'menu-item',
+      'm-1 px-3 py-2',
+      'flex items-center gap-2',
+      className,
+    )}
     class:destructive
     class:disabled
     class:selected
+    class:hoverable
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -134,22 +162,16 @@
     {...$$restProps}
   >
     <slot name="leading" />
-    <div class:centered class="menu-item-wrapper">
-      {#if description}
-        <div class="flex flex-col">
-          <slot />
-          <span class="menu-item-description">
-            {description}
-          </span>
-        </div>
-      {:else}
+    <div class="grow">
+      <div class:centered class="menu-item-wrapper">
         <slot />
-      {/if}
-      {#if selected !== undefined}
-        <div class="flex h-6 w-6 shrink-0">
-          {#if selected}
-            <Icon name="checkmark" />
-          {/if}
+        {#if selected}
+          <Icon name="checkmark" class="shrink-0" />
+        {/if}
+      </div>
+      {#if description}
+        <div class="menu-item-description" class:text-center={centered}>
+          {description}
         </div>
       {/if}
     </div>
@@ -159,7 +181,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply flex cursor-pointer flex-row items-center gap-2 rounded border border-transparent text-sm font-medium focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+    @apply cursor-pointer rounded border border-transparent text-sm font-medium focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
 
     &.hoverable {
       @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary;
@@ -179,7 +201,7 @@
   }
 
   .menu-item-wrapper {
-    @apply flex grow items-center justify-between gap-2;
+    @apply flex items-center justify-between gap-2;
 
     &.centered {
       @apply justify-center;
@@ -187,6 +209,6 @@
   }
 
   .menu-item-description {
-    @apply text-xs font-normal text-subtle;
+    @apply mr-6 text-xs font-normal text-subtle;
   }
 </style>

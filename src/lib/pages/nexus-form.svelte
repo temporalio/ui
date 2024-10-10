@@ -26,7 +26,6 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Editor from '$lib/holocene/monaco/editor.svelte';
   import Markdown from '$lib/holocene/monaco/markdown.svelte';
-  import MultiSelect from '$lib/holocene/select/multi-select.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -84,16 +83,6 @@
     value: n.namespace,
     label: n.namespace,
   }));
-  $: initialCallerNamespaces =
-    endpoint?.spec?.allowedCallerNamespaces?.map((n) => {
-      return { value: n, label: n };
-    }) || [];
-
-  const onCallerNamespaceChange = (
-    selected: { value: string; label: string }[],
-  ) => {
-    allowedCallerNamespaces = selected.map((n) => n.value);
-  };
 
   onDestroy(() => {
     $endpointForm = emptyEndpoint;
@@ -150,19 +139,21 @@
         {translate('nexus.allowed-caller-namespaces-description')}
       </p>
     </div>
-    <MultiSelect
+    <Combobox
       id="caller-namespace-filter-menu"
+      multiselect
+      displayChips={false}
+      bind:value={allowedCallerNamespaces}
       options={callerNamespaces}
-      initialSelected={initialCallerNamespaces}
-      label={allowedCallerNamespaces.length
-        ? translate('nexus.selected-namespaces', {
-            count: allowedCallerNamespaces.length,
-          })
-        : translate('nexus.select-namespaces')}
-      selectAllLabel={translate('common.select-all')}
-      clearAllLabel={translate('common.clear-all-capitalized')}
-      initialSelectedAll={false}
-      onChange={onCallerNamespaceChange}
+      label={translate('nexus.allowed-caller-namespaces')}
+      toggleLabel={translate('common.namespaces')}
+      leadingIcon="search"
+      noResultsText={translate('common.no-results')}
+      valid={!!allowedCallerNamespaces.length}
+      error="Please select at least one Namespace."
+      placeholder={translate('nexus.select-namespaces')}
+      optionValueKey="value"
+      optionLabelKey="label"
     />
   </IsOssGuard>
 

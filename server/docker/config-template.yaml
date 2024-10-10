@@ -16,7 +16,7 @@ workflowCancelDisabled: {{ default .Env.TEMPORAL_WORKFLOW_CANCEL_DISABLED "false
 workflowSignalDisabled: {{ default .Env.TEMPORAL_WORKFLOW_SIGNAL_DISABLED "false" }}
 workflowResetDisabled: {{ default .Env.TEMPORAL_WORKFLOW_RESET_DISABLED "false" }}
 batchActionsDisabled: {{ default .Env.TEMPORAL_BATCH_ACTIONS_DISABLED "false" }}
-startWorkflowDisabled: {{ default .Env.TEMPORAL_START_WORKFLOW_DISABLED "true" }}
+startWorkflowDisabled: {{ default .Env.TEMPORAL_START_WORKFLOW_DISABLED "false" }}
 hideWorkflowQueryErrors: {{ default .Env.TEMPORAL_HIDE_WORKFLOW_QUERY_ERRORS "false" }} 
 refreshWorkflowCountsDisabled: {{ default .Env.TEMPORAL_REFRESH_WORKFLOW_COUNTS_DISABLED "false" }}
 cors:

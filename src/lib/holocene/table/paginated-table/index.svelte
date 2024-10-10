@@ -7,6 +7,7 @@
   export let variant: 'primary' | 'split' = 'primary';
   export let updating = false;
   export let maxHeight = '';
+  export let fixed = false;
 
   let tableContainer: HTMLDivElement;
 
@@ -20,7 +21,11 @@
   bind:this={tableContainer}
   style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`}"
 >
-  <table class="paginated-table">
+  <table
+    class="paginated-table"
+    class:table-fixed={fixed}
+    class:table-auto={!fixed}
+  >
     <slot name="caption" />
     <thead class="paginated-table-header">
       <slot name="headers" {visibleItems} />
@@ -57,7 +62,7 @@
   }
 
   .paginated-table {
-    @apply w-full table-auto;
+    @apply w-full;
   }
 
   .paginated-table-header {

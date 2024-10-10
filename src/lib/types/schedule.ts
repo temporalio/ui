@@ -38,6 +38,7 @@ export type ScheduleActionParameters = {
   workflowId: string;
   taskQueue: string;
   input: string;
+  encoding: string;
   searchAttributes: SearchAttributeInput[];
 };
 

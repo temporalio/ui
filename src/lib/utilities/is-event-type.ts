@@ -49,6 +49,7 @@ import type {
   WorkflowExecutionTerminatedEvent,
   WorkflowExecutionTimedOutEvent,
   WorkflowExecutionUpdateAcceptedEvent,
+  WorkflowExecutionUpdateAdmittedEvent,
   WorkflowExecutionUpdateCompletedEvent,
   WorkflowTaskCompletedEvent,
   WorkflowTaskFailedEvent,
@@ -162,6 +163,7 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'markerRecordedEventAttributes',
   'workflowExecutionSignaledEventAttributes',
   'workflowExecutionTerminatedEventAttributes',
+  'workflowExecutionUpdateAdmittedEventAttributes',
   'workflowExecutionUpdateAcceptedEventAttributes',
   'workflowExecutionUpdateCompletedEventAttributes',
   'workflowExecutionUpdateRejectedEventAttributes',
@@ -273,7 +275,8 @@ export const isWorkflowTaskFailedEvent = (event: WorkflowEvent) => {
   return (
     isPureWorkflowTaskFailedEvent(event) &&
     event.workflowTaskFailedEventAttributes?.failure?.message !==
-      'UnhandledCommand'
+      'UnhandledCommand' &&
+    !event.workflowTaskFailedEventAttributes?.failure?.resetWorkflowFailureInfo
   );
 };
 
@@ -450,6 +453,11 @@ export const isLocalActivityMarkerEvent = (
 export const isWorkflowExecutionUpdateAcceptedEvent =
   hasAttributes<WorkflowExecutionUpdateAcceptedEvent>(
     'workflowExecutionUpdateAcceptedEventAttributes',
+  );
+
+export const isWorkflowExecutionUpdateAdmittedEvent =
+  hasAttributes<WorkflowExecutionUpdateAdmittedEvent>(
+    'workflowExecutionUpdateAdmittedEventAttributes',
   );
 
 export const isWorkflowExecutionUpdateCompletedEvent =

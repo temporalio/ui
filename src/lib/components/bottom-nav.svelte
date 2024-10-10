@@ -19,9 +19,7 @@
   import BottomNavNamespaces from './bottom-nav-namespaces.svelte';
   import BottomNavSettings from './bottom-nav-settings.svelte';
 
-  export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
-  export let userEmaiLink = '';
   export let linkList: NavLinkListItem[];
   export let isCloud = false;
 
@@ -85,7 +83,9 @@
   >
     <BottomNavLinks open={viewLinks} {linkList} />
     <BottomNavNamespaces open={viewNamespaces} {namespaceList} />
-    <BottomNavSettings open={viewSettings} {logout} {userEmaiLink} />
+    <BottomNavSettings open={viewSettings}>
+      <slot />
+    </BottomNavSettings>
   </div>
 {/if}
 <nav

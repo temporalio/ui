@@ -104,6 +104,7 @@ export const Strings = {
   import: 'Import',
   feedback: 'Feedback',
   'log-out': 'Log out',
+  'my-profile': 'My Profile',
   details: 'Details',
   unknown: 'Unknown',
   key: 'Key',
