@@ -4,8 +4,8 @@ import { decodeURIForSvelte, encodeURIForSvelte } from './encode-uri';
 
 describe('encodeURIForSvelte', () => {
   it('should encode reserved URI characters, \\ and %', () => {
-    const path = encodeURIForSvelte('Test\\_With@%Many!!,Characters');
-    expect(path).toEqual('Test%5C_With%40%25Many!!%2CCharacters');
+    const path = encodeURIForSvelte('Test\\_With@%Many!!,Char/acters');
+    expect(path).toEqual('Test%5C_With%40%25Many!!%2CChar%2Facters');
   });
 
   it('should encode reserved URI characters : # &', () => {
@@ -28,8 +28,8 @@ describe('encodeURIForSvelte', () => {
 
 describe('decodeURIForSvelte', () => {
   it('should decode reserved URI characters, \\ and %', () => {
-    const path = decodeURIForSvelte('Test%5C_With%40%25Many!!%2CCharacters');
-    expect(path).toEqual('Test\\_With@%Many!!,Characters');
+    const path = decodeURIForSvelte('Test%5C_With%40%25Many!!%2CChar%2Facters');
+    expect(path).toEqual('Test\\_With@%Many!!,Char/acters');
   });
 
   it('should decode reserved URI characters : # &', () => {
