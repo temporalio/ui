@@ -89,7 +89,12 @@
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
         content={String(value)}
       >
-        <EventDetailsLink value={String(value)} {attributes} type={linkType} />
+        <EventDetailsLink
+          value={String(value)}
+          {attributes}
+          type={linkType}
+          class="whitespace-pre-line "
+        />
       </Copyable>
     </div>
   {:else}
