@@ -7,6 +7,7 @@
 
   import PayloadDecoder from '../event/payload-decoder.svelte';
   import PayloadInput, {
+    isPayloadInputEncodingType,
     type PayloadInputEncoding,
   } from '../payload-input.svelte';
 
@@ -18,17 +19,18 @@
 
   const setInitialInput = (decodedValue: string): void => {
     input = getSinglePayload(decodedValue);
-    $encoding = atob(
+    const currentEncoding = atob(
       String(payloads?.payloads[0]?.metadata?.encoding ?? 'json/plain'),
-    ) as PayloadInputEncoding;
+    );
+    if (isPayloadInputEncodingType(currentEncoding)) {
+      $encoding = currentEncoding;
+    }
     loading = false;
   };
 </script>
 
 <div class="flex flex-col gap-1">
   <PayloadDecoder value={payloads} key="payloads" onDecode={setInitialInput}>
-    {#key loading}
-      <PayloadInput bind:input bind:encoding />
-    {/key}
+    <PayloadInput bind:input bind:encoding bind:loading />
   </PayloadDecoder>
 </div>
