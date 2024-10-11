@@ -93,7 +93,7 @@
           value={String(value)}
           {attributes}
           type={linkType}
-          class="whitespace-pre-line "
+          class="whitespace-pre-line"
         />
       </Copyable>
     </div>

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import type { EventLink } from '$lib/types/events';
   import { routeForEventHistory } from '$lib/utilities/route-for';
@@ -9,19 +8,16 @@
 
 {#each links as link}
   {#if link?.workflowEvent}
+    {@const href = routeForEventHistory({
+      namespace: link.workflowEvent.namespace,
+      workflow: link.workflowEvent.workflowId,
+      run: link.workflowEvent.runId,
+    })}
     <div class="content">
       <p class="text-sm">Link</p>
-      <Badge type="subtle">
-        <Link
-          href={routeForEventHistory({
-            namespace: link.workflowEvent.namespace,
-            workflow: link.workflowEvent.workflowId,
-            run: link.workflowEvent.runId,
-          })}
-        >
-          {link.workflowEvent.workflowId}
-        </Link>
-      </Badge>
+      <Link class="whitespace-pre-line" {href}>
+        {link.workflowEvent.workflowId}
+      </Link>
     </div>
   {/if}
 {/each}
