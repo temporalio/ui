@@ -1,5 +1,9 @@
 <script context="module" lang="ts">
-  export type PayloadInputEncoding = 'json/plain' | 'json/protobuf';
+  const encoding = ['json/plain', 'json/protobuf'] as const;
+  export type PayloadInputEncoding = (typeof encoding)[number];
+  export const isPayloadInputEncodingType = (
+    x: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+  ): x is PayloadInputEncoding => encoding.includes(x);
 </script>
 
 <script lang="ts">
