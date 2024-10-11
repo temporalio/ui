@@ -40,6 +40,6 @@
   $: href = hrefs[type];
 </script>
 
-<Link class="truncate break-all" {href} {light}>
+<Link class="whitespace-pre-line" {href} {light}>
   {value}
 </Link>

@@ -89,13 +89,7 @@
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
         content={String(value)}
       >
-        <Badge type="subtle" class="select-none">
-          <EventDetailsLink
-            value={String(value)}
-            {attributes}
-            type={linkType}
-          />
-        </Badge>
+        <EventDetailsLink value={String(value)} {attributes} type={linkType} />
       </Copyable>
     </div>
   {:else}
