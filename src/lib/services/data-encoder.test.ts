@@ -78,4 +78,16 @@ describe('Codec Server Requests for Decode and Encode', () => {
       codeServerRequest({ type: 'encode', payloads, namespace, settings }),
     ).rejects.toThrow();
   });
+
+  it('should throw an error for encode if response is not ok', async () => {
+    const response = new Response(JSON.stringify(payloads), {
+      status: 500,
+      statusText: 'Internal Server Error',
+    });
+    global.fetch = vi.fn(() => Promise.resolve(response));
+
+    await expect(
+      codeServerRequest({ type: 'encode', payloads, namespace, settings }),
+    ).rejects.toThrow();
+  });
 });

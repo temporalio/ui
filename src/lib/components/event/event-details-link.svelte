@@ -40,6 +40,6 @@
   $: href = hrefs[type];
 </script>
 
-<Link class="truncate break-all" {href} {light}>
+<Link class={$$restProps.class} {href} {light}>
   {value}
 </Link>

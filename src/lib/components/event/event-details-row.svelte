@@ -44,9 +44,7 @@
         content={value}
         container-class="truncate"
       >
-        <p class="select-none truncate">
-          <EventDetailsLink {value} {attributes} type={linkType} />
-        </p>
+        <EventDetailsLink {value} {attributes} type={linkType} />
       </Copyable>
     {:else}
       <Badge type="subtle" class="block select-none truncate">
