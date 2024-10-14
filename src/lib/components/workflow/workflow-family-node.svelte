@@ -20,13 +20,12 @@
   const getPositions = (
     width: number,
     height: number,
-    zoomLevel: number,
     rootX: number,
     rootY: number,
   ) => {
     const x = rootX || width / 2;
     const y = rootY || height / 3;
-    const radius = 10 / (2 * zoomLevel);
+    const radius = 10;
     return {
       x,
       y,
@@ -34,12 +33,30 @@
     };
   };
 
-  $: ({ x, y, radius } = getPositions(width, height, zoomLevel, rootX, rootY));
+  $: ({ x, y, radius } = getPositions(width, height, rootX, rootY));
+
+  $: getPosition = (index: number) => {
+    const childY = y + y / 2 / generation;
+
+    const getX = () => {
+      const numberOfSiblings = root.children?.length;
+      if (numberOfSiblings === 1) return x;
+      const expandFactor = (radius * (8 - generation * 3)) / zoomLevel;
+      if (numberOfSiblings % 2 === 0) {
+        return x + (index - numberOfSiblings / 2) * expandFactor;
+      } else {
+        const middleIndex = numberOfSiblings / 2 - 0.5;
+        if (index === middleIndex) return x;
+        return x + (index - middleIndex) * expandFactor;
+      }
+    };
+
+    return { childX: getX(), childY };
+  };
 </script>
 
-{#each root.children as child, index}
-  {@const childX = (width / root.children.length) * index + radius}
-  {@const childY = y + y / 2 / generation}
+{#each root?.children as child, index}
+  {@const { childX, childY } = getPosition(index)}
   {#if child.children.length}
     <svelte:self
       root={child}
@@ -56,6 +73,7 @@
     y2={childY}
     class="stroke-black transition-all duration-300 ease-in-out dark:stroke-white"
     stroke-width="2"
+    stroke-opacity="0.25"
     stroke-dasharray={child.workflow.status === 'Running' ? '5' : 'none'}
   />
   <circle

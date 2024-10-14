@@ -19,7 +19,6 @@
   import LiveChildWorkflowsTable from './live-child-workflows-table.svelte';
   import ParentWorkflowTable from './parent-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
-  import WorkflowAtom from './workflow-atom.svelte';
   import WorkflowFamilyTree from './workflow-family-tree.svelte';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
@@ -71,14 +70,7 @@
           {#if links.length}
             <Breadcrumbs {links} />
           {/if}
-          <div class="flex gap-2">
-            <div class="w-1/2">
-              <WorkflowAtom {root} {onNodeClick} />
-            </div>
-            <div class="w-1/2">
-              <WorkflowFamilyTree {root} />
-            </div>
-          </div>
+          <WorkflowFamilyTree {root} {onNodeClick} />
         {/if}
       {/await}
       {#if scheduleId}

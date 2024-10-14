@@ -16,8 +16,8 @@
 
 <div class="w-full rounded-xl border-2 border-subtle bg-primary">
   <ZoomSvg
-    initialZoom={0.65}
-    maxZoomOut={1}
+    initialZoom={1}
+    maxZoomOut={1.5}
     maxZoomIn={0.25}
     let:width
     let:height
