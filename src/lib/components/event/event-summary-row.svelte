@@ -243,7 +243,7 @@
   }
 
   .canceled {
-    @apply border-2 border-warning;
+    @apply border border-warning;
   }
 
   .canceled .event-name {
@@ -251,7 +251,7 @@
   }
 
   .terminated {
-    @apply border-2 border-pink-700;
+    @apply border border-pink-700;
   }
 
   .terminated .event-name {
