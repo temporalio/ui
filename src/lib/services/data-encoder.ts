@@ -14,7 +14,6 @@ import {
   getCodecIncludeCredentials,
   getCodecPassAccessToken,
 } from '$lib/utilities/get-codec';
-import { has } from '$lib/utilities/has';
 import { validateHttps } from '$lib/utilities/is-http';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
@@ -71,7 +70,7 @@ export async function codeServerRequest({
     requestOptions,
   )
     .then((response) => {
-      if (has(response, 'ok') && !response.ok) {
+      if (response.ok === false) {
         throw {
           statusCode: response.status,
           statusText: response.statusText,

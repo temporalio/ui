@@ -34,7 +34,7 @@
     const getOtherFilters = () =>
       $workflowFilters.filter((f) => f.attribute !== attribute);
 
-    if (!filter) {
+    if (!filter || filter.value !== value) {
       const newFilter: SearchAttributeFilter = {
         attribute,
         type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
