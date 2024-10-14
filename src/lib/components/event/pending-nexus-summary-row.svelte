@@ -43,8 +43,8 @@
   data-testid="pending-nexus-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td class="w-10 text-left">
-    <Link class="truncate px-1" data-testid="link" {href}>
+  <td class="w-12 text-left">
+    <Link data-testid="link" {href}>
       {event.scheduledEventId || ''}
     </Link>
   </td>
@@ -87,7 +87,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex select-none items-center text-sm no-underline;
+    @apply flex select-none items-center gap-4 px-1 text-sm no-underline;
   }
 
   .expanded-cell {

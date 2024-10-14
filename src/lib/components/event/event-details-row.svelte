@@ -20,7 +20,7 @@
 
 {#if key}
   <div
-    class="invisible flex w-0 items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 md:visible md:w-auto"
+    class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
   >
     {#if showKey}
       <p class="whitespace-nowrap text-right text-xs">
@@ -44,7 +44,12 @@
         content={value}
         container-class="truncate"
       >
-        <EventDetailsLink {value} {attributes} type={linkType} />
+        <EventDetailsLink
+          {value}
+          {attributes}
+          type={linkType}
+          class="truncate"
+        />
       </Copyable>
     {:else}
       <Badge type="subtle" class="block select-none truncate">
