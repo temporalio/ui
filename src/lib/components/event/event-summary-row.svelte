@@ -6,6 +6,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isEventGroup } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
@@ -31,8 +32,6 @@
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  import { CategoryIcon } from '../lines-and-dots/constants';
-
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
   import EventLink from './event-link.svelte';
@@ -48,7 +47,7 @@
   export let onRowClick: () => void = noop;
 
   $: selectedId = isEventGroup(event)
-    ? Array.from(event.events.keys()).pop()
+    ? Array.from(event.events.keys()).shift()
     : event.id;
 
   $: ({ workflow, run, namespace } = $page.params);
@@ -87,10 +86,6 @@
   $: canceled = eventOrGroupIsCanceled(event);
   $: terminated = eventOrGroupIsTerminated(event);
 
-  $: icon = isLocalActivityMarkerEvent(event)
-    ? CategoryIcon['local-activity']
-    : CategoryIcon[event.category];
-
   $: displayName = isEventGroup(event)
     ? event.label
     : isLocalActivityMarkerEvent(event)
@@ -127,24 +122,62 @@
   data-testid="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  {#if !compact}
-    <td class="w-12 text-left">
-      <Link class="truncate px-1" data-testid="link" {href}>
+  {#if isEventGroup(event)}
+    <td class="w-24 min-w-fit">
+      <div class="flex items-center gap-0.5">
+        {#each event.eventList as groupEvent}
+          <Link
+            data-testid="link"
+            href={routeForEventHistoryEvent({
+              eventId: groupEvent.id,
+              namespace,
+              workflow,
+              run,
+            })}
+          >
+            {groupEvent.id}
+          </Link>
+        {/each}
+      </div>
+    </td>
+  {:else}
+    <td>
+      <Link data-testid="link" {href}>
         {event.id}
       </Link>
     </td>
-  {:else}
-    <td class="w-4" />
   {/if}
-  <td
-    class="flex w-full items-center gap-2 overflow-hidden text-right text-sm font-normal xl:text-left"
-  >
-    <Icon name={icon} />
-    <p
-      class="event-name max-w-fit whitespace-nowrap text-sm font-semibold md:text-base"
+  <td class="text-right md:hidden">
+    <Tooltip
+      hide={(isEventGroup(event) && !duration) || !elapsedTime}
+      text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
+      bottom
     >
+      {formatDate(currentEvent?.eventTime, $timeFormat, {
+        relative: $relativeTime,
+        abbrFormat: true,
+      })}
+    </Tooltip>
+  </td>
+  <td class="hidden text-right md:block">
+    <Tooltip
+      hide={(isEventGroup(event) && !duration) || !elapsedTime}
+      text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
+      bottom
+    >
+      {formatDate(currentEvent?.eventTime, $timeFormat, {
+        relative: $relativeTime,
+      })}
+    </Tooltip>
+  </td>
+  <td class="truncate md:min-w-fit">
+    <p class="event-name whitespace-nowrap font-semibold md:text-base">
       {displayName}
     </p>
+  </td>
+  <td
+    class="hidden w-full items-center gap-2 text-right text-sm font-normal md:flex xl:text-left"
+  >
     {#if pendingAttempt}
       <div
         class="flex items-center gap-1 {pendingAttempt > 1 &&
@@ -166,7 +199,7 @@
       </div>
     {/if}
     {#if currentEvent?.links?.length}
-      <EventLink link={currentEvent.links[0]} />
+      <EventLink link={currentEvent.links[0]} class="max-w-xl truncate" />
     {/if}
     {#if primaryAttribute?.key}
       <EventDetailsRow {...primaryAttribute} {attributes} />
@@ -182,49 +215,6 @@
       <EventDetailsRow {...secondaryAttribute} {attributes} />
     {/if}
   </td>
-  <td>
-    {#if isEventGroup(event)}
-      <div class="flex items-center gap-2 px-2">
-        <div class="flex gap-0.5">
-          {#each event.eventList as groupEvent}
-            <Link
-              class="truncate"
-              data-testid="link"
-              href={routeForEventHistoryEvent({
-                eventId: groupEvent.id,
-                namespace,
-                workflow,
-                run,
-              })}
-            >
-              {groupEvent.id}
-            </Link>
-          {/each}
-        </div>
-        {#if duration && duration !== '0ms'}
-          <div class="flex items-center gap-1 text-sm text-secondary">
-            <Icon class="inline" name="clock" />
-            <p class="whitespace-noline truncate">
-              {duration}
-            </p>
-          </div>
-        {/if}
-      </div>
-    {:else}
-      <div class="flex flex-col gap-0 px-2 text-right">
-        <p class="-mb-1 truncate text-xs leading-3 text-secondary">
-          {#if elapsedTime}
-            +{elapsedTime}
-          {/if}
-        </p>
-        <p class="truncate text-sm">
-          {formatDate(currentEvent?.eventTime, $timeFormat, {
-            relative: $relativeTime,
-          })}
-        </p>
-      </div>
-    {/if}
-  </td>
 </tr>
 {#if expanded}
   <tr
@@ -233,7 +223,7 @@
     class:typedError
     class="row expanded"
   >
-    <td class="expanded-cell w-full" colspan="3">
+    <td class="expanded-cell w-full" colspan="4">
       <EventDetailsFull {group} event={currentEvent} />
     </td>
   </tr>
@@ -241,11 +231,11 @@
 
 <style lang="postcss">
   .row {
-    @apply flex select-none items-center text-sm no-underline;
+    @apply flex select-none items-center gap-4 px-1 text-sm no-underline;
   }
 
   .failure {
-    @apply border-2 border-danger;
+    @apply border border-danger;
   }
 
   .failure .event-name {
