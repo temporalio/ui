@@ -1,23 +1,17 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
-  import Breadcrumbs from '$lib/holocene/breadcrumbs.svelte';
   import ZoomSvg from '$lib/holocene/zoom-svg.svelte';
   import type { RootNode } from '$lib/services/workflow-service';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import WorkflowElectron from './workflow-electron.svelte';
 
-  $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
 
   export let root: RootNode;
+  export let onNodeClick: (node: RootNode) => void;
 
   let activeNode: RootNode | undefined;
   let hoverNode: RootNode | undefined;
-
-  let links: { copy: string; href: string }[] = [];
 
   $: currentNode =
     root?.workflow?.runId === workflow.runId &&
@@ -52,29 +46,16 @@
     hoverNode = undefined;
   };
 
-  const onNodeClick = (node: RootNode) => {
+  const nodeClick = (node: RootNode) => {
     if (activeNode === node) {
       activeNode = undefined;
-      links = [];
     } else {
       activeNode = node;
-      links = node.rootPaths.map((path) => {
-        return {
-          copy: node.workflow.id,
-          href: routeForEventHistory({
-            namespace,
-            workflow: path.workflowId,
-            run: path.runId,
-          }),
-        };
-      });
     }
+    nodeClick(node);
   };
 </script>
 
-{#if links.length}
-  <Breadcrumbs {links} />
-{/if}
 <div class="w-full rounded-xl border-2 border-subtle bg-primary">
   <ZoomSvg
     initialZoom={0.65}
@@ -144,8 +125,8 @@
       class="outline-none"
       role="button"
       tabindex="0"
-      on:keypress={() => onNodeClick(root)}
-      on:click={() => onNodeClick(root)}
+      on:keypress={() => nodeClick(root)}
+      on:click={() => nodeClick(root)}
     >
       {#if currentNode}
         <circle

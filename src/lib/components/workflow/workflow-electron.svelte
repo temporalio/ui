@@ -98,7 +98,7 @@
   y2={parentCenter.y}
   class="stroke-black transition-all duration-300 ease-in-out dark:stroke-white"
   stroke-width="2"
-  stroke-opacity={active ? 0.35 : 0.05}
+  stroke-opacity={active ? 0.15 : 0.05}
   stroke-dasharray={node.workflow.status === 'Running' ? '5' : 'none'}
 />
 <g
