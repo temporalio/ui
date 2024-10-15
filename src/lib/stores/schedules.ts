@@ -198,7 +198,7 @@ export const submitEditSchedule = async (
           workflowId,
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
-          input: payloads ? { payloads } : null,
+          ...(input !== undefined && { input: payloads ? { payloads } : null }),
         },
       },
     },
