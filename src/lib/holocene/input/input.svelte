@@ -100,8 +100,8 @@
       class:disabled
       class:error
       class:noBorder
-      class:unroundLeft
-      class:unroundRight
+      class:unroundLeft={unroundLeft || $$slots['before-input']}
+      class:unroundRight={unroundRight || $$slots['after-input']}
       class:invalid={!valid}
       tabindex={disabled ? undefined : 0}
       on:focus={handleFocus}
@@ -124,7 +124,15 @@
         {spellcheck}
         {required}
         {autocomplete}
+        data-lpignore="true"
+        data-1p-ignore="true"
         bind:value
+        on:click|stopPropagation
+        on:input
+        on:keydown|stopPropagation
+        on:change
+        on:focus
+        on:blur
         data-testid={testId}
         {...$$restProps}
       />
