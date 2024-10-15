@@ -74,8 +74,10 @@
 
   let testId = $$props['data-testid'] || id;
 
-  function callFocus(input: HTMLInputElement) {
-    if (autoFocus && input) input.focus();
+  let inputRef: HTMLInputElement | null = null;
+
+  function handleFocus() {
+    inputRef?.focus();
   }
 
   const dispatch = createEventDispatcher();
@@ -93,25 +95,28 @@
   <div class="input-group flex rounded-lg">
     <slot name="before-input" {disabled} />
     <div
+      role="button"
       class="input-container"
       class:disabled
       class:error
       class:noBorder
-      class:unroundLeft={unroundLeft || $$slots['before-input']}
-      class:unroundRight={unroundRight || $$slots['after-input']}
+      class:unroundLeft
+      class:unroundRight
       class:invalid={!valid}
+      tabindex={disabled ? undefined : 0}
+      on:focus={handleFocus}
     >
       {#if icon}
         <span class="icon-container">
           <Icon name={icon} />
         </span>
       {/if}
+
       <input
+        bind:this={inputRef}
         class="input"
         class:disabled
         {disabled}
-        data-lpignore="true"
-        data-1p-ignore="true"
         maxlength={maxLength > 0 ? maxLength : undefined}
         {placeholder}
         {id}
@@ -120,16 +125,10 @@
         {required}
         {autocomplete}
         bind:value
-        on:click|stopPropagation
-        on:input
-        on:keydown|stopPropagation
-        on:change
-        on:focus
-        on:blur
-        use:callFocus
         data-testid={testId}
         {...$$restProps}
       />
+
       {#if copyable}
         <div class="copy-icon-container">
           <button aria-label={copyButtonLabel} on:click={(e) => copy(e, value)}>
@@ -185,7 +184,7 @@
 <style lang="postcss">
   /* Base styles */
   .input-container {
-    @apply surface-primary relative box-border inline-flex h-10 w-full items-center rounded-lg border-2 border-subtle text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply surface-primary relative box-border inline-flex h-10 w-full cursor-text items-center rounded-lg border-2 border-subtle text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     &.error,
     &.invalid {
