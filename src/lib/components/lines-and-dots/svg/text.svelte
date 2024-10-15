@@ -17,7 +17,6 @@
   export let icon: IconName | undefined = undefined;
   export let config: GraphConfig | undefined = undefined;
   export let label = false;
-  export let dark = false;
 
   $: [x, y] = point;
 
@@ -37,12 +36,12 @@
     strokeWidth={backdropHeight}
   />
 {/if}
-{#if showIcon && textAnchor === 'start'}
+{#if showIcon}
   <Icon
     name={icon}
-    {x}
+    x={textAnchor === 'end' ? x - textWidth - backdropHeight : x}
     y={y - 8}
-    class={dark ? 'text-black' : !backdrop ? 'text-primary' : 'text-white'}
+    class={!backdrop ? 'text-primary' : 'text-white'}
   />
 {/if}
 <text
@@ -50,7 +49,6 @@
   class="cursor-pointer select-none outline-none {category} text-primary"
   class:label
   class:backdrop
-  class:dark
   x={textX}
   {y}
   font-size={fontSize}
@@ -59,14 +57,6 @@
 >
   <slot />
 </text>
-{#if showIcon && textAnchor === 'end'}
-  <Icon
-    name={icon}
-    {x}
-    y={y - 8}
-    class={dark ? 'text-black' : !backdrop ? 'text-primary' : 'text-white'}
-  />
-{/if}
 
 <style lang="postcss">
   text {
@@ -120,7 +110,6 @@
     fill: #ff4518;
   }
 
-  text.dark,
   text.none {
     fill: theme('colors.space-black');
   }
