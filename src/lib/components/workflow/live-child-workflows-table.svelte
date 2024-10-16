@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -10,6 +11,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
+  import PayloadDecoder from '../event/payload-decoder.svelte';
   import WorkflowStatus from '../workflow-status.svelte';
 
   export let children: WorkflowExecution[] = [];
@@ -35,6 +37,7 @@
       <th class="max-lg:hidden">{translate('common.type')}</th>
       <th>{translate('workflows.child-id')}</th>
       <th>{translate('workflows.child-run-id')}</th>
+      <th>{translate('common.memo')}</th>
     </TableHeaderRow>
     {#each visibleItems as child}
       <TableRow>
@@ -65,6 +68,11 @@
           >
             {child.runId}
           </Link>
+        </td>
+        <td>
+          <PayloadDecoder value={child.memo} key="fields" let:decodedValue>
+            <CodeBlock content={decodedValue} />
+          </PayloadDecoder>
         </td>
       </TableRow>
     {/each}
