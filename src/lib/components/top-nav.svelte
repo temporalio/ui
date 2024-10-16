@@ -6,7 +6,6 @@
   import Button from '$lib/holocene/button.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { dataEncoder } from '$lib/stores/data-encoder';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
@@ -16,14 +15,6 @@
   let screenWidth: number;
 
   $: namespace = $page.params.namespace || $lastUsedNamespace;
-  $: pathNameSplit = $page.url.pathname.split('/');
-  $: showNamespaceSpecificNav =
-    namespace &&
-    (pathNameSplit.includes('workflows') ||
-      pathNameSplit.includes('schedules') ||
-      pathNameSplit.includes('batch-operations') ||
-      pathNameSplit.includes('task-queues') ||
-      pathNameSplit.includes('import'));
   $: namespaceExists = namespaceList.some(
     (namespaceListItem) => namespaceListItem.namespace === namespace,
   );
@@ -39,9 +30,8 @@
 
 <svelte:window bind:innerWidth={screenWidth} />
 <nav
-  class="surface-primary sticky top-0 z-40 flex hidden w-full flex-col items-center justify-end border-b border-subtle p-1 px-4 md:flex md:flex-row md:px-8"
+  class="surface-primary sticky top-0 z-40 hidden w-full flex-col items-center justify-end border-b border-subtle p-1 px-4 md:flex md:flex-row md:px-8"
   data-testid="top-nav"
-  class:bg-red-400={$dataEncoder.hasError && showNamespaceSpecificNav}
   aria-label={translate('common.main')}
 >
   <div class="flex grow items-center">

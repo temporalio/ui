@@ -10,7 +10,6 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { dataEncoder } from '$lib/stores/data-encoder';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
@@ -28,14 +27,6 @@
   let viewSettings = false;
 
   $: namespace = $page.params.namespace || $lastUsedNamespace;
-  $: pathNameSplit = $page.url.pathname.split('/');
-  $: showNamespaceSpecificNav =
-    namespace &&
-    (pathNameSplit.includes('workflows') ||
-      pathNameSplit.includes('schedules') ||
-      pathNameSplit.includes('batch-operations') ||
-      pathNameSplit.includes('task-queues') ||
-      pathNameSplit.includes('import'));
   $: namespaceExists = namespaceList.some(
     (namespaceListItem) => namespaceListItem.namespace === namespace,
   );
@@ -96,7 +87,6 @@
       : 'surface-black border-t border-subtle',
   )}
   data-testid="top-nav"
-  class:bg-red-400={$dataEncoder.hasError && showNamespaceSpecificNav}
   aria-label={translate('common.main')}
 >
   <button
@@ -148,7 +138,7 @@
 
 <style lang="postcss">
   .namespace-wrapper {
-    @apply surface-black flex h-10 w-full grow flex-row items-center items-center rounded-lg border-2 border-subtle px-0.5 text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply surface-black flex h-10 w-full grow flex-row items-center rounded-lg border-2 border-subtle px-0.5 text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
   }
 
   .nav-button {
