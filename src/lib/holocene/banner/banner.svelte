@@ -45,8 +45,8 @@
     id: string;
     message: string;
     dismissible?: boolean;
-    icon: IconName | null;
-    type: BannerType;
+    icon?: IconName;
+    type?: BannerType;
     class?: string;
   };
 

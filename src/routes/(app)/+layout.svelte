@@ -191,8 +191,10 @@
       <UserMenu {logout} />
     </TopNavigation>
     <Banner
+      id="settings-banner-text"
       message={$page.data.settings?.bannerText}
-      closeLabel={translate('common.close')}
+      dismissable
+      dismissLabel={translate('common.close')}
     />
     <div
       slot="main"
