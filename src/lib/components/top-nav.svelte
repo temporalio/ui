@@ -3,11 +3,9 @@
 
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
-  import Banner from '$lib/holocene/banner/banner.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { dataEncoder } from '$lib/stores/data-encoder';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
@@ -17,14 +15,6 @@
   let screenWidth: number;
 
   $: namespace = $page.params.namespace || $lastUsedNamespace;
-  $: pathNameSplit = $page.url.pathname.split('/');
-  $: showNamespaceSpecificNav =
-    namespace &&
-    (pathNameSplit.includes('workflows') ||
-      pathNameSplit.includes('schedules') ||
-      pathNameSplit.includes('batch-operations') ||
-      pathNameSplit.includes('task-queues') ||
-      pathNameSplit.includes('import'));
   $: namespaceExists = namespaceList.some(
     (namespaceListItem) => namespaceListItem.namespace === namespace,
   );
@@ -75,11 +65,3 @@
     <slot />
   </div>
 </nav>
-{#if $dataEncoder.hasError && showNamespaceSpecificNav}
-  <Banner
-    message={translate('data-encoder.codec-server-error')}
-    id="transcoder-error"
-    icon="transcoder-error"
-    type="danger"
-  />
-{/if}

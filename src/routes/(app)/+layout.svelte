@@ -16,6 +16,7 @@
   import { translate } from '$lib/i18n/translate';
   import { clearAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
+  import { dataEncoder } from '$lib/stores/data-encoder';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
   import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
@@ -51,6 +52,15 @@
       },
     };
   });
+
+  $: pathNameSplit = $page.url.pathname.split('/');
+  $: showNamespaceSpecificNav =
+    activeNamespaceName &&
+    (pathNameSplit.includes('workflows') ||
+      pathNameSplit.includes('schedules') ||
+      pathNameSplit.includes('batch-operations') ||
+      pathNameSplit.includes('task-queues') ||
+      pathNameSplit.includes('import'));
 
   $: linkList = getLinkList(activeNamespaceName, !!$inProgressBatchOperation);
 
@@ -190,12 +200,21 @@
     <TopNavigation {namespaceList}>
       <UserMenu {logout} />
     </TopNavigation>
-    <Banner
-      id="settings-banner-text"
-      message={$page.data.settings?.bannerText}
-      dismissable
-      dismissLabel={translate('common.close')}
-    />
+    {#if $dataEncoder.hasError && showNamespaceSpecificNav}
+      <Banner
+        message={translate('data-encoder.codec-server-error')}
+        id="transcoder-error"
+        icon="transcoder-error"
+        type="danger"
+      />
+    {:else}
+      <Banner
+        id="settings-banner-text"
+        message={$page.data.settings?.bannerText}
+        dismissable
+        dismissLabel={translate('common.close')}
+      />
+    {/if}
     <div
       slot="main"
       class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
