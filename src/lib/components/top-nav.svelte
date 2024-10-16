@@ -3,6 +3,7 @@
 
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
+  import Banner from '$lib/holocene/banner/banner.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -39,9 +40,8 @@
 
 <svelte:window bind:innerWidth={screenWidth} />
 <nav
-  class="surface-primary sticky top-0 z-40 flex hidden w-full flex-col items-center justify-end border-b border-subtle p-1 px-4 md:flex md:flex-row md:px-8"
+  class="surface-primary sticky top-0 z-40 hidden w-full flex-col items-center justify-end border-b border-subtle p-1 px-4 md:flex md:flex-row md:px-8"
   data-testid="top-nav"
-  class:bg-red-400={$dataEncoder.hasError && showNamespaceSpecificNav}
   aria-label={translate('common.main')}
 >
   <div class="flex grow items-center">
@@ -75,3 +75,11 @@
     <slot />
   </div>
 </nav>
+{#if $dataEncoder.hasError && showNamespaceSpecificNav}
+  <Banner
+    message={translate('data-encoder.codec-server-error')}
+    id="transcoder-error"
+    icon="transcoder-error"
+    type="danger"
+  />
+{/if}
