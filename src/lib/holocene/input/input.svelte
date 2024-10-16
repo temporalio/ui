@@ -77,7 +77,9 @@
   let inputRef: HTMLInputElement | null = null;
 
   function handleFocus() {
-    inputRef?.focus();
+    if (autoFocus && !disabled) {
+      inputRef?.focus();
+    }
   }
 
   const dispatch = createEventDispatcher();
