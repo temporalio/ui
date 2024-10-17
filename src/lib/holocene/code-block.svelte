@@ -183,10 +183,9 @@
   $: content, language, setView();
 </script>
 
-<div role="button" class="relative" tabindex={0} on:focus={handleFocus}>
+<div class="relative" tabindex={0} on:focus={handleFocus}>
   <div
     bind:this={editor}
-    role="textbox"
     class={`rounded-x inline min-w-[80px] cursor-text ${className} ${
       editable ? 'editable' : 'readOnly'
     }`}

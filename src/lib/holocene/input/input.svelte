@@ -97,7 +97,6 @@
   <div class="input-group flex rounded-lg">
     <slot name="before-input" {disabled} />
     <div
-      role="button"
       class="input-container"
       class:disabled
       class:error
