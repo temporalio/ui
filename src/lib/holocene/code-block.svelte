@@ -187,7 +187,7 @@
   <div
     bind:this={editor}
     role="textbox"
-    class={`inline min-w-[80px] cursor-text rounded-xl outline-none ${className} ${
+    class={`rounded-x inline min-w-[80px] cursor-text ${className} ${
       editable ? 'editable' : 'readOnly'
     }`}
     class:inline
