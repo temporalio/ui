@@ -215,7 +215,7 @@
 <slot name="header" visibleItems={$store.visibleItems} />
 <div class="relative mb-8 flex flex-col gap-4">
   <div
-    class="flex flex-col items-center gap-4 lg:flex-row {$$slots[
+    class="flex flex-row flex-wrap items-center gap-4 {$$slots[
       'action-top-left'
     ]
       ? 'justify-between'
@@ -237,7 +237,7 @@
       />
     {/if}
     <nav
-      class="flex shrink-0 flex-col gap-4 md:flex-row"
+      class="flex flex-row flex-wrap justify-center gap-4"
       aria-label="{$$restProps['aria-label']} 1"
     >
       <slot name="action-top-center" />
