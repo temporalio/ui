@@ -226,7 +226,7 @@
       <Input
         icon="search"
         id="api-pagination-search-input"
-        class="w-full grow sm:w-1/2"
+        class="grow"
         bind:value={query}
         label={filterInputPlaceholder}
         labelHidden
