@@ -26,14 +26,15 @@
 {#if open}
   <div class="flex h-full flex-col justify-end gap-6 overflow-auto px-4 py-8">
     <TimezoneSelect position="left" />
-    {#if $dataEncoder.hasError}
-      <p class="text-red-400">{translate('data-encoder.codec-server-error')}</p>
-    {/if}
     <NavigationButton
       onClick={onCodecServerClick}
       tooltip={translate('data-encoder.codec-server')}
       label={translate('data-encoder.codec-server')}
-      icon={hasCodecServer ? 'transcoder-on' : 'transcoder-off'}
+      icon={hasCodecServer
+        ? $dataEncoder.hasError
+          ? 'transcoder-error'
+          : 'transcoder-on'
+        : 'transcoder-off'}
     />
     <DataEncoderSettings />
     <div class="border-b-2 border-subtle" />
