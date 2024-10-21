@@ -9,6 +9,9 @@ import {
   isChildWorkflowExecutionTerminatedEvent,
   isChildWorkflowExecutionTimedOutEvent,
   isFailedWorkflowExecutionUpdateCompletedEvent,
+  isNexusOperationCanceledEvent,
+  isNexusOperationFailedEvent,
+  isNexusOperationTimedOutEvent,
   isSignalExternalWorkflowExecutionFailedEvent,
   isTimerCanceledEvent,
   isWorkflowExecutionCanceledEvent,
@@ -30,7 +33,9 @@ export const eventIsFailureOrTimedOut = (event: WorkflowEvent): boolean => {
     isChildWorkflowExecutionFailedEvent(event) ||
     isChildWorkflowExecutionTimedOutEvent(event) ||
     isSignalExternalWorkflowExecutionFailedEvent(event) ||
-    isFailedWorkflowExecutionUpdateCompletedEvent(event)
+    isFailedWorkflowExecutionUpdateCompletedEvent(event) ||
+    isNexusOperationFailedEvent(event) ||
+    isNexusOperationTimedOutEvent(event)
   );
 };
 
@@ -46,7 +51,8 @@ export const eventIsCanceled = (event: WorkflowEvent): boolean => {
     isActivityTaskCanceledEvent(event) ||
     isTimerCanceledEvent(event) ||
     isWorkflowExecutionCanceledEvent(event) ||
-    isChildWorkflowExecutionCanceledEvent(event)
+    isChildWorkflowExecutionCanceledEvent(event) ||
+    isNexusOperationCanceledEvent(event)
   );
 };
 
