@@ -26,6 +26,7 @@
   export let error = false;
   export let resetValues = false;
   export let loading = false;
+  export let editing = true;
 
   let codeBlock: CodeBlock;
 
@@ -69,37 +70,24 @@
 </script>
 
 <div class="flex items-center justify-between">
-  <h5>Input</h5>
+  <h5>{translate('workflows.input')}</h5>
   <span class="text-xs font-light italic">
     {translate('workflows.signal-payload-input-label-hint')}
   </span>
 </div>
 <Card class="flex flex-col gap-2">
-  <div class="flex items-center justify-between">
-    <RadioGroup description={'Encoding'} bind:group={encoding} name="encoding">
-      <RadioInput id="json/plain" value="json/plain" label="json/plain" />
-      <RadioInput
-        id="json/protobuf"
-        value="json/protobuf"
-        label="json/protobuf"
-      />
-    </RadioGroup>
-    <Tooltip text={translate('common.upload-json')} left>
-      <FileInput id="start-workflow-input-file-upload" {onUpload} />
-    </Tooltip>
-  </div>
   <div class="flex flex-col gap-2">
     <Label
       for="payload-input"
       label={translate('workflows.signal-payload-input-label')}
     />
-    {#key loading}
+    {#key [loading, editing]}
       <CodeBlock
         id="payload-input"
         maxHeight={320}
         content={input}
         on:change={handleInputChange}
-        editable
+        editable={editing}
         copyable={false}
         bind:this={codeBlock}
       />
@@ -107,5 +95,29 @@
     {#if error}
       <Alert intent="error" title={translate('common.input-valid-json')} />
     {/if}
+  </div>
+  <div class="flex items-start {editing ? 'justify-between' : 'justify-end'}">
+    {#if editing}
+      <RadioGroup
+        description={'Encoding'}
+        bind:group={encoding}
+        name="encoding"
+      >
+        <RadioInput id="json/plain" value="json/plain" label="json/plain" />
+        <RadioInput
+          id="json/protobuf"
+          value="json/protobuf"
+          label="json/protobuf"
+        />
+      </RadioGroup>
+    {/if}
+    <div class="flex gap-2">
+      {#if editing}
+        <Tooltip text={translate('common.upload-json')} left>
+          <FileInput id="start-workflow-input-file-upload" {onUpload} />
+        </Tooltip>
+      {/if}
+      <slot name="action" />
+    </div>
   </div>
 </Card>

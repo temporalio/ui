@@ -73,7 +73,7 @@
   let workflowId = decodedWorkflow?.workflowId ?? '';
   let taskQueue = decodedWorkflow?.taskQueue?.name ?? '';
   let input = '';
-  let initialInput = '';
+  let editInput = !schedule;
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let daysOfWeek: string[] = [];
   let daysOfMonth: number[] = [];
@@ -94,7 +94,7 @@
       workflowType,
       workflowId,
       taskQueue,
-      ...(initialInput !== input && { input }),
+      ...(editInput && { input }),
       encoding: $encoding,
       hour,
       minute,
@@ -217,9 +217,10 @@
       </div>
       <ScheduleInputPayload
         bind:input
-        bind:initialInput
+        bind:editInput
         bind:encoding
         payloads={schedule?.action?.startWorkflow?.input}
+        showEditActions={Boolean(schedule)}
       />
       <AddSearchAttributes
         bind:attributesToAdd={searchAttributesInput}
