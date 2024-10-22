@@ -81,22 +81,29 @@
       for="payload-input"
       label={translate('workflows.signal-payload-input-label')}
     />
-    {#key [loading, editing]}
-      <CodeBlock
-        id="payload-input"
-        maxHeight={320}
-        content={input}
-        on:change={handleInputChange}
-        editable={editing}
-        copyable={false}
-        bind:this={codeBlock}
-      />
-    {/key}
+    <div class="flex gap-2">
+      {#key [loading, editing]}
+        <CodeBlock
+          id="payload-input"
+          maxHeight={320}
+          content={input}
+          on:change={handleInputChange}
+          editable={editing}
+          copyable={false}
+          bind:this={codeBlock}
+        />
+      {/key}
+      {#if editing}
+        <Tooltip text={translate('common.upload-json')} topRight>
+          <FileInput id="start-workflow-input-file-upload" {onUpload} />
+        </Tooltip>
+      {/if}
+    </div>
     {#if error}
       <Alert intent="error" title={translate('common.input-valid-json')} />
     {/if}
   </div>
-  <div class="flex items-start {editing ? 'justify-between' : 'justify-end'}">
+  <div class="flex items-end {editing ? 'justify-between' : 'justify-end'}">
     {#if editing}
       <RadioGroup
         description={'Encoding'}
@@ -111,13 +118,6 @@
         />
       </RadioGroup>
     {/if}
-    <div class="flex gap-2">
-      {#if editing}
-        <Tooltip text={translate('common.upload-json')} left>
-          <FileInput id="start-workflow-input-file-upload" {onUpload} />
-        </Tooltip>
-      {/if}
-      <slot name="action" />
-    </div>
+    <slot name="action" />
   </div>
 </Card>
