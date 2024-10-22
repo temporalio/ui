@@ -90,10 +90,10 @@
         }),
       });
     } catch (e) {
+      error = e?.message || translate('workflows.start-workflow-error');
       toaster.push({
         variant: 'error',
-        duration: 5000,
-        message: e?.message || translate('workflows.start-workflow-error'),
+        message: translate('workflows.start-workflow-error'),
       });
     }
   };
