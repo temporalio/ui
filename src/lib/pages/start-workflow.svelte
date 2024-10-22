@@ -82,11 +82,10 @@
         encoding: $encoding,
         searchAttributes,
       });
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       goto(routeForWorkflows({ namespace }));
     } catch (e) {
-      error = e?.message || 'Error start Workflow';
-    } finally {
+      error = e?.message || 'Error starting Workflow';
       loading = false;
     }
   };
