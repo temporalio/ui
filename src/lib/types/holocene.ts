@@ -10,4 +10,5 @@ export interface Toast {
   variant?: ToastVariant;
   id?: string;
   duration?: number;
+  link?: string;
 }
