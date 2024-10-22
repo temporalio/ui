@@ -144,27 +144,4 @@ describe('createEventGroup', () => {
   it('should ignore an event that should not create an event group', () => {
     expect(createEventGroup(completedEvent)).toBeUndefined();
   });
-
-  it('should create a group from a WorkflowExecutionUpdateAccepted event and add WorkflowTaskScheduled event to group', () => {
-    const workflowTaskEvent = {
-      id: '120',
-    } as unknown as WorkflowEvent;
-
-    const updateEvent = {
-      id: '123',
-      eventId: '123',
-      workflowExecutionUpdateAcceptedEventAttributes: {
-        acceptedRequestSequencingEventId: 120,
-      },
-    } as unknown as WorkflowEvent;
-
-    expect(
-      createEventGroup(updateEvent, [workflowTaskEvent, updateEvent])
-        .initialEvent.id,
-    ).toBe(workflowTaskEvent.id);
-    expect(
-      createEventGroup(updateEvent, [workflowTaskEvent, updateEvent]).eventList
-        .length,
-    ).toBe(2);
-  });
 });

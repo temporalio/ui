@@ -50,44 +50,21 @@ type StartingEvents = {
   Nexus: NexusOperationScheduledEvent;
 };
 
-const getInitialEvent = (
-  event: CommonHistoryEvent,
-  events?: CommonHistoryEvent[],
-) => {
-  if (events?.length && isWorkflowExecutionUpdateAcceptedEvent(event)) {
-    return events.find(
-      (e) =>
-        e.id ===
-        event.workflowExecutionUpdateAcceptedEventAttributes?.acceptedRequestSequencingEventId.toString(),
-    );
-  }
-  return event;
-};
-
 const createGroupFor = <K extends keyof StartingEvents>(
   event: StartingEvents[K],
-  events?: CommonHistoryEvent[],
 ): EventGroup => {
   const id = getGroupId(event);
-  const initialEvent = getInitialEvent(event, events);
-  const name = getEventGroupName(event, initialEvent);
+  const name = getEventGroupName(event);
   const label = getEventGroupLabel(event);
-  const displayName = getEventGroupDisplayName(event, initialEvent);
+  const displayName = getEventGroupDisplayName(event);
 
   const { timestamp, category, classification } = event;
 
   const groupEvents: EventGroup['events'] = new Map();
   const groupEventIds: EventGroup['eventIds'] = new Set();
 
-  if (initialEvent && isWorkflowExecutionUpdateAcceptedEvent(event)) {
-    groupEvents.set(initialEvent.id, initialEvent);
-    groupEvents.set(event.id, event);
-    groupEventIds.add(initialEvent.id);
-    groupEventIds.add(event.id);
-  } else {
-    groupEvents.set(event.id, event);
-    groupEventIds.add(event.id);
-  }
+  groupEvents.set(event.id, event);
+  groupEventIds.add(event.id);
 
   return {
     id,
@@ -96,7 +73,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     displayName,
     events: groupEvents,
     eventIds: groupEventIds,
-    initialEvent,
+    initialEvent: event,
     timestamp,
     category: isLocalActivityMarkerEvent(event) ? 'local-activity' : category,
     classification,
@@ -140,10 +117,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
   };
 };
 
-export const createEventGroup = (
-  event: CommonHistoryEvent,
-  events?: CommonHistoryEvent[],
-): EventGroup => {
+export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
   if (isActivityTaskScheduledEvent(event))
     return createGroupFor<'Activity'>(event);
 
@@ -166,16 +140,15 @@ export const createEventGroup = (
   }
 
   if (isWorkflowExecutionUpdateAcceptedEvent(event))
-    return createGroupFor<'Update'>(event, events);
+    return createGroupFor<'Update'>(event);
 
   if (isNexusOperationScheduledEvent(event))
-    return createGroupFor<'Nexus'>(event, events);
+    return createGroupFor<'Nexus'>(event);
 };
 
 export const createWorkflowTaskGroup = (
   event: CommonHistoryEvent,
-  events?: CommonHistoryEvent[],
 ): EventGroup => {
   if (isWorkflowTaskScheduledEvent(event))
-    return createGroupFor<'WorkflowTask'>(event, events);
+    return createGroupFor<'WorkflowTask'>(event);
 };

@@ -501,7 +501,7 @@ export async function startWorkflow({
   input,
   encoding,
   searchAttributes,
-}: StartWorkflowOptions) {
+}: StartWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow', {
     namespace,
     workflowId,

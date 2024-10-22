@@ -119,7 +119,7 @@
 {#if isRunning}
   <SplitButton
     id="workflow-actions"
-    menuClass="w-[24rem]"
+    menuClass="w-[16rem] md:w-[24rem]"
     position="right"
     disabled={actionsDisabled}
     primaryActionDisabled={!cancelEnabled || cancelInProgress}

@@ -124,11 +124,6 @@ describe('formatAttributes', () => {
     expect(formattedAttributes.firstWorkflowTaskBackoff).toBe(undefined);
   });
 
-  it('should remove values that are should be omitted', () => {
-    const formattedAttributes = formatAttributes(workflowEvent);
-    expect(formattedAttributes.header).toBe(undefined);
-  });
-
   it('should format nested attributes', () => {
     const formattedAttributes = formatAttributes(workflowEvent);
     expect(formattedAttributes.taskQueueName).toBe('rainbow-statuses');
@@ -178,6 +173,7 @@ describe('attributeGroups', () => {
       'identity',
       'firstExecutionRunId',
       'attempt',
+      'header',
       'parentInitiatedEventId',
     ]);
     expect(groups.parent).toEqual([]);

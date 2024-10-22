@@ -247,5 +247,6 @@ export const Strings = {
   'pending-workflow-task': 'Pending Workflow Task',
   'original-scheduled-time': 'Original Scheduled Time',
   'started-time': 'Started Time',
-  'starting-workflow': 'Starting Workflow',
+  'start-workflow-success': 'Workflow started successfully',
+  'start-workflow-error': 'Error starting Workflow',
 } as const;

@@ -30,8 +30,6 @@ export type CombinedAttributes = EventAttribute & {
   namespace?: string;
 };
 
-const keysToOmit: Readonly<Set<string>> = new Set(['header']);
-
 const keysToExpand: Readonly<Set<string>> = new Set([
   'taskQueue',
   'retryPolicy',
@@ -106,7 +104,7 @@ export const formatAttributes = (event: IterableEvent): CombinedAttributes => {
   if (event.attributes) {
     for (const [key, value] of Object.entries(event.attributes)) {
       const shouldDisplay = shouldDisplayAttribute(key, value);
-      if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
+      if (shouldDisplay) attributes[key] = value;
       formatNestedAttributes(attributes, key);
     }
   }
@@ -121,7 +119,7 @@ export const formatGroupAttributes = (
   group.eventList.forEach((event) => {
     for (const [key, value] of Object.entries(event.attributes)) {
       const shouldDisplay = shouldDisplayAttribute(key, value);
-      if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
+      if (shouldDisplay) attributes[key] = value;
       formatNestedAttributes(attributes, key);
     }
   });
@@ -153,7 +151,7 @@ export const formatPendingAttributes = (
           relative: get(relativeTime),
         })
       : value;
-    if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = formattedValue;
+    if (shouldDisplay) attributes[key] = formattedValue;
     formatNestedAttributes(attributes, key);
   }
 
