@@ -6,10 +6,10 @@
   import { getSinglePayload } from '$lib/utilities/encode-payload';
 
   import PayloadDecoder from '../event/payload-decoder.svelte';
-  import PayloadInput, {
+  import PayloadInputWithEncoding, {
     isPayloadInputEncodingType,
     type PayloadInputEncoding,
-  } from '../payload-input.svelte';
+  } from '../payload-input-with-encoding.svelte';
 
   export let input: string;
   export let encoding: Writable<PayloadInputEncoding>;
@@ -31,6 +31,6 @@
 
 <div class="flex flex-col gap-1">
   <PayloadDecoder value={payloads} key="payloads" onDecode={setInitialInput}>
-    <PayloadInput bind:input bind:encoding bind:loading />
+    <PayloadInputWithEncoding bind:input bind:encoding bind:loading />
   </PayloadDecoder>
 </div>

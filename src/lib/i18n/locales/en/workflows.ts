@@ -249,4 +249,5 @@ export const Strings = {
   'started-time': 'Started Time',
   'start-workflow-success': 'Workflow started successfully',
   'start-workflow-error': 'Error starting Workflow',
+  encoding: 'Encoding',
 } as const;

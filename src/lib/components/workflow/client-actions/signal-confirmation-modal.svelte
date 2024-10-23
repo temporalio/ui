@@ -1,9 +1,9 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
 
-  import PayloadInput, {
+  import PayloadInputWithEncoding, {
     type PayloadInputEncoding,
-  } from '$lib/components/payload-input.svelte';
+  } from '$lib/components/payload-input-with-encoding.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -76,6 +76,6 @@
       required
       bind:value={name}
     />
-    <PayloadInput bind:input bind:encoding resetValues={!open} />
+    <PayloadInputWithEncoding bind:input bind:encoding resetValues={!open} />
   </div>
 </Modal>
