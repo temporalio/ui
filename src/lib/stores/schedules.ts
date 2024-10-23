@@ -14,6 +14,7 @@ import type {
   ScheduleSpecParameters,
 } from '$lib/types/schedule';
 import { encodePayloads } from '$lib/utilities/encode-payload';
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
 import {
   convertDaysAndMonths,
@@ -203,6 +204,18 @@ export const submitEditSchedule = async (
       },
     },
   };
+
+  const fields = body.schedule.action.startWorkflow?.header?.fields;
+  if (fields && Object.keys(fields).length > 0) {
+    const entries = Object.entries(fields);
+    for (const [key, value] of entries) {
+      const encodedValue = await encodePayloads(
+        stringifyWithBigInt(value),
+        'json/plain',
+      );
+      fields[key] = encodedValue[0];
+    }
+  }
 
   if (preset === 'existing') {
     body.schedule.spec = schedule.spec;
