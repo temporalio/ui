@@ -60,7 +60,7 @@
           'surface-retry rounded px-1 py-0.5'}"
       >
         <Icon class="mr-1.5 inline" name="retry" />
-        {translate('workflows.retry')}
+        {translate('workflows.attempt')}
         {event.attempt} / {event.maximumAttempts || '∞'}
         {#if event.attempt > 1}
           • {translate('workflows.next-retry')}

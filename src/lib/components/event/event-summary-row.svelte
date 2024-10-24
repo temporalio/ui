@@ -184,7 +184,7 @@
           'surface-retry rounded px-1 py-0.5'}"
       >
         <Icon class="mr-1.5 inline" name="retry" />
-        {translate('workflows.retry')}
+        {translate('workflows.attempt')}
         {pendingAttempt}
         {#if hasPendingActivity}
           / {hasPendingActivity.maximumAttempts || '∞'}
