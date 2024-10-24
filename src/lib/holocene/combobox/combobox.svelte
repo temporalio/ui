@@ -32,7 +32,6 @@
   interface BaseProps extends HTMLInputAttributes {
     id: string;
     label: string;
-    toggleLabel: string;
     noResultsText: string;
     disabled?: boolean;
     labelHidden?: boolean;
@@ -90,7 +89,6 @@
   export let label: string;
   export let multiselect = false;
   export let value: string | string[] = multiselect ? [] : undefined;
-  export let toggleLabel: string;
   export let noResultsText: string;
   export let disabled = false;
   export let labelHidden = false;
