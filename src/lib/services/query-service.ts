@@ -1,3 +1,4 @@
+import type { Payloads } from '$lib/types';
 import type { WorkflowQueryRouteParameters } from '$lib/types/api';
 import type { Eventual, Settings } from '$lib/types/global';
 import { convertPayloadToJsonWithCodec } from '$lib/utilities/decode-payload';
@@ -17,9 +18,13 @@ type QueryRequestParameters = {
   workflow: Eventual<{ id: string; runId: string }>;
   namespace: string;
   queryType: string;
+  queryArgs?: Payloads;
 };
 
-type WorkflowParameters = Omit<QueryRequestParameters, 'queryType'>;
+type WorkflowParameters = Omit<
+  QueryRequestParameters,
+  'queryType' | 'queryArgs'
+>;
 
 type QueryPayload = {
   data: string;
@@ -53,7 +58,7 @@ const formatParameters = async (
 };
 
 async function fetchQuery(
-  { workflow, namespace, queryType }: QueryRequestParameters,
+  { workflow, namespace, queryType, queryArgs }: QueryRequestParameters,
   request = fetch,
   onError?: (error: {
     status: number;
@@ -75,6 +80,7 @@ async function fetchQuery(
         },
         query: {
           queryType,
+          queryArgs,
         },
       }),
     },

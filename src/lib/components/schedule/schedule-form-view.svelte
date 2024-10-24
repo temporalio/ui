@@ -26,7 +26,7 @@
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  import type { PayloadInputEncoding } from '../payload-input.svelte';
+  import type { PayloadInputEncoding } from '../payload-input-with-encoding.svelte';
   import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';

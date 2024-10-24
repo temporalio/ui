@@ -11,11 +11,11 @@
   interface $$Props extends HTMLSelectAttributes {
     id: string;
     value: SelectOptionValue;
-    name?: string;
-    options?: SelectOptionValue[];
-    label?: string;
-    labelHidden?: boolean;
+    label: string;
     arrow?: boolean;
+    name?: string;
+    required?: boolean;
+    options?: SelectOptionValue[];
     'data-testid'?: string;
   }
 
@@ -23,7 +23,7 @@
   export { className as class };
   export let id: string;
   export let value: SelectOptionValue;
-  export let label: string = null;
+  export let label: string;
   export let arrow = false;
   export let name = id;
   export let required = false;

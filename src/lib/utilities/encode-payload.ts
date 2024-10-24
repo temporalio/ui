@@ -2,6 +2,7 @@ import { get } from 'svelte/store';
 
 import { encodePayloadsWithCodec } from '$lib/services/data-encoder';
 import { dataEncoder } from '$lib/stores/data-encoder';
+import type { Payloads } from '$lib/types';
 import { btoa } from '$lib/utilities/btoa';
 import {
   parseWithBigInt,
@@ -28,14 +29,18 @@ export const setBase64Payload = (payload: string, encoding = 'json/plain') => {
   };
 };
 
-export const encodePayloads = async (input: string, encoding: string) => {
+export const encodePayloads = async (
+  input: string,
+  encoding: string,
+  encodeWithCodec: boolean = true,
+): Promise<Payloads> => {
   let payloads = null;
 
   if (input) {
     const parsedInput = JSON.parse(input);
     payloads = [setBase64Payload(parsedInput, encoding)];
     const endpoint = get(dataEncoder).endpoint;
-    if (endpoint) {
+    if (endpoint && encodeWithCodec) {
       const awaitData = await encodePayloadsWithCodec({
         payloads: { payloads },
       });

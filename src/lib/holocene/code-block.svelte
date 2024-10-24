@@ -157,7 +157,7 @@
     return () => view.destroy();
   });
 
-  export const resetView = (value = '', format = true) => {
+  const resetView = (value = '', format = true) => {
     const formattedValue = format ? formatValue({ value, language }) : value;
     view.dispatch({
       changes: {
@@ -169,8 +169,8 @@
   };
 
   const setView = () => {
-    if (view && !editable) {
-      resetView(value, false);
+    if (view && (!editable || view.state.doc.toString() !== content)) {
+      resetView(content);
     }
   };
 
