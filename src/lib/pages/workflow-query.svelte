@@ -126,6 +126,7 @@
           language={jsonFormatting ? 'json' : 'text'}
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          testId="query-result"
         />
       {:catch _error}
         <EmptyState
