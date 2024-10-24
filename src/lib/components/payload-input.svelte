@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { v4 } from 'uuid';
+  import { v4 as uuid } from 'uuid';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import FileInput from '$lib/holocene/file-input.svelte';
@@ -8,23 +8,16 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let id = v4();
+  export let id = uuid();
   export let error = false;
   export let input: string;
   export let label = translate('workflows.signal-payload-input-label');
   export let loading = false;
-  export let resetValues = false;
   export let hintText = translate('workflows.signal-payload-input-label-hint');
 
   let codeBlock: CodeBlock;
 
   $: error = !isValidInput(input);
-
-  $: {
-    if (resetValues) {
-      clearValues();
-    }
-  }
 
   const isValidInput = (value: string) => {
     if (!input) return true;
@@ -51,9 +44,7 @@
     codeBlock?.resetView(input);
   };
 
-  onDestroy(() => {
-    clearValues();
-  });
+  onDestroy(clearValues);
 </script>
 
 <div class="flex flex-col gap-2">

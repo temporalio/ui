@@ -17,16 +17,20 @@
   export let namespace: string;
   export let refresh: Writable<number>;
 
+  const defaultEncoding: PayloadInputEncoding = 'json/plain';
+
   let error: string = '';
   let loading = false;
   let name = '';
 
-  let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
+  let encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
   let input = '';
 
   const hideSignalModal = () => {
     open = false;
     name = '';
+    input = '';
+    $encoding = defaultEncoding;
   };
 
   const signal = async () => {
@@ -76,6 +80,6 @@
       required
       bind:value={name}
     />
-    <PayloadInputWithEncoding bind:input bind:encoding resetValues={!open} />
+    <PayloadInputWithEncoding bind:input bind:encoding />
   </div>
 </Modal>

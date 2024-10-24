@@ -2,8 +2,8 @@
   const encoding = ['json/plain', 'json/protobuf'] as const;
   export type PayloadInputEncoding = (typeof encoding)[number];
   export const isPayloadInputEncodingType = (
-    x: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-  ): x is PayloadInputEncoding => encoding.includes(x);
+    x: unknown,
+  ): x is PayloadInputEncoding => encoding.includes(x as PayloadInputEncoding);
 </script>
 
 <script lang="ts">
@@ -21,22 +21,13 @@
   export let input: string;
   export let encoding: Writable<PayloadInputEncoding>;
   export let error = false;
-  export let resetValues = false;
   export let loading = false;
-
-  $: {
-    if (resetValues) {
-      clearValues();
-    }
-  }
 
   const clearValues = () => {
     $encoding = 'json/plain';
   };
 
-  onDestroy(() => {
-    clearValues();
-  });
+  onDestroy(clearValues);
 </script>
 
 <div>
