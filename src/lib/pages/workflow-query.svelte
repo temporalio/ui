@@ -85,7 +85,7 @@
     <div class="flex items-end justify-between gap-2 max-sm:flex-wrap">
       <Card class="flex w-full flex-col gap-2 xl:w-2/3">
         <div class="flex flex-col gap-1">
-          <PayloadInput bind:input label={translate('workflows.query-args')} />
+          <PayloadInput bind:input label={translate('workflows.query-arg')} />
         </div>
         <div class="flex flex-wrap items-end gap-4">
           <Select
