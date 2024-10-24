@@ -15,8 +15,6 @@
   export let loading = false;
   export let hintText = translate('workflows.signal-payload-input-label-hint');
 
-  let codeBlock: CodeBlock;
-
   $: error = !isValidInput(input);
 
   const isValidInput = (value: string) => {
@@ -35,13 +33,11 @@
 
   const clearValues = () => {
     input = '';
-    codeBlock?.resetView(input);
     loading = false;
   };
 
   const onUpload = (uploadInput: string) => {
     input = uploadInput;
-    codeBlock?.resetView(input);
   };
 
   onDestroy(clearValues);
@@ -58,7 +54,6 @@
         on:change={handleInputChange}
         editable
         copyable={false}
-        bind:this={codeBlock}
       />
     {/key}
     <Tooltip text={translate('common.upload-json')} topRight>
