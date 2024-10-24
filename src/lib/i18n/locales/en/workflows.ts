@@ -177,6 +177,7 @@ export const Strings = {
   'call-stack-link-postface': ', run a Worker on the {{taskQueue}} Task Queue.',
   'json-formatting': 'JSON Formatting',
   'query-type': 'Query Type',
+  'query-args': 'Query Args',
   'pending-activities-empty-state': 'No Pending Activities',
   'activity-id': 'Activity ID',
   details: 'Details',
