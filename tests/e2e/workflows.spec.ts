@@ -39,7 +39,7 @@ test.describe('Workflow Execution Page', () => {
 
     await page.getByTestId('query-select-button').click();
     await page.getByRole('option', { name: 'is-blocked' }).click();
-    await page.getByRole('button', { name: 'Query' }).click();
+    await page.getByRole('button', { name: /query/i }).click();
 
     const codeBlock = page.getByTestId('query-result').getByRole('textbox');
     await expect(codeBlock).toContainText('Mock decoded payload');

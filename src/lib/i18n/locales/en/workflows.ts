@@ -178,6 +178,8 @@ export const Strings = {
   'json-formatting': 'JSON Formatting',
   'query-type': 'Query Type',
   'query-arg': 'Query Arg',
+  'run-query': 'Run Query',
+  'refresh-query': 'Refresh Query',
   'pending-activities-empty-state': 'No Pending Activities',
   'activity-id': 'Activity ID',
   details: 'Details',

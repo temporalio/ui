@@ -29,7 +29,13 @@
   };
 
   let queryType: string;
-  let isLoading = false;
+  let initialQueryType: string;
+  let input = '';
+  let initialInput = '';
+  let loading = false;
+  let jsonFormatting = true;
+
+  $: edited = initialQueryType !== queryType || input !== initialInput;
 
   let queryTypes = getQueryTypes({
     namespace,
@@ -43,8 +49,14 @@
   let queryResult: Promise<ParsedQuery>;
   let encodePayloadResult: Promise<Payloads>;
 
+  const reset = () => {
+    loading = false;
+    initialQueryType = queryType;
+    initialInput = input;
+  };
+
   const query = async (queryType: string) => {
-    isLoading = true;
+    loading = true;
     let payloads;
 
     try {
@@ -53,7 +65,7 @@
         : Promise.resolve(null);
       payloads = await encodePayloadResult;
     } catch (e) {
-      isLoading = false;
+      reset();
       return;
     }
 
@@ -67,73 +79,76 @@
       $page.data?.settings,
       $authUser?.accessToken,
     ).finally(() => {
-      isLoading = false;
+      reset();
     });
   };
-
-  let input = '';
-  let jsonFormatting = true;
 </script>
 
 <section>
   {#await queryTypes}
     <div class="text-center">
       <Loading />
-      <p>{translate('workflows.no-workers-failure-message')}</p>
+      <p class="-mt-10">{translate('workflows.no-workers-failure-message')}</p>
     </div>
   {:then types}
-    <div class="flex items-end justify-between gap-2 max-sm:flex-wrap">
-      <Card class="flex w-full flex-col gap-2 xl:w-2/3">
+    <div class="flex w-3/4 gap-4 max-2xl:w-full max-lg:flex-col">
+      <Card class="mt-7 flex h-fit w-full flex-col gap-2">
+        <Select
+          id="query-select"
+          label={translate('workflows.query-type')}
+          bind:value={queryType}
+          data-testid="query-select"
+          required
+        >
+          {#each types as value}
+            <Option {value}>{value}</Option>
+          {/each}
+        </Select>
         <div class="flex flex-col gap-1">
           <PayloadInput bind:input label={translate('workflows.query-arg')} />
         </div>
-        <div class="flex flex-wrap items-end gap-4">
-          <Select
-            id="query-select"
-            label={translate('workflows.query-type')}
-            bind:value={queryType}
-            data-testid="query-select"
-          >
-            {#each types as value}
-              <Option {value}>{value}</Option>
-            {/each}
-          </Select>
+        <div class="flex w-full flex-wrap items-end justify-end gap-4">
           <Button
             on:click={() => query(queryType)}
-            leadingIcon="retry"
-            loading={isLoading}
+            {loading}
+            variant={edited ? 'primary' : 'secondary'}
+            leadingIcon={edited ? null : 'retry'}
+            disabled={loading}
           >
-            {translate('common.query')}
+            {edited
+              ? translate('workflows.run-query')
+              : translate('workflows.refresh-query')}
           </Button>
         </div>
       </Card>
-      <div class="flex justify-end">
-        <ToggleSwitch
-          label={translate('workflows.json-formatting')}
-          labelPosition="left"
-          id="json-formatting"
-          checked={jsonFormatting}
-          on:change={() => (jsonFormatting = !jsonFormatting)}
-        />
+      <div class="flex w-full flex-col gap-2">
+        {#await Promise.all( [queryResult, encodePayloadResult], ) then [result, _]}
+          {@const content =
+            typeof result !== 'string' ? stringifyWithBigInt(result) : result}
+          <div class="ml-auto">
+            <ToggleSwitch
+              label={translate('workflows.json-formatting')}
+              labelPosition="left"
+              id="json-formatting"
+              checked={jsonFormatting}
+              on:change={() => (jsonFormatting = !jsonFormatting)}
+            />
+          </div>
+          <CodeBlock
+            {content}
+            language={jsonFormatting ? 'json' : 'text'}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            testId="query-result"
+            class={edited && 'opacity-50'}
+          />
+        {:catch _error}
+          <EmptyState
+            title={translate('common.error-occurred')}
+            error={_error?.message}
+          />
+        {/await}
       </div>
-    </div>
-    <div class="my-2 flex h-full items-start">
-      {#await Promise.all([queryResult, encodePayloadResult]) then [result, _]}
-        {@const content =
-          typeof result !== 'string' ? stringifyWithBigInt(result) : result}
-        <CodeBlock
-          {content}
-          language={jsonFormatting ? 'json' : 'text'}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          testId="query-result"
-        />
-      {:catch _error}
-        <EmptyState
-          title={translate('common.error-occurred')}
-          error={_error?.message}
-        />
-      {/await}
     </div>
   {:catch _error}
     <EmptyState
