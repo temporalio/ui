@@ -37,11 +37,15 @@
 
   $: edited = initialQueryType !== queryType || input !== initialInput;
 
-  let queryTypes = getQueryTypes({
-    namespace,
-    workflow: params,
-  }).then((queryTypes) => {
-    queryType = queryType || queryTypes[0];
+  let queryTypes = getQueryTypes(
+    {
+      namespace,
+      workflow: params,
+    },
+    $page.data?.settings,
+    $authUser?.accessToken,
+  ).then((queryTypes) => {
+    queryType = queryType || queryTypes[0]?.name;
     query(queryType);
     return queryTypes;
   });
@@ -96,12 +100,13 @@
         <Select
           id="query-select"
           label={translate('workflows.query-type')}
+          class="min-w-fit"
           bind:value={queryType}
           data-testid="query-select"
           required
         >
-          {#each types as value}
-            <Option {value}>{value}</Option>
+          {#each types as { name: value, description = '' }}
+            <Option {value} {description}>{value}</Option>
           {/each}
         </Select>
         <div class="flex flex-col gap-1">

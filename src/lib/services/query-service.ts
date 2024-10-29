@@ -92,9 +92,29 @@ async function fetchQuery(
 
 export async function getQueryTypes(
   options: WorkflowParameters,
+  settings: Settings,
+  accessToken: string,
+): Promise<{ name: string; description?: string }[]> {
+  try {
+    const response = await getQuery(
+      { ...options, queryType: '__temporal_workflow_metadata' },
+      settings,
+      accessToken,
+    );
+    const results = parseWithBigInt(response);
+    return results?.definition?.queryDefinitions?.filter((query) => {
+      return query?.name !== '__stack_trace';
+    });
+  } catch (e) {
+    return getQueryTypesByError(options);
+  }
+}
+
+export async function getQueryTypesByError(
+  options: WorkflowParameters,
   request = fetch,
-): Promise<string[]> {
-  return new Promise<string[]>((resolve, reject) => {
+): Promise<{ name: string }[]> {
+  return new Promise<{ name: string }[]>((resolve, reject) => {
     fetchQuery(
       { ...options, queryType: '@@temporal-internal__list' },
       request,
