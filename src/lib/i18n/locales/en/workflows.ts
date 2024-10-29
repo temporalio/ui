@@ -177,6 +177,9 @@ export const Strings = {
   'call-stack-link-postface': ', run a Worker on the {{taskQueue}} Task Queue.',
   'json-formatting': 'JSON Formatting',
   'query-type': 'Query Type',
+  'query-arg': 'Query Arg',
+  'run-query': 'Run Query',
+  'refresh-query': 'Refresh Query',
   'pending-activities-empty-state': 'No Pending Activities',
   'activity-id': 'Activity ID',
   details: 'Details',
@@ -249,4 +252,5 @@ export const Strings = {
   'started-time': 'Started Time',
   'start-workflow-success': 'Workflow started successfully',
   'start-workflow-error': 'Error starting Workflow',
+  encoding: 'Encoding',
 } as const;

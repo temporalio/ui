@@ -10,6 +10,7 @@ export const Strings = {
   query: 'Query',
   ago: 'ago',
   'all-time': 'All Time',
+  time: 'Time',
   custom: 'Custom',
   'start-time': 'Start Time',
   'end-time': 'End Time',

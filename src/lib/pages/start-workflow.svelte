@@ -6,9 +6,9 @@
 
   import { page } from '$app/stores';
 
-  import PayloadInput, {
+  import PayloadInputWithEncoding, {
     type PayloadInputEncoding,
-  } from '$lib/components/payload-input.svelte';
+  } from '$lib/components/payload-input-with-encoding.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -239,7 +239,7 @@
       on:blur={(e) => onInputChange(e, 'workflowType')}
     />
     {#key inputRetrieved}
-      <PayloadInput bind:input bind:encoding />
+      <PayloadInputWithEncoding bind:input bind:encoding />
     {/key}
     {#if viewAdvancedOptions}
       <AddSearchAttributes bind:attributesToAdd={searchAttributes} />

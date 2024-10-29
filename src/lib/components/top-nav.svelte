@@ -37,7 +37,6 @@
   <div class="flex grow items-center">
     <Combobox
       label={translate('namespaces.namespace-label', { namespace })}
-      toggleLabel={translate('common.namespaces')}
       noResultsText={translate('common.no-results')}
       labelHidden
       value={namespace}
