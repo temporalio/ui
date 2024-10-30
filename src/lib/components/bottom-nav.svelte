@@ -120,6 +120,7 @@
   </div>
   <button
     class="nav-button"
+    data-testid="nav-profile-button"
     class:active-shadow={viewSettings}
     type="button"
     on:click={onSettingsClick}

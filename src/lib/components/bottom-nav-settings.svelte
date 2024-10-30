@@ -30,6 +30,11 @@
       onClick={onCodecServerClick}
       tooltip={translate('data-encoder.codec-server')}
       label={translate('data-encoder.codec-server')}
+      data-testid="data-encoder-status{hasCodecServer
+        ? $dataEncoder.hasError
+          ? '-error'
+          : '-configured'
+        : ''}"
       icon={hasCodecServer
         ? $dataEncoder.hasError
           ? 'transcoder-error'
