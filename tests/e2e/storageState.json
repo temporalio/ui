@@ -1,14 +1,4 @@
 {
   "cookies": [],
-  "origins": [
-    {
-      "origin": "http://localhost:3000",
-      "localStorage": [
-        {
-          "name": "locale",
-          "value": "en-US"
-        }
-      ]
-    }
-  ]
+  "origins": []
 }
