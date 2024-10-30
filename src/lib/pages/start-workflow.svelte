@@ -14,6 +14,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Editor from '$lib/holocene/monaco/editor.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -261,6 +262,7 @@
           maxLength={255}
           bind:value={summary}
         />
+        <Label label="Details" for="details" />
         <Editor
           content={details}
           on:change={(event) => (details = event.detail.value)}
