@@ -13,6 +13,7 @@
   export let href: string = null;
   export let icon: IconName | undefined = undefined;
   export let tooltip: string = '';
+  export let badge = false;
 </script>
 
 <p class="flex items-center gap-2 whitespace-nowrap {$$restProps.class}">
@@ -33,7 +34,8 @@
       {#if href}
         <Link
           {href}
-          class="surface-subtle flex w-fit flex-row items-center gap-1 truncate rounded-sm p-1 leading-4"
+          class="flex w-fit flex-row items-center gap-1 truncate rounded-sm p-1 leading-4 {badge &&
+            'surface-subtle'}"
           ><span class="truncate">{content}</span>
           {#if filterable}
             <Icon name="filter" class="shrink-0" />
@@ -42,8 +44,8 @@
       {:else}
         <Tooltip text={tooltip} hide={!tooltip} top>
           <span
-            class="surface-subtle w-fit select-all truncate rounded-sm p-1 leading-4"
-            >{content}</span
+            class="w-fit select-all truncate rounded-sm p-1 leading-4"
+            class:surface-subtle={badge}>{content}</span
           >
         </Tooltip>
       {/if}
@@ -56,12 +58,16 @@
       <Icon name={icon} />
     {/if}
     {#if href}
-      <Link {href} class="value">{content}</Link>
+      <Link
+        {href}
+        class="value truncate rounded-sm p-1 leading-4  {badge &&
+          'surface-subtle'}">{content}</Link
+      >
     {:else}
       <Tooltip text={tooltip} hide={!tooltip} top>
         <span
-          class="surface-subtle w-fit select-all truncate rounded-sm p-1 leading-4"
-          >{content}</span
+          class="w-fit select-all truncate rounded-sm p-1 leading-4"
+          class:surface-subtle={badge}>{content}</span
         >
       </Tooltip>
     {/if}

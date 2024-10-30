@@ -171,14 +171,14 @@
     class="absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
       ? 'top-[540px]'
       : 'top-0'}
-    } flex h-full flex-col gap-0"
+    } flex h-full flex-col gap-4"
   >
     {#if workflowError}
       <WorkflowError error={workflowError} />
     {:else if !$workflowRun.workflow}
       <Loading class="pt-24" />
     {:else}
-      <div class="px-8 pt-8 md:pt-20">
+      <div class="border-b-2 border-subtle px-8 pt-8 md:pt-20">
         <WorkflowHeader namespace={$page.params.namespace} />
       </div>
       <slot />

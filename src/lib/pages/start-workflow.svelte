@@ -12,8 +12,10 @@
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Editor from '$lib/holocene/monaco/editor.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getPollers } from '$lib/services/pollers-service';
   import {
@@ -41,6 +43,8 @@
   let taskQueue = '';
   let workflowType = '';
   let input = '';
+  let summary = '';
+  let details = '';
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let inputRetrieved = 0;
 
@@ -76,6 +80,8 @@
         taskQueue,
         workflowType,
         input,
+        summary,
+        details,
         encoding: $encoding,
         searchAttributes,
       });
@@ -166,6 +172,11 @@
     !workflowCreateDisabled($page);
 
   $: checkTaskQueue(taskQueueParam);
+
+  $: {
+    console.log('Details: ', details);
+    console.log('Summary: ', summary);
+  }
 </script>
 
 <div class="flex w-full flex-col items-center pb-24">
@@ -242,6 +253,30 @@
       <PayloadInputWithEncoding bind:input bind:encoding />
     {/key}
     {#if viewAdvancedOptions}
+      <Card class="flex flex-col gap-2">
+        <h3>User Metadata</h3>
+        <Input
+          id="summary"
+          label="Summary"
+          maxLength={255}
+          bind:value={summary}
+        />
+        <Editor
+          content={details}
+          on:change={(event) => (details = event.detail.value)}
+        />
+
+        <!-- <PayloadInputWithEncoding
+          label="Summary"
+          bind:input={summary}
+          bind:encoding
+        />
+        <PayloadInputWithEncoding
+          label="Details"
+          bind:input={details}
+          bind:encoding
+        /> -->
+      </Card>
       <AddSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}
     <div class="mt-4 flex w-full justify-between">

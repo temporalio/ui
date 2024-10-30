@@ -53,12 +53,21 @@ export type WorkflowExecutionConfig = Replace<
   { defaultWorkflowTaskTimeout: Duration }
 >;
 
+export type UserMetadata = {
+  summary?: Payload;
+  details?: Payload;
+};
+
+export type WorkflowExecutionConfigWithMetadata = WorkflowExecutionConfig & {
+  userMetadata?: UserMetadata;
+};
+
 export type WorkflowExecutionAPIResponse = Optional<{
   workflowExecutionInfo: WorkflowExecutionInfo;
   pendingActivities: PendingActivityInfo[];
   pendingChildren: PendingChildren[];
   pendingNexusOperations: PendingNexusOperation[];
-  executionConfig: WorkflowExecutionConfig;
+  executionConfig: WorkflowExecutionConfigWithMetadata;
   callbacks: Callbacks;
   pendingWorkflowTask: PendingWorkflowTaskInfo;
 }>;
@@ -153,6 +162,8 @@ export type WorkflowExecution = {
   defaultWorkflowTaskTimeout: Duration;
   canBeTerminated: boolean;
   callbacks: Callbacks;
+  summary?: string;
+  details?: string;
 };
 
 export type WorkflowTaskFailedCause =

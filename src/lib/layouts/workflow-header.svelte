@@ -3,6 +3,7 @@
 
   import { page } from '$app/stores';
 
+  import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import WorkflowVersioningHeader from '$lib/components/workflow-versioning-header.svelte';
@@ -11,6 +12,7 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Markdown from '$lib/holocene/monaco/markdown.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
@@ -63,6 +65,10 @@
     $fullEventHistory,
     $namespaces,
   );
+
+  $: {
+    console.log('Workflow, ', workflow);
+  }
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -102,7 +108,7 @@
           <Copyable
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={workflow?.id}
+            content={workflow?.summary ?? workflow?.id}
             clickAllToCopy
             container-class="w-full"
             class="overflow-hidden text-ellipsis"
@@ -117,6 +123,10 @@
       <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
     </div>
   </div>
+  {#if workflow?.details}
+    <Markdown content={workflow.details || 'No description provided'} />
+  {/if}
+  <WorkflowDetails />
   <Tabs>
     <TabList class="flex flex-wrap gap-6 p-4 pl-0" label="workflow detail">
       <Tab

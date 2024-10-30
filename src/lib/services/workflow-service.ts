@@ -92,6 +92,8 @@ type StartWorkflowOptions = {
   workflowType: string;
   input: string;
   encoding: string;
+  summary: string;
+  details: string;
   searchAttributes: SearchAttributeInput[];
 };
 
@@ -498,6 +500,8 @@ export async function startWorkflow({
   taskQueue,
   workflowType,
   input,
+  summary,
+  details,
   encoding,
   searchAttributes,
 }: StartWorkflowOptions): Promise<{ runId: string }> {
@@ -524,6 +528,10 @@ export async function startWorkflow({
       name: workflowType,
     },
     input: payloads ? { payloads } : null,
+    userMetadata: {
+      summary: setBase64Payload(summary),
+      details: setBase64Payload(details),
+    },
     searchAttributes:
       searchAttributes.length === 0
         ? null

@@ -116,6 +116,12 @@ export const toWorkflowExecution = (
     toPendingNexusOperations(response?.pendingNexusOperations);
   const pendingWorkflowTask = response?.pendingWorkflowTask;
   const callbacks = toCallbacks(response?.callbacks);
+  const summary = decodePayload(
+    response?.executionConfig?.userMetadata?.summary,
+  );
+  const details = decodePayload(
+    response?.executionConfig?.userMetadata?.details,
+  );
 
   return {
     name,
@@ -138,6 +144,8 @@ export const toWorkflowExecution = (
     pendingNexusOperations,
     pendingWorkflowTask,
     callbacks,
+    summary,
+    details,
     parentNamespaceId,
     parent,
     stateTransitionCount,

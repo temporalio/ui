@@ -20,7 +20,7 @@
       on:load={resizeIframe}
       title="output"
       src="/render?content={encodeURIComponent(content)}&theme={theme}"
-      class="w-full rounded-md shadow-md dark:shadow-slate-900"
+      class="w-full rounded-md"
     />
   {/key}
 </section>
