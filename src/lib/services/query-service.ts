@@ -4,14 +4,8 @@ import type { Eventual, Settings } from '$lib/types/global';
 import { convertPayloadToJsonWithCodec } from '$lib/utilities/decode-payload';
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
 import { has } from '$lib/utilities/has';
-import {
-  parseWithBigInt,
-  stringifyWithBigInt,
-} from '$lib/utilities/parse-with-big-int';
-import {
-  isTemporalAPIError,
-  requestFromAPI,
-} from '$lib/utilities/request-from-api';
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 type QueryRequestParameters = {
@@ -92,24 +86,25 @@ async function fetchQuery(
 
 export async function getQueryTypes(
   options: WorkflowParameters,
-  request = fetch,
-): Promise<string[]> {
-  return new Promise<string[]>((resolve, reject) => {
-    fetchQuery(
-      { ...options, queryType: '@@temporal-internal__list' },
-      request,
-      (response) => {
-        if (
-          isTemporalAPIError(response.body) &&
-          response.body.message.includes('@@temporal-internal__list')
-        ) {
-          resolve(getQueryTypesFromError(response.body.message));
-        } else {
-          reject(response);
-        }
-      },
+  settings: Settings,
+  accessToken: string,
+): Promise<{ name: string; description?: string }[]> {
+  try {
+    const result = await getQuery(
+      { ...options, queryType: '__temporal_workflow_metadata' },
+      settings,
+      accessToken,
     );
-  });
+    return result?.definition?.queryDefinitions?.filter((query) => {
+      return query?.name !== '__stack_trace';
+    });
+  } catch (e) {
+    if (e.message?.includes('__temporal_workflow_metadata')) {
+      return getQueryTypesFromError(e.message);
+    } else {
+      throw e;
+    }
+  }
 }
 
 export async function getQuery(
@@ -138,8 +133,7 @@ export async function getQuery(
           data = convertedAttributes.payloads[0];
         }
       }
-
-      return parseWithBigInt(data);
+      return data;
     } catch (e) {
       if (typeof data !== 'string') {
         return stringifyWithBigInt(data);

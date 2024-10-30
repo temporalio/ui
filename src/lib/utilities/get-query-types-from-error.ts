@@ -1,4 +1,4 @@
-export const getQueryTypesFromError = (message: string): string[] => {
+export const getQueryTypesFromError = (message: string): { name: string }[] => {
   const indexOfOpeningBracket = message.indexOf('[');
   const indexOfClosingBracket = message.indexOf(']');
 
@@ -8,9 +8,9 @@ export const getQueryTypesFromError = (message: string): string[] => {
     .filter((query: string) => query !== '__stack_trace')
     .map((query: string) => {
       if (query.endsWith(',')) {
-        return query.slice(0, query.length - 1);
+        return { name: query.slice(0, query.length - 1) };
       } else {
-        return query;
+        return { name: query };
       }
     });
 };
