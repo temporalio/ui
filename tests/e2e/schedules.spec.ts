@@ -7,9 +7,19 @@ test.beforeEach(async ({ page, baseURL }) => {
 test.describe('Schedules Page', () => {
   test('should render empty list of schedules and navigate to Create Schedule page with form', async ({
     page,
+  }, {
+    project: {
+      use: { isMobile },
+    },
   }) => {
     test.slow();
-    const scheduleButton = page.getByTestId('schedules-button');
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (isMobile) {
+      await page.getByTestId('nav-menu-button').click();
+    }
+    const scheduleButton = page
+      .getByTestId('schedules-button')
+      .locator('visible=true');
     await scheduleButton.click();
     await expect(page).toHaveURL(/schedules/);
     const createScheduleButton = page.getByTestId('create-schedule');
