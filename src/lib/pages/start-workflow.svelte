@@ -4,12 +4,11 @@
   import { onMount } from 'svelte';
   import { v4 } from 'uuid';
 
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import PayloadInput, {
+  import PayloadInputWithEncoding, {
     type PayloadInputEncoding,
-  } from '$lib/components/payload-input.svelte';
+  } from '$lib/components/payload-input-with-encoding.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -25,9 +24,11 @@
     customSearchAttributes,
     type SearchAttributeInput,
   } from '$lib/stores/search-attributes';
+  import { toaster } from '$lib/stores/toaster';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { pluralize } from '$lib/utilities/pluralize';
   import {
+    routeForEventHistory,
     routeForTaskQueue,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
@@ -69,7 +70,7 @@
   const onWorkflowStart = async () => {
     try {
       error = '';
-      await startWorkflow({
+      const { runId } = await startWorkflow({
         namespace,
         workflowId,
         taskQueue,
@@ -78,9 +79,22 @@
         encoding: $encoding,
         searchAttributes,
       });
-      goto(routeForWorkflows({ namespace }));
+      toaster.push({
+        variant: 'success',
+        duration: 5000,
+        message: translate('workflows.start-workflow-success'),
+        link: routeForEventHistory({
+          namespace,
+          workflow: workflowId,
+          run: runId,
+        }),
+      });
     } catch (e) {
-      error = e?.message || 'Error start Workflow';
+      error = e?.message || translate('workflows.start-workflow-error');
+      toaster.push({
+        variant: 'error',
+        message: translate('workflows.start-workflow-error'),
+      });
     }
   };
 
@@ -225,7 +239,7 @@
       on:blur={(e) => onInputChange(e, 'workflowType')}
     />
     {#key inputRetrieved}
-      <PayloadInput bind:input bind:encoding />
+      <PayloadInputWithEncoding bind:input bind:encoding />
     {/key}
     {#if viewAdvancedOptions}
       <AddSearchAttributes bind:attributesToAdd={searchAttributes} />

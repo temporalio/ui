@@ -5,11 +5,9 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
-  import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
   import {
     CategoryIcon,
-    textBackdropOffsetWithIcon,
     TimelineConfig,
     timelineTextPosition,
   } from '../constants';
@@ -29,12 +27,9 @@
 
   const { height, gutter, radius } = TimelineConfig;
 
-  let textWidth = 0;
-
   $: timelineWidth = canvasWidth - 2 * gutter;
   $: active = !activeGroups.length || activeGroups.includes(group.id);
-  $: ({ pendingActivity } = group);
-  $: hasPendingActivity = isPendingActivity(pendingActivity);
+  $: pendingActivity = group?.pendingActivity;
 
   const getDistancePointsAndPositions = (
     endTime: string | Date,
@@ -105,8 +100,8 @@
       <Line
         startPoint={[x, y]}
         endPoint={[canvasWidth - gutter, y]}
-        category={group?.pendingActivity
-          ? group?.pendingActivity.attempt > 1
+        category={pendingActivity
+          ? pendingActivity.attempt > 1
             ? 'retry'
             : 'pending'
           : group.category}
@@ -116,35 +111,31 @@
       />
     {/if}
     {#if showText}
-      <Text
-        point={textPosition}
-        {textAnchor}
-        {backdrop}
-        backdropHeight={radius * 2}
-        config={TimelineConfig}
-        bind:textWidth
-      >
-        {group?.displayName}
-      </Text>
-    {/if}
-    {#if hasPendingActivity && pendingActivity.attempt > 1}
-      <Text
-        point={[
-          textPosition[0] + textWidth + textBackdropOffsetWithIcon,
-          textPosition[1],
-        ]}
-        textAnchor="start"
-        {backdrop}
-        backdropHeight={radius * 2}
-        config={TimelineConfig}
-        icon="retry"
-        status="retry"
-        noOffset
-        dark
-      >
-        {translate('workflows.retry')}
-        {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
-      </Text>
+      {#if pendingActivity}
+        {#key pendingActivity.attempt}
+          <Text
+            point={textPosition}
+            {textAnchor}
+            {backdrop}
+            backdropHeight={radius * 2}
+            config={TimelineConfig}
+            icon="retry"
+          >
+            {group?.displayName} • {translate('workflows.attempt')}
+            {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
+          </Text>
+        {/key}
+      {:else}
+        <Text
+          point={textPosition}
+          {textAnchor}
+          {backdrop}
+          backdropHeight={radius * 2}
+          config={TimelineConfig}
+        >
+          {group?.displayName}
+        </Text>
+      {/if}
     {/if}
     <Dot
       point={[x, y]}

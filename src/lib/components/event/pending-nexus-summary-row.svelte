@@ -43,8 +43,8 @@
   data-testid="pending-nexus-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td class="w-10 text-left">
-    <Link class="truncate px-1" data-testid="link" {href}>
+  <td class="w-12 text-left">
+    <Link data-testid="link" {href}>
       {event.scheduledEventId || ''}
     </Link>
   </td>
@@ -61,7 +61,7 @@
               'surface-retry rounded px-1 py-0.5'}"
           >
             <Icon class="mr-1.5 inline" name="retry" />
-            {translate('workflows.retry')}
+            {translate('workflows.attempt')}
             {event.attempt}
             {#if event.attempt > 1}
               • {translate('workflows.next-retry')}
@@ -87,7 +87,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex select-none items-center text-sm no-underline;
+    @apply flex select-none items-center gap-4 px-1 text-sm no-underline;
   }
 
   .expanded-cell {

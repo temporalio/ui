@@ -2,12 +2,7 @@
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import {
-    getTextOffset,
-    type GraphConfig,
-    textBackdropOffset,
-    textBackdropOffsetWithIcon,
-  } from '../constants';
+  import type { GraphConfig } from '../constants';
 
   import Line from './line.svelte';
 
@@ -22,9 +17,6 @@
   export let icon: IconName | undefined = undefined;
   export let config: GraphConfig | undefined = undefined;
   export let label = false;
-  export let textWidth = 0;
-  export let noOffset = false;
-  export let dark = false;
 
   $: [x, y] = point;
 
@@ -32,12 +24,8 @@
 
   $: showIcon = icon && config;
   $: textWidth = textElement?.getBBox()?.width || 0;
-  $: backdropWidth =
-    showIcon && !noOffset
-      ? textWidth + textBackdropOffsetWithIcon
-      : textWidth + textBackdropOffset;
+  $: backdropWidth = showIcon ? textWidth + 36 : textWidth + 12;
   $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 2 : x;
-  $: offset = noOffset ? getTextOffset(config.radius || 0) : 0;
 </script>
 
 {#if backdrop}
@@ -48,12 +36,12 @@
     strokeWidth={backdropHeight}
   />
 {/if}
-{#if showIcon && textAnchor === 'start'}
+{#if showIcon}
   <Icon
     name={icon}
-    x={x - offset}
+    x={textAnchor === 'end' ? x - textWidth - backdropHeight : x}
     y={y - 8}
-    class={dark ? 'text-black' : 'text-white'}
+    class={!backdrop ? 'text-primary' : 'text-white'}
   />
 {/if}
 <text
@@ -61,8 +49,7 @@
   class="cursor-pointer select-none outline-none {category} text-primary"
   class:label
   class:backdrop
-  class:dark
-  x={textX - offset}
+  x={textX}
   {y}
   font-size={fontSize}
   font-weight={fontWeight}
@@ -70,14 +57,6 @@
 >
   <slot />
 </text>
-{#if showIcon && textAnchor === 'end'}
-  <Icon
-    name={icon}
-    x={x - offset}
-    y={y - 8}
-    class={dark ? 'text-black' : 'text-white'}
-  />
-{/if}
 
 <style lang="postcss">
   text {
@@ -131,7 +110,6 @@
     fill: #ff4518;
   }
 
-  text.dark,
   text.none {
     fill: theme('colors.space-black');
   }

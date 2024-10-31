@@ -111,7 +111,6 @@
   </div>
   <Combobox
     label={translate('nexus.target-namespace')}
-    toggleLabel={translate('common.namespaces')}
     noResultsText={translate('common.no-results')}
     valid={!!target}
     error="Please select a target Namespace."
@@ -146,7 +145,6 @@
       bind:value={allowedCallerNamespaces}
       options={callerNamespaces}
       label={translate('nexus.allowed-caller-namespaces')}
-      toggleLabel={translate('common.namespaces')}
       leadingIcon="search"
       noResultsText={translate('common.no-results')}
       valid={!!allowedCallerNamespaces.length}

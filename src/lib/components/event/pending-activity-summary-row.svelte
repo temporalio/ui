@@ -44,17 +44,15 @@
   data-testid="pending-activity-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td class="w-10 truncate text-left">
-    <Link class="px-1" data-testid="link" {href}>
+  <td>
+    <Link data-testid="link" {href}>
       {event.activityId}
     </Link>
   </td>
-  <td
-    class="w-full overflow-hidden text-right text-sm font-normal xl:text-left"
-  >
+  <td class="w-full overflow-hidden text-right font-normal xl:text-left">
     <div class="flex w-full items-center gap-2">
-      <Icon name="activity" />
-      <p class="event-name truncate text-sm font-semibold md:text-base">
+      <!-- <Icon name="activity" /> -->
+      <p class="event-name truncate font-semibold md:text-base">
         Pending Activity
       </p>
       <div
@@ -62,7 +60,7 @@
           'surface-retry rounded px-1 py-0.5'}"
       >
         <Icon class="mr-1.5 inline" name="retry" />
-        {translate('workflows.retry')}
+        {translate('workflows.attempt')}
         {event.attempt} / {event.maximumAttempts || '∞'}
         {#if event.attempt > 1}
           • {translate('workflows.next-retry')}
@@ -92,7 +90,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex select-none items-center text-sm no-underline;
+    @apply flex select-none items-center gap-4 px-1 text-sm no-underline;
   }
 
   .expanded-cell {

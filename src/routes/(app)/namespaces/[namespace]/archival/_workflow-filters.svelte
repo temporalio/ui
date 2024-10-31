@@ -103,7 +103,11 @@
           <Option {value}>{label}</Option>
         {/each}
       </FilterSelect>
-      <Select id="filter-by-relative-time" bind:value={$timeFormat}>
+      <Select
+        id="filter-by-relative-time"
+        label={translate('common.time')}
+        bind:value={$timeFormat}
+      >
         <Option value={'relative'}>{translate('common.relative')}</Option>
         <Option value={'UTC'}>{translate('common.utc')}</Option>
         <Option value={'local'}>{translate('common.local')}</Option>

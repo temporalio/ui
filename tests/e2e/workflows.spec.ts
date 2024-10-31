@@ -12,7 +12,8 @@ test.describe('Workflow Execution Page', () => {
       .click({ force: true });
 
     const inputAndResult = page.getByTestId('input-and-result');
-    await expect(inputAndResult).toContainText('Mock decoded payload');
+    await expect(inputAndResult).toContainText('Plain text input 1');
+    await expect(inputAndResult).toContainText('Received Plain text input 1');
   });
 
   test('should render decoded call stack', async ({ page }) => {
@@ -26,7 +27,7 @@ test.describe('Workflow Execution Page', () => {
     await tab.click();
 
     const codeBlock = page.getByRole('textbox');
-    await expect(codeBlock).toContainText('Mock decoded payload');
+    await expect(codeBlock).toContainText('at workflow');
   });
 
   test('should render decoded query results', async ({ page }) => {
@@ -37,9 +38,11 @@ test.describe('Workflow Execution Page', () => {
     const tab = page.getByTestId('queries-tab');
     await tab.click();
 
-    await page.getByLabel('Query Type').selectOption('is-blocked');
+    await page.getByTestId('query-select-button').click();
+    await page.getByRole('option', { name: 'is-blocked' }).click();
+    await page.getByRole('button', { name: /query/i }).click();
 
-    const codeBlock = page.getByRole('textbox');
-    await expect(codeBlock).toContainText('Mock decoded payload');
+    const codeBlock = page.getByTestId('query-result').getByRole('textbox');
+    await expect(codeBlock).toContainText('true');
   });
 });

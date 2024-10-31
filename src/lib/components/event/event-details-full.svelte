@@ -26,7 +26,11 @@
         {@const attributes = formatAttributes(groupEvent)}
         {@const details = Object.entries(attributes)}
         <div
-          class="w-full border-subtle xl:w-1/3 [&:not(:last-child)]:border-r-2"
+          class="w-full border-subtle [&:not(:last-child)]:border-r-2"
+          class:three-events={group.eventList.length === 3 ||
+            (group.eventList.length === 2 && pendingEvent)}
+          class:two-events={group.eventList.length === 2 ||
+            (group.eventList.length === 1 && pendingEvent)}
         >
           <div
             class="flex w-full flex-wrap justify-between bg-subtle px-2 py-1"
@@ -49,7 +53,11 @@
       {/each}
       {#if pendingEvent}
         {@const details = Object.entries(pendingEvent)}
-        <div class="w-full border-subtle [&:not(:last-child)]:border-r-2">
+        <div
+          class="w-full border-subtle [&:not(:last-child)]:border-r-2"
+          class:three-events={group.eventList.length === 2}
+          class:two-events={group.eventList.length === 1}
+        >
           <div class="pending flex w-full justify-between px-2 py-1 text-white">
             <div class="flex gap-2">
               Pending {isPendingActivity(pendingEvent)
@@ -78,6 +86,14 @@
 {/if}
 
 <style lang="postcss">
+  .three-events {
+    @apply xl:w-1/3;
+  }
+
+  .two-events {
+    @apply xl:w-1/2;
+  }
+
   .pending {
     background: repeating-linear-gradient(
       to right,

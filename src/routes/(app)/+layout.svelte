@@ -3,6 +3,7 @@
   import { page, updated } from '$app/stores';
 
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
+  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
@@ -190,10 +191,15 @@
     <TopNavigation {namespaceList}>
       <UserMenu {logout} />
     </TopNavigation>
-    <Banner
-      message={$page.data.settings?.bannerText}
-      closeLabel={translate('common.close')}
-    />
+    <CodecServerErrorBanner>
+      <Banner
+        id="settings-banner-text"
+        message={$page.data.settings?.bannerText}
+        dismissable
+        dismissLabel={translate('common.close')}
+        slot="fallback"
+      />
+    </CodecServerErrorBanner>
     <div
       slot="main"
       class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"

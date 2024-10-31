@@ -69,7 +69,7 @@ export const groupEvents = (
 
   const createGroups = (event: CommonHistoryEvent) => {
     const id = getGroupId(event);
-    const group = createEventGroup(event, events);
+    const group = createEventGroup(event);
     const pendingActivity = getPendingActivity(event, pendingActivities);
     const pendingNexusOperation = getPendingNexusOperation(
       event,
@@ -131,7 +131,7 @@ export const groupWorkflowTaskEvents = (
 
   const createGroups = (event: CommonHistoryEvent) => {
     const id = getGroupId(event);
-    const group = createWorkflowTaskGroup(event, events);
+    const group = createWorkflowTaskGroup(event);
 
     if (group) {
       groups[group.id] = group;

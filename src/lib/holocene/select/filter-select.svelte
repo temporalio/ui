@@ -29,7 +29,7 @@
   };
 </script>
 
-<Select on:change={onChange} {id} bind:value={_value} {...$$props}>
+<Select on:change={onChange} {id} bind:value={_value} {label} {...$$props}>
   <slot>
     {#each options.map((o) => o.toString()) as option}
       <Option value={option} />

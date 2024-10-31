@@ -9,18 +9,7 @@
   export let data: PageData;
 
   $: ({ endpoints } = data);
-
-  $: search = $page.url.searchParams.get('search') || '';
-  $: empty = !endpoints?.length && !search;
 </script>
 
 <PageTitle title={translate('nexus.endpoints')} url={$page.url.href} />
-<div class:empty>
-  <NexusEndpoints {endpoints} />
-</div>
-
-<style lang="postcss">
-  .empty {
-    @apply absolute left-0 right-0 top-12;
-  }
-</style>
+<NexusEndpoints {endpoints} />

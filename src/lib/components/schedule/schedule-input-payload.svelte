@@ -8,10 +8,10 @@
   import { getSinglePayload } from '$lib/utilities/encode-payload';
 
   import PayloadDecoder from '../event/payload-decoder.svelte';
-  import PayloadInput, {
+  import PayloadInputWithEncoding, {
     isPayloadInputEncodingType,
     type PayloadInputEncoding,
-  } from '../payload-input.svelte';
+  } from '../payload-input-with-encoding.svelte';
 
   export let input: string;
   export let editInput: boolean;
@@ -20,6 +20,7 @@
   export let showEditActions: boolean = false;
 
   let initialInput = '';
+  let initialEncoding: PayloadInputEncoding = 'json/plain';
   let loading = true;
 
   const setInitialInput = (decodedValue: string): void => {
@@ -30,6 +31,7 @@
     );
     if (isPayloadInputEncodingType(currentEncoding)) {
       $encoding = currentEncoding;
+      initialEncoding = $encoding;
     }
     loading = false;
   };
@@ -38,6 +40,7 @@
     if (editInput) {
       editInput = false;
       input = initialInput;
+      $encoding = initialEncoding;
     } else {
       editInput = true;
       input;
@@ -47,12 +50,18 @@
 
 <div class="flex flex-col gap-1">
   <PayloadDecoder value={payloads} key="payloads" onDecode={setInitialInput}>
-    <PayloadInput bind:input bind:encoding bind:loading editing={editInput}>
+    <PayloadInputWithEncoding
+      bind:input
+      bind:encoding
+      bind:loading
+      editing={editInput}
+      id="schedule-payload-input"
+    >
       <div slot="action" class:hidden={!showEditActions}>
         <Button variant="secondary" on:click={handleEdit}>
           {editInput ? translate('common.cancel') : translate('common.edit')}
         </Button>
       </div>
-    </PayloadInput>
+    </PayloadInputWithEncoding>
   </PayloadDecoder>
 </div>
