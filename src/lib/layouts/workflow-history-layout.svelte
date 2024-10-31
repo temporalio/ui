@@ -7,6 +7,7 @@
   import WorkflowCallback from '$lib/components/lines-and-dots/workflow-callback.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import { activeGroups, clearActives } from '$lib/stores/active-events';
@@ -60,8 +61,10 @@
 
 <div class="flex flex-col gap-0 px-8">
   {#if metadata.currentDetails}
-    <div class="rounded bg-interactive p-4 text-xl">
-      {metadata.currentDetails}
+    <div
+      class="flex items-center gap-2 rounded border-2 border-interactive p-4 text-xl"
+    >
+      <Icon name="flag" width={32} height={32} />{metadata.currentDetails}
     </div>
   {/if}
   <WorkflowCallStackError />
