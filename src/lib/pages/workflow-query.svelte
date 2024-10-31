@@ -6,17 +6,13 @@
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    getQuery,
-    getQueryTypes,
-    type ParsedQuery,
-  } from '$lib/services/query-service';
+  import { getQuery, type ParsedQuery } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { Payloads } from '$lib/types';
   import { encodePayloads } from '$lib/utilities/encode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -37,18 +33,9 @@
 
   $: edited = initialQueryType !== queryType || input !== initialInput;
 
-  let queryTypes = getQueryTypes(
-    {
-      namespace,
-      workflow: params,
-    },
-    $page.data?.settings,
-    $authUser?.accessToken,
-  ).then((queryTypes) => {
-    queryType = queryType || queryTypes[0]?.name;
-    query(queryType);
-    return queryTypes;
-  });
+  $: metadataError = $workflowRun.metadata?.error?.message;
+  $: queryTypes = $workflowRun?.metadata?.definition?.queryDefinitions;
+  $: queryType = queryType || queryTypes?.[0]?.name;
 
   let queryResult: Promise<ParsedQuery>;
   let encodePayloadResult: Promise<Payloads>;
@@ -89,12 +76,13 @@
 </script>
 
 <section>
-  {#await queryTypes}
-    <div class="text-center">
-      <Loading />
-      <p class="-mt-10">{translate('workflows.no-workers-failure-message')}</p>
-    </div>
-  {:then types}
+  {#if metadataError}
+    <EmptyState
+      title={translate('common.error-occurred')}
+      content={translate('workflows.no-workers-running-message')}
+      error={$workflowRun.metadata?.error?.message}
+    />
+  {:else}
     <div class="flex w-3/4 gap-4 max-2xl:w-full max-lg:flex-col">
       <Card class="mt-7 flex h-fit w-full flex-col gap-2">
         <Select
@@ -105,7 +93,7 @@
           data-testid="query-select"
           required
         >
-          {#each types as { name: value, description = '' }}
+          {#each queryTypes as { name: value, description = '' }}
             <Option {value} {description}>{value}</Option>
           {/each}
         </Select>
@@ -155,11 +143,5 @@
         {/await}
       </div>
     </div>
-  {:catch _error}
-    <EmptyState
-      title={translate('common.error-occurred')}
-      content={translate('workflows.no-workers-running-message')}
-      error={_error?.body?.message}
-    />
-  {/await}
+  {/if}
 </section>

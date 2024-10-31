@@ -15,6 +15,7 @@
     throttleRefresh,
   } from '$lib/services/events-service';
   import { getPollers } from '$lib/services/pollers-service';
+  import { getWorkflowMetadata } from '$lib/services/query-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
@@ -74,7 +75,18 @@
       settings,
       $authUser?.accessToken,
     );
-    $workflowRun = { workflow, workers };
+    const metadata = await getWorkflowMetadata(
+      {
+        namespace,
+        workflow: {
+          id: workflowId,
+          runId,
+        },
+      },
+      settings,
+      $authUser?.accessToken,
+    );
+    $workflowRun = { workflow, workers, metadata };
     eventHistoryController = new AbortController();
     $fullEventHistory = await fetchAllEvents({
       namespace,
@@ -106,7 +118,19 @@
         settings,
         $authUser?.accessToken,
       );
-      $workflowRun = { ...$workflowRun, workflow };
+
+      const metadata = await getWorkflowMetadata(
+        {
+          namespace,
+          workflow: {
+            id: workflowId,
+            runId,
+          },
+        },
+        settings,
+        $authUser?.accessToken,
+      );
+      $workflowRun = { ...$workflowRun, workflow, metadata };
     }
   };
 

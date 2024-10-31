@@ -1,6 +1,7 @@
 import type { Payloads } from '$lib/types';
 import type { WorkflowQueryRouteParameters } from '$lib/types/api';
 import type { Eventual, Settings } from '$lib/types/global';
+import type { WorkflowMetadata } from '$lib/types/workflows';
 import { convertPayloadToJsonWithCodec } from '$lib/utilities/decode-payload';
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
 import { has } from '$lib/utilities/has';
@@ -84,25 +85,36 @@ async function fetchQuery(
   });
 }
 
-export async function getQueryTypes(
+export async function getWorkflowMetadata(
   options: WorkflowParameters,
   settings: Settings,
   accessToken: string,
-): Promise<{ name: string; description?: string }[]> {
+): Promise<WorkflowMetadata> {
   try {
-    const result = await getQuery(
+    const metadata = await getQuery(
       { ...options, queryType: '__temporal_workflow_metadata' },
       settings,
       accessToken,
     );
-    return result?.definition?.queryDefinitions?.filter((query) => {
-      return query?.name !== '__stack_trace';
-    });
+    const queryDefinitions = metadata?.definition?.queryDefinitions?.filter(
+      (query) => {
+        return query?.name !== '__stack_trace';
+      },
+    );
+    metadata.definition.queryDefinitions = queryDefinitions;
+    return metadata;
   } catch (e) {
     if (e.message?.includes('__temporal_workflow_metadata')) {
-      return getQueryTypesFromError(e.message);
+      const queryDefinitions = getQueryTypesFromError(e.message);
+      return {
+        definition: {
+          queryDefinitions,
+        },
+      };
     } else {
-      throw e;
+      return {
+        error: e,
+      };
     }
   }
 }

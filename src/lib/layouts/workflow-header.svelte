@@ -66,10 +66,6 @@
     $fullEventHistory,
     $namespaces,
   );
-
-  $: {
-    console.log('Workflow, ', workflow);
-  }
 </script>
 
 <div class="flex items-center justify-between pb-4">

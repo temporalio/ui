@@ -53,6 +53,22 @@ export type WorkflowExecutionConfig = Replace<
   { defaultWorkflowTaskTimeout: Duration }
 >;
 
+export type WorkflowInteractionDefinition = {
+  name?: string;
+  description?: string;
+};
+
+export type WorkflowMetadata = {
+  currentDetails?: string;
+  error?: Error;
+  definition?: {
+    type?: string;
+    queryDefinitions?: WorkflowInteractionDefinition[];
+    signalDefinitions?: WorkflowInteractionDefinition[];
+    updateDefinitions?: WorkflowInteractionDefinition[];
+  };
+};
+
 export type UserMetadata = {
   summary?: Payload;
   details?: Payload;

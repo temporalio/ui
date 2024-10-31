@@ -41,7 +41,7 @@
 
 <div
   class={merge(
-    'w-full rounded bg-interactive-secondary-hover p-2 hover:bg-subtle focus-visible:bg-interactive focus-visible:outline-none',
+    'w-full cursor-pointer rounded p-2 hover:bg-interactive-secondary-hover focus-visible:bg-interactive focus-visible:outline-none',
     className,
   )}
   {...$$restProps}

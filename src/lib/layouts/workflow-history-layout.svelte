@@ -19,7 +19,7 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  $: ({ workflow } = $workflowRun);
+  $: ({ workflow, metadata } = $workflowRun);
   $: pendingActivities = workflow?.pendingActivities;
   $: pendingNexusOperations = workflow?.pendingNexusOperations;
 
@@ -59,6 +59,11 @@
 </script>
 
 <div class="flex flex-col gap-0 px-8">
+  {#if metadata.currentDetails}
+    <div class="rounded bg-interactive p-4 text-xl">
+      {metadata.currentDetails}
+    </div>
+  {/if}
   <WorkflowCallStackError />
   <div class="flex flex-col gap-2">
     <InputAndResults />
