@@ -7,6 +7,7 @@
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import WorkflowVersioningHeader from '$lib/components/workflow-versioning-header.svelte';
+  import AccordionLight from '$lib/holocene/accordion/accordion-light.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
@@ -97,7 +98,7 @@
     {/if}
   </div>
 </div>
-<header class="rounded-top flex flex-col gap-0">
+<header class="rounded-top flex flex-col gap-2">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
     <div class="flex flex-col items-center gap-4 lg:flex-row">
       <div class="px-2">
@@ -124,7 +125,11 @@
     </div>
   </div>
   {#if workflow?.details}
-    <Markdown content={workflow.details || 'No description provided'} />
+    <AccordionLight title="Details" let:open>
+      {#if open}
+        <Markdown content={workflow.details} />
+      {/if}
+    </AccordionLight>
   {/if}
   <WorkflowDetails />
   <Tabs>

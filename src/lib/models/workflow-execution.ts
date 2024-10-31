@@ -116,12 +116,13 @@ export const toWorkflowExecution = (
     toPendingNexusOperations(response?.pendingNexusOperations);
   const pendingWorkflowTask = response?.pendingWorkflowTask;
   const callbacks = toCallbacks(response?.callbacks);
-  const summary = decodePayload(
-    response?.executionConfig?.userMetadata?.summary,
-  );
-  const details = decodePayload(
-    response?.executionConfig?.userMetadata?.details,
-  );
+
+  let summary;
+  let details;
+  if (response?.executionConfig?.userMetadata) {
+    summary = decodePayload(response?.executionConfig?.userMetadata?.summary);
+    details = decodePayload(response?.executionConfig?.userMetadata?.details);
+  }
 
   return {
     name,

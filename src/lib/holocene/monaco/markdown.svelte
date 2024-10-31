@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fade } from 'svelte/transition';
+
   import { page } from '$app/stores';
 
   import { useDarkMode } from '$lib/utilities/dark-mode';
@@ -33,7 +35,7 @@
   const templatedContent = replaceTemplate(content);
 </script>
 
-<section class="h-full w-full">
+<section class="h-full w-full" in:fade={{ duration: 1000 }}>
   {#key theme}
     <iframe
       bind:this={iframe}
