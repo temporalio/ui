@@ -16,15 +16,18 @@
   import { EditorState } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
   import { createEventDispatcher, onMount } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import { useDarkMode } from '$lib/utilities/dark-mode';
   import {
     parseWithBigInt,
     stringifyWithBigInt,
   } from '$lib/utilities/parse-with-big-int';
   import {
     TEMPORAL_SYNTAX,
+    TEMPORAL_SYNTAX_DARK,
     TEMPORAL_THEME,
   } from '$lib/vendor/codemirror/theme';
 
@@ -90,10 +93,10 @@
 
   $: value = formatValue({ value: content, language });
 
-  const createEditorView = (): EditorView => {
+  const createEditorView = (isDark: boolean): EditorView => {
     return new EditorView({
       parent: editor,
-      state: createEditorState(value),
+      state: createEditorState(value, isDark),
       dispatch(transaction) {
         view.update([transaction]);
         if (transaction.docChanged) {
@@ -103,11 +106,16 @@
     });
   };
 
-  const createEditorState = (value: string | null | undefined): EditorState => {
+  const createEditorState = (
+    value: string | null | undefined,
+    isDark: boolean,
+  ): EditorState => {
     const extensions = [
       keymap.of([...standardKeymap, ...historyKeymap]),
-      TEMPORAL_THEME,
-      syntaxHighlighting(TEMPORAL_SYNTAX, { fallback: true }),
+      TEMPORAL_THEME(isDark),
+      syntaxHighlighting(isDark ? TEMPORAL_SYNTAX_DARK : TEMPORAL_SYNTAX, {
+        fallback: true,
+      }),
       indentUnit.of('  '),
       closeBrackets(),
       autocompletion(),
@@ -153,9 +161,16 @@
   };
 
   onMount(() => {
-    view = createEditorView();
-    return () => view.destroy();
+    createView($useDarkMode);
+    return () => view?.destroy();
   });
+
+  const createView = (isDark: boolean) => {
+    if (view) view.destroy();
+    view = createEditorView(isDark);
+  };
+
+  $: createView($useDarkMode);
 
   const resetView = (value = '', format = true) => {
     const formattedValue = format ? formatValue({ value, language }) : value;
@@ -180,7 +195,7 @@
 <div class="relative min-w-[80px] grow">
   <div
     bind:this={editor}
-    class={className}
+    class={merge('surface-primary rounded border-2 border-subtle', className)}
     class:inline
     data-testid={$$props.testId}
     class:editable
@@ -191,7 +206,7 @@
     <CopyButton
       {copyIconTitle}
       {copySuccessIconTitle}
-      class="absolute right-1 top-1 text-secondary"
+      class="absolute right-3 top-1 text-secondary"
       data-theme="dark"
       on:click={handleCopy}
       copied={$copied}

@@ -20,7 +20,6 @@
   export let key: string;
   export let value: string | number | Record<string, unknown>;
   export let attributes: CombinedAttributes;
-  export let inline = false;
 
   $: codeBlockValue = getCodeBlockValue(value);
   $: stackTrace = getStackTrace(codeBlockValue);
@@ -37,7 +36,6 @@
             <CodeBlock
               content={decodedValue}
               maxHeight={384}
-              {inline}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
             />
@@ -51,7 +49,6 @@
             <CodeBlock
               content={decodedValue}
               maxHeight={384}
-              {inline}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
             />
@@ -61,14 +58,13 @@
             <CodeBlock
               content={decodedValue}
               maxHeight={384}
-              {inline}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
             />
           </PayloadDecoder>
         {/if}
       </div>
-      {#if stackTrace && !inline}
+      {#if stackTrace}
         <div class="flex flex-col">
           <p class="text-sm">{translate('workflows.call-stack-tab')}</p>
           <CodeBlock
