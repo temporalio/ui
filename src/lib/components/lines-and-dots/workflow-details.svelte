@@ -25,7 +25,7 @@
 <div class="flex flex-col gap-2">
   <h3 class="flex items-center">Summary</h3>
   <div
-    class="surface-primary grid w-full grid-flow-row grid-cols-1 gap-2 rounded-xl border-2 border-primary p-2 md:grid-cols-2 xl:grid-cols-3"
+    class="surface-primary grid w-full grid-flow-row grid-cols-1 gap-2 rounded border-2 border-subtle p-2 md:grid-cols-2 xl:grid-cols-3"
   >
     <WorkflowDetail
       title={translate('common.start')}
