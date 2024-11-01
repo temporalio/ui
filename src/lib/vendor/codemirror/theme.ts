@@ -31,12 +31,12 @@ export const TEMPORAL_SYNTAX = HighlightStyle.define(
   [
     { tag: tags.punctuation, color: colors.slate['800'] },
     { tag: tags.string, color: colors.slate['800'] },
-    { tag: tags.propertyName, color: colors.indigo['500'] },
+    { tag: tags.propertyName, color: colors.indigo['600'] },
     { tag: tags.bool, color: colors.slate['800'] },
     { tag: tags.number, color: colors.slate['800'] },
     { tag: tags.operator, color: colors.pink['400'] },
     { tag: tags.comment, color: colors.green['400'] },
-    { tag: tags.variableName, color: colors.pink['400'] },
+    { tag: tags.variableName, color: colors.pink['600'] },
   ],
   { themeType: 'light' },
 );

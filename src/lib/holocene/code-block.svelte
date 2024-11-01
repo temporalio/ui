@@ -195,7 +195,7 @@
 <div class="relative min-w-[80px] grow">
   <div
     bind:this={editor}
-    class={merge('rounded border-2 border-subtle bg-primary', className)}
+    class={merge('surface-primary rounded border-2 border-subtle', className)}
     class:inline
     data-testid={$$props.testId}
     class:editable
