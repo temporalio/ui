@@ -136,7 +136,23 @@ describe('updateQueryParameters', () => {
 
     const [href, options] = goto.mock.calls[0];
 
-    expect(href).toBe('/?other=value&parameter=value');
+    expect(href).toBe('/?parameter=value&other=value');
+    expect(options).toEqual(gotoOptions);
+  });
+
+  it('should call `goto` with the correct path for the updated param and keep order if there are other params', () => {
+    const parameter = 'parameter';
+    const value = 'newValue';
+    const url = new URL(
+      `https://temporal.io/?other1=value1&${parameter}=oldValue&other2=value2`,
+    );
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
+
+    updateQueryParameters({ parameter, value, url, goto });
+
+    const [href, options] = goto.mock.calls[0];
+
+    expect(href).toBe('/?other1=value1&parameter=newValue&other2=value2');
     expect(options).toEqual(gotoOptions);
   });
 
