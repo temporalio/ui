@@ -87,6 +87,8 @@
         {/if}
       </IsTemporalServerVersionGuard>
     </td>
+  {:else}
+    <td></td>
   {/if}
   <slot />
   <td />
