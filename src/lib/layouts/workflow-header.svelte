@@ -40,7 +40,7 @@
 
   export let namespace: string;
 
-  $: ({ workflow, workers } = $workflowRun);
+  $: ({ workflow, workers, metadata } = $workflowRun);
   $: id = $page.params.id;
 
   $: routeParameters = {
@@ -94,7 +94,7 @@
     {/if}
   </div>
 </div>
-<header class="rounded-top flex flex-col gap-2">
+<header class="rounded-top flex flex-col gap-0.5">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
     <div class="flex flex-col items-center gap-4 lg:flex-row">
       <div class="px-2">
@@ -122,6 +122,13 @@
   </div>
   {#if workflow?.details}
     <AccordionLight title="Details" let:open>
+      <div
+        slot="title"
+        class="flex w-1/2 items-center gap-2 rounded p-4 text-xl"
+      >
+        <Icon name="flag" width={32} height={32} />{metadata.currentDetails}
+      </div>
+
       {#if open}
         <Markdown content={workflow.details} />
       {/if}

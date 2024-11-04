@@ -41,7 +41,7 @@
 
 <div
   class={merge(
-    'w-full cursor-pointer rounded p-2 hover:bg-interactive-secondary-hover focus-visible:bg-interactive focus-visible:outline-none',
+    'w-full cursor-pointer rounded border-2 border-interactive hover:bg-interactive-secondary-hover focus-visible:bg-interactive focus-visible:outline-none',
     className,
   )}
   {...$$restProps}
@@ -55,11 +55,7 @@
     on:click={toggleAccordion}
   >
     <div class="flex w-full flex-row items-center justify-between gap-2">
-      <h3 class="flex items-center gap-2">
-        {#if icon}<Icon name={icon} />{/if}
-        {title}
-        <slot name="summary" />
-      </h3>
+      <slot name="title" />
       <slot name="description" />
       <div
         class="flex flex-row items-center gap-2 pr-2"
