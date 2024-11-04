@@ -11,6 +11,7 @@ const combinedQuery =
   '`WorkflowId`="Hello" and `WorkflowType`="World" and `StartTime` BETWEEN "2022-04-18T18:09:49-06:00" AND "2022-04-20T18:09:49-06:00"';
 const valuesWithSpacesQuery =
   '`Custom Key Word`="Hello there world" AND `WorkflowId`="one and two = three" OR `WorkflowType`="example=\'one\'"';
+const keywordListQuery = '`CustomKeywordListField`IN("Hello", "World")';
 
 describe('tokenize', () => {
   it('should eliminate spaces', () => {
@@ -85,6 +86,16 @@ describe('tokenize', () => {
       'AND',
       'Custom Boolean',
       '=true',
+    ]);
+  });
+
+  it('should tokenize the keywordListQuery', () => {
+    const query = keywordListQuery;
+
+    expect(tokenize(query)).toEqual([
+      'CustomKeywordListField',
+      'IN',
+      '("Hello", "World")',
     ]);
   });
 

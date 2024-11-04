@@ -33,6 +33,7 @@ const workflowQueryWithSpaces =
 const prefixQuery = '`WorkflowType` STARTS_WITH "hello"';
 const isEmptyQuery = '`WorkflowType` is null';
 const isNotEmptyQuery = '`StartTime` IS NOT NULL';
+const keywordListQuery = '`CustomKeywordListField`IN("Hello", "World")';
 
 const attributes = {
   CloseTime: 'Datetime',
@@ -43,6 +44,7 @@ const attributes = {
   CustomBoolField: 'Bool',
   'Custom Keyword Field': 'Keyword',
   'Custom Bool Field': 'Bool',
+  CustomKeywordListField: 'KeywordList',
 };
 
 describe('toListWorkflowFilters', () => {
@@ -263,6 +265,87 @@ describe('toListWorkflowFilters', () => {
         operator: '',
         parenthesis: '',
         value: 'true',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
+  it('should parse a query with a KeywordList type', () => {
+    const result = toListWorkflowFilters(keywordListQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'CustomKeywordListField',
+        type: 'KeywordList',
+        conditional: 'IN',
+        operator: '',
+        parenthesis: '',
+        value: '("Hello", "World")',
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
+  it('should parse a query with a KeywordList type and other types ', () => {
+    const result = toListWorkflowFilters(
+      keywordListQuery + ' AND ' + workflowQuery4 + ' AND ' + keywordListQuery,
+      attributes,
+    );
+    const expectedFilters = [
+      {
+        attribute: 'CustomKeywordListField',
+        type: 'KeywordList',
+        conditional: 'IN',
+        operator: 'AND',
+        parenthesis: '',
+        value: '("Hello", "World")',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        type: 'Keyword',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '(',
+        value: 'Canceled',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        type: 'Keyword',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '',
+        value: 'Failed',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        type: 'Keyword',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: ')',
+        value: 'Completed',
+      },
+      {
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'World',
+      },
+      {
+        attribute: 'StartTime',
+        type: 'Datetime',
+        conditional: '>',
+        operator: 'AND',
+        parenthesis: '',
+        value: '2022-04-18T17:45:18-06:00',
+      },
+      {
+        attribute: 'CustomKeywordListField',
+        type: 'KeywordList',
+        conditional: 'IN',
+        operator: '',
+        parenthesis: '',
+        value: '("Hello", "World")',
       },
     ];
     expect(result).toEqual(expectedFilters);

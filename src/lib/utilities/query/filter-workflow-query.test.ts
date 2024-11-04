@@ -201,4 +201,19 @@ describe('toListWorkflowQueryFromFilters', () => {
       '`WorkflowType`="cronWorkflow" AND StartTime > "2019-12-30T00:00:00.000Z"',
     );
   });
+
+  it('should convert a KeywordList filter', () => {
+    const filters = [
+      {
+        attribute: 'CustomKeywordListField',
+        type: 'KeywordList',
+        conditional: 'IN',
+        operator: '',
+        parenthesis: '',
+        value: '("Hello", "World")',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`CustomKeywordListField`IN("Hello", "World")');
+  });
 });

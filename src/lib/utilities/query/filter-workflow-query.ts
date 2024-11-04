@@ -47,6 +47,9 @@ const formatValue = (
   if (type === SEARCH_ATTRIBUTE_TYPE.BOOL) {
     return value.toLowerCase() === 'true' ? true : false;
   }
+  if (type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST) {
+    return value;
+  }
   return `"${value}"`;
 };
 
