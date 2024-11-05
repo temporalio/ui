@@ -27,9 +27,7 @@
   const { filter, resetFilter } = getContext<FilterContext>(FILTER_CONTEXT);
   const open = writable(true);
   $: _filters = [...filters];
-  $: statusFilters = _filters.filter((filter) =>
-    isStatusFilter(filter.attribute),
-  );
+  $: statusFilters = _filters.filter((filter) => isStatusFilter(filter));
 
   function apply() {
     filters = _filters;
@@ -61,9 +59,7 @@
     if (status === 'All') {
       _filters = filters.filter((f) => f.attribute !== 'ExecutionStatus');
     } else if (statusFilters.find((s) => s.value === status)) {
-      const nonStatusFilters = filters.filter(
-        (f) => !isStatusFilter(f.attribute),
-      );
+      const nonStatusFilters = filters.filter((f) => !isStatusFilter(f));
       _filters = [
         ...nonStatusFilters,
         ...mapStatusesToFilters(
@@ -74,9 +70,7 @@
       if (!statusFilters.length) {
         _filters = [..._filters, mapStatusToFilter(status)];
       } else {
-        const nonStatusFilters = _filters.filter(
-          (f) => !isStatusFilter(f.attribute),
-        );
+        const nonStatusFilters = _filters.filter((f) => !isStatusFilter(f));
         _filters = [
           ...nonStatusFilters,
           ...mapStatusesToFilters([

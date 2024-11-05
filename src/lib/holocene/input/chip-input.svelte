@@ -24,6 +24,7 @@
   let inputContainer: HTMLDivElement;
   let input: HTMLInputElement;
 
+  $: chips, ($values = chips);
   $: invalid = $values.some((chip) => !validator(chip));
 
   let className = '';

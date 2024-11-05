@@ -30,11 +30,11 @@ const store = writable<SearchAttributes>({
 
 describe('isStatusFilter', () => {
   it('should return true if the attribute is ExecutionStatus', () => {
-    expect(isStatusFilter('ExecutionStatus')).toBe(true);
+    expect(isStatusFilter({ attribute: 'ExecutionStatus' })).toBe(true);
   });
 
   it('should return false if the attribute is not ExecutionStatus', () => {
-    expect(isStatusFilter('WorkflowType')).toBe(false);
+    expect(isStatusFilter({ attribute: 'WorkflowType' })).toBe(false);
   });
 });
 
@@ -104,11 +104,11 @@ describe('isNumberFilter', () => {
 
 describe('isDurationFilter', () => {
   it('should return true if the attribute is ExecutionDuration', () => {
-    expect(isDurationFilter('ExecutionDuration')).toBe(true);
+    expect(isDurationFilter({ attribute: 'ExecutionDuration' })).toBe(true);
   });
 
   it('should return false if the attribute is not ExecutionDuration', () => {
-    expect(isDurationFilter('CustomB')).toBe(false);
+    expect(isDurationFilter({ attribute: 'CustomB' })).toBe(false);
   });
 });
 
