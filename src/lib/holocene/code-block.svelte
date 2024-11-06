@@ -207,7 +207,6 @@
       {copyIconTitle}
       {copySuccessIconTitle}
       class="absolute right-3 top-1 text-secondary"
-      data-theme="dark"
       on:click={handleCopy}
       copied={$copied}
     />
