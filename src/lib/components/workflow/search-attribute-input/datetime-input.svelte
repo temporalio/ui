@@ -16,7 +16,7 @@
   let second = '';
 
   onMount(() => {
-    if (value) {
+    if (value && (typeof value === 'string' || typeof value === 'number')) {
       const datetime = new Date(value);
       const utcDate = new Date(
         datetime.getUTCFullYear(),

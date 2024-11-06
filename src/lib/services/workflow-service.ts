@@ -484,9 +484,7 @@ export const setSearchAttributes = (
 
   const searchAttributes: SearchAttribute = {};
   attributes.forEach((attribute) => {
-    searchAttributes[attribute.attribute] = setBase64Payload(
-      String(attribute.value),
-    );
+    searchAttributes[attribute.attribute] = setBase64Payload(attribute.value);
   });
 
   return searchAttributes;

@@ -13,6 +13,7 @@
   } from '$lib/types/workflows';
 
   import DatetimeInput from './datetime-input.svelte';
+  import ListInput from './list-input.svelte';
   import NumberInput from './number-input.svelte';
   import TextInput from './text-input.svelte';
 
@@ -22,9 +23,9 @@
   export let onRemove: (attribute: string) => void;
 
   $: type = searchAttributes[attribute.attribute];
-  $: searchAttributesOptions = [...Object.entries(searchAttributes)]
-    .map(([key, value]) => ({ label: key, value: key, type: value }))
-    .filter(({ type }) => type !== 'KeywordList');
+  $: searchAttributesOptions = [...Object.entries(searchAttributes)].map(
+    ([key, value]) => ({ label: key, value: key, type: value }),
+  );
 
   $: isDisabled = (value: string) => {
     return !!attributesToAdd.find((a) => a.attribute === value);
@@ -37,7 +38,7 @@
   };
 </script>
 
-<div class="flex items-start gap-2">
+<div class="flex items-end gap-2">
   <div class="min-w-fit">
     <Select
       id="search-attribute"
@@ -67,6 +68,8 @@
     <DatetimeInput bind:value={attribute.value} />
   {:else if type === SEARCH_ATTRIBUTE_TYPE.INT || type === SEARCH_ATTRIBUTE_TYPE.DOUBLE}
     <NumberInput bind:value={attribute.value} />
+  {:else if type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST}
+    <ListInput bind:value={attribute.value} />
   {:else}
     <TextInput bind:value={attribute.value} />
   {/if}
