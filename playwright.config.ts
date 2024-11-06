@@ -31,8 +31,22 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'chromium desktop',
+      testIgnore: /.*mobile.spec.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1920, height: 1080 },
+        isMobile: false,
+      },
+    },
+    {
+      name: 'chromium mobile',
+      testIgnore: /.*desktop.spec.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 320, height: 480 },
+        isMobile: true,
+      },
     },
   ],
   webServer: {
