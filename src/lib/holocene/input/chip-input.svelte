@@ -18,6 +18,10 @@
   export let hintText = '';
   export let validator: (value: string) => boolean = () => true;
   export let removeChipButtonLabel: string | ((chipValue: string) => string);
+  export let unroundRight = false;
+  export let unroundLeft = false;
+  export let external = false;
+
   const values = writable<string[]>(chips);
   let displayValue = '';
   let shouldScrollToInput = false;
@@ -111,8 +115,10 @@
       disabled && 'cursor-not-allowed opacity-65',
       invalid && 'invalid',
     )}
+    class:unroundLeft
+    class:unroundRight
   >
-    {#if $values.length > 0}
+    {#if $values.length > 0 && !external}
       {#each $values as chip, i (`${chip}-${i}`)}
         {@const valid = validator(chip)}
         <Chip
@@ -149,6 +155,21 @@
       {hintText}
     </span>
   {/if}
+  {#if $values.length > 0 && external}
+    <div class="mt-1 flex flex-row flex-wrap gap-1">
+      {#each $values as chip, i (`${chip}-${i}`)}
+        {@const valid = validator(chip)}
+        <Chip
+          removeButtonLabel={typeof removeChipButtonLabel === 'string'
+            ? removeChipButtonLabel
+            : removeChipButtonLabel(chip)}
+          on:remove={() => removeChip(i)}
+          intent={valid ? 'default' : 'warning'}
+          {disabled}>{chip}</Chip
+        >
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style lang="postcss">
@@ -162,6 +183,14 @@
 
   input {
     @apply surface-primary inline-block w-full focus:outline-none;
+  }
+
+  .unroundRight {
+    @apply rounded-br-none rounded-tr-none border-r-0;
+  }
+
+  .unroundLeft {
+    @apply rounded-bl-none rounded-tl-none border-l-0;
   }
 
   .hint {

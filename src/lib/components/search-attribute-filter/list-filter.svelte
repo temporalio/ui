@@ -41,6 +41,9 @@
     removeChipButtonLabel={(chip) =>
       translate('workflows.remove-keyword-label', { keyword: chip })}
     placeholder="{translate('common.type-or-paste-in')} {$filter.attribute}"
+    unroundLeft
+    unroundRight
+    external
   />
   <div class="flex h-fit items-center">
     <Button
