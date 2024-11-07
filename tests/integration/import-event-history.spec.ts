@@ -16,7 +16,11 @@ test.beforeEach(async ({ page }) => {
   await mockWorkflowsApis(page);
 });
 
-test('Navigate to import page from nav', async ({ page }) => {
+test('Navigate to import page from nav', async ({ page }, {
+  project: {
+    use: { isMobile },
+  },
+}) => {
   await mockWorkflowsGroupByCountApi(page);
   await page.goto(workflowsUrl);
   await waitForWorkflowsApis(page);
@@ -27,7 +31,11 @@ test('Navigate to import page from nav', async ({ page }) => {
   await page.goto(importUrl);
   page.waitForRequest(SETTINGS_API);
 
-  await page.getByTestId('import-button').click();
+  // eslint-disable-next-line playwright/no-conditional-in-test
+  if (isMobile) {
+    await page.getByTestId('nav-menu-button').click();
+  }
+  await page.getByTestId('import-button').locator('visible=true').click();
 
   const title = await page.getByTestId('import-event-history').innerText();
   expect(title).toBe('Import Event History');

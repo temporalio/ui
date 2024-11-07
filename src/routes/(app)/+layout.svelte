@@ -187,7 +187,7 @@
     <SideNavigation {linkList} {isCloud} />
   </div>
   <MainContentContainer>
-    <DataEncoderSettings />
+    <DataEncoderSettings class="hidden md:flex" />
     <TopNavigation {namespaceList}>
       <UserMenu {logout} />
     </TopNavigation>

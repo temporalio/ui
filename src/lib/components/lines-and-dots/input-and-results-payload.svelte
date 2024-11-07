@@ -32,7 +32,6 @@
         {#each parsePayloads(decodedValue) as decodedContent}
           <CodeBlock
             content={stringifyWithBigInt(decodedContent)}
-            class="rounded-none"
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
             maxHeight={300}
@@ -43,7 +42,6 @@
       <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
         <CodeBlock
           content={decodedValue}
-          class="rounded-none"
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
           maxHeight={300}

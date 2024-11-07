@@ -96,12 +96,6 @@ export async function getWorkflowMetadata(
       settings,
       accessToken,
     );
-    const queryDefinitions = metadata?.definition?.queryDefinitions?.filter(
-      (query) => {
-        return query?.name !== '__stack_trace';
-      },
-    );
-    metadata.definition.queryDefinitions = queryDefinitions;
     return metadata;
   } catch (e) {
     if (e.message?.includes('__temporal_workflow_metadata')) {

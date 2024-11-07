@@ -34,7 +34,12 @@
   $: edited = initialQueryType !== queryType || input !== initialInput;
 
   $: metadataError = $workflowRun.metadata?.error?.message;
-  $: queryTypes = $workflowRun?.metadata?.definition?.queryDefinitions;
+  $: queryTypes = $workflowRun?.metadata?.definition?.queryDefinitions?.filter(
+    (query) => {
+      return query?.name !== '__stack_trace';
+    },
+  );
+
   $: queryType = queryType || queryTypes?.[0]?.name;
 
   let queryResult: Promise<ParsedQuery>;

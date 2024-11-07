@@ -7,9 +7,7 @@ test.beforeEach(async ({ page, baseURL }) => {
 test.describe('Workflow Execution Page', () => {
   test('should render decoded Payloads', async ({ page }) => {
     test.slow();
-    await page
-      .getByRole('link', { name: 'e2e-workflow-1' })
-      .click({ force: true });
+    await page.getByRole('link', { name: 'e2e-workflow-1' }).click();
 
     const inputAndResult = page.getByTestId('input-and-result');
     await expect(inputAndResult).toContainText('Plain text input 1');
@@ -17,9 +15,7 @@ test.describe('Workflow Execution Page', () => {
   });
 
   test('should render decoded call stack', async ({ page }) => {
-    await page
-      .getByRole('link', { name: 'e2e-workflow-2' })
-      .click({ force: true });
+    await page.getByRole('link', { name: 'e2e-workflow-2' }).click();
 
     await page.getByText('Call Stack').click();
 
@@ -31,9 +27,7 @@ test.describe('Workflow Execution Page', () => {
   });
 
   test('should render decoded query results', async ({ page }) => {
-    await page
-      .getByRole('link', { name: 'e2e-workflow-2' })
-      .click({ force: true });
+    await page.getByRole('link', { name: 'e2e-workflow-2' }).click();
 
     const tab = page.getByTestId('queries-tab');
     await tab.click();

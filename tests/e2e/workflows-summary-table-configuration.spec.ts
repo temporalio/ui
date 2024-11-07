@@ -144,7 +144,14 @@ test.describe('Workflows Table Configuration', () => {
 
   test('allows reordering columns in the table via drag and drop', async ({
     page,
+  }, {
+    project: {
+      use: { isMobile },
+    },
   }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(isMobile, 'This test is for Desktop only');
+
     const initialThs = await page
       .locator('.workflows-summary-table-header-cell')
       .all();

@@ -112,6 +112,7 @@
       value: workflowId,
       url: $page.url,
       allowEmpty: true,
+      options: { keepFocus: true, noScroll: true, replaceState: true },
     });
   };
 
@@ -151,6 +152,7 @@
       value,
       url: $page.url,
       allowEmpty: true,
+      options: { keepFocus: true, noScroll: true, replaceState: true },
     });
   };
 

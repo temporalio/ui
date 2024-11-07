@@ -25,6 +25,7 @@
   export let error = false;
   export let loading = false;
   export let label = translate('workflows.input');
+  export let editing = true;
 
   const clearValues = () => {
     $encoding = 'json/plain';
@@ -36,20 +37,23 @@
 <div>
   <h5 class="pb-1 text-sm font-medium">{label}</h5>
   <Card class="flex flex-col gap-2">
-    <PayloadInput bind:input bind:loading {error} {id} />
-    <div class="flex items-end justify-between">
-      <RadioGroup
-        description={translate('workflows.encoding')}
-        bind:group={encoding}
-        name="encoding"
-      >
-        <RadioInput id="json/plain" value="json/plain" label="json/plain" />
-        <RadioInput
-          id="json/protobuf"
-          value="json/protobuf"
-          label="json/protobuf"
-        />
-      </RadioGroup>
+    <PayloadInput bind:input bind:loading {error} {id} {editing} />
+    <div class="flex items-end {editing ? 'justify-between' : 'justify-end'}">
+      {#if editing}
+        <RadioGroup
+          description={translate('workflows.encoding')}
+          bind:group={encoding}
+          name="encoding"
+        >
+          <RadioInput id="json/plain" value="json/plain" label="json/plain" />
+          <RadioInput
+            id="json/protobuf"
+            value="json/protobuf"
+            label="json/protobuf"
+          />
+        </RadioGroup>
+      {/if}
+      <slot name="action" />
     </div>
   </Card>
 </div>

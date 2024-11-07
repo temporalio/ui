@@ -16,9 +16,7 @@
 </script>
 
 {#if open}
-  <div
-    class="relative flex h-full flex-col items-center gap-4 overflow-auto px-4 py-8"
-  >
+  <div data-testid="namespace-search-list">
     <Input
       id="namespace-search"
       type="search"
@@ -26,18 +24,22 @@
       labelHidden
       autoFocus
       placeholder="Search"
-      class="sticky top-0 w-full"
+      class="sticky top-0 w-full bg-primary p-2"
       bind:value={search}
     />
-    {#each namespaces as { namespace, onClick }}
-      <button
-        class="namespace"
-        class:selected={namespace === $lastUsedNamespace}
-        on:click|preventDefault|stopPropagation={() => onClick(namespace)}
-      >
-        {namespace}
-      </button>
-    {/each}
+    <ul class="flex w-full flex-col gap-4 overflow-auto p-4 pt-2">
+      {#each namespaces as { namespace, onClick }}
+        <li>
+          <button
+            class="namespace"
+            class:selected={namespace === $lastUsedNamespace}
+            on:click|preventDefault|stopPropagation={() => onClick(namespace)}
+          >
+            {namespace}
+          </button>
+        </li>
+      {/each}
+    </ul>
   </div>
 {/if}
 

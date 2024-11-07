@@ -91,6 +91,7 @@
 >
   <button
     class="nav-button relative"
+    data-testid="nav-menu-button"
     class:active-shadow={viewLinks}
     type="button"
     on:click={onLinksClick}
@@ -104,6 +105,7 @@
   <div class="namespace-wrapper">
     <Button
       variant="ghost"
+      data-testid="namespace-switcher"
       leadingIcon="namespace-switcher"
       size="xs"
       class="grow text-white"
@@ -120,6 +122,7 @@
   </div>
   <button
     class="nav-button"
+    data-testid="nav-profile-button"
     class:active-shadow={viewSettings}
     type="button"
     on:click={onSettingsClick}
