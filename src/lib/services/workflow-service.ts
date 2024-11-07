@@ -562,6 +562,8 @@ export const fetchInitialValuesForStartWorkflow = async ({
 }): Promise<{
   input: string;
   searchAttributes: Record<string, string | Payload> | undefined;
+  summary: string;
+  details: string;
 }> => {
   const handleError: ErrorCallback = (err) => {
     console.error(err);
@@ -569,6 +571,8 @@ export const fetchInitialValuesForStartWorkflow = async ({
   const emptyValues = {
     input: '',
     searchAttributes: undefined,
+    summary: '',
+    details: '',
   };
   try {
     let query = '';
@@ -590,13 +594,14 @@ export const fetchInitialValuesForStartWorkflow = async ({
     );
 
     if (!workflows?.executions?.[0]) return emptyValues;
-    const workflow = toWorkflowExecutions(workflows)[0];
-
-    const firstEvent = await fetchInitialEvent({
+    const listWorkflow = toWorkflowExecutions(workflows)[0];
+    const params = {
       namespace,
-      workflowId: workflow.id,
-      runId: workflow.runId,
-    });
+      workflowId: listWorkflow.id,
+      runId: listWorkflow.runId,
+    };
+    const { workflow } = await fetchWorkflow(params);
+    const firstEvent = await fetchInitialEvent(params);
 
     const startEvent = firstEvent as WorkflowExecutionStartedEvent;
     const convertedAttributes = (await cloneAllPotentialPayloadsWithCodec(
@@ -610,6 +615,8 @@ export const fetchInitialValuesForStartWorkflow = async ({
     return {
       input,
       searchAttributes: workflow?.searchAttributes?.indexedFields,
+      summary: workflow?.summary || '',
+      details: workflow?.details || '',
     };
   } catch (e) {
     return emptyValues;

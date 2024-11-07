@@ -22,10 +22,8 @@
     'data-testid'?: string;
   }
 
-  export let title: string;
   export let id: string = v4();
   export let subtitle = '';
-  export let icon = null;
   export let open = false;
   export let error = '';
   export let onToggle = noop;
@@ -41,7 +39,7 @@
 
 <div
   class={merge(
-    'w-full cursor-pointer rounded border-2 border-interactive hover:bg-interactive-secondary-hover focus-visible:bg-interactive focus-visible:outline-none',
+    'w-full cursor-pointer hover:bg-interactive-secondary-hover focus-visible:bg-interactive focus-visible:outline-none',
     className,
   )}
   {...$$restProps}
@@ -79,7 +77,7 @@
     id="{id}-content"
     aria-labelledby="{id}-trigger"
     role="textbox"
-    class="mt-2 block w-full rounded-b"
+    class="rounded-b-2 block w-full"
     class:hidden={!open}
     transition:slide
   >

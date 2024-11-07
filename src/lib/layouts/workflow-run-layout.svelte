@@ -69,13 +69,16 @@
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
 
+    $workflowRun = { ...$workflowRun, workflow, workers };
+
     workflow.pendingActivities = await toDecodedPendingActivities(
       workflow,
       namespace,
       settings,
       $authUser?.accessToken,
     );
-    const metadata = await getWorkflowMetadata(
+
+    getWorkflowMetadata(
       {
         namespace,
         workflow: {
@@ -85,8 +88,10 @@
       },
       settings,
       $authUser?.accessToken,
-    );
-    $workflowRun = { workflow, workers, metadata };
+    ).then((metadata) => {
+      $workflowRun.metadata = metadata;
+    });
+
     eventHistoryController = new AbortController();
     $fullEventHistory = await fetchAllEvents({
       namespace,
@@ -112,6 +117,7 @@
         workflowError = error;
         return;
       }
+      $workflowRun.workflow = workflow;
       workflow.pendingActivities = await toDecodedPendingActivities(
         workflow,
         namespace,
@@ -119,7 +125,7 @@
         $authUser?.accessToken,
       );
 
-      const metadata = await getWorkflowMetadata(
+      getWorkflowMetadata(
         {
           namespace,
           workflow: {
@@ -129,8 +135,9 @@
         },
         settings,
         $authUser?.accessToken,
-      );
-      $workflowRun = { ...$workflowRun, workflow, metadata };
+      ).then((metadata) => {
+        $workflowRun.metadata = metadata;
+      });
     }
   };
 

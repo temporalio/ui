@@ -40,11 +40,6 @@ h6 {
   font-size: 0.67em;
 }
 
-ol,
-ul {
-  list-style: none;
-}
-
 blockquote,
 q {
   quotes: none;
@@ -62,7 +57,9 @@ table {
   border-spacing: 0;
 }
 
-ul {
+ul,
+ol {
+  list-style: none;
   white-space: normal;
 }
 

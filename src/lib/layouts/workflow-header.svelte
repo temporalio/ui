@@ -94,12 +94,10 @@
     {/if}
   </div>
 </div>
-<header class="rounded-top flex flex-col gap-0.5">
+<header class="rounded-top flex flex-col gap-1">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
     <div class="flex flex-col items-center gap-4 lg:flex-row">
-      <div class="px-2">
-        <WorkflowStatus status={workflow?.status} big />
-      </div>
+      <WorkflowStatus status={workflow?.status} big />
       <div class="flex flex-col flex-wrap gap-0">
         <h1 data-testid="workflow-id-heading" class="gap-0 overflow-hidden">
           <Copyable
@@ -124,9 +122,14 @@
     <AccordionLight title="Details" let:open>
       <div
         slot="title"
-        class="flex w-1/2 items-center gap-2 rounded p-4 text-xl"
+        class="flex w-full items-center gap-2 rounded p-2 text-xl"
       >
-        <Icon name="flag" width={32} height={32} />{metadata.currentDetails}
+        <Icon
+          name="flag"
+          class="text-indigo-600/80"
+          width={32}
+          height={32}
+        />{metadata?.currentDetails ?? 'Details'}
       </div>
 
       {#if open}

@@ -131,6 +131,8 @@
     });
     input = initialValues.input;
     inputRetrieved = Date.now();
+    summary = initialValues.summary;
+    details = initialValues.details;
     if (initialValues?.searchAttributes) {
       const customSAKeys = Object.keys($customSearchAttributes);
       Object.entries(initialValues.searchAttributes).forEach(([key, value]) => {
@@ -141,6 +143,13 @@
           ];
         }
       });
+    }
+
+    if (
+      initialValues?.searchAttributes ||
+      initialValues?.summary ||
+      initialValues?.details
+    ) {
       viewAdvancedOptions = true;
     }
   };
@@ -269,17 +278,6 @@
           content={details}
           on:change={(event) => (details = event.detail.value)}
         />
-
-        <!-- <PayloadInputWithEncoding
-          label="Summary"
-          bind:input={summary}
-          bind:encoding
-        />
-        <PayloadInputWithEncoding
-          label="Details"
-          bind:input={details}
-          bind:encoding
-        /> -->
       </Card>
       <AddSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}
