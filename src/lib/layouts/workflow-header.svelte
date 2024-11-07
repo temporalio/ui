@@ -118,7 +118,7 @@
       <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
     </div>
   </div>
-  {#if workflow?.details}
+  {#if workflow?.details || metadata?.currentDetails}
     <AccordionLight title="Details" let:open>
       <div
         slot="title"
@@ -132,7 +132,7 @@
         />{metadata?.currentDetails ?? 'Details'}
       </div>
 
-      {#if open}
+      {#if open && workflow.details}
         <Markdown content={workflow.details} />
       {/if}
     </AccordionLight>
