@@ -66,6 +66,10 @@
     $fullEventHistory,
     $namespaces,
   );
+
+  $: {
+    console.log('workflow?.summary: ', workflow?.summary);
+  }
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -103,7 +107,7 @@
           <Copyable
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={workflow?.summary ?? workflow?.id}
+            content={workflow?.summary || workflow?.id}
             clickAllToCopy
             container-class="w-full"
             class="overflow-hidden text-ellipsis"

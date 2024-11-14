@@ -67,6 +67,10 @@ li {
   list-style: inside;
 }
 
+li * {
+  display: inline;
+}
+
 a {
   gap: 0.5rem;
   align-items: center;
