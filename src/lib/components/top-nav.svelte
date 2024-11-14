@@ -18,6 +18,7 @@
   $: namespaceExists = namespaceList.some(
     (namespaceListItem) => namespaceListItem.namespace === namespace,
   );
+  $: href = routeForNamespace({ namespace });
 
   const handleNamespaceSelect = (
     event: CustomEvent<{ value: NamespaceListItem }>,
@@ -52,7 +53,7 @@
         slot="action"
         variant="ghost"
         size="xs"
-        href={routeForNamespace({ namespace })}
+        {href}
         disabled={!namespaceExists}
         leadingIcon="external-link"
       />
