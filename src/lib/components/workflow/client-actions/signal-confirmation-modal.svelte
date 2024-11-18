@@ -28,6 +28,7 @@
   let error: string = '';
   let loading = false;
   let name = '';
+  let customSignal = false;
 
   let encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
   let input = '';
@@ -36,6 +37,7 @@
     open = false;
     name = '';
     input = '';
+    customSignal = false;
     $encoding = defaultEncoding;
   };
 
@@ -64,6 +66,11 @@
       loading = false;
     }
   };
+
+  const handleCustom = () => {
+    customSignal = true;
+    name = '';
+  };
 </script>
 
 <Modal
@@ -80,18 +87,24 @@
 >
   <h3 slot="title">{translate('workflows.signal-modal-title')}</h3>
   <div slot="content" class="flex flex-col gap-4">
-    {#if signalDefinitions?.length > 0}
+    {#if signalDefinitions?.length > 0 && !customSignal}
       <Select
         id="signal-select"
         label={translate('workflows.signal-name-label')}
         class="min-w-fit"
         bind:value={name}
         data-testid="signal-select"
+        placeholder="Select a signal"
         required
       >
         {#each signalDefinitions as { name: value, description = '' }}
           <Option {value} {description}>{value}</Option>
         {/each}
+        <Option
+          on:click={handleCustom}
+          value="custom"
+          description="Input signal name">Custom</Option
+        >
       </Select>
     {:else}
       <Input

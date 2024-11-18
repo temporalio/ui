@@ -24,14 +24,13 @@
 
 <div class="flex flex-col gap-2">
   <div
-    class="grid w-full grid-flow-row grid-cols-1 gap-2 rounded-xl p-2 text-sm lg:grid-cols-3 xl:grid-cols-4"
+    class="grid w-full grid-flow-row grid-cols-1 gap-x-4 gap-y-2 text-sm lg:grid-cols-3 lg:gap-y-1 xl:grid-cols-4"
   >
     <WorkflowDetail
       content={elapsedTime}
       class="order-1 font-mono text-xl"
       icon="clock"
     />
-
     <WorkflowDetail
       title={translate('common.start')}
       tooltip={$relativeTime
@@ -44,6 +43,7 @@
       content={formatDate(workflow?.startTime, $timeFormat, {
         relative: $relativeTime,
       })}
+      badge
       class="order-2"
     />
 
@@ -63,6 +63,7 @@
             relative: $relativeTime,
           })
         : '-'}
+      badge
       class="order-3 lg:order-5 xl:order-6"
     />
     <WorkflowDetail

@@ -13,7 +13,6 @@
       <h3>
         {translate('events.attribute-group.search-attributes')}
       </h3>
-      <div class="h-0.5 rounded-full bg-inverse" />
       <PayloadDecoder
         value={{ searchAttributes: workflow.searchAttributes }}
         key="searchAttributes"
@@ -31,7 +30,6 @@
   {#if workflow?.memo}
     <div class="mt-4 flex flex-col gap-2">
       <h3>{translate('common.memo')}</h3>
-      <div class="h-0.5 rounded-full bg-inverse" />
       <PayloadDecoder
         value={{ memo: workflow.memo }}
         key="memo"
