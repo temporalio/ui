@@ -89,7 +89,10 @@
       error={$workflowRun.metadata?.error?.message}
     />
   {:else if !queryTypes.length}
-    <Loading title="Getting queries" />
+    <div class="text-center">
+      <Loading />
+      <p class="-mt-10">{translate('workflows.no-workers-failure-message')}</p>
+    </div>
   {:else}
     <div class="flex w-3/4 gap-4 max-2xl:w-full max-lg:flex-col">
       <Card class="mt-7 flex h-fit w-full flex-col gap-2">
