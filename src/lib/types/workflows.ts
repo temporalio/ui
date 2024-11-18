@@ -178,8 +178,8 @@ export type WorkflowExecution = {
   defaultWorkflowTaskTimeout: Duration;
   canBeTerminated: boolean;
   callbacks: Callbacks;
-  summary?: string;
-  details?: string;
+  summary?: Payload;
+  details?: Payload;
 };
 
 export type WorkflowTaskFailedCause =

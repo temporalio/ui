@@ -24,6 +24,7 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
+  import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import { has } from '$lib/utilities/has';
   import { pathMatches } from '$lib/utilities/path-matches';
@@ -66,6 +67,10 @@
     $fullEventHistory,
     $namespaces,
   );
+
+  $: {
+    console.log('Summary: ', workflow?.summary);
+  }
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -131,14 +136,16 @@
           height={32}
         />{translate('workflows.summary-and-details')}
       </div>
-      {#if open && workflow.summary}
-        <h3>{translate('workflows.summary')}</h3>
-        <Markdown content={workflow.summary} />
-      {/if}
-      {#if open && workflow.details}
-        <h3>{translate('workflows.details')}</h3>
-        <Markdown content={workflow.details} />
-      {/if}
+      {#await Promise.all( [decodeSingleReadablePayloadWithCodec(workflow.summary), decodeSingleReadablePayloadWithCodec(workflow.details)], ) then [summary, details]}
+        {#if open && workflow.summary}
+          <h3>{translate('workflows.summary')}</h3>
+          <Markdown content={summary} />
+        {/if}
+        {#if open && workflow.details}
+          <h3>{translate('workflows.details')}</h3>
+          <Markdown content={details} />
+        {/if}
+      {/await}
     </AccordionLight>
   {/if}
   <WorkflowDetails />

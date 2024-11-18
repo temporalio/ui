@@ -120,8 +120,8 @@ export const toWorkflowExecution = (
   let summary;
   let details;
   if (response?.executionConfig?.userMetadata) {
-    summary = decodePayload(response?.executionConfig?.userMetadata?.summary);
-    details = decodePayload(response?.executionConfig?.userMetadata?.details);
+    summary = response?.executionConfig?.userMetadata?.summary;
+    details = response?.executionConfig?.userMetadata?.details;
   }
 
   return {

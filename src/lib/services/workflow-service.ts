@@ -510,6 +510,8 @@ export async function startWorkflow({
     workflowId,
   });
   let payloads;
+  let summaryPayload;
+  let detailsPayload;
 
   if (input) {
     try {
@@ -517,6 +519,18 @@ export async function startWorkflow({
     } catch (_) {
       console.error('Could not decode input for starting workflow');
     }
+  }
+
+  if (summary) {
+    summaryPayload = (
+      await encodePayloads(stringifyWithBigInt(summary), encoding)
+    )[0];
+  }
+
+  if (details) {
+    detailsPayload = (
+      await encodePayloads(stringifyWithBigInt(details), encoding)
+    )[0];
   }
 
   const body = stringifyWithBigInt({
@@ -529,8 +543,8 @@ export async function startWorkflow({
     },
     input: payloads ? { payloads } : null,
     userMetadata: {
-      summary: setBase64Payload(summary),
-      details: setBase64Payload(details),
+      summary: summaryPayload,
+      details: detailsPayload,
     },
     searchAttributes:
       searchAttributes.length === 0
