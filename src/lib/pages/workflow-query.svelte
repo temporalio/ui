@@ -6,6 +6,7 @@
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
@@ -87,6 +88,8 @@
       content={translate('workflows.no-workers-running-message')}
       error={$workflowRun.metadata?.error?.message}
     />
+  {:else if !queryTypes.length}
+    <Loading title="Getting queries" />
   {:else}
     <div class="flex w-3/4 gap-4 max-2xl:w-full max-lg:flex-col">
       <Card class="mt-7 flex h-fit w-full flex-col gap-2">

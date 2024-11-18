@@ -13,10 +13,12 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Editor from '$lib/holocene/monaco/editor.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getPollers } from '$lib/services/pollers-service';
   import {
@@ -133,6 +135,7 @@
     inputRetrieved = Date.now();
     summary = initialValues.summary;
     details = initialValues.details;
+
     if (initialValues?.searchAttributes) {
       const customSAKeys = Object.keys($customSearchAttributes);
       Object.entries(initialValues.searchAttributes).forEach(([key, value]) => {
@@ -146,7 +149,7 @@
     }
 
     if (
-      initialValues?.searchAttributes ||
+      initialValues?.searchAttributes?.length ||
       initialValues?.summary ||
       initialValues?.details
     ) {
@@ -184,11 +187,6 @@
     !workflowCreateDisabled($page);
 
   $: checkTaskQueue(taskQueueParam);
-
-  $: {
-    console.log('Details: ', details);
-    console.log('Summary: ', summary);
-  }
 </script>
 
 <div class="flex w-full flex-col items-center pb-24">
@@ -266,14 +264,26 @@
     {/key}
     {#if viewAdvancedOptions}
       <Card class="flex flex-col gap-2">
-        <h3>User Metadata</h3>
-        <Input
-          id="summary"
-          label="Summary"
-          maxLength={255}
-          bind:value={summary}
+        <div class="flex justify-between">
+          <h3>{translate('workflows.user-metadata')}</h3>
+          <p class="flex items-center gap-1 text-sm text-subtle">
+            {translate('workflows.markdown-supported')}
+            <Tooltip
+              topRight
+              width={200}
+              text={translate('workflows.markdown-description')}
+            >
+              <Icon name="info" /></Tooltip
+            >
+          </p>
+        </div>
+        <Label label={translate('workflows.summary')} for="summary" />
+        <Editor
+          content={summary}
+          on:change={(event) => (summary = event.detail.value)}
+          class="min-h-48"
         />
-        <Label label="Details" for="details" />
+        <Label label={translate('workflows.details')} for="details" />
         <Editor
           content={details}
           on:change={(event) => (details = event.detail.value)}

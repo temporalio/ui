@@ -124,20 +124,6 @@
         settings,
         $authUser?.accessToken,
       );
-
-      getWorkflowMetadata(
-        {
-          namespace,
-          workflow: {
-            id: workflowId,
-            runId,
-          },
-        },
-        settings,
-        $authUser?.accessToken,
-      ).then((metadata) => {
-        $workflowRun.metadata = metadata;
-      });
     }
   };
 

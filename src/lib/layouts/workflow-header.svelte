@@ -40,7 +40,7 @@
 
   export let namespace: string;
 
-  $: ({ workflow, workers, metadata } = $workflowRun);
+  $: ({ workflow, workers } = $workflowRun);
   $: id = $page.params.id;
 
   $: routeParameters = {
@@ -66,10 +66,6 @@
     $fullEventHistory,
     $namespaces,
   );
-
-  $: {
-    console.log('workflow?.summary: ', workflow?.summary);
-  }
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -107,7 +103,7 @@
           <Copyable
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={workflow?.summary || workflow?.id}
+            content={workflow?.id}
             clickAllToCopy
             container-class="w-full"
             class="overflow-hidden text-ellipsis"
@@ -122,8 +118,8 @@
       <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
     </div>
   </div>
-  {#if workflow?.details || metadata?.currentDetails}
-    <AccordionLight title="Details" let:open>
+  {#if workflow?.summary || workflow?.details}
+    <AccordionLight let:open>
       <div
         slot="title"
         class="flex w-full items-center gap-2 rounded p-2 text-xl"
@@ -133,10 +129,14 @@
           class="text-indigo-600/80"
           width={32}
           height={32}
-        />{metadata?.currentDetails ?? 'Details'}
+        />{translate('workflows.summary-and-details')}
       </div>
-
+      {#if open && workflow.summary}
+        <h3>{translate('workflows.summary')}</h3>
+        <Markdown content={workflow.summary} />
+      {/if}
       {#if open && workflow.details}
+        <h3>{translate('workflows.details')}</h3>
         <Markdown content={workflow.details} />
       {/if}
     </AccordionLight>

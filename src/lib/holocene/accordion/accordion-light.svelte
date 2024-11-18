@@ -3,17 +3,13 @@
   import { noop } from 'svelte/internal';
   import { slide } from 'svelte/transition';
 
-  import { twMerge as merge } from 'tailwind-merge';
   import { v4 } from 'uuid';
 
-  import Badge from '$lib/holocene/badge.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
-    title: string;
     id?: string;
-    subtitle?: string;
     icon?: IconName;
     open?: boolean;
     expandable?: boolean;
@@ -23,13 +19,8 @@
   }
 
   export let id: string = v4();
-  export let subtitle = '';
   export let open = false;
-  export let error = '';
   export let onToggle = noop;
-
-  let className = '';
-  export { className as class };
 
   const toggleAccordion = () => {
     open = !open;
@@ -37,18 +28,12 @@
   };
 </script>
 
-<div
-  class={merge(
-    'w-full cursor-pointer hover:bg-interactive-secondary-hover focus-visible:bg-interactive focus-visible:outline-none',
-    className,
-  )}
-  {...$$restProps}
->
+<div class="w-full" {...$$restProps}>
   <button
     id="{id}-trigger"
     aria-expanded={open}
     aria-controls="{id}-content"
-    class="w-full"
+    class="w-full cursor-pointer hover:bg-interactive-secondary-hover focus-visible:bg-interactive focus-visible:outline-none"
     type="button"
     on:click={toggleAccordion}
   >
@@ -65,19 +50,12 @@
         <Icon class="m-2 shrink-0" name={open ? 'arrow-down' : 'arrow-right'} />
       </div>
     </div>
-    <p class="flex items-center">
-      {#if error}
-        <Badge class="mr-2" type="danger">{error}</Badge>
-      {/if}
-      {subtitle}
-    </p>
   </button>
-
   <div
     id="{id}-content"
     aria-labelledby="{id}-trigger"
     role="textbox"
-    class="rounded-b-2 block w-full"
+    class="rounded-b-2 block w-full bg-primary p-2"
     class:hidden={!open}
     transition:slide
   >
