@@ -49,6 +49,8 @@
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
+
+  import AsyncTest from './async-test.svelte';
 </script>
 
 <Template let:args let:context>
@@ -133,3 +135,22 @@
     value: [],
   }}
 />
+
+<Story
+  name="Async Select"
+  args={{
+    options: [
+      'English',
+      'English (UK)',
+      'German',
+      'French',
+      'Japanese',
+      'Spanish',
+      'Portuguese',
+    ],
+    multiselect: true,
+    value: [],
+  }}
+>
+  <AsyncTest></AsyncTest>
+</Story>

@@ -48,6 +48,13 @@
     actionTooltip?: string;
     href?: string;
     hrefDisabled?: boolean;
+    /**
+     * Use Keypress to receive the event after the combobox has done it's updating for async operations
+     * @param event
+     */
+    keypress: (event: KeyboardEvent) => void;
+    loading?: boolean;
+    loadingText?: string;
   }
 
   type MultiSelectProps = {
@@ -92,6 +99,7 @@
   export let label: string;
   export let multiselect = false;
   export let value: string | string[] = multiselect ? [] : undefined;
+  export let keypress: BaseProps['keypress'] = () => {};
   export let noResultsText: string;
   export let disabled = false;
   export let labelHidden = false;
@@ -114,6 +122,8 @@
   export let actionTooltip = '';
   export let href = '';
   export let hrefDisabled = false;
+  export let loading = false;
+  export let loadingText = 'Loading more results';
 
   export let numberOfItemsSelectedLabel = (count: number) =>
     `${count} option${count > 1 ? 's' : ''} selected`;
@@ -123,7 +133,7 @@
   let menuElement: HTMLUListElement;
   let inputElement: HTMLInputElement;
   const open = writable<boolean>(false);
-  $: list = options;
+  $: list = filterOptions(displayValue, options);
 
   $: {
     if (inputElement && displayValue) {
@@ -216,6 +226,11 @@
     }
   };
 
+  /**
+   * Given an option that could be an object of type T set internal value in the component to string/string[]
+   * or cast it to a string
+   * @param option
+   */
   const setValue = (option: string | T): void => {
     if (isStringOption(option)) {
       if (isArrayValue(value)) {
@@ -306,30 +321,35 @@
   };
 
   const handleInput = (event: ExtendedInputEvent) => {
+    // Reactive statement at top makes this work, not my favorite tho
     displayValue = event.currentTarget.value;
+  };
+
+  function filterOptions(value: string, options: (T | string)[]) {
     dispatch('filter', displayValue);
     if (!$open) $open = true;
 
-    list = options.filter((option) => {
+    return options.filter((option) => {
       if (isStringOption(option)) {
-        return option
-          .toLowerCase()
-          .includes(event.currentTarget.value.toLowerCase());
+        return option.toLowerCase().includes(value.toLowerCase());
       }
 
       if (isObjectOption(option) && canRenderCustomOption(option)) {
         return String(option[optionLabelKey])
           .toLowerCase()
-          .includes(event.currentTarget.value.toLowerCase());
+          .includes(value.toLowerCase());
       }
     });
-  };
+  }
 
   const handleInputClick = () => {
     if (!$open) openList();
   };
 
-  const isSelected = (option: string | T): boolean => {
+  const isSelected = (
+    option: string | T,
+    value: string | string[],
+  ): boolean => {
     if (isObjectOption(option)) {
       const o = String(option[optionValueKey]);
       return isArrayValue(value) ? value.includes(o) : value === o;
@@ -391,6 +411,7 @@
         on:focus|stopPropagation={openList}
         on:input|stopPropagation={handleInput}
         on:keydown|stopPropagation={handleInputKeydown}
+        on:keyup={keypress}
         on:click|stopPropagation={handleInputClick}
         data-testid={$$props['data-testid'] ?? id}
         bind:this={inputElement}
@@ -452,18 +473,25 @@
       />
       <MenuDivider />
     {/if}
-    {#key value}
-      {#each list as option}
-        <ComboboxOption
-          {multiselect}
-          on:click={() => handleSelectOption(option)}
-          selected={isSelected(option)}
-          label={getDisplayValue(option)}
-        />
-      {:else}
+
+    {#each list as option}
+      <ComboboxOption
+        {multiselect}
+        on:click={() => handleSelectOption(option)}
+        selected={isSelected(option, value)}
+        label={getDisplayValue(option)}
+      />
+    {:else}
+      {#if loading === false}
         <ComboboxOption disabled label={noResultsText} />
-      {/each}
-    {/key}
+      {/if}
+    {/each}
+
+    {#if loading}
+      <ComboboxOption disabled label={loadingText}>
+        <Icon slot="leading" name="spinner" class="animate-spin" />
+      </ComboboxOption>
+    {/if}
   </Menu>
 
   {#if error && !valid}
