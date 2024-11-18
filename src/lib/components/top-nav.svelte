@@ -48,7 +48,7 @@
       minSize={32}
       actionTooltip={translate('namespaces.go-to-namespace')}
       {href}
-      disabled={!namespaceExists}
+      hrefDisabled={!namespaceExists}
     />
   </div>
   <div class="flex items-center gap-2">
