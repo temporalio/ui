@@ -102,10 +102,5 @@
       class="order-9 xl:order-8"
       badge
     />
-    <!-- <WorkflowDetail
-      title={translate('workflows.state-transitions')}
-      content={workflow?.stateTransitionCount}
-      class="order-8"
-    /> -->
   </div>
 </div>
