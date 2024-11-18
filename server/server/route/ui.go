@@ -28,11 +28,21 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"path"
 	"regexp"
 	"strings"
 
 	"github.com/labstack/echo/v4"
 )
+
+// Set render route
+func SetRenderRoute(e *echo.Echo, publicPath string) {
+	renderPath := path.Join(publicPath, "render")
+	e.GET(renderPath, func(c echo.Context) error {
+		// Forward the request to the SvelteKit handler
+		return c.File(path.Join(publicPath, "render"))
+	})
+}
 
 // SetUIRoutes sets UI routes
 func SetUIRoutes(e *echo.Echo, publicPath string, assets fs.FS) error {
