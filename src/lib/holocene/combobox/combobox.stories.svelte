@@ -148,7 +148,7 @@
 
 <Story
   name="Async Select"
-  play={async ({ canvasElement, id }) => {
+  play={async ({ canvasElement, id, step }) => {
     const canvas = within(canvasElement);
     const combobox = canvas.getByTestId(id);
 
@@ -158,15 +158,28 @@
 
     expect(menu).toBeInTheDocument();
 
-    expect(canvas.getByText('one')).toBeInTheDocument();
-    expect(canvas.getByText('Loading more results')).toBeInTheDocument();
+    await step('Check async results', async () => {
+      expect(canvas.getByText('one')).toBeInTheDocument();
+      expect(canvas.getByText('Loading more results')).toBeInTheDocument();
 
-    waitFor(
-      () => {
-        expect(canvas.getByText('asyncone')).toBeInTheDocument();
-      },
-      { timeout: 5000 },
-    );
+      await waitFor(
+        () => {
+          expect(canvas.getByText('asyncone')).toBeInTheDocument();
+        },
+        { timeout: 2001 },
+      );
+    });
+
+    await step('Get no results', async () => {
+      await userEvent.type(combobox, 'omgnoresults');
+      expect(canvas.getByText('Loading more results')).toBeInTheDocument();
+      waitFor(
+        () => {
+          expect(canvas.getByText('No Results')).toBeInTheDocument();
+        },
+        { timeout: 2001 },
+      );
+    });
   }}
   let:context
 >

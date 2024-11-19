@@ -41,7 +41,7 @@
           // console.log("it's old!", { value });
         }
       },
-      3000 + i * 100,
+      2000 + i * 100,
       value,
     );
   }
@@ -56,7 +56,7 @@
   }}
   {loading}
   {id}
-  noResultsText="cookies"
+  noResultsText="No Results"
   label="Async Test"
   placeholder="Type away!"
 ></Combobox>
