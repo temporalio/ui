@@ -136,6 +136,7 @@
   }}
   play={async () => {
     // re-enable this to get ally errors. Need to come back and resolve this
+    // DT-2629
     // const canvas = within(canvasElement);
     // const combobox = canvas.getByTestId(id);
     // await userEvent.type(combobox, 'E');
