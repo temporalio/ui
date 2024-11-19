@@ -132,7 +132,7 @@ devDependencies:
     version: 1.5.0(react@18.2.0)
   '@grpc/grpc-js':
     specifier: ^1.8.22
-    version: 1.10.8
+    version: 1.10.9
   '@playwright/test':
     specifier: ^1.44.1
     version: 1.44.1
@@ -3456,8 +3456,8 @@ packages:
     resolution: {integrity: sha512-kEnRN/Vs7TgWkY+Y5U36b2NZOYITWEY1T6LYkjFopCA2eaUWY4DDO7UOov55VE/PHDZH8KZZIOoEmBiM4Nv7Kw==}
     dev: false
 
-  /@grpc/grpc-js@1.10.8:
-    resolution: {integrity: sha512-vYVqYzHicDqyKB+NQhAc54I1QWCBLCrYG6unqOIcBTHx+7x8C9lcoLj3KVJXs2VB4lUbpWY+Kk9NipcbXYWmvg==}
+  /@grpc/grpc-js@1.10.9:
+    resolution: {integrity: sha512-5tcgUctCG0qoNyfChZifz2tJqbRbXVO9J7X6duFcOjY3HUNCxg5D0ZCK7EP9vIcZ0zRpLU9bWkyCqVCLZ46IbQ==}
     engines: {node: '>=12.10.0'}
     dependencies:
       '@grpc/proto-loader': 0.7.13
@@ -5672,7 +5672,7 @@ packages:
   /@temporalio/client@1.10.3:
     resolution: {integrity: sha512-0xGYlURFoHrWByIJB3vNCaY7p9lnUkvrlA4uVAG92AwI0z/kcXdkUwn+VTOBBJi83iX6NZ0QS47HA6sCr00OPw==}
     dependencies:
-      '@grpc/grpc-js': 1.10.8
+      '@grpc/grpc-js': 1.10.9
       '@temporalio/common': 1.10.3
       '@temporalio/proto': 1.10.3
       abort-controller: 3.0.0
