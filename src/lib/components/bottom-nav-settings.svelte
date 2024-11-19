@@ -24,12 +24,17 @@
 </script>
 
 {#if open}
-  <div class="flex h-full flex-col justify-end gap-6 overflow-auto px-4 py-8">
+  <div class="flex h-full flex-col justify-start gap-6 overflow-auto px-4 py-8">
     <TimezoneSelect position="left" />
     <NavigationButton
       onClick={onCodecServerClick}
       tooltip={translate('data-encoder.codec-server')}
       label={translate('data-encoder.codec-server')}
+      data-testid="data-encoder-status{hasCodecServer
+        ? $dataEncoder.hasError
+          ? '-error'
+          : '-configured'
+        : ''}"
       icon={hasCodecServer
         ? $dataEncoder.hasError
           ? 'transcoder-error'

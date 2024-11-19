@@ -3,7 +3,6 @@
 
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import { translate } from '$lib/i18n/translate';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
@@ -18,6 +17,7 @@
   $: namespaceExists = namespaceList.some(
     (namespaceListItem) => namespaceListItem.namespace === namespace,
   );
+  $: href = routeForNamespace({ namespace });
 
   const handleNamespaceSelect = (
     event: CustomEvent<{ value: NamespaceListItem }>,
@@ -47,16 +47,9 @@
       on:change={handleNamespaceSelect}
       minSize={32}
       actionTooltip={translate('namespaces.go-to-namespace')}
-    >
-      <Button
-        slot="action"
-        variant="ghost"
-        size="xs"
-        href={routeForNamespace({ namespace })}
-        disabled={!namespaceExists}
-        leadingIcon="external-link"
-      />
-    </Combobox>
+      {href}
+      hrefDisabled={!namespaceExists}
+    />
   </div>
   <div class="flex items-center gap-2">
     <TimezoneSelect position={screenWidth < 768 ? 'left' : 'right'} />

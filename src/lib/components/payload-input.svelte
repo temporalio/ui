@@ -14,6 +14,7 @@
   export let label = translate('workflows.signal-payload-input-label');
   export let loading = false;
   export let hintText = translate('workflows.signal-payload-input-label-hint');
+  export let editing = true;
 
   $: error = !isValidInput(input);
 
@@ -46,19 +47,21 @@
 <div class="flex flex-col gap-2">
   <Label for={id} {label} />
   <div class="flex gap-2">
-    {#key loading}
+    {#key [loading, editing]}
       <CodeBlock
         {id}
         maxHeight={320}
         content={input}
         on:change={handleInputChange}
-        editable
+        editable={editing}
         copyable={false}
       />
     {/key}
-    <Tooltip text={translate('common.upload-json')} topRight>
-      <FileInput id="{id}-input-file-upload" {onUpload} />
-    </Tooltip>
+    {#if editing}
+      <Tooltip text={translate('common.upload-json')} topRight>
+        <FileInput id="{id}-input-file-upload" {onUpload} />
+      </Tooltip>
+    {/if}
   </div>
   <span
     class="text-xs {error ? 'text-danger' : 'text-primary'} inline-block"

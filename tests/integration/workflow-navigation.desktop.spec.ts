@@ -8,7 +8,9 @@ test.beforeEach(async ({ page, baseURL }) => {
 });
 
 test('Top Navigation current namespace is present', async ({ page }) => {
-  const switcher = page.getByTestId('namespace-switcher');
+  const switcher = page
+    .getByTestId('namespace-switcher')
+    .locator('visible=true');
   await expect(switcher).toBeVisible();
   await switcher.click();
   await expect(switcher).toBeFocused();
@@ -18,7 +20,9 @@ test('Top Navigation current namespace is present', async ({ page }) => {
 test('Top Navigation current namespace is present and has other namespaces to search and navigate to', async ({
   page,
 }) => {
-  const switcher = page.getByTestId('namespace-switcher');
+  const switcher = page
+    .getByTestId('namespace-switcher')
+    .locator('visible=true');
   await expect(switcher).toBeVisible();
   await switcher.click();
   await expect(switcher).toBeFocused();
@@ -41,7 +45,9 @@ test('Top Navigation current namespace is present and has other namespaces to se
 test('Top Navigation current namespace is present and has other namespaces to search and stays open with space press', async ({
   page,
 }) => {
-  const switcher = page.getByTestId('namespace-switcher');
+  const switcher = page
+    .getByTestId('namespace-switcher')
+    .locator('visible=true');
   await expect(switcher).toBeVisible();
   await switcher.click();
   await expect(switcher).toBeFocused();
@@ -64,7 +70,9 @@ test('Top Navigation current namespace is present and has other namespaces to se
 test('Top Navigation current namespace is present on non-namespace specific pages', async ({
   page,
 }) => {
-  const switcher = page.getByTestId('namespace-switcher');
+  const switcher = page
+    .getByTestId('namespace-switcher')
+    .locator('visible=true');
 
   await expect(switcher).toBeVisible();
   await page.getByRole('link', { name: 'Namespaces' }).click();

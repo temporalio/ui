@@ -2,6 +2,8 @@
   import { writable } from 'svelte/store';
   import { fly } from 'svelte/transition';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
   import { page } from '$app/stores';
 
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
@@ -26,6 +28,9 @@
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import { trimTrailingSlash } from '$lib/utilities/trim-trailing-slash';
+
+  let className = '';
+  export { className as class };
 
   let endpoint = $codecEndpoint ?? '';
   let passToken = $passAccessToken ?? false;
@@ -76,7 +81,10 @@
 {#if $viewDataEncoderSettings}
   <aside
     in:fly={{ y: -50, delay: 0, duration: 500 }}
-    class="surface-primary relative flex h-[540px] w-full flex-col gap-6 overflow-auto border-b border-subtle p-4 md:p-12"
+    class={merge(
+      'surface-primary relative flex h-[540px] w-full flex-col gap-6 overflow-auto border-b border-subtle p-4 md:p-12',
+      className,
+    )}
   >
     <div class="flex w-full flex-col gap-4 xl:w-1/2">
       <div class="flex items-center justify-between space-x-2">
