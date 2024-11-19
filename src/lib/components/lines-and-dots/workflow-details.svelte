@@ -24,7 +24,7 @@
 
 <div class="flex flex-col gap-2">
   <div
-    class="grid w-full grid-flow-row grid-cols-1 gap-x-4 gap-y-2 text-sm lg:grid-cols-3 lg:gap-y-1 xl:grid-cols-4"
+    class="grid w-full grid-flow-row grid-cols-1 gap-x-4 gap-y-2 text-sm lg:grid-cols-3 xl:grid-cols-4"
   >
     <WorkflowDetail
       content={elapsedTime}
