@@ -136,21 +136,6 @@
   }}
 />
 
-<Story
-  name="Async Select"
-  args={{
-    options: [
-      'English',
-      'English (UK)',
-      'German',
-      'French',
-      'Japanese',
-      'Spanish',
-      'Portuguese',
-    ],
-    multiselect: true,
-    value: [],
-  }}
->
+<Story name="Async Select">
   <AsyncTest></AsyncTest>
 </Story>
