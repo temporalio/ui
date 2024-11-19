@@ -52,7 +52,7 @@
      * Use Keypress to receive the event after the combobox has done it's updating for async operations
      * @param event
      */
-    keypress: (event: KeyboardEvent) => void;
+    keypress?: (event: KeyboardEvent) => void;
     loading?: boolean;
     loadingText?: string;
   }
