@@ -321,13 +321,13 @@
   };
 
   const handleInput = (event: ExtendedInputEvent) => {
+    if (!$open) $open = true;
     // Reactive statement at top makes this work, not my favorite tho
     displayValue = event.currentTarget.value;
   };
 
   function filterOptions(value: string, options: (T | string)[]) {
     dispatch('filter', displayValue);
-    if (!$open) $open = true;
 
     return options.filter((option) => {
       if (isStringOption(option)) {

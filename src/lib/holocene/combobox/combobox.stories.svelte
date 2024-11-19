@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
   import type { Meta } from '@storybook/svelte';
-  import { expect, userEvent, within } from '@storybook/test';
+  import { expect, userEvent, waitFor, within } from '@storybook/test';
 
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import { iconNames } from '$lib/holocene/icon';
@@ -134,8 +134,41 @@
     multiselect: true,
     value: [],
   }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+
+    await userEvent.type(combobox, 'E');
+
+    const menu = canvas.getByRole('listbox');
+
+    expect(menu).toBeInTheDocument();
+  }}
 />
 
-<Story name="Async Select">
-  <AsyncTest></AsyncTest>
+<Story
+  name="Async Select"
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+
+    await userEvent.type(combobox, 'one');
+
+    const menu = canvas.getByRole('listbox');
+
+    expect(menu).toBeInTheDocument();
+
+    expect(canvas.getByText('one')).toBeInTheDocument();
+    expect(canvas.getByText('Loading more results')).toBeInTheDocument();
+
+    waitFor(
+      () => {
+        expect(canvas.getByText('asyncone')).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
+  }}
+  let:context
+>
+  <AsyncTest id={context.id}></AsyncTest>
 </Story>

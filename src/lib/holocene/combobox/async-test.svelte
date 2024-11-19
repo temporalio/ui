@@ -9,7 +9,10 @@
   let options = syncOptions;
   let loading = false;
   let abortController: AbortController | null = null;
+
   $: i = 0;
+
+  export let id = '';
 
   function keypress(stuff) {
     loading = true;
@@ -38,7 +41,7 @@
           // console.log("it's old!", { value });
         }
       },
-      5000 + i * 100,
+      3000 + i * 100,
       value,
     );
   }
@@ -52,7 +55,8 @@
     console.log('change', newVal);
   }}
   {loading}
-  id="test"
+  {id}
   noResultsText="cookies"
-  label="asyncTest"
+  label="Async Test"
+  placeholder="Type away!"
 ></Combobox>
