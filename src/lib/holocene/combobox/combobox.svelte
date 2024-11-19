@@ -129,11 +129,16 @@
     `${count} option${count > 1 ? 's' : ''} selected`;
 
   let displayValue: string = '';
+  // Filter value and display value are close but different in a few cases
+  // primary difference is when opening a select box display value is filled
+  // and filter value should be blank
+  let filterValue: string = '';
   let selectedOption: string | T;
   let menuElement: HTMLUListElement;
   let inputElement: HTMLInputElement;
   const open = writable<boolean>(false);
-  $: list = filterOptions(displayValue, options);
+  // We want this to react to external changes to the options prop to support async use cases
+  $: list = filterOptions(filterValue, options);
 
   $: {
     if (inputElement && displayValue) {
@@ -163,6 +168,7 @@
 
   const openList = () => {
     $open = true;
+    filterValue = '';
     inputElement.focus();
     inputElement.select();
   };
@@ -324,6 +330,7 @@
     if (!$open) $open = true;
     // Reactive statement at top makes this work, not my favorite tho
     displayValue = event.currentTarget.value;
+    filterValue = displayValue;
   };
 
   function filterOptions(value: string, options: (T | string)[]) {
