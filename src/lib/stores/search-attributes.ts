@@ -34,6 +34,20 @@ export const customSearchAttributes: Readable<SearchAttributes> = derived(
   ([$allSearchAttributes]) => $allSearchAttributes.customAttributes,
 );
 
+export const customSearchAttributeOptions: Readable<
+  {
+    label: string;
+    value: string;
+    type: SearchAttributeType;
+  }[]
+> = derived([customSearchAttributes], ([$customSearchAttributes]) =>
+  Object.entries($customSearchAttributes).map(([key, value]) => ({
+    label: key,
+    value: key,
+    type: value,
+  })),
+);
+
 export const isCustomSearchAttribute = (key: string) => {
   const customSearchAttrs = get(customSearchAttributes);
   return key in customSearchAttrs;

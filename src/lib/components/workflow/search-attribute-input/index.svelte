@@ -4,13 +4,11 @@
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    customSearchAttributeOptions,
     customSearchAttributes,
     type SearchAttributeInput,
   } from '$lib/stores/search-attributes';
-  import {
-    SEARCH_ATTRIBUTE_TYPE,
-    type SearchAttributes,
-  } from '$lib/types/workflows';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
   import DatetimeInput from './datetime-input.svelte';
   import ListInput from './list-input.svelte';
@@ -18,21 +16,16 @@
   import TextInput from './text-input.svelte';
 
   export let attributesToAdd: SearchAttributeInput[] = [];
-  export let searchAttributes: SearchAttributes = $customSearchAttributes;
   export let attribute: SearchAttributeInput;
   export let onRemove: (attribute: string) => void;
 
-  $: type = searchAttributes[attribute.attribute];
-  $: searchAttributesOptions = [...Object.entries(searchAttributes)].map(
-    ([key, value]) => ({ label: key, value: key, type: value }),
-  );
-
+  $: type = $customSearchAttributes[attribute.attribute];
   $: isDisabled = (value: string) => {
     return !!attributesToAdd.find((a) => a.attribute === value);
   };
 
   const handleAttributeChange = (attr: string) => {
-    if (type !== searchAttributes[attr]) {
+    if (type !== $customSearchAttributes[attr]) {
       attribute.value = null;
     }
   };
@@ -48,7 +41,7 @@
       bind:value={attribute.attribute}
       onChange={handleAttributeChange}
     >
-      {#each searchAttributesOptions as { value, label, type }}
+      {#each $customSearchAttributeOptions as { value, label, type }}
         <Option disabled={isDisabled(value)} {value} description={type}
           >{label}</Option
         >
