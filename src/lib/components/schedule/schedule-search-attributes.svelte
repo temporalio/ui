@@ -1,8 +1,9 @@
 <script lang="ts">
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { Payload, SearchAttribute } from '$lib/types';
+  import type { SearchAttribute } from '$lib/types';
   import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
+  import { payloadToString } from '$lib/utilities/payload-to-string';
   import { pluralize } from '$lib/utilities/pluralize';
 
   export let searchAttributes: SearchAttribute;
@@ -11,13 +12,6 @@
   $: indexedFields =
     decodedSearchAttributes?.searchAttributes.indexedFields ?? {};
   $: searchAttributeCount = Object.keys(indexedFields).length;
-
-  const formatValue = (value: Payload) => {
-    if (Array.isArray(value)) {
-      return value.join(', ');
-    }
-    return value;
-  };
 </script>
 
 <Accordion
@@ -30,7 +24,7 @@
   {#if searchAttributeCount}
     <ul class="w-full">
       {#each Object.entries(indexedFields) as [searchAttrName, searchAttrValue]}
-        {@const value = formatValue(searchAttrValue)}
+        {@const value = payloadToString(searchAttrValue)}
         <li
           class="flex flex-wrap items-center gap-2 border-b py-2 last-of-type:border-b-0"
         >
