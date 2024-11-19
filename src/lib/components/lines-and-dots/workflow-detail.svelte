@@ -36,7 +36,7 @@
           {href}
           class="flex w-fit flex-row items-center gap-1 truncate rounded-sm p-1 leading-4 {badge &&
             'surface-subtle'}"
-          ><span class="truncate">{content}</span>
+          ><span class="truncate font-bold">{content}</span>
           {#if filterable}
             <Icon name="filter" class="shrink-0" />
           {/if}
@@ -44,7 +44,7 @@
       {:else}
         <Tooltip text={tooltip} hide={!tooltip} top>
           <span
-            class="w-fit select-all truncate rounded-sm p-1 leading-4"
+            class="w-fit select-all truncate rounded-sm p-1 font-bold leading-4"
             class:surface-subtle={badge}>{content}</span
           >
         </Tooltip>
@@ -60,13 +60,13 @@
     {#if href}
       <Link
         {href}
-        class="value truncate rounded-sm p-1 leading-4  {badge &&
+        class="value truncate rounded-sm p-1 font-bold leading-4 {badge &&
           'surface-subtle'}">{content}</Link
       >
     {:else}
       <Tooltip text={tooltip} hide={!tooltip} top>
         <span
-          class="w-fit select-all truncate rounded-sm p-1 leading-4"
+          class="w-fit select-all truncate rounded-sm p-1 font-bold leading-4"
           class:surface-subtle={badge}>{content}</span
         >
       </Tooltip>

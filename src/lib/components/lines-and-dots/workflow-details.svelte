@@ -43,7 +43,6 @@
       content={formatDate(workflow?.startTime, $timeFormat, {
         relative: $relativeTime,
       })}
-      badge
       class="order-2"
     />
 
@@ -63,7 +62,6 @@
             relative: $relativeTime,
           })
         : '-'}
-      badge
       class="order-3 lg:order-5 xl:order-6"
     />
     <WorkflowDetail
@@ -75,7 +73,6 @@
         workflow: workflow?.id,
         run: workflow?.runId,
       })}
-      badge
     />
     <WorkflowDetail
       title={translate('common.workflow-type')}
@@ -87,20 +84,17 @@
         namespace,
         query: `WorkflowType="${workflow?.name}"`,
       })}
-      badge
     />
     <WorkflowDetail
       title={translate('common.run-id')}
       content={workflow?.runId}
       copyable
       class="order-8 xl:order-7"
-      badge
     />
     <WorkflowDetail
       title={translate('common.history-size-bytes')}
       content={workflow?.historySizeBytes}
       class="order-9 xl:order-8"
-      badge
     />
   </div>
 </div>
