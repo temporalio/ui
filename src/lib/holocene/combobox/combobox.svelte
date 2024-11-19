@@ -11,6 +11,7 @@
   import Menu from '$lib/holocene/menu/menu.svelte';
 
   import Badge from '../badge.svelte';
+  import Button from '../button.svelte';
   import Chip from '../chip.svelte';
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
@@ -45,6 +46,8 @@
     error?: string;
     valid?: boolean;
     actionTooltip?: string;
+    href?: string;
+    hrefDisabled?: boolean;
   }
 
   type MultiSelectProps = {
@@ -109,6 +112,8 @@
   export let deselectAllLabel = 'Deselect All';
   export let removeChipLabel = 'Remove Option';
   export let actionTooltip = '';
+  export let href = '';
+  export let hrefDisabled = false;
 
   export let numberOfItemsSelectedLabel = (count: number) =>
     `${count} option${count > 1 ? 's' : ''} selected`;
@@ -400,6 +405,28 @@
           </Tooltip>
         {:else}
           <slot name="action" />
+        {/if}
+      </div>
+    {:else if href}
+      <div class="ml-1 flex h-full items-center border-l-2 border-subtle p-0.5">
+        {#if actionTooltip}
+          <Tooltip text={actionTooltip} right>
+            <Button
+              variant="ghost"
+              size="xs"
+              {href}
+              disabled={hrefDisabled}
+              leadingIcon="external-link"
+            />
+          </Tooltip>
+        {:else}
+          <Button
+            variant="ghost"
+            size="xs"
+            {href}
+            disabled={hrefDisabled}
+            leadingIcon="external-link"
+          />
         {/if}
       </div>
     {/if}

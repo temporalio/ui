@@ -123,7 +123,7 @@
   on:click|stopPropagation={onLinkClick}
 >
   {#if isEventGroup(event)}
-    <td class="w-24 min-w-fit">
+    <td class="w-24 min-w-fit font-mono">
       <div class="flex items-center gap-0.5">
         {#each event.eventList as groupEvent}
           <Link
@@ -141,7 +141,7 @@
       </div>
     </td>
   {:else}
-    <td>
+    <td class="font-mono">
       <Link data-testid="link" {href}>
         {event.id}
       </Link>
