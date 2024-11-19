@@ -177,7 +177,7 @@ const keyIs = (key: string, ...validKeys: string[]) => {
 };
 
 export const decodeSingleReadablePayloadWithCodec = async (
-  payload: RawPayload,
+  payload: RawPayload | Payload,
   settings: Settings = get(page).data.settings,
 ): Promise<string> => {
   try {

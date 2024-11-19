@@ -10,6 +10,10 @@ export type WorkflowRunWithWorkers = {
   workflow: WorkflowExecution | null;
   workers: GetPollersResponse;
   metadata: WorkflowMetadata;
+  userMetadata: {
+    summary: string;
+    details: string;
+  };
 };
 
 export const initialWorkflowRun: WorkflowRunWithWorkers = {
@@ -19,6 +23,10 @@ export const initialWorkflowRun: WorkflowRunWithWorkers = {
     definition: {
       queryDefinitions: [],
     },
+  },
+  userMetadata: {
+    summary: '',
+    details: '',
   },
 };
 

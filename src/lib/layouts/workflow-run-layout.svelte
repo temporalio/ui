@@ -32,7 +32,9 @@
     workflowRun,
   } from '$lib/stores/workflow-run';
   import type { NetworkError } from '$lib/types/global';
+  import type { WorkflowExecution } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
@@ -47,6 +49,22 @@
 
   const handleCopy = (e: Event) => {
     copy(e, stringifyWithBigInt(fullJson));
+  };
+
+  const decodeUserMetadata = async (workflow: WorkflowExecution) => {
+    try {
+      if (workflow?.summary) {
+        $workflowRun.userMetadata.summary =
+          await decodeSingleReadablePayloadWithCodec(workflow.summary);
+      }
+
+      if (workflow?.details) {
+        $workflowRun.userMetadata.details =
+          await decodeSingleReadablePayloadWithCodec(workflow.details);
+      }
+    } catch (e) {
+      console.error('Error decoding user metadata', e);
+    }
   };
 
   const getWorkflowAndEventHistory = async (
@@ -65,6 +83,8 @@
       workflowError = error;
       return;
     }
+
+    await decodeUserMetadata(workflow);
 
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });

@@ -4,6 +4,7 @@ import { v4 } from 'uuid';
 
 import { page } from '$app/stores';
 
+import type { PayloadInputEncoding } from '$lib/components/payload-input-with-encoding.svelte';
 import { Action } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
@@ -37,6 +38,7 @@ import type {
 } from '$lib/types/workflows';
 import {
   cloneAllPotentialPayloadsWithCodec,
+  decodeSingleReadablePayloadWithCodec,
   type PotentiallyDecodable,
 } from '$lib/utilities/decode-payload';
 import {
@@ -82,7 +84,7 @@ type SignalWorkflowOptions = {
   workflow: WorkflowExecution;
   name: string;
   input: string;
-  encoding: string;
+  encoding: PayloadInputEncoding;
 };
 
 type StartWorkflowOptions = {
@@ -91,7 +93,7 @@ type StartWorkflowOptions = {
   taskQueue: string;
   workflowType: string;
   input: string;
-  encoding: string;
+  encoding: PayloadInputEncoding;
   summary: string;
   details: string;
   searchAttributes: SearchAttributeInput[];
@@ -517,20 +519,24 @@ export async function startWorkflow({
     try {
       payloads = await encodePayloads(input, encoding);
     } catch (_) {
-      console.error('Could not decode input for starting workflow');
+      throw new Error('Could not encode input for starting workflow');
     }
   }
 
-  if (summary) {
-    summaryPayload = (
-      await encodePayloads(stringifyWithBigInt(summary), encoding)
-    )[0];
-  }
+  try {
+    if (summary) {
+      summaryPayload = (
+        await encodePayloads(stringifyWithBigInt(summary), 'json/plain')
+      )[0];
+    }
 
-  if (details) {
-    detailsPayload = (
-      await encodePayloads(stringifyWithBigInt(details), encoding)
-    )[0];
+    if (details) {
+      detailsPayload = (
+        await encodePayloads(stringifyWithBigInt(details), 'json/plain')
+      )[0];
+    }
+  } catch (e) {
+    console.error('Could not encode summary or details for starting workflow');
   }
 
   const body = stringifyWithBigInt({
@@ -625,12 +631,22 @@ export const fetchInitialValuesForStartWorkflow = async ({
       get(authUser).accessToken,
     )) as PotentiallyDecodable;
 
+    let summary = '';
+    if (workflow.summary) {
+      summary = await decodeSingleReadablePayloadWithCodec(workflow.summary);
+    }
+
+    let details = '';
+    if (workflow.details) {
+      details = await decodeSingleReadablePayloadWithCodec(workflow.details);
+    }
+
     const input = stringifyWithBigInt(convertedAttributes?.payloads[0]);
     return {
       input,
       searchAttributes: workflow?.searchAttributes?.indexedFields,
-      summary: workflow?.summary || '',
-      details: workflow?.details || '',
+      summary,
+      details,
     };
   } catch (e) {
     return emptyValues;
