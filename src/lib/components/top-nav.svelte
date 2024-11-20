@@ -1,31 +1,9 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
-  import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import type { NamespaceListItem } from '$lib/types/global';
-  import { routeForNamespace } from '$lib/utilities/route-for';
-
-  export let namespaceList: NamespaceListItem[] = [];
 
   let screenWidth: number;
-
-  $: namespace = $page.params.namespace || $lastUsedNamespace;
-  $: namespaceExists = namespaceList.some(
-    (namespaceListItem) => namespaceListItem.namespace === namespace,
-  );
-  $: href = routeForNamespace({ namespace });
-
-  const handleNamespaceSelect = (
-    event: CustomEvent<{ value: NamespaceListItem }>,
-  ) => {
-    const namespaceListItem = event.detail.value;
-    $lastUsedNamespace = namespaceListItem.namespace;
-    namespaceListItem?.onClick(namespaceListItem.namespace);
-  };
 </script>
 
 <svelte:window bind:innerWidth={screenWidth} />
@@ -35,21 +13,7 @@
   aria-label={translate('common.main')}
 >
   <div class="flex grow items-center">
-    <Combobox
-      label={translate('namespaces.namespace-label', { namespace })}
-      noResultsText={translate('common.no-results')}
-      labelHidden
-      value={namespace}
-      id="namespace-switcher"
-      leadingIcon="namespace-switcher"
-      options={namespaceList}
-      optionValueKey="namespace"
-      on:change={handleNamespaceSelect}
-      minSize={32}
-      actionTooltip={translate('namespaces.go-to-namespace')}
-      {href}
-      hrefDisabled={!namespaceExists}
-    />
+    <slot name="left" />
   </div>
   <div class="flex items-center gap-2">
     <TimezoneSelect position={screenWidth < 768 ? 'left' : 'right'} />
