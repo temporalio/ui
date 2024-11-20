@@ -58,12 +58,11 @@ table {
 
 ul,
 ol {
-  list-style: none;
   white-space: normal;
 }
 
 li {
-  list-style: inside;
+  list-style-position: inside;
 }
 
 li * {

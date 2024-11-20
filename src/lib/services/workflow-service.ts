@@ -644,7 +644,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
     let details = '';
     if (workflow.details) {
       const decodedDetails = await decodeSingleReadablePayloadWithCodec(
-        workflow.summary,
+        workflow.details,
       );
       if (typeof decodedDetails === 'string') {
         details = decodedDetails;
