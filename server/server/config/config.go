@@ -65,6 +65,9 @@ type (
 		HideWorkflowQueryErrors bool `yaml:"hideWorkflowQueryErrors"`
 		// Whether to disable refreshing workflow counts in UI
 		RefreshWorkflowCountsDisabled bool `yaml:"refreshWorkflowCountsDisabled"`
+		// Whether to enable the count group by execution status in UI
+		WorkflowCountGroupByExecutionStatusEnabled bool `yaml:"WorkflowCountGroupByExecutionStatusEnabled"`
+
 		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
 		ForwardHeaders []string `yaml:"forwardHeaders"`
 		HideLogs       bool     `yaml:"hideLogs"`
