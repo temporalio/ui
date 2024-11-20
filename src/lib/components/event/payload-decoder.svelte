@@ -54,6 +54,7 @@
       } else {
         decodedValue = stringifyWithBigInt(decodedAttributes);
       }
+
       if (onDecode) {
         onDecode(decodedValue);
       }

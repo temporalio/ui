@@ -5,7 +5,6 @@
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import WorkflowCallback from '$lib/components/lines-and-dots/workflow-callback.svelte';
-  import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -62,7 +61,6 @@
 <div class="flex flex-col gap-0 px-8">
   <WorkflowCallStackError />
   <div class="flex flex-col gap-2">
-    <WorkflowDetails />
     <InputAndResults />
     {#if workflowTaskFailedError}
       <WorkflowError

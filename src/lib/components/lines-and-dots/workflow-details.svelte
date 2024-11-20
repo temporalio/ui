@@ -23,10 +23,14 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <h3 class="flex items-center">Summary</h3>
   <div
-    class="surface-primary grid w-full grid-flow-row grid-cols-1 gap-2 rounded border-2 border-subtle p-2 md:grid-cols-2 xl:grid-cols-3"
+    class="grid w-full grid-flow-row grid-cols-1 gap-x-4 gap-y-2 text-sm lg:grid-cols-3 xl:grid-cols-4"
   >
+    <WorkflowDetail
+      content={elapsedTime}
+      class="order-1 font-mono text-xl"
+      icon="clock"
+    />
     <WorkflowDetail
       title={translate('common.start')}
       tooltip={$relativeTime
@@ -39,8 +43,11 @@
       content={formatDate(workflow?.startTime, $timeFormat, {
         relative: $relativeTime,
       })}
-      class="order-1 text-sm "
+      class="order-2"
     />
+
+    <div class="hidden lg:order-4 lg:block xl:order-5" />
+    <div class="hidden lg:order-7 lg:block xl:hidden" />
     <WorkflowDetail
       title={translate('common.end')}
       tooltip={$relativeTime
@@ -55,17 +62,12 @@
             relative: $relativeTime,
           })
         : '-'}
-      class="order-2 text-sm md:order-3 xl:order-4"
-    />
-    <WorkflowDetail
-      content={elapsedTime}
-      class="order-3 text-sm md:order-5 xl:order-7"
-      icon="clock"
+      class="order-3 lg:order-5 xl:order-6"
     />
     <WorkflowDetail
       title={translate('common.task-queue')}
       content={workflow?.taskQueue}
-      class="order-4 text-sm md:order-8"
+      class="order-6 xl:order-4"
       href={routeForWorkers({
         namespace: $page.params.namespace,
         workflow: workflow?.id,
@@ -77,7 +79,7 @@
       content={workflow?.name}
       copyable
       filterable
-      class="order-4 text-sm md:order-2 xl:order-2"
+      class="order-3"
       href={routeForWorkflowsWithQuery({
         namespace,
         query: `WorkflowType="${workflow?.name}"`,
@@ -87,17 +89,12 @@
       title={translate('common.run-id')}
       content={workflow?.runId}
       copyable
-      class="order-5 text-sm md:order-4 xl:order-5"
+      class="order-8 xl:order-7"
     />
     <WorkflowDetail
       title={translate('common.history-size-bytes')}
       content={workflow?.historySizeBytes}
-      class="order-6 text-sm md:order-6 xl:order-3"
-    />
-    <WorkflowDetail
-      title={translate('workflows.state-transitions')}
-      content={workflow?.stateTransitionCount}
-      class="order-7 text-sm md:order-8 xl:order-6"
+      class="order-9 xl:order-8"
     />
   </div>
 </div>
