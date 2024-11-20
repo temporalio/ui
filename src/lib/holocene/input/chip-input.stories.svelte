@@ -26,7 +26,7 @@
       hintText: { name: 'Hint Text', control: 'text' },
       disabled: { name: 'Disabled', control: 'boolean' },
       required: { name: 'Required', control: 'boolean' },
-      external: { name: 'External Content', control: 'boolean' },
+      external: { name: 'External Chips', control: 'boolean' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       chips: { name: 'Chips', table: { disable: true } },
       validator: { table: { disable: true } },
@@ -49,7 +49,7 @@
 
 <Story name="Default" />
 
-<Story name="External Content" args={{ external: true }} />
+<Story name="External Chips" args={{ external: true }} />
 
 <Story name="Disabled" args={{ disabled: true }} />
 

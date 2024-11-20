@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext, onMount } from 'svelte';
+  import { getContext } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
@@ -9,19 +9,14 @@
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
-  let list: string[] = [];
-
-  onMount(() => {
-    const { value } = $filter;
-    const initialList =
-      value.length > 0
-        ? value
-            .slice(1, -1)
-            .split(', ')
-            .map((v) => v.slice(1, -1))
-        : [];
-    list = initialList;
-  });
+  $: ({ value } = $filter);
+  $: list =
+    value.length > 0
+      ? value
+          .slice(1, -1)
+          .split(', ')
+          .map((v) => v.slice(1, -1))
+      : [];
 
   function onSubmit() {
     $filter.conditional = 'IN';
