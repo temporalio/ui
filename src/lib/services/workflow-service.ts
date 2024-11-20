@@ -633,12 +633,22 @@ export const fetchInitialValuesForStartWorkflow = async ({
 
     let summary = '';
     if (workflow.summary) {
-      summary = await decodeSingleReadablePayloadWithCodec(workflow.summary);
+      const decodedSummary = await decodeSingleReadablePayloadWithCodec(
+        workflow.summary,
+      );
+      if (typeof decodedSummary === 'string') {
+        summary = decodedSummary;
+      }
     }
 
     let details = '';
     if (workflow.details) {
-      details = await decodeSingleReadablePayloadWithCodec(workflow.details);
+      const decodedDetails = await decodeSingleReadablePayloadWithCodec(
+        workflow.summary,
+      );
+      if (typeof decodedDetails === 'string') {
+        details = decodedDetails;
+      }
     }
 
     const input = stringifyWithBigInt(convertedAttributes?.payloads[0]);

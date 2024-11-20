@@ -42,7 +42,7 @@
   $: fullJson = { ...$workflowRun, eventHistory: $fullEventHistory };
 
   let workflowError: NetworkError;
-  let eventHistoryController: AbortController;
+  let workflowRunController: AbortController;
   let refreshInterval;
 
   const { copy, copied } = copyToClipboard();
@@ -54,13 +54,20 @@
   const decodeUserMetadata = async (workflow: WorkflowExecution) => {
     try {
       if (workflow?.summary) {
-        $workflowRun.userMetadata.summary =
-          await decodeSingleReadablePayloadWithCodec(workflow.summary);
+        const decodedSummary = await decodeSingleReadablePayloadWithCodec(
+          workflow.summary,
+        );
+        if (typeof decodedSummary === 'string') {
+          $workflowRun.userMetadata.summary = decodedSummary;
+        }
       }
-
       if (workflow?.details) {
-        $workflowRun.userMetadata.details =
-          await decodeSingleReadablePayloadWithCodec(workflow.details);
+        const decodedDetails = await decodeSingleReadablePayloadWithCodec(
+          workflow.details,
+        );
+        if (typeof decodedDetails === 'string') {
+          $workflowRun.userMetadata.details = decodedDetails;
+        }
       }
     } catch (e) {
       console.error('Error decoding user metadata', e);
@@ -98,6 +105,7 @@
       $authUser?.accessToken,
     );
 
+    workflowRunController = new AbortController();
     getWorkflowMetadata(
       {
         namespace,
@@ -108,17 +116,17 @@
       },
       settings,
       $authUser?.accessToken,
+      workflowRunController.signal,
     ).then((metadata) => {
       $workflowRun.metadata = metadata;
     });
 
-    eventHistoryController = new AbortController();
     $fullEventHistory = await fetchAllEvents({
       namespace,
       workflowId,
       runId,
       sort: 'ascending',
-      signal: eventHistoryController.signal,
+      signal: workflowRunController.signal,
       historySize: workflow.historyEvents,
     });
   };
@@ -149,8 +157,8 @@
 
   const abortPolling = () => {
     $fullEventHistory = [];
-    if (eventHistoryController) {
-      eventHistoryController.abort();
+    if (workflowRunController) {
+      workflowRunController.abort();
     }
   };
 
