@@ -1,6 +1,7 @@
 import type { Payloads } from '$lib/types';
 import type { WorkflowQueryRouteParameters } from '$lib/types/api';
 import type { Eventual, Settings } from '$lib/types/global';
+import type { WorkflowMetadata } from '$lib/types/workflows';
 import { convertPayloadToJsonWithCodec } from '$lib/utilities/decode-payload';
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
 import { has } from '$lib/utilities/has';
@@ -53,12 +54,7 @@ const formatParameters = async (
 
 async function fetchQuery(
   { workflow, namespace, queryType, queryArgs }: QueryRequestParameters,
-  request = fetch,
-  onError?: (error: {
-    status: number;
-    statusText: string;
-    body: unknown;
-  }) => void,
+  signal?: AbortSignal,
 ): Promise<QueryResponse> {
   workflow = await workflow;
   const parameters = await formatParameters(namespace, workflow, queryType);
@@ -77,32 +73,39 @@ async function fetchQuery(
           queryArgs,
         },
       }),
+      signal,
     },
-    request,
-    onError,
+    request: fetch,
     notifyOnError: false,
   });
 }
 
-export async function getQueryTypes(
+export async function getWorkflowMetadata(
   options: WorkflowParameters,
   settings: Settings,
   accessToken: string,
-): Promise<{ name: string; description?: string }[]> {
+  signal?: AbortSignal,
+): Promise<WorkflowMetadata> {
   try {
-    const result = await getQuery(
+    const metadata = await getQuery(
       { ...options, queryType: '__temporal_workflow_metadata' },
       settings,
       accessToken,
+      signal,
     );
-    return result?.definition?.queryDefinitions?.filter((query) => {
-      return query?.name !== '__stack_trace';
-    });
+    return metadata;
   } catch (e) {
     if (e.message?.includes('__temporal_workflow_metadata')) {
-      return getQueryTypesFromError(e.message);
+      const queryDefinitions = getQueryTypesFromError(e.message);
+      return {
+        definition: {
+          queryDefinitions,
+        },
+      };
     } else {
-      throw e;
+      return {
+        error: e,
+      };
     }
   }
 }
@@ -111,9 +114,9 @@ export async function getQuery(
   options: QueryRequestParameters,
   settings: Settings,
   accessToken: string,
-  request = fetch,
+  signal?: AbortSignal,
 ): Promise<ParsedQuery> {
-  return fetchQuery(options, request).then(async (execution) => {
+  return fetchQuery(options, signal).then(async (execution) => {
     const { queryResult } = execution ?? { queryResult: { payloads: [] } };
 
     let data: ParsedQuery = queryResult.payloads;

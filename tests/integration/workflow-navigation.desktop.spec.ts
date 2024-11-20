@@ -3,8 +3,8 @@ import { expect, test } from '@playwright/test';
 import { mockWorkflowsApis } from '~/test-utilities/mock-apis';
 
 test.beforeEach(async ({ page, baseURL }) => {
-  await page.goto(baseURL);
   await mockWorkflowsApis(page);
+  await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
 });
 
 test('Top Navigation current namespace is present', async ({ page }) => {
@@ -35,7 +35,7 @@ test('Top Navigation current namespace is present and has other namespaces to se
   ).toBeHidden();
 
   await switcher.clear();
-  await switcher.type('some');
+  await switcher.fill('some');
   await expect(page.getByRole('option', { name: 'default' })).toBeHidden();
 
   await page.getByRole('option', { name: 'some-other-namespace' }).click();

@@ -182,7 +182,9 @@ export const Strings = {
   'refresh-query': 'Refresh Query',
   'pending-activities-empty-state': 'No Pending Activities',
   'activity-id': 'Activity ID',
+  summary: 'Summary',
   details: 'Details',
+  'summary-and-details': 'Summary & Details',
   'maximum-attempts': 'Maximum Attempts',
   'retry-expiration': 'Retry Expiration',
   state: 'State',
@@ -253,4 +255,8 @@ export const Strings = {
   'start-workflow-success': 'Workflow started successfully',
   'start-workflow-error': 'Error starting Workflow',
   encoding: 'Encoding',
+  'user-metadata': 'User Metadata',
+  'markdown-supported': 'Markdown Supported',
+  'markdown-description':
+    'Markdown is supported in the summary and details fields. You can use {namespace}, {workflowId} or {runId} syntax in link href to create dynamic links based on the page you are on. Images are not allowed.',
 } as const;

@@ -5,6 +5,7 @@
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
+  import NamespacePicker from '$lib/components/namespace-picker.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
@@ -188,7 +189,8 @@
   </div>
   <MainContentContainer>
     <DataEncoderSettings class="hidden md:flex" />
-    <TopNavigation {namespaceList}>
+    <TopNavigation>
+      <NamespacePicker {namespaceList} slot="left" />
       <UserMenu {logout} />
     </TopNavigation>
     <CodecServerErrorBanner>

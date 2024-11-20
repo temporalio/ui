@@ -24,6 +24,7 @@
   export let encoding: Writable<PayloadInputEncoding>;
   export let error = false;
   export let loading = false;
+  export let label = translate('workflows.input');
   export let editing = true;
 
   const clearValues = () => {
@@ -34,7 +35,7 @@
 </script>
 
 <div>
-  <h5 class="pb-1 text-sm font-medium">{translate('workflows.input')}</h5>
+  <h5 class="pb-1 text-sm font-medium">{label}</h5>
   <Card class="flex flex-col gap-2">
     <PayloadInput bind:input bind:loading {error} {id} {editing} />
     <div class="flex items-end {editing ? 'justify-between' : 'justify-end'}">
