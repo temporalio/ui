@@ -103,7 +103,7 @@
         <Option
           on:click={handleCustom}
           value="custom"
-          description="Input signal name">Custom</Option
+          description="Input Signal name">Custom</Option
         >
       </Select>
     {:else}
