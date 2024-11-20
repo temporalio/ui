@@ -12,7 +12,7 @@
     value = _value;
   });
 
-  function getValue(value: number | string) {
+  function getValue(value: SearchAttributeInputValue) {
     const _numValue = Number(value);
     const isZero = value === 0 || value === '0';
     if (_numValue || isZero) return _numValue;

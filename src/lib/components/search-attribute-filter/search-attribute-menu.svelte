@@ -13,10 +13,7 @@
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import type { SearchAttributeType } from '$lib/types/workflows';
-  import {
-    getFocusedElementId,
-    isListFilter,
-  } from '$lib/utilities/query/search-attribute-filter';
+  import { getFocusedElementId } from '$lib/utilities/query/search-attribute-filter';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
@@ -38,18 +35,14 @@
   function handleNewQuery(value: string, type: SearchAttributeType) {
     searchAttributeValue = '';
     filter.set({ ...emptyFilter(), attribute: value, conditional: '=', type });
-    $focusedElementId = getFocusedElementId({ attribute: value, type });
+    $focusedElementId = getFocusedElementId($filter);
   }
 
   let searchAttributeValue = '';
-  //  TODO: Add KeywordList support
-  $: _options = options.filter(
-    ({ value, type }) => !isListFilter({ attribute: value, type }),
-  );
 
   $: filteredOptions = !searchAttributeValue
-    ? _options
-    : _options.filter((option) =>
+    ? options
+    : options.filter((option) =>
         option.value.toLowerCase().includes(searchAttributeValue.toLowerCase()),
       );
 </script>

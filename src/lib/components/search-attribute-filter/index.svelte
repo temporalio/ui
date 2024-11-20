@@ -30,6 +30,7 @@
     isBooleanFilter,
     isDateTimeFilter,
     isDurationFilter,
+    isListFilter,
     isNumberFilter,
     isStatusFilter,
     isTextFilter,
@@ -45,6 +46,7 @@
   import DateTimeFilter from './datetime-filter.svelte';
   import DurationFilter from './duration-filter.svelte';
   import FilterList from './filter-list.svelte';
+  import ListFilter from './list-filter.svelte';
   import NumberFilter from './number-filter.svelte';
   import SearchAttributeMenu from './search-attribute-menu.svelte';
   import StatusFilter from './status-filter.svelte';
@@ -59,9 +61,8 @@
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
 
-  $: ({ attribute, type } = $filter);
   $: searchParamQuery = $page.url.searchParams.get('query');
-  $: showClearAllButton = showFilter && filters.length && !attribute;
+  $: showClearAllButton = showFilter && filters.length && !$filter.attribute;
 
   setContext<FilterContext>(FILTER_CONTEXT, {
     filter,
@@ -105,7 +106,7 @@
 
   function updateFocusedElementId() {
     if ($activeQueryIndex !== null) {
-      $focusedElementId = getFocusedElementId({ attribute, type });
+      $focusedElementId = getFocusedElementId($filter);
     }
   }
 
@@ -134,7 +135,7 @@
   }
 
   function handleKeyUp(event: KeyboardEvent) {
-    if (event.key === 'Escape' && !isTextFilter({ attribute, type })) {
+    if (event.key === 'Escape' && !isTextFilter($filter)) {
       resetFilter();
     }
   }
@@ -145,19 +146,19 @@
     <slot />
     {#if showFilter}
       <div
-        class="flex items-center"
+        class="flex"
         class:filter={!showClearAllButton}
         on:keyup={handleKeyUp}
         role="none"
       >
-        {#if isStatusFilter(attribute)}
+        {#if isStatusFilter($filter)}
           <StatusFilter bind:filters />
         {:else}
           <SearchAttributeMenu {filters} {options} />
         {/if}
 
-        {#if attribute}
-          {#if isTextFilter({ attribute, type })}
+        {#if $filter.attribute}
+          {#if isTextFilter($filter)}
             <div
               class="flex w-full items-center"
               in:fly={{ x: -100, duration: 150 }}
@@ -165,12 +166,13 @@
               <TextFilter />
               <CloseFilter />
             </div>
-            <!-- TODO: Add KeywordList support -->
-            <!-- {:else if isListFilter(attribute)}
+          {:else if isListFilter($filter)}
             <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
-                <ListFilter />
-            </div> -->
-          {:else if isDurationFilter(attribute)}
+              <ListFilter>
+                <CloseFilter />
+              </ListFilter>
+            </div>
+          {:else if isDurationFilter($filter)}
             <div
               class="flex w-full items-center"
               in:fly={{ x: -100, duration: 150 }}
@@ -178,7 +180,7 @@
               <DurationFilter />
               <CloseFilter />
             </div>
-          {:else if isNumberFilter({ attribute, type })}
+          {:else if isNumberFilter($filter)}
             <div
               class="flex w-full items-center"
               in:fly={{ x: -100, duration: 150 }}
@@ -186,7 +188,7 @@
               <NumberFilter />
               <CloseFilter />
             </div>
-          {:else if isDateTimeFilter({ attribute, type })}
+          {:else if isDateTimeFilter($filter)}
             <div
               class="flex w-full items-center"
               in:fly={{ x: -100, duration: 150 }}
@@ -194,7 +196,7 @@
               <DateTimeFilter />
               <CloseFilter />
             </div>
-          {:else if isBooleanFilter({ attribute, type })}
+          {:else if isBooleanFilter($filter)}
             <div
               class="flex w-full items-center"
               in:fly={{ x: -100, duration: 150 }}

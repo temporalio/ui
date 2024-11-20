@@ -22,7 +22,7 @@ export const getSinglePayload = (decodedValue: string): string => {
 };
 
 export const setBase64Payload = (
-  payload: string,
+  payload: unknown,
   encoding: PayloadInputEncoding = 'json/plain',
 ) => {
   return {
