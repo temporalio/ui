@@ -311,7 +311,7 @@ export const getEventSummaryAttribute = (
   if (isWorkflowExecutionUpdateAcceptedEvent(event)) {
     if (event.attributes.acceptedRequest.input?.name) {
       return {
-        key: 'Name',
+        key: 'name',
         value: event.attributes.acceptedRequest.input.name,
       };
     }
