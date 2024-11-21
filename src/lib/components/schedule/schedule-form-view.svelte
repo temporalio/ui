@@ -87,13 +87,13 @@
   let second = '';
   let phase = '';
   let cronString = '';
-  let searchAttributesInput: SearchAttributeInput[] = Object.entries(
-    indexedFields,
-  ).map(([label, value]) => ({
-    label,
-    value,
-    type: $customSearchAttributes[label],
-  }));
+  let searchAttributesInput = Object.entries(indexedFields).map(
+    ([label, value]) => ({
+      label,
+      value,
+      type: $customSearchAttributes[label],
+    }),
+  ) as SearchAttributeInput[];
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: Partial<ScheduleParameters> = {

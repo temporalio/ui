@@ -648,8 +648,9 @@ export const fetchInitialValuesForStartWorkflow = async ({
         details = decodedDetails;
       }
     }
-
-    const input = stringifyWithBigInt(convertedAttributes?.payloads[0]);
+    const input = convertedAttributes?.payloads
+      ? stringifyWithBigInt(convertedAttributes.payloads[0])
+      : '';
     return {
       input,
       searchAttributes: workflow?.searchAttributes?.indexedFields,
