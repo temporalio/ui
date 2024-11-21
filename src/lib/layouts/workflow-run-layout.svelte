@@ -52,13 +52,14 @@
   };
 
   const decodeUserMetadata = async (workflow: WorkflowExecution) => {
+    const userMetadata = { summary: '', details: '' };
     try {
       if (workflow?.summary) {
         const decodedSummary = await decodeSingleReadablePayloadWithCodec(
           workflow.summary,
         );
         if (typeof decodedSummary === 'string') {
-          $workflowRun.userMetadata.summary = decodedSummary;
+          userMetadata.summary = decodedSummary;
         }
       }
       if (workflow?.details) {
@@ -66,9 +67,11 @@
           workflow.details,
         );
         if (typeof decodedDetails === 'string') {
-          $workflowRun.userMetadata.details = decodedDetails;
+          userMetadata.details = decodedDetails;
         }
       }
+
+      $workflowRun = { ...$workflowRun, userMetadata };
     } catch (e) {
       console.error('Error decoding user metadata', e);
     }
