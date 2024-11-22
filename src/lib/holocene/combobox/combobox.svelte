@@ -24,6 +24,7 @@
     change: { value: string | T };
     filter: string;
     close: { selectedOption: string | T };
+    input: string;
   }>();
 
   type ExtendedInputEvent = Event & {
@@ -48,11 +49,6 @@
     actionTooltip?: string;
     href?: string;
     hrefDisabled?: boolean;
-    /**
-     * Use Keypress to receive the event after the combobox has done it's updating for async operations
-     * @param event
-     */
-    keypress?: (event: KeyboardEvent) => void;
     loading?: boolean;
     loadingText?: string;
   }
@@ -99,7 +95,6 @@
   export let label: string;
   export let multiselect = false;
   export let value: string | string[] = multiselect ? [] : undefined;
-  export let keypress: BaseProps['keypress'] = () => {};
   export let noResultsText: string;
   export let disabled = false;
   export let labelHidden = false;
@@ -331,6 +326,7 @@
     // Reactive statement at top makes this work, not my favorite tho
     displayValue = event.currentTarget.value;
     filterValue = displayValue;
+    dispatch('input', displayValue);
   };
 
   function filterOptions(value: string, options: (T | string)[]) {
@@ -418,7 +414,6 @@
         on:focus|stopPropagation={openList}
         on:input|stopPropagation={handleInput}
         on:keydown|stopPropagation={handleInputKeydown}
-        on:keyup={keypress}
         on:click|stopPropagation={handleInputClick}
         data-testid={$$props['data-testid'] ?? id}
         bind:this={inputElement}
