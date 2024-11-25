@@ -21,9 +21,9 @@
 
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
-  import { noop, onMount } from 'svelte/internal';
   import { writable, type Writable } from 'svelte/store';
 
+  import { onMount } from 'svelte';
   import { setContext } from 'svelte';
 
   import type { IconName } from '$lib/holocene/icon';
@@ -56,7 +56,7 @@
   export let placeholder = '';
   export let disabled = false;
   export let leadingIcon: IconName = null;
-  export let onChange: (value: T) => void = noop;
+  export let onChange: (value: T) => void = () => {};
   export let menuClass: string | undefined = undefined;
   export let variant: MenuButtonVariant = 'secondary';
   export let required = false;
@@ -128,9 +128,11 @@
         aria-required={required}
         {...$$restProps}
       />
-      {#if disabled}
-        <Icon slot="trailing" name="lock" />
-      {/if}
+      <slot slot="trailing">
+        {#if disabled}
+          <Icon name="lock" />
+        {/if}
+      </slot>
     </MenuButton>
   {/key}
   <Menu role="listbox" id="{id}-select" class={menuClass}>

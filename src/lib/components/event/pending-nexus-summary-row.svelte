@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -18,7 +16,7 @@
   export let index: number;
   export let expandAll = false;
   export let active = false;
-  export let onRowClick: () => void = noop;
+  export let onRowClick: () => void = () => {};
 
   $: expanded = expandAll;
   $: ({ workflow, run, namespace } = $page.params);
