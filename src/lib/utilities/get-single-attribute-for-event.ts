@@ -309,7 +309,7 @@ export const getEventSummaryAttribute = (
   }
 
   if (isWorkflowExecutionUpdateAcceptedEvent(event)) {
-    if (event.attributes.acceptedRequest.input?.name) {
+    if (event.attributes?.acceptedRequest?.input?.name) {
       return {
         key: 'name',
         value: event.attributes.acceptedRequest.input.name,
