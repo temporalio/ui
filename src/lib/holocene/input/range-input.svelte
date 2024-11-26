@@ -124,7 +124,7 @@
   }
 
   .numeric-input {
-    @apply h-10 w-10 rounded-lg border border-subtle bg-information text-center text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply h-10 w-10 rounded-lg border border-subtle bg-information text-center text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
 
     appearance: textfield;
   }
@@ -140,7 +140,7 @@
   }
 
   .numeric-input:focus {
-    @apply outline outline-2 outline-blue-700;
+    @apply outline ring-2 ring-primary/70;
   }
 
   .floating-value {
@@ -160,10 +160,10 @@
   }
 
   input[type='range']:focus::-webkit-slider-thumb {
-    @apply border border-primary outline outline-2 outline-blue-700;
+    @apply border border-primary ring-2 ring-primary/70;
   }
 
   input[type='range']:focus::-moz-range-thumb {
-    @apply border border-primary outline outline-2 outline-blue-700;
+    @apply border border-primary ring-2 ring-primary/70;
   }
 </style>

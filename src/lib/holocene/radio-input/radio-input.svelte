@@ -72,7 +72,7 @@
     &:enabled {
       &:focus-visible,
       &:hover {
-        @apply bg-interactive-active ring-4 ring-primary/70;
+        @apply bg-interactive-active ring-2 ring-primary/70;
 
         &:checked {
           &:not(:active) {

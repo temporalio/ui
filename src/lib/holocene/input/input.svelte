@@ -94,7 +94,7 @@
     <slot name="before-input" {disabled} />
     <div
       class={merge(
-        'surface-primary relative box-border inline-flex h-10 w-full items-center rounded-lg border border-subtle text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70',
+        'surface-primary relative box-border inline-flex h-10 w-full items-center rounded-lg border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
       )}
       class:disabled
       class:error

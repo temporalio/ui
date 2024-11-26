@@ -42,7 +42,7 @@
 {#if expandable}
   <div
     class={merge(
-      'surface-primary w-full rounded-2xl border border-subtle p-2 focus-within:ring-4 focus-within:ring-inset focus-within:ring-primary/70',
+      'surface-primary w-full rounded-2xl border border-subtle p-2 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary/70',
       className,
     )}
     {...$$restProps}

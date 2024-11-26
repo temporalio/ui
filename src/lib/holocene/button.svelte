@@ -30,7 +30,7 @@
       'transition-shadow',
       'focus-visible:outline-none',
       'focus-visible:border-inverse',
-      'focus-visible:ring-4',
+      'focus-visible:ring-2',
       'whitespace-nowrap',
       'no-underline',
       '[.button-group>&]:rounded-none',
