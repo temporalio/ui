@@ -124,7 +124,7 @@
   }
 
   .numeric-input {
-    @apply h-10 w-10 rounded-lg border-2 border-subtle bg-information text-center text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply h-10 w-10 rounded-lg border border-subtle bg-information text-center text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
 
     appearance: textfield;
   }
@@ -148,7 +148,7 @@
   }
 
   input[type='range']::-webkit-slider-thumb {
-    @apply h-4 w-8 appearance-none rounded-full border-2 border-solid border-primary bg-information;
+    @apply h-4 w-8 appearance-none rounded-full border border-solid border-primary bg-information;
   }
 
   input[type='range']::-moz-range-thumb {

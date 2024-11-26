@@ -54,11 +54,11 @@
   }
 
   .primary {
-    @apply rounded-lg border-2 border-table;
+    @apply rounded-lg border border-table;
   }
 
   .split {
-    @apply border-t-2 border-subtle;
+    @apply border-t border-subtle;
   }
 
   .paginated-table {

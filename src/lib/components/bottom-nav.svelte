@@ -111,7 +111,7 @@
       class="grow text-white"
       on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
     >
-    <div class="ml-1 h-full w-1 border-l-2 border-subtle" />
+    <div class="ml-1 h-full w-1 border-l border-subtle" />
     <Button
       variant="ghost"
       size="xs"
@@ -141,7 +141,7 @@
 
 <style lang="postcss">
   .namespace-wrapper {
-    @apply surface-black flex h-10 w-full grow flex-row items-center rounded-lg border-2 border-subtle px-0.5 text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply surface-black flex h-10 w-full grow flex-row items-center rounded-lg border border-subtle px-0.5 text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
   }
 
   .nav-button {

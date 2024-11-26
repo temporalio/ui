@@ -65,7 +65,7 @@
 
 <style lang="postcss">
   .tab {
-    @apply flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 border-transparent text-sm font-medium outline-none focus-visible:rounded-sm focus-visible:ring-4 focus-visible:ring-primary/70;
+    @apply flex cursor-pointer items-center gap-1 whitespace-nowrap border-b border-transparent text-sm font-medium outline-none focus-visible:rounded-sm focus-visible:ring-4 focus-visible:ring-primary/70;
 
     &:not(.disabled) {
       @apply hover:text-brand;
