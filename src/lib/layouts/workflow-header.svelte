@@ -146,6 +146,35 @@
     </AccordionLight>
   {/if}
   <WorkflowDetails />
+  {#if cancelInProgress}
+    <div in:fly={{ duration: 200, delay: 100 }}>
+      <Alert
+        icon="info"
+        intent="info"
+        title={translate('workflows.cancel-request-sent')}
+      >
+        {translate('workflows.cancel-request-sent-description')}
+      </Alert>
+    </div>
+  {/if}
+  {#if workflowHasBeenReset}
+    <div in:fly={{ duration: 200, delay: 100 }}>
+      <Alert
+        icon="info"
+        intent="info"
+        data-testid="workflow-reset-alert"
+        title={translate('workflows.reset-success-alert-title')}
+      >
+        You can find the resulting Workflow Execution <Link
+          href={routeForEventHistory({
+            namespace,
+            workflow: $workflowRun?.workflow?.id,
+            run: $resetWorkflows[$workflowRun?.workflow?.runId],
+          })}>here</Link
+        >.
+      </Alert>
+    </div>
+  {/if}
   <Tabs>
     <TabList class="flex flex-wrap gap-6 pb-1 pt-4" label="workflow detail">
       <Tab
@@ -240,34 +269,4 @@
       />
     </TabList>
   </Tabs>
-
-  {#if cancelInProgress}
-    <div in:fly={{ duration: 200, delay: 100 }}>
-      <Alert
-        icon="info"
-        intent="info"
-        title={translate('workflows.cancel-request-sent')}
-      >
-        {translate('workflows.cancel-request-sent-description')}
-      </Alert>
-    </div>
-  {/if}
-  {#if workflowHasBeenReset}
-    <div in:fly={{ duration: 200, delay: 100 }}>
-      <Alert
-        icon="info"
-        intent="info"
-        data-testid="workflow-reset-alert"
-        title={translate('workflows.reset-success-alert-title')}
-      >
-        You can find the resulting Workflow Execution <Link
-          href={routeForEventHistory({
-            namespace,
-            workflow: $workflowRun?.workflow?.id,
-            run: $resetWorkflows[$workflowRun?.workflow?.runId],
-          })}>here</Link
-        >.
-      </Alert>
-    </div>
-  {/if}
 </header>
