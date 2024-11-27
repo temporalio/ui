@@ -13,8 +13,13 @@
 
   const resizeIframe = () => {
     if (!iframe) return;
+    const minHeight = 100;
+    const height = Math.max(
+      iframe.contentWindow.document.body.scrollHeight + 2,
+      minHeight,
+    );
     iframe.height = '';
-    iframe.height = iframe.contentWindow.document.body.scrollHeight + 2 + 'px';
+    iframe.height = height + 'px';
   };
 
   const { workflow: workflowId, run: runId, namespace } = $page.params;
