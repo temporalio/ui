@@ -1176,7 +1176,7 @@ describe('combineFilters', () => {
         conditional: 'is',
         operator: '',
         parenthesis: '',
-        value: 'null',
+        value: null,
       },
     ];
     expect(result).toEqual(expectedFilters);
@@ -1191,7 +1191,7 @@ describe('combineFilters', () => {
         conditional: 'IS NOT',
         operator: '',
         parenthesis: '',
-        value: 'NULL',
+        value: null,
       },
     ];
     expect(result).toEqual(expectedFilters);
@@ -1209,7 +1209,7 @@ describe('combineFilters', () => {
         conditional: 'is',
         operator: 'AND',
         parenthesis: '',
-        value: 'null',
+        value: null,
       },
       {
         attribute: 'StartTime',
@@ -1217,7 +1217,33 @@ describe('combineFilters', () => {
         conditional: 'IS NOT',
         operator: '',
         parenthesis: '',
-        value: 'NULL',
+        value: null,
+      },
+    ];
+    expect(result).toEqual(expectedFilters);
+  });
+
+  it('should parse a query with "is" and "is not" as a value', () => {
+    const result = toListWorkflowFilters(
+      '`WorkflowId`="is" AND `WorkflowType`="is not"',
+      attributes,
+    );
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowId',
+        type: 'Keyword',
+        conditional: '=',
+        operator: 'AND',
+        parenthesis: '',
+        value: 'is',
+      },
+      {
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'is not',
       },
     ];
     expect(result).toEqual(expectedFilters);
