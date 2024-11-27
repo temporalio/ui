@@ -3,17 +3,24 @@ import { EditorView } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
 import colors from 'tailwindcss/colors';
 
+import { css } from '$lib/theme/utilities';
+
 export const TEMPORAL_THEME = (isDark) =>
   EditorView.theme(
     {
       '&': {
+        color: css('--color-text-primary'),
+        backgroundColor: css('--color-surface-primary'),
         borderRadius: '0.25rem',
+        borderWidth: '2px',
+        borderColor: css('--color-border-subtle'),
         padding: '0.5rem',
       },
       '.cm-scroller': {
         fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
       },
       '.cm-content': {
+        caretColor: css('--color-text-primary'),
         fontSize: '0.875em',
       },
       '.cm-editor&.cm-focused': {
@@ -29,28 +36,14 @@ export const TEMPORAL_THEME = (isDark) =>
 
 export const TEMPORAL_SYNTAX = HighlightStyle.define(
   [
-    { tag: tags.punctuation, color: colors.slate['800'] },
-    { tag: tags.string, color: colors.slate['800'] },
-    { tag: tags.propertyName, color: colors.indigo['600'] },
-    { tag: tags.bool, color: colors.slate['800'] },
-    { tag: tags.number, color: colors.slate['800'] },
-    { tag: tags.operator, color: colors.pink['400'] },
-    { tag: tags.comment, color: colors.green['400'] },
-    { tag: tags.variableName, color: colors.pink['600'] },
+    { tag: tags.punctuation, color: css('--color-text-primary') },
+    { tag: tags.string, color: css('--color-text-primary') },
+    { tag: tags.propertyName, color: css('--color-text-brand') },
+    { tag: tags.bool, color: css('--color-text-primary') },
+    { tag: tags.number, color: css('--color-text-primary') },
+    { tag: tags.operator, color: css('--color-text-pink') },
+    { tag: tags.comment, color: css('--color-text-success') },
+    { tag: tags.variableName, color: css('--color-text-pink') },
   ],
   { themeType: 'light' },
-);
-
-export const TEMPORAL_SYNTAX_DARK = HighlightStyle.define(
-  [
-    { tag: tags.punctuation, color: colors.slate['200'] },
-    { tag: tags.string, color: colors.slate['200'] },
-    { tag: tags.propertyName, color: colors.indigo['400'] },
-    { tag: tags.bool, color: colors.slate['200'] },
-    { tag: tags.number, color: colors.slate['200'] },
-    { tag: tags.operator, color: colors.pink['500'] },
-    { tag: tags.comment, color: colors.green['600'] },
-    { tag: tags.variableName, color: colors.pink['500'] },
-  ],
-  { themeType: 'dark' },
 );
