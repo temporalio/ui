@@ -33,7 +33,7 @@ const workflowQueryWithSpaces =
 const prefixQuery = '`WorkflowType` STARTS_WITH "hello"';
 const isEmptyQuery = '`WorkflowType` is null';
 const isNotEmptyQuery = '`StartTime` IS NOT NULL';
-const keywordListQuery = '`CustomKeywordListField`IN("Hello", "World")';
+const keywordListQuery = '`CustomKeywordListField`in("Hello", "World")';
 
 const attributes = {
   CloseTime: 'Datetime',
@@ -276,7 +276,7 @@ describe('toListWorkflowFilters', () => {
       {
         attribute: 'CustomKeywordListField',
         type: 'KeywordList',
-        conditional: 'IN',
+        conditional: 'in',
         operator: '',
         parenthesis: '',
         value: '("Hello", "World")',
@@ -285,7 +285,7 @@ describe('toListWorkflowFilters', () => {
     expect(result).toEqual(expectedFilters);
   });
 
-  it('should parse a query with a KeywordList type and other types ', () => {
+  it('should parse a query with a KeywordList type and other types', () => {
     const result = toListWorkflowFilters(
       keywordListQuery + ' AND ' + workflowQuery4 + ' AND ' + keywordListQuery,
       attributes,
@@ -294,7 +294,7 @@ describe('toListWorkflowFilters', () => {
       {
         attribute: 'CustomKeywordListField',
         type: 'KeywordList',
-        conditional: 'IN',
+        conditional: 'in',
         operator: 'AND',
         parenthesis: '',
         value: '("Hello", "World")',
@@ -342,7 +342,7 @@ describe('toListWorkflowFilters', () => {
       {
         attribute: 'CustomKeywordListField',
         type: 'KeywordList',
-        conditional: 'IN',
+        conditional: 'in',
         operator: '',
         parenthesis: '',
         value: '("Hello", "World")',
