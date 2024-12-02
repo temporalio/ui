@@ -33,16 +33,6 @@
       max: { name: 'Minimum Value', control: { type: 'number', min: 0 } },
       min: { name: 'Maximum Value', control: { type: 'number', min: 0 } },
       search: { name: 'Search', control: 'boolean' },
-      unroundLeft: {
-        name: 'Left',
-        control: 'boolean',
-        table: { category: 'Styling', subcategory: 'Unround' },
-      },
-      unroundRight: {
-        name: 'Right',
-        control: 'boolean',
-        table: { category: 'Styling', subcategory: 'Unround' },
-      },
     },
   } satisfies Meta<NumberInput>;
 </script>

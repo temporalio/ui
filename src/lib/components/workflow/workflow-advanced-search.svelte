@@ -74,10 +74,9 @@
         labelHidden
         placeholder={translate('workflows.search-placeholder')}
         icon="search"
-        class="w-full lg:w-3/4"
+        class="w-full lg:w-3/4 [&_*]:border-r-0"
         clearable
         clearButtonLabel={translate('common.clear-input-button-label')}
-        unroundRight
         on:clear={handleClearInput}
         bind:value={manualSearchString}
       />
