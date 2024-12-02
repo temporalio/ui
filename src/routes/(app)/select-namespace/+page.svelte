@@ -64,16 +64,14 @@
     />
   </form>
   <div
-    class="h-96 w-full overflow-hidden rounded-md border"
+    class="h-96 w-full overflow-hidden border"
     aria-label={translate('common.namespaces')}
   >
     {#if items.length}
       <VirtualList {items} let:item itemHeight={50}>
         <button
           on:click={() => navigateToNamespace(item.namespace)}
-          class="surface-primary flex w-full cursor-pointer gap-2 truncate border-b from-blue-100 to-purple-100 p-3 text-left hover:bg-gradient-to-br"
-          class:rounded-t-md={item.index === 0}
-          class:rounded-b-md={item.index === items.length - 1}
+          class="surface-primary flex w-full cursor-pointer gap-2 truncate border-b p-3 text-left outline-none hover:bg-interactive-secondary-hover focus-visible:bg-interactive-secondary-hover"
         >
           {item.namespace}
         </button>

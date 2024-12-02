@@ -71,7 +71,7 @@
         {#each endpoints as endpoint}
           <Link href={routeForNexusEndpoint(endpoint.id)} role="button">
             <div
-              class="transition:colors flex cursor-pointer flex-col gap-1 rounded-lg p-4 duration-200 ease-in-out"
+              class="transition:colors flex cursor-pointer flex-col gap-1 p-4 duration-200 ease-in-out"
             >
               <h3 class="break-all">
                 {endpoint.spec.name}

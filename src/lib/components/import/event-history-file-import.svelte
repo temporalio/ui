@@ -67,7 +67,7 @@
   />
   <input
     id="import-event-history-file-upload"
-    class="import-input block rounded-md border border-slate-200 p-2"
+    class="import-input block border border-slate-200 p-2"
     type="file"
     accept=".json"
     on:change={onFileSelect}
