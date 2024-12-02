@@ -1,12 +1,10 @@
 <script lang="ts">
   import { BROWSER } from 'esm-env';
-  import { createEventDispatcher } from 'svelte';
-
-  import { afterNavigate } from '$app/navigation';
 
   import Link from '$lib/holocene/link.svelte';
   import type { NetworkError } from '$lib/types/global';
   import { has } from '$lib/utilities/has';
+  import CodeBlock from './code-block.svelte';
 
   export let error: App.Error | NetworkError = null;
   export let status = 500;
@@ -15,25 +13,16 @@
   if (has(error, 'statusCode')) {
     status = error.statusCode;
   }
-
-  const dispatch = createEventDispatcher();
-
-  afterNavigate(() => {
-    dispatch('clearError', {});
-  });
 </script>
 
 <section
   aria-roledescription="error"
-  class="mt-32 text-center align-middle"
+  class="flex flex-col items-center justify-center gap-4 border-2 border-danger bg-danger px-24 py-12"
   role="alert"
 >
-  <h1 class="text-[12rem] font-semibold">{status}</h1>
-  <p class="-mt-6 mb-5 text-lg">Uh oh. There's an error.</p>
-  <p class="my-4 w-auto text-2xl font-extrabold text-red-700">
-    {message}
-  </p>
-
+  <h1 class="text-[12rem] font-semibold leading-none">{status}</h1>
+  <p class="text-lg">Uh oh. There's an error.</p>
+  <CodeBlock content={message} language="text" />
   <p class="text-lg">
     <button
       class="underline hover:text-blue-700"
@@ -45,7 +34,7 @@
       }}>Try a refresh</button
     >
     or
-    <Link newTab href="https://temporal.io/slack"
+    <Link newTab href="https://temporal.io/slack" class="text-black"
       >jump on our Slack Channel</Link
     >.
   </p>

@@ -403,19 +403,6 @@
       "type": "IconName"
     }
   ],
-  "error-boundary-fallback": [
-    {
-      "name": "error"
-    }
-  ],
-  "error-boundary": [
-    {
-      "name": "error"
-    },
-    {
-      "name": "onError"
-    }
-  ],
   "error": [
     {
       "name": "error",

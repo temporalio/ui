@@ -6,7 +6,7 @@
 <script lang="ts">
   import type { HTMLAnchorAttributes, HTMLLiAttributes } from 'svelte/elements';
 
-  import { createEventDispatcher, getContext } from 'svelte';
+  import { createEventDispatcher, getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -27,9 +27,11 @@
     disabled?: boolean;
     description?: string;
     centered?: boolean;
-    class?: string;
+    className?: string;
     'data-testid'?: string;
     hoverable?: boolean;
+    leading?: Snippet;
+    trailingIcon?: Snippet;
   };
 
   type MenuItemWithoutHrefProps = BaseProps &
@@ -46,22 +48,27 @@
 
   type $$Props = MenuItemWithoutHrefProps | MenuItemWithHrefProps;
 
-  let className = '';
-  export { className as class };
-  export let selected = undefined;
-  export let destructive = false;
-  export let disabled = false;
-  export let href = null;
-  export let description: string = null;
-  export let centered = false;
-  export let hoverable = true;
-  export let newTab = false;
+  let { 
+    className = '',
+    selected = undefined,
+    destructive = false,
+    disabled = false,
+    href = null,
+    description = null,
+    centered = false,
+    hoverable = true,
+    newTab = false,
+    children,
+    leading = null,
+    trailingIcon = null,
+  }: $$Props = $props();
 
   const { keepOpen, open } = getContext<MenuContext>(MENU_CONTEXT);
 
   const dispatch = createEventDispatcher<{ click: undefined }>();
 
   const handleKeydown = (event: ExtendedLIEvent | ExtendedAnchorEvent) => {
+    event.stopPropagation();
     switch (event.key) {
       case 'Escape':
         $open = false;
@@ -136,10 +143,9 @@
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
-    on:keydown|stopPropagation={handleKeydown}
-    {...$$restProps}
+    onkeydown={handleKeydown}
   >
-    <slot />
+    {@render children()}
   </a>
 {:else}
   <li
@@ -157,16 +163,15 @@
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
-    on:click={handleClick}
-    on:keydown|stopPropagation={handleKeydown}
-    {...$$restProps}
+    onclick={handleClick}
+    onkeydown={handleKeydown}
   >
-    <slot name="leading" />
+    {@render leading?.()}
     <div class="grow">
       <div class:centered class="menu-item-wrapper">
-        <slot />
+        {@render children()}
         {#if selected}
-          <Icon name="checkmark" class="shrink-0" />
+          <Icon name="checkmark" />
         {/if}
       </div>
       {#if description}
@@ -175,7 +180,7 @@
         </div>
       {/if}
     </div>
-    <slot name="trailing" />
+    {@render trailingIcon?.()}
   </li>
 {/if}
 

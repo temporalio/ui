@@ -30,7 +30,7 @@
         id="filter-button"
       >
         {#key filtered}
-          <Icon title={filterIconTitle} name="filter" class="m-1" />
+          <Icon title={filterIconTitle} name="filter" className="m-1" />
         {/key}
       </button>
     {/if}

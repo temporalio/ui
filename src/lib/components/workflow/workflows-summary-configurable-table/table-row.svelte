@@ -79,7 +79,7 @@
                 : translate('workflows.show-children')}
               topLeft
             >
-              <Icon name="relationship" class="scale-80" />
+              <Icon name="relationship" className="scale-80" />
             </Tooltip>
           </Button>
         {/if}

@@ -1,21 +1,28 @@
 <script lang="ts">
   import { type IconName, icons } from './paths';
 
-  export let name: IconName;
-  export let width = 16;
-  export let height = 16;
-  export let title = '';
+  type Props = {
+    name: IconName;
+    width?: number;
+    height?: number;
+    title?: string;
+    className?: string;
+    x?: number;
+    y?: number;
+  };
+  let {
+    name,
+    width = 16,
+    height = 16,
+    title = '',
+    className = '',
+    x,
+    y,
+  }: Props = $props();
 
-  $: icon = icons[name];
+  const Icon = $derived(icons[name]);
 </script>
 
-{#if icon}
-  <svelte:component
-    this={icon}
-    {width}
-    {height}
-    {title}
-    class="shrink-0 {$$props.class}"
-    {...$$restProps}
-  />
+{#if Icon}
+  <Icon {width} {height} {title} {x} {y} class="shrink-0 {className}" />
 {/if}

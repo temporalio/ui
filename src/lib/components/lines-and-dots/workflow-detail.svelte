@@ -38,7 +38,7 @@
             'surface-subtle'}"
           ><span class="truncate">{content}</span>
           {#if filterable}
-            <Icon name="filter" class="shrink-0" />
+            <Icon name="filter" />
           {/if}
         </Link>
       {:else}

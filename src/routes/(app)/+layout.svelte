@@ -10,7 +10,7 @@
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
   import Banner from '$lib/holocene/banner/banner.svelte';
-  // import { ErrorBoundary } from '$lib/holocene/error-boundary';
+  import Error from '$lib/holocene/error.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
@@ -35,14 +35,14 @@
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
-  let namespaceList: NamespaceListItem[];
+  let { children }: { children: any } = $props();
 
-  $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
-  $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
-  $: namespaceNames = isCloud
+  const isCloud = $derived($page.data?.settings?.runtimeEnvironment?.isCloud);
+  const activeNamespaceName = $derived($page.params?.namespace ?? $lastUsedNamespace);
+  const namespaceNames = $derived(isCloud
     ? [$page.params.namespace]
-    : $namespaces.map((namespace: Namespace) => namespace?.namespaceInfo?.name);
-  $: namespaceList = namespaceNames.map((namespace: string) => {
+    : $namespaces.map((namespace: Namespace) => namespace?.namespaceInfo?.name));
+  const namespaceList = $derived(namespaceNames.map((namespace: string) => {
     const getHref = (namespace: string) =>
       isCloud ? routeForWorkflows({ namespace }) : getCurrentHref(namespace);
     return {
@@ -51,10 +51,9 @@
         $lastUsedNamespace = namespace;
         goto(getHref(namespace));
       },
-    };
-  });
-
-  $: linkList = getLinkList(activeNamespaceName, !!$inProgressBatchOperation);
+      };
+    }),
+  );
 
   const getLinkList = (
     namespace: string,
@@ -137,6 +136,8 @@
     ];
   };
 
+  const linkList = $derived(getLinkList(activeNamespaceName, !!$inProgressBatchOperation));
+
   function getCurrentHref(namespace: string) {
     const namespacePages = [
       {
@@ -206,7 +207,12 @@
       slot="main"
       class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
     >
-      <slot />
+    <svelte:boundary>
+      {@render children()}
+      {#snippet failed(error, reset)}
+        <Error on:clearError={reset} error={error} />
+      {/snippet}  
+    </svelte:boundary>
     </div>
     <BottomNavigation slot="footer" {linkList} {namespaceList} {isCloud}>
       <UserMenuMobile {logout} />

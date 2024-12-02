@@ -117,7 +117,7 @@
       size="xs"
       href={routeForNamespace({ namespace })}
       disabled={!namespaceExists}
-      ><Icon class="text-white" name="external-link" /></Button
+      ><Icon className="text-white" name="external-link" /></Button
     >
   </div>
   <button

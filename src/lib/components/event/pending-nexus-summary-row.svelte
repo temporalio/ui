@@ -58,7 +58,7 @@
             class="flex items-center gap-1 {event.attempt > 1 &&
               'surface-retry rounded px-1 py-0.5'}"
           >
-            <Icon class="mr-1.5 inline" name="retry" />
+            <Icon className="mr-1.5 inline" name="retry" />
             {translate('workflows.attempt')}
             {event.attempt}
             {#if event.attempt > 1}
@@ -73,7 +73,7 @@
       </div>
     </div>
   </td>
-  <td />
+  <td></td>
 </tr>
 {#if expanded}
   <tr class="row expanded">

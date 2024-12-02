@@ -49,7 +49,7 @@
   {role}
   {...$$restProps}
 >
-  <Icon name={icon} class="mt-0.5 shrink-0" />
+  <Icon name={icon} className="mt-0.5" />
   <div class="w-full min-w-0 gap-1">
     <p class="font-medium">
       {title}
