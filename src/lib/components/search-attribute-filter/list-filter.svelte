@@ -39,11 +39,7 @@
     external
   />
   <div class="flex h-fit items-center">
-    <Button
-      borderRadiusModifier="square-left"
-      disabled={!list.length}
-      type="submit"
-    >
+    <Button disabled={!list.length} type="submit">
       {translate('common.search')}
     </Button>
     <slot />

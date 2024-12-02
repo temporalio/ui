@@ -22,7 +22,6 @@
       'justify-center',
       'border',
       'gap-2',
-      'rounded-lg',
       'disabled:opacity-50',
       'disabled:cursor-not-allowed',
       'border-box',
@@ -33,12 +32,6 @@
       'focus-visible:ring-2',
       'whitespace-nowrap',
       'no-underline',
-      '[.button-group>&]:rounded-none',
-      '[.button-group>&:first-child]:rounded-l-lg',
-      '[.button-group>&:last-child]:rounded-r-lg',
-      '[.input-group>&]:rounded-none',
-      'last:[.input-group>&]:rounded-r',
-      'first:[.input-group>&]:rounded-l',
     ],
     {
       variants: {
@@ -59,11 +52,6 @@
           sm: 'h-9 text-sm px-4 py-1.5',
           md: 'h-10 text-base px-4 py-2',
           lg: 'h-11 text-lg px-5 py-2.5',
-        },
-        borderRadiusModifier: {
-          square: 'rounded-none',
-          'square-left': 'rounded-l-none',
-          'square-right': 'rounded-r-none',
         },
       },
       defaultVariants: {
@@ -97,7 +85,6 @@
 
   export let variant: ButtonStyles['variant'] = 'primary';
   export let size: ButtonStyles['size'] = 'md';
-  export let borderRadiusModifier: ButtonStyles['borderRadiusModifier'] = null;
   export let disabled = false;
   export let loading = false;
   export let leadingIcon: IconName = null;
@@ -129,7 +116,6 @@
     class={buttonStyles({
       variant,
       size,
-      borderRadiusModifier,
     })}
     on:click|stopPropagation={onLinkClick}
     tabindex={href ? null : 0}
@@ -164,7 +150,6 @@
       buttonStyles({
         variant,
         size,
-        borderRadiusModifier,
       }),
       className,
     )}

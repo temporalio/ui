@@ -83,7 +83,6 @@
       <Button
         data-testid="manual-search-button"
         variant="primary"
-        borderRadiusModifier="square-left"
         type="submit"
       >
         {translate('common.search')}
