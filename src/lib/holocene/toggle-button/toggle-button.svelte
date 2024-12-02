@@ -52,7 +52,6 @@
   class:group
   class:active={href ? $page.url.pathname.includes(base) : active}
   href={href ? href + $page.url.search : null}
-  class:rounded-lg={!group}
   class:disabled={$$restProps.disabled}
   on:click
   role="button"
@@ -90,15 +89,7 @@
     @apply cursor-not-allowed opacity-50;
   }
 
-  .group:first-child {
-    @apply rounded-bl-lg rounded-tl-lg;
-  }
-
   .group:not(:last-child) {
     @apply border-r-0;
-  }
-
-  .group:last-child {
-    @apply rounded-br-lg rounded-tr-lg;
   }
 </style>

@@ -137,7 +137,7 @@
 
 <style lang="postcss">
   .body {
-    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto rounded-2xl border border-secondary p-0 text-primary shadow-xl md:h-max;
+    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto border border-secondary p-0 text-primary shadow-xl md:h-max;
   }
 
   .body::backdrop {
