@@ -16,7 +16,6 @@
   import { EditorState } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
   import { createEventDispatcher, onMount } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
 
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
@@ -27,7 +26,6 @@
   } from '$lib/utilities/parse-with-big-int';
   import {
     TEMPORAL_SYNTAX,
-    TEMPORAL_SYNTAX_DARK,
     TEMPORAL_THEME,
   } from '$lib/vendor/codemirror/theme';
 
@@ -113,9 +111,7 @@
     const extensions = [
       keymap.of([...standardKeymap, ...historyKeymap]),
       TEMPORAL_THEME(isDark),
-      syntaxHighlighting(isDark ? TEMPORAL_SYNTAX_DARK : TEMPORAL_SYNTAX, {
-        fallback: true,
-      }),
+      syntaxHighlighting(TEMPORAL_SYNTAX, { fallback: true }),
       indentUnit.of('  '),
       closeBrackets(),
       autocompletion(),
@@ -195,7 +191,7 @@
 <div class="relative min-w-[80px] grow">
   <div
     bind:this={editor}
-    class={merge('surface-primary rounded border border-subtle', className)}
+    class={className}
     class:inline
     data-testid={$$props.testId}
     class:editable
