@@ -88,8 +88,8 @@ pnpm dev:docker
 ```
 
 ```bash
-pnpn run build:docker
-pnpn run preview:docker
+pnpm run build:docker
+pnpm run preview:docker
 ```
 
 
