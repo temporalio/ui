@@ -70,7 +70,7 @@
     copy(e, content);
   };
 
-  let editor: HTMLElement;
+  let editor: HTMLDivElement | null = null;
   let view: EditorView;
 
   const formatJSON = (jsonData: string): string => {
@@ -185,19 +185,30 @@
     }
   };
 
+  $: disabled = disabled || copyable;
+  function handleFocus() {
+    if (editor) {
+      editor.focus();
+    }
+  }
   $: content, language, setView();
 </script>
 
-<div class="relative min-w-[80px] grow">
+<div class="relative" tabindex={0} on:focus={handleFocus}>
   <div
     bind:this={editor}
-    class={className}
+    class={`rounded-x inline min-w-[80px] cursor-text ${className} ${
+      editable ? 'editable' : 'readOnly'
+    }`}
     class:inline
+    contenteditable={editable}
     data-testid={$$props.testId}
     class:editable
+    tabindex={-1}
     class:readOnly={!editable}
     {...$$restProps}
   />
+
   {#if copyable}
     <CopyButton
       {copyIconTitle}
