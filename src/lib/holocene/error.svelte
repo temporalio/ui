@@ -1,17 +1,34 @@
 <script lang="ts">
-  import { BROWSER } from 'esm-env';
-
   import Link from '$lib/holocene/link.svelte';
   import type { NetworkError } from '$lib/types/global';
   import { has } from '$lib/utilities/has';
+  import { BROWSER } from 'esm-env';
   import CodeBlock from './code-block.svelte';
 
-  export let error: App.Error | NetworkError = null;
-  export let status = 500;
-  let message = error?.message || '';
+  const reload = () => {
+    if (BROWSER) {
+      window.location.reload();
+    }
+  };
+
+  let {
+    reset = reload,
+    error,
+    status = 500,
+  }: {
+    reset?: () => void;
+    error: App.Error | NetworkError | unknown;
+    status?: number;
+  } = $props();
+
+  let message = $state(
+    has(error, 'message') && typeof error.message === 'string'
+      ? error.message
+      : '',
+  );
 
   if (has(error, 'statusCode')) {
-    status = error.statusCode;
+    status = error.statusCode as number;
   }
 </script>
 
@@ -22,16 +39,12 @@
 >
   <h1 class="text-[12rem] font-semibold leading-none">{status}</h1>
   <p class="text-lg">Uh oh. There's an error.</p>
-  <CodeBlock content={message} language="text" />
+  <div class="w-full">
+    <CodeBlock content={message} language="text" />
+  </div>
   <p class="text-lg">
-    <button
-      class="underline hover:text-blue-700"
-      tabindex={0}
-      on:click={() => {
-        if (BROWSER) {
-          window.location.reload();
-        }
-      }}>Try a refresh</button
+    <button class="underline hover:text-blue-700" tabindex={0} onclick={reset}
+      >Try a refresh</button
     >
     or
     <Link newTab href="https://temporal.io/slack" class="text-black"

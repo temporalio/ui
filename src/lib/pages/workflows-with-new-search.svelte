@@ -59,6 +59,7 @@
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
+  import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
 
   $: query = $page.url.searchParams.get('query');
   $: query, ($workflowsQuery = query);
@@ -225,8 +226,11 @@
 </header>
 
 <div class="flex flex-col gap-2 md:flex-row">
-  <WorkflowSearchAttributeFilter onClickConfigure={openCustomizationDrawer} />
+  <ErrorBoundary>
+    <WorkflowSearchAttributeFilter onClickConfigure={openCustomizationDrawer} />
+  </ErrorBoundary>
 </div>
+
 <WorkflowsSummaryConfigurableTable>
   <slot name="cloud" slot="cloud" />
 </WorkflowsSummaryConfigurableTable>
