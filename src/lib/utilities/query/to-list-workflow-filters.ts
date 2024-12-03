@@ -95,9 +95,10 @@ export const toListWorkflowFilters = (
 
         if (isNullConditional(nextToken)) {
           const combinedTokens = `${nextToken} ${tokenTwoAhead}`;
-          filter.value = isNullConditional(combinedTokens)
+          const value = isNullConditional(combinedTokens)
             ? getThreeAhead(tokens, index)
             : tokenTwoAhead;
+          filter.value = value.toLocaleLowerCase() === 'null' ? null : value;
         } else if (isDatetimeStatement(attributes[token])) {
           const start = tokenTwoAhead;
           const hasValidStartTime = isValidDate(start);
@@ -125,7 +126,7 @@ export const toListWorkflowFilters = (
         }
       }
 
-      if (isConditional(token)) {
+      if (!filter.conditional && isConditional(token)) {
         const combinedTokens = `${token} ${nextToken}`;
         if (isNullConditional(combinedTokens)) {
           filter.conditional = combinedTokens;

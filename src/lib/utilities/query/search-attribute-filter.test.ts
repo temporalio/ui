@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import type { SearchAttributes } from '$lib/types/workflows';
 
 import {
+  formatListFilterValue,
   isBooleanFilter,
   isDateTimeFilter,
   isDurationFilter,
@@ -148,5 +149,28 @@ describe('isDateTimeFilter', () => {
     expect(
       isDateTimeFilter({ attribute: 'TemporalSchedulePaused' }, store),
     ).toBe(false);
+  });
+});
+
+describe('formatListFilterValue', () => {
+  it('should return an empty array if there is no value', () => {
+    expect(formatListFilterValue('')).toStrictEqual([]);
+  });
+
+  it('should return an array of strings if the value starts with "(" and ends with ")"', () => {
+    expect(formatListFilterValue('("one")')).toStrictEqual(['one']);
+    expect(formatListFilterValue('("one", "two")')).toStrictEqual([
+      'one',
+      'two',
+    ]);
+    expect(formatListFilterValue('("one","two","three")')).toStrictEqual([
+      'one',
+      'two',
+      'three',
+    ]);
+  });
+
+  it('should return an array with the value', () => {
+    expect(formatListFilterValue('example')).toStrictEqual(['example']);
   });
 });
