@@ -19,13 +19,14 @@ i18next.init({
 });
 
 const BroadcastChannelMock = vi.fn(() => ({
-  addEventListener: () => {},
-  postMessage: () => {},
+  addEventListener: () => { },
+  postMessage: () => { },
 }));
 
 vi.stubGlobal('BroadcastChannel', BroadcastChannelMock);
 
-vi.mock('esm-env', () => {
+vi.mock('esm-env', async (importOriginal) => {
+  const actual = (await importOriginal()) as { BROWSER: boolean, ENV: boolean };
   const BROWSER = true;
-  return { BROWSER };
+  return { ...actual, BROWSER };
 });
