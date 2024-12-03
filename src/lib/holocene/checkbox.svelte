@@ -145,7 +145,7 @@
         <Icon
           className="absolute left-0 top-0 h-4 w-4"
           name={indeterminate ? 'hyphen' : checked ? 'checkmark' : null}
-          strokeWidth={3}
+          strokeWidth="3"
         />
       {/if}
     </span>

@@ -11,8 +11,10 @@
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
-  $: ({ value } = $filter);
-  $: _value = value;
+  let _value = $state('');
+  $effect(() => {
+    _value = $filter.value;
+  });
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Enter' && _value !== '') {
@@ -22,13 +24,13 @@
     }
   }
 
-  $: options = [
+  const options = $derived([
     { value: '=', label: translate('common.equal-to') },
     { value: '!=', label: translate('common.not-equal-to') },
     ...($prefixSearchEnabled && $filter.type === SEARCH_ATTRIBUTE_TYPE.KEYWORD
       ? [{ value: 'STARTS_WITH', label: translate('common.starts-with') }]
       : []),
-  ];
+  ]);
 </script>
 
 <ConditionalMenu {options} inputId="text-filter" noBorderLeft>

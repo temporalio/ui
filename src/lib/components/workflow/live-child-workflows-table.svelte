@@ -25,7 +25,7 @@
   previousButtonLabel={translate('common.previous')}
   nextButtonLabel={translate('common.next')}
 >
-  <div slot="pagination-top" />
+  <div slot="pagination-top"></div>
   <Table class="w-full">
     <caption class="sr-only" slot="caption"
       >{translate('workflows.child-workflows')}</caption

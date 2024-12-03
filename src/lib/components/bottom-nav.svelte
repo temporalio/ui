@@ -111,7 +111,7 @@
       class="grow text-white"
       on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
     >
-    <div class="ml-1 h-full w-1 border-l-2 border-subtle" />
+    <div class="ml-1 h-full w-1 border-l-2 border-subtle"></div>
     <Button
       variant="ghost"
       size="xs"

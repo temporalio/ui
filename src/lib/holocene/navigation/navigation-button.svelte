@@ -8,7 +8,6 @@
   export let icon: IconName | undefined = undefined;
   export let tooltip = label;
   export let animate = false;
-  export let active = false;
   export let disabled = false;
 </script>
 
@@ -26,7 +25,7 @@
       class="flex h-6 w-6 items-center after:absolute after:left-[calc(100%_+_1.5rem)] after:top-0 after:hidden after:h-8 after:items-center after:rounded-md after:bg-slate-800 after:p-1 after:px-2 after:text-xs after:text-white after:content-[attr(data-tooltip)] group-data-[nav=closed]:hover:after:flex"
       data-tooltip={tooltip}
     >
-      <Icon name={icon} {animate} {active} />
+      <Icon name={icon} {animate} />
     </div>
   {/if}
   <div class="opacity-0 transition-opacity group-data-[nav=open]:opacity-100">

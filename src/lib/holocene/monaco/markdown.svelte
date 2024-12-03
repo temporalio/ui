@@ -43,6 +43,6 @@
       title="output"
       src="/render?content={encodeURIComponent(templatedContent)}&theme={theme}"
       class="w-full rounded-md"
-    />
+    ></iframe>
   {/key}
 </section>

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const MENU_ITEM_SELECTORS =
     'input, li[role="option"]:not([aria-disabled="true"]), li[role="menuitem"]:not([aria-disabled="true"])';
 </script>
@@ -48,7 +48,7 @@
 
   type $$Props = MenuItemWithoutHrefProps | MenuItemWithHrefProps;
 
-  let { 
+  let {
     className = '',
     selected = undefined,
     destructive = false,

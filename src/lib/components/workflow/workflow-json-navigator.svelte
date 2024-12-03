@@ -57,10 +57,8 @@
         }}
         aria-label={translate('common.previous')}
       >
-        <span
-          class="arrow arrow-left"
-          class:arrow-left-disabled={index === 1}
-        />
+        <span class="arrow arrow-left" class:arrow-left-disabled={index === 1}
+        ></span>
       </button>
       <button
         class="caret"
@@ -73,7 +71,7 @@
         <span
           class="arrow arrow-right"
           class:arrow-right-disabled={index === events.length}
-        />
+        ></span>
       </button>
     </div>
   </div>

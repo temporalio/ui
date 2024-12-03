@@ -68,7 +68,7 @@
       on:blur
       on:keydown|stopPropagation
       maxlength={maxLength > 0 ? maxLength : undefined}
-    />
+    ></textarea>
   </div>
   <div class="flex justify-between gap-2">
     <div

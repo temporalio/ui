@@ -36,41 +36,48 @@
   import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  let refresh = Date.now();
-  let coreUser = coreUserStore();
-  let customizationDrawerOpen = false;
-  let error = '';
+  const coreUser = coreUserStore();
+  let customizationDrawerOpen = $state(false);
+  let error = $state('');
+  let refresh = $state(Date.now());
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
 
-  $: namespace = $page.params.namespace;
-  $: columns = $configurableTableColumns?.[namespace]?.schedules ?? [];
-  $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
-  $: searchAttributeOptions = Object.entries({
-    ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
-      ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  const namespace = $derived($page.params.namespace);
+  const columns = $derived(
+    $configurableTableColumns?.[namespace]?.schedules ?? [],
+  );
+  const createDisabled = $derived($coreUser.namespaceWriteDisabled(namespace));
+  const searchAttributeOptions = $derived(
+    Object.entries({
+      ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
+        ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      }),
+      ...$customSearchAttributes,
+    }).map(([key, value]) => {
+      return {
+        label: key,
+        value: key,
+        type: value,
+      };
     }),
-    ...$customSearchAttributes,
-  }).map(([key, value]) => {
-    return {
-      label: key,
-      value: key,
-      type: value,
-    };
-  });
-  $: query = $page.url.searchParams.get('query');
-  $: onFetch = () => {
+  );
+  const query = $derived($page.url.searchParams.get('query'));
+  const onFetch = $derived(() => {
     error = '';
     return fetchPaginatedSchedules(namespace, query, onError);
-  };
-  $: availableColumns = availableScheduleColumns(namespace);
+  });
+  const availableColumns = $derived(availableScheduleColumns(namespace));
 
+  const searchAttributesValue = $derived($searchAttributes);
   onMount(() => {
     if (query) {
-      // Set filters from inital page load query if it exists
-      $scheduleFilters = toListWorkflowFilters(query, $searchAttributes);
+      if ($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) {
+        searchAttributesValue.ScheduleId = SEARCH_ATTRIBUTE_TYPE.KEYWORD;
+      }
+      $scheduleFilters = toListWorkflowFilters(query, searchAttributesValue);
     }
   });
 

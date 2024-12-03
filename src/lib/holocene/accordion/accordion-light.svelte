@@ -46,7 +46,7 @@
         role="none"
       >
         <slot name="action" />
-        <Icon class="m-2 shrink-0" name={open ? 'arrow-down' : 'arrow-right'} />
+        <Icon className="m-2" name={open ? 'arrow-down' : 'arrow-right'} />
       </div>
     </div>
   </button>

@@ -89,7 +89,7 @@
     <td></td>
   {/if}
   <slot />
-  <td />
+  <td></td>
 </tr>
 
 <style lang="postcss">

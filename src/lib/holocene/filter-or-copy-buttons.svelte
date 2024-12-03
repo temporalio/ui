@@ -43,7 +43,7 @@
         <Icon
           title={$copied ? copySuccessIconTitle : copyIconTitle}
           name={$copied ? 'checkmark' : 'copy'}
-          class="m-1"
+          className="m-1"
         />
       </button>
     {/if}

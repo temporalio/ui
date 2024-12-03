@@ -48,7 +48,7 @@
       />
     </th>
   {/if}
-  <th class="w-12" />
+  <th class="w-12"></th>
   {#if $supportsBulkActions && $batchActionsVisible}
     <th class="batch-actions-table-cell" colspan={columnsCount}>
       <BatchActions {workflows} />
@@ -56,7 +56,7 @@
   {:else}
     <slot />
   {/if}
-  <th class="configuration-button-table-cell" />
+  <th class="configuration-button-table-cell"></th>
 </tr>
 
 <style lang="postcss">

@@ -23,7 +23,7 @@
   import { capitalize } from '$lib/utilities/format-camel-case';
   import { formatUTCOffset, getLocalTime } from '$lib/utilities/format-date';
 
-  export let position: 'left' | 'right' = 'right';
+  let { position = 'right' }: { position?: 'left' | 'right' } = $props();
 
   const localTime = getLocalTime();
   const QuickTimezoneOptions: TimeFormatOptions = [
@@ -34,18 +34,20 @@
     { label: translate('common.local'), value: 'local' },
   ];
 
-  let search = '';
+  let search = $state('');
 
-  $: filteredOptions = !search
-    ? TimezoneOptions
-    : TimezoneOptions.filter(({ abbr, value, zones }) => {
-        const searchValue = search.trim().toLowerCase();
-        return (
-          value.toLowerCase().includes(searchValue) ||
-          abbr?.toLowerCase().includes(searchValue) ||
-          zones?.some((zone) => zone.toLowerCase().includes(searchValue))
-        );
-      });
+  const filteredOptions = $derived(
+    !search
+      ? TimezoneOptions
+      : TimezoneOptions.filter(({ abbr, value, zones }) => {
+          const searchValue = search.trim().toLowerCase();
+          return (
+            value.toLowerCase().includes(searchValue) ||
+            abbr?.toLowerCase().includes(searchValue) ||
+            zones?.some((zone) => zone.toLowerCase().includes(searchValue))
+          );
+        }),
+  );
 
   const selectTimezone = (value: TimeFormat) => {
     if ($relativeTime && value !== 'local') $relativeTime = false;
@@ -60,10 +62,11 @@
     }
   };
 
-  $: timezone =
+  const timezone = $derived(
     Timezones[$timeFormat]?.abbr ??
-    Timezones[$timeFormat]?.label ??
-    capitalize($timeFormat);
+      Timezones[$timeFormat]?.label ??
+      capitalize($timeFormat),
+  );
 
   onMount(() => {
     if (String($timeFormat) === 'relative') {

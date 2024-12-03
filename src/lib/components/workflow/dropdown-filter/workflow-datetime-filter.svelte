@@ -31,29 +31,33 @@
 
   const localTime = getLocalTime() || translate('common.local');
 
-  let custom = false;
-  let value = 'All Time';
-  let timeField = 'StartTime';
+  let custom = $state(false);
+  let value = $state('All Time');
+  let timeField = $state('StartTime');
 
-  let startDate = startOfDay(new Date());
-  let endDate = startOfDay(new Date());
+  let startDate = $state(startOfDay(new Date()));
+  let endDate = $state(startOfDay(new Date()));
 
-  let startHour = '';
-  let startMinute = '';
-  let startSecond = '';
-  let startHalf: 'AM' | 'PM' = 'AM';
+  let startHour = $state('');
+  let startMinute = $state('');
+  let startSecond = $state('');
+  let startHalf: 'AM' | 'PM' = $state('AM');
 
-  let endHour = '';
-  let endMinute = '';
-  let endSecond = '';
-  let endHalf: 'AM' | 'PM' = 'AM';
+  let endHour = $state('');
+  let endMinute = $state('');
+  let endSecond = $state('');
+  let endHalf: 'AM' | 'PM' = $state('AM');
 
-  $: timeFilter = $workflowFilters.find(
-    (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
+  const timeFilter = $derived(
+    $workflowFilters.find(
+      (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
+    ),
   );
-  $: useBetweenDateTimeQuery = custom || !$supportsAdvancedVisibility;
+  const useBetweenDateTimeQuery = $derived(
+    custom || !$supportsAdvancedVisibility,
+  );
 
-  const setTimeValues = () => {
+  const setTimeValues = (timeFilter: SearchAttributeFilter) => {
     if (!timeFilter) {
       value = 'All Time';
       timeField = 'StartTime';
@@ -66,7 +70,9 @@
     }
   };
 
-  $: timeFilter, setTimeValues();
+  $effect(() => {
+    setTimeValues(timeFilter);
+  });
 
   const getOtherFilters = () =>
     $workflowFilters.filter(

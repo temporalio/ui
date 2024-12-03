@@ -68,10 +68,7 @@
           role="none"
         >
           <slot name="action" />
-          <Icon
-            class="m-2 shrink-0"
-            name={open ? 'chevron-up' : 'chevron-down'}
-          />
+          <Icon className="m-2" name={open ? 'chevron-up' : 'chevron-down'} />
         </div>
       </div>
       <p class="flex items-center">

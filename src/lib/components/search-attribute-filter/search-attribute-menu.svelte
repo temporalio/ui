@@ -64,7 +64,7 @@
   </MenuButton>
   <Menu id="search-attribute-menu" keepOpen>
     <MenuItem
-      class="p-0"
+      className="p-0"
       hoverable={false}
       on:click={() => {
         document.getElementById('filter-search')?.focus();
@@ -93,7 +93,7 @@
         {label}
       </MenuItem>
     {:else}
-      <MenuItem class="whitespace-nowrap" disabled
+      <MenuItem className="whitespace-nowrap" disabled
         >{translate('common.no-results')}</MenuItem
       >
     {/each}

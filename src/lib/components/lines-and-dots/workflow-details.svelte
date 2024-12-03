@@ -46,8 +46,8 @@
       class="order-2"
     />
 
-    <div class="hidden lg:order-4 lg:block xl:order-5" />
-    <div class="hidden lg:order-7 lg:block xl:hidden" />
+    <div class="hidden lg:order-4 lg:block xl:order-5"></div>
+    <div class="hidden lg:order-7 lg:block xl:hidden"></div>
     <WorkflowDetail
       title={translate('common.end')}
       tooltip={$relativeTime
