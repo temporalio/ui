@@ -51,7 +51,7 @@
   items={filteredForStatus(items)}
   let:visibleItems
   variant="split"
-  maxHeight="calc(100vh - 200px)"
+  maxHeight="100%"
 >
   {#if !compact}
     <HistoryGraph {groups} history={history(visibleItems)} />
