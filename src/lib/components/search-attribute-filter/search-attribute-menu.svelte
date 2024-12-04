@@ -12,7 +12,10 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
-  import type { SearchAttributeType } from '$lib/types/workflows';
+  import {
+    SEARCH_ATTRIBUTE_TYPE,
+    type SearchAttributeType,
+  } from '$lib/types/workflows';
   import { getFocusedElementId } from '$lib/utilities/query/search-attribute-filter';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
@@ -34,7 +37,8 @@
 
   function handleNewQuery(value: string, type: SearchAttributeType) {
     searchAttributeValue = '';
-    filter.set({ ...emptyFilter(), attribute: value, conditional: '=', type });
+    const conditional = type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST ? 'in' : '=';
+    filter.set({ ...emptyFilter(), attribute: value, conditional, type });
     $focusedElementId = getFocusedElementId($filter);
   }
 

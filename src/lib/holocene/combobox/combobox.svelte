@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
-  import { writable } from 'svelte/store';
+  import { writable, type Writable } from 'svelte/store';
 
   import { createEventDispatcher } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -24,6 +24,7 @@
     change: { value: string | T };
     filter: string;
     close: { selectedOption: string | T };
+    input: string;
   }>();
 
   type ExtendedInputEvent = Event & {
@@ -48,13 +49,10 @@
     actionTooltip?: string;
     href?: string;
     hrefDisabled?: boolean;
-    /**
-     * Use Keypress to receive the event after the combobox has done it's updating for async operations
-     * @param event
-     */
-    keypress?: (event: KeyboardEvent) => void;
     loading?: boolean;
     loadingText?: string;
+    open?: Writable<boolean>;
+    maxMenuHeight?: string;
   }
 
   type MultiSelectProps = {
@@ -99,7 +97,6 @@
   export let label: string;
   export let multiselect = false;
   export let value: string | string[] = multiselect ? [] : undefined;
-  export let keypress: BaseProps['keypress'] = () => {};
   export let noResultsText: string;
   export let disabled = false;
   export let labelHidden = false;
@@ -136,7 +133,20 @@
   let selectedOption: string | T;
   let menuElement: HTMLUListElement;
   let inputElement: HTMLInputElement;
-  const open = writable<boolean>(false);
+
+  export let open = writable<boolean>(false);
+  export let maxMenuHeight: string = 'max-h-[20rem]';
+
+  // We need this piece of code to focus the element when externally modifying the
+  // open store. Specifically we use this behaviour in bottom nav to focus the combobox
+  // after the bottom nav is clicked
+  $: {
+    if ($open && inputElement && document.activeElement !== inputElement) {
+      inputElement.focus();
+      inputElement.select();
+    }
+  }
+
   // We want this to react to external changes to the options prop to support async use cases
   $: list = filterOptions(filterValue, options);
 
@@ -331,6 +341,7 @@
     // Reactive statement at top makes this work, not my favorite tho
     displayValue = event.currentTarget.value;
     filterValue = displayValue;
+    dispatch('input', displayValue);
   };
 
   function filterOptions(value: string, options: (T | string)[]) {
@@ -418,7 +429,6 @@
         on:focus|stopPropagation={openList}
         on:input|stopPropagation={handleInput}
         on:keydown|stopPropagation={handleInputKeydown}
-        on:keyup={keypress}
         on:click|stopPropagation={handleInputClick}
         data-testid={$$props['data-testid'] ?? id}
         bind:this={inputElement}
@@ -461,11 +471,12 @@
   </div>
 
   <Menu
-    keepOpen={multiselect}
+    keepOpen={multiselect || true}
     bind:menuElement
     id="{id}-listbox"
     role="listbox"
     class="w-full"
+    maxHeight={maxMenuHeight}
   >
     {#if multiselect && isArrayValue(value)}
       <ComboboxOption

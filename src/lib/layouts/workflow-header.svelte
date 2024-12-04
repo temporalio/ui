@@ -98,7 +98,7 @@
     {/if}
   </div>
 </div>
-<header class="rounded-top flex flex-col gap-1">
+<header class="rounded-top flex flex-col gap-2">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
     <div class="flex flex-col items-center gap-4 lg:flex-row">
       <WorkflowStatus status={workflow?.status} big />
@@ -146,8 +146,37 @@
     </AccordionLight>
   {/if}
   <WorkflowDetails />
+  {#if cancelInProgress}
+    <div in:fly={{ duration: 200, delay: 100 }}>
+      <Alert
+        icon="info"
+        intent="info"
+        title={translate('workflows.cancel-request-sent')}
+      >
+        {translate('workflows.cancel-request-sent-description')}
+      </Alert>
+    </div>
+  {/if}
+  {#if workflowHasBeenReset}
+    <div in:fly={{ duration: 200, delay: 100 }}>
+      <Alert
+        icon="info"
+        intent="info"
+        data-testid="workflow-reset-alert"
+        title={translate('workflows.reset-success-alert-title')}
+      >
+        You can find the resulting Workflow Execution <Link
+          href={routeForEventHistory({
+            namespace,
+            workflow: $workflowRun?.workflow?.id,
+            run: $resetWorkflows[$workflowRun?.workflow?.runId],
+          })}>here</Link
+        >.
+      </Alert>
+    </div>
+  {/if}
   <Tabs>
-    <TabList class="flex flex-wrap gap-6 pb-1 pt-4" label="workflow detail">
+    <TabList class="flex flex-wrap gap-6 pt-2" label="workflow detail">
       <Tab
         label={translate('workflows.history-tab')}
         id="history-tab"
@@ -240,34 +269,4 @@
       />
     </TabList>
   </Tabs>
-
-  {#if cancelInProgress}
-    <div in:fly={{ duration: 200, delay: 100 }}>
-      <Alert
-        icon="info"
-        intent="info"
-        title={translate('workflows.cancel-request-sent')}
-      >
-        {translate('workflows.cancel-request-sent-description')}
-      </Alert>
-    </div>
-  {/if}
-  {#if workflowHasBeenReset}
-    <div in:fly={{ duration: 200, delay: 100 }}>
-      <Alert
-        icon="info"
-        intent="info"
-        data-testid="workflow-reset-alert"
-        title={translate('workflows.reset-success-alert-title')}
-      >
-        You can find the resulting Workflow Execution <Link
-          href={routeForEventHistory({
-            namespace,
-            workflow: $workflowRun?.workflow?.id,
-            run: $resetWorkflows[$workflowRun?.workflow?.runId],
-          })}>here</Link
-        >.
-      </Alert>
-    </div>
-  {/if}
 </header>

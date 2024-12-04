@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
 
   import { twMerge as merge } from 'tailwind-merge';
@@ -18,12 +19,12 @@
   import BottomNavNamespaces from './bottom-nav-namespaces.svelte';
   import BottomNavSettings from './bottom-nav-settings.svelte';
 
-  export let namespaceList: NamespaceListItem[] = [];
+  export let namespaceList: NamespaceListItem[] | undefined = [];
   export let linkList: NavLinkListItem[];
   export let isCloud = false;
 
   let viewLinks = false;
-  let viewNamespaces = false;
+  let viewNamespaces = writable(false);
   let viewSettings = false;
 
   $: namespace = $page.params.namespace || $lastUsedNamespace;
@@ -33,29 +34,29 @@
 
   const onLinksClick = () => {
     viewSettings = false;
-    viewNamespaces = false;
+    $viewNamespaces = false;
     viewLinks = !viewLinks;
   };
 
   const onNamespaceClick = () => {
     viewLinks = false;
-    viewNamespaces = !viewNamespaces;
+    $viewNamespaces = !$viewNamespaces;
     viewSettings = false;
   };
 
   const onSettingsClick = () => {
     viewLinks = false;
-    viewNamespaces = false;
+    $viewNamespaces = false;
     viewSettings = !viewSettings;
   };
 
   beforeNavigate(() => {
     viewLinks = false;
     viewSettings = false;
-    viewNamespaces = false;
+    $viewNamespaces = false;
   });
 
-  $: menuIsOpen = viewLinks || viewNamespaces || viewSettings;
+  $: menuIsOpen = viewLinks || $viewNamespaces || viewSettings;
 
   const truncateNamespace = (namespace: string) => {
     if (namespace.length > 16) {
@@ -73,7 +74,9 @@
     out:slide={{ duration: 200, delay: 0 }}
   >
     <BottomNavLinks open={viewLinks} {linkList} />
-    <BottomNavNamespaces open={viewNamespaces} {namespaceList} />
+    <slot name="nsPicker" open={viewNamespaces}>
+      <BottomNavNamespaces open={$viewNamespaces} {namespaceList} />
+    </slot>
     <BottomNavSettings open={viewSettings}>
       <slot />
     </BottomNavSettings>

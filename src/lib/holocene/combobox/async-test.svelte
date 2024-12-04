@@ -14,10 +14,10 @@
 
   export let id = '';
 
-  function keypress(stuff) {
+  function input(stuff: CustomEvent) {
     loading = true;
-    value = stuff.target.value;
-
+    value = stuff.detail;
+    console.log(value);
     options = syncOptions;
 
     // This makes sure the worst case always happens the newest value comes first
@@ -41,7 +41,7 @@
           // console.log("it's old!", { value });
         }
       },
-      2000 + i * 100,
+      2000 + i * 25,
       value,
     );
   }
@@ -50,7 +50,7 @@
 <Combobox
   bind:value
   {options}
-  {keypress}
+  on:input={input}
   on:change={(newVal) => {
     console.log('change', newVal);
   }}
