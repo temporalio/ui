@@ -16,21 +16,23 @@
   export let badge = false;
 </script>
 
-<p class="flex items-center gap-2 whitespace-nowrap {$$restProps.class}">
+<p
+  class="flex h-4 items-center justify-between gap-16 truncate whitespace-nowrap {$$restProps.class}"
+>
+  {#if title}
+    <span class="font-mono">{title}</span>
+  {/if}
+  {#if icon}
+    <Icon name={icon} />
+  {/if}
   {#if copyable}
     <Copyable
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       {content}
       visible
-      container-class="gap-1 w-full h-4"
+      container-class="gap-1 w-full justify-end"
     >
-      {#if icon}
-        <Icon name={icon} />
-      {/if}
-      {#if title}
-        <i>{title}</i>
-      {/if}
       {#if href}
         <Link
           {href}
@@ -50,26 +52,18 @@
         </Tooltip>
       {/if}
     </Copyable>
+  {:else if href}
+    <Link
+      {href}
+      class="value truncate rounded-sm p-1 leading-4 {badge &&
+        'surface-subtle'}">{content}</Link
+    >
   {:else}
-    {#if title}
-      <i>{title}</i>
-    {/if}
-    {#if icon}
-      <Icon name={icon} />
-    {/if}
-    {#if href}
-      <Link
-        {href}
-        class="value truncate rounded-sm p-1 leading-4 {badge &&
-          'surface-subtle'}">{content}</Link
+    <Tooltip text={tooltip} hide={!tooltip} top>
+      <span
+        class="w-fit select-all truncate rounded-sm p-1 leading-4"
+        class:surface-subtle={badge}>{content}</span
       >
-    {:else}
-      <Tooltip text={tooltip} hide={!tooltip} top>
-        <span
-          class="w-fit select-all truncate rounded-sm p-1 leading-4"
-          class:surface-subtle={badge}>{content}</span
-        >
-      </Tooltip>
-    {/if}
+    </Tooltip>
   {/if}
 </p>
