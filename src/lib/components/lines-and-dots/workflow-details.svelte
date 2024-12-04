@@ -84,7 +84,7 @@
   <div class="flex w-full flex-col gap-2 xl:w-1/3">
     {#if workflow?.parent}
       <WorkflowDetail
-        title="Parent Workflow"
+        title={translate('workflows.parent-workflow')}
         content={workflow?.parent?.workflowId}
         href={routeForWorkflow({
           namespace,

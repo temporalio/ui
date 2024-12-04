@@ -17,7 +17,7 @@
 </script>
 
 <p
-  class="flex h-4 items-center justify-between gap-16 whitespace-nowrap {$$restProps.class}"
+  class="flex h-4 items-center justify-between gap-16 truncate whitespace-nowrap {$$restProps.class}"
 >
   {#if title}
     <span class="font-mono">{title}</span>
