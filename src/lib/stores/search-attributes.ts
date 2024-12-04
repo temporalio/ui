@@ -1,6 +1,7 @@
 import { derived, get, type Readable, writable } from 'svelte/store';
 
 import type {
+  SEARCH_ATTRIBUTE_TYPE,
   SearchAttributes,
   SearchAttributeType,
   WorkflowExecution,
@@ -66,12 +67,42 @@ export type SearchAttributeOption = {
   type: SearchAttributeType;
 };
 
-export type SearchAttributeInputValue = string | number | string[];
-
-export type SearchAttributeInput = {
-  attribute: string;
-  value: SearchAttributeInputValue;
+type BaseSearchAttributeInput = {
+  label: string;
 };
+
+type BoolSearchAttributeInput = BaseSearchAttributeInput & {
+  value: boolean;
+  type: typeof SEARCH_ATTRIBUTE_TYPE.BOOL;
+};
+
+type NumberSearchAttributeInput = BaseSearchAttributeInput & {
+  value: number;
+  type: typeof SEARCH_ATTRIBUTE_TYPE.INT | typeof SEARCH_ATTRIBUTE_TYPE.DOUBLE;
+};
+
+type StringSearchAttributeInput = BaseSearchAttributeInput & {
+  value: string;
+  type:
+    | typeof SEARCH_ATTRIBUTE_TYPE.TEXT
+    | typeof SEARCH_ATTRIBUTE_TYPE.KEYWORD
+    | typeof SEARCH_ATTRIBUTE_TYPE.DATETIME;
+};
+
+type ListSearchAttributeInput = BaseSearchAttributeInput & {
+  value: string[];
+  type: typeof SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST;
+};
+export type SearchAttributeInput =
+  | {
+      label: null;
+      value: null;
+      type: typeof SEARCH_ATTRIBUTE_TYPE.UNSPECIFIED;
+    }
+  | BoolSearchAttributeInput
+  | NumberSearchAttributeInput
+  | StringSearchAttributeInput
+  | ListSearchAttributeInput;
 
 export const searchAttributeOptions: Readable<SearchAttributeOption[]> =
   derived([searchAttributes], ([$searchAttributes]) => {
