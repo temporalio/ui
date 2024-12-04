@@ -15,7 +15,7 @@
   <span
     class="surface-secondary flex h-16 w-16 items-center justify-center rounded-full"
   >
-    <Icon name={icon} class="block h-full w-full" /></span
+    <Icon name={icon} className="block h-full w-full" /></span
   >
   <p class="text-xl font-medium">{title}</p>
   {#if content}

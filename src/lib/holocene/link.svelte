@@ -49,7 +49,7 @@
   {...$$restProps}
 >
   {#if icon}
-    <Icon class="mt-0.5" name={icon} />
+    <Icon className="mt-0.5" name={icon} />
   {/if}
   {#if text}
     {text}

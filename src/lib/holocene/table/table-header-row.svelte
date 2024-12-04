@@ -1,5 +1,5 @@
 <tr class={$$props.class}>
-  <td />
+  <td></td>
   <slot />
-  <td />
+  <td></td>
 </tr>

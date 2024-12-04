@@ -61,7 +61,7 @@
     controls="event-date-filter-menu"
     data-testid="event-date-filter-button"
   >
-    <Icon class="md:hidden" name="clock" />
+    <Icon className="md:hidden" name="clock" />
     <span class="max-md:hidden">{translate('common.date-and-time')}</span>
   </MenuButton>
   <Menu class="w-80" id="event-date-filter-menu">

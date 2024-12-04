@@ -3,7 +3,7 @@
 </script>
 
 <div class="meter">
-  <span style="width: {width};" />
+  <span style="width: {width};"></span>
 </div>
 
 <style lang="postcss">

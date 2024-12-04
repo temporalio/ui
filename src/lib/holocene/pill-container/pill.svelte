@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
-  import { noop } from 'svelte/internal';
 
   import { getContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -24,7 +23,7 @@
   } & HTMLButtonAttributes;
 
   export let id: string;
-  export let onClick: () => void = noop;
+  export let onClick: () => void = () => {};
   export let disabled = false;
   export let loading = false;
   export let active: boolean = null;

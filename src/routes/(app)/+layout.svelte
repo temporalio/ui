@@ -10,7 +10,8 @@
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
   import Banner from '$lib/holocene/banner/banner.svelte';
-  import { ErrorBoundary } from '$lib/holocene/error-boundary';
+  import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
+  import Error from '$lib/holocene/error.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
@@ -20,7 +21,7 @@
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
-  import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
+  import type { NavLinkListItem } from '$lib/types/global';
   import DarkMode from '$lib/utilities/dark-mode';
   import {
     routeForArchivalWorkfows,
@@ -35,26 +36,32 @@
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
-  let namespaceList: NamespaceListItem[];
+  let { children }: { children: any } = $props();
 
-  $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
-  $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
-  $: namespaceNames = isCloud
-    ? [$page.params.namespace]
-    : $namespaces.map((namespace: Namespace) => namespace?.namespaceInfo?.name);
-  $: namespaceList = namespaceNames.map((namespace: string) => {
-    const getHref = (namespace: string) =>
-      isCloud ? routeForWorkflows({ namespace }) : getCurrentHref(namespace);
-    return {
-      namespace,
-      onClick: (namespace: string) => {
-        $lastUsedNamespace = namespace;
-        goto(getHref(namespace));
-      },
-    };
-  });
-
-  $: linkList = getLinkList(activeNamespaceName, !!$inProgressBatchOperation);
+  const isCloud = $derived($page.data?.settings?.runtimeEnvironment?.isCloud);
+  const activeNamespaceName = $derived(
+    $page.params?.namespace ?? $lastUsedNamespace,
+  );
+  const namespaceNames = $derived(
+    isCloud
+      ? [$page.params.namespace]
+      : $namespaces.map(
+          (namespace: Namespace) => namespace?.namespaceInfo?.name,
+        ),
+  );
+  const namespaceList = $derived(
+    namespaceNames.map((namespace: string) => {
+      const getHref = (namespace: string) =>
+        isCloud ? routeForWorkflows({ namespace }) : getCurrentHref(namespace);
+      return {
+        namespace,
+        onClick: (namespace: string) => {
+          $lastUsedNamespace = namespace;
+          goto(getHref(namespace));
+        },
+      };
+    }),
+  );
 
   const getLinkList = (
     namespace: string,
@@ -137,6 +144,10 @@
     ];
   };
 
+  const linkList = $derived(
+    getLinkList(activeNamespaceName, !!$inProgressBatchOperation),
+  );
+
   function getCurrentHref(namespace: string) {
     const namespacePages = [
       {
@@ -206,8 +217,8 @@
       slot="main"
       class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
     >
-      <ErrorBoundary onError={() => {}}>
-        <slot />
+      <ErrorBoundary>
+        {@render children()}
       </ErrorBoundary>
     </div>
     <BottomNavigation slot="footer" {linkList} {namespaceList} {isCloud}>

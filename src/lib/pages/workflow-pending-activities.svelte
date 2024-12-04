@@ -55,7 +55,7 @@
               <h4>{translate('workflows.attempt')}</h4>
               <Badge type={failed ? 'danger' : undefined}>
                 {#if failed}
-                  <Icon class="mr-1" name="retry" />
+                  <Icon className="mr-1" name="retry" />
                 {/if}
                 {details.attempt}
               </Badge>
@@ -97,29 +97,31 @@
               {#if details.heartbeatDetails}
                 <li class="event-table-row">
                   <h4>{translate('workflows.heartbeat-details')}</h4>
-                  <CodeBlock
-                    slot="value"
-                    class="pb-2"
-                    content={stringifyWithBigInt(details.heartbeatDetails)}
-                    copyIconTitle={translate('common.copy-icon-title')}
-                    copySuccessIconTitle={translate(
-                      'common.copy-success-icon-title',
-                    )}
-                  />
+                  <slot slot="value">
+                    <CodeBlock
+                      class="pb-2"
+                      content={stringifyWithBigInt(details.heartbeatDetails)}
+                      copyIconTitle={translate('common.copy-icon-title')}
+                      copySuccessIconTitle={translate(
+                        'common.copy-success-icon-title',
+                      )}
+                    />
+                  </slot>
                 </li>
               {/if}
               {#if details.lastFailure}
                 <li class="event-table-row">
                   <h4>{translate('workflows.last-failure')}</h4>
-                  <CodeBlock
-                    slot="value"
-                    class="pb-2"
-                    content={stringifyWithBigInt(details.lastFailure)}
-                    copyIconTitle={translate('common.copy-icon-title')}
-                    copySuccessIconTitle={translate(
-                      'common.copy-success-icon-title',
-                    )}
-                  />
+                  <slot slot="value">
+                    <CodeBlock
+                      class="pb-2"
+                      content={stringifyWithBigInt(details.lastFailure)}
+                      copyIconTitle={translate('common.copy-icon-title')}
+                      copySuccessIconTitle={translate(
+                        'common.copy-success-icon-title',
+                      )}
+                    />
+                  </slot>
                 </li>
               {/if}
               <li class="event-table-row">

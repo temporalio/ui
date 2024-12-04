@@ -130,7 +130,7 @@
       >
         <Icon
           name="flag"
-          class="text-indigo-600/80"
+          className="text-indigo-600/80"
           width={32}
           height={32}
         />{translate('workflows.summary-and-details')}

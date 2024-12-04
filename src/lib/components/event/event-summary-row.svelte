@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
   import { fade, slide } from 'svelte/transition';
 
   import { page } from '$app/stores';
@@ -44,7 +43,7 @@
   export let expandAll = false;
   export let typedError = false;
   export let active = false;
-  export let onRowClick: () => void = noop;
+  export let onRowClick: () => void = () => {};
 
   $: selectedId = isEventGroup(event)
     ? Array.from(event.events.keys()).shift()
@@ -183,7 +182,7 @@
         class="flex items-center gap-1 {pendingAttempt > 1 &&
           'surface-retry rounded px-1 py-0.5'}"
       >
-        <Icon class="mr-1.5 inline" name="retry" />
+        <Icon className="mr-1.5 inline" name="retry" />
         {translate('workflows.attempt')}
         {pendingAttempt}
         {#if hasPendingActivity}

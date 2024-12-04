@@ -1,18 +1,18 @@
 <div class="row">
   <div class="cell md:table-cell">
-    <p />
+    <p></p>
   </div>
   <div class="cell w-1/2 md:table-cell">
     <p>Loading</p>
   </div>
   <div class="cell md:table-cell">
-    <p />
+    <p></p>
   </div>
   <div class="cell inline-block md:hidden xl:table-cell">
-    <p />
+    <p></p>
   </div>
   <div class="cell inline-block md:hidden xl:table-cell">
-    <p />
+    <p></p>
   </div>
 </div>
 

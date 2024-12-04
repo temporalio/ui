@@ -14,7 +14,7 @@
   let requestFromAPIError: Record<string, unknown>;
 
   try {
-    requestFromAPIError = parseWithBigInt(error.message);
+    requestFromAPIError = parseWithBigInt(error?.message);
 
     if (isNetworkError(requestFromAPIError)) {
       status = requestFromAPIError.statusCode;
