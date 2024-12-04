@@ -34,7 +34,6 @@
     language?: 'json' | 'text' | 'shell';
     editable?: boolean;
     inline?: boolean;
-    grow?: boolean;
     testId?: string;
     copyable?: boolean;
     minHeight?: number;
