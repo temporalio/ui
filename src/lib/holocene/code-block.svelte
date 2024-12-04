@@ -57,7 +57,6 @@
   export { className as class };
   export let editable = false;
   export let inline = false;
-  export let grow = true;
   export let language = 'json';
   export let copyable = true;
   export let copyIconTitle = '';
@@ -190,7 +189,7 @@
   $: content, language, setView();
 </script>
 
-<div class:grow class="relative min-w-[80px]">
+<div class="relative min-w-[80px] grow-0">
   <div
     bind:this={editor}
     class={className}

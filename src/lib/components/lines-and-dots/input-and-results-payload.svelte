@@ -35,7 +35,6 @@
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
             maxHeight={300}
-            grow={false}
           />
         {/each}
       </PayloadDecoder>
@@ -46,7 +45,6 @@
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
           maxHeight={300}
-          grow={false}
         />
       </PayloadDecoder>
     {/if}
@@ -56,7 +54,6 @@
       language="text"
       copyable={false}
       maxHeight={300}
-      grow={false}
     />
   {/if}
 </div>
