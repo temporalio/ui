@@ -34,7 +34,7 @@
 
 <section
   aria-roledescription="error"
-  class="flex flex-col items-center justify-center gap-4 border-2 border-danger bg-danger px-24 py-12"
+  class="flex w-full flex-col items-center justify-center gap-4 border-2 border-danger bg-danger px-24 py-12"
   role="alert"
 >
   <h1 class="text-[12rem] font-semibold leading-none">{status}</h1>
