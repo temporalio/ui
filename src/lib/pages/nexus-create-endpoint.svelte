@@ -40,14 +40,18 @@
     {callerNamespaceList}
     {isCloud}
   />
-  <div class="flex items-center gap-4">
+  <div class="flex flex-row items-center gap-4 max-sm:flex-col">
     <Button
       variant="primary"
       on:click={onCreate}
       disabled={createDisabled}
+      class="max-sm:w-full"
       {loading}>{translate('nexus.create-endpoint')}</Button
     >
-    <Button variant="ghost" on:click={() => goto(routeForNexus())}
+    <Button
+      variant="ghost"
+      class="max-sm:w-full"
+      on:click={() => goto(routeForNexus())}
       >{translate('common.cancel')}</Button
     >
   </div>
