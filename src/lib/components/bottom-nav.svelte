@@ -75,7 +75,7 @@
   >
     <BottomNavLinks open={viewLinks} {linkList} />
     <slot name="nsPicker" open={viewNamespaces}>
-      <BottomNavNamespaces open={$viewNamespaces} />
+      <BottomNavNamespaces open={$viewNamespaces} {namespaceList} />
     </slot>
     <BottomNavSettings open={viewSettings}>
       <slot />
