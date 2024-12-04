@@ -14,6 +14,7 @@ import bookmark from './svg/bookmark.svelte';
 import calendarPlus from './svg/calendar-plus.svelte';
 import calendar from './svg/calendar.svelte';
 import canceled from './svg/canceled.svelte';
+import chartAscending from './svg/chart-ascending.svelte';
 import chart from './svg/chart.svelte';
 import checkmark from './svg/checkmark.svelte';
 import chevronDown from './svg/chevron-down.svelte';
@@ -67,6 +68,7 @@ import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
 import nexus from './svg/nexus.svelte';
+import officeBuildings from './svg/office-buildings.svelte';
 import pause from './svg/pause.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
@@ -93,6 +95,7 @@ import table from './svg/table.svelte';
 import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
 import timeline from './svg/timeline.svelte';
+import toolbox from './svg/toolbox.svelte';
 import transcoderError from './svg/transcoder-error.svelte';
 import transcoderOff from './svg/transcoder-off.svelte';
 import transcoderOn from './svg/transcoder-on.svelte';
@@ -121,6 +124,7 @@ export const icons = {
   'calendar-plus': calendarPlus,
   calendar,
   canceled,
+  'chart-ascending': chartAscending,
   chart,
   checkmark,
   'chevron-down': chevronDown,
@@ -174,6 +178,7 @@ export const icons = {
   'namespace-switcher': namespaceSwitcher,
   namespace,
   nexus,
+  'office-buildings': officeBuildings,
   play,
   pause,
   'pin-filled': pinFilled,
@@ -201,6 +206,7 @@ export const icons = {
   'temporal-logo': temporalLogo,
   terminal,
   timeline,
+  toolbox,
   'transcoder-error': transcoderError,
   'transcoder-on': transcoderOn,
   'transcoder-off': transcoderOff,

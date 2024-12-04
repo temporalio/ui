@@ -13,7 +13,10 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import { error, loading } from '$lib/stores/schedules';
-  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+  import {
+    customSearchAttributes,
+    type SearchAttributeInput,
+  } from '$lib/stores/search-attributes';
   import type {
     FullSchedule,
     ScheduleParameters,
@@ -84,9 +87,13 @@
   let second = '';
   let phase = '';
   let cronString = '';
-  let searchAttributesInput: SearchAttributeInput[] = Object.entries(
-    indexedFields,
-  ).map(([attribute, value]) => ({ attribute, value }));
+  let searchAttributesInput = Object.entries(indexedFields).map(
+    ([label, value]) => ({
+      label,
+      value,
+      type: $customSearchAttributes[label],
+    }),
+  ) as SearchAttributeInput[];
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: Partial<ScheduleParameters> = {

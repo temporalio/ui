@@ -142,14 +142,18 @@
         if (customSAKeys.includes(key)) {
           searchAttributes = [
             ...searchAttributes,
-            { attribute: key, value: String(value) },
+            {
+              label: key,
+              value,
+              type: $customSearchAttributes[key],
+            } as SearchAttributeInput,
           ];
         }
       });
     }
 
     if (
-      initialValues?.searchAttributes?.length ||
+      Object.keys(initialValues?.searchAttributes ?? {}).length ||
       initialValues?.summary ||
       initialValues?.details
     ) {

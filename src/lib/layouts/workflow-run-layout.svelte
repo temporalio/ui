@@ -226,7 +226,7 @@
     {:else if !$workflowRun.workflow}
       <Loading class="pt-24" />
     {:else}
-      <div class="border-b border-subtle px-8 pt-8 md:pt-20">
+      <div class="border-b border-subtle px-4 pt-8 md:pt-20 xl:px-8">
         <WorkflowHeader namespace={$page.params.namespace} />
       </div>
       <slot />

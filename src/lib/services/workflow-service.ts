@@ -488,7 +488,7 @@ export const setSearchAttributes = (
 
   const searchAttributes: SearchAttribute = {};
   attributes.forEach((attribute) => {
-    searchAttributes[attribute.attribute] = setBase64Payload(attribute.value);
+    searchAttributes[attribute.label] = setBase64Payload(attribute.value);
   });
 
   return searchAttributes;
@@ -648,8 +648,9 @@ export const fetchInitialValuesForStartWorkflow = async ({
         details = decodedDetails;
       }
     }
-
-    const input = stringifyWithBigInt(convertedAttributes?.payloads[0]);
+    const input = convertedAttributes?.payloads
+      ? stringifyWithBigInt(convertedAttributes.payloads[0])
+      : '';
     return {
       input,
       searchAttributes: workflow?.searchAttributes?.indexedFields,
