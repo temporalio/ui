@@ -8,7 +8,7 @@ import {
   type SearchAttributeType,
 } from '$lib/types/workflows';
 
-import { isNullConditional, isStartsWith } from '../is';
+import { isInConditional, isNullConditional, isStartsWith } from '../is';
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 
 export type QueryKey =
@@ -40,12 +40,23 @@ const isValid = (value: unknown, conditional: string): boolean => {
   return true;
 };
 
-const formatValue = (
-  value: string,
-  type: SearchAttributeType,
-): string | boolean => {
+const formatValue = ({
+  value,
+  type,
+  conditional,
+}: {
+  value: string;
+  type: SearchAttributeType;
+  conditional: string;
+}): string | boolean => {
   if (type === SEARCH_ATTRIBUTE_TYPE.BOOL) {
     return value.toLowerCase() === 'true' ? true : false;
+  }
+  if (
+    type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST &&
+    isInConditional(conditional)
+  ) {
+    return value;
   }
   return `"${value}"`;
 };
@@ -87,10 +98,18 @@ const toFilterQueryStatement = (
   }
 
   if (isStartsWith(conditional)) {
-    return `\`${queryKey}\` ${conditional} ${formatValue(value, type)}`;
+    return `\`${queryKey}\` ${conditional} ${formatValue({
+      value,
+      type,
+      conditional,
+    })}`;
   }
 
-  return `\`${queryKey}\`${conditional}${formatValue(value, type)}`;
+  return `\`${queryKey}\`${conditional}${formatValue({
+    value,
+    type,
+    conditional,
+  })}`;
 };
 
 const toQueryStatementsFromFilters = (

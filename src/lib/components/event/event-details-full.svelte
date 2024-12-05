@@ -20,13 +20,13 @@
 {#if showEventGroup}
   <div class="w-full p-2">
     <div
-      class="flex flex-col gap-0 overflow-hidden rounded-xl border-2 border-subtle xl:flex-row"
+      class="flex flex-col gap-0 overflow-hidden rounded-xl border border-subtle xl:flex-row"
     >
       {#each group.eventList as groupEvent}
         {@const attributes = formatAttributes(groupEvent)}
         {@const details = Object.entries(attributes)}
         <div
-          class="w-full border-subtle [&:not(:last-child)]:border-r-2"
+          class="w-full border-subtle [&:not(:last-child)]:border-r"
           class:three-events={group.eventList.length === 3 ||
             (group.eventList.length === 2 && pendingEvent)}
           class:two-events={group.eventList.length === 2 ||
@@ -54,7 +54,7 @@
       {#if pendingEvent}
         {@const details = Object.entries(pendingEvent)}
         <div
-          class="w-full border-subtle [&:not(:last-child)]:border-r-2"
+          class="w-full border-subtle [&:not(:last-child)]:border-r"
           class:three-events={group.eventList.length === 2}
           class:two-events={group.eventList.length === 1}
         >
@@ -76,7 +76,7 @@
   {@const attributes = formatAttributes(event)}
   {@const details = Object.entries(attributes)}
   <div class="w-full p-2">
-    <div class="w-full overflow-hidden rounded-xl border-2 border-subtle">
+    <div class="w-full overflow-hidden rounded-xl border border-subtle">
       <EventLinksExpanded links={event?.links} />
       {#each details as [key, value] (key)}
         <EventDetailsRowExpanded {key} {value} {attributes} />

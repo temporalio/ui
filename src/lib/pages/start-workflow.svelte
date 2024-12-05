@@ -6,14 +6,19 @@
 
   import { page } from '$app/stores';
 
-  import PayloadInput, {
+  import PayloadInputWithEncoding, {
     type PayloadInputEncoding,
-  } from '$lib/components/payload-input.svelte';
+  } from '$lib/components/payload-input-with-encoding.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Card from '$lib/holocene/card.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Editor from '$lib/holocene/monaco/editor.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getPollers } from '$lib/services/pollers-service';
   import {
@@ -41,6 +46,8 @@
   let taskQueue = '';
   let workflowType = '';
   let input = '';
+  let summary = '';
+  let details = '';
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let inputRetrieved = 0;
 
@@ -76,6 +83,8 @@
         taskQueue,
         workflowType,
         input,
+        summary,
+        details,
         encoding: $encoding,
         searchAttributes,
       });
@@ -105,6 +114,7 @@
       value: workflowId,
       url: $page.url,
       allowEmpty: true,
+      options: { keepFocus: true, noScroll: true, replaceState: true },
     });
   };
 
@@ -123,16 +133,30 @@
     });
     input = initialValues.input;
     inputRetrieved = Date.now();
+    summary = initialValues.summary;
+    details = initialValues.details;
+
     if (initialValues?.searchAttributes) {
       const customSAKeys = Object.keys($customSearchAttributes);
       Object.entries(initialValues.searchAttributes).forEach(([key, value]) => {
         if (customSAKeys.includes(key)) {
           searchAttributes = [
             ...searchAttributes,
-            { attribute: key, value: String(value) },
+            {
+              label: key,
+              value,
+              type: $customSearchAttributes[key],
+            } as SearchAttributeInput,
           ];
         }
       });
+    }
+
+    if (
+      Object.keys(initialValues?.searchAttributes ?? {}).length ||
+      initialValues?.summary ||
+      initialValues?.details
+    ) {
       viewAdvancedOptions = true;
     }
   };
@@ -144,6 +168,7 @@
       value,
       url: $page.url,
       allowEmpty: true,
+      options: { keepFocus: true, noScroll: true, replaceState: true },
     });
   };
 
@@ -168,7 +193,7 @@
   $: checkTaskQueue(taskQueueParam);
 </script>
 
-<div class="flex w-full flex-col items-center pb-24">
+<div class="flex w-full flex-col items-center pb-10">
   <div class="mb-6 flex w-full items-start">
     <Link
       href={`${routeForWorkflows({
@@ -239,14 +264,43 @@
       on:blur={(e) => onInputChange(e, 'workflowType')}
     />
     {#key inputRetrieved}
-      <PayloadInput bind:input bind:encoding />
+      <PayloadInputWithEncoding bind:input bind:encoding />
     {/key}
     {#if viewAdvancedOptions}
+      <Card class="flex flex-col gap-2">
+        <div class="flex justify-between">
+          <h3>{translate('workflows.user-metadata')}</h3>
+          <p class="flex items-center gap-1 text-sm text-subtle">
+            {translate('workflows.markdown-supported')}
+            <Tooltip
+              topRight
+              width={200}
+              text={translate('workflows.markdown-description')}
+            >
+              <Icon name="info" /></Tooltip
+            >
+          </p>
+        </div>
+        <Label label={translate('workflows.summary')} for="summary" />
+        <Editor
+          content={summary}
+          on:change={(event) => (summary = event.detail.value)}
+          class="min-h-48"
+        />
+        <Label label={translate('workflows.details')} for="details" />
+        <Editor
+          content={details}
+          on:change={(event) => (details = event.detail.value)}
+        />
+      </Card>
       <AddSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}
-    <div class="mt-4 flex w-full justify-between">
+    <div
+      class="mt-4 flex w-full flex-row justify-between gap-4 max-sm:flex-col"
+    >
       <Button
         variant="ghost"
+        class="max-sm:w-full"
         trailingIcon={viewAdvancedOptions ? 'chevron-up' : 'chevron-down'}
         on:click={() => (viewAdvancedOptions = !viewAdvancedOptions)}
         >{translate('common.more-options')}</Button
@@ -255,7 +309,7 @@
         disabled={!enableStart}
         on:click={onWorkflowStart}
         data-testid="start-workflow-button"
-        >{translate('workflows.start-workflow')}</Button
+        class="max-sm:w-full">{translate('workflows.start-workflow')}</Button
       >
     </div>
     {#if error}

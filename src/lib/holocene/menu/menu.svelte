@@ -14,6 +14,7 @@
     keepOpen?: boolean;
     position?: 'left' | 'right' | 'top-left' | 'top-right';
     menuElement?: HTMLUListElement;
+    maxHeight?: string;
   }
 
   let className = '';
@@ -23,6 +24,7 @@
   export let keepOpen = false;
   export let position: 'left' | 'right' | 'top-left' | 'top-right' = 'left';
   export let menuElement: HTMLUListElement = null;
+  export let maxHeight: string = 'max-h-[20rem]';
 
   const {
     keepOpen: keepOpenCtx,
@@ -44,7 +46,7 @@
 <ul
   in:fly={{ duration: 100 }}
   role="menu"
-  class={merge('menu', 'max-h-[20rem]', position, className)}
+  class={merge('menu', maxHeight, position, className)}
   class:hidden={!$open}
   aria-labelledby={id}
   tabindex={-1}
@@ -63,7 +65,7 @@
 
 <style lang="postcss">
   .menu {
-    @apply surface-primary absolute z-20 mt-1 min-w-fit list-none overflow-auto rounded-lg border-2 border-subtle text-primary shadow;
+    @apply surface-primary absolute z-20 mt-1 min-w-fit list-none overflow-auto rounded-lg border border-subtle text-primary shadow;
 
     &.left,
     &.top-left {

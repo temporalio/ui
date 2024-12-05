@@ -177,13 +177,13 @@ const keyIs = (key: string, ...validKeys: string[]) => {
 };
 
 export const decodeSingleReadablePayloadWithCodec = async (
-  payload: RawPayload,
+  payload: RawPayload | Payload,
   settings: Settings = get(page).data.settings,
-): Promise<string> => {
+): Promise<string | Payload> => {
   try {
     const decode = decodeReadablePayloads(settings);
     const data = await decode([payload]);
-    const result = data[0] as string;
+    const result = data[0];
     return result || '';
   } catch {
     return '';

@@ -19,6 +19,7 @@
 
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import { useDarkMode } from '$lib/utilities/dark-mode';
   import {
     parseWithBigInt,
     stringifyWithBigInt,
@@ -90,10 +91,10 @@
 
   $: value = formatValue({ value: content, language });
 
-  const createEditorView = (): EditorView => {
+  const createEditorView = (isDark: boolean): EditorView => {
     return new EditorView({
       parent: editor,
-      state: createEditorState(value),
+      state: createEditorState(value, isDark),
       dispatch(transaction) {
         view.update([transaction]);
         if (transaction.docChanged) {
@@ -103,10 +104,13 @@
     });
   };
 
-  const createEditorState = (value: string | null | undefined): EditorState => {
+  const createEditorState = (
+    value: string | null | undefined,
+    isDark: boolean,
+  ): EditorState => {
     const extensions = [
       keymap.of([...standardKeymap, ...historyKeymap]),
-      TEMPORAL_THEME,
+      TEMPORAL_THEME(isDark),
       syntaxHighlighting(TEMPORAL_SYNTAX, { fallback: true }),
       indentUnit.of('  '),
       closeBrackets(),
@@ -153,11 +157,18 @@
   };
 
   onMount(() => {
-    view = createEditorView();
-    return () => view.destroy();
+    createView($useDarkMode);
+    return () => view?.destroy();
   });
 
-  export const resetView = (value = '', format = true) => {
+  const createView = (isDark: boolean) => {
+    if (view) view.destroy();
+    view = createEditorView(isDark);
+  };
+
+  $: createView($useDarkMode);
+
+  const resetView = (value = '', format = true) => {
     const formattedValue = format ? formatValue({ value, language }) : value;
     view.dispatch({
       changes: {
@@ -169,8 +180,8 @@
   };
 
   const setView = () => {
-    if (view && !editable) {
-      resetView(value, false);
+    if (view && (!editable || view.state.doc.toString() !== content)) {
+      resetView(content);
     }
   };
 
@@ -191,8 +202,7 @@
     <CopyButton
       {copyIconTitle}
       {copySuccessIconTitle}
-      class="absolute right-1 top-1 text-secondary"
-      data-theme="dark"
+      class="absolute right-3 top-1 text-secondary"
       on:click={handleCopy}
       copied={$copied}
     />

@@ -53,12 +53,37 @@ export type WorkflowExecutionConfig = Replace<
   { defaultWorkflowTaskTimeout: Duration }
 >;
 
+export type WorkflowInteractionDefinition = {
+  name?: string;
+  description?: string;
+};
+
+export type WorkflowMetadata = {
+  currentDetails?: string;
+  error?: Error;
+  definition?: {
+    type?: string;
+    queryDefinitions?: WorkflowInteractionDefinition[];
+    signalDefinitions?: WorkflowInteractionDefinition[];
+    updateDefinitions?: WorkflowInteractionDefinition[];
+  };
+};
+
+export type UserMetadata = {
+  summary?: Payload;
+  details?: Payload;
+};
+
+export type WorkflowExecutionConfigWithMetadata = WorkflowExecutionConfig & {
+  userMetadata?: UserMetadata;
+};
+
 export type WorkflowExecutionAPIResponse = Optional<{
   workflowExecutionInfo: WorkflowExecutionInfo;
   pendingActivities: PendingActivityInfo[];
   pendingChildren: PendingChildren[];
   pendingNexusOperations: PendingNexusOperation[];
-  executionConfig: WorkflowExecutionConfig;
+  executionConfig: WorkflowExecutionConfigWithMetadata;
   callbacks: Callbacks;
   pendingWorkflowTask: PendingWorkflowTaskInfo;
 }>;
@@ -117,10 +142,6 @@ export type WorkflowSearchAttributes = {
   indexedFields?: Record<string, Payload>;
 };
 
-export type DecodedWorkflowSearchAttributes = {
-  indexedFields?: Record<string, string | Payload>;
-};
-
 export interface MostRecentWOrkflowVersionStamp
   extends WorkflowVersionTimpstamp {
   useVersioning?: boolean;
@@ -139,7 +160,7 @@ export type WorkflowExecution = {
   historySizeBytes: string;
   mostRecentWorkerVersionStamp?: MostRecentWOrkflowVersionStamp;
   assignedBuildId?: string;
-  searchAttributes?: DecodedWorkflowSearchAttributes;
+  searchAttributes?: WorkflowSearchAttributes;
   memo: Memo;
   rootExecution?: WorkflowIdentifier;
   pendingChildren: PendingChildren[];
@@ -154,6 +175,8 @@ export type WorkflowExecution = {
   defaultWorkflowTaskTimeout: Duration;
   canBeTerminated: boolean;
   callbacks: Callbacks;
+  summary?: Payload;
+  details?: Payload;
 };
 
 export type WorkflowTaskFailedCause =

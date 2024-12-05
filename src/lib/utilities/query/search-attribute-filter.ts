@@ -1,25 +1,19 @@
 import { get } from 'svelte/store';
 
+import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { searchAttributes } from '$lib/stores/search-attributes';
-import {
-  SEARCH_ATTRIBUTE_TYPE,
-  type SearchAttributeType,
-} from '$lib/types/workflows';
+import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
-export function isStatusFilter(attribute: string) {
+export function isStatusFilter({ attribute }: SearchAttributeFilter) {
   return attribute === 'ExecutionStatus';
 }
 
-type FilterAttributeAndType = {
-  attribute: string;
-  type?: SearchAttributeType;
-};
-
 export function isTextFilter(
-  { attribute, type }: FilterAttributeAndType,
+  filter: SearchAttributeFilter,
   attributes = searchAttributes,
 ) {
-  if (isStatusFilter(attribute)) return false;
+  const { attribute, type } = filter;
+  if (isStatusFilter(filter)) return false;
   if (type === SEARCH_ATTRIBUTE_TYPE.KEYWORD) return true;
 
   const searchAttributeType = get(attributes)[attribute];
@@ -31,7 +25,7 @@ export function isTextFilter(
 }
 
 export function isListFilter(
-  { attribute, type }: FilterAttributeAndType,
+  { attribute, type }: SearchAttributeFilter,
   attributes = searchAttributes,
 ) {
   if (type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST) return true;
@@ -41,7 +35,7 @@ export function isListFilter(
 }
 
 export function isNumberFilter(
-  { attribute, type }: FilterAttributeAndType,
+  { attribute, type }: SearchAttributeFilter,
   attributes = searchAttributes,
 ) {
   if (type === SEARCH_ATTRIBUTE_TYPE.INT) return true;
@@ -53,12 +47,12 @@ export function isNumberFilter(
   );
 }
 
-export function isDurationFilter(attribute: string) {
+export function isDurationFilter({ attribute }: SearchAttributeFilter) {
   return ['ExecutionDuration'].includes(attribute);
 }
 
 export function isDateTimeFilter(
-  { attribute, type }: FilterAttributeAndType,
+  { attribute, type }: SearchAttributeFilter,
   attributes = searchAttributes,
 ) {
   if (type === SEARCH_ATTRIBUTE_TYPE.DATETIME) return true;
@@ -68,7 +62,7 @@ export function isDateTimeFilter(
 }
 
 export function isBooleanFilter(
-  { attribute, type }: FilterAttributeAndType,
+  { attribute, type }: SearchAttributeFilter,
   attributes = searchAttributes,
 ) {
   if (type === SEARCH_ATTRIBUTE_TYPE.BOOL) return true;
@@ -77,22 +71,30 @@ export function isBooleanFilter(
   return searchAttributeType === SEARCH_ATTRIBUTE_TYPE.BOOL;
 }
 
-export function getFocusedElementId({
-  attribute,
-  type,
-}: FilterAttributeAndType) {
-  if (isStatusFilter(attribute)) return 'status-filter';
+export function getFocusedElementId(filter: SearchAttributeFilter) {
+  if (isStatusFilter(filter)) return 'status-filter';
 
   if (
-    isTextFilter({ attribute, type }) ||
-    isNumberFilter({ attribute, type }) ||
-    isDateTimeFilter({ attribute, type })
+    isTextFilter(filter) ||
+    isNumberFilter(filter) ||
+    isDateTimeFilter(filter)
   )
     return 'conditional-menu-button';
 
-  if (isListFilter({ attribute, type })) return 'list-filter';
+  if (isListFilter(filter)) return 'list-filter';
 
-  if (isBooleanFilter({ attribute, type })) return 'boolean-filter';
+  if (isBooleanFilter(filter)) return 'boolean-filter';
 
   return '';
+}
+
+export function formatListFilterValue(value: string): string[] {
+  if (value.startsWith('(') && value.endsWith(')')) {
+    return value
+      .slice(1, -1)
+      .split(',')
+      .map((v) => v.trim().slice(1, -1));
+  }
+  if (value) return [value];
+  return [];
 }

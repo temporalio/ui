@@ -2,7 +2,6 @@ import { derived, type Readable, type Writable } from 'svelte/store';
 
 import { page } from '$app/stores';
 
-import { translate } from '$lib/i18n/translate';
 import type { Settings } from '$lib/types/global';
 
 import { namespaces } from './namespaces';
@@ -117,12 +116,12 @@ const DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS: ConfigurableTableHeader[] = [
 ];
 
 const DEFAULT_SCHEDULES_COLUMNS: ConfigurableTableHeader[] = [
-  { label: translate('common.status'), pinned: false },
-  { label: translate('schedules.id'), pinned: false },
-  { label: translate('common.workflow-type'), pinned: false },
-  { label: translate('schedules.recent-runs'), pinned: false },
-  { label: translate('schedules.upcoming-runs'), pinned: false },
-  { label: translate('schedules.schedule-spec'), pinned: false },
+  { label: 'Status', pinned: false },
+  { label: 'Schedule ID', pinned: false },
+  { label: 'Workflow Type', pinned: false },
+  { label: 'Recent Runs', pinned: false },
+  { label: 'Upcoming Runs', pinned: false },
+  { label: 'Schedule Spec', pinned: false },
 ];
 
 const isNotParentWorkflowIdColumn = (column: ConfigurableTableHeader) =>

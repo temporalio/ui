@@ -201,4 +201,37 @@ describe('toListWorkflowQueryFromFilters', () => {
       '`WorkflowType`="cronWorkflow" AND StartTime > "2019-12-30T00:00:00.000Z"',
     );
   });
+
+  it('should convert a KeywordList filter', () => {
+    const filters = [
+      {
+        attribute: 'CustomKeywordListField',
+        type: 'KeywordList',
+        conditional: 'in',
+        operator: '',
+        parenthesis: '',
+        value: '("Hello", "World")',
+      },
+      {
+        attribute: 'CustomKeywordListField',
+        type: 'KeywordList',
+        conditional: 'is',
+        operator: '',
+        parenthesis: '',
+        value: null,
+      },
+      {
+        attribute: 'CustomKeywordListField',
+        type: 'KeywordList',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Hello',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(combineFilters(filters));
+    expect(query).toBe(
+      '`CustomKeywordListField`in("Hello", "World") AND `CustomKeywordListField` is null AND `CustomKeywordListField`="Hello"',
+    );
+  });
 });

@@ -15,7 +15,10 @@ export const load = async ({ params, fetch, parent }) => {
           endpoint.spec.description,
           data.settings,
         );
-        description = decodedDescription;
+
+        if (typeof decodedDescription === 'string') {
+          description = decodedDescription;
+        }
       }
     } catch (e) {
       console.error('Error decoding Nexus Endpoint description:', e);

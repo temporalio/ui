@@ -4,7 +4,6 @@ body {
   padding: 0;
   border: 0;
   font-size: 100%;
-  font: inherit;
   vertical-align: baseline;
 }
 
@@ -40,11 +39,6 @@ h6 {
   font-size: 0.67em;
 }
 
-ol,
-ul {
-  list-style: none;
-}
-
 blockquote,
 q {
   quotes: none;
@@ -62,12 +56,17 @@ table {
   border-spacing: 0;
 }
 
-ul {
+ul,
+ol {
   white-space: normal;
 }
 
 li {
-  list-style: inside;
+  list-style-position: inside;
+}
+
+li * {
+  display: inline;
 }
 
 a {

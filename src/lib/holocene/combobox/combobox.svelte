@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
-  import { writable } from 'svelte/store';
+  import { writable, type Writable } from 'svelte/store';
 
   import { createEventDispatcher } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -11,6 +11,7 @@
   import Menu from '$lib/holocene/menu/menu.svelte';
 
   import Badge from '../badge.svelte';
+  import Button from '../button.svelte';
   import Chip from '../chip.svelte';
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
@@ -23,6 +24,7 @@
     change: { value: string | T };
     filter: string;
     close: { selectedOption: string | T };
+    input: string;
   }>();
 
   type ExtendedInputEvent = Event & {
@@ -32,7 +34,6 @@
   interface BaseProps extends HTMLInputAttributes {
     id: string;
     label: string;
-    toggleLabel: string;
     noResultsText: string;
     disabled?: boolean;
     labelHidden?: boolean;
@@ -46,6 +47,12 @@
     error?: string;
     valid?: boolean;
     actionTooltip?: string;
+    href?: string;
+    hrefDisabled?: boolean;
+    loading?: boolean;
+    loadingText?: string;
+    open?: Writable<boolean>;
+    maxMenuHeight?: string;
   }
 
   type MultiSelectProps = {
@@ -90,7 +97,6 @@
   export let label: string;
   export let multiselect = false;
   export let value: string | string[] = multiselect ? [] : undefined;
-  export let toggleLabel: string;
   export let noResultsText: string;
   export let disabled = false;
   export let labelHidden = false;
@@ -111,16 +117,38 @@
   export let deselectAllLabel = 'Deselect All';
   export let removeChipLabel = 'Remove Option';
   export let actionTooltip = '';
+  export let href = '';
+  export let hrefDisabled = false;
+  export let loading = false;
+  export let loadingText = 'Loading more results';
 
   export let numberOfItemsSelectedLabel = (count: number) =>
     `${count} option${count > 1 ? 's' : ''} selected`;
 
   let displayValue: string = '';
+  // Filter value and display value are close but different in a few cases
+  // primary difference is when opening a select box display value is filled
+  // and filter value should be blank
+  let filterValue: string = '';
   let selectedOption: string | T;
   let menuElement: HTMLUListElement;
   let inputElement: HTMLInputElement;
-  const open = writable<boolean>(false);
-  $: list = options;
+
+  export let open = writable<boolean>(false);
+  export let maxMenuHeight: string = 'max-h-[20rem]';
+
+  // We need this piece of code to focus the element when externally modifying the
+  // open store. Specifically we use this behaviour in bottom nav to focus the combobox
+  // after the bottom nav is clicked
+  $: {
+    if ($open && inputElement && document.activeElement !== inputElement) {
+      inputElement.focus();
+      inputElement.select();
+    }
+  }
+
+  // We want this to react to external changes to the options prop to support async use cases
+  $: list = filterOptions(filterValue, options);
 
   $: {
     if (inputElement && displayValue) {
@@ -150,6 +178,7 @@
 
   const openList = () => {
     $open = true;
+    filterValue = '';
     inputElement.focus();
     inputElement.select();
   };
@@ -213,6 +242,11 @@
     }
   };
 
+  /**
+   * Given an option that could be an object of type T set internal value in the component to string/string[]
+   * or cast it to a string
+   * @param option
+   */
   const setValue = (option: string | T): void => {
     if (isStringOption(option)) {
       if (isArrayValue(value)) {
@@ -303,30 +337,37 @@
   };
 
   const handleInput = (event: ExtendedInputEvent) => {
-    displayValue = event.currentTarget.value;
-    dispatch('filter', displayValue);
     if (!$open) $open = true;
+    // Reactive statement at top makes this work, not my favorite tho
+    displayValue = event.currentTarget.value;
+    filterValue = displayValue;
+    dispatch('input', displayValue);
+  };
 
-    list = options.filter((option) => {
+  function filterOptions(value: string, options: (T | string)[]) {
+    dispatch('filter', displayValue);
+
+    return options.filter((option) => {
       if (isStringOption(option)) {
-        return option
-          .toLowerCase()
-          .includes(event.currentTarget.value.toLowerCase());
+        return option.toLowerCase().includes(value.toLowerCase());
       }
 
       if (isObjectOption(option) && canRenderCustomOption(option)) {
         return String(option[optionLabelKey])
           .toLowerCase()
-          .includes(event.currentTarget.value.toLowerCase());
+          .includes(value.toLowerCase());
       }
     });
-  };
+  }
 
   const handleInputClick = () => {
     if (!$open) openList();
   };
 
-  const isSelected = (option: string | T): boolean => {
+  const isSelected = (
+    option: string | T,
+    value: string | string[],
+  ): boolean => {
     if (isObjectOption(option)) {
       const o = String(option[optionValueKey]);
       return isArrayValue(value) ? value.includes(o) : value === o;
@@ -395,7 +436,7 @@
       />
     </div>
     {#if $$slots.action}
-      <div class="ml-1 flex h-full items-center border-l-2 border-subtle p-0.5">
+      <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
         {#if actionTooltip}
           <Tooltip text={actionTooltip} right>
             <slot name="action" />
@@ -404,15 +445,38 @@
           <slot name="action" />
         {/if}
       </div>
+    {:else if href}
+      <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
+        {#if actionTooltip}
+          <Tooltip text={actionTooltip} right>
+            <Button
+              variant="ghost"
+              size="xs"
+              {href}
+              disabled={hrefDisabled}
+              leadingIcon="external-link"
+            />
+          </Tooltip>
+        {:else}
+          <Button
+            variant="ghost"
+            size="xs"
+            {href}
+            disabled={hrefDisabled}
+            leadingIcon="external-link"
+          />
+        {/if}
+      </div>
     {/if}
   </div>
 
   <Menu
-    keepOpen={multiselect}
+    keepOpen={multiselect || true}
     bind:menuElement
     id="{id}-listbox"
     role="listbox"
     class="w-full"
+    maxHeight={maxMenuHeight}
   >
     {#if multiselect && isArrayValue(value)}
       <ComboboxOption
@@ -427,18 +491,25 @@
       />
       <MenuDivider />
     {/if}
-    {#key value}
-      {#each list as option}
-        <ComboboxOption
-          {multiselect}
-          on:click={() => handleSelectOption(option)}
-          selected={isSelected(option)}
-          label={getDisplayValue(option)}
-        />
-      {:else}
+
+    {#each list as option}
+      <ComboboxOption
+        {multiselect}
+        on:click={() => handleSelectOption(option)}
+        selected={isSelected(option, value)}
+        label={getDisplayValue(option)}
+      />
+    {:else}
+      {#if loading === false}
         <ComboboxOption disabled label={noResultsText} />
-      {/each}
-    {/key}
+      {/if}
+    {/each}
+
+    {#if loading}
+      <ComboboxOption disabled label={loadingText}>
+        <Icon slot="leading" name="spinner" class="animate-spin" />
+      </ComboboxOption>
+    {/if}
   </Menu>
 
   {#if error && !valid}
@@ -448,10 +519,10 @@
 
 <style lang="postcss">
   .combobox-wrapper {
-    @apply surface-primary flex w-full flex-row items-center rounded-lg border-2 border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply surface-primary flex w-full flex-row items-center rounded-lg border border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
 
     &.invalid {
-      @apply border-2 border-danger text-danger focus-within:ring-danger/70;
+      @apply border border-danger text-danger focus-within:ring-danger/70;
     }
 
     &.disabled {

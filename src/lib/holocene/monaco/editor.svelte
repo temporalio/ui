@@ -1,6 +1,7 @@
 <script lang="ts">
   import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
   import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import { useDarkMode } from '$lib/utilities/dark-mode/dark-mode';
 
@@ -43,4 +44,7 @@
   });
 </script>
 
-<div class="h-full min-h-80" bind:this={container} />
+<div
+  class={merge('h-full min-h-80', $$restProps.class)}
+  bind:this={container}
+></div>

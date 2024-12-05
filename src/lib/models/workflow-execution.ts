@@ -7,7 +7,6 @@ import type {
   PendingNexusOperation,
 } from '$lib/types/events';
 import type {
-  DecodedWorkflowSearchAttributes,
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
   WorkflowExecutionAPIResponse,
@@ -58,7 +57,7 @@ const toCallbacks = (callbacks?: Callbacks): Callbacks => {
 
 const toSearchAttributes = (
   apiSearchAttributes: WorkflowSearchAttributes,
-): DecodedWorkflowSearchAttributes => {
+): WorkflowSearchAttributes => {
   if (!apiSearchAttributes || !apiSearchAttributes.indexedFields) return {};
   const decoded = Object.entries(apiSearchAttributes.indexedFields).reduce(
     (searchAttributes, [searchAttributeName, payload]) => {
@@ -118,6 +117,13 @@ export const toWorkflowExecution = (
   const callbacks = toCallbacks(response?.callbacks);
   const rootExecution = response.workflowExecutionInfo?.rootExecution;
 
+  let summary;
+  let details;
+  if (response?.executionConfig?.userMetadata) {
+    summary = response?.executionConfig?.userMetadata?.summary;
+    details = response?.executionConfig?.userMetadata?.details;
+  }
+
   return {
     name,
     id,
@@ -140,6 +146,8 @@ export const toWorkflowExecution = (
     pendingNexusOperations,
     pendingWorkflowTask,
     callbacks,
+    summary,
+    details,
     parentNamespaceId,
     parent,
     stateTransitionCount,

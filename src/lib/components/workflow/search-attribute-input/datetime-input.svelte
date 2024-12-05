@@ -5,31 +5,23 @@
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { SearchAttributeInputValue } from '$lib/stores/search-attributes';
   import { getUTCString } from '$lib/utilities/format-date';
 
-  export let value: SearchAttributeInputValue;
+  export let value: string | null;
 
-  let date = startOfDay(new Date());
-  let hour = '';
-  let minute = '';
-  let second = '';
+  const datetime = value ? new Date(value) : new Date();
+  const utcDate = new Date(
+    datetime.getUTCFullYear(),
+    datetime.getUTCMonth(),
+    datetime.getUTCDate(),
+  );
+  let date = startOfDay(utcDate);
+  let hour = value ? String(datetime.getUTCHours()) : '';
+  let minute = value ? String(datetime.getUTCMinutes()) : '';
+  let second = value ? String(datetime.getUTCSeconds()) : '';
 
   onMount(() => {
-    if (value) {
-      const datetime = new Date(value);
-      const utcDate = new Date(
-        datetime.getUTCFullYear(),
-        datetime.getUTCMonth(),
-        datetime.getUTCDate(),
-      );
-      date = startOfDay(utcDate);
-      hour = String(datetime.getUTCHours());
-      minute = String(datetime.getUTCMinutes());
-      second = String(datetime.getUTCSeconds());
-    } else {
-      updateDatetime();
-    }
+    if (!value) updateDatetime();
   });
 
   const onDateChange = (d: CustomEvent) => {

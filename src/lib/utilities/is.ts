@@ -10,6 +10,7 @@ type Backtick = '`';
 type Operator = (typeof operators)[number];
 type Conditional = (typeof conditionals)[number];
 type Parenthesis = (typeof parenthesis)[number];
+type EndParenthesis = ')';
 type Join = (typeof joins)[number];
 
 const executionStatuses: Readonly<WorkflowStatus[]> = [
@@ -58,6 +59,7 @@ const conditionals = [
   'starts_with',
   'is',
   'is not',
+  'in',
 ] as const;
 
 const joins = ['and', 'or'] as const;
@@ -137,6 +139,11 @@ export const isParenthesis = (x: unknown): x is Parenthesis => {
   return false;
 };
 
+export const isEndParenthesis = (x: unknown): x is EndParenthesis => {
+  if (!isString(x)) return false;
+  return x.toLocaleLowerCase() === ')';
+};
+
 export const isJoin = (x: unknown): x is Join => {
   if (!isString(x)) return false;
   x = x.toLocaleLowerCase();
@@ -177,4 +184,10 @@ export const isError = (e: unknown): e is Error => {
 export const isStartsWith = (x: unknown) => {
   if (!isString(x)) return false;
   return x.toLocaleLowerCase() === 'starts_with';
+};
+
+export const isInConditional = (x: unknown) => {
+  if (!isString(x)) return false;
+
+  return x.toLocaleLowerCase() === 'in';
 };

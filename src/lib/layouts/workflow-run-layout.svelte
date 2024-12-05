@@ -15,6 +15,7 @@
     throttleRefresh,
   } from '$lib/services/events-service';
   import { getPollers } from '$lib/services/pollers-service';
+  import { getWorkflowMetadata } from '$lib/services/query-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
@@ -31,7 +32,9 @@
     workflowRun,
   } from '$lib/stores/workflow-run';
   import type { NetworkError } from '$lib/types/global';
+  import type { WorkflowExecution } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
@@ -39,13 +42,39 @@
   $: fullJson = { ...$workflowRun, eventHistory: $fullEventHistory };
 
   let workflowError: NetworkError;
-  let eventHistoryController: AbortController;
+  let workflowRunController: AbortController;
   let refreshInterval;
 
   const { copy, copied } = copyToClipboard();
 
   const handleCopy = (e: Event) => {
     copy(e, stringifyWithBigInt(fullJson));
+  };
+
+  const decodeUserMetadata = async (workflow: WorkflowExecution) => {
+    const userMetadata = { summary: '', details: '' };
+    try {
+      if (workflow?.summary) {
+        const decodedSummary = await decodeSingleReadablePayloadWithCodec(
+          workflow.summary,
+        );
+        if (typeof decodedSummary === 'string') {
+          userMetadata.summary = decodedSummary;
+        }
+      }
+      if (workflow?.details) {
+        const decodedDetails = await decodeSingleReadablePayloadWithCodec(
+          workflow.details,
+        );
+        if (typeof decodedDetails === 'string') {
+          userMetadata.details = decodedDetails;
+        }
+      }
+
+      $workflowRun = { ...$workflowRun, userMetadata };
+    } catch (e) {
+      console.error('Error decoding user metadata', e);
+    }
   };
 
   const getWorkflowAndEventHistory = async (
@@ -65,8 +94,12 @@
       return;
     }
 
+    await decodeUserMetadata(workflow);
+
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
+
+    $workflowRun = { ...$workflowRun, workflow, workers };
 
     workflow.pendingActivities = await toDecodedPendingActivities(
       workflow,
@@ -74,14 +107,29 @@
       settings,
       $authUser?.accessToken,
     );
-    $workflowRun = { workflow, workers };
-    eventHistoryController = new AbortController();
+
+    workflowRunController = new AbortController();
+    getWorkflowMetadata(
+      {
+        namespace,
+        workflow: {
+          id: workflowId,
+          runId,
+        },
+      },
+      settings,
+      $authUser?.accessToken,
+      workflowRunController.signal,
+    ).then((metadata) => {
+      $workflowRun.metadata = metadata;
+    });
+
     $fullEventHistory = await fetchAllEvents({
       namespace,
       workflowId,
       runId,
       sort: 'ascending',
-      signal: eventHistoryController.signal,
+      signal: workflowRunController.signal,
       historySize: workflow.historyEvents,
     });
   };
@@ -100,20 +148,20 @@
         workflowError = error;
         return;
       }
+      $workflowRun.workflow = workflow;
       workflow.pendingActivities = await toDecodedPendingActivities(
         workflow,
         namespace,
         settings,
         $authUser?.accessToken,
       );
-      $workflowRun = { ...$workflowRun, workflow };
     }
   };
 
   const abortPolling = () => {
     $fullEventHistory = [];
-    if (eventHistoryController) {
-      eventHistoryController.abort();
+    if (workflowRunController) {
+      workflowRunController.abort();
     }
   };
 
@@ -171,14 +219,14 @@
     class="absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
       ? 'top-[540px]'
       : 'top-0'}
-    } flex h-full flex-col gap-0"
+    } flex h-full flex-col gap-4"
   >
     {#if workflowError}
       <WorkflowError error={workflowError} />
     {:else if !$workflowRun.workflow}
       <Loading class="pt-24" />
     {:else}
-      <div class="px-8 pt-8 md:pt-20">
+      <div class="border-b border-subtle px-4 pt-8 md:pt-20 xl:px-8">
         <WorkflowHeader namespace={$page.params.namespace} />
       </div>
       <slot />

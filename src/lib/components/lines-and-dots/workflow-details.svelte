@@ -8,6 +8,7 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import {
     routeForWorkers,
+    routeForWorkflow,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
@@ -22,11 +23,8 @@
   });
 </script>
 
-<div class="flex flex-col gap-2">
-  <h3 class="flex items-center">Summary</h3>
-  <div
-    class="surface-primary grid w-full grid-flow-row grid-cols-1 gap-2 rounded-xl border-2 border-primary p-2 md:grid-cols-2 xl:grid-cols-3"
-  >
+<div class="flex w-full flex-col gap-2 xl:flex-row xl:gap-16">
+  <div class="flex w-full flex-col gap-2 xl:w-1/3">
     <WorkflowDetail
       title={translate('common.start')}
       tooltip={$relativeTime
@@ -39,7 +37,6 @@
       content={formatDate(workflow?.startTime, $timeFormat, {
         relative: $relativeTime,
       })}
-      class="order-1 text-sm "
     />
     <WorkflowDetail
       title={translate('common.end')}
@@ -55,49 +52,50 @@
             relative: $relativeTime,
           })
         : '-'}
-      class="order-2 text-sm md:order-3 xl:order-4"
     />
+    <WorkflowDetail content={elapsedTime} icon="clock" />
+  </div>
+  <div class="flex w-full flex-col gap-2 xl:w-1/3">
     <WorkflowDetail
-      content={elapsedTime}
-      class="order-3 text-sm md:order-5 xl:order-7"
-      icon="clock"
-    />
-    <WorkflowDetail
-      title={translate('common.task-queue')}
-      content={workflow?.taskQueue}
-      class="order-4 text-sm md:order-8"
-      href={routeForWorkers({
-        namespace: $page.params.namespace,
-        workflow: workflow?.id,
-        run: workflow?.runId,
-      })}
+      title={translate('common.run-id')}
+      content={workflow?.runId}
+      copyable
     />
     <WorkflowDetail
       title={translate('common.workflow-type')}
       content={workflow?.name}
       copyable
       filterable
-      class="order-4 text-sm md:order-2 xl:order-2"
       href={routeForWorkflowsWithQuery({
         namespace,
         query: `WorkflowType="${workflow?.name}"`,
       })}
     />
     <WorkflowDetail
-      title={translate('common.run-id')}
-      content={workflow?.runId}
-      copyable
-      class="order-5 text-sm md:order-4 xl:order-5"
+      title={translate('common.task-queue')}
+      content={workflow?.taskQueue}
+      href={routeForWorkers({
+        namespace: $page.params.namespace,
+        workflow: workflow?.id,
+        run: workflow?.runId,
+      })}
     />
+  </div>
+  <div class="flex w-full flex-col gap-2 xl:w-1/3">
+    {#if workflow?.parent}
+      <WorkflowDetail
+        title={translate('workflows.parent-workflow')}
+        content={workflow?.parent?.workflowId}
+        href={routeForWorkflow({
+          namespace,
+          workflow: workflow?.parent?.workflowId,
+          run: workflow?.parent?.runId,
+        })}
+      />
+    {/if}
     <WorkflowDetail
       title={translate('common.history-size-bytes')}
       content={workflow?.historySizeBytes}
-      class="order-6 text-sm md:order-6 xl:order-3"
-    />
-    <WorkflowDetail
-      title={translate('workflows.state-transitions')}
-      content={workflow?.stateTransitionCount}
-      class="order-7 text-sm md:order-8 xl:order-6"
     />
   </div>
 </div>

@@ -3,14 +3,17 @@
 
   import { page } from '$app/stores';
 
+  import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import WorkflowVersioningHeader from '$lib/components/workflow-versioning-header.svelte';
+  import AccordionLight from '$lib/holocene/accordion/accordion-light.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Markdown from '$lib/holocene/monaco/markdown.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
@@ -56,6 +59,10 @@
   $: workflowUsesVersioning =
     workflow?.assignedBuildId ??
     workflow?.mostRecentWorkerVersionStamp?.useVersioning;
+
+  $: summary = $workflowRun?.userMetadata?.summary;
+  $: details = $workflowRun?.userMetadata?.details;
+  $: hasUserMetadata = summary || details;
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -84,12 +91,10 @@
     {/if}
   </div>
 </div>
-<header class="rounded-top flex flex-col gap-0">
+<header class="rounded-top flex flex-col gap-2">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
     <div class="flex flex-col items-center gap-4 lg:flex-row">
-      <div class="px-2">
-        <WorkflowStatus status={workflow?.status} big />
-      </div>
+      <WorkflowStatus status={workflow?.status} big />
       <div class="flex flex-col flex-wrap gap-0">
         <h1 data-testid="workflow-id-heading" class="gap-0 overflow-hidden">
           <Copyable
@@ -110,8 +115,61 @@
       <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
     </div>
   </div>
+  {#if hasUserMetadata}
+    <AccordionLight let:open>
+      <div
+        slot="title"
+        class="flex w-full items-center gap-2 rounded p-2 text-xl"
+      >
+        <Icon
+          name="flag"
+          class="text-indigo-600/80"
+          width={32}
+          height={32}
+        />{translate('workflows.summary-and-details')}
+      </div>
+      {#if open && summary}
+        <h3>{translate('workflows.summary')}</h3>
+        <Markdown content={summary} />
+      {/if}
+      {#if open && details}
+        <h3>{translate('workflows.details')}</h3>
+        <Markdown content={details} />
+      {/if}
+    </AccordionLight>
+  {/if}
+  <WorkflowDetails />
+  {#if cancelInProgress}
+    <div in:fly={{ duration: 200, delay: 100 }}>
+      <Alert
+        icon="info"
+        intent="info"
+        title={translate('workflows.cancel-request-sent')}
+      >
+        {translate('workflows.cancel-request-sent-description')}
+      </Alert>
+    </div>
+  {/if}
+  {#if workflowHasBeenReset}
+    <div in:fly={{ duration: 200, delay: 100 }}>
+      <Alert
+        icon="info"
+        intent="info"
+        data-testid="workflow-reset-alert"
+        title={translate('workflows.reset-success-alert-title')}
+      >
+        You can find the resulting Workflow Execution <Link
+          href={routeForEventHistory({
+            namespace,
+            workflow: $workflowRun?.workflow?.id,
+            run: $resetWorkflows[$workflowRun?.workflow?.runId],
+          })}>here</Link
+        >.
+      </Alert>
+    </div>
+  {/if}
   <Tabs>
-    <TabList class="flex flex-wrap gap-6 p-4 pl-0" label="workflow detail">
+    <TabList class="flex flex-wrap gap-6 pt-2" label="workflow detail">
       <Tab
         label={translate('workflows.history-tab')}
         id="history-tab"
@@ -200,34 +258,4 @@
       />
     </TabList>
   </Tabs>
-
-  {#if cancelInProgress}
-    <div in:fly={{ duration: 200, delay: 100 }}>
-      <Alert
-        icon="info"
-        intent="info"
-        title={translate('workflows.cancel-request-sent')}
-      >
-        {translate('workflows.cancel-request-sent-description')}
-      </Alert>
-    </div>
-  {/if}
-  {#if workflowHasBeenReset}
-    <div in:fly={{ duration: 200, delay: 100 }}>
-      <Alert
-        icon="info"
-        intent="info"
-        data-testid="workflow-reset-alert"
-        title={translate('workflows.reset-success-alert-title')}
-      >
-        You can find the resulting Workflow Execution <Link
-          href={routeForEventHistory({
-            namespace,
-            workflow: $workflowRun?.workflow?.id,
-            run: $resetWorkflows[$workflowRun?.workflow?.runId],
-          })}>here</Link
-        >.
-      </Alert>
-    </div>
-  {/if}
 </header>

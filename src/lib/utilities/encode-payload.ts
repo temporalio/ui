@@ -1,7 +1,9 @@
 import { get } from 'svelte/store';
 
+import type { PayloadInputEncoding } from '$lib/components/payload-input-with-encoding.svelte';
 import { encodePayloadsWithCodec } from '$lib/services/data-encoder';
 import { dataEncoder } from '$lib/stores/data-encoder';
+import type { Payloads } from '$lib/types';
 import { btoa } from '$lib/utilities/btoa';
 import {
   parseWithBigInt,
@@ -19,7 +21,10 @@ export const getSinglePayload = (decodedValue: string): string => {
   return '';
 };
 
-export const setBase64Payload = (payload: string, encoding = 'json/plain') => {
+export const setBase64Payload = (
+  payload: unknown,
+  encoding: PayloadInputEncoding = 'json/plain',
+) => {
   return {
     metadata: {
       encoding: btoa(encoding),
@@ -28,14 +33,18 @@ export const setBase64Payload = (payload: string, encoding = 'json/plain') => {
   };
 };
 
-export const encodePayloads = async (input: string, encoding: string) => {
+export const encodePayloads = async (
+  input: string,
+  encoding: PayloadInputEncoding,
+  encodeWithCodec: boolean = true,
+): Promise<Payloads> => {
   let payloads = null;
 
   if (input) {
     const parsedInput = JSON.parse(input);
     payloads = [setBase64Payload(parsedInput, encoding)];
     const endpoint = get(dataEncoder).endpoint;
-    if (endpoint) {
+    if (endpoint && encodeWithCodec) {
       const awaitData = await encodePayloadsWithCodec({
         payloads: { payloads },
       });

@@ -18,12 +18,17 @@
   export let hintText = '';
   export let validator: (value: string) => boolean = () => true;
   export let removeChipButtonLabel: string | ((chipValue: string) => string);
+  export let unroundRight = false;
+  export let unroundLeft = false;
+  export let external = false;
+
   const values = writable<string[]>(chips);
   let displayValue = '';
   let shouldScrollToInput = false;
   let inputContainer: HTMLDivElement;
   let input: HTMLInputElement;
 
+  $: chips, ($values = chips);
   $: invalid = $values.some((chip) => !validator(chip));
 
   let className = '';
@@ -110,8 +115,10 @@
       disabled && 'cursor-not-allowed opacity-65',
       invalid && 'invalid',
     )}
+    class:unroundLeft
+    class:unroundRight
   >
-    {#if $values.length > 0}
+    {#if $values.length > 0 && !external}
       {#each $values as chip, i (`${chip}-${i}`)}
         {@const valid = validator(chip)}
         <Chip
@@ -148,19 +155,42 @@
       {hintText}
     </span>
   {/if}
+  {#if $values.length > 0 && external}
+    <div class="mt-1 flex flex-row flex-wrap gap-1">
+      {#each $values as chip, i (`${chip}-${i}`)}
+        {@const valid = validator(chip)}
+        <Chip
+          removeButtonLabel={typeof removeChipButtonLabel === 'string'
+            ? removeChipButtonLabel
+            : removeChipButtonLabel(chip)}
+          on:remove={() => removeChip(i)}
+          intent={valid ? 'default' : 'warning'}
+          {disabled}>{chip}</Chip
+        >
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style lang="postcss">
   .input-container {
-    @apply surface-primary flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded-lg border-2 border-subtle p-2 text-sm text-primary focus-within:border-interactive focus-within:ring-4 focus-within:ring-primary/70;
+    @apply surface-primary flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded-lg border border-subtle p-2 text-sm text-primary focus-within:border-interactive focus-within:ring-2 focus-within:ring-primary/70;
   }
 
   .invalid {
-    @apply border-danger focus-within:border-danger focus-within:ring-4 focus-within:ring-danger/70;
+    @apply border-danger focus-within:border-danger focus-within:ring-2 focus-within:ring-danger/70;
   }
 
   input {
     @apply surface-primary inline-block w-full focus:outline-none;
+  }
+
+  .unroundRight {
+    @apply rounded-br-none rounded-tr-none border-r-0;
+  }
+
+  .unroundLeft {
+    @apply rounded-bl-none rounded-tl-none border-l-0;
   }
 
   .hint {

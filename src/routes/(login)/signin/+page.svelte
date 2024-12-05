@@ -23,7 +23,7 @@
   <FeedbackButton />
 </header>
 <section class="my-[20vh] text-center">
-  <h1 class="text-8xl font-semibold" data-testid="login-title">
+  <h1 class="text-7xl font-semibold sm:text-8xl" data-testid="login-title">
     Welcome back.
   </h1>
   <p class="my-7" data-testid="login-info">Let's get you signed in.</p>
@@ -48,7 +48,7 @@
   {#if error}
     <div class="my-12 flex flex-col items-center justify-start gap-2">
       <p
-        class="rounded-md border-2 border-orange-500 bg-orange-100 p-5 text-center"
+        class="rounded-md border border-orange-500 bg-orange-100 p-5 text-center"
       >
         {error}
       </p>

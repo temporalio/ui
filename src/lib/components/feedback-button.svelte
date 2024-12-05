@@ -19,7 +19,7 @@
 
 <style lang="postcss">
   .feedback-button {
-    @apply flex w-40 cursor-pointer items-center justify-between rounded-full px-4 py-2 text-sm text-purple-200 shadow-md;
+    @apply flex cursor-pointer items-center justify-between rounded-full px-4 py-2 text-sm text-purple-200 shadow-md;
   }
 
   .feedback-button:hover {
@@ -27,6 +27,6 @@
   }
 
   .feedback-icon {
-    @apply mr-2 rounded-full border-2 border-purple-200;
+    @apply mr-2 rounded-full border-purple-200;
   }
 </style>

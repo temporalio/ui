@@ -123,7 +123,7 @@
   on:click|stopPropagation={onLinkClick}
 >
   {#if isEventGroup(event)}
-    <td class="w-24 min-w-fit">
+    <td class="w-24 min-w-fit font-mono">
       <div class="flex items-center gap-0.5">
         {#each event.eventList as groupEvent}
           <Link
@@ -141,7 +141,7 @@
       </div>
     </td>
   {:else}
-    <td>
+    <td class="font-mono">
       <Link data-testid="link" {href}>
         {event.id}
       </Link>
@@ -184,7 +184,7 @@
           'surface-retry rounded px-1 py-0.5'}"
       >
         <Icon class="mr-1.5 inline" name="retry" />
-        {translate('workflows.retry')}
+        {translate('workflows.attempt')}
         {pendingAttempt}
         {#if hasPendingActivity}
           / {hasPendingActivity.maximumAttempts || '∞'}

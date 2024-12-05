@@ -1,3 +1,4 @@
+import type { PayloadInputEncoding } from '$lib/components/payload-input-with-encoding.svelte';
 import type { SearchAttributeInput } from '$lib/stores/search-attributes';
 import type {
   CalendarSpec,
@@ -38,7 +39,7 @@ export type ScheduleActionParameters = {
   workflowId: string;
   taskQueue: string;
   input: string;
-  encoding: string;
+  encoding: PayloadInputEncoding;
   searchAttributes: SearchAttributeInput[];
 };
 

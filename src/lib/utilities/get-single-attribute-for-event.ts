@@ -12,7 +12,10 @@ import { decodePayload, isSinglePayload } from './decode-payload';
 import type { CombinedAttributes } from './format-event-attributes';
 import { has } from './has';
 import { isObject } from './is';
-import { isLocalActivityMarkerEvent } from './is-event-type';
+import {
+  isLocalActivityMarkerEvent,
+  isWorkflowExecutionUpdateAcceptedEvent,
+} from './is-event-type';
 import {
   isPendingActivity,
   isPendingNexusOperation,
@@ -302,6 +305,15 @@ export const getEventSummaryAttribute = (
     const activityType = getActivityType(payload);
     if (activityType) {
       return formatSummaryValue('ActivityType', activityType);
+    }
+  }
+
+  if (isWorkflowExecutionUpdateAcceptedEvent(event)) {
+    if (event.attributes?.acceptedRequest?.input?.name) {
+      return {
+        key: 'name',
+        value: event.attributes.acceptedRequest.input.name,
+      };
     }
   }
 

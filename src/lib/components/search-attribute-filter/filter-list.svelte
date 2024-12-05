@@ -89,8 +89,7 @@
 
 <div class="flex flex-wrap gap-2" class:pt-2={visibleFilters.length}>
   {#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
-    {@const { attribute, type, value, conditional, customDate } =
-      workflowFilter}
+    {@const { attribute, value, conditional, customDate } = workflowFilter}
     {#if attribute}
       <div in:fade data-testid="{workflowFilter.attribute}-{i}">
         <Chip
@@ -119,7 +118,7 @@
               {#if isNullConditional(conditional)}
                 {conditional}
                 {value}
-              {:else if isDateTimeFilter({ attribute, type })}
+              {:else if isDateTimeFilter(workflowFilter)}
                 {#if customDate}
                   {formatDateTimeRange(value, $timeFormat, $relativeTime)}
                 {:else}
@@ -133,7 +132,7 @@
                 {isStartsWith(conditional)
                   ? translate('common.starts-with').toLocaleLowerCase()
                   : conditional}
-                {isTextFilter({ attribute, type }) ? `"${value}"` : value}
+                {isTextFilter(workflowFilter) ? `"${value}"` : value}
               {/if}
             </span>
           {/if}

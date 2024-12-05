@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import type { SearchAttributes } from '$lib/types/workflows';
 
 import {
+  formatListFilterValue,
   isBooleanFilter,
   isDateTimeFilter,
   isDurationFilter,
@@ -30,11 +31,11 @@ const store = writable<SearchAttributes>({
 
 describe('isStatusFilter', () => {
   it('should return true if the attribute is ExecutionStatus', () => {
-    expect(isStatusFilter('ExecutionStatus')).toBe(true);
+    expect(isStatusFilter({ attribute: 'ExecutionStatus' })).toBe(true);
   });
 
   it('should return false if the attribute is not ExecutionStatus', () => {
-    expect(isStatusFilter('WorkflowType')).toBe(false);
+    expect(isStatusFilter({ attribute: 'WorkflowType' })).toBe(false);
   });
 });
 
@@ -104,11 +105,11 @@ describe('isNumberFilter', () => {
 
 describe('isDurationFilter', () => {
   it('should return true if the attribute is ExecutionDuration', () => {
-    expect(isDurationFilter('ExecutionDuration')).toBe(true);
+    expect(isDurationFilter({ attribute: 'ExecutionDuration' })).toBe(true);
   });
 
   it('should return false if the attribute is not ExecutionDuration', () => {
-    expect(isDurationFilter('CustomB')).toBe(false);
+    expect(isDurationFilter({ attribute: 'CustomB' })).toBe(false);
   });
 });
 
@@ -148,5 +149,28 @@ describe('isDateTimeFilter', () => {
     expect(
       isDateTimeFilter({ attribute: 'TemporalSchedulePaused' }, store),
     ).toBe(false);
+  });
+});
+
+describe('formatListFilterValue', () => {
+  it('should return an empty array if there is no value', () => {
+    expect(formatListFilterValue('')).toStrictEqual([]);
+  });
+
+  it('should return an array of strings if the value starts with "(" and ends with ")"', () => {
+    expect(formatListFilterValue('("one")')).toStrictEqual(['one']);
+    expect(formatListFilterValue('("one", "two")')).toStrictEqual([
+      'one',
+      'two',
+    ]);
+    expect(formatListFilterValue('("one","two","three")')).toStrictEqual([
+      'one',
+      'two',
+      'three',
+    ]);
+  });
+
+  it('should return an array with the value', () => {
+    expect(formatListFilterValue('example')).toStrictEqual(['example']);
   });
 });

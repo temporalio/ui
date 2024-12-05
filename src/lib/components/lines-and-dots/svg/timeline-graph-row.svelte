@@ -121,7 +121,7 @@
             config={TimelineConfig}
             icon="retry"
           >
-            {group?.displayName} • {translate('workflows.retry')}
+            {group?.displayName} • {translate('workflows.attempt')}
             {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
           </Text>
         {/key}

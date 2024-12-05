@@ -22,7 +22,7 @@
   $: showParsedContent = payloads.length > 0;
 </script>
 
-<div class="flex w-full grow flex-col gap-2 py-4 {$$restProps.class}">
+<div class="flex w-full grow flex-col gap-2 {$$restProps.class}">
   <h3 class="flex items-center gap-2">
     {title}
   </h3>
@@ -32,7 +32,6 @@
         {#each parsePayloads(decodedValue) as decodedContent}
           <CodeBlock
             content={stringifyWithBigInt(decodedContent)}
-            class="rounded-none"
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
             maxHeight={300}
@@ -43,7 +42,6 @@
       <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
         <CodeBlock
           content={decodedValue}
-          class="rounded-none"
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
           maxHeight={300}

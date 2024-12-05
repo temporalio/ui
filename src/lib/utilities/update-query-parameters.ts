@@ -9,11 +9,13 @@ type UpdateQueryParams = {
   goto?: typeof navigateTo;
   allowEmpty?: boolean;
   clearParameters?: string[];
+  options?: typeof gotoOptions;
 };
 
 export const gotoOptions = {
   keepFocus: true,
   noScroll: true,
+  replaceState: false,
 };
 
 export const updateQueryParameters = async ({
@@ -23,19 +25,30 @@ export const updateQueryParameters = async ({
   goto = navigateTo,
   allowEmpty = false,
   clearParameters = [],
+  options = gotoOptions,
 }: UpdateQueryParams): Promise<typeof value> => {
   const next = String(value);
   const params = {};
+  let replaced = false;
+
   url.searchParams.forEach((value, key) => {
     if (key !== parameter) {
       params[key] = value;
+    } else {
+      if (next) {
+        params[key] = next;
+        replaced = true;
+      } else if (allowEmpty) {
+        params[key] = '';
+        replaced = true;
+      }
     }
   });
   const newQuery = new URLSearchParams(params);
 
-  if (value) {
+  if (value && !replaced) {
     newQuery.set(parameter, next);
-  } else if (allowEmpty) {
+  } else if (allowEmpty && !replaced) {
     newQuery.set(parameter, '');
   }
 
@@ -49,7 +62,7 @@ export const updateQueryParameters = async ({
     const query = newQuery?.toString();
     const newUrl = query ? `${url.pathname}?${query}` : url.pathname;
 
-    goto(newUrl, gotoOptions);
+    goto(newUrl, options);
   }
 
   return value;

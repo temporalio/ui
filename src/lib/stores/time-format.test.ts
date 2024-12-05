@@ -63,6 +63,6 @@ describe('getUTCOffset', () => {
   });
 
   test('should return a formatted UTC offset for a timezone', () => {
-    expect(getUTCOffset('America/Denver' as TimeFormat)).toBe('-06:00');
+    expect(getUTCOffset('America/Phoenix' as TimeFormat)).toBe('-07:00');
   });
 });

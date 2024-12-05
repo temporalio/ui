@@ -24,12 +24,20 @@ package route
 
 import (
 	"bytes"
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
+	"html/template"
 	"io/fs"
 	"log"
 	"net/http"
+	"path"
 	"regexp"
 	"strings"
+
+	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/html"
+	"github.com/gomarkdown/markdown/parser"
 
 	"github.com/labstack/echo/v4"
 )
@@ -85,4 +93,100 @@ func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, err
 func buildUIAssetsHandler(assets fs.FS) echo.HandlerFunc {
 	handler := http.FileServer(http.FS(assets))
 	return echo.WrapHandler(handler)
+}
+
+func generateNonce() string {
+	bytes := make([]byte, 16)
+	if _, err := rand.Read(bytes); err != nil {
+		panic(err)
+	}
+	return hex.EncodeToString(bytes)
+}
+
+// Generate CSP header
+func generateCSP(nonce string) string {
+	return fmt.Sprintf(
+		"base-uri 'self'; default-src 'none'; style-src 'nonce-%s'; script-src 'nonce-%s'; frame-ancestors 'self'; form-action 'none'; sandbox allow-same-origin allow-popups allow-popups-to-escape-sandbox;",
+		nonce,
+		nonce,
+	)
+}
+
+// Process markdown content
+func processMarkdown(content string) string {
+	// Create markdown parser with extensions
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
+	p := parser.NewWithExtensions(extensions)
+
+	// Parse markdown to AST
+	ast := p.Parse([]byte(content))
+
+	// Setup HTML renderer
+	opts := html.RendererOptions{
+		Flags: html.CommonFlags | html.HrefTargetBlank,
+	}
+	renderer := html.NewRenderer(opts)
+
+	// Render to HTML
+	return string(markdown.Render(ast, renderer))
+}
+
+// Template for the HTML page
+const pageTemplate = `
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Rendered Markdown</title>
+	<base target="_blank">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style nonce="{{.Nonce}}">
+			{{.CSS}}
+	</style>
+</head>
+<body class="prose" {{if .Theme}}data-theme="{{.Theme}}"{{end}}>
+	<main>
+			{{.Content}}
+	</main>
+</body>
+</html>
+`
+
+func SetRenderRoute(e *echo.Echo, publicPath string) {
+	renderPath := path.Join(publicPath, "render")
+
+	// Parse template once at startup
+	tmpl := template.Must(template.New("page").Parse(pageTemplate))
+
+	e.GET(renderPath, func(c echo.Context) error {
+		content := c.QueryParam("content")
+		theme := c.QueryParam("theme")
+
+		// Process markdown to HTML
+		renderedHTML := processMarkdown(content)
+
+		nonce := generateNonce()
+
+		data := struct {
+			Content template.HTML
+			Nonce   string
+			Theme   string
+			CSS     string
+		}{
+			Content: template.HTML(renderedHTML),
+			Nonce:   nonce,
+			Theme:   theme,
+		}
+
+		// Set headers
+		c.Response().Header().Set("Content-Type", "text/html")
+		c.Response().Header().Set("Content-Security-Policy", generateCSP(nonce))
+
+		err := tmpl.Execute(c.Response().Writer, data)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

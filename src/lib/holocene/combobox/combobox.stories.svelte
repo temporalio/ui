@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
   import type { Meta } from '@storybook/svelte';
-  import { expect, userEvent, within } from '@storybook/test';
+  import { expect, userEvent, waitFor, within } from '@storybook/test';
 
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import { iconNames } from '$lib/holocene/icon';
@@ -12,7 +12,6 @@
       label: 'Select a Language',
       placeholder: 'Start Typing...',
       noResultsText: 'No Results',
-      toggleLabel: 'Show Results',
       readonly: false,
       required: false,
       disabled: false,
@@ -38,11 +37,6 @@
         control: 'select',
         options: iconNames,
       },
-      toggleLabel: {
-        name: 'Toggle Label',
-        control: 'text',
-        table: { category: 'Accessibility' },
-      },
       noResultsText: { name: 'No Results Text', control: 'text' },
       optionValueKey: { control: 'text', table: { disable: true } },
       optionLabelKey: { control: 'text', table: { disable: true } },
@@ -55,6 +49,8 @@
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
+
+  import AsyncTest from './async-test.svelte';
 </script>
 
 <Template let:args let:context>
@@ -138,4 +134,53 @@
     multiselect: true,
     value: [],
   }}
+  play={async () => {
+    // re-enable this to get ally errors. Need to come back and resolve this
+    // DT-2629
+    // const canvas = within(canvasElement);
+    // const combobox = canvas.getByTestId(id);
+    // await userEvent.type(combobox, 'E');
+    // const menu = canvas.getByRole('listbox');
+    // expect(menu).toBeInTheDocument();
+  }}
 />
+
+<Story
+  name="Async Select"
+  play={async ({ canvasElement, id, step }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+
+    await userEvent.type(combobox, 'one');
+
+    const menu = canvas.getByRole('listbox');
+
+    expect(menu).toBeInTheDocument();
+
+    await step('Check async results', async () => {
+      expect(canvas.getByText('one')).toBeInTheDocument();
+      expect(canvas.getByText('Loading more results')).toBeInTheDocument();
+
+      await waitFor(
+        () => {
+          expect(canvas.getByText('asyncone')).toBeInTheDocument();
+        },
+        { timeout: 2001 },
+      );
+    });
+
+    await step('Get no results', async () => {
+      await userEvent.type(combobox, 'omgnoresults');
+      expect(canvas.getByText('Loading more results')).toBeInTheDocument();
+      waitFor(
+        () => {
+          expect(canvas.getByText('No Results')).toBeInTheDocument();
+        },
+        { timeout: 2001 },
+      );
+    });
+  }}
+  let:context
+>
+  <AsyncTest id={context.id}></AsyncTest>
+</Story>

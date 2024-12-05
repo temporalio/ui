@@ -48,7 +48,7 @@ export const variables = {
     dark: 'yellow.500',
   },
   '--color-text-pink': {
-    light: 'pink.500',
+    light: 'pink.800',
     dark: 'pink.400',
   },
   '--color-text-brand': {

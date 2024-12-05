@@ -38,7 +38,13 @@
 >
   <slot slot="leading" name="leading">
     {#if multiselect}
-      <Checkbox on:change={() => dispatch('click')} checked={selected} />
+      <Checkbox
+        on:change={() => dispatch('click')}
+        checked={selected}
+        tabindex={-1}
+        {label}
+        labelHidden
+      />
     {/if}
   </slot>
   {label}

@@ -1,25 +1,25 @@
+import type { Payloads } from '$lib/types';
 import type { WorkflowQueryRouteParameters } from '$lib/types/api';
 import type { Eventual, Settings } from '$lib/types/global';
+import type { WorkflowMetadata } from '$lib/types/workflows';
 import { convertPayloadToJsonWithCodec } from '$lib/utilities/decode-payload';
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
 import { has } from '$lib/utilities/has';
-import {
-  parseWithBigInt,
-  stringifyWithBigInt,
-} from '$lib/utilities/parse-with-big-int';
-import {
-  isTemporalAPIError,
-  requestFromAPI,
-} from '$lib/utilities/request-from-api';
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 type QueryRequestParameters = {
   workflow: Eventual<{ id: string; runId: string }>;
   namespace: string;
   queryType: string;
+  queryArgs?: Payloads;
 };
 
-type WorkflowParameters = Omit<QueryRequestParameters, 'queryType'>;
+type WorkflowParameters = Omit<
+  QueryRequestParameters,
+  'queryType' | 'queryArgs'
+>;
 
 type QueryPayload = {
   data: string;
@@ -53,13 +53,8 @@ const formatParameters = async (
 };
 
 async function fetchQuery(
-  { workflow, namespace, queryType }: QueryRequestParameters,
-  request = fetch,
-  onError?: (error: {
-    status: number;
-    statusText: string;
-    body: unknown;
-  }) => void,
+  { workflow, namespace, queryType, queryArgs }: QueryRequestParameters,
+  signal?: AbortSignal,
 ): Promise<QueryResponse> {
   workflow = await workflow;
   const parameters = await formatParameters(namespace, workflow, queryType);
@@ -75,44 +70,53 @@ async function fetchQuery(
         },
         query: {
           queryType,
+          queryArgs,
         },
       }),
+      signal,
     },
-    request,
-    onError,
+    request: fetch,
     notifyOnError: false,
   });
 }
 
-export async function getQueryTypes(
+export async function getWorkflowMetadata(
   options: WorkflowParameters,
-  request = fetch,
-): Promise<string[]> {
-  return new Promise<string[]>((resolve, reject) => {
-    fetchQuery(
-      { ...options, queryType: '@@temporal-internal__list' },
-      request,
-      (response) => {
-        if (
-          isTemporalAPIError(response.body) &&
-          response.body.message.includes('@@temporal-internal__list')
-        ) {
-          resolve(getQueryTypesFromError(response.body.message));
-        } else {
-          reject(response);
-        }
-      },
+  settings: Settings,
+  accessToken: string,
+  signal?: AbortSignal,
+): Promise<WorkflowMetadata> {
+  try {
+    const metadata = await getQuery(
+      { ...options, queryType: '__temporal_workflow_metadata' },
+      settings,
+      accessToken,
+      signal,
     );
-  });
+    return metadata;
+  } catch (e) {
+    if (e.message?.includes('__temporal_workflow_metadata')) {
+      const queryDefinitions = getQueryTypesFromError(e.message);
+      return {
+        definition: {
+          queryDefinitions,
+        },
+      };
+    } else {
+      return {
+        error: e,
+      };
+    }
+  }
 }
 
 export async function getQuery(
   options: QueryRequestParameters,
   settings: Settings,
   accessToken: string,
-  request = fetch,
+  signal?: AbortSignal,
 ): Promise<ParsedQuery> {
-  return fetchQuery(options, request).then(async (execution) => {
+  return fetchQuery(options, signal).then(async (execution) => {
     const { queryResult } = execution ?? { queryResult: { payloads: [] } };
 
     let data: ParsedQuery = queryResult.payloads;
@@ -132,8 +136,7 @@ export async function getQuery(
           data = convertedAttributes.payloads[0];
         }
       }
-
-      return parseWithBigInt(data);
+      return data;
     } catch (e) {
       if (typeof data !== 'string') {
         return stringifyWithBigInt(data);

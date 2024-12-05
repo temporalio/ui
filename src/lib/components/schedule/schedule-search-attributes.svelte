@@ -3,6 +3,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttribute } from '$lib/types';
   import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
+  import { payloadToString } from '$lib/utilities/payload-to-string';
   import { pluralize } from '$lib/utilities/pluralize';
 
   export let searchAttributes: SearchAttribute;
@@ -23,12 +24,13 @@
   {#if searchAttributeCount}
     <ul class="w-full">
       {#each Object.entries(indexedFields) as [searchAttrName, searchAttrValue]}
+        {@const value = payloadToString(searchAttrValue)}
         <li
           class="flex flex-wrap items-center gap-2 border-b py-2 last-of-type:border-b-0"
         >
           <span class="break-all">{searchAttrName}</span>
           <span class="surface-subtle select-all rounded-sm p-1 leading-4"
-            >{searchAttrValue}</span
+            >{value}</span
           >
         </li>
       {/each}

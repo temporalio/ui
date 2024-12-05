@@ -30,22 +30,22 @@ const javaSDKError = {
 
 describe('getQueryTypesFromError', () => {
   it('should return an array of query types', () => {
-    const queryTypes = ['__open_sessions'];
+    const queryTypes = [{ name: '__open_sessions' }];
     expect(getQueryTypesFromError(error.message)).toEqual(queryTypes);
   });
 
   it('should omit __stack_traces', () => {
-    expect(getQueryTypesFromError(error.message)).not.toContain(
-      '__stack_trace',
-    );
+    expect(getQueryTypesFromError(error.message)).not.toContain({
+      name: '__stack_trace',
+    });
   });
 
   it('should work with the Java SDK', () => {
     expect(getQueryTypesFromError(javaSDKError.message)).toEqual([
-      'getLoan',
-      'getNextPaymentDue',
-      'getPaymentObligations',
-      'getNextPaymentObligation',
+      { name: 'getLoan' },
+      { name: 'getNextPaymentDue' },
+      { name: 'getPaymentObligations' },
+      { name: 'getNextPaymentObligation' },
     ]);
   });
 });

@@ -46,7 +46,7 @@
   {/if}
   <div
     class={merge(
-      'relative box-border inline-flex w-full rounded-lg border-2 border-subtle focus-within:border-information focus-within:ring-4 focus-within:ring-primary/70',
+      'relative box-border inline-flex w-full rounded-lg border border-subtle focus-within:border-information focus-within:ring-2 focus-within:ring-primary/70',
       !isValid && 'error',
       !disabled && 'hover:border-information',
     )}
@@ -97,7 +97,7 @@
 
 <style lang="postcss">
   .error {
-    @apply border-danger focus-within:border-danger focus-within:ring-4 focus-within:ring-danger/70;
+    @apply border-danger focus-within:border-danger focus-within:ring-2 focus-within:ring-danger/70;
   }
 
   .error-msg {

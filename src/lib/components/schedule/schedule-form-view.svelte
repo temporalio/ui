@@ -13,7 +13,10 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import { error, loading } from '$lib/stores/schedules';
-  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+  import {
+    customSearchAttributes,
+    type SearchAttributeInput,
+  } from '$lib/stores/search-attributes';
   import type {
     FullSchedule,
     ScheduleParameters,
@@ -26,7 +29,7 @@
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  import type { PayloadInputEncoding } from '../payload-input.svelte';
+  import type { PayloadInputEncoding } from '../payload-input-with-encoding.svelte';
   import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
@@ -73,6 +76,7 @@
   let workflowId = decodedWorkflow?.workflowId ?? '';
   let taskQueue = decodedWorkflow?.taskQueue?.name ?? '';
   let input = '';
+  let editInput = !schedule;
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let daysOfWeek: string[] = [];
   let daysOfMonth: number[] = [];
@@ -83,9 +87,13 @@
   let second = '';
   let phase = '';
   let cronString = '';
-  let searchAttributesInput: SearchAttributeInput[] = Object.entries(
-    indexedFields,
-  ).map(([attribute, value]) => ({ attribute, value }));
+  let searchAttributesInput = Object.entries(indexedFields).map(
+    ([label, value]) => ({
+      label,
+      value,
+      type: $customSearchAttributes[label],
+    }),
+  ) as SearchAttributeInput[];
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: Partial<ScheduleParameters> = {
@@ -93,7 +101,7 @@
       workflowType,
       workflowId,
       taskQueue,
-      input,
+      ...(editInput && { input }),
       encoding: $encoding,
       hour,
       minute,
@@ -157,7 +165,7 @@
   onDestroy(() => ($error = ''));
 </script>
 
-<div class="pb-20">
+<div class="pb-10">
   {#if $loading}
     <Loading title={loadingText} />
   {:else}
@@ -216,8 +224,10 @@
       </div>
       <ScheduleInputPayload
         bind:input
+        bind:editInput
         bind:encoding
         payloads={schedule?.action?.startWorkflow?.input}
+        showEditActions={Boolean(schedule)}
       />
       <AddSearchAttributes
         bind:attributesToAdd={searchAttributesInput}
@@ -236,13 +246,13 @@
         bind:phase
         bind:cronString
       >
-        <div class="mt-8 flex items-center gap-2">
+        <div class="mt-4 flex flex-row items-center gap-4 max-sm:flex-col">
           <Button
             disabled={isDisabled(preset) || !writeActionsAreAllowed()}
             on:click={() => handleConfirm(preset, schedule)}
-            >{confirmText}</Button
+            class="max-sm:w-full">{confirmText}</Button
           >
-          <Button variant="ghost" href={backHref}
+          <Button variant="ghost" href={backHref} class="max-sm:w-full"
             >{translate('common.cancel')}</Button
           >
         </div>
