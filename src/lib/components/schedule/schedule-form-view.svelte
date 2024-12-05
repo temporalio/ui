@@ -8,6 +8,7 @@
   import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -165,99 +166,99 @@
   onDestroy(() => ($error = ''));
 </script>
 
-<div class="pb-20">
+<div class="flex flex-col gap-4 pb-20">
   {#if $loading}
     <Loading title={loadingText} />
   {:else}
-    <header class="mb-12 flex flex-col gap-4">
-      <Link href={backHref} icon="chevron-left">
-        {backTitle}
-      </Link>
-      <h1>{title}</h1>
-    </header>
-    <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
-      <div class="w-full">
-        <Input
-          id="name"
-          bind:value={name}
-          label={translate('schedules.name-label')}
-          error={errors['name']}
-          maxLength={232}
-          disabled={Boolean(scheduleId)}
-          on:input={onInput}
-          on:blur={onBlur}
-          required
-        />
-      </div>
-      <div class="w-full">
-        <Input
-          id="workflowType"
-          bind:value={workflowType}
-          label={translate('schedules.workflow-type-label')}
-          error={errors['workflowType']}
-          on:input={onInput}
-          on:blur={onBlur}
-          required
-        />
-      </div>
-      <div class="w-full">
-        <Input
-          id="workflowId"
-          bind:value={workflowId}
-          label={translate('schedules.workflow-id-label')}
-          error={errors['workflowId']}
-          on:input={onInput}
-          on:blur={onBlur}
-          required
-        />
-      </div>
-      <div class="w-full">
-        <Input
-          id="taskQueue"
-          bind:value={taskQueue}
-          label={translate('schedules.task-queue-label')}
-          error={errors['taskQueue']}
-          on:input={onInput}
-          on:blur={onBlur}
-          required
-        />
-      </div>
-      <ScheduleInputPayload
-        bind:input
-        bind:editInput
-        bind:encoding
-        payloads={schedule?.action?.startWorkflow?.input}
-        showEditActions={Boolean(schedule)}
-      />
-      <AddSearchAttributes
-        bind:attributesToAdd={searchAttributesInput}
-        class="w-full"
-      />
-      <SchedulesCalendarView
-        let:preset
-        {schedule}
-        bind:daysOfWeek
-        bind:daysOfMonth
-        bind:months
-        bind:days
-        bind:hour
-        bind:minute
-        bind:second
-        bind:phase
-        bind:cronString
-      >
-        <div class="mt-8 flex items-center gap-2">
-          <Button
-            disabled={isDisabled(preset) || !writeActionsAreAllowed()}
-            on:click={() => handleConfirm(preset, schedule)}
-            >{confirmText}</Button
-          >
-          <Button variant="ghost" href={backHref}
-            >{translate('common.cancel')}</Button
-          >
+    <Link href={backHref} icon="chevron-left">
+      {backTitle}
+    </Link>
+    <h1>{title}</h1>
+    <Card class="w-full xl:w-3/4 2xl:w-1/2">
+      <form class="flex w-full flex-col gap-4">
+        <div class="w-full">
+          <Input
+            id="name"
+            bind:value={name}
+            label={translate('schedules.name-label')}
+            error={errors['name']}
+            maxLength={232}
+            disabled={Boolean(scheduleId)}
+            on:input={onInput}
+            on:blur={onBlur}
+            required
+          />
         </div>
-      </SchedulesCalendarView>
-      <Alert intent="error" title={$error} hidden={!$error} />
-    </form>
+        <div class="w-full">
+          <Input
+            id="workflowType"
+            bind:value={workflowType}
+            label={translate('schedules.workflow-type-label')}
+            error={errors['workflowType']}
+            on:input={onInput}
+            on:blur={onBlur}
+            required
+          />
+        </div>
+        <div class="w-full">
+          <Input
+            id="workflowId"
+            bind:value={workflowId}
+            label={translate('schedules.workflow-id-label')}
+            error={errors['workflowId']}
+            on:input={onInput}
+            on:blur={onBlur}
+            required
+          />
+        </div>
+        <div class="w-full">
+          <Input
+            id="taskQueue"
+            bind:value={taskQueue}
+            label={translate('schedules.task-queue-label')}
+            error={errors['taskQueue']}
+            on:input={onInput}
+            on:blur={onBlur}
+            required
+          />
+        </div>
+        <ScheduleInputPayload
+          bind:input
+          bind:editInput
+          bind:encoding
+          payloads={schedule?.action?.startWorkflow?.input}
+          showEditActions={Boolean(schedule)}
+        />
+        <AddSearchAttributes
+          bind:attributesToAdd={searchAttributesInput}
+          class="w-full"
+        />
+        <SchedulesCalendarView
+          let:preset
+          {schedule}
+          bind:daysOfWeek
+          bind:daysOfMonth
+          bind:months
+          bind:days
+          bind:hour
+          bind:minute
+          bind:second
+          bind:phase
+          bind:cronString
+        >
+          <div class="mt-8 flex items-center gap-2">
+            <Button
+              disabled={isDisabled(preset) || !writeActionsAreAllowed()}
+              on:click={() => handleConfirm(preset, schedule)}
+              >{confirmText}</Button
+            >
+            <Button variant="ghost" href={backHref}
+              >{translate('common.cancel')}</Button
+            >
+          </div>
+        </SchedulesCalendarView>
+        <Alert intent="error" title={$error} hidden={!$error} />
+      </form>
+    </Card>
   {/if}
 </div>
