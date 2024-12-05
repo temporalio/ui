@@ -50,9 +50,7 @@
   };
 </script>
 
-<div
-  class="h-[320px] w-full overflow-hidden rounded-xl border-2 border-subtle bg-primary"
->
+<div class="h-[320px] w-full overflow-hidden">
   <ZoomSvg
     initialZoom={0.75}
     maxZoomOut={1.5}
