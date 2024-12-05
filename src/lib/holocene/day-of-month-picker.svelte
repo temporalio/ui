@@ -18,25 +18,24 @@
   };
 </script>
 
-<div class="text-center">
-  <div
-    class="surface-primary grid gap-x-4 gap-y-4 rounded border border-subtle px-0 py-4 text-center md:gap-x-8 md:px-2 xl:gap-x-16 xl:px-4"
-  >
-    {#each daysInMonth as day}
-      {@const active = daysOfMonth.includes(day)}
-      <Button
-        variant="secondary"
-        class={active && 'bg-interactive-secondary-active'}
-        on:click={(e) => onClick(e, day)}
-      >
-        {day}
-      </Button>
-    {/each}
-  </div>
+<div
+  class="surface-primary grid place-items-center gap-1 rounded border border-subtle px-0 py-4 text-center sm:gap-4 md:gap-x-8 md:px-2 xl:gap-x-16 xl:px-4"
+>
+  {#each daysInMonth as day}
+    {@const active = daysOfMonth.includes(day)}
+    <Button
+      variant="secondary"
+      class="max-md:h-9 max-md:px-4 max-md:py-1.5 max-md:text-sm max-sm:h-8 max-sm:px-2 max-sm:py-1 max-sm:text-xs {active &&
+        'bg-interactive-secondary-active'}"
+      on:click={(e) => onClick(e, day)}
+    >
+      {day}
+    </Button>
+  {/each}
 </div>
 
 <style lang="postcss">
   .grid {
-    grid-template-columns: repeat(7, minmax(45px, 1fr));
+    grid-template-columns: repeat(7, minmax(32px, 1fr));
   }
 </style>

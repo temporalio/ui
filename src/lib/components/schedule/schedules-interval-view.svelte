@@ -41,7 +41,7 @@
   <p>
     {translate('schedules.interval-view-description')}
   </p>
-  <div class="flex flex-col items-center gap-2 lg:flex-row">
+  <div class="flex flex-col gap-2 md:flex-row md:items-center">
     <Input
       id="days"
       class="w-28"
@@ -54,7 +54,7 @@
       maxLength={3}
       error={error(days)}
     />
-    <div class="hidden lg:block">:</div>
+    <div class="hidden md:block">:</div>
     <Input
       id="hour-interval"
       class="w-24"
@@ -67,7 +67,7 @@
       maxLength={2}
       error={error(hour)}
     />
-    <div class="hidden lg:block">:</div>
+    <div class="hidden md:block">:</div>
     <Input
       id="minute-interval"
       class="w-24"
@@ -80,7 +80,7 @@
       maxLength={2}
       error={error(minute)}
     />
-    <div class="hidden lg:block">:</div>
+    <div class="hidden md:block">:</div>
     <Input
       id="second"
       class="w-24"
