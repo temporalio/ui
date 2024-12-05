@@ -67,7 +67,7 @@
 </script>
 
 <div
-  class="relative h-auto overflow-auto border-b-2 border-subtle"
+  class="relative h-auto overflow-auto border-b border-subtle"
   bind:clientWidth={canvasWidth}
   style="max-height: {viewportHeight}px;"
   on:scroll={handleScroll}

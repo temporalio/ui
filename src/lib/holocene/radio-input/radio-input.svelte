@@ -63,7 +63,7 @@
   }
 
   input[type='radio'] {
-    @apply box-border h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-secondary outline-none;
+    @apply box-border h-5 w-5 cursor-pointer appearance-none rounded-full border border-secondary outline-none;
 
     &:checked {
       @apply bg-interactive;
@@ -72,7 +72,7 @@
     &:enabled {
       &:focus-visible,
       &:hover {
-        @apply bg-interactive-active ring-4 ring-primary/70;
+        @apply bg-interactive-active ring-2 ring-primary/70;
 
         &:checked {
           &:not(:active) {
@@ -88,7 +88,7 @@
 
     &:checked,
     &:active {
-      @apply shadow-[inset_0_0_0_2px] shadow-white dark:shadow-black;
+      @apply shadow-[inset_0_0_0_1px] shadow-white dark:shadow-black;
     }
 
     &:disabled {

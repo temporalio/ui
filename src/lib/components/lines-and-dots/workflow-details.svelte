@@ -53,7 +53,7 @@
           })
         : '-'}
     />
-    <WorkflowDetail content={elapsedTime} class="text-xl" icon="clock" />
+    <WorkflowDetail content={elapsedTime} icon="clock" />
   </div>
   <div class="flex w-full flex-col gap-2 xl:w-1/3">
     <WorkflowDetail

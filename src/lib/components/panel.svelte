@@ -8,7 +8,7 @@
 
 <style lang="postcss">
   .panel {
-    @apply rounded-xl border-2 p-8 dark:border-subtle;
+    @apply rounded-xl border p-8 dark:border-subtle;
 
     &.error {
       @apply border-danger bg-danger;

@@ -436,7 +436,7 @@
       />
     </div>
     {#if $$slots.action}
-      <div class="ml-1 flex h-full items-center border-l-2 border-subtle p-0.5">
+      <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
         {#if actionTooltip}
           <Tooltip text={actionTooltip} right>
             <slot name="action" />
@@ -446,7 +446,7 @@
         {/if}
       </div>
     {:else if href}
-      <div class="ml-1 flex h-full items-center border-l-2 border-subtle p-0.5">
+      <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
         {#if actionTooltip}
           <Tooltip text={actionTooltip} right>
             <Button
@@ -471,7 +471,7 @@
   </div>
 
   <Menu
-    keepOpen={multiselect || true}
+    keepOpen={multiselect}
     bind:menuElement
     id="{id}-listbox"
     role="listbox"
@@ -519,10 +519,10 @@
 
 <style lang="postcss">
   .combobox-wrapper {
-    @apply surface-primary flex w-full flex-row items-center rounded-lg border-2 border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply surface-primary flex w-full flex-row items-center rounded-lg border border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
 
     &.invalid {
-      @apply border-2 border-danger text-danger focus-within:ring-danger/70;
+      @apply border border-danger text-danger focus-within:ring-danger/70;
     }
 
     &.disabled {

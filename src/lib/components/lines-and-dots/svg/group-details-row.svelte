@@ -162,7 +162,7 @@
           runId={childWorkflowStartedEvent.attributes.workflowExecution.runId}
           height={childTimelineHeight}
           width={childTimelineWidth}
-          class="overflow-x-hidden rounded-br rounded-tr border-b-2 border-r-2 border-t-2 border-subtle bg-primary"
+          class="overflow-x-hidden rounded-br rounded-tr border-y border-r border-subtle bg-primary"
         />
       {/key}
     </foreignObject>

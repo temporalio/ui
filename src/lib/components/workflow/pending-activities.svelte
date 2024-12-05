@@ -189,7 +189,7 @@
   }
 
   .pending-activity-summary {
-    @apply w-full overflow-x-scroll border-b-2 border-subtle py-1 text-sm;
+    @apply w-full overflow-x-scroll border-b border-subtle py-1 text-sm;
   }
 
   .pending-activity-row:last-child .pending-activity-summary {

@@ -30,6 +30,6 @@
 
 <style lang="postcss">
   .row {
-    @apply my-1 inline-flex h-10 w-full justify-start border-b-2 border-subtle py-1;
+    @apply my-1 inline-flex h-10 w-full justify-start border-b border-subtle py-1;
   }
 </style>

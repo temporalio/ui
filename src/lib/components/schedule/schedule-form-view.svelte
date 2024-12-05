@@ -166,7 +166,7 @@
   onDestroy(() => ($error = ''));
 </script>
 
-<div class="flex flex-col gap-4 pb-20">
+<div class="flex flex-col gap-4 pb-10">
   {#if $loading}
     <Loading title={loadingText} />
   {:else}
@@ -175,7 +175,7 @@
     </Link>
     <h1>{title}</h1>
     <Card class="w-full xl:w-3/4 2xl:w-1/2">
-      <form class="flex w-full flex-col gap-4">
+      <form class="mb-4 flex w-full flex-col gap-4">
         <div class="w-full">
           <Input
             id="name"
@@ -246,13 +246,13 @@
           bind:phase
           bind:cronString
         >
-          <div class="mt-8 flex items-center gap-2">
+          <div class="mt-4 flex flex-row items-center gap-4 max-sm:flex-col">
             <Button
               disabled={isDisabled(preset) || !writeActionsAreAllowed()}
               on:click={() => handleConfirm(preset, schedule)}
-              >{confirmText}</Button
+              class="max-sm:w-full">{confirmText}</Button
             >
-            <Button variant="ghost" href={backHref}
+            <Button variant="ghost" href={backHref} class="max-sm:w-full"
               >{translate('common.cancel')}</Button
             >
           </div>

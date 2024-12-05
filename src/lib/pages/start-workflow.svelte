@@ -203,7 +203,9 @@
   >
     {translate('workflows.back-to-workflows')}
   </Link>
-  <h1 data-testid="start-workflow">Start a Workflow</h1>
+  <h1 class="mb-4 overflow-hidden" data-testid="start-workflow">
+    Start a Workflow
+  </h1>
   <Card class="flex w-full flex-col gap-4 xl:w-3/4 2xl:w-1/2">
     <div
       class="flex w-full flex-col justify-between gap-2 sm:items-center md:flex-row md:gap-4"
@@ -291,9 +293,12 @@
       </Card>
       <AddSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}
-    <div class="mt-4 flex w-full justify-between">
+    <div
+      class="mt-4 flex w-full flex-row justify-between gap-4 max-sm:flex-col"
+    >
       <Button
         variant="ghost"
+        class="max-sm:w-full"
         trailingIcon={viewAdvancedOptions ? 'chevron-up' : 'chevron-down'}
         on:click={() => (viewAdvancedOptions = !viewAdvancedOptions)}
         >{translate('common.more-options')}</Button
@@ -302,7 +307,7 @@
         disabled={!enableStart}
         on:click={onWorkflowStart}
         data-testid="start-workflow-button"
-        >{translate('workflows.start-workflow')}</Button
+        class="max-sm:w-full">{translate('workflows.start-workflow')}</Button
       >
     </div>
     {#if error}

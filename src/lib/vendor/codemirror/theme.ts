@@ -12,7 +12,7 @@ export const TEMPORAL_THEME = (isDark) =>
         color: css('--color-text-primary'),
         backgroundColor: css('--color-surface-primary'),
         borderRadius: '0.25rem',
-        borderWidth: '2px',
+        borderWidth: '1px',
         borderColor: css('--color-border-subtle'),
         padding: '0.5rem',
       },

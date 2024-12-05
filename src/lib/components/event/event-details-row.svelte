@@ -61,6 +61,6 @@
 
 <style lang="postcss">
   .payload {
-    @apply overflow-hidden rounded border-2 border-subtle bg-primary px-1 py-0.5 font-mono text-xs;
+    @apply overflow-hidden rounded border border-subtle bg-primary px-1 py-0.5 font-mono text-xs;
   }
 </style>
