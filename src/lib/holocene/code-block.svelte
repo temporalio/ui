@@ -188,7 +188,7 @@
   $: content, language, setView();
 </script>
 
-<div class="relative min-w-[80px] grow-0">
+<div class="relative min-w-[80px] grow">
   <div
     bind:this={editor}
     class={className}
