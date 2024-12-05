@@ -165,7 +165,7 @@
   onDestroy(() => ($error = ''));
 </script>
 
-<div class="pb-20">
+<div class="pb-10">
   {#if $loading}
     <Loading title={loadingText} />
   {:else}
@@ -246,13 +246,13 @@
         bind:phase
         bind:cronString
       >
-        <div class="mt-8 flex items-center gap-2">
+        <div class="mt-4 flex flex-row items-center gap-4 max-sm:flex-col">
           <Button
             disabled={isDisabled(preset) || !writeActionsAreAllowed()}
             on:click={() => handleConfirm(preset, schedule)}
-            >{confirmText}</Button
+            class="max-sm:w-full">{confirmText}</Button
           >
-          <Button variant="ghost" href={backHref}
+          <Button variant="ghost" href={backHref} class="max-sm:w-full"
             >{translate('common.cancel')}</Button
           >
         </div>

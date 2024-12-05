@@ -34,20 +34,9 @@
     </Link>
   </div>
   <div class="flex flex-col gap-1">
-    <div class="flex items-center justify-between">
-      <h1 data-testid="namespace-selector-title">
-        {endpoint.spec.name}
-      </h1>
-      <div class="flex items-center gap-2">
-        <Button
-          variant="destructive"
-          on:click={() => (deleteConfirmationModalOpen = true)}
-          >{translate('nexus.delete-endpoint')}</Button
-        >
-        <Button on:click={onUpdate} {loading}>{translate('common.save')}</Button
-        >
-      </div>
-    </div>
+    <h1 data-testid="namespace-selector-title">
+      {endpoint.spec.name}
+    </h1>
   </div>
   <NexusForm
     {endpoint}
@@ -59,9 +48,30 @@
     {isCloud}
     nameDisabled
   />
-  <div class="flex items-center gap-4">
-    <Button on:click={onUpdate} {loading}>{translate('common.save')}</Button>
+  <div
+    class="flex w-full flex-row items-center justify-between gap-4 max-sm:flex-col xl:w-1/2"
+  >
+    <div
+      class="items-centeritems-center flex w-full flex-row gap-4 max-sm:flex-col"
+    >
+      <Button class="max-sm:w-full" on:click={onUpdate} {loading}
+        >{translate('common.save')}</Button
+      >
+      <Button
+        class="max-sm:hidden"
+        variant="ghost"
+        on:click={() => goto(routeForNexusEndpoint($page.params.id))}
+        >{translate('common.cancel')}</Button
+      >
+    </div>
     <Button
+      class="max-sm:w-full"
+      variant="destructive"
+      on:click={() => (deleteConfirmationModalOpen = true)}
+      >{translate('common.delete')}</Button
+    >
+    <Button
+      class="w-full sm:hidden"
       variant="ghost"
       on:click={() => goto(routeForNexusEndpoint($page.params.id))}
       >{translate('common.cancel')}</Button
