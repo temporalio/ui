@@ -74,7 +74,7 @@
     out:slide={{ duration: 200, delay: 0 }}
   >
     <BottomNavLinks open={viewLinks} {linkList} />
-    <slot name="nsPicker" open={viewNamespaces}>
+    <slot name="nsPicker" open={$viewNamespaces}>
       <BottomNavNamespaces open={$viewNamespaces} {namespaceList} />
     </slot>
     <BottomNavSettings open={viewSettings}>
