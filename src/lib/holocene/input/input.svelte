@@ -93,7 +93,9 @@
   <div class="input-group flex rounded-lg">
     <slot name="before-input" {disabled} />
     <div
-      class="input-container"
+      class={merge(
+        'surface-primary relative box-border inline-flex h-10 w-full items-center rounded-lg border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
+      )}
       class:disabled
       class:error
       class:noBorder
@@ -185,7 +187,7 @@
 <style lang="postcss">
   /* Base styles */
   .input-container {
-    @apply surface-primary relative box-border inline-flex h-10 w-full items-center rounded-lg border-2 border-subtle text-sm focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    /* @apply ; */
 
     &.error,
     &.invalid {

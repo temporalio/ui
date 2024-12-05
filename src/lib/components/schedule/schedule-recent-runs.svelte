@@ -93,6 +93,6 @@
 
 <style lang="postcss">
   .row {
-    @apply my-1 inline-flex w-full items-center border-b-2 border-subtle py-1;
+    @apply my-1 inline-flex w-full items-center border-b border-subtle py-1;
   }
 </style>

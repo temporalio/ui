@@ -45,7 +45,7 @@
 
 <style lang="postcss">
   .namespace {
-    @apply w-full cursor-pointer rounded border border-transparent text-left text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+    @apply w-full cursor-pointer rounded border border-transparent text-left text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
 
     &.selected {
       @apply text-brand;
