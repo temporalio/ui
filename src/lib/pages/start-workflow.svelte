@@ -142,14 +142,18 @@
         if (customSAKeys.includes(key)) {
           searchAttributes = [
             ...searchAttributes,
-            { attribute: key, value: String(value) },
+            {
+              label: key,
+              value,
+              type: $customSearchAttributes[key],
+            } as SearchAttributeInput,
           ];
         }
       });
     }
 
     if (
-      initialValues?.searchAttributes?.length ||
+      Object.keys(initialValues?.searchAttributes ?? {}).length ||
       initialValues?.summary ||
       initialValues?.details
     ) {
@@ -189,7 +193,7 @@
   $: checkTaskQueue(taskQueueParam);
 </script>
 
-<div class="flex w-full flex-col items-center pb-24">
+<div class="flex w-full flex-col items-center pb-10">
   <div class="mb-6 flex w-full items-start">
     <Link
       href={`${routeForWorkflows({
@@ -291,9 +295,12 @@
       </Card>
       <AddSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}
-    <div class="mt-4 flex w-full justify-between">
+    <div
+      class="mt-4 flex w-full flex-row justify-between gap-4 max-sm:flex-col"
+    >
       <Button
         variant="ghost"
+        class="max-sm:w-full"
         trailingIcon={viewAdvancedOptions ? 'chevron-up' : 'chevron-down'}
         on:click={() => (viewAdvancedOptions = !viewAdvancedOptions)}
         >{translate('common.more-options')}</Button
@@ -302,7 +309,7 @@
         disabled={!enableStart}
         on:click={onWorkflowStart}
         data-testid="start-workflow-button"
-        >{translate('workflows.start-workflow')}</Button
+        class="max-sm:w-full">{translate('workflows.start-workflow')}</Button
       >
     </div>
     {#if error}

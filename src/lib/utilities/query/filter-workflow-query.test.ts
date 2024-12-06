@@ -207,13 +207,31 @@ describe('toListWorkflowQueryFromFilters', () => {
       {
         attribute: 'CustomKeywordListField',
         type: 'KeywordList',
-        conditional: 'IN',
+        conditional: 'in',
         operator: '',
         parenthesis: '',
         value: '("Hello", "World")',
       },
+      {
+        attribute: 'CustomKeywordListField',
+        type: 'KeywordList',
+        conditional: 'is',
+        operator: '',
+        parenthesis: '',
+        value: null,
+      },
+      {
+        attribute: 'CustomKeywordListField',
+        type: 'KeywordList',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'Hello',
+      },
     ];
-    const query = toListWorkflowQueryFromFilters(filters);
-    expect(query).toBe('`CustomKeywordListField`IN("Hello", "World")');
+    const query = toListWorkflowQueryFromFilters(combineFilters(filters));
+    expect(query).toBe(
+      '`CustomKeywordListField`in("Hello", "World") AND `CustomKeywordListField` is null AND `CustomKeywordListField`="Hello"',
+    );
   });
 });

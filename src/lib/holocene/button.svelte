@@ -113,10 +113,13 @@
     type="button"
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
-    class={buttonStyles({
-      variant,
-      size,
-    })}
+    class={merge(
+      buttonStyles({
+        variant,
+        size,
+      }),
+      className,
+    )}
     on:click|stopPropagation={onLinkClick}
     tabindex={href ? null : 0}
     {...$$restProps}

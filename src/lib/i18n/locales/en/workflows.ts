@@ -248,6 +248,7 @@ export const Strings = {
   'start-workflow-like-this-one': 'Start Workflow Like This One',
   'custom-search-attribute': 'Custom Search Attribute',
   'select-attribute': 'Select Attribute',
+  'unsupported-attribute': 'Unsupported attribute type',
   'add-search-attribute': 'Add a Search Attribute',
   'pending-workflow-task': 'Pending Workflow Task',
   'original-scheduled-time': 'Original Scheduled Time',

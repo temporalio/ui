@@ -98,7 +98,7 @@
     {/if}
   </div>
 </div>
-<header class="flex flex-col gap-1">
+<header class="flex flex-col gap-2">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
     <div class="flex flex-col items-center gap-4 lg:flex-row">
       <WorkflowStatus status={workflow?.status} big />
@@ -173,7 +173,7 @@
     </div>
   {/if}
   <Tabs>
-    <TabList class="flex flex-wrap gap-6 pb-1 pt-4" label="workflow detail">
+    <TabList class="flex flex-wrap gap-6 pt-2" label="workflow detail">
       <Tab
         label={translate('workflows.history-tab')}
         id="history-tab"

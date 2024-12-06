@@ -7,7 +7,6 @@ import type {
   PendingNexusOperation,
 } from '$lib/types/events';
 import type {
-  DecodedWorkflowSearchAttributes,
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
   WorkflowExecutionAPIResponse,
@@ -58,7 +57,7 @@ const toCallbacks = (callbacks?: Callbacks): Callbacks => {
 
 const toSearchAttributes = (
   apiSearchAttributes: WorkflowSearchAttributes,
-): DecodedWorkflowSearchAttributes => {
+): WorkflowSearchAttributes => {
   if (!apiSearchAttributes || !apiSearchAttributes.indexedFields) return {};
   const decoded = Object.entries(apiSearchAttributes.indexedFields).reduce(
     (searchAttributes, [searchAttributeName, payload]) => {
