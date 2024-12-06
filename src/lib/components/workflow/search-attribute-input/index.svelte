@@ -38,22 +38,31 @@
   };
 </script>
 
-<div class="flex items-end gap-2">
-  <div class="min-w-fit">
-    <Select
-      id="search-attribute"
-      label={translate('workflows.custom-search-attribute')}
-      class="w-full"
-      placeholder={translate('workflows.select-attribute')}
-      bind:value={attribute.label}
-      onChange={handleAttributeChange}
-    >
-      {#each $customSearchAttributeOptions as { value, label, type }}
-        <Option disabled={isDisabled(value)} {value} description={type}
-          >{label}</Option
-        >
-      {/each}
-    </Select>
+<div
+  class="flex flex-col gap-2 border-b border-subtle pb-4 sm:flex-row sm:gap-4"
+>
+  <div class="flex min-w-fit justify-between gap-2 sm:gap-4">
+    <div class="grow [&_button]:w-full">
+      <Select
+        id="search-attribute"
+        label={translate('workflows.custom-search-attribute')}
+        placeholder={translate('workflows.select-attribute')}
+        bind:value={attribute.label}
+        onChange={handleAttributeChange}
+      >
+        {#each $customSearchAttributeOptions as { value, label, type }}
+          <Option disabled={isDisabled(value)} {value} description={type}
+            >{label}</Option
+          >
+        {/each}
+      </Select>
+    </div>
+    <Button
+      variant="ghost"
+      leadingIcon="close"
+      class="mt-6 w-10 rounded-full sm:hidden"
+      on:click={() => onRemove(attribute.label)}
+    />
   </div>
   {#if attribute.type === SEARCH_ATTRIBUTE_TYPE.BOOL}
     <Select
@@ -102,7 +111,7 @@
   <Button
     variant="ghost"
     leadingIcon="close"
-    class="mt-6 w-10 rounded-full"
+    class="mt-6 w-10 rounded-full max-sm:hidden"
     on:click={() => onRemove(attribute.label)}
   />
 </div>
