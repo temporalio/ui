@@ -185,6 +185,7 @@ export const Strings = {
   summary: 'Summary',
   details: 'Details',
   'summary-and-details': 'Summary & Details',
+  'current-details': 'Current Details',
   'maximum-attempts': 'Maximum Attempts',
   'retry-expiration': 'Retry Expiration',
   state: 'State',
