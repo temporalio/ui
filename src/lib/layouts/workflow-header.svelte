@@ -157,7 +157,7 @@
           height={32}
         />{translate('workflows.current-details')}
       </div>
-      {#if open && currentDetails}
+      {#if open}
         <Markdown content={currentDetails} />
       {/if}
     </AccordionLight>
