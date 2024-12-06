@@ -144,7 +144,7 @@
 
 <style lang="postcss">
   .orderable-item {
-    @apply flex select-none list-none flex-row items-center justify-between border-b border-subtle p-2 text-sm font-medium first-of-type:rounded-tl-lg first-of-type:rounded-tr-lg last-of-type:rounded-bl-lg last-of-type:rounded-br-lg last-of-type:border-b-0;
+    @apply flex select-none list-none flex-row items-center justify-between border-b border-subtle p-2 text-sm font-medium last-of-type:border-b-0;
   }
 
   .orderable-item[draggable='true'] {
@@ -157,9 +157,5 @@
 
   :global(.orderable-item.dragging-over:not(.locked)) {
     @apply bg-gradient-to-br from-blue-100 to-purple-100;
-
-    &:last-of-type {
-      @apply rounded-bl-lg rounded-br-lg;
-    }
   }
 </style>

@@ -22,6 +22,6 @@
 
 <style lang="postcss">
   .frequency {
-    @apply flex h-auto max-h-32 flex-col overflow-auto rounded-lg border border-subtle bg-primary px-2 py-2 font-mono text-sm;
+    @apply flex h-auto max-h-32 flex-col overflow-auto border border-subtle bg-primary px-2 py-2 font-mono text-sm;
   }
 </style>

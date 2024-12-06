@@ -42,7 +42,7 @@
 {#if expandable}
   <div
     class={merge(
-      'surface-primary w-full rounded-2xl border border-subtle p-2 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary/70',
+      'surface-primary w-full border border-subtle p-2 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary/70',
       className,
     )}
     {...$$restProps}
@@ -51,7 +51,7 @@
       id="{id}-trigger"
       aria-expanded={open}
       aria-controls="{id}-content"
-      class="flex w-full flex-col rounded-lg p-2 hover:bg-interactive-secondary-hover focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
+      class="flex w-full flex-col p-2 hover:bg-interactive-secondary-hover focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
       type="button"
       on:click={toggleAccordion}
     >
@@ -94,11 +94,8 @@
     </div>
   </div>
 {:else}
-  <div
-    class="surface-primary w-full rounded-2xl border border-subtle p-4"
-    {...$$restProps}
-  >
-    <div class="flex w-full flex-col rounded-lg">
+  <div class="surface-primary w-full border border-subtle p-4" {...$$restProps}>
+    <div class="flex w-full flex-col">
       <div class="space-between flex w-full flex-row items-center">
         <h3 class="flex w-full items-center gap-2">
           {#if icon}<Icon name={icon} />{/if}

@@ -60,16 +60,6 @@
         control: 'text',
         table: { category: 'Accessibility' },
       },
-      unroundLeft: {
-        name: 'Unround Left',
-        control: 'boolean',
-        table: { category: 'Styling (Deprecated)' },
-      },
-      unroundRight: {
-        name: 'Unround Right',
-        control: 'boolean',
-        table: { category: 'Styling (Deprecated)' },
-      },
       noBorder: {
         name: 'No Border',
         control: 'boolean',

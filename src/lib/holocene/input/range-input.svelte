@@ -124,7 +124,7 @@
   }
 
   .numeric-input {
-    @apply h-10 w-10 rounded-lg border border-subtle bg-information text-center text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
+    @apply h-10 w-10 border border-subtle bg-information text-center text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
 
     appearance: textfield;
   }
