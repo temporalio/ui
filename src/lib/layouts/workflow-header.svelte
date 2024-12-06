@@ -38,15 +38,13 @@
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
-  export let namespace: string;
-
+  $: ({ namespace, workflow: workflowId, run: runId, id } = $page.params);
   $: ({ workflow, workers } = $workflowRun);
-  $: id = $page.params.id;
 
   $: routeParameters = {
     namespace,
-    workflow: workflow?.id,
-    run: workflow?.runId,
+    workflow: workflowId,
+    run: runId,
   };
 
   $: isRunning = $workflowRun?.workflow?.isRunning;
@@ -57,7 +55,7 @@
     $workflowRun?.workflow?.status,
     $fullEventHistory,
   );
-  $: workflowHasBeenReset = has($resetWorkflows, $workflowRun?.workflow?.runId);
+  $: workflowHasBeenReset = has($resetWorkflows, runId);
   $: workflowUsesVersioning =
     workflow?.assignedBuildId ??
     workflow?.mostRecentWorkerVersionStamp?.useVersioning;
@@ -70,6 +68,7 @@
   $: summary = $workflowRun?.userMetadata?.summary;
   $: details = $workflowRun?.userMetadata?.details;
   $: hasUserMetadata = summary || details;
+  $: currentDetails = $workflowRun?.metadata?.currentDetails;
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -129,7 +128,7 @@
         class="flex w-full items-center gap-2 rounded p-2 text-xl"
       >
         <Icon
-          name="flag"
+          name="info"
           class="text-indigo-600/80"
           width={32}
           height={32}
@@ -142,6 +141,24 @@
       {#if open && details}
         <h3>{translate('workflows.details')}</h3>
         <Markdown content={details} />
+      {/if}
+    </AccordionLight>
+  {/if}
+  {#if currentDetails}
+    <AccordionLight let:open>
+      <div
+        slot="title"
+        class="flex w-full items-center gap-2 rounded p-2 text-xl"
+      >
+        <Icon
+          name="flag"
+          class="text-indigo-600/80"
+          width={32}
+          height={32}
+        />{translate('workflows.current-details')}
+      </div>
+      {#if open && currentDetails}
+        <Markdown content={currentDetails} />
       {/if}
     </AccordionLight>
   {/if}
