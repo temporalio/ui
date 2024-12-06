@@ -176,52 +176,44 @@
     <h1>{title}</h1>
     <Card class="w-full xl:w-3/4 2xl:w-1/2">
       <form class="mb-4 flex w-full flex-col gap-4">
-        <div class="w-full">
-          <Input
-            id="name"
-            bind:value={name}
-            label={translate('schedules.name-label')}
-            error={errors['name']}
-            maxLength={232}
-            disabled={Boolean(scheduleId)}
-            on:input={onInput}
-            on:blur={onBlur}
-            required
-          />
-        </div>
-        <div class="w-full">
-          <Input
-            id="workflowType"
-            bind:value={workflowType}
-            label={translate('schedules.workflow-type-label')}
-            error={errors['workflowType']}
-            on:input={onInput}
-            on:blur={onBlur}
-            required
-          />
-        </div>
-        <div class="w-full">
-          <Input
-            id="workflowId"
-            bind:value={workflowId}
-            label={translate('schedules.workflow-id-label')}
-            error={errors['workflowId']}
-            on:input={onInput}
-            on:blur={onBlur}
-            required
-          />
-        </div>
-        <div class="w-full">
-          <Input
-            id="taskQueue"
-            bind:value={taskQueue}
-            label={translate('schedules.task-queue-label')}
-            error={errors['taskQueue']}
-            on:input={onInput}
-            on:blur={onBlur}
-            required
-          />
-        </div>
+        <Input
+          id="name"
+          bind:value={name}
+          label={translate('schedules.name-label')}
+          error={errors['name']}
+          maxLength={232}
+          disabled={Boolean(scheduleId)}
+          on:input={onInput}
+          on:blur={onBlur}
+          required
+        />
+        <Input
+          id="workflowType"
+          bind:value={workflowType}
+          label={translate('schedules.workflow-type-label')}
+          error={errors['workflowType']}
+          on:input={onInput}
+          on:blur={onBlur}
+          required
+        />
+        <Input
+          id="workflowId"
+          bind:value={workflowId}
+          label={translate('schedules.workflow-id-label')}
+          error={errors['workflowId']}
+          on:input={onInput}
+          on:blur={onBlur}
+          required
+        />
+        <Input
+          id="taskQueue"
+          bind:value={taskQueue}
+          label={translate('schedules.task-queue-label')}
+          error={errors['taskQueue']}
+          on:input={onInput}
+          on:blur={onBlur}
+          required
+        />
         <ScheduleInputPayload
           bind:input
           bind:editInput
