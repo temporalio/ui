@@ -28,7 +28,7 @@
 </script>
 
 <div class="flex flex-col gap-4 text-center">
-  <div class="flex gap-2 text-center">
+  <div class="flex flex-wrap gap-2 text-center">
     {#each genericWeekDays as { label, value }}
       {@const active = daysOfWeek.includes(value)}
       <Button

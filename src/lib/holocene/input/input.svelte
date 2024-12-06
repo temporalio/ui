@@ -90,6 +90,7 @@
     <slot name="before-input" {disabled} />
     <div
       class={merge(
+        'input-container',
         'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
       )}
       class:disabled
@@ -181,8 +182,6 @@
 <style lang="postcss">
   /* Base styles */
   .input-container {
-    /* @apply ; */
-
     &.error,
     &.invalid {
       @apply border-danger focus-within:ring-danger/70;

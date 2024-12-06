@@ -16,9 +16,7 @@
     {translate('schedules.recurring-dates-heading')}
   </h3>
   <p>{translate('schedules.recurring-dates-description')}</p>
-  <div class="flex w-full flex-col gap-4">
-    <DayOfMonthPicker bind:daysOfMonth />
-    <MonthPicker bind:months />
-  </div>
+  <DayOfMonthPicker bind:daysOfMonth />
+  <MonthPicker bind:months />
 </div>
 <SchedulesTimeView bind:hour bind:minute />
