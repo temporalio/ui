@@ -233,6 +233,7 @@ const categories: Record<
 
   update: [
     'WorkflowExecutionUpdateAccepted',
+    'WorkflowExecutionUpdateAdmitted',
     'WorkflowExecutionUpdateCompleted',
   ],
 
