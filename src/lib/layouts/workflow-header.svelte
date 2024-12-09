@@ -123,13 +123,10 @@
   </div>
   {#if hasUserMetadata}
     <AccordionLight let:open>
-      <div
-        slot="title"
-        class="flex w-full items-center gap-2 rounded p-2 text-xl"
-      >
+      <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
         <Icon
           name="info"
-          class="text-indigo-600/80"
+          class="text-brand"
           width={32}
           height={32}
         />{translate('workflows.summary-and-details')}
