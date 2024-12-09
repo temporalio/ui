@@ -97,7 +97,7 @@
     {/if}
   </div>
 </div>
-<header class="rounded-top flex flex-col gap-2">
+<header class="flex flex-col gap-2">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
     <div class="flex flex-col items-center gap-4 lg:flex-row">
       <WorkflowStatus status={workflow?.status} big />

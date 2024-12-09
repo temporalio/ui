@@ -170,7 +170,7 @@
         />
       </button>
     {:else}
-      <Skeleton class="h-6 w-24 rounded" />
+      <Skeleton class="h-6 w-24 rounded-sm" />
     {/if}
   {/each}
 </div>
