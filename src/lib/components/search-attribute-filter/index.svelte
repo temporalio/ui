@@ -228,8 +228,4 @@
   .filter {
     @apply grow;
   }
-
-  :global(.attribute-selected) {
-    @apply rounded-r-none;
-  }
 </style>

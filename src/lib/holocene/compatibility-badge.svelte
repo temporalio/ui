@@ -12,7 +12,7 @@
   {#if defaultVersion && buildId}
     <span
       class={merge(
-        'flex items-center gap-1 rounded border border-subtle px-1 text-sm text-primary',
+        'flex items-center gap-1 rounded-sm border border-subtle px-1 text-sm text-primary',
         active && 'border-green-200 bg-green-200 text-black',
       )}
     >
@@ -22,7 +22,7 @@
     </span>
   {:else if buildId}
     <span
-      class="flex items-center gap-1 rounded border border-subtle px-1 text-sm text-primary"
+      class="flex items-center gap-1 rounded-sm border border-subtle px-1 text-sm text-primary"
     >
       <Icon name="merge" />{buildId}
     </span>
