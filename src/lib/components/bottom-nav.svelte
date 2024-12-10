@@ -2,6 +2,7 @@
   import { writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
 
+  import { onDestroy, onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { beforeNavigate } from '$app/navigation';
@@ -27,6 +28,33 @@
   let viewNamespaces = writable(false);
   let viewSettings = false;
 
+  const escHandler = new AbortController();
+
+  onMount(() => {
+    document.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.key === 'Escape' &&
+          [viewSettings, viewNamespaces, viewSettings].some((isOpen) => isOpen)
+        ) {
+          closeMenu();
+        }
+      },
+      {
+        signal: escHandler.signal,
+      },
+    );
+  });
+
+  onDestroy(() => {
+    escHandler.abort();
+  });
+
+  beforeNavigate(() => {
+    closeMenu();
+  });
+
   $: namespace = $page.params.namespace || $lastUsedNamespace;
   $: namespaceExists = namespaceList.some(
     (namespaceListItem) => namespaceListItem.namespace === namespace,
@@ -50,11 +78,11 @@
     viewSettings = !viewSettings;
   };
 
-  beforeNavigate(() => {
+  function closeMenu() {
     viewLinks = false;
     viewSettings = false;
     $viewNamespaces = false;
-  });
+  }
 
   $: menuIsOpen = viewLinks || $viewNamespaces || viewSettings;
 
@@ -74,7 +102,7 @@
     out:slide={{ duration: 200, delay: 0 }}
   >
     <BottomNavLinks open={viewLinks} {linkList} />
-    <slot name="nsPicker" open={$viewNamespaces}>
+    <slot name="nsPicker" open={$viewNamespaces} {closeMenu}>
       <BottomNavNamespaces open={$viewNamespaces} {namespaceList} />
     </slot>
     <BottomNavSettings open={viewSettings}>
