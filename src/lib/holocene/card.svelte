@@ -4,6 +4,6 @@
 
 <style lang="postcss">
   .card {
-    @apply rounded-2xl border border-subtle p-4;
+    @apply border border-subtle p-4;
   }
 </style>

@@ -59,9 +59,7 @@
   <MenuButton
     class="{noBorderRight ? '!border-r-0' : ''} {noBorderLeft
       ? '!border-l-0'
-      : ''} whitespace-nowrap {isNullFilter
-      ? 'rounded-l-none'
-      : 'rounded-none'}"
+      : ''} whitespace-nowrap"
     id="conditional-menu-button"
     controls="conditional-menu"
     {disabled}

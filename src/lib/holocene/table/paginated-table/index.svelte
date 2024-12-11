@@ -54,7 +54,7 @@
   }
 
   .primary {
-    @apply rounded-lg border border-table;
+    @apply border border-table;
   }
 
   .split {
@@ -73,7 +73,7 @@
     }
 
     :global(tr > th) {
-      @apply whitespace-nowrap px-2 text-left font-medium first-of-type:rounded-tl last-of-type:rounded-tr;
+      @apply whitespace-nowrap px-2 text-left font-medium;
     }
   }
 
@@ -126,6 +126,6 @@
   }
 
   .paginated-table-controls {
-    @apply surface-primary sticky bottom-0 left-0 flex w-full grow justify-between gap-2 rounded-b border-t border-table px-4 py-2;
+    @apply surface-primary sticky bottom-0 left-0 flex w-full grow justify-between gap-2 border-t border-table px-4 py-2;
   }
 </style>

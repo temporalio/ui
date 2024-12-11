@@ -228,13 +228,4 @@
   .filter {
     @apply grow;
   }
-
-  :global(.attribute-selected) {
-    @apply rounded-r-none;
-  }
-
-  :global(#time-range-filter),
-  :global(#boolean-filter) {
-    @apply rounded-l-none;
-  }
 </style>
