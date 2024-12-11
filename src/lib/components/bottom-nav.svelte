@@ -2,7 +2,6 @@
   import { writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
 
-  import { onDestroy, onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { beforeNavigate } from '$app/navigation';
@@ -28,28 +27,14 @@
   let viewNamespaces = writable(false);
   let viewSettings = false;
 
-  const escHandler = new AbortController();
-
-  onMount(() => {
-    document.addEventListener(
-      'keydown',
-      (e) => {
-        if (
-          e.key === 'Escape' &&
-          [viewSettings, viewNamespaces, viewSettings].some((isOpen) => isOpen)
-        ) {
-          closeMenu();
-        }
-      },
-      {
-        signal: escHandler.signal,
-      },
-    );
-  });
-
-  onDestroy(() => {
-    escHandler.abort();
-  });
+  function escapeHandler(e: KeyboardEvent) {
+    if (
+      e.key === 'Escape' &&
+      [viewLinks, viewNamespaces, viewSettings].some((isOpen) => isOpen)
+    ) {
+      closeMenu();
+    }
+  }
 
   beforeNavigate(() => {
     closeMenu();
@@ -61,9 +46,9 @@
   );
 
   const onLinksClick = () => {
-    viewSettings = false;
-    $viewNamespaces = false;
     viewLinks = !viewLinks;
+    $viewNamespaces = false;
+    viewSettings = false;
   };
 
   const onNamespaceClick = () => {
@@ -80,8 +65,8 @@
 
   function closeMenu() {
     viewLinks = false;
-    viewSettings = false;
     $viewNamespaces = false;
+    viewSettings = false;
   }
 
   $: menuIsOpen = viewLinks || $viewNamespaces || viewSettings;
@@ -93,6 +78,8 @@
     return namespace;
   };
 </script>
+
+<svelte:window on:keypress={escapeHandler} />
 
 {#if menuIsOpen}
   <div
