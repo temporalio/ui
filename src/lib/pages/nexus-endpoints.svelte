@@ -22,6 +22,7 @@
 
   export let endpoints: NexusEndpoint[] = [];
   export let searchPlaceholder = translate('common.search');
+  export let createDisabled = false;
 
   let search = '';
   $: searchParam = $page.url.searchParams.get('search') || '';
@@ -40,13 +41,16 @@
 </script>
 
 {#if !endpoints?.length && !searchParam}
-  <NexusEmptyState />
+  <NexusEmptyState {createDisabled} />
 {:else}
   <div class="mb-8 flex items-center justify-between">
     <h1 data-testid="namespace-selector-title">
       {translate('nexus.endpoints')}
     </h1>
-    <Button variant="primary" href={routeForNexusEndpointCreate()}
+    <Button
+      disabled={createDisabled}
+      variant="primary"
+      href={routeForNexusEndpointCreate()}
       >{translate('nexus.create-endpoint')}</Button
     >
   </div>
