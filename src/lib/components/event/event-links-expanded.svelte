@@ -10,14 +10,10 @@
 
 {#each links as link}
   {#if link?.workflowEvent}
-    <div
-      class="block flex w-full items-center gap-4 px-2 py-1 py-1 text-left text-left xl:flex"
-    >
+    <div class="flex w-full items-center gap-4 p-2">
       <EventLink {link} />
     </div>
-    <div
-      class="block flex w-full items-center gap-4 px-2 py-1 py-1 text-left text-left xl:flex"
-    >
+    <div class="flex w-full items-center gap-4 p-2">
       <EventLink
         {link}
         label={translate('nexus.link-namespace')}
@@ -27,9 +23,3 @@
     </div>
   {/if}
 {/each}
-
-<style lang="postcss">
-  .content {
-    @apply block flex w-full w-full items-center gap-4 px-2 py-1 py-1 text-left text-left xl:flex;
-  }
-</style>
