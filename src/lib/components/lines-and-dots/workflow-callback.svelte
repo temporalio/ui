@@ -84,9 +84,3 @@
     {/if}
   </div>
 </Alert>
-
-<style lang="postcss">
-  .badge {
-    @apply inline-flex items-center gap-1 rounded-sm bg-subtle px-1 py-0.5 font-medium;
-  }
-</style>
