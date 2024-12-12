@@ -8,6 +8,7 @@
   import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -165,18 +166,16 @@
   onDestroy(() => ($error = ''));
 </script>
 
-<div class="pb-10">
+<div class="flex flex-col gap-4 pb-10">
   {#if $loading}
     <Loading title={loadingText} />
   {:else}
-    <header class="mb-12 flex flex-col gap-4">
-      <Link href={backHref} icon="chevron-left">
-        {backTitle}
-      </Link>
-      <h1>{title}</h1>
-    </header>
-    <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
-      <div class="w-full">
+    <Link href={backHref} icon="chevron-left">
+      {backTitle}
+    </Link>
+    <h1>{title}</h1>
+    <Card class="w-full xl:w-3/4 2xl:w-1/2">
+      <form class="mb-4 flex w-full flex-col gap-4">
         <Input
           id="name"
           bind:value={name}
@@ -188,8 +187,6 @@
           on:blur={onBlur}
           required
         />
-      </div>
-      <div class="w-full">
         <Input
           id="workflowType"
           bind:value={workflowType}
@@ -199,8 +196,6 @@
           on:blur={onBlur}
           required
         />
-      </div>
-      <div class="w-full">
         <Input
           id="workflowId"
           bind:value={workflowId}
@@ -210,8 +205,6 @@
           on:blur={onBlur}
           required
         />
-      </div>
-      <div class="w-full">
         <Input
           id="taskQueue"
           bind:value={taskQueue}
@@ -221,43 +214,43 @@
           on:blur={onBlur}
           required
         />
-      </div>
-      <ScheduleInputPayload
-        bind:input
-        bind:editInput
-        bind:encoding
-        payloads={schedule?.action?.startWorkflow?.input}
-        showEditActions={Boolean(schedule)}
-      />
-      <AddSearchAttributes
-        bind:attributesToAdd={searchAttributesInput}
-        class="w-full"
-      />
-      <SchedulesCalendarView
-        let:preset
-        {schedule}
-        bind:daysOfWeek
-        bind:daysOfMonth
-        bind:months
-        bind:days
-        bind:hour
-        bind:minute
-        bind:second
-        bind:phase
-        bind:cronString
-      >
-        <div class="mt-4 flex flex-row items-center gap-4 max-sm:flex-col">
-          <Button
-            disabled={isDisabled(preset) || !writeActionsAreAllowed()}
-            on:click={() => handleConfirm(preset, schedule)}
-            class="max-sm:w-full">{confirmText}</Button
-          >
-          <Button variant="ghost" href={backHref} class="max-sm:w-full"
-            >{translate('common.cancel')}</Button
-          >
-        </div>
-      </SchedulesCalendarView>
-      <Alert intent="error" title={$error} hidden={!$error} />
-    </form>
+        <ScheduleInputPayload
+          bind:input
+          bind:editInput
+          bind:encoding
+          payloads={schedule?.action?.startWorkflow?.input}
+          showEditActions={Boolean(schedule)}
+        />
+        <AddSearchAttributes
+          bind:attributesToAdd={searchAttributesInput}
+          class="w-full"
+        />
+        <SchedulesCalendarView
+          let:preset
+          {schedule}
+          bind:daysOfWeek
+          bind:daysOfMonth
+          bind:months
+          bind:days
+          bind:hour
+          bind:minute
+          bind:second
+          bind:phase
+          bind:cronString
+        >
+          <div class="mt-4 flex flex-row items-center gap-4 max-sm:flex-col">
+            <Button
+              disabled={isDisabled(preset) || !writeActionsAreAllowed()}
+              on:click={() => handleConfirm(preset, schedule)}
+              class="max-sm:w-full">{confirmText}</Button
+            >
+            <Button variant="ghost" href={backHref} class="max-sm:w-full"
+              >{translate('common.cancel')}</Button
+            >
+          </div>
+        </SchedulesCalendarView>
+        <Alert intent="error" title={$error} hidden={!$error} />
+      </form>
+    </Card>
   {/if}
 </div>

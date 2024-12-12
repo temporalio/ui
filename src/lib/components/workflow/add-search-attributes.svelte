@@ -27,13 +27,14 @@
   };
 </script>
 
-<div class="flex flex-col gap-2 {className}">
+<div class="flex flex-col gap-4 {className}">
   {#each attributesToAdd as attribute}
     <SearchAttributeInput {attributesToAdd} bind:attribute {onRemove} />
   {/each}
   <Button
     variant="ghost"
     leadingIcon="add"
+    class="max-sm:w-full"
     on:click={addSearchAttribute}
     disabled={!searchAttributes.length ||
       attributesToAdd.length === searchAttributes.length ||

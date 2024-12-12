@@ -471,7 +471,7 @@
   </div>
 
   <Menu
-    keepOpen={multiselect || true}
+    keepOpen={multiselect}
     bind:menuElement
     id="{id}-listbox"
     role="listbox"
