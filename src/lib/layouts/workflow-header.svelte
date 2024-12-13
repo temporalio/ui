@@ -143,10 +143,7 @@
   {/if}
   {#if currentDetails}
     <AccordionLight let:open>
-      <div
-        slot="title"
-        class="flex w-full items-center gap-2 rounded p-2 text-xl"
-      >
+      <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
         <Icon
           name="flag"
           class="text-brand"
