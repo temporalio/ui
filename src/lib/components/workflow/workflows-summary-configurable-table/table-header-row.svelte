@@ -56,7 +56,6 @@
   {:else}
     <slot />
   {/if}
-  <th class="configuration-button-table-cell" />
 </tr>
 
 <style lang="postcss">
@@ -66,9 +65,5 @@
 
   .batch-actions-table-cell {
     @apply overflow-visible whitespace-nowrap font-medium;
-  }
-
-  .configuration-button-table-cell {
-    @apply h-10 w-10 py-1;
   }
 </style>

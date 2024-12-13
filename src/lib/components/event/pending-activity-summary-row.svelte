@@ -82,7 +82,7 @@
 </tr>
 {#if expanded}
   <tr class="row expanded">
-    <td class="expanded-cell w-full" colspan="3">
+    <td class="expanded-cell w-full">
       <EventDetailsFull {group} />
     </td>
   </tr>

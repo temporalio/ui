@@ -62,9 +62,6 @@
       <td class="max-sm:hidden" colspan="4">
         <EmptyState title={translate('batch.empty-state-title')}></EmptyState>
       </td>
-      <td class="sm:hidden" colspan="2">
-        <EmptyState title={translate('batch.empty-state-title')}></EmptyState>
-      </td>
     </TableRow>
   {/each}
 </Table>

@@ -65,7 +65,7 @@
     </TableRow>
   {:else}
     <tr class="w-full">
-      <td colspan={6}>
+      <td colspan="5">
         <EmptyState title={translate('workflows.workers-empty-state')} />
       </td>
     </tr>

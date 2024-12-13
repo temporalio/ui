@@ -71,7 +71,7 @@
     </TableRow>
   {:else}
     <tr class="w-full">
-      <td colspan="6">
+      <td colspan="2">
         <EmptyState title={translate('workers.no-version-sets-found')} />
       </td>
     </tr>
@@ -161,7 +161,7 @@
     </TableRow>
   {:else}
     <tr class="w-full">
-      <td colspan={reachability?.buildIdReachability?.length ? 8 : 6}>
+      <td colspan={reachability?.buildIdReachability?.length ? 6 : 4}>
         <EmptyState title={translate('workflows.workers-empty-state')} />
       </td>
     </tr>

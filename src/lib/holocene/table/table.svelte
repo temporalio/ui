@@ -58,11 +58,11 @@
         @apply border-t border-table px-1 py-2;
 
         &:first-child {
-          @apply w-[1px] border-l border-table;
+          @apply border-l border-table;
         }
 
         &:last-child {
-          @apply w-[1px] border-r border-table;
+          @apply border-r border-table;
         }
       }
     }
@@ -71,16 +71,8 @@
       td {
         @apply border-t border-table px-1 py-2 text-sm;
 
-        &:first-child {
-          @apply px-1;
-        }
-
         &:first-child:is(.expanded-cell) {
           @apply px-0;
-        }
-
-        &:last-child {
-          @apply w-0 p-0;
         }
       }
     }

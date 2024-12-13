@@ -223,7 +223,7 @@
     class:typedError
     class="row expanded"
   >
-    <td class="expanded-cell w-full" colspan="4">
+    <td class="expanded-cell w-full">
       <EventDetailsFull {group} event={currentEvent} />
     </td>
   </tr>
