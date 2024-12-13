@@ -209,8 +209,8 @@ export const shouldDisplayChildWorkflowLink = (
 const keysWithNexusEndpointLinks = ['endpointId'] as const;
 
 export const shouldDisplayNexusEndpointLink = (key: string): boolean => {
-  for (const taskQueueKey of keysWithNexusEndpointLinks) {
-    if (key === taskQueueKey) return true;
+  for (const endpointKey of keysWithNexusEndpointLinks) {
+    if (key === endpointKey) return true;
   }
 
   return false;

@@ -199,7 +199,11 @@
       </div>
     {/if}
     {#if currentEvent?.links?.length}
-      <EventLink link={currentEvent.links[0]} class="max-w-xl truncate" />
+      <EventLink
+        link={currentEvent.links[0]}
+        class="max-w-xl"
+        linkClass="truncate"
+      />
     {/if}
     {#if primaryAttribute?.key}
       <EventDetailsRow {...primaryAttribute} {attributes} />
