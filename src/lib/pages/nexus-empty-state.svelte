@@ -5,6 +5,8 @@
   import { useDarkMode } from '$lib/utilities/dark-mode';
   import { routeForNexusEndpointCreate } from '$lib/utilities/route-for';
   import andromeda from '$lib/vendor/andromeda.png';
+
+  export let createDisabled = false;
 </script>
 
 <div class="flex min-h-screen flex-col gap-8 p-10">
@@ -35,7 +37,10 @@
           a uniform interface to get the status of an operation or its result,
           receive a completion callback, or cancel the operation.
         </p>
-        <Button variant="primary" href={routeForNexusEndpointCreate()}
+        <Button
+          disabled={createDisabled}
+          variant="primary"
+          href={routeForNexusEndpointCreate()}
           >{translate('nexus.create-endpoint')}</Button
         >
       </div>
