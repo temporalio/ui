@@ -1,6 +1,7 @@
 <script lang="ts">
   import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { useDarkMode } from '$lib/utilities/dark-mode';
   import { routeForNexusEndpointCreate } from '$lib/utilities/route-for';
@@ -19,24 +20,42 @@
         >
           {translate('nexus.endpoints')}
         </h1>
-        <Badge type="primary">Pre-Release</Badge>
+        <Badge type="primary">Public Preview</Badge>
       </div>
       <div class="flex w-full flex-col gap-4 pr-8 md:pr-24">
         <h2 class="text-4xl">Get Started</h2>
+
         <p>
-          Nexus RPC is a modern open-source service framework for
-          arbitrary-length operations whose lifetime may extend beyond a
-          traditional RPC. Nexus was designed with Durable Execution in mind, as
-          an underpinning to connect durable executions within and across
-          Namespaces, clusters, and regions – with a clean API contract to
-          streamline multi-team collaboration.
+          <Link href="https://docs.temporal.io/evaluate/nexus" newTab
+            >Temporal Nexus</Link
+          > allows you to reliably connect Temporal Applications. It promotes a more
+          modular architecture for sharing a subset of your team's capabilities with
+          well-defined microservice contracts for other teams to use. Nexus was designed
+          with Durable Execution in mind and enables each team to have their own
+          Namespace for improved modularity, security, debugging, and fault isolation.
         </p>
         <p>
-          Any service can be exposed via a Nexus Endpoint as a set of sync or
-          async Nexus operations – the latter provides an operation identity and
-          a uniform interface to get the status of an operation or its result,
-          receive a completion callback, or cancel the operation.
+          <Link href="https://docs.temporal.io/nexus/services" newTab
+            >Nexus Services</Link
+          > are exposed from a <Link
+            href="https://docs.temporal.io/nexus/endpoints"
+            newTab>Nexus Endpoint</Link
+          > created in the <Link
+            href="https://docs.temporal.io/nexus/registry"
+            newTab>Nexus Registry</Link
+          >. Adding a Nexus Endpoint to the Nexus Registry deploys the Endpoint,
+          so it is available at runtime to serve Nexus requests.
         </p>
+        <p>
+          A Nexus Endpoint is a reverse proxy that decouples the caller from the
+          handler and routes requests to upstream targets. It currently supports
+          routing to a single target Namespace and Task Queue. Nexus Services
+          and <Link href="https://docs.temporal.io/nexus/operations" newTab
+            >Nexus Operations</Link
+          > are often registered in the same Worker as the underlying Temporal primitives
+          they abstract.
+        </p>
+        <slot />
         <Button
           disabled={createDisabled}
           variant="primary"
