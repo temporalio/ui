@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
   import { createEventDispatcher } from 'svelte';
 
   import { getDateRows, weekDays } from '$lib/utilities/calendar';
@@ -41,7 +39,7 @@
       {#if value}
         <button
           type="button"
-          on:click={allowed && value ? () => onChange(value) : noop}
+          on:click={allowed && value ? () => onChange(value) : () => {}}
           class="cell"
           class:highlight={allowed && value}
           class:disabled={!allowed}

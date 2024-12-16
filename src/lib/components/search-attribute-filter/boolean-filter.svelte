@@ -48,7 +48,7 @@
           }
           handleSubmit();
         }}
-        class="text-nowrap"
+        className="text-nowrap"
       >
         {label}
       </MenuItem>

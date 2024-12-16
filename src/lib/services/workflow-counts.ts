@@ -1,5 +1,3 @@
-import { noop } from 'svelte/internal';
-
 import type { CountWorkflowExecutionsResponse } from '$lib/types/workflows';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -14,8 +12,8 @@ export const fetchWorkflowCount = async (
     const countRoute = routeForApi('workflows.count', { namespace });
     const result = await requestFromAPI<{ count: string }>(countRoute, {
       params: query ? { query } : {},
-      onError: noop,
-      handleError: noop,
+      onError: () => {},
+      handleError: () => {},
       request,
     });
     count = parseInt(result?.count || '0');

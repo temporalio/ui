@@ -72,7 +72,7 @@
       </div>
     {:catch}
       <div class="row">
-        <div class="w-28" />
+        <div class="w-28"></div>
         <div class="w-96">
           {run.startWorkflowResult.workflowId}
         </div>

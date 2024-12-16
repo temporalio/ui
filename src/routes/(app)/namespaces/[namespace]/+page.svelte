@@ -76,7 +76,7 @@
         )}`}</caption
       >
       <tr slot="headers">
-        <th class="w-1/2 lg:w-3/5" /><th />
+        <th class="w-1/2 lg:w-3/5"></th><th></th>
       </tr>
       <tr data-testid="namespace-owner">
         <td>{translate('namespaces.owner')}</td>
@@ -150,7 +150,7 @@
         >{translate('namespaces.versions')}</caption
       >
       <tr slot="headers">
-        <th class="w-1/2 lg:w-3/4" /><th />
+        <th class="w-1/2 lg:w-3/4"></th><th></th>
       </tr>
 
       <tr data-testid="server-version">
@@ -174,7 +174,7 @@
       >
 
       <tr slot="headers">
-        <th class="w-1/2 lg:w-3/5" /><th />
+        <th class="w-1/2 lg:w-3/5"></th><th></th>
       </tr>
 
       <tr>

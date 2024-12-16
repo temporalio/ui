@@ -1,5 +1,3 @@
-import { noop } from 'svelte/internal';
-
 import i18next from 'i18next';
 import { vi } from 'vitest';
 
@@ -21,13 +19,14 @@ i18next.init({
 });
 
 const BroadcastChannelMock = vi.fn(() => ({
-  addEventListener: noop,
-  postMessage: noop,
+  addEventListener: () => { },
+  postMessage: () => { },
 }));
 
 vi.stubGlobal('BroadcastChannel', BroadcastChannelMock);
 
-vi.mock('esm-env', () => {
+vi.mock('esm-env', async (importOriginal) => {
+  const actual = (await importOriginal()) as { BROWSER: boolean, ENV: boolean };
   const BROWSER = true;
-  return { BROWSER };
+  return { ...actual, BROWSER };
 });

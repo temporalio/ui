@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type MenuButtonVariant =
     | 'primary'
     | 'secondary'
@@ -9,7 +9,7 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
-  import { createEventDispatcher, getContext } from 'svelte';
+  import { createEventDispatcher, getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
@@ -32,17 +32,24 @@
     class?: string;
     active?: boolean;
     'data-testid'?: string;
+    leading?: Snippet;
+    trailing?: Snippet;
   }
 
   let className = '';
-  export { className as class };
-  export let controls: string;
-  export let count = 0;
-  export let disabled = false;
-  export let hasIndicator = false;
-  export let id: string = null;
-  export let label: string = null;
-  export let variant: MenuButtonVariant = 'secondary';
+
+  let {
+    controls,
+    count = 0,
+    disabled = false,
+    hasIndicator = false,
+    id = null,
+    label = null,
+    variant = 'secondary',
+    children,
+    leading,
+    trailing,
+  }: $$Props = $props();
 
   const dispatch = createEventDispatcher<{ click: { open: boolean } }>();
   const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);
@@ -100,18 +107,17 @@
   aria-label={label}
   {variant}
   class={merge(className)}
-  {...$$restProps}
 >
-  <slot name="leading" />
-  <div class="flex grow items-center" class:hidden={!$$slots.default}>
-    <slot />
+{@render leading?.()}
+  <div class="flex grow items-center" class:hidden={!children}>
+    {@render children?.()}
   </div>
   {#if hasIndicator}
     <div class="flex">
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
     </div>
   {/if}
-  <slot name="trailing" />
+  {@render trailing?.()}
   {#if count > 0}
     <Badge
       class="absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"

@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { noop } from 'svelte/internal';
 
   import { twMerge as merge } from 'tailwind-merge';
   import { v4 } from 'uuid';
@@ -28,7 +27,7 @@
   export let open = false;
   export let expandable = true;
   export let error = '';
-  export let onToggle = noop;
+  export let onToggle = () => {};
 
   let className = '';
   export { className as class };
@@ -69,10 +68,7 @@
           role="none"
         >
           <slot name="action" />
-          <Icon
-            class="m-2 shrink-0"
-            name={open ? 'chevron-up' : 'chevron-down'}
-          />
+          <Icon class="m-2" name={open ? 'chevron-up' : 'chevron-down'} />
         </div>
       </div>
       <p class="flex items-center">

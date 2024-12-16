@@ -11,6 +11,15 @@
 
   import IconButton from '../icon-button.svelte';
 
+  type AutoComplete =
+    | 'on'
+    | 'off'
+    | 'name'
+    | 'email'
+    | 'username'
+    | 'new-password'
+    | 'current-password';
+
   type BaseProps = HTMLInputAttributes & {
     id: string;
     value: string;
@@ -21,6 +30,7 @@
     valid?: boolean;
     hintText?: string;
     maxLength?: number;
+    autocomplete?: AutoComplete;
     hideCount?: boolean;
     spellcheck?: boolean;
     unroundRight?: boolean;
@@ -54,7 +64,7 @@
   export let copyable = false;
   export let disabled = false;
   export let clearable = false;
-  export let autocomplete = 'off';
+  export let autocomplete: AutoComplete = 'off';
   export let valid = true;
   export let hintText = '';
   export let maxLength = 0;

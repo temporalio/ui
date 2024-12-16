@@ -52,7 +52,7 @@
               : eventInGroup.eventType}
           </p>
         </td>
-        <td />
+        <td></td>
       </tr>
     {/each}
   </Table>
