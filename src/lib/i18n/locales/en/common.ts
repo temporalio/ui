@@ -158,6 +158,7 @@ export const Strings = {
   'auto-refresh': 'Auto refresh',
   'auto-refresh-tooltip': '{{ interval }} second page refresh',
   'view-more': 'View More...',
+  'view-all': 'View All',
   'view-all-runs': 'View All Runs',
   'more-options': 'More options',
   download: 'Download',

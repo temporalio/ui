@@ -39,7 +39,6 @@
 </script>
 
 <div class="flex flex-col gap-4 pb-8">
-  <h2>{translate('workflows.relationships')}</h2>
   {#if hasRelationships}
     <div class="flex w-full flex-col justify-center gap-4">
       {#await fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId)}

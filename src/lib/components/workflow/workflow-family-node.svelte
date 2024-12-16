@@ -36,7 +36,7 @@
     rootY: number,
   ) => {
     const x = rootX || width / 2;
-    const y = rootY || height / 6;
+    const y = rootY || height / 3;
     const radius = 10;
     return {
       x,
