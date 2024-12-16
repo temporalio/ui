@@ -142,14 +142,18 @@
         if (customSAKeys.includes(key)) {
           searchAttributes = [
             ...searchAttributes,
-            { attribute: key, value: String(value) },
+            {
+              label: key,
+              value,
+              type: $customSearchAttributes[key],
+            } as SearchAttributeInput,
           ];
         }
       });
     }
 
     if (
-      initialValues?.searchAttributes?.length ||
+      Object.keys(initialValues?.searchAttributes ?? {}).length ||
       initialValues?.summary ||
       initialValues?.details
     ) {
@@ -189,24 +193,22 @@
   $: checkTaskQueue(taskQueueParam);
 </script>
 
-<div class="flex w-full flex-col items-center pb-24">
-  <div class="mb-6 flex w-full items-start">
-    <Link
-      href={`${routeForWorkflows({
-        namespace,
-      })}?${$workflowsSearchParams}`}
-      data-testid="back-to-workflows"
-      icon="chevron-left"
-    >
-      {translate('workflows.back-to-workflows')}
-    </Link>
-  </div>
-  <div class="flex w-full flex-col gap-4 lg:w-2/3 2xl:w-1/2">
-    <h1 class="mb-4 overflow-hidden" data-testid="start-workflow">
-      Start a Workflow
-    </h1>
+<div class="flex w-full flex-col gap-4 pb-20">
+  <Link
+    href={`${routeForWorkflows({
+      namespace,
+    })}?${$workflowsSearchParams}`}
+    data-testid="back-to-workflows"
+    icon="chevron-left"
+  >
+    {translate('workflows.back-to-workflows')}
+  </Link>
+  <h1 class="mb-4 overflow-hidden" data-testid="start-workflow">
+    Start a Workflow
+  </h1>
+  <Card class="flex w-full flex-col gap-4 xl:w-3/4 2xl:w-1/2">
     <div
-      class="flex w-full flex-col items-center justify-between gap-2 md:flex-row md:gap-4"
+      class="flex w-full flex-col justify-between gap-2 sm:items-center md:flex-row md:gap-4"
     >
       <Input
         id="workflowId"
@@ -264,7 +266,7 @@
     {/key}
     {#if viewAdvancedOptions}
       <Card class="flex flex-col gap-2">
-        <div class="flex justify-between">
+        <div class="flex flex-wrap justify-between">
           <h3>{translate('workflows.user-metadata')}</h3>
           <p class="flex items-center gap-1 text-sm text-subtle">
             {translate('workflows.markdown-supported')}
@@ -291,9 +293,12 @@
       </Card>
       <AddSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}
-    <div class="mt-4 flex w-full justify-between">
+    <div
+      class="mt-4 flex w-full flex-row justify-between gap-4 max-sm:flex-col"
+    >
       <Button
         variant="ghost"
+        class="max-sm:w-full"
         trailingIcon={viewAdvancedOptions ? 'chevron-up' : 'chevron-down'}
         on:click={() => (viewAdvancedOptions = !viewAdvancedOptions)}
         >{translate('common.more-options')}</Button
@@ -302,11 +307,11 @@
         disabled={!enableStart}
         on:click={onWorkflowStart}
         data-testid="start-workflow-button"
-        >{translate('workflows.start-workflow')}</Button
+        class="max-sm:w-full">{translate('workflows.start-workflow')}</Button
       >
     </div>
     {#if error}
       <Alert intent="error" title={error} />
     {/if}
-  </div>
+  </Card>
 </div>

@@ -6,7 +6,7 @@
     width?: number;
     height?: number;
     title?: string;
-    className?: string;
+    class?: string;
     x?: number;
     y?: number;
     strokeWidth?: string;
@@ -19,7 +19,7 @@
     width = 16,
     height = 16,
     title = '',
-    className = '',
+    class: className = '',
     x,
     y,
     strokeWidth,

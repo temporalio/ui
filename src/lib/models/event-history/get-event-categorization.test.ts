@@ -64,6 +64,7 @@ describe('Event Category Data Structures', () => {
         "WorkflowExecutionTerminated": "workflow",
         "WorkflowExecutionTimedOut": "workflow",
         "WorkflowExecutionUpdateAccepted": "update",
+        "WorkflowExecutionUpdateAdmitted": "update",
         "WorkflowExecutionUpdateCompleted": "update",
         "WorkflowExecutionUpdateRejected": "update",
         "WorkflowExecutionUpdateRequested": "update",
@@ -232,6 +233,7 @@ const categories: Record<
 
   update: [
     'WorkflowExecutionUpdateAccepted',
+    'WorkflowExecutionUpdateAdmitted',
     'WorkflowExecutionUpdateCompleted',
   ],
 

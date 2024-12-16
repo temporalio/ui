@@ -20,7 +20,7 @@
       'w-fit',
       'items-center',
       'justify-center',
-      'border-2',
+      'border',
       'gap-2',
       'rounded-lg',
       'disabled:opacity-50',
@@ -30,7 +30,7 @@
       'transition-shadow',
       'focus-visible:outline-none',
       'focus-visible:border-inverse',
-      'focus-visible:ring-4',
+      'focus-visible:ring-2',
       'whitespace-nowrap',
       'no-underline',
       '[.button-group>&]:rounded-none',
@@ -126,11 +126,14 @@
     type="button"
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
-    class={buttonStyles({
-      variant,
-      size,
-      borderRadiusModifier,
-    })}
+    class={merge(
+      buttonStyles({
+        variant,
+        size,
+        borderRadiusModifier,
+      }),
+      className,
+    )}
     on:click|stopPropagation={onLinkClick}
     tabindex={href ? null : 0}
     {...$$restProps}

@@ -27,15 +27,28 @@
   let viewNamespaces = writable(false);
   let viewSettings = false;
 
+  function escapeHandler(e: KeyboardEvent) {
+    if (
+      e.key === 'Escape' &&
+      [viewLinks, viewNamespaces, viewSettings].some((isOpen) => isOpen)
+    ) {
+      closeMenu();
+    }
+  }
+
+  beforeNavigate(() => {
+    closeMenu();
+  });
+
   $: namespace = $page.params.namespace || $lastUsedNamespace;
   $: namespaceExists = namespaceList.some(
     (namespaceListItem) => namespaceListItem.namespace === namespace,
   );
 
   const onLinksClick = () => {
-    viewSettings = false;
-    $viewNamespaces = false;
     viewLinks = !viewLinks;
+    $viewNamespaces = false;
+    viewSettings = false;
   };
 
   const onNamespaceClick = () => {
@@ -50,11 +63,11 @@
     viewSettings = !viewSettings;
   };
 
-  beforeNavigate(() => {
+  function closeMenu() {
     viewLinks = false;
-    viewSettings = false;
     $viewNamespaces = false;
-  });
+    viewSettings = false;
+  }
 
   $: menuIsOpen = viewLinks || $viewNamespaces || viewSettings;
 
@@ -66,6 +79,8 @@
   };
 </script>
 
+<svelte:window on:keypress={escapeHandler} />
+
 {#if menuIsOpen}
   <div
     class="group surface-primary fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto md:hidden"
@@ -74,7 +89,7 @@
     out:slide={{ duration: 200, delay: 0 }}
   >
     <BottomNavLinks open={viewLinks} {linkList} />
-    <slot name="nsPicker" open={viewNamespaces}>
+    <slot name="nsPicker" open={$viewNamespaces} {closeMenu}>
       <BottomNavNamespaces open={$viewNamespaces} {namespaceList} />
     </slot>
     <BottomNavSettings open={viewSettings}>
@@ -114,13 +129,13 @@
       class="grow text-white"
       on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
     >
-    <div class="ml-1 h-full w-1 border-l-2 border-subtle"></div>
+    <div class="ml-1 h-full w-1 border-l border-subtle"></div>
     <Button
       variant="ghost"
       size="xs"
       href={routeForNamespace({ namespace })}
       disabled={!namespaceExists}
-      ><Icon className="text-white" name="external-link" /></Button
+      ><Icon class="text-white" name="external-link" /></Button
     >
   </div>
   <button
@@ -144,7 +159,7 @@
 
 <style lang="postcss">
   .namespace-wrapper {
-    @apply surface-black flex h-10 w-full grow flex-row items-center rounded-lg border-2 border-subtle px-0.5 text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-4 focus-within:ring-primary/70;
+    @apply surface-black flex h-10 w-full grow flex-row items-center rounded-lg border border-subtle px-0.5 text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
   }
 
   .nav-button {

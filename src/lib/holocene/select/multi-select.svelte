@@ -60,10 +60,9 @@
   };
 </script>
 
-
 <MenuContainer {open}>
   <MenuButton hasIndicator controls={id} {variant} {active} {disabled}>
-    {#if icon}<Icon className="md:hidden" name={icon} />{/if}
+    {#if icon}<Icon class="md:hidden" name={icon} />{/if}
     <span class="max-md:hidden">{label}</span>
   </MenuButton>
   <Menu {id} keepOpen {position}>

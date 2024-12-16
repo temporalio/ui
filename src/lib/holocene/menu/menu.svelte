@@ -65,7 +65,7 @@
 
 <style lang="postcss">
   .menu {
-    @apply surface-primary absolute z-20 mt-1 min-w-fit list-none overflow-auto rounded-lg border-2 border-subtle text-primary shadow;
+    @apply surface-primary absolute z-20 mt-1 min-w-fit list-none overflow-auto rounded-lg border border-subtle text-primary shadow;
 
     &.left,
     &.top-left {

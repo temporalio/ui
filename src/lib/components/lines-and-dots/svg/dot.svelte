@@ -33,7 +33,7 @@
       y={y - r / 2}
       width={r}
       height={r}
-      className="text-black"
+      class="text-black"
     />
   {/if}
 </g>

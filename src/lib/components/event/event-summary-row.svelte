@@ -182,7 +182,7 @@
         class="flex items-center gap-1 {pendingAttempt > 1 &&
           'surface-retry rounded px-1 py-0.5'}"
       >
-        <Icon className="mr-1.5 inline" name="retry" />
+        <Icon class="mr-1.5 inline" name="retry" />
         {translate('workflows.attempt')}
         {pendingAttempt}
         {#if hasPendingActivity}
@@ -198,7 +198,11 @@
       </div>
     {/if}
     {#if currentEvent?.links?.length}
-      <EventLink link={currentEvent.links[0]} class="max-w-xl truncate" />
+      <EventLink
+        link={currentEvent.links[0]}
+        class="max-w-xl"
+        linkClass="truncate"
+      />
     {/if}
     {#if primaryAttribute?.key}
       <EventDetailsRow {...primaryAttribute} {attributes} />

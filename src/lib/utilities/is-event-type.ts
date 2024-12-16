@@ -134,6 +134,7 @@ export const eventTypes = [
   'RequestCancelExternalWorkflowExecutionInitiated',
   'UpsertWorkflowSearchAttributes',
   'WorkflowExecutionUpdateAccepted',
+  'WorkflowExecutionUpdateAdmitted',
   'WorkflowExecutionUpdateCompleted',
   'WorkflowExecutionUpdateRejected',
   'WorkflowExecutionUpdateRequested',

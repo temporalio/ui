@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.33.1",
+  "version": "2.33.7",
   "engines": {
     "pnpm": ">=8.6.0",
     "node": ">=18.15.0"
@@ -128,8 +128,8 @@
     "@storybook/addon-themes": "^8.1.10",
     "@storybook/blocks": "^8.1.10",
     "@storybook/icons": "^1.2.9",
-    "@storybook/svelte": "^8.1.10",
-    "@storybook/sveltekit": "^8.1.10",
+    "@storybook/svelte": "^8.4.7",
+    "@storybook/sveltekit": "^8.4.7",
     "@storybook/test": "^8.1.10",
     "@storybook/test-runner": "^0.18.2",
     "@sveltejs/adapter-static": "^3.0.0",
@@ -209,7 +209,7 @@
     "stylelint-config-recommended": "^13.0.0",
     "stylelint-config-standard": "^34.0.0",
     "svelte": "^5.5.4",
-    "svelte-check": "^3.8.6",
+    "svelte-check": "^4.1.1",
     "svelte-eslint-parser": "^0.33.1",
     "svelte-highlight": "^3.4.0",
     "svelte-loader": "^3.1.4",

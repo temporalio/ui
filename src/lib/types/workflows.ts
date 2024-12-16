@@ -142,10 +142,6 @@ export type WorkflowSearchAttributes = {
   indexedFields?: Record<string, Payload>;
 };
 
-export type DecodedWorkflowSearchAttributes = {
-  indexedFields?: Record<string, string | Payload>;
-};
-
 export interface MostRecentWOrkflowVersionStamp
   extends WorkflowVersionTimpstamp {
   useVersioning?: boolean;
@@ -164,7 +160,7 @@ export type WorkflowExecution = {
   historySizeBytes: string;
   mostRecentWorkerVersionStamp?: MostRecentWOrkflowVersionStamp;
   assignedBuildId?: string;
-  searchAttributes?: DecodedWorkflowSearchAttributes;
+  searchAttributes?: WorkflowSearchAttributes;
   memo: Memo;
   pendingChildren: PendingChildren[];
   pendingNexusOperations: PendingNexusOperation[];

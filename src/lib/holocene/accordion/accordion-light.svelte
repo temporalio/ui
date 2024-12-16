@@ -32,7 +32,7 @@
     id="{id}-trigger"
     aria-expanded={open}
     aria-controls="{id}-content"
-    class="w-full cursor-pointer hover:bg-interactive-secondary-hover focus-visible:bg-interactive focus-visible:outline-none"
+    class="focus-visible:outline-interactive w-full cursor-pointer hover:bg-interactive-secondary-hover"
     type="button"
     on:click={toggleAccordion}
   >
@@ -46,7 +46,7 @@
         role="none"
       >
         <slot name="action" />
-        <Icon className="m-2" name={open ? 'arrow-down' : 'arrow-right'} />
+        <Icon class="m-2" name={open ? 'arrow-down' : 'arrow-right'} />
       </div>
     </div>
   </button>

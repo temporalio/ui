@@ -70,6 +70,7 @@ export const eventTypeCategorizations: Readonly<
   WorkflowExecutionUpdateCompleted: CATEGORIES.UPDATE,
   WorkflowExecutionUpdateRequested: CATEGORIES.UPDATE,
   WorkflowExecutionUpdateRejected: CATEGORIES.UPDATE,
+  WorkflowExecutionUpdateAdmitted: CATEGORIES.UPDATE,
 
   NexusOperationScheduled: CATEGORIES.NEXUS,
   NexusOperationStarted: CATEGORIES.NEXUS,

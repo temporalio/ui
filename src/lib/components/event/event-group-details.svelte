@@ -19,7 +19,7 @@
   $: ({ workflow, run, namespace } = $page.params);
 </script>
 
-<div class="w-full border-slate-700 lg:w-1/3 lg:border-r-2">
+<div class="w-full border-slate-700 lg:w-1/3 lg:border-r">
   <Table class="surface-primary w-full table-fixed pb-2" variant="simple">
     {#each [...eventGroup.events].reverse() as [id, eventInGroup] (id)}
       <tr

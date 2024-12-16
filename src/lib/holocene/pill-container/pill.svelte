@@ -50,7 +50,7 @@
   on:click|stopPropagation={handleClick}
   class={merge(
     'surface-subtle flex items-center justify-center gap-2 rounded-full px-3 py-1 text-sm',
-    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/70',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
     isActive && 'bg-interactive text-white',
     className,
   )}

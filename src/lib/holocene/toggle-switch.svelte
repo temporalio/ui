@@ -39,7 +39,7 @@
   <span
     class="surface-background not-sr-only flex h-5 w-9 items-center rounded-xl border border-secondary p-px peer-checked:justify-end peer-checked:border-interactive peer-checked:bg-interactive peer-checked:text-off-white {disabled
       ? ''
-      : 'group-hover:border-information group-hover:bg-interactive-secondary-hover group-hover:peer-checked:bg-interactive-hover'} peer-focus-visible:border-inverse peer-focus-visible:bg-interactive-secondary-hover peer-focus-visible:ring-4 peer-focus-visible:ring-primary/70 peer-focus-visible:peer-checked:bg-interactive-hover"
+      : 'group-hover:border-information group-hover:bg-interactive-secondary-hover group-hover:peer-checked:bg-interactive-hover'} peer-focus-visible:border-inverse peer-focus-visible:bg-interactive-secondary-hover peer-focus-visible:ring-2 peer-focus-visible:ring-primary/70 peer-focus-visible:peer-checked:bg-interactive-hover"
   >
     <span class="h-4 w-4 rounded-[50%] bg-current"></span>
   </span>

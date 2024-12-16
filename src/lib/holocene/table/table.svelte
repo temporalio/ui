@@ -45,7 +45,7 @@
   }
 
   table.fancy {
-    @apply surface-primary border-separate border-spacing-0 rounded-xl border-2 border-table;
+    @apply surface-primary border-separate border-spacing-0 rounded-xl border border-table;
 
     thead {
       @apply surface-table;

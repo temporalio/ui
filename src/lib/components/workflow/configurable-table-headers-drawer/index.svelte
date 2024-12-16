@@ -35,11 +35,11 @@
 >
   <DrawerContent title={translate('workflows.configure-headers', { title })}>
     <svelte:fragment slot="subtitle">
-      Add (<Icon className="inline" name="add" />), re-arrange (<Icon
-        className="inline"
+      Add (<Icon class="inline" name="add" />), re-arrange (<Icon
+        class="inline"
         name="chevron-selector-vertical"
-      />), and remove (<Icon className="inline" name="hyphen" />), {type} Headings
-      to personalize the {title} Table.
+      />), and remove (<Icon class="inline" name="hyphen" />), {type} Headings to
+      personalize the {title} Table.
     </svelte:fragment>
 
     <OrderableList {availableColumns} {table} {type} />

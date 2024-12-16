@@ -57,4 +57,7 @@ export const Strings = {
   'last-attempt-completed-time': 'Last Attempt Completed Time',
   'next-attempt-scheduled-time': 'Next Attempt Scheduled Time',
   'last-attempt-failure': 'Last Attempt Failure',
+  'blocked-reason': 'Blocked Reason',
+  link: 'Link',
+  'link-namespace': 'Link Namespace',
 } as const;

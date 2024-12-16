@@ -41,7 +41,7 @@
     name={icon}
     x={textAnchor === 'end' ? x - textWidth - backdropHeight : x}
     y={y - 8}
-    className={!backdrop ? 'text-primary' : 'text-white'}
+    class={!backdrop ? 'text-primary' : 'text-white'}
   />
 {/if}
 <text

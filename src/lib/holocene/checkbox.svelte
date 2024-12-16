@@ -114,8 +114,8 @@
           'flex-none',
           'cursor-pointer',
           'rounded-md',
-          'border-2',
-          'bg-transparent',
+          'border',
+          'bg-primary',
           'text-inverse',
           'bg-clip-padding',
           'peer-indeterminate:bg-interactive',
@@ -124,17 +124,17 @@
           'peer-checked:border-interactive',
         ],
         !disabled && [
-          'group-hover:border-transparent',
-          'peer-focus-visible:border-transparent',
-          'group-hover:peer-checked:border-transparent',
-          'group-hover:peer-indeterminate:border-transparent',
+          'group-hover:border-inverse',
+          'peer-focus-visible:border-inverse',
+          'group-hover:peer-checked:border-inverse',
+          'group-hover:peer-indeterminate:border-inverse',
           'group-hover:bg-interactive-active',
           'peer-focus-visible:bg-interactive-active',
           'group-hover:peer-checked:bg-interactive-active',
           'group-hover:peer-indeterminate:bg-interactive-active',
-          'group-hover:ring-4',
+          'group-hover:ring-2',
           'group-hover:ring-primary/70',
-          'peer-focus-visible:ring-4',
+          'peer-focus-visible:ring-2',
           'peer-focus-visible:ring-primary/70',
         ],
         disabled && ['cursor-not-allowed', 'opacity-50'],
@@ -143,7 +143,7 @@
     >
       {#if indeterminate || checked}
         <Icon
-          className="absolute left-0 top-0 h-4 w-4"
+          class="absolute left-0 top-0 h-4 w-4"
           name={indeterminate ? 'hyphen' : checked ? 'checkmark' : null}
           strokeWidth="3"
         />

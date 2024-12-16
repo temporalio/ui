@@ -33,7 +33,7 @@
     width={radius}
     height={radius}
     strokeWidth="4"
-    className="text-black"
+    class="text-black"
   />
   <Dot point={[end, y]} classification={workflow.status} r={radius} />
   <Icon
@@ -43,7 +43,7 @@
     width={radius}
     height={radius}
     strokeWidth="4"
-    className="text-black"
+    class="text-black"
   />
 </g>
 

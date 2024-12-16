@@ -147,7 +147,7 @@ devDependencies:
     version: 8.1.10(react@18.2.0)
   '@storybook/addon-svelte-csf':
     specifier: ^4.1.3
-    version: 4.1.3(@storybook/svelte@8.1.10)(@sveltejs/vite-plugin-svelte@4.0.0)(svelte-loader@3.1.4)(svelte@5.5.4)(vite@5.3.6)
+    version: 4.1.3(@storybook/svelte@8.4.7)(@sveltejs/vite-plugin-svelte@4.0.0)(svelte-loader@3.1.4)(svelte@5.5.4)(vite@5.3.6)
   '@storybook/addon-themes':
     specifier: ^8.1.10
     version: 8.1.10
@@ -158,11 +158,11 @@ devDependencies:
     specifier: ^1.2.9
     version: 1.2.9(react-dom@18.2.0)(react@18.2.0)
   '@storybook/svelte':
-    specifier: ^8.1.10
-    version: 8.1.10(prettier@3.2.5)(svelte@5.5.4)
+    specifier: ^8.4.7
+    version: 8.4.7(storybook@8.1.10)(svelte@5.5.4)
   '@storybook/sveltekit':
-    specifier: ^8.1.10
-    version: 8.1.10(@babel/core@7.20.12)(@sveltejs/vite-plugin-svelte@4.0.0)(postcss-load-config@3.1.4)(postcss@8.4.31)(prettier@3.2.5)(svelte@5.5.4)(typescript@5.2.2)(vite@5.3.6)
+    specifier: ^8.4.7
+    version: 8.4.7(@babel/core@7.20.12)(@sveltejs/vite-plugin-svelte@4.0.0)(postcss-load-config@3.1.4)(postcss@8.4.31)(storybook@8.1.10)(svelte@5.5.4)(vite@5.3.6)
   '@storybook/test':
     specifier: ^8.1.10
     version: 8.1.10(jest@29.7.0)(vitest@1.6.0)
@@ -401,8 +401,8 @@ devDependencies:
     specifier: ^5.5.4
     version: 5.5.4
   svelte-check:
-    specifier: ^3.8.6
-    version: 3.8.6(@babel/core@7.20.12)(postcss-load-config@3.1.4)(postcss@8.4.31)(svelte@5.5.4)
+    specifier: ^4.1.1
+    version: 4.1.1(svelte@5.5.4)(typescript@5.2.2)
   svelte-eslint-parser:
     specifier: ^0.33.1
     version: 0.33.1(svelte@5.5.4)
@@ -3510,6 +3510,7 @@ packages:
 
   /@humanwhocodes/object-schema@1.2.1:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
+    deprecated: Use @eslint/object-schema instead
     dev: true
 
   /@isaacs/cliui@8.0.2:
@@ -3799,19 +3800,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.25
     dev: true
 
-  /@jridgewell/sourcemap-codec@1.4.14:
-    resolution: {integrity: sha512-XPSJHWmi394fuUuzDnGz1wiKqWfo1yXecHQMRf2l6hztTO+nPru658AyDngaBe7isIxEkRsPR3FZh+s7iVa4Uw==}
-    dev: true
-
   /@jridgewell/sourcemap-codec@1.5.0:
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
-
-  /@jridgewell/trace-mapping@0.3.17:
-    resolution: {integrity: sha512-MCNzAp77qzKca9+W/+I0+sEpaUnZoeasnghNeVc41VZCEKaCH73Vq3BZZ/SzWIgrqE4H4ceI+p+b6C0mHf9T4g==}
-    dependencies:
-      '@jridgewell/resolve-uri': 3.1.0
-      '@jridgewell/sourcemap-codec': 1.4.14
-    dev: true
 
   /@jridgewell/trace-mapping@0.3.25:
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
@@ -4449,6 +4439,19 @@ packages:
       polished: 4.2.2
       uuid: 9.0.1
 
+  /@storybook/addon-actions@8.4.7(storybook@8.1.10):
+    resolution: {integrity: sha512-mjtD5JxcPuW74T6h7nqMxWTvDneFtokg88p6kQ5OnC1M259iAXb//yiSZgu/quunMHPCXSiqn4FNOSgASTSbsA==}
+    peerDependencies:
+      storybook: ^8.4.7
+    dependencies:
+      '@storybook/global': 5.0.0
+      '@types/uuid': 9.0.8
+      dequal: 2.0.3
+      polished: 4.2.2
+      storybook: 8.1.10(react-dom@18.2.0)(react@18.2.0)
+      uuid: 9.0.1
+    dev: true
+
   /@storybook/addon-backgrounds@8.1.10:
     resolution: {integrity: sha512-nX9Hmcq5U/13S2ETcjGaLqfDcaSKTNPD3RBzWUoNQuZB/bB1q4qLLncQnQfaa6uruP9k6GIFZvtXeJAs9r0POw==}
     dependencies:
@@ -4582,7 +4585,7 @@ packages:
       ts-dedent: 2.2.0
     dev: true
 
-  /@storybook/addon-svelte-csf@4.1.3(@storybook/svelte@8.1.10)(@sveltejs/vite-plugin-svelte@4.0.0)(svelte-loader@3.1.4)(svelte@5.5.4)(vite@5.3.6):
+  /@storybook/addon-svelte-csf@4.1.3(@storybook/svelte@8.4.7)(@sveltejs/vite-plugin-svelte@4.0.0)(svelte-loader@3.1.4)(svelte@5.5.4)(vite@5.3.6):
     resolution: {integrity: sha512-mtd6sK/5nbMF/7Z9nIoVbu7pNd+O1AEedKtR2oS1L9y2i5PLVYA7Dfzj1V9OwZtGK0YnX0bp7p/GMHpBWHgr2A==}
     peerDependencies:
       '@storybook/svelte': ^7.0.0 || ^8.0.0 || ^8.0.0-beta.0
@@ -4599,7 +4602,7 @@ packages:
         optional: true
     dependencies:
       '@babel/runtime': 7.23.2
-      '@storybook/svelte': 8.1.10(prettier@3.2.5)(svelte@5.5.4)
+      '@storybook/svelte': 8.4.7(storybook@8.1.10)(svelte@5.5.4)
       '@sveltejs/vite-plugin-svelte': 4.0.0(svelte@5.5.4)(vite@5.3.6)
       dedent: 1.5.1
       magic-string: 0.30.5
@@ -4694,44 +4697,17 @@ packages:
       - supports-color
     dev: true
 
-  /@storybook/builder-vite@8.1.10(prettier@3.2.5)(typescript@5.2.2)(vite@5.3.6):
-    resolution: {integrity: sha512-8A/i5OEyRVKkTROLgxXEEJRAS8gmdonr4xA15TqAvjOtdYjwP6JoQ4cjNOqH7fPPGPdx/t49Z/7E+v7Ovv6cAw==}
+  /@storybook/builder-vite@8.4.7(storybook@8.1.10)(vite@5.3.6):
+    resolution: {integrity: sha512-LovyXG5VM0w7CovI/k56ZZyWCveQFVDl0m7WwetpmMh2mmFJ+uPQ35BBsgTvTfc8RHi+9Q3F58qP1MQSByXi9g==}
     peerDependencies:
-      '@preact/preset-vite': '*'
-      typescript: '>= 4.3.x'
-      vite: ^4.0.0 || ^5.0.0
-      vite-plugin-glimmerx: '*'
-    peerDependenciesMeta:
-      '@preact/preset-vite':
-        optional: true
-      typescript:
-        optional: true
-      vite-plugin-glimmerx:
-        optional: true
+      storybook: ^8.4.7
+      vite: ^4.0.0 || ^5.0.0 || ^6.0.0
     dependencies:
-      '@storybook/channels': 8.1.10
-      '@storybook/client-logger': 8.1.10
-      '@storybook/core-common': 8.1.10(prettier@3.2.5)
-      '@storybook/core-events': 8.1.10
-      '@storybook/csf-plugin': 8.1.10
-      '@storybook/node-logger': 8.1.10
-      '@storybook/preview': 8.1.10
-      '@storybook/preview-api': 8.1.10
-      '@storybook/types': 8.1.10
-      '@types/find-cache-dir': 3.2.1
+      '@storybook/csf-plugin': 8.4.7(storybook@8.1.10)
       browser-assert: 1.2.1
-      es-module-lexer: 1.5.3
-      express: 4.20.0
-      find-cache-dir: 3.3.2
-      fs-extra: 11.1.1
-      magic-string: 0.30.14
+      storybook: 8.1.10(react-dom@18.2.0)(react@18.2.0)
       ts-dedent: 2.2.0
-      typescript: 5.2.2
       vite: 5.3.6(@types/node@18.15.3)
-    transitivePeerDependencies:
-      - encoding
-      - prettier
-      - supports-color
     dev: true
 
   /@storybook/channels@8.0.9:
@@ -4859,6 +4835,14 @@ packages:
     transitivePeerDependencies:
       - '@types/react'
       - '@types/react-dom'
+    dev: true
+
+  /@storybook/components@8.4.7(storybook@8.1.10):
+    resolution: {integrity: sha512-uyJIcoyeMWKAvjrG9tJBUCKxr2WZk+PomgrgrUwejkIfXMO76i6jw9BwLa0NZjYdlthDv30r9FfbYZyeNPmF0g==}
+    peerDependencies:
+      storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
+    dependencies:
+      storybook: 8.1.10(react-dom@18.2.0)(react@18.2.0)
     dev: true
 
   /@storybook/core-common@8.0.9:
@@ -5019,6 +5003,15 @@ packages:
       - supports-color
     dev: true
 
+  /@storybook/csf-plugin@8.4.7(storybook@8.1.10):
+    resolution: {integrity: sha512-Fgogplu4HImgC+AYDcdGm1rmL6OR1rVdNX1Be9C/NEXwOCpbbBwi0BxTf/2ZxHRk9fCeaPEcOdP5S8QHfltc1g==}
+    peerDependencies:
+      storybook: ^8.4.7
+    dependencies:
+      storybook: 8.1.10(react-dom@18.2.0)(react@18.2.0)
+      unplugin: 1.5.0
+    dev: true
+
   /@storybook/csf-tools@8.0.9:
     resolution: {integrity: sha512-PiNMhL97giLytTdQwuhsZ92buVk4gy9H/8DtrDhUc45/1OmF95gogm6T2Yap729SIFwgpOcuq/U3aVo6d6swVQ==}
     dependencies:
@@ -5138,6 +5131,14 @@ packages:
       - react-dom
     dev: true
 
+  /@storybook/manager-api@8.4.7(storybook@8.1.10):
+    resolution: {integrity: sha512-ELqemTviCxAsZ5tqUz39sDmQkvhVAvAgiplYy9Uf15kO0SP2+HKsCMzlrm2ue2FfkUNyqbDayCPPCB0Cdn/mpQ==}
+    peerDependencies:
+      storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
+    dependencies:
+      storybook: 8.1.10(react-dom@18.2.0)(react@18.2.0)
+    dev: true
+
   /@storybook/manager@8.1.10:
     resolution: {integrity: sha512-dQmRBfT4CABIPhv0kL25qKcQk2SiU5mIZ1DuVzckIbZW+iYEOAusyJ/0HExM9leCrymaW3BgZGlHbIXL7EvZtw==}
     dev: true
@@ -5188,8 +5189,12 @@ packages:
       util-deprecate: 1.0.2
     dev: true
 
-  /@storybook/preview@8.1.10:
-    resolution: {integrity: sha512-Ch7SJQ8/vm4o7ZPwPeL3nGOCKx1Aul7VcvOVkDs+K2lZusJjUROHVTBYlbs71DTTmCo2gS7WhSq+HOpD59BPDg==}
+  /@storybook/preview-api@8.4.7(storybook@8.1.10):
+    resolution: {integrity: sha512-0QVQwHw+OyZGHAJEXo6Knx+6/4er7n2rTDE5RYJ9F2E2Lg42E19pfdLlq2Jhoods2Xrclo3wj6GWR//Ahi39Eg==}
+    peerDependencies:
+      storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
+    dependencies:
+      storybook: 8.1.10(react-dom@18.2.0)(react@18.2.0)
     dev: true
 
   /@storybook/react-dom-shim@8.1.10(react-dom@18.2.0)(react@18.2.0):
@@ -5210,96 +5215,88 @@ packages:
       qs: 6.13.0
     dev: true
 
-  /@storybook/svelte-vite@8.1.10(@babel/core@7.20.12)(@sveltejs/vite-plugin-svelte@4.0.0)(postcss-load-config@3.1.4)(postcss@8.4.31)(prettier@3.2.5)(svelte@5.5.4)(typescript@5.2.2)(vite@5.3.6):
-    resolution: {integrity: sha512-8xiW4cgTSHaXrX1Kt7qXgEUoR6xW2mx4nBNo9rIkYdZ5brq8e7vtj9jdJh7H/QDUFrQTw2nPLWdccwm6YjGVrw==}
+  /@storybook/svelte-vite@8.4.7(@babel/core@7.20.12)(@sveltejs/vite-plugin-svelte@4.0.0)(postcss-load-config@3.1.4)(postcss@8.4.31)(storybook@8.1.10)(svelte@5.5.4)(vite@5.3.6):
+    resolution: {integrity: sha512-6IhZLUnf3Yj5Z8DAKcrF0V/dq3jFrflH2Cjh8Hev+EtDplFNBkqy8ywAbrXA68Vnp+jBWMXqskvo+bmnyQO0nw==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      '@sveltejs/vite-plugin-svelte': ^2.0.0 || ^3.0.0
-      svelte: ^4.0.0 || ^5.0.0-next.65
-      vite: ^4.0.0 || ^5.0.0
+      '@sveltejs/vite-plugin-svelte': ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0
+      storybook: ^8.4.7
+      svelte: ^4.0.0 || ^5.0.0
+      vite: ^4.0.0 || ^5.0.0 || ^6.0.0
     dependencies:
-      '@storybook/builder-vite': 8.1.10(prettier@3.2.5)(typescript@5.2.2)(vite@5.3.6)
-      '@storybook/node-logger': 8.1.10
-      '@storybook/svelte': 8.1.10(prettier@3.2.5)(svelte@5.5.4)
-      '@storybook/types': 8.1.10
+      '@storybook/builder-vite': 8.4.7(storybook@8.1.10)(vite@5.3.6)
+      '@storybook/svelte': 8.4.7(storybook@8.1.10)(svelte@5.5.4)
       '@sveltejs/vite-plugin-svelte': 4.0.0(svelte@5.5.4)(vite@5.3.6)
       magic-string: 0.30.14
+      storybook: 8.1.10(react-dom@18.2.0)(react@18.2.0)
       svelte: 5.5.4
       svelte-preprocess: 5.1.4(@babel/core@7.20.12)(postcss-load-config@3.1.4)(postcss@8.4.31)(svelte@5.5.4)(typescript@5.2.2)
+      svelte2tsx: 0.7.28(svelte@5.5.4)(typescript@5.2.2)
       sveltedoc-parser: 4.2.1
       ts-dedent: 2.2.0
+      typescript: 5.2.2
       vite: 5.3.6(@types/node@18.15.3)
     transitivePeerDependencies:
       - '@babel/core'
-      - '@preact/preset-vite'
       - coffeescript
-      - encoding
       - less
       - postcss
       - postcss-load-config
-      - prettier
       - pug
       - sass
       - stylus
       - sugarss
       - supports-color
-      - typescript
-      - vite-plugin-glimmerx
     dev: true
 
-  /@storybook/svelte@8.1.10(prettier@3.2.5)(svelte@5.5.4):
-    resolution: {integrity: sha512-w/ZCJu/kabRLrLJgabPPSF488LniQPCUbmcQPyMdp1oj+ToIbnD4/IFZJ6ObYRJwWVhQbnJVr2g8ii0UsGe0FQ==}
+  /@storybook/svelte@8.4.7(storybook@8.1.10)(svelte@5.5.4):
+    resolution: {integrity: sha512-HhLczOzyC50stZ5tAeMPdtkr7l70MAQnUrPqgh5nRAWBDFdq7jufAxxuUof6qj3UjRxpkh5VoNv+f1mz12kHaw==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      svelte: ^4.0.0 || ^5.0.0-next.65
+      storybook: ^8.4.7
+      svelte: ^4.0.0 || ^5.0.0
     dependencies:
-      '@storybook/client-logger': 8.1.10
-      '@storybook/core-events': 8.1.10
-      '@storybook/docs-tools': 8.1.10(prettier@3.2.5)
+      '@storybook/components': 8.4.7(storybook@8.1.10)
       '@storybook/global': 5.0.0
-      '@storybook/preview-api': 8.1.10
-      '@storybook/types': 8.1.10
+      '@storybook/manager-api': 8.4.7(storybook@8.1.10)
+      '@storybook/preview-api': 8.4.7(storybook@8.1.10)
+      '@storybook/theming': 8.4.7(storybook@8.1.10)
+      storybook: 8.1.10(react-dom@18.2.0)(react@18.2.0)
       svelte: 5.5.4
       sveltedoc-parser: 4.2.1
       ts-dedent: 2.2.0
       type-fest: 2.19.0
     transitivePeerDependencies:
-      - encoding
-      - prettier
       - supports-color
     dev: true
 
-  /@storybook/sveltekit@8.1.10(@babel/core@7.20.12)(@sveltejs/vite-plugin-svelte@4.0.0)(postcss-load-config@3.1.4)(postcss@8.4.31)(prettier@3.2.5)(svelte@5.5.4)(typescript@5.2.2)(vite@5.3.6):
-    resolution: {integrity: sha512-OzaQJpR9dcWJsdo8NEFDxrX3dQX1dtCdF89nt7CIsK62nnbvPn3Kzc+xszazC+tb9Zpnj4eoFTH1POMIJq6oaQ==}
+  /@storybook/sveltekit@8.4.7(@babel/core@7.20.12)(@sveltejs/vite-plugin-svelte@4.0.0)(postcss-load-config@3.1.4)(postcss@8.4.31)(storybook@8.1.10)(svelte@5.5.4)(vite@5.3.6):
+    resolution: {integrity: sha512-71SKirAoGH0zq3AvDBoRxmFY2zcoKyro78fpCH9ORVZtsOz+ZWSCGQkpq3j7b3bAHjtS2vqESGmOPEWNWm/gwg==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      svelte: ^4.0.0 || ^5.0.0-next.65
-      vite: ^4.0.0 || ^5.0.0
+      storybook: ^8.4.7
+      svelte: ^4.0.0 || ^5.0.0
+      vite: ^4.0.0 || ^5.0.0 || ^6.0.0
     dependencies:
-      '@storybook/addon-actions': 8.1.10
-      '@storybook/builder-vite': 8.1.10(prettier@3.2.5)(typescript@5.2.2)(vite@5.3.6)
-      '@storybook/svelte': 8.1.10(prettier@3.2.5)(svelte@5.5.4)
-      '@storybook/svelte-vite': 8.1.10(@babel/core@7.20.12)(@sveltejs/vite-plugin-svelte@4.0.0)(postcss-load-config@3.1.4)(postcss@8.4.31)(prettier@3.2.5)(svelte@5.5.4)(typescript@5.2.2)(vite@5.3.6)
-      '@storybook/types': 8.1.10
+      '@storybook/addon-actions': 8.4.7(storybook@8.1.10)
+      '@storybook/builder-vite': 8.4.7(storybook@8.1.10)(vite@5.3.6)
+      '@storybook/svelte': 8.4.7(storybook@8.1.10)(svelte@5.5.4)
+      '@storybook/svelte-vite': 8.4.7(@babel/core@7.20.12)(@sveltejs/vite-plugin-svelte@4.0.0)(postcss-load-config@3.1.4)(postcss@8.4.31)(storybook@8.1.10)(svelte@5.5.4)(vite@5.3.6)
+      storybook: 8.1.10(react-dom@18.2.0)(react@18.2.0)
       svelte: 5.5.4
       vite: 5.3.6(@types/node@18.15.3)
     transitivePeerDependencies:
       - '@babel/core'
-      - '@preact/preset-vite'
       - '@sveltejs/vite-plugin-svelte'
       - coffeescript
-      - encoding
       - less
       - postcss
       - postcss-load-config
-      - prettier
       - pug
       - sass
       - stylus
       - sugarss
       - supports-color
-      - typescript
-      - vite-plugin-glimmerx
     dev: true
 
   /@storybook/telemetry@8.1.10(prettier@3.2.5):
@@ -5395,6 +5392,14 @@ packages:
       memoizerific: 1.11.3
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: true
+
+  /@storybook/theming@8.4.7(storybook@8.1.10):
+    resolution: {integrity: sha512-99rgLEjf7iwfSEmdqlHkSG3AyLcK0sfExcr0jnc6rLiAkBhzuIsvcHjjUwkR210SOCgXqBPW0ZA6uhnuyppHLw==}
+    peerDependencies:
+      storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
+    dependencies:
+      storybook: 8.1.10(react-dom@18.2.0)(react@18.2.0)
     dev: true
 
   /@storybook/types@8.0.9:
@@ -5951,10 +5956,6 @@ packages:
 
   /@types/extend@3.0.1:
     resolution: {integrity: sha512-R1g/VyKFFI2HLC1QGAeTtCBWCo6n75l41OnsVYNbmKG+kempOESaodf6BeJyUM3Q0rKa/NQcTHbB2+66lNnxLw==}
-    dev: true
-
-  /@types/find-cache-dir@3.2.1:
-    resolution: {integrity: sha512-frsJrz2t/CeGifcu/6uRo4b+SzAwT4NYCVPu1GN8IB9XTzrpPkGuV0tmh9mN+/L0PklAlsC3u5Fxt0ju00LXIw==}
     dev: true
 
   /@types/fs-extra@9.0.13:
@@ -7617,6 +7618,13 @@ packages:
       readdirp: 3.6.0
     optionalDependencies:
       fsevents: 2.3.3
+
+  /chokidar@4.0.1:
+    resolution: {integrity: sha512-n8enUVCED/KVRQlab1hr3MVpcVMvxtZjmEa956u+4YijlmQED223XMSYj2tLuKvr4jcCTzNNMpQDUer72MMmzA==}
+    engines: {node: '>= 14.16.0'}
+    dependencies:
+      readdirp: 4.0.2
+    dev: true
 
   /chownr@1.1.4:
     resolution: {integrity: sha512-jJ0bqzaylmJtVnNgzTeSOs8DPavpbYgEr/b0YL8/2GO3xJEhInFmhKMUnEJQjZumK7KXGFhUy89PrsJWlakBVg==}
@@ -9661,7 +9669,7 @@ packages:
       eslint-scope: 7.2.2
       eslint-utils: 3.0.0(eslint@8.4.1)
       eslint-visitor-keys: 3.4.3
-      espree: 9.2.0
+      espree: 9.6.1
       esquery: 1.5.0
       esutils: 2.0.3
       fast-deep-equal: 3.1.3
@@ -10006,6 +10014,15 @@ packages:
     resolution: {integrity: sha512-p5161BqbuCaSnB8jIbzQHOlpgsPmK5rJVDfDKO91Axs5NC1uu3HRQm6wt9cd9/+GtQQIO53JdGXXoyDpTAsgYA==}
     dependencies:
       bser: 2.1.1
+    dev: true
+
+  /fdir@6.4.2:
+    resolution: {integrity: sha512-KnhMXsKSPZlAhp7+IjUkRZKPb4fUyccpDrdFXbi4QL1qkmFh9kVY09Yox+n4MaOb3lHZ1Tv829C3oaaXoMYPDQ==}
+    peerDependencies:
+      picomatch: ^3 || ^4
+    peerDependenciesMeta:
+      picomatch:
+        optional: true
     dev: true
 
   /fetch-blob@3.2.0:
@@ -12126,7 +12143,7 @@ packages:
       jest-watcher: 29.7.0
       slash: 5.1.0
       string-length: 5.0.1
-      strip-ansi: 7.0.1
+      strip-ansi: 7.1.0
     dev: true
 
   /jest-watcher@29.7.0:
@@ -14746,7 +14763,7 @@ packages:
     peerDependencies:
       postcss: ^8.1.0
     dependencies:
-      picocolors: 1.0.0
+      picocolors: 1.1.1
       postcss: 8.4.31
       thenby: 1.3.4
     dev: true
@@ -15341,6 +15358,11 @@ packages:
     engines: {node: '>=8.10.0'}
     dependencies:
       picomatch: 2.3.1
+
+  /readdirp@4.0.2:
+    resolution: {integrity: sha512-yDMz9g+VaZkqBYS/ozoBJwaBhTbZo3UNYQHNRw1D3UFQB8oHB4uS/tAODO+ZLjGWmUbKnIlOWO+aaIiAxrUWHA==}
+    engines: {node: '>= 14.16.0'}
+    dev: true
 
   /recast@0.23.6:
     resolution: {integrity: sha512-9FHoNjX1yjuesMwuthAmPKabxYQdOgihFYmT5ebXfYGBcnqXZf3WOVz+5foEZ8Y83P4ZY6yQD5GMmtV+pgCCAQ==}
@@ -16218,7 +16240,7 @@ packages:
     engines: {node: '>=12.20'}
     dependencies:
       char-regex: 2.0.1
-      strip-ansi: 7.0.1
+      strip-ansi: 7.1.0
     dev: true
 
   /string-width@4.2.3:
@@ -16236,7 +16258,7 @@ packages:
     dependencies:
       eastasianwidth: 0.2.0
       emoji-regex: 9.2.2
-      strip-ansi: 7.0.1
+      strip-ansi: 7.1.0
     dev: true
 
   /string.prototype.padend@3.1.4:
@@ -16296,13 +16318,6 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       ansi-regex: 5.0.1
-    dev: true
-
-  /strip-ansi@7.0.1:
-    resolution: {integrity: sha512-cXNxvT8dFNRVfhVME3JAe98mkXDYN2O1l7jmcwMnOslDeESg1rF/OZMtK0nRAhiari1unG5cD4jG3rapUAkLbw==}
-    engines: {node: '>=12'}
-    dependencies:
-      ansi-regex: 6.0.1
     dev: true
 
   /strip-ansi@7.1.0:
@@ -16496,29 +16511,23 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /svelte-check@3.8.6(@babel/core@7.20.12)(postcss-load-config@3.1.4)(postcss@8.4.31)(svelte@5.5.4):
-    resolution: {integrity: sha512-ij0u4Lw/sOTREP13BdWZjiXD/BlHE6/e2e34XzmVmsp5IN4kVa3PWP65NM32JAgwjZlwBg/+JtiNV1MM8khu0Q==}
+  /svelte-check@4.1.1(svelte@5.5.4)(typescript@5.2.2):
+    resolution: {integrity: sha512-NfaX+6Qtc8W/CyVGS/F7/XdiSSyXz+WGYA9ZWV3z8tso14V2vzjfXviKaTFEzB7g8TqfgO2FOzP6XT4ApSTUTw==}
+    engines: {node: '>= 18.0.0'}
     hasBin: true
     peerDependencies:
-      svelte: ^3.55.0 || ^4.0.0-next.0 || ^4.0.0 || ^5.0.0-next.0
+      svelte: ^4.0.0 || ^5.0.0-next.0
+      typescript: '>=5.0.0'
     dependencies:
-      '@jridgewell/trace-mapping': 0.3.17
-      chokidar: 3.5.3
-      picocolors: 1.0.0
+      '@jridgewell/trace-mapping': 0.3.25
+      chokidar: 4.0.1
+      fdir: 6.4.2
+      picocolors: 1.1.1
       sade: 1.8.1
       svelte: 5.5.4
-      svelte-preprocess: 5.1.4(@babel/core@7.20.12)(postcss-load-config@3.1.4)(postcss@8.4.31)(svelte@5.5.4)(typescript@5.2.2)
       typescript: 5.2.2
     transitivePeerDependencies:
-      - '@babel/core'
-      - coffeescript
-      - less
-      - postcss
-      - postcss-load-config
-      - pug
-      - sass
-      - stylus
-      - sugarss
+      - picomatch
     dev: true
 
   /svelte-dev-helper@1.1.9:
@@ -16657,7 +16666,6 @@ packages:
       pascal-case: 3.1.2
       svelte: 5.5.4
       typescript: 5.2.2
-    dev: false
 
   /svelte@5.5.4:
     resolution: {integrity: sha512-NRqpckffqpQ7MM9weWLSsqoWtPZM6A0lyYsNXqqJ/NiCHo00o0V+XFeOdp03IC+2X+Zor2uWE7E93nJFvMOJGA==}
@@ -17435,7 +17443,7 @@ packages:
     dependencies:
       browserslist: 4.21.4
       escalade: 3.1.1
-      picocolors: 1.0.0
+      picocolors: 1.1.1
     dev: true
 
   /update-browserslist-db@1.0.13(browserslist@4.23.0):
@@ -17446,7 +17454,7 @@ packages:
     dependencies:
       browserslist: 4.23.0
       escalade: 3.1.1
-      picocolors: 1.0.0
+      picocolors: 1.1.1
     dev: true
 
   /uri-js@4.4.1:
@@ -17641,7 +17649,7 @@ packages:
       cac: 6.7.14
       debug: 4.3.7
       pathe: 1.1.2
-      picocolors: 1.0.0
+      picocolors: 1.1.1
       vite: 5.3.6(@types/node@18.15.3)
     transitivePeerDependencies:
       - '@types/node'

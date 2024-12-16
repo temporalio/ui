@@ -49,7 +49,7 @@
   {role}
   {...$$restProps}
 >
-  <Icon name={icon} className="mt-0.5" />
+  <Icon name={icon} class="mt-0.5" />
   <div class="w-full min-w-0 gap-1">
     <p class="font-medium">
       {title}
@@ -64,7 +64,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply items-start gap-2 break-words rounded-lg border-2 p-5 text-sm text-primary;
+    @apply items-start gap-2 break-words rounded-lg border p-5 text-sm text-primary;
   }
 
   .alert.success {

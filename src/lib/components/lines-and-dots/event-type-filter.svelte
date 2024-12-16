@@ -71,7 +71,7 @@
       class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-200"
       class:bg-interactive={filterActive}
     >
-      <Icon name="filter" className={filterActive && 'pt-0.5 text-white'} />
+      <Icon name="filter" class={filterActive && 'pt-0.5 text-white'} />
     </div>
     {translate('events.event-types')}
   </MenuButton>

@@ -1,16 +1,22 @@
 <script lang="ts">
   import Alert from '$lib/holocene/alert.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fullEventHistory } from '$lib/stores/events';
   import { timeFormat } from '$lib/stores/time-format';
-  import type { CallbackInfo } from '$lib/types';
+  import type { Callback } from '$lib/types/nexus';
   import { formatDate } from '$lib/utilities/format-date';
+  import { routeForNamespace } from '$lib/utilities/route-for';
 
-  export let callback: CallbackInfo;
+  import EventLink from '../event/event-link.svelte';
+
+  export let callback: Callback;
 
   $: completedTime = formatDate(callback.lastAttemptCompleteTime, $timeFormat);
   $: nextTime = formatDate(callback.nextAttemptScheduleTime, $timeFormat);
   $: failure = callback?.lastAttemptFailure?.message;
+  $: blockedReason = callback?.blockedReason;
 
   const titles = {
     Standby: translate('nexus.callback.standby'),
@@ -19,41 +25,52 @@
     Failed: translate('nexus.callback.failed'),
     Succeeded: translate('nexus.callback.succeeded'),
   };
+  $: initialEvent = $fullEventHistory[0];
+  $: link = initialEvent?.links[0];
 
   $: title = titles[callback.state] || translate('nexus.nexus-callback');
 </script>
 
 <Alert icon="nexus" intent="info" {title}>
   <div class="flex flex-col gap-2 pt-2">
-    <div class="flex items-center gap-2">
-      <p>
-        {translate('common.url')}
-        <span class="badge">{callback.callback.nexus.url}</span>
-      </p>
-    </div>
+    {#if link}
+      <EventLink {link} />
+      <EventLink
+        {link}
+        label={translate('nexus.link-namespace')}
+        value={link.workflowEvent.namespace}
+        href={routeForNamespace({ namespace: link.workflowEvent.namespace })}
+      />
+    {/if}
     <div class="flex flex-col items-start gap-2 md:flex-row md:items-center">
-      <p>
-        {translate('common.state')} <span class="badge">{callback.state}</span>
+      <p class="flex items-center gap-2">
+        {translate('common.state')}<Badge type="subtle">{callback.state}</Badge>
       </p>
       {#if callback.attempt}
-        <p>
+        <p class="flex items-center gap-2">
           {translate('common.attempt')}
-          <span class="badge">{callback.attempt}</span>
+          <Badge type="subtle">{callback.attempt}</Badge>
         </p>
       {/if}
       {#if callback.lastAttemptCompleteTime}
-        <p>
+        <p class="flex items-center gap-2">
           {translate('nexus.last-attempt-completed-time')}
-          <span class="badge">{completedTime}</span>
+          <Badge type="subtle">{completedTime}</Badge>
         </p>
       {/if}
       {#if callback.nextAttemptScheduleTime}
-        <p>
+        <p class="flex items-center gap-2">
           {translate('nexus.next-attempt-scheduled-time')}
-          <span class="badge">{nextTime}</span>
+          <Badge type="subtle">{nextTime}</Badge>
         </p>
       {/if}
     </div>
+    {#if blockedReason}
+      <p class="flex items-center gap-2">
+        {translate('nexus.blocked-reason')}
+        <Badge type="subtle">{blockedReason}</Badge>
+      </p>
+    {/if}
     {#if failure}
       <div class="flex flex-col gap-2">
         <p>{translate('nexus.last-attempt-failure')}</p>
@@ -67,9 +84,3 @@
     {/if}
   </div>
 </Alert>
-
-<style lang="postcss">
-  .badge {
-    @apply inline-flex items-center gap-1 rounded-sm bg-subtle px-1 py-0.5 font-medium;
-  }
-</style>

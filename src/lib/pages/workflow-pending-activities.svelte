@@ -55,7 +55,7 @@
               <h4>{translate('workflows.attempt')}</h4>
               <Badge type={failed ? 'danger' : undefined}>
                 {#if failed}
-                  <Icon className="mr-1" name="retry" />
+                  <Icon class="mr-1" name="retry" />
                 {/if}
                 {details.attempt}
               </Badge>

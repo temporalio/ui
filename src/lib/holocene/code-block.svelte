@@ -110,7 +110,7 @@
   ): EditorState => {
     const extensions = [
       keymap.of([...standardKeymap, ...historyKeymap]),
-      TEMPORAL_THEME(isDark),
+      TEMPORAL_THEME({ isDark, copyable }),
       syntaxHighlighting(TEMPORAL_SYNTAX, { fallback: true }),
       indentUnit.of('  '),
       closeBrackets(),
@@ -188,7 +188,7 @@
   $: content, language, setView();
 </script>
 
-<div class="relative min-w-[80px] grow-0">
+<div class="relative min-w-[80px] grow">
   <div
     bind:this={editor}
     class={className}
@@ -202,7 +202,7 @@
     <CopyButton
       {copyIconTitle}
       {copySuccessIconTitle}
-      class="absolute right-3 top-1 text-secondary"
+      class="absolute right-1 top-1 text-secondary"
       on:click={handleCopy}
       copied={$copied}
     />

@@ -5,6 +5,7 @@
     customSearchAttributes,
     type SearchAttributeInput as SAInput,
   } from '$lib/stores/search-attributes';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
   import SearchAttributeInput from './search-attribute-input/index.svelte';
 
@@ -13,23 +14,27 @@
   export let attributesToAdd: SAInput[] = [];
 
   const addSearchAttribute = () => {
-    attributesToAdd = [...attributesToAdd, { attribute: '', value: null }];
+    attributesToAdd = [
+      ...attributesToAdd,
+      { label: null, value: null, type: SEARCH_ATTRIBUTE_TYPE.UNSPECIFIED },
+    ];
   };
 
   $: searchAttributes = Object.keys($customSearchAttributes);
 
   const onRemove = (attribute: string) => {
-    attributesToAdd = attributesToAdd.filter((a) => a.attribute !== attribute);
+    attributesToAdd = attributesToAdd.filter((a) => a.label !== attribute);
   };
 </script>
 
-<div class="flex flex-col gap-2 {className}">
+<div class="flex flex-col gap-4 {className}">
   {#each attributesToAdd as attribute}
     <SearchAttributeInput {attributesToAdd} bind:attribute {onRemove} />
   {/each}
   <Button
     variant="ghost"
     leadingIcon="add"
+    class="max-sm:w-full"
     on:click={addSearchAttribute}
     disabled={!searchAttributes.length ||
       attributesToAdd.length === searchAttributes.length ||

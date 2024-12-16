@@ -7,7 +7,7 @@
 
 <Icon
   name={includesTaskQueueType ? 'checkmark' : 'close'}
-  className="m-auto {includesTaskQueueType ? 'text-blue-700' : 'text-primary'}"
+  class="m-auto {includesTaskQueueType ? 'text-blue-700' : 'text-primary'}"
   title={includesTaskQueueType
     ? translate('common.yes')
     : translate('common.no')}

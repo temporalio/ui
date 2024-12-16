@@ -1,4 +1,3 @@
-import type { CallbackInfo } from '$lib/types';
 import type {
   Callbacks,
   PendingActivity,
@@ -6,8 +5,8 @@ import type {
   PendingChildren,
   PendingNexusOperation,
 } from '$lib/types/events';
+import type { Callback } from '$lib/types/nexus';
 import type {
-  DecodedWorkflowSearchAttributes,
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
   WorkflowExecutionAPIResponse,
@@ -48,7 +47,7 @@ const toPendingNexusOperations = (
 
 const toCallbacks = (callbacks?: Callbacks): Callbacks => {
   if (!callbacks) return [];
-  return callbacks.map((callback): CallbackInfo => {
+  return callbacks.map((callback): Callback => {
     return {
       ...callback,
       state: toCallbackStateReadable(callback.state),
@@ -58,7 +57,7 @@ const toCallbacks = (callbacks?: Callbacks): Callbacks => {
 
 const toSearchAttributes = (
   apiSearchAttributes: WorkflowSearchAttributes,
-): DecodedWorkflowSearchAttributes => {
+): WorkflowSearchAttributes => {
   if (!apiSearchAttributes || !apiSearchAttributes.indexedFields) return {};
   const decoded = Object.entries(apiSearchAttributes.indexedFields).reduce(
     (searchAttributes, [searchAttributeName, payload]) => {

@@ -19,6 +19,6 @@
   }
 
   .orderable-list {
-    @apply surface-primary rounded-lg border-2 border-subtle;
+    @apply surface-primary rounded-lg border border-subtle;
   }
 </style>
