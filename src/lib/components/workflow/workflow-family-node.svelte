@@ -36,8 +36,8 @@
     rootY: number,
   ) => {
     const x = rootX || width / 2;
-    const y = rootY || height / 3;
-    const radius = 10;
+    const y = rootY || height / 5;
+    const radius = 20;
     return {
       x,
       y,
@@ -53,7 +53,7 @@
     const getX = () => {
       const numberOfSiblings = root.children?.length;
       if (numberOfSiblings === 1) return x;
-      const expandFactor = (radius * (8 - generation * 2)) / zoomLevel;
+      const expandFactor = (radius * (6 - generation * 2)) / zoomLevel;
       if (numberOfSiblings % 2 === 0) {
         return x + (index - numberOfSiblings / 2) * expandFactor;
       } else {
@@ -98,20 +98,22 @@
     stroke-opacity="0.15"
     stroke-dasharray={child.workflow.status === 'Running' ? '5' : 'none'}
   />
-  <circle
-    class="stroke-black dark:stroke-white {child.workflow.status}"
-    cx={childX}
-    cy={childY}
-    r={radius}
-    stroke-width="2"
+  <rect
+    class={child.workflow.status}
+    x={childX - radius / 2}
+    y={childY - radius / 2}
+    cx={radius / 2}
+    cy={radius / 2}
+    width={radius}
+    height={radius}
     fill-opacity="1"
     on:click={() => clickNode(child)}
     cursor={child.children?.length ? 'pointer' : 'default'}
   />
-  {#if child?.children?.length && !showChildren[child.workflow.id]}
+  {#if child?.children?.length}
     <text
       x={childX}
-      y={childY + 2.25 * radius}
+      y={childY - radius}
       class="text-center text-xs"
       fill="currentColor"
       text-anchor="middle"
@@ -120,12 +122,14 @@
   {/if}
 {/each}
 {#if generation === 1}
-  <circle
-    class="stroke-black dark:stroke-white {root.workflow.status}"
-    cx={x}
-    cy={y}
-    r={radius * 2}
-    stroke-width="2"
+  <rect
+    class={root.workflow.status}
+    x={x - radius / 2}
+    y={y - radius / 2}
+    width={radius}
+    height={radius}
+    cx={radius / 2}
+    cy={radius / 2}
     fill-opacity="1"
     cursor="pointer"
     on:click={() => clickNode(root)}
@@ -133,7 +137,7 @@
   {#if root?.children?.length}
     <text
       {x}
-      y={y - 2.25 * radius}
+      y={y - radius}
       class="text-center text-xs"
       fill="currentColor"
       text-anchor="middle"

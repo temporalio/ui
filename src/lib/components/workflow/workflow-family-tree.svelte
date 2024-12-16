@@ -39,7 +39,7 @@
 </script>
 
 <div class="flex">
-  <div class="flex h-full w-96 flex-col text-base">
+  <div class="flex h-full w-96 flex-col border-r border-subtle text-base">
     <div class="flex flex-col items-end">
       <ToggleSwitch
         label={translate('common.view-all')}
@@ -56,7 +56,7 @@
   </div>
   <div class="w-full overflow-hidden">
     <ZoomSvg
-      initialZoom={1}
+      initialZoom={1.5}
       maxZoomOut={1.5}
       maxZoomIn={0.25}
       let:width
