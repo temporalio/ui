@@ -41,7 +41,9 @@
 </script>
 
 {#if !endpoints?.length && !searchParam}
-  <NexusEmptyState {createDisabled} />
+  <NexusEmptyState {createDisabled}>
+    <slot />
+  </NexusEmptyState>
 {:else}
   <div class="mb-8 flex items-center justify-between">
     <h1 data-testid="namespace-selector-title">
