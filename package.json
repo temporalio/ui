@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.33.8",
+  "version": "2.33.9",
   "engines": {
     "pnpm": ">=8.6.0",
     "node": ">=18.15.0"
