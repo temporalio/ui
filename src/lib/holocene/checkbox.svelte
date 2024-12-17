@@ -113,7 +113,6 @@
           'w-4',
           'flex-none',
           'cursor-pointer',
-          'rounded-md',
           'border',
           'bg-primary',
           'text-inverse',

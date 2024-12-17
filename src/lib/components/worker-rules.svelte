@@ -60,7 +60,7 @@
     </TableRow>
   {:else}
     <tr class="w-full">
-      <td colspan="6">
+      <td colspan="4">
         <EmptyState title={translate('workers.no-assignment-rules-found')} />
       </td>
     </tr>
@@ -104,7 +104,7 @@
     </TableRow>
   {:else}
     <tr class="w-full">
-      <td colspan="6">
+      <td colspan="3">
         <EmptyState title={translate('workers.no-redirect-rules-found')} />
       </td>
     </tr>

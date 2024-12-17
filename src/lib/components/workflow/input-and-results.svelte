@@ -51,7 +51,7 @@
   <h3 class="mb-2 flex items-center gap-2">
     {title}
     {#if showParsedContentCount}
-      <Badge type="count" class="rounded-sm">{payloads.length}</Badge>
+      <Badge type="count">{payloads.length}</Badge>
     {/if}
   </h3>
   {#if content}

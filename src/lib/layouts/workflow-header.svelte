@@ -97,7 +97,7 @@
     {/if}
   </div>
 </div>
-<header class="rounded-top flex flex-col gap-2">
+<header class="flex flex-col gap-2">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
     <div class="flex flex-col items-center gap-4 lg:flex-row">
       <WorkflowStatus status={workflow?.status} big />
@@ -143,10 +143,7 @@
   {/if}
   {#if currentDetails}
     <AccordionLight let:open>
-      <div
-        slot="title"
-        class="flex w-full items-center gap-2 rounded p-2 text-xl"
-      >
+      <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
         <Icon
           name="flag"
           class="text-brand"

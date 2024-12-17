@@ -87,11 +87,8 @@
         {/if}
       </IsTemporalServerVersionGuard>
     </td>
-  {:else}
-    <td></td>
   {/if}
   <slot />
-  <td />
 </tr>
 
 <style lang="postcss">

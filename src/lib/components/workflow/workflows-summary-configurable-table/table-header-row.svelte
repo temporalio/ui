@@ -56,19 +56,14 @@
   {:else}
     <slot />
   {/if}
-  <th class="configuration-button-table-cell" />
 </tr>
 
 <style lang="postcss">
   .batch-actions-checkbox-table-cell {
-    @apply w-10 rounded-tl-lg;
+    @apply w-10;
   }
 
   .batch-actions-table-cell {
     @apply overflow-visible whitespace-nowrap font-medium;
-  }
-
-  .configuration-button-table-cell {
-    @apply h-10 w-10 py-1;
   }
 </style>

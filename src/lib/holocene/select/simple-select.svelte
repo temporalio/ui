@@ -33,10 +33,7 @@
 <div>
   <Label {required} {label} hidden for={id} />
   <select
-    class={merge(
-      'inline h-10 w-full rounded-lg border px-2 text-base',
-      className,
-    )}
+    class={merge('inline h-10 w-full border px-2 text-base', className)}
     class:remove={arrow}
     {name}
     {id}
@@ -58,6 +55,6 @@
   }
 
   .remove {
-    @apply h-8 appearance-none rounded-xl py-1 pl-3 text-sm;
+    @apply h-8 appearance-none py-1 pl-3 text-sm;
   }
 </style>

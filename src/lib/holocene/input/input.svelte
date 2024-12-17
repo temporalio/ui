@@ -23,8 +23,6 @@
     maxLength?: number;
     hideCount?: boolean;
     spellcheck?: boolean;
-    unroundRight?: boolean;
-    unroundLeft?: boolean;
     noBorder?: boolean;
     autoFocus?: boolean;
     error?: boolean;
@@ -60,8 +58,6 @@
   export let maxLength = 0;
   export let hideCount = false;
   export let spellcheck: boolean = null;
-  export let unroundRight = false;
-  export let unroundLeft = false;
   export let noBorder = false;
   export let autoFocus = false;
   export let error = false;
@@ -90,18 +86,16 @@
 
 <div class={merge('flex flex-col gap-1', className)}>
   <Label {required} {label} hidden={labelHidden} for={id} />
-  <div class="input-group flex rounded-lg">
+  <div class="input-group flex">
     <slot name="before-input" {disabled} />
     <div
       class={merge(
         'input-container',
-        'surface-primary relative box-border inline-flex h-10 w-full items-center rounded-lg border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
+        'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
       )}
       class:disabled
       class:error
       class:noBorder
-      class:unroundLeft={unroundLeft || $$slots['before-input']}
-      class:unroundRight={unroundRight || $$slots['after-input']}
       class:invalid={!valid}
     >
       {#if icon}
@@ -207,15 +201,7 @@
   }
 
   .suffix {
-    @apply block h-full w-fit rounded-br rounded-tr border-l border-subtle px-4 py-2;
-  }
-
-  .unroundRight {
-    @apply rounded-br-none rounded-tr-none border-r-0;
-  }
-
-  .unroundLeft {
-    @apply rounded-bl-none rounded-tl-none border-l-0;
+    @apply block h-full w-fit border-l border-subtle px-4 py-2;
   }
 
   .noBorder {
@@ -227,7 +213,7 @@
   }
 
   .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r border-l border-subtle;
+    @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-subtle;
   }
 
   .disabled-icon-container {
@@ -235,7 +221,7 @@
   }
 
   .clear-icon-container {
-    @apply mr-2 flex w-6 cursor-pointer items-center justify-center rounded-full;
+    @apply mr-2 flex w-6 cursor-pointer items-center justify-center;
   }
 
   .count {
