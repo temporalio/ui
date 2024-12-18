@@ -1,46 +1,40 @@
 <script lang="ts">
-  // import { page } from '$app/stores';
-
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import ZoomSvg from '$lib/holocene/zoom-svg.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { RootNode } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
-  import WorkflowFamilyNodeDescription from './workflow-family-node-description.svelte';
+  import WorkflowFamilyNodeDescriptionTree from './workflow-family-node-description-tree.svelte';
   import WorkflowFamilyNode from './workflow-family-node.svelte';
 
-  // $: ({ namespace } = $page.params);
   export let root: RootNode;
 
   let expandAll = false;
-
-  // $: currentNode =
-  //   root?.workflow?.runId === workflow.runId &&
-  //   root?.workflow?.id === workflow.id;
+  let activeWorkflow: WorkflowExecution | undefined = undefined;
 
   const onExpandAll = () => {
     expandAll = !expandAll;
   };
 
-  let workflow: WorkflowExecution | undefined = undefined;
-
   const onNodeClick = (node: RootNode) => {
+    console.log(node);
     if (
-      node.workflow.id === workflow?.id &&
-      node.workflow.runId === workflow?.runId
+      node.workflow.id === activeWorkflow?.id &&
+      node.workflow.runId === activeWorkflow?.runId
     ) {
-      workflow = undefined;
+      activeWorkflow = undefined;
     } else {
-      workflow = node.workflow;
+      activeWorkflow = node.workflow;
     }
   };
 </script>
 
-<div class="flex">
-  <div class="flex h-full w-96 flex-col border-r border-subtle text-base">
-    <div class="flex flex-col items-end">
+<div class="-mt-4 flex flex-col lg:flex-row">
+  <div
+    class="flex w-full flex-col border-b border-subtle text-base lg:w-96 lg:border-0"
+  >
+    <div class="flex flex-col items-end pb-2 pt-6">
       <ToggleSwitch
         label={translate('common.view-all')}
         labelPosition="left"
@@ -49,10 +43,19 @@
         on:change={onExpandAll}
       />
     </div>
-    <div class="flex items-center gap-3 border-b border-subtle">
-      <Icon name="chevron-down" />{root.workflow.name}
+    <button
+      class="w-full select-none border border-subtle px-4 py-2 hover:surface-interactive-secondary"
+    >
+      {root.workflow.name}
+    </button>
+    <div class="flex flex-col gap-0">
+      <WorkflowFamilyNodeDescriptionTree
+        {root}
+        {onNodeClick}
+        {expandAll}
+        {activeWorkflow}
+      />
     </div>
-    <WorkflowFamilyNodeDescription {root} {onNodeClick} {expandAll} />
   </div>
   <div class="w-full overflow-hidden">
     <ZoomSvg
@@ -71,6 +74,7 @@
         {zoomLevel}
         {onNodeClick}
         {expandAll}
+        {activeWorkflow}
       />
     </ZoomSvg>
   </div>

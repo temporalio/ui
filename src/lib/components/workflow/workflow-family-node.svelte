@@ -1,8 +1,6 @@
 <script lang="ts">
   import type { RootNode } from '$lib/services/workflow-service';
-  // import { workflowRun } from '$lib/stores/workflow-run';
-
-  // $: ({ workflow } = $workflowRun);
+  import type { WorkflowExecution } from '$lib/types/workflows';
 
   export let root: RootNode;
   export let width: number;
@@ -11,23 +9,10 @@
   export let rootX = 0;
   export let rootY = 0;
   export let generation = 1;
-
+  export let activeWorkflow: WorkflowExecution | undefined = undefined;
   export let expandAll: boolean;
   export let onNodeClick: (node: RootNode) => void;
-
-  let showChildren = {};
-
-  const setAllExpanded = (expandAll: boolean) => {
-    root.children.forEach((child) => {
-      showChildren[child.workflow.id] = expandAll;
-    });
-  };
-
-  $: setAllExpanded(expandAll);
-
-  // $: currentNode =
-  //   root?.workflow?.runId === workflow.runId &&
-  //   root?.workflow?.id === workflow.id;
+  export let expanded = false;
 
   const getPositions = (
     width: number,
@@ -48,14 +33,16 @@
   $: ({ x, y, radius } = getPositions(width, height, rootX, rootY));
 
   $: getPosition = (index: number) => {
-    const childY = y + y / 1.5 / generation;
+    const childY = y + 4 * radius;
 
     const getX = () => {
       const numberOfSiblings = root.children?.length;
       if (numberOfSiblings === 1) return x;
       const expandFactor = (radius * (6 - generation * 2)) / zoomLevel;
       if (numberOfSiblings % 2 === 0) {
-        return x + (index - numberOfSiblings / 2) * expandFactor;
+        return (
+          x + (index - numberOfSiblings * 0.5) * expandFactor + expandFactor / 2
+        );
       } else {
         const middleIndex = numberOfSiblings / 2 - 0.5;
         if (index === middleIndex) return x;
@@ -66,31 +53,41 @@
     return { childX: getX(), childY };
   };
 
-  const clickNode = (node) => {
-    showChildren[node.workflow.id] =
-      showChildren?.[node.workflow.id] === undefined
-        ? true
-        : !showChildren[node.workflow.id];
-    onNodeClick(node);
+  const nodeClick = (e) => {
+    e.stopPropagation();
+    expanded = !expanded;
   };
 </script>
 
+{#if root?.children.length}
+  <line
+    x1={getPosition(0).childX}
+    y1={getPosition(0).childY - 1.5 * radius}
+    x2={getPosition(root?.children.length - 1).childX}
+    y2={getPosition(0).childY - 1.5 * radius}
+    class="stroke-black transition-all duration-300 ease-in-out dark:stroke-white"
+    stroke-width="2"
+    stroke-opacity="0.15"
+  />
+{/if}
 {#each root?.children as child, index}
   {@const { childX, childY } = getPosition(index)}
-  {#if child.children.length && showChildren[child.workflow.id]}
+  {#if child.children.length && expanded}
     <svelte:self
       root={child}
+      {width}
+      {height}
       {zoomLevel}
       rootX={childX}
       rootY={childY}
       generation={generation + 1}
-      {onNodeClick}
       {expandAll}
+      {activeWorkflow}
     />
   {/if}
   <line
-    x1={x}
-    y1={y}
+    x1={childX}
+    y1={childY - 1.5 * radius}
     x2={childX}
     y2={childY}
     class="stroke-black transition-all duration-300 ease-in-out dark:stroke-white"
@@ -98,30 +95,53 @@
     stroke-opacity="0.15"
     stroke-dasharray={child.workflow.status === 'Running' ? '5' : 'none'}
   />
-  <rect
-    class={child.workflow.status}
-    x={childX - radius / 2}
-    y={childY - radius / 2}
-    cx={radius / 2}
-    cy={radius / 2}
-    width={radius}
-    height={radius}
-    fill-opacity="1"
-    on:click={() => clickNode(child)}
-    cursor={child.children?.length ? 'pointer' : 'default'}
-  />
-  {#if child?.children?.length}
-    <text
-      x={childX}
-      y={childY - radius}
-      class="text-center text-xs"
-      fill="currentColor"
-      text-anchor="middle"
-      font-weight="500">{child.children.length}</text
-    >
-  {/if}
+  <g role="button" on:click={nodeClick}>
+    {#if child?.children?.length && expanded}
+      <line
+        x1={childX}
+        y1={childY}
+        x2={childX}
+        y2={childY + 2.5 * radius}
+        class="stroke-black transition-all duration-300 ease-in-out dark:stroke-white"
+        stroke-width="2"
+        stroke-opacity="0.15"
+      />
+    {/if}
+    <rect
+      class={child.workflow.status}
+      x={childX - radius / 2}
+      y={childY - radius / 2}
+      cx={radius / 2}
+      cy={radius / 2}
+      width={radius}
+      height={radius}
+      fill-opacity="1"
+      cursor={child.children?.length ? 'pointer' : 'default'}
+    />
+    {#if child?.children?.length}
+      <text
+        x={childX}
+        y={childY + 1.25 * radius}
+        class="text-center text-xs"
+        fill="currentColor"
+        text-anchor="middle"
+        font-weight="500">{child.children.length}</text
+      >
+    {/if}
+  </g>
 {/each}
 {#if generation === 1}
+  {#if root?.children?.length}
+    <line
+      x1={x}
+      y1={y}
+      x2={x}
+      y2={y + 2.5 * radius}
+      class="stroke-black transition-all duration-300 ease-in-out dark:stroke-white"
+      stroke-width="2"
+      stroke-opacity="0.15"
+    />
+  {/if}
   <rect
     class={root.workflow.status}
     x={x - radius / 2}
@@ -132,7 +152,7 @@
     cy={radius / 2}
     fill-opacity="1"
     cursor="pointer"
-    on:click={() => clickNode(root)}
+    on:click={nodeClick}
   />
   {#if root?.children?.length}
     <text
@@ -181,5 +201,9 @@
 
   .Canceled {
     fill: #fed64b;
+  }
+
+  .ContinuedAsNew {
+    fill: #e2d5fe;
   }
 </style>

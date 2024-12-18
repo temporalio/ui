@@ -1,54 +1,46 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { RootNode } from '$lib/services/workflow-service';
-  // import { workflowRun } from '$lib/stores/workflow-run';
+  import type { WorkflowExecution } from '$lib/types/workflows';
 
-  // $: ({ workflow } = $workflowRun);
+  import WorkflowFamilyNodeDescriptionTree from './workflow-family-node-description-tree.svelte';
 
   export let root: RootNode;
   export let expandAll: boolean;
+  export let generation = 1;
   export let onNodeClick: (node: RootNode) => void;
+  export let activeWorkflow: WorkflowExecution | undefined = undefined;
 
-  let showChildren = {};
-
-  const setAllExpanded = (expandAll: boolean) => {
-    root.children.forEach((child) => {
-      showChildren[child.workflow.id] = expandAll;
-    });
-  };
-
-  $: setAllExpanded(expandAll);
-
-  // $: currentNode =
-  //   root?.workflow?.runId === workflow.runId &&
-  //   root?.workflow?.id === workflow.id;
-
-  $: {
-    if (root.children) {
-      console.log('root.children: ', root.children);
-    }
-  }
+  let expanded = false;
 </script>
 
-{#each root?.children as child}
-  <div
-    class="cursor-pointer {child?.children?.length &&
-      'border-b border-subtle'} pl-4"
+<div class="cursor-pointer border-subtle" class:border-r={generation === 1}>
+  <button
+    class="w-full select-none border-b border-subtle px-4 py-2 hover:surface-interactive-secondary"
+    on:click|stopPropagation={() => (expanded = !expanded)}
   >
     <p
-      class="flex items-center gap-3 px-1 hover:surface-interactive-secondary"
-      class:ml-6={!child?.children?.length}
+      class="flex items-center gap-3 truncate"
+      class:ml-6={!root?.children?.length}
     >
-      {#if child?.children?.length}
-        <Icon name={expandAll ? 'chevron-up' : 'chevron-down'} />
+      {#if root?.children?.length}
+        <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="-mr-1" />
       {/if}
-      <span class="h-4 w-4 {child.workflow.status}"></span>{child.workflow.name}
+      <span class="h-4 w-4 {root.workflow.status}"></span>{root.workflow.name}
     </p>
-    {#if child?.children?.length && expandAll}
-      <svelte:self root={child} {onNodeClick} {expandAll} />
-    {/if}
-  </div>
-{/each}
+  </button>
+  {#if root?.children?.length && expanded}
+    <div class="pl-4">
+      <WorkflowFamilyNodeDescriptionTree
+        {root}
+        {onNodeClick}
+        {expandAll}
+        {activeWorkflow}
+        generation={generation + 1}
+      />
+    </div>
+  {/if}
+</div>
 
 <style lang="postcss">
   .Running {
@@ -85,5 +77,9 @@
 
   .Canceled {
     background-color: #fed64b;
+  }
+
+  .ContinuedAsNew {
+    background-color: #e2d5fe;
   }
 </style>
