@@ -10,8 +10,6 @@
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
   import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
-  // import LiveChildWorkflowsTable from './live-child-workflows-table.svelte';
-  // import ParentWorkflowTable from './parent-workflow-table.svelte';
   import WorkflowFamilyTree from './relationships/workflow-family-tree.svelte';
   import SchedulerTable from './scheduler-table.svelte';
 
@@ -26,16 +24,8 @@
     $fullEventHistory,
     $namespaces,
   );
-  $: ({
-    // hasChildren,
-    hasRelationships,
-    first,
-    // parent,
-    // parentNamespaceName,
-    next,
-    previous,
-    scheduleId,
-  } = workflowRelationships);
+  $: ({ hasRelationships, first, next, previous, scheduleId } =
+    workflowRelationships);
 </script>
 
 <div class="flex flex-col gap-4 pb-8">
@@ -51,14 +41,6 @@
       {#if scheduleId}
         <SchedulerTable {scheduleId} {namespace} />
       {/if}
-      <!-- {#if parent}
-        <ParentWorkflowTable {parent} {parentNamespaceName} {namespace} />
-      {/if}
-      {#if hasChildren}
-        {#await fetchAllChildWorkflows(namespace, workflowId, runId) then children}
-          <LiveChildWorkflowsTable {children} />
-        {/await}
-      {/if} -->
       {#if first || previous || next}
         <FirstPreviousNextWorkflowTable
           {first}

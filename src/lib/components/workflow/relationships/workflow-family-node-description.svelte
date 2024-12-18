@@ -62,16 +62,18 @@
   </button>
   {#if expanded}
     <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
-    <div class="pl-4">
-      <WorkflowFamilyNodeDescriptionTree
-        {root}
-        {onNodeClick}
-        {expandAll}
-        {activeWorkflow}
-        generation={generation + 1}
-        {openRuns}
-      />
-    </div>
+    {#if root?.children?.length}
+      <div class="pl-4">
+        <WorkflowFamilyNodeDescriptionTree
+          {root}
+          {onNodeClick}
+          {expandAll}
+          {activeWorkflow}
+          generation={generation + 1}
+          {openRuns}
+        />
+      </div>
+    {/if}
   {/if}
 </div>
 
