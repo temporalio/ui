@@ -6,26 +6,24 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   import WorkflowFamilyNodeDescriptionTree from './workflow-family-node-description-tree.svelte';
-  import WorkflowFamilyNode from './workflow-family-node.svelte';
+  import WorkflowFamilyNodeTree from './workflow-family-node-tree.svelte';
 
   export let root: RootNode;
 
   let expandAll = false;
   let activeWorkflow: WorkflowExecution | undefined = undefined;
 
+  let openRuns = {};
+
   const onExpandAll = () => {
     expandAll = !expandAll;
   };
 
   const onNodeClick = (node: RootNode) => {
-    console.log(node);
-    if (
-      node.workflow.id === activeWorkflow?.id &&
-      node.workflow.runId === activeWorkflow?.runId
-    ) {
-      activeWorkflow = undefined;
+    if (openRuns[node.workflow.runId]) {
+      openRuns[node.workflow.runId] = false;
     } else {
-      activeWorkflow = node.workflow;
+      openRuns[node.workflow.runId] = true;
     }
   };
 </script>
@@ -44,7 +42,7 @@
       />
     </div>
     <button
-      class="w-full select-none border border-subtle px-4 py-2 hover:surface-interactive-secondary"
+      class="w-full select-none border border-subtle px-4 py-2 text-sm hover:surface-interactive-secondary"
     >
       {root.workflow.name}
     </button>
@@ -60,21 +58,21 @@
   <div class="w-full overflow-hidden lg:w-2/3">
     <ZoomSvg
       initialZoom={1.5}
-      maxZoomOut={1.5}
+      maxZoomOut={2.5}
       maxZoomIn={0.25}
       let:width
       let:height
       let:zoomLevel
       class="spin"
     >
-      <WorkflowFamilyNode
+      <WorkflowFamilyNodeTree
         {root}
         {width}
         {height}
         {zoomLevel}
         {onNodeClick}
         {expandAll}
-        {activeWorkflow}
+        {openRuns}
       />
     </ZoomSvg>
   </div>

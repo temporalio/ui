@@ -15,39 +15,39 @@
   export let onNodeClick: (node: RootNode) => void;
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
 
-  let expanded = false;
+  $: expanded = expandAll;
 
   $: ({ namespace } = $page.params);
 </script>
 
 <div class="cursor-pointer border-subtle" class:border-r={generation === 1}>
   <button
-    class="w-full select-none border-b border-subtle px-4 py-2 hover:surface-interactive-secondary"
+    class="flex w-full select-none justify-between gap-3 border-b border-subtle px-4 py-2 hover:surface-interactive-secondary"
     on:click|stopPropagation={() => (expanded = !expanded)}
   >
-    <p
-      class="flex items-center gap-3 truncate"
+    <div
+      class="flex max-w-fit items-center gap-3 truncate text-sm"
       class:ml-6={!root?.children?.length}
     >
       {#if root?.children?.length}
-        <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="-mr-1" />
+        <Icon
+          name={expanded ? 'chevron-up' : 'chevron-down'}
+          class="-mr-1 w-4 flex-shrink-0"
+        />
       {/if}
-      <span class="h-4 w-4 {root.workflow.status}"></span>{root.workflow.name}
-    </p>
-  </button>
-  {#if expanded}
-    <div class="flex items-center gap-2 px-4 py-2">
-      <Link
-        href={routeForEventHistory({
-          namespace,
-          workflow: root.workflow.id,
-          run: root.workflow.runId,
-        })}
-      >
-        {root.workflow.id}
-      </Link>
+      <div class="h-4 w-4 flex-shrink-0 {root.workflow.status}"></div>
+      <p class="truncate">{root.workflow.id}</p>
     </div>
-  {/if}
+    <Link
+      href={routeForEventHistory({
+        namespace,
+        workflow: root.workflow.id,
+        run: root.workflow.runId,
+      })}
+      newTab
+      icon="external-link"
+    ></Link>
+  </button>
   {#if root?.children?.length && expanded}
     <div class="pl-4">
       <WorkflowFamilyNodeDescriptionTree

@@ -12,8 +12,8 @@
   import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
   // import LiveChildWorkflowsTable from './live-child-workflows-table.svelte';
   // import ParentWorkflowTable from './parent-workflow-table.svelte';
+  import WorkflowFamilyTree from './relationships/workflow-family-tree.svelte';
   import SchedulerTable from './scheduler-table.svelte';
-  import WorkflowFamilyTree from './workflow-family-tree.svelte';
 
   $: ({ namespace, workflow: workflowId } = $page.params);
   $: ({ workflow } = $workflowRun);

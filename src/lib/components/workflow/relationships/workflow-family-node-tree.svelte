@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { RootNode } from '$lib/services/workflow-service';
-  import type { WorkflowExecution } from '$lib/types/workflows';
 
   export let root: RootNode;
   export let width: number;
@@ -9,10 +8,9 @@
   export let rootX = 0;
   export let rootY = 0;
   export let generation = 1;
-  export let activeWorkflow: WorkflowExecution | undefined = undefined;
+  export let openRuns: Record<string, boolean> = {};
   export let expandAll: boolean;
   export let onNodeClick: (node: RootNode) => void;
-  export let expanded = false;
 
   const getPositions = (
     width: number,
@@ -53,9 +51,13 @@
     return { childX: getX(), childY };
   };
 
-  const nodeClick = (e) => {
+  const nodeClick = (e, node: RootNode) => {
     e.stopPropagation();
-    expanded = !expanded;
+    onNodeClick(node);
+  };
+
+  $: isExpanded = (node: RootNode) => {
+    return openRuns[node.workflow.runId];
   };
 </script>
 
@@ -72,7 +74,7 @@
 {/if}
 {#each root?.children as child, index}
   {@const { childX, childY } = getPosition(index)}
-  {#if child.children.length && expanded}
+  {#if child.children.length && isExpanded(child)}
     <svelte:self
       root={child}
       {width}
@@ -82,7 +84,8 @@
       rootY={childY}
       generation={generation + 1}
       {expandAll}
-      {activeWorkflow}
+      {openRuns}
+      {onNodeClick}
     />
   {/if}
   <line
@@ -95,8 +98,8 @@
     stroke-opacity="0.15"
     stroke-dasharray={child.workflow.status === 'Running' ? '5' : 'none'}
   />
-  <g role="button" on:click={nodeClick}>
-    {#if child?.children?.length && expanded}
+  <g role="button" on:click={(e) => nodeClick(e, child)}>
+    {#if child?.children?.length && isExpanded(child)}
       <line
         x1={childX}
         y1={childY}
@@ -130,6 +133,7 @@
     {/if}
   </g>
 {/each}
+
 {#if generation === 1}
   {#if root?.children?.length}
     <line
@@ -152,7 +156,7 @@
     cy={radius / 2}
     fill-opacity="1"
     cursor="pointer"
-    on:click={nodeClick}
+    on:click={(e) => nodeClick(e, root)}
   />
   {#if root?.children?.length}
     <text
