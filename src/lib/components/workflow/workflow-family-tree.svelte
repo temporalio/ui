@@ -32,9 +32,9 @@
 
 <div class="-mt-4 flex flex-col lg:flex-row">
   <div
-    class="flex w-full flex-col border-b border-subtle text-base lg:w-96 lg:border-0"
+    class="flex w-full flex-col border-b border-subtle text-base lg:w-1/3 lg:border-0"
   >
-    <div class="flex flex-col items-end pb-2 pt-6">
+    <div class="flex flex-col items-end border-r border-subtle pb-4 pt-6">
       <ToggleSwitch
         label={translate('common.view-all')}
         labelPosition="left"
@@ -57,7 +57,7 @@
       />
     </div>
   </div>
-  <div class="w-full overflow-hidden">
+  <div class="w-full overflow-hidden lg:w-2/3">
     <ZoomSvg
       initialZoom={1.5}
       maxZoomOut={1.5}

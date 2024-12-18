@@ -1,7 +1,11 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import type { RootNode } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import WorkflowFamilyNodeDescriptionTree from './workflow-family-node-description-tree.svelte';
 
@@ -12,6 +16,8 @@
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
 
   let expanded = false;
+
+  $: ({ namespace } = $page.params);
 </script>
 
 <div class="cursor-pointer border-subtle" class:border-r={generation === 1}>
@@ -29,6 +35,19 @@
       <span class="h-4 w-4 {root.workflow.status}"></span>{root.workflow.name}
     </p>
   </button>
+  {#if expanded}
+    <div class="flex items-center gap-2 px-4 py-2">
+      <Link
+        href={routeForEventHistory({
+          namespace,
+          workflow: root.workflow.id,
+          run: root.workflow.runId,
+        })}
+      >
+        {root.workflow.id}
+      </Link>
+    </div>
+  {/if}
   {#if root?.children?.length && expanded}
     <div class="pl-4">
       <WorkflowFamilyNodeDescriptionTree
