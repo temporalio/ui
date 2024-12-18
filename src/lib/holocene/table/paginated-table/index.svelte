@@ -73,13 +73,13 @@
     }
 
     :global(tr > th) {
-      @apply whitespace-nowrap px-2 text-left font-medium;
+      @apply whitespace-nowrap p-2 text-left font-medium;
     }
   }
 
   .paginated-table-body {
     :global(tr.primary) {
-      @apply h-12 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
 
     :global(tr.dense) {
@@ -103,7 +103,7 @@
     }
 
     :global(tr > td) {
-      @apply whitespace-nowrap px-2;
+      @apply whitespace-nowrap p-2;
     }
 
     :global(tr > td > .table-link) {
