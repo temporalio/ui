@@ -1,14 +1,21 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import ZoomSvg from '$lib/holocene/zoom-svg.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { RootNode } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import WorkflowFamilyNodeDescriptionTree from './workflow-family-node-description-tree.svelte';
   import WorkflowFamilyNodeTree from './workflow-family-node-tree.svelte';
 
   export let root: RootNode;
+
+  $: ({ namespace, workflow, run } = $page.params);
 
   let expandAll = false;
   let activeWorkflow: WorkflowExecution | undefined = undefined;
@@ -26,11 +33,13 @@
       openRuns[node.workflow.runId] = true;
     }
   };
+
+  $: isActive = root.workflow.id === workflow && root.workflow.runId === run;
 </script>
 
-<div class="-mt-4 flex flex-col lg:flex-row">
+<div class="-mt-4 flex flex-col bg-primary lg:flex-row">
   <div
-    class="flex w-full flex-col border-b border-subtle text-base lg:w-1/3 lg:border-0"
+    class="flex w-full flex-col border-b border-subtle bg-secondary text-base lg:w-1/3 lg:border-0"
   >
     <div class="flex flex-col items-end border-r border-subtle pb-4 pt-6">
       <ToggleSwitch
@@ -41,17 +50,35 @@
         on:change={onExpandAll}
       />
     </div>
-    <button
-      class="w-full select-none border border-subtle px-4 py-2 text-sm hover:surface-interactive-secondary"
+    <div
+      class="flex w-full select-none justify-between gap-1 border-b border-r border-subtle px-2 py-1 hover:surface-interactive-secondary"
+      class:bg-blue-700={isActive}
+      class:text-white={isActive}
     >
-      {root.workflow.name}
-    </button>
+      <div class="flex max-w-fit items-center gap-3 truncate text-sm">
+        <WorkflowStatus status={root.workflow.status} />
+        <div class="shrink-1 flex flex-col items-start text-left leading-4">
+          <p>{root.workflow.name}</p>
+          <p>{root.workflow.id}</p>
+        </div>
+      </div>
+      <Link
+        href={routeForEventHistory({
+          namespace,
+          workflow: root.workflow.id,
+          run: root.workflow.runId,
+        })}
+        newTab
+        icon="external-link"
+      ></Link>
+    </div>
     <div class="flex flex-col gap-0">
       <WorkflowFamilyNodeDescriptionTree
         {root}
         {onNodeClick}
         {expandAll}
         {activeWorkflow}
+        {openRuns}
       />
     </div>
   </div>
@@ -63,7 +90,6 @@
       let:width
       let:height
       let:zoomLevel
-      class="spin"
     >
       <WorkflowFamilyNodeTree
         {root}

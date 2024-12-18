@@ -70,6 +70,6 @@
       {/if}
     </div>
   {:else}
-    <p>{translate('workflows.no-relationships')}</p>
+    <h4 class="px-8">{translate('workflows.no-relationships')}</h4>
   {/if}
 </div>

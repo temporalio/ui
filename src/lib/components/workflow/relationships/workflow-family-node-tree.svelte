@@ -1,4 +1,8 @@
 <script lang="ts">
+  import { cva } from 'class-variance-authority';
+
+  import { page } from '$app/stores';
+
   import type { RootNode } from '$lib/services/workflow-service';
 
   export let root: RootNode;
@@ -11,6 +15,8 @@
   export let openRuns: Record<string, boolean> = {};
   export let expandAll: boolean;
   export let onNodeClick: (node: RootNode) => void;
+
+  $: ({ workflow, run } = $page.params);
 
   const getPositions = (
     width: number,
@@ -36,7 +42,7 @@
     const getX = () => {
       const numberOfSiblings = root.children?.length;
       if (numberOfSiblings === 1) return x;
-      const expandFactor = (radius * (6 - generation * 2)) / zoomLevel;
+      const expandFactor = (radius * 6) / zoomLevel;
       if (numberOfSiblings % 2 === 0) {
         return (
           x + (index - numberOfSiblings * 0.5) * expandFactor + expandFactor / 2
@@ -57,8 +63,36 @@
   };
 
   $: isExpanded = (node: RootNode) => {
-    return openRuns[node.workflow.runId];
+    return expandAll || openRuns[node.workflow.runId];
   };
+
+  $: isActive = (node: RootNode) => {
+    return node.workflow.id === workflow && node.workflow.runId === run;
+  };
+
+  const workflowStatus = cva(['stroke-2'], {
+    variants: {
+      status: {
+        Running: 'fill-blue-300 stroke-blue-500',
+        TimedOut: 'fill-orange-200 stroke-orange-400',
+        Completed: 'fill-green-200 stroke-green-400',
+        Failed: 'fill-red-200 stroke-red-400',
+        ContinuedAsNew: 'fill-purple-200 stroke-purple-400',
+        Canceled: 'fill-slate-100 stroke-slate-300',
+        Terminated: 'fill-yellow-200 stroke-yellow-400',
+        Paused: 'fill-yellow-200 stroke-yellow-400',
+        Unspecified: 'fill-slate-100 stroke-slate-300',
+        Scheduled: 'fill-blue-300 stroke-blue-500',
+        Started: 'fill-blue-300 stroke-blue-500',
+        Open: 'fill-green-200 stroke-green-400',
+        New: 'fill-blue-300 stroke-blue-500',
+        Initiated: 'fill-blue-300 stroke-blue-500',
+        Fired: 'fill-pink-200 stroke-pink-400',
+        CancelRequested: 'fill-yellow-200 stroke-yellow-400',
+        Signaled: 'fill-pink-200 stroke-pink-400',
+      },
+    },
+  });
 </script>
 
 {#if root?.children.length}
@@ -69,7 +103,6 @@
     y2={getPosition(0).childY - 1.5 * radius}
     class="stroke-black transition-all duration-300 ease-in-out dark:stroke-white"
     stroke-width="2"
-    stroke-opacity="0.15"
   />
 {/if}
 {#each root?.children as child, index}
@@ -93,9 +126,8 @@
     y1={childY - 1.5 * radius}
     x2={childX}
     y2={childY}
-    class="stroke-black transition-all duration-300 ease-in-out dark:stroke-white"
+    class="stroke-black stroke-2 transition-all duration-300 ease-in-out dark:stroke-white"
     stroke-width="2"
-    stroke-opacity="0.15"
     stroke-dasharray={child.workflow.status === 'Running' ? '5' : 'none'}
   />
   <g role="button" on:click={(e) => nodeClick(e, child)}>
@@ -105,27 +137,27 @@
         y1={childY}
         x2={childX}
         y2={childY + 2.5 * radius}
-        class="stroke-black transition-all duration-300 ease-in-out dark:stroke-white"
-        stroke-width="2"
-        stroke-opacity="0.15"
+        class="stroke-black stroke-2 transition-all duration-300 ease-in-out dark:stroke-white"
       />
     {/if}
+    {#if isActive(child)}
+      <circle cx={childX} cy={childY} r={radius} class="fill-blue-700" />
+    {/if}
     <rect
-      class={child.workflow.status}
+      class={workflowStatus({ status: child.workflow.status })}
       x={childX - radius / 2}
       y={childY - radius / 2}
       cx={radius / 2}
       cy={radius / 2}
       width={radius}
       height={radius}
-      fill-opacity="1"
       cursor={child.children?.length ? 'pointer' : 'default'}
     />
-    {#if child?.children?.length}
+    {#if child?.children?.length && !isExpanded(child)}
       <text
         x={childX}
-        y={childY + 1.25 * radius}
-        class="text-center text-xs"
+        y={childY + 1.5 * radius}
+        class="text-center"
         fill="currentColor"
         text-anchor="middle"
         font-weight="500">{child.children.length}</text
@@ -141,73 +173,63 @@
       y1={y}
       x2={x}
       y2={y + 2.5 * radius}
-      class="stroke-black transition-all duration-300 ease-in-out dark:stroke-white"
-      stroke-width="2"
-      stroke-opacity="0.15"
+      class="stroke-black stroke-2 transition-all duration-300 ease-in-out dark:stroke-white"
     />
   {/if}
+  {#if isActive(root)}
+    <circle cx={x} cy={y} r={radius} class="fill-blue-700" />
+  {/if}
   <rect
-    class={root.workflow.status}
+    class={workflowStatus({ status: root.workflow.status })}
     x={x - radius / 2}
     y={y - radius / 2}
     width={radius}
     height={radius}
     cx={radius / 2}
     cy={radius / 2}
-    fill-opacity="1"
     cursor="pointer"
     on:click={(e) => nodeClick(e, root)}
   />
-  {#if root?.children?.length}
-    <text
-      {x}
-      y={y - radius}
-      class="text-center text-xs"
-      fill="currentColor"
-      text-anchor="middle"
-      font-weight="500">{root.children.length}</text
-    >
-  {/if}
 {/if}
 
 <style lang="postcss">
   .Running {
-    fill: #93bbfd;
+    @apply fill-green-200;
   }
 
   .Started {
-    fill: #92a4c3;
+    @apply fill-green-200;
   }
 
   .Completed {
-    fill: #00f37e;
+    @apply fill-green-200;
   }
 
   .Fired {
-    fill: #f8a208;
+    @apply fill-green-200;
   }
 
   .Signaled {
-    fill: #d300d8;
+    @apply fill-green-200;
   }
 
   .Failed {
-    fill: #ff4518;
+    @apply fill-green-200;
   }
 
   .Terminated {
-    fill: #fde989;
+    @apply fill-green-200;
   }
 
   .TimedOut {
-    fill: #c2570c;
+    @apply fill-green-200;
   }
 
   .Canceled {
-    fill: #fed64b;
+    @apply fill-green-200;
   }
 
   .ContinuedAsNew {
-    fill: #e2d5fe;
+    @apply fill-green-200;
   }
 </style>

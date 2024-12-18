@@ -731,10 +731,6 @@ export async function fetchAllRootWorkflows(
   }
 }
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 export const fetchAllPaginatedWorkflows = async (
   namespace: string,
   parameters: ValidWorkflowParameters,
@@ -751,7 +747,6 @@ export const fetchAllPaginatedWorkflows = async (
   }
   const route = routeForApi('workflows', { namespace });
   const { executions } = await paginated(async (token: string) => {
-    await sleep(500);
     return requestFromAPI<ListWorkflowExecutionsResponse>(route, {
       token,
       request,

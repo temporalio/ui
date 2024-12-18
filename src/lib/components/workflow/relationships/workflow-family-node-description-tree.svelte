@@ -9,6 +9,7 @@
   export let onNodeClick: (node: RootNode) => void;
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
   export let generation = 1;
+  export let openRuns: Record<string, boolean> = {};
 </script>
 
 {#each root?.children as child}
@@ -18,5 +19,6 @@
     {onNodeClick}
     {activeWorkflow}
     {generation}
+    {openRuns}
   />
 {/each}

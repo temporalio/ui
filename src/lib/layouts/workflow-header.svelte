@@ -152,7 +152,7 @@
       {/if}
     </AccordionLight>
   {/if}
-  <WorkflowDetails />
+  <WorkflowDetails {workflow} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
@@ -209,7 +209,9 @@
           $page.url.pathname,
           routeForRelationships(routeParameters),
         )}
-      />
+      >
+        <Badge type="primary" class="px-1 py-0">New</Badge>
+      </Tab>
       <Tab
         label={translate('workflows.workers-tab')}
         id="workers-tab"

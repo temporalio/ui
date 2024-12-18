@@ -1,12 +1,14 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import type { RootNode } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
+  import WorkflowFamilyNodeDescriptionDetails from './workflow-family-node-description-details.svelte';
   import WorkflowFamilyNodeDescriptionTree from './workflow-family-node-description-tree.svelte';
 
   export let root: RootNode;
@@ -14,19 +16,26 @@
   export let generation = 1;
   export let onNodeClick: (node: RootNode) => void;
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
+  export let openRuns: Record<string, boolean> = {};
 
-  $: expanded = expandAll;
+  $: ({ namespace, workflow, run } = $page.params);
+  $: expanded = expandAll || openRuns[root.workflow.runId];
+  $: isActive = root.workflow.id === workflow && root.workflow.runId === run;
 
-  $: ({ namespace } = $page.params);
+  const onClick = () => {
+    onNodeClick(root);
+  };
 </script>
 
 <div class="cursor-pointer border-subtle" class:border-r={generation === 1}>
   <button
-    class="flex w-full select-none justify-between gap-3 border-b border-subtle px-4 py-2 hover:surface-interactive-secondary"
-    on:click|stopPropagation={() => (expanded = !expanded)}
+    class="flex w-full select-none items-center justify-between gap-1 border-b border-subtle px-2 py-1 hover:surface-interactive-secondary"
+    class:bg-blue-700={isActive}
+    class:text-white={isActive}
+    on:click|stopPropagation={onClick}
   >
     <div
-      class="flex max-w-fit items-center gap-3 truncate text-sm"
+      class="flex w-full items-center gap-3 text-sm"
       class:ml-6={!root?.children?.length}
     >
       {#if root?.children?.length}
@@ -35,8 +44,11 @@
           class="-mr-1 w-4 flex-shrink-0"
         />
       {/if}
-      <div class="h-4 w-4 flex-shrink-0 {root.workflow.status}"></div>
-      <p class="truncate">{root.workflow.id}</p>
+      <WorkflowStatus status={root.workflow.status} />
+      <div class="shrink-1 flex flex-col items-start text-left leading-4">
+        <p>{root.workflow.name}</p>
+        <p>{root.workflow.id}</p>
+      </div>
     </div>
     <Link
       href={routeForEventHistory({
@@ -48,7 +60,10 @@
       icon="external-link"
     ></Link>
   </button>
-  {#if root?.children?.length && expanded}
+  {#if expanded}
+    <div class="border-b border-subtle">
+      <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
+    </div>
     <div class="pl-4">
       <WorkflowFamilyNodeDescriptionTree
         {root}
@@ -56,6 +71,7 @@
         {expandAll}
         {activeWorkflow}
         generation={generation + 1}
+        {openRuns}
       />
     </div>
   {/if}

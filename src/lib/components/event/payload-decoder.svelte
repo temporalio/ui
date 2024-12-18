@@ -41,7 +41,7 @@
   };
 
   const decodePayloads = async (
-    _value: PotentiallyDecodable | EventAttribute | WorkflowEvent,
+    _value: PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo,
   ) => {
     try {
       const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
