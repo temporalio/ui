@@ -71,7 +71,7 @@
     </TableRow>
   {:else}
     <tr class="w-full">
-      <td colspan="6">
+      <td colspan="2">
         <EmptyState title={translate('workers.no-version-sets-found')} />
       </td>
     </tr>
@@ -79,7 +79,7 @@
 </Table>
 <h2 class="flex items-center gap-2" data-testid="workers">
   {translate('workers.workers')}
-  <Badge type="count" class="rounded-sm">{workers?.pollers?.length || 0}</Badge>
+  <Badge type="count">{workers?.pollers?.length || 0}</Badge>
 </h2>
 <Table class="mb-6 w-full min-w-[600px] table-fixed">
   <caption class="sr-only" slot="caption"
@@ -161,7 +161,7 @@
     </TableRow>
   {:else}
     <tr class="w-full">
-      <td colspan={reachability?.buildIdReachability?.length ? 8 : 6}>
+      <td colspan={reachability?.buildIdReachability?.length ? 6 : 4}>
         <EmptyState title={translate('workflows.workers-empty-state')} />
       </td>
     </tr>

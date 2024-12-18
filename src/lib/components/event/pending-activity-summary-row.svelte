@@ -57,7 +57,7 @@
       </p>
       <div
         class="flex items-center gap-1 {event.attempt > 1 &&
-          'surface-retry rounded px-1 py-0.5'}"
+          'surface-retry px-1 py-0.5'}"
       >
         <Icon class="mr-1.5 inline" name="retry" />
         {translate('workflows.attempt')}
@@ -82,7 +82,7 @@
 </tr>
 {#if expanded}
   <tr class="row expanded">
-    <td class="expanded-cell w-full" colspan="3">
+    <td class="expanded-cell w-full">
       <EventDetailsFull {group} />
     </td>
   </tr>

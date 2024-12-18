@@ -41,7 +41,9 @@
 </script>
 
 {#if !endpoints?.length && !searchParam}
-  <NexusEmptyState {createDisabled} />
+  <NexusEmptyState {createDisabled}>
+    <slot />
+  </NexusEmptyState>
 {:else}
   <div class="mb-8 flex items-center justify-between">
     <h1 data-testid="namespace-selector-title">
@@ -75,7 +77,7 @@
         {#each endpoints as endpoint}
           <Link href={routeForNexusEndpoint(endpoint.id)} role="button">
             <div
-              class="transition:colors flex cursor-pointer flex-col gap-1 rounded-lg p-4 duration-200 ease-in-out"
+              class="transition:colors flex cursor-pointer flex-col gap-1 p-4 duration-200 ease-in-out"
             >
               <h3 class="break-all">
                 {endpoint.spec.name}

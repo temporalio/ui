@@ -34,8 +34,7 @@
     bind:value={_value}
     {min}
     on:keydown={handleKeydown}
-    unroundLeft
     search
-    class="-mr-2"
+    class="-mr-2 [&_*]:border-l-0"
   />
 </ConditionalMenu>

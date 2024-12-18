@@ -18,8 +18,6 @@
   export let hintText = '';
   export let max: number = undefined;
   export let min: number = undefined;
-  export let unroundRight = false;
-  export let unroundLeft = false;
   export let search = false;
 
   let valid = true;
@@ -41,11 +39,9 @@
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="flex items-center gap-2">
     <div
-      class="input-container"
-      class:disabled
+      class="surface-primary relative box-border flex h-10 w-16 items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70"
+      class:opacity-50={disabled}
       class:search
-      class:unroundRight
-      class:unroundLeft
       class:invalid={!valid}
     >
       {#if icon}
@@ -55,7 +51,6 @@
       {/if}
       <input
         class="m-2 block w-full bg-transparent text-center text-primary focus:outline-none"
-        class:disabled
         type="number"
         {max}
         {min}
@@ -87,11 +82,7 @@
     @apply text-sm font-medium text-primary;
   }
 
-  .input-container {
-    @apply surface-primary relative box-border flex h-10 w-16 items-center rounded-lg border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
-  }
-
-  .input-container.search {
+  .search {
     @apply w-fit;
 
     input {
@@ -103,19 +94,7 @@
     @apply ml-2 flex items-center justify-center;
   }
 
-  .input-container.invalid {
+  .invalid {
     @apply border-danger focus-within:ring-danger/70;
-  }
-
-  .input-container.disabled {
-    @apply opacity-50;
-  }
-
-  .unroundRight {
-    @apply rounded-br-none rounded-tr-none;
-  }
-
-  .unroundLeft {
-    @apply rounded-bl-none rounded-tl-none border-l-0;
   }
 </style>

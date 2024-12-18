@@ -57,7 +57,7 @@
     disabled={$activeQueryIndex !== null}
     count={$filter.attribute ? 0 : filters.length}
     on:click={() => (searchAttributeValue = '')}
-    class="text-nowrap {!!$filter.attribute && 'attribute-selected'}"
+    class="text-nowrap"
   >
     <svelte:fragment slot="leading">
       {#if !$filter.attribute}
