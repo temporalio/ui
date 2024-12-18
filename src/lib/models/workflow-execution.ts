@@ -1,4 +1,3 @@
-import type { CallbackInfo } from '$lib/types';
 import type {
   Callbacks,
   PendingActivity,
@@ -6,6 +5,7 @@ import type {
   PendingChildren,
   PendingNexusOperation,
 } from '$lib/types/events';
+import type { Callback } from '$lib/types/nexus';
 import type {
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
@@ -47,7 +47,7 @@ const toPendingNexusOperations = (
 
 const toCallbacks = (callbacks?: Callbacks): Callbacks => {
   if (!callbacks) return [];
-  return callbacks.map((callback): CallbackInfo => {
+  return callbacks.map((callback): Callback => {
     return {
       ...callback,
       state: toCallbackStateReadable(callback.state),
