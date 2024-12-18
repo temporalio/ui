@@ -127,8 +127,6 @@
     x2={childX}
     y2={childY}
     class="stroke-black stroke-2 transition-all duration-300 ease-in-out dark:stroke-white"
-    stroke-width="2"
-    stroke-dasharray={child.workflow.status === 'Running' ? '5' : 'none'}
   />
   <g role="button" on:click={(e) => nodeClick(e, child)}>
     {#if child?.children?.length && isExpanded(child)}
