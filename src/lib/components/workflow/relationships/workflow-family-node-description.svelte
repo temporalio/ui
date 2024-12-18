@@ -61,9 +61,7 @@
     ></Link>
   </button>
   {#if expanded}
-    <div class="border-b border-subtle">
-      <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
-    </div>
+    <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
     <div class="pl-4">
       <WorkflowFamilyNodeDescriptionTree
         {root}

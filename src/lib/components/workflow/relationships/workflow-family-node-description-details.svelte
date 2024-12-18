@@ -11,7 +11,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import {
-    routeForWorkers,
+    routeForTaskQueue,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
@@ -26,7 +26,7 @@
   });
 </script>
 
-<Table>
+<Table class="w-full">
   <TableRow>
     <td class="font-mono">{translate('common.start')}</td>
     <td
@@ -66,10 +66,9 @@
     <td class="font-mono">{translate('common.task-queue')}</td>
     <td
       ><Link
-        href={routeForWorkers({
+        href={routeForTaskQueue({
           namespace,
-          workflow: workflow?.id,
-          run: workflow?.runId,
+          queue: workflow?.taskQueue,
         })}>{workflow?.taskQueue}</Link
       ></td
     >
