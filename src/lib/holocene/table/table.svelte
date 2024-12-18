@@ -51,11 +51,11 @@
       @apply surface-table;
 
       :global(th) {
-        @apply border-t border-table px-1 py-2 text-off-white;
+        @apply border-t border-table p-2 text-off-white;
       }
 
       :global(td) {
-        @apply border-t border-table px-1 py-2;
+        @apply border-t border-table p-2;
 
         &:first-child {
           @apply border-l border-table;
@@ -69,7 +69,7 @@
 
     tbody :global {
       td {
-        @apply border-t border-table px-1 py-2 text-sm;
+        @apply border-t border-table p-2 text-sm;
 
         &:first-child:is(.expanded-cell) {
           @apply px-0;
@@ -81,11 +81,11 @@
   table.simple {
     thead :global(td),
     thead :global(th) {
-      @apply border-b border-primary py-2;
+      @apply border-b border-primary p-2;
     }
 
     tbody :global(td) {
-      @apply border-b  py-2;
+      @apply border-b p-2;
     }
 
     &:last-child {

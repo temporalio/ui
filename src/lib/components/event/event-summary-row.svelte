@@ -235,7 +235,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex select-none items-center gap-4 px-1 text-sm no-underline;
+    @apply flex select-none items-center gap-4 px-2 text-sm no-underline;
   }
 
   .failure {
