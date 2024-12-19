@@ -67,15 +67,17 @@
           <p>{root.workflow.id}</p>
         </div>
       </div>
-      <Link
-        href={routeForEventHistory({
-          namespace,
-          workflow: root.workflow.id,
-          run: root.workflow.runId,
-        })}
-        newTab
-        icon="external-link"
-      ></Link>
+      {#if !isCurrent}
+        <Link
+          href={routeForEventHistory({
+            namespace,
+            workflow: root.workflow.id,
+            run: root.workflow.runId,
+          })}
+          newTab
+          icon="external-link"
+        ></Link>
+      {/if}
     </div>
     <div class="flex flex-col gap-0">
       <WorkflowFamilyNodeDescriptionTree
