@@ -15,7 +15,7 @@
 
   export let root: RootNode;
 
-  $: ({ namespace, workflow, run } = $page.params);
+  $: ({ namespace, run } = $page.params);
 
   let expandAll = false;
   let activeWorkflow: WorkflowExecution | undefined = undefined;
@@ -32,9 +32,15 @@
     } else {
       openRuns[node.workflow.runId] = true;
     }
+
+    if (activeWorkflow?.runId === node.workflow.runId) {
+      activeWorkflow = undefined;
+    } else {
+      activeWorkflow = node.workflow;
+    }
   };
 
-  $: isActive = root.workflow.id === workflow && root.workflow.runId === run;
+  $: isCurrent = root.workflow.runId === run;
 </script>
 
 <div class="-mt-4 flex flex-col bg-primary lg:flex-row">
@@ -51,9 +57,8 @@
       />
     </div>
     <div
-      class="flex w-full select-none justify-between gap-1 border-b border-r border-subtle px-2 py-1 hover:surface-interactive-secondary"
-      class:bg-blue-700={isActive}
-      class:text-white={isActive}
+      class="flex w-full select-none {isCurrent &&
+        'bg-indigo-200/20'} justify-between gap-1 border-b border-r border-subtle px-2 py-1 hover:surface-interactive-secondary"
     >
       <div class="flex max-w-fit items-center gap-3 truncate text-sm">
         <WorkflowStatus status={root.workflow.status} />
@@ -99,6 +104,7 @@
         {onNodeClick}
         {expandAll}
         {openRuns}
+        {activeWorkflow}
       />
     </ZoomSvg>
   </div>

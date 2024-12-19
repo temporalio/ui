@@ -43,9 +43,11 @@
     <p class="break-all">{workflow?.runId}</p>
   </div>
 </div>
-<div class="grid grid-cols-1 gap-2 bg-primary p-2">
-  <p class="font-mono text-sm">{translate('common.memo')}</p>
-  <PayloadDecoder value={workflow.memo} let:decodedValue>
-    <CodeBlock content={decodedValue} />
-  </PayloadDecoder>
-</div>
+{#if Object.keys(workflow.memo).length > 0}
+  <div class="grid grid-cols-1 gap-2 bg-primary p-2">
+    <p class="font-mono text-sm">{translate('common.memo')}</p>
+    <PayloadDecoder value={workflow.memo} let:decodedValue>
+      <CodeBlock content={decodedValue} />
+    </PayloadDecoder>
+  </div>
+{/if}

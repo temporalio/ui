@@ -20,7 +20,8 @@
 
   $: ({ namespace, workflow, run } = $page.params);
   $: expanded = expandAll || openRuns[root.workflow.runId];
-  $: isActive = root.workflow.id === workflow && root.workflow.runId === run;
+  $: isCurrent = root.workflow.id === workflow && root.workflow.runId === run;
+  $: isActive = root.workflow.runId === activeWorkflow?.runId;
 
   const onClick = () => {
     onNodeClick(root);
@@ -29,9 +30,8 @@
 
 <div class="cursor-pointer border-subtle" class:border-r={generation === 1}>
   <button
-    class="flex w-full select-none items-center justify-between gap-1 border-b border-subtle px-2 py-1 hover:surface-interactive-secondary"
-    class:bg-blue-700={isActive}
-    class:text-white={isActive}
+    class="flex w-full select-none {isCurrent &&
+      'bg-indigo-200/20'} items-center justify-between gap-1 border-b border-subtle px-2 py-1 hover:surface-interactive-secondary"
     on:click|stopPropagation={onClick}
   >
     <div
@@ -50,18 +50,22 @@
         <p>{root.workflow.id}</p>
       </div>
     </div>
-    <Link
-      href={routeForEventHistory({
-        namespace,
-        workflow: root.workflow.id,
-        run: root.workflow.runId,
-      })}
-      newTab
-      icon="external-link"
-    ></Link>
+    {#if !isCurrent}
+      <Link
+        href={routeForEventHistory({
+          namespace,
+          workflow: root.workflow.id,
+          run: root.workflow.runId,
+        })}
+        newTab
+        icon="external-link"
+      ></Link>
+    {/if}
   </button>
   {#if expanded}
-    <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
+    {#if isActive}
+      <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
+    {/if}
     {#if root?.children?.length}
       <div class="pl-4">
         <WorkflowFamilyNodeDescriptionTree

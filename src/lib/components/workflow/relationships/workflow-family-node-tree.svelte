@@ -4,6 +4,7 @@
   import { page } from '$app/stores';
 
   import type { RootNode } from '$lib/services/workflow-service';
+  import type { WorkflowExecution } from '$lib/types/workflows';
 
   export let root: RootNode;
   export let width: number;
@@ -15,6 +16,7 @@
   export let openRuns: Record<string, boolean> = {};
   export let expandAll: boolean;
   export let onNodeClick: (node: RootNode) => void;
+  export let activeWorkflow: WorkflowExecution | undefined = undefined;
 
   $: ({ workflow, run } = $page.params);
 
@@ -66,8 +68,12 @@
     return expandAll || openRuns[node.workflow.runId];
   };
 
-  $: isActive = (node: RootNode) => {
+  $: isCurrent = (node: RootNode) => {
     return node.workflow.id === workflow && node.workflow.runId === run;
+  };
+
+  $: isActive = (node: RootNode) => {
+    return node.workflow.runId === activeWorkflow?.runId;
   };
 
   const workflowStatus = cva(['stroke-2'], {
@@ -119,6 +125,7 @@
       {expandAll}
       {openRuns}
       {onNodeClick}
+      {activeWorkflow}
     />
   {/if}
   <line
@@ -138,8 +145,23 @@
         class="stroke-black stroke-2 transition-all duration-300 ease-in-out dark:stroke-white"
       />
     {/if}
+    {#if isCurrent(child)}
+      <circle
+        cx={childX}
+        cy={childY}
+        r={radius}
+        class="fill-indigo-200"
+        fill-opacity=".75"
+      />
+    {/if}
     {#if isActive(child)}
-      <circle cx={childX} cy={childY} r={radius} class="fill-blue-700" />
+      <circle
+        cx={childX}
+        cy={childY}
+        r={radius}
+        class="fill-indigo-200"
+        fill-opacity=".5"
+      />
     {/if}
     <rect
       class={workflowStatus({ status: child.workflow.status })}
@@ -155,7 +177,7 @@
       <text
         x={childX}
         y={childY + 1.5 * radius}
-        class="text-center"
+        class="text-center font-mono text-lg"
         fill="currentColor"
         text-anchor="middle"
         font-weight="500">{child.children.length}</text
@@ -175,7 +197,22 @@
     />
   {/if}
   {#if isActive(root)}
-    <circle cx={x} cy={y} r={radius} class="fill-blue-700" />
+    <circle
+      cx={x}
+      cy={y}
+      r={radius}
+      class="fill-indigo-200"
+      fill-opacity=".5"
+    />
+  {/if}
+  {#if isCurrent(root)}
+    <circle
+      cx={x}
+      cy={y}
+      r={radius}
+      class="fill-indigo-200"
+      fill-opacity=".75"
+    />
   {/if}
   <rect
     class={workflowStatus({ status: root.workflow.status })}
