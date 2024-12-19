@@ -18,7 +18,7 @@
 </script>
 
 {#if showEventGroup}
-  <div class="w-full p-2">
+  <div class="w-full">
     <div
       class="flex flex-col gap-0 overflow-hidden border border-subtle xl:flex-row"
     >
@@ -75,7 +75,7 @@
 {:else if event}
   {@const attributes = formatAttributes(event)}
   {@const details = Object.entries(attributes)}
-  <div class="w-full p-2">
+  <div class="w-full">
     <div class="w-full overflow-hidden border border-subtle">
       <EventLinksExpanded links={event?.links} />
       {#each details as [key, value] (key)}
