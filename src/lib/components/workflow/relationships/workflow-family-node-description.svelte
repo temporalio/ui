@@ -14,28 +14,33 @@
   export let root: RootNode;
   export let expandAll: boolean;
   export let generation = 1;
-  export let onNodeClick: (node: RootNode) => void;
+  export let onNodeClick: (node: RootNode, generation: number) => void;
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
-  export let openRuns: Record<string, boolean> = {};
+  export let openRuns: Map<number, string>;
 
   $: ({ namespace, workflow, run } = $page.params);
-  $: expanded = expandAll || openRuns[root.workflow.runId];
+  $: expanded = expandAll || openRuns.get(generation) === root.workflow.runId;
   $: isCurrent = root.workflow.id === workflow && root.workflow.runId === run;
   $: isActive = root.workflow.runId === activeWorkflow?.runId;
 
   const onClick = () => {
-    onNodeClick(root);
+    onNodeClick(root, generation);
   };
 </script>
 
-<div class="cursor-pointer border-subtle" class:border-r={generation === 1}>
+<div
+  class="cursor-pointer border-l border-r border-subtle {isActive &&
+    ' bg-brand'}"
+  class:border-r={generation === 1}
+>
   <button
     class="flex w-full select-none {isCurrent &&
-      'bg-indigo-200/20'} items-center justify-between gap-1 border-b border-subtle px-2 py-1 hover:surface-interactive-secondary"
+      'bg-indigo-200/20'} bg-secondary {isActive &&
+      'bg-brand'} items-center justify-between gap-1 px-2 py-1"
     on:click|stopPropagation={onClick}
   >
     <div
-      class="flex w-full items-center gap-3 text-sm"
+      class="flex w-full items-center gap-3 text-base"
       class:ml-6={!root?.children?.length}
     >
       {#if root?.children?.length}
@@ -45,7 +50,7 @@
         />
       {/if}
       <WorkflowStatus status={root.workflow.status} />
-      <div class="shrink-1 flex flex-col items-start text-left leading-4">
+      <div class="shrink-1 flex flex-col items-start gap-0 text-left leading-4">
         <p>{root.workflow.name}</p>
         <p>{root.workflow.id}</p>
       </div>
@@ -63,11 +68,12 @@
     {/if}
   </button>
   {#if expanded}
-    {#if isActive}
-      <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
-    {/if}
-    {#if root?.children?.length}
-      <div class="pl-4">
+    <div class="pl-4">
+      {#if isActive}
+        <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
+      {/if}
+
+      {#if root?.children?.length}
         <WorkflowFamilyNodeDescriptionTree
           {root}
           {onNodeClick}
@@ -76,8 +82,8 @@
           generation={generation + 1}
           {openRuns}
         />
-      </div>
-    {/if}
+      {/if}
+    </div>
   {/if}
 </div>
 

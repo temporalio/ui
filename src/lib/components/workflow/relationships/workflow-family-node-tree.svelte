@@ -13,9 +13,9 @@
   export let rootX = 0;
   export let rootY = 0;
   export let generation = 1;
-  export let openRuns: Record<string, boolean> = {};
+  export let openRuns: Map<number, string>;
   export let expandAll: boolean;
-  export let onNodeClick: (node: RootNode) => void;
+  export let onNodeClick: (node: RootNode, generation: number) => void;
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
 
   $: ({ workflow, run } = $page.params);
@@ -61,11 +61,12 @@
 
   const nodeClick = (e, node: RootNode) => {
     e.stopPropagation();
-    onNodeClick(node);
+    onNodeClick(node, generation);
   };
 
   $: isExpanded = (node: RootNode) => {
-    return expandAll || openRuns[node.workflow.runId];
+    const opened = openRuns.get(generation) === node.workflow.runId;
+    return expandAll || opened;
   };
 
   $: isCurrent = (node: RootNode) => {
@@ -107,8 +108,9 @@
     y1={getPosition(0).childY - 1.5 * radius}
     x2={getPosition(root?.children.length - 1).childX}
     y2={getPosition(0).childY - 1.5 * radius}
-    class="stroke-black transition-all duration-300 ease-in-out dark:stroke-white"
-    stroke-width="2"
+    class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
+      ? 'stroke-indigo-700'
+      : 'stroke-black dark:stroke-white'}"
   />
 {/if}
 {#each root?.children as child, index}
@@ -133,7 +135,10 @@
     y1={childY - 1.5 * radius}
     x2={childX}
     y2={childY}
-    class="stroke-black stroke-2 transition-all duration-300 ease-in-out dark:stroke-white"
+    class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
+      ? 'stroke-indigo-700'
+      : 'stroke-black dark:stroke-white'}"
+  />
   />
   <g role="button" on:click={(e) => nodeClick(e, child)}>
     {#if child?.children?.length && isExpanded(child)}
@@ -142,7 +147,18 @@
         y1={childY}
         x2={childX}
         y2={childY + 2.5 * radius}
-        class="stroke-black stroke-2 transition-all duration-300 ease-in-out dark:stroke-white"
+        class="stroke-2 transition-all duration-300 ease-in-out {isActive(child)
+          ? 'stroke-indigo-700'
+          : 'stroke-black dark:stroke-white'}"
+      />
+    {/if}
+    {#if isActive(child)}
+      <circle
+        cx={childX}
+        cy={childY}
+        r={radius}
+        class="fill-indigo-700"
+        fill-opacity=".95"
       />
     {/if}
     {#if isCurrent(child)}
@@ -154,15 +170,6 @@
         fill-opacity=".75"
       />
     {/if}
-    {#if isActive(child)}
-      <circle
-        cx={childX}
-        cy={childY}
-        r={radius}
-        class="fill-indigo-200"
-        fill-opacity=".5"
-      />
-    {/if}
     <rect
       class={workflowStatus({ status: child.workflow.status })}
       x={childX - radius / 2}
@@ -171,7 +178,7 @@
       cy={radius / 2}
       width={radius}
       height={radius}
-      cursor={child.children?.length ? 'pointer' : 'default'}
+      cursor="pointer"
     />
     {#if child?.children?.length && !isExpanded(child)}
       <text
@@ -193,16 +200,9 @@
       y1={y}
       x2={x}
       y2={y + 2.5 * radius}
-      class="stroke-black stroke-2 transition-all duration-300 ease-in-out dark:stroke-white"
-    />
-  {/if}
-  {#if isActive(root)}
-    <circle
-      cx={x}
-      cy={y}
-      r={radius}
-      class="fill-indigo-200"
-      fill-opacity=".5"
+      class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
+        ? 'stroke-indigo-700'
+        : 'stroke-black dark:stroke-white'}"
     />
   {/if}
   {#if isCurrent(root)}
@@ -212,6 +212,15 @@
       r={radius}
       class="fill-indigo-200"
       fill-opacity=".75"
+    />
+  {/if}
+  {#if isActive(root)}
+    <circle
+      cx={x}
+      cy={y}
+      r={radius}
+      class="fill-indigo-200"
+      fill-opacity=".5"
     />
   {/if}
   <rect

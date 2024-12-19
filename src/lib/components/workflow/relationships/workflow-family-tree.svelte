@@ -20,24 +20,30 @@
   let expandAll = false;
   let activeWorkflow: WorkflowExecution | undefined = undefined;
 
-  let openRuns = {};
+  let openRuns = new Map<number, string>();
 
   const onExpandAll = () => {
     expandAll = !expandAll;
   };
 
-  const onNodeClick = (node: RootNode) => {
-    if (openRuns[node.workflow.runId]) {
-      openRuns[node.workflow.runId] = false;
+  const onNodeClick = (node: RootNode, generation: number) => {
+    const newRuns = new Map(openRuns);
+    const highestGeneration = Math.max(...Array.from(newRuns.keys()));
+
+    if (openRuns.get(generation) === node.workflow.runId) {
+      newRuns.set(generation, '');
     } else {
-      openRuns[node.workflow.runId] = true;
+      newRuns.set(generation, node.workflow.runId);
     }
 
-    if (activeWorkflow?.runId === node.workflow.runId) {
-      activeWorkflow = undefined;
-    } else {
-      activeWorkflow = node.workflow;
+    if (generation < highestGeneration) {
+      for (let i = generation + 1; i <= highestGeneration; i++) {
+        newRuns.delete(i);
+      }
     }
+
+    openRuns = newRuns;
+    activeWorkflow = node.workflow;
   };
 
   $: isCurrent = root.workflow.runId === run;
@@ -45,7 +51,7 @@
 
 <div class="-mt-4 flex flex-col bg-primary lg:flex-row">
   <div
-    class="flex w-full flex-col border-b border-subtle bg-secondary text-base lg:w-1/3 lg:border-0"
+    class="flex h-auto w-full flex-col overflow-auto border-b border-subtle bg-secondary text-base lg:w-1/2 lg:border-0"
   >
     <div class="flex flex-col items-end border-r border-subtle pb-4 pt-6">
       <ToggleSwitch
@@ -89,7 +95,7 @@
       />
     </div>
   </div>
-  <div class="w-full overflow-hidden lg:w-2/3">
+  <div class="w-full overflow-hidden lg:w-1/2">
     <ZoomSvg
       initialZoom={1.5}
       maxZoomOut={2.5}

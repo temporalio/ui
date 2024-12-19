@@ -1,6 +1,6 @@
 <script lang="ts">
-  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
+  // import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  // import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
@@ -43,11 +43,14 @@
     <p class="break-all">{workflow?.runId}</p>
   </div>
 </div>
-{#if Object.keys(workflow.memo).length > 0}
+<!-- <div class="h-48 overflow-auto">
+  <CodeBlock content={JSON.stringify(workflow)} />
+</div> -->
+<!-- {#if Object.keys(workflow.memo).length > 0}
   <div class="grid grid-cols-1 gap-2 bg-primary p-2">
     <p class="font-mono text-sm">{translate('common.memo')}</p>
     <PayloadDecoder value={workflow.memo} let:decodedValue>
       <CodeBlock content={decodedValue} />
     </PayloadDecoder>
   </div>
-{/if}
+{/if} -->
