@@ -266,7 +266,7 @@
   {#if $loading}
     <Loading title={translate('schedules.deleting')} class="my-2" />
   {:else}
-    <header class="mb-8 flex flex-row justify-between gap-4">
+    <header class="mb-8 flex flex-row flex-wrap justify-between gap-4">
       <div class="relative flex flex-col gap-4">
         <Link href={routeForSchedules({ namespace })} icon="chevron-left">
           {translate('schedules.back-to-schedules')}
@@ -276,7 +276,7 @@
             {scheduleId}
           </span>
         </h1>
-        <div class="flex items-center gap-2 text-lg">
+        <div class="flex flex-wrap items-center gap-2 text-lg">
           <WorkflowStatus
             status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
           />
@@ -284,15 +284,13 @@
             {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
           </p>
         </div>
-        <div class="flex items-center gap-2 text-sm">
-          <p>
-            {translate('common.created', {
-              created: formatDate(schedule?.info?.createTime, $timeFormat, {
-                relative: $relativeTime,
-              }),
-            })}
-          </p>
-        </div>
+        <p class="flex items-center gap-2 text-sm">
+          {translate('common.created', {
+            created: formatDate(schedule?.info?.createTime, $timeFormat, {
+              relative: $relativeTime,
+            }),
+          })}
+        </p>
         {#if schedule?.info?.updateTime}
           <div class="flex items-center gap-2 text-sm">
             <p>

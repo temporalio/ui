@@ -35,7 +35,9 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
     }) => {
       await mockSettingsApi(page, { DisableWriteActions: true });
 
-      await expect(page.getByTestId('workflow-reset-button')).toBeDisabled();
+      await expect(
+        page.getByTestId('workflow-reset-button').locator('visible=true'),
+      ).toBeDisabled();
     });
 
     test('is disabled when reset is disabled via Settings API', async ({
@@ -43,7 +45,9 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
     }) => {
       await mockSettingsApi(page, { WorkflowResetDisabled: true });
 
-      await expect(page.getByTestId('workflow-reset-button')).toBeDisabled();
+      await expect(
+        page.getByTestId('workflow-reset-button').locator('visible=true'),
+      ).toBeDisabled();
     });
 
     test('allows reapplying signals after the reset point', async ({
@@ -51,16 +55,24 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
     }) => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
-      await page.getByTestId('workflow-reset-button').click();
-      await page.getByTestId('workflow-reset-event-id-select-button').click();
+      await page
+        .getByTestId('workflow-reset-button')
+        .locator('visible=true')
+        .click();
+      await page
+        .getByTestId('workflow-reset-event-id-select-button')
+        .locator('visible=true')
+        .click();
       await page
         .locator('#reset-event-id-select')
         .locator('[role="option"]')
+        .locator('visible=true')
         .first()
         .click();
 
       await page
         .getByTestId('reset-confirmation-modal')
+        .locator('visible=true')
         .getByTestId('confirm-modal-button')
         .click();
 
@@ -77,19 +89,30 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
     }) => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
-      await page.getByTestId('workflow-reset-button').click();
-      await page.getByTestId('workflow-reset-event-id-select-button').click();
+      await page
+        .getByTestId('workflow-reset-button')
+        .locator('visible=true')
+        .click();
+      await page
+        .getByTestId('workflow-reset-event-id-select-button')
+        .locator('visible=true')
+        .click();
       await page
         .locator('#reset-event-id-select')
         .locator('[role="option"]')
+        .locator('visible=true')
         .first()
         .click();
 
       // this checkbox is defaulted to checked, so click it to uncheck it
-      await page.getByTestId('reset-include-signals-checkbox').click();
+      await page
+        .getByTestId('reset-include-signals-checkbox')
+        .locator('visible=true')
+        .click();
 
       await page
         .getByTestId('reset-confirmation-modal')
+        .locator('visible=true')
         .getByTestId('confirm-modal-button')
         .click();
 
@@ -115,16 +138,24 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
     }) => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
-      await page.getByTestId('workflow-reset-button').click();
-      await page.getByTestId('workflow-reset-event-id-select-button').click();
+      await page
+        .getByTestId('workflow-reset-button')
+        .locator('visible=true')
+        .click();
+      await page
+        .getByTestId('workflow-reset-event-id-select-button')
+        .locator('visible=true')
+        .click();
       await page
         .locator('#reset-event-id-select')
         .locator('[role="option"]')
+        .locator('visible=true')
         .first()
         .click();
 
       await page
         .getByTestId('reset-confirmation-modal')
+        .locator('visible=true')
         .getByTestId('confirm-modal-button')
         .click();
 
@@ -141,18 +172,29 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
     test('Allows excluding Signals after the reset point', async ({ page }) => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
-      await page.getByTestId('workflow-reset-button').click();
-      await page.getByTestId('workflow-reset-event-id-select-button').click();
+      await page
+        .getByTestId('workflow-reset-button')
+        .locator('visible=true')
+        .click();
+      await page
+        .getByTestId('workflow-reset-event-id-select-button')
+        .locator('visible=true')
+        .click();
       await page
         .locator('#reset-event-id-select')
         .locator('[role="option"]')
+        .locator('visible=true')
         .first()
         .click();
 
-      await page.getByTestId('reset-exclude-signals-checkbox').click();
+      await page
+        .getByTestId('reset-exclude-signals-checkbox')
+        .locator('visible=true')
+        .click();
 
       await page
         .getByTestId('reset-confirmation-modal')
+        .locator('visible=true')
         .getByTestId('confirm-modal-button')
         .click();
 
@@ -169,18 +211,29 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
     test('Allows excluding Updates after the reset point', async ({ page }) => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
-      await page.getByTestId('workflow-reset-button').click();
-      await page.getByTestId('workflow-reset-event-id-select-button').click();
+      await page
+        .getByTestId('workflow-reset-button')
+        .locator('visible=true')
+        .click();
+      await page
+        .getByTestId('workflow-reset-event-id-select-button')
+        .locator('visible=true')
+        .click();
       await page
         .locator('#reset-event-id-select')
         .locator('[role="option"]')
+        .locator('visible=true')
         .first()
         .click();
 
-      await page.getByTestId('reset-exclude-updates-checkbox').click();
+      await page
+        .getByTestId('reset-exclude-updates-checkbox')
+        .locator('visible=true')
+        .click();
 
       await page
         .getByTestId('reset-confirmation-modal')
+        .locator('visible=true')
         .getByTestId('confirm-modal-button')
         .click();
 
@@ -216,10 +269,12 @@ test.describe('Workflow actions for a Running Workflow', () => {
   }) => {
     await mockSettingsApi(page, { DisableWriteActions: true });
 
-    await expect(page.locator('#workflow-actions-menu-button')).toBeDisabled();
+    await expect(
+      page.locator('#workflow-actions-menu-button').locator('visible=true'),
+    ).toBeDisabled();
 
     await expect(
-      page.locator('#workflow-actions-primary-button'),
+      page.locator('#workflow-actions-primary-button').locator('visible=true'),
     ).toBeDisabled();
   });
 
@@ -230,21 +285,35 @@ test.describe('Workflow actions for a Running Workflow', () => {
       await mockSettingsApi(page, { WorkflowCancelDisabled: true });
 
       await expect(
-        page.locator('#workflow-actions-primary-button'),
+        page
+          .locator('#workflow-actions-primary-button')
+          .locator('visible=true'),
       ).toBeDisabled();
 
-      await page.locator('#workflow-actions-menu-button').click();
+      await page
+        .locator('#workflow-actions-menu-button')
+        .locator('visible=true')
+        .click();
 
       await expect(
-        page.locator('#workflow-actions-menu').getByText('Send a Signal'),
+        page
+          .locator('#workflow-actions-menu')
+          .locator('visible=true')
+          .getByText('Send a Signal'),
       ).toBeEnabled();
 
       await expect(
-        page.locator('#workflow-actions-menu').getByText('Terminate'),
+        page
+          .locator('#workflow-actions-menu')
+          .locator('visible=true')
+          .getByText('Terminate'),
       ).toBeEnabled();
 
       await expect(
-        page.locator('#workflow-actions-menu').getByText('Reset'),
+        page
+          .locator('#workflow-actions-menu')
+          .locator('visible=true')
+          .getByText('Reset'),
       ).toBeEnabled();
     });
   });
@@ -256,21 +325,35 @@ test.describe('Workflow actions for a Running Workflow', () => {
       await mockSettingsApi(page, { WorkflowTerminateDisabled: true });
 
       await expect(
-        page.locator('#workflow-actions-primary-button'),
+        page
+          .locator('#workflow-actions-primary-button')
+          .locator('visible=true'),
       ).toBeEnabled();
 
-      await page.locator('#workflow-actions-menu-button').click();
+      await page
+        .locator('#workflow-actions-menu-button')
+        .locator('visible=true')
+        .click();
 
       await expect(
-        page.locator('#workflow-actions-menu').getByText('Send a Signal'),
+        page
+          .locator('#workflow-actions-menu')
+          .locator('visible=true')
+          .getByText('Send a Signal'),
       ).toBeEnabled();
 
       await expect(
-        page.locator('#workflow-actions-menu').getByText('Terminate'),
+        page
+          .locator('#workflow-actions-menu')
+          .locator('visible=true')
+          .getByText('Terminate'),
       ).toBeDisabled();
 
       await expect(
-        page.locator('#workflow-actions-menu').getByText('Reset'),
+        page
+          .locator('#workflow-actions-menu')
+          .locator('visible=true')
+          .getByText('Reset'),
       ).toBeEnabled();
     });
   });
@@ -282,21 +365,35 @@ test.describe('Workflow actions for a Running Workflow', () => {
       await mockSettingsApi(page, { WorkflowSignalDisabled: true });
 
       await expect(
-        page.locator('#workflow-actions-primary-button'),
+        page
+          .locator('#workflow-actions-primary-button')
+          .locator('visible=true'),
       ).toBeEnabled();
 
-      await page.locator('#workflow-actions-menu-button').click();
+      await page
+        .locator('#workflow-actions-menu-button')
+        .locator('visible=true')
+        .click();
 
       await expect(
-        page.locator('#workflow-actions-menu').getByText('Send a Signal'),
+        page
+          .locator('#workflow-actions-menu')
+          .locator('visible=true')
+          .getByText('Send a Signal'),
       ).toBeDisabled();
 
       await expect(
-        page.locator('#workflow-actions-menu').getByText('Terminate'),
+        page
+          .locator('#workflow-actions-menu')
+          .locator('visible=true')
+          .getByText('Terminate'),
       ).toBeEnabled();
 
       await expect(
-        page.locator('#workflow-actions-menu').getByText('Reset'),
+        page
+          .locator('#workflow-actions-menu')
+          .locator('visible=true')
+          .getByText('Reset'),
       ).toBeEnabled();
     });
   });
