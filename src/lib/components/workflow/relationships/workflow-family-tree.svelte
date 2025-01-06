@@ -85,7 +85,7 @@
         ></Link>
       {/if}
     </div>
-    <div class="flex flex-col gap-0">
+    <div class="flex flex-col">
       <WorkflowFamilyNodeDescriptionTree
         {root}
         {onNodeClick}

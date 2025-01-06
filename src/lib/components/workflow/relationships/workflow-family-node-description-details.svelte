@@ -17,9 +17,9 @@
   });
 </script>
 
-<div class="grid grid-cols-2 gap-2 bg-primary p-2">
+<div class="grid grid-cols-2 gap-2 bg-primary p-2 text-sm">
   <div>
-    <p class="font-mono text-sm">{translate('common.start')}</p>
+    <p class="font-mono text-xs">{translate('common.start')}</p>
     <p>
       {formatDate(workflow?.startTime, $timeFormat, {
         relative: $relativeTime,
@@ -27,7 +27,7 @@
     </p>
   </div>
   <div>
-    <p class="font-mono text-sm">{translate('common.end')}</p>
+    <p class="font-mono text-xs">{translate('common.end')}</p>
     <p>
       {formatDate(workflow?.endTime, $timeFormat, {
         relative: $relativeTime,
@@ -39,7 +39,7 @@
     <p>{elapsedTime}</p>
   </div>
   <div>
-    <p class="font-mono text-sm">{translate('common.run-id')}</p>
+    <p class="font-mono text-xs">{translate('common.run-id')}</p>
     <p class="break-all">{workflow?.runId}</p>
   </div>
 </div>
@@ -48,7 +48,7 @@
 </div> -->
 <!-- {#if Object.keys(workflow.memo).length > 0}
   <div class="grid grid-cols-1 gap-2 bg-primary p-2">
-    <p class="font-mono text-sm">{translate('common.memo')}</p>
+    <p class="font-mono text-xs">{translate('common.memo')}</p>
     <PayloadDecoder value={workflow.memo} let:decodedValue>
       <CodeBlock content={decodedValue} />
     </PayloadDecoder>

@@ -29,12 +29,12 @@
 </script>
 
 <div
-  class="cursor-pointer border-l-4 border-r border-subtle"
+  class="cursor-pointer border-l border-r border-subtle py-1"
   class:border-r={generation === 1}
 >
   <button
-    class="flex w-full select-none {isCurrent &&
-      'bg-indigo-200/20'} items-center justify-between gap-1 bg-secondary px-2 py-1"
+    class="flex w-full select-none {isActive && 'surface-subtle'} {isCurrent &&
+      'bg-indigo-200/20'} items-center justify-between gap-1 px-2 py-1 hover:surface-interactive-secondary focus-visible:surface-interactive-secondary"
     on:click|stopPropagation={onClick}
   >
     <div
@@ -53,6 +53,12 @@
         <p>{root.workflow.id}</p>
       </div>
     </div>
+    {#if root?.children?.length}
+      <div class="flex items-center gap-2 text-sm">
+        <Icon name="relationship" class="-mr-1 w-3 flex-shrink-0" />
+        <span class="inline-block">{root?.children?.length}</span>
+      </div>
+    {/if}
     {#if !isCurrent}
       <Link
         href={routeForEventHistory({
@@ -61,8 +67,9 @@
           run: root.workflow.runId,
         })}
         newTab
-        icon="external-link"
-      ></Link>
+      >
+        <Icon name="external-link" />
+      </Link>
     {/if}
   </button>
   {#if expanded}
