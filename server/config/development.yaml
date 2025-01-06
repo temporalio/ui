@@ -20,6 +20,7 @@ batchActionsDisabled: false
 startWorkflowDisabled: false
 hideWorkflowQueryErrors: false
 refreshWorkflowCountsDisabled: false
+WorkflowCountGroupByExecutionStatusEnabled: true
 auth:
   enabled: false
   providers:

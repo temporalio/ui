@@ -19,6 +19,7 @@ batchActionsDisabled: {{ default .Env.TEMPORAL_BATCH_ACTIONS_DISABLED "false" }}
 startWorkflowDisabled: {{ default .Env.TEMPORAL_START_WORKFLOW_DISABLED "false" }}
 hideWorkflowQueryErrors: {{ default .Env.TEMPORAL_HIDE_WORKFLOW_QUERY_ERRORS "false" }} 
 refreshWorkflowCountsDisabled: {{ default .Env.TEMPORAL_REFRESH_WORKFLOW_COUNTS_DISABLED "false" }}
+WorkflowCountGroupByExecutionStatusEnabled: {{ default .Env.TEMPORAL_WORKFLOW_COUNT_GROUP_BY_EXECUTION_STATUS_ENABLED "true" }}
 cors:
   cookieInsecure: {{ default .Env.TEMPORAL_CSRF_COOKIE_INSECURE "false" }}
   allowOrigins:
