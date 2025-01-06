@@ -29,18 +29,16 @@
 </script>
 
 <div
-  class="cursor-pointer border-l border-r border-subtle {isActive &&
-    ' bg-brand'}"
+  class="cursor-pointer border-l-4 border-r border-subtle"
   class:border-r={generation === 1}
 >
   <button
     class="flex w-full select-none {isCurrent &&
-      'bg-indigo-200/20'} bg-secondary {isActive &&
-      'bg-brand'} items-center justify-between gap-1 px-2 py-1"
+      'bg-indigo-200/20'} items-center justify-between gap-1 bg-secondary px-2 py-1"
     on:click|stopPropagation={onClick}
   >
     <div
-      class="flex w-full items-center gap-3 text-base"
+      class="flex w-full items-center gap-3 text-sm"
       class:ml-6={!root?.children?.length}
     >
       {#if root?.children?.length}
@@ -68,7 +66,7 @@
     {/if}
   </button>
   {#if expanded}
-    <div class="pl-4">
+    <div class="pl-2">
       {#if isActive}
         <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
       {/if}

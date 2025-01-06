@@ -183,7 +183,7 @@
     {#if child?.children?.length && !isExpanded(child)}
       <text
         x={childX}
-        y={childY + 1.5 * radius}
+        y={childY + 2 * radius}
         class="text-center font-mono text-lg"
         fill="currentColor"
         text-anchor="middle"
@@ -231,8 +231,6 @@
     height={radius}
     cx={radius / 2}
     cy={radius / 2}
-    cursor="pointer"
-    on:click={(e) => nodeClick(e, root)}
   />
 {/if}
 

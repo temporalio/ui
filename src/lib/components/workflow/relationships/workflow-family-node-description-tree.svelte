@@ -6,10 +6,10 @@
 
   export let root: RootNode;
   export let expandAll: boolean;
-  export let onNodeClick: (node: RootNode) => void;
+  export let onNodeClick: (node: RootNode, generation: number) => void;
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
   export let generation = 1;
-  export let openRuns: Record<string, boolean> = {};
+  export let openRuns: Map<number, string>;
 </script>
 
 {#each root?.children as child}
