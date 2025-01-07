@@ -25,6 +25,7 @@
     class="paginated-table"
     class:table-fixed={fixed}
     class:table-auto={!fixed}
+    {...$$restProps}
   >
     <slot name="caption" />
     <thead class="paginated-table-header">

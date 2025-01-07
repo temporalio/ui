@@ -18,6 +18,7 @@
 
   type Item = $$Generic;
 
+  export let id: string = null;
   export let items: Item[];
   export let variant: 'primary' | 'split' = 'primary';
   export let updating = false;
@@ -94,6 +95,7 @@
   {maxHeight}
   visibleItems={$store.items}
   {fixed}
+  {id}
 >
   <slot name="caption" slot="caption" />
   <slot name="headers" slot="headers" visibleItems={$store.items} />

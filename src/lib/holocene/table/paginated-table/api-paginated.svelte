@@ -26,6 +26,7 @@
 
   type T = $$Generic;
   type $$Props = HTMLAttributes<HTMLDivElement> & {
+    id?: string;
     onError?: (error: Error | unknown) => void | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
     onShiftUp?: (event: KeyboardEvent) => void | undefined;
@@ -43,6 +44,7 @@
     pageSizeOptions?: string[];
   };
 
+  export let id: string = null;
   export let onError: (error: Error) => void | undefined = undefined;
   export let onFetch: () => Promise<PaginatedRequest<T>>;
   export let onShiftUp: (event: KeyboardEvent) => void | undefined = undefined;
@@ -169,7 +171,11 @@
 
 <slot name="header" visibleItems={$store.visibleItems} />
 
-<PaginatedTable updating={$store.updating} visibleItems={$store.visibleItems}>
+<PaginatedTable
+  updating={$store.updating}
+  visibleItems={$store.visibleItems}
+  {id}
+>
   <slot name="caption" slot="caption" />
   <slot name="headers" slot="headers" visibleItems={$store.visibleItems} />
 
