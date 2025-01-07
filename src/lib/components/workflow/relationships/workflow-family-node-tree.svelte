@@ -12,7 +12,7 @@
   export let zoomLevel: number;
   export let rootX = 0;
   export let rootY = 0;
-  export let generation = 0;
+  export let generation = 1;
   export let openRuns: Map<number, string>;
   export let expandAll: boolean;
   export let onNodeClick: (node: RootNode, generation: number) => void;
@@ -193,7 +193,7 @@
   </g>
 {/each}
 
-{#if generation === 0}
+{#if generation === 1}
   {#if root?.children?.length}
     <line
       x1={x}

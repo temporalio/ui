@@ -20,6 +20,8 @@
   };
 
   const onNodeClick = (node: RootNode, generation: number) => {
+    console.log('Node: ', node);
+    console.log('Generation: ', generation);
     const newRuns = new Map(openRuns);
     const highestGeneration = Math.max(...Array.from(newRuns.keys()));
 
@@ -41,7 +43,9 @@
 </script>
 
 <div class="-mt-4 flex flex-col bg-primary">
-  <div class="relative w-full overflow-hidden">
+  <div
+    class="relative z-50 w-full overflow-hidden border-b border-subtle bg-primary lg:sticky lg:top-0"
+  >
     <ZoomSvg
       initialZoom={2}
       maxZoomOut={2.5}
