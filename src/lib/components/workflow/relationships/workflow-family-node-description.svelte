@@ -36,7 +36,7 @@
     class="flex w-full select-none {isActive &&
       'surface-interactive'} {isCurrent &&
       !isActive &&
-      'surface-subtle'} items-center gap-1 px-2 py-2 {!isActive &&
+      'surface-subtle'} items-center gap-1 px-2 py-1 lg:py-2 {!isActive &&
       'hover:surface-interactive-secondary'}"
     on:click|stopPropagation={onClick}
   >

@@ -44,11 +44,11 @@
       </p>
     </div>
     <div class="leading-3">
-      <p class="font-mono text-xs">{translate('common.end')}</p>
+      <p class="min-w-12 font-mono text-xs">{translate('common.end')}</p>
       <p>
         {formatDate(workflow?.endTime, $timeFormat, {
           relative: $relativeTime,
-        })}
+        }) || '-'}
       </p>
     </div>
     <div class="leading-3">
