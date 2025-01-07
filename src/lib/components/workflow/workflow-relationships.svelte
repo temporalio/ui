@@ -9,11 +9,11 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
-  import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
+  import ContinueAsNewTree from './relationships/continue-as-new-tree.svelte';
   import WorkflowFamilyTree from './relationships/workflow-family-tree.svelte';
   import SchedulerTable from './scheduler-table.svelte';
 
-  $: ({ namespace, workflow: workflowId } = $page.params);
+  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: ({ workflow } = $workflowRun);
 
   $: rootWorkflowId = workflow.rootExecution.workflowId;
@@ -42,11 +42,12 @@
         <SchedulerTable {scheduleId} {namespace} />
       {/if}
       {#if first || previous || next}
-        <FirstPreviousNextWorkflowTable
+        <ContinueAsNewTree
           {first}
           {previous}
           {next}
-          workflow={workflowId}
+          current={runId}
+          {workflowId}
           {namespace}
         />
       {/if}

@@ -8,6 +8,8 @@
   export let maxZoomOut = 2.5;
   export let width = 600;
   export let height = 400;
+  export let zoomable = true;
+  export let pannable = true;
 
   let zoomLevel = initialZoom;
 
@@ -27,6 +29,7 @@
   let panOffsetY = 0;
 
   const handleWheel = (event: WheelEvent) => {
+    if (!zoomable) return;
     event.preventDefault();
 
     const rect = svg.getBoundingClientRect();
@@ -51,6 +54,7 @@
   };
 
   function handleMouseDown(event: MouseEvent) {
+    if (!pannable) return;
     isPanning = true;
     startX = event.clientX;
     startY = event.clientY;
@@ -111,7 +115,9 @@
     viewBox="{viewBox.x} {viewBox.y} {viewBox.width} {viewBox.height}"
     {width}
     {height}
-    class="relative cursor-grab select-none active:cursor-grabbing {$$restProps.class}"
+    class="relative select-none {$$restProps.class}"
+    class:cursor-grab={pannable}
+    class:active:cursor-grabbing={pannable}
     on:wheel={handleWheel}
     on:mousedown={handleMouseDown}
     on:mousemove={handleMouseMove}
