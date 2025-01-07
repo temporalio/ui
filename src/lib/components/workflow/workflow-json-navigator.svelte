@@ -58,8 +58,10 @@
         aria-label={translate('common.previous')}
       >
         <span
-          class="arrow arrow-left"
-          class:arrow-left-disabled={index === 1}
+          class="arrow arrow-left border-b-transparent border-t-transparent dark:border-r-white"
+          class:border-r-slate-900={index !== 1}
+          class:border-r-slate-100={index === 1}
+          class:dark:border-r-slate-800={index === 1}
         />
       </button>
       <button
@@ -71,15 +73,17 @@
         aria-label={translate('common.next')}
       >
         <span
-          class="arrow arrow-right"
-          class:arrow-right-disabled={index === events.length}
+          class="arrow arrow-right border-b-transparent border-t-transparent dark:border-l-white"
+          class:border-l-slate-100={index === events.length}
+          class:border-l-slate-900={index !== events.length}
+          class:dark:border-l-slate-800={index === events.length}
         />
       </button>
     </div>
   </div>
   <slot name="decode" />
 </div>
-<div class="py-4">
+<div class="min-h-screen py-4">
   {#if $decodeEventHistory}
     {#key [index, $decodeEventHistory]}
       <PayloadDecoder
@@ -131,19 +135,9 @@
 
   .arrow-left {
     border-width: 6px 12px 6px 0;
-    border-color: transparent #18181b transparent transparent;
-  }
-
-  .arrow-left-disabled {
-    border-color: transparent #d4d4d8 transparent transparent;
   }
 
   .arrow-right {
     border-width: 6px 0 6px 12px;
-    border-color: transparent transparent transparent #18181b;
-  }
-
-  .arrow-right-disabled {
-    border-color: transparent transparent transparent #d4d4d8;
   }
 </style>
