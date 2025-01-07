@@ -36,7 +36,7 @@ The config file can use templating which uses [go's text templating](https://pkg
 
 To enable templating you can add a commented "# enable-template" line at the top of the file.
 
-Note: Previously our docker images supported Dockerize for templating. This is now deprecated, and will be removed soon.
+Note: Previously our docker images supported Dockerize for templating. This is now deprecated, and will be removed soon. If you have an existing custom config templating using dockerize, it will need to be adjusted to use Sprig's helpers. A good example of this is the `default` helper which uses a different argument ordering to dockerize.
 
 ## Serve UI under a sub-path
 
