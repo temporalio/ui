@@ -46,7 +46,7 @@
   >
     <ZoomSvg
       initialZoom={2}
-      maxZoomOut={2.5}
+      maxZoomOut={5}
       maxZoomIn={0.25}
       containerHeight={240}
       let:width
