@@ -42,7 +42,7 @@
   >
     <div class="flex w-full items-center gap-3 pr-2 text-sm">
       <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
-      <div class="flex basis-16 items-center gap-1">
+      <div class="flex basis-16 items-center justify-end gap-1">
         {#if !isCurrent}
           <Link
             href={routeForEventHistory({
