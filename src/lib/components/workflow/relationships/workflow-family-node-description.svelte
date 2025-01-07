@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import type { RootNode } from '$lib/services/workflow-service';
@@ -13,71 +12,67 @@
 
   export let root: RootNode;
   export let expandAll: boolean;
-  export let generation = 1;
+  export let generation = 0;
   export let onNodeClick: (node: RootNode, generation: number) => void;
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
   export let openRuns: Map<number, string>;
 
   $: ({ namespace, workflow, run } = $page.params);
-  $: expanded = expandAll || openRuns.get(generation) === root.workflow.runId;
+  $: expanded =
+    expandAll ||
+    openRuns.get(generation) === root.workflow.runId ||
+    generation === 0;
   $: isCurrent = root.workflow.id === workflow && root.workflow.runId === run;
   $: isActive = root.workflow.runId === activeWorkflow?.runId;
+  $: isRootWorkflow = generation === 0;
 
   const onClick = () => {
     onNodeClick(root, generation);
   };
 </script>
 
-<div
-  class="cursor-pointer border-l border-r border-subtle py-1"
-  class:border-r={generation === 1}
->
+<div class="w-full border-subtle" class:border-l={!isRootWorkflow}>
   <button
-    class="flex w-full select-none {isActive && 'surface-subtle'} {isCurrent &&
-      'bg-indigo-200/20'} items-center justify-between gap-1 px-2 py-1 hover:surface-interactive-secondary focus-visible:surface-interactive-secondary"
+    class="flex w-full select-none {isActive &&
+      'surface-interactive'} {isCurrent &&
+      !isActive &&
+      'surface-subtle'} items-center justify-between gap-1 px-2 py-2 {!isActive &&
+      'hover:surface-interactive-secondary'}"
     on:click|stopPropagation={onClick}
   >
     <div
-      class="flex w-full items-center gap-3 text-sm"
+      class="flex w-full items-center gap-3 pr-2 text-sm"
       class:ml-6={!root?.children?.length}
     >
-      {#if root?.children?.length}
+      {#if root?.children?.length && !isRootWorkflow}
         <Icon
           name={expanded ? 'chevron-up' : 'chevron-down'}
           class="-mr-1 w-4 flex-shrink-0"
         />
       {/if}
-      <WorkflowStatus status={root.workflow.status} />
-      <div class="shrink-1 flex flex-col items-start gap-0 text-left leading-4">
-        <p>{root.workflow.name}</p>
-        <p>{root.workflow.id}</p>
-      </div>
+      <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
+      {#if root?.children?.length}
+        <div class="flex items-center gap-2 text-sm">
+          <Icon name="relationship" class="-mr-1 w-3 flex-shrink-0" />
+          <span class="inline-block">{root?.children?.length}</span>
+        </div>
+      {/if}
+      {#if !isCurrent}
+        <Link
+          href={routeForEventHistory({
+            namespace,
+            workflow: root.workflow.id,
+            run: root.workflow.runId,
+          })}
+          newTab
+        >
+          <Icon name="external-link" class={isActive && 'text-white'} />
+        </Link>
+      {/if}
     </div>
-    {#if root?.children?.length}
-      <div class="flex items-center gap-2 text-sm">
-        <Icon name="relationship" class="-mr-1 w-3 flex-shrink-0" />
-        <span class="inline-block">{root?.children?.length}</span>
-      </div>
-    {/if}
-    {#if !isCurrent}
-      <Link
-        href={routeForEventHistory({
-          namespace,
-          workflow: root.workflow.id,
-          run: root.workflow.runId,
-        })}
-        newTab
-      >
-        <Icon name="external-link" />
-      </Link>
-    {/if}
   </button>
   {#if expanded}
-    <div class="pl-2">
-      {#if isActive}
-        <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
-      {/if}
-
+    <div class="pl-4">
       {#if root?.children?.length}
         <WorkflowFamilyNodeDescriptionTree
           {root}

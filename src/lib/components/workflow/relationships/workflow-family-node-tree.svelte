@@ -27,7 +27,7 @@
     rootY: number,
   ) => {
     const x = rootX || width / 2;
-    const y = rootY || height / 5;
+    const y = rootY || height / 3;
     const radius = 20;
     return {
       x,

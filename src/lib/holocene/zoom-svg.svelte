@@ -4,12 +4,13 @@
 
   export let containerHeight = 600;
   export let initialZoom = 1;
-  export let maxZoomIn = 0.5;
-  export let maxZoomOut = 1.5;
+  export let maxZoomIn = 0.25;
+  export let maxZoomOut = 2.5;
+  export let width = 600;
+  export let height = 400;
+
   let zoomLevel = initialZoom;
 
-  let width = 600;
-  let height = 400;
   let svg;
 
   $: viewBox = {
@@ -25,7 +26,7 @@
   let panOffsetX = 0;
   let panOffsetY = 0;
 
-  const handleWheel = (event) => {
+  const handleWheel = (event: WheelEvent) => {
     event.preventDefault();
 
     const rect = svg.getBoundingClientRect();
@@ -49,7 +50,7 @@
     zoomLevel = newZoomLevel;
   };
 
-  function handleMouseDown(event) {
+  function handleMouseDown(event: MouseEvent) {
     isPanning = true;
     startX = event.clientX;
     startY = event.clientY;
@@ -57,7 +58,7 @@
     panOffsetY = viewBox.y;
   }
 
-  function handleMouseMove(event) {
+  function handleMouseMove(event: MouseEvent) {
     if (!isPanning) return;
 
     const dx = (startX - event.clientX) * (viewBox.width / svg.clientWidth);
@@ -90,7 +91,8 @@
   bind:clientHeight={height}
   style="height: {containerHeight}px"
 >
-  <div class="absolute right-4 top-4 z-20 flex flex-col items-center gap-2">
+  <div class="absolute right-4 top-4 z-20 flex items-center gap-2">
+    <slot name="controls" />
     <Tooltip text="Center" left>
       <Button
         class="cursor-pointer"
@@ -102,7 +104,6 @@
         }}
       />
     </Tooltip>
-    <slot name="controls" />
   </div>
   <svg
     role="presentation"

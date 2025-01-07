@@ -1,6 +1,5 @@
 <script lang="ts">
-  // import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
-  // import CodeBlock from '$lib/holocene/code-block.svelte';
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
@@ -17,40 +16,44 @@
   });
 </script>
 
-<div class="grid grid-cols-2 gap-2 bg-primary p-2 text-sm">
-  <div>
-    <p class="font-mono text-xs">{translate('common.start')}</p>
-    <p>
-      {formatDate(workflow?.startTime, $timeFormat, {
-        relative: $relativeTime,
-      })}
-    </p>
+<div
+  class="flex w-full flex-col items-center gap-2 p-1 text-left text-sm lg:flex-row"
+>
+  <div class="flex items-center gap-4 lg:basis-96">
+    <div class="w-32 leading-3">
+      <WorkflowStatus status={workflow.status} />
+    </div>
+    <div class="w-full leading-3">
+      <p class="font-mono text-xs">{translate('common.type')}</p>
+      <p>{workflow.name}</p>
+    </div>
   </div>
-  <div>
-    <p class="font-mono text-xs">{translate('common.end')}</p>
-    <p>
-      {formatDate(workflow?.endTime, $timeFormat, {
-        relative: $relativeTime,
-      })}
-    </p>
+  <div class="leading-3 lg:basis-[800px]">
+    <p class="font-mono text-xs">{translate('common.id')}</p>
+    <p>{workflow.id}</p>
   </div>
-  <div>
-    <p><Icon name="clock" /></p>
-    <p>{elapsedTime}</p>
-  </div>
-  <div>
-    <p class="font-mono text-xs">{translate('common.run-id')}</p>
-    <p class="break-all">{workflow?.runId}</p>
+  <div class="flex items-center gap-4 lg:basis-5/12">
+    <div class="leading-3">
+      <p class="font-mono text-xs">
+        {translate('common.start')}
+      </p>
+      <p>
+        {formatDate(workflow?.startTime, $timeFormat, {
+          relative: $relativeTime,
+        })}
+      </p>
+    </div>
+    <div class="leading-3">
+      <p class="font-mono text-xs">{translate('common.end')}</p>
+      <p>
+        {formatDate(workflow?.endTime, $timeFormat, {
+          relative: $relativeTime,
+        })}
+      </p>
+    </div>
+    <div class="leading-3">
+      <Icon name="clock" class="h-4 w-3" />
+      <p>{elapsedTime}</p>
+    </div>
   </div>
 </div>
-<!-- <div class="h-48 overflow-auto">
-  <CodeBlock content={JSON.stringify(workflow)} />
-</div> -->
-<!-- {#if Object.keys(workflow.memo).length > 0}
-  <div class="grid grid-cols-1 gap-2 bg-primary p-2">
-    <p class="font-mono text-xs">{translate('common.memo')}</p>
-    <PayloadDecoder value={workflow.memo} let:decodedValue>
-      <CodeBlock content={decodedValue} />
-    </PayloadDecoder>
-  </div>
-{/if} -->
