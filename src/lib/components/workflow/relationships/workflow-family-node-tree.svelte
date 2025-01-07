@@ -12,7 +12,7 @@
   export let zoomLevel: number;
   export let rootX = 0;
   export let rootY = 0;
-  export let generation = 1;
+  export let generation = 0;
   export let openRuns: Map<number, string>;
   export let expandAll: boolean;
   export let onNodeClick: (node: RootNode, generation: number) => void;
@@ -193,7 +193,7 @@
   </g>
 {/each}
 
-{#if generation === 1}
+{#if generation === 0}
   {#if root?.children?.length}
     <line
       x1={x}
@@ -232,6 +232,16 @@
     cx={radius / 2}
     cy={radius / 2}
   />
+  {#if root?.children?.length}
+    <text
+      {x}
+      y={y - radius}
+      class="text-center font-mono text-lg"
+      fill="currentColor"
+      text-anchor="middle"
+      font-weight="500">{root.children.length}</text
+    >
+  {/if}
 {/if}
 
 <style lang="postcss">
