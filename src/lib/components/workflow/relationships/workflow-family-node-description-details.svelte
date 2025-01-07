@@ -19,7 +19,7 @@
 <div
   class="flex w-full flex-col gap-2 p-1 text-left text-sm lg:flex-row lg:items-center"
 >
-  <div class="flex items-center gap-4 lg:basis-96">
+  <div class="flex items-center gap-2 lg:basis-96">
     <div class="w-32 leading-3">
       <WorkflowStatus status={workflow.status} />
     </div>
@@ -32,7 +32,7 @@
     <p class="font-mono text-xs">{translate('common.id')}</p>
     <p>{workflow.id}</p>
   </div>
-  <div class="flex items-center gap-4 lg:basis-5/12">
+  <div class="hidden items-center gap-4 lg:flex lg:basis-5/12">
     <div class="leading-3">
       <p class="font-mono text-xs">
         {translate('common.start')}

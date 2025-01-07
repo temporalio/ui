@@ -48,7 +48,7 @@
       initialZoom={2}
       maxZoomOut={2.5}
       maxZoomIn={0.25}
-      containerHeight={300}
+      containerHeight={240}
       let:width
       let:height
       let:zoomLevel
