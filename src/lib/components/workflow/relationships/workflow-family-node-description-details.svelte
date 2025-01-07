@@ -17,7 +17,7 @@
 </script>
 
 <div
-  class="flex w-full flex-col items-center gap-2 p-1 text-left text-sm lg:flex-row"
+  class="flex w-full flex-col gap-2 p-1 text-left text-sm lg:flex-row lg:items-center"
 >
   <div class="flex items-center gap-4 lg:basis-96">
     <div class="w-32 leading-3">
