@@ -97,7 +97,7 @@
 >
   <div class="absolute right-4 top-4 z-20 flex items-center gap-2">
     <slot name="controls" />
-    <Tooltip text="Center" left>
+    <Tooltip text="Center" bottom>
       <Button
         class="cursor-pointer"
         variant="secondary"

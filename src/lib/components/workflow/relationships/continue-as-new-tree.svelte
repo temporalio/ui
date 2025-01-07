@@ -1,7 +1,6 @@
 <script lang="ts">
-  import ZoomSvg from '$lib/holocene/zoom-svg.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { routeForRelationships } from '$lib/utilities/route-for';
 
   import ContinueAsNewNode from './continue-as-new-node.svelte';
 
@@ -11,78 +10,63 @@
   export let previous: string;
   export let current: string;
   export let next: string;
-
-  const span = 500;
-  const x = first ? 200 : 0;
 </script>
 
-<div class="-mt-4 flex flex-col bg-primary">
-  <div class="w-full overflow-hidden bg-primary">
-    <ZoomSvg
-      initialZoom={2}
-      maxZoomOut={2.5}
-      maxZoomIn={0.25}
-      containerHeight={400}
-      zoomable={false}
-      pannable={false}
-    >
-      {#if first}
-        <ContinueAsNewNode
-          {x}
-          y={200}
-          {span}
-          label={translate('workflows.first-execution')}
-          value={first}
-          href={routeForEventHistory({
-            namespace,
-            workflow: workflowId,
-            run: first,
-          })}
-          dash
-        />
-      {/if}
-      {#if previous}
-        <ContinueAsNewNode
-          x={x + span}
-          y={200}
-          {span}
-          label={translate('workflows.previous-execution')}
-          value={first}
-          href={routeForEventHistory({
-            namespace,
-            workflow: workflowId,
-            run: previous,
-          })}
-        />
-      {/if}
-      <ContinueAsNewNode
-        x={first ? x + 2 * span : x + span}
-        y={200}
-        {span}
-        label="Current"
-        value={current}
-        href={routeForEventHistory({
-          namespace,
-          workflow: workflowId,
-          run: current,
-        })}
-      />
-      {#if next}
-        <ContinueAsNewNode
-          x={first ? x + 3 * span : x + 2 * span}
-          y={200}
-          span={0}
-          label={translate('workflows.next-execution')}
-          value={next}
-          href={routeForEventHistory({
-            namespace,
-            workflow: workflowId,
-            run: next,
-          })}
-        />
-      {/if}
-    </ZoomSvg>
-  </div>
+<div
+  class="-mt-4 flex w-full items-center justify-between bg-primary px-8 py-24 xl:px-32"
+>
+  {#if first}
+    <ContinueAsNewNode
+      label={translate('workflows.first-execution')}
+      value={first}
+      href={routeForRelationships({
+        namespace,
+        workflow: workflowId,
+        run: first,
+      })}
+    />
+    <div
+      class="border-top border-1 w-full border border-dashed border-indigo-700 dark:border-indigo-300"
+    />
+  {/if}
+  {#if previous}
+    <ContinueAsNewNode
+      label={translate('workflows.previous-execution')}
+      value={first}
+      href={routeForRelationships({
+        namespace,
+        workflow: workflowId,
+        run: previous,
+      })}
+    />
+    <div
+      class="border-top border-1 w-full border border-indigo-700 dark:border-indigo-300"
+    />
+  {/if}
+  <ContinueAsNewNode
+    label={translate('workflows.current-execution')}
+    value={current}
+    href={routeForRelationships({
+      namespace,
+      workflow: workflowId,
+      run: current,
+    })}
+    current
+  />
+  {#if next}
+    <div
+      class="border-top border-1 w-full border border-indigo-700 dark:border-indigo-300"
+    />
+    <ContinueAsNewNode
+      label={translate('workflows.next-execution')}
+      value={next}
+      href={routeForRelationships({
+        namespace,
+        workflow: workflowId,
+        run: next,
+      })}
+    />
+  {/if}
 </div>
 
 <style lang="postcss">

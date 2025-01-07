@@ -10,8 +10,8 @@
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
   import ContinueAsNewTree from './relationships/continue-as-new-tree.svelte';
+  import ScheduleTree from './relationships/schedule-tree.svelte';
   import WorkflowFamilyTree from './relationships/workflow-family-tree.svelte';
-  import SchedulerTable from './scheduler-table.svelte';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: ({ workflow } = $workflowRun);
@@ -37,20 +37,20 @@
         {#if root && !!root.children.length}
           <WorkflowFamilyTree {root} />
         {/if}
+        {#if scheduleId}
+          <ScheduleTree {scheduleId} current={runId} {workflowId} {namespace} />
+        {/if}
+        {#if first || previous || next}
+          <ContinueAsNewTree
+            {first}
+            {previous}
+            {next}
+            current={runId}
+            {workflowId}
+            {namespace}
+          />
+        {/if}
       {/await}
-      {#if scheduleId}
-        <SchedulerTable {scheduleId} {namespace} />
-      {/if}
-      {#if first || previous || next}
-        <ContinueAsNewTree
-          {first}
-          {previous}
-          {next}
-          current={runId}
-          {workflowId}
-          {namespace}
-        />
-      {/if}
     </div>
   {:else}
     <h4 class="px-8">{translate('workflows.no-relationships')}</h4>

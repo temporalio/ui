@@ -36,39 +36,38 @@
     class="flex w-full select-none {isActive &&
       'surface-interactive'} {isCurrent &&
       !isActive &&
-      'surface-subtle'} items-center justify-between gap-1 px-2 py-2 {!isActive &&
+      'surface-subtle'} items-center gap-1 px-2 py-2 {!isActive &&
       'hover:surface-interactive-secondary'}"
     on:click|stopPropagation={onClick}
   >
-    <div
-      class="flex w-full items-center gap-3 pr-2 text-sm"
-      class:ml-6={!root?.children?.length}
-    >
-      {#if root?.children?.length && !isRootWorkflow}
-        <Icon
-          name={expanded ? 'chevron-up' : 'chevron-down'}
-          class="-mr-1 w-4 flex-shrink-0"
-        />
-      {/if}
+    <div class="flex w-full items-center gap-3 pr-2 text-sm">
       <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
-      {#if root?.children?.length}
-        <div class="flex items-center gap-2 text-sm">
-          <Icon name="relationship" class="-mr-1 w-3 flex-shrink-0" />
-          <span class="inline-block">{root?.children?.length}</span>
-        </div>
-      {/if}
-      {#if !isCurrent}
-        <Link
-          href={routeForEventHistory({
-            namespace,
-            workflow: root.workflow.id,
-            run: root.workflow.runId,
-          })}
-          newTab
-        >
-          <Icon name="external-link" class={isActive && 'text-white'} />
-        </Link>
-      {/if}
+      <div class="flex basis-16 items-center gap-1">
+        {#if !isCurrent}
+          <Link
+            href={routeForEventHistory({
+              namespace,
+              workflow: root.workflow.id,
+              run: root.workflow.runId,
+            })}
+            newTab
+          >
+            <Icon name="external-link" class={isActive && 'text-white'} />
+          </Link>
+        {/if}
+        {#if root?.children?.length}
+          <div class="flex items-center gap-2 text-sm">
+            <Icon name="relationship" class="-mr-1 w-3 flex-shrink-0" />
+            <span class="inline-block">{root?.children?.length}</span>
+          </div>
+          {#if !isRootWorkflow}
+            <Icon
+              name={expanded ? 'chevron-up' : 'chevron-down'}
+              class="-mr-1 w-4 flex-shrink-0"
+            />
+          {/if}
+        {/if}
+      </div>
     </div>
   </button>
   {#if expanded}
