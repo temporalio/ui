@@ -140,7 +140,13 @@
       : 'stroke-black dark:stroke-white'}"
   />
   />
-  <g role="button" on:click={(e) => nodeClick(e, child)}>
+  <g
+    role="button"
+    tabindex="0"
+    class="outline-none"
+    on:click={(e) => nodeClick(e, child)}
+    on:keypress={(e) => nodeClick(e, child)}
+  >
     {#if child?.children?.length && isExpanded(child)}
       <line
         x1={childX}
@@ -194,54 +200,62 @@
 {/each}
 
 {#if generation === 1}
-  {#if root?.children?.length}
-    <line
-      x1={x}
-      y1={y}
-      x2={x}
-      y2={y + 2.5 * radius}
-      class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
-        ? 'stroke-indigo-700'
-        : 'stroke-black dark:stroke-white'}"
+  <g
+    role="button"
+    class="outline-none"
+    tabindex="0"
+    on:click={(e) => nodeClick(e, root)}
+    on:keypress={(e) => nodeClick(e, root)}
+  >
+    {#if root?.children?.length}
+      <line
+        x1={x}
+        y1={y}
+        x2={x}
+        y2={y + 2.5 * radius}
+        class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
+          ? 'stroke-indigo-700'
+          : 'stroke-black dark:stroke-white'}"
+      />
+    {/if}
+    {#if isCurrent(root)}
+      <circle
+        cx={x}
+        cy={y}
+        r={radius}
+        class="fill-indigo-200"
+        fill-opacity=".75"
+      />
+    {/if}
+    {#if isActive(root)}
+      <circle
+        cx={x}
+        cy={y}
+        r={radius}
+        class="fill-indigo-700"
+        fill-opacity=".95"
+      />
+    {/if}
+    <rect
+      class={workflowStatus({ status: root.workflow.status })}
+      x={x - radius / 2}
+      y={y - radius / 2}
+      width={radius}
+      height={radius}
+      cx={radius / 2}
+      cy={radius / 2}
     />
-  {/if}
-  {#if isCurrent(root)}
-    <circle
-      cx={x}
-      cy={y}
-      r={radius}
-      class="fill-indigo-200"
-      fill-opacity=".75"
-    />
-  {/if}
-  {#if isActive(root)}
-    <circle
-      cx={x}
-      cy={y}
-      r={radius}
-      class="fill-indigo-200"
-      fill-opacity=".5"
-    />
-  {/if}
-  <rect
-    class={workflowStatus({ status: root.workflow.status })}
-    x={x - radius / 2}
-    y={y - radius / 2}
-    width={radius}
-    height={radius}
-    cx={radius / 2}
-    cy={radius / 2}
-  />
-  {#if root?.children?.length}
-    <text
-      {x}
-      y={y - radius}
-      class="text-center font-mono text-lg"
-      fill="currentColor"
-      text-anchor="middle"
-      font-weight="500">{root.children.length}</text
-    >
-  {/if}
+    {#if root?.children?.length}
+      <text
+        {x}
+        y={y - radius}
+        class="text-center font-mono text-lg"
+        fill="currentColor"
+        text-anchor="middle"
+        font-weight="500">{root.children.length}</text
+      >
+    {/if}
+  </g>
 {/if}
 
 <style lang="postcss">

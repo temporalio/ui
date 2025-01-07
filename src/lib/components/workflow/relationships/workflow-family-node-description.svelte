@@ -50,7 +50,6 @@
               workflow: root.workflow.id,
               run: root.workflow.runId,
             })}
-            newTab
           >
             <Icon name="external-link" class={isActive && 'text-white'} />
           </Link>
