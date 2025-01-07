@@ -14,9 +14,9 @@ test.describe('Enable write actions by default', () => {
   });
 
   test('Cancel workflow button enabled', async ({ page }) => {
-    const workflowActionButton = page.locator(
-      '#workflow-actions-primary-button',
-    );
+    const workflowActionButton = page
+      .locator('#workflow-actions-primary-button')
+      .locator('visible=true');
     await expect(workflowActionButton).toBeEnabled();
   });
 });
@@ -29,9 +29,9 @@ test.describe('Disable write actions on workflow actions', () => {
   });
 
   test('Cancel workflow button disabled', async ({ page }) => {
-    const workflowActionButton = page.locator(
-      '#workflow-actions-primary-button',
-    );
+    const workflowActionButton = page
+      .locator('#workflow-actions-primary-button')
+      .locator('visible=true');
     await expect(workflowActionButton).toBeDisabled();
   });
 });
