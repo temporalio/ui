@@ -713,22 +713,18 @@ export async function fetchAllRootWorkflows(
   rootWorkflowId: string,
   rootRunId?: string,
 ): Promise<RootNode | undefined> {
-  try {
-    let query = `RootWorkflowId = "${rootWorkflowId}"`;
-    if (rootRunId) {
-      query += ` AND RootRunId = "${rootRunId}"`;
-    }
-
-    const root = await fetchWorkflow({
-      namespace,
-      workflowId: rootWorkflowId,
-      runId: rootRunId,
-    });
-    const workflows = await fetchAllPaginatedWorkflows(namespace, { query });
-    return buildRoots(root?.workflow, workflows);
-  } catch (e) {
-    return;
+  let query = `RootWorkflowId = "${rootWorkflowId}"`;
+  if (rootRunId) {
+    query += ` AND RootRunId = "${rootRunId}"`;
   }
+
+  const root = await fetchWorkflow({
+    namespace,
+    workflowId: rootWorkflowId,
+    runId: rootRunId,
+  });
+  const workflows = await fetchAllPaginatedWorkflows(namespace, { query });
+  return buildRoots(root?.workflow, workflows);
 }
 
 export const fetchAllPaginatedWorkflows = async (
@@ -745,6 +741,7 @@ export const fetchAllPaginatedWorkflows = async (
   } catch {
     query = rawQuery;
   }
+
   const route = routeForApi('workflows', { namespace });
   const { executions } = await paginated(async (token: string) => {
     return requestFromAPI<ListWorkflowExecutionsResponse>(route, {

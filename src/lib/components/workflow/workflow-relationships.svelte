@@ -12,6 +12,7 @@
   import ContinueAsNewTree from './relationships/continue-as-new-tree.svelte';
   import ScheduleTree from './relationships/schedule-tree.svelte';
   import WorkflowFamilyTree from './relationships/workflow-family-tree.svelte';
+  import WorkflowRelationshipsOld from './workflow-relationships-old.svelte';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: ({ workflow } = $workflowRun);
@@ -28,7 +29,7 @@
     workflowRelationships);
 </script>
 
-<div class="flex flex-col gap-4 pb-8">
+<div class="flex flex-col gap-4 pb-16">
   {#if hasRelationships}
     <div class="flex w-full flex-col justify-center gap-4">
       {#await fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId)}
@@ -50,6 +51,8 @@
             {namespace}
           />
         {/if}
+      {:catch}
+        <WorkflowRelationshipsOld />
       {/await}
     </div>
   {:else}
