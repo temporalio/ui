@@ -290,7 +290,7 @@ devDependencies:
     specifier: ^0.8.0
     version: 0.8.0(eslint@8.47.0)(typescript@5.5.2)
   eslint-plugin-svelte:
-    specifier: ^2.45.1
+    specifier: ^2.46.1
     version: 2.46.1(eslint@8.47.0)(svelte@5.5.4)(ts-node@10.9.1)
   eslint-plugin-vitest:
     specifier: ^0.2.8
