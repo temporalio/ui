@@ -180,7 +180,7 @@
     {#if pendingAttempt}
       <div
         class="flex items-center gap-1 {pendingAttempt > 1 &&
-          'surface-retry rounded px-1 py-0.5'}"
+          'surface-retry px-1 py-0.5'}"
       >
         <Icon class="mr-1.5 inline" name="retry" />
         {translate('workflows.attempt')}
@@ -226,7 +226,7 @@
     class:typedError
     class="row expanded"
   >
-    <td class="expanded-cell w-full" colspan="4">
+    <td class="expanded-cell w-full">
       <EventDetailsFull {group} event={currentEvent} />
     </td>
   </tr>
@@ -234,7 +234,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex select-none items-center gap-4 px-1 text-sm no-underline;
+    @apply flex select-none items-center gap-4 px-2 text-sm no-underline;
   }
 
   .failure {
@@ -267,13 +267,5 @@
 
   .typedError .expanded-cell {
     @apply border-b-0;
-  }
-
-  .row.typedError {
-    @apply rounded-lg;
-
-    &.expanded {
-      @apply rounded-b-none;
-    }
   }
 </style>

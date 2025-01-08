@@ -68,7 +68,6 @@
 </h2>
 <Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
-    <h3>{translate('common.details')}</h3>
     <Table variant="simple">
       <caption class="sr-only" slot="caption"
         >{`${translate('namespaces.namespace')} ${translate(
@@ -76,7 +75,9 @@
         )}`}</caption
       >
       <tr slot="headers">
-        <th class="w-1/2 lg:w-3/5"></th><th></th>
+        <th colspan="2">
+          <h3>{translate('common.details')}</h3>
+        </th>
       </tr>
       <tr data-testid="namespace-owner">
         <td>{translate('namespaces.owner')}</td>
@@ -144,13 +145,14 @@
   </article>
 
   <article class="namespace-info flex w-full flex-col">
-    <h3>{translate('namespaces.versions')}</h3>
     <Table variant="simple">
       <caption class="sr-only" slot="caption"
         >{translate('namespaces.versions')}</caption
       >
       <tr slot="headers">
-        <th class="w-1/2 lg:w-3/4"></th><th></th>
+        <th colspan="2">
+          <h3>{translate('namespaces.versions')}</h3>
+        </th>
       </tr>
 
       <tr data-testid="server-version">
@@ -165,16 +167,17 @@
   </article>
 
   <article class="namespace-info flex w-full flex-col">
-    <h3>
-      {translate('namespaces.client-actions')}
-    </h3>
     <Table variant="simple">
       <caption class="sr-only" slot="caption"
         >{translate('namespaces.client-actions')}</caption
       >
 
       <tr slot="headers">
-        <th class="w-1/2 lg:w-3/5"></th><th></th>
+        <th colspan="2">
+          <h3>
+            {translate('namespaces.client-actions')}
+          </h3>
+        </th>
       </tr>
 
       <tr>

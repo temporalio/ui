@@ -27,12 +27,12 @@
   data-testid="navigation-header"
   {...$$restProps}
 >
-  <a href="/" class="w-fit rounded-lg">
+  <a href="/" class="w-fit">
     <Logo height={24} width={24} class="m-1" />
   </a>
   <button
     title={$navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-[8px] self-start justify-self-end rounded opacity-0 transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180 {isCloud
+    class="mx-[8px] self-start justify-self-end opacity-0 transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180 {isCloud
       ? 'focus-visible:ring-primary/70 focus-visible:dark:ring-success'
       : 'focus-visible:ring-primary/70'}"
     on:click={toggle}

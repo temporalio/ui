@@ -41,8 +41,7 @@
     type="search"
     placeholder={`${translate('common.enter')} ${$filter.attribute}`}
     icon="search"
-    class="w-full"
-    unroundLeft
+    class="w-full [&_*]:border-l-0"
     bind:value={_value}
     on:keydown={handleKeydown}
   />

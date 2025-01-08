@@ -10,7 +10,5 @@
 </script>
 
 <tr on:click|stopPropagation class={className} {...$$restProps}>
-  <td></td>
   <slot />
-  <td></td>
 </tr>

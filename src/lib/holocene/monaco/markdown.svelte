@@ -47,7 +47,7 @@
       on:load={resizeIframe}
       title="output"
       src="/render?content={encodeURIComponent(templatedContent)}&theme={theme}"
-      class="w-full rounded-md"
-    ></iframe>
+      class="w-full"
+    />
   {/key}
 </section>

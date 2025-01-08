@@ -186,7 +186,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer rounded border border-transparent text-sm font-medium focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+    @apply cursor-pointer border border-transparent text-sm font-medium focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
 
     &.hoverable {
       @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary;

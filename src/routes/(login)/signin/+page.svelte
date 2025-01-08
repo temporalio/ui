@@ -47,9 +47,7 @@
 
   {#if error}
     <div class="my-12 flex flex-col items-center justify-start gap-2">
-      <p
-        class="rounded-md border border-orange-500 bg-orange-100 p-5 text-center"
-      >
+      <p class="border border-orange-500 bg-orange-100 p-5 text-center">
         {error}
       </p>
     </div>

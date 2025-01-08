@@ -22,7 +22,7 @@
     <p class="text-center">{content}</p>
   {/if}
   {#if error}
-    <p class="rounded-md border border-danger bg-danger p-5 text-center">
+    <p class="border border-danger bg-danger p-5 text-center">
       {error}
     </p>
   {/if}

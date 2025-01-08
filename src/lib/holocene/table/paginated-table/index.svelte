@@ -54,7 +54,7 @@
   }
 
   .primary {
-    @apply rounded-lg border border-table;
+    @apply border border-table;
   }
 
   .split {
@@ -73,13 +73,13 @@
     }
 
     :global(tr > th) {
-      @apply whitespace-nowrap px-2 text-left font-medium first-of-type:rounded-tl last-of-type:rounded-tr;
+      @apply whitespace-nowrap p-2 text-left font-medium;
     }
   }
 
   .paginated-table-body {
     :global(tr.primary) {
-      @apply h-12 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
 
     :global(tr.dense) {
@@ -103,7 +103,7 @@
     }
 
     :global(tr > td) {
-      @apply whitespace-nowrap px-2;
+      @apply whitespace-nowrap p-2;
     }
 
     :global(tr > td > .table-link) {
@@ -126,6 +126,6 @@
   }
 
   .paginated-table-controls {
-    @apply surface-primary sticky bottom-0 left-0 flex w-full grow justify-between gap-2 rounded-b border-t border-table px-4 py-2;
+    @apply surface-primary sticky bottom-0 left-0 flex w-full grow justify-between gap-2 border-t border-table px-4 py-2;
   }
 </style>

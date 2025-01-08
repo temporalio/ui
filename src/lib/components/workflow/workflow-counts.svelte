@@ -24,7 +24,7 @@
   import { getExponentialBackoffSeconds } from '$lib/utilities/refresh-rate';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  import WorkflowCountStatus from './workflow-count-status.svelte';
+  import WorkflowCountStatus from '../workflow-status.svelte';
 
   export let staticQuery = '';
   $: namespace = $page.params.namespace;
@@ -167,10 +167,11 @@
           newCount={newStatusGroups.find((g) => g.status === status)
             ? newStatusGroups.find((g) => g.status === status).count - count
             : 0}
+          test-id="workflow-status-{status}"
         />
       </button>
     {:else}
-      <Skeleton class="h-6 w-24 rounded" />
+      <Skeleton class="h-6 w-24 rounded-sm" />
     {/if}
   {/each}
 </div>

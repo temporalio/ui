@@ -54,7 +54,7 @@
     id="{id}-content"
     aria-labelledby="{id}-trigger"
     role="textbox"
-    class="rounded-b-2 block w-full bg-primary p-2"
+    class="block w-full bg-primary p-2"
     class:hidden={!open}
     transition:slide
   >

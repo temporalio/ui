@@ -33,7 +33,7 @@
     </div>
     <p>UUID: {endpoint.id}</p>
   </div>
-  <div class="surface-primary max-w-fit rounded-lg border border-secondary p-4">
+  <div class="surface-primary max-w-fit border border-secondary p-4">
     <p class="text-lg">Target</p>
     <div class="flex flex-col gap-4 lg:flex-row">
       <div class="flex items-center gap-2">

@@ -44,20 +44,14 @@
         labelHidden
         id="list-filter"
         bind:chips
-        class="w-full"
+        class="w-full [&_*]:border-l-0 [&_*]:border-r-0"
         removeChipButtonLabel={(chip) =>
           translate('workflows.remove-keyword-label', { keyword: chip })}
         placeholder="{translate('common.enter')} {$filter.attribute}"
-        unroundLeft
-        unroundRight
         external
       />
       <div class="flex h-fit items-center">
-        <Button
-          borderRadiusModifier="square-left"
-          disabled={!chips.length}
-          type="submit"
-        >
+        <Button disabled={!chips.length} type="submit">
           {translate('common.search')}
         </Button>
         <slot />
@@ -70,8 +64,7 @@
         type="search"
         placeholder={`${translate('common.enter')} ${$filter.attribute}`}
         icon="search"
-        class="w-full"
-        unroundLeft
+        class="w-full [&_*]:border-l-0"
         bind:value={_value}
         on:keydown={handleKeydown}
       />

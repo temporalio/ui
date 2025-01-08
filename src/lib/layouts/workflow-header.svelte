@@ -97,19 +97,36 @@
     {/if}
   </div>
 </div>
-<header class="rounded-top flex flex-col gap-2">
+<header class="flex flex-col gap-2">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
-    <div class="flex flex-col items-center gap-4 lg:flex-row">
-      <WorkflowStatus status={workflow?.status} big />
+    <div
+      class="flex w-full flex-col items-start gap-4 lg:flex-row lg:items-center"
+    >
+      <div
+        class="flex flex-wrap items-center justify-between gap-4 max-lg:w-full"
+      >
+        <WorkflowStatus status={workflow?.status} big />
+        <div class="lg:hidden">
+          <WorkflowActions
+            {isRunning}
+            {cancelInProgress}
+            {workflow}
+            {namespace}
+          />
+        </div>
+      </div>
       <div class="flex flex-col flex-wrap gap-0">
-        <h1 data-testid="workflow-id-heading" class="gap-0 overflow-hidden">
+        <h1
+          data-testid="workflow-id-heading"
+          class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
+        >
           <Copyable
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
             content={workflow?.id}
             clickAllToCopy
             container-class="w-full"
-            class="overflow-hidden text-ellipsis"
+            class="overflow-hidden text-ellipsis text-left"
           />
         </h1>
         {#if workflowUsesVersioning}
@@ -117,7 +134,7 @@
         {/if}
       </div>
     </div>
-    <div class="px-2">
+    <div class="max-lg:hidden">
       <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
     </div>
   </div>
@@ -143,10 +160,7 @@
   {/if}
   {#if currentDetails}
     <AccordionLight let:open>
-      <div
-        slot="title"
-        class="flex w-full items-center gap-2 rounded p-2 text-xl"
-      >
+      <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
         <Icon
           name="flag"
           class="text-brand"

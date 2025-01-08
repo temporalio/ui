@@ -64,7 +64,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply items-start gap-2 break-words rounded-lg border p-5 text-sm text-primary;
+    @apply items-start gap-2 break-words border p-5 text-sm text-primary;
   }
 
   .alert.success {
