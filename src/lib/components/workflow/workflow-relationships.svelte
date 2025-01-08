@@ -29,7 +29,7 @@
     workflowRelationships);
 </script>
 
-<div class="flex flex-col gap-4 pb-16">
+<div class="flex flex-col gap-4 pb-12">
   {#if hasRelationships}
     <div class="flex w-full flex-col justify-center gap-4">
       {#await fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId)}
@@ -56,6 +56,6 @@
       {/await}
     </div>
   {:else}
-    <h4 class="px-8">{translate('workflows.no-relationships')}</h4>
+    <h4 class="px-8 py-4">{translate('workflows.no-relationships')}</h4>
   {/if}
 </div>

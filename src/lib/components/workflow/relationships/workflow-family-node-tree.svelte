@@ -110,7 +110,7 @@
     y2={getPosition(0).childY - 1.5 * radius}
     class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
       ? 'stroke-indigo-700'
-      : 'stroke-black dark:stroke-white'}"
+      : 'stroke-slate-100 dark:stroke-slate-800'}"
   />
 {/if}
 {#each root?.children as child, index}
@@ -137,7 +137,7 @@
     y2={childY}
     class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
       ? 'stroke-indigo-700'
-      : 'stroke-black dark:stroke-white'}"
+      : 'stroke-slate-100 dark:stroke-slate-800'}"
   />
   />
   <g
@@ -155,7 +155,7 @@
         y2={childY + 2.5 * radius}
         class="stroke-2 transition-all duration-300 ease-in-out {isActive(child)
           ? 'stroke-indigo-700'
-          : 'stroke-black dark:stroke-white'}"
+          : 'stroke-slate-100 dark:stroke-slate-800'}"
       />
     {/if}
     {#if isActive(child)}
@@ -215,7 +215,7 @@
         y2={y + 2.5 * radius}
         class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
           ? 'stroke-indigo-700'
-          : 'stroke-black dark:stroke-white'}"
+          : 'stroke-slate-100 dark:stroke-slate-800'}"
       />
     {/if}
     {#if isCurrent(root)}

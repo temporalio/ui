@@ -40,9 +40,9 @@
   };
 </script>
 
-<div class="-mt-4 flex flex-col bg-primary">
+<div class="flex flex-col bg-primary">
   <div
-    class="relative z-50 w-full overflow-hidden border-b border-subtle bg-primary lg:sticky lg:top-12"
+    class="relative z-30 w-full overflow-hidden border-b border-subtle bg-primary lg:sticky lg:top-12"
   >
     <ZoomSvg
       initialZoom={2}

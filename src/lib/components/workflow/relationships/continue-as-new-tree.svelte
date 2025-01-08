@@ -13,7 +13,7 @@
 </script>
 
 <div
-  class="-mt-4 flex w-full items-center justify-between bg-primary px-8 py-24 xl:px-32"
+  class="flex w-full items-center justify-between overflow-auto bg-primary px-8 py-16 lg:py-36 xl:px-32"
 >
   {#if first}
     <ContinueAsNewNode
@@ -26,8 +26,8 @@
       })}
     />
     <div
-      class="border-top border-1 w-full border border-dashed border-indigo-700 dark:border-indigo-300"
-    />
+      class="border-top border-1 w-full border border-dashed border-subtle"
+    ></div>
   {/if}
   {#if previous}
     <ContinueAsNewNode
@@ -39,9 +39,7 @@
         run: previous,
       })}
     />
-    <div
-      class="border-top border-1 w-full border border-indigo-700 dark:border-indigo-300"
-    />
+    <div class="border-top border-1 w-full border border-subtle"></div>
   {/if}
   <ContinueAsNewNode
     label={translate('workflows.current-execution')}
@@ -54,9 +52,7 @@
     current
   />
   {#if next}
-    <div
-      class="border-top border-1 w-full border border-indigo-700 dark:border-indigo-300"
-    />
+    <div class="border-top border-1 w-full border border-subtle"></div>
     <ContinueAsNewNode
       label={translate('workflows.next-execution')}
       value={next}
@@ -68,9 +64,3 @@
     />
   {/if}
 </div>
-
-<style lang="postcss">
-  .ContinuedAsNew {
-    @apply fill-green-200;
-  }
-</style>

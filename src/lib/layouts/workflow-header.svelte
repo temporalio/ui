@@ -206,9 +206,7 @@
           $page.url.pathname,
           routeForRelationships(routeParameters),
         )}
-      >
-        <Badge type="primary" class="px-1 py-0">New</Badge>
-      </Tab>
+      ></Tab>
       <Tab
         label={translate('workflows.workers-tab')}
         id="workers-tab"

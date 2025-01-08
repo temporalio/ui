@@ -41,7 +41,10 @@
     on:click|stopPropagation={onClick}
   >
     <div class="flex w-full items-center gap-3 pr-2 text-sm">
-      <WorkflowFamilyNodeDescriptionDetails workflow={root.workflow} />
+      <WorkflowFamilyNodeDescriptionDetails
+        workflow={root.workflow}
+        {isRootWorkflow}
+      />
       <div class="flex basis-16 items-center justify-end gap-1">
         {#if !isCurrent}
           <Link

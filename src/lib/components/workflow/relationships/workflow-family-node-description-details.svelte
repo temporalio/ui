@@ -8,6 +8,7 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   export let workflow: WorkflowExecution;
+  export let isRootWorkflow = false;
 
   $: elapsedTime = formatDistanceAbbreviated({
     start: workflow?.startTime,
@@ -24,19 +25,25 @@
       <WorkflowStatus status={workflow.status} />
     </div>
     <div class="w-full leading-3">
-      <p class="font-mono text-xs">{translate('common.type')}</p>
+      {#if isRootWorkflow}
+        <p class="font-mono text-xs">{translate('common.type')}</p>
+      {/if}
       <p>{workflow.name}</p>
     </div>
   </div>
   <div class="leading-3 lg:basis-[800px]">
-    <p class="font-mono text-xs">{translate('common.id')}</p>
+    {#if isRootWorkflow}
+      <p class="font-mono text-xs">{translate('common.id')}</p>
+    {/if}
     <p>{workflow.id}</p>
   </div>
   <div class="hidden items-center gap-4 lg:flex lg:basis-5/12">
     <div class="leading-3">
-      <p class="font-mono text-xs">
-        {translate('common.start')}
-      </p>
+      {#if isRootWorkflow}
+        <p class="font-mono text-xs">
+          {translate('common.start')}
+        </p>
+      {/if}
       <p>
         {formatDate(workflow?.startTime, $timeFormat, {
           relative: $relativeTime,
@@ -44,7 +51,9 @@
       </p>
     </div>
     <div class="leading-3">
-      <p class="min-w-12 font-mono text-xs">{translate('common.end')}</p>
+      {#if isRootWorkflow}
+        <p class="min-w-12 font-mono text-xs">{translate('common.end')}</p>
+      {/if}
       <p>
         {formatDate(workflow?.endTime, $timeFormat, {
           relative: $relativeTime,
@@ -52,7 +61,9 @@
       </p>
     </div>
     <div class="leading-3">
-      <Icon name="clock" class="h-4 w-3" />
+      {#if isRootWorkflow}
+        <Icon name="clock" class="h-4 w-3" />
+      {/if}
       <p>{elapsedTime}</p>
     </div>
   </div>

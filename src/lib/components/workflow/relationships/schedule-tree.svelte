@@ -14,17 +14,18 @@
 </script>
 
 <div
-  class="-mt-4 flex w-full flex-col items-center justify-between gap-4 bg-primary px-8 py-12 xl:px-32"
+  class="flex w-full flex-col items-center justify-between gap-4 bg-primary px-8 py-12 xl:px-32"
 >
   <ContinueAsNewNode
     label="Schedule"
     value={scheduleId}
+    icon="schedules"
     href={routeForSchedule({
       namespace: namespace,
       scheduleId,
     })}
   />
-  <div class="border-top border-1 h-24 w-1 bg-indigo-700 dark:bg-indigo-300" />
+  <div class="border-top border-1 h-24 w-0.5 bg-subtle" />
   <ContinueAsNewNode
     label={translate('workflows.current-execution')}
     value={current}

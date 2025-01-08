@@ -58,7 +58,7 @@
   }
 </script>
 
-<div class="flex flex-col gap-0 px-8">
+<div class="flex flex-col gap-0 px-2 pt-4 md:px-4 lg:px-8">
   <WorkflowCallStackError />
   <div class="flex flex-col gap-2">
     <InputAndResults />
@@ -80,7 +80,7 @@
     </div>
   </div>
 </div>
-<div class="px-8 pb-24">
+<div class="px-2 pb-24 md:px-4 lg:px-8">
   <div class="flex w-full flex-col border border-subtle">
     <TimelineGraph
       {workflow}
