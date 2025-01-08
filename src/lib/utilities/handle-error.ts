@@ -1,3 +1,5 @@
+import { writable } from 'svelte/store';
+
 import { BROWSER } from 'esm-env';
 
 import { toaster } from '$lib/stores/toaster';
@@ -7,7 +9,6 @@ import { has } from './has';
 import { isNetworkError } from './is-network-error';
 import type { APIErrorResponse, TemporalAPIError } from './request-from-api';
 import { routeForLoginPage } from './route-for';
-import { writable } from 'svelte/store';
 
 interface NetworkErrorWithReport extends NetworkError {
   report?: boolean;

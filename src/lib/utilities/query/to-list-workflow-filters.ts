@@ -25,10 +25,10 @@ export type ParsedParameters = FilterParameters & { timeRange?: string };
 
 const is =
   (identifier: string) =>
-    (token: string): boolean => {
-      if (token.toLowerCase() === identifier.toLowerCase()) return true;
-      return false;
-    };
+  (token: string): boolean => {
+    if (token.toLowerCase() === identifier.toLowerCase()) return true;
+    return false;
+  };
 
 const getOneAhead = (tokens: Tokens, index: number): string =>
   tokens[index + 1];

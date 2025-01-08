@@ -41,6 +41,7 @@
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
@@ -59,7 +60,6 @@
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
-  import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
 
   $: query = $page.url.searchParams.get('query');
   $: query, ($workflowsQuery = query);

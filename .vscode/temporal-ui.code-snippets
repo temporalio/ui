@@ -2,6 +2,6 @@
   "Playwright Test": {
     "prefix": "pwt",
     "body": ["test('${1}', async ({ page }) => {", "  $0", "});"],
-    "description": "useState()"
-  }
+    "description": "useState()",
+  },
 }

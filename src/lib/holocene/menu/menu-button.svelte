@@ -108,7 +108,7 @@
   {variant}
   class={merge(className)}
 >
-{@render leading?.()}
+  {@render leading?.()}
   <div class="flex grow items-center" class:hidden={!children}>
     {@render children?.()}
   </div>

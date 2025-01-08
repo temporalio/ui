@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { BROWSER } from 'esm-env';
+
   import Link from '$lib/holocene/link.svelte';
   import type { NetworkError } from '$lib/types/global';
   import { has } from '$lib/utilities/has';
-  import { BROWSER } from 'esm-env';
+
   import CodeBlock from './code-block.svelte';
 
   const reload = () => {

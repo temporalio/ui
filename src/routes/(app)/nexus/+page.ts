@@ -7,8 +7,8 @@ export const load: PageLoad = async ({ fetch, parent, url }) => {
   const nexusEnabled = systemInfo?.capabilities?.nexus;
   if (!nexusEnabled) {
     return {
-      endpoints: []
-    }
+      endpoints: [],
+    };
   }
 
   const search = url.searchParams.get('search') || '';
