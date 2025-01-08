@@ -248,7 +248,7 @@
     {#if root?.children?.length}
       <text
         {x}
-        y={y - radius}
+        y={y - radius * 1.5}
         class="text-center font-mono text-lg"
         fill="currentColor"
         text-anchor="middle"
