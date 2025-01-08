@@ -22,6 +22,7 @@ import chevronLeft from './svg/chevron-left.svelte';
 import chevronRight from './svg/chevron-right.svelte';
 import chevronSelectorVertical from './svg/chevron-selector-vertical.svelte';
 import chevronUp from './svg/chevron-up.svelte';
+import circleCheckFilled from './svg/circle-check-filled.svelte';
 import clock from './svg/clock.svelte';
 import close from './svg/close.svelte';
 import cometSolid from './svg/comet-solid.svelte';
@@ -54,7 +55,6 @@ import graph from './svg/graph.svelte';
 import hyphen from './svg/hyphen.svelte';
 import importIcon from './svg/import.svelte';
 import info from './svg/info.svelte';
-import invertedCheckmark from './svg/inverted-checkmark.svelte';
 import json from './svg/json.svelte';
 import keyboard from './svg/keyboard.svelte';
 import labs from './svg/labs.svelte';
@@ -107,6 +107,7 @@ import usage from './svg/usage.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
 import warning from './svg/warning.svelte';
 import workflow from './svg/workflow.svelte';
+import xmarkFilled from './svg/xmark-filled.svelte';
 
 export const icons = {
   activity,
@@ -132,6 +133,7 @@ export const icons = {
   'chevron-right': chevronRight,
   'chevron-up': chevronUp,
   'chevron-selector-vertical': chevronSelectorVertical,
+  'circle-check-filled': circleCheckFilled,
   clock,
   close,
   'comet-solid': cometSolid,
@@ -164,7 +166,6 @@ export const icons = {
   hyphen,
   import: importIcon,
   info,
-  'inverted-checkmark': invertedCheckmark,
   json,
   keyboard,
   labs,
@@ -218,6 +219,7 @@ export const icons = {
   'vertical-ellipsis': verticalEllipsis,
   warning,
   workflow,
+  'xmark-filled': xmarkFilled,
 } as const;
 
 export type IconName = keyof typeof icons;
