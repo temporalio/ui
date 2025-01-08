@@ -25,7 +25,6 @@
     strokeWidth,
     'aria-hidden': ariaHidden = 'false',
     animate = false,
-    active = false,
   }: Props = $props();
 
   const Icon = $derived(icons[name]);

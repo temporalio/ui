@@ -11,7 +11,6 @@
   import TopNavigation from '$lib/components/top-nav.svelte';
   import Banner from '$lib/holocene/banner/banner.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
-  import Error from '$lib/holocene/error.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
@@ -36,7 +35,7 @@
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
-  let { children }: { children: any } = $props();
+  let { children }: { children } = $props();
 
   const isCloud = $derived($page.data?.settings?.runtimeEnvironment?.isCloud);
   const activeNamespaceName = $derived(
