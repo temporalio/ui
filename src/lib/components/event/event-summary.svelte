@@ -47,8 +47,8 @@
   $: items = compact
     ? groups
     : reverseSort
-    ? [...pendingNexusOperations, ...pendingActivities, ...history]
-    : [...history, ...pendingActivities, ...pendingNexusOperations];
+      ? [...pendingNexusOperations, ...pendingActivities, ...history]
+      : [...history, ...pendingActivities, ...pendingNexusOperations];
 
   const onAllClick = () => {
     $eventViewType = 'feed';

@@ -10,7 +10,7 @@
 {#if hide}
   <slot />
 {:else}
-  <span class="new-tag" class:alpha />
+  <span class="new-tag" class:alpha></span>
 {/if}
 
 <style lang="postcss">

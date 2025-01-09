@@ -41,6 +41,7 @@
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
@@ -225,8 +226,11 @@
 </header>
 
 <div class="flex flex-col gap-2 md:flex-row">
-  <WorkflowSearchAttributeFilter onClickConfigure={openCustomizationDrawer} />
+  <ErrorBoundary>
+    <WorkflowSearchAttributeFilter onClickConfigure={openCustomizationDrawer} />
+  </ErrorBoundary>
 </div>
+
 <WorkflowsSummaryConfigurableTable>
   <slot name="cloud" slot="cloud" />
 </WorkflowsSummaryConfigurableTable>

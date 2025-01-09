@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { noop } from 'svelte/internal';
   import { slide } from 'svelte/transition';
 
   import { v4 } from 'uuid';
@@ -20,7 +19,7 @@
 
   export let id: string = v4();
   export let open = false;
-  export let onToggle = noop;
+  export let onToggle = () => {};
 
   const toggleAccordion = () => {
     open = !open;
@@ -47,7 +46,7 @@
         role="none"
       >
         <slot name="action" />
-        <Icon class="m-2 shrink-0" name={open ? 'arrow-down' : 'arrow-right'} />
+        <Icon class="m-2" name={open ? 'arrow-down' : 'arrow-right'} />
       </div>
     </div>
   </button>

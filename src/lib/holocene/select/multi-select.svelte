@@ -34,8 +34,8 @@
   let selectedOptions = initialSelected.length
     ? initialSelected
     : initialSelectedAll
-    ? options
-    : [];
+      ? options
+      : [];
 
   const open = writable(false);
 
@@ -76,19 +76,22 @@
           onOptionClick(option);
         }}
       >
-        <Checkbox
-          on:click={() => onOptionClick(option)}
-          slot="leading"
-          {checked}
-          label={option.label}
-          labelHidden
-        />
-        <div class="flex items-center gap-2">
+        {#snippet leading()}
+          <Checkbox
+            onclick={() => onOptionClick(option)}
+            {checked}
+            label={option.label}
+            labelHidden
+          />
+        {/snippet}
+        {#snippet trailingIcon()}
           {#if option.icon}
-            <Icon slot="trailing" name={option.icon} />
+            <div class="flex items-center gap-2">
+              <Icon name={option.icon} />
+              {option.label}
+            </div>
           {/if}
-          {option.label}
-        </div>
+        {/snippet}
       </MenuItem>
     {/each}
     <MenuDivider />

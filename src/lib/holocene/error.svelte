@@ -1,51 +1,55 @@
 <script lang="ts">
   import { BROWSER } from 'esm-env';
-  import { createEventDispatcher } from 'svelte';
-
-  import { afterNavigate } from '$app/navigation';
 
   import Link from '$lib/holocene/link.svelte';
   import type { NetworkError } from '$lib/types/global';
   import { has } from '$lib/utilities/has';
 
-  export let error: App.Error | NetworkError = null;
-  export let status = 500;
-  let message = error?.message || '';
+  import CodeBlock from './code-block.svelte';
+
+  const reload = () => {
+    if (BROWSER) {
+      window.location.reload();
+    }
+  };
+
+  let {
+    reset = reload,
+    error,
+    status = 500,
+  }: {
+    reset?: () => void;
+    error: App.Error | NetworkError | unknown;
+    status?: number;
+  } = $props();
+
+  let message = $state(
+    has(error, 'message') && typeof error.message === 'string'
+      ? error.message
+      : '',
+  );
 
   if (has(error, 'statusCode')) {
-    status = error.statusCode;
+    status = error.statusCode as number;
   }
-
-  const dispatch = createEventDispatcher();
-
-  afterNavigate(() => {
-    dispatch('clearError', {});
-  });
 </script>
 
 <section
   aria-roledescription="error"
-  class="mt-32 text-center align-middle"
+  class="flex w-full flex-col items-center justify-center gap-4 border-2 border-danger bg-danger px-24 py-12"
   role="alert"
 >
-  <h1 class="text-[12rem] font-semibold">{status}</h1>
-  <p class="-mt-6 mb-5 text-lg">Uh oh. There's an error.</p>
-  <p class="my-4 w-auto text-2xl font-extrabold text-red-700">
-    {message}
-  </p>
-
+  <h1 class="text-[12rem] font-semibold leading-none">{status}</h1>
+  <p class="text-lg">Uh oh. There's an error.</p>
+  <div class="w-full">
+    <CodeBlock content={message} language="text" />
+  </div>
   <p class="text-lg">
-    <button
-      class="underline hover:text-blue-700"
-      tabindex={0}
-      on:click={() => {
-        if (BROWSER) {
-          window.location.reload();
-        }
-      }}>Try a refresh</button
+    <button class="underline hover:text-blue-700" tabindex={0} onclick={reset}
+      >Try a refresh</button
     >
     or
-    <Link newTab href="https://temporal.io/slack"
+    <Link newTab href="https://temporal.io/slack" class="text-black"
       >jump on our Slack Channel</Link
     >.
   </p>

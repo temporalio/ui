@@ -259,7 +259,7 @@
           >{translate('common.apply')}</Button
         >
       </div>
-      <MenuItem centered disabled class="!pt-0">
+      <MenuItem centered disabled className="!pt-0">
         <Icon name="clock" aria-hidden="true" />
         {translate('common.based-on-time-preface')}
         {selectedTime}

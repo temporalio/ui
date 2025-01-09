@@ -88,8 +88,8 @@ export function getLocalTimezone(): string {
 
 export function getLocalTime(): string {
   const localTimezone = getLocalTimezone();
-  const localOption = TimezoneOptions.find(
-    ({ zones }) => zones?.includes(localTimezone),
+  const localOption = TimezoneOptions.find(({ zones }) =>
+    zones?.includes(localTimezone),
   );
   return localOption
     ? `${localOption.label} (${localOption.abbr})`

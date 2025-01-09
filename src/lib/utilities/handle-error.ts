@@ -1,6 +1,7 @@
+import { writable } from 'svelte/store';
+
 import { BROWSER } from 'esm-env';
 
-import { networkError } from '$lib/stores/error';
 import { toaster } from '$lib/stores/toaster';
 import type { NetworkError } from '$lib/types/global';
 
@@ -16,7 +17,7 @@ interface NetworkErrorWithReport extends NetworkError {
 export const handleError = (
   error: unknown,
   toasts = toaster,
-  errors = networkError,
+  errors = writable(null),
   isBrowser = BROWSER,
 ): void => {
   if (error instanceof DOMException && error.name === 'AbortError') {

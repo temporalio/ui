@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
   import { getContext } from 'svelte';
 
   import { page } from '$app/stores';
@@ -24,7 +22,7 @@
 
   export let workflow: WorkflowExecution | undefined = undefined;
   export let empty = false;
-  export let viewChildren: (workflow?: WorkflowExecution) => void = noop;
+  export let viewChildren: (workflow?: WorkflowExecution) => void = () => {};
   export let childCount: number | undefined = undefined;
   export let child = false;
 
