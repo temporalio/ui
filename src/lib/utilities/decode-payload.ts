@@ -10,7 +10,7 @@ import type {
   passAccessToken,
 } from '$lib/stores/data-encoder-config';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
-import type { Payloads, Payload as RawPayload } from '$lib/types';
+import type { Memo, Payloads, Payload as RawPayload } from '$lib/types';
 import type {
   EventAttribute,
   EventRequestMetadata,
@@ -232,13 +232,20 @@ export const isSinglePayload = (payload: unknown): boolean => {
 };
 
 export const cloneAllPotentialPayloadsWithCodec = async (
-  anyAttributes: PotentiallyDecodable | EventAttribute | WorkflowEvent | null,
+  anyAttributes:
+    | PotentiallyDecodable
+    | EventAttribute
+    | WorkflowEvent
+    | Memo
+    | null,
   namespace: string,
   settings: Settings,
   accessToken: string,
   decodeSetting: DownloadEventHistorySetting = 'readable',
   returnDataOnly: boolean = true,
-): Promise<PotentiallyDecodable | EventAttribute | WorkflowEvent | null> => {
+): Promise<
+  PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null
+> => {
   if (!anyAttributes) return anyAttributes;
 
   const decode =

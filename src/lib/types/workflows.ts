@@ -162,6 +162,7 @@ export type WorkflowExecution = {
   assignedBuildId?: string;
   searchAttributes?: WorkflowSearchAttributes;
   memo: Memo;
+  rootExecution?: WorkflowIdentifier;
   pendingChildren: PendingChildren[];
   pendingNexusOperations: PendingNexusOperation[];
   pendingActivities: PendingActivity[];
