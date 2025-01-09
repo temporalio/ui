@@ -35,6 +35,7 @@ import type {
   ArchiveFilterParameters,
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
+  WorkflowIdentifier,
 } from '$lib/types/workflows';
 import {
   cloneAllPotentialPayloadsWithCodec,
@@ -84,6 +85,15 @@ type SignalWorkflowOptions = {
   workflow: WorkflowExecution;
   name: string;
   input: string;
+  encoding: PayloadInputEncoding;
+};
+
+type UpdateWorkflowOptions = {
+  namespace: string;
+  workflow: WorkflowIdentifier;
+  name: string;
+  input: string;
+  updateId?: string;
   encoding: PayloadInputEncoding;
 };
 
@@ -353,6 +363,39 @@ export async function signalWorkflow({
           'execution.runId': runId,
         },
       };
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt(body),
+    },
+  });
+}
+
+export async function updateWorkflow({
+  namespace,
+  workflow: { workflowId, runId },
+  name,
+  input,
+  encoding,
+}: UpdateWorkflowOptions) {
+  const route = routeForApi('workflow.update', {
+    namespace,
+    workflowId,
+    updateName: name,
+  });
+  const payloads = await encodePayloads(input, encoding);
+  const body = {
+    signalName: name,
+    workflowExecution: {
+      workflowId,
+      runId,
+    },
+    input: {
+      payloads,
+    },
+  };
 
   return requestFromAPI(route, {
     notifyOnError: false,

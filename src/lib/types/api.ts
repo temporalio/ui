@@ -15,6 +15,8 @@ export type WorkflowAPIRoutePath =
 
 export type WorkflowSignalAPIRoutePath = 'workflow.signal';
 
+export type WorkflowUpdateAPIRoutePath = 'workflow.update';
+
 export type WorkflowQueryAPIRoutePath = 'query';
 
 export type WorkflowActivitiesAPIRoutePath =
@@ -54,6 +56,7 @@ export type APIRoutePath =
   | WorkerAPIRoutePath
   | WorkflowAPIRoutePath
   | WorkflowSignalAPIRoutePath
+  | WorkflowUpdateAPIRoutePath
   | WorkflowQueryAPIRoutePath
   | WorkflowActivitiesAPIRoutePath
   | WorkflowsAPIRoutePath
@@ -84,6 +87,11 @@ export type SearchAttributesRouteParameters = Pick<
 export type WorkflowSignalRouteParameters = Pick<
   APIRouteParameters,
   'namespace' | 'workflowId' | 'signalName'
+>;
+
+export type WorkflowUpdateRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'workflowId' | 'updateName'
 >;
 
 export type WorkflowRouteParameters = Pick<

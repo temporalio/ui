@@ -36,6 +36,7 @@
     routeForWorkflowMetadata,
     routeForWorkflowQuery,
     routeForWorkflows,
+    routeForWorkflowUpdate,
   } from '$lib/utilities/route-for';
 
   $: ({ namespace, workflow: workflowId, run: runId, id } = $page.params);
@@ -293,6 +294,15 @@
         active={pathMatches(
           $page.url.pathname,
           routeForWorkflowMetadata(routeParameters),
+        )}
+      />
+      <Tab
+        label={translate('workflows.update-tab')}
+        id="metadata-tab"
+        href={routeForWorkflowUpdate(routeParameters)}
+        active={pathMatches(
+          $page.url.pathname,
+          routeForWorkflowUpdate(routeParameters),
         )}
       />
     </TabList>
