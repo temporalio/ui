@@ -59,9 +59,13 @@
         <h3 class="flex items-center gap-2">
           {#if icon}<Icon name={icon} />{/if}
           {title}
-          <slot name="summary" />
+          <span class="text-secondary">
+            <slot name="summary" />
+          </span>
         </h3>
-        <slot name="description" />
+        <span class="text-secondary">
+          <slot name="description" />
+        </span>
         <div
           class="flex flex-row items-center gap-2 pr-2"
           on:click|stopPropagation
@@ -75,7 +79,7 @@
           />
         </div>
       </div>
-      <p class="flex items-center">
+      <p class="flex items-center text-secondary">
         {#if error}
           <Badge class="mr-2" type="danger">{error}</Badge>
         {/if}
@@ -87,7 +91,7 @@
       id="{id}-content"
       aria-labelledby="{id}-trigger"
       role="textbox"
-      class="mt-6 block w-full p-2"
+      class="mt-4 block w-full p-2"
       class:hidden={!open}
     >
       <slot />

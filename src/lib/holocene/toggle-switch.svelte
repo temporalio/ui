@@ -14,7 +14,7 @@
 
 <Label
   class={merge(
-    'group relative flex w-fit min-w-fit rounded px-2',
+    'group relative flex w-fit min-w-fit rounded',
     labelPosition === 'right' ? 'flex-row-reverse' : 'flex-row',
     disabled && 'opacity-50',
   )}
