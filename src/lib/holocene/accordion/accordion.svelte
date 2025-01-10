@@ -41,17 +41,14 @@
 
 {#if expandable}
   <div
-    class={merge(
-      'surface-primary w-full border border-subtle p-2 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary/70',
-      className,
-    )}
+    class={merge('surface-primary w-full border border-subtle', className)}
     {...$$restProps}
   >
     <button
       id="{id}-trigger"
       aria-expanded={open}
       aria-controls="{id}-content"
-      class="flex w-full flex-col p-2 hover:bg-interactive-secondary-hover focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
+      class="flex w-full flex-col p-4 focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
       type="button"
       on:click={toggleAccordion}
     >
@@ -73,10 +70,7 @@
         >
           <slot name="action" />
         </div>
-        <Icon
-          class="m-2 shrink-0"
-          name={open ? 'chevron-up' : 'chevron-down'}
-        />
+        <Icon class="shrink-0" name={open ? 'chevron-up' : 'chevron-down'} />
       </div>
       <div class="text-secondary sm:hidden">
         <slot name="summary" />
@@ -93,7 +87,7 @@
       id="{id}-content"
       aria-labelledby="{id}-trigger"
       role="textbox"
-      class="mt-4 block w-full p-2"
+      class="mt-4 block w-full p-4"
       class:hidden={!open}
     >
       <slot />
