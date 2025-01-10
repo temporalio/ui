@@ -11,7 +11,6 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import Option from '$lib/holocene/select/option.svelte';
@@ -39,23 +38,14 @@
   let customUpdate = false;
   let encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
 
-  $: requirements = [
-    {
-      text: 'The first character must be a letter (a-z)',
-      invalid: name && !/^[a-z]/i.test(name),
-    },
-    {
-      text: 'All letters must be lowercase',
-      invalid: name && name !== name.toLowerCase(),
-    },
-  ];
-
   const hideModal = () => {
     open = false;
     name = '';
     input = '';
     customUpdate = false;
     $encoding = defaultEncoding;
+    failure = undefined;
+    success = undefined;
   };
 
   const update = async () => {
@@ -160,21 +150,6 @@
         {/if}
       </div>
     {/if}
-    <ul class="surface-background p-4">
-      {#each requirements as { text, invalid }}
-        <li class="flex gap-1" class:text-danger={invalid}>
-          <Icon
-            width={16}
-            height={16}
-            name={invalid ? 'xmark-filled' : 'circle-check-filled'}
-            class={`mt-0.5 shrink-0 ${
-              invalid ? 'text-danger' : 'text-success'
-            }`}
-          />
-          {text}
-        </li>
-      {/each}
-    </ul>
     <Input
       id="update-id"
       label={translate('workflows.update-id')}
@@ -183,11 +158,5 @@
     />
 
     <PayloadInput bind:input />
-    <Button
-      on:click={update}
-      disabled={!name || !encoding}
-      variant="primary"
-      class="w-full">Send Update</Button
-    >
   </div>
 </Modal>
