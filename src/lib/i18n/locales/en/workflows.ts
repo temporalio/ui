@@ -53,6 +53,7 @@ export const Strings = {
   paused: 'Paused',
   reset: 'Reset',
   signal: 'Send a Signal',
+  update: 'Send an Update',
   'n-selected': '{{count, number}} selected',
   'all-selected': 'All {{count, number}} selected.',
   'select-all-leading': 'or ',
@@ -105,6 +106,7 @@ export const Strings = {
   'signal-name-label': 'Signal name',
   'signal-payload-input-label': 'Data',
   'signal-payload-input-label-hint': '(only single JSON payload supported)',
+  'update-modal-title': 'Send and Receive an Update',
   'cancel-request-sent': 'Cancel Request Sent',
   'cancel-request-sent-description':
     "The request to cancel this Workflow Execution has been sent. If the Workflow uses the cancellation API, it'll cancel at the next available opportunity.",

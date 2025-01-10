@@ -5,12 +5,15 @@
 
   import { page } from '$app/stores';
 
+  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import { type PayloadInputEncoding } from '$lib/components/payload-input-with-encoding.svelte';
   import PayloadInput from '$lib/components/payload-input.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Card from '$lib/holocene/card.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -21,11 +24,14 @@
   $: ({ metadata } = $workflowRun);
   $: updateDefinitions = metadata?.definition?.updateDefinitions;
 
+  export let open: boolean;
+
   const defaultEncoding: PayloadInputEncoding = 'json/plain';
 
-  // let error = '';
-  // let loading = false;
+  let error = '';
+  let loading = false;
   let failure;
+  let success;
 
   let name = '';
   let updateId = uuid();
@@ -44,9 +50,17 @@
     },
   ];
 
+  const hideModal = () => {
+    open = false;
+    name = '';
+    input = '';
+    customUpdate = false;
+    $encoding = defaultEncoding;
+  };
+
   const update = async () => {
-    // error = '';
-    // loading = true;
+    error = '';
+    loading = true;
     try {
       const result = await updateWorkflow({
         namespace,
@@ -59,19 +73,17 @@
 
       if (result?.outcome?.failure) {
         failure = result.outcome.failure;
+        success = undefined;
       } else {
-        failure = {
-          message: '',
-          source: '',
-          stackTrace: '',
-        };
+        success = result.outcome.success;
+        failure = undefined;
       }
     } catch (err) {
       // error = isNetworkError(err)
       //   ? err.message
       //   : translate('common.unknown-error');
     } finally {
-      // loading = false;
+      loading = false;
     }
   };
 
@@ -81,9 +93,37 @@
   };
 </script>
 
-<section class="flex gap-4">
-  <Card class="mt-7 flex h-fit w-full w-full flex-col gap-4 xl:w-1/2">
-    <h3>Send Update</h3>
+<Modal
+  id="update-confirmation-modal"
+  data-testid="update-confirmation-modal"
+  large
+  bind:error
+  bind:open
+  {loading}
+  confirmText={translate('common.submit')}
+  cancelText={translate('common.cancel')}
+  confirmDisabled={!name || !encoding}
+  on:cancelModal={hideModal}
+  on:confirmModal={update}
+>
+  <h3 slot="title">{translate('workflows.update-modal-title')}</h3>
+  <div class="flex flex-col gap-4" slot="content">
+    {#if failure}
+      <Alert intent="error" title={failure?.message || 'Failure'}>
+        {#if failure?.stackTrace}
+          <CodeBlock class="mt-4" content={failure.stackTrace} lang="text" />
+        {/if}
+      </Alert>
+    {/if}
+    {#if success}
+      <Alert intent="success" title="Success">
+        {#if success?.payloads?.[0] && success.payloads[0].data}
+          <PayloadDecoder value={success.payloads[0]} let:decodedValue>
+            <CodeBlock class="mt-4" content={decodedValue} lang="text" />
+          </PayloadDecoder>
+        {/if}
+      </Alert>
+    {/if}
     {#if updateDefinitions?.length > 0 && !customUpdate}
       <Select
         id="update-select"
@@ -149,17 +189,5 @@
       variant="primary"
       class="w-full">Send Update</Button
     >
-  </Card>
-  {#if failure}
-    <Card
-      class="surface-danger mt-7 flex h-fit w-full w-full flex-col gap-4 xl:w-1/2"
-    >
-      {#if failure}
-        <h3>Failure</h3>
-        <p>{failure.message}</p>
-        <p>{failure.source}</p>
-        <p>{failure.stackTrace}</p>
-      {/if}
-    </Card>
-  {/if}
-</section>
+  </div>
+</Modal>
