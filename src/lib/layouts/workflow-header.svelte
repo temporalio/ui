@@ -19,12 +19,10 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fullEventHistory } from '$lib/stores/events';
-  import { namespaces } from '$lib/stores/namespaces';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
-  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import { has } from '$lib/utilities/has';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
@@ -59,11 +57,6 @@
   $: workflowUsesVersioning =
     workflow?.assignedBuildId ??
     workflow?.mostRecentWorkerVersionStamp?.useVersioning;
-  $: workflowRelationships = getWorkflowRelationships(
-    workflow,
-    $fullEventHistory,
-    $namespaces,
-  );
 
   $: summary = $workflowRun?.userMetadata?.summary;
   $: details = $workflowRun?.userMetadata?.details;
@@ -173,7 +166,7 @@
       {/if}
     </AccordionLight>
   {/if}
-  <WorkflowDetails />
+  <WorkflowDetails {workflow} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
@@ -223,6 +216,15 @@
         </Badge>
       </Tab>
       <Tab
+        label={translate('workflows.relationships')}
+        id="relationships-tab"
+        href={routeForRelationships(routeParameters)}
+        active={pathMatches(
+          $page.url.pathname,
+          routeForRelationships(routeParameters),
+        )}
+      ></Tab>
+      <Tab
         label={translate('workflows.workers-tab')}
         id="workers-tab"
         href={routeForWorkers(routeParameters)}
@@ -234,19 +236,6 @@
         <Badge type="primary" class="px-2 py-0">
           {workers?.pollers?.length}
         </Badge>
-      </Tab>
-      <Tab
-        label={translate('workflows.relationships')}
-        id="relationships-tab"
-        href={routeForRelationships(routeParameters)}
-        active={pathMatches(
-          $page.url.pathname,
-          routeForRelationships(routeParameters),
-        )}
-      >
-        <Badge type="primary" class="px-2 py-0"
-          >{workflowRelationships.relationshipCount}</Badge
-        >
       </Tab>
       <Tab
         label={translate('workflows.pending-activities-tab')}

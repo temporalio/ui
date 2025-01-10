@@ -61,7 +61,7 @@
             {#if icon}<Icon name={icon} />{/if}
             {title}
           </h3>
-          <div class="max-sm:hidden">
+          <div class="text-secondary max-sm:hidden">
             <slot name="summary" />
           </div>
         </div>
@@ -78,14 +78,14 @@
           name={open ? 'chevron-up' : 'chevron-down'}
         />
       </div>
-      <div class="sm:hidden">
+      <div class="text-secondary sm:hidden">
         <slot name="summary" />
       </div>
       <p class="flex items-center">
         {#if error}
           <Badge class="mr-2" type="danger">{error}</Badge>
         {/if}
-        {subtitle}
+        <span class="text-secondary">{subtitle}</span>
       </p>
     </button>
 
@@ -93,7 +93,7 @@
       id="{id}-content"
       aria-labelledby="{id}-trigger"
       role="textbox"
-      class="mt-6 block w-full p-2"
+      class="mt-4 block w-full p-2"
       class:hidden={!open}
     >
       <slot />
@@ -108,7 +108,7 @@
             {#if icon}<Icon name={icon} />{/if}
             {title}
           </h3>
-          <div class="max-sm:hidden">
+          <div class="text-secondary max-sm:hidden">
             <slot name="summary" />
           </div>
         </div>
@@ -116,14 +116,14 @@
           <slot name="action" />
         </div>
       </div>
-      <div class="sm:hidden">
+      <div class="text-secondary sm:hidden">
         <slot name="summary" />
       </div>
       <p class="flex items-center">
         {#if error}
           <Badge class="mr-2" type="danger">{error}</Badge>
         {/if}
-        {subtitle}
+        <span class="text-secondary">{subtitle}</span>
       </p>
     </div>
 
