@@ -115,12 +115,12 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.9.0",
+    "@axe-core/playwright": "^4.10.1",
     "@babel/core": "^7.20.12",
     "@babel/preset-typescript": "^7.18.6",
     "@chromatic-com/storybook": "^1.5.0",
     "@grpc/grpc-js": "^1.8.22",
-    "@playwright/test": "^1.44.1",
+    "@playwright/test": "^1.49.1",
     "@storybook/addon-a11y": "^8.1.10",
     "@storybook/addon-essentials": "^8.1.10",
     "@storybook/addon-interactions": "^8.1.10",
@@ -160,7 +160,7 @@
     "@vitest/coverage-v8": "^1.6.0",
     "@vitest/ui": "^1.6.0",
     "autoprefixer": "^10.4.13",
-    "axe-playwright": "^2.0.1",
+    "axe-playwright": "^2.0.3",
     "c8": "^7.12.0",
     "chalk": "^4.1.2",
     "concurrently": "^7.6.0",
