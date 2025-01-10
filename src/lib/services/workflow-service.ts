@@ -387,13 +387,19 @@ export async function updateWorkflow({
   });
   const payloads = await encodePayloads(input, encoding);
   const body = {
-    signalName: name,
     workflowExecution: {
-      workflowId,
       runId,
     },
-    input: {
-      payloads,
+    request: {
+      meta: {
+        updateId: Date.now().toString(),
+        identity: 'alex',
+      },
+      input: {
+        args: {
+          payloads,
+        },
+      },
     },
   };
 

@@ -80,7 +80,7 @@
         class="min-w-fit"
         bind:value={name}
         data-testid="update-select"
-        placeholder="Select a signal"
+        placeholder="Select an Update"
         required
       >
         {#each updateDefinitions as { name: value, description = '' }}
