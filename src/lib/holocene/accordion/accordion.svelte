@@ -56,12 +56,15 @@
       on:click={toggleAccordion}
     >
       <div class="flex w-full flex-row items-center justify-between gap-2">
-        <h3 class="flex items-center gap-2">
-          {#if icon}<Icon name={icon} />{/if}
-          {title}
-          <slot name="summary" />
-        </h3>
-        <slot name="description" />
+        <div class="flex w-full items-center gap-2">
+          <h3 class="flex shrink-0 items-center gap-2">
+            {#if icon}<Icon name={icon} />{/if}
+            {title}
+          </h3>
+          <div class="max-sm:hidden">
+            <slot name="summary" />
+          </div>
+        </div>
         <div
           class="flex flex-row items-center gap-2 pr-2"
           on:click|stopPropagation
@@ -69,11 +72,14 @@
           role="none"
         >
           <slot name="action" />
-          <Icon
-            class="m-2 shrink-0"
-            name={open ? 'chevron-up' : 'chevron-down'}
-          />
         </div>
+        <Icon
+          class="m-2 shrink-0"
+          name={open ? 'chevron-up' : 'chevron-down'}
+        />
+      </div>
+      <div class="sm:hidden">
+        <slot name="summary" />
       </div>
       <p class="flex items-center">
         {#if error}
@@ -96,15 +102,22 @@
 {:else}
   <div class="surface-primary w-full border border-subtle p-4" {...$$restProps}>
     <div class="flex w-full flex-col">
-      <div class="space-between flex w-full flex-row items-center">
-        <h3 class="flex w-full items-center gap-2">
-          {#if icon}<Icon name={icon} />{/if}
-          {title}
-          <slot name="summary" />
-        </h3>
+      <div class="flex w-full flex-row items-center justify-between gap-2">
+        <div class="flex w-full items-center gap-2">
+          <h3 class="flex shrink-0 items-center gap-2">
+            {#if icon}<Icon name={icon} />{/if}
+            {title}
+          </h3>
+          <div class="max-sm:hidden">
+            <slot name="summary" />
+          </div>
+        </div>
         <div class="flex flex-row items-center gap-2 pr-2">
           <slot name="action" />
         </div>
+      </div>
+      <div class="sm:hidden">
+        <slot name="summary" />
       </div>
       <p class="flex items-center">
         {#if error}
