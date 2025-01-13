@@ -149,6 +149,7 @@ export const Strings = {
   'parent-workflow': 'Parent Workflow',
   'first-execution': 'First Execution',
   'previous-execution': 'Previous Execution',
+  'current-execution': 'Current Execution',
   'next-execution': 'Next Execution',
   'child-id': 'Child Workflow ID',
   'child-run-id': 'Child Run ID',

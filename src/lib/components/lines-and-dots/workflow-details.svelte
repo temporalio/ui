@@ -3,7 +3,7 @@
 
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import {
@@ -14,8 +14,10 @@
 
   import WorkflowDetail from './workflow-detail.svelte';
 
+  export let workflow: WorkflowExecution;
+
   $: ({ namespace } = $page.params);
-  $: ({ workflow } = $workflowRun);
+
   $: elapsedTime = formatDistanceAbbreviated({
     start: workflow?.startTime,
     end: workflow?.endTime || Date.now(),

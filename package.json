@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.33.10",
+  "version": "2.34.3",
   "engines": {
     "pnpm": ">=8.6.0",
     "node": ">=18.15.0"
@@ -120,7 +120,7 @@
     "@babel/preset-typescript": "^7.18.6",
     "@chromatic-com/storybook": "^1.5.0",
     "@grpc/grpc-js": "^1.8.22",
-    "@playwright/test": "^1.44.1",
+    "@playwright/test": "^1.49.1",
     "@storybook/addon-a11y": "^8.1.10",
     "@storybook/addon-essentials": "^8.1.10",
     "@storybook/addon-interactions": "^8.1.10",

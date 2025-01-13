@@ -51,6 +51,7 @@ import {
   isForbidden,
   isUnauthorized,
 } from '$lib/utilities/handle-error';
+import { paginated } from '$lib/utilities/paginated';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
@@ -709,4 +710,91 @@ export const fetchInitialValuesForStartWorkflow = async ({
   } catch (e) {
     return emptyValues;
   }
+};
+
+export interface RootNode {
+  workflow: WorkflowExecution;
+  children: RootNode[];
+  rootPaths: { runId: string; workflowId: string }[];
+}
+
+const buildRoots = (
+  root: WorkflowExecution,
+  workflows: WorkflowExecution[],
+) => {
+  const childrenMap = new Map<string, WorkflowExecution[]>();
+
+  workflows.forEach((workflow) => {
+    if (workflow.parent) {
+      const key = `${workflow.parent.workflowId}:${workflow.parent.runId}`;
+      const children = childrenMap.get(key) || [];
+      children.push(workflow);
+      childrenMap.set(key, children);
+    }
+  });
+
+  const buildNode = (
+    workflow: WorkflowExecution,
+    paths: { runId: string; workflowId: string }[],
+  ): RootNode => {
+    const key = `${workflow.id}:${workflow.runId}`;
+    const children = childrenMap.get(key) || [];
+
+    const node: RootNode = {
+      workflow,
+      children: [],
+      rootPaths: [...paths, { runId: workflow.runId, workflowId: workflow.id }],
+    };
+
+    node.children = children.map((child) => buildNode(child, node.rootPaths));
+
+    return node;
+  };
+
+  return buildNode(root, []);
+};
+
+export async function fetchAllRootWorkflows(
+  namespace: string,
+  rootWorkflowId: string,
+  rootRunId?: string,
+): Promise<RootNode | undefined> {
+  let query = `RootWorkflowId = "${rootWorkflowId}"`;
+  if (rootRunId) {
+    query += ` AND RootRunId = "${rootRunId}"`;
+  }
+
+  const root = await fetchWorkflow({
+    namespace,
+    workflowId: rootWorkflowId,
+    runId: rootRunId,
+  });
+  const workflows = await fetchAllPaginatedWorkflows(namespace, { query });
+  return buildRoots(root?.workflow, workflows);
+}
+
+export const fetchAllPaginatedWorkflows = async (
+  namespace: string,
+  parameters: ValidWorkflowParameters,
+  request = fetch,
+  archived = false,
+): Promise<WorkflowExecution[]> => {
+  const rawQuery =
+    parameters.query || toListWorkflowQuery(parameters, archived);
+  let query: string;
+  try {
+    query = decodeURIComponent(rawQuery);
+  } catch {
+    query = rawQuery;
+  }
+
+  const route = routeForApi('workflows', { namespace });
+  const { executions } = await paginated(async (token: string) => {
+    return requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+      token,
+      request,
+      params: { query },
+    });
+  });
+  return toWorkflowExecutions({ executions });
 };

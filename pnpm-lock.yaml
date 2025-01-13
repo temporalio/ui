@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
 
 settings:
   autoInstallPeers: true
@@ -120,7 +120,7 @@ dependencies:
 devDependencies:
   '@axe-core/playwright':
     specifier: ^4.9.0
-    version: 4.9.0(playwright-core@1.44.1)
+    version: 4.9.0(playwright-core@1.49.1)
   '@babel/core':
     specifier: ^7.20.12
     version: 7.20.12
@@ -134,8 +134,8 @@ devDependencies:
     specifier: ^1.8.22
     version: 1.10.9
   '@playwright/test':
-    specifier: ^1.44.1
-    version: 1.44.1
+    specifier: ^1.49.1
+    version: 1.49.1
   '@storybook/addon-a11y':
     specifier: ^8.1.10
     version: 8.1.10
@@ -255,7 +255,7 @@ devDependencies:
     version: 10.4.13(postcss@8.4.31)
   axe-playwright:
     specifier: ^2.0.1
-    version: 2.0.1(playwright@1.44.1)
+    version: 2.0.1(playwright@1.49.1)
   c8:
     specifier: ^7.12.0
     version: 7.12.0
@@ -505,13 +505,13 @@ packages:
       default-browser-id: 3.0.0
     dev: true
 
-  /@axe-core/playwright@4.9.0(playwright-core@1.44.1):
+  /@axe-core/playwright@4.9.0(playwright-core@1.49.1):
     resolution: {integrity: sha512-Q1Lz75dNsX38jof+aev7RficDMdH/HLOLySkDdXR0fUoeFcLdw4UNgDO2CNNP4CTpoesEdfYRdd6VmDXjhBgbA==}
     peerDependencies:
       playwright-core: '>= 1.0.0'
     dependencies:
       axe-core: 4.9.0
-      playwright-core: 1.44.1
+      playwright-core: 1.49.1
     dev: true
 
   /@babel/code-frame@7.18.6:
@@ -3927,12 +3927,12 @@ packages:
     dev: true
     optional: true
 
-  /@playwright/test@1.44.1:
-    resolution: {integrity: sha512-1hZ4TNvD5z9VuhNJ/walIjvMVvYkZKf71axoF/uiAqpntQJXpG64dlXhoDXE3OczPuTuvjf/M5KWFg5VAVUS3Q==}
-    engines: {node: '>=16'}
+  /@playwright/test@1.49.1:
+    resolution: {integrity: sha512-Ky+BVzPz8pL6PQxHqNRW1k3mIyv933LML7HktS8uik0bUXNCdPhoS/kLihiO1tMf/egaJb4IutXd7UywvXEW+g==}
+    engines: {node: '>=18'}
     hasBin: true
     dependencies:
-      playwright: 1.44.1
+      playwright: 1.49.1
     dev: true
 
   /@polka/url@1.0.0-next.24:
@@ -7119,7 +7119,7 @@ packages:
       rimraf: 3.0.2
     dev: true
 
-  /axe-playwright@2.0.1(playwright@1.44.1):
+  /axe-playwright@2.0.1(playwright@1.49.1):
     resolution: {integrity: sha512-MHjNjGARulF9XzqSfspmNjw+tpBz4x9o1VlTuLWEUW9fqzhn+xWa1qEpuOIQPbsRWQiLfooDjQAunLeE0PM5AQ==}
     peerDependencies:
       playwright: '>1.0.0'
@@ -7129,7 +7129,7 @@ packages:
       axe-html-reporter: 2.2.3(axe-core@4.9.0)
       junit-report-builder: 3.2.1
       picocolors: 1.0.0
-      playwright: 1.44.1
+      playwright: 1.49.1
     dev: true
 
   /axios@1.7.4:
@@ -11896,7 +11896,7 @@ packages:
       jest-process-manager: 0.4.0
       jest-runner: 29.7.0
       nyc: 15.1.0
-      playwright-core: 1.41.1
+      playwright-core: 1.49.1
       rimraf: 3.0.2
       uuid: 8.3.2
     transitivePeerDependencies:
@@ -14241,15 +14241,15 @@ packages:
       pathe: 1.1.2
     dev: true
 
-  /playwright-core@1.41.1:
-    resolution: {integrity: sha512-/KPO5DzXSMlxSX77wy+HihKGOunh3hqndhqeo/nMxfigiKzogn8kfL0ZBDu0L1RKgan5XHCPmn6zXd2NUJgjhg==}
+  /playwright-core@1.44.1:
+    resolution: {integrity: sha512-wh0JWtYTrhv1+OSsLPgFzGzt67Y7BE/ZS3jEqgGBlp2ppp1ZDj8c+9IARNW4dwf1poq5MgHreEM2KV/GuR4cFA==}
     engines: {node: '>=16'}
     hasBin: true
     dev: true
 
-  /playwright-core@1.44.1:
-    resolution: {integrity: sha512-wh0JWtYTrhv1+OSsLPgFzGzt67Y7BE/ZS3jEqgGBlp2ppp1ZDj8c+9IARNW4dwf1poq5MgHreEM2KV/GuR4cFA==}
-    engines: {node: '>=16'}
+  /playwright-core@1.49.1:
+    resolution: {integrity: sha512-BzmpVcs4kE2CH15rWfzpjzVGhWERJfmnXmniSyKeRZUs9Ws65m+RGIi7mjJK/euCegfn3i7jvqWeWyHe9y3Vgg==}
+    engines: {node: '>=18'}
     hasBin: true
     dev: true
 
@@ -14259,6 +14259,16 @@ packages:
     hasBin: true
     dependencies:
       playwright-core: 1.44.1
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: true
+
+  /playwright@1.49.1:
+    resolution: {integrity: sha512-VYL8zLoNTBxVOrJBbDuRgDWa3i+mfQgDTrL8Ah9QXZ7ax4Dsj0MSq5bYgytRnDVVe+njoKnfsYkH3HzqVj5UZA==}
+    engines: {node: '>=18'}
+    hasBin: true
+    dependencies:
+      playwright-core: 1.49.1
     optionalDependencies:
       fsevents: 2.3.2
     dev: true

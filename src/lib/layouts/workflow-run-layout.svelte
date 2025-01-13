@@ -219,7 +219,7 @@
     class="absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
       ? 'top-[540px]'
       : 'top-0'}
-    } flex h-full flex-col gap-4"
+   flex h-full flex-col"
   >
     {#if workflowError}
       <WorkflowError error={workflowError} />
