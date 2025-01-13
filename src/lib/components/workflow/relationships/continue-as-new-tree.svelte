@@ -32,7 +32,7 @@
   {#if previous}
     <ContinueAsNewNode
       label={translate('workflows.previous-execution')}
-      value={first}
+      value={previous}
       href={routeForRelationships({
         namespace,
         workflow: workflowId,
