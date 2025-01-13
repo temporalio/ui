@@ -41,31 +41,27 @@
 
 {#if expandable}
   <div
-    class={merge(
-      'surface-primary w-full border border-subtle p-2 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary/70',
-      className,
-    )}
+    class={merge('surface-primary w-full border border-subtle', className)}
     {...$$restProps}
   >
     <button
       id="{id}-trigger"
       aria-expanded={open}
       aria-controls="{id}-content"
-      class="flex w-full flex-col p-2 hover:bg-interactive-secondary-hover focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
+      class="flex w-full flex-col p-4 focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
       type="button"
       on:click={toggleAccordion}
     >
       <div class="flex w-full flex-row items-center justify-between gap-2">
-        <h3 class="flex items-center gap-2">
-          {#if icon}<Icon name={icon} />{/if}
-          {title}
-          <span class="text-secondary">
+        <div class="flex w-full items-center gap-2">
+          <h3 class="flex shrink-0 items-center gap-2">
+            {#if icon}<Icon name={icon} />{/if}
+            {title}
+          </h3>
+          <div class="text-secondary max-sm:hidden">
             <slot name="summary" />
-          </span>
-        </h3>
-        <span class="text-secondary">
-          <slot name="description" />
-        </span>
+          </div>
+        </div>
         <div
           class="flex flex-row items-center gap-2 pr-2"
           on:click|stopPropagation
@@ -73,17 +69,17 @@
           role="none"
         >
           <slot name="action" />
-          <Icon
-            class="m-2 shrink-0"
-            name={open ? 'chevron-up' : 'chevron-down'}
-          />
         </div>
+        <Icon class="shrink-0" name={open ? 'chevron-up' : 'chevron-down'} />
       </div>
-      <p class="flex items-center text-secondary">
+      <div class="text-secondary sm:hidden">
+        <slot name="summary" />
+      </div>
+      <p class="flex items-center">
         {#if error}
           <Badge class="mr-2" type="danger">{error}</Badge>
         {/if}
-        {subtitle}
+        <span class="text-secondary">{subtitle}</span>
       </p>
     </button>
 
@@ -91,7 +87,7 @@
       id="{id}-content"
       aria-labelledby="{id}-trigger"
       role="textbox"
-      class="mt-4 block w-full p-2"
+      class="mt-4 block w-full p-4"
       class:hidden={!open}
     >
       <slot />
@@ -100,21 +96,28 @@
 {:else}
   <div class="surface-primary w-full border border-subtle p-4" {...$$restProps}>
     <div class="flex w-full flex-col">
-      <div class="space-between flex w-full flex-row items-center">
-        <h3 class="flex w-full items-center gap-2">
-          {#if icon}<Icon name={icon} />{/if}
-          {title}
-          <slot name="summary" />
-        </h3>
+      <div class="flex w-full flex-row items-center justify-between gap-2">
+        <div class="flex w-full items-center gap-2">
+          <h3 class="flex shrink-0 items-center gap-2">
+            {#if icon}<Icon name={icon} />{/if}
+            {title}
+          </h3>
+          <div class="text-secondary max-sm:hidden">
+            <slot name="summary" />
+          </div>
+        </div>
         <div class="flex flex-row items-center gap-2 pr-2">
           <slot name="action" />
         </div>
+      </div>
+      <div class="text-secondary sm:hidden">
+        <slot name="summary" />
       </div>
       <p class="flex items-center">
         {#if error}
           <Badge class="mr-2" type="danger">{error}</Badge>
         {/if}
-        {subtitle}
+        <span class="text-secondary">{subtitle}</span>
       </p>
     </div>
 

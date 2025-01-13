@@ -82,3 +82,10 @@
     </Link>
   </Accordion>
 </Story>
+
+<Story name="With Summary" let:args>
+  <Accordion {...args} onToggle={action('onToggle')}>
+    <p slot="summary">Accordion Summary</p>
+    <p>Accordion Content</p>
+  </Accordion>
+</Story>
