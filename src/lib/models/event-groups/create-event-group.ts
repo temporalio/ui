@@ -10,6 +10,7 @@ import type {
   WorkflowExecutionUpdateAcceptedEvent,
   WorkflowTaskScheduledEvent,
 } from '$lib/types/events';
+// import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload';
 import {
   isActivityTaskScheduledEvent,
   isLocalActivityMarkerEvent,
@@ -80,6 +81,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     level: undefined,
     pendingActivity: undefined,
     pendingNexusOperation: undefined,
+    userMetadata: event?.userMetadata,
     get eventTime() {
       return this.lastEvent?.eventTime;
     },
@@ -113,6 +115,11 @@ const createGroupFor = <K extends keyof StartingEvents>(
     },
     get isTerminated() {
       return Boolean(this.eventList.find(eventIsTerminated));
+    },
+    get metadataSummary() {
+      // if (this.userMetadata.summary) {
+      //   await decodeSingleReadablePayloadWithCodec(this.userMetadata.summary);
+      // }
     },
   };
 };
