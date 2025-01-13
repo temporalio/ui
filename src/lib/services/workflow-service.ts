@@ -673,39 +673,36 @@ const buildRoots = (
   root: WorkflowExecution,
   workflows: WorkflowExecution[],
 ) => {
-  const rootMap: RootNode = {
-    workflow: root,
-    children: [],
-    rootPaths: [{ runId: root.runId, workflowId: root.id }],
-  };
+  const childrenMap = new Map<string, WorkflowExecution[]>();
 
-  const getOrCreateNodes = (node: RootNode, children: WorkflowExecution[]) => {
-    if (children?.length) {
-      node.children = children.map((wf) => ({
-        workflow: wf,
-        children: [],
-        rootPaths: [...node.rootPaths, { runId: wf.runId, workflowId: wf.id }],
-      }));
-      node.children.forEach((child) => {
-        const nodeChildren = workflows.filter(
-          (w) =>
-            w?.parent?.workflowId === child.workflow.id &&
-            w?.parent?.runId === child.workflow.runId,
-        );
-        getOrCreateNodes(child, nodeChildren);
-      });
-    } else {
-      node.children = [];
+  workflows.forEach((workflow) => {
+    if (workflow.parent) {
+      const key = `${workflow.parent.workflowId}:${workflow.parent.runId}`;
+      const children = childrenMap.get(key) || [];
+      children.push(workflow);
+      childrenMap.set(key, children);
     }
+  });
+
+  const buildNode = (
+    workflow: WorkflowExecution,
+    paths: { runId: string; workflowId: string }[],
+  ): RootNode => {
+    const key = `${workflow.id}:${workflow.runId}`;
+    const children = childrenMap.get(key) || [];
+
+    const node: RootNode = {
+      workflow,
+      children: [],
+      rootPaths: [...paths, { runId: workflow.runId, workflowId: workflow.id }],
+    };
+
+    node.children = children.map((child) => buildNode(child, node.rootPaths));
+
+    return node;
   };
 
-  const rootChildren = workflows.filter(
-    (w) => w?.parent?.workflowId === root.id && w?.parent?.runId === root.runId,
-  );
-
-  getOrCreateNodes(rootMap, rootChildren);
-
-  return rootMap;
+  return buildNode(root, []);
 };
 
 export async function fetchAllRootWorkflows(
