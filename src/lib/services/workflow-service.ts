@@ -710,9 +710,9 @@ export async function fetchAllRootWorkflows(
   rootWorkflowId: string,
   rootRunId?: string,
 ): Promise<RootNode | undefined> {
-  let query = `RootWorkflowId = "${rootWorkflowId}"`;
+  let query = `RootWorkflowId = '${rootWorkflowId}'`;
   if (rootRunId) {
-    query += ` AND RootRunId = "${rootRunId}"`;
+    query += ` AND RootRunId = '${rootRunId}'`;
   }
 
   const root = await fetchWorkflow({
