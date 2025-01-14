@@ -4,6 +4,7 @@
 
   import { page } from '$app/stores';
 
+  import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -35,6 +36,7 @@
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
   import EventLink from './event-link.svelte';
+  import MetadataDecoder from './metadata-decoder.svelte';
 
   export let event: IterableEvent;
   export let group: EventGroup | undefined = undefined;
@@ -198,6 +200,17 @@
         {/if}
       </div>
     {/if}
+    <MetadataDecoder
+      value={currentEvent?.userMetadata?.summary}
+      fallback=""
+      let:decodedValue
+    >
+      {#if decodedValue}
+        <Badge type="subtle" class="block select-none truncate">
+          {decodedValue}
+        </Badge>
+      {/if}
+    </MetadataDecoder>
     {#if currentEvent?.links?.length}
       <EventLink
         link={currentEvent.links[0]}
