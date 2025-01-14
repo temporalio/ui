@@ -68,6 +68,8 @@
         success = result.outcome.success;
         failure = undefined;
       }
+
+      updateId = uuid();
     } catch (err) {
       // error = isNetworkError(err)
       //   ? err.message
@@ -141,6 +143,9 @@
       bind:value={updateId}
     />
     <PayloadInput bind:input />
+    {#if loading}
+      <Alert intent="info" title="In Progress">Waiting on Update</Alert>
+    {/if}
     {#if failure}
       <Alert intent="error" title={failure?.message || 'Failure'}>
         {#if failure?.stackTrace}
