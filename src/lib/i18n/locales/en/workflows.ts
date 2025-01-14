@@ -53,7 +53,7 @@ export const Strings = {
   paused: 'Paused',
   reset: 'Reset',
   signal: 'Send a Signal',
-  update: 'Send an Update',
+  update: 'Send and Receive Update',
   'n-selected': '{{count, number}} selected',
   'all-selected': 'All {{count, number}} selected.',
   'select-all-leading': 'or ',

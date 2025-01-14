@@ -98,22 +98,6 @@
 >
   <h3 slot="title">{translate('workflows.update-modal-title')}</h3>
   <div class="flex flex-col gap-4" slot="content">
-    {#if failure}
-      <Alert intent="error" title={failure?.message || 'Failure'}>
-        {#if failure?.stackTrace}
-          <CodeBlock class="mt-4" content={failure.stackTrace} lang="text" />
-        {/if}
-      </Alert>
-    {/if}
-    {#if success}
-      <Alert intent="success" title="Success">
-        {#if success?.payloads?.[0] && success.payloads[0].data}
-          <PayloadDecoder value={success.payloads[0]} let:decodedValue>
-            <CodeBlock class="mt-4" content={decodedValue} lang="text" />
-          </PayloadDecoder>
-        {/if}
-      </Alert>
-    {/if}
     {#if updateDefinitions?.length > 0 && !customUpdate}
       <Select
         id="update-select"
@@ -156,7 +140,26 @@
       required
       bind:value={updateId}
     />
-
     <PayloadInput bind:input />
+    {#if failure}
+      <Alert intent="error" title={failure?.message || 'Failure'}>
+        {#if failure?.stackTrace}
+          <CodeBlock
+            class="mt-4"
+            content={failure.stackTrace}
+            language="text"
+          />
+        {/if}
+      </Alert>
+    {/if}
+    {#if success}
+      <Alert intent="success" title="Success">
+        {#if success?.payloads?.[0] && success.payloads[0].data}
+          <PayloadDecoder value={success.payloads[0]} let:decodedValue>
+            <CodeBlock class="mt-4" content={decodedValue} language="text" />
+          </PayloadDecoder>
+        {/if}
+      </Alert>
+    {/if}
   </div>
 </Modal>
