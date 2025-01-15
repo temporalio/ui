@@ -234,7 +234,6 @@
 
 {#if updateEnabled}
   <UpdateConfirmationModal
-    {refresh}
     {workflow}
     {namespace}
     bind:open={updateConfirmationModalOpen}

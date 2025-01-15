@@ -101,6 +101,7 @@ const encode = (
       queue: '',
       queryType: '',
       signalName: '',
+      updateName: '',
       batchJobId: '',
       activityId: '',
       endpointId: '',

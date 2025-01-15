@@ -72,6 +72,7 @@ export type APIRouteParameters = {
   queue: string;
   queryType: string;
   signalName: string;
+  updateName: string;
   activityId: string;
   endpointId: string;
 };

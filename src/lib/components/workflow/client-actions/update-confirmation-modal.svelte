@@ -17,13 +17,18 @@
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
   import { updateWorkflow } from '$lib/services/workflow-service';
+  import { toaster } from '$lib/stores/toaster';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import type { WorkflowExecution } from '$lib/types/workflows';
+  import { isNetworkError } from '$lib/utilities/is-network-error';
 
-  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
+  $: ({ run: runId } = $page.params);
   $: ({ metadata } = $workflowRun);
   $: updateDefinitions = metadata?.definition?.updateDefinitions;
 
   export let open: boolean;
+  export let workflow: WorkflowExecution;
+  export let namespace: string;
 
   const defaultEncoding: PayloadInputEncoding = 'json/plain';
 
@@ -49,31 +54,36 @@
   };
 
   const update = async () => {
+    failure = undefined;
+    success = undefined;
     error = '';
     loading = true;
+
     try {
       const result = await updateWorkflow({
         namespace,
-        workflow: { workflowId, runId },
+        workflow: { workflowId: workflow.id, runId },
         input,
         updateId,
         encoding: $encoding,
         name,
       });
 
-      if (result?.outcome?.failure) {
-        failure = result.outcome.failure;
-        success = undefined;
-      } else {
-        success = result.outcome.success;
-        failure = undefined;
-      }
-
+      failure = result?.outcome?.failure;
+      success = result?.outcome?.success;
       updateId = uuid();
+
+      if (success) {
+        toaster.push({
+          message: translate('workflows.update-success'),
+          variant: 'success',
+        });
+        hideModal();
+      }
     } catch (err) {
-      // error = isNetworkError(err)
-      //   ? err.message
-      //   : translate('common.unknown-error');
+      error = isNetworkError(err)
+        ? err.message
+        : translate('common.unknown-error');
     } finally {
       loading = false;
     }
@@ -144,7 +154,9 @@
     />
     <PayloadInput bind:input />
     {#if loading}
-      <Alert intent="info" title="In Progress">Waiting on Update</Alert>
+      <Alert intent="info" title="In Progress"
+        >{translate('workflows.update-in-progress')}</Alert
+      >
     {/if}
     {#if failure}
       <Alert intent="error" title={failure?.message || 'Failure'}>

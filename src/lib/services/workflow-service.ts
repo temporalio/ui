@@ -20,6 +20,7 @@ import {
   ResetReapplyType,
   type ResetWorkflowRequest,
   type SearchAttribute,
+  type UpdateWorkflowResponse,
 } from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
@@ -93,6 +94,7 @@ type UpdateWorkflowOptions = {
   namespace: string;
   workflow: WorkflowIdentifier;
   name: string;
+  identity?: string;
   input: string;
   updateId?: string;
   encoding: PayloadInputEncoding;
@@ -378,9 +380,11 @@ export async function updateWorkflow({
   namespace,
   workflow: { workflowId, runId },
   name,
-  input,
+  identity,
+  updateId,
+  input = '',
   encoding,
-}: UpdateWorkflowOptions) {
+}: UpdateWorkflowOptions): Promise<UpdateWorkflowResponse> {
   const route = routeForApi('workflow.update', {
     namespace,
     workflowId,
@@ -393,8 +397,8 @@ export async function updateWorkflow({
     },
     request: {
       meta: {
-        updateId: Date.now().toString(),
-        identity: 'alex',
+        updateId,
+        identity,
       },
       input: {
         args: {
