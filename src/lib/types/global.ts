@@ -88,6 +88,7 @@ export type Settings = {
   workflowTerminateDisabled: boolean;
   workflowCancelDisabled: boolean;
   workflowSignalDisabled: boolean;
+  workflowUpdateDisabled: boolean;
   workflowResetDisabled: boolean;
   hideWorkflowQueryErrors: boolean;
   batchActionsDisabled: boolean;

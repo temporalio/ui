@@ -22,6 +22,7 @@
   import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
   import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
+  import { workflowUpdateEnabled } from '$lib/utilities/workflow-update-enabled';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -49,7 +50,7 @@
     namespace,
   );
 
-  $: updateEnabled = workflowSignalEnabled(
+  $: updateEnabled = workflowUpdateEnabled(
     $page.data.settings,
     $coreUser,
     namespace,
