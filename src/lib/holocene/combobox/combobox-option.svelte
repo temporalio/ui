@@ -39,7 +39,7 @@
   <slot slot="leading" name="leading">
     {#if multiselect}
       <Checkbox
-        on:change={() => dispatch('click')}
+        onchange={() => dispatch('click')}
         checked={selected}
         tabindex={-1}
         {label}

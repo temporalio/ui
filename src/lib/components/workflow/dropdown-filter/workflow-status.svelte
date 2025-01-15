@@ -102,7 +102,7 @@
           label={status}
           labelHidden
           tabindex={-1}
-          on:click={() => onStatusClick(status)}
+          onclick={() => onStatusClick(status)}
           checked={statusFilters.some((filter) => filter.value === status) ||
             (!statusFilters.length && status === 'All')}
         />

@@ -38,9 +38,9 @@
 <Template let:args>
   <Checkbox
     {...args}
-    on:change={action('change')}
-    on:click={action('click')}
-    on:keypress={action('keypress')}
+    onchange={action('change')}
+    onclick={action('click')}
+    onkeypress={action('keypress')}
   />
 </Template>
 

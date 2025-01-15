@@ -1,7 +1,14 @@
-<script lang="ts">
+<script lang="ts" module>
+  export type ChangeEvent<T = undefined> = {
+    checked: boolean;
+    value?: T;
+  };
+</script>
+
+<script lang="ts" generics="T">
   import type { HTMLInputAttributes } from 'svelte/elements';
 
-  import { createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -9,11 +16,9 @@
 
   import Label from './label.svelte';
 
-  type T = $$Generic;
-
-  interface $$Props extends HTMLInputAttributes {
+  type Props = Omit<HTMLInputAttributes, 'onchange'> & {
     checked?: boolean;
-    label?: string;
+    label?: string | Snippet;
     labelHidden?: boolean;
     indeterminate?: boolean;
     value?: T;
@@ -22,29 +27,39 @@
     required?: boolean;
     valid?: boolean;
     error?: string;
-  }
+    onchange?: (changeEvent: ChangeEvent<T>) => void;
+    class?: string;
+  };
 
-  export let id = '';
-  export let checked = false;
-  export let label = '';
-  export let labelHidden = false;
-  export let indeterminate = false;
-  export let disabled = false;
-  export let value: T = undefined;
-  export let group: T[] = undefined;
-  export let valid = true;
-  export let error = '';
-  export let required = false;
+  let {
+    id = '',
+    checked = $bindable(false),
+    label = '',
+    labelHidden = false,
+    indeterminate = false,
+    disabled = false,
+    value = undefined,
+    group = $bindable(undefined),
+    valid = true,
+    error = '',
+    required = false,
+    onchange = () => {},
+    'data-testid': testId = null,
+    class: className = '',
+    ...rest
+  }: Props = $props();
 
-  let className = '';
-  export { className as class };
+  let inputElement: HTMLInputElement | undefined = $state();
 
-  let inputElement: HTMLInputElement;
-  $: inputElement !== undefined && (inputElement.indeterminate = indeterminate);
+  $effect(() => {
+    if (inputElement) {
+      inputElement.indeterminate = indeterminate;
+    }
+  });
 
-  const dispatch = createEventDispatcher<{
-    change: { checked: boolean; value?: T };
-  }>();
+  $effect(() => {
+    checked = group !== undefined ? group.includes(value) : checked;
+  });
 
   const handleChange = (
     event: Event & {
@@ -62,16 +77,18 @@
 
     checked = isChecked;
 
-    dispatch('change', { checked: event.currentTarget.checked, value });
+    onchange?.({ checked: event.currentTarget.checked, value });
   };
 
-  $: checked = group !== undefined ? group.includes(value) : checked;
+  const stopPropagation = (event: Event) => {
+    event.stopPropagation();
+  };
 </script>
 
 <div
-  data-testid={$$restProps['data-testid'] ?? null}
-  on:click|stopPropagation
-  on:keypress|stopPropagation
+  data-testid={testId}
+  onclick={stopPropagation}
+  onkeypress={stopPropagation}
   role="none"
 >
   <Label
@@ -90,8 +107,7 @@
     )}
   >
     <input
-      on:click
-      on:change={handleChange}
+      onchange={handleChange}
       {id}
       {value}
       type="checkbox"
@@ -100,7 +116,7 @@
       {disabled}
       {required}
       bind:this={inputElement}
-      {...omit($$restProps, 'data-testid')}
+      {...omit(rest, 'data-testid')}
     />
 
     <span
@@ -149,11 +165,15 @@
       {/if}
     </span>
 
-    <slot name="flex">
-      <span class="label" class:sr-only={labelHidden}>
-        {label}
-      </span>
-    </slot>
+    {#if label}
+      {#if typeof label === 'string'}
+        <span class="label" class:sr-only={labelHidden}>
+          {label}
+        </span>
+      {:else}
+        {@render label()}
+      {/if}
+    {/if}
   </Label>
   {#if !valid && error}
     <span class="text-xs text-danger">{error}</span>

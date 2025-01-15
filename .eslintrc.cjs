@@ -27,6 +27,9 @@ module.exports = {
     extraFileExtensions: ['.svelte'],
     sourceType: 'module',
     ecmaVersion: 2019,
+    svelteFeatures: {
+      experimentalGenerics: true,
+    },
   },
   env: {
     browser: true,

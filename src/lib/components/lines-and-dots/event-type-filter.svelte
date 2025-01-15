@@ -89,7 +89,7 @@
     >
       {#snippet leading()}
         <Checkbox
-          on:change={() => {
+          onchange={() => {
             $eventTypeFilter = defaultOptions;
           }}
           checked={$eventTypeFilter.length === defaultOptions.length}
@@ -107,7 +107,7 @@
     >
       {#snippet leading()}
         <Checkbox
-          on:change={() => {
+          onchange={() => {
             $eventTypeFilter = [];
           }}
           checked={!$eventTypeFilter.length}
@@ -129,7 +129,7 @@
       >
         {#snippet leading()}
           <Checkbox
-            on:click={() => onOptionClick(option)}
+            onclick={() => onOptionClick(option)}
             checked={$eventTypeFilter.some((type) => type === option.value)}
             label={option.label}
             labelHidden

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
-  import Checkbox from '$lib/holocene/checkbox.svelte';
+  import Checkbox, { type ChangeEvent } from '$lib/holocene/checkbox.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     BATCH_OPERATION_CONTEXT,
@@ -23,8 +23,7 @@
     batchActionsVisible,
   } = getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
 
-  const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
-    const { checked } = event.detail;
+  const handleCheckboxChange = ({ checked }: ChangeEvent) => {
     handleSelectPage(checked, workflows);
   };
 
@@ -44,7 +43,7 @@
         data-testid="batch-actions-checkbox"
         bind:checked={$pageSelected}
         {indeterminate}
-        on:change={handleCheckboxChange}
+        onchange={handleCheckboxChange}
       />
     </th>
   {/if}
