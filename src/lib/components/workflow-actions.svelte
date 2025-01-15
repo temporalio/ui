@@ -118,7 +118,7 @@
       onClick: () => (updateConfirmationModalOpen = true),
       testId: 'update-button',
       enabled: updateEnabled,
-      description: updateEnabled ? '' : translate('workflows.signal-disabled'),
+      description: updateEnabled ? '' : translate('workflows.update-disabled'),
     },
     {
       label: translate('workflows.terminate'),

@@ -85,6 +85,8 @@ export const Strings = {
     'Cannot reset workflows without WorkflowTaskStarted, WorkflowTaskCompleted, or WorkflowTaskTimedOut events.',
   'signal-disabled':
     'Signaling workflows is not enabled, please contact your administrator for assistance.',
+  'update-disabled':
+    'Updating workflows is not enabled, please contact your administrator for assistance.',
   'terminate-disabled':
     'Terminating workflows is not enabled, please contact your adminstrator for assistance.',
   'terminate-success': 'Workflow terminated.',
