@@ -2,10 +2,8 @@
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import type { RootNode } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import WorkflowFamilyNodeDescriptionDetails from './workflow-family-node-description-details.svelte';
   import WorkflowFamilyNodeDescriptionTree from './workflow-family-node-description-tree.svelte';
@@ -43,20 +41,11 @@
     <div class="flex w-full items-center gap-3 pr-2 text-sm">
       <WorkflowFamilyNodeDescriptionDetails
         workflow={root.workflow}
+        {namespace}
         {isRootWorkflow}
+        {isActive}
       />
       <div class="flex basis-16 items-center justify-end gap-1">
-        {#if !isCurrent}
-          <Link
-            href={routeForEventHistory({
-              namespace,
-              workflow: root.workflow.id,
-              run: root.workflow.runId,
-            })}
-          >
-            <Icon name="external-link" class={isActive && 'text-white'} />
-          </Link>
-        {/if}
         {#if root?.children?.length}
           <div class="flex items-center gap-2 text-sm">
             <Icon name="relationship" class="-mr-1 w-3 flex-shrink-0" />
