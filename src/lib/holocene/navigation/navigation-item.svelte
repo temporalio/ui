@@ -34,7 +34,7 @@
     class:disabled
     tabindex={disabled ? -1 : 0}
     class:active
-    class="mb-1 flex items-center whitespace-nowrap p-1 pl-2 text-sm font-medium"
+    class="mb-1 flex items-center whitespace-nowrap rounded-sm p-1 pl-2 text-sm font-medium"
     class:text-disabled={disabled}
   >
     {#if icon}
