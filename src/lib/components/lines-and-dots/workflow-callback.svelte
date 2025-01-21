@@ -5,6 +5,7 @@
   import { translate } from '$lib/i18n/translate';
   import { fullEventHistory } from '$lib/stores/events';
   import { timeFormat } from '$lib/stores/time-format';
+  import type { CallbackState } from '$lib/types';
   import type { Callback } from '$lib/types/nexus';
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForNamespace } from '$lib/utilities/route-for';
@@ -28,10 +29,12 @@
   $: initialEvent = $fullEventHistory[0];
   $: link = initialEvent?.links[0];
 
+  const failedState = 'Failed' as unknown as CallbackState;
+  $: failed = callback.state === failedState;
   $: title = titles[callback.state] || translate('nexus.nexus-callback');
 </script>
 
-<Alert icon="nexus" intent="info" {title}>
+<Alert icon="nexus" intent={failed ? 'error' : 'info'} {title}>
   <div class="flex flex-col gap-2 pt-2">
     {#if link}
       <EventLink {link} />

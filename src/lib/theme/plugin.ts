@@ -76,7 +76,7 @@ const temporal = plugin(
       },
       '.surface-interactive': {
         backgroundColor: css('--color-interactive-surface'),
-        color: css('--color-text-primary'),
+        color: css('--color-text-white'),
         '&:focus-visible': {
           backgroundColor: css('--color-interactive-hover'),
         },

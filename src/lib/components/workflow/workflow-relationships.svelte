@@ -1,78 +1,61 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import { page } from '$app/stores';
 
-  import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fetchAllChildWorkflows } from '$lib/services/workflow-service';
+  import { fetchAllRootWorkflows } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type { WorkflowExecution } from '$lib/types/workflows';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
-  import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
-  import LiveChildWorkflowsTable from './live-child-workflows-table.svelte';
-  import ParentWorkflowTable from './parent-workflow-table.svelte';
-  import SchedulerTable from './scheduler-table.svelte';
+  import ContinueAsNewTree from './relationships/continue-as-new-tree.svelte';
+  import ScheduleTree from './relationships/schedule-tree.svelte';
+  import WorkflowFamilyTree from './relationships/workflow-family-tree.svelte';
+  import WorkflowRelationshipsOld from './workflow-relationships-old.svelte';
 
-  $: ({ workflow: workflowId, run: runId, namespace } = $page.params);
+  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: ({ workflow } = $workflowRun);
 
-  let liveChildren: WorkflowExecution[] = [];
-
-  onMount(async () => {
-    liveChildren = await fetchAllChildWorkflows(namespace, workflowId, runId);
-  });
+  $: rootWorkflowId = workflow.rootExecution.workflowId;
+  $: rootRunId = workflow.rootExecution.runId;
 
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
     $fullEventHistory,
     $namespaces,
   );
-  $: ({
-    hasChildren,
-    hasRelationships,
-    first,
-    parent,
-    parentNamespaceName,
-    children,
-    next,
-    previous,
-    scheduleId,
-  } = workflowRelationships);
+  $: ({ hasRelationships, first, next, previous, scheduleId } =
+    workflowRelationships);
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-4 pb-12">
   {#if hasRelationships}
-    <div class="flex w-full flex-wrap gap-4">
-      {#if scheduleId}
-        <SchedulerTable {scheduleId} {namespace} />
-      {/if}
-      {#if parent}
-        <ParentWorkflowTable {parent} {parentNamespaceName} {namespace} />
-      {/if}
-      {#if first || previous || next}
-        <FirstPreviousNextWorkflowTable
-          {first}
-          {previous}
-          {next}
-          workflow={workflowId}
-          {namespace}
-        />
-      {/if}
+    <div class="flex w-full flex-col justify-center gap-4">
+      {#await fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId)}
+        <Loading />
+      {:then root}
+        {#if root && !!root.children.length}
+          <WorkflowFamilyTree {root} />
+        {/if}
+        {#if scheduleId}
+          <ScheduleTree {scheduleId} current={runId} {workflowId} {namespace} />
+        {/if}
+        {#if first || previous || next}
+          <ContinueAsNewTree
+            {first}
+            {previous}
+            {next}
+            current={runId}
+            {workflowId}
+            {namespace}
+          />
+        {/if}
+      {:catch}
+        <WorkflowRelationshipsOld />
+      {/await}
     </div>
-    {#if liveChildren.length}
-      <LiveChildWorkflowsTable children={liveChildren} />
-    {:else if hasChildren}
-      <ChildWorkflowsTable
-        {children}
-        pendingChildren={$workflowRun.workflow.pendingChildren}
-        namespace={$page.params.namespace}
-      />
-    {/if}
   {:else}
-    <p>{translate('workflows.no-relationships')}</p>
+    <h4 class="px-8 py-4">{translate('workflows.no-relationships')}</h4>
   {/if}
 </div>

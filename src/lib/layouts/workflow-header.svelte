@@ -173,7 +173,7 @@
       {/if}
     </AccordionLight>
   {/if}
-  <WorkflowDetails />
+  <WorkflowDetails {workflow} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
@@ -223,6 +223,19 @@
         </Badge>
       </Tab>
       <Tab
+        label={translate('workflows.relationships')}
+        id="relationships-tab"
+        href={routeForRelationships(routeParameters)}
+        active={pathMatches(
+          $page.url.pathname,
+          routeForRelationships(routeParameters),
+        )}
+      >
+        <Badge type="primary" class="px-2 py-0">
+          {workflowRelationships.relationshipCount}
+        </Badge></Tab
+      >
+      <Tab
         label={translate('workflows.workers-tab')}
         id="workers-tab"
         href={routeForWorkers(routeParameters)}
@@ -234,19 +247,6 @@
         <Badge type="primary" class="px-2 py-0">
           {workers?.pollers?.length}
         </Badge>
-      </Tab>
-      <Tab
-        label={translate('workflows.relationships')}
-        id="relationships-tab"
-        href={routeForRelationships(routeParameters)}
-        active={pathMatches(
-          $page.url.pathname,
-          routeForRelationships(routeParameters),
-        )}
-      >
-        <Badge type="primary" class="px-2 py-0"
-          >{workflowRelationships.relationshipCount}</Badge
-        >
       </Tab>
       <Tab
         label={translate('workflows.pending-activities-tab')}
