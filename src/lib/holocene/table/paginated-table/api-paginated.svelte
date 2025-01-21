@@ -43,23 +43,23 @@
     pageSizeOptions?: string[];
   };
 
-  export let onError: (error: Error) => void | undefined = undefined;
-  export let onFetch: () => Promise<PaginatedRequest<T>>;
-  export let onShiftUp: (event: KeyboardEvent) => void | undefined = undefined;
-  export let onShiftDown: (event: KeyboardEvent) => void | undefined =
-    undefined;
-  export let onSpace: (event: KeyboardEvent) => void | undefined = undefined;
-
-  export let total: string | number = '';
-  export let pageSizeSelectLabel: string;
-  export let emptyStateTitle = '';
-  export let emptyStateMessage = '';
-  export let errorTitle = '';
-  export let errorMessage = '';
-  export let itemsKeyname = 'items';
-  export let previousButtonLabel: string;
-  export let nextButtonLabel: string;
-  export let pageSizeOptions = options;
+  let {
+    onError,
+    onFetch,
+    onShiftUp,
+    onShiftDown,
+    onSpace,
+    total = '',
+    pageSizeSelectLabel,
+    emptyStateTitle = '',
+    emptyStateMessage = '',
+    errorTitle = '',
+    errorMessage = '',
+    itemsKeyname = 'items',
+    previousButtonLabel,
+    nextButtonLabel,
+    pageSizeOptions = options,
+  }: $$Props = $props();
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,

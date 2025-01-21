@@ -11,8 +11,12 @@
     routeForNexusEndpointEdit,
   } from '$lib/utilities/route-for';
 
-  export let endpoint: NexusEndpoint;
-  export let editDisabled = false;
+  type $$Props = {
+    endpoint: NexusEndpoint;
+    editDisabled?: boolean;
+  };
+
+  let { endpoint, editDisabled = false }: $$Props = $props();
 </script>
 
 <div class="flex flex-col gap-8">

@@ -7,21 +7,19 @@
 
   import CodeBlock from './code-block.svelte';
 
+  type $$Props = {
+    reset?: () => void;
+    error: App.Error | NetworkError | unknown;
+    status?: number;
+  };
+
   const reload = () => {
     if (BROWSER) {
       window.location.reload();
     }
   };
 
-  let {
-    reset = reload,
-    error,
-    status = 500,
-  }: {
-    reset?: () => void;
-    error: App.Error | NetworkError | unknown;
-    status?: number;
-  } = $props();
+  let { reset = reload, error, status = 500 }: $$Props = $props();
 
   let message = $state(
     has(error, 'message') && typeof error.message === 'string'

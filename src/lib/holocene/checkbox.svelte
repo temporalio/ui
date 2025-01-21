@@ -16,7 +16,7 @@
 
   import Label from './label.svelte';
 
-  type Props = Omit<HTMLInputAttributes, 'onchange'> & {
+  type $$Props = Omit<HTMLInputAttributes, 'onchange'> & {
     checked?: boolean;
     label?: string | Snippet;
     labelHidden?: boolean;
@@ -47,7 +47,7 @@
     'data-testid': testId = null,
     class: className = '',
     ...rest
-  }: Props = $props();
+  }: $$Props = $props();
 
   let inputElement: HTMLInputElement | undefined = $state();
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { type IconName, icons } from './paths';
 
-  type Props = {
+  type $$Props = {
     name: IconName;
     width?: number;
     height?: number;
@@ -25,7 +25,7 @@
     strokeWidth,
     'aria-hidden': ariaHidden = 'false',
     animate = false,
-  }: Props = $props();
+  }: $$Props = $props();
 
   const Icon = $derived(icons[name]);
 </script>
