@@ -1,19 +1,32 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
   type Item = $$Generic;
 
-  export let visibleItems: Item[];
-  export let variant: 'primary' | 'split' = 'primary';
-  export let updating = false;
-  export let maxHeight = '';
-  export let fixed = false;
+  type $$Props = HTMLAttributes<HTMLTableElement> & {
+    visibleItems: Item[];
+    variant?: 'primary' | 'split';
+    updating?: boolean;
+    maxHeight?: string;
+    fixed?: boolean;
+  };
 
-  let tableContainer: HTMLDivElement;
+  let {
+    visibleItems,
+    variant = 'primary',
+    updating = false,
+    maxHeight = '',
+    fixed = false,
+    ...rest
+  }: $$Props = $props();
 
-  $: tableOffset = tableContainer?.offsetTop
-    ? tableContainer?.offsetTop + 32
-    : 0;
+  let tableContainer: HTMLDivElement | undefined = $state();
+
+  let tableOffset = $derived(
+    tableContainer?.offsetTop ? tableContainer?.offsetTop + 32 : 0,
+  );
 </script>
 
 <div
@@ -25,7 +38,7 @@
     class="paginated-table"
     class:table-fixed={fixed}
     class:table-auto={!fixed}
-    {...$$restProps}
+    {...rest}
   >
     <slot name="caption" />
     <thead class="paginated-table-header">

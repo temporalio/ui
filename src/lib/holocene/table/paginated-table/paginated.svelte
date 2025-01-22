@@ -1,4 +1,7 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+  import { run } from 'svelte/legacy';
+
   import { page } from '$app/stores';
 
   import Button from '$lib/holocene/button.svelte';
@@ -18,25 +21,44 @@
 
   type Item = $$Generic;
 
-  export let id: string = null;
-  export let items: Item[];
-  export let variant: 'primary' | 'split' = 'primary';
-  export let updating = false;
-  export let perPageLabel: string;
-  export let pageButtonLabel: (page: number) => string;
-  export let nextPageButtonLabel: string;
-  export let previousPageButtonLabel: string;
-  export let maxHeight = '';
-  export let pageSizeOptions: string[] = options;
-  export let fixed = false;
+  type $$Props = HTMLAttributes<HTMLTableElement> & {
+    id?: string;
+    items: Item[];
+    variant?: 'primary' | 'split';
+    updating?: boolean;
+    perPageLabel: string;
+    pageButtonLabel: (page: number) => string;
+    nextPageButtonLabel: string;
+    previousPageButtonLabel: string;
+    maxHeight?: string;
+    pageSizeOptions?: string[];
+    fixed?: boolean;
+  };
 
-  $: url = $page.url;
-  $: perPageParam = url.searchParams.get(perPageKey) ?? pageSizeOptions[0];
-  $: currentPageParam = url.searchParams.get(currentPageKey) ?? '1';
-  $: store = pagination(items, perPageParam, currentPageParam);
+  let {
+    id,
+    items,
+    variant = 'primary',
+    updating = false,
+    perPageLabel,
+    pageButtonLabel,
+    nextPageButtonLabel,
+    previousPageButtonLabel,
+    maxHeight = '',
+    pageSizeOptions = options,
+    fixed = false,
+    ...rest
+  }: $$Props = $props();
+
+  let url = $derived($page.url);
+  let perPageParam = $derived(
+    url.searchParams.get(perPageKey) ?? pageSizeOptions[0],
+  );
+  let currentPageParam = $derived(url.searchParams.get(currentPageKey) ?? '1');
+  let store = $derived(pagination(items, perPageParam, currentPageParam));
 
   // keep the 'page-size' url search param within the supported options
-  $: {
+  run(() => {
     if (parseInt(perPageParam, 10) > parseInt(MAX_PAGE_SIZE, 10)) {
       updateQueryParameters({
         parameter: perPageKey,
@@ -50,10 +72,10 @@
         url,
       });
     }
-  }
+  });
 
   // Keep the 'page' url search param within 1 and the total number of pages
-  $: {
+  run(() => {
     if (
       $store.totalPages &&
       parseInt(currentPageParam, 10) > $store.totalPages
@@ -73,7 +95,7 @@
         url,
       });
     }
-  }
+  });
 
   const handlePageChange = (page: number) => {
     updateQueryParameters({
@@ -83,10 +105,10 @@
     });
   };
 
-  $: {
+  run(() => {
     if (currentPageParam) store.jumpToPage(currentPageParam);
     if (perPageParam) store.adjustPageSize(perPageParam);
-  }
+  });
 </script>
 
 <PaginatedTable
@@ -130,7 +152,7 @@
 
   <nav
     class="flex shrink-0 items-center gap-2"
-    aria-label={$$restProps['aria-label']}
+    aria-label={rest['aria-label']}
     slot="actions-end"
   >
     <IconButton

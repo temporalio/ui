@@ -145,7 +145,7 @@
     tabindex={disabled ? -1 : 0}
     onkeydown={handleKeydown}
   >
-    {@render children()}
+    {@render children?.()}
   </a>
 {:else}
   <li
@@ -169,7 +169,7 @@
     {@render leading?.()}
     <div class="grow">
       <div class:centered class="menu-item-wrapper">
-        {@render children()}
+        {@render children?.()}
         {#if selected}
           <Icon name="checkmark" />
         {/if}

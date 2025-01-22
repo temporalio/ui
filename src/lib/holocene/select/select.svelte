@@ -23,8 +23,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { writable, type Writable } from 'svelte/store';
 
-  import { onMount } from 'svelte';
-  import { setContext } from 'svelte';
+  import { onMount, setContext, type Snippet } from 'svelte';
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -47,6 +46,7 @@
     menuClass?: string;
     variant?: MenuButtonVariant;
     required?: boolean;
+    icon?: Snippet;
   };
 
   let {
@@ -63,6 +63,7 @@
     required = false,
     children,
     'data-testid': testId = '',
+    icon,
   }: $$Props = $props();
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
@@ -120,7 +121,9 @@
       data-testid={`${testId}-button`}
     >
       {#snippet leading()}
-        {#if leadingIcon}
+        {#if icon}
+          {@render icon()}
+        {:else if leadingIcon}
           <Icon name={leadingIcon} />
         {/if}
       {/snippet}

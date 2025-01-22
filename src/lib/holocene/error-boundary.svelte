@@ -1,7 +1,12 @@
-<script>
+<script lang="ts">
+  import type { Snippet } from 'svelte';
   import Error from './error.svelte';
 
-  let { children } = $props();
+  type $$Props = {
+    children: Snippet;
+  };
+
+  let { children }: $$Props = $props();
 </script>
 
 <svelte:boundary>

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type PaginatedRequest<T> = (
     size: number,
     token: string,
@@ -7,6 +7,7 @@
 
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
+  import { run } from 'svelte/legacy';
 
   import { onMount } from 'svelte';
 
@@ -25,7 +26,7 @@
   import PaginatedTable from './index.svelte';
 
   type T = $$Generic;
-  type $$Props = HTMLAttributes<HTMLDivElement> & {
+  type $$Props = HTMLAttributes<HTMLTableElement> & {
     id?: string;
     maxHeight?: string;
     onError?: (error: Error | unknown) => void | undefined;
@@ -63,31 +64,33 @@
     previousButtonLabel,
     nextButtonLabel,
     pageSizeOptions = options,
+    ...rest
   }: $$Props = $props();
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
     pageSizeOptions[0],
   );
-  let error: Error;
+  let error: Error = $state();
 
   function clearError() {
     if (error) error = undefined;
   }
 
-  $: pageSizeChange =
-    !$store.loading && $store.pageSize !== $store.previousPageSize;
+  let pageSizeChange = $derived(
+    !$store.loading && $store.pageSize !== $store.previousPageSize,
+  );
 
   onMount(() => {
     initalDataFetch();
   });
 
-  $: {
+  run(() => {
     if (pageSizeChange) {
       store.resetPageSize($store.pageSize);
       initalDataFetch();
     }
-  }
+  });
 
   async function initalDataFetch() {
     const fetchData = await onFetch();
@@ -213,7 +216,7 @@
 
   <nav
     class="flex shrink-0 items-center gap-2"
-    aria-label={$$restProps['aria-label']}
+    aria-label={rest['aria-label']}
     slot="actions-end"
   >
     <IconButton
