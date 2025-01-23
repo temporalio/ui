@@ -1,19 +1,26 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
   import { getDateRows, weekDays } from '$lib/utilities/calendar';
 
-  const dispatch = createEventDispatcher();
+  interface Props {
+    date?: Date;
+    month?: number;
+    year?: number;
+    isAllowed?: (_date: Date) => boolean;
+    datechange: (_date: Date) => void;
+  }
 
-  export let date: Date | undefined;
-  export let month: number | undefined;
-  export let year: number | undefined;
-  export let isAllowed = (_date: Date) => true;
+  let {
+    date,
+    month,
+    year,
+    isAllowed = () => true,
+    datechange,
+  }: Props = $props();
 
-  let cells = [];
+  let cells = $state([]);
 
   const onChange = (date: number) => {
-    dispatch('datechange', new Date(year, month, date));
+    datechange(new Date(year, month, date));
   };
 
   const allow = (year: number, month: number, date: number) => {
@@ -21,10 +28,12 @@
     return isAllowed(new Date(year, month, date));
   };
 
-  $: cells = getDateRows(month, year).map((c) => ({
-    value: c,
-    allowed: allow(year, month, c),
-  }));
+  $effect(() => {
+    cells = getDateRows(month, year).map((c) => ({
+      value: c,
+      allowed: allow(year, month, c),
+    }));
+  });
 </script>
 
 <div class="container">
@@ -39,7 +48,7 @@
       {#if value}
         <button
           type="button"
-          on:click={allowed && value ? () => onChange(value) : () => {}}
+          onclick={allowed && value ? () => onChange(value) : () => {}}
           class="cell"
           class:highlight={allowed && value}
           class:disabled={!allowed}

@@ -1,9 +1,13 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Checkbox',
     component: Checkbox,
     args: {
@@ -27,22 +31,22 @@
       group: { control: 'object', table: { disable: true } },
       valid: { control: 'boolean' },
     },
-  } satisfies Meta<Checkbox<string>>;
+  });
 </script>
 
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args>
+{#snippet template(args: Args<typeof Story>)}
   <Checkbox
     {...args}
     onchange={action('change')}
     onclick={action('click')}
     onkeypress={action('keypress')}
   />
-</Template>
+{/snippet}
 
 <Story name="Default" />
 

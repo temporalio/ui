@@ -1,9 +1,13 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import Skeleton from './index.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Skeleton Loader',
     component: Skeleton,
     args: { class: 'h-4' },
@@ -13,15 +17,15 @@
         description: 'Tailwind compliant "height" class, i.e. h-10',
       },
     },
-  } satisfies Meta<Skeleton>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args>
+{#snippet template(args: Args<typeof Story>)}
   <Skeleton {...args} />
-</Template>
+{/snippet}
 
 <Story name="Default" />

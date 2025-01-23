@@ -3,15 +3,28 @@
   import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
   import { fullEventHistory } from '$lib/stores/events';
 
-  export let scrollToTopHidden = true;
-  export let scrollToBottomHidden = false;
-  export let onScrollToTopClick: () => void;
-  export let onScrollToBottomClick: () => void;
-  export let scrollToTopAriaLabel: string;
-  export let scrollToBottomAriaLabel: string;
+  interface Props {
+    scrollToTopHidden?: boolean;
+    scrollToBottomHidden?: boolean;
+    onScrollToTopClick: () => void;
+    onScrollToBottomClick: () => void;
+    scrollToTopAriaLabel: string;
+    scrollToBottomAriaLabel: string;
+    class?: string;
+  }
+
+  let {
+    scrollToTopHidden = true,
+    scrollToBottomHidden = false,
+    onScrollToTopClick,
+    onScrollToBottomClick,
+    scrollToTopAriaLabel,
+    scrollToBottomAriaLabel,
+    class: className = '',
+  }: Props = $props();
 </script>
 
-<div id="scroll-container" class={$$props.class}>
+<div id="scroll-container" class={className}>
   <ScrollToTop
     hidden={scrollToTopHidden}
     {onScrollToTopClick}

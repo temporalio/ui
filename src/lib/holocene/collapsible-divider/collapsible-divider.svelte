@@ -5,16 +5,19 @@
 
   import Icon from '../icon/icon.svelte';
 
-  type $$Props = HTMLAttributes<HTMLDivElement> & {
+  interface Props extends HTMLAttributes<HTMLDivElement> {
     label: string;
     open?: boolean;
-  };
+    class?: string;
+  }
 
-  let className: string | undefined = undefined;
-
-  export let label: string;
-  export let open: boolean = false;
-  export { className as class };
+  let {
+    class: className = '',
+    label,
+    open = false,
+    children,
+    ...rest
+  }: Props = $props();
 
   const toggleOpen = () => (open = !open);
 </script>
@@ -24,12 +27,12 @@
     'flex w-full flex-row items-center justify-evenly gap-4',
     className,
   )}
-  {...$$restProps}
+  {...rest}
 >
   <div class="w-full border border-subtle"></div>
   <button
     class="flex grow items-center gap-2 whitespace-nowrap"
-    on:click={toggleOpen}
+    onclick={toggleOpen}
   >
     {label}
     <Icon name={open ? 'chevron-up' : 'chevron-down'} />
@@ -38,5 +41,5 @@
 </div>
 
 <div class:hidden={!open}>
-  <slot />
+  {@render children?.()}
 </div>

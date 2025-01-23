@@ -2,7 +2,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { writable, type Writable } from 'svelte/store';
 
-  import { createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
@@ -19,13 +19,6 @@
   import Tooltip from '../tooltip.svelte';
 
   type T = $$Generic;
-
-  const dispatch = createEventDispatcher<{
-    change: { value: string | T };
-    filter: string;
-    close: { selectedOption: string | T };
-    input: string;
-  }>();
 
   type ExtendedInputEvent = Event & {
     currentTarget: EventTarget & HTMLInputElement;
@@ -53,6 +46,12 @@
     loadingText?: string;
     open?: Writable<boolean>;
     maxMenuHeight?: string;
+    action?: Snippet;
+    change?: (args: { value: string | T }) => void;
+    filter?: (arg: string) => void;
+    close?: (args: { selectedOption: string | T }) => void;
+    input?: (arg: string) => void;
+    class?: string;
   }
 
   type MultiSelectProps = {
@@ -63,6 +62,7 @@
     removeChipLabel?: string;
     selectAllLabel?: string;
     selectNoneLabel?: string;
+    deselectAllLabel?: string;
     numberOfItemsSelectedLabel?: (count: number) => string;
   };
 
@@ -70,13 +70,18 @@
     multiselect?: false;
     value: string;
     chipLimit?: never;
+    displayChips?: never;
+    selectAllLabel?: never;
+    selectNoneLabel?: never;
+    deselectAllLabel?: never;
+    removeChipLabel?: never;
+    numberOfItemsSelectedLabel?: never;
   };
 
   type StringOptionProps = {
     options: string[];
     optionValueKey?: never;
     optionLabelKey?: never;
-    displayValue?: never;
   };
 
   type CustomOptionProps = {
@@ -85,72 +90,77 @@
     optionLabelKey?: keyof T;
   };
 
-  type $$Props =
+  type Props =
     | (BaseProps & StringOptionProps & SingleSelectProps)
     | (BaseProps & StringOptionProps & MultiSelectProps)
     | (BaseProps & CustomOptionProps & SingleSelectProps)
     | (BaseProps & CustomOptionProps & MultiSelectProps);
 
-  let className = '';
-  export { className as class };
-  export let id: string;
-  export let label: string;
-  export let multiselect = false;
-  export let value: string | string[] = multiselect ? [] : undefined;
-  export let noResultsText: string;
-  export let disabled = false;
-  export let labelHidden = false;
-  export let options: (T | string)[];
-  export let placeholder: string = null;
-  export let readonly = false;
-  export let required = false;
-  export let leadingIcon: IconName = null;
-  export let optionValueKey: keyof T = null;
-  export let optionLabelKey: keyof T = optionValueKey;
-  export let minSize = 0;
-  export let maxSize = 120;
-  export let error = '';
-  export let valid = true;
-  export let displayChips = true;
-  export let chipLimit = 5;
-  export let selectAllLabel = 'Select All';
-  export let deselectAllLabel = 'Deselect All';
-  export let removeChipLabel = 'Remove Option';
-  export let actionTooltip = '';
-  export let href = '';
-  export let hrefDisabled = false;
-  export let loading = false;
-  export let loadingText = 'Loading more results';
+  let {
+    id,
+    label,
+    multiselect = false,
+    value = $bindable(multiselect ? [] : undefined),
+    noResultsText,
+    disabled = false,
+    labelHidden = false,
+    options,
+    placeholder = null,
+    readonly = false,
+    required = false,
+    leadingIcon = null,
+    optionValueKey = null,
+    optionLabelKey = optionValueKey,
+    minSize = 0,
+    maxSize = 120,
+    error = '',
+    valid = true,
+    displayChips = true,
+    chipLimit = 5,
+    selectAllLabel = 'Select All',
+    deselectAllLabel = 'Deselect All',
+    removeChipLabel = 'Remove Option',
+    actionTooltip = '',
+    href = '',
+    hrefDisabled = false,
+    loading = false,
+    loadingText = 'Loading more results',
+    numberOfItemsSelectedLabel = (count: number) =>
+      `${count} option${count > 1 ? 's' : ''} selected`,
+    open = writable<boolean>(false),
+    maxMenuHeight = 'max-h-[20rem]',
+    action,
+    change = () => {},
+    filter = () => {},
+    close = () => {},
+    input = () => {},
+    class: className = '',
+    ...rest
+  }: Props = $props();
 
-  export let numberOfItemsSelectedLabel = (count: number) =>
-    `${count} option${count > 1 ? 's' : ''} selected`;
-
-  let displayValue: string = '';
+  let displayValue: string = $state('');
   // Filter value and display value are close but different in a few cases
   // primary difference is when opening a select box display value is filled
   // and filter value should be blank
-  let filterValue: string = '';
-  let selectedOption: string | T;
-  let menuElement: HTMLUListElement;
-  let inputElement: HTMLInputElement;
-
-  export let open = writable<boolean>(false);
-  export let maxMenuHeight: string = 'max-h-[20rem]';
+  let filterValue: string = $state('');
+  let selectedOption: string | T = $state();
+  let menuElement: HTMLUListElement = $state();
+  let inputElement: HTMLInputElement = $state();
 
   // We need this piece of code to focus the element when externally modifying the
   // open store. Specifically we use this behaviour in bottom nav to focus the combobox
   // after the bottom nav is clicked
-  $: {
+  $effect(() => {
     if ($open && inputElement && document.activeElement !== inputElement) {
       inputElement.focus();
       inputElement.select();
     }
-  }
+  });
 
   // We want this to react to external changes to the options prop to support async use cases
-  $: list = filterOptions(filterValue, options);
+  let list = $derived(filterOptions(filterValue, options));
 
-  $: {
+  $effect(() => {
     if (inputElement && displayValue) {
       if (displayValue.length < minSize) {
         inputElement.size = minSize;
@@ -160,23 +170,10 @@
         inputElement.size = displayValue.length;
       }
     }
-  }
+  });
 
-  $: if (!multiselect) {
-    selectedOption = options.find((option) => {
-      if (isStringOption(option)) {
-        return option === value;
-      }
-
-      if (isObjectOption(option) && canRenderCustomOption(option)) {
-        return option[optionValueKey] === value;
-      }
-    });
-
-    displayValue = getDisplayValue(selectedOption);
-  }
-
-  const openList = () => {
+  const openList = (event?: FocusEvent) => {
+    event?.stopPropagation();
     $open = true;
     filterValue = '';
     inputElement.focus();
@@ -186,18 +183,18 @@
   const closeList = () => {
     if (!$open) return;
     $open = false;
-    dispatch('close', { selectedOption });
+    close({ selectedOption });
     resetValueAndOptions();
   };
 
   const handleMenuClose = () => {
-    dispatch('close', { selectedOption });
+    close({ selectedOption });
     resetValueAndOptions();
   };
 
   const resetValueAndOptions = () => {
     displayValue = getDisplayValue(selectedOption);
-    list = options;
+    filterValue = displayValue;
   };
 
   const isArrayValue = (value: string | string[]): value is string[] => {
@@ -242,6 +239,22 @@
     }
   };
 
+  $effect(() => {
+    if (!multiselect) {
+      selectedOption = options.find((option) => {
+        if (isStringOption(option)) {
+          return option === value;
+        }
+
+        if (isObjectOption(option) && canRenderCustomOption(option)) {
+          return option[optionValueKey] === value;
+        }
+      });
+
+      displayValue = getDisplayValue(selectedOption);
+    }
+  });
+
   /**
    * Given an option that could be an object of type T set internal value in the component to string/string[]
    * or cast it to a string
@@ -276,7 +289,7 @@
 
   const handleSelectOption = (option: string | T) => {
     setValue(option);
-    dispatch('change', { value: option });
+    change({ value: option });
     if (!multiselect) {
       resetValueAndOptions();
     }
@@ -315,6 +328,7 @@
   };
 
   const handleInputKeydown = (event: KeyboardEvent) => {
+    event.stopPropagation();
     switch (event.key) {
       case 'Escape':
         closeList();
@@ -337,15 +351,16 @@
   };
 
   const handleInput = (event: ExtendedInputEvent) => {
+    event.stopPropagation();
     if (!$open) $open = true;
     // Reactive statement at top makes this work, not my favorite tho
     displayValue = event.currentTarget.value;
     filterValue = displayValue;
-    dispatch('input', displayValue);
+    input(displayValue);
   };
 
   function filterOptions(value: string, options: (T | string)[]) {
-    dispatch('filter', displayValue);
+    filter(displayValue);
 
     return options.filter((option) => {
       if (isStringOption(option)) {
@@ -360,7 +375,8 @@
     });
   }
 
-  const handleInputClick = () => {
+  const handleInputClick = (event: MouseEvent) => {
+    event.stopPropagation();
     if (!$open) openList();
   };
 
@@ -379,7 +395,7 @@
   };
 </script>
 
-<MenuContainer {open} on:close={handleMenuClose}>
+<MenuContainer {open} close={handleMenuClose}>
   <Label class="pb-1" hidden={labelHidden} {required} {label} for={id} />
 
   <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
@@ -395,7 +411,7 @@
         {#if displayChips}
           {#each value.slice(0, chipLimit) as v}
             <Chip
-              on:remove={() => removeOption(v)}
+              remove={() => removeOption(v)}
               removeButtonLabel={removeChipLabel}>{v}</Chip
             >
           {/each}
@@ -426,23 +442,23 @@
         aria-expanded={$open}
         aria-required={required}
         aria-autocomplete="list"
-        on:focus|stopPropagation={openList}
-        on:input|stopPropagation={handleInput}
-        on:keydown|stopPropagation={handleInputKeydown}
-        on:click|stopPropagation={handleInputClick}
-        data-testid={$$props['data-testid'] ?? id}
+        onfocus={openList}
+        oninput={handleInput}
+        onkeydown={handleInputKeydown}
+        onclick={handleInputClick}
+        data-testid={rest['data-testid'] ?? id}
         bind:this={inputElement}
-        {...$$restProps}
+        {...rest}
       />
     </div>
-    {#if $$slots.action}
+    {#if action}
       <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
         {#if actionTooltip}
           <Tooltip text={actionTooltip} right>
-            <slot name="action" />
+            {@render action()}
           </Tooltip>
         {:else}
-          <slot name="action" />
+          {@render action()}
         {/if}
       </div>
     {:else if href}
@@ -481,12 +497,12 @@
     {#if multiselect && isArrayValue(value)}
       <ComboboxOption
         disabled={value.length === options.length}
-        on:click={selectAll}
+        onclick={selectAll}
         label={selectAllLabel}
       />
       <ComboboxOption
         disabled={value.length === 0}
-        on:click={deselectAll}
+        onclick={deselectAll}
         label={deselectAllLabel}
       />
       <MenuDivider />
@@ -495,7 +511,7 @@
     {#each list as option}
       <ComboboxOption
         {multiselect}
-        on:click={() => handleSelectOption(option)}
+        onclick={() => handleSelectOption(option)}
         selected={isSelected(option, value)}
         label={getDisplayValue(option)}
       />
@@ -507,7 +523,9 @@
 
     {#if loading}
       <ComboboxOption disabled label={loadingText}>
-        <Icon slot="leading" name="spinner" class="animate-spin" />
+        {#snippet leading()}
+          <Icon name="spinner" class="animate-spin" />
+        {/snippet}
       </ComboboxOption>
     {/if}
   </Menu>

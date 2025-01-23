@@ -1,13 +1,13 @@
 <script lang="ts">
-  import type { HTMLAttributes } from 'svelte/elements';
   import { slide } from 'svelte/transition';
 
+  import type { Snippet } from 'svelte';
   import { v4 } from 'uuid';
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+  interface Props {
     id?: string;
     icon?: IconName;
     open?: boolean;
@@ -15,11 +15,26 @@
     error?: string;
     onToggle?: () => void;
     'data-testid'?: string;
+    title?: Snippet;
+    description?: Snippet;
+    action?: Snippet;
+    children?: Snippet<[{ open: boolean }]>;
+    onclick?: (e: MouseEvent) => void;
+    onkeyup?: (e: KeyboardEvent) => void;
   }
 
-  export let id: string = v4();
-  export let open = false;
-  export let onToggle = () => {};
+  let {
+    id = v4(),
+    open = $bindable(false),
+    onToggle = () => {},
+    title,
+    description,
+    action,
+    children,
+    onclick = () => {},
+    onkeyup = () => {},
+    ...rest
+  }: Props = $props();
 
   const toggleAccordion = () => {
     open = !open;
@@ -27,25 +42,31 @@
   };
 </script>
 
-<div class="w-full" {...$$restProps}>
+<div class="w-full" {...rest}>
   <button
     id="{id}-trigger"
     aria-expanded={open}
     aria-controls="{id}-content"
     class="focus-visible:outline-interactive w-full cursor-pointer hover:bg-interactive-secondary-hover"
     type="button"
-    on:click={toggleAccordion}
+    onclick={toggleAccordion}
   >
     <div class="flex w-full flex-row items-center justify-between gap-2">
-      <slot name="title" />
-      <slot name="description" />
+      {@render title?.()}
+      {@render description?.()}
       <div
         class="flex flex-row items-center gap-2 pr-2"
-        on:click|stopPropagation
-        on:keyup|stopPropagation
+        onclick={(e: MouseEvent) => {
+          e.stopPropagation();
+          onclick(e);
+        }}
+        onkeyup={(e: KeyboardEvent) => {
+          e.stopPropagation();
+          onkeyup(e);
+        }}
         role="none"
       >
-        <slot name="action" />
+        {@render action?.()}
         <Icon class="m-2" name={open ? 'arrow-down' : 'arrow-right'} />
       </div>
     </div>
@@ -58,6 +79,6 @@
     class:hidden={!open}
     transition:slide
   >
-    <slot {open} />
+    {@render children?.({ open })}
   </div>
 </div>

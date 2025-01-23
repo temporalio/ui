@@ -5,22 +5,44 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
 
-  export let icon: IconName = null;
-  export let id: string;
-  export let value: number;
-  export let label: string;
-  export let labelHidden = false;
-  export let units = '';
-  export let placeholder = '';
-  export let name = id;
-  export let disabled = false;
-  export let required = false;
-  export let hintText = '';
-  export let max: number = undefined;
-  export let min: number = undefined;
-  export let search = false;
+  interface Props {
+    icon?: IconName;
+    id: string;
+    value: number;
+    label: string;
+    labelHidden?: boolean;
+    units?: string;
+    placeholder?: string;
+    name?: string;
+    disabled?: boolean;
+    required?: boolean;
+    hintText?: string;
+    max?: number;
+    min?: number;
+    search?: boolean;
+    class?: string;
+  }
 
-  let valid = true;
+  let {
+    icon = null,
+    id,
+    value,
+    label,
+    labelHidden = false,
+    units = '',
+    placeholder = '',
+    name = id,
+    disabled = false,
+    required = false,
+    hintText = '',
+    max,
+    min,
+    search = false,
+    class: className = '',
+    ...rest
+  }: Props = $props();
+
+  let valid = $state(true);
 
   const validate = (val: number) => {
     if ((min !== undefined && val < min) || (max !== undefined && val > max)) {
@@ -30,12 +52,12 @@
     }
   };
 
-  $: {
+  $effect(() => {
     validate(value);
-  }
+  });
 </script>
 
-<div class={merge('flex flex-col gap-1', $$props.class)}>
+<div class={merge('flex flex-col gap-1', className)}>
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="flex items-center gap-2">
     <div
@@ -63,11 +85,7 @@
         autocomplete="off"
         spellcheck="false"
         bind:value
-        on:input
-        on:change
-        on:focus
-        on:blur
-        on:keydown
+        {...rest}
       />
     </div>
     <div class="units">{units}</div>

@@ -1,7 +1,5 @@
 <script lang="ts">
-  import type { HTMLAttributes } from 'svelte/elements';
-
-  import { onMount } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
 
   import { page } from '$app/stores';
 
@@ -19,7 +17,8 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   type T = $$Generic;
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+
+  interface Props {
     items: T[];
     floatId?: string | undefined;
     startingIndex?: string | number;
@@ -29,26 +28,53 @@
     pageSizeSelectLabel: string;
     previousButtonLabel: string;
     nextButtonLabel: string;
+    pagination_top?: Snippet;
+    action_top_right?: Snippet;
+    action_top_left?: Snippet;
+    action_top_center?: Snippet;
+    action_bottom_left?: Snippet;
+    action_bottom_right?: Snippet;
+    children: Snippet<
+      [
+        {
+          visibleItems: T[];
+          initialItem: T;
+          activeRowIndex: number;
+          setActiveRowIndex: (index: number | undefined) => void;
+        },
+      ]
+    >;
   }
 
-  export let items: T[];
-  export let floatId: string | undefined = undefined;
-  export let startingIndex: string | number = 0;
-  export let currentPageKey = 'page';
-  export let itemsPerPage: number | null = null;
-  export let updating = false;
-  export let pageSizeSelectLabel: string;
-  export let previousButtonLabel: string;
-  export let nextButtonLabel: string;
+  let {
+    items,
+    floatId,
+    startingIndex = 0,
+    currentPageKey = 'page',
+    itemsPerPage = null,
+    updating = false,
+    pageSizeSelectLabel,
+    previousButtonLabel,
+    nextButtonLabel,
+    pagination_top,
+    action_top_right,
+    action_top_left,
+    action_top_center,
+    action_bottom_left,
+    action_bottom_right,
+    children,
+    ...rest
+  }: Props = $props();
 
-  $: perPage =
+  let perPage = $derived(
     itemsPerPage !== null
       ? String(itemsPerPage)
       : String(
           perPageFromSearchParameter($page.url.searchParams.get(perPageKey)),
-        ).toString();
+        ).toString(),
+  );
 
-  $: {
+  $effect(() => {
     if (parseInt(perPage, 10) > parseInt(MAX_PAGE_SIZE, 10)) {
       updateQueryParameters({
         parameter: perPageKey,
@@ -62,15 +88,20 @@
         url: $page.url,
       });
     }
-  }
-  $: store = pagination(items, perPage, startingIndex);
-  $: currentPage =
-    $page.url.searchParams.get(currentPageKey) ?? $store.currentPage;
-  $: store.jumpToPage(currentPage);
+  });
 
-  let screenWidth: number;
-  let width: number | undefined;
-  let height: number | undefined;
+  let store = $derived(pagination(items, perPage, startingIndex));
+  let currentPage = $derived(
+    $page.url.searchParams.get(currentPageKey) ?? $store.currentPage,
+  );
+
+  $effect(() => {
+    store.jumpToPage(currentPage);
+  });
+
+  let screenWidth: number = $state();
+  let width: number | undefined = $state();
+  let height: number | undefined = $state();
 
   onMount(() => {
     updateWidth();
@@ -94,7 +125,7 @@
     }
   };
 
-  $: floatStyle = getFloatStyle({ width, height, screenWidth });
+  let floatStyle = $derived(getFloatStyle({ width, height, screenWidth }));
 
   async function handleKeydown(event: KeyboardEvent) {
     switch (event.code) {
@@ -128,8 +159,8 @@
 
 <svelte:window
   bind:innerWidth={screenWidth}
-  on:resize={updateWidth}
-  on:keydown={handleKeydown}
+  onresize={updateWidth}
+  onkeydown={handleKeydown}
 />
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
@@ -137,15 +168,15 @@
     class="flex flex-col items-center justify-between gap-2 md:flex-row md:items-start"
   >
     <div class="w-full">
-      <slot name="action-top-left" />
+      {@render action_top_left?.()}
     </div>
     <nav
       style={floatStyle}
       bind:clientHeight={height}
       class="flex min-w-fit flex-col items-end gap-4 md:flex-row"
-      aria-label="{$$restProps['aria-label']} 1"
+      aria-label="{rest['aria-label']} 1"
     >
-      <slot name="action-top-center" />
+      {@render action_top_center?.()}
       <div class="flex gap-4">
         {#if !itemsPerPage}
           <FilterSelect
@@ -156,12 +187,14 @@
             position="top"
           />
         {/if}
-        <slot name="pagination-top">
+        {#if pagination_top}
+          {@render pagination_top()}
+        {:else}
           <div class="flex items-center justify-center gap-3">
             <button
               class="caret"
               disabled={!$store.hasPrevious}
-              on:click={() => {
+              onclick={() => {
                 store.previous();
                 handlePageChange();
               }}
@@ -181,7 +214,7 @@
             <button
               class="caret"
               disabled={!$store.hasNext}
-              on:click={() => {
+              onclick={() => {
                 store.next();
                 handlePageChange();
               }}
@@ -190,24 +223,23 @@
               <span class="arrow arrow-right"></span>
             </button>
           </div>
-        </slot>
+        {/if}
       </div>
-      <slot name="action-top-right" />
+      {@render action_top_right?.()}
     </nav>
   </div>
-  <slot
-    visibleItems={$store.items}
-    initialItem={$store.initialItem}
-    activeRowIndex={$store.activeRowIndex}
-    setActiveRowIndex={store.setActiveRowIndex}
-  />
+
+  {@render children?.({
+    visibleItems: $store.items,
+    initialItem: $store.initialItem,
+    activeRowIndex: $store.activeRowIndex,
+    setActiveRowIndex: store.setActiveRowIndex,
+  })}
   <nav
-    class={`flex ${
-      $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
-    }`}
-    aria-label="{$$restProps['aria-label']} 2"
+    class={`flex ${action_bottom_left ? 'justify-between' : 'justify-end'}`}
+    aria-label="{rest['aria-label']} 2"
   >
-    <slot name="action-bottom-left" />
+    {@render action_bottom_left?.()}
     <div class="flex gap-4">
       {#if !itemsPerPage}
         <FilterSelect
@@ -222,7 +254,7 @@
         <button
           class="caret"
           disabled={!$store.hasPrevious}
-          on:click={() => {
+          onclick={() => {
             store.previous();
             handlePageChange();
           }}
@@ -241,7 +273,7 @@
         <button
           class="caret"
           disabled={!$store.hasNext}
-          on:click={() => {
+          onclick={() => {
             store.next();
             handlePageChange();
           }}
@@ -250,7 +282,7 @@
           <span class="arrow arrow-right"></span>
         </button>
       </div>
-      <slot name="action-bottom-right" />
+      {@render action_bottom_right?.()}
     </div>
   </nav>
 </div>

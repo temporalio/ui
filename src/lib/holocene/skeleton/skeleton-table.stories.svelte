@@ -1,9 +1,13 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import SkeletonTable from './table.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Skeleton Table',
     component: SkeletonTable,
     args: {
@@ -14,24 +18,24 @@
       rows: { name: 'Rows', control: 'number' },
       columns: { name: 'Columns', control: 'number' },
     },
-  } satisfies Meta<SkeletonTable>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args>
+{#snippet template(args: Args<typeof Story>)}
   {@const columnWidths = Array.from(new Array(args.columns)).fill(
     100 / args.columns,
   )}
   <SkeletonTable {columnWidths} {...args}>
-    <svelte:fragment slot="headers">
+    {#snippet headers()}
       {#each Array(args.columns) as _, index}
         <th>Heading {index + 1}</th>
       {/each}
-    </svelte:fragment>
+    {/snippet}
   </SkeletonTable>
-</Template>
+{/snippet}
 
 <Story name="Default" args={{ rows: 10, columns: 4 }} />

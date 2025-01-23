@@ -1,11 +1,15 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import { iconNames } from './';
 
   import Icon from './icon.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Icon',
     component: Icon,
     args: {
@@ -22,15 +26,15 @@
       height: { name: 'Height', control: 'number' },
       width: { name: 'Width', control: 'number' },
     },
-  } satisfies Meta<Icon>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args>
-  <Icon {...args} />
-</Template>
+{#snippet template({ name, ...args }: Args<typeof Story>)}
+  <Icon {name} {...args} />
+{/snippet}
 
 <Story name="Default" args={{ name: 'add', height: 24, width: 24 }} />

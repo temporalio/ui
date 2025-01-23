@@ -2,29 +2,35 @@
   import type { HTMLAttributes } from 'svelte/elements';
   import { fly } from 'svelte/transition';
 
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { getFocusableElements } from '$lib/utilities/focus-trap';
 
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
-  interface $$Props extends HTMLAttributes<HTMLUListElement> {
+  interface Props extends HTMLAttributes<HTMLUListElement> {
     id: string;
     keepOpen?: boolean;
     position?: 'left' | 'right' | 'top-left' | 'top-right';
     menuElement?: HTMLUListElement;
     maxHeight?: string;
+    class?: string;
+    children?: Snippet;
+    onclick?: (e: MouseEvent) => void;
   }
 
-  let className = '';
-  let height = 0;
-  export { className as class };
-  export let id: string;
-  export let keepOpen = false;
-  export let position: 'left' | 'right' | 'top-left' | 'top-right' = 'left';
-  export let menuElement: HTMLUListElement = null;
-  export let maxHeight: string = 'max-h-[20rem]';
+  let {
+    id,
+    keepOpen = false,
+    position = 'left',
+    menuElement = $bindable(),
+    maxHeight = 'max-h-[20rem]',
+    class: className = '',
+    children,
+    onclick = () => {},
+    ...rest
+  }: Props = $props();
 
   const {
     keepOpen: keepOpenCtx,
@@ -32,11 +38,19 @@
     open,
   } = getContext<MenuContext>(MENU_CONTEXT);
 
-  $: $keepOpenCtx = keepOpen;
-  $: $menuElementCtx = menuElement;
+  $effect(() => {
+    $keepOpenCtx = keepOpen;
+  });
 
-  $: menuItems = menuElement ? getFocusableElements(menuElement) : [];
-  $: lastMenuItem = menuItems[menuItems.length - 1];
+  $effect(() => {
+    $menuElementCtx = menuElement;
+  });
+
+  let height = $state(0);
+  let menuItems = $derived(
+    menuElement ? getFocusableElements(menuElement) : [],
+  );
+  let lastMenuItem = $derived(menuItems[menuItems.length - 1]);
 
   const handleFocusOut = (e: FocusEvent) => {
     if (!$keepOpenCtx && e.target === lastMenuItem) $open = false;
@@ -56,11 +70,14 @@
   {id}
   bind:this={menuElement}
   bind:clientHeight={height}
-  on:focusout={handleFocusOut}
-  on:click|stopPropagation
-  {...$$restProps}
+  onfocusout={handleFocusOut}
+  onclick={(e: MouseEvent) => {
+    e.stopPropagation();
+    onclick(e);
+  }}
+  {...rest}
 >
-  <slot />
+  {@render children?.()}
 </ul>
 
 <style lang="postcss">

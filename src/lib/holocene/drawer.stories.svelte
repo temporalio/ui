@@ -1,15 +1,18 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import Drawer from './drawer.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Drawer',
     component: Drawer,
     args: {
       open: true,
       position: 'bottom',
-      title: 'Drawer',
       dark: true,
       closeButtonLabel: 'Close',
       closePadding: true,
@@ -20,7 +23,6 @@
         control: 'radio',
         options: ['bottom', 'right'],
       },
-      title: { name: 'Title', control: 'text' },
       dark: { name: 'Dark', control: 'boolean' },
       onClick: { control: false, table: { disable: true } },
       closePadding: { control: 'boolean', table: { disable: true } },
@@ -34,19 +36,20 @@
 
       open: { table: { disable: true } },
     },
-  } satisfies Meta<Drawer['$$prop_def'] & { title: string }>;
+  });
 </script>
 
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
   import { twMerge as merge } from 'tailwind-merge';
 
   import DrawerContent from './drawer-content.svelte';
+
+  setTemplate(template);
 </script>
 
-<Template let:args>
-  <Drawer {...args} onClick={action('click')}>
+{#snippet template({ closeButtonLabel, ...args }: Args<typeof Story>)}
+  <Drawer {closeButtonLabel} {...args} onClick={action('click')}>
     <DrawerContent title="Drawer Title">
       <p class={merge(args.position === 'right' && 'max-w-80')}>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.
@@ -65,7 +68,7 @@
       </p>
     </DrawerContent>
   </Drawer>
-</Template>
+{/snippet}
 
 <Story name="Bottom" />
 

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { run } from 'svelte/legacy';
+
+  import type { Snippet } from 'svelte';
 
   import { page } from '$app/stores';
 
@@ -21,7 +22,7 @@
 
   type Item = $$Generic;
 
-  type $$Props = HTMLAttributes<HTMLTableElement> & {
+  interface Props extends HTMLAttributes<HTMLTableElement> {
     id?: string;
     items: Item[];
     variant?: 'primary' | 'split';
@@ -33,7 +34,10 @@
     maxHeight?: string;
     pageSizeOptions?: string[];
     fixed?: boolean;
-  };
+    caption?: Snippet;
+    headers?: Snippet;
+    empty?: Snippet;
+  }
 
   let {
     id,
@@ -47,8 +51,12 @@
     maxHeight = '',
     pageSizeOptions = options,
     fixed = false,
+    caption,
+    children,
+    headers,
+    empty,
     ...rest
-  }: $$Props = $props();
+  }: Props = $props();
 
   let url = $derived($page.url);
   let perPageParam = $derived(
@@ -58,7 +66,7 @@
   let store = $derived(pagination(items, perPageParam, currentPageParam));
 
   // keep the 'page-size' url search param within the supported options
-  run(() => {
+  $effect(() => {
     if (parseInt(perPageParam, 10) > parseInt(MAX_PAGE_SIZE, 10)) {
       updateQueryParameters({
         parameter: perPageKey,
@@ -75,7 +83,7 @@
   });
 
   // Keep the 'page' url search param within 1 and the total number of pages
-  run(() => {
+  $effect(() => {
     if (
       $store.totalPages &&
       parseInt(currentPageParam, 10) > $store.totalPages
@@ -105,7 +113,7 @@
     });
   };
 
-  run(() => {
+  $effect(() => {
     if (currentPageParam) store.jumpToPage(currentPageParam);
     if (perPageParam) store.adjustPageSize(perPageParam);
   });
@@ -118,56 +126,58 @@
   visibleItems={$store.items}
   {fixed}
   {id}
+  {caption}
+  {headers}
+  {empty}
 >
-  <slot name="caption" slot="caption" />
-  <slot name="headers" slot="headers" visibleItems={$store.items} />
-  <slot visibleItems={$store.items} />
+  {@render children?.()}
 
-  <svelte:fragment slot="actions-start">
+  {#snippet actionsStart()}
     <FilterSelect
       label={perPageLabel}
       parameter={perPageKey}
       value={perPageParam}
       options={pageSizeOptions}
     />
-  </svelte:fragment>
+  {/snippet}
 
-  <div class="flex items-center gap-2" slot="actions-center">
-    {#each $store.pageShortcuts as page}
-      {#if isNaN(page)}
-        <span class="text-primary">...</span>
-      {:else}
-        <Button
-          variant="ghost"
-          size="sm"
-          class={page === $store.currentPage
-            ? 'bg-interactive-secondary-active'
-            : ''}
-          aria-label={pageButtonLabel(page)}
-          on:click={() => handlePageChange(page)}>{page}</Button
-        >
-      {/if}
-    {/each}
-  </div>
+  {#snippet actionsCenter()}
+    <div class="flex items-center gap-2">
+      {#each $store.pageShortcuts as page}
+        {#if isNaN(page)}
+          <span class="text-primary">...</span>
+        {:else}
+          <Button
+            variant="ghost"
+            size="sm"
+            class={page === $store.currentPage
+              ? 'bg-interactive-secondary-active'
+              : ''}
+            aria-label={pageButtonLabel(page)}
+            onclick={() => handlePageChange(page)}>{page}</Button
+          >
+        {/if}
+      {/each}
+    </div>
+  {/snippet}
 
-  <nav
-    class="flex shrink-0 items-center gap-2"
-    aria-label={rest['aria-label']}
-    slot="actions-end"
-  >
-    <IconButton
-      label={previousPageButtonLabel}
-      disabled={!$store.hasPrevious}
-      icon="arrow-left"
-      on:click={() => handlePageChange($store.currentPage - 1)}
-    />
-    <IconButton
-      label={nextPageButtonLabel}
-      disabled={!$store.hasNext}
-      on:click={() => handlePageChange($store.currentPage + 1)}
-      icon="arrow-right"
-    />
-  </nav>
-
-  <slot name="empty" slot="empty" {updating} />
+  {#snippet actionsEnd()}
+    <nav
+      class="flex shrink-0 items-center gap-2"
+      aria-label={rest['aria-label']}
+    >
+      <IconButton
+        label={previousPageButtonLabel}
+        disabled={!$store.hasPrevious}
+        icon="arrow-left"
+        onclick={() => handlePageChange($store.currentPage - 1)}
+      />
+      <IconButton
+        label={nextPageButtonLabel}
+        disabled={!$store.hasNext}
+        onclick={() => handlePageChange($store.currentPage + 1)}
+        icon="arrow-right"
+      />
+    </nav>
+  {/snippet}
 </PaginatedTable>

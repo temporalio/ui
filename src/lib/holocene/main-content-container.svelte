@@ -1,10 +1,12 @@
-<script context="module">
+<script module>
   import { writable } from 'svelte/store';
 
   export const scrollTop = writable(0);
 </script>
 
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import {
     clearActives,
     endIndex,
@@ -14,10 +16,17 @@
   import { filteredEventHistory } from '$lib/stores/events';
 
   import ScrollToContainer from './scroll-to-container.svelte';
+  interface Props {
+    children?: Snippet;
+    main?: Snippet;
+    footer?: Snippet;
+  }
 
-  let scrollToTopHidden = true;
-  let scrollToBottomHidden = false;
-  let showScrollToTopOn = 150; // pixels
+  let { children, main, footer }: Props = $props();
+
+  let scrollToTopHidden = $state(true);
+  const scrollToBottomHidden = false;
+  const showScrollToTopOn = 150; // pixels
 
   function getScrollContainer(): HTMLElement | null {
     return document.getElementById('content-wrapper');
@@ -49,13 +58,13 @@
 <div
   id="content-wrapper"
   class="relative h-screen w-max flex-auto overflow-auto"
-  on:scroll={handleOnScroll}
+  onscroll={handleOnScroll}
 >
-  <slot />
+  {@render children?.()}
   <main id="content" class="pb-16 md:pb-0">
-    <slot name="main" />
+    {@render main?.()}
   </main>
-  <slot name="footer" />
+  {@render footer?.()}
   <ScrollToContainer
     {scrollToTopHidden}
     {scrollToBottomHidden}

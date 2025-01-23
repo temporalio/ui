@@ -1,32 +1,53 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import Button from './button.svelte';
   import Tooltip from './tooltip.svelte';
 
-  export let containerHeight = 600;
-  export let initialZoom = 1;
-  export let maxZoomIn = 0.25;
-  export let maxZoomOut = 2.5;
-  export let width = 600;
-  export let height = 400;
-  export let zoomable = true;
-  export let pannable = true;
+  interface Props {
+    containerHeight?: number;
+    initialZoom?: number;
+    maxZoomIn?: number;
+    maxZoomOut?: number;
+    width?: number;
+    height?: number;
+    zoomable?: boolean;
+    pannable?: boolean;
+    class?: string;
+    controls?: Snippet;
+    children?: Snippet<[{ width: number; height: number; zoomLevel: number }]>;
+  }
 
-  let zoomLevel = initialZoom;
+  let {
+    containerHeight = 600,
+    initialZoom = 1,
+    maxZoomIn = 0.25,
+    maxZoomOut = 2.5,
+    width = 600,
+    height = 400,
+    zoomable = true,
+    pannable = true,
+    class: className = '',
+    controls,
+    children,
+  }: Props = $props();
 
-  let svg;
+  let zoomLevel = $state(initialZoom);
 
-  $: viewBox = {
+  let svg: SVGElement = $state();
+
+  let viewBox = $derived({
     x: 0,
     y: 0,
     width,
     height,
-  };
+  });
 
-  let isPanning = false;
-  let startX = 0;
-  let startY = 0;
-  let panOffsetX = 0;
-  let panOffsetY = 0;
+  let isPanning = $state(false);
+  let startX = $state(0);
+  let startY = $state(0);
+  let panOffsetX = $state(0);
+  let panOffsetY = $state(0);
 
   const handleWheel = (event: WheelEvent) => {
     if (!zoomable) return;
@@ -96,14 +117,14 @@
   style="height: {containerHeight}px"
 >
   <div class="absolute right-4 top-4 z-20 flex items-center gap-2">
-    <slot name="controls" />
+    {@render controls?.()}
     <Tooltip text="Center" bottom>
       <Button
         class="cursor-pointer"
         variant="secondary"
         size="sm"
         leadingIcon="target"
-        on:click={() => {
+        onclick={() => {
           onCenter();
         }}
       />
@@ -115,15 +136,15 @@
     viewBox="{viewBox.x} {viewBox.y} {viewBox.width} {viewBox.height}"
     {width}
     {height}
-    class="relative select-none {$$restProps.class}"
+    class="relative select-none {className}"
     class:cursor-grab={pannable}
     class:active:cursor-grabbing={pannable}
-    on:wheel={handleWheel}
-    on:mousedown={handleMouseDown}
-    on:mousemove={handleMouseMove}
-    on:mouseup={handleMouseUp}
-    on:mouseleave={handleMouseLeave}
+    onwheel={handleWheel}
+    onmousedown={handleMouseDown}
+    onmousemove={handleMouseMove}
+    onmouseup={handleMouseUp}
+    onmouseleave={handleMouseLeave}
   >
-    <slot {width} {height} {zoomLevel} />
+    {@render children?.({ width, height, zoomLevel })}
   </svg>
 </div>

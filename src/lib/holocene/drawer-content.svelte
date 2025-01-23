@@ -1,22 +1,28 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
 
-  export let title: string = '';
+  interface Props {
+    title?: string;
+    subtitle?: Snippet;
+    children?: Snippet;
+  }
 
-  let position = getContext('drawer-pos');
+  let { title = '', subtitle, children }: Props = $props();
+
+  const position = getContext('drawer-pos');
 </script>
 
 <div class="title-wrapper {position}">
   <h2>{title}</h2>
-  {#if $$slots['subtitle']}
+  {#if subtitle}
     <p class="text-xs font-normal">
-      <slot name="subtitle" />
+      {@render subtitle()}
     </p>
   {/if}
 </div>
 
 <div class="content {position}">
-  <slot />
+  {@render children?.()}
 </div>
 
 <style lang="postcss">

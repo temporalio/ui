@@ -3,20 +3,33 @@
 
   import Icon from '../icon/icon.svelte';
 
-  export let onClick: () => void = () => {};
-  export let label: string;
-  export let icon: IconName | undefined = undefined;
-  export let tooltip = label;
-  export let animate = false;
-  export let disabled = false;
+  interface Props {
+    onClick?: () => void;
+    label: string;
+    icon?: IconName;
+    tooltip?: string;
+    animate?: boolean;
+    disabled?: boolean;
+    'data-testid'?: string;
+  }
+
+  let {
+    onClick = () => {},
+    label,
+    icon,
+    tooltip = label,
+    animate = false,
+    disabled = false,
+    ...rest
+  }: Props = $props();
 </script>
 
 <div
   role="button"
-  on:click={onClick}
-  on:keypress={onClick}
+  onclick={onClick}
+  onkeypress={onClick}
   tabindex="0"
-  data-testid={$$props['data-testid']}
+  data-testid={rest['data-testid']}
   class:disabled
   class="relative mb-1 flex items-center whitespace-nowrap p-1 pl-2 text-sm font-medium hover:bg-white hover:text-black group-[.surface-primary]:hover:bg-black group-[.surface-primary]:hover:text-white group-[.surface-primary]:dark:hover:bg-white group-[.surface-primary]:dark:hover:text-black"
 >

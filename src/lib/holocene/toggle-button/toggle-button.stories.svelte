@@ -1,5 +1,9 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
   import { expect, userEvent, within } from '@storybook/test';
 
   import { iconNames } from '$lib/holocene/icon';
@@ -7,10 +11,9 @@
   import ToggleButton from './toggle-button.svelte';
   import ToggleButtons from './toggle-buttons.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Toggle Button',
     component: ToggleButton,
-    subcomponents: { ToggleButtons },
     argTypes: {
       icon: { name: 'Icon', control: 'select', options: iconNames },
       group: { table: { disable: true } },
@@ -18,14 +21,15 @@
       href: { table: { disable: true } },
       active: { table: { disable: true } },
     },
-  } satisfies Meta<ToggleButton>;
+  });
 </script>
 
 <script lang="ts">
   import { get, writable } from 'svelte/store';
 
   import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+
+  setTemplate(template);
 
   const selected = writable(0);
   const select = (index: number) => {
@@ -33,7 +37,7 @@
     action('select')(index);
   };
 
-  const play: Story['play'] = async ({ canvasElement, step }) => {
+  const play = async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
     selected.set(0);
@@ -65,19 +69,19 @@
   };
 </script>
 
-<Template let:args>
+{#snippet template(args: Args<typeof Story>)}
   <ToggleButtons>
     {#each ['John', 'Paul', 'George', 'Ringo'] as name, index}
       <ToggleButton
         {...args}
         data-testid={`toggle-button-${index}`}
         active={$selected === index}
-        on:click={() => select(index)}
+        onclick={() => select(index)}
       >
         {name}
       </ToggleButton>
     {/each}
   </ToggleButtons>
-</Template>
+{/snippet}
 
 <Story name="Default" {play} />

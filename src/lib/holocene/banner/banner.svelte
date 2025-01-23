@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { cva, type VariantProps } from 'class-variance-authority';
 
   import { persistStore } from '$lib/stores/persist-store';
@@ -55,19 +55,22 @@
     dismissLabel: string;
   };
 
-  type $$Props = BaseProps | DismissibleBanner;
+  type Props =
+    | (BaseProps & { dismissable?: false; dismissLabel?: '' })
+    | DismissibleBanner;
 
-  export let id: string;
-  export let message: string;
-  export let dismissLabel: string = '';
-  export let dismissable = false;
-  export let icon: IconName = null;
-  export let type: BannerType = 'default';
+  let {
+    id,
+    message,
+    dismissLabel = '',
+    dismissable = false,
+    icon = null,
+    type = 'default',
+    class: className = '',
+    ...rest
+  }: Props = $props();
 
-  let className = '';
-  export { className as class };
-
-  $: show = message && !$dismissedBanners[id];
+  let show = $derived(message && !$dismissedBanners[id]);
 
   const dismissBanner = () => {
     $dismissedBanners[id] = true;
@@ -75,7 +78,7 @@
 </script>
 
 {#if show}
-  <section class={merge(types({ type }), className)} {...$$restProps}>
+  <section class={merge(types({ type }), className)} {...rest}>
     <span class="flex items-center gap-2">
       {#if icon}
         <Icon name={icon} />
@@ -84,7 +87,7 @@
     </span>
     {#if dismissable}
       <Button
-        on:click={dismissBanner}
+        onclick={dismissBanner}
         leadingIcon="close"
         variant="ghost"
         size="xs"

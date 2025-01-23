@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/stores';
@@ -8,11 +9,18 @@
   import { translate } from '$lib/i18n/translate';
   import { navOpen } from '$lib/stores/nav-open';
 
-  export let isCloud = false;
+  interface Props {
+    isCloud?: boolean;
+    bottom?: Snippet;
+    children?: Snippet;
+    'aria-label'?: string;
+  }
+
+  let { isCloud = false, bottom, children, ...rest }: Props = $props();
 
   const toggle = () => ($navOpen = !$navOpen);
 
-  $: version = $page.data?.settings?.version ?? '';
+  let version = $derived($page.data?.settings?.version ?? '');
 </script>
 
 <nav
@@ -25,7 +33,7 @@
   )}
   data-nav={$navOpen ? 'open' : 'closed'}
   data-testid="navigation-header"
-  {...$$restProps}
+  {...rest}
 >
   <a href="/" class="w-fit">
     <Logo height={24} width={24} class="m-1" />
@@ -35,15 +43,15 @@
     class="mx-[8px] self-start justify-self-end opacity-0 transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180 {isCloud
       ? 'focus-visible:ring-primary/70 focus-visible:dark:ring-success'
       : 'focus-visible:ring-primary/70'}"
-    on:click={toggle}
+    onclick={toggle}
   >
     <Icon name="chevron-right" />
   </button>
   <div role="list">
-    <slot />
+    {@render children?.()}
   </div>
   <div class="self-end">
-    <slot name="bottom" />
+    {@render bottom?.()}
     <div
       class="self-center justify-self-center py-3 text-center text-[0.6rem] text-slate-300"
     >

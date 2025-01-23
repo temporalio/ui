@@ -1,11 +1,16 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+    type StoryContext,
+  } from '@storybook/addon-svelte-csf';
   import { expect, userEvent, waitFor, within } from '@storybook/test';
 
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import { iconNames } from '$lib/holocene/icon';
 
-  export const meta = {
+  const { Story } = defineMeta<typeof Combobox<unknown>>({
     title: 'Combobox',
     component: Combobox,
     args: {
@@ -43,25 +48,31 @@
 
       options: { table: { disable: true } },
     },
-  } satisfies Meta<Combobox<unknown>>;
+  });
 </script>
 
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
 
   import AsyncTest from './async-test.svelte';
+
+  setTemplate(template);
 </script>
 
-<Template let:args let:context>
+{#snippet template(
+  { label, noResultsText, ...args }: Args<typeof Story>,
+  context: StoryContext<typeof Story>,
+)}
   <Combobox
     id={context.id}
     data-testid={context.id}
-    on:change={action('change')}
-    on:filter={action('filter')}
+    change={action('change')}
+    filter={action('filter')}
+    {label}
+    {noResultsText}
     {...args}
   />
-</Template>
+{/snippet}
 
 <Story
   name="String Options"
@@ -180,7 +191,8 @@
       );
     });
   }}
-  let:context
 >
-  <AsyncTest id={context.id}></AsyncTest>
+  {#snippet children(_, context)}
+    <AsyncTest id={context.id}></AsyncTest>
+  {/snippet}
 </Story>

@@ -7,9 +7,8 @@
 
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { run } from 'svelte/legacy';
 
-  import { onMount } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
 
   import Alert from '$lib/holocene/alert.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -26,7 +25,7 @@
   import PaginatedTable from './index.svelte';
 
   type T = $$Generic;
-  type $$Props = HTMLAttributes<HTMLTableElement> & {
+  interface Props extends HTMLAttributes<HTMLTableElement> {
     id?: string;
     maxHeight?: string;
     onError?: (error: Error | unknown) => void | undefined;
@@ -44,7 +43,10 @@
     previousButtonLabel: string;
     nextButtonLabel: string;
     pageSizeOptions?: string[];
-  };
+    header?: Snippet;
+    caption?: Snippet;
+    headers?: Snippet;
+  }
 
   let {
     id,
@@ -64,8 +66,12 @@
     previousButtonLabel,
     nextButtonLabel,
     pageSizeOptions = options,
+    header,
+    caption,
+    headers,
+    children,
     ...rest
-  }: $$Props = $props();
+  }: Props = $props();
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
@@ -85,7 +91,7 @@
     initalDataFetch();
   });
 
-  run(() => {
+  $effect(() => {
     if (pageSizeChange) {
       store.resetPageSize($store.pageSize);
       initalDataFetch();
@@ -172,74 +178,68 @@
   }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} />
 
-<slot name="header" visibleItems={$store.visibleItems} />
+{@render header?.()}
 
 <PaginatedTable
   updating={$store.updating}
   visibleItems={$store.visibleItems}
   {maxHeight}
   {id}
+  {caption}
+  {headers}
 >
-  <slot name="caption" slot="caption" />
-  <slot name="headers" slot="headers" visibleItems={$store.visibleItems} />
+  {@render children?.()}
 
-  <slot visibleItems={$store.visibleItems} />
-
-  <svelte:fragment slot="empty">
+  {#snippet empty()}
     {#if $store.loading}
-      <slot name="loading">
-        <Loading />
-      </slot>
+      <Loading />
     {:else if error}
-      <slot name="error">
-        <EmptyState title={errorTitle}>
-          <Alert intent="error" title={error?.message ?? errorMessage} />
-        </EmptyState>
-      </slot>
+      <EmptyState title={errorTitle}>
+        <Alert intent="error" title={error?.message ?? errorMessage} />
+      </EmptyState>
     {:else}
-      <slot name="empty">
-        <EmptyState title={emptyStateTitle} content={emptyStateMessage} />
-      </slot>
+      <EmptyState title={emptyStateTitle} content={emptyStateMessage} />
     {/if}
-  </svelte:fragment>
+  {/snippet}
 
-  <svelte:fragment slot="actions-start">
+  {#snippet actionsStart()}
     <FilterSelect
       label={pageSizeSelectLabel}
       parameter={$store.key}
       value={String($store.pageSize)}
       options={pageSizeOptions}
     />
-  </svelte:fragment>
+  {/snippet}
 
-  <nav
-    class="flex shrink-0 items-center gap-2"
-    aria-label={rest['aria-label']}
-    slot="actions-end"
-  >
-    <IconButton
-      label={previousButtonLabel}
-      disabled={!$store.hasPrevious}
-      on:click={store.previousPage}
-      icon="arrow-left"
-    />
-    <div class="flex gap-1">
-      <p>
-        {$store.indexStart}–{$store.indexEnd}
-      </p>
-      {#if total}
+  {#snippet actionsEnd()}
+    <nav
+      class="flex shrink-0 items-center gap-2"
+      aria-label={rest['aria-label']}
+    >
+      <IconButton
+        label={previousButtonLabel}
+        disabled={!$store.hasPrevious}
+        onclick={store.previousPage}
+        icon="arrow-left"
+      />
+      <div class="flex gap-1">
         <p>
-          of {total}
+          {$store.indexStart}–{$store.indexEnd}
         </p>
-      {/if}
-    </div>
-    <IconButton
-      label={nextButtonLabel}
-      disabled={!$store.hasNext}
-      on:click={fetchIndexData}
-      icon="arrow-right"
-    />
-  </nav>
+        {#if total}
+          <p>
+            of {total}
+          </p>
+        {/if}
+      </div>
+      <IconButton
+        label={nextButtonLabel}
+        disabled={!$store.hasNext}
+        onclick={fetchIndexData}
+        icon="arrow-right"
+      />
+    </nav>
+  {/snippet}
 </PaginatedTable>

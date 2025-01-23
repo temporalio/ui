@@ -1,16 +1,22 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
+  import Button, {
+    type ButtonWithoutHrefProps,
+  } from '$lib/holocene/button.svelte';
 
-  export let hidden: boolean;
-  export let onScrollToTopClick: () => void;
+  interface Props extends ButtonWithoutHrefProps {
+    hidden: boolean;
+    onScrollToTopClick: () => void;
+  }
+
+  let { hidden, onScrollToTopClick, ...rest }: Props = $props();
 </script>
 
 <div class:invisible={hidden}>
   <Button
     size="xs"
     variant="primary"
-    on:click={onScrollToTopClick}
+    onclick={onScrollToTopClick}
     leadingIcon="arrow-up"
-    {...$$restProps}
+    {...rest}
   />
 </div>

@@ -1,12 +1,17 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+    type StoryContext,
+  } from '@storybook/addon-svelte-csf';
 
   import { iconNames } from '$lib/holocene/icon';
 
   import Option from './option.svelte';
   import Select from './select.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Select',
     component: Select,
     args: {
@@ -30,20 +35,23 @@
       onChange: { table: { disable: true } },
       value: { table: { disable: true } },
     },
-  } satisfies Meta<Select<string>>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args let:context>
-  <Select {...args} id={context.id}>
+{#snippet template(
+  { label, ...args }: Args<typeof Story>,
+  context: StoryContext<typeof Story>,
+)}
+  <Select {label} {...args} id={context.id}>
     <Option value="pizza">Pizza</Option>
     <Option value="hamburgers">Hamburgers</Option>
     <Option value="hot_dogs">Hot Dogs</Option>
   </Select>
-</Template>
+{/snippet}
 
 <Story name="Unselected" />
 

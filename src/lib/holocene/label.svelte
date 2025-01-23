@@ -1,23 +1,28 @@
 <script lang="ts">
   import type { HTMLLabelAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  type $$Props = HTMLLabelAttributes & {
+  interface Props extends HTMLLabelAttributes {
     label?: string;
     hidden?: boolean;
     required?: boolean;
     disabled?: boolean;
     'data-testid'?: string;
-  };
+    class?: string;
+    children?: Snippet;
+  }
 
-  export let label = '';
-  export let hidden = false;
-  export let required = false;
-  export let disabled = false;
-
-  let className = '';
-  export { className as class };
+  let {
+    label = '',
+    hidden = false,
+    required = false,
+    disabled = false,
+    class: className = '',
+    children,
+    ...rest
+  }: Props = $props();
 </script>
 
 <label
@@ -37,9 +42,9 @@
     className,
   )}
   data-required={required}
-  {...$$restProps}
+  {...rest}
 >
-  <slot><span>{label}</span></slot>
+  {#if children}{@render children()}{:else}<span>{label}</span>{/if}
   {#if required}
     <span class="h-1.5 w-1.5 rounded-full bg-interactive-error"></span>
   {/if}

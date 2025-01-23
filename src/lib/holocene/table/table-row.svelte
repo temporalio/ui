@@ -1,14 +1,27 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
-  interface $$Props extends HTMLAttributes<HTMLTableRowElement> {
+  interface Props extends HTMLAttributes<HTMLTableRowElement> {
     'data-testid'?: string;
+    class?: string;
+    onclick?: (e: MouseEvent) => void;
   }
 
-  let className = '';
-  export { className as class };
+  let {
+    class: className = '',
+    children,
+    onclick = () => {},
+    ...rest
+  }: Props = $props();
 </script>
 
-<tr on:click|stopPropagation class={className} {...$$restProps}>
-  <slot />
+<tr
+  onclick={(e: MouseEvent) => {
+    e.stopPropagation();
+    onclick(e);
+  }}
+  class={className}
+  {...rest}
+>
+  {@render children?.()}
 </tr>

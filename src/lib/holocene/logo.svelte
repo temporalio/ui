@@ -3,13 +3,13 @@
 
   import { twMerge as merge } from 'tailwind-merge';
 
-  interface $$Props extends SVGAttributes<SVGElement> {
+  interface Props extends SVGAttributes<SVGElement> {
     width?: number;
     height?: number;
+    class?: string;
   }
 
-  export let width = 100;
-  export let height = 100;
+  let { width = 100, height = 100, class: className = '' }: Props = $props();
 </script>
 
 <svg
@@ -18,7 +18,7 @@
   viewBox="0 0 100 100"
   {width}
   {height}
-  class={merge('fill-current', $$restProps.class)}
+  class={merge('fill-current', className)}
 >
   <path
     fill-rule="evenodd"

@@ -1,9 +1,13 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import Textarea from './textarea.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Textarea',
     component: Textarea,
     args: {
@@ -35,26 +39,30 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       id: { name: 'Id', control: 'text', table: { disable: true } },
     },
-  } satisfies Meta<Textarea>;
+  });
 </script>
 
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
 
   import { shouldNotBeTransparent } from './test-utilities';
+
+  setTemplate(template);
 </script>
 
-<Template let:args>
+{#snippet template({ id, label, value, ...args }: Args<typeof Story>)}
   <Textarea
-    on:input={action('input')}
-    on:blur={action('blue')}
-    on:change={action('change')}
-    on:focus={action('focus')}
-    on:keydown={action('keydown')}
+    oninput={action('input')}
+    onblur={action('blue')}
+    onchange={action('change')}
+    onfocus={action('focus')}
+    onkeydown={action('keydown')}
+    {id}
+    {label}
+    {value}
     {...args}
   />
-</Template>
+{/snippet}
 
 <Story
   name="Default"

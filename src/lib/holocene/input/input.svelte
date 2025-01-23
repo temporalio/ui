@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
 
-  import { createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import type { IconName } from '$lib/holocene/icon';
@@ -37,67 +37,81 @@
     autoFocus?: boolean;
     error?: boolean;
     'data-testid'?: string;
+    copyable?: boolean;
+    copyButtonLabel?: string;
+    clearable?: boolean;
+    clearButtonLabel?: string;
+    clear?: () => void;
+    onclick?: (e: MouseEvent) => void;
+    onkeydown?: (e: KeyboardEvent) => void;
+    before_input?: Snippet<[{ disabled: boolean }]>;
+    after_input?: Snippet<[{ disabled: boolean }]>;
   };
 
   type CopyableProps = BaseProps & {
-    copyable: boolean;
+    copyable: true;
     copyButtonLabel: string;
   };
 
   type ClearableProps = BaseProps & {
-    clearable: boolean;
+    clearable: true;
     clearButtonLabel: string;
   };
 
-  type $$Props = BaseProps | CopyableProps | ClearableProps;
+  type Props = BaseProps | CopyableProps | ClearableProps;
 
-  export let id: string;
-  export let value: string;
-  export let label: string;
-  export let labelHidden = false;
-  export let icon: IconName = null;
-  export let placeholder = '';
-  export let suffix = '';
-  export let name = id;
-  export let copyable = false;
-  export let disabled = false;
-  export let clearable = false;
-  export let autocomplete: AutoComplete = 'off';
-  export let valid = true;
-  export let hintText = '';
-  export let maxLength = 0;
-  export let hideCount = false;
-  export let spellcheck: boolean = null;
-  export let noBorder = false;
-  export let autoFocus = false;
-  export let error = false;
-  export let required = false;
-  export let copyButtonLabel = '';
-  export let clearButtonLabel = '';
+  let {
+    id,
+    value = $bindable(),
+    label,
+    labelHidden = false,
+    icon = null,
+    placeholder = '',
+    suffix = '',
+    name = id,
+    copyable = false,
+    disabled: isDisabled = false,
+    clearable = false,
+    autocomplete = 'off',
+    valid = true,
+    hintText = '',
+    maxLength = 0,
+    hideCount = false,
+    spellcheck = null,
+    noBorder = false,
+    autoFocus = false,
+    error = false,
+    required = false,
+    copyButtonLabel = '',
+    clearButtonLabel = '',
+    class: className = '',
+    clear = () => {},
+    onclick = () => {},
+    onkeydown = () => {},
+    before_input,
+    after_input,
+    ...rest
+  }: Props = $props();
 
-  let className = '';
-  export { className as class };
-
-  let testId = $$props['data-testid'] || id;
+  let testId = rest['data-testid'] || id;
 
   function callFocus(input: HTMLInputElement) {
     if (autoFocus && input) input.focus();
   }
 
-  const dispatch = createEventDispatcher();
   function onClear() {
     value = '';
-    dispatch('clear', {});
+    clear();
   }
 
   const { copy, copied } = copyToClipboard();
-  $: disabled = disabled || copyable;
+  let disabled = $derived(isDisabled || copyable);
 </script>
 
 <div class={merge('flex flex-col gap-1', className)}>
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="input-group flex">
-    <slot name="before-input" {disabled} />
+    {@render before_input?.({ disabled })}
     <div
       class={merge(
         'input-container',
@@ -127,19 +141,21 @@
         {required}
         {autocomplete}
         bind:value
-        on:click|stopPropagation
-        on:input
-        on:keydown|stopPropagation
-        on:change
-        on:focus
-        on:blur
+        onclick={(e: MouseEvent) => {
+          e.stopPropagation();
+          onclick(e);
+        }}
+        onkeydown={(e: KeyboardEvent) => {
+          e.stopPropagation();
+          onkeydown(e);
+        }}
         use:callFocus
         data-testid={testId}
-        {...$$restProps}
+        {...rest}
       />
       {#if copyable}
         <div class="copy-icon-container">
-          <button aria-label={copyButtonLabel} on:click={(e) => copy(e, value)}>
+          <button aria-label={copyButtonLabel} onclick={(e) => copy(e, value)}>
             {#if $copied}
               <Icon name="checkmark" />
             {:else}
@@ -153,11 +169,7 @@
         </div>
       {:else if clearable && value}
         <div class="clear-icon-container" data-testid="clear-input">
-          <IconButton
-            label={clearButtonLabel}
-            on:click={onClear}
-            icon="close"
-          />
+          <IconButton label={clearButtonLabel} onclick={onClear} icon="close" />
         </div>
       {/if}
       {#if maxLength && !disabled && !hideCount}
@@ -175,7 +187,7 @@
         </div>
       {/if}
     </div>
-    <slot name="after-input" {disabled} />
+    {@render after_input?.({ disabled })}
   </div>
 
   <span

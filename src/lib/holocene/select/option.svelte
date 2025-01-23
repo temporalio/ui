@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export interface OptionType<T> {
     label: string;
     value: T;
@@ -15,12 +15,7 @@
 </script>
 
 <script lang="ts">
-  import {
-    createEventDispatcher,
-    getContext,
-    onDestroy,
-    onMount,
-  } from 'svelte';
+  import { getContext, onDestroy, onMount, type Snippet } from 'svelte';
 
   import { MenuItem } from '$lib/holocene/menu';
 
@@ -31,27 +26,42 @@
   const { selectValue, handleChange, options } =
     getContext<SelectContext<T>>(SELECT_CONTEXT);
 
-  const dispatch = createEventDispatcher<{ click: { value: T } }>();
+  interface Props {
+    value: T;
+    description?: string;
+    disabled?: boolean;
+    class?: string;
+    leading?: Snippet;
+    trailing?: Snippet;
+    children?: Snippet;
+    click?: (e: { value: T }) => void;
+  }
 
-  export let value: T;
-  export let description = '';
-  export let disabled = false;
-  let className = '';
-  export { className as class };
+  let {
+    value,
+    description = '',
+    disabled = false,
+    class: className = '',
+    leading: leading_render,
+    trailing: trailing_render,
+    children,
+    click = () => {},
+    ...rest
+  }: Props = $props();
 
-  let selected = false;
-  let _value: T | string;
-  let slotWrapper: HTMLSpanElement;
-  let optionElement: HTMLLIElement;
-  let label: string;
+  let selected = $state(false);
+  let _value: T | string = $state();
+  let slotWrapper: HTMLSpanElement = $state();
+  let optionElement: HTMLLIElement = $state();
+  let label: string = $state();
 
-  $: {
+  $effect(() => {
     if (slotWrapper) {
       _value = value ?? slotWrapper.textContent;
       selected = $selectValue === _value;
       label = slotWrapper.textContent;
     }
-  }
+  });
 
   onMount(() => {
     if (slotWrapper) {
@@ -70,22 +80,26 @@
 
   const handleOptionClick = () => {
     handleChange(_value as T);
-    dispatch('click', { value: _value as T });
+    click({ value: _value as T });
   };
 </script>
 
 <MenuItem
-  on:click={handleOptionClick}
+  onclick={handleOptionClick}
   role="option"
   {selected}
   {description}
   {disabled}
   class={className}
-  data-testid={$$restProps['data-testid'] ?? ''}
+  data-testid={rest['data-testid'] ?? ''}
 >
-  <slot name="leading" slot="leading" />
+  {#snippet leading()}
+    {@render leading_render?.()}
+  {/snippet}
   <span bind:this={slotWrapper}>
-    <slot />
+    {@render children?.()}
   </span>
-  <slot name="trailing" slot="trailing" />
+  {#snippet trailing()}
+    {@render trailing_render?.()}
+  {/snippet}
 </MenuItem>

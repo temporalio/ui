@@ -1,10 +1,14 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import Button from '$lib/holocene/button.svelte';
   import { iconNames } from '$lib/holocene/icon';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Button',
     component: Button,
     args: {
@@ -72,34 +76,39 @@
         },
       },
     },
-  } satisfies Meta<Button>;
+  });
 </script>
 
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
 
   import { shouldNotBeTransparent } from './test-utilities';
+
+  setTemplate(template);
 </script>
 
-<Template let:args>
-  <Button {...args} on:click={action('click')}>Click Me</Button>
-</Template>
+{#snippet template(args: Args<typeof Story>)}
+  <Button {...args} onclick={action('click')}>Click Me</Button>
+{/snippet}
 
 <Story name="Primary" args={{}} />
 
-<Story name="With Long Title" let:args>
-  <div class="max-w-16">
-    <Button {...args} on:click={action('click')}>Request Cancellation</Button>
-  </div>
+<Story name="With Long Title">
+  {#snippet children(args)}
+    <div class="max-w-16">
+      <Button {...args} onclick={action('click')}>Request Cancellation</Button>
+    </div>
+  {/snippet}
 </Story>
 
-<Story name="Button Group" let:args>
-  <div class="button-group flex">
-    <Button {...args} on:click={action('click')}>First</Button>
-    <Button {...args} on:click={action('click')}>Middle</Button>
-    <Button {...args} on:click={action('click')}>Last</Button>
-  </div>
+<Story name="Button Group">
+  {#snippet children(args)}
+    <div class="button-group flex">
+      <Button {...args} onclick={action('click')}>First</Button>
+      <Button {...args} onclick={action('click')}>Middle</Button>
+      <Button {...args} onclick={action('click')}>Last</Button>
+    </div>
+  {/snippet}
 </Story>
 
 <Story

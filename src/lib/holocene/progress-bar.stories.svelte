@@ -1,23 +1,30 @@
-<script lang="ts" context="module">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Progress Bar',
     component: ProgressBar,
     args: {
       width: '50%',
     },
-  } as Meta<ProgressBar>;
+  });
 </script>
 
-<Template let:args>
+<script lang="ts">
+  setTemplate(template);
+</script>
+
+{#snippet template(args: Args<typeof Story>)}
   <div class="relative mx-auto p-8">
     <ProgressBar {...args} />
   </div>
-</Template>
+{/snippet}
 
 <Story name="Partial" args={{ width: '60%' }} />
 <Story name="Full" args={{ width: '100%' }} />

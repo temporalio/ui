@@ -7,9 +7,7 @@
 </script>
 
 <script lang="ts">
-  import type { HTMLButtonAttributes } from 'svelte/elements';
-
-  import { createEventDispatcher, getContext, type Snippet } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
@@ -21,7 +19,7 @@
   } from '$lib/holocene/menu/menu-container.svelte';
   import { MENU_ITEM_SELECTORS } from '$lib/holocene/menu/menu-item.svelte';
 
-  interface $$Props extends HTMLButtonAttributes {
+  interface Props {
     controls: string;
     count?: number;
     disabled?: boolean;
@@ -30,13 +28,13 @@
     label?: string;
     variant?: MenuButtonVariant;
     class?: string;
+    children?: Snippet;
     active?: boolean;
     'data-testid'?: string;
     leading?: Snippet;
     trailing?: Snippet;
+    click?: (args: { open: boolean }) => void;
   }
-
-  let className = '';
 
   let {
     controls,
@@ -46,12 +44,13 @@
     id = null,
     label = null,
     variant = 'secondary',
+    class: className = '',
     children,
     leading,
     trailing,
-  }: $$Props = $props();
+    click = () => {},
+  }: Props = $props();
 
-  const dispatch = createEventDispatcher<{ click: { open: boolean } }>();
   const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);
 
   const handleClick = () => {
@@ -61,7 +60,7 @@
         newState = !previousState;
       }
 
-      dispatch('click', { open: newState });
+      click({ open: newState });
       return newState;
     });
   };
@@ -99,8 +98,8 @@
   {id}
   {disabled}
   type="button"
-  on:click={handleClick}
-  on:keydown={handleKeyDown}
+  onclick={handleClick}
+  onkeydown={handleKeyDown}
   aria-haspopup={!disabled}
   aria-controls={controls}
   aria-expanded={$open}

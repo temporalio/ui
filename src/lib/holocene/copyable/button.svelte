@@ -5,7 +5,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  interface $$Props extends HTMLButtonAttributes {
+  interface Props extends HTMLButtonAttributes {
     copyIconTitle: string;
     copySuccessIconTitle: string;
     copied: boolean;
@@ -13,12 +13,13 @@
     'data-theme'?: string;
   }
 
-  export let copyIconTitle: string;
-  export let copySuccessIconTitle: string;
-  export let copied: boolean;
-
-  let className = '';
-  export { className as class };
+  let {
+    copyIconTitle,
+    copySuccessIconTitle,
+    copied,
+    class: className = '',
+    ...rest
+  }: Props = $props();
 </script>
 
 <button
@@ -26,8 +27,7 @@
     'surface-interactive-secondary m-1 border border-[transparent] bg-transparent p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
     className,
   )}
-  on:click
-  {...$$restProps}
+  {...rest}
 >
   <Icon
     title={copied ? copySuccessIconTitle : copyIconTitle}

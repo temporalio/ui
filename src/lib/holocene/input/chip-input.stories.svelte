@@ -1,11 +1,16 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+    type StoryContext,
+  } from '@storybook/addon-svelte-csf';
   import { userEvent, within } from '@storybook/test';
 
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import { isEmail } from '$lib/utilities/is-email';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Chip Input',
     component: ChipInput,
     args: {
@@ -36,16 +41,25 @@
         table: { category: 'Accessibility' },
       },
     },
-  } satisfies Meta<ChipInput>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args let:context>
-  <ChipInput {...args} id={context.id} />
-</Template>
+{#snippet template(
+  { chips, label, removeChipButtonLabel, ...args }: Args<typeof Story>,
+  context: StoryContext<typeof Story>,
+)}
+  <ChipInput
+    {chips}
+    {label}
+    {removeChipButtonLabel}
+    {...args}
+    id={context.id}
+  />
+{/snippet}
 
 <Story name="Default" />
 

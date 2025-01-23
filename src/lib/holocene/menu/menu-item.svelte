@@ -6,7 +6,7 @@
 <script lang="ts">
   import type { HTMLAnchorAttributes, HTMLLiAttributes } from 'svelte/elements';
 
-  import { createEventDispatcher, getContext, type Snippet } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -31,7 +31,9 @@
     'data-testid'?: string;
     hoverable?: boolean;
     leading?: Snippet;
-    trailingIcon?: Snippet;
+    trailing?: Snippet;
+    onclick?: (e: MouseEvent) => void;
+    click?: () => void;
   };
 
   type MenuItemWithoutHrefProps = BaseProps &
@@ -46,11 +48,11 @@
       newTab?: boolean;
     };
 
-  type $$Props = MenuItemWithoutHrefProps | MenuItemWithHrefProps;
+  type Props = MenuItemWithoutHrefProps | MenuItemWithHrefProps;
 
   let {
     className = '',
-    selected = undefined,
+    selected,
     destructive = false,
     disabled = false,
     href = null,
@@ -59,13 +61,13 @@
     hoverable = true,
     newTab = false,
     children,
-    leading = null,
-    trailingIcon = null,
-  }: $$Props = $props();
+    leading,
+    trailing,
+    onclick = () => {},
+    click = () => {},
+  }: Props = $props();
 
   const { keepOpen, open } = getContext<MenuContext>(MENU_CONTEXT);
-
-  const dispatch = createEventDispatcher<{ click: undefined }>();
 
   const handleKeydown = (event: ExtendedLIEvent | ExtendedAnchorEvent) => {
     event.stopPropagation();
@@ -83,7 +85,7 @@
         break;
       case ' ':
       case 'Enter':
-        dispatch('click');
+        click();
         if (!$keepOpen) $open = false;
         break;
       default:
@@ -119,9 +121,10 @@
     }
   };
 
-  const handleClick = () => {
+  const handleClick = (e: MouseEvent) => {
     if (!$keepOpen) $open = false;
-    dispatch('click');
+    click();
+    onclick(e);
   };
 </script>
 
@@ -180,7 +183,7 @@
         </div>
       {/if}
     </div>
-    {@render trailingIcon?.()}
+    {@render trailing?.()}
   </li>
 {/if}
 

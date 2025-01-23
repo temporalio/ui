@@ -1,7 +1,11 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'File Input',
     component: FileInput,
     args: {
@@ -12,17 +16,17 @@
       id: { control: 'text' },
       accept: { control: 'text' },
     },
-  } satisfies Meta<FileInput>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
   import FileInput from './file-input.svelte';
+
+  setTemplate(template);
 </script>
 
-<Template let:args>
-  <FileInput {...args} />
-</Template>
+{#snippet template({ id, ...args }: Args<typeof Story>)}
+  <FileInput {id} {...args} onUpload={() => {}} />
+{/snippet}
 
 <Story name="Default" />

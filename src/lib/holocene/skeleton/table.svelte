@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import Table from '$lib/holocene/table/table.svelte';
 
   import TableHeaderRow from '../table/table-header-row.svelte';
@@ -6,19 +8,33 @@
 
   import Skeleton from './index.svelte';
 
-  export let rows = 10;
-  export let columns = 4;
-  export let columnWidths: number[] = new Array(columns).fill(100 / columns);
+  interface Props {
+    rows?: number;
+    columns?: number;
+    columnWidths?: number[];
+    headers?: Snippet;
+  }
+
+  let {
+    rows = 10,
+    columns = 4,
+    columnWidths = new Array(columns).fill(100 / columns),
+    headers: table_headers,
+  }: Props = $props();
 </script>
 
 <Table class="w-full table-fixed" variant="fancy">
-  <TableHeaderRow slot="headers" class="h-8">
-    <slot name="headers">
-      {#each Array.from(new Array(columns)) as _column, i}
-        <th style="width: {columnWidths[i]}%;"></th>
-      {/each}
-    </slot>
-  </TableHeaderRow>
+  {#snippet headers()}
+    <TableHeaderRow class="h-8">
+      {#if table_headers}
+        {@render table_headers()}
+      {:else}
+        {#each Array.from(new Array(columns)) as _column, i}
+          <th style="width: {columnWidths[i]}%;"></th>
+        {/each}
+      {/if}
+    </TableHeaderRow>
+  {/snippet}
   {#each Array.from(Array(rows).keys()) as _row}
     <TableRow>
       {#each Array.from(new Array(columns)) as _column}

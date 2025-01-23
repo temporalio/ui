@@ -3,9 +3,13 @@
   import { translate } from '$lib/i18n/translate';
   import { toaster } from '$lib/stores/toaster';
 
-  export let id: string;
-  export let accept = '.json';
-  export let onUpload: (input: string) => void;
+  interface Props {
+    id: string;
+    accept?: string;
+    onUpload: (input: string) => void;
+  }
+
+  let { id, accept = '.json', onUpload }: Props = $props();
 
   const onFileSelect = (e: Event) => {
     const target = e.target as HTMLInputElement;
@@ -31,7 +35,7 @@
 <label for={id} class="file-upload-label">
   <Icon name="upload" />
 </label>
-<input {id} class="hidden" type="file" {accept} on:change={onFileSelect} />
+<input {id} class="hidden" type="file" {accept} onchange={onFileSelect} />
 
 <style lang="postcss">
   .file-upload-label {

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { page } from '$app/stores';
 
   import type { SelectOptionValue } from '$lib/types/global';
@@ -7,18 +9,31 @@
   import Option from './simple-option.svelte';
   import Select from './simple-select.svelte';
 
-  export let label: string;
-  export let value: SelectOptionValue;
-  export let options: SelectOptionValue[] = [];
-  export let parameter: string = null;
-  export let position: string | undefined = undefined;
+  interface Props {
+    label: string;
+    value: SelectOptionValue;
+    options?: SelectOptionValue[];
+    parameter?: string;
+    position?: string;
+    children?: Snippet;
+  }
+
+  let {
+    label,
+    value,
+    options = [],
+    parameter = null,
+    position,
+    children,
+    ...rest
+  }: Props = $props();
 
   const id = `${parameter || label}-${
     position ? `${position}-filter` : 'filter'
   }`;
   const parameterValue = parameter && $page.url.searchParams.get(parameter);
 
-  let _value = parameterValue || (value && value.toString());
+  let _value = $state(parameterValue || (value && value.toString()));
 
   const onChange = () => {
     updateQueryParameters({
@@ -29,10 +44,12 @@
   };
 </script>
 
-<Select on:change={onChange} {id} bind:value={_value} {label} {...$$props}>
-  <slot>
+<Select onchange={onChange} {id} bind:value={_value} {label} {...rest}>
+  {#if children}
+    {@render children()}
+  {:else}
     {#each options.map((o) => o.toString()) as option}
       <Option value={option} />
     {/each}
-  </slot>
+  {/if}
 </Select>

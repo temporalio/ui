@@ -1,24 +1,23 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const RADIO_GROUP_CONTEXT = 'radio-group-ctx';
 </script>
 
 <script lang="ts">
-  import type { Writable } from 'svelte/store';
-
   import { setContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import type { RadioGroupContext, RadioGroupProps } from './types';
 
   type T = $$Generic;
-  type $$Props = RadioGroupProps<T>;
 
-  let className: string = '';
-
-  export { className as class };
-  export let name: string;
-  export let group: Writable<T>;
-  export let description = '';
+  let {
+    class: className = '',
+    name,
+    group,
+    description = '',
+    children,
+    ...rest
+  }: RadioGroupProps<T> = $props();
 
   setContext<RadioGroupContext<T>>(RADIO_GROUP_CONTEXT, {
     name,
@@ -26,9 +25,9 @@
   });
 </script>
 
-<div class={merge('flex flex-col gap-2 p-1', className)} {...$$restProps}>
+<div class={merge('flex flex-col gap-2 p-1', className)} {...rest}>
   {#if description}
     <p class="text-sm font-medium">{description}</p>
   {/if}
-  <slot />
+  {@render children?.()}
 </div>

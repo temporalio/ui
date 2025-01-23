@@ -1,5 +1,10 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+    type StoryContext,
+  } from '@storybook/addon-svelte-csf';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import {
@@ -8,11 +13,11 @@
     MenuContainer,
     MenuItem,
   } from '$lib/holocene/menu';
+  import type { MenuButtonVariant } from '$lib/holocene/menu/menu-button.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta<typeof MenuButton | typeof Menu>({
     title: 'Menu',
     component: MenuButton,
-    subcomponents: { MenuButton, MenuContainer, MenuItem },
     args: {
       variant: 'primary',
       keepOpen: false,
@@ -40,43 +45,49 @@
         },
       },
     },
-  } satisfies Meta<MenuButton | Menu>;
+  });
 </script>
 
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
 
   import { shouldNotBeTransparent } from '../test-utilities';
+
+  setTemplate(template);
 </script>
 
-<Template let:args let:context>
+{#snippet template(
+  args: Args<typeof Story> & { variant: MenuButtonVariant },
+  context: StoryContext<typeof Story>,
+)}
   <div class="flex items-center justify-center">
     <MenuContainer>
       <MenuButton hasIndicator variant={args.variant} controls={context.id}>
-        <Icon slot="leading" name="temporal-logo" />
+        {#snippet leading()}
+          <Icon name="temporal-logo" />
+        {/snippet}
         Menu
       </MenuButton>
       <Menu id={context.id} class="w-64" {...args}>
-        <MenuItem href="https://temporal.io" newTab on:click={action('click')}>
+        <MenuItem href="https://temporal.io" newTab onclick={action('click')}>
           Link
         </MenuItem>
         <MenuItem disabled href="https://temporal.io">Disabled Link</MenuItem>
-        <MenuItem on:click={action('click')} selected>Selected</MenuItem>
+        <MenuItem onclick={action('click')} selected>Selected</MenuItem>
         <MenuItem
-          on:click={action('click')}
+          onclick={action('click')}
           description="Selected description"
           selected>Selected With Description</MenuItem
         >
-        <MenuItem on:click={action('click')}>Standard</MenuItem>
-        <MenuItem on:click={action('click')} description="Standard description"
+        <MenuItem onclick={action('click')}>Standard</MenuItem>
+        <MenuItem onclick={action('click')} description="Standard description"
           >Standard With Description</MenuItem
         >
-        <MenuItem on:click={action('click')} destructive>Destructive</MenuItem>
+        <MenuItem onclick={action('click')} destructive>Destructive</MenuItem>
       </Menu>
     </MenuContainer>
   </div>
-</Template>
+{/snippet}
 
 <Story name="Primary" args={{ variant: 'primary' }} />
 

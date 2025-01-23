@@ -1,9 +1,13 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import Chip from '$lib/holocene/chip.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Chip',
     component: Chip,
     args: {
@@ -22,19 +26,24 @@
         },
       },
     },
-  } satisfies Meta<Chip>;
+  });
 </script>
 
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args>
-  <Chip {...args} on:remove={action('remove')} on:click={action('click')}>
+{#snippet template({ removeButtonLabel, ...args }: Args<typeof Story>)}
+  <Chip
+    {removeButtonLabel}
+    {...args}
+    remove={action('remove')}
+    onclick={action('click')}
+  >
     ross.edfort@temporal.io
   </Chip>
-</Template>
+{/snippet}
 
 <Story name="Default" />
 

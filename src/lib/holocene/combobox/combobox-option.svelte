@@ -1,52 +1,63 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
 
-  import Checkbox from '$lib/holocene/checkbox.svelte';
+  import Checkbox, { type ChangeEvent } from '$lib/holocene/checkbox.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
 
-  const dispatch = createEventDispatcher<{ click: undefined }>();
+  interface BaseProps {
+    label: string;
+    leading?: Snippet;
+    trailing?: Snippet;
+    onclick?: (e: MouseEvent | ChangeEvent) => void;
+  }
 
-  interface Props {
+  interface EnabledProps extends BaseProps {
     selected?: boolean;
     disabled?: boolean;
     multiselect?: boolean;
-    label: string;
   }
 
-  interface DisabledProps {
-    label: string;
-    disabled: true;
+  interface DisabledProps extends BaseProps {
     selected?: never;
+    disabled: true;
+    multiselect?: never;
   }
 
-  type $$Props = Props | DisabledProps;
+  type Props = EnabledProps | DisabledProps;
 
-  export let selected = false;
-  export let disabled = false;
-  export let multiselect = false;
-  export let label: string;
+  let {
+    selected = false,
+    disabled = false,
+    multiselect = false,
+    label,
+    leading: leading_render,
+    trailing,
+    onclick = () => {},
+  }: Props = $props();
 </script>
 
 <MenuItem
-  on:click
+  {onclick}
   role="option"
   class="break-all"
   aria-selected={selected}
   aria-disabled={disabled}
   selected={!multiselect && selected}
   {disabled}
+  {trailing}
 >
-  <slot slot="leading" name="leading">
-    {#if multiselect}
+  {#snippet leading()}
+    {#if leading_render}
+      {@render leading_render()}
+    {:else if multiselect}
       <Checkbox
-        onchange={() => dispatch('click')}
+        onchange={onclick}
         checked={selected}
         tabindex={-1}
         {label}
         labelHidden
       />
     {/if}
-  </slot>
+  {/snippet}
   {label}
-  <slot slot="trailing" name="trailing" />
 </MenuItem>

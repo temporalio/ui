@@ -10,23 +10,23 @@
   type Intent = 'warning' | 'error' | 'success' | 'info' | 'nexus';
   type AlertIcon = Extract<IconName, Intent>;
 
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+  interface Props extends HTMLAttributes<HTMLDivElement> {
     intent: Intent;
     title?: string;
     icon?: AlertIcon;
-    'data-testid'?: string;
     hidden?: boolean;
+    class?: string;
   }
 
-  export let intent: Intent;
-  export let title = '';
-  export let icon: AlertIcon = intent;
-  export let hidden = false;
-
-  let className = '';
-  export { className as class };
-
-  $: role = getRole(intent);
+  let {
+    intent,
+    title = '',
+    icon = intent,
+    hidden = false,
+    class: className = '',
+    children,
+    ...rest
+  }: Props = $props();
 
   function getRole(
     alertIntent: typeof intent,
@@ -41,22 +41,24 @@
 
     return null;
   }
+
+  let role = $derived(getRole(intent));
 </script>
 
 <div
   class={merge('alert flex', intent, className)}
   class:hidden
   {role}
-  {...$$restProps}
+  {...rest}
 >
   <Icon name={icon} class="mt-0.5" />
   <div class="w-full min-w-0 gap-1">
     <p class="font-medium">
       {title}
     </p>
-    {#if $$slots.default}
+    {#if children}
       <div class="content">
-        <slot />
+        {@render children()}
       </div>
     {/if}
   </div>

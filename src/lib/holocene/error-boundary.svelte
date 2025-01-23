@@ -2,11 +2,11 @@
   import type { Snippet } from 'svelte';
   import Error from './error.svelte';
 
-  type $$Props = {
+  interface Props {
     children: Snippet;
-  };
+  }
 
-  let { children }: $$Props = $props();
+  let { children }: Props = $props();
 </script>
 
 <svelte:boundary>

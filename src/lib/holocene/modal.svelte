@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
-  import { type ComponentProps, createEventDispatcher } from 'svelte';
+  import { type ComponentProps, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
@@ -9,11 +9,11 @@
 
   import IconButton from './icon-button.svelte';
 
-  interface $$Props extends HTMLAttributes<HTMLDialogElement> {
+  interface Props extends HTMLAttributes<HTMLDialogElement> {
     cancelText: string;
     confirmDisabled?: boolean;
     confirmText: string;
-    confirmType?: ComponentProps<Button>['variant'];
+    confirmType?: ComponentProps<typeof Button>['variant'];
     hideConfirm?: boolean;
     hightlightNav?: boolean;
     id: string;
@@ -22,26 +22,38 @@
     'data-testid'?: string;
     open: boolean;
     error?: string;
+    class?: string;
+    modal_title?: Snippet;
+    content?: Snippet;
+    confirmModal: () => void;
+    cancelModal: () => void;
   }
 
-  export let hideConfirm = false;
-  export let confirmText: string;
-  export let cancelText: string;
-  export let confirmType: ComponentProps<Button>['variant'] = 'primary';
-  export let confirmDisabled = false;
-  export let large = false;
-  export let loading = false;
-  export let hightlightNav = false;
-  export let id: string;
-  export let open: boolean;
-  export let error = '';
+  let {
+    hideConfirm = false,
+    confirmText,
+    cancelText,
+    confirmType = 'primary',
+    confirmDisabled = false,
+    large = false,
+    loading = false,
+    hightlightNav = false,
+    id,
+    open,
+    error = '',
+    class: className = '',
+    modal_title,
+    content,
+    confirmModal,
+    cancelModal,
+    ...rest
+  }: Props = $props();
 
-  let className = '';
-  export { className as class };
+  let modalElement: HTMLDialogElement = $state();
 
-  let modalElement: HTMLDialogElement;
-
-  $: toggleModal(open, modalElement);
+  $effect(() => {
+    toggleModal(open, modalElement);
+  });
 
   export const toggleModal = (open: boolean, modal: HTMLDialogElement) => {
     if (open) {
@@ -51,19 +63,15 @@
     }
   };
 
-  const dispatch = createEventDispatcher<{
-    cancelModal: undefined;
-    confirmModal: undefined;
-  }>();
-
   const handleCancel = () => {
-    dispatch('cancelModal');
+    cancelModal();
     open = false;
     error = '';
   };
 
-  const confirmModal = () => {
-    dispatch('confirmModal');
+  const handleConfirm = (event: SubmitEvent) => {
+    event.preventDefault();
+    confirmModal();
   };
 
   const closeModal = () => {
@@ -74,26 +82,25 @@
     if (event.target === modalElement) closeModal();
   };
 
-  $: {
+  $effect(() => {
     if (open && modalElement) {
       modalElement.focus();
     }
-  }
+  });
 </script>
 
-<svelte:window on:click={handleClick} />
+<svelte:window onclick={handleClick} />
 
 <dialog
   {id}
-  on:close={handleCancel}
+  onclose={handleCancel}
   bind:this={modalElement}
   class={merge('body', className)}
   class:large
   class:hightlightNav
   aria-modal="true"
   aria-labelledby="modal-title-{id}"
-  data-testid={$$props['data-testid']}
-  {...$$restProps}
+  {...rest}
   use:focusTrap={true}
 >
   {#if !loading}
@@ -101,15 +108,15 @@
       label={cancelText}
       icon="close"
       class="float-right m-4"
-      on:click={closeModal}
+      onclick={closeModal}
     />
   {/if}
   <div id="modal-title-{id}" class="title">
-    <slot name="title" />
+    {@render modal_title?.()}
   </div>
-  <form on:submit|preventDefault={confirmModal} method="dialog">
+  <form onsubmit={handleConfirm} method="dialog">
     <div id="modal-content-{id}" class="content">
-      <slot name="content" />
+      {@render content?.()}
       <p
         class="mt-2 text-sm font-normal text-danger"
         class:hidden={!error}
@@ -119,7 +126,7 @@
       </p>
     </div>
     <div class="flex items-center justify-end space-x-2 p-6">
-      <Button variant="ghost" disabled={loading} on:click={closeModal}
+      <Button variant="ghost" disabled={loading} onclick={closeModal}
         >{cancelText}</Button
       >
       {#if !hideConfirm}

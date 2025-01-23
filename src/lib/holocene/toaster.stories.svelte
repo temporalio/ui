@@ -1,5 +1,12 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+    type StoryContext,
+  } from '@storybook/addon-svelte-csf';
+
+  import type { Toast as ToastProps } from '$lib/types/holocene';
 
   import { toaster } from '../stores/toaster';
 
@@ -7,13 +14,13 @@
   import Toast from './toast.svelte';
   import Toaster from './toaster.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Toaster',
     component: Toaster,
     args: {
       closeButtonLabel: 'Close',
       duration: 2000,
-      variant: 'Primary',
+      variant: 'primary',
       message: 'This is a toast message.',
     },
     argTypes: {
@@ -37,32 +44,40 @@
         table: { category: 'Accessibility' },
       },
     },
-  } satisfies Meta<Toaster & Toast['variant']>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args let:context>
+{#snippet template(
+  args: Args<typeof Story> & ToastProps,
+  context: StoryContext<typeof Story>,
+)}
   {@const { duration, message, variant, closeButtonLabel } = args}
   <div class="flex max-w-60 flex-col gap-2">
     <Toast id={context.id} {variant} {closeButtonLabel}>{message}</Toast>
 
-    <Button on:click={() => toaster.push({ duration, message, variant })}>
+    <Button onclick={() => toaster.push({ duration, message, variant })}>
       <span class="capitalize">Trigger {variant} toast</span>
     </Button>
 
-    <Toaster {...args} pop={toaster.pop} toasts={toaster.toasts} />
+    <Toaster
+      {closeButtonLabel}
+      {...args}
+      pop={toaster.pop}
+      toasts={toaster.toasts}
+    />
   </div>
-</Template>
+{/snippet}
 
 <Story name="Primary" />
 
-<Story name="Success" args={{ variant: 'Success' }} />
+<Story name="Success" args={{ variant: 'success' }} />
 
-<Story name="Info" args={{ variant: 'Info' }} />
+<Story name="Info" args={{ variant: 'info' }} />
 
-<Story name="Error" args={{ variant: 'Error' }} />
+<Story name="Error" args={{ variant: 'error' }} />
 
-<Story name="Warning" args={{ variant: 'Warning' }} />
+<Story name="Warning" args={{ variant: 'warning' }} />

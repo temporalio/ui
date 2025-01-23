@@ -1,11 +1,15 @@
 <script lang="ts">
   import Svg from '../svg.svelte';
 
-  export let animate = false;
-  export let duration = 2000;
+  interface Props {
+    animate?: boolean;
+    duration?: number;
+  }
+
+  let { animate = false, duration = 2000, ...rest }: Props = $props();
 </script>
 
-<Svg {...$$restProps}>
+<Svg {...rest}>
   <path
     d="M12 9.53906L4.925 6L12 2.46094L19.075 6L12 9.53906ZM21.5375 4.76719L12 0L2.4625 4.76719L0 6L2.4625 7.23281L12 12L21.5375 7.23281L24 6L21.5375 4.76719Z"
     fill="currentcolor"

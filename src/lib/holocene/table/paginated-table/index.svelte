@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
+
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
   type Item = $$Generic;
@@ -11,6 +13,12 @@
     updating?: boolean;
     maxHeight?: string;
     fixed?: boolean;
+    caption?: Snippet;
+    headers?: Snippet;
+    empty?: Snippet;
+    actionsStart?: Snippet;
+    actionsCenter?: Snippet;
+    actionsEnd?: Snippet;
   };
 
   let {
@@ -19,6 +27,13 @@
     updating = false,
     maxHeight = '',
     fixed = false,
+    caption,
+    headers,
+    children,
+    empty,
+    actionsStart,
+    actionsCenter,
+    actionsEnd,
     ...rest
   }: $$Props = $props();
 
@@ -40,25 +55,25 @@
     class:table-auto={!fixed}
     {...rest}
   >
-    <slot name="caption" />
+    {@render caption?.()}
     <thead class="paginated-table-header">
-      <slot name="headers" {visibleItems} />
+      {@render headers?.()}
       {#if updating}
         <ProgressBar />
       {/if}
     </thead>
     <tbody class="paginated-table-body">
-      <slot />
+      {@render children?.()}
     </tbody>
   </table>
   {#if visibleItems.length}
     <div class="paginated-table-controls">
-      <slot name="actions-start" />
-      <slot name="actions-center" />
-      <slot name="actions-end" />
+      {@render actionsStart?.()}
+      {@render actionsCenter?.()}
+      {@render actionsEnd?.()}
     </div>
   {:else}
-    <slot name="empty" />
+    {@render empty?.()}
   {/if}
 </div>
 

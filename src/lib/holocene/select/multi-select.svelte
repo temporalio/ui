@@ -17,25 +17,45 @@
   type Option = { label: string; value: string; icon?: IconName };
   type MultiSelectOptions = Option[];
 
-  export let options: MultiSelectOptions = [];
-  export let initialSelected: MultiSelectOptions = [];
-  export let onChange: (options: MultiSelectOptions) => void;
-  export let label: string;
-  export let id: string;
-  export let variant: MenuButtonVariant = 'secondary';
-  export let icon: IconName | undefined = undefined;
-  export let selectAllLabel: string;
-  export let clearAllLabel: string;
-  export let active = false;
-  export let disabled = false;
-  export let position: 'left' | 'right' = 'left';
-  export let initialSelectedAll = true;
+  interface Props {
+    options?: MultiSelectOptions;
+    initialSelected?: MultiSelectOptions;
+    onChange: (options: MultiSelectOptions) => void;
+    label: string;
+    id: string;
+    variant?: MenuButtonVariant;
+    icon?: IconName;
+    selectAllLabel: string;
+    clearAllLabel: string;
+    active?: boolean;
+    disabled?: boolean;
+    position?: 'left' | 'right';
+    initialSelectedAll?: boolean;
+  }
 
-  let selectedOptions = initialSelected.length
-    ? initialSelected
-    : initialSelectedAll
-      ? options
-      : [];
+  let {
+    options = [],
+    initialSelected = [],
+    onChange,
+    label,
+    id,
+    variant = 'secondary',
+    icon,
+    selectAllLabel,
+    clearAllLabel,
+    active = false,
+    disabled = false,
+    position = 'left',
+    initialSelectedAll = true,
+  }: Props = $props();
+
+  let selectedOptions = $state(
+    initialSelected.length
+      ? initialSelected
+      : initialSelectedAll
+        ? options
+        : [],
+  );
 
   const open = writable(false);
 
@@ -72,7 +92,7 @@
       )}
       <MenuItem
         data-testid={option.label}
-        on:click={() => {
+        onclick={() => {
           onOptionClick(option);
         }}
       >
@@ -84,26 +104,24 @@
             labelHidden
           />
         {/snippet}
-        {#snippet trailingIcon()}
+        <div class="flex items-center gap-2">
           {#if option.icon}
-            <div class="flex items-center gap-2">
-              <Icon name={option.icon} />
-              {option.label}
-            </div>
+            <Icon name={option.icon} />
           {/if}
-        {/snippet}
+          {option.label}
+        </div>
       </MenuItem>
     {/each}
     <MenuDivider />
     <MenuItem
       data-testid="multiselect-select-all"
-      on:click={onSelectAllOptionClick}
+      onclick={onSelectAllOptionClick}
     >
       {selectAllLabel}
     </MenuItem>
     <MenuItem
       data-testid="multiselect-remove-all"
-      on:click={onRemoveAllOptionClick}
+      onclick={onRemoveAllOptionClick}
     >
       {clearAllLabel}
     </MenuItem>

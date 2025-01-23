@@ -6,10 +6,16 @@
   import mp4Logo from '$lib/vendor/Temporal_Logo_Animation.mp4';
   import webmLogo from '$lib/vendor/Temporal_Logo_Animation.webm';
 
-  export let title = translate('common.loading');
+  interface Props {
+    title?: string;
+    class?: string;
+  }
 
-  let isAutoplayAllowed = true;
-  let videoElement: HTMLVideoElement;
+  let { title = translate('common.loading'), class: className = '' }: Props =
+    $props();
+
+  let isAutoplayAllowed = $state(true);
+  let videoElement: HTMLVideoElement = $state();
 
   onMount(async () => {
     const autoplay = videoElement?.play();
@@ -28,9 +34,7 @@
   });
 </script>
 
-<div
-  class="my-12 flex flex-col items-center justify-start gap-4 {$$props.class}"
->
+<div class="my-12 flex flex-col items-center justify-start gap-4 {className}">
   {#if isAutoplayAllowed}
     <video
       autoplay

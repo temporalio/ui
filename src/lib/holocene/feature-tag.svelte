@@ -1,14 +1,21 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { viewedFeatureTags } from '$lib/stores/new-feature-tags';
 
-  export let feature: string;
-  export let alpha = false;
+  interface Props {
+    feature: string;
+    alpha?: boolean;
+    children?: Snippet;
+  }
 
-  $: hide = $viewedFeatureTags?.includes(feature);
+  let { feature, alpha = false, children }: Props = $props();
+
+  let hide = $derived($viewedFeatureTags?.includes(feature));
 </script>
 
 {#if hide}
-  <slot />
+  {@render children?.()}
 {:else}
   <span class="new-tag" class:alpha></span>
 {/if}

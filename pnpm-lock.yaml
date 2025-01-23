@@ -117,7 +117,7 @@ dependencies:
 devDependencies:
   '@axe-core/playwright':
     specifier: ^4.10.1
-    version: 4.10.1(playwright-core@1.49.0)
+    version: 4.10.1(playwright-core@1.49.1)
   '@babel/core':
     specifier: ^7.20.12
     version: 7.20.12
@@ -146,8 +146,8 @@ devDependencies:
     specifier: '^8.4.7 '
     version: 8.5.0(react@18.2.0)(storybook@8.5.0)
   '@storybook/addon-svelte-csf':
-    specifier: ^4.2.0
-    version: 4.2.0(@storybook/svelte@8.4.7)(@sveltejs/vite-plugin-svelte@4.0.0)(svelte-loader@3.2.3)(svelte@5.5.4)(vite@5.4.4)
+    specifier: ^5.0.0-next.23
+    version: 5.0.0-next.23(@storybook/svelte@8.4.7)(@sveltejs/vite-plugin-svelte@4.0.0)(storybook@8.5.0)(svelte@5.5.4)(vite@5.4.4)
   '@storybook/addon-themes':
     specifier: ^8.4.7
     version: 8.5.0(storybook@8.5.0)
@@ -252,7 +252,7 @@ devDependencies:
     version: 10.4.13(postcss@8.4.31)
   axe-playwright:
     specifier: ^2.0.3
-    version: 2.0.3(playwright@1.49.0)
+    version: 2.0.3(playwright@1.49.1)
   c8:
     specifier: ^7.12.0
     version: 7.12.0
@@ -503,13 +503,13 @@ packages:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
-  /@axe-core/playwright@4.10.1(playwright-core@1.49.0):
+  /@axe-core/playwright@4.10.1(playwright-core@1.49.1):
     resolution: {integrity: sha512-EV5t39VV68kuAfMKqb/RL+YjYKhfuGim9rgIaQ6Vntb2HgaCaau0h98Y3WEUqW1+PbdzxDtDNjFAipbtZuBmEA==}
     peerDependencies:
       playwright-core: '>= 1.0.0'
     dependencies:
       axe-core: 4.10.2
-      playwright-core: 1.49.0
+      playwright-core: 1.49.1
     dev: true
 
   /@babel/code-frame@7.18.6:
@@ -2892,33 +2892,30 @@ packages:
       ts-dedent: 2.2.0
     dev: true
 
-  /@storybook/addon-svelte-csf@4.2.0(@storybook/svelte@8.4.7)(@sveltejs/vite-plugin-svelte@4.0.0)(svelte-loader@3.2.3)(svelte@5.5.4)(vite@5.4.4):
-    resolution: {integrity: sha512-ius5C6vp+55upbi7MAiJvBSkXxZuokNwkBfmUgY3sAdvp4IAvBp8A+Yvk6bWZqo2TJTfM4ccT3WAmNTxa9m0sw==}
+  /@storybook/addon-svelte-csf@5.0.0-next.23(@storybook/svelte@8.4.7)(@sveltejs/vite-plugin-svelte@4.0.0)(storybook@8.5.0)(svelte@5.5.4)(vite@5.4.4):
+    resolution: {integrity: sha512-GAdvA1f5wMhfrkP9znwDZzBFEopkELTRz8US+5XqucYHFfATiJIOALB+dW+CsUuknsfPxaA/Yqz9314ZYrT4iQ==}
     peerDependencies:
-      '@storybook/svelte': ^7.0.0 || ^8.0.0 || ^8.0.0-beta.0 || ^8.2.0-beta.0
-      '@sveltejs/vite-plugin-svelte': ^2.0.0 || ^3.0.0
-      svelte: ^4.0.0
-      svelte-loader: ^3.1.2
-      vite: ^4.0.0 || ^5.0.0 || ^6.0.0
-    peerDependenciesMeta:
-      '@sveltejs/vite-plugin-svelte':
-        optional: true
-      svelte-loader:
-        optional: true
-      vite:
-        optional: true
+      '@storybook/svelte': ^8.0.0
+      '@sveltejs/vite-plugin-svelte': ^4.0.0 || ^5.0.0
+      svelte: ^5.0.0
+      vite: ^5.0.0 || ^6.0.0
     dependencies:
-      '@babel/runtime': 7.23.2
+      '@storybook/csf': 0.1.13
+      '@storybook/docs-tools': 8.5.1(storybook@8.5.0)
       '@storybook/svelte': 8.4.7(storybook@8.5.0)(svelte@5.5.4)
       '@storybook/types': 8.1.10
       '@sveltejs/vite-plugin-svelte': 4.0.0(svelte@5.5.4)(vite@5.4.4)
-      dedent: 1.5.1
+      dedent: 1.5.3
+      es-toolkit: 1.31.0
+      esrap: 1.2.3
       magic-string: 0.30.14
       svelte: 5.5.4
-      svelte-loader: 3.2.3(svelte@5.5.4)
+      svelte-ast-print: 0.4.2(svelte@5.5.4)
       vite: 5.4.4(@types/node@18.15.3)
+      zimmerframe: 1.1.2
     transitivePeerDependencies:
       - babel-plugin-macros
+      - storybook
     dev: true
 
   /@storybook/addon-themes@8.5.0(storybook@8.5.0):
@@ -3007,7 +3004,7 @@ packages:
   /@storybook/core-events@8.1.10:
     resolution: {integrity: sha512-aS4zsBVyJds74+rAW0IfTEjULDCQwXecVpQfv11B8/89/07s3bOPssGGoTtCTaN4pHbduywE6MxbmFvTmXOFCA==}
     dependencies:
-      '@storybook/csf': 0.1.8
+      '@storybook/csf': 0.1.13
       ts-dedent: 2.2.0
     dev: true
 
@@ -3071,10 +3068,12 @@ packages:
       type-fest: 2.19.0
     dev: true
 
-  /@storybook/csf@0.1.8:
-    resolution: {integrity: sha512-Ntab9o7LjBCbFIao5l42itFiaSh/Qu+l16l/r/9qmV9LnYZkO+JQ7tzhdlwpgJfhs+B5xeejpdAtftDRyXNajw==}
+  /@storybook/docs-tools@8.5.1(storybook@8.5.0):
+    resolution: {integrity: sha512-0mPWEnYhAMYeSGWKK9NNbdWyDMIy9HB3cPdY6NKkvHcw7Sy9cmQtvuvwVPptjdcf0BShJkMTJjmf5h9YNhJPmQ==}
+    peerDependencies:
+      storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
     dependencies:
-      type-fest: 2.19.0
+      storybook: 8.5.0(prettier@3.2.5)
     dev: true
 
   /@storybook/global@5.0.0:
@@ -5020,7 +5019,7 @@ packages:
       mustache: 4.2.0
     dev: true
 
-  /axe-playwright@2.0.3(playwright@1.49.0):
+  /axe-playwright@2.0.3(playwright@1.49.1):
     resolution: {integrity: sha512-s7iI2okyHHsD3XZK4RMJtTy2UASkNWLQtnzLuaHiK3AWkERf+cqZJqkxb7O4b56fnbib9YnZVRByTl92ME3o6g==}
     peerDependencies:
       playwright: '>1.0.0'
@@ -5030,7 +5029,7 @@ packages:
       axe-html-reporter: 2.2.11(axe-core@4.10.2)
       junit-report-builder: 5.1.1
       picocolors: 1.1.1
-      playwright: 1.49.0
+      playwright: 1.49.1
     dev: true
 
   /axios@1.7.4:
@@ -6044,6 +6043,15 @@ packages:
         optional: true
     dev: true
 
+  /dedent@1.5.3:
+    resolution: {integrity: sha512-NHQtfOOW68WD8lgypbLA5oT+Bt0xXJhiYvoR6SmmNXZfpzOGXwdKWmcwG8N7PwVVWV3eF/68nmD9BaJSsTBhyQ==}
+    peerDependencies:
+      babel-plugin-macros: ^3.1.0
+    peerDependenciesMeta:
+      babel-plugin-macros:
+        optional: true
+    dev: true
+
   /deep-eql@4.1.3:
     resolution: {integrity: sha512-WaEtAOpRA1MQ0eohqZjpGD8zdI0Ovsm8mmFhaDN8dvDZzyoUMcYDnf5Y6iu7HTXxf8JDS23qWa4a+hKCDyOPzw==}
     engines: {node: '>=6'}
@@ -6520,6 +6528,10 @@ packages:
       is-callable: 1.2.7
       is-date-object: 1.0.5
       is-symbol: 1.0.4
+    dev: true
+
+  /es-toolkit@1.31.0:
+    resolution: {integrity: sha512-vwS0lv/tzjM2/t4aZZRAgN9I9TP0MSkWuvt6By+hEXfG/uLs8yg2S1/ayRXH/x3pinbLgVJYT+eppueg3cM6tg==}
     dev: true
 
   /es6-error@4.1.1:
@@ -7378,6 +7390,13 @@ packages:
     engines: {node: '>=0.10'}
     dependencies:
       estraverse: 5.3.0
+    dev: true
+
+  /esrap@1.2.2:
+    resolution: {integrity: sha512-F2pSJklxx1BlQIQgooczXCPHmcWpn6EsP5oo73LQfonG9fIlIENQ8vMmfGXeojP9MrkzUNAfyU5vdFlR9shHAw==}
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.5.0
+      '@types/estree': 1.0.6
     dev: true
 
   /esrap@1.2.3:
@@ -13433,6 +13452,17 @@ packages:
   /supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+    dev: true
+
+  /svelte-ast-print@0.4.2(svelte@5.5.4):
+    resolution: {integrity: sha512-hRHHufbJoArFmDYQKCpCvc0xUuIEfwYksvyLYEQyH+1xb5LD5sM/IthfooCdXZQtOIqXz6xm7NmaqdfwG4kh6w==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      svelte: ^5.0.0
+    dependencies:
+      esrap: 1.2.2
+      svelte: 5.5.4
+      zimmerframe: 1.1.2
     dev: true
 
   /svelte-check@4.1.1(svelte@5.5.4)(typescript@5.5.2):

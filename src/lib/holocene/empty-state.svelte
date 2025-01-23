@@ -1,16 +1,33 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  export let title: string;
-  export let content = '';
-  export let error = '';
-  export let icon: IconName = 'comet';
+  interface Props {
+    title: string;
+    content?: string;
+    error?: string;
+    icon?: IconName;
+    testId?: string;
+    class?: string;
+    children?: Snippet;
+  }
+
+  let {
+    title,
+    content = '',
+    error = '',
+    icon = 'comet',
+    testId = '',
+    class: className = '',
+    children,
+  }: Props = $props();
 </script>
 
 <div
-  class="my-12 flex w-full flex-col items-center justify-start gap-2 text-primary {$$props.class}"
-  data-testid={$$props.testId}
+  class="my-12 flex w-full flex-col items-center justify-start gap-2 text-primary {className}"
+  data-testid={testId}
 >
   <span
     class="surface-secondary flex h-16 w-16 items-center justify-center rounded-full"
@@ -26,5 +43,5 @@
       {error}
     </p>
   {/if}
-  <slot />
+  {@render children?.()}
 </div>

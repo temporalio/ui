@@ -1,5 +1,9 @@
 <script lang="ts">
-  export let width = '100%';
+  interface Props {
+    width?: string;
+  }
+
+  let { width = '100%' }: Props = $props();
 </script>
 
 <div class="meter">

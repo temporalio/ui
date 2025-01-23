@@ -1,11 +1,15 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import IconButton from '$lib/holocene/icon-button.svelte';
 
   import { iconNames } from './icon';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Icon Button (Deprecated)',
     component: IconButton,
     args: {
@@ -19,16 +23,17 @@
         options: iconNames,
       },
     },
-  } satisfies Meta<IconButton>;
+  });
 </script>
 
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+
+  setTemplate(template);
 </script>
 
-<Template let:args>
-  <IconButton {...args} on:click={action('click')} />
-</Template>
+{#snippet template({ icon, label, ...args }: Args<typeof Story>)}
+  <IconButton {icon} {label} {...args} onclick={action('click')} />
+{/snippet}
 
 <Story name="Default" />

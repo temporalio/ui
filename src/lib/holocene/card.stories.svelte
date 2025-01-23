@@ -1,19 +1,23 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import Card from './card.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Card',
     component: Card,
-  } satisfies Meta<Card>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args>
+{#snippet template(args: Args<typeof Story>)}
   <Card {...args}>
     <p>
       Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate
@@ -22,6 +26,6 @@
       itaque?
     </p>
   </Card>
-</Template>
+{/snippet}
 
 <Story name="Default" />

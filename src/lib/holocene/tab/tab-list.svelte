@@ -3,23 +3,21 @@
 
   import { twMerge as merge } from 'tailwind-merge';
 
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+  interface Props extends HTMLAttributes<HTMLDivElement> {
     label: string;
     class?: string;
   }
 
-  export let label: string;
-  let className = '';
-  export { className as class };
+  let { label, class: className = '', children, ...rest }: Props = $props();
 </script>
 
 <div
   class={merge('tab-list', className)}
   role="tablist"
   aria-label={label}
-  {...$$restProps}
+  {...rest}
 >
-  <slot />
+  {@render children?.()}
 </div>
 
 <style lang="postcss">

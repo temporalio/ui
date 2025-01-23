@@ -1,7 +1,7 @@
 <script lang="ts">
   import { type IconName, icons } from './paths';
 
-  type $$Props = {
+  interface Props {
     name: IconName;
     width?: number;
     height?: number;
@@ -12,34 +12,28 @@
     strokeWidth?: string;
     'aria-hidden'?: string;
     animate?: boolean;
+    duration?: number;
     active?: boolean;
-  };
+  }
+
   let {
     name,
     width = 16,
     height = 16,
     title = '',
     class: className = '',
-    x,
-    y,
-    strokeWidth,
-    'aria-hidden': ariaHidden = 'false',
-    animate = false,
-  }: $$Props = $props();
+    ...rest
+  }: Props = $props();
 
-  const Icon = $derived(icons[name]);
+  const IconComponent = icons[name];
 </script>
 
-{#if Icon}
-  <Icon
+{#if IconComponent}
+  <IconComponent
     {width}
     {height}
     {title}
-    {x}
-    {y}
-    {ariaHidden}
-    {strokeWidth}
-    {animate}
     class="shrink-0 {className}"
+    {...rest}
   />
 {/if}

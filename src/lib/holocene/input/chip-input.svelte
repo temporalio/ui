@@ -1,36 +1,55 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import { afterUpdate, onDestroy } from 'svelte';
+  import { onDestroy, tick } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Chip from '$lib/holocene/chip.svelte';
   import Label from '$lib/holocene/label.svelte';
 
-  export let id: string;
-  export let chips: string[];
-  export let label: string;
-  export let labelHidden = false;
-  export let placeholder = '';
-  export let name = id;
-  export let disabled = false;
-  export let required = false;
-  export let hintText = '';
-  export let validator: (value: string) => boolean = () => true;
-  export let removeChipButtonLabel: string | ((chipValue: string) => string);
-  export let external = false;
+  interface Props {
+    id: string;
+    chips: string[];
+    label: string;
+    labelHidden?: boolean;
+    placeholder?: string;
+    name?: string;
+    disabled?: boolean;
+    required?: boolean;
+    hintText?: string;
+    validator?: (value: string) => boolean;
+    removeChipButtonLabel?: string | ((chipValue: string) => string);
+    external?: boolean;
+    class?: string;
+  }
+
+  let {
+    id,
+    chips,
+    label,
+    labelHidden = false,
+    placeholder = '',
+    name = id,
+    disabled = false,
+    required = false,
+    hintText = '',
+    validator = () => true,
+    removeChipButtonLabel,
+    external = false,
+    class: className = '',
+  }: Props = $props();
 
   const values = writable<string[]>(chips);
-  let displayValue = '';
-  let shouldScrollToInput = false;
-  let inputContainer: HTMLDivElement;
-  let input: HTMLInputElement;
+  let displayValue = $state('');
+  let shouldScrollToInput = $state(false);
+  let inputContainer: HTMLDivElement = $state();
+  let input: HTMLInputElement = $state();
 
-  $: chips, ($values = chips);
-  $: invalid = $values.some((chip) => !validator(chip));
+  $effect(() => {
+    $values = chips;
+  });
 
-  let className = '';
-  export { className as class };
+  let invalid = $derived($values.some((chip) => !validator(chip)));
 
   const scrollToInput = () => {
     let rect = input.getBoundingClientRect();
@@ -43,10 +62,10 @@
     chips = updatedChips;
   });
 
-  afterUpdate(() => {
-    if (shouldScrollToInput) {
-      scrollToInput();
-    }
+  $effect(() => {
+    tick().then(() => {
+      if (shouldScrollToInput) scrollToInput();
+    });
   });
 
   onDestroy(() => {
@@ -54,6 +73,7 @@
   });
 
   const handleKeydown = (e: KeyboardEvent) => {
+    e.stopPropagation();
     const value = displayValue.trim();
     if ((e.key === ',' || e.key === 'Enter') && value !== '') {
       e.preventDefault();
@@ -121,7 +141,7 @@
           removeButtonLabel={typeof removeChipButtonLabel === 'string'
             ? removeChipButtonLabel
             : removeChipButtonLabel(chip)}
-          on:remove={() => removeChip(i)}
+          remove={() => removeChip(i)}
           intent={valid ? 'default' : 'warning'}
           {disabled}>{chip}</Chip
         >
@@ -141,9 +161,9 @@
       data-testid={id}
       bind:this={input}
       bind:value={displayValue}
-      on:blur={handleBlur}
-      on:keydown|stopPropagation={handleKeydown}
-      on:paste={handlePaste}
+      onblur={handleBlur}
+      onkeydown={handleKeydown}
+      onpaste={handlePaste}
     />
   </div>
   {#if invalid && hintText}
@@ -159,7 +179,7 @@
           removeButtonLabel={typeof removeChipButtonLabel === 'string'
             ? removeChipButtonLabel
             : removeChipButtonLabel(chip)}
-          on:remove={() => removeChip(i)}
+          remove={() => removeChip(i)}
           intent={valid ? 'default' : 'warning'}
           {disabled}>{chip}</Chip
         >

@@ -1,17 +1,5 @@
-<script lang="ts">
-  import type {
-    HTMLAnchorAttributes,
-    HTMLButtonAttributes,
-  } from 'svelte/elements';
-
+<script lang="ts" module>
   import { cva, type VariantProps } from 'class-variance-authority';
-  import { twMerge as merge } from 'tailwind-merge';
-
-  import { goto } from '$app/navigation';
-
-  import Badge from '$lib/holocene/badge.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
 
   const buttonStyles = cva(
     [
@@ -61,7 +49,9 @@
     },
   );
 
-  type BaseProps = {
+  type ButtonStyles = VariantProps<typeof buttonStyles>;
+
+  type BaseProps = ButtonStyles & {
     disabled?: boolean;
     loading?: boolean;
     leadingIcon?: IconName;
@@ -69,43 +59,70 @@
     count?: number;
     id?: string;
     'data-testid'?: string;
+    onclick?: (e: MouseEvent) => void;
   };
 
-  type ButtonWithoutHrefProps = BaseProps & HTMLButtonAttributes;
-  type ButtonWithHrefProps = BaseProps &
+  export type ButtonWithoutHrefProps = BaseProps &
+    HTMLButtonAttributes & {
+      onkeydown?: (e: KeyboardEvent) => void;
+      href?: never;
+      target?: never;
+    };
+  export type ButtonWithHrefProps = BaseProps &
     HTMLAnchorAttributes & {
+      onkeydown?: never;
       href: string;
       target?: HTMLAnchorAttributes['target'];
       disabled?: boolean;
     };
+</script>
 
-  type ButtonStyles = VariantProps<typeof buttonStyles>;
+<script lang="ts">
+  import type {
+    HTMLAnchorAttributes,
+    HTMLButtonAttributes,
+  } from 'svelte/elements';
 
-  type $$Props = (ButtonWithoutHrefProps | ButtonWithHrefProps) & ButtonStyles;
+  import { twMerge as merge } from 'tailwind-merge';
 
-  export let variant: ButtonStyles['variant'] = 'primary';
-  export let size: ButtonStyles['size'] = 'md';
-  export let disabled = false;
-  export let loading = false;
-  export let leadingIcon: IconName = null;
-  export let trailingIcon: IconName = null;
-  export let count = 0;
-  export let id: string = null;
-  export let href: string = null;
-  export let target: string = null;
+  import { goto } from '$app/navigation';
 
-  let className = '';
-  export { className as class };
+  import Badge from '$lib/holocene/badge.svelte';
+  import type { IconName } from '$lib/holocene/icon';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+
+  type Props = ButtonWithoutHrefProps | ButtonWithHrefProps;
+
+  let props: Props = $props();
 
   const onLinkClick = (e: MouseEvent) => {
     // Skip if middle mouse click or new tab
-    if (e.button === 1 || target || e.metaKey) return;
+    if (e.button === 1 || props.target || e.metaKey) return;
     e.preventDefault();
-    goto(href);
+    goto(props.href);
+  };
+
+  const isLink = (props: Props): props is ButtonWithHrefProps => {
+    return props.href && !props.disabled;
   };
 </script>
 
-{#if href && !disabled}
+{#if isLink(props)}
+  {@const {
+    variant = 'primary',
+    size = 'md',
+    loading = false,
+    leadingIcon = null,
+    trailingIcon = null,
+    count = 0,
+    id = null,
+    href = null,
+    target = null,
+    class: className = '',
+    children,
+    onclick = () => {},
+    ...rest
+  } = props}
   <a
     {href}
     {id}
@@ -120,16 +137,20 @@
       }),
       className,
     )}
-    on:click|stopPropagation={onLinkClick}
+    onclick={(e: MouseEvent) => {
+      e.stopPropagation();
+      onclick(e);
+      onLinkClick(e);
+    }}
     tabindex={href ? null : 0}
-    {...$$restProps}
+    {...rest}
   >
     {#if leadingIcon || loading}
       <span class:animate-spin={loading}>
         <Icon name={loading ? 'spinner' : leadingIcon} />
       </span>
     {/if}
-    <slot />
+    {@render children?.()}
     {#if trailingIcon}
       <span>
         <Icon name={trailingIcon} />
@@ -143,12 +164,33 @@
     {/if}
   </a>
 {:else}
+  {@const {
+    variant = 'primary',
+    size = 'md',
+    disabled = false,
+    loading = false,
+    leadingIcon = null,
+    trailingIcon = null,
+    count = 0,
+    id = null,
+    class: className = '',
+    children,
+    onclick = () => {},
+    onkeydown = () => {},
+    ...rest
+  } = props}
   <button
     {disabled}
     {id}
     type="button"
-    on:click|stopPropagation
-    on:keydown|stopPropagation
+    onclick={(e: MouseEvent) => {
+      e.stopPropagation();
+      onclick(e);
+    }}
+    onkeydown={(e: KeyboardEvent) => {
+      e.stopPropagation();
+      onkeydown(e);
+    }}
     class={merge(
       buttonStyles({
         variant,
@@ -156,14 +198,14 @@
       }),
       className,
     )}
-    {...$$restProps}
+    {...rest}
   >
     {#if leadingIcon || loading}
       <span class:animate-spin={loading}>
         <Icon name={loading ? 'spinner' : leadingIcon} />
       </span>
     {/if}
-    <slot />
+    {@render children?.()}
     {#if trailingIcon}
       <span>
         <Icon name={trailingIcon} />

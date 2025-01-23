@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
   import { clickoutside } from '$lib/holocene/outside-click';
   import { translate } from '$lib/i18n/translate';
   import { getMonthName } from '$lib/utilities/calendar';
@@ -9,26 +7,39 @@
   import Icon from './icon/icon.svelte';
   import Input from './input/input.svelte';
 
-  const dispatch = createEventDispatcher();
+  interface Props {
+    isAllowed?: (_date: Date) => boolean;
+    selected?: Date;
+    label: string;
+    labelHidden?: boolean;
+    todayLabel: string;
+    closeLabel: string;
+    clearLabel: string;
+    disabled?: boolean;
+    datechange: (_date: Date) => void;
+  }
 
-  export let isAllowed: (d: Date) => boolean = () => true;
-  export let selected = new Date();
-  export let label: string;
-  export let labelHidden = false;
-  export let todayLabel: string;
-  export let closeLabel: string;
-  export let clearLabel: string;
-  export let disabled = false;
+  let {
+    isAllowed = () => true,
+    selected = new Date(),
+    label,
+    labelHidden = false,
+    todayLabel,
+    closeLabel,
+    clearLabel,
+    disabled = false,
+    datechange,
+  }: Props = $props();
 
-  let month: number | undefined;
-  let year: number | undefined;
-  let showDatePicker = false;
+  let month: number | undefined = $state();
+  let year: number | undefined = $state();
+  let showDatePicker = $state(false);
 
   // so that these change with props
-  $: {
+  $effect(() => {
     month = selected.getMonth();
     year = selected.getFullYear();
-  }
+  });
 
   // handlers
   const onFocus = () => {
@@ -45,7 +56,7 @@
       const month = parseInt(inputDateSplit[0]) - 1;
       const date = parseInt(inputDateSplit[1]);
       const newDate = new Date(year, month, date);
-      dispatch('datechange', newDate);
+      datechange(newDate);
     }
   };
 
@@ -67,9 +78,9 @@
     month -= 1;
   };
 
-  const onDateChange = (d: CustomEvent) => {
+  const onDateChange = (date: Date) => {
     showDatePicker = false;
-    dispatch('datechange', d.detail);
+    datechange(date);
   };
 
   const previousMonth = translate('date-picker.previous-month');
@@ -83,8 +94,8 @@
     {labelHidden}
     icon="calendar-plus"
     type="text"
-    on:focus={onFocus}
-    on:input={onInput}
+    onfocus={onFocus}
+    oninput={onInput}
     placeholder="MM/DD/YY"
     value={selected.toDateString()}
     clearable
@@ -97,7 +108,7 @@
     >
       <div class="mx-3 my-2 flex items-center justify-around">
         <div class="flex items-center justify-center">
-          <button type="button" on:click={prev} title={previousMonth}>
+          <button type="button" onclick={prev} title={previousMonth}>
             <span class="sr-only">{previousMonth}</span>
             <Icon name="chevron-left" /></button
           >
@@ -108,7 +119,7 @@
         </div>
         <div class="flex items-center justify-center">
           <span class="sr-only">Next Month</span>
-          <button type="button" on:click={next} title={nextMonth}>
+          <button type="button" onclick={next} title={nextMonth}>
             <span class="sr-only">{nextMonth}</span>
             <Icon name="chevron-right" />
           </button>
@@ -119,20 +130,20 @@
         {year}
         date={selected}
         {isAllowed}
-        on:datechange={onDateChange}
+        datechange={onDateChange}
       />
       <div class="my-1 flex justify-between px-2">
         <button
           type="button"
           class="cursor-pointer text-[12px]"
-          on:click={() => (selected = new Date())}
+          onclick={() => (selected = new Date())}
         >
           {todayLabel}
         </button>
         <button
           type="button"
           class="cursor-pointer text-[12px]"
-          on:click={() => (showDatePicker = false)}
+          onclick={() => (showDatePicker = false)}
         >
           {closeLabel}
         </button>

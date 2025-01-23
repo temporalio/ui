@@ -20,6 +20,7 @@
     active?: boolean;
     'data-testid'?: string;
     tooltip?: string;
+    disabled?: boolean;
   };
 
   type AnchorProps = BaseProps &
@@ -34,16 +35,20 @@
       base?: never;
     };
 
-  type $$Props = AnchorProps | ButtonProps;
+  type Props = AnchorProps | ButtonProps;
 
-  let className = '';
-  export { className as class };
-  export let icon: IconName = null;
-  export let group = getAppContext('group');
-  export let href = '';
-  export let base = href;
-  export let active = false;
-  export let tooltip = '';
+  let {
+    class: className = '',
+    icon = null,
+    group = getAppContext('group'),
+    href = '',
+    base = href,
+    active = false,
+    tooltip = '',
+    disabled = false,
+    children,
+    ...rest
+  }: Props = $props();
 </script>
 
 <svelte:element
@@ -52,22 +57,21 @@
   class:group
   class:active={href ? $page.url.pathname.includes(base) : active}
   href={href ? href + $page.url.search : null}
-  class:disabled={$$restProps.disabled}
-  on:click
+  class:disabled
   role="button"
   tabindex="0"
-  {...$$restProps}
+  {...rest}
 >
   <Tooltip hide={!tooltip} text={tooltip} top>
     {#if icon}
       <div class="flex items-center gap-2">
         <Icon name={icon} />
-        {#if $$slots.default}
-          <span class="hidden md:block"><slot /></span>
+        {#if children}
+          <span class="hidden md:block">{@render children()}</span>
         {/if}
       </div>
     {:else}
-      <slot />
+      {@render children?.()}
     {/if}
   </Tooltip>
 </svelte:element>

@@ -1,23 +1,37 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
 
-  export let icon: IconName;
-  export let link: string;
-  export let tooltip: string = '';
-  export let external = false;
+  interface Props {
+    icon?: IconName;
+    link: string;
+    tooltip?: string;
+    external?: boolean;
+    class?: string;
+    children?: Snippet;
+    'data-testid'?: string;
+  }
 
-  let className: string = '';
-  export { className as class };
+  let {
+    icon,
+    link,
+    tooltip = '',
+    external = false,
+    class: className = '',
+    children,
+    ...rest
+  }: Props = $props();
 
-  $: rel = external ? 'noopener noreferrer' : '';
-  $: target = external ? '_blank' : '';
+  let rel = $derived(external ? 'noopener noreferrer' : '');
+  let target = $derived(external ? '_blank' : '');
 </script>
 
 <div
   class="relative {className}"
   role="listitem"
-  data-testid={$$props['data-testid']}
+  data-testid={rest['data-testid']}
 >
   <a
     href={link}
@@ -36,7 +50,7 @@
     <div
       class="text-center group-data-[nav=open]:visible group-data-[nav=closed]:hidden"
     >
-      <slot />
+      {@render children?.()}
     </div>
   </a>
 </div>

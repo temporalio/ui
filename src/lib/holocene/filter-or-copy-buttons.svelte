@@ -4,27 +4,46 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
-  export let show = false;
-  export let filterable = true;
-  export let copyable = true;
-  export let content: string;
-  export let onFilter: () => void = () => {};
-  export let filtered = false;
-  export let copyIconTitle: string;
-  export let copySuccessIconTitle: string;
-  export let filterIconTitle: string;
+  interface Props {
+    show?: boolean;
+    filterable?: boolean;
+    copyable?: boolean;
+    content: string;
+    onFilter?: () => void;
+    filtered?: boolean;
+    copyIconTitle: string;
+    copySuccessIconTitle: string;
+    filterIconTitle: string;
+    class?: string;
+  }
 
-  let className = '';
-  export { className as class };
+  let {
+    show = false,
+    filterable = true,
+    copyable = true,
+    content,
+    onFilter = () => {},
+    filtered = false,
+    copyIconTitle,
+    copySuccessIconTitle,
+    filterIconTitle,
+    class: className = '',
+  }: Props = $props();
 
   const { copy, copied } = copyToClipboard();
+
+  function handleOnFilter(event: Event) {
+    event.stopPropagation();
+    event.preventDefault;
+    onFilter();
+  }
 </script>
 
 {#if show}
   <div class={merge('copy-or-filter', className)}>
     {#if filterable}
       <button
-        on:click|preventDefault|stopPropagation={onFilter}
+        onclick={handleOnFilter}
         class="copy-or-filter-button"
         class:filtered
         id="filter-button"
@@ -37,7 +56,11 @@
     {#if copyable}
       <button
         class="copy-or-filter-button"
-        on:click|preventDefault|stopPropagation={(e) => copy(e, content)}
+        onclick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          copy(e, content);
+        }}
         id="copy-button"
       >
         <Icon

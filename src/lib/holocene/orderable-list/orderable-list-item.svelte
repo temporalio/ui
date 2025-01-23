@@ -1,14 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
   import IconButton from '../icon-button.svelte';
-
-  const dispatch = createEventDispatcher<{
-    addItem: undefined;
-    moveItem: { from: number; to: number };
-    pinItem: undefined;
-    removeItem: undefined;
-  }>();
 
   type ExtendedDragEvent = DragEvent & {
     currentTarget: EventTarget & HTMLLIElement;
@@ -20,14 +11,31 @@
     totalItems?: number;
     pinned?: boolean;
     maxPinnedItems?: number;
+    addItem?: () => void;
+    moveItem?: (args: { from: number; to: number }) => void;
+    pinItem?: () => void;
+    removeItem?: () => void;
   };
 
   type ReadonlyProps = BaseProps & {
-    readonly: boolean;
+    static?: false;
+    readonly: true;
+    moveUpButtonLabel?: '';
+    moveDownButtonLabel?: '';
+    pinButtonLabel?: '';
+    unpinButtonLabel?: '';
+    addButtonLabel?: '';
+    removeButtonLabel?: '';
   };
 
   type StaticProps = BaseProps & {
-    static: boolean;
+    static: true;
+    readonly?: false;
+    moveUpButtonLabel?: '';
+    moveDownButtonLabel?: '';
+    pinButtonLabel?: '';
+    unpinButtonLabel?: '';
+    removeButtonLabel?: '';
   } & Pick<I18nProps, 'addButtonLabel'>;
 
   type I18nProps = {
@@ -39,22 +47,30 @@
     removeButtonLabel: string;
   };
 
-  type $$Props = (BaseProps & I18nProps) | ReadonlyProps | StaticProps;
+  type Props =
+    | (BaseProps & I18nProps & { static?: false; readonly?: false })
+    | ReadonlyProps
+    | StaticProps;
 
-  let isStatic = false;
-  export { isStatic as static };
-  export let label: string;
-  export let maxPinnedItems: number = undefined;
-  export let pinned = false;
-  export let readonly = false;
-  export let index = 0;
-  export let totalItems = 0;
-  export let moveUpButtonLabel = '';
-  export let moveDownButtonLabel = '';
-  export let pinButtonLabel = '';
-  export let unpinButtonLabel = '';
-  export let addButtonLabel = '';
-  export let removeButtonLabel = '';
+  let {
+    label,
+    maxPinnedItems,
+    pinned = false,
+    readonly = false,
+    index = 0,
+    totalItems = 0,
+    moveUpButtonLabel = '',
+    moveDownButtonLabel = '',
+    pinButtonLabel = '',
+    unpinButtonLabel = '',
+    addButtonLabel = '',
+    removeButtonLabel = '',
+    addItem = () => {},
+    moveItem = () => {},
+    pinItem = () => {},
+    removeItem = () => {},
+    static: isStatic = false,
+  }: Props = $props();
 
   const handleDragStart = (event: ExtendedDragEvent, index: number) => {
     if (isStatic || readonly) return;
@@ -65,24 +81,36 @@
   const handleDrop = (event: ExtendedDragEvent, to: number) => {
     event.currentTarget.classList.remove('dragging-over');
     const from = parseInt(event.dataTransfer.getData('text/plain'));
-    dispatch('moveItem', { from, to });
+    moveItem({ from, to });
   };
 
-  const handleDragEnter = (event: ExtendedDragEvent) =>
+  const handleDragEnter = (event: ExtendedDragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     event.currentTarget.classList.add('dragging-over');
-  const handleDragLeave = (event: ExtendedDragEvent) =>
+  };
+  const handleDragLeave = (event: ExtendedDragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     event.currentTarget.classList.remove('dragging-over');
+  };
 </script>
 
 <li
   draggable={!isStatic && !readonly}
   class="orderable-item group"
   class:readonly
-  on:dragstart={(e) => handleDragStart(e, index)}
-  on:drop|preventDefault={(e) => handleDrop(e, index)}
-  on:dragenter|preventDefault|stopPropagation={handleDragEnter}
-  on:dragleave|preventDefault|stopPropagation={handleDragLeave}
-  on:dragover|preventDefault|stopPropagation
+  ondragstart={(e) => handleDragStart(e, index)}
+  ondrop={(e) => {
+    e.preventDefault();
+    handleDrop(e, index);
+  }}
+  ondragenter={handleDragEnter}
+  ondragleave={handleDragLeave}
+  ondragover={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }}
   data-testid="orderable-list-item-{label}"
 >
   <div class="flex flex-row items-center gap-2">
@@ -93,14 +121,14 @@
           icon="chevron-up"
           data-testid="orderable-list-item-{label}-move-up-button"
           label={moveUpButtonLabel}
-          on:click={() => dispatch('moveItem', { from: index, to: index - 1 })}
+          onclick={() => moveItem({ from: index, to: index - 1 })}
         />
         <IconButton
           disabled={index === totalItems - 1}
           icon="chevron-down"
           data-testid="orderable-list-item-{label}-move-down-button"
           label={moveDownButtonLabel}
-          on:click={() => dispatch('moveItem', { from: index, to: index + 1 })}
+          onclick={() => moveItem({ from: index, to: index + 1 })}
         />
       </div>
     {/if}
@@ -111,14 +139,14 @@
           icon="pin-filled"
           data-testid="orderable-list-item-{label}-unpin-button"
           label={unpinButtonLabel}
-          on:click={() => dispatch('pinItem')}
+          onclick={() => pinItem()}
         />
       {:else}
         <IconButton
           icon="pin"
           data-testid="orderable-list-item-{label}-pin-button"
           label={pinButtonLabel}
-          on:click={() => dispatch('pinItem')}
+          onclick={() => pinItem()}
         />
       {/if}
     {/if}
@@ -129,14 +157,14 @@
         icon="add"
         data-testid="orderable-list-item-{label}-add-button"
         label={addButtonLabel}
-        on:click={() => dispatch('addItem')}
+        onclick={() => addItem()}
       />
     {:else}
       <IconButton
         icon="hyphen"
         data-testid="orderable-list-item-{label}-remove-button"
         label={removeButtonLabel}
-        on:click={() => dispatch('removeItem')}
+        onclick={() => removeItem()}
       />
     {/if}
   {/if}

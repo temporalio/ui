@@ -1,10 +1,14 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
   import { within } from '@storybook/test';
 
   import DatePicker from '$lib/holocene/date-picker.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Date Picker',
     component: DatePicker,
     args: {
@@ -38,12 +42,11 @@
         table: { category: 'Accessibility' },
       },
     },
-  } satisfies Meta<DatePicker>;
+  });
 </script>
 
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
 
   /**
    * Used for the "Focused" story to focus the input.
@@ -55,11 +58,26 @@
   };
 
   const disallowSundays = (date: Date) => date.getDay() !== 0;
+
+  setTemplate(template);
 </script>
 
-<Template let:args>
-  <DatePicker {...args} on:datechange={action('date-change')} />
-</Template>
+{#snippet template({
+  label,
+  todayLabel,
+  closeLabel,
+  clearLabel,
+  ...args
+}: Args<typeof Story>)}
+  <DatePicker
+    {label}
+    {todayLabel}
+    {closeLabel}
+    {clearLabel}
+    {...args}
+    datechange={action('date-change')}
+  />
+{/snippet}
 
 <Story name="Default" play={focus} />
 

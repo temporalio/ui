@@ -15,7 +15,7 @@
   import { shell } from '@codemirror/legacy-modes/mode/shell';
   import { EditorState } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
@@ -29,9 +29,11 @@
     TEMPORAL_THEME,
   } from '$lib/vendor/codemirror/theme';
 
+  type Language = 'json' | 'text' | 'shell';
+
   type BaseProps = HTMLAttributes<HTMLDivElement> & {
     content: string;
-    language?: 'json' | 'text' | 'shell';
+    language?: Language;
     editable?: boolean;
     inline?: boolean;
     testId?: string;
@@ -39,6 +41,7 @@
     minHeight?: number;
     maxHeight?: number;
     label?: string;
+    change?: (value: string) => void;
   };
 
   type CopyableProps = BaseProps & {
@@ -47,22 +50,26 @@
     copySuccessIconTitle: string;
   };
 
-  type $$Props = BaseProps | CopyableProps;
+  type Props =
+    | (BaseProps & { copyIconTitle?: string; copySuccessIconTitle?: string })
+    | CopyableProps;
 
-  const dispatch = createEventDispatcher<{ change: string }>();
-
-  export let content: string;
-  let className: string = null;
-  export { className as class };
-  export let editable = false;
-  export let inline = false;
-  export let language = 'json';
-  export let copyable = true;
-  export let copyIconTitle = '';
-  export let copySuccessIconTitle = '';
-  export let minHeight = undefined;
-  export let maxHeight = undefined;
-  export let label = '';
+  let {
+    content,
+    class: className = '',
+    editable = false,
+    inline = false,
+    language = 'json',
+    copyable = true,
+    copyIconTitle = '',
+    copySuccessIconTitle = '',
+    minHeight,
+    maxHeight,
+    label = '',
+    testId,
+    change = () => {},
+    ...rest
+  }: Props = $props();
 
   const { copy, copied } = copyToClipboard();
 
@@ -70,8 +77,8 @@
     copy(e, content);
   };
 
-  let editor: HTMLElement;
-  let view: EditorView;
+  let editor: HTMLElement = $state();
+  let view: EditorView = $state();
 
   const formatJSON = (jsonData: string): string => {
     if (!jsonData) return;
@@ -89,7 +96,7 @@
   const formatValue = ({ value, language }) =>
     language === 'json' ? formatJSON(value) : value;
 
-  $: value = formatValue({ value: content, language });
+  let value = $derived(formatValue({ value: content, language }));
 
   const createEditorView = (isDark: boolean): EditorView => {
     return new EditorView({
@@ -98,7 +105,7 @@
       dispatch(transaction) {
         view.update([transaction]);
         if (transaction.docChanged) {
-          dispatch('change', view.state.doc.toString());
+          change(view.state.doc.toString());
         }
       },
     });
@@ -157,18 +164,28 @@
   };
 
   onMount(() => {
-    createView($useDarkMode);
+    view = createView($useDarkMode);
     return () => view?.destroy();
   });
 
-  const createView = (isDark: boolean) => {
+  const createView = (isDark: boolean): EditorView => {
     if (view) view.destroy();
-    view = createEditorView(isDark);
+    return createEditorView(isDark);
   };
 
-  $: createView($useDarkMode);
+  useDarkMode.subscribe((isDark) => {
+    view = createView(isDark);
+  });
 
-  const resetView = (value = '', format = true) => {
+  const resetView = ({
+    value = '',
+    format = true,
+    language,
+  }: {
+    value?: string;
+    format?: boolean;
+    language: Language;
+  }) => {
     const formattedValue = format ? formatValue({ value, language }) : value;
     view.dispatch({
       changes: {
@@ -179,13 +196,21 @@
     });
   };
 
-  const setView = () => {
+  const setView = ({
+    content,
+    language,
+  }: {
+    content: string;
+    language: Language;
+  }) => {
     if (view && (!editable || view.state.doc.toString() !== content)) {
-      resetView(content);
+      resetView({ value: content, language });
     }
   };
 
-  $: content, language, setView();
+  $effect(() => {
+    setView({ content, language });
+  });
 </script>
 
 <div class="relative min-w-[80px] grow">
@@ -193,18 +218,18 @@
     bind:this={editor}
     class={className}
     class:inline
-    data-testid={$$props.testId}
+    data-testid={testId}
     class:editable
     class:readOnly={!editable}
-    {...$$restProps}
+    {...rest}
   ></div>
   {#if copyable}
     <CopyButton
       {copyIconTitle}
       {copySuccessIconTitle}
       class="absolute right-1 top-1 text-secondary"
-      on:click={handleCopy}
+      onclick={handleCopy}
       copied={$copied}
-    />
+    ></CopyButton>
   {/if}
 </div>

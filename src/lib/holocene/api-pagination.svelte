@@ -1,8 +1,6 @@
 <script lang="ts">
-  import type { HTMLAttributes } from 'svelte/elements';
-
   import debounce from 'just-debounce';
-  import { onMount } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
 
   import Alert from '$lib/holocene/alert.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -16,7 +14,7 @@
   import { isError } from '$lib/utilities/is';
 
   type T = $$Generic;
-  type BaseProps = HTMLAttributes<HTMLDivElement> & {
+  interface BaseProps {
     onError?: (error: Error | unknown) => void | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
     onShiftUp?: (event: KeyboardEvent) => void | undefined;
@@ -31,10 +29,31 @@
     itemsKeyname?: string;
     previousButtonLabel: string;
     nextButtonLabel: string;
-  };
+    header: Snippet<[{ visibleItems: T[] }]>;
+    error?: Snippet;
+    loading?: Snippet;
+    empty?: Snippet<[{ query: string }]>;
+    action_top_left?: Snippet<[{ visibleItems: T[] }]>;
+    action_top_center?: Snippet;
+    action_top_right?: Snippet;
+    action_bottom_right?: Snippet;
+    action_bottom_left?: Snippet;
+    children?: Snippet<
+      [
+        {
+          updating: boolean;
+          visibleItems: T[];
+          activeIndex: number;
+          setActiveIndex: (activeIndex: number) => void;
+        },
+      ]
+    >;
+  }
 
   type NonFilterableProps = {
     filterable?: false;
+    filterInputPlaceholder: never;
+    filterDebounceInMilliseconds?: never;
   };
 
   type FilterableProps = {
@@ -43,7 +62,7 @@
     filterDebounceInMilliseconds?: number;
   };
 
-  type $$Props = BaseProps & (FilterableProps | NonFilterableProps);
+  type Props = BaseProps & (FilterableProps | NonFilterableProps);
 
   type PaginatedRequest<T> = (
     size: number,
@@ -51,53 +70,65 @@
     query?: string,
   ) => Promise<{ items: T[]; nextPageToken: string }>;
 
-  export let onError: (error: Error) => void | undefined = undefined;
-  export let onFetch: () => Promise<PaginatedRequest<T>>;
-  export let onShiftUp: (event: KeyboardEvent) => void | undefined = undefined;
-  export let onShiftDown: (event: KeyboardEvent) => void | undefined =
-    undefined;
-  export let onSpace: (event: KeyboardEvent) => void | undefined = undefined;
+  let {
+    onError,
+    onFetch,
+    onShiftUp,
+    onShiftDown,
+    onSpace,
+    pageSizeOptions = options,
+    defaultPageSize,
+    total = '',
+    pageSizeSelectLabel,
+    emptyStateMessage,
+    fallbackErrorMessage,
+    itemsKeyname = 'items',
+    previousButtonLabel,
+    nextButtonLabel,
+    filterable = false,
+    filterInputPlaceholder,
+    filterDebounceInMilliseconds = 1000,
+    header,
+    error: error_render,
+    loading,
+    empty,
+    action_top_left,
+    action_top_center,
+    action_top_right,
+    action_bottom_right,
+    action_bottom_left,
+    children,
+    ...rest
+  }: Props = $props();
 
-  export let pageSizeOptions: string[] | number[] = options;
-  export let defaultPageSize: string | number | undefined = undefined;
-  export let total: string | number = '';
-  export let pageSizeSelectLabel: string;
-  export let emptyStateMessage: string;
-  export let fallbackErrorMessage: string;
-  export let itemsKeyname = 'items';
-  export let previousButtonLabel: string;
-  export let nextButtonLabel: string;
-  export let filterable = false;
-  export let filterInputPlaceholder: string = undefined;
-  export let filterDebounceInMilliseconds = 1000;
-
-  let query = '';
+  let query = $state('');
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
     defaultPageSize,
   );
 
-  let error: Error;
+  let error: Error = $state();
 
   function clearError() {
     if (error) error = undefined;
   }
 
-  $: isEmpty = $store.visibleItems.length === 0 && !$store.loading;
-  $: pageSizeChange =
-    !$store.loading && $store.pageSize !== $store.previousPageSize;
+  let isEmpty = $derived($store.visibleItems.length === 0 && !$store.loading);
+  let pageSizeChange = $derived(
+    !$store.loading && $store.pageSize !== $store.previousPageSize,
+  );
 
   onMount(() => {
     initalDataFetch();
   });
 
-  $: {
+  $effect(() => {
     if (pageSizeChange) {
       store.resetPageSize($store.pageSize);
       initalDataFetch();
     }
-  }
+  });
 
   async function initalDataFetch() {
     const fetchData = await onFetch();
@@ -200,10 +231,10 @@
   );
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} />
 
-{#if error && $$slots.error}
-  <slot name="error" />
+{#if error && error_render}
+  {@render error_render()}
 {:else if error}
   <Alert
     intent="error"
@@ -212,16 +243,14 @@
   />
 {/if}
 
-<slot name="header" visibleItems={$store.visibleItems} />
+{@render header({ visibleItems: $store.visibleItems })}
 <div class="relative mb-8 flex flex-col gap-4">
   <div
-    class="flex flex-row flex-wrap items-center gap-4 {$$slots[
-      'action-top-left'
-    ]
+    class="flex flex-row flex-wrap items-center gap-4 {action_top_left
       ? 'justify-between'
       : 'justify-end'}"
   >
-    <slot name="action-top-left" visibleItems={$store.visibleItems} />
+    {@render action_top_left?.({ visibleItems: $store.visibleItems })}
     {#if filterable && filterInputPlaceholder}
       <Input
         icon="search"
@@ -231,16 +260,17 @@
         label={filterInputPlaceholder}
         labelHidden
         placeholder={filterInputPlaceholder}
-        on:input={debouncedHandleFilter}
-        on:clear={handleFilter}
+        oninput={debouncedHandleFilter}
+        clear={handleFilter}
         clearable
+        clearButtonLabel="clear"
       />
     {/if}
     <nav
       class="flex flex-row flex-wrap justify-center gap-4"
-      aria-label="{$$restProps['aria-label']} 1"
+      aria-label="{rest['aria-label']} 1"
     >
-      <slot name="action-top-center" />
+      {@render action_top_center?.()}
       {#if $store.visibleItems.length}
         {#if pageSizeOptions.length}
           <FilterSelect
@@ -254,7 +284,7 @@
           <button
             class="caret"
             disabled={!$store.hasPrevious}
-            on:click={store.previousPage}
+            onclick={store.previousPage}
             aria-label={previousButtonLabel}
           >
             <span class="arrow arrow-left"></span>
@@ -272,39 +302,41 @@
           <button
             class="caret"
             disabled={!$store.hasNext}
-            on:click={fetchIndexData}
+            onclick={fetchIndexData}
             aria-label={nextButtonLabel}
           >
             <span class="arrow arrow-right"></span>
           </button>
         </div>
       {/if}
-      <slot name="action-top-right" />
+      {@render action_top_right?.()}
     </nav>
   </div>
   {#if $store.loading}
-    {#if $$slots.loading}
-      <slot name="loading" />
+    {#if loading}
+      {@render loading()}
     {:else}
       <SkeletonTable rows={15} />
     {/if}
   {:else if isEmpty}
-    <slot name="empty" {query}>{emptyStateMessage}</slot>
+    {#if empty}
+      {@render empty({ query })}
+    {:else}
+      {emptyStateMessage}
+    {/if}
   {:else}
-    <slot
-      updating={$store.updating}
-      visibleItems={$store.visibleItems}
-      activeIndex={$store.activeIndex}
-      setActiveIndex={store.setActiveIndex}
-    />
+    {@render children?.({
+      updating: $store.updating,
+      visibleItems: $store.visibleItems,
+      activeIndex: $store.activeIndex,
+      setActiveIndex: store.setActiveIndex,
+    })}
   {/if}
   <nav
-    class="flex {$$slots['action-bottom-left']
-      ? 'justify-between'
-      : 'justify-end'}"
-    aria-label="{$$restProps['aria-label']} 2"
+    class="flex {action_bottom_left ? 'justify-between' : 'justify-end'}"
+    aria-label="{rest['aria-label']} 2"
   >
-    <slot name="action-bottom-left" />
+    {@render action_bottom_left?.()}
     <div class="flex gap-4">
       {#if $store.visibleItems.length}
         {#if pageSizeOptions.length}
@@ -319,7 +351,7 @@
           <button
             class="caret"
             disabled={!$store.hasPrevious}
-            on:click={store.previousPage}
+            onclick={store.previousPage}
             aria-label={previousButtonLabel}
           >
             <span class="arrow arrow-left"></span>
@@ -337,14 +369,14 @@
           <button
             class="caret"
             disabled={!$store.hasNext}
-            on:click={fetchIndexData}
+            onclick={fetchIndexData}
             aria-label={nextButtonLabel}
           >
             <span class="arrow arrow-right"></span>
           </button>
         </div>
       {/if}
-      <slot name="action-bottom-right" />
+      {@render action_bottom_right?.()}
     </div>
   </nav>
 </div>

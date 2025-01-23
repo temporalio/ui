@@ -1,9 +1,13 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Code Block',
     args: {
       editable: false,
@@ -51,31 +55,20 @@
         table: { category: 'Copy Icon' },
       },
     },
-  } satisfies Meta<CodeBlock>;
+  });
 </script>
 
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
 
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+
+  setTemplate(template);
 </script>
 
-<Template id="json" let:args>
-  <CodeBlock language="json" {...args} on:change={action('change')} />
-</Template>
-
-<Template id="shell" let:args>
-  <CodeBlock language="shell" {...args} on:change={action('change')} />
-</Template>
-
-<Template id="text" let:args>
-  <CodeBlock language="text" {...args} on:change={action('change')} />
-</Template>
-
-<Template let:args>
-  <CodeBlock {...args} />
-</Template>
+{#snippet template({ content, ...args }: Args<typeof Story>)}
+  <CodeBlock {content} {...args} change={action('change')} />
+{/snippet}
 
 <Story
   name="Default"
