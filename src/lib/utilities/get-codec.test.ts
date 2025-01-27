@@ -34,6 +34,7 @@ const defaultSettings = {
   workflowTerminateDisabled: false,
   workflowCancelDisabled: false,
   workflowSignalDisabled: false,
+  workflowUpdateDisabled: false,
   workflowResetDisabled: false,
   batchActionsDisabled: false,
 };

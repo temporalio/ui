@@ -215,6 +215,12 @@ export const routeForWorkflowMetadata = (
   return `${routeForWorkflow(parameters)}/metadata`;
 };
 
+export const routeForWorkflowUpdate = (
+  parameters: WorkflowParameters,
+): string => {
+  return `${routeForWorkflow(parameters)}/update`;
+};
+
 export const routeForPendingActivities = (
   parameters: WorkflowParameters,
 ): string => {

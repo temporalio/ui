@@ -32,6 +32,8 @@ import type {
   WorkflowsAPIRoutePath,
   WorkflowSignalAPIRoutePath,
   WorkflowSignalRouteParameters,
+  WorkflowUpdateAPIRoutePath,
+  WorkflowUpdateRouteParameters,
 } from '$lib/types/api';
 
 import { getApiOrigin } from './get-api-origin';
@@ -99,6 +101,7 @@ const encode = (
       queue: '',
       queryType: '',
       signalName: '',
+      updateName: '',
       batchJobId: '',
       activityId: '',
       endpointId: '',
@@ -135,6 +138,7 @@ export function pathForApi(
     'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/terminate`,
     'workflow.cancel': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/cancel`,
     'workflow.signal': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/signal/${parameters.signalName}`,
+    'workflow.update': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/update/${parameters.updateName}`,
     'workflow.reset': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/reset`,
     workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}`,
     workflows: `/namespaces/${parameters?.namespace}/workflows`,
@@ -179,6 +183,11 @@ export function routeForApi(
 export function routeForApi(
   route: WorkflowSignalAPIRoutePath,
   parameters: WorkflowSignalRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: WorkflowUpdateAPIRoutePath,
+  parameters: WorkflowUpdateRouteParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(

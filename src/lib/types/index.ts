@@ -37,6 +37,10 @@ export type StartBatchOperationRequest =
   temporal.api.workflowservice.v1.IStartBatchOperationRequest;
 export type ResetWorkflowRequest =
   temporal.api.workflowservice.v1.IResetWorkflowExecutionRequest;
+export type UpdateWorkflowRequest =
+  temporal.api.workflowservice.v1.IUpdateWorkflowExecutionRequest;
+export type UpdateWorkflowResponse =
+  temporal.api.workflowservice.v1.IUpdateWorkflowExecutionResponse;
 
 // api.history
 
@@ -249,6 +253,7 @@ export type SettingsResponse = {
   WorkflowTerminateDisabled: boolean;
   WorkflowCancelDisabled: boolean;
   WorkflowSignalDisabled: boolean;
+  WorkflowUpdateDisabled: boolean;
   WorkflowResetDisabled: boolean;
   BatchActionsDisabled: boolean;
   StartWorkflowDisabled: boolean;

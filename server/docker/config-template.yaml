@@ -14,6 +14,7 @@ disableWriteActions: {{ default .Env.TEMPORAL_DISABLE_WRITE_ACTIONS "false" }}
 workflowTerminateDisabled: {{ default .Env.TEMPORAL_WORKFLOW_TERMINATE_DISABLED "false" }}
 workflowCancelDisabled: {{ default .Env.TEMPORAL_WORKFLOW_CANCEL_DISABLED "false" }}
 workflowSignalDisabled: {{ default .Env.TEMPORAL_WORKFLOW_SIGNAL_DISABLED "false" }}
+workflowUpdateDisabled: {{ default .Env.TEMPORAL_WORKFLOW_UPDATE_DISABLED "false" }}
 workflowResetDisabled: {{ default .Env.TEMPORAL_WORKFLOW_RESET_DISABLED "false" }}
 batchActionsDisabled: {{ default .Env.TEMPORAL_BATCH_ACTIONS_DISABLED "false" }}
 startWorkflowDisabled: {{ default .Env.TEMPORAL_START_WORKFLOW_DISABLED "false" }}
