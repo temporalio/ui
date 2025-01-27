@@ -30,6 +30,7 @@
   {selected}
   {disabled}
 >
+  <slot slot="leading" name="leading" />
   {label}
   <slot slot="trailing" name="trailing" />
 </MenuItem>
