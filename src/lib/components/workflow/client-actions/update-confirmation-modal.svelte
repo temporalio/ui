@@ -70,7 +70,7 @@
       });
 
       failure = result?.outcome?.failure;
-      success = result?.outcome?.success;
+      success = result?.outcome?.success || !failure;
       updateId = uuid();
 
       if (success) {
