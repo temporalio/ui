@@ -132,15 +132,17 @@
           fallback={group?.displayName}
           let:decodedValue
         >
-          <Text
-            point={textPosition}
-            {textAnchor}
-            {backdrop}
-            backdropHeight={radius * 2}
-            config={TimelineConfig}
-          >
-            {decodedValue}
-          </Text>
+          {#key decodedValue}
+            <Text
+              point={textPosition}
+              {textAnchor}
+              {backdrop}
+              backdropHeight={radius * 2}
+              config={TimelineConfig}
+            >
+              {decodedValue}
+            </Text>
+          {/key}
         </MetadataDecoder>
       {/if}
     {/if}

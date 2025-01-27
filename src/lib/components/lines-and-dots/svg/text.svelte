@@ -9,7 +9,7 @@
   export let point: [number, number] = [0, 0];
   export let category: string | undefined = undefined;
   export let status: string | undefined = 'none';
-  export let fontSize = '14px';
+  export let fontSize = '12px';
   export let fontWeight = '400';
   export let textAnchor = 'start';
   export let backdrop = false;

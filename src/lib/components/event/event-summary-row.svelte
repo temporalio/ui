@@ -200,36 +200,39 @@
         {/if}
       </div>
     {/if}
-    <MetadataDecoder
-      value={currentEvent?.userMetadata?.summary}
-      fallback=""
-      let:decodedValue
-    >
-      {#if decodedValue}
-        <Badge type="subtle" class="block select-none truncate">
-          {decodedValue}
-        </Badge>
+    {#if currentEvent?.userMetadata?.summary}
+      <MetadataDecoder
+        value={currentEvent?.userMetadata?.summary}
+        fallback=""
+        let:decodedValue
+      >
+        {#if decodedValue}
+          <Badge type="subtle" class="block select-none truncate">
+            {decodedValue}
+          </Badge>
+        {/if}
+      </MetadataDecoder>
+    {:else}
+      {#if currentEvent?.links?.length}
+        <EventLink
+          link={currentEvent.links[0]}
+          class="max-w-xl"
+          linkClass="truncate"
+        />
       {/if}
-    </MetadataDecoder>
-    {#if currentEvent?.links?.length}
-      <EventLink
-        link={currentEvent.links[0]}
-        class="max-w-xl"
-        linkClass="truncate"
-      />
-    {/if}
-    {#if primaryAttribute?.key}
-      <EventDetailsRow {...primaryAttribute} {attributes} />
-    {/if}
-    {#if nonPendingActivityAttempt}
-      <EventDetailsRow
-        key="attempt"
-        value={nonPendingActivityAttempt.toString()}
-        {attributes}
-      />
-    {/if}
-    {#if compact && secondaryAttribute?.key}
-      <EventDetailsRow {...secondaryAttribute} {attributes} />
+      {#if primaryAttribute?.key}
+        <EventDetailsRow {...primaryAttribute} {attributes} />
+      {/if}
+      {#if nonPendingActivityAttempt}
+        <EventDetailsRow
+          key="attempt"
+          value={nonPendingActivityAttempt.toString()}
+          {attributes}
+        />
+      {/if}
+      {#if compact && secondaryAttribute?.key}
+        <EventDetailsRow {...secondaryAttribute} {attributes} />
+      {/if}
     {/if}
   </td>
 </tr>

@@ -84,7 +84,7 @@ export const timelineTextPosition = (
   let textAnchor = 'start';
   let textIndex = 0;
 
-  const textToLeft = firstPoint > (1 / 3) * width;
+  const textToLeft = firstPoint > (1 / 2) * width;
   let textToRight = !textToLeft && lastPoint < (2 / 3) * width && !isPending;
 
   if (textToLeft) textAnchor = 'end';
