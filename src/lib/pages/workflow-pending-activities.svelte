@@ -11,6 +11,7 @@
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import { decodeAllPotentialPayloadsWithCodec } from '$lib/utilities/decode-payload';
   import { formatDate } from '$lib/utilities/format-date';
   import {
     formatAttemptsLeft,
@@ -18,6 +19,7 @@
     formatRetryExpiration,
   } from '$lib/utilities/format-event-attributes';
   import { formatDuration, getDuration } from '$lib/utilities/format-time';
+  import { omit } from '$lib/utilities/omit';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
@@ -109,17 +111,33 @@
                 </li>
               {/if}
               {#if details.lastFailure}
+                {@const { lastFailure } = details}
                 <li class="event-table-row">
                   <h4>{translate('workflows.last-failure')}</h4>
-                  <CodeBlock
-                    slot="value"
-                    class="pb-2"
-                    content={stringifyWithBigInt(details.lastFailure)}
-                    copyIconTitle={translate('common.copy-icon-title')}
-                    copySuccessIconTitle={translate(
-                      'common.copy-success-icon-title',
-                    )}
-                  />
+                  <div>
+                    <p>{translate('workflows.details')}</p>
+                    {#await decodeAllPotentialPayloadsWithCodec(lastFailure) then result}
+                      <CodeBlock
+                        class="pb-2"
+                        content={stringifyWithBigInt(
+                          omit(result, 'stackTrace'),
+                        )}
+                        copyIconTitle={translate('common.copy-icon-title')}
+                        copySuccessIconTitle={translate(
+                          'common.copy-success-icon-title',
+                        )}
+                      />
+                    {/await}
+                    <p>{translate('common.stack-trace')}</p>
+                    <CodeBlock
+                      language="text"
+                      content={lastFailure.stackTrace}
+                      copyIconTitle={translate('common.copy-icon-title')}
+                      copySuccessIconTitle={translate(
+                        'common.copy-success-icon-title',
+                      )}
+                    />
+                  </div>
                 </li>
               {/if}
               <li class="event-table-row">
