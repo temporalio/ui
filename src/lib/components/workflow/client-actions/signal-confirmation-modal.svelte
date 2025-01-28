@@ -82,8 +82,8 @@
   confirmText={translate('common.submit')}
   cancelText={translate('common.cancel')}
   confirmDisabled={!name || !encoding}
-  on:cancelModal={hideSignalModal}
-  on:confirmModal={signal}
+  cancelModal={hideSignalModal}
+  confirmModal={signal}
 >
   <h3 slot="title">{translate('workflows.signal-modal-title')}</h3>
   <div slot="content" class="flex flex-col gap-4">
@@ -101,7 +101,7 @@
           <Option {value} {description}>{value}</Option>
         {/each}
         <Option
-          on:click={handleCustom}
+          click={handleCustom}
           value="custom"
           description="Input Signal name">Custom</Option
         >

@@ -44,6 +44,7 @@
         },
       ]
     >;
+    'aria-label'?: string;
   }
 
   let {

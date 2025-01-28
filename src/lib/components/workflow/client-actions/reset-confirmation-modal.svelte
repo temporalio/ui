@@ -79,8 +79,8 @@
   bind:error
   bind:open
   {loading}
-  on:confirmModal={reset}
-  on:cancelModal={hideResetModal}
+  confirmModal={reset}
+  cancelModal={hideResetModal}
   confirmDisabled={!$eventId}
 >
   <h3 slot="title">{translate('workflows.reset-modal-title')}</h3>

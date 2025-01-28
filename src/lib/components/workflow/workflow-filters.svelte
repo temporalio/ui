@@ -71,14 +71,14 @@
     {#if searchType === 'advanced'}
       <Link
         href="{$page.url.pathname}?search=basic"
-        on:click={updateSearchType('basic')}
+        onclick={updateSearchType('basic')}
       >
         {translate('workflows.basic-search')}
       </Link>
     {:else}
       <Link
         href="{$page.url.pathname}?search=advanced"
-        on:click={updateSearchType('advanced')}
+        onclick={updateSearchType('advanced')}
       >
         {translate('workflows.advanced-search')}
       </Link>
@@ -106,7 +106,7 @@
         label={translate('common.workflow-id')}
         labelHidden
         bind:value={parameters.workflowId}
-        on:input={handleParameterChange}
+        oninput={handleParameterChange}
       />
       <Input
         icon="search"
@@ -116,13 +116,13 @@
         label={translate('common.workflow-type')}
         labelHidden
         bind:value={parameters.workflowType}
-        on:input={handleParameterChange}
+        oninput={handleParameterChange}
       />
       <Select
         id="time-range-filter"
         label={translate('common.time-range')}
         bind:value={parameters.timeRange}
-        on:change={handleParameterChange}
+        onchange={handleParameterChange}
       >
         <Option value={null}>All</Option>
         {#if parameters.timeRange && !durations.includes(parameters.timeRange)}
@@ -136,7 +136,7 @@
         id="execution-status-filter"
         label={translate('common.status')}
         bind:value={parameters.executionStatus}
-        on:change={handleParameterChange}
+        onchange={handleParameterChange}
       >
         {#each Object.entries(statuses) as [label, value] (label)}
           <Option {value}>{label}</Option>

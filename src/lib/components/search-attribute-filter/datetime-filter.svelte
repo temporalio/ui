@@ -54,12 +54,12 @@
     !useBetweenDateTimeQuery &&
     (!relativeTime || error(relativeTime));
 
-  const onStartDateChange = (d: CustomEvent) => {
-    startDate = startOfDay(d.detail);
+  const onStartDateChange = (date: Date) => {
+    startDate = startOfDay(date);
   };
 
-  const onEndDateChange = (d: CustomEvent) => {
-    endDate = startOfDay(d.detail);
+  const onEndDateChange = (date: Date) => {
+    endDate = startOfDay(date);
   };
 
   const applyTimeChanges = (
@@ -153,7 +153,7 @@
           <div class="flex flex-col gap-2">
             <DatePicker
               label={translate('common.start')}
-              on:datechange={onStartDateChange}
+              datechange={onStartDateChange}
               selected={startDate}
               todayLabel={translate('common.today')}
               closeLabel={translate('common.close')}
@@ -172,7 +172,7 @@
           <div class="flex flex-col gap-2">
             <DatePicker
               label={translate('common.end')}
-              on:datechange={onEndDateChange}
+              datechange={onEndDateChange}
               selected={endDate}
               todayLabel={translate('common.today')}
               closeLabel={translate('common.close')}
@@ -187,7 +187,7 @@
           </div>
         </MenuItem>
       {:else}
-        <MenuItem on:click={() => ($type = 'relative')}>
+        <MenuItem onclick={() => ($type = 'relative')}>
           <div class="flex flex-col">
             <RadioInput
               label={translate('common.relative')}
@@ -222,7 +222,7 @@
           </div>
         </MenuItem>
         <MenuDivider />
-        <MenuItem on:click={() => ($type = 'absolute')}>
+        <MenuItem onclick={() => ($type = 'absolute')}>
           <div class="flex flex-col gap-2">
             <RadioInput
               label={translate('common.absolute')}
@@ -235,7 +235,7 @@
               <DatePicker
                 label={''}
                 labelHidden
-                on:datechange={onStartDateChange}
+                datechange={onStartDateChange}
                 selected={startDate}
                 todayLabel={translate('common.today')}
                 closeLabel={translate('common.close')}
@@ -255,7 +255,7 @@
       {/if}
       <MenuDivider />
       <div class="flex items-center p-2">
-        <Button size="xs" style="width: 100%" on:click={onApply} {disabled}
+        <Button size="xs" style="width: 100%" onclick={onApply} {disabled}
           >{translate('common.apply')}</Button
         >
       </div>

@@ -25,7 +25,7 @@
 
   let {
     id,
-    chips,
+    chips = $bindable(),
     label,
     labelHidden = false,
     placeholder = '',

@@ -216,13 +216,13 @@
         bind:value={workflowId}
         label="Workflow ID"
         class="w-full grow"
-        on:blur={(e) => onInputChange(e, 'workflowId')}
+        onblur={(e) => onInputChange(e, 'workflowId')}
       />
       <Button
         class="mt-0 md:mt-6"
         variant="secondary"
         leadingIcon="retry"
-        on:click={generateRandomWorkflowId}>Random UUID</Button
+        onclick={generateRandomWorkflowId}>Random UUID</Button
       >
     </div>
     <div class="flex w-full items-center justify-between gap-4">
@@ -232,7 +232,7 @@
         bind:value={taskQueue}
         label="Task Queue"
         class="grow"
-        on:blur={(e) => onInputChange(e, 'taskQueue')}
+        onblur={(e) => onInputChange(e, 'taskQueue')}
       />
     </div>
     {#if pollerCount !== undefined}
@@ -259,7 +259,7 @@
       required
       bind:value={workflowType}
       label="Workflow Type"
-      on:blur={(e) => onInputChange(e, 'workflowType')}
+      onblur={(e) => onInputChange(e, 'workflowType')}
     />
     {#key inputRetrieved}
       <PayloadInputWithEncoding bind:input bind:encoding />
@@ -282,14 +282,11 @@
         <Label label={translate('workflows.summary')} for="summary" />
         <Editor
           content={summary}
-          on:change={(event) => (summary = event.detail.value)}
+          change={({ value }) => (summary = value)}
           class="min-h-48"
         />
         <Label label={translate('workflows.details')} for="details" />
-        <Editor
-          content={details}
-          on:change={(event) => (details = event.detail.value)}
-        />
+        <Editor content={details} change={({ value }) => (details = value)} />
       </Card>
       <AddSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}
@@ -300,12 +297,12 @@
         variant="ghost"
         class="max-sm:w-full"
         trailingIcon={viewAdvancedOptions ? 'chevron-up' : 'chevron-down'}
-        on:click={() => (viewAdvancedOptions = !viewAdvancedOptions)}
+        onclick={() => (viewAdvancedOptions = !viewAdvancedOptions)}
         >{translate('common.more-options')}</Button
       >
       <Button
         disabled={!enableStart}
-        on:click={onWorkflowStart}
+        onclick={onWorkflowStart}
         data-testid="start-workflow-button"
         class="max-sm:w-full">{translate('workflows.start-workflow')}</Button
       >

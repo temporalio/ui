@@ -35,7 +35,7 @@
     variant="ghost"
     leadingIcon="add"
     class="max-sm:w-full"
-    on:click={addSearchAttribute}
+    onclick={addSearchAttribute}
     disabled={!searchAttributes.length ||
       attributesToAdd.length === searchAttributes.length ||
       attributesToAdd.filter(

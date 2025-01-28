@@ -49,58 +49,61 @@
   pageButtonLabel={(page) => translate('common.go-to-page', { page })}
   {updating}
   items={filteredForStatus(items)}
-  let:visibleItems
   variant="split"
   maxHeight="calc(100vh - 200px)"
 >
-  {#if !compact}
-    <HistoryGraph {groups} history={history(visibleItems)} />
-  {/if}
-  <div class="w-full">
-    {#each visibleItems as event, index}
-      {#if isEventGroup(event)}
-        <EventSummaryRow
-          {event}
-          {index}
-          group={event}
-          {compact}
-          {expandAll}
-          {initialItem}
-        />
-      {:else if isPendingActivity(event)}
-        <PendingActivitySummaryRow
-          {event}
-          {index}
-          group={groups.find(
-            (g) =>
-              isPendingActivity(event) && g?.pendingActivity?.id === event.id,
-          )}
-          {expandAll}
-        />
-      {:else if isPendingNexusOperation(event)}
-        <PendingNexusSummaryRow
-          {event}
-          {index}
-          group={groups.find(
-            (g) =>
-              isPendingNexusOperation(event) &&
-              g?.pendingNexusOperation?.scheduledEventId ===
-                event.scheduledEventId,
-          )}
-          {expandAll}
-        />
+  {#snippet children({ visibleItems })}
+    {#if !compact}
+      <HistoryGraph {groups} history={history(visibleItems)} />
+    {/if}
+    <div class="w-full">
+      {#each visibleItems as event, index}
+        {#if isEventGroup(event)}
+          <EventSummaryRow
+            {event}
+            {index}
+            group={event}
+            {compact}
+            {expandAll}
+            {initialItem}
+          />
+        {:else if isPendingActivity(event)}
+          <PendingActivitySummaryRow
+            {event}
+            {index}
+            group={groups.find(
+              (g) =>
+                isPendingActivity(event) && g?.pendingActivity?.id === event.id,
+            )}
+            {expandAll}
+          />
+        {:else if isPendingNexusOperation(event)}
+          <PendingNexusSummaryRow
+            {event}
+            {index}
+            group={groups.find(
+              (g) =>
+                isPendingNexusOperation(event) &&
+                g?.pendingNexusOperation?.scheduledEventId ===
+                  event.scheduledEventId,
+            )}
+            {expandAll}
+          />
+        {:else}
+          <EventSummaryRow
+            {event}
+            {index}
+            group={groups.find(
+              (g) => isEvent(event) && g.eventIds.has(event.id),
+            )}
+            {compact}
+            {expandAll}
+            {initialItem}
+          />
+        {/if}
       {:else}
-        <EventSummaryRow
-          {event}
-          {index}
-          group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
-          {compact}
-          {expandAll}
-          {initialItem}
-        />
-      {/if}
-    {:else}
-      <EventEmptyRow loading={!$fullEventHistory.length} />
-    {/each}
-  </div>
+        <EventEmptyRow loading={!$fullEventHistory.length} />
+      {/each}
+    </div>
+  {/snippet}
 </Paginated>

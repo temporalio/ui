@@ -54,26 +54,26 @@
     <div
       class="items-centeritems-center flex w-full flex-row gap-4 max-sm:flex-col"
     >
-      <Button class="max-sm:w-full" on:click={onUpdate} {loading}
+      <Button class="max-sm:w-full" onclick={onUpdate} {loading}
         >{translate('common.save')}</Button
       >
       <Button
         class="max-sm:hidden"
         variant="ghost"
-        on:click={() => goto(routeForNexusEndpoint($page.params.id))}
+        onclick={() => goto(routeForNexusEndpoint($page.params.id))}
         >{translate('common.cancel')}</Button
       >
     </div>
     <Button
       class="max-sm:w-full"
       variant="destructive"
-      on:click={() => (deleteConfirmationModalOpen = true)}
+      onclick={() => (deleteConfirmationModalOpen = true)}
       >{translate('common.delete')}</Button
     >
     <Button
       class="w-full sm:hidden"
       variant="ghost"
-      on:click={() => goto(routeForNexusEndpoint($page.params.id))}
+      onclick={() => goto(routeForNexusEndpoint($page.params.id))}
       >{translate('common.cancel')}</Button
     >
   </div>
@@ -85,8 +85,8 @@
   confirmType="destructive"
   confirmText={translate('common.delete')}
   cancelText={translate('common.cancel')}
-  on:confirmModal={onDelete}
-  on:cancelModal={() => (deleteConfirmationModalOpen = false)}
+  confirmModal={onDelete}
+  cancelModal={() => (deleteConfirmationModalOpen = false)}
   confirmDisabled={confirmDeleteInput !== endpoint.spec.name}
 >
   <h3 slot="title">{translate('nexus.delete-modal-title')}</h3>

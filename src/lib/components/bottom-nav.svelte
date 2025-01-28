@@ -127,7 +127,7 @@
       leadingIcon="namespace-switcher"
       size="xs"
       class="grow text-white"
-      on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
+      onclick={onNamespaceClick}>{truncateNamespace(namespace)}</Button
     >
     <div class="ml-1 h-full w-1 border-l border-subtle"></div>
     <Button

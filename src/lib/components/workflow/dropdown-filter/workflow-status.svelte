@@ -96,7 +96,7 @@
   </MenuButton>
   <Menu keepOpen id="execution-status-filter">
     {#each workflowStatusFilters as status}
-      <MenuItem on:click={() => onStatusClick(status)}>
+      <MenuItem onclick={() => onStatusClick(status)}>
         <Checkbox
           slot="leading"
           label={status}

@@ -22,7 +22,7 @@
 
   type Item = $$Generic;
 
-  interface Props extends HTMLAttributes<HTMLTableElement> {
+  interface Props extends Omit<HTMLAttributes<HTMLTableElement>, 'children'> {
     id?: string;
     items: Item[];
     variant?: 'primary' | 'split';
@@ -37,6 +37,7 @@
     caption?: Snippet;
     headers?: Snippet;
     empty?: Snippet;
+    children?: Snippet<[{ visibleItems: Item[] }]>;
   }
 
   let {

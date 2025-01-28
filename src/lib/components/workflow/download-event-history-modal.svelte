@@ -32,8 +32,8 @@
   confirmType="primary"
   confirmText={translate('common.download')}
   cancelText={translate('common.cancel')}
-  on:confirmModal={() => onDownloadClick()}
-  on:cancelModal={() => (open = false)}
+  confirmModal={() => onDownloadClick()}
+  cancelModal={() => (open = false)}
 >
   <h3 slot="title">
     {translate('common.download-json')}

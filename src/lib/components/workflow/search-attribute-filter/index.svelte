@@ -60,7 +60,7 @@
             bind:checked={$searchInputViewOpen}
           />
           <MenuItem
-            on:click={onClickConfigure}
+            onclick={onClickConfigure}
             className="m-0"
             data-testid="workflows-summary-table-configuration-button"
           >
@@ -69,7 +69,7 @@
             })}
           </MenuItem>
           <MenuItem
-            on:click={() => exportWorkflows($workflows)}
+            onclick={() => exportWorkflows($workflows)}
             className="m-0"
             data-testid="export-history-button"
           >

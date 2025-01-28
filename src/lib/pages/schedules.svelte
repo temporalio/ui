@@ -88,7 +88,6 @@
 
 {#key [namespace, query, refresh]}
   <PaginatedTable
-    let:visibleItems
     {onFetch}
     {onError}
     total={$schedulesCount}
@@ -99,52 +98,57 @@
     emptyStateMessage={translate('schedules.empty-state-title')}
     errorMessage={translate('schedules.error-message-fetching')}
   >
-    <caption class="sr-only" slot="caption"
-      >{translate('common.schedules')}</caption
-    >
+    {#snippet caption()}
+      <caption class="sr-only">{translate('common.schedules')}</caption>
+    {/snippet}
 
-    <div class="flex flex-col gap-4" slot="header" let:visibleItems>
+    {#snippet header({ visibleItems })}
       {@const showActions = visibleItems.length || query}
-      <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
-        <SchedulesCount />
-      </h1>
-      <div class="flex flex-col justify-between gap-2 md:flex-row">
-        {#if showActions}
-          <SearchAttributeFilter
-            bind:filters={$scheduleFilters}
-            options={searchAttributeOptions}
-            refresh={() => {
-              refresh = Date.now();
-            }}
-          />
-          <Button
-            leadingIcon="settings"
-            variant="secondary"
-            on:click={openCustomizationDrawer}
-          />
-          {#if !createDisabled}
+      <div class="flex flex-col gap-4">
+        <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
+          <SchedulesCount />
+        </h1>
+        <div class="flex flex-col justify-between gap-2 md:flex-row">
+          {#if showActions}
+            <SearchAttributeFilter
+              bind:filters={$scheduleFilters}
+              options={searchAttributeOptions}
+              refresh={() => {
+                refresh = Date.now();
+              }}
+            />
             <Button
-              data-testid="create-schedule"
-              href={routeForScheduleCreate({ namespace })}
-              disabled={!writeActionsAreAllowed()}
-            >
-              {translate('schedules.create')}
-            </Button>
+              leadingIcon="settings"
+              variant="secondary"
+              onclick={openCustomizationDrawer}
+            />
+            {#if !createDisabled}
+              <Button
+                data-testid="create-schedule"
+                href={routeForScheduleCreate({ namespace })}
+                disabled={!writeActionsAreAllowed()}
+              >
+                {translate('schedules.create')}
+              </Button>
+            {/if}
           {/if}
-        {/if}
+        </div>
       </div>
-    </div>
-
-    <tr slot="headers" class="text-left">
-      {#each columns as { label }}
-        <th>{label}</th>
+    {/snippet}
+    {#snippet headers()}
+      <tr class="text-left">
+        {#each columns as { label }}
+          <th>{label}</th>
+        {/each}
+      </tr>
+    {/snippet}
+    {#snippet children({ visibleItems })}
+      {#each visibleItems as schedule}
+        <SchedulesTableRow {schedule} {columns} />
       {/each}
-    </tr>
-    {#each visibleItems as schedule}
-      <SchedulesTableRow {schedule} {columns} />
-    {/each}
+    {/snippet}
 
-    <svelte:fragment slot="empty">
+    {#snippet empty()}
       {#if error}
         <EmptyState title={translate('schedules.empty-state-title')}>
           <Alert intent="warning" icon="warning" class="mx-12">
@@ -171,7 +175,7 @@
           {#if !createDisabled}
             <Button
               data-testid="create-schedule"
-              on:click={() => goto(routeForScheduleCreate({ namespace }))}
+              onclick={() => goto(routeForScheduleCreate({ namespace }))}
               disabled={!writeActionsAreAllowed()}
             >
               {translate('schedules.create')}
@@ -179,7 +183,7 @@
           {/if}
         </EmptyState>
       {/if}
-    </svelte:fragment>
+    {/snippet}
   </PaginatedTable>
 {/key}
 

@@ -84,10 +84,10 @@
   };
 </script>
 
-<MenuContainer {open} on:close={resetFilter}>
+<MenuContainer {open} close={resetFilter}>
   <MenuButton
     controls="status-menu"
-    on:click={() => {
+    click={() => {
       if ($open) resetFilter();
     }}
   >
@@ -100,7 +100,7 @@
         (!statusFilters.length && status === 'All')}
       <MenuItem
         data-testid={status}
-        on:click={() => {
+        onclick={() => {
           onStatusClick(status);
         }}
       >

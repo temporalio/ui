@@ -96,7 +96,7 @@
       class="text-off-white focus-visible:border-table"
       data-testid="bulk-cancel-button"
       disabled={!$cancelableWorkflows.length}
-      on:click={openBatchCancelConfirmationModal}
+      onclick={openBatchCancelConfirmationModal}
       >{translate('workflows.request-cancellation')}</Button
     >
   {/if}
@@ -106,7 +106,7 @@
       variant="ghost"
       class="text-off-white focus-visible:border-table"
       data-testid="bulk-reset-button"
-      on:click={openBatchResetConfirmationModal}
+      onclick={openBatchResetConfirmationModal}
       >{translate('workflows.reset')}</Button
     >
   {/if}
@@ -116,7 +116,7 @@
       variant="destructive"
       class="focus-visible:border-table"
       data-testid="bulk-terminate-button"
-      on:click={openBatchTerminateConfirmationModal}
+      onclick={openBatchTerminateConfirmationModal}
       >{translate('workflows.terminate')}</Button
     >
   {/if}

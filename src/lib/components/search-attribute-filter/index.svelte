@@ -214,7 +214,7 @@
         : 'justify-end'}"
     >
       {#if showClearAllButton}
-        <Button variant="ghost" on:click={handleClearInput}
+        <Button variant="ghost" onclick={handleClearInput}
           >{translate('common.clear-all')}</Button
         >
       {/if}

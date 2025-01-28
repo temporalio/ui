@@ -96,8 +96,8 @@
           removeButtonLabel={translate('workflows.remove-filter-label', {
             attribute,
           })}
-          on:remove={() => removeQuery(i)}
-          on:click={() => {
+          remove={() => removeQuery(i)}
+          onclick={() => {
             $activeQueryIndex = i;
             $filter = { ...workflowFilter };
           }}
@@ -141,7 +141,7 @@
     {/if}
   {/each}
   {#if hasMoreFilters}
-    <Button variant="secondary" size="xs" on:click={viewMoreFilters}
+    <Button variant="secondary" size="xs" onclick={viewMoreFilters}
       >{translate('common.view-more')}</Button
     >
   {/if}

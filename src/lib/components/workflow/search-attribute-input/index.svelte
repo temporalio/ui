@@ -61,7 +61,7 @@
       variant="ghost"
       leadingIcon="close"
       class="mt-6 w-10 rounded-full sm:hidden"
-      on:click={() => onRemove(attribute.label)}
+      onclick={() => onRemove(attribute.label)}
     />
   </div>
   {#if attribute.type === SEARCH_ATTRIBUTE_TYPE.BOOL}
@@ -112,6 +112,6 @@
     variant="ghost"
     leadingIcon="close"
     class="mt-6 w-10 rounded-full max-sm:hidden"
-    on:click={() => onRemove(attribute.label)}
+    onclick={() => onRemove(attribute.label)}
   />
 </div>

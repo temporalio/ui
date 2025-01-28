@@ -71,7 +71,7 @@
           <Button
             size="xs"
             variant={childrenShown ? 'primary' : 'ghost'}
-            on:click={() => viewChildren(workflow)}
+            onclick={() => viewChildren(workflow)}
           >
             <Tooltip
               text={childrenShown

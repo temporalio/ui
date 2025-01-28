@@ -181,12 +181,12 @@
   let endMinute = '';
   let endSecond = '';
 
-  const onStartDateChange = (d: CustomEvent) => {
-    startDate = startOfDay(d.detail);
+  const onStartDateChange = (date: Date) => {
+    startDate = startOfDay(date);
   };
 
-  const onEndDateChange = (d: CustomEvent) => {
-    endDate = startOfDay(d.detail);
+  const onEndDateChange = (date: Date) => {
+    endDate = startOfDay(date);
   };
 
   const updateDefaultBackfillTimes = () => {
@@ -311,17 +311,17 @@
         menuLabel={translate('schedules.schedule-actions')}
         id="schedule-actions"
         disabled={editDisabled}
-        on:click={() => (pauseConfirmationModalOpen = true)}
+        onclick={() => (pauseConfirmationModalOpen = true)}
       >
         <MenuItem
           data-testid="trigger-schedule"
-          on:click={() => (triggerConfirmationModalOpen = true)}
+          onclick={() => (triggerConfirmationModalOpen = true)}
         >
           {translate('schedules.trigger')}
         </MenuItem>
         <MenuItem
           data-testid="backfill-schedule"
-          on:click={() => (backfillConfirmationModalOpen = true)}
+          onclick={() => (backfillConfirmationModalOpen = true)}
         >
           {translate('schedules.backfill')}
         </MenuItem>
@@ -334,7 +334,7 @@
         <MenuItem
           data-testid="delete-schedule"
           destructive
-          on:click={() => (deleteConfirmationModalOpen = true)}
+          onclick={() => (deleteConfirmationModalOpen = true)}
         >
           {translate('common.delete')}
         </MenuItem>
@@ -360,7 +360,7 @@
               size="xs"
               variant="ghost"
               leadingIcon="retry"
-              on:click={() => {
+              onclick={() => {
                 scheduleFetch = fetchSchedule(parameters);
                 $refresh = Date.now();
               }}
@@ -414,8 +414,8 @@
         : translate('schedules.pause')}
       cancelText={translate('common.cancel')}
       confirmDisabled={!reason}
-      on:confirmModal={() => handlePause(schedule)}
-      on:cancelModal={resetReason}
+      confirmModal={() => handlePause(schedule)}
+      cancelModal={resetReason}
     >
       <h3 slot="title">
         {schedule?.schedule.state.paused
@@ -454,8 +454,8 @@
       confirmText={translate('schedules.trigger')}
       cancelText={translate('common.cancel')}
       loading={scheduleUpdating}
-      on:confirmModal={() => handleTriggerImmediately()}
-      on:cancelModal={closeTriggerModal}
+      confirmModal={() => handleTriggerImmediately()}
+      cancelModal={closeTriggerModal}
     >
       <h3 slot="title">
         {translate('schedules.trigger-modal-title')}
@@ -485,8 +485,8 @@
       confirmText={translate('schedules.schedule')}
       cancelText={translate('common.cancel')}
       loading={scheduleUpdating}
-      on:confirmModal={() => handleBackfill()}
-      on:cancelModal={closeBackfillModal}
+      confirmModal={() => handleBackfill()}
+      cancelModal={closeBackfillModal}
     >
       <h3 slot="title">
         {translate('schedules.schedule')}
@@ -496,7 +496,7 @@
         <div class="flex flex-col gap-2 p-2">
           <DatePicker
             label={translate('common.start')}
-            on:datechange={onStartDateChange}
+            datechange={onStartDateChange}
             selected={startDate}
             todayLabel={translate('common.today')}
             closeLabel={translate('common.close')}
@@ -510,7 +510,7 @@
           />
           <DatePicker
             label={translate('common.end')}
-            on:datechange={onEndDateChange}
+            datechange={onEndDateChange}
             selected={endDate}
             todayLabel={translate('common.today')}
             closeLabel={translate('common.close')}
@@ -556,7 +556,7 @@
             <Button
               variant="ghost"
               size="xs"
-              on:click={() => (viewMoreBackfillOptions = true)}
+              onclick={() => (viewMoreBackfillOptions = true)}
               >{translate('schedules.more-options')}</Button
             >
           {/if}
@@ -570,8 +570,8 @@
       confirmType="destructive"
       confirmText={translate('common.delete')}
       cancelText={translate('common.cancel')}
-      on:confirmModal={handleDelete}
-      on:cancelModal={resetReason}
+      confirmModal={handleDelete}
+      cancelModal={resetReason}
     >
       <h3 slot="title">{translate('schedules.delete-modal-title')}</h3>
       <div slot="content">
