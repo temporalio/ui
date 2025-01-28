@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
   import ArrowDown from './arrow-down.svelte';
@@ -6,9 +8,14 @@
   import ArrowRight from './arrow-right.svelte';
   import ArrowUp from './arrow-up.svelte';
 
-  export let tooltipText = '';
-  export let arrow: 'up' | 'down' | 'left' | 'right' | undefined = undefined;
-  export let title: string;
+  interface Props {
+    tooltipText?: string;
+    arrow?: 'up' | 'down' | 'left' | 'right';
+    title: string;
+    children?: Snippet;
+  }
+
+  let { tooltipText = '', arrow, title, children }: Props = $props();
 
   const ArrowComponents = {
     up: ArrowUp,
@@ -16,14 +23,16 @@
     left: ArrowLeft,
     right: ArrowRight,
   };
+
+  const ArrowComponent = ArrowComponents[arrow];
 </script>
 
 <Tooltip text={tooltipText} hide={!tooltipText} top>
   <kbd class="shortcut">
     {#if arrow}
-      <svelte:component this={ArrowComponents[arrow]} {title} />
+      <ArrowComponent {title} />
     {:else}
-      <slot />
+      {@render children?.()}
     {/if}
   </kbd>
 </Tooltip>

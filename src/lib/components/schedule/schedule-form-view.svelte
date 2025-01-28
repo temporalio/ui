@@ -183,8 +183,8 @@
           error={errors['name']}
           maxLength={232}
           disabled={Boolean(scheduleId)}
-          on:input={onInput}
-          on:blur={onBlur}
+          oninput={onInput}
+          onblur={onBlur}
           required
         />
         <Input
@@ -192,8 +192,8 @@
           bind:value={workflowType}
           label={translate('schedules.workflow-type-label')}
           error={errors['workflowType']}
-          on:input={onInput}
-          on:blur={onBlur}
+          oninput={onInput}
+          onblur={onBlur}
           required
         />
         <Input
@@ -201,8 +201,8 @@
           bind:value={workflowId}
           label={translate('schedules.workflow-id-label')}
           error={errors['workflowId']}
-          on:input={onInput}
-          on:blur={onBlur}
+          oninput={onInput}
+          onblur={onBlur}
           required
         />
         <Input
@@ -210,8 +210,8 @@
           bind:value={taskQueue}
           label={translate('schedules.task-queue-label')}
           error={errors['taskQueue']}
-          on:input={onInput}
-          on:blur={onBlur}
+          oninput={onInput}
+          onblur={onBlur}
           required
         />
         <ScheduleInputPayload
@@ -241,7 +241,7 @@
           <div class="mt-4 flex flex-row items-center gap-4 max-sm:flex-col">
             <Button
               disabled={isDisabled(preset) || !writeActionsAreAllowed()}
-              on:click={() => handleConfirm(preset, schedule)}
+              onclick={() => handleConfirm(preset, schedule)}
               class="max-sm:w-full">{confirmText}</Button
             >
             <Button variant="ghost" href={backHref} class="max-sm:w-full"

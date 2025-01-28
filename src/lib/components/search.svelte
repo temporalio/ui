@@ -32,7 +32,6 @@
     {value}
     {placeholder}
     data-testid={`${testId}-input`}
-    on:input
   >
     <Button slot="after-input" type="submit" data-testid={`${testId}-button`}>
       {label}

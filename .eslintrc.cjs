@@ -9,7 +9,7 @@ module.exports = {
     'plugin:storybook/recommended',
   ],
   plugins: ['svelte', '@typescript-eslint', 'vitest', 'import'],
-  ignorePatterns: ['**/*.cjs', '/server'],
+  ignorePatterns: ['**/*.cjs', '/server', '**/error-boundary.svelte'],
   overrides: [
     {
       files: ['src/**/*.svelte'],
@@ -27,6 +27,9 @@ module.exports = {
     extraFileExtensions: ['.svelte'],
     sourceType: 'module',
     ecmaVersion: 2019,
+    svelteFeatures: {
+      experimentalGenerics: true,
+    },
   },
   env: {
     browser: true,

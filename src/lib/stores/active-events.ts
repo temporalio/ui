@@ -62,8 +62,8 @@ export const setActiveEvent = (
   }
 
   if (!get(activeEvents).includes(event.id)) {
-    const activeEventInGroup = get(activeEvents).find(
-      (id) => group?.eventIds.has(id),
+    const activeEventInGroup = get(activeEvents).find((id) =>
+      group?.eventIds.has(id),
     );
     if (activeEventInGroup) {
       activeEvents.set([

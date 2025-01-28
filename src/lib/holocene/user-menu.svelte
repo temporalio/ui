@@ -10,9 +10,13 @@
 
   import Icon from './icon/icon.svelte';
 
-  export let logout: () => void;
+  interface Props {
+    logout: () => void;
+  }
 
-  let showProfilePic = true;
+  let { logout }: Props = $props();
+
+  let showProfilePic = $state(true);
 
   function fixImage() {
     showProfilePic = false;
@@ -26,7 +30,7 @@
         src={$authUser?.picture}
         alt={$authUser?.profile ?? translate('common.user-profile')}
         class="h-[24px] w-[24px] cursor-pointer"
-        on:error={fixImage}
+        onerror={fixImage}
         class:hidden={!showProfilePic}
       />
       <div
@@ -47,7 +51,7 @@
           <p>{$authUser?.email}</p>
         </div>
       </MenuItem>
-      <MenuItem on:click={logout}>
+      <MenuItem onclick={logout}>
         <div class="flex items-center justify-start gap-4">
           <Icon name="logout" />
           {translate('common.log-out')}

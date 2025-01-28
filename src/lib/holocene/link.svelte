@@ -9,7 +9,7 @@
 
   import Icon from './icon/icon.svelte';
 
-  type $$Props = HTMLAnchorAttributes & {
+  interface Props extends HTMLAnchorAttributes {
     href: string;
     active?: boolean;
     interactive?: boolean;
@@ -19,19 +19,23 @@
     text?: string;
     light?: boolean;
     'data-testid'?: string;
-  };
+  }
 
-  let className = '';
-  export { className as class };
-  export let href: string;
-  export let active = false;
-  export let interactive = false;
-  export let newTab = false;
-  export let icon: IconName = null;
-  export let text: string = '';
-  export let light = false;
+  let {
+    class: className = '',
+    href,
+    active = false,
+    interactive = false,
+    newTab = false,
+    icon = null,
+    text = '',
+    light = false,
+    children,
+    ...rest
+  }: Props = $props();
 
   const onLinkClick = (e: MouseEvent) => {
+    e.stopPropagation();
     // Skip if middle mouse click or new tab
     if (e.button === 1 || newTab || e.metaKey) return;
     e.preventDefault();
@@ -47,9 +51,9 @@
   class:active
   class:interactive
   class:light
-  on:click|stopPropagation={onLinkClick}
+  onclick={onLinkClick}
   tabindex={href ? null : 0}
-  {...$$restProps}
+  {...rest}
 >
   {#if icon}
     <Icon class="mt-0.5" name={icon} />
@@ -57,7 +61,7 @@
   {#if text}
     {text}
   {/if}
-  <slot />
+  {@render children?.()}
 </a>
 
 <style lang="postcss">

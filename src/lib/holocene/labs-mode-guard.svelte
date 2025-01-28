@@ -1,21 +1,32 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { page } from '$app/stores';
 
   import { labsMode } from '$lib/stores/labs-mode';
-  $: labsModeParamOn = $page.url.searchParams.get('labs') === 'true';
-  $: labsModeParamOff = $page.url.searchParams.get('labs') === 'false';
 
-  $: {
+  interface Props {
+    children?: Snippet;
+    fallback?: Snippet;
+  }
+
+  let { children, fallback }: Props = $props();
+  let labsModeParamOn = $derived($page.url.searchParams.get('labs') === 'true');
+  let labsModeParamOff = $derived(
+    $page.url.searchParams.get('labs') === 'false',
+  );
+
+  $effect(() => {
     if (labsModeParamOn) {
       $labsMode = true;
     } else if (labsModeParamOff) {
       $labsMode = false;
     }
-  }
+  });
 </script>
 
 {#if $labsMode}
-  <slot />
+  {@render children?.()}
 {:else}
-  <slot name="fallback" />
+  {@render fallback?.()}
 {/if}

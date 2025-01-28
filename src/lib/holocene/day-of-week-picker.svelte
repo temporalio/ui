@@ -2,7 +2,11 @@
   import Button from '$lib/holocene/button.svelte';
   import { genericWeekDays, weekDays } from '$lib/utilities/calendar';
 
-  export let daysOfWeek: string[];
+  interface Props {
+    daysOfWeek: string[];
+  }
+
+  let { daysOfWeek = $bindable() }: Props = $props();
 
   const onClick = (e: MouseEvent, day: string) => {
     if (e.metaKey) {
@@ -34,7 +38,7 @@
       <Button
         variant="secondary"
         class={active && 'bg-interactive-secondary-active'}
-        on:click={(e) => onClick(e, value)}
+        onclick={(e: MouseEvent) => onClick(e, value)}
       >
         {label}
       </Button>
@@ -46,7 +50,7 @@
       <Button
         variant="secondary"
         class={active && 'bg-interactive-secondary-active'}
-        on:click={(e) => onClick(e, value)}
+        onclick={(e: MouseEvent) => onClick(e, value)}
       >
         {label}
       </Button>

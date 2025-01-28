@@ -1,9 +1,14 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+    type StoryContext,
+  } from '@storybook/addon-svelte-csf';
 
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Toggle Switch',
     component: ToggleSwitch,
     args: {
@@ -28,16 +33,19 @@
         table: { disable: true },
       },
     },
-  } satisfies Meta<ToggleSwitch>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args let:context>
-  <ToggleSwitch {...args} id={context.id} />
-</Template>
+{#snippet template(
+  { label, ...args }: Args<typeof Story>,
+  context: StoryContext<typeof Story>,
+)}
+  <ToggleSwitch {label} {...args} id={context.id} />
+{/snippet}
 
 <Story name="Unchecked" />
 
@@ -48,5 +56,3 @@
 <Story name="Label Hidden" args={{ labelHidden: true }} />
 
 <Story name="Label Left" args={{ labelPosition: 'left' }} />
-
-<Story name="Unchecked" />

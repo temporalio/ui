@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
   import { fade, slide } from 'svelte/transition';
 
   import { page } from '$app/stores';
@@ -44,7 +43,7 @@
   export let expandAll = false;
   export let typedError = false;
   export let active = false;
-  export let onRowClick: () => void = noop;
+  export let onRowClick: () => void = () => {};
 
   $: selectedId = isEventGroup(event)
     ? Array.from(event.events.keys()).shift()
@@ -89,8 +88,8 @@
   $: displayName = isEventGroup(event)
     ? event.label
     : isLocalActivityMarkerEvent(event)
-    ? 'Local Activity'
-    : spaceBetweenCapitalLetters(event.name);
+      ? 'Local Activity'
+      : spaceBetweenCapitalLetters(event.name);
 
   $: primaryAttribute = getPrimaryAttributeForEvent(
     isEventGroup(event) ? event.initialEvent : event,

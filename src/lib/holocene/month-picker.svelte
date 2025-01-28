@@ -2,7 +2,11 @@
   import Button from '$lib/holocene/button.svelte';
   import { monthNames } from '$lib/utilities/calendar';
 
-  export let months: string[];
+  interface Props {
+    months: string[];
+  }
+
+  let { months = $bindable() }: Props = $props();
 
   const onClick = (e: MouseEvent, month: string) => {
     if (e.metaKey && month !== '*') {
@@ -26,7 +30,7 @@
     <Button
       variant="secondary"
       class={active && 'bg-interactive-secondary-active'}
-      on:click={(e) => onClick(e, value)}
+      onclick={(e: MouseEvent) => onClick(e, value)}
     >
       {label}
     </Button>

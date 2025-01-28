@@ -1,8 +1,15 @@
 <script lang="ts">
-  import { setContext } from 'svelte';
+  import { setContext, type Snippet } from 'svelte';
+
+  interface Props {
+    children?: Snippet;
+  }
+
+  let { children }: Props = $props();
+
   setContext<boolean>('group', true);
 </script>
 
 <div class="flex">
-  <slot />
+  {@render children?.()}
 </div>

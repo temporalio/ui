@@ -1,10 +1,15 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+    type StoryContext,
+  } from '@storybook/addon-svelte-csf';
 
   import { iconNames } from '$lib/holocene/icon';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Number Input',
     component: NumberInput,
     args: {
@@ -34,16 +39,19 @@
       min: { name: 'Maximum Value', control: { type: 'number', min: 0 } },
       search: { name: 'Search', control: 'boolean' },
     },
-  } satisfies Meta<NumberInput>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args let:context>
-  <NumberInput {...args} id={context.id} />
-</Template>
+{#snippet template(
+  { value, label, ...args }: Args<typeof Story>,
+  context: StoryContext<typeof Story>,
+)}
+  <NumberInput {value} {label} {...args} id={context.id} />
+{/snippet}
 
 <Story name="Default" />
 

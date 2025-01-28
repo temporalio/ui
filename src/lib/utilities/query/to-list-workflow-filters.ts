@@ -89,6 +89,8 @@ export const toListWorkflowFilters = (
       const nextToken = getOneAhead(tokens, index);
       const tokenTwoAhead = getTwoAhead(tokens, index);
 
+      console.log('attributes', attributes);
+      console.log('token', token);
       if (attributes[token]) {
         filter.attribute = token;
         filter.type = attributes[token];

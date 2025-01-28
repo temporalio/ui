@@ -1,17 +1,21 @@
 <script lang="ts">
   import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
-  import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { useDarkMode } from '$lib/utilities/dark-mode/dark-mode';
 
-  const dispatch = createEventDispatcher();
+  let monaco: typeof Monaco = $state();
+  let editor: Monaco.editor.IStandaloneCodeEditor = $state();
+  let container: HTMLDivElement = $state();
 
-  let monaco: typeof Monaco;
-  let editor: Monaco.editor.IStandaloneCodeEditor;
-  let container: HTMLDivElement;
+  interface Props {
+    content?: string;
+    class?: string;
+    change?: (args: { value: string }) => void;
+  }
 
-  export let content = '';
+  let { content = '', class: className = '', change }: Props = $props();
 
   onMount(async () => {
     monaco = (await import('./index')).default;
@@ -24,19 +28,19 @@
 
     model.onDidChangeContent(() => {
       const value = model.getValue();
-      dispatch('change', { value });
+      change({ value });
     });
 
     editor.setModel(model);
   });
 
-  $: {
+  $effect(() => {
     if ($useDarkMode) {
       monaco?.editor.setTheme('vs-dark');
     } else {
       monaco?.editor.setTheme('vs');
     }
-  }
+  });
 
   onDestroy(() => {
     monaco?.editor.getModels().forEach((model) => model.dispose());
@@ -44,7 +48,4 @@
   });
 </script>
 
-<div
-  class={merge('h-full min-h-80', $$restProps.class)}
-  bind:this={container}
-></div>
+<div class={merge('h-full min-h-80', className)} bind:this={container}></div>

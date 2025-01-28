@@ -1,36 +1,48 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
 
-  interface Props {
+  interface BaseProps {
+    label: string;
+    leading?: Snippet;
+    trailing?: Snippet;
+    onclick?: (e: MouseEvent) => void;
+  }
+  interface EnabledProps extends BaseProps {
     selected?: boolean;
     disabled?: boolean;
-    multiselect?: boolean;
-    label: string;
   }
 
-  interface DisabledProps {
-    label: string;
-    disabled: true;
+  interface DisabledProps extends BaseProps {
     selected?: never;
+    disabled: true;
   }
 
-  type $$Props = Props | DisabledProps;
+  type Props = EnabledProps | DisabledProps;
 
-  export let selected = false;
-  export let disabled = false;
-  export let label: string;
+  let {
+    selected = false,
+    disabled = false,
+    label,
+    leading: leading_render,
+    trailing,
+    onclick,
+  }: Props = $props();
 </script>
 
 <MenuItem
-  on:click
+  {onclick}
   role="option"
   class="break-all"
   aria-selected={selected}
   aria-disabled={disabled}
   {selected}
   {disabled}
+  {trailing}
 >
-  <slot slot="leading" name="leading" />
+  {#snippet leading()}
+    {@render leading_render?.()}
+  {/snippet}
   {label}
-  <slot slot="trailing" name="trailing" />
 </MenuItem>

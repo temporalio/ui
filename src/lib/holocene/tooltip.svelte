@@ -1,9 +1,9 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { Only } from '$lib/types/global';
 
   type BaseProps = {
     text?: string;
@@ -12,27 +12,41 @@
     width?: number;
     class?: string;
     show?: boolean;
+    children?: Snippet;
+    content?: Snippet;
   };
 
   type BasePositionProps = {
-    top?: boolean;
-    topRight?: boolean;
-    right?: boolean;
-    bottomRight?: boolean;
-    bottom?: boolean;
-    bottomLeft?: boolean;
-    left?: boolean;
-    topLeft?: boolean;
+    /** bottom center of the tooltip aligned to the top center of the wrapper */
+    top?: never;
+    /** bottom right of the tooltip aligned to the top right of the wrapper */
+    topRight?: never;
+    /** left center of the tooltip aligned to the right center of the wrapper */
+    right?: never;
+    /** top center of the tooltip aligned to the bottom center of the wrapper */
+    bottom?: never;
+    /** top left of the tooltip aligned to the bottom left of the wrapper */
+    bottomLeft?: never;
+    /** top right of the tooltip aligned to the bottom right of the wrapper */
+    bottomRight?: never;
+    /** right center of the tooltip aligned to the left center of the wrapper */
+    left?: never;
+    /** bottom left of the tooltip aligned to the top left of the wrapper   */
+    topLeft?: never;
   };
 
-  type OnlyTop = Only<BasePositionProps, 'top'>;
-  type OnlyTopRight = Only<BasePositionProps, 'topRight'>;
-  type OnlyRight = Only<BasePositionProps, 'right'>;
-  type OnlyBottomRight = Only<BasePositionProps, 'bottomRight'>;
-  type OnlyBottom = Only<BasePositionProps, 'bottom'>;
-  type OnlyBottomLeft = Only<BasePositionProps, 'bottomLeft'>;
-  type OnlyLeft = Only<BasePositionProps, 'left'>;
-  type OnlyTopLeft = Only<BasePositionProps, 'topLeft'>;
+  type OnlyTop = Omit<BasePositionProps, 'top'> & { top: true };
+  type OnlyTopRight = Omit<BasePositionProps, 'topRight'> & { topRight: true };
+  type OnlyRight = Omit<BasePositionProps, 'right'> & { right: true };
+  type OnlyBottomRight = Omit<BasePositionProps, 'bottomRight'> & {
+    bottomRight: true;
+  };
+  type OnlyBottom = Omit<BasePositionProps, 'bottom'> & { bottom: true };
+  type OnlyBottomLeft = Omit<BasePositionProps, 'bottomLeft'> & {
+    bottomLeft: true;
+  };
+  type OnlyLeft = Omit<BasePositionProps, 'left'> & { left: true };
+  type OnlyTopLeft = Omit<BasePositionProps, 'topLeft'> & { topLeft: true };
 
   type AllUniquePositionProps =
     | OnlyTop
@@ -44,38 +58,33 @@
     | OnlyLeft
     | OnlyTopLeft;
 
-  type $$Props = BaseProps & AllUniquePositionProps;
+  type Props = BaseProps & AllUniquePositionProps;
 
-  let className = '';
-  export { className as class };
-  export let text = '';
-  export let icon: IconName = null;
-  /** bottom center of the tooltip aligned to the top center of the wrapper */
-  export let top = false;
-  /** bottom right of the tooltip aligned to the top right of the wrapper */
-  export let topRight = false;
-  /** left center of the tooltip aligned to the right center of the wrapper */
-  export let right = false;
-  /** top center of the tooltip aligned to the bottom center of the wrapper */
-  export let bottom = false;
-  /** top left of the tooltip aligned to the bottom left of the wrapper */
-  export let bottomLeft = false;
-  /** top right of the tooltip aligned to the bottom right of the wrapper */
-  export let bottomRight = false;
-  /** right center of the tooltip aligned to the left center of the wrapper */
-  export let left = false;
-  /** bottom left of the tooltip aligned to the top left of the wrapper   */
-  export let topLeft = false;
-  export let hide: boolean | null = false;
-  export let width: number | null = null;
-  export let show = false;
+  let {
+    class: className = '',
+    text = '',
+    icon = null,
+    top,
+    topRight,
+    right,
+    bottom,
+    bottomLeft,
+    bottomRight,
+    left,
+    topLeft,
+    hide,
+    width = null,
+    show,
+    children,
+    content,
+  }: Props = $props();
 </script>
 
 {#if hide}
-  <slot />
+  {@render children?.()}
 {:else}
   <div class={merge('wrapper group relative inline-block', className)}>
-    <slot />
+    {@render children?.()}
     <div
       class={merge(
         'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover:inline-block group-hover:opacity-90',
@@ -93,10 +102,12 @@
     >
       <div class="inline-block rounded-md bg-slate-800 px-2 py-2">
         <div class="flex gap-2 text-slate-100">
-          <slot name="content">
+          {#if content}
+            {@render content()}
+          {:else}
             {#if icon}<Icon name={icon} class="inline h-4 text-white" />{/if}
             <span>{text}</span>
-          </slot>
+          {/if}
         </div>
       </div>
     </div>

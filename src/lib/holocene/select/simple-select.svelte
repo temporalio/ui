@@ -8,7 +8,7 @@
 
   import Option from './simple-option.svelte';
 
-  interface $$Props extends HTMLSelectAttributes {
+  interface Props extends HTMLSelectAttributes {
     id: string;
     value: SelectOptionValue;
     label: string;
@@ -17,17 +17,21 @@
     required?: boolean;
     options?: SelectOptionValue[];
     'data-testid'?: string;
+    class?: string;
   }
 
-  let className: string = null;
-  export { className as class };
-  export let id: string;
-  export let value: SelectOptionValue;
-  export let label: string;
-  export let arrow = false;
-  export let name = id;
-  export let required = false;
-  export let options: SelectOptionValue[] = [];
+  let {
+    id,
+    value = $bindable(),
+    label,
+    arrow = false,
+    name = id,
+    required = false,
+    options = [],
+    class: className = null,
+    children,
+    ...rest
+  }: Props = $props();
 </script>
 
 <div>
@@ -38,14 +42,15 @@
     {name}
     {id}
     bind:value
-    on:change
-    {...$$restProps}
+    {...rest}
   >
-    <slot>
+    {#if children}
+      {@render children()}
+    {:else}
       {#each options as option}
         <Option value={option} />
       {/each}
-    </slot>
+    {/if}
   </select>
 </div>
 

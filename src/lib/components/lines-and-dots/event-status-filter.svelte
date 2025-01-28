@@ -21,7 +21,7 @@
     <div class="flex items-center">
       <Checkbox
         type="checkbox"
-        on:click={onOptionClick}
+        onclick={onOptionClick}
         checked={$eventStatusFilter}
       />
       <div

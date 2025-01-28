@@ -1,34 +1,30 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import PillContainer from './pill-container.svelte';
   import Pill from './pill.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Pill Container',
     component: PillContainer,
     subcomponents: { Pill },
-    argTypes: {
-      PILLS: {
-        name: 'Pill Container',
-        table: {
-          disable: true,
-        },
-      },
-    },
-  } satisfies Meta<Omit<PillContainer, 'PILLS'>>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args>
+{#snippet template(args: Args<typeof Story>)}
   <PillContainer {...args}>
     <Pill id="A">Pill A</Pill>
     <Pill id="B">Pill B</Pill>
     <Pill id="C">Pill C</Pill>
   </PillContainer>
-</Template>
+{/snippet}
 
 <Story name="Default" />

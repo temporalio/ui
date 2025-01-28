@@ -1,34 +1,49 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import type { MouseEventHandler } from 'svelte/elements';
+
+  import { type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  export let intent: 'warning' | 'default' = 'default';
-  export let button = false;
-  export let removeButtonLabel: string;
-  export let disabled = false;
+  interface Props {
+    intent?: 'warning' | 'default';
+    button?: boolean;
+    removeButtonLabel: string;
+    disabled?: boolean;
+    children?: Snippet;
+    onclick?: MouseEventHandler<HTMLButtonElement>;
+    remove?: () => void;
+  }
 
-  const dispatch = createEventDispatcher();
+  let {
+    intent = 'default',
+    button = false,
+    removeButtonLabel,
+    disabled = false,
+    children,
+    onclick,
+    remove = () => {},
+  }: Props = $props();
 
   const handleRemove = (e: Event) => {
     e.preventDefault();
-    dispatch('remove');
+    remove();
   };
 </script>
 
 <span class={merge('chip', intent)}>
   {#if button}
-    <button class="flex items-center gap-1" on:click>
-      <slot />
+    <button class="flex items-center gap-1" {onclick}>
+      {@render children?.()}
     </button>
   {:else}
-    <slot />
+    {@render children?.()}
   {/if}
   <button
     aria-label={removeButtonLabel}
     class:hidden={disabled}
-    on:click={handleRemove}
+    onclick={handleRemove}
   >
     <Icon name="close" />
   </button>

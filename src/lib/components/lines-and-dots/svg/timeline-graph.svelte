@@ -77,7 +77,7 @@
       size="xs"
       variant="ghost"
       class="sticky left-0.5 top-1"
-      on:click={onExpandCollapse}
+      onclick={onExpandCollapse}
     >
       <Icon
         name={viewportHeight === 360 ? 'chevron-down' : 'chevron-up'}
@@ -89,8 +89,8 @@
       class="sticky {timelineHeight < viewportHeight
         ? 'top-[160px]'
         : viewportHeight === 360
-        ? 'top-[260px]'
-        : 'top-[700px]'}"
+          ? 'top-[260px]'
+          : 'top-[700px]'}"
       class:invisible={!!activeGroups.length}
     >
       <div class="flex w-full justify-between text-xs">

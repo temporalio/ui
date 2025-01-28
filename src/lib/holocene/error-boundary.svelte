@@ -1,36 +1,17 @@
 <script lang="ts">
-  import { networkError } from '$lib/stores/error';
-  import type { NetworkError } from '$lib/types/global';
-
+  import type { Snippet } from 'svelte';
   import Error from './error.svelte';
 
-  export let error = null;
-  export let onError = null;
-
-  let theError: NetworkError;
-
-  $: {
-    if (error && $error) {
-      theError = error;
-    }
-    if (networkError && $networkError) {
-      theError = $networkError;
-    }
-
-    if (onError && theError) {
-      onError(theError);
-    }
+  interface Props {
+    children: Snippet;
   }
-  function clearError() {
-    $error = null;
-    onError = null;
-    theError = null;
-    $networkError = null;
-  }
+
+  let { children }: Props = $props();
 </script>
 
-{#if theError}
-  <Error on:clearError={clearError} error={theError} />
-{:else}
-  <slot />
-{/if}
+<svelte:boundary>
+  {@render children()}
+  {#snippet failed(error, reset)}
+    <Error {reset} {error} />
+  {/snippet}
+</svelte:boundary>

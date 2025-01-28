@@ -1,10 +1,13 @@
-<script lang="ts" context="module">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Compatibility Badge',
     component: CompatibilityBadge,
     args: {
@@ -12,37 +15,57 @@
       active: false,
       buildId: '1234567890',
     },
-  } satisfies Meta<CompatibilityBadge>;
+  });
 </script>
 
-<Template let:args>
-  <CompatibilityBadge {...args} />
-</Template>
+<script lang="ts">
+  setTemplate(template);
+</script>
+
+{#snippet template({ buildId, ...args }: Args<typeof Story>)}
+  <CompatibilityBadge {buildId} {...args} />
+{/snippet}
 
 <Story name="Build ID" args={{ defaultVersion: false }} />
 
 <Story name="Active" args={{ defaultVersion: true, active: true }} />
 
-<Story name="Default Worker" let:args>
-  <CompatibilityBadge {...args}>
-    <span slot="default-worker">Default</span>
-  </CompatibilityBadge>
+<Story name="Default Worker">
+  {#snippet children({ buildId, ...args })}
+    <CompatibilityBadge {buildId} {...args}>
+      {#snippet defaultWorker()}
+        <span>Default</span>
+      {/snippet}
+    </CompatibilityBadge>
+  {/snippet}
 </Story>
 
-<Story name="Overall Default Worker" let:args>
-  <CompatibilityBadge {...args}>
-    <span slot="overall-default-worker">Overall</span>
-  </CompatibilityBadge>
+<Story name="Overall Default Worker">
+  {#snippet children({ buildId, ...args })}
+    <CompatibilityBadge {buildId} {...args}>
+      {#snippet overallDefaultWorker()}
+        <span>Overall</span>
+      {/snippet}
+    </CompatibilityBadge>
+  {/snippet}
 </Story>
 
-<Story name="Default Worker (Active)" args={{ active: true }} let:args>
-  <CompatibilityBadge {...args}>
-    <span slot="default-worker">Default</span>
-  </CompatibilityBadge>
+<Story name="Default Worker (Active)" args={{ active: true }}>
+  {#snippet children({ buildId, ...args })}
+    <CompatibilityBadge {buildId} {...args}>
+      {#snippet defaultWorker()}
+        <span>Default</span>
+      {/snippet}
+    </CompatibilityBadge>
+  {/snippet}
 </Story>
 
-<Story name="Overall Default Worker (Active)" args={{ active: true }} let:args>
-  <CompatibilityBadge {...args}>
-    <span slot="overall-default-worker">Overall</span>
-  </CompatibilityBadge>
+<Story name="Overall Default Worker (Active)" args={{ active: true }}>
+  {#snippet children({ buildId, ...args })}
+    <CompatibilityBadge {buildId} {...args}>
+      {#snippet overallDefaultWorker()}
+        <span>Overall</span>
+      {/snippet}
+    </CompatibilityBadge>
+  {/snippet}
 </Story>

@@ -4,12 +4,27 @@
 
   import Label from '$lib/holocene/label.svelte';
 
-  export let id: string;
-  export let label: string;
-  export let disabled = false;
-  export let checked = false;
-  export let labelPosition: 'left' | 'right' = 'right';
-  export let labelHidden = false;
+  interface Props {
+    id: string;
+    label: string;
+    disabled?: boolean;
+    checked?: boolean;
+    labelPosition?: 'left' | 'right';
+    labelHidden?: boolean;
+    'data-testid'?: string;
+    onchange?: (e: Event) => void;
+  }
+
+  let {
+    id,
+    label,
+    disabled = false,
+    checked = $bindable(false),
+    labelPosition = 'right',
+    labelHidden = false,
+    onchange,
+    ...rest
+  }: Props = $props();
 </script>
 
 <Label
@@ -19,7 +34,7 @@
     disabled && 'opacity-50',
   )}
   {disabled}
-  data-testid={$$props['data-testid']}
+  data-testid={rest['data-testid']}
 >
   <span
     class="whitespace-nowrap text-sm font-medium"
@@ -28,7 +43,7 @@
     {label}
   </span>
   <input
-    on:change
+    {onchange}
     bind:checked
     {id}
     {disabled}
@@ -41,6 +56,6 @@
       ? ''
       : 'group-hover:border-information group-hover:bg-interactive-secondary-hover group-hover:peer-checked:bg-interactive-hover'} peer-focus-visible:border-inverse peer-focus-visible:bg-interactive-secondary-hover peer-focus-visible:ring-2 peer-focus-visible:ring-primary/70 peer-focus-visible:peer-checked:bg-interactive-hover"
   >
-    <span class="h-4 w-4 rounded-[50%] bg-current" />
+    <span class="h-4 w-4 rounded-[50%] bg-current"></span>
   </span>
 </Label>

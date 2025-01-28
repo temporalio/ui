@@ -31,29 +31,33 @@
 
   const localTime = getLocalTime() || translate('common.local');
 
-  let custom = false;
-  let value = 'All Time';
-  let timeField = 'StartTime';
+  let custom = $state(false);
+  let value = $state('All Time');
+  let timeField = $state('StartTime');
 
-  let startDate = startOfDay(new Date());
-  let endDate = startOfDay(new Date());
+  let startDate = $state(startOfDay(new Date()));
+  let endDate = $state(startOfDay(new Date()));
 
-  let startHour = '';
-  let startMinute = '';
-  let startSecond = '';
-  let startHalf: 'AM' | 'PM' = 'AM';
+  let startHour = $state('');
+  let startMinute = $state('');
+  let startSecond = $state('');
+  let startHalf: 'AM' | 'PM' = $state('AM');
 
-  let endHour = '';
-  let endMinute = '';
-  let endSecond = '';
-  let endHalf: 'AM' | 'PM' = 'AM';
+  let endHour = $state('');
+  let endMinute = $state('');
+  let endSecond = $state('');
+  let endHalf: 'AM' | 'PM' = $state('AM');
 
-  $: timeFilter = $workflowFilters.find(
-    (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
+  const timeFilter = $derived(
+    $workflowFilters.find(
+      (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
+    ),
   );
-  $: useBetweenDateTimeQuery = custom || !$supportsAdvancedVisibility;
+  const useBetweenDateTimeQuery = $derived(
+    custom || !$supportsAdvancedVisibility,
+  );
 
-  const setTimeValues = () => {
+  const setTimeValues = (timeFilter: SearchAttributeFilter) => {
     if (!timeFilter) {
       value = 'All Time';
       timeField = 'StartTime';
@@ -66,7 +70,9 @@
     }
   };
 
-  $: timeFilter, setTimeValues();
+  $effect(() => {
+    setTimeValues(timeFilter);
+  });
 
   const getOtherFilters = () =>
     $workflowFilters.filter(
@@ -103,12 +109,12 @@
     }
   };
 
-  const onStartDateChange = (d: CustomEvent) => {
-    startDate = startOfDay(d.detail);
+  const onStartDateChange = (date: Date) => {
+    startDate = startOfDay(date);
   };
 
-  const onEndDateChange = (d: CustomEvent) => {
-    endDate = startOfDay(d.detail);
+  const onEndDateChange = (date: Date) => {
+    endDate = startOfDay(date);
   };
 
   const applyTimeChanges = (
@@ -189,7 +195,7 @@
         <div class="flex flex-col gap-2 p-2">
           <DatePicker
             label={translate('common.start')}
-            on:datechange={onStartDateChange}
+            datechange={onStartDateChange}
             selected={startDate}
             todayLabel={translate('common.today')}
             closeLabel={translate('common.close')}
@@ -203,7 +209,7 @@
           />
           <DatePicker
             label={translate('common.end')}
-            on:datechange={onEndDateChange}
+            datechange={onEndDateChange}
             selected={endDate}
             todayLabel={translate('common.today')}
             closeLabel={translate('common.close')}
@@ -216,8 +222,8 @@
             bind:half={endHalf}
           />
           <div class="flex gap-2">
-            <Button on:click={onApply}>{translate('common.apply')}</Button>
-            <Button variant="secondary" on:click={() => (custom = false)}
+            <Button onclick={onApply}>{translate('common.apply')}</Button>
+            <Button variant="secondary" onclick={() => (custom = false)}
               >{translate('common.cancel')}</Button
             >
           </div>
@@ -225,26 +231,25 @@
       {:else}
         <div class="flex w-full flex-wrap">
           <div class="flex w-1/2 flex-col border-b border-subtle">
-            <MenuItem on:click={() => onChange('All Time')}
+            <MenuItem onclick={() => onChange('All Time')}
               >{translate('common.all-time')}</MenuItem
             >
           </div>
           <div class="flex w-1/2 flex-col border-b border-subtle">
-            <MenuItem on:click={() => onChange('Custom')}
+            <MenuItem onclick={() => onChange('Custom')}
               >{translate('common.custom')}</MenuItem
             >
           </div>
           {#each columnOrderedDurations as duration}
             <div class="flex w-1/2 flex-col justify-center">
-              <MenuItem on:click={() => onChange(duration)}>{duration}</MenuItem
-              >
+              <MenuItem onclick={() => onChange(duration)}>{duration}</MenuItem>
             </div>
           {/each}
           <div class="flex w-full flex-wrap">
             <div class="flex w-1/2 flex-col border-t border-subtle">
               <MenuItem
                 selected={timeField === 'StartTime'}
-                on:click={() => onTimeFieldChange('StartTime')}
+                onclick={() => onTimeFieldChange('StartTime')}
               >
                 {translate('common.start-time')}
               </MenuItem>
@@ -252,7 +257,7 @@
             <div class="flex w-1/2 flex-col border-t border-subtle">
               <MenuItem
                 selected={timeField === 'CloseTime'}
-                on:click={() => onTimeFieldChange('CloseTime')}
+                onclick={() => onTimeFieldChange('CloseTime')}
               >
                 {translate('common.end-time')}
               </MenuItem>

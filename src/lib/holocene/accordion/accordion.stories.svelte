@@ -1,11 +1,15 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import { iconNames } from '$lib/holocene/icon';
 
   import Accordion from './accordion.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Accordion',
     component: Accordion,
     args: {
@@ -27,36 +31,37 @@
         options: iconNames,
       },
     },
-  } satisfies Meta<Accordion>;
+  });
 </script>
 
 <script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  import { action as storyAction } from '@storybook/addon-actions';
 
   import Link from '../link.svelte';
 
   import AccordionGroup from './accordion-group.svelte';
+
+  setTemplate(template);
 </script>
 
-<Template let:args>
+{#snippet template({ title, ...args }: Args<typeof Story>)}
   <div class="flex flex-col gap-2">
-    <Accordion {...args} onToggle={action('onToggle')}>
+    <Accordion {title} {...args} onToggle={storyAction('onToggle')}>
       <p>Accordion Content</p>
     </Accordion>
     <AccordionGroup>
-      <Accordion {...args} onToggle={action('onToggle')}>
+      <Accordion {title} {...args} onToggle={storyAction('onToggle')}>
         <p>Accordion Content</p>
       </Accordion>
-      <Accordion {...args} onToggle={action('onToggle')}>
+      <Accordion {title} {...args} onToggle={storyAction('onToggle')}>
         <p>Accordion Content</p>
       </Accordion>
-      <Accordion {...args} onToggle={action('onToggle')}>
+      <Accordion {title} {...args} onToggle={storyAction('onToggle')}>
         <p>Accordion Content</p>
       </Accordion>
     </AccordionGroup>
   </div>
-</Template>
+{/snippet}
 
 <Story name="Default" args={{ open: false }} />
 
@@ -68,24 +73,31 @@
 
 <Story
   name="With Action"
-  let:args
   parameters={{
     a11y: {
       disable: true,
     },
   }}
 >
-  <Accordion {...args} onToggle={action('onToggle')}>
-    <p>Accordion Content</p>
-    <Link href="https://docs.temporal.io/" newTab slot="action" icon="book">
-      <span class="sr-only">docs</span>
-    </Link>
-  </Accordion>
+  {#snippet children({ title, ...args })}
+    <Accordion {title} {...args} onToggle={storyAction('onToggle')}>
+      <p>Accordion Content</p>
+      {#snippet action()}
+        <Link href="https://docs.temporal.io/" newTab icon="book">
+          <span class="sr-only">docs</span>
+        </Link>
+      {/snippet}
+    </Accordion>
+  {/snippet}
 </Story>
 
-<Story name="With Summary" let:args>
-  <Accordion {...args} onToggle={action('onToggle')}>
-    <p slot="summary">Accordion Summary</p>
-    <p>Accordion Content</p>
-  </Accordion>
+<Story name="With Summary">
+  {#snippet children({ title, ...args })}
+    <Accordion {title} {...args} onToggle={storyAction('onToggle')}>
+      {#snippet summary()}
+        <p>Accordion Summary</p>
+      {/snippet}
+      <p>Accordion Content</p>
+    </Accordion>
+  {/snippet}
 </Story>

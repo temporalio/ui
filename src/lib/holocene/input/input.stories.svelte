@@ -1,12 +1,17 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+    type StoryContext,
+  } from '@storybook/addon-svelte-csf';
   import { expect, userEvent, within } from '@storybook/test';
 
   import { iconNames } from '$lib/holocene/icon';
 
   import Input from './input.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Input',
     component: Input,
     args: {
@@ -66,18 +71,21 @@
         table: { category: 'Styling (Deprecated)' },
       },
     },
-  } satisfies Meta<Input>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
   import Button from '../button.svelte';
+
+  setTemplate(template);
 </script>
 
-<Template let:args let:context>
-  <Input {...args} id={context.id} data-testid={context.id} />
-</Template>
+{#snippet template(
+  { value, label, ...args }: Args<typeof Story>,
+  context: StoryContext<typeof Story>,
+)}
+  <Input {value} {label} {...args} id={context.id} data-testid={context.id} />
+{/snippet}
 
 <Story name="Empty" />
 
@@ -136,9 +144,15 @@
   }}
 />
 
-<Story name="With Buttons" let:args let:context>
-  <Input {...args} id={context.id} data-testid={context.id}>
-    <Button slot="before-input" type="button">Before</Button>
-    <Button slot="after-input" type="button">After</Button>
-  </Input>
+<Story name="With Buttons">
+  {#snippet children({ value, label, ...args }, context)}
+    <Input {value} {label} {...args} id={context.id} data-testid={context.id}>
+      {#snippet before_input()}
+        <Button type="button">Before</Button>
+      {/snippet}
+      {#snippet after_input()}
+        <Button type="button">After</Button>
+      {/snippet}
+    </Input>
+  {/snippet}
 </Story>

@@ -140,7 +140,7 @@
     position="right"
     disabled={actionsDisabled}
     primaryActionDisabled={!cancelEnabled || cancelInProgress}
-    on:click={() => (cancelConfirmationModalOpen = true)}
+    onclick={() => (cancelConfirmationModalOpen = true)}
     label={translate('workflows.request-cancellation')}
     menuLabel={translate('workflows.workflow-actions')}
   >
@@ -149,7 +149,7 @@
         <MenuDivider />
       {/if}
       <MenuItem
-        on:click={onClick}
+        onclick={onClick}
         {destructive}
         disabled={!enabled}
         data-testid={testId}
@@ -161,7 +161,7 @@
     {#if !workflowCreateDisabled($page)}
       <MenuDivider />
       <MenuItem
-        on:click={() =>
+        onclick={() =>
           goto(
             routeForWorkflowStart({
               namespace,
@@ -182,12 +182,12 @@
     menuClass="w-[16rem]"
     position="right"
     primaryActionDisabled={!resetEnabled}
-    on:click={() => (resetConfirmationModalOpen = true)}
+    onclick={() => (resetConfirmationModalOpen = true)}
     label={translate('workflows.reset')}
     menuLabel={translate('workflows.workflow-actions')}
   >
     <MenuItem
-      on:click={() =>
+      onclick={() =>
         goto(
           routeForWorkflowStart({
             namespace,
@@ -207,7 +207,7 @@
       aria-label={translate('workflows.reset')}
       disabled={!resetEnabled}
       variant="primary"
-      on:click={() => (resetConfirmationModalOpen = true)}
+      onclick={() => (resetConfirmationModalOpen = true)}
       data-testid="workflow-reset-button"
     >
       {translate('workflows.reset')}

@@ -1,9 +1,13 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import CollapsibleDivider from './collapsible-divider.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Collapsible Divider',
     component: CollapsibleDivider,
     args: {
@@ -13,17 +17,17 @@
     argTypes: {
       label: { name: 'Label', control: 'text' },
     },
-  } satisfies Meta<CollapsibleDivider>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args>
+{#snippet template(args: Args<typeof Story>)}
   <CollapsibleDivider label={args.label}>
     <p>This is the content</p>
   </CollapsibleDivider>
-</Template>
+{/snippet}
 
 <Story name="Default" />

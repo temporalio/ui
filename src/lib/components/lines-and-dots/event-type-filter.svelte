@@ -17,39 +17,40 @@
   } from '$lib/models/event-history/get-event-categorization';
   import { clearActiveEvents } from '$lib/stores/active-events';
   import { eventTypeFilter } from '$lib/stores/filters';
-  import { temporalVersion } from '$lib/stores/versions';
   import { nexusEnabled } from '$lib/utilities/nexus-enabled';
-  import { isVersionNewer } from '$lib/utilities/version-check';
 
   import { CategoryIcon } from './constants';
 
-  export let compact = false;
+  let { compact = false }: { compact?: boolean } = $props();
+
   let open = writable(false);
 
-  $: defaultOptions = compact
-    ? compactEventTypeOptions.map((o) => o.value)
-    : allEventTypeOptions.map((o) => o.value);
+  const allOptions = $derived(
+    nexusEnabled($page.data.systemInfo?.capabilities)
+      ? allEventTypeOptions
+      : allEventTypeOptions.filter((o) => o.value !== 'nexus'),
+  );
 
-  $: options = [
-    ...(compact ? compactEventTypeOptions : allEventTypeOptions).map((o) => ({
+  const compactOptions = $derived(
+    nexusEnabled($page.data.systemInfo?.capabilities)
+      ? compactEventTypeOptions
+      : compactEventTypeOptions.filter((o) => o.value !== 'nexus'),
+  );
+
+  const defaultOptions = $derived(
+    compact
+      ? compactOptions.map((o) => o.value)
+      : allOptions.map((o) => o.value),
+  );
+
+  let options = $derived([
+    ...(compact ? compactOptions : allOptions).map((o) => ({
       ...o,
       label: translate(o.label),
       icon: CategoryIcon[o.value],
       description: translate(o.description),
     })),
-  ];
-
-  $: {
-    if (isVersionNewer('1.21.0', $temporalVersion)) {
-      options = options.filter(({ value }) => value !== 'update');
-    }
-  }
-
-  $: {
-    if (!nexusEnabled($page.data.systemInfo?.capabilities)) {
-      options = options.filter(({ value }) => value !== 'nexus');
-    }
-  }
+  ]);
 
   const onOptionClick = ({ value }) => {
     clearActiveEvents();
@@ -58,7 +59,9 @@
       : [...$eventTypeFilter, value];
   };
 
-  $: filterActive = $eventTypeFilter.length < defaultOptions.length;
+  const filterActive = $derived(
+    $eventTypeFilter.length < defaultOptions.length,
+  );
 </script>
 
 <MenuContainer {open}>
@@ -80,36 +83,38 @@
   >
     <MenuItem
       data-testid={translate('common.all')}
-      on:click={() => {
+      onclick={() => {
         $eventTypeFilter = defaultOptions;
       }}
     >
-      <Checkbox
-        on:change={() => {
-          $eventTypeFilter = defaultOptions;
-        }}
-        slot="leading"
-        checked={$eventTypeFilter.length === defaultOptions.length}
-        label={translate('common.all')}
-        labelHidden
-      />
+      {#snippet leading()}
+        <Checkbox
+          onchange={() => {
+            $eventTypeFilter = defaultOptions;
+          }}
+          checked={$eventTypeFilter.length === defaultOptions.length}
+          label={translate('common.all')}
+          labelHidden
+        />
+      {/snippet}
       {translate('common.all')}
     </MenuItem>
     <MenuItem
       data-testid={translate('common.none')}
-      on:click={() => {
+      onclick={() => {
         $eventTypeFilter = [];
       }}
     >
-      <Checkbox
-        on:change={() => {
-          $eventTypeFilter = [];
-        }}
-        slot="leading"
-        checked={!$eventTypeFilter.length}
-        label={translate('common.none')}
-        labelHidden
-      />
+      {#snippet leading()}
+        <Checkbox
+          onchange={() => {
+            $eventTypeFilter = [];
+          }}
+          checked={!$eventTypeFilter.length}
+          label={translate('common.none')}
+          labelHidden
+        />
+      {/snippet}
       {translate('common.none')}
     </MenuItem>
     <MenuDivider />
@@ -117,18 +122,19 @@
       <MenuItem
         data-testid={option.label}
         description={option.description}
-        on:click={() => {
+        onclick={() => {
           onOptionClick(option);
         }}
-        class="items-start"
+        className="items-start"
       >
-        <Checkbox
-          on:click={() => onOptionClick(option)}
-          slot="leading"
-          checked={$eventTypeFilter.some((type) => type === option.value)}
-          label={option.label}
-          labelHidden
-        />
+        {#snippet leading()}
+          <Checkbox
+            onclick={() => onOptionClick(option)}
+            checked={$eventTypeFilter.some((type) => type === option.value)}
+            label={option.label}
+            labelHidden
+          />
+        {/snippet}
         {option.label}
       </MenuItem>
     {/each}

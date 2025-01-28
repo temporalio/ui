@@ -5,11 +5,15 @@
 
   import { useDarkMode } from '$lib/utilities/dark-mode';
 
-  export let content: string;
+  interface Props {
+    content: string;
+  }
 
-  let iframe;
+  let { content }: Props = $props();
 
-  $: theme = $useDarkMode ? 'dark' : 'light';
+  let iframe: HTMLIFrameElement = $state();
+
+  let theme = $derived($useDarkMode ? 'dark' : 'light');
 
   const resizeIframe = () => {
     if (!iframe) return;
@@ -44,10 +48,10 @@
   {#key theme}
     <iframe
       bind:this={iframe}
-      on:load={resizeIframe}
+      onload={resizeIframe}
       title="output"
       src="/render?content={encodeURIComponent(templatedContent)}&theme={theme}"
       class="w-full"
-    />
+    ></iframe>
   {/key}
 </section>

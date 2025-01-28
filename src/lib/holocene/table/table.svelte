@@ -1,33 +1,40 @@
 <script lang="ts">
   import type { HTMLTableAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
-  interface $$Props extends HTMLTableAttributes {
+  interface Props extends HTMLTableAttributes {
     variant?: 'simple' | 'fancy';
     updating?: boolean;
     class?: string;
-    'data-testid'?: string;
+    caption?: Snippet;
+    headers?: Snippet;
   }
 
-  let className = '';
-  export { className as class };
-  export let variant: 'simple' | 'fancy' = 'fancy';
-  export let updating = false;
+  let {
+    variant = 'fancy',
+    updating = false,
+    class: className = '',
+    caption,
+    headers,
+    children,
+    ...rest
+  }: Props = $props();
 </script>
 
-<table class={merge(variant, className)} {...$$restProps}>
-  <slot name="caption" />
+<table class={merge(variant, className)} {...rest}>
+  {@render caption?.()}
   <thead>
-    <slot name="headers" />
+    {@render headers?.()}
     {#if updating}
       <ProgressBar />
     {/if}
   </thead>
   <tbody>
-    <slot />
+    {@render children?.()}
   </tbody>
 </table>
 

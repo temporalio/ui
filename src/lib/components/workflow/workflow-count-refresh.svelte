@@ -10,7 +10,7 @@
   variant="ghost"
   leadingIcon="retry"
   loading={$loading || $updating}
-  on:click={() => ($refresh = Date.now())}
+  onclick={() => ($refresh = Date.now())}
 >
   {#if count > 0}
     +{count.toLocaleString()}

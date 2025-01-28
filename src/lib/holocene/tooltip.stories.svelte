@@ -1,11 +1,16 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+    type StoryContext,
+  } from '@storybook/addon-svelte-csf';
 
   import Button from '$lib/holocene/button.svelte';
   import { iconNames } from '$lib/holocene/icon';
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Tooltip',
     component: Tooltip,
     args: {
@@ -68,20 +73,23 @@
         table: { category: 'Positioning' },
       },
     },
-  } satisfies Meta<Omit<Tooltip, 'copyIconTitle'>>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args let:context>
+{#snippet template(
+  args: Args<typeof Story>,
+  context: StoryContext<typeof Story>,
+)}
   <div class="flex h-screen w-full items-center justify-center">
     <Tooltip {...args}>
       <Button>{context.name} Tooltip</Button>
     </Tooltip>
   </div>
-</Template>
+{/snippet}
 
 <Story name="Top" args={{ top: true }} />
 
@@ -123,11 +131,13 @@
 
 <Story name="With Content instead of text">
   <Tooltip bottomRight show>
-    <div slot="content">
-      <div>whadup</div>
-      <div>whadup</div>
-      <div>whadup</div>
-    </div>
+    {#snippet content()}
+      <div>
+        <div>whadup</div>
+        <div>whadup</div>
+        <div>whadup</div>
+      </div>
+    {/snippet}
     <Button>Tooltip</Button>
   </Tooltip>
 </Story>

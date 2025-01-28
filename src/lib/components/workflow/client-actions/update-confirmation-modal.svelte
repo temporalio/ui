@@ -105,8 +105,8 @@
   confirmText={translate('common.submit')}
   cancelText={translate('common.cancel')}
   confirmDisabled={!name || !encoding}
-  on:cancelModal={hideModal}
-  on:confirmModal={update}
+  cancelModal={hideModal}
+  confirmModal={update}
 >
   <h3 slot="title">{translate('workflows.update-modal-title')}</h3>
   <div class="flex flex-col gap-4" slot="content">
@@ -123,7 +123,7 @@
         {#each updateDefinitions as { name: value, description = '' }}
           <Option {value} {description}>{value}</Option>
         {/each}
-        <Option on:click={handleCustom} value="custom">Custom</Option>
+        <Option click={handleCustom} value="custom">Custom</Option>
       </Select>
     {:else}
       <div class="flex w-full items-end justify-between gap-2">
@@ -136,7 +136,7 @@
         />
         {#if customUpdate}
           <Button
-            on:click={() => {
+            onclick={() => {
               customUpdate = false;
               name = '';
             }}

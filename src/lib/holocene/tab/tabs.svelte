@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type TabContext = {
     activeTab: Writable<string>;
     activePanel: Writable<string>;
@@ -11,15 +11,14 @@
 </script>
 
 <script lang="ts">
-  import type { HTMLAttributes } from 'svelte/elements';
   import { type Writable, writable } from 'svelte/store';
 
   import { onDestroy, setContext } from 'svelte';
 
-  type $$Props = HTMLAttributes<HTMLDivElement>;
+  let { children, ...rest } = $props();
 
-  const tabs: string[] = [];
-  const panels: string[] = [];
+  const tabs: string[] = $state([]);
+  const panels: string[] = $state([]);
   const activeTab = writable<string>(null);
   const activePanel = writable<string>(null);
 
@@ -61,6 +60,6 @@
   });
 </script>
 
-<div class="tabs" {...$$restProps}>
-  <slot />
+<div class="tabs" {...rest}>
+  {@render children?.()}
 </div>

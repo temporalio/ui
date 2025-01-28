@@ -80,7 +80,7 @@
   bind:error
   bind:open
   id="batch-reset-confirmation-modal"
-  on:confirmModal={resetWorkflows}
+  confirmModal={resetWorkflows}
   confirmType="destructive"
 >
   <h3 slot="title">

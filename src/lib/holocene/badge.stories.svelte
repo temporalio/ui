@@ -1,38 +1,29 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import { defineMeta, setTemplate } from '@storybook/addon-svelte-csf';
 
   import Badge, { badgeTypes } from './badge.svelte';
 
-  const types = badgeTypes.filter((type) => type !== 'count');
-
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Badge',
     component: Badge,
-    args: {
-      count: 99,
-      label: 'Badge',
-    },
-    argTypes: {
-      label: { control: 'text' },
-      count: { control: 'number', min: 0, max: 99999, step: 1 },
-    },
     parameters: {
       controls: { exclude: ['type', 'badgeTypes', 'class'] },
     },
-  } satisfies Meta<Badge['$$prop_def'] & { label?: string; count?: number }>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args>
+{#snippet template()}
   <div class="flex flex-col gap-2">
-    {#each types as type}
-      <Badge {type} class="capitalize">{type.replace(/-/g, ' ')}</Badge>
+    {#each badgeTypes as type}
+      <Badge {type} class="capitalize">
+        {type === 'count' ? '99' : type.replace(/-/g, ' ')}
+      </Badge>
     {/each}
-    <Badge type="count">{args.count}</Badge>
   </div>
-</Template>
+{/snippet}
 
 <Story name="Default" />

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const SELECT_CONTEXT = 'select-context';
 
   type ExtendedSelectOption<T> = {
@@ -21,10 +21,9 @@
 
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
-  import { noop, onMount } from 'svelte/internal';
   import { writable, type Writable } from 'svelte/store';
 
-  import { setContext } from 'svelte';
+  import { onMount, setContext, type Snippet } from 'svelte';
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -47,19 +46,25 @@
     menuClass?: string;
     variant?: MenuButtonVariant;
     required?: boolean;
+    icon?: Snippet;
   };
 
-  export let label: string;
-  export let labelHidden = false;
-  export let id: string;
-  export let value: T = undefined;
-  export let placeholder = '';
-  export let disabled = false;
-  export let leadingIcon: IconName = null;
-  export let onChange: (value: T) => void = noop;
-  export let menuClass: string | undefined = undefined;
-  export let variant: MenuButtonVariant = 'secondary';
-  export let required = false;
+  let {
+    label,
+    labelHidden = false,
+    id,
+    value = $bindable(),
+    placeholder = '',
+    disabled = false,
+    leadingIcon = null,
+    onChange = () => {},
+    menuClass = undefined,
+    variant = 'secondary',
+    required = false,
+    children,
+    'data-testid': testId = '',
+    icon,
+  }: $$Props = $props();
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
   const valueCtx = writable<T>(value);
@@ -67,11 +72,13 @@
   const labelCtx = writable<string>(value?.toString());
   const open = writable<boolean>(false);
 
-  $: value, updateContext();
+  $effect(() => {
+    updateContext(value);
+  });
 
-  function updateContext() {
-    $valueCtx = value;
-    $labelCtx = getLabelFromOptions(value);
+  function updateContext(_value) {
+    $valueCtx = _value;
+    $labelCtx = getLabelFromOptions(_value);
   }
 
   const handleChange = (newValue: T) => {
@@ -111,13 +118,15 @@
       {disabled}
       controls="{id}-select"
       {variant}
-      data-testid={`${$$restProps['data-testid'] ?? ''}-button`}
+      data-testid={`${testId}-button`}
     >
-      <slot name="leading" slot="leading">
-        {#if leadingIcon}
+      {#snippet leading()}
+        {#if icon}
+          {@render icon()}
+        {:else if leadingIcon}
           <Icon name={leadingIcon} />
         {/if}
-      </slot>
+      {/snippet}
       <input
         {id}
         value={!value && placeholder !== '' ? placeholder : $labelCtx}
@@ -126,15 +135,16 @@
         class:disabled
         {required}
         aria-required={required}
-        {...$$restProps}
       />
-      {#if disabled}
-        <Icon slot="trailing" name="lock" />
-      {/if}
+      {#snippet trailing()}
+        {#if disabled}
+          <Icon name="lock" />
+        {/if}
+      {/snippet}
     </MenuButton>
   {/key}
   <Menu role="listbox" id="{id}-select" class={menuClass}>
-    <slot />
+    {@render children?.()}
   </Menu>
 </MenuContainer>
 

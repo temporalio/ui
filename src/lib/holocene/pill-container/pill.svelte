@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
-  import { noop } from 'svelte/internal';
 
   import { getContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -12,7 +11,7 @@
 
   import { PILLS, type PillsContext } from './pill-container.svelte';
 
-  type $$Props = {
+  interface Props extends HTMLButtonAttributes {
     id: string;
     onClick?: () => void;
     disabled?: boolean;
@@ -21,26 +20,29 @@
     icon?: IconName;
     count?: number;
     class?: string;
-  } & HTMLButtonAttributes;
+  }
 
-  export let id: string;
-  export let onClick: () => void = noop;
-  export let disabled = false;
-  export let loading = false;
-  export let active: boolean = null;
-  export let icon: IconName = null;
-  export let count: number = null;
-  let className = '';
-  export { className as class };
+  let {
+    id,
+    onClick = () => {},
+    disabled = false,
+    loading = false,
+    active = null,
+    icon = null,
+    count = null,
+    class: className = '',
+    children,
+  }: Props = $props();
 
   const { activePill, registerPill, selectPill } =
     getContext<PillsContext>(PILLS);
 
   registerPill(id);
 
-  $: isActive = isNull(active) ? $activePill === id : active;
+  let isActive = $derived(isNull(active) ? $activePill === id : active);
 
-  const handleClick = () => {
+  const handleClick = (event: MouseEvent) => {
+    event.stopPropagation();
     if (disabled) return;
     selectPill(id);
     onClick && onClick();
@@ -48,7 +50,7 @@
 </script>
 
 <button
-  on:click|stopPropagation={handleClick}
+  onclick={handleClick}
   class={merge(
     'surface-subtle flex items-center justify-center gap-2 rounded-full px-3 py-1 text-sm',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
@@ -62,7 +64,7 @@
       <Icon name={loading ? 'spinner' : icon} />
     </span>
   {/if}
-  <slot />
+  {@render children?.()}
   {#if !isNull(count)}
     <Badge type="count">{count}</Badge>
   {/if}

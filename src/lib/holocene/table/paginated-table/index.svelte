@@ -1,19 +1,47 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
+  import type { Snippet } from 'svelte';
+
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
   type Item = $$Generic;
 
-  export let visibleItems: Item[];
-  export let variant: 'primary' | 'split' = 'primary';
-  export let updating = false;
-  export let maxHeight = '';
-  export let fixed = false;
+  type $$Props = HTMLAttributes<HTMLTableElement> & {
+    visibleItems: Item[];
+    variant?: 'primary' | 'split';
+    updating?: boolean;
+    maxHeight?: string;
+    fixed?: boolean;
+    caption?: Snippet;
+    headers?: Snippet;
+    empty?: Snippet;
+    actionsStart?: Snippet;
+    actionsCenter?: Snippet;
+    actionsEnd?: Snippet;
+  };
 
-  let tableContainer: HTMLDivElement;
+  let {
+    visibleItems,
+    variant = 'primary',
+    updating = false,
+    maxHeight = '',
+    fixed = false,
+    caption,
+    headers,
+    children,
+    empty,
+    actionsStart,
+    actionsCenter,
+    actionsEnd,
+    ...rest
+  }: $$Props = $props();
 
-  $: tableOffset = tableContainer?.offsetTop
-    ? tableContainer?.offsetTop + 32
-    : 0;
+  let tableContainer: HTMLDivElement | undefined = $state();
+
+  let tableOffset = $derived(
+    tableContainer?.offsetTop ? tableContainer?.offsetTop + 32 : 0,
+  );
 </script>
 
 <div
@@ -25,27 +53,27 @@
     class="paginated-table"
     class:table-fixed={fixed}
     class:table-auto={!fixed}
-    {...$$restProps}
+    {...rest}
   >
-    <slot name="caption" />
+    {@render caption?.()}
     <thead class="paginated-table-header">
-      <slot name="headers" {visibleItems} />
+      {@render headers?.()}
       {#if updating}
         <ProgressBar />
       {/if}
     </thead>
     <tbody class="paginated-table-body">
-      <slot />
+      {@render children?.()}
     </tbody>
   </table>
   {#if visibleItems.length}
     <div class="paginated-table-controls">
-      <slot name="actions-start" />
-      <slot name="actions-center" />
-      <slot name="actions-end" />
+      {@render actionsStart?.()}
+      {@render actionsCenter?.()}
+      {@render actionsEnd?.()}
     </div>
   {:else}
-    <slot name="empty" />
+    {@render empty?.()}
   {/if}
 </div>
 

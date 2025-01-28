@@ -36,41 +36,48 @@
   import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  let refresh = Date.now();
-  let coreUser = coreUserStore();
-  let customizationDrawerOpen = false;
-  let error = '';
+  const coreUser = coreUserStore();
+  let customizationDrawerOpen = $state(false);
+  let error = $state('');
+  let refresh = $state(Date.now());
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
 
-  $: namespace = $page.params.namespace;
-  $: columns = $configurableTableColumns?.[namespace]?.schedules ?? [];
-  $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
-  $: searchAttributeOptions = Object.entries({
-    ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
-      ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  const namespace = $derived($page.params.namespace);
+  const columns = $derived(
+    $configurableTableColumns?.[namespace]?.schedules ?? [],
+  );
+  const createDisabled = $derived($coreUser.namespaceWriteDisabled(namespace));
+  const searchAttributeOptions = $derived(
+    Object.entries({
+      ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
+        ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      }),
+      ...$customSearchAttributes,
+    }).map(([key, value]) => {
+      return {
+        label: key,
+        value: key,
+        type: value,
+      };
     }),
-    ...$customSearchAttributes,
-  }).map(([key, value]) => {
-    return {
-      label: key,
-      value: key,
-      type: value,
-    };
-  });
-  $: query = $page.url.searchParams.get('query');
-  $: onFetch = () => {
+  );
+  const query = $derived($page.url.searchParams.get('query'));
+  const onFetch = $derived(() => {
     error = '';
     return fetchPaginatedSchedules(namespace, query, onError);
-  };
-  $: availableColumns = availableScheduleColumns(namespace);
+  });
+  const availableColumns = $derived(availableScheduleColumns(namespace));
 
+  const searchAttributesValue = $derived($searchAttributes);
   onMount(() => {
     if (query) {
-      // Set filters from inital page load query if it exists
-      $scheduleFilters = toListWorkflowFilters(query, $searchAttributes);
+      if ($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) {
+        searchAttributesValue.ScheduleId = SEARCH_ATTRIBUTE_TYPE.KEYWORD;
+      }
+      $scheduleFilters = toListWorkflowFilters(query, searchAttributesValue);
     }
   });
 
@@ -81,7 +88,6 @@
 
 {#key [namespace, query, refresh]}
   <PaginatedTable
-    let:visibleItems
     {onFetch}
     {onError}
     total={$schedulesCount}
@@ -92,52 +98,57 @@
     emptyStateMessage={translate('schedules.empty-state-title')}
     errorMessage={translate('schedules.error-message-fetching')}
   >
-    <caption class="sr-only" slot="caption"
-      >{translate('common.schedules')}</caption
-    >
+    {#snippet caption()}
+      <caption class="sr-only">{translate('common.schedules')}</caption>
+    {/snippet}
 
-    <div class="flex flex-col gap-4" slot="header" let:visibleItems>
+    {#snippet header({ visibleItems })}
       {@const showActions = visibleItems.length || query}
-      <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
-        <SchedulesCount />
-      </h1>
-      <div class="flex flex-col justify-between gap-2 md:flex-row">
-        {#if showActions}
-          <SearchAttributeFilter
-            bind:filters={$scheduleFilters}
-            options={searchAttributeOptions}
-            refresh={() => {
-              refresh = Date.now();
-            }}
-          />
-          <Button
-            leadingIcon="settings"
-            variant="secondary"
-            on:click={openCustomizationDrawer}
-          />
-          {#if !createDisabled}
+      <div class="flex flex-col gap-4">
+        <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
+          <SchedulesCount />
+        </h1>
+        <div class="flex flex-col justify-between gap-2 md:flex-row">
+          {#if showActions}
+            <SearchAttributeFilter
+              bind:filters={$scheduleFilters}
+              options={searchAttributeOptions}
+              refresh={() => {
+                refresh = Date.now();
+              }}
+            />
             <Button
-              data-testid="create-schedule"
-              href={routeForScheduleCreate({ namespace })}
-              disabled={!writeActionsAreAllowed()}
-            >
-              {translate('schedules.create')}
-            </Button>
+              leadingIcon="settings"
+              variant="secondary"
+              onclick={openCustomizationDrawer}
+            />
+            {#if !createDisabled}
+              <Button
+                data-testid="create-schedule"
+                href={routeForScheduleCreate({ namespace })}
+                disabled={!writeActionsAreAllowed()}
+              >
+                {translate('schedules.create')}
+              </Button>
+            {/if}
           {/if}
-        {/if}
+        </div>
       </div>
-    </div>
-
-    <tr slot="headers" class="text-left">
-      {#each columns as { label }}
-        <th>{label}</th>
+    {/snippet}
+    {#snippet headers()}
+      <tr class="text-left">
+        {#each columns as { label }}
+          <th>{label}</th>
+        {/each}
+      </tr>
+    {/snippet}
+    {#snippet children({ visibleItems })}
+      {#each visibleItems as schedule}
+        <SchedulesTableRow {schedule} {columns} />
       {/each}
-    </tr>
-    {#each visibleItems as schedule}
-      <SchedulesTableRow {schedule} {columns} />
-    {/each}
+    {/snippet}
 
-    <svelte:fragment slot="empty">
+    {#snippet empty()}
       {#if error}
         <EmptyState title={translate('schedules.empty-state-title')}>
           <Alert intent="warning" icon="warning" class="mx-12">
@@ -164,7 +175,7 @@
           {#if !createDisabled}
             <Button
               data-testid="create-schedule"
-              on:click={() => goto(routeForScheduleCreate({ namespace }))}
+              onclick={() => goto(routeForScheduleCreate({ namespace }))}
               disabled={!writeActionsAreAllowed()}
             >
               {translate('schedules.create')}
@@ -172,7 +183,7 @@
           {/if}
         </EmptyState>
       {/if}
-    </svelte:fragment>
+    {/snippet}
   </PaginatedTable>
 {/key}
 

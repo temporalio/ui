@@ -1,13 +1,31 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
   import CopyButton from './button.svelte';
 
-  export let content: string;
-  export let visible = false;
-  export let clickAllToCopy = false;
-  export let copyIconTitle: string;
-  export let copySuccessIconTitle: string;
+  interface Props {
+    content: string;
+    visible?: boolean;
+    clickAllToCopy?: boolean;
+    copyIconTitle?: string;
+    copySuccessIconTitle?: string;
+    class?: string;
+    'container-class'?: string;
+    children?: Snippet;
+  }
+
+  let {
+    content,
+    visible = false,
+    clickAllToCopy = false,
+    copyIconTitle,
+    copySuccessIconTitle,
+    class: className = '',
+    children,
+    ...rest
+  }: Props = $props();
 
   const { copy, copied } = copyToClipboard();
 
@@ -18,34 +36,34 @@
 
 {#if clickAllToCopy}
   <button
-    class="group flex items-center gap-1 break-all {$$props['container-class']}"
-    on:click={handleOnClick}
+    class="group flex items-center gap-1 break-all {rest['container-class']}"
+    onclick={handleOnClick}
   >
-    <slot>
-      <span class={$$props.class} class:select-all={!$$slots.default}
-        >{content}</span
-      >
-    </slot>
+    {#if children}
+      {@render children()}
+    {:else}
+      <span class="select-all {className}">{content}</span>
+    {/if}
     <CopyButton
       {copyIconTitle}
       {copySuccessIconTitle}
       class={visible ? 'visible' : 'invisible group-hover:visible'}
-      on:click={handleOnClick}
+      onclick={handleOnClick}
       copied={$copied}
     />
   </button>
 {:else}
-  <div class="group flex items-center gap-1 {$$props['container-class']}">
-    <slot>
-      <span class={$$props.class} class:select-all={!$$slots.default}
-        >{content}</span
-      >
-    </slot>
+  <div class="group flex items-center gap-1 {rest['container-class']}">
+    {#if children}
+      {@render children()}
+    {:else}
+      <span class="select-all {className}">{content}</span>
+    {/if}
     <CopyButton
       {copyIconTitle}
       {copySuccessIconTitle}
       class={visible ? 'visible' : 'invisible group-hover:visible'}
-      on:click={handleOnClick}
+      onclick={handleOnClick}
       copied={$copied}
     />
   </div>

@@ -11,13 +11,15 @@
 
   type T = $$Generic;
 
-  type $$Props = RadioInputProps<T>;
-  export let value: T;
-  export let id: string;
-  export let label: string;
-  export let description: string | undefined = undefined;
-  export let labelHidden = false;
-  export let disabled = false;
+  let {
+    value,
+    id,
+    label,
+    description = undefined,
+    labelHidden = false,
+    disabled = false,
+    ...rest
+  }: RadioInputProps<T> = $props();
 
   let internalGroup: Writable<T> = writable(value);
   let internalName: string = '';
@@ -44,7 +46,7 @@
       {value}
       {id}
       {disabled}
-      {...$$restProps}
+      {...rest}
     />
     <span class="label" class:hidden={labelHidden}>
       {label}

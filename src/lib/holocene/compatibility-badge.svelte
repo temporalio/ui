@@ -1,11 +1,24 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  export let defaultVersion = false;
-  export let active = false;
-  export let buildId: string;
+  interface Props {
+    defaultVersion?: boolean;
+    active?: boolean;
+    buildId: string;
+    overallDefaultWorker?: Snippet;
+    defaultWorker?: Snippet;
+  }
+
+  let {
+    defaultVersion = false,
+    active = false,
+    buildId,
+    overallDefaultWorker,
+    defaultWorker,
+  }: Props = $props();
 </script>
 
 <p class="flex select-all gap-2 font-mono">
@@ -17,8 +30,8 @@
       )}
     >
       <Icon name="merge" />{buildId}
-      <slot name="overall-default-worker" />
-      <slot name="default-worker" />
+      {@render overallDefaultWorker?.()}
+      {@render defaultWorker?.()}
     </span>
   {:else if buildId}
     <span

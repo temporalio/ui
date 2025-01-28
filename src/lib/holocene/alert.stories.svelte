@@ -1,7 +1,13 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
-  export const meta = {
+  import Alert from './alert.svelte';
+
+  const { Story } = defineMeta({
     title: 'Alert',
     component: Alert,
     args: {
@@ -21,17 +27,15 @@
       },
       hidden: { table: { disable: true } },
     },
-  } satisfies Meta<Alert>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
-  import Alert from './alert.svelte';
+  setTemplate(template);
 </script>
 
-<Template let:args>
-  <Alert {...args}>
+{#snippet template({ intent, ...args }: Args<typeof Story>)}
+  <Alert {intent} {...args}>
     <p>
       Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate
       exercitationem quia quibusdam excepturi rem saepe dolore quas, odit vero
@@ -39,7 +43,7 @@
       itaque?
     </p>
   </Alert>
-</Template>
+{/snippet}
 
 <Story name="Information" args={{ intent: 'info' }} />
 

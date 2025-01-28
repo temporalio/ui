@@ -56,7 +56,7 @@
     controls="search-attribute-menu"
     disabled={$activeQueryIndex !== null}
     count={$filter.attribute ? 0 : filters.length}
-    on:click={() => (searchAttributeValue = '')}
+    click={() => (searchAttributeValue = '')}
     class="text-nowrap"
   >
     <svelte:fragment slot="leading">
@@ -68,9 +68,9 @@
   </MenuButton>
   <Menu id="search-attribute-menu" keepOpen>
     <MenuItem
-      class="p-0"
+      className="p-0"
       hoverable={false}
-      on:click={() => {
+      onclick={() => {
         document.getElementById('filter-search')?.focus();
       }}
     >
@@ -89,7 +89,7 @@
     {#each filteredOptions as { value, label, type }}
       {@const disabled = isOptionDisabled(value, filters)}
       <MenuItem
-        on:click={() => {
+        onclick={() => {
           handleNewQuery(value, type);
         }}
         {disabled}
@@ -97,7 +97,7 @@
         {label}
       </MenuItem>
     {:else}
-      <MenuItem class="whitespace-nowrap" disabled
+      <MenuItem className="whitespace-nowrap" disabled
         >{translate('common.no-results')}</MenuItem
       >
     {/each}

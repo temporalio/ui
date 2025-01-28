@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte/internal';
+  import { onMount } from 'svelte';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -23,7 +23,7 @@
   import { capitalize } from '$lib/utilities/format-camel-case';
   import { formatUTCOffset, getLocalTime } from '$lib/utilities/format-date';
 
-  export let position: 'left' | 'right' = 'right';
+  let { position = 'right' }: { position?: 'left' | 'right' } = $props();
 
   const localTime = getLocalTime();
   const QuickTimezoneOptions: TimeFormatOptions = [
@@ -34,18 +34,20 @@
     { label: translate('common.local'), value: 'local' },
   ];
 
-  let search = '';
+  let search = $state('');
 
-  $: filteredOptions = !search
-    ? TimezoneOptions
-    : TimezoneOptions.filter(({ abbr, value, zones }) => {
-        const searchValue = search.trim().toLowerCase();
-        return (
-          value.toLowerCase().includes(searchValue) ||
-          abbr?.toLowerCase().includes(searchValue) ||
-          zones?.some((zone) => zone.toLowerCase().includes(searchValue))
-        );
-      });
+  const filteredOptions = $derived(
+    !search
+      ? TimezoneOptions
+      : TimezoneOptions.filter(({ abbr, value, zones }) => {
+          const searchValue = search.trim().toLowerCase();
+          return (
+            value.toLowerCase().includes(searchValue) ||
+            abbr?.toLowerCase().includes(searchValue) ||
+            zones?.some((zone) => zone.toLowerCase().includes(searchValue))
+          );
+        }),
+  );
 
   const selectTimezone = (value: TimeFormat) => {
     if ($relativeTime && value !== 'local') $relativeTime = false;
@@ -60,10 +62,11 @@
     }
   };
 
-  $: timezone =
+  const timezone = $derived(
     Timezones[$timeFormat]?.abbr ??
-    Timezones[$timeFormat]?.label ??
-    capitalize($timeFormat);
+      Timezones[$timeFormat]?.label ??
+      capitalize($timeFormat),
+  );
 
   onMount(() => {
     if (String($timeFormat) === 'relative') {
@@ -104,7 +107,7 @@
     {#if !search}
       {#each QuickTimezoneOptions as { value, label }}
         <MenuItem
-          on:click={() => selectTimezone(value)}
+          onclick={() => selectTimezone(value)}
           data-testid={`timezones-${value}`}
           selected={value === $timeFormat}
           description={value === 'local' && localTime}
@@ -119,7 +122,7 @@
           id="relative-toggle"
           bind:checked={$relativeTime}
           labelPosition="left"
-          on:change={handleRelativeToggle}
+          onchange={handleRelativeToggle}
           data-testid="timezones-relative-toggle"
         />
       </div>
@@ -130,7 +133,7 @@
     {#each filteredOptions as { value, label, offset, abbr }}
       <MenuItem
         selected={value === $timeFormat}
-        on:click={() => selectTimezone(value)}
+        onclick={() => selectTimezone(value)}
         description={formatUTCOffset(offset, translate('common.utc'))}
       >
         {label} ({abbr})

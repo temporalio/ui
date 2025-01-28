@@ -1,15 +1,24 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import OrderableListItem from './orderable-list-item.svelte';
+
+  interface Props {
+    heading?: Snippet;
+    children?: Snippet;
+  }
+
+  let { heading, children }: Props = $props();
 </script>
 
 <div class="orderable-section">
   <h5>
-    <slot name="heading">Items</slot>
+    {#if heading}{@render heading()}{:else}Items{/if}
   </h5>
   <ol class="orderable-list">
-    <slot>
-      <OrderableListItem readonly label="No Items" pinned={false} />
-    </slot>
+    {#if children}{@render children()}{:else}
+      <OrderableListItem readonly label="No Items" />
+    {/if}
   </ol>
 </div>
 

@@ -1,31 +1,26 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import TabList from './tab-list.svelte';
   import TabPanel from './tab-panel.svelte';
   import Tab from './tab.svelte';
   import Tabs from './tabs.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Tabs',
     component: Tabs,
-    subcomponents: { TabList, TabPanel, Tab },
-    argTypes: {
-      TABS: {
-        name: 'Tabs',
-        table: {
-          disable: true,
-        },
-      },
-    },
-  } satisfies Meta<Omit<Tabs, 'TABS'>>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args>
+{#snippet template(args: Args<typeof Story>)}
   <Tabs {...args}>
     <TabList label="tabs">
       <Tab id="tab-a" panelId="tab-panel-a" label="Tab A" />
@@ -42,6 +37,6 @@
       <p class="py-4">Tab C Content</p>
     </TabPanel>
   </Tabs>
-</Template>
+{/snippet}
 
 <Story name="Default" />

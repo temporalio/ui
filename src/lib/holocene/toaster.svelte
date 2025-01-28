@@ -4,12 +4,16 @@
   import Link from './link.svelte';
   import ToastComponent from './toast.svelte';
 
-  export let pop: Toaster['pop'];
-  export let toasts: Toaster['toasts'];
-  export let closeButtonLabel: string;
+  interface Props {
+    pop: Toaster['pop'];
+    toasts: Toaster['toasts'];
+    closeButtonLabel: string;
+  }
 
-  const dismissToast = (event: CustomEvent<{ id: string }>) => {
-    pop(event.detail.id);
+  let { pop, toasts, closeButtonLabel }: Props = $props();
+
+  const dismissToast = ({ id }: { id: string }) => {
+    pop(id);
   };
 </script>
 
@@ -18,7 +22,7 @@
   role="log"
 >
   {#each $toasts as { message, variant, id, link } (id)}
-    <ToastComponent {closeButtonLabel} {variant} {id} on:dismiss={dismissToast}>
+    <ToastComponent {closeButtonLabel} {variant} {id} dismiss={dismissToast}>
       {#if link}
         <Link href={link}>
           {message}

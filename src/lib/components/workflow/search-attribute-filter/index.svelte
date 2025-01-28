@@ -37,9 +37,9 @@
         data-testid="filter-configuration-menu-button"
         class="max-w-[3rem] text-nowrap md:max-w-full"
       >
-        <svelte:fragment slot="leading">
+        {#snippet leading()}
           <Icon name="settings" />
-        </svelte:fragment>
+        {/snippet}
       </MenuButton>
       <Menu id="filter-configuration-menu" position="right">
         <div class="flex flex-col items-start gap-4 p-4 md:items-end">
@@ -60,8 +60,8 @@
             bind:checked={$searchInputViewOpen}
           />
           <MenuItem
-            on:click={onClickConfigure}
-            class="m-0 py-0.5"
+            onclick={onClickConfigure}
+            className="m-0"
             data-testid="workflows-summary-table-configuration-button"
           >
             {translate('workflows.configure-headers', {
@@ -69,8 +69,8 @@
             })}
           </MenuItem>
           <MenuItem
-            on:click={() => exportWorkflows($workflows)}
-            class="m-0 py-0.5"
+            onclick={() => exportWorkflows($workflows)}
+            className="m-0"
             data-testid="export-history-button"
           >
             {translate('common.download-json')}

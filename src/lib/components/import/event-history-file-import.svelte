@@ -72,7 +72,7 @@
     accept=".json"
     on:change={onFileSelect}
   />
-  <Button leadingIcon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
+  <Button leadingIcon="file-upload" onclick={onConfirm} disabled={!fileLoaded}
     >{translate('common.import')}</Button
   >
 </div>

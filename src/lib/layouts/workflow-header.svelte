@@ -139,38 +139,46 @@
     </div>
   </div>
   {#if hasUserMetadata}
-    <AccordionLight let:open>
-      <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
-        <Icon
-          name="info"
-          class="text-brand"
-          width={32}
-          height={32}
-        />{translate('workflows.summary-and-details')}
-      </div>
-      {#if open && summary}
-        <h3>{translate('workflows.summary')}</h3>
-        <Markdown content={summary} />
-      {/if}
-      {#if open && details}
-        <h3>{translate('workflows.details')}</h3>
-        <Markdown content={details} />
-      {/if}
+    <AccordionLight>
+      {#snippet title()}
+        <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
+          <Icon
+            name="info"
+            class="text-brand"
+            width={32}
+            height={32}
+          />{translate('workflows.summary-and-details')}
+        </div>
+      {/snippet}
+      {#snippet children({ open })}
+        {#if open && summary}
+          <h3>{translate('workflows.summary')}</h3>
+          <Markdown content={summary} />
+        {/if}
+        {#if open && details}
+          <h3>{translate('workflows.details')}</h3>
+          <Markdown content={details} />
+        {/if}
+      {/snippet}
     </AccordionLight>
   {/if}
   {#if currentDetails}
-    <AccordionLight let:open>
-      <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
-        <Icon
-          name="flag"
-          class="text-brand"
-          width={32}
-          height={32}
-        />{translate('workflows.current-details')}
-      </div>
-      {#if open}
-        <Markdown content={currentDetails} />
-      {/if}
+    <AccordionLight>
+      {#snippet title()}
+        <div class="flex w-full items-center gap-2 p-2 text-xl">
+          <Icon
+            name="flag"
+            class="text-brand"
+            width={32}
+            height={32}
+          />{translate('workflows.current-details')}
+        </div>
+      {/snippet}
+      {#snippet children({ open })}
+        {#if open}
+          <Markdown content={currentDetails} />
+        {/if}
+      {/snippet}
     </AccordionLight>
   {/if}
   <WorkflowDetails {workflow} />

@@ -1,9 +1,13 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import Modal from './modal.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Modal',
     component: Modal,
     args: {
@@ -82,41 +86,53 @@
         name: 'Highlight Navigation',
         control: 'boolean',
       },
-
-      toggleModal: { table: { disable: true } },
     },
-  } satisfies Meta<Modal>;
+  });
 </script>
 
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+
+  setTemplate(template);
 </script>
 
-<Template let:args>
+{#snippet template({
+  cancelText,
+  confirmText,
+  open,
+  ...args
+}: Args<typeof Story>)}
   <Modal
     id="modal"
-    on:confirmModal={action('confirm')}
-    on:cancelModal={action('cancel')}
+    confirmModal={action('confirm')}
+    cancelModal={action('cancel')}
+    {cancelText}
+    {confirmText}
+    {open}
     {...args}
   >
-    <h3 slot="title">Modal Title</h3>
-    <p slot="content">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.
-      Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies
-      sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a,
-      semper congue, euismod non, mi. Proin porttitor, orci nec nonummy
-      molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat.
-      Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a,
-      enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor.
-      Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent
-      blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales.
-      Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere
-      cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede pellentesque
-      fermentum. Maecenas adipiscing ante non diam sodales hendrerit.
-    </p>
+    {#snippet modal_title()}
+      <h3>Modal Title</h3>
+    {/snippet}
+    {#snippet content()}
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.
+        Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies
+        sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius
+        a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy
+        molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat.
+        Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium
+        a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra
+        tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede.
+        Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit
+        sodales. Vestibulum ante ipsum primis in faucibus orci luctus et
+        ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede
+        pellentesque fermentum. Maecenas adipiscing ante non diam sodales
+        hendrerit.
+      </p>
+    {/snippet}
   </Modal>
-</Template>
+{/snippet}
 
 <Story name="Default" />
 

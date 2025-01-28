@@ -1,11 +1,15 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import { iconNames } from './icon';
 
   import Link from './link.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Link',
     component: Link,
     args: {
@@ -19,19 +23,20 @@
       href: { control: 'text' },
       icon: { control: 'select', options: iconNames },
     },
-  } satisfies Meta<Link>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
   import { twMerge } from 'tailwind-merge';
+
+  setTemplate(template);
 </script>
 
-<Template let:args>
+{#snippet template({ href, ...args }: Args<typeof Story>)}
   <div class={twMerge(args.light && 'bg-space-black')}>
-    <Link {...args}>This is a link.</Link>
+    <Link {href} {...args}>This is a link.</Link>
   </div>
-</Template>
+{/snippet}
 
 <Story name="Default" />
 

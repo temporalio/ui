@@ -3,7 +3,11 @@
 
   const daysInMonth = Array.from({ length: 31 }).map((_, i) => i + 1);
 
-  export let daysOfMonth: number[];
+  interface Props {
+    daysOfMonth: number[];
+  }
+
+  let { daysOfMonth = $bindable() }: Props = $props();
 
   const onClick = (e: MouseEvent, day: number) => {
     if (e.metaKey) {
@@ -27,7 +31,7 @@
       variant="secondary"
       class="max-md:h-9 max-md:px-4 max-md:py-1.5 max-md:text-sm max-sm:h-8 max-sm:px-2 max-sm:py-1 max-sm:text-xs {active &&
         'bg-interactive-secondary-active'}"
-      on:click={(e) => onClick(e, day)}
+      onclick={(e: MouseEvent) => onClick(e, day)}
     >
       {day}
     </Button>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { setContext } from 'svelte';
+  import { setContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { clickoutside } from '$lib/holocene/outside-click';
@@ -9,25 +9,38 @@
 
   import IconButton from './icon-button.svelte';
 
-  export let open = false;
-  export let position: 'bottom' | 'right' = 'bottom';
-  export let dark = true;
-  export let onClick: (e: MouseEvent | CustomEvent) => void;
-  export let id = 'navigation-drawer';
-  export let closeButtonLabel: string;
-  export let closePadding: boolean = true;
+  interface Props {
+    open?: boolean;
+    position?: 'bottom' | 'right';
+    dark?: boolean;
+    onClick: (e: MouseEvent | CustomEvent) => void;
+    id?: string;
+    closeButtonLabel: string;
+    closePadding?: boolean;
+    class?: string;
+    close_button?: Snippet;
+    children?: Snippet;
+  }
 
-  let className = '';
-  export { className as class };
+  let {
+    open = false,
+    position = 'bottom',
+    dark = true,
+    onClick,
+    id = 'navigation-drawer',
+    closeButtonLabel,
+    closePadding = true,
+    class: className = '',
+    close_button,
+    children,
+  }: Props = $props();
 
-  $: flyParams = {
+  let flyParams = $derived({
     duration: 500,
     ...(position === 'bottom' ? { y: 200 } : { x: 200 }),
-  };
+  });
 
-  $: {
-    setContext('drawer-pos', position);
-  }
+  setContext('drawer-pos', position);
 </script>
 
 {#if open}
@@ -48,7 +61,9 @@
   >
     <div class="relative h-full" class:pt-10={closePadding}>
       <div class="absolute right-2 top-2">
-        <slot name="close-button">
+        {#if close_button}
+          {@render close_button()}
+        {:else}
           <IconButton
             data-testid="drawer-close-button"
             label={closeButtonLabel}
@@ -59,11 +74,11 @@
             icon="close"
             aria-expanded={open}
             aria-controls="navigation-drawer"
-            on:click={onClick}
+            onclick={onClick}
           />
-        </slot>
+        {/if}
       </div>
-      <slot />
+      {@render children?.()}
     </div>
   </aside>
 {/if}

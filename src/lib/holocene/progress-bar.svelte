@@ -1,9 +1,13 @@
 <script lang="ts">
-  export let width = '100%';
+  interface Props {
+    width?: string;
+  }
+
+  let { width = '100%' }: Props = $props();
 </script>
 
 <div class="meter">
-  <span style="width: {width};" />
+  <span style="width: {width};"></span>
 </div>
 
 <style lang="postcss">

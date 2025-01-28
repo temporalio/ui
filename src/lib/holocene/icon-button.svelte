@@ -6,18 +6,21 @@
   import Button from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
 
-  interface $$Props extends HTMLButtonAttributes {
+  interface Props extends HTMLButtonAttributes {
     icon: IconName;
     'data-testid'?: string;
     label: string;
     variant?: 'primary' | 'secondary' | 'ghost';
+    class?: string;
   }
 
-  let className = '';
-  export { className as class };
-  export let icon: IconName;
-  export let label: string;
-  export let variant: 'primary' | 'secondary' | 'ghost' = 'ghost';
+  let {
+    icon,
+    label,
+    variant = 'ghost',
+    class: className = '',
+    ...rest
+  }: Props = $props();
 </script>
 
 <Button
@@ -25,6 +28,5 @@
   leadingIcon={icon}
   class={merge('h-9 w-9 shrink-0 rounded-full p-0', className)}
   aria-label={label}
-  on:click
-  {...$$restProps}
+  {...rest}
 />

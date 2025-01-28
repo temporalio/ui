@@ -43,7 +43,7 @@
   <div class="flex flex-row items-center gap-4 max-sm:flex-col">
     <Button
       variant="primary"
-      on:click={onCreate}
+      onclick={onCreate}
       disabled={createDisabled}
       class="max-sm:w-full"
       {loading}>{translate('nexus.create-endpoint')}</Button
@@ -51,8 +51,7 @@
     <Button
       variant="ghost"
       class="max-sm:w-full"
-      on:click={() => goto(routeForNexus())}
-      >{translate('common.cancel')}</Button
+      onclick={() => goto(routeForNexus())}>{translate('common.cancel')}</Button
     >
   </div>
 </div>

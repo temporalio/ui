@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type MenuButtonVariant =
     | 'primary'
     | 'secondary'
@@ -7,9 +7,7 @@
 </script>
 
 <script lang="ts">
-  import type { HTMLButtonAttributes } from 'svelte/elements';
-
-  import { createEventDispatcher, getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
@@ -21,7 +19,7 @@
   } from '$lib/holocene/menu/menu-container.svelte';
   import { MENU_ITEM_SELECTORS } from '$lib/holocene/menu/menu-item.svelte';
 
-  interface $$Props extends HTMLButtonAttributes {
+  interface Props {
     controls: string;
     count?: number;
     disabled?: boolean;
@@ -30,21 +28,29 @@
     label?: string;
     variant?: MenuButtonVariant;
     class?: string;
+    children?: Snippet;
     active?: boolean;
     'data-testid'?: string;
+    leading?: Snippet;
+    trailing?: Snippet;
+    click?: (args: { open: boolean }) => void;
   }
 
-  let className = '';
-  export { className as class };
-  export let controls: string;
-  export let count = 0;
-  export let disabled = false;
-  export let hasIndicator = false;
-  export let id: string = null;
-  export let label: string = null;
-  export let variant: MenuButtonVariant = 'secondary';
+  let {
+    controls,
+    count = 0,
+    disabled = false,
+    hasIndicator = false,
+    id = null,
+    label = null,
+    variant = 'secondary',
+    class: className = '',
+    children,
+    leading,
+    trailing,
+    click = () => {},
+  }: Props = $props();
 
-  const dispatch = createEventDispatcher<{ click: { open: boolean } }>();
   const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);
 
   const handleClick = () => {
@@ -54,7 +60,7 @@
         newState = !previousState;
       }
 
-      dispatch('click', { open: newState });
+      click({ open: newState });
       return newState;
     });
   };
@@ -92,26 +98,25 @@
   {id}
   {disabled}
   type="button"
-  on:click={handleClick}
-  on:keydown={handleKeyDown}
+  onclick={handleClick}
+  onkeydown={handleKeyDown}
   aria-haspopup={!disabled}
   aria-controls={controls}
   aria-expanded={$open}
   aria-label={label}
   {variant}
   class={merge(className)}
-  {...$$restProps}
 >
-  <slot name="leading" />
-  <div class="flex grow items-center" class:hidden={!$$slots.default}>
-    <slot />
+  {@render leading?.()}
+  <div class="flex grow items-center" class:hidden={!children}>
+    {@render children?.()}
   </div>
   {#if hasIndicator}
     <div class="flex">
       <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
     </div>
   {/if}
-  <slot name="trailing" />
+  {@render trailing?.()}
   {#if count > 0}
     <Badge
       class="absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"

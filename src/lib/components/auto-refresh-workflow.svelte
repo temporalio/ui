@@ -18,6 +18,6 @@
     labelPosition="left"
     id="autorefresh"
     {checked}
-    on:change={onChange}
+    onchange={onChange}
   />
 </Tooltip>

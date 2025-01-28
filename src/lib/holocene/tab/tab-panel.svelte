@@ -5,15 +5,14 @@
 
   import { type TabContext, TABS } from './tabs.svelte';
 
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+  interface Props extends HTMLAttributes<HTMLDivElement> {
     id: string;
     tabId: string;
   }
 
-  export let id: string;
-  export let tabId: string;
+  let { id, tabId, children, ...rest }: Props = $props();
   const { registerPanel, activePanel } = getContext<TabContext>(TABS);
-  $: active = $activePanel === id;
+  let active = $derived($activePanel === id);
   registerPanel(id);
 </script>
 
@@ -24,7 +23,7 @@
   aria-labelledby={tabId}
   tabindex="0"
   role="tabpanel"
-  {...$$restProps}
+  {...rest}
 >
-  <slot />
+  {@render children?.()}
 </div>

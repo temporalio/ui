@@ -1,21 +1,39 @@
 <script lang="ts">
   import { type IconName, icons } from './paths';
 
-  export let name: IconName;
-  export let width = 16;
-  export let height = 16;
-  export let title = '';
+  interface Props {
+    name: IconName;
+    width?: number;
+    height?: number;
+    title?: string;
+    class?: string;
+    x?: number;
+    y?: number;
+    strokeWidth?: string;
+    'aria-hidden'?: string;
+    animate?: boolean;
+    duration?: number;
+    active?: boolean;
+  }
 
-  $: icon = icons[name];
+  let {
+    name,
+    width = 16,
+    height = 16,
+    title = '',
+    class: className = '',
+    ...rest
+  }: Props = $props();
+
+  const IconComponent = icons[name];
 </script>
 
-{#if icon}
-  <svelte:component
-    this={icon}
+{#if IconComponent}
+  <IconComponent
     {width}
     {height}
     {title}
-    class="shrink-0 {$$props.class}"
-    {...$$restProps}
+    class="shrink-0 {className}"
+    {...rest}
   />
 {/if}

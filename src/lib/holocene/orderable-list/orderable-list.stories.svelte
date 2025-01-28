@@ -1,5 +1,5 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import { defineMeta } from '@storybook/addon-svelte-csf';
 
   import OrderableListItem from './orderable-list-item.svelte';
   import OrderableList from './orderable-list.svelte';
@@ -13,50 +13,51 @@
     { label: 'Item F' },
   ];
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Orderable List',
     component: OrderableList,
-    subcomponents: { OrderableListItem },
-    argTypes: {
-      items: {
-        name: 'Items',
-        control: { type: 'object' },
-      },
-    },
-  } satisfies Meta<OrderableList>;
+  });
 </script>
 
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
-  import { Story } from '@storybook/addon-svelte-csf';
 </script>
 
 <Story name="Empty">
   <OrderableList />
 </Story>
 
-<Story name="Heading" let:context>
-  <OrderableList>
-    <span slot="heading">{context.name}</span>
-  </OrderableList>
+<Story name="Heading">
+  {#snippet children(_, context)}
+    <OrderableList>
+      {#snippet heading()}
+        <span>{context.name}</span>
+      {/snippet}
+    </OrderableList>
+  {/snippet}
 </Story>
 
-<Story name="With Items" let:context>
-  <OrderableList>
-    <span slot="heading">{context.name}</span>
-    {#each items as item, index (item.label)}
-      <OrderableListItem
-        on:moveItem={action('moveItem')}
-        on:removeItem={action('removeItem')}
-        addButtonLabel="Add"
-        static={false}
-        label={item.label}
-        pinned={item.pinned}
-        moveUpButtonLabel="Move Up"
-        moveDownButtonLabel="Move Down"
-        removeButtonLabel="Remove"
-        {index}
-      />
-    {/each}
-  </OrderableList>
+<Story name="With Items">
+  {#snippet children(_, context)}
+    <OrderableList>
+      {#snippet heading()}
+        <span>{context.name}</span>
+      {/snippet}
+      {#each items as item, index (item.label)}
+        <OrderableListItem
+          moveItem={action('moveItem')}
+          removeItem={action('removeItem')}
+          addButtonLabel="Add"
+          label={item.label}
+          pinned={item.pinned}
+          moveUpButtonLabel="Move Up"
+          moveDownButtonLabel="Move Down"
+          removeButtonLabel="Remove"
+          pinButtonLabel="Pin"
+          unpinButtonLabel="Unpin"
+          {index}
+        />
+      {/each}
+    </OrderableList>
+  {/snippet}
 </Story>

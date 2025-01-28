@@ -1,11 +1,15 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import {
+    type Args,
+    defineMeta,
+    setTemplate,
+  } from '@storybook/addon-svelte-csf';
 
   import { iconNames } from '$lib/holocene/icon';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Split Button',
     component: SplitButton,
     args: {
@@ -39,21 +43,21 @@
         control: 'boolean',
       },
     },
-  } satisfies Meta<SplitButton>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+  setTemplate(template);
 </script>
 
-<Template let:args>
+{#snippet template({ id, label, menuLabel, ...args }: Args<typeof Story>)}
   <div class="flex">
-    <SplitButton {...args}>
+    <SplitButton {id} {label} {menuLabel} {...args}>
       <MenuItem>View</MenuItem>
       <MenuItem destructive>Delete</MenuItem>
     </SplitButton>
   </div>
-</Template>
+{/snippet}
 
 <Story name="Default" />
 
