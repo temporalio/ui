@@ -242,7 +242,6 @@ export const cloneAllPotentialPayloadsWithCodec = async (
     | EventAttribute
     | WorkflowEvent
     | Memo
-    | Failure
     | null,
   namespace: string,
   settings: Settings,
@@ -250,7 +249,7 @@ export const cloneAllPotentialPayloadsWithCodec = async (
   decodeSetting: DownloadEventHistorySetting = 'readable',
   returnDataOnly: boolean = true,
 ): Promise<
-  PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | Failure | null
+  PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null
 > => {
   if (!anyAttributes) return anyAttributes;
 
@@ -297,8 +296,10 @@ export const convertPayloadToJsonWithCodec = async ({
   settings,
   accessToken,
 }: {
-  attributes: EventAttribute | PotentiallyDecodable;
-} & EventRequestMetadata): Promise<EventAttribute | PotentiallyDecodable> => {
+  attributes: EventAttribute | PotentiallyDecodable | Failure;
+} & EventRequestMetadata): Promise<
+  EventAttribute | PotentiallyDecodable | Failure
+> => {
   const decodedAttributes = await decodeAllPotentialPayloadsWithCodec(
     attributes,
     namespace,
