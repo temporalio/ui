@@ -10,7 +10,12 @@ import type {
   passAccessToken,
 } from '$lib/stores/data-encoder-config';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
-import type { Memo, Payloads, Payload as RawPayload } from '$lib/types';
+import type {
+  Failure,
+  Memo,
+  Payloads,
+  Payload as RawPayload,
+} from '$lib/types';
 import type {
   EventAttribute,
   EventRequestMetadata,
@@ -191,11 +196,11 @@ export const decodeSingleReadablePayloadWithCodec = async (
 };
 
 export const decodeAllPotentialPayloadsWithCodec = async (
-  anyAttributes: EventAttribute | PotentiallyDecodable,
+  anyAttributes: EventAttribute | PotentiallyDecodable | Failure,
   namespace: string = get(page).params.namespace,
   settings: Settings = get(page).data.settings,
   accessToken: string = get(authUser).accessToken,
-): Promise<EventAttribute | PotentiallyDecodable> => {
+): Promise<EventAttribute | PotentiallyDecodable | Failure> => {
   const decode = decodeReadablePayloads(settings);
 
   if (anyAttributes) {
@@ -291,8 +296,10 @@ export const convertPayloadToJsonWithCodec = async ({
   settings,
   accessToken,
 }: {
-  attributes: EventAttribute | PotentiallyDecodable;
-} & EventRequestMetadata): Promise<EventAttribute | PotentiallyDecodable> => {
+  attributes: EventAttribute | PotentiallyDecodable | Failure;
+} & EventRequestMetadata): Promise<
+  EventAttribute | PotentiallyDecodable | Failure
+> => {
   const decodedAttributes = await decodeAllPotentialPayloadsWithCodec(
     attributes,
     namespace,
