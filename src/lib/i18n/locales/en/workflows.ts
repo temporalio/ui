@@ -53,6 +53,9 @@ export const Strings = {
   paused: 'Paused',
   reset: 'Reset',
   signal: 'Send a Signal',
+  update: 'Send an Update',
+  'update-success': 'Update successful',
+  'update-in-progress': 'Update in progress',
   'n-selected': '{{count, number}} selected',
   'all-selected': 'All {{count, number}} selected.',
   'select-all-leading': 'or ',
@@ -82,6 +85,8 @@ export const Strings = {
     'Cannot reset workflows without WorkflowTaskStarted, WorkflowTaskCompleted, or WorkflowTaskTimedOut events.',
   'signal-disabled':
     'Signaling workflows is not enabled, please contact your administrator for assistance.',
+  'update-disabled':
+    'Updating workflows is not enabled, please contact your administrator for assistance.',
   'terminate-disabled':
     'Terminating workflows is not enabled, please contact your adminstrator for assistance.',
   'terminate-success': 'Workflow terminated.',
@@ -105,6 +110,7 @@ export const Strings = {
   'signal-name-label': 'Signal name',
   'signal-payload-input-label': 'Data',
   'signal-payload-input-label-hint': '(only single JSON payload supported)',
+  'update-modal-title': 'Send an Update',
   'cancel-request-sent': 'Cancel Request Sent',
   'cancel-request-sent-description':
     "The request to cancel this Workflow Execution has been sent. If the Workflow uses the cancellation API, it'll cancel at the next available opportunity.",
@@ -118,6 +124,7 @@ export const Strings = {
   'call-stack-tab': 'Call Stack',
   'queries-tab': 'Queries',
   'metadata-tab': 'Metadata',
+  'update-tab': 'Update',
   'workflow-404-title': 'This is not the Workflow you are looking for',
   'workflow-error-title':
     'We are having technical difficulties retrieving this Workflow',
@@ -262,4 +269,6 @@ export const Strings = {
   'markdown-supported': 'Markdown Supported',
   'markdown-description':
     'Markdown is supported in the summary and details fields. You can use {namespace}, {workflowId} or {runId} syntax in link href to create dynamic links based on the page you are on. Images are not allowed.',
+  'update-id': 'Update ID (optional)',
+  'update-name-label': 'Update name',
 } as const;

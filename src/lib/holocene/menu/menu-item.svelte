@@ -196,7 +196,7 @@
     }
 
     &.selected {
-      @apply text-brand;
+      @apply bg-brand/10 text-brand;
     }
 
     &.destructive {

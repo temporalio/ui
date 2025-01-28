@@ -156,7 +156,7 @@
   }
 
   .large {
-    @apply lg:w-1/2;
+    @apply lg:max-w-3xl;
   }
 
   .title {
