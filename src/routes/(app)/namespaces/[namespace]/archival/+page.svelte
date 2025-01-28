@@ -38,17 +38,18 @@
   {#if workflows?.length}
     <Pagination
       items={workflows}
-      let:visibleItems
       aria-label={translate('workflows.archived-workflows')}
       pageSizeSelectLabel={translate('common.per-page')}
       previousButtonLabel={translate('common.previous')}
       nextButtonLabel={translate('common.next')}
     >
-      <WorkflowsSummaryTable>
-        {#each visibleItems as event}
-          <WorkflowsSummaryRow workflow={event} namespace={namespaceName} />
-        {/each}
-      </WorkflowsSummaryTable>
+      {#snippet children({ visibleItems })}
+        <WorkflowsSummaryTable>
+          {#each visibleItems as event}
+            <WorkflowsSummaryRow workflow={event} namespace={namespaceName} />
+          {/each}
+        </WorkflowsSummaryTable>
+      {/snippet}
     </Pagination>
   {:else}
     <EmptyState

@@ -58,7 +58,7 @@
       id="schedule-payload-input"
     >
       <div slot="action" class:hidden={!showEditActions}>
-        <Button variant="secondary" on:click={handleEdit}>
+        <Button variant="secondary" onclick={handleEdit}>
           {editInput ? translate('common.cancel') : translate('common.edit')}
         </Button>
       </div>

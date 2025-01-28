@@ -140,13 +140,13 @@
         <Button
           disabled={Boolean(error)}
           data-testid="confirm-data-encoder-button"
-          on:click={onConfirm}
+          onclick={onConfirm}
           type="submit">{translate('common.apply')}</Button
         >
         <Button
           variant="ghost"
           data-testid="cancel-data-encoder-button"
-          on:click={onCancel}>{translate('common.cancel')}</Button
+          onclick={onCancel}>{translate('common.cancel')}</Button
         >
       </div>
     </div>

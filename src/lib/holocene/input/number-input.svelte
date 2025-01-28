@@ -1,11 +1,13 @@
 <script lang="ts">
+  import type { HTMLInputAttributes } from 'svelte/elements';
+
   import { twMerge as merge } from 'tailwind-merge';
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
 
-  interface Props {
+  interface Props extends HTMLInputAttributes {
     icon?: IconName;
     id: string;
     value: number;
@@ -26,7 +28,7 @@
   let {
     icon = null,
     id,
-    value,
+    value = $bindable(),
     label,
     labelHidden = false,
     units = '',

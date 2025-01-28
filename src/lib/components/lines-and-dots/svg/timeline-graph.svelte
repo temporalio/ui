@@ -77,7 +77,7 @@
       size="xs"
       variant="ghost"
       class="sticky left-0.5 top-1"
-      on:click={onExpandCollapse}
+      onclick={onExpandCollapse}
     >
       <Icon
         name={viewportHeight === 360 ? 'chevron-down' : 'chevron-up'}

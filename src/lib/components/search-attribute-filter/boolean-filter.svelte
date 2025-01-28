@@ -38,7 +38,7 @@
   <Menu id="boolean-filter-menu">
     {#each options as { value, label }}
       <MenuItem
-        on:click={() => {
+        onclick={() => {
           if (isNullConditional(value)) {
             $filter.conditional = value;
             $filter.value = null;

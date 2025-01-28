@@ -116,7 +116,7 @@
       : translate('batch.job-id-input-error')}
     bind:value={jobId}
     placeholder={jobIdPlaceholder}
-    on:input={handleJobIdChange}
+    oninput={handleJobIdChange}
     valid={jobIdValid}
   />
   <slot />

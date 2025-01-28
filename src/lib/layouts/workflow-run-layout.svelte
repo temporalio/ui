@@ -209,7 +209,7 @@
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       class="absolute right-1 top-1"
-      on:click={handleCopy}
+      onclick={handleCopy}
       copied={$copied}
     />
     {stringifyWithBigInt(fullJson, null, 2)}

@@ -35,7 +35,7 @@
           class="relative flex items-center"
           data-testid="data-encoder-status-configured"
           icon="transcoder-on"
-          on:click={onIconClick}
+          onclick={onIconClick}
         />
       </Tooltip>
     {:else if $dataEncoder.hasError}
@@ -46,7 +46,7 @@
           class="relative flex items-center"
           data-testid="data-encoder-status-error"
           icon="transcoder-error"
-          on:click={onIconClick}
+          onclick={onIconClick}
         />
       </Tooltip>
     {:else if $dataEncoder.hasSuccess}
@@ -60,7 +60,7 @@
           class="relative flex items-center"
           data-testid="data-encoder-status-success"
           icon="transcoder-on"
-          on:click={onIconClick}
+          onclick={onIconClick}
         />
       </Tooltip>
     {/if}
@@ -75,7 +75,7 @@
         class="relative flex items-center"
         data-testid="data-encoder-status"
         icon="transcoder-off"
-        on:click={onIconClick}
+        onclick={onIconClick}
       />
     </Tooltip>
   {/if}

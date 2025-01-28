@@ -22,7 +22,7 @@
     max,
     step,
     id,
-    value = Math.round((min + max) / 2),
+    value = $bindable(Math.round((min + max) / 2)),
     class: className = '',
     ...rest
   }: Props = $props();

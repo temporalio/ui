@@ -40,10 +40,10 @@
     maxLength={2}
   />
   <ToggleButtons>
-    <ToggleButton active={time === 'AM'} on:click={() => (time = 'AM')}
+    <ToggleButton active={time === 'AM'} onclick={() => (time = 'AM')}
       >{translate('common.ante-meridiem')}</ToggleButton
     >
-    <ToggleButton active={time === 'PM'} on:click={() => (time = 'PM')}
+    <ToggleButton active={time === 'PM'} onclick={() => (time = 'PM')}
       >{translate('common.post-meridiem')}</ToggleButton
     >
   </ToggleButtons>

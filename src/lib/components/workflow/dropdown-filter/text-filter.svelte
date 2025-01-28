@@ -42,8 +42,7 @@
     updateQueryParamsFromFilter($page.url, $workflowFilters, true);
   };
 
-  function handleShowInput(event: CustomEvent<{ open: boolean }>) {
-    const { open } = event.detail;
+  function handleShowInput({ open }: { open: boolean }) {
     if (open && idFilter?.value) {
       value = idFilter.value;
     } else if (open && !idFilter && value) {
@@ -62,7 +61,7 @@
     data-testid="{attributeToId[attribute]}-filter-button"
     variant="table-header"
     controls="{attributeToId[attribute]}-filter-menu"
-    on:click={handleShowInput}
+    click={handleShowInput}
   >
     {attributeToHumanReadable[attribute]}
     <Icon name="filter" slot="trailing" />
@@ -79,8 +78,8 @@
       autoFocus
       clearable
       clearButtonLabel={translate('common.clear-input-button-label')}
-      on:input={onInput}
-      on:clear={handleClearInput}
+      oninput={onInput}
+      clear={handleClearInput}
       bind:value
     />
   </Menu>

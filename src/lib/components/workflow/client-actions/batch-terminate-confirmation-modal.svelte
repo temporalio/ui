@@ -77,7 +77,7 @@
   cancelText={translate('common.cancel')}
   confirmDisabled={!jobIdValid}
   confirmText={translate('workflows.terminate')}
-  on:confirmModal={terminateWorkflows}
+  confirmModal={terminateWorkflows}
 >
   <h3 slot="title">
     <Translate key="workflows.batch-terminate-modal-title" />

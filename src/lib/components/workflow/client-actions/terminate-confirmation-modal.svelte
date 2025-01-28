@@ -58,8 +58,8 @@
   confirmText={translate('workflows.terminate')}
   cancelText={translate('common.cancel')}
   confirmType="destructive"
-  on:cancelModal={hideModal}
-  on:confirmModal={terminate}
+  cancelModal={hideModal}
+  confirmModal={terminate}
 >
   <h3 slot="title">{translate('workflows.terminate-modal-title')}</h3>
   <div slot="content">

@@ -69,7 +69,7 @@
     <TableRow
       data-testid="view-all"
       class="surface-subtle cursor-pointer"
-      on:click={() => (showAll = !showAll)}
+      onclick={() => (showAll = !showAll)}
     >
       <td></td>
       <td class="break-all text-left text-blue-700 underline"

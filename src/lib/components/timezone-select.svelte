@@ -107,7 +107,7 @@
     {#if !search}
       {#each QuickTimezoneOptions as { value, label }}
         <MenuItem
-          on:click={() => selectTimezone(value)}
+          onclick={() => selectTimezone(value)}
           data-testid={`timezones-${value}`}
           selected={value === $timeFormat}
           description={value === 'local' && localTime}
@@ -122,7 +122,7 @@
           id="relative-toggle"
           bind:checked={$relativeTime}
           labelPosition="left"
-          on:change={handleRelativeToggle}
+          onchange={handleRelativeToggle}
           data-testid="timezones-relative-toggle"
         />
       </div>
@@ -133,7 +133,7 @@
     {#each filteredOptions as { value, label, offset, abbr }}
       <MenuItem
         selected={value === $timeFormat}
-        on:click={() => selectTimezone(value)}
+        onclick={() => selectTimezone(value)}
         description={formatUTCOffset(offset, translate('common.utc'))}
       >
         {label} ({abbr})

@@ -54,7 +54,7 @@
         label={translate('common.auto-refresh')}
         labelPosition="left"
         checked={$autoRefresh}
-        on:change={handleToggleAutoRefresh}
+        onchange={handleToggleAutoRefresh}
       />
     </Tooltip>
   {/if}

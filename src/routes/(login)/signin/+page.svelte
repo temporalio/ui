@@ -31,7 +31,7 @@
     <Button
       data-testid="login-button"
       leadingIcon="lock"
-      on:click={() => {
+      onclick={() => {
         if (BROWSER) {
           window.location.assign(
             routeForAuthentication({

@@ -77,7 +77,7 @@
         class="w-full lg:w-3/4 [&_*]:border-r-0"
         clearable
         clearButtonLabel={translate('common.clear-input-button-label')}
-        on:clear={handleClearInput}
+        clear={handleClearInput}
         bind:value={manualSearchString}
       />
       <Button

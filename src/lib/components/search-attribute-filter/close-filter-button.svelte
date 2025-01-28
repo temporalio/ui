@@ -12,6 +12,6 @@
 <IconButton
   label={translate('common.close')}
   icon="close"
-  on:click={resetFilter}
+  onclick={resetFilter}
   class="ml-1"
 />

@@ -13,7 +13,7 @@
   let {
     class: className = '',
     name,
-    group,
+    group = $bindable(),
     description = '',
     children,
     ...rest

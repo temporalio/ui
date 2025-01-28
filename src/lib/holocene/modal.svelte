@@ -25,8 +25,8 @@
     class?: string;
     modal_title?: Snippet;
     content?: Snippet;
-    confirmModal: () => void;
-    cancelModal: () => void;
+    confirmModal?: () => void;
+    cancelModal?: () => void;
   }
 
   let {
@@ -39,13 +39,13 @@
     loading = false,
     hightlightNav = false,
     id,
-    open,
-    error = '',
+    open = $bindable(),
+    error = $bindable(''),
     class: className = '',
     modal_title,
     content,
-    confirmModal,
-    cancelModal,
+    confirmModal = () => {},
+    cancelModal = () => {},
     ...rest
   }: Props = $props();
 

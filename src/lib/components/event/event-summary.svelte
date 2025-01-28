@@ -88,17 +88,17 @@
         <ToggleButton
           active={$eventViewType === 'feed'}
           data-testid="feed"
-          on:click={onAllClick}>All</ToggleButton
+          onclick={onAllClick}>All</ToggleButton
         >
         <ToggleButton
           active={$eventViewType === 'compact'}
           data-testid="compact"
-          on:click={onCompactClick}>Compact</ToggleButton
+          onclick={onCompactClick}>Compact</ToggleButton
         >
         <ToggleButton
           active={$eventViewType === 'json'}
           data-testid="json"
-          on:click={onJSONClick}>JSON</ToggleButton
+          onclick={onJSONClick}>JSON</ToggleButton
         >
       </ToggleButtons>
     </div>
@@ -108,13 +108,13 @@
           <ToggleButton
             icon={reverseSort ? 'arrow-down' : 'arrow-up'}
             data-testid="zoom-in"
-            on:click={onSort}>{reverseSort ? 'Desc' : 'Asc'}</ToggleButton
+            onclick={onSort}>{reverseSort ? 'Desc' : 'Asc'}</ToggleButton
           >
           <ToggleButton
             icon={expandAll ? 'chevron-up' : 'chevron-down'}
             data-testid="expandAll"
             tooltip={expandAll ? 'Collapse All Events' : 'Expand All Events'}
-            on:click={onExpandAll}
+            onclick={onExpandAll}
           />
         </ToggleButtons>
       {/if}
@@ -126,13 +126,13 @@
           tooltip={$pauseLiveUpdates
             ? 'Resume Live Updates'
             : 'Pause Live Updates'}
-          on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
+          onclick={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
         />
         <ToggleButton
           data-testid="download"
           icon="download"
           tooltip="Download Event History"
-          on:click={() => (showDownloadPrompt = true)}
+          onclick={() => (showDownloadPrompt = true)}
         />
       </ToggleButtons>
     </div>

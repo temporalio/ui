@@ -25,7 +25,7 @@
     variant="ghost"
     class="start-button"
     leadingIcon="lightning-bolt"
-    on:click={() => goto(href)}
+    onclick={() => goto(href)}
     {...$$restProps}
   ></Button>
 </Tooltip>

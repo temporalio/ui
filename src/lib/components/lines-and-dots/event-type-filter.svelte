@@ -83,7 +83,7 @@
   >
     <MenuItem
       data-testid={translate('common.all')}
-      on:click={() => {
+      onclick={() => {
         $eventTypeFilter = defaultOptions;
       }}
     >
@@ -101,7 +101,7 @@
     </MenuItem>
     <MenuItem
       data-testid={translate('common.none')}
-      on:click={() => {
+      onclick={() => {
         $eventTypeFilter = [];
       }}
     >
@@ -122,7 +122,7 @@
       <MenuItem
         data-testid={option.label}
         description={option.description}
-        on:click={() => {
+        onclick={() => {
           onOptionClick(option);
         }}
         className="items-start"

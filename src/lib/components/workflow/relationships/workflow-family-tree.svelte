@@ -49,29 +49,28 @@
       maxZoomOut={5}
       maxZoomIn={0.25}
       containerHeight={240}
-      let:width
-      let:height
-      let:zoomLevel
     >
-      <div class="flex py-4" slot="controls">
-        <ToggleSwitch
-          label={translate('common.view-all')}
-          labelPosition="left"
-          id="autorefresh"
-          checked={expandAll}
-          on:change={onExpandAll}
+      {#snippet children({ width, height, zoomLevel })}
+        <div class="flex py-4" slot="controls">
+          <ToggleSwitch
+            label={translate('common.view-all')}
+            labelPosition="left"
+            id="autorefresh"
+            checked={expandAll}
+            onchange={onExpandAll}
+          />
+        </div>
+        <WorkflowFamilyNodeTree
+          {root}
+          {width}
+          {height}
+          {zoomLevel}
+          {onNodeClick}
+          {expandAll}
+          {openRuns}
+          {activeWorkflow}
         />
-      </div>
-      <WorkflowFamilyNodeTree
-        {root}
-        {width}
-        {height}
-        {zoomLevel}
-        {onNodeClick}
-        {expandAll}
-        {openRuns}
-        {activeWorkflow}
-      />
+      {/snippet}
     </ZoomSvg>
   </div>
   <div class="flex h-auto w-full flex-col overflow-auto bg-secondary text-base">

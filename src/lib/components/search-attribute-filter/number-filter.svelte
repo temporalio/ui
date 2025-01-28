@@ -33,7 +33,7 @@
     placeholder={translate('common.number-input-placeholder')}
     bind:value={_value}
     {min}
-    on:keydown={handleKeydown}
+    onkeydown={handleKeydown}
     search
     class="-mr-2 [&_*]:border-l-0"
   />

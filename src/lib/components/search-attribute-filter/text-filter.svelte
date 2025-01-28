@@ -43,6 +43,6 @@
     icon="search"
     class="w-full [&_*]:border-l-0"
     bind:value={_value}
-    on:keydown={handleKeydown}
+    onkeydown={handleKeydown}
   />
 </ConditionalMenu>

@@ -45,8 +45,8 @@
     icon="search"
     class="w-full [&_*]:border-l-0"
     bind:value={_value}
-    on:keydown={handleKeydown}
-    on:input={validateDuration}
+    onkeydown={handleKeydown}
+    oninput={validateDuration}
     valid={isValid}
   />
 </ConditionalMenu>

@@ -159,13 +159,13 @@
     <ToggleButton
       active={showPreview === false}
       data-testid="description-editor"
-      on:click={() => (showPreview = false)}
+      onclick={() => (showPreview = false)}
       >{translate('common.description')}</ToggleButton
     >
     <ToggleButton
       active={showPreview === true}
       data-testid="description-preview"
-      on:click={() => (showPreview = true)}
+      onclick={() => (showPreview = true)}
       >{translate('common.preview')}</ToggleButton
     >
   </ToggleButtons>
@@ -175,7 +175,7 @@
     {:else}
       <Editor
         content={description}
-        on:change={(event) => (description = event.detail.value)}
+        change={({ value }) => (description = value)}
       />
     {/if}
     <p class="my-2 text-xs text-secondary">Do not include sensitive data.</p>

@@ -35,7 +35,7 @@
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
-  let { children }: { children } = $props();
+  let { children } = $props();
 
   const isCloud = $derived($page.data?.settings?.runtimeEnvironment?.isCloud);
   const activeNamespaceName = $derived(
@@ -212,16 +212,17 @@
         slot="fallback"
       />
     </CodecServerErrorBanner>
-    <div
-      slot="main"
-      class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
-    >
-      <ErrorBoundary>
-        {@render children()}
-      </ErrorBoundary>
-    </div>
-    <BottomNavigation slot="footer" {linkList} {namespaceList} {isCloud}>
-      <UserMenuMobile {logout} />
-    </BottomNavigation>
+    {#snippet main()}
+      <div class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8">
+        <ErrorBoundary>
+          {@render children()}
+        </ErrorBoundary>
+      </div>
+    {/snippet}
+    {#snippet footer()}
+      <BottomNavigation {linkList} {namespaceList} {isCloud}>
+        <UserMenuMobile {logout} />
+      </BottomNavigation>
+    {/snippet}
   </MainContentContainer>
 </div>

@@ -25,7 +25,7 @@
   import PaginatedTable from './index.svelte';
 
   type T = $$Generic;
-  interface Props extends HTMLAttributes<HTMLTableElement> {
+  interface Props extends Omit<HTMLAttributes<HTMLTableElement>, 'children'> {
     id?: string;
     maxHeight?: string;
     onError?: (error: Error | unknown) => void | undefined;
@@ -43,9 +43,11 @@
     previousButtonLabel: string;
     nextButtonLabel: string;
     pageSizeOptions?: string[];
-    header?: Snippet;
+    header?: Snippet<[{ visibleItems: T[] }]>;
     caption?: Snippet;
     headers?: Snippet;
+    empty?: Snippet;
+    children?: Snippet<[{ visibleItems: T[] }]>;
   }
 
   let {
@@ -69,6 +71,7 @@
     header,
     caption,
     headers,
+    empty: empty_render,
     children,
     ...rest
   }: Props = $props();
@@ -180,7 +183,7 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-{@render header?.()}
+{@render header?.({ visibleItems: $store.visibleItems })}
 
 <PaginatedTable
   updating={$store.updating}
@@ -190,10 +193,12 @@
   {caption}
   {headers}
 >
-  {@render children?.()}
+  {@render children?.({ visibleItems: $store.visibleItems })}
 
   {#snippet empty()}
-    {#if $store.loading}
+    {#if empty_render}
+      {@render empty_render()}
+    {:else if $store.loading}
       <Loading />
     {:else if error}
       <EmptyState title={errorTitle}>

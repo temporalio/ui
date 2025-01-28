@@ -67,7 +67,7 @@
       />
       <div class="flex items-center gap-4">
         <Button
-          on:click={refreshStackTrace}
+          onclick={refreshStackTrace}
           leadingIcon="retry"
           loading={isLoading}
         >

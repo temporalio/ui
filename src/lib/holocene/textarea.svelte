@@ -31,7 +31,7 @@
     placeholder = '',
     rows = 5,
     spellcheck = null,
-    value,
+    value = $bindable(),
     label,
     labelHidden = false,
     id,
