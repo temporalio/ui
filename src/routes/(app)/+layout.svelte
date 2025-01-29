@@ -54,20 +54,50 @@
     };
   });
 
-  $: linkList = getLinkList(activeNamespaceName, !!$inProgressBatchOperation);
+  $: routes = getRoutes(activeNamespaceName);
+  $: linkList = getLinkList(routes, !!$inProgressBatchOperation);
+
+  const getRoutes = (namespace: string) => {
+    return {
+      workflowsRoute: routeForWorkflows({ namespace }),
+      schedulesRoute: routeForSchedules({ namespace }),
+      batchOperationsRoute: routeForBatchOperations({ namespace }),
+      archivalRoute: routeForArchivalWorkfows({ namespace }),
+      namespacesRoute: routeForNamespaces(),
+      nexusRoute: routeForNexus(),
+      historyImportRoute: routeForEventHistoryImport(),
+    };
+  };
+
+  $: ({ workflowsRoute, schedulesRoute, batchOperationsRoute, archivalRoute } =
+    routes);
+  $: showNamespacePicker = [
+    workflowsRoute,
+    schedulesRoute,
+    batchOperationsRoute,
+    archivalRoute,
+  ].some((route) => $page.url.href.includes(route));
 
   const getLinkList = (
-    namespace: string,
+    {
+      workflowsRoute,
+      schedulesRoute,
+      batchOperationsRoute,
+      archivalRoute,
+      namespacesRoute,
+      nexusRoute,
+      historyImportRoute,
+    }: {
+      workflowsRoute: string;
+      schedulesRoute: string;
+      batchOperationsRoute: string;
+      archivalRoute: string;
+      namespacesRoute: string;
+      nexusRoute: string;
+      historyImportRoute: string;
+    },
     inProgressBatch: boolean,
   ): NavLinkListItem[] => {
-    const workflowsRoute = routeForWorkflows({ namespace });
-    const schedulesRoute = routeForSchedules({ namespace });
-    const batchOperationsRoute = routeForBatchOperations({ namespace });
-    const archivalRoute = routeForArchivalWorkfows({ namespace });
-    const namespacesRoute = routeForNamespaces();
-    const nexusRoute = routeForNexus();
-    const historyImportRoute = routeForEventHistoryImport();
-
     return [
       {
         href: workflowsRoute,
@@ -190,7 +220,11 @@
   <MainContentContainer>
     <DataEncoderSettings class="hidden md:flex" />
     <TopNavigation>
-      <NamespacePicker {namespaceList} slot="left" />
+      <svelte:fragment slot="left">
+        {#if showNamespacePicker}
+          <NamespacePicker {namespaceList} />
+        {/if}
+      </svelte:fragment>
       <UserMenu {logout} />
     </TopNavigation>
     <CodecServerErrorBanner>
@@ -210,7 +244,13 @@
         <slot />
       </ErrorBoundary>
     </div>
-    <BottomNavigation slot="footer" {linkList} {namespaceList} {isCloud}>
+    <BottomNavigation
+      slot="footer"
+      {linkList}
+      {namespaceList}
+      {isCloud}
+      {showNamespacePicker}
+    >
       <UserMenuMobile {logout} />
     </BottomNavigation>
   </MainContentContainer>
