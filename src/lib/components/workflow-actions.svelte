@@ -12,6 +12,7 @@
   import SplitButton from '$lib/holocene/split-button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import { coreUserStore } from '$lib/stores/core-user';
   import { resetEvents } from '$lib/stores/events';
   import { refresh } from '$lib/stores/workflow-run';
@@ -145,7 +146,7 @@
     menuLabel={translate('workflows.workflow-actions')}
   >
     {#each workflowActions as { onClick, destructive, label, enabled, testId, description }}
-      {#if !$page.data.settings.runtimeEnvironment.isCloud || ($page.data.settings.runtimeEnvironment.isCloud && testId !== 'update-button')}
+      {#if !$isCloud || ($isCloud && testId !== 'update-button')}
         {#if destructive}
           <MenuDivider />
         {/if}
