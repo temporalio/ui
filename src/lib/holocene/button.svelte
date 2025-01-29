@@ -93,22 +93,7 @@
 
   type Props = ButtonWithoutHrefProps | ButtonWithHrefProps;
 
-  let props: Props = $props();
-
-  const onLinkClick = (e: MouseEvent) => {
-    // Skip if middle mouse click or new tab
-    if (e.button === 1 || props.target || e.metaKey) return;
-    e.preventDefault();
-    goto(props.href);
-  };
-
-  const isLink = (props: Props): props is ButtonWithHrefProps => {
-    return props.href && !props.disabled;
-  };
-</script>
-
-{#if isLink(props)}
-  {@const {
+  let {
     variant = 'primary',
     size = 'md',
     loading = false,
@@ -119,10 +104,22 @@
     href = null,
     target = null,
     class: className = '',
+    disabled = false,
     children,
     onclick = () => {},
+    onkeydown = () => {},
     ...rest
-  } = props}
+  }: Props = $props();
+
+  const onLinkClick = (e: MouseEvent) => {
+    // Skip if middle mouse click or new tab
+    if (e.button === 1 || target || e.metaKey) return;
+    e.preventDefault();
+    goto(href);
+  };
+</script>
+
+{#if href && !disabled}
   <a
     {href}
     {id}
@@ -164,21 +161,6 @@
     {/if}
   </a>
 {:else}
-  {@const {
-    variant = 'primary',
-    size = 'md',
-    disabled = false,
-    loading = false,
-    leadingIcon = null,
-    trailingIcon = null,
-    count = 0,
-    id = null,
-    class: className = '',
-    children,
-    onclick = () => {},
-    onkeydown = () => {},
-    ...rest
-  } = props}
   <button
     {disabled}
     {id}

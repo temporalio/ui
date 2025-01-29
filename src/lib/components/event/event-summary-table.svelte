@@ -52,7 +52,7 @@
   variant="split"
   maxHeight="calc(100vh - 200px)"
 >
-  {#snippet children({ visibleItems })}
+  {#snippet rows({ visibleItems })}
     {#if !compact}
       <HistoryGraph {groups} history={history(visibleItems)} />
     {/if}

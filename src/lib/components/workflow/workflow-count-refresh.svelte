@@ -2,7 +2,7 @@
   import Button from '$lib/holocene/button.svelte';
   import { loading, refresh, updating } from '$lib/stores/workflows';
 
-  export let count = 0;
+  let { count = 0 } = $props();
 </script>
 
 <Button

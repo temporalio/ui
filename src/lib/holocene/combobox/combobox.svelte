@@ -2,7 +2,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { writable, type Writable } from 'svelte/store';
 
-  import type { Snippet } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
@@ -147,6 +147,8 @@
   let menuElement: HTMLUListElement = $state();
   let inputElement: HTMLInputElement = $state();
 
+  let list = $derived(filterOptions(filterValue, options));
+
   // We need this piece of code to focus the element when externally modifying the
   // open store. Specifically we use this behaviour in bottom nav to focus the combobox
   // after the bottom nav is clicked
@@ -158,7 +160,6 @@
   });
 
   // We want this to react to external changes to the options prop to support async use cases
-  let list = $derived(filterOptions(filterValue, options));
 
   $effect(() => {
     if (inputElement && displayValue) {
@@ -239,7 +240,7 @@
     }
   };
 
-  $effect(() => {
+  const setDisplayValue = () => {
     if (!multiselect) {
       selectedOption = options.find((option) => {
         if (isStringOption(option)) {
@@ -253,6 +254,10 @@
 
       displayValue = getDisplayValue(selectedOption);
     }
+  };
+
+  onMount(() => {
+    setDisplayValue();
   });
 
   /**
@@ -285,6 +290,8 @@
         value = opt;
       }
     }
+
+    setDisplayValue();
   };
 
   const handleSelectOption = (option: string | T) => {

@@ -35,9 +35,9 @@
     pageSizeOptions?: string[];
     fixed?: boolean;
     caption?: Snippet;
-    headers?: Snippet;
-    empty?: Snippet;
-    children?: Snippet<[{ visibleItems: Item[] }]>;
+    header?: Snippet<[{ visibleItems: Item[] }]>;
+    emptyState?: Snippet;
+    rows?: Snippet<[{ visibleItems: Item[] }]>;
   }
 
   let {
@@ -53,9 +53,9 @@
     pageSizeOptions = options,
     fixed = false,
     caption,
-    children,
-    headers,
-    empty,
+    rows,
+    header,
+    emptyState,
     ...rest
   }: Props = $props();
 
@@ -128,11 +128,12 @@
   {fixed}
   {id}
   {caption}
-  {headers}
-  {empty}
+  {emptyState}
 >
-  {@render children?.()}
-
+  {#snippet headers()}
+    {@render header?.({ visibleItems: $store.items })}
+  {/snippet}
+  {@render rows?.({ visibleItems: $store.items })}
   {#snippet actionsStart()}
     <FilterSelect
       label={perPageLabel}

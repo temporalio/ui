@@ -37,34 +37,40 @@
 
   import type { Schedule, SearchAttribute } from '$types';
 
-  export let schedule: FullSchedule | null = null;
-  export let searchAttributes: SearchAttribute = {};
-
-  export let onConfirm: (
-    preset: SchedulePreset,
-    args: Partial<ScheduleParameters>,
-    schedule?: Schedule,
-  ) => void;
+  type Props = {
+    schedule: FullSchedule | null;
+    searchAttributes: SearchAttribute;
+    onConfirm: (
+      preset: SchedulePreset,
+      args: Partial<ScheduleParameters>,
+      schedule?: Schedule,
+    ) => void;
+  };
+  let { schedule = null, searchAttributes = {}, onConfirm }: Props = $props();
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
 
-  let title = translate(schedule ? 'schedules.edit' : 'schedules.create');
-  let loadingText = translate(
-    schedule ? 'schedules.editing' : 'schedules.creating',
+  let title = $derived(
+    translate(schedule ? 'schedules.edit' : 'schedules.create'),
   );
-  let backTitle = translate(
-    schedule ? 'schedules.back-to-schedule' : 'schedules.back-to-schedules',
+  let loadingText = $derived(
+    translate(schedule ? 'schedules.editing' : 'schedules.creating'),
   );
-  let backHref = schedule
-    ? routeForSchedule({ namespace, scheduleId })
-    : routeForSchedules({ namespace });
-  let confirmText = schedule
-    ? translate('common.save')
-    : translate('schedules.create');
+  let backTitle = $derived(
+    translate(
+      schedule ? 'schedules.back-to-schedule' : 'schedules.back-to-schedules',
+    ),
+  );
+  let backHref = $derived(
+    schedule
+      ? routeForSchedule({ namespace, scheduleId })
+      : routeForSchedules({ namespace }),
+  );
+  let confirmText = $derived(
+    schedule ? translate('common.save') : translate('schedules.create'),
+  );
 
-  let errors = {};
-  let name = scheduleId ?? '';
   const decodedWorkflow = decodePayloadAttributes(
     schedule?.action?.startWorkflow,
   );
@@ -73,28 +79,31 @@
     decodedSearchAttributes?.searchAttributes.indexedFields ??
     ({} as { [k: string]: string });
 
-  let workflowType = decodedWorkflow?.workflowType?.name ?? '';
-  let workflowId = decodedWorkflow?.workflowId ?? '';
-  let taskQueue = decodedWorkflow?.taskQueue?.name ?? '';
-  let input = '';
-  let editInput = !schedule;
-  let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
-  let daysOfWeek: string[] = [];
-  let daysOfMonth: number[] = [];
-  let months: string[] = [];
-  let days = '';
-  let hour = '';
-  let minute = '';
-  let second = '';
-  let phase = '';
-  let cronString = '';
-  let searchAttributesInput = Object.entries(indexedFields).map(
-    ([label, value]) => ({
+  let preset: SchedulePreset = $state(scheduleId ? 'existing' : 'interval');
+  let errors = $state({});
+  let name = $state(scheduleId ?? '');
+  let workflowType = $state(decodedWorkflow?.workflowType?.name ?? '');
+  let workflowId = $state(decodedWorkflow?.workflowId ?? '');
+  let taskQueue = $state(decodedWorkflow?.taskQueue?.name ?? '');
+  let input = $state('');
+  let editInput = $state(!schedule);
+  let encoding: Writable<PayloadInputEncoding> = $state(writable('json/plain'));
+  let daysOfWeek: string[] = $state([]);
+  let daysOfMonth: number[] = $state([]);
+  let months: string[] = $state([]);
+  let days = $state('');
+  let hour = $state('');
+  let minute = $state('');
+  let second = $state('');
+  let phase = $state('');
+  let cronString = $state('');
+  let searchAttributesInput = $state(
+    Object.entries(indexedFields).map(([label, value]) => ({
       label,
       value,
       type: $customSearchAttributes[label],
-    }),
-  ) as SearchAttributeInput[];
+    })) as SearchAttributeInput[],
+  );
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: Partial<ScheduleParameters> = {
@@ -153,7 +162,7 @@
     }
   };
 
-  $: isDisabled = (preset: SchedulePreset) => {
+  const isDisabled = $derived((preset: SchedulePreset) => {
     if (!name || !workflowType || !workflowId || !taskQueue) return true;
     if (!isValidInput(input)) return true;
     if (preset === 'interval') return !days && !hour && !minute && !second;
@@ -161,7 +170,7 @@
     if (preset === 'month') return !daysOfMonth.length || !months.length;
     if (preset === 'string') return !cronString;
     return false;
-  };
+  });
 
   onDestroy(() => ($error = ''));
 </script>
@@ -226,8 +235,8 @@
           class="w-full"
         />
         <SchedulesCalendarView
-          let:preset
           {schedule}
+          bind:preset
           bind:daysOfWeek
           bind:daysOfMonth
           bind:months

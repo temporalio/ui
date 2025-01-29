@@ -195,7 +195,7 @@
 >
   {@render children?.({ visibleItems: $store.visibleItems })}
 
-  {#snippet empty()}
+  {#snippet emptyState()}
     {#if empty_render}
       {@render empty_render()}
     {:else if $store.loading}

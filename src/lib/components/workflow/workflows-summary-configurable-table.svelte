@@ -69,45 +69,48 @@
   pageButtonLabel={(page) => translate('common.go-to-page', { page })}
   updating={$updating}
   items={$workflows}
-  let:visibleItems
 >
-  <caption class="sr-only" slot="caption">
-    {translate('common.workflows')}
-  </caption>
-  <TableHeaderRow
-    columnsCount={columns.length}
-    {empty}
-    slot="headers"
-    let:visibleItems
-    workflows={visibleItems}
-  >
-    {#each columns as column}
-      <TableHeaderCell {column} />
-    {/each}
-  </TableHeaderRow>
-  {#each visibleItems as workflow}
-    <TableRow
-      {workflow}
-      {viewChildren}
-      childCount={childrenActive(workflow)?.children.length}
+  {#snippet caption()}
+    <caption class="sr-only" slot="caption">
+      {translate('common.workflows')}
+    </caption>
+  {/snippet}
+  {#snippet header({ visibleItems })}
+    <TableHeaderRow
+      columnsCount={columns.length}
+      {empty}
+      workflows={visibleItems}
     >
       {#each columns as column}
-        <TableBodyCell {workflow} {column} />
+        <TableHeaderCell {column} />
       {/each}
-    </TableRow>
-    {#if childrenActive(workflow)}
-      {#each childrenActive(workflow).children as child}
-        <TableRow workflow={child} child>
-          {#each columns as column}
-            <TableBodyCell workflow={child} {column} />
-          {/each}
-        </TableRow>
-      {/each}
-    {/if}
-  {/each}
-  <svelte:fragment slot="empty" let:updating>
-    <TableEmptyState {updating}>
+    </TableHeaderRow>
+  {/snippet}
+  {#snippet rows({ visibleItems })}
+    {#each visibleItems as workflow}
+      <TableRow
+        {workflow}
+        {viewChildren}
+        childCount={childrenActive(workflow)?.children.length}
+      >
+        {#each columns as column}
+          <TableBodyCell {workflow} {column} />
+        {/each}
+      </TableRow>
+      {#if childrenActive(workflow)}
+        {#each childrenActive(workflow).children as child}
+          <TableRow workflow={child} child>
+            {#each columns as column}
+              <TableBodyCell workflow={child} {column} />
+            {/each}
+          </TableRow>
+        {/each}
+      {/if}
+    {/each}
+  {/snippet}
+  {#snippet emptyState()}
+    <TableEmptyState updating={$updating}>
       <slot name="cloud" slot="cloud" />
     </TableEmptyState>
-  </svelte:fragment>
+  {/snippet}
 </PaginatedTable>

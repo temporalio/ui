@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { onMount, type Snippet } from 'svelte';
 
   import Input from '$lib/holocene/input/input.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
@@ -14,20 +14,35 @@
   import ScheduleFrequency from './schedule-frequency.svelte';
   import SchedulesIntervalView from './schedules-interval-view.svelte';
 
-  let scheduleId = $page.params.schedule;
+  type Props = {
+    schedule: FullSchedule | null;
+    daysOfWeek: string[];
+    daysOfMonth: number[];
+    months: string[];
+    days: string;
+    hour: string;
+    minute: string;
+    second: string;
+    phase: string;
+    cronString: string;
+    preset: SchedulePreset;
+    children: Snippet;
+  };
 
-  let preset: SchedulePreset = scheduleId ? 'existing' : 'interval';
-
-  export let schedule: FullSchedule | null = null;
-  export let daysOfWeek: string[];
-  export let daysOfMonth: number[];
-  export let months: string[];
-  export let days: string;
-  export let hour: string;
-  export let minute: string;
-  export let second: string;
-  export let phase: string;
-  export let cronString: string;
+  let {
+    schedule = null,
+    daysOfWeek = $bindable([]),
+    daysOfMonth = $bindable([]),
+    months = $bindable([]),
+    days = $bindable(''),
+    hour = $bindable(''),
+    minute = $bindable(''),
+    second = $bindable(''),
+    phase = $bindable(''),
+    cronString = $bindable(''),
+    preset = $bindable(''),
+    children,
+  }: Props = $props();
 
   const clearSchedule = () => {
     daysOfWeek = [];
@@ -41,7 +56,9 @@
     cronString = '';
   };
 
-  $: clearSchedule();
+  onMount(() => {
+    () => clearSchedule();
+  });
 </script>
 
 <Tabs class="mt-8 w-full">
@@ -126,5 +143,5 @@
       </div>
     </TabPanel>
   </div>
-  <slot {preset} />
+  {@render children?.()}
 </Tabs>

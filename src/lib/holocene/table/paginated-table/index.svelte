@@ -15,7 +15,7 @@
     fixed?: boolean;
     caption?: Snippet;
     headers?: Snippet;
-    empty?: Snippet;
+    emptyState?: Snippet;
     actionsStart?: Snippet;
     actionsCenter?: Snippet;
     actionsEnd?: Snippet;
@@ -30,7 +30,7 @@
     caption,
     headers,
     children,
-    empty,
+    emptyState,
     actionsStart,
     actionsCenter,
     actionsEnd,
@@ -73,7 +73,7 @@
       {@render actionsEnd?.()}
     </div>
   {:else}
-    {@render empty?.()}
+    {@render emptyState?.()}
   {/if}
 </div>
 
