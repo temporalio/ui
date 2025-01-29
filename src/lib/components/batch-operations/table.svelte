@@ -26,15 +26,19 @@
 </script>
 
 <Table class="w-full table-fixed">
-  <caption class="sr-only" slot="caption">
-    {translate('batch.list-page-title')}
-  </caption>
-  <TableHeaderRow slot="headers">
-    <th class="w-28">{translate('common.status')}</th>
-    <th class="w-auto">{translate('common.job-id')}</th>
-    <th class="max-sm:hidden lg:w-56">{translate('common.start-time')}</th>
-    <th class="max-sm:hidden lg:w-56">{translate('common.close-time')}</th>
-  </TableHeaderRow>
+  {#snippet caption()}
+    <caption class="sr-only">
+      {translate('batch.list-page-title')}
+    </caption>
+  {/snippet}
+  {#snippet headers()}
+    <TableHeaderRow>
+      <th class="w-28">{translate('common.status')}</th>
+      <th class="w-auto">{translate('common.job-id')}</th>
+      <th class="max-sm:hidden lg:w-56">{translate('common.start-time')}</th>
+      <th class="max-sm:hidden lg:w-56">{translate('common.close-time')}</th>
+    </TableHeaderRow>
+  {/snippet}
   {#each operations as { state, jobId, startTime, closeTime }}
     <TableRow>
       <td>

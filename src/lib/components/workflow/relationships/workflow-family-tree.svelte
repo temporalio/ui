@@ -50,8 +50,8 @@
       maxZoomIn={0.25}
       containerHeight={240}
     >
-      {#snippet children({ width, height, zoomLevel })}
-        <div class="flex py-4" slot="controls">
+      {#snippet controls()}
+        <div class="flex py-4">
           <ToggleSwitch
             label={translate('common.view-all')}
             labelPosition="left"
@@ -60,6 +60,8 @@
             onchange={onExpandAll}
           />
         </div>
+      {/snippet}
+      {#snippet children({ width, height, zoomLevel })}
         <WorkflowFamilyNodeTree
           {root}
           {width}

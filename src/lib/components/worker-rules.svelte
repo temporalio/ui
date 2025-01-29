@@ -36,12 +36,14 @@
   {translate('workers.assignment-rules')}
 </h2>
 <Table class="mb-6 w-full table-fixed">
-  <TableHeaderRow slot="headers">
-    <th class="w-20">Index</th>
-    <th class="grow">Target Build ID</th>
-    <th class="w-20">Ramp</th>
-    <th class="text-right">Create Time</th>
-  </TableHeaderRow>
+  {#snippet headers()}
+    <TableHeaderRow>
+      <th class="w-20">Index</th>
+      <th class="grow">Target Build ID</th>
+      <th class="w-20">Ramp</th>
+      <th class="text-right">Create Time</th>
+    </TableHeaderRow>
+  {/snippet}
   {#each visibleRules as rule, index (index)}
     <TableRow data-testid="version-row">
       <td class="text-left" data-testid="index">{index}</td>

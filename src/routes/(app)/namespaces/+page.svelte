@@ -27,12 +27,14 @@
     nextButtonLabel={translate('common.next')}
   >
     <Table variant="fancy" class="w-full">
-      <caption class="sr-only" slot="caption"
-        >{translate('common.namespaces')}</caption
-      >
-      <TableHeaderRow slot="headers">
-        <th>{translate('common.name')}</th>
-      </TableHeaderRow>
+      {#snippet caption()}
+        <caption class="sr-only">{translate('common.namespaces')}</caption>
+      {/snippet}
+      {#snippet headers()}
+        <TableHeaderRow>
+          <th>{translate('common.name')}</th>
+        </TableHeaderRow>
+      {/snippet}
       {#each visibleItems as namespace}
         <TableRow>
           <td>

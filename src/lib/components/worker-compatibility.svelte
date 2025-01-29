@@ -37,10 +37,12 @@
   {translate('workers.version-sets')}
 </h2>
 <Table class="mb-6 w-full min-w-[600px] table-fixed">
-  <TableHeaderRow slot="headers">
-    <th class="w-3/12">{translate('workers.default')}</th>
-    <th class="w-9/12">{translate('workers.compatible-build-ids')}</th>
-  </TableHeaderRow>
+  {#snippet headers()}
+    <TableHeaderRow>
+      <th class="w-3/12">{translate('workers.default')}</th>
+      <th class="w-9/12">{translate('workers.compatible-build-ids')}</th>
+    </TableHeaderRow>
+  {/snippet}
   {#each versionSets as set, index (index)}
     <TableRow data-testid="version-row">
       <td class="text-left" data-testid="version-default">
@@ -85,24 +87,27 @@
   <caption class="sr-only" slot="caption"
     >{translate('workflows.workers-tab')}</caption
   >
-  <TableHeaderRow slot="headers">
-    <th class={reachability?.buildIdReachability?.length ? 'w-3/12' : 'w-6/12'}
-      >{translate('common.id')}</th
-    >
-    {#if reachability?.buildIdReachability?.length}
-      <th class="w-3/12">{translate('workers.version')}</th>
-      <th class="w-2/12">{translate('workers.retirability')}</th>
-    {/if}
-    <th class="w-2/12">{translate('workflows.last-accessed')}</th>
-    <th class="w-2/12">
-      <p class="text-center">
-        {translate('workflows.workflow-task-handler')}
-      </p>
-    </th>
-    <th class="w-2/12 text-center">
-      <p class="text-center">{translate('workflows.activity-handler')}</p>
-    </th>
-  </TableHeaderRow>
+  {#snippet headers()}
+    <TableHeaderRow>
+      <th
+        class={reachability?.buildIdReachability?.length ? 'w-3/12' : 'w-6/12'}
+        >{translate('common.id')}</th
+      >
+      {#if reachability?.buildIdReachability?.length}
+        <th class="w-3/12">{translate('workers.version')}</th>
+        <th class="w-2/12">{translate('workers.retirability')}</th>
+      {/if}
+      <th class="w-2/12">{translate('workflows.last-accessed')}</th>
+      <th class="w-2/12">
+        <p class="text-center">
+          {translate('workflows.workflow-task-handler')}
+        </p>
+      </th>
+      <th class="w-2/12 text-center">
+        <p class="text-center">{translate('workflows.activity-handler')}</p>
+      </th>
+    </TableHeaderRow>
+  {/snippet}
   {#each workers?.pollers as poller (poller.identity)}
     {@const buildId = getCurrentPollerBuildId(poller)}
     {@const pollerReachability = getBuildIdReachability(

@@ -12,12 +12,14 @@
 </script>
 
 <Table class="w-full">
-  <caption class="sr-only" slot="caption"
-    >{translate('schedules.schedule')}</caption
-  >
-  <TableHeaderRow slot="headers">
-    <th>{translate('schedules.schedule')}</th>
-  </TableHeaderRow>
+  {#snippet caption()}
+    <caption class="sr-only">{translate('schedules.schedule')}</caption>
+  {/snippet}
+  {#snippet headers()}
+    <TableHeaderRow>
+      <th>{translate('schedules.schedule')}</th>
+    </TableHeaderRow>
+  {/snippet}
   <TableRow class="hover:text-blue-700 hover:underline">
     <td>
       <Link

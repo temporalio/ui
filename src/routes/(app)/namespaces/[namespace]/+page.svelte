@@ -69,16 +69,20 @@
 <Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
     <Table variant="simple">
-      <caption class="sr-only" slot="caption"
-        >{`${translate('namespaces.namespace')} ${translate(
-          'common.details',
-        )}`}</caption
-      >
-      <tr slot="headers">
-        <th colspan="2">
-          <h3>{translate('common.details')}</h3>
-        </th>
-      </tr>
+      {#snippet caption()}
+        <caption class="sr-only" slot="caption"
+          >{`${translate('namespaces.namespace')} ${translate(
+            'common.details',
+          )}`}</caption
+        >
+      {/snippet}
+      {#snippet headers()}
+        <tr>
+          <th colspan="2">
+            <h3>{translate('common.details')}</h3>
+          </th>
+        </tr>
+      {/snippet}
       <tr data-testid="namespace-owner">
         <td>{translate('namespaces.owner')}</td>
         <td
