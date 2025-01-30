@@ -59,25 +59,13 @@
     count?: number;
     id?: string;
     'data-testid'?: string;
-    onclick?: (e: MouseEvent) => void;
     href?: string;
     target?: HTMLAnchorAttributes['target'];
   };
 
-  export type ButtonWithoutHrefProps = BaseProps &
-    HTMLButtonAttributes & {
-      onkeydown?: (e: KeyboardEvent) => void;
-      href?: never;
-      target?: never;
-    };
+  export type ButtonWithoutHrefProps = BaseProps & HTMLButtonAttributes;
 
-  export type ButtonWithHrefProps = BaseProps &
-    HTMLAnchorAttributes & {
-      onkeydown?: never;
-      href?: string;
-      target?: HTMLAnchorAttributes['target'];
-      disabled?: never;
-    };
+  export type ButtonWithHrefProps = BaseProps & HTMLAnchorAttributes;
 
   type Props = ButtonWithoutHrefProps | ButtonWithHrefProps;
 </script>
@@ -86,6 +74,8 @@
   import type {
     HTMLAnchorAttributes,
     HTMLButtonAttributes,
+    KeyboardEventHandler,
+    MouseEventHandler,
   } from 'svelte/elements';
 
   import { twMerge as merge } from 'tailwind-merge';
@@ -100,12 +90,16 @@
     return 'href' in props && !props.disabled;
   };
 
-  const handleClick = (event: MouseEvent) => {
+  const handleClick: MouseEventHandler<
+    HTMLButtonElement & HTMLAnchorElement
+  > = (event) => {
     event.stopPropagation();
     props.onclick?.(event);
   };
 
-  const handleKeydown = (event: KeyboardEvent) => {
+  const handleKeydown: KeyboardEventHandler<
+    HTMLButtonElement & HTMLAnchorElement
+  > = (event) => {
     event.stopPropagation();
     props.onkeydown?.(event);
   };

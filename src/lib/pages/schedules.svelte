@@ -122,10 +122,11 @@
               variant="secondary"
               onclick={openCustomizationDrawer}
             />
-            {#if !createDisabled && writeActionsAreAllowed()}
+            {#if !createDisabled}
               <Button
                 data-testid="create-schedule"
                 href={routeForScheduleCreate({ namespace })}
+                disabled={!writeActionsAreAllowed()}
               >
                 {translate('schedules.create')}
               </Button>

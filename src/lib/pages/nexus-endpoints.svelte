@@ -49,11 +49,12 @@
     <h1 data-testid="namespace-selector-title">
       {translate('nexus.endpoints')}
     </h1>
-    {#if !createDisabled}
-      <Button variant="primary" href={routeForNexusEndpointCreate()}
-        >{translate('nexus.create-endpoint')}</Button
-      >
-    {/if}
+    <Button
+      disabled={createDisabled}
+      variant="primary"
+      href={routeForNexusEndpointCreate()}
+      >{translate('nexus.create-endpoint')}</Button
+    >
   </div>
   <div class="flex flex-col gap-4">
     <div class="flex flex-col justify-between lg:flex-row">

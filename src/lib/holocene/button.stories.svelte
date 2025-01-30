@@ -83,25 +83,13 @@
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
 
-  import { omit } from '$lib/utilities/omit';
-
   import { shouldNotBeTransparent } from './test-utilities';
 
   setTemplate(template);
 </script>
 
 {#snippet template(args: Args<typeof Story>)}
-  {#if args.href}
-    <Button
-      href={args.href}
-      {...omit(args, 'disabled')}
-      onclick={action('click')}>Click Me</Button
-    >
-  {:else}
-    <Button {...omit(args, 'href', 'target')} onclick={action('click')}
-      >Click Me</Button
-    >
-  {/if}
+  <Button {...args} onclick={action('click')}>Click Me</Button>
 {/snippet}
 
 <Story name="Primary" args={{}} />
@@ -109,9 +97,7 @@
 <Story name="With Long Title">
   {#snippet children(args)}
     <div class="max-w-16">
-      <Button {...omit(args, 'href', 'target')} onclick={action('click')}
-        >Request Cancellation</Button
-      >
+      <Button {...args} onclick={action('click')}>Request Cancellation</Button>
     </div>
   {/snippet}
 </Story>
@@ -119,15 +105,9 @@
 <Story name="Button Group">
   {#snippet children(args)}
     <div class="button-group flex">
-      <Button {...omit(args, 'href', 'target')} onclick={action('click')}
-        >First</Button
-      >
-      <Button {...omit(args, 'href', 'target')} onclick={action('click')}
-        >Middle</Button
-      >
-      <Button {...omit(args, 'href', 'target')} onclick={action('click')}
-        >Last</Button
-      >
+      <Button {...args} onclick={action('click')}>First</Button>
+      <Button {...args} onclick={action('click')}>Middle</Button>
+      <Button {...args} onclick={action('click')}>Last</Button>
     </div>
   {/snippet}
 </Story>
@@ -159,3 +139,8 @@
 <Story name="With Trailing Icon" args={{ trailingIcon: 'workflow' }} />
 
 <Story name="With Link" args={{ href: 'https://example.com' }} />
+
+<Story
+  name="With Link and Disabled"
+  args={{ href: 'https://temporal.io', disabled: true }}
+/>

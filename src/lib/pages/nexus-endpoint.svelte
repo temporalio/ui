@@ -30,11 +30,10 @@
       <h1 data-testid="namespace-selector-title">
         {endpoint.spec.name}
       </h1>
-      {#if !editDisabled}
-        <Button href={routeForNexusEndpointEdit(endpoint.id)}
-          >{translate('common.edit')}</Button
-        >
-      {/if}
+      <Button
+        href={routeForNexusEndpointEdit(endpoint.id)}
+        disabled={editDisabled}>{translate('common.edit')}</Button
+      >
     </div>
     <p>UUID: {endpoint.id}</p>
   </div>
