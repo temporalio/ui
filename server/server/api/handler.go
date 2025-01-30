@@ -214,7 +214,7 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 
 func withMarshaler() runtime.ServeMuxOption {
 	return runtime.WithMarshalerOption(runtime.MIMEWildcard, temporalProtoMarshaler{
-		contentType: runtime.MIMEWildcard,
+		contentType: "application/json",
 		mOpts: temporalproto.CustomJSONMarshalOptions{
 			Indent: "  ",
 		},
