@@ -36,6 +36,7 @@ import {
   getEventGroupName,
 } from './get-group-name';
 import { getLastEvent } from './get-last-event';
+import { isEvent } from '../event-history';
 
 type StartingEvents = {
   Activity: ActivityTaskScheduledEvent;
@@ -66,6 +67,8 @@ const createGroupFor = <K extends keyof StartingEvents>(
   groupEvents.set(event.id, event);
   groupEventIds.add(event.id);
 
+  const userMetadata = isEvent(event) ? event.userMetadata : undefined;
+
   return {
     id,
     name,
@@ -80,7 +83,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     level: undefined,
     pendingActivity: undefined,
     pendingNexusOperation: undefined,
-    userMetadata: event?.userMetadata,
+    userMetadata,
     get eventTime() {
       return this.lastEvent?.eventTime;
     },

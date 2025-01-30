@@ -10,7 +10,7 @@
   } from '$lib/utilities/get-codec';
 
   export let value: Payload | undefined = undefined;
-  export let fallback: string;
+  export let fallback: string = '';
   export let onDecode: (decodedValue: string) => void | undefined = undefined;
 
   let decodedValue = fallback;
@@ -39,7 +39,10 @@
         _value,
         settings,
       );
-      decodedValue = metadata;
+
+      if (typeof metadata === 'string') {
+        decodedValue = metadata;
+      }
 
       if (onDecode) {
         onDecode(decodedValue);
