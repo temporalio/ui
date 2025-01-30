@@ -211,6 +211,8 @@
           <Badge type="secondary" class="block select-none truncate">
             {decodedValue}
           </Badge>
+        {:else}
+          <EventDetailsRow {...primaryAttribute} {attributes} />
         {/if}
       </MetadataDecoder>
     {:else if primaryAttribute?.key}

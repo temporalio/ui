@@ -243,11 +243,11 @@ const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
  */
 const preferredSummaryKeys = [
   'signalName',
+  'activityType',
   'workflowType',
   'result',
   'failure',
   'input',
-  'activityType',
   'outcome',
   'workflowExecution',
   'taskQueue',
