@@ -50,6 +50,8 @@
   import { action } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
 
+  import Button from '../button.svelte';
+
   import AsyncTest from './async-test.svelte';
 </script>
 
@@ -181,4 +183,27 @@
   let:context
 >
   <AsyncTest id={context.id}></AsyncTest>
+</Story>
+
+<Story name="With Action" let:args let:context>
+  <div class="w-64">
+    <Combobox
+      id={context.id}
+      data-testid={context.id}
+      on:change={action('change')}
+      on:filter={action('filter')}
+      leadingIcon="search"
+      options={['English', 'English (UK)', 'German', 'French', 'Japanese']}
+      {...args}
+    >
+      <Button
+        on:click={() => {}}
+        slot="action"
+        variant="ghost"
+        size="xs"
+        leadingIcon="close"
+        aria-label="clear"
+      />
+    </Combobox>
+  </div>
 </Story>
