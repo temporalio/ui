@@ -207,32 +207,31 @@
         let:decodedValue
       >
         {#if decodedValue}
-          <Badge type="subtle" class="block select-none truncate">
+          <p class="whitespace-nowrap text-right text-xs">Summary</p>
+          <Badge type="secondary" class="block select-none truncate">
             {decodedValue}
           </Badge>
         {/if}
       </MetadataDecoder>
-    {:else}
-      {#if currentEvent?.links?.length}
-        <EventLink
-          link={currentEvent.links[0]}
-          class="max-w-xl"
-          linkClass="truncate"
-        />
-      {/if}
-      {#if primaryAttribute?.key}
-        <EventDetailsRow {...primaryAttribute} {attributes} />
-      {/if}
-      {#if nonPendingActivityAttempt}
-        <EventDetailsRow
-          key="attempt"
-          value={nonPendingActivityAttempt.toString()}
-          {attributes}
-        />
-      {/if}
-      {#if compact && secondaryAttribute?.key}
-        <EventDetailsRow {...secondaryAttribute} {attributes} />
-      {/if}
+    {:else if primaryAttribute?.key}
+      <EventDetailsRow {...primaryAttribute} {attributes} />
+    {/if}
+    {#if currentEvent?.links?.length}
+      <EventLink
+        link={currentEvent.links[0]}
+        class="max-w-xl"
+        linkClass="truncate"
+      />
+    {/if}
+    {#if nonPendingActivityAttempt}
+      <EventDetailsRow
+        key="attempt"
+        value={nonPendingActivityAttempt.toString()}
+        {attributes}
+      />
+    {/if}
+    {#if compact && secondaryAttribute?.key}
+      <EventDetailsRow {...secondaryAttribute} {attributes} />
     {/if}
   </td>
 </tr>
