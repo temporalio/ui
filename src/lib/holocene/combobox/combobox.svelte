@@ -384,7 +384,7 @@
 
   <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
     {#if leadingIcon}
-      <Icon width={20} height={20} class="ml-2" name={leadingIcon} />
+      <Icon class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
     <div
       class="input-wrapper"
@@ -535,7 +535,11 @@
   }
 
   .input-wrapper {
-    @apply ml-2 flex w-full flex-wrap items-center;
+    @apply flex w-full flex-wrap items-center;
+
+    input {
+      @apply indent-2;
+    }
   }
 
   .combobox-input {
