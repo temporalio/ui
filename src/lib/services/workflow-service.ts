@@ -20,6 +20,7 @@ import {
   ResetReapplyType,
   type ResetWorkflowRequest,
   type SearchAttribute,
+  type UpdateWorkflowResponse,
 } from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
@@ -35,6 +36,7 @@ import type {
   ArchiveFilterParameters,
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
+  WorkflowIdentifier,
 } from '$lib/types/workflows';
 import {
   cloneAllPotentialPayloadsWithCodec,
@@ -85,6 +87,16 @@ type SignalWorkflowOptions = {
   workflow: WorkflowExecution;
   name: string;
   input: string;
+  encoding: PayloadInputEncoding;
+};
+
+type UpdateWorkflowOptions = {
+  namespace: string;
+  workflow: WorkflowIdentifier;
+  name: string;
+  identity?: string;
+  input: string;
+  updateId?: string;
   encoding: PayloadInputEncoding;
 };
 
@@ -354,6 +366,47 @@ export async function signalWorkflow({
           'execution.runId': runId,
         },
       };
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt(body),
+    },
+  });
+}
+
+export async function updateWorkflow({
+  namespace,
+  workflow: { workflowId, runId },
+  name,
+  identity,
+  updateId,
+  input = '',
+  encoding,
+}: UpdateWorkflowOptions): Promise<UpdateWorkflowResponse> {
+  const route = routeForApi('workflow.update', {
+    namespace,
+    workflowId,
+    updateName: name,
+  });
+  const payloads = await encodePayloads(input, encoding);
+  const body = {
+    workflowExecution: {
+      runId,
+    },
+    request: {
+      meta: {
+        updateId,
+        identity,
+      },
+      input: {
+        args: {
+          payloads,
+        },
+      },
+    },
+  };
 
   return requestFromAPI(route, {
     notifyOnError: false,

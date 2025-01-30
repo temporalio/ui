@@ -56,6 +56,7 @@ type (
 		WorkflowTerminateDisabled bool `yaml:"workflowTerminateDisabled"`
 		WorkflowCancelDisabled    bool `yaml:"workflowCancelDisabled"`
 		WorkflowSignalDisabled    bool `yaml:"workflowSignalDisabled"`
+		WorkflowUpdateDisabled    bool `yaml:"workflowUpdateDisabled"`
 		WorkflowResetDisabled     bool `yaml:"workflowResetDisabled"`
 		// Whether bulk/batch actions are enabled in the UI
 		BatchActionsDisabled bool `yaml:"batchActionsDisabled"`

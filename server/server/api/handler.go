@@ -68,6 +68,7 @@ type SettingsResponse struct {
 	WorkflowTerminateDisabled     bool
 	WorkflowCancelDisabled        bool
 	WorkflowSignalDisabled        bool
+	WorkflowUpdateDisabled        bool
 	WorkflowResetDisabled         bool
 	BatchActionsDisabled          bool
 	StartWorkflowDisabled         bool
@@ -142,6 +143,7 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			WorkflowTerminateDisabled:     cfg.WorkflowTerminateDisabled,
 			WorkflowCancelDisabled:        cfg.WorkflowCancelDisabled,
 			WorkflowSignalDisabled:        cfg.WorkflowSignalDisabled,
+			WorkflowUpdateDisabled:        cfg.WorkflowUpdateDisabled,
 			WorkflowResetDisabled:         cfg.WorkflowResetDisabled,
 			BatchActionsDisabled:          cfg.BatchActionsDisabled,
 			StartWorkflowDisabled:         cfg.StartWorkflowDisabled,
@@ -212,7 +214,7 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 
 func withMarshaler() runtime.ServeMuxOption {
 	return runtime.WithMarshalerOption(runtime.MIMEWildcard, temporalProtoMarshaler{
-		contentType: runtime.MIMEWildcard,
+		contentType: "application/json",
 		mOpts: temporalproto.CustomJSONMarshalOptions{
 			Indent: "  ",
 		},

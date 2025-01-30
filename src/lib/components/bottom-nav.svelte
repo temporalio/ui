@@ -22,6 +22,7 @@
   export let namespaceList: NamespaceListItem[] | undefined = [];
   export let linkList: NavLinkListItem[];
   export let isCloud = false;
+  export let showNamespacePicker = true;
 
   let viewLinks = false;
   let viewNamespaces = writable(false);
@@ -120,24 +121,26 @@
       <Logo height={32} width={32} />
     {/if}
   </button>
-  <div class="namespace-wrapper">
-    <Button
-      variant="ghost"
-      data-testid="namespace-switcher"
-      leadingIcon="namespace-switcher"
-      size="xs"
-      class="grow text-white"
-      on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
-    >
-    <div class="ml-1 h-full w-1 border-l border-subtle" />
-    <Button
-      variant="ghost"
-      size="xs"
-      href={routeForNamespace({ namespace })}
-      disabled={!namespaceExists}
-      ><Icon class="text-white" name="external-link" /></Button
-    >
-  </div>
+  {#if showNamespacePicker}
+    <div class="namespace-wrapper">
+      <Button
+        variant="ghost"
+        data-testid="namespace-switcher"
+        leadingIcon="namespace-switcher"
+        size="xs"
+        class="grow text-white"
+        on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
+      >
+      <div class="ml-1 h-full w-1 border-l border-subtle" />
+      <Button
+        variant="ghost"
+        size="xs"
+        href={routeForNamespace({ namespace })}
+        disabled={!namespaceExists}
+        ><Icon class="text-white" name="external-link" /></Button
+      >
+    </div>
+  {/if}
   <button
     class="nav-button"
     data-testid="nav-profile-button"

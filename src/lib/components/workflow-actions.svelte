@@ -6,11 +6,13 @@
   import ResetConfirmationModal from '$lib/components/workflow/client-actions/reset-confirmation-modal.svelte';
   import SignalConfirmationModal from '$lib/components/workflow/client-actions/signal-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
+  import UpdateConfirmationModal from '$lib/components/workflow/client-actions/update-confirmation-modal.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import { coreUserStore } from '$lib/stores/core-user';
   import { resetEvents } from '$lib/stores/events';
   import { refresh } from '$lib/stores/workflow-run';
@@ -21,6 +23,7 @@
   import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
   import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
+  import { workflowUpdateEnabled } from '$lib/utilities/workflow-update-enabled';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -31,6 +34,8 @@
   let terminateConfirmationModalOpen = false;
   let resetConfirmationModalOpen = false;
   let signalConfirmationModalOpen = false;
+  let updateConfirmationModalOpen = false;
+
   let resetDescription: string;
   let coreUser = coreUserStore();
 
@@ -41,6 +46,12 @@
   );
 
   $: signalEnabled = workflowSignalEnabled(
+    $page.data.settings,
+    $coreUser,
+    namespace,
+  );
+
+  $: updateEnabled = workflowUpdateEnabled(
     $page.data.settings,
     $coreUser,
     namespace,
@@ -104,6 +115,13 @@
       description: signalEnabled ? '' : translate('workflows.signal-disabled'),
     },
     {
+      label: translate('workflows.update'),
+      onClick: () => (updateConfirmationModalOpen = true),
+      testId: 'update-button',
+      enabled: updateEnabled,
+      description: updateEnabled ? '' : translate('workflows.update-disabled'),
+    },
+    {
       label: translate('workflows.terminate'),
       onClick: () => (terminateConfirmationModalOpen = true),
       testId: 'terminate-button',
@@ -128,18 +146,20 @@
     menuLabel={translate('workflows.workflow-actions')}
   >
     {#each workflowActions as { onClick, destructive, label, enabled, testId, description }}
-      {#if destructive}
-        <MenuDivider />
+      {#if !$isCloud || ($isCloud && testId !== 'update-button')}
+        {#if destructive}
+          <MenuDivider />
+        {/if}
+        <MenuItem
+          on:click={onClick}
+          {destructive}
+          disabled={!enabled}
+          data-testid={testId}
+          {description}
+        >
+          {label}
+        </MenuItem>
       {/if}
-      <MenuItem
-        on:click={onClick}
-        {destructive}
-        disabled={!enabled}
-        data-testid={testId}
-        {description}
-      >
-        {label}
-      </MenuItem>
     {/each}
     {#if !workflowCreateDisabled($page)}
       <MenuDivider />
@@ -213,6 +233,14 @@
     {workflow}
     {namespace}
     bind:open={signalConfirmationModalOpen}
+  />
+{/if}
+
+{#if updateEnabled}
+  <UpdateConfirmationModal
+    {workflow}
+    {namespace}
+    bind:open={updateConfirmationModalOpen}
   />
 {/if}
 
