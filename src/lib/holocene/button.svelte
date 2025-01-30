@@ -51,7 +51,7 @@
 
   type ButtonStyles = VariantProps<typeof buttonStyles>;
 
-  type BaseProps = ButtonStyles & {
+  export type BaseProps = ButtonStyles & {
     disabled?: boolean;
     loading?: boolean;
     leadingIcon?: IconName;
@@ -60,6 +60,8 @@
     id?: string;
     'data-testid'?: string;
     onclick?: (e: MouseEvent) => void;
+    href?: string;
+    target?: HTMLAnchorAttributes['target'];
   };
 
   export type ButtonWithoutHrefProps = BaseProps &
@@ -68,13 +70,16 @@
       href?: never;
       target?: never;
     };
+
   export type ButtonWithHrefProps = BaseProps &
     HTMLAnchorAttributes & {
       onkeydown?: never;
-      href: string;
+      href?: string;
       target?: HTMLAnchorAttributes['target'];
-      disabled?: boolean;
+      disabled?: never;
     };
+
+  type Props = ButtonWithoutHrefProps | ButtonWithHrefProps;
 </script>
 
 <script lang="ts">
@@ -85,41 +90,55 @@
 
   import { twMerge as merge } from 'tailwind-merge';
 
-  import { goto } from '$app/navigation';
-
   import Badge from '$lib/holocene/badge.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  type Props = ButtonWithoutHrefProps | ButtonWithHrefProps;
+  let props: Props = $props();
 
-  let {
-    variant = 'primary',
-    size = 'md',
-    loading = false,
-    leadingIcon = null,
-    trailingIcon = null,
-    count = 0,
-    id = null,
-    href = null,
-    target = null,
-    class: className = '',
-    disabled = false,
-    children,
-    onclick = () => {},
-    onkeydown = () => {},
-    ...rest
-  }: Props = $props();
-
-  const onLinkClick = (e: MouseEvent) => {
-    // Skip if middle mouse click or new tab
-    if (e.button === 1 || target || e.metaKey) return;
-    e.preventDefault();
-    goto(href);
+  const isLink = (props: Props): props is ButtonWithHrefProps => {
+    return 'href' in props && !props.disabled;
   };
+
+  const handleClick = (event: MouseEvent) => {
+    event.stopPropagation();
+    props.onclick?.(event);
+  };
+
+  const handleKeydown = (event: KeyboardEvent) => {
+    event.stopPropagation();
+    props.onkeydown?.(event);
+  };
+
+  const className = merge(
+    buttonStyles({ variant: props.variant, size: props.size }),
+    props.class,
+  );
 </script>
 
-{#if href && !disabled}
+{#snippet buttonContent()}
+  {@const { leadingIcon, loading, trailingIcon, count, children } = props}
+  {#if leadingIcon || loading}
+    <span class:animate-spin={loading}>
+      <Icon name={loading ? 'spinner' : leadingIcon} />
+    </span>
+  {/if}
+  {@render children?.()}
+  {#if trailingIcon}
+    <span>
+      <Icon name={trailingIcon} />
+    </span>
+  {/if}
+  {#if count > 0}
+    <Badge
+      class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
+      type="count">{count}</Badge
+    >
+  {/if}
+{/snippet}
+
+{#if isLink(props)}
+  {@const { href, id, target, ...rest } = props}
   <a
     {href}
     {id}
@@ -127,77 +146,24 @@
     type="button"
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
-    class={merge(
-      buttonStyles({
-        variant,
-        size,
-      }),
-      className,
-    )}
-    onclick={(e: MouseEvent) => {
-      e.stopPropagation();
-      onclick(e);
-      onLinkClick(e);
-    }}
+    class={className}
+    onclick={handleClick}
     tabindex={href ? null : 0}
     {...rest}
   >
-    {#if leadingIcon || loading}
-      <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon} />
-      </span>
-    {/if}
-    {@render children?.()}
-    {#if trailingIcon}
-      <span>
-        <Icon name={trailingIcon} />
-      </span>
-    {/if}
-    {#if count > 0}
-      <Badge
-        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
-        type="count">{count}</Badge
-      >
-    {/if}
+    {@render buttonContent()}
   </a>
 {:else}
+  {@const { id, disabled, ...rest } = props}
   <button
     {disabled}
     {id}
     type="button"
-    onclick={(e: MouseEvent) => {
-      e.stopPropagation();
-      onclick(e);
-    }}
-    onkeydown={(e: KeyboardEvent) => {
-      e.stopPropagation();
-      onkeydown(e);
-    }}
-    class={merge(
-      buttonStyles({
-        variant,
-        size,
-      }),
-      className,
-    )}
+    onclick={handleClick}
+    onkeydown={handleKeydown}
+    class={className}
     {...rest}
   >
-    {#if leadingIcon || loading}
-      <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon} />
-      </span>
-    {/if}
-    {@render children?.()}
-    {#if trailingIcon}
-      <span>
-        <Icon name={trailingIcon} />
-      </span>
-    {/if}
-    {#if count > 0}
-      <Badge
-        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
-        type="count">{count}</Badge
-      >
-    {/if}
+    {@render buttonContent()}
   </button>
 {/if}

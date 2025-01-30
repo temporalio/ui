@@ -56,12 +56,11 @@
           they abstract.
         </p>
         <slot />
-        <Button
-          disabled={createDisabled}
-          variant="primary"
-          href={routeForNexusEndpointCreate()}
-          >{translate('nexus.create-endpoint')}</Button
-        >
+        {#if !createDisabled}
+          <Button variant="primary" href={routeForNexusEndpointCreate()}
+            >{translate('nexus.create-endpoint')}</Button
+          >
+        {/if}
       </div>
     </div>
     <div class="bg-dark mx-auto mt-8 w-full" class:invert={!$useDarkMode}>

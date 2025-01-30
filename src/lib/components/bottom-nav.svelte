@@ -130,13 +130,11 @@
       onclick={onNamespaceClick}>{truncateNamespace(namespace)}</Button
     >
     <div class="ml-1 h-full w-1 border-l border-subtle"></div>
-    <Button
-      variant="ghost"
-      size="xs"
-      href={routeForNamespace({ namespace })}
-      disabled={!namespaceExists}
-      ><Icon class="text-white" name="external-link" /></Button
-    >
+    {#if namespaceExists}
+      <Button variant="ghost" size="xs" href={routeForNamespace({ namespace })}
+        ><Icon class="text-white" name="external-link" /></Button
+      >
+    {/if}
   </div>
   <button
     class="nav-button"
