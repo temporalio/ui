@@ -394,16 +394,18 @@
       {#if multiselect && isArrayValue(value) && value.length > 0}
         {#if displayChips}
           {#each value.slice(0, chipLimit) as v}
-            <Chip
-              on:remove={() => removeOption(v)}
-              removeButtonLabel={removeChipLabel}>{v}</Chip
-            >
+            <div class="first-of-type:ml-2 last-of-type:-mr-1">
+              <Chip
+                on:remove={() => removeOption(v)}
+                removeButtonLabel={removeChipLabel}>{v}</Chip
+              >
+            </div>
           {/each}
           {#if value.length > chipLimit}
-            <p>+{value.slice(chipLimit).length}</p>
+            <p class="-mr-1 ml-1">+{value.slice(chipLimit).length}</p>
           {/if}
         {:else}
-          <Badge>{numberOfItemsSelectedLabel(value.length)}</Badge>
+          <Badge class="ml-2">{numberOfItemsSelectedLabel(value.length)}</Badge>
         {/if}
       {/if}
       <input
