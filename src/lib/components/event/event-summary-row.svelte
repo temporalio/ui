@@ -202,7 +202,7 @@
     {/if}
     {#if currentEvent?.userMetadata?.summary}
       <MetadataDecoder
-        value={currentEvent?.userMetadata?.summary}
+        value={currentEvent.userMetadata.summary}
         fallback=""
         let:decodedValue
       >

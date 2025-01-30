@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
@@ -15,7 +16,6 @@
   import {
     DetailsChildTimelineHeight,
     DetailsConfig,
-    getGroupDetailsBoxHeight,
     getStatusColor,
     mergeEventGroupDetails,
     staticCodeBlockHeight,
@@ -24,12 +24,13 @@
   import Box from './box.svelte';
   import GraphWidget from './graph-widget.svelte';
   import GroupDetailsText from './group-details-text.svelte';
-  import Text from './text.svelte';
 
   export let group: EventGroup;
   export let canvasWidth: number;
   export let x = 0;
   export let y: number;
+
+  let innerContent;
 
   $: status =
     group?.finalClassification || group?.classification || group?.label;
@@ -44,22 +45,16 @@
     }
   }
 
-  const { gutter, fontSizeRatio, height } = DetailsConfig;
+  const { fontSizeRatio, height } = DetailsConfig;
   $: ({ namespace } = $page.params);
 
   $: width = canvasWidth;
-  $: boxHeight = getGroupDetailsBoxHeight(group, width);
   $: isWide = width >= 960;
-
-  $: codeBlockX = x + gutter + (isWide ? 0.666 * width : 0.5 * width);
-  $: codeBlockWidth = (isWide ? 0.333 * width : 0.5 * width) - 2 * gutter;
 
   $: textStartingY = height + y + fontSizeRatio;
   $: textHeight =
     fontSizeRatio * textAttributes.length * (isWide ? 1 : 2) + fontSizeRatio;
-  $: textWidth = (isWide ? 0.666 * width : 0.5 * width) - gutter;
 
-  $: childTimelineY = textStartingY + textHeight;
   $: childTimelineWidth = isWide ? 0.666 * width : 0.5 * width;
   $: childTimelineHeight = Math.max(
     DetailsChildTimelineHeight,
@@ -80,7 +75,12 @@
 </script>
 
 <g role="button" tabindex="0" class="relative z-50 cursor-pointer">
-  <Box point={[x, y]} {width} height={boxHeight} fill="#465A78" />
+  <Box
+    point={[x, y]}
+    {width}
+    height={innerContent?.clientHeight + height + 2 * fontSizeRatio}
+    fill="#465A78"
+  />
   <Box point={[x, y]} {width} {height} fill="#1E293B" />
   <foreignObject {x} {y} {width} height={fontSizeRatio}>
     <div class="flex h-full items-center justify-between text-sm text-white">
@@ -108,65 +108,77 @@
       </div>
     </div>
   </foreignObject>
-  {#each codeBlockAttributes as [key, value], index (key)}
-    {@const y = textStartingY + index * staticCodeBlockHeight}
-    <Text point={[codeBlockX, y]} label>{format(key)}</Text>
-    <GroupDetailsText
-      point={[codeBlockX, y + 1.5 * fontSizeRatio]}
-      {key}
-      {value}
-      {attributes}
-      width={codeBlockWidth}
-    />
-  {/each}
   <foreignObject
-    x={x + gutter}
+    {x}
     y={textStartingY}
-    width={textWidth}
-    height={textHeight}
+    {width}
+    height={innerContent?.clientHeight}
+    class="px-4 text-white"
   >
-    <div class="grid grid-cols-1 gap-x-2 lg:grid-cols-2">
-      {#each textAttributes as [key, value], index (key)}
-        <div
-          class="flex flex-col gap-0 text-sm text-white"
-          style="height: {2 * fontSizeRatio}px;"
-        >
-          <div class="font-medium leading-3 text-[#C9D9F0]">
-            {format(key)}
-          </div>
-          <div class="text-wrap break-all leading-4">
-            <GroupDetailsText
-              point={[x + gutter, textStartingY + index * fontSizeRatio]}
-              {key}
-              {value}
-              {attributes}
-              {width}
-            />
+    <div bind:this={innerContent} class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4 xl:flex-row">
+        <div class="flex w-full flex-col gap-2 xl:w-1/2">
+          {#each codeBlockAttributes as [key, value] (key)}
+            <div>
+              <div class="font-medium leading-4 text-slate-100">
+                {format(key)}
+              </div>
+              <GroupDetailsText {key} {value} {attributes} />
+            </div>
+          {/each}
+        </div>
+        <div class="w-full xl:w-1/2">
+          <div class="grid grid-cols-2 gap-2">
+            {#if group.userMetadata?.summary}
+              <div>
+                <div class="font-medium leading-3 text-purple-200">
+                  {translate('common.summary')}
+                </div>
+                <div class="text-wrap break-all leading-4">
+                  <MetadataDecoder
+                    value={group?.userMetadata?.summary}
+                    fallback={group?.displayName}
+                    let:decodedValue
+                  >
+                    {#key decodedValue}
+                      {decodedValue}
+                    {/key}
+                  </MetadataDecoder>
+                </div>
+              </div>
+            {/if}
+            {#each textAttributes as [key, value] (key)}
+              <div>
+                <div class="font-medium leading-3 text-slate-100">
+                  {format(key)}
+                </div>
+                <div class="text-wrap break-all leading-4">
+                  <GroupDetailsText {key} {value} {attributes} />
+                </div>
+              </div>
+            {/each}
           </div>
         </div>
-      {/each}
+      </div>
+      {#if childWorkflowStartedEvent}
+        <div>
+          <div class="font-medium leading-4 text-slate-100">Child Workflow</div>
+          {#key group.eventList.length}
+            <GraphWidget
+              {namespace}
+              workflowId={childWorkflowStartedEvent.attributes.workflowExecution
+                .workflowId}
+              runId={childWorkflowStartedEvent.attributes.workflowExecution
+                .runId}
+              height={childTimelineHeight}
+              width={childTimelineWidth}
+              class="overflow-x-hidden rounded-br rounded-tr border-y border-r border-subtle bg-primary"
+            />
+          {/key}
+        </div>
+      {/if}
     </div>
   </foreignObject>
-  {#if childWorkflowStartedEvent}
-    <foreignObject
-      {x}
-      y={childTimelineY}
-      width={childTimelineWidth}
-      height={childTimelineHeight}
-    >
-      {#key group.eventList.length}
-        <GraphWidget
-          {namespace}
-          workflowId={childWorkflowStartedEvent.attributes.workflowExecution
-            .workflowId}
-          runId={childWorkflowStartedEvent.attributes.workflowExecution.runId}
-          height={childTimelineHeight}
-          width={childTimelineWidth}
-          class="overflow-x-hidden rounded-br rounded-tr border-y border-r border-subtle bg-primary"
-        />
-      {/key}
-    </foreignObject>
-  {/if}
 </g>
 
 <style lang="postcss">

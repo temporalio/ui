@@ -242,8 +242,8 @@ const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
  * A list of the keys that should be shown in the summary view.
  */
 const preferredSummaryKeys = [
-  'signalName',
   'activityType',
+  'signalName',
   'workflowType',
   'result',
   'failure',
