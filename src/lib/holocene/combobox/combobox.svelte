@@ -389,23 +389,21 @@
     <div
       class="input-wrapper"
       class:gap-1={multiselect}
-      class:py-1={multiselect && displayChips}
+      class:p-1={multiselect && displayChips}
     >
       {#if multiselect && isArrayValue(value) && value.length > 0}
         {#if displayChips}
           {#each value.slice(0, chipLimit) as v}
-            <div class="first-of-type:ml-2 last-of-type:-mr-1">
-              <Chip
-                on:remove={() => removeOption(v)}
-                removeButtonLabel={removeChipLabel}>{v}</Chip
-              >
-            </div>
+            <Chip
+              on:remove={() => removeOption(v)}
+              removeButtonLabel={removeChipLabel}>{v}</Chip
+            >
           {/each}
           {#if value.length > chipLimit}
-            <p class="-mr-1 ml-1">+{value.slice(chipLimit).length}</p>
+            <p>+{value.slice(chipLimit).length}</p>
           {/if}
         {:else}
-          <Badge class="ml-2">{numberOfItemsSelectedLabel(value.length)}</Badge>
+          <Badge>{numberOfItemsSelectedLabel(value.length)}</Badge>
         {/if}
       {/if}
       <input

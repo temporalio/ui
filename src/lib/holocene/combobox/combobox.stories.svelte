@@ -185,15 +185,39 @@
   <AsyncTest id={context.id}></AsyncTest>
 </Story>
 
-<Story name="With Action" let:args let:context>
+<Story
+  name="With Multiselect and Action"
+  let:args
+  let:context
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+    await userEvent.type(combobox, 'A');
+    const selectAll = canvas.getByText('Select All');
+    await userEvent.click(selectAll);
+  }}
+>
   <div class="w-64">
     <Combobox
       id={context.id}
       data-testid={context.id}
       on:change={action('change')}
       on:filter={action('filter')}
+      multiselect
       leadingIcon="search"
-      options={['English', 'English (UK)', 'German', 'French', 'Japanese']}
+      options={[
+        'English',
+        'English (UK)',
+        'German',
+        'French',
+        'Japanese',
+        'Spanish',
+        'Portuguese',
+        'Mandarin',
+        'Hindi',
+        'Russian',
+        'Italian',
+      ]}
       {...args}
     >
       <Button
