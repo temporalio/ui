@@ -1,10 +1,14 @@
 <script lang="ts">
+  import { tick } from 'svelte';
+
   import { page } from '$app/stores';
 
+  import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import { setActiveGroup } from '$lib/stores/active-events';
+  import { activeGroupHeight, setActiveGroup } from '$lib/stores/active-events';
   import {
     format,
     spaceBetweenCapitalLetters,
@@ -12,60 +16,29 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
 
-  import {
-    DetailsChildTimelineHeight,
-    DetailsConfig,
-    getGroupDetailsBoxHeight,
-    getStatusColor,
-    mergeEventGroupDetails,
-    staticCodeBlockHeight,
-  } from '../constants';
+  import { getStatusColor, mergeEventGroupDetails } from '../constants';
 
-  import Box from './box.svelte';
   import GraphWidget from './graph-widget.svelte';
   import GroupDetailsText from './group-details-text.svelte';
-  import Text from './text.svelte';
 
   export let group: EventGroup;
   export let canvasWidth: number;
   export let x = 0;
   export let y: number;
 
+  let innerContent;
+  $: contentHeight = innerContent?.offsetHeight || 0;
+
+  const setActiveGroupHeight = (height) => {
+    $activeGroupHeight = height;
+  };
+
+  $: setActiveGroupHeight(contentHeight || 0);
+
   $: status =
     group?.finalClassification || group?.classification || group?.label;
-
-  $: {
-    if (group?.pendingActivity) {
-      if (group.pendingActivity.attempt > 1) {
-        status = 'Retrying';
-      } else {
-        status = 'Pending';
-      }
-    }
-  }
-
-  const { gutter, fontSizeRatio, height } = DetailsConfig;
   $: ({ namespace } = $page.params);
-
   $: width = canvasWidth;
-  $: boxHeight = getGroupDetailsBoxHeight(group, width);
-  $: isWide = width >= 960;
-
-  $: codeBlockX = x + gutter + (isWide ? 0.666 * width : 0.5 * width);
-  $: codeBlockWidth = (isWide ? 0.333 * width : 0.5 * width) - 2 * gutter;
-
-  $: textStartingY = height + y + fontSizeRatio;
-  $: textHeight =
-    fontSizeRatio * textAttributes.length * (isWide ? 1 : 2) + fontSizeRatio;
-  $: textWidth = (isWide ? 0.666 * width : 0.5 * width) - gutter;
-
-  $: childTimelineY = textStartingY + textHeight;
-  $: childTimelineWidth = isWide ? 0.666 * width : 0.5 * width;
-  $: childTimelineHeight = Math.max(
-    DetailsChildTimelineHeight,
-    staticCodeBlockHeight * codeBlockAttributes.length - textHeight,
-  );
-
   $: title = group.displayName;
   $: attributes = mergeEventGroupDetails(group);
   $: codeBlockAttributes = Object.entries(attributes).filter(
@@ -77,96 +50,119 @@
 
   $: childWorkflowStartedEvent =
     group && group.eventList.find(isChildWorkflowExecutionStartedEvent);
+
+  $: duration = formatDistanceAbbreviated({
+    start: group?.initialEvent?.eventTime,
+    end: group?.lastEvent?.eventTime,
+    includeMilliseconds: true,
+  });
+
+  $: {
+    if (group?.pendingActivity) {
+      if (group.pendingActivity.attempt > 1) {
+        status = 'Retrying';
+      } else {
+        status = 'Pending';
+      }
+    }
+  }
+
+  const onDecode = async () => {
+    await tick();
+    contentHeight = innerContent?.offsetHeight;
+  };
 </script>
 
-<g role="button" tabindex="0" class="relative z-50 cursor-pointer">
-  <Box point={[x, y]} {width} height={boxHeight} fill="#465A78" />
-  <Box point={[x, y]} {width} {height} fill="#1E293B" />
-  <foreignObject {x} {y} {width} height={fontSizeRatio}>
-    <div class="flex h-full items-center justify-between text-sm text-white">
-      <div class="flex h-full items-center gap-2">
-        <div
-          class="px-4 py-1 text-black"
-          style="background-color: {getStatusColor(status)};"
-        >
-          {status ? spaceBetweenCapitalLetters(status) : group.label}
-        </div>
-        {title}
-      </div>
-      <div class="flex items-center gap-4">
-        {formatDistanceAbbreviated({
-          start: group?.initialEvent?.eventTime,
-          end: group?.lastEvent?.eventTime,
-          includeMilliseconds: true,
-        })}
-        <button
-          class="flex items-center gap-0.5 rounded-t bg-white px-2 text-sm text-black"
-          on:click|stopPropagation={() => setActiveGroup(group)}
-        >
-          {translate('common.close')}<Icon name="close" />
-        </button>
-      </div>
-    </div>
-  </foreignObject>
-  {#each codeBlockAttributes as [key, value], index (key)}
-    {@const y = textStartingY + index * staticCodeBlockHeight}
-    <Text point={[codeBlockX, y]} label>{format(key)}</Text>
-    <GroupDetailsText
-      point={[codeBlockX, y + 1.5 * fontSizeRatio]}
-      {key}
-      {value}
-      {attributes}
-      width={codeBlockWidth}
-    />
-  {/each}
-  <foreignObject
-    x={x + gutter}
-    y={textStartingY}
-    width={textWidth}
-    height={textHeight}
-  >
-    <div class="grid grid-cols-1 gap-x-2 lg:grid-cols-2">
-      {#each textAttributes as [key, value], index (key)}
-        <div
-          class="flex flex-col gap-0 text-sm text-white"
-          style="height: {2 * fontSizeRatio}px;"
-        >
-          <div class="font-medium leading-3 text-[#C9D9F0]">
-            {format(key)}
+<g role="button" tabindex="0" class="relative z-50">
+  <foreignObject {x} {y} {width} height={contentHeight}>
+    <div bind:this={innerContent} class="flex flex-col border-b border-subtle">
+      <div
+        class="relative flex h-full items-center justify-between bg-slate-200 text-sm dark:bg-slate-800"
+      >
+        <div class="flex h-full items-center gap-4">
+          <div
+            class="px-4 py-1.5 text-black"
+            style="background-color: {getStatusColor(status)};"
+          >
+            {status ? spaceBetweenCapitalLetters(status) : group.label}
           </div>
-          <div class="text-wrap break-all leading-4">
-            <GroupDetailsText
-              point={[x + gutter, textStartingY + index * fontSizeRatio]}
-              {key}
-              {value}
-              {attributes}
-              {width}
+          {title}
+          {#if duration}
+            <div class="flex items-center gap-1">
+              <Icon name="clock" />
+              {duration}
+            </div>
+          {/if}
+        </div>
+        <div class="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="xs"
+            on:click={() => setActiveGroup(group)}
+            >{translate('common.close')} <Icon name="close" /></Button
+          >
+        </div>
+      </div>
+      <div class="surface-primary flex flex-col gap-4 p-4 xl:flex-row">
+        <div class="w-full xl:w-1/2">
+          <div class="grid grid-cols-2 gap-3">
+            {#if group.userMetadata?.summary}
+              <MetadataDecoder
+                value={group?.userMetadata?.summary}
+                let:decodedValue
+                {onDecode}
+              >
+                <div>
+                  <div class="font-medium leading-3 text-brand">
+                    {translate('common.summary')}
+                  </div>
+                  <div class="text-wrap break-all leading-4">
+                    {decodedValue}
+                  </div>
+                </div>
+              </MetadataDecoder>
+            {/if}
+            {#each textAttributes as [key, value] (key)}
+              <div>
+                <div class="font-medium leading-3 text-subtle">
+                  {format(key)}
+                </div>
+                <div class="text-wrap break-all leading-4">
+                  <GroupDetailsText {key} {value} {attributes} />
+                </div>
+              </div>
+            {/each}
+          </div>
+        </div>
+        <div class="flex w-full flex-col gap-2 xl:w-1/2">
+          {#each codeBlockAttributes as [key, value] (key)}
+            <div>
+              <div class="font-medium leading-4 text-subtle">
+                {format(key)}
+              </div>
+              <GroupDetailsText {key} {value} {attributes} {onDecode} />
+            </div>
+          {/each}
+        </div>
+      </div>
+      {#if childWorkflowStartedEvent}
+        <div class="surface-primary px-4">
+          <div class="font-medium leading-4 text-subtle">Child Workflow</div>
+          {#key group.eventList.length}
+            <GraphWidget
+              {namespace}
+              workflowId={childWorkflowStartedEvent.attributes.workflowExecution
+                .workflowId}
+              runId={childWorkflowStartedEvent.attributes.workflowExecution
+                .runId}
+              height={200}
+              class="surface-primary overflow-x-hidden border border-subtle"
             />
-          </div>
+          {/key}
         </div>
-      {/each}
+      {/if}
     </div>
   </foreignObject>
-  {#if childWorkflowStartedEvent}
-    <foreignObject
-      {x}
-      y={childTimelineY}
-      width={childTimelineWidth}
-      height={childTimelineHeight}
-    >
-      {#key group.eventList.length}
-        <GraphWidget
-          {namespace}
-          workflowId={childWorkflowStartedEvent.attributes.workflowExecution
-            .workflowId}
-          runId={childWorkflowStartedEvent.attributes.workflowExecution.runId}
-          height={childTimelineHeight}
-          width={childTimelineWidth}
-          class="overflow-x-hidden rounded-br rounded-tr border-y border-r border-subtle bg-primary"
-        />
-      {/key}
-    </foreignObject>
-  {/if}
 </g>
 
 <style lang="postcss">

@@ -1,7 +1,11 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import type {
+    EventGroup,
+    EventGroups,
+  } from '$lib/models/event-groups/event-groups';
+  import { activeGroupHeight, activeGroups } from '$lib/stores/active-events';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
@@ -11,11 +15,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';
 
-  import {
-    activeGroupsHeightAboveGroup,
-    getGroupDetailsBoxHeight,
-    TimelineConfig,
-  } from '../constants';
+  import { TimelineConfig } from '../constants';
   import EndTimeInterval from '../end-time-interval.svelte';
 
   import GroupDetailsRow from './group-details-row.svelte';
@@ -28,7 +28,6 @@
   export let y = 0;
   export let workflow: WorkflowExecution;
   export let groups: EventGroups;
-  export let activeGroups: string[] = [];
   export let readOnly = false;
   export let workflowTaskFailedError: WorkflowTaskFailedEvent | undefined =
     undefined;
@@ -41,17 +40,9 @@
 
   $: filteredGroups = getFailedOrPendingGroups(groups, $eventStatusFilter);
   $: startTime = $fullEventHistory[0]?.eventTime || workflow.startTime;
-  $: activeDetailsHeight = activeGroups
-    .map((id) => {
-      const group = filteredGroups.find((group) => group.id === id);
-      if (!group) return 0;
-      return getGroupDetailsBoxHeight(group, canvasWidth);
-    })
-    .reduce((acc, height) => acc + height, 0);
-
   $: timelineHeight =
-    Math.max(height * (filteredGroups.length + 2), 120) + activeDetailsHeight;
-  $: canvasHeight = timelineHeight + 140;
+    Math.max(height * (filteredGroups.length + 2), 120) + $activeGroupHeight;
+  $: canvasHeight = timelineHeight + 120;
 
   const onExpandCollapse = () => {
     if (viewportHeight === 360) {
@@ -63,6 +54,17 @@
 
   const handleScroll = (e) => {
     scrollY = e?.target?.scrollTop;
+  };
+
+  $: activeGroupsHeightAboveGroup = (group: EventGroup) => {
+    const activeGroupIsAbove = $activeGroups?.filter((id) => {
+      if ($eventFilterSort === 'ascending')
+        return parseInt(id) < parseInt(group.id);
+      return parseInt(id) > parseInt(group.id);
+    });
+
+    if (!activeGroupIsAbove?.length) return 0;
+    return $activeGroupHeight;
   };
 </script>
 
@@ -91,7 +93,7 @@
         : viewportHeight === 360
         ? 'top-[260px]'
         : 'top-[700px]'}"
-      class:invisible={!!activeGroups.length}
+      class:invisible={!!$activeGroups.length}
     >
       <div class="flex w-full justify-between text-xs">
         <p class="w-60 -translate-x-24 rotate-90">
@@ -130,21 +132,13 @@
       />
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
       {#each filteredGroups as group, index (group.id)}
-        {@const y =
-          (index + 2) * height +
-          activeGroupsHeightAboveGroup(
-            activeGroups,
-            group,
-            filteredGroups,
-            canvasWidth,
-            $eventFilterSort,
-          )}
+        {@const y = (index + 2) * height + activeGroupsHeightAboveGroup(group)}
         {#if y > scrollY - 2 * height && y < scrollY + viewportHeight * height}
           {#key group.eventList.length}
             <TimelineGraphRow
               {y}
               {group}
-              {activeGroups}
+              activeGroups={$activeGroups}
               {canvasWidth}
               {startTime}
               {endTime}
@@ -152,7 +146,7 @@
             />
           {/key}
         {/if}
-        {#if activeGroups.includes(group.id)}
+        {#if $activeGroups.includes(group.id)}
           <GroupDetailsRow y={y + 1.33 * radius} {group} {canvasWidth} />
         {/if}
       {/each}

@@ -1,6 +1,6 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import { clearActiveEvents } from '$lib/stores/active-events';
+  import { clearActiveGroups } from '$lib/stores/active-events';
   import { eventStatusFilter } from '$lib/stores/filters';
 
   const options = [
@@ -11,7 +11,7 @@
   ];
 
   const onOptionClick = () => {
-    clearActiveEvents();
+    clearActiveGroups();
     $eventStatusFilter = !$eventStatusFilter;
   };
 </script>

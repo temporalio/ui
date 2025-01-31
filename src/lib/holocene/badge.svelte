@@ -6,7 +6,7 @@
 
   const type = {
     primary: 'bg-blue-300',
-    secondary: 'bg-purple-200',
+    secondary: 'bg-purple-200 dark:bg-purple-800 dark:text-white',
     default: 'bg-slate-100',
     warning: 'bg-yellow-200',
     success: 'bg-green-200',

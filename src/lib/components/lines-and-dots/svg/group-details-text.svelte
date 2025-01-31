@@ -13,31 +13,22 @@
   export let key: string;
   export let value: string | Record<string, unknown>;
   export let attributes: CombinedAttributes;
-  export let point: [number, number] = [0, 0];
-  export let width: number;
+  export let onDecode: (decodedValue: string) => void | undefined = undefined;
 
   const { fontSizeRatio } = DetailsConfig;
 
-  $: [x, y] = point;
   $: codeBlockValue = getCodeBlockValue(value);
   $: linkType = displayLinkType(key, attributes);
 </script>
 
 {#if typeof value === 'object'}
   {#if value?.payloads}
-    <PayloadDecoder {value} key="payloads" let:decodedValue>
+    <PayloadDecoder {value} key="payloads" let:decodedValue {onDecode}>
       {#key decodedValue}
-        <foreignObject
-          {x}
-          y={y - fontSizeRatio}
-          {width}
-          height={staticCodeBlockHeight - fontSizeRatio}
-        >
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={staticCodeBlockHeight - fontSizeRatio}
-          />
-        </foreignObject>
+        <CodeBlock
+          content={decodedValue}
+          maxHeight={staticCodeBlockHeight - fontSizeRatio}
+        />
       {/key}
     </PayloadDecoder>
   {:else if key === 'searchAttributes'}
@@ -45,40 +36,27 @@
       key="searchAttributes"
       value={{ searchAttributes: codeBlockValue }}
       let:decodedValue
+      {onDecode}
     >
       {#key decodedValue}
-        <foreignObject
-          {x}
-          y={y - fontSizeRatio}
-          {width}
-          height={staticCodeBlockHeight - fontSizeRatio}
-        >
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={staticCodeBlockHeight - fontSizeRatio}
-          />
-        </foreignObject>
+        <CodeBlock
+          content={decodedValue}
+          maxHeight={staticCodeBlockHeight - fontSizeRatio}
+        />
       {/key}
     </PayloadDecoder>
   {:else}
-    <PayloadDecoder value={codeBlockValue} let:decodedValue>
+    <PayloadDecoder value={codeBlockValue} let:decodedValue {onDecode}>
       {#key decodedValue}
-        <foreignObject
-          {x}
-          y={y - fontSizeRatio}
-          {width}
-          height={staticCodeBlockHeight - fontSizeRatio}
-        >
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={staticCodeBlockHeight - fontSizeRatio}
-          />
-        </foreignObject>
+        <CodeBlock
+          content={decodedValue}
+          maxHeight={staticCodeBlockHeight - fontSizeRatio}
+        />
       {/key}
     </PayloadDecoder>
   {/if}
 {:else if linkType !== 'none'}
-  <EventDetailsLink {value} {attributes} type={linkType} light />
+  <EventDetailsLink {value} {attributes} type={linkType} />
 {:else}
   {value}
 {/if}

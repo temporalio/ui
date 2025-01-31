@@ -1,3 +1,4 @@
+import type { Payload } from '$lib/types';
 import type {
   PendingActivity,
   PendingNexusOperation,
@@ -29,6 +30,7 @@ interface EventGroup
   level: number | undefined;
   pendingActivity: PendingActivity | undefined;
   pendingNexusOperation: PendingNexusOperation | undefined;
+  userMetadata?: { summary?: Payload };
 }
 
 type EventGroups = EventGroup[];
