@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { tick } from 'svelte';
+
   import { page } from '$app/stores';
 
   import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
@@ -65,7 +67,8 @@
     }
   }
 
-  const onDecode = () => {
+  const onDecode = async () => {
+    await tick();
     contentHeight = innerContent?.offsetHeight;
   };
 </script>
