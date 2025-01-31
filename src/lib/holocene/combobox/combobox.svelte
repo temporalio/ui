@@ -1,30 +1,5 @@
-<script lang="ts">
-  import type { HTMLInputAttributes } from 'svelte/elements';
-  import { writable, type Writable } from 'svelte/store';
-
-  import { onMount, type Snippet } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
-
-  import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
-  import Label from '$lib/holocene/label.svelte';
-  import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
-  import Menu from '$lib/holocene/menu/menu.svelte';
-
-  import Badge from '../badge.svelte';
-  import Button from '../button.svelte';
-  import Chip from '../chip.svelte';
-  import type { IconName } from '../icon';
-  import Icon from '../icon/icon.svelte';
-  import MenuDivider from '../menu/menu-divider.svelte';
-  import Tooltip from '../tooltip.svelte';
-
-  type T = $$Generic;
-
-  type ExtendedInputEvent = Event & {
-    currentTarget: EventTarget & HTMLInputElement;
-  };
-
-  interface BaseProps extends HTMLInputAttributes {
+<script lang="ts" module>
+  export type OwnProps<T> = {
     id: string;
     label: string;
     noResultsText: string;
@@ -52,9 +27,9 @@
     close?: (args: { selectedOption: string | T }) => void;
     input?: (arg: string) => void;
     class?: string;
-  }
+  };
 
-  type MultiSelectProps = {
+  export type MultiSelectProps = {
     multiselect: true;
     value: string[];
     displayChips?: boolean;
@@ -66,7 +41,7 @@
     numberOfItemsSelectedLabel?: (count: number) => string;
   };
 
-  type SingleSelectProps = {
+  export type SingleSelectProps = {
     multiselect?: false;
     value: string;
     chipLimit?: never;
@@ -78,23 +53,65 @@
     numberOfItemsSelectedLabel?: never;
   };
 
-  type StringOptionProps = {
+  export type StringOptionProps = {
     options: string[];
     optionValueKey?: never;
     optionLabelKey?: never;
   };
 
-  type CustomOptionProps = {
+  export type CustomOptionProps<T> = {
     options: T[];
     optionValueKey: keyof T;
     optionLabelKey?: keyof T;
   };
 
-  type Props =
-    | (BaseProps & StringOptionProps & SingleSelectProps)
-    | (BaseProps & StringOptionProps & MultiSelectProps)
-    | (BaseProps & CustomOptionProps & SingleSelectProps)
-    | (BaseProps & CustomOptionProps & MultiSelectProps);
+  export type BaseProps<T> = OwnProps<T> & HTMLInputAttributes;
+
+  export type SingleSelectStringOptionProps<T> = BaseProps<T> &
+    StringOptionProps &
+    SingleSelectProps;
+
+  export type MultiSelectStringOptionProps<T> = BaseProps<T> &
+    StringOptionProps &
+    MultiSelectProps;
+
+  export type SingleSelectCustomOptionProps<T> = BaseProps<T> &
+    CustomOptionProps<T> &
+    SingleSelectProps;
+
+  export type MultiSelectCustomPropsProps<T> = BaseProps<T> &
+    CustomOptionProps<T> &
+    MultiSelectProps;
+
+  export type Props<T> =
+    | SingleSelectStringOptionProps<T>
+    | MultiSelectStringOptionProps<T>
+    | SingleSelectCustomOptionProps<T>
+    | MultiSelectCustomPropsProps<T>;
+</script>
+
+<script lang="ts" generics="T">
+  import type {
+    HTMLInputAttributes,
+    KeyboardEventHandler,
+  } from 'svelte/elements';
+  import { writable, type Writable } from 'svelte/store';
+
+  import { onMount, type Snippet } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
+
+  import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
+  import Label from '$lib/holocene/label.svelte';
+  import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
+  import Menu from '$lib/holocene/menu/menu.svelte';
+
+  import Badge from '../badge.svelte';
+  import Button from '../button.svelte';
+  import Chip from '../chip.svelte';
+  import type { IconName } from '../icon';
+  import Icon from '../icon/icon.svelte';
+  import MenuDivider from '../menu/menu-divider.svelte';
+  import Tooltip from '../tooltip.svelte';
 
   let {
     id,
@@ -136,7 +153,7 @@
     input = () => {},
     class: className = '',
     ...rest
-  }: Props = $props();
+  }: Props<T> = $props();
 
   let displayValue: string = $state('');
   // Filter value and display value are close but different in a few cases
@@ -357,7 +374,7 @@
     }
   };
 
-  const handleInput = (event: ExtendedInputEvent) => {
+  const handleInput: KeyboardEventHandler<HTMLInputElement> = (event) => {
     event.stopPropagation();
     if (!$open) $open = true;
     // Reactive statement at top makes this work, not my favorite tho

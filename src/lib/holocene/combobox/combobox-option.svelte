@@ -1,31 +1,34 @@
-<script lang="ts">
+<script lang="ts" module>
   import type { Snippet } from 'svelte';
 
-  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
-
-  interface BaseProps {
+  type BaseProps = {
     label: string;
     leading?: Snippet;
     trailing?: Snippet;
     onclick?: (e: MouseEvent) => void;
-  }
-  interface EnabledProps extends BaseProps {
+  };
+
+  type EnabledProps = BaseProps & {
     selected?: boolean;
     disabled?: boolean;
-  }
+  };
 
-  interface DisabledProps extends BaseProps {
+  type DisabledProps = BaseProps & {
     selected?: never;
     disabled: true;
-  }
+  };
 
-  type Props = EnabledProps | DisabledProps;
+  export type Props = EnabledProps | DisabledProps;
+</script>
+
+<script lang="ts">
+  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
 
   let {
     selected = false,
     disabled = false,
     label,
-    leading: leading_render,
+    leading: leadingChildren,
     trailing,
     onclick,
   }: Props = $props();
@@ -42,7 +45,7 @@
   {trailing}
 >
   {#snippet leading()}
-    {@render leading_render?.()}
+    {@render leadingChildren?.()}
   {/snippet}
   {label}
 </MenuItem>

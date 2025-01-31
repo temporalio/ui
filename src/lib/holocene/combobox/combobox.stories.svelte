@@ -6,11 +6,17 @@
     type StoryContext,
   } from '@storybook/addon-svelte-csf';
   import { expect, userEvent, waitFor, within } from '@storybook/test';
+  import type { Component } from 'svelte';
 
-  import Combobox from '$lib/holocene/combobox/combobox.svelte';
+  import Combobox, { type Props } from '$lib/holocene/combobox/combobox.svelte';
   import { iconNames } from '$lib/holocene/icon';
 
-  const { Story } = defineMeta<typeof Combobox<unknown>>({
+  type Option = {
+    label: string;
+    value: string;
+  };
+
+  const { Story } = defineMeta<Component<Props<string | Option>>>({
     title: 'Combobox',
     component: Combobox,
     args: {
@@ -60,7 +66,7 @@
 </script>
 
 {#snippet template(
-  { label, noResultsText, ...args }: Args<typeof Story>,
+  args: Args<typeof Story>,
   context: StoryContext<typeof Story>,
 )}
   <Combobox
@@ -68,9 +74,7 @@
     data-testid={context.id}
     change={action('change')}
     filter={action('filter')}
-    {label}
-    {noResultsText}
-    {...args}
+    {...args as Props<string>}
   />
 {/snippet}
 
@@ -88,17 +92,6 @@
 
 <Story
   name="Custom Options"
-  args={{
-    options: [
-      { label: 'English', value: 'en-us' },
-      { label: 'English (UK)', value: 'en-uk' },
-      { label: 'German', value: 'de' },
-      { label: 'French', value: 'fr' },
-      { label: 'Japanese', value: 'jp' },
-    ],
-    optionLabelKey: 'label',
-    optionValueKey: 'value',
-  }}
   play={async ({ canvasElement, id }) => {
     const canvas = within(canvasElement);
     const combobox = canvas.getByTestId(id);
@@ -109,7 +102,26 @@
 
     expect(menu).toBeInTheDocument();
   }}
-/>
+>
+  {#snippet children(args, context)}
+    <Combobox
+      id={context.id}
+      data-testid={context.id}
+      change={action('change')}
+      filter={action('filter')}
+      {...args as Props<Option>}
+      options={[
+        { label: 'English', value: 'en-us' },
+        { label: 'English (UK)', value: 'en-uk' },
+        { label: 'German', value: 'de' },
+        { label: 'French', value: 'fr' },
+        { label: 'Japanese', value: 'jp' },
+      ]}
+      optionLabelKey="label"
+      optionValueKey="value"
+    />
+  {/snippet}
+</Story>
 
 <Story
   name="No Results"
