@@ -30,7 +30,6 @@
 
   const decodePayload = async (_value: Payload | undefined) => {
     if (!_value) {
-      decodedValue = fallback;
       return;
     }
 

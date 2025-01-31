@@ -14,16 +14,10 @@ import type {
 } from '$lib/types/events';
 import type { WorkflowStatus } from '$lib/types/workflows';
 import {
-  formatAttributes,
   formatGroupAttributes,
   formatPendingAttributes,
 } from '$lib/utilities/format-event-attributes';
-import {
-  getGroupForEventOrPendingEvent,
-  isAssociatedPendingActivity,
-} from '$lib/utilities/pending-activities';
-
-export const DetailsChildTimelineHeight = 200;
+import { getGroupForEventOrPendingEvent } from '$lib/utilities/pending-activities';
 
 export type GraphConfig = {
   height: number;
@@ -33,8 +27,6 @@ export type GraphConfig = {
 };
 
 const baseRadius = 6;
-
-export const minCompactWidth = 200;
 
 export const TimelineConfig: GraphConfig = {
   height: baseRadius * 5,
@@ -267,25 +259,6 @@ export const getCategoryColor = (type: EventTypeCategory): string => {
   }
 };
 
-export const activeGroupsHeightAboveGroup = (
-  activeGroups: string[],
-  group: EventGroup,
-  groups: EventGroups,
-  width: number,
-  sort: EventSortOrder,
-) => {
-  return activeGroups
-    .filter((id) => {
-      if (sort === 'ascending') return parseInt(id) < parseInt(group.id);
-      return parseInt(id) > parseInt(group.id);
-    })
-    .map((id) => {
-      const group = groups.find((group) => group.id === id);
-      return getGroupDetailsBoxHeight(group, width);
-    })
-    .reduce((acc, height) => acc + height, 0);
-};
-
 export const mergeEventGroupDetails = (group: EventGroup) => {
   const attributes = formatGroupAttributes(group);
   return group.pendingActivity
@@ -294,55 +267,6 @@ export const mergeEventGroupDetails = (group: EventGroup) => {
 };
 
 export const staticCodeBlockHeight = 200;
-
-export const getGroupDetailsBoxHeight = (group: EventGroup, width: number) => {
-  const isWide = width >= 960;
-  const attributes = mergeEventGroupDetails(group);
-  const codeBlockAttributes = Object.entries(attributes).filter(
-    ([, value]) => typeof value === 'object',
-  );
-  const textAttributes = Object.entries(attributes).filter(
-    ([, value]) => typeof value !== 'object',
-  );
-
-  const codeBlockHeight = codeBlockAttributes.length * staticCodeBlockHeight;
-  const textHeight =
-    (isWide ? 1 : 2) * textAttributes.length * DetailsConfig.fontSizeRatio +
-    DetailsConfig.fontSizeRatio;
-  const totalTextHeight =
-    group.category === 'child-workflow'
-      ? textHeight + DetailsChildTimelineHeight
-      : textHeight;
-  return (
-    Math.max(codeBlockHeight, totalTextHeight) + 3 * DetailsConfig.fontSizeRatio
-  );
-};
-
-export const getEventDetailsBoxHeight = (
-  event: WorkflowEvent,
-  pendingActivity?: PendingActivity,
-) => {
-  const attributes = formatAttributes(event);
-  const codeBlockAttributes = Object.entries(attributes).filter(
-    ([, value]) => typeof value === 'object',
-  );
-  const textAttributes = Object.entries(attributes).filter(
-    ([, value]) => typeof value !== 'object',
-  );
-
-  let pendingActivityHeight = 0;
-  if (isAssociatedPendingActivity(event, pendingActivity)) {
-    pendingActivityHeight = getPendingEventDetailHeight(pendingActivity);
-  }
-  const codeBlockHeight = codeBlockAttributes.length * staticCodeBlockHeight;
-  const textHeight = textAttributes.length * DetailsConfig.fontSizeRatio;
-  return (
-    pendingActivityHeight +
-    codeBlockHeight +
-    textHeight +
-    +2 * DetailsConfig.fontSizeRatio
-  );
-};
 
 export const getPendingEventDetailHeight = (event: PendingActivity) => {
   const textHeight = 5 * DetailsConfig.fontSizeRatio;

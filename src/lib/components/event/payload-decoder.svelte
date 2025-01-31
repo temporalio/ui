@@ -40,6 +40,13 @@
     },
   };
 
+  const formatFromArray = (value: unknown): string => {
+    if (Array.isArray(value) && value.length === 1) {
+      return stringifyWithBigInt(value[0]);
+    }
+    return stringifyWithBigInt(value);
+  };
+
   const decodePayloads = async (
     _value: PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo,
   ) => {
@@ -54,11 +61,7 @@
         convertedAttributes,
       ) as object;
       const keyExists = key && decodedAttributes?.[key];
-      if (keyExists) {
-        decodedValue = stringifyWithBigInt(keyExists);
-      } else {
-        decodedValue = stringifyWithBigInt(decodedAttributes);
-      }
+      decodedValue = formatFromArray(keyExists || decodedAttributes);
 
       if (onDecode) {
         onDecode(decodedValue);

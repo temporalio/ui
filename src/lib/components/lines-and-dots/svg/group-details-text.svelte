@@ -13,6 +13,7 @@
   export let key: string;
   export let value: string | Record<string, unknown>;
   export let attributes: CombinedAttributes;
+  export let onDecode: (decodedValue: string) => void | undefined = undefined;
 
   const { fontSizeRatio } = DetailsConfig;
 
@@ -22,7 +23,7 @@
 
 {#if typeof value === 'object'}
   {#if value?.payloads}
-    <PayloadDecoder {value} key="payloads" let:decodedValue>
+    <PayloadDecoder {value} key="payloads" let:decodedValue {onDecode}>
       {#key decodedValue}
         <CodeBlock
           content={decodedValue}
@@ -35,6 +36,7 @@
       key="searchAttributes"
       value={{ searchAttributes: codeBlockValue }}
       let:decodedValue
+      {onDecode}
     >
       {#key decodedValue}
         <CodeBlock
@@ -44,7 +46,7 @@
       {/key}
     </PayloadDecoder>
   {:else}
-    <PayloadDecoder value={codeBlockValue} let:decodedValue>
+    <PayloadDecoder value={codeBlockValue} let:decodedValue {onDecode}>
       {#key decodedValue}
         <CodeBlock
           content={decodedValue}

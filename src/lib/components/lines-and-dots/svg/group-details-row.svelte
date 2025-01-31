@@ -6,7 +6,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import { setActiveGroup } from '$lib/stores/active-events';
+  import { activeGroupHeight, setActiveGroup } from '$lib/stores/active-events';
   import {
     format,
     spaceBetweenCapitalLetters,
@@ -25,7 +25,13 @@
   export let y: number;
 
   let innerContent;
-  $: contentHeight = innerContent?.clientHeight;
+  $: contentHeight = innerContent?.offsetHeight || 0;
+
+  const setActiveGroupHeight = (height) => {
+    $activeGroupHeight = height;
+  };
+
+  $: setActiveGroupHeight(contentHeight || 0);
 
   $: status =
     group?.finalClassification || group?.classification || group?.label;
@@ -58,11 +64,15 @@
       }
     }
   }
+
+  const onDecode = () => {
+    contentHeight = innerContent?.offsetHeight;
+  };
 </script>
 
 <g role="button" tabindex="0" class="relative z-50">
   <foreignObject {x} {y} {width} height={contentHeight}>
-    <div bind:this={innerContent} class="flex flex-col">
+    <div bind:this={innerContent} class="flex flex-col border-b border-subtle">
       <div
         class="relative flex h-full items-center justify-between bg-slate-200 text-sm dark:bg-slate-800"
       >
@@ -91,35 +101,22 @@
         </div>
       </div>
       <div class="surface-primary flex flex-col gap-4 p-4 xl:flex-row">
-        <div class="flex w-full flex-col gap-2 xl:w-1/2">
-          {#each codeBlockAttributes as [key, value] (key)}
-            <div>
-              <div class="font-medium leading-4 text-subtle">
-                {format(key)}
-              </div>
-              <GroupDetailsText {key} {value} {attributes} />
-            </div>
-          {/each}
-        </div>
         <div class="w-full xl:w-1/2">
           <div class="grid grid-cols-2 gap-3">
             {#if group.userMetadata?.summary}
               <MetadataDecoder
                 value={group?.userMetadata?.summary}
                 let:decodedValue
+                {onDecode}
               >
-                {#if decodedValue}
-                  <div>
-                    <div class="font-medium leading-3 text-brand">
-                      {translate('common.summary')}
-                    </div>
-                    <div class="text-wrap break-all leading-4">
-                      {#key decodedValue}
-                        {decodedValue}
-                      {/key}
-                    </div>
+                <div>
+                  <div class="font-medium leading-3 text-brand">
+                    {translate('common.summary')}
                   </div>
-                {/if}
+                  <div class="text-wrap break-all leading-4">
+                    {decodedValue}
+                  </div>
+                </div>
               </MetadataDecoder>
             {/if}
             {#each textAttributes as [key, value] (key)}
@@ -133,6 +130,16 @@
               </div>
             {/each}
           </div>
+        </div>
+        <div class="flex w-full flex-col gap-2 xl:w-1/2">
+          {#each codeBlockAttributes as [key, value] (key)}
+            <div>
+              <div class="font-medium leading-4 text-subtle">
+                {format(key)}
+              </div>
+              <GroupDetailsText {key} {value} {attributes} {onDecode} />
+            </div>
+          {/each}
         </div>
       </div>
       {#if childWorkflowStartedEvent}

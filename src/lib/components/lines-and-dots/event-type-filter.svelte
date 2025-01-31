@@ -15,7 +15,7 @@
     allEventTypeOptions,
     compactEventTypeOptions,
   } from '$lib/models/event-history/get-event-categorization';
-  import { clearActiveEvents } from '$lib/stores/active-events';
+  import { clearActiveGroups } from '$lib/stores/active-events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
   import { nexusEnabled } from '$lib/utilities/nexus-enabled';
@@ -52,7 +52,7 @@
   }
 
   const onOptionClick = ({ value }) => {
-    clearActiveEvents();
+    clearActiveGroups();
     $eventTypeFilter = $eventTypeFilter.some((type) => type === value)
       ? $eventTypeFilter.filter((type) => type !== value)
       : [...$eventTypeFilter, value];
