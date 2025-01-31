@@ -54,7 +54,7 @@
     </PayloadDecoder>
   {/if}
 {:else if linkType !== 'none'}
-  <EventDetailsLink {value} {attributes} type={linkType} light />
+  <EventDetailsLink {value} {attributes} type={linkType} />
 {:else}
   {value}
 {/if}

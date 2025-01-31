@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
 
   import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
@@ -13,15 +14,8 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
 
-  import {
-    DetailsChildTimelineHeight,
-    DetailsConfig,
-    getStatusColor,
-    mergeEventGroupDetails,
-    staticCodeBlockHeight,
-  } from '../constants';
+  import { getStatusColor, mergeEventGroupDetails } from '../constants';
 
-  import Box from './box.svelte';
   import GraphWidget from './graph-widget.svelte';
   import GroupDetailsText from './group-details-text.svelte';
 
@@ -31,36 +25,12 @@
   export let y: number;
 
   let innerContent;
+  $: contentHeight = innerContent?.clientHeight;
 
   $: status =
     group?.finalClassification || group?.classification || group?.label;
-
-  $: {
-    if (group?.pendingActivity) {
-      if (group.pendingActivity.attempt > 1) {
-        status = 'Retrying';
-      } else {
-        status = 'Pending';
-      }
-    }
-  }
-
-  const { fontSizeRatio, height } = DetailsConfig;
   $: ({ namespace } = $page.params);
-
   $: width = canvasWidth;
-  $: isWide = width >= 960;
-
-  $: textStartingY = height + y + fontSizeRatio;
-  $: textHeight =
-    fontSizeRatio * textAttributes.length * (isWide ? 1 : 2) + fontSizeRatio;
-
-  $: childTimelineWidth = isWide ? 0.666 * width : 0.5 * width;
-  $: childTimelineHeight = Math.max(
-    DetailsChildTimelineHeight,
-    staticCodeBlockHeight * codeBlockAttributes.length - textHeight,
-  );
-
   $: title = group.displayName;
   $: attributes = mergeEventGroupDetails(group);
   $: codeBlockAttributes = Object.entries(attributes).filter(
@@ -72,55 +42,59 @@
 
   $: childWorkflowStartedEvent =
     group && group.eventList.find(isChildWorkflowExecutionStartedEvent);
+
+  $: duration = formatDistanceAbbreviated({
+    start: group?.initialEvent?.eventTime,
+    end: group?.lastEvent?.eventTime,
+    includeMilliseconds: true,
+  });
+
+  $: {
+    if (group?.pendingActivity) {
+      if (group.pendingActivity.attempt > 1) {
+        status = 'Retrying';
+      } else {
+        status = 'Pending';
+      }
+    }
+  }
 </script>
 
-<g role="button" tabindex="0" class="relative z-50 cursor-pointer">
-  <Box
-    point={[x, y]}
-    {width}
-    height={innerContent?.clientHeight + height + 2 * fontSizeRatio}
-    fill="#465A78"
-  />
-  <Box point={[x, y]} {width} {height} fill="#1E293B" />
-  <foreignObject {x} {y} {width} height={fontSizeRatio}>
-    <div class="flex h-full items-center justify-between text-sm text-white">
-      <div class="flex h-full items-center gap-2">
-        <div
-          class="px-4 py-1 text-black"
-          style="background-color: {getStatusColor(status)};"
-        >
-          {status ? spaceBetweenCapitalLetters(status) : group.label}
+<g role="button" tabindex="0" class="relative z-50">
+  <foreignObject {x} {y} {width} height={contentHeight}>
+    <div bind:this={innerContent} class="flex flex-col">
+      <div
+        class="relative flex h-full items-center justify-between bg-slate-200 text-sm dark:bg-slate-800"
+      >
+        <div class="flex h-full items-center gap-4">
+          <div
+            class="px-4 py-1.5 text-black"
+            style="background-color: {getStatusColor(status)};"
+          >
+            {status ? spaceBetweenCapitalLetters(status) : group.label}
+          </div>
+          {title}
+          {#if duration}
+            <div class="flex items-center gap-1">
+              <Icon name="clock" />
+              {duration}
+            </div>
+          {/if}
         </div>
-        {title}
+        <div class="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="xs"
+            on:click={() => setActiveGroup(group)}
+            >{translate('common.close')} <Icon name="close" /></Button
+          >
+        </div>
       </div>
-      <div class="flex items-center gap-4">
-        {formatDistanceAbbreviated({
-          start: group?.initialEvent?.eventTime,
-          end: group?.lastEvent?.eventTime,
-          includeMilliseconds: true,
-        })}
-        <button
-          class="flex items-center gap-0.5 rounded-t bg-white px-2 text-sm text-black"
-          on:click|stopPropagation={() => setActiveGroup(group)}
-        >
-          {translate('common.close')}<Icon name="close" />
-        </button>
-      </div>
-    </div>
-  </foreignObject>
-  <foreignObject
-    {x}
-    y={textStartingY}
-    {width}
-    height={innerContent?.clientHeight}
-    class="px-4 text-white"
-  >
-    <div bind:this={innerContent} class="flex flex-col gap-4">
-      <div class="flex flex-col gap-4 xl:flex-row">
+      <div class="surface-primary flex flex-col gap-4 p-4 xl:flex-row">
         <div class="flex w-full flex-col gap-2 xl:w-1/2">
           {#each codeBlockAttributes as [key, value] (key)}
             <div>
-              <div class="font-medium leading-4 text-slate-100">
+              <div class="font-medium leading-4 text-subtle">
                 {format(key)}
               </div>
               <GroupDetailsText {key} {value} {attributes} />
@@ -128,28 +102,29 @@
           {/each}
         </div>
         <div class="w-full xl:w-1/2">
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-2 gap-3">
             {#if group.userMetadata?.summary}
-              <div>
-                <div class="font-medium leading-3 text-purple-200">
-                  {translate('common.summary')}
-                </div>
-                <div class="text-wrap break-all leading-4">
-                  <MetadataDecoder
-                    value={group?.userMetadata?.summary}
-                    fallback={group?.displayName}
-                    let:decodedValue
-                  >
-                    {#key decodedValue}
-                      {decodedValue}
-                    {/key}
-                  </MetadataDecoder>
-                </div>
-              </div>
+              <MetadataDecoder
+                value={group?.userMetadata?.summary}
+                let:decodedValue
+              >
+                {#if decodedValue}
+                  <div>
+                    <div class="font-medium leading-3 text-brand">
+                      {translate('common.summary')}
+                    </div>
+                    <div class="text-wrap break-all leading-4">
+                      {#key decodedValue}
+                        {decodedValue}
+                      {/key}
+                    </div>
+                  </div>
+                {/if}
+              </MetadataDecoder>
             {/if}
             {#each textAttributes as [key, value] (key)}
               <div>
-                <div class="font-medium leading-3 text-slate-100">
+                <div class="font-medium leading-3 text-subtle">
                   {format(key)}
                 </div>
                 <div class="text-wrap break-all leading-4">
@@ -161,8 +136,8 @@
         </div>
       </div>
       {#if childWorkflowStartedEvent}
-        <div>
-          <div class="font-medium leading-4 text-slate-100">Child Workflow</div>
+        <div class="surface-primary px-4">
+          <div class="font-medium leading-4 text-subtle">Child Workflow</div>
           {#key group.eventList.length}
             <GraphWidget
               {namespace}
@@ -170,9 +145,8 @@
                 .workflowId}
               runId={childWorkflowStartedEvent.attributes.workflowExecution
                 .runId}
-              height={childTimelineHeight}
-              width={childTimelineWidth}
-              class="overflow-x-hidden rounded-br rounded-tr border-y border-r border-subtle bg-primary"
+              height={200}
+              class="surface-primary overflow-x-hidden border border-subtle"
             />
           {/key}
         </div>
