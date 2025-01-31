@@ -9,7 +9,6 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
-  import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import {
     fetchAllEvents,
     throttleRefresh,
@@ -101,13 +100,6 @@
 
     $workflowRun = { ...$workflowRun, workflow, workers };
 
-    workflow.pendingActivities = await toDecodedPendingActivities(
-      workflow,
-      namespace,
-      settings,
-      $authUser?.accessToken,
-    );
-
     workflowRunController = new AbortController();
     getWorkflowMetadata(
       {
@@ -136,8 +128,6 @@
 
   const getOnlyWorkflowWithPendingActivities = async (refresh: number) => {
     if (refresh && $workflowRun?.workflow?.isRunning) {
-      const { settings } = $page.data;
-
       const { workflow, error } = await fetchWorkflow({
         namespace,
         workflowId,
@@ -149,12 +139,6 @@
         return;
       }
       $workflowRun.workflow = workflow;
-      workflow.pendingActivities = await toDecodedPendingActivities(
-        workflow,
-        namespace,
-        settings,
-        $authUser?.accessToken,
-      );
     }
   };
 
