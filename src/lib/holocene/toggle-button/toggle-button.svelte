@@ -1,3 +1,30 @@
+<script lang="ts" module>
+  export type BaseProps = {
+    icon?: IconName;
+    group?: boolean;
+    active?: boolean;
+    'data-testid'?: string;
+    tooltip?: string;
+    disabled?: boolean;
+    href?: string | undefined;
+    base?: string | undefined;
+  };
+
+  export type AnchorProps = BaseProps &
+    HTMLAnchorAttributes & {
+      href: string;
+      base?: string;
+    };
+
+  export type ButtonProps = BaseProps &
+    HTMLButtonAttributes & {
+      href?: never;
+      base?: never;
+    };
+
+  export type Props = AnchorProps | ButtonProps;
+</script>
+
 <script lang="ts">
   import type {
     HTMLAnchorAttributes,
@@ -13,29 +40,6 @@
   import { getAppContext } from '$lib/utilities/get-context';
 
   import Tooltip from '../tooltip.svelte';
-
-  type BaseProps = {
-    icon?: IconName;
-    group?: boolean;
-    active?: boolean;
-    'data-testid'?: string;
-    tooltip?: string;
-    disabled?: boolean;
-  };
-
-  type AnchorProps = BaseProps &
-    HTMLAnchorAttributes & {
-      href: string;
-      base?: string;
-    };
-
-  type ButtonProps = BaseProps &
-    HTMLButtonAttributes & {
-      href?: never;
-      base?: never;
-    };
-
-  type Props = AnchorProps | ButtonProps;
 
   let {
     class: className = '',

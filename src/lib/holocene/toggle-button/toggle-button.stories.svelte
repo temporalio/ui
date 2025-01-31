@@ -5,13 +5,14 @@
     setTemplate,
   } from '@storybook/addon-svelte-csf';
   import { expect, userEvent, within } from '@storybook/test';
+  import type { Component } from 'svelte';
 
   import { iconNames } from '$lib/holocene/icon';
 
-  import ToggleButton from './toggle-button.svelte';
+  import ToggleButton, { type BaseProps } from './toggle-button.svelte';
   import ToggleButtons from './toggle-buttons.svelte';
 
-  const { Story } = defineMeta({
+  const { Story } = defineMeta<Component<BaseProps>>({
     title: 'Toggle Button',
     component: ToggleButton,
     argTypes: {
@@ -77,6 +78,7 @@
         data-testid={`toggle-button-${index}`}
         active={$selected === index}
         onclick={() => select(index)}
+        href={undefined}
       >
         {name}
       </ToggleButton>
