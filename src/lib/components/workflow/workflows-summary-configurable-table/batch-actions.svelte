@@ -27,6 +27,7 @@
     allSelected,
     handleSelectAll,
     cancelableWorkflows,
+    terminableWorkflows,
     openBatchCancelConfirmationModal,
     openBatchTerminateConfirmationModal,
     openBatchResetConfirmationModal,
@@ -116,6 +117,7 @@
       variant="destructive"
       class="focus-visible:border-table"
       data-testid="bulk-terminate-button"
+      disabled={!$terminableWorkflows.length}
       on:click={openBatchTerminateConfirmationModal}
       >{translate('workflows.terminate')}</Button
     >
