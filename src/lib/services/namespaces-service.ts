@@ -1,5 +1,5 @@
+import { toaster } from '$lib/holocene/toaster/toaster.svelte';
 import { namespaces } from '$lib/stores/namespaces';
-import { toaster } from '$lib/stores/toaster';
 import type {
   DescribeNamespaceResponse,
   ListNamespacesResponse,

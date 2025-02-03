@@ -12,14 +12,13 @@
   import Banner from '$lib/holocene/banner/banner.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
-  import Toaster from '$lib/holocene/toaster.svelte';
+  import Toaster from '$lib/holocene/toaster/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
   import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import { clearAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
-  import { toaster } from '$lib/stores/toaster';
   import type { NavLinkListItem } from '$lib/types/global';
   import DarkMode from '$lib/utilities/dark-mode';
   import {
@@ -189,11 +188,7 @@
 <SkipNavigation />
 
 <div class="flex w-screen flex-row">
-  <Toaster
-    closeButtonLabel={translate('common.close')}
-    pop={toaster.pop}
-    toasts={toaster.toasts}
-  />
+  <Toaster closeButtonLabel={translate('common.close')} />
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
     <SideNavigation {linkList} {isCloud} />
   </div>

@@ -3,9 +3,9 @@
 
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
+  import { toaster } from '$lib/holocene/toaster/toaster.svelte';
   import { translate } from '$lib/i18n/translate';
   import { terminateWorkflow } from '$lib/services/workflow-service';
-  import { toaster } from '$lib/stores/toaster';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 

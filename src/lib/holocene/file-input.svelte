@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { toaster } from '$lib/holocene/toaster/toaster.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { toaster } from '$lib/stores/toaster';
 
   interface Props {
     id: string;

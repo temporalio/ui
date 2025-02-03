@@ -15,9 +15,9 @@
   import Modal from '$lib/holocene/modal.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
+  import { toaster } from '$lib/holocene/toaster/toaster.svelte';
   import { translate } from '$lib/i18n/translate';
   import { updateWorkflow } from '$lib/services/workflow-service';
-  import { toaster } from '$lib/stores/toaster';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isNetworkError } from '$lib/utilities/is-network-error';

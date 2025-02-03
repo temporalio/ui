@@ -7,6 +7,7 @@
   import Modal from '$lib/holocene/modal.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
+  import { toaster } from '$lib/holocene/toaster/toaster.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { Action } from '$lib/models/workflow-actions';
@@ -16,7 +17,6 @@
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { batchResetWorkflows } from '$lib/services/batch-service';
   import { authUser } from '$lib/stores/auth-user';
-  import { toaster } from '$lib/stores/toaster';
   import { workflowsQuery } from '$lib/stores/workflows';
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { getPlacholder } from '$lib/utilities/workflow-actions';

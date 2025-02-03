@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 
 import { BROWSER } from 'esm-env';
 
-import { toaster } from '$lib/stores/toaster';
+import { toaster } from '$lib/holocene/toaster/toaster.svelte';
 import type { NetworkError } from '$lib/types/global';
 
 import { has } from './has';

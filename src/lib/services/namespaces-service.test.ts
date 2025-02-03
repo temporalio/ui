@@ -1,10 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchNamespaces } from './namespaces-service';
+import { toaster } from '../../lib/holocene/toaster/toaster.svelte';
 import { namespaces } from '../stores/namespaces';
-import { toaster } from '../stores/toaster';
 
-vi.mock('../stores/toaster', () => ({ toaster: { push: vi.fn() } }));
+vi.mock('.../../lib/holocene/toaster/toaster.svelte', () => ({
+  toaster: { push: vi.fn() },
+}));
 vi.mock('../stores/namespaces', () => ({ namespaces: { set: vi.fn() } }));
 
 const createSuccessfulRequest = () =>

@@ -3,12 +3,12 @@
 
   import Button from '$lib/holocene/button.svelte';
   import Label from '$lib/holocene/label.svelte';
+  import { toaster } from '$lib/holocene/toaster/toaster.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import { toEventHistory } from '$lib/models/event-history';
   import { importEventGroups, importEvents } from '$lib/stores/import-events';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { toaster } from '$lib/stores/toaster';
   import type { HistoryEvent } from '$lib/types/events';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { routeForEventHistoryImport } from '$lib/utilities/route-for';

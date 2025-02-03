@@ -18,6 +18,7 @@
   import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Editor from '$lib/holocene/monaco/editor.svelte';
+  import { toaster } from '$lib/holocene/toaster/toaster.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getPollers } from '$lib/services/pollers-service';
@@ -29,7 +30,6 @@
     customSearchAttributes,
     type SearchAttributeInput,
   } from '$lib/stores/search-attributes';
-  import { toaster } from '$lib/stores/toaster';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { pluralize } from '$lib/utilities/pluralize';
   import {

@@ -3,20 +3,14 @@
     type Args,
     defineMeta,
     setTemplate,
-    type StoryContext,
   } from '@storybook/addon-svelte-csf';
 
-  import type { Toast as ToastProps } from '$lib/types/holocene';
+  import Button from '../button.svelte';
 
-  import { toaster } from '../stores/toaster';
-
-  import Button from './button.svelte';
-  import Toast from './toast.svelte';
-  import Toaster from './toaster.svelte';
+  import Toaster, { toaster } from './toaster.svelte';
 
   const { Story } = defineMeta({
     title: 'Toaster',
-    component: Toaster,
     args: {
       closeButtonLabel: 'Close',
       duration: 2000,
@@ -41,7 +35,10 @@
       closeButtonLabel: {
         name: 'Close Button Label',
         control: 'text',
-        table: { category: 'Accessibility' },
+      },
+      link: {
+        name: 'Link',
+        control: 'text',
       },
     },
   });
@@ -51,24 +48,14 @@
   setTemplate(template);
 </script>
 
-{#snippet template(
-  args: Args<typeof Story> & ToastProps,
-  context: StoryContext<typeof Story>,
-)}
-  {@const { duration, message, variant, closeButtonLabel } = args}
+{#snippet template(args: Args<typeof Story>)}
+  {@const { duration, message, variant, link } = args}
   <div class="flex max-w-60 flex-col gap-2">
-    <Toast id={context.id} {variant} {closeButtonLabel}>{message}</Toast>
-
-    <Button onclick={() => toaster.push({ duration, message, variant })}>
+    <Button onclick={() => toaster.push({ duration, message, variant, link })}>
       <span class="capitalize">Trigger {variant} toast</span>
     </Button>
 
-    <Toaster
-      {closeButtonLabel}
-      {...args}
-      pop={toaster.pop}
-      toasts={toaster.toasts}
-    />
+    <Toaster closeButtonLabel="Close" />
   </div>
 {/snippet}
 

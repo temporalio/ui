@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { toaster } from './toaster';
+import { toaster } from './toaster.svelte';
 
 describe('toaster', () => {
   afterEach(() => {
