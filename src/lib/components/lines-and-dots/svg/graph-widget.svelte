@@ -18,7 +18,6 @@
       fetchWorkflow({ namespace, workflowId, runId }),
       fetchAllEvents({ namespace, workflowId, runId }),
     ]);
-    onLoad();
     return { workflow: workflow.workflow, history };
   };
 
@@ -26,6 +25,7 @@
     workflow: WorkflowExecution,
     history: WorkflowEvents,
   ) => {
+    onLoad();
     const pendingActivities = workflow?.pendingActivities ?? [];
     return groupEvents(history, 'ascending', pendingActivities);
   };
