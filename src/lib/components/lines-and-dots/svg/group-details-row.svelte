@@ -4,19 +4,17 @@
   import { page } from '$app/stores';
 
   import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { activeGroupHeight, setActiveGroup } from '$lib/stores/active-events';
-  import {
-    format,
-    spaceBetweenCapitalLetters,
-  } from '$lib/utilities/format-camel-case';
+  import { format } from '$lib/utilities/format-camel-case';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
 
-  import { getStatusColor, mergeEventGroupDetails } from '../constants';
+  import { mergeEventGroupDetails } from '../constants';
 
   import GraphWidget from './graph-widget.svelte';
   import GroupDetailsText from './group-details-text.svelte';
@@ -35,8 +33,7 @@
 
   $: setActiveGroupHeight(contentHeight || 0);
 
-  $: status =
-    group?.finalClassification || group?.classification || group?.label;
+  $: status = group?.finalClassification || group?.classification;
   $: ({ namespace } = $page.params);
   $: width = canvasWidth;
   $: title = group.displayName;
@@ -60,9 +57,9 @@
   $: {
     if (group?.pendingActivity) {
       if (group.pendingActivity.attempt > 1) {
-        status = 'Retrying';
+        status = translate('events.event-classification.retrying');
       } else {
-        status = 'Pending';
+        status = translate('events.event-classification.pending');
       }
     }
   }
@@ -77,15 +74,12 @@
   <foreignObject {x} {y} {width} height={contentHeight}>
     <div bind:this={innerContent} class="flex flex-col border-b border-subtle">
       <div
-        class="relative flex h-full items-center justify-between bg-slate-200 text-sm dark:bg-slate-800"
+        class="relative flex h-full items-center justify-between bg-slate-50 text-sm dark:bg-slate-800"
       >
-        <div class="flex h-full items-center gap-4">
-          <div
-            class="px-4 py-1.5 text-black"
-            style="background-color: {getStatusColor(status)};"
-          >
-            {status ? spaceBetweenCapitalLetters(status) : group.label}
-          </div>
+        <div class="flex h-full items-center gap-4 px-2">
+          {#if status}
+            <WorkflowStatus {status} />
+          {/if}
           {title}
           {#if duration}
             <div class="flex items-center gap-1">

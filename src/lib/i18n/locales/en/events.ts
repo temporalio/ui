@@ -82,6 +82,8 @@ export const Strings = {
     canceled: 'Canceled',
     failed: 'Failed',
     terminated: 'Terminated',
+    pending: 'Pending',
+    retrying: 'Retrying',
   },
   'decode-event-history': 'Decode Event History',
   encoded: 'Encoded',
