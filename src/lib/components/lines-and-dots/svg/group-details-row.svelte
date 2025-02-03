@@ -149,8 +149,9 @@
                 .workflowId}
               runId={childWorkflowStartedEvent.attributes.workflowExecution
                 .runId}
-              height={200}
+              viewportHeight={200}
               class="surface-primary overflow-x-hidden border border-subtle"
+              onLoad={onDecode}
             />
           {/key}
         </div>

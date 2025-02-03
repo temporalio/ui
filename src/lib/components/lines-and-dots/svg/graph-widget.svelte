@@ -10,7 +10,8 @@
   export let namespace: string;
   export let workflowId: string;
   export let runId = '';
-  export let height = 400;
+  export let viewportHeight = 360;
+  export let onLoad: () => void = () => {};
 
   const getWorkflowAndEventHistory = async () => {
     const [workflow, history] = await Promise.all([
@@ -25,16 +26,15 @@
     history: WorkflowEvents,
   ) => {
     const pendingActivities = workflow?.pendingActivities ?? [];
+    onLoad();
     return groupEvents(history, 'ascending', pendingActivities);
   };
 </script>
 
 {#await getWorkflowAndEventHistory() then { workflow, history }}
-  <div
-    class="cursor-pointer overflow-auto {$$restProps.class}"
-    style="height: {height}px;"
-  >
+  <div class="cursor-pointer overflow-auto {$$restProps.class}">
     <TimelineGraph
+      {viewportHeight}
       {workflow}
       groups={createGroups(workflow, history)}
       readOnly

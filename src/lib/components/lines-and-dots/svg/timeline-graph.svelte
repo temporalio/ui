@@ -28,6 +28,7 @@
   export let y = 0;
   export let workflow: WorkflowExecution;
   export let groups: EventGroups;
+  export let viewportHeight = 360;
   export let readOnly = false;
   export let workflowTaskFailedError: WorkflowTaskFailedEvent | undefined =
     undefined;
@@ -35,13 +36,13 @@
   const { height, gutter, radius } = TimelineConfig;
 
   let canvasWidth = 0;
-  let viewportHeight = 360;
   let scrollY = 0;
 
+  $: expandedGroupHeight = readOnly ? 0 : $activeGroupHeight;
   $: filteredGroups = getFailedOrPendingGroups(groups, $eventStatusFilter);
   $: startTime = $fullEventHistory[0]?.eventTime || workflow.startTime;
   $: timelineHeight =
-    Math.max(height * (filteredGroups.length + 2), 120) + $activeGroupHeight;
+    Math.max(height * (filteredGroups.length + 2), 120) + expandedGroupHeight;
   $: canvasHeight = timelineHeight + 120;
 
   const onExpandCollapse = () => {
@@ -64,7 +65,7 @@
     });
 
     if (!activeGroupIsAbove?.length) return 0;
-    return $activeGroupHeight;
+    return expandedGroupHeight;
   };
 </script>
 
@@ -75,18 +76,15 @@
   on:scroll={handleScroll}
 >
   <EndTimeInterval {workflow} {startTime} let:endTime let:duration>
-    <Button
-      size="xs"
-      variant="ghost"
-      class="sticky left-0.5 top-1"
-      on:click={onExpandCollapse}
-    >
-      <Icon
-        name={viewportHeight === 360 ? 'chevron-down' : 'chevron-up'}
-        x={canvasWidth - 2 * radius}
-        y={radius}
-      />
-    </Button>
+    <div class="sticky left-0.5 top-1" class:invisible={readOnly}>
+      <Button size="xs" variant="ghost" on:click={onExpandCollapse}>
+        <Icon
+          name={viewportHeight === 360 ? 'chevron-down' : 'chevron-up'}
+          x={canvasWidth - 2 * radius}
+          y={radius}
+        />
+      </Button>
+    </div>
     <div
       class="sticky {timelineHeight < viewportHeight
         ? 'top-[160px]'
