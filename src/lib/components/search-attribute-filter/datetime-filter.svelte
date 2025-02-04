@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { writable, type Writable } from 'svelte/store';
-
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
   import { getContext } from 'svelte';
@@ -18,7 +16,15 @@
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { getTimezone, timeFormat } from '$lib/stores/time-format';
+  import {
+    endDate,
+    getTimezone,
+    relativeTimeDuration,
+    relativeTimeUnit,
+    startDate,
+    timeFormat,
+    timeFormatType,
+  } from '$lib/stores/time-format';
   import { getSelectedTimezone } from '$lib/utilities/format-date';
   import { toDate } from '$lib/utilities/to-duration';
 
@@ -30,9 +36,6 @@
   $: isTimeRange = $filter.conditional === 'BETWEEN';
   $: selectedTime = getSelectedTimezone($timeFormat);
 
-  let startDate = startOfDay(new Date());
-  let endDate = startOfDay(new Date());
-
   let startHour = '';
   let startMinute = '';
   let startSecond = '';
@@ -43,23 +46,21 @@
 
   const TIME_UNIT_OPTIONS = ['minutes', 'hours', 'days'];
 
-  let timeUnit = TIME_UNIT_OPTIONS[0];
-  let relativeTime = '';
-
-  const type: Writable<'relative' | 'absolute'> = writable('relative');
+  let timeUnit = $relativeTimeUnit || TIME_UNIT_OPTIONS[0];
+  let relativeTime = $relativeTimeDuration || '';
 
   $: useBetweenDateTimeQuery = isTimeRange || !$supportsAdvancedVisibility;
   $: disabled =
-    $type === 'relative' &&
+    $timeFormatType === 'relative' &&
     !useBetweenDateTimeQuery &&
     (!relativeTime || error(relativeTime));
 
   const onStartDateChange = (d: CustomEvent) => {
-    startDate = startOfDay(d.detail);
+    $startDate = startOfDay(d.detail);
   };
 
   const onEndDateChange = (d: CustomEvent) => {
-    endDate = startOfDay(d.detail);
+    $endDate = startOfDay(d.detail);
   };
 
   const applyTimeChanges = (
@@ -75,17 +76,19 @@
   };
 
   const onApply = () => {
-    if ($type === 'relative' && !useBetweenDateTimeQuery) {
+    if ($timeFormatType === 'relative' && !useBetweenDateTimeQuery) {
       if (!relativeTime) return;
       $filter.value = toDate(`${relativeTime} ${timeUnit}`);
       $filter.customDate = false;
+      $relativeTimeDuration = relativeTime;
+      $relativeTimeUnit = timeUnit;
     } else {
-      let startDateWithTime = applyTimeChanges(startDate, {
+      let startDateWithTime = applyTimeChanges($startDate, {
         hour: startHour,
         minute: startMinute,
         second: startSecond,
       });
-      let endDateWithTime = applyTimeChanges(endDate, {
+      let endDateWithTime = applyTimeChanges($endDate, {
         hour: endHour,
         minute: endMinute,
         second: endSecond,
@@ -154,7 +157,7 @@
             <DatePicker
               label={translate('common.start')}
               on:datechange={onStartDateChange}
-              selected={startDate}
+              selected={new Date($startDate)}
               todayLabel={translate('common.today')}
               closeLabel={translate('common.close')}
               clearLabel={translate('common.clear-input-button-label')}
@@ -173,7 +176,7 @@
             <DatePicker
               label={translate('common.end')}
               on:datechange={onEndDateChange}
-              selected={endDate}
+              selected={new Date($endDate)}
               todayLabel={translate('common.today')}
               closeLabel={translate('common.close')}
               clearLabel={translate('common.clear-input-button-label')}
@@ -187,14 +190,14 @@
           </div>
         </MenuItem>
       {:else}
-        <MenuItem on:click={() => ($type = 'relative')}>
+        <MenuItem on:click={() => ($timeFormatType = 'relative')}>
           <div class="flex flex-col">
             <RadioInput
               label={translate('common.relative')}
               id="relative-time"
               value="relative"
               name="time-filter-type"
-              group={type}
+              group={timeFormatType}
             />
             <div class="ml-6 flex gap-2 pt-2">
               <Input
@@ -205,14 +208,14 @@
                 placeholder="00"
                 error={error(relativeTime)}
                 class="h-10"
-                disabled={$type !== 'relative'}
+                disabled={$timeFormatType !== 'relative'}
               />
               <Select
                 bind:value={timeUnit}
                 id="relative-datetime-unit-input"
                 label={translate('common.time-unit')}
                 labelHidden
-                disabled={$type !== 'relative'}
+                disabled={$timeFormatType !== 'relative'}
               >
                 {#each TIME_UNIT_OPTIONS as unit}
                   <Option value={unit}>{unit} {translate('common.ago')}</Option>
@@ -222,32 +225,32 @@
           </div>
         </MenuItem>
         <MenuDivider />
-        <MenuItem on:click={() => ($type = 'absolute')}>
+        <MenuItem on:click={() => ($timeFormatType = 'absolute')}>
           <div class="flex flex-col gap-2">
             <RadioInput
               label={translate('common.absolute')}
               id="absolute-time"
               value="absolute"
               name="time-filter-type"
-              group={type}
+              group={timeFormatType}
             />
             <div class="ml-6 flex flex-col gap-2">
               <DatePicker
                 label={''}
                 labelHidden
                 on:datechange={onStartDateChange}
-                selected={startDate}
+                selected={new Date($startDate)}
                 todayLabel={translate('common.today')}
                 closeLabel={translate('common.close')}
                 clearLabel={translate('common.clear-input-button-label')}
-                disabled={$type !== 'absolute'}
+                disabled={$timeFormatType !== 'absolute'}
               />
               <TimePicker
                 bind:hour={startHour}
                 bind:minute={startMinute}
                 bind:second={startSecond}
                 twelveHourClock={false}
-                disabled={$type !== 'absolute'}
+                disabled={$timeFormatType !== 'absolute'}
               />
             </div>
           </div>

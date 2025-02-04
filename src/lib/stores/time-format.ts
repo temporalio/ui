@@ -1,10 +1,22 @@
+import { startOfDay } from 'date-fns';
 import * as dateTz from 'date-fns-tz';
 
 import { persistStore } from '$lib/stores/persist-store';
 import { getLocalTimezone } from '$lib/utilities/format-date';
 
+type TimeFormatTypes = 'relative' | 'absolute';
 export const timeFormat = persistStore('timeFormat', 'UTC' as TimeFormat);
+export const timeFormatType = persistStore(
+  'timeFormatType',
+  'relative' as TimeFormatTypes,
+);
+
 export const relativeTime = persistStore('relativeTime', false);
+export const relativeTimeDuration = persistStore('relativeTimeDuration', '');
+export const relativeTimeUnit = persistStore('relativeTimeUnit', '');
+
+export const startDate = persistStore('startDate', startOfDay(new Date()));
+export const endDate = persistStore('endDate', startOfDay(new Date()));
 
 export type TimeFormat = keyof typeof Timezones | 'UTC' | 'local';
 
