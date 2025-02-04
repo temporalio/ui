@@ -24,8 +24,8 @@
   export let x = 0;
   export let y: number;
 
-  let innerContent;
-  $: contentHeight = innerContent?.offsetHeight || 0;
+  let offsetHeight;
+  $: contentHeight = offsetHeight || 0;
 
   const setActiveGroupHeight = (height) => {
     $activeGroupHeight = height;
@@ -66,13 +66,13 @@
 
   const onDecode = async () => {
     await tick();
-    contentHeight = innerContent?.offsetHeight;
+    contentHeight = offsetHeight;
   };
 </script>
 
 <g role="button" tabindex="0" class="relative z-50">
   <foreignObject {x} {y} {width} height={contentHeight}>
-    <div bind:this={innerContent} class="flex flex-col border-b border-subtle">
+    <div bind:offsetHeight class="flex flex-col border-b border-subtle">
       <div
         class="relative flex h-full items-center justify-between bg-slate-50 text-sm dark:bg-slate-800"
       >
@@ -104,6 +104,7 @@
               <MetadataDecoder
                 value={group?.userMetadata?.summary}
                 let:decodedValue
+                fallback={translate('events.decode-failed')}
                 {onDecode}
               >
                 <div>

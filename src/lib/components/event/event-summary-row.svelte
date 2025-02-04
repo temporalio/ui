@@ -203,14 +203,17 @@
     {#if currentEvent?.userMetadata?.summary}
       <MetadataDecoder
         value={currentEvent.userMetadata.summary}
-        fallback=""
         let:decodedValue
       >
         {#if decodedValue}
-          <p class="whitespace-nowrap text-right text-xs">Summary</p>
-          <Badge type="secondary" class="block select-none truncate">
-            {decodedValue}
-          </Badge>
+          <div
+            class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
+          >
+            <p class="whitespace-nowrap text-right text-xs">Summary</p>
+            <Badge type="secondary" class="block select-none truncate">
+              {decodedValue}
+            </Badge>
+          </div>
         {:else}
           <EventDetailsRow {...primaryAttribute} {attributes} />
         {/if}

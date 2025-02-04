@@ -13,8 +13,6 @@
   export let fallback: string = '';
   export let onDecode: (decodedValue: string) => void | undefined = undefined;
 
-  let decodedValue = fallback;
-
   $: endpoint = getCodecEndpoint($page.data.settings);
   $: passAccessToken = getCodecPassAccessToken($page.data.settings);
   $: includeCredentials = getCodecIncludeCredentials($page.data.settings);
@@ -28,30 +26,29 @@
     },
   };
 
-  const decodePayload = async (_value: Payload | undefined) => {
+  $: decodePayload = async (_value: Payload | undefined) => {
     if (!_value) {
-      return;
+      return fallback;
     }
 
-    try {
-      const metadata = await decodeSingleReadablePayloadWithCodec(
-        _value,
-        settings,
-      );
+    const metadata = await decodeSingleReadablePayloadWithCodec(
+      _value,
+      settings,
+    );
 
-      if (typeof metadata === 'string') {
-        decodedValue = metadata;
-      }
-
+    if (typeof metadata === 'string') {
       if (onDecode) {
-        onDecode(decodedValue);
+        onDecode(metadata);
       }
-    } catch (e) {
-      console.error('Could not decode payloads');
+      return metadata;
     }
-  };
 
-  $: decodePayload(value);
+    return fallback;
+  };
 </script>
 
-<slot {decodedValue} />
+{#await decodePayload(value) then decodedValue}
+  <slot {decodedValue} />
+{:catch}
+  <slot decodedValue={fallback} />
+{/await}

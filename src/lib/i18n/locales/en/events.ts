@@ -92,4 +92,5 @@ export const Strings = {
   readable: 'Human Readable',
   'readable-description': 'Codec Server decoded and base64 decoded',
   'event-types': 'Event Types',
+  'decode-failed': 'Decoding failed',
 } as const;
