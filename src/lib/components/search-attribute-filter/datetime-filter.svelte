@@ -18,10 +18,17 @@
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import {
     endDate,
+    endHour,
+    endMinute,
+    endSecond,
     getTimezone,
     relativeTimeDuration,
     relativeTimeUnit,
     startDate,
+    startHour,
+    startMinute,
+    startSecond,
+    TIME_UNIT_OPTIONS,
     timeFormat,
     timeFormatType,
   } from '$lib/stores/time-format';
@@ -36,31 +43,24 @@
   $: isTimeRange = $filter.conditional === 'BETWEEN';
   $: selectedTime = getSelectedTimezone($timeFormat);
 
-  let startHour = '';
-  let startMinute = '';
-  let startSecond = '';
-
-  let endHour = '';
-  let endMinute = '';
-  let endSecond = '';
-
-  const TIME_UNIT_OPTIONS = ['minutes', 'hours', 'days'];
-
-  let timeUnit = $relativeTimeUnit || TIME_UNIT_OPTIONS[0];
-  let relativeTime = $relativeTimeDuration || '';
-
   $: useBetweenDateTimeQuery = isTimeRange || !$supportsAdvancedVisibility;
   $: disabled =
     $timeFormatType === 'relative' &&
     !useBetweenDateTimeQuery &&
-    (!relativeTime || error(relativeTime));
+    (!$relativeTimeDuration || error($relativeTimeDuration));
 
   const onStartDateChange = (d: CustomEvent) => {
     $startDate = startOfDay(d.detail);
+    $startHour = '';
+    $startMinute = '';
+    $startSecond = '';
   };
 
   const onEndDateChange = (d: CustomEvent) => {
     $endDate = startOfDay(d.detail);
+    $endHour = '';
+    $endMinute = '';
+    $endSecond = '';
   };
 
   const applyTimeChanges = (
@@ -77,21 +77,19 @@
 
   const onApply = () => {
     if ($timeFormatType === 'relative' && !useBetweenDateTimeQuery) {
-      if (!relativeTime) return;
-      $filter.value = toDate(`${relativeTime} ${timeUnit}`);
+      if (!$relativeTimeDuration) return;
+      $filter.value = toDate(`${$relativeTimeDuration} ${$relativeTimeUnit}`);
       $filter.customDate = false;
-      $relativeTimeDuration = relativeTime;
-      $relativeTimeUnit = timeUnit;
     } else {
       let startDateWithTime = applyTimeChanges($startDate, {
-        hour: startHour,
-        minute: startMinute,
-        second: startSecond,
+        hour: $startHour,
+        minute: $startMinute,
+        second: $startSecond,
       });
       let endDateWithTime = applyTimeChanges($endDate, {
-        hour: endHour,
-        minute: endMinute,
-        second: endSecond,
+        hour: $endHour,
+        minute: $endMinute,
+        second: $endSecond,
       });
 
       const timezone = getTimezone($timeFormat);
@@ -163,9 +161,9 @@
               clearLabel={translate('common.clear-input-button-label')}
             />
             <TimePicker
-              bind:hour={startHour}
-              bind:minute={startMinute}
-              bind:second={startSecond}
+              bind:hour={$startHour}
+              bind:minute={$startMinute}
+              bind:second={$startSecond}
               twelveHourClock={false}
             />
           </div>
@@ -182,9 +180,9 @@
               clearLabel={translate('common.clear-input-button-label')}
             />
             <TimePicker
-              bind:hour={endHour}
-              bind:minute={endMinute}
-              bind:second={endSecond}
+              bind:hour={$endHour}
+              bind:minute={$endMinute}
+              bind:second={$endSecond}
               twelveHourClock={false}
             />
           </div>
@@ -204,14 +202,14 @@
                 label={translate('common.relative')}
                 labelHidden
                 id="relative-datetime-input"
-                bind:value={relativeTime}
+                bind:value={$relativeTimeDuration}
                 placeholder="00"
-                error={error(relativeTime)}
+                error={error($relativeTimeDuration)}
                 class="h-10"
                 disabled={$timeFormatType !== 'relative'}
               />
               <Select
-                bind:value={timeUnit}
+                bind:value={$relativeTimeUnit}
                 id="relative-datetime-unit-input"
                 label={translate('common.time-unit')}
                 labelHidden
@@ -246,9 +244,9 @@
                 disabled={$timeFormatType !== 'absolute'}
               />
               <TimePicker
-                bind:hour={startHour}
-                bind:minute={startMinute}
-                bind:second={startSecond}
+                bind:hour={$startHour}
+                bind:minute={$startMinute}
+                bind:second={$startSecond}
                 twelveHourClock={false}
                 disabled={$timeFormatType !== 'absolute'}
               />

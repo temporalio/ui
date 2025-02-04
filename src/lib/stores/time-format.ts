@@ -5,6 +5,9 @@ import { persistStore } from '$lib/stores/persist-store';
 import { getLocalTimezone } from '$lib/utilities/format-date';
 
 type TimeFormatTypes = 'relative' | 'absolute';
+
+export const TIME_UNIT_OPTIONS = ['minutes', 'hours', 'days'];
+
 export const timeFormat = persistStore('timeFormat', 'UTC' as TimeFormat);
 export const timeFormatType = persistStore(
   'timeFormatType',
@@ -13,10 +16,20 @@ export const timeFormatType = persistStore(
 
 export const relativeTime = persistStore('relativeTime', false);
 export const relativeTimeDuration = persistStore('relativeTimeDuration', '');
-export const relativeTimeUnit = persistStore('relativeTimeUnit', '');
+export const relativeTimeUnit = persistStore(
+  'relativeTimeUnit',
+  TIME_UNIT_OPTIONS[0],
+);
 
 export const startDate = persistStore('startDate', startOfDay(new Date()));
+export const startHour = persistStore('startHour', '');
+export const startMinute = persistStore('startMinute', '');
+export const startSecond = persistStore('startSecond', '');
+
 export const endDate = persistStore('endDate', startOfDay(new Date()));
+export const endHour = persistStore('endHour', '');
+export const endMinute = persistStore('endMinute', '');
+export const endSecond = persistStore('endSecond', '');
 
 export type TimeFormat = keyof typeof Timezones | 'UTC' | 'local';
 
