@@ -26,11 +26,11 @@
 
   import { setContext } from 'svelte';
 
+  import type { ButtonStyles } from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
-  import type { MenuButtonVariant } from '$lib/holocene/menu/menu-button.svelte';
 
   type T = $$Generic;
 
@@ -45,7 +45,7 @@
     onChange?: (value: T) => void;
     'data-testid'?: string;
     menuClass?: string;
-    variant?: MenuButtonVariant;
+    variant?: ButtonStyles['variant'];
     required?: boolean;
   };
 
@@ -58,7 +58,7 @@
   export let leadingIcon: IconName = null;
   export let onChange: (value: T) => void = noop;
   export let menuClass: string | undefined = undefined;
-  export let variant: MenuButtonVariant = 'secondary';
+  export let variant: ButtonStyles['variant'] = 'secondary';
   export let required = false;
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value

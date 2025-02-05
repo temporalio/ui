@@ -10,9 +10,9 @@
     MenuItem,
   } from '$lib/holocene/menu';
 
+  import type { ButtonStyles } from '../button.svelte';
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
-  import type { MenuButtonVariant } from '../menu/menu-button.svelte';
 
   type Option = { label: string; value: string; icon?: IconName };
   type MultiSelectOptions = Option[];
@@ -22,7 +22,7 @@
   export let onChange: (options: MultiSelectOptions) => void;
   export let label: string;
   export let id: string;
-  export let variant: MenuButtonVariant = 'secondary';
+  export let variant: ButtonStyles['variant'] = 'secondary';
   export let icon: IconName | undefined = undefined;
   export let selectAllLabel: string;
   export let clearAllLabel: string;
