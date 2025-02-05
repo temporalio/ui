@@ -186,15 +186,13 @@
 </Story>
 
 <Story
-  name="With Multiselect and Action"
+  name="With Action"
   let:args
   let:context
   play={async ({ canvasElement, id }) => {
     const canvas = within(canvasElement);
     const combobox = canvas.getByTestId(id);
-    await userEvent.type(combobox, 'A');
-    const selectAll = canvas.getByText('Select All');
-    await userEvent.click(selectAll);
+    await userEvent.type(combobox, 'E');
   }}
 >
   <div class="w-64">
@@ -203,7 +201,6 @@
       data-testid={context.id}
       on:change={action('change')}
       on:filter={action('filter')}
-      multiselect
       leadingIcon="search"
       options={[
         'English',
