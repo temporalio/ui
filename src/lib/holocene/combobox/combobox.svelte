@@ -436,7 +436,7 @@
       />
     </div>
     {#if $$slots.action}
-      <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
+      <div class="ml-1 flex h-full items-start border-l border-subtle p-0.5">
         {#if actionTooltip}
           <Tooltip text={actionTooltip} right>
             <slot name="action" />
