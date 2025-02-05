@@ -4,6 +4,7 @@
 
   import { page } from '$app/stores';
 
+  import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -35,6 +36,7 @@
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
   import EventLink from './event-link.svelte';
+  import MetadataDecoder from './metadata-decoder.svelte';
 
   export let event: IterableEvent;
   export let group: EventGroup | undefined = undefined;
@@ -198,15 +200,33 @@
         {/if}
       </div>
     {/if}
+    {#if currentEvent?.userMetadata?.summary}
+      <MetadataDecoder
+        value={currentEvent.userMetadata.summary}
+        let:decodedValue
+      >
+        {#if decodedValue}
+          <div
+            class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
+          >
+            <p class="whitespace-nowrap text-right text-xs">Summary</p>
+            <Badge type="secondary" class="block select-none truncate">
+              {decodedValue}
+            </Badge>
+          </div>
+        {:else}
+          <EventDetailsRow {...primaryAttribute} {attributes} />
+        {/if}
+      </MetadataDecoder>
+    {:else if primaryAttribute?.key}
+      <EventDetailsRow {...primaryAttribute} {attributes} />
+    {/if}
     {#if currentEvent?.links?.length}
       <EventLink
         link={currentEvent.links[0]}
         class="max-w-xl"
         linkClass="truncate"
       />
-    {/if}
-    {#if primaryAttribute?.key}
-      <EventDetailsRow {...primaryAttribute} {attributes} />
     {/if}
     {#if nonPendingActivityAttempt}
       <EventDetailsRow

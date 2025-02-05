@@ -9,7 +9,7 @@
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
-  import { activeGroups, clearActives } from '$lib/stores/active-events';
+  import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import {
     currentEventHistory,
@@ -82,12 +82,7 @@
 </div>
 <div class="px-2 pb-24 md:px-4 lg:px-8">
   <div class="flex w-full flex-col border border-subtle">
-    <TimelineGraph
-      {workflow}
-      {groups}
-      activeGroups={$activeGroups}
-      {workflowTaskFailedError}
-    />
+    <TimelineGraph {workflow} {groups} {workflowTaskFailedError} />
     <EventSummary {groups} {history} />
   </div>
 </div>

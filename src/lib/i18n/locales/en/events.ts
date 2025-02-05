@@ -82,6 +82,8 @@ export const Strings = {
     canceled: 'Canceled',
     failed: 'Failed',
     terminated: 'Terminated',
+    pending: 'Pending',
+    retrying: 'Retrying',
   },
   'decode-event-history': 'Decode Event History',
   encoded: 'Encoded',
@@ -90,4 +92,5 @@ export const Strings = {
   readable: 'Human Readable',
   'readable-description': 'Codec Server decoded and base64 decoded',
   'event-types': 'Event Types',
+  'decode-failed': 'Decoding failed',
 } as const;

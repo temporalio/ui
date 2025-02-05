@@ -12,7 +12,12 @@
 
   import HeartBeat from './heart-beat-indicator.svelte';
 
-  type Status = WorkflowStatus | ScheduleStatus | EventClassification;
+  type Status =
+    | WorkflowStatus
+    | ScheduleStatus
+    | EventClassification
+    | 'Pending'
+    | 'Retrying';
 
   export let delay = 0;
   export let status: Status = 'Running';
@@ -39,6 +44,8 @@
     Fired: translate('events.event-classification.fired'),
     CancelRequested: translate('events.event-classification.cancelrequested'),
     Signaled: translate('events.event-classification.signaled'),
+    Pending: translate('events.event-classification.pending'),
+    Retrying: translate('events.event-classification.retrying'),
   };
 
   const workflowStatus = cva(
@@ -63,6 +70,8 @@
           Fired: 'bg-pink-200',
           CancelRequested: 'bg-yellow-200',
           Signaled: 'bg-pink-200',
+          Pending: 'bg-purple-200',
+          Retrying: 'bg-red-200',
         },
       },
     },
