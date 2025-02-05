@@ -13,6 +13,8 @@
   export let fallback: string = '';
   export let onDecode: (decodedValue: string) => void | undefined = undefined;
 
+  let decodedValue = '';
+
   $: endpoint = getCodecEndpoint($page.data.settings);
   $: passAccessToken = getCodecPassAccessToken($page.data.settings);
   $: includeCredentials = getCodecIncludeCredentials($page.data.settings);
@@ -27,9 +29,8 @@
   };
 
   $: decodePayload = async (_value: Payload | undefined) => {
-    if (!_value) {
-      return fallback;
-    }
+    if (!_value) return fallback;
+    if (decodedValue) return decodedValue;
 
     const metadata = await decodeSingleReadablePayloadWithCodec(
       _value,
@@ -40,6 +41,7 @@
       if (onDecode) {
         onDecode(metadata);
       }
+      decodedValue = metadata;
       return metadata;
     }
 
@@ -47,8 +49,8 @@
   };
 </script>
 
-{#await decodePayload(value) then decodedValue}
-  <slot {decodedValue} />
+{#await decodePayload(value) then metadata}
+  <slot decodedValue={metadata} />
 {:catch}
   <slot decodedValue={fallback} />
 {/await}
