@@ -45,6 +45,7 @@
       return metadata;
     }
 
+    decodedValue = fallback;
     return fallback;
   };
 </script>
