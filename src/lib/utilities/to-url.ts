@@ -5,7 +5,7 @@ export const toURL = (
 ): string => {
   const isURLSearchParams = params instanceof URLSearchParams;
   if (params && !isURLSearchParams) params = new URLSearchParams(params);
-  if (params) return `${url}?${params}`;
-  if (hash) return `${url}#${hash}`;
+  if (params) url = `${url}?${params}`;
+  if (hash) url = `${url}#${hash}`;
   return url;
 };
