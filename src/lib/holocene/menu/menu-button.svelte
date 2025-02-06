@@ -3,6 +3,7 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
+  import type { ButtonStyles } from '$lib/holocene/button.svelte';
   import Button, {
     type ButtonWithoutHrefProps,
   } from '$lib/holocene/button.svelte';
@@ -30,6 +31,7 @@
   export let hasIndicator = false;
   export let id: string = null;
   export let label: string = null;
+  export let variant: ButtonStyles['variant'] = 'secondary';
 
   const dispatch = createEventDispatcher<{ click: { open: boolean } }>();
   const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);
@@ -85,6 +87,7 @@
   aria-controls={controls}
   aria-expanded={$open}
   aria-label={label}
+  {variant}
   class={merge(className)}
   {...$$restProps}
 >
