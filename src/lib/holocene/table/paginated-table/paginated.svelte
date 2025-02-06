@@ -33,7 +33,8 @@
   $: url = $page.url;
   $: perPageParam = url.searchParams.get(perPageKey) ?? pageSizeOptions[0];
   $: currentPageParam = url.searchParams.get(currentPageKey) ?? '1';
-  $: store = pagination(items, perPageParam, currentPageParam);
+  $: hash = $page.url.hash;
+  $: store = pagination(items, perPageParam, currentPageParam, hash);
 
   // keep the 'page-size' url search param within the supported options
   $: {
@@ -84,7 +85,7 @@
   };
 
   $: {
-    if (currentPageParam) store.jumpToPage(currentPageParam);
+    if (currentPageParam && !hash) store.jumpToPage(currentPageParam);
     if (perPageParam) store.adjustPageSize(perPageParam);
   }
 </script>

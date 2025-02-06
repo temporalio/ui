@@ -151,6 +151,12 @@ export const outOfBounds = (
   return false;
 };
 
+export const hasId = (item: unknown): item is { id: string } => {
+  return (
+    typeof item === 'object' && Object.prototype.hasOwnProperty.call(item, 'id')
+  );
+};
+
 /**
  * Creates a Svelte store for viewing pages of a larger data set.
  */
@@ -158,8 +164,19 @@ export const pagination = <T>(
   items: Readonly<T[]> = [],
   perPage: number | string = defaultItemsPerPage,
   startingIndex: string | number = 0,
+  hash: string = '',
 ): PaginationStore<T> => {
   perPage = perPageFromSearchParameter(perPage);
+
+  const hashId = hash?.slice(1);
+  if (hashId) {
+    const itemIndex = items.findIndex(
+      (item: unknown) => hasId(item) && item?.id === hashId,
+    );
+    if (itemIndex !== -1) {
+      startingIndex = itemIndex;
+    }
+  }
 
   const start = getNearestStartingIndex(
     toNumber(startingIndex),
