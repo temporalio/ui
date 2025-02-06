@@ -6,6 +6,7 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
+  import { isActivityTaskScheduledEvent } from '$lib/utilities/is-event-type';
 
   import {
     CategoryIcon,
@@ -129,6 +130,9 @@
       {:else}
         <MetadataDecoder
           value={group?.userMetadata?.summary}
+          prefix={isActivityTaskScheduledEvent(group.initialEvent)
+            ? group?.displayName
+            : ''}
           fallback={group?.displayName}
           let:decodedValue
         >
