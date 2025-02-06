@@ -14,7 +14,7 @@
   export let prefix: string = '';
   export let onDecode: (decodedValue: string) => void | undefined = undefined;
 
-  const maxLength = 100;
+  const maxLength = 120;
 
   let decodedValue = '';
 
@@ -34,9 +34,10 @@
   const setPrefix = (metadata: string) => {
     if (prefix) {
       metadata = `${prefix} • ${metadata}`;
+      if (metadata.length < maxLength) return metadata;
+      return metadata.slice(0, maxLength) + '...';
     }
-    if (metadata.length < maxLength) return metadata;
-    return metadata.slice(0, maxLength) + '...';
+    return metadata;
   };
 
   $: decodePayload = async (_value: Payload | undefined) => {
