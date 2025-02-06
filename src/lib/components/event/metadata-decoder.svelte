@@ -11,7 +11,10 @@
 
   export let value: Payload | undefined = undefined;
   export let fallback: string = '';
+  export let prefix: string = '';
   export let onDecode: (decodedValue: string) => void | undefined = undefined;
+
+  const maxLength = 100;
 
   let decodedValue = '';
 
@@ -28,6 +31,14 @@
     },
   };
 
+  const setPrefix = (metadata: string) => {
+    if (prefix) {
+      metadata = `${prefix} • ${metadata}`;
+    }
+    if (metadata.length < maxLength) return metadata;
+    return metadata.slice(0, maxLength) + '...';
+  };
+
   $: decodePayload = async (_value: Payload | undefined) => {
     if (!_value) return fallback;
     if (decodedValue) return decodedValue;
@@ -38,11 +49,11 @@
     );
 
     if (typeof metadata === 'string') {
+      decodedValue = setPrefix(metadata);
       if (onDecode) {
-        onDecode(metadata);
+        onDecode(decodedValue);
       }
-      decodedValue = metadata;
-      return metadata;
+      return decodedValue;
     }
 
     decodedValue = fallback;

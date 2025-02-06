@@ -200,6 +200,9 @@
         {/if}
       </div>
     {/if}
+    {#if primaryAttribute?.key}
+      <EventDetailsRow {...primaryAttribute} {attributes} />
+    {/if}
     {#if currentEvent?.userMetadata?.summary}
       <MetadataDecoder
         value={currentEvent.userMetadata.summary}
@@ -214,12 +217,8 @@
               {decodedValue}
             </Badge>
           </div>
-        {:else}
-          <EventDetailsRow {...primaryAttribute} {attributes} />
         {/if}
       </MetadataDecoder>
-    {:else if primaryAttribute?.key}
-      <EventDetailsRow {...primaryAttribute} {attributes} />
     {/if}
     {#if currentEvent?.links?.length}
       <EventLink
@@ -235,7 +234,7 @@
         {attributes}
       />
     {/if}
-    {#if compact && secondaryAttribute?.key}
+    {#if compact && secondaryAttribute?.key && !currentEvent?.userMetadata?.summary}
       <EventDetailsRow {...secondaryAttribute} {attributes} />
     {/if}
   </td>
