@@ -32,9 +32,8 @@
   };
 
   const setPrefix = (metadata: string) => {
-    let value = metadata;
     if (prefix) {
-      metadata = `${prefix} • ${value}`;
+      metadata = `${prefix} • ${metadata}`;
     }
     if (metadata.length < maxLength) return metadata;
     return metadata.slice(0, maxLength) + '...';
