@@ -133,6 +133,7 @@
     aria-label={$$restProps['aria-label']}
     slot="actions-end"
   >
+    <slot name="actions-end-additional" />
     <IconButton
       label={previousPageButtonLabel}
       disabled={!$store.hasPrevious}

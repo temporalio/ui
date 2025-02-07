@@ -18,6 +18,12 @@ export const showChildWorkflows = persistStore<boolean>(
   true,
 );
 
+export const hideChildWorkflows = persistStore<boolean>(
+  'hideChildWorkflows',
+  false,
+  true,
+);
+
 const category = derived([page], ([$page]) =>
   $page.url.searchParams.get('category'),
 );

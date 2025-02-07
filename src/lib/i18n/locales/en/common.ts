@@ -184,4 +184,8 @@ export const Strings = {
   message: 'Message',
   'upload-json': 'Upload JSON',
   'input-valid-json': 'Input must be valid JSON',
+  'workflows-table': 'Workflows Table',
+  'schedules-table': 'Schedules Table',
+  column: 'Column',
+  columns: 'Columns',
 } as const;
