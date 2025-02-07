@@ -15,9 +15,6 @@ import {
 } from './pagination';
 
 const oneHundredResolutions = new Array(100).fill(null).map((_, i) => i);
-const oneHundredItems = new Array(100)
-  .fill(null)
-  .map((_, i) => ({ id: i.toString() }));
 
 describe('pagination', () => {
   it('should have a pageSize', () => {
@@ -580,19 +577,5 @@ describe('hash included in pagination store', () => {
 
   it('should return false if object does not have id', () => {
     expect(hasId({ name: 'cats', startedId: 'asdf' })).toBe(false);
-  });
-
-  it('should not adjust page when hash is included and on first page', () => {
-    const store = pagination(oneHundredItems, 50, 0, '#23');
-    const { currentPage } = get(store);
-
-    expect(currentPage).toBe(1);
-  });
-
-  it('should adjust page when hash is included and is on next page', () => {
-    const store = pagination(oneHundredItems, 50, 0, '#87');
-    const { currentPage } = get(store);
-
-    expect(currentPage).toBe(2);
   });
 });

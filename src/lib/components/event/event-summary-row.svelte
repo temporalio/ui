@@ -2,7 +2,6 @@
   import { noop } from 'svelte/internal';
   import { fade, slide } from 'svelte/transition';
 
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import Badge from '$lib/holocene/badge.svelte';
@@ -49,8 +48,6 @@
   export let active = false;
   export let onRowClick: () => void = noop;
 
-  let row: HTMLTableRowElement;
-
   $: selectedId = isEventGroup(event)
     ? Array.from(event.events.keys()).shift()
     : event.id;
@@ -87,26 +84,6 @@
     onRowClick();
   };
 
-  const isHashRow = (hash: string) => {
-    if (hash) {
-      const id = hash.slice(1);
-      return compact ? group?.eventIds.has(id) : event?.id === id;
-    }
-    return false;
-  };
-
-  const scrollToId = async (hash: string) => {
-    if (isHashRow(hash)) {
-      expanded = true;
-      setTimeout(() => {
-        row?.scrollIntoView({ behavior: 'smooth' });
-        goto(location.pathname + location.search, { replaceState: true });
-      }, 500);
-    }
-  };
-
-  $: scrollToId($page.url.hash);
-
   $: failure = eventOrGroupIsFailureOrTimedOut(event);
   $: canceled = eventOrGroupIsCanceled(event);
   $: terminated = eventOrGroupIsTerminated(event);
@@ -136,7 +113,6 @@
 </script>
 
 <tr
-  bind:this={row}
   class="row dense"
   id={`${event.id}-${index}`}
   class:expanded={expanded && !expandAll}
@@ -145,6 +121,7 @@
   class:canceled
   class:terminated
   class:typedError
+  data-eventid={event.id}
   data-testid="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
