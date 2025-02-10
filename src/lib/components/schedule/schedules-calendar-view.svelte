@@ -129,7 +129,7 @@
 │ │ │ ┌───────────── month (1 - 12)
 │ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday)
 │ │ │ │ │
-* * * * * <command to execute>`}
+* * * * *`}
             copyable={false}
           />
         </div>
