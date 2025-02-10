@@ -9,11 +9,15 @@
   export let minute: string;
 </script>
 
-<div class="my-2 flex flex-col gap-4">
-  <h3>
-    {translate('schedules.recurring-days-heading')}
-  </h3>
-  <p>{translate('schedules.recurring-days-description')}</p>
-  <DayOfWeekPicker bind:daysOfWeek />
+<div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-2">
+    <h3>
+      {translate('schedules.recurring-days-heading')}
+    </h3>
+    <p class="text-secondary">
+      {translate('schedules.recurring-days-description')}
+    </p>
+    <DayOfWeekPicker bind:daysOfWeek />
+  </div>
+  <SchedulesTimeView bind:hour bind:minute />
 </div>
-<SchedulesTimeView bind:hour bind:minute />

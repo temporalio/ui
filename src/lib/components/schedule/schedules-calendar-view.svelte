@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import TabPanel from '$lib/holocene/tab/tab-panel.svelte';
@@ -111,18 +112,39 @@
       />
     </TabPanel>
     <TabPanel id="string-panel" tabId="string-tab">
-      <div class="my-2 flex w-full flex-col gap-4">
-        <h3>
-          {translate('schedules.cron-view-title')}
-        </h3>
-        <p>{translate('schedules.cron-view-description')}</p>
-        <Input
-          label={translate('schedules.cron-view-title')}
-          labelHidden
-          id="cronString"
-          bind:value={cronString}
-          placeholder="* * * * *"
-        />
+      <div class="flex w-full flex-col gap-4">
+        <div class="flex flex-col gap-2">
+          <h3>
+            {translate('schedules.cron-view-title')}
+          </h3>
+          <p class="text-secondary">
+            {translate('schedules.crow-view-example-description')}
+          </p>
+          <CodeBlock
+            inline
+            language="text"
+            content={`┌───────────── minute (0 - 59) 
+│ ┌───────────── hour (0 - 23)
+│ │ ┌───────────── day of the month (1 - 31)
+│ │ │ ┌───────────── month (1 - 12)
+│ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday)
+│ │ │ │ │
+* * * * *`}
+            copyable={false}
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <p class="text-secondary">
+            {translate('schedules.cron-view-description')}
+          </p>
+          <Input
+            label={translate('schedules.cron-view-title')}
+            labelHidden
+            id="cronString"
+            bind:value={cronString}
+            placeholder="* * * * *"
+          />
+        </div>
       </div>
     </TabPanel>
   </div>

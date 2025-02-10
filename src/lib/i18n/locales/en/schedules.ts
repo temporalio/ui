@@ -82,7 +82,9 @@ export const Strings = {
   'offset-unit': 'Offset Unit',
   'offset-description':
     'Specify the time to offset when this schedule will run (for example 15 min past the hour).',
-  'cron-view-title': 'String',
+  'cron-view-title': 'Cron String',
+  'crow-view-example-description':
+    'Temporal Workflow Schedule Cron strings follow this format:',
   'cron-view-description':
     'Write or paste in a cron string to generate a schedule.',
   'error-title': 'Error Message',
