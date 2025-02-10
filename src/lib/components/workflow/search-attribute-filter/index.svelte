@@ -20,7 +20,7 @@
         id="close-search-input"
         variant="ghost"
         class="mt-1"
-        leadingIcon="close"
+        leadingIcon="filter"
         size="xs"
         on:click={() => ($searchInputViewOpen = false)}
       />

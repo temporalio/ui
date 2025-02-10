@@ -207,7 +207,7 @@ export const Strings = {
   filter: 'Filter',
   'view-search-input': 'View Raw Query',
   'view-search-description': 'For advanced search syntax',
-  'close-search-input': 'Hide Raw Query',
+  'close-search-input': 'Show Filters',
   'select-time': 'Select Time',
   'search-placeholder': 'Enter a query',
   'child-workflows': 'Child Workflows',
