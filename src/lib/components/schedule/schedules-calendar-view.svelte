@@ -111,18 +111,22 @@
       />
     </TabPanel>
     <TabPanel id="string-panel" tabId="string-tab">
-      <div class="my-2 flex w-full flex-col gap-4">
-        <h3>
-          {translate('schedules.cron-view-title')}
-        </h3>
-        <p>{translate('schedules.cron-view-description')}</p>
-        <Input
-          label={translate('schedules.cron-view-title')}
-          labelHidden
-          id="cronString"
-          bind:value={cronString}
-          placeholder="* * * * *"
-        />
+      <div class="flex w-full flex-col gap-4">
+        <div class="flex flex-col gap-2">
+          <h3>
+            {translate('schedules.cron-view-title')}
+          </h3>
+          <p class="text-secondary">
+            {translate('schedules.cron-view-description')}
+          </p>
+          <Input
+            label={translate('schedules.cron-view-title')}
+            labelHidden
+            id="cronString"
+            bind:value={cronString}
+            placeholder="* * * * *"
+          />
+        </div>
       </div>
     </TabPanel>
   </div>
