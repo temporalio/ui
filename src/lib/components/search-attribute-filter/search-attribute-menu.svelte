@@ -59,6 +59,7 @@
 
 <MenuContainer>
   <MenuButton
+    id="search-attribute-filter-button"
     controls="search-attribute-menu"
     disabled={$activeQueryIndex !== null}
     count={$filter.attribute ? 0 : filters.length}
@@ -94,6 +95,7 @@
     {#if workflowsPage}
       <MenuItem
         class="min-w-56"
+        data-testid="manual-search-toggle"
         on:click={() => ($searchInputViewOpen = !$searchInputViewOpen)}
         description={translate('workflows.view-search-description')}
         >{translate('workflows.view-search-input')}</MenuItem
