@@ -16,7 +16,7 @@ export const TEMPORAL_THEME = ({
     {
       '&': {
         color: css('--color-text-primary'),
-        backgroundColor: css('--color-surface-secondary'),
+        backgroundColor: css('--color-surface-code-block'),
         borderWidth: '1px',
         borderColor: css('--color-border-subtle'),
         padding: '0.5rem',

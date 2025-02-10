@@ -187,6 +187,7 @@ const temporal = plugin(
         success: css('--color-surface-success'),
         warning: css('--color-surface-warning'),
         danger: css('--color-surface-danger'),
+        'code-block': css('--color-surface-code-block'),
 
         DEFAULT: css('--color-surface-primary'),
       }),
