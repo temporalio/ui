@@ -28,6 +28,7 @@ import close from './svg/close.svelte';
 import cometSolid from './svg/comet-solid.svelte';
 import comet from './svg/comet.svelte';
 import compact from './svg/compact.svelte';
+import connection from './svg/connection.svelte';
 import converterDown from './svg/converter-down.svelte';
 import converterUp from './svg/converter-up.svelte';
 import copy from './svg/copy.svelte';
@@ -140,6 +141,7 @@ export const icons = {
   'comet-solid': cometSolid,
   comet,
   compact,
+  connection,
   'converter-down': converterDown,
   'converter-up': converterUp,
   copy,
