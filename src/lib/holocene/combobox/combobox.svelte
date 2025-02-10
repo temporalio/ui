@@ -494,7 +494,6 @@
 
     {#each list as option}
       <ComboboxOption
-        {multiselect}
         on:click={() => handleSelectOption(option)}
         selected={isSelected(option, value)}
         label={getDisplayValue(option)}

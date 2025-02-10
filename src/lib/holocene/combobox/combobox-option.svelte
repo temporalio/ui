@@ -4,7 +4,6 @@
   interface Props {
     selected?: boolean;
     disabled?: boolean;
-    multiselect?: boolean;
     label: string;
   }
 
