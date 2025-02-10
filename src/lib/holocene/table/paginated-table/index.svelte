@@ -127,6 +127,6 @@
   }
 
   .paginated-table-controls {
-    @apply surface-primary sticky bottom-0 left-0 flex w-full grow justify-between gap-2 border-t border-table px-4 py-2;
+    @apply surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-table px-4 py-2;
   }
 </style>

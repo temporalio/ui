@@ -16,7 +16,7 @@
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
-  import { showChildWorkflows } from '$lib/stores/filters';
+  import { hideChildWorkflows } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
@@ -69,7 +69,7 @@
         />
       {/if}
       <IsTemporalServerVersionGuard minimumVersion="1.23.0">
-        {#if !$showChildWorkflows && !child}
+        {#if $hideChildWorkflows && !child}
           <Button
             size="xs"
             variant={childrenShown ? 'primary' : 'ghost'}

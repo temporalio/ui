@@ -38,8 +38,8 @@
       Add (<Icon class="inline" name="add" />), re-arrange (<Icon
         class="inline"
         name="chevron-selector-vertical"
-      />), and remove (<Icon class="inline" name="hyphen" />), {type} Headings to
-      personalize the {title} Table.
+      />), and remove (<Icon class="inline" name="hyphen" />), {type} to personalize
+      the {title}.
     </svelte:fragment>
 
     <OrderableList {availableColumns} {table} {type} />

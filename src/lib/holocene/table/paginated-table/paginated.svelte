@@ -110,7 +110,7 @@
     />
   </svelte:fragment>
 
-  <div class="flex items-center gap-2" slot="actions-center">
+  <div class="hidden items-center gap-2 md:flex" slot="actions-center">
     {#each $store.pageShortcuts as page}
       {#if isNaN(page)}
         <span class="text-primary">...</span>
@@ -133,6 +133,7 @@
     aria-label={$$restProps['aria-label']}
     slot="actions-end"
   >
+    <slot name="actions-end-additional" />
     <IconButton
       label={previousPageButtonLabel}
       disabled={!$store.hasPrevious}

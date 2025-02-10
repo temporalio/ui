@@ -224,16 +224,14 @@
   {/if}
 </header>
 
-<div class="flex flex-col gap-2 md:flex-row">
-  <WorkflowSearchAttributeFilter onClickConfigure={openCustomizationDrawer} />
-</div>
-<WorkflowsSummaryConfigurableTable>
+<WorkflowSearchAttributeFilter />
+<WorkflowsSummaryConfigurableTable onClickConfigure={openCustomizationDrawer}>
   <slot name="cloud" slot="cloud" />
 </WorkflowsSummaryConfigurableTable>
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}
-  type={translate('common.workflows', { count: 1 })}
-  title={translate('common.workflows', { count: 2 })}
+  type={translate('common.columns')}
+  title={translate('common.workflows-table')}
 />
