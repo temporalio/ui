@@ -1,34 +1,41 @@
-// interface Deployment {
-//   seriesName: string;
-//   buildId: string;
-// }
+import type { Timestamp } from '@temporalio/common';
 
-// interface DeploymentListInfo {
-//   deployment: Deployment;
-//   createTime: string; // ISO timestamp
-//   isCurrent: boolean;
-// }
+export interface DeploymentParameters {
+  namespace: string;
+  deploymentName: string;
+}
 
-// interface WorkerDeploymentOptions {
-//   deploymentName: string;
-//   buildId: string;
-//   workerVersioningMode: WorkerVersioningMode;
-// }
+export interface RoutingConfig {
+  currentVersion: string;
+  rampingVersion: string;
+  rampingVersionPercentage: number;
+  currentVersionChangedTime: Timestamp;
+  rampingVersionChangedTime: Timestamp;
+  rampingVersionPercentageChangedTime: Timestamp;
+}
 
-// enum WorkerVersioningMode {
-//   UNSPECIFIED = 0,
-//   UNVERSIONED = 1,
-//   VERSIONED = 2
-// }
+export interface WorkerDeploymentSummary {
+  name: string;
+  createTime: Timestamp;
+  routingConfig: RoutingConfig;
+}
 
-// enum TaskQueueType {
-//   UNSPECIFIED = 0,
-//   WORKFLOW = 1,
-//   ACTIVITY = 2
-// }
+export interface ListWorkerDeploymentsResponse {
+  nextPageToken: string;
+  workerDeployments: WorkerDeploymentSummary[];
+}
 
-// enum VersionDrainageStatus {
-//   UNSPECIFIED = 0,
-//   DRAINING = 1,
-//   DRAINED = 2
-// }
+export interface VersionSummary {
+  version: string;
+  createTime: Timestamp;
+  drainageStatus: string;
+}
+export interface WorkerDeploymentInfo extends WorkerDeploymentSummary {
+  lastModifierIdentity: string;
+  versionSummaries: VersionSummary[];
+}
+
+export interface WorkerDeploymentResponse {
+  conflictToken: string;
+  workerDeploymentInfo: WorkerDeploymentInfo;
+}

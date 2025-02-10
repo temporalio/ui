@@ -2,17 +2,15 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
-  import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
+  import DeploymentsTableRow from '$lib/components/deployments/deployments-table-row.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
+  import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
   import { coreUserStore } from '$lib/stores/core-user';
-  import { schedulesCount } from '$lib/stores/schedules';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
@@ -27,14 +25,27 @@
 
   $: onFetch = () => {
     error = '';
-    return fetchPaginatedSchedules(namespace, query, onError);
+    return fetchPaginatedDeployments(namespace, query, undefined);
   };
 
   const onError = (err: APIErrorResponse) => {
-    error = err?.body?.message || translate('schedules.error-message-fetching');
+    error =
+      err?.body?.message || translate('deployments.error-message-fetching');
   };
 
-  const columns = [];
+  const columns = [
+    { label: translate('deployments.deployments-table.name'), pinned: true },
+    {
+      label: translate('deployments.deployments-table.current-version'),
+      pinned: true,
+    },
+    { label: translate('deployments.deployments-table.created'), pinned: true },
+    { label: translate('deployments.deployments-table.ramping'), pinned: true },
+    {
+      label: translate('deployments.deployments-table.workflows'),
+      pinned: true,
+    },
+  ];
 </script>
 
 {#key [namespace, query, refresh]}
@@ -42,22 +53,19 @@
     let:visibleItems
     {onFetch}
     {onError}
-    total={$schedulesCount}
-    aria-label={translate('common.schedules')}
+    aria-label={translate('deployments.deployments')}
     pageSizeSelectLabel={translate('common.per-page')}
     nextButtonLabel={translate('common.next')}
     previousButtonLabel={translate('common.previous')}
-    emptyStateMessage={translate('schedules.empty-state-title')}
-    errorMessage={translate('schedules.error-message-fetching')}
+    emptyStateMessage={translate('deployments.empty-state-title')}
+    errorMessage={translate('deployments.error-message-fetching')}
   >
     <caption class="sr-only" slot="caption"
-      >{translate('common.schedules')}</caption
+      >{translate('deployments.deployments')}</caption
     >
 
     <div class="flex flex-col gap-4" slot="header">
-      <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
-        <SchedulesCount />
-      </h1>
+      <h1>{translate('deployments.worker-deployments')}</h1>
     </div>
 
     <tr slot="headers" class="text-left">
@@ -65,21 +73,21 @@
         <th>{label}</th>
       {/each}
     </tr>
-    {#each visibleItems as schedule}
-      <SchedulesTableRow {schedule} {columns} />
+    {#each visibleItems as deployment}
+      <DeploymentsTableRow {deployment} {columns} />
     {/each}
 
     <svelte:fragment slot="empty">
       {#if error}
-        <EmptyState title={translate('schedules.empty-state-title')}>
+        <EmptyState title={translate('deployments.empty-state-title')}>
           <Alert intent="warning" icon="warning" class="mx-12">
             {error}
           </Alert>
         </EmptyState>
       {:else if query}
         <EmptyState
-          title={translate('schedules.empty-state-title')}
-          content={translate('schedules.empty-state-description')}
+          title={translate('deployments.empty-state-title')}
+          content={translate('deployments.empty-state-description')}
         />
       {:else}
         <EmptyState title={translate('schedules.empty-state-title')}>
