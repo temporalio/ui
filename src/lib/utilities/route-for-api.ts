@@ -22,6 +22,10 @@ import type {
   TaskQueueAPIRoutePath,
   TaskQueueRouteParameters,
   WorkerAPIRoutePath,
+  WorkerDeploymentAPIRoutePath,
+  WorkerDeploymentListRouteParameters,
+  WorkerDeploymentRouteParameters,
+  WorkerDeploymentsAPIRoutePath,
   WorkflowActivitiesAPIRoutePath,
   WorkflowActivitiesRouteParameters,
   WorkflowAPIRoutePath,
@@ -105,6 +109,7 @@ const encode = (
       batchJobId: '',
       activityId: '',
       endpointId: '',
+      deploymentName: '',
     },
   );
 };
@@ -151,6 +156,8 @@ export function pathForApi(
     'nexus-endpoints': '/nexus/endpoints',
     'nexus-endpoint': `/nexus/endpoints/${parameters.endpointId}`,
     'nexus-endpoint.update': `/nexus/endpoints/${parameters.endpointId}/update`,
+    'worker-deployments': `/namespaces/${parameters.namespace}/worker-deployments`,
+    'worker-deployment': `/namespaces/${parameters.namespace}/worker-deployments/${parameters.deploymentName}`,
   };
 
   return getPath(routes[route]);
@@ -222,6 +229,16 @@ export function routeForApi(
 export function routeForApi(
   route: NexusAPIRoutePath,
   parameters: NexusRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: WorkerDeploymentsAPIRoutePath,
+  parameters: WorkerDeploymentListRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: WorkerDeploymentAPIRoutePath,
+  parameters: WorkerDeploymentRouteParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(route: ParameterlessAPIRoutePath): string;
