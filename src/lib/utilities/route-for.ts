@@ -203,6 +203,18 @@ export const routeForWorkerDeployment = ({
   return `${base}/namespaces/${namespace}/worker-deployments/${deployment}`;
 };
 
+export const routeForWorkerDeploymentVersion = ({
+  namespace,
+  deployment,
+  version,
+}: {
+  namespace: string;
+  deployment: string;
+  version: string;
+}) => {
+  return `${base}/namespaces/${namespace}/worker-deployments/${deployment}/version/${version}`;
+};
+
 export const routeForRelationships = (
   parameters: WorkflowParameters,
 ): string => {
