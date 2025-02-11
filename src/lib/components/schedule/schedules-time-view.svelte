@@ -8,19 +8,21 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <h3>
-    {translate('schedules.time-view-heading')}
-  </h3>
-  <p>
-    {translate('schedules.time-view-description')}
-  </p>
+  <div class="flex flex-col gap-2">
+    <h3>
+      {translate('schedules.time-view-heading')}
+    </h3>
+    <p class="text-secondary">
+      {translate('schedules.time-view-description')}
+    </p>
 
-  <TimePicker
-    bind:hour
-    bind:minute
-    twelveHourClock={false}
-    includeSeconds={false}
-  />
+    <TimePicker
+      bind:hour
+      bind:minute
+      twelveHourClock={false}
+      includeSeconds={false}
+    />
+  </div>
 
   <div class="flex w-full flex-row items-center gap-2">
     <Icon name="clock" aria-hidden="true" />
