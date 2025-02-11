@@ -1,8 +1,10 @@
 import type {
   DeploymentParameters,
+  DeploymentVersionParameters,
   ListWorkerDeploymentsResponse,
   WorkerDeploymentResponse,
   WorkerDeploymentSummary,
+  WorkerDeploymentVersionResponse,
 } from '$lib/types/deployments';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -83,7 +85,17 @@ const mockDeployment = {
       {
         version: 'build.alpha.1',
         createTime: '2025-02-10T17:54:57.986Z',
-        drainageStatus: 'VERSION_DRAINAGE_STATUS_UNSPECIFIED',
+        drainageStatus: 'Draining',
+      },
+      {
+        version: 'build.alpha.2',
+        createTime: '2025-02-10T17:54:57.986Z',
+        drainageStatus: 'Drained',
+      },
+      {
+        version: 'build.beta.3',
+        createTime: '2025-02-11T18:54:57.986Z',
+        drainageStatus: 'Drained',
       },
     ],
     createTime: '2025-02-10T17:54:57.986Z',
@@ -107,6 +119,48 @@ export const fetchDeployment = async (
   return requestFromAPI(route, { request, notifyOnError: false }).catch(
     (_error) => {
       return mockDeployment;
+    },
+  );
+};
+
+const mockDeploymentVersion = {
+  workerDeploymentVersionInfo: {
+    version: 'build.alpha.1',
+    deploymentName: 'my-app',
+    createTime: '2025-02-11T15:13:16.972Z',
+    routingChangedTime: '2025-02-11T15:13:16.972Z',
+    currentSinceTime: '2025-02-11T15:13:16.972Z',
+    rampingSinceTime: '2025-02-11T15:13:16.972Z',
+    rampPercentage: 25,
+    taskQueueInfos: [
+      {
+        name: 'default',
+        type: 'TASK_QUEUE_TYPE_UNSPECIFIED',
+      },
+    ],
+    drainageInfo: {
+      status: 'VERSION_DRAINAGE_STATUS_UNSPECIFIED',
+      lastChangedTime: '2025-02-11T15:13:16.972Z',
+      lastCheckedTime: '2025-02-11T15:13:16.972Z',
+    },
+    metadata: {
+      entries: {
+        additionalProp1: 'string',
+        additionalProp2: 'string',
+        additionalProp3: 'string',
+      },
+    },
+  },
+};
+
+export const fetchDeploymentVersion = async (
+  parameters: DeploymentVersionParameters,
+  request = fetch,
+): Promise<WorkerDeploymentVersionResponse> => {
+  const route = routeForApi('worker-deployment-version', parameters);
+  return requestFromAPI(route, { request, notifyOnError: false }).catch(
+    (_error) => {
+      return mockDeploymentVersion;
     },
   );
 };

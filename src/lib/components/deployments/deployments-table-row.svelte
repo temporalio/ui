@@ -19,7 +19,7 @@
 
 <tr>
   {#each columns as { label } (label)}
-    {#if label === translate('deployments.deployments-table.name')}
+    {#if label === translate('deployments.name')}
       <td class="cell"
         ><Link
           href={routeForWorkerDeployment({
@@ -28,22 +28,22 @@
           })}>{deployment.name}</Link
         ></td
       >
-    {:else if label === translate('deployments.deployments-table.current-version')}
+    {:else if label === translate('deployments.current-version')}
       <td class="cell whitespace-pre-line break-words"
         >{deployment.routingConfig.currentVersion}</td
       >
-    {:else if label === translate('deployments.deployments-table.created')}
+    {:else if label === translate('deployments.created')}
       <td class="cell truncate"
         >{formatDate(deployment.createTime, $timeFormat, {
           relative: $relativeTime,
         })}</td
       >
-    {:else if label === translate('deployments.deployments-table.ramping')}
+    {:else if label === translate('deployments.ramping')}
       <td class="cell whitespace-pre-line break-words"
         >{deployment.routingConfig.rampingVersion} 📈 Ramping {deployment
           .routingConfig.rampingVersionPercentage}%</td
       >
-    {:else if label === translate('deployments.deployments-table.workflows')}
+    {:else if label === translate('deployments.workflows')}
       <td class="cell truncate"
         ><Link
           href={routeForWorkflowsWithQuery({

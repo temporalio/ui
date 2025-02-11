@@ -5,6 +5,11 @@ export interface DeploymentParameters {
   deploymentName: string;
 }
 
+export interface DeploymentVersionParameters {
+  namespace: string;
+  version: string;
+}
+
 export interface RoutingConfig {
   currentVersion: string;
   rampingVersion: string;
@@ -38,4 +43,32 @@ export interface WorkerDeploymentInfo extends WorkerDeploymentSummary {
 export interface WorkerDeploymentResponse {
   conflictToken: string;
   workerDeploymentInfo: WorkerDeploymentInfo;
+}
+
+export interface TaskQueueInfo {
+  name: string;
+  type: string;
+}
+
+export interface WorkerDeploymentVersionInfo {
+  version: string;
+  deploymentName: string;
+  createTime: Timestamp;
+  routingChangedTime: Timestamp;
+  currentSinceTime: Timestamp;
+  rampingSinceTime: Timestamp;
+  rampPercentage: number;
+  taskQueueInfos: TaskQueueInfo[];
+  drainageInfo: {
+    status: string;
+    lastChangedTime: Timestamp;
+    lastCheckedTime: Timestamp;
+  };
+  metadata: {
+    entries: Record<string, string>;
+  };
+}
+
+export interface WorkerDeploymentVersionResponse {
+  workerDeploymentVersionInfo: WorkerDeploymentVersionInfo;
 }
