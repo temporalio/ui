@@ -39,9 +39,10 @@
         })}</td
       >
     {:else if label === translate('deployments.ramping')}
-      <td class="cell whitespace-pre-line break-words"
-        >{deployment.routingConfig.rampingVersion} 📈 Ramping {deployment
-          .routingConfig.rampingVersionPercentage}%</td
+      <td class="cell flex items-center gap-1.5"
+        >{deployment.routingConfig.rampingVersion}
+        <Icon name="trending" class="text-cyan-400" />
+        Ramping {deployment.routingConfig.rampingVersionPercentage}%</td
       >
     {:else if label === translate('deployments.workflows')}
       <td class="cell truncate"

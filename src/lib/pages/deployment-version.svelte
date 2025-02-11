@@ -68,7 +68,7 @@
         {version}
       </div>
       <div class="flex w-full items-center justify-between">
-        <h1>{deploymentName} {'<'} {version}</h1>
+        <h1>{version}</h1>
         <Button
           href={routeForWorkflowsWithQuery({
             namespace: $page.params.namespace,

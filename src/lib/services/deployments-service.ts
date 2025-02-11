@@ -134,7 +134,11 @@ const mockDeploymentVersion = {
     rampPercentage: 25,
     taskQueueInfos: [
       {
-        name: 'default',
+        name: 'alpha-task-queue',
+        type: 'TASK_QUEUE_TYPE_UNSPECIFIED',
+      },
+      {
+        name: 'beta-task-queue',
         type: 'TASK_QUEUE_TYPE_UNSPECIFIED',
       },
     ],

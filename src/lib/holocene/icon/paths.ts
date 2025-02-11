@@ -102,6 +102,7 @@ import transcoderError from './svg/transcoder-error.svelte';
 import transcoderOff from './svg/transcoder-off.svelte';
 import transcoderOn from './svg/transcoder-on.svelte';
 import trash from './svg/trash.svelte';
+import trending from './svg/trending.svelte';
 import tutorial from './svg/tutorial.svelte';
 import update from './svg/update.svelte';
 import upload from './svg/upload.svelte';
@@ -216,6 +217,7 @@ export const icons = {
   'transcoder-on': transcoderOn,
   'transcoder-off': transcoderOff,
   trash,
+  trending,
   tutorial,
   update,
   upload,
