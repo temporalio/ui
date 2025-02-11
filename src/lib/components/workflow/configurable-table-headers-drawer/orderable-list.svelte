@@ -31,7 +31,7 @@
 <div class="flex flex-col gap-4">
   <OrderableList>
     <svelte:fragment slot="heading">
-      {type} Headings <span class="font-normal">(in view)</span>
+      {type} <span class="font-normal">(in view)</span>
     </svelte:fragment>
     {#each columnsInUse as { label }, index (label)}
       <OrderableListItem
@@ -69,7 +69,7 @@
   </OrderableList>
   <OrderableList>
     <svelte:fragment slot="heading">
-      Available Headings <span class="font-normal">(not in view)</span>
+      Available Columns <span class="font-normal">(not in view)</span>
     </svelte:fragment>
     {#each $availableColumns as { label }}
       <OrderableListItem

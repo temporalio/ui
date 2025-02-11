@@ -12,7 +12,7 @@ import { minimumVersionRequired } from '$lib/utilities/version-check';
 
 import { isCloud, supportsAdvancedVisibility } from './advanced-visibility';
 import { groupByCountEnabled } from './capability-enablement';
-import { showChildWorkflows } from './filters';
+import { hideChildWorkflows } from './filters';
 import { temporalVersion } from './versions';
 
 export const refresh = writable(0);
@@ -35,12 +35,9 @@ export const canFetchChildWorkflows = derived(
 
 const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
 export const queryWithParentWorkflowId = derived(
-  [query, canFetchChildWorkflows, showChildWorkflows],
-  ([$query, $canFetchChildWorkflows, $showChildWorkflows]) => {
-    if ($canFetchChildWorkflows && !$showChildWorkflows) {
-      if ($query) {
-        return `ParentWorkflowId is NULL AND ${$query}`;
-      }
+  [query, canFetchChildWorkflows, hideChildWorkflows],
+  ([$query, $canFetchChildWorkflows, $hideChildWorkflows]) => {
+    if ($canFetchChildWorkflows && $hideChildWorkflows && !$query) {
       return 'ParentWorkflowId is NULL';
     }
     return $query;

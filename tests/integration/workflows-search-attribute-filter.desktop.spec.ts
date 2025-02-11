@@ -39,7 +39,7 @@ test('it should update the datetime filter based on the selected timezone', asyn
   await page.getByLabel('hrs', { exact: true }).fill('5');
   await page.getByRole('button', { name: 'Apply' }).click();
 
-  await page.getByTestId('filter-configuration-menu-button').click();
+  await page.locator('#search-attribute-filter-button').click();
   await page.getByTestId('manual-search-toggle').click();
 
   let filter = await page.getByTestId('CloseTime-0').innerText();
