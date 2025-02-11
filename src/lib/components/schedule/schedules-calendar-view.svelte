@@ -111,40 +111,42 @@
         bind:minute
       />
     </TabPanel>
-    <TabPanel id="string-panel" tabId="string-tab">
-      <div class="flex w-full flex-col gap-4">
-        <div class="flex flex-col gap-2">
-          <h3>
-            {translate('schedules.cron-view-title')}
-          </h3>
-          <p class="text-secondary">
-            {translate('schedules.crow-view-example-description')}
-          </p>
-          <CodeBlock
-            inline
-            language="text"
-            content={`┌───────────── minute (0 - 59) 
+    <TabPanel
+      id="string-panel"
+      tabId="string-tab"
+      class="flex w-full flex-col gap-4"
+    >
+      <div class="flex flex-col gap-2">
+        <h3>
+          {translate('schedules.cron-view-title')}
+        </h3>
+        <p class="text-secondary">
+          {translate('schedules.crow-view-example-description')}
+        </p>
+        <CodeBlock
+          inline
+          language="text"
+          content={`┌───────────── minute (0 - 59) 
 │ ┌───────────── hour (0 - 23)
 │ │ ┌───────────── day of the month (1 - 31)
 │ │ │ ┌───────────── month (1 - 12)
 │ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday)
 │ │ │ │ │
 * * * * *`}
-            copyable={false}
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <p class="text-secondary">
-            {translate('schedules.cron-view-description')}
-          </p>
-          <Input
-            label={translate('schedules.cron-view-title')}
-            labelHidden
-            id="cronString"
-            bind:value={cronString}
-            placeholder="* * * * *"
-          />
-        </div>
+          copyable={false}
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <p class="text-secondary">
+          {translate('schedules.cron-view-description')}
+        </p>
+        <Input
+          label={translate('schedules.cron-view-title')}
+          labelHidden
+          id="cronString"
+          bind:value={cronString}
+          placeholder="* * * * *"
+        />
       </div>
     </TabPanel>
   </div>
