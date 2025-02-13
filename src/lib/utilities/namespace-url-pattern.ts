@@ -10,4 +10,5 @@ export const namespaceUrlPattern = new UrlPattern(
 
 export const workflowRoutePattern = new UrlPattern(
   '/namespaces/:namespace/workflows*',
+  urlPatternOpts,
 );
