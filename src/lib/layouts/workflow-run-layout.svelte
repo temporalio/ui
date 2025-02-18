@@ -101,20 +101,23 @@
     $workflowRun = { ...$workflowRun, workflow, workers };
 
     workflowRunController = new AbortController();
-    getWorkflowMetadata(
-      {
-        namespace,
-        workflow: {
-          id: workflowId,
-          runId,
+
+    if (workflow.isRunning) {
+      getWorkflowMetadata(
+        {
+          namespace,
+          workflow: {
+            id: workflowId,
+            runId,
+          },
         },
-      },
-      settings,
-      $authUser?.accessToken,
-      workflowRunController.signal,
-    ).then((metadata) => {
-      $workflowRun.metadata = metadata;
-    });
+        settings,
+        $authUser?.accessToken,
+        workflowRunController.signal,
+      ).then((metadata) => {
+        $workflowRun.metadata = metadata;
+      });
+    }
 
     $fullEventHistory = await fetchAllEvents({
       namespace,

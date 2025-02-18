@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { noop } from 'svelte/internal';
   import { slide } from 'svelte/transition';
 
   import { v4 } from 'uuid';
@@ -14,17 +13,22 @@
     open?: boolean;
     expandable?: boolean;
     error?: string;
-    onToggle?: () => void;
+    onToggle?: () => Promise<void>;
     'data-testid'?: string;
   }
 
   export let id: string = v4();
   export let open = false;
-  export let onToggle = noop;
+  export let onToggle = undefined;
+  export let icon: IconName | undefined = undefined;
 
-  const toggleAccordion = () => {
-    open = !open;
-    onToggle();
+  const toggleAccordion = async () => {
+    if (onToggle) {
+      await onToggle();
+      open = !open;
+    } else {
+      open = !open;
+    }
   };
 </script>
 
@@ -40,14 +44,10 @@
     <div class="flex w-full flex-row items-center justify-between gap-2">
       <slot name="title" />
       <slot name="description" />
-      <div
-        class="flex flex-row items-center gap-2 pr-2"
-        on:click|stopPropagation
-        on:keyup|stopPropagation
-        role="none"
-      >
-        <slot name="action" />
-        <Icon class="m-2 shrink-0" name={open ? 'arrow-down' : 'arrow-right'} />
+      <div class="flex items-center gap-2">
+        <button class="pr-4">
+          <Icon name={icon ? icon : open ? 'arrow-down' : 'arrow-right'} />
+        </button>
       </div>
     </div>
   </button>

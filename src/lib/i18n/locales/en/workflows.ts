@@ -274,4 +274,5 @@ export const Strings = {
     'Markdown is supported in the summary and details fields. You can use {namespace}, {workflowId} or {runId} syntax in link href to create dynamic links based on the page you are on. Images are not allowed.',
   'update-id': 'Update ID (optional)',
   'update-name-label': 'Update name',
+  'no-current-details': 'No Current Details',
 } as const;

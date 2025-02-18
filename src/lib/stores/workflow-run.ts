@@ -19,11 +19,7 @@ export type WorkflowRunWithWorkers = {
 export const initialWorkflowRun: WorkflowRunWithWorkers = {
   workflow: null,
   workers: { pollers: [], taskQueueStatus: null },
-  metadata: {
-    definition: {
-      queryDefinitions: [],
-    },
-  },
+  metadata: undefined,
   userMetadata: {
     summary: '',
     details: '',
