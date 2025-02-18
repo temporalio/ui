@@ -91,6 +91,9 @@ const createGroupFor = <K extends keyof StartingEvents>(
     get eventList() {
       return Array.from(this.events, ([_key, value]) => value);
     },
+    get links() {
+      return Array.from(this.events, ([_key, value]) => value.links).flat();
+    },
     get lastEvent() {
       return getLastEvent(this);
     },

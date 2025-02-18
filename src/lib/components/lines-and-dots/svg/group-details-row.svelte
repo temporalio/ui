@@ -7,12 +7,14 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { activeGroupHeight, setActiveGroup } from '$lib/stores/active-events';
   import { format } from '$lib/utilities/format-camel-case';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import { mergeEventGroupDetails } from '../constants';
 
@@ -44,6 +46,7 @@
   $: textAttributes = Object.entries(attributes).filter(
     ([, value]) => typeof value !== 'object',
   );
+  $: link = group.links?.[0];
 
   $: childWorkflowStartedEvent =
     group && group.eventList.find(isChildWorkflowExecutionStartedEvent);
@@ -116,6 +119,20 @@
                   </div>
                 </div>
               </MetadataDecoder>
+            {/if}
+            {#if link}
+              <div>
+                <div class="font-medium leading-3 text-subtle">
+                  {translate('nexus.link')}
+                </div>
+                <Link
+                  href={routeForEventHistory({
+                    namespace: link.workflowEvent.namespace,
+                    workflow: link.workflowEvent.workflowId,
+                    run: link.workflowEvent.runId,
+                  })}>{link.workflowEvent.workflowId}</Link
+                >
+              </div>
             {/if}
             {#each textAttributes as [key, value] (key)}
               <div>
