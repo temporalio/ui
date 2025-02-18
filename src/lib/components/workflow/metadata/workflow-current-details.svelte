@@ -14,7 +14,6 @@
   $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
   $: currentDetails = $workflowRun?.metadata?.currentDetails || '';
-  $: openWithoutDetails = workflow.isRunning && !currentDetails;
   $: closedWithoutDetails = !workflow.isRunning && !currentDetails;
 
   let loading = false;
@@ -49,34 +48,32 @@
   };
 </script>
 
-{#if !openWithoutDetails}
-  <AccordionLight
-    let:open
-    onToggle={closedWithoutDetails ? fetchCurrentDetails : undefined}
-    icon={closedWithoutDetails ? 'retry' : undefined}
-  >
-    <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
-      <Icon name="flag" class="text-brand" width={32} height={32} />
-      {translate('workflows.current-details')}
-      {#if loading}{translate('common.loading')}{/if}
-    </div>
-    {#if open}
-      {#key currentDetails}
-        <Markdown content={currentDetails} />
-      {/key}
+<AccordionLight
+  let:open
+  onToggle={closedWithoutDetails ? fetchCurrentDetails : undefined}
+  icon={closedWithoutDetails ? 'retry' : undefined}
+>
+  <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
+    <Icon name="flag" class="text-brand" width={32} height={32} />
+    {translate('workflows.current-details')}
+    {#if loading}{translate('common.loading')}{/if}
+  </div>
+  {#if open}
+    {#key currentDetails}
+      <Markdown content={currentDetails} />
+    {/key}
+  {/if}
+  <svelte:fragment slot="action">
+    {#if workflow.isRunning}
+      <Tooltip text={translate('workflows.update-details')} left>
+        <Button
+          variant="ghost"
+          on:click={fetchCurrentDetails}
+          disabled={loading}
+        >
+          <Icon name="retry" />
+        </Button>
+      </Tooltip>
     {/if}
-    <svelte:fragment slot="action">
-      {#if workflow.isRunning}
-        <Tooltip text={translate('workflows.update-details')} left>
-          <Button
-            variant="ghost"
-            on:click={fetchCurrentDetails}
-            disabled={loading}
-          >
-            <Icon name="retry" />
-          </Button>
-        </Tooltip>
-      {/if}
-    </svelte:fragment>
-  </AccordionLight>
-{/if}
+  </svelte:fragment>
+</AccordionLight>
