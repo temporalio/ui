@@ -67,7 +67,7 @@
     {/if}
     <svelte:fragment slot="action">
       {#if workflow.isRunning}
-        <Tooltip text="Update Details" left>
+        <Tooltip text={translate('workflows.update-details')} left>
           <Button
             variant="ghost"
             on:click={fetchCurrentDetails}

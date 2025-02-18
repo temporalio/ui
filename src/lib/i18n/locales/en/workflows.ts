@@ -275,4 +275,5 @@ export const Strings = {
   'update-id': 'Update ID (optional)',
   'update-name-label': 'Update name',
   'no-current-details': 'No Current Details',
+  'update-details': 'Update Details',
 } as const;
