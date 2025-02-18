@@ -20,6 +20,7 @@
   let loading = false;
 
   const fetchCurrentDetails = async () => {
+    if (loading) return;
     loading = true;
     try {
       const { settings } = $page.data;
@@ -55,9 +56,8 @@
     icon={closedWithoutDetails ? 'retry' : undefined}
   >
     <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
-      <Icon name="flag" class="text-brand" width={32} height={32} />{translate(
-        'workflows.current-details',
-      )}
+      <Icon name="flag" class="text-brand" width={32} height={32} />
+      {translate('workflows.current-details')}
       {#if loading}{translate('common.loading')}{/if}
     </div>
     {#if open}
@@ -67,7 +67,7 @@
     {/if}
     <svelte:fragment slot="action">
       {#if workflow.isRunning}
-        <Tooltip text="Query Details" left>
+        <Tooltip text="Update Details" left>
           <Button
             variant="ghost"
             on:click={fetchCurrentDetails}
