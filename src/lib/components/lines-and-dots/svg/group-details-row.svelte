@@ -122,7 +122,7 @@
             {/if}
             {#if link}
               <div>
-                <div class="font-medium leading-3 text-subtle">
+                <div class="font-medium leading-3 text-secondary">
                   {translate('nexus.link')}
                 </div>
                 <Link
@@ -136,7 +136,7 @@
             {/if}
             {#each textAttributes as [key, value] (key)}
               <div>
-                <div class="font-medium leading-3 text-subtle">
+                <div class="font-medium leading-3 text-secondary">
                   {format(key)}
                 </div>
                 <div class="text-wrap break-all leading-4">
@@ -149,7 +149,7 @@
         <div class="flex w-full flex-col gap-2 xl:w-1/2">
           {#each codeBlockAttributes as [key, value] (key)}
             <div>
-              <div class="font-medium leading-4 text-subtle">
+              <div class="font-medium leading-4 text-secondary">
                 {format(key)}
               </div>
               <GroupDetailsText {key} {value} {attributes} {onDecode} />
@@ -159,7 +159,7 @@
       </div>
       {#if childWorkflowStartedEvent}
         <div class="surface-primary px-4">
-          <div class="font-medium leading-4 text-subtle">Child Workflow</div>
+          <div class="font-medium leading-4 text-secondary">Child Workflow</div>
           {#key group.eventList.length}
             <GraphWidget
               {namespace}
