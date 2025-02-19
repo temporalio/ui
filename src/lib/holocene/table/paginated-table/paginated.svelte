@@ -94,7 +94,6 @@
     if (row) {
       setTimeout(() => {
         row?.scrollIntoView({ behavior: 'smooth' });
-        // goto(location.pathname + location.search, { replaceState: true });
       }, 500);
     }
   };
