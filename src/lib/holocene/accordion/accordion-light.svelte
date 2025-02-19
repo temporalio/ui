@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { slide } from 'svelte/transition';
 
   import { v4 } from 'uuid';
 
@@ -53,10 +52,8 @@
   <div
     id="{id}-content"
     aria-labelledby="{id}-trigger"
-    role="textbox"
     class="block w-full bg-primary p-2"
     class:hidden={!open}
-    transition:slide
   >
     <slot {open} />
   </div>
