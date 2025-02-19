@@ -125,13 +125,15 @@
                 <div class="font-medium leading-3 text-secondary">
                   {translate('nexus.link')}
                 </div>
-                <Link
-                  href={routeForEventHistory({
-                    namespace: link.workflowEvent.namespace,
-                    workflow: link.workflowEvent.workflowId,
-                    run: link.workflowEvent.runId,
-                  })}>{link.workflowEvent.workflowId}</Link
-                >
+                <div class="text-wrap break-all leading-4">
+                  <Link
+                    href={routeForEventHistory({
+                      namespace: link.workflowEvent.namespace,
+                      workflow: link.workflowEvent.workflowId,
+                      run: link.workflowEvent.runId,
+                    })}>{link.workflowEvent.workflowId}</Link
+                  >
+                </div>
               </div>
             {/if}
             {#each textAttributes as [key, value] (key)}
