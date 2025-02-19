@@ -216,7 +216,7 @@
         bind:value={workflowId}
         label="Workflow ID"
         class="w-full grow"
-        maxlength={36}
+        maxLength={36}
         on:blur={(e) => onInputChange(e, 'workflowId')}
       />
       <Button
