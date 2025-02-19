@@ -105,10 +105,12 @@ export async function getWorkflowMetadata(
         definition: {
           queryDefinitions,
         },
+        currentDetails: translate('workflows.no-current-details'),
       };
     } else {
       return {
         error: e,
+        currentDetails: translate('workflows.no-current-details'),
       };
     }
   }
