@@ -71,7 +71,7 @@
 
   $: resetEnabled =
     resetAuthorized &&
-    workflow.pendingChildren.length === 0 &&
+    workflow?.pendingChildren?.length === 0 &&
     $resetEvents.length > 0;
 
   $: actionsDisabled = !resetEnabled && !signalEnabled && !terminateEnabled;
