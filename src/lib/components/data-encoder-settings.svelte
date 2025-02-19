@@ -66,7 +66,7 @@
 
   const onConfirm = () => {
     error = '';
-    $codecEndpoint = trimTrailingSlash(endpoint);
+    $codecEndpoint = endpoint ? trimTrailingSlash(endpoint) : endpoint;
     $passAccessToken = passToken;
     $includeCredentials = includeCreds;
     $viewDataEncoderSettings = false;

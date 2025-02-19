@@ -54,7 +54,7 @@
     <textarea
       bind:value
       class={merge(
-        'surface-primary min-h-fit w-full px-3 py-2 text-sm focus-visible:outline-none',
+        'surface-primary min-h-fit w-full px-3 py-2 text-sm placeholder:text-secondary focus-visible:outline-none',
         disabled && 'cursor-not-allowed opacity-50',
       )}
       {id}
@@ -68,6 +68,7 @@
       on:blur
       on:keydown|stopPropagation
       maxlength={maxLength > 0 ? maxLength : undefined}
+      {...$$restProps}
     />
   </div>
   <div class="flex justify-between gap-2">

@@ -11,8 +11,10 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
@@ -110,11 +112,6 @@
               refresh = Date.now();
             }}
           />
-          <Button
-            leadingIcon="settings"
-            variant="secondary"
-            on:click={openCustomizationDrawer}
-          />
           {#if !createDisabled}
             <Button
               data-testid="create-schedule"
@@ -173,6 +170,18 @@
         </EmptyState>
       {/if}
     </svelte:fragment>
+    <svelte:fragment slot="actions-end-additional">
+      <Tooltip text="Configure Columns" top>
+        <Button
+          on:click={openCustomizationDrawer}
+          data-testid="workflows-summary-table-configuration-button"
+          size="xs"
+          variant="ghost"
+        >
+          <Icon name="settings" />
+        </Button>
+      </Tooltip>
+    </svelte:fragment>
   </PaginatedTable>
 {/key}
 
@@ -180,6 +189,6 @@
   {availableColumns}
   bind:open={customizationDrawerOpen}
   table={TABLE_TYPE.SCHEDULES}
-  type={translate('schedules.schedule')}
-  title={translate('common.schedules')}
+  type={translate('common.columns')}
+  title={translate('common.schedules-table')}
 />

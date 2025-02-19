@@ -150,6 +150,7 @@ export const colors = {
   black: '#000000',
   'space-black': '#141414',
   'off-black': palette['slate'][950],
+  'code-black': '#292D3E',
   current: 'currentColor',
   transparent: 'transparent',
   mint: '#59FDA0',

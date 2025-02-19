@@ -11,12 +11,17 @@
   export let minute: string;
 </script>
 
-<div class="my-2 flex flex-col gap-4">
-  <h3>
-    {translate('schedules.recurring-dates-heading')}
-  </h3>
-  <p>{translate('schedules.recurring-dates-description')}</p>
-  <DayOfMonthPicker bind:daysOfMonth />
+<div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-2">
+    <h3>
+      {translate('schedules.recurring-dates-heading')}
+    </h3>
+    <p class="text-secondary">
+      {translate('schedules.recurring-dates-description')}
+    </p>
+
+    <DayOfMonthPicker bind:daysOfMonth />
+  </div>
   <MonthPicker bind:months />
+  <SchedulesTimeView bind:hour bind:minute />
 </div>
-<SchedulesTimeView bind:hour bind:minute />
