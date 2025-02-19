@@ -52,7 +52,7 @@
   let encodePayloadResult: Promise<Payloads>;
 
   onMount(() => {
-    if (!$workflowRun?.metadata) {
+    if (!$workflowRun.metadata) {
       fetchCurrentDetails();
     }
   });
@@ -71,11 +71,6 @@
       $authUser?.accessToken,
     );
     $workflowRun.metadata = metadata;
-    if (!metadata.currentDetails) {
-      $workflowRun.metadata.currentDetails = translate(
-        'workflows.no-current-details',
-      );
-    }
   };
 
   const reset = () => {

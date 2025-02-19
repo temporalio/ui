@@ -41,14 +41,12 @@
     type="button"
     on:click={toggleAccordion}
   >
-    <div class="flex w-full flex-row items-center justify-between gap-2">
+    <div class="flex w-full flex-row items-center justify-between gap-2 pr-4">
       <slot name="title" />
       <slot name="description" />
       <div class="flex items-center gap-4">
         <slot name="action" />
-        <button class="pr-4">
-          <Icon name={icon ? icon : open ? 'arrow-down' : 'arrow-right'} />
-        </button>
+        <Icon name={icon ? icon : open ? 'arrow-down' : 'arrow-right'} />
       </div>
     </div>
   </button>

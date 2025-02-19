@@ -35,11 +35,6 @@
         $authUser?.accessToken,
       );
       $workflowRun.metadata = metadata;
-      if (!metadata.currentDetails) {
-        $workflowRun.metadata.currentDetails = translate(
-          'workflows.no-current-details',
-        );
-      }
     } catch (error) {
       console.error('Error fetching current details:', error);
     } finally {

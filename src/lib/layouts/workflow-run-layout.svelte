@@ -116,11 +116,6 @@
         workflowRunController.signal,
       ).then((metadata) => {
         $workflowRun.metadata = metadata;
-        if (!metadata.currentDetails) {
-          $workflowRun.metadata.currentDetails = translate(
-            'workflows.no-current-details',
-          );
-        }
       });
     }
 

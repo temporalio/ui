@@ -1,3 +1,4 @@
+import { translate } from '$lib/i18n/translate';
 import type { Payloads } from '$lib/types';
 import type { WorkflowQueryRouteParameters } from '$lib/types/api';
 import type { Eventual, Settings } from '$lib/types/global';
@@ -93,6 +94,9 @@ export async function getWorkflowMetadata(
       accessToken,
       signal,
     );
+    if (!metadata.currentDetails) {
+      metadata.currentDetails = translate('workflows.no-current-details');
+    }
     return metadata;
   } catch (e) {
     if (e.message?.includes('__temporal_workflow_metadata')) {
