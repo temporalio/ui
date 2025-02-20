@@ -91,6 +91,16 @@
 
   $: value = formatValue({ value: content, language });
 
+  const lineBreakReplacer = EditorView.updateListener.of((update) => {
+    if (editable) return;
+    const newText = update.state.doc.toString().replace(/\\n/g, '\n');
+    if (newText !== update.state.doc.toString()) {
+      update.view.dispatch({
+        changes: { from: 0, to: update.state.doc.length, insert: newText },
+      });
+    }
+  });
+
   const createEditorView = (isDark: boolean): EditorView => {
     return new EditorView({
       parent: editor,
@@ -120,6 +130,7 @@
       EditorState.readOnly.of(!editable),
       EditorView.editable.of(editable),
       EditorView.contentAttributes.of({ 'aria-label': label }),
+      lineBreakReplacer,
     ];
 
     if (language === 'json') {
