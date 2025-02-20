@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -10,7 +8,7 @@
   export let filterable = true;
   export let copyable = true;
   export let content: string;
-  export let onFilter: () => void = noop;
+  export let onFilter: () => void = () => {};
   export let filtered = false;
   export let copyIconTitle: string;
   export let copySuccessIconTitle: string;

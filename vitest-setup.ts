@@ -1,5 +1,3 @@
-import { noop } from 'svelte/internal';
-
 import i18next from 'i18next';
 import { vi } from 'vitest';
 
@@ -21,8 +19,8 @@ i18next.init({
 });
 
 const BroadcastChannelMock = vi.fn(() => ({
-  addEventListener: noop,
-  postMessage: noop,
+  addEventListener: () => {},
+  postMessage: () => {},
 }));
 
 vi.stubGlobal('BroadcastChannel', BroadcastChannelMock);
