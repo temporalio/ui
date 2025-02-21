@@ -9,6 +9,7 @@ import {
   getStartingIndexForPage,
   getTotalPages,
   getValidPage,
+  hasId,
   pagination,
   perPageFromSearchParameter,
 } from './pagination';
@@ -540,5 +541,41 @@ describe('perPageFromSearchParameter', () => {
 
   it("should fallback to 100 in the event that it's given an object", () => {
     expect(perPageFromSearchParameter({} as any)).toBe(100);
+  });
+});
+
+describe('getStartingIndexForPage', () => {
+  it('should return 0 for the first page', () => {
+    expect(getStartingIndexForPage(1, 20, oneHundredResolutions)).toBe(0);
+  });
+
+  it('should return the first index of the second page for the something on the second page', () => {
+    expect(getStartingIndexForPage(2, 20, oneHundredResolutions)).toBe(20);
+  });
+
+  it('should return the first index of the last page for the something out of bounds', () => {
+    expect(getStartingIndexForPage(100, 20, oneHundredResolutions)).toBe(80);
+  });
+
+  it('should return 0 for the something out of bounds if the total number of items is less than itemsPerPage', () => {
+    expect(getStartingIndexForPage(3, 101, oneHundredResolutions)).toBe(0);
+  });
+
+  it('should return 0 if given a negative number for the page', () => {
+    expect(getStartingIndexForPage(-10, 20, oneHundredResolutions)).toBe(0);
+  });
+
+  it('should return 0 if given NaN', () => {
+    expect(getStartingIndexForPage(NaN, 20, oneHundredResolutions)).toBe(0);
+  });
+});
+
+describe('hash included in pagination store', () => {
+  it('should return true if object has id', () => {
+    expect(hasId({ id: '1234', name: 'cats' })).toBe(true);
+  });
+
+  it('should return false if object does not have id', () => {
+    expect(hasId({ name: 'cats', startedId: 'asdf' })).toBe(false);
   });
 });

@@ -12,6 +12,7 @@ type PaginationMethods<T> = {
   next: () => void;
   previous: () => void;
   jumpToPage: (x: number | string) => void;
+  jumpToHashPage: (hash: string) => void;
   jumpToIndex: (x: number | string) => void;
   findIndex: (fn: (item: T) => boolean) => number;
   findPage: (fn: (item: T) => boolean) => number;
@@ -151,21 +152,23 @@ export const outOfBounds = (
   return false;
 };
 
+export const hasId = (item: unknown): item is { id: string } => {
+  return (
+    typeof item === 'object' && Object.prototype.hasOwnProperty.call(item, 'id')
+  );
+};
+
 /**
  * Creates a Svelte store for viewing pages of a larger data set.
  */
 export const pagination = <T>(
   items: Readonly<T[]> = [],
   perPage: number | string = defaultItemsPerPage,
-  startingIndex: string | number = 0,
+  currentPage: string | number = 0,
 ): PaginationStore<T> => {
   perPage = perPageFromSearchParameter(perPage);
 
-  const start = getNearestStartingIndex(
-    toNumber(startingIndex),
-    perPage,
-    items,
-  );
+  const start = getNearestStartingIndex(toNumber(currentPage), perPage, items);
 
   const pageSize = writable(perPage);
   const index = writable(start);
@@ -212,6 +215,21 @@ export const pagination = <T>(
   const jumpToIndex = (i: number | string) => {
     const page = getPageForIndex(Number(i), get(pageSize));
     jumpToPage(page);
+  };
+
+  const jumpToHashPage = (hash: string) => {
+    const hashId = hash?.slice(1);
+    if (hashId) {
+      const itemIndex = items.findIndex(
+        (item: unknown) => hasId(item) && item?.id === hashId,
+      );
+      if (itemIndex !== -1) {
+        const hashPage = getPageForIndex(itemIndex, get(pageSize));
+        if (hashPage !== currentPage) {
+          jumpToPage(hashPage);
+        }
+      }
+    }
   };
 
   const findIndex = (fn: (item: T) => boolean): number => {
@@ -284,6 +302,7 @@ export const pagination = <T>(
     previous,
     jumpToPage,
     jumpToIndex,
+    jumpToHashPage,
     findIndex,
     findPage,
     nextRow,
