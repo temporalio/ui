@@ -44,6 +44,7 @@ import type {
   WorkflowExecutionCompletedEvent,
   WorkflowExecutionContinuedAsNewEvent,
   WorkflowExecutionFailedEvent,
+  WorkflowExecutionOptionsUpdatedEvent,
   WorkflowExecutionSignaledEvent,
   WorkflowExecutionStartedEvent,
   WorkflowExecutionTerminatedEvent,
