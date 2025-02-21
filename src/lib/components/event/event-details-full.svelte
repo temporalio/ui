@@ -5,6 +5,7 @@
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
+  import { isWorkflowExecutionOptionsUpdatedEvent } from '$lib/utilities/is-event-type';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
   import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
@@ -13,6 +14,12 @@
 
   export let group: EventGroup | undefined = undefined;
   export let event: WorkflowEvent | undefined = undefined;
+
+  $: {
+    if (isWorkflowExecutionOptionsUpdatedEvent(event)) {
+      console.log('Update Options Event: ', event);
+    }
+  }
 
   $: pendingEvent = group?.pendingActivity || group?.pendingNexusOperation;
   $: showEventGroup = group && (group.eventList.length > 1 || pendingEvent);
@@ -79,6 +86,7 @@
 {:else if event}
   {@const attributes = formatAttributes(event)}
   {@const details = Object.entries(attributes)}
+  {console.log('Details: ', details)}
   <div class="w-full">
     <div class="w-full overflow-hidden border border-subtle">
       <EventLinksExpanded links={event?.links} />

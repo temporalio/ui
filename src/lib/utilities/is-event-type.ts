@@ -123,6 +123,7 @@ export const eventTypes = [
   'WorkflowExecutionStarted',
   'WorkflowExecutionTerminated',
   'WorkflowExecutionTimedOut',
+  'WorkflowExecutionOptionsUpdated',
   'WorkflowTaskCompleted',
   'WorkflowTaskFailed',
   'WorkflowTaskScheduled',
@@ -146,6 +147,7 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'workflowExecutionCompletedEventAttributes',
   'workflowExecutionFailedEventAttributes',
   'workflowExecutionTimedOutEventAttributes',
+  'workflowExecutionOptionsUpdatedEventAttributes',
   'workflowTaskStartedEventAttributes',
   'workflowTaskScheduledEventAttributes',
   'workflowTaskCompletedEventAttributes',
@@ -249,6 +251,11 @@ export const isWorkflowExecutionFailedEvent =
 export const isWorkflowExecutionTimedOutEvent =
   hasAttributes<WorkflowExecutionTimedOutEvent>(
     'workflowExecutionTimedOutEventAttributes',
+  );
+
+export const isWorkflowExecutionOptionsUpdatedEvent =
+  hasAttributes<WorkflowExecutionOptionsUpdatedEvent>(
+    'workflowExecutionOptionsUpdatedEventAttributes',
   );
 
 export const isWorkflowTaskScheduledEvent =
