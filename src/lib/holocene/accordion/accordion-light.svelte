@@ -31,7 +31,7 @@
   };
 </script>
 
-<div class="w-full" {...$$restProps}>
+<div class="w-full {$$restProps.class}">
   <button
     id="{id}-trigger"
     aria-expanded={open}

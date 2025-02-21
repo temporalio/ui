@@ -4,9 +4,9 @@
   import EventSummary from '$lib/components/event/event-summary.svelte';
   import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
-  import WorkflowCallback from '$lib/components/lines-and-dots/workflow-callback.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
+  import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import { clearActives } from '$lib/stores/active-events';
@@ -69,7 +69,7 @@
       />
     {/if}
     {#if workflow?.callbacks?.length}
-      <WorkflowCallback callback={workflow.callbacks[0]} />
+      <WorkflowCallbacks callbacks={workflow.callbacks} />
     {/if}
     <div
       class="flex flex-col items-center gap-2 py-2 xl:flex-row xl:justify-between xl:gap-8"

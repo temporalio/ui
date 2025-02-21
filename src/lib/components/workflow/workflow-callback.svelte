@@ -3,9 +3,9 @@
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fullEventHistory } from '$lib/stores/events';
   import { timeFormat } from '$lib/stores/time-format';
   import type { CallbackState } from '$lib/types';
+  import type { EventLink as Link } from '$lib/types/events';
   import type { Callback } from '$lib/types/nexus';
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForNamespace } from '$lib/utilities/route-for';
@@ -13,11 +13,13 @@
   import EventLink from '../event/event-link.svelte';
 
   export let callback: Callback;
+  export let link: Link | undefined = undefined;
 
   $: completedTime = formatDate(callback.lastAttemptCompleteTime, $timeFormat);
   $: nextTime = formatDate(callback.nextAttemptScheduleTime, $timeFormat);
   $: failure = callback?.lastAttemptFailure?.message;
   $: blockedReason = callback?.blockedReason;
+  $: callbackUrl = callback?.callback?.nexus?.url;
 
   const titles = {
     Standby: translate('nexus.callback.standby'),
@@ -26,8 +28,6 @@
     Failed: translate('nexus.callback.failed'),
     Succeeded: translate('nexus.callback.succeeded'),
   };
-  $: initialEvent = $fullEventHistory[0];
-  $: link = initialEvent?.links[0];
 
   const failedState = 'Failed' as unknown as CallbackState;
   $: failed = callback.state === failedState;
@@ -68,6 +68,12 @@
         </p>
       {/if}
     </div>
+    {#if !link}
+      <p class="flex items-center gap-2">
+        {translate('nexus.callback-url')}
+        <Badge type="subtle">{callbackUrl}</Badge>
+      </p>
+    {/if}
     {#if blockedReason}
       <p class="flex items-center gap-2">
         {translate('nexus.blocked-reason')}
@@ -86,4 +92,5 @@
       </div>
     {/if}
   </div>
+  <slot />
 </Alert>
