@@ -1,6 +1,8 @@
 import type { Readable } from 'svelte/store';
 import { derived, get, writable } from 'svelte/store';
 
+import { has } from '$lib/utilities/has';
+
 export const defaultItemsPerPage = 100;
 export const options: string[] = ['100', '250', '500'];
 export const perPageKey = 'per-page';
@@ -152,12 +154,6 @@ export const outOfBounds = (
   return false;
 };
 
-export const hasId = (item: unknown): item is { id: string } => {
-  return (
-    typeof item === 'object' && Object.prototype.hasOwnProperty.call(item, 'id')
-  );
-};
-
 /**
  * Creates a Svelte store for viewing pages of a larger data set.
  */
@@ -221,7 +217,7 @@ export const pagination = <T>(
     const hashId = hash?.slice(1);
     if (hashId) {
       const itemIndex = items.findIndex(
-        (item: unknown) => hasId(item) && item?.id === hashId,
+        (item: unknown) => has(item, 'id') && item?.id === hashId,
       );
       if (itemIndex !== -1) {
         const hashPage = getPageForIndex(itemIndex, get(pageSize));

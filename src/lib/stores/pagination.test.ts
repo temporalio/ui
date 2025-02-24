@@ -9,7 +9,6 @@ import {
   getStartingIndexForPage,
   getTotalPages,
   getValidPage,
-  hasId,
   pagination,
   perPageFromSearchParameter,
 } from './pagination';
@@ -567,15 +566,5 @@ describe('getStartingIndexForPage', () => {
 
   it('should return 0 if given NaN', () => {
     expect(getStartingIndexForPage(NaN, 20, oneHundredResolutions)).toBe(0);
-  });
-});
-
-describe('hash included in pagination store', () => {
-  it('should return true if object has id', () => {
-    expect(hasId({ id: '1234', name: 'cats' })).toBe(true);
-  });
-
-  it('should return false if object does not have id', () => {
-    expect(hasId({ name: 'cats', startedId: 'asdf' })).toBe(false);
   });
 });
