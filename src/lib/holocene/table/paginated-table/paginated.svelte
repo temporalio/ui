@@ -31,6 +31,7 @@
   export let maxHeight = '';
   export let pageSizeOptions: string[] = options;
   export let fixed = false;
+  export let hashField = '';
 
   $: url = $page.url;
   $: perPageParam = url.searchParams.get(perPageKey) ?? pageSizeOptions[0];
@@ -90,7 +91,7 @@
     store.jumpToHashPage(hash);
     await tick();
     let id = hash.slice(1);
-    const row = document?.querySelector(`[data-eventid="${id}"]`);
+    const row = document?.querySelector(`[data-${hashField}="${id}"]`);
     if (row) {
       setTimeout(() => {
         row?.scrollIntoView({ behavior: 'smooth' });
@@ -100,7 +101,8 @@
 
   $: {
     if (currentPageParam && !hash) store.jumpToPage(currentPageParam);
-    if (hash && !url.searchParams.get(currentPageKey)) scrollToHashEvent();
+    if (hash && hashField && !url.searchParams.get(currentPageKey))
+      scrollToHashEvent();
     if (perPageParam) store.adjustPageSize(perPageParam);
   }
 </script>
