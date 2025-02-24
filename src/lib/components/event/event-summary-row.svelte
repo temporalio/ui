@@ -120,6 +120,7 @@
   class:canceled
   class:terminated
   class:typedError
+  data-eventid={event.id}
   data-testid="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
