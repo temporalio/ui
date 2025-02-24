@@ -170,8 +170,6 @@ export type WorkflowExecutionFailedEvent =
   EventWithAttributes<'workflowExecutionFailedEventAttributes'>;
 export type WorkflowExecutionTimedOutEvent =
   EventWithAttributes<'workflowExecutionTimedOutEventAttributes'>;
-export type WorkflowExecutionOptionsUpdatedEvent =
-  EventWithAttributes<'workflowExecutionOptionsUpdatedEventAttributes'>;
 export type WorkflowTaskScheduledEvent =
   EventWithAttributes<'workflowTaskScheduledEventAttributes'>;
 export type WorkflowTaskStartedEvent =
