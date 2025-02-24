@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements';
-  import { noop } from 'svelte/internal';
 
   import { getContext } from 'svelte';
 
@@ -29,7 +28,7 @@
   export let panelId: string = null;
   export let disabled = false;
   export let active: boolean = null;
-  export let onClick: () => void = noop;
+  export let onClick: () => void = () => {};
 
   const { registerTab, selectTab, activeTab } = getContext<TabContext>(TABS);
 

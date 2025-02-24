@@ -21,10 +21,9 @@
 
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
-  import { noop, onMount } from 'svelte/internal';
   import { writable, type Writable } from 'svelte/store';
 
-  import { setContext } from 'svelte';
+  import { onMount, setContext } from 'svelte';
 
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
@@ -56,7 +55,7 @@
   export let placeholder = '';
   export let disabled = false;
   export let leadingIcon: IconName = null;
-  export let onChange: (value: T) => void = noop;
+  export let onChange: (value: T) => void = () => {};
   export let menuClass: string | undefined = undefined;
   export let variant: ButtonStyles['variant'] = 'secondary';
   export let required = false;

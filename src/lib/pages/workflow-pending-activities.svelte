@@ -22,9 +22,11 @@
   import { omit } from '$lib/utilities/omit';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
+
+  $: pendingActivities = $workflowRun.workflow?.pendingActivities;
 </script>
 
-{#if $workflowRun.workflow?.pendingActivities}
+{#if pendingActivities?.length}
   {#await toDecodedPendingActivities($workflowRun.workflow) then activities}
     <Table class="mb-6 w-full min-w-[600px] table-fixed">
       <caption class="sr-only" slot="caption"

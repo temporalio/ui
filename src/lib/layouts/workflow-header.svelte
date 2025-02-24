@@ -4,16 +4,16 @@
   import { page } from '$app/stores';
 
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
+  import WorkflowCurrentDetails from '$lib/components/workflow/metadata/workflow-current-details.svelte';
+  import WorkflowSummaryAndDetails from '$lib/components/workflow/metadata/workflow-summary-and-details.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import WorkflowVersioningHeader from '$lib/components/workflow-versioning-header.svelte';
-  import AccordionLight from '$lib/holocene/accordion/accordion-light.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Markdown from '$lib/holocene/monaco/markdown.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
@@ -64,11 +64,6 @@
     $fullEventHistory,
     $namespaces,
   );
-
-  $: summary = $workflowRun?.userMetadata?.summary;
-  $: details = $workflowRun?.userMetadata?.details;
-  $: hasUserMetadata = summary || details;
-  $: currentDetails = $workflowRun?.metadata?.currentDetails;
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -138,41 +133,8 @@
       <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
     </div>
   </div>
-  {#if hasUserMetadata}
-    <AccordionLight let:open>
-      <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
-        <Icon
-          name="info"
-          class="text-brand"
-          width={32}
-          height={32}
-        />{translate('workflows.summary-and-details')}
-      </div>
-      {#if open && summary}
-        <h3>{translate('workflows.summary')}</h3>
-        <Markdown content={summary} />
-      {/if}
-      {#if open && details}
-        <h3>{translate('workflows.details')}</h3>
-        <Markdown content={details} />
-      {/if}
-    </AccordionLight>
-  {/if}
-  {#if currentDetails}
-    <AccordionLight let:open>
-      <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
-        <Icon
-          name="flag"
-          class="text-brand"
-          width={32}
-          height={32}
-        />{translate('workflows.current-details')}
-      </div>
-      {#if open}
-        <Markdown content={currentDetails} />
-      {/if}
-    </AccordionLight>
-  {/if}
+  <WorkflowSummaryAndDetails />
+  <WorkflowCurrentDetails />
   <WorkflowDetails {workflow} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
