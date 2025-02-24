@@ -54,6 +54,7 @@ export const Strings = {
     failed: 'Nexus Callback has failed.',
     succeeded: 'Nexus Callback has succeeded.',
   },
+  'callback-url': 'Callback URL',
   'last-attempt-completed-time': 'Last Attempt Completed Time',
   'next-attempt-scheduled-time': 'Next Attempt Scheduled Time',
   'last-attempt-failure': 'Last Attempt Failure',

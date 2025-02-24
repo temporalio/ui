@@ -57,6 +57,7 @@ export const eventTypeCategorizations: Readonly<
   WorkflowExecutionStarted: CATEGORIES.WORKFLOW,
   WorkflowExecutionTerminated: CATEGORIES.WORKFLOW,
   WorkflowExecutionTimedOut: CATEGORIES.WORKFLOW,
+  WorkflowExecutionOptionsUpdated: CATEGORIES.WORKFLOW,
   WorkflowTaskCompleted: CATEGORIES.WORKFLOW,
   WorkflowTaskFailed: CATEGORIES.WORKFLOW,
   WorkflowTaskScheduled: CATEGORIES.WORKFLOW,
