@@ -142,14 +142,12 @@ export const eventTypes = [
   'WorkflowPropertiesModified',
 ] as const;
 
-// Remove ts-ignore when TS SDK adds workflowExecutionOptionsUpdatedEventAttributes
 export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'workflowExecutionStartedEventAttributes',
   'workflowExecutionCompletedEventAttributes',
   'workflowExecutionFailedEventAttributes',
   'workflowExecutionTimedOutEventAttributes',
-  // @ts-ignore
-  'workflowExecutionOptionsUpdatedEventAttributes',
+  'workflowExecutionOptionsUpdatedEventAttributes' as unknown as EventAttributeKey,
   'workflowTaskStartedEventAttributes',
   'workflowTaskScheduledEventAttributes',
   'workflowTaskCompletedEventAttributes',

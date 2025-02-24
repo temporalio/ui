@@ -39,7 +39,6 @@ module.exports = {
     $$Generic: 'readonly',
   },
   rules: {
-    '@typescript-eslint/ban-ts-comment': 'warn',
     quotes: ['error', 'single', { avoidEscape: true }],
     '@typescript-eslint/no-unused-vars': [
       'error',
