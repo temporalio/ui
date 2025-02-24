@@ -52,6 +52,7 @@
   let:visibleItems
   variant="split"
   maxHeight="calc(100vh - 200px)"
+  hashField="eventid"
 >
   {#if !compact}
     <HistoryGraph {groups} history={history(visibleItems)} />
