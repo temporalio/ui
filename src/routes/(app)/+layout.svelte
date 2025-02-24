@@ -195,6 +195,10 @@
         subPath: 'batch-operations',
         fullRoute: routeForBatchOperations({ namespace }),
       },
+      {
+        subPath: 'worker-deployments',
+        fullRoute: routeForWorkerDeployments({ namespace }),
+      },
     ];
 
     for (const { subPath, fullRoute } of namespacePages) {

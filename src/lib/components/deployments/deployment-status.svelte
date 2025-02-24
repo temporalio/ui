@@ -18,12 +18,14 @@
   };
 
   const deploymentStatus = cva(
-    ['flex items-center gap-1 rounded-sm border border-subtle px-1'],
+    [
+      'flex items-center gap-1 rounded-sm border border-subtle px-1 transition-colors',
+    ],
     {
       variants: {
         status: {
-          Ramping: 'text-cyan-500 dark:text-cyan-400',
-          Current: 'text-blue-500 dark:text-blue-400',
+          Ramping: 'text-cyan-600 dark:text-cyan-400',
+          Current: 'text-blue-600 dark:text-blue-400',
           Draining: 'text-yellow-600 dark:text-yellow-200',
           Drained: 'text-secondary',
           Inactive: 'text-secondary',

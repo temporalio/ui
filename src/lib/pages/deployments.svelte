@@ -5,7 +5,6 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
@@ -14,11 +13,10 @@
   let error = '';
 
   $: namespace = $page.params.namespace;
-  $: query = $page.url.searchParams.get('query');
 
   $: onFetch = () => {
     error = '';
-    return fetchPaginatedDeployments(namespace, query, onError);
+    return fetchPaginatedDeployments(namespace, '', onError);
   };
 
   const onError = (err: APIErrorResponse) => {
@@ -41,7 +39,7 @@
 </script>
 
 <div class="flex flex-col gap-4 pt-4">
-  {#key [namespace, query]}
+  {#key [namespace]}
     <PaginatedTable
       let:visibleItems
       {onFetch}
@@ -66,17 +64,6 @@
         <p class="text-sm text-secondary">
           {translate('deployments.worker-deployments-description')}
         </p>
-        <Input
-          class="w-full lg:w-1/2"
-          id="deployment-search"
-          icon="search"
-          label={translate('common.search')}
-          labelHidden
-          placeholder={translate(
-            'deployments.worker-deployments-search-placeholder',
-          )}
-          value={query}
-        />
       </div>
 
       <tr slot="headers" class="text-left">
@@ -98,11 +85,6 @@
               {error}
             </Alert>
           </EmptyState>
-        {:else if query}
-          <EmptyState
-            title={translate('deployments.empty-state-title')}
-            content={translate('deployments.empty-state-description')}
-          />
         {:else}
           <EmptyState
             title={translate('deployments.empty-state-title')}

@@ -6,12 +6,18 @@
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import { type GetPollersResponse } from '$lib/services/pollers-service';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
 
   import PollerIcon from './poller-icon.svelte';
 
   export let workers: GetPollersResponse;
+
+  const getDeploymentName = (poller) => {
+    const deployment = poller?.workerVersionCapabilities?.deploymentSeriesName;
+    return deployment ?? '';
+  };
 </script>
 
 <h2 class="flex items-center gap-2" data-testid="workers">
@@ -25,6 +31,9 @@
   <TableHeaderRow slot="headers">
     <th class={'w-4/12'}>{translate('common.id')}</th>
     <th class={'w-3/12'}>{translate('workers.buildId')}</th>
+    {#if !$isCloud}
+      <th class={'w-3/12'}>{translate('deployments.deployment')}</th>
+    {/if}
     <th class="w-2/12">{translate('workflows.last-accessed')}</th>
     <th class="w-2/12">
       <p class="text-center">
@@ -45,6 +54,14 @@
           {poller?.workerVersionCapabilities?.buildId ?? ''}
         </p>
       </td>
+      {#if !$isCloud}
+        {@const deployment = getDeploymentName(poller)}
+        <td class="text-left" data-testid="worker-build-id">
+          <p class="select-all break-all">
+            {deployment ?? ''}
+          </p>
+        </td>
+      {/if}
       <td class="text-left" data-testid="worker-last-access-time">
         <p class="select-all">
           {formatDate(poller.lastAccessTime, $timeFormat, {
