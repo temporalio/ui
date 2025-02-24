@@ -59,6 +59,7 @@ describe('Event Category Data Structures', () => {
         "WorkflowExecutionCompleted": "workflow",
         "WorkflowExecutionContinuedAsNew": "workflow",
         "WorkflowExecutionFailed": "workflow",
+        "WorkflowExecutionOptionsUpdated": "workflow",
         "WorkflowExecutionSignaled": "signal",
         "WorkflowExecutionStarted": "workflow",
         "WorkflowExecutionTerminated": "workflow",

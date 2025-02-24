@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte/internal';
+  import { onMount } from 'svelte';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';

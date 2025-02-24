@@ -1,9 +1,8 @@
 <script lang="ts" context="module">
-  import { afterUpdate } from 'svelte/internal';
   import { writable, type Writable } from 'svelte/store';
   import { fly } from 'svelte/transition';
 
-  import { setContext } from 'svelte';
+  import { afterUpdate, setContext } from 'svelte';
 
   export const FILTER_CONTEXT = 'filter-context';
 
