@@ -18,7 +18,7 @@
     />
     <WorkflowDetail
       title={translate('common.status')}
-      content={deployment?.workerDeploymentInfo.routingConfig.rampingVersionPercentage.toString() +
+      content={deployment?.workerDeploymentInfo.routingConfig?.rampingVersionPercentage?.toString() +
         '%'}
     />
   </div>

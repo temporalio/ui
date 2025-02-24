@@ -1,8 +1,6 @@
 import type {
-  DeploymentParameters,
   DeploymentVersionParameters,
   ListWorkerDeploymentsResponse,
-  WorkerDeploymentResponse,
   WorkerDeploymentSummary,
   WorkerDeploymentVersionResponse,
 } from '$lib/types/deployments';
@@ -77,85 +75,81 @@ export const fetchPaginatedDeployments = async (
   };
 };
 
-const mockDeployment = {
-  conflictToken: 'string',
-  workerDeploymentInfo: {
-    name: 'my-app',
-    versionSummaries: [
-      {
-        version: 'build.alpha.1',
-        createTime: '2025-02-10T17:54:57.986Z',
-        drainageStatus: 'Draining',
-      },
-      {
-        version: 'build.alpha.2',
-        createTime: '2025-02-10T17:54:57.986Z',
-        drainageStatus: 'Drained',
-      },
-      {
-        version: 'build.beta.3',
-        createTime: '2025-02-11T18:54:57.986Z',
-        drainageStatus: 'Drained',
-      },
-    ],
-    createTime: '2025-02-10T17:54:57.986Z',
-    routingConfig: {
-      currentVersion: 'build.alpha.1',
-      rampingVersion: 'build.alpha.2',
-      rampingVersionPercentage: 25,
-      currentVersionChangedTime: '2025-02-10T15:54:55.423Z',
-      rampingVersionChangedTime: '2025-02-10T15:54:55.423Z',
-      rampingVersionPercentageChangedTime: '2025-02-10T15:54:55.423Z',
-    },
-    lastModifierIdentity: '@me',
-  },
-};
+// const mockDeployment = {
+//   conflictToken: 'string',
+//   workerDeploymentInfo: {
+//     name: 'my-app',
+//     versionSummaries: [
+//       {
+//         version: 'build.alpha.1',
+//         createTime: '2025-02-10T17:54:57.986Z',
+//         drainageStatus: 'Draining',
+//       },
+//       {
+//         version: 'build.alpha.2',
+//         createTime: '2025-02-10T17:54:57.986Z',
+//         drainageStatus: 'Drained',
+//       },
+//       {
+//         version: 'build.beta.3',
+//         createTime: '2025-02-11T18:54:57.986Z',
+//         drainageStatus: 'Drained',
+//       },
+//     ],
+//     createTime: '2025-02-10T17:54:57.986Z',
+//     routingConfig: {
+//       currentVersion: 'build.alpha.1',
+//       rampingVersion: 'build.alpha.2',
+//       rampingVersionPercentage: 25,
+//       currentVersionChangedTime: '2025-02-10T15:54:55.423Z',
+//       rampingVersionChangedTime: '2025-02-10T15:54:55.423Z',
+//       rampingVersionPercentageChangedTime: '2025-02-10T15:54:55.423Z',
+//     },
+//     lastModifierIdentity: '@me',
+//   },
+// };
 
-export const fetchDeployment = async (
-  parameters: DeploymentParameters,
-  request = fetch,
-): Promise<WorkerDeploymentResponse> => {
-  const route = routeForApi('worker-deployment', parameters);
-  return requestFromAPI(route, { request, notifyOnError: false }).catch(
-    (_error) => {
-      return mockDeployment;
-    },
-  );
-};
+// export const fetchDeployment = async (
+//   parameters: DeploymentParameters,
+//   request = fetch,
+// ): Promise<WorkerDeploymentResponse> => {
+//   const route = routeForApi('worker-deployment', parameters);
+//   return requestFromAPI(route, { request, notifyOnError: false })
+// };
 
-const mockDeploymentVersion = {
-  workerDeploymentVersionInfo: {
-    version: 'build.alpha.1',
-    deploymentName: 'my-app',
-    createTime: '2025-02-11T15:13:16.972Z',
-    routingChangedTime: '2025-02-11T15:13:16.972Z',
-    currentSinceTime: '2025-02-11T15:13:16.972Z',
-    rampingSinceTime: '2025-02-11T15:13:16.972Z',
-    rampPercentage: 25,
-    taskQueueInfos: [
-      {
-        name: 'alpha-task-queue',
-        type: 'TASK_QUEUE_TYPE_UNSPECIFIED',
-      },
-      {
-        name: 'beta-task-queue',
-        type: 'TASK_QUEUE_TYPE_UNSPECIFIED',
-      },
-    ],
-    drainageInfo: {
-      status: 'VERSION_DRAINAGE_STATUS_UNSPECIFIED',
-      lastChangedTime: '2025-02-11T15:13:16.972Z',
-      lastCheckedTime: '2025-02-11T15:13:16.972Z',
-    },
-    metadata: {
-      entries: {
-        additionalProp1: 'string',
-        additionalProp2: 'string',
-        additionalProp3: 'string',
-      },
-    },
-  },
-};
+// const mockDeploymentVersion = {
+//   workerDeploymentVersionInfo: {
+//     version: 'build.alpha.1',
+//     deploymentName: 'my-app',
+//     createTime: '2025-02-11T15:13:16.972Z',
+//     routingChangedTime: '2025-02-11T15:13:16.972Z',
+//     currentSinceTime: '2025-02-11T15:13:16.972Z',
+//     rampingSinceTime: '2025-02-11T15:13:16.972Z',
+//     rampPercentage: 25,
+//     taskQueueInfos: [
+//       {
+//         name: 'alpha-task-queue',
+//         type: 'TASK_QUEUE_TYPE_UNSPECIFIED',
+//       },
+//       {
+//         name: 'beta-task-queue',
+//         type: 'TASK_QUEUE_TYPE_UNSPECIFIED',
+//       },
+//     ],
+//     drainageInfo: {
+//       status: 'VERSION_DRAINAGE_STATUS_UNSPECIFIED',
+//       lastChangedTime: '2025-02-11T15:13:16.972Z',
+//       lastCheckedTime: '2025-02-11T15:13:16.972Z',
+//     },
+//     metadata: {
+//       entries: {
+//         additionalProp1: 'string',
+//         additionalProp2: 'string',
+//         additionalProp3: 'string',
+//       },
+//     },
+//   },
+// };
 
 export const fetchDeploymentVersion = async (
   parameters: DeploymentVersionParameters,

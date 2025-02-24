@@ -49,7 +49,7 @@
   ];
 </script>
 
-{#await deploymentFetch then deployment}
+{#await deploymentFetch then deployment}}
   <header
     class="flex flex-row flex-wrap justify-between gap-8 border-b border-subtle px-4 pb-4 pt-8 md:pt-20 xl:px-8"
   >
