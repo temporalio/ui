@@ -50,6 +50,11 @@ export interface TaskQueueInfo {
   type: string;
 }
 
+export interface VersioningInfo {
+  behavior: string;
+  version: string;
+}
+
 export interface WorkerDeploymentVersionInfo {
   version: string;
   deploymentName: string;
@@ -72,3 +77,10 @@ export interface WorkerDeploymentVersionInfo {
 export interface WorkerDeploymentVersionResponse {
   workerDeploymentVersionInfo: WorkerDeploymentVersionInfo;
 }
+
+export type DeploymentStatus =
+  | 'Ramping'
+  | 'Current'
+  | 'Draining'
+  | 'Drained'
+  | 'Inactive';

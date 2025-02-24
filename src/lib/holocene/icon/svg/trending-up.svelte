@@ -23,5 +23,5 @@
     y2="11"
     stroke="currentColor"
     stroke-width="2"
-  />
-</Svg>
+  /></Svg
+>

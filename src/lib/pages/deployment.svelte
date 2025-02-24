@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import DeploymentDetails from '$lib/components/deployments/deployment-details.svelte';
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -27,29 +26,17 @@
   const columns = [
     { label: translate('deployments.version'), pinned: true },
     {
-      label: translate('deployments.status'),
+      label: translate('deployments.deployed'),
       pinned: true,
     },
     {
-      label: translate('deployments.task-queue-name'),
-      pinned: true,
-    },
-    {
-      label: translate('deployments.rollout-started'),
-      pinned: true,
-    },
-    {
-      label: translate('deployments.rollout-completed'),
-      pinned: true,
-    },
-    {
-      label: translate('deployments.rollout-url'),
+      label: translate('deployments.workflows'),
       pinned: true,
     },
   ];
 </script>
 
-{#await deploymentFetch then deployment}}
+{#await deploymentFetch then deployment}
   <header
     class="flex flex-row flex-wrap justify-between gap-8 border-b border-subtle px-4 pb-4 pt-8 md:pt-20 xl:px-8"
   >
@@ -74,7 +61,6 @@
         >
       </div>
     </div>
-    <DeploymentDetails {deployment} />
   </header>
   <div class="bg-primary p-8">
     <PaginatedTable
@@ -90,18 +76,18 @@
         {translate('deployments.deployments')}
       </caption>
 
-      <div class="flex flex-col gap-4" slot="header">
-        <h1>{translate('deployments.worker-deployments')}</h1>
-      </div>
-
       <tr slot="headers" class="text-left">
-        {#each columns as { label }}
-          <th>{label}</th>
+        {#each columns as { label }, index}
+          <th class={index === 0 && 'w-full'}>{label}</th>
         {/each}
       </tr>
 
       {#each visibleItems as version}
-        <VersionTableRow {version} {columns} />
+        <VersionTableRow
+          routingConfig={deployment.workerDeploymentInfo.routingConfig}
+          {version}
+          {columns}
+        />
       {/each}
     </PaginatedTable>
   </div>

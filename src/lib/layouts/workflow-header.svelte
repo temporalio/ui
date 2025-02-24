@@ -8,7 +8,6 @@
   import WorkflowSummaryAndDetails from '$lib/components/workflow/metadata/workflow-summary-and-details.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import WorkflowVersioningHeader from '$lib/components/workflow-versioning-header.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
@@ -56,9 +55,6 @@
     $fullEventHistory,
   );
   $: workflowHasBeenReset = has($resetWorkflows, runId);
-  $: workflowUsesVersioning =
-    workflow?.assignedBuildId ??
-    workflow?.mostRecentWorkerVersionStamp?.useVersioning;
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
     $fullEventHistory,
@@ -124,9 +120,6 @@
             class="overflow-hidden text-ellipsis text-left"
           />
         </h1>
-        {#if workflowUsesVersioning}
-          <WorkflowVersioningHeader {workflow} />
-        {/if}
       </div>
     </div>
     <div class="max-lg:hidden">

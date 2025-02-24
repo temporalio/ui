@@ -1,31 +1,24 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import DeploymentsTableRow from '$lib/components/deployments/deployments-table-row.svelte';
+  import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
-  import { coreUserStore } from '$lib/stores/core-user';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
-  import { routeForScheduleCreate } from '$lib/utilities/route-for';
-  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  let coreUser = coreUserStore();
   let error = '';
 
   $: namespace = $page.params.namespace;
-  $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
   $: query = $page.url.searchParams.get('query');
 
   $: onFetch = () => {
     error = '';
-    return fetchPaginatedDeployments(namespace, query, undefined);
+    return fetchPaginatedDeployments(namespace, query, onError);
   };
 
   const onError = (err: APIErrorResponse) => {
@@ -36,11 +29,10 @@
   const columns = [
     { label: translate('deployments.name'), pinned: true },
     {
-      label: translate('deployments.current-version'),
+      label: translate('deployments.deployment-version'),
       pinned: true,
     },
-    { label: translate('deployments.created'), pinned: true },
-    { label: translate('deployments.ramping'), pinned: true },
+    { label: translate('deployments.deployed'), pinned: true },
     {
       label: translate('deployments.workflows'),
       pinned: true,
@@ -65,7 +57,12 @@
         >{translate('deployments.deployments')}</caption
       >
       <div class="flex flex-col gap-4" slot="header">
-        <h1>{translate('deployments.worker-deployments')}</h1>
+        <div class="flex items-center gap-2">
+          <h1>
+            {translate('deployments.worker-deployments')}
+          </h1>
+          <Badge>Pre-Release</Badge>
+        </div>
         <p class="text-sm text-secondary">
           {translate('deployments.worker-deployments-description')}
         </p>
@@ -83,17 +80,20 @@
       </div>
 
       <tr slot="headers" class="text-left">
-        {#each columns as { label }}
-          <th>{label}</th>
+        {#each columns as { label }, index}
+          <th class={index === 0 && 'w-full'}>{label}</th>
         {/each}
       </tr>
       {#each visibleItems as deployment}
-        <DeploymentsTableRow {deployment} {columns} />
+        <DeploymentTableRow {deployment} {columns} />
       {/each}
 
       <svelte:fragment slot="empty">
         {#if error}
-          <EmptyState title={translate('deployments.empty-state-title')}>
+          <EmptyState
+            title={translate('deployments.empty-state-title')}
+            content={translate('deployments.empty-state-description')}
+          >
             <Alert intent="warning" icon="warning" class="mx-12">
               {error}
             </Alert>
@@ -104,27 +104,10 @@
             content={translate('deployments.empty-state-description')}
           />
         {:else}
-          <EmptyState title={translate('schedules.empty-state-title')}>
-            <p>
-              {translate('schedules.getting-started-docs-link-preface')}
-              <Link newTab href="https://docs.temporal.io/workflows/#schedule"
-                >{translate('schedules.getting-started-docs-link')}</Link
-              >
-              {translate('schedules.getting-started-cli-link-preface')}
-              <Link newTab href="https://docs.temporal.io/cli/schedule"
-                >Temporal CLI</Link
-              >.
-            </p>
-            {#if !createDisabled}
-              <Button
-                data-testid="create-schedule"
-                on:click={() => goto(routeForScheduleCreate({ namespace }))}
-                disabled={!writeActionsAreAllowed()}
-              >
-                {translate('schedules.create')}
-              </Button>
-            {/if}
-          </EmptyState>
+          <EmptyState
+            title={translate('deployments.empty-state-title')}
+            content={translate('deployments.empty-state-description')}
+          />
         {/if}
       </svelte:fragment>
     </PaginatedTable>

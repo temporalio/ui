@@ -112,6 +112,7 @@ const encode = (
       activityId: '',
       endpointId: '',
       deploymentName: '',
+      version: '',
     },
   );
 };
