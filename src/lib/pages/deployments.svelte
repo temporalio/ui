@@ -79,14 +79,10 @@
           class="px-4"
         >
           <p class="text-center">
-            Grouping your Workers into Deployments will enable you to more
-            effectively manage your Workers. For example, see <Link
+            Enable Worker Deployments to manage your workers more effectively. <Link
               href="https://docs.temporal.io/worker-deployments"
-              newTab
-            >
-              Worker Versioning</Link
-            > for how you can use Deployments to make it safer to roll out new Workflow
-            code.
+              newTab>Learn more</Link
+            >.
           </p>
           {#if error}
             <Alert intent="warning" icon="warning" class="px-12">
