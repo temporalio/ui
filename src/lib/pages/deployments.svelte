@@ -5,6 +5,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
@@ -76,21 +77,26 @@
       {/each}
 
       <svelte:fragment slot="empty">
-        {#if error}
-          <EmptyState
-            title={translate('deployments.empty-state-title')}
-            content={translate('deployments.empty-state-description')}
-          >
-            <Alert intent="warning" icon="warning" class="mx-12">
+        <EmptyState
+          title={translate('deployments.empty-state-title')}
+          class="px-4"
+        >
+          <p class="text-center">
+            Grouping your Workers into Deployments will enable you to more
+            effectively manage your Workers. For example, see <Link
+              href="https://docs.temporal.io/worker-versioning"
+              newTab
+            >
+              Worker Versioning</Link
+            > for how you can use Deployments to make it safer to roll out new Workflow
+            code.
+          </p>
+          {#if error}
+            <Alert intent="warning" icon="warning" class="px-12">
               {error}
             </Alert>
-          </EmptyState>
-        {:else}
-          <EmptyState
-            title={translate('deployments.empty-state-title')}
-            content={translate('deployments.empty-state-description')}
-          />
-        {/if}
+          {/if}
+        </EmptyState>
       </svelte:fragment>
     </PaginatedTable>
   {/key}
