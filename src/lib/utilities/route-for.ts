@@ -185,6 +185,39 @@ export const routeForWorkers = (parameters: WorkflowParameters): string => {
   return `${routeForWorkflow(parameters)}/workers`;
 };
 
+export const routeForWorkerDeployments = ({
+  namespace,
+}: {
+  namespace: string;
+}) => {
+  return `${base}/namespaces/${namespace}/worker-deployments`;
+};
+
+export const routeForWorkerDeployment = ({
+  namespace,
+  deployment,
+}: {
+  namespace: string;
+  deployment: string;
+}) => {
+  return `${base}/namespaces/${namespace}/worker-deployments/${deployment}`;
+};
+
+export const routeForWorkerDeploymentVersion = ({
+  namespace,
+  deployment,
+  version,
+}: {
+  namespace: string;
+  deployment: string;
+  version: string;
+}) => {
+  return `${routeForWorkerDeployment({
+    namespace,
+    deployment,
+  })}/version/${version}`;
+};
+
 export const routeForRelationships = (
   parameters: WorkflowParameters,
 ): string => {

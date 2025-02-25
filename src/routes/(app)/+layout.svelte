@@ -30,6 +30,7 @@
     routeForNamespaces,
     routeForNexus,
     routeForSchedules,
+    routeForWorkerDeployments,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
@@ -62,6 +63,7 @@
       workflowsRoute: routeForWorkflows({ namespace }),
       schedulesRoute: routeForSchedules({ namespace }),
       batchOperationsRoute: routeForBatchOperations({ namespace }),
+      workerDeploymentsRoute: routeForWorkerDeployments({ namespace }),
       archivalRoute: routeForArchivalWorkfows({ namespace }),
       namespacesRoute: routeForNamespaces(),
       nexusRoute: routeForNexus(),
@@ -69,11 +71,17 @@
     };
   };
 
-  $: ({ workflowsRoute, schedulesRoute, batchOperationsRoute, archivalRoute } =
-    routes);
+  $: ({
+    workflowsRoute,
+    schedulesRoute,
+    batchOperationsRoute,
+    workerDeploymentsRoute,
+    archivalRoute,
+  } = routes);
   $: showNamespacePicker = [
     workflowsRoute,
     schedulesRoute,
+    workerDeploymentsRoute,
     batchOperationsRoute,
     archivalRoute,
   ].some((route) => $page.url.href.includes(route));
@@ -83,6 +91,7 @@
       workflowsRoute,
       schedulesRoute,
       batchOperationsRoute,
+      workerDeploymentsRoute,
       archivalRoute,
       namespacesRoute,
       nexusRoute,
@@ -91,6 +100,7 @@
       workflowsRoute: string;
       schedulesRoute: string;
       batchOperationsRoute: string;
+      workerDeploymentsRoute: string;
       archivalRoute: string;
       namespacesRoute: string;
       nexusRoute: string;
@@ -120,6 +130,13 @@
         isActive: (path) => path.includes(batchOperationsRoute),
       },
       {
+        href: workerDeploymentsRoute,
+        icon: 'merge',
+        label: translate('deployments.deployments'),
+        tooltip: translate('deployments.worker-deployments'),
+        isActive: (path) => path.includes(workerDeploymentsRoute),
+      },
+      {
         href: archivalRoute,
         icon: 'archives',
         label: translate('common.archive'),
@@ -135,6 +152,7 @@
           !path.includes(workflowsRoute) &&
           !path.includes(schedulesRoute) &&
           !path.includes(batchOperationsRoute) &&
+          !path.includes(workerDeploymentsRoute) &&
           !path.includes(archivalRoute),
       },
       {
@@ -176,6 +194,10 @@
       {
         subPath: 'batch-operations',
         fullRoute: routeForBatchOperations({ namespace }),
+      },
+      {
+        subPath: 'worker-deployments',
+        fullRoute: routeForWorkerDeployments({ namespace }),
       },
     ];
 

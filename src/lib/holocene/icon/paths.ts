@@ -36,6 +36,7 @@ import creditCard from './svg/credit-card.svelte';
 import descending from './svg/descending.svelte';
 import dollarBadge from './svg/dollar-badge.svelte';
 import download from './svg/download.svelte';
+import drained from './svg/drained.svelte';
 import error from './svg/error.svelte';
 import exit from './svg/exit.svelte';
 import externalLink from './svg/external-link.svelte';
@@ -53,8 +54,10 @@ import fireExtinguisher from './svg/fire-extinguisher.svelte';
 import flag from './svg/flag.svelte';
 import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
+import heartbeat from './svg/heartbeat.svelte';
 import hyphen from './svg/hyphen.svelte';
 import importIcon from './svg/import.svelte';
+import inactive from './svg/inactive.svelte';
 import info from './svg/info.svelte';
 import json from './svg/json.svelte';
 import keyboard from './svg/keyboard.svelte';
@@ -102,6 +105,8 @@ import transcoderError from './svg/transcoder-error.svelte';
 import transcoderOff from './svg/transcoder-off.svelte';
 import transcoderOn from './svg/transcoder-on.svelte';
 import trash from './svg/trash.svelte';
+import trendingDown from './svg/trending-down.svelte';
+import trendingUp from './svg/trending-up.svelte';
 import tutorial from './svg/tutorial.svelte';
 import update from './svg/update.svelte';
 import upload from './svg/upload.svelte';
@@ -149,6 +154,7 @@ export const icons = {
   descending,
   download,
   'dollar-badge': dollarBadge,
+  drained,
   error,
   exit,
   'external-link': externalLink,
@@ -166,7 +172,9 @@ export const icons = {
   'fire-extinguisher': fireExtinguisher,
   github,
   graph,
+  heartbeat,
   hyphen,
+  inactive,
   import: importIcon,
   info,
   json,
@@ -216,6 +224,8 @@ export const icons = {
   'transcoder-on': transcoderOn,
   'transcoder-off': transcoderOff,
   trash,
+  'trending-up': trendingUp,
+  'trending-down': trendingDown,
   tutorial,
   update,
   upload,

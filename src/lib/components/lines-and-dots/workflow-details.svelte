@@ -7,6 +7,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import {
+    routeForWorkerDeployment,
     routeForWorkers,
     routeForWorkflow,
     routeForWorkflowsWithQuery,
@@ -23,10 +24,26 @@
     end: workflow?.endTime || Date.now(),
     includeMilliseconds: true,
   });
+  $: deployment =
+    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'];
+  $: deploymentVersion =
+    workflow?.searchAttributes?.indexedFields?.[
+      'TemporalWorkerDeploymentVersion'
+    ];
+  $: deploymentBehavior =
+    workflow?.searchAttributes?.indexedFields?.[
+      'TemporalWorkflowVersioningBehavior'
+    ];
 </script>
 
-<div class="flex w-full flex-col gap-2 xl:flex-row xl:gap-16">
-  <div class="flex w-full flex-col gap-2 xl:w-1/3">
+<div
+  class="flex w-full flex-col gap-2 {deployment
+    ? '2xl:flex-row 2xl:gap-8'
+    : 'xl:flex-row xl:gap-8'}"
+>
+  <div
+    class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
+  >
     <WorkflowDetail
       title={translate('common.start')}
       tooltip={$relativeTime
@@ -57,7 +74,9 @@
     />
     <WorkflowDetail content={elapsedTime} icon="clock" />
   </div>
-  <div class="flex w-full flex-col gap-2 xl:w-1/3">
+  <div
+    class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
+  >
     <WorkflowDetail
       title={translate('common.run-id')}
       content={workflow?.runId}
@@ -83,7 +102,35 @@
       })}
     />
   </div>
-  <div class="flex w-full flex-col gap-2 xl:w-1/3">
+  {#if deployment}
+    <div class="flex w-full flex-col gap-2 2xl:w-1/4">
+      <WorkflowDetail
+        title={translate('deployments.deployment')}
+        content={deployment}
+        href={routeForWorkerDeployment({
+          namespace,
+          deployment,
+        })}
+      />
+      {#if deploymentVersion}
+        <WorkflowDetail
+          title={translate('deployments.deployment-version')}
+          content={workflow.searchAttributes.indexedFields[
+            'TemporalWorkerDeploymentVersion'
+          ]}
+        />
+      {/if}
+      {#if deploymentBehavior}
+        <WorkflowDetail
+          title={translate('deployments.deployment-behavior')}
+          content={deploymentBehavior}
+        />
+      {/if}
+    </div>
+  {/if}
+  <div
+    class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
+  >
     {#if workflow?.parent}
       <WorkflowDetail
         title={translate('workflows.parent-workflow')}
