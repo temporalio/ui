@@ -62,9 +62,6 @@
           </h1>
           <Badge class="shrink-0">Pre-Release</Badge>
         </div>
-        <p class="text-sm text-secondary">
-          {translate('deployments.worker-deployments-description')}
-        </p>
       </div>
 
       <tr slot="headers" class="text-left">
