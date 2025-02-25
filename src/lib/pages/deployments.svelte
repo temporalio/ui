@@ -55,7 +55,7 @@
         >{translate('deployments.deployments')}</caption
       >
       <div class="flex flex-col gap-4" slot="header">
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
           <h1>
             {translate('deployments.worker-deployments')}
           </h1>
