@@ -84,7 +84,7 @@
           <p class="text-center">
             Grouping your Workers into Deployments will enable you to more
             effectively manage your Workers. For example, see <Link
-              href="https://docs.temporal.io/worker-versioning"
+              href="https://docs.temporal.io/worker-deployments"
               newTab
             >
               Worker Versioning</Link
