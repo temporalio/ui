@@ -39,7 +39,7 @@
       })
     : drainageStatus
     ? fromScreamingEnum(drainageStatus, 'VersionDrainageStatus')
-    : 'Inactive';
+    : translate('common.inactive');
 </script>
 
 <tr>
