@@ -28,7 +28,7 @@
       ? translate('deployments.ramping')
       : drainageStatus
       ? fromScreamingEnum(drainageStatus, 'VersionDrainageStatus')
-      : 'Inactive'
+      : translate('common.inactive')
   ) as Status;
 
   $: statusLabel = isCurrent
