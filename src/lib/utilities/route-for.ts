@@ -212,7 +212,10 @@ export const routeForWorkerDeploymentVersion = ({
   deployment: string;
   version: string;
 }) => {
-  return `${routeForWorkerDeployment({namespace, deployment)}/version/${version}`;
+  return `${routeForWorkerDeployment({
+    namespace,
+    deployment,
+  })}/version/${version}`;
 };
 
 export const routeForRelationships = (
