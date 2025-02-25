@@ -59,7 +59,7 @@
           <h1>
             {translate('deployments.worker-deployments')}
           </h1>
-          <Badge>Pre-Release</Badge>
+          <Badge class="shrink-0">Pre-Release</Badge>
         </div>
         <p class="text-sm text-secondary">
           {translate('deployments.worker-deployments-description')}
