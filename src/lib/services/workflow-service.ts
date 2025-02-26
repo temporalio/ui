@@ -107,6 +107,7 @@ type StartWorkflowOptions = {
   workflowType: string;
   input: string;
   encoding: PayloadInputEncoding;
+  messageType: string;
   summary: string;
   details: string;
   searchAttributes: SearchAttributeInput[];
@@ -342,7 +343,7 @@ export async function signalWorkflow({
     workflowId,
     signalName: name,
   });
-  const payloads = await encodePayloads(input, encoding);
+  const payloads = await encodePayloads({ input, encoding });
   const settings = get(page).data.settings;
   const version = settings?.version ?? '';
   const newVersion = isVersionNewer(version, '2.22');
@@ -390,7 +391,7 @@ export async function updateWorkflow({
     workflowId,
     updateName: name,
   });
-  const payloads = await encodePayloads(input, encoding);
+  const payloads = await encodePayloads({ input, encoding });
   const body = {
     workflowExecution: {
       runId,
@@ -557,6 +558,7 @@ export async function startWorkflow({
   summary,
   details,
   encoding,
+  messageType,
   searchAttributes,
 }: StartWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow', {
@@ -569,7 +571,7 @@ export async function startWorkflow({
 
   if (input) {
     try {
-      payloads = await encodePayloads(input, encoding);
+      payloads = await encodePayloads({ input, encoding, messageType });
     } catch (_) {
       throw new Error('Could not encode input for starting workflow');
     }
@@ -578,13 +580,19 @@ export async function startWorkflow({
   try {
     if (summary) {
       summaryPayload = (
-        await encodePayloads(stringifyWithBigInt(summary), 'json/plain')
+        await encodePayloads({
+          input: stringifyWithBigInt(summary),
+          encoding: 'json/plain',
+        })
       )[0];
     }
 
     if (details) {
       detailsPayload = (
-        await encodePayloads(stringifyWithBigInt(details), 'json/plain')
+        await encodePayloads({
+          input: stringifyWithBigInt(details),
+          encoding: 'json/plain',
+        })
       )[0];
     }
   } catch (e) {

@@ -97,7 +97,7 @@ export const submitCreateSchedule = async ({
 
   if (input) {
     try {
-      payloads = await encodePayloads(input, encoding);
+      payloads = await encodePayloads({ input, encoding });
     } catch (e) {
       error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
       return;
@@ -173,7 +173,7 @@ export const submitEditSchedule = async (
 
   if (input) {
     try {
-      payloads = await encodePayloads(input, encoding);
+      payloads = await encodePayloads({ input, encoding });
     } catch (e) {
       error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
       return;
@@ -210,10 +210,10 @@ export const submitEditSchedule = async (
     try {
       const entries = Object.entries(fields);
       for (const [key, value] of entries) {
-        const encodedValue = await encodePayloads(
-          stringifyWithBigInt(value),
-          'json/plain',
-        );
+        const encodedValue = await encodePayloads({
+          input: stringifyWithBigInt(value),
+          encoding: 'json/plain',
+        });
         fields[key] = encodedValue[0];
       }
     } catch (e) {
