@@ -39,7 +39,9 @@
   <h5 class="pb-1 text-sm font-medium">{label}</h5>
   <Card class="flex flex-col gap-2">
     <PayloadInput bind:input bind:loading {error} {id} {editing} />
-    <div class="flex items-end {editing ? 'justify-between' : 'justify-end'}">
+    <div
+      class="flex items-end gap-2 {editing ? 'justify-between' : 'justify-end'}"
+    >
       {#if editing}
         <div class="flex w-full flex-col gap-2">
           <RadioGroup
