@@ -9,7 +9,6 @@
 <script lang="ts">
   import { type Writable } from 'svelte/store';
 
-  import { onDestroy } from 'svelte';
   import { v4 as uuid } from 'uuid';
 
   import Card from '$lib/holocene/card.svelte';
@@ -23,7 +22,7 @@
   export let id = uuid();
   export let input: string;
   export let encoding: Writable<PayloadInputEncoding>;
-  export let messageType = '';
+  export let messageType: string;
   export let error = false;
   export let loading = false;
   export let label = translate('workflows.input');
@@ -34,12 +33,6 @@
       messageType = '';
     }
   }
-
-  const clearValues = () => {
-    $encoding = 'json/plain';
-  };
-
-  onDestroy(clearValues);
 </script>
 
 <div>
@@ -63,7 +56,7 @@
           </RadioGroup>
           {#if $encoding === 'json/protobuf'}
             <Input
-              label="Message Type"
+              label={translate('workflows.message-type')}
               bind:value={messageType}
               {error}
               id="messageType"

@@ -134,6 +134,8 @@
       workflowType: type,
     });
     input = initialValues.input;
+    encoding.set(initialValues.encoding);
+    messageType = initialValues.messageType;
     inputRetrieved = Date.now();
     summary = initialValues.summary;
     details = initialValues.details;

@@ -90,6 +90,7 @@ export const submitCreateSchedule = async ({
     taskQueue,
     input,
     encoding,
+    messageType,
     searchAttributes,
   } = action;
 
@@ -97,7 +98,7 @@ export const submitCreateSchedule = async ({
 
   if (input) {
     try {
-      payloads = await encodePayloads({ input, encoding });
+      payloads = await encodePayloads({ input, encoding, messageType });
     } catch (e) {
       error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
       return;
@@ -166,6 +167,7 @@ export const submitEditSchedule = async (
     taskQueue,
     input,
     encoding,
+    messageType,
     searchAttributes,
   } = action;
 
@@ -173,7 +175,7 @@ export const submitEditSchedule = async (
 
   if (input) {
     try {
-      payloads = await encodePayloads({ input, encoding });
+      payloads = await encodePayloads({ input, encoding, messageType });
     } catch (e) {
       error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
       return;

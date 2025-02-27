@@ -268,6 +268,7 @@ export const Strings = {
   'start-workflow-success': 'Workflow started successfully',
   'start-workflow-error': 'Error starting Workflow',
   encoding: 'Encoding',
+  'message-type': 'Message Type',
   'user-metadata': 'User Metadata',
   'markdown-supported': 'Markdown Supported',
   'markdown-description':
