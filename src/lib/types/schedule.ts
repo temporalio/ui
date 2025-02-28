@@ -40,6 +40,7 @@ export type ScheduleActionParameters = {
   taskQueue: string;
   input: string;
   encoding: PayloadInputEncoding;
+  messageType?: string;
   searchAttributes: SearchAttributeInput[];
 };
 

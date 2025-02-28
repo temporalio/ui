@@ -85,7 +85,11 @@
 
     try {
       encodePayloadResult = input
-        ? encodePayloads(input, 'json/plain', false)
+        ? encodePayloads({
+            input,
+            encoding: 'json/plain',
+            encodeWithCodec: false,
+          })
         : Promise.resolve(null);
       payloads = await encodePayloadResult;
     } catch (e) {

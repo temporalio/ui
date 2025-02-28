@@ -16,11 +16,13 @@
   export let input: string;
   export let editInput: boolean;
   export let encoding: Writable<PayloadInputEncoding>;
+  export let messageType: string;
   export let payloads: Payloads;
   export let showEditActions: boolean = false;
 
   let initialInput = '';
   let initialEncoding: PayloadInputEncoding = 'json/plain';
+  let initialMessageType = '';
   let loading = true;
 
   const setInitialInput = (decodedValue: string): void => {
@@ -29,9 +31,17 @@
     const currentEncoding = atob(
       String(payloads?.payloads[0]?.metadata?.encoding ?? 'json/plain'),
     );
+    const currentMessageType = payloads?.payloads[0]?.metadata?.messageType
+      ? atob(String(payloads?.payloads[0]?.metadata?.messageType))
+      : '';
+
     if (isPayloadInputEncodingType(currentEncoding)) {
       $encoding = currentEncoding;
       initialEncoding = $encoding;
+      if (currentEncoding === 'json/protobuf' && currentMessageType) {
+        messageType = currentMessageType;
+        initialMessageType = currentMessageType;
+      }
     }
     loading = false;
   };
@@ -41,6 +51,7 @@
       editInput = false;
       input = initialInput;
       $encoding = initialEncoding;
+      messageType = initialMessageType;
     } else {
       editInput = true;
       input;
@@ -53,6 +64,7 @@
     <PayloadInputWithEncoding
       bind:input
       bind:encoding
+      bind:messageType
       bind:loading
       editing={editInput}
       id="schedule-payload-input"

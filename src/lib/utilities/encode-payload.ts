@@ -24,7 +24,17 @@ export const getSinglePayload = (decodedValue: string): string => {
 export const setBase64Payload = (
   payload: unknown,
   encoding: PayloadInputEncoding = 'json/plain',
+  messageType = '',
 ) => {
+  if (messageType) {
+    return {
+      metadata: {
+        encoding: btoa(encoding),
+        messageType: btoa(messageType),
+      },
+      data: btoa(JSON.stringify(payload)),
+    };
+  }
   return {
     metadata: {
       encoding: btoa(encoding),
@@ -33,16 +43,24 @@ export const setBase64Payload = (
   };
 };
 
-export const encodePayloads = async (
-  input: string,
-  encoding: PayloadInputEncoding,
-  encodeWithCodec: boolean = true,
-): Promise<Payloads> => {
+type EncodePayloads = {
+  input: string;
+  encoding: PayloadInputEncoding;
+  messageType?: string;
+  encodeWithCodec?: boolean;
+};
+
+export const encodePayloads = async ({
+  input,
+  encoding,
+  messageType = '',
+  encodeWithCodec = true,
+}: EncodePayloads): Promise<Payloads> => {
   let payloads = null;
 
   if (input) {
     const parsedInput = JSON.parse(input);
-    payloads = [setBase64Payload(parsedInput, encoding)];
+    payloads = [setBase64Payload(parsedInput, encoding, messageType)];
     const endpoint = get(dataEncoder).endpoint;
     if (endpoint && encodeWithCodec) {
       const awaitData = await encodePayloadsWithCodec({

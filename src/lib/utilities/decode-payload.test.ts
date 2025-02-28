@@ -58,6 +58,15 @@ const ProtobufEncoded = {
   data: 'InRlc3RAdGVzdC5jb20i',
 };
 
+const ProtobufEncodedWithMessageType = {
+  metadata: {
+    encoding: 'anNvbi9wcm90b2J1Zg==',
+    messageType:
+      'dGVtcG9yYWwuYXBpLndvcmtmbG93LnYxLldvcmtmbG93RXhlY3V0aW9uU3RhcnRlZEV2ZW50QXR0cmlidXRlcw==',
+  },
+  data: 'InRlc3RAdGVzdC5jb20i',
+};
+
 const BinaryNullEncodedNoData = {
   metadata: {
     encoding: 'YmluYXJ5L251bGw=',
@@ -117,33 +126,75 @@ describe('decodePayload with returnDataOnly = false', () => {
     expect(decodePayload(WebDecodePayload, false)).toEqual(WebDecodePayload);
   });
   it('Should not decode a payload with encoding binary/null', () => {
-    const fullDecodedPayload = { ...BinaryNullEncodedNoData, data: null };
+    const fullDecodedPayload = {
+      metadata: {
+        encoding: 'binary/null',
+      },
+      data: null,
+    };
     expect(decodePayload(BinaryNullEncodedNoData, false)).toEqual(
       fullDecodedPayload,
     );
   });
   it('Should decode a payload with encoding json/plain', () => {
-    const fullDecodedPayload = { ...JsonPlainEncoded, data: Base64Decoded };
+    const fullDecodedPayload = {
+      metadata: {
+        encoding: 'json/plain',
+        type: 'Keyword',
+      },
+      data: Base64Decoded,
+    };
     expect(decodePayload(JsonPlainEncoded, false)).toEqual(fullDecodedPayload);
   });
   it('Should decode a payload with encoding json/foo', () => {
-    const fullDecodedPayload = { ...JsonFooEncoded, data: Base64Decoded };
+    const fullDecodedPayload = {
+      metadata: {
+        encoding: 'json/foo',
+        type: 'Keyword',
+      },
+      data: Base64Decoded,
+    };
     expect(decodePayload(JsonFooEncoded, false)).toEqual(fullDecodedPayload);
   });
   it('Should decode a payload with encoding json/protobuf', () => {
-    const fullDecodedPayload = { ...ProtobufEncoded, data: Base64Decoded };
+    const fullDecodedPayload = {
+      metadata: {
+        encoding: 'json/protobuf',
+        type: 'Keyword',
+      },
+      data: Base64Decoded,
+    };
     expect(decodePayload(ProtobufEncoded, false)).toEqual(fullDecodedPayload);
+  });
+  it('Should decode a payload with encoding json/protobuf with messageType', () => {
+    const fullDecodedPayload = {
+      metadata: {
+        encoding: 'json/protobuf',
+        messageType:
+          'temporal.api.workflow.v1.WorkflowExecutionStartedEventAttributes',
+      },
+      data: Base64Decoded,
+    };
+    expect(decodePayload(ProtobufEncodedWithMessageType, false)).toEqual(
+      fullDecodedPayload,
+    );
   });
   it('Should decode a json payload with encoding json/plain', () => {
     const fullDecodedPayload = {
-      ...JsonObjectEncoded,
+      metadata: {
+        encoding: 'json/plain',
+        type: 'Keyword',
+      },
       data: JsonObjectDecoded,
     };
     expect(decodePayload(JsonObjectEncoded, false)).toEqual(fullDecodedPayload);
   });
   it('Should decode a json payload with constructor keyword with encoding json/plain', () => {
     const fullDecodedPayload = {
-      ...JsonObjectEncoded,
+      metadata: {
+        encoding: 'json/plain',
+        type: 'Keyword',
+      },
       data: JsonObjectDecodedWithConstructor,
     };
     expect(decodePayload(JsonObjectEncodedWithConstructor, false)).toEqual(

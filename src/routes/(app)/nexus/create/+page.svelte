@@ -19,10 +19,10 @@
     loading = true;
     try {
       const body = { ...$endpointForm };
-      const payloads = await encodePayloads(
-        JSON.stringify(body.spec.descriptionString),
-        'json/plain',
-      );
+      const payloads = await encodePayloads({
+        input: JSON.stringify(body.spec.descriptionString),
+        encoding: 'json/plain',
+      });
       body.spec.description = payloads[0];
 
       delete body.spec.allowedCallerNamespaces;
