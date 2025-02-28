@@ -39,7 +39,7 @@
   ];
 </script>
 
-<div class="flex flex-col gap-4 pt-4">
+<div class="flex flex-col gap-4">
   {#key [namespace]}
     <PaginatedTable
       let:visibleItems

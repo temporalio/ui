@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -20,7 +19,6 @@
         >
           {translate('nexus.endpoints')}
         </h1>
-        <Badge type="primary">Public Preview</Badge>
       </div>
       <div class="flex w-full flex-col gap-4 pr-8 md:pr-24">
         <h2 class="text-4xl">Get Started</h2>
