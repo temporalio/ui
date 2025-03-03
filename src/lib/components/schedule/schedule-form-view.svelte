@@ -79,6 +79,7 @@
   let input = '';
   let editInput = !schedule;
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
+  let messageType = '';
   let daysOfWeek: string[] = [];
   let daysOfMonth: number[] = [];
   let months: string[] = [];
@@ -104,6 +105,7 @@
       taskQueue,
       ...(editInput && { input }),
       encoding: $encoding,
+      messageType,
       hour,
       minute,
       second,
@@ -218,6 +220,7 @@
           bind:input
           bind:editInput
           bind:encoding
+          bind:messageType
           payloads={schedule?.action?.startWorkflow?.input}
           showEditActions={Boolean(schedule)}
         />

@@ -4,7 +4,10 @@ import { v4 } from 'uuid';
 
 import { page } from '$app/stores';
 
-import type { PayloadInputEncoding } from '$lib/components/payload-input-with-encoding.svelte';
+import {
+  isPayloadInputEncodingType,
+  type PayloadInputEncoding,
+} from '$lib/components/payload-input-with-encoding.svelte';
 import { Action } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
@@ -88,6 +91,7 @@ type SignalWorkflowOptions = {
   name: string;
   input: string;
   encoding: PayloadInputEncoding;
+  messageType: string;
 };
 
 type UpdateWorkflowOptions = {
@@ -107,6 +111,7 @@ type StartWorkflowOptions = {
   workflowType: string;
   input: string;
   encoding: PayloadInputEncoding;
+  messageType: string;
   summary: string;
   details: string;
   searchAttributes: SearchAttributeInput[];
@@ -336,13 +341,14 @@ export async function signalWorkflow({
   name,
   input,
   encoding,
+  messageType,
 }: SignalWorkflowOptions) {
   const route = routeForApi('workflow.signal', {
     namespace,
     workflowId,
     signalName: name,
   });
-  const payloads = await encodePayloads(input, encoding);
+  const payloads = await encodePayloads({ input, encoding, messageType });
   const settings = get(page).data.settings;
   const version = settings?.version ?? '';
   const newVersion = isVersionNewer(version, '2.22');
@@ -390,7 +396,7 @@ export async function updateWorkflow({
     workflowId,
     updateName: name,
   });
-  const payloads = await encodePayloads(input, encoding);
+  const payloads = await encodePayloads({ input, encoding });
   const body = {
     workflowExecution: {
       runId,
@@ -557,6 +563,7 @@ export async function startWorkflow({
   summary,
   details,
   encoding,
+  messageType,
   searchAttributes,
 }: StartWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow', {
@@ -569,7 +576,7 @@ export async function startWorkflow({
 
   if (input) {
     try {
-      payloads = await encodePayloads(input, encoding);
+      payloads = await encodePayloads({ input, encoding, messageType });
     } catch (_) {
       throw new Error('Could not encode input for starting workflow');
     }
@@ -578,13 +585,19 @@ export async function startWorkflow({
   try {
     if (summary) {
       summaryPayload = (
-        await encodePayloads(stringifyWithBigInt(summary), 'json/plain')
+        await encodePayloads({
+          input: stringifyWithBigInt(summary),
+          encoding: 'json/plain',
+        })
       )[0];
     }
 
     if (details) {
       detailsPayload = (
-        await encodePayloads(stringifyWithBigInt(details), 'json/plain')
+        await encodePayloads({
+          input: stringifyWithBigInt(details),
+          encoding: 'json/plain',
+        })
       )[0];
     }
   } catch (e) {
@@ -633,6 +646,8 @@ export const fetchInitialValuesForStartWorkflow = async ({
   workflowId?: string;
 }): Promise<{
   input: string;
+  encoding: PayloadInputEncoding;
+  messageType: string;
   searchAttributes: Record<string, string | Payload> | undefined;
   summary: string;
   details: string;
@@ -642,6 +657,8 @@ export const fetchInitialValuesForStartWorkflow = async ({
   };
   const emptyValues = {
     input: '',
+    encoding: 'json/plain' as PayloadInputEncoding,
+    messageType: '',
     searchAttributes: undefined,
     summary: '',
     details: '',
@@ -681,6 +698,8 @@ export const fetchInitialValuesForStartWorkflow = async ({
       namespace,
       get(page).data.settings,
       get(authUser).accessToken,
+      'readable',
+      false,
     )) as PotentiallyDecodable;
 
     let summary = '';
@@ -703,10 +722,23 @@ export const fetchInitialValuesForStartWorkflow = async ({
       }
     }
     const input = convertedAttributes?.payloads
-      ? stringifyWithBigInt(convertedAttributes.payloads[0])
+      ? stringifyWithBigInt(convertedAttributes.payloads[0]?.data)
       : '';
+    const encoding =
+      convertedAttributes?.payloads &&
+      isPayloadInputEncodingType(
+        convertedAttributes.payloads[0]?.metadata?.encoding,
+      )
+        ? convertedAttributes.payloads[0]?.metadata?.encoding
+        : 'json/plain';
+    const messageType = convertedAttributes?.payloads
+      ? convertedAttributes.payloads[0]?.metadata?.messageType
+      : '';
+
     return {
       input,
+      encoding,
+      messageType,
       searchAttributes: workflow?.searchAttributes?.indexedFields,
       summary,
       details,
