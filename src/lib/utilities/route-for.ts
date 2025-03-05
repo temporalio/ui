@@ -200,7 +200,8 @@ export const routeForWorkerDeployment = ({
   namespace: string;
   deployment: string;
 }) => {
-  return `${base}/namespaces/${namespace}/worker-deployments/${deployment}`;
+  const deploymentName = encodeURIForSvelte(deployment);
+  return `${base}/namespaces/${namespace}/worker-deployments/${deploymentName}`;
 };
 
 export const routeForWorkerDeploymentVersion = ({
