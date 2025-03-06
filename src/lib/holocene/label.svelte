@@ -9,6 +9,7 @@
     required?: boolean;
     disabled?: boolean;
     'data-testid'?: string;
+    class?: string;
   };
 
   export let label = '';

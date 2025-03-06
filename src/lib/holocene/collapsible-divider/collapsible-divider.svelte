@@ -8,6 +8,7 @@
   type $$Props = HTMLAttributes<HTMLDivElement> & {
     label: string;
     open?: boolean;
+    class?: string;
   };
 
   let className: string | undefined = undefined;

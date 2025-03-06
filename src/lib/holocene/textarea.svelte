@@ -19,6 +19,7 @@
     required?: boolean;
     description?: string;
     maxLength?: number;
+    class?: string;
   };
 
   export let disabled = false;
