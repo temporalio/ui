@@ -208,7 +208,7 @@
     class:editable
     class:readOnly={!editable}
     {...$$restProps}
-  />
+  ></div>
   {#if copyable}
     <CopyButton
       {copyIconTitle}

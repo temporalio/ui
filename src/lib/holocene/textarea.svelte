@@ -69,7 +69,7 @@
       on:keydown|stopPropagation
       maxlength={maxLength > 0 ? maxLength : undefined}
       {...$$restProps}
-    />
+    ></textarea>
   </div>
   <div class="flex justify-between gap-2">
     <div

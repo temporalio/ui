@@ -76,7 +76,7 @@
       />
     </div></td
   >
-  <td />
+  <td></td>
 </tr>
 {#if expanded}
   <tr class="row expanded">

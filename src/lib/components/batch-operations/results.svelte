@@ -49,7 +49,7 @@
       <div
         class="absolute left-0 flex h-full items-center bg-indigo-600"
         style="width:{progressPercent}%;"
-      />
+      ></div>
     </div>
   </div>
 
@@ -72,11 +72,11 @@
       <div
         style="width:{completePercent}%;"
         class="absolute left-0 flex h-full items-center bg-green-200"
-      />
+      ></div>
       <div
         style="width:{failurePercent}%;"
         class="absolute right-0 flex h-full items-center justify-end bg-red-200"
-      />
+      ></div>
     </div>
   </div>
 </div>
