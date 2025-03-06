@@ -25,21 +25,21 @@
     isCurrent
       ? translate('deployments.current')
       : isRamping
-      ? translate('deployments.ramping')
-      : drainageStatus
-      ? fromScreamingEnum(drainageStatus, 'VersionDrainageStatus')
-      : translate('common.inactive')
+        ? translate('deployments.ramping')
+        : drainageStatus
+          ? fromScreamingEnum(drainageStatus, 'VersionDrainageStatus')
+          : translate('common.inactive')
   ) as Status;
 
   $: statusLabel = isCurrent
     ? translate('deployments.current')
     : isRamping
-    ? translate('deployments.ramping', {
-        percentage: routingConfig.rampingVersionPercentage,
-      })
-    : drainageStatus
-    ? fromScreamingEnum(drainageStatus, 'VersionDrainageStatus')
-    : translate('common.inactive');
+      ? translate('deployments.ramping', {
+          percentage: routingConfig.rampingVersionPercentage,
+        })
+      : drainageStatus
+        ? fromScreamingEnum(drainageStatus, 'VersionDrainageStatus')
+        : translate('common.inactive');
 </script>
 
 <tr>

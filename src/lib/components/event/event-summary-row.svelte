@@ -90,8 +90,8 @@
   $: displayName = isEventGroup(event)
     ? event.label
     : isLocalActivityMarkerEvent(event)
-    ? 'Local Activity'
-    : spaceBetweenCapitalLetters(event.name);
+      ? 'Local Activity'
+      : spaceBetweenCapitalLetters(event.name);
 
   $: primaryAttribute = getPrimaryAttributeForEvent(
     isEventGroup(event) ? event.initialEvent : event,
