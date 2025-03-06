@@ -10,7 +10,7 @@
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
   import Banner from '$lib/holocene/banner/banner.svelte';
-  import { ErrorBoundary } from '$lib/holocene/error-boundary';
+  import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
@@ -262,7 +262,7 @@
       slot="main"
       class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
     >
-      <ErrorBoundary onError={() => {}}>
+      <ErrorBoundary>
         <slot />
       </ErrorBoundary>
     </div>

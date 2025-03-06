@@ -26,9 +26,6 @@ dependencies:
   '@codemirror/view':
     specifier: ^6.29.0
     version: 6.29.0
-  '@crownframework/svelte-error-boundary':
-    specifier: ^1.0.3
-    version: 1.0.3
   '@fontsource-variable/inter':
     specifier: ^5.0.8
     version: 5.0.8
@@ -1347,10 +1344,6 @@ packages:
       '@codemirror/state': 6.4.1
       style-mod: 4.1.2
       w3c-keyname: 2.2.6
-    dev: false
-
-  /@crownframework/svelte-error-boundary@1.0.3:
-    resolution: {integrity: sha512-ZtfYF9if48Ok8BTx/fn7bERJFKHKO6Ih5d/fkY6/pC3DQEnJq4vy6JOBFcisnpKYcZbjG5F/D4r06kqX7JKyqw==}
     dev: false
 
   /@cspotcode/source-map-support@0.8.1:
