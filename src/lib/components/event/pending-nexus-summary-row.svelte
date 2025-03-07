@@ -41,7 +41,7 @@
   data-testid="pending-nexus-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td class="w-12 text-left">
+  <td class="font-mono">
     <Link data-testid="link" {href}>
       {event.scheduledEventId || ''}
     </Link>
@@ -51,7 +51,6 @@
   >
     <div class="flex">
       <div class="flex w-full items-center gap-2">
-        <Icon name="nexus" />
         <p class="font-semibold md:text-base">Pending Nexus Operation</p>
         {#if event.attempt}
           <div
@@ -85,7 +84,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex select-none items-center gap-4 px-1 text-sm no-underline;
+    @apply flex select-none items-center gap-4 px-2 text-sm no-underline;
   }
 
   .expanded-cell {

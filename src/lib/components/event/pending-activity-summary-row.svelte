@@ -42,14 +42,13 @@
   data-testid="pending-activity-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td>
+  <td class="font-mono">
     <Link data-testid="link" {href}>
       {event.activityId}
     </Link>
   </td>
   <td class="w-full overflow-hidden text-right font-normal xl:text-left">
     <div class="flex w-full items-center gap-2">
-      <!-- <Icon name="activity" /> -->
       <p class="event-name truncate font-semibold md:text-base">
         Pending Activity
       </p>
@@ -88,7 +87,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex select-none items-center gap-4 px-1 text-sm no-underline;
+    @apply flex select-none items-center gap-4 px-2 text-sm no-underline;
   }
 
   .expanded-cell {
