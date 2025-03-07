@@ -117,7 +117,7 @@
               {attribute}
               {#if isNullConditional(conditional)}
                 {conditional}
-                {value}
+                {String(value)}
               {:else if isDateTimeFilter(workflowFilter)}
                 {#if customDate}
                   {formatDateTimeRange(value, $timeFormat, $relativeTime)}
