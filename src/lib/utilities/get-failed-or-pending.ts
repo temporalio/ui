@@ -3,6 +3,7 @@ import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { isEvent } from '$lib/models/event-history';
 import type { IterableEventWithPending } from '$lib/types/events';
 
+import { isLocalActivityMarkerEvent } from './is-event-type';
 import {
   isPendingActivity,
   isPendingNexusOperation,
@@ -17,6 +18,9 @@ export const getFailedOrPendingEvents = (
     (item) =>
       (isEvent(item) && item.classification === 'Failed') ||
       (isEvent(item) && item.classification === 'TimedOut') ||
+      (isEvent(item) &&
+        isLocalActivityMarkerEvent(item) &&
+        item.markerRecordedEventAttributes.failure) ||
       isPendingActivity(item) ||
       isPendingNexusOperation(item) ||
       (isEventGroup(item) &&
