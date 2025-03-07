@@ -36,7 +36,7 @@
   on:cancelModal={() => (open = false)}
 >
   <h3 slot="title">
-    {translate('common.download-json')}
+    {translate('common.download-event-history-json')}
   </h3>
   <div slot="content" class="flex flex-col gap-4">
     <RadioGroup

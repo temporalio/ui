@@ -16,7 +16,8 @@
     compactEventTypeOptions,
   } from '$lib/models/event-history/get-event-categorization';
   import { clearActiveGroups } from '$lib/stores/active-events';
-  import { eventTypeFilter } from '$lib/stores/filters';
+  import { eventViewType } from '$lib/stores/event-view';
+  import { eventStatusFilter, eventTypeFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
   import { nexusEnabled } from '$lib/utilities/nexus-enabled';
   import { isVersionNewer } from '$lib/utilities/version-check';
@@ -70,7 +71,7 @@
     >
       <Icon name="filter" class={filterActive && 'pt-0.5 text-white'} />
     </div>
-    {translate('events.event-types')}
+    <span class="hidden text-sm md:block">{translate('common.filter')}</span>
   </MenuButton>
   <Menu
     id="event-type-menu"
@@ -82,31 +83,58 @@
       data-testid={translate('common.all')}
       on:click={() => {
         $eventTypeFilter = defaultOptions;
+        $eventStatusFilter = false;
       }}
     >
       <Checkbox
         on:change={() => {
           $eventTypeFilter = defaultOptions;
+          $eventStatusFilter = false;
         }}
         slot="leading"
-        checked={$eventTypeFilter.length === defaultOptions.length}
+        checked={!$eventStatusFilter &&
+          $eventTypeFilter.length === defaultOptions.length}
         label={translate('common.all')}
         labelHidden
       />
       {translate('common.all')}
     </MenuItem>
+    {#if $eventViewType !== 'json'}
+      <MenuItem
+        data-testid={translate('common.pending-and-failed')}
+        description={translate('common.pending-and-failed-description')}
+        on:click={() => {
+          $eventTypeFilter = defaultOptions;
+          $eventStatusFilter = !$eventStatusFilter;
+        }}
+      >
+        <Checkbox
+          on:change={() => {
+            $eventTypeFilter = defaultOptions;
+            $eventStatusFilter = !$eventStatusFilter;
+          }}
+          slot="leading"
+          checked={$eventStatusFilter}
+          label={translate('common.all')}
+          labelHidden
+        />
+        {translate('common.pending-and-failed')}
+      </MenuItem>
+    {/if}
     <MenuItem
       data-testid={translate('common.none')}
       on:click={() => {
         $eventTypeFilter = [];
+        $eventStatusFilter = false;
       }}
     >
       <Checkbox
         on:change={() => {
           $eventTypeFilter = [];
+          $eventStatusFilter = false;
         }}
         slot="leading"
-        checked={!$eventTypeFilter.length}
+        checked={!$eventStatusFilter && !$eventTypeFilter.length}
         label={translate('common.none')}
         labelHidden
       />
