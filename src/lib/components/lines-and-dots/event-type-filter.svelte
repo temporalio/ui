@@ -25,6 +25,8 @@
   import { CategoryIcon } from './constants';
 
   export let compact = false;
+  export let minimized = true;
+
   let open = writable(false);
 
   $: defaultOptions = compact
@@ -76,8 +78,8 @@
   <Menu
     id="event-type-menu"
     keepOpen
-    position="top-right"
-    class="w-[240px] md:w-[400px]"
+    position={minimized ? 'top-right' : 'right'}
+    class="w-[220px] md:w-[360px]"
   >
     <MenuItem
       data-testid={translate('common.all')}

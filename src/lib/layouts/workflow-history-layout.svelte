@@ -15,7 +15,11 @@
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import { clearActives } from '$lib/stores/active-events';
-  import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
+  import {
+    eventFilterSort,
+    eventViewType,
+    minimizeEventView,
+  } from '$lib/stores/event-view';
   import {
     currentEventHistory,
     filteredEventHistory,
@@ -60,7 +64,6 @@
     }
   }
 
-  let minimized = true;
   let showDownloadPrompt = false;
 
   const onSort = () => {
@@ -85,55 +88,61 @@
     {#if workflow?.callbacks?.length}
       <WorkflowCallbacks callbacks={workflow.callbacks} />
     {/if}
-    <div class="flex items-center justify-between gap-2 py-2 xl:gap-8">
-      <h2>
-        {translate('workflows.event-history')}
-      </h2>
-      <div class="flex items-center gap-2">
-        <ToggleButtons>
-          {#if $eventViewType !== 'json'}
-            <ToggleButton
-              icon={reverseSort ? 'descending' : 'ascending'}
-              data-testid="zoom-in"
-              on:click={onSort}>{reverseSort ? 'Desc' : 'Asc'}</ToggleButton
-            >
-          {/if}
-          <ToggleButton
-            icon={minimized ? 'arrow-up' : 'arrow-down'}
-            data-testid="expandAll"
-            on:click={() => (minimized = !minimized)}
-            >{minimized ? 'Minimize' : 'Expand'}</ToggleButton
-          >
-          <EventTypeFilter {compact} />
-          <ToggleButton
-            disabled={!workflow.isRunning}
-            icon={$pauseLiveUpdates ? 'play' : 'pause'}
-            data-testid="pause"
-            on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
-          >
-            {$pauseLiveUpdates ? 'Resume' : 'Pause'}
-          </ToggleButton>
-          <ToggleButton
-            data-testid="download"
-            icon="download"
-            on:click={() => (showDownloadPrompt = true)}
-          >
-            {translate('common.download')}
-          </ToggleButton>
-        </ToggleButtons>
-      </div>
-    </div>
   </div>
 </div>
-<div class="px-2 pb-24 md:px-4 lg:px-8">
-  <div class="flex w-full flex-col border border-subtle">
+<div class="relative px-2 pb-24 md:px-4 lg:px-8">
+  <div
+    class="flex items-center justify-between gap-2 py-2 xl:gap-8"
+    class:sticky-header={!$minimizeEventView}
+  >
+    <h2>
+      {translate('workflows.event-history')}
+    </h2>
+    <div class="flex items-center gap-2">
+      <ToggleButtons>
+        {#if $eventViewType !== 'json'}
+          <ToggleButton
+            icon={reverseSort ? 'descending' : 'ascending'}
+            data-testid="zoom-in"
+            on:click={onSort}>{reverseSort ? 'Desc' : 'Asc'}</ToggleButton
+          >
+        {/if}
+        <ToggleButton
+          icon={$minimizeEventView ? 'arrow-up' : 'arrow-down'}
+          data-testid="expandAll"
+          on:click={() => ($minimizeEventView = !$minimizeEventView)}
+          >{$minimizeEventView ? 'Minimize' : 'Expand'}</ToggleButton
+        >
+        <EventTypeFilter {compact} minimized={$minimizeEventView} />
+        <ToggleButton
+          disabled={!workflow.isRunning}
+          icon={$pauseLiveUpdates ? 'play' : 'pause'}
+          data-testid="pause"
+          on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
+        >
+          {$pauseLiveUpdates ? 'Resume' : 'Pause'}
+        </ToggleButton>
+        <ToggleButton
+          data-testid="download"
+          icon="download"
+          on:click={() => (showDownloadPrompt = true)}
+        >
+          {translate('common.download')}
+        </ToggleButton>
+      </ToggleButtons>
+    </div>
+  </div>
+  <div
+    class="flex w-full flex-col border border-subtle {!$minimizeEventView &&
+      'border-t-0'}"
+  >
     <TimelineGraph
       {workflow}
       {groups}
       {workflowTaskFailedError}
-      viewportHeight={minimized ? 360 : undefined}
+      viewportHeight={$minimizeEventView ? 360 : undefined}
     />
-    <EventSummary {groups} {history} {minimized} />
+    <EventSummary {groups} {history} minimized={$minimizeEventView} />
   </div>
 </div>
 <DownloadEventHistoryModal
@@ -142,3 +151,9 @@
   workflowId={workflow.id}
   runId={workflow.runId}
 />
+
+<style lang="postcss">
+  .sticky-header {
+    @apply sticky top-12 z-50 border-b border-subtle backdrop-blur-sm;
+  }
+</style>
