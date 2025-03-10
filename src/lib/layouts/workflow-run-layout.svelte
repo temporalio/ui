@@ -102,7 +102,7 @@
 
     workflowRunController = new AbortController();
 
-    if (workflow.isRunning) {
+    if (workflow.isRunning && workers?.pollers?.length) {
       getWorkflowMetadata(
         {
           namespace,

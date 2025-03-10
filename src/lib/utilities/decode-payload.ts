@@ -55,6 +55,16 @@ const toArray = (payloads: Payload | Payload[]): Payload[] => {
   }
 };
 
+const decodeMetadata = (metadata: Record<string, unknown>) => {
+  return Object.entries(metadata).reduce(
+    (acc, [key, value]) => {
+      acc[key] = atob(String(value));
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
+};
+
 export function decodePayload(
   payload: Payload,
   returnDataOnly: boolean = true,
@@ -66,7 +76,12 @@ export function decodePayload(
 
   try {
     const data = parseWithBigInt(atob(String(payload?.data ?? '')));
-    return returnDataOnly ? data : { ...payload, data };
+    if (returnDataOnly) return data;
+    const metadata = decodeMetadata(payload?.metadata);
+    return {
+      metadata,
+      data,
+    };
   } catch (_e) {
     console.warn('Could not parse payload: ', _e);
     // Couldn't correctly decode this just let the user deal with the data as is
@@ -74,7 +89,12 @@ export function decodePayload(
 
   const encoding = atob(String(payload?.metadata?.encoding ?? ''));
   if (encoding === 'binary/null') {
-    return returnDataOnly ? null : { ...payload, data: null };
+    if (returnDataOnly) return null;
+    const metadata = decodeMetadata(payload?.metadata);
+    return {
+      metadata,
+      data: null,
+    };
   }
 
   return payload;
