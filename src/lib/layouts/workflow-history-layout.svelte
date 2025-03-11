@@ -111,7 +111,7 @@
           icon={$minimizeEventView ? 'arrow-up' : 'arrow-down'}
           data-testid="expandAll"
           on:click={() => ($minimizeEventView = !$minimizeEventView)}
-          >{$minimizeEventView ? 'Minimize' : 'Expand'}</ToggleButton
+          >{$minimizeEventView ? 'Minimized' : 'Expanded'}</ToggleButton
         >
         <EventTypeFilter {compact} minimized={$minimizeEventView} />
         <ToggleButton
