@@ -30,8 +30,9 @@
   let name = '';
   let customSignal = false;
 
-  let encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
   let input = '';
+  let encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
+  let messageType = '';
 
   const hideSignalModal = () => {
     open = false;
@@ -39,6 +40,7 @@
     input = '';
     customSignal = false;
     $encoding = defaultEncoding;
+    messageType = '';
   };
 
   const signal = async () => {
@@ -50,6 +52,7 @@
         workflow,
         input,
         encoding: $encoding,
+        messageType,
         name,
       });
       $refresh = Date.now();
@@ -114,6 +117,6 @@
         bind:value={name}
       />
     {/if}
-    <PayloadInputWithEncoding bind:input bind:encoding />
+    <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
   </div>
 </Modal>

@@ -109,6 +109,11 @@
     isEventGroup(event) &&
     !event.isPending &&
     event.eventList.find(isActivityTaskStartedEvent)?.attributes?.attempt;
+  $: showSecondaryAttribute =
+    compact &&
+    secondaryAttribute?.key &&
+    secondaryAttribute?.key !== primaryAttribute?.key &&
+    !currentEvent?.userMetadata?.summary;
 </script>
 
 <tr
@@ -234,7 +239,7 @@
         {attributes}
       />
     {/if}
-    {#if compact && secondaryAttribute?.key && !currentEvent?.userMetadata?.summary}
+    {#if showSecondaryAttribute}
       <EventDetailsRow {...secondaryAttribute} {attributes} />
     {/if}
   </td>

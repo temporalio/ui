@@ -37,6 +37,7 @@
       taskQueue,
       input,
       encoding,
+      messageType,
       hour,
       minute,
       second,
@@ -56,6 +57,7 @@
       taskQueue,
       input,
       encoding,
+      messageType,
       searchAttributes,
     };
     const spec: Partial<ScheduleSpecParameters> = {

@@ -49,6 +49,7 @@
   let summary = '';
   let details = '';
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
+  let messageType = '';
   let inputRetrieved = 0;
 
   let initialWorkflowId = '';
@@ -86,6 +87,7 @@
         summary,
         details,
         encoding: $encoding,
+        messageType,
         searchAttributes,
       });
       toaster.push({
@@ -132,6 +134,8 @@
       workflowType: type,
     });
     input = initialValues.input;
+    encoding.set(initialValues.encoding);
+    messageType = initialValues.messageType;
     inputRetrieved = Date.now();
     summary = initialValues.summary;
     details = initialValues.details;
@@ -262,7 +266,7 @@
       on:blur={(e) => onInputChange(e, 'workflowType')}
     />
     {#key inputRetrieved}
-      <PayloadInputWithEncoding bind:input bind:encoding />
+      <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
     {/key}
     {#if viewAdvancedOptions}
       <Card class="flex flex-col gap-2">
