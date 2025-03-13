@@ -76,11 +76,16 @@
   {:else if attribute.type === SEARCH_ATTRIBUTE_TYPE.DATETIME}
     <DatetimeInput bind:value={attribute.value} />
   {:else if attribute.type === SEARCH_ATTRIBUTE_TYPE.INT || attribute.type === SEARCH_ATTRIBUTE_TYPE.DOUBLE}
-    <NumberInput
-      label={translate('common.value')}
-      id="attribute-value"
-      bind:value={attribute.value}
-    />
+    <div>
+      <NumberInput
+        label={translate('common.value')}
+        id="attribute-value"
+        valid={attribute.value < Number.MAX_SAFE_INTEGER}
+        hintText="Number is too large"
+        bind:value={attribute.value}
+        max={Number.MAX_SAFE_INTEGER}
+      />
+    </div>
   {:else if attribute.type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST}
     <ChipInput
       label={translate('common.value')}
