@@ -68,12 +68,14 @@
         active={$eventViewType === 'compact'}
         data-testid="compact"
         icon="compact"
+        class="h-10"
         on:click={onCompactClick}>Compact</ToggleButton
       >
       <ToggleButton
         active={$eventViewType === 'json'}
         data-testid="json"
         icon="json"
+        class="h-10"
         on:click={onJSONClick}>JSON</ToggleButton
       >
     </ToggleButtons>
