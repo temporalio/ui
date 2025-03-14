@@ -52,5 +52,5 @@
 </script>
 
 <div class="px-8" data-testid="event-summary-table">
-  <EventSummaryTable items={visibleItems} {groups} {updating} openExpanded />
+  <EventSummaryTable items={visibleItems} {groups} {updating} expandAll />
 </div>

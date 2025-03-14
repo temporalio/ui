@@ -18,6 +18,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
 
   import CopyButton from '$lib/holocene/copyable/button.svelte';
+  import ExpandButton from '$lib/holocene/expandable/button.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { useDarkMode } from '$lib/utilities/dark-mode';
   import {
@@ -65,9 +66,14 @@
   export let label = '';
 
   const { copy, copied } = copyToClipboard();
+  let expanded = false;
 
   const handleCopy = (e: Event) => {
     copy(e, content);
+  };
+
+  const handleExpand = () => {
+    expanded = !expanded;
   };
 
   let editor: HTMLElement;
@@ -101,10 +107,10 @@
     }
   });
 
-  const createEditorView = (isDark: boolean): EditorView => {
+  const createEditorView = (isDark: boolean, expanded: boolean): EditorView => {
     return new EditorView({
       parent: editor,
-      state: createEditorState(value, isDark),
+      state: createEditorState(value, isDark, expanded),
       dispatch(transaction) {
         view.update([transaction]);
         if (transaction.docChanged) {
@@ -117,6 +123,7 @@
   const createEditorState = (
     value: string | null | undefined,
     isDark: boolean,
+    expanded: boolean,
   ): EditorState => {
     const extensions = [
       keymap.of([...standardKeymap, ...historyKeymap]),
@@ -149,7 +156,7 @@
       extensions.push(foldGutter());
     }
 
-    if (minHeight || maxHeight) {
+    if (minHeight || (maxHeight && !expanded)) {
       extensions.push(
         EditorView.theme({
           '&': {
@@ -168,16 +175,16 @@
   };
 
   onMount(() => {
-    createView($useDarkMode);
+    createView($useDarkMode, expanded);
     return () => view?.destroy();
   });
 
-  const createView = (isDark: boolean) => {
+  const createView = (isDark: boolean, expanded) => {
     if (view) view.destroy();
-    view = createEditorView(isDark);
+    view = createEditorView(isDark, expanded);
   };
 
-  $: createView($useDarkMode);
+  $: createView($useDarkMode, expanded);
 
   const resetView = (value = '', format = true) => {
     const formattedValue = format ? formatValue({ value, language }) : value;
@@ -197,6 +204,16 @@
   };
 
   $: content, language, setView();
+
+  $: expandable = !editable && maxHeight && contentHeight(editor) > maxHeight;
+
+  const contentHeight = (element: HTMLElement) => {
+    const childElement = element?.querySelector('.cm-content') as HTMLElement;
+    if (childElement) {
+      return childElement?.offsetHeight || 0;
+    }
+    return 0;
+  };
 </script>
 
 <div class="relative min-w-[80px] grow">
@@ -209,13 +226,18 @@
     class:readOnly={!editable}
     {...$$restProps}
   />
-  {#if copyable}
-    <CopyButton
-      {copyIconTitle}
-      {copySuccessIconTitle}
-      class="absolute right-1 top-1 text-secondary"
-      on:click={handleCopy}
-      copied={$copied}
-    />
-  {/if}
+  <div class="absolute right-1 top-1 flex items-center">
+    {#if expandable}
+      <ExpandButton class="text-secondary" on:click={handleExpand} {expanded} />
+    {/if}
+    {#if copyable}
+      <CopyButton
+        {copyIconTitle}
+        {copySuccessIconTitle}
+        class="text-secondary"
+        on:click={handleCopy}
+        copied={$copied}
+      />
+    {/if}
+  </div>
 </div>

@@ -77,6 +77,6 @@
     </h2>
   {/if}
   <div data-testid="event-summary-table">
-    <EventSummaryTable items={events} groups={events} {updating} openExpanded />
+    <EventSummaryTable items={events} groups={events} {updating} expandAll />
   </div>
 </div>

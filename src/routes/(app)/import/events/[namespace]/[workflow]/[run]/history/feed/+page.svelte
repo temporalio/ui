@@ -1,6 +1,6 @@
 <script lang="ts">
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
-  import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
+  import { eventFilterSort } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
   import { importEvents } from '$lib/stores/import-events';
   import type { WorkflowEvent } from '$lib/types/events';
@@ -14,10 +14,6 @@
       return $eventCategoryFilter.includes(event.category);
     return event;
   });
-
-  function handleExpandChange(event: CustomEvent) {
-    $expandAllEvents = event.detail.expanded;
-  }
 </script>
 
-<EventSummaryTable items={filteredEvents} on:expandAll={handleExpandChange} />
+<EventSummaryTable items={filteredEvents} />

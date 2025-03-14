@@ -3,6 +3,7 @@ export const Namespace = 'common' as const;
 export const Strings = {
   loading: 'Loading...',
   filtering: 'filtering',
+  filter: 'Filter',
   'unknown-error': 'An unknown error occurred.',
   search: 'Search',
   apply: 'Apply',
@@ -147,6 +148,7 @@ export const Strings = {
   'time-range': 'Time Range',
   'based-on-time-preface': 'Based on',
   'download-json': 'Download JSON',
+  'download-event-history-json': 'Download Event History JSON',
   'skip-nav': 'Skip to Main Content',
   timeline: 'Timeline',
   graph: 'Graph',
@@ -176,6 +178,9 @@ export const Strings = {
   value: 'Value',
   table: 'Table',
   failure: 'Failure',
+  'pending-and-failed': 'Pending and Failed',
+  'pending-and-failed-description':
+    'View only Pending, Failed, and Timed Out events',
   'stack-trace': 'Stack Trace',
   source: 'Source',
   url: 'URL',

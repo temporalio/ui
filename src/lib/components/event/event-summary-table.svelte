@@ -4,7 +4,6 @@
   import { isEventGroup } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
-  import { expandAllEvents } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
   import type {
@@ -28,11 +27,10 @@
   export let groups: EventGroups = [];
   export let updating = false;
   export let compact = false;
-  export let openExpanded = false;
+  export let minimized = true;
+  export let expandAll = false;
 
   $: initialItem = $fullEventHistory?.[0];
-
-  $: expandAll = openExpanded || $expandAllEvents === 'true';
 
   const history = (items: IterableEventWithPending[]) => {
     return items as WorkflowEventWithPending[];
@@ -51,7 +49,7 @@
   items={filteredForStatus(items)}
   let:visibleItems
   variant="split"
-  maxHeight="calc(100vh - 200px)"
+  maxHeight={minimized ? 'calc(100vh - 200px)' : '20000px'}
   hashField="eventid"
 >
   {#if !compact}

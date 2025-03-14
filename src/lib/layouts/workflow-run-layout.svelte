@@ -129,8 +129,11 @@
     });
   };
 
-  const getOnlyWorkflowWithPendingActivities = async (refresh: number) => {
-    if (refresh && $workflowRun?.workflow?.isRunning) {
+  const getOnlyWorkflowWithPendingActivities = async (
+    refresh: number,
+    pause: boolean,
+  ) => {
+    if (refresh && !pause && $workflowRun?.workflow?.isRunning) {
       const { workflow, error } = await fetchWorkflow({
         namespace,
         workflowId,
@@ -165,7 +168,7 @@
   $: runId, clearWorkflowData();
 
   $: getWorkflowAndEventHistory(namespace, workflowId, runId);
-  $: getOnlyWorkflowWithPendingActivities($refresh);
+  $: getOnlyWorkflowWithPendingActivities($refresh, $pauseLiveUpdates);
 
   const setCurrentEvents = (fullHistory, pause) => {
     if (!pause) {
