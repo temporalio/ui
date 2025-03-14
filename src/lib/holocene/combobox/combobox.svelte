@@ -53,6 +53,7 @@
     loadingText?: string;
     open?: Writable<boolean>;
     maxMenuHeight?: string;
+    class?: string;
   }
 
   type MultiSelectProps = {

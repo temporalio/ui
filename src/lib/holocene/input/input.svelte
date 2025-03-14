@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { HTMLInputAttributes } from 'svelte/elements';
+  import type { FullAutoFill, HTMLInputAttributes } from 'svelte/elements';
 
   import { createEventDispatcher } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -27,6 +27,7 @@
     autoFocus?: boolean;
     error?: boolean;
     'data-testid'?: string;
+    class?: string;
   };
 
   type CopyableProps = BaseProps & {
@@ -52,7 +53,7 @@
   export let copyable = false;
   export let disabled = false;
   export let clearable = false;
-  export let autocomplete = 'off';
+  export let autocomplete: FullAutoFill = 'off';
   export let valid = true;
   export let hintText = '';
   export let maxLength = 0;

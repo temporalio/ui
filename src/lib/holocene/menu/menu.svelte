@@ -15,6 +15,7 @@
     position?: 'left' | 'right' | 'top-left' | 'top-right';
     menuElement?: HTMLUListElement;
     maxHeight?: string;
+    class?: string;
   }
 
   let className = '';

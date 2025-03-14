@@ -77,11 +77,10 @@ export function getFocusedElementId(filter: SearchAttributeFilter) {
   if (
     isTextFilter(filter) ||
     isNumberFilter(filter) ||
-    isDateTimeFilter(filter)
+    isDateTimeFilter(filter) ||
+    isListFilter(filter)
   )
     return 'conditional-menu-button';
-
-  if (isListFilter(filter)) return 'list-filter';
 
   if (isBooleanFilter(filter)) return 'boolean-filter';
 

@@ -3,6 +3,7 @@
 
   interface $$Props extends HTMLAttributes<HTMLTableRowElement> {
     'data-testid'?: string;
+    class?: string;
   }
 
   let className = '';

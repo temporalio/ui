@@ -34,8 +34,8 @@
   let selectedOptions = initialSelected.length
     ? initialSelected
     : initialSelectedAll
-    ? options
-    : [];
+      ? options
+      : [];
 
   const open = writable(false);
 

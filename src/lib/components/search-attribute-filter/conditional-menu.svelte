@@ -57,7 +57,7 @@
 
 <MenuContainer>
   <MenuButton
-    class="{noBorderRight ? '!border-r-0' : ''} {noBorderLeft
+    class="{noBorderRight && !isNullFilter ? '!border-r-0' : ''} {noBorderLeft
       ? '!border-l-0'
       : ''} whitespace-nowrap"
     id="conditional-menu-button"

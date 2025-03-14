@@ -39,6 +39,7 @@
     minHeight?: number;
     maxHeight?: number;
     label?: string;
+    class?: string;
   };
 
   type CopyableProps = BaseProps & {
@@ -208,7 +209,7 @@
     class:editable
     class:readOnly={!editable}
     {...$$restProps}
-  />
+  ></div>
   {#if copyable}
     <CopyButton
       {copyIconTitle}

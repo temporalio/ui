@@ -42,7 +42,7 @@
         : 'transcoder-off'}
     />
     <DataEncoderSettings />
-    <div class="border-b border-subtle" />
+    <div class="border-b border-subtle"></div>
     <NavigationButton
       onClick={() => ($useDarkMode = !$useDarkMode)}
       tooltip={$useDarkMode
