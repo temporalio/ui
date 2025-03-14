@@ -25,5 +25,8 @@
   on:click
   {...$$restProps}
 >
-  <Icon name={expanded ? 'chevron-up' : 'chevron-down'} />
+  <Icon
+    title={expanded ? 'collapse' : 'expand'}
+    name={expanded ? 'chevron-up' : 'chevron-down'}
+  />
 </button>
