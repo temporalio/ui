@@ -53,23 +53,27 @@
 </script>
 
 <div
-  class="flex flex-col items-center justify-center gap-4 py-4 lg:flex-row lg:py-8"
+  class="flex flex-col items-center justify-end gap-4 py-4 lg:flex-row lg:py-8"
 >
   <div class="flex items-center gap-2 px-4">
     <ToggleButtons>
       <ToggleButton
         active={$eventViewType === 'feed'}
         data-testid="feed"
+        icon="feed"
+        class="h-10"
         on:click={onAllClick}>All</ToggleButton
       >
       <ToggleButton
         active={$eventViewType === 'compact'}
         data-testid="compact"
+        icon="compact"
         on:click={onCompactClick}>Compact</ToggleButton
       >
       <ToggleButton
         active={$eventViewType === 'json'}
         data-testid="json"
+        icon="json"
         on:click={onJSONClick}>JSON</ToggleButton
       >
     </ToggleButtons>

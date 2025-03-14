@@ -104,11 +104,12 @@
           <ToggleButton
             icon={reverseSort ? 'descending' : 'ascending'}
             data-testid="zoom-in"
-            on:click={onSort}>{reverseSort ? 'Desc' : 'Asc'}</ToggleButton
+            on:click={onSort}
+            >{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
           >
         {/if}
         <ToggleButton
-          icon={$minimizeEventView ? 'arrow-up' : 'arrow-down'}
+          icon={$minimizeEventView ? 'minimize' : 'expand'}
           data-testid="expandAll"
           on:click={() => ($minimizeEventView = !$minimizeEventView)}
           >{$minimizeEventView ? 'Minimized' : 'Expanded'}</ToggleButton
