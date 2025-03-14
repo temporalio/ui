@@ -65,17 +65,15 @@
 
   let errors = {};
   let name = scheduleId ?? '';
-  const decodedWorkflow = decodePayloadAttributes(
-    schedule?.action?.startWorkflow,
-  );
+
   const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
   const indexedFields =
     decodedSearchAttributes?.searchAttributes.indexedFields ??
     ({} as { [k: string]: string });
 
-  let workflowType = decodedWorkflow?.workflowType?.name ?? '';
-  let workflowId = decodedWorkflow?.workflowId ?? '';
-  let taskQueue = decodedWorkflow?.taskQueue?.name ?? '';
+  let workflowType = schedule?.action?.startWorkflow?.workflowType?.name ?? '';
+  let workflowId = schedule?.action?.startWorkflow?.workflowId ?? '';
+  let taskQueue = schedule?.action?.startWorkflow?.taskQueue?.name ?? '';
   let input = '';
   let editInput = !schedule;
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
