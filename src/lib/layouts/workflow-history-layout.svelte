@@ -111,6 +111,9 @@
         <ToggleButton
           icon={$minimizeEventView ? 'minimize' : 'expand'}
           data-testid="expandAll"
+          tooltip={$minimizeEventView
+            ? 'Timeline and Event History are collapsed to minimized height'
+            : 'Timeline and Event History are expanded to full height'}
           on:click={() => ($minimizeEventView = !$minimizeEventView)}
           >{$minimizeEventView ? 'Minimized' : 'Expanded'}</ToggleButton
         >
