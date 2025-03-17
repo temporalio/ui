@@ -207,11 +207,13 @@ const temporal = plugin(
 
         DEFAULT: css('--color-border-primary'),
       }),
-      ringColor: {
+      ringColor: ({ theme }) => ({
+        ...theme('colors'),
         primary: css('--color-border-focus-info'),
         danger: css('--color-border-focus-danger'),
         success: css('--color-surface-success-loud'),
-      },
+        brand: css('--color-surface-brand'),
+      }),
       textColor: ({ theme }) => ({
         ...theme('colors'),
         primary: css('--color-text-primary'),

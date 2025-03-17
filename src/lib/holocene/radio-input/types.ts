@@ -10,6 +10,7 @@ export interface RadioInputProps<T> extends HTMLInputAttributes {
   group?: Writable<T>;
   name?: string;
   'data-testid'?: string;
+  class?: string;
 }
 
 export interface RadioGroupProps<T> extends HTMLAttributes<HTMLDivElement> {
