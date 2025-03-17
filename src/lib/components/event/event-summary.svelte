@@ -2,8 +2,8 @@
   import { page } from '$app/stores';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
-  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
-  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
+  import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
@@ -52,37 +52,35 @@
   };
 </script>
 
-<div
-  class="flex flex-col items-center justify-end gap-4 py-4 lg:flex-row lg:py-8"
->
+<div class="flex items-center justify-end gap-4 pt-4 lg:pt-8">
   <div class="flex items-center gap-2 px-4">
-    <ToggleButtons>
-      <ToggleButton
+    <TabButtons>
+      <TabButton
         active={$eventViewType === 'feed'}
         data-testid="feed"
         icon="feed"
         class="h-10"
-        on:click={onAllClick}>All</ToggleButton
+        on:click={onAllClick}>All</TabButton
       >
-      <ToggleButton
+      <TabButton
         active={$eventViewType === 'compact'}
         data-testid="compact"
         icon="compact"
         class="h-10"
-        on:click={onCompactClick}>Compact</ToggleButton
+        on:click={onCompactClick}>Compact</TabButton
       >
-      <ToggleButton
+      <TabButton
         active={$eventViewType === 'json'}
         data-testid="json"
         icon="json"
         class="h-10"
-        on:click={onJSONClick}>JSON</ToggleButton
+        on:click={onJSONClick}>JSON</TabButton
       >
-    </ToggleButtons>
+    </TabButtons>
   </div>
 </div>
 {#if $eventViewType === 'json'}
-  <div class="px-4">
+  <div class="border-t border-subtle px-4">
     <WorkflowHistoryJson />
   </div>
 {:else}
