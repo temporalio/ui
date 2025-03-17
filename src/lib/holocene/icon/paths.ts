@@ -1,5 +1,6 @@
 import activity from './svg/activity.svelte';
 import add from './svg/add.svelte';
+import apple from './svg/apple.svelte';
 import archives from './svg/archives.svelte';
 import arrowDown from './svg/arrow-down.svelte';
 import arrowLeft from './svg/arrow-left.svelte';
@@ -23,6 +24,8 @@ import chevronRight from './svg/chevron-right.svelte';
 import chevronSelectorVertical from './svg/chevron-selector-vertical.svelte';
 import chevronUp from './svg/chevron-up.svelte';
 import circleCheckFilled from './svg/circle-check-filled.svelte';
+import circleCheck from './svg/circle-check.svelte';
+import cirlceQuestion from './svg/circle-question.svelte';
 import clock from './svg/clock.svelte';
 import close from './svg/close.svelte';
 import cometSolid from './svg/comet-solid.svelte';
@@ -64,10 +67,12 @@ import keyboard from './svg/keyboard.svelte';
 import labs from './svg/labs.svelte';
 import lightningBolt from './svg/lightning-bolt.svelte';
 import link from './svg/link.svelte';
+import linux from './svg/linux.svelte';
 import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
 import marker from './svg/marker.svelte';
 import merge from './svg/merge.svelte';
+import microsoft from './svg/microsoft.svelte';
 import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
@@ -119,6 +124,7 @@ import xmarkFilled from './svg/xmark-filled.svelte';
 export const icons = {
   activity,
   add,
+  apple,
   archives,
   'arrow-down': arrowDown,
   'arrow-left': arrowLeft,
@@ -140,7 +146,9 @@ export const icons = {
   'chevron-right': chevronRight,
   'chevron-up': chevronUp,
   'chevron-selector-vertical': chevronSelectorVertical,
+  'circle-check': circleCheck,
   'circle-check-filled': circleCheckFilled,
+  'circle-question': cirlceQuestion,
   clock,
   close,
   'comet-solid': cometSolid,
@@ -182,10 +190,12 @@ export const icons = {
   labs,
   'lightning-bolt': lightningBolt,
   link,
+  linux,
   lock,
   logout,
   marker,
   merge,
+  microsoft,
   moon,
   'namespace-switcher': namespaceSwitcher,
   namespace,

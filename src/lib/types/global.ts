@@ -132,7 +132,7 @@ export type User = {
 export type ClusterInformation = import('$lib/types').GetClusterInfoResponse;
 export type SystemInformation = import('$lib/types').GetSystemInfoResponse;
 
-export type SelectOptionValue = number | string | boolean;
+export type SelectOptionValue = number | string | boolean | undefined;
 
 export type BooleanString = 'true' | 'false';
 
