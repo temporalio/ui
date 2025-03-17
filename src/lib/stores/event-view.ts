@@ -15,13 +15,12 @@ export const autoRefreshWorkflow = persistStore<'on' | 'off'>(
 
 export const eventViewType = persistStore<EventView>('eventView', 'feed', true);
 
-export const expandAllEvents = persistStore('expandAllEvents', 'false');
+export const minimizeEventView = persistStore('minimizeEventView', true, true);
 
 export const eventFilterSort = persistStore<EventSortOrder>(
   'eventFilterSort',
   'descending',
 );
-
 export const eventShowElapsed = persistStore<BooleanString>(
   'eventShowElapsed',
   'false',
