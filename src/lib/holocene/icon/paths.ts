@@ -42,6 +42,7 @@ import download from './svg/download.svelte';
 import drained from './svg/drained.svelte';
 import error from './svg/error.svelte';
 import exit from './svg/exit.svelte';
+import expand from './svg/expand.svelte';
 import externalLink from './svg/external-link.svelte';
 import eyeHide from './svg/eye-hide.svelte';
 import eyeShow from './svg/eye-show.svelte';
@@ -73,6 +74,7 @@ import logout from './svg/logout.svelte';
 import marker from './svg/marker.svelte';
 import merge from './svg/merge.svelte';
 import microsoft from './svg/microsoft.svelte';
+import minimize from './svg/minimize.svelte';
 import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
@@ -165,6 +167,7 @@ export const icons = {
   drained,
   error,
   exit,
+  expand,
   'external-link': externalLink,
   'eye-hide': eyeHide,
   'eye-show': eyeShow,
@@ -196,6 +199,7 @@ export const icons = {
   marker,
   merge,
   microsoft,
+  minimize,
   moon,
   'namespace-switcher': namespaceSwitcher,
   namespace,
