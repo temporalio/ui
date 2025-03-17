@@ -75,8 +75,8 @@
       <td class="break-all text-left text-blue-700 underline"
         >{translate('workers.show-inactive-assignment-rules')}</td
       >
-      <td />
-      <td />
+      <td></td>
+      <td></td>
     </TableRow>
   {/if}
 </Table>

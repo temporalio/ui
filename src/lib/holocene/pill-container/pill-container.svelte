@@ -15,7 +15,9 @@
   import { onDestroy, setContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  type $$Props = HTMLAttributes<HTMLDivElement>;
+  type $$Props = HTMLAttributes<HTMLDivElement> & {
+    class?: string;
+  };
 
   let className = '';
   export { className as class };

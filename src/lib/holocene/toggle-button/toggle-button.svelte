@@ -20,6 +20,7 @@
     active?: boolean;
     'data-testid'?: string;
     tooltip?: string;
+    class?: string;
   };
 
   type AnchorProps = BaseProps &

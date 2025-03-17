@@ -48,5 +48,3 @@
 <Story name="Label Hidden" args={{ labelHidden: true }} />
 
 <Story name="Label Left" args={{ labelPosition: 'left' }} />
-
-<Story name="Unchecked" />
