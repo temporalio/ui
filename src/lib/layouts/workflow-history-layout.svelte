@@ -155,6 +155,6 @@
 
 <style lang="postcss">
   .sticky-header {
-    @apply sticky top-12 z-50 border-b border-subtle backdrop-blur-sm;
+    @apply sticky top-0 z-50 border-b border-subtle bg-off-white/50 md:top-12;
   }
 </style>
