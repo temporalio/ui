@@ -19,10 +19,12 @@
   import { page } from '$app/stores';
 
   import Button from '$lib/holocene/button.svelte';
+  import CopyButton from '$lib/holocene/copyable/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import {
     getFocusedElementId,
@@ -70,6 +72,12 @@
     focusedElementId,
     resetFilter,
   });
+
+  const { copy, copied } = copyToClipboard();
+
+  function handleCopy(e: Event) {
+    copy(e, searchParamQuery);
+  }
 
   function onSearch() {
     const searchQuery = toListWorkflowQueryFromFilters(combineFilters(filters));
@@ -206,6 +214,14 @@
           {/if}
         {/if}
       </div>
+    {/if}
+    {#if showFilter}
+      <CopyButton
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        copied={$copied}
+        on:click={handleCopy}
+      />
     {/if}
     <div
       class="flex flex-col sm:flex-row {showClearAllButton
