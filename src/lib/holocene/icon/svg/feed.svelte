@@ -3,8 +3,7 @@
 </script>
 
 <Svg {...$$props}>
-  <path
-    d="M1 4.5H20V6.9375H1V4.5ZM4 10.625H23V13.0625H4V10.625ZM20 16.75V19.1875H1V16.75H20Z"
-    fill="currentcolor"
-  />
+  <path d="M17.5 7H5V8.5H17.5V7Z" fill="currentcolor" />
+  <path d="M19.5 11.25H7V12.75H19.5V11.25Z" fill="currentcolor" />
+  <path d="M17.5 15.5H5V17H17.5V15.5Z" fill="currentcolor" />
 </Svg>

@@ -2,7 +2,7 @@
   import { writable, type Writable } from 'svelte/store';
   import { fly } from 'svelte/transition';
 
-  import { afterUpdate, setContext } from 'svelte';
+  import { afterUpdate, setContext, tick } from 'svelte';
 
   export const FILTER_CONTEXT = 'filter-context';
 
@@ -44,7 +44,7 @@
 
   import BooleanFilter from './boolean-filter.svelte';
   import CloseFilter from './close-filter-button.svelte';
-  import DateTimeFilter from './datetime-filter.svelte';
+  import DatetimeFilter from './datetime-filter.svelte';
   import DurationFilter from './duration-filter.svelte';
   import FilterList from './filter-list.svelte';
   import ListFilter from './list-filter.svelte';
@@ -133,7 +133,9 @@
   }
 
   afterUpdate(() => {
-    updateFocus();
+    tick().then(() => {
+      updateFocus();
+    });
   });
 
   function resetFilter() {
@@ -200,7 +202,7 @@
               class="flex w-full items-center"
               in:fly={{ x: -100, duration: 150 }}
             >
-              <DateTimeFilter />
+              <DatetimeFilter />
               <CloseFilter />
             </div>
           {:else if isBooleanFilter($filter)}

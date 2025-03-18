@@ -102,10 +102,11 @@
   });
 </script>
 
-<MenuContainer {open}>
+<MenuContainer class="w-full" {open}>
   <Label class="pb-1" {label} hidden={labelHidden} for={id} {required} />
   {#key $labelCtx}
     <MenuButton
+      class="w-full"
       hasIndicator={!disabled}
       {disabled}
       controls="{id}-select"
@@ -139,6 +140,6 @@
 
 <style lang="postcss">
   input {
-    @apply pointer-events-none w-full bg-transparent text-sm;
+    @apply pointer-events-none w-full grow bg-transparent text-sm;
   }
 </style>

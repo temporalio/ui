@@ -1,6 +1,7 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { minimizeEventView } from '$lib/stores/event-view';
   import {
     parseWithBigInt,
     stringifyWithBigInt,
@@ -27,27 +28,29 @@
     {title}
   </h3>
   {#if content}
-    {#if showParsedContent}
-      <PayloadDecoder value={parsedContent} key="payloads" let:decodedValue>
-        {#each parsePayloads(decodedValue) as decodedContent}
+    {#key $minimizeEventView}
+      {#if showParsedContent}
+        <PayloadDecoder value={parsedContent} key="payloads" let:decodedValue>
+          {#each parsePayloads(decodedValue) as decodedContent}
+            <CodeBlock
+              content={stringifyWithBigInt(decodedContent)}
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+              maxHeight={300}
+            />
+          {/each}
+        </PayloadDecoder>
+      {:else}
+        <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
           <CodeBlock
-            content={stringifyWithBigInt(decodedContent)}
+            content={decodedValue}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
             maxHeight={300}
           />
-        {/each}
-      </PayloadDecoder>
-    {:else}
-      <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
-        <CodeBlock
-          content={decodedValue}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          maxHeight={300}
-        />
-      </PayloadDecoder>
-    {/if}
+        </PayloadDecoder>
+      {/if}
+    {/key}
   {:else}
     <CodeBlock
       content={isRunning ? 'Results will appear upon completion.' : 'null'}
