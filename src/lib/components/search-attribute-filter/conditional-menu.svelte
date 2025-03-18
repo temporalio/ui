@@ -46,6 +46,7 @@
 
   function handleNullFilter() {
     $filter.value = null;
+    $filter.customDate = false;
     handleSubmit();
   }
 
@@ -57,7 +58,7 @@
 
 <MenuContainer>
   <MenuButton
-    class="{noBorderRight ? '!border-r-0' : ''} {noBorderLeft
+    class="{noBorderRight && !isNullFilter ? '!border-r-0' : ''} {noBorderLeft
       ? '!border-l-0'
       : ''} whitespace-nowrap"
     id="conditional-menu-button"
