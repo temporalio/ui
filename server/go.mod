@@ -1,6 +1,7 @@
 module github.com/temporalio/ui-server/v2
 
 go 1.23
+
 require (
 	github.com/coreos/go-oidc/v3 v3.11.0
 	github.com/gomarkdown/markdown v0.0.0-20241105142532-d03b89096d81
