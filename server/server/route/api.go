@@ -25,6 +25,7 @@ package route
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 
@@ -40,7 +41,19 @@ func DisableWriteMiddleware(cfgProvider *config.ConfigProviderWithRefresh) echo.
 				return c.JSON(http.StatusInternalServerError, err)
 			}
 
-			if cfg.DisableWriteActions && c.Request().Method != http.MethodGet {
+			if c.Request().Method == http.MethodGet {
+				return next(c)
+			}
+
+			if cfg.DisableWriteActions {
+				path := c.Request().URL.Path
+				method := c.Request().Method
+
+				if method == http.MethodPost && strings.HasPrefix(path, "/api/v1/namespaces/") &&
+					strings.Contains(path, "/workflows/") && strings.Contains(path, "/query/") {
+					return next(c)
+				}
+
 				return echo.ErrMethodNotAllowed
 			}
 
