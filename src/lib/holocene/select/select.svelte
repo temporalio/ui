@@ -127,6 +127,7 @@
         {id}
         value={!value && placeholder !== '' ? placeholder : $labelCtx}
         tabindex="-1"
+        disabled
         class:disabled
         {required}
         aria-required={required}
