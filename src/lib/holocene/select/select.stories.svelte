@@ -64,5 +64,5 @@
 
 <Story
   name="Invalid with error message"
-  args={{ invalid: true, error: 'This value is invalid' }}
+  args={{ valid: false, error: 'This value is invalid' }}
 />
