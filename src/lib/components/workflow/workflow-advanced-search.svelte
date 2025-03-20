@@ -59,34 +59,28 @@
   }
 </script>
 
-<div class="flex grow gap-4">
-  <div class="flex w-full items-center gap-0" in:fade>
-    <form
-      on:submit|preventDefault={onSearch}
-      class="relative flex w-full items-center gap-0"
-      in:fly={{ x: -100, duration: 150 }}
-      role="search"
-    >
-      <Input
-        id="manual-search"
-        type="search"
-        label={translate('workflows.search-placeholder')}
-        labelHidden
-        placeholder={translate('workflows.search-placeholder')}
-        icon="search"
-        class="w-full lg:w-3/4 [&_*]:border-r-0"
-        clearable
-        clearButtonLabel={translate('common.clear-input-button-label')}
-        on:clear={handleClearInput}
-        bind:value={manualSearchString}
-      />
-      <Button
-        data-testid="manual-search-button"
-        variant="primary"
-        type="submit"
-      >
-        {translate('common.search')}
-      </Button>
-    </form>
-  </div>
+<div class="w-full" in:fade>
+  <form
+    on:submit|preventDefault={onSearch}
+    class="flex items-center gap-0"
+    in:fly={{ x: -100, duration: 150 }}
+    role="search"
+  >
+    <Input
+      id="manual-search"
+      type="search"
+      label={translate('workflows.search-placeholder')}
+      labelHidden
+      placeholder={translate('workflows.search-placeholder')}
+      icon="search"
+      class="grow lg:w-3/4 [&_*]:border-r-0"
+      clearable
+      clearButtonLabel={translate('common.clear-input-button-label')}
+      on:clear={handleClearInput}
+      bind:value={manualSearchString}
+    />
+    <Button data-testid="manual-search-button" variant="primary" type="submit">
+      {translate('common.search')}
+    </Button>
+  </form>
 </div>

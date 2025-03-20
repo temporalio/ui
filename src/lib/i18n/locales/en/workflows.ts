@@ -206,6 +206,7 @@ export const Strings = {
   'no-retry': 'None',
   filter: 'Filter',
   'view-search-input': 'View Raw Query',
+  'copy-search-input': 'Copy Raw Query',
   'view-search-description': 'For advanced search syntax',
   'close-search-input': 'Show Filters',
   'select-time': 'Select Time',

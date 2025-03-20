@@ -64,7 +64,7 @@
   const focusedElementId = writable<string>('');
 
   $: searchParamQuery = $page.url.searchParams.get('query');
-  $: showClearAllButton = showFilter && filters.length && !$filter.attribute;
+  $: showActions = filters.length && !$filter.attribute;
 
   setContext<FilterContext>(FILTER_CONTEXT, {
     filter,
@@ -157,7 +157,7 @@
     {#if showFilter}
       <div
         class="flex"
-        class:filter={!showClearAllButton}
+        class:filter={!showActions}
         on:keyup={handleKeyUp}
         role="none"
       >
@@ -218,25 +218,22 @@
         {/if}
       </div>
     {/if}
-    {#if searchParamQuery}
-      <Tooltip topRight text={translate('common.copy-icon-title')}>
-        <CopyButton
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          copied={$copied}
-          on:click={handleCopy}
-        />
-      </Tooltip>
-    {/if}
-    <div
-      class="flex flex-col sm:flex-row {showClearAllButton
-        ? 'w-full justify-between'
-        : 'justify-end'}"
-    >
-      {#if showClearAllButton}
-        <Button variant="ghost" on:click={handleClearInput}
-          >{translate('common.clear-all')}</Button
-        >
+
+    <div class="flex flex-col items-center justify-end gap-1 sm:flex-row">
+      {#if showActions}
+        {#if showFilter}
+          <Button variant="ghost" on:click={handleClearInput}>
+            {translate('common.clear-all')}
+          </Button>
+        {/if}
+        <Tooltip topRight text={translate('workflows.copy-search-input')}>
+          <CopyButton
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            copied={$copied}
+            on:click={handleCopy}
+          />
+        </Tooltip>
       {/if}
     </div>
     <slot name="actions" />
