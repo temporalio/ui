@@ -20,6 +20,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import CopyButton from '$lib/holocene/copyable/button.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
@@ -217,13 +218,15 @@
         {/if}
       </div>
     {/if}
-    {#if showFilter}
-      <CopyButton
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        copied={$copied}
-        on:click={handleCopy}
-      />
+    {#if searchParamQuery}
+      <Tooltip topRight text={translate('common.copy-icon-title')}>
+        <CopyButton
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          copied={$copied}
+          on:click={handleCopy}
+        />
+      </Tooltip>
     {/if}
     <div
       class="flex flex-col sm:flex-row {showClearAllButton
