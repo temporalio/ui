@@ -5,14 +5,12 @@
   import { page } from '$app/stores';
 
   import Button from '$lib/holocene/button.svelte';
-  import CopyButton from '$lib/holocene/copyable/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { refresh, workflowsQuery } from '$lib/stores/workflows';
-  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
@@ -59,12 +57,6 @@
   function handleClearInput() {
     onSearch();
   }
-
-  const { copy, copied } = copyToClipboard();
-
-  function handleCopy(e: Event) {
-    copy(e, manualSearchString);
-  }
 </script>
 
 <div class="flex grow gap-4">
@@ -95,12 +87,6 @@
       >
         {translate('common.search')}
       </Button>
-      <CopyButton
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        copied={$copied}
-        on:click={handleCopy}
-      />
     </form>
   </div>
 </div>
