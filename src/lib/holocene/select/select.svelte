@@ -24,6 +24,7 @@
   import { writable, type Writable } from 'svelte/store';
 
   import { onMount, setContext } from 'svelte';
+  import { twMerge } from 'tailwind-merge';
 
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
@@ -46,6 +47,8 @@
     menuClass?: string;
     variant?: ButtonStyles['variant'];
     required?: boolean;
+    valid?: boolean;
+    error?: string;
   };
 
   export let label: string;
@@ -59,6 +62,8 @@
   export let menuClass: string | undefined = undefined;
   export let variant: ButtonStyles['variant'] = 'secondary';
   export let required = false;
+  export let error = '';
+  export let valid = true;
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
   const valueCtx = writable<T>(value);
@@ -102,10 +107,11 @@
   });
 </script>
 
-<MenuContainer {open}>
+<MenuContainer class="w-full" {open}>
   <Label class="pb-1" {label} hidden={labelHidden} for={id} {required} />
   {#key $labelCtx}
     <MenuButton
+      class={twMerge('w-full', !valid ? 'border-danger' : undefined)}
       hasIndicator={!disabled}
       {disabled}
       controls="{id}-select"
@@ -135,10 +141,14 @@
   <Menu role="listbox" id="{id}-select" class={menuClass}>
     <slot />
   </Menu>
+
+  {#if error && !valid}
+    <span class="text-xs text-danger">{error}</span>
+  {/if}
 </MenuContainer>
 
 <style lang="postcss">
   input {
-    @apply pointer-events-none w-full bg-transparent text-sm;
+    @apply pointer-events-none w-full grow bg-transparent text-sm;
   }
 </style>

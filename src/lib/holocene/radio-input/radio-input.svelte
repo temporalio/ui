@@ -4,6 +4,7 @@
   import { getContext } from 'svelte';
 
   import Label from '$lib/holocene/label.svelte';
+  import { omit } from '$lib/utilities/omit';
 
   import type { RadioGroupContext, RadioInputProps } from './types';
 
@@ -21,9 +22,11 @@
 
   let internalGroup: Writable<T> = writable(value);
   let internalName: string = '';
+  let className: string | undefined = undefined;
 
   export { internalGroup as group };
   export { internalName as name };
+  export { className as class };
 
   const ctx = getContext<RadioGroupContext<T>>(RADIO_GROUP_CONTEXT) ?? {
     name: internalName,
@@ -34,7 +37,7 @@
 </script>
 
 <div class="flex flex-col gap-1">
-  <Label {disabled}>
+  <Label {disabled} class={className}>
     <input
       bind:group={$group}
       type="radio"
@@ -44,7 +47,7 @@
       {value}
       {id}
       {disabled}
-      {...$$restProps}
+      {...omit($$restProps, 'class')}
     />
     <span class="label" class:hidden={labelHidden}>
       {label}

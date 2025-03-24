@@ -61,3 +61,8 @@
 <Story name="Disabled and Selected" args={{ disabled: true, value: 'pizza' }} />
 
 <Story name="Label Hidden" args={{ labelHidden: true }} />
+
+<Story
+  name="Invalid with error message"
+  args={{ valid: false, error: 'This value is invalid' }}
+/>

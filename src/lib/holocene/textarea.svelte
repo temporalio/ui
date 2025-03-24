@@ -121,8 +121,4 @@
   .count > .error {
     @apply text-danger;
   }
-
-  textarea {
-    @apply surface-primary dark:bg-transparent;
-  }
 </style>

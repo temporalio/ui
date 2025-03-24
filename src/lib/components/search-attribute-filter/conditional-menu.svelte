@@ -46,6 +46,7 @@
 
   function handleNullFilter() {
     $filter.value = null;
+    $filter.customDate = false;
     handleSubmit();
   }
 

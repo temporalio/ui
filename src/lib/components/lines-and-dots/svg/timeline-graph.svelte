@@ -1,6 +1,4 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import type {
     EventGroup,
     EventGroups,
@@ -28,7 +26,7 @@
   export let y = 0;
   export let workflow: WorkflowExecution;
   export let groups: EventGroups;
-  export let viewportHeight = 360;
+  export let viewportHeight: number | undefined;
   export let readOnly = false;
   export let workflowTaskFailedError: WorkflowTaskFailedEvent | undefined =
     undefined;
@@ -44,14 +42,6 @@
   $: timelineHeight =
     Math.max(height * (filteredGroups.length + 2), 120) + expandedGroupHeight;
   $: canvasHeight = timelineHeight + 120;
-
-  const onExpandCollapse = () => {
-    if (viewportHeight === 360) {
-      viewportHeight = 800;
-    } else {
-      viewportHeight = 360;
-    }
-  };
 
   const handleScroll = (e) => {
     scrollY = e?.target?.scrollTop;
@@ -72,27 +62,11 @@
 <div
   class="relative h-auto overflow-auto border-b border-subtle"
   bind:clientWidth={canvasWidth}
-  style="max-height: {viewportHeight}px;"
+  style={viewportHeight ? `max-height: ${viewportHeight}px;` : ''}
   on:scroll={handleScroll}
 >
   <EndTimeInterval {workflow} {startTime} let:endTime let:duration>
-    <div class="sticky left-0.5 top-1" class:invisible={readOnly}>
-      <Button size="xs" variant="ghost" on:click={onExpandCollapse}>
-        <Icon
-          name={viewportHeight === 360 ? 'chevron-down' : 'chevron-up'}
-          x={canvasWidth - 2 * radius}
-          y={radius}
-        />
-      </Button>
-    </div>
-    <div
-      class="sticky {timelineHeight < viewportHeight
-        ? 'top-[160px]'
-        : viewportHeight === 360
-          ? 'top-[260px]'
-          : 'top-[700px]'}"
-      class:invisible={!!$activeGroups.length}
-    >
+    <div class="sticky top-[120px]" class:invisible={!!$activeGroups.length}>
       <div class="flex w-full justify-between text-xs">
         <p class="w-60 -translate-x-24 rotate-90">
           {formatDate(startTime, $timeFormat)}
@@ -108,7 +82,7 @@
       viewBox="0 0 {canvasWidth} {canvasHeight}"
       height={canvasHeight}
       width={canvasWidth}
-      class="-mt-12"
+      class="-mt-4"
       class:error={workflowTaskFailedError}
     >
       <Line
@@ -131,7 +105,7 @@
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
       {#each filteredGroups as group, index (group.id)}
         {@const y = (index + 2) * height + activeGroupsHeightAboveGroup(group)}
-        {#if y > scrollY - 2 * height && y < scrollY + viewportHeight * height}
+        {#if !viewportHeight || (y > scrollY - 2 * height && y < scrollY + viewportHeight * height)}
           {#key group.eventList.length}
             <TimelineGraphRow
               {y}
