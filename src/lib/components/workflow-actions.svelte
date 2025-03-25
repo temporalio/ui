@@ -15,9 +15,11 @@
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { coreUserStore } from '$lib/stores/core-user';
   import { resetEvents } from '$lib/stores/events';
+  import { temporalVersion } from '$lib/stores/versions';
   import { refresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
+  import { isVersionNewer } from '$lib/utilities/version-check';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
   import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
@@ -69,11 +71,15 @@
     namespace,
   );
 
+  // https://github.com/temporalio/temporal/releases/tag/v1.27.1
+  $: canResetWithPendingChildWorkflows =
+    isVersionNewer('1.27.1', $temporalVersion) ||
+    workflow.pendingChildren.length === 0;
+
   $: resetEnabled =
     resetAuthorized &&
-    workflow?.pendingChildren?.length === 0 &&
+    canResetWithPendingChildWorkflows &&
     $resetEvents.length > 0;
-
   $: actionsDisabled = !resetEnabled && !signalEnabled && !terminateEnabled;
 
   let workflowActions: {
@@ -88,11 +94,11 @@
   $: {
     if (!resetAuthorized) {
       resetDescription = translate('workflows.reset-disabled-unauthorized');
-    } else if (resetAuthorized && workflow?.pendingChildren?.length > 0) {
+    } else if (resetAuthorized && !canResetWithPendingChildWorkflows) {
       resetDescription = translate('workflows.reset-disabled-pending-children');
     } else if (
       resetAuthorized &&
-      workflow?.pendingChildren?.length === 0 &&
+      canResetWithPendingChildWorkflows &&
       $resetEvents.length === 0
     ) {
       resetDescription = translate('workflows.reset-disabled-no-events');
