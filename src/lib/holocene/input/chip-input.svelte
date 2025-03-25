@@ -1,7 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import { afterUpdate, onDestroy } from 'svelte';
+  import { afterUpdate } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Chip from '$lib/holocene/chip.svelte';
@@ -23,7 +23,6 @@
 
   const values = writable<string[]>(chips);
   let displayValue = '';
-  let shouldScrollToInput = false;
   let inputContainer: HTMLDivElement;
   let input: HTMLInputElement;
 
@@ -33,25 +32,8 @@
   let className = '';
   export { className as class };
 
-  const scrollToInput = () => {
-    let rect = input.getBoundingClientRect();
-    inputContainer.scrollTo(rect.x, rect.y);
-    shouldScrollToInput = false;
-  };
-
-  const unsubscribe = values.subscribe((updatedChips) => {
-    shouldScrollToInput = updatedChips.length > chips.length;
-    chips = updatedChips;
-  });
-
   afterUpdate(() => {
-    if (shouldScrollToInput) {
-      scrollToInput();
-    }
-  });
-
-  onDestroy(() => {
-    unsubscribe();
+    input.scrollIntoView();
   });
 
   const handleKeydown = (e: KeyboardEvent) => {
@@ -202,7 +184,7 @@
   }
 
   input {
-    @apply surface-primary inline-block w-full focus:outline-none;
+    @apply surface-primary inline-block grow focus:outline-none;
   }
 
   .error-msg {
