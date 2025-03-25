@@ -9,11 +9,11 @@
   import python from '$lib/vendor/sdk-logos/python-logo.png';
   import ruby from '$lib/vendor/sdk-logos/ruby-logo.png';
   import rust from '$lib/vendor/sdk-logos/rust-logo.png';
-  import ts from '$lib/vendor/sdk-logos/ts-logo.png';
+  import typescript from '$lib/vendor/sdk-logos/ts-logo.png';
 
   const sdkLogos: Record<string, string> = {
     go,
-    ts,
+    typescript,
     java,
     python,
     '.net': dotNet,
