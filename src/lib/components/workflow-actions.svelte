@@ -19,7 +19,7 @@
   import { refresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
-  import { isVersionNewer } from '$lib/utilities/version-check';
+  import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
   import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
@@ -73,7 +73,8 @@
 
   // https://github.com/temporalio/temporal/releases/tag/v1.27.1
   $: canResetWithPendingChildWorkflows =
-    isVersionNewer('1.27.1', $temporalVersion) ||
+    minimumVersionRequired('1.27.1', $temporalVersion) ||
+    $isCloud ||
     workflow.pendingChildren.length === 0;
 
   $: resetEnabled =
