@@ -12,6 +12,10 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
+  import TabList from '$lib/holocene/tab/tab-list.svelte';
+  import TabPanel from '$lib/holocene/tab/tab-panel.svelte';
+  import Tab from '$lib/holocene/tab/tab.svelte';
+  import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { error, loading } from '$lib/stores/schedules';
   import {
@@ -94,6 +98,7 @@
       type: $customSearchAttributes[label],
     }),
   ) as SearchAttributeInput[];
+  let workflowSearchAttributesInput: SearchAttributeInput[] = [];
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: Partial<ScheduleParameters> = {
@@ -114,6 +119,7 @@
       days,
       months,
       searchAttributes: searchAttributesInput,
+      workflowSearchAttributes: workflowSearchAttributesInput,
     };
 
     onConfirm(preset, args, schedule);
@@ -222,10 +228,34 @@
           payloads={schedule?.action?.startWorkflow?.input}
           showEditActions={Boolean(schedule)}
         />
-        <AddSearchAttributes
-          bind:attributesToAdd={searchAttributesInput}
-          class="w-full"
-        />
+        <Tabs>
+          <h2>Search Attributes</h2>
+          <TabList
+            label={translate('schedules.add-schedule-attr')}
+            class="flex flex-wrap gap-6"
+          >
+            <Tab
+              label="Schedules"
+              id="schedules-tab"
+              panelId="schedules-panel"
+            />
+            <Tab label="Workflow" id="workflow-tab" panelId="workflow-panel" />
+          </TabList>
+          <div class="mt-4 flex w-full flex-wrap gap-6">
+            <TabPanel id="schedules-panel" tabId="schedules-tab" class="w-full">
+              <AddSearchAttributes
+                bind:attributesToAdd={searchAttributesInput}
+                class="w-full"
+              />
+            </TabPanel>
+            <TabPanel id="workflow-panel" tabId="workflow-tab" class="w-full">
+              <AddSearchAttributes
+                bind:attributesToAdd={workflowSearchAttributesInput}
+                class="w-full"
+              />
+            </TabPanel>
+          </div>
+        </Tabs>
         <SchedulesCalendarView
           let:preset
           {schedule}
