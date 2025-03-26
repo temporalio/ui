@@ -33,6 +33,8 @@
   );
   $: ({ hasRelationships, first, next, previous, scheduleId } =
     workflowRelationships);
+
+  const MAX_UPPER_LIMIT = 3000;
 </script>
 
 <div class="flex flex-col gap-4 pb-12">
@@ -41,7 +43,7 @@
       {#await fetchAllRootWorkflowsCount(namespace, rootWorkflowId, rootRunId)}
         <Loading />
       {:then { count, groups }}
-        {#if parseInt(count) > 3000}
+        {#if parseInt(count) > MAX_UPPER_LIMIT}
           {@const statusGroups = getStatusAndCountOfGroup(groups)}
           <div class="flex flex-col gap-2 px-8 py-4">
             <h4 class="text-xl font-medium">
