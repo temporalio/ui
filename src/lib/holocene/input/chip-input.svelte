@@ -1,7 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import { afterUpdate } from 'svelte';
+  import { afterUpdate, onDestroy } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Chip from '$lib/holocene/chip.svelte';
@@ -19,10 +19,10 @@
   export let validator: (value: string) => boolean = () => true;
   export let removeChipButtonLabel: string | ((chipValue: string) => string);
   export let external = false;
-  export let maxLength = 0;
 
   const values = writable<string[]>(chips);
   let displayValue = '';
+  let shouldScrollToInput = false;
   let inputContainer: HTMLDivElement;
   let input: HTMLInputElement;
 
@@ -32,8 +32,25 @@
   let className = '';
   export { className as class };
 
+  const scrollToInput = () => {
+    let rect = input.getBoundingClientRect();
+    inputContainer.scrollTo(rect.x, rect.y);
+    shouldScrollToInput = false;
+  };
+
+  const unsubscribe = values.subscribe((updatedChips) => {
+    shouldScrollToInput = updatedChips.length > chips.length;
+    chips = updatedChips;
+  });
+
   afterUpdate(() => {
-    input.scrollIntoView();
+    if (shouldScrollToInput) {
+      scrollToInput();
+    }
+  });
+
+  onDestroy(() => {
+    unsubscribe();
   });
 
   const handleKeydown = (e: KeyboardEvent) => {
@@ -57,17 +74,11 @@
 
   const handlePaste = (e: ClipboardEvent) => {
     e.preventDefault();
-    if (maxLength && $values.length >= maxLength) return;
     const clipboardContents = e.clipboardData.getData('text/plain');
-    let newValues = clipboardContents
-      .split(',')
-      .map((content) => content.trim());
-
-    if (maxLength) {
-      newValues = newValues.slice(0, maxLength - $values.length);
-    }
-
-    values.update((previous) => [...previous, ...newValues]);
+    values.update((previous) => [
+      ...previous,
+      ...clipboardContents.split(',').map((content) => content.trim()),
+    ]);
   };
 
   const handleBlur = () => {
@@ -86,14 +97,15 @@
   };
 </script>
 
-<div
-  class={merge(
-    'group flex flex-col gap-1',
-    disabled && 'cursor-not-allowed',
-    className,
-  )}
->
-  <Label {required} {label} {disabled} hidden={labelHidden} for={id} />
+<div class={merge(disabled && 'cursor-not-allowed', className)}>
+  <Label
+    class="pb-1"
+    {required}
+    {label}
+    {disabled}
+    hidden={labelHidden}
+    for={id}
+  />
   <div
     bind:this={inputContainer}
     class={merge(
@@ -132,37 +144,15 @@
       on:blur={handleBlur}
       on:keydown|stopPropagation={handleKeydown}
       on:paste={handlePaste}
-      maxlength={maxLength && $values.length >= maxLength ? 0 : undefined}
     />
   </div>
-
-  {#if (invalid && hintText) || (maxLength && !disabled)}
-    <div class="flex justify-between gap-2">
-      <div
-        class="error-msg"
-        class:min-width={maxLength}
-        aria-live={invalid ? 'assertive' : 'off'}
-      >
-        {#if invalid && hintText}
-          <p>{hintText}</p>
-        {/if}
-      </div>
-      {#if maxLength && !disabled}
-        <span class="count">
-          <span
-            class="text-information"
-            class:warn={maxLength - $values?.length <= 5}
-            class:error={maxLength === $values?.length}
-          >
-            {$values?.length ?? 0}
-          </span>&nbsp;/&nbsp;{maxLength}
-        </span>
-      {/if}
-    </div>
+  {#if invalid && hintText}
+    <span class="hint">
+      {hintText}
+    </span>
   {/if}
-
   {#if $values.length > 0 && external}
-    <div class="flex flex-row flex-wrap gap-1">
+    <div class="mt-1 flex flex-row flex-wrap gap-1">
       {#each $values as chip, i (`${chip}-${i}`)}
         {@const valid = validator(chip)}
         <Chip
@@ -184,26 +174,10 @@
   }
 
   input {
-    @apply surface-primary inline-block grow focus:outline-none;
+    @apply surface-primary inline-block w-full focus:outline-none;
   }
 
-  .error-msg {
-    @apply break-words text-sm text-danger;
-  }
-
-  .error-msg.min-width {
-    @apply w-[calc(100%-6rem)];
-  }
-
-  .count {
-    @apply invisible text-right text-sm font-medium text-primary group-focus-within:visible;
-  }
-
-  .count > .warn {
-    @apply text-warning;
-  }
-
-  .count > .error {
-    @apply text-danger;
+  .hint {
+    @apply text-xs text-danger;
   }
 </style>
