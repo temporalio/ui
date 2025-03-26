@@ -33,7 +33,7 @@
   export { className as class };
 
   afterUpdate(() => {
-    input.scrollIntoView();
+    input.scrollIntoView({ block: 'nearest', inline: 'start' });
   });
 
   const handleKeydown = (e: KeyboardEvent) => {
