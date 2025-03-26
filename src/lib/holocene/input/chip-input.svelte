@@ -133,6 +133,7 @@
       on:keydown|stopPropagation={handleKeydown}
       on:paste={handlePaste}
       maxlength={maxLength && $values.length >= maxLength ? 0 : undefined}
+      size={placeholder.length || undefined}
     />
   </div>
 
