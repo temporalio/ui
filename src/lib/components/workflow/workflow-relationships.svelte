@@ -3,11 +3,17 @@
 
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fetchAllRootWorkflows } from '$lib/services/workflow-service';
+  import {
+    fetchAllRootWorkflows,
+    fetchAllRootWorkflowsCount,
+  } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import { getStatusAndCountOfGroup } from '$lib/utilities/get-group-status-and-count';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
+
+  import WorkflowCountStatus from '../workflow-status.svelte';
 
   import ContinueAsNewTree from './relationships/continue-as-new-tree.svelte';
   import ScheduleTree from './relationships/schedule-tree.svelte';
@@ -32,24 +38,72 @@
 <div class="flex flex-col gap-4 pb-12">
   {#if hasRelationships}
     <div class="flex w-full flex-col justify-center gap-4">
-      {#await fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId)}
+      {#await fetchAllRootWorkflowsCount(namespace, rootWorkflowId, rootRunId)}
         <Loading />
-      {:then root}
-        {#if root && !!root.children.length}
-          <WorkflowFamilyTree {root} />
-        {/if}
-        {#if scheduleId}
-          <ScheduleTree {scheduleId} current={runId} {workflowId} {namespace} />
-        {/if}
-        {#if first || previous || next}
-          <ContinueAsNewTree
-            {first}
-            {previous}
-            {next}
-            current={runId}
-            {workflowId}
-            {namespace}
-          />
+      {:then { count, groups }}
+        {#if parseInt(count) > 3000}
+          {@const statusGroups = getStatusAndCountOfGroup(groups)}
+          <div class="flex flex-col gap-2 px-8 py-4">
+            <h4 class="text-xl font-medium">
+              {count} Workflows associated to Root Workflow
+            </h4>
+            <div class="flex flex-wrap items-center gap-1">
+              {#each statusGroups as { count, status } (status)}
+                <WorkflowCountStatus
+                  {status}
+                  {count}
+                  big
+                  test-id="workflow-status-{status}"
+                />
+              {/each}
+            </div>
+            {#if scheduleId}
+              <ScheduleTree
+                {scheduleId}
+                current={runId}
+                {workflowId}
+                {namespace}
+              />
+            {/if}
+            {#if first || previous || next}
+              <ContinueAsNewTree
+                {first}
+                {previous}
+                {next}
+                current={runId}
+                {workflowId}
+                {namespace}
+              />
+            {/if}
+          </div>
+        {:else}
+          {#await fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId)}
+            <Loading />
+          {:then root}
+            {#if root && !!root.children.length}
+              <WorkflowFamilyTree {root} />
+            {/if}
+            {#if scheduleId}
+              <ScheduleTree
+                {scheduleId}
+                current={runId}
+                {workflowId}
+                {namespace}
+              />
+            {/if}
+            {#if first || previous || next}
+              <ContinueAsNewTree
+                {first}
+                {previous}
+                {next}
+                current={runId}
+                {workflowId}
+                {namespace}
+              />
+            {/if}
+          {:catch}
+            <WorkflowRelationshipsOld />
+          {/await}
         {/if}
       {:catch}
         <WorkflowRelationshipsOld />
