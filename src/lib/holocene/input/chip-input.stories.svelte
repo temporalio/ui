@@ -18,7 +18,6 @@
       removeChipButtonLabel: 'Remove',
       labelHidden: false,
       validator: isEmail,
-      maxLength: undefined,
       chips: ['tobias@temporal.io'],
     },
     argTypes: {
@@ -31,7 +30,6 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       chips: { name: 'Chips', table: { disable: true } },
       validator: { table: { disable: true } },
-      maxLength: { name: 'Maximum Length', control: 'number' },
       removeChipButtonLabel: {
         name: 'Aria label for remove button',
         control: 'text',
@@ -82,21 +80,11 @@
 />
 
 <Story
-  name="Error"
+  name="Invalid"
   play={async ({ canvasElement, id }) => {
     const canvas = within(canvasElement);
     const input = canvas.getByTestId(id);
     await userEvent.type(input, 'bonbon');
     await userEvent.keyboard('{enter}');
-  }}
-/>
-
-<Story
-  name="With Maximum Length"
-  args={{ maxLength: 10 }}
-  play={async ({ canvasElement, id }) => {
-    const canvas = within(canvasElement);
-    const input = canvas.getByTestId(id);
-    await userEvent.click(input);
   }}
 />
