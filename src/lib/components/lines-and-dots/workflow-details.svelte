@@ -13,6 +13,7 @@
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
+  import SdkLogo from './sdk-logo.svelte';
   import WorkflowDetail from './workflow-detail.svelte';
 
   export let workflow: WorkflowExecution;
@@ -131,6 +132,7 @@
   <div
     class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
   >
+    <SdkLogo />
     {#if workflow?.parent}
       <WorkflowDetail
         title={translate('workflows.parent-workflow')}
