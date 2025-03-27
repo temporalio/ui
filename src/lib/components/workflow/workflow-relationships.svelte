@@ -43,11 +43,12 @@
       {#await fetchAllRootWorkflowsCount(namespace, rootWorkflowId, rootRunId)}
         <Loading />
       {:then { count, groups }}
-        {#if parseInt(count) > MAX_UPPER_LIMIT}
+        {@const intCount = parseInt(count)}
+        {#if intCount > MAX_UPPER_LIMIT}
           {@const statusGroups = getStatusAndCountOfGroup(groups)}
           <div class="flex flex-col gap-2 px-8 py-4">
             <h4 class="text-xl font-medium">
-              {count} Workflows associated to Root Workflow
+              {intCount.toLocaleString()} Workflows associated to Root Workflow
             </h4>
             <div class="flex flex-wrap items-center gap-1">
               {#each statusGroups as { count, status } (status)}
