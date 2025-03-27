@@ -58,7 +58,7 @@
     workflow,
     run,
   });
-  $: expanded = expandAll;
+  $: expanded = expandAll || $page.params.id === event.id;
   $: attributes = formatAttributes(event);
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;

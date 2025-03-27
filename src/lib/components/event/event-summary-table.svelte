@@ -26,9 +26,11 @@
   export let items: IterableEventWithPending[];
   export let groups: EventGroups = [];
   export let updating = false;
+  export let loading = false;
   export let compact = false;
   export let minimized = true;
   export let expandAll = false;
+  export let showGraph = !compact;
 
   $: initialItem = $fullEventHistory?.[0];
 
@@ -50,9 +52,8 @@
   let:visibleItems
   variant="split"
   maxHeight={minimized ? 'calc(100vh - 200px)' : '20000px'}
-  hashField="eventid"
 >
-  {#if !compact}
+  {#if showGraph}
     <HistoryGraph {groups} history={history(visibleItems)} />
   {/if}
   <div class="w-full">
@@ -99,7 +100,10 @@
         />
       {/if}
     {:else}
-      <EventEmptyRow loading={!$fullEventHistory.length} />
+      <EventEmptyRow loading={!$fullEventHistory.length || loading} />
     {/each}
   </div>
+  <svelte:fragment slot="actions-end-additional">
+    <slot name="controls" />
+  </svelte:fragment>
 </Paginated>
