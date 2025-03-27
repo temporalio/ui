@@ -34,6 +34,7 @@ import type {
   WorkflowListRouteParameters,
   WorkflowQueryAPIRoutePath,
   WorkflowQueryRouteParameters,
+  WorkflowRawHistoryRouteParameters,
   WorkflowRouteParameters,
   WorkflowsAPIRoutePath,
   WorkflowSignalAPIRoutePath,
@@ -109,6 +110,7 @@ const encode = (
       signalName: '',
       updateName: '',
       batchJobId: '',
+      runId: '',
       activityId: '',
       endpointId: '',
       deploymentName: '',
@@ -130,6 +132,7 @@ export function pathForApi(
     namespaces: '/namespaces',
     namespace: `/namespaces/${parameters?.namespace}`,
     'search-attributes': `/namespaces/${parameters.namespace}/search-attributes`,
+    'events.raw': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/run/${parameters?.runId}/history.json`,
     'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history`,
     'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history-reverse`,
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/query/${parameters.queryType}`,
@@ -190,6 +193,10 @@ export function routeForApi(
   route: WorkflowAPIRoutePath,
   parameters: WorkflowRouteParameters,
   shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: WorkflowAPIRoutePath,
+  parameters: WorkflowRawHistoryRouteParameters,
 ): string;
 export function routeForApi(
   route: WorkflowSignalAPIRoutePath,

@@ -39,6 +39,14 @@ export type FetchEventsParametersWithSettings = FetchEventsParameters & {
   accessToken: string;
 };
 
+export const getEndpointForRawHistory = ({
+  namespace,
+  workflowId,
+  runId,
+}: FetchEventsParameters): string => {
+  return routeForApi('events.raw', { namespace, workflowId, runId });
+};
+
 const getEndpointForSortOrder = (
   sortOrder: EventSortOrder,
 ): WorkflowAPIRoutePath => {
