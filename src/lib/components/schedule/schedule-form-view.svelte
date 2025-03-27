@@ -71,8 +71,15 @@
   let name = scheduleId ?? '';
 
   const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
+  const decodedWorkflowSearchAttributes = decodePayloadAttributes({
+    searchAttributes: schedule?.action?.startWorkflow?.searchAttributes,
+  });
+
   const indexedFields =
     decodedSearchAttributes?.searchAttributes.indexedFields ??
+    ({} as { [k: string]: string });
+  const workflowIndexedFields =
+    decodedWorkflowSearchAttributes?.searchAttributes.indexedFields ??
     ({} as { [k: string]: string });
 
   let workflowType = schedule?.action?.startWorkflow?.workflowType?.name ?? '';
@@ -98,7 +105,13 @@
       type: $customSearchAttributes[label],
     }),
   ) as SearchAttributeInput[];
-  let workflowSearchAttributesInput: SearchAttributeInput[] = [];
+  let workflowSearchAttributesInput = Object.entries(workflowIndexedFields).map(
+    ([label, value]) => ({
+      label,
+      value,
+      type: $customSearchAttributes[label],
+    }),
+  ) as SearchAttributeInput[];
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: Partial<ScheduleParameters> = {
@@ -229,26 +242,26 @@
           showEditActions={Boolean(schedule)}
         />
         <Tabs>
-          <h2>Search Attributes</h2>
+          <h2 class="mb-4">Search Attributes</h2>
           <TabList
             label={translate('schedules.add-schedule-attr')}
             class="flex flex-wrap gap-6"
           >
+            <Tab label="Schedule" id="schedule-tab" panelId="schedule-panel" />
             <Tab
-              label="Schedules"
-              id="schedules-tab"
-              panelId="schedules-panel"
+              label="Workflows"
+              id="workflows-tab"
+              panelId="workflows-panel"
             />
-            <Tab label="Workflow" id="workflow-tab" panelId="workflow-panel" />
           </TabList>
           <div class="mt-4 flex w-full flex-wrap gap-6">
-            <TabPanel id="schedules-panel" tabId="schedules-tab" class="w-full">
+            <TabPanel id="schedule-panel" tabId="schedule-tab" class="w-full">
               <AddSearchAttributes
                 bind:attributesToAdd={searchAttributesInput}
                 class="w-full"
               />
             </TabPanel>
-            <TabPanel id="workflow-panel" tabId="workflow-tab" class="w-full">
+            <TabPanel id="workflows-panel" tabId="workflows-tab" class="w-full">
               <AddSearchAttributes
                 bind:attributesToAdd={workflowSearchAttributesInput}
                 class="w-full"
