@@ -72,7 +72,7 @@
 
   const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
   const decodedWorkflowSearchAttributes = decodePayloadAttributes({
-    searchAttributes: schedule?.action?.startWorkflow?.searchAttributes,
+    searchAttributes: schedule?.action?.startWorkflow?.searchAttributes ?? {},
   });
 
   const indexedFields =
