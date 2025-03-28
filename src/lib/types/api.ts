@@ -10,6 +10,7 @@ export type WorkflowAPIRoutePath =
   | 'workflow.terminate'
   | 'workflow.cancel'
   | 'workflow.reset'
+  | 'events.raw'
   | 'events.ascending'
   | 'events.descending';
 
@@ -74,6 +75,8 @@ export type APIRouteParameters = {
   namespace: string;
   workflowId: string;
   scheduleId: string;
+  // feel like this might not be the "right" spot for this.
+  runId: string;
   batchJobId: string;
   queue: string;
   queryType: string;
@@ -106,6 +109,11 @@ export type WorkflowUpdateRouteParameters = Pick<
 export type WorkflowRouteParameters = Pick<
   APIRouteParameters,
   'namespace' | 'workflowId'
+>;
+
+export type WorkflowRawHistoryRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'workflowId' | 'runId'
 >;
 
 export type WorkflowQueryRouteParameters = Pick<

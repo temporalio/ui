@@ -8,6 +8,8 @@
   import { downloadEventHistorySetting } from '$lib/stores/events';
   import { exportHistory } from '$lib/utilities/export-history';
 
+  import WorkflowRawHistoryLink from '../workflow-raw-history-link.svelte';
+
   export let open = false;
   export let namespace: string;
   export let workflowId: string;
@@ -65,5 +67,7 @@
         description={translate('events.readable-description')}
       />
     </RadioGroup>
+
+    <WorkflowRawHistoryLink />
   </div>
 </Modal>

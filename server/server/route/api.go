@@ -28,6 +28,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"go.temporal.io/api/workflowservice/v1"
 
 	"github.com/temporalio/ui-server/v2/server/api"
 	"github.com/temporalio/ui-server/v2/server/config"
@@ -70,10 +71,15 @@ func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, a
 
 	writeControlMiddleware := DisableWriteMiddleware(cfgProvider)
 	conn, err := api.CreateGRPCConnection(cfgProvider)
-
 	if err != nil {
 		return fmt.Errorf("Failed to create gRPC connection to Temporal server: %w", err)
 	}
+
+	route.GET(
+		api.WorkflowRawHistoryUrl,
+		api.WorkflowRawHistoryHandler(workflowservice.NewWorkflowServiceClient(conn)),
+		writeControlMiddleware,
+	)
 
 	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
 

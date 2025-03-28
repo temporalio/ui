@@ -131,6 +131,14 @@ export const routeForWorkflow = ({
   return `${routeForWorkflows(parameters)}/${wid}/${run}`;
 };
 
+export const routeForWorkflowHistoryJson = ({
+  workflow,
+  run,
+  ...parameters
+}: WorkflowParameters): string => {
+  return `${routeForWorkflows(parameters)}/${workflow}/${run}/history.json`;
+};
+
 export const routeForSchedules = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/schedules`;
 };

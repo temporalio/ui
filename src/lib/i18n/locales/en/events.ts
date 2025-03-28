@@ -93,4 +93,5 @@ export const Strings = {
   'readable-description': 'Codec Server decoded and base64 decoded',
   'event-types': 'Event Types',
   'decode-failed': 'Decoding failed',
+  'view-raw-history': 'View Raw History',
 } as const;
