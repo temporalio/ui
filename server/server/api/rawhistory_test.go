@@ -1,4 +1,4 @@
-package api
+package api_test
 
 import (
 	"context"
@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/temporalio/ui-server/v2/server/api"
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -48,7 +50,7 @@ func TestWorkflowRawHistoryHandler_HappyPath(t *testing.T) {
 			},
 		}, nil)
 
-	handler := WorkflowRawHistoryHandler(nil, mockService)
+	handler := api.WorkflowRawHistoryHandler(nil, mockService)
 
 	err := handler(c)
 
@@ -70,7 +72,7 @@ func TestRawHistory_StreamEvents_ErrorHandling(t *testing.T) {
 		}, fmt.Errorf("fetch error"))
 
 	rec := httptest.NewRecorder()
-	rh := NewRawHistory().
+	rh := api.NewRawHistory().
 		SetIDs("test-namespace", "test-workflow", "test-runid").
 		SetContext(context.Background()).
 		SetWriter(rec).
@@ -97,7 +99,7 @@ func TestRawHistory_StreamEvents_HappyPath(t *testing.T) {
 		}, nil)
 
 	rec := httptest.NewRecorder()
-	rh := NewRawHistory().
+	rh := api.NewRawHistory().
 		SetIDs("test-namespace", "test-workflow", "test-runid").
 		SetContext(context.Background()).
 		SetWriter(rec).
