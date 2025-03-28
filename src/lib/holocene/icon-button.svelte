@@ -11,6 +11,7 @@
     'data-testid'?: string;
     label: string;
     variant?: 'primary' | 'secondary' | 'ghost';
+    class?: string;
   }
 
   let className = '';

@@ -21,6 +21,15 @@ export default {
     }),
   ],
   kit: {
+    alias: {
+      $lib: 'src/lib',
+      '$lib/*': 'src/lib/*',
+      $types: 'src/lib/types',
+      '$types/*': 'src/lib/types/*',
+      '$components/*': 'src/components/*',
+      '$fixtures/*': 'src/fixtures/*',
+    },
+
     adapter: ci
       ? vercel()
       : adapter({

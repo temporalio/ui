@@ -40,6 +40,7 @@
     minHeight?: number;
     maxHeight?: number;
     label?: string;
+    class?: string;
   };
 
   type CopyableProps = BaseProps & {
