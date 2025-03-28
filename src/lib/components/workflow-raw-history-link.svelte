@@ -15,7 +15,7 @@
   $: linkToRedirect = `${href}.json`;
 </script>
 
-{#if !isCloud}
+{#if !$isCloud}
   <div class="flex items-center space-x-4">
     <Link
       icon="external-link"
