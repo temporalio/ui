@@ -50,7 +50,7 @@ func TestWorkflowRawHistoryHandler_HappyPath(t *testing.T) {
 			},
 		}, nil)
 
-	handler := api.WorkflowRawHistoryHandler(nil, mockService)
+	handler := api.WorkflowRawHistoryHandler(mockService)
 
 	err := handler(c)
 
