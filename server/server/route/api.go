@@ -71,6 +71,9 @@ func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, a
 
 	writeControlMiddleware := DisableWriteMiddleware(cfgProvider)
 	conn, err := api.CreateGRPCConnection(cfgProvider)
+	if err != nil {
+		return fmt.Errorf("Failed to create gRPC connection to Temporal server: %w", err)
+	}
 
 	route.GET(
 		api.WorkflowRawHistoryUrl,
@@ -80,10 +83,6 @@ func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, a
 		),
 		writeControlMiddleware,
 	)
-
-	if err != nil {
-		return fmt.Errorf("Failed to create gRPC connection to Temporal server: %w", err)
-	}
 
 	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
 
