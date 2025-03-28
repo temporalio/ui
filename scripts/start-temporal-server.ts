@@ -14,6 +14,7 @@ const options: TemporalServerOptions = {
   path: args['path'],
   logLevel: args['logLevel'] ?? args['log-level'],
   codecEndpoint: args['codecEndpoint'] ?? args['codec-endpoint'],
+  dbFilename: args['dbFilename'] ?? args['db-filename'],
 };
 
 const server: TemporalServer = await createTemporalServer(options);

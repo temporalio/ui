@@ -17,6 +17,7 @@ export type TemporalServerOptions = {
   logLevel?: string;
   codecEndpoint?: string;
   headless?: boolean;
+  dbFilename?: string;
 };
 
 const warn = (message: Parameters<typeof console.warn>[0]) => {
@@ -61,6 +62,7 @@ export const createTemporalServer = async ({
   logLevel = 'error',
   codecEndpoint,
   headless = false,
+  dbFilename,
 }: TemporalServerOptions = {}) => {
   const cliPath = await getCLIPath(path);
 
@@ -77,6 +79,10 @@ export const createTemporalServer = async ({
 
   if (headless) {
     flags.push('--headless');
+  }
+
+  if (dbFilename) {
+    flags.push(`--db-filename=${dbFilename}`);
   }
 
   const temporal =

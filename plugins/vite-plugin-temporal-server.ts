@@ -22,6 +22,22 @@ const shouldSkip = (server: ViteDevServer): boolean => {
   return false;
 };
 
+const persistentDB = (server: ViteDevServer): string | undefined => {
+  const filename = server.config.env.VITE_TEMPORAL_DB;
+  if (!filename) {
+    console.warn(
+      magenta(
+        'No VITE_TEMPORAL_DB environment variable set. Using in-memory database.',
+      ),
+    );
+    return;
+  }
+
+  console.log(magenta(`Using persistent database at ${filename}.`));
+
+  return filename;
+};
+
 const getPortFromApiEndpoint = (endpoint: string, fallback = 8233): number => {
   return validatePort(
     endpoint.slice(endpoint.lastIndexOf(':') + 1, endpoint.length),
@@ -68,6 +84,7 @@ export function temporalServer(): Plugin {
       temporal = await createTemporalServer({
         port,
         uiPort,
+        dbFilename: persistentDB(server),
       });
 
       await temporal.ready();
