@@ -82,8 +82,6 @@
     </div>
   </div>
   <slot name="decode" />
-
-  <slot name="viewraw" />
 </div>
 <div class="min-h-screen py-4">
   {#if $decodeEventHistory}

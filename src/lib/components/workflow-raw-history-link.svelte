@@ -1,25 +1,27 @@
 <script lang="ts">
   import Link from '$lib/holocene/link.svelte';
-  import { getEndpointForRawHistory } from '$lib/services/events-service';
+  import { translate } from '$lib/i18n/translate';
   import { parameters } from '$lib/stores/events';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   const { namespace, workflowId, runId } = $parameters;
 
-  $: link = getEndpointForRawHistory({
+  $: href = routeForEventHistory({
     namespace,
-    workflowId,
-    runId,
+    workflow: workflowId,
+    run: runId,
   });
+  $: linkToRedirect = `${href}.json`;
 </script>
 
 <div class="flex items-center space-x-4">
   <Link
+    icon="external-link"
     class="whitespace-nowrap"
-    href={link}
+    href={linkToRedirect}
     newTab={true}
     data-testid="view-raw-event-history"
   >
-    <!-- TODO: i18n needed -->
-    Raw History
+    {translate('events.view-raw-history')}
   </Link>
 </div>
