@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/temporalio/ui-server/v2/server/config"
 	"go.temporal.io/api/common/v1"
 	"go.temporal.io/api/workflowservice/v1"
 	"golang.org/x/net/context"
@@ -15,10 +14,7 @@ import (
 
 const WorkflowRawHistoryUrl = "/namespaces/:namespace/workflows/:workflow/run/:runid/history.json"
 
-func WorkflowRawHistoryHandler(
-	cfgProvider *config.ConfigProviderWithRefresh,
-	service IWorkflowService,
-) echo.HandlerFunc {
+func WorkflowRawHistoryHandler(service IWorkflowService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// Set headers for JSON streaming
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)

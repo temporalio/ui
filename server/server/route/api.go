@@ -77,10 +77,7 @@ func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, a
 
 	route.GET(
 		api.WorkflowRawHistoryUrl,
-		api.WorkflowRawHistoryHandler(
-			cfgProvider,
-			workflowservice.NewWorkflowServiceClient(conn),
-		),
+		api.WorkflowRawHistoryHandler(workflowservice.NewWorkflowServiceClient(conn)),
 		writeControlMiddleware,
 	)
 
