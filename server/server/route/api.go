@@ -28,6 +28,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"go.temporal.io/api/workflowservice/v1"
 
 	"github.com/temporalio/ui-server/v2/server/api"
 	"github.com/temporalio/ui-server/v2/server/config"
@@ -63,11 +64,7 @@ func DisableWriteMiddleware(cfgProvider *config.ConfigProviderWithRefresh) echo.
 }
 
 // SetAPIRoutes sets api routes
-func SetAPIRoutes(
-	e *echo.Echo,
-	cfgProvider *config.ConfigProviderWithRefresh,
-	apiMiddleware []api.Middleware,
-) error {
+func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []api.Middleware) error {
 
 	route := e.Group("/api/v1")
 	route.GET("/settings", api.GetSettings(cfgProvider))
@@ -77,7 +74,10 @@ func SetAPIRoutes(
 
 	route.GET(
 		api.WorkflowRawHistoryUrl,
-		api.WorkflowRawHistoryHandler(cfgProvider, conn),
+		api.WorkflowRawHistoryHandler(
+			cfgProvider,
+			workflowservice.NewWorkflowServiceClient(conn),
+		),
 		writeControlMiddleware,
 	)
 
@@ -85,12 +85,7 @@ func SetAPIRoutes(
 		return fmt.Errorf("Failed to create gRPC connection to Temporal server: %w", err)
 	}
 
-	route.Match(
-		[]string{"GET", "POST", "PUT", "PATCH", "DELETE"},
-		"/*",
-		api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn),
-		writeControlMiddleware,
-	)
+	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
 
 	// New api paths with removed prefix. Need to figure out how to handle when ui and ui server are on same host
 	// e.GET("/settings", api.GetSettings(cfgProvider))

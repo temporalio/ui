@@ -17,7 +17,7 @@ const WorkflowRawHistoryUrl = "/namespaces/:namespace/workflows/:workflow/run/:r
 
 func WorkflowRawHistoryHandler(
 	cfgProvider *config.ConfigProviderWithRefresh,
-	conn *grpc.ClientConn,
+	service IWorkflowService,
 ) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// Set headers for JSON streaming
@@ -26,12 +26,24 @@ func WorkflowRawHistoryHandler(
 
 		// // Stream the history events
 		return NewRawHistory().
-			SetIDs(c).
-			SetContext(c).
-			SetWriter(c).
-			SetTemporalClient(conn).
+			SetIDs(
+				c.Param("namespace"),
+				c.Param("workflow"),
+				c.Param("runid"),
+			).
+			SetContext(c.Request().Context()).
+			SetWriter(c.Response().Writer).
+			SetWorkflowService(service).
 			StreamEvents()
 	}
+}
+
+type IWorkflowService interface {
+	GetWorkflowExecutionHistory(
+		ctx context.Context,
+		in *workflowservice.GetWorkflowExecutionHistoryRequest,
+		opts ...grpc.CallOption,
+	) (*workflowservice.GetWorkflowExecutionHistoryResponse, error)
 }
 
 func NewRawHistory() *RawHistory {
@@ -43,35 +55,41 @@ type RawHistory struct {
 	workflowID string
 	runID      string
 
+	writtenCount int
+
 	context context.Context
 	writer  http.ResponseWriter
 	encoder *json.Encoder
-	client  workflowservice.WorkflowServiceClient
+	service IWorkflowService
 }
 
-func (rh *RawHistory) SetIDs(c echo.Context) *RawHistory {
-	rh.namespace = c.Param("namespace")
-	rh.workflowID = c.Param("workflow")
-	rh.runID = c.Param("runid")
+func (rh *RawHistory) SetIDs(
+	namespace string,
+	workflowID string,
+	runID string,
+) *RawHistory {
+	rh.namespace = namespace
+	rh.workflowID = workflowID
+	rh.runID = runID
 
 	return rh
 }
 
-func (rh *RawHistory) SetContext(c echo.Context) *RawHistory {
-	rh.context = c.Request().Context()
+func (rh *RawHistory) SetContext(c context.Context) *RawHistory {
+	rh.context = c
 
 	return rh
 }
 
-func (rh *RawHistory) SetWriter(c echo.Context) *RawHistory {
-	rh.writer = c.Response().Writer
+func (rh *RawHistory) SetWriter(w http.ResponseWriter) *RawHistory {
+	rh.writer = w
 	rh.encoder = json.NewEncoder(rh.writer)
 
 	return rh
 }
 
-func (rh *RawHistory) SetTemporalClient(conn *grpc.ClientConn) *RawHistory {
-	rh.client = workflowservice.NewWorkflowServiceClient(conn)
+func (rh *RawHistory) SetWorkflowService(service IWorkflowService) *RawHistory {
+	rh.service = service
 
 	return rh
 }
@@ -83,7 +101,7 @@ func (rh *RawHistory) StreamEvents() error {
 	// Write the history events
 	err := rh.streamEvents()
 	if err != nil {
-		fmt.Fprintf(rh.writer, `{ "error": %v }`, err)
+		rh.handleError(err)
 	}
 
 	fmt.Fprint(rh.writer, "]")
@@ -121,6 +139,7 @@ func (rh *RawHistory) streamEvents() error {
 
 			// Flush to ensure streaming
 			writer.(http.Flusher).Flush()
+			rh.writtenCount++
 		}
 
 		// Check if we're done
@@ -146,5 +165,13 @@ func (rh *RawHistory) fetchPage(
 		NextPageToken: nextPageToken,
 	}
 
-	return rh.client.GetWorkflowExecutionHistory(rh.context, request)
+	return rh.service.GetWorkflowExecutionHistory(rh.context, request)
+}
+
+func (rh *RawHistory) handleError(err error) {
+	if rh.writtenCount > 0 {
+		fmt.Fprint(rh.writer, ",")
+	}
+
+	fmt.Fprintf(rh.writer, `{"error": "%s"}`, err)
 }
