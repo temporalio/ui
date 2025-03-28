@@ -98,6 +98,7 @@
   let second = '';
   let phase = '';
   let cronString = '';
+  let activeTab = 'schedule-tab';
   let searchAttributesInput = Object.entries(indexedFields).map(
     ([label, value]) => ({
       label,
@@ -194,7 +195,7 @@
     </Link>
     <h1>{title}</h1>
     <Card class="w-full xl:w-3/4 2xl:w-1/2">
-      <form class="mb-4 flex w-full flex-col gap-4">
+      <form on:submit|preventDefault class="mb-4 flex w-full flex-col gap-4">
         <Input
           id="name"
           bind:value={name}
@@ -241,17 +242,23 @@
           payloads={schedule?.action?.startWorkflow?.input}
           showEditActions={Boolean(schedule)}
         />
-        <Tabs>
+        <Tabs {activeTab} class="mt-8">
           <h2 class="mb-4">Search Attributes</h2>
           <TabList
             label={translate('schedules.add-schedule-attr')}
             class="flex flex-wrap gap-6"
           >
-            <Tab label="Schedule" id="schedule-tab" panelId="schedule-panel" />
+            <Tab
+              label="Schedule"
+              id="schedule-tab"
+              panelId="schedule-panel"
+              onClick={() => (activeTab = 'schedule-tab')}
+            />
             <Tab
               label="Workflows"
               id="workflows-tab"
               panelId="workflows-panel"
+              onClick={() => (activeTab = 'workflows-tab')}
             />
           </TabList>
           <div class="mt-4 flex w-full flex-wrap gap-6">

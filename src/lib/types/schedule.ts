@@ -81,3 +81,5 @@ export type OverlapPolicy =
   | 'CancelOther'
   | 'TerminateOther'
   | 'AllowAll';
+
+export type SearchAttributeCategory = 'workflows' | 'schedule';
