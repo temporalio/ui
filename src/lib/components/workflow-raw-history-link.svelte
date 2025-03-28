@@ -3,16 +3,15 @@
   import { translate } from '$lib/i18n/translate';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { parameters } from '$lib/stores/events';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { routeForWorkflowHistoryJson } from '$lib/utilities/route-for';
 
   const { namespace, workflowId, runId } = $parameters;
 
-  $: href = routeForEventHistory({
+  $: href = routeForWorkflowHistoryJson({
     namespace,
     workflow: workflowId,
     run: runId,
   });
-  $: linkToRedirect = `${href}.json`;
 </script>
 
 {#if !$isCloud}
@@ -20,7 +19,7 @@
     <Link
       icon="external-link"
       class="whitespace-nowrap"
-      href={linkToRedirect}
+      {href}
       newTab={true}
       data-testid="view-raw-event-history"
     >

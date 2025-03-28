@@ -197,6 +197,7 @@ export function routeForApi(
 export function routeForApi(
   route: WorkflowAPIRoutePath,
   parameters: WorkflowRawHistoryRouteParameters,
+  shouldEncode?: boolean,
 ): string;
 export function routeForApi(
   route: WorkflowSignalAPIRoutePath,
