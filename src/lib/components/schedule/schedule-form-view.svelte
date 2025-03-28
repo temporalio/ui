@@ -12,6 +12,10 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
+  import TabList from '$lib/holocene/tab/tab-list.svelte';
+  import TabPanel from '$lib/holocene/tab/tab-panel.svelte';
+  import Tab from '$lib/holocene/tab/tab.svelte';
+  import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { error, loading } from '$lib/stores/schedules';
   import {
@@ -67,8 +71,15 @@
   let name = scheduleId ?? '';
 
   const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
+  const decodedWorkflowSearchAttributes = decodePayloadAttributes({
+    searchAttributes: schedule?.action?.startWorkflow?.searchAttributes ?? {},
+  });
+
   const indexedFields =
     decodedSearchAttributes?.searchAttributes.indexedFields ??
+    ({} as { [k: string]: string });
+  const workflowIndexedFields =
+    decodedWorkflowSearchAttributes?.searchAttributes.indexedFields ??
     ({} as { [k: string]: string });
 
   let workflowType = schedule?.action?.startWorkflow?.workflowType?.name ?? '';
@@ -87,7 +98,15 @@
   let second = '';
   let phase = '';
   let cronString = '';
+  let activeTab = 'schedule-tab';
   let searchAttributesInput = Object.entries(indexedFields).map(
+    ([label, value]) => ({
+      label,
+      value,
+      type: $customSearchAttributes[label],
+    }),
+  ) as SearchAttributeInput[];
+  let workflowSearchAttributesInput = Object.entries(workflowIndexedFields).map(
     ([label, value]) => ({
       label,
       value,
@@ -114,6 +133,7 @@
       days,
       months,
       searchAttributes: searchAttributesInput,
+      workflowSearchAttributes: workflowSearchAttributesInput,
     };
 
     onConfirm(preset, args, schedule);
@@ -175,7 +195,7 @@
     </Link>
     <h1>{title}</h1>
     <Card class="w-full xl:w-3/4 2xl:w-1/2">
-      <form class="mb-4 flex w-full flex-col gap-4">
+      <form on:submit|preventDefault class="mb-4 flex w-full flex-col gap-4">
         <Input
           id="name"
           bind:value={name}
@@ -222,10 +242,40 @@
           payloads={schedule?.action?.startWorkflow?.input}
           showEditActions={Boolean(schedule)}
         />
-        <AddSearchAttributes
-          bind:attributesToAdd={searchAttributesInput}
-          class="w-full"
-        />
+        <Tabs {activeTab} class="mt-8">
+          <h2 class="mb-4">Search Attributes</h2>
+          <TabList
+            label={translate('schedules.add-schedule-attr')}
+            class="flex flex-wrap gap-6"
+          >
+            <Tab
+              label="Schedule"
+              id="schedule-tab"
+              panelId="schedule-panel"
+              onClick={() => (activeTab = 'schedule-tab')}
+            />
+            <Tab
+              label="Workflows"
+              id="workflows-tab"
+              panelId="workflows-panel"
+              onClick={() => (activeTab = 'workflows-tab')}
+            />
+          </TabList>
+          <div class="mt-4 flex w-full flex-wrap gap-6">
+            <TabPanel id="schedule-panel" tabId="schedule-tab" class="w-full">
+              <AddSearchAttributes
+                bind:attributesToAdd={searchAttributesInput}
+                class="w-full"
+              />
+            </TabPanel>
+            <TabPanel id="workflows-panel" tabId="workflows-tab" class="w-full">
+              <AddSearchAttributes
+                bind:attributesToAdd={workflowSearchAttributesInput}
+                class="w-full"
+              />
+            </TabPanel>
+          </div>
+        </Tabs>
         <SchedulesCalendarView
           let:preset
           {schedule}
