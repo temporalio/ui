@@ -12,22 +12,14 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
-  import TabList from '$lib/holocene/tab/tab-list.svelte';
-  import TabPanel from '$lib/holocene/tab/tab-panel.svelte';
-  import Tab from '$lib/holocene/tab/tab.svelte';
-  import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { error, loading } from '$lib/stores/schedules';
-  import {
-    customSearchAttributes,
-    type SearchAttributeInput,
-  } from '$lib/stores/search-attributes';
+  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
   import type {
     FullSchedule,
     ScheduleParameters,
     SchedulePreset,
   } from '$lib/types/schedule';
-  import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
   import {
     routeForSchedule,
     routeForSchedules,
@@ -35,14 +27,14 @@
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import type { PayloadInputEncoding } from '../payload-input-with-encoding.svelte';
-  import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
+  import SchedulesSearchAttributesInputs from './schedules-search-attributes-inputs.svelte';
 
   import type { Schedule, SearchAttribute } from '$types';
 
   export let schedule: FullSchedule | null = null;
-  export let searchAttributes: SearchAttribute = {};
+  export const searchAttributes: SearchAttribute = {};
 
   export let onConfirm: (
     preset: SchedulePreset,
@@ -70,18 +62,6 @@
   let errors = {};
   let name = scheduleId ?? '';
 
-  const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
-  const decodedWorkflowSearchAttributes = decodePayloadAttributes({
-    searchAttributes: schedule?.action?.startWorkflow?.searchAttributes ?? {},
-  });
-
-  const indexedFields =
-    decodedSearchAttributes?.searchAttributes.indexedFields ??
-    ({} as { [k: string]: string });
-  const workflowIndexedFields =
-    decodedWorkflowSearchAttributes?.searchAttributes.indexedFields ??
-    ({} as { [k: string]: string });
-
   let workflowType = schedule?.action?.startWorkflow?.workflowType?.name ?? '';
   let workflowId = schedule?.action?.startWorkflow?.workflowId ?? '';
   let taskQueue = schedule?.action?.startWorkflow?.taskQueue?.name ?? '';
@@ -98,20 +78,8 @@
   let second = '';
   let phase = '';
   let cronString = '';
-  let searchAttributesInput = Object.entries(indexedFields).map(
-    ([label, value]) => ({
-      label,
-      value,
-      type: $customSearchAttributes[label],
-    }),
-  ) as SearchAttributeInput[];
-  let workflowSearchAttributesInput = Object.entries(workflowIndexedFields).map(
-    ([label, value]) => ({
-      label,
-      value,
-      type: $customSearchAttributes[label],
-    }),
-  ) as SearchAttributeInput[];
+  let searchAttributesInput: SearchAttributeInput[] = [];
+  let workflowSearchAttributesInput: SearchAttributeInput[] = [];
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: Partial<ScheduleParameters> = {
@@ -241,34 +209,14 @@
           payloads={schedule?.action?.startWorkflow?.input}
           showEditActions={Boolean(schedule)}
         />
-        <Tabs>
-          <h2 class="mb-4">Search Attributes</h2>
-          <TabList
-            label={translate('schedules.add-schedule-attr')}
-            class="flex flex-wrap gap-6"
-          >
-            <Tab label="Schedule" id="schedule-tab" panelId="schedule-panel" />
-            <Tab
-              label="Workflows"
-              id="workflows-tab"
-              panelId="workflows-panel"
-            />
-          </TabList>
-          <div class="mt-4 flex w-full flex-wrap gap-6">
-            <TabPanel id="schedule-panel" tabId="schedule-tab" class="w-full">
-              <AddSearchAttributes
-                bind:attributesToAdd={searchAttributesInput}
-                class="w-full"
-              />
-            </TabPanel>
-            <TabPanel id="workflows-panel" tabId="workflows-tab" class="w-full">
-              <AddSearchAttributes
-                bind:attributesToAdd={workflowSearchAttributesInput}
-                class="w-full"
-              />
-            </TabPanel>
-          </div>
-        </Tabs>
+
+        <SchedulesSearchAttributesInputs
+          {schedule}
+          {searchAttributes}
+          bind:searchAttributesInput
+          bind:workflowSearchAttributesInput
+        />
+
         <SchedulesCalendarView
           let:preset
           {schedule}
