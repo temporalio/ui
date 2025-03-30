@@ -6,6 +6,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
@@ -266,8 +267,8 @@
   {#if $loading}
     <Loading title={translate('schedules.deleting')} class="my-2" />
   {:else}
-    <header class="mb-8 flex flex-row flex-wrap justify-between gap-4">
-      <div class="relative flex flex-col gap-4">
+    <header class="flex flex-row flex-wrap justify-between gap-4">
+      <div class="relative flex flex-col">
         <Link href={routeForSchedules({ namespace })} icon="chevron-left">
           {translate('schedules.back-to-schedules')}
         </Link>
@@ -284,7 +285,7 @@
             {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
           </p>
         </div>
-        <p class="flex items-center gap-2 text-sm">
+        <p class="flex items-center gap-2 text-right text-sm">
           {translate('common.created', {
             created: formatDate(schedule?.info?.createTime, $timeFormat, {
               relative: $relativeTime,
@@ -292,15 +293,13 @@
           })}
         </p>
         {#if schedule?.info?.updateTime}
-          <div class="flex items-center gap-2 text-sm">
-            <p>
-              {translate('common.last-updated', {
-                updated: formatDate(schedule?.info?.updateTime, $timeFormat, {
-                  relative: $relativeTime,
-                }),
-              })}
-            </p>
-          </div>
+          <p class="flex items-center gap-2 text-right text-sm">
+            {translate('common.last-updated', {
+              updated: formatDate(schedule?.info?.updateTime, $timeFormat, {
+                relative: $relativeTime,
+              }),
+            })}
+          </p>
         {/if}
       </div>
       <SplitButton
@@ -340,6 +339,7 @@
         </MenuItem>
       </SplitButton>
     </header>
+    <CodecServerErrorBanner />
     <div class="flex flex-col gap-4 pb-24">
       {#if schedule?.info?.invalidScheduleError}
         <div class="w-full xl:w-1/2">

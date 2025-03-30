@@ -3,6 +3,7 @@
 
   import { page } from '$app/stores';
 
+  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import WorkflowCurrentDetails from '$lib/components/workflow/metadata/workflow-current-details.svelte';
   import WorkflowSummaryAndDetails from '$lib/components/workflow/metadata/workflow-summary-and-details.svelte';
@@ -126,6 +127,7 @@
       <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
     </div>
   </div>
+  <CodecServerErrorBanner />
   <WorkflowSummaryAndDetails />
   <WorkflowCurrentDetails />
   <WorkflowDetails {workflow} />
