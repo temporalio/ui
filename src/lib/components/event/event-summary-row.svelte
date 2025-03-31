@@ -51,14 +51,14 @@
     ? Array.from(event.events.keys()).shift()
     : event.id;
 
-  $: ({ workflow, run, namespace } = $page.params);
+  $: ({ workflow, run, namespace, id } = $page.params);
   $: href = routeForEventHistoryEvent({
     eventId: event.id,
     namespace,
     workflow,
     run,
   });
-  $: expanded = expandAll || $page.params.id === event.id;
+  $: expanded = expandAll || id === event.id;
   $: attributes = formatAttributes(event);
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;

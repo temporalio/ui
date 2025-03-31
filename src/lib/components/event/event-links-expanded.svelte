@@ -11,7 +11,7 @@
 {#each links as link}
   {#if link?.workflowEvent}
     <div class="flex w-full items-center gap-4 p-2">
-      <EventLink {link} />
+      <EventLink {link} linkClass="truncate" />
     </div>
     <div class="flex w-full items-center gap-4 p-2">
       <EventLink

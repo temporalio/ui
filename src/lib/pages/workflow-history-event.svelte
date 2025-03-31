@@ -57,7 +57,9 @@
   $: visibleItems = $fullEventHistory.filter((e) => ids.includes(e.id));
   $: loading = !visibleItems.length;
 
-  const loadPrevious = () => {
+  const loadPrevious = (e) => {
+    e.preventDefault();
+
     const firstId = parseInt(ids[0]);
     const previousTen: string[] = [];
     const start = firstId - 10;
@@ -69,7 +71,9 @@
     ids = [...previousTen, ...ids];
   };
 
-  const loadNext = () => {
+  const loadNext = (e) => {
+    e.preventDefault();
+
     const lastId = parseInt(ids[ids.length - 1]);
     const nextTen: string[] = [];
     const start = lastId + 1;
