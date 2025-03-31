@@ -21,6 +21,7 @@ export const load = async ({ params }) => {
       namespace,
       workflowId: workflow,
       runId: run,
+      sort: 'ascending',
     });
   } catch (error) {
     redirect(302, workflowRoute);

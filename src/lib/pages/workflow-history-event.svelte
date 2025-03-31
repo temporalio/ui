@@ -57,33 +57,35 @@
   $: visibleItems = $fullEventHistory.filter((e) => ids.includes(e.id));
   $: loading = !visibleItems.length;
 
-  const loadPrevious = (e) => {
-    e.preventDefault();
-
+  const loadPrevious = () => {
     const firstId = parseInt(ids[0]);
     const previousTen: string[] = [];
     const start = firstId - 10;
 
     for (let i = 0; i < 10; i++) {
-      previousTen.push((start + i).toString());
+      if (start + i > 0) {
+        previousTen.push((start + i).toString());
+      }
     }
 
     ids = [...previousTen, ...ids];
   };
 
-  const loadNext = (e) => {
-    e.preventDefault();
-
+  const loadNext = () => {
     const lastId = parseInt(ids[ids.length - 1]);
     const nextTen: string[] = [];
     const start = lastId + 1;
 
     for (let i = 0; i < 10; i++) {
-      nextTen.push((start + i).toString());
+      if (start + i <= $fullEventHistory.length) {
+        nextTen.push((start + i).toString());
+      }
     }
 
     ids = [...ids, ...nextTen];
   };
+
+  $: lastEventId = $fullEventHistory[$fullEventHistory.length - 1]?.id;
 </script>
 
 <div class="px-8 pb-16" data-testid="event-summary-table">
@@ -92,9 +94,14 @@
       <Button
         variant="ghost"
         on:click={loadPrevious}
+        disabled={ids[0] === '1' || loading}
         data-testid="load-previous">Show Previous 10</Button
       >
-      <Button variant="ghost" on:click={loadNext} data-testid="load-previous"
+      <Button
+        variant="ghost"
+        on:click={loadNext}
+        data-testid="load-next"
+        disabled={ids[ids.length - 1] === lastEventId || loading}
         >Show Next 10</Button
       >
     </div>
