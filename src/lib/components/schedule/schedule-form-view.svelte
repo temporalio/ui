@@ -34,7 +34,7 @@
   import type { Schedule, SearchAttribute } from '$types';
 
   export let schedule: FullSchedule | null = null;
-  export const searchAttributes: SearchAttribute = {};
+  export let searchAttributes: SearchAttribute = {};
 
   export let onConfirm: (
     preset: SchedulePreset,
