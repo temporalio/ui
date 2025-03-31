@@ -4,7 +4,6 @@
   import { page } from '$app/stores';
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
-  import { workflowStatuses } from '$lib/models/workflow-status';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
@@ -18,7 +17,7 @@
     SEARCH_ATTRIBUTE_TYPE,
     type WorkflowStatus,
   } from '$lib/types/workflows';
-  import { decodePayload } from '$lib/utilities/decode-payload';
+  import { getStatusAndCountOfGroup } from '$lib/utilities/get-group-status-and-count';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { getExponentialBackoffSeconds } from '$lib/utilities/refresh-rate';
@@ -63,26 +62,6 @@
     $workflowCount.newCount = 0;
     attempt = 1;
     loading = true;
-  };
-
-  const getStatusAndCountOfGroup = (groups = []) => {
-    return groups
-      .map((group) => {
-        const status = decodePayload(
-          group?.groupValues[0],
-        ) as unknown as WorkflowStatus;
-        const count = parseInt(group.count);
-        return {
-          status,
-          count,
-        };
-      })
-      .sort((a, b) => {
-        return (
-          workflowStatuses.indexOf(a.status) -
-          workflowStatuses.indexOf(b.status)
-        );
-      });
   };
 
   const fetchNewCounts = async () => {

@@ -388,9 +388,12 @@
       <Icon class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
     <div
-      class="input-wrapper"
-      class:gap-1={multiselect}
-      class:p-1={multiselect && displayChips}
+      class={merge(
+        'input-wrapper',
+        multiselect && 'gap-1',
+        multiselect && 'm-1',
+        leadingIcon && multiselect && 'ml-2',
+      )}
     >
       {#if multiselect && isArrayValue(value) && value.length > 0}
         {#if displayChips}
@@ -416,7 +419,15 @@
         type="text"
         value={displayValue}
         class:disabled
-        class={merge('combobox-input', className)}
+        class={merge(
+          'combobox-input',
+          multiselect
+            ? value.length > 0 || leadingIcon
+              ? 'indent-0'
+              : 'indent-1'
+            : 'indent-2',
+          className,
+        )}
         role="combobox"
         autocomplete="off"
         autocapitalize="off"
@@ -536,10 +547,6 @@
 
   .input-wrapper {
     @apply flex w-full flex-wrap items-center;
-
-    input {
-      @apply indent-2;
-    }
   }
 
   .combobox-input {

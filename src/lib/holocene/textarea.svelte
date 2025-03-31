@@ -69,6 +69,7 @@
       on:blur
       on:keydown|stopPropagation
       maxlength={maxLength > 0 ? maxLength : undefined}
+      data-testid={id}
       {...$$restProps}
     ></textarea>
   </div>
