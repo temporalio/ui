@@ -148,5 +148,9 @@
       title={translate('common.history-size-bytes')}
       content={workflow?.historySizeBytes}
     />
+    <WorkflowDetail
+      title={translate('workflows.state-transitions')}
+      content={workflow?.stateTransitionCount}
+    />
   </div>
 </div>
