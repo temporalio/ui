@@ -88,7 +88,7 @@
 
 <div class="px-8 pb-16" data-testid="event-summary-table">
   <EventSummaryTable items={visibleItems} {groups} {loading} showGraph={false}>
-    <div slot="controls" class="flex items-center gap-2">
+    <div slot="controls" class="flex flex-col items-center gap-2 md:flex-row">
       <Button
         variant="ghost"
         on:click={loadPrevious}
