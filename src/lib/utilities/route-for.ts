@@ -182,13 +182,6 @@ export const routeForEventHistoryEventType = ({
   return `${routeForWorkflow(parameters)}/history/events/type/${eventType}`;
 };
 
-export const routeForEventGroup = ({
-  eventId,
-  ...parameters
-}: EventParameters): string => {
-  return `${routeForWorkflow(parameters)}/history/event-groups/${eventId}`;
-};
-
 export const routeForWorkers = (parameters: WorkflowParameters): string => {
   return `${routeForWorkflow(parameters)}/workers`;
 };
