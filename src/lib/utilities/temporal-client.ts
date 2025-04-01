@@ -10,4 +10,4 @@ export const newClient = (apiUrl?: string) => {
   return new Client(apiUrl);
 };
 
-export const temporalDefaultClient = newClient();
+export const temporalClient = newClient();

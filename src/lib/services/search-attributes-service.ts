@@ -1,13 +1,14 @@
 import type { SearchAttributesResponseHumanized } from '$lib/types/workflows';
 import { toSearchAttributeTypeReadable } from '$lib/utilities/screaming-enums';
-import { temporalDefaultClient } from '$lib/utilities/temporal-client';
+import { temporalClient } from '$lib/utilities/temporal-client';
 
 export const fetchSearchAttributesForNamespace = async (
   namespace: string,
 ): Promise<SearchAttributesResponseHumanized> => {
   try {
-    const searchAttributesResponse =
-      await temporalDefaultClient.listSearchAttributes({ namespace });
+    const searchAttributesResponse = await temporalClient.listSearchAttributes({
+      namespace,
+    });
 
     // DEPRECATED
     //

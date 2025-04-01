@@ -35,6 +35,7 @@
     "eslint:fix": "eslint --ignore-path .gitignore --fix .",
     "dev": "pnpm dev:ui-server -- --open",
     "dev:ui-server": ". ./.env.ui-server && vite dev --mode ui-server",
+    "dev:http-api": ". ./.env.http-api && vite dev --mode ui-server",
     "dev:local-temporal": ". ./.env.local-temporal && vite dev --mode local-temporal",
     "dev:temporal-cli": "vite dev --mode temporal-server",
     "dev:docker": ". ./.env && VITE_API=http://localhost:8080 vite dev --mode docker",
