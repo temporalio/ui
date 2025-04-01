@@ -103,7 +103,7 @@
   >
   <table>
     <thead></thead>
-    <tbody class="table-body">
+    <tbody>
       {#each visibleItems as event, index}
         <EventSummaryRow
           {event}
@@ -125,7 +125,7 @@
 </div>
 
 <style lang="postcss">
-  .table-body {
+  tbody {
     :global(tr.dense) {
       @apply h-8 hover:cursor-pointer hover:bg-interactive-table-hover hover:bg-fixed;
     }
