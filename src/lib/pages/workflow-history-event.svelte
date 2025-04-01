@@ -89,21 +89,24 @@
 </script>
 
 <div class="px-8 pb-16" data-testid="event-summary-table">
-  <EventSummaryTable items={visibleItems} {groups} {loading} showGraph={false}>
-    <div slot="controls" class="flex flex-col items-center gap-2 md:flex-row">
-      <Button
-        variant="ghost"
-        on:click={loadPrevious}
-        disabled={ids[0] === '1' || loading}
-        data-testid="load-previous">Show Previous 10</Button
-      >
-      <Button
-        variant="ghost"
-        on:click={loadNext}
-        data-testid="load-next"
-        disabled={ids[ids.length - 1] === lastEventId || loading}
-        >Show Next 10</Button
-      >
-    </div>
-  </EventSummaryTable>
+  <Button
+    variant="ghost"
+    leadingIcon="arrow-up"
+    on:click={loadPrevious}
+    disabled={ids[0] === '1' || loading}
+    data-testid="load-previous">Show Previous 10</Button
+  >
+  <EventSummaryTable
+    items={visibleItems}
+    {groups}
+    {loading}
+    showGraph={false}
+  />
+  <Button
+    variant="ghost"
+    leadingIcon="arrow-down"
+    on:click={loadNext}
+    disabled={ids[ids.length - 1] === lastEventId || loading}
+    data-testid="load-next">Show Next 10</Button
+  >
 </div>

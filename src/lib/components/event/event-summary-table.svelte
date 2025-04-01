@@ -103,7 +103,4 @@
       <EventEmptyRow loading={!$fullEventHistory.length || loading} />
     {/each}
   </div>
-  <svelte:fragment slot="actions-end-additional">
-    <slot name="controls" />
-  </svelte:fragment>
 </Paginated>
