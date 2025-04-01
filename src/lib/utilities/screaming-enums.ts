@@ -1,3 +1,5 @@
+import type { ListSearchAttributesResponse } from 'temporal-http-client/schemas/list-search-attributes-response';
+
 import type {
   ArchivalState,
   CallbackState,
@@ -14,11 +16,10 @@ import type {
 
 import type { EventType } from './is-event-type';
 
-export const fromScreamingEnum = <T>(
-  potentialScreamingEnum: T,
+export const fromScreamingEnum = <T, V>(
+  potentialScreamingEnum: V,
   prefix: string,
-): T => {
-  if (!potentialScreamingEnum) return potentialScreamingEnum;
+): T | V => {
   const stringEnum = String(potentialScreamingEnum);
   const split = stringEnum.split('_');
   if (!split || split.length <= 1) return potentialScreamingEnum;
@@ -31,8 +32,11 @@ export const fromScreamingEnum = <T>(
 };
 
 export const toSearchAttributeTypeReadable = (
-  status: SearchAttributeType,
-): SearchAttributeType => {
+  status:
+    | ListSearchAttributesResponse['customAttributes'][string]
+    | ListSearchAttributesResponse['systemAttributes'][string]
+    | SearchAttributeType,
+): typeof status => {
   return fromScreamingEnum(status, 'IndexedValueType');
 };
 
