@@ -195,10 +195,10 @@ devDependencies:
     version: 1.11.6
   '@temporalio/testing':
     specifier: 1.11.6
-    version: 1.11.6(esbuild@0.13.15)
+    version: 1.11.6(esbuild@0.25.0)
   '@temporalio/worker':
     specifier: 1.11.6
-    version: 1.11.6(esbuild@0.13.15)
+    version: 1.11.6(esbuild@0.25.0)
   '@temporalio/workflow':
     specifier: 1.11.6
     version: 1.11.6
@@ -272,8 +272,8 @@ devDependencies:
     specifier: ^5.1.14
     version: 5.1.14(postcss@8.4.31)
   esbuild:
-    specifier: ^0.13.15
-    version: 0.13.15
+    specifier: ^0.25.0
+    version: 0.25.0
   eslint:
     specifier: ^8.47.0
     version: 8.47.0
@@ -456,7 +456,7 @@ devDependencies:
     version: 1.0.4
   webpack:
     specifier: ^5.76.0
-    version: 5.94.0(@swc/core@1.10.7)(esbuild@0.13.15)
+    version: 5.94.0(@swc/core@1.10.7)(esbuild@0.25.0)
   yargs:
     specifier: ^17.7.2
     version: 17.7.2
@@ -3564,7 +3564,7 @@ packages:
       protobufjs: 7.2.5
     dev: true
 
-  /@temporalio/testing@1.11.6(esbuild@0.13.15):
+  /@temporalio/testing@1.11.6(esbuild@0.25.0):
     resolution: {integrity: sha512-Vsxd7d6cO2CbjyLDezWUdaQUb0uXRZbUb7i7O4ALZ64yXX8FdYTn3IYmihNunjD1Eb3I1zu8yv+DhA9TMJce6w==}
     dependencies:
       '@temporalio/activity': 1.11.6
@@ -3572,7 +3572,7 @@ packages:
       '@temporalio/common': 1.11.6
       '@temporalio/core-bridge': 1.11.6
       '@temporalio/proto': 1.11.6
-      '@temporalio/worker': 1.11.6(esbuild@0.13.15)
+      '@temporalio/worker': 1.11.6(esbuild@0.25.0)
       '@temporalio/workflow': 1.11.6
       abort-controller: 3.0.0
     transitivePeerDependencies:
@@ -3582,7 +3582,7 @@ packages:
       - webpack-cli
     dev: true
 
-  /@temporalio/worker@1.11.6(esbuild@0.13.15):
+  /@temporalio/worker@1.11.6(esbuild@0.25.0):
     resolution: {integrity: sha512-Y8ccZBN0c4KLe06DfWbw1Is11y2ENuN+oQvrl9Tw66OGCRLE1Kk08m59iQrWiehiXYzW1DRQG4IHlMjv0Tl8Rg==}
     engines: {node: '>= 16.0.0'}
     dependencies:
@@ -3602,7 +3602,7 @@ packages:
       supports-color: 8.1.1
       swc-loader: 0.2.3(@swc/core@1.10.7)(webpack@5.94.0)
       unionfs: 4.5.1
-      webpack: 5.94.0(@swc/core@1.10.7)(esbuild@0.13.15)
+      webpack: 5.94.0(@swc/core@1.10.7)(esbuild@0.25.0)
     transitivePeerDependencies:
       - '@swc/helpers'
       - esbuild
@@ -6398,110 +6398,6 @@ packages:
     resolution: {integrity: sha512-SOp9Phqvqn7jtEUxPWdWfWoLmyt2VaJ6MpvP9Comy1MceMXqE6bxvaTu4iaxpYYPzhny28Lc+M87/c2cPK6lDg==}
     dev: true
 
-  /esbuild-android-arm64@0.13.15:
-    resolution: {integrity: sha512-m602nft/XXeO8YQPUDVoHfjyRVPdPgjyyXOxZ44MK/agewFFkPa8tUo6lAzSWh5Ui5PB4KR9UIFTSBKh/RrCmg==}
-    cpu: [arm64]
-    os: [android]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-darwin-64@0.13.15:
-    resolution: {integrity: sha512-ihOQRGs2yyp7t5bArCwnvn2Atr6X4axqPpEdCFPVp7iUj4cVSdisgvEKdNR7yH3JDjW6aQDw40iQFoTqejqxvQ==}
-    cpu: [x64]
-    os: [darwin]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-darwin-arm64@0.13.15:
-    resolution: {integrity: sha512-i1FZssTVxUqNlJ6cBTj5YQj4imWy3m49RZRnHhLpefFIh0To05ow9DTrXROTE1urGTQCloFUXTX8QfGJy1P8dQ==}
-    cpu: [arm64]
-    os: [darwin]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-freebsd-64@0.13.15:
-    resolution: {integrity: sha512-G3dLBXUI6lC6Z09/x+WtXBXbOYQZ0E8TDBqvn7aMaOCzryJs8LyVXKY4CPnHFXZAbSwkCbqiPuSQ1+HhrNk7EA==}
-    cpu: [x64]
-    os: [freebsd]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-freebsd-arm64@0.13.15:
-    resolution: {integrity: sha512-KJx0fzEDf1uhNOZQStV4ujg30WlnwqUASaGSFPhznLM/bbheu9HhqZ6mJJZM32lkyfGJikw0jg7v3S0oAvtvQQ==}
-    cpu: [arm64]
-    os: [freebsd]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-linux-32@0.13.15:
-    resolution: {integrity: sha512-ZvTBPk0YWCLMCXiFmD5EUtB30zIPvC5Itxz0mdTu/xZBbbHJftQgLWY49wEPSn2T/TxahYCRDWun5smRa0Tu+g==}
-    cpu: [ia32]
-    os: [linux]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-linux-64@0.13.15:
-    resolution: {integrity: sha512-eCKzkNSLywNeQTRBxJRQ0jxRCl2YWdMB3+PkWFo2BBQYC5mISLIVIjThNtn6HUNqua1pnvgP5xX0nHbZbPj5oA==}
-    cpu: [x64]
-    os: [linux]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-linux-arm64@0.13.15:
-    resolution: {integrity: sha512-bYpuUlN6qYU9slzr/ltyLTR9YTBS7qUDymO8SV7kjeNext61OdmqFAzuVZom+OLW1HPHseBfJ/JfdSlx8oTUoA==}
-    cpu: [arm64]
-    os: [linux]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-linux-arm@0.13.15:
-    resolution: {integrity: sha512-wUHttDi/ol0tD8ZgUMDH8Ef7IbDX+/UsWJOXaAyTdkT7Yy9ZBqPg8bgB/Dn3CZ9SBpNieozrPRHm0BGww7W/jA==}
-    cpu: [arm]
-    os: [linux]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-linux-mips64le@0.13.15:
-    resolution: {integrity: sha512-KlVjIG828uFPyJkO/8gKwy9RbXhCEUeFsCGOJBepUlpa7G8/SeZgncUEz/tOOUJTcWMTmFMtdd3GElGyAtbSWg==}
-    cpu: [mips64el]
-    os: [linux]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-linux-ppc64le@0.13.15:
-    resolution: {integrity: sha512-h6gYF+OsaqEuBjeesTBtUPw0bmiDu7eAeuc2OEH9S6mV9/jPhPdhOWzdeshb0BskRZxPhxPOjqZ+/OqLcxQwEQ==}
-    cpu: [ppc64]
-    os: [linux]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-netbsd-64@0.13.15:
-    resolution: {integrity: sha512-3+yE9emwoevLMyvu+iR3rsa+Xwhie7ZEHMGDQ6dkqP/ndFzRHkobHUKTe+NCApSqG5ce2z4rFu+NX/UHnxlh3w==}
-    cpu: [x64]
-    os: [netbsd]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-openbsd-64@0.13.15:
-    resolution: {integrity: sha512-wTfvtwYJYAFL1fSs8yHIdf5GEE4NkbtbXtjLWjM3Cw8mmQKqsg8kTiqJ9NJQe5NX/5Qlo7Xd9r1yKMMkHllp5g==}
-    cpu: [x64]
-    os: [openbsd]
-    requiresBuild: true
-    dev: true
-    optional: true
-
   /esbuild-register@3.5.0(esbuild@0.25.0):
     resolution: {integrity: sha512-+4G/XmakeBAsvJuDugJvtyF1x+XJT4FMocynNpxrvEBViirpfUn2PgNpCHedfWhF4WokNsO/OvMKrmJOIJsI5A==}
     peerDependencies:
@@ -6511,62 +6407,6 @@ packages:
       esbuild: 0.25.0
     transitivePeerDependencies:
       - supports-color
-
-  /esbuild-sunos-64@0.13.15:
-    resolution: {integrity: sha512-lbivT9Bx3t1iWWrSnGyBP9ODriEvWDRiweAs69vI+miJoeKwHWOComSRukttbuzjZ8r1q0mQJ8Z7yUsDJ3hKdw==}
-    cpu: [x64]
-    os: [sunos]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-windows-32@0.13.15:
-    resolution: {integrity: sha512-fDMEf2g3SsJ599MBr50cY5ve5lP1wyVwTe6aLJsM01KtxyKkB4UT+fc5MXQFn3RLrAIAZOG+tHC+yXObpSn7Nw==}
-    cpu: [ia32]
-    os: [win32]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-windows-64@0.13.15:
-    resolution: {integrity: sha512-9aMsPRGDWCd3bGjUIKG/ZOJPKsiztlxl/Q3C1XDswO6eNX/Jtwu4M+jb6YDH9hRSUflQWX0XKAfWzgy5Wk54JQ==}
-    cpu: [x64]
-    os: [win32]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild-windows-arm64@0.13.15:
-    resolution: {integrity: sha512-zzvyCVVpbwQQATaf3IG8mu1IwGEiDxKkYUdA4FpoCHi1KtPa13jeScYDjlW0Qh+ebWzpKfR2ZwvqAQkSWNcKjA==}
-    cpu: [arm64]
-    os: [win32]
-    requiresBuild: true
-    dev: true
-    optional: true
-
-  /esbuild@0.13.15:
-    resolution: {integrity: sha512-raCxt02HBKv8RJxE8vkTSCXGIyKHdEdGfUmiYb8wnabnaEmHzyW7DCHb5tEN0xU8ryqg5xw54mcwnYkC4x3AIw==}
-    hasBin: true
-    requiresBuild: true
-    optionalDependencies:
-      esbuild-android-arm64: 0.13.15
-      esbuild-darwin-64: 0.13.15
-      esbuild-darwin-arm64: 0.13.15
-      esbuild-freebsd-64: 0.13.15
-      esbuild-freebsd-arm64: 0.13.15
-      esbuild-linux-32: 0.13.15
-      esbuild-linux-64: 0.13.15
-      esbuild-linux-arm: 0.13.15
-      esbuild-linux-arm64: 0.13.15
-      esbuild-linux-mips64le: 0.13.15
-      esbuild-linux-ppc64le: 0.13.15
-      esbuild-netbsd-64: 0.13.15
-      esbuild-openbsd-64: 0.13.15
-      esbuild-sunos-64: 0.13.15
-      esbuild-windows-32: 0.13.15
-      esbuild-windows-64: 0.13.15
-      esbuild-windows-arm64: 0.13.15
-    dev: true
 
   /esbuild@0.17.19:
     resolution: {integrity: sha512-XQ0jAPFkK/u3LcVRcvVHQcTIqD6E2H1fvZMA5dQPSOWb3suUbWbfbRf94pjc0bNzRYLfIrDRQXr7X+LHIm5oHw==}
@@ -12601,7 +12441,7 @@ packages:
     dependencies:
       iconv-lite: 0.6.3
       source-map-js: 1.2.1
-      webpack: 5.94.0(@swc/core@1.10.7)(esbuild@0.13.15)
+      webpack: 5.94.0(@swc/core@1.10.7)(esbuild@0.25.0)
     dev: true
 
   /source-map-support@0.5.13:
@@ -13258,7 +13098,7 @@ packages:
       webpack: '>=2'
     dependencies:
       '@swc/core': 1.10.7
-      webpack: 5.94.0(@swc/core@1.10.7)(esbuild@0.13.15)
+      webpack: 5.94.0(@swc/core@1.10.7)(esbuild@0.25.0)
     dev: true
 
   /symbol-tree@3.2.4:
@@ -13348,7 +13188,7 @@ packages:
       yallist: 4.0.0
     dev: true
 
-  /terser-webpack-plugin@5.3.10(@swc/core@1.10.7)(esbuild@0.13.15)(webpack@5.94.0):
+  /terser-webpack-plugin@5.3.10(@swc/core@1.10.7)(esbuild@0.25.0)(webpack@5.94.0):
     resolution: {integrity: sha512-BKFPWlPDndPs+NGGCr1U59t0XScL5317Y0UReNrHaw9/FwhPENlq6bfgs+4yPfyP51vqC1bQ4rp1EfXW5ZSH9w==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
@@ -13366,12 +13206,12 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       '@swc/core': 1.10.7
-      esbuild: 0.13.15
+      esbuild: 0.25.0
       jest-worker: 27.5.1
       schema-utils: 3.3.0
       serialize-javascript: 6.0.2
       terser: 5.28.1
-      webpack: 5.94.0(@swc/core@1.10.7)(esbuild@0.13.15)
+      webpack: 5.94.0(@swc/core@1.10.7)(esbuild@0.25.0)
     dev: true
 
   /terser@5.28.1:
@@ -14272,7 +14112,7 @@ packages:
     resolution: {integrity: sha512-kyDivFZ7ZM0BVOUteVbDFhlRt7Ah/CSPwJdi8hBpkK7QLumUqdLtVfm/PX/hkcnrvr0i77fO5+TjZ94Pe+C9iw==}
     dev: true
 
-  /webpack@5.94.0(@swc/core@1.10.7)(esbuild@0.13.15):
+  /webpack@5.94.0(@swc/core@1.10.7)(esbuild@0.25.0):
     resolution: {integrity: sha512-KcsGn50VT+06JH/iunZJedYGUJS5FGjow8wb9c0v5n1Om8O1g4L6LjtfxwlXIATopoQu+vOXXa7gYisWxCoPyg==}
     engines: {node: '>=10.13.0'}
     hasBin: true
@@ -14302,7 +14142,7 @@ packages:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(@swc/core@1.10.7)(esbuild@0.13.15)(webpack@5.94.0)
+      terser-webpack-plugin: 5.3.10(@swc/core@1.10.7)(esbuild@0.25.0)(webpack@5.94.0)
       watchpack: 2.4.2
       webpack-sources: 3.2.3
     transitivePeerDependencies:
