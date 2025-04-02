@@ -37,6 +37,7 @@ import type {
 } from '$lib/types/global';
 import type {
   ArchiveFilterParameters,
+  CountWorkflowExecutionsResponse,
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
   WorkflowIdentifier,
@@ -68,6 +69,7 @@ import {
 import { formatReason } from '$lib/utilities/workflow-actions';
 
 import { fetchInitialEvent } from './events-service';
+import { fetchWorkflowCountByExecutionStatus } from './workflow-counts';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -789,6 +791,24 @@ const buildRoots = (
 
   return buildNode(root, []);
 };
+
+export async function fetchAllRootWorkflowsCount(
+  namespace: string,
+  rootWorkflowId: string,
+  rootRunId?: string,
+): Promise<CountWorkflowExecutionsResponse> {
+  let query = `RootWorkflowId = "${rootWorkflowId}"`;
+  if (rootRunId) {
+    query += ` AND RootRunId = "${rootRunId}"`;
+  }
+
+  const count = await fetchWorkflowCountByExecutionStatus({
+    namespace,
+    query,
+  });
+
+  return count;
+}
 
 export async function fetchAllRootWorkflows(
   namespace: string,

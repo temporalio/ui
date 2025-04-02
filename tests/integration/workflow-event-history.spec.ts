@@ -70,7 +70,7 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('feed')).toBeHidden();
     await expect(page.getByTestId('compact')).toBeHidden();
     await expect(page.getByTestId('json')).toBeHidden();
-    await expect(page.getByTestId('event-summary-table')).toBeVisible();
+    await expect(page.getByTestId('event-summary-log')).toBeVisible();
 
     await page.getByTestId('history-tab').click();
 

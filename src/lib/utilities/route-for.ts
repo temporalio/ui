@@ -14,6 +14,7 @@ type RouteParameters = {
   view?: EventView | string;
   queryParams?: Record<string, string>;
   eventId?: string;
+  eventType?: string;
   scheduleId: string;
   queue: string;
   schedule: string;
@@ -42,7 +43,7 @@ export type EventHistoryParameters = Pick<
 >;
 export type EventParameters = Pick<
   RouteParameters,
-  'namespace' | 'workflow' | 'run' | 'view' | 'eventId'
+  'namespace' | 'workflow' | 'run' | 'view' | 'eventId' | 'eventType'
 >;
 
 export type AuthenticationParameters = {
@@ -131,6 +132,14 @@ export const routeForWorkflow = ({
   return `${routeForWorkflows(parameters)}/${wid}/${run}`;
 };
 
+export const routeForWorkflowHistoryJson = ({
+  workflow,
+  run,
+  ...parameters
+}: WorkflowParameters): string => {
+  return `${routeForWorkflows(parameters)}/${workflow}/${run}/history.json`;
+};
+
 export const routeForSchedules = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/schedules`;
 };
@@ -164,7 +173,7 @@ export const routeForEventHistory = ({
   ...parameters
 }: EventHistoryParameters): string => {
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
-  return toURL(`${eventHistoryPath}`, queryParams, parameters?.eventId);
+  return toURL(`${eventHistoryPath}`, queryParams);
 };
 
 export const routeForEventHistoryEvent = ({
@@ -174,11 +183,11 @@ export const routeForEventHistoryEvent = ({
   return `${routeForWorkflow(parameters)}/history/events/${eventId}`;
 };
 
-export const routeForEventGroup = ({
-  eventId,
+export const routeForEventHistoryEventType = ({
+  eventType,
   ...parameters
 }: EventParameters): string => {
-  return `${routeForWorkflow(parameters)}/history/event-groups/${eventId}`;
+  return `${routeForWorkflow(parameters)}/history/events/type/${eventType}`;
 };
 
 export const routeForWorkers = (parameters: WorkflowParameters): string => {

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { tick } from 'svelte';
-
   import { page } from '$app/stores';
 
   import Button from '$lib/holocene/button.svelte';
@@ -31,12 +29,10 @@
   export let maxHeight = '';
   export let pageSizeOptions: string[] = options;
   export let fixed = false;
-  export let hashField = '';
 
   $: url = $page.url;
   $: perPageParam = url.searchParams.get(perPageKey) ?? pageSizeOptions[0];
   $: currentPageParam = url.searchParams.get(currentPageKey) || '1';
-  $: hash = $page.url.hash;
   $: store = pagination(items, perPageParam, currentPageParam);
 
   // keep the 'page-size' url search param within the supported options
@@ -87,22 +83,8 @@
     });
   };
 
-  const scrollToHashEvent = async () => {
-    store.jumpToHashPage(hash);
-    await tick();
-    let id = hash.slice(1);
-    const row = document?.querySelector(`[data-${hashField}="${id}"]`);
-    if (row) {
-      setTimeout(() => {
-        row?.scrollIntoView({ behavior: 'smooth' });
-      }, 500);
-    }
-  };
-
   $: {
-    if (currentPageParam && !hash) store.jumpToPage(currentPageParam);
-    if (hash && hashField && !url.searchParams.get(currentPageKey))
-      scrollToHashEvent();
+    if (currentPageParam) store.jumpToPage(currentPageParam);
     if (perPageParam) store.adjustPageSize(perPageParam);
   }
 </script>

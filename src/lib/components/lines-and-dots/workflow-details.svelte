@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
 
   import { translate } from '$lib/i18n/translate';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
@@ -13,6 +14,7 @@
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
+  import SdkLogo from './sdk-logo.svelte';
   import WorkflowDetail from './workflow-detail.svelte';
 
   export let workflow: WorkflowExecution;
@@ -131,6 +133,7 @@
   <div
     class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
   >
+    <SdkLogo />
     {#if workflow?.parent}
       <WorkflowDetail
         title={translate('workflows.parent-workflow')}
@@ -146,5 +149,11 @@
       title={translate('common.history-size-bytes')}
       content={workflow?.historySizeBytes}
     />
+    {#if !$isCloud}
+      <WorkflowDetail
+        title={translate('workflows.state-transitions')}
+        content={workflow?.stateTransitionCount}
+      />
+    {/if}
   </div>
 </div>
