@@ -3,8 +3,8 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventLink } from '$lib/types/events';
   import {
+    routeForEventHistory,
     routeForEventHistoryEvent,
-    routeForEventHistoryEventType,
   } from '$lib/utilities/route-for';
 
   export let link: EventLink;
@@ -21,14 +21,24 @@
         eventId: link.workflowEvent.eventRef.eventId,
       });
       value = `${link.workflowEvent.workflowId}/history/events/${link.workflowEvent.eventRef.eventId}`;
-    } else {
-      href = routeForEventHistoryEventType({
+    } else if (
+      link.workflowEvent?.eventRef?.eventType ===
+      'EVENT_TYPE_WORKFLOW_EXECUTION_STARTED'
+    ) {
+      href = routeForEventHistoryEvent({
         namespace: link.workflowEvent.namespace,
         workflow: link.workflowEvent.workflowId,
         run: link.workflowEvent.runId,
-        eventType: link.workflowEvent.eventRef.eventType,
+        eventId: '1',
       });
-      value = `${link.workflowEvent.workflowId}/history/events/type/${link.workflowEvent.eventRef.eventType}`;
+      value = `${link.workflowEvent.workflowId}/history/events/1`;
+    } else {
+      href = routeForEventHistory({
+        namespace: link.workflowEvent.namespace,
+        workflow: link.workflowEvent.workflowId,
+        run: link.workflowEvent.runId,
+      });
+      value = `${link.workflowEvent.workflowId}/history`;
     }
   }
 </script>
