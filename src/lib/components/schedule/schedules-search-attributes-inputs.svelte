@@ -22,7 +22,7 @@
 </script>
 
 <Tabs>
-  <h2 class="mb-4">Search Attributes</h2>
+  <h2 class="mb-4 mt-8">Search Attributes</h2>
   <TabList
     label={translate('schedules.add-schedule-attr')}
     class="flex flex-wrap gap-6"
