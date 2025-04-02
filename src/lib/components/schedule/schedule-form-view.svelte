@@ -42,8 +42,8 @@
     schedule?: Schedule,
   ) => void;
 
-  let namespace = $page.params.namespace;
-  let scheduleId = $page.params.schedule;
+  $: namespace = $page.params.namespace;
+  $: scheduleId = $page.params.schedule;
 
   let title = translate(schedule ? 'schedules.edit' : 'schedules.create');
   let loadingText = translate(
@@ -209,14 +209,12 @@
           payloads={schedule?.action?.startWorkflow?.input}
           showEditActions={Boolean(schedule)}
         />
-
         <SchedulesSearchAttributesInputs
           {schedule}
           {searchAttributes}
           bind:searchAttributesInput
           bind:workflowSearchAttributesInput
         />
-
         <SchedulesCalendarView
           let:preset
           {schedule}

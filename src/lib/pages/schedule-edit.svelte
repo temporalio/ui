@@ -16,8 +16,8 @@
   } from '$lib/types/schedule';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
-  let namespace = $page.params.namespace;
-  let scheduleId = $page.params.schedule;
+  $: namespace = $page.params.namespace;
+  $: scheduleId = $page.params.schedule;
 
   const parameters = {
     namespace,
