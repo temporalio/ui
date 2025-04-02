@@ -29,6 +29,10 @@
   $: chips, ($values = chips);
   $: invalid = $values.some((chip) => !validator(chip));
 
+  values.subscribe((updatedChips) => {
+    chips = updatedChips;
+  });
+
   let className = '';
   export { className as class };
 
