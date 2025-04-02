@@ -45,6 +45,7 @@
 
 <svelte:element
   this={href ? 'a' : 'button'}
+  type={href ? undefined : 'button'}
   role="tab"
   class="tab"
   aria-selected={isActive}
