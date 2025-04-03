@@ -829,6 +829,35 @@ export async function fetchAllRootWorkflows(
   return buildRoots(root?.workflow, workflows);
 }
 
+type DirectWorkflowInputs = {
+  namespace: string;
+  workflowId: string;
+  runId?: string;
+  parentWorkflowId: string;
+  parentRunId?: string;
+};
+
+export async function fetchAllDirectWorkflows({
+  namespace,
+  workflowId,
+  runId,
+  parentWorkflowId,
+  parentRunId,
+}: DirectWorkflowInputs): Promise<RootNode | undefined> {
+  let query = `ParentWorkflowId = "${workflowId}"`;
+  if (runId) {
+    query += ` AND ParentRunId = "${runId}"`;
+  }
+
+  const parent = await fetchWorkflow({
+    namespace,
+    workflowId: parentWorkflowId,
+    runId: parentRunId,
+  });
+  const childWorkflows = await fetchAllPaginatedWorkflows(namespace, { query });
+  return buildRoots(parent?.workflow, childWorkflows);
+}
+
 export const fetchAllPaginatedWorkflows = async (
   namespace: string,
   parameters: ValidWorkflowParameters,

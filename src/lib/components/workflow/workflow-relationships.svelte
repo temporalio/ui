@@ -4,6 +4,7 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    fetchAllDirectWorkflows,
     fetchAllRootWorkflows,
     fetchAllRootWorkflowsCount,
   } from '$lib/services/workflow-service';
@@ -25,6 +26,8 @@
 
   $: rootWorkflowId = workflow.rootExecution.workflowId;
   $: rootRunId = workflow.rootExecution.runId;
+  $: parentWorkflowId = workflow.parent.workflowId;
+  $: parentRunId = workflow.parent.runId;
 
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
@@ -35,6 +38,7 @@
     workflowRelationships);
 
   const MAX_UPPER_LIMIT = 3000;
+  const FULL_TREE_LIMIT = 100;
 </script>
 
 <div class="flex flex-col gap-4 pb-12">
@@ -60,25 +64,17 @@
                 />
               {/each}
             </div>
-            {#if scheduleId}
-              <ScheduleTree
-                {scheduleId}
-                current={runId}
-                {workflowId}
-                {namespace}
-              />
-            {/if}
-            {#if first || previous || next}
-              <ContinueAsNewTree
-                {first}
-                {previous}
-                {next}
-                current={runId}
-                {workflowId}
-                {namespace}
-              />
-            {/if}
           </div>
+        {:else if intCount > FULL_TREE_LIMIT}
+          {#await fetchAllDirectWorkflows( { namespace, workflowId, runId, parentWorkflowId, parentRunId }, )}
+            <Loading />
+          {:then root}
+            {#if root && !!root.children.length}
+              <WorkflowFamilyTree {root} />
+            {/if}
+          {:catch}
+            <WorkflowRelationshipsOld />
+          {/await}
         {:else}
           {#await fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId)}
             <Loading />
@@ -86,27 +82,22 @@
             {#if root && !!root.children.length}
               <WorkflowFamilyTree {root} />
             {/if}
-            {#if scheduleId}
-              <ScheduleTree
-                {scheduleId}
-                current={runId}
-                {workflowId}
-                {namespace}
-              />
-            {/if}
-            {#if first || previous || next}
-              <ContinueAsNewTree
-                {first}
-                {previous}
-                {next}
-                current={runId}
-                {workflowId}
-                {namespace}
-              />
-            {/if}
           {:catch}
             <WorkflowRelationshipsOld />
           {/await}
+        {/if}
+        {#if scheduleId}
+          <ScheduleTree {scheduleId} current={runId} {workflowId} {namespace} />
+        {/if}
+        {#if first || previous || next}
+          <ContinueAsNewTree
+            {first}
+            {previous}
+            {next}
+            current={runId}
+            {workflowId}
+            {namespace}
+          />
         {/if}
       {:catch}
         <WorkflowRelationshipsOld />
