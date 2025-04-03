@@ -2,10 +2,7 @@ import { ListSearchAttributesResponse } from '@temporalio/schemas';
 
 import type { SearchAttributesResponseHumanized } from '$lib/types/workflows';
 import { mapEntries } from '$lib/utilities/map-entries';
-import {
-  isTemporalAPIError,
-  requestFromAPI,
-} from '$lib/utilities/request-from-api';
+import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toSearchAttributeTypeReadable } from '$lib/utilities/screaming-enums';
 
@@ -18,7 +15,7 @@ export const fetchSearchAttributesForNamespace = async (
     const parsed = await parsedResponse({ namespace, request });
 
     // parse the response to a human readable format
-    return mutateSearchAttributes(parsed);
+    return humanizeSearchAttributes(parsed);
   } catch (err) {
     // handle the error and return a default value
     handleError({ namespace, err });
@@ -43,7 +40,7 @@ async function parsedResponse({
   return ListSearchAttributesResponse.parse(searchAttributesResponse);
 }
 
-function mutateSearchAttributes(
+function humanizeSearchAttributes(
   parsed: ListSearchAttributesResponse,
 ): SearchAttributesResponseHumanized {
   return {
@@ -66,11 +63,7 @@ function handleError({
   namespace: string;
   err: unknown;
 }): SearchAttributesResponseHumanized {
-  let message = 'Error fetching search attributes';
-  if (isTemporalAPIError(err)) {
-    message = 'Error fetching search attributes for namespace:';
-  }
-
+  const message = 'Error fetching search attributes for namespace:';
   console.error(message, namespace, err);
 
   return {
