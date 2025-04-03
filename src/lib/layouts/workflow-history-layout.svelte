@@ -92,7 +92,7 @@
 </div>
 <div class="relative px-2 pb-24 md:px-4 lg:px-8">
   <div
-    class="flex items-center justify-between gap-2 py-2 xl:gap-8"
+    class="flex items-center justify-between gap-2 bg-off-white/50 py-2 xl:gap-8 dark:bg-space-black/50"
     class:sticky-header={!$minimizeEventView}
   >
     <h2>
@@ -158,6 +158,6 @@
 
 <style lang="postcss">
   .sticky-header {
-    @apply sticky top-0 z-30 border-b border-subtle bg-off-white/50 md:top-12 dark:bg-space-black/50;
+    @apply sticky top-0 z-30 border-b border-subtle md:top-12;
   }
 </style>
