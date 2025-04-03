@@ -53,8 +53,8 @@
 
   import type { DescribeScheduleResponse } from '$types';
 
-  $: namespace = $page.params.namespace;
-  $: scheduleId = $page.params.schedule;
+  let namespace = $page.params.namespace;
+  let scheduleId = $page.params.schedule;
   let workflowQuery = `TemporalScheduledById="${scheduleId}"`;
 
   const parameters = {
