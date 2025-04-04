@@ -14,16 +14,12 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import { error, loading } from '$lib/stores/schedules';
-  import {
-    customSearchAttributes,
-    type SearchAttributeInput,
-  } from '$lib/stores/search-attributes';
+  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
   import type {
     FullSchedule,
     ScheduleParameters,
     SchedulePreset,
   } from '$lib/types/schedule';
-  import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
   import {
     routeForSchedule,
     routeForSchedules,
@@ -31,9 +27,9 @@
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import type { PayloadInputEncoding } from '../payload-input-with-encoding.svelte';
-  import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
+  import SchedulesSearchAttributesInputs from './schedules-search-attributes-inputs.svelte';
 
   import type { Schedule, SearchAttribute } from '$types';
 
@@ -46,8 +42,8 @@
     schedule?: Schedule,
   ) => void;
 
-  let namespace = $page.params.namespace;
-  let scheduleId = $page.params.schedule;
+  $: namespace = $page.params.namespace;
+  $: scheduleId = $page.params.schedule;
 
   let title = translate(schedule ? 'schedules.edit' : 'schedules.create');
   let loadingText = translate(
@@ -66,11 +62,6 @@
   let errors = {};
   let name = scheduleId ?? '';
 
-  const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
-  const indexedFields =
-    decodedSearchAttributes?.searchAttributes.indexedFields ??
-    ({} as { [k: string]: string });
-
   let workflowType = schedule?.action?.startWorkflow?.workflowType?.name ?? '';
   let workflowId = schedule?.action?.startWorkflow?.workflowId ?? '';
   let taskQueue = schedule?.action?.startWorkflow?.taskQueue?.name ?? '';
@@ -87,13 +78,8 @@
   let second = '';
   let phase = '';
   let cronString = '';
-  let searchAttributesInput = Object.entries(indexedFields).map(
-    ([label, value]) => ({
-      label,
-      value,
-      type: $customSearchAttributes[label],
-    }),
-  ) as SearchAttributeInput[];
+  let searchAttributesInput: SearchAttributeInput[] = [];
+  let workflowSearchAttributesInput: SearchAttributeInput[] = [];
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: Partial<ScheduleParameters> = {
@@ -114,6 +100,7 @@
       days,
       months,
       searchAttributes: searchAttributesInput,
+      workflowSearchAttributes: workflowSearchAttributesInput,
     };
 
     onConfirm(preset, args, schedule);
@@ -222,9 +209,11 @@
           payloads={schedule?.action?.startWorkflow?.input}
           showEditActions={Boolean(schedule)}
         />
-        <AddSearchAttributes
-          bind:attributesToAdd={searchAttributesInput}
-          class="w-full"
+        <SchedulesSearchAttributesInputs
+          {schedule}
+          {searchAttributes}
+          bind:searchAttributesInput
+          bind:workflowSearchAttributesInput
         />
         <SchedulesCalendarView
           let:preset

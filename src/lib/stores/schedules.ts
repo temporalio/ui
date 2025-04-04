@@ -92,6 +92,7 @@ export const submitCreateSchedule = async ({
     encoding,
     messageType,
     searchAttributes,
+    workflowSearchAttributes,
   } = action;
 
   let payloads;
@@ -127,6 +128,14 @@ export const submitCreateSchedule = async ({
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
           input: payloads ? { payloads } : null,
+          searchAttributes:
+            workflowSearchAttributes.length === 0
+              ? null
+              : {
+                  indexedFields: {
+                    ...setSearchAttributes(workflowSearchAttributes),
+                  },
+                },
         },
       },
     },
@@ -169,6 +178,7 @@ export const submitEditSchedule = async (
     encoding,
     messageType,
     searchAttributes,
+    workflowSearchAttributes,
   } = action;
 
   let payloads;
@@ -202,6 +212,14 @@ export const submitEditSchedule = async (
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
           ...(input !== undefined && { input: payloads ? { payloads } : null }),
+          searchAttributes:
+            workflowSearchAttributes.length === 0
+              ? null
+              : {
+                  indexedFields: {
+                    ...setSearchAttributes(workflowSearchAttributes),
+                  },
+                },
         },
       },
     },
