@@ -9,6 +9,7 @@
     required?: boolean;
     disabled?: boolean;
     'data-testid'?: string;
+    class?: string;
   };
 
   export let label = '';
@@ -41,6 +42,6 @@
 >
   <slot><span>{label}</span></slot>
   {#if required}
-    <span class="h-1.5 w-1.5 rounded-full bg-interactive-error" />
+    <span class="h-1.5 w-1.5 rounded-full bg-interactive-error"></span>
   {/if}
 </label>

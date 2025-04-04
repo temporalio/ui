@@ -17,6 +17,7 @@
     required?: boolean;
     options?: SelectOptionValue[];
     'data-testid'?: string;
+    class?: string;
   }
 
   let className: string = null;

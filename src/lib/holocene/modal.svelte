@@ -22,6 +22,7 @@
     'data-testid'?: string;
     open: boolean;
     error?: string;
+    class?: string;
   }
 
   export let hideConfirm = false;

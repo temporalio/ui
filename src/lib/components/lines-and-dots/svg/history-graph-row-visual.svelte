@@ -57,8 +57,8 @@
     isPendingActivity(event) || isPendingNexusOperation(event)
       ? 'pending'
       : nextIsPending
-      ? event?.category
-      : '';
+        ? event?.category
+        : '';
   $: reverseSort = $eventFilterSort === 'descending';
 </script>
 

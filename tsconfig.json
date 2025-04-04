@@ -20,17 +20,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
     "allowJs": true,
-    "checkJs": true,
-    "paths": {
-      "$lib": ["src/lib"],
-      "$lib/*": ["src/lib/*"],
-      "$types": ["src/lib/types"],
-      "$types/*": ["src/lib/types/*"],
-      "$components/*": ["src/components/*"],
-      "$fixtures/*": ["src/fixtures/*"]
-    }
+    "checkJs": true
   },
   "include": [
     "src/**/*.d.ts",
