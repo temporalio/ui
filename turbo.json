@@ -1,0 +1,39 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "lint-staged": {
+      "persistent": true,
+      "cache": false
+    },
+    "build": {
+      "outputs": ["dist/**"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "lint": {
+      "outputs": ["{changedFiles}"],
+      "persistent": true,
+      "cache": false
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false
+    },
+    "format": {
+      "outputs": ["{changedFiles}"],
+      "persistent": true,
+      "cache": false
+    },
+    "prepare": {
+      "outputs": ["{changedFiles}"],
+      "persistent": true,
+      "cache": false
+    },
+    "test": {
+      "outputs": ["{changedFiles}"],
+      "persistent": true,
+      "cache": false
+    }
+  }
+}

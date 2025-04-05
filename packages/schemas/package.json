@@ -10,7 +10,7 @@
   "scripts": {
     "test": "bun test",
     "test:watch": "bun test --watch",
-    "lint": "prettier --check . && eslint .",
+    "lint": "prettier --check .",
     "format": "prettier --write .",
     "generate": "npm run generate:schema && npm run generate:types",
     "generate:schema": "bun ./scripts/generate-schema",

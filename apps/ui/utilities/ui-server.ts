@@ -24,7 +24,7 @@ const portForEnv = (env: Environemt) => {
 export const createUIServer = async (
   env: 'development' | 'e2e' = 'development',
 ) => {
-  $.cwd = join(process.cwd(), 'server');
+  $.cwd = join(process.cwd(), '..', 'server');
 
   await $`make build`;
 
