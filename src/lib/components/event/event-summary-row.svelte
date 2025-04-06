@@ -43,7 +43,7 @@
   export let initialItem: IterableEvent | undefined;
   export let index = 0;
   export let compact = false;
-  export let expandAll = false;
+  export let expanded = false;
   export let typedError = false;
   export let active = false;
   export let onRowClick: () => void = () => {};
@@ -52,14 +52,13 @@
     ? Array.from(event.events.keys()).shift()
     : event.id;
 
-  $: ({ workflow, run, namespace, id } = $page.params);
+  $: ({ workflow, run, namespace } = $page.params);
   $: href = routeForEventHistoryEvent({
     eventId: event.id,
     namespace,
     workflow,
     run,
   });
-  $: expanded = expandAll || id === event.id;
   $: attributes = formatAttributes(event);
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
@@ -127,7 +126,7 @@
 <tr
   class="row dense"
   id={`${event.id}-${index}`}
-  class:expanded={expanded && !expandAll}
+  class:expanded
   class:active
   class:failure
   class:canceled

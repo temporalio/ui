@@ -29,7 +29,6 @@
   export let loading = false;
   export let compact = false;
   export let minimized = true;
-  export let expandAll = false;
   export let showGraph = !compact;
 
   $: initialItem = $fullEventHistory?.[0];
@@ -64,7 +63,6 @@
           {index}
           group={event}
           {compact}
-          {expandAll}
           {initialItem}
         />
       {:else if isPendingActivity(event)}
@@ -75,7 +73,6 @@
             (g) =>
               isPendingActivity(event) && g?.pendingActivity?.id === event.id,
           )}
-          {expandAll}
         />
       {:else if isPendingNexusOperation(event)}
         <PendingNexusSummaryRow
@@ -87,7 +84,6 @@
               g?.pendingNexusOperation?.scheduledEventId ===
                 event.scheduledEventId,
           )}
-          {expandAll}
         />
       {:else}
         <EventSummaryRow
@@ -95,7 +91,6 @@
           {index}
           group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
           {compact}
-          {expandAll}
           {initialItem}
         />
       {/if}

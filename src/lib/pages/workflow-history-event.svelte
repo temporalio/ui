@@ -108,6 +108,7 @@
         <EventSummaryRow
           {event}
           {index}
+          expanded={event.id === eventId}
           group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
           initialItem={$fullEventHistory[0]}
         />
