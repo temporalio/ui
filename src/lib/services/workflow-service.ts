@@ -792,6 +792,44 @@ const buildRoots = (
   return buildNode(root, []);
 };
 
+const buildDirectRoots = ({
+  parent,
+  workflow,
+  children,
+}: {
+  parent: WorkflowExecution;
+  workflow: WorkflowExecution;
+  children: WorkflowExecution[];
+}) => {
+  const childNodes = children.map((child) => {
+    return {
+      workflow: child,
+      children: [],
+      rootPaths: [
+        ...currentNode.rootPaths,
+        { runId: child.runId, workflowId: child.id },
+      ],
+    };
+  });
+
+  const currentNode = {
+    workflow,
+    children: childNodes,
+    rootPaths: [
+      { runId: parent.runId, workflowId: parent.id },
+      { runId: workflow.runId, workflowId: workflow.id },
+    ],
+  };
+
+  const parentNode = {
+    workflow: parent,
+    children: currentNode,
+    rootPaths: [{ runId: parent.runId, workflowId: parent.id }],
+  };
+
+  return parentNode;
+};
+
 export async function fetchAllRootWorkflowsCount(
   namespace: string,
   rootWorkflowId: string,
@@ -831,31 +869,26 @@ export async function fetchAllRootWorkflows(
 
 type DirectWorkflowInputs = {
   namespace: string;
-  workflowId: string;
-  runId?: string;
   parentWorkflowId: string;
   parentRunId?: string;
+  workflow: WorkflowExecution;
 };
 
 export async function fetchAllDirectWorkflows({
   namespace,
-  workflowId,
-  runId,
   parentWorkflowId,
   parentRunId,
+  workflow,
 }: DirectWorkflowInputs): Promise<RootNode | undefined> {
-  let query = `ParentWorkflowId = "${workflowId}"`;
-  if (runId) {
-    query += ` AND ParentRunId = "${runId}"`;
-  }
-
   const parent = await fetchWorkflow({
     namespace,
     workflowId: parentWorkflowId,
     runId: parentRunId,
   });
-  const childWorkflows = await fetchAllPaginatedWorkflows(namespace, { query });
-  return buildRoots(parent?.workflow, childWorkflows);
+
+  const query = `ParentWorkflowId = "${workflow.id}" AND ParentRunId = "${workflow.runId}"`;
+  const children = await fetchAllPaginatedWorkflows(namespace, { query });
+  return buildDirectRoots({ parent, workflow, children });
 }
 
 export const fetchAllPaginatedWorkflows = async (

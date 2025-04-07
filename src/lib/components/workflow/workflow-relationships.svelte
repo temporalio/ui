@@ -26,8 +26,8 @@
 
   $: rootWorkflowId = workflow.rootExecution.workflowId;
   $: rootRunId = workflow.rootExecution.runId;
-  $: parentWorkflowId = workflow.parent.workflowId;
-  $: parentRunId = workflow.parent.runId;
+  $: parentWorkflowId = workflow?.parent?.workflowId;
+  $: parentRunId = workflow?.parent?.runId;
 
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
@@ -66,7 +66,7 @@
             </div>
           </div>
         {:else if intCount > FULL_TREE_LIMIT}
-          {#await fetchAllDirectWorkflows( { namespace, workflowId, runId, parentWorkflowId, parentRunId }, )}
+          {#await fetchAllDirectWorkflows( { namespace, parentWorkflowId, parentRunId, workflow }, )}
             <Loading />
           {:then root}
             {#if root && !!root.children.length}
