@@ -45,10 +45,15 @@ temporal-ui/
 └── turbo.json
 ```
 
-## App/Package dependency graph
+## Repo/App/Package Relationships
 
 ```mermaid
 flowchart TD
+  subgraph Public Repos
+    ui-repo["🧱 ui"]
+    ui-server-repo["🧱 ui-server"]
+  end
+
   subgraph Packages
     schemas["📦 schemas"]
     holocene["📦 holocene"]
@@ -57,23 +62,24 @@ flowchart TD
   subgraph Apps
     oss_ui["🧱 oss-ui"]
     cloud_ui["☁️ cloud-ui"]
-    ui_server["🖥️ ui-server (Go)"]
+    ui-server["🖥️ ui-server (Go)"]
     codec_server["🧪 codec-server (local npm tool)"]
   end
 
-  %% Package usage
-  oss_ui --> schemas
-  oss_ui --> holocene
-  cloud_ui --> oss_ui
-  cloud_ui -->|wraps and enhances| oss_ui
+  ui-repo --> oss_ui --> schemas
+  ui-repo --> oss_ui --> holocene
+  ui-repo -->|used only for local codec testing| codec_server
+  ui-repo --> cloud_ui --> oss_ui
 
   %% CI/CD pipeline
-  oss_ui -->|on merge to main| ui_server
-  ui_server -->|bundles oss-ui to assets| ui_server_assets[ui-server/assets]
-  ui_server_assets -->|docker build + release artifacts| docker_release[Docker Image & Release Artifacts]
-
-  %% Dev-only usage
-  codec_server -->|used only for local payload testing| oss_ui
+  subgraph CI/CD
+    schemas --> release["📦 Release Artifacts + NPM Publish"]
+    holocene --> release["📦 Release Artifacts + NPM Publish"]
+    oss_ui --> release["📦 Release Artifacts + NPM Publish"]
+    ui-server --> ui_server_assets["🖥️ ui-server/assets"] -->|merge to main| ui-server-repo
+    cloud_ui -->|on release| vercel_release["☁️ Vercel Deployment"]
+    ui-server-repo -->|on release| docker_release["🐳 Docker Image & Release Artifacts"]
+  end
 ```
 
 ## Migration Plan
