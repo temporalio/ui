@@ -753,6 +753,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
 export interface RootNode {
   workflow: WorkflowExecution;
   children: RootNode[];
+  scheduleId?: string;
   rootPaths: { runId: string; workflowId: string }[];
 }
 
@@ -780,6 +781,8 @@ const buildRoots = (
 
     const node: RootNode = {
       workflow,
+      scheduleId:
+        workflow?.searchAttributes?.indexedFields?.TemporalScheduledById,
       children: [],
       rootPaths: [...paths, { runId: workflow.runId, workflowId: workflow.id }],
     };
@@ -797,33 +800,44 @@ const buildDirectRoots = ({
   workflow,
   children,
 }: {
-  parent: WorkflowExecution;
+  parent: WorkflowExecution | undefined;
   workflow: WorkflowExecution;
   children: WorkflowExecution[];
-}) => {
-  const childNodes = children.map((child) => {
+}): RootNode => {
+  const childNodes: RootNode[] = children.map((child) => {
+    const rootPaths = parent
+      ? [
+          { runId: parent.runId, workflowId: parent.id },
+          { runId: workflow.runId, workflowId: workflow.id },
+          { runId: child.runId, workflowId: child.id },
+        ]
+      : [
+          { runId: workflow.runId, workflowId: workflow.id },
+          { runId: child.runId, workflowId: child.id },
+        ];
     return {
       workflow: child,
       children: [],
-      rootPaths: [
-        ...currentNode.rootPaths,
-        { runId: child.runId, workflowId: child.id },
-      ],
+      rootPaths,
     };
   });
 
-  const currentNode = {
+  const currentNode: RootNode = {
     workflow,
     children: childNodes,
-    rootPaths: [
-      { runId: parent.runId, workflowId: parent.id },
-      { runId: workflow.runId, workflowId: workflow.id },
-    ],
+    rootPaths: parent
+      ? [
+          { runId: parent.runId, workflowId: parent.id },
+          { runId: workflow.runId, workflowId: workflow.id },
+        ]
+      : [{ runId: workflow.runId, workflowId: workflow.id }],
   };
 
-  const parentNode = {
+  if (!parent) return currentNode;
+
+  const parentNode: RootNode = {
     workflow: parent,
-    children: currentNode,
+    children: [currentNode],
     rootPaths: [{ runId: parent.runId, workflowId: parent.id }],
   };
 
@@ -879,16 +893,27 @@ export async function fetchAllDirectWorkflows({
   parentWorkflowId,
   parentRunId,
   workflow,
-}: DirectWorkflowInputs): Promise<RootNode | undefined> {
-  const parent = await fetchWorkflow({
-    namespace,
-    workflowId: parentWorkflowId,
-    runId: parentRunId,
-  });
+}: DirectWorkflowInputs): Promise<RootNode> {
+  let parent;
 
-  const query = `ParentWorkflowId = "${workflow.id}" AND ParentRunId = "${workflow.runId}"`;
-  const children = await fetchAllPaginatedWorkflows(namespace, { query });
-  return buildDirectRoots({ parent, workflow, children });
+  const fetchChildWorkflows = async (
+    workflowId: string,
+    runId: string,
+  ): Promise<WorkflowExecution[]> => {
+    const query = `ParentWorkflowId = "${workflowId}" AND ParentRunId = "${runId}"`;
+    return await fetchAllPaginatedWorkflows(namespace, { query });
+  };
+
+  if (parentWorkflowId) {
+    parent = await fetchWorkflow({
+      namespace,
+      workflowId: parentWorkflowId,
+      runId: parentRunId,
+    });
+  }
+
+  const children = await fetchChildWorkflows(workflow.id, workflow.runId);
+  return buildDirectRoots({ parent: parent?.workflow, workflow, children });
 }
 
 export const fetchAllPaginatedWorkflows = async (

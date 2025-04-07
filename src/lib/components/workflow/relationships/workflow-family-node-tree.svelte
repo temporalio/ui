@@ -5,7 +5,12 @@
 
   import type { RootNode } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import {
+    routeForRelationships,
+    routeForSchedule,
+  } from '$lib/utilities/route-for';
 
+  export let fullTree = false;
   export let root: RootNode;
   export let width: number;
   export let height: number;
@@ -17,8 +22,11 @@
   export let expandAll: boolean;
   export let onNodeClick: (node: RootNode, generation: number) => void;
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
+  export let first: string | undefined;
+  export let previous: string | undefined;
+  export let next: string | undefined;
 
-  $: ({ workflow, run } = $page.params);
+  $: ({ workflow, run, namespace } = $page.params);
 
   const getPositions = (
     width: number,
@@ -128,6 +136,7 @@
       {openRuns}
       {onNodeClick}
       {activeWorkflow}
+      {fullTree}
     />
   {/if}
   <line
@@ -196,6 +205,17 @@
         font-weight="500">{child.children.length}</text
       >
     {/if}
+    {#if !fullTree}
+      <text
+        x={childX}
+        y={!child?.children?.length ? childY + radius : childY - radius}
+        class="text-center text-lg {!child?.children?.length &&
+          '[writing-mode:vertical-lr]'}"
+        fill="currentColor"
+        text-anchor={!child?.children?.length ? 'start' : 'middle'}
+        font-weight="500">{child.workflow.id}</text
+      >
+    {/if}
   </g>
 {/each}
 
@@ -207,6 +227,115 @@
     on:click={(e) => nodeClick(e, root)}
     on:keypress={(e) => nodeClick(e, root)}
   >
+    {#if root?.scheduleId}
+      <line
+        x1={x}
+        y1={y}
+        x2={x}
+        y2={y - 2.5 * radius}
+        stroke-dasharray="3 2"
+        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+      />
+      <line
+        x1={x - 5 * radius}
+        y1={y - 2.5 * radius}
+        x2={x}
+        y2={y - 2.5 * radius}
+        stroke-dasharray="3 2"
+        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+      />
+      <a href={routeForSchedule({ namespace, scheduleId: root.scheduleId })}>
+        <text
+          x={x - 5.25 * radius}
+          y={y - 2.5 * radius}
+          fill="currentColor"
+          text-decoration="underline"
+          text-anchor="end"
+          font-weight="500">{root.scheduleId}</text
+        >
+      </a>
+    {/if}
+    {#if next}
+      <line
+        x1={x}
+        y1={y}
+        x2={x + 4 * radius}
+        y2={y}
+        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+      />
+      <text
+        x={x + 4.25 * radius}
+        y={y - 4}
+        fill="currentColor"
+        text-anchor="start"
+        font-weight="500">Next Execution</text
+      >
+      <a href={routeForRelationships({ namespace, workflow, run: next })}>
+        <text
+          x={x + 4.25 * radius}
+          y={y + radius - 4}
+          fill="currentColor"
+          text-decoration="underline"
+          text-anchor="start"
+          font-weight="500">{next}</text
+        >
+      </a>
+    {/if}
+    {#if previous}
+      <line
+        x1={x}
+        y1={y}
+        x2={x - 4 * radius}
+        y2={y}
+        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+      />
+      <text
+        x={x - 4.25 * radius}
+        y={y - 4}
+        fill="currentColor"
+        text-anchor="end"
+        font-weight="500"
+        >{previous === first ? 'First' : 'Previous'} Execution</text
+      >
+      <a href={routeForRelationships({ namespace, workflow, run: previous })}>
+        <text
+          href={routeForRelationships({ namespace, workflow, run: previous })}
+          x={x - 4.25 * radius}
+          y={y + radius - 4}
+          fill="currentColor"
+          text-decoration="underline"
+          text-anchor="end"
+          font-weight="500">{previous}</text
+        >
+      </a>
+    {/if}
+    {#if first && previous !== first}
+      <line
+        x1={x - 4 * radius}
+        y1={y}
+        x2={radius}
+        y2={y}
+        stroke-dasharray="3 2"
+        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+      />
+      <text
+        x={radius}
+        y={y - 4}
+        fill="currentColor"
+        text-anchor="start"
+        font-weight="500">First Execution</text
+      >
+      <a href={routeForRelationships({ namespace, workflow, run: first })}>
+        <text
+          x={radius}
+          y={y + radius - 4}
+          fill="currentColor"
+          text-decoration="underline"
+          text-anchor="start"
+          font-weight="500">{first}</text
+        >
+      </a>
+    {/if}
     {#if root?.children?.length}
       <line
         x1={x}
@@ -248,11 +377,12 @@
     {#if root?.children?.length}
       <text
         {x}
-        y={y - radius * 1.5}
-        class="text-center font-mono text-lg"
+        y={y - radius}
+        class="text-center {fullTree && 'font-mono'} text-lg"
         fill="currentColor"
         text-anchor="middle"
-        font-weight="500">{root.children.length}</text
+        font-weight="500"
+        >{fullTree ? root.children.length : root.workflow.id}</text
       >
     {/if}
   </g>
