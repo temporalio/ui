@@ -49,34 +49,44 @@ temporal-ui/
 
 ```mermaid
 flowchart TD
+  subgraph private-ui-repo["🔒 Private UI Repo"]
+
+
+    subgraph Packages
+      schemas["📦 schemas"]
+      oss-components["📦 oss components"]
+      holocene["📦 holocene"]
+    end
+
+    subgraph Apps
+      oss_ui["🧱 oss-ui"]
+      cloud_ui["☁️ cloud-ui"]
+      ui-server["🖥️ ui-server (Go)"]
+      codec_server["🧪 codec-server (local codec development tool)"]
+    end
+
+  end
+
   subgraph Public Repos
-    ui-repo["🧱 ui"]
+    ui-repo["🧱 ui mirror"]
     ui-server-repo["🧱 ui-server"]
   end
 
-  subgraph Packages
-    schemas["📦 schemas"]
-    holocene["📦 holocene"]
-  end
+  %%dependencies
+   schemas --> oss_ui
+   holocene --> oss_ui
+   oss-components --> oss_ui
+   oss_ui --> cloud_ui
 
-  subgraph Apps
-    oss_ui["🧱 oss-ui"]
-    cloud_ui["☁️ cloud-ui"]
-    ui-server["🖥️ ui-server (Go)"]
-    codec_server["🧪 codec-server (local npm tool)"]
-  end
-
-  ui-repo --> oss_ui --> schemas
-  ui-repo --> oss_ui --> holocene
-  ui-repo -->|used only for local codec testing| codec_server
-  ui-repo --> cloud_ui --> oss_ui
+   %% states
+   npm_release["📦 Release Artifacts + NPM Publish"]
 
   %% CI/CD pipeline
   subgraph CI/CD
-    schemas --> release["📦 Release Artifacts + NPM Publish"]
-    holocene --> release["📦 Release Artifacts + NPM Publish"]
-    oss_ui --> release["📦 Release Artifacts + NPM Publish"]
-    ui-server --> ui_server_assets["🖥️ ui-server/assets"] -->|merge to main| ui-server-repo
+    schemas -->|on release| npm_release
+    holocene -->|on release| npm_release
+    oss_ui -->|on release| npm_release -->|copy source code to public mirror| ui-repo
+    ui-server -->|on release| ui_server_assets["🖥️ build ui-server/assets"] -->|push to main| ui-server-repo
     cloud_ui -->|on release| vercel_release["☁️ Vercel Deployment"]
     ui-server-repo -->|on release| docker_release["🐳 Docker Image & Release Artifacts"]
   end
