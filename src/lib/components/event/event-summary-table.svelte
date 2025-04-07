@@ -29,7 +29,8 @@
   export let loading = false;
   export let compact = false;
   export let minimized = true;
-  export let showGraph = !compact;
+
+  $: showGraph = !compact;
 
   $: initialItem = $fullEventHistory?.[0];
 
