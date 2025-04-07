@@ -52,7 +52,8 @@ const requestData = {
 };
 
 // Parse and validate the request data
-const validatedRequest = SignalWorkflowExecutionRequestSchema.parse(requestData);
+const validatedRequest =
+  SignalWorkflowExecutionRequestSchema.parse(requestData);
 
 // Now you can safely send the validated data to the API
 await fetch('/api/workflows/signal', {

@@ -1,12 +1,33 @@
 {
   "name": "@temporalio/schemas",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "engines": {
     "bun": "^1.0.0"
   },
-  "main": "src/schemas/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schemas": {
+      "types": "./dist/schemas/index.d.ts",
+      "import": "./dist/schemas/index.js"
+    },
+    "./schemas/*": {
+      "types": "./dist/schemas/*.d.ts",
+      "import": "./dist/schemas/*.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*"
+  ],
   "scripts": {
     "test": "bun test",
     "test:watch": "bun test --watch",
@@ -14,7 +35,8 @@
     "format": "prettier --write .",
     "generate": "npm run generate:schema && npm run generate:types",
     "generate:schema": "bun ./scripts/generate-schema",
-    "generate:types": "bun ./scripts/generate-types"
+    "generate:types": "bun ./scripts/generate-types",
+    "build": "bun run build.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",

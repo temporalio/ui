@@ -35,7 +35,11 @@ for (const [name, component] of Object.entries(schema.components.schemas)) {
   }
 
   console.log(
-    chalk.cyan(`Schema generated successfully`, chalk.magenta(name), chalk.yellow(filePath)),
+    chalk.cyan(
+      `Schema generated successfully`,
+      chalk.magenta(name),
+      chalk.yellow(filePath),
+    ),
   );
 
   writer.write(`export * from './${fileName}'\n`);

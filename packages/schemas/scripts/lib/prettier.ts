@@ -19,7 +19,11 @@ export default class Prettier {
     Prettier.options = options;
   };
 
-  static format(code: string, options = this.options, parser = this.parser): Promise<string> {
+  static format(
+    code: string,
+    options = this.options,
+    parser = this.parser,
+  ): Promise<string> {
     return prettier.format(code, {
       ...options,
       parser: parser || this.parser,
@@ -31,7 +35,11 @@ export default class Prettier {
     public parser: prettier.Options['parser'] = Prettier.parser,
   ) {}
 
-  format = (code: string, options = this.options, parser = this.parser): Promise<string> => {
+  format = (
+    code: string,
+    options = this.options,
+    parser = this.parser,
+  ): Promise<string> => {
     return Prettier.format(code, options, parser);
   };
 }

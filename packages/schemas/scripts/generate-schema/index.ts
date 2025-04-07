@@ -23,7 +23,11 @@ const { values } = parseArgs({
 
 const schema = values.output || join('src', 'schema.ts');
 const openAPIDefinitionsDirectory = './tmp/api';
-const openApiDefinitionsFile = join(openAPIDefinitionsDirectory, 'openapi', 'openapiv3.yaml');
+const openApiDefinitionsFile = join(
+  openAPIDefinitionsDirectory,
+  'openapi',
+  'openapiv3.yaml',
+);
 const openApiDefinitions = Bun.file(openApiDefinitionsFile);
 
 if (await openApiDefinitions.exists()) {
