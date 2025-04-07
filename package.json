@@ -61,7 +61,7 @@
     "prettier:fix": "prettier --write --plugin prettier-plugin-svelte --plugin prettier-plugin-tailwindcss .",
     "preview:local": "VITE_TEMPORAL_UI_BUILD_TARGET=local vite preview",
     "preview:docker": "VITE_API=http://localhost:8080 VITE_TEMPORAL_UI_BUILD_TARGET=local vite preview",
-    "package": "pnpm -r build; svelte-package",
+    "package": "pnpm -r package; svelte-package",
     "package:patch": "pnpm version patch && package",
     "package:minor": "pnpm version minor && package",
     "package:major": "pnpm version major && package",
@@ -76,7 +76,7 @@
     "workflows": "esno scripts/workflows.ts",
     "audit:tailwind": "esno scripts/audit-tailwind-colors",
     "audit:holocene-props": "esno scripts/generate-holocene-props.ts",
-    "prepublish": "pnpm -r publish"
+    "publish:schemas": "bun run --filter @temporalio/schemas publish"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.17.0",

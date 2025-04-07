@@ -36,7 +36,7 @@
     "generate": "npm run generate:schema && npm run generate:types",
     "generate:schema": "bun ./scripts/generate-schema",
     "generate:types": "bun ./scripts/generate-types",
-    "build": "bun run build.ts"
+    "package": "bun run build.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",

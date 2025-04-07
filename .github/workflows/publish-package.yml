@@ -14,6 +14,10 @@ jobs:
         uses: ./.github/actions/checkout-and-setup
       - name: Build package
         run: pnpm package
+      - name: Publish schemas to npm
+        run: npm publish:schemas
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish package to npm
         run: npm publish
         env:
