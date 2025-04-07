@@ -23,6 +23,7 @@ pnpm generate:schemas
 ```
 
 This will:
+
 1. Fetch the latest Temporal API definitions
 2. Generate TypeScript type definitions from the OpenAPI schema
 3. Create Zod schemas for each component in the API

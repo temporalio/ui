@@ -70,6 +70,7 @@
     "stories:test": "test-storybook --index-json",
     "stylelint": "stylelint \"src/**/*.{css,postcss,svelte}\"",
     "stylelint:fix": "stylelint --fix \"src/**/*.{css,postcss,svelte}\"",
+    "generate": "pnpm generate:schemas && pnpm generate:locales",
     "generate:schemas": "bun run --filter @temporalio/schemas generate",
     "generate:locales": "esno scripts/generate-locales.ts",
     "workflows": "esno scripts/workflows.ts",
