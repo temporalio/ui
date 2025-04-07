@@ -4,6 +4,7 @@
   import { page } from '$app/stores';
 
   import Badge from '$lib/holocene/badge.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -42,7 +43,7 @@
   export let initialItem: IterableEvent | undefined;
   export let index = 0;
   export let compact = false;
-  export let expandAll = false;
+  export let expanded = false;
   export let typedError = false;
   export let active = false;
   export let onRowClick: () => void = () => {};
@@ -51,14 +52,13 @@
     ? Array.from(event.events.keys()).shift()
     : event.id;
 
-  $: ({ workflow, run, namespace, id } = $page.params);
+  $: ({ workflow, run, namespace } = $page.params);
   $: href = routeForEventHistoryEvent({
     eventId: event.id,
     namespace,
     workflow,
     run,
   });
-  $: expanded = expandAll || id === event.id;
   $: attributes = formatAttributes(event);
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
@@ -114,12 +114,19 @@
     secondaryAttribute?.key &&
     secondaryAttribute?.key !== primaryAttribute?.key &&
     !currentEvent?.userMetadata?.summary;
+  $: eventTime = formatDate(currentEvent?.eventTime, $timeFormat, {
+    relative: $relativeTime,
+  });
+  $: abbrEventTime = formatDate(currentEvent?.eventTime, $timeFormat, {
+    relative: $relativeTime,
+    abbrFormat: true,
+  });
 </script>
 
 <tr
   class="row dense"
   id={`${event.id}-${index}`}
-  class:expanded={expanded && !expandAll}
+  class:expanded
   class:active
   class:failure
   class:canceled
@@ -160,10 +167,13 @@
       text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
       bottom
     >
-      {formatDate(currentEvent?.eventTime, $timeFormat, {
-        relative: $relativeTime,
-        abbrFormat: true,
-      })}
+      <Copyable
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        content={abbrEventTime}
+      >
+        {abbrEventTime}
+      </Copyable>
     </Tooltip>
   </td>
   <td class="hidden text-right md:block">
@@ -172,9 +182,13 @@
       text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
       bottom
     >
-      {formatDate(currentEvent?.eventTime, $timeFormat, {
-        relative: $relativeTime,
-      })}
+      <Copyable
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        content={eventTime}
+      >
+        {eventTime}
+      </Copyable>
     </Tooltip>
   </td>
   <td class="truncate md:min-w-fit">
