@@ -199,7 +199,7 @@
       <text
         x={childX}
         y={childY + 2 * radius}
-        class="text-center font-mono text-lg"
+        class="text-center font-mono"
         fill="currentColor"
         text-anchor="middle"
         font-weight="500">{child.children.length}</text
@@ -209,7 +209,7 @@
       <text
         x={childX}
         y={!child?.children?.length ? childY + radius : childY - radius}
-        class="text-center text-lg {!child?.children?.length &&
+        class="text-center {!child?.children?.length &&
           '[writing-mode:vertical-lr]'}"
         fill="currentColor"
         text-anchor={!child?.children?.length ? 'start' : 'middle'}
@@ -378,7 +378,7 @@
       <text
         {x}
         y={y - radius}
-        class="text-center {fullTree && 'font-mono'} text-lg"
+        class="text-center {fullTree && 'font-mono'}"
         fill="currentColor"
         text-anchor="middle"
         font-weight="500"

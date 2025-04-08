@@ -858,7 +858,6 @@ export async function fetchAllRootWorkflowsCount(
     namespace,
     query,
   });
-
   return count;
 }
 
