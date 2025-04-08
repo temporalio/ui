@@ -18,9 +18,9 @@ test.describe('Create Schedule Calendar Configuration', () => {
     await page.getByTestId('schedule-task-queue-input').fill('test');
     await page.getByRole('tab', { name: /interval/i }).click();
     await page.getByTestId('days-input').fill('1');
-    await page.getByTestId('hours-interval-input').fill('2');
-    await page.getByTestId('minutes-interval-input').fill('30');
-    await page.getByTestId('seconds-interval-input').fill('0');
+    await page.getByTestId('hour-interval-input').fill('2');
+    await page.getByTestId('minute-interval-input').fill('30');
+    await page.getByTestId('second-interval-input').fill('0');
 
     const createButton = page.getByRole('button', { name: /create/i });
     await expect(createButton).toBeEnabled();
