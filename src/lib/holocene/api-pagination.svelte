@@ -257,7 +257,7 @@
             on:click={store.previousPage}
             aria-label={previousButtonLabel}
           >
-            <span class="arrow arrow-left" />
+            <span class="arrow arrow-left"></span>
           </button>
           <div class="flex gap-1">
             <p>
@@ -275,7 +275,7 @@
             on:click={fetchIndexData}
             aria-label={nextButtonLabel}
           >
-            <span class="arrow arrow-right" />
+            <span class="arrow arrow-right"></span>
           </button>
         </div>
       {/if}
@@ -322,7 +322,7 @@
             on:click={store.previousPage}
             aria-label={previousButtonLabel}
           >
-            <span class="arrow arrow-left" />
+            <span class="arrow arrow-left"></span>
           </button>
           <div class="flex gap-1">
             <p>
@@ -340,7 +340,7 @@
             on:click={fetchIndexData}
             aria-label={nextButtonLabel}
           >
-            <span class="arrow arrow-right" />
+            <span class="arrow arrow-right"></span>
           </button>
         </div>
       {/if}

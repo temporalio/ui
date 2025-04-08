@@ -11,7 +11,7 @@
   import type { RadioGroupContext, RadioGroupProps } from './types';
 
   type T = $$Generic;
-  type $$Props = RadioGroupProps<T>;
+  type $$Props = RadioGroupProps<T> & { class?: string };
 
   let className: string = '';
 

@@ -40,6 +40,7 @@
     minHeight?: number;
     maxHeight?: number;
     label?: string;
+    class?: string;
   };
 
   type CopyableProps = BaseProps & {
@@ -225,7 +226,7 @@
     class:editable
     class:readOnly={!editable}
     {...$$restProps}
-  />
+  ></div>
   <div class="absolute right-1 top-1 flex items-center">
     {#if expandable}
       <ExpandButton class="text-secondary" on:click={handleExpand} {expanded} />

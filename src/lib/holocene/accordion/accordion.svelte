@@ -18,6 +18,7 @@
     error?: string;
     onToggle?: () => void;
     'data-testid'?: string;
+    class?: string;
   }
 
   export let title: string;

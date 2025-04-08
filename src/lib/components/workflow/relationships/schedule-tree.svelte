@@ -25,7 +25,7 @@
       scheduleId,
     })}
   />
-  <div class="border-top border-1 h-24 w-0.5 bg-subtle" />
+  <div class="border-top border-1 h-24 w-0.5 bg-subtle"></div>
   <ContinueAsNewNode
     label={translate('workflows.current-execution')}
     value={current}
