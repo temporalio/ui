@@ -45,7 +45,6 @@
       }
 
       openRuns = newRuns;
-      activeWorkflow = node.workflow;
     } else {
       root = await fetchAllDirectWorkflows({
         namespace,
@@ -54,6 +53,7 @@
         parentRunId: node.workflow?.parent?.runId,
       });
     }
+    activeWorkflow = node.workflow;
   };
 </script>
 

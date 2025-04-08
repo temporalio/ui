@@ -753,6 +753,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
 export interface RootNode {
   workflow: WorkflowExecution;
   children: RootNode[];
+  siblingCount?: number;
   scheduleId?: string;
   rootPaths: { runId: string; workflowId: string }[];
 }
@@ -799,10 +800,12 @@ const buildDirectRoots = ({
   parent,
   workflow,
   children,
+  siblingCount,
 }: {
   parent: WorkflowExecution | undefined;
   workflow: WorkflowExecution;
   children: WorkflowExecution[];
+  siblingCount: number;
 }): RootNode => {
   const childNodes: RootNode[] = children.map((child) => {
     const rootPaths = parent
@@ -817,6 +820,7 @@ const buildDirectRoots = ({
         ];
     return {
       workflow: child,
+      siblingCount,
       children: [],
       rootPaths,
     };
@@ -903,16 +907,29 @@ export async function fetchAllDirectWorkflows({
     return await fetchAllPaginatedWorkflows(namespace, { query });
   };
 
+  let siblingCount = 0;
   if (parentWorkflowId) {
     parent = await fetchWorkflow({
       namespace,
       workflowId: parentWorkflowId,
       runId: parentRunId,
     });
+
+    const query = `ParentWorkflowId = "${parentWorkflowId}" AND ParentRunId = "${parentRunId}"`;
+    const { count } = await fetchWorkflowCountByExecutionStatus({
+      namespace,
+      query,
+    });
+    siblingCount = parseInt(count);
   }
 
   const children = await fetchChildWorkflows(workflow.id, workflow.runId);
-  return buildDirectRoots({ parent: parent?.workflow, workflow, children });
+  return buildDirectRoots({
+    parent: parent?.workflow,
+    workflow,
+    children,
+    siblingCount,
+  });
 }
 
 export const fetchAllPaginatedWorkflows = async (

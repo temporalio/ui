@@ -148,7 +148,6 @@
       ? 'stroke-indigo-700'
       : 'stroke-slate-100 dark:stroke-slate-800'}"
   />
-  />
   <g
     role="button"
     tabindex="0"
@@ -208,13 +207,51 @@
     {#if !fullTree}
       <text
         x={childX}
-        y={!child?.children?.length ? childY + radius : childY - radius}
+        y={!child?.children?.length
+          ? childY + 1.25 * radius
+          : childY - 1.25 * radius}
         class="text-center {!child?.children?.length &&
           '[writing-mode:vertical-lr]'}"
         fill="currentColor"
         text-anchor={!child?.children?.length ? 'start' : 'middle'}
         font-weight="500">{child.workflow.id}</text
       >
+    {/if}
+    {#if !fullTree && child.siblingCount > 0}
+      <line
+        x1={x}
+        y1={y}
+        x2={x - 5 * radius}
+        y2={y}
+        class="stroke-slate-50 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-900"
+      />
+      <rect
+        class="fill-slate-50 dark:fill-slate-900"
+        x={x - 3 * radius - radius / 2}
+        y={y - radius / 2}
+        cx={radius / 2}
+        cy={radius / 2}
+        width={radius}
+        height={radius}
+        cursor="pointer"
+      />
+      <line
+        x1={x}
+        y1={y}
+        x2={x + 5 * radius}
+        y2={y}
+        class="stroke-slate-50 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-900"
+      />
+      <rect
+        class="fill-slate-50 dark:fill-slate-900"
+        x={x + 3 * radius - radius / 2}
+        y={y - radius / 2}
+        cx={radius / 2}
+        cy={radius / 2}
+        width={radius}
+        height={radius}
+        cursor="pointer"
+      />
     {/if}
   </g>
 {/each}
@@ -377,7 +414,7 @@
     {#if root?.children?.length}
       <text
         {x}
-        y={y - radius}
+        y={y - 1.25 * radius}
         class="text-center {fullTree && 'font-mono'}"
         fill="currentColor"
         text-anchor="middle"
