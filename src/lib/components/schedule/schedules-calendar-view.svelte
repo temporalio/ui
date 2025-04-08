@@ -45,7 +45,7 @@
   $: clearSchedule();
 </script>
 
-<Tabs class="w-full">
+<Tabs class="mt-8 w-full">
   <h2 class="mb-4">{translate('schedules.schedule-spec')}</h2>
   <TabList label="Schedule Tabs" class="flex flex-wrap gap-6">
     {#if schedule}

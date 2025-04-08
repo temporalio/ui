@@ -166,6 +166,7 @@
         <Input
           id="name"
           bind:value={name}
+          data-testid="schedule-name-input"
           label={translate('schedules.name-label')}
           error={errors['name']}
           maxLength={232}
@@ -177,6 +178,7 @@
         <Input
           id="workflowType"
           bind:value={workflowType}
+          data-testid="schedule-type-input"
           label={translate('schedules.workflow-type-label')}
           error={errors['workflowType']}
           on:input={onInput}
@@ -186,6 +188,7 @@
         <Input
           id="workflowId"
           bind:value={workflowId}
+          data-testid="schedule-workflow-id-input"
           label={translate('schedules.workflow-id-label')}
           error={errors['workflowId']}
           on:input={onInput}
@@ -195,6 +198,7 @@
         <Input
           id="taskQueue"
           bind:value={taskQueue}
+          data-testid="schedule-task-queue-input"
           label={translate('schedules.task-queue-label')}
           error={errors['taskQueue']}
           on:input={onInput}
@@ -209,12 +213,6 @@
           payloads={schedule?.action?.startWorkflow?.input}
           showEditActions={Boolean(schedule)}
         />
-        <SchedulesSearchAttributesInputs
-          {schedule}
-          {searchAttributes}
-          bind:searchAttributesInput
-          bind:workflowSearchAttributesInput
-        />
         <SchedulesCalendarView
           let:preset
           {schedule}
@@ -228,6 +226,12 @@
           bind:phase
           bind:cronString
         >
+          <SchedulesSearchAttributesInputs
+            {schedule}
+            {searchAttributes}
+            bind:searchAttributesInput
+            bind:workflowSearchAttributesInput
+          />
           <div class="mt-4 flex flex-row items-center gap-4 max-sm:flex-col">
             <Button
               disabled={isDisabled(preset) || !writeActionsAreAllowed()}
