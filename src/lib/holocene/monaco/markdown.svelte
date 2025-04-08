@@ -48,6 +48,6 @@
       title="output"
       src="/render?content={encodeURIComponent(templatedContent)}&theme={theme}"
       class="w-full"
-    />
+    ></iframe>
   {/key}
 </section>
