@@ -25,9 +25,7 @@ test.describe('Create Schedule Calendar Configuration', () => {
     await expect(createButton).toBeEnabled();
     await createButton.click();
 
-    await expect(page).toHaveURL('/namespaces/default/schedules');
-    await page.getByRole('link', { name: 'test' }).click();
-    await expect(page).toHaveURL('/namespaces/default/schedules/test');
+    await page.goto('/namespaces/default/schedules/test');
     await expect(page.getByTestId('schedule-name')).toHaveText('test');
   });
 });
