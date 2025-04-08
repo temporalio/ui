@@ -2,7 +2,6 @@ import { expect, test } from '@playwright/test';
 
 import { mockSchedulesApis } from '~/test-utilities/mock-apis';
 
-const schedulesUrl = '/namespaces/default/schedules';
 const createScheduleUrl = '/namespaces/default/schedules/create';
 
 test.describe('Create Schedule Calendar Configuration', () => {
@@ -26,7 +25,7 @@ test.describe('Create Schedule Calendar Configuration', () => {
     await expect(createButton).toBeEnabled();
     await createButton.click();
 
-    await expect(page).toHaveURL(schedulesUrl);
+    await expect(page).toHaveURL('/namespaces/default/schedules');
     await page.getByRole('link', { name: 'test' }).click();
     await expect(page).toHaveURL('/namespaces/default/schedules/test');
     await expect(page.getByTestId('schedule-name')).toHaveText('test');
