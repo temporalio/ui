@@ -34,7 +34,7 @@
     <div class="flex flex-col gap-2 xl:flex-row">
       <div class="grow basis-1/3 overflow-hidden">
         <h4>{translate('common.execution-details')}</h4>
-        <div class="h-0.5 rounded-full bg-inverse" />
+        <div class="h-0.5 rounded-full bg-inverse"></div>
         <WorkflowDetail
           title={translate('common.workflow-type')}
           content={workflow?.name}
@@ -56,7 +56,7 @@
       </div>
       <div class="grow overflow-hidden">
         <h4>{translate('common.task-queue')}</h4>
-        <div class="h-0.5 rounded-full bg-inverse" />
+        <div class="h-0.5 rounded-full bg-inverse"></div>
         <WorkflowDetail
           content={workflow?.taskQueue}
           href={routeForWorkers({
@@ -77,7 +77,7 @@
         <h4>
           {translate('workflows.start-and-close-time')}
         </h4>
-        <div class="h-0.5 rounded-full bg-inverse" />
+        <div class="h-0.5 rounded-full bg-inverse"></div>
         <WorkflowDetail
           title={translate('common.start-time')}
           tooltip={$relativeTime

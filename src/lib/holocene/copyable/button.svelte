@@ -11,6 +11,7 @@
     copied: boolean;
     'data-testid'?: string;
     'data-theme'?: string;
+    class?: string;
   }
 
   export let copyIconTitle: string;

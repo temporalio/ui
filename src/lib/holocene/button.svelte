@@ -55,6 +55,7 @@
     count?: number;
     id?: string;
     'data-testid'?: string;
+    class?: string;
   };
 
   export type ButtonStyles = VariantProps<typeof buttonStyles>;

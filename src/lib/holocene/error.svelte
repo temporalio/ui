@@ -1,26 +1,24 @@
 <script lang="ts">
   import { BROWSER } from 'esm-env';
-  import { createEventDispatcher } from 'svelte';
-
-  import { afterNavigate } from '$app/navigation';
 
   import Link from '$lib/holocene/link.svelte';
   import type { NetworkError } from '$lib/types/global';
   import { has } from '$lib/utilities/has';
 
-  export let error: App.Error | NetworkError = null;
+  const reload = () => {
+    if (BROWSER) {
+      window.location.reload();
+    }
+  };
+
+  export let error: App.Error | NetworkError | unknown;
   export let status = 500;
-  let message = error?.message || '';
+  export let reset = reload;
 
+  let message = has(error, 'message') ? String(error.message) : '';
   if (has(error, 'statusCode')) {
-    status = error.statusCode;
+    status = Number(error.statusCode);
   }
-
-  const dispatch = createEventDispatcher();
-
-  afterNavigate(() => {
-    dispatch('clearError', {});
-  });
 </script>
 
 <section
@@ -35,14 +33,8 @@
   </p>
 
   <p class="text-lg">
-    <button
-      class="underline hover:text-blue-700"
-      tabindex={0}
-      on:click={() => {
-        if (BROWSER) {
-          window.location.reload();
-        }
-      }}>Try a refresh</button
+    <button class="underline hover:text-blue-700" tabindex={0} onclick={reset}
+      >Try a refresh</button
     >
     or
     <Link newTab href="https://temporal.io/slack"

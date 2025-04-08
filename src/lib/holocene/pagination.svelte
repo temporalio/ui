@@ -167,7 +167,7 @@
               }}
               aria-label={previousButtonLabel}
             >
-              <span class="arrow arrow-left" />
+              <span class="arrow arrow-left"></span>
             </button>
             <p>
               {#if updating}
@@ -187,7 +187,7 @@
               }}
               aria-label={nextButtonLabel}
             >
-              <span class="arrow arrow-right" />
+              <span class="arrow arrow-right"></span>
             </button>
           </div>
         </slot>
@@ -228,7 +228,7 @@
           }}
           aria-label={previousButtonLabel}
         >
-          <span class="arrow arrow-left" />
+          <span class="arrow arrow-left"></span>
         </button>
         <p>
           {#if updating}
@@ -247,7 +247,7 @@
           }}
           aria-label={nextButtonLabel}
         >
-          <span class="arrow arrow-right" />
+          <span class="arrow arrow-right"></span>
         </button>
       </div>
       <slot name="action-bottom-right" />
