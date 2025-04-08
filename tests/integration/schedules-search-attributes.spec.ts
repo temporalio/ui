@@ -4,7 +4,7 @@ import { mockSchedulesApis } from '~/test-utilities/mock-apis';
 
 const createScheduleUrl = '/namespaces/default/schedules/create';
 
-test.describe('Create Schedule Calendar Configuration', () => {
+test.describe('Creates Schedule Successfully', () => {
   test.beforeEach(async ({ page }) => {
     await mockSchedulesApis(page, true);
     await page.goto(createScheduleUrl);
