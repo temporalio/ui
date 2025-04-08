@@ -7,6 +7,8 @@ import chalk from 'chalk';
 import degit from 'degit';
 import yaml from 'js-yaml';
 
+import { handleBunError } from '../lib/error-handler';
+
 const { values } = parseArgs({
   args: argv,
   options: {
@@ -29,34 +31,58 @@ const openApiDefinitionsFile = join(
 );
 const openApiDefinitions = Bun.file(openApiDefinitionsFile);
 
-if (await openApiDefinitions.exists()) {
-  await rm(openAPIDefinitionsDirectory, { recursive: true });
-}
-
-await mkdir(openAPIDefinitionsDirectory, { recursive: true });
-
-const emitter = degit('temporalio/api', {
-  cache: false,
-  force: true,
-  verbose: true,
-});
-
-emitter.on('warn', (warning) => {
-  console.warn(chalk.bgYellow(' WARN '), warning.message);
-});
-
-await emitter.clone(openAPIDefinitionsDirectory);
 try {
-  await $`npx openapi-typescript ${openApiDefinitionsFile} -o ${schema} --immutable-types --alphabetize --support-array-length --empty-objects-unknown -default-non-nullable`.quiet();
+  if (await openApiDefinitions.exists()) {
+    await rm(openAPIDefinitionsDirectory, { recursive: true });
+  }
+
+  await mkdir(openAPIDefinitionsDirectory, { recursive: true });
+
+  const emitter = degit('temporalio/api', {
+    cache: false,
+    force: true,
+    verbose: true,
+  });
+
+  emitter.on('warn', (warning) => {
+    console.warn(chalk.bgYellow(' WARN '), warning.message);
+  });
+
+  await emitter.clone(openAPIDefinitionsDirectory);
+
+  try {
+    const args = [
+      openApiDefinitionsFile,
+      '-o',
+      schema,
+      '--immutable-types',
+      '--alphabetize',
+      '--support-array-length',
+      '--empty-objects-unknown',
+      '-default-non-nullable',
+    ];
+
+    await $`npx openapi-typescript ${args}`;
+  } catch (error) {
+    handleBunError(error, 'Failed to generate OpenAPI schema', {
+      showCommand: true,
+      exitProcess: true,
+    });
+  }
+
+  const openApiSchema = await openApiDefinitions.text();
+  const openApiSchemaObject = yaml.load(openApiSchema);
+  const openApiSchemaString = JSON.stringify(openApiSchemaObject, null, 2);
+
+  await Bun.write('./scripts/schemas/lib/schema.json', openApiSchemaString);
+
+  console.log(
+    chalk.green('Schema generated successfully:'),
+    chalk.blue(schema),
+  );
 } catch (error) {
-  console.error(chalk.red('Error generating schema:'), error);
-  throw error;
+  handleBunError(error, 'Schema generation failed', {
+    showStackTrace: false,
+    exitProcess: true,
+  });
 }
-
-const openApiSchema = await openApiDefinitions.text();
-const openApiSchemaObject = yaml.load(openApiSchema);
-const openApiSchemaString = JSON.stringify(openApiSchemaObject, null, 2);
-
-await Bun.write('./scripts/schemas/lib/schema.json', openApiSchemaString);
-
-console.log(chalk.green('Schema generated successfully:'), chalk.blue(schema));

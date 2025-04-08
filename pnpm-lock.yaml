@@ -232,7 +232,7 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       '@types/node':
-        specifier: ^18.15.3
+        specifier: ^18.19.86
         version: 18.19.86
       '@types/sanitize-html':
         specifier: ^2.8.0

@@ -25,6 +25,15 @@ This will:
 3. Create Zod schemas for each component in the API
 4. Update the package exports
 
+### Error Handling
+
+The schema generation scripts use a standardized error handling approach for Bun system calls through the `handleBunError` utility in `lib/error-handler.ts`. This provides clear, actionable error messages when something goes wrong, including:
+
+- User-friendly error messages with actionable advice
+- Detection of common issues (missing modules, permissions, etc.)
+- Clear indications of what command failed
+- Suggestions for resolution
+
 ### Using Schemas
 
 Import the schemas you need:
