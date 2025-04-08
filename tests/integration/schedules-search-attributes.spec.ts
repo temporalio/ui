@@ -17,10 +17,10 @@ test.describe('Create Schedule Calendar Configuration', () => {
     await page.getByTestId('schedule-workflow-id-input').fill('test');
     await page.getByTestId('schedule-task-queue-input').fill('test');
     await page.getByRole('tab', { name: /interval/i }).click();
-    await page.getByLabel('Days').fill('1');
-    await page.getByLabel('Hours').fill('2');
-    await page.getByLabel('Minutes').fill('30');
-    await page.getByLabel('Seconds').fill('0');
+    await page.getByTestId('days-input').fill('1');
+    await page.getByTestId('hours-interval-input').fill('2');
+    await page.getByTestId('minutes-interval-input').fill('30');
+    await page.getByTestId('seconds-interval-input').fill('0');
 
     const createButton = page.getByRole('button', { name: /create/i });
     await expect(createButton).toBeEnabled();

@@ -117,7 +117,7 @@ dependencies:
 devDependencies:
   '@axe-core/playwright':
     specifier: ^4.10.1
-    version: 4.10.1(playwright-core@1.50.1)
+    version: 4.10.1(playwright-core@1.51.1)
   '@babel/core':
     specifier: ^7.20.12
     version: 7.20.12
@@ -128,7 +128,7 @@ devDependencies:
     specifier: ^3.2.6
     version: 3.2.6(react@18.2.0)(storybook@8.6.11)
   '@grpc/grpc-js':
-    specifier: ^1.8.22
+    specifier: ^1.10.9
     version: 1.10.9
   '@playwright/test':
     specifier: ^1.49.1
@@ -138,7 +138,7 @@ devDependencies:
     version: 8.6.11(storybook@8.6.11)
   '@storybook/addon-essentials':
     specifier: ^8.6.11
-    version: 8.6.11(@types/react@19.0.8)(storybook@8.6.11)
+    version: 8.6.11(@types/react@19.1.0)(storybook@8.6.11)
   '@storybook/addon-interactions':
     specifier: ^8.6.11
     version: 8.6.11(storybook@8.6.11)
@@ -146,7 +146,7 @@ devDependencies:
     specifier: ^8.6.11
     version: 8.6.11(react@18.2.0)(storybook@8.6.11)
   '@storybook/addon-svelte-csf':
-    specifier: ^5.0.0-next.23
+    specifier: 5.0.0-next.27
     version: 5.0.0-next.27(@storybook/svelte@8.6.11)(@sveltejs/vite-plugin-svelte@5.0.3)(storybook@8.6.11)(svelte@5.25.5)(vite@6.2.4)
   '@storybook/addon-themes':
     specifier: ^8.6.11
@@ -252,7 +252,7 @@ devDependencies:
     version: 10.4.13(postcss@8.4.31)
   axe-playwright:
     specifier: ^2.0.3
-    version: 2.0.3(playwright@1.50.1)
+    version: 2.0.3(playwright@1.51.1)
   c8:
     specifier: ^7.12.0
     version: 7.12.0
@@ -299,7 +299,7 @@ devDependencies:
     specifier: ^0.16.3
     version: 0.16.3
   express:
-    specifier: ^4.18.2
+    specifier: ^4.20.0
     version: 4.20.0
   fast-glob:
     specifier: ^3.3.1
@@ -347,7 +347,7 @@ devDependencies:
     specifier: ^3.1.4
     version: 3.1.4(postcss@8.4.31)(ts-node@10.9.1)
   prettier:
-    specifier: ^3.5.1
+    specifier: ^3.5.3
     version: 3.5.3
   prettier-plugin-svelte:
     specifier: ^3.3.3
@@ -455,7 +455,7 @@ devDependencies:
     specifier: ^1.0.4
     version: 1.0.4
   webpack:
-    specifier: ^5.76.0
+    specifier: ^5.94.0
     version: 5.94.0(@swc/core@1.10.7)(esbuild@0.25.0)
   yargs:
     specifier: ^17.7.2
@@ -495,13 +495,13 @@ packages:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
-  /@axe-core/playwright@4.10.1(playwright-core@1.50.1):
+  /@axe-core/playwright@4.10.1(playwright-core@1.51.1):
     resolution: {integrity: sha512-EV5t39VV68kuAfMKqb/RL+YjYKhfuGim9rgIaQ6Vntb2HgaCaau0h98Y3WEUqW1+PbdzxDtDNjFAipbtZuBmEA==}
     peerDependencies:
       playwright-core: '>= 1.0.0'
     dependencies:
       axe-core: 4.10.2
-      playwright-core: 1.50.1
+      playwright-core: 1.51.1
     dev: true
 
   /@babel/code-frame@7.18.6:
@@ -2492,14 +2492,14 @@ packages:
       - supports-color
     dev: true
 
-  /@mdx-js/react@3.0.1(@types/react@19.0.8)(react@18.2.0):
+  /@mdx-js/react@3.0.1(@types/react@19.1.0)(react@18.2.0):
     resolution: {integrity: sha512-9ZrPIU4MGf6et1m1ov3zKf+q9+deetI51zprKB1D/z3NOb+rUxxtEl3mCjW5wTGh6VhRdwPueh1oRzi6ezkA8A==}
     peerDependencies:
       '@types/react': '>=16'
       react: '>=16'
     dependencies:
       '@types/mdx': 2.0.9
-      '@types/react': 19.0.8
+      '@types/react': 19.1.0
       react: 18.2.0
     dev: true
 
@@ -2840,12 +2840,12 @@ packages:
       ts-dedent: 2.2.0
     dev: true
 
-  /@storybook/addon-docs@8.6.11(@types/react@19.0.8)(storybook@8.6.11):
+  /@storybook/addon-docs@8.6.11(@types/react@19.1.0)(storybook@8.6.11):
     resolution: {integrity: sha512-gTSF1m3HJkeU7GKPYhe8grO48FbpulvIWZ213PtnWedgVkTNieok3oBmmigv17ua/QXH0u5EbaoMSxaAyrsAzg==}
     peerDependencies:
       storybook: ^8.6.11
     dependencies:
-      '@mdx-js/react': 3.0.1(@types/react@19.0.8)(react@18.2.0)
+      '@mdx-js/react': 3.0.1(@types/react@19.1.0)(react@18.2.0)
       '@storybook/blocks': 8.6.11(react-dom@18.2.0)(react@18.2.0)(storybook@8.6.11)
       '@storybook/csf-plugin': 8.6.11(storybook@8.6.11)
       '@storybook/react-dom-shim': 8.6.11(react-dom@18.2.0)(react@18.2.0)(storybook@8.6.11)
@@ -2857,7 +2857,7 @@ packages:
       - '@types/react'
     dev: true
 
-  /@storybook/addon-essentials@8.6.11(@types/react@19.0.8)(storybook@8.6.11):
+  /@storybook/addon-essentials@8.6.11(@types/react@19.1.0)(storybook@8.6.11):
     resolution: {integrity: sha512-QII5yTM0cGRryfTSJSK5Hf2CEiAX3atqccHZbPipkqO7dE9YDBvRfVwG0cQpHdv10tP066MDWgVDF5E3pDKecw==}
     peerDependencies:
       storybook: ^8.6.11
@@ -2865,7 +2865,7 @@ packages:
       '@storybook/addon-actions': 8.6.11(storybook@8.6.11)
       '@storybook/addon-backgrounds': 8.6.11(storybook@8.6.11)
       '@storybook/addon-controls': 8.6.11(storybook@8.6.11)
-      '@storybook/addon-docs': 8.6.11(@types/react@19.0.8)(storybook@8.6.11)
+      '@storybook/addon-docs': 8.6.11(@types/react@19.1.0)(storybook@8.6.11)
       '@storybook/addon-highlight': 8.6.11(storybook@8.6.11)
       '@storybook/addon-measure': 8.6.11(storybook@8.6.11)
       '@storybook/addon-outline': 8.6.11(storybook@8.6.11)
@@ -3901,8 +3901,8 @@ packages:
     resolution: {integrity: sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==}
     dev: true
 
-  /@types/react@19.0.8:
-    resolution: {integrity: sha512-9P/o1IGdfmQxrujGbIMDyYaaCykhLKc0NGCtYcECNUr9UAaDe4gwvV9bR6tvd5Br1SG0j+PBpbKr2UYY8CwqSw==}
+  /@types/react@19.1.0:
+    resolution: {integrity: sha512-UaicktuQI+9UKyA4njtDOGBD/67t8YEBt2xdfqu8+gP9hqPUPsiXlNPcpS2gVdjmis5GKPG3fCxbQLVgxsQZ8w==}
     dependencies:
       csstype: 3.1.3
     dev: true
@@ -4870,7 +4870,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.21.4
-      caniuse-lite: 1.0.30001582
+      caniuse-lite: 1.0.30001712
       fraction.js: 4.2.0
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -4897,7 +4897,7 @@ packages:
       mustache: 4.2.0
     dev: true
 
-  /axe-playwright@2.0.3(playwright@1.50.1):
+  /axe-playwright@2.0.3(playwright@1.51.1):
     resolution: {integrity: sha512-s7iI2okyHHsD3XZK4RMJtTy2UASkNWLQtnzLuaHiK3AWkERf+cqZJqkxb7O4b56fnbib9YnZVRByTl92ME3o6g==}
     peerDependencies:
       playwright: '>1.0.0'
@@ -4907,7 +4907,7 @@ packages:
       axe-html-reporter: 2.2.11(axe-core@4.10.2)
       junit-report-builder: 5.1.1
       picocolors: 1.1.0
-      playwright: 1.50.1
+      playwright: 1.51.1
     dev: true
 
   /axios@1.7.4:
@@ -5096,7 +5096,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001612
+      caniuse-lite: 1.0.30001712
       electron-to-chromium: 1.4.745
       node-releases: 2.0.14
       update-browserslist-db: 1.0.13(browserslist@4.21.4)
@@ -5107,7 +5107,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001612
+      caniuse-lite: 1.0.30001712
       electron-to-chromium: 1.4.745
       node-releases: 2.0.14
       update-browserslist-db: 1.0.13(browserslist@4.23.0)
@@ -5217,17 +5217,13 @@ packages:
     resolution: {integrity: sha512-bsTwuIg/BZZK/vreVTYYbSWoe2F+71P7K5QGEX+pT250DZbfU1MQ5prOKpPR+LL6uWKK3KMwMCAS74QB3Um1uw==}
     dependencies:
       browserslist: 4.23.0
-      caniuse-lite: 1.0.30001612
+      caniuse-lite: 1.0.30001712
       lodash.memoize: 4.1.2
       lodash.uniq: 4.5.0
     dev: true
 
-  /caniuse-lite@1.0.30001582:
-    resolution: {integrity: sha512-vsJG3V5vgfduaQGVxL53uSX/HUzxyr2eA8xCo36OLal7sRcSZbibJtLeh0qja4sFOr/QQGt4opB4tOy+eOgAxg==}
-    dev: true
-
-  /caniuse-lite@1.0.30001612:
-    resolution: {integrity: sha512-lFgnZ07UhaCcsSZgWW0K5j4e69dK1u/ltrL9lTUiFOwNHs12S3UMIEYgBV0Z6C6hRDev7iRnMzzYmKabYdXF9g==}
+  /caniuse-lite@1.0.30001712:
+    resolution: {integrity: sha512-MBqPpGYYdQ7/hfKiet9SCI+nmN5/hp4ZzveOJubl5DTAMa5oggjAuoi0Z4onBpKPFI2ePGnQuQIzF3VxDjDJig==}
     dev: true
 
   /cargo-cp-artifact@0.1.8:
@@ -10928,6 +10924,12 @@ packages:
     hasBin: true
     dev: true
 
+  /playwright-core@1.51.1:
+    resolution: {integrity: sha512-/crRMj8+j/Nq5s8QcvegseuyeZPxpQCZb6HNk3Sos3BlZyAknRjoyJPFWkpNn8v0+P3WiwqFF8P+zQo4eqiNuw==}
+    engines: {node: '>=18'}
+    hasBin: true
+    dev: true
+
   /playwright@1.49.1:
     resolution: {integrity: sha512-VYL8zLoNTBxVOrJBbDuRgDWa3i+mfQgDTrL8Ah9QXZ7ax4Dsj0MSq5bYgytRnDVVe+njoKnfsYkH3HzqVj5UZA==}
     engines: {node: '>=18'}
@@ -10944,6 +10946,16 @@ packages:
     hasBin: true
     dependencies:
       playwright-core: 1.50.1
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: true
+
+  /playwright@1.51.1:
+    resolution: {integrity: sha512-kkx+MB2KQRkyxjYPc3a0wLZZoDczmppyGJIvQ43l+aZihkaVvmu/21kiyaHeHjiFxjxNNFnUncKmcGIyOojsaw==}
+    engines: {node: '>=18'}
+    hasBin: true
+    dependencies:
+      playwright-core: 1.51.1
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
