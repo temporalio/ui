@@ -24,10 +24,10 @@ export const getEventClassification = (
   eventType: EventType | number,
 ): EventClassification => {
   if (typeof eventType === 'number') return 'Unspecified';
-  if (eventType?.includes('RequestCancel')) return 'CancelRequested';
+  if (eventType.includes('RequestCancel')) return 'CancelRequested';
 
   for (const classification of eventClassifications) {
-    if (eventType?.includes(classification)) return classification;
+    if (eventType.includes(classification)) return classification;
   }
 
   return 'Unspecified';
