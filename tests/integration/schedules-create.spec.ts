@@ -1,22 +1,17 @@
 import { expect, test } from '@playwright/test';
 
-import {
-  mockSchedulesApis,
-  mockSearchAttributesApi,
-} from '~/test-utilities/mock-apis';
+import { mockSchedulesApis } from '~/test-utilities/mock-apis';
 
 const createScheduleUrl = '/namespaces/default/schedules/create';
 
 test.describe('Creates Schedule Successfully', () => {
   test.beforeEach(async ({ page }) => {
-    await mockSearchAttributesApi(page, {
+    await mockSchedulesApis(page, true, {
       customAttributes: {
         attributeOne: 'Keyword',
         attributeTwo: 'Keyword',
       },
     });
-
-    await mockSchedulesApis(page, true);
     await page.goto(createScheduleUrl);
   });
 
@@ -51,25 +46,31 @@ test.describe('Creates Schedule Successfully', () => {
     await page.getByTestId('minute-interval-input').fill('30');
     await page.getByTestId('second-interval-input').fill('0');
 
-    const workflowsTab = page.getByTestId('workflows-panel');
     await page.getByTestId('workflows-tab').click();
+    const workflowsTab = page.getByTestId('workflows-panel');
     await expect(
       workflowsTab.getByTestId('add-search-attribute-button'),
     ).toBeEnabled();
     await workflowsTab.getByTestId('add-search-attribute-button').click();
-    await workflowsTab
-      .getByTestId('custom-search-attribute-select')
-      .selectOption('attributeOne');
+    const selectInput = workflowsTab.getByTestId(
+      'custom-search-attribute-select',
+    );
+    await expect(selectInput).toBeEnabled();
+    await selectInput.click();
+    await workflowsTab.getByRole('option', { name: 'attributeOne' }).click();
     await workflowsTab
       .getByTestId('custom-search-attribute-value')
       .fill('workflow-value');
 
     await page.getByTestId('schedule-tab').click();
     const scheduleTab = page.getByTestId('schedule-panel');
+    await expect(
+      scheduleTab.getByTestId('add-search-attribute-button'),
+    ).toBeEnabled();
     await scheduleTab.getByTestId('add-search-attribute-button').click();
-    await scheduleTab
-      .getByTestId('custom-search-attribute-select')
-      .selectOption('attributeTwo');
+    await scheduleTab.getByTestId('custom-search-attribute-select').click();
+
+    await scheduleTab.getByRole('option', { name: 'attributeTwo' }).click();
     await scheduleTab
       .getByTestId('custom-search-attribute-value')
       .fill('schedule-value');
