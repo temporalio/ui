@@ -236,9 +236,14 @@
             <Button
               disabled={isDisabled(preset) || !writeActionsAreAllowed()}
               on:click={() => handleConfirm(preset, schedule)}
-              class="max-sm:w-full">{confirmText}</Button
+              class="max-sm:w-full"
+              data-testid="create-schedule-button">{confirmText}</Button
             >
-            <Button variant="ghost" href={backHref} class="max-sm:w-full"
+            <Button
+              variant="ghost"
+              href={backHref}
+              class="max-sm:w-full"
+              data-testid="cancel-schedule-button"
               >{translate('common.cancel')}</Button
             >
           </div>

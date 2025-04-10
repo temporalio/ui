@@ -27,8 +27,18 @@
     label={translate('schedules.add-schedule-attr')}
     class="flex flex-wrap gap-6"
   >
-    <Tab label="Schedule" id="schedule-tab" panelId="schedule-panel" />
-    <Tab label="Workflows" id="workflows-tab" panelId="workflows-panel" />
+    <Tab
+      label="Schedule"
+      id="schedule-tab"
+      data-testid="schedule-tab"
+      panelId="schedule-panel"
+    />
+    <Tab
+      label="Workflows"
+      id="workflows-tab"
+      data-testid="workflows-tab"
+      panelId="workflows-panel"
+    />
   </TabList>
 
   <div class="mt-4 flex w-full flex-wrap gap-6">

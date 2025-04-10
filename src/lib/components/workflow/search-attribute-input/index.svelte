@@ -45,6 +45,7 @@
     <div class="grow [&_button]:w-full">
       <Select
         id="search-attribute"
+        data-testid="custom-search-attribute-select"
         label={translate('workflows.custom-search-attribute')}
         placeholder={translate('workflows.select-attribute')}
         bind:value={attribute.label}
@@ -98,6 +99,7 @@
   {:else if attribute.type === SEARCH_ATTRIBUTE_TYPE.TEXT || attribute.type === SEARCH_ATTRIBUTE_TYPE.KEYWORD || attribute.type === SEARCH_ATTRIBUTE_TYPE.UNSPECIFIED}
     <Input
       label={translate('common.value')}
+      data-testid="custom-search-attribute-value"
       id="attribute-value"
       class="grow"
       bind:value={attribute.value}
@@ -116,6 +118,7 @@
   <Button
     variant="ghost"
     leadingIcon="close"
+    data-testid="search-attribute-close-button"
     class="mt-6 w-10 rounded-full max-sm:hidden"
     on:click={() => onRemove(attribute.label)}
   />

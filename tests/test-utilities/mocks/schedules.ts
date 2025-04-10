@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test';
 
 export const SCHEDULES_API = '**/api/v1/namespaces/*/schedules**';
+export const SCHEDULE_API = '**/api/v1/namespaces/*/schedules/**';
 
 export const mockSchedule = {
   scheduleId: 'test-schedule',
@@ -58,6 +59,14 @@ export const mockSchedulesApi = (page: Page, empty = false) => {
         schedules: empty ? [] : [mockSchedule],
         nextPageToken: null,
       },
+    });
+  });
+};
+
+export const mockScheduleApi = (page: Page) => {
+  return page.route(SCHEDULE_API, (route) => {
+    return route.fulfill({
+      json: mockSchedule,
     });
   });
 };
