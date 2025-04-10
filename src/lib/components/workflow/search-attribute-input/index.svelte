@@ -45,7 +45,7 @@
     <div class="grow [&_button]:w-full">
       <Select
         id="search-attribute"
-        data-testid="custom-search-attribute-select"
+        data-testid="search-attribute-select"
         label={translate('workflows.custom-search-attribute')}
         placeholder={translate('workflows.select-attribute')}
         bind:value={attribute.label}

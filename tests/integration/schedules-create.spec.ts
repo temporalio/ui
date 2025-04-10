@@ -52,11 +52,10 @@ test.describe('Creates Schedule Successfully', () => {
       workflowsTab.getByTestId('add-search-attribute-button'),
     ).toBeEnabled();
     await workflowsTab.getByTestId('add-search-attribute-button').click();
-    const selectInput = workflowsTab.getByTestId(
-      'custom-search-attribute-select',
-    );
-    await expect(selectInput).toBeEnabled();
-    await selectInput.click();
+    await workflowsTab.getByTestId('search-attribute-select').click();
+    await expect(
+      workflowsTab.getByRole('option', { name: 'attributeOne' }),
+    ).toBeVisible();
     await workflowsTab.getByRole('option', { name: 'attributeOne' }).click();
     await workflowsTab
       .getByTestId('custom-search-attribute-value')
