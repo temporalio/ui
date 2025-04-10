@@ -218,10 +218,6 @@ export type ScheduleActionResult =
 // api.query
 export type QueryResult = temporal.api.query.v1.IWorkflowQueryResult;
 
-// api.operatorservice
-export type ListSearchAttributesResponse =
-  temporal.api.operatorservice.v1.IListSearchAttributesResponse;
-
 // api.batch
 export type BatchCancelOperation =
   temporal.api.batch.v1.IBatchOperationCancellation;

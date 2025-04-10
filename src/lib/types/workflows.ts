@@ -136,10 +136,9 @@ export type SearchAttributes = {
   [k: string]: SearchAttributeType;
 };
 
-export type SearchAttributesResponse = {
+export type SearchAttributesResponseHumanized = {
   customAttributes: Record<string, SearchAttributeType>;
   systemAttributes: Record<string, SearchAttributeType>;
-  storageSchema: import('$lib/types').ListSearchAttributesResponse['storageSchema'];
 };
 
 export type WorkflowSearchAttributes = {
