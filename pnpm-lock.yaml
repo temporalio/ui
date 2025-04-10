@@ -5,6 +5,12 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@buf/temporalio_api.bufbuild_es':
+    specifier: 2.2.5-20250410175421-ad7e1ab83792.1
+    version: 2.2.5-20250410175421-ad7e1ab83792.1(@bufbuild/protobuf@2.2.5)
+  '@bufbuild/protobuf':
+    specifier: ^2.2.5
+    version: 2.2.5
   '@codemirror/autocomplete':
     specifier: ^6.17.0
     version: 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.29.0)(@lezer/common@1.2.3)
@@ -26,6 +32,12 @@ dependencies:
   '@codemirror/view':
     specifier: ^6.29.0
     version: 6.29.0
+  '@connectrpc/connect':
+    specifier: ^2.0.2
+    version: 2.0.2(@bufbuild/protobuf@2.2.5)
+  '@connectrpc/connect-web':
+    specifier: ^2.0.2
+    version: 2.0.2(@bufbuild/protobuf@2.2.5)(@connectrpc/connect@2.0.2)
   '@crownframework/svelte-error-boundary':
     specifier: ^1.0.3
     version: 1.0.3
@@ -1251,6 +1263,27 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
 
+  /@buf/googleapis_googleapis.bufbuild_es@2.2.5-20230822184711-28151c0d0a16.1(@bufbuild/protobuf@2.2.5):
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/googleapis_googleapis.bufbuild_es/-/googleapis_googleapis.bufbuild_es-2.2.5-20230822184711-28151c0d0a16.1.tgz}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2.2.5
+    dependencies:
+      '@bufbuild/protobuf': 2.2.5
+    dev: false
+
+  /@buf/temporalio_api.bufbuild_es@2.2.5-20250410175421-ad7e1ab83792.1(@bufbuild/protobuf@2.2.5):
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/temporalio_api.bufbuild_es/-/temporalio_api.bufbuild_es-2.2.5-20250410175421-ad7e1ab83792.1.tgz}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2.2.5
+    dependencies:
+      '@buf/googleapis_googleapis.bufbuild_es': 2.2.5-20230822184711-28151c0d0a16.1(@bufbuild/protobuf@2.2.5)
+      '@bufbuild/protobuf': 2.2.5
+    dev: false
+
+  /@bufbuild/protobuf@2.2.5:
+    resolution: {integrity: sha512-/g5EzJifw5GF8aren8wZ/G5oMuPoGeS6MQD3ca8ddcvdXR5UELUfdTZITCGNhNXynY/AYl3Z4plmxdj/tRl/hQ==}
+    dev: false
+
   /@chromatic-com/storybook@3.2.3(react@18.2.0)(storybook@8.4.7):
     resolution: {integrity: sha512-3+hfANx79kIjP1qrOSLxpoAXOiYUA0S7A0WI0A24kASrv7USFNNW8etR5TjUilMb0LmqKUn3wDwUK2h6aceQ9g==}
     engines: {node: '>=16.0.0', yarn: '>=1.22.18'}
@@ -1326,6 +1359,24 @@ packages:
       '@codemirror/state': 6.4.1
       style-mod: 4.1.2
       w3c-keyname: 2.2.6
+    dev: false
+
+  /@connectrpc/connect-web@2.0.2(@bufbuild/protobuf@2.2.5)(@connectrpc/connect@2.0.2):
+    resolution: {integrity: sha512-QANMFPiL2o66BdBEctg4TsQLe5ozsBLqcle3dCBp7BwGlNGTY6NnNnqmt+YRnpeMW88GgomJwWNMGCrRD9pRKA==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2.2.0
+      '@connectrpc/connect': 2.0.2
+    dependencies:
+      '@bufbuild/protobuf': 2.2.5
+      '@connectrpc/connect': 2.0.2(@bufbuild/protobuf@2.2.5)
+    dev: false
+
+  /@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.2.5):
+    resolution: {integrity: sha512-xZuylIUNvNlH52e/4eQsZvY4QZyDJRtEFEDnn/yBrv5Xi5ZZI/p8X+GAHH35ucVaBvv9u7OzHZo8+tEh1EFTxA==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2.2.0
+    dependencies:
+      '@bufbuild/protobuf': 2.2.5
     dev: false
 
   /@crownframework/svelte-error-boundary@1.0.3:

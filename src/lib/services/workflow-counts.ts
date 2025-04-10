@@ -1,3 +1,7 @@
+import { WorkflowService } from '@buf/temporalio_api.bufbuild_es/temporal/api/workflowservice/v1/service_pb.js';
+import { createClient } from '@connectrpc/connect';
+import { createConnectTransport } from '@connectrpc/connect-web';
+
 import type { CountWorkflowExecutionsResponse } from '$lib/types/workflows';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -28,6 +32,25 @@ type WorkflowCountByExecutionStatusOptions = {
   namespace: string;
   query: string;
 };
+
+const transport = createConnectTransport({
+  baseUrl: 'https://demo.connectrpc.com',
+});
+const workflowServiceClient = createClient(WorkflowService, transport);
+
+const letsHopeThisThing = workflowServiceClient.countWorkflowExecutions({
+  namespace: '',
+  query: {},
+});
+
+const letsHopeThisThingDuex = workflowServiceClient.countWorkflowExecutions({
+  namespace: '',
+  query: {},
+});
+
+// const thing = workflowServiceClient.
+
+// letsHopeThisThing;
 
 export const fetchWorkflowCountByExecutionStatus = async ({
   namespace,

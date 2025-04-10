@@ -126,6 +126,7 @@
       }),
       className,
     )}
+    data-temporal-tracking={true}
     on:click|stopPropagation={onLinkClick}
     tabindex={href ? null : 0}
     {...$$restProps}
