@@ -56,7 +56,7 @@
       />
     </td>
     <td
-      class="cursor-point relative flex items-center justify-center gap-0.5 pt-2"
+      class="cursor-point relative flex items-center justify-center gap-0.5 pt-1"
     >
       {#if !workflowCreateDisabled($page)}
         <StartWorkflowButton
