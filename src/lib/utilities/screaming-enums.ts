@@ -1,3 +1,4 @@
+import type { ListSearchAttributesResponse } from '$lib/schemas';
 import type {
   ArchivalState,
   CallbackState,
@@ -14,10 +15,10 @@ import type {
 
 import type { EventType } from './is-event-type';
 
-export const fromScreamingEnum = <T>(
-  potentialScreamingEnum: T,
+export const fromScreamingEnum = <T, V>(
+  potentialScreamingEnum: V,
   prefix: string,
-): T => {
+): T | V => {
   if (!potentialScreamingEnum) return potentialScreamingEnum;
   const stringEnum = String(potentialScreamingEnum);
   const split = stringEnum.split('_');
@@ -31,8 +32,11 @@ export const fromScreamingEnum = <T>(
 };
 
 export const toSearchAttributeTypeReadable = (
-  status: SearchAttributeType,
-): SearchAttributeType => {
+  status:
+    | ListSearchAttributesResponse['customAttributes'][string]
+    | ListSearchAttributesResponse['systemAttributes'][string]
+    | SearchAttributeType,
+): typeof status => {
   return fromScreamingEnum(status, 'IndexedValueType');
 };
 
