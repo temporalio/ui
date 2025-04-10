@@ -42,14 +42,24 @@
   </TabList>
 
   <div class="mt-4 flex w-full flex-wrap gap-6">
-    <TabPanel id="schedule-panel" tabId="schedule-tab" class="w-full">
+    <TabPanel
+      id="schedule-panel"
+      tabId="schedule-tab"
+      class="w-full"
+      data-testid="schedule-panel"
+    >
       <SchedulesSearchAttributesInput
         bind:searchAttributes={scheduleSearchAttributes}
         bind:searchAttributesInput
       />
     </TabPanel>
 
-    <TabPanel id="workflows-panel" tabId="workflows-tab" class="w-full">
+    <TabPanel
+      id="workflows-panel"
+      tabId="workflows-tab"
+      class="w-full"
+      data-testid="workflows-panel"
+    >
       <SchedulesSearchAttributesInput
         bind:searchAttributes={workflowSearchAttributes}
         bind:searchAttributesInput={workflowSearchAttributesInput}

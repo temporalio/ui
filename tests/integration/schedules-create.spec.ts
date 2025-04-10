@@ -51,21 +51,26 @@ test.describe('Creates Schedule Successfully', () => {
     await page.getByTestId('minute-interval-input').fill('30');
     await page.getByTestId('second-interval-input').fill('0');
 
+    const workflowsTab = page.getByTestId('workflows-panel');
     await page.getByTestId('workflows-tab').click();
-    await page.getByTestId('add-search-attribute-button').click();
-    await page
+    await expect(
+      workflowsTab.getByTestId('add-search-attribute-button'),
+    ).toBeEnabled();
+    await workflowsTab.getByTestId('add-search-attribute-button').click();
+    await workflowsTab
       .getByTestId('custom-search-attribute-select')
       .selectOption('attributeOne');
-    await page
+    await workflowsTab
       .getByTestId('custom-search-attribute-value')
       .fill('workflow-value');
 
     await page.getByTestId('schedule-tab').click();
-    await page.getByTestId('add-search-attribute-button').click();
-    await page
+    const scheduleTab = page.getByTestId('schedule-panel');
+    await scheduleTab.getByTestId('add-search-attribute-button').click();
+    await scheduleTab
       .getByTestId('custom-search-attribute-select')
       .selectOption('attributeTwo');
-    await page
+    await scheduleTab
       .getByTestId('custom-search-attribute-value')
       .fill('schedule-value');
 
