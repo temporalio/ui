@@ -35,6 +35,7 @@
     variant="ghost"
     leadingIcon="add"
     class="max-sm:w-full"
+    data-testid="add-search-attribute-button"
     on:click={addSearchAttribute}
     disabled={!searchAttributes.length ||
       attributesToAdd.length === searchAttributes.length ||

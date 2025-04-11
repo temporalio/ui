@@ -52,6 +52,7 @@
       <Tab
         label="Existing"
         id="existing-tab"
+        data-testid="existing-tab"
         panelId="existing-panel"
         onClick={() => (preset = 'existing')}
       />
@@ -59,24 +60,28 @@
     <Tab
       label="Interval"
       id="interval-tab"
+      data-testid="interval-tab"
       panelId="interval-panel"
       onClick={() => (preset = 'interval')}
     />
     <Tab
       label="Days of the Week"
       id="daily-tab"
+      data-testid="daily-tab"
       panelId="daily-panel"
       onClick={() => (preset = 'week')}
     />
     <Tab
       label="Days of the Month"
       id="monthly-tab"
+      data-testid="monthly-tab"
       panelId="monthly-panel"
       onClick={() => (preset = 'month')}
     />
     <Tab
       label="String"
       id="string-tab"
+      data-testid="string-tab"
       panelId="string-panel"
       onClick={() => (preset = 'string')}
     />
