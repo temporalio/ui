@@ -36,6 +36,7 @@
 
     attribute.type = type;
   };
+  console.log('custom search', $customSearchAttributeOptions[0]);
 </script>
 
 <div

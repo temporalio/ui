@@ -52,7 +52,10 @@ test.describe('Creates Schedule Successfully', () => {
       workflowsTab.getByTestId('add-search-attribute-button'),
     ).toBeEnabled();
     await workflowsTab.getByTestId('add-search-attribute-button').click();
-    await workflowsTab.getByTestId('search-attribute-select').click();
+    await expect(
+      workflowsTab.getByTestId('search-attribute-select-button'),
+    ).toBeEnabled();
+    await workflowsTab.getByTestId('search-attribute-select-button').click();
     await expect(
       workflowsTab.getByRole('option', { name: 'attributeOne' }),
     ).toBeVisible();
@@ -67,7 +70,10 @@ test.describe('Creates Schedule Successfully', () => {
       scheduleTab.getByTestId('add-search-attribute-button'),
     ).toBeEnabled();
     await scheduleTab.getByTestId('add-search-attribute-button').click();
-    await scheduleTab.getByTestId('custom-search-attribute-select').click();
+    await expect(
+      scheduleTab.getByTestId('search-attribute-select-button'),
+    ).toBeEnabled();
+    await scheduleTab.getByTestId('search-attribute-select-button').click();
 
     await scheduleTab.getByRole('option', { name: 'attributeTwo' }).click();
     await scheduleTab
