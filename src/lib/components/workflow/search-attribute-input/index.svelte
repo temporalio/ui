@@ -33,6 +33,7 @@
   const getType = (attr: string) => $customSearchAttributes[attr];
 
   const handleAttributeChange = (attr: string) => {
+    console.log('handleAttributeChange', attr);
     const type = getType(attr);
 
     if (type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST) {
