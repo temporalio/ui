@@ -37,6 +37,8 @@ describe('Event Category Data Structures', () => {
         "ExternalWorkflowExecutionCancelRequested": "workflow",
         "ExternalWorkflowExecutionSignaled": "signal",
         "MarkerRecorded": "other",
+        "NexusOperationCancelRequestCompleted": "nexus",
+        "NexusOperationCancelRequestFailed": "nexus",
         "NexusOperationCancelRequested": "nexus",
         "NexusOperationCanceled": "nexus",
         "NexusOperationCompleted": "nexus",

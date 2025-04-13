@@ -48,7 +48,7 @@
       />
     </th>
   {/if}
-  <th class="w-12"></th>
+  <th class="w-6"></th>
   {#if $supportsBulkActions && $batchActionsVisible}
     <th class="batch-actions-table-cell" colspan={columnsCount}>
       <BatchActions {workflows} />

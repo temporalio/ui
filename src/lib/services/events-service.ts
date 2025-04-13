@@ -51,7 +51,7 @@ export const getEndpointForRawHistory = ({
       workflowId,
       runId,
     },
-    false,
+    true,
   );
 };
 
