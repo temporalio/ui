@@ -36,14 +36,17 @@
   export let schedule: FullSchedule | null = null;
   export let searchAttributes: SearchAttribute = {};
 
+  console.log('schedule', schedule);
+  console.log('search attributes schedule form', searchAttributes);
+
   export let onConfirm: (
     preset: SchedulePreset,
     args: Partial<ScheduleParameters>,
     schedule?: Schedule,
   ) => void;
 
-  $: namespace = $page.params.namespace;
-  $: scheduleId = $page.params.schedule;
+  let namespace = $page.params.namespace;
+  let scheduleId = $page.params.schedule;
 
   let title = translate(schedule ? 'schedules.edit' : 'schedules.create');
   let loadingText = translate(

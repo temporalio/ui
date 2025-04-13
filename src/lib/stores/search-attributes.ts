@@ -33,10 +33,6 @@ export const internalSearchAttributes: Readable<SearchAttributes> = derived(
 export const customSearchAttributes: Readable<SearchAttributes> = derived(
   [allSearchAttributes],
   ([$allSearchAttributes]) => {
-    console.log(
-      '🔍 customAttributes from allSearchAttributes:',
-      $allSearchAttributes.customAttributes,
-    );
     return $allSearchAttributes.customAttributes;
   },
 );
@@ -48,11 +44,6 @@ export const customSearchAttributeOptions: Readable<
     type: SearchAttributeType;
   }[]
 > = derived([customSearchAttributes], ([$customSearchAttributes]) => {
-  console.log(
-    '🔍 customSearchAttributeOptions derived from:',
-    $customSearchAttributes,
-  );
-
   return Object.entries($customSearchAttributes).map(([key, value]) => ({
     label: key,
     value: key,
