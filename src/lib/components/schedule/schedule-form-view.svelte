@@ -14,12 +14,16 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import { error, loading } from '$lib/stores/schedules';
-  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+  import {
+    customSearchAttributes,
+    type SearchAttributeInput,
+  } from '$lib/stores/search-attributes';
   import type {
     FullSchedule,
     ScheduleParameters,
     SchedulePreset,
   } from '$lib/types/schedule';
+  import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
   import {
     routeForSchedule,
     routeForSchedules,
@@ -81,8 +85,34 @@
   let second = '';
   let phase = '';
   let cronString = '';
-  let searchAttributesInput: SearchAttributeInput[] = [];
-  let workflowSearchAttributesInput: SearchAttributeInput[] = [];
+
+  const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
+  const decodedWorkflowSearchAttributes = decodePayloadAttributes({
+    searchAttributes: schedule?.action?.startWorkflow?.searchAttributes ?? {},
+  });
+
+  const indexedFields =
+    decodedSearchAttributes?.searchAttributes.indexedFields ??
+    ({} as { [k: string]: string });
+  const workflowIndexedFields =
+    decodedWorkflowSearchAttributes?.searchAttributes.indexedFields ??
+    ({} as { [k: string]: string });
+
+  let searchAttributesInput = Object.entries(indexedFields).map(
+    ([label, value]) => ({
+      label,
+      value,
+      type: $customSearchAttributes[label],
+    }),
+  ) as SearchAttributeInput[];
+
+  let workflowSearchAttributesInput = Object.entries(workflowIndexedFields).map(
+    ([label, value]) => ({
+      label,
+      value,
+      type: $customSearchAttributes[label],
+    }),
+  ) as SearchAttributeInput[];
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: Partial<ScheduleParameters> = {
@@ -154,6 +184,13 @@
   };
 
   onDestroy(() => ($error = ''));
+  console.log('indexed fields', indexedFields);
+
+  Object.entries(indexedFields).map(([label, value]) => {
+    console.log('label', label);
+    console.log('value', value);
+    console.log('type', $customSearchAttributes[label]);
+  });
 </script>
 
 <div class="flex flex-col gap-4 pb-10">

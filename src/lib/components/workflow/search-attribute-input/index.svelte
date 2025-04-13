@@ -16,6 +16,13 @@
   import DatetimeInput from './datetime-input.svelte';
 
   export let attributesToAdd: SearchAttributeInput[] = [];
+
+  console.log(
+    'attributesToAdd',
+    attributesToAdd,
+    'customSearchAttributeOptions',
+    $customSearchAttributeOptions,
+  );
   export let attribute: SearchAttributeInput;
   export let onRemove: (attribute: string) => void;
 

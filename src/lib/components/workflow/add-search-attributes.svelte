@@ -21,14 +21,10 @@
   };
 
   $: searchAttributes = Object.keys($customSearchAttributes);
-  console.log('search attributes add file', searchAttributes);
-  console.log(attributesToAdd);
 
   const onRemove = (attribute: string) => {
     attributesToAdd = attributesToAdd.filter((a) => a.label !== attribute);
   };
-
-  console.log('in add search', searchAttributes);
 </script>
 
 <div class="flex flex-col gap-4 {className}">
