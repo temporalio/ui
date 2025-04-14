@@ -1,6 +1,4 @@
 <script lang="ts">
-  import _ from 'json-bigint';
-
   import Button from '$lib/holocene/button.svelte';
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
