@@ -52,7 +52,6 @@ export const mockSearchAttributesApi = (
 ) => {
   return page.route(SEARCH_ATTRIBUTES_API, (route) => {
     const payload = mergeSearchAttributes(searchAttributes);
-    console.log('✅ Mocking search attributes with:', payload);
     route.fulfill({ json: payload });
   });
 };

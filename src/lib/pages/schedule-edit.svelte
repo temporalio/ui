@@ -25,7 +25,6 @@
   };
   let scheduleFetch = fetchSchedule(parameters);
 
-  console.log(scheduleFetch);
   const handleEdit = (
     preset: SchedulePreset,
     args: Partial<ScheduleParameters>,

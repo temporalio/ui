@@ -40,8 +40,6 @@
   export let schedule: FullSchedule | null = null;
   export let searchAttributes: SearchAttribute = {};
 
-  console.log('schedule', schedule);
-
   export let onConfirm: (
     preset: SchedulePreset,
     args: Partial<ScheduleParameters>,
