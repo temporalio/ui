@@ -39,6 +39,7 @@ export {
   mockSearchAttributesApi,
   SEARCH_ATTRIBUTES_API,
 } from './mocks/search-attributes';
+export { mockScheduleApi, SCHEDULE_API } from './mocks/schedules';
 export { mockWorkflowsApi, WORKFLOWS_API } from './mocks/workflows';
 export { mockWorkflowApi, WORKFLOW_API } from './mocks/workflow';
 export {
@@ -82,6 +83,7 @@ export const mockSchedulesApis = (
     mockGlobalApis(page),
     mockSearchAttributesApi(page, customSearchAttributes),
     mockSchedulesApi(page, empty),
+    mockWorkflowsCountApi(page),
   ]);
 };
 
