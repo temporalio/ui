@@ -31,6 +31,7 @@
   "homepage": "https://github.com/temporalio/ui/tree/main",
   "scripts": {
     "prepare": "svelte-kit sync && esno scripts/download-temporal.ts && husky install",
+    "preinstall": "pnpm prepare",
     "eslint": "eslint --ignore-path .gitignore .",
     "eslint:fix": "eslint --ignore-path .gitignore --fix .",
     "dev": "pnpm dev:ui-server -- --open",
