@@ -5,17 +5,8 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeInput } from '$lib/stores/search-attributes';
-  import type { SearchAttribute } from '$lib/types';
-  import type { FullSchedule } from '$lib/types/schedule';
 
-  import SchedulesSearchAttributesInput from './schedules-search-attributes-input.svelte';
-
-  export let schedule: FullSchedule | null = null;
-  export let searchAttributes: SearchAttribute = {};
-
-  let workflowSearchAttributes =
-    schedule?.action?.startWorkflow?.searchAttributes ?? {};
-  let scheduleSearchAttributes = searchAttributes;
+  import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
 
   export let searchAttributesInput: SearchAttributeInput[] = [];
   export let workflowSearchAttributesInput: SearchAttributeInput[] = [];
@@ -48,9 +39,9 @@
       class="w-full"
       data-testid="schedule-panel"
     >
-      <SchedulesSearchAttributesInput
-        bind:searchAttributes={scheduleSearchAttributes}
-        bind:searchAttributesInput
+      <AddSearchAttributes
+        bind:attributesToAdd={searchAttributesInput}
+        class="w-full"
       />
     </TabPanel>
 
@@ -60,9 +51,9 @@
       class="w-full"
       data-testid="workflows-panel"
     >
-      <SchedulesSearchAttributesInput
-        bind:searchAttributes={workflowSearchAttributes}
-        bind:searchAttributesInput={workflowSearchAttributesInput}
+      <AddSearchAttributes
+        bind:attributesToAdd={workflowSearchAttributesInput}
+        class="w-full"
       />
     </TabPanel>
   </div>

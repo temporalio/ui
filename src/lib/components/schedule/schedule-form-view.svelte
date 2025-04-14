@@ -41,7 +41,6 @@
   export let searchAttributes: SearchAttribute = {};
 
   console.log('schedule', schedule);
-  console.log('search attributes schedule form', searchAttributes);
 
   export let onConfirm: (
     preset: SchedulePreset,
@@ -184,13 +183,6 @@
   };
 
   onDestroy(() => ($error = ''));
-  console.log('indexed fields', indexedFields);
-
-  Object.entries(indexedFields).map(([label, value]) => {
-    console.log('label', label);
-    console.log('value', value);
-    console.log('type', $customSearchAttributes[label]);
-  });
 </script>
 
 <div class="flex flex-col gap-4 pb-10">
@@ -267,8 +259,6 @@
           bind:cronString
         >
           <SchedulesSearchAttributesInputs
-            {schedule}
-            {searchAttributes}
             bind:searchAttributesInput
             bind:workflowSearchAttributesInput
           />

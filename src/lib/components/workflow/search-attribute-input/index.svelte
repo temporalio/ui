@@ -1,4 +1,6 @@
 <script lang="ts">
+  import _ from 'json-bigint';
+
   import Button from '$lib/holocene/button.svelte';
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -11,29 +13,27 @@
     customSearchAttributes,
     type SearchAttributeInput,
   } from '$lib/stores/search-attributes';
+  import type { SelectOptionValue } from '$lib/types/global';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
   import DatetimeInput from './datetime-input.svelte';
 
-  export let attributesToAdd: SearchAttributeInput[] = [];
+  export let attributes: SearchAttributeInput[] = [];
 
-  console.log(
-    'attributesToAdd',
-    attributesToAdd,
-    'customSearchAttributeOptions',
-    $customSearchAttributeOptions,
-  );
   export let attribute: SearchAttributeInput;
   export let onRemove: (attribute: string) => void;
 
+  let label: SelectOptionValue;
+  let _label = attribute.label || (label && label.toString());
+
   $: isDisabled = (value: string) => {
-    return !!attributesToAdd.find((a) => a.label === value);
+    return !!attributes.find((a) => a.label === value);
   };
 
   const getType = (attr: string) => $customSearchAttributes[attr];
 
   const handleAttributeChange = (attr: string) => {
-    console.log('handleAttributeChange', attr);
+    attribute.label = attr;
     const type = getType(attr);
 
     if (type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST) {
@@ -56,7 +56,7 @@
         data-testid="search-attribute-select"
         label={translate('workflows.custom-search-attribute')}
         placeholder={translate('workflows.select-attribute')}
-        bind:value={attribute.label}
+        bind:value={_label}
         onChange={handleAttributeChange}
       >
         {#each $customSearchAttributeOptions as { value, label, type }}

@@ -22,14 +22,16 @@
 
   $: searchAttributes = Object.keys($customSearchAttributes);
 
+  $: attributes = attributesToAdd;
+
   const onRemove = (attribute: string) => {
     attributesToAdd = attributesToAdd.filter((a) => a.label !== attribute);
   };
 </script>
 
 <div class="flex flex-col gap-4 {className}">
-  {#each attributesToAdd as attribute}
-    <SearchAttributeInput {attributesToAdd} bind:attribute {onRemove} />
+  {#each attributes as attribute}
+    <SearchAttributeInput {attributes} bind:attribute {onRemove} />
   {/each}
   <Button
     variant="ghost"
@@ -38,8 +40,8 @@
     data-testid="add-search-attribute-button"
     on:click={addSearchAttribute}
     disabled={!searchAttributes.length ||
-      attributesToAdd.length === searchAttributes.length ||
-      attributesToAdd.filter(
+      attributes.length === searchAttributes.length ||
+      attributes.filter(
         (a) =>
           a.value === '' ||
           a.value === null ||
