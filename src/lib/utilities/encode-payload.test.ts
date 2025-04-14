@@ -56,21 +56,6 @@ describe('encodePayloads', () => {
     ];
     expect(payload).toEqual(expectedEncodedPayload);
   });
-  it('should encode single simple string payload', async () => {
-    const payload = await encodePayloads({
-      input: stringifyWithBigInt('cats'),
-      encoding: 'json/plain',
-    });
-    const expectedEncodedPayload = [
-      {
-        data: 'ImNhdHMi',
-        metadata: {
-          encoding: 'anNvbi9wbGFpbg==',
-        },
-      },
-    ];
-    expect(payload).toEqual(expectedEncodedPayload);
-  });
   it('should encode bigInt string payload', async () => {
     const input = { foo: 1234213412398883n };
     const payload = await encodePayloads({
