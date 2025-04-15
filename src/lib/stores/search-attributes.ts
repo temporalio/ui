@@ -32,7 +32,9 @@ export const internalSearchAttributes: Readable<SearchAttributes> = derived(
 
 export const customSearchAttributes: Readable<SearchAttributes> = derived(
   [allSearchAttributes],
-  ([$allSearchAttributes]) => $allSearchAttributes.customAttributes,
+  ([$allSearchAttributes]) => {
+    return $allSearchAttributes.customAttributes;
+  },
 );
 
 export const customSearchAttributeOptions: Readable<
@@ -41,13 +43,13 @@ export const customSearchAttributeOptions: Readable<
     value: string;
     type: SearchAttributeType;
   }[]
-> = derived([customSearchAttributes], ([$customSearchAttributes]) =>
-  Object.entries($customSearchAttributes).map(([key, value]) => ({
+> = derived([customSearchAttributes], ([$customSearchAttributes]) => {
+  return Object.entries($customSearchAttributes).map(([key, value]) => ({
     label: key,
     value: key,
     type: value,
-  })),
-);
+  }));
+});
 
 export const isCustomSearchAttribute = (key: string) => {
   const customSearchAttrs = get(customSearchAttributes);

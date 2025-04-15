@@ -24,7 +24,10 @@ import {
   WORKFLOWS_COUNT_API,
 } from './mocks/workflows-count';
 
-import { WorkflowExecutionAPIResponse } from '$src/lib/types/workflows';
+import {
+  SearchAttributesResponse,
+  WorkflowExecutionAPIResponse,
+} from '$src/lib/types/workflows';
 
 export { mockClusterApi, CLUSTER_API } from './mocks/cluster';
 export { mockNamespaceApi, NAMESPACE_API } from './mocks/namespace';
@@ -36,6 +39,7 @@ export {
   mockSearchAttributesApi,
   SEARCH_ATTRIBUTES_API,
 } from './mocks/search-attributes';
+export { mockScheduleApi, SCHEDULE_API } from './mocks/schedules';
 export { mockWorkflowsApi, WORKFLOWS_API } from './mocks/workflows';
 export { mockWorkflowApi, WORKFLOW_API } from './mocks/workflow';
 export {
@@ -70,11 +74,17 @@ export const mockWorkflowsApis = (page: Page) => {
   ]);
 };
 
-export const mockSchedulesApis = (page: Page, empty = false) => {
+export const mockSchedulesApis = (
+  page: Page,
+  empty = false,
+  emptyWorkflowsCount = false,
+  customSearchAttributes?: Partial<SearchAttributesResponse>,
+) => {
   return Promise.all([
     mockGlobalApis(page),
-    mockSearchAttributesApi(page),
+    mockSearchAttributesApi(page, customSearchAttributes),
     mockSchedulesApi(page, empty),
+    mockWorkflowsCountApi(page, emptyWorkflowsCount),
   ]);
 };
 

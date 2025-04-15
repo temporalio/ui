@@ -95,4 +95,6 @@ export const Strings = {
   'getting-started-docs-link-preface': 'Go to',
   'getting-started-docs-link': 'docs',
   'getting-started-cli-link-preface': 'or get started with',
+  'add-schedule-attr': 'Schedule Attributes',
+  'add-workflow-attr': 'Workflow Attributes',
 } as const;

@@ -42,6 +42,7 @@ export type ScheduleActionParameters = {
   encoding: PayloadInputEncoding;
   messageType?: string;
   searchAttributes: SearchAttributeInput[];
+  workflowSearchAttributes?: SearchAttributeInput[];
 };
 
 export type ScheduleSpecParameters = {
@@ -54,6 +55,7 @@ export type ScheduleSpecParameters = {
   phase: string;
   cronString: string;
   searchAttributes: SearchAttributeInput[];
+  workflowSearchAttributes?: SearchAttributeInput[];
 };
 
 // For UI Only

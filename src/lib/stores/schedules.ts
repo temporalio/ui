@@ -34,6 +34,14 @@ type ScheduleParameterArgs = {
 // "timezoneName": "string",
 // "timezoneData": "string"
 
+const getSearchAttributes = (
+  attrs: (typeof setSearchAttributes.arguments)[0],
+) => {
+  return attrs.length === 0
+    ? null
+    : { indexedFields: { ...setSearchAttributes(attrs) } };
+};
+
 const setBodySpec = (
   body: DescribeFullSchedule,
   spec: Partial<ScheduleSpecParameters>,
@@ -92,6 +100,7 @@ export const submitCreateSchedule = async ({
     encoding,
     messageType,
     searchAttributes,
+    workflowSearchAttributes,
   } = action;
 
   let payloads;
@@ -127,6 +136,14 @@ export const submitCreateSchedule = async ({
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
           input: payloads ? { payloads } : null,
+          searchAttributes:
+            workflowSearchAttributes.length === 0
+              ? null
+              : {
+                  indexedFields: {
+                    ...setSearchAttributes(workflowSearchAttributes),
+                  },
+                },
         },
       },
     },
@@ -169,6 +186,7 @@ export const submitEditSchedule = async (
     encoding,
     messageType,
     searchAttributes,
+    workflowSearchAttributes,
   } = action;
 
   let payloads;
@@ -185,14 +203,7 @@ export const submitEditSchedule = async (
   const { preset } = presets;
   const body: DescribeFullSchedule = {
     schedule_id: scheduleId,
-    searchAttributes:
-      searchAttributes.length === 0
-        ? null
-        : {
-            indexedFields: {
-              ...setSearchAttributes(searchAttributes),
-            },
-          },
+    searchAttributes: getSearchAttributes(searchAttributes),
     schedule: {
       ...schedule,
       action: {
@@ -202,6 +213,7 @@ export const submitEditSchedule = async (
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
           ...(input !== undefined && { input: payloads ? { payloads } : null }),
+          searchAttributes: getSearchAttributes(workflowSearchAttributes),
         },
       },
     },
