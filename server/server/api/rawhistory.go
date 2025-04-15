@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/labstack/echo/v4"
 	"go.temporal.io/api/common/v1"
@@ -16,6 +17,13 @@ const WorkflowRawHistoryUrl = "/namespaces/:namespace/workflows/:workflow/run/:r
 
 func WorkflowRawHistoryHandler(service IWorkflowService) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		// url decode workflow param
+		value := c.Param("workflow")
+		decodedValue, err := url.QueryUnescape(value)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid workflow ID: %s", value))
+		}
+
 		// Set headers for JSON streaming
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		c.Response().WriteHeader(http.StatusOK)
@@ -24,7 +32,7 @@ func WorkflowRawHistoryHandler(service IWorkflowService) echo.HandlerFunc {
 		return NewRawHistory().
 			SetIDs(
 				c.Param("namespace"),
-				c.Param("workflow"),
+				decodedValue,
 				c.Param("runid"),
 			).
 			SetContext(c.Request().Context()).

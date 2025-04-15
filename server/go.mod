@@ -10,11 +10,11 @@ require (
 	github.com/labstack/echo/v4 v4.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.3.0
-	go.temporal.io/api v1.44.1
+	go.temporal.io/api v1.47.0
 	golang.org/x/net v0.36.0
 	golang.org/x/oauth2 v0.22.0
 	google.golang.org/grpc v1.66.0
-	google.golang.org/protobuf v1.34.2
+	google.golang.org/protobuf v1.36.5
 	gopkg.in/validator.v2 v2.0.0-20210331031555-b37d688a7fb0
 	gopkg.in/yaml.v3 v3.0.1
 )

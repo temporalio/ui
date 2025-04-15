@@ -21,11 +21,14 @@ export const eventClassifications = [
 ] as const;
 
 export const getEventClassification = (
-  eventType: EventType,
+  eventType: EventType | number,
 ): EventClassification => {
+  if (typeof eventType === 'number') return 'Unspecified';
   if (eventType.includes('RequestCancel')) return 'CancelRequested';
 
   for (const classification of eventClassifications) {
     if (eventType.includes(classification)) return classification;
   }
+
+  return 'Unspecified';
 };

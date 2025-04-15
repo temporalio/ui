@@ -32,14 +32,14 @@ export const setBase64Payload = (
         encoding: btoa(encoding),
         messageType: btoa(messageType),
       },
-      data: btoa(JSON.stringify(payload)),
+      data: btoa(stringifyWithBigInt(payload)),
     };
   }
   return {
     metadata: {
       encoding: btoa(encoding),
     },
-    data: btoa(JSON.stringify(payload)),
+    data: btoa(stringifyWithBigInt(payload)),
   };
 };
 
@@ -59,7 +59,7 @@ export const encodePayloads = async ({
   let payloads = null;
 
   if (input) {
-    const parsedInput = JSON.parse(input);
+    const parsedInput = parseWithBigInt(input);
     payloads = [setBase64Payload(parsedInput, encoding, messageType)];
     const endpoint = get(dataEncoder).endpoint;
     if (endpoint && encodeWithCodec) {
@@ -69,6 +69,5 @@ export const encodePayloads = async ({
       payloads = awaitData?.payloads ?? null;
     }
   }
-
   return payloads;
 };

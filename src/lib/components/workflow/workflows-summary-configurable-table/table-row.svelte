@@ -56,7 +56,10 @@
       />
     </td>
     <td
-      class="cursor-point relative flex items-center justify-center gap-0.5 pt-2"
+      class="cursor-point relative flex items-center justify-center gap-0.5 py-0.5 {$hideChildWorkflows &&
+      !child
+        ? 'w-auto'
+        : 'w-6'}"
     >
       {#if !workflowCreateDisabled($page)}
         <StartWorkflowButton

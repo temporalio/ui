@@ -80,6 +80,8 @@ export const eventTypeCategorizations: Readonly<
   NexusOperationCanceled: CATEGORIES.NEXUS,
   NexusOperationTimedOut: CATEGORIES.NEXUS,
   NexusOperationCancelRequested: CATEGORIES.NEXUS,
+  NexusOperationCancelRequestCompleted: CATEGORIES.NEXUS,
+  NexusOperationCancelRequestFailed: CATEGORIES.NEXUS,
 
   MarkerRecorded: CATEGORIES.OTHER,
   UpsertWorkflowSearchAttributes: CATEGORIES.OTHER,
