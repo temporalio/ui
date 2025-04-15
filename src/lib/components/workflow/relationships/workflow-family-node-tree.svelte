@@ -221,35 +221,55 @@
       <line
         x1={x}
         y1={y}
-        x2={x - 5 * radius}
+        x2={x - 4 * radius}
         y2={y}
         class="stroke-slate-50 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-900"
       />
       <rect
         class="fill-slate-50 dark:fill-slate-900"
         x={x - 3 * radius - radius / 2}
-        y={y - radius / 2}
+        y={y - radius / 4}
         cx={radius / 2}
         cy={radius / 2}
-        width={radius}
-        height={radius}
+        width={radius / 2}
+        height={radius / 2}
+        cursor="pointer"
+      />
+      <rect
+        class="fill-slate-50 dark:fill-slate-900"
+        x={x - 1.5 * radius - radius / 2}
+        y={y - radius / 4}
+        cx={radius / 2}
+        cy={radius / 2}
+        width={radius / 2}
+        height={radius / 2}
         cursor="pointer"
       />
       <line
         x1={x}
         y1={y}
-        x2={x + 5 * radius}
+        x2={x + 4 * radius}
         y2={y}
         class="stroke-slate-50 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-900"
       />
       <rect
         class="fill-slate-50 dark:fill-slate-900"
-        x={x + 3 * radius - radius / 2}
-        y={y - radius / 2}
+        x={x + 1.5 * radius}
+        y={y - radius / 4}
         cx={radius / 2}
         cy={radius / 2}
-        width={radius}
-        height={radius}
+        width={radius / 2}
+        height={radius / 2}
+        cursor="pointer"
+      />
+      <rect
+        class="fill-slate-50 dark:fill-slate-900"
+        x={x + 3 * radius}
+        y={y - radius / 4}
+        cx={radius / 2}
+        cy={radius / 2}
+        width={radius / 2}
+        height={radius / 2}
         cursor="pointer"
       />
     {/if}

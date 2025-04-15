@@ -42,17 +42,13 @@
       {:then { count }}
         {@const intCount = parseInt(count)}
         {#if intCount > MAX_UPPER_LIMIT}
-          {#await fetchAllDirectWorkflows( { namespace, parentWorkflowId, parentRunId, workflow }, )}
-            <Loading />
-          {:then root}
+          {#await fetchAllDirectWorkflows( { namespace, parentWorkflowId, parentRunId, workflow }, ) then root}
             <WorkflowFamilyTree {root} {namespace} {first} {previous} {next} />
           {:catch}
             <WorkflowRelationshipsOld />
           {/await}
         {:else}
-          {#await fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId)}
-            <Loading />
-          {:then root}
+          {#await fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId) then root}
             <WorkflowFamilyTree
               fullTree
               {root}
