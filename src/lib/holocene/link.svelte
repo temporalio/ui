@@ -32,8 +32,9 @@
   export let light = false;
 
   const onLinkClick = (e: MouseEvent) => {
-    // Skip if middle mouse click or new tab
-    if (e.button === 1 || newTab || e.metaKey) return;
+    if (e.button === 1 || newTab || e.metaKey || e.ctrlKey || e.shiftKey)
+      return;
+
     e.preventDefault();
     goto(href);
   };
@@ -42,7 +43,7 @@
 <a
   {href}
   target={newTab ? '_blank' : null}
-  rel={newTab ? 'noreferrer' : null}
+  rel={newTab ? 'noreferrer noopener' : null}
   class={merge('link', icon ? 'inline-flex' : 'inline', className)}
   class:active
   class:interactive
