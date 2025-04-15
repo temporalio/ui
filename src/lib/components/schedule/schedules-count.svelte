@@ -18,6 +18,8 @@
   };
 
   $: namespace, fetchCounts();
+
+  console.log('schedulesCount', $schedulesCount);
 </script>
 
 <div class="flex flex-wrap items-center gap-2">

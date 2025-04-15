@@ -116,14 +116,31 @@ export const mockSchedule = {
   conflictToken: 'AAAAAAAAAAE=',
 };
 
+// export const mockSchedulesApi = (page: Page, empty = false) => {
+//   return page.route(SCHEDULES_API, (route) => {
+//     return route.fulfill({
+//       json: {
+//         schedules: empty ? [] : [mockListSchedule],
+//         nextPageToken: null,
+//       },
+//     });
+//   });
+// };
+
 export const mockSchedulesApi = (page: Page, empty = false) => {
   return page.route(SCHEDULES_API, (route) => {
-    return route.fulfill({
-      json: {
-        schedules: empty ? [] : [mockListSchedule],
-        nextPageToken: null,
-      },
-    });
+    const json = {
+      schedules: empty ? [] : [mockListSchedule],
+      nextPageToken: null,
+    };
+
+    console.log(
+      '📦 Mocking schedules API response:',
+      JSON.stringify(json, null, 2),
+    );
+    console.log('🔗 Request URL:', route.request().url());
+
+    return route.fulfill({ json });
   });
 };
 

@@ -77,13 +77,14 @@ export const mockWorkflowsApis = (page: Page) => {
 export const mockSchedulesApis = (
   page: Page,
   empty = false,
+  emptyWorkflowsCount = false,
   customSearchAttributes?: Partial<SearchAttributesResponse>,
 ) => {
   return Promise.all([
     mockGlobalApis(page),
     mockSearchAttributesApi(page, customSearchAttributes),
     mockSchedulesApi(page, empty),
-    mockWorkflowsCountApi(page),
+    mockWorkflowsCountApi(page, emptyWorkflowsCount),
   ]);
 };
 
