@@ -6,7 +6,7 @@ const createScheduleUrl = '/namespaces/default/schedules/create';
 
 test.describe('Creates Schedule Successfully', () => {
   test.beforeEach(async ({ page }) => {
-    await mockSchedulesApis(page, true, {
+    await mockSchedulesApis(page, true, false, {
       customAttributes: {
         attributeOne: 'Keyword',
         attributeTwo: 'Keyword',

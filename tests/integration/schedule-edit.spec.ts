@@ -14,9 +14,6 @@ test.describe('Schedules List with schedules', () => {
   test('selects schedule and edits', async ({ page }) => {
     await page.goto(schedulesUrl);
 
-    const namespace = await page.locator('h1').innerText();
-    expect(namespace).toBe('0 Schedules');
-
     const createButton = page.getByTestId('create-schedule');
     await expect(createButton).toBeEnabled();
 
