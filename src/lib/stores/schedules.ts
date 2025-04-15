@@ -34,6 +34,14 @@ type ScheduleParameterArgs = {
 // "timezoneName": "string",
 // "timezoneData": "string"
 
+const getSearchAttributes = (
+  attrs: (typeof setSearchAttributes.arguments)[0],
+) => {
+  return attrs.length === 0
+    ? null
+    : { indexedFields: { ...setSearchAttributes(attrs) } };
+};
+
 const setBodySpec = (
   body: DescribeFullSchedule,
   spec: Partial<ScheduleSpecParameters>,
@@ -108,14 +116,8 @@ export const submitCreateSchedule = async ({
 
   const body: DescribeFullSchedule = {
     schedule_id: name.trim(),
-    searchAttributes:
-      searchAttributes.length === 0
-        ? null
-        : {
-            indexedFields: {
-              ...setSearchAttributes(searchAttributes),
-            },
-          },
+    searchAttributes: getSearchAttributes(searchAttributes),
+
     schedule: {
       spec: {
         calendar: [],
@@ -128,14 +130,7 @@ export const submitCreateSchedule = async ({
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
           input: payloads ? { payloads } : null,
-          searchAttributes:
-            workflowSearchAttributes.length === 0
-              ? null
-              : {
-                  indexedFields: {
-                    ...setSearchAttributes(workflowSearchAttributes),
-                  },
-                },
+          searchAttributes: getSearchAttributes(workflowSearchAttributes),
         },
       },
     },
