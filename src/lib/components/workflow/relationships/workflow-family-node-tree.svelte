@@ -151,7 +151,7 @@
   <g
     role="button"
     tabindex="0"
-    class="outline-none"
+    class="outline-none transition-all"
     on:click={(e) => nodeClick(e, child)}
     on:keypress={(e) => nodeClick(e, child)}
   >
@@ -161,7 +161,7 @@
         y1={childY}
         x2={childX}
         y2={childY + 2.5 * radius}
-        class="stroke-2 transition-all duration-300 ease-in-out {isActive(child)
+        class="stroke-2 duration-300 ease-in-out {isActive(child)
           ? 'stroke-indigo-700'
           : 'stroke-slate-100 dark:stroke-slate-800'}"
       />
@@ -206,74 +206,69 @@
     {/if}
     {#if !fullTree}
       <text
-        x={childX}
+        x={!child?.children?.length ? childX : childX + 8}
         y={!child?.children?.length
-          ? childY + 1.25 * radius
-          : childY - 1.25 * radius}
-        class="text-center {!child?.children?.length &&
-          '[writing-mode:vertical-lr]'}"
-        fill="currentColor"
-        text-anchor={!child?.children?.length ? 'start' : 'middle'}
+          ? childY + 1.15 * radius
+          : childY - 1.15 * radius}
+        class={!child?.children?.length && '[writing-mode:vertical-lr]'}
+        fill="currentcolor"
+        text-anchor={!child?.children?.length ? 'start' : 'start'}
         font-weight="500">{child.workflow.id}</text
       >
     {/if}
-    {#if !fullTree && child.siblingCount > 0}
-      <line
-        x1={x}
-        y1={y}
-        x2={x - 4 * radius}
-        y2={y}
-        class="stroke-slate-50 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-900"
-      />
-      <rect
-        class="fill-slate-50 dark:fill-slate-900"
-        x={x - 3 * radius - radius / 2}
-        y={y - radius / 4}
-        cx={radius / 2}
-        cy={radius / 2}
-        width={radius / 2}
-        height={radius / 2}
-        cursor="pointer"
-      />
-      <rect
-        class="fill-slate-50 dark:fill-slate-900"
-        x={x - 1.5 * radius - radius / 2}
-        y={y - radius / 4}
-        cx={radius / 2}
-        cy={radius / 2}
-        width={radius / 2}
-        height={radius / 2}
-        cursor="pointer"
-      />
-      <line
-        x1={x}
-        y1={y}
-        x2={x + 4 * radius}
-        y2={y}
-        class="stroke-slate-50 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-900"
-      />
-      <rect
-        class="fill-slate-50 dark:fill-slate-900"
-        x={x + 1.5 * radius}
-        y={y - radius / 4}
-        cx={radius / 2}
-        cy={radius / 2}
-        width={radius / 2}
-        height={radius / 2}
-        cursor="pointer"
-      />
-      <rect
-        class="fill-slate-50 dark:fill-slate-900"
-        x={x + 3 * radius}
-        y={y - radius / 4}
-        cx={radius / 2}
-        cy={radius / 2}
-        width={radius / 2}
-        height={radius / 2}
-        cursor="pointer"
-      />
-    {/if}
   </g>
+  {#if !fullTree && child.siblingCount > 0}
+    <line
+      x1={x}
+      y1={y}
+      x2={x - 4 * radius}
+      y2={y}
+      class="stroke-slate-50 stroke-2 duration-300 ease-in-out dark:stroke-slate-900"
+    />
+    <rect
+      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      x={x - 3 * radius - radius / 2}
+      y={y - radius / 4}
+      cx={radius / 2}
+      cy={radius / 2}
+      width={radius / 2}
+      height={radius / 2}
+    />
+    <rect
+      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      x={x - 1.5 * radius - radius / 2}
+      y={y - radius / 4}
+      cx={radius / 2}
+      cy={radius / 2}
+      width={radius / 2}
+      height={radius / 2}
+    />
+    <line
+      x1={x}
+      y1={y}
+      x2={x + 4 * radius}
+      y2={y}
+      class="stroke-slate-50 stroke-2 duration-300 ease-in-out dark:stroke-slate-900"
+    />
+    <rect
+      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      x={x + 1.5 * radius}
+      y={y - radius / 4}
+      cx={radius / 2}
+      cy={radius / 2}
+      width={radius / 2}
+      height={radius / 2}
+    />
+    <rect
+      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      x={x + 3 * radius}
+      y={y - radius / 4}
+      cx={radius / 2}
+      cy={radius / 2}
+      width={radius / 2}
+      height={radius / 2}
+    />
+  {/if}
 {/each}
 
 {#if generation === 1}

@@ -63,7 +63,7 @@
   >
     <ZoomSvg
       initialZoom={2}
-      maxZoomOut={5}
+      maxZoomOut={8}
       maxZoomIn={0.25}
       containerHeight={280}
       let:width
@@ -73,7 +73,7 @@
       <div class="flex py-4" slot="controls">
         {#if fullTree}
           <ToggleSwitch
-            label={translate('common.view-all')}
+            label={translate('common.expand-all')}
             labelPosition="left"
             id="autorefresh"
             checked={expandAll}

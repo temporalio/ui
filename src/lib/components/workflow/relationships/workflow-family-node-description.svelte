@@ -29,15 +29,19 @@
   };
 </script>
 
-<div class="w-full border-subtle" class:border-l={!isRootWorkflow}>
+<div class="w-full">
   <button
-    class="flex w-full select-none {isActive &&
+    class="relative flex w-full select-none border-subtle {isActive &&
       'surface-interactive'} {isCurrent &&
       !isActive &&
       'surface-subtle'} items-center gap-1 px-2 py-1 lg:py-2 {!isActive &&
       'hover:surface-interactive-secondary'}"
+    class:border-l={!isRootWorkflow && !isActive}
     on:click|stopPropagation={onClick}
   >
+    {#if !isRootWorkflow && !isActive}
+      <div class="absolute left-0 top-[50%] h-[1px] w-6 bg-subtle"></div>
+    {/if}
     <div class="flex w-full items-center gap-3 pr-2 text-sm">
       <WorkflowFamilyNodeDescriptionDetails
         workflow={root.workflow}
