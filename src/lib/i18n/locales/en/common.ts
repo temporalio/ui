@@ -193,4 +193,5 @@ export const Strings = {
   'schedules-table': 'Schedules Table',
   column: 'Column',
   columns: 'Columns',
+  'child-count': 'Child Count',
 } as const;

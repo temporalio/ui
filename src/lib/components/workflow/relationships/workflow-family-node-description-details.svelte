@@ -58,7 +58,7 @@
   {#if fullTree}
     <div class="text-left leading-4 lg:basis-[140px] lg:text-right">
       {#if isRootWorkflow}
-        <p class="text-xs">Child Count</p>
+        <p class="text-xs">{translate('common.child-count')}</p>
       {/if}
       <div class="flex basis-16 items-center gap-1 leading-4 lg:justify-end">
         <span class="font-mono">{children}</span>
@@ -68,9 +68,7 @@
   <div class="hidden items-center gap-4 lg:flex lg:basis-5/12">
     <div class="leading-4">
       {#if isRootWorkflow}
-        <p class="text-xs">
-          {translate('common.start')}
-        </p>
+        <p class="text-xs">{translate('common.start')}</p>
       {/if}
       <p>
         {formatDate(workflow?.startTime, $timeFormat, {
@@ -80,7 +78,7 @@
     </div>
     <div class="leading-4">
       {#if isRootWorkflow}
-        <p class="min-w-12 text-xs">{translate('common.end')}</p>
+        <p class="text-xs">{translate('common.end')}</p>
       {/if}
       <p>
         {formatDate(workflow?.endTime, $timeFormat, {
@@ -90,7 +88,7 @@
     </div>
     <div class="leading-4">
       {#if isRootWorkflow}
-        <p class="min-w-12 text-xs">{translate('common.duration')}</p>
+        <p class="text-xs">{translate('common.duration')}</p>
       {/if}
       <p>{elapsedTime}</p>
     </div>
