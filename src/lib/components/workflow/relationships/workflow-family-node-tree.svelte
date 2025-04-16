@@ -3,8 +3,13 @@
 
   import { page } from '$app/stores';
 
+  import Icon from '$lib/holocene/icon';
   import type { RootNode } from '$lib/services/workflow-service';
+  import { fullEventHistory } from '$lib/stores/events';
+  import { namespaces } from '$lib/stores/namespaces';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import {
     routeForRelationships,
     routeForSchedule,
@@ -22,11 +27,15 @@
   export let expandAll: boolean;
   export let onNodeClick: (node: RootNode, generation: number) => void;
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
-  export let first: string | undefined;
-  export let previous: string | undefined;
-  export let next: string | undefined;
 
   $: ({ workflow, run, namespace } = $page.params);
+  $: ({ workflow: fullWorkflow } = $workflowRun);
+  $: workflowRelationships = getWorkflowRelationships(
+    fullWorkflow,
+    $fullEventHistory,
+    $namespaces,
+  );
+  $: ({ first, next, previous } = workflowRelationships);
 
   const getPositions = (
     width: number,
@@ -296,6 +305,14 @@
         stroke-dasharray="3 2"
         class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
       />
+      <Icon x={x - 9.25 * radius} y={y - 4.15 * radius} name="schedules" />
+      <text
+        x={x - 5.25 * radius}
+        y={y - 3.5 * radius}
+        fill="currentColor"
+        text-anchor="end"
+        font-weight="500">Schedule</text
+      >
       <a href={routeForSchedule({ namespace, scheduleId: root.scheduleId })}>
         <text
           x={x - 5.25 * radius}

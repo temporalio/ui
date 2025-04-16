@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { RootNode } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
@@ -14,6 +13,7 @@
   export let onNodeClick: (node: RootNode, generation: number) => void;
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
   export let openRuns: Map<number, string>;
+  export let fullTree = false;
 
   $: ({ namespace, workflow, run } = $page.params);
   $: expanded =
@@ -40,7 +40,9 @@
     on:click|stopPropagation={onClick}
   >
     {#if !isRootWorkflow && !isActive}
-      <div class="absolute left-0 top-[50%] h-[1px] w-6 bg-subtle"></div>
+      <div
+        class="absolute left-0 top-[25%] h-[1px] w-3 bg-subtle lg:top-[50%] lg:w-6"
+      ></div>
     {/if}
     <div class="flex w-full items-center gap-3 pr-2 text-sm">
       <WorkflowFamilyNodeDescriptionDetails
@@ -48,21 +50,10 @@
         {namespace}
         {isRootWorkflow}
         {isActive}
+        children={root.children?.length}
+        {fullTree}
+        {expanded}
       />
-      <div class="flex basis-16 items-center justify-end gap-1">
-        {#if root?.children?.length}
-          <div class="flex items-center gap-2 text-sm">
-            <Icon name="relationship" class="-mr-1 w-3 flex-shrink-0" />
-            <span class="inline-block">{root?.children?.length}</span>
-          </div>
-          {#if !isRootWorkflow}
-            <Icon
-              name={expanded ? 'chevron-up' : 'chevron-down'}
-              class="-mr-1 w-4 flex-shrink-0"
-            />
-          {/if}
-        {/if}
-      </div>
     </div>
   </button>
   {#if expanded}
@@ -75,6 +66,7 @@
           {activeWorkflow}
           generation={generation + 1}
           {openRuns}
+          {fullTree}
         />
       {/if}
     </div>

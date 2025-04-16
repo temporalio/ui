@@ -13,10 +13,6 @@
 
   export let root: RootNode;
   export let namespace: string;
-  export let first: string | undefined;
-  export let previous: string | undefined;
-  export let next: string | undefined;
-
   export let fullTree = false;
 
   let expandAll = !fullTree;
@@ -91,19 +87,19 @@
         {openRuns}
         {activeWorkflow}
         {fullTree}
-        {first}
-        {previous}
-        {next}
       />
     </ZoomSvg>
   </div>
-  <div class="flex h-auto w-full flex-col overflow-auto bg-secondary text-base">
+  <div
+    class="surface-secondary flex h-auto w-full flex-col overflow-auto text-base"
+  >
     <WorkflowFamilyNodeDescription
       {root}
       {expandAll}
       {onNodeClick}
       {activeWorkflow}
       {openRuns}
+      {fullTree}
     />
   </div>
 </div>
