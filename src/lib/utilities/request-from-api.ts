@@ -148,8 +148,8 @@ const withAuth = async (
 
 export const authTokens = async () => {
   const tokens = {
-    accessToken: null,
-    idToken: null,
+    accessToken: undefined,
+    idToken: undefined,
   };
 
   if (globalThis?.AccessToken) {
@@ -159,6 +159,8 @@ export const authTokens = async () => {
   }
 
   const authUser = getAuthUser();
+  if (!authUser.accessToken) return tokens;
+
   tokens.accessToken = authUser.accessToken;
   tokens.idToken = authUser.idToken;
 
