@@ -11,6 +11,7 @@
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
   import { hideChildWorkflows } from '$lib/stores/filters';
   import {
+    loading,
     refresh,
     updating,
     workflows,
@@ -73,6 +74,7 @@
   nextPageButtonLabel={translate('common.next-page')}
   previousPageButtonLabel={translate('common.previous-page')}
   pageButtonLabel={(page) => translate('common.go-to-page', { page })}
+  loading={$loading}
   updating={$updating}
   items={$workflows}
   let:visibleItems
@@ -111,8 +113,8 @@
       {/each}
     {/if}
   {/each}
-  <svelte:fragment slot="empty" let:updating>
-    <TableEmptyState {updating}>
+  <svelte:fragment slot="empty">
+    <TableEmptyState>
       <slot name="cloud" slot="cloud" />
     </TableEmptyState>
   </svelte:fragment>

@@ -21,6 +21,7 @@
   export let id: string = null;
   export let items: Item[];
   export let variant: 'primary' | 'split' = 'primary';
+  export let loading = false;
   export let updating = false;
   export let perPageLabel: string;
   export let pageButtonLabel: (page: number) => string;
@@ -90,6 +91,7 @@
 </script>
 
 <PaginatedTable
+  {loading}
   {updating}
   {variant}
   {maxHeight}
@@ -148,5 +150,5 @@
     />
   </nav>
 
-  <slot name="empty" slot="empty" {updating} />
+  <slot name="empty" slot="empty" />
 </PaginatedTable>
