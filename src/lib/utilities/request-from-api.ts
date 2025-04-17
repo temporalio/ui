@@ -129,26 +129,40 @@ const withAuth = async (
   options: RequestInit,
   isBrowser = BROWSER,
 ): Promise<RequestInit> => {
-  if (globalThis?.AccessToken) {
-    options.headers = await withBearerToken(
-      options?.headers,
-      globalThis.AccessToken,
-      isBrowser,
-    );
-  } else if (getAuthUser().accessToken) {
-    options.headers = await withBearerToken(
-      options?.headers,
-      async () => getAuthUser().accessToken,
-      isBrowser,
-    );
-    options.headers = withIdToken(
-      options?.headers,
-      getAuthUser().idToken,
-      isBrowser,
-    );
-  }
+  const tokens = await authTokens();
+
+  if (!tokens) return options;
+
+  options.headers = await withBearerToken(
+    options?.headers,
+    async () => tokens.accessToken,
+    isBrowser,
+  );
+
+  if (!tokens.idToken) return options;
+
+  options.headers = withIdToken(options?.headers, tokens.idToken, isBrowser);
 
   return options;
+};
+
+export const authTokens = async () => {
+  const tokens = {
+    accessToken: null,
+    idToken: null,
+  };
+
+  if (globalThis?.AccessToken) {
+    const token = await globalThis.AccessToken();
+    tokens.accessToken = token;
+    return tokens;
+  }
+
+  const authUser = getAuthUser();
+  tokens.accessToken = authUser.accessToken;
+  tokens.idToken = authUser.idToken;
+
+  return tokens;
 };
 
 const withBearerToken = async (

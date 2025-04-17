@@ -8,10 +8,11 @@ export const load: PageLoad = async function ({ parent, params }) {
   await parent();
 
   const { namespace, workflow, run } = params;
-  const route = getEndpointForRawHistory({
+  const route = await getEndpointForRawHistory({
     namespace,
     workflowId: workflow,
     runId: run,
   });
+
   redirect(302, route);
 };
