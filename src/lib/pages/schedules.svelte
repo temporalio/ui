@@ -28,7 +28,7 @@
   import { schedulesCount } from '$lib/stores/schedules';
   import {
     customSearchAttributes,
-    searchAttributes,
+    scheduleSearchAttributes,
   } from '$lib/stores/search-attributes';
   import { temporalVersion } from '$lib/stores/versions';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
@@ -72,7 +72,10 @@
   onMount(() => {
     if (query) {
       // Set filters from inital page load query if it exists
-      $scheduleFilters = toListWorkflowFilters(query, $searchAttributes);
+      $scheduleFilters = toListWorkflowFilters(
+        query,
+        $scheduleSearchAttributes,
+      );
     }
   });
 

@@ -1,10 +1,10 @@
 import { derived, get, type Readable, writable } from 'svelte/store';
 
-import type {
+import {
   SEARCH_ATTRIBUTE_TYPE,
-  SearchAttributes,
-  SearchAttributeType,
-  WorkflowExecution,
+  type SearchAttributes,
+  type SearchAttributeType,
+  type WorkflowExecution,
 } from '$lib/types/workflows';
 
 type SearchAttributesStore = {
@@ -22,6 +22,14 @@ export const searchAttributes: Readable<SearchAttributes> = derived(
   ([$allSearchAttributes]) => ({
     ...$allSearchAttributes.customAttributes,
     ...$allSearchAttributes.systemAttributes,
+  }),
+);
+
+export const scheduleSearchAttributes: Readable<SearchAttributes> = derived(
+  [allSearchAttributes],
+  ([$allSearchAttributes]) => ({
+    ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    ...$allSearchAttributes.customAttributes,
   }),
 );
 
