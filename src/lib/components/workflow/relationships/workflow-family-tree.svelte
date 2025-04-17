@@ -2,40 +2,53 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import ZoomSvg from '$lib/holocene/zoom-svg.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { RootNode } from '$lib/services/workflow-service';
+  import {
+    fetchAllDirectWorkflows,
+    type RootNode,
+  } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   import WorkflowFamilyNodeDescription from './workflow-family-node-description.svelte';
   import WorkflowFamilyNodeTree from './workflow-family-node-tree.svelte';
 
   export let root: RootNode;
+  export let namespace: string;
+  export let fullTree = false;
 
-  let expandAll = false;
+  let expandAll = !fullTree;
   let activeWorkflow: WorkflowExecution | undefined = undefined;
-
   let openRuns = new Map<number, string>();
 
   const onExpandAll = () => {
     expandAll = !expandAll;
   };
 
-  const onNodeClick = (node: RootNode, generation: number) => {
-    const newRuns = new Map(openRuns);
-    const highestGeneration = Math.max(...Array.from(newRuns.keys()));
+  const onNodeClick = async (node: RootNode, generation: number) => {
+    if (fullTree) {
+      const newRuns = new Map(openRuns);
+      const highestGeneration = Math.max(...Array.from(newRuns.keys()));
 
-    if (openRuns.get(generation) === node.workflow.runId) {
-      newRuns.set(generation, '');
-    } else {
-      newRuns.set(generation, node.workflow.runId);
-    }
-
-    if (generation < highestGeneration) {
-      for (let i = generation + 1; i <= highestGeneration; i++) {
-        newRuns.delete(i);
+      if (openRuns.get(generation) === node.workflow.runId) {
+        newRuns.set(generation, '');
+      } else {
+        newRuns.set(generation, node.workflow.runId);
       }
-    }
 
-    openRuns = newRuns;
+      if (generation < highestGeneration) {
+        for (let i = generation + 1; i <= highestGeneration; i++) {
+          newRuns.delete(i);
+        }
+      }
+
+      openRuns = newRuns;
+    } else {
+      root = await fetchAllDirectWorkflows({
+        namespace,
+        workflow: node.workflow,
+        parentWorkflowId: node.workflow?.parent?.workflowId,
+        parentRunId: node.workflow?.parent?.runId,
+      });
+    }
     activeWorkflow = node.workflow;
   };
 </script>
@@ -46,21 +59,23 @@
   >
     <ZoomSvg
       initialZoom={2}
-      maxZoomOut={5}
+      maxZoomOut={8}
       maxZoomIn={0.25}
-      containerHeight={240}
+      containerHeight={280}
       let:width
       let:height
       let:zoomLevel
     >
       <div class="flex py-4" slot="controls">
-        <ToggleSwitch
-          label={translate('common.view-all')}
-          labelPosition="left"
-          id="autorefresh"
-          checked={expandAll}
-          on:change={onExpandAll}
-        />
+        {#if fullTree}
+          <ToggleSwitch
+            label={translate('common.expand-all')}
+            labelPosition="left"
+            id="autorefresh"
+            checked={expandAll}
+            on:change={onExpandAll}
+          />
+        {/if}
       </div>
       <WorkflowFamilyNodeTree
         {root}
@@ -71,16 +86,20 @@
         {expandAll}
         {openRuns}
         {activeWorkflow}
+        {fullTree}
       />
     </ZoomSvg>
   </div>
-  <div class="flex h-auto w-full flex-col overflow-auto bg-secondary text-base">
+  <div
+    class="surface-secondary flex h-auto w-full flex-col overflow-auto text-base"
+  >
     <WorkflowFamilyNodeDescription
       {root}
       {expandAll}
       {onNodeClick}
       {activeWorkflow}
       {openRuns}
+      {fullTree}
     />
   </div>
 </div>

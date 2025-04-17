@@ -10,6 +10,7 @@
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
   export let generation = 1;
   export let openRuns: Map<number, string>;
+  export let fullTree = false;
 </script>
 
 {#each root?.children as child}
@@ -20,5 +21,6 @@
     {activeWorkflow}
     {generation}
     {openRuns}
+    {fullTree}
   />
 {/each}

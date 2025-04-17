@@ -139,7 +139,6 @@
         workflowId,
         runId,
       });
-
       if (error) {
         workflowError = error;
         return;
