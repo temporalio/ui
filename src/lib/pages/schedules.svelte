@@ -110,7 +110,7 @@
         {#if showActions}
           <SearchAttributeFilter
             bind:filters={$scheduleFilters}
-            options={searchAttributeOptions}
+            {searchAttributeOptions}
             refresh={() => {
               refresh = Date.now();
             }}
