@@ -5,10 +5,10 @@
   import { dataEncoder } from '$lib/stores/data-encoder';
 
   $: message =
-    $dataEncoder.customErrorMessage ??
+    $dataEncoder.customErrorMessage ||
     translate('data-encoder.codec-server-error');
   $: linkUrl =
-    $dataEncoder.customErrorLink ??
+    $dataEncoder.customErrorLink ||
     'https://docs.temporal.io/production-deployment/data-encryption#set-your-codec-server-endpoints';
 </script>
 
