@@ -26,9 +26,11 @@
   export let items: IterableEventWithPending[];
   export let groups: EventGroups = [];
   export let updating = false;
+  export let loading = false;
   export let compact = false;
   export let minimized = true;
-  export let expandAll = false;
+
+  $: showGraph = !compact;
 
   $: initialItem = $fullEventHistory?.[0];
 
@@ -50,9 +52,8 @@
   let:visibleItems
   variant="split"
   maxHeight={minimized ? 'calc(100vh - 200px)' : '20000px'}
-  hashField="eventid"
 >
-  {#if !compact}
+  {#if showGraph}
     <HistoryGraph {groups} history={history(visibleItems)} />
   {/if}
   <div class="w-full">
@@ -63,7 +64,6 @@
           {index}
           group={event}
           {compact}
-          {expandAll}
           {initialItem}
         />
       {:else if isPendingActivity(event)}
@@ -74,7 +74,6 @@
             (g) =>
               isPendingActivity(event) && g?.pendingActivity?.id === event.id,
           )}
-          {expandAll}
         />
       {:else if isPendingNexusOperation(event)}
         <PendingNexusSummaryRow
@@ -86,7 +85,6 @@
               g?.pendingNexusOperation?.scheduledEventId ===
                 event.scheduledEventId,
           )}
-          {expandAll}
         />
       {:else}
         <EventSummaryRow
@@ -94,12 +92,11 @@
           {index}
           group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
           {compact}
-          {expandAll}
           {initialItem}
         />
       {/if}
     {:else}
-      <EventEmptyRow loading={!$fullEventHistory.length} />
+      <EventEmptyRow loading={!$fullEventHistory.length || loading} />
     {/each}
   </div>
 </Paginated>

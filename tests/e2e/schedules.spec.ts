@@ -27,10 +27,10 @@ test.describe('Schedules Page', () => {
     await createScheduleButton.click();
     await expect(page).toHaveURL(/create/);
 
-    await page.getByTestId('name').fill('e2e-schedule-1');
-    await page.getByTestId('workflowType').fill('test-type-e2e');
-    await page.getByTestId('workflowId').fill('e2e-1234');
-    await page.getByTestId('taskQueue').fill('default');
+    await page.getByTestId('schedule-name-input').fill('e2e-schedule-1');
+    await page.getByTestId('schedule-type-input').fill('test-type-e2e');
+    await page.getByTestId('schedule-workflow-id-input').fill('e2e-1234');
+    await page.getByTestId('schedule-task-queue-input').fill('default');
     await page
       .locator('#schedule-payload-input')
       .getByRole('textbox')

@@ -50,7 +50,6 @@
   let details = '';
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let messageType = '';
-  let inputRetrieved = 0;
 
   let initialWorkflowId = '';
   let initialWorkflowType = '';
@@ -136,7 +135,6 @@
     input = initialValues.input;
     encoding.set(initialValues.encoding);
     messageType = initialValues.messageType;
-    inputRetrieved = Date.now();
     summary = initialValues.summary;
     details = initialValues.details;
 
@@ -265,9 +263,7 @@
       label="Workflow Type"
       on:blur={(e) => onInputChange(e, 'workflowType')}
     />
-    {#key inputRetrieved}
-      <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
-    {/key}
+    <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
     {#if viewAdvancedOptions}
       <Card class="flex flex-col gap-2">
         <div class="flex flex-wrap justify-between">

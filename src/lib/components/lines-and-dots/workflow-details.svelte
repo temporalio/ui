@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
 
   import { translate } from '$lib/i18n/translate';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
@@ -148,5 +149,11 @@
       title={translate('common.history-size-bytes')}
       content={workflow?.historySizeBytes}
     />
+    {#if !$isCloud}
+      <WorkflowDetail
+        title={translate('workflows.state-transitions')}
+        content={workflow?.stateTransitionCount}
+      />
+    {/if}
   </div>
 </div>

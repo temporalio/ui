@@ -45,6 +45,7 @@
     <div class="flex flex-col gap-2 md:flex-row md:items-center">
       <Input
         id="days"
+        data-testid="days-input"
         class="w-28"
         label={translate('common.days')}
         labelHidden
@@ -58,6 +59,7 @@
       <div class="hidden md:block">:</div>
       <Input
         id="hour-interval"
+        data-testid="hour-interval-input"
         class="w-24"
         label={translate('common.hours-abbreviated')}
         labelHidden
@@ -71,6 +73,7 @@
       <div class="hidden md:block">:</div>
       <Input
         id="minute-interval"
+        data-testid="minute-interval-input"
         class="w-24"
         label={translate('common.minutes-abbreviated')}
         labelHidden
@@ -84,6 +87,7 @@
       <div class="hidden md:block">:</div>
       <Input
         id="second"
+        data-testid="second-interval-input"
         class="w-24"
         label={translate('common.seconds-abbreviated')}
         labelHidden

@@ -1,10 +1,12 @@
 <script lang="ts">
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
+  import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
 
   type Item = $$Generic;
 
   export let visibleItems: Item[];
   export let variant: 'primary' | 'split' = 'primary';
+  export let loading = false;
   export let updating = false;
   export let maxHeight = '';
   export let fixed = false;
@@ -21,31 +23,39 @@
   bind:this={tableContainer}
   style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`}"
 >
-  <table
-    class="paginated-table"
-    class:table-fixed={fixed}
-    class:table-auto={!fixed}
-    {...$$restProps}
-  >
-    <slot name="caption" />
-    <thead class="paginated-table-header">
-      <slot name="headers" {visibleItems} />
-      {#if updating}
-        <ProgressBar />
-      {/if}
-    </thead>
-    <tbody class="paginated-table-body">
-      <slot />
-    </tbody>
-  </table>
-  {#if visibleItems.length}
-    <div class="paginated-table-controls">
-      <slot name="actions-start" />
-      <slot name="actions-center" />
-      <slot name="actions-end" />
-    </div>
+  {#if loading}
+    {#if $$slots.loading}
+      <slot name="loading" />
+    {:else}
+      <SkeletonTable rows={15} />
+    {/if}
   {:else}
-    <slot name="empty" />
+    <table
+      class="paginated-table"
+      class:table-fixed={fixed}
+      class:table-auto={!fixed}
+      {...$$restProps}
+    >
+      <slot name="caption" />
+      <thead class="paginated-table-header">
+        <slot name="headers" {visibleItems} />
+        {#if updating}
+          <ProgressBar />
+        {/if}
+      </thead>
+      <tbody class="paginated-table-body">
+        <slot />
+      </tbody>
+    </table>
+    {#if visibleItems.length}
+      <div class="paginated-table-controls">
+        <slot name="actions-start" />
+        <slot name="actions-center" />
+        <slot name="actions-end" />
+      </div>
+    {:else}
+      <slot name="empty" />
+    {/if}
   {/if}
 </div>
 
@@ -74,7 +84,7 @@
     }
 
     :global(tr > th) {
-      @apply whitespace-nowrap p-2 text-left font-medium;
+      @apply whitespace-nowrap px-2 text-left font-medium;
     }
   }
 
@@ -104,7 +114,7 @@
     }
 
     :global(tr > td) {
-      @apply whitespace-nowrap p-2;
+      @apply whitespace-nowrap px-2;
     }
 
     :global(tr > td > .table-link) {
@@ -114,7 +124,7 @@
 
   .primary .paginated-table-body {
     :global(tr:not(.empty)) {
-      @apply h-12 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply h-8 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
   }
 

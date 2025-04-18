@@ -15,7 +15,7 @@
   <TableHeaderRow slot="headers" class="h-8">
     <slot name="headers">
       {#each Array.from(new Array(columns)) as _column, i}
-        <th style="width: {columnWidths[i]}%;" />
+        <th style="width: {columnWidths[i]}%;"></th>
       {/each}
     </slot>
   </TableHeaderRow>

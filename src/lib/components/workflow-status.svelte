@@ -79,7 +79,7 @@
 </script>
 
 <div
-  class="relative flex items-center gap-0 text-center text-sm leading-4"
+  class="relative flex items-center gap-0 text-center text-xs leading-4"
   data-testid={$$props['test-id']}
 >
   <span

@@ -41,6 +41,6 @@
       ? ''
       : 'group-hover:border-information group-hover:bg-interactive-secondary-hover group-hover:peer-checked:bg-interactive-hover'} peer-focus-visible:border-inverse peer-focus-visible:bg-interactive-secondary-hover peer-focus-visible:ring-2 peer-focus-visible:ring-primary/70 peer-focus-visible:peer-checked:bg-interactive-hover"
   >
-    <span class="h-4 w-4 rounded-[50%] bg-current" />
+    <span class="h-4 w-4 rounded-[50%] bg-current"></span>
   </span>
 </Label>

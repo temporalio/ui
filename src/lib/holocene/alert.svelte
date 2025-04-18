@@ -22,6 +22,7 @@
     icon?: AlertIcon;
     'data-testid'?: string;
     hidden?: boolean;
+    class?: string;
   }
 
   export let intent: Intent;

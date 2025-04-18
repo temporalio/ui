@@ -44,7 +44,7 @@ export default defineConfig({
       testIgnore: /.*desktop.spec.ts/,
       use: {
         ...devices['Desktop Chrome'],
-        viewport: { width: 320, height: 480 },
+        viewport: { width: 320, height: 800 },
         isMobile: true,
       },
     },

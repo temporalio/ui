@@ -62,7 +62,7 @@
           class:border-r-slate-900={index !== 1}
           class:border-r-slate-100={index === 1}
           class:dark:border-r-slate-800={index === 1}
-        />
+        ></span>
       </button>
       <button
         class="caret"
@@ -77,7 +77,7 @@
           class:border-l-slate-100={index === events.length}
           class:border-l-slate-900={index !== events.length}
           class:dark:border-l-slate-800={index === events.length}
-        />
+        ></span>
       </button>
     </div>
   </div>

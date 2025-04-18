@@ -115,7 +115,6 @@ export const decodePayloadAttributes = <
     has(eventAttribute.searchAttributes, 'indexedFields')
   ) {
     const searchAttributes = eventAttribute.searchAttributes.indexedFields;
-
     Object.entries(searchAttributes).forEach(([key, value]) => {
       searchAttributes[key] = decodePayload(value, returnDataOnly);
     });

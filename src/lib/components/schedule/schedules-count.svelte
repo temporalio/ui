@@ -6,11 +6,13 @@
   import { schedulesCount } from '$lib/stores/schedules';
 
   $: namespace = $page.params.namespace;
+  $: query = $page.url.searchParams.get('query');
 
   const fetchCounts = async () => {
     try {
       $schedulesCount = await fetchScheduleCount({
         namespace,
+        query,
       });
     } catch (e) {
       console.error('Fetching schedules count failed: ', e?.message);
