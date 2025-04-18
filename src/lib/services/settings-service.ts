@@ -30,9 +30,8 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
       includeCredentials: settingsResponse?.Codec?.IncludeCredentials,
       customErrorMessage: {
         default: {
-          message:
-            'Connection to Codec Server has failed. Learn how to resolve the issue.',
-          link: 'https://docs.temporal.io/production-deployment/data-encryption#set-your-codec-server-endpoints',
+          message: '',
+          link: '',
         },
       },
     },
