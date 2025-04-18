@@ -118,6 +118,7 @@ export const toWorkflowExecution = (
   const callbacks = toCallbacks(response?.callbacks);
   const rootExecution = response.workflowExecutionInfo?.rootExecution;
   const versioningInfo = response.workflowExecutionInfo?.versioningInfo;
+  const workflowExecutionExtendedInfo = response.workflowExecutionExtendedInfo;
 
   let summary;
   let details;
@@ -156,6 +157,7 @@ export const toWorkflowExecution = (
     stateTransitionCount,
     isRunning,
     defaultWorkflowTaskTimeout,
+    workflowExecutionExtendedInfo,
     get canBeTerminated(): boolean {
       return isRunning && writeActionsAreAllowed();
     },
