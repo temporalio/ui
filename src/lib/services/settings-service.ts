@@ -28,6 +28,13 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
       endpoint: settingsResponse?.Codec?.Endpoint,
       passAccessToken: settingsResponse?.Codec?.PassAccessToken,
       includeCredentials: settingsResponse?.Codec?.IncludeCredentials,
+      customErrorMessage: {
+        default: {
+          message:
+            'Connection to Codec Server has failed. Learn how to resolve the issue.',
+          link: 'https://docs.temporal.io/production-deployment/data-encryption#set-your-codec-server-endpoints',
+        },
+      },
     },
     defaultNamespace: settingsResponse?.DefaultNamespace || 'default', // API returns an empty string if default namespace is not configured
     disableWriteActions: !!settingsResponse?.DisableWriteActions || false,

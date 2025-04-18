@@ -16,6 +16,8 @@ type DataEncoder = {
   settingsPassAccessToken: boolean;
   settingsIncludeCredentials: boolean;
   endpoint: string;
+  customErrorMessage: string;
+  customErrorLink: string;
   accessToken?: string;
   hasNotRequested: boolean;
   hasError: boolean;
@@ -41,6 +43,11 @@ export const dataEncoder = derived(
   ]): DataEncoder => {
     const namespace = $page.params.namespace;
     const settingsEndpoint = $page?.data?.settings?.codec?.endpoint;
+    const customErrorMessage =
+      $page?.data?.settings?.codec?.customErrorMessage?.default?.message || '';
+    const customErrorLink =
+      $page?.data?.settings?.codec?.customErrorMessage?.default?.link || '';
+
     const settingsPassAccessToken = Boolean(
       $page?.data?.settings?.codec?.passAccessToken,
     );
@@ -68,6 +75,8 @@ export const dataEncoder = derived(
       settingsIncludeCredentials,
       endpoint,
       accessToken,
+      customErrorMessage,
+      customErrorLink,
       hasNotRequested,
       hasError,
       hasSuccess,
