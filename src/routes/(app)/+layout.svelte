@@ -38,6 +38,7 @@
 
   let namespaceList: NamespaceListItem[];
 
+  console.log('hello world');
   $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
   $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
   $: namespaceNames = isCloud
