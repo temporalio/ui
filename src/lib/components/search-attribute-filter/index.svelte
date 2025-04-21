@@ -24,7 +24,10 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
-  import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
+  import {
+    type SearchAttributeOption,
+    sortedSearchAttributeOptions,
+  } from '$lib/stores/search-attributes';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import {
@@ -55,9 +58,11 @@
   import TextFilter from './text-filter.svelte';
 
   export let filters: SearchAttributeFilter[];
-  export let options = $sortedSearchAttributeOptions;
+  export let searchAttributeOptions: SearchAttributeOption[] = null;
   export let showFilter = true;
   export let refresh: () => void;
+
+  $: options = searchAttributeOptions ?? $sortedSearchAttributeOptions;
 
   const filter = writable<SearchAttributeFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
