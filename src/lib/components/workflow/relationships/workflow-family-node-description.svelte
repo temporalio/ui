@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { RootNode } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
@@ -29,36 +28,30 @@
   };
 </script>
 
-<div class="w-full border-subtle" class:border-l={!isRootWorkflow}>
+<div class="w-full">
   <button
-    class="flex w-full select-none {isActive &&
+    class="relative flex w-full select-none border-subtle {isActive &&
       'surface-interactive'} {isCurrent &&
       !isActive &&
       'surface-subtle'} items-center gap-1 px-2 py-1 lg:py-2 {!isActive &&
       'hover:surface-interactive-secondary'}"
+    class:border-l={!isRootWorkflow && !isActive}
     on:click|stopPropagation={onClick}
   >
+    {#if !isRootWorkflow && !isActive}
+      <div
+        class="absolute left-0 top-[25%] h-[1px] w-3 bg-subtle lg:top-[50%] lg:w-6"
+      ></div>
+    {/if}
     <div class="flex w-full items-center gap-3 pr-2 text-sm">
       <WorkflowFamilyNodeDescriptionDetails
         workflow={root.workflow}
         {namespace}
         {isRootWorkflow}
         {isActive}
+        children={root.children?.length}
+        {expanded}
       />
-      <div class="flex basis-16 items-center justify-end gap-1">
-        {#if root?.children?.length}
-          <div class="flex items-center gap-2 text-sm">
-            <Icon name="relationship" class="-mr-1 w-3 flex-shrink-0" />
-            <span class="inline-block">{root?.children?.length}</span>
-          </div>
-          {#if !isRootWorkflow}
-            <Icon
-              name={expanded ? 'chevron-up' : 'chevron-down'}
-              class="-mr-1 w-4 flex-shrink-0"
-            />
-          {/if}
-        {/if}
-      </div>
     </div>
   </button>
   {#if expanded}

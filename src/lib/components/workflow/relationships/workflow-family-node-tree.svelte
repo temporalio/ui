@@ -3,8 +3,19 @@
 
   import { page } from '$app/stores';
 
+  import Icon from '$lib/holocene/icon';
   import type { RootNode } from '$lib/services/workflow-service';
+  import { fullEventHistory } from '$lib/stores/events';
+  import { namespaces } from '$lib/stores/namespaces';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
+  import {
+    routeForRelationships,
+    routeForSchedule,
+  } from '$lib/utilities/route-for';
+
+  import { showFullTree } from '../workflow-relationships.svelte';
 
   export let root: RootNode;
   export let width: number;
@@ -18,7 +29,14 @@
   export let onNodeClick: (node: RootNode, generation: number) => void;
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
 
-  $: ({ workflow, run } = $page.params);
+  $: ({ workflow, run, namespace } = $page.params);
+  $: ({ workflow: fullWorkflow } = $workflowRun);
+  $: workflowRelationships = getWorkflowRelationships(
+    fullWorkflow,
+    $fullEventHistory,
+    $namespaces,
+  );
+  $: ({ first, next, previous } = workflowRelationships);
 
   const getPositions = (
     width: number,
@@ -139,11 +157,10 @@
       ? 'stroke-indigo-700'
       : 'stroke-slate-100 dark:stroke-slate-800'}"
   />
-  />
   <g
     role="button"
     tabindex="0"
-    class="outline-none"
+    class="outline-none transition-all"
     on:click={(e) => nodeClick(e, child)}
     on:keypress={(e) => nodeClick(e, child)}
   >
@@ -153,7 +170,7 @@
         y1={childY}
         x2={childX}
         y2={childY + 2.5 * radius}
-        class="stroke-2 transition-all duration-300 ease-in-out {isActive(child)
+        class="stroke-2 duration-300 ease-in-out {isActive(child)
           ? 'stroke-indigo-700'
           : 'stroke-slate-100 dark:stroke-slate-800'}"
       />
@@ -190,13 +207,77 @@
       <text
         x={childX}
         y={childY + 2 * radius}
-        class="text-center font-mono text-lg"
+        class="text-center font-mono"
         fill="currentColor"
         text-anchor="middle"
         font-weight="500">{child.children.length}</text
       >
     {/if}
+    {#if !$showFullTree}
+      <text
+        x={!child?.children?.length ? childX : childX + 8}
+        y={!child?.children?.length
+          ? childY + 1.15 * radius
+          : childY - 1.15 * radius}
+        class={!child?.children?.length && '[writing-mode:vertical-lr]'}
+        fill="currentcolor"
+        text-anchor={!child?.children?.length ? 'start' : 'start'}
+        font-weight="500">{child.workflow.id}</text
+      >
+    {/if}
   </g>
+  {#if !$showFullTree && child.siblingCount > 0}
+    <line
+      x1={x}
+      y1={y}
+      x2={x - 4 * radius}
+      y2={y}
+      class="stroke-slate-50 stroke-2 duration-300 ease-in-out dark:stroke-slate-900"
+    />
+    <rect
+      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      x={x - 3 * radius - radius / 2}
+      y={y - radius / 4}
+      cx={radius / 2}
+      cy={radius / 2}
+      width={radius / 2}
+      height={radius / 2}
+    />
+    <rect
+      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      x={x - 1.5 * radius - radius / 2}
+      y={y - radius / 4}
+      cx={radius / 2}
+      cy={radius / 2}
+      width={radius / 2}
+      height={radius / 2}
+    />
+    <line
+      x1={x}
+      y1={y}
+      x2={x + 4 * radius}
+      y2={y}
+      class="stroke-slate-50 stroke-2 duration-300 ease-in-out dark:stroke-slate-900"
+    />
+    <rect
+      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      x={x + 1.5 * radius}
+      y={y - radius / 4}
+      cx={radius / 2}
+      cy={radius / 2}
+      width={radius / 2}
+      height={radius / 2}
+    />
+    <rect
+      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      x={x + 3 * radius}
+      y={y - radius / 4}
+      cx={radius / 2}
+      cy={radius / 2}
+      width={radius / 2}
+      height={radius / 2}
+    />
+  {/if}
 {/each}
 
 {#if generation === 1}
@@ -207,6 +288,123 @@
     on:click={(e) => nodeClick(e, root)}
     on:keypress={(e) => nodeClick(e, root)}
   >
+    {#if root?.scheduleId}
+      <line
+        x1={x}
+        y1={y}
+        x2={x}
+        y2={y - 2.5 * radius}
+        stroke-dasharray="3 2"
+        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+      />
+      <line
+        x1={x - 5 * radius}
+        y1={y - 2.5 * radius}
+        x2={x}
+        y2={y - 2.5 * radius}
+        stroke-dasharray="3 2"
+        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+      />
+      <Icon x={x - 9.25 * radius} y={y - 4.15 * radius} name="schedules" />
+      <text
+        x={x - 5.25 * radius}
+        y={y - 3.5 * radius}
+        fill="currentColor"
+        text-anchor="end"
+        font-weight="500">Schedule</text
+      >
+      <a href={routeForSchedule({ namespace, scheduleId: root.scheduleId })}>
+        <text
+          x={x - 5.25 * radius}
+          y={y - 2.5 * radius}
+          fill="currentColor"
+          text-decoration="underline"
+          text-anchor="end"
+          font-weight="500">{root.scheduleId}</text
+        >
+      </a>
+    {/if}
+    {#if next}
+      <line
+        x1={x}
+        y1={y}
+        x2={x + 4 * radius}
+        y2={y}
+        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+      />
+      <text
+        x={x + 4.25 * radius}
+        y={y - 4}
+        fill="currentColor"
+        text-anchor="start"
+        font-weight="500">Next Execution</text
+      >
+      <a href={routeForRelationships({ namespace, workflow, run: next })}>
+        <text
+          x={x + 4.25 * radius}
+          y={y + radius - 4}
+          fill="currentColor"
+          text-decoration="underline"
+          text-anchor="start"
+          font-weight="500">{next}</text
+        >
+      </a>
+    {/if}
+    {#if previous}
+      <line
+        x1={x}
+        y1={y}
+        x2={x - 4 * radius}
+        y2={y}
+        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+      />
+      <text
+        x={x - 4.25 * radius}
+        y={y - 4}
+        fill="currentColor"
+        text-anchor="end"
+        font-weight="500"
+        >{previous === first ? 'First' : 'Previous'} Execution</text
+      >
+      <a href={routeForRelationships({ namespace, workflow, run: previous })}>
+        <text
+          href={routeForRelationships({ namespace, workflow, run: previous })}
+          x={x - 4.25 * radius}
+          y={y + radius - 4}
+          fill="currentColor"
+          text-decoration="underline"
+          text-anchor="end"
+          font-weight="500">{previous}</text
+        >
+      </a>
+    {/if}
+    {#if first && previous !== first}
+      <line
+        x1={previous ? x - 4 * radius : x}
+        y1={y}
+        x2={radius}
+        y2={y}
+        stroke-dasharray="3 2"
+        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+      />
+      <text
+        x={radius}
+        y={y - 4}
+        fill="currentColor"
+        text-anchor="start"
+        font-weight="500">First Execution</text
+      >
+      <a href={routeForRelationships({ namespace, workflow, run: first })}>
+        <text
+          x={radius}
+          y={y + radius - 4}
+          fill="currentColor"
+          text-decoration="underline"
+          text-anchor="start"
+          font-weight="500">{first}</text
+        >
+      </a>
+    {/if}
     {#if root?.children?.length}
       <line
         x1={x}
@@ -248,11 +446,12 @@
     {#if root?.children?.length}
       <text
         {x}
-        y={y - radius * 1.5}
-        class="text-center font-mono text-lg"
+        y={y - 1.25 * radius}
+        class="text-center {$showFullTree && 'font-mono'}"
         fill="currentColor"
         text-anchor="middle"
-        font-weight="500">{root.children.length}</text
+        font-weight="500"
+        >{$showFullTree ? root.children.length : root.workflow.id}</text
       >
     {/if}
   </g>

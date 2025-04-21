@@ -9,20 +9,26 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
+  import { showFullTree } from '../workflow-relationships.svelte';
+
   export let workflow: WorkflowExecution;
   export let namespace: string;
   export let isRootWorkflow = false;
   export let isActive = false;
+  export let children = 0;
+  export let expanded = false;
 
   $: elapsedTime = formatDistanceAbbreviated({
     start: workflow?.startTime,
     end: workflow?.endTime || Date.now(),
     includeMilliseconds: true,
   });
+
+  $: showExpandIcon = !isRootWorkflow && $showFullTree && children;
 </script>
 
 <div
-  class="flex w-full flex-col gap-2 p-1 text-left text-sm lg:flex-row lg:items-center"
+  class="flex w-full flex-col gap-1 p-1 text-left text-sm lg:flex-row lg:items-center lg:gap-4"
 >
   <div class="flex items-center gap-2 lg:basis-96">
     <div class="w-32 leading-4">
@@ -30,14 +36,14 @@
     </div>
     <div class="w-full leading-4">
       {#if isRootWorkflow}
-        <p class="font-mono text-xs">{translate('common.type')}</p>
+        <p class="text-xs">{translate('common.type')}</p>
       {/if}
       <p>{workflow.name}</p>
     </div>
   </div>
   <div class="leading-4 lg:basis-[800px]">
     {#if isRootWorkflow}
-      <p class="font-mono text-xs">{translate('common.id')}</p>
+      <p class="text-xs">{translate('common.id')}</p>
     {/if}
     <Link
       href={routeForEventHistory({
@@ -50,12 +56,20 @@
       {workflow.id}
     </Link>
   </div>
+  {#if $showFullTree}
+    <div class="text-left leading-4 lg:basis-[140px] lg:text-right">
+      {#if isRootWorkflow}
+        <p class="text-xs">{translate('common.child-count')}</p>
+      {/if}
+      <div class="flex basis-16 items-center gap-1 leading-4 lg:justify-end">
+        <span class="font-mono">{children}</span>
+      </div>
+    </div>
+  {/if}
   <div class="hidden items-center gap-4 lg:flex lg:basis-5/12">
     <div class="leading-4">
       {#if isRootWorkflow}
-        <p class="font-mono text-xs">
-          {translate('common.start')}
-        </p>
+        <p class="text-xs">{translate('common.start')}</p>
       {/if}
       <p>
         {formatDate(workflow?.startTime, $timeFormat, {
@@ -65,7 +79,7 @@
     </div>
     <div class="leading-4">
       {#if isRootWorkflow}
-        <p class="min-w-12 font-mono text-xs">{translate('common.end')}</p>
+        <p class="text-xs">{translate('common.end')}</p>
       {/if}
       <p>
         {formatDate(workflow?.endTime, $timeFormat, {
@@ -75,9 +89,12 @@
     </div>
     <div class="leading-4">
       {#if isRootWorkflow}
-        <Icon name="clock" class="h-4 w-3" />
+        <p class="text-xs">{translate('common.duration')}</p>
       {/if}
       <p>{elapsedTime}</p>
     </div>
   </div>
+  {#if showExpandIcon}
+    <Icon class="hidden lg:block" name={expanded ? 'hyphen' : 'add'} />
+  {/if}
 </div>
