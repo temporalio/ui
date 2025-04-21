@@ -1,0 +1,57 @@
+publicPath:
+port: 8081
+enableUi: true
+bannerText:
+cors:
+  cookieInsecure: false
+  allowOrigins:
+    - http://localhost:3000 # used at development by https://github.com/temporalio/ui
+refreshInterval: 1m
+defaultNamespace: default
+showTemporalSystemNamespace: false
+feedbackUrl:
+notifyOnNewVersion: true
+disableWriteActions: false
+workflowTerminateDisabled: false
+workflowCancelDisabled: false
+workflowSignalDisabled: false
+workflowUpdateDisabled: false
+workflowResetDisabled: false
+batchActionsDisabled: false
+startWorkflowDisabled: false
+hideWorkflowQueryErrors: false
+refreshWorkflowCountsDisabled: false
+auth:
+  enabled: true
+  providers:
+    - label: Dummy OIDC
+      type: oidc # for futureproofing; only oidc is supported today
+      providerUrl: http://localhost:8889
+      issuerUrl: "" # needed if the Issuer Url and the Provider Url are different
+      clientId: temporal-ui
+      clientSecret: temporal-secret
+      scopes:
+        - openid
+        - profile
+        - email
+      callbackUrl: http://localhost:8081/auth/sso/callback
+      options: # added as URL query params when redirecting to auth provider
+        audience: myorg-dev
+        organization: org_xxxxxxxxxxxx
+        invitation:
+tls:
+  caFile:
+  certFile:
+  keyFile:
+  caData:
+  certData:
+  keyData:
+  enableHostVerification: false
+  serverName:
+codec:
+  endpoint:
+  passAccessToken: false
+  includeCredentials: false
+forwardHeaders: # can be used to pass additional HTTP headers from HTTP requests to Temporal gRPC backend
+  - X-Forwarded-For
+
