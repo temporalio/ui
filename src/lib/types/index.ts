@@ -247,6 +247,8 @@ export type SettingsResponse = {
     Endpoint: string;
     PassAccessToken?: boolean;
     IncludeCredentials?: boolean;
+    DefaultErrorMessage?: string;
+    DefaultErrorLink?: string;
   };
   DefaultNamespace: string;
   DisableWriteActions: boolean;

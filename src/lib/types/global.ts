@@ -82,6 +82,12 @@ export type Settings = {
     endpoint?: string;
     passAccessToken?: boolean;
     includeCredentials?: boolean;
+    customErrorMessage?: {
+      default?: {
+        message?: string;
+        link?: string;
+      };
+    };
   };
   defaultNamespace: string;
   disableWriteActions: boolean;

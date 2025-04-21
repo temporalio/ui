@@ -30,8 +30,8 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
       includeCredentials: settingsResponse?.Codec?.IncludeCredentials,
       customErrorMessage: {
         default: {
-          message: '',
-          link: '',
+          message: settingsResponse?.Codec?.DefaultErrorMessage || '',
+          link: settingsResponse?.Codec?.DefaultErrorLink || '',
         },
       },
     },

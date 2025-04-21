@@ -6,6 +6,7 @@
 
   import { page } from '$app/stores';
 
+  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import PayloadInputWithEncoding, {
     type PayloadInputEncoding,
   } from '$lib/components/payload-input-with-encoding.svelte';
@@ -313,5 +314,6 @@
     {#if error}
       <Alert intent="error" title={error} />
     {/if}
+    <CodecServerErrorBanner />
   </Card>
 </div>

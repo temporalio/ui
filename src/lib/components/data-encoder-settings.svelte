@@ -36,8 +36,11 @@
   let passToken = $passAccessToken ?? false;
   let includeCreds = $includeCredentials ?? false;
   let override = writable($overrideRemoteCodecConfiguration);
+  let settingsEndpoint = $page?.data?.settings?.codec?.endpoint;
 
-  $: error = '';
+  $: console.log('override: ', $override);
+
+  let error = '';
   $: namespaceOrCluster = $page.data?.settings?.runtimeEnvironment?.isCloud
     ? translate('common.namespaces')
     : translate('common.cluster');
@@ -110,6 +113,7 @@
           : translate('data-encoder.no-browser-override-description', {
               level: namespaceOrCluster,
             })}
+        subtitle={!$override ? settingsEndpoint : ''}
       >
         <RadioGroup name="override" group={override}>
           <RadioInput
