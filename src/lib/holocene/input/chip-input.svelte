@@ -1,7 +1,6 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import { afterUpdate } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Chip from '$lib/holocene/chip.svelte';
@@ -35,10 +34,6 @@
 
   let className = '';
   export { className as class };
-
-  afterUpdate(() => {
-    input.scrollIntoView({ block: 'nearest', inline: 'start' });
-  });
 
   const handleKeydown = (e: KeyboardEvent) => {
     const value = displayValue.trim();
