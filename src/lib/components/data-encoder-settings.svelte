@@ -38,9 +38,7 @@
   let override = writable($overrideRemoteCodecConfiguration);
   let settingsEndpoint = $page?.data?.settings?.codec?.endpoint;
 
-  $: console.log('override: ', $override);
-
-  let error = '';
+  $: error = '';
   $: namespaceOrCluster = $page.data?.settings?.runtimeEnvironment?.isCloud
     ? translate('common.namespaces')
     : translate('common.cluster');
