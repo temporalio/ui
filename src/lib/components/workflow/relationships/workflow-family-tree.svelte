@@ -8,14 +8,15 @@
   } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
+  import { showFullTree } from '../workflow-relationships.svelte';
+
   import WorkflowFamilyNodeDescription from './workflow-family-node-description.svelte';
   import WorkflowFamilyNodeTree from './workflow-family-node-tree.svelte';
 
   export let root: RootNode;
   export let namespace: string;
-  export let fullTree = false;
 
-  let expandAll = !fullTree;
+  $: expandAll = !$showFullTree;
   let activeWorkflow: WorkflowExecution | undefined = undefined;
   let openRuns = new Map<number, string>();
 
@@ -24,7 +25,7 @@
   };
 
   const onNodeClick = async (node: RootNode, generation: number) => {
-    if (fullTree) {
+    if ($showFullTree) {
       const newRuns = new Map(openRuns);
       const highestGeneration = Math.max(...Array.from(newRuns.keys()));
 
@@ -67,7 +68,7 @@
       let:zoomLevel
     >
       <div class="flex py-4" slot="controls">
-        {#if fullTree}
+        {#if $showFullTree}
           <ToggleSwitch
             label={translate('common.expand-all')}
             labelPosition="left"
@@ -86,7 +87,6 @@
         {expandAll}
         {openRuns}
         {activeWorkflow}
-        {fullTree}
       />
     </ZoomSvg>
   </div>
@@ -99,7 +99,6 @@
       {onNodeClick}
       {activeWorkflow}
       {openRuns}
-      {fullTree}
     />
   </div>
 </div>

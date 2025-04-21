@@ -1,4 +1,10 @@
+<script context="module" lang="ts">
+  export const showFullTree = writable(true);
+</script>
+
 <script lang="ts">
+  import { writable } from 'svelte/store';
+
   import { page } from '$app/stores';
 
   import Loading from '$lib/holocene/loading.svelte';
@@ -27,32 +33,39 @@
   $: parentRunId = initialWorkflow?.parent?.runId;
 
   $: {
-    if (!initialWorkflow && workflow) initialWorkflow = workflow;
+    if (!initialWorkflow && workflow) {
+      initialWorkflow = workflow;
+    }
   }
+
+  const fetchWorkflowsForTree = async () => {
+    const result = await fetchAllRootWorkflowsCount(
+      namespace,
+      rootWorkflowId,
+      rootRunId,
+    );
+    const count = parseInt(result.count);
+    const overMaxLimit = count > MAX_UPPER_LIMIT;
+    if (overMaxLimit) $showFullTree = false;
+
+    return overMaxLimit
+      ? fetchAllDirectWorkflows({
+          namespace,
+          parentWorkflowId,
+          parentRunId,
+          workflow: initialWorkflow,
+        })
+      : fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId);
+  };
 </script>
 
 <div class="pb-12">
   <div class="flex w-full flex-col justify-center gap-4">
     {#if initialWorkflow}
-      {#await fetchAllRootWorkflowsCount(namespace, rootWorkflowId, rootRunId) then { count }}
-        {@const intCount = parseInt(count)}
-        {#if intCount > MAX_UPPER_LIMIT}
-          {#await fetchAllDirectWorkflows( { namespace, parentWorkflowId, parentRunId, workflow: initialWorkflow }, )}
-            <Loading />
-          {:then root}
-            <WorkflowFamilyTree {root} {namespace} />
-          {:catch}
-            <WorkflowRelationshipsOld />
-          {/await}
-        {:else}
-          {#await fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId)}
-            <Loading />
-          {:then root}
-            <WorkflowFamilyTree fullTree {root} {namespace} />
-          {:catch}
-            <WorkflowRelationshipsOld />
-          {/await}
-        {/if}
+      {#await fetchWorkflowsForTree()}
+        <Loading />
+      {:then root}
+        <WorkflowFamilyTree {root} {namespace} />
       {:catch}
         <WorkflowRelationshipsOld />
       {/await}

@@ -15,7 +15,8 @@
     routeForSchedule,
   } from '$lib/utilities/route-for';
 
-  export let fullTree = false;
+  import { showFullTree } from '../workflow-relationships.svelte';
+
   export let root: RootNode;
   export let width: number;
   export let height: number;
@@ -145,7 +146,6 @@
       {openRuns}
       {onNodeClick}
       {activeWorkflow}
-      {fullTree}
     />
   {/if}
   <line
@@ -213,7 +213,7 @@
         font-weight="500">{child.children.length}</text
       >
     {/if}
-    {#if !fullTree}
+    {#if !$showFullTree}
       <text
         x={!child?.children?.length ? childX : childX + 8}
         y={!child?.children?.length
@@ -226,7 +226,7 @@
       >
     {/if}
   </g>
-  {#if !fullTree && child.siblingCount > 0}
+  {#if !$showFullTree && child.siblingCount > 0}
     <line
       x1={x}
       y1={y}
@@ -380,7 +380,7 @@
     {/if}
     {#if first && previous !== first}
       <line
-        x1={x - 4 * radius}
+        x1={previous ? x - 4 * radius : x}
         y1={y}
         x2={radius}
         y2={y}
@@ -447,11 +447,11 @@
       <text
         {x}
         y={y - 1.25 * radius}
-        class="text-center {fullTree && 'font-mono'}"
+        class="text-center {$showFullTree && 'font-mono'}"
         fill="currentColor"
         text-anchor="middle"
         font-weight="500"
-        >{fullTree ? root.children.length : root.workflow.id}</text
+        >{$showFullTree ? root.children.length : root.workflow.id}</text
       >
     {/if}
   </g>

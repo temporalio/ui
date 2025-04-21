@@ -13,7 +13,6 @@
   export let onNodeClick: (node: RootNode, generation: number) => void;
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
   export let openRuns: Map<number, string>;
-  export let fullTree = false;
 
   $: ({ namespace, workflow, run } = $page.params);
   $: expanded =
@@ -51,7 +50,6 @@
         {isRootWorkflow}
         {isActive}
         children={root.children?.length}
-        {fullTree}
         {expanded}
       />
     </div>
@@ -66,7 +64,6 @@
           {activeWorkflow}
           generation={generation + 1}
           {openRuns}
-          {fullTree}
         />
       {/if}
     </div>

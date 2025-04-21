@@ -9,12 +9,13 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
+  import { showFullTree } from '../workflow-relationships.svelte';
+
   export let workflow: WorkflowExecution;
   export let namespace: string;
   export let isRootWorkflow = false;
   export let isActive = false;
   export let children = 0;
-  export let fullTree = false;
   export let expanded = false;
 
   $: elapsedTime = formatDistanceAbbreviated({
@@ -23,7 +24,7 @@
     includeMilliseconds: true,
   });
 
-  $: showExpandIcon = !isRootWorkflow && fullTree && children;
+  $: showExpandIcon = !isRootWorkflow && $showFullTree && children;
 </script>
 
 <div
@@ -55,7 +56,7 @@
       {workflow.id}
     </Link>
   </div>
-  {#if fullTree}
+  {#if $showFullTree}
     <div class="text-left leading-4 lg:basis-[140px] lg:text-right">
       {#if isRootWorkflow}
         <p class="text-xs">{translate('common.child-count')}</p>
