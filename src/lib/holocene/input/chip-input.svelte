@@ -28,6 +28,7 @@
 
   let className = '';
   export { className as class };
+  export let scrollTo = false;
 
   const handleKeydown = (e: KeyboardEvent) => {
     const value = displayValue.trim();
@@ -82,6 +83,16 @@
     });
     chips = $values;
   };
+
+  const scrollIntoView = (element: HTMLInputElement, _: string[]) => {
+    return {
+      update: () => {
+        if (scrollTo && element === document.activeElement) {
+          element.scrollIntoView({ block: 'nearest', inline: 'start' });
+        }
+      },
+    };
+  };
 </script>
 
 <div
@@ -128,6 +139,7 @@
       on:blur={handleBlur}
       on:keydown|stopPropagation={handleKeydown}
       on:paste={handlePaste}
+      use:scrollIntoView={$values}
       maxlength={maxLength && $values.length >= maxLength ? 0 : undefined}
       size={placeholder.length || undefined}
     />
