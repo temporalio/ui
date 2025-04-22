@@ -5,6 +5,7 @@
 
   import { page } from '$app/stores';
 
+  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -277,6 +278,7 @@
           </div>
         </SchedulesCalendarView>
         <Alert intent="error" title={$error} hidden={!$error} />
+        <CodecServerErrorBanner />
       </form>
     </Card>
   {/if}

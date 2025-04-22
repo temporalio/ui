@@ -110,6 +110,7 @@
           : translate('data-encoder.no-browser-override-description', {
               level: namespaceOrCluster,
             })}
+        subtitle={!$override ? $page?.data?.settings?.codec?.endpoint : ''}
       >
         <RadioGroup name="override" group={override}>
           <RadioInput

@@ -1,29 +1,22 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
-  import Banner from '$lib/holocene/banner/banner.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { dataEncoder } from '$lib/stores/data-encoder';
-  import { lastUsedNamespace } from '$lib/stores/namespaces';
 
-  $: namespace = $page.params?.namespace ?? $lastUsedNamespace;
-  $: pathNameSplit = $page.url.pathname.split('/');
-  $: showNamespaceSpecificNav =
-    namespace &&
-    (pathNameSplit.includes('workflows') ||
-      pathNameSplit.includes('schedules') ||
-      pathNameSplit.includes('batch-operations') ||
-      pathNameSplit.includes('task-queues') ||
-      pathNameSplit.includes('import'));
+  $: message =
+    $dataEncoder.customErrorMessage ||
+    translate('data-encoder.codec-server-error');
+  $: linkUrl =
+    $dataEncoder.customErrorLink ||
+    'https://docs.temporal.io/production-deployment/data-encryption#set-your-codec-server-endpoints';
 </script>
 
-{#if $dataEncoder.hasError && showNamespaceSpecificNav}
-  <Banner
-    message={translate('data-encoder.codec-server-error')}
-    id="transcoder-error"
-    icon="transcoder-error"
-    type="danger"
-  />
-{:else}
-  <slot name="fallback" />
+{#if $dataEncoder.hasError}
+  <Alert intent="error" icon="transcoder-error">
+    <div class="flex items-center gap-2">
+      <p>{message}</p>
+      <Link href={linkUrl} newTab>{linkUrl}</Link>
+    </div>
+  </Alert>
 {/if}

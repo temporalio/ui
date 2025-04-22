@@ -54,6 +54,8 @@ codec:
   endpoint: {{ default .Env.TEMPORAL_CODEC_ENDPOINT "" }}
   passAccessToken: {{ default .Env.TEMPORAL_CODEC_PASS_ACCESS_TOKEN "false" }}
   includeCredentials: {{ default .Env.TEMPORAL_CODEC_INCLUDE_CREDENTIALS "false" }}
+  defaultErrorMessage: {{ default .Env.TEMPORAL_CODEC_DEFAULT_ERROR_MESSAGE "" }}
+  defaultErrorLink: {{ default .Env.TEMPORAL_CODEC_DEFAULT_ERROR_LINK "" }}
 
 forwardHeaders: {{ if .Env.TEMPORAL_FORWARD_HEADERS }} {{ range $seed := (split .Env.TEMPORAL_FORWARD_HEADERS ",") }}
   - {{ . }} {{ end }} {{ end }}

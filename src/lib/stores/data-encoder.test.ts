@@ -29,6 +29,8 @@ describe('dataEncoder', () => {
       settingsEndpoint: '',
       settingsIncludeCredentials: false,
       settingsPassAccessToken: false,
+      customErrorLink: '',
+      customErrorMessage: '',
     });
   });
 
@@ -44,6 +46,8 @@ describe('dataEncoder', () => {
       settingsEndpoint: '',
       settingsIncludeCredentials: false,
       settingsPassAccessToken: false,
+      customErrorLink: '',
+      customErrorMessage: '',
     });
   });
 
@@ -59,6 +63,8 @@ describe('dataEncoder', () => {
       settingsEndpoint: '',
       settingsIncludeCredentials: false,
       settingsPassAccessToken: false,
+      customErrorLink: '',
+      customErrorMessage: '',
     });
   });
 
@@ -74,6 +80,8 @@ describe('dataEncoder', () => {
       settingsEndpoint: '',
       settingsIncludeCredentials: false,
       settingsPassAccessToken: false,
+      customErrorLink: '',
+      customErrorMessage: '',
     });
   });
 });

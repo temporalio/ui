@@ -3,13 +3,11 @@
   import { page, updated } from '$app/stores';
 
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
-  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
-  import Banner from '$lib/holocene/banner/banner.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
@@ -249,15 +247,6 @@
       </svelte:fragment>
       <UserMenu {logout} />
     </TopNavigation>
-    <CodecServerErrorBanner>
-      <Banner
-        id="settings-banner-text"
-        message={$page.data.settings?.bannerText}
-        dismissable
-        dismissLabel={translate('common.close')}
-        slot="fallback"
-      />
-    </CodecServerErrorBanner>
     <div
       slot="main"
       class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
