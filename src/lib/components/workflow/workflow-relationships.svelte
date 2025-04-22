@@ -46,7 +46,11 @@
     );
     const count = parseInt(result.count);
     const overMaxLimit = count > MAX_UPPER_LIMIT;
-    if (overMaxLimit) $showFullTree = false;
+    if (overMaxLimit) {
+      $showFullTree = false;
+    } else {
+      $showFullTree = true;
+    }
 
     return overMaxLimit
       ? fetchAllDirectWorkflows({
