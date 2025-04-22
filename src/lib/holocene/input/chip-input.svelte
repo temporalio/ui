@@ -22,15 +22,9 @@
 
   const values = writable<string[]>(chips);
   let displayValue = '';
-  let inputContainer: HTMLDivElement;
-  let input: HTMLInputElement;
 
   $: chips, ($values = chips);
   $: invalid = $values.some((chip) => !validator(chip));
-
-  values.subscribe((updatedChips) => {
-    chips = updatedChips;
-  });
 
   let className = '';
   export { className as class };
@@ -40,6 +34,7 @@
     if ((e.key === ',' || e.key === 'Enter') && value !== '') {
       e.preventDefault();
       values.update((previous) => [...previous, value]);
+      chips = $values;
       displayValue = '';
     }
 
@@ -51,6 +46,7 @@
       $values.length > 0
     ) {
       values.update((previous) => previous.slice(0, -1));
+      chips = $values;
     }
   };
 
@@ -67,12 +63,14 @@
     }
 
     values.update((previous) => [...previous, ...newValues]);
+    chips = $values;
   };
 
   const handleBlur = () => {
     const value = displayValue.trim();
     if (value !== '') {
       values.update((previous) => [...previous, value]);
+      chips = $values;
       displayValue = '';
     }
   };
@@ -82,6 +80,7 @@
       previous.splice(index, 1);
       return previous;
     });
+    chips = $values;
   };
 </script>
 
@@ -94,9 +93,8 @@
 >
   <Label {required} {label} {disabled} hidden={labelHidden} for={id} />
   <div
-    bind:this={inputContainer}
     class={merge(
-      'surface-primary flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll border border-subtle p-2 text-sm text-primary focus-within:border-interactive focus-within:ring-2 focus-within:ring-primary/70',
+      'surface-primary flex min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll border border-subtle p-2 text-sm text-primary focus-within:border-interactive focus-within:ring-2 focus-within:ring-primary/70',
       disabled && 'cursor-not-allowed opacity-65',
       invalid && 'invalid',
     )}
@@ -126,7 +124,6 @@
       {required}
       multiple
       data-testid={id}
-      bind:this={input}
       bind:value={displayValue}
       on:blur={handleBlur}
       on:keydown|stopPropagation={handleKeydown}
