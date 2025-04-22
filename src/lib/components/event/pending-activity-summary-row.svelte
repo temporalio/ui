@@ -22,7 +22,7 @@
   $: expanded = expandAll;
   $: ({ workflow, run, namespace } = $page.params);
   $: href = routeForEventHistoryEvent({
-    eventId: event.activityId,
+    eventId: group?.id,
     namespace,
     workflow,
     run,
@@ -43,9 +43,13 @@
   on:click|stopPropagation={onLinkClick}
 >
   <td class="font-mono">
-    <Link data-testid="link" {href}>
-      {event.activityId}
-    </Link>
+    {#if group?.id}
+      <Link data-testid="link" {href}>
+        {group.id}
+      </Link>
+    {:else}
+      {event.id}
+    {/if}
   </td>
   <td class="w-full overflow-hidden text-right font-normal xl:text-left">
     <div class="flex w-full items-center gap-2">
