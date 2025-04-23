@@ -123,8 +123,6 @@
       <slot name="leading" slot="leading">
         {#if leadingIcon}
           <Icon name={leadingIcon} />
-        {:else if loading}
-          <Icon name="spinner" class="animate-spin" />
         {/if}
       </slot>
       <input
@@ -139,6 +137,8 @@
       />
       {#if disabled}
         <Icon slot="trailing" name="lock" />
+      {:else if loading}
+        <Icon name="spinner" class="animate-spin" />
       {/if}
     </MenuButton>
   {/key}
