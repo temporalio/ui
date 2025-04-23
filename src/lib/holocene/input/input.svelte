@@ -18,6 +18,7 @@
     labelHidden?: boolean;
     icon?: IconName;
     suffix?: string;
+    prefix?: string;
     valid?: boolean;
     hintText?: string;
     maxLength?: number;
@@ -49,6 +50,7 @@
   export let icon: IconName = null;
   export let placeholder = '';
   export let suffix = '';
+  export let prefix = '';
   export let name = id;
   export let copyable = false;
   export let disabled = false;
@@ -103,6 +105,8 @@
         <span class="icon-container">
           <Icon name={icon} />
         </span>
+      {:else if prefix}
+        <p class="prefix">{prefix}</p>
       {/if}
       <input
         class="input"
@@ -199,6 +203,10 @@
 
   .input {
     @apply m-2 w-full bg-transparent placeholder:text-secondary focus:outline-none;
+  }
+
+  .prefix {
+    @apply block h-full w-fit border-r border-subtle px-4 py-2;
   }
 
   .suffix {
