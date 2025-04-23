@@ -23,10 +23,10 @@
     variants: {
       position: {
         'top-left': 'top-16 left-5',
-        'top-center': 'top-16 left-1/2 -translate-x-1/2',
+        'top-center': 'top-16 left-1/2 -translate-x-1/2 items-center',
         'top-right': 'top-16 right-5',
         'bottom-left': 'bottom-5 left-5',
-        'bottom-center': 'bottom-5 left-1/2 -translate-x-1/2',
+        'bottom-center': 'bottom-5 left-1/2 -translate-x-1/2 items-center',
         'bottom-right': 'bottom-5 right-5',
       },
     },
