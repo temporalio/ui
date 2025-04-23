@@ -1,17 +1,23 @@
-import { writable, type Writable } from 'svelte/store';
+import { get, writable, type Writable } from 'svelte/store';
 
 import { v4 } from 'uuid';
 
-import type { Toast } from '$lib/types/holocene';
+import type { Toast, ToastPosition } from '$lib/types/holocene';
 
 const toasts = writable<Toast[]>([]);
-
+const toastPosition = writable<ToastPosition>('bottom-right');
 export interface Toaster extends Writable<Toast[]> {
   push: (toast: Toast) => void;
   pop: (id: string) => void;
   clear: () => void;
   toasts: Writable<Toast[]>;
+  setPosition: (newPosition: ToastPosition) => void;
+  position: Writable<ToastPosition>;
 }
+
+const setPosition = (position: ToastPosition): void => {
+  toastPosition.set(position);
+};
 
 const push = (toast: Toast) => {
   const toastWithDefaults: Toast = {
@@ -23,6 +29,9 @@ const push = (toast: Toast) => {
   toasts.update((ts) => [...ts, toastWithDefaults]);
   const timeoutId = setTimeout(() => {
     pop(toastWithDefaults.id);
+    if (get(toasts).length === 0) {
+      setPosition('bottom-right');
+    }
     clearTimeout(timeoutId);
   }, toastWithDefaults.duration);
 };
@@ -43,4 +52,6 @@ export const toaster: Toaster = {
   set: toasts.set,
   subscribe: toasts.subscribe,
   update: toasts.update,
+  setPosition,
+  position: toastPosition,
 };

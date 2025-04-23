@@ -233,6 +233,7 @@
     closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
     toasts={toaster.toasts}
+    position={toaster.position}
   />
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
     <SideNavigation {linkList} {isCloud} />
