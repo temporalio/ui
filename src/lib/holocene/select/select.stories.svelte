@@ -53,6 +53,8 @@
 
 <Story name="Disabled" args={{ disabled: true }} />
 
+<Story name="Loading" args={{ loading: true }} />
+
 <Story
   name="Disabled with Icon"
   args={{ disabled: true, leadingIcon: 'regions' }}
