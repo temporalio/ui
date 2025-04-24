@@ -93,6 +93,8 @@
 
 <Story name="With Suffix" args={{ suffix: 'suffix' }} />
 
+<Story name="With Prefix" args={{ prefix: 'prefix' }} />
+
 <Story name="With Hint Text" args={{ hintText: 'Hint Text' }} />
 
 <Story

@@ -41,6 +41,7 @@
     value?: T;
     placeholder?: string;
     disabled?: boolean;
+    loading?: boolean;
     leadingIcon?: IconName;
     onChange?: (value: T) => void;
     'data-testid'?: string;
@@ -57,6 +58,7 @@
   export let value: T = undefined;
   export let placeholder = '';
   export let disabled = false;
+  export let loading = false;
   export let leadingIcon: IconName = null;
   export let onChange: (value: T) => void = () => {};
   export let menuClass: string | undefined = undefined;
@@ -113,7 +115,7 @@
     <MenuButton
       class={twMerge('w-full', !valid ? 'border-danger' : undefined)}
       hasIndicator={!disabled}
-      {disabled}
+      disabled={disabled || loading}
       controls="{id}-select"
       {variant}
       data-testid={`${$$restProps['data-testid'] ?? ''}-button`}
@@ -135,6 +137,8 @@
       />
       {#if disabled}
         <Icon slot="trailing" name="lock" />
+      {:else if loading}
+        <Icon name="spinner" class="animate-spin" />
       {/if}
     </MenuButton>
   {/key}
