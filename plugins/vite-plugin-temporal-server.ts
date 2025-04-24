@@ -16,7 +16,9 @@ const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.VITEST) return true;
   if (temporal) return true;
   if (process.platform === 'win32') return true;
-  if (!['temporal-server', 'ui-server'].includes(server.config.mode))
+  if (
+    !['temporal-server', 'ui-server', 'with-auth'].includes(server.config.mode)
+  )
     return true;
 
   return false;
