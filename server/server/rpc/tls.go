@@ -34,6 +34,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/temporalio/ui-server/v2/server/config"
@@ -51,63 +52,123 @@ type HttpGetter interface {
 	Get(url string) (resp *http.Response, err error)
 }
 
-func CreateTLSConfig(address string, cfg *config.TLS) (*tls.Config, error) {
-	var host string
-	var cert *tls.Certificate
-	var caPool *x509.CertPool
+type certLoader struct {
+	CertFile    string
+	KeyFile     string
+	cachedCert  *tls.Certificate
+	lastModTime time.Time
+	lock        sync.RWMutex
+}
 
-	err := validateTLS(cfg)
+func (l *certLoader) GetClientCertificate(_ *tls.CertificateRequestInfo) (*tls.Certificate, error) {
+	stat, err := os.Stat(l.KeyFile)
+	if err != nil {
+		l.lock.RLock()
+		existingCert := l.cachedCert
+		l.lock.RUnlock()
+
+		if existingCert == nil {
+			return nil, fmt.Errorf("statting tls key file: %w", err)
+		}
+
+		log.Printf("unable to stat tls key file, returning cached cert which may expire: %s", err)
+		return existingCert, nil
+	}
+
+	l.lock.RLock()
+	if existingCert := l.cachedCert; existingCert != nil && stat.ModTime().Equal(l.lastModTime) {
+		l.lock.RUnlock()
+		log.Printf("tls cert unchanged on disk; returning cached cert")
+		return existingCert, nil
+	}
+	l.lock.RUnlock()
+
+	// If the cert file and key file don't match, tls.LoadX509KeyPair will
+	// return an error. This will protect us from a race condition where the key
+	// file has been written but the cert file has not yet. We'll log the error
+	// but keep returning the previous cert until loading the new cert succeeds.
+	cert, err := tls.LoadX509KeyPair(l.CertFile, l.KeyFile)
+
+	l.lock.Lock()
+	defer l.lock.Unlock()
+	if err != nil {
+		log.Printf("unable to load tls key pair, returning cached cert which may expire: %s", err)
+		return l.cachedCert, nil
+	}
+	log.Printf("loaded new tls key pair")
+
+	l.cachedCert = &cert
+	l.lastModTime = stat.ModTime()
+
+	return l.cachedCert, nil
+}
+
+func CreateTLSConfig(address string, cfg *config.TLS) (*tls.Config, error) {
+	err := validateTLSConfig(cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	if cfg.CaFile != "" || cfg.CaData != "" {
+	var tlsConfig *tls.Config
+
+	// If we are given a server name, set the TLS server name for DNS resolution
+	if cfg.ServerName != "" {
+		host := cfg.ServerName
+		tlsConfig = NewTLSConfigForServer(host, cfg.EnableHostVerification)
+	}
+
+	configureCertPool := cfg.CaFile != "" || cfg.CaData != ""
+
+	// validateTLSConfig above ensures these two cases are mutually exclusive
+	configureKeyPairFromFile := cfg.CertFile != "" || cfg.KeyFile != ""
+	configureKeyPairFromBytes := cfg.CertData != "" || cfg.KeyData != ""
+
+	if !configureCertPool && !configureKeyPairFromFile && !configureKeyPairFromBytes {
+		return tlsConfig, nil
+	}
+
+	// Initialize tls.Config with address in case server name is not in configuration
+	if tlsConfig == nil {
+		hostPort := address
+		if hostPort == "" {
+			hostPort = localHostPort
+		}
+		// Ignoring error as we'll fail to dial anyway, and that will produce a meaningful error
+		host, _, _ := net.SplitHostPort(hostPort)
+		tlsConfig = NewTLSConfigForServer(host, cfg.EnableHostVerification)
+	}
+
+	if configureCertPool {
 		caCertPool, err := loadCACert(cfg)
 		if err != nil {
 			log.Fatalf("Unable to load server CA certificate")
 			return nil, err
 		}
-
-		caPool = caCertPool
+		tlsConfig.RootCAs = caCertPool
 	}
-	if cfg.CertFile != "" || cfg.CertData != "" {
+
+	if configureKeyPairFromFile {
+		// Configure server to reload client cert from file if it changes on
+		// disk.
+		certLoader := &certLoader{
+			CertFile: cfg.CertFile,
+			KeyFile:  cfg.KeyFile,
+			lock:     sync.RWMutex{},
+		}
+		tlsConfig.GetClientCertificate = certLoader.GetClientCertificate
+	}
+
+	if configureKeyPairFromBytes {
+		// Load key pair from provided bytes.
 		keyPair, err := loadKeyPair(cfg)
 		if err != nil {
 			log.Fatalf("Unable to load client certificate")
 			return nil, err
 		}
-		cert = &keyPair
-	}
-	// If we are given arguments to verify either server or client, configure TLS
-	if caPool != nil || cert != nil {
-		if cfg.ServerName != "" {
-			host = cfg.ServerName
-		} else {
-			hostPort := address
-			if hostPort == "" {
-				hostPort = localHostPort
-			}
-			// Ignoring error as we'll fail to dial anyway, and that will produce a meaningful error
-			host, _, _ = net.SplitHostPort(hostPort)
-		}
-		tlsConfig := NewTLSConfigForServer(host, cfg.EnableHostVerification)
-		if caPool != nil {
-			tlsConfig.RootCAs = caPool
-		}
-		if cert != nil {
-			tlsConfig.Certificates = []tls.Certificate{*cert}
-		}
-
-		return tlsConfig, nil
-	}
-	// If we are given a server name, set the TLS server name for DNS resolution
-	if cfg.ServerName != "" {
-		host = cfg.ServerName
-		tlsConfig := NewTLSConfigForServer(host, cfg.EnableHostVerification)
-		return tlsConfig, nil
+		tlsConfig.Certificates = []tls.Certificate{keyPair}
 	}
 
-	return nil, nil
+	return tlsConfig, nil
 }
 
 func loadCACert(cfg *config.TLS) (caPool *x509.CertPool, err error) {
@@ -158,33 +219,17 @@ func loadKeyPair(cfg *config.TLS) (tls.Certificate, error) {
 	var keyBytes []byte
 	var err error
 
-	if cfg.KeyFile != "" {
-		keyBytes, err = os.ReadFile(cfg.KeyFile)
-		if err != nil {
-			return tls.Certificate{}, fmt.Errorf("unable to load TLS key from file: %v", err)
-		}
-		log.Printf("Loaded TLS key from file %v", cfg.KeyFile)
-	} else if cfg.KeyData != "" {
-		keyBytes, err = base64.StdEncoding.DecodeString(cfg.KeyData)
-		if err != nil {
-			return tls.Certificate{}, fmt.Errorf("unable to decode TLS key from base64: %w", err)
-		}
-		log.Printf("Loaded TLS key from base64")
+	keyBytes, err = base64.StdEncoding.DecodeString(cfg.KeyData)
+	if err != nil {
+		return tls.Certificate{}, fmt.Errorf("unable to decode TLS key from base64: %w", err)
 	}
+	log.Printf("Loaded TLS key from base64")
 
-	if cfg.CertFile != "" {
-		certBytes, err = os.ReadFile(cfg.CertFile)
-		if err != nil {
-			return tls.Certificate{}, fmt.Errorf("unable to load TLS cert from file: %v", err)
-		}
-		log.Printf("Loaded TLS cert from file %v", cfg.CertFile)
-	} else if cfg.CertData != "" {
-		certBytes, err = base64.StdEncoding.DecodeString(cfg.CertData)
-		if err != nil {
-			return tls.Certificate{}, fmt.Errorf("unable to decode TLS cert from base64: %w", err)
-		}
-		log.Printf("Loaded TLS cert from base64")
+	certBytes, err = base64.StdEncoding.DecodeString(cfg.CertData)
+	if err != nil {
+		return tls.Certificate{}, fmt.Errorf("unable to decode TLS cert from base64: %w", err)
 	}
+	log.Printf("Loaded TLS cert from base64")
 
 	keyPair, err := tls.X509KeyPair(certBytes, keyBytes)
 	if err != nil {
@@ -213,7 +258,7 @@ func NewTLSConfigForServer(
 	return c
 }
 
-func validateTLS(cfg *config.TLS) error {
+func validateTLSConfig(cfg *config.TLS) error {
 	if cfg.CertFile != "" && cfg.CertData != "" {
 		return fmt.Errorf("cannot specify TLS cert file and cert data at the same time")
 	}
