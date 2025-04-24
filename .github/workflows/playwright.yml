@@ -53,9 +53,9 @@ jobs:
           cache: true
           check-latest: true
       - name: Set up Protoc
-        uses: arduino/setup-protoc@v1
+        uses: arduino/setup-protoc@v3
         with:
-          version: '3.x'
+          version: '30.x'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build UI Server
         working-directory: server
