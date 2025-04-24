@@ -28,7 +28,7 @@ export async function createOidcProviderServer(
       client_id: 'temporal-ui',
       client_secret: 'temporal-secret',
       grant_types: ['authorization_code'],
-      redirect_uris: ['http://localhost:3000/auth/callback'],
+      redirect_uris: ['http://localhost:8081/auth/sso/callback'],
       response_types: ['code'],
       token_endpoint_auth_method: 'client_secret_basic',
     },
