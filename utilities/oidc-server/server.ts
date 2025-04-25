@@ -1,5 +1,4 @@
 import type { Server as HttpServer } from 'http';
-import { format } from 'node:url';
 
 import express, { type Application } from 'express';
 import helmet, { contentSecurityPolicy } from 'helmet';
@@ -107,30 +106,6 @@ export default class OIDCServer {
       this.configureProvider();
       this.configureRoutes();
 
-      const prod = process.env.NODE_ENV === 'production';
-      if (prod) {
-        this.app.enable('trust proxy');
-        this.provider.proxy = true;
-        this.app.use((req, res, next) => {
-          if (req.secure) {
-            return next();
-          }
-          if (['GET', 'HEAD'].includes(req.method)) {
-            return res.redirect(
-              format({
-                protocol: 'https',
-                host: req.get('host') || '',
-                pathname: req.originalUrl,
-              }),
-            );
-          }
-          res.status(400).json({
-            error: 'invalid_request',
-            error_description: 'please use https',
-          });
-        });
-      }
-
       this.server = this.app.listen(this.port, () => {
         // eslint-disable-next-line no-console
         console.log(
@@ -150,6 +125,7 @@ export default class OIDCServer {
    */
   public stop(): void {
     if (this.server?.listening) {
+      console.log('Stopping OIDC Server...');
       this.server.close();
     }
   }

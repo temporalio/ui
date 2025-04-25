@@ -89,7 +89,7 @@ export default class Account {
   /**
    * Finds an account by its accountId.
    */
-  public static async findAccount(id: string): Promise<Account> {
+  public static async findAccount(ctx: unknown, id: string): Promise<Account> {
     if (!Account.store.has(id)) {
       new Account(id);
     }

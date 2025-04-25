@@ -3,7 +3,14 @@
  */
 const configuration: Record<string, unknown> = {
   clients: [
-    // dynamic clients go here
+    {
+      client_id: 'temporal-ui',
+      client_secret: 'temporal-secret',
+      grant_types: ['authorization_code'],
+      redirect_uris: ['http://localhost:8081/auth/sso/callback'],
+      response_types: ['code'],
+      token_endpoint_auth_method: 'client_secret_basic',
+    },
   ],
   interactions: {
     url(_ctx: unknown, interaction: { uid: string }): string {

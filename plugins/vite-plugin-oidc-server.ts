@@ -2,7 +2,7 @@ import type { Plugin } from 'vite';
 import type { ViteDevServer } from 'vite';
 import waitForPort from 'wait-port';
 
-import { ISSUER, PORT, VIEWS_PATH } from '../utilities/oidc-server/config';
+import { getConfig } from '../utilities/oidc-server/config';
 import routes from '../utilities/oidc-server/routes/express';
 import OIDCServer from '../utilities/oidc-server/server';
 import Account from '../utilities/oidc-server/support/account';
@@ -26,12 +26,16 @@ const shouldSkip = (server: ViteDevServer): boolean => {
  * Vite plugin to manage the lifecycle of the OIDC server during dev.
  */
 export function oidcServerPlugin(): Plugin {
+  const { PORT, ISSUER, VIEWS_PATH } = getConfig();
+
   return {
     name: 'vite-plugin-oidc-server',
     enforce: 'post',
     apply: 'serve',
     async configureServer(server) {
       if (shouldSkip(server)) return;
+
+      console.log(server.config.env);
 
       console.log(`Starting OIDC Server on port ${PORT}…`);
       oidcServer = new OIDCServer({

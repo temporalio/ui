@@ -1,12 +1,13 @@
 #!/usr/bin/env ts-node
-import { ISSUER, PORT, VIEWS_PATH } from './config';
+import { getConfig } from './config';
 import routes from './routes/express';
 import OIDCServer from './server';
 import Account from './support/account';
 import providerConfiguration from './support/configuration';
 
 (async () => {
-  // Use port 0 to pick an available port
+  const { PORT, ISSUER, VIEWS_PATH } = getConfig();
+
   const server = new OIDCServer({
     issuer: ISSUER,
     port: PORT,
@@ -15,6 +16,7 @@ import providerConfiguration from './support/configuration';
     accountModel: Account,
     routes,
   });
+
   try {
     await server.start();
     console.log('✅ Server started successfully');
