@@ -433,9 +433,6 @@ devDependencies:
   tslib:
     specifier: ^2.4.1
     version: 2.8.1
-  tsx:
-    specifier: 3.12.7
-    version: 3.12.7
   typescript:
     specifier: ^5.2.2
     version: 5.8.3
@@ -444,13 +441,13 @@ devDependencies:
     version: 5.0.0
   vite:
     specifier: ^6.2.4
-    version: 6.3.3(@types/node@18.19.87)(tsx@3.12.7)
+    version: 6.3.3(@types/node@18.19.87)
   vite-node:
     specifier: ^3.1.1
-    version: 3.1.2(@types/node@18.19.87)(tsx@3.12.7)
+    version: 3.1.2(@types/node@18.19.87)
   vitest:
     specifier: ^3.1.1
-    version: 3.1.2(@types/node@18.19.87)(@vitest/ui@3.1.2)(jsdom@20.0.3)(tsx@3.12.7)
+    version: 3.1.2(@types/node@18.19.87)(@vitest/ui@3.1.2)(jsdom@20.0.3)
   vitest-localstorage-mock:
     specifier: ^0.1.2
     version: 0.1.2(vitest@3.1.2)
@@ -1043,30 +1040,6 @@ packages:
       postcss-selector-parser: ^6.0.13
     dependencies:
       postcss-selector-parser: 6.1.2
-    dev: true
-
-  /@esbuild-kit/cjs-loader@2.4.4:
-    resolution: {integrity: sha512-NfsJX4PdzhwSkfJukczyUiZGc7zNNWZcEAyqeISpDnn0PTfzMJR1aR8xAIPskBejIxBJbIgCCMzbaYa9SXepIg==}
-    deprecated: 'Merged into tsx: https://tsx.is'
-    dependencies:
-      '@esbuild-kit/core-utils': 3.3.2
-      get-tsconfig: 4.10.0
-    dev: true
-
-  /@esbuild-kit/core-utils@3.3.2:
-    resolution: {integrity: sha512-sPRAnw9CdSsRmEtnsl2WXWdyquogVpB3yZ3dgwJfe8zrOzTsV7cJvmwrKVa+0ma5BoiGJ+BoqkMvawbayKUsqQ==}
-    deprecated: 'Merged into tsx: https://tsx.is'
-    dependencies:
-      esbuild: 0.18.20
-      source-map-support: 0.5.21
-    dev: true
-
-  /@esbuild-kit/esm-loader@2.6.5:
-    resolution: {integrity: sha512-FxEMIkJKnodyA1OaCUoEvbYRkoZlLZ4d/eXFu9Fh8CbBBgP5EmZxrfTRyN0qpXZ4vOvqnE5YdRdcrmUUXuU+dA==}
-    deprecated: 'Merged into tsx: https://tsx.is'
-    dependencies:
-      '@esbuild-kit/core-utils': 3.3.2
-      get-tsconfig: 4.10.0
     dev: true
 
   /@esbuild/aix-ppc64@0.19.12:
@@ -2628,7 +2601,7 @@ packages:
       storybook: 8.6.12(prettier@3.5.3)
       svelte: 5.28.2
       svelte-ast-print: 0.4.2(svelte@5.28.2)
-      vite: 6.3.3(@types/node@18.19.87)(tsx@3.12.7)
+      vite: 6.3.3(@types/node@18.19.87)
       zimmerframe: 1.1.2
     transitivePeerDependencies:
       - babel-plugin-macros
@@ -2689,7 +2662,7 @@ packages:
       browser-assert: 1.2.1
       storybook: 8.6.12(prettier@3.5.3)
       ts-dedent: 2.2.0
-      vite: 6.3.3(@types/node@18.19.87)(tsx@3.12.7)
+      vite: 6.3.3(@types/node@18.19.87)
     dev: true
 
   /@storybook/components@8.6.12(storybook@8.6.12):
@@ -2825,7 +2798,7 @@ packages:
       sveltedoc-parser: 4.2.1
       ts-dedent: 2.2.0
       typescript: 5.8.3
-      vite: 6.3.3(@types/node@18.19.87)(tsx@3.12.7)
+      vite: 6.3.3(@types/node@18.19.87)
     transitivePeerDependencies:
       - '@babel/core'
       - coffeescript
@@ -2875,7 +2848,7 @@ packages:
       '@storybook/svelte-vite': 8.6.12(@babel/core@7.26.10)(@sveltejs/vite-plugin-svelte@5.0.3)(postcss-load-config@3.1.4)(postcss@8.5.3)(storybook@8.6.12)(svelte@5.28.2)(vite@6.3.3)
       storybook: 8.6.12(prettier@3.5.3)
       svelte: 5.28.2
-      vite: 6.3.3(@types/node@18.19.87)(tsx@3.12.7)
+      vite: 6.3.3(@types/node@18.19.87)
     transitivePeerDependencies:
       - '@babel/core'
       - '@sveltejs/vite-plugin-svelte'
@@ -2999,7 +2972,7 @@ packages:
       set-cookie-parser: 2.7.1
       sirv: 3.0.1
       svelte: 5.28.2
-      vite: 6.3.3(@types/node@18.19.87)(tsx@3.12.7)
+      vite: 6.3.3(@types/node@18.19.87)
     dev: true
 
   /@sveltejs/package@2.3.11(svelte@5.28.2)(typescript@5.8.3):
@@ -3034,7 +3007,7 @@ packages:
       '@sveltejs/vite-plugin-svelte': 5.0.3(svelte@5.28.2)(vite@6.3.3)
       debug: 4.4.0
       svelte: 5.28.2
-      vite: 6.3.3(@types/node@18.19.87)(tsx@3.12.7)
+      vite: 6.3.3(@types/node@18.19.87)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3052,7 +3025,7 @@ packages:
       kleur: 4.1.5
       magic-string: 0.30.17
       svelte: 5.28.2
-      vite: 6.3.3(@types/node@18.19.87)(tsx@3.12.7)
+      vite: 6.3.3(@types/node@18.19.87)
       vitefu: 1.0.6(vite@6.3.3)
     transitivePeerDependencies:
       - supports-color
@@ -3904,7 +3877,7 @@ packages:
       std-env: 3.9.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.1.2(@types/node@18.19.87)(@vitest/ui@3.1.2)(jsdom@20.0.3)(tsx@3.12.7)
+      vitest: 3.1.2(@types/node@18.19.87)(@vitest/ui@3.1.2)(jsdom@20.0.3)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3941,7 +3914,7 @@ packages:
       '@vitest/spy': 3.1.2
       estree-walker: 3.0.3
       magic-string: 0.30.17
-      vite: 6.3.3(@types/node@18.19.87)(tsx@3.12.7)
+      vite: 6.3.3(@types/node@18.19.87)
     dev: true
 
   /@vitest/pretty-format@2.0.5:
@@ -4001,7 +3974,7 @@ packages:
       sirv: 3.0.1
       tinyglobby: 0.2.13
       tinyrainbow: 2.0.0
-      vitest: 3.1.2(@types/node@18.19.87)(@vitest/ui@3.1.2)(jsdom@20.0.3)(tsx@3.12.7)
+      vitest: 3.1.2(@types/node@18.19.87)(@vitest/ui@3.1.2)(jsdom@20.0.3)
     dev: true
 
   /@vitest/utils@2.0.5:
@@ -6342,8 +6315,8 @@ packages:
     dependencies:
       '@typescript-eslint/utils': 6.21.0(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
-      vite: 6.3.3(@types/node@18.19.87)(tsx@3.12.7)
-      vitest: 3.1.2(@types/node@18.19.87)(@vitest/ui@3.1.2)(jsdom@20.0.3)(tsx@3.12.7)
+      vite: 6.3.3(@types/node@18.19.87)
+      vitest: 3.1.2(@types/node@18.19.87)(@vitest/ui@3.1.2)(jsdom@20.0.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -6488,7 +6461,7 @@ packages:
     resolution: {integrity: sha512-6slSBEV1lMKcX13DBifvnDFpNno5WXhw4j/ff7RI0y51BZiDqEe5dNhhjhIQ3iCOQuzsm2MbVzmwqbN78BBhPg==}
     hasBin: true
     dependencies:
-      tsx: 3.12.7
+      tsx: 3.14.0
     dev: true
 
   /espree@9.2.0:
@@ -12956,13 +12929,13 @@ packages:
       typescript: 5.8.3
     dev: true
 
-  /tsx@3.12.7:
-    resolution: {integrity: sha512-C2Ip+jPmqKd1GWVQDvz/Eyc6QJbGfE7NrR3fx5BpEHMZsEHoIxHL1j+lKdGobr8ovEyqeNkPLSKp6SCSOt7gmw==}
+  /tsx@3.14.0:
+    resolution: {integrity: sha512-xHtFaKtHxM9LOklMmJdI3BEnQq/D5F73Of2E1GDrITi9sgoVkvIsrQUTY1G8FlmGtA+awCI4EBlTRRYxkL2sRg==}
     hasBin: true
     dependencies:
-      '@esbuild-kit/cjs-loader': 2.4.4
-      '@esbuild-kit/core-utils': 3.3.2
-      '@esbuild-kit/esm-loader': 2.6.5
+      esbuild: 0.18.20
+      get-tsconfig: 4.10.0
+      source-map-support: 0.5.21
     optionalDependencies:
       fsevents: 2.3.3
     dev: true
@@ -13324,7 +13297,7 @@ packages:
       vfile-message: 4.0.2
     dev: false
 
-  /vite-node@3.1.2(@types/node@18.19.87)(tsx@3.12.7):
+  /vite-node@3.1.2(@types/node@18.19.87):
     resolution: {integrity: sha512-/8iMryv46J3aK13iUXsei5G/A3CUlW4665THCPS+K8xAaqrVWiGB4RfXMQXCLjpK9P2eK//BczrVkn5JLAk6DA==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
@@ -13333,7 +13306,7 @@ packages:
       debug: 4.4.0
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 6.3.3(@types/node@18.19.87)(tsx@3.12.7)
+      vite: 6.3.3(@types/node@18.19.87)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -13349,7 +13322,7 @@ packages:
       - yaml
     dev: true
 
-  /vite@6.3.3(@types/node@18.19.87)(tsx@3.12.7):
+  /vite@6.3.3(@types/node@18.19.87):
     resolution: {integrity: sha512-5nXH+QsELbFKhsEfWLkHrvgRpTdGJzqOZ+utSdmPTvwHmvU6ITTm3xx+mRusihkcI8GeC7lCDyn3kDtiki9scw==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
@@ -13396,7 +13369,6 @@ packages:
       postcss: 8.5.3
       rollup: 4.40.0
       tinyglobby: 0.2.13
-      tsx: 3.12.7
     optionalDependencies:
       fsevents: 2.3.3
     dev: true
@@ -13409,7 +13381,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 6.3.3(@types/node@18.19.87)(tsx@3.12.7)
+      vite: 6.3.3(@types/node@18.19.87)
     dev: true
 
   /vitest-localstorage-mock@0.1.2(vitest@3.1.2):
@@ -13417,10 +13389,10 @@ packages:
     peerDependencies:
       vitest: '*'
     dependencies:
-      vitest: 3.1.2(@types/node@18.19.87)(@vitest/ui@3.1.2)(jsdom@20.0.3)(tsx@3.12.7)
+      vitest: 3.1.2(@types/node@18.19.87)(@vitest/ui@3.1.2)(jsdom@20.0.3)
     dev: true
 
-  /vitest@3.1.2(@types/node@18.19.87)(@vitest/ui@3.1.2)(jsdom@20.0.3)(tsx@3.12.7):
+  /vitest@3.1.2(@types/node@18.19.87)(@vitest/ui@3.1.2)(jsdom@20.0.3):
     resolution: {integrity: sha512-WaxpJe092ID1C0mr+LH9MmNrhfzi8I65EX/NRU/Ld016KqQNRgxSOlGNP1hHN+a/F8L15Mh8klwaF77zR3GeDQ==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
@@ -13469,8 +13441,8 @@ packages:
       tinyglobby: 0.2.13
       tinypool: 1.0.2
       tinyrainbow: 2.0.0
-      vite: 6.3.3(@types/node@18.19.87)(tsx@3.12.7)
-      vite-node: 3.1.2(@types/node@18.19.87)(tsx@3.12.7)
+      vite: 6.3.3(@types/node@18.19.87)
+      vite-node: 3.1.2(@types/node@18.19.87)
       why-is-node-running: 2.3.0
     transitivePeerDependencies:
       - jiti
