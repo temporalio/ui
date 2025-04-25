@@ -20,6 +20,7 @@
   import { translate } from '$lib/i18n/translate';
   import { fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
+  import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
@@ -54,7 +55,8 @@
     $fullEventHistory,
   );
   $: resetRunId =
-    $workflowRun?.workflow?.workflowExecutionExtendedInfo?.resetRunId;
+    $workflowRun?.workflow?.workflowExecutionExtendedInfo?.resetRunId ||
+    $resetWorkflows[$workflowRun?.workflow?.runId];
   $: workflowHasBeenReset = !!resetRunId;
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
