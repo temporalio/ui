@@ -87,62 +87,60 @@
   };
 </script>
 
-<div class="flex flex-wrap gap-2" class:pt-2={visibleFilters.length}>
-  {#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
-    {@const { attribute, value, conditional, customDate } = workflowFilter}
-    {#if attribute}
-      <div in:fade data-testid="{workflowFilter.attribute}-{i}">
-        <Chip
-          removeButtonLabel={translate('workflows.remove-filter-label', {
-            attribute,
-          })}
-          on:remove={() => removeQuery(i)}
-          on:click={() => {
-            $activeQueryIndex = i;
-            $filter = { ...workflowFilter };
-          }}
-          intent="default"
-          button
-        >
-          {#if attribute === 'ExecutionStatus' && isWorkflowStatusType(value)}
-            <span class="flex">
-              {attribute}
+{#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
+  {@const { attribute, value, conditional, customDate } = workflowFilter}
+  {#if attribute}
+    <div in:fade data-testid="{workflowFilter.attribute}-{i}">
+      <Chip
+        removeButtonLabel={translate('workflows.remove-filter-label', {
+          attribute,
+        })}
+        on:remove={() => removeQuery(i)}
+        on:click={() => {
+          $activeQueryIndex = i;
+          $filter = { ...workflowFilter };
+        }}
+        intent="default"
+        button
+      >
+        {#if attribute === 'ExecutionStatus' && isWorkflowStatusType(value)}
+          <span class="flex">
+            {attribute}
+            {conditional}
+            <span class="-py-1 ml-1">
+              <WorkflowStatus status={value} />
+            </span>
+          </span>
+        {:else}
+          <span class="max-w-xs truncate md:max-w-lg xl:max-w-2xl">
+            {attribute}
+            {#if isNullConditional(conditional)}
               {conditional}
-              <span class="-py-1 ml-1">
-                <WorkflowStatus status={value} />
-              </span>
-            </span>
-          {:else}
-            <span class="max-w-xs truncate md:max-w-lg xl:max-w-2xl">
-              {attribute}
-              {#if isNullConditional(conditional)}
-                {conditional}
-                {String(value)}
-              {:else if isDateTimeFilter(workflowFilter)}
-                {#if customDate}
-                  {formatDateTimeRange(value, $timeFormat, $relativeTime)}
-                {:else}
-                  {getDateTimeConditonal(conditional)}
-                  {formatDate(value, $timeFormat, {
-                    relative: $relativeTime,
-                    abbrFormat: true,
-                  })}
-                {/if}
+              {String(value)}
+            {:else if isDateTimeFilter(workflowFilter)}
+              {#if customDate}
+                {formatDateTimeRange(value, $timeFormat, $relativeTime)}
               {:else}
-                {isStartsWith(conditional)
-                  ? translate('common.starts-with').toLocaleLowerCase()
-                  : conditional}
-                {isTextFilter(workflowFilter) ? `"${value}"` : value}
+                {getDateTimeConditonal(conditional)}
+                {formatDate(value, $timeFormat, {
+                  relative: $relativeTime,
+                  abbrFormat: true,
+                })}
               {/if}
-            </span>
-          {/if}
-        </Chip>
-      </div>
-    {/if}
-  {/each}
-  {#if hasMoreFilters}
-    <Button variant="secondary" size="xs" on:click={viewMoreFilters}
-      >{translate('common.view-more')}</Button
-    >
+            {:else}
+              {isStartsWith(conditional)
+                ? translate('common.starts-with').toLocaleLowerCase()
+                : conditional}
+              {isTextFilter(workflowFilter) ? `"${value}"` : value}
+            {/if}
+          </span>
+        {/if}
+      </Chip>
+    </div>
   {/if}
-</div>
+{/each}
+{#if hasMoreFilters}
+  <Button variant="secondary" size="xs" on:click={viewMoreFilters}
+    >{translate('common.view-more')}</Button
+  >
+{/if}

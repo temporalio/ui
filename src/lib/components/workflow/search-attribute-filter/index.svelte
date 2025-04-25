@@ -9,6 +9,8 @@
   import { refresh } from '$lib/stores/workflows';
   import { workflowRoutePattern } from '$lib/utilities/namespace-url-pattern';
 
+  import WorkflowSavedQueries from '../workflow-saved-queries.svelte';
+
   $: workflowsPage = workflowRoutePattern.match(window?.location?.pathname);
 </script>
 
@@ -35,6 +37,8 @@
   >
     {#if $searchInputViewOpen}
       <WorkflowAdvancedSearch />
+    {:else}
+      <WorkflowSavedQueries />
     {/if}
   </SearchAttributeFilter>
 </div>

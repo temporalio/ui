@@ -23,6 +23,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import { searchInputViewOpen } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
     type SearchAttributeOption,
@@ -225,12 +226,7 @@
     {/if}
 
     <div class="flex flex-col items-center justify-end gap-1 sm:flex-row">
-      {#if showActions}
-        {#if showFilter}
-          <Button variant="ghost" on:click={handleClearInput}>
-            {translate('common.clear-all')}
-          </Button>
-        {/if}
+      {#if $searchInputViewOpen}
         <Tooltip topRight text={translate('workflows.copy-search-input')}>
           <CopyButton
             copyIconTitle={translate('common.copy-icon-title')}
@@ -243,7 +239,21 @@
     </div>
     <slot name="actions" />
   </div>
-  <FilterList bind:filters />
+  <div class="flex flex-wrap items-center gap-2" class:pt-2={filters.length}>
+    <FilterList bind:filters />
+    {#if showFilter && showActions}
+      <Button
+        leadingIcon="bookmark"
+        size="xs"
+        variant="secondary"
+        class="font-bold text-yellow-500"
+        on:click={handleClearInput}
+      ></Button>
+      <Button size="xs" variant="ghost" on:click={handleClearInput}>
+        {translate('common.clear-all')}
+      </Button>
+    {/if}
+  </div>
 </div>
 
 <style lang="postcss">

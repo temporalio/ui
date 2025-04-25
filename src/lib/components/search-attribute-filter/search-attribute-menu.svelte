@@ -73,7 +73,7 @@
     </svelte:fragment>
     {$filter.attribute || translate('workflows.filter')}
   </MenuButton>
-  <Menu id="search-attribute-menu" keepOpen>
+  <Menu position="right" id="search-attribute-menu" keepOpen>
     <MenuItem
       class="p-0"
       hoverable={false}
