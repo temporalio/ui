@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Sign-in</title>
+    <title><%= title %></title>
+    <!--
     <style>
       @import url(https://fonts.googleapis.com/css?family=Roboto:400,100);
 
@@ -188,9 +189,18 @@
         cursor: pointer;
       }
     </style>
+    -->
+    <!-- Tailwind CSS via CDN and Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { theme: { extend: {} } };
+    </script>
   </head>
-  <body>
-    <div class="login-card">
+  <body class="antialiased bg-gray-50 text-gray-800">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md my-8">
       <h1><%= title %></h1>
       <%- body %>
       <div class="login-help">

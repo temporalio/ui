@@ -1,14 +1,24 @@
 import type { Plugin } from 'vite';
 import type { ViteDevServer } from 'vite';
 import waitForPort from 'wait-port';
+import { chalk } from 'zx';
 
-import { getConfig } from '../utilities/oidc-server/config';
-import routes from '../utilities/oidc-server/routes/express';
-import OIDCServer from '../utilities/oidc-server/server';
-import Account from '../utilities/oidc-server/support/account';
-import providerConfiguration from '../utilities/oidc-server/support/configuration';
+import {
+  Account,
+  getConfig,
+  OIDCServer,
+  providerConfiguration,
+  routes,
+} from '../utilities/oidc-server';
+
+const { blue } = chalk;
 
 let oidcServer: OIDCServer;
+
+function log(...message: string[]): void {
+  const [first, ...rest] = message;
+  console.log(blue(first), ...rest);
+}
 
 /**
  * Determine whether to skip starting the OIDC server.
@@ -35,9 +45,8 @@ export function oidcServerPlugin(): Plugin {
     async configureServer(server) {
       if (shouldSkip(server)) return;
 
-      console.log(server.config.env);
+      log(`Starting OIDC Server on port ${PORT}…`);
 
-      console.log(`Starting OIDC Server on port ${PORT}…`);
       oidcServer = new OIDCServer({
         issuer: ISSUER,
         port: PORT,
@@ -49,12 +58,13 @@ export function oidcServerPlugin(): Plugin {
       // start and wait for readiness
       await oidcServer.start();
       await waitForPort({ port: PORT, output: 'silent' });
-      console.log(`OIDC Server is running on port ${PORT}.`);
+
+      log(`OIDC Server is running on port ${PORT}.`);
     },
     async closeBundle() {
       if (oidcServer) {
         oidcServer.stop();
-        console.log('🔪 killed OIDC Server');
+        log('🔪 killed OIDC Server');
       }
     },
   };

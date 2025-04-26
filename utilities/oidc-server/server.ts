@@ -67,7 +67,14 @@ export default class OIDCServer {
 
   private configureSecurity(): void {
     const directives = contentSecurityPolicy.getDefaultDirectives();
+    // remove default form-action to allow form submissions
     delete directives['form-action'];
+    // allow Tailwind CDN and inline scripts for dynamic CSS
+    directives['script-src'] = [
+      ...((directives['script-src'] as string[]) || []),
+      'https://cdn.tailwindcss.com',
+      "'unsafe-inline'",
+    ];
     this.app.use(
       helmet({
         contentSecurityPolicy: {
@@ -106,15 +113,9 @@ export default class OIDCServer {
       this.configureProvider();
       this.configureRoutes();
 
-      this.server = this.app.listen(this.port, () => {
-        // eslint-disable-next-line no-console
-        console.log(
-          `OIDC Server listening at http://localhost:${this.port} (issuer: ${this.issuer})`,
-        );
-      });
+      this.server = this.app.listen(this.port);
     } catch (err) {
       if (this.server?.listening) this.server.close();
-      // eslint-disable-next-line no-console
       console.error('Error starting OIDC Server:', err);
       process.exit(1);
     }

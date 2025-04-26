@@ -1,8 +1,10 @@
-<div class="login-client-image">
-  <% if (client.logoUri) { %><img src="<%= client.logoUri %>"><% } %>
-</div>
+<% if (client.logoUri) { %>
+  <div class="flex justify-center mb-4">
+    <img src="<%= client.logoUri %>" class="h-16" alt="Client logo">
+  </div>
+<% } %>
 
-<ul>
+<ul class="list-disc list-inside space-y-2 text-gray-700">
 <% if ([details.missingOIDCScope, details.missingOIDCClaims, details.missingResourceScopes, details.rar].filter(Boolean).length === 0) { %>
   <li>the client is asking you to confirm previously given authorization</li>
 <% } %>
@@ -58,8 +60,8 @@
   </li>
 <% } %>
 
-</ul>
+  </ul>
 
-<form autocomplete="off" action="/interaction/<%= uid %>/confirm" method="post">
-  <button autofocus type="submit" class="login login-submit">Continue</button>
+<form autocomplete="off" action="/interaction/<%= uid %>/confirm" method="post" class="mt-6">
+  <button autofocus type="submit" class="w-full bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700">Continue</button>
 </form>

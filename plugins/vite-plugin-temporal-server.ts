@@ -7,7 +7,7 @@ import {
   type TemporalServer,
 } from '../utilities/temporal-server';
 
-const { cyan, magenta } = chalk;
+const { magenta } = chalk;
 
 let temporal: TemporalServer;
 
@@ -40,7 +40,10 @@ const persistentDB = (server: ViteDevServer): string | undefined => {
   return filename;
 };
 
-const getPortFromApiEndpoint = (endpoint: string, fallback = 8233): number => {
+export const getPortFromApiEndpoint = (
+  endpoint: string,
+  fallback = 8233,
+): number => {
   return validatePort(
     endpoint.slice(endpoint.lastIndexOf(':') + 1, endpoint.length),
     fallback,
@@ -81,7 +84,6 @@ export function temporalServer(): Plugin {
       const uiPort = getPortFromApiEndpoint(server.config.env.VITE_API);
 
       console.log(magenta(`Starting Temporal Server on Port ${port}…`));
-      console.log(cyan(`Starting Temporal UI Server on Port ${uiPort}…`));
 
       temporal = await createTemporalServer({
         port,
@@ -92,7 +94,6 @@ export function temporalServer(): Plugin {
       await temporal.ready();
 
       console.log(magenta(`Temporal Server is running on Port ${port}.`));
-      console.log(cyan(`Temporal UI Server is running on Port ${uiPort}.`));
     },
     async closeBundle() {
       await temporal?.shutdown();
