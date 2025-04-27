@@ -89,12 +89,22 @@ func NewModel(services []config.ServiceConfig, hcMap map[string]config.HealthEnt
 		statuses[svc.Name] = "Pending"
 		logs[svc.Name] = []string{}
 	}
+	// determine initial selected index based on focus
+	selected := 0
+	if focus != "" {
+		for i, svc := range services {
+			if svc.Name == focus {
+				selected = i
+				break
+			}
+		}
+	}
 	return &model{
 		services: services,
 		hcMap:    hcMap,
 		statuses: statuses,
 		logs:     logs,
-		selected: 0,
+		selected: selected,
 		focus:    focus,
 		mute:     mute,
 	}
@@ -108,17 +118,31 @@ func (m *model) Init() tea.Cmd {
 // Update handles incoming messages (logs, status updates, key presses).
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case LogMsg:
-		lines := m.logs[msg.Service]
-		lines = append(lines, msg.Line)
-		if len(lines) > MaxLogLines {
-			lines = lines[len(lines)-MaxLogLines:]
-		}
-		m.logs[msg.Service] = lines
-		return m, nil
-	case StatusMsg:
-		m.statuses[msg.Service] = msg.Status
-		return m, nil
+   case LogMsg:
+       // apply focus/mute filters
+       if m.focus != "" && msg.Service != m.focus {
+           return m, nil
+       }
+       if m.mute != "" && msg.Service == m.mute {
+           return m, nil
+       }
+       lines := m.logs[msg.Service]
+       lines = append(lines, msg.Line)
+       if len(lines) > MaxLogLines {
+           lines = lines[len(lines)-MaxLogLines:]
+       }
+       m.logs[msg.Service] = lines
+       return m, nil
+   case StatusMsg:
+       // apply focus/mute filters
+       if m.focus != "" && msg.Service != m.focus {
+           return m, nil
+       }
+       if m.mute != "" && msg.Service == m.mute {
+           return m, nil
+       }
+       m.statuses[msg.Service] = msg.Status
+       return m, nil
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "ctrl+c":

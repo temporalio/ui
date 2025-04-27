@@ -19,7 +19,7 @@ func Execute() {
 			&cli.StringFlag{Name: "mode", Aliases: []string{"m"}, Value: "dev", Usage: "Mode to run (e.g., dev, prod)"},
 			&cli.StringFlag{Name: "focus", Aliases: []string{"f"}, Value: "", Usage: "Service to focus on"},
 			&cli.StringFlag{Name: "mute", Value: "", Usage: "Service to mute"},
-			&cli.BoolFlag{Name: "tui", Usage: "Enable interactive TUI"},
+			&cli.BoolFlag{Name: "no-tui", Usage: "Disable interactive TUI"},
 		},
 		Action: action,
 	}
@@ -36,7 +36,7 @@ func action(c *cli.Context) error {
 		SetMode(c.String("mode")).
 		SetFocus(c.String("focus")).
 		SetMute(c.String("mute")).
-		SetTUI(c.Bool("tui")).
+		SetTUI(c.Bool("no-tui")).
 		Run()
 
 	if err != nil {
@@ -46,4 +46,3 @@ func action(c *cli.Context) error {
 
 	return nil
 }
-

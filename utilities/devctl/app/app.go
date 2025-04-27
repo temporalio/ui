@@ -26,7 +26,7 @@ type Handler struct {
 	// Mute is the service to mute.
 	mute string
 	// tui is the flag to enable the TUI.
-	tui bool
+	noTUI bool
 }
 
 func (h *Handler) SetConfigDir(configDir string) *Handler {
@@ -54,21 +54,17 @@ func (h *Handler) SetMute(mute string) *Handler {
 }
 
 func (h *Handler) SetTUI(tui bool) *Handler {
-	h.tui = tui
+	h.noTUI = tui
 
 	return h
 }
 
 func (h *Handler) Run() error {
-	if h.tui {
-		return tui.Run(h.configDir, h.mode, h.focus, h.mute)
+	if h.noTUI {
+		return h.runServices()
 	}
 
-	if err := h.runServices(); err != nil {
-		return err
-	}
-
-	return nil
+	return tui.Run(h.configDir, h.mode, h.focus, h.mute)
 }
 
 // runServices initializes and runs the service runner.

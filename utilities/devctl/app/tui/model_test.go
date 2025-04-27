@@ -21,6 +21,53 @@ func TestStyleStatus(t *testing.T) {
    }
 }
 
+// TestNewModelWithFocus sets initial selection based on focus flag.
+func TestNewModelWithFocus(t *testing.T) {
+   services := []config.ServiceConfig{{Name: "a"}, {Name: "b"}, {Name: "c"}}
+   m := NewModel(services, nil, "b", "")
+   mod := m.(*model)
+   if mod.selected != 1 {
+       t.Errorf("focus selection: expected selected index 1, got %d", mod.selected)
+   }
+}
+
+// TestUpdateFocusFiltering ignores logs for services outside focus.
+func TestUpdateFocusFiltering(t *testing.T) {
+   services := []config.ServiceConfig{{Name: "a"}, {Name: "b"}}
+   m := NewModel(services, nil, "a", "")
+   // Log for b should be ignored
+   m, _ = m.Update(LogMsg{Service: "b", Line: "ignored"})
+   mod := m.(*model)
+   if len(mod.logs["b"]) != 0 {
+       t.Errorf("focus filter: expected 0 logs for b, got %d", len(mod.logs["b"]))
+   }
+   // Log for a should be recorded
+   m, _ = m.Update(LogMsg{Service: "a", Line: "ok"})
+   mod = m.(*model)
+   if len(mod.logs["a"]) != 1 {
+       t.Errorf("focus filter: expected 1 log for a, got %d", len(mod.logs["a"]))
+   }
+}
+
+// TestUpdateMuteFiltering ignores logs and status updates for muted service.
+func TestUpdateMuteFiltering(t *testing.T) {
+   services := []config.ServiceConfig{{Name: "a"}, {Name: "b"}}
+   m := NewModel(services, nil, "", "b")
+   // Log for b should be ignored
+   m, _ = m.Update(LogMsg{Service: "b", Line: "ignored"})
+   mod := m.(*model)
+   if len(mod.logs["b"]) != 0 {
+       t.Errorf("mute filter: expected 0 logs for b, got %d", len(mod.logs["b"]))
+   }
+   // Status for b should be ignored
+   initial := mod.statuses["b"]
+   m, _ = m.Update(StatusMsg{Service: "b", Status: service.Statuses["Running"]})
+   mod = m.(*model)
+   if mod.statuses["b"] != initial {
+       t.Errorf("mute filter: expected status unchanged %q, got %q", initial, mod.statuses["b"])
+   }
+}
+
 // TestNewModel initializes model and checks default state.
 func TestNewModel(t *testing.T) {
    services := []config.ServiceConfig{{Name: "svc1"}, {Name: "svc2"}}
