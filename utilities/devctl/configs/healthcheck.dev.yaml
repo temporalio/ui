@@ -1,0 +1,10 @@
+# ui-server:
+#   url: http://localhost:4000/health
+#   codes: [200, 302]
+#   interval_seconds: 5
+#   timeout_seconds: 5
+# spa-ui:
+#   url: http://localhost:5173
+#   codes: [200, 302]
+#   interval_seconds: 5
+#   timeout_seconds: 5
