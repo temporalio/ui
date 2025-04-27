@@ -1,9 +1,19 @@
 package service
 
 import (
-	"strings"
-	"testing"
+   "io"
+   "strings"
+   "testing"
+   "devctl/app/config"
 )
+
+// ProcessStream is a helper that wraps Handler.processStream to apply focus and mute filters.
+func ProcessStream(r io.Reader, svcName, focus, mute string, cb func(string)) {
+   h := New().SetConfig(config.ServiceConfig{Name: svcName})
+   h.SetFocus(focus)
+   h.SetMute(mute)
+   h.processStream(r, cb)
+}
 
 func TestProcessStream_AllLines(t *testing.T) {
 	data := "line1\nline2\nline3\n"

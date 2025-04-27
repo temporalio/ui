@@ -1,8 +1,10 @@
 package config
 
 import (
-	"strings"
-	"testing"
+   "os"
+   "path/filepath"
+   "strings"
+   "testing"
 )
 
 func TestParseEnv(t *testing.T) {
@@ -30,6 +32,88 @@ KEY3=val3`
 	if env["KEY1"] != "val1" || env["KEY2"] != "val2" || env["KEY3"] != "val3" {
 		t.Errorf("unexpected env map: %v", env)
 	}
+}
+
+// Test loading environment file from disk
+func TestLoadEnvFile(t *testing.T) {
+   dir := t.TempDir()
+   content := "A=1\nB=2\n"
+   fname := filepath.Join(dir, ".env.test")
+   if err := os.WriteFile(fname, []byte(content), 0644); err != nil {
+       t.Fatalf("writing env file: %v", err)
+   }
+   env, err := LoadEnvFile(dir, "test")
+   if err != nil {
+       t.Fatalf("unexpected error: %v", err)
+   }
+   if env["A"] != "1" || env["B"] != "2" {
+       t.Errorf("unexpected env map: %v", env)
+   }
+}
+
+func TestLoadEnvFile_NotExist(t *testing.T) {
+   dir := t.TempDir()
+   _, err := LoadEnvFile(dir, "nope")
+   if !os.IsNotExist(err) {
+       t.Errorf("expected IsNotExist error, got: %v", err)
+   }
+}
+
+// Test loading Procfile from disk
+func TestLoadProcfileFile(t *testing.T) {
+   dir := t.TempDir()
+   content := "web: run-web\nworker: run-worker\n"
+   fname := filepath.Join(dir, "Procfile.test")
+   if err := os.WriteFile(fname, []byte(content), 0644); err != nil {
+       t.Fatalf("writing procfile: %v", err)
+   }
+   svcs, err := LoadProcfileFile(dir, "test")
+   if err != nil {
+       t.Fatalf("unexpected error: %v", err)
+   }
+   if len(svcs) != 2 {
+       t.Fatalf("expected 2 services, got %d", len(svcs))
+   }
+   if svcs[0].Name != "web" || svcs[0].Cmd != "run-web" {
+       t.Errorf("unexpected svc[0]: %v", svcs[0])
+   }
+}
+
+func TestLoadProcfileFile_NotExist(t *testing.T) {
+   dir := t.TempDir()
+   _, err := LoadProcfileFile(dir, "nope")
+   if !os.IsNotExist(err) {
+       t.Errorf("expected IsNotExist error, got: %v", err)
+   }
+}
+
+// Test loading health configuration from disk
+func TestLoadHealthFile(t *testing.T) {
+   dir := t.TempDir()
+   content := "svc1:\n  url: http://x\n  codes: [200]\n"
+   fname := filepath.Join(dir, "healthcheck.test.yaml")
+   if err := os.WriteFile(fname, []byte(content), 0644); err != nil {
+       t.Fatalf("writing health file: %v", err)
+   }
+   hc, err := LoadHealthFile(dir, "test")
+   if err != nil {
+       t.Fatalf("unexpected error: %v", err)
+   }
+   entry, ok := hc["svc1"]
+   if !ok {
+       t.Fatalf("missing entry for svc1")
+   }
+   if entry.URL != "http://x" || len(entry.Codes) != 1 || entry.Codes[0] != 200 {
+       t.Errorf("unexpected health entry: %+v", entry)
+   }
+}
+
+func TestLoadHealthFile_NotExist(t *testing.T) {
+   dir := t.TempDir()
+   _, err := LoadHealthFile(dir, "nope")
+   if !os.IsNotExist(err) {
+       t.Errorf("expected IsNotExist error, got: %v", err)
+   }
 }
 
 func TestParseProcfile(t *testing.T) {
