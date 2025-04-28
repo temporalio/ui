@@ -67,6 +67,7 @@
     } finally {
       loading = false;
     }
+    hideResetModal();
   };
 </script>
 
