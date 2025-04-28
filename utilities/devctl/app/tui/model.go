@@ -78,6 +78,7 @@ func NewModel(
 ) *model {
 	side := viewport.New(0, 0)
 	main := viewport.New(0, 0)
+	main.SetHorizontalStep(1)
 
 	logs := make(map[string][]string)
 	statuses := make(map[string]string)
@@ -157,8 +158,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch {
+
 		case key.Matches(msg, m.keys.Quit):
 			return m, tea.Quit
+
 		case key.Matches(msg, m.keys.Up):
 			if m.viewFocus == "sidebar" {
 				if m.selected > 0 {
@@ -171,6 +174,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.sidebar.SetContent(m.sidebarContent())
 				return m, nil
 			}
+
 		case key.Matches(msg, m.keys.Down):
 			if m.viewFocus == "sidebar" {
 				if m.selected < len(m.services)-1 {
@@ -182,6 +186,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.sidebar.SetContent(m.sidebarContent())
 				return m, nil
 			}
+
+		case key.Matches(msg, m.keys.Left):
+			m.content.ScrollLeft(m.content.Width)
+
+		case key.Matches(msg, m.keys.Right):
+			m.content.ScrollRight(m.content.Width)
+
 		case key.Matches(msg, m.keys.Tab):
 			if m.viewFocus == "sidebar" {
 				m.viewFocus = "content"
