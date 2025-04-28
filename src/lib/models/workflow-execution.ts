@@ -118,7 +118,7 @@ export const toWorkflowExecution = (
   const callbacks = toCallbacks(response?.callbacks);
   const rootExecution = response.workflowExecutionInfo?.rootExecution;
   const versioningInfo = response.workflowExecutionInfo?.versioningInfo;
-  const workflowExtendedInfo = response.workflowExtendedInfo;
+  const workflowExtendedInfo = response.workflowExtendedInfo ?? {};
 
   let summary;
   let details;
