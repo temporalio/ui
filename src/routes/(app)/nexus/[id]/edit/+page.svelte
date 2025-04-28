@@ -58,10 +58,7 @@
     error = undefined;
     loading = true;
     try {
-      await deleteNexusEndpoint(
-        endpoint.id.toString(),
-        endpoint.version.toString(),
-      );
+      await deleteNexusEndpoint(endpoint.id, String(endpoint.version));
       goto(routeForNexus());
     } catch (e) {
       error = e as NetworkError;
