@@ -5,7 +5,7 @@ ui-server:
   timeout_seconds: 5
 
 temporal:
-  url: http://localhost:7233/health
+  url: http://localhost:8081/healthz
   codes: [200, 302]
   interval_seconds: 5
   timeout_seconds: 5
