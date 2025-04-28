@@ -33,7 +33,7 @@
     "prepare": "svelte-kit sync && esno scripts/download-temporal.ts && husky install",
     "eslint": "eslint --ignore-path .gitignore .",
     "eslint:fix": "eslint --ignore-path .gitignore --fix .",
-    "dev": "pnpm dev:ui-server -- --open",
+    "dev": "./bin/devctl.sh",
     "dev:ui-server": ". ./.env.ui-server && vite dev --mode ui-server",
     "dev:local-temporal": ". ./.env.local-temporal && vite dev --mode local-temporal",
     "dev:temporal-cli": "vite dev --mode temporal-server",
