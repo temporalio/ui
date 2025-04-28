@@ -29,8 +29,9 @@ func TestHandlerSetters(t *testing.T) {
    if h.mute != "u" {
        t.Errorf("mute: expected %q, got %q", "u", h.mute)
    }
-   if !h.tui {
-       t.Error("tui: expected true, got false")
+   // SetTUI sets the noTUI flag to disable the TUI when true
+   if !h.noTUI {
+       t.Error("noTUI: expected true, got false")
    }
 }
 
@@ -62,7 +63,8 @@ func TestRun_Success(t *testing.T) {
        t.Fatalf("writing Procfile: %v", err)
    }
    defer os.Unsetenv(key)
-   h := New().SetConfigDir(dir).SetMode("test")
+   // disable the TUI to exercise the services-runner path
+   h := New().SetConfigDir(dir).SetMode("test").SetTUI(true)
    suppressOutput(func() {
        if err := h.Run(); err != nil {
            t.Fatalf("expected nil error, got %v", err)
@@ -76,7 +78,8 @@ func TestRun_Success(t *testing.T) {
 // TestRun_ProcfileMissing verifies Run returns ExitError when Procfile is missing.
 func TestRun_ProcfileMissing(t *testing.T) {
    dir := t.TempDir()
-   h := New().SetConfigDir(dir).SetMode("noexistent")
+   // disable the TUI to exercise the services-runner path
+   h := New().SetConfigDir(dir).SetMode("noexistent").SetTUI(true)
    var exitCoder cli.ExitCoder
    suppressOutput(func() {
        err := h.Run()

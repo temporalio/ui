@@ -11,14 +11,15 @@ import (
 )
 
 // makeContext builds a cli.Context with provided flag values.
-func makeContext(configDir, mode, focus, mute string, tui bool) *cli.Context {
+// makeContext builds a cli.Context with provided flag values, including --no-tui.
+func makeContext(configDir, mode, focus, mute string, noTUI bool) *cli.Context {
    app := &cli.App{}
    set := flag.NewFlagSet("test", flag.ContinueOnError)
    set.String("config-dir", "", "")
    set.String("mode", "", "")
    set.String("focus", "", "")
    set.String("mute", "", "")
-   set.Bool("tui", false, "")
+   set.Bool("no-tui", false, "")
    // Build args
    args := []string{"--config-dir", configDir, "--mode", mode}
    if focus != "" {
@@ -27,8 +28,8 @@ func makeContext(configDir, mode, focus, mute string, tui bool) *cli.Context {
    if mute != "" {
        args = append(args, "--mute", mute)
    }
-   if tui {
-       args = append(args, "--tui")
+   if noTUI {
+       args = append(args, "--no-tui")
    }
    set.Parse(args)
    return cli.NewContext(app, set, nil)
@@ -57,7 +58,8 @@ func TestAction_Success(t *testing.T) {
    if err := os.WriteFile(filepath.Join(dir, "Procfile.test"), []byte("svc: echo ok\n"), 0644); err != nil {
        t.Fatalf("writing Procfile: %v", err)
    }
-   c := makeContext(dir, "test", "", "", false)
+   // disable TUI to run services directly
+   c := makeContext(dir, "test", "", "", true)
    suppressOutput(func() {
        if err := action(c); err != nil {
            t.Fatalf("expected no error, got %v", err)
@@ -68,7 +70,8 @@ func TestAction_Success(t *testing.T) {
 // TestAction_ProcfileMissing ensures action returns ExitCoder when Procfile is absent.
 func TestAction_ProcfileMissing(t *testing.T) {
    dir := t.TempDir()
-   c := makeContext(dir, "test", "", "", false)
+   // disable TUI to run services directly
+   c := makeContext(dir, "test", "", "", true)
    var exitCoder cli.ExitCoder
    suppressOutput(func() {
        err := action(c)
