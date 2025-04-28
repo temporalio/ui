@@ -8,4 +8,4 @@ pushd $DIR/../utilities/devctl
 go build .
 popd
 
-$DIR/../utilities/devctl/devctl --config-dir ./configs
+$DIR/../utilities/devctl/devctl --config-dir ./configs "$@"
