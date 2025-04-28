@@ -1,0 +1,3 @@
+ui: pnpm vite dev
+temporal: temporal server start-dev
+ui-server: cd server && go run ./cmd/server/main.go --env development start

@@ -1,0 +1,17 @@
+ui-server:
+  url: http://localhost:8233/health
+  codes: [200, 302]
+  interval_seconds: 5
+  timeout_seconds: 5
+
+temporal:
+  url: http://localhost:7233/health
+  codes: [200, 302]
+  interval_seconds: 5
+  timeout_seconds: 5
+
+ui:
+  url: http://localhost:3000
+  codes: [200, 302]
+  interval_seconds: 5
+  timeout_seconds: 5

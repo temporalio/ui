@@ -1,20 +1,37 @@
 package tui
 
 import (
+	"fmt"
+	"strings"
+
 	"devctl/app/colors"
 	"devctl/app/config"
 	"devctl/app/service"
-	"fmt"
 
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
-	lipgloss "github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var (
-	headerStyle = lipgloss.NewStyle().
-			Bold(true).
-			Underline(true).
-			Foreground(lipgloss.Color(colors.Header))
+	sidebarWidth = 24
+
+	sidebarStyle = lipgloss.NewStyle().
+			Border(lipgloss.NormalBorder()).
+			BorderForeground(lipgloss.Color("240")).
+			Width(sidebarWidth).Align(lipgloss.Top)
+
+	sidebarFocusedStyle = sidebarStyle.
+				BorderForeground(lipgloss.Color("62")) // blue border when focused
+
+	contentStyle = lipgloss.NewStyle().
+			Border(lipgloss.NormalBorder()).
+			BorderForeground(lipgloss.Color("240")).Align(lipgloss.Top)
+
+	contentFocusedStyle = contentStyle.
+				BorderForeground(lipgloss.Color("62")) // blue border when focused
 
 	selectedStyle = lipgloss.NewStyle().
 			Bold(true).
@@ -35,6 +52,213 @@ var (
 			Foreground(lipgloss.Color(colors.Unhealthy))
 )
 
+type model struct {
+	keys keyMap
+	help help.Model
+
+	services []config.ServiceConfig
+	logs     map[string][]string
+	statuses map[string]string
+
+	selected int
+	sidebar  viewport.Model
+	content  viewport.Model
+	width    int
+	height   int
+
+	viewFocus string // "sidebar" or "content"
+	svcFocus  string
+	svcMute   string
+}
+
+func NewModel(
+	services []config.ServiceConfig,
+	hcMap map[string]config.HealthEntry,
+	focus, mute string,
+) *model {
+	side := viewport.New(0, 0)
+	main := viewport.New(0, 0)
+
+	logs := make(map[string][]string)
+	statuses := make(map[string]string)
+
+	for _, svc := range services {
+		statuses[svc.Name] = "Pending"
+		logs[svc.Name] = []string{}
+	}
+
+	m := &model{
+		keys: keys,
+		help: help.New(),
+
+		services: services,
+		logs:     logs,
+		statuses: statuses,
+
+		sidebar:   side,
+		content:   main,
+		svcFocus:  focus,
+		svcMute:   mute,
+		viewFocus: "sidebar",
+	}
+
+	side.SetContent(m.sidebarContent())
+	main.SetContent("")
+
+	return m
+}
+
+func (m model) Init() tea.Cmd {
+	return nil
+}
+
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmds []tea.Cmd
+
+	switch msg := msg.(type) {
+	case LogMsg:
+		// filters
+		if m.svcFocus != "" && msg.Service != m.svcFocus {
+			return m, nil
+		}
+		if m.svcMute != "" && msg.Service == m.svcMute {
+			return m, nil
+		}
+		// append log and keep last N
+		lines := m.logs[msg.Service]
+		lines = append(lines, msg.Line)
+		m.logs[msg.Service] = lines
+		// if for selected service, update viewport
+		if msg.Service == m.services[m.selected].Name {
+			m.content.SetContent(strings.Join(lines, "\n"))
+			m.content.GotoBottom()
+		}
+		return m, nil
+
+	case StatusMsg:
+		if m.svcFocus != "" && msg.Service != m.svcFocus {
+			return m, nil
+		}
+		if m.svcMute != "" && msg.Service == m.svcMute {
+			return m, nil
+		}
+		m.statuses[msg.Service] = msg.Status
+		m.sidebar.SetContent(m.sidebarContent())
+		return m, nil
+	case tea.WindowSizeMsg:
+		m.width = msg.Width
+		m.height = msg.Height
+
+		m.sidebar.Width = sidebarWidth
+		m.sidebar.Height = m.height - 3
+
+		m.content.Width = m.width - lipgloss.Width(m.sidebar.View()) - 4
+		m.content.Height = m.height - 3
+
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, m.keys.Quit):
+			return m, tea.Quit
+		case key.Matches(msg, m.keys.Up):
+			if m.viewFocus == "sidebar" {
+				if m.selected > 0 {
+					m.selected--
+				}
+				// load new logs
+				svc := m.services[m.selected].Name
+				m.content.SetContent(strings.Join(m.logs[svc], "\n"))
+				m.content.GotoBottom()
+				m.sidebar.SetContent(m.sidebarContent())
+				return m, nil
+			}
+		case key.Matches(msg, m.keys.Down):
+			if m.viewFocus == "sidebar" {
+				if m.selected < len(m.services)-1 {
+					m.selected++
+				}
+				svc := m.services[m.selected].Name
+				m.content.SetContent(strings.Join(m.logs[svc], "\n"))
+				m.content.GotoBottom()
+				m.sidebar.SetContent(m.sidebarContent())
+				return m, nil
+			}
+		case key.Matches(msg, m.keys.Tab):
+			if m.viewFocus == "sidebar" {
+				m.viewFocus = "content"
+			} else {
+				m.viewFocus = "sidebar"
+			}
+		}
+	}
+
+	// Update focused viewport
+	if m.viewFocus == "sidebar" {
+		var cmd tea.Cmd
+		m.sidebar, cmd = m.sidebar.Update(msg)
+		cmds = append(cmds, cmd)
+	} else {
+		var cmd tea.Cmd
+		m.content, cmd = m.content.Update(msg)
+		cmds = append(cmds, cmd)
+	}
+
+	return m, tea.Batch(cmds...)
+}
+
+func (m model) View() string {
+	side := sidebarStyle.Render(m.sidebar.View())
+	content := contentStyle.Render(m.content.View())
+
+	// Highlight focused section
+	if m.viewFocus == "sidebar" {
+		side = sidebarFocusedStyle.Render(m.sidebar.View())
+	} else {
+		content = contentFocusedStyle.Render(m.content.View())
+	}
+
+	page := lipgloss.JoinHorizontal(
+		lipgloss.Top,
+		side,
+		content,
+	)
+	page += "\n" + m.help.View(m.keys)
+
+	return page
+}
+
+func (m *model) sidebarContent() string {
+	content := ""
+
+	for i, svc := range m.services {
+		prefix := "  "
+		if i == m.selected {
+			prefix = "> "
+		}
+		status := styleStatus(m.statuses[svc.Name])
+		text := fmt.Sprintf("%s%s [%s]", prefix, svc.Name, status)
+		if i == m.selected {
+			text = selectedStyle.Render(text)
+		}
+
+		content += text + "\n"
+	}
+
+	return content
+}
+
+// Get current "selected" line based on sidebar scroll position
+func currentSidebarLine(m *model) string {
+	lines := strings.Split(m.sidebarContent(), "\n")
+	m.selected = m.selected + 1
+
+	if (len(lines) - 1) < m.selected {
+		m.selected = 0
+		return "Home"
+	}
+
+	return lines[m.selected]
+}
+
 // styleStatus colors a service status string.
 func styleStatus(status string) string {
 	var s lipgloss.Style
@@ -53,136 +277,4 @@ func styleStatus(status string) string {
 		s = pendingStyle
 	}
 	return s.Render(status)
-}
-
-// MaxLogLines is the maximum number of log lines to keep per service.
-const MaxLogLines = 100
-
-// LogMsg carries a single log line from a service.
-type LogMsg struct {
-	Service string
-	Line    string
-}
-
-// StatusMsg updates the status of a service.
-type StatusMsg struct {
-	Service string
-	Status  string
-}
-
-// model implements the Bubble Tea model for the TUI.
-type model struct {
-	services []config.ServiceConfig
-	hcMap    map[string]config.HealthEntry
-	statuses map[string]string
-	logs     map[string][]string
-	selected int
-	focus    string
-	mute     string
-}
-
-// NewModel creates a new TUI model with the given services and health config.
-func NewModel(services []config.ServiceConfig, hcMap map[string]config.HealthEntry, focus, mute string) tea.Model {
-	statuses := make(map[string]string)
-	logs := make(map[string][]string)
-	for _, svc := range services {
-		statuses[svc.Name] = "Pending"
-		logs[svc.Name] = []string{}
-	}
-	// determine initial selected index based on focus
-	selected := 0
-	if focus != "" {
-		for i, svc := range services {
-			if svc.Name == focus {
-				selected = i
-				break
-			}
-		}
-	}
-	return &model{
-		services: services,
-		hcMap:    hcMap,
-		statuses: statuses,
-		logs:     logs,
-		selected: selected,
-		focus:    focus,
-		mute:     mute,
-	}
-}
-
-// Init is called when the TUI starts; no initial commands.
-func (m *model) Init() tea.Cmd {
-	return nil
-}
-
-// Update handles incoming messages (logs, status updates, key presses).
-func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-   case LogMsg:
-       // apply focus/mute filters
-       if m.focus != "" && msg.Service != m.focus {
-           return m, nil
-       }
-       if m.mute != "" && msg.Service == m.mute {
-           return m, nil
-       }
-       lines := m.logs[msg.Service]
-       lines = append(lines, msg.Line)
-       if len(lines) > MaxLogLines {
-           lines = lines[len(lines)-MaxLogLines:]
-       }
-       m.logs[msg.Service] = lines
-       return m, nil
-   case StatusMsg:
-       // apply focus/mute filters
-       if m.focus != "" && msg.Service != m.focus {
-           return m, nil
-       }
-       if m.mute != "" && msg.Service == m.mute {
-           return m, nil
-       }
-       m.statuses[msg.Service] = msg.Status
-       return m, nil
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "q", "ctrl+c":
-			return m, tea.Quit
-		case "up", "k":
-			if m.selected > 0 {
-				m.selected--
-			}
-			return m, nil
-		case "down", "j":
-			if m.selected < len(m.services)-1 {
-				m.selected++
-			}
-			return m, nil
-		}
-	}
-	return m, nil
-}
-
-// View renders the UI: list of services and logs for the selected one.
-func (m *model) View() string {
-	s := headerStyle.Render("Services:") + "\n"
-	for i, svc := range m.services {
-		prefix := "  "
-		if i == m.selected {
-			prefix = "> "
-		}
-		status := m.statuses[svc.Name]
-		coloredStatus := styleStatus(status)
-		line := fmt.Sprintf("%s%s [%s]", prefix, svc.Name, coloredStatus)
-		if i == m.selected {
-			line = selectedStyle.Render(line)
-		}
-		s += line + "\n"
-	}
-	s += "\n" + headerStyle.Render("Logs:") + "\n"
-	selected := m.services[m.selected].Name
-	for _, line := range m.logs[selected] {
-		s += line + "\n"
-	}
-	s += "\n(q to quit)"
-	return s
 }

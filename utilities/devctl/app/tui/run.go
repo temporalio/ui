@@ -13,6 +13,18 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// LogMsg carries a single log line from a service.
+type LogMsg struct {
+	Service string
+	Line    string
+}
+
+// StatusMsg updates the status of a service.
+type StatusMsg struct {
+	Service string
+	Status  string
+}
+
 func serviceTextHandler(svcName string, p *tea.Program) func(string) {
 	return func(line string) {
 		p.Send(LogMsg{Service: svcName, Line: line})
@@ -48,8 +60,9 @@ func Run(configDir, mode, focus, mute string) error {
 	hcMap, _ := config.LoadHealthFile(configDir, mode)
 
 	// 2. Initialize the TUI model and Bubble Tea program
+	// Initialize TUI model and program; use alternate screen for full redraw
 	model := NewModel(services, hcMap, focus, mute)
-	p := tea.NewProgram(model)
+	p := tea.NewProgram(model, tea.WithAltScreen())
 
 	// 3. Setup cancellation context for subprocesses
 	ctx, cancel := context.WithCancel(context.Background())
