@@ -82,7 +82,7 @@ export type WorkflowExecutionConfigWithMetadata = WorkflowExecutionConfig & {
   userMetadata?: UserMetadata;
 };
 
-export type WorkflowExecutionExtendedInfo = {
+export type WorkflowExtendedInfo = {
   resetRunId?: string;
   originalStartTime?: string;
 };
@@ -95,7 +95,7 @@ export type WorkflowExecutionAPIResponse = Optional<{
   executionConfig: WorkflowExecutionConfigWithMetadata;
   callbacks: Callbacks;
   pendingWorkflowTask: PendingWorkflowTaskInfo;
-  workflowExecutionExtendedInfo: WorkflowExecutionExtendedInfo;
+  workflowExtendedInfo: WorkflowExtendedInfo;
 }>;
 
 export type WorkflowStatus =
@@ -192,7 +192,7 @@ export type WorkflowExecution = {
   versioningInfo?: VersioningInfo;
   summary?: Payload;
   details?: Payload;
-  workflowExecutionExtendedInfo: WorkflowExecutionExtendedInfo;
+  workflowExtendedInfo: WorkflowExtendedInfo;
 };
 
 export type WorkflowTaskFailedCause =

@@ -55,7 +55,7 @@
     $fullEventHistory,
   );
   $: resetRunId =
-    $workflowRun?.workflow?.workflowExecutionExtendedInfo?.resetRunId ||
+    $workflowRun?.workflow.workflowExtendedInfo?.resetRunId ||
     $resetWorkflows[$workflowRun?.workflow?.runId];
   $: workflowHasBeenReset = !!resetRunId;
   $: workflowRelationships = getWorkflowRelationships(
