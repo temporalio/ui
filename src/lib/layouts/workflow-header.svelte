@@ -25,7 +25,6 @@
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
-  import { has } from '$lib/utilities/has';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForCallStack,
@@ -55,7 +54,10 @@
     $workflowRun?.workflow?.status,
     $fullEventHistory,
   );
-  $: workflowHasBeenReset = has($resetWorkflows, runId);
+  $: resetRunId =
+    $workflowRun?.workflow.workflowExtendedInfo?.resetRunId ||
+    $resetWorkflows[$workflowRun?.workflow?.runId];
+  $: workflowHasBeenReset = !!resetRunId;
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
     $fullEventHistory,
@@ -154,7 +156,7 @@
           href={routeForEventHistory({
             namespace,
             workflow: $workflowRun?.workflow?.id,
-            run: $resetWorkflows[$workflowRun?.workflow?.runId],
+            run: resetRunId,
           })}>here</Link
         >.
       </Alert>
