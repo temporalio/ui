@@ -178,6 +178,122 @@ export const mockCompletedWorkflow = {
   },
 } satisfies WorkflowExecutionAPIResponse;
 
+export const mockResetWorkflow: WorkflowExecutionAPIResponse = {
+  executionConfig: {
+    taskQueue: {
+      name: 'default',
+      kind: 'TASK_QUEUE_KIND_NORMAL',
+    },
+    defaultWorkflowTaskTimeout: '10s',
+  },
+  workflowExecutionInfo: {
+    execution: {
+      workflowId: '09db17_Running',
+      runId: '4284ef9a-947f-4db2-bf15-dbc377e71fa7',
+    },
+    type: {
+      name: 'failing',
+    },
+    startTime: '2025-04-28T19:36:37.170960Z',
+    closeTime: '2025-04-28T19:36:37.214083Z',
+    status: 'WORKFLOW_EXECUTION_STATUS_FAILED',
+    historyLength: '14',
+    executionTime: '2025-04-28T19:36:37.170960Z',
+    memo: {},
+    searchAttributes: {
+      indexedFields: {
+        BuildIds: {
+          metadata: {
+            encoding: 'anNvbi9wbGFpbg==',
+            type: 'S2V5d29yZExpc3Q=',
+          },
+          data: 'WyJ1bnZlcnNpb25lZCIsInVudmVyc2lvbmVkOkB0ZW1wb3JhbGlvL3dvcmtlckAxLjExLjcrMzkyYWNkMTVkNzVjYjZjZTlmNjY4YzZlNjJjOTdmMTk0MzBkZmU4ODc4YTRmZjljZGYxYWQ5MGFlMzA1ODkwMCJd',
+        },
+      },
+    },
+    autoResetPoints: {
+      points: [
+        {
+          buildId:
+            '@temporalio/worker@1.11.7+392acd15d75cb6ce9f668c6e62c97f19430dfe8878a4ff9cdf1ad90ae3058900',
+          runId: '874c3bed-52ef-462e-9b27-195ef359f11c',
+          firstWorkflowTaskCompletedId: '7',
+          createTime: '2025-04-28T19:36:37.195767Z',
+          resettable: true,
+        },
+      ],
+    },
+    taskQueue: 'workflow-statuses',
+    stateTransitionCount: '8',
+    historySizeBytes: '2713',
+    mostRecentWorkerVersionStamp: {
+      buildId:
+        '@temporalio/worker@1.11.7+392acd15d75cb6ce9f668c6e62c97f19430dfe8878a4ff9cdf1ad90ae3058900',
+    },
+    executionDuration: '0.043123s',
+  },
+  workflowExtendedInfo: {
+    originalStartTime: '2025-04-28T19:36:14.998303Z',
+    resetRunId: 'reset-run-id',
+  },
+} satisfies WorkflowExecutionAPIResponse;
+
+export const mockNonResetWorkflow: WorkflowExecutionAPIResponse = {
+  executionConfig: {
+    taskQueue: {
+      name: 'default',
+      kind: 'TASK_QUEUE_KIND_NORMAL',
+    },
+    defaultWorkflowTaskTimeout: '10s',
+  },
+  workflowExecutionInfo: {
+    execution: {
+      workflowId: '09db18_Running',
+      runId: '4284ef9a-947f-4db2-bf15-dbc377e71fa8',
+    },
+    type: {
+      name: 'failing',
+    },
+    startTime: '2025-04-28T19:36:37.170960Z',
+    closeTime: '2025-04-28T19:36:37.214083Z',
+    status: 'WORKFLOW_EXECUTION_STATUS_FAILED',
+    historyLength: '14',
+    executionTime: '2025-04-28T19:36:37.170960Z',
+    memo: {},
+    searchAttributes: {
+      indexedFields: {
+        BuildIds: {
+          metadata: {
+            encoding: 'anNvbi9wbGFpbg==',
+            type: 'S2V5d29yZExpc3Q=',
+          },
+          data: 'WyJ1bnZlcnNpb25lZCIsInVudmVyc2lvbmVkOkB0ZW1wb3JhbGlvL3dvcmtlckAxLjExLjcrMzkyYWNkMTVkNzVjYjZjZTlmNjY4YzZlNjJjOTdmMTk0MzBkZmU4ODc4YTRmZjljZGYxYWQ5MGFlMzA1ODkwMCJd',
+        },
+      },
+    },
+    autoResetPoints: {
+      points: [
+        {
+          buildId:
+            '@temporalio/worker@1.11.7+392acd15d75cb6ce9f668c6e62c97f19430dfe8878a4ff9cdf1ad90ae3058900',
+          runId: '874c3bed-52ef-462e-9b27-195ef359f11c',
+          firstWorkflowTaskCompletedId: '7',
+          createTime: '2025-04-28T19:36:37.195767Z',
+          resettable: true,
+        },
+      ],
+    },
+    taskQueue: 'workflow-statuses',
+    stateTransitionCount: '8',
+    historySizeBytes: '2713',
+    mostRecentWorkerVersionStamp: {
+      buildId:
+        '@temporalio/worker@1.11.7+392acd15d75cb6ce9f668c6e62c97f19430dfe8878a4ff9cdf1ad90ae3058900',
+    },
+    executionDuration: '0.043123s',
+  },
+} satisfies WorkflowExecutionAPIResponse;
+
 export const mockWorkflowApi = (
   page: Page,
   workflow: WorkflowExecutionAPIResponse = mockWorkflow,
