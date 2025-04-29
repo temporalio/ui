@@ -125,9 +125,13 @@
     rel={newTab ? 'noreferrer' : null}
     role="menuitem"
     class={merge(
-      'menu-item',
+      'menu-item focus-visible:border-inverse focus-visible:ring-primary/70 dark:focus-visible:border-interactive focus-visible:outline-hidden cursor-pointer border border-transparent text-sm font-medium focus-visible:ring-2',
       'm-1 px-3 py-2',
       'flex items-center gap-2',
+      hoverable
+        ? 'hover:surface-interactive-secondary focus-visible:surface-interactive-secondary'
+        : '',
+      disabled ? 'pointer-events-none cursor-not-allowed opacity-50' : '',
       className,
     )}
     class:disabled
@@ -145,9 +149,15 @@
   <li
     role="menuitem"
     class={merge(
-      'menu-item',
+      'menu-item focus-visible:border-inverse focus-visible:ring-primary/70 dark:focus-visible:border-interactive focus-visible:outline-hidden cursor-pointer border border-transparent text-sm font-medium focus-visible:ring-2',
       'm-1 px-3 py-2',
       'flex items-center gap-2',
+      hoverable
+        ? 'hover:surface-interactive-secondary focus-visible:surface-interactive-secondary'
+        : '',
+      selected ? 'bg-brand/10 text-brand' : '',
+      destructive ? 'text-danger' : '',
+      disabled ? 'pointer-events-none cursor-not-allowed opacity-50' : '',
       className,
     )}
     class:destructive
@@ -163,14 +173,21 @@
   >
     <slot name="leading" />
     <div class="grow">
-      <div class:centered class="menu-item-wrapper">
+      <div
+        class:centered
+        class="menu-item-wrapper flex items-center justify-between gap-2"
+        class:justify-center={centered}
+      >
         <slot />
         {#if selected}
           <Icon name="checkmark" class="shrink-0" />
         {/if}
       </div>
       {#if description}
-        <div class="menu-item-description" class:text-center={centered}>
+        <div
+          class="menu-item-description text-subtle mr-6 text-xs font-normal"
+          class:text-center={centered}
+        >
           {description}
         </div>
       {/if}
@@ -182,35 +199,5 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .menu-item {
-    @apply focus-visible:border-inverse focus-visible:ring-primary/70 dark:focus-visible:border-interactive cursor-pointer border border-transparent text-sm font-medium focus-visible:ring-2 focus-visible:outline-hidden;
-
-    &.hoverable {
-      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary;
-    }
-
-    &.selected {
-      @apply bg-brand/10 text-brand;
-    }
-
-    &.destructive {
-      @apply text-danger;
-    }
-
-    &.disabled {
-      @apply pointer-events-none cursor-not-allowed opacity-50;
-    }
-  }
-
-  .menu-item-wrapper {
-    @apply flex items-center justify-between gap-2;
-
-    &.centered {
-      @apply justify-center;
-    }
-  }
-
-  .menu-item-description {
-    @apply text-subtle mr-6 text-xs font-normal;
-  }
+  /* All styles moved to inline */
 </style>

@@ -159,15 +159,21 @@
         <slot name="pagination-top">
           <div class="flex items-center justify-center gap-3">
             <button
-              class="caret"
+              class="caret relative"
               disabled={!$store.hasPrevious}
               on:click={() => {
                 store.previous();
                 handlePageChange();
               }}
               aria-label={previousButtonLabel}
+              style="width: 12px; height: 12px;"
+              class:cursor-not-allowed={!$store.hasPrevious}
+              class:opacity-50={!$store.hasPrevious}
             >
-              <span class="arrow arrow-left"></span>
+              <span
+                class="arrow arrow-left border-r-primary absolute left-0 top-0 h-0 w-0 border-b-transparent border-l-transparent border-t-transparent"
+                style="border-style: solid; border-width: 6px 12px 6px 0;"
+              ></span>
             </button>
             <p>
               {#if updating}
@@ -179,15 +185,21 @@
               {/if}
             </p>
             <button
-              class="caret"
+              class="caret relative"
               disabled={!$store.hasNext}
               on:click={() => {
                 store.next();
                 handlePageChange();
               }}
               aria-label={nextButtonLabel}
+              style="width: 12px; height: 12px;"
+              class:cursor-not-allowed={!$store.hasNext}
+              class:opacity-50={!$store.hasNext}
             >
-              <span class="arrow arrow-right"></span>
+              <span
+                class="arrow arrow-right border-l-primary absolute left-0 top-0 h-0 w-0 border-b-transparent border-r-transparent border-t-transparent"
+                style="border-style: solid; border-width: 6px 0 6px 12px;"
+              ></span>
             </button>
           </div>
         </slot>
@@ -220,15 +232,21 @@
       {/if}
       <div class="flex items-center justify-center gap-3">
         <button
-          class="caret"
+          class="caret relative"
           disabled={!$store.hasPrevious}
           on:click={() => {
             store.previous();
             handlePageChange();
           }}
           aria-label={previousButtonLabel}
+          style="width: 12px; height: 12px;"
+          class:cursor-not-allowed={!$store.hasPrevious}
+          class:opacity-50={!$store.hasPrevious}
         >
-          <span class="arrow arrow-left"></span>
+          <span
+            class="arrow arrow-left border-r-primary absolute left-0 top-0 h-0 w-0 border-b-transparent border-l-transparent border-t-transparent"
+            style="border-style: solid; border-width: 6px 12px 6px 0;"
+          ></span>
         </button>
         <p>
           {#if updating}
@@ -239,15 +257,21 @@
           {/if}
         </p>
         <button
-          class="caret"
+          class="caret relative"
           disabled={!$store.hasNext}
           on:click={() => {
             store.next();
             handlePageChange();
           }}
           aria-label={nextButtonLabel}
+          style="width: 12px; height: 12px;"
+          class:cursor-not-allowed={!$store.hasNext}
+          class:opacity-50={!$store.hasNext}
         >
-          <span class="arrow arrow-right"></span>
+          <span
+            class="arrow arrow-right border-l-primary absolute left-0 top-0 h-0 w-0 border-b-transparent border-r-transparent border-t-transparent"
+            style="border-style: solid; border-width: 6px 0 6px 12px;"
+          ></span>
         </button>
       </div>
       <slot name="action-bottom-right" />
@@ -258,33 +282,5 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .caret {
-    @apply relative;
-
-    width: 12px;
-    height: 12px;
-  }
-
-  .caret:disabled {
-    @apply cursor-not-allowed opacity-50;
-  }
-
-  .arrow {
-    @apply absolute top-0 left-0 h-0 w-0;
-
-    border-style: solid;
-    border-width: 6px 12px 6px 0;
-  }
-
-  .arrow-left {
-    border-width: 6px 12px 6px 0;
-
-    @apply border-r-primary border-t-transparent border-b-transparent border-l-transparent;
-  }
-
-  .arrow-right {
-    border-width: 6px 0 6px 12px;
-
-    @apply border-l-primary border-t-transparent border-r-transparent border-b-transparent;
-  }
+  /* Pagination styles moved to inline */
 </style>

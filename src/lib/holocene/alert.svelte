@@ -51,7 +51,15 @@
 </script>
 
 <div
-  class={merge('alert flex', intent, className)}
+  class={merge(
+    'alert text-primary flex items-start gap-2 break-words border p-5 text-sm',
+    intent === 'success' ? 'border-success bg-success' : '',
+    intent === 'info' ? 'border-information bg-information' : '',
+    intent === 'error' ? 'border-danger bg-danger' : '',
+    intent === 'warning' ? 'border-warning bg-warning' : '',
+    intent,
+    className,
+  )}
   class:hidden
   {role}
   {...$$restProps}
@@ -71,26 +79,6 @@
 
 <style lang="postcss">
   @reference "tailwindcss";
-
-  .alert {
-    @apply text-primary items-start gap-2 border p-5 text-sm break-words;
-  }
-
-  .alert.success {
-    @apply border-success bg-success;
-  }
-
-  .alert.info {
-    @apply border-information bg-information;
-  }
-
-  .alert.error {
-    @apply border-danger bg-danger;
-  }
-
-  .alert.warning {
-    @apply border-warning bg-warning;
-  }
 
   .content :global(> *) {
     @apply text-sm font-normal;

@@ -41,7 +41,7 @@
     <input
       bind:group={$group}
       type="radio"
-      class="surface-primary"
+      class="surface-primary border-secondary box-border h-5 w-5 cursor-pointer appearance-none rounded-full border outline-none"
       aria-describedby={description ? `${id}-description` : null}
       {name}
       {value}
@@ -54,7 +54,10 @@
     </span>
   </Label>
   {#if description}
-    <p class="description" id="{id}-description">
+    <p
+      class="description text-primary ml-6 text-xs font-normal"
+      id="{id}-description"
+    >
       {description}
     </p>
   {/if}
@@ -63,14 +66,10 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .description {
-    @apply text-primary ml-6 text-xs font-normal;
-  }
-
   input[type='radio'] {
-    @apply border-secondary box-border h-5 w-5 cursor-pointer appearance-none rounded-full border outline-none;
+    /* box styling moved to inline */
 
-    &:checked {
+    /* &:checked {
       @apply bg-interactive;
     }
 
@@ -98,6 +97,6 @@
 
     &:disabled {
       @apply cursor-not-allowed opacity-50;
-    }
+    } */
   }
 </style>

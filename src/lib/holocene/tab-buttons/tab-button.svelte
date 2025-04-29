@@ -49,7 +49,20 @@
 
 <svelte:element
   this={href ? 'a' : 'button'}
-  class={merge('toggle-button', className)}
+  class={merge(
+    'toggle-button border-subtle/0 text-primary flex items-center justify-center rounded-t border border-b-0 px-4 py-2 text-sm leading-4 focus-visible:outline-none',
+    href
+      ? $page.url.pathname.includes(base) || active
+        ? 'surface-primary border-subtle/100'
+        : ''
+      : active
+        ? 'surface-primary border-subtle/100'
+        : '',
+    $$restProps.disabled
+      ? 'cursor-not-allowed opacity-50'
+      : 'hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-primary/70 focus-visible:ring-2',
+    className,
+  )}
   class:group
   class:active={href ? $page.url.pathname.includes(base) : active}
   href={href ? href + $page.url.search : null}
@@ -76,19 +89,5 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .toggle-button {
-    @apply border-subtle/0 text-primary flex items-center justify-center rounded-t border border-b-0 px-4 py-2 text-sm leading-4 focus-visible:outline-none;
-
-    &:not(.disabled) {
-      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-primary/70 focus-visible:ring-2;
-    }
-  }
-
-  .toggle-button.active {
-    @apply surface-primary border-subtle/100;
-  }
-
-  .toggle-button.disabled {
-    @apply cursor-not-allowed opacity-50;
-  }
+  /* Toggle button styles moved to inline */
 </style>

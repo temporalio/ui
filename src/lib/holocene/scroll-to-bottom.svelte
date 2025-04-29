@@ -5,7 +5,7 @@
   export let onScrollToBottomClick: () => void;
 </script>
 
-<div class="jump-to-bottom relative" class:hidden>
+<div class="jump-to-bottom relative" class:hidden class:invisible={hidden}>
   <Button
     size="xs"
     variant="primary"
@@ -18,7 +18,5 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .hidden {
-    @apply invisible;
-  }
+  /* Hidden styles moved to inline */
 </style>

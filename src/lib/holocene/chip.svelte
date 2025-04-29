@@ -17,7 +17,13 @@
   };
 </script>
 
-<span class={merge('chip', intent)}>
+<span
+  class={merge(
+    'chip surface-subtle flex h-8 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-sm p-1 text-sm',
+    intent === 'warning' ? 'bg-danger' : '',
+    intent,
+  )}
+>
   {#if button}
     <button class="flex items-center gap-1" on:click>
       <slot />
@@ -38,14 +44,12 @@
   @reference "tailwindcss";
 
   .chip {
-    @apply surface-subtle flex h-8 w-fit min-w-fit flex-row items-center justify-between gap-1 rounded-sm p-1 text-sm break-all whitespace-nowrap;
+    /* Styles moved to inline */
 
     :global(.icon-button) {
       @apply ml-1 h-auto w-fit;
     }
   }
 
-  .warning {
-    @apply bg-danger;
-  }
+  /* Warning styles moved to inline */
 </style>

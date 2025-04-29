@@ -49,11 +49,26 @@
 
 <svelte:element
   this={href ? 'a' : 'button'}
-  class={merge('toggle-button', className)}
+  class={merge(
+    'toggle-button surface-primary border-subtle text-primary flex items-center justify-center border px-4 py-2 text-sm leading-4 focus-visible:outline-none',
+    href
+      ? $page.url.pathname.includes(base) || active
+        ? 'bg-interactive-secondary-active'
+        : ''
+      : active
+        ? 'bg-interactive-secondary-active'
+        : '',
+    $$restProps.disabled
+      ? 'cursor-not-allowed opacity-50'
+      : 'hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-primary/70 focus-visible:ring-2',
+    group && !$$restProps.disabled ? 'group' : '',
+    className,
+  )}
   class:group
   class:active={href ? $page.url.pathname.includes(base) : active}
   href={href ? href + $page.url.search : null}
   class:disabled={$$restProps.disabled}
+  class:border-r-0={group && !$$restProps.disabled}
   on:click
   role="button"
   tabindex="0"
@@ -76,23 +91,5 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .toggle-button {
-    @apply surface-primary border-subtle text-primary flex items-center justify-center border px-4 py-2 text-sm leading-4 focus-visible:outline-none;
-
-    &:not(.disabled) {
-      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-primary/70 focus-visible:ring-2;
-    }
-  }
-
-  .toggle-button.active {
-    @apply bg-interactive-secondary-active;
-  }
-
-  .toggle-button.disabled {
-    @apply cursor-not-allowed opacity-50;
-  }
-
-  .group:not(:last-child) {
-    @apply border-r-0;
-  }
+  /* Toggle button styles moved to inline */
 </style>

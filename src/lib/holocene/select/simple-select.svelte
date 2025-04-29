@@ -34,7 +34,11 @@
 <div>
   <Label {required} {label} hidden for={id} />
   <select
-    class={merge('inline h-10 w-full border px-2 text-base', className)}
+    class={merge(
+      'border-secondary text-primary dark:surface-primary outline-hidden inline h-10 w-full border bg-transparent px-2 text-base focus-visible:outline focus-visible:outline-blue-700',
+      arrow ? 'h-8 appearance-none py-1 pl-3 text-sm' : '',
+      className,
+    )}
     class:remove={arrow}
     {name}
     {id}
@@ -53,11 +57,5 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  select {
-    @apply border-secondary text-primary dark:surface-primary bg-transparent outline-hidden focus-visible:outline focus-visible:outline-blue-700;
-  }
-
-  .remove {
-    @apply h-8 appearance-none py-1 pl-3 text-sm;
-  }
+  /* Select styles moved to inline */
 </style>

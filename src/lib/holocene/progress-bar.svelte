@@ -2,35 +2,23 @@
   export let width = '100%';
 </script>
 
-<div class="meter">
-  <span style="width: {width};"></span>
+<div
+  class="meter bg-linear-to-r absolute left-0 right-0 box-content h-[5px] from-blue-200 to-blue-600"
+  style="box-shadow: inset 0 -1px 1px rgb(255 255 255 / 30%); z-index: 5;"
+>
+  <span
+    class="relative block h-full overflow-hidden bg-blue-500"
+    style="width: {width}; background-image: linear-gradient(center bottom, rgb(96 165 250) 32%, rgb(59 130 246) 77%); box-shadow: inset 0 2px 9px rgb(255 255 255 / 25%), inset 0 -2px 6px rgb(0 0 0 / 40%);"
+  ></span>
 </div>
 
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .meter {
-    @apply absolute right-0 left-0 box-content h-[5px] bg-linear-to-r from-blue-200 to-blue-600;
-
-    box-shadow: inset 0 -1px 1px rgb(255 255 255 / 30%);
-    z-index: 5;
-  }
-
-  .meter > span {
-    @apply relative block h-full overflow-hidden bg-blue-500;
-
-    background-image: linear-gradient(
-      center bottom,
-      rgb(96 165 250) 32%,
-      rgb(59 130 246) 77%
-    );
-    box-shadow:
-      inset 0 2px 9px rgb(255 255 255 / 25%),
-      inset 0 -2px 6px rgb(0 0 0 / 40%);
-  }
+  /* Basic meter styles moved to inline */
 
   .meter > span::after {
-    @apply absolute top-0 right-0 bottom-0 left-0 overflow-hidden;
+    @apply absolute bottom-0 left-0 right-0 top-0 overflow-hidden;
 
     content: '';
     background-image: linear-gradient(

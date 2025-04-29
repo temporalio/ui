@@ -31,8 +31,8 @@
       {#each namespaces as { namespace, onClick }}
         <li>
           <button
-            class="namespace"
-            class:selected={namespace === $lastUsedNamespace}
+            class="hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:ring-primary/70 dark:focus-visible:border-interactive focus-visible:outline-hidden w-full cursor-pointer border border-transparent text-left text-sm font-medium focus-visible:ring-2"
+            class:text-brand={namespace === $lastUsedNamespace}
             on:click|preventDefault|stopPropagation={() => onClick(namespace)}
           >
             {namespace}
@@ -42,15 +42,3 @@
     </ul>
   </div>
 {/if}
-
-<style lang="postcss">
-  @reference "tailwindcss";
-
-  .namespace {
-    @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:ring-primary/70 dark:focus-visible:border-interactive w-full cursor-pointer border border-transparent text-left text-sm font-medium focus-visible:ring-2 focus-visible:outline-hidden;
-
-    &.selected {
-      @apply text-brand;
-    }
-  }
-</style>

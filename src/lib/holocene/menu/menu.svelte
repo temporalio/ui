@@ -47,7 +47,18 @@
 <ul
   in:fly={{ duration: 100 }}
   role="menu"
-  class={merge('menu', maxHeight, position, className)}
+  class={merge(
+    'menu surface-primary border-subtle text-primary absolute z-20 mt-1 min-w-fit list-none overflow-auto border shadow',
+    position === 'left' || position === 'top-left'
+      ? 'left-0 origin-top-left'
+      : '',
+    position === 'right' || position === 'top-right'
+      ? 'right-0 origin-top-right'
+      : '',
+    maxHeight,
+    position,
+    className,
+  )}
   class:hidden={!$open}
   aria-labelledby={id}
   tabindex={-1}
@@ -67,17 +78,5 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .menu {
-    @apply surface-primary border-subtle text-primary absolute z-20 mt-1 min-w-fit list-none overflow-auto border shadow;
-
-    &.left,
-    &.top-left {
-      @apply left-0 origin-top-left;
-    }
-
-    &.right,
-    &.top-right {
-      @apply right-0 origin-top-right;
-    }
-  }
+  /* Menu styles moved to inline */
 </style>

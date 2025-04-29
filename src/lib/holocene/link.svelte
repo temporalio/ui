@@ -44,7 +44,16 @@
   {href}
   target={newTab ? '_blank' : null}
   rel={newTab ? 'noreferrer noopener' : null}
-  class={merge('link', icon ? 'inline-flex' : 'inline', className)}
+  class={merge(
+    'link text-primary hover:text-brand focus-visible:text-brand focus-visible:ring-primary/70 focus-visible:outline-hidden max-w-fit cursor-pointer items-center gap-2 underline underline-offset-2 focus-visible:ring-2',
+    active ? 'text-brand' : '',
+    interactive
+      ? 'text-white hover:text-indigo-200 focus-visible:text-indigo-200'
+      : '',
+    light ? 'text-off-white hover:text-indigo-400' : '',
+    icon ? 'inline-flex' : 'inline',
+    className,
+  )}
   class:active
   class:interactive
   class:light
@@ -64,21 +73,7 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .link {
-    @apply text-primary hover:text-brand focus-visible:text-brand focus-visible:ring-primary/70 max-w-fit cursor-pointer items-center gap-2 underline underline-offset-2 focus-visible:ring-2 focus-visible:outline-hidden;
-
-    &.active {
-      @apply text-brand;
-    }
-
-    &.interactive {
-      @apply text-white hover:text-indigo-200 focus-visible:text-indigo-200;
-    }
-
-    &.light {
-      @apply text-off-white hover:text-indigo-400;
-    }
-  }
+  /* Link styles moved to inline */
 
   .link[role='button'] {
     @apply no-underline;

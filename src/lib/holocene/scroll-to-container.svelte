@@ -11,7 +11,10 @@
   export let scrollToBottomAriaLabel: string;
 </script>
 
-<div id="scroll-container" class={$$props.class}>
+<div
+  id="scroll-container"
+  class="fixed bottom-5 right-8 z-50 hidden w-auto gap-2 md:flex {$$props.class}"
+>
   <ScrollToTop
     hidden={scrollToTopHidden}
     {onScrollToTopClick}
@@ -29,7 +32,5 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  #scroll-container {
-    @apply fixed right-8 bottom-5 z-50 hidden w-auto gap-2 md:flex;
-  }
+  /* Scroll container styles moved to inline */
 </style>

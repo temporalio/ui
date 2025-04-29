@@ -84,7 +84,7 @@
 
 {#if menuIsOpen}
   <div
-    class="group surface-primary fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto md:hidden"
+    class="surface-primary group fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto md:hidden"
     data-nav="open"
     in:slide={{ duration: 200, delay: 0 }}
     out:slide={{ duration: 200, delay: 0 }}
@@ -122,7 +122,9 @@
     {/if}
   </button>
   {#if showNamespacePicker}
-    <div class="namespace-wrapper">
+    <div
+      class="surface-black border-subtle dark:focus-within:surface-primary focus-within:border-interactive focus-within:ring-primary/70 focus-within:outline-hidden flex h-10 w-full grow flex-row items-center border px-0.5 text-sm focus-within:ring-2"
+    >
       <Button
         variant="ghost"
         data-testid="namespace-switcher"
@@ -142,7 +144,7 @@
     </div>
   {/if}
   <button
-    class="nav-button"
+    class="relative select-none p-1 text-center align-middle text-xs font-medium uppercase transition-all"
     data-testid="nav-profile-button"
     class:active-shadow={viewSettings}
     type="button"
@@ -159,15 +161,3 @@
     {/if}
   </button>
 </nav>
-
-<style lang="postcss">
-  @reference "tailwindcss";
-
-  .namespace-wrapper {
-    @apply surface-black border-subtle dark:focus-within:surface-primary focus-within:border-interactive focus-within:ring-primary/70 flex h-10 w-full grow flex-row items-center border px-0.5 text-sm focus-within:ring-2 focus-within:outline-hidden;
-  }
-
-  .nav-button {
-    @apply relative p-1 text-center align-middle text-xs font-medium uppercase transition-all select-none;
-  }
-</style>

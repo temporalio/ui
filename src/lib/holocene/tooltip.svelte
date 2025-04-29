@@ -78,8 +78,18 @@
     <slot />
     <div
       class={merge(
-        'tooltip absolute top-0 left-0 z-50 hidden translate-x-12 text-xs whitespace-nowrap opacity-0 transition-all group-hover:inline-block group-hover:opacity-90',
+        'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover:inline-block group-hover:opacity-90',
         show && 'inline-block opacity-90',
+        top && 'left-1/2 -mt-2 -translate-x-1/2 -translate-y-full',
+        bottom && 'bottom-0 left-1/2 -mb-2 -translate-x-1/2 translate-y-full',
+        left && 'left-0 top-[50%] -ml-2 -translate-x-full -translate-y-1/2',
+        right && 'right-0 top-[50%] -mr-2 -translate-y-1/2 translate-x-full',
+        topRight && 'left-auto right-0 -mt-2 -translate-y-full translate-x-0',
+        topLeft && 'left-0 right-auto -mt-2 -translate-y-full translate-x-0',
+        bottomLeft &&
+          'bottom-0 left-0 right-auto -mb-2 translate-x-0 translate-y-full',
+        bottomRight &&
+          'bottom-0 left-auto right-0 -mb-2 translate-x-0 translate-y-full',
       )}
       class:left
       class:right
@@ -106,35 +116,5 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .tooltip.top {
-    @apply left-1/2 -mt-2 -translate-x-1/2 -translate-y-full;
-  }
-
-  .tooltip.bottom {
-    @apply bottom-0 left-1/2 -mb-2 -translate-x-1/2 translate-y-full;
-  }
-
-  .tooltip.left {
-    @apply top-[50%] left-0 -ml-2 -translate-x-full -translate-y-1/2;
-  }
-
-  .tooltip.right {
-    @apply top-[50%] right-0 -mr-2 translate-x-full -translate-y-1/2;
-  }
-
-  .tooltip.topRight {
-    @apply right-0 left-auto -mt-2 translate-x-0 -translate-y-full;
-  }
-
-  .tooltip.topLeft {
-    @apply right-auto left-0 -mt-2 translate-x-0 -translate-y-full;
-  }
-
-  .tooltip.bottomLeft {
-    @apply right-auto bottom-0 left-0 -mb-2 translate-x-0 translate-y-full;
-  }
-
-  .tooltip.bottomRight {
-    @apply right-0 bottom-0 left-auto -mb-2 translate-x-0 translate-y-full;
-  }
+  /* Tooltip positioning styles moved to inline */
 </style>

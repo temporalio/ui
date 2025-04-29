@@ -130,6 +130,7 @@
         value={!value && placeholder !== '' ? placeholder : $labelCtx}
         tabindex="-1"
         disabled
+        class="pointer-events-none w-full grow bg-transparent text-sm"
         class:disabled
         {required}
         aria-required={required}
@@ -154,7 +155,5 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  input {
-    @apply pointer-events-none w-full grow bg-transparent text-sm;
-  }
+  /* Input styles moved to inline */
 </style>

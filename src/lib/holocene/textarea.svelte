@@ -48,14 +48,15 @@
   <div
     class={merge(
       'border-subtle focus-within:border-information focus-within:ring-primary/70 relative box-border inline-flex w-full border focus-within:ring-2',
-      !isValid && 'error',
+      !isValid &&
+        'border-danger focus-within:border-danger focus-within:ring-danger/70 focus-within:ring-2',
       !disabled && 'hover:border-information',
     )}
   >
     <textarea
       bind:value
       class={merge(
-        'surface-primary placeholder:text-secondary min-h-fit w-full px-3 py-2 text-sm focus-visible:outline-hidden',
+        'surface-primary placeholder:text-secondary focus-visible:outline-hidden min-h-fit w-full px-3 py-2 text-sm',
         disabled && 'cursor-not-allowed opacity-50',
       )}
       {id}
@@ -75,8 +76,9 @@
   </div>
   <div class="flex justify-between gap-2">
     <div
-      class="error-msg"
+      class="error-msg border-danger text-danger min-h-[1.25rem] break-words text-sm font-normal"
       class:min-width={maxLength}
+      class:w-[calc(100%-6rem)]={maxLength}
       aria-live={isValid ? 'off' : 'assertive'}
     >
       {#if !isValid}
@@ -87,11 +89,16 @@
       {/if}
     </div>
     {#if maxLength && !disabled}
-      <span class="count">
+      <span
+        class="count text-primary invisible text-right text-sm font-medium group-focus-within:visible"
+      >
         <span
           class="text-information"
           class:warn={maxLength - value?.length <= 5}
-          class:error={maxLength === value?.length}>{value?.length ?? 0}</span
+          class:error={maxLength === value?.length}
+          class:text-warning={maxLength - value?.length <= 5}
+          class:text-danger={maxLength === value?.length}
+          >{value?.length ?? 0}</span
         >&nbsp;/&nbsp;{maxLength}
       </span>
     {/if}
@@ -106,7 +113,7 @@
   }
 
   .error-msg {
-    @apply border-danger text-danger min-h-[1.25rem] text-sm font-normal break-words;
+    @apply border-danger text-danger min-h-[1.25rem] break-words text-sm font-normal;
   }
 
   .error-msg.min-width {

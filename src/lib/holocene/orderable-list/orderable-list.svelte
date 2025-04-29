@@ -2,11 +2,11 @@
   import OrderableListItem from './orderable-list-item.svelte';
 </script>
 
-<div class="orderable-section">
+<div class="orderable-section flex flex-col gap-1">
   <h5>
     <slot name="heading">Items</slot>
   </h5>
-  <ol class="orderable-list">
+  <ol class="orderable-list surface-primary border-subtle border">
     <slot>
       <OrderableListItem readonly label="No Items" pinned={false} />
     </slot>
@@ -16,11 +16,5 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .orderable-section {
-    @apply flex flex-col gap-1;
-  }
-
-  .orderable-list {
-    @apply surface-primary border-subtle border;
-  }
+  /* Orderable list styles moved to inline */
 </style>

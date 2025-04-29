@@ -76,8 +76,10 @@
 
 <li
   draggable={!isStatic && !readonly}
-  class="orderable-item group"
+  class="orderable-item border-subtle group flex select-none list-none flex-row items-center justify-between border-b p-2 text-sm font-medium last-of-type:border-b-0"
   class:readonly
+  class:cursor-move={!isStatic && !readonly}
+  class:surface-secondary={readonly}
   on:dragstart={(e) => handleDragStart(e, index)}
   on:drop|preventDefault={(e) => handleDrop(e, index)}
   on:dragenter|preventDefault|stopPropagation={handleDragEnter}
@@ -145,17 +147,7 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .orderable-item {
-    @apply border-subtle flex list-none flex-row items-center justify-between border-b p-2 text-sm font-medium select-none last-of-type:border-b-0;
-  }
-
-  .orderable-item[draggable='true'] {
-    @apply cursor-move;
-  }
-
-  .orderable-item.readonly {
-    @apply surface-secondary;
-  }
+  /* Basic styles moved to inline */
 
   :global(.orderable-item.dragging-over:not(.locked)) {
     @apply bg-linear-to-br from-blue-100 to-purple-100;

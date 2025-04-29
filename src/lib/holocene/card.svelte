@@ -1,11 +1,9 @@
-<div class="card surface-primary {$$props.class}">
+<div class="card surface-primary border-subtle border p-4 {$$props.class}">
   <slot />
 </div>
 
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .card {
-    @apply border-subtle border p-4;
-  }
+  /* Card styles moved to inline */
 </style>

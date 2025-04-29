@@ -2,6 +2,7 @@
   import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
   import { getContext } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import { isNull } from '$lib/utilities/is';
 
@@ -47,7 +48,11 @@
   this={href ? 'a' : 'button'}
   type={href ? undefined : 'button'}
   role="tab"
-  class="tab"
+  class={merge(
+    'tab focus-visible:ring-primary/70 outline-hidden flex cursor-pointer items-center gap-1 whitespace-nowrap border-b border-transparent text-sm font-medium focus-visible:ring-2',
+    isActive ? 'border-brand' : '',
+    disabled ? 'cursor-not-allowed opacity-50' : 'hover:text-brand',
+  )}
   aria-selected={isActive}
   aria-controls={panelId}
   tabindex={isActive ? 0 : -1}
@@ -62,23 +67,3 @@
   {label}
   <slot />
 </svelte:element>
-
-<style lang="postcss">
-  @reference "tailwindcss";
-
-  .tab {
-    @apply focus-visible:ring-primary/70 flex cursor-pointer items-center gap-1 border-b border-transparent text-sm font-medium whitespace-nowrap outline-hidden focus-visible:ring-2;
-
-    &:not(.disabled) {
-      @apply hover:text-brand;
-    }
-  }
-
-  .tab.active {
-    @apply border-brand;
-  }
-
-  .tab.disabled {
-    @apply cursor-not-allowed opacity-50;
-  }
-</style>

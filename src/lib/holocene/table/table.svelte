@@ -18,7 +18,18 @@
   export let updating = false;
 </script>
 
-<table class={merge(variant, className)} {...$$restProps}>
+<table
+  class={merge(
+    'relative',
+    variant === 'fancy'
+      ? 'surface-primary border-table border-separate border-spacing-0 border'
+      : '',
+    variant === 'simple' ? 'simple' : '',
+    variant,
+    className,
+  )}
+  {...$$restProps}
+>
   <slot name="caption" />
   <thead>
     <slot name="headers" />
@@ -35,7 +46,7 @@
   @reference "tailwindcss";
 
   table {
-    @apply relative;
+    /* Base styles moved to inline */
 
     thead :global(th) {
       @apply text-left text-sm font-medium;

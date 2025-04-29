@@ -88,7 +88,11 @@
   {id}
   on:close={handleCancel}
   bind:this={modalElement}
-  class={merge('body', className)}
+  class={merge(
+    'body surface-primary border-secondary text-primary z-50 w-full max-w-lg overflow-y-auto border p-0 shadow-xl md:h-max',
+    large ? 'lg:max-w-3xl' : '',
+    className,
+  )}
   class:large
   class:hightlightNav
   aria-modal="true"
@@ -105,11 +109,14 @@
       on:click={closeModal}
     />
   {/if}
-  <div id="modal-title-{id}" class="title">
+  <div
+    id="modal-title-{id}"
+    class="title surface-primary px-8 pb-0 pt-8 text-2xl"
+  >
     <slot name="title" />
   </div>
   <form on:submit|preventDefault={confirmModal} method="dialog">
-    <div id="modal-content-{id}" class="content">
+    <div id="modal-content-{id}" class="content whitespace-normal p-8">
       <slot name="content" />
       <p
         class="text-danger mt-2 text-sm font-normal"
@@ -139,27 +146,13 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .body {
-    @apply surface-primary border-secondary text-primary z-50 w-full max-w-lg overflow-y-auto border p-0 shadow-xl md:h-max;
-  }
+  /* Basic styles moved to inline */
 
   .body::backdrop {
     @apply cursor-pointer;
   }
 
   .body.hightlightNav::backdrop {
-    @apply top-[40px] left-[60px];
-  }
-
-  .large {
-    @apply lg:max-w-3xl;
-  }
-
-  .title {
-    @apply surface-primary px-8 pt-8 pb-0 text-2xl;
-  }
-
-  .content {
-    @apply p-8 whitespace-normal;
+    @apply left-[60px] top-[40px];
   }
 </style>

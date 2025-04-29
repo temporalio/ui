@@ -95,6 +95,9 @@
       class={merge(
         'input-container',
         'surface-primary border-subtle focus-within:ring-primary/70 focus-within:outline-hidden relative box-border inline-flex h-10 w-full items-center border text-sm focus-within:ring-2',
+        error || !valid ? 'border-danger focus-within:ring-danger/70' : '',
+        disabled ? 'opacity-50' : '',
+        noBorder ? 'border-none' : '',
       )}
       class:disabled
       class:error
@@ -102,15 +105,20 @@
       class:invalid={!valid}
     >
       {#if icon}
-        <span class="icon-container">
+        <span class="icon-container ml-2 flex items-center justify-center">
           <Icon name={icon} />
         </span>
       {:else if prefix}
-        <p class="prefix">{prefix}</p>
+        <p
+          class="prefix border-subtle text-secondary block h-full w-fit border-r px-4 py-2"
+        >
+          {prefix}
+        </p>
       {/if}
       <input
-        class="input"
+        class="input placeholder:text-secondary m-2 w-full bg-transparent focus:outline-none"
         class:disabled
+        class:caret-danger={error || !valid}
         {disabled}
         data-lpignore="true"
         data-1p-ignore="true"
@@ -133,7 +141,9 @@
         {...$$restProps}
       />
       {#if copyable}
-        <div class="copy-icon-container">
+        <div
+          class="copy-icon-container border-subtle flex h-full w-9 cursor-pointer items-center justify-center border-l"
+        >
           <button aria-label={copyButtonLabel} on:click={(e) => copy(e, value)}>
             {#if $copied}
               <Icon name="checkmark" />
@@ -143,11 +153,16 @@
           </button>
         </div>
       {:else if disabled}
-        <div class="disabled-icon-container">
+        <div
+          class="disabled-icon-container flex h-full w-9 items-center justify-center px-1"
+        >
           <Icon name="lock" />
         </div>
       {:else if clearable && value}
-        <div class="clear-icon-container" data-testid="clear-input">
+        <div
+          class="clear-icon-container mr-2 flex w-6 cursor-pointer items-center justify-center"
+          data-testid="clear-input"
+        >
           <IconButton
             label={clearButtonLabel}
             on:click={onClear}
@@ -156,16 +171,19 @@
         </div>
       {/if}
       {#if maxLength && !disabled && !hideCount}
-        <span class="count">
+        <span class="count mx-2 hidden text-sm font-medium tracking-widest">
           <span
             class:ok={maxLength - value.length > 5}
             class:warn={maxLength - value.length <= 5}
-            class:error={maxLength === value.length}>{value.length}</span
+            class:error={maxLength === value.length}
+            class:text-success={maxLength - value.length > 5}
+            class:text-warning={maxLength - value.length <= 5}
+            class:text-danger={maxLength === value.length}>{value.length}</span
           >/{maxLength}
         </span>
       {/if}
       {#if suffix}
-        <div class="suffix">
+        <div class="suffix border-subtle block h-full w-fit border-l px-4 py-2">
           {suffix}
         </div>
       {/if}
@@ -174,9 +192,10 @@
   </div>
 
   <span
-    class="hint-text inline-block"
+    class="hint-text text-primary inline-block text-xs"
     class:invalid={!valid}
     class:error
+    class:text-danger={!valid || error}
     class:hidden={!hintText}
     role={error ? 'alert' : null}
   >
@@ -187,82 +206,14 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .input-container {
-    &.error,
-    &.invalid {
-      @apply border-danger focus-within:ring-danger/70;
+  /* Most styles have been moved to inline classes */
 
-      > .input {
-        @apply caret-danger;
-      }
-    }
-
-    &.disabled {
-      @apply opacity-50;
-    }
-  }
-
-  .input {
-    @apply placeholder:text-secondary m-2 w-full bg-transparent focus:outline-none;
-  }
-
-  .prefix {
-    @apply border-subtle text-secondary block h-full w-fit border-r px-4 py-2;
-  }
-
-  .suffix {
-    @apply border-subtle block h-full w-fit border-l px-4 py-2;
-  }
-
-  .noBorder {
-    @apply border-none;
-  }
-
-  .icon-container {
-    @apply ml-2 flex items-center justify-center;
-  }
-
-  .copy-icon-container {
-    @apply border-subtle flex h-full w-9 cursor-pointer items-center justify-center border-l;
-  }
-
-  .disabled-icon-container {
-    @apply flex h-full w-9 items-center justify-center px-1;
-  }
-
-  .clear-icon-container {
-    @apply mr-2 flex w-6 cursor-pointer items-center justify-center;
-  }
-
-  .count {
-    @apply mx-2 hidden text-sm font-medium tracking-widest;
-
-    > .ok {
-      @apply text-success;
-    }
-
-    > .warn {
-      @apply text-warning;
-    }
-
-    > .error {
-      @apply text-danger;
-    }
-  }
-
+  /* This selector is hard to move inline, so we keep it in CSS */
   .input:focus ~ .count {
     @apply block;
   }
 
-  .hint-text {
-    @apply text-primary text-xs;
-
-    &.error,
-    &.invalid {
-      @apply text-danger;
-    }
-  }
-
+  /* Search cancel button needs to be in CSS */
   input[type='search']::-webkit-search-cancel-button {
     @apply hidden;
   }

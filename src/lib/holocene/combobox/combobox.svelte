@@ -383,13 +383,21 @@
 <MenuContainer {open} on:close={handleMenuClose}>
   <Label class="pb-1" hidden={labelHidden} {required} {label} for={id} />
 
-  <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
+  <div
+    class="combobox-wrapper surface-primary border-subtle dark:focus-within:surface-primary focus-within:border-interactive focus-within:ring-primary/70 focus-within:outline-hidden flex max-h-28 min-h-10 w-full flex-row items-center overflow-auto border text-sm focus-within:ring-2"
+    class:disabled
+    class:invalid={!valid}
+    class:border-danger={!valid}
+    class:text-danger={!valid}
+    class:focus-within:ring-danger={!valid}
+    class:opacity-50={disabled}
+  >
     {#if leadingIcon}
       <Icon class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
     <div
       class={merge(
-        'input-wrapper',
+        'input-wrapper flex w-full flex-wrap items-center',
         multiselect && 'gap-1',
         multiselect && 'm-1',
         leadingIcon && multiselect && 'ml-2',
@@ -420,7 +428,7 @@
         value={displayValue}
         class:disabled
         class={merge(
-          'combobox-input',
+          'combobox-input text-primary placeholder:text-secondary flex grow bg-transparent focus:outline-none',
           multiselect
             ? value.length > 0 || leadingIcon
               ? 'indent-0'
@@ -524,34 +532,12 @@
   </Menu>
 
   {#if error && !valid}
-    <span class="error">{error}</span>
+    <span class="error text-danger text-xs">{error}</span>
   {/if}
 </MenuContainer>
 
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .combobox-wrapper {
-    @apply surface-primary border-subtle dark:focus-within:surface-primary focus-within:border-interactive focus-within:ring-primary/70 flex max-h-28 min-h-10 w-full flex-row items-center overflow-auto border text-sm focus-within:ring-2 focus-within:outline-hidden;
-
-    &.invalid {
-      @apply border-danger text-danger focus-within:ring-danger/70 border;
-    }
-
-    &.disabled {
-      @apply opacity-50;
-    }
-  }
-
-  .error {
-    @apply text-danger text-xs;
-  }
-
-  .input-wrapper {
-    @apply flex w-full flex-wrap items-center;
-  }
-
-  .combobox-input {
-    @apply text-primary placeholder:text-secondary flex grow bg-transparent focus:outline-none;
-  }
+  /* All styles moved to inline */
 </style>

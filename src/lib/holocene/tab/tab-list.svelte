@@ -14,7 +14,7 @@
 </script>
 
 <div
-  class={merge('tab-list', className)}
+  class={merge('tab-list flex flex-row gap-4', className)}
   role="tablist"
   aria-label={label}
   {...$$restProps}
@@ -25,7 +25,5 @@
 <style lang="postcss">
   @reference "tailwindcss";
 
-  .tab-list {
-    @apply flex flex-row gap-4;
-  }
+  /* tab-list styles moved to inline */
 </style>
