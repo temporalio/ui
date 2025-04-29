@@ -59,8 +59,10 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .row:hover {
-    @apply cursor-pointer bg-interactive-table-hover bg-fixed;
+    @apply bg-interactive-table-hover cursor-pointer bg-fixed;
   }
 
   .active {
@@ -93,16 +95,16 @@
 
   .failure:hover,
   .active.canceled {
-    @apply bg-gradient-to-br from-red-100 to-red-200 bg-fixed;
+    @apply bg-linear-to-br from-red-100 to-red-200 bg-fixed;
   }
 
   .canceled:hover,
   .active.canceled {
-    @apply bg-gradient-to-br from-yellow-100 to-yellow-200 bg-fixed;
+    @apply bg-linear-to-br from-yellow-100 to-yellow-200 bg-fixed;
   }
 
   .terminated:hover,
   .active.terminated {
-    @apply bg-gradient-to-br from-pink-100 to-pink-200 bg-fixed;
+    @apply bg-linear-to-br from-pink-100 to-pink-200 bg-fixed;
   }
 </style>

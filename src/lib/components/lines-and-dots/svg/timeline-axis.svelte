@@ -54,6 +54,8 @@
 {/each}
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   text {
     @apply fill-current;
   }

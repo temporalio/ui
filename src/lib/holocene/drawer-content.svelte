@@ -20,6 +20,8 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .title-wrapper {
     @apply flex flex-col justify-center gap-2 px-8 py-4;
 
@@ -33,7 +35,7 @@
   }
 
   .content {
-    @apply whitespace-normal px-8;
+    @apply px-8 whitespace-normal;
 
     &.right {
       @apply py-4;

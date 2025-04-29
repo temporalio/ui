@@ -59,11 +59,13 @@
 </tr>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .batch-actions-checkbox-table-cell {
     @apply w-10;
   }
 
   .batch-actions-table-cell {
-    @apply overflow-visible whitespace-nowrap font-medium;
+    @apply overflow-visible font-medium whitespace-nowrap;
   }
 </style>

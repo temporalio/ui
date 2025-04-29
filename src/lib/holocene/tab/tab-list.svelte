@@ -23,6 +23,8 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .tab-list {
     @apply flex flex-row gap-4;
   }

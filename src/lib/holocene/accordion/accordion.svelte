@@ -41,14 +41,14 @@
 
 {#if expandable}
   <div
-    class={merge('surface-primary w-full border border-subtle', className)}
+    class={merge('surface-primary border-subtle w-full border', className)}
     {...$$restProps}
   >
     <button
       id="{id}-trigger"
       aria-expanded={open}
       aria-controls="{id}-content"
-      class="flex w-full flex-col p-4 focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
+      class="focus-visible:bg-interactive-secondary-hover flex w-full flex-col p-4 focus-visible:outline-hidden"
       type="button"
       on:click={toggleAccordion}
     >
@@ -94,7 +94,7 @@
     </div>
   </div>
 {:else}
-  <div class="surface-primary w-full border border-subtle p-4" {...$$restProps}>
+  <div class="surface-primary border-subtle w-full border p-4" {...$$restProps}>
     <div class="flex w-full flex-col">
       <div class="flex w-full flex-row items-center justify-between gap-2">
         <div class="flex w-full items-center gap-2">

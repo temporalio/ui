@@ -104,12 +104,14 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .content {
     @apply block w-full px-2 py-1 text-left;
   }
 
   .code-block-row {
-    @apply block w-full select-all py-1 text-left;
+    @apply block w-full py-1 text-left select-all;
   }
 
   .detail-row {

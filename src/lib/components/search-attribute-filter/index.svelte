@@ -247,6 +247,8 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .filter {
     @apply grow;
   }

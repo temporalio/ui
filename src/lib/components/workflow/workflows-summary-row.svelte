@@ -52,7 +52,7 @@
     />
   </td>
   <td
-    class="relative break-words pr-4"
+    class="relative pr-4 break-words"
     on:mouseover={() => (showFilterCopy = true)}
     on:focus={() => (showFilterCopy = true)}
     on:mouseleave={() => (showFilterCopy = false)}
@@ -116,6 +116,8 @@
 </TableRow>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .time-cell {
     @apply max-xl:hidden;
   }

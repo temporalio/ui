@@ -16,6 +16,8 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .hidden {
     @apply invisible;
   }

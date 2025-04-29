@@ -51,12 +51,14 @@
 {/if}
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .copy-or-filter {
-    @apply absolute bottom-0 right-0 top-0 inline-flex gap-2 px-2;
+    @apply absolute top-0 right-0 bottom-0 inline-flex gap-2 px-2;
   }
 
   .copy-or-filter-button {
-    @apply surface-primary relative top-[50%] h-fit translate-y-[-50%] rounded-full p-1 text-primary hover:surface-inverse;
+    @apply surface-primary text-primary hover:surface-inverse relative top-[50%] h-fit translate-y-[-50%] rounded-full p-1;
   }
 
   .filtered {

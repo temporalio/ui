@@ -45,7 +45,7 @@
         ).format(operation.totalOperationCount)}
       </span>
     </div>
-    <div class="relative h-2 w-full overflow-hidden rounded bg-indigo-100">
+    <div class="relative h-2 w-full overflow-hidden rounded-sm bg-indigo-100">
       <div
         class="absolute left-0 flex h-full items-center bg-indigo-600"
         style="width:{progressPercent}%;"
@@ -68,7 +68,7 @@
         })}</span
       >
     </div>
-    <div class="relative h-2 w-full overflow-hidden rounded">
+    <div class="relative h-2 w-full overflow-hidden rounded-sm">
       <div
         style="width:{completePercent}%;"
         class="absolute left-0 flex h-full items-center bg-green-200"

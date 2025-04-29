@@ -21,20 +21,20 @@
 {#if showEventGroup}
   <div class="w-full">
     <div
-      class="flex flex-col gap-0 overflow-hidden border border-subtle xl:flex-row"
+      class="border-subtle flex flex-col gap-0 overflow-hidden border xl:flex-row"
     >
       {#each group.eventList as groupEvent}
         {@const attributes = formatAttributes(groupEvent)}
         {@const details = Object.entries(attributes)}
         <div
-          class="w-full border-subtle [&:not(:last-child)]:border-r"
+          class="border-subtle w-full not-last:border-r"
           class:three-events={group.eventList.length === 3 ||
             (group.eventList.length === 2 && pendingEvent)}
           class:two-events={group.eventList.length === 2 ||
             (group.eventList.length === 1 && pendingEvent)}
         >
           <div
-            class="flex w-full flex-wrap justify-between bg-subtle px-2 py-1"
+            class="bg-subtle flex w-full flex-wrap justify-between px-2 py-1"
           >
             <div class="flex gap-2">
               {groupEvent.id}
@@ -58,7 +58,7 @@
       {#if pendingEvent}
         {@const details = Object.entries(pendingEvent)}
         <div
-          class="w-full border-subtle [&:not(:last-child)]:border-r"
+          class="border-subtle w-full not-last:border-r"
           class:three-events={group.eventList.length === 2}
           class:two-events={group.eventList.length === 1}
         >
@@ -80,7 +80,7 @@
   {@const attributes = formatAttributes(event)}
   {@const details = Object.entries(attributes)}
   <div class="w-full">
-    <div class="w-full overflow-hidden border border-subtle">
+    <div class="border-subtle w-full overflow-hidden border">
       <EventLinksExpanded links={event?.links} />
       {#each details as [key, value] (key)}
         <EventDetailsRowExpanded {key} {value} {attributes} />
@@ -90,6 +90,8 @@
 {/if}
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .three-events {
     @apply xl:w-1/3;
   }

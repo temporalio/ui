@@ -169,6 +169,8 @@
 </Table>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .reachability {
     @apply rounded-sm bg-slate-200 px-2 py-1;
   }

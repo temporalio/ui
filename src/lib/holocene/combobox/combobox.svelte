@@ -448,7 +448,7 @@
       />
     </div>
     {#if $$slots.action}
-      <div class="ml-1 flex h-full items-start border-l border-subtle p-0.5">
+      <div class="border-subtle ml-1 flex h-full items-start border-l p-0.5">
         {#if actionTooltip}
           <Tooltip text={actionTooltip} right>
             <slot name="action" />
@@ -458,7 +458,7 @@
         {/if}
       </div>
     {:else if href}
-      <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
+      <div class="border-subtle ml-1 flex h-full items-center border-l p-0.5">
         {#if actionTooltip}
           <Tooltip text={actionTooltip} right>
             <Button
@@ -529,11 +529,13 @@
 </MenuContainer>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .combobox-wrapper {
-    @apply surface-primary flex max-h-28 min-h-10 w-full flex-row items-center overflow-auto border border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
+    @apply surface-primary border-subtle dark:focus-within:surface-primary focus-within:border-interactive focus-within:ring-primary/70 flex max-h-28 min-h-10 w-full flex-row items-center overflow-auto border text-sm focus-within:ring-2 focus-within:outline-hidden;
 
     &.invalid {
-      @apply border border-danger text-danger focus-within:ring-danger/70;
+      @apply border-danger text-danger focus-within:ring-danger/70 border;
     }
 
     &.disabled {
@@ -542,7 +544,7 @@
   }
 
   .error {
-    @apply text-xs text-danger;
+    @apply text-danger text-xs;
   }
 
   .input-wrapper {
@@ -550,6 +552,6 @@
   }
 
   .combobox-input {
-    @apply flex grow bg-transparent text-primary placeholder:text-secondary focus:outline-none;
+    @apply text-primary placeholder:text-secondary flex grow bg-transparent focus:outline-none;
   }
 </style>

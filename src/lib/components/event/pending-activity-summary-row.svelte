@@ -90,8 +90,10 @@
 {/if}
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .row {
-    @apply flex select-none items-center gap-4 px-2 text-sm no-underline;
+    @apply flex items-center gap-4 px-2 text-sm no-underline select-none;
   }
 
   .expanded-cell {

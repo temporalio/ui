@@ -92,7 +92,9 @@
 </Panel>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .row {
-    @apply my-1 inline-flex w-full items-center border-b border-subtle py-1;
+    @apply border-subtle my-1 inline-flex w-full items-center border-b py-1;
   }
 </style>

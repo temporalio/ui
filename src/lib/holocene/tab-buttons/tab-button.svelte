@@ -74,11 +74,13 @@
 </svelte:element>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .toggle-button {
-    @apply flex items-center justify-center rounded-t border border-b-0 border-subtle/0 px-4 py-2 text-sm leading-4 text-primary focus-visible:outline-none;
+    @apply border-subtle/0 text-primary flex items-center justify-center rounded-t border border-b-0 px-4 py-2 text-sm leading-4 focus-visible:outline-none;
 
     &:not(.disabled) {
-      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-2 focus-visible:ring-primary/70;
+      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-primary/70 focus-visible:ring-2;
     }
   }
 

@@ -39,6 +39,8 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .heart-beat {
     @apply relative flex items-center justify-center bg-blue-300 text-center;
   }
@@ -52,7 +54,7 @@
   }
 
   .fade-in {
-    @apply absolute right-0 top-0 h-full w-full bg-blue-300;
+    @apply absolute top-0 right-0 h-full w-full bg-blue-300;
 
     animation: heartRateIn 2s linear infinite;
     animation-delay: var(--animation-delay, 0);

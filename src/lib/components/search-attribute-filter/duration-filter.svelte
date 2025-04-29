@@ -43,7 +43,7 @@
       $filter.attribute
     } (${translate('workflows.duration-filter-placeholder')})`}
     icon="search"
-    class="w-full [&_*]:border-l-0"
+    class="w-full **:border-l-0"
     bind:value={_value}
     on:keydown={handleKeydown}
     on:input={validateDuration}

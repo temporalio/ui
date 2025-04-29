@@ -29,6 +29,8 @@
 </table>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .workflows-summary-table {
     @apply w-auto table-fixed;
 

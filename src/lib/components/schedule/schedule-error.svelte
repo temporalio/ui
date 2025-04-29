@@ -13,6 +13,8 @@
 </Panel>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .error-text {
     @apply mb-2 text-base text-red-900;
   }

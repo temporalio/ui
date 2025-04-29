@@ -32,7 +32,7 @@
     'text-primary',
     'text-sm',
     'font-medium',
-    'focus:outline-none',
+    'focus:outline-hidden',
     hidden && 'sr-only',
     disabled && 'cursor-not-allowed',
     className,
@@ -42,6 +42,6 @@
 >
   <slot><span>{label}</span></slot>
   {#if required}
-    <span class="h-1.5 w-1.5 rounded-full bg-interactive-error"></span>
+    <span class="bg-interactive-error h-1.5 w-1.5 rounded-full"></span>
   {/if}
 </label>

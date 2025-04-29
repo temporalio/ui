@@ -143,6 +143,8 @@
 {/if}
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .workflows-summary-table-body-cell {
     @apply h-8 whitespace-nowrap;
 

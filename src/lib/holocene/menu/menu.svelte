@@ -65,8 +65,10 @@
 </ul>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .menu {
-    @apply surface-primary absolute z-20 mt-1 min-w-fit list-none overflow-auto border border-subtle text-primary shadow;
+    @apply surface-primary border-subtle text-primary absolute z-20 mt-1 min-w-fit list-none overflow-auto border shadow;
 
     &.left,
     &.top-left {

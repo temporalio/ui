@@ -17,6 +17,8 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .row {
     @apply items-center border-b p-2 text-sm no-underline last-of-type:border-b-0 md:table-row md:text-base;
   }
@@ -26,6 +28,6 @@
   }
 
   .row:last-of-type .cell {
-    @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
+    @apply border-b-0 first-of-type:rounded-bl-lg last-of-type:rounded-br-lg;
   }
 </style>

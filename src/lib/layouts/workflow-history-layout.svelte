@@ -92,7 +92,7 @@
 </div>
 <div class="relative px-2 pb-24 md:px-4 lg:px-8">
   <div
-    class="flex items-center justify-between gap-2 bg-off-white/50 py-2 xl:gap-8 dark:bg-space-black/50"
+    class="bg-off-white/50 dark:bg-space-black/50 flex items-center justify-between gap-2 py-2 xl:gap-8"
     class:sticky-header={!$minimizeEventView}
   >
     <h2>
@@ -137,7 +137,7 @@
     </div>
   </div>
   <div
-    class="flex w-full flex-col border border-subtle {!$minimizeEventView &&
+    class="border-subtle flex w-full flex-col border {!$minimizeEventView &&
       'border-t-0'}"
   >
     <TimelineGraph
@@ -157,7 +157,9 @@
 />
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .sticky-header {
-    @apply sticky top-0 z-30 border-b border-subtle md:top-12;
+    @apply border-subtle sticky top-0 z-30 border-b md:top-12;
   }
 </style>

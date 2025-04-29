@@ -34,7 +34,9 @@
 <input {id} class="hidden" type="file" {accept} on:change={onFileSelect} />
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .file-upload-label {
-    @apply surface-primary relative flex h-10 w-fit cursor-pointer items-center justify-center border border-subtle px-4 py-2 text-base text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-primary/70;
+    @apply surface-primary border-subtle text-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-primary/70 relative flex h-10 w-fit cursor-pointer items-center justify-center border px-4 py-2 text-base;
   }
 </style>

@@ -18,7 +18,7 @@
       'w-full',
       'md:sticky md:top-12',
       'max-md:fixed max-md:bottom-16',
-      'z-[39]',
+      'z-39',
       'flex items-center justify-between gap-2',
       'px-4 py-2',
     ],

@@ -25,7 +25,7 @@
     class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
   >
     {#if showKey}
-      <p class="whitespace-nowrap text-right text-xs">
+      <p class="text-right text-xs whitespace-nowrap">
         {format(key)}
       </p>
     {/if}
@@ -54,7 +54,7 @@
         />
       </Copyable>
     {:else}
-      <Badge type="subtle" class="block select-none truncate">
+      <Badge type="subtle" class="block truncate select-none">
         {value}
       </Badge>
     {/if}
@@ -62,7 +62,9 @@
 {/if}
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .payload {
-    @apply overflow-hidden border border-subtle bg-code-block px-1 py-0.5 font-mono text-xs;
+    @apply border-subtle bg-code-block overflow-hidden border px-1 py-0.5 font-mono text-xs;
   }
 </style>

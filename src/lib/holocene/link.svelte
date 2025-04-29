@@ -62,8 +62,10 @@
 </a>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .link {
-    @apply max-w-fit cursor-pointer items-center gap-2 text-primary underline underline-offset-2 hover:text-brand focus-visible:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70;
+    @apply text-primary hover:text-brand focus-visible:text-brand focus-visible:ring-primary/70 max-w-fit cursor-pointer items-center gap-2 underline underline-offset-2 focus-visible:ring-2 focus-visible:outline-hidden;
 
     &.active {
       @apply text-brand;

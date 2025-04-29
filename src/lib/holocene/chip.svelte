@@ -35,8 +35,10 @@
 </span>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .chip {
-    @apply surface-subtle flex h-8 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-sm p-1 text-sm;
+    @apply surface-subtle flex h-8 w-fit min-w-fit flex-row items-center justify-between gap-1 rounded-sm p-1 text-sm break-all whitespace-nowrap;
 
     :global(.icon-button) {
       @apply ml-1 h-auto w-fit;

@@ -56,11 +56,11 @@
         />
       </td>
     {:else if label === translate('schedules.id')}
-      <td class="cell whitespace-pre-line break-words">
+      <td class="cell break-words whitespace-pre-line">
         <Link href={route}>{schedule.scheduleId}</Link>
       </td>
     {:else if label === translate('common.workflow-type')}
-      <td class="cell whitespace-pre-line break-words">
+      <td class="cell break-words whitespace-pre-line">
         {schedule?.info?.workflowType?.name ?? ''}
       </td>
     {:else if label === translate('schedules.recent-runs')}
@@ -105,6 +105,8 @@
 </tr>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .cell {
     @apply p-2 text-left;
   }

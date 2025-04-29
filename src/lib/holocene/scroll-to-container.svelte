@@ -27,7 +27,9 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   #scroll-container {
-    @apply fixed bottom-5 right-8 z-50 hidden w-auto gap-2 md:flex;
+    @apply fixed right-8 bottom-5 z-50 hidden w-auto gap-2 md:flex;
   }
 </style>

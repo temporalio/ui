@@ -256,6 +256,8 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .caret {
     @apply relative;
 
@@ -268,7 +270,7 @@
   }
 
   .arrow {
-    @apply absolute left-0 top-0 h-0 w-0;
+    @apply absolute top-0 left-0 h-0 w-0;
 
     border-style: solid;
     border-width: 6px 12px 6px 0;
@@ -277,12 +279,12 @@
   .arrow-left {
     border-width: 6px 12px 6px 0;
 
-    @apply border-b-transparent border-l-transparent border-r-primary border-t-transparent;
+    @apply border-r-primary border-t-transparent border-b-transparent border-l-transparent;
   }
 
   .arrow-right {
     border-width: 6px 0 6px 12px;
 
-    @apply border-b-transparent border-l-primary border-r-transparent border-t-transparent;
+    @apply border-l-primary border-t-transparent border-r-transparent border-b-transparent;
   }
 </style>

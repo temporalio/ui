@@ -35,6 +35,6 @@
     {min}
     on:keydown={handleKeydown}
     search
-    class="-mr-2 [&_*]:border-l-0"
+    class="-mr-2 **:border-l-0"
   />
 </ConditionalMenu>

@@ -34,10 +34,10 @@
   <aside
     {id}
     class={merge(
-      'surface-primary fixed z-[55] h-auto overflow-y-auto border-subtle text-primary',
-      position === 'bottom' && 'bottom-0 left-0 right-0 border-t',
-      position === 'right' && 'right-0 top-0 h-full border-l',
-      dark && 'bg-black text-off-white',
+      'surface-primary border-subtle text-primary fixed z-55 h-auto overflow-y-auto',
+      position === 'bottom' && 'right-0 bottom-0 left-0 border-t',
+      position === 'right' && 'top-0 right-0 h-full border-l',
+      dark && 'text-off-white bg-black',
       className,
     )}
     class:max-w-fit={position === 'right'}
@@ -47,7 +47,7 @@
     use:clickoutside={onClick}
   >
     <div class="relative h-full" class:pt-10={closePadding}>
-      <div class="absolute right-2 top-2">
+      <div class="absolute top-2 right-2">
         <slot name="close-button">
           <IconButton
             data-testid="drawer-close-button"

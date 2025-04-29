@@ -7,8 +7,10 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .meter {
-    @apply absolute left-0 right-0 box-content h-[5px] bg-gradient-to-r from-blue-200 to-blue-600;
+    @apply absolute right-0 left-0 box-content h-[5px] bg-linear-to-r from-blue-200 to-blue-600;
 
     box-shadow: inset 0 -1px 1px rgb(255 255 255 / 30%);
     z-index: 5;
@@ -28,7 +30,7 @@
   }
 
   .meter > span::after {
-    @apply absolute bottom-0 left-0 right-0 top-0 overflow-hidden;
+    @apply absolute top-0 right-0 bottom-0 left-0 overflow-hidden;
 
     content: '';
     background-image: linear-gradient(

@@ -39,7 +39,7 @@
 
 <svelte:window on:keydown={handleKeydown} />
 <div class="flex gap-4 max-sm:flex-col">
-  <div class="bg-gray-100 flex w-full gap-4">
+  <div class="flex w-full gap-4 bg-gray-100">
     <RangeInput
       label={translate('common.event')}
       labelHidden
@@ -58,7 +58,7 @@
         aria-label={translate('common.previous')}
       >
         <span
-          class="arrow arrow-left border-b-transparent border-t-transparent dark:border-r-white"
+          class="arrow arrow-left border-t-transparent border-b-transparent dark:border-r-white"
           class:border-r-slate-900={index !== 1}
           class:border-r-slate-100={index === 1}
           class:dark:border-r-slate-800={index === 1}
@@ -73,7 +73,7 @@
         aria-label={translate('common.next')}
       >
         <span
-          class="arrow arrow-right border-b-transparent border-t-transparent dark:border-l-white"
+          class="arrow arrow-right border-t-transparent border-b-transparent dark:border-l-white"
           class:border-l-slate-100={index === events.length}
           class:border-l-slate-900={index !== events.length}
           class:dark:border-l-slate-800={index === events.length}
@@ -115,6 +115,8 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .caret {
     @apply relative;
 
@@ -127,7 +129,7 @@
   }
 
   .arrow {
-    @apply absolute left-0 top-0 h-0 w-0;
+    @apply absolute top-0 left-0 h-0 w-0;
 
     border-style: solid;
     border-width: 6px 12px 6px 0;

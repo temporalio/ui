@@ -39,7 +39,7 @@
       {#each activities as { id, activityId, ...details } (id)}
         {@const failed = details.attempt > 1}
         <TableRow>
-          <td class="w-44 items-start break-all py-5 pl-5 pr-2 align-top">
+          <td class="w-44 items-start py-5 pr-2 pl-5 align-top break-all">
             <div class="pt-1">
               <Link href="#{id}">{activityId}</Link>
             </div>
@@ -206,8 +206,10 @@
 {/if}
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .event-table-row {
-    @apply grid grid-cols-2 border-b border-subtle py-1;
+    @apply border-subtle grid grid-cols-2 border-b py-1;
   }
 
   .event-table-row:last-child {

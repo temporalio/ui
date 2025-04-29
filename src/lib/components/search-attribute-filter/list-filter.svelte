@@ -44,7 +44,7 @@
         labelHidden
         id="list-filter"
         bind:chips
-        class="w-full [&_*]:border-l-0 [&_*]:border-r-0"
+        class="w-full **:border-r-0 **:border-l-0"
         removeChipButtonLabel={(chip) =>
           translate('workflows.remove-keyword-label', { keyword: chip })}
         placeholder="{translate('common.enter')} {$filter.attribute}"
@@ -64,7 +64,7 @@
         type="search"
         placeholder={`${translate('common.enter')} ${$filter.attribute}`}
         icon="search"
-        class="w-full [&_*]:border-l-0"
+        class="w-full **:border-l-0"
         bind:value={_value}
         on:keydown={handleKeydown}
       />

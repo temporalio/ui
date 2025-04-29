@@ -49,7 +49,7 @@
   };
 
   const workflowStatus = cva(
-    ['flex items-center rounded-sm px-1 py-0.5 whitespace-nowrap text-black'],
+    ['flex items-center rounded-xs px-1 py-0.5 whitespace-nowrap text-black'],
     {
       variants: {
         status: {
@@ -114,6 +114,8 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .big {
     @apply flex justify-center px-4 text-lg;
   }

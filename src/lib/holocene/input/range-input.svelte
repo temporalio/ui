@@ -86,7 +86,7 @@
           id="{id}-range"
           name="range"
           type="range"
-          class="h-0 w-full cursor-pointer appearance-none rounded border-y border-primary"
+          class="border-primary h-0 w-full cursor-pointer appearance-none rounded-sm border-y"
           bind:value
           on:input={handleInput}
           {min}
@@ -96,7 +96,7 @@
         />
         <Label hidden {label} for="{id}-range" />
       </div>
-      <span class="absolute -bottom-6 right-0 text-xs font-normal">
+      <span class="absolute right-0 -bottom-6 text-xs font-normal">
         {max}
       </span>
     </div>
@@ -119,12 +119,14 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .range-input-container {
-    @apply inline-flex w-full flex-row items-center gap-4 whitespace-nowrap text-primary;
+    @apply text-primary inline-flex w-full flex-row items-center gap-4 whitespace-nowrap;
   }
 
   .numeric-input {
-    @apply h-10 w-10 border border-subtle bg-information text-center text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
+    @apply border-subtle bg-information focus-within:ring-primary/70 h-10 w-10 border text-center text-sm focus-within:ring-2 focus-within:outline-hidden;
 
     appearance: textfield;
   }
@@ -136,11 +138,11 @@
   }
 
   .numeric-input.invalid {
-    @apply border-danger bg-red-100 text-danger;
+    @apply border-danger text-danger bg-red-100;
   }
 
   .numeric-input:focus {
-    @apply outline ring-2 ring-primary/70;
+    @apply ring-primary/70 ring-2 outline;
   }
 
   .floating-value {
@@ -148,11 +150,11 @@
   }
 
   input[type='range']::-webkit-slider-thumb {
-    @apply h-4 w-8 appearance-none rounded-full border border-solid border-primary bg-information;
+    @apply border-primary bg-information h-4 w-8 appearance-none rounded-full border border-solid;
   }
 
   input[type='range']::-moz-range-thumb {
-    @apply h-4 w-8 rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100 shadow-none;
+    @apply border-primary h-4 w-8 rounded-full border border-solid bg-linear-to-br from-blue-100 to-purple-100 shadow-none;
   }
 
   input[type='range']:focus {
@@ -160,10 +162,10 @@
   }
 
   input[type='range']:focus::-webkit-slider-thumb {
-    @apply border border-primary ring-2 ring-primary/70;
+    @apply border-primary ring-primary/70 border ring-2;
   }
 
   input[type='range']:focus::-moz-range-thumb {
-    @apply border border-primary ring-2 ring-primary/70;
+    @apply border-primary ring-primary/70 border ring-2;
   }
 </style>

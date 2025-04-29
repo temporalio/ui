@@ -147,11 +147,13 @@
   </Menu>
 
   {#if error && !valid}
-    <span class="text-xs text-danger">{error}</span>
+    <span class="text-danger text-xs">{error}</span>
   {/if}
 </MenuContainer>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   input {
     @apply pointer-events-none w-full grow bg-transparent text-sm;
   }

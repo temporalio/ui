@@ -60,7 +60,7 @@
 </script>
 
 <div
-  class="relative h-auto overflow-auto border-b border-subtle"
+  class="border-subtle relative h-auto overflow-auto border-b"
   bind:clientWidth={canvasWidth}
   style={viewportHeight ? `max-height: ${viewportHeight}px;` : ''}
   on:scroll={handleScroll}
@@ -127,6 +127,8 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .error {
     @apply bg-danger;
   }

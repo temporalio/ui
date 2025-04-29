@@ -51,8 +51,10 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   select {
-    @apply border-secondary bg-transparent text-primary outline-none dark:surface-primary focus-visible:outline focus-visible:outline-blue-700;
+    @apply border-secondary text-primary dark:surface-primary bg-transparent outline-hidden focus-visible:outline focus-visible:outline-blue-700;
   }
 
   .remove {

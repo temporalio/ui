@@ -102,8 +102,8 @@
   class={merge(
     'fixed bottom-0 z-40 flex h-[64px] w-full flex-row items-center justify-between gap-5 px-4 py-2 transition-colors md:hidden',
     isCloud
-      ? 'bg-gradient-to-b from-indigo-600 to-indigo-900 text-off-white focus-visible:[&_[role=button]]:ring-success focus-visible:[&_a]:ring-success'
-      : 'surface-black border-t border-subtle',
+      ? 'text-off-white [&_[role=button]]:focus-visible:ring-success [&_a]:focus-visible:ring-success bg-linear-to-b from-indigo-600 to-indigo-900'
+      : 'surface-black border-subtle border-t',
   )}
   data-testid="top-nav"
   aria-label={translate('common.main')}
@@ -131,7 +131,7 @@
         class="grow text-white"
         on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
       >
-      <div class="ml-1 h-full w-1 border-l border-subtle"></div>
+      <div class="border-subtle ml-1 h-full w-1 border-l"></div>
       <Button
         variant="ghost"
         size="xs"
@@ -161,11 +161,13 @@
 </nav>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .namespace-wrapper {
-    @apply surface-black flex h-10 w-full grow flex-row items-center border border-subtle px-0.5 text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
+    @apply surface-black border-subtle dark:focus-within:surface-primary focus-within:border-interactive focus-within:ring-primary/70 flex h-10 w-full grow flex-row items-center border px-0.5 text-sm focus-within:ring-2 focus-within:outline-hidden;
   }
 
   .nav-button {
-    @apply relative select-none p-1 text-center align-middle text-xs font-medium uppercase transition-all;
+    @apply relative p-1 text-center align-middle text-xs font-medium uppercase transition-all select-none;
   }
 </style>

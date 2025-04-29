@@ -46,7 +46,7 @@
       {:else}
         <Tooltip text={tooltip} hide={!tooltip} top>
           <span
-            class="w-fit select-all truncate rounded-sm p-1 leading-4"
+            class="w-fit truncate rounded-xs p-1 leading-4 select-all"
             class:surface-subtle={badge}>{content}</span
           >
         </Tooltip>
@@ -61,7 +61,7 @@
   {:else}
     <Tooltip text={tooltip} hide={!tooltip} top>
       <span
-        class="w-fit select-all truncate rounded-sm p-1 leading-4"
+        class="w-fit truncate rounded-xs p-1 leading-4 select-all"
         class:surface-subtle={badge}>{content}</span
       >
     </Tooltip>

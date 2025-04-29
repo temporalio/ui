@@ -180,7 +180,7 @@
       {value}
     </MenuButton>
     <Menu
-      class="w-[25rem] !overflow-visible"
+      class="w-[25rem] overflow-visible!"
       position="right"
       keepOpen
       id="time-range-filter-menu"
@@ -224,12 +224,12 @@
         </div>
       {:else}
         <div class="flex w-full flex-wrap">
-          <div class="flex w-1/2 flex-col border-b border-subtle">
+          <div class="border-subtle flex w-1/2 flex-col border-b">
             <MenuItem on:click={() => onChange('All Time')}
               >{translate('common.all-time')}</MenuItem
             >
           </div>
-          <div class="flex w-1/2 flex-col border-b border-subtle">
+          <div class="border-subtle flex w-1/2 flex-col border-b">
             <MenuItem on:click={() => onChange('Custom')}
               >{translate('common.custom')}</MenuItem
             >
@@ -241,7 +241,7 @@
             </div>
           {/each}
           <div class="flex w-full flex-wrap">
-            <div class="flex w-1/2 flex-col border-t border-subtle">
+            <div class="border-subtle flex w-1/2 flex-col border-t">
               <MenuItem
                 selected={timeField === 'StartTime'}
                 on:click={() => onTimeFieldChange('StartTime')}
@@ -249,7 +249,7 @@
                 {translate('common.start-time')}
               </MenuItem>
             </div>
-            <div class="flex w-1/2 flex-col border-t border-subtle">
+            <div class="border-subtle flex w-1/2 flex-col border-t">
               <MenuItem
                 selected={timeField === 'CloseTime'}
                 on:click={() => onTimeFieldChange('CloseTime')}

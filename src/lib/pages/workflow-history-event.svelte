@@ -90,7 +90,7 @@
 </script>
 
 <div
-  class="flex flex-col gap-2 px-8 pb-24 pt-2"
+  class="flex flex-col gap-2 px-8 pt-2 pb-24"
   data-testid="event-summary-log"
 >
   <Button
@@ -126,13 +126,15 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   tbody {
     :global(tr.dense) {
-      @apply h-8 hover:cursor-pointer hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply hover:bg-interactive-table-hover h-8 hover:cursor-pointer hover:bg-fixed;
     }
 
     :global(tr.expanded) {
-      @apply w-full hover:bg-primary;
+      @apply hover:bg-primary w-full;
     }
 
     :global(tr.dense:nth-of-type(odd)) {
@@ -148,7 +150,7 @@
     }
 
     :global(tr > td) {
-      @apply whitespace-nowrap p-2;
+      @apply p-2 whitespace-nowrap;
     }
 
     :global(tr > td > .table-link) {

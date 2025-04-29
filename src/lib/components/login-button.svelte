@@ -12,11 +12,13 @@
 </button>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .login-button {
     @apply flex items-center justify-center px-4 py-2 text-sm text-white;
   }
 
   .login-button:hover {
-    @apply rounded-md bg-purple-100 text-primary;
+    @apply text-primary rounded-md bg-purple-100;
   }
 </style>

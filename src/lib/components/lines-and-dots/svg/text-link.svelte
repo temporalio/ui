@@ -17,7 +17,7 @@
       goto(href);
     }
   }}
-  class="cursor-pointer select-none outline-none"
+  class="cursor-pointer outline-hidden select-none"
   {x}
   {y}
   font-size={fontSize}

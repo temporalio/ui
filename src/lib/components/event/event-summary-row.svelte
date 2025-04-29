@@ -192,7 +192,7 @@
     </Tooltip>
   </td>
   <td class="truncate md:min-w-fit">
-    <p class="event-name whitespace-nowrap font-semibold md:text-base">
+    <p class="event-name font-semibold whitespace-nowrap md:text-base">
       {displayName}
     </p>
   </td>
@@ -231,8 +231,8 @@
           <div
             class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
           >
-            <p class="whitespace-nowrap text-right text-xs">Summary</p>
-            <Badge type="secondary" class="block select-none truncate">
+            <p class="text-right text-xs whitespace-nowrap">Summary</p>
+            <Badge type="secondary" class="block truncate select-none">
               {decodedValue}
             </Badge>
           </div>
@@ -272,12 +272,14 @@
 {/if}
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .row {
-    @apply flex select-none items-center gap-4 px-2 text-sm no-underline;
+    @apply flex items-center gap-4 px-2 text-sm no-underline select-none;
   }
 
   .failure {
-    @apply border border-danger;
+    @apply border-danger border;
   }
 
   .failure .event-name {
@@ -285,7 +287,7 @@
   }
 
   .canceled {
-    @apply border border-warning;
+    @apply border-warning border;
   }
 
   .canceled .event-name {

@@ -29,7 +29,7 @@
           class="flex flex-wrap items-center gap-2 border-b py-2 last-of-type:border-b-0"
         >
           <span class="break-all">{searchAttrName}</span>
-          <span class="surface-subtle select-all rounded-sm p-1 leading-4"
+          <span class="surface-subtle rounded-xs p-1 leading-4 select-all"
             >{value}</span
           >
         </li>

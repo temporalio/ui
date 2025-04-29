@@ -24,7 +24,7 @@
       labelHidden
       autoFocus
       placeholder="Search"
-      class="sticky top-0 w-full bg-primary p-2"
+      class="bg-primary sticky top-0 w-full p-2"
       bind:value={search}
     />
     <ul class="flex w-full flex-col gap-4 overflow-auto p-4 pt-2">
@@ -44,8 +44,10 @@
 {/if}
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .namespace {
-    @apply w-full cursor-pointer border border-transparent text-left text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+    @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:ring-primary/70 dark:focus-visible:border-interactive w-full cursor-pointer border border-transparent text-left text-sm font-medium focus-visible:ring-2 focus-visible:outline-hidden;
 
     &.selected {
       @apply text-brand;

@@ -143,8 +143,10 @@
 </li>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .orderable-item {
-    @apply flex select-none list-none flex-row items-center justify-between border-b border-subtle p-2 text-sm font-medium last-of-type:border-b-0;
+    @apply border-subtle flex list-none flex-row items-center justify-between border-b p-2 text-sm font-medium select-none last-of-type:border-b-0;
   }
 
   .orderable-item[draggable='true'] {
@@ -156,6 +158,6 @@
   }
 
   :global(.orderable-item.dragging-over:not(.locked)) {
-    @apply bg-gradient-to-br from-blue-100 to-purple-100;
+    @apply bg-linear-to-br from-blue-100 to-purple-100;
   }
 </style>

@@ -75,7 +75,7 @@
 
 <g role="button" tabindex="0" class="relative z-50">
   <foreignObject {x} {y} {width} height={contentHeight}>
-    <div bind:offsetHeight class="flex flex-col border-b border-subtle">
+    <div bind:offsetHeight class="border-subtle flex flex-col border-b">
       <div
         class="relative flex h-full items-center justify-between bg-slate-50 text-sm dark:bg-slate-800"
       >
@@ -111,10 +111,10 @@
                 {onDecode}
               >
                 <div>
-                  <div class="font-medium leading-3 text-brand">
+                  <div class="text-brand leading-3 font-medium">
                     {translate('common.summary')}
                   </div>
-                  <div class="text-wrap break-all leading-4">
+                  <div class="leading-4 text-wrap break-all">
                     {decodedValue}
                   </div>
                 </div>
@@ -122,10 +122,10 @@
             {/if}
             {#if link}
               <div>
-                <div class="font-medium leading-3 text-secondary">
+                <div class="text-secondary leading-3 font-medium">
                   {translate('nexus.link')}
                 </div>
-                <div class="text-wrap break-all leading-4">
+                <div class="leading-4 text-wrap break-all">
                   <Link
                     href={routeForEventHistory({
                       namespace: link.workflowEvent.namespace,
@@ -139,10 +139,10 @@
             {/if}
             {#each textAttributes as [key, value] (key)}
               <div>
-                <div class="font-medium leading-3 text-secondary">
+                <div class="text-secondary leading-3 font-medium">
                   {format(key)}
                 </div>
-                <div class="text-wrap break-all leading-4">
+                <div class="leading-4 text-wrap break-all">
                   <GroupDetailsText {key} {value} {attributes} />
                 </div>
               </div>
@@ -152,7 +152,7 @@
         <div class="flex w-full flex-col gap-2 xl:w-1/2">
           {#each codeBlockAttributes as [key, value] (key)}
             <div>
-              <div class="font-medium leading-4 text-secondary">
+              <div class="text-secondary leading-4 font-medium">
                 {format(key)}
               </div>
               <GroupDetailsText {key} {value} {attributes} {onDecode} />
@@ -162,7 +162,7 @@
       </div>
       {#if childWorkflowStartedEvent}
         <div class="surface-primary px-4">
-          <div class="font-medium leading-4 text-secondary">Child Workflow</div>
+          <div class="text-secondary leading-4 font-medium">Child Workflow</div>
           {#key group.eventList.length}
             <GraphWidget
               {namespace}
@@ -171,7 +171,7 @@
               runId={childWorkflowStartedEvent.attributes.workflowExecution
                 .runId}
               viewportHeight={200}
-              class="surface-primary overflow-x-hidden border border-subtle"
+              class="surface-primary border-subtle overflow-x-hidden border"
               onLoad={onDecode}
             />
           {/key}

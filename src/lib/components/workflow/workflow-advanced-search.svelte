@@ -73,7 +73,7 @@
       labelHidden
       placeholder={translate('workflows.search-placeholder')}
       icon="search"
-      class="grow lg:w-3/4 [&_*]:border-r-0"
+      class="grow **:border-r-0 lg:w-3/4"
       clearable
       clearButtonLabel={translate('common.clear-input-button-label')}
       on:clear={handleClearInput}

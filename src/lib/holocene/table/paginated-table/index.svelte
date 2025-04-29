@@ -60,16 +60,18 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .paginated-table-wrapper {
     @apply surface-primary min-h-[154px] overflow-auto;
   }
 
   .primary {
-    @apply border border-table;
+    @apply border-table border;
   }
 
   .split {
-    @apply border-t border-subtle;
+    @apply border-subtle border-t;
   }
 
   .paginated-table {
@@ -80,25 +82,25 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply surface-table h-10 text-off-white;
+      @apply surface-table text-off-white h-10;
     }
 
     :global(tr > th) {
-      @apply whitespace-nowrap px-2 text-left font-medium;
+      @apply px-2 text-left font-medium whitespace-nowrap;
     }
   }
 
   .paginated-table-body {
     :global(tr.primary) {
-      @apply border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply border-table hover:bg-interactive-table-hover border-b last-of-type:border-0 hover:bg-fixed;
     }
 
     :global(tr.dense) {
-      @apply h-8 hover:cursor-pointer hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply hover:bg-interactive-table-hover h-8 hover:cursor-pointer hover:bg-fixed;
     }
 
     :global(tr.expanded) {
-      @apply w-full hover:bg-primary;
+      @apply hover:bg-primary w-full;
     }
 
     :global(tr.dense:nth-of-type(odd)) {
@@ -114,7 +116,7 @@
     }
 
     :global(tr > td) {
-      @apply whitespace-nowrap px-2;
+      @apply px-2 whitespace-nowrap;
     }
 
     :global(tr > td > .table-link) {
@@ -124,7 +126,7 @@
 
   .primary .paginated-table-body {
     :global(tr:not(.empty)) {
-      @apply h-8 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply border-table hover:bg-interactive-table-hover h-8 border-b last-of-type:border-0 hover:bg-fixed;
     }
   }
 
@@ -137,6 +139,6 @@
   }
 
   .paginated-table-controls {
-    @apply surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-table px-4 py-2;
+    @apply surface-primary border-table sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t px-4 py-2;
   }
 </style>

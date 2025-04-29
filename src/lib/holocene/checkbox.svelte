@@ -126,12 +126,12 @@
         !disabled && [
           'group-hover:border-inverse',
           'peer-focus-visible:border-inverse',
-          'group-hover:peer-checked:border-inverse',
-          'group-hover:peer-indeterminate:border-inverse',
+          'peer-checked:group-hover:border-inverse',
+          'peer-indeterminate:group-hover:border-inverse',
           'group-hover:bg-interactive-active',
           'peer-focus-visible:bg-interactive-active',
-          'group-hover:peer-checked:bg-interactive-active',
-          'group-hover:peer-indeterminate:bg-interactive-active',
+          'peer-checked:group-hover:bg-interactive-active',
+          'peer-indeterminate:group-hover:bg-interactive-active',
           'group-hover:ring-2',
           'group-hover:ring-primary/70',
           'peer-focus-visible:ring-2',
@@ -143,7 +143,7 @@
     >
       {#if indeterminate || checked}
         <Icon
-          class="absolute left-0 top-0 h-4 w-4"
+          class="absolute top-0 left-0 h-4 w-4"
           name={indeterminate ? 'hyphen' : checked ? 'checkmark' : null}
           strokeWidth={3}
         />
@@ -157,6 +157,6 @@
     </slot>
   </Label>
   {#if !valid && error}
-    <span class="text-xs text-danger">{error}</span>
+    <span class="text-danger text-xs">{error}</span>
   {/if}
 </div>

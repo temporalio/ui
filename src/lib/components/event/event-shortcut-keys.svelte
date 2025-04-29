@@ -22,7 +22,7 @@
   {open}
   onClick={onClose}
   closeButtonLabel={translate('common.close-keyboard-shortcuts')}
-  class="min-w-min max-w-fit"
+  class="max-w-fit min-w-min"
 >
   <DrawerContent title={translate('common.keyboard-shortcuts')}>
     <div
@@ -69,6 +69,8 @@
 </Drawer>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .shortcut-key-button {
     @apply fixed bottom-5 left-24 z-50;
   }

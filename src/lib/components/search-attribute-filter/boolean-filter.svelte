@@ -29,7 +29,7 @@
 
 <MenuContainer>
   <MenuButton
-    class="!border-l-0"
+    class="border-l-0!"
     id="boolean-filter"
     controls="boolean-filter-menu"
   >

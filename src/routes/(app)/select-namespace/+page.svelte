@@ -71,7 +71,7 @@
       <VirtualList {items} let:item itemHeight={50}>
         <button
           on:click={() => navigateToNamespace(item.namespace)}
-          class="surface-primary flex w-full cursor-pointer gap-2 truncate border-b p-3 text-left outline-none hover:bg-interactive-secondary-hover focus-visible:bg-interactive-secondary-hover"
+          class="surface-primary hover:bg-interactive-secondary-hover focus-visible:bg-interactive-secondary-hover flex w-full cursor-pointer gap-2 truncate border-b p-3 text-left outline-hidden"
         >
           {item.namespace}
         </button>

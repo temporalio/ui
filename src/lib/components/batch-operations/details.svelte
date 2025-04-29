@@ -52,6 +52,8 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .batch-operation-detail {
     @apply border-b text-sm last-of-type:border-b-0 max-sm:flex max-sm:flex-col sm:grid sm:grid-cols-10;
   }

@@ -1,13 +1,14 @@
 import path from 'path';
 
 import { sveltekit } from '@sveltejs/kit/vite';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
 import { temporalServer } from './plugins/vite-plugin-temporal-server';
 import { uiServerPlugin } from './plugins/vite-plugin-ui-server';
 
 export default defineConfig({
-  plugins: [sveltekit(), temporalServer(), uiServerPlugin()],
+  plugins: [tailwindcss(), sveltekit(), temporalServer(), uiServerPlugin()],
   optimizeDeps: {
     include: ['date-fns', 'date-fns-tz'],
   },

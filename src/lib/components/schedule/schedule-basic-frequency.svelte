@@ -21,7 +21,9 @@
 {/key}
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .frequency {
-    @apply flex h-auto max-h-32 flex-col overflow-auto border border-subtle bg-primary px-2 py-2 font-mono text-sm;
+    @apply border-subtle bg-primary flex h-auto max-h-32 flex-col overflow-auto border px-2 py-2 font-mono text-sm;
   }
 </style>

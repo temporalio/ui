@@ -95,6 +95,8 @@
 </tr>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .child {
     @apply bg-slate-100/50 dark:bg-slate-100/5;
   }

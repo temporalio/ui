@@ -19,7 +19,7 @@
     pop(event.detail.id);
   };
 
-  const toast = cva(['fixed z-[99999] flex flex-col items-end gap-2'], {
+  const toast = cva(['fixed z-99999 flex flex-col items-end gap-2'], {
     variants: {
       position: {
         'top-left': 'top-16 left-5',

@@ -94,7 +94,7 @@
     <div
       class={merge(
         'input-container',
-        'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
+        'surface-primary border-subtle focus-within:ring-primary/70 relative box-border inline-flex h-10 w-full items-center border text-sm focus-within:ring-2 focus-within:outline-hidden',
       )}
       class:disabled
       class:error
@@ -185,7 +185,8 @@
 </div>
 
 <style lang="postcss">
-  /* Base styles */
+  @reference "tailwindcss";
+
   .input-container {
     &.error,
     &.invalid {
@@ -202,15 +203,15 @@
   }
 
   .input {
-    @apply m-2 w-full bg-transparent placeholder:text-secondary focus:outline-none;
+    @apply placeholder:text-secondary m-2 w-full bg-transparent focus:outline-none;
   }
 
   .prefix {
-    @apply block h-full w-fit border-r border-subtle px-4 py-2 text-secondary;
+    @apply border-subtle text-secondary block h-full w-fit border-r px-4 py-2;
   }
 
   .suffix {
-    @apply block h-full w-fit border-l border-subtle px-4 py-2;
+    @apply border-subtle block h-full w-fit border-l px-4 py-2;
   }
 
   .noBorder {
@@ -222,7 +223,7 @@
   }
 
   .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-subtle;
+    @apply border-subtle flex h-full w-9 cursor-pointer items-center justify-center border-l;
   }
 
   .disabled-icon-container {
@@ -254,7 +255,7 @@
   }
 
   .hint-text {
-    @apply text-xs text-primary;
+    @apply text-primary text-xs;
 
     &.error,
     &.invalid {

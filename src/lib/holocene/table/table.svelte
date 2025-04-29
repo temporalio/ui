@@ -32,6 +32,8 @@
 </table>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   table {
     @apply relative;
 
@@ -45,31 +47,31 @@
   }
 
   table.fancy {
-    @apply surface-primary border-separate border-spacing-0 border border-table;
+    @apply surface-primary border-table border-separate border-spacing-0 border;
 
     thead {
       @apply surface-table;
 
       :global(th) {
-        @apply border-t border-table p-2 text-off-white;
+        @apply border-table text-off-white border-t p-2;
       }
 
       :global(td) {
-        @apply border-t border-table p-2;
+        @apply border-table border-t p-2;
 
         &:first-child {
-          @apply border-l border-table;
+          @apply border-table border-l;
         }
 
         &:last-child {
-          @apply border-r border-table;
+          @apply border-table border-r;
         }
       }
     }
 
     tbody :global {
       td {
-        @apply border-t border-table p-2 text-sm;
+        @apply border-table border-t p-2 text-sm;
 
         &:first-child:is(.expanded-cell) {
           @apply px-0;
@@ -81,7 +83,7 @@
   table.simple {
     thead :global(td),
     thead :global(th) {
-      @apply border-b border-primary p-2;
+      @apply border-primary border-b p-2;
     }
 
     tbody :global(td) {

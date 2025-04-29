@@ -46,7 +46,7 @@
 {/if}
 <text
   bind:this={textElement}
-  class="cursor-pointer select-none outline-none {category} text-primary"
+  class="cursor-pointer outline-hidden select-none {category} text-primary"
   class:label
   class:backdrop
   x={textX}
@@ -59,6 +59,8 @@
 </text>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   text {
     @apply fill-current;
 

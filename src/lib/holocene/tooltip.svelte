@@ -78,7 +78,7 @@
     <slot />
     <div
       class={merge(
-        'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover:inline-block group-hover:opacity-90',
+        'tooltip absolute top-0 left-0 z-50 hidden translate-x-12 text-xs whitespace-nowrap opacity-0 transition-all group-hover:inline-block group-hover:opacity-90',
         show && 'inline-block opacity-90',
       )}
       class:left
@@ -104,6 +104,8 @@
 {/if}
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .tooltip.top {
     @apply left-1/2 -mt-2 -translate-x-1/2 -translate-y-full;
   }
@@ -113,26 +115,26 @@
   }
 
   .tooltip.left {
-    @apply left-0 top-[50%] -ml-2 -translate-x-full -translate-y-1/2;
+    @apply top-[50%] left-0 -ml-2 -translate-x-full -translate-y-1/2;
   }
 
   .tooltip.right {
-    @apply right-0 top-[50%] -mr-2 -translate-y-1/2 translate-x-full;
+    @apply top-[50%] right-0 -mr-2 translate-x-full -translate-y-1/2;
   }
 
   .tooltip.topRight {
-    @apply left-auto right-0 -mt-2 -translate-y-full translate-x-0;
+    @apply right-0 left-auto -mt-2 translate-x-0 -translate-y-full;
   }
 
   .tooltip.topLeft {
-    @apply left-0 right-auto -mt-2 -translate-y-full translate-x-0;
+    @apply right-auto left-0 -mt-2 translate-x-0 -translate-y-full;
   }
 
   .tooltip.bottomLeft {
-    @apply bottom-0 left-0 right-auto -mb-2 translate-x-0 translate-y-full;
+    @apply right-auto bottom-0 left-0 -mb-2 translate-x-0 translate-y-full;
   }
 
   .tooltip.bottomRight {
-    @apply bottom-0 left-auto right-0 -mb-2 translate-x-0 translate-y-full;
+    @apply right-0 bottom-0 left-auto -mb-2 translate-x-0 translate-y-full;
   }
 </style>

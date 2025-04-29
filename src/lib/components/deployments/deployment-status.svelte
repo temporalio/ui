@@ -19,7 +19,7 @@
 
   const deploymentStatus = cva(
     [
-      'flex items-center gap-1 rounded-sm border border-subtle px-1 transition-colors',
+      'flex items-center gap-1 rounded-xs border border-subtle px-1 transition-colors',
     ],
     {
       variants: {
@@ -36,7 +36,7 @@
 </script>
 
 <p class="flex items-center gap-2">
-  <span class="rounded-sm border border-subtle px-1">
+  <span class="border-subtle rounded-xs border px-1">
     {version}
   </span>
   <span class={deploymentStatus({ status })}>

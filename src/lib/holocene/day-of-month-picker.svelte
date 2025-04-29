@@ -19,7 +19,7 @@
 </script>
 
 <div
-  class="surface-primary grid place-items-center gap-1 rounded border border-subtle px-0 py-4 text-center sm:gap-4 md:gap-x-8 md:px-2 xl:gap-x-16 xl:px-4"
+  class="surface-primary border-subtle grid place-items-center gap-1 rounded-sm border px-0 py-4 text-center sm:gap-4 md:gap-x-8 md:px-2 xl:gap-x-16 xl:px-4"
 >
   {#each daysInMonth as day}
     {@const active = daysOfMonth.includes(day)}
@@ -35,6 +35,8 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .grid {
     grid-template-columns: repeat(7, minmax(32px, 1fr));
   }

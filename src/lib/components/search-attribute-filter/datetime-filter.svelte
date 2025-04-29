@@ -147,7 +147,7 @@
     <Menu
       keepOpen
       id="time-range-filter-menu"
-      class="max-h-fit w-[27rem] !overflow-visible"
+      class="max-h-fit w-[27rem] overflow-visible!"
     >
       {#if isTimeRange}
         <MenuItem>
@@ -260,7 +260,7 @@
           >{translate('common.apply')}</Button
         >
       </div>
-      <MenuItem centered disabled class="!pt-0">
+      <MenuItem centered disabled class="pt-0!">
         <Icon name="clock" aria-hidden="true" />
         {translate('common.based-on-time-preface')}
         {selectedTime}

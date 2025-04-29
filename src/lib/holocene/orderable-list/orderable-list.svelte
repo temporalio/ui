@@ -14,11 +14,13 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .orderable-section {
     @apply flex flex-col gap-1;
   }
 
   .orderable-list {
-    @apply surface-primary border border-subtle;
+    @apply surface-primary border-subtle border;
   }
 </style>

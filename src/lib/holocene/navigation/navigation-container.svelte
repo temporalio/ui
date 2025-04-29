@@ -17,10 +17,10 @@
 
 <nav
   class={merge(
-    'group grid min-h-screen w-16 grid-cols-[2rem] grid-rows-[fit-content(1.5rem)_minmax(3rem,4rem)_1fr_8rem] gap-2 border-r border-subtle px-4 py-5 transition-width data-[nav=open]:w-[180px] data-[nav=open]:grid-cols-[100%]',
-    'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-primary/70 focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary/70',
+    'group border-subtle transition-width grid min-h-screen w-16 grid-cols-[2rem] grid-rows-[fit-content(1.5rem)_minmax(3rem,4rem)_1fr_8rem] gap-2 border-r px-4 py-5 data-[nav=open]:w-[180px] data-[nav=open]:grid-cols-[100%]',
+    '[&_[role=button]]:focus-visible:ring-primary/70 [&_a]:focus-visible:ring-primary/70 [&_[role=button]]:focus-visible:ring-2 [&_[role=button]]:focus-visible:outline-hidden [&_a]:focus-visible:ring-2 [&_a]:focus-visible:outline-hidden',
     isCloud
-      ? 'bg-gradient-to-b from-indigo-600 to-indigo-950 text-off-white focus-visible:[&_[role=button]]:ring-success focus-visible:[&_a]:ring-success'
+      ? 'text-off-white [&_[role=button]]:focus-visible:ring-success [&_a]:focus-visible:ring-success bg-linear-to-b from-indigo-600 to-indigo-950'
       : 'surface-black',
   )}
   data-nav={$navOpen ? 'open' : 'closed'}
@@ -32,8 +32,8 @@
   </a>
   <button
     title={$navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-[8px] self-start justify-self-end opacity-0 transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180 {isCloud
-      ? 'focus-visible:ring-primary/70 focus-visible:dark:ring-success'
+    class="mx-[8px] self-start justify-self-end opacity-0 transition-[opacity,transform] group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180 focus-visible:ring-2 focus-visible:outline-hidden {isCloud
+      ? 'focus-visible:ring-primary/70 dark:focus-visible:ring-success'
       : 'focus-visible:ring-primary/70'}"
     on:click={toggle}
   >

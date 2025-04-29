@@ -1,10 +1,61 @@
-@import '@fontsource-variable/inter';
+@import '@fontsource-variable/inter' layer(base);
 
-@import '@fontsource/noto-sans-mono';
+@import '@fontsource/noto-sans-mono' layer(base);
 
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --font-*: initial;
+  --font-sans:
+    Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-mono:
+    Noto Sans Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+
+  --animate-spin-slow: spin 3s linear infinite;
+
+  --z-index-100: 100;
+
+
+
+
+  --border-danger:  
+
+
+  --color-white: '#FFFFFF',
+  --color-off-white: '#F8FAFC',
+  --color-black: '#000000',
+  --color-space-black: '#141414',
+  --color-off-black: palette['slate'][950],
+  --color-code-black: '#292D3E',
+  --color--current: 'currentColor',
+  --color-transparent: 'transparent',
+  --color-mint: '#59FDA0',
+
+
+
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: rgb(var(--color-border-primary));
+  }
+}
 
 @layer base {
   *,
@@ -14,7 +65,7 @@
   }
 
   body {
-    @apply body-normal surface-background relative overscroll-none;
+    @apply relative overscroll-none;
   }
 
   input[type='search']::-webkit-search-cancel-button {

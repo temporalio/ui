@@ -3,7 +3,9 @@
 </div>
 
 <style lang="postcss">
+  @reference "tailwindcss";
+
   .card {
-    @apply border border-subtle p-4;
+    @apply border-subtle border p-4;
   }
 </style>
