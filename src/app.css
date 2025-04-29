@@ -2,7 +2,7 @@
 
 @import '@fontsource/noto-sans-mono' layer(base);
 
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
@@ -18,46 +18,76 @@
   --animate-spin-slow: spin 3s linear infinite;
 
   --z-index-100: 100;
+  --color-text-black: rgb(20, 20, 20);
+  --color-text-white: rgb(248, 250, 252);
+  --color-text-primary: rgb(20, 20, 20);
+  --color-text-secondary: rgb(39, 56, 96);
+  --color-text-inverse: rgb(248, 250, 252);
+  --color-text-subtle: rgb(70, 90, 120);
+  --color-text-danger: rgb(199, 22, 7);
+  --color-text-information: rgb(68, 76, 231);
+  --color-text-success: rgb(0, 150, 78);
+  --color-text-warning: rgb(220, 122, 3);
+  --color-text-brand: rgb(68, 76, 231);
 
+  --color-surface-background: rgb(248, 250, 252);
+  --color-surface-primary: rgb(255, 255, 255);
+  --color-surface-secondary: rgb(248, 250, 252);
+  --color-surface-subtle: rgb(201, 217, 240);
+  --color-surface-success: rgb(213, 255, 235);
+  --color-surface-success-loud: rgb(0, 192, 95);
+  --color-surface-information: rgb(224, 234, 255);
+  --color-surface-information-loud: rgb(68, 76, 231);
+  --color-surface-danger: rgb(255, 228, 212);
+  --color-surface-warning: rgb(255, 244, 198);
+  --color-surface-brand: rgb(68, 76, 231);
+  --color-surface-inverse: rgb(20, 20, 20);
+  --color-surface-code-block: rgb(232, 239, 255);
 
+  --color-interactive-surface: rgb(68, 76, 231);
+  --color-interactive-hover: rgb(54, 59, 204);
+  --color-interactive-active: rgb(47, 52, 164);
+  --color-interactive-secondary-surface: rgb(255, 255, 255);
+  --color-interactive-secondary-hover: rgb(201, 217, 240);
+  --color-interactive-secondary-active: rgb(174, 190, 217);
+  --color-interactive-danger-surface: rgb(255, 155, 112);
+  --color-interactive-danger-hover: rgb(255, 102, 55);
+  --color-interactive-danger-active: rgb(255, 69, 24);
+  --color-interactive-ghost-hover: rgb(201, 217, 240);
+  --color-interactive-ghost-active: rgb(201, 217, 240);
 
+  --color-border-primary: rgb(20, 20, 20);
+  --color-border-secondary: rgb(174, 190, 217);
+  --color-border-subtle: rgb(201, 217, 240);
+  --color-border-inverse: rgb(248, 250, 252);
+  --color-border-information: rgb(68, 76, 231);
+  --color-border-success: rgb(0, 192, 95);
+  --color-border-warning: rgb(254, 201, 137);
+  --color-border-danger: rgb(255, 69, 24);
+  --color-border-focus-info: rgb(68, 76, 231);
+  --color-border-focus-danger: rgb(240, 36, 6);
 
-  --border-danger:  
-
-
-  --color-white: '#FFFFFF',
-  --color-off-white: '#F8FAFC',
-  --color-black: '#000000',
-  --color-space-black: '#141414',
-  --color-off-black: palette['slate'][950],
-  --color-code-black: '#292D3E',
-  --color--current: 'currentColor',
-  --color-transparent: 'transparent',
-  --color-mint: '#59FDA0',
-
-
-
+  --border-primary: var(--color-border-primary);
+  --border-secondary: var(--color-border-secondary);
+  --border-subtle: var(--color-border-subtle);
+  --border-inverse: var(--color-border-inverse);
+  --border-information: var(--color-border-information);
+  --border-success: var(--color-border-success);
+  --border-warning: var(--color-border-warning);
+  --border-danger: var(--color-border-danger);
+  --border-focus-info: var(--color-border-focus-info);
+  --border-focus-danger: var(--color-border-focus-danger);
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
 @layer base {
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: rgb(var(--color-border-primary));
+    border-color: var(--border-primary);
   }
-}
 
-@layer base {
   *,
   html,
   body {
@@ -71,4 +101,124 @@
   input[type='search']::-webkit-search-cancel-button {
     @apply hidden;
   }
+
+  /* Text Styles */
+  h1 {
+    @apply text-3xl font-medium;
+  }
+  h2 {
+    @apply text-2xl font-medium;
+  }
+  h3 {
+    @apply text-xl font-medium;
+  }
+  h4 {
+    @apply text-lg font-medium;
+  }
+  h5 {
+    @apply text-base font-medium;
+  }
+  h6 {
+    @apply text-sm font-medium;
+  }
+  .body-normal {
+    @apply text-sm font-normal;
+  }
+  .body-medium {
+    @apply text-sm font-medium;
+  }
+  .body-small {
+    @apply text-xs font-normal;
+  }
+  .body-small-medium {
+    @apply text-xs font-medium;
+  }
+  .body-small-mono {
+    @apply font-mono text-xs font-normal;
+  }
 }
+
+@layer components {
+  /* Surface Components */
+  .surface-background {
+    background-color: var(--color-surface-background);
+    color: var(--color-text-primary);
+  }
+  .surface-primary {
+    background-color: var(--color-surface-primary);
+    color: var(--color-text-primary);
+  }
+  .surface-secondary {
+    background-color: var(--color-surface-secondary);
+    color: var(--color-text-primary);
+  }
+  .surface-interactive {
+    background-color: var(--color-interactive-surface);
+    color: var(--color-text-white);
+  }
+  .surface-interactive:hover {
+    background-color: var(--color-interactive-hover);
+  }
+  .surface-interactive:active {
+    background-color: var(--color-interactive-active);
+  }
+  .surface-interactive-secondary {
+    background-color: var(--color-interactive-secondary-surface);
+    color: var(--color-text-primary);
+  }
+  .surface-interactive-secondary:hover {
+    background-color: var(--color-interactive-secondary-hover);
+  }
+  .surface-interactive-secondary:active {
+    background-color: var(--color-interactive-secondary-active);
+  }
+  .surface-interactive-danger {
+    background-color: var(--color-interactive-danger-surface);
+    color: var(--color-text-black);
+  }
+  .surface-interactive-danger:hover {
+    background-color: var(--color-interactive-danger-hover);
+  }
+  .surface-interactive-danger:active {
+    background-color: var(--color-interactive-danger-active);
+  }
+  .surface-interactive-ghost {
+    background-color: var(--color-surface-primary);
+    color: var(--color-text-primary);
+  }
+  .surface-interactive-ghost:hover {
+    background-color: var(--color-interactive-ghost-hover);
+  }
+  .surface-interactive-ghost:active {
+    background-color: var(--color-interactive-ghost-active);
+  }
+  .surface-inverse {
+    background-color: var(--color-surface-inverse);
+    color: var(--color-text-inverse);
+  }
+  .surface-subtle {
+    background-color: var(--color-surface-subtle);
+    color: var(--color-text-primary);
+  }
+  .surface-warning {
+    background-color: var(--color-surface-subtle);
+    color: var(--color-text-black);
+  }
+  .surface-danger {
+    background-color: var(--color-surface-danger);
+    color: var(--color-text-primary);
+  }
+  .surface-black {
+    background-color: var(--color-surface-black);
+    color: var(--color-text-white);
+  }
+  .surface-retry {
+    background-color: var(--color-surface-retry);
+    color: var(--color-text-black);
+  }
+
+  .border-danger {
+    border-color: var(--color-border-danger)
+  }
+}
+

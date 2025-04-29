@@ -94,7 +94,7 @@
     <div
       class={merge(
         'input-container',
-        'surface-primary border-subtle focus-within:ring-primary/70 relative box-border inline-flex h-10 w-full items-center border text-sm focus-within:ring-2 focus-within:outline-hidden',
+        'surface-primary border-subtle focus-within:ring-primary/70 focus-within:outline-hidden relative box-border inline-flex h-10 w-full items-center border text-sm focus-within:ring-2',
       )}
       class:disabled
       class:error
