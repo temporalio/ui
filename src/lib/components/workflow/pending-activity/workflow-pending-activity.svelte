@@ -195,10 +195,12 @@
     {formatDate(activity.scheduledTime, $timeFormat, {
       relative: $relativeTime,
     })}
-    ({toTimeDifference({
-      date: activity.scheduledTime,
-      negativeDefault: translate('workflows.no-retry'),
-    })})
+    <strong
+      >{toTimeDifference({
+        date: activity.scheduledTime,
+        negativeDefault: translate('workflows.no-retry'),
+      })}</strong
+    >
   </div>
 {/snippet}
 
