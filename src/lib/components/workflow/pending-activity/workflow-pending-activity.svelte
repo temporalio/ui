@@ -39,8 +39,6 @@
         event.attributes.activityId === activity.activityId,
     ),
   );
-
-  $inspect('scheduledEvent', scheduledEvent);
 </script>
 
 <Card
@@ -111,18 +109,18 @@
     </div>
   </div>
   <div class="flex w-full flex-col gap-2 md:flex-1">
-    {#if activity.heartbeatDetails}
-      {@render detail(translate('workflows.heartbeat-details'), heartbeat)}
-    {/if}
     {#if failed}
       {@render failures()}
+    {/if}
+    {#if activity.heartbeatDetails}
+      {@render detail(translate('workflows.heartbeat-details'), heartbeat)}
     {/if}
   </div>
 </Card>
 
 {#snippet detail(label: string, value: string | number | Snippet)}
   <div>
-    <p class="text-subtle">{label}</p>
+    <p class="text-secondary">{label}</p>
     {#if typeof value === 'string' || typeof value === 'number'}
       {value}
     {:else}
