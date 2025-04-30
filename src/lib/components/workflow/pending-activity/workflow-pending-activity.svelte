@@ -111,7 +111,9 @@
     </div>
   </div>
   <div class="flex w-full flex-col gap-2 md:flex-1">
-    {@render detail(translate('workflows.heartbeat-details'), heartbeat)}
+    {#if activity.heartbeatDetails}
+      {@render detail(translate('workflows.heartbeat-details'), heartbeat)}
+    {/if}
     {#if failed}
       {@render failures()}
     {/if}
