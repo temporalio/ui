@@ -35,11 +35,11 @@ export async function getActivityAttributes(
   return decodedAttributes;
 }
 
-export const decodePendingActivity = async ({
+const decodePendingActivity = async ({
   activity,
-  namespace = get(page).params.namespace,
-  settings = get(page).data.settings,
-  accessToken = get(authUser).accessToken,
+  namespace,
+  settings,
+  accessToken,
 }: PendingActivityWithMetadata): Promise<PendingActivity> => {
   const decodedActivity = await getActivityAttributes({
     activity,

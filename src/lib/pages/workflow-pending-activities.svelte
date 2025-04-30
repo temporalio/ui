@@ -5,17 +5,17 @@
   import { workflowRun } from '$lib/stores/workflow-run';
 
   const pendingActivities = $derived(
-    $workflowRun.workflow?.pendingActivities.sort((a, b) => {
+    $workflowRun.workflow?.pendingActivities?.sort((a, b) => {
       if (isNaN(parseInt(a.activityId)) || isNaN(parseInt(b.activityId))) {
         return a.activityId.localeCompare(b.activityId);
       }
       return parseInt(a.activityId) - parseInt(b.activityId);
-    }),
+    }) || [],
   );
 </script>
 
 <div class="pb-16">
-  {#if pendingActivities?.length}
+  {#if pendingActivities.length}
     <ul role="list" class="grid grid-cols-1 gap-4">
       {#each pendingActivities as activity (activity.id)}
         <WorkflowPendingActivity {activity} />
