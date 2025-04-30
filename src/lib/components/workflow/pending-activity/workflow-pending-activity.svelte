@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Duration } from '@temporalio/common';
   import type { Snippet } from 'svelte';
 
   import { page } from '$app/state';
@@ -19,6 +18,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import {
     formatAttemptsLeft,
+    formatMaximumAttempts,
     formatRetryExpiration,
   } from '$lib/utilities/format-event-attributes';
   import { formatDuration, getDuration } from '$lib/utilities/format-time';
@@ -32,9 +32,6 @@
   const { namespace, workflow, run } = $derived(page.params);
 
   const failed = $derived(activity.attempt > 1);
-  const retryInterval = $derived(
-    activity.currentRetryInterval as unknown as Duration,
-  );
   const scheduledEvent = $derived(
     $fullEventHistory?.find(
       (event) =>
@@ -52,21 +49,15 @@
   <div class="flex flex-1 flex-col space-y-2 truncate">
     <div class="flex-1">
       <div class="flex flex-wrap items-center space-x-3">
-        <p class="font-mono">{activity.id}</p>
         <WorkflowStatus status={activity.paused ? 'Paused' : activity.state} />
         <h4>{activity.activityType}</h4>
       </div>
     </div>
     <div class="grid grid-cols-1 gap-2 xl:grid-cols-2">
+      {@render detail(translate('workflows.activity-id'), activity.activityId)}
       {@render detail(translate('workflows.attempt'), attempts)}
       {#if activity.scheduledTime}
         {@render detail(translate('workflows.next-retry'), nextRetry)}
-      {/if}
-      {#if activity.currentRetryInterval}
-        {@render detail(
-          translate('workflows.retry-interval'),
-          formatDuration(retryInterval),
-        )}
       {/if}
       {#if activity.expirationTime}
         {@render detail(
@@ -91,6 +82,14 @@
           }),
         )}
       {/if}
+      {#if activity.lastAttemptCompleteTime}
+        {@render detail(
+          translate('workflows.last-attempt-completed-time'),
+          formatDate(activity.lastAttemptCompleteTime, $timeFormat, {
+            relative: $relativeTime,
+          }),
+        )}
+      {/if}
       {#if activity.lastStartedTime}
         {@render detail(
           translate('workflows.last-started-time'),
@@ -111,7 +110,7 @@
       {/if}
     </div>
   </div>
-  <div class="flex w-full flex-1 flex-col gap-2">
+  <div class="flex w-full flex-col gap-2 md:flex-1">
     {@render detail(translate('workflows.heartbeat-details'), heartbeat)}
     {#if failed}
       {@render failures()}
@@ -207,8 +206,13 @@
   <div class="flex items-center gap-1">
     <Badge class="mr-1" type={failed ? 'danger' : 'default'}>
       <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
-      {activity.attempt} of {activity.maximumAttempts}
+      {activity.attempt} of {formatMaximumAttempts(activity.maximumAttempts)}
     </Badge>
-    {formatAttemptsLeft(activity.maximumAttempts, activity.attempt)} remaining
+    {#if activity.maximumAttempts}
+      <span class="text-sm text-subtle"
+        >{formatAttemptsLeft(activity.maximumAttempts, activity.attempt)}
+        remaining</span
+      >
+    {/if}
   </div>
 {/snippet}

@@ -164,6 +164,7 @@ export const Strings = {
   'last-heartbeat': 'Last Heartbeat',
   attempt: 'Attempt',
   'attempts-left': 'Attempts Left',
+  'last-attempt-completed-time': 'Last Attempt Completed Time',
   retry: 'Retry',
   'next-retry': 'Next Retry',
   'retry-interval': 'Retry Interval',
