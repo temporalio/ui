@@ -6,6 +6,7 @@ import type {
   WorkflowExecutionStatus,
 } from '$lib/types';
 import type { BatchOperationState, BatchOperationType } from '$lib/types/batch';
+import type { PendingActivityState } from '$lib/types/events';
 import type {
   SearchAttributeType,
   WorkflowStatus,
@@ -75,6 +76,13 @@ export const toWorkflowTaskFailureReadable = (
 ): WorkflowTaskFailedCause => {
   if (!cause) return 'Unspecified';
   return fromScreamingEnum(cause, 'WorkflowTaskFailedCause');
+};
+
+export const toPendingActivityStateReadable = (
+  state?: PendingActivityState,
+): PendingActivityState => {
+  if (!state) return state;
+  return fromScreamingEnum(state, 'PendingActivityState');
 };
 
 export const toPendingNexusOperationStateReadable = (

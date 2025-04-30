@@ -44,7 +44,7 @@ export type PendingActivity = Replace<
   {
     id: string;
     state: PendingActivityState;
-    activityType?: { name: string };
+    activityType?: string;
   }
 >;
 
@@ -94,7 +94,7 @@ export type WorkflowEvents = WorkflowEvent[];
 
 export type PendingActivityWithMetadata = {
   activity: PendingActivity;
-} & EventRequestMetadata;
+} & Partial<EventRequestMetadata>;
 
 export type CommonEventKey =
   | 'id'
