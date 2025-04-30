@@ -94,7 +94,7 @@ export type WorkflowEvents = WorkflowEvent[];
 
 export type PendingActivityWithMetadata = {
   activity: PendingActivity;
-} & Partial<EventRequestMetadata>;
+} & EventRequestMetadata;
 
 export type CommonEventKey =
   | 'id'
