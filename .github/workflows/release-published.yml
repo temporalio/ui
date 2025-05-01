@@ -1,0 +1,46 @@
+name: Release Published
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node
+
+      - name: Build package
+        run: pnpm package
+
+      - name: Prepare checkout token
+        id: generate_token
+        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92
+        with:
+          app_id: ${{ secrets.TEMPORAL_CICD_APP_ID }}
+          private_key: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
+
+      - name: upload package artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./build/
+          asset_name: temporal-ui-package.zip
+          asset_content_type: application/zip
+
+      - name: Trigger ui-server workflow
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ outputs.generate_token.outputs.token }}
+          repository: temporalio/ui-server
+          event-type: ui-release-published
+          client-payload: |
+            {
+              "release_tag": "${{ github.event.release.tag_name }}",
+              "release_url": "${{ github.event.release.html_url }}"
+            }
