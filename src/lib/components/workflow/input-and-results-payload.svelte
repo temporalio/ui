@@ -14,10 +14,10 @@
   type Props = {
     title: string;
     content: string;
-    isRunning: boolean;
+    isRunning?: boolean;
   };
 
-  let { title, content = '', isRunning }: Props = $props();
+  let { title, content = '', isRunning = false }: Props = $props();
 
   const parseContent = (c: string): PotentiallyDecodable | undefined => {
     try {

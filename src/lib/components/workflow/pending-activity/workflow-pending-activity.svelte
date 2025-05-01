@@ -120,7 +120,7 @@
 
 {#snippet detail(label: string, value: string | number | Snippet)}
   <div>
-    <p class="text-secondary">{label}</p>
+    <p class="font-mono text-xs">{label}</p>
     {#if typeof value === 'string' || typeof value === 'number'}
       {value}
     {:else}
@@ -146,13 +146,13 @@
 {#snippet failures()}
   <Accordion
     title={activity.lastFailure?.stackTrace
-      ? 'Last Failure with Stack Trace'
-      : 'Last Failure'}
+      ? translate('workflows.last-failure-with-stack-trace')
+      : translate('workflows.last-failure')}
   >
     <div class="flex flex-col gap-2">
       <div class="flex flex-1 flex-col">
         {#if activity.lastFailure}
-          <p class="text-subtle">{translate('workflows.last-failure')}</p>
+          <p class="font-mono text-xs">{translate('workflows.last-failure')}</p>
           <CodeBlock
             class="pb-2"
             content={stringifyWithBigInt(
@@ -165,7 +165,7 @@
       </div>
       <div class="flex flex-1 flex-col">
         {#if activity.lastFailure?.stackTrace}
-          <p class="text-subtle">{translate('common.stack-trace')}</p>
+          <p class="font-mono text-xs">{translate('common.stack-trace')}</p>
           <CodeBlock
             language="text"
             content={activity.lastFailure.stackTrace}
@@ -211,7 +211,7 @@
       {activity.attempt} of {formatMaximumAttempts(activity.maximumAttempts)}
     </Badge>
     {#if activity.maximumAttempts}
-      <span class="text-sm text-subtle"
+      <span class="text-sm text-secondary"
         >{formatAttemptsLeft(activity.maximumAttempts, activity.attempt)}
         remaining</span
       >

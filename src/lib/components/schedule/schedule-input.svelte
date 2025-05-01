@@ -12,6 +12,5 @@
   <InputAndResultsPayload
     title={translate('schedules.schedule-input')}
     content={stringifyWithBigInt(input)}
-    isRunning={false}
   />
 </Panel>

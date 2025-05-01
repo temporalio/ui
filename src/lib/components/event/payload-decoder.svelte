@@ -54,7 +54,7 @@
         convertedAttributes,
       ) as object;
       const keyExists = key && decodedAttributes?.[key];
-      let finalValue = keyExists ? decodedAttributes[key] : convertedAttributes;
+      let finalValue = keyExists ? decodedAttributes[key] : decodedAttributes;
       if (Array.isArray(finalValue) && finalValue.length === 1) {
         finalValue = finalValue[0];
       }

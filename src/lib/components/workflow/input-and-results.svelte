@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { translate } from '$lib/i18n/translate';
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
@@ -12,12 +13,12 @@
 
 <div class="flex flex-col gap-4 lg:flex-row" data-testid="input-and-result">
   <InputAndResultsPayload
-    title="Input"
+    title={translate('workflows.input')}
     content={workflowEvents.input}
     {isRunning}
   />
   <InputAndResultsPayload
-    title="Result"
+    title={translate('workflows.result')}
     content={workflowEvents.results}
     {isRunning}
   />
