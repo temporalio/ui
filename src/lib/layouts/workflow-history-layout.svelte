@@ -4,10 +4,10 @@
 
   import EventSummary from '$lib/components/event/event-summary.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
-  import InputAndResults from '$lib/components/lines-and-dots/input-and-results.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
+  import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
