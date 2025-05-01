@@ -20,7 +20,6 @@
   export let payloads: Payloads;
   export let showEditActions: boolean = false;
 
-  console.log('Payloads: ', payloads);
   let initialInput = '';
   let initialEncoding: PayloadInputEncoding = 'json/plain';
   let initialMessageType = '';
