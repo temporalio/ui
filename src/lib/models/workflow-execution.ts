@@ -2,6 +2,7 @@ import type {
   Callbacks,
   PendingActivity,
   PendingActivityInfo,
+  PendingActivityState,
   PendingChildren,
   PendingNexusOperation,
 } from '$lib/types/events';
@@ -16,6 +17,7 @@ import type {
 import { decodePayload } from '$lib/utilities/decode-payload';
 import {
   toCallbackStateReadable,
+  toPendingActivityStateReadable,
   toPendingNexusOperationStateReadable,
   toWorkflowStatusReadable,
 } from '$lib/utilities/screaming-enums';
@@ -29,8 +31,12 @@ export const toPendingActivities = (
   return pendingActivity.map((activity): PendingActivity => {
     const attributes = simplifyAttributes(activity, true);
     const id = activity.activityId;
-
-    return { ...attributes, id };
+    const state = activity.state as unknown as PendingActivityState;
+    return {
+      ...attributes,
+      id,
+      state: toPendingActivityStateReadable(state),
+    };
   });
 };
 
@@ -107,7 +113,6 @@ export const toWorkflowExecution = (
     response.workflowExecutionInfo.stateTransitionCount;
   const defaultWorkflowTaskTimeout =
     response.executionConfig?.defaultWorkflowTaskTimeout;
-
   const pendingActivities: PendingActivity[] = toPendingActivities(
     response.pendingActivities,
   );

@@ -13,7 +13,9 @@ import {
 export const getSinglePayload = (decodedValue: string): string => {
   if (decodedValue) {
     const parsedValue = parseWithBigInt(decodedValue);
-    const firstPayload = parsedValue?.[0];
+    const firstPayload = Array.isArray(parsedValue)
+      ? parsedValue?.[0]
+      : parsedValue;
     if (firstPayload) {
       return stringifyWithBigInt(firstPayload);
     }

@@ -54,12 +54,11 @@
         convertedAttributes,
       ) as object;
       const keyExists = key && decodedAttributes?.[key];
-      if (keyExists) {
-        decodedValue = stringifyWithBigInt(keyExists);
-      } else {
-        decodedValue = stringifyWithBigInt(decodedAttributes);
+      let finalValue = keyExists ? decodedAttributes[key] : decodedAttributes;
+      if (Array.isArray(finalValue) && finalValue.length === 1) {
+        finalValue = finalValue[0];
       }
-
+      decodedValue = stringifyWithBigInt(finalValue);
       if (onDecode) {
         onDecode(decodedValue);
       }
