@@ -46,6 +46,8 @@
       const date = parseInt(inputDateSplit[1]);
       const newDate = new Date(year, month, date);
       dispatch('datechange', newDate);
+    } else if (inputDate.length === 0) {
+      dispatch('dateclear', {});
     }
   };
 
