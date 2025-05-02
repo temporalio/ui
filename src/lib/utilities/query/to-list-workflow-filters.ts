@@ -1,6 +1,7 @@
 import debounce from 'just-debounce';
 
 import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+import { emptyFilter } from '$lib/stores/filters';
 import { currentPageKey } from '$lib/stores/pagination';
 import {
   type FilterParameters,
@@ -53,15 +54,6 @@ export const getLargestDurationUnit = (duration: Duration): Duration => {
 
 const isDatetimeStatement = is(SEARCH_ATTRIBUTE_TYPE.DATETIME);
 const isBoolStatement = is(SEARCH_ATTRIBUTE_TYPE.BOOL);
-
-export const emptyFilter = (): SearchAttributeFilter => ({
-  attribute: '',
-  type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-  value: '',
-  operator: '',
-  parenthesis: '',
-  conditional: '',
-});
 
 const DefaultAttributes: SearchAttributes = {
   ExecutionStatus: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
@@ -244,3 +236,75 @@ export const updateQueryParamsFromFilter = debounce(
   },
   300,
 );
+
+export const getFilterIndex = (
+  filter: SearchAttributeFilter,
+  filters: SearchAttributeFilter[],
+) => {
+  return filters.findIndex(
+    (f) =>
+      f.type === filter.type &&
+      f.attribute === filter.attribute &&
+      f.value === filter.value &&
+      f.conditional === filter.conditional,
+  );
+};
+
+export const addFilter = (
+  filter: SearchAttributeFilter,
+  filters: SearchAttributeFilter[],
+) => {
+  const index = getFilterIndex(filter, filters);
+  if (index !== -1) return filters;
+
+  filters.push(filter);
+  return filters;
+};
+
+export const removeFilter = (
+  filter: SearchAttributeFilter,
+  filters: SearchAttributeFilter[],
+) => {
+  const index = getFilterIndex(filter, filters);
+  if (index === -1) return filters;
+
+  filters.splice(index, 1);
+  return filters;
+};
+
+export const toggleFilter = (
+  filter: SearchAttributeFilter,
+  filters: SearchAttributeFilter[],
+  url: URL,
+) => {
+  const index = getFilterIndex(filter, filters);
+  if (index === -1) {
+    filters = addFilter(filter, filters);
+  } else {
+    filters = removeFilter(filter, filters);
+  }
+  updateQueryParamsFromFilter(url, filters);
+  return filters;
+};
+
+export const getInitialFilters = ({
+  url,
+  searchAttributes,
+  initialFilters,
+}: {
+  url: URL;
+  searchAttributes: SearchAttributes;
+  initialFilters: { value: boolean; filter: SearchAttributeFilter }[];
+}) => {
+  const query = url.searchParams.get('query');
+  let filters = query ? toListWorkflowFilters(query, searchAttributes) : [];
+  initialFilters.forEach(({ value, filter }) => {
+    if (value) {
+      filters = addFilter(filter, filters);
+    } else {
+      filters = removeFilter(filter, filters);
+    }
+  });
+  updateQueryParamsFromFilter(url, filters);
+  return filters;
+};

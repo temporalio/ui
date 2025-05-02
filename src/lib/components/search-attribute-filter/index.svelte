@@ -23,6 +23,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import { emptyFilter } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
     type SearchAttributeOption,
@@ -40,10 +41,7 @@
     isStatusFilter,
     isTextFilter,
   } from '$lib/utilities/query/search-attribute-filter';
-  import {
-    combineFilters,
-    emptyFilter,
-  } from '$lib/utilities/query/to-list-workflow-filters';
+  import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   import BooleanFilter from './boolean-filter.svelte';

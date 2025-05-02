@@ -1,6 +1,8 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
+  import { page } from '$app/stores';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
@@ -11,7 +13,13 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import { hideChildWorkflows, searchInputViewOpen } from '$lib/stores/filters';
+  import {
+    emptyFilter,
+    hideChildWorkflows,
+    hideChildWorkflowsFilter,
+    searchInputViewOpen,
+    workflowFilters,
+  } from '$lib/stores/filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import {
     SEARCH_ATTRIBUTE_TYPE,
@@ -19,7 +27,7 @@
   } from '$lib/types/workflows';
   import { workflowRoutePattern } from '$lib/utilities/namespace-url-pattern';
   import { getFocusedElementId } from '$lib/utilities/query/search-attribute-filter';
-  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { toggleFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import IsTemporalServerVersionGuard from '../is-temporal-server-version-guard.svelte';
 
@@ -102,9 +110,16 @@
       >
       <IsTemporalServerVersionGuard minimumVersion="1.23.0">
         <MenuItem
-          on:click={() => ($hideChildWorkflows = !$hideChildWorkflows)}
+          on:click={() => {
+            $hideChildWorkflows = !$hideChildWorkflows;
+            $workflowFilters = toggleFilter(
+              hideChildWorkflowsFilter,
+              $workflowFilters,
+              $page.url,
+            );
+          }}
           description={$hideChildWorkflows
-            ? 'Child Workflows hidden by default when no filter applied'
+            ? 'Child Workflows hidden by default'
             : ''}
         >
           <div class="flex items-center gap-1">

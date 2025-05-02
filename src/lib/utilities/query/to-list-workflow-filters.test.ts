@@ -3,8 +3,12 @@ import { afterEach } from 'vitest';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
+  addFilter,
   combineDropdownFilters,
   combineFilters,
+  getFilterIndex,
+  removeFilter,
+  toggleFilter,
   toListWorkflowFilters,
 } from './to-list-workflow-filters';
 
@@ -1247,5 +1251,128 @@ describe('combineFilters', () => {
       },
     ];
     expect(result).toEqual(expectedFilters);
+  });
+});
+
+describe('getFilterIndex', () => {
+  const filter = {
+    attribute: 'ParentWorkflowId',
+    type: 'Keyword',
+    conditional: 'is',
+    operator: '',
+    parenthesis: '',
+    value: null,
+  };
+  const filters = [
+    {
+      attribute: 'WorkflowId',
+      type: 'Keyword',
+      conditional: 'is',
+      operator: '',
+      parenthesis: '',
+      value: null,
+    },
+    {
+      attribute: 'ParentWorkflowId',
+      type: 'Bool',
+      conditional: 'is',
+      operator: '',
+      parenthesis: '',
+      value: null,
+    },
+    {
+      attribute: 'ParentWorkflowId',
+      type: 'Keyword',
+      conditional: '=',
+      operator: '',
+      parenthesis: '',
+      value: null,
+    },
+    {
+      attribute: 'ParentWorkflowId',
+      type: 'Keyword',
+      conditional: 'is',
+      operator: '',
+      parenthesis: '',
+      value: 'example',
+    },
+  ];
+
+  it('should get index of filter if it exists', () => {
+    const result = getFilterIndex(filter, [...filters, filter]);
+    expect(result).toEqual(4);
+  });
+
+  it('should return -1 if filter does not exists', () => {
+    const result = getFilterIndex(filter, filters);
+    expect(result).toEqual(-1);
+  });
+});
+
+describe('addFilter', () => {
+  it('should add the filter if it does not exist', () => {
+    const filter = {
+      attribute: 'ParentWorkflowId',
+      type: 'Keyword',
+      conditional: 'is',
+      operator: '',
+      parenthesis: '',
+      value: null,
+    };
+
+    let result = addFilter(filter, []);
+    expect(result.length).toEqual(1);
+
+    result = addFilter(filter, [filter]);
+    expect(result.length).toEqual(1);
+  });
+});
+
+describe('removeFilter', () => {
+  it('should remove the filter if it exists', () => {
+    const filterA = {
+      attribute: 'ExecutionStatus',
+      type: 'Keyword',
+      conditional: '=',
+      operator: '',
+      parenthesis: '',
+      value: 'Canceled',
+    };
+    const filterB = {
+      attribute: 'ParentWorkflowId',
+      type: 'Keyword',
+      conditional: 'is',
+      operator: '',
+      parenthesis: '',
+      value: null,
+    };
+
+    let result = removeFilter(filterB, [filterA]);
+    expect(result.length).toEqual(1);
+
+    result = removeFilter(filterB, [filterA, filterB]);
+    expect(result.length).toEqual(1);
+  });
+});
+
+describe('toggleFilter', () => {
+  const url = new URL('http://localhost:3000/');
+  const filter = {
+    attribute: 'ParentWorkflowId',
+    type: 'Keyword',
+    conditional: 'is',
+    operator: '',
+    parenthesis: '',
+    value: null,
+  };
+
+  it('should add the filter if it does not exist', () => {
+    const result = toggleFilter(filter, [], url);
+    expect(result.length).toEqual(1);
+  });
+
+  it('should remove the filter if it does exist', () => {
+    const result = toggleFilter(filter, [filter], url);
+    expect(result.length).toEqual(0);
   });
 });

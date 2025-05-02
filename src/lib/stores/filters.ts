@@ -7,6 +7,7 @@ import { allEventTypeOptions } from '$lib/models/event-history/get-event-categor
 import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { persistStore } from '$lib/stores/persist-store';
 import type { EventClassification, EventTypeCategory } from '$lib/types/events';
+import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
 export const query = derived([page], ([$page]) =>
   $page.url.searchParams.get('query'),
@@ -22,6 +23,29 @@ export const hideChildWorkflows = persistStore<boolean>(
   'hideChildWorkflows',
   false,
   true,
+);
+
+export const emptyFilter = (): SearchAttributeFilter => ({
+  attribute: '',
+  type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  value: '',
+  operator: '',
+  parenthesis: '',
+  conditional: '',
+});
+
+export const hideChildWorkflowsFilter = {
+  ...emptyFilter(),
+  attribute: 'ParentWorkflowId',
+  value: null,
+  conditional: 'is',
+};
+
+export const initialWorkflowFilters = derived(
+  [hideChildWorkflows],
+  ([$hideChildWorkflows]) => {
+    return [{ value: $hideChildWorkflows, filter: hideChildWorkflowsFilter }];
+  },
 );
 
 const category = derived([page], ([$page]) =>
