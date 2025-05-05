@@ -13,15 +13,15 @@ export const query = derived([page], ([$page]) =>
   $page.url.searchParams.get('query'),
 );
 
-export const showChildWorkflows = persistStore<boolean>(
-  'showChildWorkflows',
-  true,
-  true,
-);
-
 export const hideChildWorkflows = persistStore<boolean>(
   'hideChildWorkflows',
   false,
+  true,
+);
+
+export const showWorkflowsQuickFilters = persistStore<boolean>(
+  'showWorkflowsQuickFilters',
+  get(hideChildWorkflows),
   true,
 );
 
@@ -40,13 +40,6 @@ export const hideChildWorkflowsFilter = {
   value: null,
   conditional: 'is',
 };
-
-export const initialWorkflowFilters = derived(
-  [hideChildWorkflows],
-  ([$hideChildWorkflows]) => {
-    return [{ value: $hideChildWorkflows, filter: hideChildWorkflowsFilter }];
-  },
-);
 
 const category = derived([page], ([$page]) =>
   $page.url.searchParams.get('category'),

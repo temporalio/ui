@@ -12,7 +12,6 @@ import { minimumVersionRequired } from '$lib/utilities/version-check';
 
 import { isCloud, supportsAdvancedVisibility } from './advanced-visibility';
 import { groupByCountEnabled } from './capability-enablement';
-import { hideChildWorkflows } from './filters';
 import { temporalVersion } from './versions';
 
 export const refresh = writable(0);
@@ -34,35 +33,25 @@ export const canFetchChildWorkflows = derived(
 );
 
 const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
-export const queryWithParentWorkflowId = derived(
-  [query, canFetchChildWorkflows, hideChildWorkflows],
-  ([$query, $canFetchChildWorkflows, $hideChildWorkflows]) => {
-    if ($canFetchChildWorkflows && $hideChildWorkflows && !$query) {
-      return 'ParentWorkflowId is NULL';
-    }
-    return $query;
-  },
-);
-
 const namespace = derived([page], ([$page]) => $page.params.namespace);
 const parameters = derived(
   [
     namespace,
-    queryWithParentWorkflowId,
+    query,
     refresh,
     supportsAdvancedVisibility,
     hideWorkflowQueryErrors,
   ],
   ([
     $namespace,
-    $queryWithParentWorkflowId,
+    $query,
     $refresh,
     $supportsAdvancedVisibility,
     $hideWorkflowQueryErrors,
   ]) => {
     return {
       namespace: $namespace,
-      query: $queryWithParentWorkflowId,
+      query: $query,
       refresh: $refresh,
       supportsAdvancedVisibility: $supportsAdvancedVisibility,
       hideWorkflowQueryErrors: $hideWorkflowQueryErrors,

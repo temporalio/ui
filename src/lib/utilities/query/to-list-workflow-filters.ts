@@ -286,25 +286,3 @@ export const toggleFilter = (
   updateQueryParamsFromFilter(url, filters);
   return filters;
 };
-
-export const getInitialFilters = ({
-  url,
-  searchAttributes,
-  initialFilters,
-}: {
-  url: URL;
-  searchAttributes: SearchAttributes;
-  initialFilters: { value: boolean; filter: SearchAttributeFilter }[];
-}) => {
-  const query = url.searchParams.get('query');
-  let filters = query ? toListWorkflowFilters(query, searchAttributes) : [];
-  initialFilters.forEach(({ value, filter }) => {
-    if (value) {
-      filters = addFilter(filter, filters);
-    } else {
-      filters = removeFilter(filter, filters);
-    }
-  });
-  updateQueryParamsFromFilter(url, filters);
-  return filters;
-};

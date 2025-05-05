@@ -9,7 +9,6 @@
   import { translate } from '$lib/i18n/translate';
   import { fetchAllChildWorkflows } from '$lib/services/workflow-service';
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
-  import { hideChildWorkflows } from '$lib/stores/filters';
   import {
     loading,
     refresh,
@@ -41,7 +40,7 @@
     childrenIds = [];
   };
 
-  $: $hideChildWorkflows, $refresh, $workflowsQuery, clearChildren();
+  $: $refresh, $workflowsQuery, clearChildren();
 
   const viewChildren = async (workflow: WorkflowExecution) => {
     if (childrenActive(workflow)) {

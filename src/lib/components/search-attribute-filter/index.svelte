@@ -51,11 +51,14 @@
   import FilterList from './filter-list.svelte';
   import ListFilter from './list-filter.svelte';
   import NumberFilter from './number-filter.svelte';
+  import QuickFilters, { type QuickFilter } from './quick-filters.svelte';
   import SearchAttributeMenu from './search-attribute-menu.svelte';
   import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
 
   export let filters: SearchAttributeFilter[];
+  export let quickFilters: QuickFilter[] = [];
+  export let showQuickFilters = writable(false);
   export let searchAttributeOptions: SearchAttributeOption[] = null;
   export let showFilter = true;
   export let refresh: () => void;
@@ -65,6 +68,8 @@
   const filter = writable<SearchAttributeFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
+
+  let showQuickFiltersMenu = writable(false);
 
   $: searchParamQuery = $page.url.searchParams.get('query');
   $: showActions = filters.length && !$filter.attribute;
@@ -164,10 +169,16 @@
         on:keyup={handleKeyUp}
         role="none"
       >
-        {#if isStatusFilter($filter)}
+        {#if $showQuickFiltersMenu}
+          <QuickFilters
+            open={showQuickFiltersMenu}
+            filters={quickFilters}
+            {showQuickFilters}
+          />
+        {:else if isStatusFilter($filter)}
           <StatusFilter bind:filters />
         {:else}
-          <SearchAttributeMenu {filters} {options} />
+          <SearchAttributeMenu {filters} {options} bind:showQuickFiltersMenu />
         {/if}
 
         {#if $filter.attribute}
@@ -241,6 +252,7 @@
     </div>
     <slot name="actions" />
   </div>
+  <QuickFilters filters={quickFilters} {showQuickFilters} />
   <FilterList bind:filters />
 </div>
 

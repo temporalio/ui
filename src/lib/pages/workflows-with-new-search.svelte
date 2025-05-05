@@ -46,7 +46,7 @@
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { groupByCountEnabled } from '$lib/stores/capability-enablement';
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
-  import { initialWorkflowFilters, workflowFilters } from '$lib/stores/filters';
+  import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import {
@@ -56,7 +56,7 @@
     workflowsQuery,
     workflowsSearchParams,
   } from '$lib/stores/workflows';
-  import { getInitialFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
@@ -75,11 +75,10 @@
 
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
-    $workflowFilters = getInitialFilters({
-      url: $page.url,
-      searchAttributes: $searchAttributes,
-      initialFilters: $initialWorkflowFilters,
-    });
+    if (query) {
+      // Set filters from inital page load query if it exists
+      $workflowFilters = toListWorkflowFilters(query, $searchAttributes);
+    }
   });
 
   const resetSelection = () => {
