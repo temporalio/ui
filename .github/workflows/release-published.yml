@@ -38,9 +38,10 @@ jobs:
         with:
           token: ${{ outputs.generate_token.outputs.token }}
           repository: temporalio/ui-server
-          event-type: ui-release-published
+          event-type: sync-from-ui-release
           client-payload: |
             {
+              "ref": "${{ github.event.ref }}",
               "release_tag": "${{ github.event.release.tag_name }}",
               "release_url": "${{ github.event.release.html_url }}"
             }

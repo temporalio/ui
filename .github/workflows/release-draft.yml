@@ -28,3 +28,14 @@ jobs:
       - uses: release-drafter/release-drafter@v6
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+
+      - name: Trigger ui-server workflow
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ outputs.generate_token.outputs.token }}
+          repository: temporalio/ui-server
+          event-type: sync-from-ui-commit
+          client-payload: |
+            {
+              "ref": "${{ github.event.ref }}",
+            }
