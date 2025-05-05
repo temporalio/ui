@@ -11,13 +11,9 @@
 
   import PayloadDecoder from '../event/payload-decoder.svelte';
 
-  type Props = {
-    title: string;
-    content: string;
-    isRunning?: boolean;
-  };
-
-  let { title, content = '', isRunning = false }: Props = $props();
+  export let title: string;
+  export let content: string = '';
+  export let isRunning: boolean = false;
 
   const parseContent = (c: string): PotentiallyDecodable | undefined => {
     try {
@@ -45,9 +41,9 @@
     }
   };
 
-  const parsedContent = $derived(parseContent(content));
-  const payloads = $derived(getPayloads(parsedContent));
-  const showParsedContent = $derived(payloads.length > 0);
+  $: parsedContent = parseContent(content);
+  $: payloads = getPayloads(parsedContent);
+  $: payloadsSize = payloads.length;
 </script>
 
 <div class="flex w-full grow flex-col gap-2">
@@ -56,16 +52,27 @@
   </h2>
   {#if content}
     {#key $minimizeEventView}
-      {#if showParsedContent}
+      {#if payloadsSize > 0}
         <PayloadDecoder value={parsedContent} key="payloads" let:decodedValue>
-          {#each parsePayloads(decodedValue) as decodedContent}
+          {#if payloadsSize > 1}
+            {#each parsePayloads(decodedValue) as decodedContent}
+              <CodeBlock
+                content={stringifyWithBigInt(decodedContent)}
+                copyIconTitle={translate('common.copy-icon-title')}
+                copySuccessIconTitle={translate(
+                  'common.copy-success-icon-title',
+                )}
+                maxHeight={300}
+              />
+            {/each}
+          {:else}
             <CodeBlock
-              content={stringifyWithBigInt(decodedContent)}
+              content={decodedValue}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
               maxHeight={300}
             />
-          {/each}
+          {/if}
         </PayloadDecoder>
       {:else}
         <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
