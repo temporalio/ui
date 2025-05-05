@@ -13,7 +13,7 @@ export const query = derived([page], ([$page]) =>
   $page.url.searchParams.get('query'),
 );
 
-export const hideChildWorkflows = persistStore<boolean>(
+const hideChildWorkflows = persistStore<boolean>(
   'hideChildWorkflows',
   false,
   true,
