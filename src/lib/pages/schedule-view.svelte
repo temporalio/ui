@@ -346,33 +346,33 @@
           <ScheduleError error={schedule?.info?.invalidScheduleError} />
         </div>
       {/if}
-      {#if $groupByCountEnabled}
-        <div class="flex w-full flex-col gap-2 text-lg">
-          <div class="flex items-center gap-2">
-            <span data-testid="workflow-count"
-              >{$workflowCount.count.toLocaleString()}
-              <Translate
-                key="common.workflows-plural"
-                count={$workflowCount.count}
-              />
-            </span>
-            <Button
-              size="xs"
-              variant="ghost"
-              leadingIcon="retry"
-              on:click={() => {
-                scheduleFetch = fetchSchedule(parameters);
-                $refresh = Date.now();
-              }}
-            >
-              {#if $workflowCount.newCount > 0}
-                +{$workflowCount.newCount.toLocaleString()}
-              {/if}
-            </Button>
-          </div>
-          <WorkflowCounts staticQuery={workflowQuery} />
+      <div class="flex w-full flex-col gap-2 text-lg">
+        <div class="flex items-center gap-2">
+          <span data-testid="workflow-count"
+            >{$workflowCount.count.toLocaleString()}
+            <Translate
+              key="common.workflows-plural"
+              count={$workflowCount.count}
+            />
+          </span>
+          <Button
+            size="xs"
+            variant="ghost"
+            leadingIcon="retry"
+            on:click={() => {
+              scheduleFetch = fetchSchedule(parameters);
+              $refresh = Date.now();
+            }}
+          >
+            {#if $workflowCount.newCount > 0}
+              +{$workflowCount.newCount.toLocaleString()}
+            {/if}
+          </Button>
         </div>
-      {/if}
+        {#if $groupByCountEnabled}
+          <WorkflowCounts staticQuery={workflowQuery} />
+        {/if}
+      </div>
       <div class="flex flex-col gap-4 xl:flex-row">
         <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
           <ScheduleRecentRuns

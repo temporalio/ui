@@ -13,7 +13,6 @@
     fetchPaginatedWorkflows,
   } from '$lib/services/workflow-service';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { groupByCountEnabled } from '$lib/stores/capability-enablement';
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
   import { hideChildWorkflows } from '$lib/stores/filters';
   import {
@@ -71,7 +70,7 @@
   };
 
   const fetchTotalCount = async (namespace: string, query: string) => {
-    if ($supportsAdvancedVisibility && $groupByCountEnabled) {
+    if ($supportsAdvancedVisibility) {
       fetchWorkflowCount(namespace, query).then((count) => {
         workflowCount.set({ ...count, newCount: 0 });
       });
@@ -134,10 +133,10 @@
         <slot name="cloud" slot="cloud" />
       </TableEmptyState>
     </svelte:fragment>
-    <svelte:fragment slot="actions-end-additional">
+    <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
       <Tooltip text={translate('common.download-json')} top>
         <Button
-          on:click={() => exportWorkflows(visibleItems)}
+          on:click={() => exportWorkflows(visibleItems, page)}
           data-testid="export-history-button"
           size="xs"
           variant="ghost"
