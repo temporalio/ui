@@ -130,31 +130,6 @@ const DEFAULT_SCHEDULES_COLUMNS: ConfigurableTableHeader[] = [
 const isNotParentWorkflowIdColumn = (column: ConfigurableTableHeader) =>
   column.label !== 'Parent Workflow ID';
 
-const getDefaultWorkflowsTableColumns = (): ConfigurableTableHeader[] => {
-  let columns: ConfigurableTableHeader[];
-  try {
-    // try to get the list of columns that was stored last time they interacted
-    // with the table before we made it namespace-specific
-    const stringifiedOldColumns = window.localStorage.getItem(
-      'workflow-table-columns',
-    );
-    const parsedOldColumns = JSON.parse(stringifiedOldColumns);
-
-    if (stringifiedOldColumns && parsedOldColumns?.length) {
-      const filteredOldColumns = parsedOldColumns.filter(
-        isNotParentWorkflowIdColumn,
-      );
-      columns = filteredOldColumns;
-    } else {
-      columns = DEFAULT_WORKFLOWS_COLUMNS;
-    }
-  } catch {
-    columns = DEFAULT_WORKFLOWS_COLUMNS;
-  }
-
-  return columns;
-};
-
 export const persistedWorkflowTableColumns = persistStore<State>(
   'namespace-workflow-table-columns',
   {},
@@ -205,7 +180,7 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
       workflows: useOrAddDefaultTableColumnsToNamespace(
         $persistedWorkflowTableColumns,
         namespace,
-        getDefaultWorkflowsTableColumns(),
+        DEFAULT_WORKFLOWS_COLUMNS,
         (columns) => persistedWorkflowTableColumns.set(columns),
       ),
       schedules: useOrAddDefaultTableColumnsToNamespace(
