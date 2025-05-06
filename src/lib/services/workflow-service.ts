@@ -8,6 +8,7 @@ import {
   isPayloadInputEncodingType,
   type PayloadInputEncoding,
 } from '$lib/components/payload-input-with-encoding.svelte';
+import { translate } from '$lib/i18n/translate';
 import { Action } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
@@ -17,7 +18,11 @@ import { isCloud } from '$lib/stores/advanced-visibility';
 import { authUser } from '$lib/stores/auth-user';
 import type { SearchAttributeInput } from '$lib/stores/search-attributes';
 import { temporalVersion } from '$lib/stores/versions';
-import { canFetchChildWorkflows } from '$lib/stores/workflows';
+import {
+  canFetchChildWorkflows,
+  hideWorkflowQueryErrors,
+  workflowError,
+} from '$lib/stores/workflows';
 import {
   ResetReapplyExcludeType,
   ResetReapplyType,
@@ -966,13 +971,21 @@ type PaginatedWorkflowsPromise = (
 export const fetchPaginatedWorkflows = async (
   namespace: string,
   query: string = '',
-  onError: ErrorCallback,
   request = fetch,
 ): Promise<PaginatedWorkflowsPromise> => {
   return (pageSize = 100, token = '') => {
-    if (query) {
-      query = decodeURIComponent(query);
-    }
+    workflowError.set('');
+
+    const onError: ErrorCallback = (err) => {
+      handleUnauthorizedOrForbiddenError(err);
+      if (get(hideWorkflowQueryErrors)) {
+        workflowError.set(translate('workflows.workflows-error-querying'));
+      } else {
+        workflowError.set(
+          err?.body?.message || translate('workflows.workflows-error-querying'),
+        );
+      }
+    };
 
     const route = routeForApi('workflows', { namespace });
     return requestFromAPI<ListWorkflowExecutionsResponse>(route, {
@@ -983,7 +996,8 @@ export const fetchPaginatedWorkflows = async (
       },
       request,
       onError,
-    }).then(({ executions, nextPageToken }) => {
+      handleError: onError,
+    }).then(({ executions = [], nextPageToken = '' }) => {
       return {
         items: toWorkflowExecutions({ executions }),
         nextPageToken: nextPageToken ? String(nextPageToken) : '',

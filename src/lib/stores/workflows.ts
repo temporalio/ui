@@ -3,9 +3,7 @@ import { derived, get, readable, writable } from 'svelte/store';
 
 import { page } from '$app/stores';
 
-import { translate } from '$lib/i18n/translate';
 import { fetchWorkflowCount } from '$lib/services/workflow-counts';
-import { fetchAllWorkflows } from '$lib/services/workflow-service';
 import type { FilterParameters, WorkflowExecution } from '$lib/types/workflows';
 import { withLoading } from '$lib/utilities/stores/with-loading';
 import { minimumVersionRequired } from '$lib/utilities/version-check';
@@ -74,33 +72,13 @@ const setCounts = (_workflowCount: { count: number }) => {
   workflowCount.set({ ..._workflowCount, newCount: 0 });
 };
 
-const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
+const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = () => {
   return parameters.subscribe(
-    ({
-      namespace,
-      query,
-      supportsAdvancedVisibility,
-      hideWorkflowQueryErrors,
-    }) => {
+    ({ namespace, query, supportsAdvancedVisibility }) => {
       withLoading(loading, updating, async () => {
-        const { workflows, error } = await fetchAllWorkflows(namespace, {
-          query,
-        });
-        set(workflows);
-
         if (supportsAdvancedVisibility && !get(groupByCountEnabled)) {
           const workflowCount = await fetchWorkflowCount(namespace, query);
           setCounts(workflowCount);
-        }
-
-        if (error) {
-          if (hideWorkflowQueryErrors) {
-            workflowError.set(translate('workflows.workflows-error-querying'));
-          } else {
-            workflowError.set(error);
-          }
-        } else {
-          workflowError.set('');
         }
       });
     },

@@ -21,7 +21,6 @@
   } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
-  import type { APIErrorResponse } from '$lib/utilities/request-from-api';
 
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
@@ -32,7 +31,6 @@
 
   $: ({ namespace } = $page.params);
   $: columns = $configurableTableColumns?.[namespace]?.workflows ?? [];
-  $: empty = $workflows.length === 0;
 
   let childrenIds: {
     workflowId: string;
@@ -70,12 +68,8 @@
     );
   };
 
-  const onError = (error: APIErrorResponse) => {
-    console.error('Error fetching workflows:', error);
-  };
-
   $: onFetch = () => {
-    return fetchPaginatedWorkflows(namespace, $workflowsQuery, onError);
+    return fetchPaginatedWorkflows(namespace, $workflowsQuery);
   };
 </script>
 
@@ -95,7 +89,7 @@
     </caption>
     <TableHeaderRow
       columnsCount={columns.length}
-      {empty}
+      empty={visibleItems.length === 0}
       slot="headers"
       let:visibleItems
       workflows={visibleItems}
