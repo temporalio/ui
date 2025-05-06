@@ -80,6 +80,7 @@
   const dispatch = createEventDispatcher();
   function onClear() {
     value = '';
+    dispatch('dateclear', {});
     dispatch('clear', {});
   }
 
