@@ -7,16 +7,18 @@
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fetchWorkflowCount } from '$lib/services/workflow-counts';
   import {
     fetchAllChildWorkflows,
     fetchPaginatedWorkflows,
   } from '$lib/services/workflow-service';
+  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { groupByCountEnabled } from '$lib/stores/capability-enablement';
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
   import { hideChildWorkflows } from '$lib/stores/filters';
   import {
     refresh,
     workflowCount,
-    workflows,
     workflowsQuery,
   } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -68,7 +70,16 @@
     );
   };
 
+  const fetchTotalCount = async (namespace: string, query: string) => {
+    if ($supportsAdvancedVisibility && $groupByCountEnabled) {
+      fetchWorkflowCount(namespace, query).then((count) => {
+        workflowCount.set({ ...count, newCount: 0 });
+      });
+    }
+  };
+
   $: onFetch = () => {
+    fetchTotalCount(namespace, $workflowsQuery);
     return fetchPaginatedWorkflows(namespace, $workflowsQuery);
   };
 </script>
@@ -126,7 +137,7 @@
     <svelte:fragment slot="actions-end-additional">
       <Tooltip text={translate('common.download-json')} top>
         <Button
-          on:click={() => exportWorkflows($workflows)}
+          on:click={() => exportWorkflows(visibleItems)}
           data-testid="export-history-button"
           size="xs"
           variant="ghost"

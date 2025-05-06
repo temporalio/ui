@@ -1,15 +1,11 @@
-import type { StartStopNotifier } from 'svelte/store';
-import { derived, get, readable, writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 
 import { page } from '$app/stores';
 
-import { fetchWorkflowCount } from '$lib/services/workflow-counts';
-import type { FilterParameters, WorkflowExecution } from '$lib/types/workflows';
-import { withLoading } from '$lib/utilities/stores/with-loading';
+import type { FilterParameters } from '$lib/types/workflows';
 import { minimumVersionRequired } from '$lib/utilities/version-check';
 
-import { isCloud, supportsAdvancedVisibility } from './advanced-visibility';
-import { groupByCountEnabled } from './capability-enablement';
+import { isCloud } from './advanced-visibility';
 import { hideChildWorkflows } from './filters';
 import { temporalVersion } from './versions';
 
@@ -42,49 +38,6 @@ export const queryWithParentWorkflowId = derived(
   },
 );
 
-const namespace = derived([page], ([$page]) => $page.params.namespace);
-const parameters = derived(
-  [
-    namespace,
-    queryWithParentWorkflowId,
-    refresh,
-    supportsAdvancedVisibility,
-    hideWorkflowQueryErrors,
-  ],
-  ([
-    $namespace,
-    $queryWithParentWorkflowId,
-    $refresh,
-    $supportsAdvancedVisibility,
-    $hideWorkflowQueryErrors,
-  ]) => {
-    return {
-      namespace: $namespace,
-      query: $queryWithParentWorkflowId,
-      refresh: $refresh,
-      supportsAdvancedVisibility: $supportsAdvancedVisibility,
-      hideWorkflowQueryErrors: $hideWorkflowQueryErrors,
-    };
-  },
-);
-
-const setCounts = (_workflowCount: { count: number }) => {
-  workflowCount.set({ ..._workflowCount, newCount: 0 });
-};
-
-const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = () => {
-  return parameters.subscribe(
-    ({ namespace, query, supportsAdvancedVisibility }) => {
-      withLoading(loading, updating, async () => {
-        if (supportsAdvancedVisibility && !get(groupByCountEnabled)) {
-          const workflowCount = await fetchWorkflowCount(namespace, query);
-          setCounts(workflowCount);
-        }
-      });
-    },
-  );
-};
-
 export type ParsedParameters = FilterParameters & { timeRange?: string };
 export const workflowsSearchParams = writable<string>('');
 
@@ -95,5 +48,4 @@ export const workflowCount = writable({
   newCount: 0,
 });
 export const workflowError = writable('');
-export const workflows = readable<WorkflowExecution[]>([], updateWorkflows);
 export const workflowsQuery = writable<string>('');

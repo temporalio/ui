@@ -70,11 +70,11 @@
       const { count, groups } = await fetchWorkflowCountByExecutionStatus({
         namespace,
         query,
+      }).catch((_e) => {
+        return { count: '0', groups: [] };
       });
       $workflowCount.newCount = parseInt(count) - $workflowCount.count;
       newStatusGroups = getStatusAndCountOfGroup(groups);
-    } catch (e) {
-      console.error('Fetching workflow counts failed: ', e?.message);
     } finally {
       loading = false;
     }
@@ -95,11 +95,11 @@
       const { count, groups } = await fetchWorkflowCountByExecutionStatus({
         namespace,
         query,
+      }).catch((_e) => {
+        return { count: '0', groups: [] };
       });
       $workflowCount.count = parseInt(count);
       statusGroups = getStatusAndCountOfGroup(groups);
-    } catch (e) {
-      console.error('Fetching workflow counts failed: ', e?.message);
     } finally {
       loading = false;
     }
