@@ -69,7 +69,7 @@
     );
   };
 
-  const fetchTotalCount = async (namespace: string, query: string) => {
+  const fetchTotalCount = (namespace: string, query: string) => {
     if ($supportsAdvancedVisibility) {
       fetchWorkflowCount(namespace, query).then((count) => {
         workflowCount.set({ ...count, newCount: 0 });
