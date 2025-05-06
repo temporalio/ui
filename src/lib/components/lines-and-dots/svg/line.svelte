@@ -6,6 +6,7 @@
   export let classification: string | undefined = undefined;
   export let scheduling = false;
   export let pending = false;
+  export let retried = false;
   export let strokeWidth: number = 2;
   export let strokeDasharray = 'none';
 
@@ -13,9 +14,22 @@
   $: [x2, y2] = endPoint;
 </script>
 
+<defs>
+  <pattern
+    id="retried-pattern"
+    width="10"
+    height="10"
+    patternUnits="userSpaceOnUse"
+    patternTransform="rotate(45)"
+  >
+    <rect x="0" y="0" width="5" height="10" fill="#c71607" />
+    <rect x="5" y="0" width="5" height="10" fill="#00964e" />
+  </pattern>
+</defs>
 <line
   class="line {status} {category} {classification}"
   class:scheduling
+  class:retried
   class:animate-line={pending}
   stroke-width={strokeWidth}
   stroke-dasharray={pending ? '3' : strokeDasharray}
@@ -79,6 +93,10 @@
   .Failed,
   .Terminated {
     stroke: #c71607;
+  }
+
+  .retried {
+    stroke: url("#retried-pattern");
   }
 
   .Signaled {

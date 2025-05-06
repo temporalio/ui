@@ -2,11 +2,13 @@
   import type { Timestamp } from '@temporalio/common';
 
   import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
-  import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
-  import { isActivityTaskScheduledEvent } from '$lib/utilities/is-event-type';
+  import {
+    isActivityTaskScheduledEvent,
+    isActivityTaskStartedEvent,
+  } from '$lib/utilities/is-event-type';
 
   import {
     CategoryIcon,
@@ -76,6 +78,10 @@
   };
 
   let strokeWidth = radius;
+
+  $: activityTaskScheduled = group.eventList.find(isActivityTaskStartedEvent);
+  $: retried =
+    activityTaskScheduled && activityTaskScheduled.attributes?.attempt > 1;
 </script>
 
 <g
@@ -99,6 +105,7 @@
         {strokeWidth}
         scheduling={index === 0 &&
           group.lastEvent.classification === 'Completed'}
+        {retried}
       />
     {/if}
     {#if !nextPoint && group.isPending}
@@ -125,8 +132,9 @@
             config={TimelineConfig}
             icon="retry"
           >
-            {group?.displayName} • {translate('workflows.attempt')}
             {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
+            •
+            {group?.displayName}
           </Text>
         {/key}
       {:else}
@@ -143,8 +151,13 @@
             {textAnchor}
             {backdrop}
             config={TimelineConfig}
+            icon={retried ? 'retry' : undefined}
           >
-            {decodedValue}
+            {#if retried}
+              {activityTaskScheduled.attributes.attempt} • {decodedValue}
+            {:else}
+              {decodedValue}
+            {/if}
           </Text>
         </MetadataDecoder>
       {/if}
@@ -166,17 +179,11 @@
 
   .svg-element-shadow {
     filter: drop-shadow(0 0 2px rgb(0 0 0 / 10%));
-    transform-origin: center center;
-    transform: scale(1);
-    transition:
-      filter 0.3s ease-in-out,
-      transform 0.3s ease-in-out;
+    transition: filter 0.3s ease-in-out;
   }
 
   .svg-element-shadow:hover,
   .active {
-    height: 120%;
-    transform: scale(1.005);
-    filter: drop-shadow(0 0 8px rgb(0 0 0 / 50%));
+    filter: drop-shadow(0 0 4px rgb(120 90 150 / 65%));
   }
 </style>

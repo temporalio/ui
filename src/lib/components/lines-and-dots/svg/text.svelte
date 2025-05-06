@@ -9,7 +9,7 @@
   export let point: [number, number] = [0, 0];
   export let category: string | undefined = undefined;
   export let status: string | undefined = 'none';
-  export let fontSize = '12px';
+  export let fontSize = '13px';
   export let fontWeight = '400';
   export let textAnchor = 'start';
   export let backdrop = false;
@@ -46,7 +46,7 @@
 {/if}
 <text
   bind:this={textElement}
-  class="cursor-pointer select-none outline-none {category} font-mono text-primary"
+  class="cursor-pointer select-none tracking-tight outline-none {category} text-primary"
   class:label
   class:backdrop
   x={textX}

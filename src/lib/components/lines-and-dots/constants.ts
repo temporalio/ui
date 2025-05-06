@@ -29,9 +29,9 @@ export type GraphConfig = {
 const baseRadius = 6;
 
 export const TimelineConfig: GraphConfig = {
-  height: baseRadius * 6,
+  height: baseRadius * 5,
   gutter: baseRadius * 8,
-  radius: baseRadius * 3,
+  radius: baseRadius * 3.25,
   fontSizeRatio: baseRadius * 4,
 };
 
