@@ -22,8 +22,8 @@
     patternUnits="userSpaceOnUse"
     patternTransform="rotate(45)"
   >
-    <rect x="0" y="0" width="5" height="10" fill="#c71607" />
-    <rect x="5" y="0" width="5" height="10" fill="#00964e" />
+    <rect x="0" y="0" width="10" height="10" fill="#00964e" />
+    <rect x="3.5" y="0" width="3.5" height="10" fill="#c71607" />
   </pattern>
 </defs>
 <line
@@ -96,7 +96,8 @@
   }
 
   .retried {
-    stroke: url("#retried-pattern");
+    stroke: url('#retried-pattern');
+    opacity: 0.5;
   }
 
   .Signaled {

@@ -31,7 +31,7 @@ const baseRadius = 6;
 export const TimelineConfig: GraphConfig = {
   height: baseRadius * 5,
   gutter: baseRadius * 8,
-  radius: baseRadius * 3.25,
+  radius: baseRadius * 3,
   fontSizeRatio: baseRadius * 4,
 };
 

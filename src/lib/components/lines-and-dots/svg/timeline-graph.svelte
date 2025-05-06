@@ -66,7 +66,10 @@
   on:scroll={handleScroll}
 >
   <EndTimeInterval {workflow} {startTime} let:endTime let:duration>
-    <div class="sticky top-[120px]" class:invisible={!!$activeGroups.length}>
+    <div
+      class="pointer-events-none sticky top-[120px]"
+      class:invisible={!!$activeGroups.length}
+    >
       <div class="flex w-full justify-between text-xs">
         <p class="w-60 -translate-x-24 rotate-90">
           {formatDate(startTime, $timeFormat)}
