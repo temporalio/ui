@@ -978,6 +978,7 @@ export const fetchPaginatedWorkflows = async (
 
     const onError: ErrorCallback = (err) => {
       handleUnauthorizedOrForbiddenError(err);
+
       if (get(hideWorkflowQueryErrors)) {
         workflowError.set(translate('workflows.workflows-error-querying'));
       } else {

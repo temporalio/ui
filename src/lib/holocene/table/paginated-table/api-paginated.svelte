@@ -8,6 +8,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import debounce from 'just-debounce';
   import { onMount } from 'svelte';
 
   import Alert from '$lib/holocene/alert.svelte';
@@ -64,6 +65,7 @@
   export let previousButtonLabel: string;
   export let nextButtonLabel: string;
   export let pageSizeOptions = options;
+  export let debounceDelay = 350;
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
@@ -102,30 +104,35 @@
     }
   }
 
+  const fetchNextPageData = async () => {
+    try {
+      const fetchData = await onFetch();
+      const response = await fetchData(
+        $store.pageSize,
+        $store.indexData[$store.index].nextToken,
+      );
+      const { nextPageToken } = response;
+      const items = response[itemsKeyname] || [];
+      store.nextPageWithItems(nextPageToken, items);
+    } catch (error) {
+      if (isError(error) && onError) {
+        onError(error);
+      }
+    }
+  };
+
   async function fetchIndexData() {
     clearError();
     store.setUpdating();
     if (!$store.hasNextIndexData) {
-      try {
-        const fetchData = await onFetch();
-        const response = await fetchData(
-          $store.pageSize,
-          $store.indexData[$store.index].nextToken,
-        );
-        const { nextPageToken } = response;
-        const items = response[itemsKeyname] || [];
-        store.nextPageWithItems(nextPageToken, items);
-      } catch (error) {
-        if (isError(error) && onError) {
-          onError(error);
-        }
-      }
+      debounce(await fetchNextPageData, debounceDelay)();
     } else {
       store.nextPage();
     }
   }
 
   async function handleKeydown(event: KeyboardEvent) {
+    if (event.repeat) return;
     const shifted = event.shiftKey;
     switch (event.code) {
       case 'ArrowRight':
@@ -239,8 +246,12 @@
     </div>
     <IconButton
       label={nextButtonLabel}
-      disabled={!$store.hasNext}
-      on:click={fetchIndexData}
+      disabled={!$store.hasNext || $store.updating}
+      on:click={() => {
+        if ($store.hasNext && !$store.updating) {
+          fetchIndexData();
+        }
+      }}
       icon="arrow-right"
     />
   </nav>
