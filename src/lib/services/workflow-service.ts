@@ -957,3 +957,37 @@ export const fetchAllPaginatedWorkflows = async (
   });
   return toWorkflowExecutions({ executions });
 };
+
+type PaginatedWorkflowsPromise = (
+  pageSize: number,
+  token: string,
+) => Promise<{ items: WorkflowExecution[]; nextPageToken: string }>;
+
+export const fetchPaginatedWorkflows = async (
+  namespace: string,
+  query: string = '',
+  onError: ErrorCallback,
+  request = fetch,
+): Promise<PaginatedWorkflowsPromise> => {
+  return (pageSize = 100, token = '') => {
+    if (query) {
+      query = decodeURIComponent(query);
+    }
+
+    const route = routeForApi('workflows', { namespace });
+    return requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+      params: {
+        pageSize: String(pageSize),
+        nextPageToken: token,
+        ...(query ? { query } : {}),
+      },
+      request,
+      onError,
+    }).then(({ executions, nextPageToken }) => {
+      return {
+        items: toWorkflowExecutions({ executions }),
+        nextPageToken: nextPageToken ? String(nextPageToken) : '',
+      };
+    });
+  };
+};
