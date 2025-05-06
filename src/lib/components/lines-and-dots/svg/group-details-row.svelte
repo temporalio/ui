@@ -11,7 +11,6 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { activeGroupHeight, setActiveGroup } from '$lib/stores/active-events';
-  import { format } from '$lib/utilities/format-camel-case';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
   import { routeForEventHistory } from '$lib/utilities/route-for';
@@ -138,30 +137,18 @@
               </div>
             {/if}
             {#each textAttributes as [key, value] (key)}
-              <div>
-                <div class="font-medium leading-3 text-secondary">
-                  {format(key)}
-                </div>
-                <div class="text-wrap break-all leading-4">
-                  <GroupDetailsText {key} {value} {attributes} />
-                </div>
-              </div>
+              <GroupDetailsText {key} {value} {attributes} />
             {/each}
           </div>
         </div>
         <div class="flex w-full flex-col gap-2 xl:w-1/2">
           {#each codeBlockAttributes as [key, value] (key)}
-            <div>
-              <div class="font-medium leading-4 text-secondary">
-                {format(key)}
-              </div>
-              <GroupDetailsText {key} {value} {attributes} {onDecode} />
-            </div>
+            <GroupDetailsText {key} {value} {attributes} {onDecode} />
           {/each}
         </div>
       </div>
       {#if childWorkflowStartedEvent}
-        <div class="surface-primary px-4">
+        <div class="surface-primary px-4 py-2">
           <div class="font-medium leading-4 text-secondary">Child Workflow</div>
           {#key group.eventList.length}
             <GraphWidget

@@ -22,10 +22,10 @@
     startPoint={[start, y]}
     endPoint={[end, y]}
     classification={workflow.status}
-    strokeWidth={radius * 2}
+    strokeWidth={radius}
     pending={workflow.isRunning}
   />
-  <Dot point={[start, y]} classification={workflow.status} r={radius} />
+  <Dot point={[start, y]} classification={workflow.status} r={radius / 1.5} />
   <Icon
     name="workflow"
     x={start - radius / 2}
@@ -35,7 +35,7 @@
     strokeWidth="4"
     class="text-black"
   />
-  <Dot point={[end, y]} classification={workflow.status} r={radius} />
+  <Dot point={[end, y]} classification={workflow.status} r={radius / 1.5} />
   <Icon
     name="workflow"
     x={end - radius / 2}

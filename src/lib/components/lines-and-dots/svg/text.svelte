@@ -9,14 +9,14 @@
   export let point: [number, number] = [0, 0];
   export let category: string | undefined = undefined;
   export let status: string | undefined = 'none';
-  export let fontSize = '13px';
+  export let fontSize = '12px';
   export let fontWeight = '400';
   export let textAnchor = 'start';
   export let backdrop = false;
-  export let backdropHeight = 0;
   export let icon: IconName | undefined = undefined;
   export let config: GraphConfig | undefined = undefined;
   export let label = false;
+  export let backdropHeight = config.radius;
 
   $: [x, y] = point;
 
@@ -25,7 +25,7 @@
   $: showIcon = icon && config;
   $: textWidth = textElement?.getBBox()?.width || 0;
   $: backdropWidth = showIcon ? textWidth + 36 : textWidth + 12;
-  $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 2 : x;
+  $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 1.25 : x;
 </script>
 
 {#if backdrop}
@@ -33,7 +33,7 @@
     startPoint={[x - backdropHeight, y]}
     endPoint={[x + backdropWidth, y]}
     {status}
-    strokeWidth={backdropHeight}
+    strokeWidth={config.radius}
   />
 {/if}
 {#if showIcon}
@@ -46,11 +46,11 @@
 {/if}
 <text
   bind:this={textElement}
-  class="cursor-pointer select-none outline-none {category} text-primary"
+  class="cursor-pointer select-none outline-none {category} font-mono text-primary"
   class:label
   class:backdrop
   x={textX}
-  {y}
+  y={y + 1}
   font-size={fontSize}
   font-weight={fontWeight}
   text-anchor={textAnchor}
@@ -75,6 +75,11 @@
   .label {
     fill: #c9d9f0;
     font-weight: 500;
+  }
+
+  text.blackdrop {
+    fill: #000;
+    opacity: 0.65;
   }
 
   text.marker,

@@ -29,9 +29,9 @@ export type GraphConfig = {
 const baseRadius = 6;
 
 export const TimelineConfig: GraphConfig = {
-  height: baseRadius * 5,
+  height: baseRadius * 6,
   gutter: baseRadius * 8,
-  radius: baseRadius * 2,
+  radius: baseRadius * 3,
   fontSizeRatio: baseRadius * 4,
 };
 
@@ -82,7 +82,7 @@ export const timelineTextPosition = (
   if (textToLeft) textAnchor = 'end';
   if (textToRight) textIndex = points.indexOf(lastPoint);
 
-  const offset = 1.5 * radius;
+  const offset = radius;
   let textX = textToRight ? lastPoint + offset : firstPoint - offset;
 
   // Pending or long events

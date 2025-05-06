@@ -27,7 +27,7 @@
   export let active = true;
   export let readOnly = false;
 
-  const { height, gutter, radius } = TimelineConfig;
+  let { height, gutter, radius } = TimelineConfig;
 
   $: timelineWidth = canvasWidth - 2 * gutter;
   $: active = !activeGroups.length || activeGroups.includes(group.id);
@@ -74,6 +74,8 @@
     if (readOnly) return;
     setActiveGroup(group);
   };
+
+  let strokeWidth = radius;
 </script>
 
 <g
@@ -81,7 +83,8 @@
   tabindex="0"
   on:click|preventDefault={onClick}
   on:keypress|preventDefault={onClick}
-  class="relative cursor-pointer"
+  class="{!readOnly && 'svg-element-shadow cursor-pointer'} relative"
+  class:active={!readOnly && activeGroups.includes(group.id)}
   {height}
 >
   {#each points as x, index}
@@ -93,7 +96,7 @@
         endPoint={[nextPoint, y]}
         category={group.category}
         classification={group.lastEvent.classification}
-        strokeWidth={radius * 2}
+        {strokeWidth}
         scheduling={index === 0 &&
           group.lastEvent.classification === 'Completed'}
       />
@@ -109,7 +112,7 @@
           : group.category}
         classification={group.lastEvent.classification}
         pending
-        strokeWidth={radius * 2}
+        {strokeWidth}
       />
     {/if}
     {#if showText}
@@ -119,7 +122,6 @@
             point={textPosition}
             {textAnchor}
             {backdrop}
-            backdropHeight={radius * 2}
             config={TimelineConfig}
             icon="retry"
           >
@@ -140,7 +142,6 @@
             point={textPosition}
             {textAnchor}
             {backdrop}
-            backdropHeight={radius * 2}
             config={TimelineConfig}
           >
             {decodedValue}
@@ -152,7 +153,7 @@
       point={[x, y]}
       classification={group.eventList[index]?.classification}
       icon={CategoryIcon[group.category]}
-      r={radius}
+      r={radius / 1.5}
     />
   {/each}
 </g>
@@ -161,5 +162,21 @@
   g {
     pointer-events: bounding-box;
     outline: none;
+  }
+
+  .svg-element-shadow {
+    filter: drop-shadow(0 0 2px rgb(0 0 0 / 10%));
+    transform-origin: center center;
+    transform: scale(1);
+    transition:
+      filter 0.3s ease-in-out,
+      transform 0.3s ease-in-out;
+  }
+
+  .svg-element-shadow:hover,
+  .active {
+    height: 120%;
+    transform: scale(1.005);
+    filter: drop-shadow(0 0 8px rgb(0 0 0 / 50%));
   }
 </style>

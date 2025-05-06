@@ -2,6 +2,7 @@
   import EventDetailsLink from '$lib/components/event/event-details-link.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import { format } from '$lib/utilities/format-camel-case';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
     displayLinkType,
@@ -23,40 +24,67 @@
 
 {#if typeof value === 'object'}
   {#if value?.payloads}
-    <PayloadDecoder {value} key="payloads" let:decodedValue {onDecode}>
-      {#key decodedValue}
-        <CodeBlock
-          content={decodedValue}
-          maxHeight={staticCodeBlockHeight - fontSizeRatio}
-        />
-      {/key}
-    </PayloadDecoder>
+    <div>
+      <div class="font-medium leading-4 text-secondary">
+        {format(key)}
+      </div>
+      <PayloadDecoder {value} key="payloads" let:decodedValue {onDecode}>
+        {#key decodedValue}
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={staticCodeBlockHeight - fontSizeRatio}
+          />
+        {/key}
+      </PayloadDecoder>
+    </div>
   {:else if key === 'searchAttributes'}
-    <PayloadDecoder
-      key="searchAttributes"
-      value={{ searchAttributes: codeBlockValue }}
-      let:decodedValue
-      {onDecode}
-    >
-      {#key decodedValue}
-        <CodeBlock
-          content={decodedValue}
-          maxHeight={staticCodeBlockHeight - fontSizeRatio}
-        />
-      {/key}
-    </PayloadDecoder>
-  {:else}
-    <PayloadDecoder value={codeBlockValue} let:decodedValue {onDecode}>
-      {#key decodedValue}
-        <CodeBlock
-          content={decodedValue}
-          maxHeight={staticCodeBlockHeight - fontSizeRatio}
-        />
-      {/key}
-    </PayloadDecoder>
+    <div>
+      <div class="font-medium leading-4 text-secondary">
+        {format(key)}
+      </div>
+      <PayloadDecoder
+        key="searchAttributes"
+        value={{ searchAttributes: codeBlockValue }}
+        let:decodedValue
+        {onDecode}
+      >
+        {#key decodedValue}
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={staticCodeBlockHeight - fontSizeRatio}
+          />
+        {/key}
+      </PayloadDecoder>
+    </div>
+  {:else if Object.keys(value).length > 0}
+    <div>
+      <div class="font-medium leading-4 text-secondary">
+        {format(key)}
+      </div>
+      <PayloadDecoder value={codeBlockValue} let:decodedValue {onDecode}>
+        {#key decodedValue}
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={staticCodeBlockHeight - fontSizeRatio}
+          />
+        {/key}
+      </PayloadDecoder>
+    </div>
   {/if}
 {:else if linkType !== 'none'}
-  <EventDetailsLink {value} {attributes} type={linkType} />
+  <div>
+    <div class="font-medium leading-4 text-secondary">
+      {format(key)}
+    </div>
+    <EventDetailsLink {value} {attributes} type={linkType} />
+  </div>
 {:else}
-  {value}
+  <div>
+    <div class="font-medium leading-4 text-secondary">
+      {format(key)}
+    </div>
+    <div class="text-wrap break-all leading-4">
+      {value}
+    </div>
+  </div>
 {/if}
