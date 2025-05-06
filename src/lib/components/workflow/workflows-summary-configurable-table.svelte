@@ -79,7 +79,7 @@
   };
 </script>
 
-{#key $workflowsQuery}
+{#key [$workflowsQuery, $refresh]}
   <PaginatedTable
     total={$workflowCount.count.toLocaleString()}
     {onFetch}
