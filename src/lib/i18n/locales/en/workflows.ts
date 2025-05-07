@@ -145,7 +145,7 @@ export const Strings = {
   children_one: '1 Child',
   children_other: '{{count}} Children',
   'show-children': 'All Workflows Visible',
-  'hide-children': 'Child Workflows Hidden',
+  'hide-children': 'Hide Child Workflows',
   first: '{{count}} First',
   previous: '{{count}} Previous',
   next: '{{count}} Next',
@@ -283,4 +283,6 @@ export const Strings = {
   'update-name-label': 'Update name',
   'no-current-details': 'No Current Details',
   'update-details': 'Update Details',
+  'quick-filters': 'Quick filters',
+  'show-quick-filters': 'Show quick filters',
 } as const;

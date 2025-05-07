@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { writable } from 'svelte/store';
+
   import { getContext } from 'svelte';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -11,7 +13,7 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import { hideChildWorkflows, searchInputViewOpen } from '$lib/stores/filters';
+  import { emptyFilter, searchInputViewOpen } from '$lib/stores/filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import {
     SEARCH_ATTRIBUTE_TYPE,
@@ -19,14 +21,12 @@
   } from '$lib/types/workflows';
   import { workflowRoutePattern } from '$lib/utilities/namespace-url-pattern';
   import { getFocusedElementId } from '$lib/utilities/query/search-attribute-filter';
-  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
-
-  import IsTemporalServerVersionGuard from '../is-temporal-server-version-guard.svelte';
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
   export let filters: SearchAttributeFilter[];
   export let options: SearchAttributeOption[];
+  export let showQuickFiltersMenu = writable(false);
 
   const { filter, activeQueryIndex, focusedElementId } =
     getContext<FilterContext>(FILTER_CONTEXT);
@@ -100,22 +100,9 @@
         description={translate('workflows.view-search-description')}
         >{translate('workflows.view-search-input')}</MenuItem
       >
-      <IsTemporalServerVersionGuard minimumVersion="1.23.0">
-        <MenuItem
-          on:click={() => ($hideChildWorkflows = !$hideChildWorkflows)}
-          description={$hideChildWorkflows
-            ? 'Child Workflows hidden by default when no filter applied'
-            : ''}
-        >
-          <div class="flex items-center gap-1">
-            {#if $hideChildWorkflows}
-              <Icon name="eye-hide" />{translate('workflows.hide-children')}
-            {:else}
-              <Icon name="eye-show" />{translate('workflows.show-children')}
-            {/if}
-          </div>
-        </MenuItem>
-      </IsTemporalServerVersionGuard>
+      <MenuItem on:click={() => ($showQuickFiltersMenu = true)}>
+        {translate('workflows.quick-filters')}
+      </MenuItem>
     {/if}
     <hr class="border-subtle" />
 

@@ -5,11 +5,13 @@
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
-  import { workflowFilters } from '$lib/stores/filters';
+  import {
+    workflowFilters,
+    query as workflowsQuery,
+  } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
     disableWorkflowCountsRefresh,
-    queryWithParentWorkflowId,
     refresh,
     workflowCount,
   } from '$lib/stores/workflows';
@@ -27,7 +29,7 @@
 
   export let staticQuery = '';
   $: namespace = $page.params.namespace;
-  $: query = staticQuery || $queryWithParentWorkflowId;
+  $: query = staticQuery || $workflowsQuery;
 
   let statusGroups: { status: WorkflowStatus; count: number }[] = [];
   let newStatusGroups: { status: WorkflowStatus; count: number }[] = [];
