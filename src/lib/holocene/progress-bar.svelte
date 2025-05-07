@@ -1,43 +1,45 @@
-<script lang="ts">
-  export let width = '100%';
-</script>
-
 <div class="meter">
-  <span style="width: {width};"></span>
+  <span></span>
 </div>
 
-<style lang="postcss">
+<style>
   .meter {
-    @apply absolute left-0 right-0 box-content h-[5px] bg-gradient-to-r from-blue-200 to-blue-600;
-
-    box-shadow: inset 0 -1px 1px rgb(255 255 255 / 30%);
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 4px;
+    background: #334155;
+    box-sizing: content-box;
+    box-shadow:
+      inset 0 -1px 1px rgb(255 255 255 / 30%),
+      0 1px 2px rgb(0 0 0 / 20%);
     z-index: 5;
   }
 
   .meter > span {
-    @apply relative block h-full overflow-hidden bg-blue-500;
-
-    background-image: linear-gradient(
-      center bottom,
-      rgb(96 165 250) 32%,
-      rgb(59 130 246) 77%
-    );
+    position: relative;
+    display: block;
+    height: 100%;
+    background: linear-gradient(to right, #64748b 0%, #475569 100%);
     box-shadow:
-      inset 0 2px 9px rgb(255 255 255 / 25%),
-      inset 0 -2px 6px rgb(0 0 0 / 40%);
+      inset 0 2px 5px rgb(255 255 255 / 30%),
+      inset 0 -2px 4px rgb(0 0 0 / 40%),
+      0 0 4px rgb(100 116 139 / 50%);
   }
 
   .meter > span::after {
-    @apply absolute bottom-0 left-0 right-0 top-0 overflow-hidden;
-
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
     content: '';
     background-image: linear-gradient(
       -45deg,
-      rgb(255 255 255 / 20%) 25%,
+      rgb(255 255 255 / 25%) 25%,
       transparent 25%,
       transparent 50%,
-      rgb(255 255 255 / 20%) 50%,
-      rgb(255 255 255 / 20%) 75%,
+      rgb(255 255 255 / 25%) 50%,
+      rgb(255 255 255 / 25%) 75%,
       transparent 75%,
       transparent
     );

@@ -1009,11 +1009,7 @@
       "type": "'left' | 'right'"
     }
   ],
-  "progress-bar": [
-    {
-      "name": "width"
-    }
-  ],
+  "progress-bar": [],
   "scroll-to-top": [
     {
       "name": "hidden"
