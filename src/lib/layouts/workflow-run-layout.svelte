@@ -6,7 +6,7 @@
   import { viewDataEncoderSettings } from '$lib/components/data-encoder-settings.svelte';
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
   import CopyButton from '$lib/holocene/copyable/button.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
+  import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
   import {
@@ -213,7 +213,7 @@
     {#if workflowError}
       <WorkflowError error={workflowError} />
     {:else if !$workflowRun.workflow}
-      <Loading class="pt-24" />
+      <SkeletonWorkflow />
     {:else}
       <div class="border-b border-subtle px-4 pt-8 md:pt-20 xl:px-8">
         <WorkflowHeader />
