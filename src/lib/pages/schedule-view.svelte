@@ -38,7 +38,6 @@
     triggerImmediately,
     unpauseSchedule,
   } from '$lib/services/schedule-service';
-  import { groupByCountEnabled } from '$lib/stores/capability-enablement';
   import { coreUserStore } from '$lib/stores/core-user';
   import { loading } from '$lib/stores/schedules';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
@@ -369,9 +368,7 @@
             {/if}
           </Button>
         </div>
-        {#if $groupByCountEnabled}
-          <WorkflowCounts staticQuery={workflowQuery} />
-        {/if}
+        <WorkflowCounts staticQuery={workflowQuery} />
       </div>
       <div class="flex flex-col gap-4 xl:flex-row">
         <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
