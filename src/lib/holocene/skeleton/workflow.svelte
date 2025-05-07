@@ -21,9 +21,9 @@
     <Skeleton class="h-4 w-16" />
     <Skeleton class="h-4 w-16" />
   </div>
-  <div class="flex items-center gap-4">
-    <Skeleton class="h-32 w-full rounded-sm" />
-    <Skeleton class="h-32 w-full rounded-sm" />
+  <div class="flex flex-col items-center gap-4 md:flex-row">
+    <Skeleton class="h-16 w-full rounded-sm md:h-32" />
+    <Skeleton class="h-16 w-full rounded-sm md:h-32" />
   </div>
   <Skeleton class="h-96 w-full rounded-sm" />
 </div>
