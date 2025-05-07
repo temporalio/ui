@@ -7,7 +7,6 @@
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 0;
     height: 4px;
     background: #334155;
     box-sizing: content-box;
