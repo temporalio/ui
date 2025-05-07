@@ -75,19 +75,9 @@
   <td></td>
 </tr>
 {#if expanded}
-  <tr class="row expanded">
-    <td class="expanded-cell w-full">
+  <tr class="w-full bg-primary px-2 text-sm no-underline">
+    <td class="w-full">
       <EventDetailsFull {group} />
     </td>
   </tr>
 {/if}
-
-<style lang="postcss">
-  .row {
-    @apply flex select-none items-center gap-4 px-2 text-sm no-underline;
-  }
-
-  .expanded-cell {
-    @apply text-sm no-underline;
-  }
-</style>

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { fade, slide } from 'svelte/transition';
-
   import { page } from '$app/stores';
 
   import Badge from '$lib/holocene/badge.svelte';
@@ -137,12 +135,7 @@
   on:click|stopPropagation={onLinkClick}
 >
   {#if isEventGroup(event)}
-    <td>
-      <Badge type="success">
-        {event.billableActions}
-      </Badge>
-    </td>
-    <td class="w-24 min-w-fit font-mono">
+    <td class="font-mono">
       <div class="flex items-center gap-0.5">
         {#each event.eventList as groupEvent}
           <Link
@@ -160,12 +153,7 @@
       </div>
     </td>
   {:else}
-    <td>
-      <Badge type="success">
-        {event.billableActions}
-      </Badge>
-    </td>
-    <td class="flex items-center gap-1 font-mono">
+    <td class="font-mono">
       <Link data-testid="link" {href}>
         {event.id}
       </Link>
@@ -175,6 +163,7 @@
     <Tooltip
       hide={(isEventGroup(event) && !duration) || !elapsedTime}
       text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
+      class="block"
       bottom
     >
       <Copyable
@@ -190,6 +179,7 @@
     <Tooltip
       hide={(isEventGroup(event) && !duration) || !elapsedTime}
       text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
+      class="block"
       bottom
     >
       <Copyable
@@ -201,91 +191,94 @@
       </Copyable>
     </Tooltip>
   </td>
-  <td class="truncate md:min-w-fit">
+
+  <td class="truncate">
     <p class="event-name whitespace-nowrap font-semibold md:text-base">
       {displayName}
     </p>
   </td>
   <td
-    class="hidden w-full items-center gap-2 text-right text-sm font-normal md:flex xl:text-left"
+    class="w-full items-center gap-2 text-right text-sm font-normal xl:text-left"
   >
-    {#if pendingAttempt}
-      <div
-        class="flex items-center gap-1 {pendingAttempt > 1 &&
-          'surface-retry px-1 py-0.5'}"
-      >
-        <Icon class="mr-1.5 inline" name="retry" />
-        {translate('workflows.attempt')}
-        {pendingAttempt}
-        {#if hasPendingActivity}
-          / {hasPendingActivity.maximumAttempts || '∞'}
-          {#if pendingAttempt > 1}
-            • {translate('workflows.next-retry')}
-            {toTimeDifference({
-              date: hasPendingActivity.scheduledTime,
-              negativeDefault: 'None',
-            })}
+    <div class="flex items-center gap-2">
+      {#if pendingAttempt}
+        <div
+          class="flex items-center gap-1 {pendingAttempt > 1 &&
+            'surface-retry px-1 py-0.5'}"
+        >
+          <Icon class="mr-1.5 inline" name="retry" />
+          {translate('workflows.attempt')}
+          {pendingAttempt}
+          {#if hasPendingActivity}
+            / {hasPendingActivity.maximumAttempts || '∞'}
+            {#if pendingAttempt > 1}
+              • {translate('workflows.next-retry')}
+              {toTimeDifference({
+                date: hasPendingActivity.scheduledTime,
+                negativeDefault: 'None',
+              })}
+            {/if}
           {/if}
-        {/if}
-      </div>
-    {/if}
-    {#if primaryAttribute?.key}
-      <EventDetailsRow {...primaryAttribute} {attributes} />
-    {/if}
-    {#if currentEvent?.userMetadata?.summary}
-      <MetadataDecoder
-        value={currentEvent.userMetadata.summary}
-        let:decodedValue
-      >
-        {#if decodedValue}
-          <div
-            class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
-          >
-            <p class="whitespace-nowrap text-right text-xs">Summary</p>
-            <Badge type="secondary" class="block select-none truncate">
-              {decodedValue}
-            </Badge>
-          </div>
-        {/if}
-      </MetadataDecoder>
-    {/if}
-    {#if currentEvent?.links?.length}
-      <EventLink
-        link={currentEvent.links[0]}
-        class="max-w-xl"
-        linkClass="truncate"
-      />
-    {/if}
-    {#if nonPendingActivityAttempt}
-      <EventDetailsRow
-        key="attempt"
-        value={nonPendingActivityAttempt.toString()}
-        {attributes}
-      />
-    {/if}
-    {#if showSecondaryAttribute}
-      <EventDetailsRow {...secondaryAttribute} {attributes} />
-    {/if}
+        </div>
+      {/if}
+      {#if primaryAttribute?.key}
+        <EventDetailsRow {...primaryAttribute} {attributes} />
+      {/if}
+      {#if currentEvent?.userMetadata?.summary}
+        <MetadataDecoder
+          value={currentEvent.userMetadata.summary}
+          let:decodedValue
+        >
+          {#if decodedValue}
+            <div
+              class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
+            >
+              <p class="whitespace-nowrap text-right text-xs">Summary</p>
+              <Badge type="secondary" class="block select-none truncate">
+                {decodedValue}
+              </Badge>
+            </div>
+          {/if}
+        </MetadataDecoder>
+      {/if}
+      {#if currentEvent?.links?.length}
+        <EventLink
+          link={currentEvent.links[0]}
+          class="max-w-xl"
+          linkClass="truncate"
+        />
+      {/if}
+      {#if nonPendingActivityAttempt}
+        <EventDetailsRow
+          key="attempt"
+          value={nonPendingActivityAttempt.toString()}
+          {attributes}
+        />
+      {/if}
+      {#if showSecondaryAttribute}
+        <EventDetailsRow {...secondaryAttribute} {attributes} />
+      {/if}
+    </div>
+  </td>
+  <td>
+    <div class="flex justify-center gap-0.5 font-mono">
+      {#if event.billableActions}
+        <Badge type="success">
+          💰{event.billableActions}
+        </Badge>
+      {/if}
+    </div>
   </td>
 </tr>
 {#if expanded}
-  <tr
-    in:fade
-    out:slide={{ duration: 175 }}
-    class:typedError
-    class="row expanded"
-  >
-    <td class="expanded-cell w-full">
+  <tr class:typedError class="w-full bg-primary px-2 text-sm no-underline">
+    <td colspan="5">
       <EventDetailsFull {group} event={currentEvent} />
     </td>
   </tr>
 {/if}
 
 <style lang="postcss">
-  .row {
-    @apply flex select-none items-center gap-4 px-2 text-sm no-underline;
-  }
-
   .failure {
     @apply border border-danger;
   }
@@ -308,13 +301,5 @@
 
   .terminated .event-name {
     @apply text-pink-700;
-  }
-
-  .expanded-cell {
-    @apply text-sm no-underline;
-  }
-
-  .typedError .expanded-cell {
-    @apply border-b-0;
   }
 </style>

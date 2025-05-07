@@ -19,73 +19,65 @@
 </script>
 
 {#if showEventGroup}
-  <div class="w-full">
-    <div
-      class="flex flex-col gap-0 overflow-hidden border border-subtle xl:flex-row"
-    >
-      {#each group.eventList as groupEvent}
-        {@const attributes = formatAttributes(groupEvent)}
-        {@const details = Object.entries(attributes)}
-        <div
-          class="w-full border-subtle [&:not(:last-child)]:border-r"
-          class:three-events={group.eventList.length === 3 ||
-            (group.eventList.length === 2 && pendingEvent)}
-          class:two-events={group.eventList.length === 2 ||
-            (group.eventList.length === 1 && pendingEvent)}
-        >
-          <div
-            class="flex w-full flex-wrap justify-between bg-subtle px-2 py-1"
-          >
-            <div class="flex gap-2">
-              {groupEvent.id}
-              {spaceBetweenCapitalLetters(groupEvent.name)}
-            </div>
-            <div>
-              {formatDate(groupEvent.eventTime, $timeFormat, {
-                relative: $relativeTime,
-              })}
-            </div>
+  <div class="flex flex-col gap-0 overflow-hidden xl:flex-row">
+    {#each group.eventList as groupEvent}
+      {@const attributes = formatAttributes(groupEvent)}
+      {@const details = Object.entries(attributes)}
+      <div
+        class="w-full border-subtle [&:not(:last-child)]:border-r"
+        class:three-events={group.eventList.length === 3 ||
+          (group.eventList.length === 2 && pendingEvent)}
+        class:two-events={group.eventList.length === 2 ||
+          (group.eventList.length === 1 && pendingEvent)}
+      >
+        <div class="flex w-full flex-wrap justify-between bg-subtle px-2 py-1">
+          <div class="flex gap-2">
+            {groupEvent.id}
+            {spaceBetweenCapitalLetters(groupEvent.name)}
           </div>
-          {#if groupEvent?.userMetadata?.summary}
-            <EventMetadataExpanded value={groupEvent.userMetadata.summary} />
-          {/if}
-          <EventLinksExpanded links={groupEvent?.links} />
-          {#each details as [key, value] (key)}
-            <EventDetailsRowExpanded {key} {value} {attributes} />
-          {/each}
-        </div>
-      {/each}
-      {#if pendingEvent}
-        {@const details = Object.entries(pendingEvent)}
-        <div
-          class="w-full border-subtle [&:not(:last-child)]:border-r"
-          class:three-events={group.eventList.length === 2}
-          class:two-events={group.eventList.length === 1}
-        >
-          <div class="pending flex w-full justify-between px-2 py-1 text-white">
-            <div class="flex gap-2">
-              Pending {isPendingActivity(pendingEvent)
-                ? 'Activity'
-                : 'Nexus Operation'}
-            </div>
+          <div>
+            {formatDate(groupEvent.eventTime, $timeFormat, {
+              relative: $relativeTime,
+            })}
           </div>
-          {#each details as [key, value] (key)}
-            <EventDetailsRowExpanded {key} {value} attributes={pendingEvent} />
-          {/each}
         </div>
-      {/if}
-    </div>
+        {#if groupEvent?.userMetadata?.summary}
+          <EventMetadataExpanded value={groupEvent.userMetadata.summary} />
+        {/if}
+        <EventLinksExpanded links={groupEvent?.links} />
+        {#each details as [key, value] (key)}
+          <EventDetailsRowExpanded {key} {value} {attributes} />
+        {/each}
+      </div>
+    {/each}
+    {#if pendingEvent}
+      {@const details = Object.entries(pendingEvent)}
+      <div
+        class="w-full border-subtle [&:not(:last-child)]:border-r"
+        class:three-events={group.eventList.length === 2}
+        class:two-events={group.eventList.length === 1}
+      >
+        <div class="pending flex w-full justify-between px-2 py-1 text-white">
+          <div class="flex gap-2">
+            Pending {isPendingActivity(pendingEvent)
+              ? 'Activity'
+              : 'Nexus Operation'}
+          </div>
+        </div>
+        {#each details as [key, value] (key)}
+          <EventDetailsRowExpanded {key} {value} attributes={pendingEvent} />
+        {/each}
+      </div>
+    {/if}
   </div>
 {:else if event}
   {@const attributes = formatAttributes(event)}
   {@const details = Object.entries(attributes)}
-  <div class="w-full">
-    <div class="w-full overflow-hidden border border-subtle">
-      <EventLinksExpanded links={event?.links} />
-      {#each details as [key, value] (key)}
-        <EventDetailsRowExpanded {key} {value} {attributes} />
-      {/each}
-    </div>
+  <div class="w-full overflow-hidden">
+    <EventLinksExpanded links={event?.links} />
+    {#each details as [key, value] (key)}
+      <EventDetailsRowExpanded {key} {value} {attributes} />
+    {/each}
   </div>
 {/if}
 

@@ -51,11 +51,12 @@
       {event.id}
     {/if}
   </td>
+  <td></td>
+  <td class="">
+    <p class="truncate font-semibold md:text-base">Pending Activity</p>
+  </td>
   <td class="w-full overflow-hidden text-right font-normal xl:text-left">
-    <div class="flex w-full items-center gap-2">
-      <p class="event-name truncate font-semibold md:text-base">
-        Pending Activity
-      </p>
+    <div class="flex items-center gap-1">
       <div
         class="flex items-center gap-1 {event.attempt > 1 &&
           'surface-retry px-1 py-0.5'}"
@@ -77,24 +78,13 @@
         showKey
         attributes={event}
       />
-    </div></td
-  >
-  <td></td>
+    </div>
+  </td>
 </tr>
 {#if expanded}
-  <tr class="row expanded">
-    <td class="expanded-cell w-full">
+  <tr class="w-full px-2 text-sm no-underline">
+    <td class="bg-primary" colspan="5">
       <EventDetailsFull {group} />
     </td>
   </tr>
 {/if}
-
-<style lang="postcss">
-  .row {
-    @apply flex select-none items-center gap-4 px-2 text-sm no-underline;
-  }
-
-  .expanded-cell {
-    @apply text-sm no-underline;
-  }
-</style>
