@@ -7,12 +7,10 @@
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fetchWorkflowCount } from '$lib/services/workflow-counts';
   import {
     fetchAllChildWorkflows,
     fetchPaginatedWorkflows,
   } from '$lib/services/workflow-service';
-  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
   import { hideChildWorkflows } from '$lib/stores/filters';
   import {
@@ -69,18 +67,7 @@
     );
   };
 
-  const fetchTotalCount = (namespace: string, query: string) => {
-    if ($supportsAdvancedVisibility) {
-      fetchWorkflowCount(namespace, query).then((count) => {
-        workflowCount.set({ ...count, newCount: 0 });
-      });
-    }
-  };
-
-  $: onFetch = () => {
-    fetchTotalCount(namespace, $workflowsQuery);
-    return fetchPaginatedWorkflows(namespace, $workflowsQuery);
-  };
+  $: onFetch = () => fetchPaginatedWorkflows(namespace, $workflowsQuery);
 </script>
 
 {#key [namespace, $workflowsQuery, $refresh]}
