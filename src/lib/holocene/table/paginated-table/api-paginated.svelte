@@ -181,6 +181,7 @@
 <slot name="header" visibleItems={$store.visibleItems} />
 
 <PaginatedTable
+  loading={$store.loading}
   updating={$store.updating}
   visibleItems={$store.visibleItems}
   {maxHeight}
