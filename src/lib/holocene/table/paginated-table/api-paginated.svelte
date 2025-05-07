@@ -237,11 +237,11 @@
     />
     <div class="flex gap-1">
       <p>
-        {$store.indexStart}–{$store.indexEnd}
+        {$store.indexStart.toLocaleString()}–{$store.indexEnd.toLocaleString()}
       </p>
       {#if total}
         <p>
-          of {total}
+          of {total.toLocaleString()}
         </p>
       {/if}
     </div>

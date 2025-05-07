@@ -72,7 +72,7 @@
 
 {#key [namespace, $workflowsQuery, $refresh]}
   <PaginatedTable
-    total={$workflowCount.count.toLocaleString()}
+    total={$workflowCount.count}
     {onFetch}
     let:visibleItems
     aria-label={translate('common.workflows')}
