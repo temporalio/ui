@@ -137,6 +137,11 @@
   on:click|stopPropagation={onLinkClick}
 >
   {#if isEventGroup(event)}
+    <td>
+      <Badge type="success">
+        {event.billableActions}
+      </Badge>
+    </td>
     <td class="w-24 min-w-fit font-mono">
       <div class="flex items-center gap-0.5">
         {#each event.eventList as groupEvent}
@@ -155,7 +160,12 @@
       </div>
     </td>
   {:else}
-    <td class="font-mono">
+    <td>
+      <Badge type="success">
+        {event.billableActions}
+      </Badge>
+    </td>
+    <td class="flex items-center gap-1 font-mono">
       <Link data-testid="link" {href}>
         {event.id}
       </Link>

@@ -3,6 +3,7 @@
 
   import { translate } from '$lib/i18n/translate';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { fullEventHistory } from '$lib/stores/events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
@@ -46,6 +47,12 @@
   <div
     class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
   >
+    <WorkflowDetail
+      content={$fullEventHistory
+        .reduce((acc, e) => e.billableActions + acc, 0)
+        .toString()}
+      title="Billable Actions"
+    />
     <WorkflowDetail
       title={translate('common.start')}
       tooltip={$relativeTime
