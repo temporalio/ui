@@ -65,7 +65,7 @@
   }
 
   .primary {
-    /* @apply border border-table; */
+    @apply border border-table;
   }
 
   .split {
@@ -80,7 +80,7 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply surface-primary h-10;
+      @apply surface-primary h-8;
     }
 
     :global(tr > th) {

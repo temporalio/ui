@@ -4,7 +4,7 @@
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
   import { activeGroupHeight, activeGroups } from '$lib/stores/active-events';
-  import { eventFilterSort } from '$lib/stores/event-view';
+  import { eventFilterSort, minimizeEventView } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
   import { timeFormat } from '$lib/stores/time-format';
@@ -60,7 +60,8 @@
 </script>
 
 <div
-  class="relative h-auto overflow-auto border-b border-subtle"
+  class="relative h-auto overflow-auto border {!$minimizeEventView &&
+    'border-t-0'} border-subtle bg-primary"
   bind:clientWidth={canvasWidth}
   style={viewportHeight ? `max-height: ${viewportHeight}px;` : ''}
   on:scroll={handleScroll}

@@ -136,10 +136,7 @@
       </ToggleButtons>
     </div>
   </div>
-  <div
-    class="flex w-full flex-col border border-subtle {!$minimizeEventView &&
-      'border-t-0'}"
-  >
+  <div class="flex w-full flex-col">
     <TimelineGraph
       {workflow}
       {groups}
