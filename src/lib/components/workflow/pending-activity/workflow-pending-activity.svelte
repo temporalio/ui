@@ -42,7 +42,7 @@
 </script>
 
 <Card
-  class="flex flex-col items-start gap-2 overflow-hidden bg-primary md:flex-row"
+  class="flex flex-1 flex-col items-start gap-2 overflow-hidden bg-primary md:flex-row"
 >
   <div class="flex flex-1 flex-col space-y-2 truncate">
     <div class="flex-1">

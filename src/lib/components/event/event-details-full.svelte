@@ -4,92 +4,74 @@
   import type { WorkflowEvent } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
-  import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
+  import WorkflowPendingActivity from '../workflow/pending-activity/workflow-pending-activity.svelte';
+
+  import EventCard from './event-card.svelte';
   import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
-  import EventLinksExpanded from './event-links-expanded.svelte';
-  import EventMetadataExpanded from './event-metadata-expanded.svelte';
 
-  export let group: EventGroup | undefined = undefined;
-  export let event: WorkflowEvent | undefined = undefined;
+  let {
+    group = undefined,
+    event = undefined,
+  }: { group?: EventGroup; event?: WorkflowEvent } = $props();
 
-  $: pendingEvent = group?.pendingActivity || group?.pendingNexusOperation;
-  $: showEventGroup = group && (group.eventList.length > 1 || pendingEvent);
+  const pendingEvent = $derived(
+    group?.pendingActivity || group?.pendingNexusOperation,
+  );
+  const showEventGroup = $derived(
+    group && (group.eventList.length > 1 || pendingEvent),
+  );
 </script>
 
 {#if showEventGroup}
-  <div class="flex flex-col gap-0 overflow-hidden xl:flex-row">
+  <div class="flex flex-col gap-1 overflow-hidden py-2">
     {#each group.eventList as groupEvent}
-      {@const attributes = formatAttributes(groupEvent)}
-      {@const details = Object.entries(attributes)}
-      <div
-        class="w-full border-subtle [&:not(:last-child)]:border-r"
-        class:three-events={group.eventList.length === 3 ||
-          (group.eventList.length === 2 && pendingEvent)}
-        class:two-events={group.eventList.length === 2 ||
-          (group.eventList.length === 1 && pendingEvent)}
-      >
-        <div class="flex w-full flex-wrap justify-between bg-subtle px-2 py-1">
-          <div class="flex gap-2">
-            {groupEvent.id}
-            {spaceBetweenCapitalLetters(groupEvent.name)}
+      <EventCard event={groupEvent}>
+        {#snippet title()}
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex gap-2">
+              <p class="font-mono">{groupEvent.id}</p>
+              <p class="font-medium">
+                {spaceBetweenCapitalLetters(groupEvent.name)}
+              </p>
+            </div>
+            <div class="text-sm">
+              {formatDate(groupEvent.eventTime, $timeFormat, {
+                relative: $relativeTime,
+              })}
+            </div>
           </div>
-          <div>
-            {formatDate(groupEvent.eventTime, $timeFormat, {
-              relative: $relativeTime,
-            })}
-          </div>
-        </div>
-        {#if groupEvent?.userMetadata?.summary}
-          <EventMetadataExpanded value={groupEvent.userMetadata.summary} />
-        {/if}
-        <EventLinksExpanded links={groupEvent?.links} />
-        {#each details as [key, value] (key)}
-          <EventDetailsRowExpanded {key} {value} {attributes} />
-        {/each}
-      </div>
+        {/snippet}
+      </EventCard>
     {/each}
-    {#if pendingEvent}
-      {@const details = Object.entries(pendingEvent)}
-      <div
-        class="w-full border-subtle [&:not(:last-child)]:border-r"
-        class:three-events={group.eventList.length === 2}
-        class:two-events={group.eventList.length === 1}
-      >
+    {#if group?.pendingActivity}
+      <WorkflowPendingActivity activity={group.pendingActivity} />
+    {:else if group?.pendingNexusOperation}
+      {@const details = Object.entries(group?.pendingNexusOperation)}
+      <div class="w-full border-subtle [&:not(:last-child)]:border-r">
         <div class="pending flex w-full justify-between px-2 py-1 text-white">
           <div class="flex gap-2">
-            Pending {isPendingActivity(pendingEvent)
+            Pending {isPendingActivity(group?.pendingNexusOperation)
               ? 'Activity'
               : 'Nexus Operation'}
           </div>
         </div>
         {#each details as [key, value] (key)}
-          <EventDetailsRowExpanded {key} {value} attributes={pendingEvent} />
+          <EventDetailsRowExpanded
+            {key}
+            {value}
+            attributes={group?.pendingNexusOperation}
+          />
         {/each}
       </div>
     {/if}
   </div>
 {:else if event}
-  {@const attributes = formatAttributes(event)}
-  {@const details = Object.entries(attributes)}
-  <div class="w-full overflow-hidden">
-    <EventLinksExpanded links={event?.links} />
-    {#each details as [key, value] (key)}
-      <EventDetailsRowExpanded {key} {value} {attributes} />
-    {/each}
-  </div>
+  <EventCard {event} />
 {/if}
 
 <style lang="postcss">
-  .three-events {
-    @apply xl:w-1/3;
-  }
-
-  .two-events {
-    @apply xl:w-1/2;
-  }
-
   .pending {
     background: repeating-linear-gradient(
       to right,

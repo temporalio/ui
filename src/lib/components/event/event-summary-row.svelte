@@ -271,7 +271,7 @@
   </td>
 </tr>
 {#if expanded}
-  <tr class:typedError class="w-full bg-primary px-2 text-sm no-underline">
+  <tr class:typedError class="w-full px-2 text-sm no-underline">
     <td colspan="5">
       <EventDetailsFull {group} event={currentEvent} />
     </td>
