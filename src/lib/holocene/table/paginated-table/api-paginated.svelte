@@ -174,6 +174,9 @@
         break;
     }
   }
+
+  $: adjustedTotal =
+    !$store.hasNext && $store.indexEnd !== total ? $store.indexEnd : total;
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -239,20 +242,16 @@
       <p>
         {$store.indexStart.toLocaleString()}–{$store.indexEnd.toLocaleString()}
       </p>
-      {#if total}
+      {#if adjustedTotal}
         <p>
-          of {total.toLocaleString()}
+          of {adjustedTotal.toLocaleString()}
         </p>
       {/if}
     </div>
     <IconButton
       label={nextButtonLabel}
       disabled={!$store.hasNext || $store.updating}
-      on:click={() => {
-        if ($store.hasNext && !$store.updating) {
-          fetchIndexData();
-        }
-      }}
+      on:click={fetchIndexData}
       icon="arrow-right"
     />
   </nav>

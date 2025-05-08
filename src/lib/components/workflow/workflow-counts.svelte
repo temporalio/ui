@@ -28,6 +28,7 @@
   export let staticQuery = '';
   $: namespace = $page.params.namespace;
   $: query = staticQuery || $queryWithParentWorkflowId;
+  $: perPage = $page.url.searchParams.get('per-page');
 
   let statusGroups: { status: WorkflowStatus; count: number }[] = [];
   let newStatusGroups: { status: WorkflowStatus; count: number }[] = [];
@@ -133,7 +134,7 @@
     }
   };
 
-  $: query, namespace, $refresh, fetchCounts();
+  $: namespace, query, perPage, $refresh, fetchCounts();
 </script>
 
 <div class="flex min-h-[24px] flex-wrap items-center gap-2">
