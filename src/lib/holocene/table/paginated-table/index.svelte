@@ -65,7 +65,7 @@
   }
 
   .primary {
-    @apply border border-table;
+    /* @apply border border-table; */
   }
 
   .split {
@@ -73,18 +73,18 @@
   }
 
   .paginated-table {
-    @apply w-full;
+    @apply w-full border-separate border-spacing-0;
   }
 
   .paginated-table-header {
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply surface-table h-10 text-off-white;
+      @apply surface-primary h-10;
     }
 
     :global(tr > th) {
-      @apply whitespace-nowrap px-2 text-left font-medium;
+      @apply whitespace-nowrap border-b border-table px-2 text-left font-mono text-xs;
     }
   }
 
