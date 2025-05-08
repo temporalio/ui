@@ -32,7 +32,7 @@
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkerDeploymentVersion'
     ];
-  $: deploymentBehavior =
+  $: versioningBehavior =
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkflowVersioningBehavior'
     ];
@@ -122,10 +122,10 @@
           ]}
         />
       {/if}
-      {#if deploymentBehavior}
+      {#if versioningBehavior}
         <WorkflowDetail
-          title={translate('deployments.deployment-behavior')}
-          content={deploymentBehavior}
+          title={translate('deployments.versioning-behavior')}
+          content={versioningBehavior}
         />
       {/if}
     </div>
