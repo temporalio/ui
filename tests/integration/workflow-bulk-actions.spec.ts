@@ -11,7 +11,10 @@ test.describe('Batch and Bulk Workflow Actions', () => {
   test.describe('when advanced visibility is enabled', () => {
     test.beforeEach(async ({ page }) => {
       await mockWorkflowsApis(page);
-      await mockClusterApi(page, { visibilityStore: 'elasticsearch' });
+      await mockClusterApi(page, {
+        visibilityStore: 'elasticsearch',
+        persistenceStore: 'postgres,elasticsearch',
+      });
       await mockBatchOperationApis(page);
 
       await page.goto('/namespaces/default/workflows');

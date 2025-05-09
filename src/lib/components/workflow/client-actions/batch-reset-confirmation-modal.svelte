@@ -50,7 +50,7 @@
     error = '';
     const options = {
       namespace,
-      reason: $reason || reasonPlaceholder,
+      reason: $reason ? `${$reason} ${reasonPlaceholder}` : reasonPlaceholder,
       jobId: $jobId || jobIdPlaceholder,
       resetType: $resetType,
       ...($allSelected

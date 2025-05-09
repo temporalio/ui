@@ -28,6 +28,7 @@
   export let staticQuery = '';
   $: namespace = $page.params.namespace;
   $: query = staticQuery || $queryWithParentWorkflowId;
+  $: perPage = $page.url.searchParams.get('per-page');
 
   let statusGroups: { status: WorkflowStatus; count: number }[] = [];
   let newStatusGroups: { status: WorkflowStatus; count: number }[] = [];
@@ -70,11 +71,11 @@
       const { count, groups } = await fetchWorkflowCountByExecutionStatus({
         namespace,
         query,
+      }).catch((_e) => {
+        return { count: '0', groups: [] };
       });
       $workflowCount.newCount = parseInt(count) - $workflowCount.count;
       newStatusGroups = getStatusAndCountOfGroup(groups);
-    } catch (e) {
-      console.error('Fetching workflow counts failed: ', e?.message);
     } finally {
       loading = false;
     }
@@ -95,11 +96,11 @@
       const { count, groups } = await fetchWorkflowCountByExecutionStatus({
         namespace,
         query,
+      }).catch((_e) => {
+        return { count: '0', groups: [] };
       });
       $workflowCount.count = parseInt(count);
       statusGroups = getStatusAndCountOfGroup(groups);
-    } catch (e) {
-      console.error('Fetching workflow counts failed: ', e?.message);
     } finally {
       loading = false;
     }
@@ -133,7 +134,7 @@
     }
   };
 
-  $: query, namespace, $refresh, fetchCounts();
+  $: namespace, query, perPage, $refresh, fetchCounts();
 </script>
 
 <div class="flex min-h-[24px] flex-wrap items-center gap-2">
