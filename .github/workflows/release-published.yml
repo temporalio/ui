@@ -14,7 +14,10 @@ jobs:
         uses: ./.github/actions/setup-node
 
       - name: Build package
-        run: pnpm package
+        run: |
+          pnpm package
+          # make tar from dist folder
+          tar -czf temporal-ui-package.tar.gz dist
 
       - name: upload package artifact
         uses: actions/upload-release-asset@v1
@@ -22,9 +25,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./build/
-          asset_name: temporal-ui-package.zip
-          asset_content_type: application/zip
+          asset_path: ./temporal-ui-package.tar.gz
+          asset_name: temporal-ui-package.tar.gz
+          asset_content_type: application/gzip
 
       - name: Prepare dispatch token
         id: dispatch_token
@@ -38,7 +41,7 @@ jobs:
       - name: Trigger ui-server workflow
         uses: peter-evans/repository-dispatch@v3
         with:
-          token: ${{ outputs.dispatch_token.outputs.token }}
+          token: ${{ steps.dispatch_token.outputs.token }}
           repository: ${{ vars.DOWNSTREAM_ORG }}/${{ vars.DOWNSTREAM_REPO }}
           event-type: sync-from-ui-release
           client-payload: |
