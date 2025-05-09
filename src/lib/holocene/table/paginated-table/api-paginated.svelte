@@ -65,7 +65,7 @@
   export let previousButtonLabel: string;
   export let nextButtonLabel: string;
   export let pageSizeOptions = options;
-  export let debounceDelay = 350;
+  export let debounceDelay = 250;
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
