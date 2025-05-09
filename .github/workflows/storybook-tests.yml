@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Checkout and Setup Node
-        uses: ./.github/actions/checkout-and-setup
+        uses: ./.github/actions/setup-node
       - name: Install Playwright
         run: pnpm exec playwright install --with-deps
       - name: Run Storybook tests

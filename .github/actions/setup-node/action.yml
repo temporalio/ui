@@ -1,4 +1,4 @@
-name: 'Checkout, Install Node and Dependencies'
+name: 'Install Node and Dependencies'
 description: 'Run pnpm install'
 
 runs:
@@ -8,17 +8,20 @@ runs:
       uses: pnpm/action-setup@v4.0.0
       with:
         run_install: false
+
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 18
         registry-url: 'https://registry.npmjs.org'
         cache: 'pnpm'
+
     - name: Get pnpm store directory
       id: pnpm-cache
       shell: bash
       run: |
         echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
     - uses: actions/cache@v3
       name: Setup pnpm cache
       with:
@@ -26,6 +29,7 @@ runs:
         key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
+
     - name: Install dependencies
       shell: bash
       run: pnpm install

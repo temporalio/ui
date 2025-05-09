@@ -1,0 +1,52 @@
+name: Release Published
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node
+
+      - name: Build package
+        run: |
+          pnpm package
+          # make tar from dist folder
+          tar -czf temporal-ui-package.tar.gz dist
+
+      - name: upload package artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./temporal-ui-package.tar.gz
+          asset_name: temporal-ui-package.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Prepare dispatch token
+        id: dispatch_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.TEMPORAL_CICD_APP_ID }}
+          private-key: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
+          permission-contents: write
+          repositories: ${{ vars.DOWNSTREAM_REPO }}
+
+      - name: Trigger ui-server workflow
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ steps.dispatch_token.outputs.token }}
+          repository: ${{ vars.DOWNSTREAM_ORG }}/${{ vars.DOWNSTREAM_REPO }}
+          event-type: sync-from-ui-release
+          client-payload: |
+            {
+              "ref": "${{ github.sha }}",
+              "release_tag": "${{ github.event.release.tag_name }}",
+              "release_url": "${{ github.event.release.html_url }}"
+            }
