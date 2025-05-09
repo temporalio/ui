@@ -47,6 +47,8 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     hideWorkflowQueryErrors: !!settingsResponse?.HideWorkflowQueryErrors,
     refreshWorkflowCountsDisabled:
       !!settingsResponse?.RefreshWorkflowCountsDisabled,
+    countGroupByExecutionStatus:
+      !!settingsResponse?.WorkflowCountGroupByExecutionStatusEnabled,
 
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
     notifyOnNewVersion: settingsResponse?.NotifyOnNewVersion,
