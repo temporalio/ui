@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
+  import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ParsedQuery } from '$lib/services/query-service';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
@@ -14,11 +14,14 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { Eventual } from '$lib/types/global';
 
-  const { namespace } = $page.params;
-  $: ({ workflow, workers } = $workflowRun);
+  let { workflow, workers } = $derived($workflowRun);
+  const namespace = $derived(page.params.namespace);
 
-  let currentdate = new Date();
-  let isLoading = false;
+  let currentdate = $state(new Date());
+  let isLoading = $state(false);
+  let stackTrace: Eventual<ParsedQuery> = $state();
+
+  // let refreshDate = $derived($refresh || currentdate.toLocaleTimeString());
 
   const getStackTrace = () =>
     getWorkflowStackTrace(
@@ -26,14 +29,15 @@
         workflow,
         namespace,
       },
-      $page.data?.settings,
+      page.data?.settings,
       $authUser?.accessToken,
     );
 
-  let stackTrace: Eventual<ParsedQuery>;
-  $: {
-    if (workflow?.isRunning) stackTrace = getStackTrace();
-  }
+  $effect(() => {
+    if (workflow?.isRunning) {
+      stackTrace = getStackTrace();
+    }
+  });
 
   const refreshStackTrace = () => {
     stackTrace = getWorkflowStackTrace(
@@ -41,7 +45,7 @@
         workflow,
         namespace,
       },
-      $page.data?.settings,
+      page.data?.settings,
       $authUser?.accessToken,
     );
 
@@ -54,9 +58,10 @@
 <section>
   {#if workflow?.isRunning && workers?.pollers?.length > 0}
     {#await stackTrace}
-      <div class="text-center">
-        <Loading />
-        <p>{translate('workflows.no-workers-failure-message')}</p>
+      <div class="flex flex-col gap-2">
+        <Skeleton class="h-16 w-1/3 rounded-sm" />
+        <Skeleton class="h-10 w-24 rounded-sm" />
+        <Skeleton class="h-48 w-full rounded-sm" />
       </div>
     {:then result}
       <Alert
