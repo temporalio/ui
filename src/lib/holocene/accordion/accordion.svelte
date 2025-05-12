@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
   import { v4 } from 'uuid';
 
@@ -8,7 +9,7 @@
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+  type Props = HTMLAttributes<HTMLDivElement> & {
     title: string;
     id?: string;
     subtitle?: string;
@@ -19,19 +20,26 @@
     onToggle?: () => void;
     'data-testid'?: string;
     class?: string;
-  }
+    summary?: Snippet;
+    action?: Snippet;
+    children?: Snippet;
+  };
 
-  export let title: string;
-  export let id: string = v4();
-  export let subtitle = '';
-  export let icon = null;
-  export let open = false;
-  export let expandable = true;
-  export let error = '';
-  export let onToggle = () => {};
-
-  let className = '';
-  export { className as class };
+  let {
+    title,
+    id = v4(),
+    subtitle = '',
+    icon = null,
+    open = false,
+    expandable = true,
+    error = '',
+    onToggle = () => {},
+    class: className = '',
+    summary,
+    action,
+    children,
+    ...restProps
+  }: Props = $props();
 
   const toggleAccordion = () => {
     open = !open;
@@ -42,7 +50,7 @@
 {#if expandable}
   <div
     class={merge('surface-primary w-full border border-subtle', className)}
-    {...$$restProps}
+    {...restProps}
   >
     <button
       id="{id}-trigger"
@@ -50,7 +58,7 @@
       aria-controls="{id}-content"
       class="flex w-full flex-col p-4 focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
       type="button"
-      on:click={toggleAccordion}
+      onclick={toggleAccordion}
     >
       <div class="flex w-full flex-row items-center justify-between gap-2">
         <div class="flex w-full items-center gap-2">
@@ -59,21 +67,21 @@
             {title}
           </h3>
           <div class="text-secondary max-sm:hidden">
-            <slot name="summary" />
+            {@render summary?.()}
           </div>
         </div>
         <div
           class="flex flex-row items-center gap-2 pr-2"
-          on:click|stopPropagation
-          on:keyup|stopPropagation
+          onclick={(e) => e.stopPropagation()}
+          onkeyup={(e) => e.stopPropagation()}
           role="none"
         >
-          <slot name="action" />
+          {@render action?.()}
         </div>
         <Icon class="shrink-0" name={open ? 'chevron-up' : 'chevron-down'} />
       </div>
       <div class="text-secondary sm:hidden">
-        <slot name="summary" />
+        {@render summary?.()}
       </div>
       <p class="flex items-center">
         {#if error}
@@ -90,11 +98,11 @@
       class="mt-4 block w-full p-4"
       class:hidden={!open}
     >
-      <slot />
+      {@render children?.()}
     </div>
   </div>
 {:else}
-  <div class="surface-primary w-full border border-subtle p-4" {...$$restProps}>
+  <div class="surface-primary w-full border border-subtle p-4" {...restProps}>
     <div class="flex w-full flex-col">
       <div class="flex w-full flex-row items-center justify-between gap-2">
         <div class="flex w-full items-center gap-2">
@@ -103,15 +111,15 @@
             {title}
           </h3>
           <div class="text-secondary max-sm:hidden">
-            <slot name="summary" />
+            {@render summary?.()}
           </div>
         </div>
         <div class="flex flex-row items-center gap-2 pr-2">
-          <slot name="action" />
+          {@render action?.()}
         </div>
       </div>
       <div class="text-secondary sm:hidden">
-        <slot name="summary" />
+        {@render summary?.()}
       </div>
       <p class="flex items-center">
         {#if error}
@@ -122,7 +130,7 @@
     </div>
 
     <div class="mt-6 block w-full" class:hidden={!open}>
-      <slot />
+      {@render children?.()}
     </div>
   </div>
 {/if}
