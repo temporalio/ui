@@ -2,7 +2,6 @@
   import { page } from '$app/state';
 
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -11,17 +10,14 @@
   import type { ParsedQuery } from '$lib/services/query-service';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import type { Eventual } from '$lib/types/global';
 
   let { workflow, workers } = $derived($workflowRun);
   const namespace = $derived(page.params.namespace);
-
-  let currentdate = $state(new Date());
-  let isLoading = $state(false);
   let stackTrace: Eventual<ParsedQuery> = $state();
 
-  // let refreshDate = $derived($refresh || currentdate.toLocaleTimeString());
+  let refreshDate = $derived(new Date($refresh).toLocaleTimeString());
 
   const getStackTrace = () =>
     getWorkflowStackTrace(
@@ -38,21 +34,6 @@
       stackTrace = getStackTrace();
     }
   });
-
-  const refreshStackTrace = () => {
-    stackTrace = getWorkflowStackTrace(
-      {
-        workflow,
-        namespace,
-      },
-      page.data?.settings,
-      $authUser?.accessToken,
-    );
-
-    stackTrace.then(() => {
-      currentdate = new Date();
-    });
-  };
 </script>
 
 <section>
@@ -60,7 +41,7 @@
     {#await stackTrace}
       <div class="flex flex-col gap-2">
         <Skeleton class="h-16 w-1/3 rounded-sm" />
-        <Skeleton class="h-10 w-24 rounded-sm" />
+        <Skeleton class="h-3 w-32" />
         <Skeleton class="h-48 w-full rounded-sm" />
       </div>
     {:then result}
@@ -70,19 +51,10 @@
         title={translate('workflows.call-stack-alert')}
         class="mb-4 w-fit"
       />
-      <div class="flex items-center gap-4">
-        <Button
-          on:click={refreshStackTrace}
-          leadingIcon="retry"
-          loading={isLoading}
-        >
-          {translate('common.refresh')}
-        </Button>
-        <p>
-          {translate('workflows.call-stack-at')}
-          {currentdate.toLocaleTimeString()}
-        </p>
-      </div>
+      <p>
+        {translate('workflows.call-stack-at')}
+        {refreshDate}
+      </p>
       <div class="my-2 flex h-full items-start">
         <CodeBlock
           content={result}
