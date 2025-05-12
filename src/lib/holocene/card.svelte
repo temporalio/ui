@@ -1,9 +1,7 @@
-<div class="card surface-primary {$$props.class}">
-  <slot />
-</div>
+<script lang="ts">
+  let { class: className = '', children } = $props();
+</script>
 
-<style lang="postcss">
-  .card {
-    @apply border border-subtle p-4;
-  }
-</style>
+<div class="surface-primary border border-subtle p-4 {className}">
+  {@render children?.()}
+</div>
