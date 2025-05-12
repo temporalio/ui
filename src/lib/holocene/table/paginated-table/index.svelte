@@ -65,7 +65,7 @@
   }
 
   .primary {
-    @apply border border-table;
+    @apply border border-subtle;
   }
 
   .split {
@@ -80,17 +80,17 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply surface-primary h-8;
+      @apply surface-table-header;
     }
 
     :global(tr > th) {
-      @apply whitespace-nowrap border-b border-table px-2 text-left font-mono text-xs;
+      @apply h-8 whitespace-nowrap border-b border-subtle px-2 text-left text-sm font-normal;
     }
   }
 
   .paginated-table-body {
     :global(tr.primary) {
-      @apply border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
 
     :global(tr.dense) {
@@ -124,7 +124,7 @@
 
   .primary .paginated-table-body {
     :global(tr:not(.empty)) {
-      @apply h-8 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply h-8 border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
   }
 
@@ -137,6 +137,6 @@
   }
 
   .paginated-table-controls {
-    @apply surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-table px-4 py-2;
+    @apply surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-subtle px-4 py-2;
   }
 </style>

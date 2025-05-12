@@ -37,6 +37,9 @@
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkflowVersioningBehavior'
     ];
+  $: totalActions = $fullEventHistory
+    .reduce((acc, e) => e.billableActions + acc, 0)
+    .toString();
 </script>
 
 <div
@@ -48,10 +51,9 @@
     class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
   >
     <WorkflowDetail
-      content={$fullEventHistory
-        .reduce((acc, e) => e.billableActions + acc, 0)
-        .toString()}
+      content={`💰${totalActions}`}
       title="Billable Actions"
+      badge="success"
     />
     <WorkflowDetail
       title={translate('common.start')}

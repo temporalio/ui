@@ -49,22 +49,24 @@
 
 <Card class="flex flex-1 flex-col gap-2 bg-primary">
   {@render title?.()}
-  <div class="grid flex-1 grid-cols-5 items-start gap-2 overflow-hidden">
-    <EventLinksExpanded links={event?.links} />
-    {#if event?.userMetadata?.summary}
-      {@render eventSummary(event.userMetadata.summary)}
-    {/if}
-    {#each detailFields as [key, value] (key)}
-      {@render details(key, value)}
-    {/each}
-    {#each linkFields as [key, value] (key)}
-      {@render link(key, value)}
-    {/each}
-  </div>
-  <div class="grid flex-1 grid-cols-3 gap-2 overflow-hidden">
-    {#each payloadFields as [key, value] (key)}
-      {@render payloads(key, value)}
-    {/each}
+  <div class="flex flex-1 flex-col gap-2 xl:flex-row">
+    <div class="grid flex-1 grid-cols-2 items-start gap-2 overflow-hidden">
+      <EventLinksExpanded links={event?.links} />
+      {#if event?.userMetadata?.summary}
+        {@render eventSummary(event.userMetadata.summary)}
+      {/if}
+      {#each detailFields as [key, value] (key)}
+        {@render details(key, value)}
+      {/each}
+      {#each linkFields as [key, value] (key)}
+        {@render link(key, value)}
+      {/each}
+    </div>
+    <div class="w-full flex-1 overflow-hidden">
+      {#each payloadFields as [key, value] (key)}
+        {@render payloads(key, value)}
+      {/each}
+    </div>
   </div>
 </Card>
 
@@ -90,7 +92,9 @@
   {@const stackTrace = getStackTrace(codeBlockValue)}
   <div class="w-full">
     <div class="flex flex-col">
-      <p class="font-mono text-xs text-secondary">{format(key)}</p>
+      <p class="font-mono text-xs text-secondary">
+        {format(key)}
+      </p>
       {#if value?.payloads}
         <PayloadDecoder {value} key="payloads" let:decodedValue>
           <CodeBlock
@@ -126,7 +130,9 @@
     </div>
     {#if stackTrace}
       <div class="flex flex-col">
-        <p class="text-sm">{translate('workflows.call-stack-tab')}</p>
+        <p class="font-mono text-xs text-secondary">
+          {translate('workflows.call-stack-tab')}
+        </p>
         <CodeBlock
           content={stackTrace}
           language="text"
@@ -141,7 +147,9 @@
 
 {#snippet link(key, value)}
   <div>
-    <p class="font-mono text-xs text-secondary">{format(key)}</p>
+    <p class="font-mono text-xs text-secondary">
+      {format(key)}
+    </p>
     <Copyable
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -159,7 +167,9 @@
 
 {#snippet details(key, value)}
   <div>
-    <p class="font-mono text-xs text-secondary">{format(key)}</p>
+    <p class="font-mono text-xs text-secondary">
+      {format(key)}
+    </p>
     <p class="whitespace-pre-line">
       {shouldDisplayAsTime(key) ? formatDate(value, $timeFormat) : value}
     </p>

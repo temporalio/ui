@@ -205,16 +205,7 @@
   };
 
   $: content, language, setView();
-
-  $: expandable = !editable && maxHeight && contentHeight(editor) > maxHeight;
-
-  const contentHeight = (element: HTMLElement) => {
-    const childElement = element?.querySelector('.cm-content') as HTMLElement;
-    if (childElement) {
-      return childElement?.offsetHeight || 0;
-    }
-    return 0;
-  };
+  $: expandable = !editable && maxHeight;
 </script>
 
 <div class="relative min-w-[80px] grow">

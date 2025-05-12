@@ -28,7 +28,7 @@
   aria-live="polite"
 >
   <div
-    class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 border-b border-table p-8 xl:min-w-[520px] xl:border-b-0 xl:border-r"
+    class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 border-b border-subtle p-8 xl:min-w-[520px] xl:border-b-0 xl:border-r"
   >
     <h2>
       {#if query}

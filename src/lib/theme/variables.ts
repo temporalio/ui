@@ -76,6 +76,10 @@ export const variables = {
     light: 'space-black',
     dark: 'slate.900',
   },
+  '--color-surface-table-header': {
+    light: 'slate.50',
+    dark: 'slate.800',
+  },
   '--color-surface-success': {
     light: 'green.100',
     dark: 'green.950',
