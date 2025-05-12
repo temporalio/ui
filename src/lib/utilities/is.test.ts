@@ -1,15 +1,25 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  isBacktick,
+  isBetween,
+  isConditional,
+  isEndParenthesis,
+  isError,
   isExecutionStatus,
+  isFunction,
+  isInConditional,
+  isJoin,
   isNull,
   isNullConditional,
   isNumber,
   isObject,
   isOperator,
+  isParenthesis,
   isQuote,
   isSortOrder,
   isSpace,
+  isStartsWith,
   isString,
 } from './is';
 
@@ -322,7 +332,7 @@ describe('isQuote', () => {
     expect(isQuote("'")).toBe(true);
   });
 
-  it('should return true for a single quote', () => {
+  it('should return true for a double quote', () => {
     expect(isQuote('"')).toBe(true);
   });
 
@@ -339,6 +349,283 @@ describe('isQuote', () => {
   });
 });
 
+describe('isBacktick', () => {
+  it('should return true for a backtick', () => {
+    expect(isBacktick('`')).toBe(true);
+  });
+
+  it('should return false for a letter', () => {
+    expect(isBacktick('a')).toBe(false);
+  });
+
+  it('should return false for null', () => {
+    expect(isBacktick(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isBacktick(undefined)).toBe(false);
+  });
+
+  it('should return false for an object', () => {
+    expect(isBacktick({})).toBe(false);
+  });
+});
+
+describe('isConditional', () => {
+  it('should return true for "==="', () => {
+    expect(isConditional('===')).toBe(true);
+  });
+
+  it('should return true for "!=="', () => {
+    expect(isConditional('!==')).toBe(true);
+  });
+
+  it('should return true for ">="', () => {
+    expect(isConditional('>=')).toBe(true);
+  });
+
+  it('should return true for "<="', () => {
+    expect(isConditional('<=')).toBe(true);
+  });
+
+  it('should return true for "=="', () => {
+    expect(isConditional('==')).toBe(true);
+  });
+
+  it('should return true for "!="', () => {
+    expect(isConditional('!=')).toBe(true);
+  });
+
+  it('should return true for "="', () => {
+    expect(isConditional('=')).toBe(true);
+  });
+
+  it('should return true for ">"', () => {
+    expect(isConditional('>')).toBe(true);
+  });
+
+  it('should return true for "<"', () => {
+    expect(isConditional('<')).toBe(true);
+  });
+
+  it('should return true for "!"', () => {
+    expect(isConditional('!')).toBe(true);
+  });
+
+  it('should return true for "starts_with"', () => {
+    expect(isConditional('starts_with')).toBe(true);
+  });
+
+  it('should return true for "is"', () => {
+    expect(isConditional('is')).toBe(true);
+  });
+
+  it('should return true for "is not"', () => {
+    expect(isConditional('is not')).toBe(true);
+  });
+
+  it('should return true for "in" (case insensitive)', () => {
+    expect(isConditional('in')).toBe(true);
+    expect(isConditional('IN')).toBe(true);
+  });
+
+  it('should return false for a non-conditional string', () => {
+    expect(isConditional('not-a-conditional')).toBe(false);
+  });
+
+  it('should return false for null', () => {
+    expect(isConditional(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isConditional(undefined)).toBe(false);
+  });
+
+  it('should return false for an object', () => {
+    expect(isConditional({})).toBe(false);
+  });
+});
+
+describe('isParenthesis', () => {
+  it('should return true for "("', () => {
+    expect(isParenthesis('(')).toBe(true);
+  });
+
+  it('should return true for ")"', () => {
+    expect(isParenthesis(')')).toBe(true);
+  });
+
+  it('should return true for parentheses with case insensitivity', () => {
+    // There's no uppercase for parentheses, but testing the mechanism
+    expect(isParenthesis('(')).toBe(true);
+  });
+
+  it('should return false for other characters', () => {
+    expect(isParenthesis('{')).toBe(false);
+    expect(isParenthesis('}')).toBe(false);
+    expect(isParenthesis('[')).toBe(false);
+    expect(isParenthesis(']')).toBe(false);
+  });
+
+  it('should return false for null', () => {
+    expect(isParenthesis(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isParenthesis(undefined)).toBe(false);
+  });
+
+  it('should return false for an object', () => {
+    expect(isParenthesis({})).toBe(false);
+  });
+});
+
+describe('isEndParenthesis', () => {
+  it('should return true for ")"', () => {
+    expect(isEndParenthesis(')')).toBe(true);
+  });
+
+  it('should return true for ")" with case insensitivity', () => {
+    // There's no uppercase for parentheses, but testing the mechanism
+    expect(isEndParenthesis(')')).toBe(true);
+  });
+
+  it('should return false for "("', () => {
+    expect(isEndParenthesis('(')).toBe(false);
+  });
+
+  it('should return false for other characters', () => {
+    expect(isEndParenthesis('}')).toBe(false);
+    expect(isEndParenthesis(']')).toBe(false);
+  });
+
+  it('should return false for null', () => {
+    expect(isEndParenthesis(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isEndParenthesis(undefined)).toBe(false);
+  });
+
+  it('should return false for an object', () => {
+    expect(isEndParenthesis({})).toBe(false);
+  });
+});
+
+describe('isJoin', () => {
+  it('should return true for "and"', () => {
+    expect(isJoin('and')).toBe(true);
+  });
+
+  it('should return true for "or"', () => {
+    expect(isJoin('or')).toBe(true);
+  });
+
+  it('should return true for case insensitive joins', () => {
+    expect(isJoin('AND')).toBe(true);
+    expect(isJoin('OR')).toBe(true);
+  });
+
+  it('should return false for other operators', () => {
+    expect(isJoin('not')).toBe(false);
+    expect(isJoin('+')).toBe(false);
+  });
+
+  it('should return false for null', () => {
+    expect(isJoin(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isJoin(undefined)).toBe(false);
+  });
+
+  it('should return false for an object', () => {
+    expect(isJoin({})).toBe(false);
+  });
+});
+
+describe('isBetween', () => {
+  it('should return true for "between"', () => {
+    expect(isBetween('between')).toBe(true);
+  });
+
+  it('should return true for case insensitive "between"', () => {
+    expect(isBetween('BETWEEN')).toBe(true);
+    expect(isBetween('Between')).toBe(true);
+  });
+
+  it('should return false for other strings', () => {
+    expect(isBetween('not-between')).toBe(false);
+  });
+
+  it('should return false for null', () => {
+    expect(isBetween(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isBetween(undefined)).toBe(false);
+  });
+
+  it('should return false for an object', () => {
+    expect(isBetween({})).toBe(false);
+  });
+});
+
+describe('isStartsWith', () => {
+  it('should return true for "starts_with"', () => {
+    expect(isStartsWith('starts_with')).toBe(true);
+  });
+
+  it('should return true for case insensitive "starts_with"', () => {
+    expect(isStartsWith('STARTS_WITH')).toBe(true);
+    expect(isStartsWith('Starts_With')).toBe(true);
+  });
+
+  it('should return false for other strings', () => {
+    expect(isStartsWith('startswith')).toBe(false);
+    expect(isStartsWith('ends_with')).toBe(false);
+  });
+
+  it('should return false for null', () => {
+    expect(isStartsWith(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isStartsWith(undefined)).toBe(false);
+  });
+
+  it('should return false for an object', () => {
+    expect(isStartsWith({})).toBe(false);
+  });
+});
+
+describe('isInConditional', () => {
+  it('should return true for "in"', () => {
+    expect(isInConditional('in')).toBe(true);
+  });
+
+  it('should return true for case insensitive "in"', () => {
+    expect(isInConditional('IN')).toBe(true);
+    expect(isInConditional('In')).toBe(true);
+  });
+
+  it('should return false for other strings', () => {
+    expect(isInConditional('not-in')).toBe(false);
+  });
+
+  it('should return false for null', () => {
+    expect(isInConditional(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isInConditional(undefined)).toBe(false);
+  });
+
+  it('should return false for an object', () => {
+    expect(isInConditional({})).toBe(false);
+  });
+});
+
 describe('isNullConditional', () => {
   it('should return true for is', () => {
     expect(isNullConditional('IS')).toBe(true);
@@ -352,5 +639,99 @@ describe('isNullConditional', () => {
 
   it('should return false for null', () => {
     expect(isNullConditional(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isNullConditional(undefined)).toBe(false);
+  });
+
+  it('should return false for an object', () => {
+    expect(isNullConditional({})).toBe(false);
+  });
+});
+
+describe('isError', () => {
+  it('should return true for Error objects', () => {
+    expect(isError(new Error('test error'))).toBe(true);
+  });
+
+  it('should return true for custom Error objects', () => {
+    class CustomError extends Error {
+      constructor(message: string) {
+        super(message);
+        this.name = 'CustomError';
+      }
+    }
+    expect(isError(new CustomError('custom error'))).toBe(true);
+  });
+
+  it('should return true for objects with name and message properties', () => {
+    const errorLike = { name: 'ErrorLike', message: 'error message' };
+    expect(isError(errorLike)).toBe(true);
+  });
+
+  it('should return false for objects missing name or message', () => {
+    expect(isError({ name: 'ErrorLike' })).toBe(false);
+    expect(isError({ message: 'error message' })).toBe(false);
+  });
+
+  it('should return false for null', () => {
+    expect(isError(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isError(undefined)).toBe(false);
+  });
+
+  it('should return false for primitives', () => {
+    expect(isError('error string')).toBe(false);
+    expect(isError(123)).toBe(false);
+    expect(isError(true)).toBe(false);
+  });
+});
+
+describe('isFunction', () => {
+  it('should return true if given an arrow function', () => {
+    const fn = () => 2;
+    expect(isFunction(fn)).toBe(true);
+  });
+
+  it('should return true if given a function expression', () => {
+    const fn = function () {
+      return 2;
+    };
+    expect(isFunction(fn)).toBe(true);
+  });
+
+  it('should return true if given a function declaration', () => {
+    function fn() {
+      return 2;
+    }
+    expect(isFunction(fn)).toBe(true);
+  });
+
+  it('should return true if given an async function ', () => {
+    const fn = async () => 2;
+    expect(isFunction(fn)).toBe(true);
+  });
+
+  it('should return false if given a string', () => {
+    const fn = '';
+    expect(isFunction(fn)).toBe(false);
+  });
+
+  it('should return false if given a number', () => {
+    const fn = 42;
+    expect(isFunction(fn)).toBe(false);
+  });
+
+  it('should return false if given an object', () => {
+    const fn = {};
+    expect(isFunction(fn)).toBe(false);
+  });
+
+  it('should return false if given an array', () => {
+    const fn = [];
+    expect(isFunction(fn)).toBe(false);
   });
 });
