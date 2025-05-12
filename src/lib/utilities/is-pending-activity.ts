@@ -1,21 +1,44 @@
+import { z } from 'zod';
+
 import type { PendingActivity, PendingNexusOperation } from '$lib/types/events';
 
-import { has } from './has';
+/**
+ * Zod schema for validating a PendingActivity object
+ * Requires an object with an activityType property that's not undefined
+ */
+const pendingActivitySchema = z
+  .object({
+    activityType: z.unknown().refine((val) => val !== undefined),
+  })
+  .strict()
+  .passthrough();
 
-export const isPendingActivity = (event: unknown): event is PendingActivity => {
-  if (event === null) return false;
-  if (typeof event !== 'object') return false;
-  if (Array.isArray(event)) return false;
-  if (has(event, 'activityType')) return true;
-  return false;
-};
+/**
+ * Zod schema for validating a PendingNexusOperation object
+ * Requires an object with both operation and endpoint properties that are not undefined
+ */
+const pendingNexusOperationSchema = z
+  .object({
+    operation: z.unknown().refine((val) => val !== undefined),
+    endpoint: z.unknown().refine((val) => val !== undefined),
+  })
+  .strict()
+  .passthrough();
 
+/**
+ * Checks if the provided value is a PendingActivity
+ * @param event - The value to check
+ * @returns A type guard indicating if the value is a PendingActivity
+ */
+export const isPendingActivity = (event: unknown): event is PendingActivity =>
+  pendingActivitySchema.safeParse(event).success;
+
+/**
+ * Checks if the provided value is a PendingNexusOperation
+ * @param event - The value to check
+ * @returns A type guard indicating if the value is a PendingNexusOperation
+ */
 export const isPendingNexusOperation = (
   event: unknown,
-): event is PendingNexusOperation => {
-  if (event === null) return false;
-  if (typeof event !== 'object') return false;
-  if (Array.isArray(event)) return false;
-  if (has(event, 'operation') && has(event, 'endpoint')) return true;
-  return false;
-};
+): event is PendingNexusOperation =>
+  pendingNexusOperationSchema.safeParse(event).success;
