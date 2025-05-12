@@ -3,7 +3,7 @@ import { writable } from 'svelte/store';
 
 import { BROWSER } from 'esm-env';
 
-import { isFunction } from '$lib/utilities/is-function';
+import { isFunction } from '$lib/utilities/is';
 import {
   parseWithBigInt,
   stringifyWithBigInt,
