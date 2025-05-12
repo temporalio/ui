@@ -6,7 +6,6 @@
   const dispatch = createEventDispatcher<{
     addItem: undefined;
     moveItem: { from: number; to: number };
-    pinItem: undefined;
     removeItem: undefined;
   }>();
 
@@ -18,8 +17,6 @@
     label: string;
     index?: number;
     totalItems?: number;
-    pinned?: boolean;
-    maxPinnedItems?: number;
   };
 
   type ReadonlyProps = BaseProps & {
@@ -33,8 +30,6 @@
   type I18nProps = {
     moveUpButtonLabel: string;
     moveDownButtonLabel: string;
-    pinButtonLabel: string;
-    unpinButtonLabel: string;
     addButtonLabel: string;
     removeButtonLabel: string;
   };
@@ -44,15 +39,11 @@
   let isStatic = false;
   export { isStatic as static };
   export let label: string;
-  export let maxPinnedItems: number = undefined;
-  export let pinned = false;
   export let readonly = false;
   export let index = 0;
   export let totalItems = 0;
   export let moveUpButtonLabel = '';
   export let moveDownButtonLabel = '';
-  export let pinButtonLabel = '';
-  export let unpinButtonLabel = '';
   export let addButtonLabel = '';
   export let removeButtonLabel = '';
 
@@ -105,23 +96,6 @@
       </div>
     {/if}
     {label}
-    {#if !isStatic && !readonly && index <= maxPinnedItems - 1}
-      {#if pinned}
-        <IconButton
-          icon="pin-filled"
-          data-testid="orderable-list-item-{label}-unpin-button"
-          label={unpinButtonLabel}
-          on:click={() => dispatch('pinItem')}
-        />
-      {:else}
-        <IconButton
-          icon="pin"
-          data-testid="orderable-list-item-{label}-pin-button"
-          label={pinButtonLabel}
-          on:click={() => dispatch('pinItem')}
-        />
-      {/if}
-    {/if}
   </div>
   {#if !readonly}
     {#if isStatic}

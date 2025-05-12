@@ -231,8 +231,6 @@ export const Strings = {
   'move-column-down-label': 'Move {{column}} column down',
   'add-column-label': 'Add {{column}} column',
   'remove-column-label': 'Remove {{column}} column',
-  'pin-column-label': 'Pin {{column}} column',
-  'unpin-column-label': 'Unpin {{column}} column',
   'all-headings-in-view': 'All available columns are in view',
   'no-headings-in-view': 'No columns in view',
   'archived-workflows': 'Archived Workflows',
