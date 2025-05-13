@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
 
-  import DarkModeButton from '$lib/components/dark-mode-button.svelte';
+  import DarkModeNavigationButton from '$lib/components/dark-mode-navigation-button.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
@@ -43,7 +43,7 @@
     />
     <DataEncoderSettings />
     <div class="border-b border-subtle"></div>
-    <DarkModeButton />
+    <DarkModeNavigationButton />
     <slot />
   </div>
 {/if}

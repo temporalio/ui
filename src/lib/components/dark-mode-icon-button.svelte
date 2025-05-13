@@ -2,28 +2,29 @@
   import IconButton from '$lib/holocene/icon-button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { useDarkMode, useDarkModePreference } from '$lib/utilities/dark-mode';
+  import {
+    getNextDarkModePreference,
+    useDarkMode,
+    useDarkModePreference,
+  } from '$lib/utilities/dark-mode';
 
-  $: darkModeText =
+  $: buttonText =
     $useDarkModePreference == null
       ? translate('common.system-default')
       : $useDarkModePreference
         ? translate('common.night')
         : translate('common.day');
-  $: nextDarkModePreference =
-    $useDarkModePreference == null
-      ? true
-      : $useDarkModePreference == true
-        ? false
-        : null;
 </script>
 
-<Tooltip bottomRight text={darkModeText}>
+<Tooltip bottomRight text={buttonText}>
   <IconButton
     variant="ghost"
-    label={darkModeText}
+    label={buttonText}
     class="relative flex items-center"
     icon={$useDarkMode ? 'moon' : 'sun'}
-    on:click={() => ($useDarkModePreference = nextDarkModePreference)}
+    on:click={() =>
+      ($useDarkModePreference = getNextDarkModePreference(
+        $useDarkModePreference,
+      ))}
   />
 </Tooltip>
