@@ -2,7 +2,9 @@ import { derived } from 'svelte/store';
 
 import { persistStore } from '$lib/stores/persist-store';
 
-export const useDarkModePreference = persistStore<boolean | null>(
+type DarkModePreference = boolean | null;
+
+export const useDarkModePreference = persistStore<DarkModePreference>(
   'dark mode',
   import.meta.env.VITE_DARK_MODE ?? null,
   true,
@@ -20,6 +22,9 @@ export const useDarkMode = derived(
     }
   },
 );
+
+export const getNextDarkModePreference = (value: DarkModePreference) =>
+  value == null ? true : value == true ? false : null;
 
 export const darkMode = (node: HTMLElement) => {
   useDarkMode.subscribe((value) => {
