@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import AccordionLight from '$lib/holocene/accordion/accordion-light.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -11,24 +11,28 @@
   import { authUser } from '$lib/stores/auth-user';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  const namespace = $derived(() => $page.params.namespace);
+  const namespace = page.params.namespace;
   const workflow = $derived(() => $workflowRun.workflow);
-  const currentDetails = $derived($workflowRun?.metadata?.currentDetails || '');
-  const closedWithoutDetails = $derived(!workflow.isRunning && !currentDetails);
+  const currentDetails = $derived(
+    () => $workflowRun.metadata?.currentDetails ?? '',
+  );
+  const closedWithoutDetails = $derived(
+    () => !workflow().isRunning && !currentDetails(),
+  );
 
-  let loading = false;
+  let loading = $state(false);
 
   const fetchCurrentDetails = async () => {
     if (loading) return;
     loading = true;
     try {
-      const { settings } = $page.data;
+      const { settings } = page.data;
       const metadata = await getWorkflowMetadata(
         {
           namespace,
           workflow: {
-            id: workflow.id,
-            runId: workflow.runId,
+            id: workflow().id,
+            runId: workflow().runId,
           },
         },
         settings,
@@ -44,9 +48,8 @@
 </script>
 
 <AccordionLight
-  let:open
-  onToggle={closedWithoutDetails ? fetchCurrentDetails : undefined}
-  icon={closedWithoutDetails ? 'retry' : undefined}
+  onToggle={closedWithoutDetails() ? fetchCurrentDetails : undefined}
+  icon={closedWithoutDetails() ? 'retry' : undefined}
 >
   {#snippet titleName()}
     <div class="flex w-full items-center gap-2 p-2 text-xl">
@@ -55,22 +58,28 @@
       {#if loading}{translate('common.loading')}{/if}
     </div>
   {/snippet}
-  {#if open}
-    {#key currentDetails}
-      <Markdown content={currentDetails} />
-    {/key}
-  {/if}
-  <svelte:fragment slot="action">
-    {#if workflow.isRunning}
-      <Tooltip text={translate('workflows.update-details')} left>
-        <Button
-          variant="ghost"
-          on:click={fetchCurrentDetails}
-          disabled={loading}
-        >
-          <Icon name="retry" />
-        </Button>
-      </Tooltip>
+
+  {#snippet children({ open })}
+    {#if open}
+      {#key currentDetails()}
+        <Markdown content={currentDetails()} />
+      {/key}
     {/if}
-  </svelte:fragment>
+  {/snippet}
+
+  {#snippet action()}
+    {#if closedWithoutDetails()}
+      {#if workflow().isRunning}
+        <Tooltip text={translate('workflows.update-details')} left>
+          <Button
+            variant="ghost"
+            on:click={fetchCurrentDetails}
+            disabled={loading}
+          >
+            <Icon name="retry" />
+          </Button>
+        </Tooltip>
+      {/if}
+    {/if}
+  {/snippet}
 </AccordionLight>
