@@ -86,12 +86,7 @@ export const getWorkflowRelationships = (
 
   const newExecutionRunId = getNewExecutionId(fullEventHistory);
 
-  const firstExecutionRunId =
-    workflowExecutionStartedEvent?.attributes?.firstExecutionRunId;
-
-  const first =
-    firstExecutionRunId === workflow?.runId ? undefined : firstExecutionRunId;
-
+  const first = workflowExecutionStartedEvent?.attributes?.firstExecutionRunId;
   const previous =
     workflowExecutionStartedEvent?.attributes?.continuedExecutionRunId;
 

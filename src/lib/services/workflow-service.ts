@@ -128,6 +128,7 @@ type TerminateWorkflowOptions = {
   workflow: WorkflowExecution;
   namespace: string;
   reason: string;
+  first: string | undefined;
 };
 
 export type ResetWorkflowOptions = {
@@ -293,6 +294,7 @@ export async function terminateWorkflow({
   workflow,
   namespace,
   reason,
+  first,
 }: TerminateWorkflowOptions): Promise<null> {
   const route = routeForApi('workflow.terminate', {
     namespace,
@@ -312,6 +314,7 @@ export async function terminateWorkflow({
       body: stringifyWithBigInt({
         reason: formattedReason,
         ...(email && { identity: email }),
+        firstExecutionRunId: first,
       }),
     },
     notifyOnError: false,

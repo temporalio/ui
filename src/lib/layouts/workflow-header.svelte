@@ -106,6 +106,7 @@
             {cancelInProgress}
             {workflow}
             {namespace}
+            first={workflowRelationships.first}
           />
         </div>
       </div>
@@ -126,7 +127,13 @@
       </div>
     </div>
     <div class="max-lg:hidden">
-      <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
+      <WorkflowActions
+        {isRunning}
+        {cancelInProgress}
+        {workflow}
+        {namespace}
+        first={workflowRelationships.first}
+      />
     </div>
   </div>
   <CodecServerErrorBanner />

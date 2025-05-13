@@ -110,7 +110,7 @@ describe('getWorkflowRelationships', () => {
     ).toBe(firstExecutionRunId);
   });
 
-  it('should not return the firstExecutionRunId for first on a workflowExecutionStartedEvent if the id matches the runId', () => {
+  it('should return the firstExecutionRunId for first on a workflowExecutionStartedEvent if the id matches the runId', () => {
     const workflowExecutionStartedEvent = continuedAsNewEvents.find(
       (event) => event?.name === 'WorkflowExecutionStarted',
     );
@@ -136,7 +136,7 @@ describe('getWorkflowRelationships', () => {
         continuedAsNewEvents,
         namespaces.namespaces,
       ).first,
-    ).toBe(undefined);
+    ).toBe(firstExecutionRunId);
   });
 
   it('should return the continuedExecutionRunId for previous on a WorkflowExecutionStarted event', () => {
