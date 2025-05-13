@@ -1,0 +1,76 @@
+# enable-template
+# The comment above enables templating support in the server.
+# Please see the README for details on how to use this feature.
+
+temporalGrpcAddress: {{ env "TEMPORAL_ADDRESS" | default "127.0.0.1:7233" }}
+port: {{ env "TEMPORAL_UI_PORT" | default "8080" }}
+publicPath: {{ env "TEMPORAL_UI_PUBLIC_PATH" | default "" }}
+enableUi: {{ env "TEMPORAL_UI_ENABLED" | default "true" }}
+bannerText: {{ env "TEMPORAL_BANNER_TEXT" | default "" }}
+cloudUi: {{ env "TEMPORAL_CLOUD_UI" | default "false" }}
+defaultNamespace: {{ env "TEMPORAL_DEFAULT_NAMESPACE" | default "default" }}
+feedbackUrl: {{ env "TEMPORAL_FEEDBACK_URL" | default "" }}
+notifyOnNewVersion: {{ env "TEMPORAL_NOTIFY_ON_NEW_VERSION" | default "true" }}
+refreshInterval: {{ env "TEMPORAL_CONFIG_REFRESH_INTERVAL" | default "0s" }}
+showTemporalSystemNamespace: {{ env "TEMPORAL_SHOW_TEMPORAL_SYSTEM_NAMESPACE" | default "false" }}
+disableWriteActions: {{ env "TEMPORAL_DISABLE_WRITE_ACTIONS" | default "false" }}
+workflowTerminateDisabled: {{ env "TEMPORAL_WORKFLOW_TERMINATE_DISABLED" | default "false" }}
+workflowCancelDisabled: {{ env "TEMPORAL_WORKFLOW_CANCEL_DISABLED" | default "false" }}
+workflowSignalDisabled: {{ env "TEMPORAL_WORKFLOW_SIGNAL_DISABLED" | default "false" }}
+workflowUpdateDisabled: {{ env "TEMPORAL_WORKFLOW_UPDATE_DISABLED" | default "false" }}
+workflowResetDisabled: {{ env "TEMPORAL_WORKFLOW_RESET_DISABLED" | default "false" }}
+batchActionsDisabled: {{ env "TEMPORAL_BATCH_ACTIONS_DISABLED" | default "false" }}
+startWorkflowDisabled: {{ env "TEMPORAL_START_WORKFLOW_DISABLED" | default "false" }}
+hideWorkflowQueryErrors: {{ env "TEMPORAL_HIDE_WORKFLOW_QUERY_ERRORS" | default "false" }} 
+refreshWorkflowCountsDisabled: {{ env "TEMPORAL_REFRESH_WORKFLOW_COUNTS_DISABLED" | default "false" }}
+cors:
+  cookieInsecure: {{ env "TEMPORAL_CSRF_COOKIE_INSECURE" | default "false" }}
+  allowOrigins:
+    # override framework's default that allows all origins "*"
+    {{- if env "TEMPORAL_CORS_ORIGINS" }}
+    {{- range env "TEMPORAL_CORS_ORIGINS" | split "," }}
+    - {{ . }}
+    {{- end }}
+    {{- else }}
+    - "http://localhost:8080"
+    {{- end }}
+tls:
+  caFile: {{ env "TEMPORAL_TLS_CA" | default "" }}
+  certFile: {{ env "TEMPORAL_TLS_CERT" | default "" }}
+  keyFile: {{ env "TEMPORAL_TLS_KEY" | default "" }}
+  caData: {{ env "TEMPORAL_TLS_CA_DATA" | default "" }}
+  certData: {{ env "TEMPORAL_TLS_CERT_DATA" | default "" }}
+  keyData: {{ env "TEMPORAL_TLS_KEY_DATA" | default "" }}
+  enableHostVerification: {{ env "TEMPORAL_TLS_ENABLE_HOST_VERIFICATION" | default "false" }}
+  serverName: {{ env "TEMPORAL_TLS_SERVER_NAME" | default "" }}
+auth:
+  enabled: {{ env "TEMPORAL_AUTH_ENABLED" | default "false" }}
+  providers:
+  - label: {{ env "TEMPORAL_AUTH_LABEL" | default "sso" }}
+    type: {{ env "TEMPORAL_AUTH_TYPE" | default "oidc" }}
+    providerUrl: {{ env "TEMPORAL_AUTH_PROVIDER_URL" }}
+    issuerUrl: {{ env "TEMPORAL_AUTH_ISSUER_URL" | default "" }}
+    clientId: {{ env "TEMPORAL_AUTH_CLIENT_ID" }}
+    clientSecret: {{ env "TEMPORAL_AUTH_CLIENT_SECRET" }}
+    callbackUrl: {{ env "TEMPORAL_AUTH_CALLBACK_URL" }}
+    scopes:
+    {{- if env "TEMPORAL_AUTH_SCOPES" }}
+    {{- range env "TEMPORAL_AUTH_SCOPES" | split "," }}
+      - {{ . }}
+    {{- end }}
+    {{- end }}
+codec:
+  endpoint: {{ env "TEMPORAL_CODEC_ENDPOINT" | default "" }}
+  passAccessToken: {{ env "TEMPORAL_CODEC_PASS_ACCESS_TOKEN" | default "false" }}
+  includeCredentials: {{ env "TEMPORAL_CODEC_INCLUDE_CREDENTIALS" | default "false" }}
+  defaultErrorMessage: {{ env "TEMPORAL_CODEC_DEFAULT_ERROR_MESSAGE" | default "" }}
+  defaultErrorLink: {{ env "TEMPORAL_CODEC_DEFAULT_ERROR_LINK" | default "" }}
+
+forwardHeaders:
+{{- if env "TEMPORAL_FORWARD_HEADERS" }}
+{{- range env "TEMPORAL_FORWARD_HEADERS" | split "," }}
+  - {{ . }}
+{{- end }}
+{{- end }}
+
+hideLogs: {{ env "TEMPORAL_HIDE_LOGS" | default "false" }}
