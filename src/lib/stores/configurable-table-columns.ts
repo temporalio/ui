@@ -100,13 +100,17 @@ const DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Execution Time' },
   { label: 'Execution Duration' },
   { label: 'State Transitions' },
-  { label: 'Parent Namespace' },
   { label: 'Task Queue' },
   { label: 'Scheduled By ID' },
   { label: 'Scheduled Start Time' },
   { label: 'Deployment' },
   { label: 'Deployment Version' },
   { label: 'Versioning Behavior' },
+];
+
+const DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS_CORE: ConfigurableTableHeader[] = [
+  ...DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS,
+  { label: 'Parent Namespace' },
 ];
 
 const DEFAULT_SCHEDULES_COLUMNS: ConfigurableTableHeader[] = [
@@ -197,10 +201,8 @@ export const availableWorkflowSystemSearchAttributeColumns: (
     [
       ...DEFAULT_WORKFLOWS_COLUMNS,
       ...(settings?.runtimeEnvironment?.isCloud
-        ? DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS.filter(
-            (col) => col.label !== 'Parent Namespace',
-          )
-        : DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS),
+        ? DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS
+        : DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS_CORE),
     ].filter(
       (header) =>
         !$configurableTableColumns[namespace]?.workflows?.some(
