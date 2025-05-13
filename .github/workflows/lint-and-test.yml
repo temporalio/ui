@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Checkout and Setup Node
-        uses: ./.github/actions/checkout-and-setup
+        uses: ./.github/actions/setup-node
       - name: Lint
         run: pnpm run --if-present lint:ci
   check-types:
@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Checkout and Setup Node
-        uses: ./.github/actions/checkout-and-setup
+        uses: ./.github/actions/setup-node
       - name: Check Types
         run: pnpm run check
   unit-tests:
@@ -41,6 +41,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Checkout and Setup Node
-        uses: ./.github/actions/checkout-and-setup
+        uses: ./.github/actions/setup-node
       - name: Run Unit Tests
         run: pnpm test
