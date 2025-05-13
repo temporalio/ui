@@ -318,9 +318,11 @@ export async function terminateWorkflow({
       }),
     },
     notifyOnError: false,
-    params: {
-      'execution.runId': workflow.runId,
-    },
+    params: first
+      ? {}
+      : {
+          'execution.runId': workflow.runId,
+        },
   });
 }
 
